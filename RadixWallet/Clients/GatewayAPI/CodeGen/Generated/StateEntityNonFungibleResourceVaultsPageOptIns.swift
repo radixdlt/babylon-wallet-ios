@@ -17,6 +17,7 @@ extension GatewayAPI {
 
 public struct StateEntityNonFungibleResourceVaultsPageOptIns: Codable, Hashable {
 
+    /** if set to `true`, first page of non fungible ids are returned for each non fungible resource, with cursor which can be later used at `/state/entity/page/non-fungible-vault/ids` endpoint. */
     public private(set) var nonFungibleIncludeNfids: Bool?
 
     public init(nonFungibleIncludeNfids: Bool? = nil) {

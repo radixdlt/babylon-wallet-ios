@@ -362,9 +362,9 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				),
 				warning: L10n.ImportOlympiaAccounts.VerifySeedPhrase.warning,
 				warningOnContinue: .init(
-					title: "Warning", // FIXME: Strings
-					text: "Do not throw away this seed phrase! You will still need it if you need to recover access to your Olympia accounts in the future.", // FIXME: Strings
-					button: "I understand" // FIXME: Strings
+					title: L10n.ImportOlympiaAccounts.VerifySeedPhrase.title,
+					text: L10n.ImportOlympiaAccounts.VerifySeedPhrase.keepSeedPhrasePrompt,
+					button: L10n.ImportOlympiaAccounts.VerifySeedPhrase.keepSeedPhrasePromptConfirmation
 				),
 				isWordCountFixed: true,
 				persistStrategy: nil,

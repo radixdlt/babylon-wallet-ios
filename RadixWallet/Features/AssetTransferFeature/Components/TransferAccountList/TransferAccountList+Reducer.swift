@@ -46,6 +46,14 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		case canSendTransferRequest(Bool)
 	}
 
+	public enum InternalAction: Equatable, Sendable {
+		case updateSignatureStatus(
+			accountID: ReceivingAccount.State.ID,
+			assetID: ResourceAsset.State.ID,
+			signatureRequired: Bool
+		)
+	}
+
 	public struct Destinations: Sendable, Reducer {
 		public typealias State = RelayState<ReceivingAccount.State.ID, MainState>
 		public typealias Action = RelayAction<ReceivingAccount.State.ID, MainAction>
@@ -96,7 +104,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			switch action {
 			case .delegate(.remove):
 				let account = state.receivingAccounts.remove(id: id)
-				account?.assets.compactMap(/ResourceAsset.State.fungibleAsset).forEach {
+				account?.assets.fungibleAssets.forEach {
 					updateTotalSum(&state, resourceId: $0.id)
 				}
 				return .none
@@ -142,24 +150,32 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			return .none
 		}
 	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .updateSignatureStatus(accountID, assetID, signatureRequired):
+			state.receivingAccounts[id: accountID]?.assets[id: assetID]?.additionalSignatureRequired = signatureRequired
+			return .none
+		}
+	}
 }
 
 extension TransferAccountList {
 	private func updateTotalSum(_ state: inout State, resourceId: String) {
 		let totalSum = state.receivingAccounts
 			.flatMap(\.assets)
-			.compactMap(/ResourceAsset.State.fungibleAsset)
+			.fungibleAssets
 			.filter { $0.id == resourceId }
 			.compactMap(\.transferAmount)
 			.reduce(0, +)
 
 		for account in state.receivingAccounts {
-			guard case var .fungibleAsset(asset) = state.receivingAccounts[id: account.id]?.assets[id: resourceId] else {
+			guard case var .fungibleAsset(asset) = state.receivingAccounts[id: account.id]?.assets[id: resourceId]?.kind else {
 				continue
 			}
 
 			asset.totalTransferSum = totalSum
-			state.receivingAccounts[id: account.id]?.assets[id: resourceId] = .fungibleAsset(asset)
+			state.receivingAccounts[id: account.id]?.assets[id: resourceId]?.kind = .fungibleAsset(asset)
 		}
 	}
 
@@ -174,22 +190,22 @@ extension TransferAccountList {
 
 		if let selectedXRD = selectedAssets.fungibleResources.xrdResource {
 			assets.append(
-				ResourceAsset.State.fungibleAsset(.init(resource: selectedXRD, isXRD: true))
+				ResourceAsset.State(kind: .fungibleAsset(.init(resource: selectedXRD, isXRD: true)))
 			)
 		}
 
 		assets += selectedAssets.fungibleResources.nonXrdResources.map {
-			ResourceAsset.State.fungibleAsset(.init(resource: $0, isXRD: false))
+			ResourceAsset.State(kind: .fungibleAsset(.init(resource: $0, isXRD: false)))
 		}
 
 		assets += selectedAssets.nonFungibleResources.flatMap { resource in
 			resource.tokens.map {
-				ResourceAsset.State.nonFungibleAsset(.init(
+				ResourceAsset.State(kind: .nonFungibleAsset(.init(
 					resourceImage: resource.resourceImage,
 					resourceName: resource.resourceName,
 					resourceAddress: resource.resourceAddress,
 					nftToken: $0
-				))
+				)))
 			}
 		}
 
@@ -201,6 +217,9 @@ extension TransferAccountList {
 
 		state.receivingAccounts[id: id]?.assets = existingAssets + newAssets
 
+		if let receivingAccount = state.receivingAccounts[id: id] {
+			return determineAdditionalRequiredSignatures(receivingAccount, forAssets: newAssets)
+		}
 		return .none
 	}
 
@@ -225,7 +244,7 @@ extension TransferAccountList {
 			return .none
 		}
 
-		let fungibleAssets = assets.compactMap(/ResourceAsset.State.fungibleAsset)
+		let fungibleAssets = assets.fungibleAssets
 		let xrdResource = fungibleAssets.first(where: \.isXRD).map(\.resource)
 		let nonXrdResources = fungibleAssets.filter(not(\.isXRD)).map(\.resource)
 		let selectedFungibleResources = OnLedgerEntity.OwnedFungibleResources(
@@ -234,7 +253,7 @@ extension TransferAccountList {
 		)
 
 		let selectedNonFungibleResources = assets
-			.compactMap(/ResourceAsset.State.nonFungibleAsset)
+			.nonFungibleAssets
 			.reduce(into: IdentifiedArrayOf<AssetsView.State.Mode.SelectedAssets.NonFungibleTokensPerResource>()) { partialResult, asset in
 				var resource = partialResult[id: asset.resourceAddress] ?? .init(
 					resourceAddress: asset.resourceAddress,
@@ -249,7 +268,7 @@ extension TransferAccountList {
 		let nftsSelectedForOtherAccounts = state.receivingAccounts
 			.filter { $0.id != id }
 			.flatMap(\.assets)
-			.compactMap(/ResourceAsset.State.nonFungibleAsset)
+			.nonFungibleAssets
 			.map(\.nftToken.id)
 
 		state.destination = .relayed(
@@ -263,6 +282,26 @@ extension TransferAccountList {
 				))
 			))
 		)
+		return .none
+	}
+
+	private func determineAdditionalRequiredSignatures(
+		_ receivingAccount: ReceivingAccount.State,
+		forAssets assets: IdentifiedArrayOf<ResourceAsset.State>
+	) -> Effect<Action> {
+		if case let .left(userOwnedAccount) = receivingAccount.account {
+			return .run { send in
+				for asset in assets {
+					let resourceAddress = asset.resourceAddress
+					let signatureNeeded = await needsSignatureForDepositting(into: userOwnedAccount, resource: resourceAddress)
+					await send(.internal(.updateSignatureStatus(
+						accountID: receivingAccount.id,
+						assetID: asset.id,
+						signatureRequired: signatureNeeded
+					)))
+				}
+			}
+		}
 		return .none
 	}
 }

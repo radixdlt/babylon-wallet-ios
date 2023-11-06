@@ -22,76 +22,73 @@ extension Home {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				NavigationStack {
-					ScrollView {
-						VStack(spacing: .medium1) {
-							Header.View(
-								store: store.scope(
-									state: \.header,
-									action: { .child(.header($0)) }
-								)
+				ScrollView {
+					VStack(spacing: .medium1) {
+						Header.View(
+							store: store.scope(
+								state: \.header,
+								action: { .child(.header($0)) }
 							)
+						)
 
-							AccountList.View(
-								store: store.scope(
-									state: \.accountList,
-									action: { .child(.accountList($0)) }
-								)
+						AccountList.View(
+							store: store.scope(
+								state: \.accountList,
+								action: { .child(.accountList($0)) }
 							)
-							.padding(.horizontal, .medium1)
+						)
+						.padding(.horizontal, .medium1)
 
-							Button(L10n.HomePage.createNewAccount) {
-								viewStore.send(.createAccountButtonTapped)
-							}
-							.buttonStyle(.secondaryRectangular())
+						Button(L10n.HomePage.createNewAccount) {
+							viewStore.send(.createAccountButtonTapped)
 						}
-						.padding(.bottom, .medium1)
+						.buttonStyle(.secondaryRectangular())
 					}
-					.toolbar {
-						ToolbarItem(placement: .navigationBarTrailing) {
-							SettingsButton(shouldShowNotification: viewStore.hasNotification) {
-								viewStore.send(.settingsButtonTapped)
-							}
-						}
-					}
-					.refreshable {
-						await viewStore.send(.pullToRefreshStarted).finish()
-					}
-					.task { @MainActor in
-						await viewStore.send(.task).finish()
-					}
-					.navigationDestination(
-						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-						state: /Home.Destinations.State.accountDetails,
-						action: Home.Destinations.Action.accountDetails,
-						destination: { AccountDetails.View(store: $0) }
-					)
-					.fullScreenCover( /* Full Screen cover to not be able to use iOS dismiss gestures */
-						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-						state: /Home.Destinations.State.exportMnemonic,
-						action: Home.Destinations.Action.exportMnemonic,
-						content: { childStore in
-							NavigationView {
-								ImportMnemonic.View(store: childStore)
-									// FIXME: Strings
-									.navigationTitle("Backup Seed Phrase")
-							}
-						}
-					)
-					.sheet(
-						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-						state: /Home.Destinations.State.importMnemonics,
-						action: Home.Destinations.Action.importMnemonics,
-						content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
-					)
-					.sheet(
-						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-						state: /Home.Destinations.State.createAccount,
-						action: Home.Destinations.Action.createAccount,
-						content: { CreateAccountCoordinator.View(store: $0) }
-					)
+					.padding(.bottom, .medium1)
 				}
-				.navigationTransition(.default, interactivity: .pan)
+				.toolbar {
+					ToolbarItem(placement: .navigationBarTrailing) {
+						SettingsButton(shouldShowNotification: viewStore.hasNotification) {
+							viewStore.send(.settingsButtonTapped)
+						}
+					}
+				}
+				.refreshable {
+					await viewStore.send(.pullToRefreshStarted).finish()
+				}
+				.task { @MainActor in
+					await viewStore.send(.task).finish()
+				}
+				.navigationDestination(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /Home.Destinations.State.accountDetails,
+					action: Home.Destinations.Action.accountDetails,
+					destination: { AccountDetails.View(store: $0) }
+				)
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /Home.Destinations.State.createAccount,
+					action: Home.Destinations.Action.createAccount,
+					content: { CreateAccountCoordinator.View(store: $0) }
+				)
+				.fullScreenCover( /* Full Screen cover to not be able to use iOS dismiss gestures */
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /Home.Destinations.State.exportMnemonic,
+					action: Home.Destinations.Action.exportMnemonic,
+					content: { childStore in
+						NavigationView {
+							ImportMnemonic.View(store: childStore)
+								// FIXME: Strings
+								.navigationTitle("Backup Seed Phrase")
+						}
+					}
+				)
+				.sheet(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /Home.Destinations.State.importMnemonics,
+					action: Home.Destinations.Action.importMnemonics,
+					content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
+				)
 			}
 		}
 

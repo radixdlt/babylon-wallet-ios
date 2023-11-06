@@ -17,16 +17,28 @@ extension GatewayAPI {
 
 public struct TransactionDetailsOptIns: Codable, Hashable {
 
-    public private(set) var rawHex: Bool?
-    public private(set) var receiptStateChanges: Bool?
-    public private(set) var receiptFeeSummary: Bool?
-    public private(set) var receiptFeeSource: Bool?
-    public private(set) var receiptFeeDestination: Bool?
-    public private(set) var receiptCostingParameters: Bool?
-    public private(set) var receiptEvents: Bool?
-    public private(set) var affectedGlobalEntities: Bool?
+    /** if set to `true`, raw transaction hex is returned. */
+    public private(set) var rawHex: Bool? = false
+    /** if set to `true`, state changes inside receipt object are returned. */
+    public private(set) var receiptStateChanges: Bool? = false
+    /** if set to `true`, fee summary inside receipt object is returned. */
+    public private(set) var receiptFeeSummary: Bool? = false
+    /** if set to `true`, fee source inside receipt object is returned. */
+    public private(set) var receiptFeeSource: Bool? = false
+    /** if set to `true`, fee destination inside receipt object is returned. */
+    public private(set) var receiptFeeDestination: Bool? = false
+    /** if set to `true`, costing parameters inside receipt object is returned. */
+    public private(set) var receiptCostingParameters: Bool? = false
+    /** if set to `true`, events inside receipt object is returned. */
+    public private(set) var receiptEvents: Bool? = false
+    /** (true by default) if set to `true`, transaction receipt output is returned. */
+    public private(set) var receiptOutput: Bool? = true
+    /** if set to `true`, all affected global entities by given transaction are returned. */
+    public private(set) var affectedGlobalEntities: Bool? = false
+    /** if set to `true`, returns the fungible and non-fungible balance changes.  **Warning!** This opt-in might be missing for recently committed transactions, in that case a `null` value will be returned. Retry the request until non-null value is returned.  */
+    public private(set) var balanceChanges: Bool? = false
 
-    public init(rawHex: Bool? = nil, receiptStateChanges: Bool? = nil, receiptFeeSummary: Bool? = nil, receiptFeeSource: Bool? = nil, receiptFeeDestination: Bool? = nil, receiptCostingParameters: Bool? = nil, receiptEvents: Bool? = nil, affectedGlobalEntities: Bool? = nil) {
+    public init(rawHex: Bool? = false, receiptStateChanges: Bool? = false, receiptFeeSummary: Bool? = false, receiptFeeSource: Bool? = false, receiptFeeDestination: Bool? = false, receiptCostingParameters: Bool? = false, receiptEvents: Bool? = false, receiptOutput: Bool? = true, affectedGlobalEntities: Bool? = false, balanceChanges: Bool? = false) {
         self.rawHex = rawHex
         self.receiptStateChanges = receiptStateChanges
         self.receiptFeeSummary = receiptFeeSummary
@@ -34,7 +46,9 @@ public struct TransactionDetailsOptIns: Codable, Hashable {
         self.receiptFeeDestination = receiptFeeDestination
         self.receiptCostingParameters = receiptCostingParameters
         self.receiptEvents = receiptEvents
+        self.receiptOutput = receiptOutput
         self.affectedGlobalEntities = affectedGlobalEntities
+        self.balanceChanges = balanceChanges
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -45,7 +59,9 @@ public struct TransactionDetailsOptIns: Codable, Hashable {
         case receiptFeeDestination = "receipt_fee_destination"
         case receiptCostingParameters = "receipt_costing_parameters"
         case receiptEvents = "receipt_events"
+        case receiptOutput = "receipt_output"
         case affectedGlobalEntities = "affected_global_entities"
+        case balanceChanges = "balance_changes"
     }
 
     // Encodable protocol methods
@@ -59,7 +75,9 @@ public struct TransactionDetailsOptIns: Codable, Hashable {
         try container.encodeIfPresent(receiptFeeDestination, forKey: .receiptFeeDestination)
         try container.encodeIfPresent(receiptCostingParameters, forKey: .receiptCostingParameters)
         try container.encodeIfPresent(receiptEvents, forKey: .receiptEvents)
+        try container.encodeIfPresent(receiptOutput, forKey: .receiptOutput)
         try container.encodeIfPresent(affectedGlobalEntities, forKey: .affectedGlobalEntities)
+        try container.encodeIfPresent(balanceChanges, forKey: .balanceChanges)
     }
 }
 

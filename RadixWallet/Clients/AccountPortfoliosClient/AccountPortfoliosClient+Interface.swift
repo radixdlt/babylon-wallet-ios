@@ -30,3 +30,56 @@ extension DependencyValues {
 		set { self[AccountPortfoliosClient.self] = newValue }
 	}
 }
+
+extension AccountPortfoliosClient {
+	/// Update the portfolio after a given transaction was successfull
+	public func updateAfterCommittedTransaction(_ intent: TransactionIntent) {
+		Task.detached {
+			@Dependency(\.transactionClient) var transactionClient
+			@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+			@Dependency(\.cacheClient) var cacheClient
+
+			let changedAccounts: [Profile.Network.Account.EntityAddress]?
+			let resourceAddressesToRefresh: [Address]?
+			do {
+				let manifest = intent.manifest()
+
+				let involvedAccounts = try await transactionClient.myInvolvedEntities(manifest)
+				changedAccounts = involvedAccounts.accountsDepositedInto
+					.union(involvedAccounts.accountsWithdrawnFrom)
+					.map(\.address)
+
+				let involvedAddresses = manifest.extractAddresses()
+				/// Refresh the resources if an operation on resource pool is involved,
+				/// reason being that contributing or withdrawing from a resource pool modifies the totalSupply
+				if involvedAddresses.contains(where: \.key.isResourcePool) {
+					/// A little bit too aggressive, as any other resource will also be refreshed.
+					/// But at this stage we cannot determine(without making additional calls) the pool unit related fungible resource
+					resourceAddressesToRefresh = involvedAddresses
+						.filter { $0.key == .globalFungibleResourceManager || $0.key.isResourcePool }
+						.values
+						.flatMap(identity)
+						.compactMap { try? $0.asSpecific() }
+				} else {
+					resourceAddressesToRefresh = nil
+				}
+			} catch {
+				loggerGlobal.warning("Could get transactionClient.myInvolvedEntities: \(error.localizedDescription)")
+				changedAccounts = nil
+				resourceAddressesToRefresh = nil
+			}
+
+			if let resourceAddressesToRefresh {
+				resourceAddressesToRefresh.forEach {
+					cacheClient.removeFile(.onLedgerEntity(.resource($0.asGeneral)))
+				}
+			}
+
+			if let changedAccounts {
+				// FIXME: Ideally we should only have to call the cacheClient here
+				// cacheClient.clearCacheForAccounts(Set(changedAccounts))
+				_ = try await fetchAccountPortfolios(changedAccounts, true)
+			}
+		}
+	}
+}

@@ -6,25 +6,24 @@ public struct JaggedEdge: View {
 	let color: Color
 	let shadowColor: Color
 	let isTopEdge: Bool
-	let padding: CGFloat
+	let edgeShape: JaggedEdgeShape
 
-	public init(color: Color = .white, shadowColor: Color, isTopEdge: Bool, padding: CGFloat = 0) {
+	public init(color: Color = .white, shadowColor: Color, isTopEdge: Bool) {
 		self.color = color
 		self.shadowColor = shadowColor
 		self.isTopEdge = isTopEdge
-		self.padding = padding
+		self.edgeShape = JaggedEdgeShape(isTopEdge: isTopEdge, toothWidth: toothWidth, toothHeight: toothHeight)
 	}
 
 	public var body: some View {
-		JaggedEdgeShape(
-			isTopEdge: isTopEdge,
-			toothWidth: toothWidth,
-			toothHeight: toothHeight,
-			padding: padding
-		)
-		.fill(.white)
-		.shadow(color: shadowColor, radius: 5)
-		.frame(height: padding + toothHeight)
+		ZStack {
+			edgeShape
+				.frame(height: toothHeight)
+				.frame(maxHeight: .infinity, alignment: isTopEdge ? .bottom : .top)
+				.shadow(color: shadowColor, radius: 5)
+			edgeShape
+				.fill(.white)
+		}
 	}
 }
 
@@ -33,28 +32,39 @@ struct JaggedEdgeShape: Shape {
 	let isTopEdge: Bool
 	let toothWidth: CGFloat
 	let toothHeight: CGFloat
-	let padding: CGFloat
 
 	func path(in rect: CGRect) -> SwiftUI.Path {
 		Path { path in
-			let teeth = round(rect.width / toothWidth)
-			let w = rect.width / teeth
-			let bottom = rect.maxY - (isTopEdge ? 0 : padding)
-			path.move(to: .init(x: 0, y: bottom))
-			for i in 0 ..< Int(teeth) {
-				let baseX = rect.origin.x + CGFloat(i) * w
-				path.addLine(to: .init(x: baseX + 0.5 * w, y: isTopEdge ? padding : 0))
-				path.addLine(to: .init(x: baseX + w, y: bottom))
+			let width = rect[.trailing].x - rect[.leading].x
+			let teeth = round(width / toothWidth)
+			let w = width / teeth
+			path.move(to: rect[.topLeading])
+
+			func addEdge(fromX: CGFloat, dx: CGFloat, y: CGFloat) {
+				for i in 0 ..< Int(teeth) {
+					let baseX = fromX + CGFloat(i) * dx
+					path.addLine(to: .init(x: baseX + 0.5 * dx, y: y))
+					path.addLine(to: .init(x: baseX + dx, y: y - toothHeight))
+				}
 			}
 
 			if isTopEdge {
-				path.addLine(to: .init(x: rect.maxX, y: 0))
-				path.addLine(to: rect.origin)
+				path.addLine(to: rect[.topTrailing])
+				path.addLine(to: .init(x: rect[.trailing].x, y: rect.maxY - toothHeight))
+				addEdge(fromX: rect[.trailing].x, dx: -w, y: rect.maxY)
 			} else {
-				path.addLine(to: .init(x: rect.maxX, y: rect.maxY))
-				path.addLine(to: .init(x: rect.minX, y: rect.maxY))
+				addEdge(fromX: rect[.leading].x, dx: w, y: rect.minY + toothHeight)
+				path.addLine(to: rect[.bottomTrailing])
+				path.addLine(to: rect[.bottomLeading])
 			}
+
 			path.closeSubpath()
 		}
+	}
+}
+
+extension CGRect {
+	subscript(unitPoint: UnitPoint) -> CGPoint {
+		.init(x: minX + unitPoint.x * width, y: minY + unitPoint.y * height)
 	}
 }

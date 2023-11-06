@@ -3,37 +3,14 @@ public enum SubmitTransactionFailure: Sendable, LocalizedError {
 	case failedToSubmit
 }
 
-// MARK: - TransactionPollingFailure
-public enum TransactionPollingFailure: Sendable, LocalizedError, Hashable {
-	case failedToPollTX(txID: TXID, error: FailedToPollError)
-	case failedToGetTransactionStatus(txID: TXID, error: FailedToGetTransactionStatus)
-	case invalidTXWasSubmittedButNotSuccessful(txID: TXID, status: TXFailureStatus)
-	public func hash(into hasher: inout Hasher) {
-		hasher.combine(errorDescription)
-	}
-
-	public var errorDescription: String? {
-		switch self {
-		case let .failedToPollTX(txID, error):
-			"\(error.localizedDescription) txID: \(txID)"
-		case let .failedToGetTransactionStatus(txID, error):
-			"\(error.localizedDescription) txID: \(txID)"
-		case let .invalidTXWasSubmittedButNotSuccessful(txID, status):
-			"Invalid TX submitted but not successful, status: \(status.localizedDescription) txID: \(txID)"
-		}
-	}
-}
-
 // MARK: - SubmitTransactionClient
 public struct SubmitTransactionClient: Sendable {
 	public var submitTransaction: SubmitTransaction
-	public var transactionStatusUpdates: TransactionStatusUpdates
 	public var hasTXBeenCommittedSuccessfully: HasTXBeenCommittedSuccessfully
 }
 
 extension SubmitTransactionClient {
 	public typealias SubmitTransaction = @Sendable (SubmitTXRequest) async throws -> TXID
-	public typealias TransactionStatusUpdates = @Sendable (TXID, PollStrategy) async throws -> AnyAsyncSequence<TransactionStatusUpdate>
 	public typealias HasTXBeenCommittedSuccessfully = @Sendable (TXID) async throws -> Void
 }
 
@@ -50,17 +27,15 @@ public struct SubmitTXRequest: Sendable, Hashable {
 // MARK: - TransactionStatusUpdate
 public struct TransactionStatusUpdate: Sendable, Hashable {
 	public let txID: TXID
-	public let result: Result<GatewayAPI.TransactionStatus, TransactionPollingFailure>
+	public let result: Loadable<EqVoid>
 }
 
 // MARK: - PollStrategy
 public struct PollStrategy: Sendable, Hashable {
-	public let maxPollTries: Int
 	public let sleepDuration: TimeInterval
-	public init(maxPollTries: Int, sleepDuration: TimeInterval) {
-		self.maxPollTries = maxPollTries
+	public init(sleepDuration: TimeInterval) {
 		self.sleepDuration = sleepDuration
 	}
 
-	public static let `default` = Self(maxPollTries: 20, sleepDuration: 2)
+	public static let `default` = Self(sleepDuration: 2)
 }

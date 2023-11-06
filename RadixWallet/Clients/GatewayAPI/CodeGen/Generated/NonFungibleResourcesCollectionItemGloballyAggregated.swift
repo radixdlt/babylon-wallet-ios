@@ -21,9 +21,9 @@ public struct NonFungibleResourcesCollectionItemGloballyAggregated: Codable, Has
     /** Bech32m-encoded human readable version of the address. */
     public private(set) var resourceAddress: String
     public private(set) var explicitMetadata: EntityMetadataCollection?
-    /** TBA */
+    /** The total amount of non-fungible IDs across all vaults. */
     public private(set) var amount: Int64
-    /** TBD */
+    /** The most recent state version underlying object was modified at. */
     public private(set) var lastUpdatedAtStateVersion: Int64
 
     public init(aggregationLevel: ResourceAggregationLevel, resourceAddress: String, explicitMetadata: EntityMetadataCollection? = nil, amount: Int64, lastUpdatedAtStateVersion: Int64) {

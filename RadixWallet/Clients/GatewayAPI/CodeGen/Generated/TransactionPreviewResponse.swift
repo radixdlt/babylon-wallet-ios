@@ -19,6 +19,7 @@ public struct TransactionPreviewResponse: Codable, Hashable {
 
     /** Hex-encoded binary blob. */
     public private(set) var encodedReceipt: String
+    /** This type is defined in the Core API as `TransactionReceipt`. See the Core API documentation for more details.  */
     public private(set) var receipt: TransactionReceipt
     public private(set) var resourceChanges: [AnyCodable]
     public private(set) var logs: [TransactionPreviewResponseLogsInner]

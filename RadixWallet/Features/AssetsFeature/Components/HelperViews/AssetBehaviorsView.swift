@@ -14,12 +14,18 @@ struct AssetBehaviorsView: View {
 					.foregroundColor(.app.gray2)
 
 				VStack(alignment: .leading, spacing: .small1) {
-					ForEach(behaviors, id: \.self) { behavior in
+					ForEach(filteredBehaviors, id: \.self) { behavior in
 						AssetBehaviorRow(behavior: behavior, isXRD: isXRD)
 					}
 				}
 			}
 			.transition(.opacity.combined(with: .scale(scale: 0.8)))
+		}
+	}
+
+	private var filteredBehaviors: [AssetBehavior] {
+		behaviors.filter {
+			!(isXRD && $0 == .informationChangeable)
 		}
 	}
 }
@@ -45,45 +51,45 @@ extension AssetBehavior {
 	public func text(isXRD: Bool) -> String {
 		switch self {
 		case .simpleAsset:
-			L10n.AccountSettings.Behaviors.simpleAsset
+			L10n.AssetDetails.Behaviors.simpleAsset
 		case .supplyIncreasable:
-			L10n.AccountSettings.Behaviors.supplyIncreasable
+			L10n.AssetDetails.Behaviors.supplyIncreasable
 		case .supplyDecreasable:
-			L10n.AccountSettings.Behaviors.supplyDecreasable
+			L10n.AssetDetails.Behaviors.supplyDecreasable
 		case .supplyIncreasableByAnyone:
-			L10n.AccountSettings.Behaviors.supplyIncreasableByAnyone
+			L10n.AssetDetails.Behaviors.supplyIncreasableByAnyone
 		case .supplyDecreasableByAnyone:
-			L10n.AccountSettings.Behaviors.supplyDecreasableByAnyone
+			L10n.AssetDetails.Behaviors.supplyDecreasableByAnyone
 		case .supplyFlexible:
 			if isXRD {
-				L10n.AccountSettings.Behaviors.supplyFlexibleXrd
+				L10n.AssetDetails.Behaviors.supplyFlexibleXrd
 			} else {
-				L10n.AccountSettings.Behaviors.supplyFlexible
+				L10n.AssetDetails.Behaviors.supplyFlexible
 			}
 		case .supplyFlexibleByAnyone:
-			L10n.AccountSettings.Behaviors.supplyFlexibleByAnyone
+			L10n.AssetDetails.Behaviors.supplyFlexibleByAnyone
 		case .movementRestricted:
-			L10n.AccountSettings.Behaviors.movementRestricted
+			L10n.AssetDetails.Behaviors.movementRestricted
 		case .movementRestrictableInFuture:
-			L10n.AccountSettings.Behaviors.movementRestrictableInFuture
+			L10n.AssetDetails.Behaviors.movementRestrictableInFuture
 		case .movementRestrictableInFutureByAnyone:
-			L10n.AccountSettings.Behaviors.movementRestrictableInFutureByAnyone
+			L10n.AssetDetails.Behaviors.movementRestrictableInFutureByAnyone
 		case .removableByThirdParty:
-			L10n.AccountSettings.Behaviors.removableByThirdParty
+			L10n.AssetDetails.Behaviors.removableByThirdParty
 		case .removableByAnyone:
-			L10n.AccountSettings.Behaviors.removableByAnyone
+			L10n.AssetDetails.Behaviors.removableByAnyone
 		case .freezableByThirdParty:
-			"A third party can freeze this asset in place." // FIXME: Strings ... .freezableByThirdParty
+			L10n.AssetDetails.Behaviors.freezableByThirdParty
 		case .freezableByAnyone:
-			"Anyone can freeze this asset in place." // FIXME: Strings ... .freezableByAnyone
+			L10n.AssetDetails.Behaviors.freezableByAnyone
 		case .nftDataChangeable:
-			L10n.AccountSettings.Behaviors.nftDataChangeable
+			L10n.AssetDetails.Behaviors.nftDataChangeable
 		case .nftDataChangeableByAnyone:
-			L10n.AccountSettings.Behaviors.nftDataChangeableByAnyone
+			L10n.AssetDetails.Behaviors.nftDataChangeableByAnyone
 		case .informationChangeable:
-			L10n.AccountSettings.Behaviors.informationChangeable
+			L10n.AssetDetails.Behaviors.informationChangeable
 		case .informationChangeableByAnyone:
-			L10n.AccountSettings.Behaviors.informationChangeableByAnyone
+			L10n.AssetDetails.Behaviors.informationChangeableByAnyone
 		}
 	}
 

@@ -9,17 +9,16 @@ extension BaseFactorSourceProtocol {
 extension FactorSourceKind {
 	var display: String {
 		switch self {
-		// FIXME: Strings
 		case .device:
-			"Phone"
+			L10n.FactorSources.Kind.device
 		case .ledgerHQHardwareWallet:
-			"Ledger"
+			L10n.FactorSources.Kind.ledgerHQHardwareWallet
 		case .offDeviceMnemonic:
-			"Seed phrase"
+			L10n.FactorSources.Kind.offDeviceMnemonic
 		case .trustedContact:
-			"Third-party"
+			L10n.FactorSources.Kind.trustedContact
 		case .securityQuestions:
-			"Security Questions"
+			L10n.FactorSources.Kind.securityQuestions
 		}
 	}
 }

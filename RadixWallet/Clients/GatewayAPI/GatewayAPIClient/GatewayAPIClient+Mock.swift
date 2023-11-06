@@ -43,6 +43,8 @@ extension GatewayAPIClient: TestDependencyKey {
 				.init(
 					ledgerState: .previewValue,
 					status: .committedSuccess,
+					intentStatus: .committedSuccess,
+					intentStatusDescription: "",
 					knownPayloads: [.init(payloadHash: "payload-hash-hex", status: .committedSuccess)],
 					errorMessage: nil
 				)

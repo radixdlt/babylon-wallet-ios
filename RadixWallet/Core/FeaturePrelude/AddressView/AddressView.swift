@@ -74,7 +74,7 @@ extension AddressView {
 
 						if isLedgerHWAccount {
 							Button(
-								"Verify Address with Ledger", // FIXME: Strings
+								L10n.AddressAction.verifyAddressLedger,
 								asset: AssetResource.ledger
 							) {
 								verifyAddressOnLedger(accountAddress)

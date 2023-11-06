@@ -14,9 +14,9 @@ extension AddAsset.State {
 				case .valid:
 					return .none
 				case .wrongNetwork:
-					return .error("Address is not valid on current network") // FIXME: Strings
+					return .error(L10n.AssetTransfer.Error.wrongNetwork)
 				case .alreadyAdded:
-					return .error("Resource already added") // FIXME: Strings
+					return .error(L10n.AssetTransfer.Error.resourceAlreadyAdded)
 				case .invalid:
 					return .error(L10n.AssetTransfer.ChooseReceivingAccount.invalidAddressError)
 				}

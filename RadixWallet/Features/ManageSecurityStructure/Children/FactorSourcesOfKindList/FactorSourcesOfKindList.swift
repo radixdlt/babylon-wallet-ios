@@ -239,20 +239,20 @@ extension ConfirmationDialogState<DeleteExistingFactorSourceConfirmationDialogAc
 		of factorSource: some BaseFactorSourceProtocol
 	) -> ConfirmationDialogState {
 		.init(
-			// FIXME: strings
+			// FIXME: future strings
 			title: { TextState("Can only have one") },
 			actions: {
 				ButtonState(role: .destructive, action: .deleteExistingFactorSource(factorSource.id.embed())) {
-					// FIXME: strings
+					// FIXME: future strings
 					TextState("Replace existing with new")
 				}
 				ButtonState(role: .cancel, action: .cancel) {
-					// FIXME: strings
+					// FIXME: future strings
 					TextState("Keep existing")
 				}
 			},
 			message: {
-				// FIXME: strings
+				// FIXME: future strings
 				TextState("You can only have one \(factorSource.kind.rawValue), the new you create will replace the old one.")
 			}
 		)

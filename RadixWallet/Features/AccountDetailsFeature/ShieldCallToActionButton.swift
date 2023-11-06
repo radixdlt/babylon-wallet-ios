@@ -29,14 +29,14 @@ extension View {
 
 	public func importMnemonicPromptView(action: @escaping () -> Void) -> some View {
 		shieldPromptView(
-			text: "Enter this Account's seed phrase", // FIXME: Strings
+			text: L10n.ImportMnemonic.ShieldPrompt.enterSeedPhrase,
 			action: action
 		)
 	}
 
 	public func backupMnemonicPromptView(action: @escaping () -> Void) -> some View {
 		shieldPromptView(
-			text: "Back up this Account's seed phrase", // FIXME: Strings
+			text: L10n.ImportMnemonic.ShieldPrompt.backupSeedPhrase,
 			action: action
 		)
 	}

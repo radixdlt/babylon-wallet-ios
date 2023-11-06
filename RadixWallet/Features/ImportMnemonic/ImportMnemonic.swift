@@ -289,8 +289,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			case onContinueWarning(OnContinueWarning)
 
 			public enum MarkMnemonicAsBackedUpOrNot: Sendable, Hashable {
-				case userHaveBackedUp(FactorSourceID.FromHash)
-				case userHaveNotBackedUp
+				case userHasBackedUp(FactorSourceID.FromHash)
+				case userHasNotBackedUp
 			}
 
 			public enum OnContinueWarning: Sendable, Hashable {
@@ -313,9 +313,9 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.userDefaultsClient) var userDefaultsClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	#if DEBUG
-	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.pasteboardClient) var pasteboardClient
 	#endif
 
@@ -396,7 +396,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				)))
 			}
 
-		case let .destination(.presented(.markMnemonicAsBackedUp(.userHaveBackedUp(factorSourceID)))):
+		case let .destination(.presented(.markMnemonicAsBackedUp(.userHasBackedUp(factorSourceID)))):
 			return .run { send in
 				try userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
 				await send(.delegate(.doneViewing(idOfBackedUpFactorSource: factorSourceID)))
@@ -405,7 +405,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 			}
 
-		case .destination(.presented(.markMnemonicAsBackedUp(.userHaveNotBackedUp))):
+		case .destination(.presented(.markMnemonicAsBackedUp(.userHasNotBackedUp))):
 			loggerGlobal.notice("User have not backed up")
 			return .send(.delegate(.doneViewing(idOfBackedUpFactorSource: nil)))
 
@@ -574,6 +574,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		case let .saveFactorSourceResult(.success(factorSource)):
 			state.mode.update(isProgressing: false)
+			overlayWindowClient.scheduleHUD(.seedPhraseImported)
+
 			return .send(.delegate(.persistedNewFactorSourceInProfile(factorSource)))
 		}
 	}
@@ -673,12 +675,12 @@ extension ImportMnemonic {
 extension ImportMnemonic.Destinations.State {
 	fileprivate static func askUserIfSheHasBackedUpMnemonic(_ factorSourceID: FactorSourceID.FromHash) -> Self {
 		.markMnemonicAsBackedUp(.init(
-			title: { TextState("Confirm Backup") }, // FIXME: Strings
+			title: { TextState(L10n.ImportMnemonic.BackedUpAlert.title) },
 			actions: {
-				ButtonState(action: .userHaveBackedUp(factorSourceID), label: { TextState("Yes, I have backed it up") }) // FIXME: Strings
-				ButtonState(action: .userHaveNotBackedUp, label: { TextState("No, not yet") }) // FIXME: Strings
+				ButtonState(action: .userHasBackedUp(factorSourceID), label: { TextState(L10n.ImportMnemonic.BackedUpAlert.confirmAction) })
+				ButtonState(action: .userHasNotBackedUp, label: { TextState(L10n.ImportMnemonic.BackedUpAlert.noAction) })
 			},
-			message: { TextState("Are you sure you have securely written down this seed phrase? You will need it to recover access if you lose your phone.") } // FIXME: Strings
+			message: { TextState(L10n.ImportMnemonic.BackedUpAlert.message) }
 		))
 	}
 
@@ -693,4 +695,8 @@ extension ImportMnemonic.Destinations.State {
 			message: { TextState(warning.text) }
 		))
 	}
+}
+
+extension OverlayWindowClient.Item.HUD {
+	fileprivate static let seedPhraseImported = Self(text: L10n.ImportMnemonic.seedPhraseImported)
 }

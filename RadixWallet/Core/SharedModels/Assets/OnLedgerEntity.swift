@@ -180,12 +180,13 @@ extension OnLedgerEntity {
 
 extension OnLedgerEntity {
 	public struct NonFungibleToken: Sendable, Hashable, Identifiable, Codable {
+		public typealias NFTData = GatewayAPI.ProgrammaticScryptoSborValueTuple
 		public let id: NonFungibleGlobalId
-		public let data: [NFTData]
+		public let data: NFTData?
 
 		public init(
 			id: NonFungibleGlobalId,
-			data: [NFTData]
+			data: NFTData?
 		) {
 			self.id = id
 			self.data = data
@@ -403,87 +404,71 @@ extension OnLedgerEntity.Account {
 }
 
 // MARK: - OnLedgerEntity.NonFungibleToken.NFTData
-extension OnLedgerEntity.NonFungibleToken {
-	public struct NFTData: Sendable, Hashable, Codable {
-		public enum Field: String, Sendable, Hashable, Codable {
-			case name
-			case description
-			case keyImageURL = "key_image_url"
-			case claimEpoch = "claim_epoch"
-			case claimAmount = "claim_amount"
-		}
-
-		public enum Value: Sendable, Hashable, Codable {
-			case string(String)
-			case url(URL)
-			case decimal(RETDecimal)
-			case u64(UInt64)
-
-			var string: String? {
-				guard case let .string(str) = self else {
-					return nil
-				}
-				return str
-			}
-
-			var url: URL? {
-				guard case let .url(url) = self else {
-					return nil
-				}
-				return url
-			}
-
-			var u64: UInt64? {
-				guard case let .u64(u64) = self else {
-					return nil
-				}
-				return u64
-			}
-
-			var decimal: RETDecimal? {
-				guard case let .decimal(decimal) = self else {
-					return nil
-				}
-				return decimal
-			}
-		}
-
-		public let field: Field
-		public let value: Value
-
-		public init(field: Field, value: Value) {
-			self.field = field
-			self.value = value
-		}
+extension OnLedgerEntity.NonFungibleToken.NFTData {
+	public enum Field: String, Sendable, Hashable, Codable {
+		case name
+		case description
+		case keyImageURL = "key_image_url"
+		case claimEpoch = "claim_epoch"
+		case claimAmount = "claim_amount"
 	}
-}
 
-extension [OnLedgerEntity.NonFungibleToken.NFTData] {
-	public subscript(field: OnLedgerEntity.NonFungibleToken.NFTData.Field) -> OnLedgerEntity.NonFungibleToken.NFTData.Value? {
-		first { $0.field == field }?.value
+	public func getString(forField field: Field) -> String? {
+		self.fields.compactMap(/GatewayAPI.ProgrammaticScryptoSborValue.string).first {
+			$0.fieldName == field.rawValue
+		}?.value
+	}
+
+	public func getU64Value(forField field: Field) -> UInt64? {
+		self.fields
+			.compactMap(/GatewayAPI.ProgrammaticScryptoSborValue.u64)
+			.first { $0.fieldName == field.rawValue }
+			.flatMap { UInt64($0.value) }
+	}
+
+	public func getDecimalValue(forField field: Field) -> RETDecimal? {
+		self.fields
+			.compactMap(/GatewayAPI.ProgrammaticScryptoSborValue.decimal)
+			.first { $0.fieldName == field.rawValue }
+			.flatMap { try? RETDecimal(value: $0.value) }
 	}
 
 	public var name: String? {
-		self[.name]?.string
-	}
-
-	public var keyImageURL: URL? {
-		if let string = self[.keyImageURL]?.string {
-			URL(string: string)
-		} else {
-			self[.keyImageURL]?.url
-		}
+		getString(forField: .name)
 	}
 
 	public var tokenDescription: String? {
-		self[.description]?.string
+		getString(forField: .description)
 	}
 
-	public var claimEpoch: UInt64? {
-		self[.claimEpoch]?.u64
+	public var keyImageURL: URL? {
+		getString(forField: .keyImageURL).flatMap(URL.init(string:))
 	}
 
 	public var claimAmount: RETDecimal? {
-		self[.claimAmount]?.decimal
+		getDecimalValue(forField: .claimAmount)
+	}
+
+	public var claimEpoch: UInt64? {
+		getU64Value(forField: .claimEpoch)
+	}
+}
+
+extension OnLedgerEntity.Account {
+	public var allFungibleResourceAddresses: [ResourceAddress] {
+		fungibleResources.xrdResource.asArray(\.resourceAddress) + fungibleResources.nonXrdResources.map(\.resourceAddress)
+	}
+
+	public var allResourceAddresses: Set<ResourceAddress> {
+		Set(
+			allFungibleResourceAddresses
+				+ nonFungibleResources.map(\.resourceAddress)
+				+ poolUnitResources.fungibleResourceAddresses
+				+ poolUnitResources.nonFungibleResourceAddresses
+		)
+	}
+
+	public func hasResource(_ resourceAddress: ResourceAddress) -> Bool {
+		allResourceAddresses.contains(resourceAddress)
 	}
 }

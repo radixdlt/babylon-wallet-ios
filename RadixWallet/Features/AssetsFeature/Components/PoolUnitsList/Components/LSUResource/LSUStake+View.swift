@@ -174,7 +174,7 @@ extension LSUStake.State {
 					.init(rawValue:
 						stakeClaim.tokens.map { token in
 							let status: LSUStake.ViewState.StakeClaimNFTStatus = {
-								guard let claimEpoch = token.data.claimEpoch else {
+								guard let claimEpoch = token.data?.claimEpoch else {
 									return .unstaking
 								}
 
@@ -184,7 +184,7 @@ extension LSUStake.State {
 								id: token.id,
 								thumbnail: .xrd,
 								status: status,
-								tokenAmount: (token.data.claimAmount ?? 0).formatted(),
+								tokenAmount: (token.data?.claimAmount ?? 0).formatted(),
 								isSelected: self.selectedStakeClaimAssets?.contains(token)
 							)
 						}.asIdentifiable()

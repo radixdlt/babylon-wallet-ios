@@ -28,7 +28,7 @@ extension AdvancedManageSecurityStructureFlow {
 		let confirmationRole: SecurityStructureConfigurationDetailed.Configuration.Confirmation?
 
 		var numberOfDaysUntilAutoConfirmationHint: Hint? {
-			// FIXME: strings
+			// FIXME: future strings
 			guard let _ = numberOfDaysUntilAutoConfirmation else {
 				return .error(numberOfDaysUntilAutoConfirmationErrorNotInt)
 			}
@@ -118,7 +118,7 @@ extension AdvancedManageSecurityStructureFlow {
 					}
 					.padding()
 				}
-				.navigationTitle("Advanced Multifactor")
+				.navigationTitle("Advanced Multifactor") // FIXME: future strings
 				.footer {
 					WithControlRequirements(
 						viewStore.config,
@@ -126,7 +126,7 @@ extension AdvancedManageSecurityStructureFlow {
 							viewStore.send(.finished(config))
 						},
 						control: { action in
-							// FIXME: Strings
+							// FIXME: future strings
 							let title = viewStore.mode.isExisting ? "Update setup" : "Create new setup"
 							Button(title, action: action)
 								.buttonStyle(.primaryRectangular)

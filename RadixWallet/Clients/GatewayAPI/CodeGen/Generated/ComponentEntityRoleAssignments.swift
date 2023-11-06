@@ -17,6 +17,7 @@ extension GatewayAPI {
 
 public struct ComponentEntityRoleAssignments: Codable, Hashable {
 
+    /** This type is defined in the Core API as `OwnerRole`. See the Core API documentation for more details.  */
     public private(set) var owner: AnyCodable
     public private(set) var entries: [ComponentEntityRoleAssignmentEntry]
 

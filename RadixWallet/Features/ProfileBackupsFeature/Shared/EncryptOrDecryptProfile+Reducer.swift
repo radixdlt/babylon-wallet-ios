@@ -226,14 +226,19 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 }
 
 extension EncryptOrDecryptProfile.Destination.State {
-	// FIXME: Strings
 	fileprivate static func incorrectPasswordAlert(encrypt: Bool) -> Self {
 		.incorrectPasswordAlert(.init(
-			title: { TextState("Incorrect password") },
+			title: { TextState(L10n.ProfileBackup.IncorrectPasswordAlert.title) },
 			actions: {
-				ButtonState(action: .okTapped, label: { TextState("OK") })
+				ButtonState(action: .okTapped, label: { TextState(L10n.ProfileBackup.IncorrectPasswordAlert.okAction) })
 			},
-			message: { TextState("Failed to \(encrypt ? "encrypt" : "decrypt") using provided password.") }
+			message: {
+				TextState(
+					encrypt
+						? L10n.ProfileBackup.IncorrectPasswordAlert.messageEncryption
+						: L10n.ProfileBackup.IncorrectPasswordAlert.messageDecryption
+				)
+			}
 		))
 	}
 }

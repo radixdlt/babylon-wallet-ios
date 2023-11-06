@@ -83,12 +83,6 @@ extension OverlayWindowClient {
 				}
 			}
 
-			public static let copied = Self(text: L10n.AddressAction.copiedToClipboard)
-
-			public static let updated = Self(text: L10n.AccountSettings.updatedAccountHUDMessage)
-
-			public static let seedPhraseImported = Self(text: L10n.ImportMnemonic.seedPhraseImported)
-
 			// FIXME: Strings
 			public static let accountHidden = Self(text: "Account hidden")
 
@@ -109,16 +103,6 @@ extension OverlayWindowClient {
 
 		case hud(HUD)
 		case alert(AlertState)
-	}
-}
-
-extension OverlayWindowClient.Item.AlertState {
-	public static var missingMnemonicAlert: Self {
-		// FIXME: Strings
-		.init(
-			title: { TextState("Could Not Complete") },
-			message: { TextState("The required seed phrase is missing. Please return to the account and begin the recovery process.") }
-		)
 	}
 }
 

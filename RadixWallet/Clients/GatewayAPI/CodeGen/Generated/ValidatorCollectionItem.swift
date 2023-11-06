@@ -23,6 +23,7 @@ public struct ValidatorCollectionItem: Codable, Hashable {
     public private(set) var pendingXrdWithdrawVault: ValidatorVaultItem
     public private(set) var lockedOwnerStakeUnitVault: ValidatorVaultItem
     public private(set) var pendingOwnerStakeUnitUnlockVault: ValidatorVaultItem
+    /** Validator inner state representation. This type is defined in the Core API as `ValidatorFieldStateValue`. See the Core API documentation for more details.  */
     public private(set) var state: AnyCodable?
     public private(set) var activeInEpoch: ValidatorCollectionItemActiveInEpoch?
     public private(set) var metadata: EntityMetadataCollection

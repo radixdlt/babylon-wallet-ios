@@ -163,7 +163,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 
 			} catch {
 				/// Polling failure will be displayed in SubmiTransactionView
-				if case is TransactionPollingFailure = error {
+				if case is TXFailureStatus = error {
 					return
 				}
 				errorQueue.schedule(error)

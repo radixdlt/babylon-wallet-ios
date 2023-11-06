@@ -26,21 +26,17 @@ public struct StreamTransactionsRequestEventFilterItem: Codable, Hashable {
     public private(set) var emitterAddress: String?
     /** Bech32m-encoded human readable version of the address. */
     public private(set) var resourceAddress: String?
-    /** String-encoded decimal representing the amount of a related fungible resource. */
-    public private(set) var quantity: String?
 
-    public init(event: Event, emitterAddress: String? = nil, resourceAddress: String? = nil, quantity: String? = nil) {
+    public init(event: Event, emitterAddress: String? = nil, resourceAddress: String? = nil) {
         self.event = event
         self.emitterAddress = emitterAddress
         self.resourceAddress = resourceAddress
-        self.quantity = quantity
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case event
         case emitterAddress = "emitter_address"
         case resourceAddress = "resource_address"
-        case quantity
     }
 
     // Encodable protocol methods
@@ -50,7 +46,6 @@ public struct StreamTransactionsRequestEventFilterItem: Codable, Hashable {
         try container.encode(event, forKey: .event)
         try container.encodeIfPresent(emitterAddress, forKey: .emitterAddress)
         try container.encodeIfPresent(resourceAddress, forKey: .resourceAddress)
-        try container.encodeIfPresent(quantity, forKey: .quantity)
     }
 }
 
