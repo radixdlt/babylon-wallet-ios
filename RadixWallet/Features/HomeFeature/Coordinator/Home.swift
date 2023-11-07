@@ -69,7 +69,7 @@ public struct Home: Sendable, FeatureReducer {
 
 		public var body: some ReducerOf<Self> {
 			Scope(state: /State.accountDetails, action: /Action.accountDetails) {
-				AccountDetails()._printChanges()
+				AccountDetails()
 			}
 			Scope(state: /State.createAccount, action: /Action.createAccount) {
 				CreateAccountCoordinator()
