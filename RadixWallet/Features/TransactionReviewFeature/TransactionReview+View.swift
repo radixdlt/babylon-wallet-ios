@@ -90,7 +90,7 @@ extension TransactionReview {
 							}
 						}
 					}
-					.destinations(with: store)
+					.destinations(with: store.destination)
 					.onAppear {
 						viewStore.send(.appeared)
 					}
@@ -270,15 +270,14 @@ extension StoreOf<TransactionReview> {
 
 extension View {
 	@MainActor
-	fileprivate func destinations(with store: StoreOf<TransactionReview>) -> some View {
-		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
-		return customizeGuarantees(with: destinationStore)
-			.dApp(with: destinationStore)
-			.fungibleTokenDetails(with: destinationStore)
-			.nonFungibleTokenDetails(with: destinationStore)
-			.customizeFees(with: destinationStore)
-			.signing(with: destinationStore)
-			.submitting(with: destinationStore)
+	fileprivate func destinations(with store: PresentationStoreOf<TransactionReview.Destination>) -> some View {
+		customizeGuarantees(with: store)
+			.dApp(with: store)
+			.fungibleTokenDetails(with: store)
+			.nonFungibleTokenDetails(with: store)
+			.customizeFees(with: store)
+			.signing(with: store)
+			.submitting(with: store)
 	}
 
 	@MainActor
