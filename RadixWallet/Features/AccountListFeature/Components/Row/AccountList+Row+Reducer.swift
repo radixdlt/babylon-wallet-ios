@@ -125,10 +125,21 @@ extension AccountList {
 	}
 }
 
-extension AccountList.Row {
-	fileprivate func accountSecurityCheck(
+extension FeatureReducer {
+	func accountSecurityCheck(
 		account: Profile.Network.Account,
 		portfolio: OnLedgerEntity.Account?
+	) -> DeviceFactorSourceControlled? {
+		if let portfolio, account.address != portfolio.address {
+			assertionFailure("Discrepancy, wrong owner")
+		}
+
+		return accountSecurityCheck(account: account, xrdResource: portfolio?.fungibleResources.xrdResource)
+	}
+
+	func accountSecurityCheck(
+		account: Profile.Network.Account,
+		xrdResource: OnLedgerEntity.OwnedFungibleResource?
 	) -> DeviceFactorSourceControlled? {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
@@ -151,19 +162,11 @@ extension AccountList.Row {
 			)
 		}
 
-		guard let portfolio else {
-			return nil
-		}
-		guard account.address == portfolio.address else {
-			assertionFailure("Discrepancy, wrong owner")
+		guard let xrdResource else {
 			return nil
 		}
 
-		let hasValue: Bool = if let xrdResource = portfolio.fungibleResources.xrdResource {
-			xrdResource.amount > 0
-		} else {
-			false
-		}
+		let hasValue = xrdResource.amount > 0
 
 		let hasAlreadyBackedUpMnemonic = userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().contains(factorSourceID)
 

@@ -54,7 +54,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case markBackupNeeded
 		case accountUpdated(Profile.Network.Account)
 	}
 
@@ -139,7 +138,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .assets(.delegate(.resourcesUpdated)):
-			return checkIfShouldShowExportMnemonicPrompt(state: &state)
+//			return checkIfShouldShowExportMnemonicPrompt(state: &state)
+			return .send(.delegate(.))
 
 		case .destination(.presented(.preferences(.delegate(.accountHidden)))):
 			return .send(.delegate(.dismiss))
@@ -151,50 +151,46 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case .markBackupNeeded:
-			state.isShowingExportMnemonicPrompt = true
-			return .none
-
 		case let .accountUpdated(account):
 			state.account = account
 			return .none
 		}
 	}
 
-	private func checkIfShouldShowExportMnemonicPrompt(state: inout State) -> Effect<Action> {
-		guard !state.isShowingImportMnemonicPrompt else {
-			return .none
-		}
-
-		@Dependency(\.userDefaultsClient) var userDefaultsClient
-
-		let mightNeedToBeBackedUp: Bool = {
-			guard let deviceFactorSourceID = state.account.deviceFactorSourceID else {
-				// Ledger account, mnemonics do not apply...
-				return false
-			}
-			// check if already backed up
-			let isAlreadyBackedUp = userDefaultsClient
-				.getFactorSourceIDOfBackedUpMnemonics()
-				.contains(deviceFactorSourceID)
-
-			return !isAlreadyBackedUp
-		}()
-
-		guard mightNeedToBeBackedUp else {
-			return .none
-		}
-
-		guard let xrdOwned = state.assets.fungibleTokenList?.sections[id: .xrd]?.rows.first else {
-			return .none
-		}
-
-		assert(xrdOwned.isXRD)
-
-		guard xrdOwned.token.amount > .zero else {
-			return .none
-		}
-
-		return .send(.internal(.markBackupNeeded))
-	}
+//	private func checkIfShouldShowExportMnemonicPrompt(state: inout State) -> Effect<Action> {
+//		guard !state.isShowingImportMnemonicPrompt else {
+//			return .none
+//		}
+//
+//		@Dependency(\.userDefaultsClient) var userDefaultsClient
+//
+//		let mightNeedToBeBackedUp: Bool = {
+//			guard let deviceFactorSourceID = state.account.deviceFactorSourceID else {
+//				// Ledger account, mnemonics do not apply...
+//				return false
+//			}
+//			// check if already backed up
+//			let isAlreadyBackedUp = userDefaultsClient
+//				.getFactorSourceIDOfBackedUpMnemonics()
+//				.contains(deviceFactorSourceID)
+//
+//			return !isAlreadyBackedUp
+//		}()
+//
+//		guard mightNeedToBeBackedUp else {
+//			return .none
+//		}
+//
+//		guard let xrdOwned = state.assets.fungibleTokenList?.sections[id: .xrd]?.rows.first else {
+//			return .none
+//		}
+//
+//		assert(xrdOwned.isXRD)
+//
+//		guard xrdOwned.token.amount > .zero else {
+//			return .none
+//		}
+//
+//		return .send(.internal(.markBackupNeeded))
+//	}
 }
