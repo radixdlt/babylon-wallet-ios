@@ -23,36 +23,7 @@ extension GatewaySettings {
 						.padding(.bottom, .medium1)
 						.navigationTitle(L10n.Gateways.title)
 						.task { @MainActor in await store.send(.view(.task)).finish() }
-						.alert(
-							store: store.scope(
-								state: \.$removeGatewayAlert,
-								action: { .view(.removeGateway($0)) }
-							)
-						)
-						.sheet(
-							store: store.destination,
-							state: /Destination.State.addNewGateway,
-							action: Destination.Action.addNewGateway,
-							content: { addGatewayStore in
-								WithNavigationBar {
-									addGatewayStore.send(.view(.closeButtonTapped))
-								} content: {
-									AddNewGateway.View(store: addGatewayStore)
-								}
-							}
-						)
-						.sheet(
-							store: store.destination,
-							state: /Destination.State.createAccount,
-							action: Destination.Action.createAccount,
-							content: { CreateAccountCoordinator.View(store: $0) }
-						)
-						.sheet(
-							store: store.destination,
-							state: /Destination.State.slideUpPanel,
-							action: Destination.Action.slideUpPanel,
-							content: { SlideUpPanel.View(store: $0) }
-						)
+						.destinations(with: store)
 				}
 			}
 		}
@@ -106,6 +77,58 @@ extension GatewaySettings {
 private extension StoreOf<GatewaySettings> {
 	var destination: PresentationStoreOf<GatewaySettings.Destination> {
 		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<GatewaySettings>) -> some View {
+		let destinationStore = store.destination
+		return removeGateway(with: destinationStore)
+			.addNewGateway(with: destinationStore)
+			.createAccount(with: destinationStore)
+			.slideUpPanel(with: destinationStore)
+	}
+
+	private func removeGateway(with destinationStore: PresentationStoreOf<GatewaySettings.Destination>) -> some View {
+		alert(
+			store: destinationStore,
+			state: /GatewaySettings.Destination.State.removeGateway,
+			action: GatewaySettings.Destination.Action.removeGateway
+		)
+	}
+
+	private func addNewGateway(with destinationStore: PresentationStoreOf<GatewaySettings.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /GatewaySettings.Destination.State.addNewGateway,
+			action: GatewaySettings.Destination.Action.addNewGateway,
+			content: { store in
+				WithNavigationBar {
+					store.send(.view(.closeButtonTapped))
+				} content: {
+					AddNewGateway.View(store: store)
+				}
+			}
+		)
+	}
+
+	private func createAccount(with destinationStore: PresentationStoreOf<GatewaySettings.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /GatewaySettings.Destination.State.createAccount,
+			action: GatewaySettings.Destination.Action.createAccount,
+			content: { CreateAccountCoordinator.View(store: $0) }
+		)
+	}
+
+	private func slideUpPanel(with destinationStore: PresentationStoreOf<GatewaySettings.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /GatewaySettings.Destination.State.slideUpPanel,
+			action: GatewaySettings.Destination.Action.slideUpPanel,
+			content: { SlideUpPanel.View(store: $0) }
+		)
 	}
 }
 
