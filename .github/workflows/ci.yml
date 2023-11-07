@@ -55,6 +55,7 @@ jobs:
 
   snyk_sbom:
     if: >
+      ( github.event.action == 'opened' && github.event.pull_request.draft == false ) ||
       ( github.event.pull_request.draft == false && github.event.action == 'synchronize' ) ||
       ( github.event.action == 'ready_for_review' ) ||
       ( github.event_name == 'push' && github.ref == 'refs/heads/main' )
@@ -108,6 +109,7 @@ jobs:
   linting:
     name: "Linting"
     if: >
+      ( github.event.action == 'opened' && github.event.pull_request.draft == false ) ||
       ( github.event.pull_request.draft == false && github.event.action == 'synchronize' ) ||
       ( github.event.action == 'ready_for_review' ) ||
       ( github.event_name == 'push' && github.ref == 'refs/heads/main' )
@@ -124,6 +126,7 @@ jobs:
 
   unit_test:
     if: >
+      ( github.event.action == 'opened' && github.event.pull_request.draft == false ) ||
       ( github.event.pull_request.draft == false && github.event.action == 'synchronize' ) || 
       ( github.event.action == 'ready_for_review' ) ||
       ( github.event_name == 'push' && github.ref == 'refs/heads/main' )
