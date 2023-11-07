@@ -5,14 +5,14 @@ import SwiftUI
 public struct Splash: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		@PresentationState
-		public var passcodeCheckFailedAlert: AlertState<ViewAction.PasscodeCheckFailedAlertAction>?
+		public var destination: Destination.State?
 
 		var biometricsCheckFailed: Bool = false
 
 		public init(
-			passcodeCheckFailedAlert: AlertState<ViewAction.PasscodeCheckFailedAlertAction>? = nil
+			destination: Destination.State? = nil
 		) {
-			self.passcodeCheckFailedAlert = passcodeCheckFailedAlert
+			self.destination = destination
 		}
 	}
 
@@ -37,6 +37,29 @@ public struct Splash: Sendable, FeatureReducer {
 		case completed(Profile, accountRecoveryNeeded: Bool)
 	}
 
+	public enum ChildAction: Sendable, Equatable {
+		case destination(PresentationAction<Destination.Action>)
+	}
+
+	public struct Destination: Reducer {
+		public enum State: Sendable, Hashable {
+			case passcodeCheckFailed(AlertState<Action.PasscodeCheckFailedAlert>)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case passcodeCheckFailed(PasscodeCheckFailedAlert)
+
+			public enum PasscodeCheckFailedAlert: Sendable, Equatable {
+				case retryButtonTapped
+				case openSettingsButtonTapped
+			}
+		}
+
+		public var body: some ReducerOf<Self> {
+			EmptyReducer()
+		}
+	}
+
 	@Dependency(\.networkSwitchingClient) var networkSwitchingClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
@@ -49,7 +72,9 @@ public struct Splash: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$passcodeCheckFailedAlert, action: /Action.view .. ViewAction.passcodeCheckFailedAlert)
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destination()
+			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
@@ -82,7 +107,8 @@ public struct Splash: Sendable, FeatureReducer {
 
 			guard config?.isPasscodeSetUp == true else {
 				state.biometricsCheckFailed = true
-				state.passcodeCheckFailedAlert = .init(
+
+				state.destination = .passcodeCheckFailed(.init(
 					title: { .init(L10n.Splash.PasscodeCheckFailedAlert.title) },
 					actions: {
 						ButtonState(
@@ -97,7 +123,7 @@ public struct Splash: Sendable, FeatureReducer {
 						)
 					},
 					message: { .init(L10n.Splash.PasscodeCheckFailedAlert.message) }
-				)
+				))
 
 				return .none
 			}

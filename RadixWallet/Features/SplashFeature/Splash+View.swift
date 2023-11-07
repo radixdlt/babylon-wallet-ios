@@ -26,7 +26,7 @@ extension Splash {
 							Image(systemName: "lock.circle.fill")
 								.resizable()
 								.frame(.small)
-							Text("Tap anywhere to unlock")
+							Text("Tap anywhere to unlock") // FIXME: Strings
 								.textStyle(.body1HighImportance)
 						}
 					}
@@ -48,17 +48,34 @@ extension Splash {
 					}
 				}
 				.edgesIgnoringSafeArea(.all)
-				.alert(
-					store: store.scope(
-						state: \.$passcodeCheckFailedAlert,
-						action: { .view(.passcodeCheckFailedAlert($0)) }
-					)
-				)
+				.destinations(with: store)
 				.onAppear {
 					viewStore.send(.appeared)
 				}
 			}
 		}
+	}
+}
+
+private extension StoreOf<Splash> {
+	var destination: PresentationStoreOf<Splash.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<Splash>) -> some View {
+		let destinationStore = store.destination
+		return passcodeCheckFailed(with: destinationStore)
+	}
+
+	private func passcodeCheckFailed(with destinationStore: PresentationStoreOf<Splash.Destination>) -> some View {
+		alert(
+			store: destinationStore,
+			state: /Splash.Destination.State.passcodeCheckFailed,
+			action: Splash.Destination.Action.passcodeCheckFailed
+		)
 	}
 }
 
