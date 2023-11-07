@@ -32,6 +32,7 @@ final class AccountDetailsFeatureTests: TestCase {
 		}
 
 		await store.send(.child(.destination(.presented(.preferences(.delegate(.accountHidden))))))
+
 		await store.receive(.delegate(.dismiss))
 	}
 }
