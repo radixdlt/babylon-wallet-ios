@@ -105,17 +105,7 @@ extension EditPersona {
 						}
 					}
 				}
-				.confirmationDialog(
-					store: store.destination,
-					state: /EditPersona.Destination.State.closeConfirmationDialog,
-					action: EditPersona.Destination.Action.closeConfirmationDialog
-				)
-				.sheet(
-					store: store.destination,
-					state: /EditPersona.Destination.State.addFields,
-					action: EditPersona.Destination.Action.addFields,
-					content: { EditPersonaAddEntryKinds.View(store: $0) }
-				)
+				.destinations(with: store.destination)
 			}
 		}
 	}
@@ -132,6 +122,33 @@ private extension StoreOf<EditPersona> {
 
 	var personaEntries: StoreOf<EditPersonaEntries> {
 		scope(state: \.entries) { .child(.entries($0)) }
+	}
+}
+
+extension View {
+	@MainActor
+	fileprivate func destinations(with store: PresentationStoreOf<EditPersona.Destination>) -> some View {
+		closeConfirmationDialog(with: store)
+			.addFields(with: store)
+	}
+
+	@MainActor
+	private func closeConfirmationDialog(with store: PresentationStoreOf<EditPersona.Destination>) -> some View {
+		confirmationDialog(
+			store: store,
+			state: /EditPersona.Destination.State.closeConfirmationDialog,
+			action: EditPersona.Destination.Action.closeConfirmationDialog
+		)
+	}
+
+	@MainActor
+	private func addFields(with store: PresentationStoreOf<EditPersona.Destination>) -> some View {
+		sheet(
+			store: store,
+			state: /EditPersona.Destination.State.addFields,
+			action: EditPersona.Destination.Action.addFields,
+			content: { EditPersonaAddEntryKinds.View(store: $0) }
+		)
 	}
 }
 
