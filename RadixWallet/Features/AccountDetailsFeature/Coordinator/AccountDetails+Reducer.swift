@@ -137,9 +137,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case .assets(.delegate(.resourcesUpdated)):
+		case let .assets(.delegate(.xrdBalanceUpdated(xrdBalance))):
 //			return checkIfShouldShowExportMnemonicPrompt(state: &state)
-			return .send(.delegate(.))
+			// return .send(.delegate(.))
+			fatalError()
 
 		case .destination(.presented(.preferences(.delegate(.accountHidden)))):
 			return .send(.delegate(.dismiss))

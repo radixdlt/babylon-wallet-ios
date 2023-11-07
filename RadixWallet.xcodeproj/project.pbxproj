@@ -65,8 +65,6 @@
 		48CFC26D2ADC10D900E77A5C /* SignWithFactorSourcesOfKindReducerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCB02ADC10D800E77A5C /* SignWithFactorSourcesOfKindReducerProtocol.swift */; };
 		48CFC26E2ADC10D900E77A5C /* SignWithFactorSourcesOfKindDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCB22ADC10D800E77A5C /* SignWithFactorSourcesOfKindDevice.swift */; };
 		48CFC26F2ADC10D900E77A5C /* SignWithFactorSourcesOfKindDevice+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCB32ADC10D800E77A5C /* SignWithFactorSourcesOfKindDevice+View.swift */; };
-		48CFC2702ADC10D900E77A5C /* AccountList+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCB62ADC10D800E77A5C /* AccountList+View.swift */; };
-		48CFC2712ADC10D900E77A5C /* AccountList+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCB72ADC10D800E77A5C /* AccountList+Reducer.swift */; };
 		48CFC2722ADC10D900E77A5C /* AccountList+Row+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCBA2ADC10D800E77A5C /* AccountList+Row+Reducer.swift */; };
 		48CFC2732ADC10D900E77A5C /* AccountList+Row+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCBB2ADC10D800E77A5C /* AccountList+Row+View.swift */; };
 		48CFC2742ADC10D900E77A5C /* Main+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCBD2ADC10D800E77A5C /* Main+Reducer.swift */; };
@@ -1375,8 +1373,6 @@
 		48CFBCB02ADC10D800E77A5C /* SignWithFactorSourcesOfKindReducerProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignWithFactorSourcesOfKindReducerProtocol.swift; sourceTree = "<group>"; };
 		48CFBCB22ADC10D800E77A5C /* SignWithFactorSourcesOfKindDevice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignWithFactorSourcesOfKindDevice.swift; sourceTree = "<group>"; };
 		48CFBCB32ADC10D800E77A5C /* SignWithFactorSourcesOfKindDevice+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SignWithFactorSourcesOfKindDevice+View.swift"; sourceTree = "<group>"; };
-		48CFBCB62ADC10D800E77A5C /* AccountList+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AccountList+View.swift"; sourceTree = "<group>"; };
-		48CFBCB72ADC10D800E77A5C /* AccountList+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AccountList+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBCBA2ADC10D800E77A5C /* AccountList+Row+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AccountList+Row+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBCBB2ADC10D800E77A5C /* AccountList+Row+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AccountList+Row+View.swift"; sourceTree = "<group>"; };
 		48CFBCBD2ADC10D800E77A5C /* Main+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Main+Reducer.swift"; sourceTree = "<group>"; };
@@ -2706,7 +2702,6 @@
 				48CFBC922ADC10D800E77A5C /* OnboardingFeature */,
 				48CFBC9A2ADC10D800E77A5C /* EditPersonaFeature */,
 				48CFBCA72ADC10D800E77A5C /* Signing */,
-				48CFBCB42ADC10D800E77A5C /* AccountListFeature */,
 				48CFBCBC2ADC10D800E77A5C /* MainFeature */,
 				48CFBCBF2ADC10D800E77A5C /* P2PLinksFeature */,
 				48CFBCC62ADC10D800E77A5C /* AppFeature */,
@@ -3010,39 +3005,13 @@
 			path = SignWithFactorSourcesOfKindDevice;
 			sourceTree = "<group>";
 		};
-		48CFBCB42ADC10D800E77A5C /* AccountListFeature */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBCB52ADC10D800E77A5C /* Coordinator */,
-				48CFBCB82ADC10D800E77A5C /* Components */,
-			);
-			path = AccountListFeature;
-			sourceTree = "<group>";
-		};
-		48CFBCB52ADC10D800E77A5C /* Coordinator */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBCB62ADC10D800E77A5C /* AccountList+View.swift */,
-				48CFBCB72ADC10D800E77A5C /* AccountList+Reducer.swift */,
-			);
-			path = Coordinator;
-			sourceTree = "<group>";
-		};
-		48CFBCB82ADC10D800E77A5C /* Components */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBCB92ADC10D800E77A5C /* Row */,
-			);
-			path = Components;
-			sourceTree = "<group>";
-		};
-		48CFBCB92ADC10D800E77A5C /* Row */ = {
+		48CFBCB92ADC10D800E77A5C /* AccountRow */ = {
 			isa = PBXGroup;
 			children = (
 				48CFBCBA2ADC10D800E77A5C /* AccountList+Row+Reducer.swift */,
 				48CFBCBB2ADC10D800E77A5C /* AccountList+Row+View.swift */,
 			);
-			path = Row;
+			path = AccountRow;
 			sourceTree = "<group>";
 		};
 		48CFBCBC2ADC10D800E77A5C /* MainFeature */ = {
@@ -3332,6 +3301,7 @@
 		48CFBD122ADC10D800E77A5C /* Children */ = {
 			isa = PBXGroup;
 			children = (
+				48CFBCB92ADC10D800E77A5C /* AccountRow */,
 				48CFBD162ADC10D800E77A5C /* Header */,
 			);
 			path = Children;
@@ -7811,7 +7781,6 @@
 				48CFC2562ADC10D900E77A5C /* DebugInspectProfile.swift in Sources */,
 				48CFC5912ADC10DA00E77A5C /* ProfileStore.swift in Sources */,
 				48CFC3FB2ADC10D900E77A5C /* AsyncWebSocket.swift in Sources */,
-				48CFC2702ADC10D900E77A5C /* AccountList+View.swift in Sources */,
 				48CFC3792ADC10D900E77A5C /* PoolUnit+View.swift in Sources */,
 				48CFC3712ADC10D900E77A5C /* PoolUnitsList.swift in Sources */,
 				48CFC58B2ADC10DA00E77A5C /* SubmitTransactionClient+Test.swift in Sources */,
@@ -8507,7 +8476,6 @@
 				48CFC4302ADC10DA00E77A5C /* Collection+Extra.swift in Sources */,
 				83EE47832AF0EE3C00155F03 /* ProgrammaticScryptoSborValuePreciseDecimal.swift in Sources */,
 				48CFC2D62ADC10D900E77A5C /* ChooseAccountsRow.swift in Sources */,
-				48CFC2712ADC10D900E77A5C /* AccountList+Reducer.swift in Sources */,
 				48CFC6792ADC10DB00E77A5C /* HDFactorSourceProtocol.swift in Sources */,
 				48CFC3612ADC10D900E77A5C /* LedgerHardwareDevices+View.swift in Sources */,
 				48CFC5752ADC10DA00E77A5C /* GatewayAPI+PublicKey.swift in Sources */,

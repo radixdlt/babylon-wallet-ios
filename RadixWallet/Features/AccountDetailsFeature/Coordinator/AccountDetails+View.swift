@@ -117,8 +117,6 @@ private extension View {
 	func destinations(_ destinationStore: PresentationStoreOf<AccountDetails.Destinations>) -> some SwiftUI.View {
 		preferences(destinationStore)
 			.transfer(destinationStore)
-			.exportMnemonic(destinationStore)
-			.importMnemonics(destinationStore)
 	}
 
 	func preferences(_ destinationStore: PresentationStoreOf<AccountDetails.Destinations>) -> some SwiftUI.View {
@@ -136,29 +134,6 @@ private extension View {
 			state: /AccountDetails.Destinations.State.transfer,
 			action: AccountDetails.Destinations.Action.transfer,
 			content: { AssetTransfer.SheetView(store: $0) }
-		)
-	}
-
-	func exportMnemonic(_ destinationStore: PresentationStoreOf<AccountDetails.Destinations>) -> some SwiftUI.View {
-		fullScreenCover( /* Full Screen cover to not be able to use iOS dismiss gestures */
-			store: destinationStore,
-			state: /AccountDetails.Destinations.State.exportMnemonic,
-			action: AccountDetails.Destinations.Action.exportMnemonic,
-			content: { childStore in
-				NavigationView {
-					ImportMnemonic.View(store: childStore)
-						.navigationTitle(L10n.ImportMnemonic.navigationTitleBackup)
-				}
-			}
-		)
-	}
-
-	func importMnemonics(_ destinationStore: PresentationStoreOf<AccountDetails.Destinations>) -> some SwiftUI.View {
-		sheet(
-			store: destinationStore,
-			state: /AccountDetails.Destinations.State.importMnemonics,
-			action: AccountDetails.Destinations.Action.importMnemonics,
-			content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
 		)
 	}
 }

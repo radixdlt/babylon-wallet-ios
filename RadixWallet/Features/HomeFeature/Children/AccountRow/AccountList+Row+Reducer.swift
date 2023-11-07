@@ -8,9 +8,9 @@ public struct DeviceFactorSourceControlled: Sendable, Hashable {
 	public var needToImportMnemonicForThisAccount = false
 }
 
-// MARK: - AccountList.Row
-extension AccountList {
-	public struct Row: Sendable, FeatureReducer {
+// MARK: - Home.AccountRow
+extension Home {
+	public struct AccountRow: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable, Identifiable {
 			public var id: AccountAddress { account.address }
 

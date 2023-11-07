@@ -7,21 +7,25 @@ public struct Home: Sendable, FeatureReducer {
 		// MARK: - Components
 		public var babylonAccountRecoveryIsNeeded: Bool
 		public var header: Header.State
-		public var accountList: AccountList.State
+		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State>
 		public var accounts: IdentifiedArrayOf<Profile.Network.Account> {
-			.init(uniqueElements: accountList.accounts.map(\.account))
+			accountRows.map(\.account).asIdentifiable()
 		}
 
-		// MARK: - Destinations
+		public var accountAddresses: [AccountAddress] {
+			accounts.map(\.address)
+		}
+
+		// MARK: - Destination
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		public init(
 			babylonAccountRecoveryIsNeeded: Bool
 		) {
 			self.babylonAccountRecoveryIsNeeded = babylonAccountRecoveryIsNeeded
 			self.header = .init()
-			self.accountList = .init()
+			self.accountRows = []
 			self.destination = nil
 		}
 	}
@@ -41,15 +45,15 @@ public struct Home: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case header(Header.Action)
-		case accountList(AccountList.Action)
-		case destination(PresentationAction<Destinations.Action>)
+		case account(id: Home.AccountRow.State.ID, action: Home.AccountRow.Action)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case displaySettings
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case accountDetails(AccountDetails.State)
 			case createAccount(CreateAccountCoordinator.State)
@@ -91,12 +95,12 @@ public struct Home: Sendable, FeatureReducer {
 		Scope(state: \.header, action: /Action.child .. ChildAction.header) {
 			Header()
 		}
-		Scope(state: \.accountList, action: /Action.child .. ChildAction.accountList) {
-			AccountList()
-		}
 		Reduce(core)
+			.forEach(\.accountRows, action: /Action.child .. ChildAction.account) {
+				Home.AccountRow()
+			}
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+				Destination()
 			}
 	}
 
@@ -138,10 +142,10 @@ public struct Home: Sendable, FeatureReducer {
 				return .none
 			}
 
-			state.accountList = .init(accounts: accounts)
-			let accountAddresses = state.accounts.map(\.address)
-			return .run { _ in
-				_ = try await accountPortfoliosClient.fetchAccountPortfolios(accountAddresses, false)
+			state.accountRows = accounts.map { Home.AccountRow.State(account: $0) }.asIdentifiable()
+
+			return .run { [addresses = state.accountAddresses] _ in
+				_ = try await accountPortfoliosClient.fetchAccountPortfolios(addresses, false)
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
@@ -151,17 +155,17 @@ public struct Home: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			return .none
 		case let .mnemonicAccessResult(result):
-			for account in state.accountList.accounts {
-				guard var deviceFactorSourceControlled = account.deviceFactorSourceControlled else { continue }
+			for accountRow in state.accountRows {
+				guard var deviceFactorSourceControlled = accountRow.deviceFactorSourceControlled else { continue }
 
 				let hasAccessToMnemonic = result[deviceFactorSourceControlled.factorSourceID] ?? false
-				let needToImportMnemonic = if account.isLegacyAccount {
+				let needToImportMnemonic = if accountRow.isLegacyAccount {
 					!hasAccessToMnemonic
 				} else {
 					state.babylonAccountRecoveryIsNeeded || !hasAccessToMnemonic
 				}
 				deviceFactorSourceControlled.needToImportMnemonicForThisAccount = needToImportMnemonic
-				state.accountList.accounts[id: account.id]?.deviceFactorSourceControlled = deviceFactorSourceControlled
+				state.accountRows[id: accountRow.id]?.deviceFactorSourceControlled = deviceFactorSourceControlled
 			}
 			return .none
 		}
@@ -189,29 +193,31 @@ public struct Home: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .accountList(.delegate(.displayAccountDetails(
-			account,
-			needToBackupMnemonicForThisAccount,
-			needToImportMnemonicForThisAccount
-		))):
-
-			state.destination = .accountDetails(.init(
-				for: account,
-				isShowingImportMnemonicPrompt: needToImportMnemonicForThisAccount,
-				isShowingExportMnemonicPrompt: needToBackupMnemonicForThisAccount
-			))
-			return .none
+//		case let .account(.delegate(.displayAccountDetails(
+//			account,
+//			needToBackupMnemonicForThisAccount,
+//			needToImportMnemonicForThisAccount
+//		))):
+//
+//			state.destination = .accountDetails(.init(
+//				for: account,
+//				isShowingImportMnemonicPrompt: needToImportMnemonicForThisAccount,
+//				isShowingExportMnemonicPrompt: needToBackupMnemonicForThisAccount
+//			))
+//			return .none
+//
+//
+//		case let .account(.delegate(.exportMnemonic(controlledAccount))):
+//			return exportMnemonic(controlling: controlledAccount, state: &state)
+//
+//
+//		case .accountList(.delegate(.importMnemonics)):
+//			return importMnemonics(state: &state)
 
 		case let .destination(.presented(.accountDetails(.delegate(.exportMnemonic(controlledAccount))))):
 			return exportMnemonic(controlling: controlledAccount, state: &state)
 
-		case let .accountList(.delegate(.exportMnemonic(controlledAccount))):
-			return exportMnemonic(controlling: controlledAccount, state: &state)
-
 		case .destination(.presented(.accountDetails(.delegate(.importMnemonics)))):
-			return importMnemonics(state: &state)
-
-		case .accountList(.delegate(.importMnemonics)):
 			return importMnemonics(state: &state)
 
 		case .destination(.presented(.accountDetails(.delegate(.dismiss)))):
@@ -266,7 +272,8 @@ public struct Home: Sendable, FeatureReducer {
 	}
 
 	private func securityCheckOfAccounts() -> Effect<Action> {
-		.send(.child(.accountList(.internal(.performAccountSecurityCheck))))
+//		.send(.child(.accountList(.internal(.performAccountSecurityCheck))))
+		fatalError()
 	}
 }
 
