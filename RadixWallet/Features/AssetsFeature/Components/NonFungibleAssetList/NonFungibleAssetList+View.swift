@@ -20,8 +20,8 @@ extension NonFungibleAssetList {
 			)
 			.sheet(
 				store: store.scope(state: \.$destination) { .child(.destination($0)) },
-				state: /NonFungibleAssetList.Destinations.State.details,
-				action: NonFungibleAssetList.Destinations.Action.details,
+				state: /NonFungibleAssetList.Destination.State.details,
+				action: NonFungibleAssetList.Destination.Action.details,
 				content: { NonFungibleTokenDetails.View(store: $0) }
 			)
 		}

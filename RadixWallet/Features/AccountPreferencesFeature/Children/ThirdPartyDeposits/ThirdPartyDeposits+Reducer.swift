@@ -14,7 +14,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		var thirdPartyDeposits: ThirdPartyDeposits
 
 		@PresentationState
-		var destinations: Destinations.State? = nil
+		var destination: Destination.State? = nil
 
 		init(account: Profile.Network.Account) {
 			self.account = account
@@ -32,14 +32,14 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 	}
 
 	public enum ChildAction: Equatable, Sendable {
-		case destinations(PresentationAction<Destinations.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum InternalAction: Equatable, Sendable {
 		case updated(Profile.Network.Account)
 	}
 
-	public struct Destinations: Reducer, Sendable {
+	public struct Destination: Reducer, Sendable {
 		public enum State: Equatable, Hashable, Sendable {
 			case allowDenyAssets(ResourcesList.State)
 			case allowDepositors(ResourcesList.State)
@@ -68,8 +68,8 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destinations, action: /Action.child .. ChildAction.destinations) {
-				Destinations()
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destination()
 			}
 	}
 
@@ -81,14 +81,14 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 				state.thirdPartyDeposits.depositRule = rule
 
 			case .allowDenyAssets:
-				state.destinations = .allowDenyAssets(.init(
+				state.destination = .allowDenyAssets(.init(
 					mode: .allowDenyAssets(.allow),
 					thirdPartyDeposits: state.thirdPartyDeposits,
 					networkID: state.account.networkID
 				))
 
 			case .allowDepositors:
-				state.destinations = .allowDepositors(.init(
+				state.destination = .allowDepositors(.init(
 					mode: .allowDepositors,
 					thirdPartyDeposits: state.thirdPartyDeposits,
 					networkID: state.account.networkID
@@ -108,11 +108,11 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .destinations(.presented(.allowDenyAssets(.delegate(.updated(thirdPartyDeposits))))),
-		     let .destinations(.presented(.allowDepositors(.delegate(.updated(thirdPartyDeposits))))):
+		case let .destination(.presented(.allowDenyAssets(.delegate(.updated(thirdPartyDeposits))))),
+		     let .destination(.presented(.allowDepositors(.delegate(.updated(thirdPartyDeposits))))):
 			state.thirdPartyDeposits = thirdPartyDeposits
 			return .none
-		case .destinations:
+		case .destination:
 			return .none
 		}
 	}

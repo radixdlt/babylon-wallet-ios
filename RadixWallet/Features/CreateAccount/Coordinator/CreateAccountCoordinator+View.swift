@@ -50,7 +50,7 @@ extension CreateAccountCoordinator {
 		}
 
 		private func destination(
-			for store: StoreOf<CreateAccountCoordinator.Destinations>,
+			for store: StoreOf<CreateAccountCoordinator.Destination>,
 			shouldDisplayNavBar: Bool
 		) -> some SwiftUI.View {
 			ZStack {
@@ -58,20 +58,20 @@ extension CreateAccountCoordinator {
 					switch state {
 					case .step1_nameAccount:
 						CaseLet(
-							/CreateAccountCoordinator.Destinations.State.step1_nameAccount,
-							action: CreateAccountCoordinator.Destinations.Action.step1_nameAccount,
+							/CreateAccountCoordinator.Destination.State.step1_nameAccount,
+							action: CreateAccountCoordinator.Destination.Action.step1_nameAccount,
 							then: { NameAccount.View(store: $0) }
 						)
 					case .step2_creationOfAccount:
 						CaseLet(
-							/CreateAccountCoordinator.Destinations.State.step2_creationOfAccount,
-							action: CreateAccountCoordinator.Destinations.Action.step2_creationOfAccount,
+							/CreateAccountCoordinator.Destination.State.step2_creationOfAccount,
+							action: CreateAccountCoordinator.Destination.Action.step2_creationOfAccount,
 							then: { CreationOfAccount.View(store: $0) }
 						)
 					case .step3_completion:
 						CaseLet(
-							/CreateAccountCoordinator.Destinations.State.step3_completion,
-							action: CreateAccountCoordinator.Destinations.Action.step3_completion,
+							/CreateAccountCoordinator.Destination.State.step3_completion,
+							action: CreateAccountCoordinator.Destination.Action.step3_completion,
 							then: { NewAccountCompletion.View(store: $0) }
 						)
 					}

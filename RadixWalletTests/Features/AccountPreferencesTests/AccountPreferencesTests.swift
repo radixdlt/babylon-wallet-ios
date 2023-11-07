@@ -12,7 +12,7 @@ final class AccountPreferencesTests: TestCase {
 		)
 
 		await store.send(.view(.hideAccountTapped)) { state in
-			state.destinations = .confirmHideAccount(.init(
+			state.destination = .confirmHideAccount(.init(
 				title: .init(L10n.AccountSettings.hideThisAccount),
 				message: .init(L10n.AccountSettings.hideAccountConfirmation),
 				buttons: [
@@ -34,8 +34,8 @@ final class AccountPreferencesTests: TestCase {
 			}
 		}
 
-		await store.send(.child(.destinations(.presented(.confirmHideAccount(.confirmTapped))))) { state in
-			state.destinations = nil
+		await store.send(.child(.destination(.presented(.confirmHideAccount(.confirmTapped))))) { state in
+			state.destination = nil
 		}
 
 		let idsOfUpdatedAccounts_ = await idsOfUpdatedAccounts.value

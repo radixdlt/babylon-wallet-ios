@@ -28,7 +28,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 		public var mode: Mode
 
 		@PresentationState
-		public var modalDestinations: ModalDestinations.State?
+		public var destination: Destination.State?
 
 		public init(
 			mode: Mode = .new(.init())
@@ -49,10 +49,10 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case modalDestinations(PresentationAction<ModalDestinations.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
-	public struct ModalDestinations: Sendable, Reducer {
+	public struct Destination: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case listConfirmerOfNewPhone(ListConfirmerOfNewPhone.State)
 			case listLostPhoneHelper(ListLostPhoneHelper.State)
@@ -80,8 +80,8 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$modalDestinations, action: /Action.child .. ChildAction.modalDestinations) {
-				ModalDestinations()
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destination()
 			}
 	}
 
@@ -98,7 +98,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			try! existing.configuration.confirmationRole.changeFactorSource(to: factorSource)
 			state.mode = .existing(existing)
 		}
-		state.modalDestinations = nil
+		state.destination = nil
 		return .none
 	}
 
@@ -115,16 +115,16 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			try! existing.configuration.recoveryRole.changeFactorSource(to: factorSource)
 			state.mode = .existing(existing)
 		}
-		state.modalDestinations = nil
+		state.destination = nil
 		return .none
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .modalDestinations(.presented(.listConfirmerOfNewPhone(.delegate(.choseFactorSource(secQFS))))):
+		case let .destination(.presented(.listConfirmerOfNewPhone(.delegate(.choseFactorSource(secQFS))))):
 			choseConfirmerOfNewPhone(secQFS, &state)
 
-		case let .modalDestinations(.presented(.listLostPhoneHelper(.delegate(.choseFactorSource(trustedContactFS))))):
+		case let .destination(.presented(.listLostPhoneHelper(.delegate(.choseFactorSource(trustedContactFS))))):
 			choseLostPhoneHelper(trustedContactFS, &state)
 
 		default: .none
@@ -157,13 +157,13 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			switch state.mode {
 			case let .existing(structure):
 				precondition(structure.isSimple)
-				state.modalDestinations = .listConfirmerOfNewPhone(.init(
+				state.destination = .listConfirmerOfNewPhone(.init(
 					kind: .securityQuestions,
 					mode: .selection,
 					selectedFactorSource: structure.securityQuestionsFactorSource
 				))
 			case .new:
-				state.modalDestinations = .listConfirmerOfNewPhone(.init(
+				state.destination = .listConfirmerOfNewPhone(.init(
 					kind: .securityQuestions,
 					mode: .selection
 				))
@@ -174,13 +174,13 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			switch state.mode {
 			case let .existing(structure):
 				precondition(structure.isSimple)
-				state.modalDestinations = .listLostPhoneHelper(.init(
+				state.destination = .listLostPhoneHelper(.init(
 					kind: .trustedContact,
 					mode: .selection,
 					selectedFactorSource: structure.trustedContactFactorSource
 				))
 			case .new:
-				state.modalDestinations = .listLostPhoneHelper(.init(
+				state.destination = .listLostPhoneHelper(.init(
 					kind: .trustedContact,
 					mode: .selection
 				))

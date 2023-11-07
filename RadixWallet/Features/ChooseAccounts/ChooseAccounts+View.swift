@@ -70,8 +70,8 @@ extension ChooseAccounts {
 				}
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /ChooseAccounts.Destinations.State.createAccount,
-					action: ChooseAccounts.Destinations.Action.createAccount,
+					state: /ChooseAccounts.Destination.State.createAccount,
+					action: ChooseAccounts.Destination.Action.createAccount,
 					content: { CreateAccountCoordinator.View(store: $0) }
 				)
 			}

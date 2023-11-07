@@ -91,7 +91,7 @@ extension AccountPreferences.View {
 extension View {
 	@MainActor
 	func destination(store: StoreOf<AccountPreferences>) -> some View {
-		let destinationStore = store.scope(state: \.$destinations, action: { .child(.destinations($0)) })
+		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		return showQRCode(with: destinationStore)
 			.updateAccountLabel(with: destinationStore)
 			.thirdPartyDeposits(with: destinationStore)
@@ -100,52 +100,52 @@ extension View {
 	}
 
 	@MainActor
-	func showQRCode(with destinationStore: PresentationStoreOf<AccountPreferences.Destinations>) -> some View {
+	func showQRCode(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /AccountPreferences.Destinations.State.showQR,
-			action: AccountPreferences.Destinations.Action.showQR
+			state: /AccountPreferences.Destination.State.showQR,
+			action: AccountPreferences.Destination.Action.showQR
 		) {
 			ShowQR.View(store: $0)
 		}
 	}
 
 	@MainActor
-	func updateAccountLabel(with destinationStore: PresentationStoreOf<AccountPreferences.Destinations>) -> some View {
+	func updateAccountLabel(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AccountPreferences.Destinations.State.updateAccountLabel,
-			action: AccountPreferences.Destinations.Action.updateAccountLabel,
+			state: /AccountPreferences.Destination.State.updateAccountLabel,
+			action: AccountPreferences.Destination.Action.updateAccountLabel,
 			destination: { UpdateAccountLabel.View(store: $0) }
 		)
 	}
 
 	@MainActor
-	func thirdPartyDeposits(with destinationStore: PresentationStoreOf<AccountPreferences.Destinations>) -> some View {
+	func thirdPartyDeposits(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AccountPreferences.Destinations.State.thirdPartyDeposits,
-			action: AccountPreferences.Destinations.Action.thirdPartyDeposits,
+			state: /AccountPreferences.Destination.State.thirdPartyDeposits,
+			action: AccountPreferences.Destination.Action.thirdPartyDeposits,
 			destination: { ManageThirdPartyDeposits.View(store: $0) }
 		)
 	}
 
 	@MainActor
-	func devAccountPreferences(with destinationStore: PresentationStoreOf<AccountPreferences.Destinations>) -> some View {
+	func devAccountPreferences(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AccountPreferences.Destinations.State.devPreferences,
-			action: AccountPreferences.Destinations.Action.devPreferences,
+			state: /AccountPreferences.Destination.State.devPreferences,
+			action: AccountPreferences.Destination.Action.devPreferences,
 			destination: { DevAccountPreferences.View(store: $0) }
 		)
 	}
 
 	@MainActor
-	func confirmHideAccountAlert(with destinationStore: PresentationStoreOf<AccountPreferences.Destinations>) -> some View {
+	func confirmHideAccountAlert(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
 		alert(
 			store: destinationStore,
-			state: /AccountPreferences.Destinations.State.confirmHideAccount,
-			action: AccountPreferences.Destinations.Action.confirmHideAccount
+			state: /AccountPreferences.Destination.State.confirmHideAccount,
+			action: AccountPreferences.Destination.Action.confirmHideAccount
 		)
 	}
 }

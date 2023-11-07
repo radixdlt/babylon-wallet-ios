@@ -18,7 +18,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		public init(fromAccount: Profile.Network.Account, receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>) {
 			self.fromAccount = fromAccount
@@ -38,7 +38,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Equatable, Sendable {
-		case destination(PresentationAction<Destinations.Action>)
+		case destination(PresentationAction<Destination.Action>)
 		case receivingAccount(id: ReceivingAccount.State.ID, action: ReceivingAccount.Action)
 	}
 
@@ -54,7 +54,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		)
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: Sendable, Reducer {
 		public typealias State = RelayState<ReceivingAccount.State.ID, MainState>
 		public typealias Action = RelayAction<ReceivingAccount.State.ID, MainAction>
 
@@ -83,7 +83,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+				Destination()
 			}
 			.forEach(\.receivingAccounts, action: /Action.child .. ChildAction.receivingAccount) {
 				ReceivingAccount()

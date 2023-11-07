@@ -62,8 +62,8 @@ extension PersonaDataPermission {
 				}
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /PersonaDataPermission.Destinations.State.editPersona,
-					action: PersonaDataPermission.Destinations.Action.editPersona,
+					state: /PersonaDataPermission.Destination.State.editPersona,
+					action: PersonaDataPermission.Destination.Action.editPersona,
 					content: { EditPersona.View(store: $0) }
 				)
 			}

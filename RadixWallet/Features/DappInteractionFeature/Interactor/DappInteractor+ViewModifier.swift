@@ -28,8 +28,8 @@ extension DappInteractor {
 				WithViewStore(store, observe: { $0.currentModal }) { viewStore in
 					IfLetStore(
 						store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
-						state: /DappInteractor.Destinations.State.dappInteraction,
-						action: DappInteractor.Destinations.Action.dappInteraction,
+						state: /DappInteractor.Destination.State.dappInteraction,
+						action: DappInteractor.Destination.Action.dappInteraction,
 						then: { DappInteractionCoordinator.View(store: $0.relay()) }
 					)
 					.transition(.move(edge: .bottom))
@@ -38,8 +38,8 @@ extension DappInteractor {
 			}
 			.sheet(
 				store: store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
-				state: /DappInteractor.Destinations.State.dappInteractionCompletion,
-				action: DappInteractor.Destinations.Action.dappInteractionCompletion,
+				state: /DappInteractor.Destination.State.dappInteractionCompletion,
+				action: DappInteractor.Destination.Action.dappInteractionCompletion,
 				content: { Completion.View(store: $0) }
 			)
 			.alert(

@@ -74,8 +74,8 @@ extension AssetTransferMessage.View {
 			}
 			.sheet(
 				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /AssetTransferMessage.Destinations.State.messageMode,
-				action: AssetTransferMessage.Destinations.Action.messageMode,
+				state: /AssetTransferMessage.Destination.State.messageMode,
+				action: AssetTransferMessage.Destination.Action.messageMode,
 				content: {
 					MessageMode.View(store: $0)
 						.presentationDetents([.medium])

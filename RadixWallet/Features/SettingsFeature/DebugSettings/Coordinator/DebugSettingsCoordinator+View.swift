@@ -92,12 +92,12 @@ extension DebugSettingsCoordinator.View {
 private extension View {
 	@MainActor
 	func debugUserDefaultsContents(
-		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destinations>
+		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
 	) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /DebugSettingsCoordinator.Destinations.State.debugUserDefaultsContents,
-			action: DebugSettingsCoordinator.Destinations.Action.debugUserDefaultsContents,
+			state: /DebugSettingsCoordinator.Destination.State.debugUserDefaultsContents,
+			action: DebugSettingsCoordinator.Destination.Action.debugUserDefaultsContents,
 			destination: { DebugUserDefaultsContents.View(store: $0) }
 		)
 	}
@@ -105,12 +105,12 @@ private extension View {
 	#if DEBUG
 	@MainActor
 	func debugKeychainTest(
-		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destinations>
+		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
 	) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /DebugSettingsCoordinator.Destinations.State.debugKeychainTest,
-			action: DebugSettingsCoordinator.Destinations.Action.debugKeychainTest,
+			state: /DebugSettingsCoordinator.Destination.State.debugKeychainTest,
+			action: DebugSettingsCoordinator.Destination.Action.debugKeychainTest,
 			destination: { DebugKeychainTest.View(store: $0) }
 		)
 	}
@@ -130,36 +130,36 @@ private extension View {
 
 	@MainActor
 	func factorSources(
-		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destinations>
+		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
 	) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /DebugSettingsCoordinator.Destinations.State.debugManageFactorSources,
-			action: DebugSettingsCoordinator.Destinations.Action.debugManageFactorSources,
+			state: /DebugSettingsCoordinator.Destination.State.debugManageFactorSources,
+			action: DebugSettingsCoordinator.Destination.Action.debugManageFactorSources,
 			destination: { DebugManageFactorSources.View(store: $0) }
 		)
 	}
 
 	@MainActor
 	func debugInspectProfile(
-		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destinations>
+		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
 	) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /DebugSettingsCoordinator.Destinations.State.debugInspectProfile,
-			action: DebugSettingsCoordinator.Destinations.Action.debugInspectProfile,
+			state: /DebugSettingsCoordinator.Destination.State.debugInspectProfile,
+			action: DebugSettingsCoordinator.Destination.Action.debugInspectProfile,
 			destination: { DebugInspectProfile.View(store: $0) }
 		)
 	}
 
 	@MainActor
 	func securityStructureConfigs(
-		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destinations>
+		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
 	) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /DebugSettingsCoordinator.Destinations.State.securityStructureConfigs,
-			action: DebugSettingsCoordinator.Destinations.Action.securityStructureConfigs,
+			state: /DebugSettingsCoordinator.Destination.State.securityStructureConfigs,
+			action: DebugSettingsCoordinator.Destination.Action.securityStructureConfigs,
 			destination: { SecurityStructureConfigurationListCoordinator.View(store: $0) }
 		)
 	}

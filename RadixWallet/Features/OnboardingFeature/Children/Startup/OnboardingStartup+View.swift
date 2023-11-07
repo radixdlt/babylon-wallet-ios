@@ -56,8 +56,8 @@ extension OnboardingStartup.View {
 			}
 			.sheet(
 				store: store.destination,
-				state: /OnboardingStartup.Destinations.State.restoreFromBackup,
-				action: OnboardingStartup.Destinations.Action.restoreFromBackup,
+				state: /OnboardingStartup.Destination.State.restoreFromBackup,
+				action: OnboardingStartup.Destination.Action.restoreFromBackup,
 				content: {
 					RestoreProfileFromBackupCoordinator.View(store: $0)
 				}
@@ -67,7 +67,7 @@ extension OnboardingStartup.View {
 }
 
 private extension StoreOf<OnboardingStartup> {
-	var destination: PresentationStoreOf<OnboardingStartup.Destinations> {
+	var destination: PresentationStoreOf<OnboardingStartup.Destination> {
 		scope(state: \.$destination) { .child(.destination($0)) }
 	}
 }

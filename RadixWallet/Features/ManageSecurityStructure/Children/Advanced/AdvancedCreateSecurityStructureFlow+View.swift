@@ -133,7 +133,7 @@ extension AdvancedManageSecurityStructureFlow {
 						}
 					)
 				}
-				.destinations(store: store)
+				.destination(store: store)
 			}
 		}
 	}
@@ -141,37 +141,37 @@ extension AdvancedManageSecurityStructureFlow {
 
 extension View {
 	@MainActor
-	fileprivate func destinations(store: StoreOf<AdvancedManageSecurityStructureFlow>) -> some View {
+	fileprivate func destination(store: StoreOf<AdvancedManageSecurityStructureFlow>) -> some View {
 		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		return primary(destinationStore).recovery(destinationStore).confirmation(destinationStore)
 	}
 
 	@MainActor
-	private func primary(_ destinationStore: PresentationStoreOf<AdvancedManageSecurityStructureFlow.Destinations>) -> some View {
+	private func primary(_ destinationStore: PresentationStoreOf<AdvancedManageSecurityStructureFlow.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /AdvancedManageSecurityStructureFlow.Destinations.State.factorsForPrimaryRole,
-			action: AdvancedManageSecurityStructureFlow.Destinations.Action.factorsForPrimaryRole,
+			state: /AdvancedManageSecurityStructureFlow.Destination.State.factorsForPrimaryRole,
+			action: AdvancedManageSecurityStructureFlow.Destination.Action.factorsForPrimaryRole,
 			content: { store in NavigationView { FactorsForRole<PrimaryRoleTag>.View(store: store) } }
 		)
 	}
 
 	@MainActor
-	private func recovery(_ destinationStore: PresentationStoreOf<AdvancedManageSecurityStructureFlow.Destinations>) -> some View {
+	private func recovery(_ destinationStore: PresentationStoreOf<AdvancedManageSecurityStructureFlow.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /AdvancedManageSecurityStructureFlow.Destinations.State.factorsForRecoveryRole,
-			action: AdvancedManageSecurityStructureFlow.Destinations.Action.factorsForRecoveryRole,
+			state: /AdvancedManageSecurityStructureFlow.Destination.State.factorsForRecoveryRole,
+			action: AdvancedManageSecurityStructureFlow.Destination.Action.factorsForRecoveryRole,
 			content: { store in NavigationView { FactorsForRole<RecoveryRoleTag>.View(store: store) } }
 		)
 	}
 
 	@MainActor
-	private func confirmation(_ destinationStore: PresentationStoreOf<AdvancedManageSecurityStructureFlow.Destinations>) -> some View {
+	private func confirmation(_ destinationStore: PresentationStoreOf<AdvancedManageSecurityStructureFlow.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /AdvancedManageSecurityStructureFlow.Destinations.State.factorsForConfirmationRole,
-			action: AdvancedManageSecurityStructureFlow.Destinations.Action.factorsForConfirmationRole,
+			state: /AdvancedManageSecurityStructureFlow.Destination.State.factorsForConfirmationRole,
+			action: AdvancedManageSecurityStructureFlow.Destination.Action.factorsForConfirmationRole,
 			content: { store in NavigationView { FactorsForRole<ConfirmationRoleTag>.View(store: store) } }
 		)
 	}

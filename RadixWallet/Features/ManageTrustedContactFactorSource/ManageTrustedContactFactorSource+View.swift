@@ -95,8 +95,8 @@ extension ManageTrustedContactFactorSource {
 				.navigationTitle(viewStore.isCreatingNewFromScratch ? "Add Trusted Contact" : "Edit Trusted Contact")
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /ManageTrustedContactFactorSource.Destinations.State.scanAccountAddress,
-					action: ManageTrustedContactFactorSource.Destinations.Action.scanAccountAddress,
+					state: /ManageTrustedContactFactorSource.Destination.State.scanAccountAddress,
+					action: ManageTrustedContactFactorSource.Destination.Action.scanAccountAddress,
 					content: {
 						ScanQRCoordinator.View(store: $0)
 							// FIXME: future strings

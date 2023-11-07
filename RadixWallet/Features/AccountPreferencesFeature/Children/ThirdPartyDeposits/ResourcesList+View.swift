@@ -144,27 +144,27 @@ extension ResourcesList.View {
 private extension View {
 	@MainActor
 	func destination(store: StoreOf<ResourcesList>) -> some View {
-		let destinationStore = store.scope(state: \.$destinations, action: { .child(.destinations($0)) })
+		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		return addAsset(with: destinationStore)
 			.confirmDeletionAlert(with: destinationStore)
 	}
 
 	@MainActor
-	func addAsset(with destinationStore: PresentationStoreOf<ResourcesList.Destinations>) -> some View {
+	func addAsset(with destinationStore: PresentationStoreOf<ResourcesList.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /ResourcesList.Destinations.State.addAsset,
-			action: ResourcesList.Destinations.Action.addAsset,
+			state: /ResourcesList.Destination.State.addAsset,
+			action: ResourcesList.Destination.Action.addAsset,
 			content: { AddAsset.View(store: $0) }
 		)
 	}
 
 	@MainActor
-	func confirmDeletionAlert(with destinationStore: PresentationStoreOf<ResourcesList.Destinations>) -> some View {
+	func confirmDeletionAlert(with destinationStore: PresentationStoreOf<ResourcesList.Destination>) -> some View {
 		alert(
 			store: destinationStore,
-			state: /ResourcesList.Destinations.State.confirmAssetDeletion,
-			action: ResourcesList.Destinations.Action.confirmAssetDeletion
+			state: /ResourcesList.Destination.State.confirmAssetDeletion,
+			action: ResourcesList.Destination.Action.confirmAssetDeletion
 		)
 	}
 }
