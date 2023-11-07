@@ -53,7 +53,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		var loadedResources: [ResourceViewState] = []
 
 		@PresentationState
-		var destinations: Destinations.State? = nil
+		var destination: Destination.State? = nil
 	}
 
 	public enum ViewAction: Equatable, Sendable {
@@ -64,7 +64,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 	}
 
 	public enum ChildAction: Equatable, Sendable {
-		case destinations(PresentationAction<Destinations.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum DelegateAction: Equatable, Sendable {
@@ -76,7 +76,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		case resourcesLoaded([OnLedgerEntity.Resource]?)
 	}
 
-	public struct Destinations: Reducer, Sendable {
+	public struct Destination: Reducer, Sendable {
 		public enum State: Equatable, Hashable, Sendable {
 			case addAsset(AddAsset.State)
 			case confirmAssetDeletion(AlertState<Action.ConfirmDeletionAlert>)
@@ -103,8 +103,8 @@ public struct ResourcesList: FeatureReducer, Sendable {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destinations, action: /Action.child .. ChildAction.destinations) {
-				Destinations()
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destination()
 			}
 	}
 
@@ -118,7 +118,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 			}
 
 		case .addAssetTapped:
-			state.destinations = .addAsset(.init(
+			state.destination = .addAsset(.init(
 				mode: state.mode,
 				alreadyAddedResources: state.allDepositorAddresses,
 				networkID: state.networkID
@@ -126,7 +126,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 			return .none
 
 		case let .assetRemove(resource):
-			state.destinations = .confirmAssetDeletion(.confirmAssetDeletion(
+			state.destination = .confirmAssetDeletion(.confirmAssetDeletion(
 				state.mode.removeTitle,
 				state.mode.removeConfirmationMessage,
 				resourceAddress: resource
@@ -141,16 +141,16 @@ public struct ResourcesList: FeatureReducer, Sendable {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .destinations(.presented(.addAsset(.delegate(.addAddress(mode, newAsset))))):
+		case let .destination(.presented(.addAsset(.delegate(.addAddress(mode, newAsset))))):
 			state.mode = mode
-			state.destinations = nil
+			state.destination = nil
 
 			return .run { send in
 				let loadResourceResult = try? await onLedgerEntitiesClient.getResource(newAsset.resourceAddress)
 				await send(.internal(.resourceLoaded(loadResourceResult, newAsset)))
 			}
 
-		case let .destinations(.presented(.confirmAssetDeletion(.confirmTapped(resource)))):
+		case let .destination(.presented(.confirmAssetDeletion(.confirmTapped(resource)))):
 			state.loadedResources.removeAll(where: { $0.address == resource })
 			switch resource {
 			case let .assetException(resource):
@@ -160,7 +160,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 			}
 
 			return .send(.delegate(.updated(state.thirdPartyDeposits)))
-		case .destinations:
+		case .destination:
 			return .none
 		}
 	}
@@ -200,7 +200,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 	}
 }
 
-extension AlertState<ResourcesList.Destinations.Action.ConfirmDeletionAlert> {
+extension AlertState<ResourcesList.Destination.Action.ConfirmDeletionAlert> {
 	static func confirmAssetDeletion(
 		_ title: String,
 		_ message: String,

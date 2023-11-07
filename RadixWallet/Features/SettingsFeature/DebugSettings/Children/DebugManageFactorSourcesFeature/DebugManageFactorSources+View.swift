@@ -55,8 +55,8 @@ extension DebugManageFactorSources {
 				.navigationTitle("Factor Sources")
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /DebugManageFactorSources.Destinations.State.importMnemonic,
-					action: DebugManageFactorSources.Destinations.Action.importMnemonic,
+					state: /DebugManageFactorSources.Destination.State.importMnemonic,
+					action: DebugManageFactorSources.Destination.Action.importMnemonic,
 					content: { importMnemonicStore in
 						NavigationView {
 							// We depend on `.toolbar` to display buttons on top of
@@ -68,8 +68,8 @@ extension DebugManageFactorSources {
 				)
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /DebugManageFactorSources.Destinations.State.addLedger,
-					action: DebugManageFactorSources.Destinations.Action.addLedger,
+					state: /DebugManageFactorSources.Destination.State.addLedger,
+					action: DebugManageFactorSources.Destination.Action.addLedger,
 					content: { AddLedgerFactorSource.View(store: $0) }
 				)
 			}

@@ -31,8 +31,8 @@ extension GatewaySettings {
 						)
 						.sheet(
 							store: store.destination,
-							state: /Destinations.State.addNewGateway,
-							action: Destinations.Action.addNewGateway,
+							state: /Destination.State.addNewGateway,
+							action: Destination.Action.addNewGateway,
 							content: { addGatewayStore in
 								WithNavigationBar {
 									addGatewayStore.send(.view(.closeButtonTapped))
@@ -43,14 +43,14 @@ extension GatewaySettings {
 						)
 						.sheet(
 							store: store.destination,
-							state: /Destinations.State.createAccount,
-							action: Destinations.Action.createAccount,
+							state: /Destination.State.createAccount,
+							action: Destination.Action.createAccount,
 							content: { CreateAccountCoordinator.View(store: $0) }
 						)
 						.sheet(
 							store: store.destination,
-							state: /Destinations.State.slideUpPanel,
-							action: Destinations.Action.slideUpPanel,
+							state: /Destination.State.slideUpPanel,
+							action: Destination.Action.slideUpPanel,
 							content: { SlideUpPanel.View(store: $0) }
 						)
 				}
@@ -104,7 +104,7 @@ extension GatewaySettings {
 }
 
 private extension StoreOf<GatewaySettings> {
-	var destination: PresentationStoreOf<GatewaySettings.Destinations> {
+	var destination: PresentationStoreOf<GatewaySettings.Destination> {
 		scope(state: \.$destination) { .child(.destination($0)) }
 	}
 }

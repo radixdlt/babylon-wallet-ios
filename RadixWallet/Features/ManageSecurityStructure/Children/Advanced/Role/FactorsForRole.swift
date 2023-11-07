@@ -41,7 +41,7 @@ public struct FactorsForRole<R: RoleProtocol>: Sendable, FeatureReducer {
 		public var adminFactorSources: IdentifiedArrayOf<FactorSource>
 
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		public let existing: RoleOfTier<R, FactorSource>?
 
@@ -75,14 +75,14 @@ public struct FactorsForRole<R: RoleProtocol>: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case confirmedRoleWithFactors(RoleOfTier<R, FactorSource>)
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case addThresholdFactor(SelectFactorKindThenFactor.State)
 			case addAdminFactor(SelectFactorKindThenFactor.State)
@@ -115,7 +115,7 @@ public struct FactorsForRole<R: RoleProtocol>: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+				Destination()
 			}
 	}
 

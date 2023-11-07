@@ -9,7 +9,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 	}
 
 	enum ViewAction: Sendable, Equatable {
@@ -22,10 +22,10 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	}
 
 	enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case hud(HUD.State)
 			case alert(OverlayWindowClient.Item.AlertState)
@@ -52,7 +52,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+				Destination()
 			}
 	}
 

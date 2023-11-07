@@ -12,9 +12,9 @@ public struct Home: Sendable, FeatureReducer {
 			.init(uniqueElements: accountList.accounts.map(\.account))
 		}
 
-		// MARK: - Destinations
+		// MARK: - Destination
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		public init(
 			babylonAccountRecoveryIsNeeded: Bool
@@ -42,14 +42,14 @@ public struct Home: Sendable, FeatureReducer {
 	public enum ChildAction: Sendable, Equatable {
 		case header(Header.Action)
 		case accountList(AccountList.Action)
-		case destination(PresentationAction<Destinations.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case displaySettings
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case accountDetails(AccountDetails.State)
 			case createAccount(CreateAccountCoordinator.State)
@@ -86,7 +86,7 @@ public struct Home: Sendable, FeatureReducer {
 		}
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+				Destination()
 			}
 	}
 

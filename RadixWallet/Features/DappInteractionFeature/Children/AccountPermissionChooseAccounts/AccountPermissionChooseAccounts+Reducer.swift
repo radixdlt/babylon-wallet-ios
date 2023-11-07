@@ -20,7 +20,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 		var chooseAccounts: ChooseAccounts.State
 
 		@PresentationState
-		var destination: Destinations.State?
+		var destination: Destination.State?
 
 		init(
 			challenge: P2P.Dapp.Request.AuthChallengeNonce?,
@@ -58,7 +58,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 	}
 
 	enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
+		case destination(PresentationAction<Destination.Action>)
 		case chooseAccounts(ChooseAccounts.Action)
 	}
 
@@ -70,7 +70,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 		case failedToProveOwnership(of: [Profile.Network.Account])
 	}
 
-	struct Destinations: Sendable, Reducer {
+	struct Destination: Sendable, Reducer {
 		enum State: Sendable, Hashable {
 			case signing(Signing.State)
 		}
@@ -98,7 +98,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+				Destination()
 			}
 	}
 

@@ -7,9 +7,9 @@ public struct Main: Sendable, FeatureReducer {
 
 		public var isOnMainnet = true
 
-		// MARK: - Destinations
+		// MARK: - Destination
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		public init(home: Home.State) {
 			self.home = home
@@ -22,7 +22,7 @@ public struct Main: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case home(Home.Action)
-		case destination(PresentationAction<Destinations.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -33,7 +33,7 @@ public struct Main: Sendable, FeatureReducer {
 		case currentGatewayChanged(to: Radix.Gateway)
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case settings(Settings.State)
 		}
@@ -60,7 +60,7 @@ public struct Main: Sendable, FeatureReducer {
 		}
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+				Destination()
 			}
 	}
 

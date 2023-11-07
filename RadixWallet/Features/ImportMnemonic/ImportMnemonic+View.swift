@@ -226,29 +226,29 @@ extension SwiftUI.View {
 	}
 
 	@MainActor
-	fileprivate func markMnemonicAsBackedUpAlert(with destinationStore: PresentationStoreOf<ImportMnemonic.Destinations>) -> some SwiftUI.View {
+	fileprivate func markMnemonicAsBackedUpAlert(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some SwiftUI.View {
 		alert(
 			store: destinationStore,
-			state: /ImportMnemonic.Destinations.State.markMnemonicAsBackedUp,
-			action: ImportMnemonic.Destinations.Action.markMnemonicAsBackedUp
+			state: /ImportMnemonic.Destination.State.markMnemonicAsBackedUp,
+			action: ImportMnemonic.Destination.Action.markMnemonicAsBackedUp
 		)
 	}
 
 	@MainActor
-	fileprivate func onContinueWarningAlert(with destinationStore: PresentationStoreOf<ImportMnemonic.Destinations>) -> some SwiftUI.View {
+	fileprivate func onContinueWarningAlert(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some SwiftUI.View {
 		alert(
 			store: destinationStore,
-			state: /ImportMnemonic.Destinations.State.onContinueWarning,
-			action: ImportMnemonic.Destinations.Action.onContinueWarning
+			state: /ImportMnemonic.Destination.State.onContinueWarning,
+			action: ImportMnemonic.Destination.Action.onContinueWarning
 		)
 	}
 
 	@MainActor
-	fileprivate func offDeviceMnemonicInfoSheet(with destinationStore: PresentationStoreOf<ImportMnemonic.Destinations>) -> some SwiftUI.View {
+	fileprivate func offDeviceMnemonicInfoSheet(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some SwiftUI.View {
 		sheet(
 			store: destinationStore,
-			state: /ImportMnemonic.Destinations.State.offDeviceMnemonicInfoPrompt,
-			action: ImportMnemonic.Destinations.Action.offDeviceMnemonicInfoPrompt,
+			state: /ImportMnemonic.Destination.State.offDeviceMnemonicInfoPrompt,
+			action: ImportMnemonic.Destination.Action.offDeviceMnemonicInfoPrompt,
 			content: { childStore in
 				OffDeviceMnemonicInfo.View(store: childStore)
 			}

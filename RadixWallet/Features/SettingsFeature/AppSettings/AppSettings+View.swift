@@ -145,41 +145,41 @@ extension AppSettings {
 
 private extension View {
 	@MainActor
-	func manageP2PLinks(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+	func manageP2PLinks(with destinationStore: PresentationStoreOf<AppSettings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destinations.State.manageP2PLinks,
-			action: AppSettings.Destinations.Action.manageP2PLinks,
+			state: /AppSettings.Destination.State.manageP2PLinks,
+			action: AppSettings.Destination.Action.manageP2PLinks,
 			destination: { P2PLinksFeature.View(store: $0) }
 		)
 	}
 
 	@MainActor
-	func gatewaySettings(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+	func gatewaySettings(with destinationStore: PresentationStoreOf<AppSettings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destinations.State.gatewaySettings,
-			action: AppSettings.Destinations.Action.gatewaySettings,
+			state: /AppSettings.Destination.State.gatewaySettings,
+			action: AppSettings.Destination.Action.gatewaySettings,
 			destination: { GatewaySettings.View(store: $0) }
 		)
 	}
 
 	@MainActor
-	func profileBackupSettings(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+	func profileBackupSettings(with destinationStore: PresentationStoreOf<AppSettings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destinations.State.profileBackupSettings,
-			action: AppSettings.Destinations.Action.profileBackupSettings,
+			state: /AppSettings.Destination.State.profileBackupSettings,
+			action: AppSettings.Destination.Action.profileBackupSettings,
 			destination: { ProfileBackupSettings.View(store: $0) }
 		)
 	}
 
 	@MainActor
-	func accountAndPersonasHiding(with destinationStore: PresentationStoreOf<AppSettings.Destinations>) -> some View {
+	func accountAndPersonasHiding(with destinationStore: PresentationStoreOf<AppSettings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destinations.State.accountAndPersonasHiding,
-			action: AppSettings.Destinations.Action.accountAndPersonasHiding,
+			state: /AppSettings.Destination.State.accountAndPersonasHiding,
+			action: AppSettings.Destination.Action.accountAndPersonasHiding,
 			destination: { AccountAndPersonaHiding.View(store: $0) }
 		)
 	}

@@ -73,7 +73,7 @@ extension EditPersona {
 							EditPersonaEntries.View(
 								store: store.scope(
 									state: \.entries,
-									action: (/Action.child .. EditPersona.ChildAction.personaData).embed
+									action: (/Action.child .. EditPersona.ChildAction.entries).embed
 								)
 							)
 
@@ -107,13 +107,13 @@ extension EditPersona {
 				}
 				.confirmationDialog(
 					store: store.destination,
-					state: /EditPersona.Destinations.State.closeConfirmationDialog,
-					action: EditPersona.Destinations.Action.closeConfirmationDialog
+					state: /EditPersona.Destination.State.closeConfirmationDialog,
+					action: EditPersona.Destination.Action.closeConfirmationDialog
 				)
 				.sheet(
 					store: store.destination,
-					state: /EditPersona.Destinations.State.addFields,
-					action: EditPersona.Destinations.Action.addFields,
+					state: /EditPersona.Destination.State.addFields,
+					action: EditPersona.Destination.Action.addFields,
 					content: { EditPersonaAddEntryKinds.View(store: $0) }
 				)
 			}
@@ -122,7 +122,7 @@ extension EditPersona {
 }
 
 private extension StoreOf<EditPersona> {
-	var destination: PresentationStoreOf<EditPersona.Destinations> {
+	var destination: PresentationStoreOf<EditPersona.Destination> {
 		scope(state: \.$destination) { .child(.destination($0)) }
 	}
 

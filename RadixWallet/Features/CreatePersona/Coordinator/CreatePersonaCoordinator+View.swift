@@ -49,7 +49,7 @@ extension CreatePersonaCoordinator {
 		}
 
 		private func destination(
-			for store: StoreOf<CreatePersonaCoordinator.Destinations>,
+			for store: StoreOf<CreatePersonaCoordinator.Destination>,
 			shouldDisplayNavBar: Bool
 		) -> some SwiftUI.View {
 			ZStack {
@@ -57,29 +57,29 @@ extension CreatePersonaCoordinator {
 					switch state {
 					case .step0_introduction:
 						CaseLet(
-							/CreatePersonaCoordinator.Destinations.State.step0_introduction,
-							action: CreatePersonaCoordinator.Destinations.Action.step0_introduction,
+							/CreatePersonaCoordinator.Destination.State.step0_introduction,
+							action: CreatePersonaCoordinator.Destination.Action.step0_introduction,
 							then: { IntroductionToPersonas.View(store: $0) }
 						)
 
 					case .step1_newPersonaInfo:
 						CaseLet(
-							/CreatePersonaCoordinator.Destinations.State.step1_newPersonaInfo,
-							action: CreatePersonaCoordinator.Destinations.Action.step1_newPersonaInfo,
+							/CreatePersonaCoordinator.Destination.State.step1_newPersonaInfo,
+							action: CreatePersonaCoordinator.Destination.Action.step1_newPersonaInfo,
 							then: { NewPersonaInfo.View(store: $0) }
 						)
 
 					case .step2_creationOfPersona:
 						CaseLet(
-							/CreatePersonaCoordinator.Destinations.State.step2_creationOfPersona,
-							action: CreatePersonaCoordinator.Destinations.Action.step2_creationOfPersona,
+							/CreatePersonaCoordinator.Destination.State.step2_creationOfPersona,
+							action: CreatePersonaCoordinator.Destination.Action.step2_creationOfPersona,
 							then: { CreationOfPersona.View(store: $0) }
 						)
 
 					case .step3_completion:
 						CaseLet(
-							/CreatePersonaCoordinator.Destinations.State.step3_completion,
-							action: CreatePersonaCoordinator.Destinations.Action.step3_completion,
+							/CreatePersonaCoordinator.Destination.State.step3_completion,
+							action: CreatePersonaCoordinator.Destination.Action.step3_completion,
 							then: { NewPersonaCompletion.View(store: $0) }
 						)
 					}

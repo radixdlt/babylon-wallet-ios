@@ -16,7 +16,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		var requestQueue: IdentifiedArrayOf<RequestEnvelope> = []
 
 		@PresentationState
-		var currentModal: Destinations.State?
+		var currentModal: Destination.State?
 
 		@PresentationState
 		var responseFailureAlert: AlertState<ViewAction.ResponseFailureAlertAction>?
@@ -72,10 +72,10 @@ struct DappInteractor: Sendable, FeatureReducer {
 	}
 
 	enum ChildAction: Sendable, Equatable {
-		case modal(PresentationAction<Destinations.Action>)
+		case modal(PresentationAction<Destination.Action>)
 	}
 
-	struct Destinations: Sendable, Reducer {
+	struct Destination: Sendable, Reducer {
 		enum State: Sendable, Hashable {
 			case dappInteraction(RelayState<RequestEnvelope, DappInteractionCoordinator.State>)
 			case dappInteractionCompletion(Completion.State)
@@ -109,7 +109,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$currentModal, action: /Action.child .. ChildAction.modal) {
-				Destinations()
+				Destination()
 			}
 			.ifLet(\.$responseFailureAlert, action: /Action.view .. ViewAction.responseFailureAlert)
 			.ifLet(\.$invalidRequestAlert, action: /Action.view .. ViewAction.invalidRequestAlert)

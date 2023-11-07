@@ -54,8 +54,8 @@ extension PoolUnit {
 					state: \.$destination,
 					action: (/Action.child .. PoolUnit.ChildAction.destination).embed
 				),
-				state: /Destinations.State.details,
-				action: Destinations.Action.details,
+				state: /Destination.State.details,
+				action: Destination.Action.details,
 				content: PoolUnitDetails.View.init
 			)
 		}

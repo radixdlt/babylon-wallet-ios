@@ -5,7 +5,7 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 		public var rows: IdentifiedArrayOf<NonFungibleAssetList.Row.State>
 
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		public init(rows: IdentifiedArrayOf<NonFungibleAssetList.Row.State>) {
 			self.rows = rows
@@ -14,10 +14,10 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case asset(NonFungibleAssetList.Row.State.ID, NonFungibleAssetList.Row.Action)
-		case destination(PresentationAction<Destinations.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case details(NonFungibleTokenDetails.State)
 		}
@@ -41,7 +41,7 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 				NonFungibleAssetList.Row()
 			}
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+				Destination()
 			}
 	}
 

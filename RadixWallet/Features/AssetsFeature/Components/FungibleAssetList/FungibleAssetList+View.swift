@@ -28,8 +28,8 @@ extension FungibleAssetList.View {
 		}
 		.sheet(
 			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-			state: /FungibleAssetList.Destinations.State.details,
-			action: FungibleAssetList.Destinations.Action.details,
+			state: /FungibleAssetList.Destination.State.details,
+			action: FungibleAssetList.Destination.Action.details,
 			content: { FungibleTokenDetails.View(store: $0) }
 		)
 	}

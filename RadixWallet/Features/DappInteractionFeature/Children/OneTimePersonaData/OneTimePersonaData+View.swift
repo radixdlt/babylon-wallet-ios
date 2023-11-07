@@ -87,14 +87,14 @@ extension OneTimePersonaData {
 				}
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /OneTimePersonaData.Destinations.State.editPersona,
-					action: OneTimePersonaData.Destinations.Action.editPersona,
+					state: /OneTimePersonaData.Destination.State.editPersona,
+					action: OneTimePersonaData.Destination.Action.editPersona,
 					content: { EditPersona.View(store: $0) }
 				)
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /OneTimePersonaData.Destinations.State.createPersona,
-					action: OneTimePersonaData.Destinations.Action.createPersona,
+					state: /OneTimePersonaData.Destination.State.createPersona,
+					action: OneTimePersonaData.Destination.Action.createPersona,
 					content: { CreatePersonaCoordinator.View(store: $0) }
 				)
 				.onAppear { viewStore.send(.appeared) }

@@ -61,14 +61,14 @@ extension Home {
 				}
 				.navigationDestination(
 					store: store.destination,
-					state: /Home.Destinations.State.accountDetails,
-					action: Home.Destinations.Action.accountDetails,
+					state: /Home.Destination.State.accountDetails,
+					action: Home.Destination.Action.accountDetails,
 					destination: { AccountDetails.View(store: $0) }
 				)
 				.sheet(
 					store: store.destination,
-					state: /Home.Destinations.State.createAccount,
-					action: Home.Destinations.Action.createAccount,
+					state: /Home.Destination.State.createAccount,
+					action: Home.Destination.Action.createAccount,
 					content: { CreateAccountCoordinator.View(store: $0) }
 				)
 			}
@@ -89,7 +89,7 @@ extension Home {
 }
 
 private extension StoreOf<Home> {
-	var destination: PresentationStoreOf<Home.Destinations> {
+	var destination: PresentationStoreOf<Home.Destination> {
 		scope(state: \.$destination) { .child(.destination($0)) }
 	}
 }

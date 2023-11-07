@@ -34,8 +34,8 @@ extension AccountPermissionChooseAccounts {
 				}
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /AccountPermissionChooseAccounts.Destinations.State.signing,
-					action: AccountPermissionChooseAccounts.Destinations.Action.signing,
+					state: /AccountPermissionChooseAccounts.Destination.State.signing,
+					action: AccountPermissionChooseAccounts.Destination.Action.signing,
 					content: { Signing.SheetView(store: $0) }
 				)
 			}

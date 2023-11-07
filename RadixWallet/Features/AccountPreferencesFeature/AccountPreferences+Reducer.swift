@@ -7,7 +7,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		public var account: Profile.Network.Account
 
 		@PresentationState
-		var destinations: Destinations.State? = nil
+		var destination: Destination.State? = nil
 
 		public init(account: Profile.Network.Account) {
 			self.account = account
@@ -28,7 +28,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destinations(PresentationAction<Destinations.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -36,7 +36,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	}
 
 	// MARK: - Destination
-	public struct Destinations: Reducer, Sendable {
+	public struct Destination: Reducer, Sendable {
 		public enum State: Equatable, Hashable {
 			case showQR(ShowQR.State)
 			case updateAccountLabel(UpdateAccountLabel.State)
@@ -83,8 +83,8 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destinations, action: /Action.child .. ChildAction.destinations) {
-				Destinations()
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destination()
 			}
 	}
 
@@ -99,14 +99,14 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			}
 
 		case .qrCodeButtonTapped:
-			state.destinations = .showQR(.init(accountAddress: state.account.address))
+			state.destination = .showQR(.init(accountAddress: state.account.address))
 			return .none
 
 		case let .rowTapped(row):
 			return destination(for: row, &state)
 
 		case .hideAccountTapped:
-			state.destinations = .confirmHideAccount(.init(
+			state.destination = .confirmHideAccount(.init(
 				title: .init(L10n.AccountSettings.hideThisAccount),
 				message: .init(L10n.AccountSettings.hideAccountConfirmation),
 				buttons: [
@@ -120,7 +120,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .destinations(.presented(action)):
+		case let .destination(.presented(action)):
 			onDestinationAction(action, &state)
 		default:
 			.none
@@ -140,7 +140,7 @@ extension AccountPreferences {
 	func destination(for row: AccountPreferences.Section.SectionRow, _ state: inout State) -> Effect<Action> {
 		switch row {
 		case .personalize(.accountLabel):
-			state.destinations = .updateAccountLabel(.init(account: state.account))
+			state.destination = .updateAccountLabel(.init(account: state.account))
 			return .none
 
 		case .personalize(.accountColor):
@@ -150,30 +150,30 @@ extension AccountPreferences {
 			return .none
 
 		case .onLedger(.thirdPartyDeposits):
-			state.destinations = .thirdPartyDeposits(.init(account: state.account))
+			state.destination = .thirdPartyDeposits(.init(account: state.account))
 			return .none
 
 		case .onLedger(.accountSecurity):
 			return .none
 
 		case .dev(.devPreferences):
-			state.destinations = .devPreferences(.init(address: state.account.address))
+			state.destination = .devPreferences(.init(address: state.account.address))
 			return .none
 		}
 	}
 
-	func onDestinationAction(_ action: AccountPreferences.Destinations.Action, _ state: inout State) -> Effect<Action> {
+	func onDestinationAction(_ action: AccountPreferences.Destination.Action, _ state: inout State) -> Effect<Action> {
 		switch action {
 		case .showQR(.delegate(.dismiss)):
-			if case .showQR = state.destinations {
-				state.destinations = nil
+			if case .showQR = state.destination {
+				state.destination = nil
 			}
 			return .none
 		case .showQR:
 			return .none
 		case .updateAccountLabel(.delegate(.accountLabelUpdated)),
 		     .thirdPartyDeposits(.delegate(.accountUpdated)):
-			state.destinations = nil
+			state.destination = nil
 			return .none
 		case .updateAccountLabel:
 			return .none

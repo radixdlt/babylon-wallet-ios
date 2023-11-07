@@ -5,7 +5,7 @@ import SwiftUI
 public struct DisplayMnemonics: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		@PresentationState
-		public var destination: Destinations.State? = nil
+		public var destination: Destination.State? = nil
 
 		public var deviceFactorSources: IdentifiedArrayOf<DisplayEntitiesControlledByMnemonic.State> = []
 
@@ -22,10 +22,10 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case row(id: DisplayEntitiesControlledByMnemonic.State.ID, action: DisplayEntitiesControlledByMnemonic.Action)
-		case destination(PresentationAction<Destinations.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
-	public struct Destinations: Sendable, Equatable, Reducer {
+	public struct Destination: Sendable, Equatable, Reducer {
 		public enum State: Sendable, Hashable {
 			case displayMnemonic(DisplayMnemonic.State)
 			case importMnemonicControllingAccounts(ImportMnemonicControllingAccounts.State)
@@ -61,7 +61,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 				DisplayEntitiesControlledByMnemonic()
 			}
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+				Destination()
 			}
 	}
 

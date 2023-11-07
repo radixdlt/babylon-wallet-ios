@@ -49,8 +49,8 @@ extension SelectBackup {
 				}
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /SelectBackup.Destinations.State.inputEncryptionPassword,
-					action: SelectBackup.Destinations.Action.inputEncryptionPassword,
+					state: /SelectBackup.Destination.State.inputEncryptionPassword,
+					action: SelectBackup.Destination.Action.inputEncryptionPassword,
 					content: { store in
 						NavigationView {
 							EncryptOrDecryptProfile.View(store: store)
