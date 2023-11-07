@@ -88,7 +88,6 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case handleSelectedAssets(State.Mode.SelectedAssets)
-		case xrdBalanceUpdated
 		case dismiss
 	}
 
@@ -159,11 +158,8 @@ public struct AssetsView: Sendable, FeatureReducer {
 				}
 			}
 			state.isRefreshing = false
-			if let xrdSection = resourcesState.fungibleTokenList?.sections[id: .xrd], let _ = xrdSection.rows.first?.token {
-				return .send(.delegate(.xrdBalanceUpdated))
-			} else {
-				return .none
-			}
+
+			return .none
 		}
 	}
 

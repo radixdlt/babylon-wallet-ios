@@ -123,10 +123,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case .assets(.delegate(.xrdBalanceUpdated)):
-			checkAccountAccessToMnemonic(state: &state)
-			return .none
-
 		case .destination(.presented(.preferences(.delegate(.accountHidden)))):
 			return .send(.delegate(.dismiss))
 
