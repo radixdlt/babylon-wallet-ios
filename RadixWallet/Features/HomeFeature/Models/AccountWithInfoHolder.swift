@@ -32,14 +32,14 @@ extension AccountWithInfoHolder {
 }
 
 extension AccountWithInfoHolder {
-	mutating func updateMnemonicPromptsIfNeeded(portfolio: OnLedgerEntity.Account? = nil) {
+	mutating func checkAccountAccessToMnemonic(portfolio: OnLedgerEntity.Account? = nil) {
 		if let portfolio, account.address != portfolio.address {
 			assertionFailure("Discrepancy, wrong owner")
 		}
-		updateMnemonicPromptsIfNeeded(xrdResource: portfolio?.fungibleResources.xrdResource)
+		checkAccountAccessToMnemonic(xrdResource: portfolio?.fungibleResources.xrdResource)
 	}
 
-	mutating func updateMnemonicPromptsIfNeeded(xrdResource: OnLedgerEntity.OwnedFungibleResource? = nil) {
+	mutating func checkAccountAccessToMnemonic(xrdResource: OnLedgerEntity.OwnedFungibleResource? = nil) {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 

@@ -117,6 +117,8 @@ public struct AssetsView: Sendable, FeatureReducer {
 			return .run { [address = state.account.address, mode = state.mode] send in
 				for try await portfolio in await accountPortfoliosClient.portfolioForAccount(address).debounce(for: .seconds(0.1)) {
 					guard !Task.isCancelled else { return }
+
+					loggerGlobal.critical("🔮 \(Self.self) account portfolio updated, address: \(address)")
 					await send(.internal(.resourcesStateUpdated(createResourcesState(
 						from: portfolio.nonEmptyVaults,
 						mode: mode

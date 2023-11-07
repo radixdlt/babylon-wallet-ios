@@ -55,6 +55,7 @@ extension Home {
 						guard !Task.isCancelled else {
 							return
 						}
+						loggerGlobal.critical("🔮 \(Self.self) account portfolio updated, address: \(accountAddress)")
 						await send(.internal(.accountPortfolioUpdate(accountPortfolio.nonEmptyVaults)))
 					}
 				}
@@ -86,7 +87,7 @@ extension Home {
 		}
 
 		private func checkAccountAccessToMnemonic(state: inout State) {
-			state.updateMnemonicPromptsIfNeeded(portfolio: state.portfolio.wrappedValue)
+			state.checkAccountAccessToMnemonic(portfolio: state.portfolio.wrappedValue)
 		}
 	}
 }

@@ -124,7 +124,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 
 		case let .assets(.delegate(.xrdBalanceUpdated(xrdBalance))):
-			checkIfCallActionIsNeeded(state: &state, xrdResource: xrdBalance)
+			loggerGlobal.critical("🔮 \(Self.self) account xrd balance updated, address: \(state.account.address)")
+			checkAccountAccessToMnemonic(state: &state, xrdResource: xrdBalance)
 			return .none
 
 		case .destination(.presented(.preferences(.delegate(.accountHidden)))):
@@ -143,8 +144,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	private func checkIfCallActionIsNeeded(state: inout State, xrdResource: OnLedgerEntity.OwnedFungibleResource? = nil) {
-		state.updateMnemonicPromptsIfNeeded(xrdResource: xrdResource)
+	private func checkAccountAccessToMnemonic(state: inout State, xrdResource: OnLedgerEntity.OwnedFungibleResource? = nil) {
+		state.checkAccountAccessToMnemonic(xrdResource: xrdResource)
 	}
 
 //	private func checkIfShouldShowExportMnemonicPrompt(state: inout State) -> Effect<Action> {

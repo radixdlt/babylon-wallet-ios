@@ -180,6 +180,10 @@ public struct Home: Sendable, FeatureReducer {
 				return importMnemonics(state: &state)
 			}
 
+		case let .destination(.presented(.accountDetails(.child(.assets(.delegate(.xrdBalanceUpdated(xrdBalance))))))):
+			loggerGlobal.critical("🔮 \(Self.self) account xrd balance updated")
+			return .none
+
 		case let .destination(.presented(.accountDetails(.delegate(.exportMnemonic(controlledAccount))))):
 			return exportMnemonic(controlling: controlledAccount, state: &state)
 

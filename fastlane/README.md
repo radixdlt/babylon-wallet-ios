@@ -41,6 +41,14 @@ Deploy the app for a given flavour: alpha, beta, release
 
 Usage `bundle exec fastlane ios deploy --env ios.<specific env>`
 
+### ios export_ios_app
+
+```sh
+[bundle exec] fastlane ios export_ios_app
+```
+
+Archive and export the iOS app
+
 ### ios install_distribution_certificates
 
 ```sh
