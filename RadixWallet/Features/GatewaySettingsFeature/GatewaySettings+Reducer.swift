@@ -9,7 +9,6 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		var validatedNewGatewayToSwitchTo: Radix.Gateway?
 		var gatewayForRemoval: Radix.Gateway?
 
-		@PresentationState var removeGatewayAlert: AlertState<ViewAction.RemoveGatewayAction>?
 		@PresentationState var destination: Destination.State?
 
 		public init(
@@ -21,14 +20,8 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case removeGateway(PresentationAction<RemoveGatewayAction>)
 		case addGatewayButtonTapped
 		case popoverButtonTapped
-
-		public enum RemoveGatewayAction: Sendable, Hashable {
-			case removeButtonTapped(GatewayRow.State)
-			case cancelButtonTapped
-		}
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -48,12 +41,19 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			case addNewGateway(AddNewGateway.State)
 			case createAccount(CreateAccountCoordinator.State)
 			case slideUpPanel(SlideUpPanel.State)
+			case removeGateway(AlertState<Action.RemoveGatewayAlert>)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case addNewGateway(AddNewGateway.Action)
 			case createAccount(CreateAccountCoordinator.Action)
 			case slideUpPanel(SlideUpPanel.Action)
+			case removeGateway(RemoveGatewayAlert)
+
+			public enum RemoveGatewayAlert: Sendable, Hashable {
+				case removeButtonTapped(GatewayRow.State)
+				case cancelButtonTapped
+			}
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -91,7 +91,6 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		}
 
 		Reduce(core)
-			.ifLet(\.$removeGatewayAlert, action: /Action.view .. ViewAction.removeGateway)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
 				Destination()
 			}
@@ -107,43 +106,6 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 				}
 			} catch: { error, _ in
 				errorQueue.schedule(error)
-			}
-
-		case let .removeGateway(.presented(action)):
-			switch action {
-			case let .removeButtonTapped(gatewayState):
-				guard gatewayState.gateway != .mainnet else {
-					assertionFailure("Incorrect implementation, should be impossible to remove mainnet.")
-					return .none
-				}
-				guard let currentGateway = state.currentGateway else { return .none }
-
-				switch gatewayState.gateway {
-				case currentGateway:
-
-					// FIXME: Mainnet simply once mainnet is online....
-					let containsMainnet = state.gatewayList.gateways.map(\.gateway).contains(.mainnet)
-					let newCurrent: Radix.Gateway? = if containsMainnet {
-						Radix.Gateway.mainnet
-					} else {
-						Radix.Gateway.default
-					}
-
-					guard let newCurrent else {
-						return .none
-					}
-
-					state.gatewayForRemoval = gatewayState.gateway
-					return switchToGateway(&state, gateway: newCurrent)
-
-				default:
-					return .run { _ in
-						try await gatewaysClient.removeGateway(gatewayState.gateway)
-					}
-				}
-
-			case .cancelButtonTapped:
-				return .none
 			}
 
 		case .addGatewayButtonTapped:
@@ -242,36 +204,78 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		case let .gatewayList(.delegate(action)):
 			switch action {
 			case let .removeGateway(gateway):
-				state.removeGatewayAlert = .removeGateway(row: gateway)
+				state.destination = .removeGateway(.removeGateway(row: gateway))
 				return .none
 
 			case let .switchToGateway(gateway):
 				return switchToGateway(&state, gateway: gateway)
 			}
 
-		case .destination(.presented(.addNewGateway(.delegate(.dismiss)))):
-			state.destination = nil
-			return .none
+		case let .destination(.presented(presentedAction)):
+			switch presentedAction {
+			case .addNewGateway(.delegate(.dismiss)):
+				state.destination = nil
+				return .none
 
-		case .destination(.presented(.createAccount(.delegate(.dismissed)))):
-			return skipSwitching(&state)
+			case .createAccount(.delegate(.dismissed)):
+				return skipSwitching(&state)
 
-		case .destination(.presented(.createAccount(.delegate(.completed)))):
-			state.destination = nil
-			guard let newGateway = state.validatedNewGatewayToSwitchTo else {
-				// weird state, should not happen
+			case .createAccount(.delegate(.completed)):
+				state.destination = nil
+				guard let newGateway = state.validatedNewGatewayToSwitchTo else {
+					// weird state, should not happen
+					return .none
+				}
+				return .run { send in
+					let result = await TaskResult {
+						try await networkSwitchingClient.switchTo(newGateway)
+					}
+					await send(.internal(.switchToGatewayResult(result)))
+				}
+
+			case .slideUpPanel(.delegate(.dismiss)):
+				state.destination = nil
+				return .none
+
+			case let .removeGateway(removeGatewayAction):
+				switch removeGatewayAction {
+				case let .removeButtonTapped(gatewayState):
+					guard gatewayState.gateway != .mainnet else {
+						assertionFailure("Incorrect implementation, should be impossible to remove mainnet.")
+						return .none
+					}
+					guard let currentGateway = state.currentGateway else { return .none }
+
+					switch gatewayState.gateway {
+					case currentGateway:
+						// FIXME: Mainnet simply once mainnet is online....
+						let containsMainnet = state.gatewayList.gateways.map(\.gateway).contains(.mainnet)
+						let newCurrent: Radix.Gateway? = if containsMainnet {
+							Radix.Gateway.mainnet
+						} else {
+							Radix.Gateway.default
+						}
+
+						guard let newCurrent else {
+							return .none
+						}
+
+						state.gatewayForRemoval = gatewayState.gateway
+						return switchToGateway(&state, gateway: newCurrent)
+
+					default:
+						return .run { _ in
+							try await gatewaysClient.removeGateway(gatewayState.gateway)
+						}
+					}
+
+				case .cancelButtonTapped:
+					return .none
+				}
+
+			default:
 				return .none
 			}
-			return .run { send in
-				let result = await TaskResult {
-					try await networkSwitchingClient.switchTo(newGateway)
-				}
-				await send(.internal(.switchToGatewayResult(result)))
-			}
-
-		case .destination(.presented(.slideUpPanel(.delegate(.dismiss)))):
-			state.destination = nil
-			return .none
 
 		default:
 			return .none
@@ -279,7 +283,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	}
 }
 
-extension AlertState<GatewaySettings.ViewAction.RemoveGatewayAction> {
+extension AlertState<GatewaySettings.Destination.Action.RemoveGatewayAlert> {
 	// FIXME: This should probably take an ID and not GatewayRow.State
 	static func removeGateway(row: GatewayRow.State) -> AlertState {
 		AlertState {
