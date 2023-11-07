@@ -62,7 +62,7 @@ jobs:
           secret-ids: |
             WEBHOOK, ${{ secrets.AWS_SECRET_NAME_SLACK_WEBHOOK }}
           parse-json-secrets: true
-      - uses: webfactory/ssh-agent@v0.6.0
+      - uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: |
             ${{ env.SWIFT_SSH }}
@@ -80,7 +80,7 @@ jobs:
         with:
           xcode-version: "15.0.1"
 
-      - uses: webfactory/ssh-agent@v0.6.0
+      - uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: |
             ${{ env.SWIFT_SSH }}

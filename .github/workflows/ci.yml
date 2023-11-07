@@ -90,7 +90,7 @@ jobs:
           secret_prefix: 'SWIFT_ENGINE_TOOLKIT_SSH_KEY'
           secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
           parse_json: true
-      - uses: webfactory/ssh-agent@v0.6.0
+      - uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: |
             ${{ env.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
@@ -162,7 +162,7 @@ jobs:
           secret-ids: |
             FASTLANE_MATCH_REPO_SSH_KEY, ${{ secrets.AWS_SECRET_NAME_WALLET_FASTLANE_SSH }}
           parse-json-secrets: true
-      - uses: webfactory/ssh-agent@v0.6.0
+      - uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: |
             ${{ env.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
@@ -234,7 +234,7 @@ jobs:
           secret_prefix: 'SWIFT_ENGINE_TOOLKIT_SSH_KEY'
           secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
           parse_json: true
-      - uses: webfactory/ssh-agent@v0.6.0
+      - uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: |
             ${{ env.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
