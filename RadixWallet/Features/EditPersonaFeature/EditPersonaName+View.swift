@@ -14,10 +14,15 @@ extension EditPersonaName {
 					variantPicker(viewStore)
 
 					VStack(spacing: .medium2) {
-						if viewStore.variant == .eastern {
-							easternOrder()
-						} else {
-							westernOrder()
+						switch viewStore.variant {
+						case .eastern:
+							familyNameRow
+
+							givenNameRow
+						case .western:
+							givenNameRow
+
+							familyNameRow
 						}
 					}
 				}
@@ -28,10 +33,13 @@ extension EditPersonaName {
 		@ViewBuilder
 		func variantPicker(_ viewStore: ViewStoreOf<EditPersonaName>) -> some SwiftUI.View {
 			Menu {
-				Picker(selection: viewStore.binding(
-					get: \.variant,
-					send: ViewAction.variantPick
-				), label: EmptyView()) {
+				Picker(
+					selection: viewStore.binding(
+						get: \.variant,
+						send: ViewAction.variantPick
+					),
+					label: EmptyView()
+				) {
 					ForEach(PersonaData.Name.Variant.allCases, id: \.self) {
 						Text($0.text)
 							.textStyle(.body1Regular)
@@ -68,69 +76,31 @@ extension EditPersonaName {
 			}
 		}
 
-		// FIXME: Reordering could probably be done nicer by using a Grid probably
-		@ViewBuilder
-		func westernOrder() -> some SwiftUI.View {
+		private var givenNameRow: some SwiftUI.View {
 			HStack(alignment: .top, spacing: .medium3) {
 				EditPersonaField.View(
 					store: store.scope(
 						state: \.given,
-						action: (/Action.child
-							.. EditPersonaName.ChildAction.given
-						).embed
+						action: { .child(.given($0)) }
 					)
 				)
 
 				EditPersonaField.View(
 					store: store.scope(
-						state: \.nickName,
-						action: (/Action.child
-							.. EditPersonaName.ChildAction.nickname
-						).embed
+						state: \.nickname,
+						action: { .child(.nickname($0)) }
 					)
 				)
 			}
-
-			EditPersonaField.View(
-				store: store.scope(
-					state: \.family,
-					action: (/Action.child
-						.. EditPersonaName.ChildAction.family
-					).embed
-				)
-			)
 		}
 
-		@ViewBuilder
-		func easternOrder() -> some SwiftUI.View {
+		private var familyNameRow: some SwiftUI.View {
 			EditPersonaField.View(
 				store: store.scope(
 					state: \.family,
-					action: (/Action.child
-						.. EditPersonaName.ChildAction.family
-					).embed
+					action: { .child(.family($0)) }
 				)
 			)
-
-			HStack(alignment: .top, spacing: .medium3) {
-				EditPersonaField.View(
-					store: store.scope(
-						state: \.given,
-						action: (/Action.child
-							.. EditPersonaName.ChildAction.given
-						).embed
-					)
-				)
-
-				EditPersonaField.View(
-					store: store.scope(
-						state: \.nickName,
-						action: (/Action.child
-							.. EditPersonaName.ChildAction.nickname
-						).embed
-					)
-				)
-			}
 		}
 	}
 }
