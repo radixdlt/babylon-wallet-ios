@@ -123,9 +123,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case let .assets(.delegate(.xrdBalanceUpdated(xrdBalance))):
-			loggerGlobal.critical("🔮 \(Self.self) account xrd balance updated, address: \(state.account.address)")
-			checkAccountAccessToMnemonic(state: &state, xrdResource: xrdBalance)
+		case .assets(.delegate(.xrdBalanceUpdated)):
+			checkAccountAccessToMnemonic(state: &state)
 			return .none
 
 		case .destination(.presented(.preferences(.delegate(.accountHidden)))):
@@ -140,48 +139,13 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .accountUpdated(account):
 			state.account = account
+			checkAccountAccessToMnemonic(state: &state)
 			return .none
 		}
 	}
 
-	private func checkAccountAccessToMnemonic(state: inout State, xrdResource: OnLedgerEntity.OwnedFungibleResource? = nil) {
+	private func checkAccountAccessToMnemonic(state: inout State) {
+		let xrdResource = state.assets.fungibleTokenList?.sections[id: .xrd]?.rows.first?.token
 		state.checkAccountAccessToMnemonic(xrdResource: xrdResource)
 	}
-
-//	private func checkIfShouldShowExportMnemonicPrompt(state: inout State) -> Effect<Action> {
-//		guard !state.isShowingImportMnemonicPrompt else {
-//			return .none
-//		}
-//
-//		@Dependency(\.userDefaultsClient) var userDefaultsClient
-//
-//		let mightNeedToBeBackedUp: Bool = {
-//			guard let deviceFactorSourceID = state.account.deviceFactorSourceID else {
-//				// Ledger account, mnemonics do not apply...
-//				return false
-//			}
-//			// check if already backed up
-//			let isAlreadyBackedUp = userDefaultsClient
-//				.getFactorSourceIDOfBackedUpMnemonics()
-//				.contains(deviceFactorSourceID)
-//
-//			return !isAlreadyBackedUp
-//		}()
-//
-//		guard mightNeedToBeBackedUp else {
-//			return .none
-//		}
-//
-//		guard let xrdOwned = state.assets.fungibleTokenList?.sections[id: .xrd]?.rows.first else {
-//			return .none
-//		}
-//
-//		assert(xrdOwned.isXRD)
-//
-//		guard xrdOwned.token.amount > .zero else {
-//			return .none
-//		}
-//
-//		return .send(.internal(.markBackupNeeded))
-//	}
 }

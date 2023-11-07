@@ -88,7 +88,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case handleSelectedAssets(State.Mode.SelectedAssets)
-		case xrdBalanceUpdated(OnLedgerEntity.OwnedFungibleResource)
+		case xrdBalanceUpdated
 		case dismiss
 	}
 
@@ -118,7 +118,6 @@ public struct AssetsView: Sendable, FeatureReducer {
 				for try await portfolio in await accountPortfoliosClient.portfolioForAccount(address).debounce(for: .seconds(0.1)) {
 					guard !Task.isCancelled else { return }
 
-					loggerGlobal.critical("🔮 \(Self.self) account portfolio updated, address: \(address)")
 					await send(.internal(.resourcesStateUpdated(createResourcesState(
 						from: portfolio.nonEmptyVaults,
 						mode: mode
@@ -160,8 +159,8 @@ public struct AssetsView: Sendable, FeatureReducer {
 				}
 			}
 			state.isRefreshing = false
-			if let xrdSection = resourcesState.fungibleTokenList?.sections[id: .xrd], let xrdBalance = xrdSection.rows.first?.token {
-				return .send(.delegate(.xrdBalanceUpdated(xrdBalance)))
+			if let xrdSection = resourcesState.fungibleTokenList?.sections[id: .xrd], let _ = xrdSection.rows.first?.token {
+				return .send(.delegate(.xrdBalanceUpdated))
 			} else {
 				return .none
 			}

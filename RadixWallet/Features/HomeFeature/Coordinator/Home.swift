@@ -69,7 +69,7 @@ public struct Home: Sendable, FeatureReducer {
 
 		public var body: some ReducerOf<Self> {
 			Scope(state: /State.accountDetails, action: /Action.accountDetails) {
-				AccountDetails()
+				AccountDetails()._printChanges()
 			}
 			Scope(state: /State.createAccount, action: /Action.createAccount) {
 				CreateAccountCoordinator()
@@ -179,10 +179,6 @@ public struct Home: Sendable, FeatureReducer {
 			case .importMnemonics:
 				return importMnemonics(state: &state)
 			}
-
-		case let .destination(.presented(.accountDetails(.child(.assets(.delegate(.xrdBalanceUpdated(xrdBalance))))))):
-			loggerGlobal.critical("🔮 \(Self.self) account xrd balance updated")
-			return .none
 
 		case let .destination(.presented(.accountDetails(.delegate(.exportMnemonic(controlledAccount))))):
 			return exportMnemonic(controlling: controlledAccount, state: &state)

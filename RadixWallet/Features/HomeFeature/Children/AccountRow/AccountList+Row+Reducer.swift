@@ -55,7 +55,6 @@ extension Home {
 						guard !Task.isCancelled else {
 							return
 						}
-						loggerGlobal.critical("🔮 \(Self.self) account portfolio updated, address: \(accountAddress)")
 						await send(.internal(.accountPortfolioUpdate(accountPortfolio.nonEmptyVaults)))
 					}
 				}
