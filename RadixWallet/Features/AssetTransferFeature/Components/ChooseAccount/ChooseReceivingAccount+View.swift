@@ -79,8 +79,8 @@ extension ChooseReceivingAccount.View {
 				}
 				.navigationDestination(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /ChooseReceivingAccount.Destinations.State.scanAccountAddress,
-					action: ChooseReceivingAccount.Destinations.Action.scanAccountAddress,
+					state: /ChooseReceivingAccount.Destination.State.scanAccountAddress,
+					action: ChooseReceivingAccount.Destination.Action.scanAccountAddress,
 					destination: {
 						ScanQRCoordinator.View(store: $0)
 							.navigationTitle(L10n.AssetTransfer.ChooseReceivingAccount.scanQRNavigationTitle)

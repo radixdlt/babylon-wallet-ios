@@ -22,14 +22,14 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		public let context: Context
 
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		public init(context: Context = .notOnboarding) {
 			self.context = context
 		}
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case importMnemonicControllingAccounts(ImportMnemonicControllingAccounts.State)
 		}
@@ -49,7 +49,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -86,7 +86,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+				Destination()
 			}
 	}
 

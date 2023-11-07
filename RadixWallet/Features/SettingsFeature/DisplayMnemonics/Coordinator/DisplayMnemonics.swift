@@ -9,7 +9,7 @@ public typealias DisplayMnemonic = ExportMnemonic
 public struct DisplayMnemonics: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		@PresentationState
-		public var destination: Destinations.State? = nil
+		public var destination: Destination.State? = nil
 
 		public var deviceFactorSources: IdentifiedArrayOf<DisplayEntitiesControlledByMnemonic.State> = []
 
@@ -32,7 +32,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
-	public struct Destinations: Sendable, Equatable, Reducer {
+	public struct Destination: Sendable, Equatable, Reducer {
 		public enum State: Sendable, Hashable {
 			case displayMnemonic(ImportMnemonic.State)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
@@ -68,7 +68,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 				DisplayEntitiesControlledByMnemonic()
 			}
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+				Destination()
 			}
 	}
 

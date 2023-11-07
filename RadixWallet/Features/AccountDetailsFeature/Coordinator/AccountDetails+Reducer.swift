@@ -8,7 +8,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		var assets: AssetsView.State
 
 		@PresentationState
-		var destination: Destinations.State?
+		var destination: Destination.State?
 
 		public init(
 			accountWithInfo: AccountWithInfo
@@ -33,7 +33,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case assets(AssetsView.Action)
-		case destination(PresentationAction<Destinations.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -51,7 +51,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		public let factorSourceKind: FactorSourceKind
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case preferences(AccountPreferences.State)
 			case transfer(AssetTransfer.State)
@@ -85,7 +85,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+				Destination()
 			}
 	}
 

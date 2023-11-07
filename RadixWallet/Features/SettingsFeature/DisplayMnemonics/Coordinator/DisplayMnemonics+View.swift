@@ -47,14 +47,14 @@ extension DisplayMnemonics {
 					await viewStore.send(.onFirstTask).finish()
 				}
 			}
-			.destinations(with: store)
+			.destination(with: store)
 		}
 	}
 }
 
 extension View {
 	@MainActor
-	fileprivate func destinations(
+	fileprivate func destination(
 		with store: StoreOf<DisplayMnemonics>
 	) -> some View {
 		let destinationStore = store.scope(
@@ -68,7 +68,7 @@ extension View {
 	}
 
 	@MainActor
-	private func displayMnemonicSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destinations>) -> some View {
+	private func displayMnemonicSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
 			state: /DisplayMnemonics.Destinations.State.displayMnemonic,
@@ -80,7 +80,7 @@ extension View {
 	}
 
 	@MainActor
-	private func importMnemonicsSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destinations>) -> some View {
+	private func importMnemonicsSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
 			state: /DisplayMnemonics.Destinations.State.importMnemonics,

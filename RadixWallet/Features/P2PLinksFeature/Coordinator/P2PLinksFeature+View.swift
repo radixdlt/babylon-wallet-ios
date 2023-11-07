@@ -65,14 +65,14 @@ extension P2PLinksFeature {
 				}
 				.sheet(
 					store: store.destination,
-					state: /P2PLinksFeature.Destinations.State.newConnection,
-					action: P2PLinksFeature.Destinations.Action.newConnection,
+					state: /P2PLinksFeature.Destination.State.newConnection,
+					action: P2PLinksFeature.Destination.Action.newConnection,
 					content: { NewConnection.View(store: $0) }
 				)
 				.alert(
 					store: store.destination,
-					state: /P2PLinksFeature.Destinations.State.removeConnection,
-					action: P2PLinksFeature.Destinations.Action.removeConnection
+					state: /P2PLinksFeature.Destination.State.removeConnection,
+					action: P2PLinksFeature.Destination.Action.removeConnection
 				)
 			}
 		}
@@ -80,7 +80,7 @@ extension P2PLinksFeature {
 }
 
 private extension StoreOf<P2PLinksFeature> {
-	var destination: PresentationStoreOf<P2PLinksFeature.Destinations> {
+	var destination: PresentationStoreOf<P2PLinksFeature.Destination> {
 		scope(state: \.$destination) { .child(.destination($0)) }
 	}
 }

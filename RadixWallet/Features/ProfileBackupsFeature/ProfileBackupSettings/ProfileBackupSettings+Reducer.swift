@@ -15,7 +15,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		/// An exportable Profile file, either encrypted or plaintext.
 		public var profileFile: ExportableProfileFile?
@@ -41,7 +41,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		case deleteProfileAndFactorSourcesButtonTapped
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: Sendable, Reducer {
 		static let confirmCloudSyncDisableAlert: Self.State = .confirmCloudSyncDisable(.init(
 			title: {
 				TextState(L10n.AppSettings.ConfirmCloudSyncDisableAlert.title)
@@ -124,7 +124,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -144,7 +144,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 	public var body: some ReducerOf<ProfileBackupSettings> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. /ChildAction.destination) {
-				Destinations()
+				Destination()
 			}
 	}
 
@@ -156,14 +156,14 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 
 		case let .cloudProfileSyncToggled(isEnabled):
 			if !isEnabled {
-				state.destination = Destinations.confirmCloudSyncDisableAlert
+				state.destination = Destination.confirmCloudSyncDisableAlert
 				return .none
 			} else {
 				return updateCloudSync(state: &state, isEnabled: true)
 			}
 
 		case .exportProfileButtonTapped:
-			state.destination = Destinations.optionallyEncryptProfileBeforeExportingAlert
+			state.destination = Destination.optionallyEncryptProfileBeforeExportingAlert
 			return .none
 
 		case .task:
@@ -296,7 +296,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 // MARK: - LackedPermissionToAccessSecurityScopedResource
 struct LackedPermissionToAccessSecurityScopedResource: Error {}
 
-extension ConfirmationDialogState<ProfileBackupSettings.Destinations.Action.DeleteProfileConfirmationDialogAction> {
+extension ConfirmationDialogState<ProfileBackupSettings.Destination.Action.DeleteProfileConfirmationDialogAction> {
 	static let deleteProfileConfirmationDialog = ConfirmationDialogState {
 		TextState(L10n.AppSettings.ResetWalletDialog.title)
 	} actions: {
@@ -314,7 +314,7 @@ extension ConfirmationDialogState<ProfileBackupSettings.Destinations.Action.Dele
 	}
 }
 
-extension ProfileBackupSettings.Destinations.State {
+extension ProfileBackupSettings.Destination.State {
 	fileprivate static let cloudSyncTakesLongTimeAlert = Self.syncTakesLongTimeAlert(.init(
 		title: { TextState(L10n.AppSettings.ICloudSyncEnabledAlert.title) },
 		actions: {

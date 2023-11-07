@@ -183,7 +183,7 @@ extension Settings.View {
 
 extension View {
 	@MainActor
-	fileprivate func navigationDestinations(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
+	fileprivate func navigationDestinations(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
 		self
 			.manageP2PLinks(with: destinationStore)
 			.authorizedDapps(with: destinationStore)
@@ -196,62 +196,62 @@ extension View {
 	}
 
 	@MainActor
-	private func manageP2PLinks(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
+	private func manageP2PLinks(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /Settings.Destinations.State.manageP2PLinks,
-			action: Settings.Destinations.Action.manageP2PLinks,
+			state: /Settings.Destination.State.manageP2PLinks,
+			action: Settings.Destination.Action.manageP2PLinks,
 			destination: { P2PLinksFeature.View(store: $0) }
 		)
 	}
 
 	@MainActor
-	private func authorizedDapps(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
+	private func authorizedDapps(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /Settings.Destinations.State.authorizedDapps,
-			action: Settings.Destinations.Action.authorizedDapps,
+			state: /Settings.Destination.State.authorizedDapps,
+			action: Settings.Destination.Action.authorizedDapps,
 			destination: { AuthorizedDapps.View(store: $0) }
 		)
 	}
 
 	@MainActor
-	private func personas(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
+	private func personas(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /Settings.Destinations.State.personas,
-			action: Settings.Destinations.Action.personas,
+			state: /Settings.Destination.State.personas,
+			action: Settings.Destination.Action.personas,
 			destination: { PersonasCoordinator.View(store: $0) }
 		)
 	}
 
 	@MainActor
-	private func accountSecurity(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
+	private func accountSecurity(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /Settings.Destinations.State.accountSecurity,
-			action: Settings.Destinations.Action.accountSecurity,
+			state: /Settings.Destination.State.accountSecurity,
+			action: Settings.Destination.Action.accountSecurity,
 			destination: { AccountSecurity.View(store: $0) }
 		)
 	}
 
 	@MainActor
-	private func appSettings(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
+	private func appSettings(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /Settings.Destinations.State.appSettings,
-			action: Settings.Destinations.Action.appSettings,
+			state: /Settings.Destination.State.appSettings,
+			action: Settings.Destination.Action.appSettings,
 			destination: { AppSettings.View(store: $0) }
 		)
 	}
 
 	#if DEBUG
 	@MainActor
-	private func debugSettings(with destinationStore: PresentationStoreOf<Settings.Destinations>) -> some View {
+	private func debugSettings(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /Settings.Destinations.State.debugSettings,
-			action: Settings.Destinations.Action.debugSettings,
+			state: /Settings.Destination.State.debugSettings,
+			action: Settings.Destination.Action.debugSettings,
 			destination: { DebugSettingsCoordinator.View(store: $0) }
 		)
 	}

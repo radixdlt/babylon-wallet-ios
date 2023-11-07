@@ -109,11 +109,11 @@ public extension FactorSourcesOfKindList {
 					await viewStore.send(.onFirstTask).finish()
 				}
 			}
-			.destinations(with: store)
+			.destination(with: store)
 			.confirmationDialog(
 				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /FactorSourcesOfKindList.Destinations.State.existingFactorSourceWillBeDeletedConfirmationDialog,
-				action: FactorSourcesOfKindList.Destinations.Action.existingFactorSourceWillBeDeletedConfirmationDialog
+				state: /FactorSourcesOfKindList.Destination.State.existingFactorSourceWillBeDeletedConfirmationDialog,
+				action: FactorSourcesOfKindList.Destination.Action.existingFactorSourceWillBeDeletedConfirmationDialog
 			)
 		}
 
@@ -163,17 +163,17 @@ extension FactorSource {
 
 extension View {
 	@MainActor
-	fileprivate func destinations(with store: StoreOf<FactorSourcesOfKindList<some BaseFactorSourceProtocol>>) -> some SwiftUI.View {
+	fileprivate func destination(with store: StoreOf<FactorSourcesOfKindList<some BaseFactorSourceProtocol>>) -> some SwiftUI.View {
 		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		return addNewFactorSourceSheet(with: destinationStore)
 	}
 
 	@MainActor
-	private func addNewFactorSourceSheet<F>(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList<F>.Destinations>) -> some SwiftUI.View where F: BaseFactorSourceProtocol {
+	private func addNewFactorSourceSheet<F>(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList<F>.Destination>) -> some SwiftUI.View where F: BaseFactorSourceProtocol {
 		sheet(
 			store: destinationStore,
-			state: /FactorSourcesOfKindList.Destinations.State.addNewFactorSource,
-			action: FactorSourcesOfKindList.Destinations.Action.addNewFactorSource,
+			state: /FactorSourcesOfKindList.Destination.State.addNewFactorSource,
+			action: FactorSourcesOfKindList.Destination.Action.addNewFactorSource,
 			content: { ManageSomeFactorSource<F>.View(store: $0) }
 		)
 	}

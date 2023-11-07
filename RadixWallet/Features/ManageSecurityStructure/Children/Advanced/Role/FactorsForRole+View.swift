@@ -178,8 +178,8 @@ extension FactorsForRole {
 				.destinations(with: store)
 				.confirmationDialog(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /FactorsForRole.Destinations.State.existingRoleMadeLessSafeConfirmationDialog,
-					action: FactorsForRole.Destinations.Action.existingRoleMadeLessSafeConfirmationDialog
+					state: /FactorsForRole.Destination.State.existingRoleMadeLessSafeConfirmationDialog,
+					action: FactorsForRole.Destination.Action.existingRoleMadeLessSafeConfirmationDialog
 				)
 				.navigationTitle(viewStore.role.titleAdvancedFlow)
 				.padding()
@@ -198,21 +198,21 @@ extension View {
 	}
 
 	@MainActor
-	private func addThresholdFactorSheet(with destinationStore: PresentationStoreOf<FactorsForRole<some RoleProtocol>.Destinations>) -> some SwiftUI.View {
+	private func addThresholdFactorSheet(with destinationStore: PresentationStoreOf<FactorsForRole<some RoleProtocol>.Destination>) -> some SwiftUI.View {
 		sheet(
 			store: destinationStore,
-			state: /FactorsForRole.Destinations.State.addThresholdFactor,
-			action: FactorsForRole.Destinations.Action.addThresholdFactor,
+			state: /FactorsForRole.Destination.State.addThresholdFactor,
+			action: FactorsForRole.Destination.Action.addThresholdFactor,
 			content: { store in NavigationView { SelectFactorKindThenFactor.View(store: store) } }
 		)
 	}
 
 	@MainActor
-	private func addAdminFactorSheet(with destinationStore: PresentationStoreOf<FactorsForRole<some RoleProtocol>.Destinations>) -> some SwiftUI.View {
+	private func addAdminFactorSheet(with destinationStore: PresentationStoreOf<FactorsForRole<some RoleProtocol>.Destination>) -> some SwiftUI.View {
 		sheet(
 			store: destinationStore,
-			state: /FactorsForRole.Destinations.State.addAdminFactor,
-			action: FactorsForRole.Destinations.Action.addAdminFactor,
+			state: /FactorsForRole.Destination.State.addAdminFactor,
+			action: FactorsForRole.Destination.Action.addAdminFactor,
 			content: { store in NavigationView { SelectFactorKindThenFactor.View(store: store) } }
 		)
 	}

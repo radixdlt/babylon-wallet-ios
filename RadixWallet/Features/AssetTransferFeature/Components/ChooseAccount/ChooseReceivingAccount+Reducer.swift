@@ -51,7 +51,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		let networkID: NetworkID
 
 		@PresentationState
-		var destination: Destinations.State? = nil
+		var destination: Destination.State? = nil
 
 		public init(networkID: NetworkID, chooseAccounts: ChooseAccounts.State) {
 			self.networkID = networkID
@@ -68,7 +68,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
+		case destination(PresentationAction<Destination.Action>)
 		case chooseAccounts(ChooseAccounts.Action)
 	}
 
@@ -77,7 +77,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		case handleResult(ReceivingAccount.State.Account)
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case scanAccountAddress(ScanQRCoordinator.State)
 		}
@@ -102,7 +102,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+				Destination()
 			}
 	}
 

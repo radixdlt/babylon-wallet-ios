@@ -10,7 +10,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		public var thisDeviceID: UUID?
 
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		public var profileFile: ExportableProfileFile?
 
@@ -36,7 +36,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case tappedUseCloudBackup(ProfileSnapshot.Header)
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.State)
 		}
@@ -63,7 +63,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -78,7 +78,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 	public var body: some ReducerOf<SelectBackup> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.child .. /ChildAction.destination) {
-				Destinations()
+				Destination()
 			}
 	}
 

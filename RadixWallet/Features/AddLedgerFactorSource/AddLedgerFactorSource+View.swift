@@ -91,20 +91,20 @@ extension View {
 	}
 
 	@MainActor
-	private func ledgerAlreadyExistsAlert(with destinationStore: PresentationStoreOf<AddLedgerFactorSource.Destinations>) -> some View {
+	private func ledgerAlreadyExistsAlert(with destinationStore: PresentationStoreOf<AddLedgerFactorSource.Destination>) -> some View {
 		alert(
 			store: destinationStore,
-			state: /AddLedgerFactorSource.Destinations.State.ledgerAlreadyExistsAlert,
-			action: AddLedgerFactorSource.Destinations.Action.ledgerAlreadyExistsAlert
+			state: /AddLedgerFactorSource.Destination.State.ledgerAlreadyExistsAlert,
+			action: AddLedgerFactorSource.Destination.Action.ledgerAlreadyExistsAlert
 		)
 	}
 
 	@MainActor
-	private func nameLedger(with destinationStore: PresentationStoreOf<AddLedgerFactorSource.Destinations>) -> some View {
+	private func nameLedger(with destinationStore: PresentationStoreOf<AddLedgerFactorSource.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AddLedgerFactorSource.Destinations.State.nameLedger,
-			action: AddLedgerFactorSource.Destinations.Action.nameLedger,
+			state: /AddLedgerFactorSource.Destination.State.nameLedger,
+			action: AddLedgerFactorSource.Destination.Action.nameLedger,
 			destination: { NameLedgerFactorSource.View(store: $0) }
 		)
 	}

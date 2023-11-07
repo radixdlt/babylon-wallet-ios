@@ -16,7 +16,7 @@ public struct PoolUnit: Sendable, FeatureReducer {
 			poolUnit: OnLedgerEntity.Account.PoolUnit,
 			resourceDetails: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails> = .idle,
 			isSelected: Bool? = nil,
-			destination: Destinations.State? = nil
+			destination: Destination.State? = nil
 		) {
 			self.poolUnit = poolUnit
 			self.resourceDetails = resourceDetails
@@ -25,7 +25,7 @@ public struct PoolUnit: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		var destination: Destinations.State?
+		var destination: Destination.State?
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -33,10 +33,10 @@ public struct PoolUnit: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case details(PoolUnitDetails.State)
 		}
@@ -61,7 +61,7 @@ public struct PoolUnit: Sendable, FeatureReducer {
 			.ifLet(
 				\.$destination,
 				action: /Action.child .. ChildAction.destination,
-				destination: Destinations.init
+				destination: Destination.init
 			)
 	}
 

@@ -131,7 +131,7 @@ private extension View {
 }
 
 private extension StoreOf<Home> {
-	var destination: PresentationStoreOf<Home.Destinations> {
+	var destination: PresentationStoreOf<Home.Destination> {
 		scope(state: \.$destination) { .child(.destination($0)) }
 	}
 }

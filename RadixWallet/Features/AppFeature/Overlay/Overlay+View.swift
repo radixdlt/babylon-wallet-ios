@@ -13,14 +13,14 @@ extension OverlayReducer {
 		var body: some SwiftUI.View {
 			IfLetStore(
 				store.destination,
-				state: /OverlayReducer.Destinations.State.hud,
-				action: OverlayReducer.Destinations.Action.hud,
+				state: /OverlayReducer.Destination.State.hud,
+				action: OverlayReducer.Destination.Action.hud,
 				then: { HUD.View(store: $0) }
 			)
 			.alert(
 				store: store.destination,
-				state: /OverlayReducer.Destinations.State.alert,
-				action: OverlayReducer.Destinations.Action.alert
+				state: /OverlayReducer.Destination.State.alert,
+				action: OverlayReducer.Destination.Action.alert
 			)
 			.task { store.send(.view(.task)) }
 		}
@@ -28,7 +28,7 @@ extension OverlayReducer {
 }
 
 private extension StoreOf<OverlayReducer> {
-	var destination: PresentationStoreOf<OverlayReducer.Destinations> {
+	var destination: PresentationStoreOf<OverlayReducer.Destination> {
 		scope(state: \.$destination) { .child(.destination($0)) }
 	}
 }

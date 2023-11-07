@@ -17,7 +17,7 @@ public struct LSUStake: FeatureReducer {
 		var selectedStakeClaimAssets: OrderedSet<OnLedgerEntity.NonFungibleToken>?
 
 		@PresentationState
-		var destination: Destinations.State?
+		var destination: Destination.State?
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -26,10 +26,10 @@ public struct LSUStake: FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case details(LSUDetails.State)
 		}
@@ -55,7 +55,7 @@ public struct LSUStake: FeatureReducer {
 			.ifLet(
 				\.$destination,
 				action: /Action.child .. ChildAction.destination,
-				destination: Destinations.init
+				destination: Destination.init
 			)
 	}
 

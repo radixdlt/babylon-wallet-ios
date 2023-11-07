@@ -72,8 +72,8 @@ extension ImportMnemonicControllingAccounts {
 				.onAppear { viewStore.send(.appeared) }
 				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /ImportMnemonicControllingAccounts.Destinations.State.importMnemonic,
-					action: ImportMnemonicControllingAccounts.Destinations.Action.importMnemonic,
+					state: /ImportMnemonicControllingAccounts.Destination.State.importMnemonic,
+					action: ImportMnemonicControllingAccounts.Destination.Action.importMnemonic,
 					content: { store_ in
 						NavigationView {
 							ImportMnemonic.View(store: store_)
