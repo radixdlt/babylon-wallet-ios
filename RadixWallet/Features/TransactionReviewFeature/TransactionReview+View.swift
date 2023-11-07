@@ -30,7 +30,7 @@ extension TransactionReview.State {
 			viewControlState: viewControlState,
 			rawTransaction: displayMode.rawTransaction,
 			showApprovalSlider: reviewedTransaction != nil,
-			canApproveTX: canApproveTX && reviewedTransaction?.feePayingValidation == .valid,
+			canApproveTX: canApproveTX && feePayingValidation == .valid,
 			sliderResetDate: sliderResetDate,
 			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction?.transaction != .nonConforming
 		)

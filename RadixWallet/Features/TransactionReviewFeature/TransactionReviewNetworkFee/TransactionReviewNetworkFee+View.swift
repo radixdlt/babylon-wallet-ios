@@ -26,16 +26,16 @@ extension TransactionReviewNetworkFee {
 
 						Spacer(minLength: 0)
 
-						Text(viewStore.reviewedTransaction.feePayerSelection.transactionFee.totalFee.displayedTotalFee)
+						Text(viewStore.reviewedTransaction.transactionFee.totalFee.displayedTotalFee)
 							.textStyle(.body1HighImportance)
 							.foregroundColor(.app.gray1)
 					}
 
-					if case .needsFeePayer = viewStore.reviewedTransaction.feePayingValidation {
-						WarningErrorView(text: L10n.TransactionReview.feePayerRequiredMessage, type: .warning)
-					} else if case .insufficientBalance = viewStore.reviewedTransaction.feePayingValidation {
-						WarningErrorView(text: L10n.TransactionReview.insufficientBalance, type: .error)
-					}
+//					if case .needsFeePayer = viewStore.reviewedTransaction.feePayingValidation {
+//						WarningErrorView(text: L10n.TransactionReview.feePayerRequiredMessage, type: .warning)
+//					} else if case .insufficientBalance = viewStore.reviewedTransaction.feePayingValidation {
+//						WarningErrorView(text: L10n.TransactionReview.insufficientBalance, type: .error)
+//					}
 
 					Button(L10n.TransactionReview.NetworkFee.customizeButtonTitle) {
 						viewStore.send(.customizeTapped)

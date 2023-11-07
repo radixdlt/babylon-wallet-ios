@@ -236,7 +236,7 @@ public struct TransactionToReview: Sendable, Hashable {
 	public let analyzedManifestToReview: ExecutionAnalysis
 	public let networkID: NetworkID
 
-	public var feePayerSelectionAmongstCandidates: FeePayerSelectionAmongstCandidates
+	public var transactionFee: TransactionFee
 	public var transactionSigners: TransactionSigners
 	public var signingFactors: SigningFactors
 }

@@ -204,56 +204,20 @@ extension TransactionClient {
 				includeLockFee: false // Calculate without LockFee cost. It is yet to be determined if LockFe will be added or not
 			)
 
-			let feePayerCandidates = try await allFeePayerCandidates()
-
-			if transactionFee.totalFee.lockFee == .zero {
-				/// No lockFee required
-				return .init(
-					analyzedManifestToReview: analyzedManifestToReview,
-					networkID: networkID,
-					feePayerSelectionAmongstCandidates: .init(selected: nil, candidates: feePayerCandidates, transactionFee: transactionFee),
-					transactionSigners: transactionSigners,
-					signingFactors: signingFactors
-				)
-			}
-
-			/// LockFee required
-			/// Total cost > `zero`, recalculate the total by adding lockFee cost.
-			transactionFee.addLockFeeCost()
-			/// Fee Payer is required, thus there will be a signature with user account added
-			transactionFee.updateNotarizingCost(notaryIsSignatory: false)
-
-			let involvedEntites = try await myEntitiesInvolvedInTransaction(networkID: networkID, manifest: request.manifestToSign)
-
-			/// Select the account that can pay the transaction fee
-			let result = try await feePayerSelectionAmongstCandidates(
-				allFeePayerCandidates: feePayerCandidates,
-				manifest: request.manifestToSign,
-				networkID: networkID,
-				transactionFee: transactionFee,
-				transactionSigners: transactionSigners,
-				signingFactors: signingFactors,
-				signingPurpose: request.signingPurpose,
-				involvedEntities: involvedEntites
-			)
-
-			guard let result else {
-				/// Didn't find any suitable default fee payer
-				return TransactionToReview(
-					analyzedManifestToReview: analyzedManifestToReview,
-					networkID: networkID,
-					feePayerSelectionAmongstCandidates: .init(selected: nil, candidates: feePayerCandidates, transactionFee: transactionFee),
-					transactionSigners: transactionSigners,
-					signingFactors: signingFactors
-				)
+			if transactionFee.totalFee.lockFee > .zero {
+				/// LockFee required
+				/// Total cost > `zero`, recalculate the total by adding lockFee cost.
+				transactionFee.addLockFeeCost()
+				/// Fee Payer is required, thus there will be a signature with user account added
+				transactionFee.updateNotarizingCost(notaryIsSignatory: false)
 			}
 
 			return TransactionToReview(
 				analyzedManifestToReview: analyzedManifestToReview,
 				networkID: networkID,
-				feePayerSelectionAmongstCandidates: .init(selected: result.payer, candidates: feePayerCandidates, transactionFee: result.updatedFee),
-				transactionSigners: result.transactionSigners,
-				signingFactors: result.signingFactors
+				transactionFee: transactionFee,
+				transactionSigners: transactionSigners,
+				signingFactors: signingFactors
 			)
 		}
 

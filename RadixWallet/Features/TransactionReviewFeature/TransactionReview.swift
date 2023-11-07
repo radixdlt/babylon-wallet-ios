@@ -16,6 +16,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var networkID: NetworkID? { reviewedTransaction?.networkId }
 
 		public var reviewedTransaction: ReviewedTransaction? = nil
+		public var feePayerSelection: FeePayerSelectionAmongstCandidates!
 
 		public var withdrawals: TransactionReviewAccounts.State? = nil
 		public var dAppsUsed: TransactionReviewDappsUsed.State? = nil
@@ -36,24 +37,24 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				loggerGlobal.info("\(function)#\(line) - \(msg)")
 			}
 			let intentSignersNonEmpty = reviewedTransaction?.transactionSigners.intentSignerEntitiesNonEmptyOrNil()
-			let feePayer = reviewedTransaction?.feePayerSelection.selected?.account
-
-			let notaryIsSignatory: Bool = reviewedTransaction?.transactionSigners.notaryIsSignatory == true
-			switch (intentSignersNonEmpty, feePayer) {
-			case (.none, .none):
-				doPrint("NO Feepayer or intentSigner - faucet TX⁈ (notaryIsSignatory: \(notaryIsSignatory)")
-				if !notaryIsSignatory {
-					assertionFailure("Should not happen")
-				}
-			case let (.some(_intentSigners), .some(feePayer)):
-				doPrint("Fee payer: \(feePayer.address), intentSigners: \(_intentSigners.map(\.address))")
-			case let (.some(_intentSigners), .none):
-				doPrint("‼️ NO Fee payer, but got intentSigners: \(_intentSigners.map(\.address)) ")
-				assertionFailure("Should not happen")
-			case let (.none, .some(feePayer)):
-				doPrint("‼️Fee payer: \(feePayer.address), but no intentSigners")
-				assertionFailure("Should not happen")
-			}
+//			let feePayer = feePayerSelection.selected?.account
+//
+//			let notaryIsSignatory: Bool = reviewedTransaction?.transactionSigners.notaryIsSignatory == true
+//			switch (intentSignersNonEmpty, feePayer) {
+//			case (.none, .none):
+//				doPrint("NO Feepayer or intentSigner - faucet TX⁈ (notaryIsSignatory: \(notaryIsSignatory)")
+//				if !notaryIsSignatory {
+//					assertionFailure("Should not happen")
+//				}
+//			case let (.some(_intentSigners), .some(feePayer)):
+//				doPrint("Fee payer: \(feePayer.address), intentSigners: \(_intentSigners.map(\.address))")
+//			case let (.some(_intentSigners), .none):
+//				doPrint("‼️ NO Fee payer, but got intentSigners: \(_intentSigners.map(\.address)) ")
+//				assertionFailure("Should not happen")
+//			case let (.none, .some(feePayer)):
+//				doPrint("‼️Fee payer: \(feePayer.address), but no intentSigners")
+//				assertionFailure("Should not happen")
+//			}
 			#endif
 		}
 
@@ -244,7 +245,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					return .none
 				}
 
-				let tipPercentage: UInt16 = switch reviewedTransaction.feePayerSelection.transactionFee.mode {
+				let tipPercentage: UInt16 = switch state.feePayerSelection.transactionFee.mode {
 				case .normal:
 					0
 				case let .advanced(customization):
@@ -427,9 +428,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .previewLoaded(.success(preview)):
 			do {
 				state.reviewedTransaction = try .init(
-					feePayerSelection: preview.feePayerSelectionAmongstCandidates,
 					networkId: preview.networkID,
 					transaction: preview.analyzedManifestToReview.transactionTypes.transactionKind(),
+					transactionFee: preview.transactionFee,
 					transactionSigners: preview.transactionSigners,
 					signingFactors: preview.signingFactors
 				)
@@ -593,7 +594,7 @@ extension TransactionReview {
 
 	func transactionManifestWithWalletInstructionsAdded(_ state: State) throws -> TransactionManifest {
 		var manifest = state.transactionManifest
-		if let feePayerSelection = state.reviewedTransaction?.feePayerSelection, let feePayer = feePayerSelection.selected {
+		if let feePayerSelection = state.feePayerSelection, let feePayer = feePayerSelection.selected {
 			do {
 				manifest = try manifest.withLockFeeCallMethodAdded(
 					address: feePayer.account.address.asGeneral,
@@ -1164,10 +1165,10 @@ public struct TransactionReviewFailure: LocalizedError {
 
 // MARK: - ReviewedTransaction
 public struct ReviewedTransaction: Hashable, Sendable {
-	var feePayerSelection: FeePayerSelectionAmongstCandidates
 	let networkId: NetworkID
 	let transaction: TransactionKind
 
+	var transactionFee: TransactionFee
 	var transactionSigners: TransactionSigners
 	var signingFactors: SigningFactors
 }
@@ -1179,9 +1180,9 @@ enum FeeValidationOutcome {
 	case insufficientBalance
 }
 
-extension ReviewedTransaction {
+extension TransactionReview.State {
 	var feePayingValidation: FeeValidationOutcome {
-		switch transaction {
+		switch reviewedTransaction?.transaction {
 		case .nonConforming, .conforming(.accountDepositSettings):
 			return feePayerSelection.validate
 
@@ -1192,7 +1193,7 @@ extension ReviewedTransaction {
 				return feePayerSelection.validate
 			}
 
-			let xrdAddress = knownAddresses(networkId: networkId.rawValue).resourceAddresses.xrd
+			let xrdAddress = knownAddresses(networkId: networkID!.rawValue).resourceAddresses.xrd
 
 			let xrdTotalTransfer: RETDecimal = feePayerWithdraws.reduce(.zero) { partialResult, resource in
 				if case let .fungible(resourceAddress, source) = resource, resourceAddress == xrdAddress {
@@ -1209,6 +1210,8 @@ extension ReviewedTransaction {
 			}
 
 			return .valid
+		case .none:
+			return feePayerSelection.validate
 		}
 	}
 }
