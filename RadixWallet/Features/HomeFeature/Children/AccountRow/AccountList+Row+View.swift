@@ -28,8 +28,8 @@ extension Home.AccountRow {
 		let tag: AccountTag?
 
 		let isLedgerAccount: Bool
-		let needToBackupMnemonicForThisAccount: Bool
-		let needToImportMnemonicForThisAccount: Bool
+		let needToExportMnemonic: Bool
+		let needToImportMnemonic: Bool
 
 		let fungibleResourceIcons: [TokenThumbnail.Content]
 		let nonFungibleResourcesCount: Int
@@ -48,11 +48,8 @@ extension Home.AccountRow {
 			self.tag = .init(state: state)
 			self.isLedgerAccount = state.isLedgerAccount
 
-			// Show the prompt if the account has any XRD
-			self.needToBackupMnemonicForThisAccount = state.deviceFactorSourceControlled?.needToBackupMnemonicForThisAccount ?? false
-
-			// Show the prompt if keychain does not contain the mnemonic for this account
-			self.needToImportMnemonicForThisAccount = state.deviceFactorSourceControlled?.needToImportMnemonicForThisAccount ?? false
+			self.needToExportMnemonic = state.importMnemonicNeeded
+			self.needToImportMnemonic = state.exportMnemonicNeeded
 
 			// Resources
 			guard let portfolio = state.portfolio.wrappedValue else {
@@ -108,12 +105,12 @@ extension Home.AccountRow {
 
 					ownedResourcesList(viewStore)
 
-					if viewStore.needToImportMnemonicForThisAccount {
+					if viewStore.needToImportMnemonic {
 						importMnemonicPromptView(viewStore)
 					}
 
-					if !viewStore.needToImportMnemonicForThisAccount, viewStore.needToBackupMnemonicForThisAccount {
-						backupMnemonicPromptView(viewStore)
+					if !viewStore.needToImportMnemonic, viewStore.needToExportMnemonic {
+						exportMnemonicPromptView(viewStore)
 					}
 				}
 				.padding(.horizontal, .medium1)
@@ -249,8 +246,8 @@ extension Home.AccountRow.View {
 		importMnemonicPromptView { viewStore.send(.importMnemonic) }
 	}
 
-	func backupMnemonicPromptView(_ viewStore: ViewStoreOf<Home.AccountRow>) -> some View {
-		backupMnemonicPromptView { viewStore.send(.backUpMnemonic) }
+	func exportMnemonicPromptView(_ viewStore: ViewStoreOf<Home.AccountRow>) -> some View {
+		exportMnemonicPromptView { viewStore.send(.backUpMnemonic) }
 	}
 }
 

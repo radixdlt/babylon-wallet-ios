@@ -6,8 +6,8 @@ extension AccountDetails.State {
 			accountAddress: account.address,
 			appearanceID: account.appearanceID,
 			displayName: account.displayName.rawValue,
-			needToImportMnemonicForThisAccount: isShowingImportMnemonicPrompt,
-			needToBackupMnemonicForThisAccount: isShowingExportMnemonicPrompt,
+			importMnemonicNeeded: importMnemonicNeeded,
+			exportMnemonicNeeded: exportMnemonicNeeded,
 			isLedgerAccount: account.isLedgerAccount,
 			showToolbar: destination == nil
 		)
@@ -20,8 +20,8 @@ extension AccountDetails {
 		let accountAddress: AccountAddress
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let displayName: String
-		let needToImportMnemonicForThisAccount: Bool
-		let needToBackupMnemonicForThisAccount: Bool
+		let importMnemonicNeeded: Bool
+		let exportMnemonicNeeded: Bool
 		let isLedgerAccount: Bool
 		let showToolbar: Bool
 	}
@@ -43,8 +43,8 @@ extension AccountDetails {
 						.padding(.bottom, .medium1)
 
 					prompts(
-						needToImport: viewStore.needToImportMnemonicForThisAccount,
-						needToBackup: viewStore.needToBackupMnemonicForThisAccount
+						needToImport: viewStore.importMnemonicNeeded,
+						needToExport: viewStore.exportMnemonicNeeded
 					)
 					.padding(.medium1)
 
@@ -84,14 +84,14 @@ extension AccountDetails {
 		}
 
 		@ViewBuilder
-		func prompts(needToImport: Bool, needToBackup: Bool) -> some SwiftUI.View {
+		func prompts(needToImport: Bool, needToExport: Bool) -> some SwiftUI.View {
 			// Mutally exclusive to prompt user to recover and backup mnemonic.
 			if needToImport {
 				importMnemonicPromptView {
 					store.send(.view(.recoverMnemonicsButtonTapped))
 				}
-			} else if needToBackup {
-				backupMnemonicPromptView {
+			} else if needToExport {
+				exportMnemonicPromptView {
 					store.send(.view(.exportMnemonicButtonTapped))
 				}
 			}
@@ -146,7 +146,7 @@ struct AccountDetails_Preview: PreviewProvider {
 		NavigationStack {
 			AccountDetails.View(
 				store: .init(
-					initialState: .init(for: .previewValue0),
+					initialState: .init(account: .previewValue0),
 					reducer: AccountDetails.init
 				)
 			)

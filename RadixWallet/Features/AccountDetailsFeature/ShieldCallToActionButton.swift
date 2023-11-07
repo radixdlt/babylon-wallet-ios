@@ -34,7 +34,7 @@ extension View {
 		)
 	}
 
-	public func backupMnemonicPromptView(action: @escaping () -> Void) -> some View {
+	public func exportMnemonicPromptView(action: @escaping () -> Void) -> some View {
 		shieldPromptView(
 			text: L10n.ImportMnemonic.ShieldPrompt.backupSeedPhrase,
 			action: action

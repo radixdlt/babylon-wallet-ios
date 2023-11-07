@@ -3,32 +3,18 @@ import SwiftUI
 
 // MARK: - AccountDetails
 public struct AccountDetails: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		var account: Profile.Network.Account
+	public struct State: Sendable, Hashable, AccountWithInfoHolder {
+		public var accountWithInfo: AccountWithInfo
 		var assets: AssetsView.State
-
-		public var isShowingImportMnemonicPrompt: Bool
-		public var isShowingExportMnemonicPrompt: Bool
 
 		@PresentationState
 		var destination: Destinations.State?
 
-		fileprivate var deviceControlledFactorInstance: HierarchicalDeterministicFactorInstance {
-			switch account.securityState {
-			case let .unsecured(control):
-				control.transactionSigning
-			}
-		}
-
 		public init(
-			for account: Profile.Network.Account,
-			isShowingImportMnemonicPrompt: Bool = false,
-			isShowingExportMnemonicPrompt: Bool = false
+			account: Profile.Network.Account
 		) {
-			self.account = account
+			self.accountWithInfo = .init(account: account)
 			self.assets = AssetsView.State(account: account, mode: .normal)
-			self.isShowingImportMnemonicPrompt = isShowingImportMnemonicPrompt
-			self.isShowingExportMnemonicPrompt = isShowingExportMnemonicPrompt
 		}
 	}
 
@@ -138,9 +124,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 
 		case let .assets(.delegate(.xrdBalanceUpdated(xrdBalance))):
-//			return checkIfShouldShowExportMnemonicPrompt(state: &state)
-			// return .send(.delegate(.))
-			fatalError()
+			checkIfCallActionIsNeeded(state: &state, xrdResource: xrdBalance)
+			return .none
 
 		case .destination(.presented(.preferences(.delegate(.accountHidden)))):
 			return .send(.delegate(.dismiss))
@@ -156,6 +141,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			state.account = account
 			return .none
 		}
+	}
+
+	private func checkIfCallActionIsNeeded(state: inout State, xrdResource: OnLedgerEntity.OwnedFungibleResource? = nil) {
+		state.updateMnemonicPromptsIfNeeded(xrdResource: xrdResource)
 	}
 
 //	private func checkIfShouldShowExportMnemonicPrompt(state: inout State) -> Effect<Action> {

@@ -40,7 +40,6 @@ public struct Home: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		public typealias HasAccessToMnemonic = Bool
 		case accountsLoadedResult(TaskResult<IdentifiedArrayOf<Profile.Network.Account>>)
-		case mnemonicAccessResult([FactorSourceID.FromHash: HasAccessToMnemonic])
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -154,41 +153,11 @@ public struct Home: Sendable, FeatureReducer {
 		case let .accountsLoadedResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
-		case let .mnemonicAccessResult(result):
-			for accountRow in state.accountRows {
-				guard var deviceFactorSourceControlled = accountRow.deviceFactorSourceControlled else { continue }
-
-				let hasAccessToMnemonic = result[deviceFactorSourceControlled.factorSourceID] ?? false
-				let needToImportMnemonic = if accountRow.isLegacyAccount {
-					!hasAccessToMnemonic
-				} else {
-					state.babylonAccountRecoveryIsNeeded || !hasAccessToMnemonic
-				}
-				deviceFactorSourceControlled.needToImportMnemonicForThisAccount = needToImportMnemonic
-				state.accountRows[id: accountRow.id]?.deviceFactorSourceControlled = deviceFactorSourceControlled
-			}
-			return .none
 		}
 	}
 
 	private func checkAccountsAccessToMnemonic(state: State) -> Effect<Action> {
-		let factorSourceIDs = Set(state.accounts.compactMap(\.deviceFactorSourceID))
-		guard !factorSourceIDs.isEmpty else {
-			return .none
-		}
-
-		return .run { send in
-			let result = factorSourceIDs.map { factorSourceID in
-				let hasAccessToMnemonic = secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSourceID)
-				return (factorSourceID: factorSourceID, hasAccessToMnemonic: hasAccessToMnemonic)
-			}
-
-			let dictionary = result.reduce(into: [:]) {
-				$0[$1.factorSourceID] = $1.hasAccessToMnemonic
-			}
-
-			await send(.internal(.mnemonicAccessResult(dictionary)))
-		}
+		Effect.merge(state.accountRows.map { .send(.child(.account(id: $0.id, action: .internal(.accountSecurityCheck)))) })
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
@@ -213,6 +182,19 @@ public struct Home: Sendable, FeatureReducer {
 //
 //		case .accountList(.delegate(.importMnemonics)):
 //			return importMnemonics(state: &state)
+
+		case let .account(id, action: .delegate(delegateAction)):
+			guard let accountRow = state.accountRows[id: id] else { return .none }
+			let account = accountRow.account
+			switch delegateAction {
+			case .openDetails:
+				state.destination = .accountDetails(.init(account: account))
+				return .none
+			case .exportMnemonic:
+				return exportMnemonic(controlling: account, state: &state)
+			case .importMnemonics:
+				return importMnemonics(state: &state)
+			}
 
 		case let .destination(.presented(.accountDetails(.delegate(.exportMnemonic(controlledAccount))))):
 			return exportMnemonic(controlling: controlledAccount, state: &state)
