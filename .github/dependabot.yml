@@ -7,3 +7,4 @@ updates:
     open-pull-requests-limit: 3
     reviewers:
       - "radixdlt/devops"
+      - "radixdlt/core-apps"
