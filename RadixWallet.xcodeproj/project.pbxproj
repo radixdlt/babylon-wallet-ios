@@ -1210,6 +1210,7 @@
 		E6A2D9E12AFA6BFE001857EC /* DeviceFactorSourceControlled.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A2D9E02AFA6BFE001857EC /* DeviceFactorSourceControlled.swift */; };
 		E6A2D9E32AFA6C0D001857EC /* AccountWithInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A2D9E22AFA6C0D001857EC /* AccountWithInfo.swift */; };
 		E6A2D9E52AFA6C1E001857EC /* AccountWithInfoHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A2D9E42AFA6C1E001857EC /* AccountWithInfoHolder.swift */; };
+		E6A2D9E72AFA7132001857EC /* Mnemonics+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A2D9E62AFA7132001857EC /* Mnemonics+Utils.swift */; };
 		E6A98FA82AE15324003953E2 /* BuildConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A98FA72AE15324003953E2 /* BuildConfiguration.swift */; };
 		E6DBA3192ADEBFB300A38425 /* PackagesEncodingDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA25A2ADEBFB200A38425 /* PackagesEncodingDecodingTests.swift */; };
 		E6DBA31A2ADEBFB300A38425 /* DataChannelClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA25B2ADEBFB200A38425 /* DataChannelClientTests.swift */; };
@@ -2488,6 +2489,7 @@
 		E6A2D9E02AFA6BFE001857EC /* DeviceFactorSourceControlled.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceFactorSourceControlled.swift; sourceTree = "<group>"; };
 		E6A2D9E22AFA6C0D001857EC /* AccountWithInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountWithInfo.swift; sourceTree = "<group>"; };
 		E6A2D9E42AFA6C1E001857EC /* AccountWithInfoHolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountWithInfoHolder.swift; sourceTree = "<group>"; };
+		E6A2D9E62AFA7132001857EC /* Mnemonics+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Mnemonics+Utils.swift"; sourceTree = "<group>"; };
 		E6A98FA72AE15324003953E2 /* BuildConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuildConfiguration.swift; sourceTree = "<group>"; };
 		E6DBA25A2ADEBFB200A38425 /* PackagesEncodingDecodingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PackagesEncodingDecodingTests.swift; sourceTree = "<group>"; };
 		E6DBA25B2ADEBFB200A38425 /* DataChannelClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataChannelClientTests.swift; sourceTree = "<group>"; };
@@ -3310,6 +3312,7 @@
 			children = (
 				48CFBCB92ADC10D800E77A5C /* AccountRow */,
 				48CFBD162ADC10D800E77A5C /* Header */,
+				E6A2D9E62AFA7132001857EC /* Mnemonics+Utils.swift */,
 			);
 			path = Children;
 			sourceTree = "<group>";
@@ -7876,6 +7879,7 @@
 				48CFC3CB2ADC10D900E77A5C /* WordList+English.swift in Sources */,
 				48CFC6742ADC10DB00E77A5C /* AccessController.swift in Sources */,
 				48CFC2482ADC10D900E77A5C /* ThirdPartyDeposits+View.swift in Sources */,
+				E6A2D9E72AFA7132001857EC /* Mnemonics+Utils.swift in Sources */,
 				48CFC5282ADC10DA00E77A5C /* StreamTransactionsRequestAllOf.swift in Sources */,
 				48CFC28A2ADC10D900E77A5C /* TransactionReviewGuarantees.swift in Sources */,
 				48CFC5772ADC10DA00E77A5C /* MetadataTypedValue.swift in Sources */,

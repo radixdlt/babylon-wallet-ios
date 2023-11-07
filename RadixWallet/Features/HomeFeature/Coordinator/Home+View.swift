@@ -114,9 +114,7 @@ private extension View {
 			action: Home.Destination.Action.exportMnemonic,
 			content: { childStore in
 				NavigationView {
-					ImportMnemonic.View(store: childStore)
-						// FIXME: Strings
-						.navigationTitle("Backup Seed Phrase")
+					ExportMnemonic.View(store: childStore)
 				}
 			}
 		)

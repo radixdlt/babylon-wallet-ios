@@ -48,8 +48,8 @@ extension Home.AccountRow {
 			self.tag = .init(state: state)
 			self.isLedgerAccount = state.isLedgerAccount
 
-			self.needToExportMnemonic = state.importMnemonicNeeded
-			self.needToImportMnemonic = state.exportMnemonicNeeded
+			self.needToExportMnemonic = state.exportMnemonicNeeded
+			self.needToImportMnemonic = state.importMnemonicNeeded
 
 			// Resources
 			guard let portfolio = state.portfolio.wrappedValue else {
