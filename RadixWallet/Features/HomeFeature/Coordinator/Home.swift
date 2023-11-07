@@ -157,32 +157,16 @@ public struct Home: Sendable, FeatureReducer {
 	}
 
 	private func checkAccountsAccessToMnemonic(state: State) -> Effect<Action> {
-		Effect.merge(state.accountRows.map { .send(.child(.account(id: $0.id, action: .internal(.accountSecurityCheck)))) })
+		.merge(state.accountRows.map {
+			.send(.child(.account(
+				id: $0.id,
+				action: .internal(.checkAccountAccessToMnemonic)
+			)))
+		})
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-//		case let .account(.delegate(.displayAccountDetails(
-//			account,
-//			needToBackupMnemonicForThisAccount,
-//			needToImportMnemonicForThisAccount
-//		))):
-//
-//			state.destination = .accountDetails(.init(
-//				for: account,
-//				isShowingImportMnemonicPrompt: needToImportMnemonicForThisAccount,
-//				isShowingExportMnemonicPrompt: needToBackupMnemonicForThisAccount
-//			))
-//			return .none
-//
-//
-//		case let .account(.delegate(.exportMnemonic(controlledAccount))):
-//			return exportMnemonic(controlling: controlledAccount, state: &state)
-//
-//
-//		case .accountList(.delegate(.importMnemonics)):
-//			return importMnemonics(state: &state)
-
 		case let .account(id, action: .delegate(delegateAction)):
 			guard let accountRow = state.accountRows[id: id] else { return .none }
 			let account = accountRow.account
@@ -210,7 +194,7 @@ public struct Home: Sendable, FeatureReducer {
 			state.destination = nil
 			switch delegateAction {
 			case .doneViewing:
-				return securityCheckOfAccounts()
+				return checkAccountsAccessToMnemonic(state: state)
 
 			case .notPersisted, .persistedMnemonicInKeychainOnly, .persistedNewFactorSourceInProfile:
 				assertionFailure("Expected 'doneViewing' action")

@@ -21,13 +21,13 @@ extension Home {
 		public enum ViewAction: Sendable, Equatable {
 			case tapped
 			case task
-			case backUpMnemonic
+			case exportMnemonic
 			case importMnemonic
 		}
 
 		public enum InternalAction: Sendable, Equatable {
 			case accountPortfolioUpdate(OnLedgerEntity.Account)
-			case accountSecurityCheck
+			case checkAccountAccessToMnemonic
 		}
 
 		public enum DelegateAction: Sendable, Equatable {
@@ -48,7 +48,7 @@ extension Home {
 					state.portfolio = .loading
 				}
 
-				checkIfCallActionIsNeeded(state: &state)
+				self.checkAccountAccessToMnemonic(state: &state)
 
 				return .run { send in
 					for try await accountPortfolio in await accountPortfoliosClient.portfolioForAccount(accountAddress) {
@@ -58,7 +58,7 @@ extension Home {
 						await send(.internal(.accountPortfolioUpdate(accountPortfolio.nonEmptyVaults)))
 					}
 				}
-			case .backUpMnemonic:
+			case .exportMnemonic:
 				return .send(.delegate(.exportMnemonic))
 
 			case .importMnemonic:
@@ -77,15 +77,15 @@ extension Home {
 				assert(portfolio.address == state.account.address)
 
 				state.portfolio = .success(portfolio)
-				return .send(.internal(.accountSecurityCheck))
+				return .send(.internal(.checkAccountAccessToMnemonic))
 
-			case .accountSecurityCheck:
-				checkIfCallActionIsNeeded(state: &state)
+			case .checkAccountAccessToMnemonic:
+				checkAccountAccessToMnemonic(state: &state)
 				return .none
 			}
 		}
 
-		private func checkIfCallActionIsNeeded(state: inout State) {
+		private func checkAccountAccessToMnemonic(state: inout State) {
 			state.updateMnemonicPromptsIfNeeded(portfolio: state.portfolio.wrappedValue)
 		}
 	}

@@ -247,7 +247,7 @@ extension Home.AccountRow.View {
 	}
 
 	func exportMnemonicPromptView(_ viewStore: ViewStoreOf<Home.AccountRow>) -> some View {
-		exportMnemonicPromptView { viewStore.send(.backUpMnemonic) }
+		exportMnemonicPromptView { viewStore.send(.exportMnemonic) }
 	}
 }
 
