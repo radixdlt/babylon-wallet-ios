@@ -325,7 +325,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				return resetToApprovable(&state)
 			} else if case .submitting = state.destination {
 				// This is used when tapping outside the Submitting sheet, no need to set destination to nil
-				return delayedEffect(for: .delegate(.dismiss))
+				return delayedShortEffect(for: .delegate(.dismiss))
 			}
 
 			return .none
@@ -388,12 +388,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .submitting(.delegate(.committedSuccessfully(txID))):
 			state.destination = nil
-			return delayedEffect(for: .delegate(.transactionCompleted(txID)))
+			return delayedShortEffect(for: .delegate(.transactionCompleted(txID)))
 
 		case .submitting(.delegate(.manuallyDismiss)):
 			// This is used when the close button is pressed, we have to manually
 			state.destination = nil
-			return delayedEffect(for: .delegate(.dismiss))
+			return delayedShortEffect(for: .delegate(.dismiss))
 
 		case .submitting:
 			return .none
@@ -646,16 +646,6 @@ public struct FailedToAddGuarantee: LocalizedError {
 }
 
 extension TransactionReview {
-	func delayedEffect(
-		delay: Duration = .seconds(0.3),
-		for action: Action
-	) -> Effect<Action> {
-		.run { send in
-			try await clock.sleep(for: delay)
-			await send(action)
-		}
-	}
-
 	func resetToApprovable(
 		_ state: inout State,
 		shouldNilDestination: Bool = true

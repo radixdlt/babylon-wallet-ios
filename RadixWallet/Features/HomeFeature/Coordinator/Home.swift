@@ -40,6 +40,8 @@ public struct Home: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		public typealias HasAccessToMnemonic = Bool
 		case accountsLoadedResult(TaskResult<IdentifiedArrayOf<Profile.Network.Account>>)
+		case exportMnemonic(account: Profile.Network.Account)
+		case importMnemonic
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -83,6 +85,7 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
@@ -153,6 +156,12 @@ public struct Home: Sendable, FeatureReducer {
 		case let .accountsLoadedResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
+
+		case let .exportMnemonic(account):
+			return exportMnemonic(controlling: account, state: &state)
+
+		case .importMnemonic:
+			return importMnemonics(state: &state)
 		}
 	}
 
@@ -181,10 +190,10 @@ public struct Home: Sendable, FeatureReducer {
 			}
 
 		case let .destination(.presented(.accountDetails(.delegate(.exportMnemonic(controlledAccount))))):
-			return exportMnemonic(controlling: controlledAccount, state: &state)
+			return dismissAccountDetails(then: .exportMnemonic(account: controlledAccount), &state)
 
 		case .destination(.presented(.accountDetails(.delegate(.importMnemonics)))):
-			return importMnemonics(state: &state)
+			return dismissAccountDetails(then: .importMnemonic, &state)
 
 		case .destination(.presented(.accountDetails(.delegate(.dismiss)))):
 			state.destination = nil
@@ -215,6 +224,11 @@ public struct Home: Sendable, FeatureReducer {
 		default:
 			return .none
 		}
+	}
+
+	private func dismissAccountDetails(then internalAction: InternalAction, _ state: inout State) -> Effect<Action> {
+		state.destination = nil
+		return delayedMediumEffect(internal: internalAction)
 	}
 
 	private func importMnemonics(state: inout State) -> Effect<Action> {

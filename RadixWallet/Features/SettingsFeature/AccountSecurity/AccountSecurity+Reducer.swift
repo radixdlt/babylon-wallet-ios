@@ -170,7 +170,30 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 }
 
 extension FeatureReducer {
-	func delayedEffect(for internalAction: InternalAction) -> Effect<Action> {
-		self.delayedEffect(delay: .seconds(0.6), for: .internal(internalAction))
+	func delayedMediumEffect(internal internalAction: InternalAction) -> Effect<Action> {
+		self.delayedMediumEffect(for: .internal(internalAction))
+	}
+
+	func delayedMediumEffect(
+		for action: Action
+	) -> Effect<Action> {
+		delayedEffect(delay: .seconds(0.6), for: action)
+	}
+
+	func delayedShortEffect(
+		for action: Action
+	) -> Effect<Action> {
+		delayedEffect(delay: .seconds(0.3), for: action)
+	}
+
+	func delayedEffect(
+		delay: Duration,
+		for action: Action
+	) -> Effect<Action> {
+		@Dependency(\.continuousClock) var clock
+		return .run { send in
+			try await clock.sleep(for: delay)
+			await send(action)
+		}
 	}
 }
