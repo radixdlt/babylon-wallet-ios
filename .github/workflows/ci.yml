@@ -27,7 +27,7 @@ jobs:
     name: "Snyk scan"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
@@ -62,7 +62,7 @@ jobs:
     name: "Snyk SBOM"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
@@ -112,7 +112,7 @@ jobs:
     runs-on: macos-13-xlarge
 
     steps:
-      - uses: actions/checkout@v3.1.0
+      - uses: actions/checkout@v4.1.1
 
       - name: "Run Lint"
         run: |
@@ -137,7 +137,7 @@ jobs:
       - linting
 
     steps:
-      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
       - name: Configure AWS credentials to fetch secrets
         uses: aws-actions/configure-aws-credentials@97271860067ec931c45b8d104fbf0d15954ab85c # branch v1-node16
         with:
@@ -206,7 +206,7 @@ jobs:
       - snyk_scan
       - snyk_sbom
     steps:
-      - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
@@ -255,7 +255,7 @@ jobs:
   #     - assertFormated
 
   #   steps:
-  #     - uses: actions/checkout@v3.1.0
+  #     - uses: actions/checkout@v4.1.1
 
   #     - name: "Run snapshot tests"
   #       run: echo "Runing snapshot tests" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
@@ -268,7 +268,7 @@ jobs:
   #     - assertFormated
 
   #   steps:
-  #     - uses: actions/checkout@v3.1.0
+  #     - uses: actions/checkout@v4.1.1
 
   #     - name: "Run UI tests"
   #       run: echo "Runing UI tests" # JUST A PLACEHOLDER, NEEDS TO BE REPLACED
