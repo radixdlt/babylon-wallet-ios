@@ -106,7 +106,6 @@ extension Home.AccountRow {
 					prompts(
 						mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction
 					)
-					.padding(.medium1)
 				}
 				.padding(.horizontal, .medium1)
 				.padding(.vertical, .medium2)
