@@ -3,9 +3,9 @@ import SwiftUI
 extension SelectFeePayer.State {
 	var viewState: SelectFeePayer.ViewState {
 		.init(
-			candidates: feePayerSelection.candidates.rawValue,
-			fee: feePayerSelection.transactionFee.totalFee.displayedTotalFee,
-			selectedPayer: feePayerSelection.selected
+			feePayerCandidates: feePayerCandidates.rawValue,
+			fee: transactionFee.totalFee.displayedTotalFee,
+			selectedPayer: feePayer
 		)
 	}
 }
@@ -13,9 +13,9 @@ extension SelectFeePayer.State {
 // MARK: - SelectFeePayer.View
 extension SelectFeePayer {
 	public struct ViewState: Equatable {
-		let candidates: IdentifiedArrayOf<FeePayerCandidate>
+		let feePayerCandidates: Loadable<IdentifiedArrayOf<FeePayerCandidate>>
 		let fee: String
-		var selectedPayer: FeePayerCandidate?
+		let selectedPayer: FeePayerCandidate?
 	}
 
 	@MainActor
@@ -45,24 +45,32 @@ extension SelectFeePayer {
 						.padding(.bottom, .small1)
 
 					ScrollView {
-						VStack(spacing: .small1) {
-							Selection(
-								viewStore.binding(
-									get: \.selectedPayer,
-									send: { .selectedPayer($0) }
-								),
-								from: viewStore.candidates
-							) { item in
-								SelectAccountToPayForFeeRow.View(
-									viewState: .init(candidate: item.value),
-									isSelected: item.isSelected,
-									action: item.action
-								)
+						loadable(viewStore.feePayerCandidates) {
+							ProgressView()
+						} successContent: { candidates in
+							VStack(spacing: .small1) {
+								Selection(
+									viewStore.binding(
+										get: \.selectedPayer,
+										send: { .selectedPayer($0) }
+									),
+									from: candidates
+								) { item in
+									SelectAccountToPayForFeeRow.View(
+										viewState: .init(candidate: item.value),
+										isSelected: item.isSelected,
+										action: item.action
+									)
+								}
 							}
+							.padding(.horizontal, .medium1)
+							.padding(.bottom, .medium2)
 						}
-						.padding(.horizontal, .medium1)
-						.padding(.bottom, .medium2)
 					}
+					.refreshable {}
+				}
+				.task { @MainActor in
+					await viewStore.send(.task).finish()
 				}
 				.footer {
 					WithControlRequirements(

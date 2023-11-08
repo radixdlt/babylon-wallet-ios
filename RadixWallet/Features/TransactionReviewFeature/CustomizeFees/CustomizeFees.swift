@@ -9,19 +9,21 @@ public struct CustomizeFees: FeatureReducer {
 			case advanced(AdvancedFeesCustomization.State)
 		}
 
-		var feePayerSelection: FeePayerSelectionAmongstCandidates!
-
 		let manifest: TransactionManifest
 		let signingPurpose: SigningPurpose
 		var reviewedTransaction: ReviewedTransaction
 		var modeState: CustomizationModeState
 
 		var feePayerAccount: Profile.Network.Account? {
-			feePayerSelection.selected?.account
+			feePayer?.account
+		}
+
+		var feePayer: FeePayerCandidate? {
+			reviewedTransaction.feePayer.unwrap()?.wrappedValue
 		}
 
 		var transactionFee: TransactionFee {
-			feePayerSelection.transactionFee
+			reviewedTransaction.transactionFee
 		}
 
 		@PresentationState
@@ -98,11 +100,11 @@ public struct CustomizeFees: FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .changeFeePayerTapped:
-			state.destination = .selectFeePayer(.init(feePayerSelection: state.feePayerSelection))
+			state.destination = .selectFeePayer(.init(feePayer: state.feePayer, transactionFee: state.transactionFee))
 			return .none
 		case .toggleMode:
 			state.reviewedTransaction.transactionFee.toggleMode()
-			state.modeState = state.feePayerSelection.transactionFee.customizationModeState
+			state.modeState = state.reviewedTransaction.transactionFee.customizationModeState
 			return .send(.delegate(.updated(state.reviewedTransaction)))
 		case .closeButtonTapped:
 			return .run { _ in
@@ -114,7 +116,7 @@ public struct CustomizeFees: FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .destination(.presented(.selectFeePayer(.delegate(.selected(selection))))):
-			let previousFeePayer = state.feePayerSelection.selected
+			let previousFeePayer = state.feePayer
 			state.destination = nil
 			let signingPurpose = state.signingPurpose
 
@@ -151,7 +153,7 @@ public struct CustomizeFees: FeatureReducer {
 						))
 
 						reviewedTransaction.signingFactors = factors
-						// reviewedTransaction.feePayerSelection.selected = selection
+						reviewedTransaction.feePayer = .success(selection)
 						if previousFeePayer == nil, reviewedTransaction.transactionFee.totalFee.max == .zero {
 							/// The case when no FeePayer is required, but users chooses to add a FeePayer.
 							reviewedTransaction.transactionFee.addLockFeeCost()
@@ -178,7 +180,7 @@ public struct CustomizeFees: FeatureReducer {
 		switch internalAction {
 		case let .updated(.success(reviewedTransaction)):
 			state.reviewedTransaction = reviewedTransaction
-			state.modeState = state.feePayerSelection.transactionFee.customizationModeState
+			state.modeState = state.reviewedTransaction.transactionFee.customizationModeState
 			return .send(.delegate(.updated(state.reviewedTransaction)))
 		case let .updated(.failure(error)):
 			errorQueue.schedule(error)

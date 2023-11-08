@@ -84,10 +84,10 @@ extension TransactionClient {
 		}
 
 		@Sendable
-		func allFeePayerCandidates() async throws -> NonEmpty<IdentifiedArrayOf<FeePayerCandidate>> {
+		func getAllFeePayerCandidates(refreshingBalances: Bool) async throws -> NonEmpty<IdentifiedArrayOf<FeePayerCandidate>> {
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
-			let allFeePayerCandidates = try await accountPortfoliosClient.fetchAccountPortfolios(allAccounts.map(\.address), true).compactMap { portfolio -> FeePayerCandidate? in
+			let allFeePayerCandidates = try await accountPortfoliosClient.fetchAccountPortfolios(allAccounts.map(\.address), refreshingBalances).compactMap { portfolio -> FeePayerCandidate? in
 				guard
 					let account = allAccounts.first(where: { account in account.address == portfolio.address })
 				else {
@@ -251,53 +251,49 @@ extension TransactionClient {
 			)
 		}
 
+		let determineFeePayer: DetermineFeePayer = { request in
+			let feePayerCandidates = try? await getAllFeePayerCandidates(refreshingBalances: true)
+			let involvedEntites = try? await myEntitiesInvolvedInTransaction(
+				networkID: request.networkId,
+				manifest: request.manifest
+			)
+
+			guard let feePayerCandidates, let involvedEntites else {
+				return nil
+			}
+
+			/// Select the account that can pay the transaction fee
+			return try? await feePayerSelectionAmongstCandidates(
+				request: request,
+				allFeePayerCandidates: feePayerCandidates,
+				involvedEntities: involvedEntites
+			)
+		}
+
 		return Self(
 			getTransactionReview: getTransactionReview,
 			buildTransactionIntent: buildTransactionIntent,
 			notarizeTransaction: notarizeTransaction,
-			myInvolvedEntities: myInvolvedEntities
+			myInvolvedEntities: myInvolvedEntities,
+			determineFeePayer: determineFeePayer,
+			getFeePayerCandidates: { refresh in
+				try await getAllFeePayerCandidates(refreshingBalances: refresh)
+			}
 		)
 	}
 }
 
 extension TransactionClient {
-	/// The result of selecting a fee payer.
-	/// In the case when the fee payer is not an account for which we do already have the signature - the fee, transactionSigners and signingFactors will be updated
-	/// to account for the new signature that is required to be added
-	public struct FeePayerSelectionResult {
-		public let payer: FeePayerCandidate
-		public let updatedFee: TransactionFee
-		public let transactionSigners: TransactionSigners
-		public let signingFactors: SigningFactors
-
-		public init(
-			payer: FeePayerCandidate,
-			updatedFee: TransactionFee,
-			transactionSigners: TransactionSigners,
-			signingFactors: SigningFactors
-		) {
-			self.payer = payer
-			self.updatedFee = updatedFee
-			self.transactionSigners = transactionSigners
-			self.signingFactors = signingFactors
-		}
-	}
-
 	@Sendable
 	public static func feePayerSelectionAmongstCandidates(
+		request: DetermineFeePayerRequest,
 		allFeePayerCandidates: NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>,
-		manifest: TransactionManifest,
-		networkID: NetworkID,
-		transactionFee: TransactionFee,
-		transactionSigners: TransactionSigners,
-		signingFactors: SigningFactors,
-		signingPurpose: SigningPurpose,
 		involvedEntities: MyEntitiesInvolvedInTransaction
 	) async throws -> FeePayerSelectionResult? {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
-		let totalCost = transactionFee.totalFee.max
-		let allSignerEntities = transactionSigners.intentSignerEntitiesOrEmpty()
+		let totalCost = request.transactionFee.totalFee.max
+		let allSignerEntities = request.transactionSigners.intentSignerEntitiesOrEmpty()
 
 		func findFeePayer(
 			amongst keyPath: KeyPath<MyEntitiesInvolvedInTransaction, OrderedSet<Profile.Network.Account>>,
@@ -309,14 +305,14 @@ extension TransactionClient {
 			}
 
 			for candidate in candidates {
-				if transactionSigners.intentSignerEntitiesOrEmpty().contains(.account(candidate.account)) {
+				if request.transactionSigners.intentSignerEntitiesOrEmpty().contains(.account(candidate.account)) {
 					/// The cost of the fee payer signature is already accounted for.
 					if candidate.xrdBalance >= totalCost {
 						return .init(
 							payer: candidate,
-							updatedFee: transactionFee,
-							transactionSigners: transactionSigners,
-							signingFactors: signingFactors
+							updatedFee: request.transactionFee,
+							transactionSigners: request.transactionSigners,
+							signingFactors: request.signingFactors
 						)
 					}
 				}
@@ -330,16 +326,16 @@ extension TransactionClient {
 
 				let signerEntities = allSignerEntities + [.account(candidate.account)]
 				let signingFactors = try await factorSourcesClient.getSigningFactors(.init(
-					networkID: networkID,
+					networkID: request.networkId,
 					signers: .init(rawValue: Set(signerEntities))!,
-					signingPurpose: signingPurpose
+					signingPurpose: request.signingPurpose
 				))
 
-				var feeIncludingCandidate = transactionFee
+				var feeIncludingCandidate = request.transactionFee
 				feeIncludingCandidate.updateSignaturesCost(signingFactors.expectedSignatureCount)
 				if candidate.xrdBalance >= feeIncludingCandidate.totalFee.max {
 					let signers = TransactionSigners(
-						notaryPublicKey: transactionSigners.notaryPublicKey,
+						notaryPublicKey: request.transactionSigners.notaryPublicKey,
 						intentSigning: .intentSigners(.init(rawValue: .init(signerEntities))!)
 					)
 					return .init(

@@ -1163,6 +1163,7 @@
 		830EA9E92AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */; };
 		832880692AE664C30014FBF3 /* EntityFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832880682AE664C30014FBF3 /* EntityFlag.swift */; };
 		8328806C2AE6725F0014FBF3 /* AccountPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */; };
+		8338B9E52AFAB20700D1D8EA /* TransactionFee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */; };
 		83D0B5692AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */; };
 		83EE47502AF027DF00155F03 /* AssetTransferDepositRuleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */; };
 		83EE47552AF0DE8F00155F03 /* TransactionPayloadGatewayHandlingStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47512AF0DE8E00155F03 /* TransactionPayloadGatewayHandlingStatus.swift */; };
@@ -2443,6 +2444,7 @@
 		830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Test.swift"; sourceTree = "<group>"; };
 		832880682AE664C30014FBF3 /* EntityFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityFlag.swift; sourceTree = "<group>"; };
 		8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPreferencesTests.swift; sourceTree = "<group>"; };
+		8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionFee.swift; sourceTree = "<group>"; };
 		83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixEngineToolkitError+Description.swift"; sourceTree = "<group>"; };
 		83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetTransferDepositRuleTests.swift; sourceTree = "<group>"; };
 		83EE47512AF0DE8E00155F03 /* TransactionPayloadGatewayHandlingStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionPayloadGatewayHandlingStatus.swift; sourceTree = "<group>"; };
@@ -5227,6 +5229,7 @@
 				48CFBF862ADC10D900E77A5C /* TransactionFailure.swift */,
 				48CFBF872ADC10D900E77A5C /* TransactionModels.swift */,
 				48CFBF882ADC10D900E77A5C /* MakeTransactionHeaderInput.swift */,
+				8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -8621,6 +8624,7 @@
 				48CFC48A2ADC10DA00E77A5C /* OnLedgerEntitiesClient+CreateEntity.swift in Sources */,
 				48CFC32E2ADC10D900E77A5C /* OffDeviceMnemonicInfo.swift in Sources */,
 				48CFC6132ADC10DA00E77A5C /* AuthRequestItem.swift in Sources */,
+				8338B9E52AFAB20700D1D8EA /* TransactionFee.swift in Sources */,
 				48CFC3C82ADC10D900E77A5C /* Mnemonic.swift in Sources */,
 				48CFC28C2ADC10D900E77A5C /* TransactionReviewProofs.swift in Sources */,
 				48CFC5092ADC10DA00E77A5C /* MetadataInstantArrayValue.swift in Sources */,

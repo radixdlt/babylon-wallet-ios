@@ -99,6 +99,13 @@ public enum Loadable<Value> {
 		}
 		return false
 	}
+
+    public var isSuccess: Bool {
+        if case .success = self {
+            return true
+        }
+        return false
+    }
 }
 
 extension Loadable {

@@ -29,7 +29,7 @@ extension CustomizeFees.State {
 					L10n.TransactionReview.CustomizeNetworkFeeSheet.viewNormalModeButtonTitle
 				}
 			}(),
-			feePayer: feePayerSelection.selected,
+			feePayer: feePayer,
 			noFeePayerText: {
 				if transactionFee.totalFee.lockFee == .zero {
 					L10n.TransactionReview.CustomizeNetworkFeeSheet.noneRequired
@@ -38,7 +38,7 @@ extension CustomizeFees.State {
 				}
 			}(),
 			insufficientBalanceMessage: {
-				if let feePayer = feePayerSelection.selected {
+				if let feePayer {
 					if feePayer.xrdBalance < transactionFee.totalFee.lockFee {
 						return L10n.TransactionReview.CustomizeNetworkFeeSheet.InsufficientBalance.warning
 					}
