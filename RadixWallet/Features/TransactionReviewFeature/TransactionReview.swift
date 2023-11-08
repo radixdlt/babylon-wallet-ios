@@ -501,6 +501,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 			state.reviewedTransaction = reviewedTransaction
 			state.networkFee?.reviewedTransaction = reviewedTransaction
+
+			if reviewedTransaction.transaction == .nonConforming {
+				return showRawTransaction(&state)
+			}
 			return .none
 		}
 	}
@@ -629,17 +633,21 @@ extension TransactionReview {
 	}
 
 	func determineFeePayer(_ state: State, reviewedTransaction: ReviewedTransaction) -> Effect<Action> {
-		.run { send in
-			let result = await transactionClient.determineFeePayer(.init(
-				networkId: reviewedTransaction.networkId,
-				transactionFee: reviewedTransaction.transactionFee,
-				transactionSigners: reviewedTransaction.transactionSigners,
-				signingFactors: reviewedTransaction.signingFactors,
-				signingPurpose: .signTransaction(state.signTransactionPurpose),
-				manifest: state.transactionManifest
-			))
+		if reviewedTransaction.transactionFee.totalFee.lockFee == .zero {
+			.send(.internal(.determinFeePayerResult(nil)))
+		} else {
+			.run { send in
+				let result = await transactionClient.determineFeePayer(.init(
+					networkId: reviewedTransaction.networkId,
+					transactionFee: reviewedTransaction.transactionFee,
+					transactionSigners: reviewedTransaction.transactionSigners,
+					signingFactors: reviewedTransaction.signingFactors,
+					signingPurpose: .signTransaction(state.signTransactionPurpose),
+					manifest: state.transactionManifest
+				))
 
-			await send(.internal(.determinFeePayerResult(result)))
+				await send(.internal(.determinFeePayerResult(result)))
+			}
 		}
 	}
 }

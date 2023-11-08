@@ -16,6 +16,17 @@ extension SelectFeePayer {
 		let feePayerCandidates: Loadable<IdentifiedArrayOf<FeePayerCandidate>>
 		let fee: String
 		let selectedPayer: FeePayerCandidate?
+
+		var selectButtonControlState: ControlState {
+			switch feePayerCandidates {
+			case .idle, .loading:
+				.loading(.local)
+			case .success:
+				.enabled
+			case .failure:
+				.disabled
+			}
+		}
 	}
 
 	@MainActor
@@ -79,6 +90,7 @@ extension SelectFeePayer {
 					) { action in
 						Button(L10n.TransactionReview.CustomizeNetworkFeeSheet.SelectFeePayer.selectAccountButtonTitle, action: action)
 							.buttonStyle(.primaryRectangular)
+							.controlState(viewStore.selectButtonControlState)
 					}
 				}
 			}
