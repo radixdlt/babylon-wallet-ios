@@ -77,9 +77,11 @@ public struct ApprovalSlider: View {
 		private let padding: CGFloat = 2
 
 		private func gradientMask(for width: CGFloat) -> some View {
-			Rectangle()
-				.offset(.init(x: (position - 1) * width - (approved ? 0 : 0.5 * .approveSliderHeight), y: 0))
-				.opacity(min(1.0, 2.0 * position))
+			let xAdjustment: CGFloat = (approved ? 0 : 0.5 * .approveSliderHeight)
+			let opacity: CGFloat = min(1.0, 2.0 * position)
+			return Rectangle()
+				.offset(x: (position - 1) * width - xAdjustment)
+				.opacity(opacity)
 		}
 
 		private func handle(for width: CGFloat) -> some View {

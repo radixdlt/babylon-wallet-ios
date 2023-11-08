@@ -8,7 +8,8 @@ extension DependencyValues {
 
 // MARK: - QRGeneratorClient + TestDependencyKey
 extension QRGeneratorClient: TestDependencyKey {
-	public static let previewValue: Self = .noop
+	public static let previewValue = Self.noop
+
 	public static let testValue = Self(
 		generate: unimplemented("\(Self.self).generate")
 	)

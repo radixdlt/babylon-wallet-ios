@@ -8,7 +8,7 @@ extension DependencyValues {
 
 // MARK: - PersonasClient + TestDependencyKey
 extension PersonasClient: TestDependencyKey {
-	public static let previewValue: Self = .noop
+	public static let previewValue = Self.noop
 	public static let testValue = Self(
 		personas: unimplemented("\(Self.self).personas"),
 		nextPersonaIndex: unimplemented("\(Self.self).nextPersonaIndex"),

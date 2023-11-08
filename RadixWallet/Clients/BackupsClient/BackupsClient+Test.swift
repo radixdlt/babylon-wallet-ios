@@ -8,7 +8,8 @@ extension DependencyValues {
 
 // MARK: - BackupsClient + TestDependencyKey
 extension BackupsClient: TestDependencyKey {
-	public static let previewValue: Self = .noop
+	public static let previewValue = Self.noop
+
 	public static let testValue = Self(
 		snapshotOfProfileForExport: unimplemented("\(Self.self).snapshotOfProfileForExport"),
 		loadProfileBackups: unimplemented("\(Self.self).loadProfile"),

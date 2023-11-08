@@ -8,7 +8,7 @@ extension DependencyValues {
 
 // MARK: - URLFormatterClient + TestDependencyKey
 extension URLFormatterClient: TestDependencyKey {
-	public static let previewValue: Self = .noop
+	public static let previewValue = Self.noop
 
 	public static let testValue = Self(
 		fixedSizeImage: unimplemented("\(Self.self).fixedSize"),
