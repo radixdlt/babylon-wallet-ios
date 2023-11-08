@@ -128,25 +128,28 @@ extension ROLAClient {
 	}
 }
 
-/// `0x52 || challenge(32) || L_dda(1) || dda_utf8(L_dda) || origin_utf8`
-func payloadToHash(
-	challenge: P2P.Dapp.Request.AuthChallengeNonce,
-	dAppDefinitionAddress accountAddress: AccountAddress,
-	origin metadataOrigin: P2P.Dapp.Request.Metadata.Origin
-) -> Data {
-	let rPrefix: UInt8 = 0x52
-	let dAppDefinitionAddress = accountAddress.address
-	let origin = metadataOrigin.urlString.rawValue
-	precondition(dAppDefinitionAddress.count <= UInt8.max)
-	let challengeBytes = [UInt8](challenge.data.data)
-	let lengthDappDefinitionAddress = UInt8(dAppDefinitionAddress.count)
-	return Data(
-		[rPrefix]
-			+ challengeBytes
-			+ [lengthDappDefinitionAddress]
-			+ [UInt8](dAppDefinitionAddress.utf8)
-			+ [UInt8](origin.utf8)
-	)
+extension ROLAClient {
+	/// `0x52 || challenge(32) || L_dda(1) || dda_utf8(L_dda) || origin_utf8`
+	static func payloadToHash(
+		challenge: P2P.Dapp.Request.AuthChallengeNonce,
+		dAppDefinitionAddress accountAddress: AccountAddress,
+		origin metadataOrigin: P2P.Dapp.Request.Metadata.Origin
+	) -> Data {
+		let rPrefix: UInt8 = 0x52
+		let dAppDefinitionAddress = accountAddress.address
+		let origin = metadataOrigin.urlString.rawValue
+		precondition(dAppDefinitionAddress.count <= UInt8.max)
+		let challengeBytes = [UInt8](challenge.data.data)
+		let lengthDappDefinitionAddress = UInt8(dAppDefinitionAddress.count)
+
+		var data = [rPrefix]
+		data.append(contentsOf: challengeBytes)
+		data.append(contentsOf: [lengthDappDefinitionAddress])
+		data.append(contentsOf: [UInt8](dAppDefinitionAddress.utf8))
+		data.append(contentsOf: [UInt8](origin.utf8))
+
+		return Data(data)
+	}
 }
 
 extension EngineToolkit.PublicKeyHash {
