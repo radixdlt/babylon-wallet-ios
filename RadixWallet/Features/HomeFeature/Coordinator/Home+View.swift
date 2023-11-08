@@ -108,7 +108,7 @@ private extension View {
 	}
 
 	func exportMnemonic(_ destinationStore: PresentationStoreOf<Home.Destination>) -> some SwiftUI.View {
-		fullScreenCover( /* Full Screen cover to not be able to use iOS dismiss gestures */
+		sheet(
 			store: destinationStore,
 			state: /Home.Destination.State.exportMnemonic,
 			action: Home.Destination.Action.exportMnemonic,
