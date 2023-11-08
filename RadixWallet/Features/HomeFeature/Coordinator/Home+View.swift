@@ -158,8 +158,6 @@ struct HomeView_Previews: PreviewProvider {
 }
 
 extension Home.State {
-	public static let previewValue = Home.State(
-		babylonAccountRecoveryIsNeeded: false
-	)
+	public static let previewValue = Home.State()
 }
 #endif
