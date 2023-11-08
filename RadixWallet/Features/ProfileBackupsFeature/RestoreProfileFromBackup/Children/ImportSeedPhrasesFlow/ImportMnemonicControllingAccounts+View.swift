@@ -10,19 +10,18 @@ extension ImportMnemonicControllingAccounts.State {
 extension ImportMnemonicControllingAccounts {
 	public struct ViewState: Equatable {
 		let isSkippable: Bool
+		let title: LocalizedStringKey
+		let navigationTitle: String
 
-		var title: LocalizedStringKey {
-			.init(
-				isSkippable
-					? L10n.RecoverSeedPhrase.Header.subtitleOtherSeedPhrase
-					: L10n.RecoverSeedPhrase.Header.subtitleMainSeedPhrase
-			)
-		}
-
-		var navigationTitle: String {
-			isSkippable
-				? L10n.RecoverSeedPhrase.Header.titleOther
-				: L10n.RecoverSeedPhrase.Header.titleMain
+		init(isSkippable: Bool) {
+			self.isSkippable = isSkippable
+			if isSkippable {
+				self.title = .init(L10n.RecoverSeedPhrase.Header.subtitleOtherSeedPhrase)
+				self.navigationTitle = L10n.RecoverSeedPhrase.Header.titleOther
+			} else {
+				self.title = .init(L10n.RecoverSeedPhrase.Header.subtitleMainSeedPhrase)
+				self.navigationTitle = L10n.RecoverSeedPhrase.Header.titleMain
+			}
 		}
 	}
 
@@ -70,19 +69,36 @@ extension ImportMnemonicControllingAccounts {
 				}
 				.navigationTitle(viewStore.navigationTitle)
 				.onAppear { viewStore.send(.appeared) }
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /ImportMnemonicControllingAccounts.Destination.State.importMnemonic,
-					action: ImportMnemonicControllingAccounts.Destination.Action.importMnemonic,
-					content: { store_ in
-						NavigationView {
-							ImportMnemonic.View(store: store_)
-								.navigationTitle(L10n.EnterSeedPhrase.Header.title)
-						}
-					}
-				)
+				.destinations(with: store)
 			}
 		}
+	}
+}
+
+private extension StoreOf<ImportMnemonicControllingAccounts> {
+	var destination: PresentationStoreOf<ImportMnemonicControllingAccounts.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<ImportMnemonicControllingAccounts>) -> some View {
+		let destinationStore = store.destination
+		return importMnemonic(with: destinationStore)
+	}
+
+	private func importMnemonic(with destinationStore: PresentationStoreOf<ImportMnemonicControllingAccounts.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /ImportMnemonicControllingAccounts.Destination.State.importMnemonic,
+			action: ImportMnemonicControllingAccounts.Destination.Action.importMnemonic,
+			content: { store in
+				ImportMnemonic.View(store: store)
+					.navigationTitle(L10n.EnterSeedPhrase.Header.title)
+					.inNavigationView
+			}
+		)
 	}
 }
 
