@@ -68,11 +68,20 @@ final class ROLAClientTests: TestCase {
 			jsonName: "rola_challenge_payload_hash_vectors"
 		) { (vectors: [TestVector]) in
 			for vector in vectors {
-				let payload = try payloadToHash(
+				let payload = try ROLAClient.payloadToHash(
 					challenge: .init(rawValue: .init(hex: vector.challenge)),
 					dAppDefinitionAddress: .init(validatingAddress: vector.dAppDefinitionAddress),
 					origin: .init(string: vector.origin)
 				)
+
+				let otherPayload = try _payloadToHash(
+					challenge: .init(rawValue: .init(hex: vector.challenge)),
+					dAppDefinitionAddress: .init(validatingAddress: vector.dAppDefinitionAddress),
+					origin: .init(string: vector.origin)
+				)
+
+				XCTAssertEqual(otherPayload.hex, vector.payloadToHash)
+
 				XCTAssertEqual(payload.hex, vector.payloadToHash)
 				let blakeHashOfPayload = try blake2b(data: payload)
 				XCTAssertEqual(blakeHashOfPayload.hex, vector.blakeHashOfPayload)
