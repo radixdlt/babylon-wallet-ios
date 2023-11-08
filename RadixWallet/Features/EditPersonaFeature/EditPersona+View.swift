@@ -105,7 +105,7 @@ extension EditPersona {
 						}
 					}
 				}
-				.destinations(with: store.destination)
+				.destinations(with: store)
 			}
 		}
 	}
@@ -125,26 +125,25 @@ private extension StoreOf<EditPersona> {
 	}
 }
 
-extension View {
-	@MainActor
-	fileprivate func destinations(with store: PresentationStoreOf<EditPersona.Destination>) -> some View {
-		closeConfirmationDialog(with: store)
-			.addFields(with: store)
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<EditPersona>) -> some View {
+		let destinationStore = store.destination
+		return closeConfirmationDialog(with: destinationStore)
+			.addFields(with: destinationStore)
 	}
 
-	@MainActor
-	private func closeConfirmationDialog(with store: PresentationStoreOf<EditPersona.Destination>) -> some View {
+	private func closeConfirmationDialog(with destinationStore: PresentationStoreOf<EditPersona.Destination>) -> some View {
 		confirmationDialog(
-			store: store,
+			store: destinationStore,
 			state: /EditPersona.Destination.State.closeConfirmationDialog,
 			action: EditPersona.Destination.Action.closeConfirmationDialog
 		)
 	}
 
-	@MainActor
-	private func addFields(with store: PresentationStoreOf<EditPersona.Destination>) -> some View {
+	private func addFields(with destinationStore: PresentationStoreOf<EditPersona.Destination>) -> some View {
 		sheet(
-			store: store,
+			store: destinationStore,
 			state: /EditPersona.Destination.State.addFields,
 			action: EditPersona.Destination.Action.addFields,
 			content: { EditPersonaAddEntryKinds.View(store: $0) }
