@@ -18,6 +18,11 @@ public struct WithNavigationBar<Content: View>: View {
 		self.closeAction = closeAction
 	}
 
+	init(closeAction: @escaping () -> Void, content: Content) {
+		self.content = content
+		self.closeAction = closeAction
+	}
+
 	public var body: some View {
 		NavigationStack {
 			content
@@ -28,6 +33,18 @@ public struct WithNavigationBar<Content: View>: View {
 					}
 				}
 		}
+	}
+}
+
+extension View {
+	public var inNavigationView: some View {
+		NavigationView {
+			self
+		}
+	}
+
+	public func withNavigationBar(closeAction: @escaping () -> Void) -> some View {
+		WithNavigationBar(closeAction: closeAction, content: self)
 	}
 }
 
