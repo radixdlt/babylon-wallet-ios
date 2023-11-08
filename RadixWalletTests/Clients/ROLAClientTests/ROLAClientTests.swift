@@ -74,12 +74,6 @@ final class ROLAClientTests: TestCase {
 					origin: .init(string: vector.origin)
 				)
 
-				let otherPayload = try _payloadToHash(
-					challenge: .init(rawValue: .init(hex: vector.challenge)),
-					dAppDefinitionAddress: .init(validatingAddress: vector.dAppDefinitionAddress),
-					origin: .init(string: vector.origin)
-				)
-
 				XCTAssertEqual(otherPayload.hex, vector.payloadToHash)
 
 				XCTAssertEqual(payload.hex, vector.payloadToHash)
@@ -105,7 +99,7 @@ final class ROLAClientTests: TestCase {
 				try (UInt8.zero ..< 10).map { seed -> TestVector in
 					/// deterministic derivation of a challenge, this is not `blakeHashOfPayload`
 					let challenge = try blake2b(data: Data((origin.urlString.rawValue + dAppDefinitionAddress.address).utf8) + [seed])
-					let payload = try payloadToHash(
+					let payload = try ROLAClient.payloadToHash(
 						challenge: .init(rawValue: .init(data: challenge)),
 						dAppDefinitionAddress: dAppDefinitionAddress,
 						origin: origin
@@ -136,7 +130,7 @@ final class ROLAClientTests: TestCase {
 		XCTAssertEqual(publicKey.compressedRepresentation.hex, "0a4b894208a1f6b1bd7e823b59909f01aae0172b534baa2905b25f1bcbbb4f0a")
 
 		let hash: Data = try {
-			let payload = try payloadToHash(
+			let payload = try ROLAClient.payloadToHash(
 				challenge: .init(.init(data: Data(hex: "2596b7902d56a32d17ca90ce2a1ee0a18a9cac6a82fb9f186d904e4a3eeeb627"))),
 				dAppDefinitionAddress: .init(validatingAddress: "account_rdx168fghy4kapzfnwpmq7t7753425lwklk65r82ys7pz2xzleehk2ap0k"),
 				origin: .init(string: "https://radix-dapp-toolkit-dev.rdx-works-main.extratools.works")
