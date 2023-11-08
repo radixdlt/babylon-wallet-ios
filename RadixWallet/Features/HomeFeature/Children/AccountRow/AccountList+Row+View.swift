@@ -28,8 +28,7 @@ extension Home.AccountRow {
 		let tag: AccountTag?
 
 		let isLedgerAccount: Bool
-		let needToExportMnemonic: Bool
-		let needToImportMnemonic: Bool
+		let mnemonicHandlingCallToAction: MnemonicHandling?
 
 		let fungibleResourceIcons: [TokenThumbnail.Content]
 		let nonFungibleResourcesCount: Int
@@ -48,8 +47,7 @@ extension Home.AccountRow {
 			self.tag = .init(state: state)
 			self.isLedgerAccount = state.isLedgerAccount
 
-			self.needToExportMnemonic = state.exportMnemonicNeeded
-			self.needToImportMnemonic = state.importMnemonicNeeded
+			self.mnemonicHandlingCallToAction = state.mnemonicHandlingCallToAction
 
 			// Resources
 			guard let portfolio = state.portfolio.wrappedValue else {
@@ -105,13 +103,10 @@ extension Home.AccountRow {
 
 					ownedResourcesList(viewStore)
 
-					if viewStore.needToImportMnemonic {
-						importMnemonicPromptView(viewStore)
-					}
-
-					if !viewStore.needToImportMnemonic, viewStore.needToExportMnemonic {
-						exportMnemonicPromptView(viewStore)
-					}
+					prompts(
+						mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction
+					)
+					.padding(.medium1)
 				}
 				.padding(.horizontal, .medium1)
 				.padding(.vertical, .medium2)
@@ -132,6 +127,22 @@ extension Home.AccountRow {
 extension Home.AccountRow.View {
 	private enum Constants {
 		static let iconSize = HitTargetSize.smaller
+	}
+
+	@ViewBuilder
+	func prompts(mnemonicHandlingCallToAction: MnemonicHandling?) -> some SwiftUI.View {
+		if let mnemonicHandlingCallToAction {
+			switch mnemonicHandlingCallToAction {
+			case .mustBeImported:
+				importMnemonicPromptView {
+					store.send(.view(.importMnemonicButtonTapped))
+				}
+			case .shouldBeExported:
+				exportMnemonicPromptView {
+					store.send(.view(.exportMnemonicButtonTapped))
+				}
+			}
+		}
 	}
 
 	// Crates the view of the account owned resources
@@ -238,16 +249,6 @@ extension Home.AccountRow.View {
 				.cornerRadius(Constants.iconSize.rawValue / 2)
 				.layoutPriority(100)
 		}
-	}
-}
-
-extension Home.AccountRow.View {
-	func importMnemonicPromptView(_ viewStore: ViewStoreOf<Home.AccountRow>) -> some View {
-		importMnemonicPromptView { viewStore.send(.importMnemonic) }
-	}
-
-	func exportMnemonicPromptView(_ viewStore: ViewStoreOf<Home.AccountRow>) -> some View {
-		exportMnemonicPromptView { viewStore.send(.exportMnemonic) }
 	}
 }
 

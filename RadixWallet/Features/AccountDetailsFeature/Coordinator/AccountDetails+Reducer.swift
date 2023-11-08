@@ -25,7 +25,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case transferButtonTapped
 
 		case exportMnemonicButtonTapped
-		case recoverMnemonicsButtonTapped
+		case importMnemonicButtonTapped
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -112,7 +112,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case .exportMnemonicButtonTapped:
 			return .send(.delegate(.exportMnemonic(controlling: state.account)))
 
-		case .recoverMnemonicsButtonTapped:
+		case .importMnemonicButtonTapped:
 			return .send(.delegate(.importMnemonics))
 		}
 	}

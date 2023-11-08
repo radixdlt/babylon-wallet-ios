@@ -21,8 +21,8 @@ extension Home {
 		public enum ViewAction: Sendable, Equatable {
 			case tapped
 			case task
-			case exportMnemonic
-			case importMnemonic
+			case importMnemonicButtonTapped
+			case exportMnemonicButtonTapped
 		}
 
 		public enum InternalAction: Sendable, Equatable {
@@ -58,10 +58,10 @@ extension Home {
 						await send(.internal(.accountPortfolioUpdate(accountPortfolio.nonEmptyVaults)))
 					}
 				}
-			case .exportMnemonic:
+			case .exportMnemonicButtonTapped:
 				return .send(.delegate(.exportMnemonic))
 
-			case .importMnemonic:
+			case .importMnemonicButtonTapped:
 				return .send(.delegate(.importMnemonics))
 
 			case .tapped:

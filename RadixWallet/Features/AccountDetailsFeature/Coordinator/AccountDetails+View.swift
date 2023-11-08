@@ -6,8 +6,7 @@ extension AccountDetails.State {
 			accountAddress: account.address,
 			appearanceID: account.appearanceID,
 			displayName: account.displayName.rawValue,
-			importMnemonicNeeded: importMnemonicNeeded,
-			exportMnemonicNeeded: exportMnemonicNeeded,
+			mnemonicHandlingCallToAction: mnemonicHandlingCallToAction,
 			isLedgerAccount: account.isLedgerAccount,
 			showToolbar: destination == nil
 		)
@@ -20,8 +19,7 @@ extension AccountDetails {
 		let accountAddress: AccountAddress
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let displayName: String
-		let importMnemonicNeeded: Bool
-		let exportMnemonicNeeded: Bool
+		let mnemonicHandlingCallToAction: MnemonicHandling?
 		let isLedgerAccount: Bool
 		let showToolbar: Bool
 	}
@@ -43,8 +41,7 @@ extension AccountDetails {
 						.padding(.bottom, .medium1)
 
 					prompts(
-						needToImport: viewStore.importMnemonicNeeded,
-						needToExport: viewStore.exportMnemonicNeeded
+						mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction
 					)
 					.padding(.medium1)
 
@@ -84,15 +81,17 @@ extension AccountDetails {
 		}
 
 		@ViewBuilder
-		func prompts(needToImport: Bool, needToExport: Bool) -> some SwiftUI.View {
-			// Mutally exclusive to prompt user to recover and backup mnemonic.
-			if needToImport {
-				importMnemonicPromptView {
-					store.send(.view(.recoverMnemonicsButtonTapped))
-				}
-			} else if needToExport {
-				exportMnemonicPromptView {
-					store.send(.view(.exportMnemonicButtonTapped))
+		func prompts(mnemonicHandlingCallToAction: MnemonicHandling?) -> some SwiftUI.View {
+			if let mnemonicHandlingCallToAction {
+				switch mnemonicHandlingCallToAction {
+				case .mustBeImported:
+					importMnemonicPromptView {
+						store.send(.view(.importMnemonicButtonTapped))
+					}
+				case .shouldBeExported:
+					exportMnemonicPromptView {
+						store.send(.view(.exportMnemonicButtonTapped))
+					}
 				}
 			}
 		}
