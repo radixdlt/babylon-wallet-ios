@@ -108,7 +108,7 @@ public struct Splash: Sendable, FeatureReducer {
 
 		case let .loadedProfile(profile):
 			if profile.networks.isEmpty {
-				return delegateCompleted(accountRecoveryNeeded: false)
+				return delegateCompleted()
 			} else {
 				return checkAccountRecoveryNeeded()
 			}
@@ -119,17 +119,19 @@ public struct Splash: Sendable, FeatureReducer {
 			return .none
 
 		case let .accountRecoveryNeeded(.success(recoveryNeeded)):
-			return delegateCompleted(accountRecoveryNeeded: recoveryNeeded)
+			if recoveryNeeded {
+				loggerGlobal.notice("Account recovery needed")
+			}
+			return delegateCompleted()
 		}
 	}
 
-	func delegateCompleted(accountRecoveryNeeded: Bool) -> Effect<Action> {
+	func delegateCompleted() -> Effect<Action> {
 		.run { send in
 			let profile = await onboardingClient.unlockApp()
 			await send(.delegate(
 				.completed(
-					profile,
-					accountRecoveryNeeded: accountRecoveryNeeded
+					profile
 				))
 			)
 		}
