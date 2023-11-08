@@ -2,11 +2,7 @@ import Foundation
 
 // MARK: - AccountWithInfo
 public struct AccountWithInfo: Sendable, Hashable {
-	public var account: Profile.Network.Account {
-		didSet {
-			self.deviceFactorSourceControlled = Self.makeDeviceFactorSourceControlled(account)
-		}
-	}
+	public var account: Profile.Network.Account
 
 	public var isDappDefinitionAccount: Bool = false
 	public var deviceFactorSourceControlled: DeviceFactorSourceControlled?

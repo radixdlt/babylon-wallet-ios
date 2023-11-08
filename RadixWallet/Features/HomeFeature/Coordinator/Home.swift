@@ -170,7 +170,7 @@ public struct Home: Sendable, FeatureReducer {
 			let account = accountRow.account
 			switch delegateAction {
 			case .openDetails:
-				state.destination = .accountDetails(.init(account: account))
+				state.destination = .accountDetails(.init(accountWithInfo: accountRow.accountWithInfo))
 				return .none
 			case .exportMnemonic:
 				return exportMnemonic(controlling: account, state: &state)

@@ -11,10 +11,13 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		var destination: Destinations.State?
 
 		public init(
-			account: Profile.Network.Account
+			accountWithInfo: AccountWithInfo
 		) {
-			self.accountWithInfo = .init(account: account)
-			self.assets = AssetsView.State(account: account, mode: .normal)
+			self.accountWithInfo = accountWithInfo
+			self.assets = AssetsView.State(
+				account: accountWithInfo.account,
+				mode: .normal
+			)
 		}
 	}
 
@@ -125,6 +128,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 		case .destination(.presented(.preferences(.delegate(.accountHidden)))):
 			return .send(.delegate(.dismiss))
+
+		case .assets(.internal(.resourcesStateUpdated)):
+			checkAccountAccessToMnemonic(state: &state)
+			return .none
 
 		default:
 			return .none

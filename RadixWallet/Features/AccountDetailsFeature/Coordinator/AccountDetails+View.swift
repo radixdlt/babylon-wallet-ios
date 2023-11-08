@@ -145,7 +145,7 @@ struct AccountDetails_Preview: PreviewProvider {
 		NavigationStack {
 			AccountDetails.View(
 				store: .init(
-					initialState: .init(account: .previewValue0),
+					initialState: .init(accountWithInfo: .init(account: .previewValue0)),
 					reducer: AccountDetails.init
 				)
 			)
