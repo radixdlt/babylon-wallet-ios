@@ -72,7 +72,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		// when
 		await store.send(.child(.gatewayList(.delegate(.removeGateway(gatewayToBeDeleted))))) {
 			// then
-			$0.removeGatewayAlert = .removeGateway(row: gatewayToBeDeleted)
+			$0.destination = .removeGateway(.removeGateway(row: gatewayToBeDeleted))
 		}
 	}
 
@@ -92,7 +92,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		)
 
 		var initialState = GatewaySettings.State()
-		initialState.removeGatewayAlert = .removeGateway(row: gatewayToBeDeleted)
+		initialState.destination = .removeGateway(.removeGateway(row: gatewayToBeDeleted))
 		initialState.currentGateway = currentGateway
 		initialState.gatewayList = .init(gateways: .init(
 			uniqueElements: gateways.all.elements.map {
@@ -131,9 +131,9 @@ final class GatewaySettingsFeatureTests: TestCase {
 		store.exhaustivity = .off
 
 		// when
-		await store.send(.view(.removeGateway(.presented(.removeButtonTapped(gatewayToBeDeleted))))) {
+		await store.send(.child(.destination(.presented(.removeGateway(.removeButtonTapped(gatewayToBeDeleted)))))) {
 			// then
-			$0.removeGatewayAlert = nil
+			$0.destination = nil
 		}
 
 		// when
