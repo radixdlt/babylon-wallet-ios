@@ -14,24 +14,24 @@ extension TransactionReviewNetworkFee {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .small2) {
+					HStack {
+						Text(L10n.TransactionReview.NetworkFee.heading)
+							.sectionHeading
+							.textCase(.uppercase)
+
+						//    FIXME: Uncomment and implement
+						//    TransactionReviewInfoButton {
+						//    viewStore.send(.infoTapped)
+						//    }
+
+						Spacer(minLength: 0)
+
+						Text(viewStore.reviewedTransaction.transactionFee.totalFee.displayedTotalFee)
+							.textStyle(.body1HighImportance)
+							.foregroundColor(.app.gray1)
+					}
+
 					loadable(viewStore.reviewedTransaction.feePayingValidation) { validation in
-						HStack {
-							Text(L10n.TransactionReview.NetworkFee.heading)
-								.sectionHeading
-								.textCase(.uppercase)
-
-							//    FIXME: Uncomment and implement
-							//    TransactionReviewInfoButton {
-							//    viewStore.send(.infoTapped)
-							//    }
-
-							Spacer(minLength: 0)
-
-							Text(viewStore.reviewedTransaction.transactionFee.totalFee.displayedTotalFee)
-								.textStyle(.body1HighImportance)
-								.foregroundColor(.app.gray1)
-						}
-
 						if case .needsFeePayer = validation {
 							WarningErrorView(text: L10n.TransactionReview.feePayerRequiredMessage, type: .warning)
 						} else if case .insufficientBalance = validation {

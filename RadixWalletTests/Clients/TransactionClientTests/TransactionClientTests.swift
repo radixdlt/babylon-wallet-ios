@@ -150,13 +150,15 @@ final class TransactionClientTests: TestCase {
 			}
 		} operation: {
 			try await TransactionClient.feePayerSelectionAmongstCandidates(
+				request: .init(
+					networkId: .enkinet,
+					transactionFee: txFee,
+					transactionSigners: defaultSigners,
+					signingFactors: [.device: .init(rawValue: Set(defaultFactors))!],
+					signingPurpose: .signTransaction(.manifestFromDapp),
+					manifest: .init(instructions: .fromInstructions(instructions: [], networkId: NetworkID.enkinet.rawValue), blobs: [])
+				),
 				allFeePayerCandidates: .init(rawValue: .init(uncheckedUniqueElements: allFeePayerCandidates))!,
-				manifest: .init(instructions: .fromInstructions(instructions: [], networkId: NetworkID.enkinet.rawValue), blobs: []),
-				networkID: .enkinet,
-				transactionFee: txFee,
-				transactionSigners: defaultSigners,
-				signingFactors: [.device: .init(rawValue: Set(defaultFactors))!],
-				signingPurpose: .signTransaction(.manifestFromDapp),
 				involvedEntities: .init(
 					identitiesRequiringAuth: [],
 					accountsRequiringAuth: OrderedSet(signersAfterAnalysis),
