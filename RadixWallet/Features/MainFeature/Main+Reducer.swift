@@ -51,7 +51,6 @@ public struct Main: Sendable, FeatureReducer {
 
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
-	@Dependency(\.continuousClock) var clock
 
 	public init() {}
 

@@ -4310,8 +4310,8 @@
 			isa = PBXGroup;
 			children = (
 				48CFBE342ADC10D800E77A5C /* AssetsView+Reducer.swift */,
-				48CFBE352ADC10D800E77A5C /* Components */,
 				48CFBE672ADC10D800E77A5C /* AssetsView+View.swift */,
+				48CFBE352ADC10D800E77A5C /* Components */,
 			);
 			path = AssetsFeature;
 			sourceTree = "<group>";

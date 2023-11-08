@@ -32,7 +32,6 @@ extension Main {
 					destination: { Settings.View(store: $0) }
 				)
 			}
-			.navigationViewStyle(.stack)
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()
 			}
