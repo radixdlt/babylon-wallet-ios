@@ -80,7 +80,7 @@ extension AccountDetails {
 					}
 				}
 			}
-			.destination(store.scope(state: \.$destination, action: { .child(.destination($0)) }))
+			.destinations(with: store)
 		}
 
 		@ViewBuilder
@@ -112,16 +112,23 @@ extension AccountDetails {
 	}
 }
 
+private extension StoreOf<AccountDetails> {
+	var destination: PresentationStoreOf<AccountDetails.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
 @MainActor
 private extension View {
-	func destination(_ destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
-		preferences(destinationStore)
-			.transfer(destinationStore)
-			.exportMnemonic(destinationStore)
-			.importMnemonics(destinationStore)
+	func destinations(with store: StoreOf<AccountDetails>) -> some SwiftUI.View {
+		let destinationStore = store.destination
+		return preferences(with: destinationStore)
+			.transfer(with: destinationStore)
+			.exportMnemonic(with: destinationStore)
+			.importMnemonics(with: destinationStore)
 	}
 
-	func preferences(_ destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
+	private func preferences(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
 		navigationDestination(
 			store: destinationStore,
 			state: /AccountDetails.Destination.State.preferences,
@@ -130,7 +137,7 @@ private extension View {
 		)
 	}
 
-	func transfer(_ destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
+	private func transfer(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
 		fullScreenCover(
 			store: destinationStore,
 			state: /AccountDetails.Destination.State.transfer,
@@ -139,21 +146,20 @@ private extension View {
 		)
 	}
 
-	func exportMnemonic(_ destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
+	private func exportMnemonic(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
 		fullScreenCover( /* Full Screen cover to not be able to use iOS dismiss gestures */
 			store: destinationStore,
 			state: /AccountDetails.Destination.State.exportMnemonic,
 			action: AccountDetails.Destination.Action.exportMnemonic,
-			content: { childStore in
-				NavigationView {
-					ImportMnemonic.View(store: childStore)
-						.navigationTitle(L10n.ImportMnemonic.navigationTitleBackup)
-				}
+			content: {
+				ImportMnemonic.View(store: $0)
+					.navigationTitle(L10n.ImportMnemonic.navigationTitleBackup)
+					.inNavigationView
 			}
 		)
 	}
 
-	func importMnemonics(_ destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
+	private func importMnemonics(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
 		sheet(
 			store: destinationStore,
 			state: /AccountDetails.Destination.State.importMnemonics,

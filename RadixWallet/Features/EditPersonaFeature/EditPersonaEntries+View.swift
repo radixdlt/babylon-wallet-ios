@@ -13,9 +13,7 @@ extension EditPersonaEntries {
 				IfLetStore(
 					store.scope(
 						state: \.name,
-						action: (/Action.child
-							.. EditPersonaEntries.ChildAction.name
-						).embed
+						action: { .child(.name($0)) }
 					)
 				) { store in
 					EditPersonaEntry.View(
@@ -29,9 +27,7 @@ extension EditPersonaEntries {
 				IfLetStore(
 					store.scope(
 						state: \.phoneNumber,
-						action: (/Action.child
-							.. EditPersonaEntries.ChildAction.phoneNumber
-						).embed
+						action: { .child(.phoneNumber($0)) }
 					)
 				) { store in
 					EditPersonaEntry.View(
@@ -44,9 +40,7 @@ extension EditPersonaEntries {
 				IfLetStore(
 					store.scope(
 						state: \.emailAddress,
-						action: (/Action.child
-							.. EditPersonaEntries.ChildAction.emailAddress
-						).embed
+						action: { .child(.emailAddress($0)) }
 					)
 				) { store in
 					EditPersonaEntry.View(

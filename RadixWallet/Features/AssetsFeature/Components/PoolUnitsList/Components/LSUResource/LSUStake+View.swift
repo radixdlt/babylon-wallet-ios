@@ -73,16 +73,8 @@ extension LSUStake {
 					}
 				}
 				.padding(.medium1)
-				.sheet(
-					store: store.scope(
-						state: \.$destination,
-						action: (/Action.child .. LSUStake.ChildAction.destination).embed
-					),
-					state: /Destination.State.details,
-					action: Destination.Action.details,
-					content: LSUDetails.View.init
-				)
 			}
+			.destinations(with: store)
 		}
 
 		@ViewBuilder
@@ -192,5 +184,24 @@ extension LSUStake.State {
 				}
 			)
 		})
+	}
+}
+
+private extension StoreOf<LSUStake> {
+	var destination: PresentationStoreOf<LSUStake.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<LSUStake>) -> some View {
+		let destinationStore = store.destination
+		return sheet(
+			store: destinationStore,
+			state: /LSUStake.Destination.State.details,
+			action: LSUStake.Destination.Action.details,
+			content: { LSUDetails.View(store: $0) }
+		)
 	}
 }

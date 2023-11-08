@@ -19,11 +19,7 @@ extension PoolUnit {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: \.viewState,
-				send: PoolUnit.Action.view
-			) { viewStore in
+			WithViewStore(store, observe: \.viewState, send: PoolUnit.Action.view) { viewStore in
 				Section {
 					VStack(spacing: .large2) {
 						PoolUnitHeaderView(viewState: .init(iconURL: viewStore.iconURL)) {
@@ -49,15 +45,7 @@ extension PoolUnit {
 					.rowStyle()
 				}
 			}
-			.sheet(
-				store: store.scope(
-					state: \.$destination,
-					action: (/Action.child .. PoolUnit.ChildAction.destination).embed
-				),
-				state: /Destination.State.details,
-				action: Destination.Action.details,
-				content: PoolUnitDetails.View.init
-			)
+			.destinations(with: store)
 		}
 	}
 }
@@ -110,5 +98,24 @@ extension PoolUnitResourceViewState {
 					)
 				}
 		)! // Safe to unwrap, guaranteed to not be empty
+	}
+}
+
+private extension StoreOf<PoolUnit> {
+	var destination: PresentationStoreOf<PoolUnit.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<PoolUnit>) -> some View {
+		let destinationStore = store.destination
+		return sheet(
+			store: destinationStore,
+			state: /PoolUnit.Destination.State.details,
+			action: PoolUnit.Destination.Action.details,
+			content: { PoolUnitDetails.View(store: $0) }
+		)
 	}
 }

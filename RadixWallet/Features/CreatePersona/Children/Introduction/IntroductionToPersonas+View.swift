@@ -37,13 +37,7 @@ extension IntroductionToPersonas {
 					.buttonStyle(.primaryRectangular)
 				}
 				.onAppear { viewStore.send(.appeared) }
-				.sheet(
-					store: store.scope(
-						state: \.$infoPanel,
-						action: { .child(.infoPanel($0)) }
-					),
-					content: { SlideUpPanel.View(store: $0) }
-				)
+				.destinations(with: store)
 			}
 		}
 
@@ -72,6 +66,17 @@ extension IntroductionToPersonas {
 				.font(.app.body1Regular)
 				.foregroundColor(.app.gray1)
 		}
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<IntroductionToPersonas>) -> some View {
+		let slideUpStore = store.scope(state: \.$infoPanel) { .child(.infoPanel($0)) }
+		return sheet(
+			store: slideUpStore,
+			content: { SlideUpPanel.View(store: $0) }
+		)
 	}
 }
 

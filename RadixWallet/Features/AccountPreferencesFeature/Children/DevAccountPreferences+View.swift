@@ -99,17 +99,8 @@ extension DevAccountPreferences {
 					}
 					.navigationTitle("Dev Preferences")
 					#if DEBUG
-						.sheet(
-							store: store.destination,
-							state: /DevAccountPreferences.Destination.State.reviewTransaction,
-							action: DevAccountPreferences.Destination.Action.reviewTransaction
-						) { store in
-							// FIXME: Should use DappInteractionClient intstead to schedule a transaction
-							NavigationView {
-								TransactionReview.View(store: store)
-							}
-						}
-					#endif // DEBUG
+						.destinations(with: store)
+					#endif
 						.navigationBarTitleColor(.app.gray1)
 						.navigationBarTitleDisplayMode(.inline)
 						.navigationBarInlineTitleFont(.app.secondaryHeader)
@@ -118,12 +109,6 @@ extension DevAccountPreferences {
 				}
 			}
 		}
-	}
-}
-
-private extension StoreOf<DevAccountPreferences> {
-	var destination: PresentationStoreOf<DevAccountPreferences.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
 	}
 }
 
@@ -144,7 +129,34 @@ extension DevAccountPreferences.View {
 	}
 }
 
+private extension StoreOf<DevAccountPreferences> {
+	var destination: PresentationStoreOf<DevAccountPreferences.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
 #if DEBUG
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<DevAccountPreferences>) -> some View {
+		let destinationStore = store.destination
+		return reviewTransaction(with: destinationStore)
+	}
+
+	private func reviewTransaction(with destinationStore: PresentationStoreOf<DevAccountPreferences.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /DevAccountPreferences.Destination.State.reviewTransaction,
+			action: DevAccountPreferences.Destination.Action.reviewTransaction
+		) { store in
+			// FIXME: Should use DappInteractionClient intstead to schedule a transaction
+			NavigationView {
+				TransactionReview.View(store: store)
+			}
+		}
+	}
+}
+
 extension DevAccountPreferences.View {
 	@ViewBuilder
 	private func turnIntoDappDefinitionAccountTypeButton(with viewStore: ViewStoreOf<DevAccountPreferences>) -> some View {

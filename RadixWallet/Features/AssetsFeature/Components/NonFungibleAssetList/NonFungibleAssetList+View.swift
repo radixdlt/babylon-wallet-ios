@@ -14,17 +14,29 @@ extension NonFungibleAssetList {
 		public var body: some SwiftUI.View {
 			ForEachStore(
 				store.scope(state: \.rows) { .child(.asset($0, $1)) },
-				content: {
-					NonFungibleAssetList.Row.View(store: $0)
-				}
+				content: { NonFungibleAssetList.Row.View(store: $0) }
 			)
-			.sheet(
-				store: store.scope(state: \.$destination) { .child(.destination($0)) },
-				state: /NonFungibleAssetList.Destination.State.details,
-				action: NonFungibleAssetList.Destination.Action.details,
-				content: { NonFungibleTokenDetails.View(store: $0) }
-			)
+			.destinations(with: store)
 		}
+	}
+}
+
+private extension StoreOf<NonFungibleAssetList> {
+	var destination: PresentationStoreOf<NonFungibleAssetList.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<NonFungibleAssetList>) -> some View {
+		let destinationStore = store.destination
+		return sheet(
+			store: store.scope(state: \.$destination) { .child(.destination($0)) },
+			state: /NonFungibleAssetList.Destination.State.details,
+			action: NonFungibleAssetList.Destination.Action.details,
+			content: { NonFungibleTokenDetails.View(store: $0) }
+		)
 	}
 }
 

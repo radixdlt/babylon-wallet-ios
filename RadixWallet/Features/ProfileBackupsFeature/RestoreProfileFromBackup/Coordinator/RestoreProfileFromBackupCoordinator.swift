@@ -94,7 +94,6 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			loggerGlobal.notice("Starting import snapshot process...")
 			guard let profileSelection = state.profileSelection else {
 				preconditionFailure("Expected to have a profile")
-				return .none
 			}
 			return .run { send in
 				loggerGlobal.notice("Importing snapshot...")

@@ -47,27 +47,25 @@ extension DisplayMnemonics {
 					await viewStore.send(.onFirstTask).finish()
 				}
 			}
-			.destination(with: store)
+			.destinations(with: store)
 		}
 	}
 }
 
-extension View {
-	@MainActor
-	fileprivate func destination(
-		with store: StoreOf<DisplayMnemonics>
-	) -> some View {
-		let destinationStore = store.scope(
-			state: \.$destination,
-			action: { .child(.destination($0)) }
-		)
+private extension StoreOf<DisplayMnemonics> {
+	var destination: PresentationStoreOf<DisplayMnemonics.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
 
-		return self
-			.displayMnemonicSheet(with: destinationStore)
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<DisplayMnemonics>) -> some View {
+		let destinationStore = store.destination
+		return displayMnemonicSheet(with: destinationStore)
 			.importMnemonicsSheet(with: destinationStore)
 	}
 
-	@MainActor
 	private func displayMnemonicSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
@@ -77,18 +75,14 @@ extension View {
 		)
 	}
 
-	@MainActor
 	private func importMnemonicsSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
 			state: /DisplayMnemonics.Destination.State.importMnemonicControllingAccounts,
 			action: DisplayMnemonics.Destination.Action.importMnemonicControllingAccounts,
-			destination: { importStore in
-				NavigationView {
-					ImportMnemonicControllingAccounts.View(
-						store: importStore
-					)
-				}
+			destination: {
+				ImportMnemonicControllingAccounts.View(store: $0)
+					.inNavigationView
 			}
 		)
 	}
