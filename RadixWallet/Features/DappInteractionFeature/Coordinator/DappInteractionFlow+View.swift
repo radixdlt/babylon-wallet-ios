@@ -15,7 +15,7 @@ extension DappInteractionFlow {
 				IfLetStore(
 					store.scope(state: \.root, action: { .child(.root($0)) })
 				) {
-					destination(for: $0)
+					destinations(for: $0)
 						.toolbar {
 							ToolbarItem(placement: .navigationBarLeading) {
 								CloseButton {
@@ -27,7 +27,7 @@ extension DappInteractionFlow {
 				// This is required to disable the animation of internal components during transition
 				.transaction { $0.animation = nil }
 			} destination: {
-				destination(for: $0)
+				destinations(for: $0)
 					.navigationBarBackButtonHidden()
 					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
@@ -47,7 +47,7 @@ extension DappInteractionFlow {
 			)
 		}
 
-		func destination(
+		func destinations(
 			for store: StoreOf<DappInteractionFlow.Destination>
 		) -> some SwiftUI.View {
 			SwitchStore(store.relay()) { state in

@@ -60,17 +60,31 @@ extension PersonaDataPermission {
 							.buttonStyle(.primaryRectangular)
 					}
 				}
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /PersonaDataPermission.Destination.State.editPersona,
-					action: PersonaDataPermission.Destination.Action.editPersona,
-					content: { EditPersona.View(store: $0) }
-				)
 			}
 			.task {
 				store.send(.view(.task))
 			}
+			.destinations(with: store)
 		}
+	}
+}
+
+private extension StoreOf<PersonaDataPermission> {
+	var destination: PresentationStoreOf<PersonaDataPermission.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<PersonaDataPermission>) -> some View {
+		let destinationStore = store.destination
+		return sheet(
+			store: destinationStore,
+			state: /PersonaDataPermission.Destination.State.editPersona,
+			action: PersonaDataPermission.Destination.Action.editPersona,
+			content: { EditPersona.View(store: $0) }
+		)
 	}
 }
 

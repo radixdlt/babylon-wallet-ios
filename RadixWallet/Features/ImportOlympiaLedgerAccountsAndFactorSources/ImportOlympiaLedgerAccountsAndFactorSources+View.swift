@@ -83,25 +83,30 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 					}
 					.buttonStyle(.primaryRectangular)
 				}
-				.destination(with: store)
 				.onFirstTask { @MainActor in
 					await viewStore.send(.onFirstTask).finish()
 				}
 			}
+			.destinations(with: store)
 		}
 	}
 }
 
-extension View {
-	@MainActor
-	fileprivate func destination(with store: StoreOf<ImportOlympiaLedgerAccountsAndFactorSources>) -> some View {
-		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+private extension StoreOf<ImportOlympiaLedgerAccountsAndFactorSources> {
+	var destination: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<ImportOlympiaLedgerAccountsAndFactorSources>) -> some View {
+		let destinationStore = store.destination
 		return addNewP2PLinkSheet(with: destinationStore)
 			.noP2PLinkAlert(with: destinationStore)
 			.nameLedgerSheet(with: destinationStore)
 	}
 
-	@MainActor
 	private func noP2PLinkAlert(with destinationStore: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destination>) -> some View {
 		alert(
 			store: destinationStore,
@@ -110,7 +115,6 @@ extension View {
 		)
 	}
 
-	@MainActor
 	private func addNewP2PLinkSheet(with destinationStore: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
@@ -120,7 +124,6 @@ extension View {
 		)
 	}
 
-	@MainActor
 	private func nameLedgerSheet(with destinationStore: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destination>) -> some View {
 		sheet(
 			store: destinationStore,

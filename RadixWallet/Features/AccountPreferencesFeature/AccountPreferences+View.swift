@@ -88,10 +88,16 @@ extension AccountPreferences.View {
 	}
 }
 
-extension View {
-	@MainActor
+private extension StoreOf<AccountPreferences> {
+	var destination: PresentationStoreOf<AccountPreferences.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
 	func destination(store: StoreOf<AccountPreferences>) -> some View {
-		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+		let destinationStore = store.destination
 		return showQRCode(with: destinationStore)
 			.updateAccountLabel(with: destinationStore)
 			.thirdPartyDeposits(with: destinationStore)
@@ -99,8 +105,7 @@ extension View {
 			.confirmHideAccountAlert(with: destinationStore)
 	}
 
-	@MainActor
-	func showQRCode(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
+	private func showQRCode(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
 			state: /AccountPreferences.Destination.State.showQR,
@@ -110,8 +115,7 @@ extension View {
 		}
 	}
 
-	@MainActor
-	func updateAccountLabel(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
+	private func updateAccountLabel(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
 			state: /AccountPreferences.Destination.State.updateAccountLabel,
@@ -120,8 +124,7 @@ extension View {
 		)
 	}
 
-	@MainActor
-	func thirdPartyDeposits(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
+	private func thirdPartyDeposits(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
 			state: /AccountPreferences.Destination.State.thirdPartyDeposits,
@@ -130,8 +133,7 @@ extension View {
 		)
 	}
 
-	@MainActor
-	func devAccountPreferences(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
+	private func devAccountPreferences(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
 			state: /AccountPreferences.Destination.State.devPreferences,
@@ -140,8 +142,7 @@ extension View {
 		)
 	}
 
-	@MainActor
-	func confirmHideAccountAlert(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
+	private func confirmHideAccountAlert(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
 		alert(
 			store: destinationStore,
 			state: /AccountPreferences.Destination.State.confirmHideAccount,

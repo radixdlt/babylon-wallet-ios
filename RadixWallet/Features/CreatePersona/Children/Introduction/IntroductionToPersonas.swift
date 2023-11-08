@@ -24,12 +24,10 @@ public struct IntroductionToPersonas: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		EmptyReducer()
+		Reduce(core)
 			.ifLet(\.$infoPanel, action: /Action.child .. ChildAction.infoPanel) {
 				SlideUpPanel()
 			}
-
-		Reduce(self.core)
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {

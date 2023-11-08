@@ -19,7 +19,7 @@ extension PersonasCoordinator {
 				)
 			)
 			.onAppear { store.send(.view(.appeared)) }
-			.destination(store: store)
+			.destinations(with: store)
 		}
 	}
 }
@@ -30,15 +30,14 @@ extension StoreOf<PersonasCoordinator> {
 	}
 }
 
-extension View {
-	@MainActor
-	fileprivate func destination(store: StoreOf<PersonasCoordinator>) -> some View {
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<PersonasCoordinator>) -> some View {
 		let destinationStore = store.destination
 		return createPersonaCoordinator(with: destinationStore)
 			.personaDetails(with: destinationStore)
 	}
 
-	@MainActor
 	private func createPersonaCoordinator(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
@@ -48,7 +47,6 @@ extension View {
 		)
 	}
 
-	@MainActor
 	private func personaDetails(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,

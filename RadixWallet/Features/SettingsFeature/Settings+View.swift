@@ -62,18 +62,15 @@ struct SettingsRow<Feature: FeatureReducer>: View {
 
 extension Settings.View {
 	public var body: some View {
-		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-			let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
-			settingsView(viewStore: viewStore)
-				.navigationTitle(L10n.Settings.title)
-				.navigationBarTitleColor(.app.gray1)
-				.navigationBarTitleDisplayMode(.inline)
-				.navigationBarInlineTitleFont(.app.secondaryHeader)
-				.navigationDestinations(with: destinationStore)
-				.tint(.app.gray1)
-				.foregroundColor(.app.gray1)
-		}
-		.presentsLoadingViewOverlay()
+		settingsView()
+			.navigationTitle(L10n.Settings.title)
+			.navigationBarTitleColor(.app.gray1)
+			.navigationBarTitleDisplayMode(.inline)
+			.navigationBarInlineTitleFont(.app.secondaryHeader)
+			.tint(.app.gray1)
+			.foregroundColor(.app.gray1)
+			.destinations(with: store)
+			.presentsLoadingViewOverlay()
 	}
 }
 
@@ -87,53 +84,55 @@ extension Settings.State {
 
 extension Settings.View {
 	@MainActor
-	private func settingsView(viewStore: ViewStoreOf<Settings>) -> some View {
-		ScrollView {
-			VStack(spacing: .zero) {
-				if viewStore.showsSomeBanner {
-					VStack(spacing: .medium3) {
-						if viewStore.shouldShowAddP2PLinkButton {
-							ConnectExtensionView {
-								viewStore.send(.addP2PLinkButtonTapped)
+	private func settingsView() -> some View {
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			ScrollView {
+				VStack(spacing: .zero) {
+					if viewStore.showsSomeBanner {
+						VStack(spacing: .medium3) {
+							if viewStore.shouldShowAddP2PLinkButton {
+								ConnectExtensionView {
+									viewStore.send(.addP2PLinkButtonTapped)
+								}
+							}
+							if viewStore.shouldShowMigrateOlympiaButton {
+								MigrateOlympiaAccountsView {
+									viewStore.send(.importOlympiaButtonTapped)
+								} dismiss: {
+									viewStore.send(.dismissImportOlympiaHeaderButtonTapped)
+								}
+								.transition(headerTransition)
 							}
 						}
-						if viewStore.shouldShowMigrateOlympiaButton {
-							MigrateOlympiaAccountsView {
-								viewStore.send(.importOlympiaButtonTapped)
-							} dismiss: {
-								viewStore.send(.dismissImportOlympiaHeaderButtonTapped)
-							}
-							.transition(headerTransition)
+						.padding(.medium3)
+					}
+
+					ForEach(rows) { row in
+						SettingsRow(row: row) {
+							viewStore.send(row.action)
 						}
 					}
-					.padding(.medium3)
 				}
+				.padding(.bottom, .large3)
 
-				ForEach(rows) { row in
-					SettingsRow(row: row) {
-						viewStore.send(row.action)
-					}
+				VStack(spacing: .zero) {
+					Text(viewStore.appVersion)
+						.foregroundColor(.app.gray2)
+						.textStyle(.body2Regular)
+						.padding(.bottom, .medium1)
+
+					#if DEBUG
+					Text(viewStore.debugAppInfo)
+						.foregroundColor(.app.gray2)
+						.textStyle(.body2Regular)
+						.padding(.bottom, .medium1)
+					#endif
 				}
 			}
-			.padding(.bottom, .large3)
-
-			VStack(spacing: .zero) {
-				Text(viewStore.appVersion)
-					.foregroundColor(.app.gray2)
-					.textStyle(.body2Regular)
-					.padding(.bottom, .medium1)
-
-				#if DEBUG
-				Text(viewStore.debugAppInfo)
-					.foregroundColor(.app.gray2)
-					.textStyle(.body2Regular)
-					.padding(.bottom, .medium1)
-				#endif
+			.animation(.default, value: viewStore.shouldShowMigrateOlympiaButton)
+			.onAppear {
+				viewStore.send(.appeared)
 			}
-		}
-		.animation(.default, value: viewStore.shouldShowMigrateOlympiaButton)
-		.onAppear {
-			viewStore.send(.appeared)
 		}
 	}
 
@@ -181,11 +180,17 @@ extension Settings.View {
 	}
 }
 
-extension View {
-	@MainActor
-	fileprivate func navigationDestinations(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
-		self
-			.manageP2PLinks(with: destinationStore)
+private extension StoreOf<Settings> {
+	var destination: PresentationStoreOf<Settings.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<Settings>) -> some View {
+		let destinationStore = store.destination
+		return manageP2PLinks(with: destinationStore)
 			.authorizedDapps(with: destinationStore)
 			.personas(with: destinationStore)
 			.accountSecurity(with: destinationStore)
@@ -195,7 +200,6 @@ extension View {
 		#endif
 	}
 
-	@MainActor
 	private func manageP2PLinks(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
@@ -205,7 +209,6 @@ extension View {
 		)
 	}
 
-	@MainActor
 	private func authorizedDapps(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
@@ -215,7 +218,6 @@ extension View {
 		)
 	}
 
-	@MainActor
 	private func personas(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
@@ -225,7 +227,6 @@ extension View {
 		)
 	}
 
-	@MainActor
 	private func accountSecurity(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
@@ -235,7 +236,6 @@ extension View {
 		)
 	}
 
-	@MainActor
 	private func appSettings(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
@@ -246,7 +246,6 @@ extension View {
 	}
 
 	#if DEBUG
-	@MainActor
 	private func debugSettings(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,

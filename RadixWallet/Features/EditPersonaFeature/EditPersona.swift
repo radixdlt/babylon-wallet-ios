@@ -20,7 +20,7 @@ extension EditPersona {
 						variant: $0.variant,
 						familyName: $0.family.input ?? "",
 						givenNames: $0.given.input ?? "",
-						nickname: $0.nickName.input ?? ""
+						nickname: $0.nickname.input ?? ""
 					)
 				)
 			}

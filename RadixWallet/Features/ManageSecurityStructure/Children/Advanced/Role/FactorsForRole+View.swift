@@ -176,11 +176,6 @@ extension FactorsForRole {
 					}
 				}
 				.destinations(with: store)
-				.confirmationDialog(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /FactorsForRole.Destination.State.existingRoleMadeLessSafeConfirmationDialog,
-					action: FactorsForRole.Destination.Action.existingRoleMadeLessSafeConfirmationDialog
-				)
 				.navigationTitle(viewStore.role.titleAdvancedFlow)
 				.padding()
 				.frame(maxWidth: .infinity)
@@ -189,15 +184,15 @@ extension FactorsForRole {
 	}
 }
 
-extension View {
-	@MainActor
-	fileprivate func destinations(with store: StoreOf<FactorsForRole<some RoleProtocol>>) -> some SwiftUI.View {
-		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<FactorsForRole<some RoleProtocol>>) -> some SwiftUI.View {
+		let destinationStore = store.scope(state: \.$destination) { .child(.destination($0)) }
 		return addThresholdFactorSheet(with: destinationStore)
 			.addAdminFactorSheet(with: destinationStore)
+			.existingRoleMadeLessSafe(with: destinationStore)
 	}
 
-	@MainActor
 	private func addThresholdFactorSheet(with destinationStore: PresentationStoreOf<FactorsForRole<some RoleProtocol>.Destination>) -> some SwiftUI.View {
 		sheet(
 			store: destinationStore,
@@ -207,13 +202,20 @@ extension View {
 		)
 	}
 
-	@MainActor
 	private func addAdminFactorSheet(with destinationStore: PresentationStoreOf<FactorsForRole<some RoleProtocol>.Destination>) -> some SwiftUI.View {
 		sheet(
 			store: destinationStore,
 			state: /FactorsForRole.Destination.State.addAdminFactor,
 			action: FactorsForRole.Destination.Action.addAdminFactor,
 			content: { store in NavigationView { SelectFactorKindThenFactor.View(store: store) } }
+		)
+	}
+
+	private func existingRoleMadeLessSafe(with destinationStore: PresentationStoreOf<FactorsForRole<some RoleProtocol>.Destination>) -> some SwiftUI.View {
+		confirmationDialog(
+			store: destinationStore,
+			state: /FactorsForRole.Destination.State.existingRoleMadeLessSafeConfirmationDialog,
+			action: FactorsForRole.Destination.Action.existingRoleMadeLessSafeConfirmationDialog
 		)
 	}
 }

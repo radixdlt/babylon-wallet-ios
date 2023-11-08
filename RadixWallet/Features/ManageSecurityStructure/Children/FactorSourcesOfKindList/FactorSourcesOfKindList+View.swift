@@ -109,12 +109,7 @@ public extension FactorSourcesOfKindList {
 					await viewStore.send(.onFirstTask).finish()
 				}
 			}
-			.destination(with: store)
-			.confirmationDialog(
-				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /FactorSourcesOfKindList.Destination.State.existingFactorSourceWillBeDeletedConfirmationDialog,
-				action: FactorSourcesOfKindList.Destination.Action.existingFactorSourceWillBeDeletedConfirmationDialog
-			)
+			.destinations(with: store)
 		}
 
 		@ViewBuilder
@@ -161,20 +156,27 @@ extension FactorSource {
 	}
 }
 
-extension View {
-	@MainActor
-	fileprivate func destination(with store: StoreOf<FactorSourcesOfKindList<some BaseFactorSourceProtocol>>) -> some SwiftUI.View {
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<FactorSourcesOfKindList<some BaseFactorSourceProtocol>>) -> some View {
 		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		return addNewFactorSourceSheet(with: destinationStore)
 	}
 
-	@MainActor
-	private func addNewFactorSourceSheet<F>(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList<F>.Destination>) -> some SwiftUI.View where F: BaseFactorSourceProtocol {
+	private func addNewFactorSourceSheet<F>(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList<F>.Destination>) -> some View where F: BaseFactorSourceProtocol {
 		sheet(
 			store: destinationStore,
 			state: /FactorSourcesOfKindList.Destination.State.addNewFactorSource,
 			action: FactorSourcesOfKindList.Destination.Action.addNewFactorSource,
 			content: { ManageSomeFactorSource<F>.View(store: $0) }
+		)
+	}
+
+	private func existingFactorSourceWillBeDeleted(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList<some BaseFactorSourceProtocol>.Destination>) -> some View {
+		confirmationDialog(
+			store: destinationStore,
+			state: /FactorSourcesOfKindList.Destination.State.existingFactorSourceWillBeDeletedConfirmationDialog,
+			action: FactorSourcesOfKindList.Destination.Action.existingFactorSourceWillBeDeletedConfirmationDialog
 		)
 	}
 }

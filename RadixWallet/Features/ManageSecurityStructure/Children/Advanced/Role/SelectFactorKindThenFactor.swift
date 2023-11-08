@@ -3,44 +3,66 @@ import SwiftUI
 
 // MARK: - SelectFactorKindThenFactor
 public struct SelectFactorKindThenFactor: Sendable, FeatureReducer {
+	// MARK: State
+
 	public struct State: Sendable, Hashable {
 		public let role: SecurityStructureRole
 
 		@PresentationState
-		public var factorSourceOfKind: FactorSourcesOfKindList<FactorSource>.State?
-
-		// Uh... we have to special treat Ledger, because... it is complex and uses its own list because
-		// it requires P2P connection...
-		@PresentationState
-		public var selectLedger: LedgerHardwareDevices.State?
+		public var destination: Destination.State? = nil
 
 		public init(role: SecurityStructureRole) {
 			self.role = role
 		}
 	}
 
+	// MARK: Action
+
 	public enum ViewAction: Sendable, Equatable {
 		case selected(FactorSourceKind)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case factorSourceOfKind(PresentationAction<FactorSourcesOfKindList<FactorSource>.Action>)
-		case selectLedger(PresentationAction<LedgerHardwareDevices.Action>)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case selected(FactorSource)
 	}
 
+	// MARK: Destination
+
+	public struct Destination: Reducer, Sendable {
+		public enum State: Hashable, Sendable {
+			case factorSourceOfKind(FactorSourcesOfKindList<FactorSource>.State)
+			// Uh... we have to special treat Ledger, because... it is complex and uses its own list because
+			// it requires P2P connection...
+			case selectLedger(LedgerHardwareDevices.State)
+		}
+
+		public enum Action: Equatable, Sendable {
+			case factorSourceOfKind(FactorSourcesOfKindList<FactorSource>.Action)
+			case selectLedger(LedgerHardwareDevices.Action)
+		}
+
+		public var body: some ReducerOf<Self> {
+			Scope(state: /State.factorSourceOfKind, action: /Action.factorSourceOfKind) {
+				FactorSourcesOfKindList<FactorSource>()
+			}
+			Scope(state: /State.selectLedger, action: /Action.selectLedger) {
+				LedgerHardwareDevices()
+			}
+		}
+	}
+
+	// MARK: Reducer
+
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$factorSourceOfKind, action: /Action.child .. ChildAction.factorSourceOfKind) {
-				FactorSourcesOfKindList<FactorSource>()
-			}
-			.ifLet(\.$selectLedger, action: /Action.child .. ChildAction.selectLedger) {
-				LedgerHardwareDevices()
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destination()
 			}
 	}
 
@@ -49,9 +71,9 @@ public struct SelectFactorKindThenFactor: Sendable, FeatureReducer {
 		case let .selected(kind):
 			switch kind {
 			case .ledgerHQHardwareWallet:
-				state.selectLedger = .init(context: .setupMFA)
+				state.destination = .selectLedger(.init(context: .setupMFA))
 			default:
-				state.factorSourceOfKind = .init(kind: kind, mode: .selection)
+				state.destination = .factorSourceOfKind(.init(kind: kind, mode: .selection))
 			}
 			return .none
 		}
@@ -59,13 +81,19 @@ public struct SelectFactorKindThenFactor: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .factorSourceOfKind(.presented(.delegate(.choseFactorSource(factorSource)))):
-			state.factorSourceOfKind = nil
-			return .send(.delegate(.selected(factorSource)))
+		case let .destination(.presented(presentedAction)):
+			switch presentedAction {
+			case let .factorSourceOfKind(.delegate(.choseFactorSource(factorSource))):
+				state.destination = nil
+				return .send(.delegate(.selected(factorSource)))
 
-		case let .selectLedger(.presented(.delegate(.choseLedger(ledger)))):
-			state.selectLedger = nil
-			return .send(.delegate(.selected(ledger.embed())))
+			case let .selectLedger(.delegate(.choseLedger(ledger))):
+				state.destination = nil
+				return .send(.delegate(.selected(ledger.embed())))
+
+			default:
+				return .none
+			}
 
 		default:
 			return .none

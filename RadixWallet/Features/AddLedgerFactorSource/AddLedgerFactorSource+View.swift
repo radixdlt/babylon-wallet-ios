@@ -82,15 +82,20 @@ extension AddLedgerFactorSource {
 	}
 }
 
-extension View {
-	@MainActor
-	fileprivate func destination(store: StoreOf<AddLedgerFactorSource>) -> some View {
-		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+private extension StoreOf<AddLedgerFactorSource> {
+	var destination: PresentationStoreOf<AddLedgerFactorSource.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destination(store: StoreOf<AddLedgerFactorSource>) -> some View {
+		let destinationStore = store.destination
 		return ledgerAlreadyExistsAlert(with: destinationStore)
 			.nameLedger(with: destinationStore)
 	}
 
-	@MainActor
 	private func ledgerAlreadyExistsAlert(with destinationStore: PresentationStoreOf<AddLedgerFactorSource.Destination>) -> some View {
 		alert(
 			store: destinationStore,
@@ -99,7 +104,6 @@ extension View {
 		)
 	}
 
-	@MainActor
 	private func nameLedger(with destinationStore: PresentationStoreOf<AddLedgerFactorSource.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,

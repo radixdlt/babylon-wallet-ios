@@ -137,10 +137,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 		case .addNewFactorSourceButtonTapped:
 			assert(state.canAddNew)
 
-			if
-				state.canOnlyHaveOneFactorSourceOfKind,
-				let existing = state.factorSources.last
-			{
+			if state.canOnlyHaveOneFactorSourceOfKind, let existing = state.factorSources.last {
 				state.destination = .existingFactorSourceWillBeDeletedConfirmationDialog(.deletion(of: existing))
 			} else {
 				state.destination = .addNewFactorSource(.init(kind: state.kind))

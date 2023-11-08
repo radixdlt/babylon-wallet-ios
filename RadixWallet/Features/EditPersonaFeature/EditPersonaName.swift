@@ -7,7 +7,7 @@ public struct EditPersonaName: FeatureReducer, EmptyInitializable {
 		let id: PersonaDataEntryID
 		var family: EditPersonaDynamicField.State
 		var given: EditPersonaDynamicField.State
-		var nickName: EditPersonaDynamicField.State
+		var nickname: EditPersonaDynamicField.State
 		var variant: PersonaData.Name.Variant
 
 		init(
@@ -31,7 +31,7 @@ public struct EditPersonaName: FeatureReducer, EmptyInitializable {
 				isRequiredByDapp: isRequestedByDapp,
 				showsTitle: true
 			)
-			self.nickName = EditPersonaDynamicField.State(
+			self.nickname = EditPersonaDynamicField.State(
 				behaviour: .nickName,
 				entryID: id, // FIXME: refactor this whole thing
 				text: name.nickname,
@@ -68,7 +68,7 @@ public struct EditPersonaName: FeatureReducer, EmptyInitializable {
 		)
 
 		Scope(
-			state: \.nickName,
+			state: \.nickname,
 			action: /Action.child .. ChildAction.nickname,
 			child: EditPersonaField.init
 		)
