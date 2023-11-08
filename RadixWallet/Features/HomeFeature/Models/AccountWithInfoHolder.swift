@@ -22,12 +22,17 @@ extension AccountWithInfoHolder {
 		set { accountWithInfo.deviceFactorSourceControlled = newValue }
 	}
 
+	public var mnemonicHandlingCallToAction: MnemonicHandling? {
+		get { deviceFactorSourceControlled?.mnemonicHandlingCallToAction }
+		set { deviceFactorSourceControlled?.mnemonicHandlingCallToAction = newValue }
+	}
+
 	public var importMnemonicNeeded: Bool {
-		accountWithInfo.importMnemonicNeeded
+		mnemonicHandlingCallToAction?.importMnemonicNeeded ?? false
 	}
 
 	public var exportMnemonicNeeded: Bool {
-		accountWithInfo.exportMnemonicNeeded
+		mnemonicHandlingCallToAction?.exportMnemonicNeeded ?? false
 	}
 }
 
@@ -36,7 +41,11 @@ extension DeviceFactorSourceControlled {
 		@Dependency(\.userDefaultsClient) var userDefaultsClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
-		importMnemonicNeeded = !secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSourceID)
+		let importMnemonicNeeded = !secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSourceID)
+		if importMnemonicNeeded {
+			mnemonicHandlingCallToAction = .mustBeImported
+			return
+		}
 
 		guard let xrdResource else {
 			return
@@ -45,7 +54,11 @@ extension DeviceFactorSourceControlled {
 		let hasValue = xrdResource.amount > 0
 		let hasAlreadyBackedUpMnemonic = userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().contains(factorSourceID)
 
-		exportMnemonicNeeded = !hasAlreadyBackedUpMnemonic && hasValue
+		let exportMnemonicNeeded = !hasAlreadyBackedUpMnemonic && hasValue
+
+		if exportMnemonicNeeded {
+			mnemonicHandlingCallToAction = .shouldBeExported
+		}
 	}
 }
 

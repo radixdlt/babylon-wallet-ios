@@ -33,11 +33,7 @@ public struct AccountWithInfo: Sendable, Hashable {
 	public var isLegacyAccount: Bool { account.isOlympiaAccount }
 	public var isLedgerAccount: Bool { account.isLedgerAccount }
 
-	public var importMnemonicNeeded: Bool {
-		deviceFactorSourceControlled?.importMnemonicNeeded ?? false
-	}
-
-	public var exportMnemonicNeeded: Bool {
-		deviceFactorSourceControlled?.exportMnemonicNeeded ?? false
+	public var mnemonicHandlingCallToAction: MnemonicHandling? {
+		deviceFactorSourceControlled?.mnemonicHandlingCallToAction
 	}
 }
