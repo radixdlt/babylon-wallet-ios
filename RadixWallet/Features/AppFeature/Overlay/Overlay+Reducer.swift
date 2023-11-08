@@ -40,9 +40,6 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			Scope(state: /State.hud, action: /Action.hud) {
 				HUD()
 			}
-			Scope(state: /State.alert, action: /Action.alert) {
-				EmptyReducer()
-			}
 		}
 	}
 

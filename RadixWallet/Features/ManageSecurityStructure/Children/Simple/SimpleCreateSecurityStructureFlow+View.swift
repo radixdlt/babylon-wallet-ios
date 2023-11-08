@@ -124,7 +124,7 @@ extension SimpleManageSecurityStructureFlow {
 					)
 				}
 			}
-			.modalDestination(store: self.store)
+			.destinations(with: store)
 		}
 
 		typealias NewPhoneConfirmer = FactorForRoleView<ConfirmationRoleTag, SecurityQuestionsFactorSource>
@@ -132,15 +132,20 @@ extension SimpleManageSecurityStructureFlow {
 	}
 }
 
-extension View {
-	@MainActor
-	fileprivate func modalDestination(store: StoreOf<SimpleManageSecurityStructureFlow>) -> some View {
-		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+private extension StoreOf<SimpleManageSecurityStructureFlow> {
+	var destination: PresentationStoreOf<SimpleManageSecurityStructureFlow.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<SimpleManageSecurityStructureFlow>) -> some View {
+		let destinationStore = store.destination
 		return listConfirmerOfNewPhone(with: destinationStore)
 			.listLostPhoneHelper(with: destinationStore)
 	}
 
-	@MainActor
 	private func listConfirmerOfNewPhone(with destinationStore: PresentationStoreOf<SimpleManageSecurityStructureFlow.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
@@ -150,7 +155,6 @@ extension View {
 		)
 	}
 
-	@MainActor
 	private func listLostPhoneHelper(with destinationStore: PresentationStoreOf<SimpleManageSecurityStructureFlow.Destination>) -> some View {
 		sheet(
 			store: destinationStore,

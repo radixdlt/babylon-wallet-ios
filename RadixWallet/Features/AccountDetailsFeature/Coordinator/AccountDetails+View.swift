@@ -77,7 +77,7 @@ extension AccountDetails {
 					}
 				}
 			}
-			.destination(store.scope(state: \.$destination, action: { .child(.destination($0)) }))
+			.destinations(with: store)
 		}
 
 		@ViewBuilder
@@ -111,6 +111,12 @@ extension AccountDetails {
 	}
 }
 
+private extension StoreOf<AccountDetails> {
+	var destination: PresentationStoreOf<AccountDetails.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
 @MainActor
 private extension View {
 	func destination(_ destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
@@ -118,7 +124,7 @@ private extension View {
 			.transfer(destinationStore)
 	}
 
-	func preferences(_ destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
+	private func preferences(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
 		navigationDestination(
 			store: destinationStore,
 			state: /AccountDetails.Destination.State.preferences,
@@ -127,7 +133,7 @@ private extension View {
 		)
 	}
 
-	func transfer(_ destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
+	private func transfer(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
 		fullScreenCover(
 			store: destinationStore,
 			state: /AccountDetails.Destination.State.transfer,

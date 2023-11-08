@@ -93,7 +93,7 @@ extension TransactionReview {
 							}
 						}
 					}
-					.destinations(with: store.destination)
+					.destinations(with: store)
 					.onAppear {
 						viewStore.send(.appeared)
 					}
@@ -271,19 +271,19 @@ extension StoreOf<TransactionReview> {
 	}
 }
 
-extension View {
-	@MainActor
-	fileprivate func destinations(with store: PresentationStoreOf<TransactionReview.Destination>) -> some View {
-		customizeGuarantees(with: store)
-			.dApp(with: store)
-			.fungibleTokenDetails(with: store)
-			.nonFungibleTokenDetails(with: store)
-			.customizeFees(with: store)
-			.signing(with: store)
-			.submitting(with: store)
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<TransactionReview>) -> some View {
+		let destinationStore = store.destination
+		return customizeGuarantees(with: destinationStore)
+			.dApp(with: destinationStore)
+			.fungibleTokenDetails(with: destinationStore)
+			.nonFungibleTokenDetails(with: destinationStore)
+			.customizeFees(with: destinationStore)
+			.signing(with: destinationStore)
+			.submitting(with: destinationStore)
 	}
 
-	@MainActor
 	private func customizeGuarantees(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
@@ -293,7 +293,6 @@ extension View {
 		)
 	}
 
-	@MainActor
 	private func dApp(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
@@ -309,7 +308,6 @@ extension View {
 		)
 	}
 
-	@MainActor
 	private func fungibleTokenDetails(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
@@ -319,7 +317,6 @@ extension View {
 		)
 	}
 
-	@MainActor
 	private func nonFungibleTokenDetails(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
@@ -329,7 +326,6 @@ extension View {
 		)
 	}
 
-	@MainActor
 	private func customizeFees(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
@@ -339,7 +335,6 @@ extension View {
 		)
 	}
 
-	@MainActor
 	private func signing(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
@@ -349,7 +344,6 @@ extension View {
 		)
 	}
 
-	@MainActor
 	private func submitting(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
 		sheet(
 			store: destinationStore,

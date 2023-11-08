@@ -43,7 +43,6 @@ extension AppSettings {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 				ScrollView {
 					VStack(spacing: .zero) {
 						VStack(spacing: .zero) {
@@ -68,11 +67,8 @@ extension AppSettings {
 					.navigationTitle(L10n.AppSettings.title)
 					.onAppear { viewStore.send(.appeared) }
 				}
-				.manageP2PLinks(with: destinationStore)
-				.gatewaySettings(with: destinationStore)
-				.profileBackupSettings(with: destinationStore)
-				.accountAndPersonasHiding(with: destinationStore)
 			}
+			.destinations(with: store)
 		}
 
 		private var rows: [SettingsRowModel<AppSettings>] {
@@ -143,9 +139,23 @@ extension AppSettings {
 	}
 }
 
+private extension StoreOf<AppSettings> {
+	var destination: PresentationStoreOf<AppSettings.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
 private extension View {
-	@MainActor
-	func manageP2PLinks(with destinationStore: PresentationStoreOf<AppSettings.Destination>) -> some View {
+	func destinations(with store: StoreOf<AppSettings>) -> some View {
+		let destinationStore = store.destination
+		return manageP2PLinks(with: destinationStore)
+			.gatewaySettings(with: destinationStore)
+			.profileBackupSettings(with: destinationStore)
+			.accountAndPersonasHiding(with: destinationStore)
+	}
+
+	private func manageP2PLinks(with destinationStore: PresentationStoreOf<AppSettings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
 			state: /AppSettings.Destination.State.manageP2PLinks,
@@ -154,8 +164,7 @@ private extension View {
 		)
 	}
 
-	@MainActor
-	func gatewaySettings(with destinationStore: PresentationStoreOf<AppSettings.Destination>) -> some View {
+	private func gatewaySettings(with destinationStore: PresentationStoreOf<AppSettings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
 			state: /AppSettings.Destination.State.gatewaySettings,
@@ -164,8 +173,7 @@ private extension View {
 		)
 	}
 
-	@MainActor
-	func profileBackupSettings(with destinationStore: PresentationStoreOf<AppSettings.Destination>) -> some View {
+	private func profileBackupSettings(with destinationStore: PresentationStoreOf<AppSettings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
 			state: /AppSettings.Destination.State.profileBackupSettings,
@@ -174,8 +182,7 @@ private extension View {
 		)
 	}
 
-	@MainActor
-	func accountAndPersonasHiding(with destinationStore: PresentationStoreOf<AppSettings.Destination>) -> some View {
+	private func accountAndPersonasHiding(with destinationStore: PresentationStoreOf<AppSettings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
 			state: /AppSettings.Destination.State.accountAndPersonasHiding,

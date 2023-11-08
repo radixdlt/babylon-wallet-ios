@@ -63,17 +63,7 @@ extension P2PLinksFeature {
 				.task { @MainActor in
 					await store.send(.view(.task)).finish()
 				}
-				.sheet(
-					store: store.destination,
-					state: /P2PLinksFeature.Destination.State.newConnection,
-					action: P2PLinksFeature.Destination.Action.newConnection,
-					content: { NewConnection.View(store: $0) }
-				)
-				.alert(
-					store: store.destination,
-					state: /P2PLinksFeature.Destination.State.removeConnection,
-					action: P2PLinksFeature.Destination.Action.removeConnection
-				)
+				.destinations(with: store)
 			}
 		}
 	}
@@ -82,6 +72,32 @@ extension P2PLinksFeature {
 private extension StoreOf<P2PLinksFeature> {
 	var destination: PresentationStoreOf<P2PLinksFeature.Destination> {
 		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<P2PLinksFeature>) -> some View {
+		let destinationStore = store.destination
+		return newConnection(with: destinationStore)
+			.confirmDeletionAlert(with: destinationStore)
+	}
+
+	private func newConnection(with destinationStore: PresentationStoreOf<P2PLinksFeature.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /P2PLinksFeature.Destination.State.newConnection,
+			action: P2PLinksFeature.Destination.Action.newConnection,
+			content: { NewConnection.View(store: $0) }
+		)
+	}
+
+	private func confirmDeletionAlert(with destinationStore: PresentationStoreOf<P2PLinksFeature.Destination>) -> some View {
+		alert(
+			store: destinationStore,
+			state: /P2PLinksFeature.Destination.State.removeConnection,
+			action: P2PLinksFeature.Destination.Action.removeConnection
+		)
 	}
 }
 

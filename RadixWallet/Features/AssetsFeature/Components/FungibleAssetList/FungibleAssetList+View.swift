@@ -19,15 +19,27 @@ extension FungibleAssetList.View {
 		ForEachStore(
 			store.scope(
 				state: \.sections,
-				action: { childAction in
-					.child(.section(childAction.0, childAction.1))
-				}
+				action: { .child(.section($0, $1)) }
 			)
 		) {
 			FungibleAssetList.Section.View(store: $0)
 		}
-		.sheet(
-			store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+		.destinations(with: store)
+	}
+}
+
+private extension StoreOf<FungibleAssetList> {
+	var destination: PresentationStoreOf<FungibleAssetList.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<FungibleAssetList>) -> some View {
+		let destinationStore = store.destination
+		return sheet(
+			store: destinationStore,
 			state: /FungibleAssetList.Destination.State.details,
 			action: FungibleAssetList.Destination.Action.details,
 			content: { FungibleTokenDetails.View(store: $0) }

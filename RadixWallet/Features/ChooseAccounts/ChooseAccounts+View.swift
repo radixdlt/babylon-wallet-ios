@@ -68,13 +68,27 @@ extension ChooseAccounts {
 				.onAppear {
 					viewStore.send(.appeared)
 				}
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /ChooseAccounts.Destination.State.createAccount,
-					action: ChooseAccounts.Destination.Action.createAccount,
-					content: { CreateAccountCoordinator.View(store: $0) }
-				)
 			}
+			.destinations(with: store)
 		}
+	}
+}
+
+private extension StoreOf<ChooseAccounts> {
+	var destination: PresentationStoreOf<ChooseAccounts.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<ChooseAccounts>) -> some View {
+		let destinationStore = store.destination
+		return sheet(
+			store: destinationStore,
+			state: /ChooseAccounts.Destination.State.createAccount,
+			action: ChooseAccounts.Destination.Action.createAccount,
+			content: { CreateAccountCoordinator.View(store: $0) }
+		)
 	}
 }

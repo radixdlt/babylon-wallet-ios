@@ -90,7 +90,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	// MARK: - Destination
 
 	public struct Destination: Reducer {
-		public enum State: Hashable {
+		public enum State: Sendable, Hashable {
 			case editPersona(EditPersona.State)
 			case dAppDetails(DappDetails.State)
 
@@ -98,7 +98,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			case confirmHideAlert(AlertState<Action.ConfirmHideAlert>)
 		}
 
-		public enum Action: Equatable {
+		public enum Action: Sendable, Equatable {
 			case editPersona(EditPersona.Action)
 			case dAppDetails(DappDetails.Action)
 

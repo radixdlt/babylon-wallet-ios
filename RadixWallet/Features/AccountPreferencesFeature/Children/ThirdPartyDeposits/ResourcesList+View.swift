@@ -57,7 +57,7 @@ extension ResourcesList {
 				}
 				.padding(.top, .medium1)
 				.background(.app.gray5)
-				.destination(store: store)
+				.destinations(with: store)
 				.navigationTitle(viewStore.mode.navigationTitle)
 				.defaultNavBarConfig()
 				.footer {
@@ -141,16 +141,21 @@ extension ResourcesList.View {
 	}
 }
 
+private extension StoreOf<ResourcesList> {
+	var destination: PresentationStoreOf<ResourcesList.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
 private extension View {
-	@MainActor
-	func destination(store: StoreOf<ResourcesList>) -> some View {
-		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+	func destinations(with store: StoreOf<ResourcesList>) -> some View {
+		let destinationStore = store.destination
 		return addAsset(with: destinationStore)
 			.confirmDeletionAlert(with: destinationStore)
 	}
 
-	@MainActor
-	func addAsset(with destinationStore: PresentationStoreOf<ResourcesList.Destination>) -> some View {
+	private func addAsset(with destinationStore: PresentationStoreOf<ResourcesList.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
 			state: /ResourcesList.Destination.State.addAsset,
@@ -159,8 +164,7 @@ private extension View {
 		)
 	}
 
-	@MainActor
-	func confirmDeletionAlert(with destinationStore: PresentationStoreOf<ResourcesList.Destination>) -> some View {
+	private func confirmDeletionAlert(with destinationStore: PresentationStoreOf<ResourcesList.Destination>) -> some View {
 		alert(
 			store: destinationStore,
 			state: /ResourcesList.Destination.State.confirmAssetDeletion,

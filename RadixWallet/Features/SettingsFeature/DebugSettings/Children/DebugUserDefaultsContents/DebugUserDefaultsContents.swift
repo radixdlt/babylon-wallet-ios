@@ -34,6 +34,7 @@ public struct DebugUserDefaultsContents: Sendable, FeatureReducer {
 	@Dependency(\.userDefaults) var userDefaults
 	@Dependency(\.uuid) var uuid
 	@Dependency(\.continuousClock) var clock
+
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {

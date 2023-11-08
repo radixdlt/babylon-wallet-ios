@@ -149,19 +149,43 @@ extension EncryptOrDecryptProfile {
 					.buttonStyle(.primaryRectangular)
 					.controlState(viewStore.controlState)
 				}
-				.alert(
-					store: store.destination,
-					state: /EncryptOrDecryptProfile.Destination.State.incorrectPasswordAlert,
-					action: EncryptOrDecryptProfile.Destination.Action.incorrectPasswordAlert
-				)
+				.destinations(with: store)
 				.onAppear { viewStore.send(.appeared) }
+			}
+		}
+	}
+
+	@MainActor
+	public struct SheetView: SwiftUI.View {
+		private let store: StoreOf<EncryptOrDecryptProfile>
+		@FocusState private var focusedField: State.Field?
+
+		public init(store: StoreOf<EncryptOrDecryptProfile>) {
+			self.store = store
+		}
+
+		public var body: some SwiftUI.View {
+			NavigationView {
+				EncryptOrDecryptProfile.View(store: store)
 			}
 		}
 	}
 }
 
-extension StoreOf<EncryptOrDecryptProfile> {
-	fileprivate var destination: PresentationStoreOf<EncryptOrDecryptProfile.Destination> {
+private extension StoreOf<EncryptOrDecryptProfile> {
+	var destination: PresentationStoreOf<EncryptOrDecryptProfile.Destination> {
 		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<EncryptOrDecryptProfile>) -> some View {
+		let destinationStore = store.destination
+		return alert(
+			store: destinationStore,
+			state: /EncryptOrDecryptProfile.Destination.State.incorrectPasswordAlert,
+			action: EncryptOrDecryptProfile.Destination.Action.incorrectPasswordAlert
+		)
 	}
 }

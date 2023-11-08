@@ -1,17 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
-extension ManageSomeFactorSource.State {
-	var viewState: ManageSomeFactorSource.ViewState {
-		.init()
-	}
-}
 
 // MARK: - ManageSomeFactorSource.View
 extension ManageSomeFactorSource {
-	public struct ViewState: Equatable {
-		// TODO: declare some properties
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<ManageSomeFactorSource>
@@ -27,25 +18,19 @@ extension ManageSomeFactorSource {
 					CaseLet(
 						/ManageSomeFactorSource.State.manageSecurityQuestions,
 						action: { ManageSomeFactorSource.Action.child(.manageSecurityQuestions($0)) },
-						then: {
-							AnswerSecurityQuestionsCoordinator.View(store: $0)
-						}
+						then: { AnswerSecurityQuestionsCoordinator.View(store: $0) }
 					)
 				case .manageTrustedContact:
 					CaseLet(
 						/ManageSomeFactorSource.State.manageTrustedContact,
 						action: { ManageSomeFactorSource.Action.child(.manageTrustedContact($0)) },
-						then: {
-							ManageTrustedContactFactorSource.View(store: $0)
-						}
+						then: { ManageTrustedContactFactorSource.View(store: $0) }
 					)
 				case .manageOffDeviceMnemonics:
 					CaseLet(
 						/ManageSomeFactorSource.State.manageOffDeviceMnemonics,
 						action: { ManageSomeFactorSource.Action.child(.manageOffDeviceMnemonics($0)) },
-						then: {
-							ImportMnemonic.View(store: $0)
-						}
+						then: { ImportMnemonic.View(store: $0) }
 					)
 				}
 			}

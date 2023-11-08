@@ -90,17 +90,13 @@ extension CustomizeFees {
 									CaseLet(
 										/CustomizeFees.State.CustomizationModeState.normal,
 										action: CustomizeFees.ChildAction.normalFeesCustomization,
-										then: {
-											NormalFeesCustomization.View(store: $0)
-										}
+										then: { NormalFeesCustomization.View(store: $0) }
 									)
 								case .advanced:
 									CaseLet(
 										/CustomizeFees.State.CustomizationModeState.advanced,
 										action: CustomizeFees.ChildAction.advancedFeesCustomization,
-										then: {
-											AdvancedFeesCustomization.View(store: $0)
-										}
+										then: { AdvancedFeesCustomization.View(store: $0) }
 									)
 								}
 							}
@@ -116,12 +112,7 @@ extension CustomizeFees {
 					}
 				}
 			}
-			.sheet(
-				store: store.destination,
-				state: /CustomizeFees.Destination.State.selectFeePayer,
-				action: CustomizeFees.Destination.Action.selectFeePayer,
-				content: { SelectFeePayer.View(store: $0) }
-			)
+			.destinations(with: store)
 		}
 
 		@ViewBuilder
@@ -183,5 +174,18 @@ extension CustomizeFees {
 private extension StoreOf<CustomizeFees> {
 	var destination: PresentationStoreOf<CustomizeFees.Destination> {
 		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<CustomizeFees>) -> some View {
+		let destinationStore = store.destination
+		return sheet(
+			store: destinationStore,
+			state: /CustomizeFees.Destination.State.selectFeePayer,
+			action: CustomizeFees.Destination.Action.selectFeePayer,
+			content: { SelectFeePayer.View(store: $0) }
+		)
 	}
 }

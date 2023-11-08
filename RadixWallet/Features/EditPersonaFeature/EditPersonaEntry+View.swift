@@ -46,12 +46,7 @@ extension EditPersonaEntry {
 				}
 
 				contentView(
-					store.scope(
-						state: \.content,
-						action: (/Action.child
-							.. EditPersonaEntry<ContentReducer>.ChildAction.content
-						).embed
-					)
+					store.scope(state: \.content) { .child(.content($0)) }
 				)
 			}
 		}

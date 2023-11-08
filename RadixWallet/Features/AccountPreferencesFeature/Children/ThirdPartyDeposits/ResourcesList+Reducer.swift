@@ -24,6 +24,8 @@ public struct ResourceViewState: Hashable, Sendable, Identifiable {
 
 // MARK: - ResourcesList
 public struct ResourcesList: FeatureReducer, Sendable {
+	// MARK: State
+
 	public struct State: Hashable, Sendable {
 		var allDepositorAddresses: OrderedSet<ResourceViewState.Address> {
 			switch mode {
@@ -56,6 +58,8 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		var destination: Destination.State? = nil
 	}
 
+	// MARK: Action
+
 	public enum ViewAction: Equatable, Sendable {
 		case task
 		case addAssetTapped
@@ -76,13 +80,15 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		case resourcesLoaded([OnLedgerEntity.Resource]?)
 	}
 
+	// MARK: Destination
+
 	public struct Destination: Reducer, Sendable {
-		public enum State: Equatable, Hashable, Sendable {
+		public enum State: Hashable, Sendable {
 			case addAsset(AddAsset.State)
 			case confirmAssetDeletion(AlertState<Action.ConfirmDeletionAlert>)
 		}
 
-		public enum Action: Hashable, Sendable {
+		public enum Action: Equatable, Sendable {
 			case addAsset(AddAsset.Action)
 			case confirmAssetDeletion(ConfirmDeletionAlert)
 
@@ -98,6 +104,8 @@ public struct ResourcesList: FeatureReducer, Sendable {
 			}
 		}
 	}
+
+	// MARK: Reducer
 
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 

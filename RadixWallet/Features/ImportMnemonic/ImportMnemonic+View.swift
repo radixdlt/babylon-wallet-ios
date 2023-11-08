@@ -190,7 +190,7 @@ extension ImportMnemonic {
 				#if !DEBUG
 					.screenshotProtected(isProtected: true)
 				#endif // !DEBUG
-					.destination(store: store)
+					.destinations(store: store)
 			}
 		}
 
@@ -216,17 +216,22 @@ extension ImportMnemonic {
 	}
 }
 
-extension SwiftUI.View {
-	@MainActor
-	func destination(store: StoreOf<ImportMnemonic>) -> some View {
-		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+private extension StoreOf<ImportMnemonic> {
+	var destination: PresentationStoreOf<ImportMnemonic.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension SwiftUI.View {
+	func destinations(store: StoreOf<ImportMnemonic>) -> some View {
+		let destinationStore = store.destination
 		return offDeviceMnemonicInfoSheet(with: destinationStore)
 			.onContinueWarningAlert(with: destinationStore)
 			.markMnemonicAsBackedUpAlert(with: destinationStore)
 	}
 
-	@MainActor
-	fileprivate func markMnemonicAsBackedUpAlert(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some SwiftUI.View {
+	private func markMnemonicAsBackedUpAlert(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some SwiftUI.View {
 		alert(
 			store: destinationStore,
 			state: /ImportMnemonic.Destination.State.markMnemonicAsBackedUp,
@@ -234,8 +239,7 @@ extension SwiftUI.View {
 		)
 	}
 
-	@MainActor
-	fileprivate func onContinueWarningAlert(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some SwiftUI.View {
+	private func onContinueWarningAlert(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some SwiftUI.View {
 		alert(
 			store: destinationStore,
 			state: /ImportMnemonic.Destination.State.onContinueWarning,
@@ -243,8 +247,7 @@ extension SwiftUI.View {
 		)
 	}
 
-	@MainActor
-	fileprivate func offDeviceMnemonicInfoSheet(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some SwiftUI.View {
+	private func offDeviceMnemonicInfoSheet(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some SwiftUI.View {
 		sheet(
 			store: destinationStore,
 			state: /ImportMnemonic.Destination.State.offDeviceMnemonicInfoPrompt,

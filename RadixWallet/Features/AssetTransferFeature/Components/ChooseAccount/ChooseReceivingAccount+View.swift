@@ -77,15 +77,7 @@ extension ChooseReceivingAccount.View {
 					}
 					.padding(.medium3)
 				}
-				.navigationDestination(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /ChooseReceivingAccount.Destination.State.scanAccountAddress,
-					action: ChooseReceivingAccount.Destination.Action.scanAccountAddress,
-					destination: {
-						ScanQRCoordinator.View(store: $0)
-							.navigationTitle(L10n.AssetTransfer.ChooseReceivingAccount.scanQRNavigationTitle)
-					}
-				)
+				.destinations(with: store)
 				.footer { chooseButton(viewStore) }
 				.navigationTitle(L10n.AssetTransfer.ChooseReceivingAccount.navigationTitle)
 				.navigationBarTitleColor(.app.gray1)
@@ -141,6 +133,28 @@ extension ChooseReceivingAccount.View {
 			control: { action in
 				Button(L10n.Common.choose, action: action)
 					.buttonStyle(.primaryRectangular)
+			}
+		)
+	}
+}
+
+private extension StoreOf<ChooseReceivingAccount> {
+	var destination: PresentationStoreOf<ChooseReceivingAccount.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<ChooseReceivingAccount>) -> some View {
+		let destinationStore = store.destination
+		return navigationDestination(
+			store: destinationStore,
+			state: /ChooseReceivingAccount.Destination.State.scanAccountAddress,
+			action: ChooseReceivingAccount.Destination.Action.scanAccountAddress,
+			destination: {
+				ScanQRCoordinator.View(store: $0)
+					.navigationTitle(L10n.AssetTransfer.ChooseReceivingAccount.scanQRNavigationTitle)
 			}
 		)
 	}

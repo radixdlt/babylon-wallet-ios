@@ -18,7 +18,7 @@ extension SecurityStructureConfigurationListCoordinator {
 					action: { .child(.configList($0)) }
 				)
 			)
-			.destinations(with: store.destination)
+			.destinations(with: store)
 		}
 	}
 }
@@ -29,16 +29,17 @@ private extension StoreOf<SecurityStructureConfigurationListCoordinator> {
 	}
 }
 
-extension View {
+private extension View {
 	@MainActor
-	fileprivate func destinations(with store: PresentationStoreOf<SecurityStructureConfigurationListCoordinator.Destination>) -> some View {
-		manageSecurityStructureCoordinator(with: store)
+	func destinations(with store: StoreOf<SecurityStructureConfigurationListCoordinator>) -> some View {
+		let destinationStore = store.destination
+		return manageSecurityStructureCoordinator(with: destinationStore)
 	}
 
 	@MainActor
-	private func manageSecurityStructureCoordinator(with store: PresentationStoreOf<SecurityStructureConfigurationListCoordinator.Destination>) -> some View {
+	private func manageSecurityStructureCoordinator(with destinationStore: PresentationStoreOf<SecurityStructureConfigurationListCoordinator.Destination>) -> some View {
 		sheet(
-			store: store,
+			store: destinationStore,
 			state: /SecurityStructureConfigurationListCoordinator.Destination.State.manageSecurityStructureCoordinator,
 			action: SecurityStructureConfigurationListCoordinator.Destination.Action.manageSecurityStructureCoordinator,
 			content: { ManageSecurityStructureCoordinator.View(store: $0) }

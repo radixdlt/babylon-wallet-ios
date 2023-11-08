@@ -47,7 +47,7 @@ extension ManageThirdPartyDeposits {
 				.background(.app.gray5)
 				.navigationTitle(L10n.AccountSettings.thirdPartyDeposits)
 				.defaultNavBarConfig()
-				.destination(store: store)
+				.destinations(with: store)
 				.footer {
 					Button(L10n.AccountSettings.SpecificAssetsDeposits.update) {
 						viewStore.send(.updateTapped)
@@ -129,16 +129,21 @@ extension PreferenceSection.Row where SectionId == ManageThirdPartyDeposits.Sect
 	}
 }
 
-extension View {
-	@MainActor
-	func destination(store: StoreOf<ManageThirdPartyDeposits>) -> some View {
-		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+private extension StoreOf<ManageThirdPartyDeposits> {
+	var destination: PresentationStoreOf<ManageThirdPartyDeposits.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<ManageThirdPartyDeposits>) -> some View {
+		let destinationStore = store.destination
 		return allowDenyAssets(with: destinationStore)
 			.allowDepositors(with: destinationStore)
 	}
 
-	@MainActor
-	func allowDenyAssets(with destinationStore: PresentationStoreOf<ManageThirdPartyDeposits.Destination>) -> some View {
+	private func allowDenyAssets(with destinationStore: PresentationStoreOf<ManageThirdPartyDeposits.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
 			state: /ManageThirdPartyDeposits.Destination.State.allowDenyAssets,
@@ -147,8 +152,7 @@ extension View {
 		)
 	}
 
-	@MainActor
-	func allowDepositors(with destinationStore: PresentationStoreOf<ManageThirdPartyDeposits.Destination>) -> some View {
+	private func allowDepositors(with destinationStore: PresentationStoreOf<ManageThirdPartyDeposits.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
 			state: /ManageThirdPartyDeposits.Destination.State.allowDepositors,

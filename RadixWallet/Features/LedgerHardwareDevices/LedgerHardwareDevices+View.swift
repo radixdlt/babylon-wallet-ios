@@ -180,16 +180,21 @@ extension LedgerHardwareDevices {
 	}
 }
 
-extension View {
-	@MainActor
-	fileprivate func destinations(with store: StoreOf<LedgerHardwareDevices>) -> some View {
+private extension StoreOf<LedgerHardwareDevices> {
+	var destination: PresentationStoreOf<LedgerHardwareDevices.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<LedgerHardwareDevices>) -> some View {
 		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		return addNewLedgerSheet(with: destinationStore)
 			.addNewP2PLinkSheet(with: destinationStore)
 			.noP2PLinkAlert(with: destinationStore)
 	}
 
-	@MainActor
 	private func addNewLedgerSheet(with destinationStore: PresentationStoreOf<LedgerHardwareDevices.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
@@ -199,7 +204,6 @@ extension View {
 		)
 	}
 
-	@MainActor
 	private func addNewP2PLinkSheet(with destinationStore: PresentationStoreOf<LedgerHardwareDevices.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
@@ -209,7 +213,6 @@ extension View {
 		)
 	}
 
-	@MainActor
 	private func noP2PLinkAlert(with destinationStore: PresentationStoreOf<LedgerHardwareDevices.Destination>) -> some View {
 		alert(
 			store: destinationStore,
