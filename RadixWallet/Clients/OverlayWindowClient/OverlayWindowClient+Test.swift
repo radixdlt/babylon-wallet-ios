@@ -1,7 +1,7 @@
 
 // MARK: - BannerClient + TestDependencyKey
 extension OverlayWindowClient: TestDependencyKey {
-	public static let testValue: Self = .init(
+	public static let testValue = Self(
 		scheduledItems: unimplemented("\(Self.self).scheduledItems"),
 		scheduleAlertIgnoreAction: unimplemented("\(Self.self).scheduleAlertIgnoreAction"),
 		scheduleAlertAwaitAction: unimplemented("\(Self.self).scheduleAlertAwaitAction"),

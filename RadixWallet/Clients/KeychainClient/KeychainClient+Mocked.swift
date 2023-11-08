@@ -8,6 +8,8 @@ extension DependencyValues {
 
 // MARK: - KeychainClient + TestDependencyKey
 extension KeychainClient: TestDependencyKey {
+	public static let previewValue = Self.noop
+
 	public static var testValue = Self(
 		getServiceAndAccessGroup: unimplemented("\(Self.self).getServiceAndAccessGroup"),
 		containsDataForKey: unimplemented("\(Self.self).containsDataForKey"),
@@ -33,6 +35,4 @@ extension KeychainClient: TestDependencyKey {
 		removeDataForKey: { _ in throw NoopError() },
 		removeAllItems: {}
 	)
-
-	public static let previewValue: Self = .noop
 }

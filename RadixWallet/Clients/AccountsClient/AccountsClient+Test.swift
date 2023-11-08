@@ -8,20 +8,8 @@ extension DependencyValues {
 
 // MARK: - AccountsClient + TestDependencyKey
 extension AccountsClient: TestDependencyKey {
-	public static let noop = Self(
-		getCurrentNetworkID: { .kisharnet },
-		nextAccountIndex: { _ in 0 },
-		getAccountsOnCurrentNetwork: { throw NoopError() },
-		accountsOnCurrentNetwork: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
-		accountUpdates: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
-		getAccountsOnNetwork: { _ in throw NoopError() },
-		newVirtualAccount: { _ in throw NoopError() },
-		saveVirtualAccounts: { _ in },
-		getAccountByAddress: { _ in throw NoopError() },
-		hasAccountOnNetwork: { _ in false },
-		updateAccount: { _ in }
-	)
-	public static let previewValue: Self = .noop
+	public static let previewValue = Self.noop
+
 	public static let testValue = Self(
 		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID"),
 		nextAccountIndex: unimplemented("\(Self.self).nextAccountIndex"),
@@ -34,5 +22,19 @@ extension AccountsClient: TestDependencyKey {
 		getAccountByAddress: unimplemented("\(Self.self).getAccountByAddress"),
 		hasAccountOnNetwork: unimplemented("\(Self.self).hasAccountOnNetwork"),
 		updateAccount: unimplemented("\(Self.self).updateAccount")
+	)
+
+	public static let noop = Self(
+		getCurrentNetworkID: { .kisharnet },
+		nextAccountIndex: { _ in 0 },
+		getAccountsOnCurrentNetwork: { throw NoopError() },
+		accountsOnCurrentNetwork: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
+		accountUpdates: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
+		getAccountsOnNetwork: { _ in throw NoopError() },
+		newVirtualAccount: { _ in throw NoopError() },
+		saveVirtualAccounts: { _ in },
+		getAccountByAddress: { _ in throw NoopError() },
+		hasAccountOnNetwork: { _ in false },
+		updateAccount: { _ in }
 	)
 }

@@ -8,7 +8,8 @@ extension DependencyValues {
 
 // MARK: - FactorSourcesClient + TestDependencyKey
 extension FactorSourcesClient: TestDependencyKey {
-	public static let previewValue: Self = noop
+	public static let previewValue = Self.noop
+
 	public static let testValue = Self(
 		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID"),
 		getFactorSources: unimplemented("\(Self.self).getFactorSources"),

@@ -420,10 +420,12 @@ extension OnLedgerEntity.NonFungibleToken.NFTData {
 	}
 
 	public func getU64Value(forField field: Field) -> UInt64? {
-		self.fields
-			.compactMap(/GatewayAPI.ProgrammaticScryptoSborValue.u64)
-			.first { $0.fieldName == field.rawValue }
-			.flatMap { UInt64($0.value) }
+		for f in fields {
+			if case let .u64(u64) = f, u64.fieldName == field.rawValue {
+				return UInt64(u64.value)
+			}
+		}
+		return nil
 	}
 
 	public func getDecimalValue(forField field: Field) -> RETDecimal? {
