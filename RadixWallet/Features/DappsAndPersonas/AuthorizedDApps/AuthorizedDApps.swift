@@ -16,10 +16,10 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 		public var thumbnails: [Profile.Network.AuthorizedDapp.ID: URL] = [:]
 
 		@PresentationState
-		public var presentedDapp: DappDetails.State?
+		public var destination: Destination.State? = nil
 
-		public init(presentedDapp: DappDetails.State? = nil) {
-			self.presentedDapp = presentedDapp
+		public init(destination: Destination.State? = nil) {
+			self.destination = destination
 		}
 	}
 
@@ -38,7 +38,25 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case presentedDapp(PresentationAction<DappDetails.Action>)
+		case destination(PresentationAction<Destination.Action>)
+	}
+
+	// MARK: Destination
+
+	public struct Destination: Reducer, Sendable {
+		public enum State: Hashable, Sendable {
+			case presentedDapp(DappDetails.State)
+		}
+
+		public enum Action: Equatable, Sendable {
+			case presentedDapp(DappDetails.Action)
+		}
+
+		public var body: some ReducerOf<Self> {
+			Scope(state: /State.presentedDapp, action: /Action.presentedDapp) {
+				DappDetails()
+			}
+		}
 	}
 
 	// MARK: Reducer
@@ -47,8 +65,8 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$presentedDapp, action: /Action.child .. ChildAction.presentedDapp) {
-				DappDetails()
+			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+				Destination()
 			}
 	}
 
@@ -97,7 +115,7 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			return .none
 		case let .presentDappDetails(presentedDappState):
-			state.presentedDapp = presentedDappState
+			state.destination = .presentedDapp(presentedDappState)
 			return .none
 		case let .loadedThumbnail(thumbnail, dApp: id):
 			state.thumbnails[id] = thumbnail
@@ -107,12 +125,14 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .presentedDapp(.presented(.delegate(.dAppForgotten))):
+		case .destination(.presented(.presentedDapp(.delegate(.dAppForgotten)))):
 			.run { send in
-				await send(.child(.presentedDapp(.dismiss)))
-			}.concatenate(with: loadAuthorizedDapps())
+				// TODO: Couldn't this simply be: state.destination = nil
+				await send(.child(.destination(.dismiss)))
+			}
+			.concatenate(with: loadAuthorizedDapps())
 
-		case .presentedDapp:
+		case .destination:
 			.none
 		}
 	}
