@@ -252,18 +252,14 @@ extension TransactionClient {
 		}
 
 		let determineFeePayer: DetermineFeePayer = { request in
-			let feePayerCandidates = try? await getAllFeePayerCandidates(refreshingBalances: true)
-			let involvedEntites = try? await myEntitiesInvolvedInTransaction(
+			let feePayerCandidates = try await getAllFeePayerCandidates(refreshingBalances: true)
+			let involvedEntites = try await myEntitiesInvolvedInTransaction(
 				networkID: request.networkId,
 				manifest: request.manifest
 			)
 
-			guard let feePayerCandidates, let involvedEntites else {
-				return nil
-			}
-
 			/// Select the account that can pay the transaction fee
-			return try? await feePayerSelectionAmongstCandidates(
+			return try await feePayerSelectionAmongstCandidates(
 				request: request,
 				allFeePayerCandidates: feePayerCandidates,
 				involvedEntities: involvedEntites

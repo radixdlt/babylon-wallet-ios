@@ -36,24 +36,24 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				loggerGlobal.info("\(function)#\(line) - \(msg)")
 			}
 			let intentSignersNonEmpty = reviewedTransaction?.transactionSigners.intentSignerEntitiesNonEmptyOrNil()
-//			let feePayer = feePayerSelection.selected?.account
-//
-//			let notaryIsSignatory: Bool = reviewedTransaction?.transactionSigners.notaryIsSignatory == true
-//			switch (intentSignersNonEmpty, feePayer) {
-//			case (.none, .none):
-//				doPrint("NO Feepayer or intentSigner - faucet TX⁈ (notaryIsSignatory: \(notaryIsSignatory)")
-//				if !notaryIsSignatory {
-//					assertionFailure("Should not happen")
-//				}
-//			case let (.some(_intentSigners), .some(feePayer)):
-//				doPrint("Fee payer: \(feePayer.address), intentSigners: \(_intentSigners.map(\.address))")
-//			case let (.some(_intentSigners), .none):
-//				doPrint("‼️ NO Fee payer, but got intentSigners: \(_intentSigners.map(\.address)) ")
-//				assertionFailure("Should not happen")
-//			case let (.none, .some(feePayer)):
-//				doPrint("‼️Fee payer: \(feePayer.address), but no intentSigners")
-//				assertionFailure("Should not happen")
-//			}
+			let feePayer = reviewedTransaction?.feePayer.unwrap()?.account.wrappedValue
+
+			let notaryIsSignatory: Bool = reviewedTransaction?.transactionSigners.notaryIsSignatory == true
+			switch (intentSignersNonEmpty, feePayer) {
+			case (.none, .none):
+				doPrint("NO Feepayer or intentSigner - faucet TX⁈ (notaryIsSignatory: \(notaryIsSignatory)")
+				if !notaryIsSignatory {
+					assertionFailure("Should not happen")
+				}
+			case let (.some(_intentSigners), .some(feePayer)):
+				doPrint("Fee payer: \(feePayer.address), intentSigners: \(_intentSigners.map(\.address))")
+			case let (.some(_intentSigners), .none):
+				doPrint("‼️ NO Fee payer, but got intentSigners: \(_intentSigners.map(\.address)) ")
+				assertionFailure("Should not happen")
+			case let (.none, .some(feePayer)):
+				doPrint("‼️Fee payer: \(feePayer.address), but no intentSigners")
+				assertionFailure("Should not happen")
+			}
 			#endif
 		}
 
@@ -113,7 +113,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case createTransactionReview(TransactionReview.TransactionContent)
 		case buildTransactionItentResult(TaskResult<TransactionIntent>)
 		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
-		case determinFeePayerResult(FeePayerSelectionResult?)
+		case determineFeePayerResult(TaskResult<FeePayerSelectionResult?>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -485,18 +485,18 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			return .none
 
-		case let .determinFeePayerResult(result):
+		case let .determineFeePayerResult(.success(selectionResult)):
 			guard var reviewedTransaction = state.reviewedTransaction else {
 				assertionFailure("Expected to have reviewed transaction")
 				return .none
 			}
 
-			reviewedTransaction.feePayer = .success(result?.payer)
+			reviewedTransaction.feePayer = .success(selectionResult?.payer)
 
-			if let result {
-				reviewedTransaction.transactionFee = result.updatedFee
-				reviewedTransaction.transactionSigners = result.transactionSigners
-				reviewedTransaction.signingFactors = result.signingFactors
+			if let selectionResult {
+				reviewedTransaction.transactionFee = selectionResult.updatedFee
+				reviewedTransaction.transactionSigners = selectionResult.transactionSigners
+				reviewedTransaction.signingFactors = selectionResult.signingFactors
 			}
 
 			state.reviewedTransaction = reviewedTransaction
@@ -505,6 +505,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			if reviewedTransaction.transaction == .nonConforming {
 				return showRawTransaction(&state)
 			}
+			return .none
+
+		case let .determineFeePayerResult(.failure(error)):
+			assertionFailure("Failed to determine fee payer \(error)")
+			state.reviewedTransaction?.feePayer = .success(nil)
 			return .none
 		}
 	}
@@ -634,19 +639,21 @@ extension TransactionReview {
 
 	func determineFeePayer(_ state: State, reviewedTransaction: ReviewedTransaction) -> Effect<Action> {
 		if reviewedTransaction.transactionFee.totalFee.lockFee == .zero {
-			.send(.internal(.determinFeePayerResult(nil)))
+			.send(.internal(.determineFeePayerResult(.success(nil))))
 		} else {
 			.run { send in
-				let result = await transactionClient.determineFeePayer(.init(
-					networkId: reviewedTransaction.networkId,
-					transactionFee: reviewedTransaction.transactionFee,
-					transactionSigners: reviewedTransaction.transactionSigners,
-					signingFactors: reviewedTransaction.signingFactors,
-					signingPurpose: .signTransaction(state.signTransactionPurpose),
-					manifest: state.transactionManifest
-				))
+				let result = await TaskResult {
+					try await transactionClient.determineFeePayer(.init(
+						networkId: reviewedTransaction.networkId,
+						transactionFee: reviewedTransaction.transactionFee,
+						transactionSigners: reviewedTransaction.transactionSigners,
+						signingFactors: reviewedTransaction.signingFactors,
+						signingPurpose: .signTransaction(state.signTransactionPurpose),
+						manifest: state.transactionManifest
+					))
+				}
 
-				await send(.internal(.determinFeePayerResult(result)))
+				await send(.internal(.determineFeePayerResult(result)))
 			}
 		}
 	}

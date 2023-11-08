@@ -15,7 +15,7 @@ extension TransactionClient {
 	public typealias NotarizeTransaction = @Sendable (NotarizeTransactionRequest) async throws -> NotarizeTransactionResponse
 
 	public typealias MyInvolvedEntities = @Sendable (TransactionManifest) async throws -> MyEntitiesInvolvedInTransaction
-	public typealias DetermineFeePayer = @Sendable (DetermineFeePayerRequest) async -> FeePayerSelectionResult?
+	public typealias DetermineFeePayer = @Sendable (DetermineFeePayerRequest) async throws -> FeePayerSelectionResult?
 	public typealias GetFeePayerCandidates = @Sendable (_ refreshingBalances: Bool) async throws -> NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>
 }
 
