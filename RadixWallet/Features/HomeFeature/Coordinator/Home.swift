@@ -5,25 +5,14 @@ import SwiftUI
 public struct Home: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		// MARK: - Components
-		public var babylonAccountRecoveryIsNeeded: Bool
 		public var header: Header.State
 		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State>
-		public var accounts: IdentifiedArrayOf<Profile.Network.Account> {
-			accountRows.map(\.account).asIdentifiable()
-		}
-
-		public var accountAddresses: [AccountAddress] {
-			accounts.map(\.address)
-		}
 
 		// MARK: - Destination
 		@PresentationState
 		public var destination: Destination.State?
 
-		public init(
-			babylonAccountRecoveryIsNeeded: Bool
-		) {
-			self.babylonAccountRecoveryIsNeeded = babylonAccountRecoveryIsNeeded
+		public init() {
 			self.header = .init()
 			self.accountRows = []
 			self.destination = nil
@@ -249,5 +238,15 @@ public struct Home: Sendable, FeatureReducer {
 				))
 			}
 		)
+	}
+}
+
+extension Home.State {
+	public var accounts: IdentifiedArrayOf<Profile.Network.Account> {
+		accountRows.map(\.account).asIdentifiable()
+	}
+
+	public var accountAddresses: [AccountAddress] {
+		accounts.map(\.address)
 	}
 }

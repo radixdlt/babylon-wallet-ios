@@ -34,7 +34,7 @@ public struct Splash: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case completed(Profile, accountRecoveryNeeded: Bool)
+		case completed(Profile)
 	}
 
 	@Dependency(\.networkSwitchingClient) var networkSwitchingClient
