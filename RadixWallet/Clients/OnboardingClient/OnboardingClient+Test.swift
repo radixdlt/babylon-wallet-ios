@@ -8,7 +8,8 @@ extension DependencyValues {
 
 // MARK: - OnboardingClient + TestDependencyKey
 extension OnboardingClient: TestDependencyKey {
-	public static let previewValue: Self = .noop
+	public static let previewValue = Self.noop
+
 	public static let testValue = Self(
 		unlockApp: unimplemented("\(Self.self).unlockApp"),
 		loadProfile: unimplemented("\(Self.self).loadProfile"),
