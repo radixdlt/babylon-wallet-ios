@@ -431,7 +431,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					signingFactors: preview.signingFactors
 				)
 				state.reviewedTransaction = reviewedTransaction
-				return review(&state).concatenate(with: determineFeePayer(state, reviewedTransaction: reviewedTransaction))
+				return review(&state)
+					.concatenate(with: determineFeePayer(state, reviewedTransaction: reviewedTransaction))
 			} catch {
 				errorQueue.schedule(error)
 				return .none
@@ -1232,43 +1233,13 @@ extension ReviewedTransaction {
 		feePayer.map { selected in
 			switch transaction {
 			case .nonConforming, .conforming(.accountDepositSettings):
-				if transactionFee.totalFee.lockFee == .zero {
-					// If no fee is required - valid
-					return .valid
-				}
-
-				guard let selected else {
-					// If fee is required, but no fee payer selected - invalid
-					return .needsFeePayer
-				}
-
-				guard selected.xrdBalance >= transactionFee.totalFee.lockFee else {
-					// If insufficient balance - invalid
-					return .insufficientBalance
-				}
-
-				return .valid
+				return selected.validateBalance(forFee: transactionFee)
 
 			case let .conforming(.general(generalTransaction)):
 				guard let feePayer = selected,
 				      let feePayerWithdraws = generalTransaction.accountWithdraws[feePayer.account.address.address]
 				else {
-					if transactionFee.totalFee.lockFee == .zero {
-						// If no fee is required - valid
-						return .valid
-					}
-
-					guard let selected else {
-						// If fee is required, but no fee payer selected - invalid
-						return .needsFeePayer
-					}
-
-					guard selected.xrdBalance >= transactionFee.totalFee.lockFee else {
-						// If insufficient balance - invalid
-						return .insufficientBalance
-					}
-
-					return .valid
+					return selected.validateBalance(forFee: transactionFee)
 				}
 
 				let xrdAddress = knownAddresses(networkId: networkId.rawValue).resourceAddresses.xrd
@@ -1293,26 +1264,26 @@ extension ReviewedTransaction {
 	}
 }
 
-// extension FeePa {
-//	var validate: FeeValidationOutcome {
-//		if transactionFee.totalFee.lockFee == .zero {
-//			// If no fee is required - valid
-//			return .valid
-//		}
-//
-//		guard let selected else {
-//			// If fee is required, but no fee payer selected - invalid
-//			return .needsFeePayer
-//		}
-//
-//		guard selected.xrdBalance >= transactionFee.totalFee.lockFee else {
-//			// If insufficient balance - invalid
-//			return .insufficientBalance
-//		}
-//
-//		return .valid
-//	}
-// }
+extension FeePayerCandidate? {
+	func validateBalance(forFee transactionFee: TransactionFee) -> FeeValidationOutcome {
+		if transactionFee.totalFee.lockFee == .zero {
+			// If no fee is required - valid
+			return .valid
+		}
+
+		guard let self else {
+			// If fee is required, but no fee payer selected - invalid
+			return .needsFeePayer
+		}
+
+		guard self.xrdBalance >= transactionFee.totalFee.lockFee else {
+			// If insufficient balance - invalid
+			return .insufficientBalance
+		}
+
+		return .valid
+	}
+}
 
 #if DEBUG
 func printSigners(_ reviewedTransaction: ReviewedTransaction) {

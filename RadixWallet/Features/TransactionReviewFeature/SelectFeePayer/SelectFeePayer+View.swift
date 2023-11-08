@@ -78,7 +78,9 @@ extension SelectFeePayer {
 							.padding(.bottom, .medium2)
 						}
 					}
-					.refreshable {}
+					.refreshable { @MainActor in
+						await viewStore.send(.pullToRefreshStarted).finish()
+					}
 				}
 				.task { @MainActor in
 					await viewStore.send(.task).finish()
