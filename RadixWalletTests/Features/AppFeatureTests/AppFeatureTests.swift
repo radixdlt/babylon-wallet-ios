@@ -42,8 +42,8 @@ final class AppFeatureTests: TestCase {
 		}
 
 		// THEN: navigate to main
-		await store.send(.child(.splash(.delegate(.completed(Profile.withOneAccount, accountRecoveryNeeded: accountRecoveryNeeded))))) {
-			$0.root = .main(.init(home: .init(babylonAccountRecoveryIsNeeded: accountRecoveryNeeded)))
+		await store.send(.child(.splash(.delegate(.completed(Profile.withOneAccount))))) {
+			$0.root = .main(.init(home: .init()))
 		}
 
 		await clock.run() // fast-forward clock to the end of time
@@ -61,7 +61,7 @@ final class AppFeatureTests: TestCase {
 		}
 
 		// then
-		await store.send(.child(.splash(.delegate(.completed(Profile.withNoAccounts, accountRecoveryNeeded: false))))) {
+		await store.send(.child(.splash(.delegate(.completed(Profile.withNoAccounts))))) {
 			$0.root = .onboardingCoordinator(.init())
 		}
 
