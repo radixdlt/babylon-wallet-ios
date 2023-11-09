@@ -1,4 +1,4 @@
-extension UserDefaultsClient {
+extension UserDefaults.Dependency {
 	public func addFactorSourceIDOfBackedUpMnemonic(_ factorSourceID: FactorSourceID.FromHash) throws {
 		var ids = getFactorSourceIDOfBackedUpMnemonics()
 		ids.append(factorSourceID)
@@ -10,6 +10,6 @@ extension UserDefaultsClient {
 	}
 
 	public func removeAllFactorSourceIDsOfBackedUpMnemonics() {
-		setData(nil, .mnemonicsUserClaimsToHaveBackedUp)
+		remove(.mnemonicsUserClaimsToHaveBackedUp)
 	}
 }

@@ -38,7 +38,7 @@ extension AccountWithInfoHolder {
 
 extension DeviceFactorSourceControlled {
 	mutating func checkAccountAccessToMnemonic(xrdResource: OnLedgerEntity.OwnedFungibleResource? = nil) {
-		@Dependency(\.userDefaultsClient) var userDefaultsClient
+		@Dependency(\.userDefaults) var userDefaults
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
 		let importMnemonicNeeded = !secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSourceID)
@@ -53,7 +53,7 @@ extension DeviceFactorSourceControlled {
 		}
 
 		let hasValue = xrdResource.amount > 0
-		let hasAlreadyBackedUpMnemonic = userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().contains(factorSourceID)
+		let hasAlreadyBackedUpMnemonic = userDefaults.getFactorSourceIDOfBackedUpMnemonics().contains(factorSourceID)
 		let exportMnemonicNeeded = !hasAlreadyBackedUpMnemonic && hasValue
 
 		guard exportMnemonicNeeded else {

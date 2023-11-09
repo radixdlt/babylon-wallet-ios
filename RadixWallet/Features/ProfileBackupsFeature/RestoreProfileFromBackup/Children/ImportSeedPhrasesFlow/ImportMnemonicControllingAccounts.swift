@@ -60,7 +60,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
-	@Dependency(\.userDefaultsClient) var userDefaultsClient
+	@Dependency(\.userDefaults) var userDefaults
 
 	public init() {}
 
@@ -127,7 +127,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		case let .validated(privateHDFactorSource):
 			state.destination = nil
 			return .run { send in
-				try userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(privateHDFactorSource.factorSource.id)
+				try userDefaults.addFactorSourceIDOfBackedUpMnemonic(privateHDFactorSource.factorSource.id)
 
 				try secureStorageClient.saveMnemonicForFactorSource(
 					privateHDFactorSource

@@ -452,9 +452,7 @@
 		48CFC4082ADC10DA00E77A5C /* UInt11.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF142ADC10D900E77A5C /* UInt11.swift */; };
 		48CFC4092ADC10DA00E77A5C /* FiatCurrency.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF152ADC10D900E77A5C /* FiatCurrency.swift */; };
 		48CFC40A2ADC10DA00E77A5C /* EmailAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF162ADC10D900E77A5C /* EmailAddress.swift */; };
-		48CFC40B2ADC10DA00E77A5C /* UserDefaultsClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF182ADC10D900E77A5C /* UserDefaultsClient+Live.swift */; };
-		48CFC40C2ADC10DA00E77A5C /* UserDefaultsClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF192ADC10D900E77A5C /* UserDefaultsClient+Interface.swift */; };
-		48CFC40D2ADC10DA00E77A5C /* UserDefaultsClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF1A2ADC10D900E77A5C /* UserDefaultsClient+Test.swift */; };
+		48CFC40C2ADC10DA00E77A5C /* UserDefaults+Dependency+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF192ADC10D900E77A5C /* UserDefaults+Dependency+Extension.swift */; };
 		48CFC40E2ADC10DA00E77A5C /* InsecureRandomNumberGeneratorWithSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF1B2ADC10D900E77A5C /* InsecureRandomNumberGeneratorWithSeed.swift */; };
 		48CFC40F2ADC10DA00E77A5C /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF1C2ADC10D900E77A5C /* Logger.swift */; };
 		48CFC4102ADC10DA00E77A5C /* Functions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF1D2ADC10D900E77A5C /* Functions.swift */; };
@@ -1765,9 +1763,7 @@
 		48CFBF142ADC10D900E77A5C /* UInt11.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UInt11.swift; sourceTree = "<group>"; };
 		48CFBF152ADC10D900E77A5C /* FiatCurrency.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FiatCurrency.swift; sourceTree = "<group>"; };
 		48CFBF162ADC10D900E77A5C /* EmailAddress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmailAddress.swift; sourceTree = "<group>"; };
-		48CFBF182ADC10D900E77A5C /* UserDefaultsClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaultsClient+Live.swift"; sourceTree = "<group>"; };
-		48CFBF192ADC10D900E77A5C /* UserDefaultsClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaultsClient+Interface.swift"; sourceTree = "<group>"; };
-		48CFBF1A2ADC10D900E77A5C /* UserDefaultsClient+Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaultsClient+Test.swift"; sourceTree = "<group>"; };
+		48CFBF192ADC10D900E77A5C /* UserDefaults+Dependency+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Dependency+Extension.swift"; sourceTree = "<group>"; };
 		48CFBF1B2ADC10D900E77A5C /* InsecureRandomNumberGeneratorWithSeed.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InsecureRandomNumberGeneratorWithSeed.swift; sourceTree = "<group>"; };
 		48CFBF1C2ADC10D900E77A5C /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		48CFBF1D2ADC10D900E77A5C /* Functions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Functions.swift; sourceTree = "<group>"; };
@@ -4905,14 +4901,12 @@
 			path = KeychainClient;
 			sourceTree = "<group>";
 		};
-		48CFBF172ADC10D900E77A5C /* UserDefaultsClient */ = {
+		48CFBF172ADC10D900E77A5C /* UserDefaults+Dependency+Extension */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBF182ADC10D900E77A5C /* UserDefaultsClient+Live.swift */,
-				48CFBF192ADC10D900E77A5C /* UserDefaultsClient+Interface.swift */,
-				48CFBF1A2ADC10D900E77A5C /* UserDefaultsClient+Test.swift */,
+				48CFBF192ADC10D900E77A5C /* UserDefaults+Dependency+Extension.swift */,
 			);
-			path = UserDefaultsClient;
+			path = "UserDefaults+Dependency+Extension";
 			sourceTree = "<group>";
 		};
 		48CFBF1E2ADC10D900E77A5C /* ErrorQueue */ = {
@@ -5049,7 +5043,7 @@
 				48CFC0D02ADC10D900E77A5C /* SubmitTransactionClient */,
 				48CFBF822ADC10D900E77A5C /* TransactionClient */,
 				48CFBF0C2ADC10D900E77A5C /* KeychainClient */,
-				48CFBF172ADC10D900E77A5C /* UserDefaultsClient */,
+				48CFBF172ADC10D900E77A5C /* UserDefaults+Dependency+Extension */,
 				48CFBF232ADC10D900E77A5C /* PasteboardClient */,
 				48CFC0C52ADC10D900E77A5C /* URLFormatterClient */,
 			);
@@ -8114,7 +8108,6 @@
 				48CFC32F2ADC10D900E77A5C /* BIP39+Extensions.swift in Sources */,
 				83EE47952AF0EE3C00155F03 /* ProgrammaticScryptoSborValueDecimal.swift in Sources */,
 				48CFC2D92ADC10D900E77A5C /* ManageSecurityStructureCoordinator.swift in Sources */,
-				48CFC40D2ADC10DA00E77A5C /* UserDefaultsClient+Test.swift in Sources */,
 				48CFC25F2ADC10D900E77A5C /* EditPersonaName+View.swift in Sources */,
 				48CFC3582ADC10D900E77A5C /* ShowQR+View.swift in Sources */,
 				48CFC4542ADC10DA00E77A5C /* QRGeneratorClient+Live.swift in Sources */,
@@ -8278,7 +8271,6 @@
 				48CFC3812ADC10D900E77A5C /* NFTHelperViews.swift in Sources */,
 				48CFC2DD2ADC10D900E77A5C /* SelectFactorKindThenFactor+View.swift in Sources */,
 				48CFC5322ADC10DA00E77A5C /* MetadataNonFungibleLocalIdValue.swift in Sources */,
-				48CFC40B2ADC10DA00E77A5C /* UserDefaultsClient+Live.swift in Sources */,
 				48CFC61B2ADC10DA00E77A5C /* P2P+RTCOutgoingMessage.swift in Sources */,
 				48CFC5BF2ADC10DA00E77A5C /* LoadingOverlayView.swift in Sources */,
 				48CFC3FD2ADC10D900E77A5C /* RTCPeerConnection+PeerConnection.swift in Sources */,
@@ -8776,7 +8768,7 @@
 				48CFC6562ADC10DB00E77A5C /* EntityProtocol.swift in Sources */,
 				48CFC6872ADC10DB00E77A5C /* AppPreferences+Security.swift in Sources */,
 				48CFC4BB2ADC10DA00E77A5C /* MetadataStringArrayValueAllOf.swift in Sources */,
-				48CFC40C2ADC10DA00E77A5C /* UserDefaultsClient+Interface.swift in Sources */,
+				48CFC40C2ADC10DA00E77A5C /* UserDefaults+Dependency+Extension.swift in Sources */,
 				48CFC2442ADC10D900E77A5C /* ThirdPartyDeposits+Reducer.swift in Sources */,
 				48CFC4C82ADC10DA00E77A5C /* InvalidRequestErrorAllOf.swift in Sources */,
 				48CFC5202ADC10DA00E77A5C /* PublicKeyHashEcdsaSecp256k1AllOf.swift in Sources */,

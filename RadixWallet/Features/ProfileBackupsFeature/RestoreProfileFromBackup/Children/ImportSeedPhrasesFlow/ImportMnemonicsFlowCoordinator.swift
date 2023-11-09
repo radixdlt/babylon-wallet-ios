@@ -74,7 +74,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
-	@Dependency(\.userDefaultsClient) var userDefaultsClient
+	@Dependency(\.userDefaults) var userDefaults
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.secureStorageClient) var secureStorageClient

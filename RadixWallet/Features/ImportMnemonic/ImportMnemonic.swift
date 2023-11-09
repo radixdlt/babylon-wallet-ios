@@ -312,7 +312,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	@Dependency(\.mnemonicClient) var mnemonicClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
-	@Dependency(\.userDefaultsClient) var userDefaultsClient
+	@Dependency(\.userDefaults) var userDefaults
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	#if DEBUG
@@ -398,7 +398,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		case let .destination(.presented(.markMnemonicAsBackedUp(.userHasBackedUp(factorSourceID)))):
 			return .run { send in
-				try userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
+				try userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
 				await send(.delegate(.doneViewing(idOfBackedUpFactorSource: factorSourceID)))
 			} catch: { error, _ in
 				loggerGlobal.error("Failed to save mnemonic as backed up")
@@ -550,7 +550,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return .none
 		}
 
-		let listOfBackedUpMnemonics = userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics()
+		let listOfBackedUpMnemonics = userDefaults.getFactorSourceIDOfBackedUpMnemonics()
 		if listOfBackedUpMnemonics.contains(factorSourceID) {
 			return .send(.delegate(.doneViewing(idOfBackedUpFactorSource: nil))) // user has already marked this mnemonic as "backed up"
 		} else {

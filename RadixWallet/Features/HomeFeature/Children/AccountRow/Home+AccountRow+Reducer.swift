@@ -38,7 +38,7 @@ extension Home {
 
 		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
-		@Dependency(\.userDefaultsClient) var userDefaultsClient
+		@Dependency(\.userDefaults) var userDefaults
 
 		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {

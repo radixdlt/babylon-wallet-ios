@@ -149,7 +149,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
-	@Dependency(\.userDefaultsClient) var userDefaultsClient
+	@Dependency(\.userDefaults) var userDefaults
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init() {}
@@ -418,7 +418,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			)
 
 			do {
-				try userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
+				try userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
 			} catch {
 				// Not important enought to throw
 				loggerGlobal.warning("Failed to save mnemonic as backed up, error: \(error)")

@@ -127,7 +127,7 @@ extension DependencyValues {
 	}
 }
 
-extension UserDefaultsClient {
+extension UserDefaults.Dependency {
 	public func loadEpochForWhenLastUsedByAccountAddress() -> EpochForWhenLastUsedByAccountAddress {
 		(try? loadCodable(key: .epochForWhenLastUsedByAccountAddress)) ?? .init()
 	}

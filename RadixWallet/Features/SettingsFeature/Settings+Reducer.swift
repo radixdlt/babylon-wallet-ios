@@ -102,7 +102,7 @@ public struct Settings: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.p2pLinksClient) var p2pLinksClient
 	@Dependency(\.dismiss) var dismiss
-	@Dependency(\.userDefaultsClient) var userDefaultsClient
+	@Dependency(\.userDefaults) var userDefaults
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -188,7 +188,7 @@ public struct Settings: Sendable, FeatureReducer {
 
 	private func hideImportOlympiaHeader(in state: inout State) -> Effect<Action> {
 		state.shouldShowMigrateOlympiaButton = false
-		userDefaultsClient.setHideMigrateOlympiaButton(true)
+		userDefaults.setHideMigrateOlympiaButton(true)
 		return .none
 	}
 }

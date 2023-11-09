@@ -41,7 +41,7 @@
 ///
 public final actor ProfileStore {
 	@Dependency(\.secureStorageClient) var secureStorageClient
-	@Dependency(\.userDefaultsClient) var userDefaultsClient
+	@Dependency(\.userDefaults) var userDefaults
 
 	public static let shared = ProfileStore()
 
@@ -265,7 +265,7 @@ extension ProfileStore {
 		}
 
 		do {
-			userDefaultsClient.removeActiveProfileID()
+			userDefaults.removeActiveProfileID()
 			try secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(profile.header.id, keepInICloudIfPresent)
 		} catch {
 			logAssertionFailure("Error, failed to delete profile or factor source, failure: \(String(describing: error))")
@@ -459,10 +459,10 @@ extension ProfileStore {
 
 	private static func _tryLoadSavedProfile() throws -> Profile? {
 		@Dependency(\.secureStorageClient) var secureStorageClient
-		@Dependency(\.userDefaultsClient) var userDefaultsClient
+		@Dependency(\.userDefaults) var userDefaults
 
 		guard
-			let profileId = userDefaultsClient.getActiveProfileID()
+			let profileId = userDefaults.getActiveProfileID()
 		else {
 			return nil
 		}
@@ -583,8 +583,8 @@ extension ProfileStore {
 	}
 
 	private static func _setActiveProfile(to header: ProfileSnapshot.Header) {
-		@Dependency(\.userDefaultsClient) var userDefaultsClient
-		userDefaultsClient.setActiveProfileID(header.id)
+		@Dependency(\.userDefaults) var userDefaults
+		userDefaults.setActiveProfileID(header.id)
 	}
 
 	private static func _persist(bdfsMnemonic: PrivateHDFactorSource) throws {
