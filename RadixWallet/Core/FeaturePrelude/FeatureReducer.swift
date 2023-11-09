@@ -24,6 +24,10 @@ public protocol FeatureReducer: Reducer where State: Sendable & Hashable, Action
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action>
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action>
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action>
+	func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action>
+	func reduceDismissedDestination(into state: inout State) -> Effect<Action>
+
+	associatedtype Destination_: DestinationReducer = EmptyDestination
 
 	associatedtype ViewState: Equatable = Never
 	associatedtype View: SwiftUI.View
@@ -31,10 +35,21 @@ public protocol FeatureReducer: Reducer where State: Sendable & Hashable, Action
 
 // MARK: - FeatureAction
 public enum FeatureAction<Feature: FeatureReducer>: Sendable, Equatable {
+	case destination(PresentationAction<Feature.Destination_.Action>)
 	case view(Feature.ViewAction)
 	case `internal`(Feature.InternalAction)
 	case child(Feature.ChildAction)
 	case delegate(Feature.DelegateAction)
+}
+
+// MARK: - DestinationReducer
+public protocol DestinationReducer: Reducer where State: Sendable & Hashable, Action: Sendable & Equatable {}
+
+// MARK: - EmptyDestination
+public enum EmptyDestination: DestinationReducer {
+	public struct State: Sendable, Hashable {}
+	public typealias Action = Never
+	public func reduce(into state: inout State, action: Never) -> ComposableArchitecture.Effect<Never> {}
 }
 
 extension Reducer where Self: FeatureReducer {
@@ -46,6 +61,10 @@ extension Reducer where Self: FeatureReducer {
 
 	public func core(state: inout State, action: Action) -> Effect<Action> {
 		switch action {
+		case .destination(.dismiss):
+			reduceDismissedDestination(into: &state)
+		case let .destination(.presented(presentedAction)):
+			reduce(into: &state, presentedAction: presentedAction)
 		case let .view(viewAction):
 			reduce(into: &state, viewAction: viewAction)
 		case let .internal(internalAction):
@@ -68,6 +87,14 @@ extension Reducer where Self: FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		.none
 	}
+
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		.none
+	}
+
+	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		.none
+	}
 }
 
 public typealias AlertPresentationStore<AlertAction> = Store<PresentationState<AlertState<AlertAction>>, PresentationAction<AlertAction>>
@@ -79,9 +106,11 @@ public typealias ViewStoreOf<Feature: FeatureReducer> = ViewStore<Feature.ViewSt
 public typealias StackActionOf<R: Reducer> = StackAction<R.State, R.Action>
 
 // MARK: - FeatureAction + Hashable
-extension FeatureAction: Hashable where Feature.ViewAction: Hashable, Feature.ChildAction: Hashable, Feature.InternalAction: Hashable, Feature.DelegateAction: Hashable {
+extension FeatureAction: Hashable where Feature.Destination_.Action: Hashable, Feature.ViewAction: Hashable, Feature.ChildAction: Hashable, Feature.InternalAction: Hashable, Feature.DelegateAction: Hashable {
 	public func hash(into hasher: inout Hasher) {
 		switch self {
+		case let .destination(action):
+			hasher.combine(action)
 		case let .view(action):
 			hasher.combine(action)
 		case let .internal(action):
