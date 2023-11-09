@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 extension DebugUserDefaultsContents.State {
 	var viewState: DebugUserDefaultsContents.ViewState {
-		.init(keyedValues: keyedValues)
+		.init(keyedValues: keyedValues, stringValuesOverTime: stringValuesOverTime)
 	}
 }
 
@@ -10,6 +10,7 @@ extension DebugUserDefaultsContents.State {
 extension DebugUserDefaultsContents {
 	public struct ViewState: Equatable {
 		public let keyedValues: IdentifiedArrayOf<DebugUserDefaultsContents.State.KeyValues>
+		public let stringValuesOverTime: [String]
 	}
 
 	@MainActor
@@ -50,16 +51,15 @@ extension DebugUserDefaultsContents {
 							.frame(maxWidth: .infinity)
 						}
 					}
-
+					Text("String values over time: #\(viewStore.stringValuesOverTime.count)")
 					Button("Delete All but Profile.ID") {
 						viewStore.send(.removeAllButtonTapped)
 					}
 					.padding()
 					.buttonStyle(.primaryRectangular(isDestructive: true))
 				}
-
-				.onAppear {
-					viewStore.send(.appeared)
+				.task { @MainActor in
+					await viewStore.send(.task).finish()
 				}
 			}
 		}

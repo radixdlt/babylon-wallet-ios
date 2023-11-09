@@ -20,6 +20,17 @@ extension UserDefaults.Dependency {
 }
 
 extension UserDefaults.Dependency {
+	public func codableValues<T: Sendable & Codable>(key: Key, codable: T.Type = T.self) -> AnyAsyncSequence<Result<T?, Error>> {
+		@Dependency(\.jsonDecoder) var jsonDecoder
+		return self.dataValues(forKey: key.rawValue).map {
+			if let data = $0 {
+				Result { try jsonDecoder().decode(T.self, from: data) }
+			} else {
+				Result.success(nil)
+			}
+		}.eraseToAnyAsyncSequence()
+	}
+
 	public func bool(key: Key, default defaultTo: Bool = false) -> Bool {
 		bool(forKey: key.rawValue) ?? defaultTo
 	}

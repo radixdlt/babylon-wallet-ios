@@ -1,6 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
 
+private let stringValuesTestKey = "stringValuesTestKey"
+
 // MARK: - DebugUserDefaultsContents
 public struct DebugUserDefaultsContents: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
@@ -15,26 +17,43 @@ public struct DebugUserDefaultsContents: Sendable, FeatureReducer {
 		}
 
 		public var keyedValues: IdentifiedArrayOf<KeyValues> = []
+		public var stringValuesOverTime: [String] = []
 		public init() {}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
+		case task
 		case removeAllButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case removedAll
+		case gotStringValue(String)
 	}
 
 	@Dependency(\.userDefaults) var userDefaults
+	@Dependency(\.uuid) var uuid
+	@Dependency(\.continuousClock) var clock
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .appeared:
+		case .task:
 			loadKeyValues(into: &state)
-			return .none
+			return .run { send in
+				for await string in userDefaults.stringValues(forKey: stringValuesTestKey) {
+					guard !Task.isCancelled else { return }
+					await send(.internal(.gotStringValue(string ?? "<NIL>")))
+				}
+			}.merge(with: .run { _ in
+				@Sendable func emit() async {
+					try? await clock.sleep(for: .seconds(0.5))
+					guard !Task.isCancelled else { return }
+					userDefaults.set(uuid().uuidString, forKey: stringValuesTestKey)
+					await emit()
+				}
+				await emit()
+			})
 
 		case .removeAllButtonTapped:
 			return .run { send in
@@ -48,6 +67,9 @@ public struct DebugUserDefaultsContents: Sendable, FeatureReducer {
 		switch internalAction {
 		case .removedAll:
 			loadKeyValues(into: &state)
+			return .none
+		case let .gotStringValue(stringValue):
+			state.stringValuesOverTime.append(stringValue)
 			return .none
 		}
 	}
