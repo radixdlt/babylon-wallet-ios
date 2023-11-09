@@ -35,6 +35,7 @@ extension DebugSettingsCoordinator.View {
 			.debugUserDefaultsContents(with: destinationStore)
 			#if DEBUG
 				.debugKeychainTest(with: destinationStore)
+				.debugKeychainContents(with: destinationStore)
 			#endif // DEBUG
 				.debugInspectProfile(with: destinationStore)
 				.securityStructureConfigs(with: destinationStore)
@@ -76,6 +77,12 @@ extension DebugSettingsCoordinator.View {
 				icon: .systemImage("key"),
 				action: .debugTestKeychainButtonTapped
 			),
+			// ONLY DEBUG EVER
+			.init(
+				title: "Keychain Contents",
+				icon: .systemImage("key"),
+				action: .debugKeychainContentsButtonTapped
+			),
 		]
 	}
 }
@@ -105,6 +112,18 @@ private extension View {
 			state: /DebugSettingsCoordinator.Destinations.State.debugKeychainTest,
 			action: DebugSettingsCoordinator.Destinations.Action.debugKeychainTest,
 			destination: { DebugKeychainTest.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	func debugKeychainContents(
+		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destinations>
+	) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /DebugSettingsCoordinator.Destinations.State.debugKeychainContents,
+			action: DebugSettingsCoordinator.Destinations.Action.debugKeychainContents,
+			destination: { DebugKeychainContents.View(store: $0) }
 		)
 	}
 	#endif // DEBUG

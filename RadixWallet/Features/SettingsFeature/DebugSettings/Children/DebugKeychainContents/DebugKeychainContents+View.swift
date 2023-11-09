@@ -58,10 +58,12 @@ struct KeyedMnemonicView: SwiftUI.View {
 			Text("`\(keyedMnemonicWithPassphrase.factorSourceID.description)`")
 				.textStyle(.body1Header)
 
-			Text("**\(keyedMnemonicWithPassphrase.mnemonicWithPassphrase.mnemonic.phrase.rawValue)**")
+			Text("*\(keyedMnemonicWithPassphrase.mnemonicWithPassphrase.mnemonic.phrase.rawValue)*")
 			Button("Delete") {
 				delete()
 			}
+			.padding()
+			.buttonStyle(.primaryRectangular(isDestructive: true))
 		}
 	}
 }
