@@ -280,7 +280,7 @@ extension SecureStorageClient: DependencyKey {
 			return keys.compactMap {
 				guard
 					let factorSourceID = FactorSourceID.FromHash(keychainKey: $0),
-					let mnemonicWithPassPhrase = try? loadMnemonicByFactorSourceID(
+					let mnemonicWithPassphrase = try? loadMnemonicByFactorSourceID(
 						factorSourceID,
 						.checkingAccounts,
 						false
@@ -290,7 +290,7 @@ extension SecureStorageClient: DependencyKey {
 				}
 				return KeyedMnemonicWithPassphrase(
 					factorSourceID: factorSourceID,
-					mnemonicWithPassPhrase: mnemonicWithPassPhrase
+					mnemonicWithPassphrase: mnemonicWithPassphrase
 				)
 			}
 		}

@@ -210,6 +210,6 @@ public enum CloudProfileSyncActivation: Sendable, Hashable {
 // MARK: - KeyedMnemonicWithPassphrase
 public struct KeyedMnemonicWithPassphrase: Sendable, Hashable {
 	public let factorSourceID: FactorSourceID.FromHash
-	public let mnemonicWithPassPhrase: MnemonicWithPassphrase
+	public let mnemonicWithPassphrase: MnemonicWithPassphrase
 }
 #endif

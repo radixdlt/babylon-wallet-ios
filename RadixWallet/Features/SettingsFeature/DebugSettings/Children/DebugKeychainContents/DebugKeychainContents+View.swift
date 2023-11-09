@@ -22,27 +22,19 @@ extension DebugKeychainContents {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				ScrollView {
-					VStack(alignment: .leading) {
-//						Form {
-//							ForEach(viewStore.keyedMnemonics, id: \.self) { keyValue in
-//								VStack(alignment: .leading) {
-//									Text("`\(keyValue.id)`")
-//										.textStyle(.body1Header)
-//
-//									MnemonicView(keyValue.mnemonicWithPasshprase) {
-//										viewStore.send(.deleteMnemonicByFactorSourceID(keyValue.id))
-//									}
-//								}
-//								.frame(maxWidth: .infinity)
-//							}
-//						}
-						Button("Delete All") {
-							viewStore.send(.deleteAllMnemonics)
+				VStack(alignment: .leading) {
+					Form {
+						ForEach(viewStore.keyedMnemonics, id: \.self) { keyedMnemonic in
+							KeyedMnemonicView(keyedMnemonic) {
+								viewStore.send(.deleteMnemonicByFactorSourceID(keyedMnemonic.id))
+							}
 						}
-						.padding()
-						.buttonStyle(.primaryRectangular(isDestructive: true))
 					}
+					Button("Delete All") {
+						viewStore.send(.deleteAllMnemonics)
+					}
+					.padding()
+					.buttonStyle(.primaryRectangular(isDestructive: true))
 				}
 				.task { @MainActor in
 					await viewStore.send(.task).finish()
@@ -52,17 +44,21 @@ extension DebugKeychainContents {
 	}
 }
 
-struct MnemonicView: SwiftUI.View {
-	let mnemonicWithPassphrase: MnemonicWithPassphrase
+struct KeyedMnemonicView: SwiftUI.View {
+	let keyedMnemonicWithPassphrase: KeyedMnemonicWithPassphrase
 	let delete: @Sendable () -> Void
-	init(_ mnemonicWithPassphrase: MnemonicWithPassphrase, delete: @escaping @Sendable () -> Void) {
-		self.mnemonicWithPassphrase = mnemonicWithPassphrase
+
+	init(_ keyedMnemonicWithPassphrase: KeyedMnemonicWithPassphrase, delete: @escaping @Sendable () -> Void) {
+		self.keyedMnemonicWithPassphrase = keyedMnemonicWithPassphrase
 		self.delete = delete
 	}
 
 	var body: some SwiftUI.View {
 		VStack {
-			Text("**\(mnemonicWithPassphrase.mnemonic.phrase.rawValue)**")
+			Text("`\(keyedMnemonicWithPassphrase.factorSourceID.description)`")
+				.textStyle(.body1Header)
+
+			Text("**\(keyedMnemonicWithPassphrase.mnemonicWithPassphrase.mnemonic.phrase.rawValue)**")
 			Button("Delete") {
 				delete()
 			}
