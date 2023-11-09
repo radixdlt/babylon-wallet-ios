@@ -9,7 +9,7 @@ extension DependencyValues {
 		secureStorageClient.loadProfile = { _ in
 			profile
 		}
-		userDefaultsClient.stringForKey = {
+		userDefaults.stringForKey = {
 			if $0 == .activeProfileID {
 				profile?.header.id.uuidString
 			} else { String?.none }
@@ -672,7 +672,7 @@ final class ProfileStoreExstingProfileTests: TestCase {
 			savedProfile: savedProfile,
 			action: .deleteProfileFromThisPhone,
 			then: {
-				$0.userDefaultsClient.remove = { key in
+				$0.userDefaults.remove = { key in
 					XCTAssertNoDifference(key, .activeProfileID)
 				}
 				$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { idToDelete, _ in
@@ -738,7 +738,7 @@ final class ProfileStoreExstingProfileTests: TestCase {
 			// WHEN deleteWallet
 			try await self.doTestDeleteProfile(saved: saved) { d, _ in
 				// THEN activeProfileID is deleted
-				d.userDefaultsClient.remove = {
+				d.userDefaults.remove = {
 					XCTAssertNoDifference($0, .activeProfileID)
 				}
 			}
@@ -1075,7 +1075,7 @@ extension ProfileStoreExstingProfileTests {
 		try await withTestClients {
 			$0.savedProfile(saved) // GIVEN saved profile
 			$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { _, _ in }
-			$0.userDefaultsClient.remove = { _ in }
+			$0.userDefaults.remove = { _ in }
 			then(&$0, saved) // THEN ...
 		} operation: {
 			let sut = ProfileStore()
