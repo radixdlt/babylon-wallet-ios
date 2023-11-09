@@ -55,6 +55,17 @@ extension KeychainClient: DependencyKey {
 			},
 			removeAllItems: {
 				try keychainHolder.removeAllItems()
+			},
+			getAllKeysMatchingAttributes: { attributes in
+				keychainHolder.getAllKeysMatching(
+					synchronizable: attributes.synchronizable,
+					accessibility: attributes.accessibility
+				)
+				.compactMap {
+					NonEmptyString(rawValue: $0)
+				}.compactMap {
+					Key(rawValue: $0)
+				}
 			}
 		)
 	}

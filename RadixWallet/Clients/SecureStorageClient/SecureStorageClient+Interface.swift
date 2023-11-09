@@ -25,6 +25,10 @@ public struct SecureStorageClient: Sendable {
 	public var deprecatedLoadDeviceID: DeprecatedLoadDeviceID
 	/// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
 	public var deleteDeprecatedDeviceID: DeleteDeprecatedDeviceID
+
+	#if DEBUG
+	public var getAllMnemonics: GetAllMnemonics
+	#endif
 }
 
 extension SecureStorageClient {
@@ -37,6 +41,7 @@ extension SecureStorageClient {
 	public typealias SaveMnemonicForFactorSource = @Sendable (PrivateHDFactorSource) throws -> Void
 	public typealias LoadMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash, LoadMnemonicPurpose, _ notifyIfMissing: Bool) throws -> MnemonicWithPassphrase?
 	public typealias ContainsMnemonicIdentifiedByFactorSourceID = @Sendable (FactorSourceID.FromHash) -> Bool
+	public typealias GetAllMnemonics = @Sendable () -> [KeyedMnemonicWithPassphrase]
 
 	public typealias DeleteMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash) throws -> Void
 	public typealias DeleteProfileAndMnemonicsByFactorSourceIDs = @Sendable (ProfileSnapshot.Header.ID, _ keepInICloudIfPresent: Bool) throws -> Void
@@ -114,4 +119,10 @@ public enum CloudProfileSyncActivation: Sendable, Hashable {
 
 	/// iCloud sync was disabled, user request to enable it.
 	case enable
+}
+
+// MARK: - KeyedMnemonicWithPassphrase
+public struct KeyedMnemonicWithPassphrase: Sendable, Hashable {
+	public let factorSourceID: FactorSourceID.FromHash
+	public let mnemonicWithPassPhrase: MnemonicWithPassphrase
 }
