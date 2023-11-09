@@ -70,12 +70,7 @@ extension EditPersona {
 
 							Separator()
 
-							EditPersonaEntries.View(
-								store: store.scope(
-									state: \.entries,
-									action: (/Action.child .. EditPersona.ChildAction.entries).embed
-								)
-							)
+							EditPersonaEntries.View(store: store.personaEntries)
 
 							Button(action: { viewStore.send(.addAFieldButtonTapped) }) {
 								Text(L10n.EditPersona.addAField).padding(.horizontal, .medium2)
