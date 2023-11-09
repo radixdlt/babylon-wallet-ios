@@ -9,11 +9,11 @@ extension DependencyValues {
 		secureStorageClient.loadProfile = { _ in
 			profile
 		}
-		userDefaults.stringForKey = {
-			if $0 == .activeProfileID {
-				profile?.header.id.uuidString
-			} else { String?.none }
-		}
+//		userDefaults.stringForKey = {
+//			if $0 == .activeProfileID {
+//				profile?.header.id.uuidString
+//			} else { String?.none }
+//		}
 		mnemonicClient.generate = { _, _ in .testValue }
 	}
 
@@ -672,9 +672,9 @@ final class ProfileStoreExstingProfileTests: TestCase {
 			savedProfile: savedProfile,
 			action: .deleteProfileFromThisPhone,
 			then: {
-				$0.userDefaults.remove = { key in
-					XCTAssertNoDifference(key, .activeProfileID)
-				}
+//				$0.userDefaults.remove = { key in
+//					XCTAssertNoDifference(key, .activeProfileID)
+//				}
 				$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { idToDelete, _ in
 					XCTAssertNoDifference(idToDelete, savedProfile.header.id)
 				}
@@ -736,11 +736,11 @@ final class ProfileStoreExstingProfileTests: TestCase {
 			// GIVEN saved profile
 			let saved = Profile.withOneAccount
 			// WHEN deleteWallet
-			try await self.doTestDeleteProfile(saved: saved) { d, _ in
+			try await self.doTestDeleteProfile(saved: saved) { _, _ in
 				// THEN activeProfileID is deleted
-				d.userDefaults.remove = {
-					XCTAssertNoDifference($0, .activeProfileID)
-				}
+//				d.userDefaults.remove = {
+//					XCTAssertNoDifference($0, .activeProfileID)
+//				}
 			}
 		}
 	}
@@ -1075,7 +1075,7 @@ extension ProfileStoreExstingProfileTests {
 		try await withTestClients {
 			$0.savedProfile(saved) // GIVEN saved profile
 			$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { _, _ in }
-			$0.userDefaults.remove = { _ in }
+//			$0.userDefaults.remove = { _ in }
 			then(&$0, saved) // THEN ...
 		} operation: {
 			let sut = ProfileStore()

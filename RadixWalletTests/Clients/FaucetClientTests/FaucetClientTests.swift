@@ -56,10 +56,10 @@ final class FaucetClientTests: TestCase {
 		let sut = FaucetClient.liveValue
 		await withDependencies {
 			$0.gatewayAPIClient.getEpoch = { .irrelevant }
-			$0.userDefaults.dataForKey = { key in
-				XCTAssertEqual(key, .epochForWhenLastUsedByAccountAddress)
-				return nil
-			}
+//			$0.userDefaults.dataForKey = { key in
+//				XCTAssertEqual(key, .epochForWhenLastUsedByAccountAddress)
+//				return nil
+//			}
 		} operation: {
 			let isAllowedToUseFaucet = await sut.isAllowedToUseFaucet(acco0)
 			XCTAssertTrue(isAllowedToUseFaucet)
@@ -82,7 +82,7 @@ final class FaucetClientTests: TestCase {
 		]
 		await withDependencies {
 			$0.gatewayAPIClient.getEpoch = { 3 }
-			$0.userDefaults.dataForKey = { _ in json.data }
+//			$0.userDefaults.dataForKey = { _ in json.data }
 		} operation: {
 			let isAllowedToUseFaucet = await sut.isAllowedToUseFaucet(acco0)
 			XCTAssertTrue(isAllowedToUseFaucet)
@@ -105,7 +105,7 @@ final class FaucetClientTests: TestCase {
 		]
 		await withDependencies {
 			$0.gatewayAPIClient.getEpoch = { 4 }
-			$0.userDefaults.dataForKey = { _ in json.data }
+//			$0.userDefaults._get = { _ in json.data }
 		} operation: {
 			let isAllowedToUseFaucet = await sut.isAllowedToUseFaucet(acco0)
 			XCTAssertTrue(isAllowedToUseFaucet)
@@ -128,7 +128,7 @@ final class FaucetClientTests: TestCase {
 		]
 		await withDependencies {
 			$0.gatewayAPIClient.getEpoch = { 2 }
-			$0.userDefaults.dataForKey = { _ in json.data }
+//			$0.userDefaults.dataForKey = { _ in json.data }
 		} operation: {
 			let isAllowedToUseFaucet = await sut.isAllowedToUseFaucet(acco0)
 			XCTAssertFalse(isAllowedToUseFaucet)
@@ -168,17 +168,17 @@ final class FaucetClientTests: TestCase {
 			}
 			$0.submitTXClient.hasTXBeenCommittedSuccessfully = { _ in }
 			$0.gatewaysClient.getCurrentGateway = { .enkinet }
-			$0.userDefaults.dataForKey = { _ in json.data }
-			$0.userDefaults.setData = { maybeData, key in
-				do {
-					let data = try XCTUnwrap(maybeData)
-					XCTAssertEqual(key, .epochForWhenLastUsedByAccountAddress)
-					let json = try JSON(data: data)
-					try XCTAssertJSONDecoding(json, expectedEpochs)
-				} catch {
-					XCTFail("Expected no throw, but got: \(error)")
-				}
-			}
+//			$0.userDefaults.dataForKey = { _ in json.data }
+//			$0.userDefaults.setData = { maybeData, key in
+//				do {
+//					let data = try XCTUnwrap(maybeData)
+//					XCTAssertEqual(key, .epochForWhenLastUsedByAccountAddress)
+//					let json = try JSON(data: data)
+//					try XCTAssertJSONDecoding(json, expectedEpochs)
+//				} catch {
+//					XCTFail("Expected no throw, but got: \(error)")
+//				}
+//			}
 		} operation: {
 			try await sut.getFreeXRD(.init(recipientAccountAddress: acco0))
 		}

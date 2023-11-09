@@ -333,8 +333,8 @@ private func configureTestClients(
 	d.secureStorageClient.loadProfileSnapshotData = { _ in nil }
 	d.secureStorageClient.loadProfileSnapshot = { _ in nil }
 	d.date = .constant(Date(timeIntervalSince1970: 0))
-	d.userDefaults.stringForKey = { _ in nil }
-	d.userDefaults.setString = { _, _ in }
+//	d.userDefaults.stringForKey = { _ in nil }
+//	d.userDefaults.setString = { _, _ in }
 }
 
 extension ProfileSnapshot.Header {

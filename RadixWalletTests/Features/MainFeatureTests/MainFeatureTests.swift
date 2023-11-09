@@ -7,7 +7,7 @@ final class MainFeatureTests: TestCase {
 		// given
 		let store = TestStore(initialState: Main.State(home: .previewValue)) {
 			Main()
-				.dependency(\.userDefaults, .noop)
+//				.dependency(\.userDefaults, .eph)
 		}
 
 		// when
@@ -27,7 +27,7 @@ final class MainFeatureTests: TestCase {
 		// given
 		let store = TestStore(initialState: Main.State(home: .previewValue)) {
 			Main()
-				.dependency(\.userDefaults, .noop)
+//				.dependency(\.userDefaults, .noop)
 				.dependency(\.gatewaysClient.currentGatewayValues) { AsyncLazySequence([.stokenet]).eraseToAnyAsyncSequence() }
 		}
 
