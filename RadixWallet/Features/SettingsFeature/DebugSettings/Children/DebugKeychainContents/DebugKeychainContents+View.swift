@@ -2,14 +2,14 @@
 
 extension DebugKeychainContents.State {
 	var viewState: DebugKeychainContents.ViewState {
-		.init()
+		.init(keyedMnemonics: keyedMnemonics.elements)
 	}
 }
 
 // MARK: - DebugKeychainContents.View
 extension DebugKeychainContents {
 	public struct ViewState: Equatable {
-		// TODO: declare some properties
+		let keyedMnemonics: [KeyedMnemonicWithPassphrase]
 	}
 
 	@MainActor
@@ -22,11 +22,49 @@ extension DebugKeychainContents {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: DebugKeychainContents")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+				ScrollView {
+					VStack(alignment: .leading) {
+//						Form {
+//							ForEach(viewStore.keyedMnemonics, id: \.self) { keyValue in
+//								VStack(alignment: .leading) {
+//									Text("`\(keyValue.id)`")
+//										.textStyle(.body1Header)
+//
+//									MnemonicView(keyValue.mnemonicWithPasshprase) {
+//										viewStore.send(.deleteMnemonicByFactorSourceID(keyValue.id))
+//									}
+//								}
+//								.frame(maxWidth: .infinity)
+//							}
+//						}
+						Button("Delete All") {
+							viewStore.send(.deleteAllMnemonics)
+						}
+						.padding()
+						.buttonStyle(.primaryRectangular(isDestructive: true))
+					}
+				}
+				.task { @MainActor in
+					await viewStore.send(.task).finish()
+				}
+			}
+		}
+	}
+}
+
+struct MnemonicView: SwiftUI.View {
+	let mnemonicWithPassphrase: MnemonicWithPassphrase
+	let delete: @Sendable () -> Void
+	init(_ mnemonicWithPassphrase: MnemonicWithPassphrase, delete: @escaping @Sendable () -> Void) {
+		self.mnemonicWithPassphrase = mnemonicWithPassphrase
+		self.delete = delete
+	}
+
+	var body: some SwiftUI.View {
+		VStack {
+			Text("**\(mnemonicWithPassphrase.mnemonic.phrase.rawValue)**")
+			Button("Delete") {
+				delete()
 			}
 		}
 	}

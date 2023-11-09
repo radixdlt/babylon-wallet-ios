@@ -29,6 +29,87 @@ public struct SecureStorageClient: Sendable {
 	#if DEBUG
 	public var getAllMnemonics: GetAllMnemonics
 	#endif
+
+	#if DEBUG
+	init(
+		saveProfileSnapshot: @escaping SaveProfileSnapshot,
+		loadProfileSnapshotData: @escaping LoadProfileSnapshotData,
+		loadProfileSnapshot: @escaping LoadProfileSnapshot,
+		loadProfile: @escaping LoadProfile,
+		saveMnemonicForFactorSource: @escaping SaveMnemonicForFactorSource,
+		loadMnemonicByFactorSourceID: @escaping LoadMnemonicByFactorSourceID,
+		containsMnemonicIdentifiedByFactorSourceID: @escaping ContainsMnemonicIdentifiedByFactorSourceID,
+		deleteMnemonicByFactorSourceID: @escaping DeleteMnemonicByFactorSourceID,
+		deleteProfileAndMnemonicsByFactorSourceIDs: @escaping DeleteProfileAndMnemonicsByFactorSourceIDs,
+		updateIsCloudProfileSyncEnabled: @escaping UpdateIsCloudProfileSyncEnabled,
+		loadProfileHeaderList: @escaping LoadProfileHeaderList,
+		saveProfileHeaderList: @escaping SaveProfileHeaderList,
+		deleteProfileHeaderList: @escaping DeleteProfileHeaderList,
+		loadDeviceInfo: @escaping LoadDeviceInfo,
+		saveDeviceInfo: @escaping SaveDeviceInfo,
+		deprecatedLoadDeviceID: @escaping DeprecatedLoadDeviceID,
+		deleteDeprecatedDeviceID: @escaping DeleteDeprecatedDeviceID,
+		getAllMnemonics: @escaping GetAllMnemonics
+	) {
+		self.saveProfileSnapshot = saveProfileSnapshot
+		self.loadProfileSnapshotData = loadProfileSnapshotData
+		self.loadProfileSnapshot = loadProfileSnapshot
+		self.loadProfile = loadProfile
+		self.saveMnemonicForFactorSource = saveMnemonicForFactorSource
+		self.loadMnemonicByFactorSourceID = loadMnemonicByFactorSourceID
+		self.containsMnemonicIdentifiedByFactorSourceID = containsMnemonicIdentifiedByFactorSourceID
+		self.deleteMnemonicByFactorSourceID = deleteMnemonicByFactorSourceID
+		self.deleteProfileAndMnemonicsByFactorSourceIDs = deleteProfileAndMnemonicsByFactorSourceIDs
+		self.updateIsCloudProfileSyncEnabled = updateIsCloudProfileSyncEnabled
+		self.loadProfileHeaderList = loadProfileHeaderList
+		self.saveProfileHeaderList = saveProfileHeaderList
+		self.deleteProfileHeaderList = deleteProfileHeaderList
+		self.loadDeviceInfo = loadDeviceInfo
+		self.saveDeviceInfo = saveDeviceInfo
+		self.deprecatedLoadDeviceID = deprecatedLoadDeviceID
+		self.deleteDeprecatedDeviceID = deleteDeprecatedDeviceID
+		self.getAllMnemonics = getAllMnemonics
+	}
+	#else
+
+	init(
+		saveProfileSnapshot: @escaping SaveProfileSnapshot,
+		loadProfileSnapshotData: @escaping LoadProfileSnapshotData,
+		loadProfileSnapshot: @escaping LoadProfileSnapshot,
+		loadProfile: @escaping LoadProfile,
+		saveMnemonicForFactorSource: @escaping SaveMnemonicForFactorSource,
+		loadMnemonicByFactorSourceID: @escaping LoadMnemonicByFactorSourceID,
+		containsMnemonicIdentifiedByFactorSourceID: @escaping ContainsMnemonicIdentifiedByFactorSourceID,
+		deleteMnemonicByFactorSourceID: @escaping DeleteMnemonicByFactorSourceID,
+		deleteProfileAndMnemonicsByFactorSourceIDs: @escaping DeleteProfileAndMnemonicsByFactorSourceIDs,
+		updateIsCloudProfileSyncEnabled: @escaping UpdateIsCloudProfileSyncEnabled,
+		loadProfileHeaderList: @escaping LoadProfileHeaderList,
+		saveProfileHeaderList: @escaping SaveProfileHeaderList,
+		deleteProfileHeaderList: @escaping DeleteProfileHeaderList,
+		loadDeviceInfo: @escaping LoadDeviceInfo,
+		saveDeviceInfo: @escaping SaveDeviceInfo,
+		deprecatedLoadDeviceID: @escaping DeprecatedLoadDeviceID,
+		deleteDeprecatedDeviceID: @escaping DeleteDeprecatedDeviceID
+	) {
+		self.saveProfileSnapshot = saveProfileSnapshot
+		self.loadProfileSnapshotData = loadProfileSnapshotData
+		self.loadProfileSnapshot = loadProfileSnapshot
+		self.loadProfile = loadProfile
+		self.saveMnemonicForFactorSource = saveMnemonicForFactorSource
+		self.loadMnemonicByFactorSourceID = loadMnemonicByFactorSourceID
+		self.containsMnemonicIdentifiedByFactorSourceID = containsMnemonicIdentifiedByFactorSourceID
+		self.deleteMnemonicByFactorSourceID = deleteMnemonicByFactorSourceID
+		self.deleteProfileAndMnemonicsByFactorSourceIDs = deleteProfileAndMnemonicsByFactorSourceIDs
+		self.updateIsCloudProfileSyncEnabled = updateIsCloudProfileSyncEnabled
+		self.loadProfileHeaderList = loadProfileHeaderList
+		self.saveProfileHeaderList = saveProfileHeaderList
+		self.deleteProfileHeaderList = deleteProfileHeaderList
+		self.loadDeviceInfo = loadDeviceInfo
+		self.saveDeviceInfo = saveDeviceInfo
+		self.deprecatedLoadDeviceID = deprecatedLoadDeviceID
+		self.deleteDeprecatedDeviceID = deleteDeprecatedDeviceID
+	}
+	#endif // DEBUG
 }
 
 extension SecureStorageClient {
@@ -41,7 +122,10 @@ extension SecureStorageClient {
 	public typealias SaveMnemonicForFactorSource = @Sendable (PrivateHDFactorSource) throws -> Void
 	public typealias LoadMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash, LoadMnemonicPurpose, _ notifyIfMissing: Bool) throws -> MnemonicWithPassphrase?
 	public typealias ContainsMnemonicIdentifiedByFactorSourceID = @Sendable (FactorSourceID.FromHash) -> Bool
+
+	#if DEBUG
 	public typealias GetAllMnemonics = @Sendable () -> [KeyedMnemonicWithPassphrase]
+	#endif
 
 	public typealias DeleteMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash) throws -> Void
 	public typealias DeleteProfileAndMnemonicsByFactorSourceIDs = @Sendable (ProfileSnapshot.Header.ID, _ keepInICloudIfPresent: Bool) throws -> Void
@@ -121,8 +205,11 @@ public enum CloudProfileSyncActivation: Sendable, Hashable {
 	case enable
 }
 
+#if DEBUG
+
 // MARK: - KeyedMnemonicWithPassphrase
 public struct KeyedMnemonicWithPassphrase: Sendable, Hashable {
 	public let factorSourceID: FactorSourceID.FromHash
 	public let mnemonicWithPassPhrase: MnemonicWithPassphrase
 }
+#endif
