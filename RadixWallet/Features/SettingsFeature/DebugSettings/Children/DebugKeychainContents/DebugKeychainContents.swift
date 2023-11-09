@@ -3,7 +3,7 @@
 // MARK: - DebugKeychainContents
 public struct DebugKeychainContents: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var keyedMnemonics: IdentifiedArrayOf<KeyedMnemonicWithPassphrase> = []
+		public var keyedMnemonics: IdentifiedArrayOf<KeyedMnemonicWithMetadata> = []
 		public init() {}
 	}
 
@@ -13,20 +13,33 @@ public struct DebugKeychainContents: Sendable, FeatureReducer {
 		case deleteAllMnemonics
 	}
 
+	public enum InternalAction: Sendable, Equatable {
+		case loadedMnemonics([KeyedMnemonicWithMetadata])
+	}
+
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.secureStorageClient) var secureStorageClient
+	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			loadKeyValues(into: &state)
-			return .none
+			loadKeyValues()
 
 		case let .deleteMnemonicByFactorSourceID(id):
-			return delete(ids: [id])
+			delete(ids: [id])
 
 		case .deleteAllMnemonics:
-			return delete(ids: state.keyedMnemonics.elements.map(\.id))
+			delete(ids: state.keyedMnemonics.map(\.id))
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .loadedMnemonics(mnemonics):
+			state.keyedMnemonics = mnemonics.asIdentifiable()
+			return .none
 		}
 	}
 
@@ -37,18 +50,41 @@ public struct DebugKeychainContents: Sendable, FeatureReducer {
 			}
 		} catch: { error, _ in
 			loggerGlobal.error("Failed to delete mnemonic: \(error)")
-		}
+		}.merge(with: loadKeyValues())
 	}
 
-	private func loadKeyValues(into state: inout State) {
-		state.keyedMnemonics = secureStorageClient.getAllMnemonics().asIdentifiable()
+	private func loadKeyValues() -> Effect<Action> {
+		.run { send in
+			let keyedMnemonics = secureStorageClient.getAllMnemonics()
+
+			let values = try await keyedMnemonics.asyncMap {
+				do {
+					if
+						let deviceFactorSource = try await factorSourcesClient.getFactorSource(id: $0.factorSourceID.embed(), as: DeviceFactorSource.self),
+						let entitiesControlledByFactorSource = try? await deviceFactorSourceClient.entitiesControlledByFactorSource(deviceFactorSource, nil)
+					{
+						return KeyedMnemonicWithMetadata(keyedMnemonic: $0, entitiesControlledByFactorSource: entitiesControlledByFactorSource)
+					} else {
+						return KeyedMnemonicWithMetadata(keyedMnemonic: $0)
+					}
+				} catch {
+					return KeyedMnemonicWithMetadata(keyedMnemonic: $0)
+				}
+			}
+
+			await send(.internal(.loadedMnemonics(values)))
+		}
 	}
 }
 
-extension KeyedMnemonicWithPassphrase: Identifiable {
+public struct KeyedMnemonicWithMetadata: Sendable, Hashable, Identifiable {
+	public let keyedMnemonic: KeyedMnemonicWithPassphrase
 	public typealias ID = FactorSourceID.FromHash
-	public var id: ID {
-		factorSourceID
+	public var id: ID { keyedMnemonic.factorSourceID }
+	public let entitiesControlledByFactorSource: EntitiesControlledByFactorSource?
+	init(keyedMnemonic: KeyedMnemonicWithPassphrase, entitiesControlledByFactorSource: EntitiesControlledByFactorSource? = nil) {
+		self.keyedMnemonic = keyedMnemonic
+		self.entitiesControlledByFactorSource = entitiesControlledByFactorSource
 	}
 }
 #endif // DEBUG

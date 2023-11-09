@@ -9,7 +9,7 @@ extension DebugKeychainContents.State {
 // MARK: - DebugKeychainContents.View
 extension DebugKeychainContents {
 	public struct ViewState: Equatable {
-		let keyedMnemonics: [KeyedMnemonicWithPassphrase]
+		let keyedMnemonics: [KeyedMnemonicWithMetadata]
 	}
 
 	@MainActor
@@ -45,18 +45,30 @@ extension DebugKeychainContents {
 }
 
 struct KeyedMnemonicView: SwiftUI.View {
-	let keyedMnemonicWithPassphrase: KeyedMnemonicWithPassphrase
+	let keyedMnemonicWithMetadata: KeyedMnemonicWithMetadata
+	var keyedMnemonicWithPassphrase: KeyedMnemonicWithPassphrase { keyedMnemonicWithMetadata.keyedMnemonic }
 	let delete: @Sendable () -> Void
 
-	init(_ keyedMnemonicWithPassphrase: KeyedMnemonicWithPassphrase, delete: @escaping @Sendable () -> Void) {
-		self.keyedMnemonicWithPassphrase = keyedMnemonicWithPassphrase
+	init(_ keyedMnemonicWithMetadata: KeyedMnemonicWithMetadata, delete: @escaping @Sendable () -> Void) {
+		self.keyedMnemonicWithMetadata = keyedMnemonicWithMetadata
 		self.delete = delete
 	}
 
 	var body: some SwiftUI.View {
 		VStack {
 			Text("`\(keyedMnemonicWithPassphrase.factorSourceID.description)`")
-				.textStyle(.body1Header)
+				.textStyle(.body3HighImportance)
+
+			if let entitiesControlledByFactorSource = keyedMnemonicWithMetadata.entitiesControlledByFactorSource {
+				VStack(alignment: .leading, spacing: .small3) {
+					ForEach(entitiesControlledByFactorSource.accounts) { account in
+						SmallAccountCard(account: account)
+							.cornerRadius(.small1)
+					}
+				}
+			} else {
+				Text("❌ Unknown by current Profile")
+			}
 
 			Text("*\(keyedMnemonicWithPassphrase.mnemonicWithPassphrase.mnemonic.phrase.rawValue)*")
 			Button("Delete") {
