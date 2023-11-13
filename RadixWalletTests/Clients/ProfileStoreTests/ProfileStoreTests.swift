@@ -469,32 +469,32 @@ final class ProfileStoreNewProfileTests: TestCase {
 			}
 		}
 	}
+
+	func test__GIVEN__no_profile__WHEN__init__THEN__newly_generated_mnemonic_is_used_with_empty_passphrase() throws {
+		withTestClients {
+			// GIVEN no profile
+			$0.noProfile()
+
+			$0.mnemonicClient.generate = { _, _ in
+				"zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong"
+			}
+
+			then(&$0)
+		} operation: {
+			// WHEN ProfileStore.init()
+			ProfileStore.init()
+		}
+
+		func then(_ d: inout DependencyValues) {
+			d.secureStorageClient.saveMnemonicForFactorSource = {
+				XCTAssertTrue(
+					// THEN generated mnemonic is used with empty passphrase
+					$0.mnemonicWithPassphrase.passphrase.isEmpty
+				)
+			}
+		}
+	}
 	/*
-	 func test__GIVEN__no_profile__WHEN__init__THEN__newly_generated_mnemonic_is_used_with_empty_passphrase() throws {
-	 	withTestClients {
-	 		// GIVEN no profile
-	 		$0.noProfile()
-
-	 		$0.mnemonicClient.generate = { _, _ in
-	 			"zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong"
-	 		}
-
-	 		then(&$0)
-	 	} operation: {
-	 		// WHEN ProfileStore.init()
-	 		ProfileStore.init()
-	 	}
-
-	 	func then(_ d: inout DependencyValues) {
-	 		d.secureStorageClient.saveMnemonicForFactorSource = {
-	 			XCTAssertTrue(
-	 				// THEN generated mnemonic is used with empty passphrase
-	 				$0.mnemonicWithPassphrase.passphrase.isEmpty
-	 			)
-	 		}
-	 	}
-	 }
-
 	 func test__GIVEN__no_profile__WHEN__finishOnboarding__THEN__iphone__model_is_updated_in_profile_and_keychain() async throws {
 	 	try await withTimeLimit {
 	 		let savedSnapshot = LockIsolated<ProfileSnapshot?>(nil)
