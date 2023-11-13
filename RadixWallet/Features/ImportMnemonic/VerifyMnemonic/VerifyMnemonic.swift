@@ -17,7 +17,7 @@ public struct VerifyMnemonic: Sendable, FeatureReducer {
 			let identifiedWords = mnemonic.words.identifiablyEnumerated()
 			let checksumWord = identifiedWords.last!
 			let randomWords = identifiedWords
-				.dropLast() // without checksum words
+				.dropLast() // without checksum word
 				.shuffled() // randomize
 				.prefix(Self.numberOfWordsToConfirm) // Take the required number of words
 				.sorted { $0.offset < $1.offset } // Put words in order after shuffling

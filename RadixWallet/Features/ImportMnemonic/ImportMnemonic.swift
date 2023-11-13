@@ -423,7 +423,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			state.destination = .verifyMnemonic(.init(mnemonic: mnemonic))
 			return .none
 
-		case .destination(.presented(.markMnemonicAsBackedUp(.userHasNotBackedUp))):
+		case .destination(.presented(.backupConfimartion(.userHasNotBackedUp))):
 			loggerGlobal.notice("User have not backed up")
 			return .send(.delegate(.doneViewing(idOfBackedUpFactorSource: nil)))
 
@@ -441,7 +441,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				return .none
 			}
 			return .run { send in
-				try userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
+				try userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
 				await send(.delegate(.doneViewing(idOfBackedUpFactorSource: factorSourceID)))
 			} catch: { error, _ in
 				loggerGlobal.error("Failed to save mnemonic as backed up")
