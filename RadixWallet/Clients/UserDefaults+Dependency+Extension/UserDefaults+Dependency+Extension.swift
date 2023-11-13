@@ -47,6 +47,10 @@ extension UserDefaults.Dependency {
 		set(data, forKey: key.rawValue)
 	}
 
+	public func set(string: String?, key: Key) {
+		set(string, forKey: key.rawValue)
+	}
+
 	public func loadCodable<Model: Codable>(
 		key: Key, type: Model.Type = Model.self
 	) throws -> Model? {

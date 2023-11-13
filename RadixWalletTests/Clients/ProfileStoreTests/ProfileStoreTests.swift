@@ -5,24 +5,51 @@ import XCTest
 // swiftformat:disable redundantInit
 
 extension DependencyValues {
-	private mutating func _profile(_ profile: Profile?) {
-		secureStorageClient.loadProfile = { _ in
-			profile
+	private mutating func _profile(
+		_ profile: Profile?,
+		userDefaults userDefaultsValue: UserDefaults.Dependency = .ephemeral()
+	) {
+		if let profile {
+			secureStorageClient.loadProfile = { key in
+				precondition(key == profile.header.id)
+				return profile
+			}
+			secureStorageClient.loadProfileSnapshot = { key in
+				precondition(key == profile.header.id)
+				return profile.snapshot()
+			}
+			secureStorageClient.loadProfileSnapshotData = { key in
+				precondition(key == profile.header.id)
+
+				return try! JSONEncoder.iso8601.encode(profile.snapshot())
+			}
+		} else {
+			secureStorageClient.loadProfile = { _ in
+				nil
+			}
+			secureStorageClient.loadProfileSnapshot = { _ in
+				nil
+			}
+			secureStorageClient.loadProfileSnapshotData = { _ in
+				nil
+			}
 		}
-		userDefaultsClient.stringForKey = {
-			if $0 == .activeProfileID {
-				profile?.header.id.uuidString
-			} else { String?.none }
-		}
+		userDefaultsValue.set(string: profile?.header.id.uuidString, key: .activeProfileID)
+		self.userDefaults = userDefaultsValue
 		mnemonicClient.generate = { _, _ in .testValue }
 	}
 
-	mutating func savedProfile(_ savedProfile: Profile) {
-		_profile(savedProfile)
+	mutating func savedProfile(
+		_ savedProfile: Profile,
+		userDefaults: UserDefaults.Dependency = .ephemeral()
+	) {
+		_profile(savedProfile, userDefaults: userDefaults)
 	}
 
-	mutating func noProfile() {
-		_profile(nil)
+	mutating func noProfile(
+		userDefaults: UserDefaults.Dependency = .ephemeral()
+	) {
+		_profile(nil, userDefaults: userDefaults)
 	}
 
 	mutating func noDeviceInfo() {
@@ -55,7 +82,8 @@ final class ProfileStoreNewProfileTests: TestCase {
 
 	func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__deleteDeprecatedDeviceID_is_called() async throws {
 		let deleteDeprecatedDeviceID_is_called = expectation(description: "deleteDeprecatedDeviceID is called")
-		withTestClients {
+		let userDefaults = UserDefaults.Dependency.ephemeral()
+		withTestClients(userDefaults: userDefaults) {
 			// GIVEN no device info
 			$0.noDeviceInfo()
 			$0.secureStorageClient.deprecatedLoadDeviceID = { 0xDEAD }
@@ -75,7 +103,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 		await nearFutureFulfillment(of: deleteDeprecatedDeviceID_is_called)
 	}
 
-	func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__deleteDeprecatedDeviceID_is_not_called_if_failed_to_save_migrated_deviceInfo() async {
+	func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__deleteDeprecatedDeviceID_is_not_called_if_failed_to_save_migrated_deviceInfo() async throws {
 		let deleteDeprecatedDeviceID_is_NOT_called = expectation(description: "deleteDeprecatedDeviceID is NOT called")
 		deleteDeprecatedDeviceID_is_NOT_called.isInverted = true // We expected to NOT be called.
 
@@ -536,8 +564,8 @@ final class ProfileStoreNewProfileTests: TestCase {
 	}
 }
 
-// MARK: - ProfileStoreExstingProfileTests
-final class ProfileStoreExstingProfileTests: TestCase {
+// MARK: - ProfileStoreExistingProfileTests
+final class ProfileStoreExistingProfileTests: TestCase {
 	func test__GIVEN__saved_profile__WHEN__init__THEN__saved_profile_is_used() async throws {
 		try await withTimeLimit {
 			// GIVEN saved profile
@@ -667,19 +695,24 @@ final class ProfileStoreExstingProfileTests: TestCase {
 	}
 
 	func test__GIVEN__saved_profile_mismatch_deviceID__WHEN__deleteProfile__THEN__profile_got_deleted() async throws {
+		let uuidOfNewProfile = UUID()
 		let savedProfile = Profile.withOneAccount
+		let userDefaults = UserDefaults.Dependency.ephemeral()
 		try await doTestMismatch(
 			savedProfile: savedProfile,
+			userDefaults: userDefaults,
 			action: .deleteProfileFromThisPhone,
 			then: {
-				$0.userDefaultsClient.remove = { key in
-					XCTAssertNoDifference(key, .activeProfileID)
-				}
+				$0.uuid = .constant(uuidOfNewProfile)
+				XCTAssertNoDifference(userDefaults.string(key: .activeProfileID), savedProfile.header.id.uuidString)
 				$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { idToDelete, _ in
 					XCTAssertNoDifference(idToDelete, savedProfile.header.id)
 				}
 			}
 		)
+
+		// New active profile
+		XCTAssertNoDifference(userDefaults.string(key: .activeProfileID), uuidOfNewProfile.uuidString)
 	}
 
 	func test__GIVEN__mismatch__WHEN__app_is_not_yet_unlocked__THEN__no_alert_is_displayed() async throws {
@@ -719,6 +752,7 @@ final class ProfileStoreExstingProfileTests: TestCase {
 
 	func test__GIVEN__saved_profile__WHEN__deleteWallet__THEN__profile_gets_deleted_from_secureStorage() async throws {
 		try await withTimeLimit {
+			let deleteProfileAndMnemonicsByFactorSourceIDs_is_called = self.expectation(description: "deleteProfileAndMnemonicsByFactorSourceIDs_is_called")
 			// GIVEN saved profile
 			let saved = Profile.withOneAccount
 			// WHEN deleteWallet
@@ -726,23 +760,28 @@ final class ProfileStoreExstingProfileTests: TestCase {
 				// THEN profile gets deleted from secureStorage
 				d.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { id, _ in
 					XCTAssertNoDifference(id, p.header.id)
+					deleteProfileAndMnemonicsByFactorSourceIDs_is_called.fulfill()
 				}
 			}
+			await self.nearFutureFulfillment(of: deleteProfileAndMnemonicsByFactorSourceIDs_is_called)
 		}
 	}
 
 	func test__GIVEN__saved_profile__WHEN__deleteWallet__THEN__activeProfileID_is_deleted() async throws {
+		let uuidOfNew = UUID()
+		let userDefaults = UserDefaults.Dependency.ephemeral()
 		try await withTimeLimit {
 			// GIVEN saved profile
 			let saved = Profile.withOneAccount
 			// WHEN deleteWallet
-			try await self.doTestDeleteProfile(saved: saved) { d, _ in
-				// THEN activeProfileID is deleted
-				d.userDefaultsClient.remove = {
-					XCTAssertNoDifference($0, .activeProfileID)
-				}
+			try await self.doTestDeleteProfile(saved: saved, userDefaults: userDefaults, given: {
+				XCTAssertNoDifference(userDefaults.string(key: .activeProfileID), saved.header.id.uuidString)
+			}) { d, _ in
+				d.uuid = .constant(uuidOfNew)
 			}
 		}
+		// THEN activeProfileID is deleted
+		XCTAssertNoDifference(userDefaults.string(key: .activeProfileID), uuidOfNew.uuidString)
 	}
 
 	// FIXME: Maybe should probably be moved to SecureStorageClientTests..?
@@ -1025,9 +1064,10 @@ extension ProfileStoreAsyncSequenceTests {
 	}
 }
 
-extension ProfileStoreExstingProfileTests {
+extension ProfileStoreExistingProfileTests {
 	private func doTestMismatch(
 		savedProfile: Profile,
+		userDefaults: UserDefaults.Dependency = .ephemeral(),
 		action: OverlayWindowClient.Item.AlertAction,
 		then: @escaping @Sendable (inout DependencyValues) -> Void = { _ in },
 		result assertResult: @escaping @Sendable (Profile) -> Void = { _ in }
@@ -1035,11 +1075,10 @@ extension ProfileStoreExstingProfileTests {
 		let alertScheduled = expectation(
 			description: "overlayWindowClient has scheduled alert"
 		)
-
 		try await withTimeLimit(.slow) {
-			let result = await withTestClients {
+			let result = await withTestClients(userDefaults: userDefaults) {
 				// GIVEN saved profile
-				$0.savedProfile(savedProfile)
+				$0.savedProfile(savedProfile, userDefaults: userDefaults)
 				// mistmatch deviceID
 				$0.secureStorageClient.loadDeviceInfo = { .testValueBEEF }
 				when(&$0)
@@ -1069,13 +1108,15 @@ extension ProfileStoreExstingProfileTests {
 	@discardableResult
 	private func doTestDeleteProfile(
 		saved: Profile,
+		userDefaults: UserDefaults.Dependency = .ephemeral(),
 		keepInICloudIfPresent: Bool = true,
+		given: () -> Void = {},
 		_ then: (inout DependencyValues, _ deletedProfile: Profile) -> Void
 	) async throws -> Profile {
-		try await withTestClients {
-			$0.savedProfile(saved) // GIVEN saved profile
+		try await withTestClients(userDefaults: userDefaults) {
+			$0.savedProfile(saved, userDefaults: userDefaults) // GIVEN saved profile
+			given()
 			$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { _, _ in }
-			$0.userDefaultsClient.remove = { _ in }
 			then(&$0, saved) // THEN ...
 		} operation: {
 			let sut = ProfileStore()
@@ -1084,51 +1125,4 @@ extension ProfileStoreExstingProfileTests {
 			return await sut.profile
 		}
 	}
-}
-
-extension PrivateHDFactorSource {
-	static let testValue = Self.testValueZooVote
-
-	static let testValueZooVote: Self = testValue(mnemonicWithPassphrase: .testValueZooVote)
-	static let testValueAbandonArt: Self = testValue(mnemonicWithPassphrase: .testValueAbandonArt)
-
-	static func testValue(
-		mnemonicWithPassphrase: MnemonicWithPassphrase
-	) -> Self {
-		withDependencies {
-			$0.date = .constant(Date(timeIntervalSince1970: 0))
-		} operation: {
-			Self.testValue(
-				name: deviceName,
-				model: deviceModel,
-				mnemonicWithPassphrase: mnemonicWithPassphrase
-			)
-		}
-	}
-
-	func hdRoot(derivationPath: DerivationPath) throws -> HierarchicalDeterministicFactorInstance {
-		let hdRoot = try mnemonicWithPassphrase.hdRoot()
-
-		let publicKey = try! hdRoot.derivePublicKey(
-			path: derivationPath,
-			curve: .curve25519
-		)
-
-		return HierarchicalDeterministicFactorInstance(
-			id: factorSource.id,
-			publicKey: publicKey,
-			derivationPath: derivationPath
-		)
-	}
-}
-
-private let deviceName: String = "iPhone"
-private let deviceModel: DeviceFactorSource.Hint.Model = "iPhone"
-private let expectedDeviceDescription = DeviceInfo.deviceDescription(
-	name: deviceName,
-	model: deviceModel.rawValue
-)
-
-extension Mnemonic {
-	static let testValue: Self = "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong"
 }

@@ -287,29 +287,34 @@ extension Profile {
 
 @discardableResult
 public func withTestClients<R>(
+	userDefaults: UserDefaults.Dependency = .ephemeral(),
 	_ operation: @escaping @autoclosure () -> R
 ) -> R {
-	withTestClients({ $0 }, operation: operation)
+	withTestClients(userDefaults: userDefaults, { $0 }, operation: operation)
 }
 
 @discardableResult
 public func withTestClients<R>(
+	userDefaults: UserDefaults.Dependency = .ephemeral(),
 	_ updateValuesForOperation: (inout DependencyValues) throws -> Void,
 	operation: () throws -> R
 ) rethrows -> R {
 	try withDependencies({
+		$0.userDefaults = userDefaults
 		configureTestClients(&$0)
-		try updateValuesForOperation(&$0)
+		return try updateValuesForOperation(&$0)
 	}, operation: operation)
 }
 
 @_unsafeInheritExecutor
 @discardableResult
 public func withTestClients<R>(
+	userDefaults: UserDefaults.Dependency = .ephemeral(),
 	_ updateValuesForOperation: (inout DependencyValues) async throws -> Void,
 	operation: () async throws -> R
 ) async rethrows -> R {
 	try await withDependencies({
+		$0.userDefaults = userDefaults
 		configureTestClients(&$0)
 		try await updateValuesForOperation(&$0)
 	}, operation: operation)
@@ -332,9 +337,10 @@ private func configureTestClients(
 	d.secureStorageClient.saveProfileSnapshot = { _ in }
 	d.secureStorageClient.loadProfileSnapshotData = { _ in nil }
 	d.secureStorageClient.loadProfileSnapshot = { _ in nil }
+	d.secureStorageClient.loadProfile = { _ in nil }
 	d.date = .constant(Date(timeIntervalSince1970: 0))
-	d.userDefaultsClient.stringForKey = { _ in nil }
-	d.userDefaultsClient.setString = { _, _ in }
+//	d.userDefaults.stringForKey = { _ in nil }
+//	d.userDefaults.setString = { _, _ in }
 }
 
 extension ProfileSnapshot.Header {
