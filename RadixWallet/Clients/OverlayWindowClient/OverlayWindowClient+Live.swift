@@ -38,5 +38,7 @@ extension OverlayWindowClient: DependencyKey {
 }
 
 extension OverlayWindowClient.Item.HUD {
-	fileprivate static let copied = Self(text: L10n.AddressAction.copiedToClipboard)
+	public static let updatedAccount = Self(text: L10n.AccountSettings.updatedAccountHUDMessage)
+	public static let copied = Self(text: L10n.AddressAction.copiedToClipboard)
+	public static let seedPhraseImported = Self(text: L10n.ImportMnemonic.seedPhraseImported)
 }

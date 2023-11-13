@@ -1,8 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - AccountList.Row.View
-extension AccountList.Row {
+extension Home.AccountRow {
 	public struct ViewState: Equatable {
 		let name: String
 		let address: AccountAddress
@@ -15,7 +14,7 @@ extension AccountList.Row {
 			case legacySoftware
 			case dAppDefinition
 
-			init?(state: AccountList.Row.State) {
+			init?(state: Home.AccountRow.State) {
 				switch (state.isDappDefinitionAccount, state.isLegacyAccount, state.isLedgerAccount) {
 				case (false, false, false): return nil
 				case (true, _, _): self = .dAppDefinition
@@ -29,8 +28,7 @@ extension AccountList.Row {
 		let tag: AccountTag?
 
 		let isLedgerAccount: Bool
-		let needToBackupMnemonicForThisAccount: Bool
-		let needToImportMnemonicForThisAccount: Bool
+		let mnemonicHandlingCallToAction: MnemonicHandling?
 
 		let fungibleResourceIcons: [TokenThumbnail.Content]
 		let nonFungibleResourcesCount: Int
@@ -49,11 +47,7 @@ extension AccountList.Row {
 			self.tag = .init(state: state)
 			self.isLedgerAccount = state.isLedgerAccount
 
-			// Show the prompt if the account has any XRD
-			self.needToBackupMnemonicForThisAccount = state.deviceFactorSourceControlled?.needToBackupMnemonicForThisAccount ?? false
-
-			// Show the prompt if keychain does not contain the mnemonic for this account
-			self.needToImportMnemonicForThisAccount = state.deviceFactorSourceControlled?.needToImportMnemonicForThisAccount ?? false
+			self.mnemonicHandlingCallToAction = state.mnemonicHandlingCallToAction
 
 			// Resources
 			guard let portfolio = state.portfolio.wrappedValue else {
@@ -76,9 +70,9 @@ extension AccountList.Row {
 	}
 
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<AccountList.Row>
+		private let store: StoreOf<Home.AccountRow>
 
-		public init(store: StoreOf<AccountList.Row>) {
+		public init(store: StoreOf<Home.AccountRow>) {
 			self.store = store
 		}
 
@@ -109,13 +103,9 @@ extension AccountList.Row {
 
 					ownedResourcesList(viewStore)
 
-					if viewStore.needToImportMnemonicForThisAccount {
-						importMnemonicPromptView(viewStore)
-					}
-
-					if !viewStore.needToImportMnemonicForThisAccount, viewStore.needToBackupMnemonicForThisAccount {
-						backupMnemonicPromptView(viewStore)
-					}
+					prompts(
+						mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction
+					)
 				}
 				.padding(.horizontal, .medium1)
 				.padding(.vertical, .medium2)
@@ -133,13 +123,29 @@ extension AccountList.Row {
 }
 
 // MARK: - Account resources view
-extension AccountList.Row.View {
+extension Home.AccountRow.View {
 	private enum Constants {
 		static let iconSize = HitTargetSize.smaller
 	}
 
+	@ViewBuilder
+	func prompts(mnemonicHandlingCallToAction: MnemonicHandling?) -> some SwiftUI.View {
+		if let mnemonicHandlingCallToAction {
+			switch mnemonicHandlingCallToAction {
+			case .mustBeImported:
+				importMnemonicPromptView {
+					store.send(.view(.importMnemonicButtonTapped))
+				}
+			case .shouldBeExported:
+				exportMnemonicPromptView {
+					store.send(.view(.exportMnemonicButtonTapped))
+				}
+			}
+		}
+	}
+
 	// Crates the view of the account owned resources
-	func ownedResourcesList(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
+	func ownedResourcesList(_ viewStore: ViewStoreOf<Home.AccountRow>) -> some View {
 		GeometryReader { proxy in
 			HStack(spacing: .small1) {
 				if !viewStore.fungibleResourceIcons.isEmpty {
@@ -245,18 +251,8 @@ extension AccountList.Row.View {
 	}
 }
 
-extension AccountList.Row.View {
-	func importMnemonicPromptView(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
-		importMnemonicPromptView { viewStore.send(.importMnemonic) }
-	}
-
-	func backupMnemonicPromptView(_ viewStore: ViewStoreOf<AccountList.Row>) -> some View {
-		backupMnemonicPromptView { viewStore.send(.backUpMnemonic) }
-	}
-}
-
 // FIXME: Workaround to avoid ViewThatFits
-private extension AccountList.Row.ViewState {
+private extension Home.AccountRow.ViewState {
 	func itemLimit(iconSize: CGFloat, width: CGFloat) -> Int? {
 		itemLimit(trying: showMoreFungibles ? [nil, 10] : [5, 4, 3], iconSize: iconSize, width: width)
 	}
@@ -350,7 +346,7 @@ public struct OffsetIdentified<Element>: Identifiable {
 	public let element: Element
 }
 
-extension AccountList.Row.ViewState.AccountTag {
+extension Home.AccountRow.ViewState.AccountTag {
 	var display: String {
 		switch self {
 		case .dAppDefinition:
@@ -370,16 +366,16 @@ import ComposableArchitecture
 import SwiftUI
 struct Row_Preview: PreviewProvider {
 	static var previews: some View {
-		AccountList.Row.View(
+		Home.AccountRow.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: AccountList.Row.init
+				reducer: Home.AccountRow.init
 			)
 		)
 	}
 }
 
-extension AccountList.Row.State {
+extension Home.AccountRow.State {
 	public static let previewValue = Self(account: .previewValue0)
 }
 #endif

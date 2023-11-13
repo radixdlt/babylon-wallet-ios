@@ -61,8 +61,8 @@ public struct App: Sendable, FeatureReducer {
 		case .incompatibleProfileDeleted:
 			goToOnboarding(state: &state)
 
-		case let .toMain(isAccountRecoveryNeeded):
-			goToMain(state: &state, accountRecoveryIsNeeded: isAccountRecoveryNeeded)
+		case .toMain:
+			goToMain(state: &state)
 
 		case .toOnboarding:
 			goToOnboarding(state: &state)
@@ -75,24 +75,22 @@ public struct App: Sendable, FeatureReducer {
 			goToOnboarding(state: &state)
 
 		case .onboardingCoordinator(.delegate(.completed)):
-			goToMain(state: &state, accountRecoveryIsNeeded: false)
+			goToMain(state: &state)
 
-		case let .splash(.delegate(.completed(profile, accountRecoveryNeeded))):
+		case let .splash(.delegate(.completed(profile))):
 			if profile.networks.isEmpty {
 				goToOnboarding(state: &state)
 			} else {
-				goToMain(state: &state, accountRecoveryIsNeeded: accountRecoveryNeeded)
+				goToMain(state: &state)
 			}
 		default:
 			.none
 		}
 	}
 
-	func goToMain(state: inout State, accountRecoveryIsNeeded: Bool) -> Effect<Action> {
+	func goToMain(state: inout State) -> Effect<Action> {
 		state.root = .main(.init(
-			home: .init(
-				babylonAccountRecoveryIsNeeded: accountRecoveryIsNeeded
-			))
+			home: .init())
 		)
 		return .none
 	}

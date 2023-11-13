@@ -95,3 +95,83 @@ extension FeatureAction: Hashable where Feature.ViewAction: Hashable, Feature.Ch
 
 /// For scoping to an actionless childstore
 public func actionless<T>(never: Never) -> T {}
+
+extension FeatureReducer {
+	func delayedMediumEffect(internal internalAction: InternalAction) -> Effect<Action> {
+		self.delayedMediumEffect(for: .internal(internalAction))
+	}
+
+	func delayedMediumEffect(
+		for action: Action
+	) -> Effect<Action> {
+		delayedEffect(delay: .seconds(0.6), for: action)
+	}
+
+	func delayedShortEffect(
+		for action: Action
+	) -> Effect<Action> {
+		delayedEffect(delay: .seconds(0.3), for: action)
+	}
+
+	func delayedEffect(
+		delay: Duration,
+		for action: Action
+	) -> Effect<Action> {
+		@Dependency(\.continuousClock) var clock
+		return .run { send in
+			try await clock.sleep(for: delay)
+			await send(action)
+		}
+	}
+}
+
+extension FeatureReducer {
+	func exportMnemonic(
+		controlling account: Profile.Network.Account,
+		notifyIfMissing: Bool = true,
+		onSuccess: (SimplePrivateFactorSource) -> Void
+	) -> Effect<Action> {
+		guard let txSigningFI = account.virtualHierarchicalDeterministicFactorInstances.first(where: { $0.factorSourceID.kind == .device }) else {
+			loggerGlobal.notice("Discrepancy, non software account has not mnemonic to export")
+			return .none
+		}
+
+		return exportMnemonic(
+			factorSourceID: txSigningFI.factorSourceID,
+			notifyIfMissing: notifyIfMissing,
+			onSuccess: onSuccess
+		)
+	}
+
+	func exportMnemonic(
+		factorSourceID: FactorSource.ID.FromHash,
+		notifyIfMissing: Bool = true,
+		onSuccess: (SimplePrivateFactorSource) -> Void,
+		onError: (Swift.Error) -> Void = { error in
+			loggerGlobal.error("Failed to load mnemonic to export: \(error)")
+		}
+	) -> Effect<Action> {
+		@Dependency(\.secureStorageClient) var secureStorageClient
+		do {
+			guard let mnemonicWithPassphrase = try secureStorageClient.loadMnemonic(
+				factorSourceID: factorSourceID,
+				purpose: .displaySeedPhrase,
+				notifyIfMissing: notifyIfMissing
+			) else {
+				onError(FailedToFindFactorSource())
+				return .none
+			}
+
+			onSuccess(
+				.init(
+					mnemonicWithPassphrase: mnemonicWithPassphrase,
+					factorSourceID: factorSourceID
+				)
+			)
+
+		} catch {
+			onError(error)
+		}
+		return .none
+	}
+}

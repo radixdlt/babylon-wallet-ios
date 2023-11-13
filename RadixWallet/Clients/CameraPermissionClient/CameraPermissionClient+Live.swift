@@ -2,7 +2,7 @@ import AVFoundation
 import SwiftUI
 import UIKit
 
-// MARK: - UserDefaultsClient + DependencyKey
+// MARK: - UserDefaults.Dependency + DependencyKey
 extension CameraPermissionClient: DependencyKey {
 	public static let liveValue = Self(
 		getCameraAccess: {

@@ -54,12 +54,10 @@ final class FaucetClientTests: TestCase {
 
 	func test__GIVEN__no_persisted_json__WHEN__isAllowedToUseFaucet_is_called__THEN__true() async throws {
 		let sut = FaucetClient.liveValue
+		let userDefaults = UserDefaults.Dependency.ephemeral()
 		await withDependencies {
 			$0.gatewayAPIClient.getEpoch = { .irrelevant }
-			$0.userDefaultsClient.dataForKey = { key in
-				XCTAssertEqual(key, .epochForWhenLastUsedByAccountAddress)
-				return nil
-			}
+			$0.userDefaults = userDefaults
 		} operation: {
 			let isAllowedToUseFaucet = await sut.isAllowedToUseFaucet(acco0)
 			XCTAssertTrue(isAllowedToUseFaucet)
@@ -68,21 +66,13 @@ final class FaucetClientTests: TestCase {
 
 	func test__GIVEN__persisted_json_with_epoch_2_WHEN__isAllowedToUseFaucet_is_called__and_epoch_eq_3__THEN__true() async throws {
 		let sut = FaucetClient.liveValue
-		let json: JSON = [
-			"epochForAccounts": [
-				[
-					"epoch": 2,
-					"accountAddress": .string(acco0.address),
-				],
-				[
-					"epoch": 5,
-					"accountAddress": "account_tdx_21_12xg7tf7aup8lrxkvug0vzatntzww0c6jnntyj6yd4eg5920kpxpzvt",
-				],
-			],
-		]
+
+		let userDefaults = UserDefaults.Dependency.ephemeral()
+		var epochs = EpochForWhenLastUsedByAccountAddress(epochForAccounts: [EpochForWhenLastUsedByAccountAddress.EpochForAccount(accountAddress: acco0, epoch: 2)])
+		await userDefaults.saveEpochForWhenLastUsedByAccountAddress(epochs)
 		await withDependencies {
+			$0.userDefaults = userDefaults
 			$0.gatewayAPIClient.getEpoch = { 3 }
-			$0.userDefaultsClient.dataForKey = { _ in json.data }
 		} operation: {
 			let isAllowedToUseFaucet = await sut.isAllowedToUseFaucet(acco0)
 			XCTAssertTrue(isAllowedToUseFaucet)
@@ -91,21 +81,12 @@ final class FaucetClientTests: TestCase {
 
 	func test__GIVEN__persisted_json_with_epoch_2_WHEN__isAllowedToUseFaucet_is_called__and_epoch_eq_4__THEN__true() async throws {
 		let sut = FaucetClient.liveValue
-		let json: JSON = [
-			"epochForAccounts": [
-				[
-					"epoch": 2,
-					"accountAddress": .string(acco0.address),
-				],
-				[
-					"epoch": 5,
-					"accountAddress": "account_tdx_21_12xg7tf7aup8lrxkvug0vzatntzww0c6jnntyj6yd4eg5920kpxpzvt",
-				],
-			],
-		]
+		let userDefaults = UserDefaults.Dependency.ephemeral()
+		var epochs = EpochForWhenLastUsedByAccountAddress(epochForAccounts: [EpochForWhenLastUsedByAccountAddress.EpochForAccount(accountAddress: acco0, epoch: 2)])
+		await userDefaults.saveEpochForWhenLastUsedByAccountAddress(epochs)
 		await withDependencies {
+			$0.userDefaults = userDefaults
 			$0.gatewayAPIClient.getEpoch = { 4 }
-			$0.userDefaultsClient.dataForKey = { _ in json.data }
 		} operation: {
 			let isAllowedToUseFaucet = await sut.isAllowedToUseFaucet(acco0)
 			XCTAssertTrue(isAllowedToUseFaucet)
@@ -114,21 +95,12 @@ final class FaucetClientTests: TestCase {
 
 	func test__GIVEN__persisted_json_with_epoch_2_WHEN__isAllowedToUseFaucet_is_called__and_epoch_eq_2__THEN__false() async throws {
 		let sut = FaucetClient.liveValue
-		let json: JSON = [
-			"epochForAccounts": [
-				[
-					"epoch": 2,
-					"accountAddress": .string(acco0.address),
-				],
-				[
-					"epoch": 5,
-					"accountAddress": "account_tdx_21_12xg7tf7aup8lrxkvug0vzatntzww0c6jnntyj6yd4eg5920kpxpzvt",
-				],
-			],
-		]
+		let userDefaults = UserDefaults.Dependency.ephemeral()
+		var epochs = EpochForWhenLastUsedByAccountAddress(epochForAccounts: [EpochForWhenLastUsedByAccountAddress.EpochForAccount(accountAddress: acco0, epoch: 2)])
+		await userDefaults.saveEpochForWhenLastUsedByAccountAddress(epochs)
 		await withDependencies {
 			$0.gatewayAPIClient.getEpoch = { 2 }
-			$0.userDefaultsClient.dataForKey = { _ in json.data }
+			$0.userDefaults = userDefaults
 		} operation: {
 			let isAllowedToUseFaucet = await sut.isAllowedToUseFaucet(acco0)
 			XCTAssertFalse(isAllowedToUseFaucet)
@@ -137,23 +109,14 @@ final class FaucetClientTests: TestCase {
 
 	func test__GIVEN__allowed__WHEN__getFreeXRD_is_called__THEN__epoch_gets_saved_into_userDefaults() async throws {
 		let sut = FaucetClient.liveValue
-		let json: JSON = [
-			"epochForAccounts": [
-				[
-					"epoch": 2,
-					"accountAddress": .string(acco0.address),
-				],
-				[
-					"epoch": 5,
-					"accountAddress": "account_tdx_21_12xg7tf7aup8lrxkvug0vzatntzww0c6jnntyj6yd4eg5920kpxpzvt",
-				],
-			],
-		]
 		let currentEpoch: Epoch = 1337
 		let expectedEpochs = EpochForWhenLastUsedByAccountAddress(epochForAccounts: [
-			.init(accountAddress: acco0, epoch: currentEpoch),
+			.init(accountAddress: acco0, epoch: 2),
 			.init(accountAddress: acco1, epoch: 5),
 		])
+
+		let userDefaults = UserDefaults.Dependency.ephemeral()
+		await userDefaults.saveEpochForWhenLastUsedByAccountAddress(expectedEpochs)
 
 		let hash = try TransactionHash.fromStr(string: "txid_tdx_d_1pycj4pzxu9fc9x4qxflu63x7fmmal2raafd3wj9vea9nr5wy84dqsdq4cj", networkId: NetworkID.ansharnet.rawValue)
 
@@ -163,22 +126,12 @@ final class FaucetClientTests: TestCase {
 			$0.transactionClient.buildTransactionIntent = { _ in
 				.previewValue
 			}
+			$0.userDefaults = userDefaults
 			$0.transactionClient.notarizeTransaction = { _ in
 				try NotarizeTransactionResponse(notarized: .init([]), intent: .init(header: .previewValue, manifest: .previewValue, message: .none), txID: hash)
 			}
 			$0.submitTXClient.hasTXBeenCommittedSuccessfully = { _ in }
 			$0.gatewaysClient.getCurrentGateway = { .enkinet }
-			$0.userDefaultsClient.dataForKey = { _ in json.data }
-			$0.userDefaultsClient.setData = { maybeData, key in
-				do {
-					let data = try XCTUnwrap(maybeData)
-					XCTAssertEqual(key, .epochForWhenLastUsedByAccountAddress)
-					let json = try JSON(data: data)
-					try XCTAssertJSONDecoding(json, expectedEpochs)
-				} catch {
-					XCTFail("Expected no throw, but got: \(error)")
-				}
-			}
 		} operation: {
 			try await sut.getFreeXRD(.init(recipientAccountAddress: acco0))
 		}

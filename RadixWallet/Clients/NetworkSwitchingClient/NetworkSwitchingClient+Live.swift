@@ -16,7 +16,7 @@ extension NetworkSwitchingClient {
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.cacheClient) var cacheClient
-		@Dependency(\.userDefaultsClient) var userDefaultsClient
+		@Dependency(\.userDefaults) var userDefaults
 
 		let validateGatewayURL: ValidateGatewayURL = { newURL -> Radix.Gateway? in
 			let currentURL = await gatewaysClient.getGatewayAPIEndpointBaseURL()

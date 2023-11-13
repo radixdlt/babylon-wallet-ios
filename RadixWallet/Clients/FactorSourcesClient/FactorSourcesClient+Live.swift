@@ -42,7 +42,8 @@ extension FactorSourcesClient: DependencyKey {
 				switch factorSource {
 				case let .device(deviceFactorSource):
 					try secureStorageClient.saveMnemonicForFactorSource(.init(mnemonicWithPassphrase: request.mnemonicWithPasshprase, factorSource: deviceFactorSource))
-				default: break
+				default:
+					loggerGlobal.notice("Saving of non device private HD factor source not permitted, kind is: \(factorSource.kind)")
 				}
 				let factorSourceID = factorSource.id
 
@@ -53,6 +54,7 @@ extension FactorSourcesClient: DependencyKey {
 					do {
 						try await saveFactorSource(factorSource)
 					} catch {
+						loggerGlobal.critical("Failed to save factor source, error: \(error)")
 						if let idForMnemonicToDelete = try? factorSourceID.extract(as: FactorSourceID.FromHash.self) {
 							// We were unlucky, failed to update Profile, thus best to undo the saving of
 							// the mnemonic in keychain (if we can).

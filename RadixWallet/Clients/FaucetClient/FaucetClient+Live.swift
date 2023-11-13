@@ -4,13 +4,13 @@ let minimumNumberOfEpochsPassedForFaucetToBeReused = 1
 // MARK: - FaucetClient + DependencyKey
 extension FaucetClient: DependencyKey {
 	public static let liveValue: Self = {
-		@Dependency(\.userDefaultsClient) var userDefaultsClient
+		@Dependency(\.userDefaults) var userDefaults
 		@Dependency(\.gatewaysClient) var gatewaysClient
 
 		// Return `nil` for `not allowed to use` else: return `some` for `is alllowed to use`
 		@Sendable func isAllowedToUseFaucetIfSoGetEpochs(accountAddress: AccountAddress) async -> (epochs: EpochForWhenLastUsedByAccountAddress, current: Epoch?)? {
 			@Dependency(\.gatewayAPIClient.getEpoch) var getEpoch
-			let epochs = userDefaultsClient.loadEpochForWhenLastUsedByAccountAddress()
+			let epochs = userDefaults.loadEpochForWhenLastUsedByAccountAddress()
 			guard let current = try? await getEpoch() else { return (epochs, nil) /* is allowed to use */ }
 			guard let last = epochs.getEpoch(for: accountAddress) else { return (epochs, current) /* is allowed to use */ }
 
@@ -96,7 +96,7 @@ extension FaucetClient: DependencyKey {
 			// Update last used
 			var epochs = epochsAndMaybeCurrent.epochs
 			epochs.update(epoch: current, for: accountAddress)
-			await userDefaultsClient.saveEpochForWhenLastUsedByAccountAddress(epochs)
+			await userDefaults.saveEpochForWhenLastUsedByAccountAddress(epochs)
 
 			// Done
 		}

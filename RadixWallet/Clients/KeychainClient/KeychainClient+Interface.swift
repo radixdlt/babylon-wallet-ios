@@ -15,6 +15,7 @@ public struct KeychainClient: Sendable {
 	public var _getDataWithAuthForKey: GetDataWithAuthForKey
 	public var _removeDataForKey: RemoveDataForKey
 	public var _removeAllItems: RemoveAllItems
+	public var _getAllKeysMatchingAttributes: GetAllKeysMatchingAttributes
 
 	public init(
 		getServiceAndAccessGroup: @escaping GetServiceAndAccessGroup,
@@ -26,7 +27,8 @@ public struct KeychainClient: Sendable {
 		getDataWithoutAuthForKey: @escaping GetDataWithoutAuthForKey,
 		getDataWithAuthForKey: @escaping GetDataWithAuthForKey,
 		removeDataForKey: @escaping RemoveDataForKey,
-		removeAllItems: @escaping RemoveAllItems
+		removeAllItems: @escaping RemoveAllItems,
+		getAllKeysMatchingAttributes: @escaping GetAllKeysMatchingAttributes
 	) {
 		self._getServiceAndAccessGroup = getServiceAndAccessGroup
 		self._containsDataForKey = containsDataForKey
@@ -38,6 +40,7 @@ public struct KeychainClient: Sendable {
 		self._getDataWithAuthForKey = getDataWithAuthForKey
 		self._removeDataForKey = removeDataForKey
 		self._removeAllItems = removeAllItems
+		self._getAllKeysMatchingAttributes = getAllKeysMatchingAttributes
 	}
 }
 
@@ -79,6 +82,10 @@ extension KeychainClient {
 
 	public typealias RemoveDataForKey = @Sendable (Key) throws -> Void
 	public typealias RemoveAllItems = @Sendable () throws -> Void
+	public typealias GetAllKeysMatchingAttributes = @Sendable (
+		(synchronizable: Bool?,
+		 accessibility: KeychainAccess.Accessibility?)
+	) -> [Key]
 }
 
 // MARK: - KeychainAttributes
@@ -198,5 +205,12 @@ extension KeychainClient {
 
 	public func removeAllItems() throws {
 		try _removeAllItems()
+	}
+
+	public func getAllKeysMatchingAttributes(
+		synchronizable: Bool? = false,
+		accessibility: KeychainAccess.Accessibility? = .whenPasscodeSetThisDeviceOnly
+	) -> [Key] {
+		_getAllKeysMatchingAttributes((synchronizable, accessibility))
 	}
 }

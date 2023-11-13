@@ -100,7 +100,6 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
-	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.rolaClient) var rolaClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
@@ -187,7 +186,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			case .success:
 				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID)))
 			case .failure:
-				return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
+				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 			}
 
 		case let .failedToSendResponseToDapp(response, for: request, metadata, reason):
@@ -264,11 +263,11 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismissSilently))))):
 			dismissCurrentModalAndRequest(request, for: &state)
-			return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
+			return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 
 		case .modal(.dismiss):
 			if case .dappInteractionCompletion = state.currentModal {
-				return delayedEffect(for: .internal(.presentQueuedRequestIfNeeded))
+				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 			}
 
 			return .none
@@ -455,16 +454,6 @@ extension DappInteractor {
 			}
 		} catch: { error, _ in
 			errorQueue.schedule(error)
-		}
-	}
-
-	func delayedEffect(
-		delay: Duration = .seconds(0.75),
-		for action: Action
-	) -> Effect<Action> {
-		.run { send in
-			try await clock.sleep(for: delay)
-			await send(action)
 		}
 	}
 }

@@ -7,7 +7,7 @@ extension BackupsClient: DependencyKey {
 	public static func live(
 		profileStore: ProfileStore = .shared
 	) -> Self {
-		@Dependency(\.userDefaultsClient) var userDefaultsClient
+		@Dependency(\.userDefaults) var userDefaults
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 

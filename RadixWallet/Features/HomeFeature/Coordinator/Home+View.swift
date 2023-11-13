@@ -31,12 +31,15 @@ extension Home {
 							)
 						)
 
-						AccountList.View(
-							store: store.scope(
-								state: \.accountList,
-								action: { .child(.accountList($0)) }
+						VStack(spacing: .medium3) {
+							ForEachStore(
+								store.scope(
+									state: \.accountRows,
+									action: { .child(.account(id: $0, action: $1)) }
+								),
+								content: { Home.AccountRow.View(store: $0) }
 							)
-						)
+						}
 						.padding(.horizontal, .medium1)
 
 						Button(L10n.HomePage.createNewAccount) {
@@ -59,18 +62,7 @@ extension Home {
 				.task { @MainActor in
 					await viewStore.send(.task).finish()
 				}
-				.navigationDestination(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /Home.Destinations.State.accountDetails,
-					action: Home.Destinations.Action.accountDetails,
-					destination: { AccountDetails.View(store: $0) }
-				)
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /Home.Destinations.State.createAccount,
-					action: Home.Destinations.Action.createAccount,
-					content: { CreateAccountCoordinator.View(store: $0) }
-				)
+				.destinations(store.scope(state: \.$destination, action: { .child(.destination($0)) }))
 			}
 		}
 
@@ -85,6 +77,56 @@ extension Home {
 				}
 			}
 		}
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(_ destinationStore: PresentationStoreOf<Home.Destination>) -> some SwiftUI.View {
+		accountDetails(destinationStore)
+			.createAccount(destinationStore)
+			.exportMnemonic(destinationStore)
+			.importMnemonics(destinationStore)
+	}
+
+	func accountDetails(_ destinationStore: PresentationStoreOf<Home.Destination>) -> some SwiftUI.View {
+		navigationDestination(
+			store: destinationStore,
+			state: /Home.Destination.State.accountDetails,
+			action: Home.Destination.Action.accountDetails,
+			destination: { AccountDetails.View(store: $0) }
+		)
+	}
+
+	func createAccount(_ destinationStore: PresentationStoreOf<Home.Destination>) -> some SwiftUI.View {
+		sheet(
+			store: destinationStore,
+			state: /Home.Destination.State.createAccount,
+			action: Home.Destination.Action.createAccount,
+			content: { CreateAccountCoordinator.View(store: $0) }
+		)
+	}
+
+	func exportMnemonic(_ destinationStore: PresentationStoreOf<Home.Destination>) -> some SwiftUI.View {
+		sheet(
+			store: destinationStore,
+			state: /Home.Destination.State.exportMnemonic,
+			action: Home.Destination.Action.exportMnemonic,
+			content: { childStore in
+				NavigationView {
+					ExportMnemonic.View(store: childStore)
+				}
+			}
+		)
+	}
+
+	func importMnemonics(_ destinationStore: PresentationStoreOf<Home.Destination>) -> some SwiftUI.View {
+		sheet(
+			store: destinationStore,
+			state: /Home.Destination.State.importMnemonics,
+			action: Home.Destination.Action.importMnemonics,
+			content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
+		)
 	}
 }
 
@@ -116,8 +158,6 @@ struct HomeView_Previews: PreviewProvider {
 }
 
 extension Home.State {
-	public static let previewValue = Home.State(
-		babylonAccountRecoveryIsNeeded: false
-	)
+	public static let previewValue = Home.State()
 }
 #endif

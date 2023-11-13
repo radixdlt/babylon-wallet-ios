@@ -4,8 +4,8 @@ import SwiftUI
 // MARK: - DisplayEntitiesControlledByMnemonic
 public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
-		public typealias ID = EntitiesControlledByFactorSource.ID
-		public var id: ID { accountsForDeviceFactorSource.id }
+		public typealias ID = FactorSource.ID.FromHash
+		public let id: ID
 
 		public var deviceFactorSource: DeviceFactorSource { accountsForDeviceFactorSource.deviceFactorSource }
 
@@ -24,6 +24,7 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 			accountsForDeviceFactorSource: EntitiesControlledByFactorSource,
 			mode: Mode
 		) {
+			self.id = accountsForDeviceFactorSource.factorSourceID
 			self.accountsForDeviceFactorSource = accountsForDeviceFactorSource
 			self.mode = mode
 		}

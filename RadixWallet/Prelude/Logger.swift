@@ -62,7 +62,7 @@ extension Logger {
 		emoji: String = "🔮"
 	) {
 		log(
-			level: .debug, // TODO: Add support for custom log level
+			level: .notice, // TODO: Add support for custom log level
 			Message(stringLiteral: "\(marker): \(emoji): \(message)")
 		)
 	}

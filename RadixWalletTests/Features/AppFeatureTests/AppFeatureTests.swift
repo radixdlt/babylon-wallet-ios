@@ -42,8 +42,8 @@ final class AppFeatureTests: TestCase {
 		}
 
 		// THEN: navigate to main
-		await store.send(.child(.splash(.delegate(.completed(Profile.withOneAccount, accountRecoveryNeeded: accountRecoveryNeeded))))) {
-			$0.root = .main(.init(home: .init(babylonAccountRecoveryIsNeeded: accountRecoveryNeeded)))
+		await store.send(.child(.splash(.delegate(.completed(Profile.withOneAccount))))) {
+			$0.root = .main(.init(home: .init()))
 		}
 
 		await clock.run() // fast-forward clock to the end of time
@@ -61,7 +61,7 @@ final class AppFeatureTests: TestCase {
 		}
 
 		// then
-		await store.send(.child(.splash(.delegate(.completed(Profile.withNoAccounts, accountRecoveryNeeded: false))))) {
+		await store.send(.child(.splash(.delegate(.completed(Profile.withNoAccounts))))) {
 			$0.root = .onboardingCoordinator(.init())
 		}
 
@@ -107,17 +107,14 @@ extension Profile.Network.Account {
 
 	static func makeTestValue(
 		name nameOfFirstAccount: String,
+		networkID: NetworkID = .mainnet,
 		index: HD.Path.Component.Child.Value = 0,
 		privateHDFactorSource maybePrivateHDFactorSource: PrivateHDFactorSource? = nil
 	) -> Self {
 		let privateHDFactorSource = maybePrivateHDFactorSource ?? PrivateHDFactorSource.testValue
-		let derivationPath = DerivationPath(
-			scheme: .cap26,
-			path: "m/44H/1022H/10H/525H/1460H/\(index)H"
-		)
+		let path = try! AccountBabylonDerivationPath(networkID: networkID, index: index, keyKind: .transactionSigning)
 
-		let networkID = NetworkID.mainnet
-		let hdFactorInstance = try! privateHDFactorSource.hdRoot(derivationPath: derivationPath)
+		let hdFactorInstance = try! privateHDFactorSource.hdRoot(derivationPath: path.wrapAsDerivationPath())
 
 		return try! Profile.Network.Account(
 			networkID: networkID,
@@ -290,29 +287,34 @@ extension Profile {
 
 @discardableResult
 public func withTestClients<R>(
+	userDefaults: UserDefaults.Dependency = .ephemeral(),
 	_ operation: @escaping @autoclosure () -> R
 ) -> R {
-	withTestClients({ $0 }, operation: operation)
+	withTestClients(userDefaults: userDefaults, { $0 }, operation: operation)
 }
 
 @discardableResult
 public func withTestClients<R>(
+	userDefaults: UserDefaults.Dependency = .ephemeral(),
 	_ updateValuesForOperation: (inout DependencyValues) throws -> Void,
 	operation: () throws -> R
 ) rethrows -> R {
 	try withDependencies({
+		$0.userDefaults = userDefaults
 		configureTestClients(&$0)
-		try updateValuesForOperation(&$0)
+		return try updateValuesForOperation(&$0)
 	}, operation: operation)
 }
 
 @_unsafeInheritExecutor
 @discardableResult
 public func withTestClients<R>(
+	userDefaults: UserDefaults.Dependency = .ephemeral(),
 	_ updateValuesForOperation: (inout DependencyValues) async throws -> Void,
 	operation: () async throws -> R
 ) async rethrows -> R {
 	try await withDependencies({
+		$0.userDefaults = userDefaults
 		configureTestClients(&$0)
 		try await updateValuesForOperation(&$0)
 	}, operation: operation)
@@ -335,9 +337,10 @@ private func configureTestClients(
 	d.secureStorageClient.saveProfileSnapshot = { _ in }
 	d.secureStorageClient.loadProfileSnapshotData = { _ in nil }
 	d.secureStorageClient.loadProfileSnapshot = { _ in nil }
+	d.secureStorageClient.loadProfile = { _ in nil }
 	d.date = .constant(Date(timeIntervalSince1970: 0))
-	d.userDefaultsClient.stringForKey = { _ in nil }
-	d.userDefaultsClient.setString = { _, _ in }
+//	d.userDefaults.stringForKey = { _ in nil }
+//	d.userDefaults.setString = { _, _ in }
 }
 
 extension ProfileSnapshot.Header {

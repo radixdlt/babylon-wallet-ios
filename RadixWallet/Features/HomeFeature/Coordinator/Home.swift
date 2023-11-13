@@ -5,23 +5,16 @@ import SwiftUI
 public struct Home: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		// MARK: - Components
-		public var babylonAccountRecoveryIsNeeded: Bool
 		public var header: Header.State
-		public var accountList: AccountList.State
-		public var accounts: IdentifiedArrayOf<Profile.Network.Account> {
-			.init(uniqueElements: accountList.accounts.map(\.account))
-		}
+		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State>
 
-		// MARK: - Destinations
+		// MARK: - Destination
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
-		public init(
-			babylonAccountRecoveryIsNeeded: Bool
-		) {
-			self.babylonAccountRecoveryIsNeeded = babylonAccountRecoveryIsNeeded
+		public init() {
 			self.header = .init()
-			self.accountList = .init()
+			self.accountRows = []
 			self.destination = nil
 		}
 	}
@@ -36,28 +29,33 @@ public struct Home: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		public typealias HasAccessToMnemonic = Bool
 		case accountsLoadedResult(TaskResult<IdentifiedArrayOf<Profile.Network.Account>>)
-		case mnemonicAccessResult([FactorSourceID.FromHash: HasAccessToMnemonic])
+		case exportMnemonic(account: Profile.Network.Account)
+		case importMnemonic
 	}
 
 	public enum ChildAction: Sendable, Equatable {
 		case header(Header.Action)
-		case accountList(AccountList.Action)
-		case destination(PresentationAction<Destinations.Action>)
+		case account(id: Home.AccountRow.State.ID, action: Home.AccountRow.Action)
+		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case displaySettings
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case accountDetails(AccountDetails.State)
 			case createAccount(CreateAccountCoordinator.State)
+			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
+			case exportMnemonic(ExportMnemonic.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case accountDetails(AccountDetails.Action)
 			case createAccount(CreateAccountCoordinator.Action)
+			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
+			case exportMnemonic(ExportMnemonic.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -67,9 +65,16 @@ public struct Home: Sendable, FeatureReducer {
 			Scope(state: /State.createAccount, action: /Action.createAccount) {
 				CreateAccountCoordinator()
 			}
+			Scope(state: /State.importMnemonics, action: /Action.importMnemonics) {
+				ImportMnemonicsFlowCoordinator()
+			}
+			Scope(state: /State.exportMnemonic, action: /Action.exportMnemonic) {
+				ExportMnemonic()
+			}
 		}
 	}
 
+	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
@@ -81,12 +86,12 @@ public struct Home: Sendable, FeatureReducer {
 		Scope(state: \.header, action: /Action.child .. ChildAction.header) {
 			Header()
 		}
-		Scope(state: \.accountList, action: /Action.child .. ChildAction.accountList) {
-			AccountList()
-		}
 		Reduce(core)
+			.forEach(\.accountRows, action: /Action.child .. ChildAction.account) {
+				Home.AccountRow()
+			}
 			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+				Destination()
 			}
 	}
 
@@ -128,10 +133,10 @@ public struct Home: Sendable, FeatureReducer {
 				return .none
 			}
 
-			state.accountList = .init(accounts: accounts)
-			let accountAddresses = state.accounts.map(\.address)
-			return .run { _ in
-				_ = try await accountPortfoliosClient.fetchAccountPortfolios(accountAddresses, false)
+			state.accountRows = accounts.map { Home.AccountRow.State(account: $0) }.asIdentifiable()
+
+			return .run { [addresses = state.accountAddresses] _ in
+				_ = try await accountPortfoliosClient.fetchAccountPortfolios(addresses, false)
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
@@ -140,88 +145,108 @@ public struct Home: Sendable, FeatureReducer {
 		case let .accountsLoadedResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
-		case let .mnemonicAccessResult(result):
-			for account in state.accountList.accounts {
-				guard var deviceFactorSourceControlled = account.deviceFactorSourceControlled else { continue }
 
-				let hasAccessToMnemonic = result[deviceFactorSourceControlled.factorSourceID] ?? false
-				let needToImportMnemonic = if account.isLegacyAccount {
-					!hasAccessToMnemonic
-				} else {
-					state.babylonAccountRecoveryIsNeeded || !hasAccessToMnemonic
-				}
-				deviceFactorSourceControlled.needToImportMnemonicForThisAccount = needToImportMnemonic
-				state.accountList.accounts[id: account.id]?.deviceFactorSourceControlled = deviceFactorSourceControlled
-			}
-			return .none
+		case let .exportMnemonic(account):
+			return exportMnemonic(controlling: account, state: &state)
+
+		case .importMnemonic:
+			return importMnemonics(state: &state)
 		}
 	}
 
 	private func checkAccountsAccessToMnemonic(state: State) -> Effect<Action> {
-		let factorSourceIDs = Set(state.accounts.compactMap(\.deviceFactorSourceID))
-		guard !factorSourceIDs.isEmpty else {
-			return .none
-		}
-
-		return .run { send in
-			let result = await factorSourceIDs.asyncMap { factorSourceID in
-				let hasAccessToMnemonic = await secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSourceID)
-				return (factorSourceID: factorSourceID, hasAccessToMnemonic: hasAccessToMnemonic)
-			}
-
-			let dictionary = result.reduce(into: [:]) {
-				$0[$1.factorSourceID] = $1.hasAccessToMnemonic
-			}
-
-			await send(.internal(.mnemonicAccessResult(dictionary)))
-		}
+		.merge(state.accountRows.map {
+			.send(.child(.account(
+				id: $0.id,
+				action: .internal(.checkAccountAccessToMnemonic)
+			)))
+		})
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .accountList(.delegate(.displayAccountDetails(
-			account,
-			needToBackupMnemonicForThisAccount,
-			needToImportMnemonicForThisAccount
-		))):
+		case let .account(id, action: .delegate(delegateAction)):
+			guard let accountRow = state.accountRows[id: id] else { return .none }
+			let account = accountRow.account
+			switch delegateAction {
+			case .openDetails:
+				state.destination = .accountDetails(.init(accountWithInfo: accountRow.accountWithInfo))
+				return .none
+			case .exportMnemonic:
+				return exportMnemonic(controlling: account, state: &state)
+			case .importMnemonics:
+				return importMnemonics(state: &state)
+			}
 
-			state.destination = .accountDetails(.init(
-				for: account,
-				importMnemonicPrompt: .init(needed: needToImportMnemonicForThisAccount),
-				exportMnemonicPrompt: .init(needed: needToBackupMnemonicForThisAccount)
-			))
-			return .none
+		case let .destination(.presented(.accountDetails(.delegate(.exportMnemonic(controlledAccount))))):
+			return dismissAccountDetails(then: .exportMnemonic(account: controlledAccount), &state)
 
-		case let .accountList(.delegate(.backUpMnemonic(controllingAccount))):
-			state.destination = .accountDetails(.init(
-				for: controllingAccount,
-				exportMnemonicPrompt: .init(needed: true, deepLinkTo: true)
-			))
-			return .none
-
-		case let .accountList(.delegate(.importMnemonics(account))):
-			state.destination = .accountDetails(.init(
-				for: account,
-				importMnemonicPrompt: .init(needed: true, deepLinkTo: true)
-			))
-			return .none
+		case .destination(.presented(.accountDetails(.delegate(.importMnemonics)))):
+			return dismissAccountDetails(then: .importMnemonic, &state)
 
 		case .destination(.presented(.accountDetails(.delegate(.dismiss)))):
 			state.destination = nil
 			return .none
 
-		case let .destination(.presented(.accountDetails(.delegate(.importedMnemonic(factorSourceID))))):
-			/// Check if the imported mnemonic is a babylon one, so we can reset `babylonAccountRecoveryIsNeeded` flag
-			guard let account = state.accounts.first(where: { factorSourceID == $0.deviceFactorSourceID?.embed() }) else {
+		case let .destination(.presented(.exportMnemonic(.delegate(delegateAction)))):
+			state.destination = nil
+			switch delegateAction {
+			case .doneViewing:
+				return checkAccountsAccessToMnemonic(state: state)
+
+			case .notPersisted, .persistedMnemonicInKeychainOnly, .persistedNewFactorSourceInProfile:
+				assertionFailure("Expected 'doneViewing' action")
 				return .none
 			}
-			if !account.isOlympiaAccount {
-				state.babylonAccountRecoveryIsNeeded = false
+
+		case let .destination(.presented(.importMnemonics(.delegate(delegateAction)))):
+			state.destination = nil
+			switch delegateAction {
+			case .finishedEarly: break
+			case let .finishedImportingMnemonics(_, imported):
+				if !imported.isEmpty {
+					return checkAccountsAccessToMnemonic(state: state)
+				}
 			}
 			return .none
 
 		default:
 			return .none
 		}
+	}
+
+	private func dismissAccountDetails(then internalAction: InternalAction, _ state: inout State) -> Effect<Action> {
+		state.destination = nil
+		return delayedMediumEffect(internal: internalAction)
+	}
+
+	private func importMnemonics(state: inout State) -> Effect<Action> {
+		state.destination = .importMnemonics(.init())
+		return .none
+	}
+
+	private func exportMnemonic(
+		controlling account: Profile.Network.Account,
+		state: inout State
+	) -> Effect<Action> {
+		exportMnemonic(
+			controlling: account,
+			onSuccess: {
+				state.destination = .exportMnemonic(.export(
+					$0,
+					title: L10n.RevealSeedPhrase.title
+				))
+			}
+		)
+	}
+}
+
+extension Home.State {
+	public var accounts: IdentifiedArrayOf<Profile.Network.Account> {
+		accountRows.map(\.account).asIdentifiable()
+	}
+
+	public var accountAddresses: [AccountAddress] {
+		accounts.map(\.address)
 	}
 }

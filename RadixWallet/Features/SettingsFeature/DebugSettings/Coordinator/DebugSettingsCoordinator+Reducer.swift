@@ -21,6 +21,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 		case debugInspectProfileButtonTapped
 		case debugUserDefaultsContentsButtonTapped
 		case debugTestKeychainButtonTapped
+		case debugKeychainContentsButtonTapped
 		case securityStructureConfigsButtonTapped
 	}
 
@@ -39,6 +40,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			case debugManageFactorSources(DebugManageFactorSources.State)
 			#if DEBUG
 			case debugKeychainTest(DebugKeychainTest.State)
+			case debugKeychainContents(DebugKeychainContents.State)
 			#endif // DEBUG
 			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.State)
 		}
@@ -48,6 +50,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			case debugInspectProfile(DebugInspectProfile.Action)
 			#if DEBUG
 			case debugKeychainTest(DebugKeychainTest.Action)
+			case debugKeychainContents(DebugKeychainContents.Action)
 			#endif // DEBUG
 			case debugManageFactorSources(DebugManageFactorSources.Action)
 			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.Action)
@@ -63,6 +66,9 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			#if DEBUG
 			Scope(state: /State.debugKeychainTest, action: /Action.debugKeychainTest) {
 				DebugKeychainTest()
+			}
+			Scope(state: /State.debugKeychainContents, action: /Action.debugKeychainContents) {
+				DebugKeychainContents()
 			}
 			#endif // DEBUG
 			Scope(state: /State.debugManageFactorSources, action: /Action.debugManageFactorSources) {
@@ -103,6 +109,12 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 		case .debugTestKeychainButtonTapped:
 			#if DEBUG
 			state.destination = .debugKeychainTest(.init())
+			#endif // DEBUG
+			return .none
+
+		case .debugKeychainContentsButtonTapped:
+			#if DEBUG
+			state.destination = .debugKeychainContents(.init())
 			#endif // DEBUG
 			return .none
 
