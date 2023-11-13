@@ -101,53 +101,51 @@ final class ProfileStoreNewProfileTests: TestCase {
 
 		await nearFutureFulfillment(of: deleteDeprecatedDeviceID_is_NOT_called)
 	}
+
+	func test__GIVEN_a_saved_deviceInfo__WHEN__init__THEN__deprecatedLoadDeviceID_is_not_called() async {
+		let deprecatedLoadDeviceID_is_NOT_called = expectation(description: "deprecatedLoadDeviceID is NOT called")
+		deprecatedLoadDeviceID_is_NOT_called.isInverted = true // We expected to NOT be called.
+
+		withTestClients {
+			// GIVEN a saved_ device info
+			$0.secureStorageClient.loadDeviceInfo = { .testValue }
+			then(&$0)
+		} operation: {
+			// WHEN ProfileStore.init()
+			ProfileStore.init()
+		}
+
+		func then(_ d: inout DependencyValues) {
+			d.secureStorageClient.deprecatedLoadDeviceID = {
+				// THEN deprecatedLoadDeviceID is not called
+				deprecatedLoadDeviceID_is_NOT_called.fulfill()
+				return nil
+			}
+		}
+
+		await nearFutureFulfillment(of: deprecatedLoadDeviceID_is_NOT_called)
+	}
+
+	func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__x_is_migrated_to_DeviceInfo_and_saved() {
+		let x: DeviceID = 0xDEAD
+		withTestClients {
+			// GIVEN no device info
+			$0.noDeviceInfo()
+			$0.secureStorageClient.deprecatedLoadDeviceID = { x }
+			then(&$0)
+		} operation: {
+			// WHEN ProfileStore.init()
+			ProfileStore.init()
+		}
+
+		func then(_ d: inout DependencyValues) {
+			d.secureStorageClient.saveDeviceInfo = {
+				// THEN x is migrated to DeviceInfo and saved
+				XCTAssertNoDifference($0.id, x)
+			}
+		}
+	}
 	/*
-	 func test__GIVEN_a_saved_deviceInfo__WHEN__init__THEN__deprecatedLoadDeviceID_is_not_called() async throws {
-	 	try await withTimeLimit {
-	 		let deprecatedLoadDeviceID_is_NOT_called = self.expectation(description: "deprecatedLoadDeviceID is NOT called")
-	 		deprecatedLoadDeviceID_is_NOT_called.isInverted = true // We expected to NOT be called.
-
-	 		await withTestClients {
-	 			// GIVEN a saved_ device info
-	 			$0.secureStorageClient.loadDeviceInfo = { .testValue }
-	 			then(&$0)
-	 		} operation: {
-	 			// WHEN ProfileStore.init()
-	 			ProfileStore.init()
-	 		}
-
-	 		func then(_ d: inout DependencyValues) {
-	 			d.secureStorageClient.deprecatedLoadDeviceID = {
-	 				// THEN deprecatedLoadDeviceID is not called
-	 				deprecatedLoadDeviceID_is_NOT_called.fulfill()
-	 				return nil
-	 			}
-	 		}
-
-	 		await self.nearFutureFulfillment(of: deprecatedLoadDeviceID_is_NOT_called)
-	 	}
-	 }
-
-	 func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__x_is_migrated_to_DeviceInfo_and_saved() {
-	 	let x: DeviceID = 0xDEAD
-	 	withTestClients {
-	 		// GIVEN no device info
-	 		$0.noDeviceInfo()
-	 		$0.secureStorageClient.deprecatedLoadDeviceID = { x }
-	 		then(&$0)
-	 	} operation: {
-	 		// WHEN ProfileStore.init()
-	 		ProfileStore.init()
-	 	}
-
-	 	func then(_ d: inout DependencyValues) {
-	 		d.secureStorageClient.saveDeviceInfo = {
-	 			// THEN x is migrated to DeviceInfo and saved
-	 			XCTAssertNoDifference($0.id, x)
-	 		}
-	 	}
-	 }
-
 	 func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__x_is_migrated_to_DeviceInfo_and_used() async throws {
 	 	try await withTimeLimit {
 	 		let x: DeviceID = 0xDEAD
