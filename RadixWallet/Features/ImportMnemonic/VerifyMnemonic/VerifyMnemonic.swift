@@ -14,28 +14,28 @@ public struct VerifyMnemonic: Sendable, FeatureReducer {
 
 		public init(mnemonic: Mnemonic) {
 			self.mnemonic = mnemonic
+
 			let identifiedWords = mnemonic.words.identifiablyEnumerated()
 			let checksumWord = identifiedWords.last!
 			let randomWords = identifiedWords
 				.dropLast() // without checksum word
 				.shuffled() // randomize
-				.prefix(Self.numberOfWordsToConfirm) // Take the required number of words
-				.sorted { $0.offset < $1.offset } // Put words in order after shuffling
+				.prefix(Self.numberOfWordsToConfirm) // take the required number of words
+				.sorted { $0.offset < $1.offset } // sort after shuffling
 
 			self.wordsToConfirm = .init(randomWords + [checksumWord])!
 			self.enteredWords = wordsToConfirm.rawValue.map {
 				OffsetIdentified(offset: $0.offset, element: "")
 			}.asIdentifiable()
-
 			self.focusedField = wordsToConfirm.first?.offset
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case wordEntered(OffsetIdentified<String>)
-		case textFieldFocused(Int?)
+		case wordChanged(OffsetIdentified<String>)
 		case wordSubmitted
-		case confirmSeedPhraseTapped
+		case textFieldFocused(Int?)
+		case confirmSeedPhraseButtonTapped
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -46,12 +46,13 @@ public struct VerifyMnemonic: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case let .wordEntered(identifiedWord):
+		case let .wordChanged(identifiedWord):
 			// reset the invalidMnemonic state
 			state.invalidMnemonic = false
 			state.enteredWords.updateOrAppend(identifiedWord)
 			return .none
 		case let .textFieldFocused(focus):
+			// Don't set focus to nil if it will be changed to another field
 			if focus == nil {
 				let didEnterAllWords = state.enteredWords.reduce(true) { partialResult, word in
 					partialResult && !word.element.isEmpty
@@ -72,7 +73,7 @@ public struct VerifyMnemonic: Sendable, FeatureReducer {
 			state.focusedField = nextWord?.offset
 			return .none
 
-		case .confirmSeedPhraseTapped:
+		case .confirmSeedPhraseButtonTapped:
 			let mnemonicMatches = zip(
 				state.enteredWords.elements,
 				state.wordsToConfirm.rawValue.elements

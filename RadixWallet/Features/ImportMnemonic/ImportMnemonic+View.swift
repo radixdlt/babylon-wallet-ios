@@ -241,8 +241,8 @@ extension SwiftUI.View {
 			store: destinationStore,
 			state: /ImportMnemonic.Destinations.State.verifyMnemonic,
 			action: ImportMnemonic.Destinations.Action.verifyMnemonic,
-			destination: {
-				VerifyMnemonic.View(store: $0)
+			destination: { childStore in
+				VerifyMnemonic.View(store: childStore)
 			}
 		)
 	}

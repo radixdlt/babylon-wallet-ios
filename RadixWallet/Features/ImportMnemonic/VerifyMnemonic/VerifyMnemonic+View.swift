@@ -56,6 +56,7 @@ extension VerifyMnemonic {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium1) {
+						// FIXME: Strings
 						Text("Confirm you have written down the seed phrase by entering the missing words below.")
 							.foregroundStyle(.app.gray1)
 							.textStyle(.body1Regular)
@@ -64,11 +65,12 @@ extension VerifyMnemonic {
 						wordsGrid(viewStore: viewStore)
 
 						if viewStore.verificationFailed {
+							// FIXME: Strings
 							WarningErrorView(text: "Incorrect seed phrase", type: .error)
 						}
 
-						Button("Confirm seed phrase") {
-							viewStore.send(.confirmSeedPhraseTapped)
+						Button(L10n.Common.confirm) {
+							viewStore.send(.confirmSeedPhraseButtonTapped)
 						}
 						.buttonStyle(.primaryRectangular)
 					}
@@ -76,6 +78,7 @@ extension VerifyMnemonic {
 					.padding(.bottom, .large3)
 				}
 			}
+			// FIXME: Strings
 			.navigationTitle("Confirm seed phrase")
 		}
 
@@ -125,7 +128,7 @@ extension VerifyMnemonic {
 				text: .init(
 					get: { viewState.displayText },
 					set: {
-						viewStore.send(.wordEntered(
+						viewStore.send(.wordChanged(
 							.init(
 								offset: viewState.word.offset,
 								element: $0.lowercased().trimmingWhitespacesAndNewlines()

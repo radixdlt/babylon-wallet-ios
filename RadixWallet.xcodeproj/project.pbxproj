@@ -7836,7 +7836,6 @@
 				48CFC2DA2ADC10D900E77A5C /* ManageSecurityStructureCoordinator+View.swift in Sources */,
 				48CFC3BB2ADC10D900E77A5C /* Encoding.swift in Sources */,
 				48CFC3082ADC10D900E77A5C /* DisplayMnemonics+View.swift in Sources */,
-				83ED01C82AFCD39D00F31D77 /* VerifyMnemonic+View.swift in Sources */,
 				48CFC4492ADC10DA00E77A5C /* AuthorizedDappsClient+Test.swift in Sources */,
 				48CFC4EF2ADC10DA00E77A5C /* MetadataDecimalArrayValue.swift in Sources */,
 				48CFC38C2ADC10D900E77A5C /* SignatureWithPublicKey+Utils.swift in Sources */,
