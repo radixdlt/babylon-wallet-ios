@@ -52,30 +52,30 @@ final class ProfileStoreNewProfileTests: TestCase {
 		}
 		wait(for: [deprecatedLoadDeviceID_is_called])
 	}
+
+	func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__deleteDeprecatedDeviceID_is_called() async throws {
+		let deleteDeprecatedDeviceID_is_called = expectation(description: "deleteDeprecatedDeviceID is called")
+		let userDefaults = UserDefaults.Dependency.ephemeral()
+		withTestClients(userDefaults: userDefaults) {
+			// GIVEN no device info
+			$0.noDeviceInfo()
+			$0.secureStorageClient.deprecatedLoadDeviceID = { 0xDEAD }
+			then(&$0)
+		} operation: {
+			// WHEN ProfileStore.init()
+			ProfileStore.init()
+		}
+
+		func then(_ d: inout DependencyValues) {
+			d.secureStorageClient.deleteDeprecatedDeviceID = {
+				// THEN deleteDeprecatedDeviceID is called
+				deleteDeprecatedDeviceID_is_called.fulfill()
+			}
+		}
+
+		await nearFutureFulfillment(of: deleteDeprecatedDeviceID_is_called)
+	}
 	/*
-	 func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__deleteDeprecatedDeviceID_is_called() async throws {
-	 	let deleteDeprecatedDeviceID_is_called = expectation(description: "deleteDeprecatedDeviceID is called")
-	 	let userDefaults = UserDefaults.Dependency.ephemeral()
-	 	withTestClients(userDefaults: userDefaults) {
-	 		// GIVEN no device info
-	 		$0.noDeviceInfo()
-	 		$0.secureStorageClient.deprecatedLoadDeviceID = { 0xDEAD }
-	 		then(&$0)
-	 	} operation: {
-	 		// WHEN ProfileStore.init()
-	 		ProfileStore.init()
-	 	}
-
-	 	func then(_ d: inout DependencyValues) {
-	 		d.secureStorageClient.deleteDeprecatedDeviceID = {
-	 			// THEN deleteDeprecatedDeviceID is called
-	 			deleteDeprecatedDeviceID_is_called.fulfill()
-	 		}
-	 	}
-
-	 	await nearFutureFulfillment(of: deleteDeprecatedDeviceID_is_called)
-	 }
-
 	 func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__deleteDeprecatedDeviceID_is_not_called_if_failed_to_save_migrated_deviceInfo() async throws {
 	 	try await withTimeLimit {
 	 		let deleteDeprecatedDeviceID_is_NOT_called = self.expectation(description: "deleteDeprecatedDeviceID is NOT called")
