@@ -145,40 +145,40 @@ final class ProfileStoreNewProfileTests: TestCase {
 			}
 		}
 	}
+
+	func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__x_is_migrated_to_DeviceInfo_and_used() async throws {
+		try await withTimeLimit {
+			let x: DeviceID = 0xDEAD
+
+			let profile = await withTestClients {
+				// GIVEN no device info
+				$0.noDeviceInfo()
+				$0.secureStorageClient.deprecatedLoadDeviceID = { x }
+			} operation: {
+				// WHEN ProfileStore.init()
+				await ProfileStore.init().profile
+			}
+
+			// THEN x is migrated to DeviceInfo and used
+			XCTAssertNoDifference(profile.header.creatingDevice.id, x)
+		}
+	}
+
+	func test__GIVEN__no_profile__WHEN__init__THEN__new_profile_without_network_is_used() async throws {
+		try await withTimeLimit {
+			let newProfile = await withTestClients {
+				// GIVEN no profile
+				$0.noProfile()
+			} operation: {
+				// WHEN ProfileStore.init()
+				await ProfileStore.init().profile
+			}
+
+			// THEN new profile without network is used
+			XCTAssertTrue(newProfile.networks.isEmpty)
+		}
+	}
 	/*
-	 func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__x_is_migrated_to_DeviceInfo_and_used() async throws {
-	 	try await withTimeLimit {
-	 		let x: DeviceID = 0xDEAD
-
-	 		let profile = await withTestClients {
-	 			// GIVEN no device info
-	 			$0.noDeviceInfo()
-	 			$0.secureStorageClient.deprecatedLoadDeviceID = { x }
-	 		} operation: {
-	 			// WHEN ProfileStore.init()
-	 			await ProfileStore.init().profile
-	 		}
-
-	 		// THEN x is migrated to DeviceInfo and used
-	 		XCTAssertNoDifference(profile.header.creatingDevice.id, x)
-	 	}
-	 }
-
-	 func test__GIVEN__no_profile__WHEN__init__THEN__new_profile_without_network_is_used() async throws {
-	 	try await withTimeLimit {
-	 		let newProfile = await withTestClients {
-	 			// GIVEN no profile
-	 			$0.noProfile()
-	 		} operation: {
-	 			// WHEN ProfileStore.init()
-	 			await ProfileStore.init().profile
-	 		}
-
-	 		// THEN new profile without network is used
-	 		XCTAssertTrue(newProfile.networks.isEmpty)
-	 	}
-	 }
-
 	 func test__GIVEN__no_profile__WHEN__import_profile__THEN__imported_profile_is_used() async throws {
 	 	try await withTimeLimit(.normal) {
 	 		let usedProfile = try await withTestClients {
