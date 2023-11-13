@@ -319,68 +319,68 @@ final class ProfileStoreNewProfileTests: TestCase {
 			}
 		}
 	}
+
+	func test__GIVEN__no_profile__WHEN__init__THEN__24_word_mnemonic_is_generated() throws {
+		withTestClients {
+			// GIVEN no profile
+			$0.noProfile()
+			then(&$0)
+		} operation: {
+			// WHEN ProfileStore.init()
+			ProfileStore.init()
+		}
+
+		func then(_ d: inout DependencyValues) {
+			d.mnemonicClient.generate = { wordCount, _ in
+				// THEN 24 word mnemonic is generated
+				XCTAssertNoDifference(wordCount, .twentyFour)
+				return try Mnemonic(wordCount: wordCount, language: .english)
+			}
+		}
+	}
+
+	func test__GIVEN__no_profile__WHEN__init__THEN__profile_uses_newly_generated_DeviceFactorSource() async throws {
+		try await withTimeLimit {
+			let profile = await withTestClients {
+				// GIVEN no profile
+				$0.noProfile()
+
+				$0.mnemonicClient.generate = { _, _ in
+					"zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong"
+				}
+			} operation: {
+				// WHEN ProfileStore.init()
+				await ProfileStore.init().profile
+			}
+
+			XCTAssertNoDifference(
+				profile.factorSources.first.id.description,
+				// THEN profile uses newly generated DeviceFactorSource
+				"device:09a501e4fafc7389202a82a3237a405ed191cdb8a4010124ff8e2c9259af1327"
+			)
+		}
+	}
+
+	func test__GIVEN__no_profile_but_deviceInfo_WHEN__init__THEN__profile_creatingDevice_equals_deviceInfo() async throws {
+		try await withTimeLimit {
+			let deviceInfo = DeviceInfo.testValue
+			let profile = await withTestClients {
+				// GIVEN no profile
+				$0.noProfile() // but deviceInfo
+				$0.secureStorageClient.loadDeviceInfo = { deviceInfo }
+			} operation: {
+				// WHEN ProfileStore.init()
+				await ProfileStore.init().profile
+			}
+
+			// THEN profile creatingDevice == deviceInfo
+			XCTAssertNoDifference(
+				profile.header.creatingDevice,
+				deviceInfo
+			)
+		}
+	}
 	/*
-	 func test__GIVEN__no_profile__WHEN__init__THEN__24_word_mnemonic_is_generated() throws {
-	 	withTestClients {
-	 		// GIVEN no profile
-	 		$0.noProfile()
-	 		then(&$0)
-	 	} operation: {
-	 		// WHEN ProfileStore.init()
-	 		ProfileStore.init()
-	 	}
-
-	 	func then(_ d: inout DependencyValues) {
-	 		d.mnemonicClient.generate = { wordCount, _ in
-	 			// THEN 24 word mnemonic is generated
-	 			XCTAssertNoDifference(wordCount, .twentyFour)
-	 			return try Mnemonic(wordCount: wordCount, language: .english)
-	 		}
-	 	}
-	 }
-
-	 func test__GIVEN__no_profile__WHEN__init__THEN__profile_uses_newly_generated_DeviceFactorSource() async throws {
-	 	try await withTimeLimit {
-	 		let profile = await withTestClients {
-	 			// GIVEN no profile
-	 			$0.noProfile()
-
-	 			$0.mnemonicClient.generate = { _, _ in
-	 				"zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong"
-	 			}
-	 		} operation: {
-	 			// WHEN ProfileStore.init()
-	 			await ProfileStore.init().profile
-	 		}
-
-	 		XCTAssertNoDifference(
-	 			profile.factorSources.first.id.description,
-	 			// THEN profile uses newly generated DeviceFactorSource
-	 			"device:09a501e4fafc7389202a82a3237a405ed191cdb8a4010124ff8e2c9259af1327"
-	 		)
-	 	}
-	 }
-
-	 func test__GIVEN__no_profile_but_deviceInfo_WHEN__init__THEN__profile_creatingDevice_equals_deviceInfo() async throws {
-	 	try await withTimeLimit {
-	 		let deviceInfo = DeviceInfo.testValue
-	 		let profile = await withTestClients {
-	 			// GIVEN no profile
-	 			$0.noProfile() // but deviceInfo
-	 			$0.secureStorageClient.loadDeviceInfo = { deviceInfo }
-	 		} operation: {
-	 			// WHEN ProfileStore.init()
-	 			await ProfileStore.init().profile
-	 		}
-
-	 		// THEN profile creatingDevice == deviceInfo
-	 		XCTAssertNoDifference(
-	 			profile.header.creatingDevice,
-	 			deviceInfo
-	 		)
-	 	}
-	 }
-
 	 func test__GIVEN__no_profile__WHEN__init__THEN__profile_lastUsedOnDevice_equals_creatingDevice() async throws {
 	 	try await withTimeLimit {
 	 		let profile = await withTestClients {
