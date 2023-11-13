@@ -20,6 +20,21 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return wordCount
 		}
 
+		public var factorSourceID: FactorSourceID.FromHash? {
+			guard
+				let readonlyMode,
+				let mnemonic,
+				case let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: bip39Passphrase)
+			else {
+				return nil
+			}
+
+			return try? FactorSourceID.FromHash(
+				kind: readonlyMode.factorSourceKind,
+				mnemonicWithPassphrase: mnemonicWithPassphrase
+			)
+		}
+
 		public mutating func changeWordCount(by delta: Int) {
 			let positiveDelta = abs(delta)
 			precondition(positiveDelta.isMultiple(of: ImportMnemonic.wordsPerRow))
@@ -251,19 +266,21 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case offDeviceMnemonicInfoPrompt(OffDeviceMnemonicInfo.State)
-			case markMnemonicAsBackedUp(AlertState<Action.MarkMnemonicAsBackedUpOrNot>)
+			case backupConfimartion(AlertState<Action.BackupConfirmation>)
 			case onContinueWarning(AlertState<Action.OnContinueWarning>)
+			case verifyMnemonic(VerifyMnemonic.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case offDeviceMnemonicInfoPrompt(OffDeviceMnemonicInfo.Action)
 
-			case markMnemonicAsBackedUp(MarkMnemonicAsBackedUpOrNot)
+			case backupConfimartion(BackupConfirmation)
+			case verifyMnemonic(VerifyMnemonic.Action)
 
 			case onContinueWarning(OnContinueWarning)
 
-			public enum MarkMnemonicAsBackedUpOrNot: Sendable, Hashable {
-				case userHasBackedUp(FactorSourceID.FromHash)
+			public enum BackupConfirmation: Sendable, Hashable {
+				case userHasBackedUp
 				case userHasNotBackedUp
 			}
 
@@ -273,11 +290,14 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 
 		public var body: some Reducer<State, Action> {
-			Scope(state: /State.markMnemonicAsBackedUp, action: /Action.markMnemonicAsBackedUp) {
+			Scope(state: /State.backupConfimartion, action: /Action.backupConfimartion) {
 				EmptyReducer()
 			}
 			Scope(state: /State.offDeviceMnemonicInfoPrompt, action: /Action.offDeviceMnemonicInfoPrompt) {
 				OffDeviceMnemonicInfo()
+			}
+			Scope(state: /State.verifyMnemonic, action: /Action.verifyMnemonic) {
+				VerifyMnemonic()
 			}
 		}
 	}
@@ -369,17 +389,14 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				)))
 			}
 
-		case let .destination(.presented(.markMnemonicAsBackedUp(.userHasBackedUp(factorSourceID)))):
-			return .run { send in
-				try userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
-				await send(.delegate(.doneViewing(markedMnemonicAsBackedUp: true)))
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to save mnemonic as backed up")
-				errorQueue.schedule(error)
+		case .destination(.presented(.backupConfimartion(.userHasBackedUp))):
+			guard let mnemonic = state.mnemonic else {
+				return .none
 			}
+			state.destination = .verifyMnemonic(.init(mnemonic: mnemonic))
+			return .none
 
-		case .destination(.presented(.markMnemonicAsBackedUp(.userHasNotBackedUp))):
-			loggerGlobal.notice("User have not backed up")
+		case .destination(.presented(.backupConfimartion(.userHasNotBackedUp))):
 			return .send(.delegate(.doneViewing(markedMnemonicAsBackedUp: false)))
 
 		case .destination(.presented(.onContinueWarning(.buttonTapped))):
@@ -391,6 +408,17 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			}
 			return continueWithMnemonic(mnemonic: mnemonic, in: &state)
 
+		case .destination(.presented(.verifyMnemonic(.delegate(.mnemonicVerified)))):
+			guard let factorSourceID = state.factorSourceID else {
+				return .none
+			}
+			return .run { send in
+				try userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
+				await send(.delegate(.doneViewing(markedMnemonicAsBackedUp: true)))
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to save mnemonic as backed up")
+				errorQueue.schedule(error)
+			}
 		default:
 			return .none
 		}
@@ -505,15 +533,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	}
 
 	private func markAsBackedUpIfNeeded(_ state: inout State) -> Effect<Action> {
-		guard
-			let readonlyMode = state.readonlyMode,
-			let mnemonic = state.mnemonic,
-			case let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: state.bip39Passphrase),
-			let factorSourceID = try? FactorSourceID.FromHash(
-				kind: readonlyMode.factorSourceKind,
-				mnemonicWithPassphrase: mnemonicWithPassphrase
-			)
-		else {
+		guard let factorSourceID = state.factorSourceID else {
 			return .none
 		}
 
@@ -521,7 +541,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		if listOfBackedUpMnemonics.contains(factorSourceID) {
 			return .send(.delegate(.doneViewing(markedMnemonicAsBackedUp: nil))) // user has already marked this mnemonic as "backed up"
 		} else {
-			state.destination = .askUserIfSheHasBackedUpMnemonic(factorSourceID)
+			state.destination = .askUserIfSheHasBackedUpMnemonic()
 			return .none
 		}
 	}
@@ -639,11 +659,11 @@ extension ImportMnemonic {
 }
 
 extension ImportMnemonic.Destinations.State {
-	fileprivate static func askUserIfSheHasBackedUpMnemonic(_ factorSourceID: FactorSourceID.FromHash) -> Self {
-		.markMnemonicAsBackedUp(.init(
+	fileprivate static func askUserIfSheHasBackedUpMnemonic() -> Self {
+		.backupConfimartion(.init(
 			title: { TextState(L10n.ImportMnemonic.BackedUpAlert.title) },
 			actions: {
-				ButtonState(action: .userHasBackedUp(factorSourceID), label: { TextState(L10n.ImportMnemonic.BackedUpAlert.confirmAction) })
+				ButtonState(action: .userHasBackedUp, label: { TextState(L10n.ImportMnemonic.BackedUpAlert.confirmAction) })
 				ButtonState(action: .userHasNotBackedUp, label: { TextState(L10n.ImportMnemonic.BackedUpAlert.noAction) })
 			},
 			message: { TextState(L10n.ImportMnemonic.BackedUpAlert.message) }

@@ -318,38 +318,6 @@ private extension AccountList.Row.ViewState {
 	}
 }
 
-extension Collection {
-	public func identifiablyEnumerated() -> [OffsetIdentified<Element>] {
-		enumerated().map(OffsetIdentified.init)
-	}
-}
-
-extension Collection where Element: Identifiable {
-	public func identified() throws -> IdentifiedArrayOf<Element> {
-		guard Set(map(\.id)).count == count else {
-			throw IdentifiedArrayError.clashingIDs
-		}
-		return .init(uniqueElements: self)
-	}
-
-	public func uniqueIdentified() -> IdentifiedArrayOf<Element> {
-		.init(uncheckedUniqueElements: self)
-	}
-}
-
-// MARK: - IdentifiedArrayError
-public enum IdentifiedArrayError: Error {
-	case clashingIDs
-}
-
-// MARK: - OffsetIdentified
-public struct OffsetIdentified<Element>: Identifiable {
-	public var id: Int { offset }
-
-	public let offset: Int
-	public let element: Element
-}
-
 extension AccountList.Row.ViewState.AccountTag {
 	var display: String {
 		switch self {

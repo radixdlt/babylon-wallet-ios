@@ -145,7 +145,7 @@ private extension View {
 			state: /AccountDetails.Destinations.State.exportMnemonic,
 			action: AccountDetails.Destinations.Action.exportMnemonic,
 			content: { childStore in
-				NavigationView {
+				NavigationStack {
 					ImportMnemonic.View(store: childStore)
 						.navigationTitle(L10n.ImportMnemonic.navigationTitleBackup)
 				}
@@ -158,7 +158,9 @@ private extension View {
 			store: destinationStore,
 			state: /AccountDetails.Destinations.State.importMnemonics,
 			action: AccountDetails.Destinations.Action.importMnemonics,
-			content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
+			content: {
+				ImportMnemonicsFlowCoordinator.View(store: $0)
+			}
 		)
 	}
 }

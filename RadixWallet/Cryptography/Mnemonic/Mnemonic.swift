@@ -2,7 +2,8 @@ import CryptoKit
 
 // MARK: - Mnemonic
 public struct Mnemonic: Sendable, Hashable, CustomDebugStringConvertible {
-	public let words: NonEmptyArray<BIP39.Word>
+	public typealias Word = BIP39.Word
+	public let words: NonEmptyArray<Word>
 	public let wordCount: BIP39.WordCount
 	public let language: BIP39.Language
 
@@ -45,7 +46,7 @@ extension Mnemonic {
 	}
 
 	public init(
-		words wordsMaybeEmpty: [BIP39.Word],
+		words wordsMaybeEmpty: [Word],
 		requireChecksum: Bool = true
 	) throws {
 		guard let words = NonEmptyArray(rawValue: wordsMaybeEmpty) else {
@@ -55,7 +56,7 @@ extension Mnemonic {
 	}
 
 	public init(
-		words: NonEmptyArray<BIP39.Word>,
+		words: NonEmptyArray<Word>,
 		requireChecksum: Bool = true
 	) throws {
 		// WordCount
