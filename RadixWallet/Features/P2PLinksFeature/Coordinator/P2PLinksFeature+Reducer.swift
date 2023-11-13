@@ -9,11 +9,11 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 		public var links: IdentifiedArrayOf<P2PLinkRow.State>
 
 		@PresentationState
-		public var destination: Destination.State?
+		public var destination: Destination_.State?
 
 		public init(
 			links: IdentifiedArrayOf<P2PLinkRow.State> = .init(),
-			destination: Destination.State? = nil
+			destination: Destination_.State? = nil
 		) {
 			self.links = links
 			self.destination = destination
@@ -34,13 +34,12 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
 		case connection(id: ConnectionPassword, action: P2PLinkRow.Action)
 	}
 
 	// MARK: Destination
 
-	public struct Destination: Sendable, Reducer {
+	public struct Destination_: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case newConnection(NewConnection.State)
 			case removeConnection(AlertState<Action.RemoveConnection>)
@@ -74,8 +73,8 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 			.forEach(\.links, action: /Action.child .. ChildAction.connection) {
 				P2PLinkRow()
 			}
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

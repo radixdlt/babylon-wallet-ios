@@ -7,7 +7,7 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 		public var sections: IdentifiedArrayOf<FungibleAssetList.Section.State>
 
 		@PresentationState
-		public var destination: Destination.State?
+		public var destination: Destination_.State?
 
 		public init(
 			sections: IdentifiedArrayOf<FungibleAssetList.Section.State> = []
@@ -17,11 +17,10 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
 		case section(FungibleAssetList.Section.State.ID, FungibleAssetList.Section.Action)
 	}
 
-	public struct Destination: Sendable, Reducer {
+	public struct Destination_: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case details(FungibleTokenDetails.State)
 		}
@@ -43,11 +42,11 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.forEach(\.sections, action: /Action.child .. ChildAction.section, element: {
+			.forEach(\.sections, action: /Action.child .. ChildAction.section) {
 				FungibleAssetList.Section()
-			})
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			}
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

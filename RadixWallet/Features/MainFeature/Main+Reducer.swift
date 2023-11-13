@@ -9,7 +9,7 @@ public struct Main: Sendable, FeatureReducer {
 
 		// MARK: - Destination
 		@PresentationState
-		public var destination: Destination.State?
+		public var destination: Destination_.State?
 
 		public init(home: Home.State) {
 			self.home = home
@@ -22,7 +22,6 @@ public struct Main: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case home(Home.Action)
-		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -33,7 +32,7 @@ public struct Main: Sendable, FeatureReducer {
 		case currentGatewayChanged(to: Radix.Gateway)
 	}
 
-	public struct Destination: Sendable, Reducer {
+	public struct Destination_: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case settings(Settings.State)
 		}
@@ -59,8 +58,8 @@ public struct Main: Sendable, FeatureReducer {
 			Home()
 		}
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

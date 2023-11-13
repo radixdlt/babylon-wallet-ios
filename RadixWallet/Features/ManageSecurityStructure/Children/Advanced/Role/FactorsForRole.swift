@@ -82,7 +82,7 @@ public struct FactorsForRole<R: RoleProtocol>: Sendable, FeatureReducer {
 		case confirmedRoleWithFactors(RoleOfTier<R, FactorSource>)
 	}
 
-	public struct Destination: Sendable, Reducer {
+	public struct Destination_: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case addThresholdFactor(SelectFactorKindThenFactor.State)
 			case addAdminFactor(SelectFactorKindThenFactor.State)
@@ -114,8 +114,8 @@ public struct FactorsForRole<R: RoleProtocol>: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

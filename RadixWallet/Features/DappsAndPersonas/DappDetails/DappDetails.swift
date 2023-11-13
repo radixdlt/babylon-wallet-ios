@@ -46,7 +46,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public var associatedDapps: [OnLedgerEntity.AssociatedDapp]? = nil
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		public var destination: Destination_.State? = nil
 
 		// Authorized dApp
 		public init(
@@ -55,7 +55,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			metadata: OnLedgerEntity.Metadata? = nil,
 			resources: Resources? = nil,
 			associatedDapps: [OnLedgerEntity.AssociatedDapp]? = nil,
-			destination: Destination.State? = nil
+			destination: Destination_.State? = nil
 		) {
 			self.context = .settings(context)
 			self.dAppDefinitionAddress = dApp.dAppDefinitionAddress
@@ -73,7 +73,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			metadata: OnLedgerEntity.Metadata? = nil,
 			resources: Resources? = nil,
 			associatedDapps: [OnLedgerEntity.AssociatedDapp]? = nil,
-			destination: Destination.State? = nil
+			destination: Destination_.State? = nil
 		) {
 			self.context = .general
 			self.dAppDefinitionAddress = dAppDefinitionAddress
@@ -115,13 +115,12 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case personas(PersonaList.Action)
-		case destination(PresentationAction<Destination.Action>)
 	}
 
 	// MARK: - Destination
 
-	public struct Destination: Reducer {
-		public enum State: Equatable, Hashable {
+	public struct Destination_: DestinationReducer {
+		public enum State: Hashable, Sendable {
 			case personaDetails(PersonaDetails.State)
 			case fungibleDetails(FungibleTokenDetails.State)
 			case nonFungibleDetails(NonFungibleTokenDetails.State)
@@ -129,7 +128,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			case confirmDisconnectAlert(AlertState<Action.ConfirmDisconnectAlert>)
 		}
 
-		public enum Action: Equatable {
+		public enum Action: Equatable, Sendable {
 			case personaDetails(PersonaDetails.Action)
 			case fungibleDetails(FungibleTokenDetails.Action)
 			case nonFungibleDetails(NonFungibleTokenDetails.Action)
@@ -172,8 +171,8 @@ public struct DappDetails: Sendable, FeatureReducer {
 			PersonaList()
 		}
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

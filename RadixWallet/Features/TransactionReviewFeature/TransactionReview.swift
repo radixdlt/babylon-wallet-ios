@@ -28,7 +28,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		var sliderResetDate: Date = .now
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		public var destination: Destination_.State? = nil
 
 		public func printFeePayerInfo(line: UInt = #line, function: StaticString = #function) {
 			#if DEBUG
@@ -104,8 +104,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case proofs(TransactionReviewProofs.Action)
 		case accountDepositSettings(AccountDepositSettings.Action)
 		case networkFee(TransactionReviewNetworkFee.Action)
-
-		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -123,7 +121,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case dismiss
 	}
 
-	public struct Destination: Sendable, Reducer {
+	public struct Destination_: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case customizeGuarantees(TransactionReviewGuarantees.State)
 			case signing(Signing.State)
@@ -199,8 +197,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			.ifLet(\.accountDepositSettings, action: /Action.child .. ChildAction.accountDepositSettings) {
 				AccountDepositSettings()
 			}
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

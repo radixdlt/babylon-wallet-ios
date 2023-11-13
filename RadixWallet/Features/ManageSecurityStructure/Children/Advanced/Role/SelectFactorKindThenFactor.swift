@@ -22,17 +22,13 @@ public struct SelectFactorKindThenFactor: Sendable, FeatureReducer {
 		case selected(FactorSourceKind)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
-	}
-
 	public enum DelegateAction: Sendable, Equatable {
 		case selected(FactorSource)
 	}
 
 	// MARK: Destination
 
-	public struct Destination: Reducer, Sendable {
+	public struct Destination_: DestinationReducer {
 		public enum State: Hashable, Sendable {
 			case factorSourceOfKind(FactorSourcesOfKindList<FactorSource>.State)
 			// Uh... we have to special treat Ledger, because... it is complex and uses its own list because
@@ -61,8 +57,8 @@ public struct SelectFactorKindThenFactor: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

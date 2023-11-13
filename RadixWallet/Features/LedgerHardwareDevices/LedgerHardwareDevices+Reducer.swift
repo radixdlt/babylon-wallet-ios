@@ -28,7 +28,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements? = nil
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		public var destination: Destination_.State? = nil
 
 		var pendingAction: ActionRequiringP2P? = nil
 
@@ -58,17 +58,13 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		case perform(ActionRequiringP2P)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
-	}
-
 	public enum DelegateAction: Sendable, Equatable {
 		case choseLedger(LedgerHardwareWalletFactorSource)
 	}
 
 	// MARK: - Destination
 
-	public struct Destination: Sendable, Reducer {
+	public struct Destination_: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
@@ -102,8 +98,8 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

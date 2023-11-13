@@ -9,7 +9,8 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		var validatedNewGatewayToSwitchTo: Radix.Gateway?
 		var gatewayForRemoval: Radix.Gateway?
 
-		@PresentationState var destination: Destination.State?
+		@PresentationState
+		var destination: Destination_.State?
 
 		public init(
 			gatewayList: GatewayList.State = .init(gateways: [])
@@ -33,10 +34,9 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case gatewayList(GatewayList.Action)
-		case destination(PresentationAction<Destination.Action>)
 	}
 
-	public struct Destination: Sendable, Reducer {
+	public struct Destination_: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case addNewGateway(AddNewGateway.State)
 			case createAccount(CreateAccountCoordinator.State)
@@ -91,8 +91,8 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		}
 
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

@@ -16,7 +16,7 @@ public struct PoolUnit: Sendable, FeatureReducer {
 			poolUnit: OnLedgerEntity.Account.PoolUnit,
 			resourceDetails: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails> = .idle,
 			isSelected: Bool? = nil,
-			destination: Destination.State? = nil
+			destination: Destination_.State? = nil
 		) {
 			self.poolUnit = poolUnit
 			self.resourceDetails = resourceDetails
@@ -25,18 +25,14 @@ public struct PoolUnit: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		var destination: Destination.State?
+		var destination: Destination_.State?
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case didTap
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
-	}
-
-	public struct Destination: Sendable, Reducer {
+	public struct Destination_: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case details(PoolUnitDetails.State)
 		}
@@ -58,11 +54,9 @@ public struct PoolUnit: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(
-				\.$destination,
-				action: /Action.child .. ChildAction.destination,
-				destination: Destination.init
-			)
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
+			}
 	}
 
 	public func reduce(

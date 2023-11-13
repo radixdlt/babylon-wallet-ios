@@ -28,7 +28,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 		public var mode: Mode
 
 		@PresentationState
-		public var destination: Destination.State?
+		public var destination: Destination_.State?
 
 		public init(
 			mode: Mode = .new(.init())
@@ -48,11 +48,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 		case updatedOrCreatedSecurityStructure(TaskResult<SecurityStructureProduct>)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
-	}
-
-	public struct Destination: Sendable, Reducer {
+	public struct Destination_: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case listConfirmerOfNewPhone(ListConfirmerOfNewPhone.State)
 			case listLostPhoneHelper(ListLostPhoneHelper.State)
@@ -80,8 +76,8 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

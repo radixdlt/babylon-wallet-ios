@@ -8,12 +8,12 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 		public var factorSources: FactorSources?
 
 		@PresentationState
-		public var destination: Destination.State?
+		public var destination: Destination_.State?
 
 		public init() {}
 	}
 
-	public struct Destination: Sendable, Reducer {
+	public struct Destination_: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case importMnemonic(ImportMnemonic.State)
 			case addLedger(AddLedgerFactorSource.State)
@@ -46,10 +46,6 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 		case loadFactorSourcesResult(TaskResult<FactorSources>)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
-	}
-
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
@@ -57,8 +53,8 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 
