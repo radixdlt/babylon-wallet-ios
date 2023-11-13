@@ -1,3 +1,5 @@
+import SwiftUI
+
 extension VerifyMnemonic.State {
 	public var viewState: VerifyMnemonic.ViewState {
 		let enumeratedWords = mnemonic.words.identifiablyEnumerated()
@@ -77,6 +79,7 @@ extension VerifyMnemonic {
 					.padding(.horizontal, .medium2)
 					.padding(.bottom, .large3)
 				}
+				.scrollIndicators(.hidden)
 			}
 			// FIXME: Strings
 			.navigationTitle("Confirm seed phrase")
@@ -84,21 +87,18 @@ extension VerifyMnemonic {
 
 		@ViewBuilder
 		private func wordsGrid(viewStore: ViewStoreOf<VerifyMnemonic>) -> some SwiftUI.View {
-			LazyVGrid(
-				columns: .init(
-					repeating: .init(.flexible()),
-					count: 3
-				)
-			) {
-				ForEach(viewStore.words) { wordViewState in
-					VStack {
-						if wordViewState.isDisabled {
-							placeholderWord(wordViewState)
-						} else {
-							verifyWord(wordViewState, viewStore: viewStore)
+			SwiftUI.Grid(horizontalSpacing: .small2, verticalSpacing: .medium1) {
+				ForEach(Array(viewStore.words.chunks(ofCount: 3).enumerated()), id: \.offset) { _, row in
+					SwiftUI.GridRow {
+						ForEach(row) { wordViewState in
+							VStack {
+								if wordViewState.isDisabled {
+									placeholderWord(wordViewState)
+								} else {
+									verifyWord(wordViewState, viewStore: viewStore)
+								}
+							}
 						}
-
-						FixedSpacer(width: .zero, height: .medium1)
 					}
 				}
 			}
@@ -127,14 +127,12 @@ extension VerifyMnemonic {
 				placeholder: viewState.placeholder,
 				text: .init(
 					get: { viewState.displayText },
-					set: {
-						viewStore.send(.wordChanged(
-							.init(
-								offset: viewState.word.offset,
-								element: $0.lowercased().trimmingWhitespacesAndNewlines()
-							))
-						)
-					}
+					set: { viewStore.send(.wordChanged(
+						.init(
+							offset: viewState.word.offset,
+							element: $0.lowercased().trimmingWhitespacesAndNewlines()
+						))
+					) }
 				),
 				focus: .on(
 					viewState.word.offset,

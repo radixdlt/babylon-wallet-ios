@@ -36,6 +36,7 @@ public struct VerifyMnemonic: Sendable, FeatureReducer {
 		case wordSubmitted
 		case textFieldFocused(Int?)
 		case confirmSeedPhraseButtonTapped
+		case scrollToPosition
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -88,6 +89,8 @@ public struct VerifyMnemonic: Sendable, FeatureReducer {
 				state.invalidMnemonic = true
 				return .none
 			}
+		case .scrollToPosition:
+			return .none
 		}
 	}
 }
