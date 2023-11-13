@@ -1,6 +1,12 @@
 import ComposableArchitecture
 import SwiftUI
 
+extension Settings.Destinations.State {
+	static func displayMnemonics() -> Self {
+		.accountSecurity(AccountSecurity.State(destination: .mnemonics(.init())))
+	}
+}
+
 // MARK: - Settings
 public struct Settings: Sendable, FeatureReducer {
 	public typealias Store = StoreOf<Self>
@@ -15,7 +21,6 @@ public struct Settings: Sendable, FeatureReducer {
 
 		public var shouldShowMigrateOlympiaButton: Bool = false
 		public var userHasNoP2PLinks: Bool? = nil
-
 		public init() {}
 	}
 
@@ -97,7 +102,7 @@ public struct Settings: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.p2pLinksClient) var p2pLinksClient
 	@Dependency(\.dismiss) var dismiss
-	@Dependency(\.userDefaultsClient) var userDefaultsClient
+	@Dependency(\.userDefaults) var userDefaults
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -183,9 +188,8 @@ public struct Settings: Sendable, FeatureReducer {
 
 	private func hideImportOlympiaHeader(in state: inout State) -> Effect<Action> {
 		state.shouldShowMigrateOlympiaButton = false
-		return .run { _ in
-			await userDefaultsClient.setHideMigrateOlympiaButton(true)
-		}
+		userDefaults.setHideMigrateOlympiaButton(true)
+		return .none
 	}
 }
 

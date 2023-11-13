@@ -1,5 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
+
+// MARK: - AccountSecurity
 public struct AccountSecurity: Sendable, FeatureReducer {
 	public typealias Store = StoreOf<Self>
 
@@ -94,7 +96,6 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .run { send in
-
 				let preferences = await appPreferencesClient.getPreferences()
 				await send(.internal(.loadPreferences(preferences)))
 

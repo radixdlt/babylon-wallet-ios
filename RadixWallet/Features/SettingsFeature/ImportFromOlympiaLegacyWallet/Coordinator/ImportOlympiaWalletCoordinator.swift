@@ -149,7 +149,9 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
-	@Dependency(\.userDefaultsClient) var userDefaultsClient
+	@Dependency(\.userDefaults) var userDefaults
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	@Dependency(\.secureStorageClient) var secureStorageClient
 
 	public init() {}
 
@@ -218,10 +220,19 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .foundAlreadyImportedOlympiaSoftwareAccounts(networkID, alreadyImported, existingAccounts):
-			foundAlreadyImportedAccounts(in: &state, networkID: networkID, alreadyImported: alreadyImported, existingAccounts: existingAccounts)
+			foundAlreadyImportedAccounts(
+				in: &state,
+				networkID: networkID,
+				alreadyImported: alreadyImported,
+				existingAccounts: existingAccounts
+			)
 
 		case let .checkedIfOlympiaFactorSourceAlreadyExists(idOfExistingFactorSource, softwareAccounts):
-			checkedIfOlympiaFactorSourceAlreadyExists(in: &state, idOfExistingFactorSource: idOfExistingFactorSource, softwareAccounts: softwareAccounts)
+			checkedIfOlympiaFactorSourceAlreadyExists(
+				in: &state,
+				idOfExistingFactorSource: idOfExistingFactorSource,
+				softwareAccounts: softwareAccounts
+			)
 
 		case let .migratedSoftwareAccountsToBabylon(softwareAccounts):
 			migratedSoftwareAccountsToBabylon(in: &state, softwareAccounts: softwareAccounts)
@@ -268,7 +279,11 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 		let scannedAccounts: NonEmptyArray<MigratableAccount>
 		do {
-			scannedAccounts = try migratableAccounts(from: progress.scannedAccounts, networkID: networkID, existingAccounts: existingAccounts)
+			scannedAccounts = try migratableAccounts(
+				from: progress.scannedAccounts,
+				networkID: networkID,
+				existingAccounts: existingAccounts
+			)
 		} catch {
 			errorQueue.schedule(error)
 			return generalError(error)
@@ -309,12 +324,15 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	private func continueImporting(
 		in state: inout State
 	) -> Effect<Action> {
-		guard case let .foundAlreadyImported(progress) = state.progress else { return progressError(state.progress) }
+		guard
+			case let .foundAlreadyImported(progress) = state.progress
+		else {
+			return progressError(state.progress)
+		}
 
 		if let softwareAccounts = progress.accountsToMigrate?.software {
 			return checkIfOlympiaFactorSourceAlreadyExists(wordCount: progress.previous.expectedMnemonicWordCount, softwareAccounts)
 		}
-
 		state.progress = .migratedSoftwareAccounts(.init(
 			previous: progress,
 			migratedSoftwareAccounts: []
@@ -416,13 +434,6 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				)
 			)
 
-			do {
-				try userDefaultsClient.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
-			} catch {
-				// Not important enought to throw
-				loggerGlobal.warning("Failed to save mnemonic as backed up, error: \(error)")
-			}
-
 			if let factorSource, let factorSourceToSave = migrated.factorSourceToSave {
 				guard try factorSourceToSave.id == FactorSource.id(
 					fromPrivateHDFactorSource: factorSource,
@@ -431,21 +442,31 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 					throw OlympiaFactorSourceToSaveIDDisrepancy()
 				}
 
+				let existing = try? await factorSourcesClient.getFactorSource(id: factorSourceToSave.id.embed())
 				do {
+					let saveIntoProfile = existing == nil
+					if saveIntoProfile {
+						loggerGlobal.notice("Skip saving Olympia mnemonic into Profile since it is already present, will save to keychain only")
+					}
 					_ = try await factorSourcesClient.addPrivateHDFactorSource(.init(
 						factorSource: factorSource.factorSource.embed(),
 						mnemonicWithPasshprase: factorSource.mnemonicWithPassphrase,
-						saveIntoProfile: true
+						saveIntoProfile: saveIntoProfile
 					))
 
+					overlayWindowClient.scheduleHUD(.seedPhraseImported)
+
 				} catch {
+					loggerGlobal.critical("Failed to save Olympia Mnemonic - error: \(error)")
+
 					// Check if we have already imported this Mnemonic
-					if let existing = try await factorSourcesClient.getFactorSource(id: factorSourceToSave.id.embed()) {
-						if existing.kind == .device, existing.supportsOlympia {
+					if let existing {
+						let presentInKeychain = secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSourceToSave.id)
+						if existing.kind == .device, existing.supportsOlympia, presentInKeychain {
 							// all good, we had already imported it.
 							loggerGlobal.notice("We had already imported this factor source (mnemonic) before.")
 						} else {
-							let msg = "Failed to save factor source (mnemonic), found existing but it is not of .device kind or does not support olympia params. error: \(error)"
+							let msg = "Failed to save factor source (mnemonic), found in Profile, exists in keychain? \(presentInKeychain). Maybe it is not of .device kind or does not support olympia params. error: \(error)"
 							loggerGlobal.critical(.init(stringLiteral: msg))
 							assertionFailure(msg)
 							errorQueue.schedule(error)
@@ -461,6 +482,13 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 			// Save all accounts
 			try await accountsClient.saveVirtualAccounts(migrated.babylonAccounts.elements)
+
+			do {
+				try userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
+			} catch {
+				// Not important enought to throw
+				loggerGlobal.warning("Failed to save mnemonic as backed up, error: \(error)")
+			}
 
 			await send(.internal(.migratedSoftwareAccountsToBabylon(migrated)))
 		} catch: { error, _ in

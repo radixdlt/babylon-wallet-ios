@@ -1,44 +1,63 @@
 import ComposableArchitecture
 import SwiftUI
 
+private let stringValuesTestKey = "stringValuesTestKey"
+
 // MARK: - DebugUserDefaultsContents
 public struct DebugUserDefaultsContents: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public struct KeyValues: Sendable, Hashable, Identifiable {
 			public var id: String { key.rawValue }
-			public let key: UserDefaultsClient.Key
+			public let key: UserDefaults.Dependency.Key
 			public let values: [String]
-			public init(key: UserDefaultsClient.Key, values: [String]) {
+			public init(key: UserDefaults.Dependency.Key, values: [String]) {
 				self.key = key
 				self.values = values
 			}
 		}
 
 		public var keyedValues: IdentifiedArrayOf<KeyValues> = []
+		public var stringValuesOverTime: [String] = []
 		public init() {}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
+		case task
 		case removeAllButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case removedAll
+		case gotStringValue(String)
 	}
 
-	@Dependency(\.userDefaultsClient) var userDefaultsClient
+	@Dependency(\.userDefaults) var userDefaults
+	@Dependency(\.uuid) var uuid
+	@Dependency(\.continuousClock) var clock
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .appeared:
+		case .task:
 			loadKeyValues(into: &state)
-			return .none
+			return .run { send in
+				for await string in userDefaults.stringValues(forKey: stringValuesTestKey) {
+					guard !Task.isCancelled else { return }
+					await send(.internal(.gotStringValue(string ?? "<NIL>")))
+				}
+			}.merge(with: .run { _ in
+				@Sendable func emit() async {
+					try? await clock.sleep(for: .seconds(0.5))
+					guard !Task.isCancelled else { return }
+					userDefaults.set(uuid().uuidString, forKey: stringValuesTestKey)
+					await emit()
+				}
+				await emit()
+			})
 
 		case .removeAllButtonTapped:
 			return .run { send in
-				await userDefaultsClient.removeAll(but: [.activeProfileID])
+				userDefaults.removeAll(but: [.activeProfileID])
 				await send(.internal(.removedAll))
 			}
 		}
@@ -49,11 +68,14 @@ public struct DebugUserDefaultsContents: Sendable, FeatureReducer {
 		case .removedAll:
 			loadKeyValues(into: &state)
 			return .none
+		case let .gotStringValue(stringValue):
+			state.stringValuesOverTime.append(stringValue)
+			return .none
 		}
 	}
 
 	private func loadKeyValues(into state: inout State) {
-		state.keyedValues = IdentifiedArrayOf(uniqueElements: UserDefaultsClient.Key.allCases.map {
+		state.keyedValues = IdentifiedArrayOf(uniqueElements: UserDefaults.Dependency.Key.allCases.map {
 			DebugUserDefaultsContents.State.KeyValues(
 				key: $0,
 				values: $0.valuesForKey()
@@ -62,22 +84,22 @@ public struct DebugUserDefaultsContents: Sendable, FeatureReducer {
 	}
 }
 
-extension UserDefaultsClient.Key {
+extension UserDefaults.Dependency.Key {
 	func valuesForKey() -> [String] {
-		@Dependency(\.userDefaultsClient) var userDefaultsClient
+		@Dependency(\.userDefaults) var userDefaults
 		switch self {
 		case .activeProfileID:
-			guard let value = userDefaultsClient.stringForKey(.activeProfileID) else {
+			guard let value = userDefaults.string(key: .activeProfileID) else {
 				return []
 			}
 			return [value]
 		case .epochForWhenLastUsedByAccountAddress:
-			return userDefaultsClient.loadEpochForWhenLastUsedByAccountAddress().epochForAccounts.map { "epoch: \($0.epoch) account: \($0.accountAddress)" }
+			return userDefaults.loadEpochForWhenLastUsedByAccountAddress().epochForAccounts.map { "epoch: \($0.epoch) account: \($0.accountAddress)" }
 		case .hideMigrateOlympiaButton:
-			return [userDefaultsClient.hideMigrateOlympiaButton].map(String.init(describing:))
+			return [userDefaults.hideMigrateOlympiaButton].map(String.init(describing:))
 
 		case .mnemonicsUserClaimsToHaveBackedUp:
-			return userDefaultsClient.getFactorSourceIDOfBackedUpMnemonics().map(String.init(describing:))
+			return userDefaults.getFactorSourceIDOfBackedUpMnemonics().map(String.init(describing:))
 		}
 	}
 }

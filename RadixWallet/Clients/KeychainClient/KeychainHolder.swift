@@ -38,6 +38,28 @@ extension KeychainHolder {
 	) throws -> Bool {
 		try keychain.contains(key.rawValue.rawValue, withoutAuthenticationUI: !showAuthPrompt)
 	}
+
+	func getAllKeysMatching(
+		synchronizable needleIsSynchronizable: Bool? = false,
+		accessibility needleAccessibility: KeychainAccess.Accessibility? = .whenPasscodeSetThisDeviceOnly
+	) -> [String] {
+		keychain.allItems()
+			.filter {
+				if let isSynchronizable = $0["synchronizable"] as? Bool, let needle = needleIsSynchronizable {
+					isSynchronizable == needle
+				} else {
+					true
+				}
+			}
+			.filter({
+				if let accessibilityRawValue = $0["accessibility"] as? String, let accessibility = KeychainAccess.Accessibility(rawValue: accessibilityRawValue), let needle = needleAccessibility {
+					accessibility == needle
+				} else {
+					true
+				}
+			}
+			).compactMap { $0["key"] as? String }
+	}
 }
 
 extension KeychainHolder {

@@ -6,8 +6,7 @@ extension AccountDetails.State {
 			accountAddress: account.address,
 			appearanceID: account.appearanceID,
 			displayName: account.displayName.rawValue,
-			needToImportMnemonicForThisAccount: importMnemonicPrompt.needed,
-			needToBackupMnemonicForThisAccount: exportMnemonicPrompt.needed,
+			mnemonicHandlingCallToAction: mnemonicHandlingCallToAction,
 			isLedgerAccount: account.isLedgerAccount,
 			showToolbar: destination == nil
 		)
@@ -20,8 +19,7 @@ extension AccountDetails {
 		let accountAddress: AccountAddress
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let displayName: String
-		let needToImportMnemonicForThisAccount: Bool
-		let needToBackupMnemonicForThisAccount: Bool
+		let mnemonicHandlingCallToAction: MnemonicHandling?
 		let isLedgerAccount: Bool
 		let showToolbar: Bool
 	}
@@ -43,8 +41,7 @@ extension AccountDetails {
 						.padding(.bottom, .medium1)
 
 					prompts(
-						needToImport: viewStore.needToImportMnemonicForThisAccount,
-						needToBackup: viewStore.needToBackupMnemonicForThisAccount
+						mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction
 					)
 					.padding(.medium1)
 
@@ -84,15 +81,17 @@ extension AccountDetails {
 		}
 
 		@ViewBuilder
-		func prompts(needToImport: Bool, needToBackup: Bool) -> some SwiftUI.View {
-			// Mutally exclusive to prompt user to recover and backup mnemonic.
-			if needToImport {
-				importMnemonicPromptView {
-					store.send(.view(.recoverMnemonicsButtonTapped))
-				}
-			} else if needToBackup {
-				backupMnemonicPromptView {
-					store.send(.view(.exportMnemonicButtonTapped))
+		func prompts(mnemonicHandlingCallToAction: MnemonicHandling?) -> some SwiftUI.View {
+			if let mnemonicHandlingCallToAction {
+				switch mnemonicHandlingCallToAction {
+				case .mustBeImported:
+					importMnemonicPromptView {
+						store.send(.view(.importMnemonicButtonTapped))
+					}
+				case .shouldBeExported:
+					exportMnemonicPromptView {
+						store.send(.view(.exportMnemonicButtonTapped))
+					}
 				}
 			}
 		}
@@ -117,8 +116,6 @@ private extension View {
 	func destinations(_ destinationStore: PresentationStoreOf<AccountDetails.Destinations>) -> some SwiftUI.View {
 		preferences(destinationStore)
 			.transfer(destinationStore)
-			.exportMnemonic(destinationStore)
-			.importMnemonics(destinationStore)
 	}
 
 	func preferences(_ destinationStore: PresentationStoreOf<AccountDetails.Destinations>) -> some SwiftUI.View {
@@ -138,31 +135,6 @@ private extension View {
 			content: { AssetTransfer.SheetView(store: $0) }
 		)
 	}
-
-	func exportMnemonic(_ destinationStore: PresentationStoreOf<AccountDetails.Destinations>) -> some SwiftUI.View {
-		fullScreenCover( /* Full Screen cover to not be able to use iOS dismiss gestures */
-			store: destinationStore,
-			state: /AccountDetails.Destinations.State.exportMnemonic,
-			action: AccountDetails.Destinations.Action.exportMnemonic,
-			content: { childStore in
-				NavigationStack {
-					ImportMnemonic.View(store: childStore)
-						.navigationTitle(L10n.ImportMnemonic.navigationTitleBackup)
-				}
-			}
-		)
-	}
-
-	func importMnemonics(_ destinationStore: PresentationStoreOf<AccountDetails.Destinations>) -> some SwiftUI.View {
-		sheet(
-			store: destinationStore,
-			state: /AccountDetails.Destinations.State.importMnemonics,
-			action: AccountDetails.Destinations.Action.importMnemonics,
-			content: {
-				ImportMnemonicsFlowCoordinator.View(store: $0)
-			}
-		)
-	}
 }
 
 #if DEBUG
@@ -173,7 +145,7 @@ struct AccountDetails_Preview: PreviewProvider {
 		NavigationStack {
 			AccountDetails.View(
 				store: .init(
-					initialState: .init(for: .previewValue0),
+					initialState: .init(accountWithInfo: .init(account: .previewValue0)),
 					reducer: AccountDetails.init
 				)
 			)

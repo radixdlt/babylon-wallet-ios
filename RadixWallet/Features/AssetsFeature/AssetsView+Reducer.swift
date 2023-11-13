@@ -116,7 +116,12 @@ public struct AssetsView: Sendable, FeatureReducer {
 			return .run { [address = state.account.address, mode = state.mode] send in
 				for try await portfolio in await accountPortfoliosClient.portfolioForAccount(address).debounce(for: .seconds(0.1)) {
 					guard !Task.isCancelled else { return }
-					await send(.internal(.resourcesStateUpdated(createResourcesState(from: portfolio.nonEmptyVaults, mode: mode))))
+
+					await send(.internal(.resourcesStateUpdated(createResourcesState(
+						from: portfolio.nonEmptyVaults,
+						mode: mode
+					)
+					)))
 				}
 			} catch: { error, _ in
 				loggerGlobal.error("AssetsView portfolioForAccount failed: \(error)")
@@ -153,11 +158,15 @@ public struct AssetsView: Sendable, FeatureReducer {
 				}
 			}
 			state.isRefreshing = false
+
 			return .none
 		}
 	}
 
-	private func createResourcesState(from portfolio: OnLedgerEntity.Account, mode: State.Mode) async -> InternalAction.ResourcesState {
+	private func createResourcesState(
+		from portfolio: OnLedgerEntity.Account,
+		mode: State.Mode
+	) async -> InternalAction.ResourcesState {
 		let xrd = portfolio.fungibleResources.xrdResource.map { token in
 			FungibleAssetList.Section.Row.State(
 				xrdToken: token,

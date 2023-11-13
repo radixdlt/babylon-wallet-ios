@@ -59,9 +59,9 @@ extension ImportLegacyWalletClient: DependencyKey {
 
 		return Self(
 			shouldShowImportWalletShortcutInSettings: {
-				@Dependency(\.userDefaultsClient) var userDefaultsClient
+				@Dependency(\.userDefaults) var userDefaults
 
-				let shouldHide = userDefaultsClient.hideMigrateOlympiaButton
+				let shouldHide = userDefaults.hideMigrateOlympiaButton
 				guard !shouldHide else {
 					return false
 				}
@@ -69,7 +69,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 				do {
 					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
 					if accounts.contains(where: \.isOlympiaAccount) {
-						await userDefaultsClient.setHideMigrateOlympiaButton(true)
+						await userDefaults.setHideMigrateOlympiaButton(true)
 						return false
 					}
 				} catch {

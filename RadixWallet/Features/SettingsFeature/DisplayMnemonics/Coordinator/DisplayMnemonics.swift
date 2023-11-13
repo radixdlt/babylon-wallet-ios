@@ -1,6 +1,10 @@
 import ComposableArchitecture
 import SwiftUI
 
+// FIXME: Refactor ImportMnemonic
+public typealias ExportMnemonic = ImportMnemonic
+public typealias DisplayMnemonic = ExportMnemonic
+
 // MARK: - DisplayMnemonics
 public struct DisplayMnemonics: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
@@ -21,19 +25,22 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case row(id: DisplayEntitiesControlledByMnemonic.State.ID, action: DisplayEntitiesControlledByMnemonic.Action)
+		case row(
+			id: DisplayEntitiesControlledByMnemonic.State.ID,
+			action: DisplayEntitiesControlledByMnemonic.Action
+		)
 		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public struct Destinations: Sendable, Equatable, Reducer {
 		public enum State: Sendable, Hashable {
-			case displayMnemonic(DisplayMnemonic.State)
-			case importMnemonicControllingAccounts(ImportMnemonicControllingAccounts.State)
+			case displayMnemonic(ImportMnemonic.State)
+			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case displayMnemonic(DisplayMnemonic.Action)
-			case importMnemonicControllingAccounts(ImportMnemonicControllingAccounts.Action)
+			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
 		}
 
 		public init() {}
@@ -42,9 +49,8 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			Scope(state: /State.displayMnemonic, action: /Action.displayMnemonic) {
 				DisplayMnemonic()
 			}
-
-			Scope(state: /State.importMnemonicControllingAccounts, action: /Action.importMnemonicControllingAccounts) {
-				ImportMnemonicControllingAccounts()
+			Scope(state: /State.importMnemonics, action: /Action.importMnemonics) {
+				ImportMnemonicsFlowCoordinator()
 			}
 		}
 	}
@@ -52,6 +58,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.keychainClient) var keychainClient
+	@Dependency(\.backupsClient) var backupsClient
 
 	public init() {}
 
@@ -113,39 +120,41 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			let deviceFactorSource = child.deviceFactorSource
 			switch delegateAction {
 			case .displayMnemonic:
-				// FIXME: Auto close after 2 minutes?
-				state.destination = .displayMnemonic(.init(deviceFactorSource: deviceFactorSource))
-				return .none
+				return exportMnemonic(
+					factorSourceID: deviceFactorSource.id
+				) {
+					state.destination = .displayMnemonic(.export($0, title: L10n.RevealSeedPhrase.title))
+				}
+
 			case .importMissingMnemonic:
-				state.destination = .importMnemonicControllingAccounts(.init(
-					entitiesControlledByFactorSource: child.accountsForDeviceFactorSource
-				))
+				state.destination = .importMnemonics(.init())
 				return .none
 			}
 
-		case .destination(.presented(.displayMnemonic(.delegate(.failedToLoad)))):
-			state.destination = nil
-			return .none
-
-		case let .destination(.presented(.displayMnemonic(.delegate(.doneViewing(isBackedUp, factorSourceID))))):
-			if isBackedUp {
-				state.deviceFactorSources[id: factorSourceID.embed()]?.backedUp()
-			}
-			state.destination = nil
-
-			return .none
-
-		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(delegateAction)))):
-			state.destination = nil
-
+		case let .destination(.presented(.displayMnemonic(.delegate(delegateAction)))):
 			switch delegateAction {
-			case .skippedMnemonic, .failedToSaveInKeychain: break
-			case let .persistedMnemonicInKeychain(factorSourceID):
-				assert(state.deviceFactorSources[id: factorSourceID] != nil)
-				state.deviceFactorSources[id: factorSourceID]?.imported()
+			case let .doneViewing(idOfBackedUpFactorSource):
+				if let idOfBackedUpFactorSource {
+					state.deviceFactorSources[id: idOfBackedUpFactorSource]?.backedUp()
+				}
+			case .notPersisted, .persistedMnemonicInKeychainOnly, .persistedNewFactorSourceInProfile:
+				assertionFailure("discrepancy")
 			}
+			state.destination = nil
+
 			return .none
 
+		case let .destination(.presented(.importMnemonics(.delegate(delegateAction)))):
+			switch delegateAction {
+			case .finishedEarly:
+				state.destination = nil
+			case let .finishedImportingMnemonics(_, importedIDs):
+				for imported in importedIDs {
+					state.deviceFactorSources[id: imported.factorSourceID]?.imported()
+				}
+				state.destination = nil
+			}
+			return .none
 		default: return .none
 		}
 	}
