@@ -266,60 +266,60 @@ final class ProfileStoreNewProfileTests: TestCase {
 			await self.nearFutureFulfillment(of: assertionFailureIsCalled)
 		}
 	}
+
+	func test__GIVEN__no_profile__WHEN__import_profile__THEN__ownership_has_changed() async throws {
+		let deviceInfo = DeviceInfo.testValueABBA
+		try await withTimeLimit {
+			let usedProfile = try await withTestClients {
+				// GIVEN no profile
+				$0.noProfile()
+				$0.secureStorageClient.loadDeviceInfo = { deviceInfo }
+			} operation: {
+				let sut = ProfileStore()
+				// WHEN import profile
+				try await sut.importProfile(Profile.withOneAccountsDeviceInfo_BEEF_mnemonic_ABANDON_ART)
+				return await sut.profile
+			}
+
+			// THEN imported profile is used
+			XCTAssertNoDifference(
+				usedProfile.header.lastUsedOnDevice,
+				deviceInfo
+			)
+		}
+	}
+
+	func test__GIVEN__no_profile__WHEN__import_profile__THEN__ephemeral_profile_is_deleted() async throws {
+		try await withTimeLimit {
+			let ephemeralProfileIsDeleted = self.expectation(description: "ephemeral profile is deleted")
+			let idOfDeleted = LockIsolated<Profile.ID?>(nil)
+			let ephemeralProfile = try await withTestClients {
+				// GIVEN no profile
+				$0.noProfile()
+				then(&$0)
+			} operation: {
+				let sut = ProfileStore()
+				let ephemeralProfile = await sut.profile
+				// WHEN import profile
+				try await sut.importProfile(Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART)
+				return ephemeralProfile
+			}
+
+			// THEN ephemeral profile is deleted
+			func then(_ d: inout DependencyValues) {
+				d.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { id, _ in
+					idOfDeleted.setValue(id)
+					ephemeralProfileIsDeleted.fulfill()
+				}
+			}
+
+			await self.nearFutureFulfillment(of: ephemeralProfileIsDeleted)
+			idOfDeleted.withValue { deletedID in
+				XCTAssertNoDifference(deletedID, ephemeralProfile.id)
+			}
+		}
+	}
 	/*
-	 func test__GIVEN__no_profile__WHEN__import_profile__THEN__ownership_has_changed() async throws {
-	 	let deviceInfo = DeviceInfo.testValueABBA
-	 	try await withTimeLimit {
-	 		let usedProfile = try await withTestClients {
-	 			// GIVEN no profile
-	 			$0.noProfile()
-	 			$0.secureStorageClient.loadDeviceInfo = { deviceInfo }
-	 		} operation: {
-	 			let sut = ProfileStore()
-	 			// WHEN import profile
-	 			try await sut.importProfile(Profile.withOneAccountsDeviceInfo_BEEF_mnemonic_ABANDON_ART)
-	 			return await sut.profile
-	 		}
-
-	 		// THEN imported profile is used
-	 		XCTAssertNoDifference(
-	 			usedProfile.header.lastUsedOnDevice,
-	 			deviceInfo
-	 		)
-	 	}
-	 }
-
-	 func test__GIVEN__no_profile__WHEN__import_profile__THEN__ephemeral_profile_is_deleted() async throws {
-	 	try await withTimeLimit {
-	 		let ephemeralProfileIsDeleted = self.expectation(description: "ephemeral profile is deleted")
-	 		let idOfDeleted = LockIsolated<Profile.ID?>(nil)
-	 		let ephemeralProfile = try await withTestClients {
-	 			// GIVEN no profile
-	 			$0.noProfile()
-	 			then(&$0)
-	 		} operation: {
-	 			let sut = ProfileStore()
-	 			let ephemeralProfile = await sut.profile
-	 			// WHEN import profile
-	 			try await sut.importProfile(Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART)
-	 			return ephemeralProfile
-	 		}
-
-	 		// THEN ephemeral profile is deleted
-	 		func then(_ d: inout DependencyValues) {
-	 			d.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { id, _ in
-	 				idOfDeleted.setValue(id)
-	 				ephemeralProfileIsDeleted.fulfill()
-	 			}
-	 		}
-
-	 		await self.nearFutureFulfillment(of: ephemeralProfileIsDeleted)
-	 		idOfDeleted.withValue { deletedID in
-	 			XCTAssertNoDifference(deletedID, ephemeralProfile.id)
-	 		}
-	 	}
-	 }
-
 	 func test__GIVEN__no_profile__WHEN__init__THEN__24_word_mnemonic_is_generated() throws {
 	 	withTestClients {
 	 		// GIVEN no profile
