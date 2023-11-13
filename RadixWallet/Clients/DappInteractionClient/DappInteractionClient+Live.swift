@@ -122,13 +122,9 @@ extension DappInteractionClient {
 			}
 		}
 
-		guard let originURL = URL(string: nonvalidatedMeta.origin),
-		      let nonEmptyOriginURLString = NonEmptyString(rawValue: nonvalidatedMeta.origin)
-		else {
+		guard let origin = try? DappOrigin(string: nonvalidatedMeta.origin) else {
 			return invalidRequest(.invalidOrigin(invalidURLString: nonvalidatedMeta.origin))
 		}
-
-		let origin = DappOrigin(urlString: nonEmptyOriginURLString, url: originURL)
 
 		let metadataValidDappDefAddress = P2P.Dapp.Request.Metadata(
 			version: nonvalidatedMeta.version,
@@ -144,7 +140,7 @@ extension DappInteractionClient {
 				try await rolaClient.performWellKnownFileCheck(metadataValidDappDefAddress)
 			} catch {
 				loggerGlobal.warning("\(error)")
-				return invalidRequest(.dAppValidationError)
+				return invalidRequest(.dAppValidationError(error.localizedDescription))
 			}
 		}
 

@@ -182,7 +182,7 @@ public struct LoadableImage<Placeholder: View>: View {
 					imageView(image: image, imageSize: state.imageContainer?.image.size)
 				} else {
 					brokenImageView
-					let _ = loggerGlobal.warning("Could not load thumbnail \(url): \(state.error)")
+					let _ = loggerGlobal.warning("Could not load thumbnail from \(url): \(state.error)")
 				}
 			}
 		} else {
