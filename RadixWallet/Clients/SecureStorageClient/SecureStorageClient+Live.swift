@@ -191,6 +191,47 @@ extension SecureStorageClient: DependencyKey {
 			loggerGlobal.notice("Saved deviceInfo: \(deviceInfo)")
 		}
 
+		@Sendable func loadMnemonicFor(
+			key: KeychainClient.Key,
+			purpose: LoadMnemonicPurpose,
+			notifyIfMissing: Bool
+		) throws -> MnemonicWithPassphrase? {
+			let authPromptValue: String = {
+				switch purpose {
+				case let .createEntity(kind):
+					let entityKindName = kind == .account ? L10n.Common.account : L10n.Common.persona
+					return L10n.Biometrics.Prompt.creationOfEntity(entityKindName)
+				case .signTransaction:
+					return L10n.Biometrics.Prompt.signTransaction
+				case .signAuthChallenge:
+					return L10n.Biometrics.Prompt.signAuthChallenge
+				case .displaySeedPhrase:
+					return L10n.Biometrics.Prompt.displaySeedPhrase
+				case .createSignAuthKey:
+					return L10n.Biometrics.Prompt.createSignAuthKey
+				case .importOlympiaAccounts:
+					return L10n.Biometrics.Prompt.importOlympiaAccounts
+				case .checkingAccounts:
+					return L10n.Biometrics.Prompt.checkingAccounts
+
+				case .updateAccountMetadata:
+					// This is debug only... for now.
+					return L10n.Biometrics.Prompt.updateAccountMetadata
+				}
+			}()
+			let authenticationPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: authPromptValue).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to wallet data secret."
+			guard let data = try keychainClient.getDataWithAuth(
+				forKey: key,
+				authenticationPrompt: authenticationPrompt
+			) else {
+				if notifyIfMissing {
+					overlayWindowClient.scheduleAlertIgnoreAction(.missingMnemonicAlert)
+				}
+				return nil
+			}
+			return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)
+		}
+
 		let loadProfileSnapshot: LoadProfileSnapshot = { id in
 			guard
 				let existingSnapshotData = try loadProfileSnapshotData(id)
@@ -200,167 +241,204 @@ extension SecureStorageClient: DependencyKey {
 			return try jsonDecoder().decode(ProfileSnapshot.self, from: existingSnapshotData)
 		}
 
-		return Self(
-			saveProfileSnapshot: {
-				profileSnapshot in
-				let data = try jsonEncoder().encode(profileSnapshot)
-				try saveProfile(
-					snapshotData: data,
-					key: profileSnapshot.header.id.keychainKey,
-					iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled
+		let loadMnemonicByFactorSourceID: LoadMnemonicByFactorSourceID = { factorSourceID, purpose, notifyIfMissing in
+			let key = key(factorSourceID: factorSourceID)
+			return try loadMnemonicFor(key: key, purpose: purpose, notifyIfMissing: notifyIfMissing)
+		}
+
+		let saveMnemonicForFactorSource: SaveMnemonicForFactorSource = { privateFactorSource in
+			let factorSource = privateFactorSource.factorSource
+			let mnemonicWithPassphrase = privateFactorSource.mnemonicWithPassphrase
+			let data = try jsonEncoder().encode(mnemonicWithPassphrase)
+			let mostSecureAccesibilityAndAuthenticationPolicy = try queryMostSecureAccesibilityAndAuthenticationPolicy()
+			let key = key(factorSourceID: factorSource.id)
+
+			try keychainClient.setDataWithAuth(
+				data,
+				forKey: key,
+				attributes: .init(
+					iCloudSyncEnabled: false,
+					accessibility: mostSecureAccesibilityAndAuthenticationPolicy.accessibility,
+					authenticationPolicy: mostSecureAccesibilityAndAuthenticationPolicy.authenticationPolicy,
+					label: importantKeychainIdentifier("Radix Wallet Factor Secret")!,
+					comment: .init("Created on \(factorSource.hint.name) \(factorSource.supportsOlympia ? " (Olympia)" : "")")
 				)
-			},
+			)
+		}
+
+		#if DEBUG
+		let getAllMnemonics: GetAllMnemonics = {
+			let unfilteredKeys = keychainClient.getAllKeysMatchingAttributes(
+				synchronizable: false,
+				accessibility: .whenPasscodeSetThisDeviceOnly
+			)
+			loggerGlobal.error("Found these unfilteredKeys: \(unfilteredKeys)")
+			let keys = unfilteredKeys.filter { $0.rawValue.rawValue.starts(with: "\(FactorSourceKind.device.rawValue):") }
+
+			loggerGlobal.error("Found these filtered keys: \(keys)")
+
+			return keys.compactMap {
+				guard
+					let factorSourceID = FactorSourceID.FromHash(keychainKey: $0),
+					let mnemonicWithPassphrase = try? loadMnemonicByFactorSourceID(
+						factorSourceID,
+						.checkingAccounts,
+						false
+					)
+				else {
+					return nil
+				}
+				return KeyedMnemonicWithPassphrase(
+					factorSourceID: factorSourceID,
+					mnemonicWithPassphrase: mnemonicWithPassphrase
+				)
+			}
+		}
+		#endif
+
+		let saveProfileSnapshot: SaveProfileSnapshot = {
+			profileSnapshot in
+			let data = try jsonEncoder().encode(profileSnapshot)
+			try saveProfile(
+				snapshotData: data,
+				key: profileSnapshot.header.id.keychainKey,
+				iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled
+			)
+		}
+
+		let loadProfile: LoadProfile = { id in
+			guard
+				let existingSnapshot = try loadProfileSnapshot(id)
+			else {
+				return nil
+			}
+			return Profile(snapshot: existingSnapshot)
+		}
+
+		let containsMnemonicIdentifiedByFactorSourceID: ContainsMnemonicIdentifiedByFactorSourceID = { factorSourceID in
+			let key = key(factorSourceID: factorSourceID)
+			return (try? keychainClient.contains(key)) ?? false
+		}
+
+		let deleteProfileAndMnemonicsByFactorSourceIDs: DeleteProfileAndMnemonicsByFactorSourceIDs = {
+			profileID,
+				requestedToKeepInIcloud in
+			guard
+				let profileSnapshotData = try loadProfileSnapshotData(profileID)
+			else {
+				return
+			}
+
+			guard
+				let profileSnapshot = try? jsonDecoder().decode(
+					ProfileSnapshot.self,
+					from: profileSnapshotData
+				)
+			else {
+				return
+			}
+
+			// We want to keep the profile backup in iCloud.
+			let isCloudSyncEnabled = profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled
+
+			let keepInICloudIfPresent = isCloudSyncEnabled && requestedToKeepInIcloud
+
+			if !keepInICloudIfPresent {
+				try deleteProfile(profileID)
+			}
+
+			for factorSourceID in profileSnapshot
+				.factorSources
+				.compactMap({ try? $0.extract(as: DeviceFactorSource.self) })
+				.map(\.id)
+			{
+				loggerGlobal.debug("Deleting factor source with ID: \(factorSourceID)")
+				try deleteMnemonicByFactorSourceID(factorSourceID)
+			}
+		}
+
+		let updateIsCloudProfileSyncEnabled: UpdateIsCloudProfileSyncEnabled = { profileId, change in
+			guard
+				let profileSnapshotData = try loadProfileSnapshotData(profileId),
+				let headerList = try loadProfileHeaderList()
+			else {
+				return
+			}
+
+			switch change {
+			case .disable:
+				loggerGlobal.notice("Disabling iCloud sync of Profile snapshot (which should also delete it from iCloud)")
+				try saveProfile(
+					snapshotData: profileSnapshotData,
+					key: profileId.keychainKey,
+					iCloudSyncEnabled: false
+				)
+			case .enable:
+				loggerGlobal.notice("Enabling iCloud sync of Profile snapshot")
+				try saveProfile(
+					snapshotData: profileSnapshotData,
+					key: profileId.keychainKey,
+					iCloudSyncEnabled: true
+				)
+			}
+		}
+
+		let deprecatedLoadDeviceID: DeprecatedLoadDeviceID = {
+			// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
+			try keychainClient
+				.getDataWithoutAuth(forKey: deviceIdentifierKey)
+				.map {
+					try jsonDecoder().decode(UUID.self, from: $0)
+				}
+		}
+
+		let deleteDeprecatedDeviceID: DeleteDeprecatedDeviceID = {
+			// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
+			try? keychainClient.removeData(forKey: deviceIdentifierKey)
+		}
+
+		#if DEBUG
+		return Self(
+			saveProfileSnapshot: saveProfileSnapshot,
 			loadProfileSnapshotData: loadProfileSnapshotData,
 			loadProfileSnapshot: loadProfileSnapshot,
-			loadProfile: { id in
-				guard
-					let existingSnapshot = try loadProfileSnapshot(id)
-				else {
-					return nil
-				}
-				return Profile(snapshot: existingSnapshot)
-			},
-			saveMnemonicForFactorSource: { privateFactorSource in
-				let factorSource = privateFactorSource.factorSource
-				let mnemonicWithPassphrase = privateFactorSource.mnemonicWithPassphrase
-				let data = try jsonEncoder().encode(mnemonicWithPassphrase)
-				let mostSecureAccesibilityAndAuthenticationPolicy = try queryMostSecureAccesibilityAndAuthenticationPolicy()
-				let key = key(factorSourceID: factorSource.id)
-
-				try keychainClient.setDataWithAuth(
-					data,
-					forKey: key,
-					attributes: .init(
-						iCloudSyncEnabled: false,
-						accessibility: mostSecureAccesibilityAndAuthenticationPolicy.accessibility,
-						authenticationPolicy: mostSecureAccesibilityAndAuthenticationPolicy.authenticationPolicy,
-						label: importantKeychainIdentifier("Radix Wallet Factor Secret"),
-						comment: .init("Created on \(factorSource.hint.name) \(factorSource.supportsOlympia ? " (Olympia)" : "")")
-					)
-				)
-			},
-			loadMnemonicByFactorSourceID: { factorSourceID, purpose, notifyIfMissing in
-				let key = key(factorSourceID: factorSourceID)
-				let authPromptValue: String = {
-					switch purpose {
-					case let .createEntity(kind):
-						let entityKindName = kind == .account ? L10n.Common.account : L10n.Common.persona
-						return L10n.Biometrics.Prompt.creationOfEntity(entityKindName)
-					case .signTransaction:
-						return L10n.Biometrics.Prompt.signTransaction
-					case .signAuthChallenge:
-						return L10n.Biometrics.Prompt.signAuthChallenge
-					case .displaySeedPhrase:
-						return L10n.Biometrics.Prompt.displaySeedPhrase
-					case .createSignAuthKey:
-						return L10n.Biometrics.Prompt.createSignAuthKey
-					case .importOlympiaAccounts:
-						return L10n.Biometrics.Prompt.importOlympiaAccounts
-					case .checkingAccounts:
-						return L10n.Biometrics.Prompt.checkingAccounts
-
-					case .updateAccountMetadata:
-						// This is debug only... for now.
-						return L10n.Biometrics.Prompt.updateAccountMetadata
-					}
-				}()
-				let authenticationPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: authPromptValue).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to wallet data secret."
-				guard let data = try keychainClient.getDataWithAuth(
-					forKey: key,
-					authenticationPrompt: authenticationPrompt
-				) else {
-					if notifyIfMissing {
-						overlayWindowClient.scheduleAlertIgnoreAction(.missingMnemonicAlert)
-					}
-					return nil
-				}
-				return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)
-			},
-			containsMnemonicIdentifiedByFactorSourceID: { factorSourceID in
-				let key = key(factorSourceID: factorSourceID)
-				return (try? keychainClient.contains(key)) ?? false
-			},
+			loadProfile: loadProfile,
+			saveMnemonicForFactorSource: saveMnemonicForFactorSource,
+			loadMnemonicByFactorSourceID: loadMnemonicByFactorSourceID,
+			containsMnemonicIdentifiedByFactorSourceID: containsMnemonicIdentifiedByFactorSourceID,
 			deleteMnemonicByFactorSourceID: deleteMnemonicByFactorSourceID,
-			deleteProfileAndMnemonicsByFactorSourceIDs: {
-				profileID,
-					requestedToKeepInIcloud in
-				guard
-					let profileSnapshotData = try loadProfileSnapshotData(profileID)
-				else {
-					return
-				}
-
-				guard
-					let profileSnapshot = try? jsonDecoder().decode(
-						ProfileSnapshot.self,
-						from: profileSnapshotData
-					)
-				else {
-					return
-				}
-
-				// We want to keep the profile backup in iCloud.
-				let isCloudSyncEnabled = profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled
-
-				let keepInICloudIfPresent = isCloudSyncEnabled && requestedToKeepInIcloud
-
-				if !keepInICloudIfPresent {
-					try deleteProfile(profileID)
-				}
-
-				for factorSourceID in profileSnapshot
-					.factorSources
-					.compactMap({ try? $0.extract(as: DeviceFactorSource.self) })
-					.map(\.id)
-				{
-					loggerGlobal.debug("Deleting factor source with ID: \(factorSourceID)")
-					try deleteMnemonicByFactorSourceID(factorSourceID)
-				}
-
-			},
-			updateIsCloudProfileSyncEnabled: { profileId, change in
-				guard
-					let profileSnapshotData = try loadProfileSnapshotData(profileId),
-					let headerList = try loadProfileHeaderList()
-				else {
-					return
-				}
-
-				switch change {
-				case .disable:
-					loggerGlobal.notice("Disabling iCloud sync of Profile snapshot (which should also delete it from iCloud)")
-					try saveProfile(
-						snapshotData: profileSnapshotData,
-						key: profileId.keychainKey,
-						iCloudSyncEnabled: false
-					)
-				case .enable:
-					loggerGlobal.notice("Enabling iCloud sync of Profile snapshot")
-					try saveProfile(
-						snapshotData: profileSnapshotData,
-						key: profileId.keychainKey,
-						iCloudSyncEnabled: true
-					)
-				}
-			},
+			deleteProfileAndMnemonicsByFactorSourceIDs: deleteProfileAndMnemonicsByFactorSourceIDs,
+			updateIsCloudProfileSyncEnabled: updateIsCloudProfileSyncEnabled,
 			loadProfileHeaderList: loadProfileHeaderList,
 			saveProfileHeaderList: saveProfileHeaderList,
 			deleteProfileHeaderList: deleteProfileHeaderList,
 			loadDeviceInfo: loadDeviceInfo,
 			saveDeviceInfo: saveDeviceInfo,
-			deprecatedLoadDeviceID: {
-				// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
-				try keychainClient
-					.getDataWithoutAuth(forKey: deviceIdentifierKey)
-					.map {
-						try jsonDecoder().decode(UUID.self, from: $0)
-					}
-			},
-			deleteDeprecatedDeviceID: {
-				// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
-				try? keychainClient.removeData(forKey: deviceIdentifierKey)
-			}
+			deprecatedLoadDeviceID: deprecatedLoadDeviceID,
+			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID,
+			getAllMnemonics: getAllMnemonics
 		)
+		#else
+		return Self(
+			saveProfileSnapshot: saveProfileSnapshot,
+			loadProfileSnapshotData: loadProfileSnapshotData,
+			loadProfileSnapshot: loadProfileSnapshot,
+			loadProfile: loadProfile,
+			saveMnemonicForFactorSource: saveMnemonicForFactorSource,
+			loadMnemonicByFactorSourceID: loadMnemonicByFactorSourceID,
+			containsMnemonicIdentifiedByFactorSourceID: containsMnemonicIdentifiedByFactorSourceID,
+			deleteMnemonicByFactorSourceID: deleteMnemonicByFactorSourceID,
+			deleteProfileAndMnemonicsByFactorSourceIDs: deleteProfileAndMnemonicsByFactorSourceIDs,
+			updateIsCloudProfileSyncEnabled: updateIsCloudProfileSyncEnabled,
+			loadProfileHeaderList: loadProfileHeaderList,
+			saveProfileHeaderList: saveProfileHeaderList,
+			deleteProfileHeaderList: deleteProfileHeaderList,
+			loadDeviceInfo: loadDeviceInfo,
+			saveDeviceInfo: saveDeviceInfo,
+			deprecatedLoadDeviceID: deprecatedLoadDeviceID,
+			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID
+		)
+		#endif
 	}()
 }
 
@@ -386,4 +464,20 @@ extension OverlayWindowClient.Item.AlertState {
 		title: { TextState(L10n.TransactionReview.NoMnemonicError.title) },
 		message: { TextState(L10n.TransactionReview.NoMnemonicError.text) }
 	)
+}
+
+extension FactorSourceID.FromHash {
+	init?(keychainKey: KeychainClient.Key) {
+		let key = keychainKey.rawValue.rawValue
+		guard
+			case let parts = key.split(separator: Self.keychainKeySeparator),
+			parts.count == 2,
+			let kind = FactorSourceKind(rawValue: String(parts[0])),
+			let hex32 = try? HexCodable(hex: String(parts[1])),
+			let id = try? Self(kind: kind, hash: hex32.data)
+		else {
+			return nil
+		}
+		self = id
+	}
 }

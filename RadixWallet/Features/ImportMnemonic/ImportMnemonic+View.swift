@@ -5,8 +5,8 @@ import SwiftUI
 extension ImportMnemonic.State {
 	var viewState: ImportMnemonic.ViewState {
 		var viewState = ImportMnemonic.ViewState(
-			readonlyMode: readonlyMode?.context,
-			isProgressing: isProgressing,
+			readonlyMode: mode.readonly?.context,
+			isProgressing: mode.write?.isProgressing ?? false,
 			isWordCountFixed: isWordCountFixed,
 			isAdvancedMode: isAdvancedMode,
 			header: header,

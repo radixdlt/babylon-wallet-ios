@@ -59,10 +59,6 @@ public enum L10n {
     public static let accountColorSubtitle = L10n.tr("Localizable", "accountSettings_accountColorSubtitle", fallback: "Select from a list of unique colors")
     /// Account Label
     public static let accountLabel = L10n.tr("Localizable", "accountSettings_accountLabel", fallback: "Account Label")
-    /// Account Security
-    public static let accountSecurity = L10n.tr("Localizable", "accountSettings_accountSecurity", fallback: "Account Security")
-    /// Set how you want this Account to work
-    public static let accountSecuritySubtitle = L10n.tr("Localizable", "accountSettings_accountSecuritySubtitle", fallback: "Set how you want this Account to work")
     /// Set development preferences
     public static let developmentHeading = L10n.tr("Localizable", "accountSettings_developmentHeading", fallback: "Set development preferences")
     /// Dev Preferences
@@ -100,46 +96,6 @@ public enum L10n {
       public static let selected = L10n.tr("Localizable", "accountSettings_accountColor_selected", fallback: "Selected")
       /// Select the color for this Account
       public static let text = L10n.tr("Localizable", "accountSettings_accountColor_text", fallback: "Select the color for this Account")
-    }
-    public enum Behaviors {
-      /// Anyone can freeze this asset in place.
-      public static let freezableByAnyone = L10n.tr("Localizable", "accountSettings_behaviors_freezableByAnyone", fallback: "Anyone can freeze this asset in place.")
-      /// A third party can freeze this asset in place.
-      public static let freezableByThirdParty = L10n.tr("Localizable", "accountSettings_behaviors_freezableByThirdParty", fallback: "A third party can freeze this asset in place.")
-      /// Naming and information about this asset can be changed.
-      public static let informationChangeable = L10n.tr("Localizable", "accountSettings_behaviors_informationChangeable", fallback: "Naming and information about this asset can be changed.")
-      /// Anyone can change naming and information about this asset.
-      public static let informationChangeableByAnyone = L10n.tr("Localizable", "accountSettings_behaviors_informationChangeableByAnyone", fallback: "Anyone can change naming and information about this asset.")
-      /// Movement of this asset can be restricted in the future.
-      public static let movementRestrictableInFuture = L10n.tr("Localizable", "accountSettings_behaviors_movementRestrictableInFuture", fallback: "Movement of this asset can be restricted in the future.")
-      /// Anyone can restrict movement of this token in the future.
-      public static let movementRestrictableInFutureByAnyone = L10n.tr("Localizable", "accountSettings_behaviors_movementRestrictableInFutureByAnyone", fallback: "Anyone can restrict movement of this token in the future.")
-      /// Movement of this asset is restricted.
-      public static let movementRestricted = L10n.tr("Localizable", "accountSettings_behaviors_movementRestricted", fallback: "Movement of this asset is restricted.")
-      /// Data that is set on these NFTs can be changed.
-      public static let nftDataChangeable = L10n.tr("Localizable", "accountSettings_behaviors_nftDataChangeable", fallback: "Data that is set on these NFTs can be changed.")
-      /// Anyone can change data that is set on these NFTs.
-      public static let nftDataChangeableByAnyone = L10n.tr("Localizable", "accountSettings_behaviors_nftDataChangeableByAnyone", fallback: "Anyone can change data that is set on these NFTs.")
-      /// Anyone can remove this asset from accounts and dApps.
-      public static let removableByAnyone = L10n.tr("Localizable", "accountSettings_behaviors_removableByAnyone", fallback: "Anyone can remove this asset from accounts and dApps.")
-      /// A third party can remove this asset from accounts and dApps.
-      public static let removableByThirdParty = L10n.tr("Localizable", "accountSettings_behaviors_removableByThirdParty", fallback: "A third party can remove this asset from accounts and dApps.")
-      /// This is a simple asset
-      public static let simpleAsset = L10n.tr("Localizable", "accountSettings_behaviors_simpleAsset", fallback: "This is a simple asset")
-      /// The supply of this asset can be decreased.
-      public static let supplyDecreasable = L10n.tr("Localizable", "accountSettings_behaviors_supplyDecreasable", fallback: "The supply of this asset can be decreased.")
-      /// Anyone can decrease the supply of this asset.
-      public static let supplyDecreasableByAnyone = L10n.tr("Localizable", "accountSettings_behaviors_supplyDecreasableByAnyone", fallback: "Anyone can decrease the supply of this asset.")
-      /// The supply of this asset can be increased or decreased.
-      public static let supplyFlexible = L10n.tr("Localizable", "accountSettings_behaviors_supplyFlexible", fallback: "The supply of this asset can be increased or decreased.")
-      /// Anyone can increase or decrease the supply of this asset.
-      public static let supplyFlexibleByAnyone = L10n.tr("Localizable", "accountSettings_behaviors_supplyFlexibleByAnyone", fallback: "Anyone can increase or decrease the supply of this asset.")
-      /// Only the Radix Network may increase or decrease the supply of XRD.
-      public static let supplyFlexibleXrd = L10n.tr("Localizable", "accountSettings_behaviors_supplyFlexibleXrd", fallback: "Only the Radix Network may increase or decrease the supply of XRD.")
-      /// The supply of this asset can be increased.
-      public static let supplyIncreasable = L10n.tr("Localizable", "accountSettings_behaviors_supplyIncreasable", fallback: "The supply of this asset can be increased.")
-      /// Anyone can increase the supply of this asset.
-      public static let supplyIncreasableByAnyone = L10n.tr("Localizable", "accountSettings_behaviors_supplyIncreasableByAnyone", fallback: "Anyone can increase the supply of this asset.")
     }
     public enum HideAccount {
       /// Hide Account
@@ -463,14 +419,6 @@ public enum L10n {
       /// What are NFTs?
       public static let whatAreNfts = L10n.tr("Localizable", "assetDetails_NFTDetails_whatAreNfts", fallback: "What are NFTs?")
     }
-    public enum AssetBehavior {
-      /// Naming and information about this asset can be changed.
-      public static let canChangeName = L10n.tr("Localizable", "assetDetails_assetBehavior_canChangeName", fallback: "Naming and information about this asset can be changed.")
-      /// The supply of this asset can be increased or decreased
-      public static let canIncreaseSupply = L10n.tr("Localizable", "assetDetails_assetBehavior_canIncreaseSupply", fallback: "The supply of this asset can be increased or decreased")
-      /// Movement of this asset can be restricted in the future.
-      public static let canRestrictMovement = L10n.tr("Localizable", "assetDetails_assetBehavior_canRestrictMovement", fallback: "Movement of this asset can be restricted in the future.")
-    }
     public enum BadgeDetails {
       /// You have no badges
       public static let noBadges = L10n.tr("Localizable", "assetDetails_badgeDetails_noBadges", fallback: "You have no badges")
@@ -478,10 +426,6 @@ public enum L10n {
       public static let whatAreBadges = L10n.tr("Localizable", "assetDetails_badgeDetails_whatAreBadges", fallback: "What are badges?")
     }
     public enum Behaviors {
-      /// Anyone can freeze this asset in place.
-      public static let canBeFrozeInFutureByAnyone = L10n.tr("Localizable", "assetDetails_behaviors_canBeFrozeInFutureByAnyone", fallback: "Anyone can freeze this asset in place.")
-      /// A third party can freeze this asset in place.
-      public static let canFreezeInFuture = L10n.tr("Localizable", "assetDetails_behaviors_canFreezeInFuture", fallback: "A third party can freeze this asset in place.")
       /// Anyone can freeze this asset in place.
       public static let freezableByAnyone = L10n.tr("Localizable", "assetDetails_behaviors_freezableByAnyone", fallback: "Anyone can freeze this asset in place.")
       /// A third party can freeze this asset in place.
@@ -908,6 +852,82 @@ public enum L10n {
       public static let subtitle = L10n.tr("Localizable", "createPersona_nameNewPersona_subtitle", fallback: "What would you like to call your Persona?")
     }
   }
+  public enum CustomizeNetworkFees {
+    /// Change
+    public static let changeButtonTitle = L10n.tr("Localizable", "customizeNetworkFees_changeButtonTitle", fallback: "Change")
+    /// Effective Tip
+    public static let effectiveTip = L10n.tr("Localizable", "customizeNetworkFees_effectiveTip", fallback: "Effective Tip")
+    /// Estimated Transaction Fees
+    public static let feeBreakdownTitle = L10n.tr("Localizable", "customizeNetworkFees_feeBreakdownTitle", fallback: "Estimated Transaction Fees")
+    /// Network Execution
+    public static let networkExecution = L10n.tr("Localizable", "customizeNetworkFees_networkExecution", fallback: "Network Execution")
+    /// Network Fee
+    public static let networkFee = L10n.tr("Localizable", "customizeNetworkFees_networkFee", fallback: "Network Fee")
+    /// Network Finalization
+    public static let networkFinalization = L10n.tr("Localizable", "customizeNetworkFees_networkFinalization", fallback: "Network Finalization")
+    /// Network Storage
+    public static let networkStorage = L10n.tr("Localizable", "customizeNetworkFees_networkStorage", fallback: "Network Storage")
+    /// No account selected
+    public static let noAccountSelected = L10n.tr("Localizable", "customizeNetworkFees_noAccountSelected", fallback: "No account selected")
+    /// None due
+    public static let noneDue = L10n.tr("Localizable", "customizeNetworkFees_noneDue", fallback: "None due")
+    /// None required
+    public static let noneRequired = L10n.tr("Localizable", "customizeNetworkFees_noneRequired", fallback: "None required")
+    /// Padding
+    public static let padding = L10n.tr("Localizable", "customizeNetworkFees_padding", fallback: "Padding")
+    /// Adjust Fee Padding Amount (XRD)
+    public static let paddingFieldLabel = L10n.tr("Localizable", "customizeNetworkFees_paddingFieldLabel", fallback: "Adjust Fee Padding Amount (XRD)")
+    /// Paid by dApps
+    public static let paidByDApps = L10n.tr("Localizable", "customizeNetworkFees_paidByDApps", fallback: "Paid by dApps")
+    /// Pay fee from
+    public static let payFeeFrom = L10n.tr("Localizable", "customizeNetworkFees_payFeeFrom", fallback: "Pay fee from")
+    /// Royalties
+    public static let royalties = L10n.tr("Localizable", "customizeNetworkFees_royalties", fallback: "Royalties")
+    /// Royalty fee
+    public static let royaltyFee = L10n.tr("Localizable", "customizeNetworkFees_royaltyFee", fallback: "Royalty fee")
+    /// (%% of Execution + Finalization Fees)
+    public static let tipFieldInfo = L10n.tr("Localizable", "customizeNetworkFees_tipFieldInfo", fallback: "(%% of Execution + Finalization Fees)")
+    /// Adjust Tip to Lock
+    public static let tipFieldLabel = L10n.tr("Localizable", "customizeNetworkFees_tipFieldLabel", fallback: "Adjust Tip to Lock")
+    /// Transaction Fee
+    public static let totalFee = L10n.tr("Localizable", "customizeNetworkFees_totalFee", fallback: "Transaction Fee")
+    /// View Advanced Mode
+    public static let viewAdvancedModeButtonTitle = L10n.tr("Localizable", "customizeNetworkFees_viewAdvancedModeButtonTitle", fallback: "View Advanced Mode")
+    /// View Normal Mode
+    public static let viewNormalModeButtonTitle = L10n.tr("Localizable", "customizeNetworkFees_viewNormalModeButtonTitle", fallback: "View Normal Mode")
+    public enum AdvancedMode {
+      /// Fully customize fee payment for this transaction. Not recomended unless you are a developer or advanced user.
+      public static let subtitle = L10n.tr("Localizable", "customizeNetworkFees_advancedMode_subtitle", fallback: "Fully customize fee payment for this transaction. Not recomended unless you are a developer or advanced user.")
+      /// Advanced Customize Fees
+      public static let title = L10n.tr("Localizable", "customizeNetworkFees_advancedMode_title", fallback: "Advanced Customize Fees")
+    }
+    public enum NormalMode {
+      /// Choose what account to pay the transaction fee from, or add a up your transaction if necessary.
+      public static let subtitle = L10n.tr("Localizable", "customizeNetworkFees_normalMode_subtitle", fallback: "Choose what account to pay the transaction fee from, or add a up your transaction if necessary.")
+      /// Customize Fees
+      public static let title = L10n.tr("Localizable", "customizeNetworkFees_normalMode_title", fallback: "Customize Fees")
+    }
+    public enum SelectFeePayer {
+      /// Select Fee Payer
+      public static let navigationTitle = L10n.tr("Localizable", "customizeNetworkFees_selectFeePayer_navigationTitle", fallback: "Select Fee Payer")
+      /// Select Account
+      public static let selectAccountButtonTitle = L10n.tr("Localizable", "customizeNetworkFees_selectFeePayer_selectAccountButtonTitle", fallback: "Select Account")
+      /// Select an account to pay %@ XRD transaction fee
+      public static func subtitle(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "customizeNetworkFees_selectFeePayer_subtitle", String(describing: p1), fallback: "Select an account to pay %@ XRD transaction fee")
+      }
+    }
+    public enum TotalFee {
+      /// (maximum to lock)
+      public static let info = L10n.tr("Localizable", "customizeNetworkFees_totalFee_info", fallback: "(maximum to lock)")
+    }
+    public enum Warning {
+      /// Insufficient balance to pay the transaction fee
+      public static let insufficientBalance = L10n.tr("Localizable", "customizeNetworkFees_warning_insufficientBalance", fallback: "Insufficient balance to pay the transaction fee")
+      /// Please select a fee payer for the transaction fee
+      public static let selectFeePayer = L10n.tr("Localizable", "customizeNetworkFees_warning_selectFeePayer", fallback: "Please select a fee payer for the transaction fee")
+    }
+  }
   public enum DAppRequest {
     /// Loading…
     public static let metadataLoadingPrompt = L10n.tr("Localizable", "dAppRequest_metadataLoadingPrompt", fallback: "Loading…")
@@ -1124,15 +1144,11 @@ public enum L10n {
       public static let subtitleWrongNetworkID = L10n.tr("Localizable", "dAppRequest_validationOutcome_subtitleWrongNetworkID", fallback: "Network mismatch")
     }
   }
-  public enum DepositGuarantees {
-    /// Set the guaranteed minimum deposit to be applied whenever a deposit in a transaction can only be estimated.
-    /// 
-    /// You can always change the guarantee from this default in each transaction.
-    public static let text = L10n.tr("Localizable", "depositGuarantees_text", fallback: "Set the guaranteed minimum deposit to be applied whenever a deposit in a transaction can only be estimated.\n\nYou can always change the guarantee from this default in each transaction.")
-  }
   public enum DisplayMnemonics {
     /// Write Down this Seed Phrase
     public static let backUpWarning = L10n.tr("Localizable", "displayMnemonics_backUpWarning", fallback: "Write Down this Seed Phrase")
+    /// Seed Phrase Entry Required
+    public static let seedPhraseEntryWarning = L10n.tr("Localizable", "displayMnemonics_seedPhraseEntryWarning", fallback: "Seed Phrase Entry Required")
     /// Seed Phrases
     public static let seedPhrases = L10n.tr("Localizable", "displayMnemonics_seedPhrases", fallback: "Seed Phrases")
     /// You are responsible for the security of your Seed Phrase
@@ -1407,8 +1423,6 @@ public enum L10n {
     }
     /// Wallet Data Backup
     public static let navigationTitle = L10n.tr("Localizable", "iOSProfileBackup_navigationTitle", fallback: "Wallet Data Backup")
-    /// No backups found in iCloud
-    public static let noCloudBackup = L10n.tr("Localizable", "iOSProfileBackup_noCloudBackup", fallback: "No backups found in iCloud")
     /// Number of networks: %d
     public static func numberOfNetworksLabel(_ p1: Int) -> String {
       return L10n.tr("Localizable", "iOSProfileBackup_numberOfNetworksLabel", p1, fallback: "Number of networks: %d")
@@ -1629,10 +1643,6 @@ public enum L10n {
     public static let subtitle = L10n.tr("Localizable", "importOlympiaLedgerAccounts_subtitle", fallback: "You are attempting to import one or more Olympia accounts that must be verified with a Ledger hardware wallet device.")
     /// Verify With Ledger Device
     public static let title = L10n.tr("Localizable", "importOlympiaLedgerAccounts_title", fallback: "Verify With Ledger Device")
-  }
-  public enum ImportProfile {
-    /// Import Radix Wallet backup
-    public static let importProfile = L10n.tr("Localizable", "importProfile_importProfile", fallback: "Import Radix Wallet backup")
   }
   public enum LedgerHardwareDevices {
     /// Added
@@ -1959,8 +1969,6 @@ public enum L10n {
     public static let backups = L10n.tr("Localizable", "settings_backups", fallback: "Backups")
     /// Delete Wallet Data
     public static let deleteWalletData = L10n.tr("Localizable", "settings_deleteWalletData", fallback: "Delete Wallet Data")
-    /// Deposit Guarantees
-    public static let depositGuarantees = L10n.tr("Localizable", "settings_depositGuarantees", fallback: "Deposit Guarantees")
     /// Gateways
     public static let gateways = L10n.tr("Localizable", "settings_gateways", fallback: "Gateways")
     /// Import from a Legacy Wallet
@@ -2056,64 +2064,6 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "splash_passcodeCheckFailedAlert_title", fallback: "Warning")
     }
   }
-  public enum Transaction {
-    public enum Status {
-      public enum Completing {
-        /// Completing Transaction…
-        public static let text = L10n.tr("Localizable", "transaction_status_completing_text", fallback: "Completing Transaction…")
-      }
-      public enum Dismiss {
-        public enum Dialog {
-          /// Stop waiting for transaction result? The transaction will not be canceled.
-          public static let message = L10n.tr("Localizable", "transaction_status_dismiss_dialog_message", fallback: "Stop waiting for transaction result? The transaction will not be canceled.")
-        }
-      }
-      public enum DismissalDisabledDialog {
-        /// This transaction requires to be completed
-        public static let text = L10n.tr("Localizable", "transaction_status_dismissalDisabledDialog_text", fallback: "This transaction requires to be completed")
-        /// Dismiss
-        public static let title = L10n.tr("Localizable", "transaction_status_dismissalDisabledDialog_title", fallback: "Dismiss")
-      }
-      public enum Error {
-        /// Your transaction could not be processed, but could potentially still be processed within the next %@ minutes
-        public static func text(_ p1: Any) -> String {
-          return L10n.tr("Localizable", "transaction_status_error_text", String(describing: p1), fallback: "Your transaction could not be processed, but could potentially still be processed within the next %@ minutes")
-        }
-        /// Transaction Error
-        public static let title = L10n.tr("Localizable", "transaction_status_error_title", fallback: "Transaction Error")
-      }
-      public enum Failed {
-        /// Your transaction was processed, but had a problem that caused it to fail permanently
-        public static let text = L10n.tr("Localizable", "transaction_status_failed_text", fallback: "Your transaction was processed, but had a problem that caused it to fail permanently")
-        /// Transaction Failed
-        public static let title = L10n.tr("Localizable", "transaction_status_failed_title", fallback: "Transaction Failed")
-      }
-      public enum Failure {
-        /// Transaction was rejected as invalid by the Radix Network.
-        public static let text = L10n.tr("Localizable", "transaction_status_failure_text", fallback: "Transaction was rejected as invalid by the Radix Network.")
-        /// Something went wrong
-        public static let title = L10n.tr("Localizable", "transaction_status_failure_title", fallback: "Something went wrong")
-      }
-      public enum Rejected {
-        /// Your transaction was improperly constructed and cannot be processed
-        public static let text = L10n.tr("Localizable", "transaction_status_rejected_text", fallback: "Your transaction was improperly constructed and cannot be processed")
-        /// Transaction Rejected
-        public static let title = L10n.tr("Localizable", "transaction_status_rejected_title", fallback: "Transaction Rejected")
-      }
-      public enum Success {
-        /// Your transaction was successful
-        public static let text = L10n.tr("Localizable", "transaction_status_success_text", fallback: "Your transaction was successful")
-        /// Transaction Success
-        public static let title = L10n.tr("Localizable", "transaction_status_success_title", fallback: "Transaction Success")
-      }
-      public enum Transaction {
-        public enum Id {
-          /// Transaction ID: 
-          public static let text = L10n.tr("Localizable", "transaction_status_transaction_id_text", fallback: "Transaction ID: ")
-        }
-      }
-    }
-  }
   public enum TransactionReview {
     /// Approve
     public static let approveButtonTitle = L10n.tr("Localizable", "transactionReview_approveButtonTitle", fallback: "Approve")
@@ -2183,82 +2133,6 @@ public enum L10n {
       /// Review New Deposit Settings
       public static let title = L10n.tr("Localizable", "transactionReview_accountDepositSettings_title", fallback: "Review New Deposit Settings")
     }
-    public enum CustomizeNetworkFeeSheet {
-      /// Change
-      public static let changeButtonTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_changeButtonTitle", fallback: "Change")
-      /// Effective Tip
-      public static let effectiveTip = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_effectiveTip", fallback: "Effective Tip")
-      /// Estimated Transaction Fees
-      public static let feeBreakdownTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_feeBreakdownTitle", fallback: "Estimated Transaction Fees")
-      /// Network Execution
-      public static let networkExecution = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_networkExecution", fallback: "Network Execution")
-      /// Network Fee
-      public static let networkFee = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_networkFee", fallback: "Network Fee")
-      /// Network Finalization
-      public static let networkFinalization = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_networkFinalization", fallback: "Network Finalization")
-      /// Network Storage
-      public static let networkStorage = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_networkStorage", fallback: "Network Storage")
-      /// No account selected
-      public static let noAccountSelected = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_noAccountSelected", fallback: "No account selected")
-      /// None due
-      public static let noneDue = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_noneDue", fallback: "None due")
-      /// None required
-      public static let noneRequired = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_noneRequired", fallback: "None required")
-      /// Padding
-      public static let padding = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_padding", fallback: "Padding")
-      /// Adjust Fee Padding Amount (XRD)
-      public static let paddingFieldLabel = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_paddingFieldLabel", fallback: "Adjust Fee Padding Amount (XRD)")
-      /// Paid by dApps
-      public static let paidByDApps = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_paidByDApps", fallback: "Paid by dApps")
-      /// Pay fee from
-      public static let payFeeFrom = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_payFeeFrom", fallback: "Pay fee from")
-      /// Royalties
-      public static let royalties = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_royalties", fallback: "Royalties")
-      /// Royalty fee
-      public static let royaltyFee = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_royaltyFee", fallback: "Royalty fee")
-      /// (%% of Execution + Finalization Fees)
-      public static let tipFieldInfo = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_tipFieldInfo", fallback: "(%% of Execution + Finalization Fees)")
-      /// Adjust Tip to Lock
-      public static let tipFieldLabel = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_tipFieldLabel", fallback: "Adjust Tip to Lock")
-      /// Transaction Fee
-      public static let totalFee = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_totalFee", fallback: "Transaction Fee")
-      /// View Advanced Mode
-      public static let viewAdvancedModeButtonTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_viewAdvancedModeButtonTitle", fallback: "View Advanced Mode")
-      /// View Normal Mode
-      public static let viewNormalModeButtonTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_viewNormalModeButtonTitle", fallback: "View Normal Mode")
-      public enum AdvancedMode {
-        /// Fully customize fee payment for this transaction. Not recommended unless you are a developer or advanced user.
-        public static let subtitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_advancedMode_subtitle", fallback: "Fully customize fee payment for this transaction. Not recommended unless you are a developer or advanced user.")
-        /// Advanced Customize Fees
-        public static let title = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_advancedMode_title", fallback: "Advanced Customize Fees")
-      }
-      public enum InsufficientBalance {
-        /// Insufficient balance to pay the transaction fee
-        public static let warning = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_insufficientBalance_warning", fallback: "Insufficient balance to pay the transaction fee")
-      }
-      public enum NormalMode {
-        /// Choose what account to pay the transaction fee from, or add a “tip” to speed up your transaction if necessary.
-        public static let subtitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_normalMode_subtitle", fallback: "Choose what account to pay the transaction fee from, or add a “tip” to speed up your transaction if necessary.")
-        /// Customize Fees
-        public static let title = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_normalMode_title", fallback: "Customize Fees")
-      }
-      public enum SelectFeePayer {
-        /// Select Fee Payer
-        public static let navigationTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayer_navigationTitle", fallback: "Select Fee Payer")
-        /// Select Account
-        public static let selectAccountButtonTitle = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayer_selectAccountButtonTitle", fallback: "Select Account")
-        /// Select an account to pay %@ XRD transaction fee
-        public static func subtitle(_ p1: Any) -> String {
-          return L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayer_subtitle", String(describing: p1), fallback: "Select an account to pay %@ XRD transaction fee")
-        }
-        /// Please select a fee payer for the transaction fee
-        public static let warning = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_selectFeePayer_warning", fallback: "Please select a fee payer for the transaction fee")
-      }
-      public enum TotalFee {
-        /// (maximum to lock)
-        public static let info = L10n.tr("Localizable", "transactionReview_customizeNetworkFeeSheet_totalFee_info", fallback: "(maximum to lock)")
-      }
-    }
     public enum Guarantees {
       /// Apply
       public static let applyButtonText = L10n.tr("Localizable", "transactionReview_guarantees_applyButtonText", fallback: "Apply")
@@ -2323,6 +2197,58 @@ public enum L10n {
     public static let signTransactionButtonTitle = L10n.tr("Localizable", "transactionSigning_signTransactionButtonTitle", fallback: "Approve Transaction")
     /// Approve Transaction
     public static let title = L10n.tr("Localizable", "transactionSigning_title", fallback: "Approve Transaction")
+  }
+  public enum TransactionStatus {
+    public enum Completing {
+      /// Completing Transaction…
+      public static let text = L10n.tr("Localizable", "transactionStatus_completing_text", fallback: "Completing Transaction…")
+    }
+    public enum DismissDialog {
+      /// Stop waiting for transaction result? The transaction will not be canceled.
+      public static let message = L10n.tr("Localizable", "transactionStatus_dismissDialog_message", fallback: "Stop waiting for transaction result? The transaction will not be canceled.")
+    }
+    public enum DismissalDisabledDialog {
+      /// This transaction requires to be completed
+      public static let text = L10n.tr("Localizable", "transactionStatus_dismissalDisabledDialog_text", fallback: "This transaction requires to be completed")
+      /// Dismiss
+      public static let title = L10n.tr("Localizable", "transactionStatus_dismissalDisabledDialog_title", fallback: "Dismiss")
+    }
+    public enum Error {
+      /// Your transaction could not be processed, but could potentially still be processed within the next %@ minutes
+      public static func text(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "transactionStatus_error_text", String(describing: p1), fallback: "Your transaction could not be processed, but could potentially still be processed within the next %@ minutes")
+      }
+      /// Transaction Error
+      public static let title = L10n.tr("Localizable", "transactionStatus_error_title", fallback: "Transaction Error")
+    }
+    public enum Failed {
+      /// Your transaction was processed, but had a problem that caused it to fail permanently
+      public static let text = L10n.tr("Localizable", "transactionStatus_failed_text", fallback: "Your transaction was processed, but had a problem that caused it to fail permanently")
+      /// Transaction Failed
+      public static let title = L10n.tr("Localizable", "transactionStatus_failed_title", fallback: "Transaction Failed")
+    }
+    public enum Failure {
+      /// Transaction was rejected as invalid by the Radix Network.
+      public static let text = L10n.tr("Localizable", "transactionStatus_failure_text", fallback: "Transaction was rejected as invalid by the Radix Network.")
+      /// Something went wrong
+      public static let title = L10n.tr("Localizable", "transactionStatus_failure_title", fallback: "Something went wrong")
+    }
+    public enum Rejected {
+      /// Your transaction was improperly constructed and cannot be processed
+      public static let text = L10n.tr("Localizable", "transactionStatus_rejected_text", fallback: "Your transaction was improperly constructed and cannot be processed")
+      /// Transaction Rejected
+      public static let title = L10n.tr("Localizable", "transactionStatus_rejected_title", fallback: "Transaction Rejected")
+    }
+    public enum Success {
+      /// Your transaction was successful
+      public static let text = L10n.tr("Localizable", "transactionStatus_success_text", fallback: "Your transaction was successful")
+      /// Transaction Success
+      public static let title = L10n.tr("Localizable", "transactionStatus_success_title", fallback: "Transaction Success")
+    }
+    public enum TransactionID {
+      /// Transaction ID: 
+      public static let text = L10n.tr("Localizable", "transactionStatus_transactionID_text", fallback: "Transaction ID: ")
+    }
   }
 }
 // swiftlint:enable explicit_type_interface function_parameter_count identifier_name line_length

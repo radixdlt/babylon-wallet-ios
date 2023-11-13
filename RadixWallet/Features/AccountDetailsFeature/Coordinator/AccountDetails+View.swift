@@ -6,9 +6,9 @@ extension AccountDetails.State {
 			accountAddress: account.address,
 			appearanceID: account.appearanceID,
 			displayName: account.displayName.rawValue,
-			needToImportMnemonicForThisAccount: importMnemonicPrompt.needed,
-			needToBackupMnemonicForThisAccount: exportMnemonicPrompt.needed,
-			isLedgerAccount: account.isLedgerAccount
+			mnemonicHandlingCallToAction: mnemonicHandlingCallToAction,
+			isLedgerAccount: account.isLedgerAccount,
+			showToolbar: destination == nil
 		)
 	}
 }
@@ -19,9 +19,9 @@ extension AccountDetails {
 		let accountAddress: AccountAddress
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let displayName: String
-		let needToImportMnemonicForThisAccount: Bool
-		let needToBackupMnemonicForThisAccount: Bool
+		let mnemonicHandlingCallToAction: MnemonicHandling?
 		let isLedgerAccount: Bool
+		let showToolbar: Bool
 	}
 
 	@MainActor
@@ -40,26 +40,12 @@ extension AccountDetails {
 						.textStyle(.body2HighImportance)
 						.padding(.bottom, .medium1)
 
-					Group {
-						// Mutally exclusive to prompt user to recover and backup mnemonic.
-						if viewStore.needToImportMnemonicForThisAccount {
-							recoverMnemonicsPromptView(viewStore)
-						} else if viewStore.needToBackupMnemonicForThisAccount {
-							exportMnemonicPromptView(viewStore)
-						}
-					}
+					prompts(
+						mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction
+					)
 					.padding(.medium1)
 
-					Button(L10n.Account.transfer, asset: AssetResource.transfer) {
-						viewStore.send(.transferButtonTapped)
-					}
-					.textStyle(.body1Header)
-					.foregroundColor(.app.white)
-					.padding(.horizontal, .large2)
-					.frame(height: .standardButtonHeight)
-					.background(.app.whiteTransparent3)
-					.cornerRadius(.standardButtonHeight / 2)
-					.padding(.bottom, .medium1)
+					transferButton()
 
 					AssetsView.View(store: store.scope(state: \.assets, action: { .child(.assets($0)) }))
 						.roundedCorners(.top, radius: .medium1)
@@ -70,68 +56,84 @@ extension AccountDetails {
 				.task {
 					viewStore.send(.task)
 				}
-				.navigationBarTitleDisplayMode(.inline)
+				.navigationTitle(viewStore.displayName)
+				.navigationBarTitleColor(.white)
 				.toolbar {
-					ToolbarItem(placement: .navigationBarLeading) {
-						BackButton {
-							viewStore.send(.backButtonTapped)
-						}
-						.foregroundColor(.app.white)
-					}
-					ToolbarItem(placement: .principal) {
-						Text(viewStore.displayName)
-							.textStyle(.secondaryHeader)
+					if viewStore.showToolbar {
+						ToolbarItem(placement: .navigationBarLeading) {
+							BackButton {
+								viewStore.send(.backButtonTapped)
+							}
 							.foregroundColor(.app.white)
-					}
-					ToolbarItem(placement: .navigationBarTrailing) {
-						Button(asset: AssetResource.ellipsis) {
-							viewStore.send(.preferencesButtonTapped)
 						}
-						.frame(.small)
-						.foregroundColor(.app.white)
+
+						ToolbarItem(placement: .navigationBarTrailing) {
+							Button(asset: AssetResource.ellipsis) {
+								viewStore.send(.preferencesButtonTapped)
+							}
+							.frame(.small)
+							.foregroundColor(.app.white)
+						}
 					}
 				}
-				.navigationDestination(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /AccountDetails.Destinations.State.preferences,
-					action: AccountDetails.Destinations.Action.preferences,
-					destination: { AccountPreferences.View(store: $0) }
-				)
-				.fullScreenCover(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /AccountDetails.Destinations.State.transfer,
-					action: AccountDetails.Destinations.Action.transfer,
-					content: { AssetTransfer.SheetView(store: $0) }
-				)
-				.fullScreenCover( /* Full Screen cover to not be able to use iOS dismiss gestures */
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /AccountDetails.Destinations.State.exportMnemonic,
-					action: AccountDetails.Destinations.Action.exportMnemonic,
-					content: { childStore in
-						NavigationView {
-							ImportMnemonic.View(store: childStore)
-								.navigationTitle(L10n.ImportMnemonic.navigationTitleBackup)
-						}
-					}
-				)
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /AccountDetails.Destinations.State.importMnemonics,
-					action: AccountDetails.Destinations.Action.importMnemonics,
-					content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
-				)
 			}
+			.destinations(store.scope(state: \.$destination, action: { .child(.destination($0)) }))
+		}
+
+		@ViewBuilder
+		func prompts(mnemonicHandlingCallToAction: MnemonicHandling?) -> some SwiftUI.View {
+			if let mnemonicHandlingCallToAction {
+				switch mnemonicHandlingCallToAction {
+				case .mustBeImported:
+					importMnemonicPromptView {
+						store.send(.view(.importMnemonicButtonTapped))
+					}
+				case .shouldBeExported:
+					exportMnemonicPromptView {
+						store.send(.view(.exportMnemonicButtonTapped))
+					}
+				}
+			}
+		}
+
+		func transferButton() -> some SwiftUI.View {
+			Button(L10n.Account.transfer, asset: AssetResource.transfer) {
+				store.send(.view(.transferButtonTapped))
+			}
+			.textStyle(.body1Header)
+			.foregroundColor(.app.white)
+			.padding(.horizontal, .large2)
+			.frame(height: .standardButtonHeight)
+			.background(.app.whiteTransparent3)
+			.cornerRadius(.standardButtonHeight / 2)
+			.padding(.bottom, .medium1)
 		}
 	}
 }
 
-extension View {
-	func recoverMnemonicsPromptView(_ viewStore: ViewStoreOf<AccountDetails>) -> some View {
-		importMnemonicPromptView { viewStore.send(.recoverMnemonicsButtonTapped) }
+@MainActor
+private extension View {
+	func destinations(_ destinationStore: PresentationStoreOf<AccountDetails.Destinations>) -> some SwiftUI.View {
+		preferences(destinationStore)
+			.transfer(destinationStore)
 	}
 
-	func exportMnemonicPromptView(_ viewStore: ViewStoreOf<AccountDetails>) -> some View {
-		backupMnemonicPromptView { viewStore.send(.exportMnemonicButtonTapped) }
+	func preferences(_ destinationStore: PresentationStoreOf<AccountDetails.Destinations>) -> some SwiftUI.View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AccountDetails.Destinations.State.preferences,
+			action: AccountDetails.Destinations.Action.preferences,
+			destination: { AccountPreferences.View(store: $0) }
+		)
+	}
+
+	func transfer(_ destinationStore: PresentationStoreOf<AccountDetails.Destinations>) -> some SwiftUI.View {
+		fullScreenCover(
+			store: destinationStore,
+			state: /AccountDetails.Destinations.State.transfer,
+			action: AccountDetails.Destinations.Action.transfer,
+			content: { AssetTransfer.SheetView(store: $0) }
+		)
 	}
 }
 
@@ -143,7 +145,7 @@ struct AccountDetails_Preview: PreviewProvider {
 		NavigationStack {
 			AccountDetails.View(
 				store: .init(
-					initialState: .init(for: .previewValue0),
+					initialState: .init(accountWithInfo: .init(account: .previewValue0)),
 					reducer: AccountDetails.init
 				)
 			)

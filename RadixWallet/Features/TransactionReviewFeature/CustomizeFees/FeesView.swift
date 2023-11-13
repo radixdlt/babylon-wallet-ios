@@ -14,7 +14,7 @@ struct FeesView: View {
 	var body: some View {
 		VStack(spacing: .small1) {
 			HStack {
-				Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.feeBreakdownTitle)
+				Text(L10n.CustomizeNetworkFees.feeBreakdownTitle)
 					.textStyle(.body1Link)
 					.foregroundColor(.app.gray2)
 					.textCase(.uppercase)
@@ -40,12 +40,12 @@ struct FeesView: View {
 	func transactionFeeView(fee: String, isAdvancedMode: Bool) -> some SwiftUI.View {
 		HStack {
 			VStack(spacing: .zero) {
-				Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.totalFee)
+				Text(L10n.CustomizeNetworkFees.totalFee)
 					.textStyle(.body1Link)
 					.foregroundColor(.app.gray2)
 					.textCase(.uppercase)
 				if isAdvancedMode {
-					Text(L10n.TransactionReview.CustomizeNetworkFeeSheet.TotalFee.info)
+					Text(L10n.CustomizeNetworkFees.TotalFee.info)
 						.textStyle(.body1Link)
 						.foregroundColor(.app.gray2)
 				}
@@ -90,29 +90,29 @@ extension TransactionFee.AdvancedFeeCustomization {
 	var viewStates: IdentifiedArrayOf<FeeViewState> {
 		var displayedFees = IdentifiedArrayOf<FeeViewState>(uncheckedUniqueElements: [
 			.init(
-				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkExecution,
+				name: L10n.CustomizeNetworkFees.networkExecution,
 				amount: feeSummary.totalExecutionCost
 			),
 			.init(
-				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkFinalization,
+				name: L10n.CustomizeNetworkFees.networkFinalization,
 				amount: feeSummary.finalizationCost
 			),
 			.init(
-				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.effectiveTip,
+				name: L10n.CustomizeNetworkFees.effectiveTip,
 				amount: tipAmount,
 				isUserConfigurable: true
 			),
 			.init(
-				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkStorage,
+				name: L10n.CustomizeNetworkFees.networkStorage,
 				amount: feeSummary.storageExpansionCost
 			),
 			.init(
-				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.padding,
+				name: L10n.CustomizeNetworkFees.padding,
 				amount: paddingFee,
 				isUserConfigurable: true
 			),
 			.init(
-				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.royalties,
+				name: L10n.CustomizeNetworkFees.royalties,
 				amount: feeSummary.royaltyCost
 			),
 		])
@@ -120,7 +120,7 @@ extension TransactionFee.AdvancedFeeCustomization {
 		if paidByDapps > .zero {
 			displayedFees.append(
 				.init(
-					name: L10n.TransactionReview.CustomizeNetworkFeeSheet.paidByDApps,
+					name: L10n.CustomizeNetworkFees.paidByDApps,
 					amount: paidByDapps
 				)
 			)
@@ -133,11 +133,11 @@ extension TransactionFee.NormalFeeCustomization {
 	var viewStates: IdentifiedArrayOf<FeeViewState> {
 		.init(uncheckedUniqueElements: [
 			.init(
-				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.networkFee,
+				name: L10n.CustomizeNetworkFees.networkFee,
 				amount: networkFee
 			),
 			.init(
-				name: L10n.TransactionReview.CustomizeNetworkFeeSheet.royaltyFee,
+				name: L10n.CustomizeNetworkFees.royaltyFee,
 				amount: royaltyFee
 			),
 		])
@@ -147,7 +147,7 @@ extension TransactionFee.NormalFeeCustomization {
 extension RETDecimal {
 	func formatted(showsZero: Bool) -> String {
 		if !showsZero, isZero() {
-			return L10n.TransactionReview.CustomizeNetworkFeeSheet.noneDue
+			return L10n.CustomizeNetworkFees.noneDue
 		}
 		return L10n.TransactionReview.xrdAmount(formatted())
 	}

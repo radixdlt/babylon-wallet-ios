@@ -7,13 +7,25 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		public var mnemonicsLeftToImport: IdentifiedArrayOf<EntitiesControlledByFactorSource> = []
 		public var imported: OrderedSet<SkippedOrImported> = []
 		public var skipped: OrderedSet<SkippedOrImported> = []
-		public let profileSnapshot: ProfileSnapshot
+		public enum Context: Sendable, Hashable {
+			case fromOnboarding(profileSnapshot: ProfileSnapshot)
+			case notOnboarding
+
+			var profileSnapshotFromOnboarding: ProfileSnapshot? {
+				switch self {
+				case let .fromOnboarding(profileSnapshot): profileSnapshot
+				case .notOnboarding: nil
+				}
+			}
+		}
+
+		public let context: Context
 
 		@PresentationState
 		public var destination: Destinations.State?
 
-		public init(profileSnapshot: ProfileSnapshot) {
-			self.profileSnapshot = profileSnapshot
+		public init(context: Context = .notOnboarding) {
+			self.context = context
 		}
 	}
 
@@ -54,20 +66,20 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 			imported: OrderedSet<SkippedOrImported>
 		)
 
-		case failedToImportAllRequiredMnemonics
-		case closeButtonTapped
-		case importedMnemonic(forFactorSourceID: FactorSourceID)
+		case finishedEarly(dueToFailure: Bool)
 	}
 
 	public struct SkippedOrImported: Sendable, Hashable {
-		public let factorSourceID: FactorSourceID
+		public let factorSourceID: FactorSource.ID.FromHash
 	}
 
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
-	@Dependency(\.userDefaultsClient) var userDefaultsClient
+	@Dependency(\.userDefaults) var userDefaults
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.secureStorageClient) var secureStorageClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	@Dependency(\.backupsClient) var backupsClient
 
 	public init() {}
 
@@ -81,12 +93,17 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
-			.run { [snapshot = state.profileSnapshot] send in
+			.run { [context = state.context] send in
 				await send(.internal(.loadControlledEntities(TaskResult {
+					let snapshot = if let fromOnboarding = context.profileSnapshotFromOnboarding {
+						fromOnboarding
+					} else {
+						try await backupsClient.snapshotOfProfileForExport()
+					}
 					let ents = try await deviceFactorSourceClient.controlledEntities(snapshot)
 					try? await clock.sleep(for: .milliseconds(200))
-					return await ents.asyncCompactMap { ent in
-						let hasAccessToMnemonic = await secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(ent.factorSourceID)
+					return ents.compactMap { ent in
+						let hasAccessToMnemonic = secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(ent.factorSourceID)
 						return if hasAccessToMnemonic {
 							nil // exclude this mnemonic from mnemonics to import, already present,.
 						} else {
@@ -96,7 +113,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 				})))
 			}
 		case .closeButtonTapped:
-			.send(.delegate(.closeButtonTapped))
+			.send(.delegate(.finishedEarly(dueToFailure: false)))
 		}
 	}
 
@@ -116,19 +133,19 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(delegatAction)))):
-			switch delegatAction {
+		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(delegateAction)))):
+			switch delegateAction {
 			case let .skippedMnemonic(factorSourceIDHash):
-				state.skipped.append(.init(factorSourceID: factorSourceIDHash.embed()))
-				return finishedWith(factorSourceID: factorSourceIDHash.embed(), state: &state)
+				state.skipped.append(.init(factorSourceID: factorSourceIDHash))
+				return finishedWith(factorSourceID: factorSourceIDHash, state: &state)
 
 			case let .persistedMnemonicInKeychain(factorSourceID):
+				overlayWindowClient.scheduleHUD(.seedPhraseImported)
 				state.imported.append(.init(factorSourceID: factorSourceID))
-				return .send(.delegate(.importedMnemonic(forFactorSourceID: factorSourceID)))
-					.merge(with: finishedWith(factorSourceID: factorSourceID, state: &state))
+				return finishedWith(factorSourceID: factorSourceID, state: &state)
 
 			case .failedToSaveInKeychain:
-				return .send(.delegate(.failedToImportAllRequiredMnemonics))
+				return .send(.delegate(.finishedEarly(dueToFailure: true)))
 			}
 
 		case .destination(.dismiss):
@@ -142,7 +159,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 					return nextMnemonicIfNeeded(state: &state)
 				} else {
 					// Skipped a non skippable by use of OS level gestures
-					return .send(.delegate(.failedToImportAllRequiredMnemonics))
+					return .send(.delegate(.finishedEarly(dueToFailure: true)))
 				}
 			}
 
@@ -151,8 +168,8 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	private func finishedWith(factorSourceID: FactorSourceID, state: inout State) -> Effect<Action> {
-		state.mnemonicsLeftToImport.removeAll(where: { $0.factorSourceID.embed() == factorSourceID })
+	private func finishedWith(factorSourceID: FactorSourceID.FromHash, state: inout State) -> Effect<Action> {
+		state.mnemonicsLeftToImport.removeAll(where: { $0.factorSourceID == factorSourceID })
 		return nextMnemonicIfNeeded(state: &state)
 	}
 

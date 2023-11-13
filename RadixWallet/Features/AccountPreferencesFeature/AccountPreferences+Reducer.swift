@@ -182,7 +182,6 @@ extension AccountPreferences {
 		case .devPreferences:
 			return .none
 		case let .confirmHideAccount(action):
-			state.destinations = nil
 			switch action {
 			case .confirmTapped:
 				return .run { [account = state.account] send in
