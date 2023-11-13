@@ -5,24 +5,29 @@ import XCTest
 // swiftformat:disable redundantInit
 
 extension DependencyValues {
-	private mutating func _profile(_ profile: Profile?) {
+	private mutating func _profile(
+		_ profile: Profile?,
+		userDefaults userDefaultsValue: UserDefaults.Dependency = .ephemeral()
+	) {
 		secureStorageClient.loadProfile = { _ in
 			profile
 		}
-//		userDefaults.stringForKey = {
-//			if $0 == .activeProfileID {
-//				profile?.header.id.uuidString
-//			} else { String?.none }
-//		}
+		userDefaultsValue.set(string: profile?.header.id.uuidString, key: .activeProfileID)
+		self.userDefaults = userDefaultsValue
 		mnemonicClient.generate = { _, _ in .testValue }
 	}
 
-	mutating func savedProfile(_ savedProfile: Profile) {
-		_profile(savedProfile)
+	mutating func savedProfile(
+		_ savedProfile: Profile,
+		userDefaults: UserDefaults.Dependency = .ephemeral()
+	) {
+		_profile(savedProfile, userDefaults: userDefaults)
 	}
 
-	mutating func noProfile() {
-		_profile(nil)
+	mutating func noProfile(
+		userDefaults: UserDefaults.Dependency = .ephemeral()
+	) {
+		_profile(nil, userDefaults: userDefaults)
 	}
 
 	mutating func noDeviceInfo() {
@@ -494,168 +499,166 @@ final class ProfileStoreNewProfileTests: TestCase {
 			}
 		}
 	}
-	/*
-	 func test__GIVEN__no_profile__WHEN__finishOnboarding__THEN__iphone__model_is_updated_in_profile_and_keychain() async throws {
-	 	try await withTimeLimit {
-	 		let savedSnapshot = LockIsolated<ProfileSnapshot?>(nil)
 
-	 		let inMemory = try await withTestClients {
-	 			// GIVEN no profile
-	 			$0.noProfile()
-	 			$0.device.$model = { "marco" }
-	 			$0.device.$name = { "polo" }
-	 			then(&$0)
-	 		} operation: {
-	 			// WHEN finishedOnboarding
-	 			let sut = ProfileStore()
-	 			try await sut.updating {
-	 				try $0.addAccount(Profile.Network.Account.testValue)
-	 			}
-	 			await sut.finishedOnboarding()
-	 			return await sut.profile
-	 		}
+	func test__GIVEN__no_profile__WHEN__finishOnboarding__THEN__iphone__model_is_updated_in_profile_and_keychain() async throws {
+		try await withTimeLimit {
+			let savedSnapshot = LockIsolated<ProfileSnapshot?>(nil)
 
-	 		func then(_ d: inout DependencyValues) {
-	 			d.secureStorageClient.saveProfileSnapshot = {
-	 				savedSnapshot.setValue($0)
-	 			}
-	 		}
+			let inMemory = try await withTestClients {
+				// GIVEN no profile
+				$0.noProfile()
+				$0.device.$model = { "marco" }
+				$0.device.$name = { "polo" }
+				then(&$0)
+			} operation: {
+				// WHEN finishedOnboarding
+				let sut = ProfileStore()
+				try await sut.updating {
+					try $0.addAccount(Profile.Network.Account.testValue)
+				}
+				await sut.finishedOnboarding()
+				return await sut.profile
+			}
 
-	 		func assert(_ header: ProfileSnapshot.Header?) {
-	 			let expected = "marco (polo)"
-	 			XCTAssertNoDifference(header?.creatingDevice.description, expected)
-	 			XCTAssertNoDifference(header?.lastUsedOnDevice.description, expected)
-	 		}
+			func then(_ d: inout DependencyValues) {
+				d.secureStorageClient.saveProfileSnapshot = {
+					savedSnapshot.setValue($0)
+				}
+			}
 
-	 		// THEN iphone model is updated in Profile ...
-	 		assert(inMemory.header)
-	 		savedSnapshot.withValue { inKeychain in
-	 			// ... and in keychain
-	 			assert(inKeychain?.header)
-	 		}
-	 	}
-	 }
-	  */
+			func assert(_ header: ProfileSnapshot.Header?) {
+				let expected = "marco (polo)"
+				XCTAssertNoDifference(header?.creatingDevice.description, expected)
+				XCTAssertNoDifference(header?.lastUsedOnDevice.description, expected)
+			}
+
+			// THEN iphone model is updated in Profile ...
+			assert(inMemory.header)
+			savedSnapshot.withValue { inKeychain in
+				// ... and in keychain
+				assert(inKeychain?.header)
+			}
+		}
+	}
 }
 
 // MARK: - ProfileStoreExstingProfileTests
 final class ProfileStoreExstingProfileTests: TestCase {
+	func test__GIVEN__saved_profile__WHEN__init__THEN__saved_profile_is_used() async throws {
+		try await withTimeLimit {
+			// GIVEN saved profile
+			let saved = Profile.withOneAccount
+
+			let used = await withTestClients {
+				$0.savedProfile(saved)
+			} operation: {
+				// WHEN ProfileStore.init()
+				await ProfileStore.init().profile
+			}
+
+			// THEN saved profile is used.
+			XCTAssertNoDifference(saved, used)
+		}
+	}
+
+	func test__GIVEN__profile_with_owner_X__WHEN__deprecatedLoadDeviceID_returns_X__THEN__x_is_migrated_to_DeviceInfo_and_saved() async throws {
+		try await withTimeLimit {
+			let savedProfile = Profile.withOneAccount
+			let x = savedProfile.header.lastUsedOnDevice.id
+			let used = await withTestClients {
+				// GIVEN no device info
+				$0.savedProfile(savedProfile)
+				$0.secureStorageClient.loadDeviceInfo = { nil }
+				when(&$0)
+				then(&$0)
+			} operation: {
+				await ProfileStore().profile
+			}
+
+			func when(_ d: inout DependencyValues) {
+				d.secureStorageClient.deprecatedLoadDeviceID = { x }
+			}
+
+			func then(_ d: inout DependencyValues) {
+				d.secureStorageClient.saveDeviceInfo = {
+					// THEN x is migrated to DeviceInfo and saved
+					XCTAssertNoDifference($0.id, x)
+				}
+			}
+		}
+	}
+
+	func test__GIVEN__saved_profile__WHEN__we_update_profile__THEN__ownership_is_checked_by_loading_profile_from_keychain() async throws {
+		try await withTimeLimit {
+			// GIVEN saved profile
+			let saved = Profile.withOneAccount
+
+			let profileHasBeenUpdated = LockIsolated<Bool>(false)
+			let profile_is_loaded_from_keychain = self.expectation(description: "profile is loaded from keychain")
+
+			try await withTestClients {
+				$0.savedProfile(saved)
+				then(&$0)
+			} operation: {
+				let sut = ProfileStore()
+				// WHEN we update profile
+				try await sut.updating {
+					$0.header.lastModified = Date()
+					profileHasBeenUpdated.setValue(true)
+				}
+			}
+
+			func then(_ d: inout DependencyValues) {
+				d.secureStorageClient.loadProfileSnapshot = { id in
+					profileHasBeenUpdated.withValue { hasBeenUpdated in
+						if hasBeenUpdated {
+							XCTAssertNoDifference(id, saved.id)
+							// THEN ownership is checked by loading profile from keychain
+							profile_is_loaded_from_keychain.fulfill()
+						}
+					}
+					return saved.snapshot()
+				}
+			}
+
+			await self.nearFutureFulfillment(of: profile_is_loaded_from_keychain)
+		}
+	}
+
+	func test__GIVEN__saved_profile_P__WHEN__we_update_P_changing_its_identity__THEN__identity_is_checked() async throws {
+		try await withTimeLimit(.normal) {
+			// GIVEN saved profile
+			let P = Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ZOO_VOTE
+			let Q = Profile.withOneAccountsDeviceInfo_BEEF_mnemonic_ABANDON_ART
+			XCTAssertNotEqual(P.header, Q.header)
+
+			let identityCheckFails = self.expectation(description: "identity check fails")
+
+			try await withTestClients {
+				$0.savedProfile(P)
+				then(&$0)
+			} operation: {
+				let sut = ProfileStore()
+				do {
+					try await sut.updating {
+						// WHEN we update profile changing_its_identity
+						$0.header = Q.header // swap headers... emulating some ultra weird state.
+					}
+					return XCTFail("We expected to throw")
+				} catch {}
+			}
+
+			func then(_ d: inout DependencyValues) {
+				d.assertionFailure = AssertionFailureAction.init(action: { _, _, _ in
+					// THEN identity is checked
+					identityCheckFails.fulfill()
+				})
+			}
+
+			await self.nearFutureFulfillment(of: identityCheckFails)
+		}
+	}
 	/*
-	 	func test__GIVEN__saved_profile__WHEN__init__THEN__saved_profile_is_used() async throws {
-	 		try await withTimeLimit {
-	 			// GIVEN saved profile
-	 			let saved = Profile.withOneAccount
-
-	 			let used = await withTestClients {
-	 				$0.savedProfile(saved)
-	 			} operation: {
-	 				// WHEN ProfileStore.init()
-	 				await ProfileStore.init().profile
-	 			}
-
-	 			// THEN saved profile is used.
-	 			XCTAssertNoDifference(saved, used)
-	 		}
-	 	}
-
-	 	func test__GIVEN__profile_with_owner_X__WHEN__deprecatedLoadDeviceID_returns_X__THEN__x_is_migrated_to_DeviceInfo_and_saved() async throws {
-	 		try await withTimeLimit {
-	 			let savedProfile = Profile.withOneAccount
-	 			let x = savedProfile.header.lastUsedOnDevice.id
-	 			let used = await withTestClients {
-	 				// GIVEN no device info
-	 				$0.savedProfile(savedProfile)
-	 				$0.secureStorageClient.loadDeviceInfo = { nil }
-	 				when(&$0)
-	 				then(&$0)
-	 			} operation: {
-	 				await ProfileStore().profile
-	 			}
-
-	 			func when(_ d: inout DependencyValues) {
-	 				d.secureStorageClient.deprecatedLoadDeviceID = { x }
-	 			}
-
-	 			func then(_ d: inout DependencyValues) {
-	 				d.secureStorageClient.saveDeviceInfo = {
-	 					// THEN x is migrated to DeviceInfo and saved
-	 					XCTAssertNoDifference($0.id, x)
-	 				}
-	 			}
-	 		}
-	 	}
-
-	 	func test__GIVEN__saved_profile__WHEN__we_update_profile__THEN__ownership_is_checked_by_loading_profile_from_keychain() async throws {
-	 		try await withTimeLimit {
-	 			// GIVEN saved profile
-	 			let saved = Profile.withOneAccount
-
-	 			let profileHasBeenUpdated = LockIsolated<Bool>(false)
-	 			let profile_is_loaded_from_keychain = self.expectation(description: "profile is loaded from keychain")
-
-	 			try await withTestClients {
-	 				$0.savedProfile(saved)
-	 				then(&$0)
-	 			} operation: {
-	 				let sut = ProfileStore()
-	 				// WHEN we update profile
-	 				try await sut.updating {
-	 					$0.header.lastModified = Date()
-	 					profileHasBeenUpdated.setValue(true)
-	 				}
-	 			}
-
-	 			func then(_ d: inout DependencyValues) {
-	 				d.secureStorageClient.loadProfileSnapshot = { id in
-	 					profileHasBeenUpdated.withValue { hasBeenUpdated in
-	 						if hasBeenUpdated {
-	 							XCTAssertNoDifference(id, saved.id)
-	 							// THEN ownership is checked by loading profile from keychain
-	 							profile_is_loaded_from_keychain.fulfill()
-	 						}
-	 					}
-	 					return saved.snapshot()
-	 				}
-	 			}
-
-	 			await self.nearFutureFulfillment(of: profile_is_loaded_from_keychain)
-	 		}
-	 	}
-
-	 	func test__GIVEN__saved_profile_P__WHEN__we_update_P_changing_its_identity__THEN__identity_is_checked() async throws {
-	 		try await withTimeLimit(.normal) {
-	 			// GIVEN saved profile
-	 			let P = Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ZOO_VOTE
-	 			let Q = Profile.withOneAccountsDeviceInfo_BEEF_mnemonic_ABANDON_ART
-	 			XCTAssertNotEqual(P.header, Q.header)
-
-	 			let identityCheckFails = self.expectation(description: "identity check fails")
-
-	 			try await withTestClients {
-	 				$0.savedProfile(P)
-	 				then(&$0)
-	 			} operation: {
-	 				let sut = ProfileStore()
-	 				do {
-	 					try await sut.updating {
-	 						// WHEN we update profile changing_its_identity
-	 						$0.header = Q.header // swap headers... emulating some ultra weird state.
-	 					}
-	 					return XCTFail("We expected to throw")
-	 				} catch {}
-	 			}
-
-	 			func then(_ d: inout DependencyValues) {
-	 				d.assertionFailure = AssertionFailureAction.init(action: { _, _, _ in
-	 					// THEN identity is checked
-	 					identityCheckFails.fulfill()
-	 				})
-	 			}
-
-	 			await self.nearFutureFulfillment(of: identityCheckFails)
-	 		}
-	 	}
-
 	 	func test__GIVEN__saved_profile_mismatch_deviceID__WHEN__claimAndContinueUseOnThisPhone__THEN__profile_uses_claimed_device() async throws {
 	 		try await doTestMismatch(
 	 			savedProfile: Profile.withOneAccount,
