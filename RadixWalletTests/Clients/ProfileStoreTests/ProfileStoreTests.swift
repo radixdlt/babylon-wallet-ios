@@ -32,28 +32,27 @@ extension DependencyValues {
 
 // MARK: - ProfileStoreNewProfileTests
 final class ProfileStoreNewProfileTests: TestCase {
+	func test__GIVEN__no_deviceInfo__WHEN__init__THEN__deprecatedLoadDeviceID_is_called() {
+		let deprecatedLoadDeviceID_is_called = expectation(description: "deprecatedLoadDeviceID is called")
+		withTestClients {
+			// GIVEN no device info
+			$0.noDeviceInfo()
+			then(&$0)
+		} operation: {
+			// WHEN ProfileStore.init()
+			ProfileStore.init()
+		}
+
+		func then(_ d: inout DependencyValues) {
+			d.secureStorageClient.deprecatedLoadDeviceID = {
+				// THEN deprecatedLoadDeviceID is called
+				deprecatedLoadDeviceID_is_called.fulfill()
+				return UUID?.none
+			}
+		}
+		wait(for: [deprecatedLoadDeviceID_is_called])
+	}
 	/*
-	 func test__GIVEN__no_deviceInfo__WHEN__init__THEN__deprecatedLoadDeviceID_is_called() {
-	 	let deprecatedLoadDeviceID_is_called = expectation(description: "deprecatedLoadDeviceID is called")
-	 	withTestClients {
-	 		// GIVEN no device info
-	 		$0.noDeviceInfo()
-	 		then(&$0)
-	 	} operation: {
-	 		// WHEN ProfileStore.init()
-	 		ProfileStore.init()
-	 	}
-
-	 	func then(_ d: inout DependencyValues) {
-	 		d.secureStorageClient.deprecatedLoadDeviceID = {
-	 			// THEN deprecatedLoadDeviceID is called
-	 			deprecatedLoadDeviceID_is_called.fulfill()
-	 			return UUID?.none
-	 		}
-	 	}
-	 	wait(for: [deprecatedLoadDeviceID_is_called])
-	 }
-
 	 func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__deleteDeprecatedDeviceID_is_called() async throws {
 	 	let deleteDeprecatedDeviceID_is_called = expectation(description: "deleteDeprecatedDeviceID is called")
 	 	let userDefaults = UserDefaults.Dependency.ephemeral()
