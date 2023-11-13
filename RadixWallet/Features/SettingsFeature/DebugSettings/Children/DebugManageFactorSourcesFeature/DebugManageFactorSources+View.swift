@@ -79,8 +79,8 @@ extension FactorSourceView {
 }
 
 private extension StoreOf<DebugManageFactorSources> {
-	var destination: PresentationStoreOf<DebugManageFactorSources.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<DebugManageFactorSources.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -92,11 +92,11 @@ private extension View {
 			.addLedger(with: destinationStore)
 	}
 
-	private func importMnemonic(with destinationStore: PresentationStoreOf<DebugManageFactorSources.Destination>) -> some View {
+	private func importMnemonic(with destinationStore: PresentationStoreOf<DebugManageFactorSources.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /DebugManageFactorSources.Destination.State.importMnemonic,
-			action: DebugManageFactorSources.Destination.Action.importMnemonic,
+			state: /DebugManageFactorSources.Destination_.State.importMnemonic,
+			action: DebugManageFactorSources.Destination_.Action.importMnemonic,
 			content: {
 				// We depend on `.toolbar` to display buttons on top of
 				// keyboard. And they are not displayed if we are not
@@ -107,11 +107,11 @@ private extension View {
 		)
 	}
 
-	private func addLedger(with destinationStore: PresentationStoreOf<DebugManageFactorSources.Destination>) -> some View {
+	private func addLedger(with destinationStore: PresentationStoreOf<DebugManageFactorSources.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /DebugManageFactorSources.Destination.State.addLedger,
-			action: DebugManageFactorSources.Destination.Action.addLedger,
+			state: /DebugManageFactorSources.Destination_.State.addLedger,
+			action: DebugManageFactorSources.Destination_.Action.addLedger,
 			content: { AddLedgerFactorSource.View(store: $0) }
 		)
 	}

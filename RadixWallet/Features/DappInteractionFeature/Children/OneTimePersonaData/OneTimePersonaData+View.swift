@@ -27,11 +27,7 @@ extension OneTimePersonaData {
 		let store: StoreOf<OneTimePersonaData>
 
 		var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: OneTimePersonaData.ViewState.init,
-				send: { .view($0) }
-			) { viewStore in
+			WithViewStore(store, observe: { ViewState(state: $0) }, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium2) {
 						DappHeader(
@@ -46,27 +42,7 @@ extension OneTimePersonaData {
 								.textStyle(.body1Header)
 						}
 
-						Selection(
-							viewStore.binding(
-								get: \.selectedPersona,
-								send: { .selectedPersonaChanged($0) }
-							),
-							from: viewStore.availablePersonas
-						) { item in
-							PersonaDataPermissionBox.View(
-								store: store.scope(
-									state: { _ in item.value },
-									action: { .child(.persona(id: $0.id, action: $1)) }
-								),
-								action: item.action,
-								accessory: {
-									RadioButton(
-										appearance: .dark,
-										state: item.isSelected ? .selected : .unselected
-									)
-								}
-							)
-						}
+						selection(viewStore: viewStore)
 
 						Button(L10n.Personas.createNewPersona) {
 							viewStore.send(.createNewPersonaButtonTapped)
@@ -85,22 +61,70 @@ extension OneTimePersonaData {
 							.buttonStyle(.primaryRectangular)
 					}
 				}
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /OneTimePersonaData.Destination.State.editPersona,
-					action: OneTimePersonaData.Destination.Action.editPersona,
-					content: { EditPersona.View(store: $0) }
+			}
+			.destinations(with: store)
+			.onAppear { store.send(.view(.appeared)) }
+			.task { store.send(.view(.task)) }
+		}
+
+		private func selection(viewStore: ViewStoreOf<OneTimePersonaData>) -> some SwiftUI.View {
+			Selection(
+				viewStore.binding(
+					get: \.selectedPersona,
+					send: { .selectedPersonaChanged($0) }
+				),
+				from: viewStore.availablePersonas
+			) { item in
+				PersonaDataPermissionBox.View(
+					store: store.scope(
+						state: { _ in item.value },
+						action: { .child(.persona(id: $0.id, action: $1)) }
+					),
+					action: item.action,
+					accessory: {
+						RadioButton(
+							appearance: .dark,
+							state: item.isSelected ? .selected : .unselected
+						)
+					}
 				)
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /OneTimePersonaData.Destination.State.createPersona,
-					action: OneTimePersonaData.Destination.Action.createPersona,
-					content: { CreatePersonaCoordinator.View(store: $0) }
-				)
-				.onAppear { viewStore.send(.appeared) }
-				.task { viewStore.send(.task) }
 			}
 		}
+	}
+}
+
+// MARK: - Extensions
+
+private extension StoreOf<OneTimePersonaData> {
+	var destination: PresentationStoreOf<OneTimePersonaData.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<OneTimePersonaData>) -> some View {
+		let destinationStore = store.destination
+		return editPersona(with: destinationStore)
+			.createPersona(with: destinationStore)
+	}
+
+	private func editPersona(with destinationStore: PresentationStoreOf<OneTimePersonaData.Destination_>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /OneTimePersonaData.Destination_.State.editPersona,
+			action: OneTimePersonaData.Destination_.Action.editPersona,
+			content: { EditPersona.View(store: $0) }
+		)
+	}
+
+	private func createPersona(with destinationStore: PresentationStoreOf<OneTimePersonaData.Destination_>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /OneTimePersonaData.Destination_.State.createPersona,
+			action: OneTimePersonaData.Destination_.Action.createPersona,
+			content: { CreatePersonaCoordinator.View(store: $0) }
+		)
 	}
 }
 

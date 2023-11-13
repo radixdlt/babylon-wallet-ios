@@ -78,8 +78,8 @@ extension AssetTransferMessage.View {
 }
 
 private extension StoreOf<AssetTransferMessage> {
-	var destination: PresentationStoreOf<AssetTransferMessage.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<AssetTransferMessage.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -89,8 +89,8 @@ private extension View {
 		let destinationStore = store.destination
 		return sheet(
 			store: destinationStore,
-			state: /AssetTransferMessage.Destination.State.messageMode,
-			action: AssetTransferMessage.Destination.Action.messageMode,
+			state: /AssetTransferMessage.Destination_.State.messageMode,
+			action: AssetTransferMessage.Destination_.Action.messageMode,
 			content: {
 				MessageMode.View(store: $0)
 					.presentationDetents([.medium])

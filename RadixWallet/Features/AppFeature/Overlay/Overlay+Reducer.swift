@@ -70,21 +70,23 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case .destination(.dismiss):
-			return dismissAlert(state: &state, withAction: .dismissed)
-		case let .destination(.presented(.alert(action))):
+	func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .alert(action):
 			if let item = state.itemsQueue.first, case let .alert(state) = item {
 				overlayWindowClient.sendAlertAction(action, state.id)
 			}
 			return dismiss(&state)
-		case .destination(.presented(.hud(.delegate(.dismiss)))):
+		case .hud(.delegate(.dismiss)):
 			return dismiss(&state)
 
 		default:
 			return .none
 		}
+	}
+
+	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		dismissAlert(state: &state, withAction: .dismissed)
 	}
 
 	private func showItemIfPossible(state: inout State) -> Effect<Action> {

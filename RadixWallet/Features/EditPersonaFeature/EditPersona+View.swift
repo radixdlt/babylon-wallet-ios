@@ -107,8 +107,8 @@ extension EditPersona {
 }
 
 private extension StoreOf<EditPersona> {
-	var destination: PresentationStoreOf<EditPersona.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<EditPersona.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 
 	var labelField: StoreOf<EditPersonaStaticField> {
@@ -128,19 +128,19 @@ private extension View {
 			.addFields(with: destinationStore)
 	}
 
-	private func closeConfirmationDialog(with destinationStore: PresentationStoreOf<EditPersona.Destination>) -> some View {
+	private func closeConfirmationDialog(with destinationStore: PresentationStoreOf<EditPersona.Destination_>) -> some View {
 		confirmationDialog(
 			store: destinationStore,
-			state: /EditPersona.Destination.State.closeConfirmationDialog,
-			action: EditPersona.Destination.Action.closeConfirmationDialog
+			state: /EditPersona.Destination_.State.closeConfirmationDialog,
+			action: EditPersona.Destination_.Action.closeConfirmationDialog
 		)
 	}
 
-	private func addFields(with destinationStore: PresentationStoreOf<EditPersona.Destination>) -> some View {
+	private func addFields(with destinationStore: PresentationStoreOf<EditPersona.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /EditPersona.Destination.State.addFields,
-			action: EditPersona.Destination.Action.addFields,
+			state: /EditPersona.Destination_.State.addFields,
+			action: EditPersona.Destination_.Action.addFields,
 			content: { EditPersonaAddEntryKinds.View(store: $0) }
 		)
 	}

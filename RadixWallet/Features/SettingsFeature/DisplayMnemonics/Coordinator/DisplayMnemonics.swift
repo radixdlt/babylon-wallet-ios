@@ -126,8 +126,14 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 				state.destination = .importMnemonics(.init())
 				return .none
 			}
+		default:
+			return .none
+		}
+	}
 
-		case let .destination(.presented(.displayMnemonic(.delegate(delegateAction)))):
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .displayMnemonic(.delegate(delegateAction)):
 			switch delegateAction {
 			case let .doneViewing(idOfBackedUpFactorSource):
 				if let idOfBackedUpFactorSource {
@@ -140,7 +146,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 			return .none
 
-		case let .destination(.presented(.importMnemonics(.delegate(delegateAction)))):
+		case let .importMnemonics(.delegate(delegateAction)):
 			switch delegateAction {
 			case .finishedEarly:
 				state.destination = nil
@@ -151,7 +157,9 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 				state.destination = nil
 			}
 			return .none
-		default: return .none
+
+		default:
+			return .none
 		}
 	}
 }

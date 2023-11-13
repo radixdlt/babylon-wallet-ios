@@ -49,7 +49,7 @@ extension CreatePersonaCoordinator {
 		}
 
 		private func destination(
-			for store: StoreOf<CreatePersonaCoordinator.Destination>,
+			for store: StoreOf<CreatePersonaCoordinator.Path>,
 			shouldDisplayNavBar: Bool
 		) -> some SwiftUI.View {
 			ZStack {
@@ -57,29 +57,29 @@ extension CreatePersonaCoordinator {
 					switch state {
 					case .step0_introduction:
 						CaseLet(
-							/CreatePersonaCoordinator.Destination.State.step0_introduction,
-							action: CreatePersonaCoordinator.Destination.Action.step0_introduction,
+							/CreatePersonaCoordinator.Path.State.step0_introduction,
+							action: CreatePersonaCoordinator.Path.Action.step0_introduction,
 							then: { IntroductionToPersonas.View(store: $0) }
 						)
 
 					case .step1_newPersonaInfo:
 						CaseLet(
-							/CreatePersonaCoordinator.Destination.State.step1_newPersonaInfo,
-							action: CreatePersonaCoordinator.Destination.Action.step1_newPersonaInfo,
+							/CreatePersonaCoordinator.Path.State.step1_newPersonaInfo,
+							action: CreatePersonaCoordinator.Path.Action.step1_newPersonaInfo,
 							then: { NewPersonaInfo.View(store: $0) }
 						)
 
 					case .step2_creationOfPersona:
 						CaseLet(
-							/CreatePersonaCoordinator.Destination.State.step2_creationOfPersona,
-							action: CreatePersonaCoordinator.Destination.Action.step2_creationOfPersona,
+							/CreatePersonaCoordinator.Path.State.step2_creationOfPersona,
+							action: CreatePersonaCoordinator.Path.Action.step2_creationOfPersona,
 							then: { CreationOfPersona.View(store: $0) }
 						)
 
 					case .step3_completion:
 						CaseLet(
-							/CreatePersonaCoordinator.Destination.State.step3_completion,
-							action: CreatePersonaCoordinator.Destination.Action.step3_completion,
+							/CreatePersonaCoordinator.Path.State.step3_completion,
+							action: CreatePersonaCoordinator.Path.Action.step3_completion,
 							then: { NewPersonaCompletion.View(store: $0) }
 						)
 					}

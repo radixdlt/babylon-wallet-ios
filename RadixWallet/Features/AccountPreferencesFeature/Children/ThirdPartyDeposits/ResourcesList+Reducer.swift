@@ -143,32 +143,6 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(.addAsset(.delegate(.addAddress(mode, newAsset))))):
-			state.mode = mode
-			state.destination = nil
-
-			return .run { send in
-				let loadResourceResult = try? await onLedgerEntitiesClient.getResource(newAsset.resourceAddress)
-				await send(.internal(.resourceLoaded(loadResourceResult, newAsset)))
-			}
-
-		case let .destination(.presented(.confirmAssetDeletion(.confirmTapped(resource)))):
-			state.loadedResources.removeAll(where: { $0.address == resource })
-			switch resource {
-			case let .assetException(resource):
-				state.thirdPartyDeposits.assetsExceptionList.removeAll(where: { $0.address == resource.address })
-			case let .allowedDepositor(depositorAddress):
-				state.thirdPartyDeposits.depositorsAllowList.remove(depositorAddress)
-			}
-
-			return .send(.delegate(.updated(state.thirdPartyDeposits)))
-		case .destination:
-			return .none
-		}
-	}
-
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .resourceLoaded(resource, newAsset):
@@ -202,9 +176,36 @@ public struct ResourcesList: FeatureReducer, Sendable {
 			return .none
 		}
 	}
+
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .addAsset(.delegate(.addAddress(mode, newAsset))):
+			state.mode = mode
+			state.destination = nil
+
+			return .run { send in
+				let loadResourceResult = try? await onLedgerEntitiesClient.getResource(newAsset.resourceAddress)
+				await send(.internal(.resourceLoaded(loadResourceResult, newAsset)))
+			}
+
+		case let .confirmAssetDeletion(.confirmTapped(resource)):
+			state.loadedResources.removeAll(where: { $0.address == resource })
+			switch resource {
+			case let .assetException(resource):
+				state.thirdPartyDeposits.assetsExceptionList.removeAll(where: { $0.address == resource.address })
+			case let .allowedDepositor(depositorAddress):
+				state.thirdPartyDeposits.depositorsAllowList.remove(depositorAddress)
+			}
+
+			return .send(.delegate(.updated(state.thirdPartyDeposits)))
+
+		default:
+			return .none
+		}
+	}
 }
 
-extension AlertState<ResourcesList.Destination.Action.ConfirmDeletionAlert> {
+extension AlertState<ResourcesList.Destination_.Action.ConfirmDeletionAlert> {
 	static func confirmAssetDeletion(
 		_ title: String,
 		_ message: String,

@@ -159,27 +159,28 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case .destination(.presented(.inputEncryptionPassword(.delegate(.dismiss)))):
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .inputEncryptionPassword(.delegate(.dismiss)):
 			state.destination = nil
 			return .none
 
-		case let .destination(.presented(.inputEncryptionPassword(.delegate(.successfullyDecrypted(_, decrypted))))):
+		case let .inputEncryptionPassword(.delegate(.successfullyDecrypted(_, decrypted))):
 			state.destination = nil
 			overlayWindowClient.scheduleHUD(.decryptedProfile)
 			return .send(.delegate(.selectedProfileSnapshot(decrypted, isInCloud: false)))
 
-		case .destination(.presented(.inputEncryptionPassword(.delegate(.successfullyEncrypted)))):
+		case .inputEncryptionPassword(.delegate(.successfullyEncrypted)):
 			preconditionFailure("What? Encrypted? Expected to only have DECRYPTED. Incorrect implementation somewhere...")
-
-		case .destination(.dismiss):
-			state.destination = nil
-			return .none
 
 		default:
 			return .none
 		}
+	}
+
+	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		state.destination = nil
+		return .none
 	}
 }
 

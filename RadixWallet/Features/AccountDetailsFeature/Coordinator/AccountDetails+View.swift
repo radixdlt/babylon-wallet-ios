@@ -112,32 +112,33 @@ extension AccountDetails {
 }
 
 private extension StoreOf<AccountDetails> {
-	var destination: PresentationStoreOf<AccountDetails.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<AccountDetails.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
 @MainActor
 private extension View {
-	func destination(_ destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
-		preferences(destinationStore)
-			.transfer(destinationStore)
+	func destinations(with store: StoreOf<AccountDetails>) -> some SwiftUI.View {
+		let destinationStore = store.destination
+		return preferences(with: destinationStore)
+			.transfer(with: destinationStore)
 	}
 
-	private func preferences(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
+	private func preferences(with destinationStore: PresentationStoreOf<AccountDetails.Destination_>) -> some SwiftUI.View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AccountDetails.Destination.State.preferences,
-			action: AccountDetails.Destination.Action.preferences,
+			state: /AccountDetails.Destination_.State.preferences,
+			action: AccountDetails.Destination_.Action.preferences,
 			destination: { AccountPreferences.View(store: $0) }
 		)
 	}
 
-	private func transfer(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
+	private func transfer(with destinationStore: PresentationStoreOf<AccountDetails.Destination_>) -> some SwiftUI.View {
 		fullScreenCover(
 			store: destinationStore,
-			state: /AccountDetails.Destination.State.transfer,
-			action: AccountDetails.Destination.Action.transfer,
+			state: /AccountDetails.Destination_.State.transfer,
+			action: AccountDetails.Destination_.Action.transfer,
 			content: { AssetTransfer.SheetView(store: $0) }
 		)
 	}

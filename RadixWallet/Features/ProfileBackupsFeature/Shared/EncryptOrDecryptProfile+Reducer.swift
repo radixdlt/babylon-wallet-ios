@@ -108,16 +108,6 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case .destination(.presented(.incorrectPasswordAlert(.okTapped))):
-			state.destination = nil
-			return .none
-		default:
-			return .none
-		}
-	}
-
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
@@ -219,9 +209,17 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 			return .none
 		}
 	}
+
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .incorrectPasswordAlert(.okTapped):
+			state.destination = nil
+			return .none
+		}
+	}
 }
 
-extension EncryptOrDecryptProfile.Destination.State {
+extension EncryptOrDecryptProfile.Destination_.State {
 	fileprivate static func incorrectPasswordAlert(encrypt: Bool) -> Self {
 		.incorrectPasswordAlert(.init(
 			title: { TextState(L10n.ProfileBackup.IncorrectPasswordAlert.title) },

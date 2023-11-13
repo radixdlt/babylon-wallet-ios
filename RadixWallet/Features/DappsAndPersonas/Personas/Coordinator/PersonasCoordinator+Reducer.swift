@@ -129,10 +129,14 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 				await send(.internal(.loadedPersonaDetails(personaDetailsState)))
 			}
 
-		case .personaList:
+		default:
 			return .none
+		}
+	}
 
-		case let .destination(.presented(.createPersonaCoordinator(.delegate(delegateAction)))):
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .createPersonaCoordinator(.delegate(delegateAction)):
 			switch delegateAction {
 			case .dismissed:
 				state.destination = nil
@@ -144,11 +148,11 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case .destination(.presented(.personaDetails(.delegate(.personaHidden)))):
+		case .personaDetails(.delegate(.personaHidden)):
 			state.destination = nil
 			return .none
 
-		case .destination:
+		default:
 			return .none
 		}
 	}

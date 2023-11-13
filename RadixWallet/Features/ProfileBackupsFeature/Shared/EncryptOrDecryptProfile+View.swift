@@ -154,27 +154,11 @@ extension EncryptOrDecryptProfile {
 			}
 		}
 	}
-
-	@MainActor
-	public struct SheetView: SwiftUI.View {
-		private let store: StoreOf<EncryptOrDecryptProfile>
-		@FocusState private var focusedField: State.Field?
-
-		public init(store: StoreOf<EncryptOrDecryptProfile>) {
-			self.store = store
-		}
-
-		public var body: some SwiftUI.View {
-			NavigationView {
-				EncryptOrDecryptProfile.View(store: store)
-			}
-		}
-	}
 }
 
 private extension StoreOf<EncryptOrDecryptProfile> {
-	var destination: PresentationStoreOf<EncryptOrDecryptProfile.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<EncryptOrDecryptProfile.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -184,8 +168,8 @@ private extension View {
 		let destinationStore = store.destination
 		return alert(
 			store: destinationStore,
-			state: /EncryptOrDecryptProfile.Destination.State.incorrectPasswordAlert,
-			action: EncryptOrDecryptProfile.Destination.Action.incorrectPasswordAlert
+			state: /EncryptOrDecryptProfile.Destination_.State.incorrectPasswordAlert,
+			action: EncryptOrDecryptProfile.Destination_.Action.incorrectPasswordAlert
 		)
 	}
 }

@@ -89,11 +89,30 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(
-			.importMnemonic(.delegate(delegateAction))
-		)):
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .validated(privateHDFactorSource):
+			state.destination = nil
+			return .run { send in
+				try userDefaults.addFactorSourceIDOfBackedUpMnemonic(privateHDFactorSource.factorSource.id)
+
+				try secureStorageClient.saveMnemonicForFactorSource(
+					privateHDFactorSource
+				)
+
+				await send(.delegate(.persistedMnemonicInKeychain(privateHDFactorSource.factorSource.id)))
+
+			} catch: { error, send in
+				errorQueue.schedule(error)
+				loggerGlobal.error("Failed to saved mnemonic in keychain")
+				await send(.delegate(.failedToSaveInKeychain(privateHDFactorSource.factorSource.id)))
+			}
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .importMnemonic(.delegate(delegateAction)):
 			switch delegateAction {
 			case let .notPersisted(mnemonicWithPassphrase):
 				// FIXME: should always work... but please tidy up!
@@ -118,27 +137,6 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 
 		default:
 			return .none
-		}
-	}
-
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
-		case let .validated(privateHDFactorSource):
-			state.destination = nil
-			return .run { send in
-				try userDefaults.addFactorSourceIDOfBackedUpMnemonic(privateHDFactorSource.factorSource.id)
-
-				try secureStorageClient.saveMnemonicForFactorSource(
-					privateHDFactorSource
-				)
-
-				await send(.delegate(.persistedMnemonicInKeychain(privateHDFactorSource.factorSource.id)))
-
-			} catch: { error, send in
-				errorQueue.schedule(error)
-				loggerGlobal.error("Failed to saved mnemonic in keychain")
-				await send(.delegate(.failedToSaveInKeychain(privateHDFactorSource.factorSource.id)))
-			}
 		}
 	}
 

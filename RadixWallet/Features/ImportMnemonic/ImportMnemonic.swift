@@ -282,9 +282,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		public enum Action: Sendable, Equatable {
 			case offDeviceMnemonicInfoPrompt(OffDeviceMnemonicInfo.Action)
-
 			case markMnemonicAsBackedUp(MarkMnemonicAsBackedUpOrNot)
-
 			case onContinueWarning(OnContinueWarning)
 
 			public enum MarkMnemonicAsBackedUpOrNot: Sendable, Hashable {
@@ -375,48 +373,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				&state
 			)
 
-		case let .destination(.presented(.offDeviceMnemonicInfoPrompt(.delegate(.done(label, mnemonicWithPassphrase))))):
-			state.destination = nil
-
-			guard let persistStrategy = state.mode.write?.persistStrategy else {
-				preconditionFailure("expected persistStrategy")
-				return .none
-			}
-			precondition(persistStrategy.mnemonicForFactorSourceKind == .offDevice)
-
-			return .run { send in
-				await send(.internal(.saveFactorSourceResult(
-					TaskResult {
-						try await factorSourcesClient.addOffDeviceFactorSource(
-							mnemonicWithPassphrase: mnemonicWithPassphrase,
-							label: label
-						)
-					}
-				)))
-			}
-
-		case let .destination(.presented(.markMnemonicAsBackedUp(.userHasBackedUp(factorSourceID)))):
-			return .run { send in
-				try userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
-				await send(.delegate(.doneViewing(idOfBackedUpFactorSource: factorSourceID)))
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to save mnemonic as backed up")
-				errorQueue.schedule(error)
-			}
-
-		case .destination(.presented(.markMnemonicAsBackedUp(.userHasNotBackedUp))):
-			loggerGlobal.notice("User have not backed up")
-			return .send(.delegate(.doneViewing(idOfBackedUpFactorSource: nil)))
-
-		case .destination(.presented(.onContinueWarning(.buttonTapped))):
-			guard let mnemonic = state.mnemonic else {
-				loggerGlobal.error("Can't read mnemonic")
-				struct FailedToReadMnemonic: Error {}
-				errorQueue.schedule(FailedToReadMnemonic())
-				return .none
-			}
-			return continueWithMnemonic(mnemonic: mnemonic, in: &state)
-
 		default:
 			return .none
 		}
@@ -490,7 +446,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	private func continueWithMnemonic(mnemonic: Mnemonic, in state: inout State) -> Effect<Action> {
 		guard let write = state.mode.write else {
 			preconditionFailure("expected write mode")
-			return .none
 		}
 		state.mode.update(isProgressing: true)
 		let mnemonicWithPassphrase = MnemonicWithPassphrase(
@@ -576,6 +531,54 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			overlayWindowClient.scheduleHUD(.seedPhraseImported)
 
 			return .send(.delegate(.persistedNewFactorSourceInProfile(factorSource)))
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .offDeviceMnemonicInfoPrompt(.delegate(.done(label, mnemonicWithPassphrase))):
+			state.destination = nil
+
+			guard let persistStrategy = state.mode.write?.persistStrategy else {
+				preconditionFailure("expected persistStrategy")
+			}
+			precondition(persistStrategy.mnemonicForFactorSourceKind == .offDevice)
+
+			return .run { send in
+				await send(.internal(.saveFactorSourceResult(
+					TaskResult {
+						try await factorSourcesClient.addOffDeviceFactorSource(
+							mnemonicWithPassphrase: mnemonicWithPassphrase,
+							label: label
+						)
+					}
+				)))
+			}
+
+		case let .markMnemonicAsBackedUp(.userHasBackedUp(factorSourceID)):
+			return .run { send in
+				try userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
+				await send(.delegate(.doneViewing(idOfBackedUpFactorSource: factorSourceID)))
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to save mnemonic as backed up")
+				errorQueue.schedule(error)
+			}
+
+		case .markMnemonicAsBackedUp(.userHasNotBackedUp):
+			loggerGlobal.notice("User have not backed up")
+			return .send(.delegate(.doneViewing(idOfBackedUpFactorSource: nil)))
+
+		case .onContinueWarning(.buttonTapped):
+			guard let mnemonic = state.mnemonic else {
+				loggerGlobal.error("Can't read mnemonic")
+				struct FailedToReadMnemonic: Error {}
+				errorQueue.schedule(FailedToReadMnemonic())
+				return .none
+			}
+			return continueWithMnemonic(mnemonic: mnemonic, in: &state)
+
+		default:
+			return .none
 		}
 	}
 }
@@ -671,7 +674,7 @@ extension ImportMnemonic {
 	}
 }
 
-extension ImportMnemonic.Destination.State {
+extension ImportMnemonic.Destination_.State {
 	fileprivate static func askUserIfSheHasBackedUpMnemonic(_ factorSourceID: FactorSourceID.FromHash) -> Self {
 		.markMnemonicAsBackedUp(.init(
 			title: { TextState(L10n.ImportMnemonic.BackedUpAlert.title) },

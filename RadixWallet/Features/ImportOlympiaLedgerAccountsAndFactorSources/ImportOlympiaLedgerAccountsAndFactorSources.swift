@@ -173,9 +173,9 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(.noP2PLink(noP2PLinkAction))):
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .noP2PLink(noP2PLinkAction):
 			switch noP2PLinkAction {
 			case .addNewP2PLinkTapped:
 				state.destination = .addNewP2PLink(.init())
@@ -185,7 +185,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				return .none
 			}
 
-		case let .destination(.presented(.addNewP2PLink(.delegate(addNewP2PLinkAction)))):
+		case let .addNewP2PLink(.delegate(addNewP2PLinkAction)):
 			switch addNewP2PLinkAction {
 			case let .newConnection(connectedClient):
 				state.destination = nil
@@ -202,7 +202,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				return .none
 			}
 
-		case let .destination(.presented(.nameLedgerAndDerivePublicKeys(.delegate(delegateAction)))):
+		case let .nameLedgerAndDerivePublicKeys(.delegate(delegateAction)):
 			switch delegateAction {
 			case .failedToSaveNewLedger:
 				state.destination = nil

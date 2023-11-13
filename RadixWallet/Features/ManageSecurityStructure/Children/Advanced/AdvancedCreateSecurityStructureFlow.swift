@@ -121,19 +121,19 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(.factorsForPrimaryRole(.delegate(.confirmedRoleWithFactors(primaryRole))))):
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .factorsForPrimaryRole(.delegate(.confirmedRoleWithFactors(primaryRole))):
 			state.primaryRole = primaryRole
 			state.destination = nil
 			return .none
 
-		case let .destination(.presented(.factorsForRecoveryRole(.delegate(.confirmedRoleWithFactors(recoveryRole))))):
+		case let .factorsForRecoveryRole(.delegate(.confirmedRoleWithFactors(recoveryRole))):
 			state.recoveryRole = recoveryRole
 			state.destination = nil
 			return .none
 
-		case let .destination(.presented(.factorsForConfirmationRole(.delegate(.confirmedRoleWithFactors(confirmationRole))))):
+		case let .factorsForConfirmationRole(.delegate(.confirmedRoleWithFactors(confirmationRole))):
 			state.confirmationRole = confirmationRole
 			state.destination = nil
 			return .none

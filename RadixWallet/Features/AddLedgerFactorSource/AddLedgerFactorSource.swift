@@ -81,17 +81,6 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(.nameLedger(.delegate(.complete(ledger))))):
-			completeWithLedgerEffect(ledger)
-		case .destination(.presented(.nameLedger(.delegate(.failedToCreateLedgerFactorSource)))):
-			.send(.delegate(.failedToAddLedger))
-		default:
-			.none
-		}
-	}
-
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .getDeviceInfoResult(.success(ledgerDeviceInfo)):
@@ -107,6 +96,19 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		case let .proceedToNameDevice(device):
 			state.destination = .nameLedger(.init(deviceInfo: device))
 			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .nameLedger(.delegate(.complete(ledger))):
+			completeWithLedgerEffect(ledger)
+
+		case .nameLedger(.delegate(.failedToCreateLedgerFactorSource)):
+			.send(.delegate(.failedToAddLedger))
+
+		default:
+			.none
 		}
 	}
 

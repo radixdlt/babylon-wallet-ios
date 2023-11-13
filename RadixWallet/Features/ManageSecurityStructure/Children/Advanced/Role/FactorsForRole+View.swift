@@ -187,35 +187,35 @@ extension FactorsForRole {
 @MainActor
 private extension View {
 	func destinations(with store: StoreOf<FactorsForRole<some RoleProtocol>>) -> some SwiftUI.View {
-		let destinationStore = store.scope(state: \.$destination) { .child(.destination($0)) }
+		let destinationStore = store.scope(state: \.$destination) { .destination($0) }
 		return addThresholdFactorSheet(with: destinationStore)
 			.addAdminFactorSheet(with: destinationStore)
 			.existingRoleMadeLessSafe(with: destinationStore)
 	}
 
-	private func addThresholdFactorSheet(with destinationStore: PresentationStoreOf<FactorsForRole<some RoleProtocol>.Destination>) -> some SwiftUI.View {
+	private func addThresholdFactorSheet(with destinationStore: PresentationStoreOf<FactorsForRole<some RoleProtocol>.Destination_>) -> some SwiftUI.View {
 		sheet(
 			store: destinationStore,
-			state: /FactorsForRole.Destination.State.addThresholdFactor,
-			action: FactorsForRole.Destination.Action.addThresholdFactor,
-			content: { store in NavigationView { SelectFactorKindThenFactor.View(store: store) } }
+			state: /FactorsForRole.Destination_.State.addThresholdFactor,
+			action: FactorsForRole.Destination_.Action.addThresholdFactor,
+			content: { SelectFactorKindThenFactor.View(store: $0).inNavigationView }
 		)
 	}
 
-	private func addAdminFactorSheet(with destinationStore: PresentationStoreOf<FactorsForRole<some RoleProtocol>.Destination>) -> some SwiftUI.View {
+	private func addAdminFactorSheet(with destinationStore: PresentationStoreOf<FactorsForRole<some RoleProtocol>.Destination_>) -> some SwiftUI.View {
 		sheet(
 			store: destinationStore,
-			state: /FactorsForRole.Destination.State.addAdminFactor,
-			action: FactorsForRole.Destination.Action.addAdminFactor,
-			content: { store in NavigationView { SelectFactorKindThenFactor.View(store: store) } }
+			state: /FactorsForRole.Destination_.State.addAdminFactor,
+			action: FactorsForRole.Destination_.Action.addAdminFactor,
+			content: { SelectFactorKindThenFactor.View(store: $0).inNavigationView }
 		)
 	}
 
-	private func existingRoleMadeLessSafe(with destinationStore: PresentationStoreOf<FactorsForRole<some RoleProtocol>.Destination>) -> some SwiftUI.View {
+	private func existingRoleMadeLessSafe(with destinationStore: PresentationStoreOf<FactorsForRole<some RoleProtocol>.Destination_>) -> some SwiftUI.View {
 		confirmationDialog(
 			store: destinationStore,
-			state: /FactorsForRole.Destination.State.existingRoleMadeLessSafeConfirmationDialog,
-			action: FactorsForRole.Destination.Action.existingRoleMadeLessSafeConfirmationDialog
+			state: /FactorsForRole.Destination_.State.existingRoleMadeLessSafeConfirmationDialog,
+			action: FactorsForRole.Destination_.Action.existingRoleMadeLessSafeConfirmationDialog
 		)
 	}
 }

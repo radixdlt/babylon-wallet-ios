@@ -110,11 +110,18 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 			}
 			return .none
 
-		case let .destination(.presented(.editPersona(.delegate(.personaSaved(persona))))):
-			return .send(.delegate(.personaUpdated(persona)))
-
 		default:
 			return .none
+		}
+	}
+
+	func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .editPersona(.delegate(.personaSaved(persona))):
+			.send(.delegate(.personaUpdated(persona)))
+
+		default:
+			.none
 		}
 	}
 }

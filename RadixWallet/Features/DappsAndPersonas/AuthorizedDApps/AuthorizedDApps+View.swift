@@ -80,8 +80,8 @@ extension AuthorizedDapps.State {
 }
 
 private extension StoreOf<AuthorizedDapps> {
-	var destination: PresentationStoreOf<AuthorizedDapps.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<AuthorizedDapps.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -91,8 +91,8 @@ private extension View {
 		let destinationStore = store.destination
 		return navigationDestination(
 			store: destinationStore,
-			state: /AuthorizedDapps.Destination.State.presentedDapp,
-			action: AuthorizedDapps.Destination.Action.presentedDapp,
+			state: /AuthorizedDapps.Destination_.State.presentedDapp,
+			action: AuthorizedDapps.Destination_.Action.presentedDapp,
 			destination: { DappDetails.View(store: $0) }
 		)
 	}

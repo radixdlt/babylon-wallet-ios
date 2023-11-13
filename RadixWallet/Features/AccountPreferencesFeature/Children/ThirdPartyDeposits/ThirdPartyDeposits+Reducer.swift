@@ -102,22 +102,22 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(.allowDenyAssets(.delegate(.updated(thirdPartyDeposits))))),
-		     let .destination(.presented(.allowDepositors(.delegate(.updated(thirdPartyDeposits))))):
-			state.thirdPartyDeposits = thirdPartyDeposits
-			return .none
-		case .destination:
-			return .none
-		}
-	}
-
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .updated(account):
 			state.account = account
 			state.thirdPartyDeposits = account.onLedgerSettings.thirdPartyDeposits
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .allowDenyAssets(.delegate(.updated(thirdPartyDeposits))),
+		     let .allowDepositors(.delegate(.updated(thirdPartyDeposits))):
+			state.thirdPartyDeposits = thirdPartyDeposits
+			return .none
+		default:
 			return .none
 		}
 	}
