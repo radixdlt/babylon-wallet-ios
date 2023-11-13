@@ -142,7 +142,7 @@ extension ResourcesList.View {
 }
 
 private extension StoreOf<ResourcesList> {
-	var destination: PresentationStoreOf<ResourcesList.Destination_> {
+	var destination: PresentationStoreOf<ResourcesList.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -155,20 +155,20 @@ private extension View {
 			.confirmDeletionAlert(with: destinationStore)
 	}
 
-	private func addAsset(with destinationStore: PresentationStoreOf<ResourcesList.Destination_>) -> some View {
+	private func addAsset(with destinationStore: PresentationStoreOf<ResourcesList.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /ResourcesList.Destination_.State.addAsset,
-			action: ResourcesList.Destination_.Action.addAsset,
+			state: /ResourcesList.Destination.State.addAsset,
+			action: ResourcesList.Destination.Action.addAsset,
 			content: { AddAsset.View(store: $0) }
 		)
 	}
 
-	private func confirmDeletionAlert(with destinationStore: PresentationStoreOf<ResourcesList.Destination_>) -> some View {
+	private func confirmDeletionAlert(with destinationStore: PresentationStoreOf<ResourcesList.Destination>) -> some View {
 		alert(
 			store: destinationStore,
-			state: /ResourcesList.Destination_.State.confirmAssetDeletion,
-			action: ResourcesList.Destination_.Action.confirmAssetDeletion
+			state: /ResourcesList.Destination.State.confirmAssetDeletion,
+			action: ResourcesList.Destination.Action.confirmAssetDeletion
 		)
 	}
 }

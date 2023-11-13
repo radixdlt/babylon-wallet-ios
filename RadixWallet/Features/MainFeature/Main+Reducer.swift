@@ -9,7 +9,7 @@ public struct Main: Sendable, FeatureReducer {
 
 		// MARK: - Destination
 		@PresentationState
-		public var destination: Destination_.State?
+		public var destination: Destination.State?
 
 		public init(home: Home.State) {
 			self.home = home
@@ -32,7 +32,7 @@ public struct Main: Sendable, FeatureReducer {
 		case currentGatewayChanged(to: Radix.Gateway)
 	}
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case settings(Settings.State)
 		}
@@ -59,7 +59,7 @@ public struct Main: Sendable, FeatureReducer {
 		}
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -95,7 +95,7 @@ public struct Main: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .settings(.delegate(.deleteProfileAndFactorSources(keepInIcloudIfPresent))):
 			.run { send in

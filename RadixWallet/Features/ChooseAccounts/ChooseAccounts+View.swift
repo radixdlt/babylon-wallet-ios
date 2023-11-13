@@ -75,7 +75,7 @@ extension ChooseAccounts {
 }
 
 private extension StoreOf<ChooseAccounts> {
-	var destination: PresentationStoreOf<ChooseAccounts.Destination_> {
+	var destination: PresentationStoreOf<ChooseAccounts.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -86,8 +86,8 @@ private extension View {
 		let destinationStore = store.destination
 		return sheet(
 			store: destinationStore,
-			state: /ChooseAccounts.Destination_.State.createAccount,
-			action: ChooseAccounts.Destination_.Action.createAccount,
+			state: /ChooseAccounts.Destination.State.createAccount,
+			action: ChooseAccounts.Destination.Action.createAccount,
 			content: { CreateAccountCoordinator.View(store: $0) }
 		)
 	}

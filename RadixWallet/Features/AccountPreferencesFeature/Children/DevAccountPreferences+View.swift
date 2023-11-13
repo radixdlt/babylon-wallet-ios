@@ -130,7 +130,7 @@ extension DevAccountPreferences.View {
 }
 
 private extension StoreOf<DevAccountPreferences> {
-	var destination: PresentationStoreOf<DevAccountPreferences.Destination_> {
+	var destination: PresentationStoreOf<DevAccountPreferences.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -143,11 +143,11 @@ private extension View {
 		return reviewTransaction(with: destinationStore)
 	}
 
-	private func reviewTransaction(with destinationStore: PresentationStoreOf<DevAccountPreferences.Destination_>) -> some View {
+	private func reviewTransaction(with destinationStore: PresentationStoreOf<DevAccountPreferences.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /DevAccountPreferences.Destination_.State.reviewTransaction,
-			action: DevAccountPreferences.Destination_.Action.reviewTransaction
+			state: /DevAccountPreferences.Destination.State.reviewTransaction,
+			action: DevAccountPreferences.Destination.Action.reviewTransaction
 		) { store in
 			// FIXME: Should use DappInteractionClient intstead to schedule a transaction
 			NavigationView {

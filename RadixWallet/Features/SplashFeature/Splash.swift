@@ -5,12 +5,12 @@ import SwiftUI
 public struct Splash: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		@PresentationState
-		public var destination: Destination_.State?
+		public var destination: Destination.State?
 
 		var biometricsCheckFailed: Bool = false
 
 		public init(
-			destination: Destination_.State? = nil
+			destination: Destination.State? = nil
 		) {
 			self.destination = destination
 		}
@@ -37,7 +37,7 @@ public struct Splash: Sendable, FeatureReducer {
 		case completed(Profile)
 	}
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case passcodeCheckFailed(AlertState<Action.PasscodeCheckFailedAlert>)
 		}
@@ -69,7 +69,7 @@ public struct Splash: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 

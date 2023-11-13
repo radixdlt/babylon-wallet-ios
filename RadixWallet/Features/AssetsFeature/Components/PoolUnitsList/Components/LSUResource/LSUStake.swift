@@ -17,7 +17,7 @@ public struct LSUStake: FeatureReducer {
 		var selectedStakeClaimAssets: OrderedSet<OnLedgerEntity.NonFungibleToken>?
 
 		@PresentationState
-		var destination: Destination_.State?
+		var destination: Destination.State?
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -25,7 +25,7 @@ public struct LSUStake: FeatureReducer {
 		case didTapStakeClaimNFT(withID: ViewState.StakeClaimNFTViewState.ID)
 	}
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case details(LSUDetails.State)
 		}
@@ -49,7 +49,7 @@ public struct LSUStake: FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 

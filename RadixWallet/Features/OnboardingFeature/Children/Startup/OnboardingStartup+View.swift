@@ -60,7 +60,7 @@ extension OnboardingStartup.View {
 }
 
 private extension StoreOf<OnboardingStartup> {
-	var destination: PresentationStoreOf<OnboardingStartup.Destination_> {
+	var destination: PresentationStoreOf<OnboardingStartup.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -71,8 +71,8 @@ private extension View {
 		let destinationStore = store.destination
 		return sheet(
 			store: destinationStore,
-			state: /OnboardingStartup.Destination_.State.restoreFromBackup,
-			action: OnboardingStartup.Destination_.Action.restoreFromBackup,
+			state: /OnboardingStartup.Destination.State.restoreFromBackup,
+			action: OnboardingStartup.Destination.Action.restoreFromBackup,
 			content: { RestoreProfileFromBackupCoordinator.View(store: $0) }
 		)
 	}

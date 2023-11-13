@@ -9,7 +9,7 @@ public struct Home: Sendable, FeatureReducer {
 
 		// MARK: - Destination
 		@PresentationState
-		public var destination: Destination_.State?
+		public var destination: Destination.State?
 
 		public init() {
 			self.accountRows = []
@@ -39,7 +39,7 @@ public struct Home: Sendable, FeatureReducer {
 		case displaySettings
 	}
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case accountDetails(AccountDetails.State)
 			case createAccount(CreateAccountCoordinator.State)
@@ -82,7 +82,7 @@ public struct Home: Sendable, FeatureReducer {
 				Home.AccountRow()
 			}
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -174,7 +174,7 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .accountDetails(.delegate(.exportMnemonic(controlledAccount))):
 			return dismissAccountDetails(then: .exportMnemonic(account: controlledAccount), &state)

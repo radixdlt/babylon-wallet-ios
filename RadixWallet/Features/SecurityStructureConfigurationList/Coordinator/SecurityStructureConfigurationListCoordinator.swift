@@ -7,7 +7,7 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 		public var configList: SecurityStructureConfigurationList.State
 
 		@PresentationState
-		public var destination: Destination_.State? = nil
+		public var destination: Destination.State? = nil
 
 		public init(
 			configList: SecurityStructureConfigurationList.State = .init()
@@ -26,7 +26,7 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 
 	// MARK: - Destination
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Hashable, Sendable {
 			case manageSecurityStructureCoordinator(ManageSecurityStructureCoordinator.State)
 		}
@@ -55,7 +55,7 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 		}
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -90,7 +90,7 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .manageSecurityStructureCoordinator(.delegate(.done(.success(config)))):
 			let configReference = config.asReference()

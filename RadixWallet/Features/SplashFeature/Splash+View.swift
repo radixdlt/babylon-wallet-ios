@@ -58,7 +58,7 @@ extension Splash {
 }
 
 private extension StoreOf<Splash> {
-	var destination: PresentationStoreOf<Splash.Destination_> {
+	var destination: PresentationStoreOf<Splash.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -70,11 +70,11 @@ private extension View {
 		return passcodeCheckFailed(with: destinationStore)
 	}
 
-	private func passcodeCheckFailed(with destinationStore: PresentationStoreOf<Splash.Destination_>) -> some View {
+	private func passcodeCheckFailed(with destinationStore: PresentationStoreOf<Splash.Destination>) -> some View {
 		alert(
 			store: destinationStore,
-			state: /Splash.Destination_.State.passcodeCheckFailed,
-			action: Splash.Destination_.Action.passcodeCheckFailed
+			state: /Splash.Destination.State.passcodeCheckFailed,
+			action: Splash.Destination.Action.passcodeCheckFailed
 		)
 	}
 }

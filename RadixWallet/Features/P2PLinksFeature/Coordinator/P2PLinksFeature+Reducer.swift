@@ -9,11 +9,11 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 		public var links: IdentifiedArrayOf<P2PLinkRow.State>
 
 		@PresentationState
-		public var destination: Destination_.State?
+		public var destination: Destination.State?
 
 		public init(
 			links: IdentifiedArrayOf<P2PLinkRow.State> = .init(),
-			destination: Destination_.State? = nil
+			destination: Destination.State? = nil
 		) {
 			self.links = links
 			self.destination = destination
@@ -39,7 +39,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 
 	// MARK: Destination
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case newConnection(NewConnection.State)
 			case removeConnection(AlertState<Action.RemoveConnection>)
@@ -74,7 +74,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 				P2PLinkRow()
 			}
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -134,7 +134,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .newConnection(.delegate(.newConnection(connectedClient))):
 			state.destination = nil
@@ -166,7 +166,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 	}
 }
 
-extension AlertState<P2PLinksFeature.Destination_.Action.RemoveConnection> {
+extension AlertState<P2PLinksFeature.Destination.Action.RemoveConnection> {
 	static func confirmRemoval(id: ConnectionPassword) -> AlertState {
 		AlertState {
 			TextState(L10n.LinkedConnectors.RemoveConnectionAlert.title)

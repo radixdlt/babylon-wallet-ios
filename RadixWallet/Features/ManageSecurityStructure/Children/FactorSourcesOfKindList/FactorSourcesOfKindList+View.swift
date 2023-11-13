@@ -163,20 +163,20 @@ private extension View {
 			.existingFactorSourceWillBeDeleted(with: destinationStore)
 	}
 
-	private func addNewFactorSourceSheet<F>(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList<F>.Destination_>) -> some View where F: BaseFactorSourceProtocol {
+	private func addNewFactorSourceSheet<F>(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList<F>.Destination>) -> some View where F: BaseFactorSourceProtocol {
 		sheet(
 			store: destinationStore,
-			state: /FactorSourcesOfKindList.Destination_.State.addNewFactorSource,
-			action: FactorSourcesOfKindList.Destination_.Action.addNewFactorSource,
+			state: /FactorSourcesOfKindList.Destination.State.addNewFactorSource,
+			action: FactorSourcesOfKindList.Destination.Action.addNewFactorSource,
 			content: { ManageSomeFactorSource<F>.View(store: $0) }
 		)
 	}
 
-	private func existingFactorSourceWillBeDeleted(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList<some BaseFactorSourceProtocol>.Destination_>) -> some View {
+	private func existingFactorSourceWillBeDeleted(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList<some BaseFactorSourceProtocol>.Destination>) -> some View {
 		confirmationDialog(
 			store: destinationStore,
-			state: /FactorSourcesOfKindList.Destination_.State.existingFactorSourceWillBeDeletedConfirmationDialog,
-			action: FactorSourcesOfKindList.Destination_.Action.existingFactorSourceWillBeDeletedConfirmationDialog
+			state: /FactorSourcesOfKindList.Destination.State.existingFactorSourceWillBeDeletedConfirmationDialog,
+			action: FactorSourcesOfKindList.Destination.Action.existingFactorSourceWillBeDeletedConfirmationDialog
 		)
 	}
 }

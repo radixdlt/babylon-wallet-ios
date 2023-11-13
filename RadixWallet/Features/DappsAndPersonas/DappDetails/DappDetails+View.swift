@@ -64,7 +64,7 @@ extension DappDetails.View {
 }
 
 private extension StoreOf<DappDetails> {
-	var destination: PresentationStoreOf<DappDetails.Destination_> {
+	var destination: PresentationStoreOf<DappDetails.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 
@@ -80,38 +80,38 @@ private extension View {
 		return personaDetails(with: destinationStore)
 	}
 
-	private func personaDetails(with destinationStore: PresentationStoreOf<DappDetails.Destination_>) -> some View {
+	private func personaDetails(with destinationStore: PresentationStoreOf<DappDetails.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /DappDetails.Destination_.State.personaDetails,
-			action: DappDetails.Destination_.Action.personaDetails,
+			state: /DappDetails.Destination.State.personaDetails,
+			action: DappDetails.Destination.Action.personaDetails,
 			destination: { PersonaDetails.View(store: $0) }
 		)
 	}
 
-	private func fungibleDetails(with destinationStore: PresentationStoreOf<DappDetails.Destination_>) -> some View {
+	private func fungibleDetails(with destinationStore: PresentationStoreOf<DappDetails.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /DappDetails.Destination_.State.fungibleDetails,
-			action: DappDetails.Destination_.Action.fungibleDetails,
+			state: /DappDetails.Destination.State.fungibleDetails,
+			action: DappDetails.Destination.Action.fungibleDetails,
 			content: { FungibleTokenDetails.View(store: $0) }
 		)
 	}
 
-	private func nonFungibleDetails(with destinationStore: PresentationStoreOf<DappDetails.Destination_>) -> some View {
+	private func nonFungibleDetails(with destinationStore: PresentationStoreOf<DappDetails.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /DappDetails.Destination_.State.nonFungibleDetails,
-			action: DappDetails.Destination_.Action.nonFungibleDetails,
+			state: /DappDetails.Destination.State.nonFungibleDetails,
+			action: DappDetails.Destination.Action.nonFungibleDetails,
 			content: { NonFungibleTokenDetails.View(store: $0) }
 		)
 	}
 
-	private func confirmDisconnectAlert(with destinationStore: PresentationStoreOf<DappDetails.Destination_>) -> some View {
+	private func confirmDisconnectAlert(with destinationStore: PresentationStoreOf<DappDetails.Destination>) -> some View {
 		alert(
 			store: destinationStore,
-			state: /DappDetails.Destination_.State.confirmDisconnectAlert,
-			action: DappDetails.Destination_.Action.confirmDisconnectAlert
+			state: /DappDetails.Destination.State.confirmDisconnectAlert,
+			action: DappDetails.Destination.Action.confirmDisconnectAlert
 		)
 	}
 }

@@ -130,7 +130,7 @@ extension PreferenceSection.Row where SectionId == ManageThirdPartyDeposits.Sect
 }
 
 private extension StoreOf<ManageThirdPartyDeposits> {
-	var destination: PresentationStoreOf<ManageThirdPartyDeposits.Destination_> {
+	var destination: PresentationStoreOf<ManageThirdPartyDeposits.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -143,20 +143,20 @@ private extension View {
 			.allowDepositors(with: destinationStore)
 	}
 
-	private func allowDenyAssets(with destinationStore: PresentationStoreOf<ManageThirdPartyDeposits.Destination_>) -> some View {
+	private func allowDenyAssets(with destinationStore: PresentationStoreOf<ManageThirdPartyDeposits.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /ManageThirdPartyDeposits.Destination_.State.allowDenyAssets,
-			action: ManageThirdPartyDeposits.Destination_.Action.allowDenyAssets,
+			state: /ManageThirdPartyDeposits.Destination.State.allowDenyAssets,
+			action: ManageThirdPartyDeposits.Destination.Action.allowDenyAssets,
 			destination: { ResourcesList.View(store: $0) }
 		)
 	}
 
-	private func allowDepositors(with destinationStore: PresentationStoreOf<ManageThirdPartyDeposits.Destination_>) -> some View {
+	private func allowDepositors(with destinationStore: PresentationStoreOf<ManageThirdPartyDeposits.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /ManageThirdPartyDeposits.Destination_.State.allowDepositors,
-			action: ManageThirdPartyDeposits.Destination_.Action.allowDepositors,
+			state: /ManageThirdPartyDeposits.Destination.State.allowDepositors,
+			action: ManageThirdPartyDeposits.Destination.Action.allowDepositors,
 			destination: { ResourcesList.View(store: $0) }
 		)
 	}

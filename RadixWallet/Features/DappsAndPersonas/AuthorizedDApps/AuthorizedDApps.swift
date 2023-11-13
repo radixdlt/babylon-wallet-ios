@@ -16,9 +16,9 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 		public var thumbnails: [Profile.Network.AuthorizedDapp.ID: URL] = [:]
 
 		@PresentationState
-		public var destination: Destination_.State? = nil
+		public var destination: Destination.State? = nil
 
-		public init(destination: Destination_.State? = nil) {
+		public init(destination: Destination.State? = nil) {
 			self.destination = destination
 		}
 	}
@@ -39,7 +39,7 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 
 	// MARK: Destination
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Hashable, Sendable {
 			case presentedDapp(DappDetails.State)
 		}
@@ -62,7 +62,7 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -119,7 +119,7 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .presentedDapp(.delegate(.dAppForgotten)):
 			.run { send in

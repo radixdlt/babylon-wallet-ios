@@ -40,7 +40,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		public var destination: Destination_.State? = nil
+		public var destination: Destination.State? = nil
 
 		public var mode: Mode
 		var focusedField: Field?
@@ -79,7 +79,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Hashable, Sendable {
 			case incorrectPasswordAlert(AlertState<Action.IncorrectPasswordAlert>)
 		}
@@ -104,7 +104,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -210,7 +210,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .incorrectPasswordAlert(.okTapped):
 			state.destination = nil
@@ -219,7 +219,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 	}
 }
 
-extension EncryptOrDecryptProfile.Destination_.State {
+extension EncryptOrDecryptProfile.Destination.State {
 	fileprivate static func incorrectPasswordAlert(encrypt: Bool) -> Self {
 		.incorrectPasswordAlert(.init(
 			title: { TextState(L10n.ProfileBackup.IncorrectPasswordAlert.title) },

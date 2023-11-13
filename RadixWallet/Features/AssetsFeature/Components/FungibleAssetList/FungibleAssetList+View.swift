@@ -26,7 +26,7 @@ extension FungibleAssetList.View {
 }
 
 private extension StoreOf<FungibleAssetList> {
-	var destination: PresentationStoreOf<FungibleAssetList.Destination_> {
+	var destination: PresentationStoreOf<FungibleAssetList.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -37,8 +37,8 @@ private extension View {
 		let destinationStore = store.destination
 		return sheet(
 			store: destinationStore,
-			state: /FungibleAssetList.Destination_.State.details,
-			action: FungibleAssetList.Destination_.Action.details,
+			state: /FungibleAssetList.Destination.State.details,
+			action: FungibleAssetList.Destination.Action.details,
 			content: { FungibleTokenDetails.View(store: $0) }
 		)
 	}

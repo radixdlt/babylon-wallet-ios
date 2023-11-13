@@ -28,7 +28,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		var sliderResetDate: Date = .now
 
 		@PresentationState
-		public var destination: Destination_.State? = nil
+		public var destination: Destination.State? = nil
 
 		public func printFeePayerInfo(line: UInt = #line, function: StaticString = #function) {
 			#if DEBUG
@@ -121,7 +121,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case dismiss
 	}
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case customizeGuarantees(TransactionReviewGuarantees.State)
 			case signing(Signing.State)
@@ -198,7 +198,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				AccountDepositSettings()
 			}
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -417,7 +417,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .customizeGuarantees(.delegate(.applyGuarantees(guaranteeStates))):
 			for guaranteeState in guaranteeStates {

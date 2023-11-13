@@ -17,7 +17,7 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 		public var numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays
 
 		@PresentationState
-		var destination: Destination_.State? = nil
+		var destination: Destination.State? = nil
 
 		public init(mode: Mode) {
 			switch mode {
@@ -38,7 +38,7 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case factorsForPrimaryRole(FactorsForRole<PrimaryRoleTag>.State)
 			case factorsForRecoveryRole(FactorsForRole<RecoveryRoleTag>.State)
@@ -82,7 +82,7 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -121,7 +121,7 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .factorsForPrimaryRole(.delegate(.confirmedRoleWithFactors(primaryRole))):
 			state.primaryRole = primaryRole

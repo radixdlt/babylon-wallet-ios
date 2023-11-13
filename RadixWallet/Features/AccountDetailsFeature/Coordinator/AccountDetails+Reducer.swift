@@ -8,7 +8,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		var assets: AssetsView.State
 
 		@PresentationState
-		var destination: Destination_.State?
+		var destination: Destination.State?
 
 		public init(
 			accountWithInfo: AccountWithInfo
@@ -51,7 +51,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		public let factorSourceKind: FactorSourceKind
 	}
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case preferences(AccountPreferences.State)
 			case transfer(AssetTransfer.State)
@@ -86,7 +86,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -150,7 +150,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .transfer(.delegate(.dismissed)):
 			state.destination = nil

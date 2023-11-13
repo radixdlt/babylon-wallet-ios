@@ -140,7 +140,7 @@ extension AppSettings {
 }
 
 private extension StoreOf<AppSettings> {
-	var destination: PresentationStoreOf<AppSettings.Destination_> {
+	var destination: PresentationStoreOf<AppSettings.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -155,38 +155,38 @@ private extension View {
 			.accountAndPersonasHiding(with: destinationStore)
 	}
 
-	private func manageP2PLinks(with destinationStore: PresentationStoreOf<AppSettings.Destination_>) -> some View {
+	private func manageP2PLinks(with destinationStore: PresentationStoreOf<AppSettings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destination_.State.manageP2PLinks,
-			action: AppSettings.Destination_.Action.manageP2PLinks,
+			state: /AppSettings.Destination.State.manageP2PLinks,
+			action: AppSettings.Destination.Action.manageP2PLinks,
 			destination: { P2PLinksFeature.View(store: $0) }
 		)
 	}
 
-	private func gatewaySettings(with destinationStore: PresentationStoreOf<AppSettings.Destination_>) -> some View {
+	private func gatewaySettings(with destinationStore: PresentationStoreOf<AppSettings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destination_.State.gatewaySettings,
-			action: AppSettings.Destination_.Action.gatewaySettings,
+			state: /AppSettings.Destination.State.gatewaySettings,
+			action: AppSettings.Destination.Action.gatewaySettings,
 			destination: { GatewaySettings.View(store: $0) }
 		)
 	}
 
-	private func profileBackupSettings(with destinationStore: PresentationStoreOf<AppSettings.Destination_>) -> some View {
+	private func profileBackupSettings(with destinationStore: PresentationStoreOf<AppSettings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destination_.State.profileBackupSettings,
-			action: AppSettings.Destination_.Action.profileBackupSettings,
+			state: /AppSettings.Destination.State.profileBackupSettings,
+			action: AppSettings.Destination.Action.profileBackupSettings,
 			destination: { ProfileBackupSettings.View(store: $0) }
 		)
 	}
 
-	private func accountAndPersonasHiding(with destinationStore: PresentationStoreOf<AppSettings.Destination_>) -> some View {
+	private func accountAndPersonasHiding(with destinationStore: PresentationStoreOf<AppSettings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AppSettings.Destination_.State.accountAndPersonasHiding,
-			action: AppSettings.Destination_.Action.accountAndPersonasHiding,
+			state: /AppSettings.Destination.State.accountAndPersonasHiding,
+			action: AppSettings.Destination.Action.accountAndPersonasHiding,
 			destination: { AccountAndPersonaHiding.View(store: $0) }
 		)
 	}

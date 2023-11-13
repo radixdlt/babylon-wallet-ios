@@ -24,10 +24,10 @@ public protocol FeatureReducer: Reducer where State: Sendable & Hashable, Action
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action>
 	func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action>
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action>
-	func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action>
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action>
 	func reduceDismissedDestination(into state: inout State) -> Effect<Action>
 
-	associatedtype Destination_: DestinationReducer = EmptyDestination
+	associatedtype Destination: DestinationReducer = EmptyDestination
 
 	associatedtype ViewState: Equatable = Never
 	associatedtype View: SwiftUI.View
@@ -35,7 +35,7 @@ public protocol FeatureReducer: Reducer where State: Sendable & Hashable, Action
 
 // MARK: - FeatureAction
 public enum FeatureAction<Feature: FeatureReducer>: Sendable, Equatable {
-	case destination(PresentationAction<Feature.Destination_.Action>)
+	case destination(PresentationAction<Feature.Destination.Action>)
 	case view(Feature.ViewAction)
 	case `internal`(Feature.InternalAction)
 	case child(Feature.ChildAction)
@@ -89,7 +89,7 @@ extension Reducer where Self: FeatureReducer {
 		.none
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		.none
 	}
 
@@ -107,7 +107,7 @@ public typealias ViewStoreOf<Feature: FeatureReducer> = ViewStore<Feature.ViewSt
 public typealias StackActionOf<R: Reducer> = StackAction<R.State, R.Action>
 
 // MARK: - FeatureAction + Hashable
-extension FeatureAction: Hashable where Feature.Destination_.Action: Hashable, Feature.ViewAction: Hashable, Feature.ChildAction: Hashable, Feature.InternalAction: Hashable, Feature.DelegateAction: Hashable {
+extension FeatureAction: Hashable where Feature.Destination.Action: Hashable, Feature.ViewAction: Hashable, Feature.ChildAction: Hashable, Feature.InternalAction: Hashable, Feature.DelegateAction: Hashable {
 	public func hash(into hasher: inout Hasher) {
 		switch self {
 		case let .destination(action):

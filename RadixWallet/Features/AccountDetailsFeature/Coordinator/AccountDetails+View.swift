@@ -137,7 +137,7 @@ private extension Button {
 }
 
 private extension StoreOf<AccountDetails> {
-	var destination: PresentationStoreOf<AccountDetails.Destination_> {
+	var destination: PresentationStoreOf<AccountDetails.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -150,20 +150,20 @@ private extension View {
 			.transfer(with: destinationStore)
 	}
 
-	private func preferences(with destinationStore: PresentationStoreOf<AccountDetails.Destination_>) -> some SwiftUI.View {
+	private func preferences(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AccountDetails.Destination_.State.preferences,
-			action: AccountDetails.Destination_.Action.preferences,
+			state: /AccountDetails.Destination.State.preferences,
+			action: AccountDetails.Destination.Action.preferences,
 			destination: { AccountPreferences.View(store: $0) }
 		)
 	}
 
-	private func transfer(with destinationStore: PresentationStoreOf<AccountDetails.Destination_>) -> some SwiftUI.View {
+	private func transfer(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
 		fullScreenCover(
 			store: destinationStore,
-			state: /AccountDetails.Destination_.State.transfer,
-			action: AccountDetails.Destination_.Action.transfer,
+			state: /AccountDetails.Destination.State.transfer,
+			action: AccountDetails.Destination.Action.transfer,
 			content: { AssetTransfer.SheetView(store: $0) }
 		)
 	}

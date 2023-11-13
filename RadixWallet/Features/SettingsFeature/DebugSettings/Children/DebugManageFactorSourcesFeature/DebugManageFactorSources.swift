@@ -8,12 +8,12 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 		public var factorSources: FactorSources?
 
 		@PresentationState
-		public var destination: Destination_.State?
+		public var destination: Destination.State?
 
 		public init() {}
 	}
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case importMnemonic(ImportMnemonic.State)
 			case addLedger(AddLedgerFactorSource.State)
@@ -54,7 +54,7 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -97,7 +97,7 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .importMnemonic(.delegate(.persistedNewFactorSourceInProfile)):
 			state.destination = nil

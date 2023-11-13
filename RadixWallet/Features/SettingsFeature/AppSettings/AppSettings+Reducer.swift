@@ -7,7 +7,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		@PresentationState
-		public var destination: Destination_.State?
+		public var destination: Destination.State?
 
 		public var preferences: AppPreferences?
 		var exportLogs: URL?
@@ -40,7 +40,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 	// MARK: Destination
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case manageP2PLinks(P2PLinksFeature.State)
 			case gatewaySettings(GatewaySettings.State)
@@ -80,7 +80,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -133,7 +133,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .profileBackupSettings(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))):
 			.send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent)))

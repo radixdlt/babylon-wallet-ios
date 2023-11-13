@@ -70,7 +70,7 @@ extension PersonaDataPermission {
 }
 
 private extension StoreOf<PersonaDataPermission> {
-	var destination: PresentationStoreOf<PersonaDataPermission.Destination_> {
+	var destination: PresentationStoreOf<PersonaDataPermission.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -81,8 +81,8 @@ private extension View {
 		let destinationStore = store.destination
 		return sheet(
 			store: destinationStore,
-			state: /PersonaDataPermission.Destination_.State.editPersona,
-			action: PersonaDataPermission.Destination_.Action.editPersona,
+			state: /PersonaDataPermission.Destination.State.editPersona,
+			action: PersonaDataPermission.Destination.Action.editPersona,
 			content: { EditPersona.View(store: $0) }
 		)
 	}

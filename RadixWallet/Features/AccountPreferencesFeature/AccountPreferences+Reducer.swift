@@ -7,7 +7,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		public var account: Profile.Network.Account
 
 		@PresentationState
-		var destination: Destination_.State? = nil
+		var destination: Destination.State? = nil
 
 		public init(account: Profile.Network.Account) {
 			self.account = account
@@ -32,7 +32,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	}
 
 	// MARK: - Destination
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Hashable, Sendable {
 			case showQR(ShowQR.State)
 			case updateAccountLabel(UpdateAccountLabel.State)
@@ -80,7 +80,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -122,7 +122,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .showQR(.delegate(.dismiss)):
 			if case .showQR = state.destination {

@@ -55,7 +55,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		var loadedResources: [ResourceViewState] = []
 
 		@PresentationState
-		var destination: Destination_.State? = nil
+		var destination: Destination.State? = nil
 	}
 
 	// MARK: Action
@@ -78,7 +78,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 
 	// MARK: Destination
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Hashable, Sendable {
 			case addAsset(AddAsset.State)
 			case confirmAssetDeletion(AlertState<Action.ConfirmDeletionAlert>)
@@ -108,7 +108,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -177,7 +177,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .addAsset(.delegate(.addAddress(mode, newAsset))):
 			state.mode = mode
@@ -205,7 +205,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 	}
 }
 
-extension AlertState<ResourcesList.Destination_.Action.ConfirmDeletionAlert> {
+extension AlertState<ResourcesList.Destination.Action.ConfirmDeletionAlert> {
 	static func confirmAssetDeletion(
 		_ title: String,
 		_ message: String,

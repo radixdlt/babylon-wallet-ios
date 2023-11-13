@@ -188,7 +188,7 @@ extension LSUStake.State {
 }
 
 private extension StoreOf<LSUStake> {
-	var destination: PresentationStoreOf<LSUStake.Destination_> {
+	var destination: PresentationStoreOf<LSUStake.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -199,8 +199,8 @@ private extension View {
 		let destinationStore = store.destination
 		return sheet(
 			store: destinationStore,
-			state: /LSUStake.Destination_.State.details,
-			action: LSUStake.Destination_.Action.details,
+			state: /LSUStake.Destination.State.details,
+			action: LSUStake.Destination.Action.details,
 			content: { LSUDetails.View(store: $0) }
 		)
 	}

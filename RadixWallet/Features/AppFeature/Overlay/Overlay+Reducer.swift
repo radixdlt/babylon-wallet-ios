@@ -9,7 +9,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		public var destination: Destination_.State?
+		public var destination: Destination.State?
 	}
 
 	enum ViewAction: Sendable, Equatable {
@@ -21,7 +21,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		case showNextItemIfPossible
 	}
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case hud(HUD.State)
 			case alert(OverlayWindowClient.Item.AlertState)
@@ -45,7 +45,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -70,7 +70,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .alert(action):
 			if let item = state.itemsQueue.first, case let .alert(state) = item {
