@@ -15,7 +15,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		public var destination: Destination.State?
+		public var destination: Destination_.State?
 
 		/// An exportable Profile file, either encrypted or plaintext.
 		public var profileFile: ExportableProfileFile?
@@ -41,7 +41,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		case deleteProfileAndFactorSourcesButtonTapped
 	}
 
-	public struct Destination: Sendable, Reducer {
+	public struct Destination_: DestinationReducer {
 		static let confirmCloudSyncDisableAlert: Self.State = .confirmCloudSyncDisable(.init(
 			title: {
 				TextState(L10n.AppSettings.ConfirmCloudSyncDisableAlert.title)
@@ -123,10 +123,6 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		case loadPreferences(AppPreferences)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
-	}
-
 	public enum DelegateAction: Sendable, Equatable {
 		case deleteProfileAndFactorSources(keepInICloudIfPresent: Bool)
 	}
@@ -143,8 +139,8 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<ProfileBackupSettings> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. /ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

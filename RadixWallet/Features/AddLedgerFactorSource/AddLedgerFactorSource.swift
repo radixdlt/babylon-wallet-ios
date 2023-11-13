@@ -11,7 +11,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		public var unnamedDeviceToAdd: LedgerDeviceInfo?
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		public var destination: Destination_.State? = nil
 
 		public init() {}
 	}
@@ -21,10 +21,6 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case sendAddLedgerRequestButtonTapped
 		case closeButtonTapped
-	}
-
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -41,7 +37,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	// MARK: Destination
 
-	public struct Destination: Sendable, Reducer {
+	public struct Destination_: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case ledgerAlreadyExistsAlert(AlertState<Never>)
 			case nameLedger(NameLedgerFactorSource.State)
@@ -70,8 +66,8 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

@@ -9,7 +9,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		public let entities: DisplayEntitiesControlledByMnemonic.State
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		public var destination: Destination_.State? = nil
 
 		public init(entitiesControlledByFactorSource: EntitiesControlledByFactorSource) {
 			self.entitiesControlledByFactorSource = entitiesControlledByFactorSource
@@ -35,13 +35,12 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
 		case entities(DisplayEntitiesControlledByMnemonic.Action)
 	}
 
 	// MARK: - Destination
 
-	public struct Destination: Sendable, Reducer {
+	public struct Destination_: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case importMnemonic(ImportMnemonic.State)
 		}
@@ -66,8 +65,8 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

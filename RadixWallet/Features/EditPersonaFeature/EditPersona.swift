@@ -70,7 +70,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 		var labelField: EditPersonaStaticField.State
 
 		@PresentationState
-		var destination: Destination.State? = nil
+		var destination: Destination_.State? = nil
 
 		var alreadyAddedEntryKinds: [PersonaData.Entry.Kind] {
 			[entries.name?.kind, entries.emailAddress?.kind, entries.phoneNumber?.kind].compactMap(identity)
@@ -105,14 +105,13 @@ public struct EditPersona: Sendable, FeatureReducer {
 	public enum ChildAction: Sendable, Equatable {
 		case labelField(EditPersonaStaticField.Action)
 		case entries(EditPersonaEntries.Action)
-		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case personaSaved(Profile.Network.Persona)
 	}
 
-	public struct Destination: Sendable, Reducer {
+	public struct Destination_: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case closeConfirmationDialog(ConfirmationDialogState<ViewAction.CloseConfirmationDialogAction>)
 			case addFields(EditPersonaAddEntryKinds.State)
@@ -145,8 +144,8 @@ public struct EditPersona: Sendable, FeatureReducer {
 			EditPersonaEntries()
 		}
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

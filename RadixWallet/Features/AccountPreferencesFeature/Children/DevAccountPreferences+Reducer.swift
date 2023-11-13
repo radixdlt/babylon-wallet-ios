@@ -11,7 +11,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		public var faucetButtonState: ControlState
 
 		@PresentationState
-		var destination: Destination.State? = nil
+		var destination: Destination_.State? = nil
 
 		#if DEBUG
 		public var canCreateAuthSigningKey: Bool
@@ -71,24 +71,20 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		#endif // DEBUG
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
-	}
-
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
 	}
 
 	// MARK: - Destination
 
-	public struct Destination: Reducer {
-		public enum State: Equatable, Hashable {
+	public struct Destination_: DestinationReducer {
+		public enum State: Hashable, Sendable {
 			#if DEBUG
 			case reviewTransaction(TransactionReview.State)
 			#endif // DEBUG
 		}
 
-		public enum Action: Equatable {
+		public enum Action: Equatable, Sendable {
 			#if DEBUG
 			case reviewTransaction(TransactionReview.Action)
 			#endif // DEBUG
@@ -117,8 +113,8 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

@@ -55,7 +55,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		var loadedResources: [ResourceViewState] = []
 
 		@PresentationState
-		var destination: Destination.State? = nil
+		var destination: Destination_.State? = nil
 	}
 
 	// MARK: Action
@@ -65,10 +65,6 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		case addAssetTapped
 		case assetRemove(ResourceViewState.Address)
 		case exceptionListChanged(ThirdPartyDeposits.DepositAddressExceptionRule)
-	}
-
-	public enum ChildAction: Equatable, Sendable {
-		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum DelegateAction: Equatable, Sendable {
@@ -82,7 +78,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 
 	// MARK: Destination
 
-	public struct Destination: Reducer, Sendable {
+	public struct Destination_: DestinationReducer {
 		public enum State: Hashable, Sendable {
 			case addAsset(AddAsset.State)
 			case confirmAssetDeletion(AlertState<Action.ConfirmDeletionAlert>)
@@ -111,8 +107,8 @@ public struct ResourcesList: FeatureReducer, Sendable {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

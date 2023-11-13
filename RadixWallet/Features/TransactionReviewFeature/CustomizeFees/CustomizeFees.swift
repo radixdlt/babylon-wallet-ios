@@ -27,7 +27,7 @@ public struct CustomizeFees: FeatureReducer {
 		}
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		public var destination: Destination_.State? = nil
 
 		init(
 			reviewedTransaction: ReviewedTransaction,
@@ -48,7 +48,6 @@ public struct CustomizeFees: FeatureReducer {
 	}
 
 	public enum ChildAction: Equatable, Sendable {
-		case destination(PresentationAction<Destination.Action>)
 		case normalFeesCustomization(NormalFeesCustomization.Action)
 		case advancedFeesCustomization(AdvancedFeesCustomization.Action)
 	}
@@ -61,7 +60,7 @@ public struct CustomizeFees: FeatureReducer {
 		case updated(TaskResult<ReviewedTransaction>)
 	}
 
-	public struct Destination: Sendable, Reducer {
+	public struct Destination_: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case selectFeePayer(SelectFeePayer.State)
 		}
@@ -92,8 +91,8 @@ public struct CustomizeFees: FeatureReducer {
 		}
 
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

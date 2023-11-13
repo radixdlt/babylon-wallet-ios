@@ -9,14 +9,14 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		public var personaList: PersonaList.State
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		public var destination: Destination_.State? = nil
 
 		/// Determines if the persona is first ever created across networks.
 		public var personaPrimacy: PersonaPrimacy? = nil
 
 		public init(
 			personaList: PersonaList.State = .init(),
-			destination: Destination.State? = nil,
+			destination: Destination_.State? = nil,
 			personaPrimacy: PersonaPrimacy? = nil
 		) {
 			self.personaList = personaList
@@ -38,12 +38,11 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case personaList(PersonaList.Action)
-		case destination(PresentationAction<Destination.Action>)
 	}
 
 	// MARK: - Destination
 
-	public struct Destination: Reducer {
+	public struct Destination_: DestinationReducer {
 		public enum State: Equatable, Hashable {
 			case createPersonaCoordinator(CreatePersonaCoordinator.State)
 			case personaDetails(PersonaDetails.State)
@@ -77,8 +76,8 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 			PersonaList()
 		}
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

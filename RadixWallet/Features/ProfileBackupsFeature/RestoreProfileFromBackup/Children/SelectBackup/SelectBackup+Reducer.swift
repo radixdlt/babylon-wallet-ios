@@ -3,14 +3,14 @@ import SwiftUI
 
 // MARK: - SelectBackup
 public struct SelectBackup: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
+	public struct State: Hashable, Sendable {
 		public var backupProfileHeaders: ProfileSnapshot.HeaderList?
 		public var selectedProfileHeader: ProfileSnapshot.Header?
 		public var isDisplayingFileImporter: Bool
 		public var thisDeviceID: UUID?
 
 		@PresentationState
-		public var destination: Destination.State?
+		public var destination: Destination_.State?
 
 		public var profileFile: ExportableProfileFile?
 
@@ -36,7 +36,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case tappedUseCloudBackup(ProfileSnapshot.Header)
 	}
 
-	public struct Destination: Sendable, Reducer {
+	public struct Destination_: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.State)
 		}
@@ -62,10 +62,6 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case selectedProfileSnapshot(ProfileSnapshot, isInCloud: Bool)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
-	}
-
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.dataReader) var dataReader
 	@Dependency(\.jsonDecoder) var jsonDecoder
@@ -77,8 +73,8 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<SelectBackup> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. /ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

@@ -16,9 +16,9 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 		public var thumbnails: [Profile.Network.AuthorizedDapp.ID: URL] = [:]
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		public var destination: Destination_.State? = nil
 
-		public init(destination: Destination.State? = nil) {
+		public init(destination: Destination_.State? = nil) {
 			self.destination = destination
 		}
 	}
@@ -37,13 +37,9 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 		case failedToGetDetailsOfDapp(id: Profile.Network.AuthorizedDapp.ID)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
-	}
-
 	// MARK: Destination
 
-	public struct Destination: Reducer, Sendable {
+	public struct Destination_: DestinationReducer {
 		public enum State: Hashable, Sendable {
 			case presentedDapp(DappDetails.State)
 		}
@@ -65,8 +61,8 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

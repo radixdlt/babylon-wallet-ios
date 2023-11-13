@@ -11,7 +11,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 		public var canCreateNewAccount: Bool
 
 		@PresentationState
-		var destination: Destination.State? = nil
+		var destination: Destination_.State? = nil
 
 		public init(
 			selectionRequirement: SelectionRequirement,
@@ -38,11 +38,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 		case loadAccountsResult(TaskResult<IdentifiedArrayOf<Profile.Network.Account>>)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
-	}
-
-	public struct Destination: Sendable, Reducer {
+	public struct Destination_: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case createAccount(CreateAccountCoordinator.State)
 		}
@@ -65,8 +61,8 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

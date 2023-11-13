@@ -10,7 +10,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 		let requested: P2P.Dapp.Request.PersonaDataRequestItem
 
 		@PresentationState
-		var destination: Destination.State?
+		var destination: Destination_.State?
 
 		init(
 			dappMetadata: DappMetadata,
@@ -34,7 +34,6 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 
 	enum ChildAction: Sendable, Equatable {
 		case persona(PersonaDataPermissionBox.Action)
-		case destination(PresentationAction<Destination.Action>)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -42,7 +41,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 		case continueButtonTapped(P2P.Dapp.Request.Response)
 	}
 
-	struct Destination: Sendable, Reducer {
+	public struct Destination_: DestinationReducer {
 		enum State: Sendable, Hashable {
 			case editPersona(EditPersona.State)
 		}
@@ -66,8 +65,8 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 			.ifLet(\.persona, action: /Action.child .. ChildAction.persona) {
 				PersonaDataPermissionBox()
 			}
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

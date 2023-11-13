@@ -46,7 +46,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		public var destination: Destination_.State? = nil
 
 		var identityAddress: IdentityAddress {
 			mode.id
@@ -68,10 +68,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case hidePersonaTapped
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
-	}
-
 	public enum DelegateAction: Sendable, Equatable {
 		case personaDeauthorized
 		case personaChanged(Profile.Network.Persona.ID)
@@ -89,7 +85,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destination: Reducer {
+	public struct Destination_: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case editPersona(EditPersona.State)
 			case dAppDetails(DappDetails.State)
@@ -130,8 +126,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 

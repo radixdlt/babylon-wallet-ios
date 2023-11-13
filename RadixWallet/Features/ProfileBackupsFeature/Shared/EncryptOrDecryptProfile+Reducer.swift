@@ -40,7 +40,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		public var destination: Destination_.State? = nil
 
 		public var mode: Mode
 		var focusedField: Field?
@@ -61,10 +61,6 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 		case confirmedEncryptionPassword
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
-	}
-
 	public enum InternalAction: Sendable, Equatable {
 		case focusTextField(State.Field?)
 
@@ -83,7 +79,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destination: Reducer, Sendable, Equatable {
+	public struct Destination_: DestinationReducer {
 		public enum State: Hashable, Sendable {
 			case incorrectPasswordAlert(AlertState<Action.IncorrectPasswordAlert>)
 		}
@@ -107,8 +103,8 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destination()
+			.ifLet(\.$destination, action: /Action.destination) {
+				Destination_()
 			}
 	}
 
