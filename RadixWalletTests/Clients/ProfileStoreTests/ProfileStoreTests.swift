@@ -75,35 +75,35 @@ final class ProfileStoreNewProfileTests: TestCase {
 
 		await nearFutureFulfillment(of: deleteDeprecatedDeviceID_is_called)
 	}
+
+	func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__deleteDeprecatedDeviceID_is_not_called_if_failed_to_save_migrated_deviceInfo() async throws {
+		try await withTimeLimit(.slow) {
+			let deleteDeprecatedDeviceID_is_NOT_called = self.expectation(description: "deleteDeprecatedDeviceID is NOT called")
+			deleteDeprecatedDeviceID_is_NOT_called.isInverted = true // We expected to NOT be called.
+
+			await withTestClients {
+				// GIVEN no device info
+				$0.noDeviceInfo()
+				$0.secureStorageClient.deprecatedLoadDeviceID = { 0xDEAD }
+				then(&$0)
+			} operation: {
+				// WHEN ProfileStore.init()
+				ProfileStore.init()
+			}
+
+			func then(_ d: inout DependencyValues) {
+				d.secureStorageClient.deleteDeprecatedDeviceID = {
+					// THEN deleteDeprecatedDeviceID is NOT called if...
+					deleteDeprecatedDeviceID_is_NOT_called.fulfill()
+				}
+				// ... if failed to save migrated deviceInfo
+				d.secureStorageClient.saveDeviceInfo = { _ in throw NoopError() }
+			}
+
+			await self.nearFutureFulfillment(of: deleteDeprecatedDeviceID_is_NOT_called)
+		}
+	}
 	/*
-	 func test__GIVEN__no_deviceInfo__WHEN__deprecatedLoadDeviceID_returns_x__THEN__deleteDeprecatedDeviceID_is_not_called_if_failed_to_save_migrated_deviceInfo() async throws {
-	 	try await withTimeLimit {
-	 		let deleteDeprecatedDeviceID_is_NOT_called = self.expectation(description: "deleteDeprecatedDeviceID is NOT called")
-	 		deleteDeprecatedDeviceID_is_NOT_called.isInverted = true // We expected to NOT be called.
-
-	 		await withTestClients {
-	 			// GIVEN no device info
-	 			$0.noDeviceInfo()
-	 			$0.secureStorageClient.deprecatedLoadDeviceID = { 0xDEAD }
-	 			then(&$0)
-	 		} operation: {
-	 			// WHEN ProfileStore.init()
-	 			ProfileStore.init()
-	 		}
-
-	 		func then(_ d: inout DependencyValues) {
-	 			d.secureStorageClient.deleteDeprecatedDeviceID = {
-	 				// THEN deleteDeprecatedDeviceID is NOT called if...
-	 				deleteDeprecatedDeviceID_is_NOT_called.fulfill()
-	 			}
-	 			// ... if failed to save migrated deviceInfo
-	 			d.secureStorageClient.saveDeviceInfo = { _ in throw NoopError() }
-	 		}
-
-	 		await self.nearFutureFulfillment(of: deleteDeprecatedDeviceID_is_NOT_called)
-	 	}
-	 }
-
 	 func test__GIVEN_a_saved_deviceInfo__WHEN__init__THEN__deprecatedLoadDeviceID_is_not_called() async throws {
 	 	try await withTimeLimit {
 	 		let deprecatedLoadDeviceID_is_NOT_called = self.expectation(description: "deprecatedLoadDeviceID is NOT called")
