@@ -206,6 +206,21 @@ final class ProfileStoreNewProfileTests: TestCase {
 		}
 	}
 
+	func test__GIVEN__no_profile__WHEN__init__THEN__new_profile_with_main_BDFS_is_created() async throws {
+		try await withTimeLimit {
+			let newProfile = await withTestClients {
+				// GIVEN no profile
+				$0.noProfile()
+			} operation: {
+				// WHEN ProfileStore.init()
+				await ProfileStore.init().profile
+			}
+
+			let deviceFS = try newProfile.factorSources[0].extract(as: DeviceFactorSource.self)
+			XCTAssertTrue(deviceFS.isExplicitMainBDFS)
+		}
+	}
+
 	func test__GIVEN__no_profile__WHEN__import_profile__THEN__imported_profile_is_used() async throws {
 		try await withTimeLimit(.normal) {
 			let usedProfile = try await withTestClients {

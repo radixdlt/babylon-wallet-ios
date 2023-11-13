@@ -46,6 +46,7 @@ extension FactorSource.Common {
 	) throws -> Self {
 		.init(
 			cryptoParameters: cryptoParameters,
+			flags: flags,
 			addedOn: addedOn,
 			lastUsedOn: lastUsedOn
 		)
