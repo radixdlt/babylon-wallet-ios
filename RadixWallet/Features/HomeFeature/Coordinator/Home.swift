@@ -76,6 +76,7 @@ public struct Home: Sendable, FeatureReducer {
 
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 	@Dependency(\.secureStorageClient) var secureStorageClient
@@ -202,13 +203,20 @@ public struct Home: Sendable, FeatureReducer {
 		case let .destination(.presented(.importMnemonics(.delegate(delegateAction)))):
 			state.destination = nil
 			switch delegateAction {
-			case .finishedEarly: break
-			case let .finishedImportingMnemonics(_, imported):
-				if !imported.isEmpty {
-					return checkAccountsAccessToMnemonic(state: state)
+			case .finishedEarly:
+				return .none
+			case let .finishedImportingMnemonics(_, imported, newMain):
+				var effect = Effect<Action>.none
+				if let newMain {
+					effect = .run { _ in
+						try await factorSourcesClient.newMainBDFS(newMain)
+					}
 				}
+				if !imported.isEmpty {
+					effect = effect.concatenate(with: checkAccountsAccessToMnemonic(state: state))
+				}
+				return effect
 			}
-			return .none
 
 		default:
 			return .none

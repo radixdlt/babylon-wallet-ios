@@ -7,6 +7,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		public var mnemonicsLeftToImport: IdentifiedArrayOf<EntitiesControlledByFactorSource> = []
 		public var imported: OrderedSet<SkippedOrImported> = []
 		public var skipped: OrderedSet<SkippedOrImported> = []
+		public var newMainBDFS: NewMainBDFS?
 		public enum Context: Sendable, Hashable {
 			case fromOnboarding(profileSnapshot: ProfileSnapshot)
 			case notOnboarding
@@ -63,7 +64,8 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case finishedImportingMnemonics(
 			skipped: OrderedSet<SkippedOrImported>,
-			imported: OrderedSet<SkippedOrImported>
+			imported: OrderedSet<SkippedOrImported>,
+			newMainBDFS: NewMainBDFS?
 		)
 
 		case finishedEarly(dueToFailure: Bool)
@@ -135,6 +137,11 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		switch childAction {
 		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(delegateAction)))):
 			switch delegateAction {
+			case let .createdNewMainBDFS(skipped, newMainBDFS):
+				state.newMainBDFS = newMainBDFS
+				state.skipped.append(.init(factorSourceID: skipped))
+				return finishedWith(factorSourceID: skipped, state: &state)
+
 			case let .skippedMnemonic(factorSourceIDHash):
 				state.skipped.append(.init(factorSourceID: factorSourceIDHash))
 				return finishedWith(factorSourceID: factorSourceIDHash, state: &state)
@@ -155,10 +162,10 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 			switch destination {
 			case let .importMnemonicControllingAccounts(substate):
-				if substate.entitiesControlledByFactorSource.isSkippable {
+				if !substate.isMainBDFS {
 					return nextMnemonicIfNeeded(state: &state)
 				} else {
-					// Skipped a non skippable by use of OS level gestures
+					// Skipped a main bdfs by use of OS level gestures (thus bypassing warning)
 					return .send(.delegate(.finishedEarly(dueToFailure: true)))
 				}
 			}
@@ -175,11 +182,29 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 	private func nextMnemonicIfNeeded(state: inout State) -> Effect<Action> {
 		if let next = state.mnemonicsLeftToImport.first {
-			state.destination = .importMnemonicControllingAccounts(.init(entitiesControlledByFactorSource: next))
+			let isBDFS = next.isBDFS
+			let numberOfMainBDFS = state.mnemonicsLeftToImport.filter(\.isExplicitMain).count
+
+			let isMainBDFS: Bool
+			switch numberOfMainBDFS {
+			case 0:
+				isMainBDFS = isBDFS
+			case 1:
+				isMainBDFS = next.isExplicitMainBDFS
+			default:
+				assertionFailure("DISCREPANCY, more than one Main BDFS, this should not happen.")
+				isMainBDFS = next.isExplicitMainBDFS
+			}
+			state.destination = .importMnemonicControllingAccounts(
+				.init(
+					entitiesControlledByFactorSource: next,
+					isMainBDFS: isMainBDFS
+				)
+			)
 			return .none
 		} else {
 			state.destination = nil
-			return .send(.delegate(.finishedImportingMnemonics(skipped: state.skipped, imported: state.imported)))
+			return .send(.delegate(.finishedImportingMnemonics(skipped: state.skipped, imported: state.imported, newMainBDFS: state.newMainBDFS)))
 		}
 	}
 }

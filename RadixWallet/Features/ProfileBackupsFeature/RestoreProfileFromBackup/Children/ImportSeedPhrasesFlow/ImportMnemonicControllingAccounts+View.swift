@@ -2,27 +2,27 @@ import ComposableArchitecture
 import SwiftUI
 extension ImportMnemonicControllingAccounts.State {
 	var viewState: ImportMnemonicControllingAccounts.ViewState {
-		.init(isSkippable: entitiesControlledByFactorSource.isSkippable)
+		.init(isMain: isMainBDFS)
 	}
 }
 
 // MARK: - ImportMnemonicControllingAccounts.View
 extension ImportMnemonicControllingAccounts {
 	public struct ViewState: Equatable {
-		let isSkippable: Bool
+		let isMain: Bool
 
 		var title: LocalizedStringKey {
 			.init(
-				isSkippable
-					? L10n.RecoverSeedPhrase.Header.subtitleOtherSeedPhrase
-					: L10n.RecoverSeedPhrase.Header.subtitleMainSeedPhrase
+				isMain
+					? L10n.RecoverSeedPhrase.Header.subtitleMainSeedPhrase
+					: L10n.RecoverSeedPhrase.Header.subtitleOtherSeedPhrase
 			)
 		}
 
 		var navigationTitle: String {
-			isSkippable
-				? L10n.RecoverSeedPhrase.Header.titleOther
-				: L10n.RecoverSeedPhrase.Header.titleMain
+			isMain
+				? L10n.RecoverSeedPhrase.Header.titleMain
+				: L10n.RecoverSeedPhrase.Header.titleOther
 		}
 	}
 
@@ -42,18 +42,16 @@ extension ImportMnemonicControllingAccounts {
 						.foregroundColor(.app.gray1)
 						.padding()
 
-					if viewStore.isSkippable {
-						Button(L10n.RecoverSeedPhrase.skipButton) {
-							viewStore.send(.skip)
-						}
-						.foregroundColor(.app.blue2)
-						.font(.app.body1Regular)
-						.frame(height: .standardButtonHeight)
-						.frame(maxWidth: .infinity)
-						.padding(.medium1)
-						.background(.app.white)
-						.cornerRadius(.small2)
+					Button(L10n.RecoverSeedPhrase.skipButton) {
+						viewStore.send(.skip)
 					}
+					.foregroundColor(.app.blue2)
+					.font(.app.body1Regular)
+					.frame(height: .standardButtonHeight)
+					.frame(maxWidth: .infinity)
+					.padding(.medium1)
+					.background(.app.white)
+					.cornerRadius(.small2)
 
 					ScrollView {
 						DisplayEntitiesControlledByMnemonic.View(
@@ -80,6 +78,11 @@ extension ImportMnemonicControllingAccounts {
 								.navigationTitle(L10n.EnterSeedPhrase.Header.title)
 						}
 					}
+				)
+				.alert(
+					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
+					state: /ImportMnemonicControllingAccounts.Destinations.State.confirmSkipBDFS,
+					action: ImportMnemonicControllingAccounts.Destinations.Action.confirmSkipBDFS
 				)
 			}
 		}

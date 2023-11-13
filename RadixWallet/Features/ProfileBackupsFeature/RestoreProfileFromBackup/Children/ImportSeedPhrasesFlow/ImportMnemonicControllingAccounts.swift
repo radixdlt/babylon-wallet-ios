@@ -1,6 +1,13 @@
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - NewMainBDFS
+public struct NewMainBDFS: Sendable, Hashable {
+	public let newMainBDFS: DeviceFactorSource
+	public let idsOfAccountsToHide: [Profile.Network.Account.ID]
+	public let idsOfPersonasToHide: [Profile.Network.Persona.ID]
+}
+
 // MARK: - ImportMnemonicControllingAccounts
 public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
@@ -11,7 +18,13 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State? = nil
 
-		public init(entitiesControlledByFactorSource: EntitiesControlledByFactorSource) {
+		public var isMainBDFS: Bool
+
+		public init(
+			entitiesControlledByFactorSource: EntitiesControlledByFactorSource,
+			isMainBDFS: Bool
+		) {
+			self.isMainBDFS = isMainBDFS
 			self.entitiesControlledByFactorSource = entitiesControlledByFactorSource
 			self.entities = .init(
 				accountsForDeviceFactorSource: entitiesControlledByFactorSource,
@@ -31,6 +44,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case persistedMnemonicInKeychain(FactorSourceID.FromHash)
 		case skippedMnemonic(FactorSourceID.FromHash)
+		case createdNewMainBDFS(oldSkipped: FactorSourceID.FromHash, NewMainBDFS)
 		case failedToSaveInKeychain(FactorSourceID.FromHash)
 	}
 
@@ -44,10 +58,17 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case importMnemonic(ImportMnemonic.State)
+			case confirmSkipBDFS(AlertState<Action.ConfirmSkipBDFS>)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case importMnemonic(ImportMnemonic.Action)
+			case confirmSkipBDFS(ConfirmSkipBDFS)
+
+			public enum ConfirmSkipBDFS: Sendable, Hashable {
+				case confirmTapped
+				case cancelTapped
+			}
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -61,6 +82,11 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.userDefaults) var userDefaults
+	@Dependency(\.uuid) var uuid
+	@Dependency(\.date) var date
+	@Dependency(\.device) var device
+	@Dependency(\.mnemonicClient) var mnemonicClient
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 	public init() {}
 
@@ -85,8 +111,12 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			return .none
 
 		case .skip:
-			precondition(state.entitiesControlledByFactorSource.isSkippable)
-			return .send(.delegate(.skippedMnemonic(state.entitiesControlledByFactorSource.factorSourceID)))
+			if state.isMainBDFS {
+				state.destination = .confirmSkipBDFS(.confirmSkipBDFS())
+				return .none
+			} else {
+				return .send(.delegate(.skippedMnemonic(state.entitiesControlledByFactorSource.factorSourceID)))
+			}
 		}
 	}
 
@@ -115,6 +145,48 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 
 			case .persistedMnemonicInKeychainOnly, .doneViewing, .persistedNewFactorSourceInProfile:
 				preconditionFailure("Incorrect implementation")
+			}
+
+		case .destination(.presented(.confirmSkipBDFS(.confirmTapped))):
+			loggerGlobal.notice("Skipping BDFS! Generating a new one and hiding affected accounts/personas.")
+			return .run { [entitiesControlledByFactorSource = state.entitiesControlledByFactorSource] send in
+				loggerGlobal.info("Generating mnemonic for new main BDFS")
+				let model = await device.model
+				let name = await device.name
+
+				let mnemonic = try MnemonicWithPassphrase(
+					mnemonic: mnemonicClient.generate(
+						BIP39.WordCount.twentyFour,
+						BIP39.Language.english
+					)
+				)
+
+				loggerGlobal.info("Creating new main BDFS")
+				var newBDFS = try DeviceFactorSource.babylon(
+					mnemonicWithPassphrase: mnemonic,
+					model: .init(model),
+					name: .init(name)
+				)
+				newBDFS.flagAsMain()
+
+				let newBDFSMnemonic = try PrivateHDFactorSource(
+					mnemonicWithPassphrase: mnemonic,
+					factorSource: newBDFS
+				)
+
+				loggerGlobal.info("Saving new main BDFS to Profile and Keychain")
+				try await factorSourcesClient.addOnDeviceFactorSource(
+					privateHDFactorSource: newBDFSMnemonic,
+					saveIntoProfile: false // profile is a snapshot
+				)
+
+				let accountsToHide = entitiesControlledByFactorSource.accounts
+				let personasToHide = entitiesControlledByFactorSource.personas
+
+				loggerGlobal.info("Delegating done with creating new BDFS (skipped old)")
+				await send(.delegate(.createdNewMainBDFS(oldSkipped: entitiesControlledByFactorSource.factorSourceID, .init(newMainBDFS: newBDFS, idsOfAccountsToHide: accountsToHide.map(\.id), idsOfPersonasToHide: personasToHide.map(\.id)))))
+			} catch: { error, _ in
+				loggerGlobal.critical("Failed to create new main BDFS error: \(error)")
 			}
 
 		default:
@@ -186,4 +258,21 @@ extension OverlayWindowClient.Item.HUD {
 			foregroundColor: Color.app.red1
 		)
 	)
+}
+
+extension AlertState<ImportMnemonicControllingAccounts.Destinations.Action.ConfirmSkipBDFS> {
+	static func confirmSkipBDFS() -> AlertState {
+		AlertState {
+			TextState("Sure?")
+		} actions: {
+			ButtonState(role: .destructive, action: .confirmTapped) {
+				TextState(L10n.Common.remove)
+			}
+			ButtonState(role: .cancel, action: .cancelTapped) {
+				TextState(L10n.Common.cancel)
+			}
+		} message: {
+			TextState("Sure?!")
+		}
+	}
 }

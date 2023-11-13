@@ -106,9 +106,6 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		}
 
 		public var body: some Reducer<State, Action> {
-			Scope(state: /State.confirmCloudSyncDisable, action: /Action.confirmCloudSyncDisable) {
-				EmptyReducer()
-			}
 			Scope(state: /State.optionallyEncryptProfileBeforeExporting, action: /Action.optionallyEncryptProfileBeforeExporting) {
 				EmptyReducer()
 			}

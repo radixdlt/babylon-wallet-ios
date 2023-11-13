@@ -43,6 +43,10 @@ extension DeviceFactorSource {
 }
 
 extension DeviceFactorSource {
+	public mutating func flagAsMain() {
+		common.flagAsMain()
+	}
+
 	static func from(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		model: Hint.Model = "",

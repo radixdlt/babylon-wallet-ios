@@ -26,8 +26,16 @@ extension EntitiesControlledByFactorSource {
 }
 
 extension EntitiesControlledByFactorSource {
-	public var isSkippable: Bool {
-		deviceFactorSource.supportsOlympia
+	public var isExplicitMainBDFS: Bool {
+		deviceFactorSource.isExplicitMainBDFS
+	}
+
+	public var isBDFS: Bool {
+		deviceFactorSource.isBDFS
+	}
+
+	public var isExplicitMain: Bool {
+		deviceFactorSource.isExplicitMain
 	}
 
 	public var factorSourceID: FactorSourceID.FromHash {
@@ -36,5 +44,21 @@ extension EntitiesControlledByFactorSource {
 
 	public var mnemonicWordCount: BIP39.WordCount {
 		deviceFactorSource.hint.mnemonicWordCount
+	}
+}
+
+extension DeviceFactorSource {
+	public var isExplicitMainBDFS: Bool {
+		isBDFS && isExplicitMain
+	}
+
+	public var isBDFS: Bool {
+		!supportsOlympia
+	}
+}
+
+extension FactorSourceProtocol {
+	public var isExplicitMain: Bool {
+		common.flags.contains(.main)
 	}
 }

@@ -174,6 +174,13 @@ public struct SigningFactor: Sendable, Hashable, Identifiable {
 }
 
 extension FactorSourcesClient {
+	public func newMainBDFS(_ newMainBDFS: NewMainBDFS) async throws {
+		@Dependency(\.entitiesVisibilityClient) var entitiesVisibilityClient
+		try await saveFactorSource(newMainBDFS.newMainBDFS.embed())
+		try await entitiesVisibilityClient.hideAccounts(ids: newMainBDFS.idsOfAccountsToHide)
+		try await entitiesVisibilityClient.hidePersonas(ids: newMainBDFS.idsOfPersonasToHide)
+	}
+
 	public func addOffDeviceFactorSource(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		label: OffDeviceMnemonicFactorSource.Hint.Label
@@ -190,6 +197,18 @@ extension FactorSourcesClient {
 		))
 
 		return factorSource.embed()
+	}
+
+	@discardableResult
+	public func addOnDeviceFactorSource(
+		privateHDFactorSource: PrivateHDFactorSource,
+		saveIntoProfile: Bool
+	) async throws -> FactorSourceID {
+		try await addPrivateHDFactorSource(.init(
+			factorSource: privateHDFactorSource.factorSource.embed(),
+			mnemonicWithPasshprase: privateHDFactorSource.mnemonicWithPassphrase,
+			saveIntoProfile: saveIntoProfile
+		))
 	}
 
 	public func addOnDeviceFactorSource(

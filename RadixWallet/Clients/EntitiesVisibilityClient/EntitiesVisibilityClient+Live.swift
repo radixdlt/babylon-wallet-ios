@@ -7,14 +7,14 @@ extension EntitiesVisibilityClient: DependencyKey {
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		.init(
-			hideAccount: { account in
+			hideAccounts: { idsOfAccounts in
 				try await profileStore.updatingOnCurrentNetwork { network in
-					network.hideAccount(account)
+					network.hideAccounts(ids: idsOfAccounts)
 				}
 			},
-			hidePersona: { persona in
+			hidePersonas: { idsOfPersonas in
 				try await profileStore.updatingOnCurrentNetwork { network in
-					network.hidePersona(persona)
+					network.hidePersonas(ids: idsOfPersonas)
 				}
 			},
 			unhideAllEntities: {
