@@ -49,7 +49,8 @@ public protocol DestinationReducer: Reducer where State: Sendable & Hashable, Ac
 public enum EmptyDestination: DestinationReducer {
 	public struct State: Sendable, Hashable {}
 	public typealias Action = Never
-	public func reduce(into state: inout State, action: Never) -> ComposableArchitecture.Effect<Never> {}
+	public func reduce(into state: inout State, action: Never) -> Effect<Action> {}
+	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> { .none }
 }
 
 extension Reducer where Self: FeatureReducer {
