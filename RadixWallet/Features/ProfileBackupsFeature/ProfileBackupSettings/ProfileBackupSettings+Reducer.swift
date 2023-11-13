@@ -15,7 +15,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		public var destination: Destination_.State?
+		public var destination: Destination.State?
 
 		/// An exportable Profile file, either encrypted or plaintext.
 		public var profileFile: ExportableProfileFile?
@@ -41,7 +41,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		case deleteProfileAndFactorSourcesButtonTapped
 	}
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		static let confirmCloudSyncDisableAlert: Self.State = .confirmCloudSyncDisable(.init(
 			title: {
 				TextState(L10n.AppSettings.ConfirmCloudSyncDisableAlert.title)
@@ -135,7 +135,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 	public var body: some ReducerOf<ProfileBackupSettings> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -147,14 +147,14 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 
 		case let .cloudProfileSyncToggled(isEnabled):
 			if !isEnabled {
-				state.destination = Destination_.confirmCloudSyncDisableAlert
+				state.destination = Destination.confirmCloudSyncDisableAlert
 				return .none
 			} else {
 				return updateCloudSync(state: &state, isEnabled: true)
 			}
 
 		case .exportProfileButtonTapped:
-			state.destination = Destination_.optionallyEncryptProfileBeforeExportingAlert
+			state.destination = Destination.optionallyEncryptProfileBeforeExportingAlert
 			return .none
 
 		case .task:
@@ -192,7 +192,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .deleteProfileConfirmationDialog(confirmationAction):
 			switch confirmationAction {
@@ -287,7 +287,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 // MARK: - LackedPermissionToAccessSecurityScopedResource
 struct LackedPermissionToAccessSecurityScopedResource: Error {}
 
-extension ConfirmationDialogState<ProfileBackupSettings.Destination_.Action.DeleteProfileConfirmationDialogAction> {
+extension ConfirmationDialogState<ProfileBackupSettings.Destination.Action.DeleteProfileConfirmationDialogAction> {
 	static let deleteProfileConfirmationDialog = ConfirmationDialogState {
 		TextState(L10n.AppSettings.ResetWalletDialog.title)
 	} actions: {
@@ -305,7 +305,7 @@ extension ConfirmationDialogState<ProfileBackupSettings.Destination_.Action.Dele
 	}
 }
 
-extension ProfileBackupSettings.Destination_.State {
+extension ProfileBackupSettings.Destination.State {
 	fileprivate static let cloudSyncTakesLongTimeAlert = Self.syncTakesLongTimeAlert(.init(
 		title: { TextState(L10n.AppSettings.ICloudSyncEnabledAlert.title) },
 		actions: {

@@ -22,7 +22,7 @@ extension NonFungibleAssetList {
 }
 
 private extension StoreOf<NonFungibleAssetList> {
-	var destination: PresentationStoreOf<NonFungibleAssetList.Destination_> {
+	var destination: PresentationStoreOf<NonFungibleAssetList.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -33,8 +33,8 @@ private extension View {
 		let destinationStore = store.destination
 		return sheet(
 			store: destinationStore,
-			state: /NonFungibleAssetList.Destination_.State.details,
-			action: NonFungibleAssetList.Destination_.Action.details,
+			state: /NonFungibleAssetList.Destination.State.details,
+			action: NonFungibleAssetList.Destination.Action.details,
 			content: { NonFungibleTokenDetails.View(store: $0) }
 		)
 	}

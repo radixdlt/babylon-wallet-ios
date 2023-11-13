@@ -10,7 +10,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		var gatewayForRemoval: Radix.Gateway?
 
 		@PresentationState
-		var destination: Destination_.State?
+		var destination: Destination.State?
 
 		public init(
 			gatewayList: GatewayList.State = .init(gateways: [])
@@ -36,7 +36,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		case gatewayList(GatewayList.Action)
 	}
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case addNewGateway(AddNewGateway.State)
 			case createAccount(CreateAccountCoordinator.State)
@@ -92,7 +92,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -213,7 +213,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .addNewGateway(.delegate(.dismiss)):
 			state.destination = nil
@@ -281,7 +281,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	}
 }
 
-extension AlertState<GatewaySettings.Destination_.Action.RemoveGatewayAlert> {
+extension AlertState<GatewaySettings.Destination.Action.RemoveGatewayAlert> {
 	// FIXME: This should probably take an ID and not GatewayRow.State
 	static func removeGateway(row: GatewayRow.State) -> AlertState {
 		AlertState {

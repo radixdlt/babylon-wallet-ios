@@ -9,7 +9,7 @@ public struct SelectFactorKindThenFactor: Sendable, FeatureReducer {
 		public let role: SecurityStructureRole
 
 		@PresentationState
-		public var destination: Destination_.State? = nil
+		public var destination: Destination.State? = nil
 
 		public init(role: SecurityStructureRole) {
 			self.role = role
@@ -28,7 +28,7 @@ public struct SelectFactorKindThenFactor: Sendable, FeatureReducer {
 
 	// MARK: Destination
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Hashable, Sendable {
 			case factorSourceOfKind(FactorSourcesOfKindList<FactorSource>.State)
 			// Uh... we have to special treat Ledger, because... it is complex and uses its own list because
@@ -58,7 +58,7 @@ public struct SelectFactorKindThenFactor: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -75,7 +75,7 @@ public struct SelectFactorKindThenFactor: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .factorSourceOfKind(.delegate(.choseFactorSource(factorSource))):
 			state.destination = nil

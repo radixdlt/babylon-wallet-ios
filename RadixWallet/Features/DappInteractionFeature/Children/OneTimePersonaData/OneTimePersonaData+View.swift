@@ -96,7 +96,7 @@ extension OneTimePersonaData {
 // MARK: - Extensions
 
 private extension StoreOf<OneTimePersonaData> {
-	var destination: PresentationStoreOf<OneTimePersonaData.Destination_> {
+	var destination: PresentationStoreOf<OneTimePersonaData.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -109,20 +109,20 @@ private extension View {
 			.createPersona(with: destinationStore)
 	}
 
-	private func editPersona(with destinationStore: PresentationStoreOf<OneTimePersonaData.Destination_>) -> some View {
+	private func editPersona(with destinationStore: PresentationStoreOf<OneTimePersonaData.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /OneTimePersonaData.Destination_.State.editPersona,
-			action: OneTimePersonaData.Destination_.Action.editPersona,
+			state: /OneTimePersonaData.Destination.State.editPersona,
+			action: OneTimePersonaData.Destination.Action.editPersona,
 			content: { EditPersona.View(store: $0) }
 		)
 	}
 
-	private func createPersona(with destinationStore: PresentationStoreOf<OneTimePersonaData.Destination_>) -> some View {
+	private func createPersona(with destinationStore: PresentationStoreOf<OneTimePersonaData.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /OneTimePersonaData.Destination_.State.createPersona,
-			action: OneTimePersonaData.Destination_.Action.createPersona,
+			state: /OneTimePersonaData.Destination.State.createPersona,
+			action: OneTimePersonaData.Destination.Action.createPersona,
 			content: { CreatePersonaCoordinator.View(store: $0) }
 		)
 	}

@@ -217,7 +217,7 @@ extension ImportMnemonic {
 }
 
 private extension StoreOf<ImportMnemonic> {
-	var destination: PresentationStoreOf<ImportMnemonic.Destination_> {
+	var destination: PresentationStoreOf<ImportMnemonic.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -231,27 +231,27 @@ private extension SwiftUI.View {
 			.markMnemonicAsBackedUpAlert(with: destinationStore)
 	}
 
-	private func markMnemonicAsBackedUpAlert(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination_>) -> some SwiftUI.View {
+	private func markMnemonicAsBackedUpAlert(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some SwiftUI.View {
 		alert(
 			store: destinationStore,
-			state: /ImportMnemonic.Destination_.State.markMnemonicAsBackedUp,
-			action: ImportMnemonic.Destination_.Action.markMnemonicAsBackedUp
+			state: /ImportMnemonic.Destination.State.markMnemonicAsBackedUp,
+			action: ImportMnemonic.Destination.Action.markMnemonicAsBackedUp
 		)
 	}
 
-	private func onContinueWarningAlert(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination_>) -> some SwiftUI.View {
+	private func onContinueWarningAlert(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some SwiftUI.View {
 		alert(
 			store: destinationStore,
-			state: /ImportMnemonic.Destination_.State.onContinueWarning,
-			action: ImportMnemonic.Destination_.Action.onContinueWarning
+			state: /ImportMnemonic.Destination.State.onContinueWarning,
+			action: ImportMnemonic.Destination.Action.onContinueWarning
 		)
 	}
 
-	private func offDeviceMnemonicInfoSheet(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination_>) -> some SwiftUI.View {
+	private func offDeviceMnemonicInfoSheet(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some SwiftUI.View {
 		sheet(
 			store: destinationStore,
-			state: /ImportMnemonic.Destination_.State.offDeviceMnemonicInfoPrompt,
-			action: ImportMnemonic.Destination_.Action.offDeviceMnemonicInfoPrompt,
+			state: /ImportMnemonic.Destination.State.offDeviceMnemonicInfoPrompt,
+			action: ImportMnemonic.Destination.Action.offDeviceMnemonicInfoPrompt,
 			content: { OffDeviceMnemonicInfo.View(store: $0) }
 		)
 	}

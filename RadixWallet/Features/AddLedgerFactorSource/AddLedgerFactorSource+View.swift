@@ -83,7 +83,7 @@ extension AddLedgerFactorSource {
 }
 
 private extension StoreOf<AddLedgerFactorSource> {
-	var destination: PresentationStoreOf<AddLedgerFactorSource.Destination_> {
+	var destination: PresentationStoreOf<AddLedgerFactorSource.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -96,19 +96,19 @@ private extension View {
 			.nameLedger(with: destinationStore)
 	}
 
-	private func ledgerAlreadyExistsAlert(with destinationStore: PresentationStoreOf<AddLedgerFactorSource.Destination_>) -> some View {
+	private func ledgerAlreadyExistsAlert(with destinationStore: PresentationStoreOf<AddLedgerFactorSource.Destination>) -> some View {
 		alert(
 			store: destinationStore,
-			state: /AddLedgerFactorSource.Destination_.State.ledgerAlreadyExistsAlert,
-			action: AddLedgerFactorSource.Destination_.Action.ledgerAlreadyExistsAlert
+			state: /AddLedgerFactorSource.Destination.State.ledgerAlreadyExistsAlert,
+			action: AddLedgerFactorSource.Destination.Action.ledgerAlreadyExistsAlert
 		)
 	}
 
-	private func nameLedger(with destinationStore: PresentationStoreOf<AddLedgerFactorSource.Destination_>) -> some View {
+	private func nameLedger(with destinationStore: PresentationStoreOf<AddLedgerFactorSource.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AddLedgerFactorSource.Destination_.State.nameLedger,
-			action: AddLedgerFactorSource.Destination_.Action.nameLedger,
+			state: /AddLedgerFactorSource.Destination.State.nameLedger,
+			action: AddLedgerFactorSource.Destination.Action.nameLedger,
 			destination: { NameLedgerFactorSource.View(store: $0) }
 		)
 	}

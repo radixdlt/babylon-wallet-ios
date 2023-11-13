@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension Settings.Destination_.State {
+extension Settings.Destination.State {
 	static func displayMnemonics() -> Self {
 		.accountSecurity(AccountSecurity.State(destination: .mnemonics(.init())))
 	}
@@ -17,7 +17,7 @@ public struct Settings: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		@PresentationState
-		public var destination: Destination_.State?
+		public var destination: Destination.State?
 
 		public var shouldShowMigrateOlympiaButton: Bool = false
 		public var userHasNoP2PLinks: Bool? = nil
@@ -48,7 +48,7 @@ public struct Settings: Sendable, FeatureReducer {
 		case deleteProfileAndFactorSources(keepInICloudIfPresent: Bool)
 	}
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case manageP2PLinks(P2PLinksFeature.State)
 
@@ -103,7 +103,7 @@ public struct Settings: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -160,7 +160,7 @@ public struct Settings: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .appSettings(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))):
 			.send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent)))

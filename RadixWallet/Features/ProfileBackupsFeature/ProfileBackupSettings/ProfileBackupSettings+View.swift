@@ -130,7 +130,7 @@ extension ProfileBackupSettings.View {
 }
 
 private extension StoreOf<ProfileBackupSettings> {
-	var destination: PresentationStoreOf<ProfileBackupSettings.Destination_> {
+	var destination: PresentationStoreOf<ProfileBackupSettings.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -146,43 +146,43 @@ private extension View {
 			.deleteProfileConfirmationDialog(with: destinationStore)
 	}
 
-	private func deleteProfileConfirmationDialog(with destinationStore: PresentationStoreOf<ProfileBackupSettings.Destination_>) -> some View {
+	private func deleteProfileConfirmationDialog(with destinationStore: PresentationStoreOf<ProfileBackupSettings.Destination>) -> some View {
 		confirmationDialog(
 			store: destinationStore,
-			state: /ProfileBackupSettings.Destination_.State.deleteProfileConfirmationDialog,
-			action: ProfileBackupSettings.Destination_.Action.deleteProfileConfirmationDialog
+			state: /ProfileBackupSettings.Destination.State.deleteProfileConfirmationDialog,
+			action: ProfileBackupSettings.Destination.Action.deleteProfileConfirmationDialog
 		)
 	}
 
-	private func cloudSyncTakesLongTimeAlert(with destinationStore: PresentationStoreOf<ProfileBackupSettings.Destination_>) -> some View {
+	private func cloudSyncTakesLongTimeAlert(with destinationStore: PresentationStoreOf<ProfileBackupSettings.Destination>) -> some View {
 		alert(
 			store: destinationStore,
-			state: /ProfileBackupSettings.Destination_.State.syncTakesLongTimeAlert,
-			action: ProfileBackupSettings.Destination_.Action.syncTakesLongTimeAlert
+			state: /ProfileBackupSettings.Destination.State.syncTakesLongTimeAlert,
+			action: ProfileBackupSettings.Destination.Action.syncTakesLongTimeAlert
 		)
 	}
 
-	private func disableCloudSyncConfirmationAlert(with destinationStore: PresentationStoreOf<ProfileBackupSettings.Destination_>) -> some View {
+	private func disableCloudSyncConfirmationAlert(with destinationStore: PresentationStoreOf<ProfileBackupSettings.Destination>) -> some View {
 		alert(
 			store: destinationStore,
-			state: /ProfileBackupSettings.Destination_.State.confirmCloudSyncDisable,
-			action: ProfileBackupSettings.Destination_.Action.confirmCloudSyncDisable
+			state: /ProfileBackupSettings.Destination.State.confirmCloudSyncDisable,
+			action: ProfileBackupSettings.Destination.Action.confirmCloudSyncDisable
 		)
 	}
 
-	private func encryptBeforeExportChoiceAlert(with destinationStore: PresentationStoreOf<ProfileBackupSettings.Destination_>) -> some View {
+	private func encryptBeforeExportChoiceAlert(with destinationStore: PresentationStoreOf<ProfileBackupSettings.Destination>) -> some View {
 		alert(
 			store: destinationStore,
-			state: /ProfileBackupSettings.Destination_.State.optionallyEncryptProfileBeforeExporting,
-			action: ProfileBackupSettings.Destination_.Action.optionallyEncryptProfileBeforeExporting
+			state: /ProfileBackupSettings.Destination.State.optionallyEncryptProfileBeforeExporting,
+			action: ProfileBackupSettings.Destination.Action.optionallyEncryptProfileBeforeExporting
 		)
 	}
 
-	private func encryptBeforeExportSheet(with destinationStore: PresentationStoreOf<ProfileBackupSettings.Destination_>) -> some View {
+	private func encryptBeforeExportSheet(with destinationStore: PresentationStoreOf<ProfileBackupSettings.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /ProfileBackupSettings.Destination_.State.inputEncryptionPassword,
-			action: ProfileBackupSettings.Destination_.Action.inputEncryptionPassword,
+			state: /ProfileBackupSettings.Destination.State.inputEncryptionPassword,
+			action: ProfileBackupSettings.Destination.Action.inputEncryptionPassword,
 			content: { EncryptOrDecryptProfile.View(store: $0).inNavigationView }
 		)
 	}

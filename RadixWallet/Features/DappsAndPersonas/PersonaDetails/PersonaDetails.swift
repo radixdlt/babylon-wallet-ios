@@ -46,7 +46,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		public var destination: Destination_.State? = nil
+		public var destination: Destination.State? = nil
 
 		var identityAddress: IdentityAddress {
 			mode.id
@@ -85,7 +85,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case editPersona(EditPersona.State)
 			case dAppDetails(DappDetails.State)
@@ -127,7 +127,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -221,7 +221,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .editPersona(.delegate(.personaSaved(persona))):
 			guard persona.id == state.mode.id else { return .none }
@@ -324,7 +324,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	}
 }
 
-extension AlertState<PersonaDetails.Destination_.Action.ConfirmForgetAlert> {
+extension AlertState<PersonaDetails.Destination.Action.ConfirmForgetAlert> {
 	static var confirmForget: AlertState {
 		AlertState {
 			TextState(L10n.AuthorizedDapps.RemoveAuthorizationAlert.title)
@@ -341,7 +341,7 @@ extension AlertState<PersonaDetails.Destination_.Action.ConfirmForgetAlert> {
 	}
 }
 
-extension AlertState<PersonaDetails.Destination_.Action.ConfirmHideAlert> {
+extension AlertState<PersonaDetails.Destination.Action.ConfirmHideAlert> {
 	static var confirmHide: AlertState {
 		AlertState(
 			title: .init(L10n.AuthorizedDapps.PersonaDetails.hideThisPersona),

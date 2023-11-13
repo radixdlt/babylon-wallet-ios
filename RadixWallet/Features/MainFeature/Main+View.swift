@@ -31,7 +31,7 @@ extension Main {
 }
 
 private extension StoreOf<Main> {
-	var destination: PresentationStoreOf<Main.Destination_> {
+	var destination: PresentationStoreOf<Main.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 
@@ -50,8 +50,8 @@ private extension View {
 		let destinationStore = store.destination
 		return navigationDestination(
 			store: store.destination,
-			state: /Main.Destination_.State.settings,
-			action: Main.Destination_.Action.settings,
+			state: /Main.Destination.State.settings,
+			action: Main.Destination.Action.settings,
 			destination: { Settings.View(store: $0) }
 		)
 	}

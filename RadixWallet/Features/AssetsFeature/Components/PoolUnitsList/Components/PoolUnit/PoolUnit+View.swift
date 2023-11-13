@@ -102,7 +102,7 @@ extension PoolUnitResourceViewState {
 }
 
 private extension StoreOf<PoolUnit> {
-	var destination: PresentationStoreOf<PoolUnit.Destination_> {
+	var destination: PresentationStoreOf<PoolUnit.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -113,8 +113,8 @@ private extension View {
 		let destinationStore = store.destination
 		return sheet(
 			store: destinationStore,
-			state: /PoolUnit.Destination_.State.details,
-			action: PoolUnit.Destination_.Action.details,
+			state: /PoolUnit.Destination.State.details,
+			action: PoolUnit.Destination.Action.details,
 			content: { PoolUnitDetails.View(store: $0) }
 		)
 	}

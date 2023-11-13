@@ -38,7 +38,7 @@ extension AccountPermissionChooseAccounts {
 }
 
 private extension StoreOf<AccountPermissionChooseAccounts> {
-	var destination: PresentationStoreOf<AccountPermissionChooseAccounts.Destination_> {
+	var destination: PresentationStoreOf<AccountPermissionChooseAccounts.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 
@@ -53,8 +53,8 @@ private extension View {
 		let destinationStore = store.destination
 		return sheet(
 			store: destinationStore,
-			state: /AccountPermissionChooseAccounts.Destination_.State.signing,
-			action: AccountPermissionChooseAccounts.Destination_.Action.signing,
+			state: /AccountPermissionChooseAccounts.Destination.State.signing,
+			action: AccountPermissionChooseAccounts.Destination.Action.signing,
 			content: { Signing.SheetView(store: $0) }
 		)
 	}

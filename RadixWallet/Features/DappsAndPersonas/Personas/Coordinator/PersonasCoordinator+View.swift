@@ -25,7 +25,7 @@ extension PersonasCoordinator {
 }
 
 extension StoreOf<PersonasCoordinator> {
-	var destination: PresentationStoreOf<PersonasCoordinator.Destination_> {
+	var destination: PresentationStoreOf<PersonasCoordinator.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -38,20 +38,20 @@ private extension View {
 			.personaDetails(with: destinationStore)
 	}
 
-	private func createPersonaCoordinator(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination_>) -> some View {
+	private func createPersonaCoordinator(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /PersonasCoordinator.Destination_.State.createPersonaCoordinator,
-			action: PersonasCoordinator.Destination_.Action.createPersonaCoordinator,
+			state: /PersonasCoordinator.Destination.State.createPersonaCoordinator,
+			action: PersonasCoordinator.Destination.Action.createPersonaCoordinator,
 			content: { CreatePersonaCoordinator.View(store: $0) }
 		)
 	}
 
-	private func personaDetails(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination_>) -> some View {
+	private func personaDetails(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /PersonasCoordinator.Destination_.State.personaDetails,
-			action: PersonasCoordinator.Destination_.Action.personaDetails,
+			state: /PersonasCoordinator.Destination.State.personaDetails,
+			action: PersonasCoordinator.Destination.Action.personaDetails,
 			destination: { PersonaDetails.View(store: $0) }
 		)
 	}

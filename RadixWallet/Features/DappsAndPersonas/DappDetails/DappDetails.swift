@@ -46,7 +46,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public var associatedDapps: [OnLedgerEntity.AssociatedDapp]? = nil
 
 		@PresentationState
-		public var destination: Destination_.State? = nil
+		public var destination: Destination.State? = nil
 
 		// Authorized dApp
 		public init(
@@ -55,7 +55,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			metadata: OnLedgerEntity.Metadata? = nil,
 			resources: Resources? = nil,
 			associatedDapps: [OnLedgerEntity.AssociatedDapp]? = nil,
-			destination: Destination_.State? = nil
+			destination: Destination.State? = nil
 		) {
 			self.context = .settings(context)
 			self.dAppDefinitionAddress = dApp.dAppDefinitionAddress
@@ -73,7 +73,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			metadata: OnLedgerEntity.Metadata? = nil,
 			resources: Resources? = nil,
 			associatedDapps: [OnLedgerEntity.AssociatedDapp]? = nil,
-			destination: Destination_.State? = nil
+			destination: Destination.State? = nil
 		) {
 			self.context = .general
 			self.dAppDefinitionAddress = dAppDefinitionAddress
@@ -119,7 +119,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Hashable, Sendable {
 			case personaDetails(PersonaDetails.State)
 			case fungibleDetails(FungibleTokenDetails.State)
@@ -172,7 +172,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -278,7 +278,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .personaDetails(.delegate(.personaDeauthorized)):
 			let dAppID = state.dAppDefinitionAddress
@@ -377,7 +377,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	}
 }
 
-extension AlertState<DappDetails.Destination_.Action.ConfirmDisconnectAlert> {
+extension AlertState<DappDetails.Destination.Action.ConfirmDisconnectAlert> {
 	static var confirmDisconnect: AlertState {
 		AlertState {
 			TextState(L10n.AuthorizedDapps.ForgetDappAlert.title)

@@ -28,7 +28,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 		public var mode: Mode
 
 		@PresentationState
-		public var destination: Destination_.State?
+		public var destination: Destination.State?
 
 		public init(
 			mode: Mode = .new(.init())
@@ -48,7 +48,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 		case updatedOrCreatedSecurityStructure(TaskResult<SecurityStructureProduct>)
 	}
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case listConfirmerOfNewPhone(ListConfirmerOfNewPhone.State)
 			case listLostPhoneHelper(ListLostPhoneHelper.State)
@@ -77,7 +77,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -201,7 +201,7 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .listConfirmerOfNewPhone(.delegate(.choseFactorSource(secQFS))):
 			choseConfirmerOfNewPhone(secQFS, &state)

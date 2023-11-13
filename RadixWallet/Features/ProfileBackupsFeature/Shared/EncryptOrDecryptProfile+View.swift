@@ -157,7 +157,7 @@ extension EncryptOrDecryptProfile {
 }
 
 private extension StoreOf<EncryptOrDecryptProfile> {
-	var destination: PresentationStoreOf<EncryptOrDecryptProfile.Destination_> {
+	var destination: PresentationStoreOf<EncryptOrDecryptProfile.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -168,8 +168,8 @@ private extension View {
 		let destinationStore = store.destination
 		return alert(
 			store: destinationStore,
-			state: /EncryptOrDecryptProfile.Destination_.State.incorrectPasswordAlert,
-			action: EncryptOrDecryptProfile.Destination_.Action.incorrectPasswordAlert
+			state: /EncryptOrDecryptProfile.Destination.State.incorrectPasswordAlert,
+			action: EncryptOrDecryptProfile.Destination.Action.incorrectPasswordAlert
 		)
 	}
 }

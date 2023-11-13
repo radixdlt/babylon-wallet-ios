@@ -18,7 +18,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		public var migratedAccounts: [MigratedHardwareAccounts] = []
 
 		@PresentationState
-		public var destination: Destination_.State?
+		public var destination: Destination.State?
 
 		public var hasAConnectorExtension: Bool = false
 
@@ -32,7 +32,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		}
 	}
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
@@ -96,7 +96,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	public var body: some ReducerOf<ImportOlympiaLedgerAccountsAndFactorSources> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -173,7 +173,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .noP2PLink(noP2PLinkAction):
 			switch noP2PLinkAction {

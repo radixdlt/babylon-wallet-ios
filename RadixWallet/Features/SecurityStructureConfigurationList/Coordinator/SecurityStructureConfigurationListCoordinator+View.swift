@@ -24,8 +24,8 @@ extension SecurityStructureConfigurationListCoordinator {
 }
 
 private extension StoreOf<SecurityStructureConfigurationListCoordinator> {
-	var destination: PresentationStoreOf<SecurityStructureConfigurationListCoordinator.Destination_> {
-		func toState(_ parentState: State) -> PresentationState<SecurityStructureConfigurationListCoordinator.Destination_.State> {
+	var destination: PresentationStoreOf<SecurityStructureConfigurationListCoordinator.Destination> {
+		func toState(_ parentState: State) -> PresentationState<SecurityStructureConfigurationListCoordinator.Destination.State> {
 			parentState.$destination
 		}
 		return scope(state: toState, action: Action.destination)
@@ -40,11 +40,11 @@ private extension View {
 	}
 
 	@MainActor
-	private func manageSecurityStructureCoordinator(with destinationStore: PresentationStoreOf<SecurityStructureConfigurationListCoordinator.Destination_>) -> some View {
+	private func manageSecurityStructureCoordinator(with destinationStore: PresentationStoreOf<SecurityStructureConfigurationListCoordinator.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /SecurityStructureConfigurationListCoordinator.Destination_.State.manageSecurityStructureCoordinator,
-			action: SecurityStructureConfigurationListCoordinator.Destination_.Action.manageSecurityStructureCoordinator,
+			state: /SecurityStructureConfigurationListCoordinator.Destination.State.manageSecurityStructureCoordinator,
+			action: SecurityStructureConfigurationListCoordinator.Destination.Action.manageSecurityStructureCoordinator,
 			content: { ManageSecurityStructureCoordinator.View(store: $0) }
 		)
 	}

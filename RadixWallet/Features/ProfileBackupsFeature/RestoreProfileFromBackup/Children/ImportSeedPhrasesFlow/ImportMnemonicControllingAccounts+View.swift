@@ -76,7 +76,7 @@ extension ImportMnemonicControllingAccounts {
 }
 
 private extension StoreOf<ImportMnemonicControllingAccounts> {
-	var destination: PresentationStoreOf<ImportMnemonicControllingAccounts.Destination_> {
+	var destination: PresentationStoreOf<ImportMnemonicControllingAccounts.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -88,11 +88,11 @@ private extension View {
 		return importMnemonic(with: destinationStore)
 	}
 
-	private func importMnemonic(with destinationStore: PresentationStoreOf<ImportMnemonicControllingAccounts.Destination_>) -> some View {
+	private func importMnemonic(with destinationStore: PresentationStoreOf<ImportMnemonicControllingAccounts.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /ImportMnemonicControllingAccounts.Destination_.State.importMnemonic,
-			action: ImportMnemonicControllingAccounts.Destination_.Action.importMnemonic,
+			state: /ImportMnemonicControllingAccounts.Destination.State.importMnemonic,
+			action: ImportMnemonicControllingAccounts.Destination.Action.importMnemonic,
 			content: { store in
 				ImportMnemonic.View(store: store)
 					.navigationTitle(L10n.EnterSeedPhrase.Header.title)

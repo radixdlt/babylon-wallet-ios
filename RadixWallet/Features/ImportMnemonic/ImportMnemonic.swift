@@ -127,7 +127,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		#endif
 
 		@PresentationState
-		public var destination: Destination_.State?
+		public var destination: Destination.State?
 
 		public struct PersistStrategy: Sendable, Hashable {
 			public enum Location: Sendable, Hashable {
@@ -273,7 +273,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case doneViewing(idOfBackedUpFactorSource: FactorSource.ID.FromHash?) // `nil` means it was already marked as backed up
 	}
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case offDeviceMnemonicInfoPrompt(OffDeviceMnemonicInfo.State)
 			case markMnemonicAsBackedUp(AlertState<Action.MarkMnemonicAsBackedUpOrNot>)
@@ -324,7 +324,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				ImportMnemonicWord()
 			}
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -534,7 +534,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .offDeviceMnemonicInfoPrompt(.delegate(.done(label, mnemonicWithPassphrase))):
 			state.destination = nil
@@ -674,7 +674,7 @@ extension ImportMnemonic {
 	}
 }
 
-extension ImportMnemonic.Destination_.State {
+extension ImportMnemonic.Destination.State {
 	fileprivate static func askUserIfSheHasBackedUpMnemonic(_ factorSourceID: FactorSourceID.FromHash) -> Self {
 		.markMnemonicAsBackedUp(.init(
 			title: { TextState(L10n.ImportMnemonic.BackedUpAlert.title) },

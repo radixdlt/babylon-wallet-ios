@@ -9,7 +9,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		public let entities: DisplayEntitiesControlledByMnemonic.State
 
 		@PresentationState
-		public var destination: Destination_.State? = nil
+		public var destination: Destination.State? = nil
 
 		public init(entitiesControlledByFactorSource: EntitiesControlledByFactorSource) {
 			self.entitiesControlledByFactorSource = entitiesControlledByFactorSource
@@ -40,7 +40,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case importMnemonic(ImportMnemonic.State)
 		}
@@ -66,7 +66,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -110,7 +110,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .importMnemonic(.delegate(delegateAction)):
 			switch delegateAction {

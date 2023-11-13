@@ -97,7 +97,7 @@ extension Home {
 }
 
 private extension StoreOf<Home> {
-	var destination: PresentationStoreOf<Home.Destination_> {
+	var destination: PresentationStoreOf<Home.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -112,38 +112,38 @@ private extension View {
 			.importMnemonics(with: destinationStore)
 	}
 
-	func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination_>) -> some SwiftUI.View {
+	func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination>) -> some SwiftUI.View {
 		navigationDestination(
 			store: destinationStore,
-			state: /Home.Destination_.State.accountDetails,
-			action: Home.Destination_.Action.accountDetails,
+			state: /Home.Destination.State.accountDetails,
+			action: Home.Destination.Action.accountDetails,
 			destination: { AccountDetails.View(store: $0) }
 		)
 	}
 
-	func createAccount(with destinationStore: PresentationStoreOf<Home.Destination_>) -> some SwiftUI.View {
+	func createAccount(with destinationStore: PresentationStoreOf<Home.Destination>) -> some SwiftUI.View {
 		sheet(
 			store: destinationStore,
-			state: /Home.Destination_.State.createAccount,
-			action: Home.Destination_.Action.createAccount,
+			state: /Home.Destination.State.createAccount,
+			action: Home.Destination.Action.createAccount,
 			content: { CreateAccountCoordinator.View(store: $0) }
 		)
 	}
 
-	func exportMnemonic(with destinationStore: PresentationStoreOf<Home.Destination_>) -> some SwiftUI.View {
+	func exportMnemonic(with destinationStore: PresentationStoreOf<Home.Destination>) -> some SwiftUI.View {
 		sheet(
 			store: destinationStore,
-			state: /Home.Destination_.State.exportMnemonic,
-			action: Home.Destination_.Action.exportMnemonic,
+			state: /Home.Destination.State.exportMnemonic,
+			action: Home.Destination.Action.exportMnemonic,
 			content: { ExportMnemonic.View(store: $0).inNavigationView }
 		)
 	}
 
-	func importMnemonics(with destinationStore: PresentationStoreOf<Home.Destination_>) -> some SwiftUI.View {
+	func importMnemonics(with destinationStore: PresentationStoreOf<Home.Destination>) -> some SwiftUI.View {
 		sheet(
 			store: destinationStore,
-			state: /Home.Destination_.State.importMnemonics,
-			action: Home.Destination_.Action.importMnemonics,
+			state: /Home.Destination.State.importMnemonics,
+			action: Home.Destination.Action.importMnemonics,
 			content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
 		)
 	}

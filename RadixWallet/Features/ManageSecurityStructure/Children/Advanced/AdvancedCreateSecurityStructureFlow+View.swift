@@ -140,7 +140,7 @@ extension AdvancedManageSecurityStructureFlow {
 }
 
 private extension StoreOf<AdvancedManageSecurityStructureFlow> {
-	var destination: PresentationStoreOf<AdvancedManageSecurityStructureFlow.Destination_> {
+	var destination: PresentationStoreOf<AdvancedManageSecurityStructureFlow.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -154,29 +154,29 @@ private extension View {
 			.confirmation(with: destinationStore)
 	}
 
-	private func primary(with destinationStore: PresentationStoreOf<AdvancedManageSecurityStructureFlow.Destination_>) -> some View {
+	private func primary(with destinationStore: PresentationStoreOf<AdvancedManageSecurityStructureFlow.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /AdvancedManageSecurityStructureFlow.Destination_.State.factorsForPrimaryRole,
-			action: AdvancedManageSecurityStructureFlow.Destination_.Action.factorsForPrimaryRole,
+			state: /AdvancedManageSecurityStructureFlow.Destination.State.factorsForPrimaryRole,
+			action: AdvancedManageSecurityStructureFlow.Destination.Action.factorsForPrimaryRole,
 			content: { FactorsForRole<PrimaryRoleTag>.View(store: $0).inNavigationView }
 		)
 	}
 
-	private func recovery(with destinationStore: PresentationStoreOf<AdvancedManageSecurityStructureFlow.Destination_>) -> some View {
+	private func recovery(with destinationStore: PresentationStoreOf<AdvancedManageSecurityStructureFlow.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /AdvancedManageSecurityStructureFlow.Destination_.State.factorsForRecoveryRole,
-			action: AdvancedManageSecurityStructureFlow.Destination_.Action.factorsForRecoveryRole,
+			state: /AdvancedManageSecurityStructureFlow.Destination.State.factorsForRecoveryRole,
+			action: AdvancedManageSecurityStructureFlow.Destination.Action.factorsForRecoveryRole,
 			content: { FactorsForRole<RecoveryRoleTag>.View(store: $0).inNavigationView }
 		)
 	}
 
-	private func confirmation(with destinationStore: PresentationStoreOf<AdvancedManageSecurityStructureFlow.Destination_>) -> some View {
+	private func confirmation(with destinationStore: PresentationStoreOf<AdvancedManageSecurityStructureFlow.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /AdvancedManageSecurityStructureFlow.Destination_.State.factorsForConfirmationRole,
-			action: AdvancedManageSecurityStructureFlow.Destination_.Action.factorsForConfirmationRole,
+			state: /AdvancedManageSecurityStructureFlow.Destination.State.factorsForConfirmationRole,
+			action: AdvancedManageSecurityStructureFlow.Destination.Action.factorsForConfirmationRole,
 			content: { FactorsForRole<ConfirmationRoleTag>.View(store: $0).inNavigationView }
 		)
 	}

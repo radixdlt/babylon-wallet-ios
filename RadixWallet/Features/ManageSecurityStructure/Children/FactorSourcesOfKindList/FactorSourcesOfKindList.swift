@@ -25,7 +25,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 		public var selectedFactorSourceID: FactorSourceOfKind.ID?
 
 		@PresentationState
-		public var destination: Destination_.State? = nil
+		public var destination: Destination.State? = nil
 
 		public init(
 			kind: FactorSourceKind,
@@ -84,7 +84,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 
 	// MARK: - Destination
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case addNewFactorSource(ManageSomeFactorSource<FactorSourceOfKind>.State)
 			case existingFactorSourceWillBeDeletedConfirmationDialog(ConfirmationDialogState<DeleteExistingFactorSourceConfirmationDialogAction>)
@@ -114,7 +114,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -162,7 +162,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .addNewFactorSource(.delegate(newFactorSourceAction)):
 			switch newFactorSourceAction {

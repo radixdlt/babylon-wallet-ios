@@ -9,7 +9,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		@PresentationState
-		public var destination: Destination_.State?
+		public var destination: Destination.State?
 
 		public init() {}
 	}
@@ -29,7 +29,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 		case profileToDebugLoaded(Profile)
 	}
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case debugUserDefaultsContents(DebugUserDefaultsContents.State)
 			case debugInspectProfile(DebugInspectProfile.State)
@@ -85,7 +85,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 

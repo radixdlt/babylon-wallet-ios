@@ -33,7 +33,7 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 		public var mode: Mode
 
 		@PresentationState
-		var destination: Destination_.State? = nil
+		var destination: Destination.State? = nil
 
 		public init(
 			mode: Mode = .new
@@ -60,7 +60,7 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case scanAccountAddress(ScanQRCoordinator.State)
 		}
@@ -98,7 +98,7 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -137,7 +137,7 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .scanAccountAddress(.delegate(.scanned(addressStringScanned))):
 			var addressStringScanned = addressStringScanned

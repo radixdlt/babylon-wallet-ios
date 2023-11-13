@@ -11,14 +11,14 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		@PresentationState
-		public var destination: Destination_.State? = nil
+		public var destination: Destination.State? = nil
 		public var preferences: AppPreferences? = nil
 
 		public var canImportOlympiaWallet = false
 
 		public static let importOlympia = Self(destination: .importOlympiaWallet(.init()))
 
-		public init(destination: Destination_.State? = nil) {
+		public init(destination: Destination.State? = nil) {
 			self.destination = destination
 		}
 	}
@@ -43,7 +43,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		case gotoAccountList
 	}
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case mnemonics(DisplayMnemonics.State)
 			case ledgerHardwareWallets(LedgerHardwareDevices.State)
@@ -84,7 +84,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+				Destination()
 			}
 	}
 
@@ -135,7 +135,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .importOlympiaWallet(.delegate(.finishedMigration(gotoAccountList))):
 			if gotoAccountList {
