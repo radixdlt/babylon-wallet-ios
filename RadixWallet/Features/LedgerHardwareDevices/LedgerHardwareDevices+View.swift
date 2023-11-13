@@ -182,7 +182,10 @@ extension LedgerHardwareDevices {
 
 private extension StoreOf<LedgerHardwareDevices> {
 	var destination: PresentationStoreOf<LedgerHardwareDevices.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<LedgerHardwareDevices.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

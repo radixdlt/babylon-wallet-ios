@@ -67,7 +67,10 @@ extension SelectBackup {
 
 private extension StoreOf<SelectBackup> {
 	var destination: PresentationStoreOf<SelectBackup.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<SelectBackup.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

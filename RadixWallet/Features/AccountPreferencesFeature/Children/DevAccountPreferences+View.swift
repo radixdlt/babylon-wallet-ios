@@ -131,7 +131,10 @@ extension DevAccountPreferences.View {
 
 private extension StoreOf<DevAccountPreferences> {
 	var destination: PresentationStoreOf<DevAccountPreferences.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<DevAccountPreferences.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

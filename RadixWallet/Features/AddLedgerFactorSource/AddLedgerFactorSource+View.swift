@@ -84,7 +84,10 @@ extension AddLedgerFactorSource {
 
 private extension StoreOf<AddLedgerFactorSource> {
 	var destination: PresentationStoreOf<AddLedgerFactorSource.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<AddLedgerFactorSource.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

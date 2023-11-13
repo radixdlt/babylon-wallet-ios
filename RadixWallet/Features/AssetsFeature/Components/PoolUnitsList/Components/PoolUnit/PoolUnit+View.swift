@@ -103,7 +103,10 @@ extension PoolUnitResourceViewState {
 
 private extension StoreOf<PoolUnit> {
 	var destination: PresentationStoreOf<PoolUnit.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<PoolUnit.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

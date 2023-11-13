@@ -54,7 +54,10 @@ extension DisplayMnemonics {
 
 private extension StoreOf<DisplayMnemonics> {
 	var destination: PresentationStoreOf<DisplayMnemonics.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<DisplayMnemonics.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

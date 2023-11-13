@@ -71,7 +71,10 @@ extension P2PLinksFeature {
 
 private extension StoreOf<P2PLinksFeature> {
 	var destination: PresentationStoreOf<P2PLinksFeature.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<P2PLinksFeature.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

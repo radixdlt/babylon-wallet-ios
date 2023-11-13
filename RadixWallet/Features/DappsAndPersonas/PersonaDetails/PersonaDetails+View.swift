@@ -77,7 +77,10 @@ extension PersonaDetails.View {
 
 private extension StoreOf<PersonaDetails> {
 	var destination: PresentationStoreOf<PersonaDetails.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<PersonaDetails.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

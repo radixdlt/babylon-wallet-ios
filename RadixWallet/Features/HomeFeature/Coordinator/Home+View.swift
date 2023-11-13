@@ -98,7 +98,10 @@ extension Home {
 
 private extension StoreOf<Home> {
 	var destination: PresentationStoreOf<Home.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<Home.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState) { .destination($0) }
 	}
 }
 

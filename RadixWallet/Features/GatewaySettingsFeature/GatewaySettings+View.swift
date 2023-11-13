@@ -60,7 +60,10 @@ extension GatewaySettings {
 
 private extension StoreOf<GatewaySettings> {
 	var destination: PresentationStoreOf<GatewaySettings.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<GatewaySettings.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 
 	var gatewayList: StoreOf<GatewayList> {

@@ -218,7 +218,10 @@ extension ImportMnemonic {
 
 private extension StoreOf<ImportMnemonic> {
 	var destination: PresentationStoreOf<ImportMnemonic.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<ImportMnemonic.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

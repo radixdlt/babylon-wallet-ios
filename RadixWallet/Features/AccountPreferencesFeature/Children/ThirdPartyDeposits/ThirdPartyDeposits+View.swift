@@ -131,7 +131,10 @@ extension PreferenceSection.Row where SectionId == ManageThirdPartyDeposits.Sect
 
 private extension StoreOf<ManageThirdPartyDeposits> {
 	var destination: PresentationStoreOf<ManageThirdPartyDeposits.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<ManageThirdPartyDeposits.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

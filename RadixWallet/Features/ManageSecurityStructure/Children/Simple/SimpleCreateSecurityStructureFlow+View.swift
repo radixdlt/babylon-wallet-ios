@@ -134,7 +134,10 @@ extension SimpleManageSecurityStructureFlow {
 
 private extension StoreOf<SimpleManageSecurityStructureFlow> {
 	var destination: PresentationStoreOf<SimpleManageSecurityStructureFlow.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<SimpleManageSecurityStructureFlow.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

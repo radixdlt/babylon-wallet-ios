@@ -23,7 +23,10 @@ extension NonFungibleAssetList {
 
 private extension StoreOf<NonFungibleAssetList> {
 	var destination: PresentationStoreOf<NonFungibleAssetList.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<NonFungibleAssetList.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

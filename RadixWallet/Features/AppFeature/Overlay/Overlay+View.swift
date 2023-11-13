@@ -25,7 +25,10 @@ extension OverlayReducer {
 
 private extension StoreOf<OverlayReducer> {
 	var destination: PresentationStoreOf<OverlayReducer.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<OverlayReducer.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

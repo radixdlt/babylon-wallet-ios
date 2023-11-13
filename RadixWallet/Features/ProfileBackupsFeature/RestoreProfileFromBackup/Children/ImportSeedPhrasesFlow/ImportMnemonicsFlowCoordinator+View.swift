@@ -23,7 +23,10 @@ extension ImportMnemonicsFlowCoordinator {
 
 private extension StoreOf<ImportMnemonicsFlowCoordinator> {
 	var destination: PresentationStoreOf<ImportMnemonicsFlowCoordinator.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<ImportMnemonicsFlowCoordinator.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

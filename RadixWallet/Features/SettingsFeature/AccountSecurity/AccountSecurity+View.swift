@@ -101,7 +101,10 @@ extension AccountSecurity.View {
 
 private extension StoreOf<AccountSecurity> {
 	var destination: PresentationStoreOf<AccountSecurity.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<AccountSecurity.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

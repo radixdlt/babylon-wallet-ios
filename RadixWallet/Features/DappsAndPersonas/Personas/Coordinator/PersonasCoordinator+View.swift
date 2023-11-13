@@ -12,21 +12,23 @@ extension PersonasCoordinator {
 		}
 
 		public var body: some SwiftUI.View {
-			PersonaList.View(
-				store: store.scope(
-					state: \.personaList,
-					action: { .child(.personaList($0)) }
-				)
-			)
-			.onAppear { store.send(.view(.appeared)) }
-			.destinations(with: store)
+			PersonaList.View(store: store.personaList)
+				.onAppear { store.send(.view(.appeared)) }
+				.destinations(with: store)
 		}
 	}
 }
 
 extension StoreOf<PersonasCoordinator> {
 	var destination: PresentationStoreOf<PersonasCoordinator.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<PersonasCoordinator.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+
+	var personaList: StoreOf<PersonaList> {
+		scope(state: \.personaList) { .child(.personaList($0)) }
 	}
 }
 

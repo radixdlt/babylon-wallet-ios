@@ -92,7 +92,10 @@ extension ImportMnemonicControllingAccounts {
 
 private extension StoreOf<ImportMnemonicControllingAccounts> {
 	var destination: PresentationStoreOf<ImportMnemonicControllingAccounts.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<ImportMnemonicControllingAccounts.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

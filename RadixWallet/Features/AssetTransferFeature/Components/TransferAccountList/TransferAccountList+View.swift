@@ -96,6 +96,9 @@ extension TransferAccountList.View {
 
 private extension StoreOf<TransferAccountList> {
 	var destination: PresentationStoreOf<TransferAccountList.Destinations> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+		func scopeState(state: State) -> PresentationState<TransferAccountList.Destinations.State> {
+			state.$destination
+		}
+		return scope(state: scopeState) { .child(.destination($0)) }
 	}
 }

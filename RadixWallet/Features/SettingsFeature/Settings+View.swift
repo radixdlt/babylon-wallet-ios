@@ -182,7 +182,10 @@ extension Settings.View {
 
 private extension StoreOf<Settings> {
 	var destination: PresentationStoreOf<Settings.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<Settings.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

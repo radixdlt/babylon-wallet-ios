@@ -173,7 +173,10 @@ extension CustomizeFees {
 
 private extension StoreOf<CustomizeFees> {
 	var destination: PresentationStoreOf<CustomizeFees.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<CustomizeFees.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

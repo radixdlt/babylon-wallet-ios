@@ -94,7 +94,10 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 
 private extension StoreOf<ImportOlympiaLedgerAccountsAndFactorSources> {
 	var destination: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<ImportOlympiaLedgerAccountsAndFactorSources.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

@@ -71,7 +71,10 @@ extension PersonaDataPermission {
 
 private extension StoreOf<PersonaDataPermission> {
 	var destination: PresentationStoreOf<PersonaDataPermission.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<PersonaDataPermission.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 
