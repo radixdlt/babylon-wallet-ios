@@ -95,10 +95,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			switch state.factorSourceOption {
 			case .device:
 				return .run { send in
-					let babylonFactorSource = try await factorSourcesClient
-						.getFactorSources()
-						.babylonDeviceFactorSources()
-						.first // FIXME: should only have one babylon factor source, which should be in keychain, clean this up.
+					let babylonFactorSource = try await factorSourcesClient.getMainDeviceFactorSource()
 
 					await send(.internal(.loadedDeviceFactorSource(babylonFactorSource)))
 				} catch: { error, send in

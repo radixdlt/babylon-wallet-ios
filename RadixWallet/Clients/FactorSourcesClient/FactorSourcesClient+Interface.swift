@@ -1,6 +1,7 @@
 // MARK: - FactorSourcesClient
 public struct FactorSourcesClient: Sendable {
 	public var getCurrentNetworkID: GetCurrentNetworkID
+	public var getMainDeviceFactorSource: GetMainDeviceFactorSource
 	public var getFactorSources: GetFactorSources
 	public var factorSourcesAsyncSequence: FactorSourcesAsyncSequence
 	public var addPrivateHDFactorSource: AddPrivateHDFactorSource
@@ -13,6 +14,7 @@ public struct FactorSourcesClient: Sendable {
 
 	public init(
 		getCurrentNetworkID: @escaping GetCurrentNetworkID,
+		getMainDeviceFactorSource: @escaping GetMainDeviceFactorSource,
 		getFactorSources: @escaping GetFactorSources,
 		factorSourcesAsyncSequence: @escaping FactorSourcesAsyncSequence,
 		addPrivateHDFactorSource: @escaping AddPrivateHDFactorSource,
@@ -24,6 +26,7 @@ public struct FactorSourcesClient: Sendable {
 		flagFactorSourceForDeletion: @escaping FlagFactorSourceForDeletion
 	) {
 		self.getCurrentNetworkID = getCurrentNetworkID
+		self.getMainDeviceFactorSource = getMainDeviceFactorSource
 		self.getFactorSources = getFactorSources
 		self.factorSourcesAsyncSequence = factorSourcesAsyncSequence
 		self.addPrivateHDFactorSource = addPrivateHDFactorSource
@@ -39,6 +42,7 @@ public struct FactorSourcesClient: Sendable {
 // MARK: FactorSourcesClient.GetFactorSources
 extension FactorSourcesClient {
 	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
+	public typealias GetMainDeviceFactorSource = @Sendable () async throws -> DeviceFactorSource
 	public typealias GetFactorSources = @Sendable () async throws -> FactorSources
 	public typealias FactorSourcesAsyncSequence = @Sendable () async -> AnyAsyncSequence<FactorSources>
 	public typealias AddPrivateHDFactorSource = @Sendable (AddPrivateHDFactorSourceRequest) async throws -> FactorSourceID

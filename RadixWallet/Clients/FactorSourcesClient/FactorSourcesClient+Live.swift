@@ -32,6 +32,30 @@ extension FactorSourcesClient: DependencyKey {
 			getCurrentNetworkID: {
 				await profileStore.profile.networkID
 			},
+			getMainDeviceFactorSource: {
+				let sources = try await getFactorSources()
+					.filter { $0.factorSourceKind == .device && !$0.supportsOlympia }
+					.map { try $0.extract(as: DeviceFactorSource.self) }
+
+				if let explicitMain = sources.first(where: { $0.isExplicitMain }) {
+					return explicitMain
+				} else {
+					if sources.count == 0 {
+						let errorMessage = "BAD IMPL found no babylon device factor source"
+						loggerGlobal.critical(.init(stringLiteral: errorMessage))
+						assertionFailure(errorMessage)
+						throw FactorSourceNotFound()
+					} else if sources.count > 1 {
+						let errorMessage = "BAD IMPL found more than 1 implicit main babylon device factor sources"
+						loggerGlobal.critical(.init(stringLiteral: errorMessage))
+						assertionFailure(errorMessage)
+						let dateSorted = sources.sorted(by: { $0.addedOn < $1.addedOn })
+						return dateSorted.first! // best we can do
+					} else {
+						return sources[0] // found implicit one
+					}
+				}
+			},
 			getFactorSources: getFactorSources,
 			factorSourcesAsyncSequence: {
 				await profileStore.factorSourcesValues()
