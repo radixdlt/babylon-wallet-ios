@@ -9,8 +9,30 @@ extension DependencyValues {
 		_ profile: Profile?,
 		userDefaults userDefaultsValue: UserDefaults.Dependency = .ephemeral()
 	) {
-		secureStorageClient.loadProfile = { _ in
-			profile
+		if let profile {
+			secureStorageClient.loadProfile = { key in
+				precondition(key == profile.header.id)
+				return profile
+			}
+			secureStorageClient.loadProfileSnapshot = { key in
+				precondition(key == profile.header.id)
+				return profile.snapshot()
+			}
+			secureStorageClient.loadProfileSnapshotData = { key in
+				precondition(key == profile.header.id)
+
+				return try! JSONEncoder.iso8601.encode(profile.snapshot())
+			}
+		} else {
+			secureStorageClient.loadProfile = { _ in
+				nil
+			}
+			secureStorageClient.loadProfileSnapshot = { _ in
+				nil
+			}
+			secureStorageClient.loadProfileSnapshotData = { _ in
+				nil
+			}
 		}
 		userDefaultsValue.set(string: profile?.header.id.uuidString, key: .activeProfileID)
 		self.userDefaults = userDefaultsValue
@@ -673,6 +695,7 @@ final class ProfileStoreExistingProfileTests: TestCase {
 	}
 
 	func test__GIVEN__saved_profile_mismatch_deviceID__WHEN__deleteProfile__THEN__profile_got_deleted() async throws {
+		let uuidOfNewProfile = UUID()
 		let savedProfile = Profile.withOneAccount
 		let userDefaults = UserDefaults.Dependency.ephemeral()
 		try await doTestMismatch(
@@ -680,6 +703,7 @@ final class ProfileStoreExistingProfileTests: TestCase {
 			userDefaults: userDefaults,
 			action: .deleteProfileFromThisPhone,
 			then: {
+				$0.uuid = .constant(uuidOfNewProfile)
 				XCTAssertNoDifference(userDefaults.string(key: .activeProfileID), savedProfile.header.id.uuidString)
 				$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { idToDelete, _ in
 					XCTAssertNoDifference(idToDelete, savedProfile.header.id)
@@ -688,7 +712,7 @@ final class ProfileStoreExistingProfileTests: TestCase {
 		)
 
 		// New active profile
-		XCTAssertNotEqual(userDefaults.string(key: .activeProfileID), savedProfile.header.id.uuidString)
+		XCTAssertNoDifference(userDefaults.string(key: .activeProfileID), uuidOfNewProfile.uuidString)
 	}
 
 	func test__GIVEN__mismatch__WHEN__app_is_not_yet_unlocked__THEN__no_alert_is_displayed() async throws {
@@ -725,281 +749,282 @@ final class ProfileStoreExistingProfileTests: TestCase {
 			await self.nearFutureFulfillment(of: alertNotScheduled)
 		}
 	}
-	/*
-	 	func test__GIVEN__saved_profile__WHEN__deleteWallet__THEN__profile_gets_deleted_from_secureStorage() async throws {
-	 		try await withTimeLimit {
-	 			// GIVEN saved profile
-	 			let saved = Profile.withOneAccount
-	 			// WHEN deleteWallet
-	 			try await self.doTestDeleteProfile(saved: saved) { d, p in
-	 				// THEN profile gets deleted from secureStorage
-	 				d.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { id, _ in
-	 					XCTAssertNoDifference(id, p.header.id)
-	 				}
-	 			}
-	 		}
-	 	}
 
-	 	func test__GIVEN__saved_profile__WHEN__deleteWallet__THEN__activeProfileID_is_deleted() async throws {
-	 		try await withTimeLimit {
-	 			// GIVEN saved profile
-	 			let saved = Profile.withOneAccount
-	 			// WHEN deleteWallet
-	 			let userDefaults = UserDefaults.Dependency.ephemeral()
-	 			try await self.doTestDeleteProfile(saved: saved, userDefaults: userDefaults) { _, _ in
-	 				// THEN activeProfileID is deleted
-	 //				userDefaults.remove = {
-	 //					XCTAssertNoDifference($0, .activeProfileID)
-	 //				}
-	 			}
-	 			XCTAssertNoDifference(userDefaults.string(key: .activeProfileID), nil)
-	 		}
-	 	}
+	func test__GIVEN__saved_profile__WHEN__deleteWallet__THEN__profile_gets_deleted_from_secureStorage() async throws {
+		try await withTimeLimit {
+			let deleteProfileAndMnemonicsByFactorSourceIDs_is_called = self.expectation(description: "deleteProfileAndMnemonicsByFactorSourceIDs_is_called")
+			// GIVEN saved profile
+			let saved = Profile.withOneAccount
+			// WHEN deleteWallet
+			try await self.doTestDeleteProfile(saved: saved) { d, p in
+				// THEN profile gets deleted from secureStorage
+				d.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { id, _ in
+					XCTAssertNoDifference(id, p.header.id)
+					deleteProfileAndMnemonicsByFactorSourceIDs_is_called.fulfill()
+				}
+			}
+			await self.nearFutureFulfillment(of: deleteProfileAndMnemonicsByFactorSourceIDs_is_called)
+		}
+	}
 
-	 	// FIXME: Maybe should probably be moved to SecureStorageClientTests..?
-	 	func disable_test__GIVEN__saved_profile__WHEN__deleteWallet_not_keepIcloud__THEN__profile_gets_removed_from_saved_headerlist() async throws {
-	 		try await withTimeLimit(
-	 			.slow,
-	 			failOnTimeout: false // this times out in CI sometimes...
-	 		) {
-	 			// GIVEN saved profile
-	 			let saved = Profile.withOneAccount
-	 			// WHEN deleteWallet
-	 			try await self.doTestDeleteProfile(
-	 				saved: saved,
-	 				keepInICloudIfPresent: false
-	 			) { d, _ in
-	 				d.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = SecureStorageClient.liveValue.deleteProfileAndMnemonicsByFactorSourceIDs
+	func test__GIVEN__saved_profile__WHEN__deleteWallet__THEN__activeProfileID_is_deleted() async throws {
+		let uuidOfNew = UUID()
+		let userDefaults = UserDefaults.Dependency.ephemeral()
+		try await withTimeLimit {
+			// GIVEN saved profile
+			let saved = Profile.withOneAccount
+			// WHEN deleteWallet
+			try await self.doTestDeleteProfile(saved: saved, userDefaults: userDefaults, given: {
+				XCTAssertNoDifference(userDefaults.string(key: .activeProfileID), saved.header.id.uuidString)
+			}) { d, _ in
+				d.uuid = .constant(uuidOfNew)
+			}
+		}
+		// THEN activeProfileID is deleted
+		XCTAssertNoDifference(userDefaults.string(key: .activeProfileID), uuidOfNew.uuidString)
+	}
 
-	 				d.keychainClient._getDataWithoutAuthForKey = { key in
-	 					if key == saved.header.id.keychainKey {
-	 						try! JSONEncoder.iso8601.encode(saved.snapshot())
-	 					} else if key == profileHeaderListKeychainKey {
-	 						try! JSONEncoder.iso8601.encode([saved.header])
-	 					} else {
-	 						fatalError("unknown key: \(key)")
-	 					}
-	 				}
-	 				d.keychainClient._removeDataForKey = { key in
-	 					// THEN profile gets removed from saved headerlist
-	 					if key.rawValue.rawValue.hasPrefix("profileSnapshot - ") {
-	 						XCTAssertEqual(key, saved.header.id.keychainKey)
-	 					}
-	 				}
-	 			}
-	 		}
-	 	}
+	// FIXME: Maybe should probably be moved to SecureStorageClientTests..?
+	func test__GIVEN__saved_profile__WHEN__deleteWallet_not_keepIcloud__THEN__profile_gets_removed_from_saved_headerlist() async throws {
+		try await withTimeLimit(
+			.slow,
+			failOnTimeout: false // this times out in CI sometimes...
+		) {
+			// GIVEN saved profile
+			let saved = Profile.withOneAccount
+			// WHEN deleteWallet
+			try await self.doTestDeleteProfile(
+				saved: saved,
+				keepInICloudIfPresent: false
+			) { d, _ in
+				d.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = SecureStorageClient.liveValue.deleteProfileAndMnemonicsByFactorSourceIDs
 
-	 	func test__GIVEN__saved_profile__WHEN__deleteWallet_keepIcloud__THEN__iCloud_is_kept() async throws {
-	 		try await withTimeLimit {
-	 			// GIVEN saved profile
-	 			let saved = Profile.withOneAccount
-	 			try await self.doTestDeleteProfile(
-	 				saved: saved,
-	 				// WHEN deleteWallet keep iCloud
-	 				keepInICloudIfPresent: true
-	 			) { d, _ in
-	 				// THEN iCloud is kept
-	 				d.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { _, isKeepingIcloud in
-	 					XCTAssertTrue(isKeepingIcloud)
-	 				}
-	 			}
-	 		}
-	 	}
+				d.keychainClient._getDataWithoutAuthForKey = { key in
+					if key == saved.header.id.keychainKey {
+						try! JSONEncoder.iso8601.encode(saved.snapshot())
+					} else if key == profileHeaderListKeychainKey {
+						try! JSONEncoder.iso8601.encode([saved.header])
+					} else {
+						fatalError("unknown key: \(key)")
+					}
+				}
+				d.keychainClient._removeDataForKey = { key in
+					// THEN profile gets removed from saved headerlist
+					if key.rawValue.rawValue.hasPrefix("profileSnapshot - ") {
+						XCTAssertEqual(key, saved.header.id.keychainKey)
+					}
+				}
+			}
+		}
+	}
 
-	 	func test__GIVEN__saved_profile__WHEN__deleteWallet_delete_in_iCloud__THEN__iCloud_is_not_kept() async throws {
-	 		try await withTimeLimit {
-	 			// GIVEN saved profile
-	 			let saved = Profile.withOneAccount
-	 			try await self.doTestDeleteProfile(
-	 				saved: saved,
-	 				// WHEN deleteWallet and delete in iCloud
-	 				keepInICloudIfPresent: false
-	 			) { d, _ in
-	 				// THEN iCloud is not kept
-	 				d.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { _, isKeepingIcloud in
-	 					XCTAssertFalse(isKeepingIcloud)
-	 				}
-	 			}
-	 		}
-	 	}
+	func test__GIVEN__saved_profile__WHEN__deleteWallet_keepIcloud__THEN__iCloud_is_kept() async throws {
+		try await withTimeLimit {
+			// GIVEN saved profile
+			let saved = Profile.withOneAccount
+			try await self.doTestDeleteProfile(
+				saved: saved,
+				// WHEN deleteWallet keep iCloud
+				keepInICloudIfPresent: true
+			) { d, _ in
+				// THEN iCloud is kept
+				d.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { _, isKeepingIcloud in
+					XCTAssertTrue(isKeepingIcloud)
+				}
+			}
+		}
+	}
 
-	 	func test__GIVEN__saved_profile_P__WHEN__deleteWallet__THEN__new_profile_Q_is_created() async throws {
-	 		try await withTimeLimit {
-	 			// GIVEN saved profile `P`
-	 			let P = Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ZOO_VOTE
-	 			// WHEN deleteWallet
-	 			let Q: Profile = try await self.doTestDeleteProfile(
-	 				saved: P
-	 			) { d, _ in
-	 				// THEN new profile Q is created
-	 				d.mnemonicClient.generate = { _, _ in
-	 					Mnemonic.testValueAbandonArt
-	 				}
-	 			}
-	 			XCTAssertNotEqual(P, Q)
-	 			XCTAssertNoDifference(Q.factorSources[0].id, PrivateHDFactorSource.testValueAbandonArt.factorSource.id.embed())
-	 		}
-	 	}
+	func test__GIVEN__saved_profile__WHEN__deleteWallet_delete_in_iCloud__THEN__iCloud_is_not_kept() async throws {
+		try await withTimeLimit {
+			// GIVEN saved profile
+			let saved = Profile.withOneAccount
+			try await self.doTestDeleteProfile(
+				saved: saved,
+				// WHEN deleteWallet and delete in iCloud
+				keepInICloudIfPresent: false
+			) { d, _ in
+				// THEN iCloud is not kept
+				d.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { _, isKeepingIcloud in
+					XCTAssertFalse(isKeepingIcloud)
+				}
+			}
+		}
+	}
 
-	 	func test__GIVEN__saved_profile__WHEN__deleteWallet__THEN__new_profile_is_saved_to_secureStorage() async throws {
-	 		try await withTimeLimit {
-	 			// GIVEN saved profile
-	 			let newProfile = Profile.withNoAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART
-	 			// WHEN deleteWallet
-	 			try await self.doTestDeleteProfile(
-	 				saved: Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ZOO_VOTE
-	 			) { d, _ in
-	 				d.mnemonicClient.generate = { _, _ in
-	 					Mnemonic.testValueAbandonArt
-	 				}
-	 				d.uuid = .constant(newProfile.id)
-	 				// THEN new profile is saved to secureStorage
-	 				d.secureStorageClient.saveProfileSnapshot = {
-	 					XCTAssertNoDifference($0, newProfile.snapshot())
-	 				}
-	 			}
-	 		}
-	 	}
+	func test__GIVEN__saved_profile_P__WHEN__deleteWallet__THEN__new_profile_Q_is_created() async throws {
+		try await withTimeLimit {
+			// GIVEN saved profile `P`
+			let P = Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ZOO_VOTE
+			// WHEN deleteWallet
+			let Q: Profile = try await self.doTestDeleteProfile(
+				saved: P
+			) { d, _ in
+				// THEN new profile Q is created
+				d.mnemonicClient.generate = { _, _ in
+					Mnemonic.testValueAbandonArt
+				}
+			}
+			XCTAssertNotEqual(P, Q)
+			XCTAssertNoDifference(Q.factorSources[0].id, PrivateHDFactorSource.testValueAbandonArt.factorSource.id.embed())
+		}
+	}
 
-	 	func test__GIVEN__saved_profile__WHEN__we_update_profile_without_ownership__THEN__ownership_conflict_alert_is_shown() async throws {
-	 		try await withTimeLimit(.normal) {
-	 			// GIVEN saved profile
-	 			let saved = Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART
-	 			let profileHasBeenUpdated = LockIsolated<Bool>(false)
-	 			let ownership_conflict_alert_is_shown = self.expectation(description: "ownership conflict alert is shown")
+	func test__GIVEN__saved_profile__WHEN__deleteWallet__THEN__new_profile_is_saved_to_secureStorage() async throws {
+		try await withTimeLimit {
+			// GIVEN saved profile
+			let newProfile = Profile.withNoAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART
+			// WHEN deleteWallet
+			try await self.doTestDeleteProfile(
+				saved: Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ZOO_VOTE
+			) { d, _ in
+				d.mnemonicClient.generate = { _, _ in
+					Mnemonic.testValueAbandonArt
+				}
+				d.uuid = .constant(newProfile.id)
+				// THEN new profile is saved to secureStorage
+				d.secureStorageClient.saveProfileSnapshot = {
+					XCTAssertNoDifference($0, newProfile.snapshot())
+				}
+			}
+		}
+	}
 
-	 			try await withTestClients {
-	 				$0.savedProfile(saved)
-	 				when(&$0)
-	 				then(&$0)
-	 			} operation: {
-	 				let sut = ProfileStore()
-	 				await sut.unlockedApp()
-	 				// WHEN we update profile...
-	 				do {
-	 					try await sut.updating {
-	 						$0.header.lastModified = Date()
-	 						profileHasBeenUpdated.setValue(true)
-	 					}
-	 					return XCTFail("Expected to throw")
-	 				} catch {
-	 					// expected to throw
-	 				}
-	 			}
+	func test__GIVEN__saved_profile__WHEN__we_update_profile_without_ownership__THEN__ownership_conflict_alert_is_shown() async throws {
+		try await withTimeLimit(.normal) {
+			// GIVEN saved profile
+			let saved = Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART
+			let profileHasBeenUpdated = LockIsolated<Bool>(false)
+			let ownership_conflict_alert_is_shown = self.expectation(description: "ownership conflict alert is shown")
 
-	 			func when(_ d: inout DependencyValues) {
-	 				d.secureStorageClient.loadProfileSnapshot = { _ in
-	 					profileHasBeenUpdated.withValue { hasBeenUpdated in
-	 						if hasBeenUpdated {
-	 							var modified = saved
-	 							modified.header.lastUsedOnDevice = .testValueBEEF // 0xBEEF != 0xABBA
-	 							// WHEN ... without ownership
-	 							return modified.snapshot()
-	 						} else {
-	 							return saved.snapshot()
-	 						}
-	 					}
-	 				}
-	 			}
+			try await withTestClients {
+				$0.savedProfile(saved)
+				when(&$0)
+				then(&$0)
+			} operation: {
+				let sut = ProfileStore()
+				await sut.unlockedApp()
+				// WHEN we update profile...
+				do {
+					try await sut.updating {
+						$0.header.lastModified = Date()
+						profileHasBeenUpdated.setValue(true)
+					}
+					return XCTFail("Expected to throw")
+				} catch {
+					// expected to throw
+				}
+			}
 
-	 			func then(_ d: inout DependencyValues) {
-	 				d.overlayWindowClient.scheduleAlertAwaitAction = { alert in
-	 					XCTAssertNoDifference(
-	 						alert.message, overlayClientProfileStoreOwnershipConflictTextState
-	 					)
-	 					// THEN ownership conflict alert is shown
-	 					ownership_conflict_alert_is_shown.fulfill()
-	 					return .dismissed
-	 				}
-	 			}
+			func when(_ d: inout DependencyValues) {
+				d.secureStorageClient.loadProfileSnapshot = { _ in
+					profileHasBeenUpdated.withValue { hasBeenUpdated in
+						if hasBeenUpdated {
+							var modified = saved
+							modified.header.lastUsedOnDevice = .testValueBEEF // 0xBEEF != 0xABBA
+							// WHEN ... without ownership
+							return modified.snapshot()
+						} else {
+							return saved.snapshot()
+						}
+					}
+				}
+			}
 
-	 			await self.nearFutureFulfillment(of: ownership_conflict_alert_is_shown)
-	 		}
-	 	}
-	 	 */
+			func then(_ d: inout DependencyValues) {
+				d.overlayWindowClient.scheduleAlertAwaitAction = { alert in
+					XCTAssertNoDifference(
+						alert.message, overlayClientProfileStoreOwnershipConflictTextState
+					)
+					// THEN ownership conflict alert is shown
+					ownership_conflict_alert_is_shown.fulfill()
+					return .dismissed
+				}
+			}
+
+			await self.nearFutureFulfillment(of: ownership_conflict_alert_is_shown)
+		}
+	}
 }
 
 // MARK: - ProfileStoreAsyncSequenceTests
 final class ProfileStoreAsyncSequenceTests: TestCase {
-	/*
-	 func test__GIVEN__no_profile__WHEN_add_first_network__THEN__RadixGateway_is_emitted() async throws {
-	 	try await withTimeLimit {
-	 		try await self.doTestAsyncSequence(
-	 			// GIVEN no profile
-	 			savedProfile: nil,
-	 			arrange: { sut in
-	 				await sut.currentGatewayValues()
-	 			},
-	 			act: { sut in
-	 				try await sut.updating {
-	 					// WHEN add first network (first account adds first network)
-	 					try $0.addAccount(
-	 						.testValue
-	 					)
-	 				}
-	 			},
-	 			// THEN Radix.Gatewat is emitted
-	 			assert: [Radix.Gateway.mainnet]
-	 		)
-	 	}
-	 }
+	func test__GIVEN__no_profile__WHEN_add_first_network__THEN__RadixGateway_is_emitted() async throws {
+		try await withTimeLimit {
+			try await self.doTestAsyncSequence(
+				// GIVEN no profile
+				savedProfile: nil,
+				arrange: { sut in
+					await sut.currentGatewayValues()
+				},
+				act: { sut in
+					try await sut.updating {
+						// WHEN add first network (first account adds first network)
+						try $0.addAccount(
+							.testValue
+						)
+					}
+				},
+				// THEN Radix.Gatewat is emitted
+				assert: [Radix.Gateway.mainnet]
+			)
+		}
+	}
 
-	 func test__GIVEN__no_profile__WHEN_add_first_account__THEN__account_is_emitted() async throws {
-	 	try await withTimeLimit {
-	 		let firstAccount: Profile.Network.Account = .testValueIdx0
-	 		try await self.doTestAsyncSequence(
-	 			// GIVEN no profile
-	 			savedProfile: nil,
-	 			arrange: { sut in
-	 				await sut.accountValues()
-	 			},
-	 			act: { sut in
-	 				try await sut.updating {
-	 					// WHEN add first account
-	 					try $0.addAccount(
-	 						firstAccount
-	 					)
-	 				}
-	 			},
-	 			assert: [
-	 				// THEN account is emitted
-	 				[firstAccount],
-	 			]
-	 		)
-	 	}
-	 }
+	func test__GIVEN__no_profile__WHEN_add_first_account__THEN__account_is_emitted() async throws {
+		try await withTimeLimit {
+			let firstAccount: Profile.Network.Account = .testValueIdx0
+			try await self.doTestAsyncSequence(
+				// GIVEN no profile
+				savedProfile: nil,
+				arrange: { sut in
+					await sut.accountValues()
+				},
+				act: { sut in
+					try await sut.updating {
+						// WHEN add first account
+						try $0.addAccount(
+							firstAccount
+						)
+					}
+				},
+				assert: [
+					// THEN account is emitted
+					[firstAccount],
+				]
+			)
+		}
+	}
 
-	 func test__GIVEN__profile_with_one_account__WHEN_add_2nd_account__THEN__both_accounts_are_emitted() async throws {
-	 	try await withTimeLimit(.slow) {
-	 		var profile = Profile.withNoAccounts
-	 		let firstAccount: Profile.Network.Account = .testValueIdx0
-	 		// GIVEN: Profile with one account
-	 		try profile.addAccount(firstAccount)
+	func test__GIVEN__profile_with_one_account__WHEN_add_2nd_account__THEN__both_accounts_are_emitted() async throws {
+		try await withTimeLimit(.slow) {
+			var profile = Profile.withNoAccounts
+			let firstAccount: Profile.Network.Account = .testValueIdx0
+			// GIVEN: Profile with one account
+			try profile.addAccount(firstAccount)
 
-	 		let secondAccount: Profile.Network.Account = .testValueIdx1
-	 		try await self.doTestAsyncSequence(
-	 			savedProfile: profile,
-	 			arrange: { sut in
-	 				await sut.accountValues()
-	 			},
-	 			act: { sut in
-	 				try await sut.updating {
-	 					// WHEN add 2nd account
-	 					try $0.addAccount(
-	 						secondAccount
-	 					)
-	 				}
-	 			},
-	 			assert: [
-	 				[firstAccount],
-	 				// THEN both accounts are emitted
-	 				[firstAccount, secondAccount],
-	 			]
-	 		)
-	 	}
-	 }
-	   */
+			let secondAccount: Profile.Network.Account = .testValueIdx1
+			try await self.doTestAsyncSequence(
+				savedProfile: profile,
+				arrange: { sut in
+					await sut.accountValues()
+				},
+				act: { sut in
+					try await sut.updating {
+						// WHEN add 2nd account
+						try $0.addAccount(
+							secondAccount
+						)
+					}
+				},
+				assert: [
+					[firstAccount],
+					// THEN both accounts are emitted
+					[firstAccount, secondAccount],
+				]
+			)
+		}
+	}
 }
 
 extension ProfileStoreAsyncSequenceTests {
@@ -1085,10 +1110,12 @@ extension ProfileStoreExistingProfileTests {
 		saved: Profile,
 		userDefaults: UserDefaults.Dependency = .ephemeral(),
 		keepInICloudIfPresent: Bool = true,
+		given: () -> Void = {},
 		_ then: (inout DependencyValues, _ deletedProfile: Profile) -> Void
 	) async throws -> Profile {
 		try await withTestClients(userDefaults: userDefaults) {
-			$0.savedProfile(saved) // GIVEN saved profile
+			$0.savedProfile(saved, userDefaults: userDefaults) // GIVEN saved profile
+			given()
 			$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { _, _ in }
 			then(&$0, saved) // THEN ...
 		} operation: {
