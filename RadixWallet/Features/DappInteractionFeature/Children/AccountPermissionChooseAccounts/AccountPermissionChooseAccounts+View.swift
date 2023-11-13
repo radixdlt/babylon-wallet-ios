@@ -39,7 +39,10 @@ extension AccountPermissionChooseAccounts {
 
 private extension StoreOf<AccountPermissionChooseAccounts> {
 	var destination: PresentationStoreOf<AccountPermissionChooseAccounts.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<AccountPermissionChooseAccounts.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 
 	var chooseAccounts: StoreOf<ChooseAccounts> {

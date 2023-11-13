@@ -267,7 +267,10 @@ extension TransactionReview {
 
 extension StoreOf<TransactionReview> {
 	var destination: PresentationStoreOf<TransactionReview.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<TransactionReview.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

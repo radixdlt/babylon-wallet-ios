@@ -27,7 +27,10 @@ extension FungibleAssetList.View {
 
 private extension StoreOf<FungibleAssetList> {
 	var destination: PresentationStoreOf<FungibleAssetList.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<FungibleAssetList.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

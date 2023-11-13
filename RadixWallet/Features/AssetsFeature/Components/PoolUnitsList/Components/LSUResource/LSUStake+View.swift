@@ -189,7 +189,10 @@ extension LSUStake.State {
 
 private extension StoreOf<LSUStake> {
 	var destination: PresentationStoreOf<LSUStake.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<LSUStake.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

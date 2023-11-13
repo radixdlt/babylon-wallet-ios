@@ -25,10 +25,10 @@ extension SecurityStructureConfigurationListCoordinator {
 
 private extension StoreOf<SecurityStructureConfigurationListCoordinator> {
 	var destination: PresentationStoreOf<SecurityStructureConfigurationListCoordinator.Destination> {
-		func toState(_ parentState: State) -> PresentationState<SecurityStructureConfigurationListCoordinator.Destination.State> {
-			parentState.$destination
+		func scopeState(state: State) -> PresentationState<SecurityStructureConfigurationListCoordinator.Destination.State> {
+			state.$destination
 		}
-		return scope(state: toState, action: Action.destination)
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

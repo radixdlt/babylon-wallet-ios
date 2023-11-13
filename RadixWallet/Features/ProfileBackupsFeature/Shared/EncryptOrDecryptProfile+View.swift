@@ -158,7 +158,10 @@ extension EncryptOrDecryptProfile {
 
 private extension StoreOf<EncryptOrDecryptProfile> {
 	var destination: PresentationStoreOf<EncryptOrDecryptProfile.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<EncryptOrDecryptProfile.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

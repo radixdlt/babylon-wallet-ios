@@ -143,7 +143,10 @@ extension ResourcesList.View {
 
 private extension StoreOf<ResourcesList> {
 	var destination: PresentationStoreOf<ResourcesList.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<ResourcesList.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

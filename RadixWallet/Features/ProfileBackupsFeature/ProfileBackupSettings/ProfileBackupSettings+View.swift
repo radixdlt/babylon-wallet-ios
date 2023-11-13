@@ -131,7 +131,10 @@ extension ProfileBackupSettings.View {
 
 private extension StoreOf<ProfileBackupSettings> {
 	var destination: PresentationStoreOf<ProfileBackupSettings.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<ProfileBackupSettings.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

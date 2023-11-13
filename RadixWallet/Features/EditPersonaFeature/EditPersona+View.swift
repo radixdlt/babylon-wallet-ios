@@ -108,7 +108,10 @@ extension EditPersona {
 
 private extension StoreOf<EditPersona> {
 	var destination: PresentationStoreOf<EditPersona.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<EditPersona.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 
 	var labelField: StoreOf<EditPersonaStaticField> {

@@ -90,10 +90,10 @@ extension AccountPreferences.View {
 
 private extension StoreOf<AccountPreferences> {
 	var destination: PresentationStoreOf<AccountPreferences.Destination> {
-		func toState(_ parentState: State) -> PresentationState<AccountPreferences.Destination.State> {
-			parentState.$destination
+		func scopeState(state: State) -> PresentationState<AccountPreferences.Destination.State> {
+			state.$destination
 		}
-		return scope(state: toState, action: Action.destination)
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

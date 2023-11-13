@@ -113,7 +113,10 @@ extension AccountDetails {
 
 private extension StoreOf<AccountDetails> {
 	var destination: PresentationStoreOf<AccountDetails.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<AccountDetails.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

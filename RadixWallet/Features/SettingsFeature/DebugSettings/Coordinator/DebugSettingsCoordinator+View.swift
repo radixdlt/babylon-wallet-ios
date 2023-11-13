@@ -83,7 +83,10 @@ extension DebugSettingsCoordinator.View {
 
 private extension StoreOf<DebugSettingsCoordinator> {
 	var destination: PresentationStoreOf<DebugSettingsCoordinator.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<DebugSettingsCoordinator.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

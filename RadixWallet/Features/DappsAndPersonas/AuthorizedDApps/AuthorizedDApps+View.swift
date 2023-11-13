@@ -81,7 +81,10 @@ extension AuthorizedDapps.State {
 
 private extension StoreOf<AuthorizedDapps> {
 	var destination: PresentationStoreOf<AuthorizedDapps.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<AuthorizedDapps.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

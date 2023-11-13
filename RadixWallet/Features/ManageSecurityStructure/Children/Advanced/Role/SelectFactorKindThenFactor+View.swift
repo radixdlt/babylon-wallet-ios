@@ -49,7 +49,10 @@ extension SelectFactorKindThenFactor {
 
 private extension StoreOf<SelectFactorKindThenFactor> {
 	var destination: PresentationStoreOf<SelectFactorKindThenFactor.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<SelectFactorKindThenFactor.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

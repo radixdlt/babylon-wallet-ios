@@ -59,7 +59,10 @@ extension Splash {
 
 private extension StoreOf<Splash> {
 	var destination: PresentationStoreOf<Splash.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<Splash.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 

@@ -229,10 +229,7 @@ public struct Home: Sendable, FeatureReducer {
 		exportMnemonic(
 			controlling: account,
 			onSuccess: {
-				state.destination = .exportMnemonic(.export(
-					$0,
-					title: L10n.RevealSeedPhrase.title
-				))
+				state.destination = .exportMnemonic(.export($0, title: L10n.RevealSeedPhrase.title))
 			}
 		)
 	}

@@ -32,7 +32,10 @@ extension Main {
 
 private extension StoreOf<Main> {
 	var destination: PresentationStoreOf<Main.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<Main.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 
 	var banner: Store<Bool, Never> {

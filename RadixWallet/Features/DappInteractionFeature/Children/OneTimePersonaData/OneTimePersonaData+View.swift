@@ -97,7 +97,10 @@ extension OneTimePersonaData {
 
 private extension StoreOf<OneTimePersonaData> {
 	var destination: PresentationStoreOf<OneTimePersonaData.Destination> {
-		scope(state: \.$destination) { .destination($0) }
+		func scopeState(state: State) -> PresentationState<OneTimePersonaData.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 
