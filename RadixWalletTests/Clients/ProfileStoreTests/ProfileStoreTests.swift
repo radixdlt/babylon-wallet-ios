@@ -542,8 +542,8 @@ final class ProfileStoreNewProfileTests: TestCase {
 	}
 }
 
-// MARK: - ProfileStoreExstingProfileTests
-final class ProfileStoreExstingProfileTests: TestCase {
+// MARK: - ProfileStoreExistingProfileTests
+final class ProfileStoreExistingProfileTests: TestCase {
 	func test__GIVEN__saved_profile__WHEN__init__THEN__saved_profile_is_used() async throws {
 		try await withTimeLimit {
 			// GIVEN saved profile
@@ -658,71 +658,74 @@ final class ProfileStoreExstingProfileTests: TestCase {
 			await self.nearFutureFulfillment(of: identityCheckFails)
 		}
 	}
+
+	func test__GIVEN__saved_profile_mismatch_deviceID__WHEN__claimAndContinueUseOnThisPhone__THEN__profile_uses_claimed_device() async throws {
+		try await doTestMismatch(
+			savedProfile: Profile.withOneAccount,
+			action: .claimAndContinueUseOnThisPhone
+		) { claimed in
+			// THEN profile uses claimed device
+			XCTAssertNoDifference(
+				claimed.header.lastUsedOnDevice.id,
+				DeviceInfo.testValueBEEF.id
+			)
+		}
+	}
+
+	func test__GIVEN__saved_profile_mismatch_deviceID__WHEN__deleteProfile__THEN__profile_got_deleted() async throws {
+		let savedProfile = Profile.withOneAccount
+		let userDefaults = UserDefaults.Dependency.ephemeral()
+		try await doTestMismatch(
+			savedProfile: savedProfile,
+			userDefaults: userDefaults,
+			action: .deleteProfileFromThisPhone,
+			then: {
+				XCTAssertNoDifference(userDefaults.string(key: .activeProfileID), savedProfile.header.id.uuidString)
+				$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { idToDelete, _ in
+					XCTAssertNoDifference(idToDelete, savedProfile.header.id)
+				}
+			}
+		)
+
+		// New active profile
+		XCTAssertNotEqual(userDefaults.string(key: .activeProfileID), savedProfile.header.id.uuidString)
+	}
+
+	func test__GIVEN__mismatch__WHEN__app_is_not_yet_unlocked__THEN__no_alert_is_displayed() async throws {
+		let alertNotScheduled = expectation(
+			description: "overlayWindowClient did NOT scheduled alert"
+		)
+
+		alertNotScheduled.isInverted = true // invert meaning we expect it to NOT be fulfilled.
+
+		try await withTimeLimit(.slow) {
+			try await withTestClients {
+				// GIVEN saved profile
+				$0.savedProfile(Profile.withOneAccount)
+				// mistmatch deviceID
+				$0.secureStorageClient.loadDeviceInfo = { .testValueBEEF }
+				when(&$0)
+			} operation: {
+				let sut = ProfileStore.init()
+				// UI needs some time, we still need the conditions to be correct
+				// in order to get a failure here...
+				try await Task.sleep(for: .milliseconds(50))
+				// WHEN app is NOT yet unlocked
+				// await sut.unlockedApp() // enabling this line SHOULD cause test to fail
+			}
+
+			func when(_ d: inout DependencyValues) {
+				d.overlayWindowClient.scheduleAlertAwaitAction = { _ in
+					// THEN NO alert is displayed
+					alertNotScheduled.fulfill()
+					return .dismissed // irrelevant, should not happen
+				}
+			}
+
+			await self.nearFutureFulfillment(of: alertNotScheduled)
+		}
+	}
 	/*
-	 	func test__GIVEN__saved_profile_mismatch_deviceID__WHEN__claimAndContinueUseOnThisPhone__THEN__profile_uses_claimed_device() async throws {
-	 		try await doTestMismatch(
-	 			savedProfile: Profile.withOneAccount,
-	 			action: .claimAndContinueUseOnThisPhone
-	 		) { claimed in
-	 			// THEN profile uses claimed device
-	 			XCTAssertNoDifference(
-	 				claimed.header.lastUsedOnDevice.id,
-	 				DeviceInfo.testValueBEEF.id
-	 			)
-	 		}
-	 	}
-
-	 	func test__GIVEN__saved_profile_mismatch_deviceID__WHEN__deleteProfile__THEN__profile_got_deleted() async throws {
-	 		let savedProfile = Profile.withOneAccount
-	 		try await doTestMismatch(
-	 			savedProfile: savedProfile,
-	 			action: .deleteProfileFromThisPhone,
-	 			then: {
-	 //				$0.userDefaults.remove = { key in
-	 //					XCTAssertNoDifference(key, .activeProfileID)
-	 //				}
-	 				$0.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { idToDelete, _ in
-	 					XCTAssertNoDifference(idToDelete, savedProfile.header.id)
-	 				}
-	 			}
-	 		)
-	 	}
-
-	 	func test__GIVEN__mismatch__WHEN__app_is_not_yet_unlocked__THEN__no_alert_is_displayed() async throws {
-	 		let alertNotScheduled = expectation(
-	 			description: "overlayWindowClient did NOT scheduled alert"
-	 		)
-
-	 		alertNotScheduled.isInverted = true // invert meaning we expect it to NOT be fulfilled.
-
-	 		try await withTimeLimit(.slow) {
-	 			try await withTestClients {
-	 				// GIVEN saved profile
-	 				$0.savedProfile(Profile.withOneAccount)
-	 				// mistmatch deviceID
-	 				$0.secureStorageClient.loadDeviceInfo = { .testValueBEEF }
-	 				when(&$0)
-	 			} operation: {
-	 				let sut = ProfileStore.init()
-	 				// UI needs some time, we still need the conditions to be correct
-	 				// in order to get a failure here...
-	 				try await Task.sleep(for: .milliseconds(50))
-	 				// WHEN app is NOT yet unlocked
-	 				// await sut.unlockedApp() // enabling this line SHOULD cause test to fail
-	 			}
-
-	 			func when(_ d: inout DependencyValues) {
-	 				d.overlayWindowClient.scheduleAlertAwaitAction = { _ in
-	 					// THEN NO alert is displayed
-	 					alertNotScheduled.fulfill()
-	 					return .dismissed // irrelevant, should not happen
-	 				}
-	 			}
-
-	 			await self.nearFutureFulfillment(of: alertNotScheduled)
-	 		}
-	 	}
-
 	 	func test__GIVEN__saved_profile__WHEN__deleteWallet__THEN__profile_gets_deleted_from_secureStorage() async throws {
 	 		try await withTimeLimit {
 	 			// GIVEN saved profile
@@ -1036,9 +1039,10 @@ extension ProfileStoreAsyncSequenceTests {
 	}
 }
 
-extension ProfileStoreExstingProfileTests {
+extension ProfileStoreExistingProfileTests {
 	private func doTestMismatch(
 		savedProfile: Profile,
+		userDefaults: UserDefaults.Dependency = .ephemeral(),
 		action: OverlayWindowClient.Item.AlertAction,
 		then: @escaping @Sendable (inout DependencyValues) -> Void = { _ in },
 		result assertResult: @escaping @Sendable (Profile) -> Void = { _ in }
@@ -1046,11 +1050,10 @@ extension ProfileStoreExstingProfileTests {
 		let alertScheduled = expectation(
 			description: "overlayWindowClient has scheduled alert"
 		)
-
 		try await withTimeLimit(.slow) {
-			let result = await withTestClients {
+			let result = await withTestClients(userDefaults: userDefaults) {
 				// GIVEN saved profile
-				$0.savedProfile(savedProfile)
+				$0.savedProfile(savedProfile, userDefaults: userDefaults)
 				// mistmatch deviceID
 				$0.secureStorageClient.loadDeviceInfo = { .testValueBEEF }
 				when(&$0)
