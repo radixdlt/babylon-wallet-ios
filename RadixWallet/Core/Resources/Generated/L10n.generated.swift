@@ -557,6 +557,20 @@ public enum L10n {
       /// Transfer
       public static let transfer = L10n.tr("Localizable", "assetTransfer_header_transfer", fallback: "Transfer")
     }
+    public enum MaxAmountDialog {
+      /// Sending the full amount of XRD in this account will require you to pay the transaction fee from a different account. Or, the wallet can reduce the amount transferred so the fee can be paid from this account. Choose the amount to transfer:
+      public static let body = L10n.tr("Localizable", "assetTransfer_maxAmountDialog_body", fallback: "Sending the full amount of XRD in this account will require you to pay the transaction fee from a different account. Or, the wallet can reduce the amount transferred so the fee can be paid from this account. Choose the amount to transfer:")
+      /// %@ (save 1 XRD for fee)
+      public static func saveXrdForFeeButton(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "assetTransfer_maxAmountDialog_saveXrdForFeeButton", String(describing: p1), fallback: "%@ (save 1 XRD for fee)")
+      }
+      /// %@ (send all XRD)
+      public static func sendAllButton(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "assetTransfer_maxAmountDialog_sendAllButton", String(describing: p1), fallback: "%@ (send all XRD)")
+      }
+      /// Sending All XRD
+      public static let title = L10n.tr("Localizable", "assetTransfer_maxAmountDialog_title", fallback: "Sending All XRD")
+    }
     public enum ReceivingAccount {
       /// Add Assets
       public static let addAssetsButton = L10n.tr("Localizable", "assetTransfer_receivingAccount_addAssetsButton", fallback: "Add Assets")
