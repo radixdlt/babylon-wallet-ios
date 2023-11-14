@@ -59,7 +59,7 @@ extension VerifyMnemonic {
 				ScrollView {
 					VStack(spacing: .medium1) {
 						// FIXME: Strings
-						Text("Confirm you have written down the seed phrase by entering the missing words below.")
+						Text(L10n.ConfirmMnemonicBackedUp.subtitle)
 							.foregroundStyle(.app.gray1)
 							.textStyle(.body1Regular)
 							.multilineTextAlignment(.center)
@@ -82,14 +82,14 @@ extension VerifyMnemonic {
 				.scrollIndicators(.hidden)
 			}
 			// FIXME: Strings
-			.navigationTitle("Confirm seed phrase")
+			.navigationTitle(L10n.ConfirmMnemonicBackedUp.title)
 		}
 
 		@ViewBuilder
 		private func wordsGrid(viewStore: ViewStoreOf<VerifyMnemonic>) -> some SwiftUI.View {
 			SwiftUI.Grid(horizontalSpacing: .small2, verticalSpacing: .medium1) {
 				ForEach(Array(viewStore.words.chunks(ofCount: 3).enumerated()), id: \.offset) { _, row in
-					SwiftUI.GridRow {
+					GridRow {
 						ForEach(row) { wordViewState in
 							VStack {
 								if wordViewState.isDisabled {
