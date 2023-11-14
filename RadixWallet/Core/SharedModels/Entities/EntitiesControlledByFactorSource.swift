@@ -26,10 +26,12 @@ extension EntitiesControlledByFactorSource {
 }
 
 extension EntitiesControlledByFactorSource {
+	/// **B**abylon **D**evice **F**actor **S**ource
 	public var isExplicitMainBDFS: Bool {
 		deviceFactorSource.isExplicitMainBDFS
 	}
 
+	/// **B**abylon **D**evice **F**actor **S**ource
 	public var isBDFS: Bool {
 		deviceFactorSource.isBDFS
 	}
@@ -48,10 +50,12 @@ extension EntitiesControlledByFactorSource {
 }
 
 extension DeviceFactorSource {
+	/// **B**abylon **D**evice **F**actor **S**ource
 	public var isExplicitMainBDFS: Bool {
 		isBDFS && isExplicitMain
 	}
 
+	/// **B**abylon **D**evice **F**actor **S**ource
 	public var isBDFS: Bool {
 		!supportsOlympia
 	}

@@ -587,6 +587,7 @@ extension ProfileStore {
 		userDefaults.setActiveProfileID(header.id)
 	}
 
+	/// **B**abylon **D**evice **F**actor **S**ource
 	private static func _persist(bdfsMnemonic: PrivateHDFactorSource) throws {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		try secureStorageClient.saveMnemonicForFactorSource(bdfsMnemonic)

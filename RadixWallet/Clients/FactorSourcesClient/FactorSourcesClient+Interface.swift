@@ -2,6 +2,7 @@
 public struct FactorSourcesClient: Sendable {
 	public var getCurrentNetworkID: GetCurrentNetworkID
 	public var getMainDeviceFactorSource: GetMainDeviceFactorSource
+	public var createNewMainDeviceFactorSource: CreateNewMainDeviceFactorSource
 	public var getFactorSources: GetFactorSources
 	public var factorSourcesAsyncSequence: FactorSourcesAsyncSequence
 	public var addPrivateHDFactorSource: AddPrivateHDFactorSource
@@ -15,6 +16,7 @@ public struct FactorSourcesClient: Sendable {
 	public init(
 		getCurrentNetworkID: @escaping GetCurrentNetworkID,
 		getMainDeviceFactorSource: @escaping GetMainDeviceFactorSource,
+		createNewMainDeviceFactorSource: @escaping CreateNewMainDeviceFactorSource,
 		getFactorSources: @escaping GetFactorSources,
 		factorSourcesAsyncSequence: @escaping FactorSourcesAsyncSequence,
 		addPrivateHDFactorSource: @escaping AddPrivateHDFactorSource,
@@ -27,6 +29,7 @@ public struct FactorSourcesClient: Sendable {
 	) {
 		self.getCurrentNetworkID = getCurrentNetworkID
 		self.getMainDeviceFactorSource = getMainDeviceFactorSource
+		self.createNewMainDeviceFactorSource = createNewMainDeviceFactorSource
 		self.getFactorSources = getFactorSources
 		self.factorSourcesAsyncSequence = factorSourcesAsyncSequence
 		self.addPrivateHDFactorSource = addPrivateHDFactorSource
@@ -43,6 +46,7 @@ public struct FactorSourcesClient: Sendable {
 extension FactorSourcesClient {
 	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 	public typealias GetMainDeviceFactorSource = @Sendable () async throws -> DeviceFactorSource
+	public typealias CreateNewMainDeviceFactorSource = @Sendable (_ saveIntoProfile: Bool) async throws -> PrivateHDFactorSource
 	public typealias GetFactorSources = @Sendable () async throws -> FactorSources
 	public typealias FactorSourcesAsyncSequence = @Sendable () async -> AnyAsyncSequence<FactorSources>
 	public typealias AddPrivateHDFactorSource = @Sendable (AddPrivateHDFactorSourceRequest) async throws -> FactorSourceID
@@ -88,6 +92,10 @@ public struct GetSigningFactorsRequest: Sendable, Hashable {
 }
 
 extension FactorSourcesClient {
+	public func createNewMainBDFS(saveIntoProfile: Bool) async throws -> PrivateHDFactorSource {
+		try await createNewMainDeviceFactorSource(saveIntoProfile)
+	}
+
 	public func getFactorSource(
 		id: FactorSourceID,
 		matching filter: @escaping (FactorSource) -> Bool = { _ in true }

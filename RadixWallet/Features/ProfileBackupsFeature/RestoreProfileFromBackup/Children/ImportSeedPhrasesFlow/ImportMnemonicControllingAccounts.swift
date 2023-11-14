@@ -2,6 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - NewMainBDFS
+/// **B**abylon **D**evice **F**actor **S**ource
 public struct NewMainBDFS: Sendable, Hashable {
 	public let newMainBDFS: DeviceFactorSource
 	public let idsOfAccountsToHide: [Profile.Network.Account.ID]
@@ -63,8 +64,10 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 
 		public enum Action: Sendable, Equatable {
 			case importMnemonic(ImportMnemonic.Action)
+			/// **B**abylon **D**evice **F**actor **S**ource
 			case confirmSkipBDFS(ConfirmSkipBDFS)
 
+			/// **B**abylon **D**evice **F**actor **S**ource
 			public enum ConfirmSkipBDFS: Sendable, Hashable {
 				case confirmTapped
 				case cancelTapped
@@ -82,10 +85,6 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.userDefaults) var userDefaults
-	@Dependency(\.uuid) var uuid
-	@Dependency(\.date) var date
-	@Dependency(\.device) var device
-	@Dependency(\.mnemonicClient) var mnemonicClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 	public init() {}
@@ -151,40 +150,20 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			loggerGlobal.notice("Skipping BDFS! Generating a new one and hiding affected accounts/personas.")
 			return .run { [entitiesControlledByFactorSource = state.entitiesControlledByFactorSource] send in
 				loggerGlobal.info("Generating mnemonic for new main BDFS")
-				let model = await device.model
-				let name = await device.name
-
-				let mnemonic = try MnemonicWithPassphrase(
-					mnemonic: mnemonicClient.generate(
-						BIP39.WordCount.twentyFour,
-						BIP39.Language.english
-					)
+				let newBDFS = try await factorSourcesClient.createNewMainBDFS(
+					saveIntoProfile: false // snapshot! cannot save it yet.
 				)
-
-				loggerGlobal.info("Creating new main BDFS")
-				var newBDFS = try DeviceFactorSource.babylon(
-					mnemonicWithPassphrase: mnemonic,
-					model: .init(model),
-					name: .init(name)
-				)
-				newBDFS.flagAsMain()
-
-				let newBDFSMnemonic = try PrivateHDFactorSource(
-					mnemonicWithPassphrase: mnemonic,
-					factorSource: newBDFS
-				)
-
-				loggerGlobal.info("Saving new main BDFS to Profile and Keychain")
-				try await factorSourcesClient.addOnDeviceFactorSource(
-					privateHDFactorSource: newBDFSMnemonic,
-					saveIntoProfile: false // profile is a snapshot
-				)
-
 				let accountsToHide = entitiesControlledByFactorSource.accounts
 				let personasToHide = entitiesControlledByFactorSource.personas
-
 				loggerGlobal.info("Delegating done with creating new BDFS (skipped old)")
-				await send(.delegate(.createdNewMainBDFS(oldSkipped: entitiesControlledByFactorSource.factorSourceID, .init(newMainBDFS: newBDFS, idsOfAccountsToHide: accountsToHide.map(\.id), idsOfPersonasToHide: personasToHide.map(\.id)))))
+				await send(.delegate(.createdNewMainBDFS(
+					oldSkipped: entitiesControlledByFactorSource.factorSourceID,
+					.init(
+						newMainBDFS: newBDFS.factorSource,
+						idsOfAccountsToHide: accountsToHide.map(\.id),
+						idsOfPersonasToHide: personasToHide.map(\.id)
+					)
+				)))
 			} catch: { error, _ in
 				loggerGlobal.critical("Failed to create new main BDFS error: \(error)")
 			}

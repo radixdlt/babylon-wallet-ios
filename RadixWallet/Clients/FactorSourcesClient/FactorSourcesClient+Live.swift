@@ -28,6 +28,37 @@ extension FactorSourcesClient: DependencyKey {
 			}
 		}
 
+		let addPrivateHDFactorSource: AddPrivateHDFactorSource = { request in
+			let factorSource = request.factorSource
+
+			switch factorSource {
+			case let .device(deviceFactorSource):
+				try secureStorageClient.saveMnemonicForFactorSource(.init(mnemonicWithPassphrase: request.mnemonicWithPasshprase, factorSource: deviceFactorSource))
+			default:
+				loggerGlobal.notice("Saving of non device private HD factor source not permitted, kind is: \(factorSource.kind)")
+			}
+			let factorSourceID = factorSource.id
+
+			/// We only need to save olympia mnemonics into Profile, the Babylon ones
+			/// already exist in profile, and this function is used only to save the
+			/// imported mnemonic into keychain (done above).
+			if request.saveIntoProfile {
+				do {
+					try await saveFactorSource(factorSource)
+				} catch {
+					loggerGlobal.critical("Failed to save factor source, error: \(error)")
+					if let idForMnemonicToDelete = try? factorSourceID.extract(as: FactorSourceID.FromHash.self) {
+						// We were unlucky, failed to update Profile, thus best to undo the saving of
+						// the mnemonic in keychain (if we can).
+						try? secureStorageClient.deleteMnemonicByFactorSourceID(idForMnemonicToDelete)
+					}
+					throw error
+				}
+			}
+
+			return factorSourceID
+		}
+
 		return Self(
 			getCurrentNetworkID: {
 				await profileStore.profile.networkID
@@ -56,40 +87,48 @@ extension FactorSourcesClient: DependencyKey {
 					}
 				}
 			},
+			createNewMainDeviceFactorSource: { saveIntoProfile in
+				@Dependency(\.uuid) var uuid
+				@Dependency(\.date) var date
+				@Dependency(\.device) var device
+				@Dependency(\.mnemonicClient) var mnemonicClient
+
+				let model = await device.model
+				let name = await device.name
+
+				let mnemonicWithPassphrase = try MnemonicWithPassphrase(
+					mnemonic: mnemonicClient.generate(
+						BIP39.WordCount.twentyFour,
+						BIP39.Language.english
+					)
+				)
+
+				loggerGlobal.info("Creating new main BDFS")
+				let newBDFS = try DeviceFactorSource.babylon(
+					mnemonicWithPassphrase: mnemonicWithPassphrase,
+					model: .init(model),
+					name: .init(name)
+				)
+				assert(newBDFS.isExplicitMainBDFS)
+
+				loggerGlobal.info("Saving new main BDFS to Profile and Keychain")
+				_ = try await addPrivateHDFactorSource(.init(
+					factorSource: newBDFS.embed(),
+					mnemonicWithPasshprase: mnemonicWithPassphrase,
+					saveIntoProfile: saveIntoProfile
+				))
+
+				return try PrivateHDFactorSource(
+					mnemonicWithPassphrase: mnemonicWithPassphrase,
+					factorSource: newBDFS
+				)
+
+			},
 			getFactorSources: getFactorSources,
 			factorSourcesAsyncSequence: {
 				await profileStore.factorSourcesValues()
 			},
-			addPrivateHDFactorSource: { request in
-				let factorSource = request.factorSource
-
-				switch factorSource {
-				case let .device(deviceFactorSource):
-					try secureStorageClient.saveMnemonicForFactorSource(.init(mnemonicWithPassphrase: request.mnemonicWithPasshprase, factorSource: deviceFactorSource))
-				default:
-					loggerGlobal.notice("Saving of non device private HD factor source not permitted, kind is: \(factorSource.kind)")
-				}
-				let factorSourceID = factorSource.id
-
-				/// We only need to save olympia mnemonics into Profile, the Babylon ones
-				/// already exist in profile, and this function is used only to save the
-				/// imported mnemonic into keychain (done above).
-				if request.saveIntoProfile {
-					do {
-						try await saveFactorSource(factorSource)
-					} catch {
-						loggerGlobal.critical("Failed to save factor source, error: \(error)")
-						if let idForMnemonicToDelete = try? factorSourceID.extract(as: FactorSourceID.FromHash.self) {
-							// We were unlucky, failed to update Profile, thus best to undo the saving of
-							// the mnemonic in keychain (if we can).
-							try? secureStorageClient.deleteMnemonicByFactorSourceID(idForMnemonicToDelete)
-						}
-						throw error
-					}
-				}
-
-				return factorSourceID
-			},
+			addPrivateHDFactorSource: addPrivateHDFactorSource,
 			checkIfHasOlympiaFactorSourceForAccounts: {
 				wordCount,
 					softwareAccounts -> FactorSourceID.FromHash? in
