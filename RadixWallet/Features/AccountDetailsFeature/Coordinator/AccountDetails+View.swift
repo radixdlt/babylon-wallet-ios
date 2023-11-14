@@ -141,7 +141,6 @@ private extension View {
 	func destinations(_ destinationStore: PresentationStoreOf<AccountDetails.Destinations>) -> some SwiftUI.View {
 		preferences(destinationStore)
 			.transfer(destinationStore)
-			.history(destinationStore)
 	}
 
 	func preferences(_ destinationStore: PresentationStoreOf<AccountDetails.Destinations>) -> some SwiftUI.View {
@@ -159,20 +158,6 @@ private extension View {
 			state: /AccountDetails.Destinations.State.transfer,
 			action: AccountDetails.Destinations.Action.transfer,
 			content: { AssetTransfer.SheetView(store: $0) }
-		)
-	}
-
-	func history(_ destinationStore: PresentationStoreOf<AccountDetails.Destinations>) -> some SwiftUI.View {
-		fullScreenCover(
-			store: destinationStore,
-			state: /AccountDetails.Destinations.State.history,
-			action: AccountDetails.Destinations.Action.history,
-			content: { store in
-				store.withState { url in
-					SafariWebView(url: url)
-						.ignoresSafeArea()
-				}
-			}
 		)
 	}
 }

@@ -56,13 +56,11 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case preferences(AccountPreferences.State)
 			case transfer(AssetTransfer.State)
-			case history(URL)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case preferences(AccountPreferences.Action)
 			case transfer(AssetTransfer.Action)
-			case history(EqVoid)
 		}
 
 		public var body: some Reducer<State, Action> {
@@ -75,12 +73,11 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.gatewaysClient) var gatewaysClient
-	@Dependency(\.openURL) var openURL
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
+	@Dependency(\.openURL) var openURL
 
 	public init() {}
 
@@ -122,8 +119,9 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				.dashboard(forNetworkID: state.account.networkID)
 				.recentTransactionsURL(state.account.address)
 
-			state.destination = .history(url)
-			return .none
+			return .run { _ in
+				await openURL(url)
+			}
 
 		case .exportMnemonicButtonTapped:
 			return .send(.delegate(.exportMnemonic(controlling: state.account)))
