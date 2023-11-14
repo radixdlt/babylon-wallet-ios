@@ -1,6 +1,25 @@
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - EntitiesControlledByFactorSource + Comparable
+extension EntitiesControlledByFactorSource: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		if lhs.isExplicitMainBDFS {
+			return true
+		} else if rhs.isExplicitMainBDFS {
+			return false
+		}
+
+		if lhs.isBDFS {
+			return true
+		} else if rhs.isBDFS {
+			return false
+		}
+
+		return lhs.deviceFactorSource.common.addedOn < rhs.deviceFactorSource.common.addedOn
+	}
+}
+
 // MARK: - ImportMnemonicsFlowCoordinator
 public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
@@ -128,7 +147,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case let .loadControlledEntities(.success(factorSourcesControllingEntities)):
-			state.mnemonicsLeftToImport = factorSourcesControllingEntities
+			state.mnemonicsLeftToImport = factorSourcesControllingEntities.sorted().asIdentifiable()
 			return nextMnemonicIfNeeded(state: &state)
 		}
 	}

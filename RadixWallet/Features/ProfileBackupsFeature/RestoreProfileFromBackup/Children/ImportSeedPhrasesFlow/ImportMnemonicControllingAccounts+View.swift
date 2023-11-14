@@ -24,6 +24,10 @@ extension ImportMnemonicControllingAccounts {
 				? L10n.RecoverSeedPhrase.Header.titleMain
 				: L10n.RecoverSeedPhrase.Header.titleOther
 		}
+
+		var skipButtonTitle: String {
+			isMain ? "I Don't Have the Main Seed Phrase" : L10n.RecoverSeedPhrase.skipButton
+		}
 	}
 
 	@MainActor
@@ -42,22 +46,21 @@ extension ImportMnemonicControllingAccounts {
 						.foregroundColor(.app.gray1)
 						.padding()
 
-					Button(L10n.RecoverSeedPhrase.skipButton) {
-						viewStore.send(.skip)
+					if !viewStore.isMain {
+						skipButton(with: viewStore)
 					}
-					.foregroundColor(.app.blue2)
-					.font(.app.body1Regular)
-					.frame(height: .standardButtonHeight)
-					.frame(maxWidth: .infinity)
-					.padding(.medium1)
-					.background(.app.white)
-					.cornerRadius(.small2)
-
 					ScrollView {
 						DisplayEntitiesControlledByMnemonic.View(
 							store: store.scope(state: \.entities, action: { .child(.entities($0)) })
 						)
 					}
+					.fixedSize(horizontal: false, vertical: true) // prevent ScrollView from growing vertically if not needed.
+
+					if viewStore.isMain {
+						skipButton(with: viewStore)
+					}
+
+					Spacer(minLength: 0)
 				}
 				.padding(.horizontal, .medium3)
 				.footer {
@@ -85,6 +88,19 @@ extension ImportMnemonicControllingAccounts {
 					action: ImportMnemonicControllingAccounts.Destinations.Action.confirmSkipBDFS
 				)
 			}
+		}
+
+		private func skipButton(with viewStore: ViewStoreOf<ImportMnemonicControllingAccounts>) -> some SwiftUI.View {
+			Button(viewStore.skipButtonTitle) {
+				viewStore.send(.skip)
+			}
+			.foregroundColor(.app.blue2)
+			.font(.app.body1Regular)
+			.frame(height: .standardButtonHeight)
+			.frame(maxWidth: .infinity)
+			.padding(.medium1)
+			.background(.app.white)
+			.cornerRadius(.small2)
 		}
 	}
 }
