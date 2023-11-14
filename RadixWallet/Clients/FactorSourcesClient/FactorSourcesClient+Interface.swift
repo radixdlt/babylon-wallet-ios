@@ -177,9 +177,21 @@ public struct SigningFactor: Sendable, Hashable, Identifiable {
 	}
 }
 
+extension DeviceFactorSource {
+	func removingMainFlag() -> Self {
+		var copy = self
+		copy.common.flags.remove(.main)
+		return copy
+	}
+}
+
 extension FactorSourcesClient {
 	public func newMainBDFS(_ newMainBDFS: NewMainBDFS) async throws {
 		@Dependency(\.entitiesVisibilityClient) var entitiesVisibilityClient
+		let oldMainBDFSSources = try await getFactorSources(type: DeviceFactorSource.self).filter(\.isExplicitMainBDFS)
+		for oldMainBDFS in oldMainBDFSSources {
+			try await updateFactorSource(oldMainBDFS.removingMainFlag().embed())
+		}
 		try await saveFactorSource(newMainBDFS.newMainBDFS.embed())
 		try await entitiesVisibilityClient.hideAccounts(ids: newMainBDFS.idsOfAccountsToHide)
 		try await entitiesVisibilityClient.hidePersonas(ids: newMainBDFS.idsOfPersonasToHide)
