@@ -65,6 +65,7 @@ public enum AssetResource {
   public static let iconAcceptKnownAirdrop = ImageAsset(name: "icon-accept-known-airdrop")
   public static let iconDeclineAirdrop = ImageAsset(name: "icon-decline-airdrop")
   public static let iconHardwareLedger = ImageAsset(name: "icon-hardware-ledger")
+  public static let iconHistory = ImageAsset(name: "icon-history")
   public static let iconLinkOut = ImageAsset(name: "icon-link-out")
   public static let info = ImageAsset(name: "info")
   public static let lock = ImageAsset(name: "lock")
