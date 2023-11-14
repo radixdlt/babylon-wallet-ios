@@ -36,7 +36,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				loggerGlobal.info("\(function)#\(line) - \(msg)")
 			}
 			let intentSignersNonEmpty = reviewedTransaction?.transactionSigners.intentSignerEntitiesNonEmptyOrNil()
-			let feePayer = reviewedTransaction?.feePayerSelection.selected?.account
+			let feePayer = reviewedTransaction?.feePayer.unwrap()?.account.wrappedValue
 
 			let notaryIsSignatory: Bool = reviewedTransaction?.transactionSigners.notaryIsSignatory == true
 			switch (intentSignersNonEmpty, feePayer) {
@@ -113,6 +113,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case createTransactionReview(TransactionReview.TransactionContent)
 		case buildTransactionItentResult(TaskResult<TransactionIntent>)
 		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
+		case determineFeePayerResult(TaskResult<FeePayerSelectionResult?>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -239,12 +240,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					return .none
 				}
 
-				guard let networkID = state.networkID else {
-					assertionFailure("Expected networkID")
-					return .none
-				}
-
-				let tipPercentage: UInt16 = switch reviewedTransaction.feePayerSelection.transactionFee.mode {
+				let tipPercentage: UInt16 = switch reviewedTransaction.transactionFee.mode {
 				case .normal:
 					0
 				case let .advanced(customization):
@@ -252,7 +248,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				}
 
 				let request = BuildTransactionIntentRequest(
-					networkID: networkID,
+					networkID: reviewedTransaction.networkId,
 					manifest: manifest,
 					message: state.message,
 					makeTransactionHeaderInput: MakeTransactionHeaderInput(tipPercentage: tipPercentage),
@@ -426,14 +422,17 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .previewLoaded(.success(preview)):
 			do {
-				state.reviewedTransaction = try .init(
-					feePayerSelection: preview.feePayerSelectionAmongstCandidates,
+				let reviewedTransaction = try ReviewedTransaction(
 					networkId: preview.networkID,
 					transaction: preview.analyzedManifestToReview.transactionTypes.transactionKind(),
+					feePayer: .loading,
+					transactionFee: preview.transactionFee,
 					transactionSigners: preview.transactionSigners,
 					signingFactors: preview.signingFactors
 				)
+				state.reviewedTransaction = reviewedTransaction
 				return review(&state)
+					.concatenate(with: determineFeePayer(state, reviewedTransaction: reviewedTransaction))
 			} catch {
 				errorQueue.schedule(error)
 				return .none
@@ -485,6 +484,33 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .buildTransactionItentResult(.failure(error)),
 		     let .notarizeResult(.failure(error)):
 			errorQueue.schedule(error)
+			return .none
+
+		case let .determineFeePayerResult(.success(selectionResult)):
+			guard var reviewedTransaction = state.reviewedTransaction else {
+				assertionFailure("Expected to have reviewed transaction")
+				return .none
+			}
+
+			reviewedTransaction.feePayer = .success(selectionResult?.payer)
+
+			if let selectionResult {
+				reviewedTransaction.transactionFee = selectionResult.updatedFee
+				reviewedTransaction.transactionSigners = selectionResult.transactionSigners
+				reviewedTransaction.signingFactors = selectionResult.signingFactors
+			}
+
+			state.reviewedTransaction = reviewedTransaction
+			state.networkFee?.reviewedTransaction = reviewedTransaction
+
+			if reviewedTransaction.transaction == .nonConforming {
+				return showRawTransaction(&state)
+			}
+			return .none
+
+		case let .determineFeePayerResult(.failure(error)):
+			assertionFailure("Failed to determine fee payer \(error)")
+			state.reviewedTransaction?.feePayer = .success(nil)
 			return .none
 		}
 	}
@@ -593,11 +619,11 @@ extension TransactionReview {
 
 	func transactionManifestWithWalletInstructionsAdded(_ state: State) throws -> TransactionManifest {
 		var manifest = state.transactionManifest
-		if let feePayerSelection = state.reviewedTransaction?.feePayerSelection, let feePayer = feePayerSelection.selected {
+		if let reviewedTransaction = state.reviewedTransaction, case let .success(feePayerAccount) = reviewedTransaction.feePayer.unwrap()?.account {
 			do {
 				manifest = try manifest.withLockFeeCallMethodAdded(
-					address: feePayer.account.address.asGeneral,
-					fee: feePayerSelection.transactionFee.totalFee.lockFee
+					address: feePayerAccount.address.asGeneral,
+					fee: reviewedTransaction.transactionFee.totalFee.lockFee
 				)
 			} catch {
 				loggerGlobal.error("Failed to add lock fee, error: \(error)")
@@ -609,6 +635,27 @@ extension TransactionReview {
 		} catch {
 			loggerGlobal.error("Failed to add guarantee, error: \(error)")
 			throw FailedToAddGuarantee(underlyingError: error)
+		}
+	}
+
+	func determineFeePayer(_ state: State, reviewedTransaction: ReviewedTransaction) -> Effect<Action> {
+		if reviewedTransaction.transactionFee.totalFee.lockFee == .zero {
+			.send(.internal(.determineFeePayerResult(.success(nil))))
+		} else {
+			.run { send in
+				let result = await TaskResult {
+					try await transactionClient.determineFeePayer(.init(
+						networkId: reviewedTransaction.networkId,
+						transactionFee: reviewedTransaction.transactionFee,
+						transactionSigners: reviewedTransaction.transactionSigners,
+						signingFactors: reviewedTransaction.signingFactors,
+						signingPurpose: .signTransaction(state.signTransactionPurpose),
+						manifest: state.transactionManifest
+					))
+				}
+
+				await send(.internal(.determineFeePayerResult(result)))
+			}
 		}
 	}
 }
@@ -1154,10 +1201,12 @@ public struct TransactionReviewFailure: LocalizedError {
 
 // MARK: - ReviewedTransaction
 public struct ReviewedTransaction: Hashable, Sendable {
-	var feePayerSelection: FeePayerSelectionAmongstCandidates
 	let networkId: NetworkID
 	let transaction: TransactionKind
 
+	var feePayer: Loadable<FeePayerCandidate?> = .idle
+
+	var transactionFee: TransactionFee
 	var transactionSigners: TransactionSigners
 	var signingFactors: SigningFactors
 }
@@ -1170,52 +1219,54 @@ enum FeeValidationOutcome {
 }
 
 extension ReviewedTransaction {
-	var feePayingValidation: FeeValidationOutcome {
-		switch transaction {
-		case .nonConforming, .conforming(.accountDepositSettings):
-			return feePayerSelection.validate
+	var feePayingValidation: Loadable<FeeValidationOutcome> {
+		feePayer.map { selected in
+			switch transaction {
+			case .nonConforming, .conforming(.accountDepositSettings):
+				return selected.validateBalance(forFee: transactionFee)
 
-		case let .conforming(.general(generalTransaction)):
-			guard let feePayer = feePayerSelection.selected,
-			      let feePayerWithdraws = generalTransaction.accountWithdraws[feePayer.account.address.address]
-			else {
-				return feePayerSelection.validate
-			}
-
-			let xrdAddress = knownAddresses(networkId: networkId.rawValue).resourceAddresses.xrd
-
-			let xrdTotalTransfer: RETDecimal = feePayerWithdraws.reduce(.zero) { partialResult, resource in
-				if case let .fungible(resourceAddress, source) = resource, resourceAddress == xrdAddress {
-					return (try? partialResult.add(other: source.amount)) ?? partialResult
+			case let .conforming(.general(generalTransaction)):
+				guard let feePayer = selected,
+				      let feePayerWithdraws = generalTransaction.accountWithdraws[feePayer.account.address.address]
+				else {
+					return selected.validateBalance(forFee: transactionFee)
 				}
-				return partialResult
+
+				let xrdAddress = knownAddresses(networkId: networkId.rawValue).resourceAddresses.xrd
+
+				let xrdTotalTransfer: RETDecimal = feePayerWithdraws.reduce(.zero) { partialResult, resource in
+					if case let .fungible(resourceAddress, source) = resource, resourceAddress == xrdAddress {
+						return (try? partialResult.add(other: source.amount)) ?? partialResult
+					}
+					return partialResult
+				}
+
+				let total = xrdTotalTransfer + transactionFee.totalFee.lockFee
+
+				guard feePayer.xrdBalance >= total else {
+					// Insufficient balance to pay for withdraws and transaction fee
+					return .insufficientBalance
+				}
+
+				return .valid
 			}
-
-			let total = xrdTotalTransfer + feePayerSelection.transactionFee.totalFee.lockFee
-
-			guard feePayer.xrdBalance >= total else {
-				// Insufficient balance to pay for withdraws and transaction fee
-				return .insufficientBalance
-			}
-
-			return .valid
 		}
 	}
 }
 
-extension FeePayerSelectionAmongstCandidates {
-	var validate: FeeValidationOutcome {
+extension FeePayerCandidate? {
+	func validateBalance(forFee transactionFee: TransactionFee) -> FeeValidationOutcome {
 		if transactionFee.totalFee.lockFee == .zero {
 			// If no fee is required - valid
 			return .valid
 		}
 
-		guard let selected else {
+		guard let self else {
 			// If fee is required, but no fee payer selected - invalid
 			return .needsFeePayer
 		}
 
-		guard selected.xrdBalance >= transactionFee.totalFee.lockFee else {
+		guard self.xrdBalance >= transactionFee.totalFee.lockFee else {
 			// If insufficient balance - invalid
 			return .insufficientBalance
 		}

@@ -738,6 +738,12 @@ public enum L10n {
     /// Settings
     public static let systemSettings = L10n.tr("Localizable", "common_systemSettings", fallback: "Settings")
   }
+  public enum ConfirmMnemonicBackedUp {
+    /// Confirm you have written down the seed phrase by entering the missing words below.
+    public static let subtitle = L10n.tr("Localizable", "confirmMnemonicBackedUp_subtitle", fallback: "Confirm you have written down the seed phrase by entering the missing words below.")
+    /// Confirm Your Seed Phrase
+    public static let title = L10n.tr("Localizable", "confirmMnemonicBackedUp_title", fallback: "Confirm Your Seed Phrase")
+  }
   public enum CreateAccount {
     /// Create First Account
     public static let titleFirst = L10n.tr("Localizable", "createAccount_titleFirst", fallback: "Create First Account")

@@ -672,6 +672,8 @@ You can always change the guarantee from this default in each transaction.";
 "displayMnemonics_seedPhraseSecurityInfo" = "You are responsible for the security of your Seed Phrase";
 "displayMnemonics_backUpWarning" = "Write Down this Seed Phrase";
 "displayMnemonics_seedPhraseEntryWarning" = "Seed Phrase Entry Required";
+"confirmMnemonicBackedUp_title" = "Confirm Your Seed Phrase";
+"confirmMnemonicBackedUp_subtitle" = "Confirm you have written down the seed phrase by entering the missing words below.";
 "revealSeedPhrase_title" = "Reveal Seed Phrase";
 "revealSeedPhrase_warning" = "For your safety, make sure no one is looking at your screen. Taking a screen shot has been disabled.";
 "revealSeedPhrase_wordLabel" = "Word %d";
