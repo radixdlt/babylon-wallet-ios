@@ -5,10 +5,7 @@ struct SafariWebView: UIViewControllerRepresentable {
 	let url: URL
 
 	func makeUIViewController(context: Context) -> SFSafariViewController {
-		let sf = SFSafariViewController(url: url)
-		sf.modalPresentationStyle = .overFullScreen
-		sf.configuration.barCollapsingEnabled = true
-		return sf
+		SFSafariViewController(url: url)
 	}
 
 	func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
