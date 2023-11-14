@@ -30,9 +30,10 @@ extension TransactionReview.State {
 			viewControlState: viewControlState,
 			rawTransaction: displayMode.rawTransaction,
 			showApprovalSlider: reviewedTransaction != nil,
-			canApproveTX: canApproveTX && reviewedTransaction?.feePayingValidation == .valid,
+			canApproveTX: canApproveTX && reviewedTransaction?.feePayingValidation.wrappedValue == .valid,
 			sliderResetDate: sliderResetDate,
-			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction?.transaction != .nonConforming
+			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction?.transaction != .nonConforming,
+			viewRawTransactionButtonState: reviewedTransaction?.feePayer.isSuccess == true ? .enabled : .disabled
 		)
 	}
 
@@ -58,6 +59,7 @@ extension TransactionReview {
 		let canApproveTX: Bool
 		let sliderResetDate: Date
 		let canToggleViewMode: Bool
+		let viewRawTransactionButtonState: ControlState
 
 		var approvalSliderControlState: ControlState {
 			// TODO: Is this the logic we want?
@@ -85,6 +87,7 @@ extension TransactionReview {
 								Button(asset: AssetResource.code) {
 									viewStore.send(.showRawTransactionTapped)
 								}
+								.controlState(viewStore.viewRawTransactionButtonState)
 								.buttonStyle(.secondaryRectangular(isInToolbar: true))
 								.brightness(viewStore.rawTransaction == nil ? 0 : -0.15)
 							}
