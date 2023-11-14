@@ -123,7 +123,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 				return exportMnemonic(
 					factorSourceID: deviceFactorSource.id
 				) {
-					state.destination = .displayMnemonic(.export($0, title: L10n.RevealSeedPhrase.title))
+					state.destination = .displayMnemonic(.export($0, title: L10n.RevealSeedPhrase.title, context: .fromSettings))
 				}
 
 			case .importMissingMnemonic:
