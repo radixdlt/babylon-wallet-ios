@@ -1,7 +1,8 @@
 extension ExportMnemonic.State {
 	static func export(
 		_ input: SimplePrivateFactorSource,
-		title: String
+		title: String,
+		context: ReadonlyMode.Context
 	) -> Self {
 		self.init(
 			header: .init(
@@ -10,8 +11,8 @@ extension ExportMnemonic.State {
 			warning: L10n.RevealSeedPhrase.warning,
 			mnemonicWithPassphrase: input.mnemonicWithPassphrase,
 			readonlyMode: .init(
-				context: .fromSettings,
-				factorSourceKind: input.factorSourceID.kind
+				context: context,
+				factorSourceID: input.factorSourceID
 			)
 		)
 	}

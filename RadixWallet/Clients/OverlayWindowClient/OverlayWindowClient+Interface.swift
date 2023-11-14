@@ -89,6 +89,9 @@ extension OverlayWindowClient {
 			// FIXME: Strings
 			public static let personaHidden = Self(text: "Persona hidden")
 
+			// FIXME: Strings
+			public static let succeeded = Self(text: "Success")
+
 			public init(
 				text: String,
 				icon: Icon? = Icon(

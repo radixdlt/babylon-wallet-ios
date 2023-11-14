@@ -1156,6 +1156,8 @@
 		830EA9E92AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */; };
 		832880692AE664C30014FBF3 /* EntityFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832880682AE664C30014FBF3 /* EntityFlag.swift */; };
 		8328806C2AE6725F0014FBF3 /* AccountPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */; };
+		83856D622B0279080026452A /* VerifyMnemonic+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83856D602B0279080026452A /* VerifyMnemonic+View.swift */; };
+		83856D632B0279080026452A /* VerifyMnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83856D612B0279080026452A /* VerifyMnemonic.swift */; };
 		8338B9E52AFAB20700D1D8EA /* TransactionFee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */; };
 		83D0B5692AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */; };
 		83EE47502AF027DF00155F03 /* AssetTransferDepositRuleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */; };
@@ -2438,6 +2440,8 @@
 		830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Test.swift"; sourceTree = "<group>"; };
 		832880682AE664C30014FBF3 /* EntityFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityFlag.swift; sourceTree = "<group>"; };
 		8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPreferencesTests.swift; sourceTree = "<group>"; };
+		83856D602B0279080026452A /* VerifyMnemonic+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "VerifyMnemonic+View.swift"; sourceTree = "<group>"; };
+		83856D612B0279080026452A /* VerifyMnemonic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerifyMnemonic.swift; sourceTree = "<group>"; };
 		8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionFee.swift; sourceTree = "<group>"; };
 		83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixEngineToolkitError+Description.swift"; sourceTree = "<group>"; };
 		83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetTransferDepositRuleTests.swift; sourceTree = "<group>"; };
@@ -4044,6 +4048,7 @@
 		48CFBDE12ADC10D800E77A5C /* ImportMnemonic */ = {
 			isa = PBXGroup;
 			children = (
+				83856D642B0279100026452A /* VerifyMnemonic */,
 				48CFBDE22ADC10D800E77A5C /* OffDeviceMnemonicInfo */,
 				48CFBDE52ADC10D800E77A5C /* BIP39+Extensions.swift */,
 				48CFBDE62ADC10D800E77A5C /* ImportWord */,
@@ -6765,6 +6770,15 @@
 			path = AccountPreferencesTests;
 			sourceTree = "<group>";
 		};
+		83856D642B0279100026452A /* VerifyMnemonic */ = {
+			isa = PBXGroup;
+			children = (
+				83856D612B0279080026452A /* VerifyMnemonic.swift */,
+				83856D602B0279080026452A /* VerifyMnemonic+View.swift */,
+			);
+			path = VerifyMnemonic;
+			sourceTree = "<group>";
+		};
 		83EE474E2AF027CE00155F03 /* AssetTransferTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -7808,6 +7822,7 @@
 				48CFC3B32ADC10D900E77A5C /* HD+Root.swift in Sources */,
 				48CFC4F72ADC10DA00E77A5C /* PublicKeyHashType.swift in Sources */,
 				48CFC4AD2ADC10DA00E77A5C /* FungibleResourcesCollectionItemVaultAggregatedVaultItem.swift in Sources */,
+				83856D622B0279080026452A /* VerifyMnemonic+View.swift in Sources */,
 				48CFC4332ADC10DA00E77A5C /* Either+Extra.swift in Sources */,
 				48CFC2C72ADC10D900E77A5C /* MessageMode+View.swift in Sources */,
 				48CFC57F2ADC10DA00E77A5C /* GatewayAPI.swift in Sources */,
@@ -8606,6 +8621,7 @@
 				48CFC3382ADC10D900E77A5C /* PreviewResult.swift in Sources */,
 				48CFC4DC2ADC10DA00E77A5C /* StateEntityDetailsResponsePackageDetailsBlueprintCollectionAllOf.swift in Sources */,
 				48CFC2C82ADC10D900E77A5C /* ResourceAsset+Reducer.swift in Sources */,
+				83856D632B0279080026452A /* VerifyMnemonic.swift in Sources */,
 				48CFC5332ADC10DA00E77A5C /* StateEntityNonFungibleResourceVaultsPageRequest.swift in Sources */,
 				48CFC48A2ADC10DA00E77A5C /* OnLedgerEntitiesClient+CreateEntity.swift in Sources */,
 				48CFC32E2ADC10D900E77A5C /* OffDeviceMnemonicInfo.swift in Sources */,
