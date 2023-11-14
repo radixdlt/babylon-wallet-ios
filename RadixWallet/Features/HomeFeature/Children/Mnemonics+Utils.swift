@@ -12,7 +12,7 @@ extension ExportMnemonic.State {
 			mnemonicWithPassphrase: input.mnemonicWithPassphrase,
 			readonlyMode: .init(
 				context: context,
-				factorSourceKind: input.factorSourceID.kind
+				factorSourceID: input.factorSourceID
 			)
 		)
 	}

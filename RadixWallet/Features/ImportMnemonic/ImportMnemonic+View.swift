@@ -230,7 +230,7 @@ extension SwiftUI.View {
 	fileprivate func markMnemonicAsBackedUpAlert(with destinationStore: PresentationStoreOf<ImportMnemonic.Destinations>) -> some SwiftUI.View {
 		alert(
 			store: destinationStore,
-			state: /ImportMnemonic.Destinations.State.backupConfimartion,
+			state: /ImportMnemonic.Destinations.State.backupConfirmation,
 			action: ImportMnemonic.Destinations.Action.backupConfimartion
 		)
 	}

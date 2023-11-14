@@ -55,7 +55,7 @@ public struct VerifyMnemonic: Sendable, FeatureReducer {
 			return .none
 
 		case let .textFieldFocused(focus):
-			let done = state.enteredWords.allSatisify { !$0.isEmpty }
+			let done = state.enteredWords.allSatisfy { !$0.isEmpty }
 
 			if let focus {
 				state.focusedField = focus
