@@ -78,6 +78,7 @@ extension FungibleResourceAsset.View {
 				}
 			}
 			.padding(.medium3)
+			.alert(store: store.scope(state: \.$alert, action: { .view(.alertAction($0)) }))
 		}
 	}
 }
