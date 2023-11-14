@@ -46,7 +46,7 @@ public struct FactorSourcesClient: Sendable {
 extension FactorSourcesClient {
 	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 	public typealias GetMainDeviceFactorSource = @Sendable () async throws -> DeviceFactorSource
-	public typealias CreateNewMainDeviceFactorSource = @Sendable (_ saveIntoProfile: Bool) async throws -> PrivateHDFactorSource
+	public typealias CreateNewMainDeviceFactorSource = @Sendable () async throws -> PrivateHDFactorSource
 	public typealias GetFactorSources = @Sendable () async throws -> FactorSources
 	public typealias FactorSourcesAsyncSequence = @Sendable () async -> AnyAsyncSequence<FactorSources>
 	public typealias AddPrivateHDFactorSource = @Sendable (AddPrivateHDFactorSourceRequest) async throws -> FactorSourceID
@@ -92,8 +92,8 @@ public struct GetSigningFactorsRequest: Sendable, Hashable {
 }
 
 extension FactorSourcesClient {
-	public func createNewMainBDFS(saveIntoProfile: Bool) async throws -> PrivateHDFactorSource {
-		try await createNewMainDeviceFactorSource(saveIntoProfile)
+	public func createNewMainBDFS() async throws -> PrivateHDFactorSource {
+		try await createNewMainDeviceFactorSource()
 	}
 
 	public func getFactorSource(
@@ -194,7 +194,7 @@ extension DeviceFactorSource {
 }
 
 extension FactorSourcesClient {
-	public func newMainBDFS(_ newMainBDFS: NewMainBDFS) async throws {
+	public func saveNewMainBDFS(_ newMainBDFS: NewMainBDFS) async throws {
 		@Dependency(\.entitiesVisibilityClient) var entitiesVisibilityClient
 		let oldMainBDFSSources = try await getFactorSources(type: DeviceFactorSource.self).filter(\.isExplicitMainBDFS)
 		for oldMainBDFS in oldMainBDFSSources {

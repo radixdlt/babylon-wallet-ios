@@ -43,6 +43,10 @@ extension DeviceFactorSource {
 }
 
 extension DeviceFactorSource {
+	public var flags: OrderedSet<FactorSourceFlag> {
+		common.flags
+	}
+
 	public mutating func flagAsMain() {
 		common.flagAsMain()
 	}

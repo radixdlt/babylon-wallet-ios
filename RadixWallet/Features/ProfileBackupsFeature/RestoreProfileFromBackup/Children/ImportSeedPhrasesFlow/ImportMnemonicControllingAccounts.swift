@@ -7,6 +7,15 @@ public struct NewMainBDFS: Sendable, Hashable {
 	public let newMainBDFS: DeviceFactorSource
 	public let idsOfAccountsToHide: [Profile.Network.Account.ID]
 	public let idsOfPersonasToHide: [Profile.Network.Persona.ID]
+	public init(
+		newMainBDFS: DeviceFactorSource,
+		idsOfAccountsToHide: [Profile.Network.Account.ID],
+		idsOfPersonasToHide: [Profile.Network.Persona.ID]
+	) {
+		self.newMainBDFS = newMainBDFS
+		self.idsOfAccountsToHide = idsOfAccountsToHide
+		self.idsOfPersonasToHide = idsOfPersonasToHide
+	}
 }
 
 // MARK: - ImportMnemonicControllingAccounts
@@ -150,9 +159,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			loggerGlobal.notice("Skipping BDFS! Generating a new one and hiding affected accounts/personas.")
 			return .run { [entitiesControlledByFactorSource = state.entitiesControlledByFactorSource] send in
 				loggerGlobal.info("Generating mnemonic for new main BDFS")
-				let newBDFS = try await factorSourcesClient.createNewMainBDFS(
-					saveIntoProfile: false // snapshot! cannot save it yet.
-				)
+				let newBDFS = try await factorSourcesClient.createNewMainBDFS()
 				let accountsToHide = entitiesControlledByFactorSource.accounts
 				let personasToHide = entitiesControlledByFactorSource.personas
 				loggerGlobal.info("Delegating done with creating new BDFS (skipped old)")

@@ -232,6 +232,10 @@ public func withTestClients<R>(
 private func configureTestClients(
 	_ d: inout DependencyValues
 ) {
+	d.device.$name = "Test"
+	d.device.$model = "Test"
+	d.entitiesVisibilityClient.hideAccounts = { _ in }
+	d.entitiesVisibilityClient.hidePersonas = { _ in }
 	d.uuid = .incrementing
 	d.date = .constant(Date(timeIntervalSince1970: 0))
 	d.mnemonicClient.generate = { _, _ in .testValue }
@@ -242,6 +246,7 @@ private func configureTestClients(
 	d.secureStorageClient.saveProfileHeaderList = { _ in }
 	d.secureStorageClient.deleteDeprecatedDeviceID = {}
 	d.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { _, _ in }
+	d.secureStorageClient.deleteMnemonicByFactorSourceID = { _ in }
 	d.secureStorageClient.saveMnemonicForFactorSource = { _ in }
 	d.secureStorageClient.saveProfileSnapshot = { _ in }
 	d.secureStorageClient.loadProfileSnapshotData = { _ in nil }

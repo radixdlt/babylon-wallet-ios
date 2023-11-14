@@ -102,7 +102,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 				try await backupsClient.importSnapshot(profileSelection.snapshot, fromCloud: profileSelection.isInCloud)
 
 				if let newMainBDFS {
-					try await factorSourcesClient.newMainBDFS(newMainBDFS)
+					try await factorSourcesClient.saveNewMainBDFS(newMainBDFS)
 				}
 
 				await send(.delegate(.profileImported(

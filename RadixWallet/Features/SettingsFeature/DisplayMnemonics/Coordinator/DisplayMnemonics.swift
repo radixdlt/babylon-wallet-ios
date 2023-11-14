@@ -158,7 +158,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 				if let newBDFS {
 					return .run { _ in
-						try await factorSourcesClient.newMainBDFS(newBDFS)
+						try await factorSourcesClient.saveNewMainBDFS(newBDFS)
 					}
 				} else {
 					return .none

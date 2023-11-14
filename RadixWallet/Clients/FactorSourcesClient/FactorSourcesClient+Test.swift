@@ -27,7 +27,7 @@ extension FactorSourcesClient: TestDependencyKey {
 	public static let noop = Self(
 		getCurrentNetworkID: { .kisharnet },
 		getMainDeviceFactorSource: { throw NoopError() },
-		createNewMainDeviceFactorSource: { _ in throw NoopError() },
+		createNewMainDeviceFactorSource: { throw NoopError() },
 		getFactorSources: { throw NoopError() },
 		factorSourcesAsyncSequence: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		addPrivateHDFactorSource: { _ in throw NoopError() },

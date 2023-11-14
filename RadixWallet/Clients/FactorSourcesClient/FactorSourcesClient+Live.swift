@@ -87,7 +87,7 @@ extension FactorSourcesClient: DependencyKey {
 					}
 				}
 			},
-			createNewMainDeviceFactorSource: { saveIntoProfile in
+			createNewMainDeviceFactorSource: {
 				@Dependency(\.uuid) var uuid
 				@Dependency(\.date) var date
 				@Dependency(\.device) var device
@@ -115,7 +115,7 @@ extension FactorSourcesClient: DependencyKey {
 				_ = try await addPrivateHDFactorSource(.init(
 					factorSource: newBDFS.embed(),
 					mnemonicWithPasshprase: mnemonicWithPassphrase,
-					saveIntoProfile: saveIntoProfile
+					saveIntoProfile: false
 				))
 
 				return try PrivateHDFactorSource(

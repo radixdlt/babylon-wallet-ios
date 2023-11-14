@@ -209,7 +209,7 @@ public struct Home: Sendable, FeatureReducer {
 				var effect = Effect<Action>.none
 				if let newMain {
 					effect = .run { _ in
-						try await factorSourcesClient.newMainBDFS(newMain)
+						try await factorSourcesClient.saveNewMainBDFS(newMain)
 					}
 				}
 				if !imported.isEmpty {
