@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - CustomizeFees
-public struct CustomizeFees: FeatureReducer {
+public struct CustomizeFees: FeatureReducer, Sendable {
 	public struct State: Hashable, Sendable {
 		enum CustomizationModeState: Hashable, Sendable {
 			case normal(NormalFeesCustomization.State)
@@ -27,7 +27,7 @@ public struct CustomizeFees: FeatureReducer {
 		}
 
 		@PresentationState
-		public var destination: Destination_.State? = nil
+		public var destination: Destination.State? = nil
 
 		init(
 			reviewedTransaction: ReviewedTransaction,
@@ -60,7 +60,7 @@ public struct CustomizeFees: FeatureReducer {
 		case updated(TaskResult<ReviewedTransaction>)
 	}
 
-	public struct Destination_: DestinationReducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case selectFeePayer(SelectFeePayer.State)
 		}
@@ -91,10 +91,12 @@ public struct CustomizeFees: FeatureReducer {
 		}
 
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.destination) {
-				Destination_()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -114,7 +116,29 @@ public struct CustomizeFees: FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .destination(.presented(.selectFeePayer(.delegate(.selected(selection))))):
+		case let .advancedFeesCustomization(.delegate(.updated(advancedFees))):
+			state.reviewedTransaction.transactionFee.mode = .advanced(advancedFees)
+			return .send(.delegate(.updated(state.reviewedTransaction)))
+		default:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .updated(.success(reviewedTransaction)):
+			state.reviewedTransaction = reviewedTransaction
+			state.modeState = state.reviewedTransaction.transactionFee.customizationModeState
+			return .send(.delegate(.updated(state.reviewedTransaction)))
+		case let .updated(.failure(error)):
+			errorQueue.schedule(error)
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .selectFeePayer(.delegate(.selected(selection))):
 			let previousFeePayer = state.feePayer
 			state.destination = nil
 			let signingPurpose = state.signingPurpose
@@ -167,22 +191,8 @@ public struct CustomizeFees: FeatureReducer {
 			}
 
 			return replaceFeePayer(selection, state.reviewedTransaction, manifest: state.manifest)
-		case let .advancedFeesCustomization(.delegate(.updated(advancedFees))):
-			state.reviewedTransaction.transactionFee.mode = .advanced(advancedFees)
-			return .send(.delegate(.updated(state.reviewedTransaction)))
-		default:
-			return .none
-		}
-	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
-		case let .updated(.success(reviewedTransaction)):
-			state.reviewedTransaction = reviewedTransaction
-			state.modeState = state.reviewedTransaction.transactionFee.customizationModeState
-			return .send(.delegate(.updated(state.reviewedTransaction)))
-		case let .updated(.failure(error)):
-			errorQueue.schedule(error)
+		default:
 			return .none
 		}
 	}

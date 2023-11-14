@@ -63,10 +63,12 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			.forEach(\.deviceFactorSources, action: /Action.child .. ChildAction.row) {
 				DisplayEntitiesControlledByMnemonic()
 			}
-			.ifLet(\.$destination, action: /Action.destination) {
+			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {

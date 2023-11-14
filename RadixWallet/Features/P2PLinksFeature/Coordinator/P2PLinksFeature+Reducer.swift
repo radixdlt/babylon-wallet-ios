@@ -73,10 +73,12 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 			.forEach(\.links, action: /Action.child .. ChildAction.connection) {
 				P2PLinkRow()
 			}
-			.ifLet(\.$destination, action: /Action.destination) {
+			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
