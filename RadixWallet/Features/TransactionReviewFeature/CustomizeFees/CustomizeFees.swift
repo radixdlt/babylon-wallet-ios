@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - CustomizeFees
-public struct CustomizeFees: FeatureReducer {
+public struct CustomizeFees: FeatureReducer, Sendable {
 	public struct State: Hashable, Sendable {
 		enum CustomizationModeState: Hashable, Sendable {
 			case normal(NormalFeesCustomization.State)
@@ -91,10 +91,12 @@ public struct CustomizeFees: FeatureReducer {
 		}
 
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.destination) {
+			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {

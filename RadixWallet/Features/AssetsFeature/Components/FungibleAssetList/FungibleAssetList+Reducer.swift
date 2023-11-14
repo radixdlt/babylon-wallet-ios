@@ -45,10 +45,12 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 			.forEach(\.sections, action: /Action.child .. ChildAction.section) {
 				FungibleAssetList.Section()
 			}
-			.ifLet(\.$destination, action: /Action.destination) {
+			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {

@@ -76,10 +76,12 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 			.forEach(\.personas, action: /Action.child .. ChildAction.persona) {
 				PersonaDataPermissionBox()
 			}
-			.ifLet(\.$destination, action: /Action.destination) {
+			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {

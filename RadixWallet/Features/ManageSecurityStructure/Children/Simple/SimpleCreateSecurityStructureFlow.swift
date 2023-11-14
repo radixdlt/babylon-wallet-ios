@@ -76,10 +76,12 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.destination) {
+			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	private func choseConfirmerOfNewPhone(
 		_ factorSource: SecurityQuestionsFactorSource,

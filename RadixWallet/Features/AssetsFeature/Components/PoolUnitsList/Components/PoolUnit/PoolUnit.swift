@@ -54,15 +54,14 @@ public struct PoolUnit: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.destination) {
+			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
 	}
 
-	public func reduce(
-		into state: inout State,
-		viewAction: ViewAction
-	) -> Effect<Action> {
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .didTap:
 			guard case let .success(details) = state.resourceDetails else {

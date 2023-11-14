@@ -327,10 +327,12 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			.forEach(\.words, action: /Action.child .. ChildAction.word) {
 				ImportMnemonicWord()
 			}
-			.ifLet(\.$destination, action: /Action.destination) {
+			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
