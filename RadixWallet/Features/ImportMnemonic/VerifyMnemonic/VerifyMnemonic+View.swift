@@ -7,7 +7,7 @@ extension VerifyMnemonic.State {
 			let isConfirmationWord = wordsToConfirm.contains(word)
 			return VerifyMnemonic.ViewState.WordViewState(
 				word: word,
-				placeholder: isConfirmationWord ? "" : "•••••",
+				placeholder: isConfirmationWord ? "" : "••••",
 				isDisabled: !isConfirmationWord,
 				displayText: {
 					if let confirmationWord = enteredWords[id: word.id]?.element {

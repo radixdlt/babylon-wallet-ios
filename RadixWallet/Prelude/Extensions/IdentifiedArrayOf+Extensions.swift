@@ -12,24 +12,6 @@ extension Collection {
 	}
 }
 
-extension Collection where Element: Identifiable {
-	public func identified() throws -> IdentifiedArrayOf<Element> {
-		guard Set(map(\.id)).count == count else {
-			throw IdentifiedArrayError.clashingIDs
-		}
-		return .init(uniqueElements: self)
-	}
-
-	public func uniqueIdentified() -> IdentifiedArrayOf<Element> {
-		.init(uncheckedUniqueElements: self)
-	}
-}
-
-// MARK: - IdentifiedArrayError
-public enum IdentifiedArrayError: Error {
-	case clashingIDs
-}
-
 // MARK: - OffsetIdentified
 public struct OffsetIdentified<Element>: Identifiable {
 	public var id: Int { offset }
@@ -46,3 +28,7 @@ extension OffsetIdentified: Hashable where Element: Hashable {}
 
 // MARK: Sendable
 extension OffsetIdentified: Sendable where Element: Sendable {}
+
+extension OffsetIdentified where Element: Collection {
+	var isEmpty: Bool { element.isEmpty }
+}

@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - DisplayMnemonic
 public struct VerifyMnemonic: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public static let numberOfWordsToConfirm = 3
+		public static let numberOfRandomWordsToConfirm = 3
 
 		public let mnemonic: Mnemonic
 		public let wordsToConfirm: NonEmpty<IdentifiedArrayOf<OffsetIdentified<Mnemonic.Word>>>
@@ -17,16 +17,18 @@ public struct VerifyMnemonic: Sendable, FeatureReducer {
 
 			let identifiedWords = mnemonic.words.identifiablyEnumerated()
 			let checksumWord = identifiedWords.last!
-			let randomWords = identifiedWords
+			var randomWords = identifiedWords
 				.dropLast() // without checksum word
 				.shuffled() // randomize
-				.prefix(Self.numberOfWordsToConfirm) // take the required number of words
+				.prefix(Self.numberOfRandomWordsToConfirm) // take the required number of words
 				.sorted { $0.offset < $1.offset } // sort after shuffling
+			randomWords.append(checksumWord)
 
-			self.wordsToConfirm = .init(randomWords + [checksumWord])!
+			self.wordsToConfirm = .init(randomWords)!
 			self.enteredWords = wordsToConfirm.rawValue.map {
 				OffsetIdentified(offset: $0.offset, element: "")
 			}.asIdentifiable()
+
 			self.focusedField = wordsToConfirm.first?.offset
 		}
 	}
@@ -51,24 +53,21 @@ public struct VerifyMnemonic: Sendable, FeatureReducer {
 			state.invalidMnemonic = false
 			state.enteredWords.updateOrAppend(identifiedWord)
 			return .none
-		case let .textFieldFocused(focus):
-			// Don't set focus to nil if it will be changed to another field
-			if focus == nil {
-				let didEnterAllWords = state.enteredWords.reduce(true) { partialResult, word in
-					partialResult && !word.element.isEmpty
-				}
 
-				if didEnterAllWords {
-					state.focusedField = nil
-				}
-				return .none
+		case let .textFieldFocused(focus):
+			let done = state.enteredWords.allSatisify { !$0.isEmpty }
+
+			if let focus {
+				state.focusedField = focus
+			} else if done {
+				state.focusedField = nil
 			}
-			state.focusedField = focus
+
 			return .none
 
 		case .wordSubmitted:
 			let nextWord = state.enteredWords.first { word in
-				word.element.isEmpty
+				word.isEmpty
 			}
 			state.focusedField = nextWord?.offset
 			return .none
