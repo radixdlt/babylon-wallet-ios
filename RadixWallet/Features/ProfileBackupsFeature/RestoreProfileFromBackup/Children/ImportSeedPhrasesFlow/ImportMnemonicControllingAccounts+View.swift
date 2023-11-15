@@ -82,10 +82,15 @@ extension ImportMnemonicControllingAccounts {
 						}
 					}
 				)
-				.alert(
+				.sheet(
 					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /ImportMnemonicControllingAccounts.Destinations.State.confirmSkipBDFS,
-					action: ImportMnemonicControllingAccounts.Destinations.Action.confirmSkipBDFS
+					state: /ImportMnemonicControllingAccounts.Destinations.State.confirmSkippingBDFS,
+					action: ImportMnemonicControllingAccounts.Destinations.Action.confirmSkippingBDFS,
+					content: { store_ in
+						NavigationStack {
+							ConfirmSkippingBDFS.View(store: store_)
+						}
+					}
 				)
 			}
 		}

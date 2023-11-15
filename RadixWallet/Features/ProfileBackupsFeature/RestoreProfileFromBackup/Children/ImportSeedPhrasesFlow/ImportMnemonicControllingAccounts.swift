@@ -68,24 +68,21 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case importMnemonic(ImportMnemonic.State)
-			case confirmSkipBDFS(AlertState<Action.ConfirmSkipBDFS>)
+			case confirmSkippingBDFS(ConfirmSkippingBDFS.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case importMnemonic(ImportMnemonic.Action)
 			/// **B**abylon **D**evice **F**actor **S**ource
-			case confirmSkipBDFS(ConfirmSkipBDFS)
-
-			/// **B**abylon **D**evice **F**actor **S**ource
-			public enum ConfirmSkipBDFS: Sendable, Hashable {
-				case confirmTapped
-				case cancelTapped
-			}
+			case confirmSkippingBDFS(ConfirmSkippingBDFS.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
 			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
 				ImportMnemonic()
+			}
+			Scope(state: /State.confirmSkippingBDFS, action: /Action.confirmSkippingBDFS) {
+				ConfirmSkippingBDFS()
 			}
 		}
 	}
@@ -120,7 +117,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 
 		case .skip:
 			if state.isMainBDFS {
-				state.destination = .confirmSkipBDFS(.confirmSkipBDFS())
+				state.destination = .confirmSkippingBDFS(.init())
 				return .none
 			} else {
 				return .send(.delegate(.skippedMnemonic(state.entitiesControlledByFactorSource.factorSourceID)))
@@ -155,7 +152,11 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 				preconditionFailure("Incorrect implementation")
 			}
 
-		case .destination(.presented(.confirmSkipBDFS(.confirmTapped))):
+		case .destination(.presented(.confirmSkippingBDFS(.delegate(.cancel)))):
+			state.destination = nil
+			return .none
+
+		case .destination(.presented(.confirmSkippingBDFS(.delegate(.confirmed)))):
 			loggerGlobal.notice("Skipping BDFS! Generating a new one and hiding affected accounts/personas.")
 			return .run { [entitiesControlledByFactorSource = state.entitiesControlledByFactorSource] send in
 				loggerGlobal.info("Generating mnemonic for new main BDFS")
@@ -246,19 +247,19 @@ extension OverlayWindowClient.Item.HUD {
 	)
 }
 
-extension AlertState<ImportMnemonicControllingAccounts.Destinations.Action.ConfirmSkipBDFS> {
-	static func confirmSkipBDFS() -> AlertState {
-		AlertState {
-			TextState("Sure?")
-		} actions: {
-			ButtonState(role: .destructive, action: .confirmTapped) {
-				TextState(L10n.Common.remove)
-			}
-			ButtonState(role: .cancel, action: .cancelTapped) {
-				TextState(L10n.Common.cancel)
-			}
-		} message: {
-			TextState("Sure?!")
-		}
-	}
-}
+// extension AlertState<ImportMnemonicControllingAccounts.Destinations.Action.ConfirmSkipBDFS> {
+// 	static func confirmSkippingBDFS() -> AlertState {
+// 		AlertState {
+// 			TextState("Sure?")
+// 		} actions: {
+// 			ButtonState(role: .destructive, action: .confirmTapped) {
+// 				TextState(L10n.Common.remove)
+// 			}
+// 			ButtonState(role: .cancel, action: .cancelTapped) {
+// 				TextState(L10n.Common.cancel)
+// 			}
+// 		} message: {
+// 			TextState("Sure?!")
+// 		}
+// 	}
+// }
