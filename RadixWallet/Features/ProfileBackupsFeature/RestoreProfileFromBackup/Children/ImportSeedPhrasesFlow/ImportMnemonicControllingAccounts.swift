@@ -1,23 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - NewMainBDFS
-/// **B**abylon **D**evice **F**actor **S**ource
-public struct NewMainBDFS: Sendable, Hashable {
-	public var newMainBDFS: DeviceFactorSource
-	public let idsOfAccountsToHide: [Profile.Network.Account.ID]
-	public let idsOfPersonasToHide: [Profile.Network.Persona.ID]
-	public init(
-		newMainBDFS: DeviceFactorSource,
-		idsOfAccountsToHide: [Profile.Network.Account.ID],
-		idsOfPersonasToHide: [Profile.Network.Persona.ID]
-	) {
-		self.newMainBDFS = newMainBDFS
-		self.idsOfAccountsToHide = idsOfAccountsToHide
-		self.idsOfPersonasToHide = idsOfPersonasToHide
-	}
-}
-
 // MARK: - ImportMnemonicControllingAccounts
 public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
@@ -58,7 +41,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case persistedMnemonicInKeychain(FactorSourceID.FromHash)
 		case skippedMnemonic(FactorSourceID.FromHash)
-		case createdNewMainBDFS(oldSkipped: FactorSourceID.FromHash, NewMainBDFS)
+		case createdNewMainBDFS(oldSkipped: FactorSourceID.FromHash, DeviceFactorSource)
 		case failedToSaveInKeychain(FactorSourceID.FromHash)
 	}
 
@@ -165,17 +148,11 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			state.destination = nil
 			return .run { [entitiesControlledByFactorSource = state.entitiesControlledByFactorSource] send in
 				loggerGlobal.info("Generating mnemonic for new main BDFS")
-				let newBDFS = try await factorSourcesClient.createNewMainBDFS()
-				let accountsToHide = entitiesControlledByFactorSource.accounts
-				let personasToHide = entitiesControlledByFactorSource.personas
+				let newMainBDFS = try await factorSourcesClient.createNewMainBDFS()
 				loggerGlobal.info("Delegating done with creating new BDFS (skipped old)")
 				await send(.delegate(.createdNewMainBDFS(
 					oldSkipped: entitiesControlledByFactorSource.factorSourceID,
-					.init(
-						newMainBDFS: newBDFS.factorSource,
-						idsOfAccountsToHide: accountsToHide.map(\.id),
-						idsOfPersonasToHide: personasToHide.map(\.id)
-					)
+					newMainBDFS.factorSource
 				)))
 			} catch: { error, _ in
 				loggerGlobal.critical("Failed to create new main BDFS error: \(error)")

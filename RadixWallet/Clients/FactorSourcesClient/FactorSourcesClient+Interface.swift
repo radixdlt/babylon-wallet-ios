@@ -194,15 +194,14 @@ extension DeviceFactorSource {
 }
 
 extension FactorSourcesClient {
-	public func saveNewMainBDFS(_ newMainBDFS: NewMainBDFS) async throws {
-		@Dependency(\.entitiesVisibilityClient) var entitiesVisibilityClient
+	public func saveNewMainBDFS(_ newMainBDFS: DeviceFactorSource) async throws {
 		let oldMainBDFSSources = try await getFactorSources(type: DeviceFactorSource.self).filter(\.isExplicitMainBDFS)
+
 		for oldMainBDFS in oldMainBDFSSources {
 			try await updateFactorSource(oldMainBDFS.removingMainFlag().embed())
 		}
-		try await saveFactorSource(newMainBDFS.newMainBDFS.embed())
-		try await entitiesVisibilityClient.hideAccounts(ids: newMainBDFS.idsOfAccountsToHide)
-		try await entitiesVisibilityClient.hidePersonas(ids: newMainBDFS.idsOfPersonasToHide)
+
+		try await saveFactorSource(newMainBDFS.embed())
 	}
 
 	public func addOffDeviceFactorSource(

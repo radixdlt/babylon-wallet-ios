@@ -203,20 +203,14 @@ public struct Home: Sendable, FeatureReducer {
 		case let .destination(.presented(.importMnemonics(.delegate(delegateAction)))):
 			state.destination = nil
 			switch delegateAction {
-			case .finishedEarly:
-				return .none
-			case let .finishedImportingMnemonics(_, imported, newMain):
-				var effect = Effect<Action>.none
-				if let newMain {
-					effect = .run { _ in
-						try await factorSourcesClient.saveNewMainBDFS(newMain)
-					}
-				}
+			case .finishedEarly: break
+			case let .finishedImportingMnemonics(_, imported, newMainBDFS):
+				assert(newMainBDFS == nil, "Discrepancy, should not have been able to create new BDFS from outside of onboarding.")
 				if !imported.isEmpty {
-					effect = effect.concatenate(with: checkAccountsAccessToMnemonic(state: state))
+					return checkAccountsAccessToMnemonic(state: state)
 				}
-				return effect
 			}
+			return .none
 
 		default:
 			return .none

@@ -26,7 +26,8 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		public var mnemonicsLeftToImport: IdentifiedArrayOf<ImportMnemonicControllingAccounts.State> = []
 		public var imported: OrderedSet<SkippedOrImported> = []
 		public var skipped: OrderedSet<SkippedOrImported> = []
-		public var newMainBDFS: NewMainBDFS?
+		public var newMainBDFS: DeviceFactorSource?
+
 		public enum Context: Sendable, Hashable {
 			case fromOnboarding(profileSnapshot: ProfileSnapshot)
 			case notOnboarding
@@ -35,6 +36,13 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 				switch self {
 				case let .fromOnboarding(profileSnapshot): profileSnapshot
 				case .notOnboarding: nil
+				}
+			}
+
+			var isFromOnboarding: Bool {
+				switch self {
+				case .fromOnboarding: true
+				case .notOnboarding: false
 				}
 			}
 		}
@@ -77,14 +85,21 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadControlledEntities(TaskResult<IdentifiedArrayOf<EntitiesControlledByFactorSource>>)
+		case loadedToImport(TaskResult<ToImport>)
+	}
+
+	public struct ToImport: Sendable, Equatable {
+		let factorSourcesControllingEntities: IdentifiedArrayOf<EntitiesControlledByFactorSource>
+
+		/// Profiles before App Version 1.2 did not have the `main` FactorSourceFlag on their BDFS.
+		let hasAnyBDFSExplicitlyMarkedMain: Bool
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case finishedImportingMnemonics(
 			skipped: OrderedSet<SkippedOrImported>,
 			imported: OrderedSet<SkippedOrImported>,
-			newMainBDFS: NewMainBDFS?
+			newMainBDFS: DeviceFactorSource?
 		)
 
 		case finishedEarly(dueToFailure: Bool)
@@ -115,15 +130,16 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		switch viewAction {
 		case .onFirstTask:
 			.run { [context = state.context] send in
-				await send(.internal(.loadControlledEntities(TaskResult {
+				await send(.internal(.loadedToImport(TaskResult {
 					let snapshot = if let fromOnboarding = context.profileSnapshotFromOnboarding {
 						fromOnboarding
 					} else {
 						try await backupsClient.snapshotOfProfileForExport()
 					}
 					let ents = try await deviceFactorSourceClient.controlledEntities(snapshot)
+					let hasAnyBDFSExplicitlyMarkedMain = ents.contains(where: \.isExplicitMain)
 					try? await clock.sleep(for: .milliseconds(200))
-					return ents.compactMap { ent in
+					let factorSourcesControllingEntities: IdentifiedArrayOf<EntitiesControlledByFactorSource> = ents.compactMap { ent in
 						let hasAccessToMnemonic = secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(ent.factorSourceID)
 						return if hasAccessToMnemonic {
 							nil // exclude this mnemonic from mnemonics to import, already present,.
@@ -131,6 +147,11 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 							ent // user does not have access to this, needs importing.
 						}
 					}.asIdentifiable()
+
+					return ToImport(
+						factorSourcesControllingEntities: factorSourcesControllingEntities,
+						hasAnyBDFSExplicitlyMarkedMain: hasAnyBDFSExplicitlyMarkedMain
+					)
 				})))
 			}
 		case .closeButtonTapped:
@@ -140,14 +161,14 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadControlledEntities(.failure(error)):
+		case let .loadedToImport(.failure(error)):
 			// FIXME: Error handling...?
 			loggerGlobal.error("Failed to load entities controlled by profile snapshot")
 			errorQueue.schedule(error)
 			return .none
 
-		case let .loadControlledEntities(.success(factorSourcesControllingEntities)):
-			let ents = factorSourcesControllingEntities.sorted().asIdentifiable()
+		case let .loadedToImport(.success(toImport)):
+			let ents = toImport.factorSourcesControllingEntities.sorted().asIdentifiable()
 			var mnemonicsLeftToImport = ents.map {
 				ImportMnemonicControllingAccounts.State(
 					entitiesControlledByFactorSource: $0,
@@ -162,9 +183,13 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 					assertionFailure("DISCREPANCY, more than one Main BDFS, this should not happen.")
 				}
 			} else {
-				// No explicit BDFS, needs to treat first Babylon device factor source as implicit main
+				// Did not find **explicit** `main` BDFS among mnemonics to import =>
+				// must check if we need to treat first Babylon device factor source as implicit main
 				if let firstBabylonDeviceFactorSource = ents.filter(\.isBDFS).first {
-					mnemonicsLeftToImport[id: firstBabylonDeviceFactorSource.id]?.isMainBDFS = true
+					// Only if we dont have ANY **explicit** `main` we treat the first BDFS to import
+					// as implicit main (pre-1.2.0 version of the App BDFS (Profile)).
+					let treatAsImplicitMain = !toImport.hasAnyBDFSExplicitlyMarkedMain
+					mnemonicsLeftToImport[id: firstBabylonDeviceFactorSource.id]?.isMainBDFS = treatAsImplicitMain
 				} else {
 					assertionFailure("DISCREPANCY, no babylon device factor source, invalid profile.")
 				}
@@ -180,7 +205,13 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(delegateAction)))):
 			switch delegateAction {
 			case let .createdNewMainBDFS(skipped, newMainBDFS):
-				state.newMainBDFS = newMainBDFS
+				if state.context.isFromOnboarding {
+					state.newMainBDFS = newMainBDFS
+				} else {
+					let errorMessage = "DISCREPANCY! We should not have been able to create a new BDFS outside of onboarding."
+					loggerGlobal.critical(.init(stringLiteral: errorMessage))
+					assertionFailure(errorMessage)
+				}
 				state.skipped.append(.init(factorSourceID: skipped))
 				return finishedWith(factorSourceID: skipped, state: &state)
 
