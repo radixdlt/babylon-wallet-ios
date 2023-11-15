@@ -169,7 +169,7 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 				.cornerRadius(.small2)
 				.overlay(
 					RoundedRectangle(cornerRadius: .small2)
-						.stroke(accentColor(border: true), lineWidth: 1)
+						.stroke(accentColor(border: !isEnabled), lineWidth: 1)
 				)
 
 				hint

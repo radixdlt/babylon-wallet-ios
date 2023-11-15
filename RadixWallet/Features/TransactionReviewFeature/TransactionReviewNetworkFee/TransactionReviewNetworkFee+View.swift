@@ -19,29 +19,31 @@ extension TransactionReviewNetworkFee {
 							.sectionHeading
 							.textCase(.uppercase)
 
-						//	FIXME: Uncomment and implement
-						//	TransactionReviewInfoButton {
-						//	viewStore.send(.infoTapped)
-						//	}
+						//    FIXME: Uncomment and implement
+						//    TransactionReviewInfoButton {
+						//    viewStore.send(.infoTapped)
+						//    }
 
 						Spacer(minLength: 0)
 
-						Text(viewStore.reviewedTransaction.feePayerSelection.transactionFee.totalFee.displayedTotalFee)
+						Text(viewStore.reviewedTransaction.transactionFee.totalFee.displayedTotalFee)
 							.textStyle(.body1HighImportance)
 							.foregroundColor(.app.gray1)
 					}
 
-					if case .needsFeePayer = viewStore.reviewedTransaction.feePayingValidation {
-						WarningErrorView(text: L10n.TransactionReview.feePayerRequiredMessage, type: .warning)
-					} else if case .insufficientBalance = viewStore.reviewedTransaction.feePayingValidation {
-						WarningErrorView(text: L10n.TransactionReview.insufficientBalance, type: .error)
-					}
+					loadable(viewStore.reviewedTransaction.feePayingValidation) { validation in
+						if case .needsFeePayer = validation {
+							WarningErrorView(text: L10n.TransactionReview.feePayerRequiredMessage, type: .warning)
+						} else if case .insufficientBalance = validation {
+							WarningErrorView(text: L10n.TransactionReview.insufficientBalance, type: .error)
+						}
 
-					Button(L10n.TransactionReview.NetworkFee.customizeButtonTitle) {
-						viewStore.send(.customizeTapped)
+						Button(L10n.TransactionReview.NetworkFee.customizeButtonTitle) {
+							viewStore.send(.customizeTapped)
+						}
+						.textStyle(.body1StandaloneLink)
+						.foregroundColor(.app.blue2)
 					}
-					.textStyle(.body1StandaloneLink)
-					.foregroundColor(.app.blue2)
 				}
 			}
 		}
