@@ -227,7 +227,7 @@ extension Color {
 	}
 
 	public static func randomDark(seed: Data?) -> Self {
-		random(range: 10 ... 128, seed: seed)
+		random(range: 40 ... 128, seed: seed)
 	}
 
 	public static func randomLight(seed: Data?) -> Self {
