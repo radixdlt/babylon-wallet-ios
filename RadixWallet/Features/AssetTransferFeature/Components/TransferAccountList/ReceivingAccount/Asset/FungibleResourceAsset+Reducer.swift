@@ -25,7 +25,7 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 		// MARK: - Mutable state
 
 		@PresentationState
-		public var alert: AlertState<ViewAction.AlertAction>?
+		public var alert: AlertState<ViewAction.Alert>?
 
 		public var transferAmountStr: String = ""
 		public var transferAmount: RETDecimal? = nil
@@ -48,9 +48,9 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 		case focusChanged(Bool)
 		case removeTapped
 
-		case alertAction(PresentationAction<AlertAction>)
+		case alert(PresentationAction<Alert>)
 
-		public enum AlertAction: Hashable, Sendable {
+		public enum Alert: Hashable, Sendable {
 			case chooseXRDAmountAlert(ChooseXRDAmountAlert)
 			case needsToPayFeeFromOtherAccount(NeedsToPayFeeFromOtherAccount)
 
@@ -111,7 +111,7 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 		case .removeTapped:
 			return .send(.delegate(.removed))
 
-		case let .alertAction(action):
+		case let .alert(action):
 			state.alert = nil
 			switch action {
 			case let .presented(.chooseXRDAmountAlert(.deductFee(amount))),
@@ -131,19 +131,19 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 	}
 }
 
-extension AlertState where Action == FungibleResourceAsset.ViewAction.AlertAction {
+extension AlertState where Action == FungibleResourceAsset.ViewAction.Alert {
 	fileprivate static func chooseXRDAmount(feeDeductedAmount: RETDecimal, maxAmount: RETDecimal) -> Self {
-		.init(
-			title: .init(L10n.AssetTransfer.MaxAmountDialog.title),
-			message: .init(L10n.AssetTransfer.MaxAmountDialog.body),
+		AlertState(
+			title: TextState(L10n.AssetTransfer.MaxAmountDialog.title),
+			message: TextState(L10n.AssetTransfer.MaxAmountDialog.body),
 			buttons:
 			[
-				.default(
-					.init(L10n.AssetTransfer.MaxAmountDialog.saveXrdForFeeButton(feeDeductedAmount.formatted())),
+				ButtonState.default(
+					TextState(L10n.AssetTransfer.MaxAmountDialog.saveXrdForFeeButton(feeDeductedAmount.formatted())),
 					action: .send(.chooseXRDAmountAlert(.deductFee(feeDeductedAmount)))
 				),
-				.default(
-					.init(L10n.AssetTransfer.MaxAmountDialog.sendAllButton(maxAmount.formatted())),
+				ButtonState.default(
+					TextState(L10n.AssetTransfer.MaxAmountDialog.sendAllButton(maxAmount.formatted())),
 					action: .send(.chooseXRDAmountAlert(.sendAll(maxAmount)))
 				),
 			]
@@ -151,17 +151,17 @@ extension AlertState where Action == FungibleResourceAsset.ViewAction.AlertActio
 	}
 
 	fileprivate static func willNeedToPayFeeFromOtherAccount(_ amount: RETDecimal) -> Self {
-		.init(
-			title: .init(L10n.AssetTransfer.MaxAmountDialog.title),
-			message: .init("Sending the full amount of XRD in this account will require you to pay the transaction fee from a different account"),
+		AlertState(
+			title: TextState(L10n.AssetTransfer.MaxAmountDialog.title),
+			message: TextState("Sending the full amount of XRD in this account will require you to pay the transaction fee from a different account"),
 			buttons:
 			[
-				.default(
-					.init(L10n.Common.ok),
+				ButtonState.default(
+					TextState(L10n.Common.ok),
 					action: .send(.needsToPayFeeFromOtherAccount(.confirm(amount)))
 				),
-				.default(
-					.init(L10n.Common.cancel),
+				ButtonState.default(
+					TextState(L10n.Common.cancel),
 					action: .send(.needsToPayFeeFromOtherAccount(.cancel))
 				),
 			]
