@@ -16,6 +16,10 @@ extension Radix {
 
 extension Radix.Dashboard {
 	public static func dashboard(forNetwork network: Radix.Network) -> Self {
+		dashboard(forNetworkID: network.id)
+	}
+
+	public static func dashboard(forNetworkID network: NetworkID) -> Self {
 		switch network {
 		case .mainnet:
 			.mainnet
@@ -109,5 +113,25 @@ extension Radix.Dashboard {
 		"""
 		url: \(url)
 		"""
+	}
+}
+
+extension Radix.Dashboard {
+	enum Path: String {
+		case account
+		case recentTransactions = "recent-transactions"
+	}
+
+	func recentTransactionsURL(_ address: AccountAddress) -> URL {
+		self.url
+			.appending(path: .account)
+			.appending(path: address.address)
+			.appending(path: .recentTransactions)
+	}
+}
+
+extension URL {
+	fileprivate func appending(path: Radix.Dashboard.Path) -> Self {
+		appending(path: path.rawValue)
 	}
 }
