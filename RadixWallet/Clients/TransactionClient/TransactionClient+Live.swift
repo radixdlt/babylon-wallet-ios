@@ -169,9 +169,7 @@ extension TransactionClient {
 			let transactionPreviewRequest = try await createTransactionPreviewRequest(for: request, networkID: networkID, transactionSigners: transactionSigners)
 			let transactionPreviewResponse = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
 			guard transactionPreviewResponse.receipt.status == .succeeded else {
-				throw TransactionFailure.failedToPrepareTXReview(
-					.failedToRetrieveTXReceipt(transactionPreviewResponse.receipt.errorMessage ?? "Unknown reason")
-				)
+				throw TransactionFailure.fromFailedTXReviewResponse(transactionPreviewResponse)
 			}
 			let receiptBytes = try [UInt8](hex: transactionPreviewResponse.encodedReceipt)
 
@@ -365,5 +363,22 @@ extension TransactionClient {
 
 		loggerGlobal.notice("Did not find any suitable fee payer, retrieving candidates for user selection....")
 		return nil
+	}
+}
+
+extension TransactionFailure {
+	static func fromFailedTXReviewResponse(_ response: GatewayAPI.TransactionPreviewResponse) -> Self {
+		let message = response.receipt.errorMessage ?? "Unknown reason"
+
+		// Quite rudimentary, but it is not worth making something smarter,
+		// as the GW will provide in the future strongly typed errors
+		let isFailureDueToDepositRules = message.contains("AccountError(DepositIsDisallowed") ||
+			message.contains("AccountError(NotAllBucketsCouldBeDeposited")
+
+		if isFailureDueToDepositRules {
+			return .failedToPrepareTXReview(.oneOfRecevingAccountsDoesNotAllowDeposits)
+		} else {
+			return .failedToPrepareTXReview(.failedToRetrieveTXReceipt(message))
+		}
 	}
 }
