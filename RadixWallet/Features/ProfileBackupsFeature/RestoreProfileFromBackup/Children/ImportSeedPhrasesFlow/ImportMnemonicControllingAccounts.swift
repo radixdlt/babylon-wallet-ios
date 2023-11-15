@@ -162,6 +162,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 
 		case .destination(.presented(.confirmSkippingBDFS(.delegate(.confirmed)))):
 			loggerGlobal.notice("Skipping BDFS! Generating a new one and hiding affected accounts/personas.")
+			state.destination = nil
 			return .run { [entitiesControlledByFactorSource = state.entitiesControlledByFactorSource] send in
 				loggerGlobal.info("Generating mnemonic for new main BDFS")
 				let newBDFS = try await factorSourcesClient.createNewMainBDFS()
