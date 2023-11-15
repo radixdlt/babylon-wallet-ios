@@ -1,17 +1,25 @@
 
 // MARK: - Hint
 public struct Hint: View, Equatable {
+	public struct ViewState: Equatable {
+		public let kind: Kind
+		public let text: Text?
+	}
+
 	public enum Kind: Equatable {
 		case info
 		case error
+		case warning
 	}
 
-	let kind: Kind
-	let text: Text?
+	public let viewState: ViewState
 
 	private init(kind: Kind, text: Text?) {
-		self.kind = kind
-		self.text = text
+		self.viewState = .init(kind: kind, text: text)
+	}
+
+	public init(viewState: ViewState) {
+		self.viewState = viewState
 	}
 
 	public static func info(_ text: () -> Text) -> Self {
@@ -35,12 +43,15 @@ public struct Hint: View, Equatable {
 	}
 
 	public var body: some View {
-		if let text {
+		if let text = viewState.text {
 			Label {
 				text.lineSpacing(0).textStyle(.body2Regular)
 			} icon: {
-				if kind == .error {
-					Image(asset: AssetResource.error)
+				if let iconAsset {
+					Image(asset: iconAsset)
+						.resizable()
+						.renderingMode(.template)
+						.frame(.smallest)
 				}
 			}
 			.foregroundColor(foregroundColor)
@@ -48,11 +59,24 @@ public struct Hint: View, Equatable {
 	}
 
 	private var foregroundColor: Color {
-		switch kind {
+		switch viewState.kind {
 		case .info:
 			.app.gray2
 		case .error:
 			.app.red1
+		case .warning:
+			.app.alert
+		}
+	}
+
+	private var iconAsset: ImageAsset? {
+		switch viewState.kind {
+		case .info:
+			nil
+		case .error:
+			AssetResource.error
+		case .warning:
+			AssetResource.warningError
 		}
 	}
 }

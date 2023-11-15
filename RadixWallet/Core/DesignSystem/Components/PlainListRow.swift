@@ -1,9 +1,38 @@
 // MARK: - PlainListRow
 public struct PlainListRow<Icon: View>: View {
-	let accessory: ImageAsset?
-	let title: String
-	let subtitle: String?
-	let icon: Icon?
+	public struct ViewState {
+		let accessory: ImageAsset?
+		let rowCoreViewState: PlainListRowCore.ViewState
+		let icon: Icon?
+
+		public init(
+			rowCoreViewState: PlainListRowCore.ViewState,
+			accessory: ImageAsset? = AssetResource.chevronRight,
+			@ViewBuilder icon: () -> Icon
+		) {
+			self.accessory = accessory
+			self.rowCoreViewState = rowCoreViewState
+			self.icon = icon()
+		}
+
+		public init(
+			_ content: AssetIcon.Content?,
+			rowCoreViewState: PlainListRowCore.ViewState,
+			accessory: ImageAsset? = AssetResource.chevronRight
+		) where Icon == AssetIcon {
+			self.accessory = accessory
+			self.rowCoreViewState = rowCoreViewState
+			self.icon = content.map { AssetIcon($0) }
+		}
+	}
+
+	public let viewState: ViewState
+
+	public init(
+		viewState: ViewState
+	) {
+		self.viewState = viewState
+	}
 
 	public init(
 		title: String,
@@ -11,10 +40,7 @@ public struct PlainListRow<Icon: View>: View {
 		accessory: ImageAsset? = AssetResource.chevronRight,
 		@ViewBuilder icon: () -> Icon
 	) {
-		self.accessory = accessory
-		self.title = title
-		self.subtitle = subtitle
-		self.icon = icon()
+		self.viewState = ViewState(rowCoreViewState: .init(title: title, subtitle: subtitle), accessory: accessory, icon: icon)
 	}
 
 	public init(
@@ -23,24 +49,21 @@ public struct PlainListRow<Icon: View>: View {
 		subtitle: String? = nil,
 		accessory: ImageAsset? = AssetResource.chevronRight
 	) where Icon == AssetIcon {
-		self.accessory = accessory
-		self.title = title
-		self.subtitle = subtitle
-		self.icon = content.map { AssetIcon($0) }
+		self.viewState = ViewState(content, rowCoreViewState: .init(title: title, subtitle: subtitle), accessory: accessory)
 	}
 
 	public var body: some View {
 		HStack(spacing: .zero) {
-			if let icon {
+			if let icon = viewState.icon {
 				icon
 					.padding(.trailing, .medium3)
 			}
 
-			PlainListRowCore(title: title, subtitle: subtitle)
+			PlainListRowCore(viewState: viewState.rowCoreViewState)
 
 			Spacer(minLength: 0)
 
-			if let accessory {
+			if let accessory = viewState.accessory {
 				Image(asset: accessory)
 			}
 		}
@@ -52,29 +75,54 @@ public struct PlainListRow<Icon: View>: View {
 
 // MARK: - PlainListRowCore
 public struct PlainListRowCore: View {
-	let title: String
-	let subtitle: String?
+	public struct ViewState {
+		public let title: String
+		public let subtitle: String?
+		public let hint: Hint.ViewState?
+
+		init(
+			title: String,
+			subtitle: String? = nil,
+			hint: Hint.ViewState? = nil
+		) {
+			self.title = title
+			self.subtitle = subtitle
+			self.hint = hint
+		}
+	}
+
+	public let viewState: ViewState
+
+	public init(
+		viewState: ViewState
+	) {
+		self.viewState = viewState
+	}
 
 	public init(title: String, subtitle: String?) {
-		self.title = title
-		self.subtitle = subtitle
+		self.viewState = ViewState(title: title, subtitle: subtitle)
 	}
 
 	public var body: some View {
 		VStack(alignment: .leading, spacing: .zero) {
-			Text(title)
+			Text(viewState.title)
 				.lineSpacing(-6)
 				.lineLimit(1)
 				.textStyle(.secondaryHeader)
 				.foregroundColor(.app.gray1)
 
-			if let subtitle {
+			if let subtitle = viewState.subtitle {
 				Text(subtitle)
 					.lineSpacing(-4)
 					.lineLimit(2)
 					.minimumScaleFactor(0.8)
 					.textStyle(.body2Regular)
 					.foregroundColor(.app.gray2)
+			}
+
+			if let hint = viewState.hint {
+				Hint(viewState: hint)
+					.padding(.top, .small3)
 			}
 		}
 	}
@@ -115,8 +163,10 @@ extension View {
 struct PlainListRow_Previews: PreviewProvider {
 	static var previews: some View {
 		PlainListRow(
-			.asset(AssetResource.appSettings),
-			title: "A title"
+			viewState: .init(
+				.asset(AssetResource.appSettings),
+				rowCoreViewState: .init(title: "A title", subtitle: nil)
+			)
 		)
 	}
 }

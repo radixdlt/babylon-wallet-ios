@@ -40,12 +40,21 @@ extension Settings {
 
 // MARK: - SettingsRowModel
 struct SettingsRowModel<Feature: FeatureReducer>: Identifiable {
-	var id: String { title }
+	var id: String { rowViewState.rowCoreViewState.title }
 
-	let title: String
-	var subtitle: String?
-	let icon: AssetIcon.Content
+	let rowViewState: PlainListRow<AssetIcon>.ViewState
 	let action: Feature.ViewAction
+
+	public init(
+		title: String,
+		subtitle: String? = nil,
+		hint: Hint.ViewState? = nil,
+		icon: AssetIcon.Content,
+		action: Feature.ViewAction
+	) {
+		self.rowViewState = .init(icon, rowCoreViewState: .init(title: title, subtitle: subtitle, hint: hint))
+		self.action = action
+	}
 }
 
 // MARK: - SettingsRow
@@ -54,9 +63,11 @@ struct SettingsRow<Feature: FeatureReducer>: View {
 	let action: () -> Void
 
 	var body: some View {
-		PlainListRow(row.icon, title: row.title, subtitle: row.subtitle)
-			.tappable(action)
-			.withSeparator
+		VStack(spacing: .small3) {
+			PlainListRow(viewState: row.rowViewState)
+				.tappable(action)
+				.withSeparator
+		}
 	}
 }
 
@@ -164,6 +175,7 @@ extension Settings.View {
 			),
 			.init(
 				title: L10n.Settings.personas,
+				hint: .init(kind: .warning, text: .init("Back up seed phrase for your Personas")),
 				icon: .asset(AssetResource.personas),
 				action: .personasButtonTapped
 			),

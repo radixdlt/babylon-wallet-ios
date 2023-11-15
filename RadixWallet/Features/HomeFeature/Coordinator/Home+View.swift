@@ -2,7 +2,9 @@ import ComposableArchitecture
 import SwiftUI
 extension Home.State {
 	var viewState: Home.ViewState {
-		.init(hasNotification: false) // we don't have any notification to show at the moment
+		.init(hasNotification: accountRows.contains(where: { account in
+			account.exportMnemonicNeeded
+		}))
 	}
 }
 

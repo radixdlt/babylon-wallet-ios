@@ -21,6 +21,7 @@ public struct Settings: Sendable, FeatureReducer {
 
 		public var shouldShowMigrateOlympiaButton: Bool = false
 		public var userHasNoP2PLinks: Bool? = nil
+		public var shouldBackupPersonasSeedPhrase: Bool = true
 		public init() {}
 	}
 
