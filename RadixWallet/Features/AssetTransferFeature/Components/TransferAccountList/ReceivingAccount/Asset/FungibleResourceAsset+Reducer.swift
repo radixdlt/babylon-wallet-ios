@@ -52,11 +52,16 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 
 		public enum AlertAction: Hashable, Sendable {
 			case chooseXRDAmountAlert(ChooseXRDAmountAlert)
-			case needsToPayFeeFromOtherAccount(EqVoid)
+			case needsToPayFeeFromOtherAccount(NeedsToPayFeeFromOtherAccount)
 
 			public enum ChooseXRDAmountAlert: Hashable, Sendable {
 				case deductFee(RETDecimal)
 				case sendAll(RETDecimal)
+			}
+
+			public enum NeedsToPayFeeFromOtherAccount: Hashable, Sendable {
+				case confirm(RETDecimal)
+				case cancel
 			}
 		}
 	}
@@ -88,10 +93,11 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 						feeDeductedAmount: remainingAmount - 1,
 						maxAmount: remainingAmount
 					)
-					return .none
 				} else {
-					state.alert = .willNeedToPayFeeFromOtherAccount()
+					state.alert = .willNeedToPayFeeFromOtherAccount(remainingAmount)
 				}
+
+				return .none
 			}
 
 			state.transferAmount = remainingAmount
@@ -109,12 +115,15 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 			state.alert = nil
 			switch action {
 			case let .presented(.chooseXRDAmountAlert(.deductFee(amount))),
-			     let .presented(.chooseXRDAmountAlert(.sendAll(amount))):
+			     let .presented(.chooseXRDAmountAlert(.sendAll(amount))),
+			     let .presented(.needsToPayFeeFromOtherAccount(.confirm(amount))):
 				state.transferAmount = amount
 				state.transferAmountStr = amount.formattedPlain(useGroupingSeparator: false)
 				return .send(.delegate(.amountChanged))
-			case .presented(.needsToPayFeeFromOtherAccount):
+
+			case .presented(.needsToPayFeeFromOtherAccount(.cancel)):
 				return .none
+
 			case .dismiss:
 				return .none
 			}
@@ -141,10 +150,21 @@ extension AlertState where Action == FungibleResourceAsset.ViewAction.AlertActio
 		)
 	}
 
-	fileprivate static func willNeedToPayFeeFromOtherAccount() -> Self {
+	fileprivate static func willNeedToPayFeeFromOtherAccount(_ amount: RETDecimal) -> Self {
 		.init(
 			title: .init(L10n.AssetTransfer.MaxAmountDialog.title),
-			message: .init("Sending the full amount of XRD in this account will require you to pay the transaction fee from a different account")
+			message: .init("Sending the full amount of XRD in this account will require you to pay the transaction fee from a different account"),
+			buttons:
+			[
+				.default(
+					.init(L10n.Common.ok),
+					action: .send(.needsToPayFeeFromOtherAccount(.confirm(amount)))
+				),
+				.default(
+					.init(L10n.Common.cancel),
+					action: .send(.needsToPayFeeFromOtherAccount(.cancel))
+				),
+			]
 		)
 	}
 }
