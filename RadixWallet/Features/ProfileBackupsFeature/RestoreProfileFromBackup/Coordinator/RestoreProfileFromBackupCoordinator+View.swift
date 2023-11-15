@@ -43,23 +43,3 @@ extension RestoreProfileFromBackupCoordinator {
 		}
 	}
 }
-
-// #if DEBUG
-// import SwiftUI
-import ComposableArchitecture //
-//// MARK: - RestoreProfileFromBackup_Preview
-// struct RestoreProfileFromBackup_Preview: PreviewProvider {
-//	static var previews: some View {
-//		RestoreProfileFromBackupCoordinator.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: RestoreProfileFromBackupCoordinator.init
-//			)
-//		)
-//	}
-// }
-//
-// extension RestoreProfileFromBackupCoordinator.State {
-//	public static let previewValue = Self()
-// }
-// #endif

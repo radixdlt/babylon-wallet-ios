@@ -6,6 +6,8 @@ public struct AccountsClient: Sendable {
 	/// Accounts on current network (active gateway)
 	public var getAccountsOnCurrentNetwork: GetAccountsOnCurrentNetwork
 
+	public var getHiddenAccountsOnCurrentNetwork: GetHiddenAccountsOnCurrentNetwork
+
 	/// Async sequence of Accounts valuues on current network (active gateway), emits new
 	/// value of Accounts when you switch network (if new active gateway is on a new network).
 	public var accountsOnCurrentNetwork: AccountsOnCurrentNetwork
@@ -31,6 +33,7 @@ public struct AccountsClient: Sendable {
 		getCurrentNetworkID: @escaping GetCurrentNetworkID,
 		nextAccountIndex: @escaping NextAccountIndex,
 		getAccountsOnCurrentNetwork: @escaping GetAccountsOnCurrentNetwork,
+		getHiddenAccountsOnCurrentNetwork: @escaping GetHiddenAccountsOnCurrentNetwork,
 		accountsOnCurrentNetwork: @escaping AccountsOnCurrentNetwork,
 		accountUpdates: @escaping AccountUpdates,
 		getAccountsOnNetwork: @escaping GetAccountsOnNetwork,
@@ -43,6 +46,7 @@ public struct AccountsClient: Sendable {
 		self.getCurrentNetworkID = getCurrentNetworkID
 		self.nextAccountIndex = nextAccountIndex
 		self.getAccountsOnCurrentNetwork = getAccountsOnCurrentNetwork
+		self.getHiddenAccountsOnCurrentNetwork = getHiddenAccountsOnCurrentNetwork
 		self.getAccountsOnNetwork = getAccountsOnNetwork
 		self.accountsOnCurrentNetwork = accountsOnCurrentNetwork
 		self.accountUpdates = accountUpdates
@@ -60,6 +64,7 @@ extension AccountsClient {
 	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 	public typealias NextAccountIndex = @Sendable (NetworkID?) async -> HD.Path.Component.Child.Value
 	public typealias GetAccountsOnCurrentNetwork = @Sendable () async throws -> Accounts
+	public typealias GetHiddenAccountsOnCurrentNetwork = @Sendable () async throws -> Accounts
 	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> Accounts
 
 	public typealias AccountsOnCurrentNetwork = @Sendable () async -> AnyAsyncSequence<Accounts>

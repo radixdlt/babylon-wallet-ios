@@ -21,7 +21,8 @@ extension DisplayEntitiesControlledByMnemonic.State {
 				}
 			}(),
 			promptUserToBackUpMnemonic: mode == .mnemonicCanBeDisplayed && !accountsForDeviceFactorSource.isMnemonicMarkedAsBackedUp,
-			accounts: accountsForDeviceFactorSource.accounts
+			accounts: accountsForDeviceFactorSource.accounts,
+			hiddenAccounts: accountsForDeviceFactorSource.hiddenAccounts
 		)
 	}
 }
@@ -42,6 +43,7 @@ extension DisplayEntitiesControlledByMnemonic {
 		public let buttonState: ButtonState?
 		public let promptUserToBackUpMnemonic: Bool
 		public let accounts: [Profile.Network.Account]
+		public let hiddenAccounts: [Profile.Network.Account]
 	}
 }
 
@@ -93,10 +95,14 @@ extension DisplayEntitiesControlledByMnemonic {
 						)
 					}
 
-					VStack(alignment: .leading, spacing: .small3) {
-						ForEach(viewStore.accounts) { account in
-							SmallAccountCard(account: account)
-								.cornerRadius(.small1)
+					if viewStore.accounts.isEmpty {
+						NoContentView("No non-hidden accounts.\n#\(viewStore.hiddenAccounts.count) hidden accounts.") // FIXME: Strings
+					} else {
+						VStack(alignment: .leading, spacing: .small3) {
+							ForEach(viewStore.accounts) { account in
+								SmallAccountCard(account: account)
+									.cornerRadius(.small1)
+							}
 						}
 					}
 				}

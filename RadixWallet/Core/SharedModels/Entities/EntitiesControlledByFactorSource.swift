@@ -3,17 +3,20 @@ public struct EntitiesControlledByFactorSource: Sendable, Hashable, Identifiable
 	public typealias ID = FactorSourceID
 	public var id: ID { deviceFactorSource.id.embed() }
 	public let entities: [EntityPotentiallyVirtual]
+	public let hiddenEntities: [EntityPotentiallyVirtual]
 	public var isMnemonicPresentInKeychain: Bool
 	public var isMnemonicMarkedAsBackedUp: Bool
 	public let deviceFactorSource: DeviceFactorSource
 
 	public init(
 		entities: [EntityPotentiallyVirtual],
+		hiddenEntities: [EntityPotentiallyVirtual],
 		deviceFactorSource: DeviceFactorSource,
 		isMnemonicPresentInKeychain: Bool,
 		isMnemonicMarkedAsBackedUp: Bool
 	) {
 		self.entities = entities
+		self.hiddenEntities = hiddenEntities
 		self.deviceFactorSource = deviceFactorSource
 		self.isMnemonicPresentInKeychain = isMnemonicPresentInKeychain
 		self.isMnemonicMarkedAsBackedUp = isMnemonicMarkedAsBackedUp
@@ -22,7 +25,9 @@ public struct EntitiesControlledByFactorSource: Sendable, Hashable, Identifiable
 
 extension EntitiesControlledByFactorSource {
 	public var accounts: [Profile.Network.Account] { entities.compactMap { try? $0.asAccount() } }
+	public var hiddenAccounts: [Profile.Network.Account] { hiddenEntities.compactMap { try? $0.asAccount() } }
 	public var personas: [Profile.Network.Persona] { entities.compactMap { try? $0.asPersona() } }
+	public var hiddenPersonas: [Profile.Network.Persona] { hiddenEntities.compactMap { try? $0.asPersona() } }
 }
 
 extension EntitiesControlledByFactorSource {

@@ -92,11 +92,7 @@ extension SelectBackup.View {
 					cloudBackupDataCard(item, viewStore: viewStore)
 				}
 			} else {
-				Text(L10n.IOSRecoverProfileBackup.noBackupsAvailable)
-					.foregroundColor(.app.gray2)
-					.padding(.large1)
-					.background(.app.gray5)
-					.cornerRadius(.small1)
+				NoContentView(L10n.IOSRecoverProfileBackup.noBackupsAvailable)
 			}
 		}
 		.padding(.horizontal, .medium3)
