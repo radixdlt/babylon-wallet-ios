@@ -1190,12 +1190,19 @@ extension ResourceTracker {
 public struct TransactionReviewFailure: LocalizedError {
 	public let underylying: Swift.Error
 	public var errorDescription: String? {
-		// https://rdxworks.slack.com/archives/C031A0V1A1W/p1694087946050189?thread_ts=1694085688.749539&cid=C031A0V1A1W
-		#if DEBUG
-		L10n.Error.TransactionFailure.reviewFailure + "\n[DEBUG] Underlying error: \(String(describing: underylying))"
-		#else
-		L10n.Error.TransactionFailure.reviewFailure
-		#endif
+		L10n.Error.TransactionFailure.reviewFailure + {
+			// https://rdxworks.slack.com/archives/C031A0V1A1W/p1694087946050189?thread_ts=1694085688.749539&cid=C031A0V1A1W
+			#if DEBUG
+			"\n[DEBUG] Underlying error: \(String(describing: underylying))"
+			#else
+			if case TransactionFailure.failedToPrepareTXReview(.oneOfRecevingAccountsDoesNotAllowDeposits) = underylying {
+				// FIXME: strings
+				"\n\n One of the receiving accounts does not allow Third-Party deposits"
+			} else {
+				""
+			}
+			#endif
+		}()
 	}
 }
 
