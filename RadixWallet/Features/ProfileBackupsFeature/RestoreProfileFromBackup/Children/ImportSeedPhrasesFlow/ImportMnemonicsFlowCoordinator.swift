@@ -23,7 +23,7 @@ extension EntitiesControlledByFactorSource: Comparable {
 // MARK: - ImportMnemonicsFlowCoordinator
 public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var mnemonicsLeftToImport: IdentifiedArrayOf<EntitiesControlledByFactorSource> = []
+		public var mnemonicsLeftToImport: IdentifiedArrayOf<ImportMnemonicControllingAccounts.State> = []
 		public var imported: OrderedSet<SkippedOrImported> = []
 		public var skipped: OrderedSet<SkippedOrImported> = []
 		public var newMainBDFS: NewMainBDFS?
@@ -147,7 +147,30 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case let .loadControlledEntities(.success(factorSourcesControllingEntities)):
-			state.mnemonicsLeftToImport = factorSourcesControllingEntities.sorted().asIdentifiable()
+			let ents = factorSourcesControllingEntities.sorted().asIdentifiable()
+			var mnemonicsLeftToImport = ents.map {
+				ImportMnemonicControllingAccounts.State(
+					entitiesControlledByFactorSource: $0,
+					isMainBDFS: false
+				)
+			}.asIdentifiable()
+			let explicitMainBDFSFactorSources = ents.filter(\.isExplicitMain)
+
+			if let explicitMain = explicitMainBDFSFactorSources.first {
+				mnemonicsLeftToImport[id: explicitMain.id]?.isMainBDFS = true
+				if explicitMainBDFSFactorSources.count > 1 {
+					assertionFailure("DISCREPANCY, more than one Main BDFS, this should not happen.")
+				}
+			} else {
+				// No explicit BDFS, needs to treat first Babylon device factor source as implicit main
+				if let firstBabylonDeviceFactorSource = ents.filter(\.isBDFS).first {
+					mnemonicsLeftToImport[id: firstBabylonDeviceFactorSource.id]?.isMainBDFS = true
+				} else {
+					assertionFailure("DISCREPANCY, no babylon device factor source, invalid profile.")
+				}
+			}
+
+			state.mnemonicsLeftToImport = mnemonicsLeftToImport
 			return nextMnemonicIfNeeded(state: &state)
 		}
 	}
@@ -195,30 +218,14 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	}
 
 	private func finishedWith(factorSourceID: FactorSourceID.FromHash, state: inout State) -> Effect<Action> {
-		state.mnemonicsLeftToImport.removeAll(where: { $0.factorSourceID == factorSourceID })
+		state.mnemonicsLeftToImport.removeAll(where: { $0.id == factorSourceID.embed() })
 		return nextMnemonicIfNeeded(state: &state)
 	}
 
 	private func nextMnemonicIfNeeded(state: inout State) -> Effect<Action> {
 		if let next = state.mnemonicsLeftToImport.first {
-			let isBDFS = next.isBDFS
-			let numberOfMainBDFS = state.mnemonicsLeftToImport.filter(\.isExplicitMain).count
-
-			let isMainBDFS: Bool
-			switch numberOfMainBDFS {
-			case 0:
-				isMainBDFS = isBDFS
-			case 1:
-				isMainBDFS = next.isExplicitMainBDFS
-			default:
-				assertionFailure("DISCREPANCY, more than one Main BDFS, this should not happen.")
-				isMainBDFS = next.isExplicitMainBDFS
-			}
 			state.destination = .importMnemonicControllingAccounts(
-				.init(
-					entitiesControlledByFactorSource: next,
-					isMainBDFS: isMainBDFS
-				)
+				next
 			)
 			return .none
 		} else {

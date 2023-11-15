@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - NewMainBDFS
 /// **B**abylon **D**evice **F**actor **S**ource
 public struct NewMainBDFS: Sendable, Hashable {
-	public let newMainBDFS: DeviceFactorSource
+	public var newMainBDFS: DeviceFactorSource
 	public let idsOfAccountsToHide: [Profile.Network.Account.ID]
 	public let idsOfPersonasToHide: [Profile.Network.Persona.ID]
 	public init(
@@ -20,7 +20,11 @@ public struct NewMainBDFS: Sendable, Hashable {
 
 // MARK: - ImportMnemonicControllingAccounts
 public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
+	public struct State: Sendable, Hashable, Identifiable {
+		public var id: EntitiesControlledByFactorSource.ID {
+			entitiesControlledByFactorSource.id
+		}
+
 		public let entitiesControlledByFactorSource: EntitiesControlledByFactorSource
 
 		public let entities: DisplayEntitiesControlledByMnemonic.State
@@ -246,20 +250,3 @@ extension OverlayWindowClient.Item.HUD {
 		)
 	)
 }
-
-// extension AlertState<ImportMnemonicControllingAccounts.Destinations.Action.ConfirmSkipBDFS> {
-// 	static func confirmSkippingBDFS() -> AlertState {
-// 		AlertState {
-// 			TextState("Sure?")
-// 		} actions: {
-// 			ButtonState(role: .destructive, action: .confirmTapped) {
-// 				TextState(L10n.Common.remove)
-// 			}
-// 			ButtonState(role: .cancel, action: .cancelTapped) {
-// 				TextState(L10n.Common.cancel)
-// 			}
-// 		} message: {
-// 			TextState("Sure?!")
-// 		}
-// 	}
-// }

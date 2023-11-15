@@ -166,12 +166,14 @@ public struct DebugInspectFactorSourceView: IndentedView {
 
 extension DebugInspectFactorSourceView {
 	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
+		VStack(alignment: .leading, spacing: 2) {
 			Text("Factor Source")
 				.fontWeight(.heavy)
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
+
+			Labeled("ID", value: factorSource.id)
 
 			switch factorSource {
 			case let .device(deviceFactorSource):
