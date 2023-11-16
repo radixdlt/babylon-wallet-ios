@@ -1,5 +1,5 @@
 "homePage_securityPromptBackup" = "Please write down this Account\'s seed phrase";
-"homePage_securityPromptRecover" = "Please recover your seed phrase";
+"homePage_securityPromptRecover" = "Seed phrase required - begin entry";
 "homePage_backedUpMnemonicHeading" = "I have written down this seed phrase";
 "homePage_createNewAccount" = "Create a New Account";
 "homePage_legacyAccountHeading" = "Legacy";
@@ -675,7 +675,7 @@ You can always change the guarantee from this default in each transaction.";
 "displayMnemonics_connectedAccountsLabel_many" = "Connected to %d Accounts";
 "displayMnemonics_seedPhraseSecurityInfo" = "You are responsible for the security of your Seed Phrase";
 "displayMnemonics_backUpWarning" = "Write Down this Seed Phrase";
-"displayMnemonics_seedPhraseEntryWarning" = "Seed Phrase Entry Required";
+"displayMnemonics_seedPhraseEntryWarning" = "Begin seed phrase entry";
 "confirmMnemonicBackedUp_title" = "Confirm Your Seed Phrase";
 "confirmMnemonicBackedUp_subtitle" = "Confirm you have written down the seed phrase by entering the missing words below.";
 "revealSeedPhrase_title" = "Reveal Seed Phrase";
