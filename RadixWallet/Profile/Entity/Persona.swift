@@ -166,3 +166,15 @@ extension Profile.Network.Personas {
 		filter(\.isHidden).asIdentifiable()
 	}
 }
+
+extension Profile.Network.Persona {
+	public var shouldBackupSeedPhrase: Bool {
+		guard let deviceFactorSourceID else {
+			return false
+		}
+
+		@Dependency(\.userDefaults) var userDefaults
+		let backedUpIds = userDefaults.getFactorSourceIDOfBackedUpMnemonics()
+		return !backedUpIds.contains(deviceFactorSourceID)
+	}
+}

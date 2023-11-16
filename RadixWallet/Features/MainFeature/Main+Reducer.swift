@@ -51,6 +51,7 @@ public struct Main: Sendable, FeatureReducer {
 
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
+	@Dependency(\.personasClient) var personasClient
 
 	public init() {}
 
@@ -85,6 +86,7 @@ public struct Main: Sendable, FeatureReducer {
 
 		case let .destination(.presented(.settings(.delegate(.deleteProfileAndFactorSources(keepInIcloudIfPresent))))):
 			return .run { send in
+
 				try await appPreferencesClient.deleteProfileAndFactorSources(keepInIcloudIfPresent)
 				await send(.delegate(.removedWallet))
 			} catch: { error, _ in

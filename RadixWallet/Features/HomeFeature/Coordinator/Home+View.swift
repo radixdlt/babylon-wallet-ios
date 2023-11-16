@@ -2,9 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 extension Home.State {
 	var viewState: Home.ViewState {
-		.init(hasNotification: accountRows.contains(where: { account in
-			account.exportMnemonicNeeded
-		}))
+		.init(hasNotification: shouldBackupPersonasSeedPhrase)
 	}
 }
 

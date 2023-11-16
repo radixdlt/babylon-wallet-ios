@@ -19,8 +19,22 @@ extension Persona {
 					Card {
 						viewStore.send(.tapped)
 					} contents: {
-						PlainListRow(title: viewStore.displayName) {
-							PersonaThumbnail(viewStore.thumbnail)
+						VStack {
+							PlainListRow(title: viewStore.displayName) {
+								PersonaThumbnail(viewStore.thumbnail)
+							}
+							if viewStore.shouldBackupSeedPhrase {
+								shieldPromptView(
+									text: "Backup this Persona's seed phrase",
+									action: {
+										viewStore.send(.backupSeedPhrasePromptTapped)
+									}
+								)
+								.background(.app.gray2)
+								.cornerRadius(.small2)
+								.padding(.horizontal, .medium3)
+								.padding(.vertical, .small2)
+							}
 						}
 					}
 				} else {

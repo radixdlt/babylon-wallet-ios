@@ -47,6 +47,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case createNewPersona
 		case openDetails(Profile.Network.Persona)
+		case exportMnemonic(Profile.Network.Persona)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -118,6 +119,11 @@ public struct PersonaList: Sendable, FeatureReducer {
 				await send(.delegate(.openDetails(persona)))
 			}
 
+		case .persona(id: let id, action: .delegate(.backupSeedPhrase)):
+			.run { send in
+				let persona = try await personasClient.getPersona(id: id)
+				await send(.delegate(.exportMnemonic(persona)))
+			}
 		case .persona:
 			.none
 		}

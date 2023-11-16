@@ -30,6 +30,7 @@ extension View {
 		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		return createPersonaCoordinator(with: destinationStore)
 			.personaDetails(with: destinationStore)
+			.exportMnemonic(with: destinationStore)
 	}
 
 	@MainActor
@@ -49,6 +50,20 @@ extension View {
 			state: /PersonasCoordinator.Destination.State.personaDetails,
 			action: PersonasCoordinator.Destination.Action.personaDetails,
 			destination: { PersonaDetails.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func exportMnemonic(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination>) -> some SwiftUI.View {
+		sheet(
+			store: destinationStore,
+			state: /PersonasCoordinator.Destination.State.exportMnemonic,
+			action: PersonasCoordinator.Destination.Action.exportMnemonic,
+			content: { childStore in
+				NavigationStack {
+					ExportMnemonic.View(store: childStore)
+				}
+			}
 		)
 	}
 }

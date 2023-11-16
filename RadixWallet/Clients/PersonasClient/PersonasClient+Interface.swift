@@ -68,4 +68,12 @@ extension PersonasClient {
 			firstOnCurrent: isFirstPersonaOnCurrentNetwork
 		)
 	}
+
+	public func shouldBackupSeedPhraseForAnyPersona() async -> AnyAsyncSequence<Bool> {
+		await personas().map { personas in
+			personas.contains(where: \.shouldBackupSeedPhrase)
+		}
+		.share()
+		.eraseToAnyAsyncSequence()
+	}
 }

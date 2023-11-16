@@ -21,14 +21,15 @@ public struct Settings: Sendable, FeatureReducer {
 
 		public var shouldShowMigrateOlympiaButton: Bool = false
 		public var userHasNoP2PLinks: Bool? = nil
-		public var shouldBackupPersonasSeedPhrase: Bool = true
+		public var shouldBackupPersonasSeedPhrase: Bool = false
+
 		public init() {}
 	}
 
 	// MARK: Action
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
+		case task
 		case addP2PLinkButtonTapped
 		case importOlympiaButtonTapped
 		case dismissImportOlympiaHeaderButtonTapped
@@ -43,6 +44,7 @@ public struct Settings: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case loadedP2PLinks(P2PLinks)
 		case loadedShouldShowImportWalletShortcutInSettings(Bool)
+		case loadedShouldBackupPersonasSeedPhrase(Bool)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -114,8 +116,11 @@ public struct Settings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .appeared:
-			return loadShouldShowImportWalletShortcutInSettings()
+		case .task:
+			return loadShouldBackupPersonasSeedPhrase()
+				.merge(
+					with: loadShouldShowImportWalletShortcutInSettings()
+				)
 				.concatenate(
 					with: loadP2PLinks()
 				)
@@ -161,6 +166,10 @@ public struct Settings: Sendable, FeatureReducer {
 
 		case let .loadedP2PLinks(clients):
 			state.userHasNoP2PLinks = clients.isEmpty
+			return .none
+
+		case let .loadedShouldBackupPersonasSeedPhrase(shouldBackup):
+			state.shouldBackupPersonasSeedPhrase = shouldBackup
 			return .none
 		}
 	}
@@ -209,6 +218,16 @@ extension Settings {
 			@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
 			let shouldShow = await importLegacyWalletClient.shouldShowImportWalletShortcutInSettings()
 			await send(.internal(.loadedShouldShowImportWalletShortcutInSettings(shouldShow)))
+		}
+	}
+
+	private func loadShouldBackupPersonasSeedPhrase() -> Effect<Action> {
+		.run { send in
+			@Dependency(\.personasClient) var personasClient
+			for try await shouldBackup in await personasClient.shouldBackupSeedPhraseForAnyPersona() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.loadedShouldBackupPersonasSeedPhrase(shouldBackup)))
+			}
 		}
 	}
 }

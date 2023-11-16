@@ -34,6 +34,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable & Equatable {
 		case personaPrimacyDetermined(PersonaPrimacy)
 		case loadedPersonaDetails(PersonaDetails.State)
+		case personasSeedPhraseBackedup(personaIDs: Set<Profile.Network.Persona.ID>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -47,11 +48,13 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		public enum State: Equatable, Hashable {
 			case createPersonaCoordinator(CreatePersonaCoordinator.State)
 			case personaDetails(PersonaDetails.State)
+			case exportMnemonic(ExportMnemonic.State)
 		}
 
 		public enum Action: Equatable {
 			case createPersonaCoordinator(CreatePersonaCoordinator.Action)
 			case personaDetails(PersonaDetails.Action)
+			case exportMnemonic(ExportMnemonic.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -60,6 +63,9 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.personaDetails, action: /Action.personaDetails) {
 				PersonaDetails()
+			}
+			Scope(state: /State.exportMnemonic, action: /Action.exportMnemonic) {
+				ExportMnemonic()
 			}
 		}
 	}
@@ -102,6 +108,14 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		case let .loadedPersonaDetails(personaDetails):
 			state.destination = .personaDetails(personaDetails)
 			return .none
+
+		case let .personasSeedPhraseBackedup(personaIDs):
+			state.personaList.personas.mutateAll { persona in
+				if personaIDs.contains(persona.id) {
+					persona.shouldBackupSeedPhrase = false
+				}
+			}
+			return .none
 		}
 	}
 
@@ -130,6 +144,9 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 				await send(.internal(.loadedPersonaDetails(personaDetailsState)))
 			}
 
+		case let .personaList(.delegate(.exportMnemonic(persona))):
+			return exportMnemonic(controlling: persona, state: &state)
+
 		case .personaList:
 			return .none
 
@@ -149,8 +166,39 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
+		case let .destination(.presented(.exportMnemonic(.delegate(.doneViewing(idOfBackedUpFactorSource))))):
+			state.destination = nil
+			guard let idOfBackedUpFactorSource else {
+				return .none
+			}
+
+			return .run { send in
+				let personas = try await personasClient.getPersonas()
+				let personasToRefresh = personas.filter {
+					$0.deviceFactorSourceID == idOfBackedUpFactorSource
+				}.map(\.id)
+
+				await send(.internal(.personasSeedPhraseBackedup(personaIDs: Set(personasToRefresh))))
+			}
+
 		case .destination:
 			return .none
 		}
+	}
+
+	private func exportMnemonic(
+		controlling persona: Profile.Network.Persona,
+		state: inout State
+	) -> Effect<Action> {
+		exportMnemonic(
+			controlling: persona,
+			onSuccess: {
+				state.destination = .exportMnemonic(.export(
+					$0,
+					title: L10n.RevealSeedPhrase.title,
+					context: .fromBackupPrompt
+				))
+			}
+		)
 	}
 }
