@@ -1156,10 +1156,10 @@
 		830EA9E92AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */; };
 		832880692AE664C30014FBF3 /* EntityFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832880682AE664C30014FBF3 /* EntityFlag.swift */; };
 		8328806C2AE6725F0014FBF3 /* AccountPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */; };
+		8338B9E52AFAB20700D1D8EA /* TransactionFee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */; };
 		8397A4042B036FFF00BB6DD3 /* SafariWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8397A4032B036FFF00BB6DD3 /* SafariWebView.swift */; };
 		83856D622B0279080026452A /* VerifyMnemonic+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83856D602B0279080026452A /* VerifyMnemonic+View.swift */; };
 		83856D632B0279080026452A /* VerifyMnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83856D612B0279080026452A /* VerifyMnemonic.swift */; };
-		8338B9E52AFAB20700D1D8EA /* TransactionFee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */; };
 		83D0B5692AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */; };
 		83EE47502AF027DF00155F03 /* AssetTransferDepositRuleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */; };
 		83EE47552AF0DE8F00155F03 /* TransactionPayloadGatewayHandlingStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47512AF0DE8E00155F03 /* TransactionPayloadGatewayHandlingStatus.swift */; };
@@ -2444,10 +2444,10 @@
 		830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Test.swift"; sourceTree = "<group>"; };
 		832880682AE664C30014FBF3 /* EntityFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityFlag.swift; sourceTree = "<group>"; };
 		8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPreferencesTests.swift; sourceTree = "<group>"; };
+		8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionFee.swift; sourceTree = "<group>"; };
 		8397A4032B036FFF00BB6DD3 /* SafariWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebView.swift; sourceTree = "<group>"; };
 		83856D602B0279080026452A /* VerifyMnemonic+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "VerifyMnemonic+View.swift"; sourceTree = "<group>"; };
 		83856D612B0279080026452A /* VerifyMnemonic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerifyMnemonic.swift; sourceTree = "<group>"; };
-		8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionFee.swift; sourceTree = "<group>"; };
 		83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixEngineToolkitError+Description.swift"; sourceTree = "<group>"; };
 		83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetTransferDepositRuleTests.swift; sourceTree = "<group>"; };
 		83EE47512AF0DE8E00155F03 /* TransactionPayloadGatewayHandlingStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionPayloadGatewayHandlingStatus.swift; sourceTree = "<group>"; };
@@ -9338,7 +9338,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/radixdlt/swift-composable-architecture";
 			requirement = {
-				branch = "full-scope-1.3";
+				branch = "full-scope-1.4";
 				kind = branch;
 			};
 		};

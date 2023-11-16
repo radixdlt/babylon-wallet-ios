@@ -146,6 +146,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 					.ifCaseLet(/MainState.chooseAccounts, action: /MainAction.chooseAccounts) {
 						AccountPermissionChooseAccounts()
 					}
+				EmptyReducer()
 					.ifCaseLet(/MainState.personaDataPermission, action: /MainAction.personaDataPermission) {
 						PersonaDataPermission()
 					}
