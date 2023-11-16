@@ -171,12 +171,6 @@ extension Profile.Network.Account {
 
 extension FactorSourcesClient {
 	func saveNew(mainBDFS: PrivateHDFactorSource) async throws {
-		try await saveNewMainBDFS(
-			NewMainBDFS(
-				newMainBDFS: mainBDFS.factorSource,
-				idsOfAccountsToHide: [],
-				idsOfPersonasToHide: []
-			)
-		)
+		try await saveNewMainBDFS(mainBDFS.factorSource)
 	}
 }
