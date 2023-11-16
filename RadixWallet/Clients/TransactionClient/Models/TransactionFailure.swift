@@ -35,7 +35,9 @@ extension TransactionFailure {
 		case .failedToPrepareTXReview(.failedToRetrieveTXPreview),
 		     .failedToPrepareTXReview(.failedToExtractTXReceiptBytes),
 		     .failedToPrepareTXReview(.failedToGenerateTXReview),
-		     .failedToPrepareTXReview(.failedToRetrieveTXReceipt):
+		     .failedToPrepareTXReview(.failedToRetrieveTXReceipt),
+		     .failedToPrepareTXReview(.manifestWithReservedInstructions),
+		     .failedToPrepareTXReview(.oneOfRecevingAccountsDoesNotAllowDeposits):
 			(errorKind: .failedToPrepareTransaction, message: self.errorDescription)
 
 		case let .failedToCompileOrSign(error):
@@ -47,9 +49,6 @@ extension TransactionFailure {
 			}
 		case .failedToSubmit:
 			(errorKind: .failedToSubmitTransaction, message: nil)
-
-		case .failedToPrepareTXReview(.manifestWithReservedInstructions):
-			(errorKind: .failedToPrepareTransaction, message: self.errorDescription)
 
 //		case let .failedToSubmit(error):
 //			switch error {
@@ -83,6 +82,7 @@ extension TransactionFailure {
 		case failedToExtractTXReceiptBytes(Error)
 		case failedToGenerateTXReview(Error)
 		case manifestWithReservedInstructions([ReservedInstruction])
+		case oneOfRecevingAccountsDoesNotAllowDeposits
 
 		public var errorDescription: String? {
 			switch self {
@@ -98,6 +98,8 @@ extension TransactionFailure {
 				"Failed to retrive TX receipt from gateway: \(message)"
 			case .manifestWithReservedInstructions:
 				"Transaction Manifest contains forbidden instructions"
+			case .oneOfRecevingAccountsDoesNotAllowDeposits:
+				"One of the receiving accounts does not allow Third-Party deposits"
 			}
 		}
 	}

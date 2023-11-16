@@ -78,6 +78,13 @@ extension FungibleResourceAsset.View {
 				}
 			}
 			.padding(.medium3)
+			.alert(store: store.alert)
 		}
+	}
+}
+
+private extension StoreOf<FungibleResourceAsset> {
+	var alert: AlertPresentationStore<FungibleResourceAsset.ViewAction.Alert> {
+		scope(state: \.$alert, action: { .view(.alert($0)) })
 	}
 }
