@@ -15,33 +15,23 @@ extension DebugSettingsCoordinator {
 
 extension DebugSettingsCoordinator.View {
 	public var body: some View {
-		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-			let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
-			ScrollView {
-				VStack(spacing: .zero) {
-					ForEach(rows) { row in
-						SettingsRow(row: row) {
-							viewStore.send(row.action)
-						}
+		ScrollView {
+			VStack(spacing: .zero) {
+				ForEach(rows) { row in
+					SettingsRow(row: row) {
+						store.send(.view(row.action))
 					}
 				}
 			}
-			.padding(.bottom, .large3)
-			.navigationTitle("Debug Settings")
-			.navigationBarTitleColor(.app.gray1)
-			.navigationBarTitleDisplayMode(.inline)
-			.navigationBarInlineTitleFont(.app.secondaryHeader)
-			.factorSources(with: destinationStore)
-			.debugUserDefaultsContents(with: destinationStore)
-			#if DEBUG
-				.debugKeychainTest(with: destinationStore)
-				.debugKeychainContents(with: destinationStore)
-			#endif // DEBUG
-				.debugInspectProfile(with: destinationStore)
-				.securityStructureConfigs(with: destinationStore)
-				.tint(.app.gray1)
-				.foregroundColor(.app.gray1)
 		}
+		.padding(.bottom, .large3)
+		.navigationTitle("Debug Settings")
+		.navigationBarTitleColor(.app.gray1)
+		.navigationBarTitleDisplayMode(.inline)
+		.navigationBarInlineTitleFont(.app.secondaryHeader)
+		.destinations(with: store)
+		.tint(.app.gray1)
+		.foregroundColor(.app.gray1)
 		.presentsLoadingViewOverlay()
 	}
 
@@ -89,9 +79,29 @@ extension DebugSettingsCoordinator.View {
 
 // MARK: - Extensions
 
+private extension StoreOf<DebugSettingsCoordinator> {
+	var destination: PresentationStoreOf<DebugSettingsCoordinator.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
 private extension View {
-	@MainActor
-	func debugUserDefaultsContents(
+	func destinations(
+		with store: StoreOf<DebugSettingsCoordinator>
+	) -> some View {
+		let destinationStore = store.destination
+		return factorSources(with: destinationStore)
+			.debugUserDefaultsContents(with: destinationStore)
+		#if DEBUG
+			.debugKeychainTest(with: destinationStore)
+			.debugKeychainContents(with: destinationStore)
+		#endif // DEBUG
+			.debugInspectProfile(with: destinationStore)
+			.securityStructureConfigs(with: destinationStore)
+	}
+
+	private func debugUserDefaultsContents(
 		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
 	) -> some View {
 		navigationDestination(
@@ -103,8 +113,7 @@ private extension View {
 	}
 
 	#if DEBUG
-	@MainActor
-	func debugKeychainTest(
+	private func debugKeychainTest(
 		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
 	) -> some View {
 		navigationDestination(
@@ -115,21 +124,19 @@ private extension View {
 		)
 	}
 
-	@MainActor
-	func debugKeychainContents(
-		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destinations>
+	private func debugKeychainContents(
+		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
 	) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /DebugSettingsCoordinator.Destinations.State.debugKeychainContents,
-			action: DebugSettingsCoordinator.Destinations.Action.debugKeychainContents,
+			state: /DebugSettingsCoordinator.Destination.State.debugKeychainContents,
+			action: DebugSettingsCoordinator.Destination.Action.debugKeychainContents,
 			destination: { DebugKeychainContents.View(store: $0) }
 		)
 	}
 	#endif // DEBUG
 
-	@MainActor
-	func factorSources(
+	private func factorSources(
 		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
 	) -> some View {
 		navigationDestination(
@@ -140,8 +147,7 @@ private extension View {
 		)
 	}
 
-	@MainActor
-	func debugInspectProfile(
+	private func debugInspectProfile(
 		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
 	) -> some View {
 		navigationDestination(
@@ -152,8 +158,7 @@ private extension View {
 		)
 	}
 
-	@MainActor
-	func securityStructureConfigs(
+	private func securityStructureConfigs(
 		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
 	) -> some View {
 		navigationDestination(

@@ -51,7 +51,7 @@ extension SecureStorageClient: TestDependencyKey {
 	)
 	#endif // DEBUG
 
-	public static let previewValue: Self = .noop
+	public static let previewValue = Self.noop
 
 	#if DEBUG
 	public static let testValue = Self(

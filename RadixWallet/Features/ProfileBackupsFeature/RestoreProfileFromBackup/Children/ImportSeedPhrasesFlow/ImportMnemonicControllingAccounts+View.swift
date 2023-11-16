@@ -71,27 +71,7 @@ extension ImportMnemonicControllingAccounts {
 				}
 				.navigationTitle(viewStore.navigationTitle)
 				.onAppear { viewStore.send(.appeared) }
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /ImportMnemonicControllingAccounts.Destination.State.importMnemonic,
-					action: ImportMnemonicControllingAccounts.Destination.Action.importMnemonic,
-					content: { store_ in
-						NavigationView {
-							ImportMnemonic.View(store: store_)
-								.navigationTitle(L10n.EnterSeedPhrase.Header.title)
-						}
-					}
-				)
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /ImportMnemonicControllingAccounts.Destinations.State.confirmSkippingBDFS,
-					action: ImportMnemonicControllingAccounts.Destinations.Action.confirmSkippingBDFS,
-					content: { store_ in
-						NavigationStack {
-							ConfirmSkippingBDFS.View(store: store_)
-						}
-					}
-				)
+				.destinations(with: store)
 			}
 		}
 
@@ -107,6 +87,46 @@ extension ImportMnemonicControllingAccounts {
 			.background(.app.white)
 			.cornerRadius(.small2)
 		}
+	}
+}
+
+private extension StoreOf<ImportMnemonicControllingAccounts> {
+	var destination: PresentationStoreOf<ImportMnemonicControllingAccounts.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<ImportMnemonicControllingAccounts>) -> some View {
+		let destinationStore = store.destination
+		return importMnemonic(with: destinationStore)
+			.confirmSkippingBDFS(with: destinationStore)
+	}
+
+	private func importMnemonic(with destinationStore: PresentationStoreOf<ImportMnemonicControllingAccounts.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /ImportMnemonicControllingAccounts.Destination.State.importMnemonic,
+			action: ImportMnemonicControllingAccounts.Destination.Action.importMnemonic,
+			content: {
+				ImportMnemonic.View(store: $0)
+					.navigationTitle(L10n.EnterSeedPhrase.Header.title)
+					.inNavigationView
+			}
+		)
+	}
+
+	private func confirmSkippingBDFS(with destinationStore: PresentationStoreOf<ImportMnemonicControllingAccounts.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /ImportMnemonicControllingAccounts.Destination.State.confirmSkippingBDFS,
+			action: ImportMnemonicControllingAccounts.Destination.Action.confirmSkippingBDFS,
+			content: {
+				ConfirmSkippingBDFS.View(store: $0)
+					.inNavigationStack
+			}
+		)
 	}
 }
 

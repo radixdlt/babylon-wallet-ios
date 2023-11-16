@@ -43,6 +43,13 @@ extension View {
 		}
 	}
 
+	@MainActor
+	public var inNavigationStack: some View {
+		NavigationStack {
+			self
+		}
+	}
+
 	public func withNavigationBar(closeAction: @escaping () -> Void) -> some View {
 		WithNavigationBar(closeAction: closeAction, content: self)
 	}

@@ -62,7 +62,7 @@ extension Home {
 				.task { @MainActor in
 					await viewStore.send(.task).finish()
 				}
-				.destinations(store.scope(state: \.$destination, action: { .child(.destination($0)) }))
+				.destinations(with: store)
 			}
 		}
 
@@ -80,16 +80,23 @@ extension Home {
 	}
 }
 
+private extension StoreOf<Home> {
+	var destination: PresentationStoreOf<Home.Destination> {
+		scope(state: \.$destination) { .child(.destination($0)) }
+	}
+}
+
 @MainActor
 private extension View {
-	func destinations(_ destinationStore: PresentationStoreOf<Home.Destination>) -> some SwiftUI.View {
-		accountDetails(destinationStore)
-			.createAccount(destinationStore)
-			.exportMnemonic(destinationStore)
-			.importMnemonics(destinationStore)
+	func destinations(with store: StoreOf<Home>) -> some View {
+		let destinationStore = store.destination
+		return accountDetails(with: destinationStore)
+			.createAccount(with: destinationStore)
+			.exportMnemonic(with: destinationStore)
+			.importMnemonics(with: destinationStore)
 	}
 
-	func accountDetails(_ destinationStore: PresentationStoreOf<Home.Destination>) -> some SwiftUI.View {
+	func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
 			state: /Home.Destination.State.accountDetails,
@@ -98,7 +105,7 @@ private extension View {
 		)
 	}
 
-	func createAccount(_ destinationStore: PresentationStoreOf<Home.Destination>) -> some SwiftUI.View {
+	func createAccount(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
 			state: /Home.Destination.State.createAccount,
@@ -107,7 +114,7 @@ private extension View {
 		)
 	}
 
-	func exportMnemonic(_ destinationStore: PresentationStoreOf<Home.Destination>) -> some SwiftUI.View {
+	func exportMnemonic(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
 			state: /Home.Destination.State.exportMnemonic,
@@ -120,7 +127,7 @@ private extension View {
 		)
 	}
 
-	func importMnemonics(_ destinationStore: PresentationStoreOf<Home.Destination>) -> some SwiftUI.View {
+	func importMnemonics(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
 			state: /Home.Destination.State.importMnemonics,

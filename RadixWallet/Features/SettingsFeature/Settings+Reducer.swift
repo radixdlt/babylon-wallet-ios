@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension Settings.Destinations.State {
+extension Settings.Destination.State {
 	static func displayMnemonics() -> Self {
 		.accountSecurity(AccountSecurity.State(destination: .mnemonics(.init())))
 	}
