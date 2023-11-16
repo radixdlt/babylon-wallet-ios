@@ -59,6 +59,7 @@ public struct DappOrigin: Sendable, Hashable, Codable {
 
 	public let urlString: NonEmptyString
 	public let url: URL
+
 	public func encode(to encoder: Encoder) throws {
 		var singleValueContainer = encoder.singleValueContainer()
 		try singleValueContainer.encode(urlString.rawValue)
@@ -70,6 +71,7 @@ public struct DappOrigin: Sendable, Hashable, Codable {
 	}
 
 	struct InvalidOriginURL: Error {}
+
 	public init(string: String) throws {
 		guard
 			let urlNonEmpty = NonEmptyString(rawValue: string),

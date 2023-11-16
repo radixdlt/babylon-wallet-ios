@@ -218,7 +218,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			let response = P2P.Dapp.Response.WalletInteractionFailureResponse(
 				interactionId: invalidRequest.id,
 				errorType: reason.interactionResponseError,
-				message: reason.explanation(isDeveloperModeEnabled)
+				message: reason.responseMessage()
 			)
 
 			state.invalidRequestAlert = .init(
@@ -231,14 +231,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 						TextState(L10n.Common.cancel)
 					}
 				},
-				message: {
-					let explanation = reason.explanation(isDeveloperModeEnabled)
-					if explanation == reason.subtitle {
-						return TextState(reason.subtitle)
-					} else {
-						return TextState(reason.subtitle + "\n" + explanation)
-					}
-				}
+				message: { TextState(reason.alertMessage(isDeveloperModeEnabled)) }
 			)
 			return .none
 
@@ -365,7 +358,20 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 		}
 	}
 
-	var subtitle: String {
+	func responseMessage() -> String {
+		detailedExplanationForDevelopers
+	}
+
+	func alertMessage(_ isDeveloperModeEnabled: Bool) -> String {
+		let explanation = explanation(isDeveloperModeEnabled)
+		if explanation.hasPrefix(subtitle) {
+			return explanation
+		} else {
+			return subtitle + "\n" + explanation
+		}
+	}
+
+	private var subtitle: String {
 		switch self {
 		case .badContent(.numberOfAccountsInvalid):
 			L10n.DAppRequest.ValidationOutcome.subtitleBadContent
@@ -378,7 +384,7 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 		}
 	}
 
-	func explanation(_ isDeveloperModeEnabled: Bool) -> String {
+	private func explanation(_ isDeveloperModeEnabled: Bool) -> String {
 		if isDeveloperModeEnabled {
 			return detailedExplanationForDevelopers
 		}
@@ -399,7 +405,9 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 			L10n.DAppRequest.ValidationOutcome.devExplanationInvalidOrigin(invalidURLString)
 		case let .invalidDappDefinitionAddress(invalidAddress):
 			L10n.DAppRequest.ValidationOutcome.devExplanationInvalidDappDefinitionAddress(invalidAddress)
-		case .dAppValidationError, .wrongNetworkID:
+		case let .dAppValidationError(underlyingError):
+			"\(L10n.DAppRequest.ValidationOutcome.invalidRequestMessage): \(underlyingError)"
+		case .wrongNetworkID:
 			shortExplanation
 		}
 	}
