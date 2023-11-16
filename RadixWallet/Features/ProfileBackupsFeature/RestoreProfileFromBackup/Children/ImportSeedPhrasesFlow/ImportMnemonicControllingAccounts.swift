@@ -3,7 +3,11 @@ import SwiftUI
 
 // MARK: - ImportMnemonicControllingAccounts
 public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
+	public struct State: Sendable, Hashable, Identifiable {
+		public var id: EntitiesControlledByFactorSource.ID {
+			entitiesControlledByFactorSource.id
+		}
+
 		public let entitiesControlledByFactorSource: EntitiesControlledByFactorSource
 
 		public let entities: DisplayEntitiesControlledByMnemonic.State
@@ -11,7 +15,13 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destinations.State? = nil
 
-		public init(entitiesControlledByFactorSource: EntitiesControlledByFactorSource) {
+		public var isMainBDFS: Bool
+
+		public init(
+			entitiesControlledByFactorSource: EntitiesControlledByFactorSource,
+			isMainBDFS: Bool
+		) {
+			self.isMainBDFS = isMainBDFS
 			self.entitiesControlledByFactorSource = entitiesControlledByFactorSource
 			self.entities = .init(
 				accountsForDeviceFactorSource: entitiesControlledByFactorSource,
@@ -31,6 +41,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case persistedMnemonicInKeychain(FactorSourceID.FromHash)
 		case skippedMnemonic(FactorSourceID.FromHash)
+		case createdNewMainBDFS(oldSkipped: FactorSourceID.FromHash, DeviceFactorSource)
 		case failedToSaveInKeychain(FactorSourceID.FromHash)
 	}
 
@@ -44,15 +55,21 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	public struct Destinations: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case importMnemonic(ImportMnemonic.State)
+			case confirmSkippingBDFS(ConfirmSkippingBDFS.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case importMnemonic(ImportMnemonic.Action)
+			/// **B**abylon **D**evice **F**actor **S**ource
+			case confirmSkippingBDFS(ConfirmSkippingBDFS.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
 			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
 				ImportMnemonic()
+			}
+			Scope(state: /State.confirmSkippingBDFS, action: /Action.confirmSkippingBDFS) {
+				ConfirmSkippingBDFS()
 			}
 		}
 	}
@@ -61,6 +78,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.userDefaults) var userDefaults
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 	public init() {}
 
@@ -85,8 +103,12 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			return .none
 
 		case .skip:
-			precondition(state.entitiesControlledByFactorSource.isSkippable)
-			return .send(.delegate(.skippedMnemonic(state.entitiesControlledByFactorSource.factorSourceID)))
+			if state.isMainBDFS {
+				state.destination = .confirmSkippingBDFS(.init())
+				return .none
+			} else {
+				return .send(.delegate(.skippedMnemonic(state.entitiesControlledByFactorSource.factorSourceID)))
+			}
 		}
 	}
 
@@ -115,6 +137,25 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 
 			case .persistedMnemonicInKeychainOnly, .doneViewing, .persistedNewFactorSourceInProfile:
 				preconditionFailure("Incorrect implementation")
+			}
+
+		case .destination(.presented(.confirmSkippingBDFS(.delegate(.cancel)))):
+			state.destination = nil
+			return .none
+
+		case .destination(.presented(.confirmSkippingBDFS(.delegate(.confirmed)))):
+			loggerGlobal.notice("Skipping BDFS! Generating a new one and hiding affected accounts/personas.")
+			state.destination = nil
+			return .run { [entitiesControlledByFactorSource = state.entitiesControlledByFactorSource] send in
+				loggerGlobal.info("Generating mnemonic for new main BDFS")
+				let newMainBDFS = try await factorSourcesClient.createNewMainBDFS()
+				loggerGlobal.info("Delegating done with creating new BDFS (skipped old)")
+				await send(.delegate(.createdNewMainBDFS(
+					oldSkipped: entitiesControlledByFactorSource.factorSourceID,
+					newMainBDFS.factorSource
+				)))
+			} catch: { error, _ in
+				loggerGlobal.critical("Failed to create new main BDFS error: \(error)")
 			}
 
 		default:

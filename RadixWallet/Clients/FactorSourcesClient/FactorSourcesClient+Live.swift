@@ -28,44 +28,107 @@ extension FactorSourcesClient: DependencyKey {
 			}
 		}
 
+		let addPrivateHDFactorSource: AddPrivateHDFactorSource = { request in
+			let factorSource = request.factorSource
+
+			switch factorSource {
+			case let .device(deviceFactorSource):
+				try secureStorageClient.saveMnemonicForFactorSource(.init(mnemonicWithPassphrase: request.mnemonicWithPasshprase, factorSource: deviceFactorSource))
+			default:
+				loggerGlobal.notice("Saving of non device private HD factor source not permitted, kind is: \(factorSource.kind)")
+			}
+			let factorSourceID = factorSource.id
+
+			/// We only need to save olympia mnemonics into Profile, the Babylon ones
+			/// already exist in profile, and this function is used only to save the
+			/// imported mnemonic into keychain (done above).
+			if request.saveIntoProfile {
+				do {
+					try await saveFactorSource(factorSource)
+				} catch {
+					loggerGlobal.critical("Failed to save factor source, error: \(error)")
+					if let idForMnemonicToDelete = try? factorSourceID.extract(as: FactorSourceID.FromHash.self) {
+						// We were unlucky, failed to update Profile, thus best to undo the saving of
+						// the mnemonic in keychain (if we can).
+						try? secureStorageClient.deleteMnemonicByFactorSourceID(idForMnemonicToDelete)
+					}
+					throw error
+				}
+			}
+
+			return factorSourceID
+		}
+
 		return Self(
 			getCurrentNetworkID: {
 				await profileStore.profile.networkID
+			},
+			getMainDeviceFactorSource: {
+				let sources = try await getFactorSources()
+					.filter { $0.factorSourceKind == .device && !$0.supportsOlympia }
+					.map { try $0.extract(as: DeviceFactorSource.self) }
+
+				if let explicitMain = sources.first(where: { $0.isExplicitMain }) {
+					return explicitMain
+				} else {
+					if sources.count == 0 {
+						let errorMessage = "BAD IMPL found no babylon device factor source"
+						loggerGlobal.critical(.init(stringLiteral: errorMessage))
+						assertionFailure(errorMessage)
+						throw FactorSourceNotFound()
+					} else if sources.count > 1 {
+						let errorMessage = "BAD IMPL found more than 1 implicit main babylon device factor sources"
+						loggerGlobal.critical(.init(stringLiteral: errorMessage))
+						assertionFailure(errorMessage)
+						let dateSorted = sources.sorted(by: { $0.addedOn < $1.addedOn })
+						return dateSorted.first! // best we can do
+					} else {
+						return sources[0] // found implicit one
+					}
+				}
+			},
+			createNewMainDeviceFactorSource: {
+				@Dependency(\.uuid) var uuid
+				@Dependency(\.date) var date
+				@Dependency(\.device) var device
+				@Dependency(\.mnemonicClient) var mnemonicClient
+
+				let model = await device.model
+				let name = await device.name
+
+				let mnemonicWithPassphrase = try MnemonicWithPassphrase(
+					mnemonic: mnemonicClient.generate(
+						BIP39.WordCount.twentyFour,
+						BIP39.Language.english
+					)
+				)
+
+				loggerGlobal.info("Creating new main BDFS")
+				let newBDFS = try DeviceFactorSource.babylon(
+					mnemonicWithPassphrase: mnemonicWithPassphrase,
+					model: .init(model),
+					name: .init(name)
+				)
+				assert(newBDFS.isExplicitMainBDFS)
+
+				loggerGlobal.info("Saving new main BDFS to Profile and Keychain")
+				_ = try await addPrivateHDFactorSource(.init(
+					factorSource: newBDFS.embed(),
+					mnemonicWithPasshprase: mnemonicWithPassphrase,
+					saveIntoProfile: false
+				))
+
+				return try PrivateHDFactorSource(
+					mnemonicWithPassphrase: mnemonicWithPassphrase,
+					factorSource: newBDFS
+				)
+
 			},
 			getFactorSources: getFactorSources,
 			factorSourcesAsyncSequence: {
 				await profileStore.factorSourcesValues()
 			},
-			addPrivateHDFactorSource: { request in
-				let factorSource = request.factorSource
-
-				switch factorSource {
-				case let .device(deviceFactorSource):
-					try secureStorageClient.saveMnemonicForFactorSource(.init(mnemonicWithPassphrase: request.mnemonicWithPasshprase, factorSource: deviceFactorSource))
-				default:
-					loggerGlobal.notice("Saving of non device private HD factor source not permitted, kind is: \(factorSource.kind)")
-				}
-				let factorSourceID = factorSource.id
-
-				/// We only need to save olympia mnemonics into Profile, the Babylon ones
-				/// already exist in profile, and this function is used only to save the
-				/// imported mnemonic into keychain (done above).
-				if request.saveIntoProfile {
-					do {
-						try await saveFactorSource(factorSource)
-					} catch {
-						loggerGlobal.critical("Failed to save factor source, error: \(error)")
-						if let idForMnemonicToDelete = try? factorSourceID.extract(as: FactorSourceID.FromHash.self) {
-							// We were unlucky, failed to update Profile, thus best to undo the saving of
-							// the mnemonic in keychain (if we can).
-							try? secureStorageClient.deleteMnemonicByFactorSourceID(idForMnemonicToDelete)
-						}
-						throw error
-					}
-				}
-
-				return factorSourceID
-			},
+			addPrivateHDFactorSource: addPrivateHDFactorSource,
 			checkIfHasOlympiaFactorSourceForAccounts: {
 				wordCount,
 					softwareAccounts -> FactorSourceID.FromHash? in

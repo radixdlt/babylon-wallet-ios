@@ -35,6 +35,9 @@ extension AccountsClient: DependencyKey {
 			getCurrentNetworkID: getCurrentNetworkID,
 			nextAccountIndex: nextAccountIndex,
 			getAccountsOnCurrentNetwork: getAccountsOnCurrentNetwork,
+			getHiddenAccountsOnCurrentNetwork: {
+				try await profileStore.profile.network(id: getCurrentNetworkID()).getHiddenAccounts()
+			},
 			accountsOnCurrentNetwork: { await profileStore.accountValues() },
 			accountUpdates: { address in
 				await profileStore.accountValues().compactMap {

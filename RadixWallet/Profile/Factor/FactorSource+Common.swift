@@ -34,6 +34,10 @@ extension FactorSource {
 }
 
 extension FactorSource.Common {
+	public mutating func flagAsMain() {
+		flags.append(.main)
+	}
+
 	public static func from(
 		cryptoParameters: FactorSource.CryptoParameters = .babylon,
 		flags: OrderedSet<FactorSourceFlag> = [],
@@ -42,6 +46,7 @@ extension FactorSource.Common {
 	) throws -> Self {
 		.init(
 			cryptoParameters: cryptoParameters,
+			flags: flags,
 			addedOn: addedOn,
 			lastUsedOn: lastUsedOn
 		)

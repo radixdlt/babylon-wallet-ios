@@ -93,10 +93,14 @@ extension DisplayEntitiesControlledByMnemonic {
 						)
 					}
 
-					VStack(alignment: .leading, spacing: .small3) {
-						ForEach(viewStore.accounts) { account in
-							SmallAccountCard(account: account)
-								.cornerRadius(.small1)
+					if viewStore.accounts.isEmpty {
+						NoContentView("Hidden Accounts only")
+					} else {
+						VStack(alignment: .leading, spacing: .small3) {
+							ForEach(viewStore.accounts) { account in
+								SmallAccountCard(account: account)
+									.cornerRadius(.small1)
+							}
 						}
 					}
 				}

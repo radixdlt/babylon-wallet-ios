@@ -5,6 +5,7 @@ public struct PersonasClient: Sendable {
 	public var personas: Personas
 	public var getPersonas: GetPersonas
 	public var getPersonasOnNetwork: GetPersonasOnNetwork
+	public var getHiddenPersonasOnCurrentNetwork: getHiddenPersonasOnCurrentNetwork
 	public var updatePersona: UpdatePersona
 
 	public var saveVirtualPersona: SaveVirtualPersona
@@ -16,6 +17,7 @@ public struct PersonasClient: Sendable {
 		nextPersonaIndex: @escaping NextPersonaIndex,
 		getPersonas: @escaping GetPersonas,
 		getPersonasOnNetwork: @escaping GetPersonasOnNetwork,
+		getHiddenPersonasOnCurrentNetwork: @escaping getHiddenPersonasOnCurrentNetwork,
 		updatePersona: @escaping UpdatePersona,
 		saveVirtualPersona: @escaping SaveVirtualPersona,
 		hasSomePersonaOnAnyNetwork: @escaping HasSomePersonaOnAnyNetworks,
@@ -25,6 +27,7 @@ public struct PersonasClient: Sendable {
 		self.nextPersonaIndex = nextPersonaIndex
 		self.getPersonas = getPersonas
 		self.getPersonasOnNetwork = getPersonasOnNetwork
+		self.getHiddenPersonasOnCurrentNetwork = getHiddenPersonasOnCurrentNetwork
 		self.updatePersona = updatePersona
 		self.saveVirtualPersona = saveVirtualPersona
 		self.hasSomePersonaOnAnyNetwork = hasSomePersonaOnAnyNetwork
@@ -37,6 +40,7 @@ extension PersonasClient {
 	public typealias Personas = @Sendable () async -> AnyAsyncSequence<Profile.Network.Personas>
 	public typealias GetPersonas = @Sendable () async throws -> Profile.Network.Personas
 	public typealias GetPersonasOnNetwork = @Sendable (NetworkID) async -> Profile.Network.Personas
+	public typealias getHiddenPersonasOnCurrentNetwork = @Sendable () async throws -> Profile.Network.Personas
 	public typealias HasSomePersonaOnAnyNetworks = @Sendable () async -> Bool
 	public typealias HasSomePersonaOnCurrentNetwork = @Sendable () async -> Bool
 	public typealias UpdatePersona = @Sendable (Profile.Network.Persona) async throws -> Void

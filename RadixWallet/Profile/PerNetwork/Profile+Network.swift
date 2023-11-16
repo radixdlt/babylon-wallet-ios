@@ -74,16 +74,18 @@ extension Profile.Network {
 		accounts.append(account)
 	}
 
-	public mutating func hideAccount(_ account: Profile.Network.Account) {
+	public mutating func hideAccounts(ids idsOfAccountsToHide: Set<Profile.Network.Account.ID>) {
 		var identifiedArrayOf = accounts.rawValue
-		identifiedArrayOf[id: account.address]?.hide()
-		accounts = .init(rawValue: identifiedArrayOf)!
+		for id in idsOfAccountsToHide {
+			identifiedArrayOf[id: id]?.hide()
 
-		authorizedDapps.mutateAll { dapp in
-			dapp.referencesToAuthorizedPersonas.mutateAll { persona in
-				persona.sharedAccounts?.ids.remove(account.address)
+			authorizedDapps.mutateAll { dapp in
+				dapp.referencesToAuthorizedPersonas.mutateAll { persona in
+					persona.sharedAccounts?.ids.remove(id)
+				}
 			}
 		}
+		accounts = .init(rawValue: identifiedArrayOf)!
 	}
 }
 
@@ -124,13 +126,15 @@ extension Profile.Network {
 		}
 	}
 
-	public mutating func hidePersona(_ personaToHide: Persona) {
-		/// Hide the persona itself
-		personas[id: personaToHide.id]?.hide()
+	public mutating func hidePersonas(ids idsOfPersonaToHide: Set<Persona.ID>) {
+		for id in idsOfPersonaToHide {
+			/// Hide the personas themselves
+			personas[id: id]?.hide()
 
-		/// Remove the persona reference on any authorized dapp
-		authorizedDapps.mutateAll { dapp in
-			dapp.referencesToAuthorizedPersonas.remove(id: personaToHide.id)
+			/// Remove the persona reference on any authorized dapp
+			authorizedDapps.mutateAll { dapp in
+				dapp.referencesToAuthorizedPersonas.remove(id: id)
+			}
 		}
 
 		/// Filter out dapps that do not reference any persona

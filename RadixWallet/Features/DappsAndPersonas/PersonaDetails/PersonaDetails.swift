@@ -163,7 +163,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 					return .none
 				}
 				return .run { send in
-					try await entitiesVisibilityClient.hidePersona(persona)
+					try await entitiesVisibilityClient.hide(persona: persona)
 					overlayWindowClient.scheduleHUD(.personaHidden)
 					await send(.delegate(.personaHidden))
 				} catch: { error, _ in

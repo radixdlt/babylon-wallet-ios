@@ -22,9 +22,9 @@ final class AccountPreferencesTests: TestCase {
 			))
 		}
 
-		let updateAccount = ActorIsolated<Profile.Network.Account?>(nil)
-		store.dependencies.entitiesVisibilityClient.hideAccount = { account in
-			await updateAccount.setValue(account)
+		let idsOfUpdatedAccounts = ActorIsolated<Set<Profile.Network.Account.ID>?>(nil)
+		store.dependencies.entitiesVisibilityClient.hideAccounts = { accounts in
+			await idsOfUpdatedAccounts.setValue(accounts)
 		}
 
 		let scheduleCompletionHUD = ActorIsolated<OverlayWindowClient.Item.HUD?>(nil)
@@ -38,8 +38,8 @@ final class AccountPreferencesTests: TestCase {
 			state.destinations = nil
 		}
 
-		let updatedAccount = await updateAccount.value
-		XCTAssertEqual(account, updatedAccount)
+		let idsOfUpdatedAccounts_ = await idsOfUpdatedAccounts.value
+		XCTAssertEqual([account.id], idsOfUpdatedAccounts_)
 
 		let scheduledCompletionHUD = await scheduleCompletionHUD.value
 		XCTAssertEqual(scheduledCompletionHUD, .accountHidden)
