@@ -43,14 +43,9 @@ extension ROLAClient {
 
 		return Self(
 			performDappDefinitionVerification: { metadata async throws in
-				_ = try await cacheClient.withCaching(
-					cacheEntry: .rolaDappVerificationMetadata(metadata.dAppDefinitionAddress.address),
-					request: {
-						try await onLedgerEntitiesClient.getDappMetadata(
-							metadata.dAppDefinitionAddress,
-							validatingWebsite: metadata.origin.url
-						)
-					}
+				_ = try await onLedgerEntitiesClient.getDappMetadata(
+					metadata.dAppDefinitionAddress,
+					validatingWebsite: metadata.origin.url
 				)
 			},
 			performWellKnownFileCheck: { metadata async throws in
@@ -83,10 +78,7 @@ extension ROLAClient {
 					}
 				}
 
-				let response = try await cacheClient.withCaching(
-					cacheEntry: .rolaWellKnownFileVerification(url.absoluteString),
-					request: fetchWellKnownFile
-				)
+				let response = try await fetchWellKnownFile()
 
 				let dAppDefinitionAddresses = response.dApps.map(\.dAppDefinitionAddress)
 				guard dAppDefinitionAddresses.contains(metadata.dAppDefinitionAddress) else {

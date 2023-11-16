@@ -156,7 +156,7 @@ extension CacheClient {
 		var lifetime: TimeInterval {
 			switch self {
 			case .networkName, .onLedgerEntity:
-				360 * 60 * 24 // On day cache
+				60 * 60 * 24 // On day cache
 			case .dAppRequestMetadata, .rolaDappVerificationMetadata, .rolaWellKnownFileVerification:
 				60
 			}
