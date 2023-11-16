@@ -1,5 +1,15 @@
+extension ConfirmSkippingBDFS.State {
+	var viewState: ConfirmSkippingBDFS.ViewState {
+		.init(flashScrollIndicators: flashScrollIndicators)
+	}
+}
+
 // MARK: - ConfirmSkippingBDFS.View
 extension ConfirmSkippingBDFS {
+	public struct ViewState: Equatable {
+		let flashScrollIndicators: Bool
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<ConfirmSkippingBDFS>
@@ -9,35 +19,53 @@ extension ConfirmSkippingBDFS {
 		}
 
 		public var body: some SwiftUI.View {
-			VStack(spacing: .medium2) {
-				// FIXME: Strings
-				Text("No Main Seed Phrase?")
-					.textStyle(.sheetTitle)
-					.padding(.horizontal, -.small2)
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				VStack(spacing: .medium2) {
+					// FIXME: Strings
+					Text("No Main Seed Phrase?")
+						.textStyle(.sheetTitle)
+						.padding(.horizontal, -.small2)
 
-				Text("WARNING: If you continue without entering your previous main “Babylon” seed phrase, **you will permanently lose access** to your Personas and any Accounts listed on the previous screen. A new main seed phrase will be created.\n\nTap Continue to proceed with recovering control of any Accounts created with a Ledger hardware wallet, or Accounts you originally created on the Olympia network.")
-					.textStyle(.body1Regular)
-					.foregroundColor(.app.gray1)
-					.multilineTextAlignment(.leading)
+					ScrollView(.vertical, showsIndicators: true) {
+						Text("The Radix Wallet always uses a single main “Babylon” seed phrase to generate new Personas and new Accounts (when not using a Ledger device).\n\nIf you do not have access to your previous main seed phrase, you can skip entering it for now. The Radix Wallet will create a new one, which will be used for new Personas and Accounts.\n\nYour old Accounts and Personas will still be listed, but you will have to enter their original seed phrase to use them. Alternatively, you can hide them if you no longer are interested in using them.")
+							.textStyle(.body1Regular)
+							.foregroundColor(.app.gray1)
+							.multilineTextAlignment(.leading)
+					}
+					.conditionalModifier {
+						if #available(iOS 17, *) {
+							$0.scrollIndicatorsFlash(trigger: viewStore.flashScrollIndicators)
+						} else {
+							$0
+						}
+					}
 
-				Spacer(minLength: 0)
-
-				// FIXME: Strings
-				Button("Continue") {
-					store.send(.view(.confirmTapped))
+					// FIXME: Strings
+					Button("Skip Main Seed Phrase Entry") {
+						store.send(.view(.confirmTapped))
+					}
+					.buttonStyle(.primaryRectangular)
 				}
-				.buttonStyle(.primaryRectangular)
-			}
-			.padding(.horizontal, .large3)
-			.padding(.bottom, .medium2)
-			.toolbar {
-				ToolbarItem(placement: .navigationBarLeading) {
-					BackButton {
-						store.send(.view(.backButtonTapped))
+				.task { @MainActor in
+					await store.send(.view(.task)).finish()
+				}
+				.padding(.horizontal, .large3)
+				.padding(.bottom, .medium2)
+				.toolbar {
+					ToolbarItem(placement: .navigationBarLeading) {
+						BackButton {
+							store.send(.view(.backButtonTapped))
+						}
 					}
 				}
 			}
 		}
+	}
+}
+
+extension View {
+	func conditionalModifier(@ViewBuilder _ closure: (Self) -> some View) -> some View {
+		closure(self)
 	}
 }
 
