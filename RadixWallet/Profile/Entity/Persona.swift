@@ -168,7 +168,7 @@ extension Profile.Network.Personas {
 }
 
 extension Profile.Network.Persona {
-	public var shouldBackupSeedPhrase: Bool {
+	public var shouldWriteDownSeedPhrase: Bool {
 		guard let deviceFactorSourceID else {
 			return false
 		}

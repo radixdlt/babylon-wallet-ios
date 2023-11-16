@@ -69,9 +69,9 @@ extension PersonasClient {
 		)
 	}
 
-	public func shouldBackupSeedPhraseForAnyPersona() async -> AnyAsyncSequence<Bool> {
+	public func shouldWriteDownSeedPhraseForAnyPersona() async -> AnyAsyncSequence<Bool> {
 		await personas().map { personas in
-			personas.contains(where: \.shouldBackupSeedPhrase)
+			personas.contains(where: \.shouldWriteDownSeedPhrase)
 		}
 		.share()
 		.eraseToAnyAsyncSequence()

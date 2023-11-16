@@ -7,7 +7,7 @@ public struct Persona: Sendable, FeatureReducer {
 		public let id: Profile.Network.Persona.ID
 		public let thumbnail: URL?
 		public let displayName: String
-		public var shouldBackupSeedPhrase: Bool
+		public var shouldWriteDownSeedPhrase: Bool
 
 		public init(persona: Profile.Network.AuthorizedPersonaDetailed) {
 			self.init(
@@ -22,26 +22,26 @@ public struct Persona: Sendable, FeatureReducer {
 				id: persona.id,
 				thumbnail: nil,
 				displayName: persona.displayName.rawValue,
-				shouldBackupSeedPhrase: persona.shouldBackupSeedPhrase
+				shouldWriteDownSeedPhrase: persona.shouldWriteDownSeedPhrase
 			)
 		}
 
-		public init(id: Profile.Network.Persona.ID, thumbnail: URL?, displayName: String, shouldBackupSeedPhrase: Bool = false) {
+		public init(id: Profile.Network.Persona.ID, thumbnail: URL?, displayName: String, shouldWriteDownSeedPhrase: Bool = false) {
 			self.id = id
 			self.thumbnail = thumbnail
 			self.displayName = displayName
-			self.shouldBackupSeedPhrase = shouldBackupSeedPhrase
+			self.shouldWriteDownSeedPhrase = shouldWriteDownSeedPhrase
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case tapped
-		case backupSeedPhrasePromptTapped
+		case writeDownSeedPhrasePromptTapped
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case openDetails
-		case backupSeedPhrase
+		case writeDownSeedPhrase
 	}
 
 	public init() {}
@@ -50,8 +50,8 @@ public struct Persona: Sendable, FeatureReducer {
 		switch viewAction {
 		case .tapped:
 			.send(.delegate(.openDetails))
-		case .backupSeedPhrasePromptTapped:
-			.send(.delegate(.backupSeedPhrase))
+		case .writeDownSeedPhrasePromptTapped:
+			.send(.delegate(.writeDownSeedPhrase))
 		}
 	}
 }

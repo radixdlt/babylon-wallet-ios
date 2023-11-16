@@ -119,7 +119,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 				await send(.delegate(.openDetails(persona)))
 			}
 
-		case .persona(id: let id, action: .delegate(.backupSeedPhrase)):
+		case .persona(id: let id, action: .delegate(.writeDownSeedPhrase)):
 			.run { send in
 				let persona = try await personasClient.getPersona(id: id)
 				await send(.delegate(.exportMnemonic(persona)))

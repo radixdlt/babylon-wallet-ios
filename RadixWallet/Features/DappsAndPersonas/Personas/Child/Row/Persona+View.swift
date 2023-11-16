@@ -23,11 +23,11 @@ extension Persona {
 							PlainListRow(title: viewStore.displayName) {
 								PersonaThumbnail(viewStore.thumbnail)
 							}
-							if viewStore.shouldBackupSeedPhrase {
+							if viewStore.shouldWriteDownSeedPhrase {
 								shieldPromptView(
 									text: "Backup this Persona's seed phrase",
 									action: {
-										viewStore.send(.backupSeedPhrasePromptTapped)
+										viewStore.send(.writeDownSeedPhrasePromptTapped)
 									}
 								)
 								.background(.app.gray2)

@@ -112,7 +112,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 		case let .personasSeedPhraseBackedup(personaIDs):
 			state.personaList.personas.mutateAll { persona in
 				if personaIDs.contains(persona.id) {
-					persona.shouldBackupSeedPhrase = false
+					persona.shouldWriteDownSeedPhrase = false
 				}
 			}
 			return .none
