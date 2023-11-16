@@ -201,8 +201,8 @@ public struct Home: Sendable, FeatureReducer {
 			state.destination = nil
 			switch delegateAction {
 			case .finishedEarly: break
-			case let .finishedImportingMnemonics(_, imported, newMainBDFS):
-				assert(newMainBDFS == nil, "Discrepancy, should not have been able to create new BDFS from outside of onboarding.")
+			case let .finishedImportingMnemonics(_, imported, notYetSavedNewMainBDFS):
+				assert(notYetSavedNewMainBDFS == nil, "Discrepancy, new Main BDFS should already have been saved.")
 				if !imported.isEmpty {
 					return checkAccountsAccessToMnemonic(state: state)
 				}

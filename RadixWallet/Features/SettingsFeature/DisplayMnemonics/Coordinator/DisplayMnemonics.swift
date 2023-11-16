@@ -150,8 +150,8 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			case .finishedEarly:
 				state.destination = nil
 				return .none
-			case let .finishedImportingMnemonics(_, importedIDs, newMainBDFS):
-				assert(newMainBDFS == nil, "Discrepancy, should not have been able to create new BDFS from outside of onboarding.")
+			case let .finishedImportingMnemonics(_, importedIDs, notYetSavedNewMainBDFS):
+				assert(notYetSavedNewMainBDFS == nil, "Discrepancy, new Main BDFS should already have been saved.")
 				for imported in importedIDs {
 					state.deviceFactorSources[id: imported.factorSourceID]?.imported()
 				}

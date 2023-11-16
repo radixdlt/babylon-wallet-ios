@@ -91,7 +91,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 					))))
 			}
 
-		case let .path(.element(_, action: .importMnemonicsFlow(.delegate(.finishedImportingMnemonics(skipList, _, newMainBDFS))))):
+		case let .path(.element(_, action: .importMnemonicsFlow(.delegate(.finishedImportingMnemonics(skipList, _, notYetSavedNewMainBDFS))))):
 			loggerGlobal.notice("Starting import snapshot process...")
 			guard let profileSelection = state.profileSelection else {
 				preconditionFailure("Expected to have a profile")
@@ -101,8 +101,8 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 				loggerGlobal.notice("Importing snapshot...")
 				try await backupsClient.importSnapshot(profileSelection.snapshot, fromCloud: profileSelection.isInCloud)
 
-				if let newMainBDFS {
-					try await factorSourcesClient.saveNewMainBDFS(newMainBDFS)
+				if let notYetSavedNewMainBDFS {
+					try await factorSourcesClient.saveNewMainBDFS(notYetSavedNewMainBDFS)
 				}
 
 				await send(.delegate(.profileImported(

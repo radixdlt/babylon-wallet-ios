@@ -99,7 +99,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		case finishedImportingMnemonics(
 			skipped: OrderedSet<SkippedOrImported>,
 			imported: OrderedSet<SkippedOrImported>,
-			newMainBDFS: DeviceFactorSource?
+			notYetSavedNewMainBDFS: DeviceFactorSource?
 		)
 
 		case finishedEarly(dueToFailure: Bool)
@@ -110,6 +110,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.userDefaults) var userDefaults
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
@@ -205,13 +206,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(delegateAction)))):
 			switch delegateAction {
 			case let .createdNewMainBDFS(skipped, newMainBDFS):
-				if state.context.isFromOnboarding {
-					state.newMainBDFS = newMainBDFS
-				} else {
-					let errorMessage = "DISCREPANCY! We should not have been able to create a new BDFS outside of onboarding."
-					loggerGlobal.critical(.init(stringLiteral: errorMessage))
-					assertionFailure(errorMessage)
-				}
+				state.newMainBDFS = newMainBDFS
 				state.skipped.append(.init(factorSourceID: skipped))
 				return finishedWith(factorSourceID: skipped, state: &state)
 
@@ -261,7 +256,21 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 			return .none
 		} else {
 			state.destination = nil
-			return .send(.delegate(.finishedImportingMnemonics(skipped: state.skipped, imported: state.imported, newMainBDFS: state.newMainBDFS)))
+			guard let newMainBDFS = state.newMainBDFS else {
+				return .send(.delegate(.finishedImportingMnemonics(skipped: state.skipped, imported: state.imported, notYetSavedNewMainBDFS: nil)))
+			}
+			if state.context.isFromOnboarding {
+				return .send(.delegate(.finishedImportingMnemonics(skipped: state.skipped, imported: state.imported, notYetSavedNewMainBDFS: state.newMainBDFS)))
+			} else {
+				return .run { [skipped = state.skipped, imported = state.imported] send in
+					try await factorSourcesClient.saveNewMainBDFS(newMainBDFS)
+					return await send(.delegate(.finishedImportingMnemonics(
+						skipped: skipped,
+						imported: imported,
+						notYetSavedNewMainBDFS: nil
+					)))
+				}
+			}
 		}
 	}
 }
