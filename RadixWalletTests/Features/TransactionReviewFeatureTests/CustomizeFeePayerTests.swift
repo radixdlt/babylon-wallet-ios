@@ -8,13 +8,10 @@ final class CustomizeFeePayerTests: TestCase {
 		let manifestStub = try TransactionManifest(instructions: .fromInstructions(instructions: [], networkId: NetworkID.enkinet.rawValue), blobs: [])
 		let notaryKey = Curve25519.Signing.PrivateKey()
 		var transactionStub = ReviewedTransaction(
-			feePayerSelection: .init(
-				selected: nil,
-				candidates: .init(.init(account: .previewValue0, xrdBalance: 10)),
-				transactionFee: .nonContingentLockPaying
-			),
 			networkId: NetworkID.enkinet,
 			transaction: .nonConforming,
+			feePayer: .success(nil),
+			transactionFee: .nonContingentLockPaying,
 			transactionSigners: .init(notaryPublicKey: notaryKey.publicKey, intentSigning: .notaryIsSignatory),
 			signingFactors: [:]
 		)
@@ -40,13 +37,13 @@ final class CustomizeFeePayerTests: TestCase {
 		let selectedFeePayer = FeePayerCandidate(account: .previewValue1, xrdBalance: 20)
 
 		await sut.send(.view(.changeFeePayerTapped)) {
-			$0.destination = .selectFeePayer(.init(feePayerSelection: transactionStub.feePayerSelection))
+			$0.destination = .selectFeePayer(.init(feePayer: nil, transactionFee: .nonContingentLockPaying))
 		}
 		await sut.send(.child(.destination(.presented(.selectFeePayer(.delegate(.selected(selectedFeePayer))))))) {
 			$0.destination = nil
 		}
 
-		transactionStub.feePayerSelection.selected = selectedFeePayer
+		transactionStub.feePayer = .success(selectedFeePayer)
 		let accountEntity = EntityPotentiallyVirtual.account(selectedFeePayer.account)
 		transactionStub.transactionSigners = .init(
 			notaryPublicKey: notaryKey.publicKey,
@@ -60,9 +57,9 @@ final class CustomizeFeePayerTests: TestCase {
 		}
 
 		transactionStub.signingFactors = [.device: .init(rawValue: [signingFactor])!]
-		transactionStub.feePayerSelection.transactionFee.addLockFeeCost()
-		transactionStub.feePayerSelection.transactionFee.updateSignaturesCost(1)
-		transactionStub.feePayerSelection.transactionFee.updateNotarizingCost(notaryIsSignatory: false)
+		transactionStub.transactionFee.addLockFeeCost()
+		transactionStub.transactionFee.updateSignaturesCost(1)
+		transactionStub.transactionFee.updateNotarizingCost(notaryIsSignatory: false)
 
 		await sut.receive(.internal(.updated(.success(transactionStub))), timeout: .seconds(1)) {
 			$0.reviewedTransaction = transactionStub

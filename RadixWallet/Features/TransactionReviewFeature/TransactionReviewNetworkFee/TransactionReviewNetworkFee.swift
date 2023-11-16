@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - TransactionReviewNetworkFee
 public struct TransactionReviewNetworkFee: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let reviewedTransaction: ReviewedTransaction
+		public var reviewedTransaction: ReviewedTransaction
 
 		public init(
 			reviewedTransaction: ReviewedTransaction

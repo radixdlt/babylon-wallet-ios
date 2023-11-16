@@ -223,14 +223,27 @@ extension SwiftUI.View {
 		return offDeviceMnemonicInfoSheet(with: destinationStore)
 			.onContinueWarningAlert(with: destinationStore)
 			.markMnemonicAsBackedUpAlert(with: destinationStore)
+			.verifyMnemonicDestination(with: destinationStore)
 	}
 
 	@MainActor
 	fileprivate func markMnemonicAsBackedUpAlert(with destinationStore: PresentationStoreOf<ImportMnemonic.Destinations>) -> some SwiftUI.View {
 		alert(
 			store: destinationStore,
-			state: /ImportMnemonic.Destinations.State.markMnemonicAsBackedUp,
-			action: ImportMnemonic.Destinations.Action.markMnemonicAsBackedUp
+			state: /ImportMnemonic.Destinations.State.backupConfirmation,
+			action: ImportMnemonic.Destinations.Action.backupConfimartion
+		)
+	}
+
+	@MainActor
+	fileprivate func verifyMnemonicDestination(with destinationStore: PresentationStoreOf<ImportMnemonic.Destinations>) -> some SwiftUI.View {
+		navigationDestination(
+			store: destinationStore,
+			state: /ImportMnemonic.Destinations.State.verifyMnemonic,
+			action: ImportMnemonic.Destinations.Action.verifyMnemonic,
+			destination: { childStore in
+				VerifyMnemonic.View(store: childStore)
+			}
 		)
 	}
 

@@ -236,7 +236,8 @@ public struct Home: Sendable, FeatureReducer {
 			onSuccess: {
 				state.destination = .exportMnemonic(.export(
 					$0,
-					title: L10n.RevealSeedPhrase.title
+					title: L10n.RevealSeedPhrase.title,
+					context: .fromBackupPrompt
 				))
 			}
 		)

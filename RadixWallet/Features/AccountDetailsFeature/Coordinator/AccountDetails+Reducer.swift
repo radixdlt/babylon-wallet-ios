@@ -26,6 +26,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case backButtonTapped
 		case preferencesButtonTapped
 		case transferButtonTapped
+		case historyButtonTapped
 
 		case exportMnemonicButtonTapped
 		case importMnemonicButtonTapped
@@ -76,6 +77,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
+	@Dependency(\.openURL) var openURL
 
 	public init() {}
 
@@ -111,6 +113,15 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				from: state.account
 			))
 			return .none
+
+		case .historyButtonTapped:
+			let url = Radix.Dashboard
+				.dashboard(forNetworkID: state.account.networkID)
+				.recentTransactionsURL(state.account.address)
+
+			return .run { _ in
+				await openURL(url)
+			}
 
 		case .exportMnemonicButtonTapped:
 			return .send(.delegate(.exportMnemonic(controlling: state.account)))

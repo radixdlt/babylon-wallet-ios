@@ -113,7 +113,7 @@ private extension View {
 			state: /Home.Destination.State.exportMnemonic,
 			action: Home.Destination.Action.exportMnemonic,
 			content: { childStore in
-				NavigationView {
+				NavigationStack {
 					ExportMnemonic.View(store: childStore)
 				}
 			}
