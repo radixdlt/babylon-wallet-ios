@@ -98,8 +98,6 @@ extension DisplayEntitiesControlledByMnemonic {
 					if viewStore.accounts.isEmpty {
 						if viewStore.hasHiddenAccounts {
 							NoContentView("Hidden Accounts only.")
-						} else {
-							NoContentView("No accounts yet.")
 						}
 					} else {
 						VStack(alignment: .leading, spacing: .small3) {
