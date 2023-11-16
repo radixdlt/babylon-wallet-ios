@@ -449,7 +449,7 @@ extension ProfileStore {
 		do {
 			if var existing = try _tryLoadSavedProfile() {
 				if
-					let bdfs = existing.factorSources.compactMap({ $0.extract(DeviceFactorSource.self) }).filter(\.isExplicitMainBDFS).first,
+					case let bdfs = existing.factorSources.babylonDevice,
 					!secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(bdfs.id),
 					existing.networks.isEmpty
 				{
