@@ -32,7 +32,7 @@ extension ConfirmSkippingBDFS {
 							.foregroundColor(.app.gray1)
 							.multilineTextAlignment(.leading)
 					}
-					.conditionalModifier {
+					.modifier {
 						if #available(iOS 17, *) {
 							$0.scrollIndicatorsFlash(trigger: viewStore.flashScrollIndicators)
 						} else {
@@ -60,12 +60,6 @@ extension ConfirmSkippingBDFS {
 				}
 			}
 		}
-	}
-}
-
-extension View {
-	func conditionalModifier(@ViewBuilder _ closure: (Self) -> some View) -> some View {
-		closure(self)
 	}
 }
 

@@ -74,12 +74,9 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
-	@Dependency(\.secureStorageClient) var secureStorageClient
 
 	public init() {}
 
