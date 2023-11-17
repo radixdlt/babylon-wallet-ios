@@ -154,10 +154,17 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 			}
 			return .none
 
-		case let .destination(.presented(.editPersona(.delegate(.personaSaved(persona))))):
+		default:
+			return .none
+		}
+	}
+
+	func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .editPersona(.delegate(.personaSaved(persona))):
 			return .send(.delegate(.personaUpdated(persona)))
 
-		case .destination(.presented(.createPersona(.delegate(.completed)))):
+		case .createPersona(.delegate(.completed)):
 			state.personaPrimacy = .notFirstOnCurrentNetwork
 			return .none
 

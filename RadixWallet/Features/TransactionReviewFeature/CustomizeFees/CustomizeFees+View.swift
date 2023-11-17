@@ -172,8 +172,8 @@ extension CustomizeFees {
 }
 
 private extension StoreOf<CustomizeFees> {
-	var destination: PresentationStoreOf<CustomizeFees.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<CustomizeFees.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -183,8 +183,8 @@ private extension View {
 		let destinationStore = store.destination
 		return sheet(
 			store: destinationStore,
-			state: /CustomizeFees.Destination.State.selectFeePayer,
-			action: CustomizeFees.Destination.Action.selectFeePayer,
+			state: /CustomizeFees.Destination_.State.selectFeePayer,
+			action: CustomizeFees.Destination_.Action.selectFeePayer,
 			content: { SelectFeePayer.View(store: $0) }
 		)
 	}

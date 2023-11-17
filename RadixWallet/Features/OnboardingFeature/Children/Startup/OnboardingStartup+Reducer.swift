@@ -52,12 +52,12 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case .destination(.presented(.restoreFromBackup(.delegate(.profileImported)))):
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .restoreFromBackup(.delegate(.profileImported)):
 			.send(.delegate(.completed))
 
-		case .destination(.presented(.restoreFromBackup(.delegate(.failedToImportProfileDueToMnemonics)))):
+		case .restoreFromBackup(.delegate(.failedToImportProfileDueToMnemonics)):
 			.none
 
 		default:

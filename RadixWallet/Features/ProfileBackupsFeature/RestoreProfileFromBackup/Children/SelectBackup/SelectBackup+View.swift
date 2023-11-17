@@ -66,8 +66,8 @@ extension SelectBackup {
 }
 
 private extension StoreOf<SelectBackup> {
-	var destination: PresentationStoreOf<SelectBackup.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<SelectBackup.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -77,8 +77,8 @@ private extension View {
 		let destinationStore = store.destination
 		return sheet(
 			store: destinationStore,
-			state: /SelectBackup.Destination.State.inputEncryptionPassword,
-			action: SelectBackup.Destination.Action.inputEncryptionPassword,
+			state: /SelectBackup.Destination_.State.inputEncryptionPassword,
+			action: SelectBackup.Destination_.Action.inputEncryptionPassword,
 			content: { EncryptOrDecryptProfile.View(store: $0).inNavigationView }
 		)
 	}

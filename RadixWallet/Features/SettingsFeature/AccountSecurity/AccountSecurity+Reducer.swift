@@ -135,9 +135,9 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(.importOlympiaWallet(.delegate(.finishedMigration(gotoAccountList))))):
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .importOlympiaWallet(.delegate(.finishedMigration(gotoAccountList))):
 			if gotoAccountList {
 				return .send(.delegate(.gotoAccountList))
 			} else {
@@ -145,16 +145,17 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case .destination(.dismiss):
-			if case let .depositGuarantees(depositGuarantees) = state.destination, let value = depositGuarantees.depositGuarantee {
-				state.preferences?.transaction.defaultDepositGuarantee = value
-				return savePreferences(state: state)
-			}
-			return .none
-
-		case .destination:
+		default:
 			return .none
 		}
+	}
+
+	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		if case let .depositGuarantees(depositGuarantees) = state.destination, let value = depositGuarantees.depositGuarantee {
+			state.preferences?.transaction.defaultDepositGuarantee = value
+			return savePreferences(state: state)
+		}
+		return .none
 	}
 
 	private func savePreferences(state: State) -> Effect<Action> {

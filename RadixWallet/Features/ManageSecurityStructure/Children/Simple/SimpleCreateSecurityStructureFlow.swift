@@ -115,18 +115,6 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 		return .none
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(.listConfirmerOfNewPhone(.delegate(.choseFactorSource(secQFS))))):
-			choseConfirmerOfNewPhone(secQFS, &state)
-
-		case let .destination(.presented(.listLostPhoneHelper(.delegate(.choseFactorSource(trustedContactFS))))):
-			choseLostPhoneHelper(trustedContactFS, &state)
-
-		default: .none
-		}
-	}
-
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .changedNumberOfDaysUntilAutoConfirmation(delayAsString):
@@ -185,7 +173,6 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			return .none
 
 		case let .finished(simpleFactorConfig):
-
 			switch state.mode {
 			case let .new(new):
 				precondition(new.lostPhoneHelper == simpleFactorConfig.singleRecoveryFactor)
@@ -211,6 +198,19 @@ public struct SimpleManageSecurityStructureFlow: Sendable, FeatureReducer {
 			case let .existing(structureToUpdate):
 				return .send(.delegate(.updatedOrCreatedSecurityStructure(.success(.updating(structure: structureToUpdate)))))
 			}
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .listConfirmerOfNewPhone(.delegate(.choseFactorSource(secQFS))):
+			choseConfirmerOfNewPhone(secQFS, &state)
+
+		case let .listLostPhoneHelper(.delegate(.choseFactorSource(trustedContactFS))):
+			choseLostPhoneHelper(trustedContactFS, &state)
+
+		default:
+			.none
 		}
 	}
 }

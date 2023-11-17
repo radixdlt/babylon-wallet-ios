@@ -52,11 +52,6 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .destination(.presented(.details(.delegate(.dismiss)))):
-			state.destination = nil
-			return .none
-		case .destination:
-			return .none
 		case let .section(id, .delegate(.selected(token))):
 			state.destination = .details(.init(
 				resourceAddress: token.resourceAddress,
@@ -65,6 +60,16 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 			))
 			return .none
 		case .section:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .details(.delegate(.dismiss)):
+			state.destination = nil
+			return .none
+		default:
 			return .none
 		}
 	}

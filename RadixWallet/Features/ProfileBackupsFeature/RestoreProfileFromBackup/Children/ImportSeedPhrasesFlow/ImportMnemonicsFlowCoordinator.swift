@@ -197,9 +197,9 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(delegateAction)))):
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .importMnemonicControllingAccounts(.delegate(delegateAction)):
 			switch delegateAction {
 			case let .createdNewMainBDFS(skipped, newMainBDFS):
 				state.newMainBDFS = newMainBDFS
@@ -219,23 +219,24 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 				return .send(.delegate(.finishedEarly(dueToFailure: true)))
 			}
 
-		case .destination(.dismiss):
-			guard let destination = state.destination else {
-				return nextMnemonicIfNeeded(state: &state)
-			}
-
-			switch destination {
-			case let .importMnemonicControllingAccounts(substate):
-				if !substate.isMainBDFS {
-					return nextMnemonicIfNeeded(state: &state)
-				} else {
-					// Skipped a main bdfs by use of OS level gestures (thus bypassing warning)
-					return .send(.delegate(.finishedEarly(dueToFailure: true)))
-				}
-			}
-
 		default:
 			return .none
+		}
+	}
+
+	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		guard let destination = state.destination else {
+			return nextMnemonicIfNeeded(state: &state)
+		}
+
+		switch destination {
+		case let .importMnemonicControllingAccounts(substate):
+			if !substate.isMainBDFS {
+				return nextMnemonicIfNeeded(state: &state)
+			} else {
+				// Skipped a main bdfs by use of OS level gestures (thus bypassing warning)
+				return .send(.delegate(.finishedEarly(dueToFailure: true)))
+			}
 		}
 	}
 

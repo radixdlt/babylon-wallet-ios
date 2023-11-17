@@ -102,21 +102,6 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(.scanAccountAddress(.delegate(.scanned(addressStringScanned))))):
-			var addressStringScanned = addressStringScanned
-			QR.removeAddressPrefixIfNeeded(from: &addressStringScanned)
-
-			state.radixAddress = addressStringScanned
-			state.destination = nil
-			return .none
-
-		default:
-			return .none
-		}
-	}
-
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .radixAddressChanged(radixAddress):
@@ -149,6 +134,21 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 				}
 				await send(.delegate(.saveFactorSourceResult(result)))
 			}
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .scanAccountAddress(.delegate(.scanned(addressStringScanned))):
+			var addressStringScanned = addressStringScanned
+			QR.removeAddressPrefixIfNeeded(from: &addressStringScanned)
+
+			state.radixAddress = addressStringScanned
+			state.destination = nil
+			return .none
+
+		default:
+			return .none
 		}
 	}
 }

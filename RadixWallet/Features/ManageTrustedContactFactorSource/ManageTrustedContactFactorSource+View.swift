@@ -180,8 +180,8 @@ extension ManageTrustedContactFactorSource {
 }
 
 private extension StoreOf<ManageTrustedContactFactorSource> {
-	var destination: PresentationStoreOf<ManageTrustedContactFactorSource.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<ManageTrustedContactFactorSource.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -191,8 +191,8 @@ private extension View {
 		let destinationStore = store.destination
 		return sheet(
 			store: destinationStore,
-			state: /ManageTrustedContactFactorSource.Destination.State.scanAccountAddress,
-			action: ManageTrustedContactFactorSource.Destination.Action.scanAccountAddress,
+			state: /ManageTrustedContactFactorSource.Destination_.State.scanAccountAddress,
+			action: ManageTrustedContactFactorSource.Destination_.Action.scanAccountAddress,
 			content: {
 				ScanQRCoordinator.View(store: $0)
 					.navigationTitle("Scan address") // FIXME: future strings

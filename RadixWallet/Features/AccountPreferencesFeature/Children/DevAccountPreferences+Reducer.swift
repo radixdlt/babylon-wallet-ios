@@ -184,27 +184,6 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(action)):
-			switch action {
-			#if DEBUG
-			case .reviewTransaction(.delegate(.transactionCompleted)), .reviewTransaction(.delegate(.failed)):
-				if case .reviewTransaction = state.destination {
-					state.destination = nil
-				}
-				return .none
-			#endif
-
-			default:
-				return .none
-			}
-
-		default:
-			return .none
-		}
-	}
-
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .currentNetwork(currentNetwork):
@@ -256,6 +235,21 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 			return .none
 		#endif
 		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		#if DEBUG
+		switch presentedAction {
+		case .reviewTransaction(.delegate(.transactionCompleted)), .reviewTransaction(.delegate(.failed)):
+			if case .reviewTransaction = state.destination {
+				state.destination = nil
+			}
+			return .none
+
+		default:
+			return .none
+		}
+		#endif
 	}
 
 	private func call(

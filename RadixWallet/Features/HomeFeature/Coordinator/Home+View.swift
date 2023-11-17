@@ -21,48 +21,64 @@ extension Home {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				ScrollView {
-					VStack(spacing: .medium1) {
-						Header.View(
-							store: store.scope(
-								state: \.header,
-								action: { .child(.header($0)) }
-							)
+			ScrollView {
+				VStack(spacing: .medium1) {
+					HeaderView()
+
+					VStack(spacing: .medium3) {
+						ForEachStore(
+							store.scope(
+								state: \.accountRows,
+								action: { .child(.account(id: $0, action: $1)) }
+							),
+							content: { Home.AccountRow.View(store: $0) }
 						)
-
-						VStack(spacing: .medium3) {
-							ForEachStore(
-								store.scope(
-									state: \.accountRows,
-									action: { .child(.account(id: $0, action: $1)) }
-								),
-								content: { Home.AccountRow.View(store: $0) }
-							)
-						}
-						.padding(.horizontal, .medium1)
-
-						Button(L10n.HomePage.createNewAccount) {
-							viewStore.send(.createAccountButtonTapped)
-						}
-						.buttonStyle(.secondaryRectangular())
 					}
-					.padding(.bottom, .medium1)
+					.padding(.horizontal, .medium1)
+
+					Button(L10n.HomePage.createNewAccount) {
+						store.send(.view(.createAccountButtonTapped))
+					}
+					.buttonStyle(.secondaryRectangular())
 				}
-				.toolbar {
-					ToolbarItem(placement: .navigationBarTrailing) {
+				.padding(.bottom, .medium1)
+			}
+			.toolbar {
+				ToolbarItem(placement: .navigationBarTrailing) {
+					WithViewStore(store, observe: \.viewState) { viewStore in
 						SettingsButton(shouldShowNotification: viewStore.hasNotification) {
-							viewStore.send(.settingsButtonTapped)
+							store.send(.view(.settingsButtonTapped))
 						}
 					}
 				}
-				.refreshable {
-					await viewStore.send(.pullToRefreshStarted).finish()
+			}
+			.refreshable {
+				await store.send(.view(.pullToRefreshStarted)).finish()
+			}
+			.task { @MainActor in
+				await store.send(.view(.task)).finish()
+			}
+			.destinations(with: store)
+		}
+
+		private struct HeaderView: SwiftUI.View {
+			var body: some SwiftUI.View {
+				VStack(alignment: .leading, spacing: .small2) {
+					Text(L10n.HomePage.title)
+						.foregroundColor(.app.gray1)
+						.textStyle(.sheetTitle)
+
+					HStack {
+						Text(L10n.HomePage.subtitle)
+							.foregroundColor(.app.gray2)
+							.textStyle(.body1HighImportance)
+							.lineLimit(2)
+
+						Spacer(minLength: 2 * .large1)
+					}
 				}
-				.task { @MainActor in
-					await viewStore.send(.task).finish()
-				}
-				.destinations(with: store)
+				.padding(.leading, .medium1)
+				.padding(.top, .small3)
 			}
 		}
 
@@ -81,8 +97,8 @@ extension Home {
 }
 
 private extension StoreOf<Home> {
-	var destination: PresentationStoreOf<Home.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<Home.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -96,42 +112,38 @@ private extension View {
 			.importMnemonics(with: destinationStore)
 	}
 
-	func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
+	func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination_>) -> some SwiftUI.View {
 		navigationDestination(
 			store: destinationStore,
-			state: /Home.Destination.State.accountDetails,
-			action: Home.Destination.Action.accountDetails,
+			state: /Home.Destination_.State.accountDetails,
+			action: Home.Destination_.Action.accountDetails,
 			destination: { AccountDetails.View(store: $0) }
 		)
 	}
 
-	func createAccount(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
+	func createAccount(with destinationStore: PresentationStoreOf<Home.Destination_>) -> some SwiftUI.View {
 		sheet(
 			store: destinationStore,
-			state: /Home.Destination.State.createAccount,
-			action: Home.Destination.Action.createAccount,
+			state: /Home.Destination_.State.createAccount,
+			action: Home.Destination_.Action.createAccount,
 			content: { CreateAccountCoordinator.View(store: $0) }
 		)
 	}
 
-	func exportMnemonic(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
+	func exportMnemonic(with destinationStore: PresentationStoreOf<Home.Destination_>) -> some SwiftUI.View {
 		sheet(
 			store: destinationStore,
-			state: /Home.Destination.State.exportMnemonic,
-			action: Home.Destination.Action.exportMnemonic,
-			content: { childStore in
-				NavigationStack {
-					ExportMnemonic.View(store: childStore)
-				}
-			}
+			state: /Home.Destination_.State.exportMnemonic,
+			action: Home.Destination_.Action.exportMnemonic,
+			content: { ExportMnemonic.View(store: $0).inNavigationStack }
 		)
 	}
 
-	func importMnemonics(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
+	func importMnemonics(with destinationStore: PresentationStoreOf<Home.Destination_>) -> some SwiftUI.View {
 		sheet(
 			store: destinationStore,
-			state: /Home.Destination.State.importMnemonics,
-			action: Home.Destination.Action.importMnemonics,
+			state: /Home.Destination_.State.importMnemonics,
+			action: Home.Destination_.Action.importMnemonics,
 			content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
 		)
 	}

@@ -132,13 +132,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .destination(.presented(.transfer(.delegate(.dismissed)))):
-			state.destination = nil
-			return .none
-
-		case .destination(.presented(.preferences(.delegate(.accountHidden)))):
-			return .send(.delegate(.dismiss))
-
 		case .assets(.internal(.resourcesStateUpdated)):
 			checkAccountAccessToMnemonic(state: &state)
 			return .none
@@ -153,6 +146,20 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case let .accountUpdated(account):
 			state.account = account
 			checkAccountAccessToMnemonic(state: &state)
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .transfer(.delegate(.dismissed)):
+			state.destination = nil
+			return .none
+
+		case .preferences(.delegate(.accountHidden)):
+			return .send(.delegate(.dismiss))
+
+		default:
 			return .none
 		}
 	}

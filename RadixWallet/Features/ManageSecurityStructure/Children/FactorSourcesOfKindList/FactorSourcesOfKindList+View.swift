@@ -135,8 +135,7 @@ public extension FactorSourcesOfKindList {
 						FactorSourceRowView(viewState: .init(
 							factorSource: factorSource.embed(),
 							describe: { $0.generalHint }
-						)
-						)
+						))
 					}
 				}
 			}
@@ -159,24 +158,25 @@ extension FactorSource {
 @MainActor
 private extension View {
 	func destinations(with store: StoreOf<FactorSourcesOfKindList<some BaseFactorSourceProtocol>>) -> some View {
-		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+		let destinationStore = store.scope(state: \.$destination) { .destination($0) }
 		return addNewFactorSourceSheet(with: destinationStore)
+			.existingFactorSourceWillBeDeleted(with: destinationStore)
 	}
 
-	private func addNewFactorSourceSheet<F>(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList<F>.Destination>) -> some View where F: BaseFactorSourceProtocol {
+	private func addNewFactorSourceSheet<F>(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList<F>.Destination_>) -> some View where F: BaseFactorSourceProtocol {
 		sheet(
 			store: destinationStore,
-			state: /FactorSourcesOfKindList.Destination.State.addNewFactorSource,
-			action: FactorSourcesOfKindList.Destination.Action.addNewFactorSource,
+			state: /FactorSourcesOfKindList.Destination_.State.addNewFactorSource,
+			action: FactorSourcesOfKindList.Destination_.Action.addNewFactorSource,
 			content: { ManageSomeFactorSource<F>.View(store: $0) }
 		)
 	}
 
-	private func existingFactorSourceWillBeDeleted(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList<some BaseFactorSourceProtocol>.Destination>) -> some View {
+	private func existingFactorSourceWillBeDeleted(with destinationStore: PresentationStoreOf<FactorSourcesOfKindList<some BaseFactorSourceProtocol>.Destination_>) -> some View {
 		confirmationDialog(
 			store: destinationStore,
-			state: /FactorSourcesOfKindList.Destination.State.existingFactorSourceWillBeDeletedConfirmationDialog,
-			action: FactorSourcesOfKindList.Destination.Action.existingFactorSourceWillBeDeletedConfirmationDialog
+			state: /FactorSourcesOfKindList.Destination_.State.existingFactorSourceWillBeDeletedConfirmationDialog,
+			action: FactorSourcesOfKindList.Destination_.Action.existingFactorSourceWillBeDeletedConfirmationDialog
 		)
 	}
 }

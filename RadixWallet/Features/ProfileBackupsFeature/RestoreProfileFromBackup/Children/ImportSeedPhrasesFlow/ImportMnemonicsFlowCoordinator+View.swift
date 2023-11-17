@@ -22,8 +22,8 @@ extension ImportMnemonicsFlowCoordinator {
 }
 
 private extension StoreOf<ImportMnemonicsFlowCoordinator> {
-	var destination: PresentationStoreOf<ImportMnemonicsFlowCoordinator.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<ImportMnemonicsFlowCoordinator.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -37,8 +37,8 @@ private extension View {
 		// 2. If fixes issue where user can dismiss screen with iOS gesture, which we dont want in this case
 		return fullScreenCover(
 			store: destinationStore,
-			state: /ImportMnemonicsFlowCoordinator.Destination.State.importMnemonicControllingAccounts,
-			action: ImportMnemonicsFlowCoordinator.Destination.Action.importMnemonicControllingAccounts,
+			state: /ImportMnemonicsFlowCoordinator.Destination_.State.importMnemonicControllingAccounts,
+			action: ImportMnemonicsFlowCoordinator.Destination_.Action.importMnemonicControllingAccounts,
 			content: { importStore in
 				ImportMnemonicControllingAccounts.View(store: importStore)
 					.withNavigationBar {

@@ -133,8 +133,8 @@ extension SimpleManageSecurityStructureFlow {
 }
 
 private extension StoreOf<SimpleManageSecurityStructureFlow> {
-	var destination: PresentationStoreOf<SimpleManageSecurityStructureFlow.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<SimpleManageSecurityStructureFlow.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -146,20 +146,20 @@ private extension View {
 			.listLostPhoneHelper(with: destinationStore)
 	}
 
-	private func listConfirmerOfNewPhone(with destinationStore: PresentationStoreOf<SimpleManageSecurityStructureFlow.Destination>) -> some View {
+	private func listConfirmerOfNewPhone(with destinationStore: PresentationStoreOf<SimpleManageSecurityStructureFlow.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /SimpleManageSecurityStructureFlow.Destination.State.listConfirmerOfNewPhone,
-			action: SimpleManageSecurityStructureFlow.Destination.Action.listConfirmerOfNewPhone,
+			state: /SimpleManageSecurityStructureFlow.Destination_.State.listConfirmerOfNewPhone,
+			action: SimpleManageSecurityStructureFlow.Destination_.Action.listConfirmerOfNewPhone,
 			content: { ListConfirmerOfNewPhone.View(store: $0) }
 		)
 	}
 
-	private func listLostPhoneHelper(with destinationStore: PresentationStoreOf<SimpleManageSecurityStructureFlow.Destination>) -> some View {
+	private func listLostPhoneHelper(with destinationStore: PresentationStoreOf<SimpleManageSecurityStructureFlow.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /SimpleManageSecurityStructureFlow.Destination.State.listLostPhoneHelper,
-			action: SimpleManageSecurityStructureFlow.Destination.Action.listLostPhoneHelper,
+			state: /SimpleManageSecurityStructureFlow.Destination_.State.listLostPhoneHelper,
+			action: SimpleManageSecurityStructureFlow.Destination_.Action.listLostPhoneHelper,
 			content: { ListLostPhoneHelper.View(store: $0) }
 		)
 	}

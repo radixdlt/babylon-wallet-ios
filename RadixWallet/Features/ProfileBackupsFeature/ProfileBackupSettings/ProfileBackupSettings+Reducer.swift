@@ -149,14 +149,14 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 
 		case let .cloudProfileSyncToggled(isEnabled):
 			if !isEnabled {
-				state.destination = Destination.confirmCloudSyncDisableAlert
+				state.destination = Destination_.confirmCloudSyncDisableAlert
 				return .none
 			} else {
 				return updateCloudSync(state: &state, isEnabled: true)
 			}
 
 		case .exportProfileButtonTapped:
-			state.destination = Destination.optionallyEncryptProfileBeforeExportingAlert
+			state.destination = Destination_.optionallyEncryptProfileBeforeExportingAlert
 			return .none
 
 		case .task:
@@ -194,9 +194,9 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(.deleteProfileConfirmationDialog(confirmationAction))):
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .deleteProfileConfirmationDialog(confirmationAction):
 			switch confirmationAction {
 			case .deleteProfile:
 				return deleteProfile(keepInICloudIfPresent: false)
@@ -208,39 +208,39 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case .destination(.presented(.syncTakesLongTimeAlert(.ok))):
+		case .syncTakesLongTimeAlert(.ok):
 			state.destination = nil
 			return .none
 
-		case .destination(.presented(.optionallyEncryptProfileBeforeExporting(.doNotEncrypt))):
+		case .optionallyEncryptProfileBeforeExporting(.doNotEncrypt):
 			return exportProfile(encrypt: false, state: &state)
 
-		case .destination(.presented(.optionallyEncryptProfileBeforeExporting(.encrypt))):
+		case .optionallyEncryptProfileBeforeExporting(.encrypt):
 			return exportProfile(encrypt: true, state: &state)
 
-		case .destination(.presented(.confirmCloudSyncDisable(.confirm))):
+		case .confirmCloudSyncDisable(.confirm):
 			state.destination = nil
 			return updateCloudSync(state: &state, isEnabled: false)
 
-		case .destination(.presented(.inputEncryptionPassword(.delegate(.dismiss)))):
+		case .inputEncryptionPassword(.delegate(.dismiss)):
 			state.destination = nil
 			return .none
 
-		case .destination(.presented(.inputEncryptionPassword(.delegate(.successfullyDecrypted)))):
+		case .inputEncryptionPassword(.delegate(.successfullyDecrypted)):
 			preconditionFailure("What? Decrypted? Expected to only have ENCRYPTED. Incorrect implementation somewhere...")
-			return .none
 
-		case let .destination(.presented(.inputEncryptionPassword(.delegate(.successfullyEncrypted(_, encrypted: encrypted))))):
+		case let .inputEncryptionPassword(.delegate(.successfullyEncrypted(_, encrypted: encrypted))):
 			state.destination = nil
 			return showFileExporter(with: .encrypted(encrypted), &state)
-
-		case .destination(.dismiss):
-			state.destination = nil
-			return .none
 
 		default:
 			return .none
 		}
+	}
+
+	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		state.destination = nil
+		return .none
 	}
 
 	private func showFileExporter(with file: ExportableProfileFile, _ state: inout State) -> Effect<Action> {
@@ -289,7 +289,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 // MARK: - LackedPermissionToAccessSecurityScopedResource
 struct LackedPermissionToAccessSecurityScopedResource: Error {}
 
-extension ConfirmationDialogState<ProfileBackupSettings.Destination.Action.DeleteProfileConfirmationDialogAction> {
+extension ConfirmationDialogState<ProfileBackupSettings.Destination_.Action.DeleteProfileConfirmationDialogAction> {
 	static let deleteProfileConfirmationDialog = ConfirmationDialogState {
 		TextState(L10n.AppSettings.ResetWalletDialog.title)
 	} actions: {
@@ -307,7 +307,7 @@ extension ConfirmationDialogState<ProfileBackupSettings.Destination.Action.Delet
 	}
 }
 
-extension ProfileBackupSettings.Destination.State {
+extension ProfileBackupSettings.Destination_.State {
 	fileprivate static let cloudSyncTakesLongTimeAlert = Self.syncTakesLongTimeAlert(.init(
 		title: { TextState(L10n.AppSettings.ICloudSyncEnabledAlert.title) },
 		actions: {

@@ -131,49 +131,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(presentedAction)):
-			switch presentedAction {
-			case let .editPersona(.delegate(.personaSaved(persona))):
-				guard persona.id == state.mode.id else { return .none }
-				return reloadEffect(mode: state.mode, notifyDelegate: true)
-
-			case .dAppDetails(.delegate(.dAppForgotten)):
-				state.destination = nil
-				return reloadEffect(mode: state.mode, notifyDelegate: false)
-
-			case .confirmForgetAlert(.confirmTapped):
-				guard case let .dApp(dApp, persona: persona) = state.mode else { return .none }
-				let (personaID, dAppID, networkID) = (persona.id, dApp.dAppDefinitionAddress, dApp.networkID)
-				return .run { send in
-					try await authorizedDappsClient.deauthorizePersonaFromDapp(personaID, dAppID, networkID)
-					await send(.delegate(.personaDeauthorized))
-				} catch: { error, _ in
-					loggerGlobal.error("Failed to deauthorize persona \(personaID) from dApp \(dAppID), error: \(error)")
-					errorQueue.schedule(error)
-				}
-
-			case .confirmHideAlert(.confirmTapped):
-				guard case let .general(persona, _) = state.mode else {
-					return .none
-				}
-				return .run { send in
-					try await entitiesVisibilityClient.hide(persona: persona)
-					overlayWindowClient.scheduleHUD(.personaHidden)
-					await send(.delegate(.personaHidden))
-				} catch: { error, _ in
-					errorQueue.schedule(error)
-				}
-
-			default:
-				return .none
-			}
-		case .destination:
-			return .none
-		}
-	}
-
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
@@ -264,6 +221,44 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 	}
 
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .editPersona(.delegate(.personaSaved(persona))):
+			guard persona.id == state.mode.id else { return .none }
+			return reloadEffect(mode: state.mode, notifyDelegate: true)
+
+		case .dAppDetails(.delegate(.dAppForgotten)):
+			state.destination = nil
+			return reloadEffect(mode: state.mode, notifyDelegate: false)
+
+		case .confirmForgetAlert(.confirmTapped):
+			guard case let .dApp(dApp, persona: persona) = state.mode else { return .none }
+			let (personaID, dAppID, networkID) = (persona.id, dApp.dAppDefinitionAddress, dApp.networkID)
+			return .run { send in
+				try await authorizedDappsClient.deauthorizePersonaFromDapp(personaID, dAppID, networkID)
+				await send(.delegate(.personaDeauthorized))
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to deauthorize persona \(personaID) from dApp \(dAppID), error: \(error)")
+				errorQueue.schedule(error)
+			}
+
+		case .confirmHideAlert(.confirmTapped):
+			guard case let .general(persona, _) = state.mode else {
+				return .none
+			}
+			return .run { send in
+				try await entitiesVisibilityClient.hide(persona: persona)
+				overlayWindowClient.scheduleHUD(.personaHidden)
+				await send(.delegate(.personaHidden))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
+
+		default:
+			return .none
+		}
+	}
+
 	private func reloadEffect(mode: State.Mode, notifyDelegate: Bool) -> Effect<Action> {
 		.run { send in
 			let updated = try await reload(in: mode)
@@ -329,7 +324,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	}
 }
 
-extension AlertState<PersonaDetails.Destination.Action.ConfirmForgetAlert> {
+extension AlertState<PersonaDetails.Destination_.Action.ConfirmForgetAlert> {
 	static var confirmForget: AlertState {
 		AlertState {
 			TextState(L10n.AuthorizedDapps.RemoveAuthorizationAlert.title)
@@ -346,7 +341,7 @@ extension AlertState<PersonaDetails.Destination.Action.ConfirmForgetAlert> {
 	}
 }
 
-extension AlertState<PersonaDetails.Destination.Action.ConfirmHideAlert> {
+extension AlertState<PersonaDetails.Destination_.Action.ConfirmHideAlert> {
 	static var confirmHide: AlertState {
 		AlertState(
 			title: .init(L10n.AuthorizedDapps.PersonaDetails.hideThisPersona),

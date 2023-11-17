@@ -62,12 +62,16 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 
 		case .asset:
 			return .none
+		}
+	}
 
-		case .destination(.presented(.details(.delegate(.dismiss)))):
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .details(.delegate(.dismiss)):
 			state.destination = nil
 			return .none
 
-		case .destination:
+		default:
 			return .none
 		}
 	}

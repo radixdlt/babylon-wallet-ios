@@ -217,8 +217,8 @@ extension ImportMnemonic {
 }
 
 private extension StoreOf<ImportMnemonic> {
-	var destination: PresentationStoreOf<ImportMnemonic.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<ImportMnemonic.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -226,45 +226,43 @@ private extension StoreOf<ImportMnemonic> {
 extension View {
 	func destinations(store: StoreOf<ImportMnemonic>) -> some View {
 		let destinationStore = store.destination
-		return offDeviceMnemonicInfoSheet(with: destinationStore)
-			.onContinueWarningAlert(with: destinationStore)
+		return offDeviceMnemonicInfoPrompt(with: destinationStore)
+			.onContinueWarning(with: destinationStore)
 			.backupConfirmation(with: destinationStore)
 			.verifyMnemonic(with: destinationStore)
 	}
 
-	private func backupConfirmation(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some View {
+	private func backupConfirmation(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination_>) -> some View {
 		alert(
 			store: destinationStore,
-			state: /ImportMnemonic.Destination.State.backupConfirmation,
-			action: ImportMnemonic.Destination.Action.backupConfimartion
+			state: /ImportMnemonic.Destination_.State.backupConfirmation,
+			action: ImportMnemonic.Destination_.Action.backupConfirmation
 		)
 	}
 
-	private func verifyMnemonic(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some View {
+	private func verifyMnemonic(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination_>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /ImportMnemonic.Destination.State.verifyMnemonic,
-			action: ImportMnemonic.Destination.Action.verifyMnemonic,
+			state: /ImportMnemonic.Destination_.State.verifyMnemonic,
+			action: ImportMnemonic.Destination_.Action.verifyMnemonic,
 			destination: { VerifyMnemonic.View(store: $0) }
 		)
 	}
 
-	private func onContinueWarningAlert(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some View {
+	private func onContinueWarning(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination_>) -> some View {
 		alert(
 			store: destinationStore,
-			state: /ImportMnemonic.Destination.State.onContinueWarning,
-			action: ImportMnemonic.Destination.Action.onContinueWarning
+			state: /ImportMnemonic.Destination_.State.onContinueWarning,
+			action: ImportMnemonic.Destination_.Action.onContinueWarning
 		)
 	}
 
-	private func offDeviceMnemonicInfoSheet(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some View {
+	private func offDeviceMnemonicInfoPrompt(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /ImportMnemonic.Destination.State.offDeviceMnemonicInfoPrompt,
-			action: ImportMnemonic.Destination.Action.offDeviceMnemonicInfoPrompt,
-			content: { childStore in
-				OffDeviceMnemonicInfo.View(store: childStore)
-			}
+			state: /ImportMnemonic.Destination_.State.offDeviceMnemonicInfoPrompt,
+			action: ImportMnemonic.Destination_.Action.offDeviceMnemonicInfoPrompt,
+			content: { OffDeviceMnemonicInfo.View(store: $0) }
 		)
 	}
 }

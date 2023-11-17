@@ -132,15 +132,16 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case var .destination(.presented(.scanAccountAddress(.delegate(.scanned(address))))):
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case var .scanAccountAddress(.delegate(.scanned(address))):
 			state.destination = nil
 
 			QR.removeAddressPrefixIfNeeded(from: &address)
 
 			state.manualAccountAddress = address
 			return .none
+
 		default:
 			return .none
 		}

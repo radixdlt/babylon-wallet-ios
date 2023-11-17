@@ -70,8 +70,8 @@ extension P2PLinksFeature {
 }
 
 private extension StoreOf<P2PLinksFeature> {
-	var destination: PresentationStoreOf<P2PLinksFeature.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<P2PLinksFeature.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -83,20 +83,20 @@ private extension View {
 			.confirmDeletionAlert(with: destinationStore)
 	}
 
-	private func newConnection(with destinationStore: PresentationStoreOf<P2PLinksFeature.Destination>) -> some View {
+	private func newConnection(with destinationStore: PresentationStoreOf<P2PLinksFeature.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /P2PLinksFeature.Destination.State.newConnection,
-			action: P2PLinksFeature.Destination.Action.newConnection,
+			state: /P2PLinksFeature.Destination_.State.newConnection,
+			action: P2PLinksFeature.Destination_.Action.newConnection,
 			content: { NewConnection.View(store: $0) }
 		)
 	}
 
-	private func confirmDeletionAlert(with destinationStore: PresentationStoreOf<P2PLinksFeature.Destination>) -> some View {
+	private func confirmDeletionAlert(with destinationStore: PresentationStoreOf<P2PLinksFeature.Destination_>) -> some View {
 		alert(
 			store: destinationStore,
-			state: /P2PLinksFeature.Destination.State.removeConnection,
-			action: P2PLinksFeature.Destination.Action.removeConnection
+			state: /P2PLinksFeature.Destination_.State.removeConnection,
+			action: P2PLinksFeature.Destination_.Action.removeConnection
 		)
 	}
 }

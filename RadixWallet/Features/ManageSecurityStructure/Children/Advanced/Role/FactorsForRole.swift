@@ -41,7 +41,7 @@ public struct FactorsForRole<R: RoleProtocol>: Sendable, FeatureReducer {
 		public var adminFactorSources: IdentifiedArrayOf<FactorSource>
 
 		@PresentationState
-		public var destination: Destination.State?
+		public var destination: Destination_.State?
 
 		public let existing: RoleOfTier<R, FactorSource>?
 
@@ -72,10 +72,6 @@ public struct FactorsForRole<R: RoleProtocol>: Sendable, FeatureReducer {
 
 		case thresholdChanged(String)
 		case confirmedRoleWithFactors(RoleOfTier<R, FactorSource>)
-	}
-
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -173,19 +169,19 @@ public struct FactorsForRole<R: RoleProtocol>: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(.addAdminFactor(.delegate(.selected(adminFactorSource))))):
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .addAdminFactor(.delegate(.selected(adminFactorSource))):
 			state.adminFactorSources.append(adminFactorSource)
 			state.destination = nil
 			return .none
 
-		case let .destination(.presented(.addThresholdFactor(.delegate(.selected(thresholdFactorSource))))):
+		case let .addThresholdFactor(.delegate(.selected(thresholdFactorSource))):
 			state.thresholdFactorSources.append(thresholdFactorSource)
 			state.destination = nil
 			return .none
 
-		case let .destination(.presented(.existingRoleMadeLessSafeConfirmationDialog(confirmationAction))):
+		case let .existingRoleMadeLessSafeConfirmationDialog(confirmationAction):
 			state.destination = nil
 			switch confirmationAction {
 			case .cancel:

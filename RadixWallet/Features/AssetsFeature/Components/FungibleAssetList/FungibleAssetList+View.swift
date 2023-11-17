@@ -17,10 +17,7 @@ extension FungibleAssetList {
 extension FungibleAssetList.View {
 	public var body: some View {
 		ForEachStore(
-			store.scope(
-				state: \.sections,
-				action: { .child(.section($0, $1)) }
-			)
+			store.scope(state: \.sections) { .child(.section($0, $1)) }
 		) {
 			FungibleAssetList.Section.View(store: $0)
 		}
@@ -29,8 +26,8 @@ extension FungibleAssetList.View {
 }
 
 private extension StoreOf<FungibleAssetList> {
-	var destination: PresentationStoreOf<FungibleAssetList.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<FungibleAssetList.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -40,8 +37,8 @@ private extension View {
 		let destinationStore = store.destination
 		return sheet(
 			store: destinationStore,
-			state: /FungibleAssetList.Destination.State.details,
-			action: FungibleAssetList.Destination.Action.details,
+			state: /FungibleAssetList.Destination_.State.details,
+			action: FungibleAssetList.Destination_.Action.details,
 			content: { FungibleTokenDetails.View(store: $0) }
 		)
 	}

@@ -150,11 +150,11 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+	func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
 		let selectedAccounts = (state.chooseAccounts.selectedAccounts ?? []).map(\.account)
 
-		switch childAction {
-		case let .destination(.presented(.signing(.delegate(signingAction)))):
+		switch presentedAction {
+		case let .signing(.delegate(signingAction)):
 			switch signingAction {
 			case .cancelSigning:
 				state.destination = nil
@@ -195,15 +195,16 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 				return .send(.delegate(.failedToProveOwnership(of: selectedAccounts)))
 			}
 
-		case .destination(.dismiss):
-			if case .signing = state.destination {
-				return cancelSigningEffect(state: &state)
-			} else {
-				return .none
-			}
-
 		default:
 			return .none
+		}
+	}
+
+	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		if case .signing = state.destination {
+			cancelSigningEffect(state: &state)
+		} else {
+			.none
 		}
 	}
 

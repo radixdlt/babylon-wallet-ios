@@ -119,16 +119,16 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case .destination(.presented(.presentedDapp(.delegate(.dAppForgotten)))):
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .presentedDapp(.delegate(.dAppForgotten)):
 			.run { send in
 				// TODO: Couldn't this simply be: state.destination = nil
-				await send(.child(.destination(.dismiss)))
+				await send(.destination(.dismiss))
 			}
 			.concatenate(with: loadAuthorizedDapps())
 
-		case .destination:
+		default:
 			.none
 		}
 	}

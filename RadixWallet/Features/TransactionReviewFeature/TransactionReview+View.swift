@@ -245,7 +245,7 @@ extension TransactionReview {
 			let accountDepositSettingsStore = store.scope(state: \.accountDepositSettings) { .child(.accountDepositSettings($0)) }
 			IfLetStore(accountDepositSettingsStore) { childStore in
 				VStack(spacing: .small2) {
-					TransactionHeading("Account Deposit Settings")
+					TransactionHeading("Account Deposit Settings") // FIXME: Strings
 					AccountDepositSettings.View(store: childStore)
 						.padding(.bottom, .medium1)
 				}
@@ -266,8 +266,8 @@ extension TransactionReview {
 }
 
 extension StoreOf<TransactionReview> {
-	var destination: PresentationStoreOf<TransactionReview.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<TransactionReview.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -284,20 +284,20 @@ private extension View {
 			.submitting(with: destinationStore)
 	}
 
-	private func customizeGuarantees(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
+	private func customizeGuarantees(with destinationStore: PresentationStoreOf<TransactionReview.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /TransactionReview.Destination.State.customizeGuarantees,
-			action: TransactionReview.Destination.Action.customizeGuarantees,
+			state: /TransactionReview.Destination_.State.customizeGuarantees,
+			action: TransactionReview.Destination_.Action.customizeGuarantees,
 			content: { TransactionReviewGuarantees.View(store: $0) }
 		)
 	}
 
-	private func dApp(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
+	private func dApp(with destinationStore: PresentationStoreOf<TransactionReview.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /TransactionReview.Destination.State.dApp,
-			action: TransactionReview.Destination.Action.dApp,
+			state: /TransactionReview.Destination_.State.dApp,
+			action: TransactionReview.Destination_.Action.dApp,
 			content: { detailsStore in
 				WithNavigationBar {
 					destinationStore.send(.dismiss)
@@ -308,47 +308,47 @@ private extension View {
 		)
 	}
 
-	private func fungibleTokenDetails(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
+	private func fungibleTokenDetails(with destinationStore: PresentationStoreOf<TransactionReview.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /TransactionReview.Destination.State.fungibleTokenDetails,
-			action: TransactionReview.Destination.Action.fungibleTokenDetails,
+			state: /TransactionReview.Destination_.State.fungibleTokenDetails,
+			action: TransactionReview.Destination_.Action.fungibleTokenDetails,
 			content: { FungibleTokenDetails.View(store: $0) }
 		)
 	}
 
-	private func nonFungibleTokenDetails(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
+	private func nonFungibleTokenDetails(with destinationStore: PresentationStoreOf<TransactionReview.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /TransactionReview.Destination.State.nonFungibleTokenDetails,
-			action: TransactionReview.Destination.Action.nonFungibleTokenDetails,
+			state: /TransactionReview.Destination_.State.nonFungibleTokenDetails,
+			action: TransactionReview.Destination_.Action.nonFungibleTokenDetails,
 			content: { NonFungibleTokenDetails.View(store: $0) }
 		)
 	}
 
-	private func customizeFees(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
+	private func customizeFees(with destinationStore: PresentationStoreOf<TransactionReview.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /TransactionReview.Destination.State.customizeFees,
-			action: TransactionReview.Destination.Action.customizeFees,
+			state: /TransactionReview.Destination_.State.customizeFees,
+			action: TransactionReview.Destination_.Action.customizeFees,
 			content: { store in NavigationView { CustomizeFees.View(store: store) } }
 		)
 	}
 
-	private func signing(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
+	private func signing(with destinationStore: PresentationStoreOf<TransactionReview.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /TransactionReview.Destination.State.signing,
-			action: TransactionReview.Destination.Action.signing,
+			state: /TransactionReview.Destination_.State.signing,
+			action: TransactionReview.Destination_.Action.signing,
 			content: { Signing.SheetView(store: $0) }
 		)
 	}
 
-	private func submitting(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
+	private func submitting(with destinationStore: PresentationStoreOf<TransactionReview.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /TransactionReview.Destination.State.submitting,
-			action: TransactionReview.Destination.Action.submitting,
+			state: /TransactionReview.Destination_.State.submitting,
+			action: TransactionReview.Destination_.Action.submitting,
 			content: { SubmitTransaction.View(store: $0) }
 		)
 	}

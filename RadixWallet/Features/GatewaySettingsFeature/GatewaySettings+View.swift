@@ -1,13 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
-extension GatewaySettings.State {
-	var viewState: GatewaySettings.ViewState { .init() }
-}
 
 // MARK: - GatewaySettings.View
 extension GatewaySettings {
-	public struct ViewState: Equatable {}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<GatewaySettings>
@@ -17,25 +12,23 @@ extension GatewaySettings {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				ScrollView {
-					coreView(with: viewStore)
-						.padding(.bottom, .medium1)
-						.navigationTitle(L10n.Gateways.title)
-						.task { @MainActor in await store.send(.view(.task)).finish() }
-						.destinations(with: store)
-				}
+			ScrollView {
+				coreView()
+					.padding(.bottom, .medium1)
+					.navigationTitle(L10n.Gateways.title)
 			}
+			.task { @MainActor in await store.send(.view(.task)).finish() }
+			.destinations(with: store)
 		}
 
-		private func coreView(with viewStore: ViewStoreOf<GatewaySettings>) -> some SwiftUI.View {
+		private func coreView() -> some SwiftUI.View {
 			VStack(spacing: .zero) {
 				VStack(alignment: .leading, spacing: .small2) {
 					subtitle
 
 					//	FIXME: Uncomment and implement
 					//	Button(L10n.Gateways.whatIsAGateway) {
-					//		viewStore.send(.popoverButtonTapped)
+					//		store.send(.view(.popoverButtonTapped))
 					//	}
 					//	.buttonStyle(.info)
 					//	.padding(.vertical, .medium2)
@@ -50,7 +43,7 @@ extension GatewaySettings {
 					.frame(height: .large1)
 
 				Button(L10n.Gateways.addNewGatewayButtonTitle) {
-					viewStore.send(.addGatewayButtonTapped)
+					store.send(.view(.addGatewayButtonTapped))
 				}
 				.buttonStyle(.secondaryRectangular(shouldExpand: true))
 				.padding(.horizontal, .medium1)
@@ -75,8 +68,8 @@ extension GatewaySettings {
 }
 
 private extension StoreOf<GatewaySettings> {
-	var destination: PresentationStoreOf<GatewaySettings.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<GatewaySettings.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -90,19 +83,19 @@ private extension View {
 			.slideUpPanel(with: destinationStore)
 	}
 
-	private func removeGateway(with destinationStore: PresentationStoreOf<GatewaySettings.Destination>) -> some View {
+	private func removeGateway(with destinationStore: PresentationStoreOf<GatewaySettings.Destination_>) -> some View {
 		alert(
 			store: destinationStore,
-			state: /GatewaySettings.Destination.State.removeGateway,
-			action: GatewaySettings.Destination.Action.removeGateway
+			state: /GatewaySettings.Destination_.State.removeGateway,
+			action: GatewaySettings.Destination_.Action.removeGateway
 		)
 	}
 
-	private func addNewGateway(with destinationStore: PresentationStoreOf<GatewaySettings.Destination>) -> some View {
+	private func addNewGateway(with destinationStore: PresentationStoreOf<GatewaySettings.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /GatewaySettings.Destination.State.addNewGateway,
-			action: GatewaySettings.Destination.Action.addNewGateway,
+			state: /GatewaySettings.Destination_.State.addNewGateway,
+			action: GatewaySettings.Destination_.Action.addNewGateway,
 			content: { store in
 				WithNavigationBar {
 					store.send(.view(.closeButtonTapped))
@@ -113,20 +106,20 @@ private extension View {
 		)
 	}
 
-	private func createAccount(with destinationStore: PresentationStoreOf<GatewaySettings.Destination>) -> some View {
+	private func createAccount(with destinationStore: PresentationStoreOf<GatewaySettings.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /GatewaySettings.Destination.State.createAccount,
-			action: GatewaySettings.Destination.Action.createAccount,
+			state: /GatewaySettings.Destination_.State.createAccount,
+			action: GatewaySettings.Destination_.Action.createAccount,
 			content: { CreateAccountCoordinator.View(store: $0) }
 		)
 	}
 
-	private func slideUpPanel(with destinationStore: PresentationStoreOf<GatewaySettings.Destination>) -> some View {
+	private func slideUpPanel(with destinationStore: PresentationStoreOf<GatewaySettings.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /GatewaySettings.Destination.State.slideUpPanel,
-			action: GatewaySettings.Destination.Action.slideUpPanel,
+			state: /GatewaySettings.Destination_.State.slideUpPanel,
+			action: GatewaySettings.Destination_.Action.slideUpPanel,
 			content: { SlideUpPanel.View(store: $0) }
 		)
 	}

@@ -97,13 +97,13 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case .destination(.presented(.importMnemonic(.delegate(.persistedNewFactorSourceInProfile(_))))):
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .importMnemonic(.delegate(.persistedNewFactorSourceInProfile)):
 			state.destination = nil
 			return .none
 
-		case .destination(.presented(.addLedger(.delegate(.completed)))):
+		case .addLedger(.delegate(.completed)):
 			state.destination = nil
 			return .none
 

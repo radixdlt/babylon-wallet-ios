@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension Settings.Destination.State {
+extension Settings.Destination_.State {
 	static func displayMnemonics() -> Self {
 		.accountSecurity(AccountSecurity.State(destination: .mnemonics(.init())))
 	}
@@ -160,25 +160,23 @@ public struct Settings: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(presentedAction)):
-			switch presentedAction {
-			case let .appSettings(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))):
-				.send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent)))
-			case .accountSecurity(.delegate(.gotoAccountList)):
-				.run { _ in await dismiss() }
-			default:
-				.none
-			}
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .appSettings(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))):
+			.send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent)))
+		case .accountSecurity(.delegate(.gotoAccountList)):
+			.run { _ in await dismiss() }
+		default:
+			.none
+		}
+	}
 
-		case .destination(.dismiss):
-			switch state.destination {
-			case .manageP2PLinks:
-				loadP2PLinks()
-			default:
-				.none
-			}
+	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		switch state.destination {
+		case .manageP2PLinks:
+			loadP2PLinks()
+		default:
+			.none
 		}
 	}
 

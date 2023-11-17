@@ -114,7 +114,29 @@ public struct CustomizeFees: FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .destination(.presented(.selectFeePayer(.delegate(.selected(selection))))):
+		case let .advancedFeesCustomization(.delegate(.updated(advancedFees))):
+			state.reviewedTransaction.transactionFee.mode = .advanced(advancedFees)
+			return .send(.delegate(.updated(state.reviewedTransaction)))
+		default:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .updated(.success(reviewedTransaction)):
+			state.reviewedTransaction = reviewedTransaction
+			state.modeState = state.reviewedTransaction.transactionFee.customizationModeState
+			return .send(.delegate(.updated(state.reviewedTransaction)))
+		case let .updated(.failure(error)):
+			errorQueue.schedule(error)
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .selectFeePayer(.delegate(.selected(selection))):
 			let previousFeePayer = state.feePayer
 			state.destination = nil
 			let signingPurpose = state.signingPurpose
@@ -167,22 +189,8 @@ public struct CustomizeFees: FeatureReducer {
 			}
 
 			return replaceFeePayer(selection, state.reviewedTransaction, manifest: state.manifest)
-		case let .advancedFeesCustomization(.delegate(.updated(advancedFees))):
-			state.reviewedTransaction.transactionFee.mode = .advanced(advancedFees)
-			return .send(.delegate(.updated(state.reviewedTransaction)))
-		default:
-			return .none
-		}
-	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
-		case let .updated(.success(reviewedTransaction)):
-			state.reviewedTransaction = reviewedTransaction
-			state.modeState = state.reviewedTransaction.transactionFee.customizationModeState
-			return .send(.delegate(.updated(state.reviewedTransaction)))
-		case let .updated(.failure(error)):
-			errorQueue.schedule(error)
+		default:
 			return .none
 		}
 	}

@@ -53,8 +53,8 @@ extension DisplayMnemonics {
 }
 
 private extension StoreOf<DisplayMnemonics> {
-	var destination: PresentationStoreOf<DisplayMnemonics.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<DisplayMnemonics.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -66,24 +66,21 @@ private extension View {
 			.importMnemonicsSheet(with: destinationStore)
 	}
 
-	private func displayMnemonicSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destination>) -> some View {
+	private func displayMnemonicSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destination_>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /DisplayMnemonics.Destination.State.displayMnemonic,
-			action: DisplayMnemonics.Destination.Action.displayMnemonic,
+			state: /DisplayMnemonics.Destination_.State.displayMnemonic,
+			action: DisplayMnemonics.Destination_.Action.displayMnemonic,
 			destination: { DisplayMnemonic.View(store: $0) }
 		)
 	}
 
-	private func importMnemonicsSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destination>) -> some View {
+	private func importMnemonicsSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destination_>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /DisplayMnemonics.Destination.State.importMnemonics,
-			action: DisplayMnemonics.Destination.Action.importMnemonics,
-			destination: {
-				ImportMnemonicsFlowCoordinator.View(store: $0)
-					.inNavigationView
-			}
+			state: /DisplayMnemonics.Destination_.State.importMnemonics,
+			action: DisplayMnemonics.Destination_.Action.importMnemonics,
+			destination: { ImportMnemonicsFlowCoordinator.View(store: $0).inNavigationView }
 		)
 	}
 }

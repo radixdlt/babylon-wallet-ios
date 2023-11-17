@@ -78,10 +78,6 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 		case loadedFactorSources(TaskResult<IdentifiedArrayOf<FactorSourceOfKind>>)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
-	}
-
 	public enum DelegateAction: Sendable, Equatable {
 		case choseFactorSource(FactorSourceOfKind)
 	}
@@ -166,9 +162,9 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(.addNewFactorSource(.delegate(newFactorSourceAction)))):
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .addNewFactorSource(.delegate(newFactorSourceAction)):
 			switch newFactorSourceAction {
 			case let .done(.success(factorSource)):
 				state.destination = nil
@@ -190,7 +186,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 				return .none
 			}
 
-		case let .destination(.presented(.existingFactorSourceWillBeDeletedConfirmationDialog(confirmationAction))):
+		case let .existingFactorSourceWillBeDeletedConfirmationDialog(confirmationAction):
 			switch confirmationAction {
 			case .cancel:
 				state.destination = nil

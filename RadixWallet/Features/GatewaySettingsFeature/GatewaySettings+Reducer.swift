@@ -208,69 +208,70 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 				return switchToGateway(&state, gateway: gateway)
 			}
 
-		case let .destination(.presented(presentedAction)):
-			switch presentedAction {
-			case .addNewGateway(.delegate(.dismiss)):
-				state.destination = nil
+		default:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .addNewGateway(.delegate(.dismiss)):
+			state.destination = nil
+			return .none
+
+		case .createAccount(.delegate(.dismissed)):
+			return skipSwitching(&state)
+
+		case .createAccount(.delegate(.completed)):
+			state.destination = nil
+			guard let newGateway = state.validatedNewGatewayToSwitchTo else {
+				// weird state, should not happen
 				return .none
+			}
+			return .run { send in
+				let result = await TaskResult {
+					try await networkSwitchingClient.switchTo(newGateway)
+				}
+				await send(.internal(.switchToGatewayResult(result)))
+			}
 
-			case .createAccount(.delegate(.dismissed)):
-				return skipSwitching(&state)
+		case .slideUpPanel(.delegate(.dismiss)):
+			state.destination = nil
+			return .none
 
-			case .createAccount(.delegate(.completed)):
-				state.destination = nil
-				guard let newGateway = state.validatedNewGatewayToSwitchTo else {
-					// weird state, should not happen
+		case let .removeGateway(removeGatewayAction):
+			switch removeGatewayAction {
+			case let .removeButtonTapped(gatewayState):
+				guard gatewayState.gateway != .mainnet else {
+					assertionFailure("Incorrect implementation, should be impossible to remove mainnet.")
 					return .none
 				}
-				return .run { send in
-					let result = await TaskResult {
-						try await networkSwitchingClient.switchTo(newGateway)
+				guard let currentGateway = state.currentGateway else { return .none }
+
+				switch gatewayState.gateway {
+				case currentGateway:
+					// FIXME: Mainnet simply once mainnet is online....
+					let containsMainnet = state.gatewayList.gateways.map(\.gateway).contains(.mainnet)
+					let newCurrent: Radix.Gateway? = if containsMainnet {
+						Radix.Gateway.mainnet
+					} else {
+						Radix.Gateway.default
 					}
-					await send(.internal(.switchToGatewayResult(result)))
-				}
 
-			case .slideUpPanel(.delegate(.dismiss)):
-				state.destination = nil
-				return .none
-
-			case let .removeGateway(removeGatewayAction):
-				switch removeGatewayAction {
-				case let .removeButtonTapped(gatewayState):
-					guard gatewayState.gateway != .mainnet else {
-						assertionFailure("Incorrect implementation, should be impossible to remove mainnet.")
+					guard let newCurrent else {
 						return .none
 					}
-					guard let currentGateway = state.currentGateway else { return .none }
 
-					switch gatewayState.gateway {
-					case currentGateway:
-						// FIXME: Mainnet simply once mainnet is online....
-						let containsMainnet = state.gatewayList.gateways.map(\.gateway).contains(.mainnet)
-						let newCurrent: Radix.Gateway? = if containsMainnet {
-							Radix.Gateway.mainnet
-						} else {
-							Radix.Gateway.default
-						}
+					state.gatewayForRemoval = gatewayState.gateway
+					return switchToGateway(&state, gateway: newCurrent)
 
-						guard let newCurrent else {
-							return .none
-						}
-
-						state.gatewayForRemoval = gatewayState.gateway
-						return switchToGateway(&state, gateway: newCurrent)
-
-					default:
-						return .run { _ in
-							try await gatewaysClient.removeGateway(gatewayState.gateway)
-						}
+				default:
+					return .run { _ in
+						try await gatewaysClient.removeGateway(gatewayState.gateway)
 					}
-
-				case .cancelButtonTapped:
-					return .none
 				}
 
-			default:
+			case .cancelButtonTapped:
 				return .none
 			}
 
@@ -280,7 +281,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	}
 }
 
-extension AlertState<GatewaySettings.Destination.Action.RemoveGatewayAlert> {
+extension AlertState<GatewaySettings.Destination_.Action.RemoveGatewayAlert> {
 	// FIXME: This should probably take an ID and not GatewayRow.State
 	static func removeGateway(row: GatewayRow.State) -> AlertState {
 		AlertState {

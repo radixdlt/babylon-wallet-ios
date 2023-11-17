@@ -123,8 +123,6 @@
 		48CFC2AA2ADC10D900E77A5C /* DappDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD0D2ADC10D800E77A5C /* DappDetails.swift */; };
 		48CFC2AB2ADC10D900E77A5C /* Home.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD102ADC10D800E77A5C /* Home.swift */; };
 		48CFC2AC2ADC10D900E77A5C /* Home+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD112ADC10D800E77A5C /* Home+View.swift */; };
-		48CFC2AF2ADC10D900E77A5C /* Header+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD172ADC10D800E77A5C /* Header+View.swift */; };
-		48CFC2B02ADC10D900E77A5C /* Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD182ADC10D800E77A5C /* Header.swift */; };
 		48CFC2B12ADC10D900E77A5C /* DerivePublicKeys+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD1A2ADC10D800E77A5C /* DerivePublicKeys+View.swift */; };
 		48CFC2B22ADC10D900E77A5C /* DerivePublicKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD1B2ADC10D800E77A5C /* DerivePublicKeys.swift */; };
 		48CFC2B32ADC10D900E77A5C /* ProfileBackupSettings+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD1E2ADC10D800E77A5C /* ProfileBackupSettings+View.swift */; };
@@ -1445,8 +1443,6 @@
 		48CFBD0D2ADC10D800E77A5C /* DappDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DappDetails.swift; sourceTree = "<group>"; };
 		48CFBD102ADC10D800E77A5C /* Home.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Home.swift; sourceTree = "<group>"; };
 		48CFBD112ADC10D800E77A5C /* Home+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+View.swift"; sourceTree = "<group>"; };
-		48CFBD172ADC10D800E77A5C /* Header+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Header+View.swift"; sourceTree = "<group>"; };
-		48CFBD182ADC10D800E77A5C /* Header.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Header.swift; sourceTree = "<group>"; };
 		48CFBD1A2ADC10D800E77A5C /* DerivePublicKeys+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DerivePublicKeys+View.swift"; sourceTree = "<group>"; };
 		48CFBD1B2ADC10D800E77A5C /* DerivePublicKeys.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DerivePublicKeys.swift; sourceTree = "<group>"; };
 		48CFBD1E2ADC10D800E77A5C /* ProfileBackupSettings+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ProfileBackupSettings+View.swift"; sourceTree = "<group>"; };
@@ -3331,19 +3327,9 @@
 			isa = PBXGroup;
 			children = (
 				48CFBCB92ADC10D800E77A5C /* AccountRow */,
-				48CFBD162ADC10D800E77A5C /* Header */,
 				E6A2D9E62AFA7132001857EC /* Mnemonics+Utils.swift */,
 			);
 			path = Children;
-			sourceTree = "<group>";
-		};
-		48CFBD162ADC10D800E77A5C /* Header */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBD172ADC10D800E77A5C /* Header+View.swift */,
-				48CFBD182ADC10D800E77A5C /* Header.swift */,
-			);
-			path = Header;
 			sourceTree = "<group>";
 		};
 		48CFBD192ADC10D800E77A5C /* DerivePublicKeys */ = {
@@ -7774,7 +7760,6 @@
 				48CFC60C2ADC10DA00E77A5C /* WalletInteractionSuccessResponse.swift in Sources */,
 				48CFC4EA2ADC10DA00E77A5C /* StateEntityFungiblesPageResponse.swift in Sources */,
 				48CFC5822ADC10DA00E77A5C /* URLFormatterClient+Interface.swift in Sources */,
-				48CFC2AF2ADC10D900E77A5C /* Header+View.swift in Sources */,
 				48CFC2762ADC10D900E77A5C /* P2PLinksFeature+Reducer.swift in Sources */,
 				48CFC4F02ADC10DA00E77A5C /* StateNonFungibleLocationResponseItem.swift in Sources */,
 				48CFC3C12ADC10D900E77A5C /* Mnemonic+Seed.swift in Sources */,
@@ -8063,7 +8048,6 @@
 				48CFC2C92ADC10D900E77A5C /* FungibleResourceAsset+View.swift in Sources */,
 				48CFC50D2ADC10DA00E77A5C /* FungibleResourcesCollection.swift in Sources */,
 				48CFC40F2ADC10DA00E77A5C /* Logger.swift in Sources */,
-				48CFC2B02ADC10D900E77A5C /* Header.swift in Sources */,
 				48CFC36C2ADC10D900E77A5C /* FungibleTokenDetails+View.swift in Sources */,
 				48CFC6712ADC10DB00E77A5C /* MnemonicBasedFactorSourceKind.swift in Sources */,
 				48CFC2932ADC10D900E77A5C /* AdvancedFeesCustomization+View.swift in Sources */,

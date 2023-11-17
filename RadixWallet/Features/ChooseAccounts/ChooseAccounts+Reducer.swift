@@ -98,9 +98,9 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case .destination(.presented(.createAccount(.delegate(.completed)))):
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .createAccount(.delegate(.completed)):
 			loadAccounts()
 
 		default:

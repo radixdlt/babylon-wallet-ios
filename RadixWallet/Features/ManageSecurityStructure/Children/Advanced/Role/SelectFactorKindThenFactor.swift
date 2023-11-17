@@ -9,7 +9,7 @@ public struct SelectFactorKindThenFactor: Sendable, FeatureReducer {
 		public let role: SecurityStructureRole
 
 		@PresentationState
-		public var destination: Destination.State? = nil
+		public var destination: Destination_.State? = nil
 
 		public init(role: SecurityStructureRole) {
 			self.role = role
@@ -75,21 +75,15 @@ public struct SelectFactorKindThenFactor: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(presentedAction)):
-			switch presentedAction {
-			case let .factorSourceOfKind(.delegate(.choseFactorSource(factorSource))):
-				state.destination = nil
-				return .send(.delegate(.selected(factorSource)))
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .factorSourceOfKind(.delegate(.choseFactorSource(factorSource))):
+			state.destination = nil
+			return .send(.delegate(.selected(factorSource)))
 
-			case let .selectLedger(.delegate(.choseLedger(ledger))):
-				state.destination = nil
-				return .send(.delegate(.selected(ledger.embed())))
-
-			default:
-				return .none
-			}
+		case let .selectLedger(.delegate(.choseLedger(ledger))):
+			state.destination = nil
+			return .send(.delegate(.selected(ledger.embed())))
 
 		default:
 			return .none

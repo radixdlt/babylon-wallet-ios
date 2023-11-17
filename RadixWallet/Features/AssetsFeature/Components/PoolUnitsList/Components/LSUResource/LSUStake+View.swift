@@ -151,7 +151,7 @@ extension View {
 
 extension LSUStake.State {
 	var viewState: LSUStake.ViewState {
-		.init(id: stake.validatorAddress, content: stakeDetails.map { details in
+		LSUStake.ViewState(id: stake.validatorAddress, content: stakeDetails.map { details in
 			LSUStake.ViewState.Content(
 				validatorNameViewState: .init(with: details.validator),
 				liquidStakeUnit: details.stakeUnitResource.map { _ in
@@ -188,8 +188,8 @@ extension LSUStake.State {
 }
 
 private extension StoreOf<LSUStake> {
-	var destination: PresentationStoreOf<LSUStake.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<LSUStake.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -199,8 +199,8 @@ private extension View {
 		let destinationStore = store.destination
 		return sheet(
 			store: destinationStore,
-			state: /LSUStake.Destination.State.details,
-			action: LSUStake.Destination.Action.details,
+			state: /LSUStake.Destination_.State.details,
+			action: LSUStake.Destination_.Action.details,
 			content: { LSUDetails.View(store: $0) }
 		)
 	}

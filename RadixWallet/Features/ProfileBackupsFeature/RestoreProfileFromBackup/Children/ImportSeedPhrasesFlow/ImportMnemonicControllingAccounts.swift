@@ -111,11 +111,9 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(
-			.importMnemonic(.delegate(delegateAction))
-		)):
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .importMnemonic(.delegate(delegateAction)):
 			switch delegateAction {
 			case let .notPersisted(mnemonicWithPassphrase):
 				// FIXME: should always work... but please tidy up!
@@ -138,11 +136,11 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 				preconditionFailure("Incorrect implementation")
 			}
 
-		case .destination(.presented(.confirmSkippingBDFS(.delegate(.cancel)))):
+		case .confirmSkippingBDFS(.delegate(.cancel)):
 			state.destination = nil
 			return .none
 
-		case .destination(.presented(.confirmSkippingBDFS(.delegate(.confirmed)))):
+		case .confirmSkippingBDFS(.delegate(.confirmed)):
 			loggerGlobal.notice("Skipping BDFS! Generating a new one and hiding affected accounts/personas.")
 			state.destination = nil
 			return .run { [entitiesControlledByFactorSource = state.entitiesControlledByFactorSource] send in

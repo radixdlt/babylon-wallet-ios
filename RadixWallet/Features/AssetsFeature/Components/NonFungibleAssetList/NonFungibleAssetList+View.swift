@@ -22,8 +22,8 @@ extension NonFungibleAssetList {
 }
 
 private extension StoreOf<NonFungibleAssetList> {
-	var destination: PresentationStoreOf<NonFungibleAssetList.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<NonFungibleAssetList.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -32,9 +32,9 @@ private extension View {
 	func destinations(with store: StoreOf<NonFungibleAssetList>) -> some View {
 		let destinationStore = store.destination
 		return sheet(
-			store: store.scope(state: \.$destination) { .child(.destination($0)) },
-			state: /NonFungibleAssetList.Destination.State.details,
-			action: NonFungibleAssetList.Destination.Action.details,
+			store: destinationStore,
+			state: /NonFungibleAssetList.Destination_.State.details,
+			action: NonFungibleAssetList.Destination_.Action.details,
 			content: { NonFungibleTokenDetails.View(store: $0) }
 		)
 	}

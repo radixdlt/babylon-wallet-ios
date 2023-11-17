@@ -48,8 +48,8 @@ extension SelectFactorKindThenFactor {
 }
 
 private extension StoreOf<SelectFactorKindThenFactor> {
-	var destination: PresentationStoreOf<SelectFactorKindThenFactor.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<SelectFactorKindThenFactor.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -61,20 +61,20 @@ private extension View {
 			.selectLedger(with: destinationStore)
 	}
 
-	private func factorSourceOfKind(with destinationStore: PresentationStoreOf<SelectFactorKindThenFactor.Destination>) -> some View {
+	private func factorSourceOfKind(with destinationStore: PresentationStoreOf<SelectFactorKindThenFactor.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /SelectFactorKindThenFactor.Destination.State.factorSourceOfKind,
-			action: SelectFactorKindThenFactor.Destination.Action.factorSourceOfKind,
+			state: /SelectFactorKindThenFactor.Destination_.State.factorSourceOfKind,
+			action: SelectFactorKindThenFactor.Destination_.Action.factorSourceOfKind,
 			content: { FactorSourcesOfKindList<FactorSource>.View(store: $0) }
 		)
 	}
 
-	private func selectLedger(with destinationStore: PresentationStoreOf<SelectFactorKindThenFactor.Destination>) -> some View {
+	private func selectLedger(with destinationStore: PresentationStoreOf<SelectFactorKindThenFactor.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /SelectFactorKindThenFactor.Destination.State.selectLedger,
-			action: SelectFactorKindThenFactor.Destination.Action.selectLedger,
+			state: /SelectFactorKindThenFactor.Destination_.State.selectLedger,
+			action: SelectFactorKindThenFactor.Destination_.Action.selectLedger,
 			content: { LedgerHardwareDevices.View(store: $0) }
 		)
 	}

@@ -195,12 +195,12 @@ public struct EditPersona: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case .destination(.presented(.closeConfirmationDialog(.discardChanges))):
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .closeConfirmationDialog(.discardChanges):
 			return .run { _ in await dismiss() }
 
-		case let .destination(.presented(.addFields(.delegate(.addEntryKinds(fieldsToAdd))))):
+		case let .addFields(.delegate(.addEntryKinds(fieldsToAdd))):
 			for kind in fieldsToAdd {
 				switch kind {
 				case .fullName:

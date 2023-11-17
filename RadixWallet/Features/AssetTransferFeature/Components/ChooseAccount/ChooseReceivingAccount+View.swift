@@ -139,8 +139,8 @@ extension ChooseReceivingAccount.View {
 }
 
 private extension StoreOf<ChooseReceivingAccount> {
-	var destination: PresentationStoreOf<ChooseReceivingAccount.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<ChooseReceivingAccount.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -150,8 +150,8 @@ private extension View {
 		let destinationStore = store.destination
 		return navigationDestination(
 			store: destinationStore,
-			state: /ChooseReceivingAccount.Destination.State.scanAccountAddress,
-			action: ChooseReceivingAccount.Destination.Action.scanAccountAddress,
+			state: /ChooseReceivingAccount.Destination_.State.scanAccountAddress,
+			action: ChooseReceivingAccount.Destination_.Action.scanAccountAddress,
 			destination: {
 				ScanQRCoordinator.View(store: $0)
 					.navigationTitle(L10n.AssetTransfer.ChooseReceivingAccount.scanQRNavigationTitle)

@@ -91,8 +91,8 @@ extension ImportMnemonicControllingAccounts {
 }
 
 private extension StoreOf<ImportMnemonicControllingAccounts> {
-	var destination: PresentationStoreOf<ImportMnemonicControllingAccounts.Destination> {
-		scope(state: \.$destination) { .child(.destination($0)) }
+	var destination: PresentationStoreOf<ImportMnemonicControllingAccounts.Destination_> {
+		scope(state: \.$destination) { .destination($0) }
 	}
 }
 
@@ -104,11 +104,11 @@ private extension View {
 			.confirmSkippingBDFS(with: destinationStore)
 	}
 
-	private func importMnemonic(with destinationStore: PresentationStoreOf<ImportMnemonicControllingAccounts.Destination>) -> some View {
+	private func importMnemonic(with destinationStore: PresentationStoreOf<ImportMnemonicControllingAccounts.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /ImportMnemonicControllingAccounts.Destination.State.importMnemonic,
-			action: ImportMnemonicControllingAccounts.Destination.Action.importMnemonic,
+			state: /ImportMnemonicControllingAccounts.Destination_.State.importMnemonic,
+			action: ImportMnemonicControllingAccounts.Destination_.Action.importMnemonic,
 			content: {
 				ImportMnemonic.View(store: $0)
 					.navigationTitle(L10n.EnterSeedPhrase.Header.title)
@@ -117,11 +117,11 @@ private extension View {
 		)
 	}
 
-	private func confirmSkippingBDFS(with destinationStore: PresentationStoreOf<ImportMnemonicControllingAccounts.Destination>) -> some View {
+	private func confirmSkippingBDFS(with destinationStore: PresentationStoreOf<ImportMnemonicControllingAccounts.Destination_>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /ImportMnemonicControllingAccounts.Destination.State.confirmSkippingBDFS,
-			action: ImportMnemonicControllingAccounts.Destination.Action.confirmSkippingBDFS,
+			state: /ImportMnemonicControllingAccounts.Destination_.State.confirmSkippingBDFS,
+			action: ImportMnemonicControllingAccounts.Destination_.Action.confirmSkippingBDFS,
 			content: {
 				ConfirmSkippingBDFS.View(store: $0)
 					.inNavigationStack

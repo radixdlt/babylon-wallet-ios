@@ -82,14 +82,6 @@ public struct Main: Sendable, FeatureReducer {
 			state.destination = .settings(.init())
 			return .none
 
-		case let .destination(.presented(.settings(.delegate(.deleteProfileAndFactorSources(keepInIcloudIfPresent))))):
-			return .run { send in
-				try await appPreferencesClient.deleteProfileAndFactorSources(keepInIcloudIfPresent)
-				await send(.delegate(.removedWallet))
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to delete profile: \(error)")
-			}
-
 		default:
 			return .none
 		}
@@ -100,6 +92,21 @@ public struct Main: Sendable, FeatureReducer {
 		case let .currentGatewayChanged(currentGateway):
 			state.isOnMainnet = currentGateway.network == .mainnet
 			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination_.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .settings(.delegate(.deleteProfileAndFactorSources(keepInIcloudIfPresent))):
+			.run { send in
+				try await appPreferencesClient.deleteProfileAndFactorSources(keepInIcloudIfPresent)
+				await send(.delegate(.removedWallet))
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to delete profile: \(error)")
+			}
+
+		default:
+			.none
 		}
 	}
 }
