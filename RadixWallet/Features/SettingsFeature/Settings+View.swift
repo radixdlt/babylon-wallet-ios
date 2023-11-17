@@ -18,7 +18,7 @@ extension Settings {
 		#endif
 		let shouldShowAddP2PLinkButton: Bool
 		let shouldShowMigrateOlympiaButton: Bool
-		let shouldBackupPersonasSeedPhrase: Bool
+		let shouldWriteDownPersonasSeedPhrase: Bool
 		let appVersion: String
 
 		var showsSomeBanner: Bool {
@@ -33,7 +33,7 @@ extension Settings {
 
 			self.shouldShowAddP2PLinkButton = state.userHasNoP2PLinks ?? false
 			self.shouldShowMigrateOlympiaButton = state.shouldShowMigrateOlympiaButton
-			self.shouldBackupPersonasSeedPhrase = state.shouldBackupPersonasSeedPhrase
+			self.shouldWriteDownPersonasSeedPhrase = state.shouldWriteDownPersonasSeedPhrase
 			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
 			self.appVersion = L10n.Settings.appVersion(bundleInfo.shortVersion, bundleInfo.version)
 		}
@@ -177,7 +177,7 @@ extension Settings.View {
 			),
 			.init(
 				title: L10n.Settings.personas,
-				hint: viewStore.shouldBackupPersonasSeedPhrase ? .init(kind: .warning, text: .init("Back up seed phrase for your Personas")) : nil,
+				hint: viewStore.shouldWriteDownPersonasSeedPhrase ? .init(kind: .warning, text: .init("Back up seed phrase for your Personas")) : nil,
 				icon: .asset(AssetResource.personas),
 				action: .personasButtonTapped
 			),

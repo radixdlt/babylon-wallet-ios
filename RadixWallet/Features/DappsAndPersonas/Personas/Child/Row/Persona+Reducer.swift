@@ -26,7 +26,12 @@ public struct Persona: Sendable, FeatureReducer {
 			)
 		}
 
-		public init(id: Profile.Network.Persona.ID, thumbnail: URL?, displayName: String, shouldWriteDownSeedPhrase: Bool = false) {
+		public init(
+			id: Profile.Network.Persona.ID,
+			thumbnail: URL?,
+			displayName: String,
+			shouldWriteDownSeedPhrase: Bool = false
+		) {
 			self.id = id
 			self.thumbnail = thumbnail
 			self.displayName = displayName

@@ -7,7 +7,7 @@ public struct Home: Sendable, FeatureReducer {
 		// MARK: - Components
 		public var header: Header.State
 		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State>
-		public var shouldBackupPersonasSeedPhrase: Bool = false
+		public var shouldWriteDownPersonasSeedPhrase: Bool = false
 
 		// MARK: - Destination
 		@PresentationState
@@ -32,7 +32,7 @@ public struct Home: Sendable, FeatureReducer {
 		case accountsLoadedResult(TaskResult<IdentifiedArrayOf<Profile.Network.Account>>)
 		case exportMnemonic(account: Profile.Network.Account)
 		case importMnemonic
-		case loadedShouldBackupPersonasSeedPhrase(Bool)
+		case loadedShouldWriteDownPersonasSeedPhrase(Bool)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -109,7 +109,7 @@ public struct Home: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 			}
 			.merge(with: checkAccountsAccessToMnemonic(state: state))
-			.merge(with: loadShouldBackupPersonasSeedPhrase())
+			.merge(with: loadShouldWriteDownPersonasSeedPhrase())
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(
@@ -150,8 +150,8 @@ public struct Home: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			return .none
 
-		case let .loadedShouldBackupPersonasSeedPhrase(shouldBackup):
-			state.shouldBackupPersonasSeedPhrase = shouldBackup
+		case let .loadedShouldWriteDownPersonasSeedPhrase(shouldBackup):
+			state.shouldWriteDownPersonasSeedPhrase = shouldBackup
 			return .none
 
 		case let .exportMnemonic(account):
@@ -249,12 +249,12 @@ public struct Home: Sendable, FeatureReducer {
 		)
 	}
 
-	private func loadShouldBackupPersonasSeedPhrase() -> Effect<Action> {
+	private func loadShouldWriteDownPersonasSeedPhrase() -> Effect<Action> {
 		.run { send in
 			@Dependency(\.personasClient) var personasClient
 			for try await shouldBackup in await personasClient.shouldWriteDownSeedPhraseForAnyPersona() {
 				guard !Task.isCancelled else { return }
-				await send(.internal(.loadedShouldBackupPersonasSeedPhrase(shouldBackup)))
+				await send(.internal(.loadedShouldWriteDownPersonasSeedPhrase(shouldBackup)))
 			}
 		}
 	}

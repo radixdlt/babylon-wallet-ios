@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 extension Home.State {
 	var viewState: Home.ViewState {
-		.init(hasNotification: shouldBackupPersonasSeedPhrase)
+		.init(hasNotification: shouldWriteDownPersonasSeedPhrase)
 	}
 }
 

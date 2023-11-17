@@ -21,7 +21,7 @@ public struct Settings: Sendable, FeatureReducer {
 
 		public var shouldShowMigrateOlympiaButton: Bool = false
 		public var userHasNoP2PLinks: Bool? = nil
-		public var shouldBackupPersonasSeedPhrase: Bool = false
+		public var shouldWriteDownPersonasSeedPhrase: Bool = false
 
 		public init() {}
 	}
@@ -44,7 +44,7 @@ public struct Settings: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case loadedP2PLinks(P2PLinks)
 		case loadedShouldShowImportWalletShortcutInSettings(Bool)
-		case loadedShouldBackupPersonasSeedPhrase(Bool)
+		case loadedShouldWriteDownPersonasSeedPhrase(Bool)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -117,7 +117,7 @@ public struct Settings: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			return loadShouldBackupPersonasSeedPhrase()
+			return loadShouldWriteDownPersonasSeedPhrase()
 				.merge(
 					with: loadShouldShowImportWalletShortcutInSettings()
 				)
@@ -168,8 +168,8 @@ public struct Settings: Sendable, FeatureReducer {
 			state.userHasNoP2PLinks = clients.isEmpty
 			return .none
 
-		case let .loadedShouldBackupPersonasSeedPhrase(shouldBackup):
-			state.shouldBackupPersonasSeedPhrase = shouldBackup
+		case let .loadedShouldWriteDownPersonasSeedPhrase(shouldBackup):
+			state.shouldWriteDownPersonasSeedPhrase = shouldBackup
 			return .none
 		}
 	}
@@ -221,12 +221,12 @@ extension Settings {
 		}
 	}
 
-	private func loadShouldBackupPersonasSeedPhrase() -> Effect<Action> {
+	private func loadShouldWriteDownPersonasSeedPhrase() -> Effect<Action> {
 		.run { send in
 			@Dependency(\.personasClient) var personasClient
 			for try await shouldBackup in await personasClient.shouldWriteDownSeedPhraseForAnyPersona() {
 				guard !Task.isCancelled else { return }
-				await send(.internal(.loadedShouldBackupPersonasSeedPhrase(shouldBackup)))
+				await send(.internal(.loadedShouldWriteDownPersonasSeedPhrase(shouldBackup)))
 			}
 		}
 	}
