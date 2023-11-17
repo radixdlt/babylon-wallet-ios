@@ -177,7 +177,8 @@ extension Settings.View {
 			),
 			.init(
 				title: L10n.Settings.personas,
-				hint: viewStore.shouldWriteDownPersonasSeedPhrase ? .init(kind: .warning, text: .init("Back up seed phrase for your Personas")) : nil,
+				// FIXME: Strings
+				hint: viewStore.shouldWriteDownPersonasSeedPhrase ? .init(kind: .warning, text: .init("Write down seed phrase for your Personas")) : nil,
 				icon: .asset(AssetResource.personas),
 				action: .personasButtonTapped
 			),

@@ -25,7 +25,8 @@ extension Persona {
 							}
 							if viewStore.shouldWriteDownSeedPhrase {
 								shieldPromptView(
-									text: "Backup this Persona's seed phrase",
+									// FIXME: Strings
+									text: "Write down this Persona's seed phrase",
 									action: {
 										viewStore.send(.writeDownSeedPhrasePromptTapped)
 									}
