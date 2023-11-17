@@ -80,7 +80,7 @@ extension DebugSettingsCoordinator.View {
 // MARK: - Extensions
 
 private extension StoreOf<DebugSettingsCoordinator> {
-	var destination: PresentationStoreOf<DebugSettingsCoordinator.Destination_> {
+	var destination: PresentationStoreOf<DebugSettingsCoordinator.Destination> {
 		scope(state: \.$destination) { .destination($0) }
 	}
 }
@@ -100,69 +100,69 @@ private extension View {
 	}
 
 	private func debugUserDefaultsContents(
-		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination_>
+		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
 	) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /DebugSettingsCoordinator.Destination_.State.debugUserDefaultsContents,
-			action: DebugSettingsCoordinator.Destination_.Action.debugUserDefaultsContents,
+			state: /DebugSettingsCoordinator.Destination.State.debugUserDefaultsContents,
+			action: DebugSettingsCoordinator.Destination.Action.debugUserDefaultsContents,
 			destination: { DebugUserDefaultsContents.View(store: $0) }
 		)
 	}
 
 	#if DEBUG
 	private func debugKeychainTest(
-		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination_>
+		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
 	) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /DebugSettingsCoordinator.Destination_.State.debugKeychainTest,
-			action: DebugSettingsCoordinator.Destination_.Action.debugKeychainTest,
+			state: /DebugSettingsCoordinator.Destination.State.debugKeychainTest,
+			action: DebugSettingsCoordinator.Destination.Action.debugKeychainTest,
 			destination: { DebugKeychainTest.View(store: $0) }
 		)
 	}
 
 	private func debugKeychainContents(
-		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination_>
+		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
 	) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /DebugSettingsCoordinator.Destination_.State.debugKeychainContents,
-			action: DebugSettingsCoordinator.Destination_.Action.debugKeychainContents,
+			state: /DebugSettingsCoordinator.Destination.State.debugKeychainContents,
+			action: DebugSettingsCoordinator.Destination.Action.debugKeychainContents,
 			destination: { DebugKeychainContents.View(store: $0) }
 		)
 	}
 	#endif // DEBUG
 
 	private func factorSources(
-		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination_>
+		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
 	) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /DebugSettingsCoordinator.Destination_.State.debugManageFactorSources,
-			action: DebugSettingsCoordinator.Destination_.Action.debugManageFactorSources,
+			state: /DebugSettingsCoordinator.Destination.State.debugManageFactorSources,
+			action: DebugSettingsCoordinator.Destination.Action.debugManageFactorSources,
 			destination: { DebugManageFactorSources.View(store: $0) }
 		)
 	}
 
 	private func debugInspectProfile(
-		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination_>
+		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
 	) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /DebugSettingsCoordinator.Destination_.State.debugInspectProfile,
-			action: DebugSettingsCoordinator.Destination_.Action.debugInspectProfile,
+			state: /DebugSettingsCoordinator.Destination.State.debugInspectProfile,
+			action: DebugSettingsCoordinator.Destination.Action.debugInspectProfile,
 			destination: { DebugInspectProfile.View(store: $0) }
 		)
 	}
 
 	private func securityStructureConfigs(
-		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination_>
+		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
 	) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /DebugSettingsCoordinator.Destination_.State.securityStructureConfigs,
-			action: DebugSettingsCoordinator.Destination_.Action.securityStructureConfigs,
+			state: /DebugSettingsCoordinator.Destination.State.securityStructureConfigs,
+			action: DebugSettingsCoordinator.Destination.Action.securityStructureConfigs,
 			destination: { SecurityStructureConfigurationListCoordinator.View(store: $0) }
 		)
 	}
