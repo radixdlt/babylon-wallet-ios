@@ -86,10 +86,20 @@ extension AddressView {
 	}
 
 	private var addressView: some View {
-		Text("\(identifiable.address.formatted(format)) \(image)")
-			.lineLimit(format == .full ? nil : 1)
-			.multilineTextAlignment(.leading)
-			.minimumScaleFactor(0.5)
+		Group {
+			if format == .full {
+				Text("\(identifiable.address.formatted(format))\(image)")
+					.lineLimit(nil)
+			} else {
+				HStack(spacing: .small3) {
+					Text(identifiable.address.formatted(format))
+						.lineLimit(1)
+					image
+				}
+			}
+		}
+		.multilineTextAlignment(.leading)
+		.minimumScaleFactor(0.5)
 	}
 
 	private var image: Image {
