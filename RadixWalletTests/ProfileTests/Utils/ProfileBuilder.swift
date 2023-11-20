@@ -15,13 +15,15 @@ public final class ProfileBuilder {
 }
 
 extension ProfileBuilder {
-	public func build() -> Profile {
+	public func build(allowEmpty: Bool = false) -> Profile {
 		guard let bdfs else { fatalError("No BDFS, unable to create Profile.") }
 		let deviceInfo = DeviceInfo(description: "Builder", id: UUID(), date: .now)
 		let networksDictionary: OrderedDictionary<NetworkID, Profile.Network> = .init(uniqueKeysWithValues: self.networks.map {
 			(key: $0.id, value: Profile.Network(networkID: $0.id, accounts: .init(rawValue: $0.accounts)!, personas: [], authorizedDapps: []))
 		})
-		assert(networksDictionary.keys.contains(.mainnet))
+		if !allowEmpty {
+			assert(networksDictionary.keys.contains(.mainnet))
+		}
 		let profile = Profile(
 			header: .init(
 				creatingDevice: deviceInfo,
@@ -34,7 +36,9 @@ extension ProfileBuilder {
 			appPreferences: .init(gateways: .init(current: .mainnet)),
 			networks: .init(dictionary: networksDictionary)
 		)
-		assert(!profile.network!.getAccounts().isEmpty)
+		if !allowEmpty {
+			assert(!profile.network!.getAccounts().isEmpty)
+		}
 		return profile
 	}
 }

@@ -166,15 +166,20 @@ extension ProfileStore {
 		)
 
 		if let idOfEphemeralProfileToDelete {
-			do {
-				try secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(
-					profileID: idOfEphemeralProfileToDelete,
-					keepInICloudIfPresent: false
-				)
-			} catch {
-				// Not important enought to fail
-				logAssertionFailure("Failed to delete empty ephemeral profile ID, error: \(error)")
-			}
+			Self.deleteEphemeralProfile(id: idOfEphemeralProfileToDelete)
+		}
+	}
+
+	private static func deleteEphemeralProfile(id: ProfileSnapshot.Header.ID) {
+		@Dependency(\.secureStorageClient) var secureStorageClient
+		do {
+			try secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(
+				profileID: id,
+				keepInICloudIfPresent: false
+			)
+		} catch {
+			// Not important enought to fail
+			logAssertionFailure("Failed to delete empty ephemeral profile ID, error: \(error)")
 		}
 	}
 
@@ -425,12 +430,47 @@ extension ProfileStore {
 
 // MARK: Private Static
 extension ProfileStore {
+	typealias NewProfileTuple = (deviceInfo: DeviceInfo, profile: Profile, conflictingOwners: ConflictingOwners?)
+
 	private static func _loadSavedElseNewProfile(
 		metaDeviceInfo: MetaDeviceInfo
-	) -> (deviceInfo: DeviceInfo, profile: Profile, conflictingOwners: ConflictingOwners?) {
+	) -> NewProfileTuple {
+		@Dependency(\.secureStorageClient) var secureStorageClient
 		let deviceInfo = metaDeviceInfo.deviceInfo
+
+		func newProfile() throws -> NewProfileTuple {
+			try (
+				deviceInfo: metaDeviceInfo.deviceInfo,
+				profile: _tryGenerateAndSaveNewProfile(deviceInfo: deviceInfo),
+				conflictingOwners: nil
+			)
+		}
+
 		do {
 			if var existing = try _tryLoadSavedProfile() {
+				if
+					case let bdfs = existing.factorSources.babylonDevice,
+					!secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(bdfs.id),
+					existing.networks.isEmpty
+				{
+					// Unlikely corner case, but possible. The Profile does not contain any accounts and
+					// the BDFS mnemonic is missing => treat this scenario as if there is no Profile ->
+					// let user start fresh. It is possible for users to end up in this corner case scenario
+					// if the do this:
+					// 1. Start wallet without any Profile => a new Profile and BDFS is saved into keychain (and BDFS mnemonic)
+					// 2. Before they create the first account, they delete the passcode from their device and re-enabling it, this
+					// 		will delete the mnemonic from keychain, but not the Profile.
+					// 3. Start wallet again, and they are met with onboarding screen to create their first acocunt into the empty
+					// 		Profile created in step 1. HOWEVER, they user is now stuck in a bad state. The account creation will
+					// 		try to use a missing mnemonic which silently fails and user gets back to the screen where they are asked
+					//		to name the account.
+					//
+					//	The solution is simple, this Profile has no value! It has no accounts! So we just toss it and generate a new
+					//	(Profile, BDFS) pair, with the mnemonic of this new BDFS intact in keychain.
+					Self.deleteEphemeralProfile(id: existing.header.id)
+					return try newProfile()
+				}
+
 				// Read: https://radixdlt.atlassian.net/l/cp/fmoH9KcN
 				let matchingIDs = existing.header.lastUsedOnDevice.id == deviceInfo.id
 				if metaDeviceInfo.fromDeprecatedDeviceID, matchingIDs {
@@ -446,11 +486,7 @@ extension ProfileStore {
 					)
 				)
 			} else {
-				return try (
-					deviceInfo: metaDeviceInfo.deviceInfo,
-					profile: _tryGenerateAndSaveNewProfile(deviceInfo: deviceInfo),
-					conflictingOwners: nil
-				)
+				return try newProfile()
 			}
 		} catch {
 			fatalError("Unable to use app. error: \(error)")
