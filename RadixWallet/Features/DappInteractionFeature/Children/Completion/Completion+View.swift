@@ -38,7 +38,9 @@ extension Completion {
 
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: ViewState.init) { viewStore in
-				WithNavigationBar(closeAction: dismiss.callAsFunction) {
+				WithNavigationBar {
+					store.send(.view(.dismissTapped))
+				} content: {
 					VStack(spacing: .small3) {
 						Image(asset: AssetResource.successCheckmark)
 
@@ -56,6 +58,8 @@ extension Completion {
 								Text(L10n.TransactionReview.SubmitTransaction.txID)
 								AddressView(.identifier(.transaction(txID)))
 							}
+							.foregroundColor(.app.gray1)
+							.textStyle(.body1Regular)
 						}
 					}
 					.padding(.horizontal, .medium2)
