@@ -49,8 +49,8 @@ extension ProfileBackupSettings.View {
 	private func coreView(with viewStore: ViewStoreOf<ProfileBackupSettings>) -> some SwiftUI.View {
 		ScrollView {
 			VStack(alignment: .leading, spacing: .large3) {
-				// MUST use `.init` to get markdown in string to work
-				Text(.init(L10n.ProfileBackup.headerTitle))
+				// Contains bold text segments.
+				Text(LocalizedStringKey(L10n.ProfileBackup.headerTitle))
 					.padding(.horizontal, .medium2)
 					.padding(.vertical, .small1)
 
@@ -60,8 +60,8 @@ extension ProfileBackupSettings.View {
 
 				section(L10n.ProfileBackup.ManualBackups.title) {
 					VStack(alignment: .leading, spacing: .medium1) {
-						// MUST use `.init` to get markdown in string to work
-						Text(.init(L10n.ProfileBackup.ManualBackups.subtitle))
+						// Contains bold text segments.
+						Text(LocalizedStringKey(L10n.ProfileBackup.ManualBackups.subtitle))
 						Button(L10n.ProfileBackup.ManualBackups.exportButtonTitle) {
 							viewStore.send(.exportProfileButtonTapped)
 						}
@@ -71,8 +71,8 @@ extension ProfileBackupSettings.View {
 
 				section(L10n.ProfileBackup.DeleteWallet.title) {
 					VStack(alignment: .leading, spacing: .medium1) {
-						// MUST use `.init` to get markdown in string to work
-						Text(.init(L10n.IOSProfileBackup.DeleteWallet.subtitle))
+						// Contains bold text segments.
+						Text(LocalizedStringKey(L10n.IOSProfileBackup.DeleteWallet.subtitle))
 
 						Button(L10n.IOSProfileBackup.DeleteWallet.confirmButton) {
 							viewStore.send(.deleteProfileAndFactorSourcesButtonTapped)

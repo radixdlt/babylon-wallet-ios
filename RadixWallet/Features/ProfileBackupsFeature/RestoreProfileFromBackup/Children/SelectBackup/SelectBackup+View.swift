@@ -116,16 +116,14 @@ extension SelectBackup.View {
 		let header = item.value
 		let isVersionCompatible = header.isVersionCompatible()
 		let creatingDevice = header.creatingDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.creatingDevice.description
-//		let lastUsedOnDevice = header.lastUsedOnDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.lastUsedOnDevice.description.rawValue
-
 		return Card(action: item.action) {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
 					Group {
-						Text(.init(L10n.RecoverProfileBackup.backupFrom(creatingDevice)))
-						// FIXME: update bolding of 'label'?
+						// Contains bold text segments.
+						Text(LocalizedStringKey(L10n.RecoverProfileBackup.backupFrom(creatingDevice)))
 						Text(L10n.IOSProfileBackup.lastModifedDateLabel(formatDate(header.lastModified)))
-//						Text(L10n.IOSProfileBackup.numberOfNetworksLabel(header.contentHint.numberOfNetworks))
+
 						Text(L10n.IOSProfileBackup.totalAccountsNumberLabel(header.contentHint.numberOfAccountsOnAllNetworksInTotal))
 						Text(L10n.IOSProfileBackup.totalPersonasNumberLabel(header.contentHint.numberOfPersonasOnAllNetworksInTotal))
 					}

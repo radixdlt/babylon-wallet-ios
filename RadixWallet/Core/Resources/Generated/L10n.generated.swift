@@ -1167,8 +1167,8 @@ public enum L10n {
   public enum DisplayMnemonics {
     /// Write Down this Seed Phrase
     public static let backUpWarning = L10n.tr("Localizable", "displayMnemonics_backUpWarning", fallback: "Write Down this Seed Phrase")
-    /// Seed Phrase Entry Required
-    public static let seedPhraseEntryWarning = L10n.tr("Localizable", "displayMnemonics_seedPhraseEntryWarning", fallback: "Seed Phrase Entry Required")
+    /// Begin seed phrase entry
+    public static let seedPhraseEntryWarning = L10n.tr("Localizable", "displayMnemonics_seedPhraseEntryWarning", fallback: "Begin seed phrase entry")
     /// Seed Phrases
     public static let seedPhrases = L10n.tr("Localizable", "displayMnemonics_seedPhrases", fallback: "Seed Phrases")
     /// You are responsible for the security of your Seed Phrase
@@ -1383,8 +1383,8 @@ public enum L10n {
     public static let legacyAccountHeading = L10n.tr("Localizable", "homePage_legacyAccountHeading", fallback: "Legacy")
     /// Please write down this Account's seed phrase
     public static let securityPromptBackup = L10n.tr("Localizable", "homePage_securityPromptBackup", fallback: "Please write down this Account's seed phrase")
-    /// Please recover your seed phrase
-    public static let securityPromptRecover = L10n.tr("Localizable", "homePage_securityPromptRecover", fallback: "Please recover your seed phrase")
+    /// Seed phrase required - begin entry
+    public static let securityPromptRecover = L10n.tr("Localizable", "homePage_securityPromptRecover", fallback: "Seed phrase required - begin entry")
     /// Welcome. Here are all your Accounts on the Radix Network.
     public static let subtitle = L10n.tr("Localizable", "homePage_subtitle", fallback: "Welcome. Here are all your Accounts on the Radix Network.")
     /// Radix Wallet
@@ -1923,15 +1923,27 @@ public enum L10n {
   public enum RecoverSeedPhrase {
     /// Enter This Seed Phrase
     public static let enterButton = L10n.tr("Localizable", "recoverSeedPhrase_enterButton", fallback: "Enter This Seed Phrase")
+    /// I Don’t Have the Main Seed Phrase
+    public static let noMainSeedPhraseButton = L10n.tr("Localizable", "recoverSeedPhrase_noMainSeedPhraseButton", fallback: "I Don’t Have the Main Seed Phrase")
     /// Skip This Seed Phrase For Now
     public static let skipButton = L10n.tr("Localizable", "recoverSeedPhrase_skipButton", fallback: "Skip This Seed Phrase For Now")
+    /// Skip Main Seed Phrase Entry
+    public static let skipMainSeedPhraseButton = L10n.tr("Localizable", "recoverSeedPhrase_skipMainSeedPhraseButton", fallback: "Skip Main Seed Phrase Entry")
     public enum Header {
       /// Your **Personas** and the following **Accounts** are controlled by your main seed phrase. To recover control, you must re-enter it.
       public static let subtitleMainSeedPhrase = L10n.tr("Localizable", "recoverSeedPhrase_header_subtitleMainSeedPhrase", fallback: "Your **Personas** and the following **Accounts** are controlled by your main seed phrase. To recover control, you must re-enter it.")
+      /// The Radix Wallet always uses a single main “Babylon” seed phrase to generate new Personas and new Accounts (when not using a Ledger device).
+      /// 
+      /// If you do not have access to your previous main seed phrase, you can skip entering it for now. **The Radix Wallet will create a new one, which will be used for new Personas and Accounts.**
+      /// 
+      /// Your old Accounts and Personas will still be listed, but you will have to enter their original seed phrase to use them. Alternatively, you can hide them if you no longer are interested in using them.
+      public static let subtitleNoMainSeedPhrase = L10n.tr("Localizable", "recoverSeedPhrase_header_subtitleNoMainSeedPhrase", fallback: "The Radix Wallet always uses a single main “Babylon” seed phrase to generate new Personas and new Accounts (when not using a Ledger device).\n\nIf you do not have access to your previous main seed phrase, you can skip entering it for now. **The Radix Wallet will create a new one, which will be used for new Personas and Accounts.**\n\nYour old Accounts and Personas will still be listed, but you will have to enter their original seed phrase to use them. Alternatively, you can hide them if you no longer are interested in using them.")
       /// The following **Accounts** are controlled by a seed phrase. To recover control, you must re-enter it.
       public static let subtitleOtherSeedPhrase = L10n.tr("Localizable", "recoverSeedPhrase_header_subtitleOtherSeedPhrase", fallback: "The following **Accounts** are controlled by a seed phrase. To recover control, you must re-enter it.")
       /// Main Seed Phrase Required
       public static let titleMain = L10n.tr("Localizable", "recoverSeedPhrase_header_titleMain", fallback: "Main Seed Phrase Required")
+      /// No Main Seed Phrase?
+      public static let titleNoMainSeedPhrase = L10n.tr("Localizable", "recoverSeedPhrase_header_titleNoMainSeedPhrase", fallback: "No Main Seed Phrase?")
       /// Seed Phrase Required
       public static let titleOther = L10n.tr("Localizable", "recoverSeedPhrase_header_titleOther", fallback: "Seed Phrase Required")
     }
