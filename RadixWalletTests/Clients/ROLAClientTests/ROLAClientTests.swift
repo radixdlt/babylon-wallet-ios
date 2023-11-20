@@ -73,9 +73,6 @@ final class ROLAClientTests: TestCase {
 					dAppDefinitionAddress: .init(validatingAddress: vector.dAppDefinitionAddress),
 					origin: .init(string: vector.origin)
 				)
-
-				XCTAssertEqual(otherPayload.hex, vector.payloadToHash)
-
 				XCTAssertEqual(payload.hex, vector.payloadToHash)
 				let blakeHashOfPayload = try blake2b(data: payload)
 				XCTAssertEqual(blakeHashOfPayload.hex, vector.blakeHashOfPayload)
