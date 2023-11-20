@@ -171,7 +171,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case let .destination(.presented(.exportMnemonic(.delegate(.doneViewing(idOfBackedUpFactorSource))))):
+		case let .exportMnemonic(.delegate(.doneViewing(idOfBackedUpFactorSource))):
 			state.destination = nil
 			guard let idOfBackedUpFactorSource else {
 				return .none
