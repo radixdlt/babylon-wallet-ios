@@ -23,6 +23,7 @@ extension ConfirmSkippingBDFS {
 				VStack(spacing: .medium2) {
 					Text(L10n.RecoverSeedPhrase.Header.titleNoMainSeedPhrase)
 						.textStyle(.sheetTitle)
+						.foregroundColor(.app.gray1)
 						.multilineTextAlignment(.center)
 
 					ScrollView(.vertical, showsIndicators: true) {
