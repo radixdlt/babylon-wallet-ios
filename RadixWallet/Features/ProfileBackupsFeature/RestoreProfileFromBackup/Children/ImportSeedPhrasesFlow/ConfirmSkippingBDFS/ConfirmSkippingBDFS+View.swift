@@ -27,8 +27,8 @@ extension ConfirmSkippingBDFS {
 						.multilineTextAlignment(.center)
 
 					ScrollView(.vertical, showsIndicators: true) {
-						// we use `.init` to preserve bold attribute of string.
-						Text(.init(L10n.RecoverSeedPhrase.Header.subtitleNoMainSeedPhrase))
+						// Contains bold text segments.
+						Text(LocalizedStringKey(L10n.RecoverSeedPhrase.Header.subtitleNoMainSeedPhrase))
 							.textStyle(.body1Regular)
 							.foregroundColor(.app.gray1)
 							.multilineTextAlignment(.leading)
