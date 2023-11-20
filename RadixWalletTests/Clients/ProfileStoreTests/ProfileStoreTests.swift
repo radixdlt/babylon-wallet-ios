@@ -206,6 +206,21 @@ final class ProfileStoreNewProfileTests: TestCase {
 		}
 	}
 
+	func test__GIVEN__no_profile__WHEN__init__THEN__new_profile_with_main_BDFS_is_created() async throws {
+		try await withTimeLimit {
+			let newProfile = await withTestClients {
+				// GIVEN no profile
+				$0.noProfile()
+			} operation: {
+				// WHEN ProfileStore.init()
+				await ProfileStore.init().profile
+			}
+
+			let deviceFS = try newProfile.factorSources[0].extract(as: DeviceFactorSource.self)
+			XCTAssertTrue(deviceFS.isExplicitMainBDFS)
+		}
+	}
+
 	func test__GIVEN__no_profile__WHEN__import_profile__THEN__imported_profile_is_used() async throws {
 		try await withTimeLimit(.normal) {
 			let usedProfile = try await withTestClients {
@@ -580,6 +595,34 @@ final class ProfileStoreExistingProfileTests: TestCase {
 
 			// THEN saved profile is used.
 			XCTAssertNoDifference(saved, used)
+		}
+	}
+
+	func test__GIVEN__saved_empty_profile__WHEN__passcode_removed__THEN__new_profile_is_used() async throws {
+		try await withTimeLimit {
+			let mnemonicGotDeleted = self.expectation(description: "Mnemonic got deleted")
+			// GIVEN saved profile
+			let savedEmptyProfile = ProfileBuilder().bdfs().build(allowEmpty: true)
+			let firstBDFS = savedEmptyProfile.factorSources.babylonDevice
+
+			let used = await withTestClients {
+				$0.secureStorageClient.containsMnemonicIdentifiedByFactorSourceID = { factorSourceID in
+					// WHEN passcode remove (mnemonic deleted)
+					if factorSourceID == firstBDFS.id {
+						mnemonicGotDeleted.fulfill()
+						return false
+					}
+					return true
+				}
+				$0.savedProfile(savedEmptyProfile)
+			} operation: {
+				await ProfileStore.init().profile
+			}
+
+			await self.nearFutureFulfillment(of: mnemonicGotDeleted)
+
+			// THEN a new profile is used
+			XCTAssertNotEqual(savedEmptyProfile, used)
 		}
 	}
 

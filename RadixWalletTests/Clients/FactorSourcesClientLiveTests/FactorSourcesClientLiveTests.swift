@@ -47,6 +47,27 @@ final class FactorSourcesClientLiveTests: TestCase {
 		let ledger = ledgers.first
 		XCTAssertEqual(accountsOf(signingFactor: ledger).sorted(), [accounts[3], accounts[4], accounts[5]])
 	}
+
+	func test_new_bdfs() async throws {
+		let userDefaults = UserDefaults.Dependency.ephemeral()
+		let profile = ProfileBuilder()
+			.bdfs()
+			.account(name: "Foo")
+			.build()
+		userDefaults.set(string: profile.header.id.uuidString, key: .activeProfileID)
+
+		try await withTestClients {
+			$0.userDefaults = userDefaults
+			$0.secureStorageClient.loadDeviceInfo = { profile.header.creatingDevice }
+			$0.secureStorageClient.loadProfile = { _ in profile }
+		} operation: {
+			let sut = FactorSourcesClient.liveValue
+			let newMainBDFS = try await sut.createNewMainBDFS()
+			try await sut.saveNew(mainBDFS: newMainBDFS)
+			let usedMainBDFS = try await sut.getMainDeviceFactorSource()
+			XCTAssertNoDifference(newMainBDFS.factorSource, usedMainBDFS)
+		}
+	}
 }
 
 // MARK: - SigningFactor + Comparable
@@ -145,5 +166,11 @@ extension Profile.Network.Account {
 				appearanceID: .fromIndex(Int(index))
 			)
 		)
+	}
+}
+
+extension FactorSourcesClient {
+	func saveNew(mainBDFS: PrivateHDFactorSource) async throws {
+		try await saveNewMainBDFS(mainBDFS.factorSource)
 	}
 }

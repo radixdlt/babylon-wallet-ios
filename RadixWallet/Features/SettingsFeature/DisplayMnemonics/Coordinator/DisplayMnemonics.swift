@@ -59,6 +59,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.backupsClient) var backupsClient
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 	public init() {}
 
@@ -148,13 +149,16 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			switch delegateAction {
 			case .finishedEarly:
 				state.destination = nil
-			case let .finishedImportingMnemonics(_, importedIDs):
+				return .none
+			case let .finishedImportingMnemonics(_, importedIDs, notYetSavedNewMainBDFS):
+				assert(notYetSavedNewMainBDFS == nil, "Discrepancy, new Main BDFS should already have been saved.")
 				for imported in importedIDs {
 					state.deviceFactorSources[id: imported.factorSourceID]?.imported()
 				}
 				state.destination = nil
+
+				return .none
 			}
-			return .none
 		default: return .none
 		}
 	}

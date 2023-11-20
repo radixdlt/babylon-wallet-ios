@@ -26,6 +26,9 @@ extension PersonasClient: DependencyKey {
 				try await profileStore.network().getPersonas()
 			},
 			getPersonasOnNetwork: getPersonasOnNetwork,
+			getHiddenPersonasOnCurrentNetwork: {
+				try await profileStore.network().getHiddenPersonas()
+			},
 			updatePersona: { persona in
 				try await profileStore.updating {
 					try $0.updatePersona(persona)

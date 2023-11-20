@@ -2,6 +2,7 @@ import EngineToolkit
 @testable import Radix_Wallet_Dev
 import XCTest
 
+// MARK: - EntitiesHidingTests
 final class EntitiesHidingTests: TestCase {
 	let account0 = Profile.Network.Account.testValueIdx0
 	let account1 = Profile.Network.Account.testValueIdx1
@@ -46,59 +47,59 @@ final class EntitiesHidingTests: TestCase {
 
 	func test_GIVEN_hasUnhiddenAccounts_WHEN_accountIsHidden_THEN_accountIsFilteredOut() {
 		var sut = network
-		sut.hideAccount(account0)
+		sut.hide(account: account0)
 		XCTAssertEqual(sut.getAccounts(), [account1])
 	}
 
 	func test_GIVEN_hasUnhiddenAccounts_WHEN_accountIsHidden_THEN_accountIsReturnedInHiddenAccounts() {
 		var sut = network
-		sut.hideAccount(account0)
+		sut.hide(account: account0)
 		XCTAssertEqual(sut.getHiddenAccounts().map(\.id), [account0.id])
 	}
 
 	func test_GIVEN_hasHiddenAccounts_WHEN_checkingIfUserHasSomeAccounts_THEN_returnsTrue() {
 		var sut = network
-		sut.hideAccount(account0)
-		sut.hideAccount(account1)
+		sut.hide(account: account0)
+		sut.hide(account: account1)
 		XCTAssertTrue(sut.hasSomeAccount())
 	}
 
 	func test_GIVEN_hasHiddenAccounts_WHEN_askingForNextAccountIndex_THEN_returnsProperValue() {
 		var sut = network
-		sut.hideAccount(account0)
-		sut.hideAccount(account1)
+		sut.hide(account: account0)
+		sut.hide(account: account1)
 		XCTAssertEqual(sut.nextAccountIndex(), 2)
 	}
 
 	func test_GIVEN_hasUnhiddenPersonas_WHEN_personaIsHidden_THEN_personaIsFilteredOut() {
 		var sut = network
-		sut.hidePersona(persona0)
+		sut.hide(persona: persona0)
 		XCTAssertEqual(sut.getPersonas(), [persona1])
 	}
 
 	func test_GIVEN_hasUnhiddenPersonas_WHEN_personaIsHidden_THEN_personaIsReturnedInHiddenPersonas() {
 		var sut = network
-		sut.hidePersona(persona0)
+		sut.hide(persona: persona0)
 		XCTAssertEqual(sut.getHiddenPersonas().map(\.id), [persona0.id])
 	}
 
 	func test_GIVEN_hasHiddenPersonas_WHEN_checkingIfUserHasSomePersonas_THEN_returnsTrue() {
 		var sut = network
-		sut.hidePersona(persona0)
-		sut.hidePersona(persona1)
+		sut.hide(persona: persona0)
+		sut.hide(persona: persona1)
 		XCTAssertTrue(sut.hasSomePersona())
 	}
 
 	func test_GIVEN_hasHiddenPersonas_WHEN_askingForNextPersonaIndex_THEN_returnsProperValue() {
 		var sut = network
-		sut.hidePersona(persona0)
-		sut.hidePersona(persona1)
+		sut.hide(persona: persona0)
+		sut.hide(persona: persona1)
 		XCTAssertEqual(sut.nextPersonaIndex(), 2)
 	}
 
 	func test_GIVEN_hasSharedAccountsWithDapps_WHEN_accountIsHidden_THEN_accountIsRemovedFromSharedAccounts() {
 		var sut = network
-		sut.hideAccount(account0)
+		sut.hide(account: account0)
 
 		let authorizedDapp0 = sut.authorizedDapps[id: dApp0.id]!
 		let authorizedDapp1 = sut.authorizedDapps[id: dApp1.id]!
@@ -111,7 +112,7 @@ final class EntitiesHidingTests: TestCase {
 
 	func test_GIVEN_hasAuthorizedDappsWithOnePersona_WHEN_personaIsHidden_THEN_dappIsRemoved() {
 		var sut = network
-		sut.hidePersona(persona0)
+		sut.hide(persona: persona0)
 
 		/// dApp0 references only persona0
 		XCTAssertNil(sut.authorizedDapps[id: dApp0.id])
@@ -119,12 +120,22 @@ final class EntitiesHidingTests: TestCase {
 
 	func test_GIVEN_hasAuthorizedDappsWithMoreThanOnePersona_WHEN_personaIsHidden_THEN_personaIsRemovedFromDapp() throws {
 		var sut = network
-		sut.hidePersona(persona0)
+		sut.hide(persona: persona0)
 
 		/// authorizedDapp1 references persona0 and persona1
 		let authorizedDapp1 = try XCTUnwrap(sut.authorizedDapps.first { $0.dAppDefinitionAddress == dApp1.dAppDefinitionAddress })
 
 		/// Assert that persona0 is removed, but persona1 is still kept.
 		XCTAssertEqual(authorizedDapp1.referencesToAuthorizedPersonas.map(\.identityAddress), [persona1.address])
+	}
+}
+
+extension Profile.Network {
+	mutating func hide(account: Profile.Network.Account) {
+		hideAccounts(ids: [account.id])
+	}
+
+	mutating func hide(persona: Profile.Network.Persona) {
+		hidePersonas(ids: [persona.id])
 	}
 }

@@ -143,17 +143,15 @@ extension OnLedgerEntitiesClient {
 	}
 
 	@Sendable
-	public func getAssociatedDapps(_ addresses: [DappDefinitionAddress]) async throws -> [OnLedgerEntity.AssociatedDapp] {
-		try await getEntities(addresses.map(\.asGeneral), .dappMetadataKeys, nil, false)
+	public func getAssociatedDapps(_ addresses: [DappDefinitionAddress], forceRefresh: Bool = false) async throws -> [OnLedgerEntity.AssociatedDapp] {
+		try await getEntities(addresses.map(\.asGeneral), .dappMetadataKeys, nil, forceRefresh)
 			.compactMap(\.account)
-			.map {
-				.init(address: $0.address, metadata: $0.metadata)
-			}
+			.map { .init(address: $0.address, metadata: $0.metadata) }
 	}
 
 	@Sendable
-	public func getAssociatedDapp(_ address: DappDefinitionAddress) async throws -> OnLedgerEntity.AssociatedDapp {
-		guard let dApp = try await getAssociatedDapps([address]).first else {
+	public func getAssociatedDapp(_ address: DappDefinitionAddress, forceRefresh: Bool = false) async throws -> OnLedgerEntity.AssociatedDapp {
+		guard let dApp = try await getAssociatedDapps([address], forceRefresh: forceRefresh).first else {
 			throw Error.emptyResponse
 		}
 		return dApp
@@ -201,7 +199,9 @@ extension OnLedgerEntitiesClient {
 		validatingDappDefinitionAddress dappDefinitionAddress: DappDefinitionAddress? = nil,
 		validatingWebsite website: URL? = nil
 	) async throws -> OnLedgerEntity.Metadata {
-		let dappMetadata = try await getAssociatedDapp(dappDefinition).metadata
+		let forceRefresh = component != nil || dappDefinitionAddress != nil || website != nil
+
+		let dappMetadata = try await getAssociatedDapp(dappDefinition, forceRefresh: forceRefresh).metadata
 
 		try dappMetadata.validateAccountType()
 

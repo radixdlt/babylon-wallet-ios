@@ -73,7 +73,7 @@ extension DappInteractionClient {
 			case wrongNetworkID(connectorExtensionSent: NetworkID, walletUses: NetworkID)
 			case invalidDappDefinitionAddress(gotStringWhichIsAnInvalidAccountAddress: String)
 			case invalidOrigin(invalidURLString: String)
-			case dAppValidationError
+			case dAppValidationError(String)
 			case badContent(BadContent)
 			public enum BadContent: Sendable, Hashable {
 				case numberOfAccountsInvalid

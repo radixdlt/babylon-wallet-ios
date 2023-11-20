@@ -76,11 +76,9 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
-	@Dependency(\.secureStorageClient) var secureStorageClient
 
 	public init() {}
 
@@ -211,7 +209,8 @@ public struct Home: Sendable, FeatureReducer {
 			state.destination = nil
 			switch delegateAction {
 			case .finishedEarly: break
-			case let .finishedImportingMnemonics(_, imported):
+			case let .finishedImportingMnemonics(_, imported, notYetSavedNewMainBDFS):
+				assert(notYetSavedNewMainBDFS == nil, "Discrepancy, new Main BDFS should already have been saved.")
 				if !imported.isEmpty {
 					return checkAccountsAccessToMnemonic(state: state)
 				}

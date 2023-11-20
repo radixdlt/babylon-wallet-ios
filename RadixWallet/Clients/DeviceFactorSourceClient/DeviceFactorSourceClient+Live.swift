@@ -14,27 +14,47 @@ extension DeviceFactorSourceClient: DependencyKey {
 
 		let entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource = { factorSource, maybeSnapshot in
 
-			let allEntities: [EntityPotentiallyVirtual] = try await {
-				let accounts: [Profile.Network.Account]
-				let personas: [Profile.Network.Persona]
+			let (allNonHiddenEntities, allHiddenEntities) = try await { () -> (allNonHiddenEntities: [EntityPotentiallyVirtual], allHiddenEntities: [EntityPotentiallyVirtual]) in
+				let accountNonHidden: [Profile.Network.Account]
+				let accountHidden: [Profile.Network.Account]
+				let personasNonHidden: [Profile.Network.Persona]
+				let personasHidden: [Profile.Network.Persona]
 
 				// FIXME: Uh this aint pretty... but we are short on time.
 				if let overridingSnapshot = maybeSnapshot {
 					let networkID = Radix.Gateway.default.network.id
 					let profile = Profile(snapshot: overridingSnapshot)
 					let network = try profile.network(id: networkID)
-					accounts = network.getAccounts().elements
-					personas = network.getPersonas().elements
+					accountNonHidden = network.getAccounts().elements
+					personasNonHidden = network.getPersonas().elements
+
+					accountHidden = network.getHiddenAccounts().elements
+					personasHidden = network.getHiddenPersonas().elements
 				} else {
-					personas = try await personasClient.getPersonas().elements
-					accounts = try await accountsClient.getAccountsOnCurrentNetwork().elements
+					accountNonHidden = try await accountsClient.getAccountsOnCurrentNetwork().elements
+					personasNonHidden = try await personasClient.getPersonas().elements
+
+					accountHidden = try await accountsClient.getHiddenAccountsOnCurrentNetwork().elements
+					personasHidden = try await personasClient.getHiddenPersonasOnCurrentNetwork().elements
 				}
 
-				return accounts.map(EntityPotentiallyVirtual.account) + personas.map(EntityPotentiallyVirtual.persona)
+				var allNonHiddenEntities = accountNonHidden.map(EntityPotentiallyVirtual.account)
+				allNonHiddenEntities.append(contentsOf: personasNonHidden.map(EntityPotentiallyVirtual.persona))
 
+				var allHidden = accountHidden.map(EntityPotentiallyVirtual.account)
+				allHidden.append(contentsOf: personasHidden.map(EntityPotentiallyVirtual.persona))
+
+				return (allNonHiddenEntities, allHidden)
 			}()
 
-			let entitiesForSource = allEntities.filter { entity in
+			let nonHiddenEntitiesForSource = allNonHiddenEntities.filter { entity in
+				switch entity.securityState {
+				case let .unsecured(unsecuredEntityControl):
+					unsecuredEntityControl.transactionSigning.factorSourceID == factorSource.id
+				}
+			}
+
+			let hiddenEntitiesForSource = allHiddenEntities.filter { entity in
 				switch entity.securityState {
 				case let .unsecured(unsecuredEntityControl):
 					unsecuredEntityControl.transactionSigning.factorSourceID == factorSource.id
@@ -44,7 +64,8 @@ extension DeviceFactorSourceClient: DependencyKey {
 			let isMnemonicMarkedAsBackedUp = userDefaults.getFactorSourceIDOfBackedUpMnemonics().contains(factorSource.id)
 
 			return EntitiesControlledByFactorSource(
-				entities: entitiesForSource,
+				entities: nonHiddenEntitiesForSource,
+				hiddenEntities: hiddenEntitiesForSource,
 				deviceFactorSource: factorSource,
 				isMnemonicPresentInKeychain: secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSource.id),
 				isMnemonicMarkedAsBackedUp: isMnemonicMarkedAsBackedUp

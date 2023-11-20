@@ -43,19 +43,30 @@ extension DeviceFactorSource {
 }
 
 extension DeviceFactorSource {
+	public var flags: OrderedSet<FactorSourceFlag> {
+		common.flags
+	}
+
+	public mutating func flagAsMain() {
+		common.flagAsMain()
+	}
+
 	static func from(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		model: Hint.Model = "",
 		name: String = "",
+		isMain: Bool = false,
 		isOlympiaCompatible: Bool,
 		addedOn: Date? = nil,
 		lastUsedOn: Date? = nil
 	) throws -> Self {
 		@Dependency(\.date) var date
+		assert(!(isMain && isOlympiaCompatible), "Olympia Device factor source should never be marked 'main'.")
 		return try Self(
 			id: .init(kind: .device, mnemonicWithPassphrase: mnemonicWithPassphrase),
 			common: .from(
 				cryptoParameters: isOlympiaCompatible ? .olympiaBackwardsCompatible : .babylon,
+				flags: isMain ? [.main] : [],
 				addedOn: addedOn ?? date(),
 				lastUsedOn: lastUsedOn ?? date()
 			),
@@ -75,6 +86,7 @@ extension DeviceFactorSource {
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
 			model: model,
 			name: name,
+			isMain: true,
 			isOlympiaCompatible: false,
 			addedOn: addedOn ?? date(),
 			lastUsedOn: lastUsedOn ?? date()

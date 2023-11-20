@@ -166,14 +166,15 @@ public struct DebugInspectFactorSourceView: IndentedView {
 
 extension DebugInspectFactorSourceView {
 	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
+		VStack(alignment: .leading, spacing: 2) {
 			Text("Factor Source")
 				.fontWeight(.heavy)
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
 
-			FactorSourceCommonView(common: factorSource.common)
+			Labeled("ID", value: factorSource.id)
+
 			switch factorSource {
 			case let .device(deviceFactorSource):
 				DeviceFactorSouceView(deviceFactorSource: deviceFactorSource)
@@ -188,12 +189,30 @@ extension DebugInspectFactorSourceView {
 				// FIXME: impl me
 				Text("\(String(describing: trustedContact))")
 			}
+			FactorSourceCommonView(common: factorSource.common)
 		}
 		.background {
 			Color.randomDark(seed: factorSource.id.description.data(using: .utf8)!)
 		}
 		.foregroundColor(.white)
 		.padding(.leading, leadingPadding)
+		.overlay {
+			if factorSource.isExplicitMain {
+				RoundedRectangle(cornerRadius: 4)
+					.stroke(.green, lineWidth: 10)
+			}
+		}
+	}
+}
+
+// MARK: - FactorSourceCommonView
+extension FactorSource {
+	var isExplicitMain: Bool {
+		switch self {
+		case let .device(deviceFactorSource):
+			deviceFactorSource.isExplicitMain
+		default: false
+		}
 	}
 }
 
@@ -210,7 +229,10 @@ public struct FactorSourceCommonView: View {
 // MARK: - DeviceFactorSouceView
 public struct DeviceFactorSouceView: View {
 	public let deviceFactorSource: DeviceFactorSource
+	var isMain: Bool { deviceFactorSource.flags.contains(.main) }
 	public var body: some View {
+		Labeled("Is Main?", value: isMain)
+			.fontWeight(.heavy)
 		Labeled("Name", value: deviceFactorSource.hint.name)
 		Labeled("Model", value: deviceFactorSource.hint.model.rawValue)
 	}
@@ -584,12 +606,26 @@ extension ProfileNetworkView {
 			Labeled("ID", value: String(describing: network.networkID))
 
 			AccountsView(
+				areHidden: false,
 				entities: network.getAccounts().elements,
 				indentation: inOneLevel
 			)
 
+			AccountsView(
+				areHidden: true,
+				entities: network.getHiddenAccounts().elements,
+				indentation: inOneLevel
+			)
+
 			PersonasView(
+				areHidden: false,
 				entities: network.getPersonas().elements,
+				indentation: inOneLevel
+			)
+
+			PersonasView(
+				areHidden: true,
+				entities: network.getHiddenPersonas().elements,
 				indentation: inOneLevel
 			)
 
@@ -609,6 +645,7 @@ public typealias PersonasView = EntitiesView<Profile.Network.Persona>
 
 // MARK: - EntitiesView
 public struct EntitiesView<Entity: EntityProtocol>: IndentedView {
+	public let areHidden: Bool
 	public let entities: [Entity]
 	public let indentation: Indentation
 }
@@ -616,6 +653,10 @@ public struct EntitiesView<Entity: EntityProtocol>: IndentedView {
 extension EntitiesView {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
+			if areHidden {
+				Text("HIDDEN")
+					.fontWeight(.heavy)
+			}
 			Text(Entity.entityKind == .identity ? "Personas" : "Accounts")
 				.fontWeight(.heavy)
 			#if os(macOS)
@@ -626,6 +667,7 @@ extension EntitiesView {
 			} else {
 				ForEach(entities, id: \.address) { entity in
 					EntityView(
+						isHidden: areHidden,
 						entity: entity,
 						indentation: inOneLevel
 					)
@@ -638,6 +680,7 @@ extension EntitiesView {
 
 // MARK: - EntityView
 public struct EntityView<Entity: EntityProtocol>: IndentedView {
+	public let isHidden: Bool
 	public let entity: Entity
 	public let indentation: Indentation
 }
@@ -671,12 +714,16 @@ extension EntityView {
 				Labeled("Account Appearance ID", value: account.appearanceID.description)
 			}
 		}
-		.foregroundColor(entity.kind == .account ? .white : .black)
+		.foregroundColor(isHidden ? .white : (entity.kind == .account ? .white : .black))
 		.padding(.leading, leadingPadding)
 		.background {
-			if let account = entity as? Profile.Network.Account {
-				account.appearanceID.gradient
-					.brightness(-0.2)
+			if isHidden {
+				Color.gray
+			} else {
+				if let account = entity as? Profile.Network.Account {
+					account.appearanceID.gradient
+						.brightness(-0.2)
+				}
 			}
 		}
 	}

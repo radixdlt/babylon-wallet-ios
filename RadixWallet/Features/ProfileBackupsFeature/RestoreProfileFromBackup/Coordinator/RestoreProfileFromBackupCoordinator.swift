@@ -56,6 +56,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.backupsClient) var backupsClient
+	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
 	public init() {}
@@ -90,7 +91,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 					))))
 			}
 
-		case let .path(.element(_, action: .importMnemonicsFlow(.delegate(.finishedImportingMnemonics(skipList, _))))):
+		case let .path(.element(_, action: .importMnemonicsFlow(.delegate(.finishedImportingMnemonics(skipList, _, notYetSavedNewMainBDFS))))):
 			loggerGlobal.notice("Starting import snapshot process...")
 			guard let profileSelection = state.profileSelection else {
 				preconditionFailure("Expected to have a profile")
@@ -99,6 +100,11 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			return .run { send in
 				loggerGlobal.notice("Importing snapshot...")
 				try await backupsClient.importSnapshot(profileSelection.snapshot, fromCloud: profileSelection.isInCloud)
+
+				if let notYetSavedNewMainBDFS {
+					try await factorSourcesClient.saveNewMainBDFS(notYetSavedNewMainBDFS)
+				}
+
 				await send(.delegate(.profileImported(
 					skippedAnyMnemonic: !skipList.isEmpty
 				)))
