@@ -168,13 +168,25 @@ extension Profile.Network.Personas {
 }
 
 extension Profile.Network.Persona {
-	public var shouldWriteDownSeedPhrase: Bool {
+	public var shouldWriteDownMnemonic: Bool {
+		@Dependency(\.userDefaults) var userDefaults
+		@Dependency(\.secureStorageClient) var secureStorageClient
+
 		guard let deviceFactorSourceID else {
 			return false
 		}
 
-		@Dependency(\.userDefaults) var userDefaults
+		guard
+			secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(deviceFactorSourceID)
+		else {
+			loggerGlobal.trace("SHOULD write down seed phrase for persona: \(self), factorSource: \(deviceFactorSourceID)")
+			// Can't write down, what you dont have.
+			return false
+		}
+
 		let backedUpIds = userDefaults.getFactorSourceIDOfBackedUpMnemonics()
-		return !backedUpIds.contains(deviceFactorSourceID)
+		let alreadyBackedUp = backedUpIds.contains(deviceFactorSourceID)
+		loggerGlobal.trace("SHOULD write down seed phrase for persona: \(self), factorSource: \(deviceFactorSourceID)")
+		return !alreadyBackedUp
 	}
 }

@@ -7,7 +7,7 @@ public struct Persona: Sendable, FeatureReducer {
 		public let id: Profile.Network.Persona.ID
 		public let thumbnail: URL?
 		public let displayName: String
-		public var shouldWriteDownSeedPhrase: Bool
+		public var shouldWriteDownMnemonic: Bool
 
 		public init(persona: Profile.Network.AuthorizedPersonaDetailed) {
 			self.init(
@@ -22,7 +22,7 @@ public struct Persona: Sendable, FeatureReducer {
 				id: persona.id,
 				thumbnail: nil,
 				displayName: persona.displayName.rawValue,
-				shouldWriteDownSeedPhrase: persona.shouldWriteDownSeedPhrase
+				shouldWriteDownMnemonic: persona.shouldWriteDownMnemonic
 			)
 		}
 
@@ -30,12 +30,12 @@ public struct Persona: Sendable, FeatureReducer {
 			id: Profile.Network.Persona.ID,
 			thumbnail: URL?,
 			displayName: String,
-			shouldWriteDownSeedPhrase: Bool = false
+			shouldWriteDownMnemonic: Bool = false
 		) {
 			self.id = id
 			self.thumbnail = thumbnail
 			self.displayName = displayName
-			self.shouldWriteDownSeedPhrase = shouldWriteDownSeedPhrase
+			self.shouldWriteDownMnemonic = shouldWriteDownMnemonic
 		}
 	}
 

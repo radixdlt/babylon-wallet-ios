@@ -23,7 +23,7 @@ extension Persona {
 							PlainListRow(title: viewStore.displayName) {
 								PersonaThumbnail(viewStore.thumbnail)
 							}
-							if viewStore.shouldWriteDownSeedPhrase {
+							if viewStore.shouldWriteDownMnemonic {
 								shieldPromptView(
 									// FIXME: Strings
 									text: "Write down this Persona's seed phrase",

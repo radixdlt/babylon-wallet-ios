@@ -71,7 +71,7 @@ extension PersonasClient {
 
 	public func shouldWriteDownSeedPhraseForAnyPersona() async -> AnyAsyncSequence<Bool> {
 		await personas().map { personas in
-			personas.contains(where: \.shouldWriteDownSeedPhrase)
+			personas.contains(where: \.shouldWriteDownMnemonic)
 		}
 		.share()
 		.eraseToAnyAsyncSequence()

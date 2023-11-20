@@ -34,7 +34,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable & Equatable {
 		case personaPrimacyDetermined(PersonaPrimacy)
 		case loadedPersonaDetails(PersonaDetails.State)
-		case personasSeedPhraseBackedup(personaIDs: Set<Profile.Network.Persona.ID>)
+		case finishedWritingDownMnemonicForPersonas(ids: Set<Profile.Network.Persona.ID>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -109,10 +109,10 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 			state.destination = .personaDetails(personaDetails)
 			return .none
 
-		case let .personasSeedPhraseBackedup(personaIDs):
+		case let .finishedWritingDownMnemonicForPersonas(ids):
 			state.personaList.personas.mutateAll { persona in
-				if personaIDs.contains(persona.id) {
-					persona.shouldWriteDownSeedPhrase = false
+				if ids.contains(persona.id) {
+					persona.shouldWriteDownMnemonic = false
 				}
 			}
 			return .none
@@ -178,7 +178,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 					$0.deviceFactorSourceID == idOfBackedUpFactorSource
 				}.map(\.id)
 
-				await send(.internal(.personasSeedPhraseBackedup(personaIDs: Set(personasToRefresh))))
+				await send(.internal(.finishedWritingDownMnemonicForPersonas(ids: Set(personasToRefresh))))
 			}
 
 		case .destination:
