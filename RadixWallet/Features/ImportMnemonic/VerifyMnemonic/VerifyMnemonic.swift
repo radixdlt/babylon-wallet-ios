@@ -38,6 +38,9 @@ public struct VerifyMnemonic: Sendable, FeatureReducer {
 		case wordSubmitted
 		case textFieldFocused(Int?)
 		case confirmSeedPhraseButtonTapped
+		#if DEBUG
+		case debugCheat
+		#endif
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -87,6 +90,12 @@ public struct VerifyMnemonic: Sendable, FeatureReducer {
 				state.invalidMnemonic = true
 				return .none
 			}
+
+		#if DEBUG
+		case .debugCheat:
+			overlayWindowClient.scheduleHUD(.succeeded)
+			return .send(.delegate(.mnemonicVerified))
+		#endif
 		}
 	}
 }

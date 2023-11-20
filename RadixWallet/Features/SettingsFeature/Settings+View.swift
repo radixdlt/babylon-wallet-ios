@@ -18,6 +18,7 @@ extension Settings {
 		#endif
 		let shouldShowAddP2PLinkButton: Bool
 		let shouldShowMigrateOlympiaButton: Bool
+		let shouldWriteDownPersonasSeedPhrase: Bool
 		let appVersion: String
 
 		var showsSomeBanner: Bool {
@@ -32,6 +33,7 @@ extension Settings {
 
 			self.shouldShowAddP2PLinkButton = state.userHasNoP2PLinks ?? false
 			self.shouldShowMigrateOlympiaButton = state.shouldShowMigrateOlympiaButton
+			self.shouldWriteDownPersonasSeedPhrase = state.shouldWriteDownPersonasSeedPhrase
 			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
 			self.appVersion = L10n.Settings.appVersion(bundleInfo.shortVersion, bundleInfo.version)
 		}
@@ -40,12 +42,21 @@ extension Settings {
 
 // MARK: - SettingsRowModel
 struct SettingsRowModel<Feature: FeatureReducer>: Identifiable {
-	var id: String { title }
+	var id: String { rowViewState.rowCoreViewState.title }
 
-	let title: String
-	var subtitle: String?
-	let icon: AssetIcon.Content
+	let rowViewState: PlainListRow<AssetIcon>.ViewState
 	let action: Feature.ViewAction
+
+	public init(
+		title: String,
+		subtitle: String? = nil,
+		hint: Hint.ViewState? = nil,
+		icon: AssetIcon.Content,
+		action: Feature.ViewAction
+	) {
+		self.rowViewState = .init(icon, rowCoreViewState: .init(title: title, subtitle: subtitle, hint: hint))
+		self.action = action
+	}
 }
 
 // MARK: - SettingsRow
@@ -54,9 +65,11 @@ struct SettingsRow<Feature: FeatureReducer>: View {
 	let action: () -> Void
 
 	var body: some View {
-		PlainListRow(row.icon, title: row.title, subtitle: row.subtitle)
-			.tappable(action)
-			.withSeparator
+		VStack(spacing: .small3) {
+			PlainListRow(viewState: row.rowViewState)
+				.tappable(action)
+				.withSeparator
+		}
 	}
 }
 
@@ -107,7 +120,7 @@ extension Settings.View {
 						.padding(.medium3)
 					}
 
-					ForEach(rows) { row in
+					ForEach(rows(viewStore: viewStore)) { row in
 						SettingsRow(row: row) {
 							viewStore.send(row.action)
 						}
@@ -130,8 +143,8 @@ extension Settings.View {
 				}
 			}
 			.animation(.default, value: viewStore.shouldShowMigrateOlympiaButton)
-			.onAppear {
-				viewStore.send(.appeared)
+			.task { @MainActor in
+				await viewStore.send(.task).finish()
 			}
 		}
 	}
@@ -141,8 +154,8 @@ extension Settings.View {
 	}
 
 	@MainActor
-	private var rows: [SettingsRowModel<Settings>] {
-		var visibleRows = normalRows
+	private func rows(viewStore: ViewStoreOf<Settings>) -> [SettingsRowModel<Settings>] {
+		var visibleRows = normalRows(viewStore: viewStore)
 		#if DEBUG
 		visibleRows.append(.init(
 			title: "Debug Settings",
@@ -154,7 +167,7 @@ extension Settings.View {
 	}
 
 	@MainActor
-	private var normalRows: [SettingsRowModel<Settings>] {
+	private func normalRows(viewStore: ViewStoreOf<Settings>) -> [SettingsRowModel<Settings>] {
 		[
 			.init(
 				title: L10n.Settings.authorizedDapps,
@@ -163,6 +176,8 @@ extension Settings.View {
 			),
 			.init(
 				title: L10n.Settings.personas,
+				// FIXME: Strings
+				hint: viewStore.shouldWriteDownPersonasSeedPhrase ? .init(kind: .warning, text: .init("Write down seed phrase for your Personas")) : nil,
 				icon: .asset(AssetResource.personas),
 				action: .personasButtonTapped
 			),

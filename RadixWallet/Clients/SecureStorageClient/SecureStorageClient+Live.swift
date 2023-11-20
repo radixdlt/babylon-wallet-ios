@@ -272,10 +272,8 @@ extension SecureStorageClient: DependencyKey {
 				synchronizable: false,
 				accessibility: .whenPasscodeSetThisDeviceOnly
 			)
-			loggerGlobal.error("Found these unfilteredKeys: \(unfilteredKeys)")
-			let keys = unfilteredKeys.filter { $0.rawValue.rawValue.starts(with: "\(FactorSourceKind.device.rawValue):") }
 
-			loggerGlobal.error("Found these filtered keys: \(keys)")
+			let keys = unfilteredKeys.filter { $0.rawValue.rawValue.starts(with: "\(FactorSourceKind.device.rawValue):") }
 
 			return keys.compactMap {
 				guard
