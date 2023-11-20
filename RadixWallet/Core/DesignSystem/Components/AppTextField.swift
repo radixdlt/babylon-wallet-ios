@@ -181,13 +181,15 @@ public struct AppTextField<FocusValue: Hashable, Accessory: View, InnerAccessory
 	}
 
 	private func accentColor(border: Bool) -> Color {
-		switch hint?.kind {
+		switch hint?.viewState.kind {
 		case .none:
 			border ? .app.gray4 : .app.gray1
 		case .info:
 			.app.gray1
 		case .error:
 			.app.red1
+		case .warning:
+			.app.alert
 		}
 	}
 }

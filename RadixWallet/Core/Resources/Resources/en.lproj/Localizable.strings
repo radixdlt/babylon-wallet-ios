@@ -1,5 +1,5 @@
 "homePage_securityPromptBackup" = "Please write down this Account\'s seed phrase";
-"homePage_securityPromptRecover" = "Please recover your seed phrase";
+"homePage_securityPromptRecover" = "Seed phrase required - begin entry";
 "homePage_backedUpMnemonicHeading" = "I have written down this seed phrase";
 "homePage_createNewAccount" = "Create a New Account";
 "homePage_legacyAccountHeading" = "Legacy";
@@ -675,7 +675,7 @@ You can always change the guarantee from this default in each transaction.";
 "displayMnemonics_connectedAccountsLabel_many" = "Connected to %d Accounts";
 "displayMnemonics_seedPhraseSecurityInfo" = "You are responsible for the security of your Seed Phrase";
 "displayMnemonics_backUpWarning" = "Write Down this Seed Phrase";
-"displayMnemonics_seedPhraseEntryWarning" = "Seed Phrase Entry Required";
+"displayMnemonics_seedPhraseEntryWarning" = "Begin seed phrase entry";
 "confirmMnemonicBackedUp_title" = "Confirm Your Seed Phrase";
 "confirmMnemonicBackedUp_subtitle" = "Confirm you have written down the seed phrase by entering the missing words below.";
 "revealSeedPhrase_title" = "Reveal Seed Phrase";
@@ -810,11 +810,19 @@ Only the **current configuration** of your wallet is backed up with each manual 
 "recoverProfileBackup_incompatibleWalletDataLabel" = "Incompatible Wallet data";
 "recoverProfileBackup_passwordWrong" = "The password is wrong";
 "recoverSeedPhrase_header_titleMain" = "Main Seed Phrase Required";
+"recoverSeedPhrase_header_titleNoMainSeedPhrase" = "No Main Seed Phrase?";
 "recoverSeedPhrase_header_titleOther" = "Seed Phrase Required";
 "recoverSeedPhrase_header_subtitleMainSeedPhrase" = "Your **Personas** and the following **Accounts** are controlled by your main seed phrase. To recover control, you must re-enter it.";
 "recoverSeedPhrase_header_subtitleOtherSeedPhrase" = "The following **Accounts** are controlled by a seed phrase. To recover control, you must re-enter it.";
+"recoverSeedPhrase_header_subtitleNoMainSeedPhrase" = "The Radix Wallet always uses a single main “Babylon” seed phrase to generate new Personas and new Accounts (when not using a Ledger device).
+
+If you do not have access to your previous main seed phrase, you can skip entering it for now. **The Radix Wallet will create a new one, which will be used for new Personas and Accounts.**
+
+Your old Accounts and Personas will still be listed, but you will have to enter their original seed phrase to use them. Alternatively, you can hide them if you no longer are interested in using them.";
 "recoverSeedPhrase_skipButton" = "Skip This Seed Phrase For Now";
+"recoverSeedPhrase_noMainSeedPhraseButton" = "I Don’t Have the Main Seed Phrase";
 "recoverSeedPhrase_enterButton" = "Enter This Seed Phrase";
+"recoverSeedPhrase_skipMainSeedPhraseButton" = "Skip Main Seed Phrase Entry";
 "enterSeedPhrase_header_title" = "Enter Seed Phrase";
 "enterSeedPhrase_warning" = "For your safety, make sure no one is looking at your screen. Never give your seed phrase to anyone for any reason.";
 "factorSources_kind_device" = "Phone";

@@ -158,11 +158,11 @@ extension FeatureReducer {
 
 extension FeatureReducer {
 	func exportMnemonic(
-		controlling account: Profile.Network.Account,
+		controlling entity: EntityBaseProtocol,
 		notifyIfMissing: Bool = true,
 		onSuccess: (SimplePrivateFactorSource) -> Void
 	) -> Effect<Action> {
-		guard let txSigningFI = account.virtualHierarchicalDeterministicFactorInstances.first(where: { $0.factorSourceID.kind == .device }) else {
+		guard let txSigningFI = entity.virtualHierarchicalDeterministicFactorInstances.first(where: { $0.factorSourceID.kind == .device }) else {
 			loggerGlobal.notice("Discrepancy, non software account has not mnemonic to export")
 			return .none
 		}

@@ -144,3 +144,17 @@ extension EntityBaseProtocol {
 		flags.contains(.deletedByUser)
 	}
 }
+
+extension EntityProtocol {
+	public var deviceFactorSourceID: FactorSourceID.FromHash? {
+		switch self.securityState {
+		case let .unsecured(control):
+			let factorSourceID = control.transactionSigning.factorSourceID
+			guard factorSourceID.kind == .device else {
+				return nil
+			}
+
+			return factorSourceID
+		}
+	}
+}

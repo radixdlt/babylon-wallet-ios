@@ -38,6 +38,7 @@ private extension View {
 		let destinationStore = store.destination
 		return createPersonaCoordinator(with: destinationStore)
 			.personaDetails(with: destinationStore)
+			.exportMnemonic(with: destinationStore)
 	}
 
 	private func createPersonaCoordinator(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination>) -> some View {
@@ -55,6 +56,20 @@ private extension View {
 			state: /PersonasCoordinator.Destination.State.personaDetails,
 			action: PersonasCoordinator.Destination.Action.personaDetails,
 			destination: { PersonaDetails.View(store: $0) }
+		)
+	}
+
+	@MainActor
+	private func exportMnemonic(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination>) -> some SwiftUI.View {
+		sheet(
+			store: destinationStore,
+			state: /PersonasCoordinator.Destination.State.exportMnemonic,
+			action: PersonasCoordinator.Destination.Action.exportMnemonic,
+			content: { childStore in
+				NavigationStack {
+					ExportMnemonic.View(store: childStore)
+				}
+			}
 		)
 	}
 }

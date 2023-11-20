@@ -6,6 +6,7 @@ public struct Home: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		// MARK: - Components
 		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State>
+		public var shouldWriteDownPersonasSeedPhrase: Bool = false
 
 		// MARK: - Destination
 		@PresentationState
@@ -29,6 +30,7 @@ public struct Home: Sendable, FeatureReducer {
 		case accountsLoadedResult(TaskResult<IdentifiedArrayOf<Profile.Network.Account>>)
 		case exportMnemonic(account: Profile.Network.Account)
 		case importMnemonic
+		case loadedShouldWriteDownPersonasSeedPhrase(Bool)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -100,6 +102,8 @@ public struct Home: Sendable, FeatureReducer {
 				errorQueue.schedule(error)
 			}
 			.merge(with: checkAccountsAccessToMnemonic(state: state))
+			.merge(with: loadShouldWriteDownPersonasSeedPhrase())
+
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(
 				.init(config: .init(
@@ -137,6 +141,10 @@ public struct Home: Sendable, FeatureReducer {
 
 		case let .accountsLoadedResult(.failure(error)):
 			errorQueue.schedule(error)
+			return .none
+
+		case let .loadedShouldWriteDownPersonasSeedPhrase(shouldBackup):
+			state.shouldWriteDownPersonasSeedPhrase = shouldBackup
 			return .none
 
 		case let .exportMnemonic(account):
@@ -237,6 +245,16 @@ public struct Home: Sendable, FeatureReducer {
 				))
 			}
 		)
+	}
+
+	private func loadShouldWriteDownPersonasSeedPhrase() -> Effect<Action> {
+		.run { send in
+			@Dependency(\.personasClient) var personasClient
+			for try await shouldBackup in await personasClient.shouldWriteDownSeedPhraseForAnyPersona() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.loadedShouldWriteDownPersonasSeedPhrase(shouldBackup)))
+			}
+		}
 	}
 }
 

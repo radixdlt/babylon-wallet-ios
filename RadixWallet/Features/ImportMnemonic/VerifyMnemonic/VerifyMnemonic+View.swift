@@ -71,6 +71,14 @@ extension VerifyMnemonic {
 							WarningErrorView(text: "Incorrect seed phrase", type: .error)
 						}
 
+						#if DEBUG
+						Button("DEBUG ONLY Cheat") {
+							viewStore.send(.debugCheat)
+						}
+						.buttonStyle(.secondaryRectangular(isDestructive: true))
+						.padding(.bottom, .medium1)
+						#endif
+
 						Button(L10n.Common.confirm) {
 							viewStore.send(.confirmSeedPhraseButtonTapped)
 						}
