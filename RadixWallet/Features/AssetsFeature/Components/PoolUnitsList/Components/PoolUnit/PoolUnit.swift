@@ -16,7 +16,7 @@ public struct PoolUnit: Sendable, FeatureReducer {
 			poolUnit: OnLedgerEntity.Account.PoolUnit,
 			resourceDetails: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails> = .idle,
 			isSelected: Bool? = nil,
-			destination: Destinations.State? = nil
+			destination: Destination.State? = nil
 		) {
 			self.poolUnit = poolUnit
 			self.resourceDetails = resourceDetails
@@ -25,18 +25,14 @@ public struct PoolUnit: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		var destination: Destinations.State?
+		var destination: Destination.State?
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case didTap
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
-	}
-
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case details(PoolUnitDetails.State)
 		}
@@ -58,17 +54,14 @@ public struct PoolUnit: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(
-				\.$destination,
-				action: /Action.child .. ChildAction.destination,
-				destination: Destinations.init
-			)
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
+			}
 	}
 
-	public func reduce(
-		into state: inout State,
-		viewAction: ViewAction
-	) -> Effect<Action> {
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .didTap:
 			guard case let .success(details) = state.resourceDetails else {

@@ -3,6 +3,7 @@
 
 extension RadixConnectClient: TestDependencyKey {
 	public static let previewValue = Self.noop
+
 	public static let testValue = Self(
 		loadFromProfileAndConnectAll: unimplemented("\(Self.self).loadFromProfileAndConnectAll"),
 		disconnectAndRemoveAll: unimplemented("\(Self.self).disconnectAndRemoveAll"),

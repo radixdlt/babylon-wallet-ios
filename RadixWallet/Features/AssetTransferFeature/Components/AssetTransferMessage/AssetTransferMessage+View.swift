@@ -72,17 +72,34 @@ extension AssetTransferMessage.View {
 					.bind(viewStore.focusedBinding, to: $focused)
 				}
 			}
-			.sheet(
-				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /AssetTransferMessage.Destinations.State.messageMode,
-				action: AssetTransferMessage.Destinations.Action.messageMode,
-				content: {
-					MessageMode.View(store: $0)
-						.presentationDetents([.medium])
-						.presentationDragIndicator(.visible)
-						.presentationBackground(.blur)
-				}
-			)
 		}
+		.destinations(with: store)
+	}
+}
+
+private extension StoreOf<AssetTransferMessage> {
+	var destination: PresentationStoreOf<AssetTransferMessage.Destination> {
+		func scopeState(state: State) -> PresentationState<AssetTransferMessage.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<AssetTransferMessage>) -> some View {
+		let destinationStore = store.destination
+		return sheet(
+			store: destinationStore,
+			state: /AssetTransferMessage.Destination.State.messageMode,
+			action: AssetTransferMessage.Destination.Action.messageMode,
+			content: {
+				MessageMode.View(store: $0)
+					.presentationDetents([.medium])
+					.presentationDragIndicator(.visible)
+					.presentationBackground(.blur)
+			}
+		)
 	}
 }

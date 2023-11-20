@@ -93,17 +93,8 @@ extension ManageTrustedContactFactorSource {
 				}
 				// FIXME: future strings
 				.navigationTitle(viewStore.isCreatingNewFromScratch ? "Add Trusted Contact" : "Edit Trusted Contact")
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /ManageTrustedContactFactorSource.Destinations.State.scanAccountAddress,
-					action: ManageTrustedContactFactorSource.Destinations.Action.scanAccountAddress,
-					content: {
-						ScanQRCoordinator.View(store: $0)
-							// FIXME: future strings
-							.navigationTitle("Scan address")
-					}
-				)
 			}
+			.destinations(with: store)
 		}
 
 		private func addressField(
@@ -185,6 +176,31 @@ extension ManageTrustedContactFactorSource {
 				}
 			)
 		}
+	}
+}
+
+private extension StoreOf<ManageTrustedContactFactorSource> {
+	var destination: PresentationStoreOf<ManageTrustedContactFactorSource.Destination> {
+		func scopeState(state: State) -> PresentationState<ManageTrustedContactFactorSource.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<ManageTrustedContactFactorSource>) -> some View {
+		let destinationStore = store.destination
+		return sheet(
+			store: destinationStore,
+			state: /ManageTrustedContactFactorSource.Destination.State.scanAccountAddress,
+			action: ManageTrustedContactFactorSource.Destination.Action.scanAccountAddress,
+			content: {
+				ScanQRCoordinator.View(store: $0)
+					.navigationTitle("Scan address") // FIXME: future strings
+			}
+		)
 	}
 }
 

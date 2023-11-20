@@ -25,7 +25,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 		public var selectedFactorSourceID: FactorSourceOfKind.ID?
 
 		@PresentationState
-		public var destination: Destinations.State? = nil
+		public var destination: Destination.State? = nil
 
 		public init(
 			kind: FactorSourceKind,
@@ -78,17 +78,13 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 		case loadedFactorSources(TaskResult<IdentifiedArrayOf<FactorSourceOfKind>>)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
-	}
-
 	public enum DelegateAction: Sendable, Equatable {
 		case choseFactorSource(FactorSourceOfKind)
 	}
 
 	// MARK: - Destination
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case addNewFactorSource(ManageSomeFactorSource<FactorSourceOfKind>.State)
 			case existingFactorSourceWillBeDeletedConfirmationDialog(ConfirmationDialogState<DeleteExistingFactorSourceConfirmationDialogAction>)
@@ -117,10 +113,12 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -137,10 +135,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 		case .addNewFactorSourceButtonTapped:
 			assert(state.canAddNew)
 
-			if
-				state.canOnlyHaveOneFactorSourceOfKind,
-				let existing = state.factorSources.last
-			{
+			if state.canOnlyHaveOneFactorSourceOfKind, let existing = state.factorSources.last {
 				state.destination = .existingFactorSourceWillBeDeletedConfirmationDialog(.deletion(of: existing))
 			} else {
 				state.destination = .addNewFactorSource(.init(kind: state.kind))
@@ -169,9 +164,9 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(.addNewFactorSource(.delegate(newFactorSourceAction)))):
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .addNewFactorSource(.delegate(newFactorSourceAction)):
 			switch newFactorSourceAction {
 			case let .done(.success(factorSource)):
 				state.destination = nil
@@ -193,7 +188,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 				return .none
 			}
 
-		case let .destination(.presented(.existingFactorSourceWillBeDeletedConfirmationDialog(confirmationAction))):
+		case let .existingFactorSourceWillBeDeletedConfirmationDialog(confirmationAction):
 			switch confirmationAction {
 			case .cancel:
 				state.destination = nil

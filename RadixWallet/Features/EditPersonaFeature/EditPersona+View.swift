@@ -58,15 +58,11 @@ extension EditPersona {
 						VStack(spacing: .medium1) {
 							PersonaThumbnail(viewStore.avatarURL, size: .veryLarge)
 
-							EditPersonaField.View(
-								store: store.scope(
-									state: \.labelField,
-									action: (/Action.child .. EditPersona.ChildAction.labelField).embed
-								)
-							)
+							EditPersonaField.View(store: store.labelField)
 
 							Separator()
 
+							// FIXME: Strings
 							Text("dApps can request permission from you to share the following fields of information.")
 								.multilineTextAlignment(.leading)
 								.textStyle(.body1HighImportance)
@@ -74,12 +70,7 @@ extension EditPersona {
 
 							Separator()
 
-							EditPersonaEntries.View(
-								store: store.scope(
-									state: \.entries,
-									action: (/Action.child .. EditPersona.ChildAction.personaData).embed
-								)
-							)
+							EditPersonaEntries.View(store: store.personaEntries)
 
 							Button(action: { viewStore.send(.addAFieldButtonTapped) }) {
 								Text(L10n.EditPersona.addAField).padding(.horizontal, .medium2)
@@ -109,19 +100,52 @@ extension EditPersona {
 						}
 					}
 				}
-				.confirmationDialog(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /EditPersona.Destinations.State.closeConfirmationDialog,
-					action: EditPersona.Destinations.Action.closeConfirmationDialog
-				)
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /EditPersona.Destinations.State.addFields,
-					action: EditPersona.Destinations.Action.addFields,
-					content: { EditPersonaAddEntryKinds.View(store: $0) }
-				)
+				.destinations(with: store)
 			}
 		}
+	}
+}
+
+private extension StoreOf<EditPersona> {
+	var destination: PresentationStoreOf<EditPersona.Destination> {
+		func scopeState(state: State) -> PresentationState<EditPersona.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+
+	var labelField: StoreOf<EditPersonaStaticField> {
+		scope(state: \.labelField) { .child(.labelField($0)) }
+	}
+
+	var personaEntries: StoreOf<EditPersonaEntries> {
+		scope(state: \.entries) { .child(.entries($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<EditPersona>) -> some View {
+		let destinationStore = store.destination
+		return closeConfirmationDialog(with: destinationStore)
+			.addFields(with: destinationStore)
+	}
+
+	private func closeConfirmationDialog(with destinationStore: PresentationStoreOf<EditPersona.Destination>) -> some View {
+		confirmationDialog(
+			store: destinationStore,
+			state: /EditPersona.Destination.State.closeConfirmationDialog,
+			action: EditPersona.Destination.Action.closeConfirmationDialog
+		)
+	}
+
+	private func addFields(with destinationStore: PresentationStoreOf<EditPersona.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /EditPersona.Destination.State.addFields,
+			action: EditPersona.Destination.Action.addFields,
+			content: { EditPersonaAddEntryKinds.View(store: $0) }
+		)
 	}
 }
 

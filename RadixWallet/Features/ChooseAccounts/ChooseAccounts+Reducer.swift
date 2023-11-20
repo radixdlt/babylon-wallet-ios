@@ -11,7 +11,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 		public var canCreateNewAccount: Bool
 
 		@PresentationState
-		var destination: Destinations.State? = nil
+		var destination: Destination.State? = nil
 
 		public init(
 			selectionRequirement: SelectionRequirement,
@@ -38,11 +38,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 		case loadAccountsResult(TaskResult<IdentifiedArrayOf<Profile.Network.Account>>)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
-	}
-
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case createAccount(CreateAccountCoordinator.State)
 		}
@@ -65,10 +61,12 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -102,9 +100,9 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case .destination(.presented(.createAccount(.delegate(.completed)))):
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .createAccount(.delegate(.completed)):
 			loadAccounts()
 
 		default:

@@ -28,7 +28,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		var sliderResetDate: Date = .now
 
 		@PresentationState
-		public var destination: Destinations.State? = nil
+		public var destination: Destination.State? = nil
 
 		public func printFeePayerInfo(line: UInt = #line, function: StaticString = #function) {
 			#if DEBUG
@@ -104,8 +104,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case proofs(TransactionReviewProofs.Action)
 		case accountDepositSettings(AccountDepositSettings.Action)
 		case networkFee(TransactionReviewNetworkFee.Action)
-
-		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -123,7 +121,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case dismiss
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case customizeGuarantees(TransactionReviewGuarantees.State)
 			case signing(Signing.State)
@@ -199,10 +197,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			.ifLet(\.accountDepositSettings, action: /Action.child .. ChildAction.accountDepositSettings) {
 				AccountDepositSettings()
 			}
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -312,103 +312,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			))
 			return .none
 
-		case let .destination(.presented(presentedAction)):
-			return reduce(into: &state, presentedAction: presentedAction)
-
-		case .destination(.dismiss):
-			if case .signing = state.destination {
-				loggerGlobal.notice("Cancelled signing")
-				return resetToApprovable(&state)
-			} else if case .submitting = state.destination {
-				// This is used when tapping outside the Submitting sheet, no need to set destination to nil
-				return delayedShortEffect(for: .delegate(.dismiss))
-			}
-
-			return .none
 		default:
-			return .none
-		}
-	}
-
-	public func reduce(into state: inout State, presentedAction: Destinations.Action) -> Effect<Action> {
-		switch presentedAction {
-		case let .customizeGuarantees(.delegate(.applyGuarantees(guaranteeStates))):
-			for guaranteeState in guaranteeStates {
-				if let guarantee = guaranteeState.details.guarantee {
-					state.applyGuarantee(guarantee, transferID: guaranteeState.id)
-				}
-			}
-
-			return .none
-
-		case .customizeGuarantees:
-			return .none
-
-		case let .customizeFees(.delegate(.updated(reviewedTransaction))):
-			state.reviewedTransaction = reviewedTransaction
-			state.networkFee = .init(reviewedTransaction: reviewedTransaction)
-			state.printFeePayerInfo()
-			return .none
-
-		case .customizeFees:
-			return .none
-
-		case .signing(.delegate(.cancelSigning)):
-			loggerGlobal.notice("Cancelled signing")
-			return resetToApprovable(&state)
-
-		case .signing(.delegate(.failedToSign)):
-			loggerGlobal.error("Failed sign tx")
-			return resetToApprovable(&state)
-
-		case let .signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))):
-			state.destination = .submitting(.init(
-				notarizedTX: notarizedTX,
-				inProgressDismissalDisabled: state.waitsForTransactionToBeComitted
-			))
-			return .none
-
-		case .signing(.delegate(.finishedSigning(.signAuth))):
-			state.canApproveTX = true
-			assertionFailure("Did not expect to have sign auth data...")
-			return .none
-
-		case .signing:
-			return .none
-
-		case let .submitting(.delegate(.submittedButNotCompleted(txID))):
-			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
-
-		case .submitting(.delegate(.failedToSubmit)):
-			return .send(.delegate(.failed(.failedToSubmit)))
-
-		case let .submitting(.delegate(.committedSuccessfully(txID))):
-			state.destination = nil
-			return delayedShortEffect(for: .delegate(.transactionCompleted(txID)))
-
-		case .submitting(.delegate(.manuallyDismiss)):
-			// This is used when the close button is pressed, we have to manually
-			state.destination = nil
-			return delayedShortEffect(for: .delegate(.dismiss))
-
-		case .submitting:
-			return .none
-
-		case .dApp:
-			return .none
-
-		case .fungibleTokenDetails(.delegate(.dismiss)):
-			state.destination = nil
-			return .none
-
-		case .fungibleTokenDetails:
-			return .none
-
-		case .nonFungibleTokenDetails(.delegate(.dismiss)):
-			state.destination = nil
-			return .none
-
-		case .nonFungibleTokenDetails:
 			return .none
 		}
 	}
@@ -513,6 +417,83 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.reviewedTransaction?.feePayer = .success(nil)
 			return .none
 		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .customizeGuarantees(.delegate(.applyGuarantees(guaranteeStates))):
+			for guaranteeState in guaranteeStates {
+				if let guarantee = guaranteeState.details.guarantee {
+					state.applyGuarantee(guarantee, transferID: guaranteeState.id)
+				}
+			}
+
+			return .none
+
+		case let .customizeFees(.delegate(.updated(reviewedTransaction))):
+			state.reviewedTransaction = reviewedTransaction
+			state.networkFee = .init(reviewedTransaction: reviewedTransaction)
+			state.printFeePayerInfo()
+			return .none
+
+		case .signing(.delegate(.cancelSigning)):
+			loggerGlobal.notice("Cancelled signing")
+			return resetToApprovable(&state)
+
+		case .signing(.delegate(.failedToSign)):
+			loggerGlobal.error("Failed sign tx")
+			return resetToApprovable(&state)
+
+		case let .signing(.delegate(.finishedSigning(.signTransaction(notarizedTX, origin: _)))):
+			state.destination = .submitting(.init(
+				notarizedTX: notarizedTX,
+				inProgressDismissalDisabled: state.waitsForTransactionToBeComitted
+			))
+			return .none
+
+		case .signing(.delegate(.finishedSigning(.signAuth))):
+			state.canApproveTX = true
+			assertionFailure("Did not expect to have sign auth data...")
+			return .none
+
+		case let .submitting(.delegate(.submittedButNotCompleted(txID))):
+			return .send(.delegate(.signedTXAndSubmittedToGateway(txID)))
+
+		case .submitting(.delegate(.failedToSubmit)):
+			return .send(.delegate(.failed(.failedToSubmit)))
+
+		case let .submitting(.delegate(.committedSuccessfully(txID))):
+			state.destination = nil
+			return delayedShortEffect(for: .delegate(.transactionCompleted(txID)))
+
+		case .submitting(.delegate(.manuallyDismiss)):
+			// This is used when the close button is pressed, we have to manually
+			state.destination = nil
+			return delayedShortEffect(for: .delegate(.dismiss))
+
+		case .fungibleTokenDetails(.delegate(.dismiss)):
+			state.destination = nil
+			return .none
+
+		case .nonFungibleTokenDetails(.delegate(.dismiss)):
+			state.destination = nil
+			return .none
+
+		default:
+			return .none
+		}
+	}
+
+	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		if case .signing = state.destination {
+			loggerGlobal.notice("Cancelled signing")
+			return resetToApprovable(&state)
+		} else if case .submitting = state.destination {
+			// This is used when tapping outside the Submitting sheet, no need to set destination to nil
+			return delayedShortEffect(for: .delegate(.dismiss))
+		}
+
+		return .none
 	}
 }
 

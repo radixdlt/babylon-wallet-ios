@@ -32,7 +32,7 @@ final class AccountDetailsFeatureTests: TestCase {
 			state.destination = .preferences(.init(account: state.account))
 		}
 
-		await store.send(.child(.destination(.presented(.preferences(.delegate(.accountHidden))))))
+		await store.send(.destination(.presented(.preferences(.delegate(.accountHidden)))))
 
 		await store.receive(.delegate(.dismiss))
 	}

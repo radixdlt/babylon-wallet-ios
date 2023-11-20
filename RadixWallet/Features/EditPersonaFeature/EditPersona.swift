@@ -20,7 +20,7 @@ extension EditPersona {
 						variant: $0.variant,
 						familyName: $0.family.input ?? "",
 						givenNames: $0.given.input ?? "",
-						nickname: $0.nickName.input ?? ""
+						nickname: $0.nickname.input ?? ""
 					)
 				)
 			}
@@ -70,7 +70,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 		var labelField: EditPersonaStaticField.State
 
 		@PresentationState
-		var destination: Destinations.State? = nil
+		var destination: Destination.State? = nil
 
 		var alreadyAddedEntryKinds: [PersonaData.Entry.Kind] {
 			[entries.name?.kind, entries.emailAddress?.kind, entries.phoneNumber?.kind].compactMap(identity)
@@ -104,15 +104,14 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case labelField(EditPersonaStaticField.Action)
-		case personaData(action: EditPersonaEntries.Action)
-		case destination(PresentationAction<Destinations.Action>)
+		case entries(EditPersonaEntries.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case personaSaved(Profile.Network.Persona)
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case closeConfirmationDialog(ConfirmationDialogState<ViewAction.CloseConfirmationDialogAction>)
 			case addFields(EditPersonaAddEntryKinds.State)
@@ -141,14 +140,16 @@ public struct EditPersona: Sendable, FeatureReducer {
 		Scope(state: \.labelField, action: /Action.child .. ChildAction.labelField) {
 			EditPersonaField()
 		}
-		Scope(state: \.entries, action: /Action.child .. ChildAction.personaData) {
+		Scope(state: \.entries, action: /Action.child .. ChildAction.entries) {
 			EditPersonaEntries()
 		}
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -196,12 +197,12 @@ public struct EditPersona: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case .destination(.presented(.closeConfirmationDialog(.discardChanges))):
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .closeConfirmationDialog(.discardChanges):
 			return .run { _ in await dismiss() }
 
-		case let .destination(.presented(.addFields(.delegate(.addEntryKinds(fieldsToAdd))))):
+		case let .addFields(.delegate(.addEntryKinds(fieldsToAdd))):
 			for kind in fieldsToAdd {
 				switch kind {
 				case .fullName:

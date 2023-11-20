@@ -59,13 +59,9 @@ extension TransferAccountList.View {
 				.flushedRight
 				.padding(.top, .medium1)
 			}
-			.sheet(
-				store: store.scope(
-					state: \.$destination,
-					action: { .child(.destination($0)) }
-				),
-				content: { destinations($0) }
-			)
+			.sheet(store: store.destination) { destinationStore in
+				destinations(destinationStore)
+			}
 		}
 	}
 
@@ -95,5 +91,14 @@ extension TransferAccountList.View {
 				)
 			}
 		}
+	}
+}
+
+private extension StoreOf<TransferAccountList> {
+	var destination: PresentationStoreOf<TransferAccountList.Destinations> {
+		func scopeState(state: State) -> PresentationState<TransferAccountList.Destinations.State> {
+			state.$destination
+		}
+		return scope(state: scopeState) { .child(.destination($0)) }
 	}
 }

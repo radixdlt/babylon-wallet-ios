@@ -12,28 +12,35 @@ extension PersonasCoordinator {
 		}
 
 		public var body: some SwiftUI.View {
-			PersonaList.View(
-				store: store.scope(
-					state: \.personaList,
-					action: { .child(.personaList($0)) }
-				)
-			)
-			.onAppear { store.send(.view(.appeared)) }
-			.destination(store: store)
+			PersonaList.View(store: store.personaList)
+				.onAppear { store.send(.view(.appeared)) }
+				.destinations(with: store)
 		}
 	}
 }
 
-extension View {
-	@MainActor
-	fileprivate func destination(store: StoreOf<PersonasCoordinator>) -> some View {
-		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+extension StoreOf<PersonasCoordinator> {
+	var destination: PresentationStoreOf<PersonasCoordinator.Destination> {
+		func scopeState(state: State) -> PresentationState<PersonasCoordinator.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+
+	var personaList: StoreOf<PersonaList> {
+		scope(state: \.personaList) { .child(.personaList($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<PersonasCoordinator>) -> some View {
+		let destinationStore = store.destination
 		return createPersonaCoordinator(with: destinationStore)
 			.personaDetails(with: destinationStore)
 			.exportMnemonic(with: destinationStore)
 	}
 
-	@MainActor
 	private func createPersonaCoordinator(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
@@ -43,7 +50,6 @@ extension View {
 		)
 	}
 
-	@MainActor
 	private func personaDetails(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,

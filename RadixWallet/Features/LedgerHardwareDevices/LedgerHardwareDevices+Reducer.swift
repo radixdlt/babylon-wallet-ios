@@ -28,7 +28,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements? = nil
 
 		@PresentationState
-		public var destination: Destinations.State? = nil
+		public var destination: Destination.State? = nil
 
 		var pendingAction: ActionRequiringP2P? = nil
 
@@ -58,17 +58,13 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		case perform(ActionRequiringP2P)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
-	}
-
 	public enum DelegateAction: Sendable, Equatable {
 		case choseLedger(LedgerHardwareWalletFactorSource)
 	}
 
 	// MARK: - Destination
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
@@ -102,10 +98,12 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -148,9 +146,9 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(.noP2PLink(alertAction))):
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .noP2PLink(alertAction):
 			switch alertAction {
 			case .addNewP2PLinkTapped:
 				state.destination = .addNewP2PLink(.init())
@@ -160,7 +158,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case let .destination(.presented(.addNewP2PLink(.delegate(newP2PAction)))):
+		case let .addNewP2PLink(.delegate(newP2PAction)):
 			switch newP2PAction {
 			case let .newConnection(connectedClient):
 				state.destination = nil
@@ -176,7 +174,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case let .destination(.presented(.addNewLedger(.delegate(newLedgerAction)))):
+		case let .addNewLedger(.delegate(newLedgerAction)):
 			switch newLedgerAction {
 			case let .completed(ledger):
 				state.destination = nil

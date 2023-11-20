@@ -68,10 +68,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case hidePersonaTapped
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
-	}
-
 	public enum DelegateAction: Sendable, Equatable {
 		case personaDeauthorized
 		case personaChanged(Profile.Network.Persona.ID)
@@ -89,8 +85,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destination: Reducer {
-		public enum State: Hashable {
+	public struct Destination: DestinationReducer {
+		public enum State: Sendable, Hashable {
 			case editPersona(EditPersona.State)
 			case dAppDetails(DappDetails.State)
 
@@ -98,7 +94,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			case confirmHideAlert(AlertState<Action.ConfirmHideAlert>)
 		}
 
-		public enum Action: Equatable {
+		public enum Action: Sendable, Equatable {
 			case editPersona(EditPersona.Action)
 			case dAppDetails(DappDetails.Action)
 
@@ -130,53 +126,12 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(presentedAction)):
-			switch presentedAction {
-			case let .editPersona(.delegate(.personaSaved(persona))):
-				guard persona.id == state.mode.id else { return .none }
-				return reloadEffect(mode: state.mode, notifyDelegate: true)
-
-			case .dAppDetails(.delegate(.dAppForgotten)):
-				state.destination = nil
-				return reloadEffect(mode: state.mode, notifyDelegate: false)
-
-			case .confirmForgetAlert(.confirmTapped):
-				guard case let .dApp(dApp, persona: persona) = state.mode else { return .none }
-				let (personaID, dAppID, networkID) = (persona.id, dApp.dAppDefinitionAddress, dApp.networkID)
-				return .run { send in
-					try await authorizedDappsClient.deauthorizePersonaFromDapp(personaID, dAppID, networkID)
-					await send(.delegate(.personaDeauthorized))
-				} catch: { error, _ in
-					loggerGlobal.error("Failed to deauthorize persona \(personaID) from dApp \(dAppID), error: \(error)")
-					errorQueue.schedule(error)
-				}
-
-			case .confirmHideAlert(.confirmTapped):
-				guard case let .general(persona, _) = state.mode else {
-					return .none
-				}
-				return .run { send in
-					try await entitiesVisibilityClient.hide(persona: persona)
-					overlayWindowClient.scheduleHUD(.personaHidden)
-					await send(.delegate(.personaHidden))
-				} catch: { error, _ in
-					errorQueue.schedule(error)
-				}
-
-			default:
-				return .none
-			}
-		case .destination:
-			return .none
-		}
-	}
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -264,6 +219,44 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 		case let .dAppLoaded(dApp):
 			state.destination = .dAppDetails(.init(dApp: dApp, context: .personaDetails))
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .editPersona(.delegate(.personaSaved(persona))):
+			guard persona.id == state.mode.id else { return .none }
+			return reloadEffect(mode: state.mode, notifyDelegate: true)
+
+		case .dAppDetails(.delegate(.dAppForgotten)):
+			state.destination = nil
+			return reloadEffect(mode: state.mode, notifyDelegate: false)
+
+		case .confirmForgetAlert(.confirmTapped):
+			guard case let .dApp(dApp, persona: persona) = state.mode else { return .none }
+			let (personaID, dAppID, networkID) = (persona.id, dApp.dAppDefinitionAddress, dApp.networkID)
+			return .run { send in
+				try await authorizedDappsClient.deauthorizePersonaFromDapp(personaID, dAppID, networkID)
+				await send(.delegate(.personaDeauthorized))
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to deauthorize persona \(personaID) from dApp \(dAppID), error: \(error)")
+				errorQueue.schedule(error)
+			}
+
+		case .confirmHideAlert(.confirmTapped):
+			guard case let .general(persona, _) = state.mode else {
+				return .none
+			}
+			return .run { send in
+				try await entitiesVisibilityClient.hide(persona: persona)
+				overlayWindowClient.scheduleHUD(.personaHidden)
+				await send(.delegate(.personaHidden))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
+			}
+
+		default:
 			return .none
 		}
 	}

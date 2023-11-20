@@ -190,7 +190,7 @@ extension ImportMnemonic {
 				#if !DEBUG
 					.screenshotProtected(isProtected: true)
 				#endif // !DEBUG
-					.destination(store: store)
+					.destinations(store: store)
 			}
 		}
 
@@ -216,55 +216,56 @@ extension ImportMnemonic {
 	}
 }
 
-extension SwiftUI.View {
-	@MainActor
-	func destination(store: StoreOf<ImportMnemonic>) -> some View {
-		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
-		return offDeviceMnemonicInfoSheet(with: destinationStore)
-			.onContinueWarningAlert(with: destinationStore)
-			.markMnemonicAsBackedUpAlert(with: destinationStore)
-			.verifyMnemonicDestination(with: destinationStore)
+private extension StoreOf<ImportMnemonic> {
+	var destination: PresentationStoreOf<ImportMnemonic.Destination> {
+		func scopeState(state: State) -> PresentationState<ImportMnemonic.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+extension View {
+	func destinations(store: StoreOf<ImportMnemonic>) -> some View {
+		let destinationStore = store.destination
+		return offDeviceMnemonicInfoPrompt(with: destinationStore)
+			.onContinueWarning(with: destinationStore)
+			.backupConfirmation(with: destinationStore)
+			.verifyMnemonic(with: destinationStore)
 	}
 
-	@MainActor
-	fileprivate func markMnemonicAsBackedUpAlert(with destinationStore: PresentationStoreOf<ImportMnemonic.Destinations>) -> some SwiftUI.View {
+	private func backupConfirmation(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some View {
 		alert(
 			store: destinationStore,
-			state: /ImportMnemonic.Destinations.State.backupConfirmation,
-			action: ImportMnemonic.Destinations.Action.backupConfimartion
+			state: /ImportMnemonic.Destination.State.backupConfirmation,
+			action: ImportMnemonic.Destination.Action.backupConfirmation
 		)
 	}
 
-	@MainActor
-	fileprivate func verifyMnemonicDestination(with destinationStore: PresentationStoreOf<ImportMnemonic.Destinations>) -> some SwiftUI.View {
+	private func verifyMnemonic(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /ImportMnemonic.Destinations.State.verifyMnemonic,
-			action: ImportMnemonic.Destinations.Action.verifyMnemonic,
-			destination: { childStore in
-				VerifyMnemonic.View(store: childStore)
-			}
+			state: /ImportMnemonic.Destination.State.verifyMnemonic,
+			action: ImportMnemonic.Destination.Action.verifyMnemonic,
+			destination: { VerifyMnemonic.View(store: $0) }
 		)
 	}
 
-	@MainActor
-	fileprivate func onContinueWarningAlert(with destinationStore: PresentationStoreOf<ImportMnemonic.Destinations>) -> some SwiftUI.View {
+	private func onContinueWarning(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some View {
 		alert(
 			store: destinationStore,
-			state: /ImportMnemonic.Destinations.State.onContinueWarning,
-			action: ImportMnemonic.Destinations.Action.onContinueWarning
+			state: /ImportMnemonic.Destination.State.onContinueWarning,
+			action: ImportMnemonic.Destination.Action.onContinueWarning
 		)
 	}
 
-	@MainActor
-	fileprivate func offDeviceMnemonicInfoSheet(with destinationStore: PresentationStoreOf<ImportMnemonic.Destinations>) -> some SwiftUI.View {
+	private func offDeviceMnemonicInfoPrompt(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /ImportMnemonic.Destinations.State.offDeviceMnemonicInfoPrompt,
-			action: ImportMnemonic.Destinations.Action.offDeviceMnemonicInfoPrompt,
-			content: { childStore in
-				OffDeviceMnemonicInfo.View(store: childStore)
-			}
+			state: /ImportMnemonic.Destination.State.offDeviceMnemonicInfoPrompt,
+			action: ImportMnemonic.Destination.Action.offDeviceMnemonicInfoPrompt,
+			content: { OffDeviceMnemonicInfo.View(store: $0) }
 		)
 	}
 }

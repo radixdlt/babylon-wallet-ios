@@ -82,13 +82,15 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+			.ifLet(destinationPath, action: /Action.child .. ChildAction.destination) {
 				Destinations()
 			}
 			.forEach(\.receivingAccounts, action: /Action.child .. ChildAction.receivingAccount) {
 				ReceivingAccount()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destinations.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {

@@ -9,11 +9,11 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 		public var links: IdentifiedArrayOf<P2PLinkRow.State>
 
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		public init(
 			links: IdentifiedArrayOf<P2PLinkRow.State> = .init(),
-			destination: Destinations.State? = nil
+			destination: Destination.State? = nil
 		) {
 			self.links = links
 			self.destination = destination
@@ -34,13 +34,12 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
 		case connection(id: ConnectionPassword, action: P2PLinkRow.Action)
 	}
 
-	// MARK: Destinations
+	// MARK: Destination
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case newConnection(NewConnection.State)
 			case removeConnection(AlertState<Action.RemoveConnection>)
@@ -74,10 +73,12 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 			.forEach(\.links, action: /Action.child .. ChildAction.connection) {
 				P2PLinkRow()
 			}
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -130,8 +131,14 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 		case let .connection(id, .delegate(.deleteConnection)):
 			state.destination = .removeConnection(.confirmRemoval(id: id))
 			return .none
+		default:
+			return .none
+		}
+	}
 
-		case let .destination(.presented(.newConnection(.delegate(.newConnection(connectedClient))))):
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .newConnection(.delegate(.newConnection(connectedClient))):
 			state.destination = nil
 			return .run { send in
 				let result = await TaskResult {
@@ -142,11 +149,11 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 				await send(.internal(.saveNewConnectionResult(result)))
 			}
 
-		case .destination(.presented(.newConnection(.delegate(.dismiss)))):
+		case .newConnection(.delegate(.dismiss)):
 			state.destination = nil
 			return .none
 
-		case let .destination(.presented(.removeConnection(.removeTapped(id)))):
+		case let .removeConnection(.removeTapped(id)):
 			return .run { send in
 				let result = await TaskResult {
 					try await radixConnectClient.deleteP2PLinkByPassword(id)
@@ -161,7 +168,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 	}
 }
 
-extension AlertState<P2PLinksFeature.Destinations.Action.RemoveConnection> {
+extension AlertState<P2PLinksFeature.Destination.Action.RemoveConnection> {
 	static func confirmRemoval(id: ConnectionPassword) -> AlertState {
 		AlertState {
 			TextState(L10n.LinkedConnectors.RemoveConnectionAlert.title)

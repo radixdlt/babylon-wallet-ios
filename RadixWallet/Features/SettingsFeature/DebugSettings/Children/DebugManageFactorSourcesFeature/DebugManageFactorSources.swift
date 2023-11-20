@@ -8,12 +8,12 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 		public var factorSources: FactorSources?
 
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		public init() {}
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case importMnemonic(ImportMnemonic.State)
 			case addLedger(AddLedgerFactorSource.State)
@@ -46,10 +46,6 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 		case loadFactorSourcesResult(TaskResult<FactorSources>)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
-	}
-
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
@@ -57,10 +53,12 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -101,13 +99,13 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case .destination(.presented(.importMnemonic(.delegate(.persistedNewFactorSourceInProfile(_))))):
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .importMnemonic(.delegate(.persistedNewFactorSourceInProfile)):
 			state.destination = nil
 			return .none
 
-		case .destination(.presented(.addLedger(.delegate(.completed)))):
+		case .addLedger(.delegate(.completed)):
 			state.destination = nil
 			return .none
 

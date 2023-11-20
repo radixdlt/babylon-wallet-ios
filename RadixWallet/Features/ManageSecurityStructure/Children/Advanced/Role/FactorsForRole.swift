@@ -41,7 +41,7 @@ public struct FactorsForRole<R: RoleProtocol>: Sendable, FeatureReducer {
 		public var adminFactorSources: IdentifiedArrayOf<FactorSource>
 
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		public let existing: RoleOfTier<R, FactorSource>?
 
@@ -74,15 +74,11 @@ public struct FactorsForRole<R: RoleProtocol>: Sendable, FeatureReducer {
 		case confirmedRoleWithFactors(RoleOfTier<R, FactorSource>)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
-	}
-
 	public enum DelegateAction: Sendable, Equatable {
 		case confirmedRoleWithFactors(RoleOfTier<R, FactorSource>)
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case addThresholdFactor(SelectFactorKindThenFactor.State)
 			case addAdminFactor(SelectFactorKindThenFactor.State)
@@ -114,10 +110,12 @@ public struct FactorsForRole<R: RoleProtocol>: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -173,19 +171,19 @@ public struct FactorsForRole<R: RoleProtocol>: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(.addAdminFactor(.delegate(.selected(adminFactorSource))))):
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .addAdminFactor(.delegate(.selected(adminFactorSource))):
 			state.adminFactorSources.append(adminFactorSource)
 			state.destination = nil
 			return .none
 
-		case let .destination(.presented(.addThresholdFactor(.delegate(.selected(thresholdFactorSource))))):
+		case let .addThresholdFactor(.delegate(.selected(thresholdFactorSource))):
 			state.thresholdFactorSources.append(thresholdFactorSource)
 			state.destination = nil
 			return .none
 
-		case let .destination(.presented(.existingRoleMadeLessSafeConfirmationDialog(confirmationAction))):
+		case let .existingRoleMadeLessSafeConfirmationDialog(confirmationAction):
 			state.destination = nil
 			switch confirmationAction {
 			case .cancel:

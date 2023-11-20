@@ -15,7 +15,7 @@ extension DappInteractionFlow {
 				IfLetStore(
 					store.scope(state: \.root, action: { .child(.root($0)) })
 				) {
-					destination(for: $0)
+					destinations(for: $0)
 						.toolbar {
 							ToolbarItem(placement: .navigationBarLeading) {
 								CloseButton {
@@ -27,7 +27,7 @@ extension DappInteractionFlow {
 				// This is required to disable the animation of internal components during transition
 				.transaction { $0.animation = nil }
 			} destination: {
-				destination(for: $0)
+				destinations(for: $0)
 					.navigationBarBackButtonHidden()
 					.toolbar {
 						ToolbarItem(placement: .navigationBarLeading) {
@@ -47,50 +47,50 @@ extension DappInteractionFlow {
 			)
 		}
 
-		func destination(
-			for store: StoreOf<DappInteractionFlow.Destinations>
+		func destinations(
+			for store: StoreOf<DappInteractionFlow.Path>
 		) -> some SwiftUI.View {
 			SwitchStore(store.relay()) { state in
 				switch state {
 				case .login:
 					CaseLet(
-						/DappInteractionFlow.Destinations.MainState.login,
-						action: DappInteractionFlow.Destinations.MainAction.login,
+						/DappInteractionFlow.Path.MainState.login,
+						action: DappInteractionFlow.Path.MainAction.login,
 						then: { Login.View(store: $0) }
 					)
 
 				case .accountPermission:
 					CaseLet(
-						/DappInteractionFlow.Destinations.MainState.accountPermission,
-						action: DappInteractionFlow.Destinations.MainAction.accountPermission,
+						/DappInteractionFlow.Path.MainState.accountPermission,
+						action: DappInteractionFlow.Path.MainAction.accountPermission,
 						then: { AccountPermission.View(store: $0) }
 					)
 
 				case .chooseAccounts:
 					CaseLet(
-						/DappInteractionFlow.Destinations.MainState.chooseAccounts,
-						action: DappInteractionFlow.Destinations.MainAction.chooseAccounts,
+						/DappInteractionFlow.Path.MainState.chooseAccounts,
+						action: DappInteractionFlow.Path.MainAction.chooseAccounts,
 						then: { AccountPermissionChooseAccounts.View(store: $0) }
 					)
 
 				case .personaDataPermission:
 					CaseLet(
-						/DappInteractionFlow.Destinations.MainState.personaDataPermission,
-						action: DappInteractionFlow.Destinations.MainAction.personaDataPermission,
+						/DappInteractionFlow.Path.MainState.personaDataPermission,
+						action: DappInteractionFlow.Path.MainAction.personaDataPermission,
 						then: { PersonaDataPermission.View(store: $0) }
 					)
 
 				case .oneTimePersonaData:
 					CaseLet(
-						/DappInteractionFlow.Destinations.MainState.oneTimePersonaData,
-						action: DappInteractionFlow.Destinations.MainAction.oneTimePersonaData,
+						/DappInteractionFlow.Path.MainState.oneTimePersonaData,
+						action: DappInteractionFlow.Path.MainAction.oneTimePersonaData,
 						then: { OneTimePersonaData.View(store: $0) }
 					)
 
 				case .reviewTransaction:
 					CaseLet(
-						/DappInteractionFlow.Destinations.MainState.reviewTransaction,
-						action: DappInteractionFlow.Destinations.MainAction.reviewTransaction,
+						/DappInteractionFlow.Path.MainState.reviewTransaction,
+						action: DappInteractionFlow.Path.MainAction.reviewTransaction,
 						then: { TransactionReview.View(store: $0) }
 					)
 				}

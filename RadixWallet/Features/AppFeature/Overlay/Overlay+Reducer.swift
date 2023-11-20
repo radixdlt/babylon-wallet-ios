@@ -9,7 +9,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 	}
 
 	enum ViewAction: Sendable, Equatable {
@@ -21,11 +21,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		case showNextItemIfPossible
 	}
 
-	enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
-	}
-
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case hud(HUD.State)
 			case alert(OverlayWindowClient.Item.AlertState)
@@ -40,9 +36,6 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			Scope(state: /State.hud, action: /Action.hud) {
 				HUD()
 			}
-			Scope(state: /State.alert, action: /Action.alert) {
-				EmptyReducer()
-			}
 		}
 	}
 
@@ -51,10 +44,12 @@ struct OverlayReducer: Sendable, FeatureReducer {
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -77,21 +72,23 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		}
 	}
 
-	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case .destination(.dismiss):
-			return dismissAlert(state: &state, withAction: .dismissed)
-		case let .destination(.presented(.alert(action))):
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .alert(action):
 			if let item = state.itemsQueue.first, case let .alert(state) = item {
 				overlayWindowClient.sendAlertAction(action, state.id)
 			}
 			return dismiss(&state)
-		case .destination(.presented(.hud(.delegate(.dismiss)))):
+		case .hud(.delegate(.dismiss)):
 			return dismiss(&state)
 
 		default:
 			return .none
 		}
+	}
+
+	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		dismissAlert(state: &state, withAction: .dismissed)
 	}
 
 	private func showItemIfPossible(state: inout State) -> Effect<Action> {

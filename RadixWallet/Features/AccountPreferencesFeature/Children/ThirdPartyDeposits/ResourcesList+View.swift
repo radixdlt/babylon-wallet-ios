@@ -57,7 +57,7 @@ extension ResourcesList {
 				}
 				.padding(.top, .medium1)
 				.background(.app.gray5)
-				.destination(store: store)
+				.destinations(with: store)
 				.navigationTitle(viewStore.mode.navigationTitle)
 				.defaultNavBarConfig()
 				.footer {
@@ -141,30 +141,37 @@ extension ResourcesList.View {
 	}
 }
 
+private extension StoreOf<ResourcesList> {
+	var destination: PresentationStoreOf<ResourcesList.Destination> {
+		func scopeState(state: State) -> PresentationState<ResourcesList.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
 private extension View {
-	@MainActor
-	func destination(store: StoreOf<ResourcesList>) -> some View {
-		let destinationStore = store.scope(state: \.$destinations, action: { .child(.destinations($0)) })
+	func destinations(with store: StoreOf<ResourcesList>) -> some View {
+		let destinationStore = store.destination
 		return addAsset(with: destinationStore)
 			.confirmDeletionAlert(with: destinationStore)
 	}
 
-	@MainActor
-	func addAsset(with destinationStore: PresentationStoreOf<ResourcesList.Destinations>) -> some View {
+	private func addAsset(with destinationStore: PresentationStoreOf<ResourcesList.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /ResourcesList.Destinations.State.addAsset,
-			action: ResourcesList.Destinations.Action.addAsset,
+			state: /ResourcesList.Destination.State.addAsset,
+			action: ResourcesList.Destination.Action.addAsset,
 			content: { AddAsset.View(store: $0) }
 		)
 	}
 
-	@MainActor
-	func confirmDeletionAlert(with destinationStore: PresentationStoreOf<ResourcesList.Destinations>) -> some View {
+	private func confirmDeletionAlert(with destinationStore: PresentationStoreOf<ResourcesList.Destination>) -> some View {
 		alert(
 			store: destinationStore,
-			state: /ResourcesList.Destinations.State.confirmAssetDeletion,
-			action: ResourcesList.Destinations.Action.confirmAssetDeletion
+			state: /ResourcesList.Destination.State.confirmAssetDeletion,
+			action: ResourcesList.Destination.Action.confirmAssetDeletion
 		)
 	}
 }

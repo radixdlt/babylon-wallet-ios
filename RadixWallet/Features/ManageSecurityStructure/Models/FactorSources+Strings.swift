@@ -58,7 +58,7 @@ extension SecurityStructureRole {
 		case .primary:
 			fatalError("not used")
 		case .confirmation:
-			"Set security questions that are trigger when you move to a new phone"
+			"Set security questions that are triggered when you move to a new phone"
 		case .recovery:
 			"Select a third-party who can help you recover your account if you lose your phone."
 		}

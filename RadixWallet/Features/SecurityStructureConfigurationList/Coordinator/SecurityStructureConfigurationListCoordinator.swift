@@ -22,25 +22,21 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 
 	public enum ChildAction: Sendable, Equatable {
 		case configList(SecurityStructureConfigurationList.Action)
-		case destination(PresentationAction<Destination.Action>)
 	}
 
 	// MARK: - Destination
 
-	public struct Destination: Reducer {
-		public enum State: Equatable, Hashable {
+	public struct Destination: DestinationReducer {
+		public enum State: Hashable, Sendable {
 			case manageSecurityStructureCoordinator(ManageSecurityStructureCoordinator.State)
 		}
 
-		public enum Action: Equatable {
+		public enum Action: Equatable, Sendable {
 			case manageSecurityStructureCoordinator(ManageSecurityStructureCoordinator.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(
-				state: /State.manageSecurityStructureCoordinator,
-				action: /Action.manageSecurityStructureCoordinator
-			) {
+			Scope(state: /State.manageSecurityStructureCoordinator, action: /Action.manageSecurityStructureCoordinator) {
 				ManageSecurityStructureCoordinator()
 			}
 		}
@@ -58,10 +54,12 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 			SecurityStructureConfigurationList()
 		}
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
@@ -82,7 +80,6 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 			return .none
 
 		case let .configList(.delegate(.displayDetails(configReference))):
-
 			return .run { send in
 				let taskResult = await TaskResult {
 					try await appPreferencesClient.getDetailsOfSecurityStructure(configReference)
@@ -90,7 +87,14 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 				await send(.internal(.loadDetailsForSecurityStructureResult(taskResult)))
 			}
 
-		case let .destination(.presented(.manageSecurityStructureCoordinator(.delegate(.done(.success(config)))))):
+		default:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .manageSecurityStructureCoordinator(.delegate(.done(.success(config)))):
 			let configReference = config.asReference()
 			state.configList.configs[id: configReference.id] = .init(configReference: configReference)
 			state.destination = nil

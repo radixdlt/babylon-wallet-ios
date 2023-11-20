@@ -180,41 +180,47 @@ extension LedgerHardwareDevices {
 	}
 }
 
-extension View {
-	@MainActor
-	fileprivate func destinations(with store: StoreOf<LedgerHardwareDevices>) -> some View {
-		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+private extension StoreOf<LedgerHardwareDevices> {
+	var destination: PresentationStoreOf<LedgerHardwareDevices.Destination> {
+		func scopeState(state: State) -> PresentationState<LedgerHardwareDevices.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<LedgerHardwareDevices>) -> some View {
+		let destinationStore = store.destination
 		return addNewLedgerSheet(with: destinationStore)
 			.addNewP2PLinkSheet(with: destinationStore)
 			.noP2PLinkAlert(with: destinationStore)
 	}
 
-	@MainActor
-	private func addNewLedgerSheet(with destinationStore: PresentationStoreOf<LedgerHardwareDevices.Destinations>) -> some View {
+	private func addNewLedgerSheet(with destinationStore: PresentationStoreOf<LedgerHardwareDevices.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /LedgerHardwareDevices.Destinations.State.addNewLedger,
-			action: LedgerHardwareDevices.Destinations.Action.addNewLedger,
+			state: /LedgerHardwareDevices.Destination.State.addNewLedger,
+			action: LedgerHardwareDevices.Destination.Action.addNewLedger,
 			content: { AddLedgerFactorSource.View(store: $0) }
 		)
 	}
 
-	@MainActor
-	private func addNewP2PLinkSheet(with destinationStore: PresentationStoreOf<LedgerHardwareDevices.Destinations>) -> some View {
+	private func addNewP2PLinkSheet(with destinationStore: PresentationStoreOf<LedgerHardwareDevices.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /LedgerHardwareDevices.Destinations.State.addNewP2PLink,
-			action: LedgerHardwareDevices.Destinations.Action.addNewP2PLink,
+			state: /LedgerHardwareDevices.Destination.State.addNewP2PLink,
+			action: LedgerHardwareDevices.Destination.Action.addNewP2PLink,
 			content: { NewConnection.View(store: $0) }
 		)
 	}
 
-	@MainActor
-	private func noP2PLinkAlert(with destinationStore: PresentationStoreOf<LedgerHardwareDevices.Destinations>) -> some View {
+	private func noP2PLinkAlert(with destinationStore: PresentationStoreOf<LedgerHardwareDevices.Destination>) -> some View {
 		alert(
 			store: destinationStore,
-			state: /LedgerHardwareDevices.Destinations.State.noP2PLink,
-			action: LedgerHardwareDevices.Destinations.Action.noP2PLink
+			state: /LedgerHardwareDevices.Destination.State.noP2PLink,
+			action: LedgerHardwareDevices.Destination.Action.noP2PLink
 		)
 	}
 }

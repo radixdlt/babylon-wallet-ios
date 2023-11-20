@@ -7,9 +7,9 @@ public struct Main: Sendable, FeatureReducer {
 
 		public var isOnMainnet = true
 
-		// MARK: - Destinations
+		// MARK: - Destination
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		public init(home: Home.State) {
 			self.home = home
@@ -22,7 +22,6 @@ public struct Main: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case home(Home.Action)
-		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -33,7 +32,7 @@ public struct Main: Sendable, FeatureReducer {
 		case currentGatewayChanged(to: Radix.Gateway)
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case settings(Settings.State)
 		}
@@ -60,10 +59,12 @@ public struct Main: Sendable, FeatureReducer {
 			Home()
 		}
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -84,15 +85,6 @@ public struct Main: Sendable, FeatureReducer {
 			state.destination = .settings(.init())
 			return .none
 
-		case let .destination(.presented(.settings(.delegate(.deleteProfileAndFactorSources(keepInIcloudIfPresent))))):
-			return .run { send in
-
-				try await appPreferencesClient.deleteProfileAndFactorSources(keepInIcloudIfPresent)
-				await send(.delegate(.removedWallet))
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to delete profile: \(error)")
-			}
-
 		default:
 			return .none
 		}
@@ -103,6 +95,21 @@ public struct Main: Sendable, FeatureReducer {
 		case let .currentGatewayChanged(currentGateway):
 			state.isOnMainnet = currentGateway.network == .mainnet
 			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .settings(.delegate(.deleteProfileAndFactorSources(keepInIcloudIfPresent))):
+			.run { send in
+				try await appPreferencesClient.deleteProfileAndFactorSources(keepInIcloudIfPresent)
+				await send(.delegate(.removedWallet))
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to delete profile: \(error)")
+			}
+
+		default:
+			.none
 		}
 	}
 }

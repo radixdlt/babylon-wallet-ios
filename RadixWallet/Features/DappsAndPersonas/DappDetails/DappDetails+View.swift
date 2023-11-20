@@ -41,50 +41,81 @@ extension DappDetails.View {
 
 					NonFungiblesListList(store: store)
 
-					let personasStore = store.scope(state: \.personaList) { .child(.personas($0)) }
-					Personas(store: personasStore, tappablePersonas: viewStore.tappablePersonas)
+					Personas(store: store.personas, tappablePersonas: viewStore.tappablePersonas)
 						.background(.app.gray5)
 
 					if viewStore.showForgetDapp {
 						Button(L10n.AuthorizedDapps.ForgetDappAlert.title) {
-							viewStore.send(.forgetThisDappTapped)
+							store.send(.view(.forgetThisDappTapped))
 						}
 						.buttonStyle(.primaryRectangular(isDestructive: true))
 						.padding([.horizontal, .top], .medium3)
 						.padding(.bottom, .large2)
 					}
 				}
-				.onAppear {
-					viewStore.send(.appeared)
-				}
 				.navigationTitle(viewStore.title)
-				.navigationDestination(
-					store: store.destination,
-					state: /DappDetails.Destination.State.personaDetails,
-					action: DappDetails.Destination.Action.personaDetails,
-					destination: { PersonaDetails.View(store: $0) }
-				)
-				.sheet(
-					store: store.destination,
-					state: /DappDetails.Destination.State.fungibleDetails,
-					action: DappDetails.Destination.Action.fungibleDetails
-				) {
-					FungibleTokenDetails.View(store: $0)
-				}
-				.sheet(
-					store: store.destination,
-					state: /DappDetails.Destination.State.nonFungibleDetails,
-					action: DappDetails.Destination.Action.nonFungibleDetails
-				) {
-					NonFungibleTokenDetails.View(store: $0)
-				}
-				.alert(
-					store: store.destination,
-					state: /DappDetails.Destination.State.confirmDisconnectAlert,
-					action: DappDetails.Destination.Action.confirmDisconnectAlert
-				)
 			}
 		}
+		.onAppear {
+			store.send(.view(.appeared))
+		}
+		.destinations(with: store)
+	}
+}
+
+private extension StoreOf<DappDetails> {
+	var destination: PresentationStoreOf<DappDetails.Destination> {
+		func scopeState(state: State) -> PresentationState<DappDetails.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+
+	var personas: StoreOf<PersonaList> {
+		scope(state: \.personaList) { .child(.personas($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<DappDetails>) -> some View {
+		let destinationStore = store.destination
+		return personaDetails(with: destinationStore)
+	}
+
+	private func personaDetails(with destinationStore: PresentationStoreOf<DappDetails.Destination>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /DappDetails.Destination.State.personaDetails,
+			action: DappDetails.Destination.Action.personaDetails,
+			destination: { PersonaDetails.View(store: $0) }
+		)
+	}
+
+	private func fungibleDetails(with destinationStore: PresentationStoreOf<DappDetails.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /DappDetails.Destination.State.fungibleDetails,
+			action: DappDetails.Destination.Action.fungibleDetails,
+			content: { FungibleTokenDetails.View(store: $0) }
+		)
+	}
+
+	private func nonFungibleDetails(with destinationStore: PresentationStoreOf<DappDetails.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /DappDetails.Destination.State.nonFungibleDetails,
+			action: DappDetails.Destination.Action.nonFungibleDetails,
+			content: { NonFungibleTokenDetails.View(store: $0) }
+		)
+	}
+
+	private func confirmDisconnectAlert(with destinationStore: PresentationStoreOf<DappDetails.Destination>) -> some View {
+		alert(
+			store: destinationStore,
+			state: /DappDetails.Destination.State.confirmDisconnectAlert,
+			action: DappDetails.Destination.Action.confirmDisconnectAlert
+		)
 	}
 }
 
@@ -116,12 +147,6 @@ private extension DappDetails.State {
 extension OnLedgerEntity.Resource {
 	var title: String {
 		metadata.name ?? metadata.symbol ?? L10n.DAppRequest.Metadata.unknownName
-	}
-}
-
-private extension StoreOf<DappDetails> {
-	var destination: PresentationStoreOf<DappDetails.Destination> {
-		scope(state: \.$destination, action: { .child(.destination($0)) })
 	}
 }
 

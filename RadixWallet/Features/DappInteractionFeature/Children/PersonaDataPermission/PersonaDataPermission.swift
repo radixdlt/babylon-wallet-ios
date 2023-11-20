@@ -10,7 +10,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 		let requested: P2P.Dapp.Request.PersonaDataRequestItem
 
 		@PresentationState
-		var destination: Destinations.State?
+		var destination: Destination.State?
 
 		init(
 			dappMetadata: DappMetadata,
@@ -34,7 +34,6 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 
 	enum ChildAction: Sendable, Equatable {
 		case persona(PersonaDataPermissionBox.Action)
-		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -42,7 +41,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 		case continueButtonTapped(P2P.Dapp.Request.Response)
 	}
 
-	struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		enum State: Sendable, Hashable {
 			case editPersona(EditPersona.State)
 		}
@@ -66,10 +65,12 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 			.ifLet(\.persona, action: /Action.child .. ChildAction.persona) {
 				PersonaDataPermissionBox()
 			}
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -111,11 +112,18 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 			}
 			return .none
 
-		case let .destination(.presented(.editPersona(.delegate(.personaSaved(persona))))):
-			return .send(.delegate(.personaUpdated(persona)))
-
 		default:
 			return .none
+		}
+	}
+
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .editPersona(.delegate(.personaSaved(persona))):
+			.send(.delegate(.personaUpdated(persona)))
+
+		default:
+			.none
 		}
 	}
 }

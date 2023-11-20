@@ -36,6 +36,7 @@ public struct DebugKeychainTest: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.keychainClient) var keychainClient
+
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {

@@ -8,7 +8,7 @@ extension DependencyValues {
 
 // MARK: - P2PLinksClient + TestDependencyKey
 extension P2PLinksClient: TestDependencyKey {
-	public static let previewValue: Self = .noop
+	public static let previewValue = Self.noop
 	public static let noop = Self(
 		getP2PLinks: { [] },
 		addP2PLink: { _ in },

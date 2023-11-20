@@ -9,7 +9,7 @@ public typealias DisplayMnemonic = ExportMnemonic
 public struct DisplayMnemonics: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		@PresentationState
-		public var destination: Destinations.State? = nil
+		public var destination: Destination.State? = nil
 
 		public var deviceFactorSources: IdentifiedArrayOf<DisplayEntitiesControlledByMnemonic.State> = []
 
@@ -25,14 +25,10 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case row(
-			id: DisplayEntitiesControlledByMnemonic.State.ID,
-			action: DisplayEntitiesControlledByMnemonic.Action
-		)
-		case destination(PresentationAction<Destinations.Action>)
+		case row(id: DisplayEntitiesControlledByMnemonic.State.ID, action: DisplayEntitiesControlledByMnemonic.Action)
 	}
 
-	public struct Destinations: Sendable, Equatable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case displayMnemonic(ImportMnemonic.State)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
@@ -68,10 +64,12 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			.forEach(\.deviceFactorSources, action: /Action.child .. ChildAction.row) {
 				DisplayEntitiesControlledByMnemonic()
 			}
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -132,7 +130,14 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case let .destination(.presented(.displayMnemonic(.delegate(delegateAction)))):
+		default:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .displayMnemonic(.delegate(delegateAction)):
 			switch delegateAction {
 			case let .doneViewing(idOfBackedUpFactorSource):
 				if let idOfBackedUpFactorSource {
@@ -145,7 +150,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 			return .none
 
-		case let .destination(.presented(.importMnemonics(.delegate(delegateAction)))):
+		case let .importMnemonics(.delegate(delegateAction)):
 			switch delegateAction {
 			case .finishedEarly:
 				state.destination = nil
@@ -159,7 +164,8 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 				return .none
 			}
-		default: return .none
+		default:
+			return .none
 		}
 	}
 }

@@ -8,7 +8,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		var assets: AssetsView.State
 
 		@PresentationState
-		var destination: Destinations.State?
+		var destination: Destination.State?
 
 		public init(
 			accountWithInfo: AccountWithInfo
@@ -34,7 +34,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case assets(AssetsView.Action)
-		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -52,7 +51,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		public let factorSourceKind: FactorSourceKind
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case preferences(AccountPreferences.State)
 			case transfer(AssetTransfer.State)
@@ -86,10 +85,12 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			AssetsView()
 		}
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -133,13 +134,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .destination(.presented(.transfer(.delegate(.dismissed)))):
-			state.destination = nil
-			return .none
-
-		case .destination(.presented(.preferences(.delegate(.accountHidden)))):
-			return .send(.delegate(.dismiss))
-
 		case .assets(.internal(.resourcesStateUpdated)):
 			checkAccountAccessToMnemonic(state: &state)
 			return .none
@@ -154,6 +148,20 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case let .accountUpdated(account):
 			state.account = account
 			checkAccountAccessToMnemonic(state: &state)
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .transfer(.delegate(.dismissed)):
+			state.destination = nil
+			return .none
+
+		case .preferences(.delegate(.accountHidden)):
+			return .send(.delegate(.dismiss))
+
+		default:
 			return .none
 		}
 	}

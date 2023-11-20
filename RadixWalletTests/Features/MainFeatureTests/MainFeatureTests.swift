@@ -17,7 +17,7 @@ final class MainFeatureTests: TestCase {
 		}
 
 		// when
-		await store.send(.child(.destination(.dismiss))) {
+		await store.send(.destination(.dismiss)) {
 			// then
 			$0.destination = nil
 		}

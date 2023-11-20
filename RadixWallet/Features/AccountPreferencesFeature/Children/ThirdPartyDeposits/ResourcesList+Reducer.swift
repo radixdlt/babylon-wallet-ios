@@ -24,6 +24,8 @@ public struct ResourceViewState: Hashable, Sendable, Identifiable {
 
 // MARK: - ResourcesList
 public struct ResourcesList: FeatureReducer, Sendable {
+	// MARK: State
+
 	public struct State: Hashable, Sendable {
 		var allDepositorAddresses: OrderedSet<ResourceViewState.Address> {
 			switch mode {
@@ -53,18 +55,16 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		var loadedResources: [ResourceViewState] = []
 
 		@PresentationState
-		var destinations: Destinations.State? = nil
+		var destination: Destination.State? = nil
 	}
+
+	// MARK: Action
 
 	public enum ViewAction: Equatable, Sendable {
 		case task
 		case addAssetTapped
 		case assetRemove(ResourceViewState.Address)
 		case exceptionListChanged(ThirdPartyDeposits.DepositAddressExceptionRule)
-	}
-
-	public enum ChildAction: Equatable, Sendable {
-		case destinations(PresentationAction<Destinations.Action>)
 	}
 
 	public enum DelegateAction: Equatable, Sendable {
@@ -76,13 +76,15 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		case resourcesLoaded([OnLedgerEntity.Resource]?)
 	}
 
-	public struct Destinations: Reducer, Sendable {
-		public enum State: Equatable, Hashable, Sendable {
+	// MARK: Destination
+
+	public struct Destination: DestinationReducer {
+		public enum State: Hashable, Sendable {
 			case addAsset(AddAsset.State)
 			case confirmAssetDeletion(AlertState<Action.ConfirmDeletionAlert>)
 		}
 
-		public enum Action: Hashable, Sendable {
+		public enum Action: Equatable, Sendable {
 			case addAsset(AddAsset.Action)
 			case confirmAssetDeletion(ConfirmDeletionAlert)
 
@@ -99,14 +101,18 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		}
 	}
 
+	// MARK: Reducer
+
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destinations, action: /Action.child .. ChildAction.destinations) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -118,7 +124,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 			}
 
 		case .addAssetTapped:
-			state.destinations = .addAsset(.init(
+			state.destination = .addAsset(.init(
 				mode: state.mode,
 				alreadyAddedResources: state.allDepositorAddresses,
 				networkID: state.networkID
@@ -126,7 +132,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 			return .none
 
 		case let .assetRemove(resource):
-			state.destinations = .confirmAssetDeletion(.confirmAssetDeletion(
+			state.destination = .confirmAssetDeletion(.confirmAssetDeletion(
 				state.mode.removeTitle,
 				state.mode.removeConfirmationMessage,
 				resourceAddress: resource
@@ -135,32 +141,6 @@ public struct ResourcesList: FeatureReducer, Sendable {
 
 		case let .exceptionListChanged(exception):
 			state.mode = .allowDenyAssets(exception)
-			return .none
-		}
-	}
-
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destinations(.presented(.addAsset(.delegate(.addAddress(mode, newAsset))))):
-			state.mode = mode
-			state.destinations = nil
-
-			return .run { send in
-				let loadResourceResult = try? await onLedgerEntitiesClient.getResource(newAsset.resourceAddress)
-				await send(.internal(.resourceLoaded(loadResourceResult, newAsset)))
-			}
-
-		case let .destinations(.presented(.confirmAssetDeletion(.confirmTapped(resource)))):
-			state.loadedResources.removeAll(where: { $0.address == resource })
-			switch resource {
-			case let .assetException(resource):
-				state.thirdPartyDeposits.assetsExceptionList.removeAll(where: { $0.address == resource.address })
-			case let .allowedDepositor(depositorAddress):
-				state.thirdPartyDeposits.depositorsAllowList.remove(depositorAddress)
-			}
-
-			return .send(.delegate(.updated(state.thirdPartyDeposits)))
-		case .destinations:
 			return .none
 		}
 	}
@@ -198,9 +178,36 @@ public struct ResourcesList: FeatureReducer, Sendable {
 			return .none
 		}
 	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .addAsset(.delegate(.addAddress(mode, newAsset))):
+			state.mode = mode
+			state.destination = nil
+
+			return .run { send in
+				let loadResourceResult = try? await onLedgerEntitiesClient.getResource(newAsset.resourceAddress)
+				await send(.internal(.resourceLoaded(loadResourceResult, newAsset)))
+			}
+
+		case let .confirmAssetDeletion(.confirmTapped(resource)):
+			state.loadedResources.removeAll(where: { $0.address == resource })
+			switch resource {
+			case let .assetException(resource):
+				state.thirdPartyDeposits.assetsExceptionList.removeAll(where: { $0.address == resource.address })
+			case let .allowedDepositor(depositorAddress):
+				state.thirdPartyDeposits.depositorsAllowList.remove(depositorAddress)
+			}
+
+			return .send(.delegate(.updated(state.thirdPartyDeposits)))
+
+		default:
+			return .none
+		}
+	}
 }
 
-extension AlertState<ResourcesList.Destinations.Action.ConfirmDeletionAlert> {
+extension AlertState<ResourcesList.Destination.Action.ConfirmDeletionAlert> {
 	static func confirmAssetDeletion(
 		_ title: String,
 		_ message: String,

@@ -12,7 +12,7 @@ public struct AssetTransferMessage: Sendable, FeatureReducer {
 		public var focused: Bool = true
 
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		init(message: String) {
 			self.message = message
@@ -34,11 +34,7 @@ public struct AssetTransferMessage: Sendable, FeatureReducer {
 		case removed
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
-	}
-
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case messageMode(MessageMode.State)
 		}
@@ -56,10 +52,12 @@ public struct AssetTransferMessage: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {

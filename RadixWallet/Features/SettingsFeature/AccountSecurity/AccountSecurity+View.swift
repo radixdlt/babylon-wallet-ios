@@ -19,11 +19,9 @@ extension AccountSecurity {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: Store
-		private let destinationStore: PresentationStoreOf<Destinations>
 
 		public init(store: Store) {
 			self.store = store
-			self.destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
 		}
 	}
 }
@@ -53,14 +51,11 @@ extension AccountSecurity.View {
 			.navigationBarTitleColor(.app.gray1)
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarInlineTitleFont(.app.secondaryHeader)
-			.mnemonics(with: destinationStore)
-			.ledgerHardwareWallets(with: destinationStore)
-			.depositGuarantees(with: destinationStore)
-			.importFromOlympiaLegacyWallet(with: destinationStore)
 			.tint(.app.gray1)
 			.foregroundColor(.app.gray1)
 			.presentsLoadingViewOverlay()
 		}
+		.destinations(with: store)
 	}
 
 	@MainActor
@@ -104,23 +99,39 @@ extension AccountSecurity.View {
 
 // MARK: - Extensions
 
+private extension StoreOf<AccountSecurity> {
+	var destination: PresentationStoreOf<AccountSecurity.Destination> {
+		func scopeState(state: State) -> PresentationState<AccountSecurity.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
 private extension View {
-	@MainActor
-	func mnemonics(with destinationStore: PresentationStoreOf<AccountSecurity.Destinations>) -> some View {
+	func destinations(with store: StoreOf<AccountSecurity>) -> some View {
+		let destinationStore = store.destination
+		return mnemonics(with: destinationStore)
+			.ledgerHardwareWallets(with: destinationStore)
+			.depositGuarantees(with: destinationStore)
+			.importFromOlympiaLegacyWallet(with: destinationStore)
+	}
+
+	private func mnemonics(with destinationStore: PresentationStoreOf<AccountSecurity.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AccountSecurity.Destinations.State.mnemonics,
-			action: AccountSecurity.Destinations.Action.mnemonics,
+			state: /AccountSecurity.Destination.State.mnemonics,
+			action: AccountSecurity.Destination.Action.mnemonics,
 			destination: { DisplayMnemonics.View(store: $0) }
 		)
 	}
 
-	@MainActor
-	func ledgerHardwareWallets(with destinationStore: PresentationStoreOf<AccountSecurity.Destinations>) -> some View {
+	private func ledgerHardwareWallets(with destinationStore: PresentationStoreOf<AccountSecurity.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AccountSecurity.Destinations.State.ledgerHardwareWallets,
-			action: AccountSecurity.Destinations.Action.ledgerHardwareWallets,
+			state: /AccountSecurity.Destination.State.ledgerHardwareWallets,
+			action: AccountSecurity.Destination.Action.ledgerHardwareWallets,
 			destination: {
 				LedgerHardwareDevices.View(store: $0)
 					.background(.app.gray5)
@@ -130,22 +141,20 @@ private extension View {
 		)
 	}
 
-	@MainActor
-	func depositGuarantees(with destinationStore: PresentationStoreOf<AccountSecurity.Destinations>) -> some View {
+	private func depositGuarantees(with destinationStore: PresentationStoreOf<AccountSecurity.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AccountSecurity.Destinations.State.depositGuarantees,
-			action: AccountSecurity.Destinations.Action.depositGuarantees,
+			state: /AccountSecurity.Destination.State.depositGuarantees,
+			action: AccountSecurity.Destination.Action.depositGuarantees,
 			destination: { DefaultDepositGuarantees.View(store: $0) }
 		)
 	}
 
-	@MainActor
-	func importFromOlympiaLegacyWallet(with destinationStore: PresentationStoreOf<AccountSecurity.Destinations>) -> some View {
+	private func importFromOlympiaLegacyWallet(with destinationStore: PresentationStoreOf<AccountSecurity.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /AccountSecurity.Destinations.State.importOlympiaWallet,
-			action: AccountSecurity.Destinations.Action.importOlympiaWallet,
+			state: /AccountSecurity.Destination.State.importOlympiaWallet,
+			action: AccountSecurity.Destination.Action.importOlympiaWallet,
 			content: { ImportOlympiaWalletCoordinator.View(store: $0) }
 		)
 	}

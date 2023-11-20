@@ -349,10 +349,14 @@ extension OnLedgerEntitiesClient {
 			account.atLedgerState,
 			refresh
 		).compactMap(\.resourcePool)
-		let allResourceAddresses = pools.flatMap { pool in
-			[pool.poolUnitResourceAddress] +
-				pool.resources.nonXrdResources.map(\.resourceAddress) +
-				(pool.resources.xrdResource.map { [$0.resourceAddress] } ?? [])
+
+		var allResourceAddresses: [ResourceAddress] = []
+		for pool in pools {
+			allResourceAddresses.append(pool.poolUnitResourceAddress)
+			allResourceAddresses += pool.resources.nonXrdResources.map(\.resourceAddress)
+			if let xrdResource = pool.resources.xrdResource {
+				allResourceAddresses.append(xrdResource.resourceAddress)
+			}
 		}
 
 		let allResources = try await getResources(allResourceAddresses, atLedgerState: account.atLedgerState, forceRefresh: refresh)
@@ -377,13 +381,15 @@ extension OnLedgerEntitiesClient {
 				nonXrdResourceDetails.append(.init(resource: resourceDetails, amount: resource.amount))
 			}
 
-			var xrdResourceDetails: ResourceWithVaultAmount? = nil
+			let xrdResourceDetails: ResourceWithVaultAmount?
 			if let xrdResource = pool.resources.xrdResource {
 				guard let details = allResources.first(where: { $0.resourceAddress == xrdResource.resourceAddress }) else {
 					assertionFailure("Did not load xrd resource details")
 					return nil
 				}
 				xrdResourceDetails = .init(resource: details, amount: xrdResource.amount)
+			} else {
+				xrdResourceDetails = nil
 			}
 
 			return .init(

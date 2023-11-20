@@ -33,7 +33,7 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 		public var mode: Mode
 
 		@PresentationState
-		var destination: Destinations.State? = nil
+		var destination: Destination.State? = nil
 
 		public init(
 			mode: Mode = .new
@@ -60,7 +60,7 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case scanAccountAddress(ScanQRCoordinator.State)
 		}
@@ -74,10 +74,6 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 				ScanQRCoordinator()
 			}
 		}
-	}
-
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Hashable {
@@ -101,25 +97,12 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(.scanAccountAddress(.delegate(.scanned(addressStringScanned))))):
-			var addressStringScanned = addressStringScanned
-			QR.removeAddressPrefixIfNeeded(from: &addressStringScanned)
-
-			state.radixAddress = addressStringScanned
-			state.destination = nil
-			return .none
-
-		default:
-			return .none
-		}
-	}
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -153,6 +136,21 @@ public struct ManageTrustedContactFactorSource: Sendable, FeatureReducer {
 				}
 				await send(.delegate(.saveFactorSourceResult(result)))
 			}
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .scanAccountAddress(.delegate(.scanned(addressStringScanned))):
+			var addressStringScanned = addressStringScanned
+			QR.removeAddressPrefixIfNeeded(from: &addressStringScanned)
+
+			state.radixAddress = addressStringScanned
+			state.destination = nil
+			return .none
+
+		default:
+			return .none
 		}
 	}
 }

@@ -71,34 +71,61 @@ extension PersonaDetails.View {
 				}
 			}
 		}
-		.navigationDestination(
-			store: store.destination,
-			state: /PersonaDetails.Destination.State.dAppDetails,
-			action: PersonaDetails.Destination.Action.dAppDetails,
-			destination: { DappDetails.View(store: $0) }
-		)
-		.sheet(
-			store: store.destination,
-			state: /PersonaDetails.Destination.State.editPersona,
-			action: PersonaDetails.Destination.Action.editPersona,
-			content: { EditPersona.View(store: $0) }
-		)
-		.alert(
-			store: store.destination,
-			state: /PersonaDetails.Destination.State.confirmForgetAlert,
-			action: PersonaDetails.Destination.Action.confirmForgetAlert
-		)
-		.alert(
-			store: store.destination,
-			state: /PersonaDetails.Destination.State.confirmHideAlert,
-			action: PersonaDetails.Destination.Action.confirmHideAlert
-		)
+		.destinations(with: store)
 	}
 }
 
 private extension StoreOf<PersonaDetails> {
 	var destination: PresentationStoreOf<PersonaDetails.Destination> {
-		scope(state: \.$destination, action: { .child(.destination($0)) })
+		func scopeState(state: State) -> PresentationState<PersonaDetails.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<PersonaDetails>) -> some View {
+		let destinationStore = store.destination
+		return dAppDetails(with: destinationStore)
+			.editPersona(with: destinationStore)
+			.confirmForgetAlert(with: destinationStore)
+			.confirmHideAlert(with: destinationStore)
+	}
+
+	private func dAppDetails(with destinationStore: PresentationStoreOf<PersonaDetails.Destination>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /PersonaDetails.Destination.State.dAppDetails,
+			action: PersonaDetails.Destination.Action.dAppDetails,
+			destination: { DappDetails.View(store: $0) }
+		)
+	}
+
+	private func editPersona(with destinationStore: PresentationStoreOf<PersonaDetails.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /PersonaDetails.Destination.State.editPersona,
+			action: PersonaDetails.Destination.Action.editPersona,
+			content: { EditPersona.View(store: $0) }
+		)
+	}
+
+	private func confirmForgetAlert(with destinationStore: PresentationStoreOf<PersonaDetails.Destination>) -> some View {
+		alert(
+			store: destinationStore,
+			state: /PersonaDetails.Destination.State.confirmForgetAlert,
+			action: PersonaDetails.Destination.Action.confirmForgetAlert
+		)
+	}
+
+	private func confirmHideAlert(with destinationStore: PresentationStoreOf<PersonaDetails.Destination>) -> some View {
+		alert(
+			store: destinationStore,
+			state: /PersonaDetails.Destination.State.confirmHideAlert,
+			action: PersonaDetails.Destination.Action.confirmHideAlert
+		)
 	}
 }
 

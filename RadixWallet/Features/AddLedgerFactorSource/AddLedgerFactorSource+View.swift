@@ -82,29 +82,36 @@ extension AddLedgerFactorSource {
 	}
 }
 
-extension View {
-	@MainActor
-	fileprivate func destination(store: StoreOf<AddLedgerFactorSource>) -> some View {
-		let destinationStore = store.scope(state: \.$destination, action: { .child(.destination($0)) })
+private extension StoreOf<AddLedgerFactorSource> {
+	var destination: PresentationStoreOf<AddLedgerFactorSource.Destination> {
+		func scopeState(state: State) -> PresentationState<AddLedgerFactorSource.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destination(store: StoreOf<AddLedgerFactorSource>) -> some View {
+		let destinationStore = store.destination
 		return ledgerAlreadyExistsAlert(with: destinationStore)
 			.nameLedger(with: destinationStore)
 	}
 
-	@MainActor
-	private func ledgerAlreadyExistsAlert(with destinationStore: PresentationStoreOf<AddLedgerFactorSource.Destinations>) -> some View {
+	private func ledgerAlreadyExistsAlert(with destinationStore: PresentationStoreOf<AddLedgerFactorSource.Destination>) -> some View {
 		alert(
 			store: destinationStore,
-			state: /AddLedgerFactorSource.Destinations.State.ledgerAlreadyExistsAlert,
-			action: AddLedgerFactorSource.Destinations.Action.ledgerAlreadyExistsAlert
+			state: /AddLedgerFactorSource.Destination.State.ledgerAlreadyExistsAlert,
+			action: AddLedgerFactorSource.Destination.Action.ledgerAlreadyExistsAlert
 		)
 	}
 
-	@MainActor
-	private func nameLedger(with destinationStore: PresentationStoreOf<AddLedgerFactorSource.Destinations>) -> some View {
+	private func nameLedger(with destinationStore: PresentationStoreOf<AddLedgerFactorSource.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /AddLedgerFactorSource.Destinations.State.nameLedger,
-			action: AddLedgerFactorSource.Destinations.Action.nameLedger,
+			state: /AddLedgerFactorSource.Destination.State.nameLedger,
+			action: AddLedgerFactorSource.Destination.Action.nameLedger,
 			destination: { NameLedgerFactorSource.View(store: $0) }
 		)
 	}

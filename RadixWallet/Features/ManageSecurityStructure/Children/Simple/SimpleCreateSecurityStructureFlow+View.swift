@@ -124,7 +124,7 @@ extension SimpleManageSecurityStructureFlow {
 					)
 				}
 			}
-			.modalDestination(store: self.store)
+			.destinations(with: store)
 		}
 
 		typealias NewPhoneConfirmer = FactorForRoleView<ConfirmationRoleTag, SecurityQuestionsFactorSource>
@@ -132,30 +132,37 @@ extension SimpleManageSecurityStructureFlow {
 	}
 }
 
-extension View {
-	@MainActor
-	fileprivate func modalDestination(store: StoreOf<SimpleManageSecurityStructureFlow>) -> some View {
-		let destinationStore = store.scope(state: \.$modalDestinations, action: { .child(.modalDestinations($0)) })
+private extension StoreOf<SimpleManageSecurityStructureFlow> {
+	var destination: PresentationStoreOf<SimpleManageSecurityStructureFlow.Destination> {
+		func scopeState(state: State) -> PresentationState<SimpleManageSecurityStructureFlow.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<SimpleManageSecurityStructureFlow>) -> some View {
+		let destinationStore = store.destination
 		return listConfirmerOfNewPhone(with: destinationStore)
 			.listLostPhoneHelper(with: destinationStore)
 	}
 
-	@MainActor
-	private func listConfirmerOfNewPhone(with destinationStore: PresentationStoreOf<SimpleManageSecurityStructureFlow.ModalDestinations>) -> some View {
+	private func listConfirmerOfNewPhone(with destinationStore: PresentationStoreOf<SimpleManageSecurityStructureFlow.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /SimpleManageSecurityStructureFlow.ModalDestinations.State.listConfirmerOfNewPhone,
-			action: SimpleManageSecurityStructureFlow.ModalDestinations.Action.listConfirmerOfNewPhone,
+			state: /SimpleManageSecurityStructureFlow.Destination.State.listConfirmerOfNewPhone,
+			action: SimpleManageSecurityStructureFlow.Destination.Action.listConfirmerOfNewPhone,
 			content: { ListConfirmerOfNewPhone.View(store: $0) }
 		)
 	}
 
-	@MainActor
-	private func listLostPhoneHelper(with destinationStore: PresentationStoreOf<SimpleManageSecurityStructureFlow.ModalDestinations>) -> some View {
+	private func listLostPhoneHelper(with destinationStore: PresentationStoreOf<SimpleManageSecurityStructureFlow.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /SimpleManageSecurityStructureFlow.ModalDestinations.State.listLostPhoneHelper,
-			action: SimpleManageSecurityStructureFlow.ModalDestinations.Action.listLostPhoneHelper,
+			state: /SimpleManageSecurityStructureFlow.Destination.State.listLostPhoneHelper,
+			action: SimpleManageSecurityStructureFlow.Destination.Action.listLostPhoneHelper,
 			content: { ListLostPhoneHelper.View(store: $0) }
 		)
 	}
