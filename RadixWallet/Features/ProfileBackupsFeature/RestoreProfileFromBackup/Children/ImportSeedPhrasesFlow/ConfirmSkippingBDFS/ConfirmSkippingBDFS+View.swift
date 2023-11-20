@@ -23,7 +23,7 @@ extension ConfirmSkippingBDFS {
 				VStack(spacing: .medium2) {
 					Text(L10n.RecoverSeedPhrase.Header.titleNoMainSeedPhrase)
 						.textStyle(.sheetTitle)
-						.padding(.horizontal, -.small2)
+						.multilineTextAlignment(.center)
 
 					ScrollView(.vertical, showsIndicators: true) {
 						// we use `.init` to preserve bold attribute of string.
