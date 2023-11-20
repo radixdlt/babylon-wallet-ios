@@ -19,13 +19,13 @@ extension Main {
 		public var body: some SwiftUI.View {
 			NavigationStack {
 				Home.View(store: store.home)
+					.destinations(with: store)
 			}
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()
 			}
 			.showDeveloperDisclaimerBanner(store.banner)
 			.presentsDappInteractions()
-			.destinations(with: store)
 		}
 	}
 }
@@ -52,7 +52,7 @@ private extension View {
 	func destinations(with store: StoreOf<Main>) -> some View {
 		let destinationStore = store.destination
 		return navigationDestination(
-			store: store.destination,
+			store: destinationStore,
 			state: /Main.Destination.State.settings,
 			action: Main.Destination.Action.settings,
 			destination: { Settings.View(store: $0) }
