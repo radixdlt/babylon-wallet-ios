@@ -131,7 +131,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		store.exhaustivity = .off
 
 		// when
-		await store.send(.child(.destination(.presented(.removeGateway(.removeButtonTapped(gatewayToBeDeleted)))))) {
+		await store.send(.destination(.presented(.removeGateway(.removeButtonTapped(gatewayToBeDeleted))))) {
 			// then
 			$0.destination = nil
 		}

@@ -34,7 +34,7 @@ final class AccountPreferencesTests: TestCase {
 			}
 		}
 
-		await store.send(.child(.destination(.presented(.confirmHideAccount(.confirmTapped))))) { state in
+		await store.send(.destination(.presented(.confirmHideAccount(.confirmTapped)))) { state in
 			state.destination = nil
 		}
 

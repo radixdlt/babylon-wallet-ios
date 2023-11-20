@@ -39,7 +39,7 @@ final class CustomizeFeePayerTests: TestCase {
 		await sut.send(.view(.changeFeePayerTapped)) {
 			$0.destination = .selectFeePayer(.init(feePayer: nil, transactionFee: .nonContingentLockPaying))
 		}
-		await sut.send(.child(.destination(.presented(.selectFeePayer(.delegate(.selected(selectedFeePayer))))))) {
+		await sut.send(.destination(.presented(.selectFeePayer(.delegate(.selected(selectedFeePayer)))))) {
 			$0.destination = nil
 		}
 
