@@ -126,7 +126,7 @@ extension PersonaData.PostalAddress {
 		case iraq
 		case ireland
 		case isleOfMan
-		case isreal
+		case israel
 		case italy
 		public static let ivoryCoast = Self.coteDIvoire
 

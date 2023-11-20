@@ -14,7 +14,7 @@ private let complexManifestString = """
 """
 
 extension P2P.Dapp.Request.AccountsRequestItem {
-	public static let previewValue: Self = .init(
+	public static let previewValue = Self(
 		numberOfAccounts: .exactly(1),
 		challenge: nil
 	)
@@ -25,7 +25,7 @@ extension P2P.Dapp.Request.PersonaDataRequestItem {
 }
 
 extension P2P.Dapp.Request.SendTransactionItem {
-	public static let previewValue: Self = .init(version: .default, transactionManifest: .previewValue, message: nil)
+	public static let previewValue = Self(version: .default, transactionManifest: .previewValue, message: nil)
 }
 
 extension P2P.Dapp.Request.ID {
@@ -64,7 +64,8 @@ extension P2P.Dapp.Request {
 		)
 	}
 
-	public static let previewValueOneTimeAccount: Self = .previewValueOneTimeAccount()
+	public static let previewValueOneTimeAccount = Self.previewValueOneTimeAccount()
+
 	public static func previewValueOneTimeAccount(
 		id: ID = .previewValue0
 	) -> Self {
@@ -80,7 +81,7 @@ extension P2P.Dapp.Request {
 		)
 	}
 
-	public static let previewValueSignTX: Self = .previewValueSignTX()
+	public static let previewValueSignTX = Self.previewValueSignTX()
 
 	public static func previewValueSignTX(
 		id: ID = .previewValue0

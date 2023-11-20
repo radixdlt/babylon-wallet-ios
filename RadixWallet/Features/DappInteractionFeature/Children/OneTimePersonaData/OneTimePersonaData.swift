@@ -12,7 +12,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 		var personaPrimacy: PersonaPrimacy? = nil
 
 		@PresentationState
-		var destination: Destinations.State?
+		var destination: Destination.State?
 
 		init(
 			dappMetadata: DappMetadata,
@@ -40,7 +40,6 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 
 	enum ChildAction: Sendable, Equatable {
 		case persona(id: PersonaDataPermissionBox.State.ID, action: PersonaDataPermissionBox.Action)
-		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -48,7 +47,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 		case continueButtonTapped(P2P.Dapp.Request.Response)
 	}
 
-	struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		enum State: Sendable, Hashable {
 			case editPersona(EditPersona.State)
 			case createPersona(CreatePersonaCoordinator.State)
@@ -77,10 +76,12 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 			.forEach(\.personas, action: /Action.child .. ChildAction.persona) {
 				PersonaDataPermissionBox()
 			}
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -155,10 +156,17 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 			}
 			return .none
 
-		case let .destination(.presented(.editPersona(.delegate(.personaSaved(persona))))):
+		default:
+			return .none
+		}
+	}
+
+	func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .editPersona(.delegate(.personaSaved(persona))):
 			return .send(.delegate(.personaUpdated(persona)))
 
-		case .destination(.presented(.createPersona(.delegate(.completed)))):
+		case .createPersona(.delegate(.completed)):
 			state.personaPrimacy = .notFirstOnCurrentNetwork
 			return .none
 

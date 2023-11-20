@@ -7,7 +7,7 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 		public var sections: IdentifiedArrayOf<FungibleAssetList.Section.State>
 
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		public init(
 			sections: IdentifiedArrayOf<FungibleAssetList.Section.State> = []
@@ -17,11 +17,10 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
 		case section(FungibleAssetList.Section.State.ID, FungibleAssetList.Section.Action)
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case details(FungibleTokenDetails.State)
 		}
@@ -43,21 +42,18 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.forEach(\.sections, action: /Action.child .. ChildAction.section, element: {
+			.forEach(\.sections, action: /Action.child .. ChildAction.section) {
 				FungibleAssetList.Section()
-			})
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			}
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
 
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
+
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .destination(.presented(.details(.delegate(.dismiss)))):
-			state.destination = nil
-			return .none
-		case .destination:
-			return .none
 		case let .section(id, .delegate(.selected(token))):
 			state.destination = .details(.init(
 				resourceAddress: token.resourceAddress,
@@ -66,6 +62,16 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 			))
 			return .none
 		case .section:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .details(.delegate(.dismiss)):
+			state.destination = nil
+			return .none
+		default:
 			return .none
 		}
 	}

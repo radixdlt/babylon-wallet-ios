@@ -17,8 +17,7 @@ extension AccountPermissionChooseAccounts {
 							subtitle: viewStore.subtitle
 						)
 
-						let accountsStore = store.scope(state: \.chooseAccounts, action: { .child(.chooseAccounts($0)) })
-						ChooseAccounts.View(store: accountsStore)
+						ChooseAccounts.View(store: store.chooseAccounts)
 					}
 					.padding(.horizontal, .medium1)
 					.padding(.bottom, .medium2)
@@ -32,14 +31,35 @@ extension AccountPermissionChooseAccounts {
 							.buttonStyle(.primaryRectangular)
 					}
 				}
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /AccountPermissionChooseAccounts.Destinations.State.signing,
-					action: AccountPermissionChooseAccounts.Destinations.Action.signing,
-					content: { Signing.SheetView(store: $0) }
-				)
 			}
+			.destinations(with: store)
 		}
+	}
+}
+
+private extension StoreOf<AccountPermissionChooseAccounts> {
+	var destination: PresentationStoreOf<AccountPermissionChooseAccounts.Destination> {
+		func scopeState(state: State) -> PresentationState<AccountPermissionChooseAccounts.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+
+	var chooseAccounts: StoreOf<ChooseAccounts> {
+		scope(state: \.chooseAccounts) { .child(.chooseAccounts($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<AccountPermissionChooseAccounts>) -> some View {
+		let destinationStore = store.destination
+		return sheet(
+			store: destinationStore,
+			state: /AccountPermissionChooseAccounts.Destination.State.signing,
+			action: AccountPermissionChooseAccounts.Destination.Action.signing,
+			content: { Signing.SheetView(store: $0) }
+		)
 	}
 }
 

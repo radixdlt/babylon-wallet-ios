@@ -8,7 +8,16 @@ extension DependencyValues {
 
 // MARK: - LedgerHardwareWalletClient + TestDependencyKey
 extension LedgerHardwareWalletClient: TestDependencyKey {
-	public static let previewValue: Self = .noop
+	public static let previewValue = Self.noop
+
+	public static let testValue = Self(
+		isConnectedToAnyConnectorExtension: unimplemented("\(Self.self).isConnectedToAnyConnectorExtension"),
+		getDeviceInfo: unimplemented("\(Self.self).getDeviceInfo"),
+		derivePublicKeys: unimplemented("\(Self.self).derivePublicKeys"),
+		signTransaction: unimplemented("\(Self.self).signTransaction"),
+		signAuthChallenge: unimplemented("\(Self.self).signAuthChallenge"),
+		deriveAndDisplayAddress: unimplemented("\(Self.self).deriveAndDisplayAddress")
+	)
 
 	public static let noop = Self(
 		isConnectedToAnyConnectorExtension: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
@@ -24,14 +33,5 @@ extension LedgerHardwareWalletClient: TestDependencyKey {
 		signTransaction: { _ in [] },
 		signAuthChallenge: { _ in [] },
 		deriveAndDisplayAddress: { _, _ in throw NoopError() }
-	)
-
-	public static let testValue = Self(
-		isConnectedToAnyConnectorExtension: unimplemented("\(Self.self).isConnectedToAnyConnectorExtension"),
-		getDeviceInfo: unimplemented("\(Self.self).getDeviceInfo"),
-		derivePublicKeys: unimplemented("\(Self.self).derivePublicKeys"),
-		signTransaction: unimplemented("\(Self.self).signTransaction"),
-		signAuthChallenge: unimplemented("\(Self.self).signAuthChallenge"),
-		deriveAndDisplayAddress: unimplemented("\(Self.self).deriveAndDisplayAddress")
 	)
 }

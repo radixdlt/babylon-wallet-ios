@@ -5,7 +5,7 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 		public var rows: IdentifiedArrayOf<NonFungibleAssetList.Row.State>
 
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		public init(rows: IdentifiedArrayOf<NonFungibleAssetList.Row.State>) {
 			self.rows = rows
@@ -14,10 +14,9 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case asset(NonFungibleAssetList.Row.State.ID, NonFungibleAssetList.Row.Action)
-		case destination(PresentationAction<Destinations.Action>)
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case details(NonFungibleTokenDetails.State)
 		}
@@ -40,10 +39,12 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 			.forEach(\.rows, action: /Action.child .. ChildAction.asset) {
 				NonFungibleAssetList.Row()
 			}
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
@@ -63,12 +64,16 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 
 		case .asset:
 			return .none
+		}
+	}
 
-		case .destination(.presented(.details(.delegate(.dismiss)))):
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .details(.delegate(.dismiss)):
 			state.destination = nil
 			return .none
 
-		case .destination:
+		default:
 			return .none
 		}
 	}

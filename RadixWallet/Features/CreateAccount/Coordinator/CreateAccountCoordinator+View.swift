@@ -29,7 +29,7 @@ extension CreateAccountCoordinator {
 					IfLetStore(
 						store.scope(state: \.root, action: { .child(.root($0)) })
 					) {
-						destination(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
+						destinations(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
 							.toolbar {
 								if viewStore.shouldDisplayNavBar {
 									ToolbarItem(placement: .primaryAction) {
@@ -43,14 +43,14 @@ extension CreateAccountCoordinator {
 					// This is required to disable the animation of internal components during transition
 					.transaction { $0.animation = nil }
 				} destination: {
-					destination(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
+					destinations(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
 				}
 				.navigationTransition(.slide, interactivity: .disabled)
 			}
 		}
 
-		private func destination(
-			for store: StoreOf<CreateAccountCoordinator.Destinations>,
+		private func destinations(
+			for store: StoreOf<CreateAccountCoordinator.Path>,
 			shouldDisplayNavBar: Bool
 		) -> some SwiftUI.View {
 			ZStack {
@@ -58,20 +58,20 @@ extension CreateAccountCoordinator {
 					switch state {
 					case .step1_nameAccount:
 						CaseLet(
-							/CreateAccountCoordinator.Destinations.State.step1_nameAccount,
-							action: CreateAccountCoordinator.Destinations.Action.step1_nameAccount,
+							/CreateAccountCoordinator.Path.State.step1_nameAccount,
+							action: CreateAccountCoordinator.Path.Action.step1_nameAccount,
 							then: { NameAccount.View(store: $0) }
 						)
 					case .step2_creationOfAccount:
 						CaseLet(
-							/CreateAccountCoordinator.Destinations.State.step2_creationOfAccount,
-							action: CreateAccountCoordinator.Destinations.Action.step2_creationOfAccount,
+							/CreateAccountCoordinator.Path.State.step2_creationOfAccount,
+							action: CreateAccountCoordinator.Path.Action.step2_creationOfAccount,
 							then: { CreationOfAccount.View(store: $0) }
 						)
 					case .step3_completion:
 						CaseLet(
-							/CreateAccountCoordinator.Destinations.State.step3_completion,
-							action: CreateAccountCoordinator.Destinations.Action.step3_completion,
+							/CreateAccountCoordinator.Path.State.step3_completion,
+							action: CreateAccountCoordinator.Path.Action.step3_completion,
 							then: { NewAccountCompletion.View(store: $0) }
 						)
 					}

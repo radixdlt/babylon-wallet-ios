@@ -17,27 +17,46 @@ extension Main {
 		}
 
 		public var body: some SwiftUI.View {
-			let bannerStore = store.scope(state: \.showIsUsingTestnetBanner, action: actionless)
 			NavigationStack {
-				Home.View(
-					store: store.scope(
-						state: \.home,
-						action: { .child(.home($0)) }
-					)
-				)
-				.navigationDestination(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /Main.Destinations.State.settings,
-					action: Main.Destinations.Action.settings,
-					destination: { Settings.View(store: $0) }
-				)
+				Home.View(store: store.home)
+					.destinations(with: store)
 			}
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()
 			}
-			.showDeveloperDisclaimerBanner(bannerStore)
+			.showDeveloperDisclaimerBanner(store.banner)
 			.presentsDappInteractions()
 		}
+	}
+}
+
+private extension StoreOf<Main> {
+	var destination: PresentationStoreOf<Main.Destination> {
+		func scopeState(state: State) -> PresentationState<Main.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+
+	var banner: Store<Bool, Never> {
+		scope(state: \.showIsUsingTestnetBanner, action: actionless)
+	}
+
+	var home: StoreOf<Home> {
+		scope(state: \.home) { .child(.home($0)) }
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<Main>) -> some View {
+		let destinationStore = store.destination
+		return navigationDestination(
+			store: destinationStore,
+			state: /Main.Destination.State.settings,
+			action: Main.Destination.Action.settings,
+			destination: { Settings.View(store: $0) }
+		)
 	}
 }
 

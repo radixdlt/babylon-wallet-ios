@@ -4,13 +4,13 @@ import SwiftUI
 // MARK: - CreatePersonaCoordinator
 public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		var root: Destinations.State?
-		var path: StackState<Destinations.State> = .init()
+		var root: Path.State?
+		var path: StackState<Path.State> = .init()
 
 		public let config: CreatePersonaConfig
 
 		public init(
-			root: Destinations.State? = nil,
+			root: Path.State? = nil,
 			config: CreatePersonaConfig
 		) {
 			self.config = config
@@ -39,7 +39,7 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Path: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case step0_introduction(IntroductionToPersonas.State)
 			case step1_newPersonaInfo(NewPersonaInfo.State)
@@ -75,8 +75,8 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case root(Destinations.Action)
-		case path(StackActionOf<Destinations>)
+		case root(Path.Action)
+		case path(StackActionOf<Path>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -93,10 +93,10 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
-				Destinations()
+				Path()
 			}
 			.forEach(\.path, action: /Action.child .. ChildAction.path) {
-				Destinations()
+				Path()
 			}
 	}
 }

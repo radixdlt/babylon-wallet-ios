@@ -11,20 +11,35 @@ extension OverlayReducer {
 		}
 
 		var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-				IfLetStore(
-					store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /OverlayReducer.Destinations.State.hud,
-					action: OverlayReducer.Destinations.Action.hud,
-					then: { HUD.View(store: $0) }
-				)
-				.alert(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /OverlayReducer.Destinations.State.alert,
-					action: OverlayReducer.Destinations.Action.alert
-				)
-				.task { viewStore.send(.task) }
-			}
+			IfLetStore(
+				store.destination,
+				state: /OverlayReducer.Destination.State.hud,
+				action: OverlayReducer.Destination.Action.hud,
+				then: { HUD.View(store: $0) }
+			)
+			.destinations(with: store)
+			.task { store.send(.view(.task)) }
 		}
+	}
+}
+
+private extension StoreOf<OverlayReducer> {
+	var destination: PresentationStoreOf<OverlayReducer.Destination> {
+		func scopeState(state: State) -> PresentationState<OverlayReducer.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<OverlayReducer>) -> some View {
+		let destinationStore = store.destination
+		return alert(
+			store: destinationStore,
+			state: /OverlayReducer.Destination.State.alert,
+			action: OverlayReducer.Destination.Action.alert
+		)
 	}
 }

@@ -16,10 +16,10 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 		public var thumbnails: [Profile.Network.AuthorizedDapp.ID: URL] = [:]
 
 		@PresentationState
-		public var presentedDapp: DappDetails.State?
+		public var destination: Destination.State? = nil
 
-		public init(presentedDapp: DappDetails.State? = nil) {
-			self.presentedDapp = presentedDapp
+		public init(destination: Destination.State? = nil) {
+			self.destination = destination
 		}
 	}
 
@@ -37,8 +37,22 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 		case failedToGetDetailsOfDapp(id: Profile.Network.AuthorizedDapp.ID)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case presentedDapp(PresentationAction<DappDetails.Action>)
+	// MARK: Destination
+
+	public struct Destination: DestinationReducer {
+		public enum State: Hashable, Sendable {
+			case presentedDapp(DappDetails.State)
+		}
+
+		public enum Action: Equatable, Sendable {
+			case presentedDapp(DappDetails.Action)
+		}
+
+		public var body: some ReducerOf<Self> {
+			Scope(state: /State.presentedDapp, action: /Action.presentedDapp) {
+				DappDetails()
+			}
+		}
 	}
 
 	// MARK: Reducer
@@ -47,10 +61,12 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$presentedDapp, action: /Action.child .. ChildAction.presentedDapp) {
-				DappDetails()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -97,7 +113,7 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			return .none
 		case let .presentDappDetails(presentedDappState):
-			state.presentedDapp = presentedDappState
+			state.destination = .presentedDapp(presentedDappState)
 			return .none
 		case let .loadedThumbnail(thumbnail, dApp: id):
 			state.thumbnails[id] = thumbnail
@@ -105,14 +121,16 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case .presentedDapp(.presented(.delegate(.dAppForgotten))):
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .presentedDapp(.delegate(.dAppForgotten)):
 			.run { send in
-				await send(.child(.presentedDapp(.dismiss)))
-			}.concatenate(with: loadAuthorizedDapps())
+				// TODO: Couldn't this simply be: state.destination = nil
+				await send(.destination(.dismiss))
+			}
+			.concatenate(with: loadAuthorizedDapps())
 
-		case .presentedDapp:
+		default:
 			.none
 		}
 	}

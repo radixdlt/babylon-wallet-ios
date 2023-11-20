@@ -51,7 +51,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		let networkID: NetworkID
 
 		@PresentationState
-		var destination: Destinations.State? = nil
+		var destination: Destination.State? = nil
 
 		public init(networkID: NetworkID, chooseAccounts: ChooseAccounts.State) {
 			self.networkID = networkID
@@ -68,7 +68,6 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
 		case chooseAccounts(ChooseAccounts.Action)
 	}
 
@@ -77,7 +76,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		case handleResult(ReceivingAccount.State.Account)
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case scanAccountAddress(ScanQRCoordinator.State)
 		}
@@ -101,10 +100,12 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		}
 
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -133,15 +134,16 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case var .destination(.presented(.scanAccountAddress(.delegate(.scanned(address))))):
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case var .scanAccountAddress(.delegate(.scanned(address))):
 			state.destination = nil
 
 			QR.removeAddressPrefixIfNeeded(from: &address)
 
 			state.manualAccountAddress = address
 			return .none
+
 		default:
 			return .none
 		}

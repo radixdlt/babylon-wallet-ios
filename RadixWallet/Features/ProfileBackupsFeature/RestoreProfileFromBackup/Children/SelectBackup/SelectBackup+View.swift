@@ -47,16 +47,7 @@ extension SelectBackup {
 						}
 					)
 				}
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /SelectBackup.Destinations.State.inputEncryptionPassword,
-					action: SelectBackup.Destinations.Action.inputEncryptionPassword,
-					content: { store in
-						NavigationView {
-							EncryptOrDecryptProfile.View(store: store)
-						}
-					}
-				)
+				.destinations(with: store)
 				.fileImporter(
 					isPresented: viewStore.binding(
 						get: \.isDisplayingFileImporter,
@@ -71,6 +62,28 @@ extension SelectBackup {
 			}
 			.navigationTitle(L10n.RecoverProfileBackup.Header.title)
 		}
+	}
+}
+
+private extension StoreOf<SelectBackup> {
+	var destination: PresentationStoreOf<SelectBackup.Destination> {
+		func scopeState(state: State) -> PresentationState<SelectBackup.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<SelectBackup>) -> some View {
+		let destinationStore = store.destination
+		return sheet(
+			store: destinationStore,
+			state: /SelectBackup.Destination.State.inputEncryptionPassword,
+			action: SelectBackup.Destination.Action.inputEncryptionPassword,
+			content: { EncryptOrDecryptProfile.View(store: $0).inNavigationView }
+		)
 	}
 }
 

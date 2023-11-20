@@ -73,16 +73,8 @@ extension LSUStake {
 					}
 				}
 				.padding(.medium1)
-				.sheet(
-					store: store.scope(
-						state: \.$destination,
-						action: (/Action.child .. LSUStake.ChildAction.destination).embed
-					),
-					state: /Destinations.State.details,
-					action: Destinations.Action.details,
-					content: LSUDetails.View.init
-				)
 			}
+			.destinations(with: store)
 		}
 
 		@ViewBuilder
@@ -159,7 +151,7 @@ extension View {
 
 extension LSUStake.State {
 	var viewState: LSUStake.ViewState {
-		.init(id: stake.validatorAddress, content: stakeDetails.map { details in
+		LSUStake.ViewState(id: stake.validatorAddress, content: stakeDetails.map { details in
 			LSUStake.ViewState.Content(
 				validatorNameViewState: .init(with: details.validator),
 				liquidStakeUnit: details.stakeUnitResource.map { _ in
@@ -192,5 +184,27 @@ extension LSUStake.State {
 				}
 			)
 		})
+	}
+}
+
+private extension StoreOf<LSUStake> {
+	var destination: PresentationStoreOf<LSUStake.Destination> {
+		func scopeState(state: State) -> PresentationState<LSUStake.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<LSUStake>) -> some View {
+		let destinationStore = store.destination
+		return sheet(
+			store: destinationStore,
+			state: /LSUStake.Destination.State.details,
+			action: LSUStake.Destination.Action.details,
+			content: { LSUDetails.View(store: $0) }
+		)
 	}
 }

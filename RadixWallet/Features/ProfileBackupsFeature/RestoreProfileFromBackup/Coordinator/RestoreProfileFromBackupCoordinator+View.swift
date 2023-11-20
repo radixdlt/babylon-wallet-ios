@@ -21,7 +21,7 @@ extension RestoreProfileFromBackupCoordinator {
 			}
 		}
 
-		func path(
+		private func path(
 			for store: StoreOf<RestoreProfileFromBackupCoordinator.Path>
 		) -> some SwiftUI.View {
 			SwitchStore(store) { state in

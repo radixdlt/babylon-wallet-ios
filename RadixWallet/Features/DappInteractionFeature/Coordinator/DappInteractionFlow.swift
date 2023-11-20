@@ -35,8 +35,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		@PresentationState
 		var personaNotFoundErrorAlert: AlertState<ViewAction.PersonaNotFoundErrorAlertAction>? = nil
 
-		var root: Destinations.State?
-		var path: StackState<Destinations.State> = .init()
+		var root: Path.State?
+		var path: StackState<Path.State> = .init()
 
 		init?(
 			dappMetadata: DappMetadata,
@@ -47,7 +47,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 			if let interactionItems = NonEmpty(rawValue: OrderedSet<AnyInteractionItem>(for: remoteInteraction.erasedItems)) {
 				self.interactionItems = interactionItems
-				self.root = Destinations.State(
+				self.root = Path.State(
 					for: interactionItems.first,
 					interaction: remoteInteraction,
 					dappMetadata: dappMetadata,
@@ -79,7 +79,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		)
 		case presentPersonaNotFoundErrorAlert(reason: String)
 		case autofillOngoingResponseItemsIfPossible(AutofillOngoingResponseItemsPayload)
-		case delayedAppendToPath(DappInteractionFlow.Destinations.State)
+		case delayedAppendToPath(DappInteractionFlow.Path.State)
 
 		struct AutofillOngoingResponseItemsPayload: Sendable, Equatable {
 			struct AccountsPayload: Sendable, Equatable {
@@ -101,8 +101,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	}
 
 	enum ChildAction: Sendable, Equatable {
-		case root(Destinations.Action)
-		case path(StackActionOf<Destinations>)
+		case root(Path.Action)
+		case path(StackActionOf<Path>)
 	}
 
 	enum DelegateAction: Sendable, Equatable {
@@ -112,7 +112,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		case dismiss
 	}
 
-	struct Destinations: Sendable, Reducer {
+	struct Path: Sendable, Reducer {
 		typealias State = RelayState<DappInteractionFlow.State.AnyInteractionItem, MainState>
 		typealias Action = RelayAction<DappInteractionFlow.State.AnyInteractionItem, MainAction>
 
@@ -162,10 +162,10 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
-				Destinations()
+				Path()
 			}
 			.forEach(\.path, action: /Action.child .. ChildAction.path) {
-				Destinations()
+				Path()
 			}
 			.ifLet(\.$personaNotFoundErrorAlert, action: /Action.view .. ViewAction.personaNotFoundErrorAlert)
 	}
@@ -754,7 +754,7 @@ extension DappInteractionFlow {
 	func continueEffect(for state: inout State) -> Effect<Action> {
 		if
 			let nextRequest = state.interactionItems.first(where: { state.responseItems[$0] == nil }),
-			let destination = Destinations.State(
+			let destination = Path.State(
 				for: nextRequest,
 				interaction: state.remoteInteraction,
 				dappMetadata: state.dappMetadata,
@@ -953,7 +953,7 @@ extension OrderedSet<DappInteractionFlow.State.AnyInteractionItem> {
 }
 
 extension DappInteractionFlow.ChildAction {
-	var itemAndAction: (DappInteractionFlow.State.AnyInteractionItem, DappInteractionFlow.Destinations.MainAction)? {
+	var itemAndAction: (DappInteractionFlow.State.AnyInteractionItem, DappInteractionFlow.Path.MainAction)? {
 		switch self {
 		case let .root(.relay(item, action)), let .path(.element(_, .relay(item, action))):
 			(item, action)
@@ -964,7 +964,7 @@ extension DappInteractionFlow.ChildAction {
 	}
 }
 
-extension DappInteractionFlow.Destinations.State {
+extension DappInteractionFlow.Path.State {
 	init?(
 		for anyItem: DappInteractionFlow.State.AnyInteractionItem,
 		interaction: DappInteractionFlow.State.RemoteInteraction,

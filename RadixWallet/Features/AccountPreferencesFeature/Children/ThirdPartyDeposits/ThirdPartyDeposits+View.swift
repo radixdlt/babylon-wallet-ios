@@ -47,7 +47,7 @@ extension ManageThirdPartyDeposits {
 				.background(.app.gray5)
 				.navigationTitle(L10n.AccountSettings.thirdPartyDeposits)
 				.defaultNavBarConfig()
-				.destination(store: store)
+				.destinations(with: store)
 				.footer {
 					Button(L10n.AccountSettings.SpecificAssetsDeposits.update) {
 						viewStore.send(.updateTapped)
@@ -129,30 +129,37 @@ extension PreferenceSection.Row where SectionId == ManageThirdPartyDeposits.Sect
 	}
 }
 
-extension View {
-	@MainActor
-	func destination(store: StoreOf<ManageThirdPartyDeposits>) -> some View {
-		let destinationStore = store.scope(state: \.$destinations, action: { .child(.destinations($0)) })
+private extension StoreOf<ManageThirdPartyDeposits> {
+	var destination: PresentationStoreOf<ManageThirdPartyDeposits.Destination> {
+		func scopeState(state: State) -> PresentationState<ManageThirdPartyDeposits.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<ManageThirdPartyDeposits>) -> some View {
+		let destinationStore = store.destination
 		return allowDenyAssets(with: destinationStore)
 			.allowDepositors(with: destinationStore)
 	}
 
-	@MainActor
-	func allowDenyAssets(with destinationStore: PresentationStoreOf<ManageThirdPartyDeposits.Destinations>) -> some View {
+	private func allowDenyAssets(with destinationStore: PresentationStoreOf<ManageThirdPartyDeposits.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /ManageThirdPartyDeposits.Destinations.State.allowDenyAssets,
-			action: ManageThirdPartyDeposits.Destinations.Action.allowDenyAssets,
+			state: /ManageThirdPartyDeposits.Destination.State.allowDenyAssets,
+			action: ManageThirdPartyDeposits.Destination.Action.allowDenyAssets,
 			destination: { ResourcesList.View(store: $0) }
 		)
 	}
 
-	@MainActor
-	func allowDepositors(with destinationStore: PresentationStoreOf<ManageThirdPartyDeposits.Destinations>) -> some View {
+	private func allowDepositors(with destinationStore: PresentationStoreOf<ManageThirdPartyDeposits.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /ManageThirdPartyDeposits.Destinations.State.allowDepositors,
-			action: ManageThirdPartyDeposits.Destinations.Action.allowDepositors,
+			state: /ManageThirdPartyDeposits.Destination.State.allowDepositors,
+			action: ManageThirdPartyDeposits.Destination.Action.allowDepositors,
 			destination: { ResourcesList.View(store: $0) }
 		)
 	}

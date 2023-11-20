@@ -127,7 +127,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		#endif
 
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		public struct PersistStrategy: Sendable, Hashable {
 			public enum Location: Sendable, Hashable {
@@ -263,7 +263,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
 		case word(id: ImportMnemonicWord.State.ID, child: ImportMnemonicWord.Action)
 	}
 
@@ -274,7 +273,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case doneViewing(idOfBackedUpFactorSource: FactorSource.ID.FromHash?) // `nil` means it was already marked as backed up
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case offDeviceMnemonicInfoPrompt(OffDeviceMnemonicInfo.State)
 			case backupConfirmation(AlertState<Action.BackupConfirmation>)
@@ -285,7 +284,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public enum Action: Sendable, Equatable {
 			case offDeviceMnemonicInfoPrompt(OffDeviceMnemonicInfo.Action)
 
-			case backupConfimartion(BackupConfirmation)
+			case backupConfirmation(BackupConfirmation)
 			case verifyMnemonic(VerifyMnemonic.Action)
 
 			case onContinueWarning(OnContinueWarning)
@@ -328,10 +327,12 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			.forEach(\.words, action: /Action.child .. ChildAction.word) {
 				ImportMnemonicWord()
 			}
-			.ifLet(\.$destination, action: /Action.child .. /ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
@@ -378,57 +379,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				&state
 			)
 
-		case let .destination(.presented(.offDeviceMnemonicInfoPrompt(.delegate(.done(label, mnemonicWithPassphrase))))):
-			state.destination = nil
-
-			guard let persistStrategy = state.mode.write?.persistStrategy else {
-				preconditionFailure("expected persistStrategy")
-				return .none
-			}
-			precondition(persistStrategy.mnemonicForFactorSourceKind == .offDevice)
-
-			return .run { send in
-				await send(.internal(.saveFactorSourceResult(
-					TaskResult {
-						try await factorSourcesClient.addOffDeviceFactorSource(
-							mnemonicWithPassphrase: mnemonicWithPassphrase,
-							label: label
-						)
-					}
-				)))
-			}
-
-		case .destination(.presented(.backupConfimartion(.userHasBackedUp))):
-			guard let mnemonic = state.mnemonic else {
-				return .none
-			}
-			state.destination = .verifyMnemonic(.init(mnemonic: mnemonic))
-			return .none
-
-		case .destination(.presented(.backupConfimartion(.userHasNotBackedUp))):
-			loggerGlobal.notice("User have not backed up")
-			return .send(.delegate(.doneViewing(idOfBackedUpFactorSource: nil)))
-
-		case .destination(.presented(.onContinueWarning(.buttonTapped))):
-			guard let mnemonic = state.mnemonic else {
-				loggerGlobal.error("Can't read mnemonic")
-				struct FailedToReadMnemonic: Error {}
-				errorQueue.schedule(FailedToReadMnemonic())
-				return .none
-			}
-			return continueWithMnemonic(mnemonic: mnemonic, in: &state)
-
-		case .destination(.presented(.verifyMnemonic(.delegate(.mnemonicVerified)))):
-			guard let factorSourceID = state.mode.readonly?.factorSourceID else {
-				return .none
-			}
-			return .run { send in
-				try userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
-				await send(.delegate(.doneViewing(idOfBackedUpFactorSource: factorSourceID)))
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to save mnemonic as backed up")
-				errorQueue.schedule(error)
-			}
 		default:
 			return .none
 		}
@@ -582,6 +532,64 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return .send(.delegate(.persistedNewFactorSourceInProfile(factorSource)))
 		}
 	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .offDeviceMnemonicInfoPrompt(.delegate(.done(label, mnemonicWithPassphrase))):
+			state.destination = nil
+
+			guard let persistStrategy = state.mode.write?.persistStrategy else {
+				preconditionFailure("expected persistStrategy")
+			}
+			precondition(persistStrategy.mnemonicForFactorSourceKind == .offDevice)
+
+			return .run { send in
+				await send(.internal(.saveFactorSourceResult(
+					TaskResult {
+						try await factorSourcesClient.addOffDeviceFactorSource(
+							mnemonicWithPassphrase: mnemonicWithPassphrase,
+							label: label
+						)
+					}
+				)))
+			}
+
+		case .backupConfirmation(.userHasBackedUp):
+			guard let mnemonic = state.mnemonic else {
+				return .none
+			}
+			state.destination = .verifyMnemonic(.init(mnemonic: mnemonic))
+			return .none
+
+		case .backupConfirmation(.userHasNotBackedUp):
+			loggerGlobal.notice("User have not backed up")
+			return .send(.delegate(.doneViewing(idOfBackedUpFactorSource: nil)))
+
+		case .onContinueWarning(.buttonTapped):
+			guard let mnemonic = state.mnemonic else {
+				loggerGlobal.error("Can't read mnemonic")
+				struct FailedToReadMnemonic: Error {}
+				errorQueue.schedule(FailedToReadMnemonic())
+				return .none
+			}
+			return continueWithMnemonic(mnemonic: mnemonic, in: &state)
+
+		case .verifyMnemonic(.delegate(.mnemonicVerified)):
+			guard let factorSourceID = state.mode.readonly?.factorSourceID else {
+				return .none
+			}
+			return .run { send in
+				try userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
+				await send(.delegate(.doneViewing(idOfBackedUpFactorSource: factorSourceID)))
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to save mnemonic as backed up")
+				errorQueue.schedule(error)
+			}
+
+		default:
+			return .none
+		}
+	}
 }
 
 extension ImportMnemonic {
@@ -675,7 +683,7 @@ extension ImportMnemonic {
 	}
 }
 
-extension ImportMnemonic.Destinations.State {
+extension ImportMnemonic.Destination.State {
 	fileprivate static func askUserIfSheHasBackedUpMnemonic() -> Self {
 		.backupConfirmation(.init(
 			title: { TextState(L10n.ImportMnemonic.BackedUpAlert.title) },

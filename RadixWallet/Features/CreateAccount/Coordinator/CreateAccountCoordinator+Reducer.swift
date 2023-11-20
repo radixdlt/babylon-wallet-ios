@@ -4,13 +4,13 @@ import SwiftUI
 // MARK: - CreateAccountCoordinator
 public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		var root: Destinations.State?
-		var path: StackState<Destinations.State> = .init()
+		var root: Path.State?
+		var path: StackState<Path.State> = .init()
 
 		public let config: CreateAccountConfig
 
 		public init(
-			root: Destinations.State? = nil,
+			root: Path.State? = nil,
 			config: CreateAccountConfig
 		) {
 			self.config = config
@@ -38,7 +38,7 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Path: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
 			case step1_nameAccount(NameAccount.State)
 			case step2_creationOfAccount(CreationOfAccount.State)
@@ -69,8 +69,8 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case root(Destinations.Action)
-		case path(StackActionOf<Destinations>)
+		case root(Path.Action)
+		case path(StackActionOf<Path>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -88,10 +88,10 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
-				Destinations()
+				Path()
 			}
 			.forEach(\.path, action: /Action.child .. ChildAction.path) {
-				Destinations()
+				Path()
 			}
 	}
 }
@@ -146,7 +146,7 @@ extension CreateAccountCoordinator {
 }
 
 extension CreateAccountCoordinator.State {
-	public var lastStepState: CreateAccountCoordinator.Destinations.State? {
+	public var lastStepState: CreateAccountCoordinator.Path.State? {
 		path.last
 	}
 }

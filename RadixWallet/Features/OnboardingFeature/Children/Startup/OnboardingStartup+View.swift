@@ -54,15 +54,30 @@ extension OnboardingStartup.View {
 					.buttonStyle(.primaryText())
 				}
 			}
-			.sheet(
-				store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-				state: /OnboardingStartup.Destinations.State.restoreFromBackup,
-				action: OnboardingStartup.Destinations.Action.restoreFromBackup,
-				content: {
-					RestoreProfileFromBackupCoordinator.View(store: $0)
-				}
-			)
+			.destinations(with: store)
 		}
+	}
+}
+
+private extension StoreOf<OnboardingStartup> {
+	var destination: PresentationStoreOf<OnboardingStartup.Destination> {
+		func scopeState(state: State) -> PresentationState<OnboardingStartup.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<OnboardingStartup>) -> some View {
+		let destinationStore = store.destination
+		return sheet(
+			store: destinationStore,
+			state: /OnboardingStartup.Destination.State.restoreFromBackup,
+			action: OnboardingStartup.Destination.Action.restoreFromBackup,
+			content: { RestoreProfileFromBackupCoordinator.View(store: $0) }
+		)
 	}
 }
 

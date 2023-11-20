@@ -38,12 +38,11 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case personaList(PersonaList.Action)
-		case destination(PresentationAction<Destination.Action>)
 	}
 
 	// MARK: - Destination
 
-	public struct Destination: Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Equatable, Hashable {
 			case createPersonaCoordinator(CreatePersonaCoordinator.State)
 			case personaDetails(PersonaDetails.State)
@@ -77,10 +76,12 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 			PersonaList()
 		}
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -130,10 +131,14 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 				await send(.internal(.loadedPersonaDetails(personaDetailsState)))
 			}
 
-		case .personaList:
+		default:
 			return .none
+		}
+	}
 
-		case let .destination(.presented(.createPersonaCoordinator(.delegate(delegateAction)))):
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .createPersonaCoordinator(.delegate(delegateAction)):
 			switch delegateAction {
 			case .dismissed:
 				state.destination = nil
@@ -145,11 +150,11 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case .destination(.presented(.personaDetails(.delegate(.personaHidden)))):
+		case .personaDetails(.delegate(.personaHidden)):
 			state.destination = nil
 			return .none
 
-		case .destination:
+		default:
 			return .none
 		}
 	}

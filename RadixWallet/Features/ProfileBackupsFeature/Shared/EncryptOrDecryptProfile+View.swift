@@ -149,19 +149,30 @@ extension EncryptOrDecryptProfile {
 					.buttonStyle(.primaryRectangular)
 					.controlState(viewStore.controlState)
 				}
-				.alert(
-					store: store.destination,
-					state: /EncryptOrDecryptProfile.Destination.State.incorrectPasswordAlert,
-					action: EncryptOrDecryptProfile.Destination.Action.incorrectPasswordAlert
-				)
+				.destinations(with: store)
 				.onAppear { viewStore.send(.appeared) }
 			}
 		}
 	}
 }
 
-extension StoreOf<EncryptOrDecryptProfile> {
-	fileprivate var destination: PresentationStoreOf<EncryptOrDecryptProfile.Destination> {
-		scope(state: \.$destination, action: { .child(.destination($0)) })
+private extension StoreOf<EncryptOrDecryptProfile> {
+	var destination: PresentationStoreOf<EncryptOrDecryptProfile.Destination> {
+		func scopeState(state: State) -> PresentationState<EncryptOrDecryptProfile.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<EncryptOrDecryptProfile>) -> some View {
+		let destinationStore = store.destination
+		return alert(
+			store: destinationStore,
+			state: /EncryptOrDecryptProfile.Destination.State.incorrectPasswordAlert,
+			action: EncryptOrDecryptProfile.Destination.Action.incorrectPasswordAlert
+		)
 	}
 }

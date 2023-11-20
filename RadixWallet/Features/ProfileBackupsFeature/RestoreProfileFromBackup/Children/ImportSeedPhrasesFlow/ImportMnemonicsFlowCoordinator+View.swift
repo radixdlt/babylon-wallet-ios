@@ -12,32 +12,42 @@ extension ImportMnemonicsFlowCoordinator {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }) { viewStore in
-				Color.app.white
-					.onFirstTask { @MainActor in
-						await viewStore.send(.view(.onFirstTask)).finish()
-					}
-					// We are using `fullScreenCover` for two reasons:
-					// 1. it fixes a bug where otherwise a secondary `ImportMnemonicControllingAccounts` screen's buttons are not pressable
-					// 2. If fixes issue where user can dismiss screen with iOS gesture, which we dont want in this case
-					.fullScreenCover(
-						store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-						state: /ImportMnemonicsFlowCoordinator.Destinations.State.importMnemonicControllingAccounts,
-						action: ImportMnemonicsFlowCoordinator.Destinations.Action.importMnemonicControllingAccounts,
-						content: { importStore in
-							NavigationView {
-								ImportMnemonicControllingAccounts.View(store: importStore)
-									.toolbar {
-										ToolbarItem(placement: .navigationBarLeading) {
-											CloseButton {
-												viewStore.send(.view(.closeButtonTapped))
-											}
-										}
-									}
-							}
-						}
-					)
-			}
+			Color.app.white
+				.onFirstTask { @MainActor in
+					await store.send(.view(.onFirstTask)).finish()
+				}
+				.destinations(with: store)
 		}
+	}
+}
+
+private extension StoreOf<ImportMnemonicsFlowCoordinator> {
+	var destination: PresentationStoreOf<ImportMnemonicsFlowCoordinator.Destination> {
+		func scopeState(state: State) -> PresentationState<ImportMnemonicsFlowCoordinator.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<ImportMnemonicsFlowCoordinator>) -> some View {
+		let destinationStore = store.destination
+
+		// We are using `fullScreenCover` for two reasons:
+		// 1. it fixes a bug where otherwise a secondary `ImportMnemonicControllingAccounts` screen's buttons are not pressable
+		// 2. If fixes issue where user can dismiss screen with iOS gesture, which we dont want in this case
+		return fullScreenCover(
+			store: destinationStore,
+			state: /ImportMnemonicsFlowCoordinator.Destination.State.importMnemonicControllingAccounts,
+			action: ImportMnemonicsFlowCoordinator.Destination.Action.importMnemonicControllingAccounts,
+			content: { importStore in
+				ImportMnemonicControllingAccounts.View(store: importStore)
+					.withNavigationBar {
+						store.send(.view(.closeButtonTapped))
+					}
+			}
+		)
 	}
 }

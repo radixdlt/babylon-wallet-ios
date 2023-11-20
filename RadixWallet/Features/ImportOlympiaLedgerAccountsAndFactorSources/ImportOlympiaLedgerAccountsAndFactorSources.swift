@@ -18,7 +18,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		public var migratedAccounts: [MigratedHardwareAccounts] = []
 
 		@PresentationState
-		public var destinations: Destinations.State?
+		public var destination: Destination.State?
 
 		public var hasAConnectorExtension: Bool = false
 
@@ -32,7 +32,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		}
 	}
 
-	public struct Destinations: Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
@@ -73,10 +73,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		case processedOlympiaHardwareAccounts(ValidatedAccounts, MigratedHardwareAccounts)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destinations(PresentationAction<Destinations.Action>)
-	}
-
 	public enum DelegateAction: Sendable, Equatable {
 		case failed(Failure)
 		case completed(IdentifiedArrayOf<Profile.Network.Account>)
@@ -99,10 +95,12 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public var body: some ReducerOf<ImportOlympiaLedgerAccountsAndFactorSources> {
 		Reduce(core)
-			.ifLet(\.$destinations, action: /Action.child .. ChildAction.destinations) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -111,7 +109,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 		case .continueTapped:
 			guard state.hasAConnectorExtension else {
-				state.destinations = .noP2PLink(.noP2Plink)
+				state.destination = .noP2PLink(.noP2Plink)
 				return .none
 			}
 
@@ -139,7 +137,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			return .none
 
 		case let .useNewLedger(deviceInfo):
-			state.destinations = .nameLedgerAndDerivePublicKeys(.init(
+			state.destination = .nameLedgerAndDerivePublicKeys(.init(
 				networkID: state.networkID,
 				olympiaAccounts: state.olympiaAccounts.unvalidated,
 				deviceInfo: deviceInfo
@@ -148,7 +146,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 		case let .useExistingLedger(ledger):
 			state.knownLedgers.append(ledger)
-			state.destinations = .nameLedgerAndDerivePublicKeys(.init(
+			state.destination = .nameLedgerAndDerivePublicKeys(.init(
 				networkID: state.networkID,
 				olympiaAccounts: state.olympiaAccounts.unvalidated,
 				ledger: ledger
@@ -177,22 +175,22 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destinations(.presented(.noP2PLink(noP2PLinkAction))):
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .noP2PLink(noP2PLinkAction):
 			switch noP2PLinkAction {
 			case .addNewP2PLinkTapped:
-				state.destinations = .addNewP2PLink(.init())
+				state.destination = .addNewP2PLink(.init())
 				return .none
 
 			case .cancelTapped:
 				return .none
 			}
 
-		case let .destinations(.presented(.addNewP2PLink(.delegate(addNewP2PLinkAction)))):
+		case let .addNewP2PLink(.delegate(addNewP2PLinkAction)):
 			switch addNewP2PLinkAction {
 			case let .newConnection(connectedClient):
-				state.destinations = nil
+				state.destination = nil
 
 				return .run { _ in
 					try await p2pLinksClient.addP2PLink(connectedClient)
@@ -202,14 +200,14 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				}
 
 			case .dismiss:
-				state.destinations = nil
+				state.destination = nil
 				return .none
 			}
 
-		case let .destinations(.presented(.nameLedgerAndDerivePublicKeys(.delegate(delegateAction)))):
+		case let .nameLedgerAndDerivePublicKeys(.delegate(delegateAction)):
 			switch delegateAction {
 			case .failedToSaveNewLedger:
-				state.destinations = nil
+				state.destination = nil
 				return .send(.delegate(.failed(.failedToSaveNewLedger)))
 
 			case let .savedNewLedger(ledger):
@@ -217,11 +215,11 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				return .none
 
 			case .derivePublicKeys(.failedToDerivePublicKey):
-				state.destinations = nil
+				state.destination = nil
 				return .send(.delegate(.failed(.failedToDerivePublicKey)))
 
 			case let .derivePublicKeys(.derivedPublicKeys(publicKeys, factorSourceID, _)):
-				state.destinations = nil
+				state.destination = nil
 				guard let ledgerID = factorSourceID.extract(FactorSourceID.FromHash.self) else {
 					loggerGlobal.error("Failed to find ledger with factor sourceID in local state: \(factorSourceID)")
 					return .none

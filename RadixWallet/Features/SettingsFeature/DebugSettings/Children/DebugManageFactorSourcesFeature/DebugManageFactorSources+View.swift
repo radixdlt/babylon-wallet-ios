@@ -22,7 +22,6 @@ extension DebugManageFactorSources {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-
 				VStack(alignment: .leading) {
 					if let factorSources = viewStore.factorSources {
 						ScrollView(showsIndicators: false) {
@@ -53,26 +52,8 @@ extension DebugManageFactorSources {
 					await store.send(.view(.task)).finish()
 				}
 				.navigationTitle("Factor Sources")
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /DebugManageFactorSources.Destinations.State.importMnemonic,
-					action: DebugManageFactorSources.Destinations.Action.importMnemonic,
-					content: { importMnemonicStore in
-						NavigationView {
-							// We depend on `.toolbar` to display buttons on top of
-							// keyboard. And they are not displayed if we are not
-							// inside a NavigationView
-							ImportMnemonic.View(store: importMnemonicStore)
-						}
-					}
-				)
-				.sheet(
-					store: store.scope(state: \.$destination, action: { .child(.destination($0)) }),
-					state: /DebugManageFactorSources.Destinations.State.addLedger,
-					action: DebugManageFactorSources.Destinations.Action.addLedger,
-					content: { AddLedgerFactorSource.View(store: $0) }
-				)
 			}
+			.destinations(with: store)
 		}
 	}
 }
@@ -94,6 +75,48 @@ extension FactorSourceView {
 		}
 		.padding()
 		.border(Color.app.gray1, width: 2)
+	}
+}
+
+private extension StoreOf<DebugManageFactorSources> {
+	var destination: PresentationStoreOf<DebugManageFactorSources.Destination> {
+		func scopeState(state: State) -> PresentationState<DebugManageFactorSources.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<DebugManageFactorSources>) -> some View {
+		let destinationStore = store.destination
+		return importMnemonic(with: destinationStore)
+			.addLedger(with: destinationStore)
+	}
+
+	private func importMnemonic(with destinationStore: PresentationStoreOf<DebugManageFactorSources.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /DebugManageFactorSources.Destination.State.importMnemonic,
+			action: DebugManageFactorSources.Destination.Action.importMnemonic,
+			content: {
+				// We depend on `.toolbar` to display buttons on top of
+				// keyboard. And they are not displayed if we are not
+				// inside a NavigationView
+				ImportMnemonic.View(store: $0)
+					.inNavigationView
+			}
+		)
+	}
+
+	private func addLedger(with destinationStore: PresentationStoreOf<DebugManageFactorSources.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /DebugManageFactorSources.Destination.State.addLedger,
+			action: DebugManageFactorSources.Destination.Action.addLedger,
+			content: { AddLedgerFactorSource.View(store: $0) }
+		)
 	}
 }
 

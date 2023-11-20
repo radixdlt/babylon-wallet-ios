@@ -61,10 +61,6 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 		case confirmedEncryptionPassword
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
-	}
-
 	public enum InternalAction: Sendable, Equatable {
 		case focusTextField(State.Field?)
 
@@ -83,7 +79,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 
-	public struct Destination: Reducer, Sendable, Equatable {
+	public struct Destination: DestinationReducer {
 		public enum State: Hashable, Sendable {
 			case incorrectPasswordAlert(AlertState<Action.IncorrectPasswordAlert>)
 		}
@@ -107,20 +103,12 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case .destination(.presented(.incorrectPasswordAlert(.okTapped))):
-			state.destination = nil
-			return .none
-		default:
-			return .none
-		}
-	}
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -220,6 +208,14 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 			let errorMsg = "Failed to load profile snapshot to encrypt, error: \(error)"
 			loggerGlobal.error(.init(stringLiteral: errorMsg))
 			errorQueue.schedule(error)
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .incorrectPasswordAlert(.okTapped):
+			state.destination = nil
 			return .none
 		}
 	}

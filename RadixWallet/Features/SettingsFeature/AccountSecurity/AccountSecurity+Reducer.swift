@@ -11,14 +11,14 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		@PresentationState
-		public var destination: Destinations.State? = nil
+		public var destination: Destination.State? = nil
 		public var preferences: AppPreferences? = nil
 
 		public var canImportOlympiaWallet = false
 
 		public static let importOlympia = Self(destination: .importOlympiaWallet(.init()))
 
-		public init(destination: Destinations.State? = nil) {
+		public init(destination: Destination.State? = nil) {
 			self.destination = destination
 		}
 	}
@@ -39,15 +39,11 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		case canImportOlympiaAccountResult(Bool)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
-	}
-
 	public enum DelegateAction: Sendable, Equatable {
 		case gotoAccountList
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case mnemonics(DisplayMnemonics.State)
 			case ledgerHardwareWallets(LedgerHardwareDevices.State)
@@ -87,10 +83,12 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -139,9 +137,9 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(.importOlympiaWallet(.delegate(.finishedMigration(gotoAccountList))))):
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .importOlympiaWallet(.delegate(.finishedMigration(gotoAccountList))):
 			if gotoAccountList {
 				return .send(.delegate(.gotoAccountList))
 			} else {
@@ -149,16 +147,17 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case .destination(.dismiss):
-			if case let .depositGuarantees(depositGuarantees) = state.destination, let value = depositGuarantees.depositGuarantee {
-				state.preferences?.transaction.defaultDepositGuarantee = value
-				return savePreferences(state: state)
-			}
-			return .none
-
-		case .destination:
+		default:
 			return .none
 		}
+	}
+
+	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		if case let .depositGuarantees(depositGuarantees) = state.destination, let value = depositGuarantees.depositGuarantee {
+			state.preferences?.transaction.defaultDepositGuarantee = value
+			return savePreferences(state: state)
+		}
+		return .none
 	}
 
 	private func savePreferences(state: State) -> Effect<Action> {

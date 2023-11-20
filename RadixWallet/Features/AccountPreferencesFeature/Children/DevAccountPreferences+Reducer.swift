@@ -71,24 +71,20 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		#endif // DEBUG
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destination.Action>)
-	}
-
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
 	}
 
 	// MARK: - Destination
 
-	public struct Destination: Reducer {
-		public enum State: Equatable, Hashable {
+	public struct Destination: DestinationReducer {
+		public enum State: Hashable, Sendable {
 			#if DEBUG
 			case reviewTransaction(TransactionReview.State)
 			#endif // DEBUG
 		}
 
-		public enum Action: Equatable {
+		public enum Action: Equatable, Sendable {
 			#if DEBUG
 			case reviewTransaction(TransactionReview.Action)
 			#endif // DEBUG
@@ -117,10 +113,12 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -188,27 +186,6 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(action)):
-			switch action {
-			#if DEBUG
-			case .reviewTransaction(.delegate(.transactionCompleted)), .reviewTransaction(.delegate(.failed)):
-				if case .reviewTransaction = state.destination {
-					state.destination = nil
-				}
-				return .none
-			#endif
-
-			default:
-				return .none
-			}
-
-		default:
-			return .none
-		}
-	}
-
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .currentNetwork(currentNetwork):
@@ -260,6 +237,21 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 			return .none
 		#endif
 		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		#if DEBUG
+		switch presentedAction {
+		case .reviewTransaction(.delegate(.transactionCompleted)), .reviewTransaction(.delegate(.failed)):
+			if case .reviewTransaction = state.destination {
+				state.destination = nil
+			}
+			return .none
+
+		default:
+			return .none
+		}
+		#endif
 	}
 
 	private func call(

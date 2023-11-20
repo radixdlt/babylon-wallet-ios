@@ -3,7 +3,7 @@ import SwiftUI
 public struct OnboardingStartup: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		public init() {}
 	}
@@ -18,11 +18,7 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 		case completed
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
-	}
-
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case restoreFromBackup(RestoreProfileFromBackupCoordinator.State)
 		}
@@ -40,10 +36,12 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -56,12 +54,12 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case .destination(.presented(.restoreFromBackup(.delegate(.profileImported)))):
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .restoreFromBackup(.delegate(.profileImported)):
 			.send(.delegate(.completed))
 
-		case .destination(.presented(.restoreFromBackup(.delegate(.failedToImportProfileDueToMnemonics)))):
+		case .restoreFromBackup(.delegate(.failedToImportProfileDueToMnemonics)):
 			.none
 
 		default:

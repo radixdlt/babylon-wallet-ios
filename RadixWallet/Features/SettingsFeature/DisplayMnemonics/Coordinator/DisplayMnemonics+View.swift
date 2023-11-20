@@ -52,46 +52,38 @@ extension DisplayMnemonics {
 	}
 }
 
-extension View {
-	@MainActor
-	fileprivate func destinations(
-		with store: StoreOf<DisplayMnemonics>
-	) -> some View {
-		let destinationStore = store.scope(
-			state: \.$destination,
-			action: { .child(.destination($0)) }
-		)
+private extension StoreOf<DisplayMnemonics> {
+	var destination: PresentationStoreOf<DisplayMnemonics.Destination> {
+		func scopeState(state: State) -> PresentationState<DisplayMnemonics.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
 
-		return self
-			.displayMnemonicSheet(with: destinationStore)
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<DisplayMnemonics>) -> some View {
+		let destinationStore = store.destination
+		return displayMnemonicSheet(with: destinationStore)
 			.importMnemonicsSheet(with: destinationStore)
 	}
 
-	@MainActor
-	private func displayMnemonicSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destinations>) -> some View {
+	private func displayMnemonicSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /DisplayMnemonics.Destinations.State.displayMnemonic,
-			action: DisplayMnemonics.Destinations.Action.displayMnemonic,
-			destination: { displayStore in
-				DisplayMnemonic.View(store: displayStore)
-			}
+			state: /DisplayMnemonics.Destination.State.displayMnemonic,
+			action: DisplayMnemonics.Destination.Action.displayMnemonic,
+			destination: { DisplayMnemonic.View(store: $0) }
 		)
 	}
 
-	@MainActor
-	private func importMnemonicsSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destinations>) -> some View {
+	private func importMnemonicsSheet(with destinationStore: PresentationStoreOf<DisplayMnemonics.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /DisplayMnemonics.Destinations.State.importMnemonics,
-			action: DisplayMnemonics.Destinations.Action.importMnemonics,
-			destination: { importStore in
-				NavigationView {
-					ImportMnemonicsFlowCoordinator.View(
-						store: importStore
-					)
-				}
-			}
+			state: /DisplayMnemonics.Destination.State.importMnemonics,
+			action: DisplayMnemonics.Destination.Action.importMnemonics,
+			destination: { ImportMnemonicsFlowCoordinator.View(store: $0).inNavigationView }
 		)
 	}
 }

@@ -17,7 +17,7 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 		public var numberOfDaysUntilAutoConfirmation: RecoveryAutoConfirmDelayInDays
 
 		@PresentationState
-		var destination: Destinations.State? = nil
+		var destination: Destination.State? = nil
 
 		public init(mode: Mode) {
 			switch mode {
@@ -38,7 +38,7 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case factorsForPrimaryRole(FactorsForRole<PrimaryRoleTag>.State)
 			case factorsForRecoveryRole(FactorsForRole<RecoveryRoleTag>.State)
@@ -73,10 +73,6 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 		case finished(SecurityStructureConfigurationDetailed.Configuration)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
-	}
-
 	public enum DelegateAction: Sendable, Equatable {
 		case updatedOrCreatedSecurityStructure(TaskResult<SecurityStructureProduct>)
 	}
@@ -85,10 +81,12 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -125,19 +123,19 @@ public struct AdvancedManageSecurityStructureFlow: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(.factorsForPrimaryRole(.delegate(.confirmedRoleWithFactors(primaryRole))))):
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .factorsForPrimaryRole(.delegate(.confirmedRoleWithFactors(primaryRole))):
 			state.primaryRole = primaryRole
 			state.destination = nil
 			return .none
 
-		case let .destination(.presented(.factorsForRecoveryRole(.delegate(.confirmedRoleWithFactors(recoveryRole))))):
+		case let .factorsForRecoveryRole(.delegate(.confirmedRoleWithFactors(recoveryRole))):
 			state.recoveryRole = recoveryRole
 			state.destination = nil
 			return .none
 
-		case let .destination(.presented(.factorsForConfirmationRole(.delegate(.confirmedRoleWithFactors(confirmationRole))))):
+		case let .factorsForConfirmationRole(.delegate(.confirmedRoleWithFactors(confirmationRole))):
 			state.confirmationRole = confirmationRole
 			state.destination = nil
 			return .none

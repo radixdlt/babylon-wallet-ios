@@ -115,13 +115,12 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	public enum ChildAction: Sendable, Equatable {
 		case personas(PersonaList.Action)
-		case destination(PresentationAction<Destination.Action>)
 	}
 
 	// MARK: - Destination
 
-	public struct Destination: Reducer {
-		public enum State: Equatable, Hashable {
+	public struct Destination: DestinationReducer {
+		public enum State: Hashable, Sendable {
 			case personaDetails(PersonaDetails.State)
 			case fungibleDetails(FungibleTokenDetails.State)
 			case nonFungibleDetails(NonFungibleTokenDetails.State)
@@ -129,7 +128,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			case confirmDisconnectAlert(AlertState<Action.ConfirmDisconnectAlert>)
 		}
 
-		public enum Action: Equatable {
+		public enum Action: Equatable, Sendable {
 			case personaDetails(PersonaDetails.Action)
 			case fungibleDetails(FungibleTokenDetails.Action)
 			case nonFungibleDetails(NonFungibleTokenDetails.Action)
@@ -172,10 +171,12 @@ public struct DappDetails: Sendable, FeatureReducer {
 			PersonaList()
 		}
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -233,36 +234,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .destination(.presented(destinationAction)):
-			switch destinationAction {
-			case .personaDetails(.delegate(.personaDeauthorized)):
-				let dAppID = state.dAppDefinitionAddress
-				return update(dAppID: dAppID, dismissPersonaDetails: true)
-
-			case .personaDetails(.delegate(.personaChanged)):
-				let dAppID = state.dAppDefinitionAddress
-				return update(dAppID: dAppID, dismissPersonaDetails: false)
-
-			case .fungibleDetails(.delegate(.dismiss)):
-				state.destination = nil
-				return .none
-
-			case .nonFungibleDetails(.delegate(.dismiss)):
-				state.destination = nil
-				return .none
-
-			case .confirmDisconnectAlert(.confirmTapped):
-				assert(state.authorizedDapp != nil, "Can only disconnect a dApp that has been authorized")
-				guard let networkID = state.authorizedDapp?.networkID else { return .none }
-				return disconnectDappEffect(dAppID: state.dAppDefinitionAddress, networkID: networkID)
-
-			default:
-				return .none
-			}
-
-		case .destination:
-			return .none
-
 		case let .personas(.delegate(.openDetails(persona))):
 			guard let dApp = state.authorizedDapp, let detailedPersona = dApp.detailedAuthorizedPersonas[id: persona.id] else { return .none }
 			let personaDetailsState = PersonaDetails.State(.dApp(dApp, persona: detailedPersona))
@@ -305,6 +276,34 @@ public struct DappDetails: Sendable, FeatureReducer {
 			state.authorizedDapp = dApp
 			state.personaList = .init(dApp: dApp)
 
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .personaDetails(.delegate(.personaDeauthorized)):
+			let dAppID = state.dAppDefinitionAddress
+			return update(dAppID: dAppID, dismissPersonaDetails: true)
+
+		case .personaDetails(.delegate(.personaChanged)):
+			let dAppID = state.dAppDefinitionAddress
+			return update(dAppID: dAppID, dismissPersonaDetails: false)
+
+		case .fungibleDetails(.delegate(.dismiss)):
+			state.destination = nil
+			return .none
+
+		case .nonFungibleDetails(.delegate(.dismiss)):
+			state.destination = nil
+			return .none
+
+		case .confirmDisconnectAlert(.confirmTapped):
+			assert(state.authorizedDapp != nil, "Can only disconnect a dApp that has been authorized")
+			guard let networkID = state.authorizedDapp?.networkID else { return .none }
+			return disconnectDappEffect(dAppID: state.dAppDefinitionAddress, networkID: networkID)
+
+		default:
 			return .none
 		}
 	}
@@ -360,7 +359,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			let updatedDapp = try await authorizedDappsClient.getDetailedDapp(dAppID)
 			await send(.internal(.dAppUpdated(updatedDapp)))
 			if dismissPersonaDetails {
-				await send(.child(.destination(.dismiss)))
+				await send(.destination(.dismiss))
 			}
 		} catch: { error, _ in
 			errorQueue.schedule(error)

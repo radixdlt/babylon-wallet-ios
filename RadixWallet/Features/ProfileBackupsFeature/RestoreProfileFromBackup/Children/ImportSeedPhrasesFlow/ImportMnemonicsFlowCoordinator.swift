@@ -50,14 +50,14 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		public let context: Context
 
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		public init(context: Context = .notOnboarding) {
 			self.context = context
 		}
 	}
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case importMnemonicControllingAccounts(ImportMnemonicControllingAccounts.State)
 		}
@@ -74,10 +74,6 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 				ImportMnemonicControllingAccounts()
 			}
 		}
-	}
-
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -122,10 +118,12 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -201,9 +199,9 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(.importMnemonicControllingAccounts(.delegate(delegateAction)))):
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .importMnemonicControllingAccounts(.delegate(delegateAction)):
 			switch delegateAction {
 			case let .createdNewMainBDFS(skipped, newMainBDFS):
 				state.newMainBDFS = newMainBDFS
@@ -223,23 +221,24 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 				return .send(.delegate(.finishedEarly(dueToFailure: true)))
 			}
 
-		case .destination(.dismiss):
-			guard let destination = state.destination else {
-				return nextMnemonicIfNeeded(state: &state)
-			}
-
-			switch destination {
-			case let .importMnemonicControllingAccounts(substate):
-				if !substate.isMainBDFS {
-					return nextMnemonicIfNeeded(state: &state)
-				} else {
-					// Skipped a main bdfs by use of OS level gestures (thus bypassing warning)
-					return .send(.delegate(.finishedEarly(dueToFailure: true)))
-				}
-			}
-
 		default:
 			return .none
+		}
+	}
+
+	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		guard let destination = state.destination else {
+			return nextMnemonicIfNeeded(state: &state)
+		}
+
+		switch destination {
+		case let .importMnemonicControllingAccounts(substate):
+			if !substate.isMainBDFS {
+				return nextMnemonicIfNeeded(state: &state)
+			} else {
+				// Skipped a main bdfs by use of OS level gestures (thus bypassing warning)
+				return .send(.delegate(.finishedEarly(dueToFailure: true)))
+			}
 		}
 	}
 

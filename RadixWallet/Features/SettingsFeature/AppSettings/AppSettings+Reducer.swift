@@ -7,7 +7,7 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		public var preferences: AppPreferences?
 		var exportLogs: URL?
@@ -34,17 +34,13 @@ public struct AppSettings: Sendable, FeatureReducer {
 		case loadPreferences(AppPreferences)
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case destination(PresentationAction<Destinations.Action>)
-	}
-
 	public enum DelegateAction: Sendable, Equatable {
 		case deleteProfileAndFactorSources(keepInICloudIfPresent: Bool)
 	}
 
-	// MARK: Destinations
+	// MARK: Destination
 
-	public struct Destinations: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case manageP2PLinks(P2PLinksFeature.State)
 			case gatewaySettings(GatewaySettings.State)
@@ -83,10 +79,12 @@ public struct AppSettings: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -137,12 +135,12 @@ public struct AppSettings: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .destination(.presented(.profileBackupSettings(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))))):
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .profileBackupSettings(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))):
 			.send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent)))
 
-		case .destination:
+		default:
 			.none
 		}
 	}

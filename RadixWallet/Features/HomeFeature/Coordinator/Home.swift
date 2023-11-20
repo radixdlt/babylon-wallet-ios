@@ -5,7 +5,6 @@ import SwiftUI
 public struct Home: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		// MARK: - Components
-		public var header: Header.State
 		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State>
 
 		// MARK: - Destination
@@ -13,7 +12,6 @@ public struct Home: Sendable, FeatureReducer {
 		public var destination: Destination.State?
 
 		public init() {
-			self.header = .init()
 			self.accountRows = []
 			self.destination = nil
 		}
@@ -34,16 +32,14 @@ public struct Home: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case header(Header.Action)
 		case account(id: Home.AccountRow.State.ID, action: Home.AccountRow.Action)
-		case destination(PresentationAction<Destination.Action>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case displaySettings
 	}
 
-	public struct Destination: Sendable, Reducer {
+	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case accountDetails(AccountDetails.State)
 			case createAccount(CreateAccountCoordinator.State)
@@ -81,17 +77,16 @@ public struct Home: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.header, action: /Action.child .. ChildAction.header) {
-			Header()
-		}
 		Reduce(core)
 			.forEach(\.accountRows, action: /Action.child .. ChildAction.account) {
 				Home.AccountRow()
 			}
-			.ifLet(\.$destination, action: /Action.child .. ChildAction.destination) {
+			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -176,17 +171,24 @@ public struct Home: Sendable, FeatureReducer {
 				return importMnemonics(state: &state)
 			}
 
-		case let .destination(.presented(.accountDetails(.delegate(.exportMnemonic(controlledAccount))))):
+		default:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .accountDetails(.delegate(.exportMnemonic(controlledAccount))):
 			return dismissAccountDetails(then: .exportMnemonic(account: controlledAccount), &state)
 
-		case .destination(.presented(.accountDetails(.delegate(.importMnemonics)))):
+		case .accountDetails(.delegate(.importMnemonics)):
 			return dismissAccountDetails(then: .importMnemonic, &state)
 
-		case .destination(.presented(.accountDetails(.delegate(.dismiss)))):
+		case .accountDetails(.delegate(.dismiss)):
 			state.destination = nil
 			return .none
 
-		case let .destination(.presented(.exportMnemonic(.delegate(delegateAction)))):
+		case let .exportMnemonic(.delegate(delegateAction)):
 			state.destination = nil
 			switch delegateAction {
 			case .doneViewing:
@@ -197,7 +199,7 @@ public struct Home: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case let .destination(.presented(.importMnemonics(.delegate(delegateAction)))):
+		case let .importMnemonics(.delegate(delegateAction)):
 			state.destination = nil
 			switch delegateAction {
 			case .finishedEarly: break
@@ -224,10 +226,7 @@ public struct Home: Sendable, FeatureReducer {
 		return .none
 	}
 
-	private func exportMnemonic(
-		controlling account: Profile.Network.Account,
-		state: inout State
-	) -> Effect<Action> {
+	private func exportMnemonic(controlling account: Profile.Network.Account, state: inout State) -> Effect<Action> {
 		exportMnemonic(
 			controlling: account,
 			onSuccess: {

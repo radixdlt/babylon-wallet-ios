@@ -58,9 +58,7 @@ extension AuthorizedDapps.View {
 				}
 			}
 			.navigationTitle(L10n.AuthorizedDapps.title)
-			.navigationDestination(store: store.presentedDapp) { store in
-				DappDetails.View(store: store)
-			}
+			.destinations(with: store)
 		}
 	}
 }
@@ -81,8 +79,24 @@ extension AuthorizedDapps.State {
 	}
 }
 
-extension AuthorizedDapps.Store {
-	var presentedDapp: PresentationStoreOf<DappDetails> {
-		scope(state: \.$presentedDapp) { .child(.presentedDapp($0)) }
+private extension StoreOf<AuthorizedDapps> {
+	var destination: PresentationStoreOf<AuthorizedDapps.Destination> {
+		func scopeState(state: State) -> PresentationState<AuthorizedDapps.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<AuthorizedDapps>) -> some View {
+		let destinationStore = store.destination
+		return navigationDestination(
+			store: destinationStore,
+			state: /AuthorizedDapps.Destination.State.presentedDapp,
+			action: AuthorizedDapps.Destination.Action.presentedDapp,
+			destination: { DappDetails.View(store: $0) }
+		)
 	}
 }
