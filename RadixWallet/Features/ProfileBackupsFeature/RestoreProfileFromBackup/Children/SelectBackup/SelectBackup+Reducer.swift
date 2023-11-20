@@ -32,6 +32,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case selectedProfileHeader(ProfileSnapshot.Header?)
 		case importFromFileInstead
 		case dismissFileImporter
+		case otherRestoreOptionsTapped
 		case profileImportResult(Result<URL, NSError>)
 		case tappedUseCloudBackup(ProfileSnapshot.Header)
 	}
@@ -39,15 +40,20 @@ public struct SelectBackup: Sendable, FeatureReducer {
 	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.State)
+			case recoverWalletWithoutProfile(RecoverWalletWithoutProfile.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.Action)
+			case recoverWalletWithoutProfile(RecoverWalletWithoutProfile.Action)
 		}
 
 		public var body: some Reducer<State, Action> {
 			Scope(state: /State.inputEncryptionPassword, action: /Action.inputEncryptionPassword) {
 				EncryptOrDecryptProfile()
+			}
+			Scope(state: /State.recoverWalletWithoutProfile, action: /Action.recoverWalletWithoutProfile) {
+				RecoverWalletWithoutProfile()
 			}
 		}
 	}
@@ -95,6 +101,10 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 		case .importFromFileInstead:
 			state.isDisplayingFileImporter = true
+			return .none
+
+		case .otherRestoreOptionsTapped:
+			state.destination = .recoverWalletWithoutProfile(.init())
 			return .none
 
 		case let .selectedProfileHeader(header):
@@ -163,6 +173,10 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
+		case .recoverWalletWithoutProfile(.delegate(.dismiss)):
+			state.destination = nil
+			return .none
+
 		case .inputEncryptionPassword(.delegate(.dismiss)):
 			state.destination = nil
 			return .none
