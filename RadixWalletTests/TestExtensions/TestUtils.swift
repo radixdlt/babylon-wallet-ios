@@ -245,6 +245,7 @@ private func configureTestClients(
 	d.secureStorageClient.loadProfileHeaderList = { nil }
 	d.secureStorageClient.saveProfileHeaderList = { _ in }
 	d.secureStorageClient.deleteDeprecatedDeviceID = {}
+	d.secureStorageClient.containsMnemonicIdentifiedByFactorSourceID = { _ in true }
 	d.secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs = { _, _ in }
 	d.secureStorageClient.deleteMnemonicByFactorSourceID = { _ in }
 	d.secureStorageClient.saveMnemonicForFactorSource = { _ in }
