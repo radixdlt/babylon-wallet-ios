@@ -152,7 +152,7 @@ private extension View {
 			state: /DevAccountPreferences.Destination.State.reviewTransaction,
 			action: DevAccountPreferences.Destination.Action.reviewTransaction
 		) { store in
-			// FIXME: Should use DappInteractionClient intstead to schedule a transaction
+			// FIXME: Should use DappInteractionClient instead to schedule a transaction
 			NavigationView {
 				TransactionReview.View(store: store)
 			}

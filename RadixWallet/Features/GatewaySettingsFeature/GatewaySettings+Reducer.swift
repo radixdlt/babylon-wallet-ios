@@ -252,20 +252,8 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 				switch gatewayState.gateway {
 				case currentGateway:
-					// FIXME: Mainnet simply once mainnet is online....
-					let containsMainnet = state.gatewayList.gateways.map(\.gateway).contains(.mainnet)
-					let newCurrent: Radix.Gateway? = if containsMainnet {
-						Radix.Gateway.mainnet
-					} else {
-						Radix.Gateway.default
-					}
-
-					guard let newCurrent else {
-						return .none
-					}
-
 					state.gatewayForRemoval = gatewayState.gateway
-					return switchToGateway(&state, gateway: newCurrent)
+					return switchToGateway(&state, gateway: .mainnet)
 
 				default:
 					return .run { _ in
