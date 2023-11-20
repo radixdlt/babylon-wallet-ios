@@ -5,23 +5,30 @@ extension AccountPreferences.State {
 	var viewState: AccountPreferences.ViewState {
 		.init(
 			account: account,
-			sections: [
-				.init(
-					id: .personalize,
-					title: L10n.AccountSettings.personalizeHeading,
-					rows: [.accountLabel(account)]
-				),
-				.init(
-					id: .onLedgerBehaviour,
-					title: L10n.AccountSettings.setBehaviorHeading,
-					rows: [.thirdPartyDeposits(account.onLedgerSettings.thirdPartyDeposits.depositRule)]
-				),
-				.init(
-					id: .development,
-					title: L10n.AccountSettings.developmentHeading,
-					rows: [.devAccountPreferneces()]
-				),
-			]
+			sections: {
+				var sections: [AccountPreferences.ViewState.Section] = [
+					.init(
+						id: .personalize,
+						title: L10n.AccountSettings.personalizeHeading,
+						rows: [.accountLabel(account)]
+					),
+					.init(
+						id: .onLedgerBehaviour,
+						title: L10n.AccountSettings.setBehaviorHeading,
+						rows: [.thirdPartyDeposits(account.onLedgerSettings.thirdPartyDeposits.depositRule)]
+					),
+				]
+
+				if account.networkID != .mainnet {
+					sections.append(.init(
+						id: .development,
+						title: L10n.AccountSettings.developmentHeading,
+						rows: [.devAccountPreferneces()]
+					))
+				}
+
+				return sections
+			}()
 		)
 	}
 }
@@ -29,8 +36,9 @@ extension AccountPreferences.State {
 // MARK: - AccountPreferences.View
 extension AccountPreferences {
 	public struct ViewState: Equatable {
+		typealias Section = PreferenceSection<AccountPreferences.Section, AccountPreferences.Section.SectionRow>.ViewState
 		let account: Profile.Network.Account
-		var sections: [PreferenceSection<AccountPreferences.Section, AccountPreferences.Section.SectionRow>.ViewState]
+		var sections: [Section]
 	}
 
 	@MainActor

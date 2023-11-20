@@ -5,6 +5,7 @@ import SwiftUI
 public struct FungibleResourceAsset: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public typealias ID = String
+		static let defaultFee: RETDecimal = 1
 
 		public var id: ID {
 			resource.resourceAddress.address
@@ -57,6 +58,7 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 			public enum ChooseXRDAmountAlert: Hashable, Sendable {
 				case deductFee(RETDecimal)
 				case sendAll(RETDecimal)
+				case cancel
 			}
 
 			public enum NeedsToPayFeeFromOtherAccount: Hashable, Sendable {
@@ -88,16 +90,16 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 			let remainingAmount = (state.balance - sumOfOthers).clamped
 
 			if state.isXRD {
-				if remainingAmount >= 1 {
+				if remainingAmount >= State.defaultFee {
 					state.alert = .chooseXRDAmount(
-						feeDeductedAmount: remainingAmount - 1,
+						feeDeductedAmount: remainingAmount - State.defaultFee,
 						maxAmount: remainingAmount
 					)
-				} else {
+					return .none
+				} else if remainingAmount > 0 {
 					state.alert = .willNeedToPayFeeFromOtherAccount(remainingAmount)
+					return .none
 				}
-
-				return .none
 			}
 
 			state.transferAmount = remainingAmount
@@ -121,7 +123,8 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 				state.transferAmountStr = amount.formattedPlain(useGroupingSeparator: false)
 				return .send(.delegate(.amountChanged))
 
-			case .presented(.needsToPayFeeFromOtherAccount(.cancel)):
+			case .presented(.needsToPayFeeFromOtherAccount(.cancel)),
+			     .presented(.chooseXRDAmountAlert(.cancel)):
 				return .none
 
 			case .dismiss:
@@ -145,6 +148,10 @@ extension AlertState where Action == FungibleResourceAsset.ViewAction.Alert {
 				ButtonState.default(
 					TextState(L10n.AssetTransfer.MaxAmountDialog.sendAllButton(maxAmount.formatted())),
 					action: .send(.chooseXRDAmountAlert(.sendAll(maxAmount)))
+				),
+				ButtonState.default(
+					TextState(L10n.Common.cancel),
+					action: .send(.chooseXRDAmountAlert(.cancel))
 				),
 			]
 		)
