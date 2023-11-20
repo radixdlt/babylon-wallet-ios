@@ -53,6 +53,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case profileImported(skippedAnyMnemonic: Bool)
 		case failedToImportProfileDueToMnemonics
+		case backToStartOfOnboarding
 	}
 
 	@Dependency(\.backupsClient) var backupsClient

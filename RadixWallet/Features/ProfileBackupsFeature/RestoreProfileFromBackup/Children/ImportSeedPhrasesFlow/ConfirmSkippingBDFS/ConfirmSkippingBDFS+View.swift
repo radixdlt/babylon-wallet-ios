@@ -20,7 +20,7 @@ extension ConfirmSkippingBDFS {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(spacing: .medium2) {
+				VStack(spacing: .medium1) {
 					// FIXME: Strings
 					Text("No Main Seed Phrase?")
 						.textStyle(.sheetTitle)

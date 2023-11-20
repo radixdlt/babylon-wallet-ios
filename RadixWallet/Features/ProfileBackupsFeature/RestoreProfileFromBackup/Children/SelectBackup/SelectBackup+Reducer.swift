@@ -66,6 +66,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case selectedProfileSnapshot(ProfileSnapshot, isInCloud: Bool)
+		case backToStartOfOnboarding
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -176,6 +177,10 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case .recoverWalletWithoutProfile(.delegate(.dismiss)):
 			state.destination = nil
 			return .none
+
+		case .recoverWalletWithoutProfile(.delegate(.backToStartOfOnboarding)):
+			state.destination = nil
+			return .send(.delegate(.backToStartOfOnboarding))
 
 		case .inputEncryptionPassword(.delegate(.dismiss)):
 			state.destination = nil

@@ -1,6 +1,6 @@
-// MARK: - ___VARIABLE_featureName___
+// MARK: - RecoverWalletControlWithBDFSOnly
 
-public struct ___VARIABLE_featureName___: Sendable, FeatureReducer {
+public struct RecoverWalletControlWithBDFSOnly: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public init() {}
 	}

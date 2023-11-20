@@ -57,13 +57,17 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .restoreFromBackup(.delegate(.profileImported)):
-			.send(.delegate(.completed))
+			return .send(.delegate(.completed))
 
 		case .restoreFromBackup(.delegate(.failedToImportProfileDueToMnemonics)):
-			.none
+			return .none
+
+		case .restoreFromBackup(.delegate(.backToStartOfOnboarding)):
+			state.destination = nil
+			return .none
 
 		default:
-			.none
+			return .none
 		}
 	}
 }

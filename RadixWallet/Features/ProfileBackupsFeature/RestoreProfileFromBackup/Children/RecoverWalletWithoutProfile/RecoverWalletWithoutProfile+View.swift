@@ -21,11 +21,12 @@ extension RecoverWalletWithoutProfile {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
 				ScrollView {
-					VStack(alignment: .center, spacing: .large1) {
+					VStack(alignment: .center, spacing: .large3) {
 						Text("Recover Control Without Backup")
 							.textStyle(.sheetTitle)
 
 						Text("If you have no wallet backup in the cloud or as an exported backup file, you still have other restore options.")
+							.multilineTextAlignment(.leading)
 
 						Divider()
 
