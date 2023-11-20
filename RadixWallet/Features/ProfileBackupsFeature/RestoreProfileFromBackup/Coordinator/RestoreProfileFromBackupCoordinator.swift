@@ -92,6 +92,9 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 					))))
 			}
 
+		case .root(.selectBackup(.delegate(.backToStartOfOnboarding))):
+			return .send(.delegate(.backToStartOfOnboarding))
+
 		case let .path(.element(_, action: .importMnemonicsFlow(.delegate(.finishedImportingMnemonics(skipList, _, notYetSavedNewMainBDFS))))):
 			loggerGlobal.notice("Starting import snapshot process...")
 			guard let profileSelection = state.profileSelection else {
