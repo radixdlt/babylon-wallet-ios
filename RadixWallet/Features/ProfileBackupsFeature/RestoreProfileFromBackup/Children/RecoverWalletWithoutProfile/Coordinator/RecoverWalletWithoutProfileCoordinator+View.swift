@@ -1,16 +1,5 @@
-extension RecoverWalletWithoutProfileCoordinator.State {
-	var viewState: RecoverWalletWithoutProfileCoordinator.ViewState {
-		.init()
-	}
-}
-
 // MARK: - RecoverWalletWithoutProfileCoordinator.View
-
 public extension RecoverWalletWithoutProfileCoordinator {
-	struct ViewState: Equatable {
-		// TODO: declare some properties
-	}
-
 	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<RecoverWalletWithoutProfileCoordinator>
@@ -23,16 +12,10 @@ public extension RecoverWalletWithoutProfileCoordinator {
 			NavigationStackStore(
 				store.scope(state: \.path, action: { .child(.path($0)) })
 			) {
-				IfLetStore(
-					store.scope(state: \.root, action: { .child(.root($0)) })
-				) {
-					path(for: $0)
-				}
-
-				//                RecoverWalletWithoutProfileStart.View(store: store.scope(
-				//                    state: \.root,
-				//                    action: { .child(.root($0)) }
-				//                ))
+				RecoverWalletWithoutProfileStart.View(store: store.scope(
+					state: \.root,
+					action: { .child(.root($0)) }
+				))
 			} destination: {
 				path(for: $0)
 			}
@@ -43,13 +26,6 @@ public extension RecoverWalletWithoutProfileCoordinator {
 		) -> some SwiftUI.View {
 			SwitchStore(store) { state in
 				switch state {
-				case .recoverWalletWithoutProfileStart:
-					CaseLet(
-						/RecoverWalletWithoutProfileCoordinator.Path.State.recoverWalletWithoutProfileStart,
-						action: RecoverWalletWithoutProfileCoordinator.Path.Action.recoverWalletWithoutProfileStart,
-						then: { RecoverWalletWithoutProfileStart.View(store: $0) }
-					)
-
 				case .recoverWalletControlWithBDFSOnly:
 					CaseLet(
 						/RecoverWalletWithoutProfileCoordinator.Path.State.recoverWalletControlWithBDFSOnly,
