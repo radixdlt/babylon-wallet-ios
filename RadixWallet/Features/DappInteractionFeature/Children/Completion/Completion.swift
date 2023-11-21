@@ -15,4 +15,19 @@ struct Completion: Sendable, FeatureReducer {
 			self.dappMetadata = dappMetadata
 		}
 	}
+
+	enum ViewAction: Sendable, Equatable {
+		case dismissTapped
+	}
+
+	@Dependency(\.dismiss) var dismiss
+
+	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+		switch viewAction {
+		case .dismissTapped:
+			.run { _ in
+				await dismiss()
+			}
+		}
+	}
 }

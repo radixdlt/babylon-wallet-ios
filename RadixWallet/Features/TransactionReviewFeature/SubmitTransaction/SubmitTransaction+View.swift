@@ -82,6 +82,8 @@ extension SubmitTransaction {
 							Text(L10n.TransactionReview.SubmitTransaction.txID)
 							AddressView(.identifier(.transaction(viewStore.txID)))
 						}
+						.foregroundColor(.app.gray1)
+						.textStyle(.body1Regular)
 					}
 					.padding(.horizontal, .medium2)
 					.padding(.bottom, .medium3)
