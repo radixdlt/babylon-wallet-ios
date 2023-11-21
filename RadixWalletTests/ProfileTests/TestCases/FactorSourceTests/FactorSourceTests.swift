@@ -60,10 +60,16 @@ final class FactorSourceTests: TestCase {
 		XCTAssertEqual(factorSourceID.description, "device:41ac202687326a4fc6cb677e9fd92d08b91ce46c669950d58790d4d5e583adc0")
 	}
 
-	func test_factorSourceID_zoo_zoo__wrong() throws {
+	func test_factorSourceID_12w_zoo_zoo__wrong() throws {
 		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
 		XCTAssertEqual(try FactorSource.id(fromRoot: mnemonic.hdRoot(), factorSourceKind: .device).description, "device:09a501e4fafc7389202a82a3237a405ed191cdb8a4010124ff8e2c9259af1327")
 		XCTAssertEqual(try FactorSource.id(fromRoot: mnemonic.hdRoot(passphrase: "foo"), factorSourceKind: .device).description, "device:537b56b9881258f08994392e9858962825d92361b6b4775a3bdfeb4eecc0d069")
+	}
+
+	func test_factorSourceID_24w_zoo_zoo__vote() throws {
+		let mnemonic = try Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote", language: .english)
+		XCTAssertEqual(try FactorSource.id(fromRoot: mnemonic.hdRoot(), factorSourceKind: .device).description, "device:3bf4636876a9c795486194d2eaff32790961ed9005e18a7ebe677f0947b54087")
+		XCTAssertEqual(try FactorSource.id(fromRoot: mnemonic.hdRoot(passphrase: "foo"), factorSourceKind: .device).description, "device:883882e1d9d47b98090163bb4b369ae00349507693d856b1854de103dfe52793")
 	}
 
 	func test_factor_source_id_cap33() async throws {

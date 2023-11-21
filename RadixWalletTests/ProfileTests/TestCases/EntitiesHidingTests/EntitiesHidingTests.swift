@@ -40,7 +40,7 @@ final class EntitiesHidingTests: TestCase {
 
 	lazy var network = try! Profile.Network(
 		networkID: .mainnet,
-		accounts: .init(rawValue: [account0, account1])!,
+		accounts: [account0, account1].asIdentifiable(),
 		personas: [persona0, persona1],
 		authorizedDapps: [dApp0, dApp1]
 	)

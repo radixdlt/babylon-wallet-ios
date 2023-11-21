@@ -31,7 +31,7 @@ extension Profile {
 		} else {
 			let network = Profile.Network(
 				networkID: networkID,
-				accounts: .init(rawValue: [account])!,
+				accounts: [account].asIdentifiable(),
 				personas: [],
 				authorizedDapps: []
 			)

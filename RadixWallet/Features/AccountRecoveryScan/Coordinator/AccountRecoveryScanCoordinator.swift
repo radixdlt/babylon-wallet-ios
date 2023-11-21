@@ -96,9 +96,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 				guard let bdfsID = state.factorSourceID.extract(FactorSource.ID.FromHash.self) else {
 					fatalError("TODO error handling")
 				}
-				guard let accounts = Profile.Network.Accounts(active) else {
-					fatalError("TODO error handling")
-				}
+				let accounts = Array(active).asIdentifiable()
 				let recoveredAccountAndBDFS = AccountsRecoveredFromScanningUsingMnemonic(
 					accounts: accounts,
 					factorSourceIDOfBDFSAlreadySavedIntoKeychain: bdfsID

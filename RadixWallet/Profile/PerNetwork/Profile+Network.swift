@@ -15,7 +15,7 @@ extension Profile {
 		/// have been added and dApps connected.
 		public let networkID: NetworkID
 
-		public typealias Accounts = NonEmpty<IdentifiedArrayOf<Account>>
+		public typealias Accounts = IdentifiedArrayOf<Account>
 
 		/// An identifiable ordered set of `Account`s created by the user for this network.
 		private var accounts: Accounts
@@ -75,7 +75,7 @@ extension Profile.Network {
 	}
 
 	public mutating func hideAccounts(ids idsOfAccountsToHide: Set<Profile.Network.Account.ID>) {
-		var identifiedArrayOf = accounts.rawValue
+		var identifiedArrayOf = self.accounts
 		for id in idsOfAccountsToHide {
 			identifiedArrayOf[id: id]?.hide()
 
@@ -85,7 +85,7 @@ extension Profile.Network {
 				}
 			}
 		}
-		accounts = .init(rawValue: identifiedArrayOf)!
+		self.accounts = identifiedArrayOf
 	}
 }
 

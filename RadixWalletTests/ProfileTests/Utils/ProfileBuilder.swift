@@ -18,8 +18,19 @@ extension ProfileBuilder {
 	public func build(allowEmpty: Bool = false) -> Profile {
 		guard let bdfs else { fatalError("No BDFS, unable to create Profile.") }
 		let deviceInfo = DeviceInfo(description: "Builder", id: UUID(), date: .now)
-		let networksDictionary: OrderedDictionary<NetworkID, Profile.Network> = .init(uniqueKeysWithValues: self.networks.map {
-			(key: $0.id, value: Profile.Network(networkID: $0.id, accounts: .init(rawValue: $0.accounts)!, personas: [], authorizedDapps: []))
+		let networksDictionary: OrderedDictionary<
+			NetworkID,
+			Profile.Network
+		> = .init(uniqueKeysWithValues: self.networks.map {
+			(
+				key: $0.id,
+				value: Profile.Network(
+					networkID: $0.id,
+					accounts: $0.accounts,
+					personas: [],
+					authorizedDapps: []
+				)
+			)
 		})
 		if !allowEmpty {
 			assert(networksDictionary.keys.contains(.mainnet))

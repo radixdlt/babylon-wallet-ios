@@ -157,7 +157,7 @@ extension Profile {
 
 		let network = Profile.Network(
 			networkID: networkID,
-			accounts: .init(rawValue: accounts)!,
+			accounts: accounts,
 			personas: [],
 			authorizedDapps: []
 		)

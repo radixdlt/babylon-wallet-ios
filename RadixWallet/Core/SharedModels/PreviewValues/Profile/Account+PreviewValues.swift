@@ -43,7 +43,7 @@ extension Profile.Network.Account {
 }
 
 extension Profile.Network.Accounts {
-	public static let previewValue = Self(rawValue: .init(uniqueElements: [Profile.Network.Account.previewValue0, Profile.Network.Account.previewValue1]))!
+	public static let previewValue = [Profile.Network.Account.previewValue0, Profile.Network.Account.previewValue1].asIdentifiable()
 }
 
 #endif // DEBUG
