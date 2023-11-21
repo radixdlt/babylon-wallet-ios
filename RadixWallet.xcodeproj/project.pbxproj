@@ -21,6 +21,7 @@
 		48AE39E82B0CBEA800813CF3 /* AccountRecoveryScanEnd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39E62B0CBEA800813CF3 /* AccountRecoveryScanEnd.swift */; };
 		48AE39EC2B0CCA7600813CF3 /* RecoverWalletControlWithBDFSComplete+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39EA2B0CCA7600813CF3 /* RecoverWalletControlWithBDFSComplete+View.swift */; };
 		48AE39ED2B0CCA7600813CF3 /* RecoverWalletControlWithBDFSComplete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39EB2B0CCA7600813CF3 /* RecoverWalletControlWithBDFSComplete.swift */; };
+		48AE39F62B0D0C6B00813CF3 /* AccountsRecoveredFromScanningUsingMnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39F52B0D0C6B00813CF3 /* AccountsRecoveredFromScanningUsingMnemonic.swift */; };
 		48CFC2392ADC10D900E77A5C /* SecurityStructureConfigurationListCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBC632ADC10D800E77A5C /* SecurityStructureConfigurationListCoordinator+View.swift */; };
 		48CFC23A2ADC10D900E77A5C /* SecurityStructureConfigurationListCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBC642ADC10D800E77A5C /* SecurityStructureConfigurationListCoordinator.swift */; };
 		48CFC23B2ADC10D900E77A5C /* SecurityStructureConfigurationList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBC672ADC10D800E77A5C /* SecurityStructureConfigurationList.swift */; };
@@ -1354,6 +1355,7 @@
 		48AE39E62B0CBEA800813CF3 /* AccountRecoveryScanEnd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRecoveryScanEnd.swift; sourceTree = "<group>"; };
 		48AE39EA2B0CCA7600813CF3 /* RecoverWalletControlWithBDFSComplete+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecoverWalletControlWithBDFSComplete+View.swift"; sourceTree = "<group>"; };
 		48AE39EB2B0CCA7600813CF3 /* RecoverWalletControlWithBDFSComplete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverWalletControlWithBDFSComplete.swift; sourceTree = "<group>"; };
+		48AE39F52B0D0C6B00813CF3 /* AccountsRecoveredFromScanningUsingMnemonic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsRecoveredFromScanningUsingMnemonic.swift; sourceTree = "<group>"; };
 		48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Radix Wallet Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		48CFBC632ADC10D800E77A5C /* SecurityStructureConfigurationListCoordinator+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SecurityStructureConfigurationListCoordinator+View.swift"; sourceTree = "<group>"; };
 		48CFBC642ADC10D800E77A5C /* SecurityStructureConfigurationListCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecurityStructureConfigurationListCoordinator.swift; sourceTree = "<group>"; };
@@ -6338,6 +6340,7 @@
 				48CFC1AA2ADC10D900E77A5C /* EncryptedProfileSnapshot.swift */,
 				48CFC1AB2ADC10D900E77A5C /* ProfileSnapshot+Header.swift */,
 				48CFC1AC2ADC10D900E77A5C /* Profile+UTType.swift */,
+				48AE39F52B0D0C6B00813CF3 /* AccountsRecoveredFromScanningUsingMnemonic.swift */,
 			);
 			path = Snapshot;
 			sourceTree = "<group>";
@@ -8030,6 +8033,7 @@
 				48CFC49E2ADC10DA00E77A5C /* StateEntityDetailsOptIns.swift in Sources */,
 				48CFC4002ADC10D900E77A5C /* Constants.swift in Sources */,
 				48CFC4DE2ADC10DA00E77A5C /* FungibleResourcesCollectionItemVaultAggregatedVault.swift in Sources */,
+				48AE39F62B0D0C6B00813CF3 /* AccountsRecoveredFromScanningUsingMnemonic.swift in Sources */,
 				48CFC2782ADC10D900E77A5C /* P2PLinkRow+View.swift in Sources */,
 				48CFC4E82ADC10DA00E77A5C /* MetadataU8ArrayValueAllOf.swift in Sources */,
 				83EE478E2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI128.swift in Sources */,

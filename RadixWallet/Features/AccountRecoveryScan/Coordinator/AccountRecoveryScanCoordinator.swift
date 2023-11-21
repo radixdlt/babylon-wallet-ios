@@ -45,11 +45,18 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		case path(StackActionOf<Path>)
 	}
 
+	public enum InternalAction: Sendable, Equatable {
+		case createProfileResult(TaskResult<EqVoid>)
+		case addAccountsToExistingProfileResult(TaskResult<EqVoid>)
+	}
+
 	public enum DelegateAction: Sendable, Equatable {
 		case completed
 		case dismissed
 	}
 
+	@Dependency(\.onboardingClient) var onboardingClient
+	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.dismiss) var dismiss
 	public init() {}
 
@@ -64,6 +71,19 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 			}
 	}
 
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .addAccountsToExistingProfileResult(.success):
+			.send(.delegate(.completed))
+		case let .addAccountsToExistingProfileResult(.failure(error)):
+			fatalError("todo error handling")
+		case let .createProfileResult(.success):
+			.send(.delegate(.completed))
+		case let .createProfileResult(.failure(error)):
+			fatalError("todo error handling")
+		}
+	}
+
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .root(.delegate(.continue)):
@@ -71,9 +91,33 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case let .path(.element(_, action: .end(.delegate(.finishedAccountRecoveryScan(active, inactive))))):
-//			return .send(.delegate(.finishedAccountRecoveryScan(active: active, inactive: inactive)))
+			switch state.purpose {
+			case .createProfile:
+				guard let bdfsID = state.factorSourceID.extract(FactorSource.ID.FromHash.self) else {
+					fatalError("TODO error handling")
+				}
+				guard let accounts = Profile.Network.Accounts(active) else {
+					fatalError("TODO error handling")
+				}
+				let recoveredAccountAndBDFS = AccountsRecoveredFromScanningUsingMnemonic(
+					accounts: accounts,
+					factorSourceIDOfBDFSAlreadySavedIntoKeychain: bdfsID
+				)
+				return .run { send in
+					let result = await TaskResult<EqVoid> {
+						try await onboardingClient.finishOnboardingWithRecoveredAccountAndBDFS(recoveredAccountAndBDFS)
+					}
+					await send(.internal(.createProfileResult(result)))
+				}
+			case .addAccounts:
+				return .run { send in
+					let result = await TaskResult<EqVoid> {
+						try await accountsClient.saveVirtualAccounts(Array(active))
+					}
+					await send(.internal(.addAccountsToExistingProfileResult(result)))
+				}
+			}
 
-			return .send(.delegate(.completed))
 		default: return .none
 		}
 	}

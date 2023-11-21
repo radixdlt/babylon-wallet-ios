@@ -193,20 +193,49 @@ extension ProfileStore {
 	}
 
 	public func finishedOnboarding() async {
-		@Dependency(\.device) var device
-		let model = await device.model
-		let name = await device.name
-		let deviceDescription = DeviceInfo.deviceDescription(
-			name: name,
-			model: model
+		await updateDeviceInfo()
+	}
+
+	public func finishOnboarding(
+		with accountsRecoveredFromScanningUsingMnemonic: AccountsRecoveredFromScanningUsingMnemonic
+	) async throws {
+		@Dependency(\.uuid) var uuid
+		let (creatingDevice, model, name) = await updateDeviceInfo()
+		let factorSourceID = accountsRecoveredFromScanningUsingMnemonic.factorSourceIDOfBDFSAlreadySavedIntoKeychain
+		let bdfs = DeviceFactorSource(
+			id: factorSourceID,
+			common: .init(),
+			hint: .init(
+				name: name,
+				model: .init(
+					model
+				),
+				mnemonicWordCount: .twentyFour
+			)
 		)
-		deviceInfo.description = deviceDescription
-		let lastUsedOnDevice = deviceInfo
-		try? secureStorageClient.saveDeviceInfo(lastUsedOnDevice)
-		try? await updating {
-			$0.header.lastUsedOnDevice = lastUsedOnDevice
-			$0.header.creatingDevice.description = deviceDescription
-		}
+		let accounts = accountsRecoveredFromScanningUsingMnemonic.accounts
+		let network = Profile.Network(networkID: .mainnet, accounts: accounts, personas: [], authorizedDapps: [])
+		let profile = Profile(
+			header: .init(
+				creatingDevice: creatingDevice,
+				lastUsedOnDevice: creatingDevice,
+				id: uuid(),
+
+				lastModified: bdfs.addedOn,
+				contentHint: ProfileSnapshot.Header.ContentHint(
+					numberOfAccountsOnAllNetworksInTotal: accounts.count,
+					numberOfPersonasOnAllNetworksInTotal: 0,
+					numberOfNetworks: 1
+				)
+			),
+			deviceFactorSource: bdfs,
+			networks: .init(
+				network: network
+			)
+		)
+
+		// We can "piggyback" on importProfile! Same logic applies!
+		try importProfile(profile)
 	}
 
 	public func unlockedApp() async -> Profile {
@@ -260,6 +289,25 @@ extension ProfileStore {
 
 // MARK: Private
 extension ProfileStore {
+	@discardableResult
+	private func updateDeviceInfo() async -> (info: DeviceInfo, model: String, name: String) {
+		@Dependency(\.device) var device
+		let model = await device.model
+		let name = await device.name
+		let deviceDescription = DeviceInfo.deviceDescription(
+			name: name,
+			model: model
+		)
+		deviceInfo.description = deviceDescription
+		let lastUsedOnDevice = deviceInfo
+		try? secureStorageClient.saveDeviceInfo(lastUsedOnDevice)
+		try? await updating {
+			$0.header.lastUsedOnDevice = lastUsedOnDevice
+			$0.header.creatingDevice.description = deviceDescription
+		}
+		return (info: lastUsedOnDevice, model: model, name: name)
+	}
+
 	private func _deleteProfile(
 		keepInICloudIfPresent: Bool,
 		assertOwnership: Bool = true
