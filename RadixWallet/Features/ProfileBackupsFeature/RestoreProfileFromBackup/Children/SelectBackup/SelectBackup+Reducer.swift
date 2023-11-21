@@ -40,20 +40,20 @@ public struct SelectBackup: Sendable, FeatureReducer {
 	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.State)
-			case recoverWalletWithoutProfile(RecoverWalletWithoutProfile.State)
+			case recoverWalletWithoutProfileCoordinator(RecoverWalletWithoutProfileCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.Action)
-			case recoverWalletWithoutProfile(RecoverWalletWithoutProfile.Action)
+			case recoverWalletWithoutProfileCoordinator(RecoverWalletWithoutProfileCoordinator.Action)
 		}
 
 		public var body: some Reducer<State, Action> {
 			Scope(state: /State.inputEncryptionPassword, action: /Action.inputEncryptionPassword) {
 				EncryptOrDecryptProfile()
 			}
-			Scope(state: /State.recoverWalletWithoutProfile, action: /Action.recoverWalletWithoutProfile) {
-				RecoverWalletWithoutProfile()
+			Scope(state: /State.recoverWalletWithoutProfileCoordinator, action: /Action.recoverWalletWithoutProfileCoordinator) {
+				RecoverWalletWithoutProfileCoordinator()
 			}
 		}
 	}
@@ -105,7 +105,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			return .none
 
 		case .otherRestoreOptionsTapped:
-			state.destination = .recoverWalletWithoutProfile(.init())
+			state.destination = .recoverWalletWithoutProfileCoordinator(.init())
 			return .none
 
 		case let .selectedProfileHeader(header):
@@ -174,11 +174,11 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .recoverWalletWithoutProfile(.delegate(.dismiss)):
+		case .recoverWalletWithoutProfileCoordinator(.delegate(.dismiss)):
 			state.destination = nil
 			return .none
 
-		case .recoverWalletWithoutProfile(.delegate(.backToStartOfOnboarding)):
+		case .recoverWalletWithoutProfileCoordinator(.delegate(.backToStartOfOnboarding)):
 			state.destination = nil
 			return .send(.delegate(.backToStartOfOnboarding))
 

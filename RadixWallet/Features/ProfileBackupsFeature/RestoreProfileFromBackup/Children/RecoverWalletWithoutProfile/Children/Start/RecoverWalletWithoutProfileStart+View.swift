@@ -1,20 +1,20 @@
-extension RecoverWalletWithoutProfile.State {
-	var viewState: RecoverWalletWithoutProfile.ViewState {
+extension RecoverWalletWithoutProfileStart.State {
+	var viewState: RecoverWalletWithoutProfileStart.ViewState {
 		.init()
 	}
 }
 
-// MARK: - RecoverWalletWithoutProfile.View
-extension RecoverWalletWithoutProfile {
+// MARK: - RecoverWalletWithoutProfileStart.View
+extension RecoverWalletWithoutProfileStart {
 	public struct ViewState: Equatable {
 		// TODO: declare some properties
 	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<RecoverWalletWithoutProfile>
+		private let store: StoreOf<RecoverWalletWithoutProfileStart>
 
-		public init(store: StoreOf<RecoverWalletWithoutProfile>) {
+		public init(store: StoreOf<RecoverWalletWithoutProfileStart>) {
 			self.store = store
 		}
 
@@ -70,7 +70,7 @@ extension RecoverWalletWithoutProfile {
 
 @MainActor
 private extension View {
-	func destinations(with store: StoreOf<RecoverWalletWithoutProfile>) -> some View {
+	func destinations(with store: StoreOf<RecoverWalletWithoutProfileStart>) -> some View {
 		let destinationStore = store.destination
 		return self
 			.recoverWithBDFSOnly(with: destinationStore)
@@ -78,30 +78,30 @@ private extension View {
 	}
 
 	private func recoverWithBDFSOnly(
-		with destinationStore: PresentationStoreOf<RecoverWalletWithoutProfile.Destination>
+		with destinationStore: PresentationStoreOf<RecoverWalletWithoutProfileStart.Destination>
 	) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /RecoverWalletWithoutProfile.Destination.State.recoverWithBDFSOnly,
-			action: RecoverWalletWithoutProfile.Destination.Action.recoverWithBDFSOnly,
+			state: /RecoverWalletWithoutProfileStart.Destination.State.recoverWithBDFSOnly,
+			action: RecoverWalletWithoutProfileStart.Destination.Action.recoverWithBDFSOnly,
 			destination: { RecoverWalletControlWithBDFSOnly.View(store: $0) }
 		)
 	}
 
 	private func ledgerOrOlympiaOnlyAlert(
-		with destinationStore: PresentationStoreOf<RecoverWalletWithoutProfile.Destination>
+		with destinationStore: PresentationStoreOf<RecoverWalletWithoutProfileStart.Destination>
 	) -> some View {
 		alert(
 			store: destinationStore,
-			state: /RecoverWalletWithoutProfile.Destination.State.ledgerOrOlympiaOnlyAlert,
-			action: RecoverWalletWithoutProfile.Destination.Action.ledgerOrOlympiaOnlyAlert
+			state: /RecoverWalletWithoutProfileStart.Destination.State.ledgerOrOlympiaOnlyAlert,
+			action: RecoverWalletWithoutProfileStart.Destination.Action.ledgerOrOlympiaOnlyAlert
 		)
 	}
 }
 
-private extension StoreOf<RecoverWalletWithoutProfile> {
-	var destination: PresentationStoreOf<RecoverWalletWithoutProfile.Destination> {
-		func scopeState(state: State) -> PresentationState<RecoverWalletWithoutProfile.Destination.State> {
+private extension StoreOf<RecoverWalletWithoutProfileStart> {
+	var destination: PresentationStoreOf<RecoverWalletWithoutProfileStart.Destination> {
+		func scopeState(state: State) -> PresentationState<RecoverWalletWithoutProfileStart.Destination.State> {
 			state.$destination
 		}
 		return scope(state: scopeState, action: Action.destination)
@@ -114,16 +114,16 @@ import SwiftUI // NB: necessary for previews to appear
 // MARK: - RecoverWalletWithoutProfile_Preview
 struct RecoverWalletWithoutProfile_Preview: PreviewProvider {
 	static var previews: some View {
-		RecoverWalletWithoutProfile.View(
+		RecoverWalletWithoutProfileStart.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: RecoverWalletWithoutProfile.init
+				reducer: RecoverWalletWithoutProfileStart.init
 			)
 		)
 	}
 }
 
-extension RecoverWalletWithoutProfile.State {
+extension RecoverWalletWithoutProfileStart.State {
 	public static let previewValue = Self()
 }
 #endif

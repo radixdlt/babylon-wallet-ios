@@ -185,7 +185,7 @@ private extension View {
 		let destinationStore = store.destination
 		return self
 			.inputEncryptionPassword(with: destinationStore)
-			.recoverWalletWithoutProfile(with: destinationStore)
+			.recoverWalletWithoutProfileCoordinator(with: destinationStore)
 	}
 
 	private func inputEncryptionPassword(with destinationStore: PresentationStoreOf<SelectBackup.Destination>) -> some View {
@@ -197,12 +197,12 @@ private extension View {
 		)
 	}
 
-	private func recoverWalletWithoutProfile(with destinationStore: PresentationStoreOf<SelectBackup.Destination>) -> some View {
+	private func recoverWalletWithoutProfileCoordinator(with destinationStore: PresentationStoreOf<SelectBackup.Destination>) -> some View {
 		fullScreenCover(
 			store: destinationStore,
-			state: /SelectBackup.Destination.State.recoverWalletWithoutProfile,
-			action: SelectBackup.Destination.Action.recoverWalletWithoutProfile,
-			content: { RecoverWalletWithoutProfile.View(store: $0) }
+			state: /SelectBackup.Destination.State.recoverWalletWithoutProfileCoordinator,
+			action: SelectBackup.Destination.Action.recoverWalletWithoutProfileCoordinator,
+			content: { RecoverWalletWithoutProfileCoordinator.View(store: $0) }
 		)
 	}
 }

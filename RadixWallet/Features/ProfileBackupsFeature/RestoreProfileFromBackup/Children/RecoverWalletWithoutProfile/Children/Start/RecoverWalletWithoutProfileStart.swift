@@ -1,5 +1,5 @@
-// MARK: - RecoverWalletWithoutProfile
-public struct RecoverWalletWithoutProfile: Sendable, FeatureReducer {
+// MARK: - RecoverWalletWithoutProfileStart
+public struct RecoverWalletWithoutProfileStart: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		@PresentationState
 		var destination: Destination.State? = nil
@@ -70,9 +70,13 @@ public struct RecoverWalletWithoutProfile: Sendable, FeatureReducer {
 		case .ledgerOrOlympiaOnlyAlert(.cancelTapped):
 			state.destination = nil
 			return .none
+
 		case .ledgerOrOlympiaOnlyAlert(.continueTapped):
 			state.destination = nil
 			return .send(.delegate(.backToStartOfOnboarding))
+
+		case .recoverWithBDFSOnly(.delegate(.continue)):
+			return .none
 
 		default:
 			return .none

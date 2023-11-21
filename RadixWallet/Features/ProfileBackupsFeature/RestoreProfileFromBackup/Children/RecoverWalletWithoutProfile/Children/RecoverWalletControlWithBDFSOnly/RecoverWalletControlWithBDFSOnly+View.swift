@@ -20,12 +20,22 @@ public extension RecoverWalletControlWithBDFSOnly {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: RecoverWalletControlWithBDFSOnly")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
+				VStack(alignment: .leading, spacing: .medium2) {
+					Text("Recover Control Without Backup")
+						.textStyle(.sheetTitle)
+
+					Text("**If you have no wallet backup in the cloud or as an exported backup file**, you can still restore Account access only using your main “Babylon” seed phrase. You cannot recover your Account names or other wallet settings this way.\n\nYou will be asked to enter the primary seed phrase. There are **24 words** that the Radix Wallet mobile app showed you to write down and save securely.")
+
+					Spacer(minLength: 0)
+				}
+				.padding()
+				.footer {
+					Button("Continue") {
+						store.send(.view(.continueTapped))
+					}
+					.buttonStyle(.primaryRectangular)
+				}
 			}
 		}
 	}
