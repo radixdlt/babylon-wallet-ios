@@ -5,6 +5,11 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		public var root: RecoverWalletWithoutProfileStart.State
 		public var path: StackState<Path.State> = .init()
 
+		/// SHOULD be used to delete the mnemonic if user did not complete
+		/// the account recovery scanning flow. Will be added to Profile
+		/// as main BDFS if account recovery scanning flow is completed.
+		public var factorSourceOfImportedMnemonic: FactorSource?
+
 		@PresentationState
 		var destination: Destination.State? = nil
 
@@ -30,6 +35,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 			Scope(state: /State.recoverWalletControlWithBDFSOnly, action: /Action.recoverWalletControlWithBDFSOnly) {
 				RecoverWalletControlWithBDFSOnly()
 			}
+
 			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
 				ImportMnemonic()
 			}
@@ -67,6 +73,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		case profileCreatedFromImportedBDFS
 	}
 
+	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.device) var device
@@ -121,6 +128,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		case let .path(.element(_, action: .importMnemonic(.delegate(delegateAction)))):
 			switch delegateAction {
 			case let .persistedMnemonicInKeychainOnly(factorSource):
+				state.factorSourceOfImportedMnemonic = factorSource
 				state.destination = .accountRecoveryScanCoordinator(.init(factorSourceID: factorSource.id, purpose: .createProfile))
 				return .none
 
@@ -144,6 +152,19 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 			state.path.append(.recoveryComplete(.init()))
 			state.destination = nil
 			return .none
+
+		case .accountRecoveryScanCoordinator(.delegate(.dismissed)):
+			if
+				let factorSourceID = state.factorSourceOfImportedMnemonic?.id,
+				let deviceFactorSourceID = factorSourceID.extract(FactorSource.ID.FromHash.self)
+			{
+				loggerGlobal.notice("We did not finish Account Recovery Scan Flow. Deleting mnemonic from keychain for safety reasons.")
+				// We did not complete account recovery scan => delete the mnemonic from
+				// keychain for security reasons.
+				try? secureStorageClient.deleteMnemonicByFactorSourceID(deviceFactorSourceID)
+			}
+			return .send(.delegate(.dismiss))
+
 		default: return .none
 		}
 	}
