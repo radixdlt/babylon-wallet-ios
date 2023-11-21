@@ -132,7 +132,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 					fatalError("error handling")
 				}
 				state.factorSourceOfImportedMnemonic = factorSource
-				state.destination = .accountRecoveryScanCoordinator(.init(purpose: .createProfile(fromHash), promptForSelectionOfInactiveAccounts: true))
+				state.destination = .accountRecoveryScanCoordinator(.init(purpose: .createProfile(fromHash), promptForSelectionOfInactiveAccountsIfAny: true))
 				return .none
 
 			default:

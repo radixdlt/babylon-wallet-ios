@@ -17,6 +17,7 @@ public struct SelectInactiveAccountsToAdd: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case doneTapped
+		case selectedAccountsChanged([ChooseAccountsRow.State]?)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -30,8 +31,15 @@ public struct SelectInactiveAccountsToAdd: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
+		case let .selectedAccountsChanged(rows):
+			if let rows {
+				state.selectedInactive = rows.map(\.account).asIdentifiable()
+			} else {
+				state.selectedInactive = []
+			}
+			return .none
 		case .doneTapped:
-			.send(
+			return .send(
 				.delegate(
 					.finished(
 						selectedInactive: state.selectedInactive,

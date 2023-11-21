@@ -2,6 +2,22 @@
 // MARK: - SelectInactiveAccountsToAdd.View
 
 public extension SelectInactiveAccountsToAdd {
+	struct ViewState: Equatable {
+		let availableAccounts: [ChooseAccountsRow.State]
+		let selectionRequirement: SelectionRequirement
+		let selectedAccounts: [ChooseAccountsRow.State]?
+
+		init(state: SelectInactiveAccountsToAdd.State) {
+			let selectionRequirement = SelectionRequirement.atLeast(0)
+			func map(_ account: Profile.Network.Account) -> ChooseAccountsRow.State {
+				.init(account: account, mode: .checkmark)
+			}
+			self.availableAccounts = state.inactive.map(map)
+			self.selectionRequirement = selectionRequirement
+			self.selectedAccounts = state.selectedInactive.map(map)
+		}
+	}
+
 	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<SelectInactiveAccountsToAdd>
@@ -11,28 +27,30 @@ public extension SelectInactiveAccountsToAdd {
 		}
 
 		public var body: some SwiftUI.View {
-//			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-//				ScrollView {
-//					VStack(spacing: .medium3) {
-//
-//						Text("Found these accounts")
-//						.foregroundColor(.app.gray1)
-//						.multilineTextAlignment(.center)
-//
-//					}
-//					.padding(.bottom, .medium3)
-//				}
-//				.footer {
-//					Button(viewStore.buttonTitle) {
-//						viewStore.send(.continueButtonTapped)
-//					}
-//					.buttonStyle(.primaryRectangular)
-//				}
-//				.onAppear {
-//					viewStore.send(.appeared)
-//				}
-//			}
-			Text("Select inactive accounts")
+			WithViewStore(
+				store,
+				observe: SelectInactiveAccountsToAdd.ViewState.init,
+				send: { .view($0) }
+			) { viewStore in
+				ScrollView {
+					VStack(spacing: .small1) {
+						Selection(
+							viewStore.binding(
+								get: \.selectedAccounts,
+								send: { .selectedAccountsChanged($0) }
+							),
+							from: viewStore.availableAccounts,
+							requiring: viewStore.selectionRequirement
+						) { item in
+							ChooseAccountsRow.View(
+								viewState: .init(state: item.value),
+								isSelected: item.isSelected,
+								action: item.action
+							)
+						}
+					}
+				}
+			}
 		}
 	}
 }

@@ -4,7 +4,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		/// Create new Profile or add accounts
 		public let purpose: Purpose
-		public let promptForSelectionOfInactiveAccounts: Bool
+		public let promptForSelectionOfInactiveAccountsIfAny: Bool
 
 		public var root: AccountRecoveryScanInProgress.State
 		public var path: StackState<Path.State> = .init()
@@ -15,9 +15,9 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 			case addAccounts(FactorSourceID)
 		}
 
-		public init(purpose: Purpose, promptForSelectionOfInactiveAccounts: Bool) {
+		public init(purpose: Purpose, promptForSelectionOfInactiveAccountsIfAny: Bool) {
 			self.purpose = purpose
-			self.promptForSelectionOfInactiveAccounts = promptForSelectionOfInactiveAccounts
+			self.promptForSelectionOfInactiveAccountsIfAny = promptForSelectionOfInactiveAccountsIfAny
 			self.root = .init()
 		}
 	}
@@ -85,11 +85,11 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .addAccountsToExistingProfileResult(.success):
+		case .addAccountsToExistingProfileResult(.success):
 			.send(.delegate(.completed))
 		case let .addAccountsToExistingProfileResult(.failure(error)):
 			fatalError("todo error handling")
-		case let .createProfileResult(.success):
+		case .createProfileResult(.success):
 			.send(.delegate(.completed))
 		case let .createProfileResult(.failure(error)):
 			fatalError("todo error handling")
@@ -99,7 +99,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .root(.delegate(.foundAccounts(active, inactive))):
-			if state.promptForSelectionOfInactiveAccounts {
+			if state.promptForSelectionOfInactiveAccountsIfAny, !inactive.isEmpty {
 				state.path.append(.selectInactiveAccountsToAdd(.init(active: active, inactive: inactive)))
 				return .none
 			} else {
