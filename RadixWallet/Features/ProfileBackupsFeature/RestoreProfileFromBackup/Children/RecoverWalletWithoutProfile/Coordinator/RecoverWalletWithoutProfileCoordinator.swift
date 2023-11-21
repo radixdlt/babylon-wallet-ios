@@ -5,6 +5,9 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		public var root: RecoverWalletWithoutProfileStart.State
 		public var path: StackState<Path.State> = .init()
 
+		@PresentationState
+		var destination: Destination.State? = nil
+
 		public init() {
 			self.root = .init()
 		}
@@ -14,13 +17,11 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case recoverWalletControlWithBDFSOnly(RecoverWalletControlWithBDFSOnly.State)
 			case importMnemonic(ImportMnemonic.State)
-			case accountRecoveryScanCoordinator(AccountRecoveryScanCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case recoverWalletControlWithBDFSOnly(RecoverWalletControlWithBDFSOnly.Action)
 			case importMnemonic(ImportMnemonic.Action)
-			case accountRecoveryScanCoordinator(AccountRecoveryScanCoordinator.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -30,6 +31,19 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
 				ImportMnemonic()
 			}
+		}
+	}
+
+	public struct Destination: DestinationReducer {
+		public enum State: Hashable, Sendable {
+			case accountRecoveryScanCoordinator(AccountRecoveryScanCoordinator.State)
+		}
+
+		public enum Action: Equatable, Sendable {
+			case accountRecoveryScanCoordinator(AccountRecoveryScanCoordinator.Action)
+		}
+
+		public var body: some ReducerOf<Self> {
 			Scope(state: /State.accountRecoveryScanCoordinator, action: /Action.accountRecoveryScanCoordinator) {
 				AccountRecoveryScanCoordinator()
 			}
@@ -53,7 +67,6 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.device) var device
-//	@Dependency(\.secureStorageClient) var secureStorageClient
 
 	public init() {}
 
@@ -63,17 +76,22 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		}
 
 		Reduce(core)
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
+			}
 			.forEach(\.path, action: /Action.child .. ChildAction.path) {
 				Path()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .privateHDFactorSourceToScanWithResult(result):
 			switch result {
 			case let .success(privateHDFactorSource):
-				state.path.append(.accountRecoveryScanCoordinator(.init(context: .restoreWalletWithOnlyBDFS(privateHDFactorSource))))
+				state.destination = .accountRecoveryScanCoordinator(.init(context: .restoreWalletWithOnlyBDFS(privateHDFactorSource)))
 			case let .failure(error):
 				loggerGlobal.error("Failed to create PrivateHDFactorSource from imported mnemonic, error: \(error)")
 				errorQueue.schedule(error)

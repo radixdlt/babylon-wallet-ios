@@ -49,23 +49,3 @@ private extension View {
 		)
 	}
 }
-
-// #if DEBUG
-// import SwiftUI
-import ComposableArchitecture //
-//// MARK: - SecurityStructureConfigurationList_Preview
-// struct SecurityStructureConfigurationList_Preview: PreviewProvider {
-//	static var previews: some View {
-//		SecurityStructureConfigurationListCoordinator.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: SecurityStructureConfigurationListCoordinator.init
-//			)
-//		)
-//	}
-// }
-//
-// extension SecurityStructureConfigurationListCoordinator.State {
-//	public static let previewValue = Self()
-// }
-// #endif

@@ -19,6 +19,7 @@ public extension RecoverWalletWithoutProfileCoordinator {
 			} destination: {
 				path(for: $0)
 			}
+			.destinations(with: store)
 		}
 
 		private func path(
@@ -38,36 +39,35 @@ public extension RecoverWalletWithoutProfileCoordinator {
 						action: RecoverWalletWithoutProfileCoordinator.Path.Action.importMnemonic,
 						then: { ImportMnemonic.View(store: $0) }
 					)
-
-				case .accountRecoveryScanCoordinator:
-					CaseLet(
-						/RecoverWalletWithoutProfileCoordinator.Path.State.accountRecoveryScanCoordinator,
-						action: RecoverWalletWithoutProfileCoordinator.Path.Action.accountRecoveryScanCoordinator,
-						then: { AccountRecoveryScanCoordinator.View(store: $0) }
-					)
 				}
 			}
 		}
 	}
 }
 
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-// MARK: - RecoverWalletWithoutProfileCoordinator_Preview
-
-struct RecoverWalletWithoutProfileCoordinator_Preview: PreviewProvider {
-	static var previews: some View {
-		RecoverWalletWithoutProfileCoordinator.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: RecoverWalletWithoutProfileCoordinator.init
-			)
-		)
+private extension StoreOf<RecoverWalletWithoutProfileCoordinator> {
+	var destination: PresentationStoreOf<RecoverWalletWithoutProfileCoordinator.Destination> {
+		func scopeState(state: State) -> PresentationState<RecoverWalletWithoutProfileCoordinator.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
 
-public extension RecoverWalletWithoutProfileCoordinator.State {
-	static let previewValue = Self()
+private extension View {
+	@MainActor
+	func destinations(with store: StoreOf<RecoverWalletWithoutProfileCoordinator>) -> some View {
+		let destinationStore = store.destination
+		return accountRecoveryScanCoordinator(with: destinationStore)
+	}
+
+	@MainActor
+	private func accountRecoveryScanCoordinator(with destinationStore: PresentationStoreOf<RecoverWalletWithoutProfileCoordinator.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /RecoverWalletWithoutProfileCoordinator.Destination.State.accountRecoveryScanCoordinator,
+			action: RecoverWalletWithoutProfileCoordinator.Destination.Action.accountRecoveryScanCoordinator,
+			content: { AccountRecoveryScanCoordinator.View(store: $0) }
+		)
+	}
 }
-#endif
