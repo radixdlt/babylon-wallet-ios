@@ -13,6 +13,12 @@
 		48AB4E842AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AB4E832AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift */; };
 		48ABCF402AE54A1F00D6E87F /* iOS-dev-test.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */; };
 		48AE39D12B0CBC3400813CF3 /* RecoverWalletWithoutProfileCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39D02B0CBC3400813CF3 /* RecoverWalletWithoutProfileCoordinator.swift */; };
+		48AE39DC2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39DA2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator.swift */; };
+		48AE39DD2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39DB2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator+View.swift */; };
+		48AE39E12B0CBE8200813CF3 /* AccountRecoveryScanStart+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39DF2B0CBE8200813CF3 /* AccountRecoveryScanStart+View.swift */; };
+		48AE39E22B0CBE8200813CF3 /* AccountRecoveryScanStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39E02B0CBE8200813CF3 /* AccountRecoveryScanStart.swift */; };
+		48AE39E72B0CBEA800813CF3 /* AccountRecoveryScanEnd+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39E52B0CBEA800813CF3 /* AccountRecoveryScanEnd+View.swift */; };
+		48AE39E82B0CBEA800813CF3 /* AccountRecoveryScanEnd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39E62B0CBEA800813CF3 /* AccountRecoveryScanEnd.swift */; };
 		48CFC2392ADC10D900E77A5C /* SecurityStructureConfigurationListCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBC632ADC10D800E77A5C /* SecurityStructureConfigurationListCoordinator+View.swift */; };
 		48CFC23A2ADC10D900E77A5C /* SecurityStructureConfigurationListCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBC642ADC10D800E77A5C /* SecurityStructureConfigurationListCoordinator.swift */; };
 		48CFC23B2ADC10D900E77A5C /* SecurityStructureConfigurationList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBC672ADC10D800E77A5C /* SecurityStructureConfigurationList.swift */; };
@@ -1338,6 +1344,12 @@
 		48AB4E832AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileStore+AsyncSequence+Updates.swift"; sourceTree = "<group>"; };
 		48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "iOS-dev-test.xcconfig"; sourceTree = "<group>"; };
 		48AE39D02B0CBC3400813CF3 /* RecoverWalletWithoutProfileCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecoverWalletWithoutProfileCoordinator.swift; sourceTree = "<group>"; };
+		48AE39DA2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountRecoveryScanCoordinator.swift; sourceTree = "<group>"; };
+		48AE39DB2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AccountRecoveryScanCoordinator+View.swift"; sourceTree = "<group>"; };
+		48AE39DF2B0CBE8200813CF3 /* AccountRecoveryScanStart+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountRecoveryScanStart+View.swift"; sourceTree = "<group>"; };
+		48AE39E02B0CBE8200813CF3 /* AccountRecoveryScanStart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRecoveryScanStart.swift; sourceTree = "<group>"; };
+		48AE39E52B0CBEA800813CF3 /* AccountRecoveryScanEnd+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountRecoveryScanEnd+View.swift"; sourceTree = "<group>"; };
+		48AE39E62B0CBEA800813CF3 /* AccountRecoveryScanEnd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRecoveryScanEnd.swift; sourceTree = "<group>"; };
 		48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Radix Wallet Dev.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		48CFBC632ADC10D800E77A5C /* SecurityStructureConfigurationListCoordinator+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SecurityStructureConfigurationListCoordinator+View.swift"; sourceTree = "<group>"; };
 		48CFBC642ADC10D800E77A5C /* SecurityStructureConfigurationListCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecurityStructureConfigurationListCoordinator.swift; sourceTree = "<group>"; };
@@ -2687,6 +2699,51 @@
 			path = RadixWalletTests;
 			sourceTree = "<group>";
 		};
+		48AE39D82B0CBE3900813CF3 /* AccountRecoveryScan */ = {
+			isa = PBXGroup;
+			children = (
+				48AE39DE2B0CBE3F00813CF3 /* Children */,
+				48AE39D92B0CBE3900813CF3 /* Coordinator */,
+			);
+			path = AccountRecoveryScan;
+			sourceTree = "<group>";
+		};
+		48AE39D92B0CBE3900813CF3 /* Coordinator */ = {
+			isa = PBXGroup;
+			children = (
+				48AE39DA2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator.swift */,
+				48AE39DB2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator+View.swift */,
+			);
+			path = Coordinator;
+			sourceTree = "<group>";
+		};
+		48AE39DE2B0CBE3F00813CF3 /* Children */ = {
+			isa = PBXGroup;
+			children = (
+				48AE39E42B0CBE9500813CF3 /* AccountRecoveryScanEnd */,
+				48AE39E32B0CBE8900813CF3 /* AccountRecoveryScanStart */,
+			);
+			path = Children;
+			sourceTree = "<group>";
+		};
+		48AE39E32B0CBE8900813CF3 /* AccountRecoveryScanStart */ = {
+			isa = PBXGroup;
+			children = (
+				48AE39DF2B0CBE8200813CF3 /* AccountRecoveryScanStart+View.swift */,
+				48AE39E02B0CBE8200813CF3 /* AccountRecoveryScanStart.swift */,
+			);
+			path = AccountRecoveryScanStart;
+			sourceTree = "<group>";
+		};
+		48AE39E42B0CBE9500813CF3 /* AccountRecoveryScanEnd */ = {
+			isa = PBXGroup;
+			children = (
+				48AE39E52B0CBEA800813CF3 /* AccountRecoveryScanEnd+View.swift */,
+				48AE39E62B0CBEA800813CF3 /* AccountRecoveryScanEnd.swift */,
+			);
+			path = AccountRecoveryScanEnd;
+			sourceTree = "<group>";
+		};
 		48CFBC462ADC106300E77A5C = {
 			isa = PBXGroup;
 			children = (
@@ -2729,6 +2786,7 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				48AE39D82B0CBE3900813CF3 /* AccountRecoveryScan */,
 				830EA9D42AE94014004C8051 /* AccountAndPersonaHidingFeature */,
 				48CFBC612ADC10D800E77A5C /* SecurityStructureConfigurationList */,
 				48CFBC6C2ADC10D800E77A5C /* AccountPreferencesFeature */,
@@ -7805,6 +7863,7 @@
 				48CFC4662ADC10DA00E77A5C /* AccountPortfoliosClient+Mock.swift in Sources */,
 				48CFC2F02ADC10D900E77A5C /* AddLedgerFactorSource+View.swift in Sources */,
 				48CFC62E2ADC10DA00E77A5C /* ProfileSnapshot.swift in Sources */,
+				48AE39E12B0CBE8200813CF3 /* AccountRecoveryScanStart+View.swift in Sources */,
 				48CFC46F2ADC10DA00E77A5C /* AppPreferencesClient+Live.swift in Sources */,
 				48CFC5B02ADC10DA00E77A5C /* TransferNFTView.swift in Sources */,
 				48CFC36F2ADC10D900E77A5C /* FungibleAssetList+View.swift in Sources */,
@@ -8292,6 +8351,7 @@
 				48CFC42C2ADC10DA00E77A5C /* Unit.swift in Sources */,
 				48CFC6622ADC10DB00E77A5C /* FactorSource.swift in Sources */,
 				48CFC2602ADC10D900E77A5C /* EditPersonaEntry+View.swift in Sources */,
+				48AE39E22B0CBE8200813CF3 /* AccountRecoveryScanStart.swift in Sources */,
 				48CFC2E92ADC10D900E77A5C /* SimpleCreateSecurityStructureFlow+View.swift in Sources */,
 				48CFC3782ADC10D900E77A5C /* LSUStake.swift in Sources */,
 				48CFC5162ADC10DA00E77A5C /* EntityNotFoundError.swift in Sources */,
@@ -8410,6 +8470,7 @@
 				48CFC3342ADC10D900E77A5C /* PreviewedFeature.swift in Sources */,
 				83EE478C2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueMapEntry.swift in Sources */,
 				48CFC3272ADC10D900E77A5C /* ScanQRCoordinator+Reducer.swift in Sources */,
+				48AE39DC2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator.swift in Sources */,
 				48CFC5762ADC10DA00E77A5C /* TransactionReceiptStatus.swift in Sources */,
 				48CFC5DE2ADC10DA00E77A5C /* OnFirstTaskViewModifier.swift in Sources */,
 				48CFC4F92ADC10DA00E77A5C /* OptionalNonFungibleIdsCollection.swift in Sources */,
@@ -8739,6 +8800,7 @@
 				48CFC5802ADC10DA00E77A5C /* BackupsClient+Live.swift in Sources */,
 				48CFC6082ADC10DA00E77A5C /* AccountsRequestResponseItem.swift in Sources */,
 				48CFC3992ADC10D900E77A5C /* TXID.swift in Sources */,
+				48AE39E82B0CBEA800813CF3 /* AccountRecoveryScanEnd.swift in Sources */,
 				48CFC59A2ADC10DA00E77A5C /* HitTargetSize.swift in Sources */,
 				48CFC68A2ADC10DB00E77A5C /* AppPreferences+Display.swift in Sources */,
 				48CFC2C12ADC10D900E77A5C /* AssetTransfer+Reducer.swift in Sources */,
@@ -8835,6 +8897,7 @@
 				48CFC6352ADC10DB00E77A5C /* AccountHierarchicalDeterministicDerivationPath.swift in Sources */,
 				48CFC5342ADC10DA00E77A5C /* MetadataNonFungibleGlobalIdValueAllOf.swift in Sources */,
 				48CFC5492ADC10DA00E77A5C /* StreamTransactionsRequestEventFilterItem.swift in Sources */,
+				48AE39E72B0CBEA800813CF3 /* AccountRecoveryScanEnd+View.swift in Sources */,
 				48CFC4092ADC10DA00E77A5C /* FiatCurrency.swift in Sources */,
 				48CFC5CA2ADC10DA00E77A5C /* FlowLayout.swift in Sources */,
 				48CFC5502ADC10DA00E77A5C /* StateValidatorsListRequest.swift in Sources */,
@@ -8843,6 +8906,7 @@
 				48CFC4E42ADC10DA00E77A5C /* MetadataPublicKeyValue.swift in Sources */,
 				83EE479A2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI32.swift in Sources */,
 				48CFC5BE2ADC10DA00E77A5C /* RoundedCornerBackground.swift in Sources */,
+				48AE39DD2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator+View.swift in Sources */,
 				48CFC2FA2ADC10D900E77A5C /* NewPersonaCompletion+View.swift in Sources */,
 				48CFC3702ADC10D900E77A5C /* FungibleAssetList+Reducer.swift in Sources */,
 				48CFC52E2ADC10DA00E77A5C /* NonFungibleIdsCollectionAllOf.swift in Sources */,
