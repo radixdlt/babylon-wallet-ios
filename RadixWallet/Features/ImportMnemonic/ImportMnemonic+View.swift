@@ -152,6 +152,12 @@ extension ImportMnemonic {
 							)
 							.padding(.horizontal, .medium2)
 							.padding(.bottom, .medium2)
+
+							Button("DEBUG ONLY use 'zoo...vote'") {
+								viewStore.send(.debugZooVote)
+							}
+							.buttonStyle(.secondaryRectangular(isDestructive: true))
+							.padding(.bottom, .medium1)
 						}
 						#endif
 
