@@ -16,17 +16,18 @@ public struct RecoverWalletWithoutProfileStart: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
 		case backToStartOfOnboarding
+		case recoverWithBDFSOnly
 	}
 
 	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case ledgerOrOlympiaOnlyAlert(AlertState<Action.LedgerOrOlympiaOnlyAction>)
-			case recoverWithBDFSOnly(RecoverWalletControlWithBDFSOnly.State)
+//			case recoverWithBDFSOnly(RecoverWalletControlWithBDFSOnly.State)
 		}
 
 		public enum Action: Sendable, Hashable {
 			case ledgerOrOlympiaOnlyAlert(LedgerOrOlympiaOnlyAction)
-			case recoverWithBDFSOnly(RecoverWalletControlWithBDFSOnly.Action)
+//			case recoverWithBDFSOnly(RecoverWalletControlWithBDFSOnly.Action)
 
 			public enum LedgerOrOlympiaOnlyAction {
 				case cancelTapped
@@ -35,9 +36,10 @@ public struct RecoverWalletWithoutProfileStart: Sendable, FeatureReducer {
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.recoverWithBDFSOnly, action: /Action.recoverWithBDFSOnly) {
-				RecoverWalletControlWithBDFSOnly()
-			}
+//			Scope(state: /State.recoverWithBDFSOnly, action: /Action.recoverWithBDFSOnly) {
+//				RecoverWalletControlWithBDFSOnly()
+//			}
+			EmptyReducer()
 		}
 	}
 
@@ -46,8 +48,9 @@ public struct RecoverWalletWithoutProfileStart: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .recoverWithBDFSTapped:
-			state.destination = .recoverWithBDFSOnly(.init())
-			return .none
+//			state.destination = .recoverWithBDFSOnly(.init())
+//			return .none
+			return .send(.delegate(.recoverWithBDFSOnly))
 
 		case .ledgerOnlyOrOlympiaOnlyTapped:
 			state.destination = .ledgerOrOlympiaOnlyAlert(.init(
@@ -75,8 +78,8 @@ public struct RecoverWalletWithoutProfileStart: Sendable, FeatureReducer {
 			state.destination = nil
 			return .send(.delegate(.backToStartOfOnboarding))
 
-		case .recoverWithBDFSOnly(.delegate(.continue)):
-			return .none
+//		case .recoverWithBDFSOnly(.delegate(.continue)):
+//			return .none
 
 		default:
 			return .none
