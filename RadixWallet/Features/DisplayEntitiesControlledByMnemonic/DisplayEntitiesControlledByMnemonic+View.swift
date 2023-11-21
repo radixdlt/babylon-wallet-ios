@@ -95,17 +95,18 @@ extension DisplayEntitiesControlledByMnemonic {
 						)
 					}
 
-					if viewStore.accounts.isEmpty {
-						if viewStore.hasHiddenAccounts {
-							NoContentView("Hidden Accounts only.") // FIXME: Strings
-						}
-					} else {
+					if !viewStore.accounts.isEmpty {
 						VStack(alignment: .leading, spacing: .small3) {
 							ForEach(viewStore.accounts) { account in
 								SmallAccountCard(account: account)
 									.cornerRadius(.small1)
 							}
 						}
+					} else if viewStore.hasHiddenAccounts {
+						NoContentView("Hidden Accounts only.") // FIXME: Strings
+							.frame(maxWidth: .infinity)
+							.frame(height: .huge2)
+							.padding(.vertical, .medium1)
 					}
 				}
 			}
