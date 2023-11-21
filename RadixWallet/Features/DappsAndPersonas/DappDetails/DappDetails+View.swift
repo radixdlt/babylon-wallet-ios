@@ -81,6 +81,9 @@ private extension View {
 	func destinations(with store: StoreOf<DappDetails>) -> some View {
 		let destinationStore = store.destination
 		return personaDetails(with: destinationStore)
+			.fungibleDetails(with: destinationStore)
+			.nonFungibleDetails(with: destinationStore)
+			.confirmDisconnectAlert(with: destinationStore)
 	}
 
 	private func personaDetails(with destinationStore: PresentationStoreOf<DappDetails.Destination>) -> some View {

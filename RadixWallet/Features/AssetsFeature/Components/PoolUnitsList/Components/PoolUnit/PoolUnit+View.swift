@@ -70,8 +70,12 @@ extension PoolUnitResourceViewState {
 	) -> NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>> {
 		func redemptionValue(for resourceDetails: OnLedgerEntitiesClient.ResourceWithVaultAmount) -> String {
 			guard let poolUnitTotalSupply = resourcesDetails.poolUnitResource.resource.totalSupply else {
-				loggerGlobal.error("Missing total supply for \(resourcesDetails.poolUnitResource.resource.totalSupply)")
+				loggerGlobal.error("Missing total supply for \(resourcesDetails.poolUnitResource.resource.resourceAddress.address)")
 				return L10n.Account.PoolUnits.noTotalSupply
+			}
+			guard poolUnitTotalSupply > 0 else {
+				loggerGlobal.error("Total supply is 0 for \(resourcesDetails.poolUnitResource.resource.resourceAddress.address)")
+				return "Total supply is 0 - could not calculate redemption value" // FIXME: strings
 			}
 			let redemptionValue = poolUnit.resource.amount * (resourceDetails.amount / poolUnitTotalSupply)
 			let decimalPlaces = resourceDetails.resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
