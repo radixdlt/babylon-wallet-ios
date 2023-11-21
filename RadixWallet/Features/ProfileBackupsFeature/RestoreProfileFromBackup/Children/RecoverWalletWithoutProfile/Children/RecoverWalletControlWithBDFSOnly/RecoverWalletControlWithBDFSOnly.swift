@@ -18,7 +18,7 @@ public struct RecoverWalletControlWithBDFSOnly: Sendable, FeatureReducer {
 	public func reduce(into _: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .continueTapped:
-			.none
+			.send(.delegate(.continue))
 		}
 	}
 }
