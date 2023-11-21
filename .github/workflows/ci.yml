@@ -150,19 +150,19 @@ jobs:
           aws-region: "eu-west-2"
           role-session-name: 'babylon-wallet-ios-${{ github.run_id }}-${{ github.run_attempt }}'
       - name: Fetch AWS secrets
-        uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
+        uses: aws-actions/aws-secretsmanager-get-secrets@022e8919774ecb75e8e375656d7b1898936ab878 # v1.0.4
         with:
           secret-ids: |
             WALLET, ${{ secrets.AWS_SECRET_NAME_WALLET }}
           parse-json-secrets: true
       - name: Fetch AWS secrets
-        uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
+        uses: aws-actions/aws-secretsmanager-get-secrets@022e8919774ecb75e8e375656d7b1898936ab878 # v1.0.4
         with:
           secret-ids: |
             SWIFT_ENGINE_TOOLKIT_SSH_KEY, ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
           parse-json-secrets: true
       - name: Fetch AWS secrets
-        uses: aws-actions/aws-secretsmanager-get-secrets@287592d14d9c9c48199db83dc182ae12af3df18e # v1.0.1
+        uses: aws-actions/aws-secretsmanager-get-secrets@022e8919774ecb75e8e375656d7b1898936ab878 # v1.0.4
         with:
           secret-ids: |
             FASTLANE_MATCH_REPO_SSH_KEY, ${{ secrets.AWS_SECRET_NAME_WALLET_FASTLANE_SSH }}
