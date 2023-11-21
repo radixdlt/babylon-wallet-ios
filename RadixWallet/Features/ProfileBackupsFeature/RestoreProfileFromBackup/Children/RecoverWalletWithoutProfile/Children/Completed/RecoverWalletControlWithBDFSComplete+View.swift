@@ -21,20 +21,22 @@ public extension RecoverWalletControlWithBDFSComplete {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
-				VStack {
+				VStack(alignment: .leading, spacing: .medium1) {
 					Text("Recovery completed")
+						.textStyle(.sheetTitle)
 
 					Text("Accounts discovered in the scan have been added to your wallet.\n\nIf you have any Olympia or “Legacy” Accounts to import - or any Accounts using a Ledger hardware wallet device - please use the **Account Recovery Scan** option in your Radix Wallet settings under **Account Security**.")
+						.textStyle(.body1Regular)
 
 					Spacer(minLength: 0)
-
-					Button("Continue") {
-						store.send(.view(.continueTapped))
-					}.buttonStyle(.secondaryRectangular)
 				}
 				.padding()
-				.background(Color.blue)
-				.foregroundColor(.white)
+				.footer {
+					Button("Continue") {
+						store.send(.view(.continueTapped))
+					}
+					.buttonStyle(.primaryRectangular)
+				}
 			}
 		}
 	}

@@ -22,12 +22,17 @@ public extension AccountRecoveryScanStart {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
 				VStack {
-					Text("AccountRecScan START")
+					Spacer(minLength: 0)
+					Text("Account Recovery Scan START")
+					Spacer(minLength: 0)
 
 					Button("Continue") {
 						store.send(.view(.continueTapped))
 					}.buttonStyle(.secondaryRectangular)
+
+					Spacer(minLength: 0)
 				}
+				.frame(maxWidth: .infinity, maxHeight: .infinity)
 				.padding()
 				.background(Color.blue)
 				.foregroundColor(.white)

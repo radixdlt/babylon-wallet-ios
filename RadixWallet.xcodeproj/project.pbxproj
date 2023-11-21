@@ -2748,13 +2748,13 @@
 			path = AccountRecoveryScanEnd;
 			sourceTree = "<group>";
 		};
-		48AE39E92B0CCA6000813CF3 /* RecoverWalletControlWithBDFSComplete */ = {
+		48AE39E92B0CCA6000813CF3 /* Completed */ = {
 			isa = PBXGroup;
 			children = (
 				48AE39EA2B0CCA7600813CF3 /* RecoverWalletControlWithBDFSComplete+View.swift */,
 				48AE39EB2B0CCA7600813CF3 /* RecoverWalletControlWithBDFSComplete.swift */,
 			);
-			path = RecoverWalletControlWithBDFSComplete;
+			path = Completed;
 			sourceTree = "<group>";
 		};
 		48CFBC462ADC106300E77A5C = {
@@ -6807,8 +6807,8 @@
 		48D8897A2B0C878C00DB4880 /* Children */ = {
 			isa = PBXGroup;
 			children = (
-				48AE39E92B0CCA6000813CF3 /* RecoverWalletControlWithBDFSComplete */,
-				E657773E2B0BAF77002DB237 /* RecoverWalletControlWithBDFSOnly */,
+				48AE39E92B0CCA6000813CF3 /* Completed */,
+				E657773E2B0BAF77002DB237 /* Info */,
 				48D8897B2B0C879300DB4880 /* Start */,
 			);
 			path = Children;
@@ -6916,13 +6916,13 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		E657773E2B0BAF77002DB237 /* RecoverWalletControlWithBDFSOnly */ = {
+		E657773E2B0BAF77002DB237 /* Info */ = {
 			isa = PBXGroup;
 			children = (
 				E657773A2B0BAB35002DB237 /* RecoverWalletControlWithBDFSOnly+View.swift */,
 				E657773B2B0BAB35002DB237 /* RecoverWalletControlWithBDFSOnly.swift */,
 			);
-			path = RecoverWalletControlWithBDFSOnly;
+			path = Info;
 			sourceTree = "<group>";
 		};
 		E66EEB9D2B066966007624BC /* RecoverWalletWithoutProfile */ = {
