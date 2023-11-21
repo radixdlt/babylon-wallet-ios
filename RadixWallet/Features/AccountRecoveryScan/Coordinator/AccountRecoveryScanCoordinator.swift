@@ -12,13 +12,26 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		/// Create new Profile or add accounts
 		public enum Purpose: Sendable, Hashable {
 			case createProfile(FactorSourceID.FromHash)
-			case addAccounts(FactorSourceID)
+			case addAccounts(FactorSourceID, offset: Int)
+			var factorSourceID: FactorSourceID {
+				switch self {
+				case let .createProfile(fromHash): fromHash.embed()
+				case let .addAccounts(id, _): id
+				}
+			}
+
+			var offset: Int {
+				switch self {
+				case .createProfile: 0
+				case let .addAccounts(_, offset): offset
+				}
+			}
 		}
 
 		public init(purpose: Purpose, promptForSelectionOfInactiveAccountsIfAny: Bool) {
 			self.purpose = purpose
 			self.promptForSelectionOfInactiveAccountsIfAny = promptForSelectionOfInactiveAccountsIfAny
-			self.root = .init()
+			self.root = .init(factorSourceID: purpose.factorSourceID, offset: purpose.offset)
 		}
 	}
 

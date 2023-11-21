@@ -1,14 +1,22 @@
 extension AccountRecoveryScanInProgress.State {
 	var viewState: AccountRecoveryScanInProgress.ViewState {
-		.init()
+		.init(
+			active: active,
+			hasFoundAnyAccounts: !active.isEmpty || !inactive.isEmpty
+		)
 	}
 }
 
 // MARK: - AccountRecoveryScanInProgress.View
-
+public let accRecScanBatchSizePerReq = 25
+public let accRecScanBatchSize = accRecScanBatchSizePerReq * 2
 public extension AccountRecoveryScanInProgress {
 	struct ViewState: Equatable {
-		// TODO: declare some properties
+		let active: IdentifiedArrayOf<Profile.Network.Account>
+		let hasFoundAnyAccounts: Bool
+		var title: String {
+			hasFoundAnyAccounts ? "Scan Complete" : "Scan in progress"
+		}
 	}
 
 	@MainActor
@@ -20,19 +28,36 @@ public extension AccountRecoveryScanInProgress {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack {
-					Spacer(minLength: 0)
-					Text("Account Recovery Scan START")
-					Spacer(minLength: 0)
+					Text(viewStore.title)
 
+					if viewStore.active.isEmpty {
+						Text("Scanning for Accounst that have been included in at least on transaction, using:")
+						Text("Babylon Seed Phrase")
+					} else {
+						VStack(alignment: .leading, spacing: .small3) {
+							ForEach(viewStore.active) { account in
+								SmallAccountCard(account: account)
+									.cornerRadius(.small1)
+							}
+						}
+						Text("The first \(accRecScanBatchSize) potential accounts from this signing factor were scanned.")
+
+						Button("Tap here to scan the next \(accRecScanBatchSize)") {
+							store.send(.view(.scanMore))
+						}.buttonStyle(.secondaryRectangular)
+					}
+				}
+				.padding()
+				.footer {
 					Button("Continue") {
 						store.send(.view(.continueTapped))
 					}.buttonStyle(.secondaryRectangular)
-
-					Spacer(minLength: 0)
 				}
-				.padding()
+				.onAppear {
+					store.send(.view(.appear))
+				}
 			}
 		}
 	}
