@@ -61,10 +61,6 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		case path(StackActionOf<Path>)
 	}
 
-	public enum InternalAction: Sendable, Equatable {
-		case privateHDFactorSourceToScanWithResult(TaskResult<PrivateHDFactorSource>)
-	}
-
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
 		case backToStartOfOnboarding
@@ -92,23 +88,6 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 	}
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
-
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
-		case let .privateHDFactorSourceToScanWithResult(result):
-			switch result {
-			case let .success(privateHDFactorSource):
-//				state.destination = .accountRecoveryScanCoordinator(.init(context: .restoreWalletWithOnlyBDFS(privateHDFactorSource)))
-				//                self.destination = .accountRecoveryScanCoordinator(<#T##AccountRecoveryScanCoordinator.State#>)
-				return .none
-			case let .failure(error):
-				loggerGlobal.error("Failed to create PrivateHDFactorSource from imported mnemonic, error: \(error)")
-				errorQueue.schedule(error)
-				_ = state.path.popLast()
-			}
-			return .none
-		}
-	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
@@ -139,7 +118,6 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 			)
 			return .none
 
-//		case let .path(.element(_, action: .importMnemonic(.delegate(.notPersisted(mnemonicWithPassphrase))))):
 		case let .path(.element(_, action: .importMnemonic(.delegate(delegateAction)))):
 			switch delegateAction {
 			case let .persistedMnemonicInKeychainOnly(factorSource):
@@ -152,22 +130,6 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 				assertionFailure(errorMsg)
 				return .send(.delegate(.dismiss))
 			}
-
-//			return .run { send in
-//				let result = await TaskResult {
-//					let model = await device.model
-//					let name = await device.name
-//					return try PrivateHDFactorSource(
-//						mnemonicWithPassphrase: mnemonicWithPassphrase,
-//						factorSource: DeviceFactorSource.babylon(
-//							mnemonicWithPassphrase: mnemonicWithPassphrase,
-//							model: .init(model),
-//							name: .init(name)
-//						)
-//					)
-//				}
-//				await send(.internal(.privateHDFactorSourceToScanWithResult(result)))
-//			}
 
 		case .path(.element(_, action: .recoveryComplete(.delegate(.profileCreatedFromImportedBDFS)))):
 			return .send(.delegate(.profileCreatedFromImportedBDFS))
