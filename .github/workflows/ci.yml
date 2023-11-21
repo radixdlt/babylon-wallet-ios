@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
           node-version: '14'
       - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
@@ -66,7 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
           node-version: '14'
       - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
@@ -212,7 +212,7 @@ jobs:
       - snyk_sbom
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
           node-version: '14'
       - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
