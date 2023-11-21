@@ -40,6 +40,10 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
+	public enum ViewAction: Sendable, Equatable {
+		case closeTapped
+	}
+
 	public enum ChildAction: Sendable, Equatable {
 		case root(AccountRecoveryScanStart.Action)
 		case path(StackActionOf<Path>)
@@ -69,6 +73,16 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 			.forEach(\.path, action: /Action.child .. ChildAction.path) {
 				Path()
 			}
+	}
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+		switch viewAction {
+		case .closeTapped:
+			.run { send in
+				await dismiss()
+				await send(.delegate(.dismissed))
+			}
+		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {

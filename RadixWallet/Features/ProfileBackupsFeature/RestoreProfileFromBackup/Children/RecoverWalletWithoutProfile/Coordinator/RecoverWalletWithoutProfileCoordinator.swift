@@ -154,18 +154,26 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case .accountRecoveryScanCoordinator(.delegate(.dismissed)):
-			if
-				let factorSourceID = state.factorSourceOfImportedMnemonic?.id,
-				let deviceFactorSourceID = factorSourceID.extract(FactorSource.ID.FromHash.self)
-			{
-				loggerGlobal.notice("We did not finish Account Recovery Scan Flow. Deleting mnemonic from keychain for safety reasons.")
-				// We did not complete account recovery scan => delete the mnemonic from
-				// keychain for security reasons.
-				try? secureStorageClient.deleteMnemonicByFactorSourceID(deviceFactorSourceID)
-			}
-			return .send(.delegate(.dismiss))
+			return deleteSavedUnusedMnemonic(state: state)
 
 		default: return .none
 		}
+	}
+
+	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		deleteSavedUnusedMnemonic(state: state)
+	}
+
+	private func deleteSavedUnusedMnemonic(state: State) -> Effect<Action> {
+		if
+			let factorSourceID = state.factorSourceOfImportedMnemonic?.id,
+			let deviceFactorSourceID = factorSourceID.extract(FactorSource.ID.FromHash.self)
+		{
+			loggerGlobal.notice("We did not finish Account Recovery Scan Flow. Deleting mnemonic from keychain for safety reasons.")
+			// We did not complete account recovery scan => delete the mnemonic from
+			// keychain for security reasons.
+			try? secureStorageClient.deleteMnemonicByFactorSourceID(deviceFactorSourceID)
+		}
+		return .send(.delegate(.dismiss))
 	}
 }

@@ -16,6 +16,13 @@ public extension AccountRecoveryScanCoordinator {
 					state: \.root,
 					action: { .child(.root($0)) }
 				))
+				.toolbar {
+					ToolbarItem(placement: .cancellationAction) {
+						CloseButton {
+							self.store.send(.view(.closeTapped))
+						}
+					}
+				}
 			} destination: {
 				path(for: $0)
 			}
@@ -32,6 +39,13 @@ public extension AccountRecoveryScanCoordinator {
 						action: AccountRecoveryScanCoordinator.Path.Action.end,
 						then: { AccountRecoveryScanEnd.View(store: $0) }
 					)
+				}
+			}
+			.toolbar {
+				ToolbarItem(placement: .cancellationAction) {
+					CloseButton {
+						self.store.send(.view(.closeTapped))
+					}
 				}
 			}
 		}

@@ -70,7 +70,7 @@ private extension View {
 
 	@MainActor
 	private func accountRecoveryScanCoordinator(with destinationStore: PresentationStoreOf<RecoverWalletWithoutProfileCoordinator.Destination>) -> some View {
-		sheet(
+		fullScreenCover(
 			store: destinationStore,
 			state: /RecoverWalletWithoutProfileCoordinator.Destination.State.accountRecoveryScanCoordinator,
 			action: RecoverWalletWithoutProfileCoordinator.Destination.Action.accountRecoveryScanCoordinator,
