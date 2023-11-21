@@ -2,20 +2,24 @@
 
 public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let context: Context
+		/// ID of factor to derive public keys with (addresses)
+		public let factorSourceID: FactorSourceID
+
+		/// Create new Profile or add accounts
+		public let purpose: Purpose
+
 		public var root: AccountRecoveryScanStart.State
 		public var path: StackState<Path.State> = .init()
 
-		public enum Context: Sendable, Hashable {
-			/// From onboarding
-			case restoreWalletWithOnlyBDFS(PrivateHDFactorSource)
-
-			/// From settings
-			case scanForMoreAccounts(FactorSourceID) // will need to load FactorSource from `factorSourcesClient`
+		/// Create new Profile or add accounts
+		public enum Purpose: Sendable, Hashable {
+			case createProfile
+			case addAccounts
 		}
 
-		public init(context: Context) {
-			self.context = context
+		public init(factorSourceID: FactorSourceID, purpose: Purpose) {
+			self.factorSourceID = factorSourceID
+			self.purpose = purpose
 			self.root = .init()
 		}
 	}
@@ -42,10 +46,8 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case finishedAccountRecoveryScan(
-			active: OrderedSet<Profile.Network.Account>,
-			inactive: OrderedSet<Profile.Network.Account>
-		)
+		case completed
+		case dismissed
 	}
 
 	@Dependency(\.dismiss) var dismiss
@@ -69,8 +71,9 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case let .path(.element(_, action: .end(.delegate(.finishedAccountRecoveryScan(active, inactive))))):
-			return .send(.delegate(.finishedAccountRecoveryScan(active: active, inactive: inactive)))
+//			return .send(.delegate(.finishedAccountRecoveryScan(active: active, inactive: inactive)))
 
+			return .send(.delegate(.completed))
 		default: return .none
 		}
 	}

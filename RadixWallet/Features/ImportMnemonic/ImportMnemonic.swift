@@ -137,7 +137,11 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 			public let mnemonicForFactorSourceKind: MnemonicBasedFactorSourceKind
 			public let location: Location
-			public init(mnemonicForFactorSourceKind: MnemonicBasedFactorSourceKind, location: Location) {
+
+			public init(
+				mnemonicForFactorSourceKind: MnemonicBasedFactorSourceKind,
+				location: Location
+			) {
 				self.mnemonicForFactorSourceKind = mnemonicForFactorSourceKind
 				self.location = location
 			}
@@ -259,8 +263,15 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
+		public struct IntermediaryResult: Sendable, Equatable {
+			public let factorSource: FactorSource
+			public let savedIntoProfile: Bool
+		}
+
 		case focusNext(ImportMnemonicWord.State.ID)
-		case saveFactorSourceResult(TaskResult<FactorSource>)
+		case saveFactorSourceResult(
+			TaskResult<IntermediaryResult>
+		)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -269,7 +280,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case persistedNewFactorSourceInProfile(FactorSource)
-		case persistedMnemonicInKeychainOnly(MnemonicWithPassphrase, FactorSourceID.FromHash)
+		case persistedMnemonicInKeychainOnly(FactorSource)
 		case notPersisted(MnemonicWithPassphrase)
 		case doneViewing(idOfBackedUpFactorSource: FactorSource.ID.FromHash?) // `nil` means it was already marked as backed up
 	}
@@ -479,10 +490,13 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				return .run { send in
 					await send(.internal(.saveFactorSourceResult(
 						TaskResult {
-							try await factorSourcesClient.addOnDeviceFactorSource(
+							let saveIntoProfile = true
+							let factorSource = try await factorSourcesClient.addOnDeviceFactorSource(
 								onDeviceMnemonicKind: onDeviceKind,
-								mnemonicWithPassphrase: mnemonicWithPassphrase
+								mnemonicWithPassphrase: mnemonicWithPassphrase,
+								saveIntoProfile: saveIntoProfile
 							)
+							return .init(factorSource: factorSource, savedIntoProfile: saveIntoProfile)
 						}
 					)))
 				}
@@ -491,11 +505,13 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return .run { send in
 				await send(.internal(.saveFactorSourceResult(
 					TaskResult {
-						try await factorSourcesClient.addOnDeviceFactorSource(
+						let saveIntoProfile = false
+						let factorSource = try await factorSourcesClient.addOnDeviceFactorSource(
 							onDeviceMnemonicKind: .babylon,
 							mnemonicWithPassphrase: mnemonicWithPassphrase,
-							saveIntoProfile: false
+							saveIntoProfile: saveIntoProfile
 						)
+						return .init(factorSource: factorSource, savedIntoProfile: saveIntoProfile)
 					}
 				)))
 			}
@@ -529,11 +545,16 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			loggerGlobal.error("Failed to save mnemonic in profile, error: \(error)")
 			return .none
 
-		case let .saveFactorSourceResult(.success(factorSource)):
+		case let .saveFactorSourceResult(.success(saved)):
+
 			state.mode.update(isProgressing: false)
 			overlayWindowClient.scheduleHUD(.seedPhraseImported)
-
-			return .send(.delegate(.persistedNewFactorSourceInProfile(factorSource)))
+			let factorSource = saved.factorSource
+			if saved.savedIntoProfile {
+				return .send(.delegate(.persistedNewFactorSourceInProfile(factorSource)))
+			} else {
+				return .send(.delegate(.persistedMnemonicInKeychainOnly(factorSource)))
+			}
 		}
 	}
 
@@ -550,10 +571,11 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return .run { send in
 				await send(.internal(.saveFactorSourceResult(
 					TaskResult {
-						try await factorSourcesClient.addOffDeviceFactorSource(
+						let factorSource = try await factorSourcesClient.addOffDeviceFactorSource(
 							mnemonicWithPassphrase: mnemonicWithPassphrase,
 							label: label
 						)
+						return .init(factorSource: factorSource, savedIntoProfile: true)
 					}
 				)))
 			}

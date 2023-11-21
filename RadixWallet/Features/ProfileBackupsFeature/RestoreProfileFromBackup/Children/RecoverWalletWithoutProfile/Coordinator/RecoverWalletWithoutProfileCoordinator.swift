@@ -98,7 +98,9 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		case let .privateHDFactorSourceToScanWithResult(result):
 			switch result {
 			case let .success(privateHDFactorSource):
-				state.destination = .accountRecoveryScanCoordinator(.init(context: .restoreWalletWithOnlyBDFS(privateHDFactorSource)))
+//				state.destination = .accountRecoveryScanCoordinator(.init(context: .restoreWalletWithOnlyBDFS(privateHDFactorSource)))
+				//                self.destination = .accountRecoveryScanCoordinator(<#T##AccountRecoveryScanCoordinator.State#>)
+				return .none
 			case let .failure(error):
 				loggerGlobal.error("Failed to create PrivateHDFactorSource from imported mnemonic, error: \(error)")
 				errorQueue.schedule(error)
@@ -121,25 +123,51 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case .path(.element(_, action: .recoverWalletControlWithBDFSOnly(.delegate(.continue)))):
-			state.path.append(.importMnemonic(.init(persistStrategy: nil)))
-			return .none
-
-		case let .path(.element(_, action: .importMnemonic(.delegate(.notPersisted(mnemonicWithPassphrase))))):
-			return .run { send in
-				let result = await TaskResult {
-					let model = await device.model
-					let name = await device.name
-					return try PrivateHDFactorSource(
-						mnemonicWithPassphrase: mnemonicWithPassphrase,
-						factorSource: DeviceFactorSource.babylon(
-							mnemonicWithPassphrase: mnemonicWithPassphrase,
-							model: .init(model),
-							name: .init(name)
+			state.path.append(
+				.importMnemonic(
+					.init(
+						// We SHOULD remove the mnemonic from keychain if it we do not
+						// complete this flow.
+						persistStrategy: .init(
+							mnemonicForFactorSourceKind: .onDevice(
+								.babylon
+							),
+							location: .intoKeychainOnly
 						)
 					)
-				}
-				await send(.internal(.privateHDFactorSourceToScanWithResult(result)))
+				)
+			)
+			return .none
+
+//		case let .path(.element(_, action: .importMnemonic(.delegate(.notPersisted(mnemonicWithPassphrase))))):
+		case let .path(.element(_, action: .importMnemonic(.delegate(delegateAction)))):
+			switch delegateAction {
+			case let .persistedMnemonicInKeychainOnly(factorSource):
+				state.destination = .accountRecoveryScanCoordinator(.init(factorSourceID: factorSource.id, purpose: .createProfile))
+				return .none
+
+			default:
+				let errorMsg = "Discrepancy! Expected to have saved mnemonic into keychain but other action happened: \(delegateAction)"
+				loggerGlobal.error(.init(stringLiteral: errorMsg))
+				assertionFailure(errorMsg)
+				return .send(.delegate(.dismiss))
 			}
+
+//			return .run { send in
+//				let result = await TaskResult {
+//					let model = await device.model
+//					let name = await device.name
+//					return try PrivateHDFactorSource(
+//						mnemonicWithPassphrase: mnemonicWithPassphrase,
+//						factorSource: DeviceFactorSource.babylon(
+//							mnemonicWithPassphrase: mnemonicWithPassphrase,
+//							model: .init(model),
+//							name: .init(name)
+//						)
+//					)
+//				}
+//				await send(.internal(.privateHDFactorSourceToScanWithResult(result)))
+//			}
 
 		case .path(.element(_, action: .recoveryComplete(.delegate(.profileCreatedFromImportedBDFS)))):
 			return .send(.delegate(.profileCreatedFromImportedBDFS))
@@ -150,7 +178,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .accountRecoveryScanCoordinator(.delegate(.finishedAccountRecoveryScan)):
+		case .accountRecoveryScanCoordinator(.delegate(.completed)):
 			state.path.append(.recoveryComplete(.init()))
 			state.destination = nil
 			return .none
