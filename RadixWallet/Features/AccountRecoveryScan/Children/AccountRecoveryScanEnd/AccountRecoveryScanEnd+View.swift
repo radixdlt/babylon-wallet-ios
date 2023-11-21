@@ -23,13 +23,14 @@ public extension AccountRecoveryScanEnd {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
 				VStack {
 					Text("AccountRecScan END ✅")
-						.background(Color.green)
-						.foregroundColor(.white)
 
 					Button("DONE") {
 						store.send(.view(.doneTapped))
-					}.buttonStyle(.primaryRectangular)
+					}.buttonStyle(.secondaryRectangular)
 				}
+				.padding()
+				.background(Color.green)
+				.foregroundColor(.white)
 			}
 		}
 	}

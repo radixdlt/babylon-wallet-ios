@@ -15,6 +15,7 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case setupNewUser
+		case profileCreatedFromImportedBDFS
 		case completed
 	}
 
@@ -65,6 +66,9 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 		case .restoreFromBackup(.delegate(.backToStartOfOnboarding)):
 			state.destination = nil
 			return .none
+
+		case .restoreFromBackup(.delegate(.profileCreatedFromImportedBDFS)):
+			return .send(.delegate(.profileCreatedFromImportedBDFS))
 
 		default:
 			return .none

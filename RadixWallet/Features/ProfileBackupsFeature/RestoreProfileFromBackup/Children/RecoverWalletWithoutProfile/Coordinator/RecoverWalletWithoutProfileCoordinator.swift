@@ -17,11 +17,13 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case recoverWalletControlWithBDFSOnly(RecoverWalletControlWithBDFSOnly.State)
 			case importMnemonic(ImportMnemonic.State)
+			case recoveryComplete(RecoverWalletControlWithBDFSComplete.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case recoverWalletControlWithBDFSOnly(RecoverWalletControlWithBDFSOnly.Action)
 			case importMnemonic(ImportMnemonic.Action)
+			case recoveryComplete(RecoverWalletControlWithBDFSComplete.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -30,6 +32,10 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.importMnemonic, action: /Action.importMnemonic) {
 				ImportMnemonic()
+			}
+
+			Scope(state: /State.recoveryComplete, action: /Action.recoveryComplete) {
+				RecoverWalletControlWithBDFSComplete()
 			}
 		}
 	}
@@ -62,6 +68,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
 		case backToStartOfOnboarding
+		case profileCreatedFromImportedBDFS
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -134,6 +141,19 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 				await send(.internal(.privateHDFactorSourceToScanWithResult(result)))
 			}
 
+		case .path(.element(_, action: .recoveryComplete(.delegate(.profileCreatedFromImportedBDFS)))):
+			return .send(.delegate(.profileCreatedFromImportedBDFS))
+
+		default: return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .accountRecoveryScanCoordinator(.delegate(.finishedAccountRecoveryScan)):
+			state.path.append(.recoveryComplete(.init()))
+			state.destination = nil
+			return .none
 		default: return .none
 		}
 	}
