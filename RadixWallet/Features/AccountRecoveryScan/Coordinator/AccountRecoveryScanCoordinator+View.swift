@@ -12,7 +12,7 @@ public extension AccountRecoveryScanCoordinator {
 			NavigationStackStore(
 				store.scope(state: \.path, action: { .child(.path($0)) })
 			) {
-				AccountRecoveryScanStart.View(store: store.scope(
+				AccountRecoveryScanInProgress.View(store: store.scope(
 					state: \.root,
 					action: { .child(.root($0)) }
 				))
@@ -33,19 +33,12 @@ public extension AccountRecoveryScanCoordinator {
 		) -> some SwiftUI.View {
 			SwitchStore(store) { state in
 				switch state {
-				case .end:
+				case .selectInactiveAccountsToAdd:
 					CaseLet(
-						/AccountRecoveryScanCoordinator.Path.State.end,
-						action: AccountRecoveryScanCoordinator.Path.Action.end,
-						then: { AccountRecoveryScanEnd.View(store: $0) }
+						/AccountRecoveryScanCoordinator.Path.State.selectInactiveAccountsToAdd,
+						action: AccountRecoveryScanCoordinator.Path.Action.selectInactiveAccountsToAdd,
+						then: { SelectInactiveAccountsToAdd.View(store: $0) }
 					)
-				}
-			}
-			.toolbar {
-				ToolbarItem(placement: .cancellationAction) {
-					CloseButton {
-						self.store.send(.view(.closeTapped))
-					}
 				}
 			}
 		}

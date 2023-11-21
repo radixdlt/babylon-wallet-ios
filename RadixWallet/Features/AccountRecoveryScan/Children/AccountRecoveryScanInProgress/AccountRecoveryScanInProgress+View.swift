@@ -1,21 +1,21 @@
-extension AccountRecoveryScanStart.State {
-	var viewState: AccountRecoveryScanStart.ViewState {
+extension AccountRecoveryScanInProgress.State {
+	var viewState: AccountRecoveryScanInProgress.ViewState {
 		.init()
 	}
 }
 
-// MARK: - AccountRecoveryScanStart.View
+// MARK: - AccountRecoveryScanInProgress.View
 
-public extension AccountRecoveryScanStart {
+public extension AccountRecoveryScanInProgress {
 	struct ViewState: Equatable {
 		// TODO: declare some properties
 	}
 
 	@MainActor
 	struct View: SwiftUI.View {
-		private let store: StoreOf<AccountRecoveryScanStart>
+		private let store: StoreOf<AccountRecoveryScanInProgress>
 
-		public init(store: StoreOf<AccountRecoveryScanStart>) {
+		public init(store: StoreOf<AccountRecoveryScanInProgress>) {
 			self.store = store
 		}
 
@@ -32,10 +32,7 @@ public extension AccountRecoveryScanStart {
 
 					Spacer(minLength: 0)
 				}
-				.frame(maxWidth: .infinity, maxHeight: .infinity)
 				.padding()
-				.background(Color.blue)
-				.foregroundColor(.white)
 			}
 		}
 	}
@@ -48,16 +45,16 @@ import SwiftUI // NB: necessary for previews to appear
 
 struct AccountRecoveryScanStart_Preview: PreviewProvider {
 	static var previews: some View {
-		AccountRecoveryScanStart.View(
+		AccountRecoveryScanInProgress.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: AccountRecoveryScanStart.init
+				reducer: AccountRecoveryScanInProgress.init
 			)
 		)
 	}
 }
 
-public extension AccountRecoveryScanStart.State {
+public extension AccountRecoveryScanInProgress.State {
 	static let previewValue = Self()
 }
 #endif

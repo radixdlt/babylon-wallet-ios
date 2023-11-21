@@ -2,40 +2,38 @@
 
 public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		/// ID of factor to derive public keys with (addresses)
-		public let factorSourceID: FactorSourceID
-
 		/// Create new Profile or add accounts
 		public let purpose: Purpose
+		public let promptForSelectionOfInactiveAccounts: Bool
 
-		public var root: AccountRecoveryScanStart.State
+		public var root: AccountRecoveryScanInProgress.State
 		public var path: StackState<Path.State> = .init()
 
 		/// Create new Profile or add accounts
 		public enum Purpose: Sendable, Hashable {
-			case createProfile
-			case addAccounts
+			case createProfile(FactorSourceID.FromHash)
+			case addAccounts(FactorSourceID)
 		}
 
-		public init(factorSourceID: FactorSourceID, purpose: Purpose) {
-			self.factorSourceID = factorSourceID
+		public init(purpose: Purpose, promptForSelectionOfInactiveAccounts: Bool) {
 			self.purpose = purpose
+			self.promptForSelectionOfInactiveAccounts = promptForSelectionOfInactiveAccounts
 			self.root = .init()
 		}
 	}
 
 	public struct Path: Sendable, Hashable, Reducer {
 		public enum State: Sendable, Hashable {
-			case end(AccountRecoveryScanEnd.State)
+			case selectInactiveAccountsToAdd(SelectInactiveAccountsToAdd.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case end(AccountRecoveryScanEnd.Action)
+			case selectInactiveAccountsToAdd(SelectInactiveAccountsToAdd.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.end, action: /Action.end) {
-				AccountRecoveryScanEnd()
+			Scope(state: /State.selectInactiveAccountsToAdd, action: /Action.selectInactiveAccountsToAdd) {
+				SelectInactiveAccountsToAdd()
 			}
 		}
 	}
@@ -45,7 +43,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case root(AccountRecoveryScanStart.Action)
+		case root(AccountRecoveryScanInProgress.Action)
 		case path(StackActionOf<Path>)
 	}
 
@@ -66,7 +64,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Scope(state: \.root, action: /Action.child .. ChildAction.root) {
-			AccountRecoveryScanStart()
+			AccountRecoveryScanInProgress()
 		}
 
 		Reduce(core)
@@ -100,37 +98,50 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .root(.delegate(.continue)):
-			state.path.append(.end(.init()))
-			return .none
-
-		case let .path(.element(_, action: .end(.delegate(.finishedAccountRecoveryScan(active, inactive))))):
-			switch state.purpose {
-			case .createProfile:
-				guard let bdfsID = state.factorSourceID.extract(FactorSource.ID.FromHash.self) else {
-					fatalError("TODO error handling")
-				}
-				let accounts = Array(active).asIdentifiable()
-				let recoveredAccountAndBDFS = AccountsRecoveredFromScanningUsingMnemonic(
-					accounts: accounts,
-					factorSourceIDOfBDFSAlreadySavedIntoKeychain: bdfsID
-				)
-				return .run { send in
-					let result = await TaskResult<EqVoid> {
-						try await onboardingClient.finishOnboardingWithRecoveredAccountAndBDFS(recoveredAccountAndBDFS)
-					}
-					await send(.internal(.createProfileResult(result)))
-				}
-			case .addAccounts:
-				return .run { send in
-					let result = await TaskResult<EqVoid> {
-						try await accountsClient.saveVirtualAccounts(Array(active))
-					}
-					await send(.internal(.addAccountsToExistingProfileResult(result)))
-				}
+		case let .root(.delegate(.foundAccounts(active, inactive))):
+			if state.promptForSelectionOfInactiveAccounts {
+				state.path.append(.selectInactiveAccountsToAdd(.init(active: active, inactive: inactive)))
+				return .none
+			} else {
+				return completed(purpose: state.purpose, inactiveToAdd: inactive, active: active)
 			}
 
+		case let .path(.element(_, action: .selectInactiveAccountsToAdd(.delegate(.finished(selectedInactive, active))))):
+			return completed(purpose: state.purpose, inactiveToAdd: selectedInactive, active: active)
+
 		default: return .none
+		}
+	}
+
+	private func completed(
+		purpose: State.Purpose,
+		inactiveToAdd: IdentifiedArrayOf<Profile.Network.Account>,
+		active: IdentifiedArrayOf<Profile.Network.Account>
+	) -> Effect<Action> {
+		// FIXME: check with Matt - should we by default we add ALL accounts, even inactive?
+		var all = active
+		all.append(contentsOf: inactiveToAdd)
+		let accounts = all.sorted(by: \.appearanceID).asIdentifiable()
+
+		switch purpose {
+		case let .createProfile(bdfsID):
+			let recoveredAccountAndBDFS = AccountsRecoveredFromScanningUsingMnemonic(
+				accounts: accounts,
+				factorSourceIDOfBDFSAlreadySavedIntoKeychain: bdfsID
+			)
+			return .run { send in
+				let result = await TaskResult<EqVoid> {
+					try await onboardingClient.finishOnboardingWithRecoveredAccountAndBDFS(recoveredAccountAndBDFS)
+				}
+				await send(.internal(.createProfileResult(result)))
+			}
+		case .addAccounts:
+			return .run { send in
+				let result = await TaskResult<EqVoid> {
+					try await accountsClient.saveVirtualAccounts(Array(accounts))
+				}
+				await send(.internal(.addAccountsToExistingProfileResult(result)))
+			}
 		}
 	}
 }

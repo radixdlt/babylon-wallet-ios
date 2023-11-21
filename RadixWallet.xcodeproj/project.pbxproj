@@ -15,10 +15,10 @@
 		48AE39D12B0CBC3400813CF3 /* RecoverWalletWithoutProfileCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39D02B0CBC3400813CF3 /* RecoverWalletWithoutProfileCoordinator.swift */; };
 		48AE39DC2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39DA2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator.swift */; };
 		48AE39DD2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39DB2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator+View.swift */; };
-		48AE39E12B0CBE8200813CF3 /* AccountRecoveryScanStart+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39DF2B0CBE8200813CF3 /* AccountRecoveryScanStart+View.swift */; };
-		48AE39E22B0CBE8200813CF3 /* AccountRecoveryScanStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39E02B0CBE8200813CF3 /* AccountRecoveryScanStart.swift */; };
-		48AE39E72B0CBEA800813CF3 /* AccountRecoveryScanEnd+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39E52B0CBEA800813CF3 /* AccountRecoveryScanEnd+View.swift */; };
-		48AE39E82B0CBEA800813CF3 /* AccountRecoveryScanEnd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39E62B0CBEA800813CF3 /* AccountRecoveryScanEnd.swift */; };
+		48AE39E12B0CBE8200813CF3 /* AccountRecoveryScanInProgress+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39DF2B0CBE8200813CF3 /* AccountRecoveryScanInProgress+View.swift */; };
+		48AE39E22B0CBE8200813CF3 /* AccountRecoveryScanInProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39E02B0CBE8200813CF3 /* AccountRecoveryScanInProgress.swift */; };
+		48AE39E72B0CBEA800813CF3 /* SelectInactiveAccountsToAdd+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39E52B0CBEA800813CF3 /* SelectInactiveAccountsToAdd+View.swift */; };
+		48AE39E82B0CBEA800813CF3 /* SelectInactiveAccountsToAdd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39E62B0CBEA800813CF3 /* SelectInactiveAccountsToAdd.swift */; };
 		48AE39EC2B0CCA7600813CF3 /* RecoverWalletControlWithBDFSComplete+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39EA2B0CCA7600813CF3 /* RecoverWalletControlWithBDFSComplete+View.swift */; };
 		48AE39ED2B0CCA7600813CF3 /* RecoverWalletControlWithBDFSComplete.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39EB2B0CCA7600813CF3 /* RecoverWalletControlWithBDFSComplete.swift */; };
 		48AE39F62B0D0C6B00813CF3 /* AccountsRecoveredFromScanningUsingMnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39F52B0D0C6B00813CF3 /* AccountsRecoveredFromScanningUsingMnemonic.swift */; };
@@ -1349,10 +1349,10 @@
 		48AE39D02B0CBC3400813CF3 /* RecoverWalletWithoutProfileCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecoverWalletWithoutProfileCoordinator.swift; sourceTree = "<group>"; };
 		48AE39DA2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountRecoveryScanCoordinator.swift; sourceTree = "<group>"; };
 		48AE39DB2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AccountRecoveryScanCoordinator+View.swift"; sourceTree = "<group>"; };
-		48AE39DF2B0CBE8200813CF3 /* AccountRecoveryScanStart+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountRecoveryScanStart+View.swift"; sourceTree = "<group>"; };
-		48AE39E02B0CBE8200813CF3 /* AccountRecoveryScanStart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRecoveryScanStart.swift; sourceTree = "<group>"; };
-		48AE39E52B0CBEA800813CF3 /* AccountRecoveryScanEnd+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountRecoveryScanEnd+View.swift"; sourceTree = "<group>"; };
-		48AE39E62B0CBEA800813CF3 /* AccountRecoveryScanEnd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRecoveryScanEnd.swift; sourceTree = "<group>"; };
+		48AE39DF2B0CBE8200813CF3 /* AccountRecoveryScanInProgress+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountRecoveryScanInProgress+View.swift"; sourceTree = "<group>"; };
+		48AE39E02B0CBE8200813CF3 /* AccountRecoveryScanInProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountRecoveryScanInProgress.swift; sourceTree = "<group>"; };
+		48AE39E52B0CBEA800813CF3 /* SelectInactiveAccountsToAdd+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SelectInactiveAccountsToAdd+View.swift"; sourceTree = "<group>"; };
+		48AE39E62B0CBEA800813CF3 /* SelectInactiveAccountsToAdd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectInactiveAccountsToAdd.swift; sourceTree = "<group>"; };
 		48AE39EA2B0CCA7600813CF3 /* RecoverWalletControlWithBDFSComplete+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecoverWalletControlWithBDFSComplete+View.swift"; sourceTree = "<group>"; };
 		48AE39EB2B0CCA7600813CF3 /* RecoverWalletControlWithBDFSComplete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverWalletControlWithBDFSComplete.swift; sourceTree = "<group>"; };
 		48AE39F52B0D0C6B00813CF3 /* AccountsRecoveredFromScanningUsingMnemonic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsRecoveredFromScanningUsingMnemonic.swift; sourceTree = "<group>"; };
@@ -2726,28 +2726,28 @@
 		48AE39DE2B0CBE3F00813CF3 /* Children */ = {
 			isa = PBXGroup;
 			children = (
-				48AE39E42B0CBE9500813CF3 /* AccountRecoveryScanEnd */,
-				48AE39E32B0CBE8900813CF3 /* AccountRecoveryScanStart */,
+				48AE39E42B0CBE9500813CF3 /* SelectInactiveAccountsToAdd */,
+				48AE39E32B0CBE8900813CF3 /* AccountRecoveryScanInProgress */,
 			);
 			path = Children;
 			sourceTree = "<group>";
 		};
-		48AE39E32B0CBE8900813CF3 /* AccountRecoveryScanStart */ = {
+		48AE39E32B0CBE8900813CF3 /* AccountRecoveryScanInProgress */ = {
 			isa = PBXGroup;
 			children = (
-				48AE39DF2B0CBE8200813CF3 /* AccountRecoveryScanStart+View.swift */,
-				48AE39E02B0CBE8200813CF3 /* AccountRecoveryScanStart.swift */,
+				48AE39DF2B0CBE8200813CF3 /* AccountRecoveryScanInProgress+View.swift */,
+				48AE39E02B0CBE8200813CF3 /* AccountRecoveryScanInProgress.swift */,
 			);
-			path = AccountRecoveryScanStart;
+			path = AccountRecoveryScanInProgress;
 			sourceTree = "<group>";
 		};
-		48AE39E42B0CBE9500813CF3 /* AccountRecoveryScanEnd */ = {
+		48AE39E42B0CBE9500813CF3 /* SelectInactiveAccountsToAdd */ = {
 			isa = PBXGroup;
 			children = (
-				48AE39E52B0CBEA800813CF3 /* AccountRecoveryScanEnd+View.swift */,
-				48AE39E62B0CBEA800813CF3 /* AccountRecoveryScanEnd.swift */,
+				48AE39E52B0CBEA800813CF3 /* SelectInactiveAccountsToAdd+View.swift */,
+				48AE39E62B0CBEA800813CF3 /* SelectInactiveAccountsToAdd.swift */,
 			);
-			path = AccountRecoveryScanEnd;
+			path = SelectInactiveAccountsToAdd;
 			sourceTree = "<group>";
 		};
 		48AE39E92B0CCA6000813CF3 /* Completed */ = {
@@ -7880,7 +7880,7 @@
 				48CFC4662ADC10DA00E77A5C /* AccountPortfoliosClient+Mock.swift in Sources */,
 				48CFC2F02ADC10D900E77A5C /* AddLedgerFactorSource+View.swift in Sources */,
 				48CFC62E2ADC10DA00E77A5C /* ProfileSnapshot.swift in Sources */,
-				48AE39E12B0CBE8200813CF3 /* AccountRecoveryScanStart+View.swift in Sources */,
+				48AE39E12B0CBE8200813CF3 /* AccountRecoveryScanInProgress+View.swift in Sources */,
 				48CFC46F2ADC10DA00E77A5C /* AppPreferencesClient+Live.swift in Sources */,
 				48CFC5B02ADC10DA00E77A5C /* TransferNFTView.swift in Sources */,
 				48CFC36F2ADC10D900E77A5C /* FungibleAssetList+View.swift in Sources */,
@@ -8369,7 +8369,7 @@
 				48CFC42C2ADC10DA00E77A5C /* Unit.swift in Sources */,
 				48CFC6622ADC10DB00E77A5C /* FactorSource.swift in Sources */,
 				48CFC2602ADC10D900E77A5C /* EditPersonaEntry+View.swift in Sources */,
-				48AE39E22B0CBE8200813CF3 /* AccountRecoveryScanStart.swift in Sources */,
+				48AE39E22B0CBE8200813CF3 /* AccountRecoveryScanInProgress.swift in Sources */,
 				48CFC2E92ADC10D900E77A5C /* SimpleCreateSecurityStructureFlow+View.swift in Sources */,
 				48CFC3782ADC10D900E77A5C /* LSUStake.swift in Sources */,
 				48CFC5162ADC10DA00E77A5C /* EntityNotFoundError.swift in Sources */,
@@ -8820,7 +8820,7 @@
 				48CFC5802ADC10DA00E77A5C /* BackupsClient+Live.swift in Sources */,
 				48CFC6082ADC10DA00E77A5C /* AccountsRequestResponseItem.swift in Sources */,
 				48CFC3992ADC10D900E77A5C /* TXID.swift in Sources */,
-				48AE39E82B0CBEA800813CF3 /* AccountRecoveryScanEnd.swift in Sources */,
+				48AE39E82B0CBEA800813CF3 /* SelectInactiveAccountsToAdd.swift in Sources */,
 				48CFC59A2ADC10DA00E77A5C /* HitTargetSize.swift in Sources */,
 				48CFC68A2ADC10DB00E77A5C /* AppPreferences+Display.swift in Sources */,
 				48CFC2C12ADC10D900E77A5C /* AssetTransfer+Reducer.swift in Sources */,
@@ -8917,7 +8917,7 @@
 				48CFC6352ADC10DB00E77A5C /* AccountHierarchicalDeterministicDerivationPath.swift in Sources */,
 				48CFC5342ADC10DA00E77A5C /* MetadataNonFungibleGlobalIdValueAllOf.swift in Sources */,
 				48CFC5492ADC10DA00E77A5C /* StreamTransactionsRequestEventFilterItem.swift in Sources */,
-				48AE39E72B0CBEA800813CF3 /* AccountRecoveryScanEnd+View.swift in Sources */,
+				48AE39E72B0CBEA800813CF3 /* SelectInactiveAccountsToAdd+View.swift in Sources */,
 				48CFC4092ADC10DA00E77A5C /* FiatCurrency.swift in Sources */,
 				48CFC5CA2ADC10DA00E77A5C /* FlowLayout.swift in Sources */,
 				48CFC5502ADC10DA00E77A5C /* StateValidatorsListRequest.swift in Sources */,

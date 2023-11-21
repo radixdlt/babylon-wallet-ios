@@ -15,6 +15,7 @@ extension Profile.Network.Account {
 		Codable,
 		CustomStringConvertible,
 		CaseIterable,
+		Comparable,
 		Identifiable
 	{
 		case _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11
@@ -29,6 +30,12 @@ extension Profile.Network.Account {
 			}
 			self = _self
 		}
+	}
+}
+
+extension RawRepresentable where RawValue: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		lhs.rawValue < rhs.rawValue
 	}
 }
 

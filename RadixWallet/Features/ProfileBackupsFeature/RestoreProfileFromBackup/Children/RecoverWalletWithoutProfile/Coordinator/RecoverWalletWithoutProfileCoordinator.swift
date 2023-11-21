@@ -128,8 +128,11 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		case let .path(.element(_, action: .importMnemonic(.delegate(delegateAction)))):
 			switch delegateAction {
 			case let .persistedMnemonicInKeychainOnly(factorSource):
+				guard let fromHash = factorSource.id.extract(FactorSource.ID.FromHash.self) else {
+					fatalError("error handling")
+				}
 				state.factorSourceOfImportedMnemonic = factorSource
-				state.destination = .accountRecoveryScanCoordinator(.init(factorSourceID: factorSource.id, purpose: .createProfile))
+				state.destination = .accountRecoveryScanCoordinator(.init(purpose: .createProfile(fromHash), promptForSelectionOfInactiveAccounts: true))
 				return .none
 
 			default:
