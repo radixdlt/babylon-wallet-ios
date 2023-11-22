@@ -11,7 +11,13 @@ extension ImportMnemonicControllingAccounts {
 	public struct ViewState: Equatable {
 		let isMain: Bool
 
-		var title: LocalizedStringKey {
+		var navigationTitle: String {
+			isMain
+				? L10n.RecoverSeedPhrase.Header.titleMain
+				: L10n.RecoverSeedPhrase.Header.titleOther
+		}
+
+		var subtitle: LocalizedStringKey {
 			.init(
 				isMain
 					? L10n.RecoverSeedPhrase.Header.subtitleMainSeedPhrase
@@ -19,13 +25,8 @@ extension ImportMnemonicControllingAccounts {
 			)
 		}
 
-		var navigationTitle: String {
-			isMain
-				? L10n.RecoverSeedPhrase.Header.titleMain
-				: L10n.RecoverSeedPhrase.Header.titleOther
-		}
-
 		var skipButtonTitle: String {
+			// FIXME: Strings
 			isMain ? "I Don't Have the Main Seed Phrase" : L10n.RecoverSeedPhrase.skipButton
 		}
 	}
@@ -44,28 +45,25 @@ extension ImportMnemonicControllingAccounts {
 					Text(viewStore.navigationTitle)
 						.textStyle(.sheetTitle)
 						.foregroundColor(.app.gray1)
+						.multilineTextAlignment(.center)
+						.padding(.bottom, .small1)
 
-					Text(viewStore.title)
+					Text(viewStore.subtitle)
 						.textStyle(.body1Regular)
 						.foregroundColor(.app.gray1)
-						.padding()
 
-					if !viewStore.isMain {
-						skipButton(with: viewStore)
-					}
 					ScrollView {
 						DisplayEntitiesControlledByMnemonic.View(
 							store: store.scope(state: \.entities, action: { .child(.entities($0)) })
 						)
 					}
 
-					if viewStore.isMain {
-						skipButton(with: viewStore)
-					}
 					Spacer(minLength: 0)
 				}
 				.padding(.horizontal, .medium3)
 				.footer {
+					skipButton(title: viewStore.skipButtonTitle)
+
 					Button(L10n.RecoverSeedPhrase.enterButton) {
 						viewStore.send(.inputMnemonic)
 					}
@@ -76,12 +74,12 @@ extension ImportMnemonicControllingAccounts {
 			}
 		}
 
-		private func skipButton(with viewStore: ViewStoreOf<ImportMnemonicControllingAccounts>) -> some SwiftUI.View {
-			Button(viewStore.skipButtonTitle) {
-				viewStore.send(.skip)
+		private func skipButton(title: String) -> some SwiftUI.View {
+			Button(title) {
+				store.send(.view(.skip))
 			}
 			.foregroundColor(.app.blue2)
-			.font(.app.body1Regular)
+			.font(.app.body1Header)
 			.frame(height: .standardButtonHeight)
 			.frame(maxWidth: .infinity)
 			.padding(.medium1)
