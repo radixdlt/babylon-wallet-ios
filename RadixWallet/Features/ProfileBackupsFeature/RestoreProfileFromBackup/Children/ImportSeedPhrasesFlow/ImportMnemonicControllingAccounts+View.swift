@@ -41,16 +41,17 @@ extension ImportMnemonicControllingAccounts {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(alignment: .center) {
+				VStack(spacing: 0) {
 					Text(viewStore.navigationTitle)
 						.textStyle(.sheetTitle)
 						.foregroundColor(.app.gray1)
 						.multilineTextAlignment(.center)
-						.padding(.bottom, .small1)
+						.padding(.bottom, .medium2)
 
 					Text(viewStore.subtitle)
 						.textStyle(.body1Regular)
 						.foregroundColor(.app.gray1)
+						.padding(.bottom, .medium3)
 
 					ScrollView {
 						DisplayEntitiesControlledByMnemonic.View(
@@ -65,7 +66,7 @@ extension ImportMnemonicControllingAccounts {
 					skipButton(title: viewStore.skipButtonTitle)
 
 					Button(L10n.RecoverSeedPhrase.enterButton) {
-						viewStore.send(.inputMnemonic)
+						viewStore.send(.inputMnemonicButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)
 				}
@@ -76,13 +77,12 @@ extension ImportMnemonicControllingAccounts {
 
 		private func skipButton(title: String) -> some SwiftUI.View {
 			Button(title) {
-				store.send(.view(.skip))
+				store.send(.view(.skipButtonTapped))
 			}
 			.foregroundColor(.app.blue2)
 			.font(.app.body1Header)
 			.frame(height: .standardButtonHeight)
 			.frame(maxWidth: .infinity)
-			.padding(.medium1)
 			.background(.app.white)
 			.cornerRadius(.small2)
 		}
