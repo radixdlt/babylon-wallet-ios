@@ -116,6 +116,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		typealias State = RelayState<DappInteractionFlow.State.AnyInteractionItem, MainState>
 		typealias Action = RelayAction<DappInteractionFlow.State.AnyInteractionItem, MainAction>
 
+		@CasePathable
 		enum MainState: Sendable, Hashable {
 			case login(Login.State)
 			case accountPermission(AccountPermission.State)
@@ -125,6 +126,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			case reviewTransaction(TransactionReview.State)
 		}
 
+		@CasePathable
 		enum MainAction: Sendable, Equatable {
 			case login(Login.Action)
 			case accountPermission(AccountPermission.Action)
@@ -136,26 +138,24 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 		var body: some ReducerOf<Self> {
 			Relay {
-				EmptyReducer()
-					.ifCaseLet(/MainState.login, action: /MainAction.login) {
-						Login()
-					}
-					.ifCaseLet(/MainState.accountPermission, action: /MainAction.accountPermission) {
-						AccountPermission()
-					}
-					.ifCaseLet(/MainState.chooseAccounts, action: /MainAction.chooseAccounts) {
-						AccountPermissionChooseAccounts()
-					}
-				EmptyReducer()
-					.ifCaseLet(/MainState.personaDataPermission, action: /MainAction.personaDataPermission) {
-						PersonaDataPermission()
-					}
-					.ifCaseLet(/MainState.oneTimePersonaData, action: /MainAction.oneTimePersonaData) {
-						OneTimePersonaData()
-					}
-					.ifCaseLet(/MainState.reviewTransaction, action: /MainAction.reviewTransaction) {
-						TransactionReview()
-					}
+				Scope(state: \.login, action: \.login) {
+					Login()
+				}
+				Scope(state: \.accountPermission, action: \.accountPermission) {
+					AccountPermission()
+				}
+				Scope(state: \.chooseAccounts, action: \.chooseAccounts) {
+					AccountPermissionChooseAccounts()
+				}
+				Scope(state: \.personaDataPermission, action: \.personaDataPermission) {
+					PersonaDataPermission()
+				}
+				Scope(state: \.oneTimePersonaData, action: \.oneTimePersonaData) {
+					OneTimePersonaData()
+				}
+				Scope(state: \.reviewTransaction, action: \.reviewTransaction) {
+					TransactionReview()
+				}
 			}
 		}
 	}
