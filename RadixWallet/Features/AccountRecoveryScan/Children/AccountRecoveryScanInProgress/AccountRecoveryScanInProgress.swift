@@ -238,9 +238,9 @@ extension AccountRecoveryScanInProgress {
 	}
 
 	private func mockedScan(accounts: IdentifiedArrayOf<Profile.Network.Account>) async throws -> (active: IdentifiedArrayOf<Profile.Network.Account>, inactive: IdentifiedArrayOf<Profile.Network.Account>) {
-		let MOCKED_activeFirstN = 5
-		let MOCKED_inactiveN = 5
-		let MOCKED_activeSecondN = 5
+		let MOCKED_activeFirstN = 10
+		let MOCKED_inactiveN = 10
+		let MOCKED_activeSecondN = 10
 
 		loggerGlobal.critical("MOCKING network scanning => \(MOCKED_activeFirstN) active, \(MOCKED_inactiveN) inactive, \(MOCKED_activeSecondN) active.\n\nImplement me! \(#file)#\(#line)")
 

@@ -62,10 +62,12 @@ public extension AccountRecoveryScanInProgress {
 						Text("Scanning for Accounts that have been included in at least on transaction, using:")
 						Text("**\(viewStore.factorSourceDescription)**")
 					} else {
-						VStack(alignment: .leading, spacing: .small3) {
-							ForEach(viewStore.active) { account in
-								SmallAccountCard(account: account)
-									.cornerRadius(.small1)
+						ScrollView {
+							VStack(alignment: .leading, spacing: .small3) {
+								ForEach(viewStore.active) { account in
+									SmallAccountCard(account: account)
+										.cornerRadius(.small1)
+								}
 							}
 						}
 						Text("The first \(accRecScanBatchSize) potential accounts from this signing factor were scanned.")
