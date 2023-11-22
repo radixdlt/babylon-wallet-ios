@@ -68,6 +68,7 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 			return .none
 
 		case .restoreFromBackup(.delegate(.profileCreatedFromImportedBDFS)):
+			state.destination = nil
 			return .send(.delegate(.profileCreatedFromImportedBDFS))
 
 		default:

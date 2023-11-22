@@ -153,8 +153,8 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case .accountRecoveryScanCoordinator(.delegate(.completed)):
-			state.path.append(.recoveryComplete(.init()))
 			state.destination = nil
+			state.path.append(.recoveryComplete(.init()))
 			return .none
 
 		case .accountRecoveryScanCoordinator(.delegate(.dismissed)):
