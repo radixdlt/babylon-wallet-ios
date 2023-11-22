@@ -9,9 +9,9 @@ extension CacheClient: DependencyKey {
 				let expirationDate = date.now.addingTimeInterval(entry.lifetime)
 				try diskPersistenceClient.save(expirationDate, entry.expirationDateFilePath)
 				try diskPersistenceClient.save(encodable, entry.filesystemFilePath)
-				loggerGlobal.debug("💾 Data successfully saved to disk: \(entry)")
+				loggerGlobal.trace("💾 Data successfully saved to disk: \(entry)")
 			} catch {
-				loggerGlobal.debug("💾❌ Could not save data to disk: \(error.localizedDescription)")
+				loggerGlobal.trace("💾❌ Could not save data to disk: \(error.localizedDescription)")
 			}
 		}, load: { decodable, entry in
 			@Dependency(\.diskPersistenceClient) var diskPersistenceClient

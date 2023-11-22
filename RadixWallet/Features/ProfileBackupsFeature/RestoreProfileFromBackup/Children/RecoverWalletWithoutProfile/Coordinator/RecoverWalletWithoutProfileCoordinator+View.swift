@@ -12,10 +12,11 @@ public extension RecoverWalletWithoutProfileCoordinator {
 			NavigationStackStore(
 				store.scope(state: \.path, action: { .child(.path($0)) })
 			) {
-				RecoverWalletWithoutProfileStart.View(store: store.scope(
-					state: \.root,
-					action: { .child(.root($0)) }
-				))
+				IfLetStore(
+					store.scope(state: \.root, action: { .child(.root($0)) })
+				) {
+					path(for: $0)
+				}
 			} destination: {
 				path(for: $0)
 			}
@@ -27,6 +28,12 @@ public extension RecoverWalletWithoutProfileCoordinator {
 		) -> some SwiftUI.View {
 			SwitchStore(store) { state in
 				switch state {
+				case .start:
+					CaseLet(
+						/RecoverWalletWithoutProfileCoordinator.Path.State.start,
+						action: RecoverWalletWithoutProfileCoordinator.Path.Action.start,
+						then: { RecoverWalletWithoutProfileStart.View(store: $0) }
+					)
 				case .recoverWalletControlWithBDFSOnly:
 					CaseLet(
 						/RecoverWalletWithoutProfileCoordinator.Path.State.recoverWalletControlWithBDFSOnly,

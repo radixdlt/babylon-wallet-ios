@@ -2,7 +2,7 @@
 
 public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var root: RecoverWalletWithoutProfileStart.State
+		public var root: Path.State?
 		public var path: StackState<Path.State> = .init()
 
 		/// SHOULD be used to delete the mnemonic if user did not complete
@@ -14,24 +14,30 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		var destination: Destination.State? = nil
 
 		public init() {
-			self.root = .init()
+			self.root = .init(.start(.init()))
 		}
 	}
 
 	public struct Path: Sendable, Hashable, Reducer {
 		public enum State: Sendable, Hashable {
+			case start(RecoverWalletWithoutProfileStart.State)
 			case recoverWalletControlWithBDFSOnly(RecoverWalletControlWithBDFSOnly.State)
 			case importMnemonic(ImportMnemonic.State)
 			case recoveryComplete(RecoverWalletControlWithBDFSComplete.State)
 		}
 
 		public enum Action: Sendable, Equatable {
+			case start(RecoverWalletWithoutProfileStart.Action)
 			case recoverWalletControlWithBDFSOnly(RecoverWalletControlWithBDFSOnly.Action)
 			case importMnemonic(ImportMnemonic.Action)
 			case recoveryComplete(RecoverWalletControlWithBDFSComplete.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
+			Scope(state: /State.start, action: /Action.start) {
+				RecoverWalletWithoutProfileStart()
+			}
+
 			Scope(state: /State.recoverWalletControlWithBDFSOnly, action: /Action.recoverWalletControlWithBDFSOnly) {
 				RecoverWalletControlWithBDFSOnly()
 			}
@@ -63,7 +69,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case root(RecoverWalletWithoutProfileStart.Action)
+		case root(Path.Action)
 		case path(StackActionOf<Path>)
 	}
 
@@ -81,16 +87,15 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.root, action: /Action.child .. ChildAction.root) {
-			RecoverWalletWithoutProfileStart()
-		}
-
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
-				Destination()
+			.ifLet(\.root, action: /Action.child .. ChildAction.root) {
+				Path()
 			}
 			.forEach(\.path, action: /Action.child .. ChildAction.path) {
 				Path()
+			}
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
 
@@ -98,13 +103,15 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .root(.delegate(.backToStartOfOnboarding)):
+		case .root(.start(.delegate(.backToStartOfOnboarding))):
 			return .send(.delegate(.backToStartOfOnboarding))
-		case .root(.delegate(.dismiss)):
+
+		case .root(.start(.delegate(.dismiss))):
 			return .run { _ in
 				await dismiss()
 			}
-		case .root(.delegate(.recoverWithBDFSOnly)):
+
+		case .root(.start(.delegate(.recoverWithBDFSOnly))):
 			state.path.append(.recoverWalletControlWithBDFSOnly(.init()))
 			return .none
 
@@ -143,7 +150,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 				return .send(.delegate(.dismiss))
 			}
 
-		case .path(.element(_, action: .recoveryComplete(.delegate(.profileCreatedFromImportedBDFS)))):
+		case .root(.recoveryComplete(.delegate(.profileCreatedFromImportedBDFS))):
 			return .send(.delegate(.profileCreatedFromImportedBDFS))
 
 		default: return .none
@@ -154,7 +161,9 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		switch presentedAction {
 		case .accountRecoveryScanCoordinator(.delegate(.completed)):
 			state.destination = nil
-			state.path.append(.recoveryComplete(.init()))
+			state.path = .init()
+			// replace root so we cannot go back from `recoveryComplete`
+			state.root = .recoveryComplete(.init())
 			return .none
 
 		case .accountRecoveryScanCoordinator(.delegate(.dismissed)):
