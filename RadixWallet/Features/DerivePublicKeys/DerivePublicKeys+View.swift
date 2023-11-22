@@ -66,23 +66,3 @@ extension DerivePublicKeys {
 		}
 	}
 }
-
-// #if DEBUG
-// import SwiftUI
-import ComposableArchitecture //
-//// MARK: - DerivePublicKey_Preview
-// struct DerivePublicKey_Preview: PreviewProvider {
-//	static var previews: some View {
-//		DerivePublicKeys.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: DerivePublicKeys.init
-//			)
-//		)
-//	}
-// }
-//
-// extension DerivePublicKeys.State {
-//	public static let previewValue = Self()
-// }
-// #endif

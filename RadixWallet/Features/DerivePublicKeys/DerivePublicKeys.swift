@@ -94,6 +94,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		case .onFirstTask:
 			switch state.factorSourceOption {
 			case .device:
+				loggerGlobal.trace("Using `device` factor source to derive public keys.")
 				return .run { send in
 					let babylonFactorSource = try await factorSourcesClient.getMainDeviceFactorSource()
 
@@ -104,6 +105,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 				}
 
 			case let .specific(factorSource):
+				loggerGlobal.trace("Using specific factor source to derive public keys - kind: \(factorSource.kind)")
 				switch factorSource {
 				case let .device(deviceFactorSource):
 					return deriveWith(deviceFactorSource: deviceFactorSource, state)
@@ -201,11 +203,13 @@ extension DerivePublicKeys {
 		loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose,
 		state: State
 	) async throws -> Action {
+		loggerGlobal.debug("Starting derivation of #\(derivationPaths.count) keys")
 		let hdKeys = try await deviceFactorSourceClient.publicKeysFromOnDeviceHD(.init(
 			deviceFactorSource: deviceFactorSource,
 			derivationPaths: derivationPaths,
 			loadMnemonicPurpose: loadMnemonicPurpose
 		))
+		loggerGlobal.debug("Finish deriving of #\(hdKeys.count) keys ✅")
 		return .delegate(.derivedPublicKeys(
 			hdKeys,
 			factorSourceID: deviceFactorSource.id.embed(),
@@ -265,6 +269,7 @@ extension DerivePublicKeys {
 	) -> Effect<Action> {
 		switch state.derivationsPathOption {
 		case let .knownPaths(derivationPaths, networkID):
+			loggerGlobal.trace("Deriving public keys at paths: \(derivationPaths)")
 			let loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose = switch state.purpose {
 			case let .createEntity(kind: entityKind):
 				.createEntity(kind: entityKind)
@@ -280,6 +285,7 @@ extension DerivePublicKeys {
 				await send(.delegate(.failedToDerivePublicKey))
 			}
 		case let .next(networkOption, entityKind, curve):
+			loggerGlobal.trace("Deriving public keys for next entity - kind: \(entityKind)")
 			let loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose = switch state.purpose {
 			case .createEntity:
 				.createEntity(kind: entityKind)

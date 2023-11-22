@@ -131,29 +131,33 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .derivePublicKeys(.delegate(.derivedPublicKeys(publicHDKeys, factorSourceID, networkID))):
-			assert(factorSourceID == state.factorSourceID.embed())
-			assert(networkID == state.networkID)
+		case let .derivePublicKeys(.delegate(delegateAction)):
+			loggerGlobal.notice("Finish deriving public keys")
+			state.destination = nil
+			switch delegateAction {
+			case let .derivedPublicKeys(publicHDKeys, factorSourceID, networkID):
+				assert(factorSourceID == state.factorSourceID.embed())
+				assert(networkID == state.networkID)
 
-			let accounts = publicHDKeys.map { publicHDKey in
-				let index = publicHDKey.derivationPath.index
-				let account = try! Profile.Network.Account(
-					networkID: networkID,
-					index: index,
-					factorInstance: .init(
-						factorSourceID: state.factorSourceID,
-						publicHDKey: publicHDKey
-					),
-					displayName: "Unnamed",
-					extraProperties: .init(index: index)
-				)
-				return account
-			}.asIdentifiable()
+				let accounts = publicHDKeys.map { publicHDKey in
+					let index = publicHDKey.derivationPath.index
+					let account = try! Profile.Network.Account(
+						networkID: networkID,
+						index: index,
+						factorInstance: .init(
+							factorSourceID: state.factorSourceID,
+							publicHDKey: publicHDKey
+						),
+						displayName: "Unnamed",
+						extraProperties: .init(index: index)
+					)
+					return account
+				}.asIdentifiable()
 
-			return scanOnLedger(accounts: accounts, state: &state)
-
-		case .derivePublicKeys(.delegate(.failedToDerivePublicKey)):
-			fatalError("error handling")
+				return scanOnLedger(accounts: accounts, state: &state)
+			case .failedToDerivePublicKey:
+				fatalError("failed to derive keys")
+			}
 
 		default: return .none
 		}
