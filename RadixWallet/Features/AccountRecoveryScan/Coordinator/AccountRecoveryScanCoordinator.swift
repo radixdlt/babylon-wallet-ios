@@ -11,27 +11,37 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 
 		/// Create new Profile or add accounts
 		public enum Purpose: Sendable, Hashable {
-			case createProfile(FactorSourceID.FromHash)
-			case addAccounts(FactorSourceID, offset: Int)
-			var factorSourceID: FactorSourceID {
-				switch self {
-				case let .createProfile(fromHash): fromHash.embed()
-				case let .addAccounts(id, _): id
-				}
-			}
+			case createProfile(DeviceFactorSource)
 
-			var offset: Int {
-				switch self {
-				case .createProfile: 0
-				case let .addAccounts(_, offset): offset
-				}
-			}
+			/// Typically we can use `offset: <CURRENT_NETWORK>.numberOfAccountsIncludingHidden(controlledBy: factorSourceID)`
+			case addAccounts(factorSourceID: FactorSourceID.FromHash, offset: Int, networkID: NetworkID, scheme: DerivationScheme)
 		}
 
 		public init(purpose: Purpose, promptForSelectionOfInactiveAccountsIfAny: Bool) {
 			self.purpose = purpose
 			self.promptForSelectionOfInactiveAccountsIfAny = promptForSelectionOfInactiveAccountsIfAny
-			self.root = .init(factorSourceID: purpose.factorSourceID, offset: purpose.offset)
+			switch purpose {
+			case let .addAccounts(id, offset, networkID, scheme):
+				self.root = .init(
+					factorSourceID: id,
+					factorSource: .loading,
+					offset: offset,
+					scheme: scheme,
+					networkID: networkID
+				)
+			case let .createProfile(
+				deviceFactorSource
+			):
+				self.root = .init(
+					factorSourceID: deviceFactorSource.id,
+					factorSource: .success(
+						deviceFactorSource.embed()
+					),
+					offset: 0,
+					scheme: .slip10,
+					networkID: .mainnet
+				)
+			}
 		}
 	}
 
@@ -137,10 +147,10 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		let accounts = all.sorted(by: \.appearanceID).asIdentifiable()
 
 		switch purpose {
-		case let .createProfile(bdfsID):
+		case let .createProfile(deviceFactorSource):
 			let recoveredAccountAndBDFS = AccountsRecoveredFromScanningUsingMnemonic(
 				accounts: accounts,
-				factorSourceIDOfBDFSAlreadySavedIntoKeychain: bdfsID
+				deviceFactorSource: deviceFactorSource
 			)
 			return .run { send in
 				let result = await TaskResult<EqVoid> {

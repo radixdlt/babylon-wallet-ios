@@ -102,6 +102,10 @@ extension Profile.Network.Account {
 		public init(numberOfAccountsOnNetwork: Int) {
 			self.init(appearanceID: .fromIndex(numberOfAccountsOnNetwork))
 		}
+
+		public init(index: HD.Path.Component.Child.Value) {
+			self.init(appearanceID: .fromIndex(.init(index)))
+		}
 	}
 
 	public init(

@@ -201,18 +201,9 @@ extension ProfileStore {
 	) async throws {
 		@Dependency(\.uuid) var uuid
 		let (creatingDevice, model, name) = await updateDeviceInfo()
-		let factorSourceID = accountsRecoveredFromScanningUsingMnemonic.factorSourceIDOfBDFSAlreadySavedIntoKeychain
-		let bdfs = DeviceFactorSource(
-			id: factorSourceID,
-			common: .init(),
-			hint: .init(
-				name: name,
-				model: .init(
-					model
-				),
-				mnemonicWordCount: .twentyFour
-			)
-		)
+		var bdfs = accountsRecoveredFromScanningUsingMnemonic.deviceFactorSource
+		bdfs.hint.name = name
+		bdfs.hint.model = .init(model)
 		let accounts = accountsRecoveredFromScanningUsingMnemonic.accounts
 		let network = Profile.Network(networkID: .mainnet, accounts: accounts, personas: [], authorizedDapps: [])
 		let profile = Profile(

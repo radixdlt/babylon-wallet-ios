@@ -1,8 +1,8 @@
 // MARK: - AccountRecoveryScanInProgress
 public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let factorSourceID: FactorSourceID
-		public var factorSource: Loadable<FactorSource> = .loading
+		public let factorSourceID: FactorSourceID.FromHash
+		public var factorSource: Loadable<FactorSource>
 		public let networkID: NetworkID
 		public var offset: Int
 		public let scheme: DerivationScheme
@@ -12,11 +12,21 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destination.State?
 
-		public init(factorSourceID: FactorSourceID, offset: Int, scheme: DerivationScheme, networkID: NetworkID) {
+		public init(
+			factorSourceID: FactorSourceID.FromHash,
+			factorSource: Loadable<FactorSource> = .loading,
+			offset: Int,
+			scheme: DerivationScheme,
+			networkID: NetworkID
+		) {
+			if let factorSource = factorSource.wrappedValue {
+				assert(factorSourceID.embed() == factorSource.id)
+			}
 			self.offset = offset
 			self.factorSourceID = factorSourceID
 			self.scheme = scheme
 			self.networkID = networkID
+			self.factorSource = factorSource
 		}
 	}
 
@@ -75,23 +85,28 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 				fatalError("error handling")
 			}
 			state.factorSource = .success(factorSource)
-			return derivePublicKeys(state: &state)
+			return derivePublicKeys(using: factorSource, state: &state)
 		}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appear:
-			return .run { [id = state.factorSourceID] send in
-				let result = await TaskResult<FactorSource?> {
-					try await factorSourcesClient.getFactorSource(id: id)
+			if let factorSource = state.factorSource.wrappedValue {
+				return derivePublicKeys(using: factorSource, state: &state)
+			} else {
+				return .run { [id = state.factorSourceID] send in
+					let result = await TaskResult<FactorSource?> {
+						try await factorSourcesClient.getFactorSource(id: id.embed())
+					}
+					await send(.internal(.loadFactorSourceResult(result)))
 				}
-				await send(.internal(.loadFactorSourceResult(result)))
 			}
 
 		case .scanMore:
+			guard let factorSource = state.factorSource.wrappedValue else { fatalError("discrepancy") }
 			state.offset += accRecScanBatchSize
-			return derivePublicKeys(state: &state)
+			return derivePublicKeys(using: factorSource, state: &state)
 
 		case .continueTapped:
 			return .send(.delegate(.foundAccounts(active: state.active, inactive: state.inactive)))
@@ -100,37 +115,30 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .derivePublicKeys(.delegate(.derivedPublicKeys(keys, factorSourceID, networkID))):
-			assert(factorSourceID == state.factorSourceID)
-			guard let factorSource = state.factorSource.wrappedValue else { fatalError("discrepancy") }
-			let accounts = keys.map { hdPubKey in
-				let index = hdPubKey.derivationPath.index
+		case let .derivePublicKeys(.delegate(.derivedPublicKeys(publicHDKeys, factorSourceID, networkID))):
+			assert(factorSourceID == state.factorSourceID.embed())
+			assert(networkID == state.networkID)
+
+			let accounts = publicHDKeys.map { publicHDKey in
+				let index = publicHDKey.derivationPath.index
 				let account = try! Profile.Network.Account(
 					networkID: networkID,
 					index: index,
 					factorInstance: .init(
-						factorInstance: .init(
-							factorSourceID: factorSourceID,
-							badge: .virtual(
-								.hierarchicalDeterministic(
-									hdPubKey
-								)
-							)
-						)
+						factorSourceID: state.factorSourceID,
+						publicHDKey: publicHDKey
 					),
 					displayName: "Unnamed",
-					extraProperties: .init(
-						appearanceID: .fromIndex(
-							.init(index)
-						)
-					)
+					extraProperties: .init(index: index)
 				)
 				return account
 			}.asIdentifiable()
+
 			return scanOnLedger(accounts: accounts, state: &state)
 
 		case .derivePublicKeys(.delegate(.failedToDerivePublicKey)):
 			fatalError("error handling")
+
 		default: return .none
 		}
 	}
@@ -140,9 +148,9 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	}
 
 	private func derivePublicKeys(
+		using factorSource: FactorSource,
 		state: inout State
 	) -> Effect<Action> {
-		guard let factorSource = state.factorSource.wrappedValue else { fatalError("discrepancy") }
 		let offset = state.offset
 		let networkID = state.networkID
 		let indexRange = (offset ..< (offset + accRecScanBatchSize))

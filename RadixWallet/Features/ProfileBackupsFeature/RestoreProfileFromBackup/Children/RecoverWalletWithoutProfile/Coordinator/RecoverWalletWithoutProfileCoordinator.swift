@@ -8,7 +8,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		/// SHOULD be used to delete the mnemonic if user did not complete
 		/// the account recovery scanning flow. Will be added to Profile
 		/// as main BDFS if account recovery scanning flow is completed.
-		public var factorSourceOfImportedMnemonic: FactorSource?
+		public var factorSourceOfImportedMnemonic: DeviceFactorSource?
 
 		@PresentationState
 		var destination: Destination.State? = nil
@@ -131,8 +131,9 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 				guard let fromHash = factorSource.id.extract(FactorSource.ID.FromHash.self) else {
 					fatalError("error handling")
 				}
-				state.factorSourceOfImportedMnemonic = factorSource
-				state.destination = .accountRecoveryScanCoordinator(.init(purpose: .createProfile(fromHash), promptForSelectionOfInactiveAccountsIfAny: true))
+				let deviceFactorSource = DeviceFactorSource(id: fromHash, common: .init(), hint: .init(name: "iPhone", model: "iPhone", mnemonicWordCount: .twentyFour))
+				state.factorSourceOfImportedMnemonic = deviceFactorSource
+				state.destination = .accountRecoveryScanCoordinator(.init(purpose: .createProfile(deviceFactorSource), promptForSelectionOfInactiveAccountsIfAny: true))
 				return .none
 
 			default:
@@ -169,13 +170,12 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 
 	private func deleteSavedUnusedMnemonic(state: State) -> Effect<Action> {
 		if
-			let factorSourceID = state.factorSourceOfImportedMnemonic?.id,
-			let deviceFactorSourceID = factorSourceID.extract(FactorSource.ID.FromHash.self)
+			let factorSourceID = state.factorSourceOfImportedMnemonic?.id
 		{
 			loggerGlobal.notice("We did not finish Account Recovery Scan Flow. Deleting mnemonic from keychain for safety reasons.")
 			// We did not complete account recovery scan => delete the mnemonic from
 			// keychain for security reasons.
-			try? secureStorageClient.deleteMnemonicByFactorSourceID(deviceFactorSourceID)
+			try? secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
 		}
 		return .send(.delegate(.dismiss))
 	}

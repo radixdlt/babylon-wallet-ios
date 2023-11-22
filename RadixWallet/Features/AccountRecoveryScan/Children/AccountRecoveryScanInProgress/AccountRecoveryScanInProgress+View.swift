@@ -62,24 +62,3 @@ public extension AccountRecoveryScanInProgress {
 		}
 	}
 }
-
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-// MARK: - AccountRecoveryScanStart_Preview
-
-struct AccountRecoveryScanStart_Preview: PreviewProvider {
-	static var previews: some View {
-		AccountRecoveryScanInProgress.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: AccountRecoveryScanInProgress.init
-			)
-		)
-	}
-}
-
-public extension AccountRecoveryScanInProgress.State {
-	static let previewValue = Self()
-}
-#endif
