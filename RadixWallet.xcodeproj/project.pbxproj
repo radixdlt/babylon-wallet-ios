@@ -9334,7 +9334,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/radixdlt/swift-composable-architecture";
 			requirement = {
-				branch = "full-scope-1.4";
+				branch = "full-scope-1.4.2";
 				kind = branch;
 			};
 		};
