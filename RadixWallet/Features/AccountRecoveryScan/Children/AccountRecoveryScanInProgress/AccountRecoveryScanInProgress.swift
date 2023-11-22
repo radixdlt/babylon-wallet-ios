@@ -1,6 +1,15 @@
 // MARK: - AccountRecoveryScanInProgress
 public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		public enum Status: Sendable, Hashable {
+			case new
+			case loadingFactorSource
+			case derivingPublicKeys
+			case scanningNetworkForActiveAccounts
+			case scanComplete
+		}
+
+		public var status: Status = .new
 		public let factorSourceID: FactorSourceID.FromHash
 		public var factorSource: Loadable<FactorSource>
 		public let networkID: NetworkID
@@ -10,7 +19,13 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		public var inactive: IdentifiedArrayOf<Profile.Network.Account> = []
 
 		@PresentationState
-		public var destination: Destination.State?
+		public var destination: Destination.State? {
+			didSet {
+				if case .some(.derivePublicKeys) = destination {
+					self.status = .derivingPublicKeys
+				}
+			}
+		}
 
 		public init(
 			factorSourceID: FactorSourceID.FromHash,
@@ -95,6 +110,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			if let factorSource = state.factorSource.wrappedValue {
 				return derivePublicKeys(using: factorSource, state: &state)
 			} else {
+				state.status = .loadingFactorSource
 				return .run { [id = state.factorSourceID] send in
 					let result = await TaskResult<FactorSource?> {
 						try await factorSourcesClient.getFactorSource(id: id.embed())
@@ -144,7 +160,8 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	}
 
 	private func scanOnLedger(accounts: IdentifiedArrayOf<Profile.Network.Account>, state: inout State) -> Effect<Action> {
-		.none
+		state.status = .scanningNetworkForActiveAccounts
+		return .none
 	}
 
 	private func derivePublicKeys(

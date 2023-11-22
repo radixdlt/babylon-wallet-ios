@@ -196,7 +196,7 @@ extension ImportMnemonic {
 				#if !DEBUG
 					.screenshotProtected(isProtected: true)
 				#endif // !DEBUG
-					.destinations(store: store)
+					.destinations(with: store)
 			}
 		}
 
@@ -233,7 +233,7 @@ private extension StoreOf<ImportMnemonic> {
 
 @MainActor
 extension View {
-	func destinations(store: StoreOf<ImportMnemonic>) -> some View {
+	func destinations(with store: StoreOf<ImportMnemonic>) -> some View {
 		let destinationStore = store.destination
 		return offDeviceMnemonicInfoPrompt(with: destinationStore)
 			.onContinueWarning(with: destinationStore)
