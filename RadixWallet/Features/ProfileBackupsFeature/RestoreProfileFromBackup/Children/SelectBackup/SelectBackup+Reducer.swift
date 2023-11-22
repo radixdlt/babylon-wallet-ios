@@ -185,7 +185,9 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 		case .recoverWalletWithoutProfileCoordinator(.delegate(.profileCreatedFromImportedBDFS)):
 			state.destination = nil
-			return .send(.delegate(.profileCreatedFromImportedBDFS))
+			// Unfortunately we need a short delay :/ otherwise the "Recovery Completed" screen pops back again,
+			// SwiftUI nav bug...
+			return delayedShortEffect(for: .delegate(.profileCreatedFromImportedBDFS))
 
 		case .inputEncryptionPassword(.delegate(.dismiss)):
 			state.destination = nil
