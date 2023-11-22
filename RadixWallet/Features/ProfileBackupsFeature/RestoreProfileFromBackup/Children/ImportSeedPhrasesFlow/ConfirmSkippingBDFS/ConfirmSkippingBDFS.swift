@@ -8,7 +8,7 @@ public struct ConfirmSkippingBDFS: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case task
 		case confirmTapped
-		case backButtonTapped
+		case closeButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -33,7 +33,7 @@ public struct ConfirmSkippingBDFS: Sendable, FeatureReducer {
 			}
 		case .confirmTapped:
 			.send(.delegate(.confirmed))
-		case .backButtonTapped:
+		case .closeButtonTapped:
 			.send(.delegate(.cancel))
 		}
 	}
