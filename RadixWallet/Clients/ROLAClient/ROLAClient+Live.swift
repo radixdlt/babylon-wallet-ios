@@ -172,7 +172,7 @@ extension EngineToolkit.PublicKeyHash {
 
 extension OnLedgerEntity.Metadata {
 	public func ownerKeyHashes() throws -> [EngineToolkit.PublicKeyHash]? {
-		try ownerKeys?.compactMap { hash in
+		try ownerKeys?.value.map { hash in
 			switch hash {
 			case let .ecdsaSecp256k1(value):
 				let bytes = try [UInt8].init(hex: value)

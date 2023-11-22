@@ -58,6 +58,7 @@ public enum EntityMetadataKey: String, CaseIterable {
 	case relatedWebsites = "related_websites"
 	case accountType = "account_type"
 	case ownerKeys = "owner_keys"
+	case ownerBadge = "owner_badge"
 
 	// The GW limits the number of metadata keys we can ask for
 	static var maxAllowedKeys = 10

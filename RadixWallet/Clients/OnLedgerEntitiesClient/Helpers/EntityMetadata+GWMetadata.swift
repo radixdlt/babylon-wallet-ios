@@ -15,7 +15,8 @@ extension OnLedgerEntity.Metadata {
 			claimedEntities: raw?.claimedEntities,
 			claimedWebsites: raw?.claimedWebsites,
 			accountType: raw?.accountType,
-			ownerKeys: raw?.ownerKeys
+			ownerKeys: raw?.ownerKeys,
+			ownerBadge: raw?.ownerBadge
 		)
 	}
 }
@@ -115,12 +116,24 @@ extension GatewayAPI.EntityMetadataItemValue {
 		typed.globalAddressValue?.value
 	}
 
+	public var asNonFungibleLocalID: NonFungibleLocalId? {
+		guard let raw = typed.nonFungibleLocalIdValue?.value else {
+			return nil
+		}
+		do {
+			return try NonFungibleLocalId.from(stringFormat: raw)
+		} catch {
+			loggerGlobal.error("Failed to convert NonFungibleLocalId from string: \(raw), error: \(error) => FILTERED OUT.")
+			return nil
+		}
+	}
+
 	public var asGlobalAddressCollection: [String]? {
 		typed.globalAddressArrayValue?.values
 	}
 
 	public var publicKeyHashes: [OnLedgerEntity.Metadata.PublicKeyHash]? {
-		typed.publicKeyHashArrayValue?.values.map { .init(raw: $0) }
+		typed.publicKeyHashArrayValue?.values.map { OnLedgerEntity.Metadata.PublicKeyHash(raw: $0) }
 	}
 }
 
@@ -136,48 +149,56 @@ extension OnLedgerEntity.Metadata.PublicKeyHash {
 }
 
 extension GatewayAPI.EntityMetadataCollection {
+	public func value(_ key: EntityMetadataKey) -> GatewayAPI.EntityMetadataItemValue? {
+		items[key]?.value
+	}
+
 	public var name: String? {
-		items[.name]?.asString
+		value(.name)?.asString
 	}
 
 	public var symbol: String? {
-		items[.symbol]?.asString
+		value(.symbol)?.asString
 	}
 
 	public var description: String? {
-		items[.description]?.asString
+		value(.description)?.asString
 	}
 
 	public var tags: [String]? {
-		items[.tags]?.asStringCollection
+		value(.tags)?.asStringCollection
 	}
 
 	public var iconURL: URL? {
-		items[.iconURL]?.asURL
+		value(.iconURL)?.asURL
 	}
 
 	public var dappDefinition: String? {
-		items[.dappDefinition]?.asGlobalAddress
+		value(.dappDefinition)?.asGlobalAddress
 	}
 
 	public var dappDefinitions: [String]? {
-		items[.dappDefinitions]?.asGlobalAddressCollection
+		value(.dappDefinitions)?.asGlobalAddressCollection
 	}
 
 	public var claimedEntities: [String]? {
-		items[.claimedEntities]?.asGlobalAddressCollection
+		value(.claimedEntities)?.asGlobalAddressCollection
 	}
 
 	public var claimedWebsites: [URL]? {
-		items[.claimedWebsites]?.asOriginCollection
+		value(.claimedWebsites)?.asOriginCollection
 	}
 
 	public var accountType: OnLedgerEntity.AccountType? {
-		items[.accountType]?.asString.flatMap(OnLedgerEntity.AccountType.init)
+		value(.accountType)?.asString.flatMap(OnLedgerEntity.AccountType.init)
 	}
 
-	public var ownerKeys: [OnLedgerEntity.Metadata.PublicKeyHash]? {
-		items[.ownerKeys]?.publicKeyHashes
+	public var ownerKeys: OnLedgerEntity.Metadata.PublicKeyHashesWithStateVersion? {
+		items[.ownerKeys]?.map(\.publicKeyHashes)
+	}
+
+	public var ownerBadge: OnLedgerEntity.Metadata.OwnerBadgeWithStateVersion? {
+		items[.ownerBadge]?.map(\.asNonFungibleLocalID)
 	}
 
 	public var validator: ValidatorAddress? {
@@ -208,18 +229,27 @@ extension GatewayAPI.EntityMetadataCollection {
 		key: EntityMetadataKey,
 		from keyPath: KeyPath<GatewayAPI.EntityMetadataItemValue, Field?>,
 		transform: @escaping (Field) throws -> Value
-	) -> Value? {
-		guard let item = items[key] else {
-			return nil
-		}
+	) -> Value? where Value: Hashable & Codable {
+		extractWithAtStateVersion(key: key, from: keyPath, transform: transform)?.value
+	}
 
-		guard let field = item[keyPath: keyPath] else {
-			assertionFailure("item found, but it was not wrapped in the expected field")
+	private func extractWithAtStateVersion<Value, Field>(
+		key: EntityMetadataKey,
+		from keyPath: KeyPath<GatewayAPI.EntityMetadataItemValue, Field?>,
+		transform: @escaping (Field) throws -> Value
+	) -> OnLedgerEntity.Metadata.ValueAtStateVersion<Value>? {
+		guard let itemAtStateVersion = items[key] else {
 			return nil
 		}
 
 		do {
-			return try transform(field)
+			return try itemAtStateVersion.map {
+				guard let field = $0[keyPath: keyPath] else {
+					assertionFailure("item found, but it was not wrapped in the expected field")
+					return nil
+				}
+				return try transform(field)
+			}
 		} catch {
 			assertionFailure(error.localizedDescription)
 			return nil
@@ -227,15 +257,22 @@ extension GatewayAPI.EntityMetadataCollection {
 	}
 }
 
+public typealias AtStateVersion = Int64
 extension [GatewayAPI.EntityMetadataItem] {
 	public typealias Key = EntityMetadataKey
 
-	public subscript(key: Key) -> GatewayAPI.EntityMetadataItemValue? {
-		first { $0.key == key.rawValue }?.value
+	public subscript(key: Key) -> OnLedgerEntity.Metadata.ValueAtStateVersion<GatewayAPI.EntityMetadataItemValue>? {
+		guard let item = first(where: { $0.key == key.rawValue }) else {
+			return nil
+		}
+		return OnLedgerEntity.Metadata.ValueAtStateVersion(value: item.value, lastUpdatedAtStateVersion: item.lastUpdatedAtStateVersion)
 	}
 
-	public subscript(customKey key: String) -> GatewayAPI.EntityMetadataItemValue? {
-		first { $0.key == key }?.value
+	public subscript(customKey key: String) -> OnLedgerEntity.Metadata.ValueAtStateVersion<GatewayAPI.EntityMetadataItemValue>? {
+		guard let item = first(where: { $0.key == key }) else {
+			return nil
+		}
+		return OnLedgerEntity.Metadata.ValueAtStateVersion(value: item.value, lastUpdatedAtStateVersion: item.lastUpdatedAtStateVersion)
 	}
 }
 

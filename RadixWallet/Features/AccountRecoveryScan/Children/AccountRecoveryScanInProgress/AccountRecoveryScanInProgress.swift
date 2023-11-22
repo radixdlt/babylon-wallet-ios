@@ -95,6 +95,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
+	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
@@ -112,6 +113,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			return scanOnLedger(accounts: accounts, state: &state)
 
 		case let .foundAccounts(active, inactive):
+			loggerGlobal.notice("✅ .internal(.foundAccounts))")
 			state.status = .scanComplete
 			state.active.append(contentsOf: active)
 			state.inactive.append(contentsOf: inactive)
@@ -168,9 +170,11 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 					return account
 				}.asIdentifiable()
 
-				// We delay because it is bad UX for user to see DerivingPublicKeys view presented
-				// and dismissed so fast.
-				return delayedMediumEffect(internal: .delayScan(accounts: accounts))
+				//				// We delay because it is bad UX for user to see DerivingPublicKeys view presented
+				//				// and dismissed so fast.
+				//				return delayedMediumEffect(internal: .delayScan(accounts: accounts))
+				loggerGlobal.warning("Done deriving keys, current thread: \(Thread.current)")
+				return scanOnLedger(accounts: accounts, state: &state)
 
 			case .failedToDerivePublicKey:
 				fatalError("failed to derive keys")
@@ -179,19 +183,55 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		default: return .none
 		}
 	}
+}
 
+extension AccountRecoveryScanInProgress {
 	private func scanOnLedger(accounts: IdentifiedArrayOf<Profile.Network.Account>, state: inout State) -> Effect<Action> {
 		assert(accounts.count == accRecScanBatchSize)
 		state.destination = nil
 		state.status = .scanningNetworkForActiveAccounts
 
-		return .run { send in
+		return .run(priority: .userInitiated) { send in
 			let MOCKED_activeFirstN = 5
 			let MOCKED_inactiveN = 5
 			let MOCKED_activeSecondN = 5
 
 			loggerGlobal.critical("MOCKING network scanning => \(MOCKED_activeFirstN) active, \(MOCKED_inactiveN) inactive, \(MOCKED_activeSecondN) active.\n\nImplement me! \(#file)#\(#line)")
-			try? await Task.sleep(for: .seconds(2))
+
+			loggerGlobal.warning("1️⃣ try Task.checkCancellation()")
+			try Task.checkCancellation()
+			loggerGlobal.warning("1️⃣ not cancelled ✅")
+
+			let accountAddresses: [AccountAddress] = accounts.map(\.address)
+			let engineAddresses: [Address] = accountAddresses.map(\.asGeneral)
+			let addressOfActiveAccounts: [AccountAddress] = try await onLedgerEntitiesClient.getEntities(
+				engineAddresses,
+				[.ownerBadge, .ownerKeys],
+				nil,
+				true // force to refresh
+			).compactMap { (onLedgerEntity: OnLedgerEntity) -> AccountAddress? in
+				guard
+					let onLedgerAccount = onLedgerEntity.account,
+					case let metadata = onLedgerAccount.metadata,
+					let ownerKeys = metadata.ownerKeys,
+					let ownerBadge = metadata.ownerBadge
+				else { return nil }
+
+				func hasStateChange(_ list: OnLedgerEntity.Metadata.ValueAtStateVersion<some Any>) -> Bool {
+					list.lastUpdatedAtStateVersion > 0
+				}
+				let isActive = hasStateChange(ownerKeys) || hasStateChange(ownerBadge)
+				guard isActive else {
+					return nil
+				}
+				return onLedgerAccount.address
+			}
+			loggerGlobal.error("IGNORED real result - addressOfActiveAccounts: \(addressOfActiveAccounts) (probably empty?)")
+
+			loggerGlobal.warning("2️⃣ try Task.checkCancellation()")
+			try Task.checkCancellation()
+			loggerGlobal.warning("2️⃣ not cancelled ✅")
+
 			var accounts = accounts
 			func take(n: Int) -> some Collection<Profile.Network.Account> {
 				defer { accounts.removeFirst(n) }
@@ -203,6 +243,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			let active = MOCKED_Active.asIdentifiable()
 			let inactive = MOCKED_Inactive.asIdentifiable()
 			assert(Set(active).intersection(Set(inactive)).isEmpty)
+			loggerGlobal.notice("Finished mocking scanned account => send(.internal(.foundAccounts))")
 			await send(.internal(.foundAccounts(active: active, inactive: inactive)))
 		}
 	}
@@ -241,6 +282,16 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			)
 		)
 		return .none
+	}
+
+	private func slow() async {
+		loggerGlobal.error("SLOW START")
+		_ = await Task(priority: .background) {
+			(0 ..< 100_000).map { _ in
+				CryptoKit.Curve25519.PrivateKey().publicKey
+			}
+		}.value
+		loggerGlobal.error("SLOW END")
 	}
 }
 

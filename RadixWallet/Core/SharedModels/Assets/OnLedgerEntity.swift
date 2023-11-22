@@ -58,6 +58,15 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable {
 	}
 }
 
+// MARK: - OnLedgerEntity.Metadata.ValueAtStateVersion + Sendable
+extension OnLedgerEntity.Metadata.ValueAtStateVersion: Sendable where Value: Sendable {}
+
+// MARK: - OnLedgerEntity.Metadata.ValueAtStateVersion + Equatable
+extension OnLedgerEntity.Metadata.ValueAtStateVersion: Equatable where Value: Equatable {}
+
+// MARK: - OnLedgerEntity.Metadata.ValueAtStateVersion + Hashable
+extension OnLedgerEntity.Metadata.ValueAtStateVersion: Hashable where Value: Hashable {}
+
 // MARK: OnLedgerEntity.Resource
 extension OnLedgerEntity {
 	public struct Metadata: Sendable, Hashable, Codable {
@@ -79,7 +88,38 @@ extension OnLedgerEntity {
 		public let claimedEntities: [String]?
 		public let claimedWebsites: [URL]?
 		public let accountType: AccountType?
-		public let ownerKeys: [PublicKeyHash]?
+		public let ownerKeys: PublicKeyHashesWithStateVersion?
+		public let ownerBadge: OwnerBadgeWithStateVersion?
+
+		public struct ValueAtStateVersion<Value>: Codable where Value: Codable {
+			public let value: Value
+			public let lastUpdatedAtStateVersion: AtStateVersion
+
+			public func map<T>(_ transform: (Value) throws -> T) rethrows -> ValueAtStateVersion<T> {
+				try ValueAtStateVersion<T>(
+					value: transform(value),
+					lastUpdatedAtStateVersion: lastUpdatedAtStateVersion
+				)
+			}
+
+			public func map<T>(_ transform: (Value) throws -> T?) rethrows -> ValueAtStateVersion<T>? {
+				guard let transformed = try transform(value) else { return nil }
+				return ValueAtStateVersion<T>(
+					value: transformed,
+					lastUpdatedAtStateVersion: lastUpdatedAtStateVersion
+				)
+			}
+
+			public func mapArray<T>(_ transform: (Value) throws -> [T]?) rethrows -> [ValueAtStateVersion<T>]? {
+				guard let elements = try transform(value) else { return nil }
+				return elements.map { (element: T) in
+					ValueAtStateVersion<T>.init(value: element, lastUpdatedAtStateVersion: lastUpdatedAtStateVersion)
+				}
+			}
+		}
+
+		public typealias OwnerBadgeWithStateVersion = ValueAtStateVersion<NonFungibleLocalId>
+		public typealias PublicKeyHashesWithStateVersion = ValueAtStateVersion<[PublicKeyHash]>
 
 		public init(
 			name: String? = nil,
@@ -95,7 +135,8 @@ extension OnLedgerEntity {
 			claimedEntities: [String]? = nil,
 			claimedWebsites: [URL]? = nil,
 			accountType: AccountType? = nil,
-			ownerKeys: [PublicKeyHash]? = nil
+			ownerKeys: PublicKeyHashesWithStateVersion? = nil,
+			ownerBadge: OwnerBadgeWithStateVersion? = nil
 		) {
 			self.name = name
 			self.symbol = symbol
@@ -111,6 +152,7 @@ extension OnLedgerEntity {
 			self.claimedWebsites = claimedWebsites
 			self.accountType = accountType
 			self.ownerKeys = ownerKeys
+			self.ownerBadge = ownerBadge
 		}
 	}
 
@@ -321,7 +363,7 @@ extension OnLedgerEntity {
 	}
 }
 
-// MARK: OnLedgerEntity.Account
+// MARK: - OnLedgerEntity.Account
 extension OnLedgerEntity {
 	public struct Account: Sendable, Hashable, Codable {
 		public let address: AccountAddress
@@ -349,7 +391,7 @@ extension OnLedgerEntity {
 	}
 }
 
-// MARK: OnLedgerEntity.AssociatedDapp
+// MARK: - OnLedgerEntity.AssociatedDapp
 extension OnLedgerEntity {
 	public struct AssociatedDapp: Sendable, Hashable, Codable {
 		public let address: DappDefinitionAddress
