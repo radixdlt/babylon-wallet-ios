@@ -40,7 +40,11 @@ extension ImportMnemonicControllingAccounts {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack {
+				VStack(alignment: .center) {
+					Text(viewStore.navigationTitle)
+						.textStyle(.sheetTitle)
+						.foregroundColor(.app.gray1)
+
 					Text(viewStore.title)
 						.textStyle(.body1Regular)
 						.foregroundColor(.app.gray1)
@@ -58,7 +62,6 @@ extension ImportMnemonicControllingAccounts {
 					if viewStore.isMain {
 						skipButton(with: viewStore)
 					}
-
 					Spacer(minLength: 0)
 				}
 				.padding(.horizontal, .medium3)
@@ -68,7 +71,6 @@ extension ImportMnemonicControllingAccounts {
 					}
 					.buttonStyle(.primaryRectangular)
 				}
-				.navigationTitle(viewStore.navigationTitle)
 				.onAppear { viewStore.send(.appeared) }
 				.destinations(with: store)
 			}
