@@ -200,6 +200,7 @@ extension ProfileStore {
 		with accountsRecoveredFromScanningUsingMnemonic: AccountsRecoveredFromScanningUsingMnemonic
 	) async throws {
 		@Dependency(\.uuid) var uuid
+		loggerGlobal.notice("Finish onboarding with accounts recovered from scanning using menmonic")
 		let (creatingDevice, model, name) = await updateDeviceInfo()
 		var bdfs = accountsRecoveredFromScanningUsingMnemonic.deviceFactorSource
 		bdfs.hint.name = name

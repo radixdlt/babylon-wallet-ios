@@ -109,11 +109,12 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .addAccountsToExistingProfileResult(.success):
-			.send(.delegate(.completed))
+			return .send(.delegate(.completed))
 		case let .addAccountsToExistingProfileResult(.failure(error)):
 			fatalError("todo error handling")
 		case .createProfileResult(.success):
-			.send(.delegate(.completed))
+			loggerGlobal.notice("Successfully created a Profile using Account Recovery Scanning ✅")
+			return .send(.delegate(.completed))
 		case let .createProfileResult(.failure(error)):
 			fatalError("todo error handling")
 		}
