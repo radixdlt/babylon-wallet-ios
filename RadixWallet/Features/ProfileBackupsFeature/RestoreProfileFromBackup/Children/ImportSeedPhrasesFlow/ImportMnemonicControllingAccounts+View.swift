@@ -54,7 +54,6 @@ extension ImportMnemonicControllingAccounts {
 							store: store.scope(state: \.entities, action: { .child(.entities($0)) })
 						)
 					}
-					.fixedSize(horizontal: false, vertical: true) // prevent ScrollView from growing vertically if not needed.
 
 					if viewStore.isMain {
 						skipButton(with: viewStore)
