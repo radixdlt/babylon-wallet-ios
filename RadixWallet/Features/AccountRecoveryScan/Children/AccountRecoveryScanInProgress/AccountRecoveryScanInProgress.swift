@@ -170,11 +170,9 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 					return account
 				}.asIdentifiable()
 
-				//				// We delay because it is bad UX for user to see DerivingPublicKeys view presented
-				//				// and dismissed so fast.
-				//				return delayedMediumEffect(internal: .delayScan(accounts: accounts))
-				loggerGlobal.warning("Done deriving keys, current thread: \(Thread.current)")
-				return scanOnLedger(accounts: accounts, state: &state)
+				// We delay because it is bad UX for user to see DerivingPublicKeys view presented
+				// and dismissed so fast.
+				return delayedMediumEffect(internal: .delayScan(accounts: accounts))
 
 			case .failedToDerivePublicKey:
 				fatalError("failed to derive keys")
@@ -191,61 +189,73 @@ extension AccountRecoveryScanInProgress {
 		state.destination = nil
 		state.status = .scanningNetworkForActiveAccounts
 
-		return .run(priority: .userInitiated) { send in
-			let MOCKED_activeFirstN = 5
-			let MOCKED_inactiveN = 5
-			let MOCKED_activeSecondN = 5
-
-			loggerGlobal.critical("MOCKING network scanning => \(MOCKED_activeFirstN) active, \(MOCKED_inactiveN) inactive, \(MOCKED_activeSecondN) active.\n\nImplement me! \(#file)#\(#line)")
-
-			loggerGlobal.warning("1️⃣ try Task.checkCancellation()")
-			try Task.checkCancellation()
-			loggerGlobal.warning("1️⃣ not cancelled ✅")
-
-			let accountAddresses: [AccountAddress] = accounts.map(\.address)
-			let engineAddresses: [Address] = accountAddresses.map(\.asGeneral)
-			let addressOfActiveAccounts: [AccountAddress] = try await onLedgerEntitiesClient.getEntities(
-				engineAddresses,
-				[.ownerBadge, .ownerKeys],
-				nil,
-				true // force to refresh
-			).compactMap { (onLedgerEntity: OnLedgerEntity) -> AccountAddress? in
-				guard
-					let onLedgerAccount = onLedgerEntity.account,
-					case let metadata = onLedgerAccount.metadata,
-					let ownerKeys = metadata.ownerKeys,
-					let ownerBadge = metadata.ownerBadge
-				else { return nil }
-
-				func hasStateChange(_ list: OnLedgerEntity.Metadata.ValueAtStateVersion<some Any>) -> Bool {
-					list.lastUpdatedAtStateVersion > 0
-				}
-				let isActive = hasStateChange(ownerKeys) || hasStateChange(ownerBadge)
-				guard isActive else {
-					return nil
-				}
-				return onLedgerAccount.address
-			}
-			loggerGlobal.error("IGNORED real result - addressOfActiveAccounts: \(addressOfActiveAccounts) (probably empty?)")
-
-			loggerGlobal.warning("2️⃣ try Task.checkCancellation()")
-			try Task.checkCancellation()
-			loggerGlobal.warning("2️⃣ not cancelled ✅")
-
-			var accounts = accounts
-			func take(n: Int) -> some Collection<Profile.Network.Account> {
-				defer { accounts.removeFirst(n) }
-				return accounts.prefix(n)
-			}
-			var MOCKED_Active = Array(take(n: MOCKED_activeFirstN))
-			let MOCKED_Inactive = Array(take(n: MOCKED_inactiveN))
-			MOCKED_Active.append(contentsOf: take(n: MOCKED_activeSecondN))
-			let active = MOCKED_Active.asIdentifiable()
-			let inactive = MOCKED_Inactive.asIdentifiable()
-			assert(Set(active).intersection(Set(inactive)).isEmpty)
+		return .run { send in
+			let (active, inactive) = try await mockedScan(accounts: accounts)
 			loggerGlobal.notice("Finished mocking scanned account => send(.internal(.foundAccounts))")
 			await send(.internal(.foundAccounts(active: active, inactive: inactive)))
 		}
+	}
+
+	/// FIXME: This results in CancellationError, not only this but doing ANY thing that takes a bit of time inside of `scanOnLedger` results in
+	/// CancellationError, e.g. `try await Task.sleep(for: .seconds(0.5))` results in CancellationError, which results in this
+	/// Reducer never ever receiving `internal(.foundAccounts` event - aka "TCA Send" bug. I will have to write it in another manner...
+	private func performScan(accounts: IdentifiedArrayOf<Profile.Network.Account>) async throws -> (active: IdentifiedArrayOf<Profile.Network.Account>, inactive: IdentifiedArrayOf<Profile.Network.Account>) {
+		let accountAddresses: [AccountAddress] = accounts.map(\.address)
+		let engineAddresses: [Address] = accountAddresses.map(\.asGeneral)
+		let addressOfActiveAccounts: [AccountAddress] = try await onLedgerEntitiesClient.getEntities(
+			engineAddresses,
+			[.ownerBadge, .ownerKeys],
+			nil,
+			true // force to refresh
+		).compactMap { (onLedgerEntity: OnLedgerEntity) -> AccountAddress? in
+			guard
+				let onLedgerAccount = onLedgerEntity.account,
+				case let metadata = onLedgerAccount.metadata,
+				let ownerKeys = metadata.ownerKeys,
+				let ownerBadge = metadata.ownerBadge
+			else { return nil }
+
+			func hasStateChange(_ list: OnLedgerEntity.Metadata.ValueAtStateVersion<some Any>) -> Bool {
+				list.lastUpdatedAtStateVersion > 0
+			}
+			let isActive = hasStateChange(ownerKeys) || hasStateChange(ownerBadge)
+			guard isActive else {
+				return nil
+			}
+			return onLedgerAccount.address
+		}
+
+		var active: IdentifiedArrayOf<Profile.Network.Account> = []
+		var inactive: IdentifiedArrayOf<Profile.Network.Account> = []
+		for account in accounts {
+			if addressOfActiveAccounts.contains(where: { $0 == account.address }) {
+				active.append(account)
+			} else {
+				inactive.append(account)
+			}
+		}
+		return (active, inactive)
+	}
+
+	private func mockedScan(accounts: IdentifiedArrayOf<Profile.Network.Account>) async throws -> (active: IdentifiedArrayOf<Profile.Network.Account>, inactive: IdentifiedArrayOf<Profile.Network.Account>) {
+		let MOCKED_activeFirstN = 5
+		let MOCKED_inactiveN = 5
+		let MOCKED_activeSecondN = 5
+
+		loggerGlobal.critical("MOCKING network scanning => \(MOCKED_activeFirstN) active, \(MOCKED_inactiveN) inactive, \(MOCKED_activeSecondN) active.\n\nImplement me! \(#file)#\(#line)")
+
+		var accounts = accounts
+		func take(n: Int) -> some Collection<Profile.Network.Account> {
+			defer { accounts.removeFirst(n) }
+			return accounts.prefix(n)
+		}
+		var MOCKED_Active = Array(take(n: MOCKED_activeFirstN))
+		let MOCKED_Inactive = Array(take(n: MOCKED_inactiveN))
+		MOCKED_Active.append(contentsOf: take(n: MOCKED_activeSecondN))
+		let active = MOCKED_Active.asIdentifiable()
+		let inactive = MOCKED_Inactive.asIdentifiable()
+		assert(Set(active).intersection(Set(inactive)).isEmpty)
+		return (active, inactive)
 	}
 
 	private func derivePublicKeys(
