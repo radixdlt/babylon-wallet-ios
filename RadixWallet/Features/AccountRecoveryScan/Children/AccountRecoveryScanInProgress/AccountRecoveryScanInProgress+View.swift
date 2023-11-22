@@ -85,7 +85,7 @@ public extension AccountRecoveryScanInProgress {
 				.footer {
 					Button("Continue") {
 						store.send(.view(.continueTapped))
-					}.buttonStyle(.secondaryRectangular)
+					}.buttonStyle(.primaryRectangular)
 				}
 				.destinations(with: store)
 				.onAppear {

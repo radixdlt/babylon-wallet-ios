@@ -32,23 +32,40 @@ public extension SelectInactiveAccountsToAdd {
 				observe: SelectInactiveAccountsToAdd.ViewState.init,
 				send: { .view($0) }
 			) { viewStore in
-				ScrollView {
-					VStack(spacing: .small1) {
-						Selection(
-							viewStore.binding(
-								get: \.selectedAccounts,
-								send: { .selectedAccountsChanged($0) }
-							),
-							from: viewStore.availableAccounts,
-							requiring: viewStore.selectionRequirement
-						) { item in
-							ChooseAccountsRow.View(
-								viewState: .init(state: item.value),
-								isSelected: item.isSelected,
-								action: item.action
-							)
+				VStack {
+					Text("Add Inactive Accounts?")
+						.textStyle(.sheetTitle)
+
+					Text("These Accounts were never used, but you *may* have created them. Check and addresses that you wish to keep:")
+
+					ScrollView {
+						VStack(spacing: .small1) {
+							Selection(
+								viewStore.binding(
+									get: \.selectedAccounts,
+									send: { .selectedAccountsChanged($0) }
+								),
+								from: viewStore.availableAccounts,
+								requiring: viewStore.selectionRequirement
+							) { item in
+								ChooseAccountsRow.View(
+									viewState: .init(state: item.value),
+									isSelected: item.isSelected,
+									showName: false,
+									action: item.action
+								)
+							}
 						}
 					}
+
+					Spacer(minLength: 0)
+				}
+				.padding()
+				.footer {
+					Button("Continue") {
+						store.send(.view(.doneTapped))
+					}
+					.buttonStyle(.primaryRectangular)
 				}
 			}
 		}

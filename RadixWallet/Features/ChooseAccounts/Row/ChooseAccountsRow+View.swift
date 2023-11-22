@@ -29,15 +29,25 @@ extension ChooseAccountsRow {
 	struct View: SwiftUI.View {
 		let viewState: ViewState
 		let isSelected: Bool
+		let showName: Bool
 		let action: () -> Void
+
+		init(viewState: ViewState, isSelected: Bool, showName: Bool = true, action: @escaping () -> Void) {
+			self.viewState = viewState
+			self.isSelected = isSelected
+			self.showName = showName
+			self.action = action
+		}
 
 		var body: some SwiftUI.View {
 			Button(action: action) {
 				HStack {
 					VStack(alignment: .leading, spacing: .medium3) {
-						Text(viewState.name)
-							.foregroundColor(.app.white)
-							.textStyle(.body1Header)
+						if showName {
+							Text(viewState.name)
+								.foregroundColor(.app.white)
+								.textStyle(.body1Header)
+						}
 
 						AddressView(.address(of: viewState.account))
 							.foregroundColor(.app.whiteTransparent)
