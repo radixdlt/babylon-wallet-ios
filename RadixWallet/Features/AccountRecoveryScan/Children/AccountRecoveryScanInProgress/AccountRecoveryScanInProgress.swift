@@ -48,6 +48,10 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case loadFactorSourceResult(TaskResult<FactorSource?>)
 		case delayScan(accounts: IdentifiedArrayOf<Profile.Network.Account>)
+		case foundAccounts(
+			active: IdentifiedArrayOf<Profile.Network.Account>,
+			inactive: IdentifiedArrayOf<Profile.Network.Account>
+		)
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -106,6 +110,12 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 		case let .delayScan(accounts):
 			return scanOnLedger(accounts: accounts, state: &state)
+
+		case let .foundAccounts(active, inactive):
+			state.status = .scanComplete
+			state.active.append(contentsOf: active)
+			state.inactive.append(contentsOf: inactive)
+			return .none
 		}
 	}
 
@@ -160,10 +170,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 				// We delay because it is bad UX for user to see DerivingPublicKeys view presented
 				// and dismissed so fast.
-				return delayedEffect(
-					delay: .seconds(1),
-					for: .internal(.delayScan(accounts: accounts))
-				)
+				return delayedMediumEffect(internal: .delayScan(accounts: accounts))
 
 			case .failedToDerivePublicKey:
 				fatalError("failed to derive keys")
@@ -174,9 +181,30 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	}
 
 	private func scanOnLedger(accounts: IdentifiedArrayOf<Profile.Network.Account>, state: inout State) -> Effect<Action> {
+		assert(accounts.count == accRecScanBatchSize)
 		state.destination = nil
 		state.status = .scanningNetworkForActiveAccounts
-		return .none
+
+		return .run { send in
+			let MOCKED_activeFirstN = 5
+			let MOCKED_inactiveN = 5
+			let MOCKED_activeSecondN = 5
+
+			loggerGlobal.critical("MOCKING network scanning => \(MOCKED_activeFirstN) active, \(MOCKED_inactiveN) inactive, \(MOCKED_activeSecondN) active.\n\nImplement me! \(#file)#\(#line)")
+			try? await Task.sleep(for: .seconds(2))
+			var accounts = accounts
+			func take(n: Int) -> some Collection<Profile.Network.Account> {
+				defer { accounts.removeFirst(n) }
+				return accounts.prefix(n)
+			}
+			var MOCKED_Active = Array(take(n: MOCKED_activeFirstN))
+			let MOCKED_Inactive = Array(take(n: MOCKED_inactiveN))
+			MOCKED_Active.append(contentsOf: take(n: MOCKED_activeSecondN))
+			let active = MOCKED_Active.asIdentifiable()
+			let inactive = MOCKED_Inactive.asIdentifiable()
+			assert(Set(active).intersection(Set(inactive)).isEmpty)
+			await send(.internal(.foundAccounts(active: active, inactive: inactive)))
+		}
 	}
 
 	private func derivePublicKeys(
