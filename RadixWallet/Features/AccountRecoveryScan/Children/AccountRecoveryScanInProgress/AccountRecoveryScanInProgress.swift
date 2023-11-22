@@ -47,6 +47,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadFactorSourceResult(TaskResult<FactorSource?>)
+		case delayScan(accounts: IdentifiedArrayOf<Profile.Network.Account>)
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -95,12 +96,16 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .loadFactorSourceResult(.failure(error)):
 			fatalError("error handling")
+
 		case let .loadFactorSourceResult(.success(factorSource)):
 			guard let factorSource else {
 				fatalError("error handling")
 			}
 			state.factorSource = .success(factorSource)
 			return derivePublicKeys(using: factorSource, state: &state)
+
+		case let .delayScan(accounts):
+			return scanOnLedger(accounts: accounts, state: &state)
 		}
 	}
 
@@ -133,7 +138,6 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		switch presentedAction {
 		case let .derivePublicKeys(.delegate(delegateAction)):
 			loggerGlobal.notice("Finish deriving public keys")
-			state.destination = nil
 			switch delegateAction {
 			case let .derivedPublicKeys(publicHDKeys, factorSourceID, networkID):
 				assert(factorSourceID == state.factorSourceID.embed())
@@ -154,7 +158,13 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 					return account
 				}.asIdentifiable()
 
-				return scanOnLedger(accounts: accounts, state: &state)
+				// We delay because it is bad UX for user to see DerivingPublicKeys view presented
+				// and dismissed so fast.
+				return delayedEffect(
+					delay: .seconds(1),
+					for: .internal(.delayScan(accounts: accounts))
+				)
+
 			case .failedToDerivePublicKey:
 				fatalError("failed to derive keys")
 			}
@@ -164,6 +174,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	}
 
 	private func scanOnLedger(accounts: IdentifiedArrayOf<Profile.Network.Account>, state: inout State) -> Effect<Action> {
+		state.destination = nil
 		state.status = .scanningNetworkForActiveAccounts
 		return .none
 	}

@@ -16,6 +16,10 @@ public let accRecScanBatchSize = accRecScanBatchSizePerReq * 2
 public extension AccountRecoveryScanInProgress {
 	struct ViewState: Equatable {
 		let status: AccountRecoveryScanInProgress.State.Status
+		var loadingState: ControlState {
+			status == .scanningNetworkForActiveAccounts ? .loading(.global(text: "Scanning network")) : .enabled
+		}
+
 		let kind: FactorSourceKind
 		let olympia: Bool
 		let active: IdentifiedArrayOf<Profile.Network.Account>
@@ -23,10 +27,6 @@ public extension AccountRecoveryScanInProgress {
 
 		var title: String {
 			status == .scanComplete ? "Scan Complete" : "Scan in progress"
-		}
-
-		var showProgressView: Bool {
-			status == .scanningNetworkForActiveAccounts
 		}
 
 		var factorSourceDescription: String {
@@ -77,13 +77,8 @@ public extension AccountRecoveryScanInProgress {
 
 					Spacer(minLength: 0)
 				}
-				.overlay {
-					if viewStore.showProgressView {
-						ProgressView()
-							.padding(.small1)
-							.centered
-					}
-				}
+				.controlState(viewStore.loadingState)
+				.presentsLoadingViewOverlay()
 				.padding()
 				.footer {
 					Button("Continue") {
