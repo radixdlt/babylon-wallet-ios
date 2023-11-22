@@ -17,13 +17,7 @@ public struct Splash: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		public enum PasscodeCheckFailedAlertAction: Sendable, Equatable {
-			case retryButtonTapped
-			case openSettingsButtonTapped
-		}
-
 		case appeared
-		case passcodeCheckFailedAlert(PresentationAction<PasscodeCheckFailedAlertAction>)
 		case didTapToUnlock
 	}
 
@@ -83,18 +77,6 @@ public struct Splash: Sendable, FeatureReducer {
 		case .didTapToUnlock:
 			state.biometricsCheckFailed = false
 			return verifyPasscode()
-
-		case let .passcodeCheckFailedAlert(.presented(action)):
-			switch action {
-			case .retryButtonTapped:
-				return verifyPasscode()
-			case .openSettingsButtonTapped:
-				return .run { _ in
-					await openURL(URL(string: UIApplication.openSettingsURLString)!)
-				}
-			}
-		case .passcodeCheckFailedAlert:
-			return .none
 		}
 	}
 
@@ -147,6 +129,17 @@ public struct Splash: Sendable, FeatureReducer {
 				loggerGlobal.notice("Account recovery needed")
 			}
 			return delegateCompleted()
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .passcodeCheckFailed(.retryButtonTapped):
+			verifyPasscode()
+		case .passcodeCheckFailed(.openSettingsButtonTapped):
+			.run { _ in
+				await openURL(URL(string: UIApplication.openSettingsURLString)!)
+			}
 		}
 	}
 

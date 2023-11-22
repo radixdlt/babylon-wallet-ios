@@ -52,9 +52,9 @@ extension ConfirmSkippingBDFS {
 				.padding(.horizontal, .large3)
 				.padding(.bottom, .medium2)
 				.toolbar {
-					ToolbarItem(placement: .navigationBarLeading) {
-						BackButton {
-							store.send(.view(.backButtonTapped))
+					ToolbarItem(placement: .primaryAction) {
+						CloseButton {
+							store.send(.view(.closeButtonTapped))
 						}
 					}
 				}
