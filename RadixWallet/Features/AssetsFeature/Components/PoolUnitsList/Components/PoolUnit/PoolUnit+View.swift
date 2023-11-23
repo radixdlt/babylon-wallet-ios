@@ -84,16 +84,18 @@ extension PoolUnitResourceViewState {
 			return roundedRedemptionValue.formatted()
 		}
 
-		let xrdResourceViewState = resourcesDetails.xrdResource.map {
-			PoolUnitResourceViewState(
-				id: $0.resource.resourceAddress,
+		let xrdResourceViewState: PoolUnitResourceViewState? = resourcesDetails.xrdResource.flatMap { resourceDetails in
+			guard resourceDetails.amount > 0 else { return nil }
+			return PoolUnitResourceViewState(
+				id: resourceDetails.resource.resourceAddress,
 				thumbnail: .xrd,
 				symbol: Constants.xrdTokenName,
-				tokenAmount: redemptionValue(for: $0)
+				tokenAmount: redemptionValue(for: resourceDetails)
 			)
 		}
-		let nonXrdResources = resourcesDetails.nonXrdResources.map { resourceDetails in
-			PoolUnitResourceViewState(
+		let nonXrdResources: [PoolUnitResourceViewState] = resourcesDetails.nonXrdResources.compactMap { resourceDetails in
+			guard resourceDetails.amount > 0 else { return nil }
+			return PoolUnitResourceViewState(
 				id: resourceDetails.resource.resourceAddress,
 				thumbnail: .known(resourceDetails.resource.metadata.iconURL),
 				symbol: resourceDetails.resource.metadata.symbol ?? resourceDetails.resource.metadata.name ?? L10n.Account.PoolUnits.unknownSymbolName,
