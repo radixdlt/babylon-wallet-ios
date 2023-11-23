@@ -65,7 +65,8 @@ extension Home.AccountRow {
 
 			self.nonFungibleResourcesCount = portfolio.nonFungibleResources.count
 
-			self.poolUnitsCount = portfolio.poolUnitResources.radixNetworkStakes.count + portfolio.poolUnitResources.poolUnits.count
+			self.poolUnitsCount = portfolio.poolUnitResources.radixNetworkStakes.count
+				+ portfolio.poolUnitResources.poolUnits.filter { $0.resource.amount > 0 }.count
 		}
 	}
 
