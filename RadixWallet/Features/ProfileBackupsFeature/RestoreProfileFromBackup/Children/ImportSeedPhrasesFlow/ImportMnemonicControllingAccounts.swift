@@ -35,7 +35,9 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared, inputMnemonic, skip
+		case appeared
+		case inputMnemonicButtonTapped
+		case skipButtonTapped
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -94,7 +96,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .none
-		case .inputMnemonic:
+		case .inputMnemonicButtonTapped:
 			state.destination = .importMnemonic(.init(
 				warning: L10n.RevealSeedPhrase.warning,
 				isWordCountFixed: true,
@@ -103,7 +105,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			))
 			return .none
 
-		case .skip:
+		case .skipButtonTapped:
 			if state.isMainBDFS {
 				state.destination = .confirmSkippingBDFS(.init())
 				return .none
