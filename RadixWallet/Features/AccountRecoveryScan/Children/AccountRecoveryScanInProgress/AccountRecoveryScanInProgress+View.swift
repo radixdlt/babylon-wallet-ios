@@ -87,39 +87,19 @@ public extension AccountRecoveryScanInProgress {
 						store.send(.view(.continueTapped))
 					}.buttonStyle(.primaryRectangular)
 				}
-				.destinations(with: store)
-				.onAppear {
-					store.send(.view(.appear))
+				.sheet(
+					store: store.scope(
+						state: \.$derivePublicKeys,
+						action: { .child(.derivePublicKeys($0)) }
+					),
+					content: {
+						DerivePublicKeys.View(store: $0)
+					}
+				)
+				.onFirstTask { @MainActor in
+					await store.send(.view(.onFirstTask)).finish()
 				}
 			}
 		}
-	}
-}
-
-private extension StoreOf<AccountRecoveryScanInProgress> {
-	var destination: PresentationStoreOf<AccountRecoveryScanInProgress.Destination> {
-		func scopeState(state: State) -> PresentationState<AccountRecoveryScanInProgress.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
-	}
-}
-
-@MainActor
-private extension View {
-	func destinations(with store: StoreOf<AccountRecoveryScanInProgress>) -> some View {
-		let destinationStore = store.destination
-		return derivingPublicKeys(with: destinationStore)
-	}
-
-	private func derivingPublicKeys(with destinationStore: PresentationStoreOf<AccountRecoveryScanInProgress.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /AccountRecoveryScanInProgress.Destination.State.derivePublicKeys,
-			action: AccountRecoveryScanInProgress.Destination.Action.derivePublicKeys,
-			content: {
-				DerivePublicKeys.View(store: $0)
-			}
-		)
 	}
 }

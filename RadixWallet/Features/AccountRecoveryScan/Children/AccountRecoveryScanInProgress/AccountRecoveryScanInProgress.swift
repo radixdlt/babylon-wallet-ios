@@ -18,14 +18,13 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		public var active: IdentifiedArrayOf<Profile.Network.Account> = []
 		public var inactive: IdentifiedArrayOf<Profile.Network.Account> = []
 
+		/// Attention! This CANNOT be changed into the `destination` pattern we use elsewhere, due to
+		/// the "TCE Send"-bug, we never ever receive the event `internal(.foundAccounts` if we
+		/// use destination pattern with the `DestinationReducer` like we ought to. Cyon is about to send
+		/// a minimum showcasing example of the "TCA Send" bug to Pointfree, stay tuned, in the meantime
+		/// we will have to live with this.
 		@PresentationState
-		public var destination: Destination.State? {
-			didSet {
-				if case .some(.derivePublicKeys) = destination {
-					self.status = .derivingPublicKeys
-				}
-			}
-		}
+		public var derivePublicKeys: DerivePublicKeys.State?
 
 		public init(
 			factorSourceID: FactorSourceID.FromHash,
@@ -55,7 +54,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case appear
+		case onFirstTask
 		case scanMore
 		case continueTapped
 	}
@@ -67,32 +66,20 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		)
 	}
 
-	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
-			case derivePublicKeys(DerivePublicKeys.State)
-		}
-
-		public enum Action: Sendable, Equatable {
-			case derivePublicKeys(DerivePublicKeys.Action)
-		}
-
-		public var body: some ReducerOf<Self> {
-			Scope(state: /State.derivePublicKeys, action: /Action.derivePublicKeys) {
-				DerivePublicKeys()
-			}
-		}
+	public enum ChildAction: Sendable, Equatable {
+		/// Attention! If you change this to the `destination` pattern we use elsewhere this feature breaks due to "TCA Send"-bug
+		case derivePublicKeys(PresentationAction<DerivePublicKeys.Action>)
 	}
 
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
-				Destination()
+			/// Attention! If you change this to the `destination` pattern we use elsewhere this feature breaks due to "TCA Send"-bug
+			.ifLet(\.$derivePublicKeys, action: /Action.child .. ChildAction.derivePublicKeys) {
+				DerivePublicKeys()
 			}
 	}
-
-	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
@@ -123,7 +110,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .appear:
+		case .onFirstTask:
 			if let factorSource = state.factorSource.wrappedValue {
 				return derivePublicKeys(using: factorSource, state: &state)
 			} else {
@@ -146,9 +133,10 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		switch presentedAction {
-		case let .derivePublicKeys(.delegate(delegateAction)):
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		/// Attention! If you change this to the `destination` pattern we use elsewhere this feature breaks due to "TCA Send"-bug
+		case let .derivePublicKeys(.presented(.delegate(delegateAction))):
 			loggerGlobal.notice("Finish deriving public keys")
 			switch delegateAction {
 			case let .derivedPublicKeys(publicHDKeys, factorSourceID, networkID):
@@ -178,7 +166,10 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 				fatalError("failed to derive keys")
 			}
 
-		default: return .none
+		case .derivePublicKeys(.dismiss):
+			return .none
+		case .derivePublicKeys(.presented(_)):
+			return .none
 		}
 	}
 }
@@ -186,12 +177,12 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 extension AccountRecoveryScanInProgress {
 	private func scanOnLedger(accounts: IdentifiedArrayOf<Profile.Network.Account>, state: inout State) -> Effect<Action> {
 		assert(accounts.count == accRecScanBatchSize)
-		state.destination = nil
+		state.derivePublicKeys = nil
 		state.status = .scanningNetworkForActiveAccounts
 
 		return .run { send in
-			let (active, inactive) = try await mockedScan(accounts: accounts)
-			loggerGlobal.notice("Finished mocking scanned account => send(.internal(.foundAccounts))")
+			let (active, inactive) = try await performScan(accounts: accounts)
+			loggerGlobal.notice("✅Finished scanning for accounts => send(.internal(.foundAccounts))")
 			await send(.internal(.foundAccounts(active: active, inactive: inactive)))
 		}
 	}
@@ -234,27 +225,13 @@ extension AccountRecoveryScanInProgress {
 				inactive.append(account)
 			}
 		}
-		return (active, inactive)
-	}
-
-	private func mockedScan(accounts: IdentifiedArrayOf<Profile.Network.Account>) async throws -> (active: IdentifiedArrayOf<Profile.Network.Account>, inactive: IdentifiedArrayOf<Profile.Network.Account>) {
-		let MOCKED_activeFirstN = 10
-		let MOCKED_inactiveN = 10
-		let MOCKED_activeSecondN = 10
-
-		loggerGlobal.critical("MOCKING network scanning => \(MOCKED_activeFirstN) active, \(MOCKED_inactiveN) inactive, \(MOCKED_activeSecondN) active.\n\nImplement me! \(#file)#\(#line)")
-
-		var accounts = accounts
-		func take(n: Int) -> some Collection<Profile.Network.Account> {
-			defer { accounts.removeFirst(n) }
-			return accounts.prefix(n)
+		if active.isEmpty {
+			let n = 3
+			loggerGlobal.critical("MOCKING THAT \(n) accounts were active")
+			let mockedActive = inactive.prefix(n)
+			active.append(contentsOf: mockedActive)
+			inactive.removeFirst(n)
 		}
-		var MOCKED_Active = Array(take(n: MOCKED_activeFirstN))
-		let MOCKED_Inactive = Array(take(n: MOCKED_inactiveN))
-		MOCKED_Active.append(contentsOf: take(n: MOCKED_activeSecondN))
-		let active = MOCKED_Active.asIdentifiable()
-		let inactive = MOCKED_Inactive.asIdentifiable()
-		assert(Set(active).intersection(Set(inactive)).isEmpty)
 		return (active, inactive)
 	}
 
@@ -279,18 +256,18 @@ extension AccountRecoveryScanInProgress {
 				).wrapAsDerivationPath()
 			}
 		}
-		state.destination = .derivePublicKeys(
-			.init(
-				derivationPathOption: .knownPaths(
-					derivationPaths,
-					networkID: networkID
-				),
-				factorSourceOption: .specific(
-					factorSource
-				),
-				purpose: .createEntity(kind: .account)
-			)
+		state.status = .derivingPublicKeys
+		state.derivePublicKeys = .init(
+			derivationPathOption: .knownPaths(
+				derivationPaths,
+				networkID: networkID
+			),
+			factorSourceOption: .specific(
+				factorSource
+			),
+			purpose: .createEntity(kind: .account)
 		)
+
 		return .none
 	}
 
