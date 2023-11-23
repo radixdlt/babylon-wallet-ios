@@ -86,21 +86,23 @@ extension PoolUnitResourceViewState {
 
 		let xrdResourceViewState = resourcesDetails.xrdResource.map {
 			PoolUnitResourceViewState(
+				id: $0.resource.resourceAddress,
 				thumbnail: .xrd,
 				symbol: Constants.xrdTokenName,
 				tokenAmount: redemptionValue(for: $0)
 			)
 		}
+		let nonXrdResources = resourcesDetails.nonXrdResources.map { resourceDetails in
+			PoolUnitResourceViewState(
+				id: resourceDetails.resource.resourceAddress,
+				thumbnail: .known(resourceDetails.resource.metadata.iconURL),
+				symbol: resourceDetails.resource.metadata.symbol ?? resourceDetails.resource.metadata.name ?? L10n.Account.PoolUnits.unknownSymbolName,
+				tokenAmount: redemptionValue(for: resourceDetails)
+			)
+		}
 
 		return .init(
-			rawValue: (xrdResourceViewState.map { [$0] } ?? [])
-				+ resourcesDetails.nonXrdResources.map { resourceDetails in
-					PoolUnitResourceViewState(
-						thumbnail: .known(resourceDetails.resource.metadata.iconURL),
-						symbol: resourceDetails.resource.metadata.symbol ?? resourceDetails.resource.metadata.name ?? L10n.Account.PoolUnits.unknownSymbolName,
-						tokenAmount: redemptionValue(for: resourceDetails)
-					)
-				}
+			rawValue: (xrdResourceViewState.map { [$0] } ?? []) + nonXrdResources
 		)! // Safe to unwrap, guaranteed to not be empty
 	}
 }
