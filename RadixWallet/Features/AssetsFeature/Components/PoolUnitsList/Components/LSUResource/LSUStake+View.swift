@@ -154,8 +154,9 @@ extension LSUStake.State {
 		LSUStake.ViewState(id: stake.validatorAddress, content: stakeDetails.map { details in
 			LSUStake.ViewState.Content(
 				validatorNameViewState: .init(with: details.validator),
-				liquidStakeUnit: details.stakeUnitResource.map { _ in
+				liquidStakeUnit: details.stakeUnitResource.map { resource in
 					.init(
+						id: resource.resource.resourceAddress, // FIXME: IS THIS CORRECT
 						thumbnail: .xrd,
 						symbol: Constants.xrdTokenName,
 						tokenAmount: details.xrdRedemptionValue.formatted(),

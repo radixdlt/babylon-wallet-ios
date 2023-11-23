@@ -36,16 +36,12 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(
-				\.lsuResource,
-				action: /Action.child .. ChildAction.lsuResource,
-				then: LSUResource.init
-			)
-			.forEach(
-				\.poolUnits,
-				action: /Action.child .. ChildAction.poolUnit,
-				element: PoolUnit.init
-			)
+			.ifLet(\.lsuResource, action: /Action.child .. ChildAction.lsuResource) {
+				LSUResource()
+			}
+			.forEach(\.poolUnits, action: /Action.child .. ChildAction.poolUnit) {
+				PoolUnit()
+			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
