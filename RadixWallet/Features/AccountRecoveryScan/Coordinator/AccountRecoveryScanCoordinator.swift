@@ -14,7 +14,12 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 			case createProfile(DeviceFactorSource)
 
 			/// Typically we can use `offset: <CURRENT_NETWORK>.numberOfAccountsIncludingHidden(controlledBy: factorSourceID)`
-			case addAccounts(factorSourceID: FactorSourceID.FromHash, offset: Int, networkID: NetworkID, scheme: DerivationScheme)
+			case addAccounts(
+				factorSourceID: FactorSourceID.FromHash,
+				offset: Int,
+				networkID: NetworkID,
+				scheme: DerivationScheme
+			)
 		}
 
 		public init(purpose: Purpose, promptForSelectionOfInactiveAccountsIfAny: Bool) {

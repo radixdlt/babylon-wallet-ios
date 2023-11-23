@@ -193,46 +193,53 @@ extension AccountRecoveryScanInProgress {
 	private func performScan(accounts: IdentifiedArrayOf<Profile.Network.Account>) async throws -> (active: IdentifiedArrayOf<Profile.Network.Account>, inactive: IdentifiedArrayOf<Profile.Network.Account>) {
 		let accountAddresses: [AccountAddress] = accounts.map(\.address)
 		let engineAddresses: [Address] = accountAddresses.map(\.asGeneral)
-		let addressOfActiveAccounts: [AccountAddress] = try await onLedgerEntitiesClient.getEntities(
-			engineAddresses,
-			[.ownerBadge, .ownerKeys],
-			nil,
-			true // force to refresh
-		).compactMap { (onLedgerEntity: OnLedgerEntity) -> AccountAddress? in
-			guard
-				let onLedgerAccount = onLedgerEntity.account,
-				case let metadata = onLedgerAccount.metadata,
-				let ownerKeys = metadata.ownerKeys,
-				let ownerBadge = metadata.ownerBadge
-			else { return nil }
 
-			func hasStateChange(_ list: OnLedgerEntity.Metadata.ValueAtStateVersion<some Any>) -> Bool {
-				list.lastUpdatedAtStateVersion > 0
-			}
-			let isActive = hasStateChange(ownerKeys) || hasStateChange(ownerBadge)
-			guard isActive else {
-				return nil
-			}
-			return onLedgerAccount.address
-		}
+		do {
+			let addressOfActiveAccounts: [AccountAddress] = try await onLedgerEntitiesClient.getEntities(
+				engineAddresses,
+				[.ownerBadge, .ownerKeys],
+				nil,
+				true // force to refresh
+			).compactMap { (onLedgerEntity: OnLedgerEntity) -> AccountAddress? in
+				guard
+					let onLedgerAccount = onLedgerEntity.account,
+					case let metadata = onLedgerAccount.metadata,
+					let ownerKeys = metadata.ownerKeys,
+					let ownerBadge = metadata.ownerBadge
+				else { return nil }
 
-		var active: IdentifiedArrayOf<Profile.Network.Account> = []
-		var inactive: IdentifiedArrayOf<Profile.Network.Account> = []
-		for account in accounts {
-			if addressOfActiveAccounts.contains(where: { $0 == account.address }) {
-				active.append(account)
-			} else {
-				inactive.append(account)
+				func hasStateChange(_ list: OnLedgerEntity.Metadata.ValueAtStateVersion<some Any>) -> Bool {
+					list.lastUpdatedAtStateVersion > 0
+				}
+				let isActive = hasStateChange(ownerKeys) || hasStateChange(ownerBadge)
+				guard isActive else {
+					return nil
+				}
+				return onLedgerAccount.address
 			}
+
+			var active: IdentifiedArrayOf<Profile.Network.Account> = []
+			var inactive: IdentifiedArrayOf<Profile.Network.Account> = []
+			for account in accounts {
+				if addressOfActiveAccounts.contains(where: { $0 == account.address }) {
+					active.append(account)
+				} else {
+					inactive.append(account)
+				}
+			}
+			if active.isEmpty {
+				let n = 3
+				loggerGlobal.critical("MOCKING THAT \(n) accounts were active")
+				let mockedActive = inactive.prefix(n)
+				active.append(contentsOf: mockedActive)
+				inactive.removeFirst(n)
+			}
+			return (active, inactive)
+		} catch is GatewayAPIClient.EmptyEntityDetailsResponse {
+			return (active: [], inactive: accounts)
+		} catch {
+			throw error
 		}
-		if active.isEmpty {
-			let n = 3
-			loggerGlobal.critical("MOCKING THAT \(n) accounts were active")
-			let mockedActive = inactive.prefix(n)
-			active.append(contentsOf: mockedActive)
-			inactive.removeFirst(n)
-		}
-		return (active, inactive)
 	}
 
 	private func derivePublicKeys(
