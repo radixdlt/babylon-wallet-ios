@@ -54,6 +54,10 @@ extension Profile.Network {
 		accounts.hidden
 	}
 
+	public func accountsIncludingHidden() -> IdentifiedArrayOf<Account> {
+		accounts
+	}
+
 	public func hasSomeAccount() -> Bool {
 		!accounts.isEmpty
 	}
@@ -102,6 +106,10 @@ extension Profile.Network {
 
 	public func getHiddenPersonas() -> IdentifiedArrayOf<Persona> {
 		personas.hiden
+	}
+
+	public func personasIncludingHidden() -> IdentifiedArrayOf<Persona> {
+		personas
 	}
 
 	public func hasSomePersona() -> Bool {

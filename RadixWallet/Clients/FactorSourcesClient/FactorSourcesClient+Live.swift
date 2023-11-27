@@ -141,8 +141,25 @@ extension FactorSourcesClient: DependencyKey {
 				let currentNetworkID = await getCurrentNetworkID()
 				let networkID = maybeNetworkID ?? currentNetworkID
 				let maybeNetwork: Profile.Network? = try? await profileStore.profile.network(id: networkID)
+
+				func entitiesControlledByFactorSource(allEntities: some Collection<some EntityProtocol>) -> HD.Path.Component.Child.Value {
+					let entitiesControlledByFactorSource = allEntities.filter { account in
+						switch account.securityState {
+						case let .unsecured(unsecuredControl):
+							unsecuredControl.transactionSigning.factorSourceID.embed() == factorSourceID
+						}
+					}
+
+					return HD.Path.Component.Child.Value(entitiesControlledByFactorSource.count)
+				}
+
 				if let network = maybeNetwork {
-					fatalError()
+					switch request.entityKind {
+					case .account:
+						return entitiesControlledByFactorSource(allEntities: network.accountsIncludingHidden())
+					case .identity:
+						return entitiesControlledByFactorSource(allEntities: network.personasIncludingHidden())
+					}
 				} else {
 					// First time this factor source is use on network `networkID`
 					return 0
