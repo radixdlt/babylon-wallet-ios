@@ -16,7 +16,6 @@ concurrency:
 
 
 jobs:
-
   snyk_scan:
     if: >
       ( github.event.action == 'opened' && github.event.pull_request.draft == false ) ||
@@ -136,7 +135,7 @@ jobs:
       checks: write
     name: "Unit test"
     runs-on: macos-13-xlarge
-    timeout-minutes: 18
+    timeout-minutes: 20
 
     needs:
       - linting
@@ -189,7 +188,9 @@ jobs:
           brew install xcbeautify
 
       - name: "Unit tests"
-        run: bundle exec fastlane tests
+        run: |
+          defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
+          bundle exec fastlane tests
 
       - name: Upload results
         uses: kishikawakatsumi/xcresulttool@2b37f116695328d5e503ac8dadca0f1545a51da4 # v1.7.1
