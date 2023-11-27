@@ -1,6 +1,6 @@
 // MARK: - PersonasClient
 public struct PersonasClient: Sendable {
-	public var nextPersonaIndex: NextPersonaIndex
+	public var nextPersonaIndexForFactorSource: NextPersonaIndexForFactorSource
 
 	public var personas: Personas
 	public var getPersonas: GetPersonas
@@ -14,7 +14,7 @@ public struct PersonasClient: Sendable {
 
 	public init(
 		personas: @escaping Personas,
-		nextPersonaIndex: @escaping NextPersonaIndex,
+		nextPersonaIndexForFactorSource: @escaping NextPersonaIndexForFactorSource,
 		getPersonas: @escaping GetPersonas,
 		getPersonasOnNetwork: @escaping GetPersonasOnNetwork,
 		getHiddenPersonasOnCurrentNetwork: @escaping getHiddenPersonasOnCurrentNetwork,
@@ -24,7 +24,7 @@ public struct PersonasClient: Sendable {
 		hasSomePersonaOnCurrentNetwork: @escaping HasSomePersonaOnCurrentNetwork
 	) {
 		self.personas = personas
-		self.nextPersonaIndex = nextPersonaIndex
+		self.nextPersonaIndexForFactorSource = nextPersonaIndexForFactorSource
 		self.getPersonas = getPersonas
 		self.getPersonasOnNetwork = getPersonasOnNetwork
 		self.getHiddenPersonasOnCurrentNetwork = getHiddenPersonasOnCurrentNetwork
@@ -36,7 +36,7 @@ public struct PersonasClient: Sendable {
 }
 
 extension PersonasClient {
-	public typealias NextPersonaIndex = @Sendable (NetworkID?) async -> HD.Path.Component.Child.Value
+	public typealias NextPersonaIndexForFactorSource = @Sendable (FactorSourceID, NetworkID?) async -> HD.Path.Component.Child.Value
 	public typealias Personas = @Sendable () async -> AnyAsyncSequence<Profile.Network.Personas>
 	public typealias GetPersonas = @Sendable () async throws -> Profile.Network.Personas
 	public typealias GetPersonasOnNetwork = @Sendable (NetworkID) async -> Profile.Network.Personas

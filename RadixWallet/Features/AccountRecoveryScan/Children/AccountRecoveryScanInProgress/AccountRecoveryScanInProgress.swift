@@ -46,7 +46,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadFactorSourceResult(TaskResult<FactorSource?>)
-		case delayScan(accounts: IdentifiedArrayOf<Profile.Network.Account>)
+		case startScan(accounts: IdentifiedArrayOf<Profile.Network.Account>)
 		case foundAccounts(
 			active: IdentifiedArrayOf<Profile.Network.Account>,
 			inactive: IdentifiedArrayOf<Profile.Network.Account>
@@ -81,6 +81,8 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			}
 	}
 
+	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.continuousClock) var clock
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
@@ -96,7 +98,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			state.factorSource = .success(factorSource)
 			return derivePublicKeys(using: factorSource, state: &state)
 
-		case let .delayScan(accounts):
+		case let .startScan(accounts):
 			return scanOnLedger(accounts: accounts, state: &state)
 
 		case let .foundAccounts(active, inactive):
@@ -142,25 +144,23 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			case let .derivedPublicKeys(publicHDKeys, factorSourceID, networkID):
 				assert(factorSourceID == state.factorSourceID.embed())
 				assert(networkID == state.networkID)
-
-				let accounts = publicHDKeys.map { publicHDKey in
-					let index = publicHDKey.derivationPath.index
-					let account = try! Profile.Network.Account(
-						networkID: networkID,
-						index: index,
-						factorInstance: .init(
-							factorSourceID: state.factorSourceID,
-							publicHDKey: publicHDKey
-						),
-						displayName: "Unnamed",
-						extraProperties: .init(index: index)
-					)
-					return account
-				}.asIdentifiable()
-
-				// We delay because it is bad UX for user to see DerivingPublicKeys view presented
-				// and dismissed so fast.
-				return delayedMediumEffect(internal: .delayScan(accounts: accounts))
+				return .run { [id = state.factorSourceID] send in
+					let accounts = await publicHDKeys.enumerated().asyncMap { offset, publicHDKey in
+						let appearanceID = await accountsClient.nextAppearanceID(networkID, offset)
+						let account = try! Profile.Network.Account(
+							networkID: networkID,
+							factorInstance: .init(
+								factorSourceID: id,
+								publicHDKey: publicHDKey
+							),
+							displayName: "Unnamed",
+							extraProperties: .init(appearanceID: appearanceID)
+						)
+						return account
+					}.asIdentifiable()
+					try? await clock.sleep(for: .milliseconds(300))
+					await send(.internal(.startScan(accounts: accounts)))
+				}
 
 			case .failedToDerivePublicKey:
 				fatalError("failed to derive keys")

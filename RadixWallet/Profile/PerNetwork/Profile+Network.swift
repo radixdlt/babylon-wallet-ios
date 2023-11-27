@@ -58,7 +58,7 @@ extension Profile.Network {
 		!accounts.isEmpty
 	}
 
-	public func nextAccountIndex() -> Int {
+	var numberOfAccountsIncludingHidden: Int {
 		accounts.count
 	}
 
@@ -106,10 +106,6 @@ extension Profile.Network {
 
 	public func hasSomePersona() -> Bool {
 		!personas.isEmpty
-	}
-
-	public func nextPersonaIndex() -> Int {
-		personas.count
 	}
 
 	public mutating func addPersona(_ persona: Persona) throws {

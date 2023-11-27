@@ -10,7 +10,7 @@ extension DependencyValues {
 extension AccountsClient: TestDependencyKey {
 	public static let noop = Self(
 		getCurrentNetworkID: { .kisharnet },
-		nextAccountIndex: { _ in 0 },
+		nextAppearanceID: { _, _ in ._0 },
 		getAccountsOnCurrentNetwork: { throw NoopError() },
 		getHiddenAccountsOnCurrentNetwork: { throw NoopError() },
 		accountsOnCurrentNetwork: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
@@ -25,7 +25,7 @@ extension AccountsClient: TestDependencyKey {
 	public static let previewValue: Self = .noop
 	public static let testValue = Self(
 		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID"),
-		nextAccountIndex: unimplemented("\(Self.self).nextAccountIndex"),
+		nextAppearanceID: unimplemented("\(Self.self).nextAppearanceID"),
 		getAccountsOnCurrentNetwork: unimplemented("\(Self.self).getAccountsOnCurrentNetwork"),
 		getHiddenAccountsOnCurrentNetwork: unimplemented("\(Self.self).getHiddenAccountsOnCurrentNetwork"),
 		accountsOnCurrentNetwork: unimplemented("\(Self.self).accountsOnCurrentNetwork"),

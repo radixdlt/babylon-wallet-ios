@@ -11,7 +11,7 @@ extension PersonasClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 	public static let testValue = Self(
 		personas: unimplemented("\(Self.self).personas"),
-		nextPersonaIndex: unimplemented("\(Self.self).nextPersonaIndex"),
+		nextPersonaIndexForFactorSource: unimplemented("\(Self.self).nextPersonaIndexForFactorSource"),
 		getPersonas: unimplemented("\(Self.self).getPersonas"),
 		getPersonasOnNetwork: unimplemented("\(Self.self).getPersonasOnNetwork"),
 		getHiddenPersonasOnCurrentNetwork: unimplemented("\(Self.self).getHiddenPersonasOnCurrentNetwork"),
@@ -22,7 +22,7 @@ extension PersonasClient: TestDependencyKey {
 	)
 	public static let noop = Self(
 		personas: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
-		nextPersonaIndex: { _ in 0 },
+		nextPersonaIndexForFactorSource: { _, _ in 0 },
 		getPersonas: { .init() },
 		getPersonasOnNetwork: { _ in .init() },
 		getHiddenPersonasOnCurrentNetwork: { throw NoopError() },

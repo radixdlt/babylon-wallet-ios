@@ -150,7 +150,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		// FIXME: check with Matt - should we by default we add ALL accounts, even inactive?
 		var all = active
 		all.append(contentsOf: inactiveToAdd)
-		let accounts = all.sorted(by: \.index).asIdentifiable()
+		let accounts = all // sort? on what?
 
 		switch purpose {
 		case let .createProfile(deviceFactorSource):

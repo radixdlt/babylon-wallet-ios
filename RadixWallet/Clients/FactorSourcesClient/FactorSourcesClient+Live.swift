@@ -59,34 +59,38 @@ extension FactorSourcesClient: DependencyKey {
 			return factorSourceID
 		}
 
-		return Self(
-			getCurrentNetworkID: {
-				await profileStore.profile.networkID
-			},
-			getMainDeviceFactorSource: {
-				let sources = try await getFactorSources()
-					.filter { $0.factorSourceKind == .device && !$0.supportsOlympia }
-					.map { try $0.extract(as: DeviceFactorSource.self) }
+		let getMainDeviceFactorSource: GetMainDeviceFactorSource = {
+			let sources = try await getFactorSources()
+				.filter { $0.factorSourceKind == .device && !$0.supportsOlympia }
+				.map { try $0.extract(as: DeviceFactorSource.self) }
 
-				if let explicitMain = sources.first(where: { $0.isExplicitMain }) {
-					return explicitMain
+			if let explicitMain = sources.first(where: { $0.isExplicitMain }) {
+				return explicitMain
+			} else {
+				if sources.count == 0 {
+					let errorMessage = "BAD IMPL found no babylon device factor source"
+					loggerGlobal.critical(.init(stringLiteral: errorMessage))
+					assertionFailure(errorMessage)
+					throw FactorSourceNotFound()
+				} else if sources.count > 1 {
+					let errorMessage = "BAD IMPL found more than 1 implicit main babylon device factor sources"
+					loggerGlobal.critical(.init(stringLiteral: errorMessage))
+					assertionFailure(errorMessage)
+					let dateSorted = sources.sorted(by: { $0.addedOn < $1.addedOn })
+					return dateSorted.first! // best we can do
 				} else {
-					if sources.count == 0 {
-						let errorMessage = "BAD IMPL found no babylon device factor source"
-						loggerGlobal.critical(.init(stringLiteral: errorMessage))
-						assertionFailure(errorMessage)
-						throw FactorSourceNotFound()
-					} else if sources.count > 1 {
-						let errorMessage = "BAD IMPL found more than 1 implicit main babylon device factor sources"
-						loggerGlobal.critical(.init(stringLiteral: errorMessage))
-						assertionFailure(errorMessage)
-						let dateSorted = sources.sorted(by: { $0.addedOn < $1.addedOn })
-						return dateSorted.first! // best we can do
-					} else {
-						return sources[0] // found implicit one
-					}
+					return sources[0] // found implicit one
 				}
-			},
+			}
+		}
+
+		let getCurrentNetworkID: GetCurrentNetworkID = {
+			await profileStore.profile.networkID
+		}
+
+		return Self(
+			getCurrentNetworkID: getCurrentNetworkID,
+			getMainDeviceFactorSource: getMainDeviceFactorSource,
 			createNewMainDeviceFactorSource: {
 				@Dependency(\.uuid) var uuid
 				@Dependency(\.date) var date
@@ -127,6 +131,22 @@ extension FactorSourcesClient: DependencyKey {
 			getFactorSources: getFactorSources,
 			factorSourcesAsyncSequence: {
 				await profileStore.factorSourcesValues()
+			},
+			nextEntityIndexForFactorSource: { request in
+				let maybeNetworkID = request.networkID
+				let maybeFactorSourceID = request.factorSourceID
+				let mainBDFS = try await getMainDeviceFactorSource()
+				let factorSourceID = maybeFactorSourceID ?? mainBDFS.factorSourceID.embed()
+
+				let currentNetworkID = await getCurrentNetworkID()
+				let networkID = maybeNetworkID ?? currentNetworkID
+				let maybeNetwork: Profile.Network? = try? await profileStore.profile.network(id: networkID)
+				if let network = maybeNetwork {
+					fatalError()
+				} else {
+					// First time this factor source is use on network `networkID`
+					return 0
+				}
 			},
 			addPrivateHDFactorSource: addPrivateHDFactorSource,
 			checkIfHasOlympiaFactorSourceForAccounts: {
