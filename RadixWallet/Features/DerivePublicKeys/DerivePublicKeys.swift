@@ -313,7 +313,11 @@ extension DerivePublicKeys {
 			case .useCurrent:
 				return .run { send in
 					let networkID = await factorSourcesClient.getCurrentNetworkID()
-					let derivationPath = try await nextDerivationPath(factorSourceID: factorSourceID, of: entityKind, networkID: nil)
+					let derivationPath = try await nextDerivationPath(
+						factorSourceID: factorSourceID,
+						of: entityKind,
+						networkID: nil
+					)
 					await send(calculatedDerivationPath(derivationPath, networkID, loadMnemonicPurpose))
 				} catch: { error, send in
 					loggerGlobal.error("Failed to create derivation path, error: \(error)")
