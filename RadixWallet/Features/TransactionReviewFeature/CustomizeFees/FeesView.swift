@@ -144,7 +144,7 @@ extension TransactionFee.NormalFeeCustomization {
 	}
 }
 
-extension RETDecimal {
+private extension RETDecimal {
 	func formatted(showsZero: Bool) -> String {
 		if !showsZero, isZero() {
 			return L10n.CustomizeNetworkFees.noneDue

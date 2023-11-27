@@ -62,8 +62,7 @@ struct PoolUnitResourcesView: View {
 
 // MARK: - PoolUnitResourceViewState
 struct PoolUnitResourceViewState: Identifiable, Equatable {
-	var id: String { symbol }
-
+	let id: ResourceAddress
 	let thumbnail: TokenThumbnail.Content
 	let symbol: String
 	let tokenAmount: String
@@ -71,11 +70,13 @@ struct PoolUnitResourceViewState: Identifiable, Equatable {
 	let isSelected: Bool?
 
 	init(
+		id: ResourceAddress,
 		thumbnail: TokenThumbnail.Content,
 		symbol: String,
 		tokenAmount: String,
 		isSelected: Bool? = nil
 	) {
+		self.id = id
 		self.thumbnail = thumbnail
 		self.symbol = symbol
 		self.tokenAmount = tokenAmount
@@ -85,10 +86,12 @@ struct PoolUnitResourceViewState: Identifiable, Equatable {
 
 extension PoolUnitResourceViewState {
 	init(
+		id: ResourceAddress,
 		xrdAmount: String,
 		isSelected: Bool? = nil
 	) {
 		self.init(
+			id: id,
 			thumbnail: .xrd,
 			symbol: Constants.xrdTokenName,
 			tokenAmount: xrdAmount,

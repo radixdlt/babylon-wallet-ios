@@ -42,11 +42,9 @@ public struct PoolUnit: Sendable, FeatureReducer {
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(
-				state: /State.details,
-				action: /Action.details,
-				child: PoolUnitDetails.init
-			)
+			Scope(state: /State.details, action: /Action.details) {
+				PoolUnitDetails()
+			}
 		}
 	}
 
