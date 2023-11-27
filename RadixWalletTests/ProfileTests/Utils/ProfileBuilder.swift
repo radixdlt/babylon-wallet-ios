@@ -103,7 +103,6 @@ extension ProfileBuilder {
 		)
 		let account = Profile.Network.Account(
 			networkID: networkID,
-			index: index,
 			address: address,
 			factorInstance: factorInstance,
 			displayName: .init(rawValue: name)!,

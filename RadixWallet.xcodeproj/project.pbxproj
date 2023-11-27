@@ -1224,6 +1224,8 @@
 		E63D123D2ADD1FC00001CBB1 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */; };
 		E657773C2B0BAB35002DB237 /* RecoverWalletControlWithBDFSOnly+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E657773A2B0BAB35002DB237 /* RecoverWalletControlWithBDFSOnly+View.swift */; };
 		E657773D2B0BAB35002DB237 /* RecoverWalletControlWithBDFSOnly.swift in Sources */ = {isa = PBXBuildFile; fileRef = E657773B2B0BAB35002DB237 /* RecoverWalletControlWithBDFSOnly.swift */; };
+		E65777402B14AC6A002DB237 /* only_plaintext_profile_snapshot_version_100_patch_after_app_version_120.json in Resources */ = {isa = PBXBuildFile; fileRef = E657773F2B14AC6A002DB237 /* only_plaintext_profile_snapshot_version_100_patch_after_app_version_120.json */; };
+		E65777422B14ACBD002DB237 /* multi_profile_snapshots_test_version_100_patch_after_app_version_120.json in Resources */ = {isa = PBXBuildFile; fileRef = E65777412B14ACBD002DB237 /* multi_profile_snapshots_test_version_100_patch_after_app_version_120.json */; };
 		E66EEB9B2B06694E007624BC /* RecoverWalletWithoutProfileStart+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66EEB992B06694E007624BC /* RecoverWalletWithoutProfileStart+View.swift */; };
 		E66EEB9C2B06694E007624BC /* RecoverWalletWithoutProfileStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66EEB9A2B06694E007624BC /* RecoverWalletWithoutProfileStart.swift */; };
 		E67F14452AE029BA00738BE1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E67F14442AE029BA00738BE1 /* Assets.xcassets */; };
@@ -2526,6 +2528,8 @@
 		E6390FB22AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift"; sourceTree = "<group>"; };
 		E657773A2B0BAB35002DB237 /* RecoverWalletControlWithBDFSOnly+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecoverWalletControlWithBDFSOnly+View.swift"; sourceTree = "<group>"; };
 		E657773B2B0BAB35002DB237 /* RecoverWalletControlWithBDFSOnly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverWalletControlWithBDFSOnly.swift; sourceTree = "<group>"; };
+		E657773F2B14AC6A002DB237 /* only_plaintext_profile_snapshot_version_100_patch_after_app_version_120.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = only_plaintext_profile_snapshot_version_100_patch_after_app_version_120.json; sourceTree = "<group>"; };
+		E65777412B14ACBD002DB237 /* multi_profile_snapshots_test_version_100_patch_after_app_version_120.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = multi_profile_snapshots_test_version_100_patch_after_app_version_120.json; sourceTree = "<group>"; };
 		E66EEB992B06694E007624BC /* RecoverWalletWithoutProfileStart+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecoverWalletWithoutProfileStart+View.swift"; sourceTree = "<group>"; };
 		E66EEB9A2B06694E007624BC /* RecoverWalletWithoutProfileStart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverWalletWithoutProfileStart.swift; sourceTree = "<group>"; };
 		E67F14442AE029BA00738BE1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -7336,6 +7340,8 @@
 		E6DBA2D22ADEBFB300A38425 /* ProfileVersion100 */ = {
 			isa = PBXGroup;
 			children = (
+				E65777412B14ACBD002DB237 /* multi_profile_snapshots_test_version_100_patch_after_app_version_120.json */,
+				E657773F2B14AC6A002DB237 /* only_plaintext_profile_snapshot_version_100_patch_after_app_version_120.json */,
 				E6DBA2D32ADEBFB300A38425 /* only_plaintext_profile_snapshot_version_100.json */,
 				E6DBA2D42ADEBFB300A38425 /* factor_sources.json */,
 				E6DBA2D52ADEBFB300A38425 /* multi_profile_snapshots_test_version_100.json */,
@@ -7723,12 +7729,14 @@
 				E6DBA34E2ADEBFB300A38425 /* slip10_tests_#1000.json in Resources */,
 				E6DBA3712ADEBFB300A38425 /* behaviors2.json in Resources */,
 				E6DBA3652ADEBFB300A38425 /* only_plaintext_profile_snapshot_version_100.json in Resources */,
+				E65777422B14ACBD002DB237 /* multi_profile_snapshots_test_version_100_patch_after_app_version_120.json in Resources */,
 				E6DBA34C2ADEBFB300A38425 /* cap26_curve25519.json in Resources */,
 				E6DBA3662ADEBFB300A38425 /* factor_sources.json in Resources */,
 				E6DBA35C2ADEBFB300A38425 /* bip39_japanese_test_vectors.json in Resources */,
 				E6DBA3672ADEBFB300A38425 /* multi_profile_snapshots_test_version_100.json in Resources */,
 				E6DBA35F2ADEBFB300A38425 /* bip39_english_test_vectors.json in Resources */,
 				E6DBA34F2ADEBFB300A38425 /* bip44_secp256k1.json in Resources */,
+				E65777402B14AC6A002DB237 /* only_plaintext_profile_snapshot_version_100_patch_after_app_version_120.json in Resources */,
 				E6DBA3772ADEBFB300A38425 /* import_olympia_wallet_parse_test.json in Resources */,
 				E6DBA3702ADEBFB300A38425 /* behaviors1.json in Resources */,
 				E6DBA3502ADEBFB300A38425 /* cap26_secp256k1.json in Resources */,

@@ -328,8 +328,16 @@ extension DerivePublicKeys {
 		of entityKind: EntityKind,
 		networkID maybeNetworkID: NetworkID?
 	) async throws -> DerivationPath {
-		let (index, networkID) = try await nextIndex(factorSourceID: factorSourceID, of: entityKind, networkID: maybeNetworkID)
-		return try DerivationPath.forEntity(kind: entityKind, networkID: networkID, index: index)
+		let (index, networkID) = try await nextIndex(
+			factorSourceID: factorSourceID,
+			of: entityKind,
+			networkID: maybeNetworkID
+		)
+		return try DerivationPath.forEntity(
+			kind: entityKind,
+			networkID: networkID,
+			index: index
+		)
 	}
 
 	private func nextIndex(
