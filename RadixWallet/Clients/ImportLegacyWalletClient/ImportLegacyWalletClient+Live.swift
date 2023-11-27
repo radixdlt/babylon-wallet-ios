@@ -16,8 +16,6 @@ extension ImportLegacyWalletClient: DependencyKey {
 			let networkID = NetworkID.mainnet
 			let sortedOlympia = accounts.sorted(by: \.addressIndex)
 
-			// let accountIndexBase = await accountsClient.nextAccountIndex(networkID)
-
 			var accountOffset = 0
 			guard let defaultAccountName: NonEmptyString = .init(rawValue: L10n.ImportOlympiaAccounts.AccountsToImport.unnamed) else {
 				// The L10n string should not be empty, so this should not be possible

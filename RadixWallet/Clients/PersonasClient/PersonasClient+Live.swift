@@ -16,17 +16,6 @@ extension PersonasClient: DependencyKey {
 			personas: {
 				await profileStore.personaValues()
 			},
-			nextPersonaIndexForFactorSource: { _, maybeNetworkID async -> HD.Path.Component.Child.Value in
-				let currentNetworkID = await profileStore.profile.networkID
-				let networkID = maybeNetworkID ?? currentNetworkID
-				let maybeNetwork: Profile.Network? = try? await profileStore.profile.network(id: networkID)
-				if let network = maybeNetwork {
-					fatalError("IMPL ME NOW")
-				} else {
-					// First Persona on this network
-					return 0
-				}
-			},
 			getPersonas: {
 				try await profileStore.network().getPersonas()
 			},

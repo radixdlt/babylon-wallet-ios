@@ -142,23 +142,48 @@ extension FactorSourcesClient: DependencyKey {
 				let networkID = maybeNetworkID ?? currentNetworkID
 				let maybeNetwork: Profile.Network? = try? await profileStore.profile.network(id: networkID)
 
-				func entitiesControlledByFactorSource(allEntities: some Collection<some EntityProtocol>) -> HD.Path.Component.Child.Value {
-					let entitiesControlledByFactorSource = allEntities.filter { account in
-						switch account.securityState {
-						case let .unsecured(unsecuredControl):
-							unsecuredControl.transactionSigning.factorSourceID.embed() == factorSourceID
+				/// We CANNOT just use `entitiesControlledByFactorSource.count` since it is possible that
+				/// some users from Radix Babylon Wallet version 1.0.0 created accounts not sarting at
+				/// index `0` (since we had global indexing, shared by all FactorSources...), lets say that
+				/// only one account is controlled by a FactorSource `X`, having index `1`, then if we were
+				/// to used `entitiesControlledByFactorSource.count` for "next index" then that would be...
+				/// the value `1` AGAIN! Which does not work. Instead we need to read out the last path
+				/// component (index!) of the derivation paths of `entitiesControlledByFactorSource` and
+				/// find the MAX value and +1 on that. This also ensures that we are NOT "gap filling",
+				/// meaning that we do not want to use index `0` even if it was not used, where `1` was used, so
+				/// next index should be `2`, not `0` (which was free). The rationale is that it would just be
+				/// confusing and messy (for us not the least). Best to always increase. But it is important
+				/// to know  AccountRecoveryScan SHOULD find these "gap entities"!
+				func nextDerivationIndexForFactorSource(
+					entitiesControlledByFactorSource: some Collection<some EntityProtocol>
+				) -> HD.Path.Component.Child.Value {
+					let indicesOfEntitiesControlledByAccount = entitiesControlledByFactorSource
+						.compactMap { entity -> HD.Path.Component.Child.Value? in
+							switch entity.securityState {
+							case let .unsecured(unsecuredControl):
+								let factorInstance = unsecuredControl.transactionSigning
+								guard factorInstance.factorSourceID.embed() == factorSourceID else {
+									return nil
+								}
+								return factorInstance.derivationPath.index
+							}
 						}
-					}
-
-					return HD.Path.Component.Child.Value(entitiesControlledByFactorSource.count)
+					guard !indicesOfEntitiesControlledByAccount.isEmpty else { return 0 }
+					let max = indicesOfEntitiesControlledByAccount.max()!
+					let nextIndex = max + 1
+					return nextIndex
 				}
 
 				if let network = maybeNetwork {
 					switch request.entityKind {
 					case .account:
-						return entitiesControlledByFactorSource(allEntities: network.accountsIncludingHidden())
+						return nextDerivationIndexForFactorSource(
+							entitiesControlledByFactorSource: network.accountsIncludingHidden()
+						)
 					case .identity:
-						return entitiesControlledByFactorSource(allEntities: network.personasIncludingHidden())
+						return nextDerivationIndexForFactorSource(
+							entitiesControlledByFactorSource: network.personasIncludingHidden()
+						)
 					}
 				} else {
 					// First time this factor source is use on network `networkID`
