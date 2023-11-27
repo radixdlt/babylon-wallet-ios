@@ -2895,10 +2895,10 @@
 		48CFBC6C2ADC10D800E77A5C /* AccountPreferencesFeature */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBC6D2ADC10D800E77A5C /* Common */,
 				48CFBC6F2ADC10D800E77A5C /* AccountPreferences+Reducer.swift */,
-				48CFBC702ADC10D800E77A5C /* Children */,
 				48CFBC7C2ADC10D800E77A5C /* AccountPreferences+View.swift */,
+				48CFBC702ADC10D800E77A5C /* Children */,
+				48CFBC6D2ADC10D800E77A5C /* Common */,
 			);
 			path = AccountPreferencesFeature;
 			sourceTree = "<group>";
@@ -2915,10 +2915,10 @@
 			isa = PBXGroup;
 			children = (
 				48CFBC712ADC10D800E77A5C /* DevAccountPreferences+Reducer.swift */,
+				48CFBC7B2ADC10D800E77A5C /* DevAccountPreferences+View.swift */,
+				48CFBC742ADC10D800E77A5C /* ThirdPartyDeposits */,
 				48CFBC722ADC10D800E77A5C /* UpdateAccountLabel+Reducer.swift */,
 				48CFBC732ADC10D800E77A5C /* UpdateAccountLabel+View.swift */,
-				48CFBC742ADC10D800E77A5C /* ThirdPartyDeposits */,
-				48CFBC7B2ADC10D800E77A5C /* DevAccountPreferences+View.swift */,
 			);
 			path = Children;
 			sourceTree = "<group>";

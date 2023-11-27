@@ -19,13 +19,21 @@ extension AccountPreferences.State {
 					),
 				]
 
+				#if DEBUG
+				sections.append(.init(
+					id: .development,
+					title: L10n.AccountSettings.developmentHeading,
+					rows: [.devAccountPreferences()]
+				))
+				#else
 				if account.networkID != .mainnet {
 					sections.append(.init(
 						id: .development,
 						title: L10n.AccountSettings.developmentHeading,
-						rows: [.devAccountPreferneces()]
+						rows: [.devAccountPreferences()]
 					))
 				}
+				#endif
 
 				return sections
 			}()
@@ -211,7 +219,7 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 		)
 	}
 
-	static func devAccountPreferneces() -> Self {
+	static func devAccountPreferences() -> Self {
 		.init(
 			id: .dev(.devPreferences),
 			title: L10n.AccountSettings.devPreferences,

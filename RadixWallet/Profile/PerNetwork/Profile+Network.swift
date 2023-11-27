@@ -66,6 +66,12 @@ extension Profile.Network {
 		accounts.count
 	}
 
+	#if DEBUG
+	public mutating func deleteAccount(address: AccountAddress) {
+		accounts.remove(id: address)
+	}
+	#endif
+
 	public mutating func updateAccount(_ account: Account) throws {
 		accounts.append(account)
 	}
