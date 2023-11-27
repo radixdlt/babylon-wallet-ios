@@ -63,7 +63,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case onFirstTask
+		case onFirstAppear
 	}
 
 	public enum InternalAction: Sendable, Hashable {
@@ -91,7 +91,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .onFirstTask:
+		case .onFirstAppear:
 			switch state.factorSourceOption {
 			case .device:
 				loggerGlobal.trace("Using `device` factor source to derive public keys.")

@@ -55,12 +55,8 @@ extension DerivePublicKeys {
 					Spacer(minLength: 0)
 				}
 				.padding(.horizontal, .medium1)
-				.onFirstTask { @MainActor in
-					/// For more information about that `sleep` please  check [this discussion in Slack](https://rdxworks.slack.com/archives/C03QFAWBRNX/p1687967412207119?thread_ts=1687964494.772899&cid=C03QFAWBRNX)
-					@Dependency(\.continuousClock) var clock
-					try? await clock.sleep(for: .milliseconds(700))
-
-					await viewStore.send(.onFirstTask).finish()
+				.onFirstAppear {
+					store.send(.view(.onFirstAppear))
 				}
 			}
 		}

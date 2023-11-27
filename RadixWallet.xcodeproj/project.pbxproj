@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		48076E402B14F5CA004575F8 /* OnFirstAppearViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48076E3F2B14F5CA004575F8 /* OnFirstAppearViewModifier.swift */; };
 		480E50D52B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 480E50D32B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift */; };
 		48581B2F2B0206E600F885C0 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48581B2E2B0206E600F885C0 /* TestUtils.swift */; };
 		48649AD52ADC7CAC006307CF /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 48649AD42ADC7CAC006307CF /* AppIcon.xcassets */; };
@@ -1340,6 +1341,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		48076E3F2B14F5CA004575F8 /* OnFirstAppearViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnFirstAppearViewModifier.swift; sourceTree = "<group>"; };
 		480E50D32B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecoverWalletWithoutProfileCoordinator+View.swift"; sourceTree = "<group>"; };
 		481B43B02ADC7F1A007945C1 /* RadixWalletTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RadixWalletTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		481B44022ADC7FB3007945C1 /* RadixWallet.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = RadixWallet.xctestplan; sourceTree = "<group>"; };
@@ -5985,6 +5987,7 @@
 			children = (
 				48CFC1332ADC10D900E77A5C /* LedgerRowView.swift */,
 				48CFC1342ADC10D900E77A5C /* OnFirstTaskViewModifier.swift */,
+				48076E3F2B14F5CA004575F8 /* OnFirstAppearViewModifier.swift */,
 				48CFC1352ADC10D900E77A5C /* OnAnimationCompletedViewModifier.swift */,
 				48CFC1362ADC10D900E77A5C /* LoadableView.swift */,
 				48CFC1372ADC10D900E77A5C /* Extensions */,
@@ -9020,6 +9023,7 @@
 				48CFC37D2ADC10D900E77A5C /* PoolUnitHeaderView.swift in Sources */,
 				48CFC2EC2ADC10D900E77A5C /* SecurityStructureTutorialHeader.swift in Sources */,
 				48CFC4052ADC10D900E77A5C /* NoopError.swift in Sources */,
+				48076E402B14F5CA004575F8 /* OnFirstAppearViewModifier.swift in Sources */,
 				48CFC39D2ADC10D900E77A5C /* Engine+Bridge+Real+CryptoPrimitives.swift in Sources */,
 				48CFC3A72ADC10D900E77A5C /* SLIP10+PublicKey.swift in Sources */,
 				48CFC4692ADC10DA00E77A5C /* ImportLegacyWalletClient+Request+Response.swift in Sources */,

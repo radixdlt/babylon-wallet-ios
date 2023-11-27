@@ -96,8 +96,8 @@ public extension AccountRecoveryScanInProgress {
 						DerivePublicKeys.View(store: $0)
 					}
 				)
-				.onFirstTask { @MainActor in
-					await store.send(.view(.onFirstTask)).finish()
+				.onFirstAppear {
+					store.send(.view(.onFirstAppear))
 				}
 			}
 		}

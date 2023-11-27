@@ -54,7 +54,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case onFirstTask
+		case onFirstAppear
 		case scanMore
 		case continueTapped
 	}
@@ -102,7 +102,6 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			return scanOnLedger(accounts: accounts, state: &state)
 
 		case let .foundAccounts(active, inactive):
-			loggerGlobal.notice("✅ .internal(.foundAccounts))")
 			state.status = .scanComplete
 			state.active.append(contentsOf: active)
 			state.inactive.append(contentsOf: inactive)
@@ -112,7 +111,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .onFirstTask:
+		case .onFirstAppear:
 			if let factorSource = state.factorSource.wrappedValue {
 				return derivePublicKeys(using: factorSource, state: &state)
 			} else {
