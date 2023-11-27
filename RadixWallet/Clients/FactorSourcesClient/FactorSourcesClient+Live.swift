@@ -133,14 +133,12 @@ extension FactorSourcesClient: DependencyKey {
 				await profileStore.factorSourcesValues()
 			},
 			nextEntityIndexForFactorSource: { request in
-				let maybeNetworkID = request.networkID
-				let maybeFactorSourceID = request.factorSourceID
 				let mainBDFS = try await getMainDeviceFactorSource()
-				let factorSourceID = maybeFactorSourceID ?? mainBDFS.factorSourceID.embed()
+				let factorSourceID = request.factorSourceID ?? mainBDFS.factorSourceID.embed()
 
 				let currentNetworkID = await getCurrentNetworkID()
-				let networkID = maybeNetworkID ?? currentNetworkID
-				let maybeNetwork: Profile.Network? = try? await profileStore.profile.network(id: networkID)
+				let networkID = request.networkID ?? currentNetworkID
+				let network = try? await profileStore.profile.network(id: networkID)
 
 				/// We CANNOT just use `entitiesControlledByFactorSource.count` since it is possible that
 				/// some users from Radix Babylon Wallet version 1.0.0 created accounts not sarting at
@@ -168,13 +166,12 @@ extension FactorSourcesClient: DependencyKey {
 								return factorInstance.derivationPath.index
 							}
 						}
-					guard !indicesOfEntitiesControlledByAccount.isEmpty else { return 0 }
-					let max = indicesOfEntitiesControlledByAccount.max()!
+					guard let max = indicesOfEntitiesControlledByAccount.max() else { return 0 }
 					let nextIndex = max + 1
 					return nextIndex
 				}
 
-				if let network = maybeNetwork {
+				if let network {
 					switch request.entityKind {
 					case .account:
 						return nextDerivationIndexForFactorSource(

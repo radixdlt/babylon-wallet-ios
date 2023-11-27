@@ -20,24 +20,26 @@ extension AccountPreferences.State {
 				]
 
 				#if DEBUG
-				sections.append(.init(
-					id: .development,
-					title: L10n.AccountSettings.developmentHeading,
-					rows: [.devAccountPreferences()]
-				))
+				addDevAccountPreferencesSection(to: &sections)
 				#else
 				if account.networkID != .mainnet {
-					sections.append(.init(
-						id: .development,
-						title: L10n.AccountSettings.developmentHeading,
-						rows: [.devAccountPreferences()]
-					))
+					addDevAccountPreferencesSection(to: &sections)
 				}
 				#endif
 
 				return sections
 			}()
 		)
+	}
+
+	func addDevAccountPreferencesSection(
+		to sections: inout [AccountPreferences.ViewState.Section]
+	) {
+		sections.append(.init(
+			id: .development,
+			title: L10n.AccountSettings.developmentHeading,
+			rows: [.devAccountPreferences()]
+		))
 	}
 }
 
