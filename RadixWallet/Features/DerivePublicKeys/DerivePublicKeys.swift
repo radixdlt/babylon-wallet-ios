@@ -294,10 +294,15 @@ extension DerivePublicKeys {
 			case .importLegacyAccounts:
 				.importOlympiaAccounts
 			}
+			let factorSourceID = hdFactorSource.factorSourceID
 			switch networkOption {
 			case let .specific(networkID):
 				return .run { send in
-					let derivationPath = try await nextDerivationPath(of: entityKind, networkID: networkID)
+					let derivationPath = try await nextDerivationPath(
+						factorSourceID: factorSourceID,
+						of: entityKind,
+						networkID: networkID
+					)
 					assert(derivationPath.curveForScheme == curve)
 					try await send(deriveWithKnownDerivationPaths([derivationPath], networkID, loadMnemonicPurpose))
 				} catch: { error, send in
@@ -308,7 +313,11 @@ extension DerivePublicKeys {
 			case .useCurrent:
 				return .run { send in
 					let networkID = await factorSourcesClient.getCurrentNetworkID()
-					let derivationPath = try await nextDerivationPath(of: entityKind, networkID: nil)
+					let derivationPath = try await nextDerivationPath(
+						factorSourceID: factorSourceID,
+						of: entityKind,
+						networkID: nil
+					)
 					await send(calculatedDerivationPath(derivationPath, networkID, loadMnemonicPurpose))
 				} catch: { error, send in
 					loggerGlobal.error("Failed to create derivation path, error: \(error)")
@@ -319,28 +328,36 @@ extension DerivePublicKeys {
 	}
 
 	private func nextDerivationPath(
+		factorSourceID: FactorSourceID,
 		of entityKind: EntityKind,
 		networkID maybeNetworkID: NetworkID?
 	) async throws -> DerivationPath {
-		let (index, networkID) = try await nextIndex(of: entityKind, networkID: maybeNetworkID)
-		return try DerivationPath.forEntity(kind: entityKind, networkID: networkID, index: index)
+		let (index, networkID) = try await nextIndex(
+			factorSourceID: factorSourceID,
+			of: entityKind,
+			networkID: maybeNetworkID
+		)
+		return try DerivationPath.forEntity(
+			kind: entityKind,
+			networkID: networkID,
+			index: index
+		)
 	}
 
 	private func nextIndex(
+		factorSourceID: FactorSourceID,
 		of entityKind: EntityKind,
 		networkID maybeNetworkID: NetworkID?
 	) async throws -> (index: HD.Path.Component.Child.Value, networkID: NetworkID) {
-		let (index, _networkID) = await { () async -> (HD.Path.Component.Child.Value, NetworkID) in
-			let currentNetwork = await accountsClient.getCurrentNetworkID()
-			let networkID = maybeNetworkID ?? currentNetwork
-			switch entityKind {
-			case .account:
-				return await (accountsClient.nextAccountIndex(networkID), networkID)
-			case .identity:
-				return await (personasClient.nextPersonaIndex(networkID), networkID)
-			}
-		}()
-		return (index: index, networkID: _networkID)
+		let currentNetwork = await accountsClient.getCurrentNetworkID()
+		let networkID = maybeNetworkID ?? currentNetwork
+		let request = NextEntityIndexForFactorSourceRequest(
+			entityKind: entityKind,
+			factorSourceID: factorSourceID,
+			networkID: networkID
+		)
+		let index = try await factorSourcesClient.nextEntityIndexForFactorSource(request)
+		return (index, networkID)
 	}
 }
 

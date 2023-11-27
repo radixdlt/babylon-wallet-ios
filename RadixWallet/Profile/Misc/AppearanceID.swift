@@ -48,9 +48,9 @@ extension Profile.Network.Account.AppearanceID {
 		String(describing: id)
 	}
 
-	public static func fromIndex(_ accountIndex: Int) -> Self {
+	public static func fromNumberOfAccounts(_ numberOfAccounts: Int) -> Self {
 		let mod = allCases.count
-		let gradientIndex = accountIndex % mod
+		let gradientIndex = numberOfAccounts % mod
 		return allCases[gradientIndex]
 	}
 }

@@ -59,34 +59,38 @@ extension FactorSourcesClient: DependencyKey {
 			return factorSourceID
 		}
 
-		return Self(
-			getCurrentNetworkID: {
-				await profileStore.profile.networkID
-			},
-			getMainDeviceFactorSource: {
-				let sources = try await getFactorSources()
-					.filter { $0.factorSourceKind == .device && !$0.supportsOlympia }
-					.map { try $0.extract(as: DeviceFactorSource.self) }
+		let getMainDeviceFactorSource: GetMainDeviceFactorSource = {
+			let sources = try await getFactorSources()
+				.filter { $0.factorSourceKind == .device && !$0.supportsOlympia }
+				.map { try $0.extract(as: DeviceFactorSource.self) }
 
-				if let explicitMain = sources.first(where: { $0.isExplicitMain }) {
-					return explicitMain
+			if let explicitMain = sources.first(where: { $0.isExplicitMain }) {
+				return explicitMain
+			} else {
+				if sources.count == 0 {
+					let errorMessage = "BAD IMPL found no babylon device factor source"
+					loggerGlobal.critical(.init(stringLiteral: errorMessage))
+					assertionFailure(errorMessage)
+					throw FactorSourceNotFound()
+				} else if sources.count > 1 {
+					let errorMessage = "BAD IMPL found more than 1 implicit main babylon device factor sources"
+					loggerGlobal.critical(.init(stringLiteral: errorMessage))
+					assertionFailure(errorMessage)
+					let dateSorted = sources.sorted(by: { $0.addedOn < $1.addedOn })
+					return dateSorted.first! // best we can do
 				} else {
-					if sources.count == 0 {
-						let errorMessage = "BAD IMPL found no babylon device factor source"
-						loggerGlobal.critical(.init(stringLiteral: errorMessage))
-						assertionFailure(errorMessage)
-						throw FactorSourceNotFound()
-					} else if sources.count > 1 {
-						let errorMessage = "BAD IMPL found more than 1 implicit main babylon device factor sources"
-						loggerGlobal.critical(.init(stringLiteral: errorMessage))
-						assertionFailure(errorMessage)
-						let dateSorted = sources.sorted(by: { $0.addedOn < $1.addedOn })
-						return dateSorted.first! // best we can do
-					} else {
-						return sources[0] // found implicit one
-					}
+					return sources[0] // found implicit one
 				}
-			},
+			}
+		}
+
+		let getCurrentNetworkID: GetCurrentNetworkID = {
+			await profileStore.profile.networkID
+		}
+
+		return Self(
+			getCurrentNetworkID: getCurrentNetworkID,
+			getMainDeviceFactorSource: getMainDeviceFactorSource,
 			createNewMainDeviceFactorSource: {
 				@Dependency(\.uuid) var uuid
 				@Dependency(\.date) var date
@@ -127,6 +131,61 @@ extension FactorSourcesClient: DependencyKey {
 			getFactorSources: getFactorSources,
 			factorSourcesAsyncSequence: {
 				await profileStore.factorSourcesValues()
+			},
+			nextEntityIndexForFactorSource: { request in
+				let mainBDFS = try await getMainDeviceFactorSource()
+				let factorSourceID = request.factorSourceID ?? mainBDFS.factorSourceID.embed()
+
+				let currentNetworkID = await getCurrentNetworkID()
+				let networkID = request.networkID ?? currentNetworkID
+				let network = try? await profileStore.profile.network(id: networkID)
+
+				/// We CANNOT just use `entitiesControlledByFactorSource.count` since it is possible that
+				/// some users from Radix Babylon Wallet version 1.0.0 created accounts not sarting at
+				/// index `0` (since we had global indexing, shared by all FactorSources...), lets say that
+				/// only one account is controlled by a FactorSource `X`, having index `1`, then if we were
+				/// to used `entitiesControlledByFactorSource.count` for "next index" then that would be...
+				/// the value `1` AGAIN! Which does not work. Instead we need to read out the last path
+				/// component (index!) of the derivation paths of `entitiesControlledByFactorSource` and
+				/// find the MAX value and +1 on that. This also ensures that we are NOT "gap filling",
+				/// meaning that we do not want to use index `0` even if it was not used, where `1` was used, so
+				/// next index should be `2`, not `0` (which was free). The rationale is that it would just be
+				/// confusing and messy (for us not the least). Best to always increase. But it is important
+				/// to know  AccountRecoveryScan SHOULD find these "gap entities"!
+				func nextDerivationIndexForFactorSource(
+					entitiesControlledByFactorSource: some Collection<some EntityProtocol>
+				) -> HD.Path.Component.Child.Value {
+					let indicesOfEntitiesControlledByAccount = entitiesControlledByFactorSource
+						.compactMap { entity -> HD.Path.Component.Child.Value? in
+							switch entity.securityState {
+							case let .unsecured(unsecuredControl):
+								let factorInstance = unsecuredControl.transactionSigning
+								guard factorInstance.factorSourceID.embed() == factorSourceID else {
+									return nil
+								}
+								return factorInstance.derivationPath.index
+							}
+						}
+					guard let max = indicesOfEntitiesControlledByAccount.max() else { return 0 }
+					let nextIndex = max + 1
+					return nextIndex
+				}
+
+				if let network {
+					switch request.entityKind {
+					case .account:
+						return nextDerivationIndexForFactorSource(
+							entitiesControlledByFactorSource: network.accountsIncludingHidden()
+						)
+					case .identity:
+						return nextDerivationIndexForFactorSource(
+							entitiesControlledByFactorSource: network.personasIncludingHidden()
+						)
+					}
+				} else {
+					// First time this factor source is use on network `networkID`
+					return 0
+				}
 			},
 			addPrivateHDFactorSource: addPrivateHDFactorSource,
 			checkIfHasOlympiaFactorSourceForAccounts: {

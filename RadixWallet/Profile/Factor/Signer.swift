@@ -54,10 +54,6 @@ public enum EntityPotentiallyVirtual: Sendable, Hashable, EntityBaseProtocol, Id
 		}
 	}
 
-	public var index: HD.Path.Component.Child.Value {
-		securityState.entityIndex
-	}
-
 	case account(Profile.Network.Account)
 	case persona(Profile.Network.Persona)
 	public var virtualHierarchicalDeterministicFactorInstances: Set<HierarchicalDeterministicFactorInstance> {

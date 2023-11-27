@@ -1,5 +1,6 @@
 // MARK: - FactorSourcesClient
 public struct FactorSourcesClient: Sendable {
+	public var nextEntityIndexForFactorSource: NextEntityIndexForFactorSource
 	public var getCurrentNetworkID: GetCurrentNetworkID
 	public var getMainDeviceFactorSource: GetMainDeviceFactorSource
 	public var createNewMainDeviceFactorSource: CreateNewMainDeviceFactorSource
@@ -19,6 +20,7 @@ public struct FactorSourcesClient: Sendable {
 		createNewMainDeviceFactorSource: @escaping CreateNewMainDeviceFactorSource,
 		getFactorSources: @escaping GetFactorSources,
 		factorSourcesAsyncSequence: @escaping FactorSourcesAsyncSequence,
+		nextEntityIndexForFactorSource: @escaping NextEntityIndexForFactorSource,
 		addPrivateHDFactorSource: @escaping AddPrivateHDFactorSource,
 		checkIfHasOlympiaFactorSourceForAccounts: @escaping CheckIfHasOlympiaFactorSourceForAccounts,
 		saveFactorSource: @escaping SaveFactorSource,
@@ -32,6 +34,7 @@ public struct FactorSourcesClient: Sendable {
 		self.createNewMainDeviceFactorSource = createNewMainDeviceFactorSource
 		self.getFactorSources = getFactorSources
 		self.factorSourcesAsyncSequence = factorSourcesAsyncSequence
+		self.nextEntityIndexForFactorSource = nextEntityIndexForFactorSource
 		self.addPrivateHDFactorSource = addPrivateHDFactorSource
 		self.checkIfHasOlympiaFactorSourceForAccounts = checkIfHasOlympiaFactorSourceForAccounts
 		self.saveFactorSource = saveFactorSource
@@ -42,8 +45,18 @@ public struct FactorSourcesClient: Sendable {
 	}
 }
 
+// MARK: - NextEntityIndexForFactorSourceRequest
+public struct NextEntityIndexForFactorSourceRequest {
+	public let entityKind: EntityKind
+	/// `nil` means use main BDFS
+	public let factorSourceID: FactorSourceID?
+	/// `nil` means `currentNetwork`
+	public let networkID: NetworkID?
+}
+
 // MARK: FactorSourcesClient.GetFactorSources
 extension FactorSourcesClient {
+	public typealias NextEntityIndexForFactorSource = @Sendable (NextEntityIndexForFactorSourceRequest) async throws -> HD.Path.Component.Child.Value
 	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 	public typealias GetMainDeviceFactorSource = @Sendable () async throws -> DeviceFactorSource
 	public typealias CreateNewMainDeviceFactorSource = @Sendable () async throws -> PrivateHDFactorSource

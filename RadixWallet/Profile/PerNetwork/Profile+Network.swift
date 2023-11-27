@@ -54,13 +54,23 @@ extension Profile.Network {
 		accounts.hidden
 	}
 
+	public func accountsIncludingHidden() -> IdentifiedArrayOf<Account> {
+		accounts
+	}
+
 	public func hasSomeAccount() -> Bool {
 		!accounts.isEmpty
 	}
 
-	public func nextAccountIndex() -> Int {
+	var numberOfAccountsIncludingHidden: Int {
 		accounts.count
 	}
+
+	#if DEBUG
+	public mutating func deleteAccount(address: AccountAddress) {
+		accounts.remove(id: address)
+	}
+	#endif
 
 	public mutating func updateAccount(_ account: Account) throws {
 		accounts.append(account)
@@ -104,12 +114,12 @@ extension Profile.Network {
 		personas.hiden
 	}
 
-	public func hasSomePersona() -> Bool {
-		!personas.isEmpty
+	public func personasIncludingHidden() -> IdentifiedArrayOf<Persona> {
+		personas
 	}
 
-	public func nextPersonaIndex() -> Int {
-		personas.count
+	public func hasSomePersona() -> Bool {
+		!personas.isEmpty
 	}
 
 	public mutating func addPersona(_ persona: Persona) throws {

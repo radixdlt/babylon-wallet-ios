@@ -33,7 +33,6 @@ extension Profile.Network.Account {
 			),
 			securityState: .unsecured(
 				.init(
-					entityIndex: index,
 					transactionSigning: hdFactorInstance
 				)
 			),
@@ -83,7 +82,6 @@ extension Profile.Network.Persona {
 			),
 			securityState: .unsecured(
 				.init(
-					entityIndex: index,
 					transactionSigning: hdFactorInstance
 				)
 			),

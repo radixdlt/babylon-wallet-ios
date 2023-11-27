@@ -585,7 +585,7 @@ extension ImportOlympiaWalletCoordinator {
 				accountName: account.displayName?.rawValue,
 				olympiaAddress: account.address,
 				babylonAddress: babylonAddress,
-				appearanceID: .fromIndex(existingAccounts + index),
+				appearanceID: .fromNumberOfAccounts(existingAccounts + index),
 				olympiaAccountType: account.accountType
 			)
 		}
