@@ -1,13 +1,14 @@
 // MARK: - OnFirstAppearViewModifier
 struct OnFirstAppearViewModifier: ViewModifier {
 	let priority: TaskPriority
-	let action: @Sendable () -> Void
+	let action: () -> Void
 
 	@State private var didFire = false
 
 	func body(content: Content) -> some View {
 		content.onAppear {
 			guard !didFire else {
+				loggerGlobal.trace("OnFirstAppearViewModifier NOT firing, already fired")
 				return
 			}
 			didFire = true
@@ -20,7 +21,7 @@ extension View {
 	/// Executes a given action only once, when the first `onAppear` is fired by the system.
 	public func onFirstAppear(
 		priority: TaskPriority = .userInitiated,
-		_ action: @escaping @Sendable () -> Void
+		_ action: @escaping () -> Void
 	) -> some View {
 		modifier(OnFirstAppearViewModifier(priority: priority, action: action))
 	}

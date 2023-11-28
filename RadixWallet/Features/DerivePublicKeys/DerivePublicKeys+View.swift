@@ -56,7 +56,7 @@ extension DerivePublicKeys {
 				}
 				.padding(.horizontal, .medium1)
 				.onFirstAppear {
-					store.send(.view(.onFirstAppear))
+					viewStore.send(.onFirstAppear)
 				}
 			}
 		}

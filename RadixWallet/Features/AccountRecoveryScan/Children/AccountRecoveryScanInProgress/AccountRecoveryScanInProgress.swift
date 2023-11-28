@@ -18,13 +18,8 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		public var active: IdentifiedArrayOf<Profile.Network.Account> = []
 		public var inactive: IdentifiedArrayOf<Profile.Network.Account> = []
 
-		/// Attention! This CANNOT be changed into the `destination` pattern we use elsewhere, due to
-		/// the "TCE Send"-bug, we never ever receive the event `internal(.foundAccounts` if we
-		/// use destination pattern with the `DestinationReducer` like we ought to. Cyon is about to send
-		/// a minimum showcasing example of the "TCA Send" bug to Pointfree, stay tuned, in the meantime
-		/// we will have to live with this.
 		@PresentationState
-		public var derivePublicKeys: DerivePublicKeys.State?
+		public var destination: Destination.State? = nil
 
 		public init(
 			factorSourceID: FactorSourceID.FromHash,
@@ -64,6 +59,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			active: IdentifiedArrayOf<Profile.Network.Account>,
 			inactive: IdentifiedArrayOf<Profile.Network.Account>
 		)
+		case failedToDerivePublicKey
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -71,15 +67,33 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		case derivePublicKeys(PresentationAction<DerivePublicKeys.Action>)
 	}
 
+	// MARK: - Destination
+	public struct Destination: DestinationReducer {
+		public enum State: Hashable, Sendable {
+			case derivePublicKeys(DerivePublicKeys.State)
+		}
+
+		public enum Action: Equatable, Sendable {
+			case derivePublicKeys(DerivePublicKeys.Action)
+		}
+
+		public var body: some ReducerOf<Self> {
+			Scope(state: /State.derivePublicKeys, action: /Action.derivePublicKeys) {
+				DerivePublicKeys()
+			}
+		}
+	}
+
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			/// Attention! If you change this to the `destination` pattern we use elsewhere this feature breaks due to "TCA Send"-bug
-			.ifLet(\.$derivePublicKeys, action: /Action.child .. ChildAction.derivePublicKeys) {
-				DerivePublicKeys()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.continuousClock) var clock
@@ -125,6 +139,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			}
 
 		case .scanMore:
+			loggerGlobal.debug("Scan more requested.")
 			guard let factorSource = state.factorSource.wrappedValue else { fatalError("discrepancy") }
 			state.offset += accRecScanBatchSize
 			return derivePublicKeys(using: factorSource, state: &state)
@@ -134,10 +149,9 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		/// Attention! If you change this to the `destination` pattern we use elsewhere this feature breaks due to "TCA Send"-bug
-		case let .derivePublicKeys(.presented(.delegate(delegateAction))):
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .derivePublicKeys(.delegate(delegateAction)):
 			loggerGlobal.notice("Finish deriving public keys")
 			switch delegateAction {
 			case let .derivedPublicKeys(publicHDKeys, factorSourceID, networkID):
@@ -162,13 +176,10 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 				}
 
 			case .failedToDerivePublicKey:
-				fatalError("failed to derive keys")
+				return .send(.delegate(.failedToDerivePublicKey))
 			}
 
-		case .derivePublicKeys(.dismiss):
-			return .none
-		case .derivePublicKeys(.presented(_)):
-			return .none
+		default: return .none
 		}
 	}
 }
@@ -176,7 +187,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 extension AccountRecoveryScanInProgress {
 	private func scanOnLedger(accounts: IdentifiedArrayOf<Profile.Network.Account>, state: inout State) -> Effect<Action> {
 		assert(accounts.count == accRecScanBatchSize)
-		state.derivePublicKeys = nil
+		state.destination = nil
 		state.status = .scanningNetworkForActiveAccounts
 
 		return .run { send in
@@ -263,7 +274,8 @@ extension AccountRecoveryScanInProgress {
 			}
 		}
 		state.status = .derivingPublicKeys
-		state.derivePublicKeys = .init(
+		loggerGlobal.debug("Settings destination to derivePublicKeys")
+		state.destination = .derivePublicKeys(.init(
 			derivationPathOption: .knownPaths(
 				derivationPaths,
 				networkID: networkID
@@ -272,7 +284,7 @@ extension AccountRecoveryScanInProgress {
 				factorSource
 			),
 			purpose: .createEntity(kind: .account)
-		)
+		))
 
 		return .none
 	}

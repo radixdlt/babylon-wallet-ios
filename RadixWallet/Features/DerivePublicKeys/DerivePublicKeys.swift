@@ -92,12 +92,14 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstAppear:
+			loggerGlobal.debug("DerivePublicKeys onFirstAppear")
 			switch state.factorSourceOption {
 			case .device:
-				loggerGlobal.trace("Using `device` factor source to derive public keys.")
+				loggerGlobal.debug("Using `device` factor source to derive public keys.")
 				return .run { send in
+					loggerGlobal.debug("Loading main BDFS...")
 					let babylonFactorSource = try await factorSourcesClient.getMainDeviceFactorSource()
-
+					loggerGlobal.debug("Loaded main BDFS ✓")
 					await send(.internal(.loadedDeviceFactorSource(babylonFactorSource)))
 				} catch: { error, send in
 					loggerGlobal.error("Failed to load factor source, error: \(error)")
@@ -105,7 +107,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 				}
 
 			case let .specific(factorSource):
-				loggerGlobal.trace("Using specific factor source to derive public keys - kind: \(factorSource.kind)")
+				loggerGlobal.debug("Using specific factor source to derive public keys - kind: \(factorSource.kind)")
 				switch factorSource {
 				case let .device(deviceFactorSource):
 					return deriveWith(deviceFactorSource: deviceFactorSource, state)
@@ -126,6 +128,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			return deriveWith(deviceFactorSource: factorSource, state)
 
 		case let .deriveWithDeviceFactor(device, derivationPath, networkID, loadMnemonicPurpose):
+			loggerGlobal.debug("Deriving using device factor source...id \(device.id)")
 			return deriveWith(deviceFactorSource: device, derivationPaths: [derivationPath], networkID: networkID, loadMnemonicPurpose: loadMnemonicPurpose, state: state)
 
 		case let .deriveWithLedgerFactor(ledger, derivationPath, networkID):
@@ -209,7 +212,7 @@ extension DerivePublicKeys {
 			derivationPaths: derivationPaths,
 			loadMnemonicPurpose: loadMnemonicPurpose
 		))
-		loggerGlobal.debug("Finish deriving of #\(hdKeys.count) keys ✅")
+		loggerGlobal.debug("Finish deriving of #\(hdKeys.count) keys ✅ => delegating `derivedPublicKeys`")
 		return .delegate(.derivedPublicKeys(
 			hdKeys,
 			factorSourceID: deviceFactorSource.id.embed(),
@@ -269,7 +272,7 @@ extension DerivePublicKeys {
 	) -> Effect<Action> {
 		switch state.derivationsPathOption {
 		case let .knownPaths(derivationPaths, networkID):
-			loggerGlobal.trace("Deriving public keys at paths: \(derivationPaths)")
+			loggerGlobal.debug("Deriving public keys at paths: \(derivationPaths)")
 			let loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose = switch state.purpose {
 			case let .createEntity(kind: entityKind):
 				.createEntity(kind: entityKind)
@@ -285,7 +288,7 @@ extension DerivePublicKeys {
 				await send(.delegate(.failedToDerivePublicKey))
 			}
 		case let .next(networkOption, entityKind, curve):
-			loggerGlobal.trace("Deriving public keys for next entity - kind: \(entityKind)")
+			loggerGlobal.debug("Deriving public keys for next entity - kind: \(entityKind)")
 			let loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose = switch state.purpose {
 			case .createEntity:
 				.createEntity(kind: entityKind)

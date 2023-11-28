@@ -135,6 +135,9 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 				return completed(purpose: state.purpose, inactiveToAdd: inactive, active: active)
 			}
 
+		case .root(.delegate(.failedToDerivePublicKey)):
+			return .send(.delegate(.dismissed))
+
 		case let .path(.element(_, action: .selectInactiveAccountsToAdd(.delegate(.finished(selectedInactive, active))))):
 			return completed(purpose: state.purpose, inactiveToAdd: selectedInactive, active: active)
 
