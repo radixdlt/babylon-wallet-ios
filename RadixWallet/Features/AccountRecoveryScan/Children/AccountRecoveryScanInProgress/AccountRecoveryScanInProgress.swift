@@ -62,11 +62,6 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		case failedToDerivePublicKey
 	}
 
-	public enum ChildAction: Sendable, Equatable {
-		/// Attention! If you change this to the `destination` pattern we use elsewhere this feature breaks due to "TCA Send"-bug
-		case derivePublicKeys(PresentationAction<DerivePublicKeys.Action>)
-	}
-
 	// MARK: - Destination
 	public struct Destination: DestinationReducer {
 		public enum State: Hashable, Sendable {

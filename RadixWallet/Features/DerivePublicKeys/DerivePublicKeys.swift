@@ -88,7 +88,9 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 
-	public init() {}
+	public init() {
+		loggerGlobal.error("Creating DerivingPublicKeys reducer")
+	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {

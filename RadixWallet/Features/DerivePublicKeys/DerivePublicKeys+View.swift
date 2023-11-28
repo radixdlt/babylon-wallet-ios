@@ -62,6 +62,9 @@ extension DerivePublicKeys {
 				.onFirstAppear {
 					viewStore.send(.onFirstAppear)
 				}
+				.onDisappear {
+					loggerGlobal.critical("DerivePublicKeys onDisappear")
+				}
 			}
 		}
 	}
