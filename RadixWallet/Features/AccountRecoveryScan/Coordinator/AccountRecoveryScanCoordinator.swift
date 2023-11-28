@@ -78,6 +78,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.onboardingClient) var onboardingClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.dismiss) var dismiss
+
 	public init() {}
 
 	public var body: some ReducerOf<Self> {

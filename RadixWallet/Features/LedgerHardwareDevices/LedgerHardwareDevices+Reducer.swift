@@ -14,6 +14,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		public enum Context: Sendable, Hashable {
 			case settings
 			case createHardwareAccount
+			case accountRecovery
 			case setupMFA
 		}
 

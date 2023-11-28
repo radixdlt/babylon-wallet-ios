@@ -1,16 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - ManualAccountRecoveryScanCoordinator.View
-extension ManualAccountRecoveryScanCoordinator {
-//	public struct ViewState: Equatable {
-//		public let canImportOlympiaWallet: Bool
-//
-//		init(state: AccountSecurity.State) {
-//			self.canImportOlympiaWallet = state.canImportOlympiaWallet
-//		}
-//	}
-
+// MARK: - ManualAccountRecovery.View
+extension ManualAccountRecovery {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: Store
@@ -21,46 +13,8 @@ extension ManualAccountRecoveryScanCoordinator {
 	}
 }
 
-extension ManualAccountRecoveryScanCoordinator.View {
+extension ManualAccountRecovery.View {
 	public var body: some View {
-		NavigationStackStore(
-			store.scope(state: \.path, action: { .child(.path($0)) })
-		) {
-			root()
-				.navigationTitle("Derive Legacy Account") // FIXME: Strings
-
-			//			.toolbar {
-			//				ToolbarItem(placement: .cancellationAction) {
-			//					CloseButton {
-			//						self.store.send(.view(.closeTapped))
-			//					}
-			//				}
-			//			}
-		} destination: {
-			PathView(store: $0)
-		}
-	}
-}
-
-private extension ManualAccountRecoveryScanCoordinator.View {
-	struct PathView: View {
-		let store: StoreOf<ManualAccountRecoveryScanCoordinator.Path>
-
-		var body: some View {
-			SwitchStore(store) { state in
-				switch state {
-				case .selectInactiveAccountsToAdd:
-					CaseLet(
-						/AccountRecoveryScanCoordinator.Path.State.selectInactiveAccountsToAdd,
-						action: AccountRecoveryScanCoordinator.Path.Action.selectInactiveAccountsToAdd,
-						then: { SelectInactiveAccountsToAdd.View(store: $0) }
-					)
-				}
-			}
-		}
-	}
-
-	func root() -> some View {
 		ScrollView {
 			VStack(spacing: .zero) {
 				babylonHeader()
@@ -72,8 +26,11 @@ private extension ManualAccountRecoveryScanCoordinator.View {
 				olympiaSection()
 					.padding(.bottom, .small2)
 				footer()
+					.padding(.bottom, .small2)
 			}
 		}
+		.navigationTitle("Derive Legacy Account") // FIXME: Strings
+		.destinations(with: store)
 	}
 
 	private func babylonHeader() -> some View {
@@ -101,11 +58,11 @@ private extension ManualAccountRecoveryScanCoordinator.View {
 	private func babylonSection() -> some View {
 		VStack(spacing: .medium2) {
 			Button("Use Seed Phrase") { // FIXME: Strings - repeated
-				store.send(.view(.babylonUseSeedPhraseTapped))
+				store.send(.view(.useSeedPhraseTapped(isOlympia: false)))
 			}
 
 			Button("Use Ledger Hardware Wallet") { // FIXME: Strings - repeated
-				store.send(.view(.babylonUseLedgerTapped))
+				store.send(.view(.useLedgerTapped(isOlympia: false)))
 			}
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
@@ -132,11 +89,11 @@ private extension ManualAccountRecoveryScanCoordinator.View {
 	private func olympiaSection() -> some View {
 		VStack(spacing: .medium2) {
 			Button("Use Seed Phrase") { // FIXME: Strings - repeated
-				store.send(.view(.olympiaUseSeedPhraseTapped))
+				store.send(.view(.useSeedPhraseTapped(isOlympia: true)))
 			}
 
 			Button("Use Ledger Hardware Wallet") { // FIXME: Strings - repeated
-				store.send(.view(.olympiaUseLedgerTapped))
+				store.send(.view(.useLedgerTapped(isOlympia: true)))
 			}
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
@@ -156,3 +113,39 @@ private let text: String =
 	The Radix Wallet can scan for previously used accounts using a bare seed phrase or Ledger hardware wallet device.
 	(If you have Olympia Accounts in the Radix Olympia Desktop Wallet, consider using **Import from a Legacy Wallet** instead.)
 	""" // FIXME: Strings
+
+private extension StoreOf<ManualAccountRecovery> {
+	var destination: PresentationStoreOf<ManualAccountRecovery.Destination> {
+		func scopeState(state: State) -> PresentationState<ManualAccountRecovery.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<ManualAccountRecovery>) -> some View {
+		let destinationStore = store.destination
+		return seedPhraseCoordinator(with: destinationStore)
+			.ledgerCoordinator(with: destinationStore)
+	}
+
+	private func seedPhraseCoordinator(with destinationStore: PresentationStoreOf<ManualAccountRecovery.Destination>) -> some View {
+		fullScreenCover(
+			store: destinationStore,
+			state: /ManualAccountRecovery.Destination.State.seedPhrase,
+			action: ManualAccountRecovery.Destination.Action.seedPhrase,
+			content: { ManualAccountRecoverySeedPhraseCoordinator.View(store: $0) }
+		)
+	}
+
+	private func ledgerCoordinator(with destinationStore: PresentationStoreOf<ManualAccountRecovery.Destination>) -> some View {
+		fullScreenCover(
+			store: destinationStore,
+			state: /ManualAccountRecovery.Destination.State.ledger,
+			action: ManualAccountRecovery.Destination.Action.ledger,
+			content: { ManualAccountRecoveryLedgerCoordinator.View(store: $0) }
+		)
+	}
+}
