@@ -1,5 +1,6 @@
 // MARK: - OnFirstAppearViewModifier
 struct OnFirstAppearViewModifier: ViewModifier {
+	let id = UUID()
 	let priority: TaskPriority
 	let action: () -> Void
 
@@ -8,10 +9,11 @@ struct OnFirstAppearViewModifier: ViewModifier {
 	func body(content: Content) -> some View {
 		content.onAppear {
 			guard !didFire else {
-				loggerGlobal.trace("OnFirstAppearViewModifier NOT firing, already fired")
+				loggerGlobal.debug("OnFirstAppearViewModifier ID=\(self.id) NOT firing, already fired")
 				return
 			}
 			didFire = true
+			loggerGlobal.debug("OnFirstAppearViewModifier ID=\(self.id) not fired, firing now!")
 			action()
 		}
 	}

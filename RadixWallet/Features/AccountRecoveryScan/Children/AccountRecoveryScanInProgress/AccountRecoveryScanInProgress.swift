@@ -126,6 +126,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstAppear:
+			loggerGlobal.debug("AccountRecoveryScanInProgress: onFirstAppear")
 			if let factorSource = state.factorSource.wrappedValue {
 				return derivePublicKeys(using: factorSource, state: &state)
 			} else {
@@ -152,7 +153,8 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .derivePublicKeys(.delegate(delegateAction)):
-			loggerGlobal.notice("Finish deriving public keys")
+			loggerGlobal.notice("Finish deriving public keys => `state.destination = nil`")
+			state.destination = nil
 			switch delegateAction {
 			case let .derivedPublicKeys(publicHDKeys, factorSourceID, networkID):
 				assert(factorSourceID == state.factorSourceID.embed())
@@ -187,7 +189,6 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 extension AccountRecoveryScanInProgress {
 	private func scanOnLedger(accounts: IdentifiedArrayOf<Profile.Network.Account>, state: inout State) -> Effect<Action> {
 		assert(accounts.count == accRecScanBatchSize)
-		state.destination = nil
 		state.status = .scanningNetworkForActiveAccounts
 
 		return .run { send in
@@ -273,7 +274,7 @@ extension AccountRecoveryScanInProgress {
 				).wrapAsDerivationPath()
 			}
 		}
-		state.status = .derivingPublicKeys
+//		state.status = .derivingPublicKeys
 		loggerGlobal.debug("Settings destination to derivePublicKeys")
 		state.destination = .derivePublicKeys(.init(
 			derivationPathOption: .knownPaths(

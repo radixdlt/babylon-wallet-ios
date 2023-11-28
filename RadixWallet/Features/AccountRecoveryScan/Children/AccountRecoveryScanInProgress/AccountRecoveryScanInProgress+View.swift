@@ -87,10 +87,13 @@ public extension AccountRecoveryScanInProgress {
 						store.send(.view(.continueTapped))
 					}.buttonStyle(.primaryRectangular)
 				}
-				.destination(store: store)
+//				.onFirstAppear { @MainActor in
+//					store.send(.view(.onFirstAppear))
+//				}
 				.onFirstAppear {
 					viewStore.send(.onFirstAppear)
 				}
+				.destination(store: store)
 			}
 		}
 	}

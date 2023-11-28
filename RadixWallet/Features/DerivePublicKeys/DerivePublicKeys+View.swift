@@ -16,6 +16,7 @@ extension DerivePublicKeys {
 		let entityKind: EntityKind?
 	}
 
+	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<DerivePublicKeys>
 
@@ -55,6 +56,9 @@ extension DerivePublicKeys {
 					Spacer(minLength: 0)
 				}
 				.padding(.horizontal, .medium1)
+				//				.onFirstAppear { @MainActor in
+				//					store.send(.view(.onFirstAppear))
+				//				}
 				.onFirstAppear {
 					viewStore.send(.onFirstAppear)
 				}

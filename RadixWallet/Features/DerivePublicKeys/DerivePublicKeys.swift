@@ -67,6 +67,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Hashable {
+		case delayedStart
 		case loadedDeviceFactorSource(DeviceFactorSource)
 		case deriveWithDeviceFactor(DeviceFactorSource, DerivationPath, NetworkID, SecureStorageClient.LoadMnemonicPurpose)
 		case deriveWithLedgerFactor(LedgerHardwareWalletFactorSource, DerivationPath, NetworkID)
@@ -93,6 +94,21 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		switch viewAction {
 		case .onFirstAppear:
 			loggerGlobal.debug("DerivePublicKeys onFirstAppear")
+			return .run { send in
+				/// For more information about that `sleep` please  check [this discussion in Slack](https://rdxworks.slack.com/archives/C03QFAWBRNX/p1687967412207119?thread_ts=1687964494.772899&cid=C03QFAWBRNX)
+				@Dependency(\.continuousClock) var clock
+				loggerGlobal.debug("DerivePublicKeys onFirstAppear sleeping")
+				try? await clock.sleep(for: .milliseconds(700))
+				loggerGlobal.debug("DerivePublicKeys onFirstAppear slept => internal(.delayedStart")
+				await send(.internal(.delayedStart))
+			}
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case .delayedStart:
+			loggerGlobal.debug("DerivingPublicKeys delayedStart")
 			switch state.factorSourceOption {
 			case .device:
 				loggerGlobal.debug("Using `device` factor source to derive public keys.")
@@ -119,11 +135,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 					return .send(.delegate(.failedToDerivePublicKey))
 				}
 			}
-		}
-	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
 		case let .loadedDeviceFactorSource(factorSource):
 			return deriveWith(deviceFactorSource: factorSource, state)
 
