@@ -102,6 +102,7 @@ jobs:
           then
             FLAVOUR=${{ github.event.inputs.flavour }}
           fi
+          defaults write com.apple.dt.Xcode IDESkipMacroFingerprintValidation -bool YES
           bundle exec fastlane deploy --env ios.$FLAVOUR
         env:
           GIT_TOKEN: ${{ env.WALLET_RADIX_BOT_PAT }}
