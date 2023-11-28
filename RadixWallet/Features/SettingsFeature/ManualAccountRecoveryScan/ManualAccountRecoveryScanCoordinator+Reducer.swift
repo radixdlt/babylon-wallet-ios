@@ -1,35 +1,37 @@
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - ManualAccountRecoveryScanCoordinator
 public struct ManualAccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	public typealias Store = StoreOf<Self>
 
 	public struct State: Sendable, Hashable {
-		public var path: StackState<Path.State> = .init()
+		public var path: StackState<Path.State>
 	}
 
 	public struct Path: Sendable, Hashable, Reducer {
 		public enum State: Sendable, Hashable {
-			case selectInactiveAccountsToAdd(SelectInactiveAccountsToAdd.State)
+			case chooseSeedPhrase(ChooseSeedPhrase.State)
+			case chooseLedger(ChooseLedger.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case selectInactiveAccountsToAdd(SelectInactiveAccountsToAdd.Action)
+			case chooseSeedPhrase(ChooseSeedPhrase.Action)
+			case chooseLedger(ChooseLedger.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.selectInactiveAccountsToAdd, action: /Action.selectInactiveAccountsToAdd) {
-				SelectInactiveAccountsToAdd()
+			Scope(state: /State.chooseLedger, action: /Action.chooseLedger) {
+				ChooseLedger()
+			}
+			Scope(state: /State.chooseSeedPhrase, action: /Action.chooseSeedPhrase) {
+				ChooseSeedPhrase()
 			}
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case babylonUseSeedPhraseTapped
-		case babylonUseLedgerTapped
-		case olympiaUseSeedPhraseTapped
-		case olympiaUseLedgerTapped
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -47,28 +49,23 @@ public struct ManualAccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
-		switch viewAction {
-		case .appeared:
-			.none
-
-		case .babylonUseSeedPhraseTapped:
-			.none
-
-		case .babylonUseLedgerTapped:
-			.none
-
-		case .olympiaUseSeedPhraseTapped:
-			.none
-
-		case .olympiaUseLedgerTapped:
-			.none
-		}
-	}
-
 	public func reduce(into state: inout State, id: StackElementID, pathAction: Path.Action) -> Effect<Action> {
 //		switch pathAction {
 //		}
 		.none
+	}
+}
+
+extension ManualAccountRecoveryScanCoordinator {
+	public struct ChooseLedger: Sendable, FeatureReducer {
+		public typealias Store = StoreOf<Self>
+
+		public struct State: Sendable, Hashable {}
+	}
+
+	public struct ChooseSeedPhrase: Sendable, FeatureReducer {
+		public typealias Store = StoreOf<Self>
+
+		public struct State: Sendable, Hashable {}
 	}
 }
