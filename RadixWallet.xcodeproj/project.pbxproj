@@ -1217,6 +1217,8 @@
 		83EE47A32AF0EECD00155F03 /* TransactionBalanceChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE479E2AF0EECD00155F03 /* TransactionBalanceChanges.swift */; };
 		83EE47A42AF0EECD00155F03 /* TransactionFungibleFeeBalanceChangeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE479F2AF0EECD00155F03 /* TransactionFungibleFeeBalanceChangeType.swift */; };
 		83FDF7EC2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FDF7EB2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift */; };
+		A41266EF2B15578600EA38E9 /* ManualAccountRecoveryScanCoordinator+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266EE2B15578600EA38E9 /* ManualAccountRecoveryScanCoordinator+Reducer.swift */; };
+		A41266F12B15579E00EA38E9 /* ManualAccountRecoveryScanCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F02B15579E00EA38E9 /* ManualAccountRecoveryScanCoordinator+View.swift */; };
 		E62449D52AFBA61100272C67 /* Home+AccountRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */; };
 		E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */; };
 		E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */; };
@@ -2524,6 +2526,8 @@
 		83EE479E2AF0EECD00155F03 /* TransactionBalanceChanges.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionBalanceChanges.swift; sourceTree = "<group>"; };
 		83EE479F2AF0EECD00155F03 /* TransactionFungibleFeeBalanceChangeType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionFungibleFeeBalanceChangeType.swift; sourceTree = "<group>"; };
 		83FDF7EB2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValue.swift; sourceTree = "<group>"; };
+		A41266EE2B15578600EA38E9 /* ManualAccountRecoveryScanCoordinator+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryScanCoordinator+Reducer.swift"; sourceTree = "<group>"; };
+		A41266F02B15579E00EA38E9 /* ManualAccountRecoveryScanCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryScanCoordinator+View.swift"; sourceTree = "<group>"; };
 		E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+Reducer.swift"; sourceTree = "<group>"; };
 		E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+View.swift"; sourceTree = "<group>"; };
 		E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportMnemonicTests.swift; sourceTree = "<group>"; };
@@ -3825,6 +3829,7 @@
 		48CFBD8D2ADC10D800E77A5C /* SettingsFeature */ = {
 			isa = PBXGroup;
 			children = (
+				A41266ED2B15577200EA38E9 /* ManualAccountRecoveryScan */,
 				48CFBDBB2ADC10D800E77A5C /* Settings+Reducer.swift */,
 				48CFBDA92ADC10D800E77A5C /* Settings+View.swift */,
 				48CFBD8E2ADC10D800E77A5C /* AccountSecurity */,
@@ -6913,6 +6918,15 @@
 			path = AssetTransferTests;
 			sourceTree = "<group>";
 		};
+		A41266ED2B15577200EA38E9 /* ManualAccountRecoveryScan */ = {
+			isa = PBXGroup;
+			children = (
+				A41266EE2B15578600EA38E9 /* ManualAccountRecoveryScanCoordinator+Reducer.swift */,
+				A41266F02B15579E00EA38E9 /* ManualAccountRecoveryScanCoordinator+View.swift */,
+			);
+			path = ManualAccountRecoveryScan;
+			sourceTree = "<group>";
+		};
 		E634CA2C2AFD259000C43DB7 /* DebugKeychainContents */ = {
 			isa = PBXGroup;
 			children = (
@@ -8847,6 +8861,7 @@
 				48CFC5EE2ADC10DA00E77A5C /* SlideUpPanel+View.swift in Sources */,
 				48CFC3492ADC10D900E77A5C /* PersonaDataPermissionBox.swift in Sources */,
 				48CFC68E2ADC10DB00E77A5C /* AddressKind.swift in Sources */,
+				A41266F12B15579E00EA38E9 /* ManualAccountRecoveryScanCoordinator+View.swift in Sources */,
 				48CFC4F32ADC10DA00E77A5C /* StateEntityDetailsResponsePackageDetails.swift in Sources */,
 				48CFC2652ADC10D900E77A5C /* EditPersonaAddEntryKinds.swift in Sources */,
 				48CFC3B62ADC10D900E77A5C /* SLIP10CurveProtocol.swift in Sources */,
@@ -8939,6 +8954,7 @@
 				48CFC5042ADC10DA00E77A5C /* StateEntityFungibleResourceVaultsPageRequest.swift in Sources */,
 				48CFC4DF2ADC10DA00E77A5C /* OptionalNonFungibleIdsCollectionAllOf.swift in Sources */,
 				48CFC4E42ADC10DA00E77A5C /* MetadataPublicKeyValue.swift in Sources */,
+				A41266EF2B15578600EA38E9 /* ManualAccountRecoveryScanCoordinator+Reducer.swift in Sources */,
 				83EE479A2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI32.swift in Sources */,
 				48CFC5BE2ADC10DA00E77A5C /* RoundedCornerBackground.swift in Sources */,
 				48AE39DD2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator+View.swift in Sources */,
