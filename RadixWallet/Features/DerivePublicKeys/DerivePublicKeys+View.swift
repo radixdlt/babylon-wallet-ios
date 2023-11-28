@@ -18,6 +18,7 @@ extension DerivePublicKeys {
 
 	@MainActor
 	public struct View: SwiftUI.View {
+		@SwiftUI.State private var id = UUID()
 		private let store: StoreOf<DerivePublicKeys>
 
 		public init(store: StoreOf<DerivePublicKeys>) {
@@ -59,11 +60,15 @@ extension DerivePublicKeys {
 				//				.onFirstAppear { @MainActor in
 				//					store.send(.view(.onFirstAppear))
 				//				}
+				.onAppear {
+					loggerGlobal.critical("DerivePublicKeys.View onAppear id \(id)")
+				}
 				.onFirstAppear {
+					loggerGlobal.critical("DerivePublicKeys.View onFirstAppear id \(id)")
 					viewStore.send(.onFirstAppear)
 				}
 				.onDisappear {
-					loggerGlobal.critical("DerivePublicKeys onDisappear")
+					loggerGlobal.critical("DerivePublicKeys.View onDisappear id \(id)")
 				}
 			}
 		}

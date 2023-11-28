@@ -2,12 +2,16 @@
 
 public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		public enum Root: Sendable, Hashable {
+			case accountRecoveryScanInProgress(AccountRecoveryScanInProgress.State)
+			case selectInactiveAccountsToAdd(SelectInactiveAccountsToAdd.State)
+		}
+
 		/// Create new Profile or add accounts
 		public let purpose: Purpose
 		public let promptForSelectionOfInactiveAccountsIfAny: Bool
 
-		public var root: AccountRecoveryScanInProgress.State
-		public var path: StackState<Path.State> = .init()
+		public var root: Root
 
 		/// Create new Profile or add accounts
 		public enum Purpose: Sendable, Hashable {
@@ -27,17 +31,17 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 			self.promptForSelectionOfInactiveAccountsIfAny = promptForSelectionOfInactiveAccountsIfAny
 			switch purpose {
 			case let .addAccounts(id, offset, networkID, scheme):
-				self.root = .init(
+				self.root = .accountRecoveryScanInProgress(.init(
 					factorSourceID: id,
 					factorSource: .loading,
 					offset: offset,
 					scheme: scheme,
 					networkID: networkID
-				)
+				))
 			case let .createProfile(
 				deviceFactorSource
 			):
-				self.root = .init(
+				self.root = .accountRecoveryScanInProgress(.init(
 					factorSourceID: deviceFactorSource.id,
 					factorSource: .success(
 						deviceFactorSource.embed()
@@ -45,23 +49,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 					offset: 0,
 					scheme: .slip10,
 					networkID: .mainnet
-				)
-			}
-		}
-	}
-
-	public struct Path: Sendable, Hashable, Reducer {
-		public enum State: Sendable, Hashable {
-			case selectInactiveAccountsToAdd(SelectInactiveAccountsToAdd.State)
-		}
-
-		public enum Action: Sendable, Equatable {
-			case selectInactiveAccountsToAdd(SelectInactiveAccountsToAdd.Action)
-		}
-
-		public var body: some ReducerOf<Self> {
-			Scope(state: /State.selectInactiveAccountsToAdd, action: /Action.selectInactiveAccountsToAdd) {
-				SelectInactiveAccountsToAdd()
+				))
 			}
 		}
 	}
@@ -71,8 +59,8 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case root(AccountRecoveryScanInProgress.Action)
-		case path(StackActionOf<Path>)
+		case accountRecoveryScanInProgress(AccountRecoveryScanInProgress.Action)
+		case selectInactiveAccountsToAdd(SelectInactiveAccountsToAdd.Action)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -91,14 +79,16 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.root, action: /Action.child .. ChildAction.root) {
-			AccountRecoveryScanInProgress()
+		Scope(state: \.root, action: /Action.child) {
+			EmptyReducer()
+				.ifCaseLet(/State.Root.accountRecoveryScanInProgress, action: /ChildAction.accountRecoveryScanInProgress) {
+					AccountRecoveryScanInProgress()
+				}
+				.ifCaseLet(/State.Root.selectInactiveAccountsToAdd, action: /ChildAction.selectInactiveAccountsToAdd) {
+					SelectInactiveAccountsToAdd()
+				}
 		}
-
 		Reduce(core)
-			.forEach(\.path, action: /Action.child .. ChildAction.path) {
-				Path()
-			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
@@ -127,18 +117,18 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .root(.delegate(.foundAccounts(active, inactive))):
+		case let .accountRecoveryScanInProgress(.delegate(.foundAccounts(active, inactive))):
 			if state.promptForSelectionOfInactiveAccountsIfAny, !inactive.isEmpty {
-				state.path.append(.selectInactiveAccountsToAdd(.init(active: active, inactive: inactive)))
+				state.root = .selectInactiveAccountsToAdd(.init(active: active, inactive: inactive))
 				return .none
 			} else {
 				return completed(purpose: state.purpose, inactiveToAdd: inactive, active: active)
 			}
 
-		case .root(.delegate(.failedToDerivePublicKey)):
+		case .accountRecoveryScanInProgress(.delegate(.failedToDerivePublicKey)):
 			return .send(.delegate(.dismissed))
 
-		case let .path(.element(_, action: .selectInactiveAccountsToAdd(.delegate(.finished(selectedInactive, active))))):
+		case let .selectInactiveAccountsToAdd(.delegate(.finished(selectedInactive, active))):
 			return completed(purpose: state.purpose, inactiveToAdd: selectedInactive, active: active)
 
 		default: return .none

@@ -149,7 +149,6 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		switch presentedAction {
 		case let .derivePublicKeys(.delegate(delegateAction)):
 			loggerGlobal.notice("Finish deriving public keys => `state.destination = nil`")
-			state.destination = nil
 			switch delegateAction {
 			case let .derivedPublicKeys(publicHDKeys, factorSourceID, networkID):
 				assert(factorSourceID == state.factorSourceID.embed())
@@ -185,8 +184,10 @@ extension AccountRecoveryScanInProgress {
 	private func scanOnLedger(accounts: IdentifiedArrayOf<Profile.Network.Account>, state: inout State) -> Effect<Action> {
 		assert(accounts.count == accRecScanBatchSize)
 		state.status = .scanningNetworkForActiveAccounts
-
+		state.destination = nil
 		return .run { send in
+			loggerGlobal.notice("Sleeping 2 sec")
+			try! await Task.sleep(for: .seconds(2))
 			let (active, inactive) = try await performScan(accounts: accounts)
 			loggerGlobal.notice("✅Finished scanning for accounts => send(.internal(.foundAccounts))")
 			await send(.internal(.foundAccounts(active: active, inactive: inactive)))

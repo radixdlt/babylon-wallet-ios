@@ -9,34 +9,18 @@ public extension AccountRecoveryScanCoordinator {
 		}
 
 		public var body: some SwiftUI.View {
-			NavigationStackStore(
-				store.scope(state: \.path, action: { .child(.path($0)) })
-			) {
-				AccountRecoveryScanInProgress.View(store: store.scope(
-					state: \.root,
-					action: { .child(.root($0)) }
-				))
-				.toolbar {
-					ToolbarItem(placement: .cancellationAction) {
-						CloseButton {
-							self.store.send(.view(.closeTapped))
-						}
-					}
-				}
-			} destination: {
-				path(for: $0)
-			}
-		}
-
-		private func path(
-			for store: StoreOf<AccountRecoveryScanCoordinator.Path>
-		) -> some SwiftUI.View {
-			SwitchStore(store) { state in
+			SwitchStore(store.scope(state: \.root, action: Action.child)) { state in
 				switch state {
+				case .accountRecoveryScanInProgress:
+					CaseLet(
+						/AccountRecoveryScanCoordinator.State.Root.accountRecoveryScanInProgress,
+						action: AccountRecoveryScanCoordinator.ChildAction.accountRecoveryScanInProgress,
+						then: { AccountRecoveryScanInProgress.View(store: $0) }
+					)
 				case .selectInactiveAccountsToAdd:
 					CaseLet(
-						/AccountRecoveryScanCoordinator.Path.State.selectInactiveAccountsToAdd,
-						action: AccountRecoveryScanCoordinator.Path.Action.selectInactiveAccountsToAdd,
+						/AccountRecoveryScanCoordinator.State.Root.selectInactiveAccountsToAdd,
+						action: AccountRecoveryScanCoordinator.ChildAction.selectInactiveAccountsToAdd,
 						then: { SelectInactiveAccountsToAdd.View(store: $0) }
 					)
 				}
