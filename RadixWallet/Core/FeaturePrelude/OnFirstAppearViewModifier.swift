@@ -4,16 +4,13 @@ struct OnFirstAppearViewModifier: ViewModifier {
 	let action: () -> Void
 
 	@State private var didFire = false
-	@State private var id = UUID()
 
 	func body(content: Content) -> some View {
 		content.onAppear {
 			guard !didFire else {
-				loggerGlobal.debug("OnFirstAppearViewModifier id=\(id) NOT firing, already fired")
 				return
 			}
 			didFire = true
-			loggerGlobal.debug("OnFirstAppearViewModifier id=\(id) not fired, firing now!")
 			action()
 		}
 	}

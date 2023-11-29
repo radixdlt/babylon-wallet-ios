@@ -58,18 +58,8 @@ extension DerivePublicKeys {
 					Spacer(minLength: 0)
 				}
 				.padding(.horizontal, .medium1)
-				//				.onFirstAppear { @MainActor in
-				//					store.send(.view(.onFirstAppear))
-				//				}
-				.onAppear {
-					loggerGlobal.critical("DerivePublicKeys.View onAppear id \(id)")
-				}
 				.onFirstAppear {
-					loggerGlobal.critical("DerivePublicKeys.View onFirstAppear id \(id)")
 					viewStore.send(.onFirstAppear)
-				}
-				.onDisappear {
-					loggerGlobal.critical("DerivePublicKeys.View onDisappear id \(id)")
 				}
 			}
 		}
