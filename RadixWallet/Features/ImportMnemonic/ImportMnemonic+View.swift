@@ -145,6 +145,14 @@ extension ImportMnemonic {
 							.padding(.bottom, .medium2)
 						}
 
+						#if DEBUG
+						Button("DEBUG use Acc.Rec.Scan.mne") {
+							viewStore.send(.debugUseTestingMnemonic)
+						}
+						.buttonStyle(.secondaryRectangular(isDestructive: true))
+						.padding(.bottom, .medium1)
+						#endif
+
 						wordsGrid(with: viewStore)
 							.padding(.horizontal, .medium2)
 							.padding(.bottom, .large3)
@@ -178,12 +186,6 @@ extension ImportMnemonic {
 							)
 							.padding(.horizontal, .medium2)
 							.padding(.bottom, .medium2)
-
-							Button("DEBUG ONLY use 'zoo...vote'") {
-								viewStore.send(.debugZooVote)
-							}
-							.buttonStyle(.secondaryRectangular(isDestructive: true))
-							.padding(.bottom, .medium1)
 						}
 						#endif
 

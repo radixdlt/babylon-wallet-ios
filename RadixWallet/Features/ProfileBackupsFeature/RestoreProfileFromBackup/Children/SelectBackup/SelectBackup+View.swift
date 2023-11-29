@@ -56,9 +56,11 @@ extension SelectBackup.View {
 
 				backupsList(with: viewStore)
 
-				selectFileInsteadButton(with: store)
-				Divider()
-				restoreWithoutProfile(with: store)
+				VStack(alignment: .center, spacing: .small1) {
+					selectFileInsteadButton(with: store)
+					Divider()
+					restoreWithoutProfile(with: store)
+				}
 			}
 			.foregroundColor(.app.gray1)
 			.padding(.medium2)
