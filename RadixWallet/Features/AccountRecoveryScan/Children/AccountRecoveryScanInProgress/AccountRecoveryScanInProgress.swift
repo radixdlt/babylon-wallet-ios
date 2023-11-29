@@ -10,8 +10,11 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		}
 
 		public var status: Status = .new
-		public let networkID: NetworkID
-		public var offset: Int
+		public var networkID: NetworkID = .mainnet
+		public var batchNumber: Int = 0
+		public var maxIndex: HD.Path.Component.Child.Value? = nil
+
+		public var indicesOfAlreadyUsedEntities: OrderedSet<HD.Path.Component.Child.Value> = []
 		public let scheme: DerivationScheme
 		public var active: IdentifiedArrayOf<Profile.Network.Account> = []
 		public var inactive: IdentifiedArrayOf<Profile.Network.Account> = []
@@ -19,51 +22,33 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destination.State? = nil
 
-		public enum FactorSourceOrigin: Sendable, Hashable {
+		public enum Mode: Sendable, Hashable {
 			case privateHD(PrivateHDFactorSource)
-			case loadFactorSourceWithID(FactorSourceID.FromHash)
-		}
-
-		public enum FactorSourceStatus: Sendable, Hashable {
-			case privateHD(PrivateHDFactorSource)
-			case factorSourceWithID(Loadable<FactorSource>, id: FactorSourceID.FromHash)
-
-			init(origin: FactorSourceOrigin) {
-				switch origin {
-				case let .loadFactorSourceWithID(id):
-					self = .factorSourceWithID(.idle, id: id)
-				case let .privateHD(privateHD):
-					self = .privateHD(privateHD)
-				}
-			}
+			case factorSourceWithID(id: FactorSourceID.FromHash, Loadable<FactorSource> = .idle)
 		}
 
 		public var factorSourceIDFromHash: FactorSourceID.FromHash {
-			switch factorSourceStatus {
+			switch mode {
 			case let .privateHD(privateHD):
 				privateHD.factorSource.id
-			case let .factorSourceWithID(_, id):
+			case let .factorSourceWithID(id, _):
 				id
 			}
 		}
 
-		public var factorSourceStatus: FactorSourceStatus
+		public var mode: Mode
 
 		public init(
-			factorSourceOrigin: FactorSourceOrigin,
-			offset: Int,
-			scheme: DerivationScheme,
-			networkID: NetworkID
+			mode: Mode,
+			scheme: DerivationScheme
 		) {
-			self.offset = offset
-			self.factorSourceStatus = FactorSourceStatus(origin: factorSourceOrigin)
+			self.mode = mode
 			self.scheme = scheme
-			self.networkID = networkID
 		}
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadFactorSourceResult(TaskResult<FactorSource?>)
+		case loadIndicesUsedByFactorSourceResult(TaskResult<IndicesUsedByFactorSource>)
 		case startScan(accounts: IdentifiedArrayOf<Profile.Network.Account>)
 		case foundAccounts(
 			active: IdentifiedArrayOf<Profile.Network.Account>,
@@ -120,20 +105,26 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadFactorSourceResult(.failure(error)):
-			fatalError("error handling")
+		case let .loadIndicesUsedByFactorSourceResult(.failure(error)):
+			let errorMsg = "Failed to load indices used by factor source, error: \(error)"
+			loggerGlobal.error(.init(stringLiteral: errorMsg))
+			return .send(.delegate(.failedToDerivePublicKey))
 
-		case let .loadFactorSourceResult(.success(factorSource)):
-			guard let factorSource else {
-				fatalError("error handling")
-			}
-			state.factorSourceStatus = .factorSourceWithID(.success(factorSource), id: state.factorSourceIDFromHash)
+		case let .loadIndicesUsedByFactorSourceResult(.success(indicesUsedByFactorSource)):
+			state.mode = .factorSourceWithID(
+				id: state.factorSourceIDFromHash,
+				.success(
+					indicesUsedByFactorSource.factorSource
+				)
+			)
+			state.indicesOfAlreadyUsedEntities = indicesUsedByFactorSource.indices
 			return derivePublicKeys(state: &state)
 
 		case let .startScan(accounts):
 			return scanOnLedger(accounts: accounts, state: &state)
 
 		case let .foundAccounts(active, inactive):
+			state.batchNumber += 1
 			state.status = .scanComplete
 			state.active.append(contentsOf: active)
 			state.inactive.append(contentsOf: inactive)
@@ -146,28 +137,40 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		case .onFirstAppear:
 			loggerGlobal.debug("AccountRecoveryScanInProgress: onFirstAppear")
 
-			switch state.factorSourceStatus {
+			switch state.mode {
 			case .privateHD:
 				return derivePublicKeys(state: &state)
 			case .factorSourceWithID:
 				state.status = .loadingFactorSource
 				let id = state.factorSourceIDFromHash
-				state.factorSourceStatus = .factorSourceWithID(.loading, id: id)
-				return .run { send in
-					let result = await TaskResult<FactorSource?> {
-						try await factorSourcesClient.getFactorSource(id: id.embed())
+				state.mode = .factorSourceWithID(id: id, .loading)
+				return .run { [networkID = state.networkID] send in
+					let result = await TaskResult<IndicesUsedByFactorSource> {
+						try await factorSourcesClient.indicesOfEntitiesControlledByFactorSource(
+							.init(
+								entityKind: .account,
+								factorSourceID: id.embed(),
+								networkID: networkID
+							)
+						)
 					}
-					await send(.internal(.loadFactorSourceResult(result)))
+					await send(.internal(.loadIndicesUsedByFactorSourceResult(result)))
 				}
 			}
 
 		case .scanMore:
 			loggerGlobal.debug("Scan more requested.")
-			state.offset += accRecScanBatchSize
 			return derivePublicKeys(state: &state)
 
 		case .continueTapped:
-			return .send(.delegate(.foundAccounts(active: state.active, inactive: state.inactive)))
+			if let maxActive = state.active.max() {
+				let inactiveInBetweenActive = state.inactive.filter {
+					$0.derivationIndex < maxActive.derivationIndex
+				}
+				return .send(.delegate(.foundAccounts(active: state.active, inactive: inactiveInBetweenActive)))
+			} else {
+				return .send(.delegate(.foundAccounts(active: [], inactive: [])))
+			}
 		}
 	}
 
@@ -207,7 +210,108 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	}
 }
 
+public func generateElements<Element>(
+	start: Element,
+	step: (Element) -> Element,
+	count: Int,
+	shouldInclude: (Element) -> Bool
+) -> OrderedSet<Element> where Element: Hashable {
+	var next = start
+	var elements: OrderedSet<Element> = []
+	while elements.count != count {
+		defer { next = step(next) }
+		guard shouldInclude(next) else { continue }
+		elements.append(next)
+	}
+	assert(elements.count == count)
+	return elements
+}
+
+public func generateIntegers<Integer>(
+	start: Integer,
+	count: Int,
+	shouldInclude: @escaping (Integer) -> Bool
+) -> OrderedSet<Integer> where Integer: FixedWidthInteger {
+	generateElements(start: start, step: { $0 + 1 }, count: count, shouldInclude: shouldInclude)
+}
+
+// MARK: - Profile.Network.Account + Comparable
+extension Profile.Network.Account: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		lhs.derivationIndex < rhs.derivationIndex
+	}
+}
+
+extension Profile.Network.Account {
+	var derivationIndex: HD.Path.Component.Child.Value {
+		switch securityState {
+		case let .unsecured(uec): uec.transactionSigning.derivationPath.index
+		}
+	}
+}
+
 extension AccountRecoveryScanInProgress {
+	private func derivePublicKeys(
+		state: inout State
+	) -> Effect<Action> {
+		let networkID = state.networkID
+		let used = state.indicesOfAlreadyUsedEntities
+
+		let derivationIndices = generateIntegers(
+			start: state.maxIndex ?? 0,
+			count: accRecScanBatchSize,
+			shouldInclude: { !used.contains($0) }
+		)
+
+		assert(derivationIndices.count == accRecScanBatchSize)
+		state.maxIndex = derivationIndices.max()!
+
+		let derivationPaths = try! OrderedSet(validating: derivationIndices.map {
+			switch state.scheme {
+			case .bip44:
+				try! LegacyOlympiaBIP44LikeDerivationPath(
+					index: $0
+				).wrapAsDerivationPath()
+			case .slip10:
+				try! AccountBabylonDerivationPath(
+					networkID: networkID,
+					index: $0,
+					keyKind: .virtualEntity
+				).wrapAsDerivationPath()
+			}
+		})
+
+		state.status = .derivingPublicKeys
+		loggerGlobal.debug("Settings destination to derivePublicKeys")
+		let factorSourceOption: DerivePublicKeys.State.FactorSourceOption
+
+		switch state.mode {
+		case let .factorSourceWithID(_, loadableState):
+			switch loadableState {
+			case let .success(factorSource):
+				factorSourceOption = .specific(factorSource)
+			default:
+				let errorMsg = "Discrepancy! Expected to loaded the factor source"
+				loggerGlobal.error(.init(stringLiteral: errorMsg))
+				assertionFailure(errorMsg)
+				return .none
+			}
+		case let .privateHD(privateHDFactorSource):
+			factorSourceOption = .specificPrivateHDFactorSource(privateHDFactorSource)
+		}
+
+		state.destination = .derivePublicKeys(.init(
+			derivationPathOption: .knownPaths(
+				Array(derivationPaths),
+				networkID: networkID
+			),
+			factorSourceOption: factorSourceOption,
+			purpose: .createEntity(kind: .account)
+		))
+
+		return .none
+	}
+
 	private func scanOnLedger(accounts: IdentifiedArrayOf<Profile.Network.Account>, state: inout State) -> Effect<Action> {
 		assert(accounts.count == accRecScanBatchSize)
 		state.status = .scanningNetworkForActiveAccounts
@@ -219,9 +323,6 @@ extension AccountRecoveryScanInProgress {
 		}
 	}
 
-	/// FIXME: This results in CancellationError, not only this but doing ANY thing that takes a bit of time inside of `scanOnLedger` results in
-	/// CancellationError, e.g. `try await Task.sleep(for: .seconds(0.5))` results in CancellationError, which results in this
-	/// Reducer never ever receiving `internal(.foundAccounts` event - aka "TCA Send" bug. I will have to write it in another manner...
 	private func performScan(accounts: IdentifiedArrayOf<Profile.Network.Account>) async throws -> (active: IdentifiedArrayOf<Profile.Network.Account>, inactive: IdentifiedArrayOf<Profile.Network.Account>) {
 		let accountAddresses: [AccountAddress] = accounts.map(\.address)
 		let engineAddresses: [Address] = accountAddresses.map(\.asGeneral)
@@ -272,67 +373,6 @@ extension AccountRecoveryScanInProgress {
 		} catch {
 			throw error
 		}
-	}
-
-	private func derivePublicKeys(
-		state: inout State
-	) -> Effect<Action> {
-		let offset = state.offset
-		let networkID = state.networkID
-		let indexRange = (offset ..< (offset + accRecScanBatchSize))
-		let derivationPaths: [DerivationPath] = indexRange.map(HD.Path.Component.Child.Value.init).map {
-			switch state.scheme {
-			case .bip44:
-				try! LegacyOlympiaBIP44LikeDerivationPath(
-					index: $0
-				).wrapAsDerivationPath()
-			case .slip10:
-				try! AccountBabylonDerivationPath(
-					networkID: networkID,
-					index: $0,
-					keyKind: .virtualEntity
-				).wrapAsDerivationPath()
-			}
-		}
-		state.status = .derivingPublicKeys
-		loggerGlobal.debug("Settings destination to derivePublicKeys")
-		let factorSourceOption: DerivePublicKeys.State.FactorSourceOption
-
-		switch state.factorSourceStatus {
-		case let .factorSourceWithID(loadableState, _):
-			switch loadableState {
-			case let .success(factorSource):
-				factorSourceOption = .specific(factorSource)
-			default:
-				let errorMsg = "Discrepancy! Expected to loaded the factor source"
-				loggerGlobal.error(.init(stringLiteral: errorMsg))
-				assertionFailure(errorMsg)
-				return .none
-			}
-		case let .privateHD(privateHDFactorSource):
-			factorSourceOption = .specificPrivateHDFactorSource(privateHDFactorSource)
-		}
-
-		state.destination = .derivePublicKeys(.init(
-			derivationPathOption: .knownPaths(
-				derivationPaths,
-				networkID: networkID
-			),
-			factorSourceOption: factorSourceOption,
-			purpose: .createEntity(kind: .account)
-		))
-
-		return .none
-	}
-
-	private func slow() async {
-		loggerGlobal.error("SLOW START")
-		_ = await Task(priority: .background) {
-			(0 ..< 100_000).map { _ in
-				CryptoKit.Curve25519.PrivateKey().publicKey
-			}
-		}.value
-		loggerGlobal.error("SLOW END")
 	}
 }
 

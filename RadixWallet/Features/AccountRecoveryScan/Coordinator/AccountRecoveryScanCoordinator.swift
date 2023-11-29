@@ -16,38 +16,39 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		public enum Purpose: Sendable, Hashable {
 			case createProfile(PrivateHDFactorSource)
 
-			/// Typically we can use `offset: <CURRENT_NETWORK>.numberOfAccountsIncludingHidden(controlledBy: factorSourceID)`
 			case addAccounts(
 				factorSourceID: FactorSourceID.FromHash,
-				offset: Int,
-				networkID: NetworkID,
 				scheme: DerivationScheme
 			)
+
+			public static func addAccountsWithBabylonFactorSource(
+				id: FactorSourceID.FromHash
+			) -> Self {
+				.addAccounts(factorSourceID: id, scheme: .slip10)
+			}
+
+			public static func addAccountsWithOlympiaFactorSource(
+				id: FactorSourceID.FromHash
+			) -> Self {
+				.addAccounts(factorSourceID: id, scheme: .bip44)
+			}
 		}
 
 		public init(purpose: Purpose) {
 			self.purpose = purpose
 			switch purpose {
-			case let .addAccounts(id, offset, networkID, scheme):
+			case let .addAccounts(id, scheme):
 				self.root = .accountRecoveryScanInProgress(
 					.init(
-						factorSourceOrigin: .loadFactorSourceWithID(
-							id
-						),
-						offset: offset,
-						scheme: scheme,
-						networkID: networkID
+						mode: .factorSourceWithID(id: id),
+						scheme: scheme
 					)
 				)
 			case let .createProfile(privateHDFactorSource):
 				self.root = .accountRecoveryScanInProgress(
 					.init(
-						factorSourceOrigin: .privateHD(
-							privateHDFactorSource
-						),
-						offset: 0,
-						scheme: .slip10,
-						networkID: .mainnet
+						mode: .privateHD(privateHDFactorSource),
+						scheme: .slip10
 					)
 				)
 			}

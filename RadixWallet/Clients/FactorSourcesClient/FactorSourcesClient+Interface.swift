@@ -1,5 +1,6 @@
 // MARK: - FactorSourcesClient
 public struct FactorSourcesClient: Sendable {
+	public var indicesOfEntitiesControlledByFactorSource: IndicesOfEntitiesControlledByFactorSource
 	public var nextEntityIndexForFactorSource: NextEntityIndexForFactorSource
 	public var getCurrentNetworkID: GetCurrentNetworkID
 	public var getMainDeviceFactorSource: GetMainDeviceFactorSource
@@ -15,6 +16,7 @@ public struct FactorSourcesClient: Sendable {
 	public var flagFactorSourceForDeletion: FlagFactorSourceForDeletion
 
 	public init(
+		indicesOfEntitiesControlledByFactorSource: @escaping IndicesOfEntitiesControlledByFactorSource,
 		getCurrentNetworkID: @escaping GetCurrentNetworkID,
 		getMainDeviceFactorSource: @escaping GetMainDeviceFactorSource,
 		createNewMainDeviceFactorSource: @escaping CreateNewMainDeviceFactorSource,
@@ -29,6 +31,7 @@ public struct FactorSourcesClient: Sendable {
 		updateLastUsed: @escaping UpdateLastUsed,
 		flagFactorSourceForDeletion: @escaping FlagFactorSourceForDeletion
 	) {
+		self.indicesOfEntitiesControlledByFactorSource = indicesOfEntitiesControlledByFactorSource
 		self.getCurrentNetworkID = getCurrentNetworkID
 		self.getMainDeviceFactorSource = getMainDeviceFactorSource
 		self.createNewMainDeviceFactorSource = createNewMainDeviceFactorSource
@@ -54,8 +57,23 @@ public struct NextEntityIndexForFactorSourceRequest {
 	public let networkID: NetworkID?
 }
 
+// MARK: - IndicesOfEntitiesControlledByFactorSourceRequest
+public struct IndicesOfEntitiesControlledByFactorSourceRequest: Sendable, Hashable {
+	let entityKind: EntityKind
+	let factorSourceID: FactorSourceID
+	let networkID: NetworkID?
+}
+
+// MARK: - IndicesUsedByFactorSource
+public struct IndicesUsedByFactorSource: Sendable, Hashable {
+	let indices: OrderedSet<HD.Path.Component.Child.Value>
+	let factorSource: FactorSource
+	let currentNetworkID: NetworkID
+}
+
 // MARK: FactorSourcesClient.GetFactorSources
 extension FactorSourcesClient {
+	public typealias IndicesOfEntitiesControlledByFactorSource = @Sendable (IndicesOfEntitiesControlledByFactorSourceRequest) async throws -> IndicesUsedByFactorSource
 	public typealias NextEntityIndexForFactorSource = @Sendable (NextEntityIndexForFactorSourceRequest) async throws -> HD.Path.Component.Child.Value
 	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 	public typealias GetMainDeviceFactorSource = @Sendable () async throws -> DeviceFactorSource
