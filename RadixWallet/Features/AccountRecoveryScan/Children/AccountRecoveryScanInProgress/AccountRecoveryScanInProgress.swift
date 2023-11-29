@@ -360,13 +360,6 @@ extension AccountRecoveryScanInProgress {
 					inactive.append(account)
 				}
 			}
-			if active.isEmpty {
-				let n = 3
-				loggerGlobal.critical("MOCKING THAT \(n) accounts were active")
-				let mockedActive = inactive.prefix(n)
-				active.append(contentsOf: mockedActive)
-				inactive.removeFirst(n)
-			}
 			return (active, inactive)
 		} catch is GatewayAPIClient.EmptyEntityDetailsResponse {
 			return (active: [], inactive: accounts)

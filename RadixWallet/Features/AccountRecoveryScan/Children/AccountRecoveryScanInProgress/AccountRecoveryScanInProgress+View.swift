@@ -6,7 +6,7 @@ extension AccountRecoveryScanInProgress.State {
 			olympia: scheme == .bip44,
 			active: active,
 			hasFoundAnyAccounts: !active.isEmpty || !inactive.isEmpty,
-			maxIndex: (batchNumber + 1) * accRecScanBatchSize
+			maxIndex: batchNumber * accRecScanBatchSize
 		)
 	}
 }
