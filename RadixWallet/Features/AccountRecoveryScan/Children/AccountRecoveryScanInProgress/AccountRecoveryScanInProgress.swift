@@ -213,8 +213,6 @@ extension AccountRecoveryScanInProgress {
 		state.status = .scanningNetworkForActiveAccounts
 		state.destination = nil
 		return .run { send in
-			loggerGlobal.notice("Sleeping 2 sec")
-			try! await Task.sleep(for: .seconds(2))
 			let (active, inactive) = try await performScan(accounts: accounts)
 			loggerGlobal.notice("✅Finished scanning for accounts => send(.internal(.foundAccounts))")
 			await send(.internal(.foundAccounts(active: active, inactive: inactive)))
