@@ -9,7 +9,6 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 
 		/// Create new Profile or add accounts
 		public let purpose: Purpose
-		public let promptForSelectionOfInactiveAccountsIfAny: Bool
 
 		public var root: Root
 
@@ -26,9 +25,8 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 			)
 		}
 
-		public init(purpose: Purpose, promptForSelectionOfInactiveAccountsIfAny: Bool) {
+		public init(purpose: Purpose) {
 			self.purpose = purpose
-			self.promptForSelectionOfInactiveAccountsIfAny = promptForSelectionOfInactiveAccountsIfAny
 			switch purpose {
 			case let .addAccounts(id, offset, networkID, scheme):
 				self.root = .accountRecoveryScanInProgress(
@@ -121,13 +119,8 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .accountRecoveryScanInProgress(.delegate(.foundAccounts(active, inactive))):
-			if state.promptForSelectionOfInactiveAccountsIfAny, !inactive.isEmpty {
-				state.root = .selectInactiveAccountsToAdd(.init(active: active, inactive: inactive))
-				return .none
-			} else {
-				return completed(purpose: state.purpose, inactiveToAdd: inactive, active: active)
-			}
-
+			state.root = .selectInactiveAccountsToAdd(.init(active: active, inactive: inactive))
+			return .none
 		case .accountRecoveryScanInProgress(.delegate(.failedToDerivePublicKey)):
 			return .send(.delegate(.dismissed))
 
@@ -150,6 +143,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 
 		switch purpose {
 		case let .createProfile(privateHD):
+			loggerGlobal.notice("Successfully discovered and created #\(active.count) accounts and #\(inactiveToAdd.count) inactive accounts that was chosen by user.")
 			let recoveredAccountAndBDFS = AccountsRecoveredFromScanningUsingMnemonic(
 				accounts: accounts,
 				deviceFactorSource: privateHD.factorSource

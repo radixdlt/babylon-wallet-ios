@@ -71,12 +71,6 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		case path(StackActionOf<Path>)
 	}
 
-	public struct EqError: Sendable, Equatable, Error {}
-
-	public enum InternalAction: Sendable, Equatable {
-		case persistBDFSIntoKeychainResult(Result<EqVoid, EqError>)
-	}
-
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
 		case backToStartOfOnboarding
@@ -131,11 +125,29 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 			switch delegateAction {
 			case let .notPersisted(mnemonicWithPassphrase):
 				do {
-					let fromHash = try FactorSource.id(fromMnemonicWithPassphrase: mnemonicWithPassphrase, factorSourceKind: .device)
-					let deviceFactorSource = DeviceFactorSource(id: fromHash, common: .init(), hint: .init(name: "iPhone", model: "iPhone", mnemonicWordCount: .twentyFour))
-					let privateHD = try PrivateHDFactorSource(mnemonicWithPassphrase: mnemonicWithPassphrase, factorSource: deviceFactorSource)
+					let fromHash = try FactorSource.id(
+						fromMnemonicWithPassphrase: mnemonicWithPassphrase,
+						factorSourceKind: .device
+					)
+
+					let deviceFactorSource = DeviceFactorSource(
+						id: fromHash,
+						common: .init(),
+						hint: .init(
+							name: "iPhone",
+							model: "iPhone",
+							mnemonicWordCount: .twentyFour
+						)
+					)
+
+					let privateHD = try PrivateHDFactorSource(
+						mnemonicWithPassphrase: mnemonicWithPassphrase,
+						factorSource: deviceFactorSource
+					)
+
 					state.factorSourceOfImportedMnemonic = privateHD
-					state.destination = .accountRecoveryScanCoordinator(.init(purpose: .createProfile(privateHD), promptForSelectionOfInactiveAccountsIfAny: true))
+					state.destination = .accountRecoveryScanCoordinator(.init(purpose: .createProfile(privateHD)))
+
 					return .none
 				} catch {
 					let errorMsg = "Failed to create Private HD FactorSource from MnemonicWithPassphrase, error: \(error)"
