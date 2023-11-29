@@ -259,11 +259,11 @@ extension AccountRecoveryScanInProgress {
 
 		let derivationIndices = generateIntegers(
 			start: state.maxIndex ?? 0,
-			count: accRecScanBatchSize,
+			count: batchSize,
 			shouldInclude: { !used.contains($0) }
 		)
 
-		assert(derivationIndices.count == accRecScanBatchSize)
+		assert(derivationIndices.count == batchSize)
 		state.maxIndex = derivationIndices.max()!
 
 		let derivationPaths = try! OrderedSet(validating: derivationIndices.map {
@@ -313,7 +313,7 @@ extension AccountRecoveryScanInProgress {
 	}
 
 	private func scanOnLedger(accounts: IdentifiedArrayOf<Profile.Network.Account>, state: inout State) -> Effect<Action> {
-		assert(accounts.count == accRecScanBatchSize)
+		assert(accounts.count == batchSize)
 		state.status = .scanningNetworkForActiveAccounts
 		state.destination = nil
 		return .run { send in

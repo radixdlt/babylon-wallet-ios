@@ -6,14 +6,13 @@ extension AccountRecoveryScanInProgress.State {
 			olympia: scheme == .bip44,
 			active: active,
 			hasFoundAnyAccounts: !active.isEmpty || !inactive.isEmpty,
-			maxIndex: batchNumber * accRecScanBatchSize
+			maxIndex: batchNumber * batchSize
 		)
 	}
 }
 
 // MARK: - AccountRecoveryScanInProgress.View
-public let accRecScanBatchSizePerReq = 25
-public let accRecScanBatchSize = accRecScanBatchSizePerReq * 2
+public let batchSize = 50
 public extension AccountRecoveryScanInProgress {
 	struct ViewState: Equatable {
 		let status: AccountRecoveryScanInProgress.State.Status
@@ -72,27 +71,30 @@ public extension AccountRecoveryScanInProgress {
 					if viewStore.isScanInProgress {
 						// FIXME: Strings
 						Text("Scanning for Accounts that have been included in at least on transaction, using:")
-						Text("**\(viewStore.factorSourceDescription)**")
+						Text("**\(viewStore.factorSourceDescription)**").frame(height: .standardButtonHeight)
 					} else {
-						if viewStore.active.isEmpty {
-							NoContentView("No accounts.") // FIXME: Strings
-						} else {
-							ScrollView {
-								VStack(alignment: .leading, spacing: .small3) {
-									ForEach(viewStore.active) { account in
-										SmallAccountCard(account: account)
-											.cornerRadius(.small1)
-									}
-								}
-							}
-						}
 						// FIXME: Strings
 						Text("The first \(viewStore.maxIndex) potential accounts from this signing factor were scanned.")
 
 						// FIXME: Strings
-						Button("Tap here to scan the next \(accRecScanBatchSize)") {
+						Button("Tap here to scan the next \(batchSize)") {
 							store.send(.view(.scanMore))
-						}.buttonStyle(.secondaryRectangular)
+						}.buttonStyle(.secondaryRectangular(shouldExpand: true))
+					}
+
+					if viewStore.active.isEmpty {
+						if !viewStore.isScanInProgress {
+							NoContentView("No accounts.") // FIXME: Strings
+						}
+					} else {
+						ScrollView {
+							VStack(alignment: .leading, spacing: .small3) {
+								ForEach(viewStore.active) { account in
+									SmallAccountCard(account: account)
+										.cornerRadius(.small1)
+								}
+							}
+						}
 					}
 
 					Spacer(minLength: 0)
