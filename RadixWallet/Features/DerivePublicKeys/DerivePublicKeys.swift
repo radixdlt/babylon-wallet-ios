@@ -100,20 +100,15 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 
-	public init() {
-		loggerGlobal.error("Creating DerivingPublicKeys reducer")
-	}
+	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstAppear:
-			loggerGlobal.debug("DerivePublicKeys onFirstAppear")
-			return .run { send in
+			.run { send in
 				/// For more information about that `sleep` please  check [this discussion in Slack](https://rdxworks.slack.com/archives/C03QFAWBRNX/p1687967412207119?thread_ts=1687964494.772899&cid=C03QFAWBRNX)
 				@Dependency(\.continuousClock) var clock
-				loggerGlobal.debug("DerivePublicKeys onFirstAppear sleeping")
 				try? await clock.sleep(for: .milliseconds(700))
-				loggerGlobal.debug("DerivePublicKeys onFirstAppear slept => internal(.delayedStart")
 				await send(.internal(.delayedStart))
 			}
 		}
@@ -122,14 +117,10 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .delayedStart:
-			loggerGlobal.debug("DerivingPublicKeys delayedStart")
 			switch state.factorSourceOption {
 			case .device:
-				loggerGlobal.debug("Using `device` factor source to derive public keys.")
 				return .run { send in
-					loggerGlobal.debug("Loading main BDFS...")
 					let babylonFactorSource = try await factorSourcesClient.getMainDeviceFactorSource()
-					loggerGlobal.debug("Loaded main BDFS ✓")
 					await send(.internal(.loadedDeviceFactorSource(babylonFactorSource)))
 				} catch: { error, send in
 					loggerGlobal.error("Failed to load factor source, error: \(error)")
@@ -140,7 +131,6 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 				return deriveWith(source: .privateHDFactorSource(privateHD), state)
 
 			case let .specific(factorSource):
-				loggerGlobal.debug("Using specific factor source to derive public keys - kind: \(factorSource.kind)")
 				switch factorSource {
 				case let .device(deviceFactorSource):
 					return deriveWith(source: .loadMnemonicFor(deviceFactorSource, purpose: state.purpose), state)
@@ -157,7 +147,6 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			return deriveWith(source: .loadMnemonicFor(factorSource, purpose: state.purpose), state)
 
 		case let .deriveWithDeviceFactor(derivationPath, networkID, source):
-			loggerGlobal.debug("Deriving using device factor source...id \(source.deviceFactorSource.id)")
 			return deriveWith(derivationPaths: [derivationPath], networkID: networkID, source: source, state: state)
 
 		case let .deriveWithLedgerFactor(ledger, derivationPath, networkID):
@@ -290,7 +279,6 @@ extension DerivePublicKeys {
 	) -> Effect<Action> {
 		switch state.derivationsPathOption {
 		case let .knownPaths(derivationPaths, networkID):
-			loggerGlobal.debug("Deriving public keys at paths: \(derivationPaths)")
 			return .run { send in
 				try await send(deriveWithKnownDerivationPaths(derivationPaths, networkID))
 			} catch: { error, send in
@@ -298,7 +286,6 @@ extension DerivePublicKeys {
 				await send(.delegate(.failedToDerivePublicKey))
 			}
 		case let .next(networkOption, entityKind, curve):
-			loggerGlobal.debug("Deriving public keys for next entity - kind: \(entityKind)")
 
 			let factorSourceID = hdFactorSource.factorSourceID
 			switch networkOption {
