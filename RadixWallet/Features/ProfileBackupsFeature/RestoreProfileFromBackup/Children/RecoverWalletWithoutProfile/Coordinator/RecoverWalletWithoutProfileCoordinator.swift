@@ -122,7 +122,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		case .path(.element(_, action: .recoverWalletControlWithBDFSOnly(.delegate(.continue)))):
 			state.path.append(
 				.importMnemonic(
-					.init(persistStrategy: nil)
+					.init(header: .init(title: L10n.EnterSeedPhrase.Header.title), persistStrategy: nil, wordCount: .twentyFour)
 				)
 			)
 			return .none

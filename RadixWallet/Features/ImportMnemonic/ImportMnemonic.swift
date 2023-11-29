@@ -20,12 +20,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return wordCount
 		}
 
-		public mutating func changeWordCount(by delta: Int) {
-			let positiveDelta = abs(delta)
-			precondition(positiveDelta.isMultiple(of: ImportMnemonic.wordsPerRow))
-
+		public mutating func changeWordCount(to newWordCount: BIP39.WordCount) {
 			let wordCount = words.count
-			let newWordCount = BIP39.WordCount(wordCount: wordCount + delta)! // might in fact be subtraction
+			let delta = newWordCount.rawValue - wordCount
+			let positiveDelta = abs(delta)
 			if delta > 0 {
 				// is increasing word count
 				words.append(contentsOf: (wordCount ..< newWordCount.rawValue).map {
@@ -184,7 +182,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.header = header
 			self.warning = warning
 			self.warningOnContinue = warningOnContinue
-			changeWordCount(by: wordCount.rawValue)
+			changeWordCount(to: wordCount)
 		}
 
 		public init(
@@ -247,8 +245,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		case toggleModeButtonTapped
 		case passphraseChanged(String)
-		case addRowButtonTapped
-		case removeRowButtonTapped
+		case changedWordCountTo(BIP39.WordCount)
 		case doneViewing
 		case closeButtonTapped
 		case backButtonTapped
@@ -409,12 +406,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			state.isAdvancedMode.toggle()
 			return .none
 
-		case .addRowButtonTapped:
-			state.changeWordCount(by: +ImportMnemonic.wordsPerRow)
-			return .none
-
-		case .removeRowButtonTapped:
-			state.changeWordCount(by: -ImportMnemonic.wordsPerRow)
+		case let .changedWordCountTo(newWordCount):
+			state.changeWordCount(to: newWordCount)
 			return .none
 
 		case let .continueButtonTapped(mnemonic):

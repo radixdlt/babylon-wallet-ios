@@ -95,6 +95,18 @@ extension ImportMnemonic {
 
 		public init(store: StoreOf<ImportMnemonic>) {
 			self.store = store
+			let blue = UIColor(Color.app.blue2)
+			let white = UIColor(Color.app.white)
+			let appearance = UISegmentedControl.appearance()
+			appearance.selectedSegmentTintColor = blue
+
+			// NORMAL
+			appearance.setTitleTextAttributes([.font: FontConvertible.Font.app.segmentedControlNormal], for: .normal)
+			appearance.setTitleTextAttributes([.foregroundColor: blue], for: .normal)
+
+			// SELECTED
+			appearance.setTitleTextAttributes([.font: FontConvertible.Font.app.segmentedControlSelected], for: .selected)
+			appearance.setTitleTextAttributes([.foregroundColor: white], for: .selected)
 		}
 
 		public var body: some SwiftUI.View {
@@ -103,7 +115,7 @@ extension ImportMnemonic {
 					VStack(spacing: 0) {
 						if let header = viewStore.header {
 							HeaderView(header: header)
-								.padding(.bottom, .medium1)
+								.padding(.bottom, viewStore.isWordCountFixed ? .medium1 : 0)
 						}
 
 						if let warning = viewStore.warning {
@@ -113,15 +125,29 @@ extension ImportMnemonic {
 								.padding(.bottom, .large3)
 						}
 
+						if !viewStore.isWordCountFixed {
+							VStack(alignment: .center) {
+								let label = "Number of Seed Phrase Words"
+								Text("\(label)").textStyle(.body1HighImportance).foregroundStyle(Color.app.gray1)
+
+								Picker(label, selection: viewStore.binding(
+									get: \.wordCount,
+									send: { .changedWordCountTo($0) }
+								)) {
+									ForEach(BIP39.WordCount.allCases, id: \.self) { wordCount in
+										Text("\(wordCount.rawValue)")
+											.textStyle(.body1Regular)
+									}
+								}
+								.pickerStyle(.segmented)
+							}
+							.padding(.horizontal, .large3)
+							.padding(.bottom, .medium2)
+						}
+
 						wordsGrid(with: viewStore)
 							.padding(.horizontal, .medium2)
 							.padding(.bottom, .large3)
-
-						if !viewStore.isWordCountFixed {
-							changeWordCountButtons(with: viewStore)
-								.padding(.horizontal, .medium2)
-								.padding(.bottom, .large3)
-						}
 
 						if viewStore.isShowingPassphrase {
 							passphrase(with: viewStore)
@@ -304,38 +330,6 @@ extension ImportMnemonic.View {
 		)
 		.disabled(viewStore.isReadonlyMode)
 		.autocorrectionDisabled()
-	}
-
-	@ViewBuilder
-	private func changeWordCountButtons(with viewStore: ViewStoreOf<ImportMnemonic>) -> some SwiftUI.View {
-		HStack {
-			Button {
-				viewStore.send(.removeRowButtonTapped)
-			} label: {
-				HStack {
-					Text(L10n.ImportMnemonic.fewerWords)
-						.foregroundColor(viewStore.isRemoveRowButtonEnabled ? .app.gray1 : .app.white)
-					Image(systemName: "text.badge.minus")
-						.foregroundColor(viewStore.isRemoveRowButtonEnabled ? .app.red1 : .app.white)
-				}
-			}
-			.controlState(viewStore.isRemoveRowButtonEnabled ? .enabled : .disabled)
-
-			Spacer(minLength: 0)
-
-			Button {
-				viewStore.send(.addRowButtonTapped)
-			} label: {
-				HStack {
-					Text(L10n.ImportMnemonic.moreWords)
-						.foregroundColor(viewStore.isAddRowButtonEnabled ? .app.gray1 : .app.white)
-					Image(systemName: "text.badge.plus")
-						.foregroundColor(viewStore.isAddRowButtonEnabled ? .app.green1 : .app.white)
-				}
-			}
-			.controlState(viewStore.isAddRowButtonEnabled ? .enabled : .disabled)
-		}
-		.buttonStyle(.secondaryRectangular)
 	}
 
 	@ViewBuilder
