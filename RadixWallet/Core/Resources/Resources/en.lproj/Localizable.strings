@@ -825,6 +825,7 @@ Your old Accounts and Personas will still be listed, but you will have to enter 
 "recoverSeedPhrase_skipMainSeedPhraseButton" = "Skip Main Seed Phrase Entry";
 "enterSeedPhrase_header_title" = "Enter Seed Phrase";
 "enterSeedPhrase_warning" = "For your safety, make sure no one is looking at your screen. Never give your seed phrase to anyone for any reason.";
+"recoverSeedPhrase_hidden_accounts_only" = "Hidden accounts only.";
 "factorSources_kind_device" = "Phone";
 "factorSources_kind_ledgerHQHardwareWallet" = "Ledger";
 "factorSources_kind_offDeviceMnemonic" = "Seed phrase";
