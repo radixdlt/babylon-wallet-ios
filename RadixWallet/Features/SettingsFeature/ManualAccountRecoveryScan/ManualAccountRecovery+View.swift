@@ -126,11 +126,25 @@ private extension StoreOf<ManualAccountRecovery> {
 private extension View {
 	func destinations(with store: StoreOf<ManualAccountRecovery>) -> some View {
 		let destinationStore = store.destination
-		return sheet(
+		return seedPhraseCoordinator(with: destinationStore)
+			.ledgerCoordinator(with: destinationStore)
+	}
+
+	private func seedPhraseCoordinator(with destinationStore: PresentationStoreOf<ManualAccountRecovery.Destination>) -> some View {
+		fullScreenCover(
 			store: destinationStore,
-			state: /ManualAccountRecovery.Destination.State.coordinator,
-			action: ManualAccountRecovery.Destination.Action.coordinator,
-			content: { ManualAccountRecoveryScanCoordinator.View(store: $0) }
+			state: /ManualAccountRecovery.Destination.State.seedPhrase,
+			action: ManualAccountRecovery.Destination.Action.seedPhrase,
+			content: { ManualAccountRecoverySeedPhraseCoordinator.View(store: $0) }
+		)
+	}
+
+	private func ledgerCoordinator(with destinationStore: PresentationStoreOf<ManualAccountRecovery.Destination>) -> some View {
+		fullScreenCover(
+			store: destinationStore,
+			state: /ManualAccountRecovery.Destination.State.ledger,
+			action: ManualAccountRecovery.Destination.Action.ledger,
+			content: { ManualAccountRecoveryLedgerCoordinator.View(store: $0) }
 		)
 	}
 }

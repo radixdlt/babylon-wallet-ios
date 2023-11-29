@@ -14,16 +14,21 @@ public struct ManualAccountRecovery: Sendable, FeatureReducer {
 
 	public struct Destination: DestinationReducer {
 		public enum State: Hashable, Sendable {
-			case coordinator(ManualAccountRecoveryScanCoordinator.State)
+			case seedPhrase(ManualAccountRecoverySeedPhraseCoordinator.State)
+			case ledger(ManualAccountRecoveryLedgerCoordinator.State)
 		}
 
 		public enum Action: Equatable, Sendable {
-			case coordinator(ManualAccountRecoveryScanCoordinator.Action)
+			case seedPhrase(ManualAccountRecoverySeedPhraseCoordinator.Action)
+			case ledger(ManualAccountRecoveryLedgerCoordinator.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.coordinator, action: /Action.coordinator) {
-				ManualAccountRecoveryScanCoordinator()
+			Scope(state: /State.seedPhrase, action: /Action.seedPhrase) {
+				ManualAccountRecoverySeedPhraseCoordinator()
+			}
+			Scope(state: /State.ledger, action: /Action.ledger) {
+				ManualAccountRecoveryLedgerCoordinator()
 			}
 		}
 	}
@@ -36,17 +41,26 @@ public struct ManualAccountRecovery: Sendable, FeatureReducer {
 		case olympiaUseLedgerTapped
 	}
 
+	public var body: some ReducerOf<Self> {
+		Reduce(core)
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
+			}
+	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
+
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
 			return .none
 
 		case .babylonUseSeedPhraseTapped:
-			state.destination = .coordinator(.chooseSeedPhrase)
+			state.destination = .seedPhrase(.init())
 			return .none
 
 		case .babylonUseLedgerTapped:
-			state.destination = .coordinator(.chooseLedger)
+			state.destination = .ledger(.init())
 			return .none
 
 		case .olympiaUseSeedPhraseTapped:
@@ -56,10 +70,17 @@ public struct ManualAccountRecovery: Sendable, FeatureReducer {
 			return .none
 		}
 	}
-}
 
-extension ManualAccountRecoveryScanCoordinator.State {
-	static let chooseLedger: Self = .init(path: .init([.chooseLedger(.init())]))
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .seedPhrase(.delegate(seedPhraseAction)):
+			switch seedPhraseAction {}
 
-	static let chooseSeedPhrase: Self = .init(path: .init([.chooseSeedPhrase(.init())]))
+		case let .ledger(.delegate(ledgerAction)):
+			switch ledgerAction {}
+
+		default:
+			return .none
+		}
+	}
 }
