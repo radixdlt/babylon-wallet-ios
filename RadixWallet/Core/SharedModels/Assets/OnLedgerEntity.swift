@@ -363,6 +363,51 @@ extension OnLedgerEntity {
 	}
 }
 
+// MARK: - GatewayAPI.DepositRule
+extension GatewayAPI {
+	public enum DepositRule: String, Sendable, Hashable, Codable {
+		case accept = "Accept"
+		case reject = "Reject"
+		case allowExisting = "AllowExisting"
+	}
+}
+
+extension Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule {
+	public init(gateway: GatewayAPI.DepositRule) {
+		switch gateway {
+		case .accept: self = .acceptAll
+		case .reject: self = .denyAll
+		case .allowExisting: self = .acceptKnown
+		}
+	}
+}
+
+extension OnLedgerEntity.Account.Details {
+	init?(_ component: GatewayAPI.StateEntityDetailsResponseComponentDetails?) {
+		guard let stateAny = component?.state else {
+			return nil
+		}
+		guard let state = stateAny.value as? [String: String] else {
+			return nil
+		}
+		guard let gatewayDepositRaw = state["default_deposit_rule"] else {
+			return nil
+		}
+		guard let gatewayDeposit = GatewayAPI.DepositRule(rawValue: gatewayDepositRaw) else {
+			return nil
+		}
+		self.init(depositRule: .init(gateway: gatewayDeposit))
+	}
+
+	init?(_ details: GatewayAPI.StateEntityDetailsResponseItemDetails?) {
+		self.init(details?.component)
+	}
+
+	init?(_ item: GatewayAPI.StateEntityDetailsResponseItem) {
+		self.init(item.details)
+	}
+}
+
 // MARK: - OnLedgerEntity.Account
 extension OnLedgerEntity {
 	public struct Account: Sendable, Hashable, Codable {
@@ -372,6 +417,14 @@ extension OnLedgerEntity {
 		public var fungibleResources: OwnedFungibleResources
 		public var nonFungibleResources: [OwnedNonFungibleResource]
 		public var poolUnitResources: PoolUnitResources
+		public struct Details: Sendable, Hashable, Codable {
+			public let depositRule: Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule
+			public init(depositRule: Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule) {
+				self.depositRule = depositRule
+			}
+		}
+
+		public var details: Details?
 
 		public init(
 			address: AccountAddress,
@@ -379,7 +432,8 @@ extension OnLedgerEntity {
 			metadata: Metadata,
 			fungibleResources: OwnedFungibleResources,
 			nonFungibleResources: [OwnedNonFungibleResource],
-			poolUnitResources: PoolUnitResources
+			poolUnitResources: PoolUnitResources,
+			details: Details? = nil
 		) {
 			self.address = address
 			self.atLedgerState = atLedgerState
@@ -387,6 +441,7 @@ extension OnLedgerEntity {
 			self.fungibleResources = fungibleResources
 			self.nonFungibleResources = nonFungibleResources
 			self.poolUnitResources = poolUnitResources
+			self.details = details
 		}
 	}
 }

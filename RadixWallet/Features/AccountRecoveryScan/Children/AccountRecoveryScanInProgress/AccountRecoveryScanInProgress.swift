@@ -184,7 +184,9 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 				assert(factorSourceID == id.embed())
 				assert(networkID == state.networkID)
 				return .run { send in
-					let accounts = await publicHDKeys.enumerated().asyncMap { offset, publicHDKey in
+					let accounts = await publicHDKeys.enumerated().asyncMap {
+						offset,
+							publicHDKey in
 						let appearanceID = await accountsClient.nextAppearanceID(networkID, offset)
 						let account = try! Profile.Network.Account(
 							networkID: networkID,
@@ -193,7 +195,10 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 								publicHDKey: publicHDKey
 							),
 							displayName: "Unnamed",
-							extraProperties: .init(appearanceID: appearanceID)
+							extraProperties: .init(
+								appearanceID: appearanceID,
+								onLedgerSettings: .unknown
+							)
 						)
 						return account
 					}.asIdentifiable()
@@ -298,17 +303,22 @@ extension AccountRecoveryScanInProgress {
 		}
 	}
 
-	private func performScan(accounts: IdentifiedArrayOf<Profile.Network.Account>) async throws -> (active: IdentifiedArrayOf<Profile.Network.Account>, inactive: IdentifiedArrayOf<Profile.Network.Account>) {
+	private func performScan(
+		accounts: IdentifiedArrayOf<Profile.Network.Account>
+	) async throws -> (
+		active: IdentifiedArrayOf<Profile.Network.Account>,
+		inactive: IdentifiedArrayOf<Profile.Network.Account>
+	) {
 		let accountAddresses: [AccountAddress] = accounts.map(\.address)
 		let engineAddresses: [Address] = accountAddresses.map(\.asGeneral)
 
 		do {
-			let addressOfActiveAccounts: [AccountAddress] = try await onLedgerEntitiesClient.getEntities(
+			let activeAccounts: [OnLedgerEntity.Account] = try await onLedgerEntitiesClient.getEntities(
 				engineAddresses,
 				[.ownerBadge, .ownerKeys],
 				nil,
 				true // force to refresh
-			).compactMap { (onLedgerEntity: OnLedgerEntity) -> AccountAddress? in
+			).compactMap { (onLedgerEntity: OnLedgerEntity) -> OnLedgerEntity.Account? in
 				guard
 					let onLedgerAccount = onLedgerEntity.account,
 					case let metadata = onLedgerAccount.metadata,
@@ -323,13 +333,17 @@ extension AccountRecoveryScanInProgress {
 				guard isActive else {
 					return nil
 				}
-				return onLedgerAccount.address
+				return onLedgerAccount
 			}
 
 			var active: IdentifiedArrayOf<Profile.Network.Account> = []
 			var inactive: IdentifiedArrayOf<Profile.Network.Account> = []
 			for account in accounts {
-				if addressOfActiveAccounts.contains(where: { $0 == account.address }) {
+				if let activeAccount = activeAccounts.first(where: { $0.address == account.address }) {
+					var account = account
+					if let depositRule = activeAccount.details?.depositRule {
+						account.onLedgerSettings.thirdPartyDeposits.depositRule = depositRule
+					}
 					active.append(account)
 				} else {
 					inactive.append(account)

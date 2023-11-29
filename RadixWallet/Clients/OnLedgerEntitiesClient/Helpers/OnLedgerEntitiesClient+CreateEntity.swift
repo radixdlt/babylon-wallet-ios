@@ -70,7 +70,8 @@ extension OnLedgerEntitiesClient {
 			metadata: .init(item.explicitMetadata),
 			fungibleResources: filteredFungibleResources.sorted(),
 			nonFungibleResources: filteredNonFungibleResources.sorted(),
-			poolUnitResources: poolUnitResources
+			poolUnitResources: poolUnitResources,
+			details: OnLedgerEntity.Account.Details(item.details)
 		)
 	}
 
@@ -523,7 +524,8 @@ extension OnLedgerEntity.Account {
 			metadata: metadata,
 			fungibleResources: fungibleResources.nonEmptyVaults,
 			nonFungibleResources: nonFungibleResources.nonEmptyVaults,
-			poolUnitResources: poolUnitResources.nonEmptyVaults
+			poolUnitResources: poolUnitResources.nonEmptyVaults,
+			details: details
 		)
 	}
 }
