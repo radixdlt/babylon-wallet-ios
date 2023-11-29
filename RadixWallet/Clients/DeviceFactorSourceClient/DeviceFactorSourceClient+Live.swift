@@ -75,14 +75,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 		return Self(
 			publicKeysFromOnDeviceHD: { request in
 				let factorSourceID = request.deviceFactorSource.id
-
-				guard
-					let mnemonicWithPassphrase = try secureStorageClient
-					.loadMnemonic(factorSourceID: factorSourceID, purpose: request.loadMnemonicPurpose)
-				else {
-					loggerGlobal.critical("Failed to find factor source with ID: '\(factorSourceID)'")
-					throw FailedToFindFactorSource()
-				}
+				let mnemonicWithPassphrase = try request.getMnemonicWithPassphrase()
 				let hdRoot = try mnemonicWithPassphrase.hdRoot()
 				let derivedKeys = try request.derivationPaths.map {
 					let key = try hdRoot.derivePrivateKey(

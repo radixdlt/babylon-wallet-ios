@@ -47,9 +47,20 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		public enum FactorSourceOption: Sendable, Hashable {
 			case device
 			case specific(FactorSource)
+			case specificPrivateHDFactorSource(PrivateHDFactorSource)
 		}
 
-		public let purpose: Purpose
+		public let _purpose: Purpose
+		public var purpose: SecureStorageClient.LoadMnemonicPurpose {
+			switch _purpose {
+			case let .createEntity(entityKind):
+				.createEntity(kind: entityKind)
+			case .createAuthSigningKey:
+				.createSignAuthKey
+			case .importLegacyAccounts:
+				.importOlympiaAccounts
+			}
+		}
 
 		public init(
 			derivationPathOption: DerivationPathOption,
@@ -58,7 +69,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		) {
 			self.derivationsPathOption = derivationPathOption
 			self.factorSourceOption = factorSourceOption
-			self.purpose = purpose
+			self._purpose = purpose
 		}
 	}
 
@@ -69,7 +80,8 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Hashable {
 		case delayedStart
 		case loadedDeviceFactorSource(DeviceFactorSource)
-		case deriveWithDeviceFactor(DeviceFactorSource, DerivationPath, NetworkID, SecureStorageClient.LoadMnemonicPurpose)
+
+		case deriveWithDeviceFactor(DerivationPath, NetworkID, PublicKeysFromOnDeviceHDRequest.Source)
 		case deriveWithLedgerFactor(LedgerHardwareWalletFactorSource, DerivationPath, NetworkID)
 	}
 
@@ -124,11 +136,14 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 					await send(.delegate(.failedToDerivePublicKey))
 				}
 
+			case let .specificPrivateHDFactorSource(privateHD):
+				return deriveWith(source: .privateHDFactorSource(privateHD), state)
+
 			case let .specific(factorSource):
 				loggerGlobal.debug("Using specific factor source to derive public keys - kind: \(factorSource.kind)")
 				switch factorSource {
 				case let .device(deviceFactorSource):
-					return deriveWith(deviceFactorSource: deviceFactorSource, state)
+					return deriveWith(source: .loadMnemonicFor(deviceFactorSource, purpose: state.purpose), state)
 				case let .ledger(ledgerFactorSource):
 					state.ledgerBeingUsed = ledgerFactorSource
 					return deriveWith(ledgerFactorSource: ledgerFactorSource, state)
@@ -139,11 +154,11 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			}
 
 		case let .loadedDeviceFactorSource(factorSource):
-			return deriveWith(deviceFactorSource: factorSource, state)
+			return deriveWith(source: .loadMnemonicFor(factorSource, purpose: state.purpose), state)
 
-		case let .deriveWithDeviceFactor(device, derivationPath, networkID, loadMnemonicPurpose):
-			loggerGlobal.debug("Deriving using device factor source...id \(device.id)")
-			return deriveWith(deviceFactorSource: device, derivationPaths: [derivationPath], networkID: networkID, loadMnemonicPurpose: loadMnemonicPurpose, state: state)
+		case let .deriveWithDeviceFactor(derivationPath, networkID, source):
+			loggerGlobal.debug("Deriving using device factor source...id \(source.deviceFactorSource.id)")
+			return deriveWith(derivationPaths: [derivationPath], networkID: networkID, source: source, state: state)
 
 		case let .deriveWithLedgerFactor(ledger, derivationPath, networkID):
 			state.ledgerBeingUsed = ledger
@@ -154,22 +169,18 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 
 extension DerivePublicKeys {
 	private func deriveWith(
-		deviceFactorSource: DeviceFactorSource,
+		source: PublicKeysFromOnDeviceHDRequest.Source,
 		_ state: State
 	) -> Effect<Action> {
 		withDerivationPath(
 			state: state,
-			hdFactorSource: deviceFactorSource,
+			hdFactorSource: source.deviceFactorSource,
 			knownPaths: {
-				try await _deriveWith(
-					deviceFactorSource: deviceFactorSource,
-					derivationPaths: $0,
-					networkID: $1,
-					loadMnemonicPurpose: $2,
-					state: state
-				)
+				try await _deriveWith(derivationPaths: $0, networkID: $1, source: source, state: state)
 			},
-			calculating: { .internal(.deriveWithDeviceFactor(deviceFactorSource, $0, $1, $2)) }
+			calculating: {
+				.internal(.deriveWithDeviceFactor($0, $1, source))
+			}
 		)
 	}
 
@@ -180,7 +191,7 @@ extension DerivePublicKeys {
 		withDerivationPath(
 			state: state,
 			hdFactorSource: ledgerFactorSource,
-			knownPaths: { path, networkID, _ in
+			knownPaths: { path, networkID in
 				try await _deriveWith(
 					ledger: ledgerFactorSource,
 					derivationPaths: path,
@@ -188,23 +199,21 @@ extension DerivePublicKeys {
 					state: state
 				)
 			},
-			calculating: { path, networkID, _ in .internal(.deriveWithLedgerFactor(ledgerFactorSource, path, networkID)) }
+			calculating: { path, networkID in .internal(.deriveWithLedgerFactor(ledgerFactorSource, path, networkID)) }
 		)
 	}
 
 	private func deriveWith(
-		deviceFactorSource: DeviceFactorSource,
 		derivationPaths: [DerivationPath],
 		networkID: NetworkID,
-		loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose,
+		source: PublicKeysFromOnDeviceHDRequest.Source,
 		state: State
 	) -> Effect<Action> {
 		.run { send in
 			try await send(_deriveWith(
-				deviceFactorSource: deviceFactorSource,
 				derivationPaths: derivationPaths,
 				networkID: networkID,
-				loadMnemonicPurpose: loadMnemonicPurpose,
+				source: source,
 				state: state
 			))
 		} catch: { error, send in
@@ -214,22 +223,17 @@ extension DerivePublicKeys {
 	}
 
 	private func _deriveWith(
-		deviceFactorSource: DeviceFactorSource,
 		derivationPaths: [DerivationPath],
 		networkID: NetworkID,
-		loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose,
+		source: PublicKeysFromOnDeviceHDRequest.Source,
 		state: State
 	) async throws -> Action {
 		loggerGlobal.debug("Starting derivation of #\(derivationPaths.count) keys")
-		let hdKeys = try await deviceFactorSourceClient.publicKeysFromOnDeviceHD(.init(
-			deviceFactorSource: deviceFactorSource,
-			derivationPaths: derivationPaths,
-			loadMnemonicPurpose: loadMnemonicPurpose
-		))
+		let hdKeys = try await deviceFactorSourceClient.publicKeysFromOnDeviceHD(.init(derivationPaths: derivationPaths, source: source))
 		loggerGlobal.debug("Finish deriving of #\(hdKeys.count) keys ✅ => delegating `derivedPublicKeys`")
 		return .delegate(.derivedPublicKeys(
 			hdKeys,
-			factorSourceID: deviceFactorSource.id.embed(),
+			factorSourceID: source.deviceFactorSource.id.embed(),
 			networkID: networkID
 		))
 	}
@@ -281,36 +285,21 @@ extension DerivePublicKeys {
 	private func withDerivationPath(
 		state: State,
 		hdFactorSource: some HDFactorSourceProtocol,
-		knownPaths deriveWithKnownDerivationPaths: @escaping @Sendable ([DerivationPath], NetworkID, SecureStorageClient.LoadMnemonicPurpose) async throws -> Action,
-		calculating calculatedDerivationPath: @escaping @Sendable (DerivationPath, NetworkID, SecureStorageClient.LoadMnemonicPurpose) -> Action
+		knownPaths deriveWithKnownDerivationPaths: @escaping @Sendable ([DerivationPath], NetworkID) async throws -> Action,
+		calculating calculatedDerivationPath: @escaping @Sendable (DerivationPath, NetworkID) -> Action
 	) -> Effect<Action> {
 		switch state.derivationsPathOption {
 		case let .knownPaths(derivationPaths, networkID):
 			loggerGlobal.debug("Deriving public keys at paths: \(derivationPaths)")
-			let loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose = switch state.purpose {
-			case let .createEntity(kind: entityKind):
-				.createEntity(kind: entityKind)
-			case .createAuthSigningKey:
-				.createSignAuthKey
-			case .importLegacyAccounts:
-				.importOlympiaAccounts
-			}
 			return .run { send in
-				try await send(deriveWithKnownDerivationPaths(derivationPaths, networkID, loadMnemonicPurpose))
+				try await send(deriveWithKnownDerivationPaths(derivationPaths, networkID))
 			} catch: { error, send in
 				loggerGlobal.error("Failed to create derivation path, error: \(error)")
 				await send(.delegate(.failedToDerivePublicKey))
 			}
 		case let .next(networkOption, entityKind, curve):
 			loggerGlobal.debug("Deriving public keys for next entity - kind: \(entityKind)")
-			let loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose = switch state.purpose {
-			case .createEntity:
-				.createEntity(kind: entityKind)
-			case .createAuthSigningKey:
-				.createSignAuthKey
-			case .importLegacyAccounts:
-				.importOlympiaAccounts
-			}
+
 			let factorSourceID = hdFactorSource.factorSourceID
 			switch networkOption {
 			case let .specific(networkID):
@@ -321,7 +310,7 @@ extension DerivePublicKeys {
 						networkID: networkID
 					)
 					assert(derivationPath.curveForScheme == curve)
-					try await send(deriveWithKnownDerivationPaths([derivationPath], networkID, loadMnemonicPurpose))
+					try await send(deriveWithKnownDerivationPaths([derivationPath], networkID))
 				} catch: { error, send in
 					loggerGlobal.error("Failed to create derivation path, error: \(error)")
 					await send(.delegate(.failedToDerivePublicKey))
@@ -335,7 +324,7 @@ extension DerivePublicKeys {
 						of: entityKind,
 						networkID: nil
 					)
-					await send(calculatedDerivationPath(derivationPath, networkID, loadMnemonicPurpose))
+					await send(calculatedDerivationPath(derivationPath, networkID))
 				} catch: { error, send in
 					loggerGlobal.error("Failed to create derivation path, error: \(error)")
 					await send(.delegate(.failedToDerivePublicKey))

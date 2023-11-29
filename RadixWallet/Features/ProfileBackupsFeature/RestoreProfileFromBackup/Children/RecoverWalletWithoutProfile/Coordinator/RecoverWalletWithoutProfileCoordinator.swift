@@ -5,10 +5,8 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		public var root: Path.State?
 		public var path: StackState<Path.State> = .init()
 
-		/// SHOULD be used to delete the mnemonic if user did not complete
-		/// the account recovery scanning flow. Will be added to Profile
-		/// as main BDFS if account recovery scanning flow is completed.
-		public var factorSourceOfImportedMnemonic: DeviceFactorSource?
+		/// Not saved into keychain yet
+		public var factorSourceOfImportedMnemonic: PrivateHDFactorSource?
 
 		@PresentationState
 		var destination: Destination.State? = nil
@@ -73,6 +71,12 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		case path(StackActionOf<Path>)
 	}
 
+	public struct EqError: Sendable, Equatable, Error {}
+
+	public enum InternalAction: Sendable, Equatable {
+		case persistBDFSIntoKeychainResult(Result<EqVoid, EqError>)
+	}
+
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
 		case backToStartOfOnboarding
@@ -118,30 +122,27 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		case .path(.element(_, action: .recoverWalletControlWithBDFSOnly(.delegate(.continue)))):
 			state.path.append(
 				.importMnemonic(
-					.init(
-						// We SHOULD remove the mnemonic from keychain if it we do not
-						// complete this flow.
-						persistStrategy: .init(
-							mnemonicForFactorSourceKind: .onDevice(
-								.babylon
-							),
-							location: .intoKeychainOnly
-						)
-					)
+					.init(persistStrategy: nil)
 				)
 			)
 			return .none
 
 		case let .path(.element(_, action: .importMnemonic(.delegate(delegateAction)))):
 			switch delegateAction {
-			case let .persistedMnemonicInKeychainOnly(factorSource):
-				guard let fromHash = factorSource.id.extract(FactorSource.ID.FromHash.self) else {
-					fatalError("error handling")
+			case let .notPersisted(mnemonicWithPassphrase):
+				do {
+					let fromHash = try FactorSource.id(fromMnemonicWithPassphrase: mnemonicWithPassphrase, factorSourceKind: .device)
+					let deviceFactorSource = DeviceFactorSource(id: fromHash, common: .init(), hint: .init(name: "iPhone", model: "iPhone", mnemonicWordCount: .twentyFour))
+					let privateHD = try PrivateHDFactorSource(mnemonicWithPassphrase: mnemonicWithPassphrase, factorSource: deviceFactorSource)
+					state.factorSourceOfImportedMnemonic = privateHD
+					state.destination = .accountRecoveryScanCoordinator(.init(purpose: .createProfile(privateHD), promptForSelectionOfInactiveAccountsIfAny: true))
+					return .none
+				} catch {
+					let errorMsg = "Failed to create Private HD FactorSource from MnemonicWithPassphrase, error: \(error)"
+					loggerGlobal.error(.init(stringLiteral: errorMsg))
+					assertionFailure(errorMsg)
+					return .send(.delegate(.dismiss))
 				}
-				let deviceFactorSource = DeviceFactorSource(id: fromHash, common: .init(), hint: .init(name: "iPhone", model: "iPhone", mnemonicWordCount: .twentyFour))
-				state.factorSourceOfImportedMnemonic = deviceFactorSource
-				state.destination = .accountRecoveryScanCoordinator(.init(purpose: .createProfile(deviceFactorSource), promptForSelectionOfInactiveAccountsIfAny: true))
-				return .none
 
 			default:
 				let errorMsg = "Discrepancy! Expected to have saved mnemonic into keychain but other action happened: \(delegateAction)"
@@ -167,25 +168,9 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case .accountRecoveryScanCoordinator(.delegate(.dismissed)):
-			return deleteSavedUnusedMnemonic(state: state)
+			return .none
 
 		default: return .none
 		}
-	}
-
-	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		deleteSavedUnusedMnemonic(state: state)
-	}
-
-	private func deleteSavedUnusedMnemonic(state: State) -> Effect<Action> {
-		if
-			let factorSourceID = state.factorSourceOfImportedMnemonic?.id
-		{
-			loggerGlobal.notice("We did not finish Account Recovery Scan Flow. Deleting mnemonic from keychain for safety reasons.")
-			// We did not complete account recovery scan => delete the mnemonic from
-			// keychain for security reasons.
-			try? secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
-		}
-		return .send(.delegate(.dismiss))
 	}
 }

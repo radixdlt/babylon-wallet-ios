@@ -10,8 +10,6 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		}
 
 		public var status: Status = .new
-		public let factorSourceID: FactorSourceID.FromHash
-		public var factorSource: Loadable<FactorSource>
 		public let networkID: NetworkID
 		public var offset: Int
 		public let scheme: DerivationScheme
@@ -21,21 +19,46 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destination.State? = nil
 
+		public enum FactorSourceOrigin: Sendable, Hashable {
+			case privateHD(PrivateHDFactorSource)
+			case loadFactorSourceWithID(FactorSourceID.FromHash)
+		}
+
+		public enum FactorSourceStatus: Sendable, Hashable {
+			case privateHD(PrivateHDFactorSource)
+			case factorSourceWithID(Loadable<FactorSource>, id: FactorSourceID.FromHash)
+
+			init(origin: FactorSourceOrigin) {
+				switch origin {
+				case let .loadFactorSourceWithID(id):
+					self = .factorSourceWithID(.idle, id: id)
+				case let .privateHD(privateHD):
+					self = .privateHD(privateHD)
+				}
+			}
+		}
+
+		public var factorSourceIDFromHash: FactorSourceID.FromHash {
+			switch factorSourceStatus {
+			case let .privateHD(privateHD):
+				privateHD.factorSource.id
+			case let .factorSourceWithID(_, id):
+				id
+			}
+		}
+
+		public var factorSourceStatus: FactorSourceStatus
+
 		public init(
-			factorSourceID: FactorSourceID.FromHash,
-			factorSource: Loadable<FactorSource> = .loading,
+			factorSourceOrigin: FactorSourceOrigin,
 			offset: Int,
 			scheme: DerivationScheme,
 			networkID: NetworkID
 		) {
-			if let factorSource = factorSource.wrappedValue {
-				assert(factorSourceID.embed() == factorSource.id)
-			}
 			self.offset = offset
-			self.factorSourceID = factorSourceID
+			self.factorSourceStatus = FactorSourceStatus(origin: factorSourceOrigin)
 			self.scheme = scheme
 			self.networkID = networkID
-			self.factorSource = factorSource
 		}
 	}
 
@@ -104,8 +127,8 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			guard let factorSource else {
 				fatalError("error handling")
 			}
-			state.factorSource = .success(factorSource)
-			return derivePublicKeys(using: factorSource, state: &state)
+			state.factorSourceStatus = .factorSourceWithID(.success(factorSource), id: state.factorSourceIDFromHash)
+			return derivePublicKeys(state: &state)
 
 		case let .startScan(accounts):
 			return scanOnLedger(accounts: accounts, state: &state)
@@ -122,11 +145,15 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		switch viewAction {
 		case .onFirstAppear:
 			loggerGlobal.debug("AccountRecoveryScanInProgress: onFirstAppear")
-			if let factorSource = state.factorSource.wrappedValue {
-				return derivePublicKeys(using: factorSource, state: &state)
-			} else {
+
+			switch state.factorSourceStatus {
+			case .privateHD:
+				return derivePublicKeys(state: &state)
+			case .factorSourceWithID:
 				state.status = .loadingFactorSource
-				return .run { [id = state.factorSourceID] send in
+				let id = state.factorSourceIDFromHash
+				state.factorSourceStatus = .factorSourceWithID(.loading, id: id)
+				return .run { send in
 					let result = await TaskResult<FactorSource?> {
 						try await factorSourcesClient.getFactorSource(id: id.embed())
 					}
@@ -136,9 +163,8 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 		case .scanMore:
 			loggerGlobal.debug("Scan more requested.")
-			guard let factorSource = state.factorSource.wrappedValue else { fatalError("discrepancy") }
 			state.offset += accRecScanBatchSize
-			return derivePublicKeys(using: factorSource, state: &state)
+			return derivePublicKeys(state: &state)
 
 		case .continueTapped:
 			return .send(.delegate(.foundAccounts(active: state.active, inactive: state.inactive)))
@@ -151,9 +177,10 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			loggerGlobal.notice("Finish deriving public keys => `state.destination = nil`")
 			switch delegateAction {
 			case let .derivedPublicKeys(publicHDKeys, factorSourceID, networkID):
-				assert(factorSourceID == state.factorSourceID.embed())
+				let id = state.factorSourceIDFromHash
+				assert(factorSourceID == id.embed())
 				assert(networkID == state.networkID)
-				return .run { [id = state.factorSourceID] send in
+				return .run { send in
 					let accounts = await publicHDKeys.enumerated().asyncMap { offset, publicHDKey in
 						let appearanceID = await accountsClient.nextAppearanceID(networkID, offset)
 						let account = try! Profile.Network.Account(
@@ -250,7 +277,6 @@ extension AccountRecoveryScanInProgress {
 	}
 
 	private func derivePublicKeys(
-		using factorSource: FactorSource,
 		state: inout State
 	) -> Effect<Action> {
 		let offset = state.offset
@@ -270,16 +296,31 @@ extension AccountRecoveryScanInProgress {
 				).wrapAsDerivationPath()
 			}
 		}
-//		state.status = .derivingPublicKeys
+		state.status = .derivingPublicKeys
 		loggerGlobal.debug("Settings destination to derivePublicKeys")
+		let factorSourceOption: DerivePublicKeys.State.FactorSourceOption
+
+		switch state.factorSourceStatus {
+		case let .factorSourceWithID(loadableState, _):
+			switch loadableState {
+			case let .success(factorSource):
+				factorSourceOption = .specific(factorSource)
+			default:
+				let errorMsg = "Discrepancy! Expected to loaded the factor source"
+				loggerGlobal.error(.init(stringLiteral: errorMsg))
+				assertionFailure(errorMsg)
+				return .none
+			}
+		case let .privateHD(privateHDFactorSource):
+			factorSourceOption = .specificPrivateHDFactorSource(privateHDFactorSource)
+		}
+
 		state.destination = .derivePublicKeys(.init(
 			derivationPathOption: .knownPaths(
 				derivationPaths,
 				networkID: networkID
 			),
-			factorSourceOption: .specific(
-				factorSource
-			),
+			factorSourceOption: factorSourceOption,
 			purpose: .createEntity(kind: .account)
 		))
 

@@ -2,7 +2,7 @@ extension AccountRecoveryScanInProgress.State {
 	var viewState: AccountRecoveryScanInProgress.ViewState {
 		.init(
 			status: status,
-			kind: factorSourceID.kind,
+			kind: factorSourceIDFromHash.kind,
 			olympia: scheme == .bip44,
 			active: active,
 			hasFoundAnyAccounts: !active.isEmpty || !inactive.isEmpty

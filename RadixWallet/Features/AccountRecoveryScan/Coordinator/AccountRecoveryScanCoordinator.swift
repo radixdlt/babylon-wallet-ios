@@ -15,7 +15,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 
 		/// Create new Profile or add accounts
 		public enum Purpose: Sendable, Hashable {
-			case createProfile(DeviceFactorSource)
+			case createProfile(PrivateHDFactorSource)
 
 			/// Typically we can use `offset: <CURRENT_NETWORK>.numberOfAccountsIncludingHidden(controlledBy: factorSourceID)`
 			case addAccounts(
@@ -31,25 +31,27 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 			self.promptForSelectionOfInactiveAccountsIfAny = promptForSelectionOfInactiveAccountsIfAny
 			switch purpose {
 			case let .addAccounts(id, offset, networkID, scheme):
-				self.root = .accountRecoveryScanInProgress(.init(
-					factorSourceID: id,
-					factorSource: .loading,
-					offset: offset,
-					scheme: scheme,
-					networkID: networkID
-				))
-			case let .createProfile(
-				deviceFactorSource
-			):
-				self.root = .accountRecoveryScanInProgress(.init(
-					factorSourceID: deviceFactorSource.id,
-					factorSource: .success(
-						deviceFactorSource.embed()
-					),
-					offset: 0,
-					scheme: .slip10,
-					networkID: .mainnet
-				))
+				self.root = .accountRecoveryScanInProgress(
+					.init(
+						factorSourceOrigin: .loadFactorSourceWithID(
+							id
+						),
+						offset: offset,
+						scheme: scheme,
+						networkID: networkID
+					)
+				)
+			case let .createProfile(privateHDFactorSource):
+				self.root = .accountRecoveryScanInProgress(
+					.init(
+						factorSourceOrigin: .privateHD(
+							privateHDFactorSource
+						),
+						offset: 0,
+						scheme: .slip10,
+						networkID: .mainnet
+					)
+				)
 			}
 		}
 	}
@@ -73,6 +75,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		case dismissed
 	}
 
+	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.onboardingClient) var onboardingClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.dismiss) var dismiss
@@ -146,14 +149,15 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		let accounts = all
 
 		switch purpose {
-		case let .createProfile(deviceFactorSource):
+		case let .createProfile(privateHD):
 			let recoveredAccountAndBDFS = AccountsRecoveredFromScanningUsingMnemonic(
 				accounts: accounts,
-				deviceFactorSource: deviceFactorSource
+				deviceFactorSource: privateHD.factorSource
 			)
 			return .run { send in
 				let result = await TaskResult<EqVoid> {
-					try await onboardingClient.finishOnboardingWithRecoveredAccountAndBDFS(recoveredAccountAndBDFS)
+					try secureStorageClient.saveMnemonicForFactorSource(privateHD)
+					return try await onboardingClient.finishOnboardingWithRecoveredAccountAndBDFS(recoveredAccountAndBDFS)
 				}
 				await send(.internal(.createProfileResult(result)))
 			}

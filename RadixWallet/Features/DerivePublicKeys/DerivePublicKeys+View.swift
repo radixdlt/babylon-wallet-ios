@@ -1,10 +1,11 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension DerivePublicKeys.State {
 	var viewState: DerivePublicKeys.ViewState {
 		.init(
 			ledger: ledgerBeingUsed,
-			entityKind: (/DerivePublicKeys.State.Purpose.createEntity).extract(from: purpose)
+			entityKind: (/DerivePublicKeys.State.Purpose.createEntity).extract(from: _purpose)
 		)
 	}
 }
