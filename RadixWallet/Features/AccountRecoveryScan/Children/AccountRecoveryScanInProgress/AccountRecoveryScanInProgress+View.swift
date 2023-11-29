@@ -12,7 +12,7 @@ extension AccountRecoveryScanInProgress.State {
 }
 
 // MARK: - AccountRecoveryScanInProgress.View
-public let batchSize = 50
+public let batchSize = 10
 public extension AccountRecoveryScanInProgress {
 	struct ViewState: Equatable {
 		let status: AccountRecoveryScanInProgress.State.Status

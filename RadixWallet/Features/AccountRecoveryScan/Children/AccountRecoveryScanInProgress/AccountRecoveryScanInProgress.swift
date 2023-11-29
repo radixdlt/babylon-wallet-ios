@@ -210,31 +210,6 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	}
 }
 
-public func generateElements<Element>(
-	start: Element,
-	step: (Element) -> Element,
-	count: Int,
-	shouldInclude: (Element) -> Bool
-) -> OrderedSet<Element> where Element: Hashable {
-	var next = start
-	var elements: OrderedSet<Element> = []
-	while elements.count != count {
-		defer { next = step(next) }
-		guard shouldInclude(next) else { continue }
-		elements.append(next)
-	}
-	assert(elements.count == count)
-	return elements
-}
-
-public func generateIntegers<Integer>(
-	start: Integer,
-	count: Int,
-	shouldInclude: @escaping (Integer) -> Bool
-) -> OrderedSet<Integer> where Integer: FixedWidthInteger {
-	generateElements(start: start, step: { $0 + 1 }, count: count, shouldInclude: shouldInclude)
-}
-
 // MARK: - Profile.Network.Account + Comparable
 extension Profile.Network.Account: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
@@ -264,7 +239,7 @@ extension AccountRecoveryScanInProgress {
 		)
 
 		assert(derivationIndices.count == batchSize)
-		state.maxIndex = derivationIndices.max()!
+		state.maxIndex = derivationIndices.max()! + 1
 
 		let derivationPaths = try! OrderedSet(validating: derivationIndices.map {
 			switch state.scheme {
@@ -280,7 +255,7 @@ extension AccountRecoveryScanInProgress {
 				).wrapAsDerivationPath()
 			}
 		})
-
+		loggerGlobal.debug("✨paths: \(derivationPaths)")
 		state.status = .derivingPublicKeys
 		loggerGlobal.debug("Settings destination to derivePublicKeys")
 		let factorSourceOption: DerivePublicKeys.State.FactorSourceOption
