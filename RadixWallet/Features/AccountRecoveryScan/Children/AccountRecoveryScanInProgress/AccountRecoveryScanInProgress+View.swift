@@ -87,9 +87,6 @@ public extension AccountRecoveryScanInProgress {
 						store.send(.view(.continueTapped))
 					}.buttonStyle(.primaryRectangular)
 				}
-//				.onFirstAppear { @MainActor in
-//					store.send(.view(.onFirstAppear))
-//				}
 				.onFirstAppear {
 					viewStore.send(.onFirstAppear)
 				}
