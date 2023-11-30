@@ -18,39 +18,25 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 
 			case addAccounts(
 				factorSourceID: FactorSourceID.FromHash,
-				scheme: DerivationScheme
+				olympia: Bool
 			)
-
-			public static func addAccountsWithBabylonFactorSource(
-				id: FactorSourceID.FromHash
-			) -> Self {
-				.addAccounts(factorSourceID: id, scheme: .slip10)
-			}
-
-			public static func addAccountsWithOlympiaFactorSource(
-				id: FactorSourceID.FromHash
-			) -> Self {
-				.addAccounts(factorSourceID: id, scheme: .bip44)
-			}
 		}
 
 		public init(purpose: Purpose) {
 			self.purpose = purpose
+
 			switch purpose {
-			case let .addAccounts(id, scheme):
-				self.root = .accountRecoveryScanInProgress(
-					.init(
-						mode: .factorSourceWithID(id: id),
-						scheme: scheme
-					)
-				)
+			case let .addAccounts(id, forOlympiaAccounts):
+				self.root = .accountRecoveryScanInProgress(.init(
+					mode: .factorSourceWithID(id: id),
+					forOlympiaAccounts: forOlympiaAccounts
+				))
+
 			case let .createProfile(privateHDFactorSource):
-				self.root = .accountRecoveryScanInProgress(
-					.init(
-						mode: .privateHD(privateHDFactorSource),
-						scheme: .slip10
-					)
-				)
+				self.root = .accountRecoveryScanInProgress(.init(
+					mode: .privateHD(privateHDFactorSource),
+					forOlympiaAccounts: false
+				))
 			}
 		}
 	}
@@ -106,14 +92,17 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .addAccountsToExistingProfileResult(.success):
+			loggerGlobal.notice("Successfully added accounts to existing profile using Account Recovery Scanning ✅")
 			return .send(.delegate(.completed))
 		case let .addAccountsToExistingProfileResult(.failure(error)):
-			fatalError("todo error handling")
+			loggerGlobal.error("Failed to add accoutns to existing profile, error: \(error)")
+			return .send(.delegate(.dismissed))
 		case .createProfileResult(.success):
 			loggerGlobal.notice("Successfully created a Profile using Account Recovery Scanning ✅")
 			return .send(.delegate(.completed))
 		case let .createProfileResult(.failure(error)):
-			fatalError("todo error handling")
+			loggerGlobal.error("Failed to add accoutns to existing profile, error: \(error)")
+			return .send(.delegate(.dismissed))
 		}
 	}
 
@@ -126,7 +115,11 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 			return .send(.delegate(.dismissed))
 
 		case let .selectInactiveAccountsToAdd(.delegate(.finished(selectedInactive, active))):
-			return completed(purpose: state.purpose, inactiveToAdd: selectedInactive, active: active)
+			var accounts = active
+			accounts.append(contentsOf: selectedInactive)
+			accounts.sort() // by index
+			loggerGlobal.debug("Successfully discovered and created #\(active.count) accounts and #\(selectedInactive.count) inactive accounts that was chosen by user, sorted by index, these are all the accounts we are gonna use:\n\(accounts)")
+			return completed(purpose: state.purpose, accounts: accounts)
 
 		default: return .none
 		}
@@ -134,17 +127,10 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 
 	private func completed(
 		purpose: State.Purpose,
-		inactiveToAdd: IdentifiedArrayOf<Profile.Network.Account>,
-		active: IdentifiedArrayOf<Profile.Network.Account>
+		accounts: IdentifiedArrayOf<Profile.Network.Account>
 	) -> Effect<Action> {
-		// FIXME: check with Matt - should we by default we add ALL accounts, even inactive?
-		var all = active
-		all.append(contentsOf: inactiveToAdd)
-		let accounts = all
-
 		switch purpose {
 		case let .createProfile(privateHD):
-			loggerGlobal.notice("Successfully discovered and created #\(active.count) accounts and #\(inactiveToAdd.count) inactive accounts that was chosen by user.")
 			let recoveredAccountAndBDFS = AccountsRecoveredFromScanningUsingMnemonic(
 				accounts: accounts,
 				deviceFactorSource: privateHD.factorSource

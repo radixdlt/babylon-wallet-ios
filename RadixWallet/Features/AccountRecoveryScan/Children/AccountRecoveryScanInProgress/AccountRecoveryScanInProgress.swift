@@ -15,7 +15,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		public var maxIndex: HD.Path.Component.Child.Value? = nil
 
 		public var indicesOfAlreadyUsedEntities: OrderedSet<HD.Path.Component.Child.Value> = []
-		public let scheme: DerivationScheme
+		public let forOlympiaAccounts: Bool
 		public var active: IdentifiedArrayOf<Profile.Network.Account> = []
 		public var inactive: IdentifiedArrayOf<Profile.Network.Account> = []
 
@@ -40,10 +40,10 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 		public init(
 			mode: Mode,
-			scheme: DerivationScheme
+			forOlympiaAccounts: Bool = false
 		) {
 			self.mode = mode
-			self.scheme = scheme
+			self.forOlympiaAccounts = forOlympiaAccounts
 		}
 	}
 
@@ -215,21 +215,6 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	}
 }
 
-// MARK: - Profile.Network.Account + Comparable
-extension Profile.Network.Account: Comparable {
-	public static func < (lhs: Self, rhs: Self) -> Bool {
-		lhs.derivationIndex < rhs.derivationIndex
-	}
-}
-
-extension Profile.Network.Account {
-	var derivationIndex: HD.Path.Component.Child.Value {
-		switch securityState {
-		case let .unsecured(uec): uec.transactionSigning.derivationPath.index
-		}
-	}
-}
-
 extension AccountRecoveryScanInProgress {
 	private func derivePublicKeys(
 		state: inout State
@@ -247,12 +232,11 @@ extension AccountRecoveryScanInProgress {
 		state.maxIndex = derivationIndices.max()! + 1
 
 		let derivationPaths = try! OrderedSet(validating: derivationIndices.map {
-			switch state.scheme {
-			case .bip44:
+			if state.forOlympiaAccounts {
 				try! LegacyOlympiaBIP44LikeDerivationPath(
 					index: $0
 				).wrapAsDerivationPath()
-			case .slip10:
+			} else {
 				try! AccountBabylonDerivationPath(
 					networkID: networkID,
 					index: $0,
@@ -262,7 +246,6 @@ extension AccountRecoveryScanInProgress {
 		})
 		loggerGlobal.debug("✨paths: \(derivationPaths)")
 		state.status = .derivingPublicKeys
-		loggerGlobal.debug("Settings destination to derivePublicKeys")
 		let factorSourceOption: DerivePublicKeys.State.FactorSourceOption
 
 		switch state.mode {
@@ -298,7 +281,6 @@ extension AccountRecoveryScanInProgress {
 		state.destination = nil
 		return .run { send in
 			let (active, inactive) = try await performScan(accounts: accounts)
-			loggerGlobal.notice("✅Finished scanning for accounts => send(.internal(.foundAccounts))")
 			await send(.internal(.foundAccounts(active: active, inactive: inactive)))
 		}
 	}
@@ -310,31 +292,28 @@ extension AccountRecoveryScanInProgress {
 		inactive: IdentifiedArrayOf<Profile.Network.Account>
 	) {
 		let accountAddresses: [AccountAddress] = accounts.map(\.address)
-		let engineAddresses: [Address] = accountAddresses.map(\.asGeneral)
 
 		do {
-			let activeAccounts: [OnLedgerEntity.Account] = try await onLedgerEntitiesClient.getEntities(
-				engineAddresses,
-				[.ownerBadge, .ownerKeys],
-				nil,
-				true // force to refresh
-			).compactMap { (onLedgerEntity: OnLedgerEntity) -> OnLedgerEntity.Account? in
-				guard
-					let onLedgerAccount = onLedgerEntity.account,
-					case let metadata = onLedgerAccount.metadata,
-					let ownerKeys = metadata.ownerKeys,
-					let ownerBadge = metadata.ownerBadge
-				else { return nil }
+			let activeAccounts = try await onLedgerEntitiesClient
+				.getAccounts(
+					accountAddresses,
+					metadataKeys: [.ownerBadge, .ownerKeys],
+					forceRefresh: true
+				)
+				.filter { (onLedgerAccount: OnLedgerEntity.Account) -> Bool in
 
-				func hasStateChange(_ list: OnLedgerEntity.Metadata.ValueAtStateVersion<some Any>) -> Bool {
-					list.lastUpdatedAtStateVersion > 0
+					guard
+						case let metadata = onLedgerAccount.metadata,
+						let ownerKeys = metadata.ownerKeys,
+						let ownerBadge = metadata.ownerBadge
+					else { return false }
+
+					func hasStateChange(_ list: OnLedgerEntity.Metadata.ValueAtStateVersion<some Any>) -> Bool {
+						list.lastUpdatedAtStateVersion > 0
+					}
+					let isActive = hasStateChange(ownerKeys) || hasStateChange(ownerBadge)
+					return isActive
 				}
-				let isActive = hasStateChange(ownerKeys) || hasStateChange(ownerBadge)
-				guard isActive else {
-					return nil
-				}
-				return onLedgerAccount
-			}
 
 			var active: IdentifiedArrayOf<Profile.Network.Account> = []
 			var inactive: IdentifiedArrayOf<Profile.Network.Account> = []
@@ -361,5 +340,20 @@ extension AccountRecoveryScanInProgress {
 extension DerivationPath {
 	var index: HD.Path.Component.Child.Value {
 		try! hdFullPath().children.last!.nonHardenedValue
+	}
+}
+
+// MARK: - Profile.Network.Account + Comparable
+extension Profile.Network.Account: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		lhs.derivationIndex < rhs.derivationIndex
+	}
+}
+
+extension Profile.Network.Account {
+	var derivationIndex: HD.Path.Component.Child.Value {
+		switch securityState {
+		case let .unsecured(uec): uec.transactionSigning.derivationPath.index
+		}
 	}
 }

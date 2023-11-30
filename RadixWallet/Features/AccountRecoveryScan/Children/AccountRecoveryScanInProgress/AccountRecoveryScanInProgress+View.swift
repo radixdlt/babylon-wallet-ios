@@ -3,7 +3,7 @@ extension AccountRecoveryScanInProgress.State {
 		.init(
 			status: status,
 			kind: factorSourceIDFromHash.kind,
-			olympia: scheme == .bip44,
+			olympia: forOlympiaAccounts,
 			active: active,
 			hasFoundAnyAccounts: !active.isEmpty || !inactive.isEmpty,
 			maxIndex: batchNumber * batchSize
@@ -12,7 +12,7 @@ extension AccountRecoveryScanInProgress.State {
 }
 
 // MARK: - AccountRecoveryScanInProgress.View
-public let batchSize = 10
+public let batchSize = 50
 public extension AccountRecoveryScanInProgress {
 	struct ViewState: Equatable {
 		let status: AccountRecoveryScanInProgress.State.Status

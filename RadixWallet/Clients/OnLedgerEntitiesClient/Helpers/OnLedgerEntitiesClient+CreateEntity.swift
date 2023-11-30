@@ -360,7 +360,11 @@ extension OnLedgerEntitiesClient {
 			}
 		}
 
-		let allResources = try await getResources(allResourceAddresses, atLedgerState: account.atLedgerState, forceRefresh: refresh)
+		let allResources = try await getResources(
+			allResourceAddresses,
+			forceRefresh: refresh,
+			atLedgerState: account.atLedgerState
+		)
 
 		return ownedPoolUnits.compactMap { ownedPoolUnit -> OwnedResourcePoolDetails? in
 			guard let pool = pools.first(where: { $0.address == ownedPoolUnit.resourcePoolAddress }) else {
@@ -420,7 +424,11 @@ extension OnLedgerEntitiesClient {
 			$0.stakeUnitResource.asArray(\.resourceAddress) + $0.stakeClaimResource.asArray(\.resourceAddress)
 		}
 
-		let resourceDetails = try await getResources(resourceAddresses, atLedgerState: account.atLedgerState, forceRefresh: refresh)
+		let resourceDetails = try await getResources(
+			resourceAddresses,
+			forceRefresh: refresh,
+			atLedgerState: account.atLedgerState
+		)
 
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		let currentEpoch = try await gatewayAPIClient.getEpoch()
