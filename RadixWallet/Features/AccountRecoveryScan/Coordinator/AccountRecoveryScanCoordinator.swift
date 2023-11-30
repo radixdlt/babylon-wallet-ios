@@ -109,17 +109,19 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .accountRecoveryScanInProgress(.delegate(.foundAccounts(active, inactive))):
-			state.root = .selectInactiveAccountsToAdd(.init(active: active, inactive: inactive))
-			return .none
+
+			if inactive.isEmpty {
+				return completed(purpose: state.purpose, active: active, inactive: inactive)
+			} else {
+				state.root = .selectInactiveAccountsToAdd(.init(active: active, inactive: inactive))
+				return .none
+			}
+
 		case .accountRecoveryScanInProgress(.delegate(.failedToDerivePublicKey)):
 			return .send(.delegate(.dismissed))
 
 		case let .selectInactiveAccountsToAdd(.delegate(.finished(selectedInactive, active))):
-			var accounts = active
-			accounts.append(contentsOf: selectedInactive)
-			accounts.sort() // by index
-			loggerGlobal.debug("Successfully discovered and created #\(active.count) accounts and #\(selectedInactive.count) inactive accounts that was chosen by user, sorted by index, these are all the accounts we are gonna use:\n\(accounts)")
-			return completed(purpose: state.purpose, accounts: accounts)
+			return completed(purpose: state.purpose, active: active, inactive: selectedInactive)
 
 		default: return .none
 		}
@@ -127,12 +129,21 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 
 	private func completed(
 		purpose: State.Purpose,
-		accounts: IdentifiedArrayOf<Profile.Network.Account>
+		active: IdentifiedArrayOf<Profile.Network.Account>,
+		inactive: IdentifiedArrayOf<Profile.Network.Account>
 	) -> Effect<Action> {
+		let sortedAccounts = {
+			var accounts = active
+			accounts.append(contentsOf: active)
+			accounts.sort() // by index
+			loggerGlobal.debug("Successfully discovered and created #\(active.count) accounts and #\(inactive.count) inactive accounts that was chosen by user, sorted by index, these are all the accounts we are gonna use:\n\(sortedAccounts)")
+			return accounts
+		}()
+
 		switch purpose {
 		case let .createProfile(privateHD):
 			let recoveredAccountAndBDFS = AccountsRecoveredFromScanningUsingMnemonic(
-				accounts: accounts,
+				accounts: sortedAccounts,
 				deviceFactorSource: privateHD.factorSource
 			)
 			return .run { send in
@@ -145,7 +156,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		case .addAccounts:
 			return .run { send in
 				let result = await TaskResult<EqVoid> {
-					try await accountsClient.saveVirtualAccounts(Array(accounts))
+					try await accountsClient.saveVirtualAccounts(Array(sortedAccounts))
 				}
 				await send(.internal(.addAccountsToExistingProfileResult(result)))
 			}
