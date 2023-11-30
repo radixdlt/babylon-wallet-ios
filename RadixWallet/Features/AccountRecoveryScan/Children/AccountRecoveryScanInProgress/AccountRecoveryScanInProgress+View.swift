@@ -116,7 +116,7 @@ public extension AccountRecoveryScanInProgress {
 				.onFirstAppear {
 					viewStore.send(.onFirstAppear)
 				}
-				.destination(store: store)
+				.destinations(with: store)
 			}
 		}
 	}
@@ -133,7 +133,7 @@ private extension StoreOf<AccountRecoveryScanInProgress> {
 
 @MainActor
 private extension View {
-	func destination(store: StoreOf<AccountRecoveryScanInProgress>) -> some View {
+	func destinations(with store: StoreOf<AccountRecoveryScanInProgress>) -> some View {
 		let destinationStore = store.destination
 		return derivePublicKeys(with: destinationStore)
 	}

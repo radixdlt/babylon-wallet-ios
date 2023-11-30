@@ -148,15 +148,12 @@ extension OnLedgerEntitiesClient {
 		forceRefresh: Bool = false,
 		atLedgerState: AtLedgerState? = nil
 	) async throws -> OnLedgerEntity {
-		guard
-			let entity = try await getEntities(
-				addresses: [address],
-				metadataKeys: metadataKeys,
-				forceRefresh: forceRefresh,
-				atLedgerState: atLedgerState
-			)
-			.first
-		else {
+		guard let entity = try await getEntities(
+			addresses: [address],
+			metadataKeys: metadataKeys,
+			forceRefresh: forceRefresh,
+			atLedgerState: atLedgerState
+		).first else {
 			throw Error.emptyResponse
 		}
 
@@ -170,14 +167,12 @@ extension OnLedgerEntitiesClient {
 		forceRefresh: Bool = false,
 		atLedgerState: AtLedgerState? = nil
 	) async throws -> OnLedgerEntity.Account {
-		guard
-			let account = try await getEntity(
-				address.asGeneral,
-				metadataKeys: metadataKeys,
-				forceRefresh: forceRefresh,
-				atLedgerState: atLedgerState
-			).account
-		else {
+		guard let account = try await getEntity(
+			address.asGeneral,
+			metadataKeys: metadataKeys,
+			forceRefresh: forceRefresh,
+			atLedgerState: atLedgerState
+		).account else {
 			throw Error.emptyResponse
 		}
 		return account
@@ -204,12 +199,10 @@ extension OnLedgerEntitiesClient {
 		_ address: DappDefinitionAddress,
 		forceRefresh: Bool = false
 	) async throws -> OnLedgerEntity.AssociatedDapp {
-		guard
-			let dApp = try await getAssociatedDapps(
-				[address],
-				forceRefresh: forceRefresh
-			).first
-		else {
+		guard let dApp = try await getAssociatedDapps(
+			[address],
+			forceRefresh: forceRefresh
+		).first else {
 			throw Error.emptyResponse
 		}
 		return dApp
@@ -236,12 +229,11 @@ extension OnLedgerEntitiesClient {
 		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys,
 		atLedgerState: AtLedgerState? = nil
 	) async throws -> OnLedgerEntity.Resource {
-		guard
-			let resource = try await getResources(
-				[address],
-				metadataKeys: metadataKeys,
-				atLedgerState: atLedgerState
-			).first
+		guard let resource = try await getResources(
+			[address],
+			metadataKeys: metadataKeys,
+			atLedgerState: atLedgerState
+		).first
 		else {
 			throw Error.emptyResponse
 		}
@@ -258,8 +250,7 @@ extension OnLedgerEntitiesClient {
 			metadataKeys: [.dappDefinition]
 		).genericComponent?.metadata
 
-		guard
-			let dappDefinitionAddress = entityMetadata?.dappDefinition
+		guard let dappDefinitionAddress = entityMetadata?.dappDefinition
 		else {
 			throw OnLedgerEntity.Metadata.MetadataError.missingDappDefinition
 		}

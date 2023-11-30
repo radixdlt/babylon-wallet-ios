@@ -34,9 +34,10 @@ public extension SelectInactiveAccountsToAdd {
 					send: { .view($0) }
 				) { viewStore in
 					VStack {
-						Text("Add Inactive Accounts?")
+						Text("Add Inactive Accounts?") // FIXME: Strings
 							.textStyle(.sheetTitle)
 
+						// FIXME: Strings
 						Text("These Accounts were never used, but you *may* have created them. Check and addresses that you wish to keep:")
 
 						ScrollView {
@@ -63,7 +64,7 @@ public extension SelectInactiveAccountsToAdd {
 					}
 					.padding()
 					.footer {
-						Button("Continue") {
+						Button("Continue") { // FIXME: Strings
 							store.send(.view(.doneTapped))
 						}
 						.buttonStyle(.primaryRectangular)

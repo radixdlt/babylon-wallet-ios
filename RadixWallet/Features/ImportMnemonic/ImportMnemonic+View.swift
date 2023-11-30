@@ -127,7 +127,7 @@ extension ImportMnemonic {
 
 						if !viewStore.isWordCountFixed {
 							VStack(alignment: .center) {
-								let label = "Number of Seed Phrase Words"
+								let label = "Number of Seed Phrase Words" // FIXME: Strings
 								Text("\(label)").textStyle(.body1HighImportance).foregroundStyle(Color.app.gray1)
 
 								Picker(label, selection: viewStore.binding(
