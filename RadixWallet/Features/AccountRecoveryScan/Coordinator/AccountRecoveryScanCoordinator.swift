@@ -132,11 +132,11 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		active: IdentifiedArrayOf<Profile.Network.Account>,
 		inactive: IdentifiedArrayOf<Profile.Network.Account>
 	) -> Effect<Action> {
-		let sortedAccounts = {
+		let sortedAccounts: IdentifiedArrayOf<Profile.Network.Account> = { () -> IdentifiedArrayOf<Profile.Network.Account> in
 			var accounts = active
 			accounts.append(contentsOf: active)
 			accounts.sort() // by index
-			loggerGlobal.debug("Successfully discovered and created #\(active.count) accounts and #\(inactive.count) inactive accounts that was chosen by user, sorted by index, these are all the accounts we are gonna use:\n\(sortedAccounts)")
+			loggerGlobal.debug("Successfully discovered and created #\(active.count) accounts and #\(inactive.count) inactive accounts that was chosen by user, sorted by index, these are all the accounts we are gonna use:\n\(accounts)")
 			return accounts
 		}()
 
