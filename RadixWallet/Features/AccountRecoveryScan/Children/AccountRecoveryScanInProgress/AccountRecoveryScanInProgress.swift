@@ -194,7 +194,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 								factorSourceID: id,
 								publicHDKey: publicHDKey
 							),
-							displayName: "Unnamed",
+							displayName: "Unnamed", // FIXME: Strings
 							extraProperties: .init(
 								appearanceID: appearanceID,
 								onLedgerSettings: .unknown

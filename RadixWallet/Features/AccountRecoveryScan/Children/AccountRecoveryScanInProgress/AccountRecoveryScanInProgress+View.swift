@@ -64,11 +64,11 @@ public extension AccountRecoveryScanInProgress {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(alignment: .leading, spacing: .medium1) {
+				VStack(alignment: .center, spacing: .medium1) {
 					Text(viewStore.title)
 						.textStyle(.sheetTitle)
 
-					VStack(alignment: .leading, spacing: .medium1) {
+					VStack(alignment: .center, spacing: .medium1) {
 						if viewStore.isScanInProgress {
 							// FIXME: Strings
 							Text("Scanning for Accounts that have been included in at least on transaction, using:")
@@ -81,7 +81,7 @@ public extension AccountRecoveryScanInProgress {
 
 					if viewStore.active.isEmpty {
 						if !viewStore.isScanInProgress {
-							NoContentView("No accounts.") // FIXME: Strings
+							NoContentView("None found.") // FIXME: Strings
 						}
 					} else {
 						ScrollView {

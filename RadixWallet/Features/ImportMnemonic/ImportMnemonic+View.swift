@@ -151,7 +151,7 @@ extension ImportMnemonic {
 								viewStore.send(.debugCopyMnemonic)
 							}
 							.buttonStyle(.secondaryRectangular(isDestructive: true))
-							.padding(.bottom, .medium1)
+							.padding(.medium1)
 						} else {
 							Button("DEBUG Acc.Rec.Scan.mne (24)") {
 								viewStore.send(.debugUseTestingMnemonicWithActiveAccounts)
@@ -163,7 +163,7 @@ extension ImportMnemonic {
 									isInToolbar: true
 								)
 							)
-							.padding(.bottom, .medium3)
+							.padding(.medium1)
 
 							Button(
 								"DEBUG zoo..vote (24)"
@@ -179,7 +179,7 @@ extension ImportMnemonic {
 									isInToolbar: true
 								)
 							)
-							.padding(.bottom, .medium3)
+							.padding(.medium1)
 
 							AppTextField(
 								placeholder: "DEBUG ONLY paste mnemonic",
