@@ -104,12 +104,14 @@ public extension AccountRecoveryScanInProgress {
 					// FIXME: Strings
 					Button("Tap here to scan the next \(batchSize)") {
 						store.send(.view(.scanMore))
-					}.buttonStyle(.alternativeRectangular)
+					}
+					.buttonStyle(.alternativeRectangular)
 
 					// FIXME: Strings
 					Button("Continue") {
 						store.send(.view(.continueTapped))
-					}.buttonStyle(.primaryRectangular)
+					}
+					.buttonStyle(.primaryRectangular)
 				}
 				.onFirstAppear {
 					viewStore.send(.onFirstAppear)
