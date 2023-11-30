@@ -101,7 +101,6 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	@Dependency(\.accountsClient) var accountsClient
-	@Dependency(\.continuousClock) var clock
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
@@ -181,35 +180,41 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	}
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		let globalOffset = state.active.count + state.inactive.count
 		switch presentedAction {
 		case let .derivePublicKeys(.delegate(delegateAction)):
-			loggerGlobal.notice("Finish deriving public keys => `state.destination = nil`")
 			switch delegateAction {
 			case let .derivedPublicKeys(publicHDKeys, factorSourceID, networkID):
 				let id = state.factorSourceIDFromHash
 				assert(factorSourceID == id.embed())
 				assert(networkID == state.networkID)
+
 				return .run { send in
-					let accounts = await publicHDKeys.enumerated().asyncMap {
-						offset,
-							publicHDKey in
+					let accounts = try await publicHDKeys.enumerated().asyncMap { localOffset, publicHDKey in
+						let offset = localOffset + globalOffset
 						let appearanceID = await accountsClient.nextAppearanceID(networkID, offset)
-						let account = try! Profile.Network.Account(
+						return try Profile.Network.Account(
 							networkID: networkID,
-							factorInstance: .init(
+							factorInstance: HierarchicalDeterministicFactorInstance(
 								factorSourceID: id,
 								publicHDKey: publicHDKey
 							),
 							displayName: "Unnamed", // FIXME: Strings
 							extraProperties: .init(
 								appearanceID: appearanceID,
+								// We will be replacing the `depositRule` with one fetched from GW
+								// in `scan` step later on.
 								onLedgerSettings: .unknown
 							)
 						)
-						return account
 					}.asIdentifiable()
-					try? await clock.sleep(for: .milliseconds(300))
+
 					await send(.internal(.startScan(accounts: accounts)))
+				} catch: { error, send in
+					let errorMsg = "Failed to create account, error: \(error)"
+					loggerGlobal.critical(.init(stringLiteral: errorMsg))
+					assertionFailure(errorMsg)
+					await send(.delegate(.failedToDerivePublicKey))
 				}
 
 			case .failedToDerivePublicKey:
@@ -261,8 +266,6 @@ extension AccountRecoveryScanInProgress {
 			assertionFailure(errorMsg)
 			return .send(.delegate(.failedToDerivePublicKey))
 		}
-		loggerGlobal.debug("✨paths: \(derivationPaths)")
-		state.status = .derivingPublicKeys
 		let factorSourceOption: DerivePublicKeys.State.FactorSourceOption
 
 		switch state.mode {
@@ -280,6 +283,7 @@ extension AccountRecoveryScanInProgress {
 			factorSourceOption = .specificPrivateHDFactorSource(privateHDFactorSource)
 		}
 
+		state.status = .derivingPublicKeys
 		state.destination = .derivePublicKeys(.init(
 			derivationPathOption: .knownPaths(
 				Array(derivationPaths),
@@ -292,7 +296,10 @@ extension AccountRecoveryScanInProgress {
 		return .none
 	}
 
-	private func scanOnLedger(accounts: IdentifiedArrayOf<Profile.Network.Account>, state: inout State) -> Effect<Action> {
+	private func scanOnLedger(
+		accounts: IdentifiedArrayOf<Profile.Network.Account>,
+		state: inout State
+	) -> Effect<Action> {
 		assert(accounts.count == batchSize)
 		state.status = .scanningNetworkForActiveAccounts
 		state.destination = nil
@@ -363,6 +370,7 @@ extension AccountRecoveryScanInProgress {
 			// info including urls.
 			_ = try await onLedgerEntitiesClient
 				.getAccounts(
+					// no need to fetch for `inactive` accounts.
 					activeAccounts.map(\.address),
 					metadataKeys: .resourceMetadataKeys,
 					forceRefresh: true
@@ -379,7 +387,14 @@ extension AccountRecoveryScanInProgress {
 
 extension DerivationPath {
 	var index: HD.Path.Component.Child.Value {
-		try! hdFullPath().children.last!.nonHardenedValue
+		do {
+			guard let index = try hdFullPath().children.last?.nonHardenedValue else {
+				fatalError("Expected to ALWAYS be able to read the last path component of an HD paths' index, but was nil.")
+			}
+			return index
+		} catch {
+			fatalError("Expected to ALWAYS be able to read the last path component of an HD paths' index, got error: \(error)")
+		}
 	}
 }
 
