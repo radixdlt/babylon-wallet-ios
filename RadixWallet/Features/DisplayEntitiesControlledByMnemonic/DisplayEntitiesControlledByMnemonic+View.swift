@@ -3,15 +3,7 @@ import SwiftUI
 
 extension DisplayEntitiesControlledByMnemonic.State {
 	var viewState: DisplayEntitiesControlledByMnemonic.ViewState {
-		let accountsCount = accountsForDeviceFactorSource.accounts.count
-		let connectedAccounts: String = if accountsCount == 1 {
-			L10n.SeedPhrases.SeedPhrase.oneConnectedAccount
-		} else {
-			L10n.SeedPhrases.SeedPhrase.multipleConnectedAccounts(accountsCount)
-		}
-
-		return .init(
-			connectedAccounts: connectedAccounts,
+		.init(
 			headingState: {
 				switch mode {
 				case .mnemonicCanBeDisplayed:
@@ -24,8 +16,7 @@ extension DisplayEntitiesControlledByMnemonic.State {
 						isError: true
 					)
 				case .displayAccountListOnly:
-					.defaultHeading(type: .selectable(true))
-//					nil
+					nil
 				}
 			}(),
 			promptUserToBackUpMnemonic: mode == .mnemonicCanBeDisplayed && !accountsForDeviceFactorSource.isMnemonicMarkedAsBackedUp,
@@ -38,7 +29,6 @@ extension DisplayEntitiesControlledByMnemonic.State {
 // MARK: - DisplayEntitiesControlledByMnemonic.ViewState
 extension DisplayEntitiesControlledByMnemonic {
 	public struct ViewState: Equatable {
-		public let connectedAccounts: String
 		public struct HeadingState: Equatable {
 			public let title: String
 			public let imageAsset: ImageAsset
@@ -93,6 +83,11 @@ extension DisplayEntitiesControlledByMnemonic {
 		let viewState: ViewState
 		let action: () -> Void
 
+		init(viewState: ViewState, action: @escaping () -> Void = {}) {
+			self.viewState = viewState
+			self.action = action
+		}
+
 		var body: some SwiftUI.View {
 			VStack(alignment: .leading) {
 				if let headingState = viewState.headingState {
@@ -142,7 +137,7 @@ extension DisplayEntitiesControlledByMnemonic {
 						.textStyle(.body1Header)
 						.foregroundColor(headingState.foregroundColor)
 
-					Text(viewState.connectedAccounts)
+					Text(connectedAccountsLabel(count: viewState.accounts.count))
 						.textStyle(.body2Regular)
 						.foregroundColor(.app.gray2)
 				}
@@ -155,6 +150,14 @@ extension DisplayEntitiesControlledByMnemonic {
 				case let .selectable(isSelected):
 					RadioButton(appearance: .light, state: isSelected ? .selected : .unselected)
 				}
+			}
+		}
+
+		private func connectedAccountsLabel(count: Int) -> String {
+			if count == 1 {
+				L10n.SeedPhrases.SeedPhrase.oneConnectedAccount
+			} else {
+				L10n.SeedPhrases.SeedPhrase.multipleConnectedAccounts(count)
 			}
 		}
 	}

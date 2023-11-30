@@ -1,8 +1,19 @@
 import ComposableArchitecture
 import SwiftUI
 
+extension ManualAccountRecoverySeedPhraseCoordinator.State {
+	var viewState: ManualAccountRecoverySeedPhraseCoordinator.ViewState {
+		.init(selected: selected, deviceFactorSources: deviceFactorSources)
+	}
+}
+
 // MARK: - ManualAccountRecoverySeedPhraseCoordinator.View
 extension ManualAccountRecoverySeedPhraseCoordinator {
+	public struct ViewState: Equatable {
+		public let selected: EntitiesControlledByFactorSource?
+		public let deviceFactorSources: IdentifiedArrayOf<EntitiesControlledByFactorSource>
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: Store
@@ -34,10 +45,6 @@ extension ManualAccountRecoverySeedPhraseCoordinator.View {
 
 // MARK: - ManualAccountRecoverySeedPhraseCoordinator.View.PathView
 private extension ManualAccountRecoverySeedPhraseCoordinator.View {
-	struct ViewState: Equatable {
-		let accounts: [AccountView.ViewState]
-	}
-
 	var rootView: some View {
 		ScrollView {
 			VStack(spacing: .zero) {
@@ -46,7 +53,7 @@ private extension ManualAccountRecoverySeedPhraseCoordinator.View {
 					.textStyle(.sheetTitle)
 					.foregroundStyle(.app.gray1)
 					.padding(.top, .medium3)
-					.padding(.horizontal, .large1)
+					.padding(.horizontal, .large2)
 					.padding(.bottom, .large3)
 
 				Text("Choose the Olympia seed phrase to use for derivation") // FIXME: Strings
@@ -68,10 +75,14 @@ private extension ManualAccountRecoverySeedPhraseCoordinator.View {
 			}
 		}
 		.footer {
-			Button("Continue") { // FIXME: Strings
-				store.send(.view(.continueButtonTapped))
+			WithViewStore(store, observe: \.selected) { viewStore in
+				WithControlRequirements(viewStore.state) { selection in
+					store.send(.view(.continueButtonTapped(selection)))
+				} control: { action in
+					Button("Continue", action: action) // FIXME: Strings
+						.buttonStyle(.primaryRectangular(shouldExpand: true))
+				}
 			}
-			.buttonStyle(.primaryRectangular(shouldExpand: true))
 		}
 		.onAppear {
 			store.send(.view(.appeared))
@@ -79,18 +90,25 @@ private extension ManualAccountRecoverySeedPhraseCoordinator.View {
 	}
 
 	private func mnemonics() -> some View {
-//		Selection(, from: <#T##Sequence#>) {}
-		ForEachStore(
-			store.scope(
-				state: \.deviceFactorSources,
-				action: { .child(.deviceFactorSource(id: $0, action: $1)) }
-			)
-		) { store in
-			Card(.app.gray4) {
-				DisplayEntitiesControlledByMnemonic.View(store: store)
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			let binding = viewStore.binding(get: \.selected, send: ManualAccountRecoverySeedPhraseCoordinator.ViewAction.selected)
+			Selection(binding, from: viewStore.deviceFactorSources) { item in
+				Card(.app.gray5) {
+					viewStore.send(.selected(item.value))
+				} contents: {
+					DisplayEntitiesControlledByMnemonic.MnemonicView(
+						viewState: .init(
+							headingState: .defaultHeading(type: .selectable(item.isSelected)),
+							promptUserToBackUpMnemonic: false,
+							accounts: item.value.accounts,
+							hasHiddenAccounts: !item.value.hiddenAccounts.isEmpty
+						)
+					)
 					.padding(.medium3)
+				}
+				.cardShadow
+				.padding(.horizontal, .medium1)
 			}
-			.padding(.horizontal, .medium1)
 		}
 	}
 
