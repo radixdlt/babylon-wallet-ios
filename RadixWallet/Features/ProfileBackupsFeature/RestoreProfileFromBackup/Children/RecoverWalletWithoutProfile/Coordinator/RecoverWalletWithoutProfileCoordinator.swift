@@ -116,7 +116,15 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		case .path(.element(_, action: .recoverWalletControlWithBDFSOnly(.delegate(.continue)))):
 			state.path.append(
 				.importMnemonic(
-					.init(header: .init(title: L10n.EnterSeedPhrase.Header.title), persistStrategy: nil, wordCount: .twentyFour)
+					.init(
+						header: .init(
+							title: L10n.EnterSeedPhrase.Header.title
+						),
+						// we require 24 word Babylon mnemonic
+						isWordCountFixed: true,
+						persistStrategy: nil,
+						wordCount: .twentyFour
+					)
 				)
 			)
 			return .none
