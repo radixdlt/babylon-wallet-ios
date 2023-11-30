@@ -222,34 +222,45 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 }
 
 extension AccountRecoveryScanInProgress {
-	private func derivePublicKeys(
-		state: inout State
-	) -> Effect<Action> {
+	private func nextDerivationPaths(state: inout State) throws -> OrderedSet<DerivationPath> {
 		let networkID = state.networkID
-		let used = state.indicesOfAlreadyUsedEntities
 
 		let derivationIndices = generateIntegers(
 			start: state.maxIndex ?? 0,
 			count: batchSize,
-			shouldInclude: { !used.contains($0) }
+			excluding: state.indicesOfAlreadyUsedEntities
 		)
 
 		assert(derivationIndices.count == batchSize)
 		state.maxIndex = derivationIndices.max()! + 1
 
-		let derivationPaths = try! OrderedSet(validating: derivationIndices.map {
+		return try OrderedSet(validating: derivationIndices.map {
 			if state.forOlympiaAccounts {
-				try! LegacyOlympiaBIP44LikeDerivationPath(
+				try LegacyOlympiaBIP44LikeDerivationPath(
 					index: $0
 				).wrapAsDerivationPath()
 			} else {
-				try! AccountBabylonDerivationPath(
+				try AccountBabylonDerivationPath(
 					networkID: networkID,
 					index: $0,
 					keyKind: .virtualEntity
 				).wrapAsDerivationPath()
 			}
 		})
+	}
+
+	private func derivePublicKeys(
+		state: inout State
+	) -> Effect<Action> {
+		let derivationPaths: OrderedSet<DerivationPath>
+		do {
+			derivationPaths = try nextDerivationPaths(state: &state)
+		} catch {
+			let errorMsg = "Failed to calculate next derivation paths"
+			loggerGlobal.error(.init(stringLiteral: errorMsg))
+			assertionFailure(errorMsg)
+			return .send(.delegate(.failedToDerivePublicKey))
+		}
 		loggerGlobal.debug("✨paths: \(derivationPaths)")
 		state.status = .derivingPublicKeys
 		let factorSourceOption: DerivePublicKeys.State.FactorSourceOption
@@ -272,7 +283,7 @@ extension AccountRecoveryScanInProgress {
 		state.destination = .derivePublicKeys(.init(
 			derivationPathOption: .knownPaths(
 				Array(derivationPaths),
-				networkID: networkID
+				networkID: state.networkID
 			),
 			factorSourceOption: factorSourceOption,
 			purpose: .createEntity(kind: .account)
