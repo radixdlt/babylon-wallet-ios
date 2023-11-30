@@ -112,6 +112,7 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 		switch internalAction {
 		case let .loadedDeviceFactorSources(.success(deviceFactorSources)):
 			state.deviceFactorSources = deviceFactorSources
+			print("LOADED \(deviceFactorSources.count)")
 			return .none
 
 		case let .loadedDeviceFactorSources(.failure(error)):

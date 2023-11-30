@@ -24,7 +24,8 @@ extension DisplayEntitiesControlledByMnemonic.State {
 						isError: true
 					)
 				case .displayAccountListOnly:
-					nil
+					.defaultHeading(type: .selectable(true))
+//					nil
 				}
 			}(),
 			promptUserToBackUpMnemonic: mode == .mnemonicCanBeDisplayed && !accountsForDeviceFactorSource.isMnemonicMarkedAsBackedUp,
@@ -93,43 +94,14 @@ extension DisplayEntitiesControlledByMnemonic {
 		let action: () -> Void
 
 		var body: some SwiftUI.View {
-			if let headingState = viewState.headingState {
-				if headingState.type == .button {
-					Button(action: action) {
-						heading(headingState)
-					}
-				} else {
-					heading(headingState)
-				}
-			}
-		}
-
-		private func heading(_ headingState: ViewState.HeadingState) -> some SwiftUI.View {
 			VStack(alignment: .leading) {
-				HStack {
-					Image(asset: headingState.imageAsset)
-						.resizable()
-						.renderingMode(.template)
-						.frame(.smallest)
-						.foregroundColor(headingState.foregroundColor)
-
-					VStack(alignment: .leading) {
-						Text(headingState.title)
-							.textStyle(.body1Header)
-							.foregroundColor(headingState.foregroundColor)
-
-						Text(viewState.connectedAccounts)
-							.textStyle(.body2Regular)
-							.foregroundColor(.app.gray2)
-					}
-
-					Spacer(minLength: 0)
-
-					switch headingState.type {
-					case .button:
-						Image(asset: AssetResource.chevronRight)
-					case let .selectable(isSelected):
-						RadioButton(appearance: .light, state: isSelected ? .selected : .unselected)
+				if let headingState = viewState.headingState {
+					if headingState.type == .button {
+						Button(action: action) {
+							heading(headingState)
+						}
+					} else {
+						heading(headingState)
 					}
 				}
 
@@ -153,6 +125,35 @@ extension DisplayEntitiesControlledByMnemonic {
 						.frame(maxWidth: .infinity)
 						.frame(height: .huge2)
 						.padding(.vertical, .medium1)
+				}
+			}
+		}
+
+		private func heading(_ headingState: ViewState.HeadingState) -> some SwiftUI.View {
+			HStack {
+				Image(asset: headingState.imageAsset)
+					.resizable()
+					.renderingMode(.template)
+					.frame(.smallest)
+					.foregroundColor(headingState.foregroundColor)
+
+				VStack(alignment: .leading) {
+					Text(headingState.title)
+						.textStyle(.body1Header)
+						.foregroundColor(headingState.foregroundColor)
+
+					Text(viewState.connectedAccounts)
+						.textStyle(.body2Regular)
+						.foregroundColor(.app.gray2)
+				}
+
+				Spacer(minLength: 0)
+
+				switch headingState.type {
+				case .button:
+					Image(asset: AssetResource.chevronRight)
+				case let .selectable(isSelected):
+					RadioButton(appearance: .light, state: isSelected ? .selected : .unselected)
 				}
 			}
 		}
