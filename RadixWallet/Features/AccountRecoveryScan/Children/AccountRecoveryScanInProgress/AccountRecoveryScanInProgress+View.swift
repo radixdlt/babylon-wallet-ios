@@ -114,6 +114,7 @@ public extension AccountRecoveryScanInProgress {
 					viewStore.send(.onFirstAppear)
 				}
 				.destination(store: store)
+				.navigationTransition(.slide, interactivity: .disabled)
 			}
 		}
 	}

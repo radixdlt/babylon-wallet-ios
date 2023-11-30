@@ -12,6 +12,17 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 
 		public var root: Root
 
+		// FIXME: Clean this up! we are temporily force to use
+		// tree based navigation with `root` since SwiftUI did not
+		// like our 9 levels deep navigation tree when coming here
+		// from onboarding. We really wanted to use a NavigationStack
+		// here, but that broke the feature, so until we flatten nav
+		// depth of onboarding we need tree based, but we wanna be
+		// able to go back from `selectInactiveAccountsToAdd` screen
+		// to `accountRecoveryScanInProgress`, this is the easiest
+		// way to preserve the exact state of that screen....
+		public var backTo: AccountRecoveryScanInProgress.State?
+
 		/// Create new Profile or add accounts
 		public enum Purpose: Sendable, Hashable {
 			case createProfile(PrivateHDFactorSource)
@@ -22,22 +33,25 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 			)
 		}
 
-		public init(purpose: Purpose) {
-			self.purpose = purpose
-
+		static func accountRecoveryScanInProgressState(purpose: Purpose) -> AccountRecoveryScanInProgress.State {
 			switch purpose {
 			case let .addAccounts(id, forOlympiaAccounts):
-				self.root = .accountRecoveryScanInProgress(.init(
+				AccountRecoveryScanInProgress.State(
 					mode: .factorSourceWithID(id: id),
 					forOlympiaAccounts: forOlympiaAccounts
-				))
+				)
 
 			case let .createProfile(privateHDFactorSource):
-				self.root = .accountRecoveryScanInProgress(.init(
+				AccountRecoveryScanInProgress.State(
 					mode: .privateHD(privateHDFactorSource),
 					forOlympiaAccounts: false
-				))
+				)
 			}
+		}
+
+		public init(purpose: Purpose) {
+			self.purpose = purpose
+			self.root = .accountRecoveryScanInProgress(Self.accountRecoveryScanInProgressState(purpose: purpose))
 		}
 	}
 
@@ -109,7 +123,11 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .accountRecoveryScanInProgress(.delegate(.foundAccounts(active, inactive))):
-
+			switch state.root {
+			case let .accountRecoveryScanInProgress(childState):
+				state.backTo = childState
+			case .selectInactiveAccountsToAdd: assertionFailure("Discrepancy, wrong state")
+			}
 			if inactive.isEmpty {
 				return completed(purpose: state.purpose, active: active, inactive: inactive)
 			} else {
@@ -120,6 +138,10 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		case .accountRecoveryScanInProgress(.delegate(.failedToDerivePublicKey)):
 			return .send(.delegate(.dismissed))
 
+		case let .selectInactiveAccountsToAdd(.delegate(.goBack)):
+			let childState = state.backTo ?? AccountRecoveryScanCoordinator.State.accountRecoveryScanInProgressState(purpose: state.purpose)
+			state.root = .accountRecoveryScanInProgress(childState)
+			return .none
 		case let .selectInactiveAccountsToAdd(.delegate(.finished(selectedInactive, active))):
 			return completed(purpose: state.purpose, active: active, inactive: selectedInactive)
 

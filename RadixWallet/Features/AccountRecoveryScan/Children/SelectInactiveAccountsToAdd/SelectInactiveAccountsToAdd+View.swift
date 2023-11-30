@@ -67,6 +67,15 @@ public extension SelectInactiveAccountsToAdd {
 					}
 					.buttonStyle(.primaryRectangular)
 				}
+				.toolbar {
+					ToolbarItem(placement: .navigationBarLeading) {
+						BackButton {
+							viewStore.send(.backButtonTapped)
+						}
+						.foregroundColor(.app.white)
+					}
+				}
+				.navigationTransition(.slide, interactivity: .disabled)
 			}
 		}
 	}
