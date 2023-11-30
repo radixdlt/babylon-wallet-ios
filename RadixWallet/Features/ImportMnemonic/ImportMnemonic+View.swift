@@ -146,24 +146,6 @@ extension ImportMnemonic {
 						}
 
 						#if DEBUG
-						Button("DEBUG use Acc.Rec.Scan.mne") {
-							viewStore.send(.debugUseTestingMnemonic)
-						}
-						.buttonStyle(.secondaryRectangular(isDestructive: true))
-						.padding(.bottom, .medium1)
-						#endif
-
-						wordsGrid(with: viewStore)
-							.padding(.horizontal, .medium2)
-							.padding(.bottom, .large3)
-
-						if viewStore.isShowingPassphrase {
-							passphrase(with: viewStore)
-								.padding(.horizontal, .medium2)
-								.padding(.bottom, .medium2)
-						}
-
-						#if DEBUG
 						if viewStore.isReadonlyMode {
 							Button("DEBUG ONLY Copy") {
 								viewStore.send(.debugCopyMnemonic)
@@ -171,6 +153,34 @@ extension ImportMnemonic {
 							.buttonStyle(.secondaryRectangular(isDestructive: true))
 							.padding(.bottom, .medium1)
 						} else {
+							Button("DEBUG Acc.Rec.Scan.mne (24)") {
+								viewStore.send(.debugUseTestingMnemonicWithActiveAccounts)
+							}
+							.buttonStyle(
+								.secondaryRectangular(
+									shouldExpand: true,
+									isDestructive: true,
+									isInToolbar: true
+								)
+							)
+							.padding(.bottom, .medium3)
+
+							Button(
+								"DEBUG zoo..vote (24)"
+							) {
+								viewStore.send(
+									.debugUseTestingMnemonicZooVote
+								)
+							}
+							.buttonStyle(
+								.secondaryRectangular(
+									shouldExpand: true,
+									isDestructive: true,
+									isInToolbar: true
+								)
+							)
+							.padding(.bottom, .medium3)
+
 							AppTextField(
 								placeholder: "DEBUG ONLY paste mnemonic",
 								text: viewStore.binding(
@@ -188,6 +198,16 @@ extension ImportMnemonic {
 							.padding(.bottom, .medium2)
 						}
 						#endif
+
+						wordsGrid(with: viewStore)
+							.padding(.horizontal, .medium2)
+							.padding(.bottom, .large3)
+
+						if viewStore.isShowingPassphrase {
+							passphrase(with: viewStore)
+								.padding(.horizontal, .medium2)
+								.padding(.bottom, .medium2)
+						}
 
 						if !viewStore.isReadonlyMode {
 							Button(viewStore.modeButtonTitle) {

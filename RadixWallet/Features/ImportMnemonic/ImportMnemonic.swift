@@ -254,7 +254,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		#if DEBUG
 		case debugCopyMnemonic
 		case debugMnemonicChanged(String)
-		case debugUseTestingMnemonic
+		case debugUseTestingMnemonicWithActiveAccounts
+		case debugUseTestingMnemonicZooVote
 		case debugPasteMnemonic
 		#endif
 	}
@@ -451,8 +452,11 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			let toPaste = pasteboardClient.getString() ?? ""
 			return .send(.view(.debugMnemonicChanged(toPaste)))
 
-		case .debugUseTestingMnemonic:
+		case .debugUseTestingMnemonicWithActiveAccounts:
 			return .send(.view(.debugMnemonicChanged("wine over village stage barrel strategy cushion decline echo fiber salad carry empower fun awful cereal galaxy laundry practice appear bean flat mansion license")))
+
+		case .debugUseTestingMnemonicZooVote:
+			return .send(.view(.debugMnemonicChanged(Mnemonic.testValueZooVote.phrase.rawValue)))
 		#endif
 		}
 	}

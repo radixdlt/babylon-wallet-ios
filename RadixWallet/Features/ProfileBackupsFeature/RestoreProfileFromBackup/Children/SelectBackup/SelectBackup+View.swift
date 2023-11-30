@@ -163,12 +163,7 @@ extension SelectBackup.View {
 		Button(title) {
 			store.send(.view(action))
 		}
-		.foregroundColor(.app.blue2)
-		.font(.app.body1Header)
-		.frame(height: .standardButtonHeight)
-		.frame(maxWidth: .infinity)
-		.background(.app.white)
-		.cornerRadius(.small2)
+		.buttonStyle(.alternativeRectangular)
 	}
 }
 

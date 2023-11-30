@@ -64,23 +64,20 @@ public extension AccountRecoveryScanInProgress {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack {
+				VStack(alignment: .leading, spacing: .medium1) {
 					Text(viewStore.title)
 						.textStyle(.sheetTitle)
 
-					if viewStore.isScanInProgress {
-						// FIXME: Strings
-						Text("Scanning for Accounts that have been included in at least on transaction, using:")
-						Text("**\(viewStore.factorSourceDescription)**").frame(height: .standardButtonHeight)
-					} else {
-						// FIXME: Strings
-						Text("The first \(viewStore.maxIndex) potential accounts from this signing factor were scanned.")
-
-						// FIXME: Strings
-						Button("Tap here to scan the next \(batchSize)") {
-							store.send(.view(.scanMore))
-						}.buttonStyle(.secondaryRectangular(shouldExpand: true))
-					}
+					VStack(alignment: .leading, spacing: .medium1) {
+						if viewStore.isScanInProgress {
+							// FIXME: Strings
+							Text("Scanning for Accounts that have been included in at least on transaction, using:")
+							Text("**\(viewStore.factorSourceDescription)**")
+						} else {
+							// FIXME: Strings
+							Text("The first \(viewStore.maxIndex) potential accounts from this signing factor were scanned.")
+						}
+					}.frame(height: .huge3) // static height else account list "jumps"
 
 					if viewStore.active.isEmpty {
 						if !viewStore.isScanInProgress {
@@ -103,6 +100,11 @@ public extension AccountRecoveryScanInProgress {
 				.presentsLoadingViewOverlay()
 				.padding()
 				.footer {
+					// FIXME: Strings
+					Button("Tap here to scan the next \(batchSize)") {
+						store.send(.view(.scanMore))
+					}.buttonStyle(.alternativeRectangular)
+
 					// FIXME: Strings
 					Button("Continue") {
 						store.send(.view(.continueTapped))
