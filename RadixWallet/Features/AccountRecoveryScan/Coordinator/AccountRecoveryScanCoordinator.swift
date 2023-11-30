@@ -138,7 +138,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		case .accountRecoveryScanInProgress(.delegate(.failedToDerivePublicKey)):
 			return .send(.delegate(.dismissed))
 
-		case let .selectInactiveAccountsToAdd(.delegate(.goBack)):
+		case .selectInactiveAccountsToAdd(.delegate(.goBack)):
 			let childState = state.backTo ?? AccountRecoveryScanCoordinator.State.accountRecoveryScanInProgressState(purpose: state.purpose)
 			state.root = .accountRecoveryScanInProgress(childState)
 			return .none

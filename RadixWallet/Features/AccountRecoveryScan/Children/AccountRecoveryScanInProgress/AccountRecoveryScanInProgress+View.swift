@@ -77,7 +77,8 @@ public extension AccountRecoveryScanInProgress {
 							// FIXME: Strings
 							Text("The first \(viewStore.maxIndex) potential accounts from this signing factor were scanned.")
 						}
-					}.frame(height: .huge3) // static height else account list "jumps"
+					}
+					.frame(height: 100) // static height else account list "jumps" when going between scanInProgress and scanCompleted
 
 					if viewStore.active.isEmpty {
 						if !viewStore.isScanInProgress {
@@ -114,7 +115,6 @@ public extension AccountRecoveryScanInProgress {
 					viewStore.send(.onFirstAppear)
 				}
 				.destination(store: store)
-				.navigationTransition(.slide, interactivity: .disabled)
 			}
 		}
 	}

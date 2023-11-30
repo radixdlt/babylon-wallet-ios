@@ -9,7 +9,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			case scanComplete
 		}
 
-		public var status: Status = .new
+		public var status: Status
 		public var networkID: NetworkID = .mainnet
 		public var batchNumber: Int = 0
 		public var maxIndex: HD.Path.Component.Child.Value? = nil
@@ -40,10 +40,12 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 		public init(
 			mode: Mode,
-			forOlympiaAccounts: Bool = false
+			forOlympiaAccounts: Bool = false,
+			status: Status = .new
 		) {
 			self.mode = mode
 			self.forOlympiaAccounts = forOlympiaAccounts
+			self.status = status
 		}
 	}
 
@@ -135,6 +137,10 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstAppear:
+			guard state.status == .new else {
+				return .none
+			}
+
 			loggerGlobal.debug("AccountRecoveryScanInProgress: onFirstAppear")
 
 			switch state.mode {
