@@ -73,7 +73,11 @@ extension PersonasClient {
 		)
 	}
 
-	public func shouldWriteDownSeedPhraseForAnyPersona() async -> AnyAsyncSequence<Bool> {
+	public func shouldWriteDownSeedPhraseForSomePersona() async throws -> Bool {
+		try await getPersonas().contains(where: \.shouldWriteDownMnemonic)
+	}
+
+	public func shouldWriteDownSeedPhraseForSomePersonaSequence() async -> AnyAsyncSequence<Bool> {
 		await personas().map { personas in
 			personas.contains(where: \.shouldWriteDownMnemonic)
 		}
