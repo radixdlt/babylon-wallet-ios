@@ -303,6 +303,8 @@ extension AccountRecoveryScanInProgress {
 			let activeAccounts = try await onLedgerEntitiesClient
 				.getAccounts(
 					accountAddresses,
+					// actually we wanna `resourceMetadataKeys` as well here, but we cannot since
+					// the count will exceed `EntityMetadataKey.maxAllowedKeys`.
 					metadataKeys: [.ownerBadge, .ownerKeys],
 					forceRefresh: true
 				)
@@ -334,6 +336,27 @@ extension AccountRecoveryScanInProgress {
 					inactive.append(account)
 				}
 			}
+
+			// Don't remove this, this is in fact needed if we don't
+			// wanna end up in a home page no icons on our tokens.
+			//
+			// Reason:
+			// GW limits the number of metadata items we can fetch:
+			// `EntityMetadataKey.maxAllowedKeys` thus we could not
+			// fetch the `resourceMetadataKeys` when we are fetching
+			// `[.ownerBadge, .ownerKeys]`, and that call gets cached!
+			// But we only need the `[.ownerBadge, .ownerKeys]` to
+			// check for active accounts, which we have finished doing
+			// above. So we now wanna replace that cache which is no
+			// longer useful, with useful metadata, containing token
+			// info including urls.
+			_ = try await onLedgerEntitiesClient
+				.getAccounts(
+					activeAccounts.map(\.address),
+					metadataKeys: .resourceMetadataKeys,
+					forceRefresh: true
+				)
+
 			return (active, inactive)
 		} catch is GatewayAPIClient.EmptyEntityDetailsResponse {
 			return (active: [], inactive: accounts)
