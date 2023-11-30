@@ -28,12 +28,10 @@ public struct ManualAccountRecoveryLedgerCoordinator: Sendable, FeatureReducer {
 
 	public struct Path: Sendable, Hashable, Reducer {
 		public enum State: Sendable, Hashable {
-//			case chooseSeedPhrase(ChooseSeedPhrase.State)
 			case recoveryComplete(ManualAccountRecoveryComplete.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-//			case chooseSeedPhrase(ChooseSeedPhrase.Action)
 			case recoveryComplete(ManualAccountRecoveryComplete.Action)
 		}
 
@@ -41,9 +39,6 @@ public struct ManualAccountRecoveryLedgerCoordinator: Sendable, FeatureReducer {
 			Scope(state: /State.recoveryComplete, action: /Action.recoveryComplete) {
 				ManualAccountRecoveryComplete()
 			}
-//			Scope(state: /State.chooseSeedPhrase, action: /Action.chooseSeedPhrase) {
-//				ChooseSeedPhrase()
-//			}
 		}
 	}
 

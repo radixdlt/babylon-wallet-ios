@@ -17,6 +17,7 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 		public enum Mode: Sendable, Hashable {
 			case mnemonicCanBeDisplayed
 			case mnemonicNeedsImport
+			case selectableHeadingAndAccountList
 			case displayAccountListOnly
 		}
 
@@ -52,7 +53,7 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 				return .send(.delegate(.displayMnemonic))
 			case .mnemonicNeedsImport:
 				return .send(.delegate(.importMissingMnemonic))
-			case .displayAccountListOnly:
+			case .selectableHeadingAndAccountList, .displayAccountListOnly:
 				assertionFailure("not clickable")
 				return .none
 			}

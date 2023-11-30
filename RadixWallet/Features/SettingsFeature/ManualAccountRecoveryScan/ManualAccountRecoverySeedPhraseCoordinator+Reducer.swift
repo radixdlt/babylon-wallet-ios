@@ -8,6 +8,7 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 	// MARK: - State
 
 	public struct State: Sendable, Hashable {
+		public var deviceFactorSources: IdentifiedArrayOf<DisplayEntitiesControlledByMnemonic.State> = []
 		public var path: StackState<Path.State> = .init()
 	}
 
@@ -21,7 +22,12 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 	}
 
 	public enum ChildAction: Sendable, Equatable {
+		case deviceFactorSource(id: DisplayEntitiesControlledByMnemonic.State.ID, action: DisplayEntitiesControlledByMnemonic.Action)
 		case path(StackActionOf<Path>)
+	}
+
+	public enum InternalAction: Sendable, Equatable {
+		case loadedDeviceFactorSources(TaskResult<IdentifiedArrayOf<DisplayEntitiesControlledByMnemonic.State>>)
 	}
 
 	// MARK: - Path
@@ -50,9 +56,13 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 	// MARK: - Reducer
 
 	@Dependency(\.dismiss) var dismiss
+	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
+			.forEach(\.deviceFactorSources, action: /Action.child .. ChildAction.deviceFactorSource) {
+				DisplayEntitiesControlledByMnemonic()
+			}
 			.forEach(\.path, action: /Action.child .. ChildAction.path) {
 				Path()
 			}
@@ -61,7 +71,8 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return .none
+			print(" appeared")
+			return updateEntities(state: &state)
 
 		case .addButtonTapped:
 			state.path.append(.enterSeedPhrase(.init(
@@ -86,12 +97,30 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
+		case .deviceFactorSource:
+			.none
 		case let .path(.element(id: id, action: pathAction)):
 			reduce(into: &state, id: id, pathAction: pathAction)
 		case let .path(.popFrom(id: id)):
 			.none
 		case let .path(.push(id: id, state: pathState)):
 			.none
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .loadedDeviceFactorSources(.success(deviceFactorSources)):
+			print(" UPDATE OK \(deviceFactorSources.count)")
+
+			state.deviceFactorSources = deviceFactorSources
+			return .none
+
+		case let .loadedDeviceFactorSources(.failure(error)):
+			print(" UPDATE faile \(error)")
+			loggerGlobal.error("Failed to load device factor sources, error: \(error)")
+//			errorQueue.schedule(error)
+			return .none
 		}
 	}
 
@@ -116,6 +145,25 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 			default:
 				.none
 			}
+		}
+	}
+
+	// Helper effects
+
+	private func updateEntities(state: inout State) -> Effect<Action> {
+		.run { send in
+			let result = await TaskResult {
+				let deviceFactorSources = try await deviceFactorSourceClient.controlledEntities(nil).map {
+					DisplayEntitiesControlledByMnemonic.State(
+						accountsForDeviceFactorSource: $0,
+						mode: .headingAndAccountList
+					)
+				}
+				return deviceFactorSources.asIdentifiable()
+			}
+			await send(.internal(.loadedDeviceFactorSources(result)))
+		} catch: { error, _ in
+			loggerGlobal.error("Error: \(error)")
 		}
 	}
 }

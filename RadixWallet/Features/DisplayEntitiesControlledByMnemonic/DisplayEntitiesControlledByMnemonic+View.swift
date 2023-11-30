@@ -11,13 +11,21 @@ extension DisplayEntitiesControlledByMnemonic.State {
 		}
 		return .init(
 			connectedAccounts: connectedAccounts,
-			buttonState: {
+			headingState: {
 				switch mode {
 				case .mnemonicCanBeDisplayed:
-					.init(title: L10n.SeedPhrases.SeedPhrase.reveal, imageAsset: AssetResource.signingKey, isError: false)
+					.defaultHeading(mode: .button)
 				case .mnemonicNeedsImport:
-					.init(title: "Seed Phrase Entry Required", imageAsset: AssetResource.error, isError: true)
-				case .displayAccountListOnly: nil
+					.init(
+						title: "Seed Phrase Entry Required", // FIXME: String
+						imageAsset: AssetResource.error,
+						isButton: true,
+						isError: true
+					)
+				case .selectableHeadingAndAccountList:
+					.defaultHeading(isButton: false)
+				case .displayAccountListOnly:
+					nil
 				}
 			}(),
 			promptUserToBackUpMnemonic: mode == .mnemonicCanBeDisplayed && !accountsForDeviceFactorSource.isMnemonicMarkedAsBackedUp,
@@ -31,16 +39,31 @@ extension DisplayEntitiesControlledByMnemonic.State {
 extension DisplayEntitiesControlledByMnemonic {
 	public struct ViewState: Equatable {
 		public let connectedAccounts: String
-		public struct ButtonState: Equatable {
+		public struct HeadingState: Equatable {
 			public let title: String
 			public let imageAsset: ImageAsset
+			public let mode: Mode
 			public let isError: Bool
 			var foregroundColor: Color {
 				isError ? .app.red1 : .black
 			}
+
+			static func defaultHeading(mode: Mode) -> HeadingState {
+				.init(
+					title: L10n.SeedPhrases.SeedPhrase.reveal,
+					imageAsset: AssetResource.signingKey,
+					mode: mode,
+					isError: false
+				)
+			}
+
+			public enum Mode: Equatable {
+				case button
+				case selected(Bool)
+			}
 		}
 
-		public let buttonState: ButtonState?
+		public let headingState: HeadingState?
 		public let promptUserToBackUpMnemonic: Bool
 		public let accounts: [Profile.Network.Account]
 		public let hasHiddenAccounts: Bool
@@ -60,31 +83,11 @@ extension DisplayEntitiesControlledByMnemonic {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading) {
-					if let buttonState = viewStore.buttonState {
-						Button {
-							viewStore.send(.navigateButtonTapped)
-						} label: {
-							HStack {
-								Image(asset: buttonState.imageAsset)
-									.resizable()
-									.renderingMode(.template)
-									.frame(.smallest)
-									.foregroundColor(buttonState.foregroundColor)
-
-								VStack(alignment: .leading) {
-									Text(buttonState.title)
-										.textStyle(.body1Header)
-										.foregroundColor(buttonState.foregroundColor)
-
-									Text(viewStore.connectedAccounts)
-										.textStyle(.body2Regular)
-										.foregroundColor(.app.gray2)
-								}
-
-								Spacer(minLength: 0)
-								Image(asset: AssetResource.chevronRight)
-							}
-						}
+					MnemonicView(
+						headingState: viewStore.headingState,
+						connectedAccounts: viewStore.connectedAccounts
+					) {
+						viewStore.send(.navigateButtonTapped)
 					}
 
 					if viewStore.promptUserToBackUpMnemonic {
@@ -108,6 +111,50 @@ extension DisplayEntitiesControlledByMnemonic {
 							.frame(height: .huge2)
 							.padding(.vertical, .medium1)
 					}
+				}
+			}
+		}
+	}
+
+	struct MnemonicView: SwiftUI.View {
+		let headingState: ViewState.HeadingState?
+		let connectedAccounts: String
+		let action: () -> Void
+
+		var body: some SwiftUI.View {
+			if let headingState {
+				if headingState.isButton {
+					Button(action: action) {
+						heading(headingState)
+					}
+				} else {
+					heading(headingState)
+				}
+			}
+		}
+
+		private func heading(_ headingState: ViewState.HeadingState) -> some SwiftUI.View {
+			HStack {
+				Image(asset: headingState.imageAsset)
+					.resizable()
+					.renderingMode(.template)
+					.frame(.smallest)
+					.foregroundColor(headingState.foregroundColor)
+
+				VStack(alignment: .leading) {
+					Text(headingState.title)
+						.textStyle(.body1Header)
+						.foregroundColor(headingState.foregroundColor)
+
+					Text(connectedAccounts)
+						.textStyle(.body2Regular)
+						.foregroundColor(.app.gray2)
+				}
+
+				Spacer(minLength: 0)
+
+				if headingState.isButton {
+					Image(asset: AssetResource.chevronRight)
 				}
 			}
 		}

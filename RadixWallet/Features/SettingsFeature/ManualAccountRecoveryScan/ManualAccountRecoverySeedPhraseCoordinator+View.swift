@@ -34,6 +34,10 @@ extension ManualAccountRecoverySeedPhraseCoordinator.View {
 
 // MARK: - ManualAccountRecoverySeedPhraseCoordinator.View.PathView
 private extension ManualAccountRecoverySeedPhraseCoordinator.View {
+	struct ViewState: Equatable {
+		let accounts: [AccountView.ViewState]
+	}
+
 	var rootView: some View {
 		ScrollView {
 			VStack(spacing: .zero) {
@@ -52,11 +56,8 @@ private extension ManualAccountRecoverySeedPhraseCoordinator.View {
 					.padding(.horizontal, .huge2)
 					.padding(.bottom, .huge3)
 
-				Card {
-					Text("Seed Phrase")
-				}
-				.padding(.horizontal, .medium1)
-				.padding(.bottom, .large3)
+				mnemonics()
+					.padding(.bottom, .large3)
 
 				Button("Add Olympia Seed Phrase") { // FIXME: Strings
 					store.send(.view(.addButtonTapped))
@@ -71,6 +72,24 @@ private extension ManualAccountRecoverySeedPhraseCoordinator.View {
 				store.send(.view(.continueButtonTapped))
 			}
 			.buttonStyle(.primaryRectangular(shouldExpand: true))
+		}
+		.onAppear {
+			store.send(.view(.appeared))
+		}
+	}
+
+	private func mnemonics() -> some View {
+		ForEachStore(
+			store.scope(
+				state: \.deviceFactorSources,
+				action: { .child(.deviceFactorSource(id: $0, action: $1)) }
+			)
+		) { store in
+			Card(.app.gray4) {
+				DisplayEntitiesControlledByMnemonic.View(store: store)
+					.padding(.medium3)
+			}
+			.padding(.horizontal, .medium1)
 		}
 	}
 
