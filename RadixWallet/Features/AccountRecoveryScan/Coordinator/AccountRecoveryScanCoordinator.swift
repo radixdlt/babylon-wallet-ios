@@ -2,67 +2,56 @@
 
 public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		/// Create new Profile or add accounts
-		public let purpose: Purpose
-		public let promptForSelectionOfInactiveAccountsIfAny: Bool
-
-		public var root: AccountRecoveryScanInProgress.State
-		public var path: StackState<Path.State> = .init()
-
-		/// Create new Profile or add accounts
-		public enum Purpose: Sendable, Hashable {
-			case createProfile(DeviceFactorSource)
-
-			/// Typically we can use `offset: <CURRENT_NETWORK>.numberOfAccountsIncludingHidden(controlledBy: factorSourceID)`
-			case addAccounts(
-				factorSourceID: FactorSourceID.FromHash,
-				offset: Int,
-				networkID: NetworkID,
-				scheme: DerivationScheme
-			)
-		}
-
-		public init(purpose: Purpose, promptForSelectionOfInactiveAccountsIfAny: Bool) {
-			self.purpose = purpose
-			self.promptForSelectionOfInactiveAccountsIfAny = promptForSelectionOfInactiveAccountsIfAny
-			switch purpose {
-			case let .addAccounts(id, offset, networkID, scheme):
-				self.root = .init(
-					factorSourceID: id,
-					factorSource: .loading,
-					offset: offset,
-					scheme: scheme,
-					networkID: networkID
-				)
-			case let .createProfile(
-				deviceFactorSource
-			):
-				self.root = .init(
-					factorSourceID: deviceFactorSource.id,
-					factorSource: .success(
-						deviceFactorSource.embed()
-					),
-					offset: 0,
-					scheme: .slip10,
-					networkID: .mainnet
-				)
-			}
-		}
-	}
-
-	public struct Path: Sendable, Hashable, Reducer {
-		public enum State: Sendable, Hashable {
+		public enum Root: Sendable, Hashable {
+			case accountRecoveryScanInProgress(AccountRecoveryScanInProgress.State)
 			case selectInactiveAccountsToAdd(SelectInactiveAccountsToAdd.State)
 		}
 
-		public enum Action: Sendable, Equatable {
-			case selectInactiveAccountsToAdd(SelectInactiveAccountsToAdd.Action)
+		/// Create new Profile or add accounts
+		public let purpose: Purpose
+
+		public var root: Root
+
+		// FIXME: Clean this up! we are temporily force to use
+		// tree based navigation with `root` since SwiftUI did not
+		// like our 9 levels deep navigation tree when coming here
+		// from onboarding. We really wanted to use a NavigationStack
+		// here, but that broke the feature, so until we flatten nav
+		// depth of onboarding we need tree based, but we wanna be
+		// able to go back from `selectInactiveAccountsToAdd` screen
+		// to `accountRecoveryScanInProgress`, this is the easiest
+		// way to preserve the exact state of that screen....
+		public var backTo: AccountRecoveryScanInProgress.State?
+
+		/// Create new Profile or add accounts
+		public enum Purpose: Sendable, Hashable {
+			case createProfile(PrivateHDFactorSource)
+
+			case addAccounts(
+				factorSourceID: FactorSourceID.FromHash,
+				olympia: Bool
+			)
 		}
 
-		public var body: some ReducerOf<Self> {
-			Scope(state: /State.selectInactiveAccountsToAdd, action: /Action.selectInactiveAccountsToAdd) {
-				SelectInactiveAccountsToAdd()
+		static func accountRecoveryScanInProgressState(purpose: Purpose) -> AccountRecoveryScanInProgress.State {
+			switch purpose {
+			case let .addAccounts(id, forOlympiaAccounts):
+				AccountRecoveryScanInProgress.State(
+					mode: .factorSourceWithID(id: id),
+					forOlympiaAccounts: forOlympiaAccounts
+				)
+
+			case let .createProfile(privateHDFactorSource):
+				AccountRecoveryScanInProgress.State(
+					mode: .privateHD(privateHDFactorSource),
+					forOlympiaAccounts: false
+				)
 			}
+		}
+
+		public init(purpose: Purpose) {
+			self.purpose = purpose
+			self.root = .accountRecoveryScanInProgress(Self.accountRecoveryScanInProgressState(purpose: purpose))
 		}
 	}
 
@@ -71,8 +60,8 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case root(AccountRecoveryScanInProgress.Action)
-		case path(StackActionOf<Path>)
+		case accountRecoveryScanInProgress(AccountRecoveryScanInProgress.Action)
+		case selectInactiveAccountsToAdd(SelectInactiveAccountsToAdd.Action)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -85,20 +74,23 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		case dismissed
 	}
 
+	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.onboardingClient) var onboardingClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.dismiss) var dismiss
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.root, action: /Action.child .. ChildAction.root) {
-			AccountRecoveryScanInProgress()
+		Scope(state: \.root, action: /Action.child) {
+			EmptyReducer()
+				.ifCaseLet(/State.Root.accountRecoveryScanInProgress, action: /ChildAction.accountRecoveryScanInProgress) {
+					AccountRecoveryScanInProgress()
+				}
+				.ifCaseLet(/State.Root.selectInactiveAccountsToAdd, action: /ChildAction.selectInactiveAccountsToAdd) {
+					SelectInactiveAccountsToAdd()
+				}
 		}
-
 		Reduce(core)
-			.forEach(\.path, action: /Action.child .. ChildAction.path) {
-				Path()
-			}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
@@ -114,29 +106,44 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case .addAccountsToExistingProfileResult(.success):
+			loggerGlobal.notice("Successfully added accounts to existing profile using Account Recovery Scanning ✅")
 			return .send(.delegate(.completed))
 		case let .addAccountsToExistingProfileResult(.failure(error)):
-			fatalError("todo error handling")
+			loggerGlobal.error("Failed to add accoutns to existing profile, error: \(error)")
+			return .send(.delegate(.dismissed))
 		case .createProfileResult(.success):
 			loggerGlobal.notice("Successfully created a Profile using Account Recovery Scanning ✅")
 			return .send(.delegate(.completed))
 		case let .createProfileResult(.failure(error)):
-			fatalError("todo error handling")
+			loggerGlobal.error("Failed to add accoutns to existing profile, error: \(error)")
+			return .send(.delegate(.dismissed))
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .root(.delegate(.foundAccounts(active, inactive))):
-			if state.promptForSelectionOfInactiveAccountsIfAny, !inactive.isEmpty {
-				state.path.append(.selectInactiveAccountsToAdd(.init(active: active, inactive: inactive)))
-				return .none
+		case let .accountRecoveryScanInProgress(.delegate(.foundAccounts(active, inactive))):
+			switch state.root {
+			case let .accountRecoveryScanInProgress(childState):
+				state.backTo = childState
+			case .selectInactiveAccountsToAdd: assertionFailure("Discrepancy, wrong state")
+			}
+			if inactive.isEmpty {
+				return completed(purpose: state.purpose, active: active, inactive: inactive)
 			} else {
-				return completed(purpose: state.purpose, inactiveToAdd: inactive, active: active)
+				state.root = .selectInactiveAccountsToAdd(.init(active: active, inactive: inactive))
+				return .none
 			}
 
-		case let .path(.element(_, action: .selectInactiveAccountsToAdd(.delegate(.finished(selectedInactive, active))))):
-			return completed(purpose: state.purpose, inactiveToAdd: selectedInactive, active: active)
+		case .accountRecoveryScanInProgress(.delegate(.failedToDerivePublicKey)):
+			return .send(.delegate(.dismissed))
+
+		case .selectInactiveAccountsToAdd(.delegate(.goBack)):
+			let childState = state.backTo ?? AccountRecoveryScanCoordinator.State.accountRecoveryScanInProgressState(purpose: state.purpose)
+			state.root = .accountRecoveryScanInProgress(childState)
+			return .none
+		case let .selectInactiveAccountsToAdd(.delegate(.finished(selectedInactive, active))):
+			return completed(purpose: state.purpose, active: active, inactive: selectedInactive)
 
 		default: return .none
 		}
@@ -144,30 +151,34 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 
 	private func completed(
 		purpose: State.Purpose,
-		inactiveToAdd: IdentifiedArrayOf<Profile.Network.Account>,
-		active: IdentifiedArrayOf<Profile.Network.Account>
+		active: IdentifiedArrayOf<Profile.Network.Account>,
+		inactive: IdentifiedArrayOf<Profile.Network.Account>
 	) -> Effect<Action> {
-		// FIXME: check with Matt - should we by default we add ALL accounts, even inactive?
-		var all = active
-		all.append(contentsOf: inactiveToAdd)
-		let accounts = all
+		let sortedAccounts: IdentifiedArrayOf<Profile.Network.Account> = { () -> IdentifiedArrayOf<Profile.Network.Account> in
+			var accounts = active
+			accounts.append(contentsOf: inactive)
+			accounts.sort() // by index
+			loggerGlobal.debug("Successfully discovered and created #\(active.count) accounts and #\(inactive.count) inactive accounts that was chosen by user, sorted by index, these are all the accounts we are gonna use:\n\(accounts)")
+			return accounts
+		}()
 
 		switch purpose {
-		case let .createProfile(deviceFactorSource):
+		case let .createProfile(privateHD):
 			let recoveredAccountAndBDFS = AccountsRecoveredFromScanningUsingMnemonic(
-				accounts: accounts,
-				deviceFactorSource: deviceFactorSource
+				accounts: sortedAccounts,
+				deviceFactorSource: privateHD.factorSource
 			)
 			return .run { send in
 				let result = await TaskResult<EqVoid> {
-					try await onboardingClient.finishOnboardingWithRecoveredAccountAndBDFS(recoveredAccountAndBDFS)
+					try secureStorageClient.saveMnemonicForFactorSource(privateHD)
+					return try await onboardingClient.finishOnboardingWithRecoveredAccountAndBDFS(recoveredAccountAndBDFS)
 				}
 				await send(.internal(.createProfileResult(result)))
 			}
 		case .addAccounts:
 			return .run { send in
 				let result = await TaskResult<EqVoid> {
-					try await accountsClient.saveVirtualAccounts(Array(accounts))
+					try await accountsClient.saveVirtualAccounts(Array(sortedAccounts))
 				}
 				await send(.internal(.addAccountsToExistingProfileResult(result)))
 			}

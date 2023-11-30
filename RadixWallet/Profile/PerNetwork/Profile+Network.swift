@@ -73,7 +73,7 @@ extension Profile.Network {
 	#endif
 
 	public mutating func updateAccount(_ account: Account) throws {
-		accounts.append(account)
+		accounts[id: account.id] = account
 	}
 
 	public mutating func addAccount(_ account: Account) throws {

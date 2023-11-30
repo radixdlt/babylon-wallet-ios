@@ -20,12 +20,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return wordCount
 		}
 
-		public mutating func changeWordCount(by delta: Int) {
-			let positiveDelta = abs(delta)
-			precondition(positiveDelta.isMultiple(of: ImportMnemonic.wordsPerRow))
-
+		public mutating func changeWordCount(to newWordCount: BIP39.WordCount) {
 			let wordCount = words.count
-			let newWordCount = BIP39.WordCount(wordCount: wordCount + delta)! // might in fact be subtraction
+			let delta = newWordCount.rawValue - wordCount
+			let positiveDelta = abs(delta)
 			if delta > 0 {
 				// is increasing word count
 				words.append(contentsOf: (wordCount ..< newWordCount.rawValue).map {
@@ -184,7 +182,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.header = header
 			self.warning = warning
 			self.warningOnContinue = warningOnContinue
-			changeWordCount(by: wordCount.rawValue)
+			changeWordCount(to: wordCount)
 		}
 
 		public init(
@@ -247,8 +245,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		case toggleModeButtonTapped
 		case passphraseChanged(String)
-		case addRowButtonTapped
-		case removeRowButtonTapped
+		case changedWordCountTo(BIP39.WordCount)
 		case doneViewing
 		case closeButtonTapped
 		case backButtonTapped
@@ -257,7 +254,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		#if DEBUG
 		case debugCopyMnemonic
 		case debugMnemonicChanged(String)
-		case debugZooVote
+		case debugUseTestingMnemonicWithActiveAccounts
+		case debugUseTestingMnemonicZooVote
 		case debugPasteMnemonic
 		#endif
 	}
@@ -409,12 +407,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			state.isAdvancedMode.toggle()
 			return .none
 
-		case .addRowButtonTapped:
-			state.changeWordCount(by: +ImportMnemonic.wordsPerRow)
-			return .none
-
-		case .removeRowButtonTapped:
-			state.changeWordCount(by: -ImportMnemonic.wordsPerRow)
+		case let .changedWordCountTo(newWordCount):
+			state.changeWordCount(to: newWordCount)
 			return .none
 
 		case let .continueButtonTapped(mnemonic):
@@ -458,7 +452,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			let toPaste = pasteboardClient.getString() ?? ""
 			return .send(.view(.debugMnemonicChanged(toPaste)))
 
-		case .debugZooVote:
+		case .debugUseTestingMnemonicWithActiveAccounts:
+			return .send(.view(.debugMnemonicChanged("wine over village stage barrel strategy cushion decline echo fiber salad carry empower fun awful cereal galaxy laundry practice appear bean flat mansion license")))
+
+		case .debugUseTestingMnemonicZooVote:
 			return .send(.view(.debugMnemonicChanged(Mnemonic.testValueZooVote.phrase.rawValue)))
 		#endif
 		}

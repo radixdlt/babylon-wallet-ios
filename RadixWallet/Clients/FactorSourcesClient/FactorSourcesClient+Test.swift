@@ -11,6 +11,7 @@ extension FactorSourcesClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 
 	public static let testValue = Self(
+		indicesOfEntitiesControlledByFactorSource: unimplemented("\(Self.self).indicesOfEntitiesControlledByFactorSource"),
 		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID"),
 		getMainDeviceFactorSource: unimplemented("\(Self.self).getMainDeviceFactorSource"),
 		createNewMainDeviceFactorSource: unimplemented("\(Self.self).createNewMainDeviceFactorSource"),
@@ -27,6 +28,7 @@ extension FactorSourcesClient: TestDependencyKey {
 	)
 
 	public static let noop = Self(
+		indicesOfEntitiesControlledByFactorSource: { _ in throw NoopError() },
 		getCurrentNetworkID: { .kisharnet },
 		getMainDeviceFactorSource: { throw NoopError() },
 		createNewMainDeviceFactorSource: { throw NoopError() },

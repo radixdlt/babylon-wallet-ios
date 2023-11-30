@@ -1,10 +1,11 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension DerivePublicKeys.State {
 	var viewState: DerivePublicKeys.ViewState {
 		.init(
 			ledger: ledgerBeingUsed,
-			entityKind: (/DerivePublicKeys.State.Purpose.createEntity).extract(from: purpose)
+			entityKind: (/DerivePublicKeys.State.Purpose.createEntity).extract(from: _purpose)
 		)
 	}
 }
@@ -16,7 +17,9 @@ extension DerivePublicKeys {
 		let entityKind: EntityKind?
 	}
 
+	@MainActor
 	public struct View: SwiftUI.View {
+		@SwiftUI.State private var id = UUID()
 		private let store: StoreOf<DerivePublicKeys>
 
 		public init(store: StoreOf<DerivePublicKeys>) {
@@ -55,12 +58,8 @@ extension DerivePublicKeys {
 					Spacer(minLength: 0)
 				}
 				.padding(.horizontal, .medium1)
-				.onFirstTask { @MainActor in
-					/// For more information about that `sleep` please  check [this discussion in Slack](https://rdxworks.slack.com/archives/C03QFAWBRNX/p1687967412207119?thread_ts=1687964494.772899&cid=C03QFAWBRNX)
-					@Dependency(\.continuousClock) var clock
-					try? await clock.sleep(for: .milliseconds(700))
-
-					await viewStore.send(.onFirstTask).finish()
+				.onFirstAppear {
+					viewStore.send(.onFirstAppear)
 				}
 			}
 		}

@@ -81,7 +81,7 @@ extension Profile.Network {
 			self.displayName = displayName
 			self.flags = []
 			self.appearanceID = extraProperties.appearanceID
-			self.onLedgerSettings = .default
+			self.onLedgerSettings = extraProperties.onLedgerSettings
 		}
 	}
 }
@@ -90,9 +90,14 @@ extension Profile.Network.Account {
 	/// Ephemeral, only used as arg passed to init.
 	public struct ExtraProperties: Sendable {
 		public var appearanceID: AppearanceID
+		public let onLedgerSettings: OnLedgerSettings
 
-		public init(appearanceID: AppearanceID) {
+		public init(
+			appearanceID: AppearanceID,
+			onLedgerSettings: OnLedgerSettings = .default
+		) {
 			self.appearanceID = appearanceID
+			self.onLedgerSettings = onLedgerSettings
 		}
 	}
 

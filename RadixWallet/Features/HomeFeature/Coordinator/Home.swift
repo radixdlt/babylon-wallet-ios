@@ -250,7 +250,7 @@ public struct Home: Sendable, FeatureReducer {
 	private func loadShouldWriteDownPersonasSeedPhrase() -> Effect<Action> {
 		.run { send in
 			@Dependency(\.personasClient) var personasClient
-			for try await shouldBackup in await personasClient.shouldWriteDownSeedPhraseForAnyPersona() {
+			for try await shouldBackup in await personasClient.shouldWriteDownSeedPhraseForSomePersonaSequence() {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.loadedShouldWriteDownPersonasSeedPhrase(shouldBackup)))
 			}

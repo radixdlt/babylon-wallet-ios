@@ -88,7 +88,55 @@ extension FactorSourcesClient: DependencyKey {
 			await profileStore.profile.networkID
 		}
 
+		let indicesOfEntitiesControlledByFactorSource: IndicesOfEntitiesControlledByFactorSource = { request in
+			let factorSourceID = request.factorSourceID
+			guard let factorSource = try await getFactorSources().first(where: { $0.id == factorSourceID }) else { throw FailedToFindFactorSource() }
+
+			let currentNetworkID = await getCurrentNetworkID()
+			let networkID = request.networkID ?? currentNetworkID
+			let network = try? await profileStore.profile.network(id: networkID)
+
+			func nextDerivationIndexForFactorSource(
+				entitiesControlledByFactorSource: some Collection<some EntityProtocol>
+			) throws -> OrderedSet<HD.Path.Component.Child.Value> {
+				let indicesOfEntitiesControlledByAccount = entitiesControlledByFactorSource
+					.compactMap { entity -> HD.Path.Component.Child.Value? in
+						switch entity.securityState {
+						case let .unsecured(unsecuredControl):
+							let factorInstance = unsecuredControl.transactionSigning
+							guard factorInstance.factorSourceID.embed() == factorSourceID else {
+								return nil
+							}
+							return factorInstance.derivationPath.index
+						}
+					}
+				return try OrderedSet(validating: indicesOfEntitiesControlledByAccount)
+			}
+
+			let indices: OrderedSet<HD.Path.Component.Child.Value> = if let network {
+				switch request.entityKind {
+				case .account:
+					try nextDerivationIndexForFactorSource(
+						entitiesControlledByFactorSource: network.accountsIncludingHidden()
+					)
+				case .identity:
+					try nextDerivationIndexForFactorSource(
+						entitiesControlledByFactorSource: network.personasIncludingHidden()
+					)
+				}
+			} else {
+				[]
+			}
+
+			return IndicesUsedByFactorSource(
+				indices: indices,
+				factorSource: factorSource,
+				currentNetworkID: networkID
+			)
+		}
+
 		return Self(
+			indicesOfEntitiesControlledByFactorSource: indicesOfEntitiesControlledByFactorSource,
 			getCurrentNetworkID: getCurrentNetworkID,
 			getMainDeviceFactorSource: getMainDeviceFactorSource,
 			createNewMainDeviceFactorSource: {
@@ -136,10 +184,6 @@ extension FactorSourcesClient: DependencyKey {
 				let mainBDFS = try await getMainDeviceFactorSource()
 				let factorSourceID = request.factorSourceID ?? mainBDFS.factorSourceID.embed()
 
-				let currentNetworkID = await getCurrentNetworkID()
-				let networkID = request.networkID ?? currentNetworkID
-				let network = try? await profileStore.profile.network(id: networkID)
-
 				/// We CANNOT just use `entitiesControlledByFactorSource.count` since it is possible that
 				/// some users from Radix Babylon Wallet version 1.0.0 created accounts not sarting at
 				/// index `0` (since we had global indexing, shared by all FactorSources...), lets say that
@@ -152,40 +196,17 @@ extension FactorSourcesClient: DependencyKey {
 				/// next index should be `2`, not `0` (which was free). The rationale is that it would just be
 				/// confusing and messy (for us not the least). Best to always increase. But it is important
 				/// to know  AccountRecoveryScan SHOULD find these "gap entities"!
-				func nextDerivationIndexForFactorSource(
-					entitiesControlledByFactorSource: some Collection<some EntityProtocol>
-				) -> HD.Path.Component.Child.Value {
-					let indicesOfEntitiesControlledByAccount = entitiesControlledByFactorSource
-						.compactMap { entity -> HD.Path.Component.Child.Value? in
-							switch entity.securityState {
-							case let .unsecured(unsecuredControl):
-								let factorInstance = unsecuredControl.transactionSigning
-								guard factorInstance.factorSourceID.embed() == factorSourceID else {
-									return nil
-								}
-								return factorInstance.derivationPath.index
-							}
-						}
-					guard let max = indicesOfEntitiesControlledByAccount.max() else { return 0 }
-					let nextIndex = max + 1
-					return nextIndex
-				}
+				let indices = try await indicesOfEntitiesControlledByFactorSource(
+					.init(
+						entityKind: request.entityKind,
+						factorSourceID: factorSourceID,
+						networkID: request.networkID
+					)
+				).indices
 
-				if let network {
-					switch request.entityKind {
-					case .account:
-						return nextDerivationIndexForFactorSource(
-							entitiesControlledByFactorSource: network.accountsIncludingHidden()
-						)
-					case .identity:
-						return nextDerivationIndexForFactorSource(
-							entitiesControlledByFactorSource: network.personasIncludingHidden()
-						)
-					}
-				} else {
-					// First time this factor source is use on network `networkID`
-					return 0
-				}
+				guard let max = indices.max() else { return 0 }
+				let nextIndex = max + 1
+				return nextIndex
 			},
 			addPrivateHDFactorSource: addPrivateHDFactorSource,
 			checkIfHasOlympiaFactorSourceForAccounts: {

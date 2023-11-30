@@ -95,6 +95,18 @@ extension ImportMnemonic {
 
 		public init(store: StoreOf<ImportMnemonic>) {
 			self.store = store
+			let blue = UIColor(Color.app.blue2)
+			let white = UIColor(Color.app.white)
+			let appearance = UISegmentedControl.appearance()
+			appearance.selectedSegmentTintColor = blue
+
+			// NORMAL
+			appearance.setTitleTextAttributes([.font: FontConvertible.Font.app.segmentedControlNormal], for: .normal)
+			appearance.setTitleTextAttributes([.foregroundColor: blue], for: .normal)
+
+			// SELECTED
+			appearance.setTitleTextAttributes([.font: FontConvertible.Font.app.segmentedControlSelected], for: .selected)
+			appearance.setTitleTextAttributes([.foregroundColor: white], for: .selected)
 		}
 
 		public var body: some SwiftUI.View {
@@ -103,7 +115,7 @@ extension ImportMnemonic {
 					VStack(spacing: 0) {
 						if let header = viewStore.header {
 							HeaderView(header: header)
-								.padding(.bottom, .medium1)
+								.padding(.bottom, viewStore.isWordCountFixed ? .medium1 : 0)
 						}
 
 						if let warning = viewStore.warning {
@@ -113,20 +125,24 @@ extension ImportMnemonic {
 								.padding(.bottom, .large3)
 						}
 
-						wordsGrid(with: viewStore)
-							.padding(.horizontal, .medium2)
-							.padding(.bottom, .large3)
-
 						if !viewStore.isWordCountFixed {
-							changeWordCountButtons(with: viewStore)
-								.padding(.horizontal, .medium2)
-								.padding(.bottom, .large3)
-						}
+							VStack(alignment: .center) {
+								let label = "Number of Seed Phrase Words" // FIXME: Strings
+								Text("\(label)").textStyle(.body1HighImportance).foregroundStyle(Color.app.gray1)
 
-						if viewStore.isShowingPassphrase {
-							passphrase(with: viewStore)
-								.padding(.horizontal, .medium2)
-								.padding(.bottom, .medium2)
+								Picker(label, selection: viewStore.binding(
+									get: \.wordCount,
+									send: { .changedWordCountTo($0) }
+								)) {
+									ForEach(BIP39.WordCount.allCases, id: \.self) { wordCount in
+										Text("\(wordCount.rawValue)")
+											.textStyle(.body1Regular)
+									}
+								}
+								.pickerStyle(.segmented)
+							}
+							.padding(.horizontal, .large3)
+							.padding(.bottom, .medium2)
 						}
 
 						#if DEBUG
@@ -134,9 +150,46 @@ extension ImportMnemonic {
 							Button("DEBUG ONLY Copy") {
 								viewStore.send(.debugCopyMnemonic)
 							}
-							.buttonStyle(.secondaryRectangular(isDestructive: true))
-							.padding(.bottom, .medium1)
+							.buttonStyle(
+								.secondaryRectangular(
+									shouldExpand: true,
+									isDestructive: true,
+									isInToolbar: true
+								)
+							)
+							.padding(.horizontal, .medium2)
+							.padding(.bottom, .medium3)
 						} else {
+							Button("DEBUG Acc.Rec.Scan.mne (24)") {
+								viewStore.send(.debugUseTestingMnemonicWithActiveAccounts)
+							}
+							.buttonStyle(
+								.secondaryRectangular(
+									shouldExpand: true,
+									isDestructive: true,
+									isInToolbar: true
+								)
+							)
+							.padding(.horizontal, .medium2)
+							.padding(.bottom, .medium3)
+
+							Button(
+								"DEBUG zoo..vote (24)"
+							) {
+								viewStore.send(
+									.debugUseTestingMnemonicZooVote
+								)
+							}
+							.buttonStyle(
+								.secondaryRectangular(
+									shouldExpand: true,
+									isDestructive: true,
+									isInToolbar: true
+								)
+							)
+							.padding(.horizontal, .medium2)
+							.padding(.bottom, .medium3)
+
 							AppTextField(
 								placeholder: "DEBUG ONLY paste mnemonic",
 								text: viewStore.binding(
@@ -152,14 +205,18 @@ extension ImportMnemonic {
 							)
 							.padding(.horizontal, .medium2)
 							.padding(.bottom, .medium2)
-
-							Button("DEBUG ONLY use 'zoo...vote'") {
-								viewStore.send(.debugZooVote)
-							}
-							.buttonStyle(.secondaryRectangular(isDestructive: true))
-							.padding(.bottom, .medium1)
 						}
 						#endif
+
+						wordsGrid(with: viewStore)
+							.padding(.horizontal, .medium2)
+							.padding(.bottom, .large3)
+
+						if viewStore.isShowingPassphrase {
+							passphrase(with: viewStore)
+								.padding(.horizontal, .medium2)
+								.padding(.bottom, .medium2)
+						}
 
 						if !viewStore.isReadonlyMode {
 							Button(viewStore.modeButtonTitle) {
@@ -304,38 +361,6 @@ extension ImportMnemonic.View {
 		)
 		.disabled(viewStore.isReadonlyMode)
 		.autocorrectionDisabled()
-	}
-
-	@ViewBuilder
-	private func changeWordCountButtons(with viewStore: ViewStoreOf<ImportMnemonic>) -> some SwiftUI.View {
-		HStack {
-			Button {
-				viewStore.send(.removeRowButtonTapped)
-			} label: {
-				HStack {
-					Text(L10n.ImportMnemonic.fewerWords)
-						.foregroundColor(viewStore.isRemoveRowButtonEnabled ? .app.gray1 : .app.white)
-					Image(systemName: "text.badge.minus")
-						.foregroundColor(viewStore.isRemoveRowButtonEnabled ? .app.red1 : .app.white)
-				}
-			}
-			.controlState(viewStore.isRemoveRowButtonEnabled ? .enabled : .disabled)
-
-			Spacer(minLength: 0)
-
-			Button {
-				viewStore.send(.addRowButtonTapped)
-			} label: {
-				HStack {
-					Text(L10n.ImportMnemonic.moreWords)
-						.foregroundColor(viewStore.isAddRowButtonEnabled ? .app.gray1 : .app.white)
-					Image(systemName: "text.badge.plus")
-						.foregroundColor(viewStore.isAddRowButtonEnabled ? .app.green1 : .app.white)
-				}
-			}
-			.controlState(viewStore.isAddRowButtonEnabled ? .enabled : .disabled)
-		}
-		.buttonStyle(.secondaryRectangular)
 	}
 
 	@ViewBuilder

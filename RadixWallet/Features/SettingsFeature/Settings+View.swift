@@ -143,8 +143,8 @@ extension Settings.View {
 				}
 			}
 			.animation(.default, value: viewStore.shouldShowMigrateOlympiaButton)
-			.task { @MainActor in
-				await viewStore.send(.task).finish()
+			.onAppear {
+				store.send(.view(.appeared))
 			}
 		}
 	}

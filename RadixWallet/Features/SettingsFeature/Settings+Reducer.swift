@@ -29,7 +29,7 @@ public struct Settings: Sendable, FeatureReducer {
 	// MARK: Action
 
 	public enum ViewAction: Sendable, Equatable {
-		case task
+		case appeared
 		case addP2PLinkButtonTapped
 		case importOlympiaButtonTapped
 		case dismissImportOlympiaHeaderButtonTapped
@@ -114,14 +114,10 @@ public struct Settings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .task:
-			return loadShouldWriteDownPersonasSeedPhrase()
-				.merge(
-					with: loadShouldShowImportWalletShortcutInSettings()
-				)
-				.concatenate(
-					with: loadP2PLinks()
-				)
+		case .appeared:
+			return loadP2PLinks()
+				.merge(with: loadShouldShowImportWalletShortcutInSettings())
+				.merge(with: loadShouldWriteDownPersonasSeedPhrase())
 
 		case .addP2PLinkButtonTapped:
 			state.destination = .manageP2PLinks(.init(destination: .newConnection(.init())))
@@ -220,10 +216,8 @@ extension Settings {
 	private func loadShouldWriteDownPersonasSeedPhrase() -> Effect<Action> {
 		.run { send in
 			@Dependency(\.personasClient) var personasClient
-			for try await shouldBackup in await personasClient.shouldWriteDownSeedPhraseForAnyPersona() {
-				guard !Task.isCancelled else { return }
-				await send(.internal(.loadedShouldWriteDownPersonasSeedPhrase(shouldBackup)))
-			}
+			let shouldBackup = try await personasClient.shouldWriteDownSeedPhraseForSomePersona()
+			await send(.internal(.loadedShouldWriteDownPersonasSeedPhrase(shouldBackup)))
 		}
 	}
 }

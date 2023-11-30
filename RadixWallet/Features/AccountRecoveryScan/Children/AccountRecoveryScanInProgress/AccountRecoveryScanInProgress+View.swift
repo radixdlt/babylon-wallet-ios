@@ -2,21 +2,22 @@ extension AccountRecoveryScanInProgress.State {
 	var viewState: AccountRecoveryScanInProgress.ViewState {
 		.init(
 			status: status,
-			kind: factorSourceID.kind,
-			olympia: scheme == .bip44,
+			kind: factorSourceIDFromHash.kind,
+			olympia: forOlympiaAccounts,
 			active: active,
-			hasFoundAnyAccounts: !active.isEmpty || !inactive.isEmpty
+			hasFoundAnyAccounts: !active.isEmpty || !inactive.isEmpty,
+			maxIndex: batchNumber * batchSize
 		)
 	}
 }
 
 // MARK: - AccountRecoveryScanInProgress.View
-public let accRecScanBatchSizePerReq = 25
-public let accRecScanBatchSize = accRecScanBatchSizePerReq * 2
+public let batchSize = 50
 public extension AccountRecoveryScanInProgress {
 	struct ViewState: Equatable {
 		let status: AccountRecoveryScanInProgress.State.Status
 		var loadingState: ControlState {
+			// FIXME: Strings
 			status == .scanningNetworkForActiveAccounts ? .loading(.global(text: "Scanning network")) : .enabled
 		}
 
@@ -24,11 +25,20 @@ public extension AccountRecoveryScanInProgress {
 		let olympia: Bool
 		let active: IdentifiedArrayOf<Profile.Network.Account>
 		let hasFoundAnyAccounts: Bool
+		let maxIndex: Int
+		var isScanInProgress: Bool {
+			switch status {
+			case .scanComplete: false
+			default: true
+			}
+		}
 
 		var title: String {
+			// FIXME: Strings
 			status == .scanComplete ? "Scan Complete" : "Scan in progress"
 		}
 
+		// FIXME: Strings
 		var factorSourceDescription: String {
 			switch kind {
 			case .device:
@@ -54,13 +64,26 @@ public extension AccountRecoveryScanInProgress {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack {
+				VStack(alignment: .center, spacing: .medium1) {
 					Text(viewStore.title)
 						.textStyle(.sheetTitle)
 
+					VStack(alignment: .center, spacing: .medium1) {
+						if viewStore.isScanInProgress {
+							// FIXME: Strings
+							Text("Scanning for Accounts that have been included in at least on transaction, using:")
+							Text("**\(viewStore.factorSourceDescription)**")
+						} else {
+							// FIXME: Strings
+							Text("The first \(viewStore.maxIndex) potential accounts from this signing factor were scanned.")
+						}
+					}
+					.frame(height: 100) // static height else account list "jumps" when going between scanInProgress and scanCompleted
+
 					if viewStore.active.isEmpty {
-						Text("Scanning for Accounts that have been included in at least on transaction, using:")
-						Text("**\(viewStore.factorSourceDescription)**")
+						if !viewStore.isScanInProgress {
+							NoContentView("None found.") // FIXME: Strings
+						}
 					} else {
 						ScrollView {
 							VStack(alignment: .leading, spacing: .small3) {
@@ -70,11 +93,6 @@ public extension AccountRecoveryScanInProgress {
 								}
 							}
 						}
-						Text("The first \(accRecScanBatchSize) potential accounts from this signing factor were scanned.")
-
-						Button("Tap here to scan the next \(accRecScanBatchSize)") {
-							store.send(.view(.scanMore))
-						}.buttonStyle(.secondaryRectangular)
 					}
 
 					Spacer(minLength: 0)
@@ -83,23 +101,50 @@ public extension AccountRecoveryScanInProgress {
 				.presentsLoadingViewOverlay()
 				.padding()
 				.footer {
+					// FIXME: Strings
+					Button("Tap here to scan the next \(batchSize)") {
+						store.send(.view(.scanMore))
+					}
+					.buttonStyle(.alternativeRectangular)
+
+					// FIXME: Strings
 					Button("Continue") {
 						store.send(.view(.continueTapped))
-					}.buttonStyle(.primaryRectangular)
-				}
-				.sheet(
-					store: store.scope(
-						state: \.$derivePublicKeys,
-						action: { .child(.derivePublicKeys($0)) }
-					),
-					content: {
-						DerivePublicKeys.View(store: $0)
 					}
-				)
-				.onFirstTask { @MainActor in
-					await store.send(.view(.onFirstTask)).finish()
+					.buttonStyle(.primaryRectangular)
 				}
+				.onFirstAppear {
+					viewStore.send(.onFirstAppear)
+				}
+				.destinations(with: store)
 			}
+		}
+	}
+}
+
+private extension StoreOf<AccountRecoveryScanInProgress> {
+	var destination: PresentationStoreOf<AccountRecoveryScanInProgress.Destination> {
+		func scopeState(state: State) -> PresentationState<AccountRecoveryScanInProgress.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<AccountRecoveryScanInProgress>) -> some View {
+		let destinationStore = store.destination
+		return derivePublicKeys(with: destinationStore)
+	}
+
+	private func derivePublicKeys(with destinationStore: PresentationStoreOf<AccountRecoveryScanInProgress.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /AccountRecoveryScanInProgress.Destination.State.derivePublicKeys,
+			action: AccountRecoveryScanInProgress.Destination.Action.derivePublicKeys
+		) {
+			DerivePublicKeys.View(store: $0)
 		}
 	}
 }

@@ -178,28 +178,28 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 
 		// 2. assetException changes:
 		let assetExceptionsToAddOrUpdate: [ThirdPartyDeposits.AssetException] = localConfig
-			.assetsExceptionList
+			.assetsExceptionSet()
 			.filter { localException in
-				!inProfileConfig.assetsExceptionList.contains { inProfileException in
+				!inProfileConfig.assetsExceptionSet().contains { inProfileException in
 					inProfileException.exceptionRule == localException.exceptionRule
 				}
 			}
 
 		let assetExceptionsToBeRemoved: [ResourceAddress] = inProfileConfig
-			.assetsExceptionList
+			.assetsExceptionSet()
 			.filter {
-				!localConfig.assetsExceptionList.contains($0)
+				!localConfig.assetsExceptionSet().contains($0)
 			}
 			.map(\.address)
 
 		// 3. Depositor allow list:
 		let depositorAddressesToAdd: [ThirdPartyDeposits.DepositorAddress] = localConfig
-			.depositorsAllowList
-			.filter { !inProfileConfig.depositorsAllowList.contains($0) }
+			.depositorsAllowSet()
+			.filter { !inProfileConfig.depositorsAllowSet().contains($0) }
 
 		let depositorAddressesToRemove: [ThirdPartyDeposits.DepositorAddress] = inProfileConfig
-			.depositorsAllowList
-			.filter { !localConfig.depositorsAllowList.contains($0) }
+			.depositorsAllowSet()
+			.filter { !localConfig.depositorsAllowSet().contains($0) }
 
 		let accountAddress = state.account.address
 

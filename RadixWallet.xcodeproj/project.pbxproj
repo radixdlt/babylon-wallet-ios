@@ -7,9 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		48076E402B14F5CA004575F8 /* OnFirstAppearViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48076E3F2B14F5CA004575F8 /* OnFirstAppearViewModifier.swift */; };
 		480E50D52B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 480E50D32B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift */; };
 		48581B2F2B0206E600F885C0 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48581B2E2B0206E600F885C0 /* TestUtils.swift */; };
 		48649AD52ADC7CAC006307CF /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 48649AD42ADC7CAC006307CF /* AppIcon.xcassets */; };
+		489122782B186F61005F2EEE /* AlternativeRectangularButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 489122772B186F61005F2EEE /* AlternativeRectangularButtonStyle.swift */; };
 		48AB4E842AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AB4E832AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift */; };
 		48ABCF402AE54A1F00D6E87F /* iOS-dev-test.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */; };
 		48AE39D12B0CBC3400813CF3 /* RecoverWalletWithoutProfileCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39D02B0CBC3400813CF3 /* RecoverWalletWithoutProfileCoordinator.swift */; };
@@ -1340,11 +1342,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		48076E3F2B14F5CA004575F8 /* OnFirstAppearViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnFirstAppearViewModifier.swift; sourceTree = "<group>"; };
 		480E50D32B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecoverWalletWithoutProfileCoordinator+View.swift"; sourceTree = "<group>"; };
 		481B43B02ADC7F1A007945C1 /* RadixWalletTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RadixWalletTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		481B44022ADC7FB3007945C1 /* RadixWallet.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = RadixWallet.xctestplan; sourceTree = "<group>"; };
 		48581B2E2B0206E600F885C0 /* TestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUtils.swift; sourceTree = "<group>"; };
 		48649AD42ADC7CAC006307CF /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
+		489122772B186F61005F2EEE /* AlternativeRectangularButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlternativeRectangularButtonStyle.swift; sourceTree = "<group>"; };
 		48AB4E832AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileStore+AsyncSequence+Updates.swift"; sourceTree = "<group>"; };
 		48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "iOS-dev-test.xcconfig"; sourceTree = "<group>"; };
 		48AE39D02B0CBC3400813CF3 /* RecoverWalletWithoutProfileCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecoverWalletWithoutProfileCoordinator.swift; sourceTree = "<group>"; };
@@ -5911,6 +5915,7 @@
 				48CFC0FA2ADC10D900E77A5C /* URLButtonStyle.swift */,
 				48CFC0FB2ADC10D900E77A5C /* SecondaryRectangularButtonStyle.swift */,
 				48CFC0FC2ADC10D900E77A5C /* PrimaryRectangularButtonStyle.swift */,
+				489122772B186F61005F2EEE /* AlternativeRectangularButtonStyle.swift */,
 				48CFC0FD2ADC10D900E77A5C /* InertButtonStyle.swift */,
 			);
 			path = Styles;
@@ -5985,6 +5990,7 @@
 			children = (
 				48CFC1332ADC10D900E77A5C /* LedgerRowView.swift */,
 				48CFC1342ADC10D900E77A5C /* OnFirstTaskViewModifier.swift */,
+				48076E3F2B14F5CA004575F8 /* OnFirstAppearViewModifier.swift */,
 				48CFC1352ADC10D900E77A5C /* OnAnimationCompletedViewModifier.swift */,
 				48CFC1362ADC10D900E77A5C /* LoadableView.swift */,
 				48CFC1372ADC10D900E77A5C /* Extensions */,
@@ -8499,6 +8505,7 @@
 				48CFC4D62ADC10DA00E77A5C /* MetadataPublicKeyHashValueAllOf.swift in Sources */,
 				48CFC32D2ADC10D900E77A5C /* OffDeviceMnemonicInfo+View.swift in Sources */,
 				48CFC2EB2ADC10D900E77A5C /* NameSecurityStructure+View.swift in Sources */,
+				489122782B186F61005F2EEE /* AlternativeRectangularButtonStyle.swift in Sources */,
 				48CFC3652ADC10D900E77A5C /* NonFungibleTokenDetails+View.swift in Sources */,
 				48CFC5542ADC10DA00E77A5C /* StateValidatorsListRequestAllOf.swift in Sources */,
 				48CFC6722ADC10DB00E77A5C /* PrivateHDFactorSource.swift in Sources */,
@@ -9020,6 +9027,7 @@
 				48CFC37D2ADC10D900E77A5C /* PoolUnitHeaderView.swift in Sources */,
 				48CFC2EC2ADC10D900E77A5C /* SecurityStructureTutorialHeader.swift in Sources */,
 				48CFC4052ADC10D900E77A5C /* NoopError.swift in Sources */,
+				48076E402B14F5CA004575F8 /* OnFirstAppearViewModifier.swift in Sources */,
 				48CFC39D2ADC10D900E77A5C /* Engine+Bridge+Real+CryptoPrimitives.swift in Sources */,
 				48CFC3A72ADC10D900E77A5C /* SLIP10+PublicKey.swift in Sources */,
 				48CFC4692ADC10DA00E77A5C /* ImportLegacyWalletClient+Request+Response.swift in Sources */,
