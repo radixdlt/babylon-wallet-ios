@@ -111,13 +111,10 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedDeviceFactorSources(.success(deviceFactorSources)):
-			print(" UPDATE OK \(deviceFactorSources.count)")
-
 			state.deviceFactorSources = deviceFactorSources
 			return .none
 
 		case let .loadedDeviceFactorSources(.failure(error)):
-			print(" UPDATE faile \(error)")
 			loggerGlobal.error("Failed to load device factor sources, error: \(error)")
 //			errorQueue.schedule(error)
 			return .none
@@ -156,7 +153,7 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 				let deviceFactorSources = try await deviceFactorSourceClient.controlledEntities(nil).map {
 					DisplayEntitiesControlledByMnemonic.State(
 						accountsForDeviceFactorSource: $0,
-						mode: .headingAndAccountList
+						mode: .displayAccountListOnly
 					)
 				}
 				return deviceFactorSources.asIdentifiable()

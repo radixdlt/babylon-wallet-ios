@@ -79,6 +79,7 @@ private extension ManualAccountRecoverySeedPhraseCoordinator.View {
 	}
 
 	private func mnemonics() -> some View {
+		Selection(, from: <#T##Sequence#>) {}
 		ForEachStore(
 			store.scope(
 				state: \.deviceFactorSources,
