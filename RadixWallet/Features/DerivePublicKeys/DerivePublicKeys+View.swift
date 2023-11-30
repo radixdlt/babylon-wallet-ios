@@ -5,7 +5,7 @@ extension DerivePublicKeys.State {
 	var viewState: DerivePublicKeys.ViewState {
 		.init(
 			ledger: ledgerBeingUsed,
-			entityKind: (/DerivePublicKeys.State.Purpose.createEntity).extract(from: _purpose)
+			entityKind: (/SecureStorageClient.LoadMnemonicPurpose.createEntity).extract(from: purpose)
 		)
 	}
 }

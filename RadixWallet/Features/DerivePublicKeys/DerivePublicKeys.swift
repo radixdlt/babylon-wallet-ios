@@ -50,7 +50,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			case specificPrivateHDFactorSource(PrivateHDFactorSource)
 		}
 
-		public let _purpose: Purpose
+		private let _purpose: Purpose
 		public var purpose: SecureStorageClient.LoadMnemonicPurpose {
 			switch _purpose {
 			case let .createEntity(entityKind):
