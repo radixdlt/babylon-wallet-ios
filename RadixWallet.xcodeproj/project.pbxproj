@@ -12,6 +12,7 @@
 		48581B2F2B0206E600F885C0 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48581B2E2B0206E600F885C0 /* TestUtils.swift */; };
 		48649AD52ADC7CAC006307CF /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 48649AD42ADC7CAC006307CF /* AppIcon.xcassets */; };
 		489122782B186F61005F2EEE /* AlternativeRectangularButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 489122772B186F61005F2EEE /* AlternativeRectangularButtonStyle.swift */; };
+		4891227A2B191B7D005F2EEE /* RadixPickerStyleViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 489122792B191B7D005F2EEE /* RadixPickerStyleViewModifier.swift */; };
 		48AB4E842AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AB4E832AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift */; };
 		48ABCF402AE54A1F00D6E87F /* iOS-dev-test.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */; };
 		48AE39D12B0CBC3400813CF3 /* RecoverWalletWithoutProfileCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE39D02B0CBC3400813CF3 /* RecoverWalletWithoutProfileCoordinator.swift */; };
@@ -1349,6 +1350,7 @@
 		48581B2E2B0206E600F885C0 /* TestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUtils.swift; sourceTree = "<group>"; };
 		48649AD42ADC7CAC006307CF /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
 		489122772B186F61005F2EEE /* AlternativeRectangularButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlternativeRectangularButtonStyle.swift; sourceTree = "<group>"; };
+		489122792B191B7D005F2EEE /* RadixPickerStyleViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadixPickerStyleViewModifier.swift; sourceTree = "<group>"; };
 		48AB4E832AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileStore+AsyncSequence+Updates.swift"; sourceTree = "<group>"; };
 		48ABCF3F2AE54A1F00D6E87F /* iOS-dev-test.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "iOS-dev-test.xcconfig"; sourceTree = "<group>"; };
 		48AE39D02B0CBC3400813CF3 /* RecoverWalletWithoutProfileCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecoverWalletWithoutProfileCoordinator.swift; sourceTree = "<group>"; };
@@ -5915,6 +5917,7 @@
 				48CFC0FA2ADC10D900E77A5C /* URLButtonStyle.swift */,
 				48CFC0FB2ADC10D900E77A5C /* SecondaryRectangularButtonStyle.swift */,
 				48CFC0FC2ADC10D900E77A5C /* PrimaryRectangularButtonStyle.swift */,
+				489122792B191B7D005F2EEE /* RadixPickerStyleViewModifier.swift */,
 				489122772B186F61005F2EEE /* AlternativeRectangularButtonStyle.swift */,
 				48CFC0FD2ADC10D900E77A5C /* InertButtonStyle.swift */,
 			);
@@ -7976,6 +7979,7 @@
 				48CFC4FE2ADC10DA00E77A5C /* StateKeyValueStoreDataResponseItem.swift in Sources */,
 				48CFC4E62ADC10DA00E77A5C /* StateEntityNonFungiblesPageRequestOptIns.swift in Sources */,
 				48CFC26D2ADC10D900E77A5C /* SignWithFactorSourcesOfKindReducerProtocol.swift in Sources */,
+				4891227A2B191B7D005F2EEE /* RadixPickerStyleViewModifier.swift in Sources */,
 				48CFC5FD2ADC10DA00E77A5C /* HTTPURLSessionResponse.swift in Sources */,
 				48CFC3B32ADC10D900E77A5C /* HD+Root.swift in Sources */,
 				48CFC4F72ADC10DA00E77A5C /* PublicKeyHashType.swift in Sources */,
