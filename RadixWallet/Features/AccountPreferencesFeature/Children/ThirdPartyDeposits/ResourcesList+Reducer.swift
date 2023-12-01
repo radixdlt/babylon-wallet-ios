@@ -27,6 +27,8 @@ public struct ResourcesList: FeatureReducer, Sendable {
 	// MARK: State
 
 	public struct State: Hashable, Sendable {
+		let canModify: Bool
+
 		var allDepositorAddresses: OrderedSet<ResourceViewState.Address> {
 			switch mode {
 			case .allowDenyAssets:

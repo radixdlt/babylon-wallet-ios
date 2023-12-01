@@ -2930,12 +2930,12 @@
 		48CFBC742ADC10D800E77A5C /* ThirdPartyDeposits */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBC752ADC10D800E77A5C /* ThirdPartyDeposits+Reducer.swift */,
 				48CFBC762ADC10D800E77A5C /* AddAsset+Reducer.swift */,
 				48CFBC772ADC10D800E77A5C /* AddAssets+View.swift */,
 				48CFBC782ADC10D800E77A5C /* ResourcesList+Reducer.swift */,
-				48CFBC792ADC10D800E77A5C /* ThirdPartyDeposits+View.swift */,
 				48CFBC7A2ADC10D800E77A5C /* ResourcesList+View.swift */,
+				48CFBC752ADC10D800E77A5C /* ThirdPartyDeposits+Reducer.swift */,
+				48CFBC792ADC10D800E77A5C /* ThirdPartyDeposits+View.swift */,
 			);
 			path = ThirdPartyDeposits;
 			sourceTree = "<group>";

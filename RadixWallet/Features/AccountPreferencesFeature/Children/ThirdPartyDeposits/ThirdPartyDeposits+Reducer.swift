@@ -80,6 +80,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 
 			case .allowDenyAssets:
 				state.destination = .allowDenyAssets(.init(
+					canModify: !state.thirdPartyDeposits.isAssetsExceptionsUnknown,
 					mode: .allowDenyAssets(.allow),
 					thirdPartyDeposits: state.thirdPartyDeposits,
 					networkID: state.account.networkID
@@ -87,6 +88,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 
 			case .allowDepositors:
 				state.destination = .allowDepositors(.init(
+					canModify: !state.thirdPartyDeposits.isAllowedDepositorsUnknown,
 					mode: .allowDepositors,
 					thirdPartyDeposits: state.thirdPartyDeposits,
 					networkID: state.account.networkID
