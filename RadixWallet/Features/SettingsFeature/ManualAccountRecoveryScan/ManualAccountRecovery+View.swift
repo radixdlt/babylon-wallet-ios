@@ -57,11 +57,11 @@ extension ManualAccountRecovery.View {
 	private func babylonSection() -> some View {
 		VStack(spacing: .medium2) {
 			Button("Use Seed Phrase") { // FIXME: Strings - repeated
-				store.send(.view(.babylonUseSeedPhraseTapped))
+				store.send(.view(.useSeedPhraseTapped(.babylon)))
 			}
 
 			Button("Use Ledger Hardware Wallet") { // FIXME: Strings - repeated
-				store.send(.view(.babylonUseLedgerTapped))
+				store.send(.view(.useLedgerTapped(.babylon)))
 			}
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
@@ -88,11 +88,11 @@ extension ManualAccountRecovery.View {
 	private func olympiaSection() -> some View {
 		VStack(spacing: .medium2) {
 			Button("Use Seed Phrase") { // FIXME: Strings - repeated
-				store.send(.view(.olympiaUseSeedPhraseTapped))
+				store.send(.view(.useSeedPhraseTapped(.olympia)))
 			}
 
 			Button("Use Ledger Hardware Wallet") { // FIXME: Strings - repeated
-				store.send(.view(.olympiaUseLedgerTapped))
+				store.send(.view(.useLedgerTapped(.olympia)))
 			}
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))

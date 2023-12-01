@@ -149,6 +149,9 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
+		case .accountRecovery(.delegate(.gotoAccountList)):
+			return .send(.delegate(.gotoAccountList))
+
 		case let .importOlympiaWallet(.delegate(.finishedMigration(gotoAccountList))):
 			if gotoAccountList {
 				return .send(.delegate(.gotoAccountList))

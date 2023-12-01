@@ -4,6 +4,7 @@ import SwiftUI
 // MARK: - ManualAccountRecovery
 public struct ManualAccountRecovery: Sendable, FeatureReducer {
 	public typealias Store = StoreOf<Self>
+	public typealias AccountType = MnemonicBasedFactorSourceKind.OnDeviceMnemonicKind
 
 	public struct State: Sendable, Hashable {
 		@PresentationState
@@ -35,11 +36,15 @@ public struct ManualAccountRecovery: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case babylonUseSeedPhraseTapped
-		case babylonUseLedgerTapped
-		case olympiaUseSeedPhraseTapped
-		case olympiaUseLedgerTapped
+		case useSeedPhraseTapped(AccountType)
+		case useLedgerTapped(AccountType)
 	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case gotoAccountList
+	}
+
+	@Dependency(\.dismiss) var dismiss
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -55,18 +60,12 @@ public struct ManualAccountRecovery: Sendable, FeatureReducer {
 		case .appeared:
 			return .none
 
-		case .babylonUseSeedPhraseTapped:
-			state.destination = .seedPhrase(.init())
+		case let .useSeedPhraseTapped(accountType):
+			state.destination = .seedPhrase(.init(accountType: accountType))
 			return .none
 
-		case .babylonUseLedgerTapped:
-			state.destination = .ledger(.init())
-			return .none
-
-		case .olympiaUseSeedPhraseTapped:
-			return .none
-
-		case .olympiaUseLedgerTapped:
+		case let .useLedgerTapped(accountType):
+			state.destination = .ledger(.init(accountType: accountType))
 			return .none
 		}
 	}
@@ -74,7 +73,12 @@ public struct ManualAccountRecovery: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .seedPhrase(.delegate(seedPhraseAction)):
-			switch seedPhraseAction {}
+			switch seedPhraseAction {
+			case .gotoAccountList:
+				return .run { send in
+					await send(.delegate(.gotoAccountList))
+				}
+			}
 
 		case let .ledger(.delegate(ledgerAction)):
 			switch ledgerAction {}

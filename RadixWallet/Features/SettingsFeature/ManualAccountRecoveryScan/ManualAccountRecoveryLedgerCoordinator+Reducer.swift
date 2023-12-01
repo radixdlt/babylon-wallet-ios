@@ -8,6 +8,7 @@ public struct ManualAccountRecoveryLedgerCoordinator: Sendable, FeatureReducer {
 	// MARK: - State
 
 	public struct State: Sendable, Hashable {
+		public var accountType: ManualAccountRecovery.AccountType
 		public var root: LedgerHardwareDevices.State = .init(context: .accountRecovery)
 		public var path: StackState<Path.State> = .init()
 	}
@@ -82,11 +83,10 @@ public struct ManualAccountRecoveryLedgerCoordinator: Sendable, FeatureReducer {
 	private func reduce(into state: inout State, rootAction: LedgerHardwareDevices.Action) -> Effect<Action> {
 		switch rootAction {
 		case let .delegate(.choseLedger(ledger)):
-			print("• CHOSE \(ledger)")
-			return .none
+			.none
 
 		default:
-			return .none
+			.none
 		}
 	}
 

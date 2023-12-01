@@ -8,6 +8,7 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 	// MARK: - State
 
 	public struct State: Sendable, Hashable {
+		public var accountType: ManualAccountRecovery.AccountType
 		public var selected: EntitiesControlledByFactorSource? = nil
 		public var deviceFactorSources: IdentifiedArrayOf<EntitiesControlledByFactorSource> = []
 		public var path: StackState<Path.State> = .init()
@@ -29,6 +30,10 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadedDeviceFactorSources(TaskResult<IdentifiedArrayOf<EntitiesControlledByFactorSource>>)
+	}
+
+	public enum DelegateAction: Sendable, Equatable {
+		case gotoAccountList
 	}
 
 	// MARK: - Path
@@ -111,6 +116,9 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 		switch internalAction {
 		case let .loadedDeviceFactorSources(.success(deviceFactorSources)):
 			state.deviceFactorSources = deviceFactorSources
+			if state.deviceFactorSources.count == 1 {
+				state.selected = deviceFactorSources[0]
+			}
 			return .none
 
 		case let .loadedDeviceFactorSources(.failure(error)):
@@ -125,8 +133,8 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 		case let .recoveryComplete(recoveryCompleteAction):
 			switch recoveryCompleteAction {
 			case .delegate(.finish):
-				.run { _ in
-					await dismiss()
+				.run { send in
+					await send(.delegate(.gotoAccountList))
 				}
 
 			default:
