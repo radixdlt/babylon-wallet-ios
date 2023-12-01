@@ -112,8 +112,13 @@ public extension AccountRecoveryScanInProgress {
 
 		@ViewBuilder
 		func fixedFrameHeader(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
+			let string = if viewStore.isScanInProgress {
+				"Scanning for Accounts that have been included in at least on transaction, using:" // FIXME: Strings
+			} else {
+				"The first \(viewStore.maxIndex) potential accounts from this signing factor were scanned." // FIXME: Strings
+			}
 			VStack(alignment: .center) {
-				Text(viewStore.isScanInProgress ? "Scanning for Accounts that have been included in at least on transaction, using:" : "The first \(viewStore.maxIndex) potential accounts from this signing factor were scanned.")
+				Text(string)
 					.frame(height: 50) // static height because we this text to have fixed position when switching between status
 				Spacer(minLength: 0)
 				if viewStore.isScanInProgress {
