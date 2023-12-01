@@ -148,7 +148,7 @@ extension DisplayEntitiesControlledByMnemonic {
 				case .button:
 					Image(asset: AssetResource.chevronRight)
 				case let .selectable(isSelected):
-					RadioButton(appearance: .light, state: isSelected ? .selected : .unselected)
+					RadioButton(appearance: .dark, state: isSelected ? .selected : .unselected)
 				}
 			}
 		}

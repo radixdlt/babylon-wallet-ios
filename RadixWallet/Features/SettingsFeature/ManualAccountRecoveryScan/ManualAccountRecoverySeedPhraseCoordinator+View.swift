@@ -3,14 +3,14 @@ import SwiftUI
 
 extension ManualAccountRecoverySeedPhraseCoordinator.State {
 	var viewState: ManualAccountRecoverySeedPhraseCoordinator.ViewState {
-		.init(accountType: accountType, selected: selected, deviceFactorSources: deviceFactorSources)
+		.init(isOlympia: isOlympia, selected: selected, deviceFactorSources: deviceFactorSources)
 	}
 }
 
 // MARK: - ManualAccountRecoverySeedPhraseCoordinator.View
 extension ManualAccountRecoverySeedPhraseCoordinator {
 	public struct ViewState: Equatable {
-		public let accountType: ManualAccountRecovery.AccountType
+		public let isOlympia: Bool
 		public let selected: EntitiesControlledByFactorSource?
 		public let deviceFactorSources: IdentifiedArrayOf<EntitiesControlledByFactorSource>
 	}
@@ -58,7 +58,7 @@ private extension ManualAccountRecoverySeedPhraseCoordinator.View {
 						.padding(.horizontal, .large2)
 						.padding(.bottom, .large3)
 
-					Text(subtitle(for: viewStore.accountType))
+					Text(subtitle(isOlympia: viewStore.isOlympia))
 						.multilineTextAlignment(.center)
 						.textStyle(.body1Header)
 						.foregroundStyle(.app.gray1)
@@ -68,7 +68,7 @@ private extension ManualAccountRecoverySeedPhraseCoordinator.View {
 					mnemonics(viewStore: viewStore)
 						.padding(.bottom, .large3)
 
-					Button(buttonText(for: viewStore.accountType)) {
+					Button(buttonText(isOlympia: viewStore.isOlympia)) {
 						store.send(.view(.addButtonTapped))
 					}
 					.buttonStyle(.secondaryRectangular)
@@ -87,26 +87,24 @@ private extension ManualAccountRecoverySeedPhraseCoordinator.View {
 				}
 			}
 		}
-		.onAppear {
+		.onFirstAppear {
 			store.send(.view(.appeared))
 		}
 	}
 
-	private func subtitle(for accountType: ManualAccountRecovery.AccountType) -> String {
-		switch accountType {
-		case .babylon:
-			"Choose the Babylon seed phrase to use for derivation" // FIXME: Strings
-		case .olympia:
+	private func subtitle(isOlympia: Bool) -> String {
+		if isOlympia {
 			"Choose the Olympia seed phrase to use for derivation" // FIXME: Strings
+		} else {
+			"Choose the Babylon seed phrase to use for derivation" // FIXME: Strings
 		}
 	}
 
-	private func buttonText(for accountType: ManualAccountRecovery.AccountType) -> String {
-		switch accountType {
-		case .babylon:
-			"Add Babylon seed phrase" // FIXME: Strings
-		case .olympia:
+	private func buttonText(isOlympia: Bool) -> String {
+		if isOlympia {
 			"Add Olympia seed phrase" // FIXME: Strings
+		} else {
+			"Add Babylon seed phrase" // FIXME: Strings
 		}
 	}
 
@@ -143,64 +141,20 @@ private extension ManualAccountRecoverySeedPhraseCoordinator.View {
 						action: ManualAccountRecoverySeedPhraseCoordinator.Path.Action.enterSeedPhrase,
 						then: { ImportMnemonic.View(store: $0) }
 					)
+				case .accountRecoveryScan:
+					CaseLet(
+						/ManualAccountRecoverySeedPhraseCoordinator.Path.State.accountRecoveryScan,
+						action: ManualAccountRecoverySeedPhraseCoordinator.Path.Action.accountRecoveryScan,
+						then: { AccountRecoveryScanCoordinator.View(store: $0) }
+					)
 				case .recoveryComplete:
 					CaseLet(
 						/ManualAccountRecoverySeedPhraseCoordinator.Path.State.recoveryComplete,
 						action: ManualAccountRecoverySeedPhraseCoordinator.Path.Action.recoveryComplete,
-						then: { ManualAccountRecoveryComplete.View(store: $0) }
+						then: { ManualAccountRecoveryCompletion.View(store: $0) }
 					)
 				}
 			}
 		}
 	}
 }
-
-// MARK: - ManualAccountRecoveryComplete.View
-extension ManualAccountRecoveryComplete {
-	@MainActor
-	public struct View: SwiftUI.View {
-		private let store: Store
-
-		public init(store: Store) {
-			self.store = store
-		}
-	}
-}
-
-extension ManualAccountRecoveryComplete.View {
-	public var body: some View {
-		ScrollView {
-			VStack(spacing: .zero) {
-				Text("Recovery Complete") // FIXME: Strings
-					.multilineTextAlignment(.center)
-					.textStyle(.sheetTitle)
-					.foregroundStyle(.app.gray1)
-					.padding(.top, .medium3)
-					.padding(.horizontal, .large1)
-					.padding(.bottom, .large3)
-
-				Text(text)
-					.multilineTextAlignment(.center)
-					.textStyle(.body1Header)
-					.foregroundStyle(.app.gray1)
-					.padding(.horizontal, .huge2)
-					.padding(.bottom, .huge3)
-
-				Spacer(minLength: 0)
-			}
-		}
-		.footer {
-			Button("Continue") { // FIXME: Strings
-				store.send(.view(.continueButtonTapped))
-			}
-			.buttonStyle(.primaryRectangular(shouldExpand: true))
-		}
-	}
-}
-
-private let text: String = // FIXME: Strings
-	"""
-	Accounts discovered in the scan have been added to your wallet.
-
-	You can repeat this process for other seed phrases or Ledger hardware wallet devices.
-	"""

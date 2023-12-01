@@ -42,11 +42,17 @@ private extension ManualAccountRecoveryLedgerCoordinator.View {
 		var body: some View {
 			SwitchStore(store) { state in
 				switch state {
+				case .accountRecoveryScan:
+					CaseLet(
+						/ManualAccountRecoverySeedPhraseCoordinator.Path.State.accountRecoveryScan,
+						action: ManualAccountRecoverySeedPhraseCoordinator.Path.Action.accountRecoveryScan,
+						then: { AccountRecoveryScanCoordinator.View(store: $0) }
+					)
 				case .recoveryComplete:
 					CaseLet(
 						/ManualAccountRecoveryLedgerCoordinator.Path.State.recoveryComplete,
 						action: ManualAccountRecoveryLedgerCoordinator.Path.Action.recoveryComplete,
-						then: { ManualAccountRecoveryComplete.View(store: $0) }
+						then: { ManualAccountRecoveryCompletion.View(store: $0) }
 					)
 				}
 			}

@@ -1221,6 +1221,8 @@
 		A41266F12B15579E00EA38E9 /* ManualAccountRecoverySeedPhraseCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhraseCoordinator+View.swift */; };
 		A41266F72B160F3F00EA38E9 /* ManualAccountRecovery+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F62B160F3F00EA38E9 /* ManualAccountRecovery+Reducer.swift */; };
 		A41266F92B160F4C00EA38E9 /* ManualAccountRecovery+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F82B160F4C00EA38E9 /* ManualAccountRecovery+View.swift */; };
+		A4738D002B1A828B0034E28B /* ManualAccountRecoveryCompletion+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4738CFF2B1A828B0034E28B /* ManualAccountRecoveryCompletion+Reducer.swift */; };
+		A4738D022B1A82C40034E28B /* ManualAccountRecoveryCompletion+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4738D012B1A82C40034E28B /* ManualAccountRecoveryCompletion+View.swift */; };
 		A4ECC9E92B17253B00609A69 /* ManualAccountRecoveryLedgerCoordinator+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECC9E82B17253B00609A69 /* ManualAccountRecoveryLedgerCoordinator+Reducer.swift */; };
 		A4ECC9EB2B17256200609A69 /* ManualAccountRecoveryLedgerCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECC9EA2B17256200609A69 /* ManualAccountRecoveryLedgerCoordinator+View.swift */; };
 		E62449D52AFBA61100272C67 /* Home+AccountRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */; };
@@ -2534,6 +2536,8 @@
 		A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhraseCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoverySeedPhraseCoordinator+View.swift"; sourceTree = "<group>"; };
 		A41266F62B160F3F00EA38E9 /* ManualAccountRecovery+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecovery+Reducer.swift"; sourceTree = "<group>"; };
 		A41266F82B160F4C00EA38E9 /* ManualAccountRecovery+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecovery+View.swift"; sourceTree = "<group>"; };
+		A4738CFF2B1A828B0034E28B /* ManualAccountRecoveryCompletion+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryCompletion+Reducer.swift"; sourceTree = "<group>"; };
+		A4738D012B1A82C40034E28B /* ManualAccountRecoveryCompletion+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryCompletion+View.swift"; sourceTree = "<group>"; };
 		A4ECC9E82B17253B00609A69 /* ManualAccountRecoveryLedgerCoordinator+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryLedgerCoordinator+Reducer.swift"; sourceTree = "<group>"; };
 		A4ECC9EA2B17256200609A69 /* ManualAccountRecoveryLedgerCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryLedgerCoordinator+View.swift"; sourceTree = "<group>"; };
 		E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+Reducer.swift"; sourceTree = "<group>"; };
@@ -6930,7 +6934,9 @@
 			isa = PBXGroup;
 			children = (
 				A41266EE2B15578600EA38E9 /* ManualAccountRecoverySeedPhraseCoordinator+Reducer.swift */,
+				A4738CFF2B1A828B0034E28B /* ManualAccountRecoveryCompletion+Reducer.swift */,
 				A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhraseCoordinator+View.swift */,
+				A4738D012B1A82C40034E28B /* ManualAccountRecoveryCompletion+View.swift */,
 				A4ECC9E82B17253B00609A69 /* ManualAccountRecoveryLedgerCoordinator+Reducer.swift */,
 				A4ECC9EA2B17256200609A69 /* ManualAccountRecoveryLedgerCoordinator+View.swift */,
 				A41266F62B160F3F00EA38E9 /* ManualAccountRecovery+Reducer.swift */,
@@ -7927,6 +7933,7 @@
 				48CFC4032ADC10D900E77A5C /* KeychainClient+Mocked.swift in Sources */,
 				48CFC2B12ADC10D900E77A5C /* DerivePublicKeys+View.swift in Sources */,
 				48CFC3032ADC10D900E77A5C /* DebugManageFactorSources.swift in Sources */,
+				A4738D002B1A828B0034E28B /* ManualAccountRecoveryCompletion+Reducer.swift in Sources */,
 				48CFC3212ADC10D900E77A5C /* NewConnection+Reducer.swift in Sources */,
 				48CFC5C92ADC10DA00E77A5C /* StackedViewsLayout.swift in Sources */,
 				48CFC45C2ADC10DA00E77A5C /* P2PLinksClient+Interface.swift in Sources */,
@@ -8252,6 +8259,7 @@
 				48CFC3402ADC10D900E77A5C /* DappInteractionCoordinator+View.swift in Sources */,
 				48CFC3152ADC10D900E77A5C /* ScanMultipleOlympiaQRCodes+View.swift in Sources */,
 				48CFC2922ADC10D900E77A5C /* TransactionReviewNetworkFee.swift in Sources */,
+				A4738D022B1A82C40034E28B /* ManualAccountRecoveryCompletion+View.swift in Sources */,
 				48CFC2892ADC10D900E77A5C /* TransactionReviewGuarantees+View.swift in Sources */,
 				48CFC4232ADC10DA00E77A5C /* Identified+Extensions.swift in Sources */,
 				48CFC4072ADC10DA00E77A5C /* HexCodable32Bytes.swift in Sources */,

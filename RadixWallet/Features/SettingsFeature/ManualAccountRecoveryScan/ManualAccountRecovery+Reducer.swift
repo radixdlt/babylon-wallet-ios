@@ -4,7 +4,6 @@ import SwiftUI
 // MARK: - ManualAccountRecovery
 public struct ManualAccountRecovery: Sendable, FeatureReducer {
 	public typealias Store = StoreOf<Self>
-	public typealias AccountType = MnemonicBasedFactorSourceKind.OnDeviceMnemonicKind
 
 	public struct State: Sendable, Hashable {
 		@PresentationState
@@ -36,8 +35,8 @@ public struct ManualAccountRecovery: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case useSeedPhraseTapped(AccountType)
-		case useLedgerTapped(AccountType)
+		case useSeedPhraseTapped(isOlympia: Bool)
+		case useLedgerTapped(isOlympia: Bool)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -60,12 +59,12 @@ public struct ManualAccountRecovery: Sendable, FeatureReducer {
 		case .appeared:
 			return .none
 
-		case let .useSeedPhraseTapped(accountType):
-			state.destination = .seedPhrase(.init(accountType: accountType))
+		case let .useSeedPhraseTapped(isOlympia):
+			state.destination = .seedPhrase(.init(isOlympia: isOlympia))
 			return .none
 
-		case let .useLedgerTapped(accountType):
-			state.destination = .ledger(.init(accountType: accountType))
+		case let .useLedgerTapped(isOlympia):
+			state.destination = .ledger(.init(isOlympia: isOlympia))
 			return .none
 		}
 	}

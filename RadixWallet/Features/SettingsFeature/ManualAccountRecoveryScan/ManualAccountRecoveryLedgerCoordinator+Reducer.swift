@@ -8,7 +8,7 @@ public struct ManualAccountRecoveryLedgerCoordinator: Sendable, FeatureReducer {
 	// MARK: - State
 
 	public struct State: Sendable, Hashable {
-		public var accountType: ManualAccountRecovery.AccountType
+		public var isOlympia: Bool
 		public var root: LedgerHardwareDevices.State = .init(context: .accountRecovery)
 		public var path: StackState<Path.State> = .init()
 	}
@@ -34,17 +34,22 @@ public struct ManualAccountRecoveryLedgerCoordinator: Sendable, FeatureReducer {
 	public struct Path: Sendable, Hashable, Reducer {
 		@CasePathable
 		public enum State: Sendable, Hashable {
-			case recoveryComplete(ManualAccountRecoveryComplete.State)
+			case accountRecoveryScan(AccountRecoveryScanCoordinator.State)
+			case recoveryComplete(ManualAccountRecoveryCompletion.State)
 		}
 
 		@CasePathable
 		public enum Action: Sendable, Equatable {
-			case recoveryComplete(ManualAccountRecoveryComplete.Action)
+			case accountRecoveryScan(AccountRecoveryScanCoordinator.Action)
+			case recoveryComplete(ManualAccountRecoveryCompletion.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
+			Scope(state: \.accountRecoveryScan, action: \.accountRecoveryScan) {
+				AccountRecoveryScanCoordinator()
+			}
 			Scope(state: \.recoveryComplete, action: \.recoveryComplete) {
-				ManualAccountRecoveryComplete()
+				ManualAccountRecoveryCompletion()
 			}
 		}
 	}
@@ -100,16 +105,16 @@ public struct ManualAccountRecoveryLedgerCoordinator: Sendable, FeatureReducer {
 
 	private func reduce(into state: inout State, id: StackElementID, pathAction: Path.Action) -> Effect<Action> {
 		switch pathAction {
-		case let .recoveryComplete(recoveryCompleteAction):
+		case let .recoveryComplete(.delegate(recoveryCompleteAction)):
 			switch recoveryCompleteAction {
-			case .delegate(.finish):
+			case .finish:
 				.run { send in
 					await send(.delegate(.gotoAccountList))
 				}
-
-			default:
-				.none
 			}
+
+		default:
+			.none
 		}
 	}
 }

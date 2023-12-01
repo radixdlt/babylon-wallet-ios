@@ -26,6 +26,7 @@ extension ManualAccountRecovery.View {
 				olympiaSection()
 					.padding(.bottom, .small2)
 				footer()
+					.padding(.bottom, .small2)
 			}
 		}
 		.navigationTitle("Derive Legacy Account") // FIXME: Strings
@@ -57,11 +58,11 @@ extension ManualAccountRecovery.View {
 	private func babylonSection() -> some View {
 		VStack(spacing: .medium2) {
 			Button("Use Seed Phrase") { // FIXME: Strings - repeated
-				store.send(.view(.useSeedPhraseTapped(.babylon)))
+				store.send(.view(.useSeedPhraseTapped(isOlympia: false)))
 			}
 
 			Button("Use Ledger Hardware Wallet") { // FIXME: Strings - repeated
-				store.send(.view(.useLedgerTapped(.babylon)))
+				store.send(.view(.useLedgerTapped(isOlympia: false)))
 			}
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
@@ -88,11 +89,11 @@ extension ManualAccountRecovery.View {
 	private func olympiaSection() -> some View {
 		VStack(spacing: .medium2) {
 			Button("Use Seed Phrase") { // FIXME: Strings - repeated
-				store.send(.view(.useSeedPhraseTapped(.olympia)))
+				store.send(.view(.useSeedPhraseTapped(isOlympia: true)))
 			}
 
 			Button("Use Ledger Hardware Wallet") { // FIXME: Strings - repeated
-				store.send(.view(.useLedgerTapped(.olympia)))
+				store.send(.view(.useLedgerTapped(isOlympia: true)))
 			}
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
