@@ -251,7 +251,7 @@ extension GatewayAPI.EntityMetadataCollection {
 				return try transform(field)
 			}
 		} catch {
-			assertionFailure(error.localizedDescription)
+			loggerGlobal.error("Failed to extractMetaData \(error.localizedDescription)")
 			return nil
 		}
 	}

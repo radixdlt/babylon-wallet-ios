@@ -95,18 +95,6 @@ extension ImportMnemonic {
 
 		public init(store: StoreOf<ImportMnemonic>) {
 			self.store = store
-			let blue = UIColor(Color.app.blue2)
-			let white = UIColor(Color.app.white)
-			let appearance = UISegmentedControl.appearance()
-			appearance.selectedSegmentTintColor = blue
-
-			// NORMAL
-			appearance.setTitleTextAttributes([.font: FontConvertible.Font.app.segmentedControlNormal], for: .normal)
-			appearance.setTitleTextAttributes([.foregroundColor: blue], for: .normal)
-
-			// SELECTED
-			appearance.setTitleTextAttributes([.font: FontConvertible.Font.app.segmentedControlSelected], for: .selected)
-			appearance.setTitleTextAttributes([.foregroundColor: white], for: .selected)
 		}
 
 		public var body: some SwiftUI.View {
@@ -139,7 +127,7 @@ extension ImportMnemonic {
 											.textStyle(.body1Regular)
 									}
 								}
-								.pickerStyle(.segmented)
+								.pickerStyleRadixSegmented()
 							}
 							.padding(.horizontal, .large3)
 							.padding(.bottom, .medium2)

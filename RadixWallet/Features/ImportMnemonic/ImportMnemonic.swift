@@ -23,7 +23,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public mutating func changeWordCount(to newWordCount: BIP39.WordCount) {
 			let wordCount = words.count
 			let delta = newWordCount.rawValue - wordCount
-			let positiveDelta = abs(delta)
 			if delta > 0 {
 				// is increasing word count
 				words.append(contentsOf: (wordCount ..< newWordCount.rawValue).map {
@@ -39,7 +38,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				})
 			} else if delta < 0 {
 				// is decreasing word count
-				words.removeLast(positiveDelta)
+				words.removeLast(-delta)
 			}
 		}
 

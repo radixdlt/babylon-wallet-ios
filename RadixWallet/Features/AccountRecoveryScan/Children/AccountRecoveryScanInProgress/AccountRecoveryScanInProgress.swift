@@ -101,7 +101,6 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	@Dependency(\.accountsClient) var accountsClient
-	@Dependency(\.continuousClock) var clock
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
@@ -181,35 +180,41 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	}
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		let globalOffset = state.active.count + state.inactive.count
 		switch presentedAction {
 		case let .derivePublicKeys(.delegate(delegateAction)):
-			loggerGlobal.notice("Finish deriving public keys => `state.destination = nil`")
 			switch delegateAction {
 			case let .derivedPublicKeys(publicHDKeys, factorSourceID, networkID):
 				let id = state.factorSourceIDFromHash
 				assert(factorSourceID == id.embed())
 				assert(networkID == state.networkID)
+
 				return .run { send in
-					let accounts = await publicHDKeys.enumerated().asyncMap {
-						offset,
-							publicHDKey in
+					let accounts = try await publicHDKeys.enumerated().asyncMap { localOffset, publicHDKey in
+						let offset = localOffset + globalOffset
 						let appearanceID = await accountsClient.nextAppearanceID(networkID, offset)
-						let account = try! Profile.Network.Account(
+						return try Profile.Network.Account(
 							networkID: networkID,
-							factorInstance: .init(
+							factorInstance: HierarchicalDeterministicFactorInstance(
 								factorSourceID: id,
 								publicHDKey: publicHDKey
 							),
 							displayName: "Unnamed", // FIXME: Strings
 							extraProperties: .init(
 								appearanceID: appearanceID,
+								// We will be replacing the `depositRule` with one fetched from GW
+								// in `scan` step later on.
 								onLedgerSettings: .unknown
 							)
 						)
-						return account
 					}.asIdentifiable()
-					try? await clock.sleep(for: .milliseconds(300))
+
 					await send(.internal(.startScan(accounts: accounts)))
+				} catch: { error, send in
+					let errorMsg = "Failed to create account, error: \(error)"
+					loggerGlobal.critical(.init(stringLiteral: errorMsg))
+					assertionFailure(errorMsg)
+					await send(.delegate(.failedToDerivePublicKey))
 				}
 
 			case .failedToDerivePublicKey:
@@ -222,36 +227,45 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 }
 
 extension AccountRecoveryScanInProgress {
-	private func derivePublicKeys(
-		state: inout State
-	) -> Effect<Action> {
+	private func nextDerivationPaths(state: inout State) throws -> OrderedSet<DerivationPath> {
 		let networkID = state.networkID
-		let used = state.indicesOfAlreadyUsedEntities
 
 		let derivationIndices = generateIntegers(
 			start: state.maxIndex ?? 0,
 			count: batchSize,
-			shouldInclude: { !used.contains($0) }
+			excluding: state.indicesOfAlreadyUsedEntities
 		)
 
 		assert(derivationIndices.count == batchSize)
 		state.maxIndex = derivationIndices.max()! + 1
 
-		let derivationPaths = try! OrderedSet(validating: derivationIndices.map {
+		return try OrderedSet(validating: derivationIndices.map {
 			if state.forOlympiaAccounts {
-				try! LegacyOlympiaBIP44LikeDerivationPath(
+				try LegacyOlympiaBIP44LikeDerivationPath(
 					index: $0
 				).wrapAsDerivationPath()
 			} else {
-				try! AccountBabylonDerivationPath(
+				try AccountBabylonDerivationPath(
 					networkID: networkID,
 					index: $0,
 					keyKind: .virtualEntity
 				).wrapAsDerivationPath()
 			}
 		})
-		loggerGlobal.debug("✨paths: \(derivationPaths)")
-		state.status = .derivingPublicKeys
+	}
+
+	private func derivePublicKeys(
+		state: inout State
+	) -> Effect<Action> {
+		let derivationPaths: OrderedSet<DerivationPath>
+		do {
+			derivationPaths = try nextDerivationPaths(state: &state)
+		} catch {
+			let errorMsg = "Failed to calculate next derivation paths"
+			loggerGlobal.error(.init(stringLiteral: errorMsg))
+			assertionFailure(errorMsg)
+			return .send(.delegate(.failedToDerivePublicKey))
+		}
 		let factorSourceOption: DerivePublicKeys.State.FactorSourceOption
 
 		switch state.mode {
@@ -269,10 +283,11 @@ extension AccountRecoveryScanInProgress {
 			factorSourceOption = .specificPrivateHDFactorSource(privateHDFactorSource)
 		}
 
+		state.status = .derivingPublicKeys
 		state.destination = .derivePublicKeys(.init(
 			derivationPathOption: .knownPaths(
 				Array(derivationPaths),
-				networkID: networkID
+				networkID: state.networkID
 			),
 			factorSourceOption: factorSourceOption,
 			purpose: .createEntity(kind: .account)
@@ -281,7 +296,10 @@ extension AccountRecoveryScanInProgress {
 		return .none
 	}
 
-	private func scanOnLedger(accounts: IdentifiedArrayOf<Profile.Network.Account>, state: inout State) -> Effect<Action> {
+	private func scanOnLedger(
+		accounts: IdentifiedArrayOf<Profile.Network.Account>,
+		state: inout State
+	) -> Effect<Action> {
 		assert(accounts.count == batchSize)
 		state.status = .scanningNetworkForActiveAccounts
 		state.destination = nil
@@ -303,6 +321,8 @@ extension AccountRecoveryScanInProgress {
 			let activeAccounts = try await onLedgerEntitiesClient
 				.getAccounts(
 					accountAddresses,
+					// actually we wanna `resourceMetadataKeys` as well here, but we cannot since
+					// the count will exceed `EntityMetadataKey.maxAllowedKeys`.
 					metadataKeys: [.ownerBadge, .ownerKeys],
 					forceRefresh: true
 				)
@@ -334,6 +354,28 @@ extension AccountRecoveryScanInProgress {
 					inactive.append(account)
 				}
 			}
+
+			// Don't remove this, this is in fact needed if we don't
+			// wanna end up in a home page no icons on our tokens.
+			//
+			// Reason:
+			// GW limits the number of metadata items we can fetch:
+			// `EntityMetadataKey.maxAllowedKeys` thus we could not
+			// fetch the `resourceMetadataKeys` when we are fetching
+			// `[.ownerBadge, .ownerKeys]`, and that call gets cached!
+			// But we only need the `[.ownerBadge, .ownerKeys]` to
+			// check for active accounts, which we have finished doing
+			// above. So we now wanna replace that cache which is no
+			// longer useful, with useful metadata, containing token
+			// info including urls.
+			_ = try await onLedgerEntitiesClient
+				.getAccounts(
+					// no need to fetch for `inactive` accounts.
+					activeAccounts.map(\.address),
+					metadataKeys: .resourceMetadataKeys,
+					forceRefresh: true
+				)
+
 			return (active, inactive)
 		} catch is GatewayAPIClient.EmptyEntityDetailsResponse {
 			return (active: [], inactive: accounts)
@@ -345,7 +387,14 @@ extension AccountRecoveryScanInProgress {
 
 extension DerivationPath {
 	var index: HD.Path.Component.Child.Value {
-		try! hdFullPath().children.last!.nonHardenedValue
+		do {
+			guard let index = try hdFullPath().children.last?.nonHardenedValue else {
+				fatalError("Expected to ALWAYS be able to read the last path component of an HD paths' index, but was nil.")
+			}
+			return index
+		} catch {
+			fatalError("Expected to ALWAYS be able to read the last path component of an HD paths' index, got error: \(error)")
+		}
 	}
 }
 

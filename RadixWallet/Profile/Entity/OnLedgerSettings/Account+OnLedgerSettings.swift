@@ -67,6 +67,10 @@ extension Profile.Network.Account.OnLedgerSettings {
 			assetsExceptionList ?? []
 		}
 
+		public var isAssetsExceptionsUnknown: Bool {
+			assetsExceptionList == nil
+		}
+
 		public mutating func updateAssetsExceptionList(_ update: (inout OrderedSet<AssetException>?) -> Void) {
 			update(&self.assetsExceptionList)
 		}
@@ -93,6 +97,10 @@ extension Profile.Network.Account.OnLedgerSettings {
 		/// Note: There is no `deny` counterpart for this, `nil` means that the account was
 		/// "recovered" using "Account Recovery Scan" features. thus the value is unknown.
 		private var depositorsAllowList: OrderedSet<DepositorAddress>?
+
+		public var isAllowedDepositorsUnknown: Bool {
+			depositorsAllowList == nil
+		}
 
 		public func depositorsAllowSet() -> OrderedSet<DepositorAddress> {
 			depositorsAllowList ?? []

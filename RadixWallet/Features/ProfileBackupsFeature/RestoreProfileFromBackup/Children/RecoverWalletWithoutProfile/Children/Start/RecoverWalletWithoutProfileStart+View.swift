@@ -27,6 +27,7 @@ extension RecoverWalletWithoutProfileStart {
 
 						Text("If you have no wallet backup in the cloud or as an exported backup file, you still have other restore options.")
 							.multilineTextAlignment(.leading)
+							.textStyle(.body1Regular)
 
 						Divider()
 
@@ -50,6 +51,8 @@ extension RecoverWalletWithoutProfileStart {
 						}
 						.buttonStyle(.secondaryRectangular)
 					}
+					.textStyle(.body1HighImportance)
+					.foregroundColor(.app.gray1)
 					.multilineTextAlignment(.center)
 					.padding()
 				}

@@ -45,3 +45,15 @@ public func generateIntegers<Integer>(
 ) -> OrderedSet<Integer> where Integer: FixedWidthInteger {
 	generateElements(start: start, step: { $0 + 1 }, count: count, shouldInclude: shouldInclude)
 }
+
+public func generateIntegers<Integer>(
+	start: Integer,
+	count: Int,
+	excluding disallowed: some Collection<Integer>
+) -> OrderedSet<Integer> where Integer: FixedWidthInteger {
+	generateIntegers(
+		start: start,
+		count: count,
+		shouldInclude: { !disallowed.contains($0) }
+	)
+}
