@@ -21,11 +21,13 @@ public extension RecoverWalletControlWithBDFSOnly {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
-				VStack(alignment: .leading, spacing: .medium2) {
+				VStack(alignment: .center, spacing: .medium2) {
 					Text("Recover Control Without Backup")
 						.textStyle(.sheetTitle)
+						.multilineTextAlignment(.center)
 
 					Text("**If you have no wallet backup in the cloud or as an exported backup file**, you can still restore Account access only using your main “Babylon” seed phrase. You cannot recover your Account names or other wallet settings this way.\n\nYou will be asked to enter the primary seed phrase. There are **24 words** that the Radix Wallet mobile app showed you to write down and save securely.")
+						.multilineTextAlignment(.leading)
 
 					Spacer(minLength: 0)
 				}

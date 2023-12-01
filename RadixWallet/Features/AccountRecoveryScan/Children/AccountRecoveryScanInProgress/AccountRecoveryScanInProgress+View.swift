@@ -68,17 +68,7 @@ public extension AccountRecoveryScanInProgress {
 					Text(viewStore.title)
 						.textStyle(.sheetTitle)
 
-					VStack(alignment: .center, spacing: .medium1) {
-						if viewStore.isScanInProgress {
-							// FIXME: Strings
-							Text("Scanning for Accounts that have been included in at least on transaction, using:")
-							Text("**\(viewStore.factorSourceDescription)**")
-						} else {
-							// FIXME: Strings
-							Text("The first \(viewStore.maxIndex) potential accounts from this signing factor were scanned.")
-						}
-					}
-					.frame(height: 100) // static height else account list "jumps" when going between scanInProgress and scanCompleted
+					fixedFrameHeader(with: viewStore)
 
 					if viewStore.active.isEmpty {
 						if !viewStore.isScanInProgress {
@@ -118,6 +108,20 @@ public extension AccountRecoveryScanInProgress {
 				}
 				.destinations(with: store)
 			}
+		}
+
+		@ViewBuilder
+		func fixedFrameHeader(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
+			VStack(alignment: .center) {
+				Text(viewStore.isScanInProgress ? "Scanning for Accounts that have been included in at least on transaction, using:" : "The first \(viewStore.maxIndex) potential accounts from this signing factor were scanned.")
+					.frame(height: 50) // static height because we this text to have fixed position when switching between status
+				Spacer(minLength: 0)
+				if viewStore.isScanInProgress {
+					// FIXME: Strings
+					Text("**\(viewStore.factorSourceDescription)**")
+				}
+			}
+			.frame(height: 80) // static height else account list "jumps" when going between scanInProgress and scanCompleted
 		}
 	}
 }
