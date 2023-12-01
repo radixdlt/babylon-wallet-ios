@@ -39,21 +39,23 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 	// MARK: - Path
 
 	public struct Path: Sendable, Hashable, Reducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case enterSeedPhrase(ImportMnemonic.State)
 			case recoveryComplete(ManualAccountRecoveryComplete.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case enterSeedPhrase(ImportMnemonic.Action)
 			case recoveryComplete(ManualAccountRecoveryComplete.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.enterSeedPhrase, action: /Action.enterSeedPhrase) {
+			Scope(state: \.enterSeedPhrase, action: \.enterSeedPhrase) {
 				ImportMnemonic()
 			}
-			Scope(state: /State.recoveryComplete, action: /Action.recoveryComplete) {
+			Scope(state: \.recoveryComplete, action: \.recoveryComplete) {
 				ManualAccountRecoveryComplete()
 			}
 		}

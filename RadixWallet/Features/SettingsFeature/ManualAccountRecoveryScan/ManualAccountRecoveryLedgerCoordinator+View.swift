@@ -16,16 +16,18 @@ extension ManualAccountRecoveryLedgerCoordinator {
 extension ManualAccountRecoveryLedgerCoordinator.View {
 	public var body: some View {
 		NavigationStackStore(
-			store.scope(state: \.path, action: { .child(.path($0)) })
+			store.scope(state: \.path) { .child(.path($0)) }
 		) {
-			Color.pink
-				.toolbar {
-					ToolbarItem(placement: .automatic) {
-						CloseButton {
-							store.send(.view(.closeButtonTapped))
-						}
+			LedgerHardwareDevices.View(
+				store: store.scope(state: \.root) { .child(.root($0)) }
+			)
+			.toolbar {
+				ToolbarItem(placement: .automatic) {
+					CloseButton {
+						store.send(.view(.closeButtonTapped))
 					}
 				}
+			}
 		} destination: {
 			PathView(store: $0)
 		}
@@ -38,23 +40,16 @@ private extension ManualAccountRecoveryLedgerCoordinator.View {
 		let store: StoreOf<ManualAccountRecoveryLedgerCoordinator.Path>
 
 		var body: some View {
-			Color.red
-//			SwitchStore(store) { state in
-//				switch state {
-//				case .chooseSeedPhrase:
-//					CaseLet(
-//						/ManualAccountRecoveryScanCoordinator.Path.State.chooseSeedPhrase,
-//						action: ManualAccountRecoveryScanCoordinator.Path.Action.chooseSeedPhrase,
-//						then: { ManualAccountRecoveryScanCoordinator.ChooseSeedPhrase.View(store: $0) }
-//					)
-//				case .chooseLedger:
-//					CaseLet(
-//						/ManualAccountRecoveryScanCoordinator.Path.State.chooseLedger,
-//						action: ManualAccountRecoveryScanCoordinator.Path.Action.chooseLedger,
-//						then: { ManualAccountRecoveryScanCoordinator.ChooseLedger.View(store: $0) }
-//					)
-//				}
-//			}
+			SwitchStore(store) { state in
+				switch state {
+				case .recoveryComplete:
+					CaseLet(
+						/ManualAccountRecoveryLedgerCoordinator.Path.State.recoveryComplete,
+						action: ManualAccountRecoveryLedgerCoordinator.Path.Action.recoveryComplete,
+						then: { ManualAccountRecoveryComplete.View(store: $0) }
+					)
+				}
+			}
 		}
 	}
 }

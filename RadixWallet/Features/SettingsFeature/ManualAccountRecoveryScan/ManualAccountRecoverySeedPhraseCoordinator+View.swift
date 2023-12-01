@@ -3,13 +3,14 @@ import SwiftUI
 
 extension ManualAccountRecoverySeedPhraseCoordinator.State {
 	var viewState: ManualAccountRecoverySeedPhraseCoordinator.ViewState {
-		.init(selected: selected, deviceFactorSources: deviceFactorSources)
+		.init(accountType: accountType, selected: selected, deviceFactorSources: deviceFactorSources)
 	}
 }
 
 // MARK: - ManualAccountRecoverySeedPhraseCoordinator.View
 extension ManualAccountRecoverySeedPhraseCoordinator {
 	public struct ViewState: Equatable {
+		public let accountType: ManualAccountRecovery.AccountType
 		public let selected: EntitiesControlledByFactorSource?
 		public let deviceFactorSources: IdentifiedArrayOf<EntitiesControlledByFactorSource>
 	}
@@ -29,7 +30,7 @@ extension ManualAccountRecoverySeedPhraseCoordinator.View {
 		NavigationStackStore(
 			store.scope(state: \.path, action: { .child(.path($0)) })
 		) {
-			rootView
+			rootView()
 				.toolbar {
 					ToolbarItem(placement: .automatic) {
 						CloseButton {
@@ -45,33 +46,35 @@ extension ManualAccountRecoverySeedPhraseCoordinator.View {
 
 // MARK: - ManualAccountRecoverySeedPhraseCoordinator.View.PathView
 private extension ManualAccountRecoverySeedPhraseCoordinator.View {
-	var rootView: some View {
+	func rootView() -> some View {
 		ScrollView {
-			VStack(spacing: .zero) {
-				Text("Choose Seed Phrase") // FIXME: Strings
-					.multilineTextAlignment(.center)
-					.textStyle(.sheetTitle)
-					.foregroundStyle(.app.gray1)
-					.padding(.top, .medium3)
-					.padding(.horizontal, .large2)
-					.padding(.bottom, .large3)
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+				VStack(spacing: .zero) {
+					Text("Choose Seed Phrase") // FIXME: Strings
+						.multilineTextAlignment(.center)
+						.textStyle(.sheetTitle)
+						.foregroundStyle(.app.gray1)
+						.padding(.top, .medium3)
+						.padding(.horizontal, .large2)
+						.padding(.bottom, .large3)
 
-				Text("Choose the Olympia seed phrase to use for derivation") // FIXME: Strings
-					.multilineTextAlignment(.center)
-					.textStyle(.body1Header)
-					.foregroundStyle(.app.gray1)
-					.padding(.horizontal, .huge2)
-					.padding(.bottom, .huge3)
+					Text(subtitle(for: viewStore.accountType))
+						.multilineTextAlignment(.center)
+						.textStyle(.body1Header)
+						.foregroundStyle(.app.gray1)
+						.padding(.horizontal, .huge2)
+						.padding(.bottom, .huge3)
 
-				mnemonics()
-					.padding(.bottom, .large3)
+					mnemonics(viewStore: viewStore)
+						.padding(.bottom, .large3)
 
-				Button("Add Olympia Seed Phrase") { // FIXME: Strings
-					store.send(.view(.addButtonTapped))
+					Button(buttonText(for: viewStore.accountType)) {
+						store.send(.view(.addButtonTapped))
+					}
+					.buttonStyle(.secondaryRectangular)
+
+					Spacer(minLength: 0)
 				}
-				.buttonStyle(.secondaryRectangular)
-
-				Spacer(minLength: 0)
 			}
 		}
 		.footer {
@@ -89,26 +92,42 @@ private extension ManualAccountRecoverySeedPhraseCoordinator.View {
 		}
 	}
 
-	private func mnemonics() -> some View {
-		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-			let binding = viewStore.binding(get: \.selected, send: ManualAccountRecoverySeedPhraseCoordinator.ViewAction.selected)
-			Selection(binding, from: viewStore.deviceFactorSources) { item in
-				Card(.app.gray5) {
-					viewStore.send(.selected(item.value))
-				} contents: {
-					DisplayEntitiesControlledByMnemonic.MnemonicView(
-						viewState: .init(
-							headingState: .defaultHeading(type: .selectable(item.isSelected)),
-							promptUserToBackUpMnemonic: false,
-							accounts: item.value.accounts,
-							hasHiddenAccounts: !item.value.hiddenAccounts.isEmpty
-						)
+	private func subtitle(for accountType: ManualAccountRecovery.AccountType) -> String {
+		switch accountType {
+		case .babylon:
+			"Choose the Babylon seed phrase to use for derivation" // FIXME: Strings
+		case .olympia:
+			"Choose the Olympia seed phrase to use for derivation" // FIXME: Strings
+		}
+	}
+
+	private func buttonText(for accountType: ManualAccountRecovery.AccountType) -> String {
+		switch accountType {
+		case .babylon:
+			"Add Babylon seed phrase" // FIXME: Strings
+		case .olympia:
+			"Add Olympia seed phrase" // FIXME: Strings
+		}
+	}
+
+	private func mnemonics(viewStore: ViewStoreOf<ManualAccountRecoverySeedPhraseCoordinator>) -> some View {
+		let binding = viewStore.binding(get: \.selected, send: ManualAccountRecoverySeedPhraseCoordinator.ViewAction.selected)
+		return Selection(binding, from: viewStore.deviceFactorSources) { item in
+			Card(.app.gray5) {
+				viewStore.send(.selected(item.value))
+			} contents: {
+				DisplayEntitiesControlledByMnemonic.MnemonicView(
+					viewState: .init(
+						headingState: .defaultHeading(type: .selectable(item.isSelected)),
+						promptUserToBackUpMnemonic: false,
+						accounts: item.value.accounts,
+						hasHiddenAccounts: !item.value.hiddenAccounts.isEmpty
 					)
-					.padding(.medium3)
-				}
-				.cardShadow
-				.padding(.horizontal, .medium1)
+				)
+				.padding(.medium3)
 			}
+			.cardShadow
+			.padding(.horizontal, .medium1)
 		}
 	}
 

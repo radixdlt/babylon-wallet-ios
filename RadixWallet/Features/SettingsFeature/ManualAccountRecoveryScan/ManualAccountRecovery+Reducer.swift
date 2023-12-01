@@ -72,19 +72,13 @@ public struct ManualAccountRecovery: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .seedPhrase(.delegate(seedPhraseAction)):
-			switch seedPhraseAction {
-			case .gotoAccountList:
-				return .run { send in
-					await send(.delegate(.gotoAccountList))
-				}
+		case .seedPhrase(.delegate(.gotoAccountList)), .ledger(.delegate(.gotoAccountList)):
+			.run { send in
+				await send(.delegate(.gotoAccountList))
 			}
 
-		case let .ledger(.delegate(ledgerAction)):
-			switch ledgerAction {}
-
 		default:
-			return .none
+			.none
 		}
 	}
 }

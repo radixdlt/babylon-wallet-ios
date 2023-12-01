@@ -25,19 +25,25 @@ public struct ManualAccountRecoveryLedgerCoordinator: Sendable, FeatureReducer {
 		case path(StackActionOf<Path>)
 	}
 
+	public enum DelegateAction: Sendable, Equatable {
+		case gotoAccountList
+	}
+
 	// MARK: - Path
 
 	public struct Path: Sendable, Hashable, Reducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case recoveryComplete(ManualAccountRecoveryComplete.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case recoveryComplete(ManualAccountRecoveryComplete.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.recoveryComplete, action: /Action.recoveryComplete) {
+			Scope(state: \.recoveryComplete, action: \.recoveryComplete) {
 				ManualAccountRecoveryComplete()
 			}
 		}
@@ -83,16 +89,27 @@ public struct ManualAccountRecoveryLedgerCoordinator: Sendable, FeatureReducer {
 	private func reduce(into state: inout State, rootAction: LedgerHardwareDevices.Action) -> Effect<Action> {
 		switch rootAction {
 		case let .delegate(.choseLedger(ledger)):
-			.none
+			print("• chose ledger")
+			state.path.append(.recoveryComplete(.init()))
+			return .none
 
 		default:
-			.none
+			return .none
 		}
 	}
 
 	private func reduce(into state: inout State, id: StackElementID, pathAction: Path.Action) -> Effect<Action> {
-//		switch pathAction {
-//		}
-		.none
+		switch pathAction {
+		case let .recoveryComplete(recoveryCompleteAction):
+			switch recoveryCompleteAction {
+			case .delegate(.finish):
+				.run { send in
+					await send(.delegate(.gotoAccountList))
+				}
+
+			default:
+				.none
+			}
+		}
 	}
 }
