@@ -87,14 +87,6 @@ extension FontConvertible.Font.App {
 		FontFamily.IBMPlexSans.bold.font(size: 32)
 	}
 
-	public var segmentedControlNormal: FontConvertible.Font {
-		FontFamily.IBMPlexSans.regular.font(size: 24)
-	}
-
-	public var segmentedControlSelected: FontConvertible.Font {
-		FontFamily.IBMPlexSans.bold.font(size: 26)
-	}
-
 	public var secondaryHeader: FontConvertible.Font {
 		FontFamily.IBMPlexSans.semiBold.font(size: 18)
 	}

@@ -92,7 +92,7 @@ extension ResourcesList.View {
 						Text($0.text)
 					}
 				}
-				.pickerStyleRadixSegmented()
+				.pickerStyle(.segmented)
 			}
 
 			Text(viewStore.info)
