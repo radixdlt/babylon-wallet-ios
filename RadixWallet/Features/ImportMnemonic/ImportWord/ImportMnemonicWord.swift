@@ -137,9 +137,16 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 			}
 
 			guard input.count >= state.value.text.count else {
-				// We don't perform lookup when we decrease character count
-				state.value = .incomplete(text: input, hasFailedValidation: false)
-				return .none
+				switch state.value {
+				case let .incomplete(text: _, hasFailedValidation) where hasFailedValidation:
+					// allow lookup if current word is invalid
+					return .send(.delegate(.lookupWord(input: input)))
+				default:
+					// We don't perform lookup when we decrease character count if the
+					// state is not currently "incomplete(_, hasFailedValidation: true)
+					state.value = .incomplete(text: input, hasFailedValidation: false)
+					return .none
+				}
 			}
 
 			return .send(.delegate(.lookupWord(input: input)))
