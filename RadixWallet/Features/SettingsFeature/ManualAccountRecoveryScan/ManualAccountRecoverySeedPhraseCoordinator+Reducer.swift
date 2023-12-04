@@ -70,6 +70,7 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
+	@Dependency(\.errorQueue) var errorQueue
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -88,8 +89,10 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 			return .none
 
 		case .addButtonTapped:
+			let title = state.isOlympia ? "Enter Legacy Seed Phrase" : "Enter Seed Phrase" // FIXME: Strings
+
 			state.path.append(.enterSeedPhrase(.init(
-				header: .init(title: "Enter Legacy Seed Phrase"), // FIXME: Strings
+				header: .init(title: title),
 				warning: L10n.EnterSeedPhrase.warning,
 				warningOnContinue: nil,
 				isWordCountFixed: false,
@@ -100,9 +103,7 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 			return .none
 
 		case let .continueButtonTapped(factorSource):
-			state.path.append(.accountRecoveryScan(.init(
-				purpose: .addAccounts(factorSourceID: factorSource.factorSourceID, olympia: state.isOlympia)
-			)))
+			state.showAccountRecoveryScan(factorSourceID: factorSource.factorSourceID)
 			return .none
 
 		case .closeButtonTapped:
@@ -114,9 +115,7 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 		switch childAction {
 		case let .path(.element(id: id, action: pathAction)):
 			reduce(into: &state, id: id, pathAction: pathAction)
-		case let .path(.popFrom(id: id)):
-			.none
-		case let .path(.push(id: id, state: pathState)):
+		default:
 			.none
 		}
 	}
@@ -132,38 +131,20 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 
 		case let .loadedDeviceFactorSources(.failure(error)):
 			loggerGlobal.error("Failed to load device factor sources, error: \(error)")
-//			errorQueue.schedule(error)
+			errorQueue.schedule(error)
 			return .none
 		}
 	}
 
-	public func reduce(into state: inout State, id: StackElementID, pathAction: Path.Action) -> Effect<Action> {
+	private func reduce(into state: inout State, id: StackElementID, pathAction: Path.Action) -> Effect<Action> {
 		switch pathAction {
 		case let .enterSeedPhrase(.delegate(importMnemonicAction)):
 			switch importMnemonicAction {
-			case let .notPersisted(mnemonicWithPassphrase):
+			case let .persistedNewFactorSourceInProfile(factorSource):
 				do {
-					let factorSourceID = try FactorSourceID.FromHash(
-						kind: .device,
-						mnemonicWithPassphrase: mnemonicWithPassphrase
-					)
-					//				guard factorSourceID == state.entitiesControlledByFactorSource.factorSourceID else {
-					//					overlayWindowClient.scheduleHUD(.wrongMnemonic)
-					//					return .none
-					//				}
-
-					//				return validate(
-					//					mnemonicWithPassphrase: mnemonicWithPassphrase,
-					//					accounts: state.entitiesControlledByFactorSource.accounts,
-					//					factorSource: state.entitiesControlledByFactorSource.deviceFactorSource
-					//				)
-
-					let deviceFactorSource: DeviceFactorSource =
-						if state.isOlympia
-					{
-						try .olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
-					} else {
-						try .babylon(mnemonicWithPassphrase: mnemonicWithPassphrase)
+					guard case let .device(deviceFactorSource) = factorSource else {
+						struct NotDeviceFactorSource: Error {}
+						throw NotDeviceFactorSource()
 					}
 
 					state.deviceFactorSources.append(
@@ -171,18 +152,31 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 							entities: [],
 							hiddenEntities: [],
 							deviceFactorSource: deviceFactorSource,
-							isMnemonicPresentInKeychain: false, // TODO: Figure out
-							isMnemonicMarkedAsBackedUp: false // TODO: Figure out
+							isMnemonicPresentInKeychain: true,
+							isMnemonicMarkedAsBackedUp: false
 						)
 					)
+
+					_ = state.path.popLast()
+
+					state.showAccountRecoveryScan(factorSourceID: deviceFactorSource.id)
 				} catch {
 					loggerGlobal.error("Failed to add mnemonic \(error)")
+					errorQueue.schedule(error)
 				}
-				_ = state.path.popLast()
 				return .none
 			default:
 				return .none
 			}
+
+		case .accountRecoveryScan(.delegate(.dismissed)):
+			_ = state.path.popLast()
+			return .none
+
+		case .accountRecoveryScan(.delegate(.completed)):
+			_ = state.path.popLast()
+			state.path.append(.recoveryComplete(.init()))
+			return .none
 
 		case let .recoveryComplete(.delegate(recoveryCompleteAction)):
 			switch recoveryCompleteAction {
@@ -203,38 +197,19 @@ public struct ManualAccountRecoverySeedPhraseCoordinator: Sendable, FeatureReduc
 		.run { [isOlympia = state.isOlympia] send in
 			let result = await TaskResult {
 				try await deviceFactorSourceClient.controlledEntities(nil)
-					.filter { $0.isBDFS == !isOlympia } // TODO: Is this one-to-one?
+					.filter { $0.isBDFS == !isOlympia }
 			}
 			await send(.internal(.loadedDeviceFactorSources(result)))
 		} catch: { error, _ in
 			loggerGlobal.error("Error: \(error)")
 		}
 	}
+}
 
-	private func validate(
-		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		accounts: [Profile.Network.Account],
-		factorSource: DeviceFactorSource
-	) -> Effect<Action> {
-		.none
-//		func fail(error: Swift.Error?) -> Effect<Action> {
-//			loggerGlobal.error("Failed to validate all accounts against mnemonic, underlying error: \(String(describing: error))")
-//			errorQueue.schedule(MnemonicDidNotValidateAllAccounts())
-//			return .none
-//		}
-//		do {
-//			guard try mnemonicWithPassphrase.validatePublicKeys(of: accounts) else {
-//				return fail(error: nil)
-//			}
-//
-//			let privateHDFactorSource = try PrivateHDFactorSource(
-//				mnemonicWithPassphrase: mnemonicWithPassphrase,
-//				factorSource: factorSource
-//			)
-//
-//			return .send(.internal(.validated(privateHDFactorSource)))
-//		} catch {
-//			return fail(error: error)
-//		}
+private extension ManualAccountRecoverySeedPhraseCoordinator.State {
+	mutating func showAccountRecoveryScan(factorSourceID: FactorSourceID.FromHash) {
+		path.append(.accountRecoveryScan(.init(
+			purpose: .addAccounts(factorSourceID: factorSourceID, olympia: isOlympia)
+		)))
 	}
 }

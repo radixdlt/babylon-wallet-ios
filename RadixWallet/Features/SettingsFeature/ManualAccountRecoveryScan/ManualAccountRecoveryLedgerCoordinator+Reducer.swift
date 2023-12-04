@@ -84,9 +84,7 @@ public struct ManualAccountRecoveryLedgerCoordinator: Sendable, FeatureReducer {
 			reduce(into: &state, rootAction: rootAction)
 		case let .path(.element(id: id, action: pathAction)):
 			reduce(into: &state, id: id, pathAction: pathAction)
-		case let .path(.popFrom(id: id)):
-			.none
-		case let .path(.push(id: id, state: pathState)):
+		default:
 			.none
 		}
 	}
@@ -94,8 +92,7 @@ public struct ManualAccountRecoveryLedgerCoordinator: Sendable, FeatureReducer {
 	private func reduce(into state: inout State, rootAction: LedgerHardwareDevices.Action) -> Effect<Action> {
 		switch rootAction {
 		case let .delegate(.choseLedger(ledger)):
-			print("• chose ledger")
-			state.path.append(.recoveryComplete(.init()))
+			state.showAccountRecoveryScan(factorSourceID: ledger.id)
 			return .none
 
 		default:
@@ -105,16 +102,33 @@ public struct ManualAccountRecoveryLedgerCoordinator: Sendable, FeatureReducer {
 
 	private func reduce(into state: inout State, id: StackElementID, pathAction: Path.Action) -> Effect<Action> {
 		switch pathAction {
+		case .accountRecoveryScan(.delegate(.dismissed)):
+			_ = state.path.popLast()
+			return .none
+
+		case .accountRecoveryScan(.delegate(.completed)):
+			_ = state.path.popLast()
+			state.path.append(.recoveryComplete(.init()))
+			return .none
+
 		case let .recoveryComplete(.delegate(recoveryCompleteAction)):
 			switch recoveryCompleteAction {
 			case .finish:
-				.run { send in
+				return .run { send in
 					await send(.delegate(.gotoAccountList))
 				}
 			}
 
 		default:
-			.none
+			return .none
 		}
+	}
+}
+
+private extension ManualAccountRecoveryLedgerCoordinator.State {
+	mutating func showAccountRecoveryScan(factorSourceID: FactorSourceID.FromHash) {
+		path.append(.accountRecoveryScan(.init(
+			purpose: .addAccounts(factorSourceID: factorSourceID, olympia: isOlympia)
+		)))
 	}
 }
