@@ -24,12 +24,15 @@ public extension RecoverWalletControlWithBDFSComplete {
 				VStack(alignment: .leading, spacing: .medium1) {
 					Text("Recovery completed")
 						.textStyle(.sheetTitle)
+						.multilineTextAlignment(.center)
 
 					Text("Accounts discovered in the scan have been added to your wallet.\n\nIf you have any Olympia or “Legacy” Accounts to import - or any Accounts using a Ledger hardware wallet device - please use the **Account Recovery Scan** option in your Radix Wallet settings under **Account Security**.")
-						.textStyle(.body1Regular)
+						.multilineTextAlignment(.leading)
 
 					Spacer(minLength: 0)
 				}
+				.textStyle(.body1Regular)
+				.foregroundColor(.app.gray1)
 				.padding()
 				.footer {
 					Button("Continue") {

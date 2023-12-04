@@ -31,6 +31,8 @@ public extension RecoverWalletControlWithBDFSOnly {
 
 					Spacer(minLength: 0)
 				}
+				.textStyle(.body1Regular)
+				.foregroundColor(.app.gray1)
 				.padding()
 				.footer {
 					Button("Continue") {

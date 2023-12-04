@@ -27,7 +27,6 @@ extension RecoverWalletWithoutProfileStart {
 
 						Text("If you have no wallet backup in the cloud or as an exported backup file, you still have other restore options.")
 							.multilineTextAlignment(.leading)
-							.textStyle(.body1Regular)
 
 						Divider()
 
@@ -46,12 +45,12 @@ extension RecoverWalletWithoutProfileStart {
 
 						Text("**I only have Accounts created on the Radix Olympia Network**")
 
-						Button("Ledger-only or Olmypia-only Restore") {
+						Button("Ledger-only or Olympia-only Restore") {
 							store.send(.view(.ledgerOnlyOrOlympiaOnlyTapped))
 						}
 						.buttonStyle(.secondaryRectangular)
 					}
-					.textStyle(.body1HighImportance)
+					.textStyle(.body1Regular)
 					.foregroundColor(.app.gray1)
 					.multilineTextAlignment(.center)
 					.padding()

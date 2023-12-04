@@ -5,6 +5,7 @@ extension AccountRecoveryScanInProgress.State {
 			kind: factorSourceIDFromHash.kind,
 			olympia: forOlympiaAccounts,
 			active: active,
+			lastScanFoundNewActiveAccounts: lastScanFoundNewActiveAccounts,
 			hasFoundAnyAccounts: !active.isEmpty || !inactive.isEmpty,
 			maxIndex: batchNumber * batchSize
 		)
@@ -24,8 +25,13 @@ public extension AccountRecoveryScanInProgress {
 		let kind: FactorSourceKind
 		let olympia: Bool
 		let active: IdentifiedArrayOf<Profile.Network.Account>
+		let lastScanFoundNewActiveAccounts: Bool
 		let hasFoundAnyAccounts: Bool
 		let maxIndex: Int
+		var indexOfLastActive: Int {
+			max(0, active.count - 1)
+		}
+
 		var isScanInProgress: Bool {
 			switch status {
 			case .scanComplete: false
@@ -76,14 +82,32 @@ public extension AccountRecoveryScanInProgress {
 						}
 					} else {
 						ScrollView {
-							VStack(alignment: .leading, spacing: .small3) {
-								ForEach(viewStore.active) { account in
-									SmallAccountCard(account: account)
-										.cornerRadius(.small1)
+							ScrollViewReader { pageScroller in
+								VStack(alignment: .leading, spacing: .small3) {
+									ForEach(Array(zip(viewStore.active.indices, viewStore.active)), id: \.1) { index, account in
+										SmallAccountCard(account: account)
+											.cornerRadius(.small1)
+											.id(index)
+									}
+								}
+								.onChange(of: viewStore.maxIndex) { _ in
+									let indexToScrollTo = viewStore.indexOfLastActive
+									// We ALWAYS need to scroll, but we ONLY wanna scroll **with animation**
+									// if we found NEW active accounts.
+									if viewStore.lastScanFoundNewActiveAccounts {
+										withAnimation {
+											pageScroller.scrollTo(indexToScrollTo, anchor: .top)
+										}
+									} else {
+										pageScroller.scrollTo(indexToScrollTo, anchor: .top)
+									}
 								}
 							}
 						}
 					}
+
+					Text(viewStore.isScanInProgress ? "" : "The first \(viewStore.maxIndex) potential accounts from this signing factor were scanned.")
+						.frame(height: .huge3) // static height so that scroll view height is static
 
 					Spacer(minLength: 0)
 				}
@@ -113,7 +137,7 @@ public extension AccountRecoveryScanInProgress {
 		@ViewBuilder
 		func fixedFrameHeader(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
 			VStack(alignment: .center) {
-				Text(viewStore.isScanInProgress ? "Scanning for Accounts that have been included in at least on transaction, using:" : "The first \(viewStore.maxIndex) potential accounts from this signing factor were scanned.")
+				Text(viewStore.isScanInProgress ? "Scanning for Accounts that have been included in at least on transaction, using:" : "The following Accounts were found that have been included in at least one transaction:")
 					.frame(height: 50) // static height because we this text to have fixed position when switching between status
 				Spacer(minLength: 0)
 				if viewStore.isScanInProgress {
