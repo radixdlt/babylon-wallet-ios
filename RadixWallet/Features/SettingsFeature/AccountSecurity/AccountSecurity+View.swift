@@ -162,11 +162,11 @@ private extension View {
 	}
 
 	private func accountRecovery(with destinationStore: PresentationStoreOf<AccountSecurity.Destination>) -> some View {
-		navigationDestination(
+		fullScreenCover(
 			store: destinationStore,
 			state: /AccountSecurity.Destination.State.accountRecovery,
 			action: AccountSecurity.Destination.Action.accountRecovery,
-			destination: { ManualAccountRecovery.View(store: $0) }
+			content: { ManualAccountRecovery.View(store: $0) }
 		)
 	}
 }

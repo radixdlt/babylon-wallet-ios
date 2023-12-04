@@ -41,6 +41,7 @@ extension ManualAccountRecoveryCompletion.View {
 			}
 			.buttonStyle(.primaryRectangular(shouldExpand: true))
 		}
+		.navigationBarBackButtonHidden()
 	}
 }
 

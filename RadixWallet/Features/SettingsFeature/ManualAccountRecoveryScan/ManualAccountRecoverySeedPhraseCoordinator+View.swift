@@ -1,14 +1,14 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension ManualAccountRecoverySeedPhraseCoordinator.State {
-	var viewState: ManualAccountRecoverySeedPhraseCoordinator.ViewState {
+extension ManualAccountRecoverySeedPhrase.State {
+	var viewState: ManualAccountRecoverySeedPhrase.ViewState {
 		.init(isOlympia: isOlympia, selected: selected, deviceFactorSources: deviceFactorSources)
 	}
 }
 
 // MARK: - ManualAccountRecoverySeedPhraseCoordinator.View
-extension ManualAccountRecoverySeedPhraseCoordinator {
+extension ManualAccountRecoverySeedPhrase {
 	public struct ViewState: Equatable {
 		public let isOlympia: Bool
 		public let selected: EntitiesControlledByFactorSource?
@@ -25,28 +25,8 @@ extension ManualAccountRecoverySeedPhraseCoordinator {
 	}
 }
 
-extension ManualAccountRecoverySeedPhraseCoordinator.View {
+extension ManualAccountRecoverySeedPhrase.View {
 	public var body: some View {
-		NavigationStackStore(
-			store.scope(state: \.path, action: { .child(.path($0)) })
-		) {
-			rootView()
-				.toolbar {
-					ToolbarItem(placement: .automatic) {
-						CloseButton {
-							store.send(.view(.closeButtonTapped))
-						}
-					}
-				}
-		} destination: {
-			PathView(store: $0)
-		}
-	}
-}
-
-// MARK: - ManualAccountRecoverySeedPhraseCoordinator.View.PathView
-private extension ManualAccountRecoverySeedPhraseCoordinator.View {
-	func rootView() -> some View {
 		ScrollView {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .zero) {
@@ -90,8 +70,39 @@ private extension ManualAccountRecoverySeedPhraseCoordinator.View {
 		.onFirstAppear {
 			store.send(.view(.appeared))
 		}
+		.destinations(with: store)
 	}
+}
 
+private extension StoreOf<ManualAccountRecoverySeedPhrase> {
+	var destination: PresentationStoreOf<ManualAccountRecoverySeedPhrase.Destination> {
+		func scopeState(state: State) -> PresentationState<ManualAccountRecoverySeedPhrase.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<ManualAccountRecoverySeedPhrase>) -> some View {
+		let destinationStore = store.destination
+		return sheet(
+			store: destinationStore,
+			state: /ManualAccountRecoverySeedPhrase.Destination.State.enterSeedPhrase,
+			action: ManualAccountRecoverySeedPhrase.Destination.Action.enterSeedPhrase,
+			content: {
+				ImportMnemonic.View(store: $0)
+					.withNavigationBar {
+						store.send(.view(.closeEnterMnemonicButtonTapped))
+					}
+			}
+		)
+	}
+}
+
+// MARK: - ManualAccountRecoverySeedPhrase.View.PathView
+private extension ManualAccountRecoverySeedPhrase.View {
 	private func subtitle(isOlympia: Bool) -> String {
 		if isOlympia {
 			"Choose the Olympia seed phrase to use for derivation" // FIXME: Strings
@@ -108,8 +119,8 @@ private extension ManualAccountRecoverySeedPhraseCoordinator.View {
 		}
 	}
 
-	private func mnemonics(viewStore: ViewStoreOf<ManualAccountRecoverySeedPhraseCoordinator>) -> some View {
-		let binding = viewStore.binding(get: \.selected, send: ManualAccountRecoverySeedPhraseCoordinator.ViewAction.selected)
+	private func mnemonics(viewStore: ViewStoreOf<ManualAccountRecoverySeedPhrase>) -> some View {
+		let binding = viewStore.binding(get: \.selected, send: ManualAccountRecoverySeedPhrase.ViewAction.selected)
 		return Selection(binding, from: viewStore.deviceFactorSources) { item in
 			Card(.app.gray5) {
 				viewStore.send(.selected(item.value))
@@ -126,35 +137,6 @@ private extension ManualAccountRecoverySeedPhraseCoordinator.View {
 			}
 			.cardShadow
 			.padding(.horizontal, .medium1)
-		}
-	}
-
-	struct PathView: View {
-		let store: StoreOf<ManualAccountRecoverySeedPhraseCoordinator.Path>
-
-		var body: some View {
-			SwitchStore(store) { state in
-				switch state {
-				case .enterSeedPhrase:
-					CaseLet(
-						/ManualAccountRecoverySeedPhraseCoordinator.Path.State.enterSeedPhrase,
-						action: ManualAccountRecoverySeedPhraseCoordinator.Path.Action.enterSeedPhrase,
-						then: { ImportMnemonic.View(store: $0) }
-					)
-				case .accountRecoveryScan:
-					CaseLet(
-						/ManualAccountRecoverySeedPhraseCoordinator.Path.State.accountRecoveryScan,
-						action: ManualAccountRecoverySeedPhraseCoordinator.Path.Action.accountRecoveryScan,
-						then: { AccountRecoveryScanCoordinator.View(store: $0) }
-					)
-				case .recoveryComplete:
-					CaseLet(
-						/ManualAccountRecoverySeedPhraseCoordinator.Path.State.recoveryComplete,
-						action: ManualAccountRecoverySeedPhraseCoordinator.Path.Action.recoveryComplete,
-						then: { ManualAccountRecoveryCompletion.View(store: $0) }
-					)
-				}
-			}
 		}
 	}
 }

@@ -1223,8 +1223,6 @@
 		A41266F92B160F4C00EA38E9 /* ManualAccountRecovery+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F82B160F4C00EA38E9 /* ManualAccountRecovery+View.swift */; };
 		A4738D002B1A828B0034E28B /* ManualAccountRecoveryCompletion+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4738CFF2B1A828B0034E28B /* ManualAccountRecoveryCompletion+Reducer.swift */; };
 		A4738D022B1A82C40034E28B /* ManualAccountRecoveryCompletion+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4738D012B1A82C40034E28B /* ManualAccountRecoveryCompletion+View.swift */; };
-		A4ECC9E92B17253B00609A69 /* ManualAccountRecoveryLedgerCoordinator+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECC9E82B17253B00609A69 /* ManualAccountRecoveryLedgerCoordinator+Reducer.swift */; };
-		A4ECC9EB2B17256200609A69 /* ManualAccountRecoveryLedgerCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECC9EA2B17256200609A69 /* ManualAccountRecoveryLedgerCoordinator+View.swift */; };
 		E62449D52AFBA61100272C67 /* Home+AccountRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */; };
 		E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */; };
 		E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */; };
@@ -2538,8 +2536,6 @@
 		A41266F82B160F4C00EA38E9 /* ManualAccountRecovery+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecovery+View.swift"; sourceTree = "<group>"; };
 		A4738CFF2B1A828B0034E28B /* ManualAccountRecoveryCompletion+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryCompletion+Reducer.swift"; sourceTree = "<group>"; };
 		A4738D012B1A82C40034E28B /* ManualAccountRecoveryCompletion+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryCompletion+View.swift"; sourceTree = "<group>"; };
-		A4ECC9E82B17253B00609A69 /* ManualAccountRecoveryLedgerCoordinator+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryLedgerCoordinator+Reducer.swift"; sourceTree = "<group>"; };
-		A4ECC9EA2B17256200609A69 /* ManualAccountRecoveryLedgerCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryLedgerCoordinator+View.swift"; sourceTree = "<group>"; };
 		E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+Reducer.swift"; sourceTree = "<group>"; };
 		E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+View.swift"; sourceTree = "<group>"; };
 		E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportMnemonicTests.swift; sourceTree = "<group>"; };
@@ -6937,8 +6933,6 @@
 				A4738CFF2B1A828B0034E28B /* ManualAccountRecoveryCompletion+Reducer.swift */,
 				A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhraseCoordinator+View.swift */,
 				A4738D012B1A82C40034E28B /* ManualAccountRecoveryCompletion+View.swift */,
-				A4ECC9E82B17253B00609A69 /* ManualAccountRecoveryLedgerCoordinator+Reducer.swift */,
-				A4ECC9EA2B17256200609A69 /* ManualAccountRecoveryLedgerCoordinator+View.swift */,
 				A41266F62B160F3F00EA38E9 /* ManualAccountRecovery+Reducer.swift */,
 				A41266F82B160F4C00EA38E9 /* ManualAccountRecovery+View.swift */,
 			);
@@ -8174,7 +8168,6 @@
 				48CFC4BD2ADC10DA00E77A5C /* MetadataNonFungibleGlobalIdArrayValueAllOf.swift in Sources */,
 				48CFC2612ADC10D900E77A5C /* EditPersonaAddEntryKinds+View.swift in Sources */,
 				48CFC4D42ADC10DA00E77A5C /* StateEntityDetailsRequest.swift in Sources */,
-				A4ECC9E92B17253B00609A69 /* ManualAccountRecoveryLedgerCoordinator+Reducer.swift in Sources */,
 				48CFC3B82ADC10D900E77A5C /* Secp256k1+SLIP10.swift in Sources */,
 				83EE478B2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueU32.swift in Sources */,
 				48CFC3072ADC10D900E77A5C /* DebugUserDefaultsContents.swift in Sources */,
@@ -8813,7 +8806,6 @@
 				48CFC3242ADC10D900E77A5C /* ConnectUsingSecrets+View.swift in Sources */,
 				48CFC2412ADC10D900E77A5C /* DevAccountPreferences+Reducer.swift in Sources */,
 				48CFC3742ADC10D900E77A5C /* LSUResource.swift in Sources */,
-				A4ECC9EB2B17256200609A69 /* ManualAccountRecoveryLedgerCoordinator+View.swift in Sources */,
 				48CFC5062ADC10DA00E77A5C /* EntityMetadataItem.swift in Sources */,
 				48CFC3232ADC10D900E77A5C /* ConnectUsingSecrets+Reducer.swift in Sources */,
 				48CFC5FF2ADC10DA00E77A5C /* Persona+PreviewValues.swift in Sources */,

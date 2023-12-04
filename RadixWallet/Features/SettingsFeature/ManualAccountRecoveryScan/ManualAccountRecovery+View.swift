@@ -15,63 +15,84 @@ extension ManualAccountRecovery {
 
 extension ManualAccountRecovery.View {
 	public var body: some View {
+		NavigationStackStore(
+			store.scope(state: \.path) { .child(.path($0)) }
+		) {
+			root()
+		} destination: {
+			PathView(store: $0)
+		}
+	}
+
+	private func root() -> some View {
 		ScrollView {
 			VStack(spacing: .zero) {
 				babylonHeader()
-					.padding(.bottom, .medium2)
 				babylonSection()
-					.padding(.bottom, .large3)
 				olympiaHeader()
-					.padding(.bottom, .medium2)
 				olympiaSection()
-					.padding(.bottom, .small2)
-				footer()
-					.padding(.bottom, .small2)
 			}
 		}
-		.navigationTitle("Derive Legacy Account") // FIXME: Strings
-		.destinations(with: store)
+		.background(.app.gray5)
+		.toolbar {
+			ToolbarItem(placement: .automatic) {
+				CloseButton {
+					store.send(.view(.closeButtonTapped))
+				}
+			}
+		}
 	}
 
 	private func babylonHeader() -> some View {
 		VStack(spacing: .zero) {
+			Text("Account Recovery Scan") // FIXME: Strings
+				.textStyle(.sheetTitle)
+				.multilineTextAlignment(.center)
+				.foregroundColor(.app.gray1)
+				.padding(.top, .small1)
+				.padding(.horizontal, .medium1)
+				.padding(.bottom, .medium3)
+
 			Text(LocalizedStringKey(text))
 				.textStyle(.body1Regular)
 				.foregroundStyle(.app.gray2)
-				.padding(.top, .medium3)
+				.padding(.bottom, .medium1)
 
-			Text("Babylon Accounts")
+			Text("Babylon Accounts") // FIXME: Strings
 				.textStyle(.sectionHeader)
 				.foregroundStyle(.app.gray1)
-				.padding(.top, .medium1)
+				.padding(.bottom, .medium3)
 
 			Text(LocalizedStringKey("Scan for Accounts originally created on the **Babylon** network:")) // FIXME: Strings
 				.textStyle(.body1Regular)
 				.foregroundStyle(.app.gray2)
 				.flushedLeft
-				.padding(.vertical, .medium3)
+				.padding(.bottom, .medium3)
 		}
 		.padding(.horizontal, .medium2)
-		.background(.app.gray5)
 	}
 
 	private func babylonSection() -> some View {
-		VStack(spacing: .medium2) {
+		VStack(spacing: 0) {
 			Button("Use Seed Phrase") { // FIXME: Strings - repeated
 				store.send(.view(.useSeedPhraseTapped(isOlympia: false)))
 			}
+			.padding(.bottom, .medium2)
 
 			Button("Use Ledger Hardware Wallet") { // FIXME: Strings - repeated
 				store.send(.view(.useLedgerTapped(isOlympia: false)))
 			}
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
+		.padding(.top, .medium2)
 		.padding(.horizontal, .medium1)
+		.padding(.bottom, .large3)
+		.background(.app.white)
 	}
 
 	private func olympiaHeader() -> some View {
 		VStack(spacing: .zero) {
-			Text("Olympia Accounts")
+			Text("Olympia Accounts") // FIXME: Strings
 				.textStyle(.sectionHeader)
 				.foregroundStyle(.app.gray1)
 				.padding(.top, .medium1)
@@ -83,28 +104,30 @@ extension ManualAccountRecovery.View {
 				.padding(.vertical, .medium3)
 		}
 		.padding(.horizontal, .medium2)
-		.background(.app.gray5)
 	}
 
 	private func olympiaSection() -> some View {
-		VStack(spacing: .medium2) {
+		VStack(spacing: 0) {
 			Button("Use Seed Phrase") { // FIXME: Strings - repeated
 				store.send(.view(.useSeedPhraseTapped(isOlympia: true)))
 			}
+			.padding(.bottom, .medium2)
 
 			Button("Use Ledger Hardware Wallet") { // FIXME: Strings - repeated
 				store.send(.view(.useLedgerTapped(isOlympia: true)))
 			}
+			.padding(.bottom, .small2)
+
+			Text(LocalizedStringKey("Note: You will still use the new **Radix Babylon** app on your Ledger device.")) // FIXME: Strings
+				.textStyle(.body1Regular)
+				.foregroundStyle(.app.gray2)
+				.flushedLeft
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
+		.padding(.top, .medium2)
 		.padding(.horizontal, .medium1)
-	}
-
-	private func footer() -> some View {
-		Text(LocalizedStringKey("Note: You will still use the new **Radix Babylon** app on your Ledger device.")) // FIXME: Strings
-			.textStyle(.body1Regular)
-			.foregroundStyle(.app.gray2)
-			.padding(.horizontal, .medium2)
+		.padding(.bottom, .small1)
+		.background(.app.white)
 	}
 }
 
@@ -123,29 +146,40 @@ private extension StoreOf<ManualAccountRecovery> {
 	}
 }
 
-@MainActor
-private extension View {
-	func destinations(with store: StoreOf<ManualAccountRecovery>) -> some View {
-		let destinationStore = store.destination
-		return seedPhraseCoordinator(with: destinationStore)
-			.ledgerCoordinator(with: destinationStore)
-	}
+// MARK: - ManualAccountRecovery.View.PathView
+private extension ManualAccountRecovery.View {
+	struct PathView: View {
+		let store: StoreOf<ManualAccountRecovery.Path>
 
-	private func seedPhraseCoordinator(with destinationStore: PresentationStoreOf<ManualAccountRecovery.Destination>) -> some View {
-		fullScreenCover(
-			store: destinationStore,
-			state: /ManualAccountRecovery.Destination.State.seedPhrase,
-			action: ManualAccountRecovery.Destination.Action.seedPhrase,
-			content: { ManualAccountRecoverySeedPhraseCoordinator.View(store: $0) }
-		)
-	}
-
-	private func ledgerCoordinator(with destinationStore: PresentationStoreOf<ManualAccountRecovery.Destination>) -> some View {
-		fullScreenCover(
-			store: destinationStore,
-			state: /ManualAccountRecovery.Destination.State.ledger,
-			action: ManualAccountRecovery.Destination.Action.ledger,
-			content: { ManualAccountRecoveryLedgerCoordinator.View(store: $0) }
-		)
+		var body: some View {
+			SwitchStore(store) { state in
+				switch state {
+				case .seedPhrase:
+					CaseLet(
+						/ManualAccountRecovery.Path.State.seedPhrase,
+						action: ManualAccountRecovery.Path.Action.seedPhrase,
+						then: { ManualAccountRecoverySeedPhrase.View(store: $0) }
+					)
+				case .ledger:
+					CaseLet(
+						/ManualAccountRecovery.Path.State.ledger,
+						action: ManualAccountRecovery.Path.Action.ledger,
+						then: { LedgerHardwareDevices.View(store: $0) }
+					)
+				case .accountRecoveryScan:
+					CaseLet(
+						/ManualAccountRecovery.Path.State.accountRecoveryScan,
+						action: ManualAccountRecovery.Path.Action.accountRecoveryScan,
+						then: { AccountRecoveryScanCoordinator.View(store: $0) }
+					)
+				case .recoveryComplete:
+					CaseLet(
+						/ManualAccountRecovery.Path.State.recoveryComplete,
+						action: ManualAccountRecovery.Path.Action.recoveryComplete,
+						then: { ManualAccountRecoveryCompletion.View(store: $0) }
+					)
+				}
+			}
+		}
 	}
 }
