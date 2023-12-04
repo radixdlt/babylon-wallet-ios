@@ -32,16 +32,15 @@ public extension AccountRecoveryScanInProgress {
 			max(0, active.count - 1)
 		}
 
+		var buttonControlState: ControlState {
+			isScanInProgress ? .disabled : .enabled
+		}
+
 		var isScanInProgress: Bool {
 			switch status {
 			case .scanComplete: false
 			default: true
 			}
-		}
-
-		var title: String {
-			// FIXME: Strings
-			status == .scanComplete ? "Scan Complete" : "Scan in progress"
 		}
 
 		// FIXME: Strings
@@ -71,46 +70,14 @@ public extension AccountRecoveryScanInProgress {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .center, spacing: .medium1) {
-					Text(viewStore.title)
-						.textStyle(.sheetTitle)
-
-					fixedFrameHeader(with: viewStore)
-
-					if viewStore.active.isEmpty {
-						if !viewStore.isScanInProgress {
-							NoContentView("None found.") // FIXME: Strings
-						}
+					if viewStore.isScanInProgress {
+						scanInProgressView(with: viewStore)
 					} else {
-						ScrollView {
-							ScrollViewReader { pageScroller in
-								VStack(alignment: .leading, spacing: .small3) {
-									ForEach(Array(zip(viewStore.active.indices, viewStore.active)), id: \.1) { index, account in
-										SmallAccountCard(account: account)
-											.cornerRadius(.small1)
-											.id(index)
-									}
-								}
-								.onChange(of: viewStore.maxIndex) { _ in
-									let indexToScrollTo = viewStore.indexOfLastActive
-									// We ALWAYS need to scroll, but we ONLY wanna scroll **with animation**
-									// if we found NEW active accounts.
-									if viewStore.lastScanFoundNewActiveAccounts {
-										withAnimation {
-											pageScroller.scrollTo(indexToScrollTo, anchor: .top)
-										}
-									} else {
-										pageScroller.scrollTo(indexToScrollTo, anchor: .top)
-									}
-								}
-							}
-						}
+						scanCompleteView(with: viewStore)
 					}
-
-					Text(viewStore.isScanInProgress ? "" : "The first \(viewStore.maxIndex) potential accounts from this signing factor were scanned.")
-						.frame(height: .huge3) // static height so that scroll view height is static
-
-					Spacer(minLength: 0)
 				}
+				.textStyle(.body1Regular)
+				.foregroundColor(.app.gray1)
 				.controlState(viewStore.loadingState)
 				.presentsLoadingViewOverlay()
 				.padding()
@@ -120,12 +87,14 @@ public extension AccountRecoveryScanInProgress {
 						store.send(.view(.scanMore))
 					}
 					.buttonStyle(.alternativeRectangular)
+					.controlState(viewStore.buttonControlState)
 
 					// FIXME: Strings
 					Button("Continue") {
 						store.send(.view(.continueTapped))
 					}
 					.buttonStyle(.primaryRectangular)
+					.controlState(viewStore.buttonControlState)
 				}
 				.onFirstAppear {
 					viewStore.send(.onFirstAppear)
@@ -135,17 +104,38 @@ public extension AccountRecoveryScanInProgress {
 		}
 
 		@ViewBuilder
-		func fixedFrameHeader(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
-			VStack(alignment: .center) {
-				Text(viewStore.isScanInProgress ? "Scanning for Accounts that have been included in at least on transaction, using:" : "The following Accounts were found that have been included in at least one transaction:")
-					.frame(height: 50) // static height because we this text to have fixed position when switching between status
-				Spacer(minLength: 0)
-				if viewStore.isScanInProgress {
-					// FIXME: Strings
-					Text("**\(viewStore.factorSourceDescription)**")
+		func scanInProgressView(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
+			Text("Scan in progress")
+				.textStyle(.sheetTitle)
+
+			Spacer()
+
+			Text("Scanning for Accounts that have been included in at least on transaction, using:")
+			Text("**\(viewStore.factorSourceDescription)**")
+		}
+
+		@ViewBuilder
+		func scanCompleteView(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
+			ScrollView {
+				VStack(alignment: .center, spacing: .medium1) {
+					Text("Scan Complete")
+						.textStyle(.sheetTitle)
+
+					Text("The first \(viewStore.maxIndex) potential Accounts from this signing factor were scanned. The following Accounts had at least one transaction:")
+
+					if viewStore.active.isEmpty {
+						NoContentView("None found.") // FIXME: Strings
+					} else {
+						// we want less spacing between accounts then between child views of the root view.
+						VStack(alignment: .leading, spacing: .small3) {
+							ForEach(viewStore.active) { account in
+								SmallAccountCard(account: account)
+									.cornerRadius(.small1)
+							}
+						}
+					}
 				}
 			}
-			.frame(height: 80) // static height else account list "jumps" when going between scanInProgress and scanCompleted
 		}
 	}
 }
