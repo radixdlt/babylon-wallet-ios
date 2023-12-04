@@ -6,31 +6,7 @@ public struct ManualAccountRecovery: Sendable, FeatureReducer {
 	public typealias Store = StoreOf<Self>
 
 	public struct State: Sendable, Hashable {
-		@PresentationState
-		public var destination: Destination.State? = nil
-
 		public var path: StackState<Path.State> = .init()
-	}
-
-	// MARK: - Destination
-
-	public struct Destination: DestinationReducer {
-		@CasePathable
-		public enum State: Hashable, Sendable {
-			case enterSeedPhrase(ImportMnemonic.State)
-		}
-
-		@CasePathable
-		public enum Action: Equatable, Sendable {
-			case enterSeedPhrase(ImportMnemonic.Action)
-		}
-
-		public var body: some ReducerOf<Self> {
-//			EmptyReducer()
-			Scope(state: \.enterSeedPhrase, action: \.enterSeedPhrase) {
-				ImportMnemonic()
-			}
-		}
 	}
 
 	// MARK: - Path
@@ -91,12 +67,7 @@ public struct ManualAccountRecovery: Sendable, FeatureReducer {
 			.forEach(\.path, action: /Action.child .. ChildAction.path) {
 				Path()
 			}
-			.ifLet(destinationPath, action: /Action.destination) {
-				Destination()
-			}
 	}
-
-	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -137,7 +108,6 @@ public struct ManualAccountRecovery: Sendable, FeatureReducer {
 			return .none
 
 		case .accountRecoveryScan(.delegate(.completed)):
-			_ = state.path.popLast()
 			state.path.append(.recoveryComplete(.init()))
 			return .none
 

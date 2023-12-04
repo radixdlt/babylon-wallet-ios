@@ -137,15 +137,6 @@ private let text: String =
 	(If you have Olympia Accounts in the Radix Olympia Desktop Wallet, consider using **Import from a Legacy Wallet** instead.)
 	""" // FIXME: Strings
 
-private extension StoreOf<ManualAccountRecovery> {
-	var destination: PresentationStoreOf<ManualAccountRecovery.Destination> {
-		func scopeState(state: State) -> PresentationState<ManualAccountRecovery.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
-	}
-}
-
 // MARK: - ManualAccountRecovery.View.PathView
 private extension ManualAccountRecovery.View {
 	struct PathView: View {
