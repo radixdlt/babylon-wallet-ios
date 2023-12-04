@@ -7,36 +7,77 @@ public struct ManualAccountRecovery: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		@PresentationState
-		var destination: Destination.State? = nil
+		public var destination: Destination.State? = nil
+
+		public var path: StackState<Path.State> = .init()
 	}
 
 	// MARK: - Destination
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Hashable, Sendable {
-			case seedPhrase(ManualAccountRecoverySeedPhraseCoordinator.State)
-			case ledger(ManualAccountRecoveryLedgerCoordinator.State)
+			case enterSeedPhrase(ImportMnemonic.State)
 		}
 
+		@CasePathable
 		public enum Action: Equatable, Sendable {
-			case seedPhrase(ManualAccountRecoverySeedPhraseCoordinator.Action)
-			case ledger(ManualAccountRecoveryLedgerCoordinator.Action)
+			case enterSeedPhrase(ImportMnemonic.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.seedPhrase, action: /Action.seedPhrase) {
-				ManualAccountRecoverySeedPhraseCoordinator()
+//			EmptyReducer()
+			Scope(state: \.enterSeedPhrase, action: \.enterSeedPhrase) {
+				ImportMnemonic()
 			}
-			Scope(state: /State.ledger, action: /Action.ledger) {
-				ManualAccountRecoveryLedgerCoordinator()
+		}
+	}
+
+	// MARK: - Path
+
+	public struct Path: Sendable, Hashable, Reducer {
+		@CasePathable
+		public enum State: Sendable, Hashable {
+			case seedPhrase(ManualAccountRecoverySeedPhrase.State)
+			case ledger(LedgerHardwareDevices.State)
+
+			case accountRecoveryScan(AccountRecoveryScanCoordinator.State)
+			case recoveryComplete(ManualAccountRecoveryCompletion.State)
+		}
+
+		@CasePathable
+		public enum Action: Sendable, Equatable {
+			case seedPhrase(ManualAccountRecoverySeedPhrase.Action)
+			case ledger(LedgerHardwareDevices.Action)
+
+			case accountRecoveryScan(AccountRecoveryScanCoordinator.Action)
+			case recoveryComplete(ManualAccountRecoveryCompletion.Action)
+		}
+
+		public var body: some ReducerOf<Self> {
+			Scope(state: \.seedPhrase, action: \.seedPhrase) {
+				ManualAccountRecoverySeedPhrase()
+			}
+			Scope(state: \.ledger, action: \.ledger) {
+				LedgerHardwareDevices()
+			}
+			Scope(state: \.accountRecoveryScan, action: \.accountRecoveryScan) {
+				AccountRecoveryScanCoordinator()
+			}
+			Scope(state: \.recoveryComplete, action: \.recoveryComplete) {
+				ManualAccountRecoveryCompletion()
 			}
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case appeared
+		case closeButtonTapped
 		case useSeedPhraseTapped(isOlympia: Bool)
 		case useLedgerTapped(isOlympia: Bool)
+	}
+
+	public enum ChildAction: Sendable, Equatable {
+		case path(StackActionOf<Path>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -47,6 +88,9 @@ public struct ManualAccountRecovery: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
+			.forEach(\.path, action: /Action.child .. ChildAction.path) {
+				Path()
+			}
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
@@ -56,28 +100,57 @@ public struct ManualAccountRecovery: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .appeared:
-			return .none
+		case .closeButtonTapped:
+			return .run { _ in await dismiss() }
 
 		case let .useSeedPhraseTapped(isOlympia):
-			state.destination = .seedPhrase(.init(isOlympia: isOlympia))
+			state.path = .init([.seedPhrase(.init(isOlympia: isOlympia))])
 			return .none
 
 		case let .useLedgerTapped(isOlympia):
-			state.destination = .ledger(.init(isOlympia: isOlympia))
+			state.path = .init([.ledger(.init(context: .accountRecovery(olympia: isOlympia)))])
 			return .none
 		}
 	}
 
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		switch presentedAction {
-		case .seedPhrase(.delegate(.gotoAccountList)), .ledger(.delegate(.gotoAccountList)):
-			.run { send in
-				await send(.delegate(.gotoAccountList))
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		case let .path(.element(id: id, action: pathAction)):
+			reduce(into: &state, id: id, pathAction: pathAction)
+		default:
+			.none
+		}
+	}
+
+	private func reduce(into state: inout State, id: StackElementID, pathAction: Path.Action) -> Effect<Action> {
+		switch pathAction {
+		case let .seedPhrase(.delegate(.recover(factorSourceID, isOlympia))):
+			state.path.append(.accountRecoveryScan(.init(purpose: .addAccounts(factorSourceID: factorSourceID, olympia: isOlympia))))
+			return .none
+
+		case let .ledger(.delegate(.choseLedgerForRecovery(ledger, isOlympia: isOlympia))):
+			state.path.append(.accountRecoveryScan(.init(purpose: .addAccounts(factorSourceID: ledger.id, olympia: isOlympia))))
+			return .none
+
+		case .accountRecoveryScan(.delegate(.dismissed)):
+			_ = state.path.popLast()
+			return .none
+
+		case .accountRecoveryScan(.delegate(.completed)):
+			_ = state.path.popLast()
+			state.path.append(.recoveryComplete(.init()))
+			return .none
+
+		case let .recoveryComplete(.delegate(recoveryCompleteAction)):
+			switch recoveryCompleteAction {
+			case .finish:
+				return .run { send in
+					await send(.delegate(.gotoAccountList))
+				}
 			}
 
 		default:
-			.none
+			return .none
 		}
 	}
 }
