@@ -14,7 +14,6 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		public var batchNumber: Int = 0
 		public var maxIndex: HD.Path.Component.Child.Value? = nil
 
-		public var lastScanFoundNewActiveAccounts = false
 		public var indicesOfAlreadyUsedEntities: OrderedSet<HD.Path.Component.Child.Value> = []
 		public let forOlympiaAccounts: Bool
 		public var active: IdentifiedArrayOf<Profile.Network.Account> = []
@@ -126,7 +125,6 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			return scanOnLedger(accounts: accounts, state: &state)
 
 		case let .foundAccounts(active, inactive):
-			state.lastScanFoundNewActiveAccounts = !active.isEmpty
 			state.batchNumber += 1
 			state.status = .scanComplete
 			state.active.append(contentsOf: active)

@@ -5,7 +5,6 @@ extension AccountRecoveryScanInProgress.State {
 			kind: factorSourceIDFromHash.kind,
 			olympia: forOlympiaAccounts,
 			active: active,
-			lastScanFoundNewActiveAccounts: lastScanFoundNewActiveAccounts,
 			hasFoundAnyAccounts: !active.isEmpty || !inactive.isEmpty,
 			maxIndex: batchNumber * batchSize
 		)
@@ -25,12 +24,8 @@ public extension AccountRecoveryScanInProgress {
 		let kind: FactorSourceKind
 		let olympia: Bool
 		let active: IdentifiedArrayOf<Profile.Network.Account>
-		let lastScanFoundNewActiveAccounts: Bool
 		let hasFoundAnyAccounts: Bool
 		let maxIndex: Int
-		var indexOfLastActive: Int {
-			max(0, active.count - 1)
-		}
 
 		var buttonControlState: ControlState {
 			isScanInProgress ? .disabled : .enabled
