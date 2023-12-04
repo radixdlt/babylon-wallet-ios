@@ -22,16 +22,20 @@ extension RecoverWalletWithoutProfileStart {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
 				ScrollView {
 					VStack(alignment: .center, spacing: .large3) {
+						// FIXME: Strings
 						Text("Recover Control Without Backup")
 							.textStyle(.sheetTitle)
 
+						// FIXME: Strings
 						Text("If you have no wallet backup in the cloud or as an exported backup file, you still have other restore options.")
 							.multilineTextAlignment(.leading)
 
 						Divider()
 
+						// FIXME: Strings
 						Text("**I have my main “Babylon” 24-word seed phrase.**")
 
+						// FIXME: Strings
 						Button("Recover with Main Seed Phrase") {
 							store.send(.view(.recoverWithBDFSTapped))
 						}
@@ -39,12 +43,16 @@ extension RecoverWalletWithoutProfileStart {
 
 						Divider()
 
+						// FIXME: Strings
 						Text("**I only want to restore Ledger hardware wallet Accounts**")
 
+						// FIXME: Strings
 						Text("OR")
 
+						// FIXME: Strings
 						Text("**I only have Accounts created on the Radix Olympia Network**")
 
+						// FIXME: Strings
 						Button("Ledger-only or Olympia-only Restore") {
 							store.send(.view(.ledgerOnlyOrOlympiaOnlyTapped))
 						}
