@@ -1,5 +1,4 @@
 // MARK: - RecoverWalletControlWithBDFSOnly.View
-
 public extension RecoverWalletControlWithBDFSOnly {
 	@MainActor
 	struct View: SwiftUI.View {
