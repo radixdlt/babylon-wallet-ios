@@ -102,7 +102,7 @@ extension DisplayEntitiesControlledByMnemonic {
 
 				if viewState.promptUserToBackUpMnemonic {
 					WarningErrorView(
-						text: "Please write down your Seed Phrase",
+						text: "Please write down your Seed Phrase", // FIXME: Strings
 						type: .error,
 						useNarrowSpacing: true
 					)

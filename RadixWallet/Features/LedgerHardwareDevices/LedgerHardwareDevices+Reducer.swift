@@ -61,7 +61,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case choseLedger(LedgerHardwareWalletFactorSource)
-		// Only use for the `accountRecovery` context
+		// Only used when in the `accountRecovery` context
 		case choseLedgerForRecovery(LedgerHardwareWalletFactorSource, isOlympia: Bool)
 	}
 

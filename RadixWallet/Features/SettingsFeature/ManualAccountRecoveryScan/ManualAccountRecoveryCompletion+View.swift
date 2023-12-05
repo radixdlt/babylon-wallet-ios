@@ -26,10 +26,11 @@ extension ManualAccountRecoveryCompletion.View {
 					.padding(.bottom, .large3)
 
 				Text(text)
-					.multilineTextAlignment(.center)
-					.textStyle(.body1Header)
+					.multilineTextAlignment(.leading)
+					.textStyle(.body1Regular)
 					.foregroundStyle(.app.gray1)
-					.padding(.horizontal, .huge2)
+					.flushedLeft
+					.padding(.horizontal, .large2)
 					.padding(.bottom, .huge3)
 
 				Spacer(minLength: 0)
