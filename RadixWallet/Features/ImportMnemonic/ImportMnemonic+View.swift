@@ -148,8 +148,23 @@ extension ImportMnemonic {
 							.padding(.horizontal, .medium2)
 							.padding(.bottom, .medium3)
 						} else {
-							Button("DEBUG Acc.Rec.Scan.mne (24)") {
-								viewStore.send(.debugUseTestingMnemonicWithActiveAccounts)
+							if !(viewStore.isWordCountFixed && viewStore.wordCount == .twentyFour) {
+								Button("DEBUG AccRecScan Olympia 15") {
+									viewStore.send(.debugUseOlympiaTestingMnemonicWithActiveAccounts)
+								}
+								.buttonStyle(
+									.secondaryRectangular(
+										shouldExpand: true,
+										isDestructive: true,
+										isInToolbar: true
+									)
+								)
+								.padding(.horizontal, .medium2)
+								.padding(.bottom, .medium3)
+							}
+
+							Button("DEBUG AccRecScan Babylon 24") {
+								viewStore.send(.debugUseBabylonTestingMnemonicWithActiveAccounts)
 							}
 							.buttonStyle(
 								.secondaryRectangular(
