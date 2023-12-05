@@ -62,46 +62,45 @@ public extension AccountRecoveryScanInProgress {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(alignment: .center, spacing: .medium1) {
-					if viewStore.isScanInProgress {
-						scanInProgressView(with: viewStore)
-					} else {
-						scanCompleteView(with: viewStore)
+				coreView(with: viewStore)
+					.presentsLoadingViewOverlay()
+					.footer {
+						footerContent(with: viewStore)
 					}
-				}
-				.textStyle(.body1Regular)
-				.foregroundColor(.app.gray1)
-				.controlState(viewStore.loadingState)
-				.presentsLoadingViewOverlay()
-				.footer {
-					Button("Tap here to scan the next \(batchSize)") { // FIXME: Strings
-						store.send(.view(.scanMore))
+					.onFirstAppear {
+						viewStore.send(.onFirstAppear)
 					}
-					.buttonStyle(.alternativeRectangular)
-					.controlState(viewStore.buttonControlState)
-
-					Button("Continue") { // FIXME: Strings
-						store.send(.view(.continueTapped))
-					}
-					.buttonStyle(.primaryRectangular)
-					.controlState(viewStore.buttonControlState)
-				}
-				.onFirstAppear {
-					viewStore.send(.onFirstAppear)
-				}
-				.destinations(with: store)
+					.destinations(with: store)
 			}
 		}
 
 		@ViewBuilder
+		func coreView(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
+			VStack(alignment: .center, spacing: .medium1) {
+				if viewStore.isScanInProgress {
+					scanInProgressView(with: viewStore)
+				} else {
+					scanCompleteView(with: viewStore)
+				}
+			}
+			.padding([.vertical])
+			.textStyle(.body1Regular)
+			.foregroundColor(.app.gray1)
+			.controlState(viewStore.loadingState)
+		}
+
+		@ViewBuilder
 		func scanInProgressView(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
-			Text("Scan in progress") // FIXME: Strings
-				.textStyle(.sheetTitle)
+			VStack(alignment: .center, spacing: .medium1) {
+				Text("Scan in progress") // FIXME: Strings
+					.textStyle(.sheetTitle)
 
-			Spacer()
+				Spacer()
 
-			Text("Scanning for Accounts that have been included in at least on transaction, using:") // FIXME: Strings
-			Text("**\(viewStore.factorSourceDescription)**") // FIXME: Strings
+				Text("Scanning for Accounts that have been included in at least on transaction, using:") // FIXME: Strings
+				Text("**\(viewStore.factorSourceDescription)**") // FIXME: Strings
+			}
+			.padding(.horizontal, .medium1)
 		}
 
 		@ViewBuilder
@@ -127,6 +126,21 @@ public extension AccountRecoveryScanInProgress {
 				}
 				.padding(.horizontal, .medium3)
 			}
+		}
+
+		@ViewBuilder
+		func footerContent(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
+			Button("Tap here to scan the next \(batchSize)") { // FIXME: Strings
+				store.send(.view(.scanMore))
+			}
+			.buttonStyle(.alternativeRectangular)
+			.controlState(viewStore.buttonControlState)
+
+			Button("Continue") { // FIXME: Strings
+				store.send(.view(.continueTapped))
+			}
+			.buttonStyle(.primaryRectangular)
+			.controlState(viewStore.buttonControlState)
 		}
 	}
 }
