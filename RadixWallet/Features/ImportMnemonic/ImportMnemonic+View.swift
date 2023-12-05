@@ -127,7 +127,7 @@ extension ImportMnemonic {
 											.textStyle(.body1Regular)
 									}
 								}
-								.pickerStyleRadixSegmented()
+								.pickerStyle(.segmented)
 							}
 							.padding(.horizontal, .large3)
 							.padding(.bottom, .medium2)

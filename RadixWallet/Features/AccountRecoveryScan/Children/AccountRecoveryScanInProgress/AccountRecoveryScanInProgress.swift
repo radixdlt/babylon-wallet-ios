@@ -140,8 +140,6 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 				return .none
 			}
 
-			loggerGlobal.debug("AccountRecoveryScanInProgress: onFirstAppear")
-
 			switch state.mode {
 			case .privateHD:
 				return derivePublicKeys(state: &state)

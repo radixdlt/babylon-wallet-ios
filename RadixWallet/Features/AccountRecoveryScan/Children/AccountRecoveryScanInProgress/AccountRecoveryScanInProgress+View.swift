@@ -17,8 +17,9 @@ public extension AccountRecoveryScanInProgress {
 	struct ViewState: Equatable {
 		let status: AccountRecoveryScanInProgress.State.Status
 		var loadingState: ControlState {
-			// FIXME: Strings
-			status == .scanningNetworkForActiveAccounts ? .loading(.global(text: "Scanning network")) : .enabled
+			status == .scanningNetworkForActiveAccounts
+				? .loading(.global(text: "Scanning network")) // FIXME: Strings
+				: .enabled
 		}
 
 		let kind: FactorSourceKind
@@ -26,16 +27,13 @@ public extension AccountRecoveryScanInProgress {
 		let active: IdentifiedArrayOf<Profile.Network.Account>
 		let hasFoundAnyAccounts: Bool
 		let maxIndex: Int
-		var isScanInProgress: Bool {
-			switch status {
-			case .scanComplete: false
-			default: true
-			}
+
+		var buttonControlState: ControlState {
+			isScanInProgress ? .disabled : .enabled
 		}
 
-		var title: String {
-			// FIXME: Strings
-			status == .scanComplete ? "Scan Complete" : "Scan in progress"
+		var isScanInProgress: Bool {
+			status != .scanComplete
 		}
 
 		// FIXME: Strings
@@ -43,13 +41,13 @@ public extension AccountRecoveryScanInProgress {
 			switch kind {
 			case .device:
 				if olympia {
-					"Olympia Seed Phrase"
+					"Olympia Seed Phrase" // FIXME: Strings
 				} else {
-					"Babylon Seed Phrase"
+					"Babylon Seed Phrase" // FIXME: Strings
 				}
 			case .ledgerHQHardwareWallet:
-				"Ledger hardware wallet device"
-			default: "Factor"
+				"Ledger hardware wallet device" // FIXME: Strings
+			default: "Factor" // FIXME: Strings
 			}
 		}
 	}
@@ -64,64 +62,85 @@ public extension AccountRecoveryScanInProgress {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(alignment: .center, spacing: .medium1) {
-					Text(viewStore.title)
-						.textStyle(.sheetTitle)
-
-					fixedFrameHeader(with: viewStore)
-
-					if viewStore.active.isEmpty {
-						if !viewStore.isScanInProgress {
-							NoContentView("None found.") // FIXME: Strings
-						}
-					} else {
-						ScrollView {
-							VStack(alignment: .leading, spacing: .small3) {
-								ForEach(viewStore.active) { account in
-									SmallAccountCard(account: account)
-										.cornerRadius(.small1)
-								}
-							}
-						}
+				coreView(with: viewStore)
+					.presentsLoadingViewOverlay()
+					.footer {
+						footerContent(with: viewStore)
 					}
-
-					Spacer(minLength: 0)
-				}
-				.controlState(viewStore.loadingState)
-				.presentsLoadingViewOverlay()
-				.padding()
-				.footer {
-					// FIXME: Strings
-					Button("Tap here to scan the next \(batchSize)") {
-						store.send(.view(.scanMore))
+					.onFirstAppear {
+						viewStore.send(.onFirstAppear)
 					}
-					.buttonStyle(.alternativeRectangular)
-
-					// FIXME: Strings
-					Button("Continue") {
-						store.send(.view(.continueTapped))
-					}
-					.buttonStyle(.primaryRectangular)
-				}
-				.onFirstAppear {
-					viewStore.send(.onFirstAppear)
-				}
-				.destinations(with: store)
+					.destinations(with: store)
 			}
 		}
 
 		@ViewBuilder
-		func fixedFrameHeader(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
-			VStack(alignment: .center) {
-				Text(viewStore.isScanInProgress ? "Scanning for Accounts that have been included in at least on transaction, using:" : "The first \(viewStore.maxIndex) potential accounts from this signing factor were scanned.")
-					.frame(height: 50) // static height because we this text to have fixed position when switching between status
-				Spacer(minLength: 0)
+		func coreView(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
+			VStack(alignment: .center, spacing: .medium1) {
 				if viewStore.isScanInProgress {
-					// FIXME: Strings
-					Text("**\(viewStore.factorSourceDescription)**")
+					scanInProgressView(with: viewStore)
+				} else {
+					scanCompleteView(with: viewStore)
 				}
 			}
-			.frame(height: 80) // static height else account list "jumps" when going between scanInProgress and scanCompleted
+			.padding([.vertical])
+			.textStyle(.body1Regular)
+			.foregroundColor(.app.gray1)
+			.controlState(viewStore.loadingState)
+		}
+
+		@ViewBuilder
+		func scanInProgressView(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
+			VStack(alignment: .center, spacing: .medium1) {
+				Text("Scan in progress") // FIXME: Strings
+					.textStyle(.sheetTitle)
+
+				Spacer()
+
+				Text("Scanning for Accounts that have been included in at least on transaction, using:") // FIXME: Strings
+				Text("**\(viewStore.factorSourceDescription)**") // FIXME: Strings
+			}
+			.padding(.horizontal, .medium1)
+		}
+
+		@ViewBuilder
+		func scanCompleteView(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
+			ScrollView {
+				VStack(alignment: .center, spacing: .medium1) {
+					Text("Scan Complete") // FIXME: Strings
+						.textStyle(.sheetTitle)
+
+					Text("The first **\(viewStore.maxIndex)** potential Accounts from this signing factor were scanned. The following Accounts had at least one transaction:") // FIXME: Strings
+
+					if viewStore.active.isEmpty {
+						NoContentView("None found.") // FIXME: Strings
+					} else {
+						// we want less spacing between accounts then between child views of the root view.
+						VStack(alignment: .leading, spacing: .small3) {
+							ForEach(viewStore.active) { account in
+								SmallAccountCard(account: account)
+									.cornerRadius(.small1)
+							}
+						}
+					}
+				}
+				.padding(.horizontal, .medium3)
+			}
+		}
+
+		@ViewBuilder
+		func footerContent(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
+			Button("Tap here to scan the next \(batchSize)") { // FIXME: Strings
+				store.send(.view(.scanMore))
+			}
+			.buttonStyle(.alternativeRectangular)
+			.controlState(viewStore.buttonControlState)
+
+			Button("Continue") { // FIXME: Strings
+				store.send(.view(.continueTapped))
+			}
+			.buttonStyle(.primaryRectangular)
+			.controlState(viewStore.buttonControlState)
 		}
 	}
 }

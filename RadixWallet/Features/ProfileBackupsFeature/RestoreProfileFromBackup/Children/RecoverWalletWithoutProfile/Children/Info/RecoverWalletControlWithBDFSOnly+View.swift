@@ -1,16 +1,5 @@
-extension RecoverWalletControlWithBDFSOnly.State {
-	var viewState: RecoverWalletControlWithBDFSOnly.ViewState {
-		.init()
-	}
-}
-
 // MARK: - RecoverWalletControlWithBDFSOnly.View
-
 public extension RecoverWalletControlWithBDFSOnly {
-	struct ViewState: Equatable {
-		// TODO: declare some properties
-	}
-
 	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<RecoverWalletControlWithBDFSOnly>
@@ -20,24 +9,24 @@ public extension RecoverWalletControlWithBDFSOnly {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
-				VStack(alignment: .center, spacing: .medium2) {
-					Text("Recover Control Without Backup")
-						.textStyle(.sheetTitle)
-						.multilineTextAlignment(.center)
+			VStack(alignment: .center, spacing: .medium2) {
+				Text("Recover Control Without Backup") // FIXME: Strings
+					.textStyle(.sheetTitle)
+					.multilineTextAlignment(.center)
 
-					Text("**If you have no wallet backup in the cloud or as an exported backup file**, you can still restore Account access only using your main “Babylon” seed phrase. You cannot recover your Account names or other wallet settings this way.\n\nYou will be asked to enter the primary seed phrase. There are **24 words** that the Radix Wallet mobile app showed you to write down and save securely.")
-						.multilineTextAlignment(.leading)
+				Text("**If you have no wallet backup in the cloud or as an exported backup file**, you can still restore Account access only using your main “Babylon” seed phrase. You cannot recover your Account names or other wallet settings this way.\n\nYou will be asked to enter the primary seed phrase. There are **24 words** that the Radix Wallet mobile app showed you to write down and save securely.") // FIXME: Strings
+					.multilineTextAlignment(.leading)
 
-					Spacer(minLength: 0)
+				Spacer(minLength: 0)
+			}
+			.textStyle(.body1Regular)
+			.foregroundColor(.app.gray1)
+			.padding()
+			.footer {
+				Button("Continue") { // FIXME: Strings
+					store.send(.view(.continueTapped))
 				}
-				.padding()
-				.footer {
-					Button("Continue") {
-						store.send(.view(.continueTapped))
-					}
-					.buttonStyle(.primaryRectangular)
-				}
+				.buttonStyle(.primaryRectangular)
 			}
 		}
 	}

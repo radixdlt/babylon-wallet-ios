@@ -22,36 +22,35 @@ extension RecoverWalletWithoutProfileStart {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
 				ScrollView {
 					VStack(alignment: .center, spacing: .large3) {
-						Text("Recover Control Without Backup")
+						Text("Recover Control Without Backup") // FIXME: Strings
 							.textStyle(.sheetTitle)
 
-						Text("If you have no wallet backup in the cloud or as an exported backup file, you still have other restore options.")
+						Text("If you have no wallet backup in the cloud or as an exported backup file, you still have other restore options.") // FIXME: Strings
 							.multilineTextAlignment(.leading)
-							.textStyle(.body1Regular)
 
 						Divider()
 
-						Text("**I have my main “Babylon” 24-word seed phrase.**")
+						Text("**I have my main “Babylon” 24-word seed phrase.**") // FIXME: Strings
 
-						Button("Recover with Main Seed Phrase") {
+						Button("Recover with Main Seed Phrase") { // FIXME: Strings
 							store.send(.view(.recoverWithBDFSTapped))
 						}
 						.buttonStyle(.secondaryRectangular)
 
 						Divider()
 
-						Text("**I only want to restore Ledger hardware wallet Accounts**")
+						Text("**I only want to restore Ledger hardware wallet Accounts**") // FIXME: Strings
 
-						Text("OR")
+						Text("OR") // FIXME: Strings
 
-						Text("**I only have Accounts created on the Radix Olympia Network**")
+						Text("**I only have Accounts created on the Radix Olympia Network**") // FIXME: Strings
 
-						Button("Ledger-only or Olmypia-only Restore") {
+						Button("Ledger-only or Olympia-only Restore") { // FIXME: Strings
 							store.send(.view(.ledgerOnlyOrOlympiaOnlyTapped))
 						}
 						.buttonStyle(.secondaryRectangular)
 					}
-					.textStyle(.body1HighImportance)
+					.textStyle(.body1Regular)
 					.foregroundColor(.app.gray1)
 					.multilineTextAlignment(.center)
 					.padding()
