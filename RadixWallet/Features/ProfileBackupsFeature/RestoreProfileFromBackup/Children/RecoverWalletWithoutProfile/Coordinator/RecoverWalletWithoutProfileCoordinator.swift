@@ -145,24 +145,14 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 			switch delegateAction {
 			case let .notPersisted(mnemonicWithPassphrase):
 				do {
-					let fromHash = try FactorSource.id(
-						fromMnemonicWithPassphrase: mnemonicWithPassphrase,
-						factorSourceKind: .device
-					)
-
-					let deviceFactorSource = DeviceFactorSource(
-						id: fromHash,
-						common: .init(),
-						hint: .init(
-							name: "iPhone",
-							model: "iPhone",
-							mnemonicWordCount: .twentyFour
-						)
+					let mainBDFS = try DeviceFactorSource.babylon(
+						mnemonicWithPassphrase: mnemonicWithPassphrase,
+						isOlympiaCompatible: false // FIXME: is this what we want?
 					)
 
 					let privateHD = try PrivateHDFactorSource(
 						mnemonicWithPassphrase: mnemonicWithPassphrase,
-						factorSource: deviceFactorSource
+						factorSource: mainBDFS
 					)
 
 					state.factorSourceOfImportedMnemonic = privateHD
