@@ -83,7 +83,6 @@ public extension AccountRecoveryScanInProgress {
 					scanCompleteView(with: viewStore)
 				}
 			}
-			.padding([.vertical])
 			.textStyle(.body1Regular)
 			.foregroundColor(.app.gray1)
 			.controlState(viewStore.loadingState)
@@ -100,6 +99,7 @@ public extension AccountRecoveryScanInProgress {
 				Text("Scanning for Accounts that have been included in at least on transaction, using:") // FIXME: Strings
 				Text("**\(viewStore.factorSourceDescription)**") // FIXME: Strings
 			}
+			.padding(.vertical, .small2)
 			.padding(.horizontal, .medium1)
 		}
 
@@ -124,6 +124,7 @@ public extension AccountRecoveryScanInProgress {
 						}
 					}
 				}
+				.padding(.vertical, .small2)
 				.padding(.horizontal, .medium3)
 			}
 		}
