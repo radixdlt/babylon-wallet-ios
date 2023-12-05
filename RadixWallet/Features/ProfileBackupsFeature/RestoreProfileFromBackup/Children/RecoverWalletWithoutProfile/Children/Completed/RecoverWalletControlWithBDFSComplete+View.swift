@@ -12,13 +12,11 @@ public extension RecoverWalletControlWithBDFSComplete {
 
 		public var body: some SwiftUI.View {
 			VStack(alignment: .leading, spacing: .medium1) {
-				// FIXME: Strings
-				Text("Recovery completed")
+				Text("Recovery completed") // FIXME: Strings
 					.textStyle(.sheetTitle)
 					.multilineTextAlignment(.center)
 
-				// FIXME: Strings
-				Text("Accounts discovered in the scan have been added to your wallet.\n\nIf you have any Olympia or “Legacy” Accounts to import - or any Accounts using a Ledger hardware wallet device - please use the **Account Recovery Scan** option in your Radix Wallet settings under **Account Security**.")
+				Text("Accounts discovered in the scan have been added to your wallet.\n\nIf you have any Olympia or “Legacy” Accounts to import - or any Accounts using a Ledger hardware wallet device - please use the **Account Recovery Scan** option in your Radix Wallet settings under **Account Security**.") // FIXME: Strings
 					.multilineTextAlignment(.leading)
 
 				Spacer(minLength: 0)
@@ -27,8 +25,7 @@ public extension RecoverWalletControlWithBDFSComplete {
 			.foregroundColor(.app.gray1)
 			.padding()
 			.footer {
-				// FIXME: Strings
-				Button("Continue") {
+				Button("Continue") { // FIXME: Strings
 					store.send(.view(.continueTapped))
 				}
 				.buttonStyle(.primaryRectangular)

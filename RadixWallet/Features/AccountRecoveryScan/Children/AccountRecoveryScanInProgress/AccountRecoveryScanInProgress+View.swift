@@ -17,8 +17,9 @@ public extension AccountRecoveryScanInProgress {
 	struct ViewState: Equatable {
 		let status: AccountRecoveryScanInProgress.State.Status
 		var loadingState: ControlState {
-			// FIXME: Strings
-			status == .scanningNetworkForActiveAccounts ? .loading(.global(text: "Scanning network")) : .enabled
+			status == .scanningNetworkForActiveAccounts
+				? .loading(.global(text: "Scanning network")) // FIXME: Strings
+				: .enabled
 		}
 
 		let kind: FactorSourceKind
@@ -32,10 +33,7 @@ public extension AccountRecoveryScanInProgress {
 		}
 
 		var isScanInProgress: Bool {
-			switch status {
-			case .scanComplete: false
-			default: true
-			}
+			status != .scanComplete
 		}
 
 		// FIXME: Strings
@@ -43,13 +41,13 @@ public extension AccountRecoveryScanInProgress {
 			switch kind {
 			case .device:
 				if olympia {
-					"Olympia Seed Phrase"
+					"Olympia Seed Phrase" // FIXME: Strings
 				} else {
-					"Babylon Seed Phrase"
+					"Babylon Seed Phrase" // FIXME: Strings
 				}
 			case .ledgerHQHardwareWallet:
-				"Ledger hardware wallet device"
-			default: "Factor"
+				"Ledger hardware wallet device" // FIXME: Strings
+			default: "Factor" // FIXME: Strings
 			}
 		}
 	}
@@ -75,17 +73,14 @@ public extension AccountRecoveryScanInProgress {
 				.foregroundColor(.app.gray1)
 				.controlState(viewStore.loadingState)
 				.presentsLoadingViewOverlay()
-				.padding()
 				.footer {
-					// FIXME: Strings
-					Button("Tap here to scan the next \(batchSize)") {
+					Button("Tap here to scan the next \(batchSize)") { // FIXME: Strings
 						store.send(.view(.scanMore))
 					}
 					.buttonStyle(.alternativeRectangular)
 					.controlState(viewStore.buttonControlState)
 
-					// FIXME: Strings
-					Button("Continue") {
+					Button("Continue") { // FIXME: Strings
 						store.send(.view(.continueTapped))
 					}
 					.buttonStyle(.primaryRectangular)
@@ -100,23 +95,23 @@ public extension AccountRecoveryScanInProgress {
 
 		@ViewBuilder
 		func scanInProgressView(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
-			Text("Scan in progress")
+			Text("Scan in progress") // FIXME: Strings
 				.textStyle(.sheetTitle)
 
 			Spacer()
 
-			Text("Scanning for Accounts that have been included in at least on transaction, using:")
-			Text("**\(viewStore.factorSourceDescription)**")
+			Text("Scanning for Accounts that have been included in at least on transaction, using:") // FIXME: Strings
+			Text("**\(viewStore.factorSourceDescription)**") // FIXME: Strings
 		}
 
 		@ViewBuilder
 		func scanCompleteView(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
 			ScrollView {
 				VStack(alignment: .center, spacing: .medium1) {
-					Text("Scan Complete")
+					Text("Scan Complete") // FIXME: Strings
 						.textStyle(.sheetTitle)
 
-					Text("The first \(viewStore.maxIndex) potential Accounts from this signing factor were scanned. The following Accounts had at least one transaction:")
+					Text("The first **\(viewStore.maxIndex)** potential Accounts from this signing factor were scanned. The following Accounts had at least one transaction:") // FIXME: Strings
 
 					if viewStore.active.isEmpty {
 						NoContentView("None found.") // FIXME: Strings
@@ -130,6 +125,7 @@ public extension AccountRecoveryScanInProgress {
 						}
 					}
 				}
+				.padding(.horizontal, .medium3)
 			}
 		}
 	}

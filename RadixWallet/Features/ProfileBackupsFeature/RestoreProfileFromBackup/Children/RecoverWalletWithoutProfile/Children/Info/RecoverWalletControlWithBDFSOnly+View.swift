@@ -10,13 +10,11 @@ public extension RecoverWalletControlWithBDFSOnly {
 
 		public var body: some SwiftUI.View {
 			VStack(alignment: .center, spacing: .medium2) {
-				// FIXME: Strings
-				Text("Recover Control Without Backup")
+				Text("Recover Control Without Backup") // FIXME: Strings
 					.textStyle(.sheetTitle)
 					.multilineTextAlignment(.center)
 
-				// FIXME: Strings
-				Text("**If you have no wallet backup in the cloud or as an exported backup file**, you can still restore Account access only using your main “Babylon” seed phrase. You cannot recover your Account names or other wallet settings this way.\n\nYou will be asked to enter the primary seed phrase. There are **24 words** that the Radix Wallet mobile app showed you to write down and save securely.")
+				Text("**If you have no wallet backup in the cloud or as an exported backup file**, you can still restore Account access only using your main “Babylon” seed phrase. You cannot recover your Account names or other wallet settings this way.\n\nYou will be asked to enter the primary seed phrase. There are **24 words** that the Radix Wallet mobile app showed you to write down and save securely.") // FIXME: Strings
 					.multilineTextAlignment(.leading)
 
 				Spacer(minLength: 0)
@@ -25,8 +23,7 @@ public extension RecoverWalletControlWithBDFSOnly {
 			.foregroundColor(.app.gray1)
 			.padding()
 			.footer {
-				// FIXME: Strings
-				Button("Continue") {
+				Button("Continue") { // FIXME: Strings
 					store.send(.view(.continueTapped))
 				}
 				.buttonStyle(.primaryRectangular)
