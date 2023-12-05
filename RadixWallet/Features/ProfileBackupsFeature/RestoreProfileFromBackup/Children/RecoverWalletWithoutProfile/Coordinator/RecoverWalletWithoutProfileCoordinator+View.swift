@@ -72,16 +72,16 @@ private extension View {
 	@MainActor
 	func destinations(with store: StoreOf<RecoverWalletWithoutProfileCoordinator>) -> some View {
 		let destinationStore = store.destination
-		return accountRecoveryScanCoordinator(with: destinationStore)
-	}
-
-	@MainActor
-	private func accountRecoveryScanCoordinator(with destinationStore: PresentationStoreOf<RecoverWalletWithoutProfileCoordinator.Destination>) -> some View {
-		fullScreenCover(
+		return fullScreenCover(
 			store: destinationStore,
 			state: /RecoverWalletWithoutProfileCoordinator.Destination.State.accountRecoveryScanCoordinator,
 			action: RecoverWalletWithoutProfileCoordinator.Destination.Action.accountRecoveryScanCoordinator,
-			content: { AccountRecoveryScanCoordinator.View(store: $0) }
+			content: {
+				AccountRecoveryScanCoordinator.View(store: $0)
+					.withNavigationBar {
+						store.send(.view(.closeRecoveryScanTapped))
+					}
+			}
 		)
 	}
 }
