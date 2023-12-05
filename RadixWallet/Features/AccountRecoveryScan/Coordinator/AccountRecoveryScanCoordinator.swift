@@ -118,7 +118,9 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 			if inactive.isEmpty {
 				return completed(purpose: state.purpose, active: active, inactive: inactive)
 			} else {
-				state.root = .selectInactiveAccountsToAdd(.init(active: active, inactive: inactive))
+				withAnimation {
+					state.root = .selectInactiveAccountsToAdd(.init(active: active, inactive: inactive))
+				}
 				return .none
 			}
 

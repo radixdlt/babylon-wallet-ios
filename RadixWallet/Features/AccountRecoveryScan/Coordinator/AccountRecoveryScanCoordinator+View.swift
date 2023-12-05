@@ -23,6 +23,7 @@ public extension AccountRecoveryScanCoordinator {
 						action: AccountRecoveryScanCoordinator.ChildAction.selectInactiveAccountsToAdd,
 						then: { SelectInactiveAccountsToAdd.View(store: $0) }
 					)
+					.transition(.move(edge: .trailing))
 				}
 			}
 		}

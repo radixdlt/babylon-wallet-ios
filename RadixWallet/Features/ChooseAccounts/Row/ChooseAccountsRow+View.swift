@@ -41,7 +41,7 @@ extension ChooseAccountsRow {
 
 		var body: some SwiftUI.View {
 			Button(action: action) {
-				HStack {
+				HStack(spacing: 0) {
 					VStack(alignment: .leading, spacing: .medium3) {
 						if showName {
 							Text(viewState.name)
@@ -54,7 +54,7 @@ extension ChooseAccountsRow {
 							.textStyle(.body2HighImportance)
 					}
 
-					Spacer()
+					Spacer(minLength: .small2)
 
 					switch viewState.mode {
 					case .checkmark:
