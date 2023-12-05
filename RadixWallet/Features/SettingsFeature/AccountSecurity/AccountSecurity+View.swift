@@ -166,7 +166,7 @@ private extension View {
 			store: destinationStore,
 			state: /AccountSecurity.Destination.State.accountRecovery,
 			action: AccountSecurity.Destination.Action.accountRecovery,
-			content: { ManualAccountRecovery.View(store: $0) }
+			content: { ManualAccountRecoveryCoordinator.View(store: $0) }
 		)
 	}
 }

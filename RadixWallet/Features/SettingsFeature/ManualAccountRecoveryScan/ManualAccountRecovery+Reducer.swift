@@ -1,8 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - ManualAccountRecovery
-public struct ManualAccountRecovery: Sendable, FeatureReducer {
+// MARK: - ManualAccountRecoveryCoordinator
+public struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 	public typealias Store = StoreOf<Self>
 
 	public struct State: Sendable, Hashable {

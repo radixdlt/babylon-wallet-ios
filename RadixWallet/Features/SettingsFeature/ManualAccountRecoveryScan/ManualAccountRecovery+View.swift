@@ -1,8 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - ManualAccountRecovery.View
-extension ManualAccountRecovery {
+// MARK: - ManualAccountRecoveryCoordinator.View
+extension ManualAccountRecoveryCoordinator {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: Store
@@ -13,7 +13,7 @@ extension ManualAccountRecovery {
 	}
 }
 
-extension ManualAccountRecovery.View {
+extension ManualAccountRecoveryCoordinator.View {
 	public var body: some View {
 		NavigationStackStore(
 			store.scope(state: \.path) { .child(.path($0)) }
@@ -137,36 +137,36 @@ private let text: String =
 	(If you have Olympia Accounts in the Radix Olympia Desktop Wallet, consider using **Import from a Legacy Wallet** instead.)
 	""" // FIXME: Strings
 
-// MARK: - ManualAccountRecovery.View.PathView
-private extension ManualAccountRecovery.View {
+// MARK: - ManualAccountRecoveryCoordinator.View.PathView
+private extension ManualAccountRecoveryCoordinator.View {
 	struct PathView: View {
-		let store: StoreOf<ManualAccountRecovery.Path>
+		let store: StoreOf<ManualAccountRecoveryCoordinator.Path>
 
 		var body: some View {
 			SwitchStore(store) { state in
 				switch state {
 				case .seedPhrase:
 					CaseLet(
-						/ManualAccountRecovery.Path.State.seedPhrase,
-						action: ManualAccountRecovery.Path.Action.seedPhrase,
+						/ManualAccountRecoveryCoordinator.Path.State.seedPhrase,
+						action: ManualAccountRecoveryCoordinator.Path.Action.seedPhrase,
 						then: { ManualAccountRecoverySeedPhrase.View(store: $0) }
 					)
 				case .ledger:
 					CaseLet(
-						/ManualAccountRecovery.Path.State.ledger,
-						action: ManualAccountRecovery.Path.Action.ledger,
+						/ManualAccountRecoveryCoordinator.Path.State.ledger,
+						action: ManualAccountRecoveryCoordinator.Path.Action.ledger,
 						then: { LedgerHardwareDevices.View(store: $0) }
 					)
 				case .accountRecoveryScan:
 					CaseLet(
-						/ManualAccountRecovery.Path.State.accountRecoveryScan,
-						action: ManualAccountRecovery.Path.Action.accountRecoveryScan,
+						/ManualAccountRecoveryCoordinator.Path.State.accountRecoveryScan,
+						action: ManualAccountRecoveryCoordinator.Path.Action.accountRecoveryScan,
 						then: { AccountRecoveryScanCoordinator.View(store: $0) }
 					)
 				case .recoveryComplete:
 					CaseLet(
-						/ManualAccountRecovery.Path.State.recoveryComplete,
-						action: ManualAccountRecovery.Path.Action.recoveryComplete,
+						/ManualAccountRecoveryCoordinator.Path.State.recoveryComplete,
+						action: ManualAccountRecoveryCoordinator.Path.Action.recoveryComplete,
 						then: { ManualAccountRecoveryCompletion.View(store: $0) }
 					)
 				}

@@ -1217,8 +1217,8 @@
 		83EE47A32AF0EECD00155F03 /* TransactionBalanceChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE479E2AF0EECD00155F03 /* TransactionBalanceChanges.swift */; };
 		83EE47A42AF0EECD00155F03 /* TransactionFungibleFeeBalanceChangeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE479F2AF0EECD00155F03 /* TransactionFungibleFeeBalanceChangeType.swift */; };
 		83FDF7EC2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FDF7EB2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift */; };
-		A41266EF2B15578600EA38E9 /* ManualAccountRecoverySeedPhraseCoordinator+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266EE2B15578600EA38E9 /* ManualAccountRecoverySeedPhraseCoordinator+Reducer.swift */; };
-		A41266F12B15579E00EA38E9 /* ManualAccountRecoverySeedPhraseCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhraseCoordinator+View.swift */; };
+		A41266EF2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266EE2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift */; };
+		A41266F12B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift */; };
 		A41266F72B160F3F00EA38E9 /* ManualAccountRecovery+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F62B160F3F00EA38E9 /* ManualAccountRecovery+Reducer.swift */; };
 		A41266F92B160F4C00EA38E9 /* ManualAccountRecovery+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F82B160F4C00EA38E9 /* ManualAccountRecovery+View.swift */; };
 		A4738D002B1A828B0034E28B /* ManualAccountRecoveryCompletion+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4738CFF2B1A828B0034E28B /* ManualAccountRecoveryCompletion+Reducer.swift */; };
@@ -2530,8 +2530,8 @@
 		83EE479E2AF0EECD00155F03 /* TransactionBalanceChanges.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionBalanceChanges.swift; sourceTree = "<group>"; };
 		83EE479F2AF0EECD00155F03 /* TransactionFungibleFeeBalanceChangeType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionFungibleFeeBalanceChangeType.swift; sourceTree = "<group>"; };
 		83FDF7EB2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValue.swift; sourceTree = "<group>"; };
-		A41266EE2B15578600EA38E9 /* ManualAccountRecoverySeedPhraseCoordinator+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoverySeedPhraseCoordinator+Reducer.swift"; sourceTree = "<group>"; };
-		A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhraseCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoverySeedPhraseCoordinator+View.swift"; sourceTree = "<group>"; };
+		A41266EE2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoverySeedPhrase+Reducer.swift"; sourceTree = "<group>"; };
+		A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoverySeedPhrase+View.swift"; sourceTree = "<group>"; };
 		A41266F62B160F3F00EA38E9 /* ManualAccountRecovery+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecovery+Reducer.swift"; sourceTree = "<group>"; };
 		A41266F82B160F4C00EA38E9 /* ManualAccountRecovery+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecovery+View.swift"; sourceTree = "<group>"; };
 		A4738CFF2B1A828B0034E28B /* ManualAccountRecoveryCompletion+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryCompletion+Reducer.swift"; sourceTree = "<group>"; };
@@ -6929,9 +6929,9 @@
 		A41266ED2B15577200EA38E9 /* ManualAccountRecoveryScan */ = {
 			isa = PBXGroup;
 			children = (
-				A41266EE2B15578600EA38E9 /* ManualAccountRecoverySeedPhraseCoordinator+Reducer.swift */,
+				A41266EE2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift */,
 				A4738CFF2B1A828B0034E28B /* ManualAccountRecoveryCompletion+Reducer.swift */,
-				A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhraseCoordinator+View.swift */,
+				A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift */,
 				A4738D012B1A82C40034E28B /* ManualAccountRecoveryCompletion+View.swift */,
 				A41266F62B160F3F00EA38E9 /* ManualAccountRecovery+Reducer.swift */,
 				A41266F82B160F4C00EA38E9 /* ManualAccountRecovery+View.swift */,
@@ -8877,7 +8877,7 @@
 				48CFC5EE2ADC10DA00E77A5C /* SlideUpPanel+View.swift in Sources */,
 				48CFC3492ADC10D900E77A5C /* PersonaDataPermissionBox.swift in Sources */,
 				48CFC68E2ADC10DB00E77A5C /* AddressKind.swift in Sources */,
-				A41266F12B15579E00EA38E9 /* ManualAccountRecoverySeedPhraseCoordinator+View.swift in Sources */,
+				A41266F12B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift in Sources */,
 				48CFC4F32ADC10DA00E77A5C /* StateEntityDetailsResponsePackageDetails.swift in Sources */,
 				48CFC2652ADC10D900E77A5C /* EditPersonaAddEntryKinds.swift in Sources */,
 				48CFC3B62ADC10D900E77A5C /* SLIP10CurveProtocol.swift in Sources */,
@@ -8970,7 +8970,7 @@
 				48CFC5042ADC10DA00E77A5C /* StateEntityFungibleResourceVaultsPageRequest.swift in Sources */,
 				48CFC4DF2ADC10DA00E77A5C /* OptionalNonFungibleIdsCollectionAllOf.swift in Sources */,
 				48CFC4E42ADC10DA00E77A5C /* MetadataPublicKeyValue.swift in Sources */,
-				A41266EF2B15578600EA38E9 /* ManualAccountRecoverySeedPhraseCoordinator+Reducer.swift in Sources */,
+				A41266EF2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift in Sources */,
 				83EE479A2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI32.swift in Sources */,
 				48CFC5BE2ADC10DA00E77A5C /* RoundedCornerBackground.swift in Sources */,
 				48AE39DD2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator+View.swift in Sources */,

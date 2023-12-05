@@ -50,7 +50,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			case ledgerHardwareWallets(LedgerHardwareDevices.State)
 			case depositGuarantees(DefaultDepositGuarantees.State)
 			case importOlympiaWallet(ImportOlympiaWalletCoordinator.State)
-			case accountRecovery(ManualAccountRecovery.State)
+			case accountRecovery(ManualAccountRecoveryCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -58,7 +58,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			case ledgerHardwareWallets(LedgerHardwareDevices.Action)
 			case depositGuarantees(DefaultDepositGuarantees.Action)
 			case importOlympiaWallet(ImportOlympiaWalletCoordinator.Action)
-			case accountRecovery(ManualAccountRecovery.Action)
+			case accountRecovery(ManualAccountRecoveryCoordinator.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -75,7 +75,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 				ImportOlympiaWalletCoordinator()
 			}
 			Scope(state: /State.accountRecovery, action: /Action.accountRecovery) {
-				ManualAccountRecovery()
+				ManualAccountRecoveryCoordinator()
 			}
 		}
 	}
