@@ -55,10 +55,6 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-		case closeTapped
-	}
-
 	public enum ChildAction: Sendable, Equatable {
 		case accountRecoveryScanInProgress(AccountRecoveryScanInProgress.Action)
 		case selectInactiveAccountsToAdd(SelectInactiveAccountsToAdd.Action)
@@ -78,6 +74,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.onboardingClient) var onboardingClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.dismiss) var dismiss
+
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
@@ -91,16 +88,6 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 				}
 		}
 		Reduce(core)
-	}
-
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
-		switch viewAction {
-		case .closeTapped:
-			.run { send in
-				await dismiss()
-				await send(.delegate(.dismissed))
-			}
-		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
@@ -145,7 +132,8 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		case let .selectInactiveAccountsToAdd(.delegate(.finished(selectedInactive, active))):
 			return completed(purpose: state.purpose, active: active, inactive: selectedInactive)
 
-		default: return .none
+		default:
+			return .none
 		}
 	}
 

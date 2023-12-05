@@ -237,19 +237,23 @@ extension AccountRecoveryScanInProgress {
 		assert(derivationIndices.count == batchSize)
 		state.maxIndex = derivationIndices.max()! + 1
 
-		return try OrderedSet(validating: derivationIndices.map {
+		let paths = try derivationIndices.map { index in
 			if state.forOlympiaAccounts {
 				try LegacyOlympiaBIP44LikeDerivationPath(
-					index: $0
-				).wrapAsDerivationPath()
+					index: index
+				)
+				.wrapAsDerivationPath()
 			} else {
 				try AccountBabylonDerivationPath(
 					networkID: networkID,
-					index: $0,
+					index: index,
 					keyKind: .virtualEntity
-				).wrapAsDerivationPath()
+				)
+				.wrapAsDerivationPath()
 			}
-		})
+		}
+
+		return try OrderedSet(validating: paths)
 	}
 
 	private func derivePublicKeys(

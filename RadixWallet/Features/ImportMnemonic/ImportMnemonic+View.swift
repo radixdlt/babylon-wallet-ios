@@ -277,7 +277,7 @@ private extension StoreOf<ImportMnemonic> {
 }
 
 @MainActor
-extension View {
+private extension View {
 	func destinations(with store: StoreOf<ImportMnemonic>) -> some View {
 		let destinationStore = store.destination
 		return offDeviceMnemonicInfoPrompt(with: destinationStore)

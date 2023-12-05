@@ -463,7 +463,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	private func continueWithMnemonic(mnemonic: Mnemonic, in state: inout State) -> Effect<Action> {
 		guard let write = state.mode.write else {
 			preconditionFailure("expected write mode")
-			return .none
 		}
 		state.mode.update(isProgressing: true)
 		let mnemonicWithPassphrase = MnemonicWithPassphrase(

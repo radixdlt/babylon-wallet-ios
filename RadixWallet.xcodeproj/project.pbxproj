@@ -1216,6 +1216,12 @@
 		83EE47A32AF0EECD00155F03 /* TransactionBalanceChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE479E2AF0EECD00155F03 /* TransactionBalanceChanges.swift */; };
 		83EE47A42AF0EECD00155F03 /* TransactionFungibleFeeBalanceChangeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE479F2AF0EECD00155F03 /* TransactionFungibleFeeBalanceChangeType.swift */; };
 		83FDF7EC2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FDF7EB2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift */; };
+		A41266EF2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266EE2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift */; };
+		A41266F12B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift */; };
+		A41266F72B160F3F00EA38E9 /* ManualAccountRecovery+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F62B160F3F00EA38E9 /* ManualAccountRecovery+Reducer.swift */; };
+		A41266F92B160F4C00EA38E9 /* ManualAccountRecovery+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F82B160F4C00EA38E9 /* ManualAccountRecovery+View.swift */; };
+		A4738D002B1A828B0034E28B /* ManualAccountRecoveryCompletion+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4738CFF2B1A828B0034E28B /* ManualAccountRecoveryCompletion+Reducer.swift */; };
+		A4738D022B1A82C40034E28B /* ManualAccountRecoveryCompletion+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4738D012B1A82C40034E28B /* ManualAccountRecoveryCompletion+View.swift */; };
 		E62449D52AFBA61100272C67 /* Home+AccountRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */; };
 		E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */; };
 		E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */; };
@@ -2522,6 +2528,12 @@
 		83EE479E2AF0EECD00155F03 /* TransactionBalanceChanges.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionBalanceChanges.swift; sourceTree = "<group>"; };
 		83EE479F2AF0EECD00155F03 /* TransactionFungibleFeeBalanceChangeType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionFungibleFeeBalanceChangeType.swift; sourceTree = "<group>"; };
 		83FDF7EB2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValue.swift; sourceTree = "<group>"; };
+		A41266EE2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoverySeedPhrase+Reducer.swift"; sourceTree = "<group>"; };
+		A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoverySeedPhrase+View.swift"; sourceTree = "<group>"; };
+		A41266F62B160F3F00EA38E9 /* ManualAccountRecovery+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecovery+Reducer.swift"; sourceTree = "<group>"; };
+		A41266F82B160F4C00EA38E9 /* ManualAccountRecovery+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecovery+View.swift"; sourceTree = "<group>"; };
+		A4738CFF2B1A828B0034E28B /* ManualAccountRecoveryCompletion+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryCompletion+Reducer.swift"; sourceTree = "<group>"; };
+		A4738D012B1A82C40034E28B /* ManualAccountRecoveryCompletion+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryCompletion+View.swift"; sourceTree = "<group>"; };
 		E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+Reducer.swift"; sourceTree = "<group>"; };
 		E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+View.swift"; sourceTree = "<group>"; };
 		E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportMnemonicTests.swift; sourceTree = "<group>"; };
@@ -3823,6 +3835,7 @@
 		48CFBD8D2ADC10D800E77A5C /* SettingsFeature */ = {
 			isa = PBXGroup;
 			children = (
+				A41266ED2B15577200EA38E9 /* ManualAccountRecoveryScan */,
 				48CFBDBB2ADC10D800E77A5C /* Settings+Reducer.swift */,
 				48CFBDA92ADC10D800E77A5C /* Settings+View.swift */,
 				48CFBD8E2ADC10D800E77A5C /* AccountSecurity */,
@@ -6910,6 +6923,19 @@
 			path = AssetTransferTests;
 			sourceTree = "<group>";
 		};
+		A41266ED2B15577200EA38E9 /* ManualAccountRecoveryScan */ = {
+			isa = PBXGroup;
+			children = (
+				A41266EE2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift */,
+				A4738CFF2B1A828B0034E28B /* ManualAccountRecoveryCompletion+Reducer.swift */,
+				A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift */,
+				A4738D012B1A82C40034E28B /* ManualAccountRecoveryCompletion+View.swift */,
+				A41266F62B160F3F00EA38E9 /* ManualAccountRecovery+Reducer.swift */,
+				A41266F82B160F4C00EA38E9 /* ManualAccountRecovery+View.swift */,
+			);
+			path = ManualAccountRecoveryScan;
+			sourceTree = "<group>";
+		};
 		E634CA2C2AFD259000C43DB7 /* DebugKeychainContents */ = {
 			isa = PBXGroup;
 			children = (
@@ -7898,6 +7924,7 @@
 				48CFC4032ADC10D900E77A5C /* KeychainClient+Mocked.swift in Sources */,
 				48CFC2B12ADC10D900E77A5C /* DerivePublicKeys+View.swift in Sources */,
 				48CFC3032ADC10D900E77A5C /* DebugManageFactorSources.swift in Sources */,
+				A4738D002B1A828B0034E28B /* ManualAccountRecoveryCompletion+Reducer.swift in Sources */,
 				48CFC3212ADC10D900E77A5C /* NewConnection+Reducer.swift in Sources */,
 				48CFC5C92ADC10DA00E77A5C /* StackedViewsLayout.swift in Sources */,
 				48CFC45C2ADC10DA00E77A5C /* P2PLinksClient+Interface.swift in Sources */,
@@ -8221,6 +8248,7 @@
 				48CFC3402ADC10D900E77A5C /* DappInteractionCoordinator+View.swift in Sources */,
 				48CFC3152ADC10D900E77A5C /* ScanMultipleOlympiaQRCodes+View.swift in Sources */,
 				48CFC2922ADC10D900E77A5C /* TransactionReviewNetworkFee.swift in Sources */,
+				A4738D022B1A82C40034E28B /* ManualAccountRecoveryCompletion+View.swift in Sources */,
 				48CFC2892ADC10D900E77A5C /* TransactionReviewGuarantees+View.swift in Sources */,
 				48CFC4232ADC10DA00E77A5C /* Identified+Extensions.swift in Sources */,
 				48CFC4072ADC10DA00E77A5C /* HexCodable32Bytes.swift in Sources */,
@@ -8618,6 +8646,7 @@
 				48CFC54F2ADC10DA00E77A5C /* RoleKey.swift in Sources */,
 				48CFC5AD2ADC10DA00E77A5C /* WarningView.swift in Sources */,
 				48CFC5982ADC10DA00E77A5C /* ControlState.swift in Sources */,
+				A41266F92B160F4C00EA38E9 /* ManualAccountRecovery+View.swift in Sources */,
 				48CFC2CA2ADC10D900E77A5C /* NonFungibleResourceAsset+Reducer+View.swift in Sources */,
 				48CFC4B72ADC10DA00E77A5C /* TransactionPreviewResponse.swift in Sources */,
 				48CFC3CA2ADC10D900E77A5C /* BIP39+Wordlists.swift in Sources */,
@@ -8811,6 +8840,7 @@
 				48CFC5FB2ADC10DA00E77A5C /* ImageAsset+Extension.swift in Sources */,
 				48CFC4C22ADC10DA00E77A5C /* StateEntityDetailsResponseNonFungibleVaultDetails.swift in Sources */,
 				48CFC3852ADC10D900E77A5C /* EmptyAssetListView.swift in Sources */,
+				A41266F72B160F3F00EA38E9 /* ManualAccountRecovery+Reducer.swift in Sources */,
 				48CFC4552ADC10DA00E77A5C /* CacheClient+Live.swift in Sources */,
 				48CFC5232ADC10DA00E77A5C /* StateValidatorsListResponseAllOf.swift in Sources */,
 				48CFC3F32ADC10D900E77A5C /* PeerConnectionClient.swift in Sources */,
@@ -8843,6 +8873,7 @@
 				48CFC5EE2ADC10DA00E77A5C /* SlideUpPanel+View.swift in Sources */,
 				48CFC3492ADC10D900E77A5C /* PersonaDataPermissionBox.swift in Sources */,
 				48CFC68E2ADC10DB00E77A5C /* AddressKind.swift in Sources */,
+				A41266F12B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift in Sources */,
 				48CFC4F32ADC10DA00E77A5C /* StateEntityDetailsResponsePackageDetails.swift in Sources */,
 				48CFC2652ADC10D900E77A5C /* EditPersonaAddEntryKinds.swift in Sources */,
 				48CFC3B62ADC10D900E77A5C /* SLIP10CurveProtocol.swift in Sources */,
@@ -8935,6 +8966,7 @@
 				48CFC5042ADC10DA00E77A5C /* StateEntityFungibleResourceVaultsPageRequest.swift in Sources */,
 				48CFC4DF2ADC10DA00E77A5C /* OptionalNonFungibleIdsCollectionAllOf.swift in Sources */,
 				48CFC4E42ADC10DA00E77A5C /* MetadataPublicKeyValue.swift in Sources */,
+				A41266EF2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift in Sources */,
 				83EE479A2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI32.swift in Sources */,
 				48CFC5BE2ADC10DA00E77A5C /* RoundedCornerBackground.swift in Sources */,
 				48AE39DD2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator+View.swift in Sources */,

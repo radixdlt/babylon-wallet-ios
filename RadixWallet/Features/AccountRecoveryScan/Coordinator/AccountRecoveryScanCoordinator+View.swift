@@ -9,27 +9,20 @@ public extension AccountRecoveryScanCoordinator {
 		}
 
 		public var body: some SwiftUI.View {
-			NavigationView {
-				SwitchStore(store.scope(state: \.root, action: Action.child)) { state in
-					switch state {
-					case .accountRecoveryScanInProgress:
-						CaseLet(
-							/AccountRecoveryScanCoordinator.State.Root.accountRecoveryScanInProgress,
-							action: AccountRecoveryScanCoordinator.ChildAction.accountRecoveryScanInProgress,
-							then: { AccountRecoveryScanInProgress.View(store: $0) }
-						)
-					case .selectInactiveAccountsToAdd:
-						CaseLet(
-							/AccountRecoveryScanCoordinator.State.Root.selectInactiveAccountsToAdd,
-							action: AccountRecoveryScanCoordinator.ChildAction.selectInactiveAccountsToAdd,
-							then: { SelectInactiveAccountsToAdd.View(store: $0) }
-						)
-					}
-				}
-				.toolbar {
-					ToolbarItem(placement: .primaryAction) {
-						CloseButton(action: { store.send(.view(.closeTapped)) })
-					}
+			SwitchStore(store.scope(state: \.root, action: Action.child)) { state in
+				switch state {
+				case .accountRecoveryScanInProgress:
+					CaseLet(
+						/AccountRecoveryScanCoordinator.State.Root.accountRecoveryScanInProgress,
+						action: AccountRecoveryScanCoordinator.ChildAction.accountRecoveryScanInProgress,
+						then: { AccountRecoveryScanInProgress.View(store: $0) }
+					)
+				case .selectInactiveAccountsToAdd:
+					CaseLet(
+						/AccountRecoveryScanCoordinator.State.Root.selectInactiveAccountsToAdd,
+						action: AccountRecoveryScanCoordinator.ChildAction.selectInactiveAccountsToAdd,
+						then: { SelectInactiveAccountsToAdd.View(store: $0) }
+					)
 				}
 			}
 		}
