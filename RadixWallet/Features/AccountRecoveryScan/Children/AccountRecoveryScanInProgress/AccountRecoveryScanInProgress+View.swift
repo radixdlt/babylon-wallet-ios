@@ -120,8 +120,7 @@ public extension AccountRecoveryScanInProgress {
 						// we want less spacing between accounts then between child views of the root view.
 						VStack(alignment: .leading, spacing: .small3) {
 							ForEach(viewStore.active) { account in
-								SmallAccountCard(account: account)
-									.cornerRadius(.small1)
+								SimpleAccountCard(account: account)
 							}
 						}
 					}
@@ -145,6 +144,23 @@ public extension AccountRecoveryScanInProgress {
 			.buttonStyle(.primaryRectangular)
 			.controlState(viewStore.buttonControlState)
 		}
+	}
+}
+
+// MARK: - SimpleAccountCard
+/// A `SmallAccountCard` without `name`, and with the address centered
+private struct SimpleAccountCard: View {
+	let account: Profile.Network.Account
+
+	var body: some View {
+		SmallAccountCard(
+			identifiable: .address(of: account),
+			gradient: .init(account.appearanceID),
+			height: .guaranteeAccountLabelHeight
+		) {
+			Spacer(minLength: 0)
+		}
+		.cornerRadius(.small1)
 	}
 }
 

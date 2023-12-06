@@ -1,13 +1,13 @@
 // MARK: - SmallAccountCard
 public struct SmallAccountCard<Accessory: View>: View {
-	let name: String
+	let name: String?
 	let identifiable: LedgerIdentifiable
 	let gradient: Gradient
 	let height: CGFloat
 	let accessory: Accessory
 
 	public init(
-		_ name: String,
+		_ name: String? = nil,
 		identifiable: LedgerIdentifiable,
 		gradient: Gradient,
 		height: CGFloat = .standardButtonHeight,
@@ -35,15 +35,18 @@ extension SmallAccountCard where Accessory == EmptyView {
 extension SmallAccountCard {
 	public var body: some View {
 		HStack(spacing: 0) {
-			Text(name)
-				.foregroundColor(.app.white)
-				.textStyle(.body1Header)
+			if let name {
+				Text(name)
+					.foregroundColor(.app.white)
+					.textStyle(.body1Header)
+			}
 
 			Spacer(minLength: 0)
 
 			AddressView(identifiable)
 				.foregroundColor(.app.whiteTransparent)
 				.textStyle(.body2HighImportance)
+
 			accessory
 		}
 		.padding(.horizontal, .medium3)
