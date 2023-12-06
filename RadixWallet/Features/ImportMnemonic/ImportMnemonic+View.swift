@@ -103,7 +103,7 @@ extension ImportMnemonic {
 					VStack(spacing: 0) {
 						if let header = viewStore.header {
 							HeaderView(header: header)
-								.padding(.bottom, viewStore.isWordCountFixed ? .medium1 : 0)
+								.padding(.bottom, viewStore.isWordCountFixed ? .medium3 : 0)
 						}
 
 						if let warning = viewStore.warning {
