@@ -280,7 +280,7 @@ extension AccountRecoveryScanInProgress {
 				let errorMsg = "Discrepancy! Expected to loaded the factor source"
 				loggerGlobal.error(.init(stringLiteral: errorMsg))
 				assertionFailure(errorMsg)
-				return .none
+				return .send(.delegate(.failedToDerivePublicKey))
 			}
 		case let .privateHD(privateHDFactorSource):
 			factorSourceOption = .specificPrivateHDFactorSource(privateHDFactorSource)
