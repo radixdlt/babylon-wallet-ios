@@ -11,7 +11,7 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destination.State? = nil
 
-		public var isOlympia: Bool
+		public let isOlympia: Bool
 		public var selected: EntitiesControlledByFactorSource? = nil
 		public var deviceFactorSources: IdentifiedArrayOf<EntitiesControlledByFactorSource> = []
 	}
