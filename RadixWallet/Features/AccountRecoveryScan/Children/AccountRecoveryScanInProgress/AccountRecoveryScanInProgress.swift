@@ -112,6 +112,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			return .send(.delegate(.failedToDerivePublicKey))
 
 		case let .loadIndicesUsedByFactorSourceResult(.success(indicesUsedByFactorSource)):
+			state.networkID = indicesUsedByFactorSource.currentNetworkID
 			state.mode = .factorSourceWithID(
 				id: state.factorSourceIDFromHash,
 				.success(
