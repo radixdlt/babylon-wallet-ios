@@ -47,6 +47,8 @@
 "assetDetails_NFTDetails_whatAreNfts" = "What are NFTs?";
 "assetDetails_NFTDetails_id" = "ID";
 "assetDetails_NFTDetails_name" = "Name";
+"assetDetails_NFTDetails_description" = "Description";
+"assetDetails_NFTDetails_complexData" = "complex data";
 "assetDetails_NFTDetails_resourceName" = "Name";
 "assetDetails_NFTDetails_nftPlural" = "%d NFTs";
 "assetDetails_NFTDetails_ownedOfTotal" = "%d NFTs of total supply %d";
@@ -559,6 +561,8 @@ You can always change the guarantee from this default in each transaction.";
 "splash_incompatibleProfileVersionAlert_title" = "Wallet Data is Incompatible";
 "splash_passcodeCheckFailedAlert_title" = "Warning";
 "splash_passcodeCheckFailedAlert_message" = "Passcode is not set up. Please update settings.";
+"splash_rootDetection_title" = "It appears that your device might be rooted. To ensure the security of your Accounts and assets, using the Radix Wallet on rooted devices is not recommended. Please confirm if you wish to continue anyway at your own risk.";
+"splash_rootDetection_acknowledgeButton" = "I Understand the Risk";
 "transactionSigning_title" = "Approve Transaction";
 "transactionSigning_preparingTransaction" = "Incoming Transaction";
 "transactionSigning_signTransactionButtonTitle" = "Approve Transaction";
