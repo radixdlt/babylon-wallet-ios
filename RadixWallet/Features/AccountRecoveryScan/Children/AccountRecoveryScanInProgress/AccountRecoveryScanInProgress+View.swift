@@ -92,14 +92,22 @@ public extension AccountRecoveryScanInProgress {
 
 		@ViewBuilder
 		func scanInProgressView(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
-			VStack(alignment: .center, spacing: .medium1) {
+			VStack(alignment: .center, spacing: 0) {
 				Text("Scan in progress") // FIXME: Strings
 					.textStyle(.sheetTitle)
-
-				Spacer()
+					.foregroundColor(.app.gray1)
+					.padding(.bottom, .medium1)
 
 				Text("Scanning for Accounts that have been included in at least on transaction, using:") // FIXME: Strings
-				Text("**\(viewStore.factorSourceDescription)**") // FIXME: Strings
+					.textStyle(.body1Regular)
+					.foregroundColor(.app.gray1)
+					.padding(.bottom, .medium2)
+
+				Text(viewStore.factorSourceDescription) // FIXME: Strings
+					.textStyle(.body1HighImportance)
+					.foregroundColor(.app.gray1)
+
+				Spacer()
 			}
 			.padding(.vertical, .small2)
 			.padding(.horizontal, .medium1)
@@ -111,8 +119,12 @@ public extension AccountRecoveryScanInProgress {
 				VStack(alignment: .center, spacing: .medium1) {
 					Text("Scan Complete") // FIXME: Strings
 						.textStyle(.sheetTitle)
+						.foregroundColor(.app.gray1)
 
 					Text("The first **\(viewStore.maxIndex)** potential Accounts from this signing factor were scanned. The following Accounts had at least one transaction:") // FIXME: Strings
+						.multilineTextAlignment(.center)
+						.textStyle(.body1Regular)
+						.foregroundColor(.app.gray1)
 
 					if viewStore.active.isEmpty {
 						NoContentView("None found.") // FIXME: Strings
