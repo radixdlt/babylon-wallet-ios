@@ -134,81 +134,7 @@ extension ImportMnemonic {
 						}
 
 						#if DEBUG
-						if viewStore.isReadonlyMode {
-							Button("DEBUG ONLY Copy") {
-								viewStore.send(.debugCopyMnemonic)
-							}
-							.buttonStyle(
-								.secondaryRectangular(
-									shouldExpand: true,
-									isDestructive: true,
-									isInToolbar: true
-								)
-							)
-							.padding(.horizontal, .medium2)
-							.padding(.bottom, .medium3)
-						} else {
-							if !(viewStore.isWordCountFixed && viewStore.wordCount == .twentyFour) {
-								Button("DEBUG AccRecScan Olympia 15") {
-									viewStore.send(.debugUseOlympiaTestingMnemonicWithActiveAccounts)
-								}
-								.buttonStyle(
-									.secondaryRectangular(
-										shouldExpand: true,
-										isDestructive: true,
-										isInToolbar: true
-									)
-								)
-								.padding(.horizontal, .medium2)
-								.padding(.bottom, .medium3)
-							}
-
-							Button("DEBUG AccRecScan Babylon 24") {
-								viewStore.send(.debugUseBabylonTestingMnemonicWithActiveAccounts)
-							}
-							.buttonStyle(
-								.secondaryRectangular(
-									shouldExpand: true,
-									isDestructive: true,
-									isInToolbar: true
-								)
-							)
-							.padding(.horizontal, .medium2)
-							.padding(.bottom, .medium3)
-
-							Button(
-								"DEBUG zoo..vote (24)"
-							) {
-								viewStore.send(
-									.debugUseTestingMnemonicZooVote
-								)
-							}
-							.buttonStyle(
-								.secondaryRectangular(
-									shouldExpand: true,
-									isDestructive: true,
-									isInToolbar: true
-								)
-							)
-							.padding(.horizontal, .medium2)
-							.padding(.bottom, .medium3)
-
-							AppTextField(
-								placeholder: "DEBUG ONLY paste mnemonic",
-								text: viewStore.binding(
-									get: { $0.debugMnemonicPhraseSingleField },
-									send: { .debugMnemonicChanged($0) }
-								),
-								innerAccessory: {
-									Button("Paste") {
-										viewStore.send(.debugPasteMnemonic)
-									}
-									.buttonStyle(.borderedProminent)
-								}
-							)
-							.padding(.horizontal, .medium2)
-							.padding(.bottom, .medium2)
-						}
+						debugSection(with: viewStore)
 						#endif
 
 						wordsGrid(with: viewStore)
@@ -338,7 +264,7 @@ private extension View {
 
 extension ImportMnemonic.View {
 	@ViewBuilder
-	private func wordsGrid(with viewStore: ViewStoreOf<ImportMnemonic>) -> some SwiftUI.View {
+	private func wordsGrid(with viewStore: ViewStoreOf<ImportMnemonic>) -> some View {
 		LazyVGrid(
 			columns: .init(
 				repeating: .init(.flexible()),
@@ -367,7 +293,7 @@ extension ImportMnemonic.View {
 	}
 
 	@ViewBuilder
-	private func footer(with viewStore: ViewStoreOf<ImportMnemonic>) -> some SwiftUI.View {
+	private func footer(with viewStore: ViewStoreOf<ImportMnemonic>) -> some View {
 		WithControlRequirements(
 			viewStore.mnemonic,
 			forAction: { viewStore.send(.continueButtonTapped($0)) }
@@ -388,4 +314,85 @@ extension ImportMnemonic.View {
 		}
 		.padding([.horizontal, .bottom], .medium2)
 	}
+
+	#if DEBUG
+	@ViewBuilder
+	private func debugSection(with viewStore: ViewStoreOf<ImportMnemonic>) -> some View {
+		if viewStore.isReadonlyMode {
+			Button("DEBUG ONLY Copy") {
+				viewStore.send(.debugCopyMnemonic)
+			}
+			.buttonStyle(
+				.secondaryRectangular(
+					shouldExpand: true,
+					isDestructive: true,
+					isInToolbar: true
+				)
+			)
+			.padding(.horizontal, .medium2)
+			.padding(.bottom, .medium3)
+		} else {
+			if !(viewStore.isWordCountFixed && viewStore.wordCount == .twentyFour) {
+				Button("DEBUG AccRecScan Olympia 15") {
+					viewStore.send(.debugUseOlympiaTestingMnemonicWithActiveAccounts)
+				}
+				.buttonStyle(
+					.secondaryRectangular(
+						shouldExpand: true,
+						isDestructive: true,
+						isInToolbar: true
+					)
+				)
+				.padding(.horizontal, .medium2)
+				.padding(.bottom, .medium3)
+			}
+
+			Button("DEBUG AccRecScan Babylon 24") {
+				viewStore.send(.debugUseBabylonTestingMnemonicWithActiveAccounts)
+			}
+			.buttonStyle(
+				.secondaryRectangular(
+					shouldExpand: true,
+					isDestructive: true,
+					isInToolbar: true
+				)
+			)
+			.padding(.horizontal, .medium2)
+			.padding(.bottom, .medium3)
+
+			Button(
+				"DEBUG zoo..vote (24)"
+			) {
+				viewStore.send(
+					.debugUseTestingMnemonicZooVote
+				)
+			}
+			.buttonStyle(
+				.secondaryRectangular(
+					shouldExpand: true,
+					isDestructive: true,
+					isInToolbar: true
+				)
+			)
+			.padding(.horizontal, .medium2)
+			.padding(.bottom, .medium3)
+
+			AppTextField(
+				placeholder: "DEBUG ONLY paste mnemonic",
+				text: viewStore.binding(
+					get: { $0.debugMnemonicPhraseSingleField },
+					send: { .debugMnemonicChanged($0) }
+				),
+				innerAccessory: {
+					Button("Paste") {
+						viewStore.send(.debugPasteMnemonic)
+					}
+					.buttonStyle(.borderedProminent)
+				}
+			)
+			.padding(.horizontal, .medium2)
+			.padding(.bottom, .medium2)
+		}
+	}
+	#endif
 }
