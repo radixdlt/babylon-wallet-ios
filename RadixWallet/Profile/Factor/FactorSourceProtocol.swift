@@ -9,20 +9,20 @@ public protocol FactorSourceProtocol:
 	Identifiable where ID: FactorSourceIDProtocol
 {
 	static var kind: FactorSourceKind { get }
-	static var casePath: CasePath<FactorSource, Self> { get }
+	static var casePath: AnyCasePath<FactorSource, Self> { get }
 	var id: ID { get }
 }
 
 extension FactorSourceProtocol {
 	public var kind: FactorSourceKind { Self.kind }
-	public var casePath: CasePath<FactorSource, Self> { Self.casePath }
+	public var casePath: AnyCasePath<FactorSource, Self> { Self.casePath }
 
 	public static func common(
-		isOlympiaCompatible: Bool = false
+		cryptoParametersPreset: FactorSource.CryptoParameters.Preset
 	) throws -> FactorSource.Common {
 		@Dependency(\.date) var date
 		return .init(
-			cryptoParameters: isOlympiaCompatible ? .olympiaBackwardsCompatible : .babylon,
+			cryptoParameters: cryptoParametersPreset.cryptoParameters,
 			addedOn: date(),
 			lastUsedOn: date()
 		)

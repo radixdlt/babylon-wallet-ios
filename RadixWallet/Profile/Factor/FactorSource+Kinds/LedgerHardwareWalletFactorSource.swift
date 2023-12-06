@@ -22,7 +22,7 @@ public struct LedgerHardwareWalletFactorSource: FactorSourceProtocol {
 extension LedgerHardwareWalletFactorSource {
 	/// Kind of factor source
 	public static let kind: FactorSourceKind = .ledgerHQHardwareWallet
-	public static let casePath: CasePath<FactorSource, Self> = /FactorSource.ledger
+	public static let casePath: AnyCasePath<FactorSource, Self> = /FactorSource.ledger
 }
 
 // MARK: LedgerHardwareWalletFactorSource.Hint
@@ -65,7 +65,7 @@ extension LedgerHardwareWalletFactorSource {
 	) throws -> Self {
 		try .init(
 			id: ID(kind: .ledgerHQHardwareWallet, body: deviceID),
-			common: common(isOlympiaCompatible: true),
+			common: common(cryptoParametersPreset: .babylonWithOlympiaCompatability),
 			hint: .init(name: name, model: model)
 		)
 	}
