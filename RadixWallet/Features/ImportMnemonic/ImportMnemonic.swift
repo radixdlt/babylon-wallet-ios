@@ -88,6 +88,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public struct WriteMode: Sendable, Hashable {
 			public var isProgressing: Bool
 			public let persistStrategy: PersistStrategy?
+			public let hideModeButton: Bool
 		}
 
 		public enum Mode: Sendable, Hashable {
@@ -167,6 +168,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public init(
 			header: Header? = nil,
 			warning: String? = nil,
+			hideModeButton: Bool = false,
 			warningOnContinue: OnContinueWarning? = nil,
 			isWordCountFixed: Bool = false,
 			persistStrategy: PersistStrategy?,
@@ -177,7 +179,13 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		) {
 			precondition(wordCount.rawValue.isMultiple(of: ImportMnemonic.wordsPerRow))
 
-			self.mode = .write(.init(isProgressing: false, persistStrategy: persistStrategy))
+			self.mode = .write(
+				.init(
+					isProgressing: false,
+					persistStrategy: persistStrategy,
+					hideModeButton: hideModeButton
+				)
+			)
 			self.language = language
 			self.bip39Passphrase = bip39Passphrase
 

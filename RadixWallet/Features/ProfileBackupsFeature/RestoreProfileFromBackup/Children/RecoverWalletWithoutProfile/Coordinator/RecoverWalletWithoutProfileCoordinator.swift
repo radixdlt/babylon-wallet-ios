@@ -131,6 +131,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 					.init(
 						header: .init(title: L10n.EnterSeedPhrase.Header.title), // FIXME: strings - should use "main"
 						warning: L10n.EnterSeedPhrase.warning,
+						hideModeButton: true,
 						// we require 24 word Babylon mnemonic
 						isWordCountFixed: true,
 						persistStrategy: nil,

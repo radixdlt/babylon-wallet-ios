@@ -6,6 +6,7 @@ extension ImportMnemonic.State {
 	var viewState: ImportMnemonic.ViewState {
 		var viewState = ImportMnemonic.ViewState(
 			readonlyMode: mode.readonly?.context,
+			hideModeButton: mode.write?.hideModeButton ?? false,
 			isProgressing: mode.write?.isProgressing ?? false,
 			isWordCountFixed: isWordCountFixed,
 			isAdvancedMode: isAdvancedMode,
@@ -36,6 +37,7 @@ extension ImportMnemonic {
 		}
 
 		let readonlyMode: ImportMnemonic.State.ReadonlyMode.Context?
+		let hideModeButton: Bool
 		let isProgressing: Bool // irrelevant for read only mode
 		let isWordCountFixed: Bool
 		let isAdvancedMode: Bool
@@ -46,6 +48,11 @@ extension ImportMnemonic {
 		let completedWords: [BIP39.Word]
 		let mnemonic: Mnemonic?
 		let bip39Passphrase: String
+
+		var showModeButton: Bool {
+			!isReadonlyMode && !hideModeButton
+		}
+
 		var showBackButton: Bool {
 			guard let readonlyMode, case .fromSettings = readonlyMode else { return false }
 			return true
@@ -147,7 +154,7 @@ extension ImportMnemonic {
 								.padding(.bottom, .medium2)
 						}
 
-						if !viewStore.isReadonlyMode {
+						if viewStore.showModeButton {
 							Button(viewStore.modeButtonTitle) {
 								viewStore.send(.toggleModeButtonTapped)
 							}
