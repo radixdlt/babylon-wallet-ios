@@ -167,7 +167,7 @@ private extension ManualAccountRecoveryCoordinator.View {
 					CaseLet(
 						/ManualAccountRecoveryCoordinator.Path.State.recoveryComplete,
 						action: ManualAccountRecoveryCoordinator.Path.Action.recoveryComplete,
-						then: { ManualAccountRecoveryCompletion.View(store: $0) }
+						then: { RecoverWalletControlWithBDFSComplete.View(store: $0) }
 					)
 				}
 			}
