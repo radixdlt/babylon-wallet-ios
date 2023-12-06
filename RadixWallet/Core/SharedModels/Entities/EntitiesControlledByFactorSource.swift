@@ -62,7 +62,9 @@ extension DeviceFactorSource {
 
 	/// **B**abylon **D**evice **F**actor **S**ource
 	public var isBDFS: Bool {
-		!supportsOlympia
+		self.hint.mnemonicWordCount == .twentyFour
+			&& supportsBabylon
+			&& !supportsOlympia // hmm is it correct?
 	}
 }
 

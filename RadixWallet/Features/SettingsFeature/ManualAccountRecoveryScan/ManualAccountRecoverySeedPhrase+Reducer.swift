@@ -89,8 +89,9 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 				header: .init(title: title),
 				warning: L10n.EnterSeedPhrase.warning,
 				warningOnContinue: nil,
-				isWordCountFixed: false,
+				isWordCountFixed: !state.isOlympia,
 				persistStrategy: persistStrategy,
+				wordCount: state.isOlympia ? .twelve : .twentyFour,
 				bip39Passphrase: "",
 				offDeviceMnemonicInfoPrompt: nil
 			))
@@ -159,7 +160,17 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 		.run { [isOlympia = state.isOlympia] send in
 			let result = await TaskResult {
 				try await deviceFactorSourceClient.controlledEntities(nil)
-					.filter { $0.isBDFS == !isOlympia }
+					.filter { deviceFactorSource in
+						if isOlympia, deviceFactorSource.deviceFactorSource.supportsOlympia {
+							true
+						} else {
+							// Disregarding if Babylon or Olympia Account Recovery Scan was selected,
+							// we show 24 word mnemonics in both scenarios, since the user might have
+							// incorrectly saved "a babylon" mnemonics as an "olympia one", or a saved
+							// "a 24 word olympia" mnemonic as "a bablony" one.
+							deviceFactorSource.deviceFactorSource.hint.mnemonicWordCount == .twentyFour
+						}
+					}
 			}
 			await send(.internal(.loadedDeviceFactorSources(result)))
 		} catch: { error, _ in

@@ -32,6 +32,10 @@ extension BaseFactorSourceProtocol {
 	public var supportsOlympia: Bool {
 		cryptoParameters.supportsOlympia
 	}
+
+	public var supportsBabylon: Bool {
+		cryptoParameters.supportsBabylon
+	}
 }
 
 extension BaseFactorSourceProtocol {
