@@ -116,21 +116,22 @@ public extension AccountRecoveryScanInProgress {
 		@ViewBuilder
 		func scanCompleteView(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
 			ScrollView {
-				VStack(alignment: .center, spacing: .medium1) {
+				VStack(alignment: .center, spacing: 0) {
 					Text("Scan Complete") // FIXME: Strings
 						.textStyle(.sheetTitle)
 						.foregroundColor(.app.gray1)
+						.padding(.bottom, .medium1)
 
 					Text("The first **\(viewStore.maxIndex)** potential Accounts from this signing factor were scanned. The following Accounts had at least one transaction:") // FIXME: Strings
 						.multilineTextAlignment(.center)
 						.textStyle(.body1Regular)
 						.foregroundColor(.app.gray1)
+						.padding(.bottom, .medium1)
 
 					if viewStore.active.isEmpty {
 						NoContentView("None found.") // FIXME: Strings
 					} else {
-						// we want less spacing between accounts then between child views of the root view.
-						VStack(alignment: .leading, spacing: .small3) {
+						VStack(alignment: .leading, spacing: .medium3) {
 							ForEach(viewStore.active) { account in
 								SimpleAccountCard(account: account)
 							}
@@ -167,8 +168,7 @@ private struct SimpleAccountCard: View {
 	var body: some View {
 		SmallAccountCard(
 			identifiable: .address(of: account),
-			gradient: .init(account.appearanceID),
-			height: .guaranteeAccountLabelHeight
+			gradient: .init(account.appearanceID)
 		) {
 			Spacer(minLength: 0)
 		}

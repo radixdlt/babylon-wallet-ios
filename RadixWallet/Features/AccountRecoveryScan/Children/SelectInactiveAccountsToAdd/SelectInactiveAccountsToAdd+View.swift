@@ -32,25 +32,25 @@ public extension SelectInactiveAccountsToAdd {
 				observe: SelectInactiveAccountsToAdd.ViewState.init,
 				send: { .view($0) }
 			) { viewStore in
-				VStack(spacing: 0) {
-					Text("Add Inactive Accounts?") // FIXME: Strings
-						.multilineTextAlignment(.center)
-						.textStyle(.sheetTitle)
-						.foregroundColor(.app.gray1)
-						.padding(.top, .medium3)
-						.padding(.horizontal, .medium1)
-						.padding(.bottom, .medium3)
+				ScrollView {
+					VStack(spacing: 0) {
+						Text("Add Inactive Accounts?") // FIXME: Strings
+							.multilineTextAlignment(.center)
+							.textStyle(.sheetTitle)
+							.foregroundColor(.app.gray1)
+							.padding(.top, .medium3)
+							.padding(.horizontal, .medium1)
+							.padding(.bottom, .medium1)
 
-					// FIXME: Strings
-					Text("These Accounts were never used, but you *may* have created them. Check any addresses that you wish to keep:")
-						.multilineTextAlignment(.center)
-						.textStyle(.body1Regular)
-						.foregroundColor(.app.gray1)
-						.padding(.horizontal, .large2)
-						.padding(.bottom, .medium1)
+						// FIXME: Strings
+						Text("These Accounts were never used, but you **may** have created them. Check any addresses that you wish to keep:")
+							.multilineTextAlignment(.center)
+							.textStyle(.body1Regular)
+							.foregroundColor(.app.gray1)
+							.padding(.horizontal, .large2)
+							.padding(.bottom, .medium1)
 
-					ScrollView {
-						VStack(spacing: .small1) {
+						VStack(spacing: .medium3) {
 							Selection(
 								viewStore.binding(
 									get: \.selectedAccounts,
