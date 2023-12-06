@@ -110,7 +110,7 @@ public enum SigningPurpose: Sendable, Hashable {
 		case internalManifest(InternalTXSignPurpose)
 		public enum InternalTXSignPurpose: Sendable, Hashable {
 			case transfer
-			case uploadAuthKey
+			case uploadAuthKey(forEntityKind: EntityKind)
 			#if DEBUG
 			/// E.g. turn account into dapp definition account type (setting metadata)
 			case debugModifyAccount

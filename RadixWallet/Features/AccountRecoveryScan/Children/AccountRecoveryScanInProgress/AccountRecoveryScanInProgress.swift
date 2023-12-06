@@ -293,7 +293,7 @@ extension AccountRecoveryScanInProgress {
 				networkID: state.networkID
 			),
 			factorSourceOption: factorSourceOption,
-			purpose: .createEntity(kind: .account)
+			purpose: .accountRecoveryScan
 		))
 
 		return .none

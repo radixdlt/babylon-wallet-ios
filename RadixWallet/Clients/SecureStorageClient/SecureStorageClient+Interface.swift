@@ -147,18 +147,22 @@ extension SecureStorageClient {
 		case signAuthChallenge
 		case importOlympiaAccounts
 
+		case accountRecoveryScan
+
 		case displaySeedPhrase
 		case createEntity(kind: EntityKind)
 
 		/// Check if account(/persona) recovery is needed
 		case checkingAccounts
 
-		case createSignAuthKey
+		case createSignAuthKey(forEntityKind: EntityKind)
 
 		case updateAccountMetadata
 
 		public var description: String {
 			switch self {
+			case .accountRecoveryScan:
+				"accountRecoveryScan"
 			case .importOlympiaAccounts:
 				"importOlympiaAccounts"
 			case .displaySeedPhrase:
@@ -171,8 +175,8 @@ extension SecureStorageClient {
 				"signTransaction"
 			case .checkingAccounts:
 				"checkingAccounts"
-			case .createSignAuthKey:
-				"createSignAuthKey"
+			case let .createSignAuthKey(kind):
+				"createSignAuthKey.\(kind)"
 			case .updateAccountMetadata:
 				"updateAccountMetadata"
 			}

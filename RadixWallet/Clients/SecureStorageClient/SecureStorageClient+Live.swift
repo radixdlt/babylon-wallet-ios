@@ -217,6 +217,8 @@ extension SecureStorageClient: DependencyKey {
 				case .updateAccountMetadata:
 					// This is debug only... for now.
 					return L10n.Biometrics.Prompt.updateAccountMetadata
+				case .accountRecoveryScan:
+					return "Deriving Accounts" // FIXME: Strings
 				}
 			}()
 			let authenticationPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: authPromptValue).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to wallet data secret."

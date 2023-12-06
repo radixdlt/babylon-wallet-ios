@@ -19,7 +19,7 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 					curve: .curve25519
 				),
 				factorSourceOption: .device,
-				purpose: .createEntity(kind: .identity)
+				purpose: .createNewEntity(kind: .identity)
 			)
 		}
 	}

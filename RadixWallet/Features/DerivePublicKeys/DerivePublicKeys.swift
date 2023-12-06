@@ -5,9 +5,22 @@ import SwiftUI
 public struct DerivePublicKeys: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Purpose: Sendable, Hashable {
-			case createEntity(kind: EntityKind)
+			case createNewEntity(kind: EntityKind)
+			case accountRecoveryScan
 			case importLegacyAccounts
-			case createAuthSigningKey
+			case createAuthSigningKey(forEntityKind: EntityKind)
+
+			public var loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose {
+				switch self {
+				case .accountRecoveryScan: .accountRecoveryScan
+				case let .createNewEntity(entityKind):
+					.createEntity(kind: entityKind)
+				case let .createAuthSigningKey(kind):
+					.createSignAuthKey(forEntityKind: kind)
+				case .importLegacyAccounts:
+					.importOlympiaAccounts
+				}
+			}
 		}
 
 		public let derivationsPathOption: DerivationPathOption
@@ -50,17 +63,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			case specificPrivateHDFactorSource(PrivateHDFactorSource)
 		}
 
-		private let _purpose: Purpose
-		public var purpose: SecureStorageClient.LoadMnemonicPurpose {
-			switch _purpose {
-			case let .createEntity(entityKind):
-				.createEntity(kind: entityKind)
-			case .createAuthSigningKey:
-				.createSignAuthKey
-			case .importLegacyAccounts:
-				.importOlympiaAccounts
-			}
-		}
+		public let purpose: Purpose
 
 		public init(
 			derivationPathOption: DerivationPathOption,
@@ -69,7 +72,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		) {
 			self.derivationsPathOption = derivationPathOption
 			self.factorSourceOption = factorSourceOption
-			self._purpose = purpose
+			self.purpose = purpose
 		}
 	}
 
@@ -133,7 +136,13 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			case let .specific(factorSource):
 				switch factorSource {
 				case let .device(deviceFactorSource):
-					return deriveWith(source: .loadMnemonicFor(deviceFactorSource, purpose: state.purpose), state)
+					return deriveWith(
+						source: .loadMnemonicFor(
+							deviceFactorSource,
+							purpose: state.purpose.loadMnemonicPurpose
+						),
+						state
+					)
 				case let .ledger(ledgerFactorSource):
 					state.ledgerBeingUsed = ledgerFactorSource
 					return deriveWith(ledgerFactorSource: ledgerFactorSource, state)
@@ -144,14 +153,30 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			}
 
 		case let .loadedDeviceFactorSource(factorSource):
-			return deriveWith(source: .loadMnemonicFor(factorSource, purpose: state.purpose), state)
+			return deriveWith(
+				source: .loadMnemonicFor(
+					factorSource,
+					purpose: state.purpose.loadMnemonicPurpose
+				),
+				state
+			)
 
 		case let .deriveWithDeviceFactor(derivationPath, networkID, source):
-			return deriveWith(derivationPaths: [derivationPath], networkID: networkID, source: source, state: state)
+			return deriveWith(
+				derivationPaths: [derivationPath],
+				networkID: networkID,
+				source: source,
+				state: state
+			)
 
 		case let .deriveWithLedgerFactor(ledger, derivationPath, networkID):
 			state.ledgerBeingUsed = ledger
-			return deriveWith(ledger: ledger, derivationPaths: [derivationPath], networkID: networkID, state: state)
+			return deriveWith(
+				ledger: ledger,
+				derivationPaths: [derivationPath],
+				networkID: networkID,
+				state: state
+			)
 		}
 	}
 }
