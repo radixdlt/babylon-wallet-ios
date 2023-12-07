@@ -88,7 +88,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public struct WriteMode: Sendable, Hashable {
 			public var isProgressing: Bool
 			public let persistStrategy: PersistStrategy?
-			public let hideModeButton: Bool
+			public let hideAdvancedMode: Bool
 		}
 
 		public enum Mode: Sendable, Hashable {
@@ -168,7 +168,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public init(
 			header: Header? = nil,
 			warning: String? = nil,
-			hideModeButton: Bool = false,
+			hideAdvancedMode: Bool = false,
 			warningOnContinue: OnContinueWarning? = nil,
 			isWordCountFixed: Bool = false,
 			persistStrategy: PersistStrategy?,
@@ -183,7 +183,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				.init(
 					isProgressing: false,
 					persistStrategy: persistStrategy,
-					hideModeButton: hideModeButton
+					hideAdvancedMode: hideAdvancedMode
 				)
 			)
 			self.language = language
