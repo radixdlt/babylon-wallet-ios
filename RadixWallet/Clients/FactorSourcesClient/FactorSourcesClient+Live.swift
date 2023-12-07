@@ -50,13 +50,12 @@ extension FactorSourcesClient: DependencyKey {
 			/// We only need to save olympia mnemonics into Profile, the Babylon ones
 			/// already exist in profile, and this function is used only to save the
 			/// imported mnemonic into keychain (done above).
+			let deviceFactorSources = try await getFactorSources()
+				.filter { $0.id == factorSourceID.embed() }
+				.map { try $0.extract(as: DeviceFactorSource.self) }
+
 			if request.saveIntoProfile {
-				if
-					let existingInProfile = try await getFactorSources()
-					.filter({ $0.id == factorSourceID.embed() }
-					).map({ try $0.extract(as: DeviceFactorSource.self) })
-					.first
-				{
+				if let existingInProfile = deviceFactorSources.first {
 					switch request.onMnemonicExistsStrategy {
 					case .abort:
 						throw FactorSourceAlreadyPresent()
