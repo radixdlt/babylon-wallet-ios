@@ -1,15 +1,5 @@
-extension RecoverWalletWithoutProfileStart.State {
-	var viewState: RecoverWalletWithoutProfileStart.ViewState {
-		.init()
-	}
-}
-
 // MARK: - RecoverWalletWithoutProfileStart.View
 extension RecoverWalletWithoutProfileStart {
-	public struct ViewState: Equatable {
-		// TODO: declare some properties
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<RecoverWalletWithoutProfileStart>
@@ -19,41 +9,58 @@ extension RecoverWalletWithoutProfileStart {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
+			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { _ in
 				ScrollView {
 					VStack(alignment: .center, spacing: .large3) {
 						Text("Recover Control Without Backup") // FIXME: Strings
 							.textStyle(.sheetTitle)
+							.padding(.horizontal, .medium3)
 
 						Text("If you have no wallet backup in the cloud or as an exported backup file, you still have other restore options.") // FIXME: Strings
 							.multilineTextAlignment(.leading)
+							.textStyle(.body1Regular)
+							.padding(.horizontal, .large2)
 
 						Divider()
+							.padding(.horizontal, .medium1)
 
-						Text("**I have my main “Babylon” 24-word seed phrase.**") // FIXME: Strings
+						Text("I have my main “Babylon” 24-word seed phrase.") // FIXME: Strings
+							.textStyle(.body1Header)
+							.padding(.horizontal, .large2)
 
 						Button("Recover with Main Seed Phrase") { // FIXME: Strings
 							store.send(.view(.recoverWithBDFSTapped))
 						}
-						.buttonStyle(.secondaryRectangular)
+						.padding(.horizontal, .medium3)
 
 						Divider()
+							.padding(.horizontal, .medium1)
 
-						Text("**I only want to restore Ledger hardware wallet Accounts**") // FIXME: Strings
+						Text("I only want to restore Ledger hardware wallet Accounts.") // FIXME: Strings
+							.textStyle(.body1Header)
+							.padding(.horizontal, .large2)
 
-						Text("OR") // FIXME: Strings
-
-						Text("**I only have Accounts created on the Radix Olympia Network**") // FIXME: Strings
-
-						Button("Ledger-only or Olympia-only Restore") { // FIXME: Strings
-							store.send(.view(.ledgerOnlyOrOlympiaOnlyTapped))
+						Button("Ledger-only Restore") { // FIXME: Strings
+							store.send(.view(.ledgerOnlyTapped))
 						}
-						.buttonStyle(.secondaryRectangular)
+						.padding(.horizontal, .medium3)
+
+						Divider()
+							.padding(.horizontal, .medium1)
+
+						Text("I only have Accounts created on the Radix Olympia network.") // FIXME: Strings
+							.textStyle(.body1Header)
+							.padding(.horizontal, .large2)
+
+						Button("Olympia-only Restore") { // FIXME: Strings
+							store.send(.view(.olympiaOnlyTapped))
+						}
+						.padding(.horizontal, .medium3)
 					}
-					.textStyle(.body1Regular)
+					.buttonStyle(.secondaryRectangular(shouldExpand: true))
 					.foregroundColor(.app.gray1)
 					.multilineTextAlignment(.center)
-					.padding()
+					.padding(.vertical, .small1)
 				}
 				.toolbar {
 					ToolbarItem(placement: .navigationBarLeading) {
@@ -81,8 +88,8 @@ private extension View {
 	) -> some View {
 		alert(
 			store: destinationStore,
-			state: /RecoverWalletWithoutProfileStart.Destination.State.ledgerOrOlympiaOnlyAlert,
-			action: RecoverWalletWithoutProfileStart.Destination.Action.ledgerOrOlympiaOnlyAlert
+			state: /RecoverWalletWithoutProfileStart.Destination.State.alert,
+			action: RecoverWalletWithoutProfileStart.Destination.Action.alert
 		)
 	}
 }
