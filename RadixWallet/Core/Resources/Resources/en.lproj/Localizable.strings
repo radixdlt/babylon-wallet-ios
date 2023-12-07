@@ -486,6 +486,8 @@ You can always change the guarantee from this default in each transaction.";
 "common_choose" = "Choose";
 "common_max" = "Max";
 "common_optional" = "Optional";
+"common_showMore" = "Show More";
+"common_showLess" = "Show Less";
 "error_dappRequest_invalidPersonaId" = "Invalid Persona specified by dApp";
 "error_dappRequest_invalidRequest" = "Invalid request";
 "error_profileLoad_decodingError" = "Failed to import Radix Wallet backup: %@";
