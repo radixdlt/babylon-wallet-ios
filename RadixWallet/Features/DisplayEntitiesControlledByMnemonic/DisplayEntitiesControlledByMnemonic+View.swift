@@ -7,12 +7,17 @@ extension DisplayEntitiesControlledByMnemonic.State {
 			headingState: {
 				switch mode {
 				case .mnemonicCanBeDisplayed:
-					.defaultHeading(type: .button)
+					.init(
+						title: L10n.SeedPhrases.SeedPhrase.reveal,
+						imageAsset: AssetResource.signingKey,
+						type: .standard,
+						isError: false
+					)
 				case .mnemonicNeedsImport:
 					.init(
 						title: "Seed Phrase Entry Required", // FIXME: String
 						imageAsset: AssetResource.error,
-						type: .button,
+						type: .standard,
 						isError: true
 					)
 				case .displayAccountListOnly:
@@ -38,18 +43,30 @@ extension DisplayEntitiesControlledByMnemonic {
 				isError ? .app.red1 : .black
 			}
 
-			static func defaultHeading(type: HeadingType) -> HeadingState {
-				.init(
-					title: L10n.SeedPhrases.SeedPhrase.reveal,
-					imageAsset: AssetResource.signingKey,
-					type: type,
-					isError: false
-				)
+			public enum HeadingType: Equatable {
+				case standard
+				case scanning(selected: Bool)
 			}
 
-			public enum HeadingType: Equatable {
-				case button
-				case selectable(Bool)
+			public func connectedAccountsLabel(accounts: Int) -> String {
+				switch type {
+				case .standard:
+					if accounts == 0 {
+						"Not connected to any Accounts" // FIXME: Strings
+					} else if accounts == 1 {
+						L10n.SeedPhrases.SeedPhrase.oneConnectedAccount
+					} else {
+						L10n.SeedPhrases.SeedPhrase.multipleConnectedAccounts(accounts)
+					}
+				case .scanning:
+					if accounts == 0 {
+						"Not yet connected to any Accounts" // FIXME: Strings
+					} else if accounts == 1 {
+						"Currently connected to 1 account" // FIXME: Strings
+					} else {
+						"Currently connected to \(accounts) accounts" // FIXME: Strings
+					}
+				}
 			}
 		}
 
@@ -91,11 +108,12 @@ extension DisplayEntitiesControlledByMnemonic {
 		var body: some SwiftUI.View {
 			VStack(alignment: .leading) {
 				if let headingState = viewState.headingState {
-					if headingState.type == .button {
+					switch headingState.type {
+					case .standard:
 						Button(action: action) {
 							heading(headingState)
 						}
-					} else {
+					case let .scanning(selected):
 						heading(headingState)
 					}
 				}
@@ -137,7 +155,7 @@ extension DisplayEntitiesControlledByMnemonic {
 						.textStyle(.body1Header)
 						.foregroundColor(headingState.foregroundColor)
 
-					Text(connectedAccountsLabel(count: viewState.accounts.count))
+					Text(headingState.connectedAccountsLabel(accounts: viewState.accounts.count))
 						.textStyle(.body2Regular)
 						.foregroundColor(.app.gray2)
 				}
@@ -145,19 +163,11 @@ extension DisplayEntitiesControlledByMnemonic {
 				Spacer(minLength: 0)
 
 				switch headingState.type {
-				case .button:
+				case .standard:
 					Image(asset: AssetResource.chevronRight)
-				case let .selectable(isSelected):
+				case let .scanning(isSelected):
 					RadioButton(appearance: .dark, state: isSelected ? .selected : .unselected)
 				}
-			}
-		}
-
-		private func connectedAccountsLabel(count: Int) -> String {
-			if count == 1 {
-				L10n.SeedPhrases.SeedPhrase.oneConnectedAccount
-			} else {
-				L10n.SeedPhrases.SeedPhrase.multipleConnectedAccounts(count)
 			}
 		}
 	}

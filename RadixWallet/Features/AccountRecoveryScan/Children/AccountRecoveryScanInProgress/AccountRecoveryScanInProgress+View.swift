@@ -92,14 +92,22 @@ public extension AccountRecoveryScanInProgress {
 
 		@ViewBuilder
 		func scanInProgressView(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
-			VStack(alignment: .center, spacing: .medium1) {
+			VStack(alignment: .center, spacing: 0) {
 				Text("Scan in progress") // FIXME: Strings
 					.textStyle(.sheetTitle)
-
-				Spacer()
+					.foregroundColor(.app.gray1)
+					.padding(.bottom, .medium1)
 
 				Text("Scanning for Accounts that have been included in at least on transaction, using:") // FIXME: Strings
-				Text("**\(viewStore.factorSourceDescription)**") // FIXME: Strings
+					.textStyle(.body1Regular)
+					.foregroundColor(.app.gray1)
+					.padding(.bottom, .medium2)
+
+				Text(viewStore.factorSourceDescription) // FIXME: Strings
+					.textStyle(.body1HighImportance)
+					.foregroundColor(.app.gray1)
+
+				Spacer()
 			}
 			.padding(.vertical, .small2)
 			.padding(.horizontal, .medium1)
@@ -108,20 +116,24 @@ public extension AccountRecoveryScanInProgress {
 		@ViewBuilder
 		func scanCompleteView(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
 			ScrollView {
-				VStack(alignment: .center, spacing: .medium1) {
+				VStack(alignment: .center, spacing: 0) {
 					Text("Scan Complete") // FIXME: Strings
 						.textStyle(.sheetTitle)
+						.foregroundColor(.app.gray1)
+						.padding(.bottom, .medium1)
 
 					Text("The first **\(viewStore.maxIndex)** potential Accounts from this signing factor were scanned. The following Accounts had at least one transaction:") // FIXME: Strings
+						.multilineTextAlignment(.center)
+						.textStyle(.body1Regular)
+						.foregroundColor(.app.gray1)
+						.padding(.bottom, .medium1)
 
 					if viewStore.active.isEmpty {
-						NoContentView("None found.") // FIXME: Strings
+						NoContentView("No new accounts found.") // FIXME: Strings
 					} else {
-						// we want less spacing between accounts then between child views of the root view.
-						VStack(alignment: .leading, spacing: .small3) {
+						VStack(alignment: .leading, spacing: .medium3) {
 							ForEach(viewStore.active) { account in
-								SmallAccountCard(account: account)
-									.cornerRadius(.small1)
+								SimpleAccountCard(account: account)
 							}
 						}
 					}
@@ -145,6 +157,22 @@ public extension AccountRecoveryScanInProgress {
 			.buttonStyle(.primaryRectangular)
 			.controlState(viewStore.buttonControlState)
 		}
+	}
+}
+
+// MARK: - SimpleAccountCard
+/// A `SmallAccountCard` without `name`, and with the address centered
+private struct SimpleAccountCard: View {
+	let account: Profile.Network.Account
+
+	var body: some View {
+		SmallAccountCard(
+			identifiable: .address(of: account),
+			gradient: .init(account.appearanceID)
+		) {
+			Spacer(minLength: 0)
+		}
+		.cornerRadius(.small1)
 	}
 }
 

@@ -137,7 +137,7 @@ extension SmallAccountCard where Accessory == EmptyView {
 				L10n.TransactionReview.externalAccountName,
 				identifiable: .address(.account(accountAddress)),
 				gradient: .init(colors: [.app.gray2]),
-				height: .guaranteeAccountLabelHeight
+				verticalPadding: .small1
 			)
 		}
 	}

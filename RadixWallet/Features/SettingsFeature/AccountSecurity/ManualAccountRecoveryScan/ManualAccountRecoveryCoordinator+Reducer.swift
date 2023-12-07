@@ -18,7 +18,7 @@ public struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 			case ledger(LedgerHardwareDevices.State)
 
 			case accountRecoveryScan(AccountRecoveryScanCoordinator.State)
-			case recoveryComplete(ManualAccountRecoveryCompletion.State)
+			case recoveryComplete(RecoverWalletControlWithBDFSComplete.State)
 		}
 
 		@CasePathable
@@ -27,7 +27,7 @@ public struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 			case ledger(LedgerHardwareDevices.Action)
 
 			case accountRecoveryScan(AccountRecoveryScanCoordinator.Action)
-			case recoveryComplete(ManualAccountRecoveryCompletion.Action)
+			case recoveryComplete(RecoverWalletControlWithBDFSComplete.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -41,7 +41,7 @@ public struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 				AccountRecoveryScanCoordinator()
 			}
 			Scope(state: \.recoveryComplete, action: \.recoveryComplete) {
-				ManualAccountRecoveryCompletion()
+				RecoverWalletControlWithBDFSComplete()
 			}
 		}
 	}
@@ -111,12 +111,9 @@ public struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 			state.path.append(.recoveryComplete(.init()))
 			return .none
 
-		case let .recoveryComplete(.delegate(recoveryCompleteAction)):
-			switch recoveryCompleteAction {
-			case .finish:
-				return .run { send in
-					await send(.delegate(.gotoAccountList))
-				}
+		case .recoveryComplete(.delegate(.profileCreatedFromImportedBDFS)):
+			return .run { send in
+				await send(.delegate(.gotoAccountList))
 			}
 
 		default:
