@@ -119,7 +119,7 @@ extension FactorSource {
 			let device = try! DeviceFactorSource(
 				id: .device(hash: Data.random(byteCount: 32)),
 				common: .init(
-					cryptoParameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon
+					cryptoParameters: olympiaCompat ? FactorSource.CryptoParameters.Preset.babylonWithOlympiaCompatability.cryptoParameters : .babylon
 				),
 				hint: .init(name: name, model: "", mnemonicWordCount: .twentyFour)
 			)
@@ -134,7 +134,7 @@ extension FactorSource {
 			let ledger = try! LedgerHardwareWalletFactorSource(
 				id: .init(kind: .ledgerHQHardwareWallet, hash: Data.random(byteCount: 32)),
 				common: .init(
-					cryptoParameters: olympiaCompat ? .olympiaBackwardsCompatible : .babylon
+					cryptoParameters: olympiaCompat ? FactorSource.CryptoParameters.Preset.babylonWithOlympiaCompatability.cryptoParameters : .babylon
 				),
 				hint: .init(name: .init(name), model: .nanoS)
 			)

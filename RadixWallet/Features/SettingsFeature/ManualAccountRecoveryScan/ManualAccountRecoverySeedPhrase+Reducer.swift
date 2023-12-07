@@ -11,7 +11,7 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destination.State? = nil
 
-		public var isOlympia: Bool
+		public let isOlympia: Bool
 		public var selected: EntitiesControlledByFactorSource? = nil
 		public var deviceFactorSources: IdentifiedArrayOf<EntitiesControlledByFactorSource> = []
 	}
@@ -21,16 +21,16 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 	public struct Destination: DestinationReducer {
 		@CasePathable
 		public enum State: Sendable, Hashable {
-			case enterSeedPhrase(ImportMnemonic.State)
+			case importMnemoninc(ImportMnemonic.State)
 		}
 
 		@CasePathable
 		public enum Action: Sendable, Equatable {
-			case enterSeedPhrase(ImportMnemonic.Action)
+			case importMnemoninc(ImportMnemonic.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: \.enterSeedPhrase, action: \.enterSeedPhrase) {
+			Scope(state: \.importMnemoninc, action: \.importMnemoninc) {
 				ImportMnemonic()
 			}
 		}
@@ -81,16 +81,18 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 			let title = state.isOlympia ? "Enter Legacy Seed Phrase" : "Enter Seed Phrase" // FIXME: Strings
 
 			let persistStrategy = ImportMnemonic.State.PersistStrategy(
-				mnemonicForFactorSourceKind: .onDevice(state.isOlympia ? .olympia : .babylon),
-				location: .intoKeychainAndProfile
+				factorSourceKindOfMnemonic: .onDevice(state.isOlympia ? .olympia : .babylon),
+				location: .intoKeychainAndProfile,
+				onMnemonicExistsStrategy: .appendWithCryptoParamaters
 			)
 
-			state.destination = .enterSeedPhrase(.init(
+			state.destination = .importMnemoninc(.init(
 				header: .init(title: title),
 				warning: L10n.EnterSeedPhrase.warning,
 				warningOnContinue: nil,
-				isWordCountFixed: false,
+				isWordCountFixed: !state.isOlympia,
 				persistStrategy: persistStrategy,
+				wordCount: state.isOlympia ? .twelve : .twentyFour,
 				bip39Passphrase: "",
 				offDeviceMnemonicInfoPrompt: nil
 			))
@@ -123,7 +125,7 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .enterSeedPhrase(.delegate(.persistedNewFactorSourceInProfile(factorSource))):
+		case let .importMnemoninc(.delegate(.persistedNewFactorSourceInProfile(factorSource))):
 			do {
 				guard case let .device(deviceFactorSource) = factorSource else {
 					struct NotDeviceFactorSource: Error {}
@@ -159,7 +161,16 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 		.run { [isOlympia = state.isOlympia] send in
 			let result = await TaskResult {
 				try await deviceFactorSourceClient.controlledEntities(nil)
-					.filter { $0.isBDFS == !isOlympia }
+					.filter {
+						let dfs = $0.deviceFactorSource
+
+						if isOlympia {
+							return dfs.supportsOlympia
+						} else {
+							// The word count == 24 check SHOULD always be true, but best include it anyway.
+							return dfs.supportsBabylon && dfs.hint.mnemonicWordCount == .twentyFour
+						}
+					}
 			}
 			await send(.internal(.loadedDeviceFactorSources(result)))
 		} catch: { error, _ in

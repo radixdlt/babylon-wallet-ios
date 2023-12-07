@@ -16,8 +16,9 @@ public struct ManageSomeFactorSource<FactorSourceOfKind: BaseFactorSourceProtoco
 			case .offDeviceMnemonic:
 				self = .manageOffDeviceMnemonics(.init(
 					persistStrategy: .init(
-						mnemonicForFactorSourceKind: .offDevice,
-						location: .intoKeychainAndProfile
+						factorSourceKindOfMnemonic: .offDevice,
+						location: .intoKeychainAndProfile,
+						onMnemonicExistsStrategy: .abort
 					))
 				)
 

@@ -16,10 +16,11 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 				derivationPathOption: .next(
 					networkOption: .useCurrent,
 					entityKind: .identity,
-					curve: .curve25519
+					curve: .curve25519,
+					scheme: .cap26
 				),
 				factorSourceOption: .device,
-				purpose: .createEntity(kind: .identity)
+				purpose: .createNewEntity(kind: .identity)
 			)
 		}
 	}

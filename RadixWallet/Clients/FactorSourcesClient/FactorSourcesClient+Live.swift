@@ -29,30 +29,53 @@ extension FactorSourcesClient: DependencyKey {
 		}
 
 		let addPrivateHDFactorSource: AddPrivateHDFactorSource = { request in
-			let factorSource = request.factorSource
+			let privateHDFactorSource = request.privateHDFactorSource
+			let deviceFactorSource = privateHDFactorSource.factorSource
+			let factorSourceID = deviceFactorSource.id
 
-			switch factorSource {
-			case let .device(deviceFactorSource):
-				try secureStorageClient.saveMnemonicForFactorSource(.init(mnemonicWithPassphrase: request.mnemonicWithPasshprase, factorSource: deviceFactorSource))
-			default:
-				loggerGlobal.notice("Saving of non device private HD factor source not permitted, kind is: \(factorSource.kind)")
+			do {
+				try secureStorageClient.saveMnemonicForFactorSource(privateHDFactorSource)
+			} catch {
+				if
+					secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSourceID),
+					request.onMnemonicExistsStrategy == .appendWithCryptoParamaters
+				{
+					loggerGlobal.notice("Failed to save mnemonic, since it already exists, so this was expected.")
+				} else {
+					loggerGlobal.error("Failed to save mnemonic, error: \(error)")
+					throw error
+				}
 			}
-			let factorSourceID = factorSource.id
 
 			/// We only need to save olympia mnemonics into Profile, the Babylon ones
 			/// already exist in profile, and this function is used only to save the
 			/// imported mnemonic into keychain (done above).
+			let deviceFactorSources = try await getFactorSources()
+				.filter { $0.id == factorSourceID.embed() }
+				.map { try $0.extract(as: DeviceFactorSource.self) }
+
 			if request.saveIntoProfile {
-				do {
-					try await saveFactorSource(factorSource)
-				} catch {
-					loggerGlobal.critical("Failed to save factor source, error: \(error)")
-					if let idForMnemonicToDelete = try? factorSourceID.extract(as: FactorSourceID.FromHash.self) {
+				if let existingInProfile = deviceFactorSources.first {
+					switch request.onMnemonicExistsStrategy {
+					case .abort:
+						throw FactorSourceAlreadyPresent()
+					case .appendWithCryptoParamaters:
+						var updated = existingInProfile
+						loggerGlobal.critical("🔮 Appending crypto parameters to DeviceFactorSource, BEFORE: \(updated.common.cryptoParameters)....")
+						updated.common.cryptoParameters.append(request.privateHDFactorSource.factorSource.common.cryptoParameters)
+						loggerGlobal.critical("🔮 Appended crypto parameters to DeviceFactorSource, AFTER: \(updated.common.cryptoParameters) ✅")
+						try await updateFactorSource(updated.embed())
+					}
+				} else {
+					do {
+						try await saveFactorSource(deviceFactorSource.embed())
+					} catch {
+						loggerGlobal.critical("Failed to save factor source, error: \(error)")
 						// We were unlucky, failed to update Profile, thus best to undo the saving of
 						// the mnemonic in keychain (if we can).
-						try? secureStorageClient.deleteMnemonicByFactorSourceID(idForMnemonicToDelete)
+						try? secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
+						throw error
 					}
-					throw error
 				}
 			}
 
@@ -105,6 +128,11 @@ extension FactorSourcesClient: DependencyKey {
 						case let .unsecured(unsecuredControl):
 							let factorInstance = unsecuredControl.transactionSigning
 							guard factorInstance.factorSourceID.embed() == factorSourceID else {
+								return nil
+							}
+							guard factorInstance.derivationPath.scheme == request.derivationPathScheme else {
+								/// If DeviceFactorSource with mnemonic `M` is used to derive Account with CAP26 derivation path at index `0`, then we must
+								/// allow `M` to be able to derive account wit hBIP44-like derivation path at index `0` as well in the future.
 								return nil
 							}
 							return factorInstance.derivationPath.index
@@ -163,12 +191,18 @@ extension FactorSourcesClient: DependencyKey {
 				)
 				assert(newBDFS.isExplicitMainBDFS)
 
-				loggerGlobal.info("Saving new main BDFS to Profile and Keychain")
-				_ = try await addPrivateHDFactorSource(.init(
-					factorSource: newBDFS.embed(),
-					mnemonicWithPasshprase: mnemonicWithPassphrase,
-					saveIntoProfile: false
-				))
+				loggerGlobal.info("Saving new main BDFS to Keychain only, we will NOT save it into Profile just yet.")
+
+				_ = try await addPrivateHDFactorSource(
+					.init(
+						privateHDFactorSource: .init(
+							mnemonicWithPassphrase: mnemonicWithPassphrase,
+							factorSource: newBDFS
+						),
+						onMnemonicExistsStrategy: .abort,
+						saveIntoProfile: false
+					)
+				)
 
 				return try PrivateHDFactorSource(
 					mnemonicWithPassphrase: mnemonicWithPassphrase,
@@ -200,6 +234,7 @@ extension FactorSourcesClient: DependencyKey {
 					.init(
 						entityKind: request.entityKind,
 						factorSourceID: factorSourceID,
+						derivationPathScheme: request.derivationPathScheme,
 						networkID: request.networkID
 					)
 				).indices
@@ -209,17 +244,15 @@ extension FactorSourcesClient: DependencyKey {
 				return nextIndex
 			},
 			addPrivateHDFactorSource: addPrivateHDFactorSource,
-			checkIfHasOlympiaFactorSourceForAccounts: {
-				wordCount,
-					softwareAccounts -> FactorSourceID.FromHash? in
+			checkIfHasOlympiaFactorSourceForAccounts: { wordCount, softwareAccounts -> FactorSourceID.FromHash? in
+
 				guard softwareAccounts.allSatisfy({ $0.accountType == .software }) else {
 					assertionFailure("Unexpectedly received hardware account, unable to verify.")
 					return nil
 				}
 				do {
-					// Might be empty, if it is, we will just return nil (for-loop below not run).
-					let olympiaDeviceFactorSources: [DeviceFactorSource] = try await getFactorSources()
-						.filter(\.supportsOlympia)
+					// Might be empty, if it is, we will just return nil (for-loop below will not run).
+					let deviceFactorSources: [DeviceFactorSource] = try await getFactorSources()
 						.filter { $0.kind == .device }
 						.compactMap {
 							guard
@@ -231,9 +264,8 @@ extension FactorSourcesClient: DependencyKey {
 							return deviceFactorSource
 						}
 
-					let factorSourceIDs = olympiaDeviceFactorSources.map(\.id)
-
-					for factorSourceID in factorSourceIDs {
+					for deviceFactorSource in deviceFactorSources {
+						let factorSourceID = deviceFactorSource.id
 						guard
 							let mnemonic = try secureStorageClient.loadMnemonic(
 								factorSourceID: factorSourceID,
@@ -246,6 +278,14 @@ extension FactorSourcesClient: DependencyKey {
 						guard (try? mnemonic.validatePublicKeys(of: softwareAccounts)) == true else {
 							continue
 						}
+
+						if !deviceFactorSource.supportsOlympia {
+							loggerGlobal.notice("Adding Olympia CryptoParameters to factor source which lacked it.")
+							var updated = deviceFactorSource
+							updated.common.cryptoParameters.append(.olympiaOnly)
+							try await updateFactorSource(updated.embed())
+						}
+
 						// YES Managed to validate all software accounts against existing factor source
 						loggerGlobal.debug("Existing factor source found for selected Olympia software accounts.")
 						return factorSourceID

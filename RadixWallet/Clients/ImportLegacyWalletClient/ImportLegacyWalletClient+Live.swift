@@ -4,7 +4,6 @@ extension ImportLegacyWalletClient: DependencyKey {
 
 	public static let liveValue: Self = {
 		@Dependency(\.accountsClient) var accountsClient
-		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		/// NB: This migrates, but does not save the migrated accounts to the profile. That needs to be done separately,
 		/// by calling `accountsClient.saveVirtualAccounts`
@@ -66,14 +65,14 @@ extension ImportLegacyWalletClient: DependencyKey {
 				do {
 					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
 					if accounts.contains(where: \.isOlympiaAccount) {
-						await userDefaults.setHideMigrateOlympiaButton(true)
+						userDefaults.setHideMigrateOlympiaButton(true)
 						return false
 					}
 				} catch {
 					loggerGlobal.warning("Failed to load accounts, error: \(error)")
 				}
 
-				return await factorSourcesClient.getCurrentNetworkID() == .mainnet
+				return await accountsClient.getCurrentNetworkID() == .mainnet
 			},
 			parseHeaderFromQRCode: {
 				let header = try CAP33.deserializeHeader(payload: $0)

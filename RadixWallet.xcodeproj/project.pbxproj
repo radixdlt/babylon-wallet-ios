@@ -1063,7 +1063,7 @@
 		48CFC66E2ADC10DB00E77A5C /* FactorInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC2012ADC10D900E77A5C /* FactorInstance.swift */; };
 		48CFC66F2ADC10DB00E77A5C /* FactorSources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC2022ADC10D900E77A5C /* FactorSources.swift */; };
 		48CFC6702ADC10DB00E77A5C /* FactorSourceKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC2042ADC10D900E77A5C /* FactorSourceKind.swift */; };
-		48CFC6712ADC10DB00E77A5C /* MnemonicBasedFactorSourceKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC2052ADC10D900E77A5C /* MnemonicBasedFactorSourceKind.swift */; };
+		48CFC6712ADC10DB00E77A5C /* FactorSourceKindOfMnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC2052ADC10D900E77A5C /* FactorSourceKindOfMnemonic.swift */; };
 		48CFC6722ADC10DB00E77A5C /* PrivateHDFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC2072ADC10D900E77A5C /* PrivateHDFactorSource.swift */; };
 		48CFC6732ADC10DB00E77A5C /* MnemonicWithPassphrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC2082ADC10D900E77A5C /* MnemonicWithPassphrase.swift */; };
 		48CFC6742ADC10DB00E77A5C /* AccessController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC20A2ADC10D900E77A5C /* AccessController.swift */; };
@@ -2411,7 +2411,7 @@
 		48CFC2012ADC10D900E77A5C /* FactorInstance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FactorInstance.swift; sourceTree = "<group>"; };
 		48CFC2022ADC10D900E77A5C /* FactorSources.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FactorSources.swift; sourceTree = "<group>"; };
 		48CFC2042ADC10D900E77A5C /* FactorSourceKind.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FactorSourceKind.swift; sourceTree = "<group>"; };
-		48CFC2052ADC10D900E77A5C /* MnemonicBasedFactorSourceKind.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MnemonicBasedFactorSourceKind.swift; sourceTree = "<group>"; };
+		48CFC2052ADC10D900E77A5C /* FactorSourceKindOfMnemonic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FactorSourceKindOfMnemonic.swift; sourceTree = "<group>"; };
 		48CFC2072ADC10D900E77A5C /* PrivateHDFactorSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrivateHDFactorSource.swift; sourceTree = "<group>"; };
 		48CFC2082ADC10D900E77A5C /* MnemonicWithPassphrase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MnemonicWithPassphrase.swift; sourceTree = "<group>"; };
 		48CFC20A2ADC10D900E77A5C /* AccessController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccessController.swift; sourceTree = "<group>"; };
@@ -6627,7 +6627,7 @@
 			isa = PBXGroup;
 			children = (
 				48CFC2042ADC10D900E77A5C /* FactorSourceKind.swift */,
-				48CFC2052ADC10D900E77A5C /* MnemonicBasedFactorSourceKind.swift */,
+				48CFC2052ADC10D900E77A5C /* FactorSourceKindOfMnemonic.swift */,
 			);
 			path = FactorSourceKind;
 			sourceTree = "<group>";
@@ -8222,7 +8222,7 @@
 				48CFC50D2ADC10DA00E77A5C /* FungibleResourcesCollection.swift in Sources */,
 				48CFC40F2ADC10DA00E77A5C /* Logger.swift in Sources */,
 				48CFC36C2ADC10D900E77A5C /* FungibleTokenDetails+View.swift in Sources */,
-				48CFC6712ADC10DB00E77A5C /* MnemonicBasedFactorSourceKind.swift in Sources */,
+				48CFC6712ADC10DB00E77A5C /* FactorSourceKindOfMnemonic.swift in Sources */,
 				48CFC2932ADC10D900E77A5C /* AdvancedFeesCustomization+View.swift in Sources */,
 				48CFC4042ADC10D900E77A5C /* KeychainHolder.swift in Sources */,
 				48CFC4392ADC10DA00E77A5C /* Sorted.swift in Sources */,

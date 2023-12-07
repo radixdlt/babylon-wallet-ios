@@ -234,8 +234,8 @@ extension SigningPurpose {
 			return .signTransaction
 		case .signTransaction(.internalManifest(.transfer)):
 			return .signTransaction
-		case .signTransaction(.internalManifest(.uploadAuthKey)):
-			return .createSignAuthKey
+		case let .signTransaction(.internalManifest(.uploadAuthKey(forEntityKind))):
+			return .createSignAuthKey(forEntityKind: forEntityKind)
 		#if DEBUG
 		case .signTransaction(.internalManifest(.debugModifyAccount)):
 			return .updateAccountMetadata

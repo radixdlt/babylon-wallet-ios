@@ -11,8 +11,10 @@ extension AccountRecoveryScanInProgress.State {
 	}
 }
 
+/// The number of accounts we derive and scan on Ledger per "request".
+let batchSize = 50
+
 // MARK: - AccountRecoveryScanInProgress.View
-public let batchSize = 50
 public extension AccountRecoveryScanInProgress {
 	struct ViewState: Equatable {
 		let status: AccountRecoveryScanInProgress.State.Status
