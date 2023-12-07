@@ -44,6 +44,7 @@ struct KeyValueView<Content: View>: View {
 				.multilineTextAlignment(.trailing)
 				.textStyle(.body1HighImportance)
 				.foregroundColor(.app.gray1)
+				.lineLimit(nil)
 		}
 	}
 }

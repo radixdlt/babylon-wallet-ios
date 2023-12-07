@@ -25,7 +25,8 @@ extension NonFungibleTokenDetails.ViewState.TokenDetails {
 			keyImage: token.data?.keyImageURL,
 			nonFungibleGlobalID: token.id,
 			name: token.data?.name,
-			description: token.data?.tokenDescription
+			description: token.data?.tokenDescription,
+			dataFields: token.data?.dataFields ?? []
 		)
 	}
 }
@@ -42,6 +43,7 @@ extension NonFungibleTokenDetails {
 			let nonFungibleGlobalID: NonFungibleGlobalId
 			let name: String?
 			let description: String?
+			let dataFields: [DataField]
 		}
 	}
 
@@ -66,6 +68,12 @@ extension NonFungibleTokenDetails {
 								}
 
 								KeyValueView(nonFungibleGlobalID: tokenDetails.nonFungibleGlobalID)
+								if let description = tokenDetails.description {
+									KeyValueView(key: "Description", value: description)
+								}
+								ForEach(tokenDetails.dataFields.identifiablyEnumerated()) { entry in
+									dataFieldView(entry.element)
+								}
 							}
 							.lineLimit(1)
 							.frame(maxWidth: .infinity, alignment: .leading)
@@ -90,5 +98,195 @@ extension NonFungibleTokenDetails {
 				}
 			}
 		}
+
+		@ViewBuilder
+		private func dataFieldView(_ field: ViewState.TokenDetails.DataField) -> some SwiftUI.View {
+			switch field.kind {
+			case let .primitive(value):
+				KeyValueView(key: field.name, value: value)
+			case .complex:
+				KeyValueView(key: field.name, value: "Complex")
+			case let .url(url):
+				KeyValueView(key: field.name) {
+					Button(url.absoluteString) {
+						Task {
+							@Dependency(\.openURL) var openURL
+							await openURL(url)
+						}
+						//   viewStore.send(.openURLTapped(domain))
+					}
+					.buttonStyle(.url)
+				}
+			case let .address(address):
+				KeyValueView(key: field.name) {
+					AddressView(.address(address))
+				}
+			case let .decimal(value):
+				KeyValueView(key: field.name, value: value.formatted())
+			case let .enum(variant):
+				KeyValueView(key: field.name, value: variant)
+			case let .id(id):
+				KeyValueView(key: field.name, value: try! id.toString())
+			}
+		}
+	}
+}
+
+// MARK: - NonFungibleTokenDetails.ViewState.TokenDetails.DataField
+extension NonFungibleTokenDetails.ViewState.TokenDetails {
+	public struct DataField: Hashable, Sendable {
+		public enum Kind: Hashable, Sendable {
+			case primitive(String)
+			case complex
+			case url(URL)
+			case address(LedgerIdentifiable.Address)
+			case decimal(RETDecimal)
+			case `enum`(variant: String)
+			case id(NonFungibleLocalId)
+		}
+
+		public let kind: Kind
+		public let name: String
+	}
+}
+
+extension OnLedgerEntity.NonFungibleToken.NFTData {
+	fileprivate var dataFields: [NonFungibleTokenDetails.ViewState.TokenDetails.DataField] {
+		fields.compactMap { field in
+			guard let fieldName = field.fieldName,
+			      let kind = field.fieldKind,
+			      !OnLedgerEntity.NonFungibleToken.NFTData.StandardField
+			      .allCases.map(\.rawValue).contains(fieldName)
+			else {
+				return nil
+			}
+			return .init(kind: kind, name: fieldName)
+		}
+	}
+}
+
+private extension String {
+	var asDataField: NonFungibleTokenDetails.ViewState.TokenDetails.DataField.Kind? {
+		guard !isEmpty else {
+			return nil
+		}
+
+		return if let address = try? LedgerIdentifiable.Address(address: Address(validatingAddress: self)) {
+			.address(address)
+		} else if let url = URL(string: self), ["http", "https"].contains(url.scheme) {
+			.url(url)
+		} else if let decimal = try? RETDecimal(value: self) {
+			.decimal(decimal)
+		} else if let id = try? NonFungibleLocalId.from(stringFormat: self) {
+			.id(id)
+		} else {
+			.primitive(self)
+		}
+	}
+}
+
+extension GatewayAPI.ProgrammaticScryptoSborValue {
+	var fieldKind: NonFungibleTokenDetails.ViewState.TokenDetails.DataField.Kind? {
+		switch self {
+		case .array, .map, .mapEntry, .tuple:
+			.complex
+
+		case let .bool(content):
+			.primitive(String(content.value))
+		case let .bytes(content):
+			content.hex.asDataField
+		case let .i8(content):
+			content.value.asDataField
+		case let .i16(content):
+			content.value.asDataField
+		case let .i32(content):
+			content.value.asDataField
+		case let .i64(content):
+			content.value.asDataField
+		case let .i128(content):
+			content.value.asDataField
+		case let .u8(content):
+			content.value.asDataField
+		case let .u16(content):
+			content.value.asDataField
+		case let .u32(content):
+			content.value.asDataField
+		case let .u64(content):
+			content.value.asDataField
+		case let .u128(content):
+			content.value.asDataField
+		case let .decimal(content):
+			content.value.asDataField
+		case let .preciseDecimal(content):
+			content.value.asDataField
+		case let .enum(content):
+			content.variantName.map { .enum(variant: $0) }
+		case let .nonFungibleLocalId(content):
+			content.value.asDataField
+		case let .own(content):
+			content.value.asDataField
+		case let .reference(content):
+			content.value.asDataField
+		case let .string(content):
+			content.value.asDataField
+		}
+	}
+}
+
+extension GatewayAPI.ProgrammaticScryptoSborValue {
+	var fieldName: String? {
+		let name = switch self {
+		case let .array(content):
+			content.fieldName
+		case let .bool(content):
+			content.fieldName
+		case let .bytes(content):
+			content.fieldName
+		case let .decimal(content):
+			content.fieldName
+		case let .enum(content):
+			content.fieldName
+		case let .i8(content):
+			content.fieldName
+		case let .i16(content):
+			content.fieldName
+		case let .i32(content):
+			content.fieldName
+		case let .i64(content):
+			content.fieldName
+		case let .i128(content):
+			content.fieldName
+		case let .map(content):
+			content.fieldName
+		case let .mapEntry(entry):
+			entry.key.fieldName
+		case let .nonFungibleLocalId(content):
+			content.fieldName
+		case let .own(content):
+			content.fieldName
+		case let .preciseDecimal(content):
+			content.fieldName
+		case let .reference(content):
+			content.fieldName
+		case let .string(content):
+			content.fieldName
+		case let .tuple(content):
+			content.fieldName
+		case let .u8(content):
+			content.fieldName
+		case let .u16(content):
+			content.fieldName
+		case let .u32(content):
+			content.fieldName
+		case let .u64(content):
+			content.fieldName
+		case let .u128(content):
+			content.fieldName
+		}
+
+		guard name?.isEmpty == false else {
+			return nil
+		}
+		return name
 	}
 }

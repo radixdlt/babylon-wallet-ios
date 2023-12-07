@@ -133,7 +133,7 @@ extension ManifestBuilder {
 		                    "name",
 		                    "description",
 		                    "key_image_url",
-		                    "arbitrary_coolness_rating"
+		                          "reference"
 		                    )
 		                    )
 		                    )
@@ -156,7 +156,7 @@ extension ManifestBuilder {
 		                    "URL    With    white    space",
 		                    "URL    with    white    space",
 		                    "https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/KL    Haze-medium.jpg",
-		                    45u64
+		                          Address("account_tdx_2_12xn3lgz7xv4d0d4cx25nvfekyxx0fsawhmtht0dd550vcu5wwl0g70")
 		                    )
 		                    )
 		                    )

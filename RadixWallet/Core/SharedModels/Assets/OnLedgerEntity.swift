@@ -405,7 +405,7 @@ extension OnLedgerEntity.Account {
 
 // MARK: - OnLedgerEntity.NonFungibleToken.NFTData
 extension OnLedgerEntity.NonFungibleToken.NFTData {
-	public enum Field: String, Sendable, Hashable, Codable {
+	public enum StandardField: String, Sendable, Hashable, Codable, CaseIterable {
 		case name
 		case description
 		case keyImageURL = "key_image_url"
@@ -413,13 +413,13 @@ extension OnLedgerEntity.NonFungibleToken.NFTData {
 		case claimAmount = "claim_amount"
 	}
 
-	public func getString(forField field: Field) -> String? {
+	public func getString(forField field: StandardField) -> String? {
 		self.fields.compactMap(/GatewayAPI.ProgrammaticScryptoSborValue.string).first {
 			$0.fieldName == field.rawValue
 		}?.value
 	}
 
-	public func getU64Value(forField field: Field) -> UInt64? {
+	public func getU64Value(forField field: StandardField) -> UInt64? {
 		for f in fields {
 			if case let .u64(u64) = f, u64.fieldName == field.rawValue {
 				return UInt64(u64.value)
@@ -428,7 +428,7 @@ extension OnLedgerEntity.NonFungibleToken.NFTData {
 		return nil
 	}
 
-	public func getDecimalValue(forField field: Field) -> RETDecimal? {
+	public func getDecimalValue(forField field: StandardField) -> RETDecimal? {
 		self.fields
 			.compactMap(/GatewayAPI.ProgrammaticScryptoSborValue.decimal)
 			.first { $0.fieldName == field.rawValue }
