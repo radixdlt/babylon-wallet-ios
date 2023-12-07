@@ -453,7 +453,11 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 					_ = try await factorSourcesClient.addOnDeviceFactorSource(
 						privateHDFactorSource: factorSource,
-						onMnemonicExistsStrategy: .abort,
+						// This is mega edge case, but if we were to use `.abort` here, then users
+						// who used a 24 word mnemonic `M` with Olympia wallet and then created their
+						// Babylon Wallet using Account Recovery Scan with `M` would not be able to
+						// perform Olympia import.
+						onMnemonicExistsStrategy: .appendWithCryptoParamaters,
 						saveIntoProfile: saveIntoProfile
 					)
 
