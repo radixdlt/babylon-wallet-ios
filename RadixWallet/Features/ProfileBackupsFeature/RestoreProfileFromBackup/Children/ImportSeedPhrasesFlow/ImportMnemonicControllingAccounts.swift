@@ -30,7 +30,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 				),
 				isMnemonicMarkedAsBackedUp: entitiesControlledByFactorSource.isMnemonicMarkedAsBackedUp,
 				isMnemonicPresentInKeychain: entitiesControlledByFactorSource.isMnemonicPresentInKeychain,
-				accounts: entitiesControlledByFactorSource.accounts.asIdentifiable(),
+				accounts: (isMainBDFS ? entitiesControlledByFactorSource.babylonAccounts : entitiesControlledByFactorSource.olympiaAccounts)?.rawValue ?? [],
 				hasHiddenAccounts: !entitiesControlledByFactorSource.hiddenAccounts.isEmpty,
 				mode: .displayAccountListOnly
 			)
