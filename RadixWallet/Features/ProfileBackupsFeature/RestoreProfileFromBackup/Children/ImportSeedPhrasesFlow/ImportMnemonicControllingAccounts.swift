@@ -23,8 +23,15 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		) {
 			self.isMainBDFS = isMainBDFS
 			self.entitiesControlledByFactorSource = entitiesControlledByFactorSource
+
 			self.entities = .init(
-				accountsForDeviceFactorSource: entitiesControlledByFactorSource,
+				id: .mixingBabylonAndOlympiaAccounts(
+					entitiesControlledByFactorSource.factorSourceID
+				),
+				isMnemonicMarkedAsBackedUp: entitiesControlledByFactorSource.isMnemonicMarkedAsBackedUp,
+				isMnemonicPresentInKeychain: entitiesControlledByFactorSource.isMnemonicPresentInKeychain,
+				accounts: entitiesControlledByFactorSource.accounts.asIdentifiable(),
+				hasHiddenAccounts: !entitiesControlledByFactorSource.hiddenAccounts.isEmpty,
 				mode: .displayAccountListOnly
 			)
 		}

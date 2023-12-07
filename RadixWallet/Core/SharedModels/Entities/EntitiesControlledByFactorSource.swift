@@ -24,6 +24,55 @@ public struct EntitiesControlledByFactorSource: Sendable, Hashable, Identifiable
 }
 
 extension EntitiesControlledByFactorSource {
+	public struct PerCurve: Equatable, Sendable {
+		public struct ID: Sendable, Hashable {
+			public let factorSourceID: FactorSource.ID.FromHash
+			public let isOlympia: Bool
+		}
+
+		public let id: ID
+		public let accounts: NonEmpty<IdentifiedArrayOf<Profile.Network.Account>>
+		public let hiddenAccounts: NonEmpty<IdentifiedArrayOf<Profile.Network.Account>>?
+	}
+
+	public var olympia: PerCurve? {
+		guard let olympiaAccounts else { return nil }
+		return PerCurve(
+			id: .init(factorSourceID: deviceFactorSource.id, isOlympia: true),
+			accounts: olympiaAccounts,
+			hiddenAccounts: olympiaAccountsHidden
+		)
+	}
+
+	public var babylon: PerCurve? {
+		guard let babylonAccounts else { return nil }
+		return PerCurve(
+			id: .init(factorSourceID: deviceFactorSource.id, isOlympia: false),
+			accounts: babylonAccounts,
+			hiddenAccounts: babylonAccountsHidden
+		)
+	}
+
+	/// Non hidden
+	public var babylonAccounts: NonEmpty<IdentifiedArrayOf<Profile.Network.Account>>? {
+		NonEmpty(rawValue: accounts.filter { !$0.isOlympiaAccount }.asIdentifiable())
+	}
+
+	/// hidden
+	public var babylonAccountsHidden: NonEmpty<IdentifiedArrayOf<Profile.Network.Account>>? {
+		NonEmpty(rawValue: hiddenAccounts.filter { !$0.isOlympiaAccount }.asIdentifiable())
+	}
+
+	/// Non hidden
+	public var olympiaAccounts: NonEmpty<IdentifiedArrayOf<Profile.Network.Account>>? {
+		NonEmpty(rawValue: accounts.filter(\.isOlympiaAccount).asIdentifiable())
+	}
+
+	/// hidden
+	public var olympiaAccountsHidden: NonEmpty<IdentifiedArrayOf<Profile.Network.Account>>? {
+		NonEmpty(rawValue: hiddenAccounts.filter(\.isOlympiaAccount).asIdentifiable())
+	}
+
 	public var accounts: [Profile.Network.Account] { entities.compactMap { try? $0.asAccount() } }
 	public var hiddenAccounts: [Profile.Network.Account] { hiddenEntities.compactMap { try? $0.asAccount() } }
 	public var personas: [Profile.Network.Persona] { entities.compactMap { try? $0.asPersona() } }

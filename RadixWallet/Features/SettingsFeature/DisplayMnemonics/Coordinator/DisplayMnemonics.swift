@@ -79,11 +79,20 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 						// `nil` means read profile in ProfileStore, instead of using an overriding profile
 						nil
 					)
-					let deviceFactorSources = entitiesForDeviceFactorSources.map {
-						DisplayEntitiesControlledByMnemonic.State(
-							accountsForDeviceFactorSource: $0,
-							mode: $0.isMnemonicPresentInKeychain ? .mnemonicCanBeDisplayed : .mnemonicNeedsImport
-						)
+					let deviceFactorSources: [DisplayEntitiesControlledByMnemonic.State] = entitiesForDeviceFactorSources.flatMap { ents in
+
+						let states = [ents.babylon, ents.olympia]
+							.compactMap { $0 }
+							.map {
+								DisplayEntitiesControlledByMnemonic.State(
+									perCurve: $0,
+									isMnemonicMarkedAsBackedUp: ents.isMnemonicMarkedAsBackedUp,
+									isMnemonicPresentInKeychain: ents.isMnemonicPresentInKeychain,
+									mode: ents.isMnemonicPresentInKeychain ? .mnemonicCanBeDisplayed : .mnemonicNeedsImport
+								)
+							}
+
+						return states
 					}
 					return deviceFactorSources.asIdentifiable()
 				}
@@ -115,11 +124,10 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 				loggerGlobal.warning("Unable to find factor source in state... strange!")
 				return .none
 			}
-			let deviceFactorSource = child.deviceFactorSource
 			switch delegateAction {
 			case .displayMnemonic:
 				return exportMnemonic(
-					factorSourceID: deviceFactorSource.id
+					factorSourceID: child.id.factorSourceID
 				) {
 					state.destination = .displayMnemonic(.export($0, title: L10n.RevealSeedPhrase.title, context: .fromSettings))
 				}
@@ -140,7 +148,8 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			switch delegateAction {
 			case let .doneViewing(idOfBackedUpFactorSource):
 				if let idOfBackedUpFactorSource {
-					state.deviceFactorSources[id: idOfBackedUpFactorSource]?.backedUp()
+					state.deviceFactorSources[id: .oneCurveOnly(idOfBackedUpFactorSource, isOlympia: true)]?.backedUp()
+					state.deviceFactorSources[id: .oneCurveOnly(idOfBackedUpFactorSource, isOlympia: false)]?.backedUp()
 				}
 			case .notPersisted, .persistedMnemonicInKeychainOnly, .persistedNewFactorSourceInProfile:
 				assertionFailure("discrepancy")
@@ -157,7 +166,8 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			case let .finishedImportingMnemonics(_, importedIDs, notYetSavedNewMainBDFS):
 				assert(notYetSavedNewMainBDFS == nil, "Discrepancy, new Main BDFS should already have been saved.")
 				for imported in importedIDs {
-					state.deviceFactorSources[id: imported.factorSourceID]?.imported()
+					state.deviceFactorSources[id: .oneCurveOnly(imported.factorSourceID, isOlympia: true)]?.imported()
+					state.deviceFactorSources[id: .oneCurveOnly(imported.factorSourceID, isOlympia: false)]?.imported()
 				}
 				state.destination = nil
 
@@ -171,12 +181,12 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 extension DisplayEntitiesControlledByMnemonic.State {
 	mutating func imported() {
-		self.accountsForDeviceFactorSource.isMnemonicPresentInKeychain = true
+		self.isMnemonicPresentInKeychain = true
 		self.mode = .mnemonicCanBeDisplayed
 		backedUp()
 	}
 
 	mutating func backedUp() {
-		self.accountsForDeviceFactorSource.isMnemonicMarkedAsBackedUp = true
+		self.isMnemonicMarkedAsBackedUp = true
 	}
 }

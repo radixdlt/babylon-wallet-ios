@@ -4,14 +4,23 @@ import SwiftUI
 // MARK: - DisplayEntitiesControlledByMnemonic
 public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
-		public typealias ID = FactorSource.ID.FromHash
+		public enum ID: Sendable, Hashable {
+			case mixingBabylonAndOlympiaAccounts(FactorSourceID.FromHash)
+			case oneCurveOnly(FactorSourceID.FromHash, isOlympia: Bool)
+			public var factorSourceID: FactorSourceID.FromHash {
+				switch self {
+				case let .mixingBabylonAndOlympiaAccounts(id): id
+				case let .oneCurveOnly(id, _): id
+				}
+			}
+		}
+
 		public let id: ID
 
-		public var deviceFactorSource: DeviceFactorSource { accountsForDeviceFactorSource.deviceFactorSource }
-
-		public var accountsForDeviceFactorSource: EntitiesControlledByFactorSource
-
-		// Mutable since if we just imported a missing mnemonic we wanna change to `mnemonicCanBeDisplayed`
+		public var isMnemonicMarkedAsBackedUp: Bool
+		public var isMnemonicPresentInKeychain: Bool
+		public let accounts: IdentifiedArrayOf<Profile.Network.Account>
+		public let hasHiddenAccounts: Bool
 		public var mode: Mode
 
 		public enum Mode: Sendable, Hashable {
@@ -21,12 +30,35 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 		}
 
 		public init(
-			accountsForDeviceFactorSource: EntitiesControlledByFactorSource,
+			id: ID,
+			isMnemonicMarkedAsBackedUp: Bool,
+			isMnemonicPresentInKeychain: Bool,
+			accounts: IdentifiedArrayOf<Profile.Network.Account>,
+			hasHiddenAccounts: Bool,
 			mode: Mode
 		) {
-			self.id = accountsForDeviceFactorSource.factorSourceID
-			self.accountsForDeviceFactorSource = accountsForDeviceFactorSource
+			self.id = id
+			self.isMnemonicMarkedAsBackedUp = isMnemonicMarkedAsBackedUp
+			self.isMnemonicPresentInKeychain = isMnemonicPresentInKeychain
+			self.accounts = accounts
+			self.hasHiddenAccounts = hasHiddenAccounts
 			self.mode = mode
+		}
+
+		public init(
+			perCurve: EntitiesControlledByFactorSource.PerCurve,
+			isMnemonicMarkedAsBackedUp: Bool,
+			isMnemonicPresentInKeychain: Bool,
+			mode: Mode
+		) {
+			self.init(
+				id: .oneCurveOnly(perCurve.id.factorSourceID, isOlympia: perCurve.id.isOlympia),
+				isMnemonicMarkedAsBackedUp: isMnemonicMarkedAsBackedUp,
+				isMnemonicPresentInKeychain: isMnemonicPresentInKeychain,
+				accounts: perCurve.accounts.rawValue,
+				hasHiddenAccounts: perCurve.hiddenAccounts != nil,
+				mode: mode
+			)
 		}
 	}
 
