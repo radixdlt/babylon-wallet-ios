@@ -3,7 +3,11 @@ import SwiftUI
 
 extension ManualAccountRecoverySeedPhrase.State {
 	var viewState: ManualAccountRecoverySeedPhrase.ViewState {
-		.init(isOlympia: isOlympia, selected: selected, deviceFactorSources: deviceFactorSources)
+		.init(
+			isOlympia: isOlympia,
+			selected: selected,
+			deviceFactorSources: deviceFactorSources
+		)
 	}
 }
 
@@ -120,7 +124,11 @@ private extension ManualAccountRecoverySeedPhrase.View {
 	}
 
 	private func mnemonics(viewStore: ViewStoreOf<ManualAccountRecoverySeedPhrase>) -> some View {
-		let binding = viewStore.binding(get: \.selected, send: ManualAccountRecoverySeedPhrase.ViewAction.selected)
+		let binding = viewStore.binding(
+			get: \.selected,
+			send: ManualAccountRecoverySeedPhrase.ViewAction.selected
+		)
+
 		return Selection(binding, from: viewStore.deviceFactorSources) { item in
 			Card(.app.gray5) {
 				viewStore.send(.selected(item.value))
@@ -129,7 +137,13 @@ private extension ManualAccountRecoverySeedPhrase.View {
 					viewState: .init(
 						headingState: .defaultHeading(type: .selectable(item.isSelected)),
 						promptUserToBackUpMnemonic: false,
-						accounts: item.value.accounts,
+						accounts: item.value.accounts.filter {
+							switch $0.securityState {
+							case let .unsecured(unsecuredEntityControl):
+								let curve = unsecuredEntityControl.transactionSigning.derivationPath.curveForScheme
+								return viewStore.isOlympia && curve == .secp256k1 || !viewStore.isOlympia && curve == .curve25519
+							}
+						},
 						hasHiddenAccounts: !item.value.hiddenAccounts.isEmpty
 					)
 				)

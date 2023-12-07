@@ -131,6 +131,11 @@ extension FactorSourcesClient: DependencyKey {
 							guard factorInstance.factorSourceID.embed() == factorSourceID else {
 								return nil
 							}
+							guard factorInstance.derivationPath.scheme == request.derivationPathScheme else {
+								/// If DeviceFactorSource with mnemonic `M` is used to derive Account with CAP26 derivation path at index `0`, then we must
+								/// allow `M` to be able to derive account wit hBIP44-like derivation path at index `0` as well in the future.
+								return nil
+							}
 							return factorInstance.derivationPath.index
 						}
 					}
@@ -230,6 +235,7 @@ extension FactorSourcesClient: DependencyKey {
 					.init(
 						entityKind: request.entityKind,
 						factorSourceID: factorSourceID,
+						derivationPathScheme: request.derivationPathScheme,
 						networkID: request.networkID
 					)
 				).indices

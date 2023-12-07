@@ -148,12 +148,13 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 				state.status = .loadingFactorSource
 				let id = state.factorSourceIDFromHash
 				state.mode = .factorSourceWithID(id: id, .loading)
-				return .run { [networkID = state.networkID] send in
+				return .run { [networkID = state.networkID, forOlympiaAccounts = state.forOlympiaAccounts] send in
 					let result = await TaskResult<IndicesUsedByFactorSource> {
 						try await factorSourcesClient.indicesOfEntitiesControlledByFactorSource(
 							.init(
 								entityKind: .account,
 								factorSourceID: id.embed(),
+								derivationPathScheme: forOlympiaAccounts ? .bip44Olympia : .cap26,
 								networkID: networkID
 							)
 						)
@@ -234,7 +235,6 @@ extension AccountRecoveryScanInProgress {
 			count: batchSize,
 			excluding: state.indicesOfAlreadyUsedEntities
 		)
-
 		assert(derivationIndices.count == batchSize)
 		state.maxIndex = derivationIndices.max()! + 1
 
@@ -270,7 +270,6 @@ extension AccountRecoveryScanInProgress {
 			return .send(.delegate(.failedToDerivePublicKey))
 		}
 		let factorSourceOption: DerivePublicKeys.State.FactorSourceOption
-
 		switch state.mode {
 		case let .factorSourceWithID(_, loadableState):
 			switch loadableState {

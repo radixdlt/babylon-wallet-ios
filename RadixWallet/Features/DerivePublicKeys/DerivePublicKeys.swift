@@ -27,7 +27,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		public var ledgerBeingUsed: LedgerHardwareWalletFactorSource?
 		public enum DerivationPathOption: Sendable, Hashable {
 			case knownPaths([DerivationPath], networkID: NetworkID) // derivation paths must not be a Set, since import from Olympia can contain duplicate derivation paths, for different Ledger devices.
-			case next(networkOption: NetworkOption, entityKind: EntityKind, curve: SLIP10.Curve)
+			case next(networkOption: NetworkOption, entityKind: EntityKind, curve: SLIP10.Curve, scheme: DerivationPathScheme)
 
 			public enum NetworkOption: Sendable, Hashable {
 				case specific(NetworkID)
@@ -45,12 +45,14 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			public static func next(
 				for entityKind: EntityKind,
 				networkID: NetworkID?,
-				curve: SLIP10.Curve
+				curve: SLIP10.Curve,
+				scheme: DerivationPathScheme
 			) -> Self {
 				.next(
 					networkOption: .init(networkID: networkID),
 					entityKind: entityKind,
-					curve: curve
+					curve: curve,
+					scheme: scheme
 				)
 			}
 		}
@@ -310,7 +312,7 @@ extension DerivePublicKeys {
 				loggerGlobal.error("Failed to create derivation path, error: \(error)")
 				await send(.delegate(.failedToDerivePublicKey))
 			}
-		case let .next(networkOption, entityKind, curve):
+		case let .next(networkOption, entityKind, curve, derivationPathScheme):
 
 			let factorSourceID = hdFactorSource.factorSourceID
 			switch networkOption {
@@ -319,6 +321,7 @@ extension DerivePublicKeys {
 					let derivationPath = try await nextDerivationPath(
 						factorSourceID: factorSourceID,
 						of: entityKind,
+						derivationPathScheme: derivationPathScheme,
 						networkID: networkID
 					)
 					assert(derivationPath.curveForScheme == curve)
@@ -334,6 +337,7 @@ extension DerivePublicKeys {
 					let derivationPath = try await nextDerivationPath(
 						factorSourceID: factorSourceID,
 						of: entityKind,
+						derivationPathScheme: derivationPathScheme,
 						networkID: nil
 					)
 					await send(calculatedDerivationPath(derivationPath, networkID))
@@ -348,11 +352,13 @@ extension DerivePublicKeys {
 	private func nextDerivationPath(
 		factorSourceID: FactorSourceID,
 		of entityKind: EntityKind,
+		derivationPathScheme: DerivationPathScheme,
 		networkID maybeNetworkID: NetworkID?
 	) async throws -> DerivationPath {
 		let (index, networkID) = try await nextIndex(
 			factorSourceID: factorSourceID,
 			of: entityKind,
+			derivationPathScheme: derivationPathScheme,
 			networkID: maybeNetworkID
 		)
 		return try DerivationPath.forEntity(
@@ -365,6 +371,7 @@ extension DerivePublicKeys {
 	private func nextIndex(
 		factorSourceID: FactorSourceID,
 		of entityKind: EntityKind,
+		derivationPathScheme: DerivationPathScheme,
 		networkID maybeNetworkID: NetworkID?
 	) async throws -> (index: HD.Path.Component.Child.Value, networkID: NetworkID) {
 		let currentNetwork = await accountsClient.getCurrentNetworkID()
@@ -372,6 +379,7 @@ extension DerivePublicKeys {
 		let request = NextEntityIndexForFactorSourceRequest(
 			entityKind: entityKind,
 			factorSourceID: factorSourceID,
+			derivationPathScheme: derivationPathScheme,
 			networkID: networkID
 		)
 		let index = try await factorSourcesClient.nextEntityIndexForFactorSource(request)

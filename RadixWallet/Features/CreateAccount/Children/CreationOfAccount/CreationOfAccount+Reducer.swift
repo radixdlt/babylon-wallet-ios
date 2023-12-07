@@ -26,7 +26,12 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 			} else {
 				self.step = .step1_derivePublicKeys(
 					.init(
-						derivationPathOption: .next(for: .account, networkID: networkID, curve: .curve25519),
+						derivationPathOption: .next(
+							for: .account,
+							networkID: networkID,
+							curve: .curve25519,
+							scheme: .cap26
+						),
 						factorSourceOption: .device,
 						purpose: .createNewEntity(kind: .account)
 					)
@@ -94,11 +99,18 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .step0_chooseLedger(.delegate(.choseLedger(ledger))):
-			state.step = .step1_derivePublicKeys(.init(
-				derivationPathOption: .next(for: .account, networkID: state.networkID, curve: .curve25519),
-				factorSourceOption: .specific(ledger.embed()),
-				purpose: .createNewEntity(kind: .account)
-			))
+			state.step = .step1_derivePublicKeys(
+				.init(
+					derivationPathOption: .next(
+						for: .account,
+						networkID: state.networkID,
+						curve: .curve25519,
+						scheme: .cap26
+					),
+					factorSourceOption: .specific(ledger.embed()),
+					purpose: .createNewEntity(kind: .account)
+				)
+			)
 			return .none
 
 		case let .step1_derivePublicKeys(.delegate(.derivedPublicKeys(hdKeys, factorSourceID, networkID))):

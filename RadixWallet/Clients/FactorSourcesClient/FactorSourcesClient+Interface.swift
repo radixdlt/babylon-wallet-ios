@@ -51,17 +51,28 @@ public struct FactorSourcesClient: Sendable {
 // MARK: - NextEntityIndexForFactorSourceRequest
 public struct NextEntityIndexForFactorSourceRequest {
 	public let entityKind: EntityKind
+
 	/// `nil` means use main BDFS
 	public let factorSourceID: FactorSourceID?
+
+	/// If DeviceFactorSource with mnemonic `M` is used to derive Account with CAP26 derivation path at index `0`, then we must
+	/// allow `M` to be able to derive account wit hBIP44-like derivation path at index `0` as well in the future.
+	public let derivationPathScheme: DerivationPathScheme
+
 	/// `nil` means `currentNetwork`
 	public let networkID: NetworkID?
 }
 
 // MARK: - IndicesOfEntitiesControlledByFactorSourceRequest
 public struct IndicesOfEntitiesControlledByFactorSourceRequest: Sendable, Hashable {
-	let entityKind: EntityKind
-	let factorSourceID: FactorSourceID
-	let networkID: NetworkID?
+	public let entityKind: EntityKind
+	public let factorSourceID: FactorSourceID
+
+	/// If DeviceFactorSource with mnemonic `M` is used to derive Account with CAP26 derivation path at index `0`, then we must
+	/// allow `M` to be able to derive account wit hBIP44-like derivation path at index `0` as well in the future.
+	public let derivationPathScheme: DerivationPathScheme
+
+	public let networkID: NetworkID?
 }
 
 // MARK: - IndicesUsedByFactorSource
