@@ -39,15 +39,7 @@ extension FactorSources {
 
 	public func babylonDeviceFactorSources() -> NonEmpty<IdentifiedArrayOf<DeviceFactorSource>> {
 		guard
-			case let array = self.compactMap({ (factorSource: FactorSource) -> DeviceFactorSource? in
-				guard
-					let device = factorSource.extract(DeviceFactorSource.self),
-					!device.supportsOlympia
-				else {
-					return nil
-				}
-				return device
-			}),
+			case let array = self.compactMap({ $0.extract(DeviceFactorSource.self) }).filter(\.isBDFS),
 			case let identifiedArray = IdentifiedArrayOf<DeviceFactorSource>(uncheckedUniqueElements: array),
 			let nonEmpty = NonEmpty<IdentifiedArrayOf<DeviceFactorSource>>(rawValue: identifiedArray)
 		else {

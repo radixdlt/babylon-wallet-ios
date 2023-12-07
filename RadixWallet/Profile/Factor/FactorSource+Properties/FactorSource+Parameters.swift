@@ -25,6 +25,10 @@ extension FactorSource.CryptoParameters {
 	/// (`secp256k1, bip44Olympia)` parameters to this BDFS, and analogously the reversed for Babylon params -> existing Olympia
 	/// DeviceFactorSource.
 	public mutating func append(_ other: Self) {
+		guard self != other else {
+			loggerGlobal.debug("NOOP, crypto parameters are the same.")
+			return
+		}
 		var curves = supportedCurves.rawValue
 		var derivationSchemes = supportedDerivationPathSchemes
 		curves.append(contentsOf: other.supportedCurves.rawValue)

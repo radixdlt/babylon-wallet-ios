@@ -62,9 +62,13 @@ extension DeviceFactorSource {
 
 	/// **B**abylon **D**evice **F**actor **S**ource
 	public var isBDFS: Bool {
-		self.hint.mnemonicWordCount == .twentyFour
-			&& supportsBabylon
-			&& !supportsOlympia // hmm is it correct?
+		guard supportsBabylon else { return false }
+		if hint.mnemonicWordCount == .twentyFour {
+			return true
+		} else {
+			assertionFailure("We should never have added Babylon crypto parameters to a non-24-word mnemonic.")
+			return false
+		}
 	}
 }
 

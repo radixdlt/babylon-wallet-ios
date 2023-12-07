@@ -36,7 +36,11 @@ extension FactorSourcesClient: DependencyKey {
 			do {
 				try secureStorageClient.saveMnemonicForFactorSource(privateHDFactorSource)
 			} catch {
-				if secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSourceID), request.onMnemonicExistsStrategy == .appendWithCryptoParamaters {
+				if
+					secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSourceID),
+					request.onMnemonicExistsStrategy == .appendWithCryptoParamaters
+				{
+					loggerGlobal.notice("Failed to save mnemonic, since it already exists, so this was expected.")
 				} else {
 					loggerGlobal.error("Failed to save mnemonic, error: \(error)")
 					throw error
