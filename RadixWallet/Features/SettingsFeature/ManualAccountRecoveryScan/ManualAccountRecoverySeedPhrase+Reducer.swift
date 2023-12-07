@@ -21,16 +21,16 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 	public struct Destination: DestinationReducer {
 		@CasePathable
 		public enum State: Sendable, Hashable {
-			case enterSeedPhrase(ImportMnemonic.State)
+			case importMnemoninc(ImportMnemonic.State)
 		}
 
 		@CasePathable
 		public enum Action: Sendable, Equatable {
-			case enterSeedPhrase(ImportMnemonic.Action)
+			case importMnemoninc(ImportMnemonic.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: \.enterSeedPhrase, action: \.enterSeedPhrase) {
+			Scope(state: \.importMnemoninc, action: \.importMnemoninc) {
 				ImportMnemonic()
 			}
 		}
@@ -81,11 +81,12 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 			let title = state.isOlympia ? "Enter Legacy Seed Phrase" : "Enter Seed Phrase" // FIXME: Strings
 
 			let persistStrategy = ImportMnemonic.State.PersistStrategy(
-				mnemonicForFactorSourceKind: .onDevice(state.isOlympia ? .olympia : .babylon),
-				location: .intoKeychainAndProfile
+				factorSourceKindOfMnemonic: .onDevice(state.isOlympia ? .olympia : .babylon),
+				location: .intoKeychainAndProfile,
+				onMnemonicExistsStrategy: .appendWithCryptoParamaters
 			)
 
-			state.destination = .enterSeedPhrase(.init(
+			state.destination = .importMnemoninc(.init(
 				header: .init(title: title),
 				warning: L10n.EnterSeedPhrase.warning,
 				warningOnContinue: nil,
@@ -124,7 +125,7 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .enterSeedPhrase(.delegate(.persistedNewFactorSourceInProfile(factorSource))):
+		case let .importMnemoninc(.delegate(.persistedNewFactorSourceInProfile(factorSource))):
 			do {
 				guard case let .device(deviceFactorSource) = factorSource else {
 					struct NotDeviceFactorSource: Error {}
@@ -160,15 +161,14 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 		.run { [isOlympia = state.isOlympia] send in
 			let result = await TaskResult {
 				try await deviceFactorSourceClient.controlledEntities(nil)
-					.filter { deviceFactorSource in
-						if isOlympia, deviceFactorSource.deviceFactorSource.supportsOlympia {
-							true
+					.filter {
+						let dfs = $0.deviceFactorSource
+
+						if isOlympia {
+							return dfs.supportsOlympia
 						} else {
-							// Disregarding if Babylon or Olympia Account Recovery Scan was selected,
-							// we show 24 word mnemonics in both scenarios, since the user might have
-							// incorrectly saved "a babylon" mnemonics as an "olympia one", or a saved
-							// "a 24 word olympia" mnemonic as "a bablony" one.
-							deviceFactorSource.deviceFactorSource.hint.mnemonicWordCount == .twentyFour
+							// The word count == 24 check SHOULD always be true, but best include it anyway.
+							return dfs.supportsBabylon && dfs.hint.mnemonicWordCount == .twentyFour
 						}
 					}
 			}

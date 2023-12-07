@@ -132,15 +132,23 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				case intoKeychainOnly
 			}
 
-			public let mnemonicForFactorSourceKind: MnemonicBasedFactorSourceKind
+			public enum OnMnemonicExistsStrategy: Sendable, Hashable {
+				case abort
+				case appendWithCryptoParamaters
+			}
+
+			public let onMnemonicExistsStrategy: OnMnemonicExistsStrategy
+			public let factorSourceKindOfMnemonic: FactorSourceKindOfMnemonic
 			public let location: Location
 
 			public init(
-				mnemonicForFactorSourceKind: MnemonicBasedFactorSourceKind,
-				location: Location
+				factorSourceKindOfMnemonic: FactorSourceKindOfMnemonic,
+				location: Location,
+				onMnemonicExistsStrategy: OnMnemonicExistsStrategy
 			) {
-				self.mnemonicForFactorSourceKind = mnemonicForFactorSourceKind
+				self.factorSourceKindOfMnemonic = factorSourceKindOfMnemonic
 				self.location = location
+				self.onMnemonicExistsStrategy = onMnemonicExistsStrategy
 			}
 		}
 
@@ -478,7 +486,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 		switch persistStrategy.location {
 		case .intoKeychainAndProfile:
-			switch persistStrategy.mnemonicForFactorSourceKind {
+			switch persistStrategy.factorSourceKindOfMnemonic {
 			case .offDevice:
 				state.destination = .offDeviceMnemonicInfoPrompt(.init(
 					mnemonicWithPassphrase: mnemonicWithPassphrase
@@ -493,9 +501,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 							let factorSource = try await factorSourcesClient.addOnDeviceFactorSource(
 								onDeviceMnemonicKind: onDeviceKind,
 								mnemonicWithPassphrase: mnemonicWithPassphrase,
+								onMnemonicExistsStrategy: persistStrategy.onMnemonicExistsStrategy,
 								saveIntoProfile: saveIntoProfile
 							)
-							return .init(factorSource: factorSource, savedIntoProfile: saveIntoProfile)
+							return .init(factorSource: factorSource.embed(), savedIntoProfile: saveIntoProfile)
 						}
 					)))
 				}
@@ -508,9 +517,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 						let factorSource = try await factorSourcesClient.addOnDeviceFactorSource(
 							onDeviceMnemonicKind: .babylon,
 							mnemonicWithPassphrase: mnemonicWithPassphrase,
+							onMnemonicExistsStrategy: persistStrategy.onMnemonicExistsStrategy,
 							saveIntoProfile: saveIntoProfile
 						)
-						return .init(factorSource: factorSource, savedIntoProfile: saveIntoProfile)
+						return .init(factorSource: factorSource.embed(), savedIntoProfile: saveIntoProfile)
 					}
 				)))
 			}
@@ -565,7 +575,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			guard let persistStrategy = state.mode.write?.persistStrategy else {
 				preconditionFailure("expected persistStrategy")
 			}
-			precondition(persistStrategy.mnemonicForFactorSourceKind == .offDevice)
+			precondition(persistStrategy.factorSourceKindOfMnemonic == .offDevice)
 
 			return .run { send in
 				await send(.internal(.saveFactorSourceResult(

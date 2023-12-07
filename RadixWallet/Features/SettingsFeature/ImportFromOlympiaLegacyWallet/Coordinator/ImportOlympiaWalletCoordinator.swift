@@ -450,11 +450,12 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 					if saveIntoProfile {
 						loggerGlobal.notice("Skip saving Olympia mnemonic into Profile since it is already present, will save to keychain only")
 					}
-					_ = try await factorSourcesClient.addPrivateHDFactorSource(.init(
-						factorSource: factorSource.factorSource.embed(),
-						mnemonicWithPasshprase: factorSource.mnemonicWithPassphrase,
+
+					_ = try await factorSourcesClient.addOnDeviceFactorSource(
+						privateHDFactorSource: factorSource,
+						onMnemonicExistsStrategy: .abort,
 						saveIntoProfile: saveIntoProfile
-					))
+					)
 
 					overlayWindowClient.scheduleHUD(.seedPhraseImported)
 

@@ -89,8 +89,8 @@ private extension View {
 		let destinationStore = store.destination
 		return sheet(
 			store: destinationStore,
-			state: /ManualAccountRecoverySeedPhrase.Destination.State.enterSeedPhrase,
-			action: ManualAccountRecoverySeedPhrase.Destination.Action.enterSeedPhrase,
+			state: /ManualAccountRecoverySeedPhrase.Destination.State.importMnemoninc,
+			action: ManualAccountRecoverySeedPhrase.Destination.Action.importMnemoninc,
 			content: {
 				ImportMnemonic.View(store: $0)
 					.withNavigationBar {

@@ -80,7 +80,7 @@ extension FactorSourcesClient {
 	public typealias CreateNewMainDeviceFactorSource = @Sendable () async throws -> PrivateHDFactorSource
 	public typealias GetFactorSources = @Sendable () async throws -> FactorSources
 	public typealias FactorSourcesAsyncSequence = @Sendable () async -> AnyAsyncSequence<FactorSources>
-	public typealias AddPrivateHDFactorSource = @Sendable (AddPrivateHDFactorSourceRequest) async throws -> FactorSourceID
+	public typealias AddPrivateHDFactorSource = @Sendable (AddPrivateHDFactorSourceRequest) async throws -> FactorSourceID.FromHash
 	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (BIP39.WordCount, NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceID.FromHash?
 	public typealias SaveFactorSource = @Sendable (FactorSource) async throws -> Void
 	public typealias UpdateFactorSource = @Sendable (FactorSource) async throws -> Void
@@ -91,14 +91,18 @@ extension FactorSourcesClient {
 
 // MARK: - AddPrivateHDFactorSourceRequest
 public struct AddPrivateHDFactorSourceRequest: Sendable, Hashable {
-	public let factorSource: FactorSource
-	public let mnemonicWithPasshprase: MnemonicWithPassphrase
+	public let privateHDFactorSource: PrivateHDFactorSource
+	public let onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy
 	/// E.g. import babylon factor sources should only be saved keychain, not profile (already there).
 	public let saveIntoProfile: Bool
-	public init(factorSource: FactorSource, mnemonicWithPasshprase: MnemonicWithPassphrase, saveIntoProfile: Bool) {
-		self.factorSource = factorSource
-		self.mnemonicWithPasshprase = mnemonicWithPasshprase
+	public init(
+		privateHDFactorSource: PrivateHDFactorSource,
+		onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy,
+		saveIntoProfile: Bool
+	) {
+		self.privateHDFactorSource = privateHDFactorSource
 		self.saveIntoProfile = saveIntoProfile
+		self.onMnemonicExistsStrategy = onMnemonicExistsStrategy
 	}
 }
 
@@ -244,11 +248,7 @@ extension FactorSourcesClient {
 			label: label
 		)
 
-		_ = try await addPrivateHDFactorSource(.init(
-			factorSource: factorSource.embed(),
-			mnemonicWithPasshprase: mnemonicWithPassphrase,
-			saveIntoProfile: true
-		))
+		try await saveFactorSource(factorSource.embed())
 
 		return factorSource.embed()
 	}
@@ -256,34 +256,40 @@ extension FactorSourcesClient {
 	@discardableResult
 	public func addOnDeviceFactorSource(
 		privateHDFactorSource: PrivateHDFactorSource,
+		onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy,
 		saveIntoProfile: Bool
 	) async throws -> FactorSourceID {
-		try await addPrivateHDFactorSource(.init(
-			factorSource: privateHDFactorSource.factorSource.embed(),
-			mnemonicWithPasshprase: privateHDFactorSource.mnemonicWithPassphrase,
-			saveIntoProfile: saveIntoProfile
-		))
+		try await addPrivateHDFactorSource(
+			.init(
+				privateHDFactorSource: privateHDFactorSource,
+				onMnemonicExistsStrategy: onMnemonicExistsStrategy,
+				saveIntoProfile: saveIntoProfile
+			)
+		).embed()
 	}
 
 	public func addOnDeviceFactorSource(
-		onDeviceMnemonicKind: MnemonicBasedFactorSourceKind.OnDeviceMnemonicKind,
+		onDeviceMnemonicKind: FactorSourceKindOfMnemonic.OnDeviceMnemonicKind,
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		saveIntoProfile: Bool? = nil
-	) async throws -> FactorSource {
+		onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy,
+		saveIntoProfile _saveIntoProfile: Bool? = nil
+	) async throws -> DeviceFactorSource {
 		let isOlympiaCompatible = onDeviceMnemonicKind == .olympia
-		let shouldSaveIntoProfile: Bool = saveIntoProfile ?? isOlympiaCompatible
+		let saveIntoProfile: Bool = _saveIntoProfile ?? isOlympiaCompatible
 
 		let factorSource: DeviceFactorSource = try isOlympiaCompatible
 			? .olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
 			: .babylon(mnemonicWithPassphrase: mnemonicWithPassphrase)
 
-		_ = try await addPrivateHDFactorSource(.init(
-			factorSource: factorSource.embed(),
-			mnemonicWithPasshprase: mnemonicWithPassphrase,
-			saveIntoProfile: shouldSaveIntoProfile
-		))
-
-		return factorSource.embed()
+		_ = try await self.addOnDeviceFactorSource(
+			privateHDFactorSource: .init(
+				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				factorSource: factorSource
+			),
+			onMnemonicExistsStrategy: onMnemonicExistsStrategy,
+			saveIntoProfile: saveIntoProfile
+		)
+		return factorSource
 	}
 }
 

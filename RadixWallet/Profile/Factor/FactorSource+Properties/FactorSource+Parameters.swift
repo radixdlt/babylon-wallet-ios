@@ -4,10 +4,10 @@ import EngineToolkit
 extension FactorSource {
 	public struct CryptoParameters: Sendable, Hashable, Codable {
 		/// either Curve25519 or secp256k1 (or P256?)
-		public let supportedCurves: NonEmpty<OrderedSet<SLIP10.Curve>>
+		public private(set) var supportedCurves: NonEmpty<OrderedSet<SLIP10.Curve>>
 
 		/// either BIP44 or CAP26 (SLIP10), empty if this factor source does not support HD derivation.
-		public let supportedDerivationPathSchemes: OrderedSet<DerivationPathScheme>
+		public private(set) var supportedDerivationPathSchemes: OrderedSet<DerivationPathScheme>
 
 		public init(
 			supportedCurves: NonEmpty<OrderedSet<SLIP10.Curve>>,
@@ -16,6 +16,29 @@ extension FactorSource {
 			self.supportedCurves = supportedCurves
 			self.supportedDerivationPathSchemes = supportedDerivationPathSchemes
 		}
+	}
+}
+
+extension FactorSource.CryptoParameters {
+	/// Appends  `supportedCurves` and `supportedDerivationPathSchemes` from `other`. This is used if a user tries to
+	/// add an Olympia Factor Source from Manual Account Recovery Scan where the mnemonic already existed as BDFS => append
+	/// (`secp256k1, bip44Olympia)` parameters to this BDFS, and analogously the reversed for Babylon params -> existing Olympia
+	/// DeviceFactorSource.
+	public mutating func append(_ other: Self) {
+		var curves = supportedCurves.rawValue
+		var derivationSchemes = supportedDerivationPathSchemes
+		curves.append(contentsOf: other.supportedCurves.rawValue)
+		derivationSchemes.append(contentsOf: other.supportedDerivationPathSchemes)
+		loggerGlobal.notice("🔮 `curves` BEFORE sorting: \(curves)")
+		curves = OrderedSet(uncheckedUniqueElements: curves.sorted(by: \.preference))
+		loggerGlobal.notice("🔮 `curves` AFTER sorting: \(curves)")
+
+		loggerGlobal.notice("🔮 `derivationSchemes` BEFORE sorting: \(derivationSchemes)")
+		derivationSchemes = OrderedSet(uncheckedUniqueElements: derivationSchemes.sorted(by: \.preference))
+		loggerGlobal.notice("🔮 `derivationSchemes` AFTER sorting: \(derivationSchemes)")
+
+		self.supportedCurves = .init(rawValue: curves)!
+		self.supportedDerivationPathSchemes = derivationSchemes
 	}
 }
 

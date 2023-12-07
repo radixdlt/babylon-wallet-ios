@@ -75,11 +75,27 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 			}
 
 		case .importOlympiaMnemonicButtonTapped:
-			state.destination = .importMnemonic(.init(persistStrategy: .init(mnemonicForFactorSourceKind: .onDevice(.olympia), location: .intoKeychainAndProfile)))
+			state.destination = .importMnemonic(
+				.init(
+					persistStrategy: .init(
+						factorSourceKindOfMnemonic: .onDevice(.olympia),
+						location: .intoKeychainAndProfile,
+						onMnemonicExistsStrategy: .appendWithCryptoParamaters
+					)
+				)
+			)
 			return .none
 
 		case .addOffDeviceMnemonicButtonTapped:
-			state.destination = .importMnemonic(.init(persistStrategy: .init(mnemonicForFactorSourceKind: .offDevice, location: .intoKeychainAndProfile)))
+			state.destination = .importMnemonic(
+				.init(
+					persistStrategy: .init(
+						factorSourceKindOfMnemonic: .offDevice,
+						location: .intoKeychainAndProfile,
+						onMnemonicExistsStrategy: .abort
+					)
+				)
+			)
 			return .none
 
 		case .addLedgerButtonTapped:

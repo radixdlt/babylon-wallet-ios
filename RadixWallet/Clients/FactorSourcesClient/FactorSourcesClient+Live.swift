@@ -29,30 +29,50 @@ extension FactorSourcesClient: DependencyKey {
 		}
 
 		let addPrivateHDFactorSource: AddPrivateHDFactorSource = { request in
-			let factorSource = request.factorSource
+			let privateHDFactorSource = request.privateHDFactorSource
+			let deviceFactorSource = privateHDFactorSource.factorSource
+			let factorSourceID = deviceFactorSource.id
 
-			switch factorSource {
-			case let .device(deviceFactorSource):
-				try secureStorageClient.saveMnemonicForFactorSource(.init(mnemonicWithPassphrase: request.mnemonicWithPasshprase, factorSource: deviceFactorSource))
-			default:
-				loggerGlobal.notice("Saving of non device private HD factor source not permitted, kind is: \(factorSource.kind)")
+			do {
+				try secureStorageClient.saveMnemonicForFactorSource(privateHDFactorSource)
+			} catch {
+				if secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSourceID), request.onMnemonicExistsStrategy == .appendWithCryptoParamaters {
+				} else {
+					loggerGlobal.error("Failed to save mnemonic, error: \(error)")
+					throw error
+				}
 			}
-			let factorSourceID = factorSource.id
 
 			/// We only need to save olympia mnemonics into Profile, the Babylon ones
 			/// already exist in profile, and this function is used only to save the
 			/// imported mnemonic into keychain (done above).
 			if request.saveIntoProfile {
-				do {
-					try await saveFactorSource(factorSource)
-				} catch {
-					loggerGlobal.critical("Failed to save factor source, error: \(error)")
-					if let idForMnemonicToDelete = try? factorSourceID.extract(as: FactorSourceID.FromHash.self) {
+				if
+					let existingInProfile = try await getFactorSources()
+					.filter({ $0.id == factorSourceID.embed() }
+					).map({ try $0.extract(as: DeviceFactorSource.self) })
+					.first
+				{
+					switch request.onMnemonicExistsStrategy {
+					case .abort:
+						throw FactorSourceAlreadyPresent()
+					case .appendWithCryptoParamaters:
+						var updated = existingInProfile
+						loggerGlobal.critical("🔮 Appending crypto parameters to DeviceFactorSource, BEFORE: \(updated.common.cryptoParameters)....")
+						updated.common.cryptoParameters.append(request.privateHDFactorSource.factorSource.common.cryptoParameters)
+						loggerGlobal.critical("🔮 Appended crypto parameters to DeviceFactorSource, AFTER: \(updated.common.cryptoParameters) ✅")
+						try await updateFactorSource(updated.embed())
+					}
+				} else {
+					do {
+						try await saveFactorSource(deviceFactorSource.embed())
+					} catch {
+						loggerGlobal.critical("Failed to save factor source, error: \(error)")
 						// We were unlucky, failed to update Profile, thus best to undo the saving of
 						// the mnemonic in keychain (if we can).
-						try? secureStorageClient.deleteMnemonicByFactorSourceID(idForMnemonicToDelete)
+						try? secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
+						throw error
 					}
-					throw error
 				}
 			}
 
@@ -163,12 +183,18 @@ extension FactorSourcesClient: DependencyKey {
 				)
 				assert(newBDFS.isExplicitMainBDFS)
 
-				loggerGlobal.info("Saving new main BDFS to Profile and Keychain")
-				_ = try await addPrivateHDFactorSource(.init(
-					factorSource: newBDFS.embed(),
-					mnemonicWithPasshprase: mnemonicWithPassphrase,
-					saveIntoProfile: false
-				))
+				loggerGlobal.info("Saving new main BDFS to Keychain only, we will NOT save it into Profile just yet.")
+
+				_ = try await addPrivateHDFactorSource(
+					.init(
+						privateHDFactorSource: .init(
+							mnemonicWithPassphrase: mnemonicWithPassphrase,
+							factorSource: newBDFS
+						),
+						onMnemonicExistsStrategy: .abort,
+						saveIntoProfile: false
+					)
+				)
 
 				return try PrivateHDFactorSource(
 					mnemonicWithPassphrase: mnemonicWithPassphrase,

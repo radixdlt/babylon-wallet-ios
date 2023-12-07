@@ -4,7 +4,7 @@ import EngineToolkit
 extension FactorSource {
 	public struct Common: Sendable, Hashable, Codable {
 		/// Curve/Derivation scheme
-		public let cryptoParameters: FactorSource.CryptoParameters
+		public var cryptoParameters: FactorSource.CryptoParameters
 
 		/// When this factor source for originally added by the user.
 		public let addedOn: Date
