@@ -280,7 +280,7 @@ extension FactorSourcesClient {
 			? .olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
 			: .babylon(mnemonicWithPassphrase: mnemonicWithPassphrase)
 
-		_ = try await self.addOnDeviceFactorSource(
+		try await self.addOnDeviceFactorSource(
 			privateHDFactorSource: .init(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
 				factorSource: factorSource

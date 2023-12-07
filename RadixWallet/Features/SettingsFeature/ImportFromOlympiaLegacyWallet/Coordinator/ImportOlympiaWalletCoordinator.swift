@@ -451,7 +451,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 						loggerGlobal.notice("Skip saving Olympia mnemonic into Profile since it is already present, will save to keychain only")
 					}
 
-					_ = try await factorSourcesClient.addOnDeviceFactorSource(
+					try await factorSourcesClient.addOnDeviceFactorSource(
 						privateHDFactorSource: factorSource,
 						// This is mega edge case, but if we were to use `.abort` here, then users
 						// who used a 24 word mnemonic `M` with Olympia wallet and then created their
