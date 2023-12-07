@@ -107,8 +107,8 @@ extension AssetBehavior {
 		case .movementRestricted: AssetResource.movementRestricted
 		case .removableByThirdParty: AssetResource.removableByThirdParty
 		case .removableByAnyone: AssetResource.removableByAnyone
-		case .freezableByThirdParty: AssetResource.removableByThirdParty // FIXME: icons
-		case .freezableByAnyone: AssetResource.removableByAnyone // FIXME: icons
+		case .freezableByThirdParty: AssetResource.freezableByThirdParty
+		case .freezableByAnyone: AssetResource.freezableByAnyone
 		case .nftDataChangeable: AssetResource.nftDataChangeable
 		case .nftDataChangeableByAnyone: AssetResource.nftDataChangeableByAnyone
 		case .informationChangeable: AssetResource.informationChangeable
