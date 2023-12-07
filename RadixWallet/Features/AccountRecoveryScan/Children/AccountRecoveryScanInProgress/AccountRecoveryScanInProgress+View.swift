@@ -129,7 +129,7 @@ public extension AccountRecoveryScanInProgress {
 						.padding(.bottom, .medium1)
 
 					if viewStore.active.isEmpty {
-						NoContentView("None found.") // FIXME: Strings
+						NoContentView("No new accounts found.") // FIXME: Strings
 					} else {
 						VStack(alignment: .leading, spacing: .medium3) {
 							ForEach(viewStore.active) { account in
