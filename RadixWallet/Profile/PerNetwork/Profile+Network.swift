@@ -15,7 +15,7 @@ extension Profile {
 		/// have been added and dApps connected.
 		public let networkID: NetworkID
 
-		public typealias Accounts = NonEmpty<IdentifiedArrayOf<Account>>
+		public typealias Accounts = IdentifiedArrayOf<Account>
 
 		/// An identifiable ordered set of `Account`s created by the user for this network.
 		private var accounts: Accounts
@@ -54,16 +54,26 @@ extension Profile.Network {
 		accounts.hidden
 	}
 
+	public func accountsIncludingHidden() -> IdentifiedArrayOf<Account> {
+		accounts
+	}
+
 	public func hasSomeAccount() -> Bool {
 		!accounts.isEmpty
 	}
 
-	public func nextAccountIndex() -> Int {
+	var numberOfAccountsIncludingHidden: Int {
 		accounts.count
 	}
 
+	#if DEBUG
+	public mutating func deleteAccount(address: AccountAddress) {
+		accounts.remove(id: address)
+	}
+	#endif
+
 	public mutating func updateAccount(_ account: Account) throws {
-		accounts.append(account)
+		accounts[id: account.id] = account
 	}
 
 	public mutating func addAccount(_ account: Account) throws {
@@ -75,7 +85,7 @@ extension Profile.Network {
 	}
 
 	public mutating func hideAccounts(ids idsOfAccountsToHide: Set<Profile.Network.Account.ID>) {
-		var identifiedArrayOf = accounts.rawValue
+		var identifiedArrayOf = self.accounts
 		for id in idsOfAccountsToHide {
 			identifiedArrayOf[id: id]?.hide()
 
@@ -85,7 +95,7 @@ extension Profile.Network {
 				}
 			}
 		}
-		accounts = .init(rawValue: identifiedArrayOf)!
+		self.accounts = identifiedArrayOf
 	}
 }
 
@@ -104,12 +114,12 @@ extension Profile.Network {
 		personas.hiden
 	}
 
-	public func hasSomePersona() -> Bool {
-		!personas.isEmpty
+	public func personasIncludingHidden() -> IdentifiedArrayOf<Persona> {
+		personas
 	}
 
-	public func nextPersonaIndex() -> Int {
-		personas.count
+	public func hasSomePersona() -> Bool {
+		!personas.isEmpty
 	}
 
 	public mutating func addPersona(_ persona: Persona) throws {

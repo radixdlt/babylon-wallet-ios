@@ -37,7 +37,7 @@ public struct OlympiaAccountToMigrate: Sendable, Hashable, CustomDebugStringConv
 	public var debugDescription: String {
 		"""
 		accountType: \(accountType)
-		name: \(displayName ?? "")
+		name: \(displayName ?? "Unknown")
 		path: \(path.derivationPath)
 		publicKey: \(publicKey.compressedRepresentation.hex)
 		"""

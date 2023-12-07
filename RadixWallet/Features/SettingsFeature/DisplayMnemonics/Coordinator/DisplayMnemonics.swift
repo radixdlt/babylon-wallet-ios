@@ -55,7 +55,6 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.keychainClient) var keychainClient
 	@Dependency(\.backupsClient) var backupsClient
-	@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 	public init() {}
 

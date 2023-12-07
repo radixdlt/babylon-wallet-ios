@@ -156,7 +156,7 @@ extension DappMetadata.Ledger {
 		origin: P2P.Dapp.Request.Metadata.Origin
 	) {
 		let items = entityMetadataForDapp.items
-		let maybeName: String? = items[.name]?.asString
+		let maybeName: String? = items[.name]?.value.asString
 		let name: NonEmptyString? = {
 			guard let name = maybeName else {
 				return nil
@@ -167,8 +167,8 @@ extension DappMetadata.Ledger {
 			origin: origin,
 			dAppDefinintionAddress: dAppDefinintionAddress,
 			name: name,
-			description: items[.description]?.asString,
-			thumbnail: items[.iconURL]?.asURL
+			description: items[.description]?.value.asString,
+			thumbnail: items[.iconURL]?.value.asURL
 		)
 	}
 }

@@ -20,4 +20,12 @@ extension DerivationPathScheme {
 			.secp256k1
 		}
 	}
+
+	/// Higher means more preferrable, we prefer `cap26` over `bip44Olympia`
+	public var preference: Int {
+		switch self {
+		case .cap26: 1
+		case .bip44Olympia: 0
+		}
+	}
 }

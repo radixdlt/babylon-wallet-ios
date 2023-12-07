@@ -13,49 +13,26 @@ extension SelectBackup {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-				ScrollView {
-					VStack(spacing: .medium1) {
-						Text(L10n.RecoverProfileBackup.Header.subtitle)
-							.textStyle(.body1Regular)
-
-						Text(L10n.IOSRecoverProfileBackup.Choose.title)
-							.textStyle(.body1Header)
-
-						backupsList(with: viewStore)
-
-						Button(L10n.RecoverProfileBackup.ImportFileButton.title) {
-							viewStore.send(.importFromFileInstead)
-						}
-						.foregroundColor(.app.blue2)
-						.font(.app.body1Header)
-						.frame(height: .standardButtonHeight)
-						.frame(maxWidth: .infinity)
-						.padding(.medium1)
-						.background(.app.white)
-						.cornerRadius(.small2)
+				coreView(store, with: viewStore)
+					.footer {
+						WithControlRequirements(
+							viewStore.selectedProfileHeader,
+							forAction: { viewStore.send(.tappedUseCloudBackup($0)) },
+							control: { action in
+								Button(L10n.IOSProfileBackup.useICloudBackup, action: action)
+									.buttonStyle(.primaryRectangular)
+							}
+						)
 					}
-					.foregroundColor(.app.gray1)
-					.padding(.medium2)
-				}
-				.footer {
-					WithControlRequirements(
-						viewStore.selectedProfileHeader,
-						forAction: { viewStore.send(.tappedUseCloudBackup($0)) },
-						control: { action in
-							Button(L10n.IOSProfileBackup.useICloudBackup, action: action)
-								.buttonStyle(.primaryRectangular)
-						}
+					.destinations(with: store)
+					.fileImporter(
+						isPresented: viewStore.binding(
+							get: \.isDisplayingFileImporter,
+							send: .dismissFileImporter
+						),
+						allowedContentTypes: [.profile],
+						onCompletion: { viewStore.send(.profileImportResult($0.mapError { $0 as NSError })) }
 					)
-				}
-				.destinations(with: store)
-				.fileImporter(
-					isPresented: viewStore.binding(
-						get: \.isDisplayingFileImporter,
-						send: .dismissFileImporter
-					),
-					allowedContentTypes: [.profile],
-					onCompletion: { viewStore.send(.profileImportResult($0.mapError { $0 as NSError })) }
-				)
 			}
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()
@@ -65,29 +42,38 @@ extension SelectBackup {
 	}
 }
 
-private extension StoreOf<SelectBackup> {
-	var destination: PresentationStoreOf<SelectBackup.Destination> {
-		func scopeState(state: State) -> PresentationState<SelectBackup.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
-	}
-}
-
-@MainActor
-private extension View {
-	func destinations(with store: StoreOf<SelectBackup>) -> some View {
-		let destinationStore = store.destination
-		return sheet(
-			store: destinationStore,
-			state: /SelectBackup.Destination.State.inputEncryptionPassword,
-			action: SelectBackup.Destination.Action.inputEncryptionPassword,
-			content: { EncryptOrDecryptProfile.View(store: $0).inNavigationView }
-		)
-	}
-}
-
 extension SelectBackup.View {
+	@MainActor
+	@ViewBuilder
+	private func coreView(_ store: StoreOf<SelectBackup>, with viewStore: ViewStoreOf<SelectBackup>) -> some SwiftUI.View {
+		ScrollView {
+			VStack(spacing: .medium1) {
+				Text(L10n.RecoverProfileBackup.Header.subtitle)
+					.textStyle(.body1Regular)
+
+				Text(L10n.IOSRecoverProfileBackup.Choose.title)
+					.textStyle(.body1Header)
+
+				backupsList(with: viewStore)
+
+				VStack(alignment: .center, spacing: .small1) {
+					selectFileInsteadButton(with: store)
+					Divider()
+					restoreWithoutProfile(with: store)
+				}
+			}
+			.foregroundColor(.app.gray1)
+			.padding(.medium2)
+		}
+		.modifier {
+			if #available(iOS 17, *) {
+				$0.scrollIndicatorsFlash(onAppear: true)
+			} else {
+				$0
+			}
+		}
+	}
+
 	@MainActor
 	private func backupsList(with viewStore: ViewStoreOf<SelectBackup>) -> some SwiftUI.View {
 		// TODO: This is speculative design, needs to be updated once we have the proper design
@@ -153,5 +139,67 @@ extension SelectBackup.View {
 	@MainActor
 	func formatDate(_ date: Date) -> String {
 		date.ISO8601Format(.iso8601Date(timeZone: .current))
+	}
+
+	@MainActor
+	private func selectFileInsteadButton(with store: StoreOf<SelectBackup>) -> some SwiftUI.View {
+		secondaryButton(title: L10n.RecoverProfileBackup.ImportFileButton.title, store: store, action: .importFromFileInstead)
+	}
+
+	@MainActor
+	@ViewBuilder
+	private func restoreWithoutProfile(with store: StoreOf<SelectBackup>) -> some SwiftUI.View {
+		// FIXME: Strings
+		Text("Backup not available?")
+			.textStyle(.body1Header)
+			.foregroundColor(.app.gray1)
+
+		// FIXME: Strings
+		secondaryButton(title: "Other Restore Options", store: store, action: .otherRestoreOptionsTapped)
+	}
+
+	@MainActor
+	private func secondaryButton(title: String, store: StoreOf<SelectBackup>, action: SelectBackup.ViewAction) -> some SwiftUI.View {
+		Button(title) {
+			store.send(.view(action))
+		}
+		.buttonStyle(.alternativeRectangular)
+	}
+}
+
+private extension StoreOf<SelectBackup> {
+	var destination: PresentationStoreOf<SelectBackup.Destination> {
+		func scopeState(state: State) -> PresentationState<SelectBackup.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<SelectBackup>) -> some View {
+		let destinationStore = store.destination
+		return self
+			.inputEncryptionPassword(with: destinationStore)
+			.recoverWalletWithoutProfileCoordinator(with: destinationStore)
+	}
+
+	private func inputEncryptionPassword(with destinationStore: PresentationStoreOf<SelectBackup.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /SelectBackup.Destination.State.inputEncryptionPassword,
+			action: SelectBackup.Destination.Action.inputEncryptionPassword,
+			content: { EncryptOrDecryptProfile.View(store: $0).inNavigationView }
+		)
+	}
+
+	private func recoverWalletWithoutProfileCoordinator(with destinationStore: PresentationStoreOf<SelectBackup.Destination>) -> some View {
+		fullScreenCover(
+			store: destinationStore,
+			state: /SelectBackup.Destination.State.recoverWalletWithoutProfileCoordinator,
+			action: SelectBackup.Destination.Action.recoverWalletWithoutProfileCoordinator,
+			content: { RecoverWalletWithoutProfileCoordinator.View(store: $0) }
+		)
 	}
 }

@@ -4,7 +4,6 @@ extension ImportLegacyWalletClient: DependencyKey {
 
 	public static let liveValue: Self = {
 		@Dependency(\.accountsClient) var accountsClient
-		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		/// NB: This migrates, but does not save the migrated accounts to the profile. That needs to be done separately,
 		/// by calling `accountsClient.saveVirtualAccounts`
@@ -16,9 +15,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 			let networkID = NetworkID.mainnet
 			let sortedOlympia = accounts.sorted(by: \.addressIndex)
 
-			let accountIndexBase = await accountsClient.nextAccountIndex(networkID)
-
-			var accountOffset: HD.Path.Component.Child.Value = 0
+			var accountOffset = 0
 			guard let defaultAccountName: NonEmptyString = .init(rawValue: L10n.ImportOlympiaAccounts.AccountsToImport.unnamed) else {
 				// The L10n string should not be empty, so this should not be possible
 				struct ImplementationError: Error {}
@@ -28,7 +25,6 @@ extension ImportLegacyWalletClient: DependencyKey {
 			var accountsSet = OrderedSet<MigratedAccount>()
 			for olympiaAccount in sortedOlympia {
 				defer { accountOffset += 1 }
-				let accountIndex = accountIndexBase + accountOffset
 				let publicKey = SLIP10.PublicKey.ecdsaSecp256k1(olympiaAccount.publicKey)
 				let factorInstance = HierarchicalDeterministicFactorInstance(
 					id: factorSouceID,
@@ -38,12 +34,12 @@ extension ImportLegacyWalletClient: DependencyKey {
 
 				let displayName = olympiaAccount.displayName ?? defaultAccountName
 
+				let appearanceID = await accountsClient.nextAppearanceID(networkID, accountOffset)
 				let babylon = try Profile.Network.Account(
 					networkID: networkID,
-					index: HD.Path.Component.Child.Value(accountIndex),
 					factorInstance: factorInstance,
 					displayName: displayName,
-					extraProperties: .init(appearanceID: .fromIndex(.init(accountIndex)))
+					extraProperties: .init(appearanceID: appearanceID)
 				)
 
 				let migrated = MigratedAccount(olympia: olympiaAccount, babylon: babylon)
@@ -69,14 +65,14 @@ extension ImportLegacyWalletClient: DependencyKey {
 				do {
 					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
 					if accounts.contains(where: \.isOlympiaAccount) {
-						await userDefaults.setHideMigrateOlympiaButton(true)
+						userDefaults.setHideMigrateOlympiaButton(true)
 						return false
 					}
 				} catch {
 					loggerGlobal.warning("Failed to load accounts, error: \(error)")
 				}
 
-				return await factorSourcesClient.getCurrentNetworkID() == .mainnet
+				return await accountsClient.getCurrentNetworkID() == .mainnet
 			},
 			parseHeaderFromQRCode: {
 				let header = try CAP33.deserializeHeader(payload: $0)

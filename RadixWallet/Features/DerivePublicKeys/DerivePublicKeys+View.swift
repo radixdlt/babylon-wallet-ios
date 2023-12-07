@@ -1,10 +1,11 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension DerivePublicKeys.State {
 	var viewState: DerivePublicKeys.ViewState {
 		.init(
 			ledger: ledgerBeingUsed,
-			entityKind: (/DerivePublicKeys.State.Purpose.createEntity).extract(from: purpose)
+			purpose: purpose
 		)
 	}
 }
@@ -13,10 +14,56 @@ extension DerivePublicKeys.State {
 extension DerivePublicKeys {
 	public struct ViewState: Equatable {
 		public let ledger: LedgerHardwareWalletFactorSource?
-		let entityKind: EntityKind?
+		let purpose: DerivePublicKeys.State.Purpose
+
+		var title: String {
+			switch purpose {
+			case .createNewEntity(kind: .account):
+				L10n.CreateAccount.DerivePublicKeys.title
+
+			case .createNewEntity(kind: .identity):
+				L10n.CreatePersona.DerivePublicKeys.title
+
+			case .importLegacyAccounts:
+				"Deriving Accounts" // FIXME: String
+
+			case .accountRecoveryScan:
+				"Deriving Accounts" // FIXME: Strings
+
+			case .createAuthSigningKey(forEntityKind: .account):
+				"Creating Key" // FIXME: Strings
+
+			case .createAuthSigningKey(forEntityKind: .identity):
+				"Creating Key" // FIXME: Strings
+			}
+		}
+
+		var subtitle: String {
+			switch purpose {
+			case .createNewEntity(.account):
+				"Authenticate to your phone to complete using your phone’s signing key." // FIXME: Strings delete `createAccount_derivePublicKeys_subtitle` add new key `L10n.DerivePublicKeys.CreateNewAccount.subtitle`
+
+			case .createNewEntity(.identity):
+				"Authenticate to your phone to complete using your phone’s signing key." // FIXME: Strings is this correct?  add new key `L10n.DerivePublicKeys.CreateNewPersona.subtitle`
+
+			case .accountRecoveryScan:
+				"Authenticate to your phone to complete using your phone's signing key" // FIXME: Strings is this correct?  add new key `L10n.DerivePublicKeys.AccountRecoveryScan.subtitle`
+
+			case .importLegacyAccounts:
+				"Authenticate to your phone to complete using your phone's signing key" // FIXME: Strings is this correct?  add new key `L10n.DerivePublicKeys.ImportLegacyAccount.subtitle`
+
+			case .createAuthSigningKey(.account):
+				"Authenticate to your phone to complete using your phone's signing key" // FIXME: Strings is this correct?  add new key `L10n.DerivePublicKeys.CreateAuthSignKeyForAccount.subtitle`
+
+			case .createAuthSigningKey(.identity):
+				"Authenticate to your phone to complete using your phone's signing key" // FIXME: Strings is this correct?  add new key `L10n.DerivePublicKeys.CreateAuthSignKeyForIdentity.subtitle`
+			}
+		}
 	}
 
+	@MainActor
 	public struct View: SwiftUI.View {
+		@SwiftUI.State private var id = UUID()
 		private let store: StoreOf<DerivePublicKeys>
 
 		public init(store: StoreOf<DerivePublicKeys>) {
@@ -31,15 +78,13 @@ extension DerivePublicKeys {
 						.padding(.vertical, .medium2)
 
 					Text(
-						viewStore.entityKind == .identity
-							? L10n.CreatePersona.DerivePublicKeys.title
-							: L10n.CreateAccount.DerivePublicKeys.title
+						viewStore.title
 					)
 					.textStyle(.sheetTitle)
 					.foregroundColor(.app.gray1)
 					.padding(.bottom, .medium1)
 
-					Text(L10n.CreateAccount.DerivePublicKeys.subtitle)
+					Text(viewStore.subtitle)
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 						.padding(.horizontal, .medium1)
@@ -55,34 +100,10 @@ extension DerivePublicKeys {
 					Spacer(minLength: 0)
 				}
 				.padding(.horizontal, .medium1)
-				.onFirstTask { @MainActor in
-					/// For more information about that `sleep` please  check [this discussion in Slack](https://rdxworks.slack.com/archives/C03QFAWBRNX/p1687967412207119?thread_ts=1687964494.772899&cid=C03QFAWBRNX)
-					@Dependency(\.continuousClock) var clock
-					try? await clock.sleep(for: .milliseconds(700))
-
-					await viewStore.send(.onFirstTask).finish()
+				.onFirstAppear {
+					viewStore.send(.onFirstAppear)
 				}
 			}
 		}
 	}
 }
-
-// #if DEBUG
-// import SwiftUI
-import ComposableArchitecture //
-//// MARK: - DerivePublicKey_Preview
-// struct DerivePublicKey_Preview: PreviewProvider {
-//	static var previews: some View {
-//		DerivePublicKeys.View(
-//			store: .init(
-//				initialState: .previewValue,
-//				reducer: DerivePublicKeys.init
-//			)
-//		)
-//	}
-// }
-//
-// extension DerivePublicKeys.State {
-//	public static let previewValue = Self()
-// }
-// #endif

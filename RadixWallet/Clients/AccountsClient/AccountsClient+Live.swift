@@ -24,58 +24,94 @@ extension AccountsClient: DependencyKey {
 			try await getAccountsOnNetwork(getCurrentNetworkID())
 		}
 
-		let nextAccountIndex: NextAccountIndex = { maybeNetworkID in
+		let nextAppearanceID: NextAppearanceID = { maybeNetworkID, maybeOffset in
+			let offset = maybeOffset ?? 0
 			let currentNetworkID = await getCurrentNetworkID()
 			let networkID = maybeNetworkID ?? currentNetworkID
-			let index = await (try? profileStore.profile.network(id: networkID).nextAccountIndex()) ?? 0
-			return HD.Path.Component.Child.Value(index)
+			let numberOfAccounts = await (try? profileStore.profile.network(id: networkID).numberOfAccountsIncludingHidden) ?? 0
+			return Profile.Network.Account.AppearanceID.fromNumberOfAccounts(numberOfAccounts + offset)
 		}
 
+		let hasAccountOnNetwork: HasAccountOnNetwork = { networkID in
+			do {
+				let network = try await profileStore.profile.network(id: networkID)
+				// N.B. `accounts` is NonEmpty so `isEmpty` should always evaluate to `false`.
+				return network.hasSomeAccount()
+			} catch {
+				return false
+			}
+		}
+
+		let getHiddenAccountsOnCurrentNetwork: GetHiddenAccountsOnCurrentNetwork = {
+			try await profileStore.profile.network(id: getCurrentNetworkID()).getHiddenAccounts()
+		}
+
+		let accountsOnCurrentNetwork: AccountsOnCurrentNetwork = { await profileStore.accountValues() }
+
+		let accountUpdates: AccountUpdates = { address in
+			await profileStore.accountValues().compactMap {
+				$0.first { $0.address == address }
+			}
+			.eraseToAnyAsyncSequence()
+		}
+
+		let newVirtualAccount: NewVirtualAccount = { request in
+			let networkID = request.networkID
+			let appearanceID = await nextAppearanceID(networkID, nil)
+			return try Profile.Network.Account(
+				networkID: networkID,
+				factorInstance: request.factorInstance,
+				displayName: request.name,
+				extraProperties: .init(appearanceID: appearanceID)
+			)
+		}
+
+		let getAccountByAddress: GetAccountByAddress = { address in
+			try await profileStore.network().entity(address: address)
+		}
+
+		let updateAccount: UpdateAccount = { updatedAccount in
+			try await profileStore.updating {
+				try $0.updateAccount(updatedAccount)
+			}
+		}
+
+		#if DEBUG
 		return Self(
 			getCurrentNetworkID: getCurrentNetworkID,
-			nextAccountIndex: nextAccountIndex,
+			nextAppearanceID: nextAppearanceID,
 			getAccountsOnCurrentNetwork: getAccountsOnCurrentNetwork,
-			getHiddenAccountsOnCurrentNetwork: {
-				try await profileStore.profile.network(id: getCurrentNetworkID()).getHiddenAccounts()
-			},
-			accountsOnCurrentNetwork: { await profileStore.accountValues() },
-			accountUpdates: { address in
-				await profileStore.accountValues().compactMap {
-					$0.first { $0.address == address }
-				}
-				.eraseToAnyAsyncSequence()
-			},
+			getHiddenAccountsOnCurrentNetwork: getHiddenAccountsOnCurrentNetwork,
+			accountsOnCurrentNetwork: accountsOnCurrentNetwork,
+			accountUpdates: accountUpdates,
 			getAccountsOnNetwork: getAccountsOnNetwork,
-			newVirtualAccount: { request in
-				let networkID = request.networkID
-				let numberOfExistingAccounts = await nextAccountIndex(networkID)
-				return try Profile.Network.Account(
-					networkID: networkID,
-					index: .init(numberOfExistingAccounts),
-					factorInstance: request.factorInstance,
-					displayName: request.name,
-					extraProperties: .init(numberOfAccountsOnNetwork: .init(numberOfExistingAccounts))
-				)
-			},
+			newVirtualAccount: newVirtualAccount,
 			saveVirtualAccounts: saveVirtualAccounts,
-			getAccountByAddress: { address in
-				try await profileStore.network().entity(address: address)
-			},
-			hasAccountOnNetwork: { networkID in
-				do {
-					let network = try await profileStore.profile.network(id: networkID)
-					// N.B. `accounts` is NonEmpty so `isEmpty` should always evaluate to `false`.
-					return network.hasSomeAccount()
-				} catch {
-					return false
-				}
-			},
-			updateAccount: { updatedAccount in
+			getAccountByAddress: getAccountByAddress,
+			hasAccountOnNetwork: hasAccountOnNetwork,
+			updateAccount: updateAccount,
+			debugOnlyDeleteAccount: { account in
 				try await profileStore.updating {
-					try $0.updateAccount(updatedAccount)
+					try $0.deleteAccount(account)
 				}
 			}
 		)
+		#else
+		return Self(
+			getCurrentNetworkID: getCurrentNetworkID,
+			nextAppearanceID: nextAppearanceID,
+			getAccountsOnCurrentNetwork: getAccountsOnCurrentNetwork,
+			getHiddenAccountsOnCurrentNetwork: getHiddenAccountsOnCurrentNetwork,
+			accountsOnCurrentNetwork: accountsOnCurrentNetwork,
+			accountUpdates: accountUpdates,
+			getAccountsOnNetwork: getAccountsOnNetwork,
+			newVirtualAccount: newVirtualAccount,
+			saveVirtualAccounts: saveVirtualAccounts,
+			getAccountByAddress: getAccountByAddress,
+			hasAccountOnNetwork: hasAccountOnNetwork,
+			updateAccount: updateAccount
+		)
+		#endif
 	}
 
 	public static let liveValue: Self = .live()

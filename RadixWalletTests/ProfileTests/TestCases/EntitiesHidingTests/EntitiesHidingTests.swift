@@ -40,7 +40,7 @@ final class EntitiesHidingTests: TestCase {
 
 	lazy var network = try! Profile.Network(
 		networkID: .mainnet,
-		accounts: .init(rawValue: [account0, account1])!,
+		accounts: [account0, account1].asIdentifiable(),
 		personas: [persona0, persona1],
 		authorizedDapps: [dApp0, dApp1]
 	)
@@ -64,13 +64,6 @@ final class EntitiesHidingTests: TestCase {
 		XCTAssertTrue(sut.hasSomeAccount())
 	}
 
-	func test_GIVEN_hasHiddenAccounts_WHEN_askingForNextAccountIndex_THEN_returnsProperValue() {
-		var sut = network
-		sut.hide(account: account0)
-		sut.hide(account: account1)
-		XCTAssertEqual(sut.nextAccountIndex(), 2)
-	}
-
 	func test_GIVEN_hasUnhiddenPersonas_WHEN_personaIsHidden_THEN_personaIsFilteredOut() {
 		var sut = network
 		sut.hide(persona: persona0)
@@ -88,13 +81,6 @@ final class EntitiesHidingTests: TestCase {
 		sut.hide(persona: persona0)
 		sut.hide(persona: persona1)
 		XCTAssertTrue(sut.hasSomePersona())
-	}
-
-	func test_GIVEN_hasHiddenPersonas_WHEN_askingForNextPersonaIndex_THEN_returnsProperValue() {
-		var sut = network
-		sut.hide(persona: persona0)
-		sut.hide(persona: persona1)
-		XCTAssertEqual(sut.nextPersonaIndex(), 2)
 	}
 
 	func test_GIVEN_hasSharedAccountsWithDapps_WHEN_accountIsHidden_THEN_accountIsRemovedFromSharedAccounts() {

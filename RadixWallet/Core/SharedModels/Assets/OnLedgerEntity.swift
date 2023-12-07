@@ -58,6 +58,15 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable {
 	}
 }
 
+// MARK: - OnLedgerEntity.Metadata.ValueAtStateVersion + Sendable
+extension OnLedgerEntity.Metadata.ValueAtStateVersion: Sendable where Value: Sendable {}
+
+// MARK: - OnLedgerEntity.Metadata.ValueAtStateVersion + Equatable
+extension OnLedgerEntity.Metadata.ValueAtStateVersion: Equatable where Value: Equatable {}
+
+// MARK: - OnLedgerEntity.Metadata.ValueAtStateVersion + Hashable
+extension OnLedgerEntity.Metadata.ValueAtStateVersion: Hashable where Value: Hashable {}
+
 // MARK: OnLedgerEntity.Resource
 extension OnLedgerEntity {
 	public struct Metadata: Sendable, Hashable, Codable {
@@ -79,7 +88,38 @@ extension OnLedgerEntity {
 		public let claimedEntities: [String]?
 		public let claimedWebsites: [URL]?
 		public let accountType: AccountType?
-		public let ownerKeys: [PublicKeyHash]?
+		public let ownerKeys: PublicKeyHashesWithStateVersion?
+		public let ownerBadge: OwnerBadgeWithStateVersion?
+
+		public struct ValueAtStateVersion<Value>: Codable where Value: Codable {
+			public let value: Value
+			public let lastUpdatedAtStateVersion: AtStateVersion
+
+			public func map<T>(_ transform: (Value) throws -> T) rethrows -> ValueAtStateVersion<T> {
+				try ValueAtStateVersion<T>(
+					value: transform(value),
+					lastUpdatedAtStateVersion: lastUpdatedAtStateVersion
+				)
+			}
+
+			public func map<T>(_ transform: (Value) throws -> T?) rethrows -> ValueAtStateVersion<T>? {
+				guard let transformed = try transform(value) else { return nil }
+				return ValueAtStateVersion<T>(
+					value: transformed,
+					lastUpdatedAtStateVersion: lastUpdatedAtStateVersion
+				)
+			}
+
+			public func mapArray<T>(_ transform: (Value) throws -> [T]?) rethrows -> [ValueAtStateVersion<T>]? {
+				guard let elements = try transform(value) else { return nil }
+				return elements.map { (element: T) in
+					ValueAtStateVersion<T>.init(value: element, lastUpdatedAtStateVersion: lastUpdatedAtStateVersion)
+				}
+			}
+		}
+
+		public typealias OwnerBadgeWithStateVersion = ValueAtStateVersion<NonFungibleLocalId>
+		public typealias PublicKeyHashesWithStateVersion = ValueAtStateVersion<[PublicKeyHash]>
 
 		public init(
 			name: String? = nil,
@@ -95,7 +135,8 @@ extension OnLedgerEntity {
 			claimedEntities: [String]? = nil,
 			claimedWebsites: [URL]? = nil,
 			accountType: AccountType? = nil,
-			ownerKeys: [PublicKeyHash]? = nil
+			ownerKeys: PublicKeyHashesWithStateVersion? = nil,
+			ownerBadge: OwnerBadgeWithStateVersion? = nil
 		) {
 			self.name = name
 			self.symbol = symbol
@@ -111,6 +152,7 @@ extension OnLedgerEntity {
 			self.claimedWebsites = claimedWebsites
 			self.accountType = accountType
 			self.ownerKeys = ownerKeys
+			self.ownerBadge = ownerBadge
 		}
 	}
 
@@ -321,7 +363,52 @@ extension OnLedgerEntity {
 	}
 }
 
-// MARK: OnLedgerEntity.Account
+// MARK: - GatewayAPI.DepositRule
+extension GatewayAPI {
+	public enum DepositRule: String, Sendable, Hashable, Codable {
+		case accept = "Accept"
+		case reject = "Reject"
+		case allowExisting = "AllowExisting"
+	}
+}
+
+extension Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule {
+	public init(gateway: GatewayAPI.DepositRule) {
+		switch gateway {
+		case .accept: self = .acceptAll
+		case .reject: self = .denyAll
+		case .allowExisting: self = .acceptKnown
+		}
+	}
+}
+
+extension OnLedgerEntity.Account.Details {
+	init?(_ component: GatewayAPI.StateEntityDetailsResponseComponentDetails?) {
+		guard let stateAny = component?.state else {
+			return nil
+		}
+		guard let state = stateAny.value as? [String: String] else {
+			return nil
+		}
+		guard let gatewayDepositRaw = state["default_deposit_rule"] else {
+			return nil
+		}
+		guard let gatewayDeposit = GatewayAPI.DepositRule(rawValue: gatewayDepositRaw) else {
+			return nil
+		}
+		self.init(depositRule: .init(gateway: gatewayDeposit))
+	}
+
+	init?(_ details: GatewayAPI.StateEntityDetailsResponseItemDetails?) {
+		self.init(details?.component)
+	}
+
+	init?(_ item: GatewayAPI.StateEntityDetailsResponseItem) {
+		self.init(item.details)
+	}
+}
+
+// MARK: - OnLedgerEntity.Account
 extension OnLedgerEntity {
 	public struct Account: Sendable, Hashable, Codable {
 		public let address: AccountAddress
@@ -330,6 +417,14 @@ extension OnLedgerEntity {
 		public var fungibleResources: OwnedFungibleResources
 		public var nonFungibleResources: [OwnedNonFungibleResource]
 		public var poolUnitResources: PoolUnitResources
+		public struct Details: Sendable, Hashable, Codable {
+			public let depositRule: Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule
+			public init(depositRule: Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule) {
+				self.depositRule = depositRule
+			}
+		}
+
+		public var details: Details?
 
 		public init(
 			address: AccountAddress,
@@ -337,7 +432,8 @@ extension OnLedgerEntity {
 			metadata: Metadata,
 			fungibleResources: OwnedFungibleResources,
 			nonFungibleResources: [OwnedNonFungibleResource],
-			poolUnitResources: PoolUnitResources
+			poolUnitResources: PoolUnitResources,
+			details: Details? = nil
 		) {
 			self.address = address
 			self.atLedgerState = atLedgerState
@@ -345,11 +441,12 @@ extension OnLedgerEntity {
 			self.fungibleResources = fungibleResources
 			self.nonFungibleResources = nonFungibleResources
 			self.poolUnitResources = poolUnitResources
+			self.details = details
 		}
 	}
 }
 
-// MARK: OnLedgerEntity.AssociatedDapp
+// MARK: - OnLedgerEntity.AssociatedDapp
 extension OnLedgerEntity {
 	public struct AssociatedDapp: Sendable, Hashable, Codable {
 		public let address: DappDefinitionAddress

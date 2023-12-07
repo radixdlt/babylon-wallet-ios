@@ -7,7 +7,6 @@ extension Profile.Network.Account {
 			validatingAddress: "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q"
 		),
 		securityState: .unsecured(.init(
-			entityIndex: 0,
 			transactionSigning: .init(
 				factorSourceID: .device(hash: "09bfa80bcc9b75d6ad82d59730f7b179cbc668ba6ad4008721d5e6a179ff55f1"),
 				publicKey: .eddsaEd25519(.init(
@@ -27,7 +26,6 @@ extension Profile.Network.Account {
 			validatingAddress: "account_sim1cyvgx33089ukm2pl97pv4max0x40ruvfy4lt60yvya744cve475w0q"
 		),
 		securityState: .unsecured(.init(
-			entityIndex: 1,
 			transactionSigning: .init(
 				factorSourceID: .device(hash: "09bfa80bcc9b75d6ad82d59730f7b179cbc668ba6ad4008721d5e6a179ff55f1"),
 				publicKey: .eddsaEd25519(.init(
@@ -43,7 +41,7 @@ extension Profile.Network.Account {
 }
 
 extension Profile.Network.Accounts {
-	public static let previewValue = Self(rawValue: .init(uniqueElements: [Profile.Network.Account.previewValue0, Profile.Network.Account.previewValue1]))!
+	public static let previewValue = [Profile.Network.Account.previewValue0, Profile.Network.Account.previewValue1].asIdentifiable()
 }
 
 #endif // DEBUG

@@ -20,12 +20,9 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return wordCount
 		}
 
-		public mutating func changeWordCount(by delta: Int) {
-			let positiveDelta = abs(delta)
-			precondition(positiveDelta.isMultiple(of: ImportMnemonic.wordsPerRow))
-
+		public mutating func changeWordCount(to newWordCount: BIP39.WordCount) {
 			let wordCount = words.count
-			let newWordCount = BIP39.WordCount(wordCount: wordCount + delta)! // might in fact be subtraction
+			let delta = newWordCount.rawValue - wordCount
 			if delta > 0 {
 				// is increasing word count
 				words.append(contentsOf: (wordCount ..< newWordCount.rawValue).map {
@@ -41,7 +38,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				})
 			} else if delta < 0 {
 				// is decreasing word count
-				words.removeLast(positiveDelta)
+				words.removeLast(-delta)
 			}
 		}
 
@@ -135,11 +132,23 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				case intoKeychainOnly
 			}
 
-			public let mnemonicForFactorSourceKind: MnemonicBasedFactorSourceKind
+			public enum OnMnemonicExistsStrategy: Sendable, Hashable {
+				case abort
+				case appendWithCryptoParamaters
+			}
+
+			public let onMnemonicExistsStrategy: OnMnemonicExistsStrategy
+			public let factorSourceKindOfMnemonic: FactorSourceKindOfMnemonic
 			public let location: Location
-			public init(mnemonicForFactorSourceKind: MnemonicBasedFactorSourceKind, location: Location) {
-				self.mnemonicForFactorSourceKind = mnemonicForFactorSourceKind
+
+			public init(
+				factorSourceKindOfMnemonic: FactorSourceKindOfMnemonic,
+				location: Location,
+				onMnemonicExistsStrategy: OnMnemonicExistsStrategy
+			) {
+				self.factorSourceKindOfMnemonic = factorSourceKindOfMnemonic
 				self.location = location
+				self.onMnemonicExistsStrategy = onMnemonicExistsStrategy
 			}
 		}
 
@@ -180,7 +189,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			self.header = header
 			self.warning = warning
 			self.warningOnContinue = warningOnContinue
-			changeWordCount(by: wordCount.rawValue)
+			changeWordCount(to: wordCount)
 		}
 
 		public init(
@@ -243,8 +252,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		case toggleModeButtonTapped
 		case passphraseChanged(String)
-		case addRowButtonTapped
-		case removeRowButtonTapped
+		case changedWordCountTo(BIP39.WordCount)
 		case doneViewing
 		case closeButtonTapped
 		case backButtonTapped
@@ -253,13 +261,23 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		#if DEBUG
 		case debugCopyMnemonic
 		case debugMnemonicChanged(String)
+		case debugUseBabylonTestingMnemonicWithActiveAccounts
+		case debugUseOlympiaTestingMnemonicWithActiveAccounts
+		case debugUseTestingMnemonicZooVote
 		case debugPasteMnemonic
 		#endif
 	}
 
 	public enum InternalAction: Sendable, Equatable {
+		public struct IntermediaryResult: Sendable, Equatable {
+			public let factorSource: FactorSource
+			public let savedIntoProfile: Bool
+		}
+
 		case focusNext(ImportMnemonicWord.State.ID)
-		case saveFactorSourceResult(TaskResult<FactorSource>)
+		case saveFactorSourceResult(
+			TaskResult<IntermediaryResult>
+		)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -268,7 +286,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case persistedNewFactorSourceInProfile(FactorSource)
-		case persistedMnemonicInKeychainOnly(MnemonicWithPassphrase, FactorSourceID.FromHash)
+		case persistedMnemonicInKeychainOnly(FactorSource)
 		case notPersisted(MnemonicWithPassphrase)
 		case doneViewing(idOfBackedUpFactorSource: FactorSource.ID.FromHash?) // `nil` means it was already marked as backed up
 	}
@@ -397,12 +415,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			state.isAdvancedMode.toggle()
 			return .none
 
-		case .addRowButtonTapped:
-			state.changeWordCount(by: +ImportMnemonic.wordsPerRow)
-			return .none
-
-		case .removeRowButtonTapped:
-			state.changeWordCount(by: -ImportMnemonic.wordsPerRow)
+		case let .changedWordCountTo(newWordCount):
+			state.changeWordCount(to: newWordCount)
 			return .none
 
 		case let .continueButtonTapped(mnemonic):
@@ -445,6 +459,15 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case .debugPasteMnemonic:
 			let toPaste = pasteboardClient.getString() ?? ""
 			return .send(.view(.debugMnemonicChanged(toPaste)))
+
+		case .debugUseOlympiaTestingMnemonicWithActiveAccounts:
+			return .send(.view(.debugMnemonicChanged("section canoe half crystal crew balcony duty scout half robot avocado gas all effort piece")))
+
+		case .debugUseBabylonTestingMnemonicWithActiveAccounts:
+			return .send(.view(.debugMnemonicChanged("wine over village stage barrel strategy cushion decline echo fiber salad carry empower fun awful cereal galaxy laundry practice appear bean flat mansion license")))
+
+		case .debugUseTestingMnemonicZooVote:
+			return .send(.view(.debugMnemonicChanged(Mnemonic.testValueZooVote.phrase.rawValue)))
 		#endif
 		}
 	}
@@ -452,7 +475,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 	private func continueWithMnemonic(mnemonic: Mnemonic, in state: inout State) -> Effect<Action> {
 		guard let write = state.mode.write else {
 			preconditionFailure("expected write mode")
-			return .none
 		}
 		state.mode.update(isProgressing: true)
 		let mnemonicWithPassphrase = MnemonicWithPassphrase(
@@ -464,7 +486,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 		switch persistStrategy.location {
 		case .intoKeychainAndProfile:
-			switch persistStrategy.mnemonicForFactorSourceKind {
+			switch persistStrategy.factorSourceKindOfMnemonic {
 			case .offDevice:
 				state.destination = .offDeviceMnemonicInfoPrompt(.init(
 					mnemonicWithPassphrase: mnemonicWithPassphrase
@@ -475,10 +497,14 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				return .run { send in
 					await send(.internal(.saveFactorSourceResult(
 						TaskResult {
-							try await factorSourcesClient.addOnDeviceFactorSource(
+							let saveIntoProfile = true
+							let factorSource = try await factorSourcesClient.addOnDeviceFactorSource(
 								onDeviceMnemonicKind: onDeviceKind,
-								mnemonicWithPassphrase: mnemonicWithPassphrase
+								mnemonicWithPassphrase: mnemonicWithPassphrase,
+								onMnemonicExistsStrategy: persistStrategy.onMnemonicExistsStrategy,
+								saveIntoProfile: saveIntoProfile
 							)
+							return .init(factorSource: factorSource.embed(), savedIntoProfile: saveIntoProfile)
 						}
 					)))
 				}
@@ -487,11 +513,14 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return .run { send in
 				await send(.internal(.saveFactorSourceResult(
 					TaskResult {
-						try await factorSourcesClient.addOnDeviceFactorSource(
+						let saveIntoProfile = false
+						let factorSource = try await factorSourcesClient.addOnDeviceFactorSource(
 							onDeviceMnemonicKind: .babylon,
 							mnemonicWithPassphrase: mnemonicWithPassphrase,
-							saveIntoProfile: false
+							onMnemonicExistsStrategy: persistStrategy.onMnemonicExistsStrategy,
+							saveIntoProfile: saveIntoProfile
 						)
+						return .init(factorSource: factorSource.embed(), savedIntoProfile: saveIntoProfile)
 					}
 				)))
 			}
@@ -525,11 +554,16 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			loggerGlobal.error("Failed to save mnemonic in profile, error: \(error)")
 			return .none
 
-		case let .saveFactorSourceResult(.success(factorSource)):
+		case let .saveFactorSourceResult(.success(saved)):
+
 			state.mode.update(isProgressing: false)
 			overlayWindowClient.scheduleHUD(.seedPhraseImported)
-
-			return .send(.delegate(.persistedNewFactorSourceInProfile(factorSource)))
+			let factorSource = saved.factorSource
+			if saved.savedIntoProfile {
+				return .send(.delegate(.persistedNewFactorSourceInProfile(factorSource)))
+			} else {
+				return .send(.delegate(.persistedMnemonicInKeychainOnly(factorSource)))
+			}
 		}
 	}
 
@@ -541,15 +575,16 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			guard let persistStrategy = state.mode.write?.persistStrategy else {
 				preconditionFailure("expected persistStrategy")
 			}
-			precondition(persistStrategy.mnemonicForFactorSourceKind == .offDevice)
+			precondition(persistStrategy.factorSourceKindOfMnemonic == .offDevice)
 
 			return .run { send in
 				await send(.internal(.saveFactorSourceResult(
 					TaskResult {
-						try await factorSourcesClient.addOffDeviceFactorSource(
+						let factorSource = try await factorSourcesClient.addOffDeviceFactorSource(
 							mnemonicWithPassphrase: mnemonicWithPassphrase,
 							label: label
 						)
+						return .init(factorSource: factorSource, savedIntoProfile: true)
 					}
 				)))
 			}

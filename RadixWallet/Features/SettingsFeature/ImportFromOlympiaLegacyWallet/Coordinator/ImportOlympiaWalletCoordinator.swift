@@ -405,7 +405,9 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 			let privateHDFactorSource = try PrivateHDFactorSource(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				factorSource: DeviceFactorSource.olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
+				factorSource: DeviceFactorSource.olympia(
+					mnemonicWithPassphrase: mnemonicWithPassphrase
+				)
 			)
 
 			return migrateSoftwareAccountsToBabylon(
@@ -448,11 +450,16 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 					if saveIntoProfile {
 						loggerGlobal.notice("Skip saving Olympia mnemonic into Profile since it is already present, will save to keychain only")
 					}
-					_ = try await factorSourcesClient.addPrivateHDFactorSource(.init(
-						factorSource: factorSource.factorSource.embed(),
-						mnemonicWithPasshprase: factorSource.mnemonicWithPassphrase,
+
+					try await factorSourcesClient.addOnDeviceFactorSource(
+						privateHDFactorSource: factorSource,
+						// This is mega edge case, but if we were to use `.abort` here, then users
+						// who used a 24 word mnemonic `M` with Olympia wallet and then created their
+						// Babylon Wallet using Account Recovery Scan with `M` would not be able to
+						// perform Olympia import.
+						onMnemonicExistsStrategy: .appendWithCryptoParamaters,
 						saveIntoProfile: saveIntoProfile
-					))
+					)
 
 					overlayWindowClient.scheduleHUD(.seedPhraseImported)
 
@@ -509,7 +516,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 		state.progress = .migratedSoftwareAccounts(.init(
 			previous: progress.previous,
-			migratedSoftwareAccounts: softwareAccounts.babylonAccounts.rawValue
+			migratedSoftwareAccounts: softwareAccounts.babylonAccounts
 		))
 
 		return migrateHardwareAccounts(in: &state)
@@ -585,7 +592,7 @@ extension ImportOlympiaWalletCoordinator {
 				accountName: account.displayName?.rawValue,
 				olympiaAddress: account.address,
 				babylonAddress: babylonAddress,
-				appearanceID: .fromIndex(existingAccounts + index),
+				appearanceID: .fromNumberOfAccounts(existingAccounts + index),
 				olympiaAccountType: account.accountType
 			)
 		}
