@@ -38,9 +38,10 @@ extension FactorSources {
 	}
 
 	public func babylonDeviceFactorSources() -> NonEmpty<IdentifiedArrayOf<DeviceFactorSource>> {
+		let array = compactMap { $0.extract(DeviceFactorSource.self) }.filter(\.isBDFS)
+		let identifiedArray = array.asIdentifiable()
+
 		guard
-			case let array = self.compactMap({ $0.extract(DeviceFactorSource.self) }).filter(\.isBDFS),
-			case let identifiedArray = IdentifiedArrayOf<DeviceFactorSource>(uncheckedUniqueElements: array),
 			let nonEmpty = NonEmpty<IdentifiedArrayOf<DeviceFactorSource>>(rawValue: identifiedArray)
 		else {
 			let errorMsg = "Critical failure, every single execution path of the babylon wallet should ALWAYS contain a babylon device factorsource, did you do something weird in a test?"
