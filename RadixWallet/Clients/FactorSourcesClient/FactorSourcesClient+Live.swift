@@ -239,17 +239,15 @@ extension FactorSourcesClient: DependencyKey {
 				return nextIndex
 			},
 			addPrivateHDFactorSource: addPrivateHDFactorSource,
-			checkIfHasOlympiaFactorSourceForAccounts: {
-				wordCount,
-					softwareAccounts -> FactorSourceID.FromHash? in
+			checkIfHasOlympiaFactorSourceForAccounts: { wordCount, softwareAccounts -> FactorSourceID.FromHash? in
+
 				guard softwareAccounts.allSatisfy({ $0.accountType == .software }) else {
 					assertionFailure("Unexpectedly received hardware account, unable to verify.")
 					return nil
 				}
 				do {
-					// Might be empty, if it is, we will just return nil (for-loop below not run).
-					let olympiaDeviceFactorSources: [DeviceFactorSource] = try await getFactorSources()
-						.filter(\.supportsOlympia)
+					// Might be empty, if it is, we will just return nil (for-loop below will not run).
+					let deviceFactorSources: [DeviceFactorSource] = try await getFactorSources()
 						.filter { $0.kind == .device }
 						.compactMap {
 							guard
@@ -261,9 +259,8 @@ extension FactorSourcesClient: DependencyKey {
 							return deviceFactorSource
 						}
 
-					let factorSourceIDs = olympiaDeviceFactorSources.map(\.id)
-
-					for factorSourceID in factorSourceIDs {
+					for deviceFactorSource in deviceFactorSources {
+						let factorSourceID = deviceFactorSource.id
 						guard
 							let mnemonic = try secureStorageClient.loadMnemonic(
 								factorSourceID: factorSourceID,
@@ -276,6 +273,14 @@ extension FactorSourcesClient: DependencyKey {
 						guard (try? mnemonic.validatePublicKeys(of: softwareAccounts)) == true else {
 							continue
 						}
+
+						if !deviceFactorSource.supportsOlympia {
+							loggerGlobal.notice("Adding Olympia CryptoParameters to factor source which lacked it.")
+							var updated = deviceFactorSource
+							updated.common.cryptoParameters.append(.olympiaOnly)
+							try await updateFactorSource(updated.embed())
+						}
+
 						// YES Managed to validate all software accounts against existing factor source
 						loggerGlobal.debug("Existing factor source found for selected Olympia software accounts.")
 						return factorSourceID
