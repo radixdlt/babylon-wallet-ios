@@ -272,10 +272,9 @@ extension FactorSourcesClient {
 		onDeviceMnemonicKind: FactorSourceKindOfMnemonic.OnDeviceMnemonicKind,
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy,
-		saveIntoProfile _saveIntoProfile: Bool? = nil
+		saveIntoProfile: Bool
 	) async throws -> DeviceFactorSource {
 		let isOlympiaCompatible = onDeviceMnemonicKind == .olympia
-		let saveIntoProfile: Bool = _saveIntoProfile ?? isOlympiaCompatible
 
 		let factorSource: DeviceFactorSource = try isOlympiaCompatible
 			? .olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
@@ -289,6 +288,7 @@ extension FactorSourcesClient {
 			onMnemonicExistsStrategy: onMnemonicExistsStrategy,
 			saveIntoProfile: saveIntoProfile
 		)
+
 		return factorSource
 	}
 }
