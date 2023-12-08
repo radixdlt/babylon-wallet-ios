@@ -49,7 +49,7 @@ extension NonFungibleTokenDetails {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		/// The text will be collapsed if it's length exeeds this value
+		/// The text will be collapsed if its length exceeds this value
 		public static let dataFieldTextCollapseLength = 256
 		/// Switch the layout based based on text length
 		public static let dataFieldHorizntalAlignmentThreshold = 40
@@ -76,7 +76,10 @@ extension NonFungibleTokenDetails {
 
 								if let description = tokenDetails.description {
 									KeyValueView(key: L10n.AssetDetails.NFTDetails.description) {
-										ExpandableTextView(fullText: description, collapsedTextLength: Self.dataFieldTextMaxLength)
+										ExpandableTextView(
+											fullText: description,
+											collapsedTextLength: Self.dataFieldTextCollapseLength
+										)
 									}
 								}
 
@@ -119,7 +122,10 @@ extension NonFungibleTokenDetails {
 						Text(field.name)
 							.textStyle(.body1Regular)
 							.foregroundColor(.app.gray2)
-						ExpandableTextView(fullText: value, collapsedTextLength: Self.dataFieldTextMaxLength)
+						ExpandableTextView(
+							fullText: value,
+							collapsedTextLength: Self.dataFieldTextCollapseLength
+						)
 					}
 					.flushedLeft
 				}
@@ -193,7 +199,7 @@ extension OnLedgerEntity.NonFungibleToken.NFTData {
 
 private extension String {
 	var asDataField: NonFungibleTokenDetails.ViewState.TokenDetails.ArbitraryDataField.Kind? {
-		nilIfEmpty {
+		nilIfEmpty.map {
 			if let url = URL(string: $0), ["http", "https"].contains(url.scheme) {
 				.url(url)
 			} else {
