@@ -24,13 +24,27 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			self.isMainBDFS = isMainBDFS
 			self.entitiesControlledByFactorSource = entitiesControlledByFactorSource
 
+			let accounts: IdentifiedArrayOf<Profile.Network.Account> = if isMainBDFS, let babylonAccounts = entitiesControlledByFactorSource.babylonAccounts {
+				babylonAccounts.rawValue
+			} else if isMainBDFS, entitiesControlledByFactorSource.babylonAccounts == nil, let olympiaAccounts = entitiesControlledByFactorSource.olympiaAccounts {
+				// Fun MEGA edge case:
+				// 1) Do some action to generate a new main BDFS (e.g. remove Passcode on iOS -> trigger Import Mnemonics flow, click "I don't have the Main Seed Phrase")
+				// 2) A new main BDFS B1 is created. Do not create any Babylon accounts with it
+				// 3) Use BDFS B1 in MARS with Olympia ==> CP_B -> CP_BOA find Olympia accounts (theoretically possible), save Olympia accounts in Profile, controlled by B1
+				// 4) Delete B1 from keychain (e.g. remove Passcode on iOS)
+				// 5) Trigger Import Mnemonics flow again: `isMainBDFS` is true, but we it controlls no babylon accounts... but it controlls Olympia accounts! So we show them!
+				olympiaAccounts.rawValue
+			} else {
+				entitiesControlledByFactorSource.olympiaAccounts?.rawValue ?? []
+			}
+
 			self.entities = .init(
 				id: .mixingBabylonAndOlympiaAccounts(
 					entitiesControlledByFactorSource.factorSourceID
 				),
 				isMnemonicMarkedAsBackedUp: entitiesControlledByFactorSource.isMnemonicMarkedAsBackedUp,
 				isMnemonicPresentInKeychain: entitiesControlledByFactorSource.isMnemonicPresentInKeychain,
-				accounts: (isMainBDFS ? entitiesControlledByFactorSource.babylonAccounts : entitiesControlledByFactorSource.olympiaAccounts)?.rawValue ?? [],
+				accounts: accounts,
 				hasHiddenAccounts: !entitiesControlledByFactorSource.hiddenAccounts.isEmpty,
 				mode: .displayAccountListOnly
 			)
