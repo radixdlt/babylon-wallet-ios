@@ -12,6 +12,14 @@ extension SLIP10 {
 }
 
 extension SLIP10.Curve {
+	/// Higher means more preferrable, we prefer `curve25519` over `secp256k1`
+	public var preference: Int {
+		switch self {
+		case .curve25519: 1
+		case .secp256k1: 0
+		}
+	}
+
 	public var description: String {
 		rawValue
 	}

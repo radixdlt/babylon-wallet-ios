@@ -9,11 +9,12 @@ extension CacheClient: DependencyKey {
 				let expirationDate = date.now.addingTimeInterval(entry.lifetime)
 				try diskPersistenceClient.save(expirationDate, entry.expirationDateFilePath)
 				try diskPersistenceClient.save(encodable, entry.filesystemFilePath)
-				loggerGlobal.debug("💾 Data successfully saved to disk: \(entry)")
+				loggerGlobal.trace("💾 Data successfully saved to disk: \(entry)")
 			} catch {
-				loggerGlobal.debug("💾❌ Could not save data to disk: \(error.localizedDescription)")
+				loggerGlobal.trace("💾❌ Could not save data to disk: \(error.localizedDescription)")
 			}
-		}, load: { decodable, entry in
+		},
+		load: { decodable, entry in
 			@Dependency(\.diskPersistenceClient) var diskPersistenceClient
 			@Dependency(\.date) var date
 
@@ -35,7 +36,8 @@ extension CacheClient: DependencyKey {
 				loggerGlobal.debug("💾❌ Could not retrieve data from disk: \(error.localizedDescription)")
 				throw Error.dataLoadingFailed
 			}
-		}, removeFile: { entry in
+		},
+		removeFile: { entry in
 			@Dependency(\.diskPersistenceClient) var diskPersistenceClient
 
 			do {
@@ -44,7 +46,8 @@ extension CacheClient: DependencyKey {
 			} catch {
 				loggerGlobal.debug("💾❌ Could not delete file from disk: \(error.localizedDescription)")
 			}
-		}, removeFolder: { entry in
+		},
+		removeFolder: { entry in
 			@Dependency(\.diskPersistenceClient) var diskPersistenceClient
 
 			do {
@@ -53,7 +56,8 @@ extension CacheClient: DependencyKey {
 			} catch {
 				loggerGlobal.debug("💾❌ Could not delete folder from disk: \(error.localizedDescription)")
 			}
-		}, removeAll: {
+		},
+		removeAll: {
 			@Dependency(\.diskPersistenceClient) var diskPersistenceClient
 
 			do {

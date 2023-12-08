@@ -29,7 +29,7 @@ final class AssetTransferDepositRuleTests: TestCase {
 		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .acceptAll
 		// WHEN
-		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = []
+		account.onLedgerSettings.thirdPartyDeposits.removeAllAssetsExceptions()
 
 		// THEN
 		try await assertNoSignatureIsRequired(for: account)
@@ -40,7 +40,7 @@ final class AssetTransferDepositRuleTests: TestCase {
 		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .acceptAll
 		// WHEN
-		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = [.init(address: Self.resourceAddress, exceptionRule: .allow)]
+		account.onLedgerSettings.thirdPartyDeposits.setAssetsExceptionList([.init(address: Self.resourceAddress, exceptionRule: .allow)])
 
 		// THEN
 		try await assertNoSignatureIsRequired(for: account)
@@ -51,7 +51,7 @@ final class AssetTransferDepositRuleTests: TestCase {
 		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .acceptAll
 		// WHEN
-		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = [.init(address: Self.resourceAddress, exceptionRule: .deny)]
+		account.onLedgerSettings.thirdPartyDeposits.setAssetsExceptionList([.init(address: Self.resourceAddress, exceptionRule: .deny)])
 		// THEN
 		try await assertSignatureIsRequired(for: account)
 	}
@@ -63,7 +63,7 @@ final class AssetTransferDepositRuleTests: TestCase {
 		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .denyAll
 		// WHEN
-		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = []
+		account.onLedgerSettings.thirdPartyDeposits.removeAllAssetsExceptions()
 
 		// THEN
 		try await assertSignatureIsRequired(for: account)
@@ -74,7 +74,7 @@ final class AssetTransferDepositRuleTests: TestCase {
 		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .denyAll
 		// WHEN
-		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = [.init(address: Self.resourceAddress, exceptionRule: .allow)]
+		account.onLedgerSettings.thirdPartyDeposits.setAssetsExceptionList([.init(address: Self.resourceAddress, exceptionRule: .allow)])
 
 		// THEN
 		try await assertNoSignatureIsRequired(for: account)
@@ -85,7 +85,7 @@ final class AssetTransferDepositRuleTests: TestCase {
 		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .denyAll
 		// WHEN
-		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = [.init(address: Self.resourceAddress, exceptionRule: .deny)]
+		account.onLedgerSettings.thirdPartyDeposits.setAssetsExceptionList([.init(address: Self.resourceAddress, exceptionRule: .deny)])
 
 		// THEN
 		try await assertSignatureIsRequired(for: account)
@@ -98,7 +98,7 @@ final class AssetTransferDepositRuleTests: TestCase {
 		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .acceptKnown
 		// WHEN
-		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = []
+		account.onLedgerSettings.thirdPartyDeposits.removeAllAssetsExceptions()
 
 		// THEN
 		try await assertSignatureIsRequired(for: account)
@@ -109,7 +109,7 @@ final class AssetTransferDepositRuleTests: TestCase {
 		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .acceptKnown
 		// WHEN
-		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = [.init(address: Self.resourceAddress, exceptionRule: .allow)]
+		account.onLedgerSettings.thirdPartyDeposits.setAssetsExceptionList([.init(address: Self.resourceAddress, exceptionRule: .allow)])
 
 		// THEN
 		try await assertNoSignatureIsRequired(for: account)
@@ -120,7 +120,7 @@ final class AssetTransferDepositRuleTests: TestCase {
 		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .acceptKnown
 		// WHEN
-		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = [.init(address: Self.resourceAddress, exceptionRule: .deny)]
+		account.onLedgerSettings.thirdPartyDeposits.setAssetsExceptionList([.init(address: Self.resourceAddress, exceptionRule: .deny)])
 
 		// THEN
 		try await assertSignatureIsRequired(for: account)
@@ -131,7 +131,7 @@ final class AssetTransferDepositRuleTests: TestCase {
 		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .acceptKnown
 		// WHEN
-		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = []
+		account.onLedgerSettings.thirdPartyDeposits.removeAllAssetsExceptions()
 
 		// THEN
 		try await assertNoSignatureIsRequired(for: account, onLedgerAccounts: [Self.onLedgerAccountWithResource])
@@ -142,7 +142,7 @@ final class AssetTransferDepositRuleTests: TestCase {
 		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .acceptKnown
 		// WHEN
-		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = [.init(address: Self.resourceAddress, exceptionRule: .allow)]
+		account.onLedgerSettings.thirdPartyDeposits.setAssetsExceptionList([.init(address: Self.resourceAddress, exceptionRule: .allow)])
 
 		// THEN
 		try await assertNoSignatureIsRequired(for: account, onLedgerAccounts: [Self.onLedgerAccountWithResource])
@@ -153,7 +153,7 @@ final class AssetTransferDepositRuleTests: TestCase {
 		// GIVEN
 		account.onLedgerSettings.thirdPartyDeposits.depositRule = .acceptKnown
 		// WHEN
-		account.onLedgerSettings.thirdPartyDeposits.assetsExceptionList = [.init(address: Self.resourceAddress, exceptionRule: .deny)]
+		account.onLedgerSettings.thirdPartyDeposits.setAssetsExceptionList([.init(address: Self.resourceAddress, exceptionRule: .deny)])
 
 		// THEN
 		try await assertSignatureIsRequired(for: account, onLedgerAccounts: [Self.onLedgerAccountWithResource])

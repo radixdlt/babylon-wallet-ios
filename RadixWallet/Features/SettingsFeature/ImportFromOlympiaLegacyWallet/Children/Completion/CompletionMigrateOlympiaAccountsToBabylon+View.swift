@@ -155,7 +155,7 @@ struct AccountCardsBackground: View {
 
 		let last = lastAppearanceID.flatMap(Profile.Network.Account.AppearanceID.allCases.firstIndex) ?? 0
 		self.indexedIDs = (0 ..< count).map { offset in
-			(index: offset, id: .fromIndex(last + 1 + offset))
+			(index: offset, id: Profile.Network.Account.AppearanceID.fromNumberOfAccounts(last + 1 + offset))
 		}
 	}
 

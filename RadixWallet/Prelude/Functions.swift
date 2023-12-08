@@ -21,7 +21,39 @@ public func identity<T>(_ t: T) -> T {
 	t
 }
 
-/// Wherever you have to handle `Never`
-public func absurd<T>(_ never: Never) -> T {
-	switch never {}
+public func generateElements<Element>(
+	start: Element,
+	step: (Element) -> Element,
+	count: Int,
+	shouldInclude: (Element) -> Bool
+) -> OrderedSet<Element> where Element: Hashable {
+	var next = start
+	var elements: OrderedSet<Element> = []
+	while elements.count != count {
+		defer { next = step(next) }
+		guard shouldInclude(next) else { continue }
+		elements.append(next)
+	}
+	assert(elements.count == count)
+	return elements
+}
+
+public func generateIntegers<Integer>(
+	start: Integer,
+	count: Int,
+	shouldInclude: @escaping (Integer) -> Bool
+) -> OrderedSet<Integer> where Integer: FixedWidthInteger {
+	generateElements(start: start, step: { $0 + 1 }, count: count, shouldInclude: shouldInclude)
+}
+
+public func generateIntegers<Integer>(
+	start: Integer,
+	count: Int,
+	excluding disallowed: some Collection<Integer>
+) -> OrderedSet<Integer> where Integer: FixedWidthInteger {
+	generateIntegers(
+		start: start,
+		count: count,
+		shouldInclude: { !disallowed.contains($0) }
+	)
 }

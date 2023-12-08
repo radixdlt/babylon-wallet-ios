@@ -33,7 +33,6 @@ extension Profile.Network.Account {
 			),
 			securityState: .unsecured(
 				.init(
-					entityIndex: index,
 					transactionSigning: hdFactorInstance
 				)
 			),
@@ -83,7 +82,6 @@ extension Profile.Network.Persona {
 			),
 			securityState: .unsecured(
 				.init(
-					entityIndex: index,
 					transactionSigning: hdFactorInstance
 				)
 			),
@@ -157,7 +155,7 @@ extension Profile {
 
 		let network = Profile.Network(
 			networkID: networkID,
-			accounts: .init(rawValue: accounts)!,
+			accounts: accounts,
 			personas: [],
 			authorizedDapps: []
 		)
@@ -238,7 +236,7 @@ private func configureTestClients(
 	d.entitiesVisibilityClient.hidePersonas = { _ in }
 	d.uuid = .incrementing
 	d.date = .constant(Date(timeIntervalSince1970: 0))
-	d.mnemonicClient.generate = { _, _ in .testValue }
+	d.mnemonicClient.generate = { _, _ in Mnemonic.testValue }
 	d.secureStorageClient.saveDeviceInfo = { _ in }
 	d.secureStorageClient.deprecatedLoadDeviceID = { nil }
 	d.secureStorageClient.loadDeviceInfo = { .testValueABBA }
@@ -349,7 +347,3 @@ private let expectedDeviceDescription = DeviceInfo.deviceDescription(
 	name: deviceName,
 	model: deviceModel.rawValue
 )
-
-extension Mnemonic {
-	static let testValue: Self = "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong"
-}

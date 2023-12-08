@@ -32,6 +32,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case selectedProfileHeader(ProfileSnapshot.Header?)
 		case importFromFileInstead
 		case dismissFileImporter
+		case otherRestoreOptionsTapped
 		case profileImportResult(Result<URL, NSError>)
 		case tappedUseCloudBackup(ProfileSnapshot.Header)
 	}
@@ -39,15 +40,20 @@ public struct SelectBackup: Sendable, FeatureReducer {
 	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.State)
+			case recoverWalletWithoutProfileCoordinator(RecoverWalletWithoutProfileCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.Action)
+			case recoverWalletWithoutProfileCoordinator(RecoverWalletWithoutProfileCoordinator.Action)
 		}
 
 		public var body: some Reducer<State, Action> {
 			Scope(state: /State.inputEncryptionPassword, action: /Action.inputEncryptionPassword) {
 				EncryptOrDecryptProfile()
+			}
+			Scope(state: /State.recoverWalletWithoutProfileCoordinator, action: /Action.recoverWalletWithoutProfileCoordinator) {
+				RecoverWalletWithoutProfileCoordinator()
 			}
 		}
 	}
@@ -60,6 +66,8 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case selectedProfileSnapshot(ProfileSnapshot, isInCloud: Bool)
+		case backToStartOfOnboarding
+		case profileCreatedFromImportedBDFS
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -95,6 +103,10 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 		case .importFromFileInstead:
 			state.isDisplayingFileImporter = true
+			return .none
+
+		case .otherRestoreOptionsTapped:
+			state.destination = .recoverWalletWithoutProfileCoordinator(.init())
 			return .none
 
 		case let .selectedProfileHeader(header):
@@ -163,6 +175,20 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
+		case .recoverWalletWithoutProfileCoordinator(.delegate(.dismiss)):
+			state.destination = nil
+			return .none
+
+		case .recoverWalletWithoutProfileCoordinator(.delegate(.backToStartOfOnboarding)):
+			state.destination = nil
+			return .send(.delegate(.backToStartOfOnboarding))
+
+		case .recoverWalletWithoutProfileCoordinator(.delegate(.profileCreatedFromImportedBDFS)):
+			state.destination = nil
+			// Unfortunately we need a short delay :/ otherwise the "Recovery Completed" screen pops back again,
+			// SwiftUI nav bug...
+			return delayedShortEffect(for: .delegate(.profileCreatedFromImportedBDFS))
+
 		case .inputEncryptionPassword(.delegate(.dismiss)):
 			state.destination = nil
 			return .none

@@ -53,6 +53,8 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case profileImported(skippedAnyMnemonic: Bool)
 		case failedToImportProfileDueToMnemonics
+		case backToStartOfOnboarding
+		case profileCreatedFromImportedBDFS
 	}
 
 	@Dependency(\.backupsClient) var backupsClient
@@ -90,6 +92,12 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 					.importMnemonicsFlow(.init(context: .fromOnboarding(profileSnapshot: profileSnapshot))
 					))))
 			}
+
+		case .root(.selectBackup(.delegate(.backToStartOfOnboarding))):
+			return .send(.delegate(.backToStartOfOnboarding))
+
+		case .root(.selectBackup(.delegate(.profileCreatedFromImportedBDFS))):
+			return .send(.delegate(.profileCreatedFromImportedBDFS))
 
 		case let .path(.element(_, action: .importMnemonicsFlow(.delegate(.finishedImportingMnemonics(skipList, _, notYetSavedNewMainBDFS))))):
 			loggerGlobal.notice("Starting import snapshot process...")

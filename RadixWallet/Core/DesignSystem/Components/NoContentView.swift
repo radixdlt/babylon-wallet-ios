@@ -9,7 +9,7 @@ public struct NoContentView: SwiftUI.View {
 	public var body: some SwiftUI.View {
 		Text(text)
 			.foregroundColor(.app.gray2)
-			.padding(.large1)
+			.padding(.large2)
 			.background(.app.gray5)
 			.cornerRadius(.small1)
 	}

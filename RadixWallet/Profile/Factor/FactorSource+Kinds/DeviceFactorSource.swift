@@ -56,16 +56,16 @@ extension DeviceFactorSource {
 		model: Hint.Model = "",
 		name: String = "",
 		isMain: Bool = false,
-		isOlympiaCompatible: Bool,
+		cryptoParametersPreset: FactorSource.CryptoParameters.Preset,
 		addedOn: Date? = nil,
 		lastUsedOn: Date? = nil
 	) throws -> Self {
 		@Dependency(\.date) var date
-		assert(!(isMain && isOlympiaCompatible), "Olympia Device factor source should never be marked 'main'.")
+		assert(!(isMain && cryptoParametersPreset != .babylonOnly), "Olympia Device factor source should never be marked 'main'.")
 		return try Self(
 			id: .init(kind: .device, mnemonicWithPassphrase: mnemonicWithPassphrase),
 			common: .from(
-				cryptoParameters: isOlympiaCompatible ? .olympiaBackwardsCompatible : .babylon,
+				cryptoParameters: cryptoParametersPreset.cryptoParameters,
 				flags: isMain ? [.main] : [],
 				addedOn: addedOn ?? date(),
 				lastUsedOn: lastUsedOn ?? date()
@@ -76,6 +76,8 @@ extension DeviceFactorSource {
 
 	public static func babylon(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
+		isMain: Bool,
+		isOlympiaCompatible: Bool = false,
 		model: Hint.Model = "",
 		name: String = "",
 		addedOn: Date? = nil,
@@ -86,8 +88,8 @@ extension DeviceFactorSource {
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
 			model: model,
 			name: name,
-			isMain: true,
-			isOlympiaCompatible: false,
+			isMain: isMain,
+			cryptoParametersPreset: .babylonOnly,
 			addedOn: addedOn ?? date(),
 			lastUsedOn: lastUsedOn ?? date()
 		)
@@ -105,7 +107,7 @@ extension DeviceFactorSource {
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
 			model: model,
 			name: name,
-			isOlympiaCompatible: true,
+			cryptoParametersPreset: .olympiaOnly,
 			addedOn: addedOn ?? date(),
 			lastUsedOn: lastUsedOn ?? date()
 		)

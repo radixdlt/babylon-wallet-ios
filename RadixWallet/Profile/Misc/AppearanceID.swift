@@ -15,6 +15,7 @@ extension Profile.Network.Account {
 		Codable,
 		CustomStringConvertible,
 		CaseIterable,
+		Comparable,
 		Identifiable
 	{
 		case _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11
@@ -32,6 +33,12 @@ extension Profile.Network.Account {
 	}
 }
 
+extension RawRepresentable where RawValue: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		lhs.rawValue < rhs.rawValue
+	}
+}
+
 extension Profile.Network.Account.AppearanceID {
 	public struct UnknownID: Swift.Error {
 		let unknown: Profile.Network.Account.AppearanceID.ID
@@ -41,9 +48,9 @@ extension Profile.Network.Account.AppearanceID {
 		String(describing: id)
 	}
 
-	public static func fromIndex(_ accountIndex: Int) -> Self {
+	public static func fromNumberOfAccounts(_ numberOfAccounts: Int) -> Self {
 		let mod = allCases.count
-		let gradientIndex = accountIndex % mod
+		let gradientIndex = numberOfAccounts % mod
 		return allCases[gradientIndex]
 	}
 }

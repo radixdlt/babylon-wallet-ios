@@ -7,7 +7,8 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		public var isOnMainnet: Bool
-		public let address: AccountAddress
+		public let account: Profile.Network.Account
+		public var address: AccountAddress { account.address }
 		public var faucetButtonState: ControlState
 
 		@PresentationState
@@ -24,11 +25,11 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 
 		public init(
 			isOnMainnet: Bool = true, // safest to default to true and change to false, we REALLY do not wanna display the faucet button for mainnet
-			address: AccountAddress,
+			account: Profile.Network.Account,
 			faucetButtonState: ControlState = .enabled
 		) {
 			self.isOnMainnet = isOnMainnet
-			self.address = address
+			self.account = account
 			self.faucetButtonState = faucetButtonState
 
 			#if DEBUG
@@ -55,6 +56,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		case createNonFungibleTokenButtonTapped
 		case createMultipleFungibleTokenButtonTapped
 		case createMultipleNonFungibleTokenButtonTapped
+		case deleteAccountButtonTapped
 		#endif // DEBUG
 	}
 
@@ -73,6 +75,9 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
+		#if DEBUG
+		case debugOnlyAccountWasDeleted
+		#endif
 	}
 
 	// MARK: - Destination
@@ -140,6 +145,11 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 				try await faucetClient.getFreeXRD(.init(recipientAccountAddress: $0))
 			}
 		#if DEBUG
+		case .deleteAccountButtonTapped:
+			return .run { [account = state.account] send in
+				try await accountsClient.debugOnlyDeleteAccount(account)
+				await send(.delegate(.debugOnlyAccountWasDeleted))
+			}
 		case .turnIntoDappDefinitionAccountTypeButtonTapped:
 			return .run { [accountAddress = state.address] send in
 				let accountAddress = try await accountsClient.getAccountByAddress(accountAddress)

@@ -54,10 +54,6 @@ public enum EntityPotentiallyVirtual: Sendable, Hashable, EntityBaseProtocol, Id
 		}
 	}
 
-	public var index: HD.Path.Component.Child.Value {
-		securityState.entityIndex
-	}
-
 	case account(Profile.Network.Account)
 	case persona(Profile.Network.Persona)
 	public var virtualHierarchicalDeterministicFactorInstances: Set<HierarchicalDeterministicFactorInstance> {
@@ -114,7 +110,7 @@ public enum SigningPurpose: Sendable, Hashable {
 		case internalManifest(InternalTXSignPurpose)
 		public enum InternalTXSignPurpose: Sendable, Hashable {
 			case transfer
-			case uploadAuthKey
+			case uploadAuthKey(forEntityKind: EntityKind)
 			#if DEBUG
 			/// E.g. turn account into dapp definition account type (setting metadata)
 			case debugModifyAccount

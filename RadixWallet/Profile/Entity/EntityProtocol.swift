@@ -7,10 +7,6 @@ public protocol EntityBaseProtocol {
 	/// The ID of the network this entity exists on.
 	var networkID: NetworkID { get }
 
-	/// The index of the account, being a counter, e.g. if you already have two accounts and create a third,
-	/// the index of the new account will be 2 (and the indices of the first is 0 and second is 1).
-	var index: HD.Path.Component.Child.Value { get }
-
 	/// Security state of this entity, either `secured` or not (controlled by a single FactorInstance)
 	var securityState: EntitySecurityState { get }
 
@@ -83,7 +79,6 @@ extension EntityProtocol {
 
 	public init(
 		networkID: NetworkID,
-		index: HD.Path.Component.Child.Value,
 		address: EntityAddress,
 		factorInstance: HierarchicalDeterministicFactorInstance,
 		displayName: NonEmpty<String>,
@@ -92,7 +87,7 @@ extension EntityProtocol {
 		self.init(
 			networkID: networkID,
 			address: address,
-			securityState: .unsecured(.init(entityIndex: index, transactionSigning: factorInstance)),
+			securityState: .unsecured(.init(transactionSigning: factorInstance)),
 			displayName: displayName,
 			extraProperties: extraProperties
 		)
@@ -100,7 +95,6 @@ extension EntityProtocol {
 
 	public init(
 		networkID: NetworkID,
-		index: HD.Path.Component.Child.Value,
 		factorInstance: HierarchicalDeterministicFactorInstance,
 		displayName: NonEmpty<String>,
 		extraProperties: ExtraProperties
@@ -108,7 +102,6 @@ extension EntityProtocol {
 		let address = try Self.deriveVirtualAddress(networkID: networkID, factorInstance: factorInstance)
 		self.init(
 			networkID: networkID,
-			index: index,
 			address: address,
 			factorInstance: factorInstance,
 			displayName: displayName,

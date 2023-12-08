@@ -64,6 +64,9 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 			)
 			return .none
 
+		case .startup(.delegate(.profileCreatedFromImportedBDFS)):
+			return sendDelegateCompleted(state: state)
+
 		case .startup(.delegate(.completed)):
 			return sendDelegateCompleted(state: state)
 

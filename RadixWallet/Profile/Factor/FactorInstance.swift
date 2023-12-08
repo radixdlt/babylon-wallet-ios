@@ -266,6 +266,17 @@ public struct HierarchicalDeterministicFactorInstance: Sendable, Hashable, Codab
 		)
 	}
 
+	public init(
+		factorSourceID: FactorSource.ID.FromHash,
+		publicHDKey: HierarchicalDeterministicPublicKey
+	) {
+		self.init(
+			id: factorSourceID,
+			publicKey: publicHDKey.publicKey,
+			derivationPath: publicHDKey.derivationPath
+		)
+	}
+
 	public init(from decoder: Decoder) throws {
 		let container = try decoder.singleValueContainer()
 		self = try container.decode(FactorInstance.self).virtualHierarchicalDeterministic()

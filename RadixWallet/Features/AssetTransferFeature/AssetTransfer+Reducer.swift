@@ -264,9 +264,12 @@ func instructionForDepositing(
 }
 
 /// Determines if depositting the resource into an account requires the addition of a signature
-func needsSignatureForDepositting(into receivingAccount: Profile.Network.Account, resource resourceAddress: ResourceAddress) async -> Bool {
+func needsSignatureForDepositting(
+	into receivingAccount: Profile.Network.Account,
+	resource resourceAddress: ResourceAddress
+) async -> Bool {
 	let depositSettings = receivingAccount.onLedgerSettings.thirdPartyDeposits
-	let resourceException = depositSettings.assetsExceptionList.first { $0.address == resourceAddress }?.exceptionRule
+	let resourceException = depositSettings.assetsExceptionSet().first { $0.address == resourceAddress }?.exceptionRule
 
 	switch (depositSettings.depositRule, resourceException) {
 	// AcceptAll

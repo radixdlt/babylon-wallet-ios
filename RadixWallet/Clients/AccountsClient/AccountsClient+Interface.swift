@@ -1,7 +1,7 @@
 // MARK: - AccountsClient
 public struct AccountsClient: Sendable {
 	public var getCurrentNetworkID: GetCurrentNetworkID
-	public var nextAccountIndex: NextAccountIndex
+	public var nextAppearanceID: NextAppearanceID
 
 	/// Accounts on current network (active gateway)
 	public var getAccountsOnCurrentNetwork: GetAccountsOnCurrentNetwork
@@ -29,9 +29,44 @@ public struct AccountsClient: Sendable {
 
 	public var updateAccount: UpdateAccount
 
+	#if DEBUG
+	public var debugOnlyDeleteAccount: DebugOnlyDeleteAccount
+	#endif
+
+	#if DEBUG
 	public init(
 		getCurrentNetworkID: @escaping GetCurrentNetworkID,
-		nextAccountIndex: @escaping NextAccountIndex,
+		nextAppearanceID: @escaping NextAppearanceID,
+		getAccountsOnCurrentNetwork: @escaping GetAccountsOnCurrentNetwork,
+		getHiddenAccountsOnCurrentNetwork: @escaping GetHiddenAccountsOnCurrentNetwork,
+		accountsOnCurrentNetwork: @escaping AccountsOnCurrentNetwork,
+		accountUpdates: @escaping AccountUpdates,
+		getAccountsOnNetwork: @escaping GetAccountsOnNetwork,
+		newVirtualAccount: @escaping NewVirtualAccount,
+		saveVirtualAccounts: @escaping SaveVirtualAccounts,
+		getAccountByAddress: @escaping GetAccountByAddress,
+		hasAccountOnNetwork: @escaping HasAccountOnNetwork,
+		updateAccount: @escaping UpdateAccount,
+		debugOnlyDeleteAccount: @escaping DebugOnlyDeleteAccount
+	) {
+		self.getCurrentNetworkID = getCurrentNetworkID
+		self.nextAppearanceID = nextAppearanceID
+		self.getAccountsOnCurrentNetwork = getAccountsOnCurrentNetwork
+		self.getHiddenAccountsOnCurrentNetwork = getHiddenAccountsOnCurrentNetwork
+		self.getAccountsOnNetwork = getAccountsOnNetwork
+		self.accountsOnCurrentNetwork = accountsOnCurrentNetwork
+		self.accountUpdates = accountUpdates
+		self.newVirtualAccount = newVirtualAccount
+		self.saveVirtualAccounts = saveVirtualAccounts
+		self.getAccountByAddress = getAccountByAddress
+		self.hasAccountOnNetwork = hasAccountOnNetwork
+		self.updateAccount = updateAccount
+		self.debugOnlyDeleteAccount = debugOnlyDeleteAccount
+	}
+	#else
+	public init(
+		getCurrentNetworkID: @escaping GetCurrentNetworkID,
+		nextAppearanceID: @escaping NextAppearanceID,
 		getAccountsOnCurrentNetwork: @escaping GetAccountsOnCurrentNetwork,
 		getHiddenAccountsOnCurrentNetwork: @escaping GetHiddenAccountsOnCurrentNetwork,
 		accountsOnCurrentNetwork: @escaping AccountsOnCurrentNetwork,
@@ -44,7 +79,7 @@ public struct AccountsClient: Sendable {
 		updateAccount: @escaping UpdateAccount
 	) {
 		self.getCurrentNetworkID = getCurrentNetworkID
-		self.nextAccountIndex = nextAccountIndex
+		self.nextAppearanceID = nextAppearanceID
 		self.getAccountsOnCurrentNetwork = getAccountsOnCurrentNetwork
 		self.getHiddenAccountsOnCurrentNetwork = getHiddenAccountsOnCurrentNetwork
 		self.getAccountsOnNetwork = getAccountsOnNetwork
@@ -56,13 +91,16 @@ public struct AccountsClient: Sendable {
 		self.hasAccountOnNetwork = hasAccountOnNetwork
 		self.updateAccount = updateAccount
 	}
+	#endif
 }
 
 extension AccountsClient {
 	public typealias Accounts = IdentifiedArrayOf<Profile.Network.Account>
 
 	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
-	public typealias NextAccountIndex = @Sendable (NetworkID?) async -> HD.Path.Component.Child.Value
+
+	public typealias NextAppearanceID = @Sendable (NetworkID?, _ offset: Int?) async -> Profile.Network.Account.AppearanceID
+
 	public typealias GetAccountsOnCurrentNetwork = @Sendable () async throws -> Accounts
 	public typealias GetHiddenAccountsOnCurrentNetwork = @Sendable () async throws -> Accounts
 	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> Accounts
@@ -78,6 +116,9 @@ extension AccountsClient {
 	public typealias HasAccountOnNetwork = @Sendable (NetworkID) async throws -> Bool
 
 	public typealias UpdateAccount = @Sendable (Profile.Network.Account) async throws -> Void
+	#if DEBUG
+	public typealias DebugOnlyDeleteAccount = @Sendable (Profile.Network.Account) async throws -> Void
+	#endif
 }
 
 // MARK: - NewAccountRequest

@@ -115,7 +115,7 @@ private extension SecureStorageClientTests {
 			let passphrase = ""
 			let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: passphrase)
 			let factorSource = try DeviceFactorSource.babylon(
-				mnemonicWithPassphrase: mnemonicWithPassphrase
+				mnemonicWithPassphrase: mnemonicWithPassphrase, isMain: true
 			)
 
 			let privateHDFactorSource = try PrivateHDFactorSource(

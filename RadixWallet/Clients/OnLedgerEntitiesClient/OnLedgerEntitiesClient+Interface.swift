@@ -112,46 +112,97 @@ extension OnLedgerEntitiesClient {
 
 extension OnLedgerEntitiesClient {
 	@Sendable
-	public func getEntity(
-		_ address: Address,
+	public func getEntities(
+		addresses: [Address],
 		metadataKeys: Set<EntityMetadataKey>,
-		forceRefresh: Bool = false
-	) async throws -> OnLedgerEntity {
-		guard let resource = try await getEntities([address], metadataKeys, nil, forceRefresh).first else {
-			throw Error.emptyResponse
-		}
-		return resource
+		forceRefresh: Bool = false,
+		atLedgerState: AtLedgerState? = nil
+	) async throws -> [OnLedgerEntity] {
+		try await getEntities(
+			addresses,
+			metadataKeys,
+			atLedgerState,
+			forceRefresh
+		)
 	}
 
 	@Sendable
 	public func getAccounts(
 		_ addresses: [AccountAddress],
-		forceRefresh: Bool = false
+		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys,
+		forceRefresh: Bool = false,
+		atLedgerState: AtLedgerState? = nil
 	) async throws -> [OnLedgerEntity.Account] {
-		try await getEntities(addresses.map(\.asGeneral), .resourceMetadataKeys, nil, forceRefresh).compactMap(\.account)
+		try await getEntities(
+			addresses: addresses.map(\.asGeneral),
+			metadataKeys: metadataKeys,
+			forceRefresh: forceRefresh,
+			atLedgerState: atLedgerState
+		).compactMap(\.account)
+	}
+
+	@Sendable
+	public func getEntity(
+		_ address: Address,
+		metadataKeys: Set<EntityMetadataKey>,
+		forceRefresh: Bool = false,
+		atLedgerState: AtLedgerState? = nil
+	) async throws -> OnLedgerEntity {
+		guard let entity = try await getEntities(
+			addresses: [address],
+			metadataKeys: metadataKeys,
+			forceRefresh: forceRefresh,
+			atLedgerState: atLedgerState
+		).first else {
+			throw Error.emptyResponse
+		}
+
+		return entity
 	}
 
 	@Sendable
 	public func getAccount(
 		_ address: AccountAddress,
-		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys
+		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys,
+		forceRefresh: Bool = false,
+		atLedgerState: AtLedgerState? = nil
 	) async throws -> OnLedgerEntity.Account {
-		guard let account = try await getEntity(address.asGeneral, metadataKeys: metadataKeys).account else {
+		guard let account = try await getEntity(
+			address.asGeneral,
+			metadataKeys: metadataKeys,
+			forceRefresh: forceRefresh,
+			atLedgerState: atLedgerState
+		).account else {
 			throw Error.emptyResponse
 		}
 		return account
 	}
 
 	@Sendable
-	public func getAssociatedDapps(_ addresses: [DappDefinitionAddress], forceRefresh: Bool = false) async throws -> [OnLedgerEntity.AssociatedDapp] {
-		try await getEntities(addresses.map(\.asGeneral), .dappMetadataKeys, nil, forceRefresh)
-			.compactMap(\.account)
-			.map { .init(address: $0.address, metadata: $0.metadata) }
+	public func getAssociatedDapps(
+		_ addresses: [DappDefinitionAddress],
+		forceRefresh: Bool = false,
+		atLedgerState: AtLedgerState? = nil
+	) async throws -> [OnLedgerEntity.AssociatedDapp] {
+		try await getEntities(
+			addresses: addresses.map(\.asGeneral),
+			metadataKeys: .dappMetadataKeys,
+			forceRefresh: forceRefresh,
+			atLedgerState: atLedgerState
+		)
+		.compactMap(\.account)
+		.map { .init(address: $0.address, metadata: $0.metadata) }
 	}
 
 	@Sendable
-	public func getAssociatedDapp(_ address: DappDefinitionAddress, forceRefresh: Bool = false) async throws -> OnLedgerEntity.AssociatedDapp {
-		guard let dApp = try await getAssociatedDapps([address], forceRefresh: forceRefresh).first else {
+	public func getAssociatedDapp(
+		_ address: DappDefinitionAddress,
+		forceRefresh: Bool = false
+	) async throws -> OnLedgerEntity.AssociatedDapp {
+		guard let dApp = try await getAssociatedDapps(
+			[address],
+			forceRefresh: forceRefresh
+		).first else {
 			throw Error.emptyResponse
 		}
 		return dApp
@@ -161,10 +212,15 @@ extension OnLedgerEntitiesClient {
 	public func getResources(
 		_ addresses: [ResourceAddress],
 		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys,
-		atLedgerState: AtLedgerState? = nil,
-		forceRefresh: Bool = false
+		forceRefresh: Bool = false,
+		atLedgerState: AtLedgerState? = nil
 	) async throws -> [OnLedgerEntity.Resource] {
-		try await getEntities(addresses.map(\.asGeneral), metadataKeys, atLedgerState, forceRefresh).compactMap(\.resource)
+		try await getEntities(
+			addresses: addresses.map(\.asGeneral),
+			metadataKeys: metadataKeys,
+			forceRefresh: forceRefresh,
+			atLedgerState: atLedgerState
+		).compactMap(\.resource)
 	}
 
 	@Sendable
@@ -173,7 +229,12 @@ extension OnLedgerEntitiesClient {
 		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys,
 		atLedgerState: AtLedgerState? = nil
 	) async throws -> OnLedgerEntity.Resource {
-		guard let resource = try await getResources([address], metadataKeys: metadataKeys, atLedgerState: atLedgerState).first else {
+		guard let resource = try await getResources(
+			[address],
+			metadataKeys: metadataKeys,
+			atLedgerState: atLedgerState
+		).first
+		else {
 			throw Error.emptyResponse
 		}
 		return resource
@@ -181,10 +242,16 @@ extension OnLedgerEntitiesClient {
 
 	/// Extracts the dApp definition address from a component, if one is present
 	@Sendable
-	public func getDappDefinitionAddress(_ component: ComponentAddress) async throws -> DappDefinitionAddress {
-		let entityMetadata = try await getEntity(component.asGeneral, metadataKeys: [.dappDefinition]).genericComponent?.metadata
+	public func getDappDefinitionAddress(
+		_ component: ComponentAddress
+	) async throws -> DappDefinitionAddress {
+		let entityMetadata = try await getEntity(
+			component.asGeneral,
+			metadataKeys: [.dappDefinition]
+		).genericComponent?.metadata
 
-		guard let dappDefinitionAddress = entityMetadata?.dappDefinition else {
+		guard let dappDefinitionAddress = entityMetadata?.dappDefinition
+		else {
 			throw OnLedgerEntity.Metadata.MetadataError.missingDappDefinition
 		}
 

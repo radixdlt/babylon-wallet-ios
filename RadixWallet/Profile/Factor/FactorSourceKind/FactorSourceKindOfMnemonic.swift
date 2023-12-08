@@ -1,8 +1,7 @@
 
-// MARK: - MnemonicBasedFactorSourceKind
-public enum MnemonicBasedFactorSourceKind: Sendable, Hashable {
+public enum FactorSourceKindOfMnemonic: Sendable, Hashable {
 	public enum OnDeviceMnemonicKind: Sendable, Hashable {
-		case babylon
+		case babylon(isMain: Bool)
 		case olympia
 	}
 
