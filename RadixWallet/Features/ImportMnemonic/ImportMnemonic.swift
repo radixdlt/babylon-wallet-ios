@@ -129,7 +129,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public struct PersistStrategy: Sendable, Hashable {
 			public enum Location: Sendable, Hashable {
 				case intoKeychainAndProfile
-				case intoKeychainOnly
 			}
 
 			public enum OnMnemonicExistsStrategy: Sendable, Hashable {
@@ -508,21 +507,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 						}
 					)))
 				}
-			}
-		case .intoKeychainOnly:
-			return .run { send in
-				await send(.internal(.saveFactorSourceResult(
-					TaskResult {
-						let saveIntoProfile = false
-						let factorSource = try await factorSourcesClient.addOnDeviceFactorSource(
-							onDeviceMnemonicKind: .babylon,
-							mnemonicWithPassphrase: mnemonicWithPassphrase,
-							onMnemonicExistsStrategy: persistStrategy.onMnemonicExistsStrategy,
-							saveIntoProfile: saveIntoProfile
-						)
-						return .init(factorSource: factorSource.embed(), savedIntoProfile: saveIntoProfile)
-					}
-				)))
 			}
 		}
 	}
