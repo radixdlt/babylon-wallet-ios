@@ -26,7 +26,7 @@ extension NonFungibleTokenDetails.ViewState.TokenDetails {
 			nonFungibleGlobalID: token.id,
 			name: token.data?.name,
 			description: token.data?.tokenDescription?.nilIfEmpty,
-			dataFields: token.data?.dataFields ?? []
+			dataFields: token.data?.arbitraryDataFields ?? []
 		)
 	}
 }
@@ -43,13 +43,16 @@ extension NonFungibleTokenDetails {
 			let nonFungibleGlobalID: NonFungibleGlobalId
 			let name: String?
 			let description: String?
-			let dataFields: [DataField]
+			let dataFields: [ArbitraryDataField]
 		}
 	}
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		public static let dataFieldTextMaxLength = 256
+		/// The text will be collapsed if it's length exeeds this value
+		public static let dataFieldTextCollapseLength = 256
+		/// Switch the layout based based on text length
+		public static let dataFieldHorizntalAlignmentThreshold = 40
 
 		private let store: StoreOf<NonFungibleTokenDetails>
 
@@ -70,13 +73,15 @@ extension NonFungibleTokenDetails {
 								}
 
 								KeyValueView(nonFungibleGlobalID: tokenDetails.nonFungibleGlobalID)
+
 								if let description = tokenDetails.description {
 									KeyValueView(key: L10n.AssetDetails.NFTDetails.description) {
 										ExpandableTextView(fullText: description, collapsedTextLength: Self.dataFieldTextMaxLength)
 									}
 								}
+
 								ForEach(tokenDetails.dataFields.identifiablyEnumerated()) { entry in
-									dataFieldView(entry.element, viewStore: viewStore)
+									arbitraryDataFieldView(entry.element, viewStore: viewStore)
 								}
 							}
 							.lineLimit(1)
@@ -104,10 +109,10 @@ extension NonFungibleTokenDetails {
 		}
 
 		@ViewBuilder
-		private func dataFieldView(_ field: ViewState.TokenDetails.DataField, viewStore: ViewStoreOf<NonFungibleTokenDetails>) -> some SwiftUI.View {
+		private func arbitraryDataFieldView(_ field: ViewState.TokenDetails.ArbitraryDataField, viewStore: ViewStoreOf<NonFungibleTokenDetails>) -> some SwiftUI.View {
 			switch field.kind {
 			case let .primitive(value):
-				if value.count < 40 {
+				if value.count <= Self.dataFieldHorizntalAlignmentThreshold {
 					KeyValueView(key: field.name, value: value)
 				} else {
 					VStack(alignment: .leading, spacing: .small3) {
@@ -152,9 +157,10 @@ extension NonFungibleTokenDetails {
 	}
 }
 
-// MARK: - NonFungibleTokenDetails.ViewState.TokenDetails.DataField
+// MARK: - NonFungibleTokenDetails.ViewState.TokenDetails.ArbitraryDataField
 extension NonFungibleTokenDetails.ViewState.TokenDetails {
-	public struct DataField: Hashable, Sendable {
+	/// Arbitrary data fields that are not standardized in the Wallet
+	public struct ArbitraryDataField: Hashable, Sendable {
 		public enum Kind: Hashable, Sendable {
 			case primitive(String)
 			case complex
@@ -171,12 +177,12 @@ extension NonFungibleTokenDetails.ViewState.TokenDetails {
 }
 
 extension OnLedgerEntity.NonFungibleToken.NFTData {
-	fileprivate var dataFields: [NonFungibleTokenDetails.ViewState.TokenDetails.DataField] {
-		fields.compactMap { field in
+	fileprivate var arbitraryDataFields: [NonFungibleTokenDetails.ViewState.TokenDetails.ArbitraryDataField] {
+		let standardFields = OnLedgerEntity.NonFungibleToken.NFTData.StandardField.allCases.map(\.rawValue)
+		return fields.compactMap { field in
 			guard let fieldName = field.fieldName,
 			      let kind = field.fieldKind,
-			      !OnLedgerEntity.NonFungibleToken.NFTData.StandardField
-			      .allCases.map(\.rawValue).contains(fieldName)
+			      !standardFields.contains(fieldName) // Filter out standard fields
 			else {
 				return nil
 			}
@@ -186,65 +192,53 @@ extension OnLedgerEntity.NonFungibleToken.NFTData {
 }
 
 private extension String {
-	var asDataField: NonFungibleTokenDetails.ViewState.TokenDetails.DataField.Kind? {
-		guard !isEmpty else {
-			return nil
-		}
-
-		return if let url = URL(string: self), ["http", "https"].contains(url.scheme) {
-			.url(url)
-		} else {
-			.primitive(self)
+	var asDataField: NonFungibleTokenDetails.ViewState.TokenDetails.ArbitraryDataField.Kind? {
+		nilIfEmpty {
+			if let url = URL(string: $0), ["http", "https"].contains(url.scheme) {
+				.url(url)
+			} else {
+				.primitive(self)
+			}
 		}
 	}
 
-	var asPrimitiveDataField: NonFungibleTokenDetails.ViewState.TokenDetails.DataField.Kind? {
-		guard !isEmpty else {
-			return nil
-		}
-
-		return .primitive(self)
+	var asPrimitiveDataField: NonFungibleTokenDetails.ViewState.TokenDetails.ArbitraryDataField.Kind? {
+		nilIfEmpty.map { .primitive($0) }
 	}
 
-	var asLedgerAddressDataField: NonFungibleTokenDetails.ViewState.TokenDetails.DataField.Kind? {
-		guard !isEmpty else {
-			return nil
-		}
-
-		return if let address = try? LedgerIdentifiable.Address(address: Address(validatingAddress: self)) {
-			.address(address)
-		} else {
-			.primitive(self)
+	var asLedgerAddressDataField: NonFungibleTokenDetails.ViewState.TokenDetails.ArbitraryDataField.Kind? {
+		nilIfEmpty.map {
+			if let address = try? LedgerIdentifiable.Address(address: Address(validatingAddress: $0)) {
+				.address(address)
+			} else {
+				.primitive(self)
+			}
 		}
 	}
 
-	var asDecimalDataField: NonFungibleTokenDetails.ViewState.TokenDetails.DataField.Kind? {
-		guard !isEmpty else {
-			return nil
-		}
-
-		return if let decimal = try? RETDecimal(value: self) {
-			.decimal(decimal)
-		} else {
-			.primitive(self)
+	var asDecimalDataField: NonFungibleTokenDetails.ViewState.TokenDetails.ArbitraryDataField.Kind? {
+		nilIfEmpty.map {
+			if let decimal = try? RETDecimal(value: $0) {
+				.decimal(decimal)
+			} else {
+				.primitive(self)
+			}
 		}
 	}
 
-	var asNonFungibleIDDataField: NonFungibleTokenDetails.ViewState.TokenDetails.DataField.Kind? {
-		guard !isEmpty else {
-			return nil
-		}
-
-		return if let id = try? NonFungibleLocalId.from(stringFormat: self) {
-			.id(id)
-		} else {
-			.primitive(self)
+	var asNonFungibleIDDataField: NonFungibleTokenDetails.ViewState.TokenDetails.ArbitraryDataField.Kind? {
+		nilIfEmpty.map {
+			if let id = try? NonFungibleLocalId.from(stringFormat: $0) {
+				.id(id)
+			} else {
+				.primitive(self)
+			}
 		}
 	}
 }
 
 extension GatewayAPI.ProgrammaticScryptoSborValue {
-	var fieldKind: NonFungibleTokenDetails.ViewState.TokenDetails.DataField.Kind? {
+	var fieldKind: NonFungibleTokenDetails.ViewState.TokenDetails.ArbitraryDataField.Kind? {
 		switch self {
 		case .array, .map, .mapEntry, .tuple:
 			.complex
@@ -342,9 +336,6 @@ extension GatewayAPI.ProgrammaticScryptoSborValue {
 			content.fieldName
 		}
 
-		guard name?.isEmpty == false else {
-			return nil
-		}
-		return name
+		return name?.nilIfEmpty
 	}
 }
