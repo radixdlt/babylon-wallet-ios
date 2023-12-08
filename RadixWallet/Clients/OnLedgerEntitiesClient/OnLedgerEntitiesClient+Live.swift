@@ -192,12 +192,16 @@ extension OnLedgerEntitiesClient {
 	) async throws -> [OnLedgerEntity] {
 		@Dependency(\.cacheClient) var cacheClient
 
-		guard cachingStrategy.read == .fromCache else {
-			let freshEntities = try await refresh(Array(identifiers))
+		func cacheIfSpecified(_ freshEntities: [OnLedgerEntity]) {
+			guard cachingStrategy.write == .toCache else { return }
 			freshEntities.forEach {
 				cacheClient.save($0, .onLedgerEntity($0.cachingIdentifier))
 			}
+		}
 
+		guard cachingStrategy.read == .fromCache else {
+			let freshEntities = try await refresh(Array(identifiers))
+			cacheIfSpecified(freshEntities)
 			return freshEntities
 		}
 
@@ -211,10 +215,7 @@ extension OnLedgerEntitiesClient {
 		}
 
 		let freshEntities = try await refresh(Array(notCachedEntities))
-		freshEntities.forEach {
-			cacheClient.save($0, .onLedgerEntity($0.cachingIdentifier))
-		}
-
+		cacheIfSpecified(freshEntities)
 		return cachedEntities + freshEntities
 	}
 

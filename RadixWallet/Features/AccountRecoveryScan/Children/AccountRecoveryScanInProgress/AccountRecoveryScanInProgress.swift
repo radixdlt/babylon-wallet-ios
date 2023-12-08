@@ -326,7 +326,7 @@ extension AccountRecoveryScanInProgress {
 					// actually we wanna `resourceMetadataKeys` as well here, but we cannot since
 					// the count will exceed `EntityMetadataKey.maxAllowedKeys`.
 					metadataKeys: [.ownerBadge, .ownerKeys],
-					cachingStrategy: OnLedgerEntitiesClient.CachingStrategy.readFromLedgerSkipWrite
+					cachingStrategy: .readFromLedgerSkipWrite
 				)
 				.filter { (onLedgerAccount: OnLedgerEntity.Account) -> Bool in
 
