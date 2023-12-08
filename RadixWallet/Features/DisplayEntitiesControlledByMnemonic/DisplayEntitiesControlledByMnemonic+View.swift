@@ -24,9 +24,9 @@ extension DisplayEntitiesControlledByMnemonic.State {
 					nil
 				}
 			}(),
-			promptUserToBackUpMnemonic: mode == .mnemonicCanBeDisplayed && !accountsForDeviceFactorSource.isMnemonicMarkedAsBackedUp,
-			accounts: accountsForDeviceFactorSource.accounts,
-			hasHiddenAccounts: !accountsForDeviceFactorSource.hiddenAccounts.isEmpty
+			promptUserToBackUpMnemonic: mode == .mnemonicCanBeDisplayed && !isMnemonicMarkedAsBackedUp,
+			accounts: accounts.elements,
+			hasHiddenAccounts: hasHiddenAccounts
 		)
 	}
 }

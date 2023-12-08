@@ -285,11 +285,15 @@ extension FactorSourcesClient {
 		onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy,
 		saveIntoProfile: Bool
 	) async throws -> DeviceFactorSource {
-		let isOlympiaCompatible = onDeviceMnemonicKind == .olympia
-
-		let factorSource: DeviceFactorSource = try isOlympiaCompatible
-			? .olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
-			: .babylon(mnemonicWithPassphrase: mnemonicWithPassphrase)
+		let factorSource: DeviceFactorSource = switch onDeviceMnemonicKind {
+		case let .babylon(isMain):
+			try DeviceFactorSource.babylon(
+				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				isMain: isMain
+			)
+		case .olympia:
+			try DeviceFactorSource.olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
+		}
 
 		try await self.addOnDeviceFactorSource(
 			privateHDFactorSource: .init(

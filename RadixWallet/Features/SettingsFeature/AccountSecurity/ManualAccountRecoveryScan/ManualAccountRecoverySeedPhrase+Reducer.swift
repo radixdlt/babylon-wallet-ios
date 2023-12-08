@@ -81,7 +81,7 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 			let title = state.isOlympia ? "Enter Legacy Seed Phrase" : "Enter Seed Phrase" // FIXME: Strings
 
 			let persistStrategy = ImportMnemonic.State.PersistStrategy(
-				factorSourceKindOfMnemonic: .onDevice(state.isOlympia ? .olympia : .babylon),
+				factorSourceKindOfMnemonic: .onDevice(state.isOlympia ? .olympia : .babylon(isMain: false)),
 				location: .intoKeychainAndProfile,
 				onMnemonicExistsStrategy: .appendWithCryptoParamaters
 			)

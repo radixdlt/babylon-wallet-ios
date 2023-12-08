@@ -76,6 +76,7 @@ extension DeviceFactorSource {
 
 	public static func babylon(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
+		isMain: Bool,
 		isOlympiaCompatible: Bool = false,
 		model: Hint.Model = "",
 		name: String = "",
@@ -87,7 +88,7 @@ extension DeviceFactorSource {
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
 			model: model,
 			name: name,
-			isMain: true,
+			isMain: isMain,
 			cryptoParametersPreset: .babylonOnly,
 			addedOn: addedOn ?? date(),
 			lastUsedOn: lastUsedOn ?? date()
