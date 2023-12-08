@@ -1,8 +1,18 @@
 import ComposableArchitecture
 import SwiftUI
 
+extension ManualAccountRecoveryCoordinator.State {
+	var viewState: ManualAccountRecoveryCoordinator.ViewState {
+		.init(showOlympiaSection: isMainnet)
+	}
+}
+
 // MARK: - ManualAccountRecoveryCoordinator.View
 extension ManualAccountRecoveryCoordinator {
+	public struct ViewState: Equatable {
+		let showOlympiaSection: Bool
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: Store
@@ -26,15 +36,19 @@ extension ManualAccountRecoveryCoordinator.View {
 
 	private func root() -> some View {
 		ScrollView {
-			VStack(spacing: .large3) {
-				header()
-				separator()
-				babylonSection()
-				separator()
-				olympiaSection()
+			WithViewStore(store, observe: \.viewState) { viewStore in
+				VStack(spacing: .large3) {
+					header()
+					separator()
+					babylonSection()
+					if viewStore.showOlympiaSection {
+						separator()
+						olympiaSection()
+					}
+				}
+				.foregroundStyle(.app.gray1)
+				.padding(.bottom, .small1)
 			}
-			.foregroundStyle(.app.gray1)
-			.padding(.bottom, .small1)
 		}
 		.background(.app.white)
 		.toolbar {
@@ -43,6 +57,9 @@ extension ManualAccountRecoveryCoordinator.View {
 					store.send(.view(.closeButtonTapped))
 				}
 			}
+		}
+		.onAppear {
+			store.send(.view(.appeared))
 		}
 	}
 

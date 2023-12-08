@@ -7,6 +7,11 @@ public struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		public var path: StackState<Path.State> = .init()
+		public var isMainnet: Bool
+
+		public init() {
+			self.isMainnet = false
+		}
 	}
 
 	// MARK: - Path
@@ -47,6 +52,7 @@ public struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
+		case appeared
 		case closeButtonTapped
 		case useSeedPhraseTapped(isOlympia: Bool)
 		case useLedgerTapped(isOlympia: Bool)
@@ -56,11 +62,16 @@ public struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 		case path(StackActionOf<Path>)
 	}
 
+	public enum InternalAction: Sendable, Equatable {
+		case isMainnet(Bool)
+	}
+
 	public enum DelegateAction: Sendable, Equatable {
 		case gotoAccountList
 	}
 
 	@Dependency(\.dismiss) var dismiss
+	@Dependency(\.gatewaysClient) var gatewaysClient
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -71,6 +82,12 @@ public struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
+		case .appeared:
+			return .run { send in
+				let isMainnet = await gatewaysClient.getCurrentGateway().network == .mainnet
+				await send(.internal(.isMainnet(isMainnet)))
+			}
+
 		case .closeButtonTapped:
 			return .run { _ in await dismiss() }
 
@@ -90,6 +107,14 @@ public struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 			reduce(into: &state, id: id, pathAction: pathAction)
 		default:
 			.none
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .isMainnet(isMainnet):
+			state.isMainnet = isMainnet
+			return .none
 		}
 	}
 
