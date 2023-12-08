@@ -49,6 +49,8 @@ extension NonFungibleTokenDetails {
 
 	@MainActor
 	public struct View: SwiftUI.View {
+		public static let dataFieldTextMaxLength = 256
+
 		private let store: StoreOf<NonFungibleTokenDetails>
 
 		public init(store: StoreOf<NonFungibleTokenDetails>) {
@@ -56,7 +58,7 @@ extension NonFungibleTokenDetails {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState) { viewStore in
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				DetailsContainer(title: .success(viewStore.tokenDetails?.name ?? "")) {
 					store.send(.view(.closeButtonTapped))
 				} contents: {
@@ -69,10 +71,12 @@ extension NonFungibleTokenDetails {
 
 								KeyValueView(nonFungibleGlobalID: tokenDetails.nonFungibleGlobalID)
 								if let description = tokenDetails.description {
-									KeyValueView(key: "Description", value: description)
+									KeyValueView(key: "Description") {
+										ExpandableTextView(fullText: description, maxLength: Self.dataFieldTextMaxLength)
+									}
 								}
 								ForEach(tokenDetails.dataFields.identifiablyEnumerated()) { entry in
-									dataFieldView(entry.element)
+									dataFieldView(entry.element, viewStore: viewStore)
 								}
 							}
 							.lineLimit(1)
@@ -94,29 +98,42 @@ extension NonFungibleTokenDetails {
 				}
 				.foregroundColor(.app.gray1)
 				.task { @MainActor in
-					await viewStore.send(.view(.task)).finish()
+					await viewStore.send(.task).finish()
 				}
 			}
 		}
 
 		@ViewBuilder
-		private func dataFieldView(_ field: ViewState.TokenDetails.DataField) -> some SwiftUI.View {
+		private func dataFieldView(_ field: ViewState.TokenDetails.DataField, viewStore: ViewStoreOf<NonFungibleTokenDetails>) -> some SwiftUI.View {
 			switch field.kind {
 			case let .primitive(value):
-				KeyValueView(key: field.name, value: value)
+				if value.count < 40 {
+					KeyValueView(key: field.name, value: value)
+				} else {
+					VStack(alignment: .leading, spacing: .small3) {
+						Text(field.name)
+							.textStyle(.body1Regular)
+							.foregroundColor(.app.gray2)
+						ExpandableTextView(fullText: value, maxLength: Self.dataFieldTextMaxLength)
+					}
+					.flushedLeft
+				}
+			//                KeyValueView(key: field.name) {
+			//                    ExpandableTextView(fullText: value, maxLength: Self.dataFieldTextMaxLength)
+			//                }
 			case .complex:
 				KeyValueView(key: field.name, value: "Complex")
 			case let .url(url):
-				KeyValueView(key: field.name) {
+				VStack(alignment: .leading, spacing: .small3) {
+					Text(field.name)
+						.textStyle(.body1Regular)
+						.foregroundColor(.app.gray2)
 					Button(url.absoluteString) {
-						Task {
-							@Dependency(\.openURL) var openURL
-							await openURL(url)
-						}
-						//   viewStore.send(.openURLTapped(domain))
+						viewStore.send(.openURLTapped(url))
 					}
 					.buttonStyle(.url)
 				}
+				.flushedLeft
 			case let .address(address):
 				KeyValueView(key: field.name) {
 					AddressView(.address(address))
@@ -171,13 +188,51 @@ private extension String {
 			return nil
 		}
 
+		return if let url = URL(string: self), ["http", "https"].contains(url.scheme) {
+			.url(url)
+		} else {
+			.primitive(self)
+		}
+	}
+
+	var asPrimitiveDataField: NonFungibleTokenDetails.ViewState.TokenDetails.DataField.Kind? {
+		guard !isEmpty else {
+			return nil
+		}
+
+		return .primitive(self)
+	}
+
+	var asLedgerAddressDataField: NonFungibleTokenDetails.ViewState.TokenDetails.DataField.Kind? {
+		guard !isEmpty else {
+			return nil
+		}
+
 		return if let address = try? LedgerIdentifiable.Address(address: Address(validatingAddress: self)) {
 			.address(address)
-		} else if let url = URL(string: self), ["http", "https"].contains(url.scheme) {
-			.url(url)
-		} else if let decimal = try? RETDecimal(value: self) {
+		} else {
+			.primitive(self)
+		}
+	}
+
+	var asDecimalDataField: NonFungibleTokenDetails.ViewState.TokenDetails.DataField.Kind? {
+		guard !isEmpty else {
+			return nil
+		}
+
+		return if let decimal = try? RETDecimal(value: self) {
 			.decimal(decimal)
-		} else if let id = try? NonFungibleLocalId.from(stringFormat: self) {
+		} else {
+			.primitive(self)
+		}
+	}
+
+	var asNonFungibleIDDataField: NonFungibleTokenDetails.ViewState.TokenDetails.DataField.Kind? {
+		guard !isEmpty else {
+			return nil
+		}
+
+		return if let id = try? NonFungibleLocalId.from(stringFormat: self) {
 			.id(id)
 		} else {
 			.primitive(self)
@@ -194,39 +249,39 @@ extension GatewayAPI.ProgrammaticScryptoSborValue {
 		case let .bool(content):
 			.primitive(String(content.value))
 		case let .bytes(content):
-			content.hex.asDataField
+			content.hex.asPrimitiveDataField
 		case let .i8(content):
-			content.value.asDataField
+			content.value.asPrimitiveDataField
 		case let .i16(content):
-			content.value.asDataField
+			"asnd wis adiu dw idbwdb soahdbwobd sdiwudbsd sdwbdwd sdwdsd sduiwdidn sdiowdb sdwiod sdiwdw dwodbsdnwh asnd wis adiu dw idbwdb soahdbwobd sdiwudbsd sdwbdwd sdwdsd sduiwdidn sdiowdb sdwiod sdiwdw dwodbsdnwh asnd wis adiu dw idbwdb soahdbwobd sdiwudbsd sdwbdwd sdwdsd sduiwdidn sdiowdb sdwiod sdiwdw dwodbsdnwh ".asPrimitiveDataField
 		case let .i32(content):
-			content.value.asDataField
+			content.value.asPrimitiveDataField
 		case let .i64(content):
-			content.value.asDataField
+			content.value.asPrimitiveDataField
 		case let .i128(content):
-			content.value.asDataField
+			content.value.asPrimitiveDataField
 		case let .u8(content):
-			content.value.asDataField
+			content.value.asPrimitiveDataField
 		case let .u16(content):
-			content.value.asDataField
+			content.value.asPrimitiveDataField
 		case let .u32(content):
-			content.value.asDataField
+			content.value.asPrimitiveDataField
 		case let .u64(content):
-			content.value.asDataField
+			content.value.asPrimitiveDataField
 		case let .u128(content):
-			content.value.asDataField
+			content.value.asPrimitiveDataField
 		case let .decimal(content):
-			content.value.asDataField
+			content.value.asDecimalDataField
 		case let .preciseDecimal(content):
-			content.value.asDataField
+			content.value.asDecimalDataField
 		case let .enum(content):
 			content.variantName.map { .enum(variant: $0) }
 		case let .nonFungibleLocalId(content):
-			content.value.asDataField
+			content.value.asNonFungibleIDDataField
 		case let .own(content):
-			content.value.asDataField
+			content.value.asLedgerAddressDataField
 		case let .reference(content):
-			content.value.asDataField
+			content.value.asLedgerAddressDataField
 		case let .string(content):
 			content.value.asDataField
 		}

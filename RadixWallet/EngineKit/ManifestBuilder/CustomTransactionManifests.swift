@@ -87,7 +87,7 @@ extension ManifestBuilder {
 		networkID: NetworkID
 	) throws -> TransactionManifest {
 		let instructions = try Instructions.fromString(
-			string: createNonFungibleTokensRawManifest(account: account, nrOfTokens: 15),
+			string: createNonFungibleTokensRawManifest(account: account, nrOfTokens: 1),
 			networkId: networkID.rawValue
 		)
 		return TransactionManifest(instructions: instructions, blobs: [])
@@ -117,8 +117,11 @@ extension ManifestBuilder {
 		                    198u8
 		                    ),
 		                    Enum<0u8>(
-		                    10u8
-		                    )
+		                    128u8
+		                    ),
+		                            Enum<0u8>(
+		                            128u8
+		                            )
 		                    )
 		                    )
 		                    ),
@@ -133,7 +136,8 @@ extension ManifestBuilder {
 		                    "name",
 		                    "description",
 		                    "key_image_url",
-		                          "reference"
+		                          "resource_reference",
+		"account_reference"
 		                    )
 		                    )
 		                    )
@@ -156,7 +160,8 @@ extension ManifestBuilder {
 		                    "URL    With    white    space",
 		                    "URL    with    white    space",
 		                    "https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/KL    Haze-medium.jpg",
-		                          Address("account_tdx_2_12xn3lgz7xv4d0d4cx25nvfekyxx0fsawhmtht0dd550vcu5wwl0g70")
+		                          Address("resource_tdx_2_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxtfd2jc"),
+		                                  Address("account_tdx_2_12xp0styrk298hzu2jamhw4f7uks6hlqkyzsp8flutmjj2tl8xr5n9a")
 		                    )
 		                    )
 		                    )
@@ -198,7 +203,7 @@ extension ManifestBuilder {
 		                    "name"    =>    Tuple(
 		                    Enum<1u8>(
 		                    Enum<0u8>(
-		                    "SandboxNFT"
+		                    "NFT with references"
 		                    )
 		                    ),
 		                    true
@@ -807,11 +812,12 @@ extension ManifestBuilder {
 	}
 
 	static func createNonFungibleTokensRawManifest(account: AccountAddress, nrOfTokens: Int = 1) -> String {
-		let instructions = if nrOfTokens == 1 {
-			createMultipleIdsNonFungibleResourceRawInstruction
-		} else {
-			Array(repeating: createSmallNonFungbileResourceRawInstruction, count: nrOfTokens).joined(separator: "\n")
-		}
+		let instructions =
+			// if nrOfTokens == 1 {
+			createSmallNonFungbileResourceRawInstruction
+		//		} else {
+		//			Array(repeating: createSmallNonFungbileResourceRawInstruction, count: nrOfTokens).joined(separator: "\n")
+		//		}
 
 		return """
 		\(instructions)
