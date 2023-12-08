@@ -18,33 +18,33 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		public var isMainBDFS: Bool
 
 		public init(
-			entitiesControlledByFactorSource: EntitiesControlledByFactorSource,
+			entitiesControlledByFactorSource ents: EntitiesControlledByFactorSource,
 			isMainBDFS: Bool
 		) {
 			self.isMainBDFS = isMainBDFS
-			self.entitiesControlledByFactorSource = entitiesControlledByFactorSource
+			self.entitiesControlledByFactorSource = ents
 
-			let accounts: IdentifiedArrayOf<Profile.Network.Account> = if isMainBDFS, let babylonAccounts = entitiesControlledByFactorSource.babylonAccounts {
+			let accounts: IdentifiedArrayOf<Profile.Network.Account> = switch (ents.babylonAccounts, ents.olympiaAccounts) {
+			case let (.some(babylonAccounts), _):
+				// We prefer Babylon, always.
 				babylonAccounts.rawValue
-			} else if isMainBDFS, entitiesControlledByFactorSource.babylonAccounts == nil, let olympiaAccounts = entitiesControlledByFactorSource.olympiaAccounts {
-				// Fun slight edge case:
-				// 1) User has a main BDFS call it B0 , which does NOT control any Babylon accounts (possible to be in this situation if the first Babylon account they created is controlled by a ledger FactorSource)
-				// 2) Use B0 in MARS with Olympia ==> CP_B -> CP_BOA find Olympia accounts (theoretically possible), save Olympia accounts in Profile, controlled by B0
-				// 3) Delete B0 from keychain (e.g. remove Passcode on iOS)
-				// 4) Trigger Import Mnemonics flow again: `isMainBDFS` is true, but we it controlls no babylon accounts... but it controlls Olympia accounts! So we show them!
+			case let (nil, .some(olympiaAccounts)):
 				olympiaAccounts.rawValue
-			} else {
-				entitiesControlledByFactorSource.olympiaAccounts?.rawValue ?? []
+			case (nil, nil):
+				// no accounts... still possible! i.e. Profile -> Create HARDWARE Account ->
+				// delete passcode -> import missing Mnemonic, which... does not control any
+				// accounts
+				[]
 			}
 
 			self.entities = .init(
 				id: .mixingBabylonAndOlympiaAccounts(
-					entitiesControlledByFactorSource.factorSourceID
+					ents.factorSourceID
 				),
-				isMnemonicMarkedAsBackedUp: entitiesControlledByFactorSource.isMnemonicMarkedAsBackedUp,
-				isMnemonicPresentInKeychain: entitiesControlledByFactorSource.isMnemonicPresentInKeychain,
+				isMnemonicMarkedAsBackedUp: ents.isMnemonicMarkedAsBackedUp,
+				isMnemonicPresentInKeychain: ents.isMnemonicPresentInKeychain,
 				accounts: accounts,
-				hasHiddenAccounts: !entitiesControlledByFactorSource.hiddenAccounts.isEmpty,
+				hasHiddenAccounts: !ents.hiddenAccounts.isEmpty,
 				mode: .displayAccountListOnly
 			)
 		}
