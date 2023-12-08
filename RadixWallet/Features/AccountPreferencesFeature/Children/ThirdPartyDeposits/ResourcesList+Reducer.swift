@@ -27,19 +27,21 @@ public struct ResourcesList: FeatureReducer, Sendable {
 	// MARK: State
 
 	public struct State: Hashable, Sendable {
+		let canModify: Bool
+
 		var allDepositorAddresses: OrderedSet<ResourceViewState.Address> {
 			switch mode {
 			case .allowDenyAssets:
-				OrderedSet(thirdPartyDeposits.assetsExceptionList.map { .assetException($0) })
+				OrderedSet(thirdPartyDeposits.assetsExceptionSet().map { .assetException($0) })
 			case .allowDepositors:
-				OrderedSet(thirdPartyDeposits.depositorsAllowList.map { .allowedDepositor($0) })
+				OrderedSet(thirdPartyDeposits.depositorsAllowSet().map { .allowedDepositor($0) })
 			}
 		}
 
 		var resourcesForDisplay: [ResourceViewState] {
 			switch mode {
 			case let .allowDenyAssets(exception):
-				let addresses: [ResourceViewState.Address] = thirdPartyDeposits.assetsExceptionList
+				let addresses: [ResourceViewState.Address] = thirdPartyDeposits.assetsExceptionSet()
 					.filter { $0.exceptionRule == exception }
 					.map { .assetException($0) }
 
@@ -152,9 +154,9 @@ public struct ResourcesList: FeatureReducer, Sendable {
 
 			switch newAsset {
 			case let .assetException(resource):
-				state.thirdPartyDeposits.assetsExceptionList.updateOrAppend(resource)
+				state.thirdPartyDeposits.appendToAssetsExceptionList(resource)
 			case let .allowedDepositor(depositorAddress):
-				state.thirdPartyDeposits.depositorsAllowList.updateOrAppend(depositorAddress)
+				state.thirdPartyDeposits.appendToDepositorsAllowList(depositorAddress)
 			}
 
 			return .send(.delegate(.updated(state.thirdPartyDeposits)))
@@ -194,9 +196,13 @@ public struct ResourcesList: FeatureReducer, Sendable {
 			state.loadedResources.removeAll(where: { $0.address == resource })
 			switch resource {
 			case let .assetException(resource):
-				state.thirdPartyDeposits.assetsExceptionList.removeAll(where: { $0.address == resource.address })
+				state.thirdPartyDeposits.updateAssetsExceptionList {
+					$0?.removeAll(where: { $0.address == resource.address })
+				}
 			case let .allowedDepositor(depositorAddress):
-				state.thirdPartyDeposits.depositorsAllowList.remove(depositorAddress)
+				state.thirdPartyDeposits.updateDepositorsAllowList {
+					$0?.remove(depositorAddress)
+				}
 			}
 
 			return .send(.delegate(.updated(state.thirdPartyDeposits)))

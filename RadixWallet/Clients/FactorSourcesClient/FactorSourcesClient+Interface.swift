@@ -1,5 +1,7 @@
 // MARK: - FactorSourcesClient
 public struct FactorSourcesClient: Sendable {
+	public var indicesOfEntitiesControlledByFactorSource: IndicesOfEntitiesControlledByFactorSource
+	public var nextEntityIndexForFactorSource: NextEntityIndexForFactorSource
 	public var getCurrentNetworkID: GetCurrentNetworkID
 	public var getMainDeviceFactorSource: GetMainDeviceFactorSource
 	public var createNewMainDeviceFactorSource: CreateNewMainDeviceFactorSource
@@ -14,11 +16,13 @@ public struct FactorSourcesClient: Sendable {
 	public var flagFactorSourceForDeletion: FlagFactorSourceForDeletion
 
 	public init(
+		indicesOfEntitiesControlledByFactorSource: @escaping IndicesOfEntitiesControlledByFactorSource,
 		getCurrentNetworkID: @escaping GetCurrentNetworkID,
 		getMainDeviceFactorSource: @escaping GetMainDeviceFactorSource,
 		createNewMainDeviceFactorSource: @escaping CreateNewMainDeviceFactorSource,
 		getFactorSources: @escaping GetFactorSources,
 		factorSourcesAsyncSequence: @escaping FactorSourcesAsyncSequence,
+		nextEntityIndexForFactorSource: @escaping NextEntityIndexForFactorSource,
 		addPrivateHDFactorSource: @escaping AddPrivateHDFactorSource,
 		checkIfHasOlympiaFactorSourceForAccounts: @escaping CheckIfHasOlympiaFactorSourceForAccounts,
 		saveFactorSource: @escaping SaveFactorSource,
@@ -27,11 +31,13 @@ public struct FactorSourcesClient: Sendable {
 		updateLastUsed: @escaping UpdateLastUsed,
 		flagFactorSourceForDeletion: @escaping FlagFactorSourceForDeletion
 	) {
+		self.indicesOfEntitiesControlledByFactorSource = indicesOfEntitiesControlledByFactorSource
 		self.getCurrentNetworkID = getCurrentNetworkID
 		self.getMainDeviceFactorSource = getMainDeviceFactorSource
 		self.createNewMainDeviceFactorSource = createNewMainDeviceFactorSource
 		self.getFactorSources = getFactorSources
 		self.factorSourcesAsyncSequence = factorSourcesAsyncSequence
+		self.nextEntityIndexForFactorSource = nextEntityIndexForFactorSource
 		self.addPrivateHDFactorSource = addPrivateHDFactorSource
 		self.checkIfHasOlympiaFactorSourceForAccounts = checkIfHasOlympiaFactorSourceForAccounts
 		self.saveFactorSource = saveFactorSource
@@ -42,14 +48,50 @@ public struct FactorSourcesClient: Sendable {
 	}
 }
 
+// MARK: - NextEntityIndexForFactorSourceRequest
+public struct NextEntityIndexForFactorSourceRequest {
+	public let entityKind: EntityKind
+
+	/// `nil` means use main BDFS
+	public let factorSourceID: FactorSourceID?
+
+	/// If DeviceFactorSource with mnemonic `M` is used to derive Account with CAP26 derivation path at index `0`, then we must
+	/// allow `M` to be able to derive account wit hBIP44-like derivation path at index `0` as well in the future.
+	public let derivationPathScheme: DerivationPathScheme
+
+	/// `nil` means `currentNetwork`
+	public let networkID: NetworkID?
+}
+
+// MARK: - IndicesOfEntitiesControlledByFactorSourceRequest
+public struct IndicesOfEntitiesControlledByFactorSourceRequest: Sendable, Hashable {
+	public let entityKind: EntityKind
+	public let factorSourceID: FactorSourceID
+
+	/// If DeviceFactorSource with mnemonic `M` is used to derive Account with CAP26 derivation path at index `0`, then we must
+	/// allow `M` to be able to derive account wit hBIP44-like derivation path at index `0` as well in the future.
+	public let derivationPathScheme: DerivationPathScheme
+
+	public let networkID: NetworkID?
+}
+
+// MARK: - IndicesUsedByFactorSource
+public struct IndicesUsedByFactorSource: Sendable, Hashable {
+	let indices: OrderedSet<HD.Path.Component.Child.Value>
+	let factorSource: FactorSource
+	let currentNetworkID: NetworkID
+}
+
 // MARK: FactorSourcesClient.GetFactorSources
 extension FactorSourcesClient {
+	public typealias IndicesOfEntitiesControlledByFactorSource = @Sendable (IndicesOfEntitiesControlledByFactorSourceRequest) async throws -> IndicesUsedByFactorSource
+	public typealias NextEntityIndexForFactorSource = @Sendable (NextEntityIndexForFactorSourceRequest) async throws -> HD.Path.Component.Child.Value
 	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 	public typealias GetMainDeviceFactorSource = @Sendable () async throws -> DeviceFactorSource
 	public typealias CreateNewMainDeviceFactorSource = @Sendable () async throws -> PrivateHDFactorSource
 	public typealias GetFactorSources = @Sendable () async throws -> FactorSources
 	public typealias FactorSourcesAsyncSequence = @Sendable () async -> AnyAsyncSequence<FactorSources>
-	public typealias AddPrivateHDFactorSource = @Sendable (AddPrivateHDFactorSourceRequest) async throws -> FactorSourceID
+	public typealias AddPrivateHDFactorSource = @Sendable (AddPrivateHDFactorSourceRequest) async throws -> FactorSourceID.FromHash
 	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (BIP39.WordCount, NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceID.FromHash?
 	public typealias SaveFactorSource = @Sendable (FactorSource) async throws -> Void
 	public typealias UpdateFactorSource = @Sendable (FactorSource) async throws -> Void
@@ -60,14 +102,18 @@ extension FactorSourcesClient {
 
 // MARK: - AddPrivateHDFactorSourceRequest
 public struct AddPrivateHDFactorSourceRequest: Sendable, Hashable {
-	public let factorSource: FactorSource
-	public let mnemonicWithPasshprase: MnemonicWithPassphrase
+	public let privateHDFactorSource: PrivateHDFactorSource
+	public let onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy
 	/// E.g. import babylon factor sources should only be saved keychain, not profile (already there).
 	public let saveIntoProfile: Bool
-	public init(factorSource: FactorSource, mnemonicWithPasshprase: MnemonicWithPassphrase, saveIntoProfile: Bool) {
-		self.factorSource = factorSource
-		self.mnemonicWithPasshprase = mnemonicWithPasshprase
+	public init(
+		privateHDFactorSource: PrivateHDFactorSource,
+		onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy,
+		saveIntoProfile: Bool
+	) {
+		self.privateHDFactorSource = privateHDFactorSource
 		self.saveIntoProfile = saveIntoProfile
+		self.onMnemonicExistsStrategy = onMnemonicExistsStrategy
 	}
 }
 
@@ -213,11 +259,7 @@ extension FactorSourcesClient {
 			label: label
 		)
 
-		_ = try await addPrivateHDFactorSource(.init(
-			factorSource: factorSource.embed(),
-			mnemonicWithPasshprase: mnemonicWithPassphrase,
-			saveIntoProfile: true
-		))
+		try await saveFactorSource(factorSource.embed())
 
 		return factorSource.embed()
 	}
@@ -225,34 +267,40 @@ extension FactorSourcesClient {
 	@discardableResult
 	public func addOnDeviceFactorSource(
 		privateHDFactorSource: PrivateHDFactorSource,
+		onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy,
 		saveIntoProfile: Bool
 	) async throws -> FactorSourceID {
-		try await addPrivateHDFactorSource(.init(
-			factorSource: privateHDFactorSource.factorSource.embed(),
-			mnemonicWithPasshprase: privateHDFactorSource.mnemonicWithPassphrase,
-			saveIntoProfile: saveIntoProfile
-		))
+		try await addPrivateHDFactorSource(
+			.init(
+				privateHDFactorSource: privateHDFactorSource,
+				onMnemonicExistsStrategy: onMnemonicExistsStrategy,
+				saveIntoProfile: saveIntoProfile
+			)
+		).embed()
 	}
 
 	public func addOnDeviceFactorSource(
-		onDeviceMnemonicKind: MnemonicBasedFactorSourceKind.OnDeviceMnemonicKind,
+		onDeviceMnemonicKind: FactorSourceKindOfMnemonic.OnDeviceMnemonicKind,
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		saveIntoProfile: Bool? = nil
-	) async throws -> FactorSource {
+		onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy,
+		saveIntoProfile: Bool
+	) async throws -> DeviceFactorSource {
 		let isOlympiaCompatible = onDeviceMnemonicKind == .olympia
-		let shouldSaveIntoProfile: Bool = saveIntoProfile ?? isOlympiaCompatible
 
 		let factorSource: DeviceFactorSource = try isOlympiaCompatible
 			? .olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
 			: .babylon(mnemonicWithPassphrase: mnemonicWithPassphrase)
 
-		_ = try await addPrivateHDFactorSource(.init(
-			factorSource: factorSource.embed(),
-			mnemonicWithPasshprase: mnemonicWithPassphrase,
-			saveIntoProfile: shouldSaveIntoProfile
-		))
+		try await self.addOnDeviceFactorSource(
+			privateHDFactorSource: .init(
+				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				factorSource: factorSource
+			),
+			onMnemonicExistsStrategy: onMnemonicExistsStrategy,
+			saveIntoProfile: saveIntoProfile
+		)
 
-		return factorSource.embed()
+		return factorSource
 	}
 }
 

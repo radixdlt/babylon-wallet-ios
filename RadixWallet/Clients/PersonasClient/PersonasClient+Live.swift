@@ -16,12 +16,6 @@ extension PersonasClient: DependencyKey {
 			personas: {
 				await profileStore.personaValues()
 			},
-			nextPersonaIndex: { maybeNetworkID async -> HD.Path.Component.Child.Value in
-				let currentNetworkID = await profileStore.profile.networkID
-				let networkID = maybeNetworkID ?? currentNetworkID
-				let count = await (try? profileStore.profile.network(id: networkID).nextPersonaIndex()) ?? 0
-				return HD.Path.Component.Child.Value(count)
-			},
 			getPersonas: {
 				try await profileStore.network().getPersonas()
 			},

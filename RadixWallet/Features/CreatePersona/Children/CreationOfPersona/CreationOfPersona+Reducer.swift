@@ -16,10 +16,11 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 				derivationPathOption: .next(
 					networkOption: .useCurrent,
 					entityKind: .identity,
-					curve: .curve25519
+					curve: .curve25519,
+					scheme: .cap26
 				),
 				factorSourceOption: .device,
-				purpose: .createEntity(kind: .identity)
+				purpose: .createNewEntity(kind: .identity)
 			)
 		}
 	}
@@ -73,10 +74,8 @@ public struct CreationOfPersona: Sendable, FeatureReducer {
 				return .send(.delegate(.createPersonaFailed))
 			}
 			return .run { [name = state.name, personaData = state.personaData] send in
-				let personaIndex = await personasClient.nextPersonaIndex(networkID)
 				let persona = try Profile.Network.Persona(
 					networkID: networkID,
-					index: .init(personaIndex),
 					factorInstance: .init(
 						factorSourceID: factorSourceID,
 						publicKey: hdKey.publicKey,

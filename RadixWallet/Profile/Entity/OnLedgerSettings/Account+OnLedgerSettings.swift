@@ -13,6 +13,10 @@ extension Profile.Network.Account {
 		/// The default value for newly created accounts.
 		/// After the account is created the OnLedgerSettings will be updated either by User or by syncing with the Ledger.
 		public static let `default` = Self(thirdPartyDeposits: .default)
+
+		/// The value used for "recovered" accounts, rediscovered using "Account Recovery Scan", either
+		/// from onboarding (assembly of Profile from mnemonic) or from App Settings.
+		public static let unknown = Self(thirdPartyDeposits: .unknown)
 	}
 }
 
@@ -54,17 +58,78 @@ extension Profile.Network.Account.OnLedgerSettings {
 		/// Controls the ability of thir-parties to deposit into this account
 		public var depositRule: DepositRule
 
-		/// Denies or allows third-party deposits of specific assets by ignoring the `depositMode`
-		public var assetsExceptionList: OrderedSet<AssetException>
+		/// Denies or allows third-party deposits of specific assets by ignoring the `depositMode`,
+		/// `nil` means that the account was "recovered" using "Account Recovery Scan" features,
+		/// thus the value is unknown.
+		private var assetsExceptionList: OrderedSet<AssetException>?
+
+		public func assetsExceptionSet() -> OrderedSet<AssetException> {
+			assetsExceptionList ?? []
+		}
+
+		public var isAssetsExceptionsUnknown: Bool {
+			assetsExceptionList == nil
+		}
+
+		public mutating func updateAssetsExceptionList(_ update: (inout OrderedSet<AssetException>?) -> Void) {
+			update(&self.assetsExceptionList)
+		}
+
+		public mutating func setAssetsExceptionList(
+			_ new: OrderedSet<AssetException>?
+		) {
+			updateAssetsExceptionList { $0 = new }
+		}
+
+		public mutating func removeAllAssetsExceptions() {
+			assetsExceptionList = []
+		}
+
+		public mutating func appendToAssetsExceptionList(_ new: AssetException) {
+			if assetsExceptionList == nil {
+				assetsExceptionList = [new]
+			} else {
+				assetsExceptionList!.updateOrAppend(new)
+			}
+		}
 
 		/// Allows certain third-party depositors to deposit assets freely.
-		/// Note: There is no `deny` counterpart for this.
-		public var depositorsAllowList: OrderedSet<DepositorAddress>
+		/// Note: There is no `deny` counterpart for this, `nil` means that the account was
+		/// "recovered" using "Account Recovery Scan" features. thus the value is unknown.
+		private var depositorsAllowList: OrderedSet<DepositorAddress>?
+
+		public var isAllowedDepositorsUnknown: Bool {
+			depositorsAllowList == nil
+		}
+
+		public func depositorsAllowSet() -> OrderedSet<DepositorAddress> {
+			depositorsAllowList ?? []
+		}
+
+		public mutating func removeAllAllowedDepositors() {
+			depositorsAllowList = []
+		}
+
+		public mutating func appendToDepositorsAllowList(_ new: DepositorAddress) {
+			if depositorsAllowList == nil {
+				depositorsAllowList = [new]
+			} else {
+				depositorsAllowList!.updateOrAppend(new)
+			}
+		}
+
+		public mutating func updateDepositorsAllowList(_ update: (inout OrderedSet<DepositorAddress>?) -> Void) {
+			update(&self.depositorsAllowList)
+		}
+
+		public mutating func setDepositorsAllowList(_ new: OrderedSet<DepositorAddress>?) {
+			updateDepositorsAllowList { $0 = new }
+		}
 
 		public init(
 			depositRule: DepositRule,
-			assetsExceptionList: OrderedSet<AssetException>,
-			depositorsAllowList: OrderedSet<DepositorAddress>
+			assetsExceptionList: OrderedSet<AssetException>?,
+			depositorsAllowList: OrderedSet<DepositorAddress>?
 		) {
 			self.depositRule = depositRule
 			self.assetsExceptionList = assetsExceptionList
@@ -72,7 +137,18 @@ extension Profile.Network.Account.OnLedgerSettings {
 		}
 
 		/// On Ledger default is `acceptAll` for deposit mode and empty lists
-		public static let `default` = Self(depositRule: .acceptAll, assetsExceptionList: [], depositorsAllowList: [])
+		public static let `default` = Self(
+			depositRule: .acceptAll,
+			assetsExceptionList: [],
+			depositorsAllowList: []
+		)
+
+		/// Used on recovered account
+		public static let unknown = Self(
+			depositRule: .acceptAll,
+			assetsExceptionList: nil,
+			depositorsAllowList: nil
+		)
 	}
 }
 

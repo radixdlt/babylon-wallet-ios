@@ -45,10 +45,6 @@ extension Profile.Network {
 		/// The ID of the network this account exists on.
 		public let networkID: NetworkID
 
-		public var index: HD.Path.Component.Child.Value {
-			securityState.entityIndex
-		}
-
 		/// The globally unique and identifiable Radix component address of this account. Can be used as
 		/// a stable ID. Cryptographically derived from a seeding public key which typically was created by
 		/// the `DeviceFactorSource` (and typically the same public key as an instance of the device factor
@@ -85,7 +81,7 @@ extension Profile.Network {
 			self.displayName = displayName
 			self.flags = []
 			self.appearanceID = extraProperties.appearanceID
-			self.onLedgerSettings = .default
+			self.onLedgerSettings = extraProperties.onLedgerSettings
 		}
 	}
 }
@@ -94,13 +90,14 @@ extension Profile.Network.Account {
 	/// Ephemeral, only used as arg passed to init.
 	public struct ExtraProperties: Sendable {
 		public var appearanceID: AppearanceID
+		public let onLedgerSettings: OnLedgerSettings
 
-		public init(appearanceID: AppearanceID) {
+		public init(
+			appearanceID: AppearanceID,
+			onLedgerSettings: OnLedgerSettings = .default
+		) {
 			self.appearanceID = appearanceID
-		}
-
-		public init(numberOfAccountsOnNetwork: Int) {
-			self.init(appearanceID: .fromIndex(numberOfAccountsOnNetwork))
+			self.onLedgerSettings = onLedgerSettings
 		}
 	}
 

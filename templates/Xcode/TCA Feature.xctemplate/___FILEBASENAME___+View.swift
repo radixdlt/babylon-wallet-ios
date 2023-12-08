@@ -1,5 +1,3 @@
-import FeaturePrelude
-
 extension ___VARIABLE_featureName___.State {
 	var viewState: ___VARIABLE_featureName___.ViewState {
 		.init()
@@ -7,13 +5,14 @@ extension ___VARIABLE_featureName___.State {
 }
 
 // MARK: - ___VARIABLE_featureName___.View
-extension ___VARIABLE_featureName___ {
-	public struct ViewState: Equatable {
+
+public extension ___VARIABLE_featureName___ {
+	struct ViewState: Equatable {
 		// TODO: declare some properties
 	}
 
 	@MainActor
-	public struct View: SwiftUI.View {
+	struct View: SwiftUI.View {
 		private let store: StoreOf<___VARIABLE_featureName___>
 
 		public init(store: StoreOf<___VARIABLE_featureName___>) {
@@ -36,6 +35,7 @@ extension ___VARIABLE_featureName___ {
 import SwiftUI // NB: necessary for previews to appear
 
 // MARK: - ___VARIABLE_featureName____Preview
+
 struct ___VARIABLE_featureName____Preview: PreviewProvider {
 	static var previews: some View {
 		___VARIABLE_featureName___.View(
@@ -47,7 +47,7 @@ struct ___VARIABLE_featureName____Preview: PreviewProvider {
 	}
 }
 
-extension ___VARIABLE_featureName___.State {
-	public static let previewValue = Self()
+public extension ___VARIABLE_featureName___.State {
+	static let previewValue = Self()
 }
 #endif

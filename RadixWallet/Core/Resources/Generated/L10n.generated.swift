@@ -400,6 +400,10 @@ public enum L10n {
     /// Validator
     public static let validator = L10n.tr("Localizable", "assetDetails_validator", fallback: "Validator")
     public enum NFTDetails {
+      /// complex data
+      public static let complexData = L10n.tr("Localizable", "assetDetails_NFTDetails_complexData", fallback: "complex data")
+      /// Description
+      public static let description = L10n.tr("Localizable", "assetDetails_NFTDetails_description", fallback: "Description")
       /// ID
       public static let id = L10n.tr("Localizable", "assetDetails_NFTDetails_id", fallback: "ID")
       /// Name
@@ -542,6 +546,10 @@ public enum L10n {
       public static let resourceAlreadyAdded = L10n.tr("Localizable", "assetTransfer_error_resourceAlreadyAdded", fallback: "Resource already added")
       /// Address is not valid on current network
       public static let wrongNetwork = L10n.tr("Localizable", "assetTransfer_error_wrongNetwork", fallback: "Address is not valid on current network")
+    }
+    public enum ExtraSignature {
+      /// You will be asked for an extra signature
+      public static let label = L10n.tr("Localizable", "assetTransfer_extraSignature_label", fallback: "You will be asked for an extra signature")
     }
     public enum FungibleResource {
       /// Balance: %@
@@ -747,6 +755,10 @@ public enum L10n {
     public static let retry = L10n.tr("Localizable", "common_retry", fallback: "Retry")
     /// Save
     public static let save = L10n.tr("Localizable", "common_save", fallback: "Save")
+    /// Show Less
+    public static let showLess = L10n.tr("Localizable", "common_showLess", fallback: "Show Less")
+    /// Show More
+    public static let showMore = L10n.tr("Localizable", "common_showMore", fallback: "Show More")
     /// Something went wrong
     public static let somethingWentWrong = L10n.tr("Localizable", "common_somethingWentWrong", fallback: "Something went wrong")
     /// Settings
@@ -1821,6 +1833,8 @@ public enum L10n {
     public static let title = L10n.tr("Localizable", "personas_title", fallback: "Personas")
     /// What is a Persona?
     public static let whatIsPersona = L10n.tr("Localizable", "personas_whatIsPersona", fallback: "What is a Persona?")
+    /// Write down main seed phrase
+    public static let writeSeedPhrase = L10n.tr("Localizable", "personas_writeSeedPhrase", fallback: "Write down main seed phrase")
   }
   public enum ProfileBackup {
     /// Backing up your wallet ensures that you can restore access to your Accounts, Personas, and wallet settings on a new phone by re-entering your seed phrase(s).
@@ -1946,6 +1960,12 @@ public enum L10n {
       public static let titleNoMainSeedPhrase = L10n.tr("Localizable", "recoverSeedPhrase_header_titleNoMainSeedPhrase", fallback: "No Main Seed Phrase?")
       /// Seed Phrase Required
       public static let titleOther = L10n.tr("Localizable", "recoverSeedPhrase_header_titleOther", fallback: "Seed Phrase Required")
+    }
+    public enum Hidden {
+      public enum Accounts {
+        /// Hidden accounts only.
+        public static let only = L10n.tr("Localizable", "recoverSeedPhrase_hidden_accounts_only", fallback: "Hidden accounts only.")
+      }
     }
   }
   public enum RevealSeedPhrase {
@@ -2094,6 +2114,12 @@ public enum L10n {
       public static let message = L10n.tr("Localizable", "splash_passcodeCheckFailedAlert_message", fallback: "Passcode is not set up. Please update settings.")
       /// Warning
       public static let title = L10n.tr("Localizable", "splash_passcodeCheckFailedAlert_title", fallback: "Warning")
+    }
+    public enum RootDetection {
+      /// I Understand the Risk
+      public static let acknowledgeButton = L10n.tr("Localizable", "splash_rootDetection_acknowledgeButton", fallback: "I Understand the Risk")
+      /// It appears that your device might be rooted. To ensure the security of your Accounts and assets, using the Radix Wallet on rooted devices is not recommended. Please confirm if you wish to continue anyway at your own risk.
+      public static let title = L10n.tr("Localizable", "splash_rootDetection_title", fallback: "It appears that your device might be rooted. To ensure the security of your Accounts and assets, using the Radix Wallet on rooted devices is not recommended. Please confirm if you wish to continue anyway at your own risk.")
     }
   }
   public enum TransactionReview {

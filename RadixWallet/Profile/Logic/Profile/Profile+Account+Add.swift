@@ -16,6 +16,14 @@ extension Profile {
 		try updateOnNetwork(network)
 	}
 
+	#if DEBUG
+	public mutating func deleteAccount(_ account: Profile.Network.Account) throws {
+		var network = try network(id: account.networkID)
+		network.deleteAccount(address: account.address)
+		try updateOnNetwork(network)
+	}
+	#endif
+
 	/// Saves an `Account` into the profile, if this is the first mainnet account,
 	/// we will switch to mainnet
 	public mutating func addAccount(
@@ -31,7 +39,7 @@ extension Profile {
 		} else {
 			let network = Profile.Network(
 				networkID: networkID,
-				accounts: .init(rawValue: [account])!,
+				accounts: [account].asIdentifiable(),
 				personas: [],
 				authorizedDapps: []
 			)

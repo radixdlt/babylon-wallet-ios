@@ -58,22 +58,29 @@ public enum EntityMetadataKey: String, CaseIterable {
 	case relatedWebsites = "related_websites"
 	case accountType = "account_type"
 	case ownerKeys = "owner_keys"
+	case ownerBadge = "owner_badge"
 
 	// The GW limits the number of metadata keys we can ask for
-	static var maxAllowedKeys = 10
+	static let maxAllowedKeys = 10
 }
 
 extension Set<EntityMetadataKey> {
 	public static var resourceMetadataKeys: Set<EntityMetadataKey> {
-		[.name, .symbol, .description, .iconURL, .validator, .pool, .accountType, .tags, .dappDefinition, .dappDefinitions]
+		let keys: Set<EntityMetadataKey> = [.name, .symbol, .description, .iconURL, .validator, .pool, .accountType, .tags, .dappDefinition, .dappDefinitions]
+		assert(keys.count <= EntityMetadataKey.maxAllowedKeys)
+		return keys
 	}
 
 	public static var poolUnitMetadataKeys: Set<EntityMetadataKey> {
-		[.name, .description, .iconURL, .poolUnit]
+		let keys: Set<EntityMetadataKey> = [.name, .description, .iconURL, .poolUnit]
+		assert(keys.count <= EntityMetadataKey.maxAllowedKeys)
+		return keys
 	}
 
 	public static var dappMetadataKeys: Set<EntityMetadataKey> {
-		[.name, .description, .iconURL, .claimedEntities, .claimedWebsites, .relatedWebsites, .dappDefinitions, .accountType]
+		let keys: Set<EntityMetadataKey> = [.name, .description, .iconURL, .claimedEntities, .claimedWebsites, .relatedWebsites, .dappDefinitions, .accountType]
+		assert(keys.count <= EntityMetadataKey.maxAllowedKeys)
+		return keys
 	}
 }
 

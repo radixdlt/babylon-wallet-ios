@@ -37,7 +37,8 @@ extension AccountSecurity.View {
 						}
 					}
 
-					if let row = importOlympiaRow(with: viewStore) {
+					if viewStore.canImportOlympiaWallet {
+						let row = importOlympiaRow
 						SettingsRow(row: row) {
 							store.send(.view(row.action))
 						}
@@ -77,18 +78,18 @@ extension AccountSecurity.View {
 				icon: .asset(AssetResource.depositGuarantees),
 				action: .defaultDepositGuaranteeButtonTapped
 			),
+			.init(
+				title: "Account Recovery Scan", // FIXME: Strings - L10n.Settings.AccountRecovery.title
+				subtitle: "Using seed phrase or Ledger device", // FIXME: Strings - L10n.Settings.AccountRecovery.subtitle
+				icon: .asset(AssetResource.appSettings), // TODO: Select asset
+				action: .accountRecoveryButtonTapped
+			),
 		]
 	}
 
 	@MainActor
-	private func importOlympiaRow(
-		with viewStore: ViewStoreOf<AccountSecurity>
-	) -> SettingsRowModel<AccountSecurity>? {
-		guard viewStore.canImportOlympiaWallet else {
-			return nil
-		}
-
-		return .init(
+	private var importOlympiaRow: SettingsRowModel<AccountSecurity> {
+		.init(
 			title: L10n.Settings.importFromLegacyWallet,
 			subtitle: nil,
 			icon: .asset(AssetResource.appSettings),
@@ -116,6 +117,7 @@ private extension View {
 			.ledgerHardwareWallets(with: destinationStore)
 			.depositGuarantees(with: destinationStore)
 			.importFromOlympiaLegacyWallet(with: destinationStore)
+			.accountRecovery(with: destinationStore)
 	}
 
 	private func mnemonics(with destinationStore: PresentationStoreOf<AccountSecurity.Destination>) -> some View {
@@ -156,6 +158,15 @@ private extension View {
 			state: /AccountSecurity.Destination.State.importOlympiaWallet,
 			action: AccountSecurity.Destination.Action.importOlympiaWallet,
 			content: { ImportOlympiaWalletCoordinator.View(store: $0) }
+		)
+	}
+
+	private func accountRecovery(with destinationStore: PresentationStoreOf<AccountSecurity.Destination>) -> some View {
+		fullScreenCover(
+			store: destinationStore,
+			state: /AccountSecurity.Destination.State.accountRecovery,
+			action: AccountSecurity.Destination.Action.accountRecovery,
+			content: { ManualAccountRecoveryCoordinator.View(store: $0) }
 		)
 	}
 }

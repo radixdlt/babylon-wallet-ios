@@ -14,6 +14,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		public enum Context: Sendable, Hashable {
 			case settings
 			case createHardwareAccount
+			case accountRecovery(olympia: Bool)
 			case setupMFA
 		}
 
@@ -60,6 +61,8 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case choseLedger(LedgerHardwareWalletFactorSource)
+		// Only used when in the `accountRecovery` context
+		case choseLedgerForRecovery(LedgerHardwareWalletFactorSource, isOlympia: Bool)
 	}
 
 	// MARK: - Destination
@@ -231,7 +234,11 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 			state.destination = .addNewLedger(.init())
 			return .none
 		case let .selectLedger(ledger):
-			return .send(.delegate(.choseLedger(ledger)))
+			if case let .accountRecovery(olympia: olympia) = state.context {
+				return .send(.delegate(.choseLedgerForRecovery(ledger, isOlympia: olympia)))
+			} else {
+				return .send(.delegate(.choseLedger(ledger)))
+			}
 		}
 	}
 }

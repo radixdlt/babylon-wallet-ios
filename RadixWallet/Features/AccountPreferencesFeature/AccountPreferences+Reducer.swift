@@ -141,6 +141,10 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			return .none
 		case .thirdPartyDeposits:
 			return .none
+		#if DEBUG
+		case .devPreferences(DevAccountPreferences.Action.delegate(.debugOnlyAccountWasDeleted)):
+			return .send(.delegate(.accountHidden))
+		#endif
 		case .devPreferences:
 			return .none
 		case let .confirmHideAccount(action):
@@ -182,7 +186,7 @@ extension AccountPreferences {
 			return .none
 
 		case .dev(.devPreferences):
-			state.destination = .devPreferences(.init(address: state.account.address))
+			state.destination = .devPreferences(.init(account: state.account))
 			return .none
 		}
 	}

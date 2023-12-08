@@ -5,7 +5,6 @@ public struct DeviceFactorSourceClient: Sendable {
 	public var isAccountRecoveryNeeded: IsAccountRecoveryNeeded
 
 	// FIXME: Find a better home for this...
-
 	public var entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource
 
 	/// Fetched accounts and personas on current network that are controlled by a device factor source, for every factor source in current profile
@@ -42,23 +41,56 @@ struct DiscrepancyUnsupportedCurve: Swift.Error {}
 
 // MARK: - PublicKeysFromOnDeviceHDRequest
 public struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
-	public let deviceFactorSource: DeviceFactorSource
 	public let derivationPaths: [DerivationPath]
-	public let loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose
+
+	public func getMnemonicWithPassphrase() throws -> MnemonicWithPassphrase {
+		@Dependency(\.secureStorageClient) var secureStorageClient
+		switch source {
+		case let .privateHDFactorSource(privateHD):
+			return privateHD.mnemonicWithPassphrase
+		case let .loadMnemonicFor(deviceFactorSource, loadMnemonicPurpose):
+			let factorSourceID = deviceFactorSource.id
+			guard
+				let mnemonicWithPassphrase = try secureStorageClient
+				.loadMnemonic(factorSourceID: factorSourceID, purpose: loadMnemonicPurpose)
+			else {
+				loggerGlobal.critical("Failed to find factor source with ID: '\(factorSourceID)'")
+				throw FailedToFindFactorSource()
+			}
+			return mnemonicWithPassphrase
+		}
+	}
+
+	public enum Source: Sendable, Hashable {
+		case privateHDFactorSource(PrivateHDFactorSource)
+		case loadMnemonicFor(DeviceFactorSource, purpose: SecureStorageClient.LoadMnemonicPurpose)
+
+		public var deviceFactorSource: DeviceFactorSource {
+			switch self {
+			case let .loadMnemonicFor(deviceFactorSource, _):
+				deviceFactorSource
+			case let .privateHDFactorSource(privateHDFactorSource):
+				privateHDFactorSource.factorSource
+			}
+		}
+	}
+
+	public let source: Source
+	public var deviceFactorSource: DeviceFactorSource {
+		source.deviceFactorSource
+	}
 
 	public init(
-		deviceFactorSource: DeviceFactorSource,
 		derivationPaths: [DerivationPath],
-		loadMnemonicPurpose: SecureStorageClient.LoadMnemonicPurpose
+		source: Source
 	) throws {
 		for derivationPath in derivationPaths {
-			guard deviceFactorSource.cryptoParameters.supportedCurves.contains(derivationPath.curveForScheme) else {
+			guard source.deviceFactorSource.cryptoParameters.supportedCurves.contains(derivationPath.curveForScheme) else {
 				throw DiscrepancyUnsupportedCurve()
 			}
 		}
-		self.deviceFactorSource = deviceFactorSource
 		self.derivationPaths = derivationPaths
-		self.loadMnemonicPurpose = loadMnemonicPurpose
+		self.source = source
 	}
 }
 
@@ -202,8 +234,8 @@ extension SigningPurpose {
 			return .signTransaction
 		case .signTransaction(.internalManifest(.transfer)):
 			return .signTransaction
-		case .signTransaction(.internalManifest(.uploadAuthKey)):
-			return .createSignAuthKey
+		case let .signTransaction(.internalManifest(.uploadAuthKey(forEntityKind))):
+			return .createSignAuthKey(forEntityKind: forEntityKind)
 		#if DEBUG
 		case .signTransaction(.internalManifest(.debugModifyAccount)):
 			return .updateAccountMetadata

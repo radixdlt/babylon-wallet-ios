@@ -1,8 +1,5 @@
-import ComposableArchitecture
-import SwiftUI
 #if DEBUG
 import ComposableArchitecture
-// Manifest turning account into Dapp Definition type, debug action...
 import SwiftUI
 #endif // DEBUG
 
@@ -90,6 +87,8 @@ extension DevAccountPreferences {
 						createNonFungibleTokenButton(with: viewStore)
 						createMultipleFungibleTokenButton(with: viewStore)
 						createMultipleNonFungibleTokenButton(with: viewStore)
+						Spacer(minLength: 0)
+						deleteAccountButton { store.send(.view(.deleteAccountButtonTapped)) }
 						#endif // DEBUG
 					}
 					.frame(maxHeight: .infinity, alignment: .top)
@@ -161,6 +160,11 @@ private extension View {
 }
 
 extension DevAccountPreferences.View {
+	private func deleteAccountButton(action: @escaping () -> Void) -> some View {
+		Button("DELETE ACCOUNT", action: action)
+			.buttonStyle(.primaryRectangular(isDestructive: true))
+	}
+
 	@ViewBuilder
 	private func turnIntoDappDefinitionAccountTypeButton(with viewStore: ViewStoreOf<DevAccountPreferences>) -> some View {
 		Button("Turn into dApp Definition account type") {
@@ -232,18 +236,3 @@ extension DevAccountPreferences.View {
 }
 
 #endif // DEBUG
-
-#if DEBUG
-import ComposableArchitecture
-import SwiftUI
-struct AccountPreferences_Preview: PreviewProvider {
-	static var previews: some View {
-		DevAccountPreferences.View(
-			store: .init(
-				initialState: .init(address: try! .init(validatingAddress: "account_tdx_c_1px26p5tyqq65809em2h4yjczxcxj776kaun6sv3dw66sc3wrm6")),
-				reducer: DevAccountPreferences.init
-			)
-		)
-	}
-}
-#endif

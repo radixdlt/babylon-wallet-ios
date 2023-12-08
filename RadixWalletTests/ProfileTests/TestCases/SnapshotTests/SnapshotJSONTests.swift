@@ -8,9 +8,14 @@ final class SnapshotJSONTests: TestCase {
 	func omit_test_generate() throws {
 		let plaintextSnapshot: ProfileSnapshot = try readTestFixture(
 			bundle: Bundle(for: Self.self),
-			// This Profile has been built using the PROD version of app, version `1.0.0 (5)`
-			// and exported as file and put here.
-			jsonName: "only_plaintext_profile_snapshot_version_100",
+
+			// This Profile was been built using the PROD version of app, version `1.0.0 (5)`
+			// and exported as file and put here, then after app version 1.2.0 we have made the
+			// following changes - which does NOT break backwards compatibility, hence we defer
+			// bumping the Profile Snapshot JSON format version number (it remains at `100`):
+			// * Added `flags` to Accounts/Personas with `deletedByUser` to support hide entities feature
+			// * Removed `index` from UnsecuredEntityControl (migrating over to FactorSource based indexing)
+			jsonName: "only_plaintext_profile_snapshot_version_100_patch_after_app_version_120",
 			jsonDecoder: jsonDecoder
 		)
 
@@ -56,6 +61,21 @@ final class SnapshotJSONTests: TestCase {
 		try testFixture(
 			bundle: Bundle(for: Self.self),
 			jsonName: "multi_profile_snapshots_test_version_100"
+		) { (vector: SnapshotTestVector) in
+			let decryptedSnapshots = try vector.validate()
+			XCTAssertAllEqual(
+				decryptedSnapshots.map(\.header.snapshotVersion),
+				vector.plaintext.header.snapshotVersion,
+				100
+			)
+			try XCTAssertJSONCoding(vector, encoder: jsonEncoder, decoder: jsonDecoder)
+		}
+	}
+
+	func test_profile_snapshot_version_100_patch_after_app_version_120() throws {
+		try testFixture(
+			bundle: Bundle(for: Self.self),
+			jsonName: "multi_profile_snapshots_test_version_100_patch_after_app_version_120"
 		) { (vector: SnapshotTestVector) in
 			let decryptedSnapshots = try vector.validate()
 			XCTAssertAllEqual(

@@ -11,11 +11,13 @@ extension FactorSourcesClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 
 	public static let testValue = Self(
+		indicesOfEntitiesControlledByFactorSource: unimplemented("\(Self.self).indicesOfEntitiesControlledByFactorSource"),
 		getCurrentNetworkID: unimplemented("\(Self.self).getCurrentNetworkID"),
 		getMainDeviceFactorSource: unimplemented("\(Self.self).getMainDeviceFactorSource"),
 		createNewMainDeviceFactorSource: unimplemented("\(Self.self).createNewMainDeviceFactorSource"),
 		getFactorSources: unimplemented("\(Self.self).getFactorSources"),
 		factorSourcesAsyncSequence: unimplemented("\(Self.self).factorSourcesAsyncSequence"),
+		nextEntityIndexForFactorSource: unimplemented("\(Self.self).nextEntityIndexForFactorSource"),
 		addPrivateHDFactorSource: unimplemented("\(Self.self).addPrivateHDFactorSource"),
 		checkIfHasOlympiaFactorSourceForAccounts: unimplemented("\(Self.self).checkIfHasOlympiaFactorSourceForAccounts"),
 		saveFactorSource: unimplemented("\(Self.self).saveFactorSource"),
@@ -26,11 +28,13 @@ extension FactorSourcesClient: TestDependencyKey {
 	)
 
 	public static let noop = Self(
+		indicesOfEntitiesControlledByFactorSource: { _ in throw NoopError() },
 		getCurrentNetworkID: { .kisharnet },
 		getMainDeviceFactorSource: { throw NoopError() },
 		createNewMainDeviceFactorSource: { throw NoopError() },
 		getFactorSources: { throw NoopError() },
 		factorSourcesAsyncSequence: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
+		nextEntityIndexForFactorSource: { _ in 0 },
 		addPrivateHDFactorSource: { _ in throw NoopError() },
 		checkIfHasOlympiaFactorSourceForAccounts: { _, _ in nil },
 		saveFactorSource: { _ in },

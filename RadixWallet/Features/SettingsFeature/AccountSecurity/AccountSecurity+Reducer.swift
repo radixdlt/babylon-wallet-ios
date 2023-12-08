@@ -32,6 +32,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		case defaultDepositGuaranteeButtonTapped
 		case ledgerHardwareWalletsButtonTapped
 		case importFromOlympiaWalletButtonTapped
+		case accountRecoveryButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -49,6 +50,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			case ledgerHardwareWallets(LedgerHardwareDevices.State)
 			case depositGuarantees(DefaultDepositGuarantees.State)
 			case importOlympiaWallet(ImportOlympiaWalletCoordinator.State)
+			case accountRecovery(ManualAccountRecoveryCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -56,6 +58,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			case ledgerHardwareWallets(LedgerHardwareDevices.Action)
 			case depositGuarantees(DefaultDepositGuarantees.Action)
 			case importOlympiaWallet(ImportOlympiaWalletCoordinator.Action)
+			case accountRecovery(ManualAccountRecoveryCoordinator.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -70,6 +73,9 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.importOlympiaWallet, action: /Action.importOlympiaWallet) {
 				ImportOlympiaWalletCoordinator()
+			}
+			Scope(state: /State.accountRecovery, action: /Action.accountRecovery) {
+				ManualAccountRecoveryCoordinator()
 			}
 		}
 	}
@@ -123,6 +129,10 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		case .importFromOlympiaWalletButtonTapped:
 			state.destination = .importOlympiaWallet(.init())
 			return .none
+
+		case .accountRecoveryButtonTapped:
+			state.destination = .accountRecovery(.init())
+			return .none
 		}
 	}
 
@@ -139,6 +149,9 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
+		case .accountRecovery(.delegate(.gotoAccountList)):
+			return .send(.delegate(.gotoAccountList))
+
 		case let .importOlympiaWallet(.delegate(.finishedMigration(gotoAccountList))):
 			if gotoAccountList {
 				return .send(.delegate(.gotoAccountList))

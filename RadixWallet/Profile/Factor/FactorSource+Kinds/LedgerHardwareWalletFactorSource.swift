@@ -22,7 +22,7 @@ public struct LedgerHardwareWalletFactorSource: FactorSourceProtocol {
 extension LedgerHardwareWalletFactorSource {
 	/// Kind of factor source
 	public static let kind: FactorSourceKind = .ledgerHQHardwareWallet
-	public static let casePath: CasePath<FactorSource, Self> = /FactorSource.ledger
+	public static let casePath: AnyCasePath<FactorSource, Self> = /FactorSource.ledger
 }
 
 // MARK: LedgerHardwareWalletFactorSource.Hint
@@ -65,7 +65,15 @@ extension LedgerHardwareWalletFactorSource {
 	) throws -> Self {
 		try .init(
 			id: ID(kind: .ledgerHQHardwareWallet, body: deviceID),
-			common: common(isOlympiaCompatible: true),
+			common: common(
+				// We MUST always save a Ledger with Babylon AND Olympia crypto parameters
+				// since most users typically only have one Ledger, and Olympia users must
+				// be able to import from Olympia wallet, which requires Olympia crypto
+				// parameters, and these user must also be able to later derive new Babylon
+				// accounts using the same Ledger, thus the FactorSource must have Babylon
+				// crypto parameters as well (since user is unable to "edit FactorSource").
+				cryptoParametersPreset: .babylonWithOlympiaCompatability
+			),
 			hint: .init(name: name, model: model)
 		)
 	}

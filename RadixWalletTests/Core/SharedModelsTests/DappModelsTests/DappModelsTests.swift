@@ -20,7 +20,7 @@ final class ToDappResponseTests: TestCase {
 						.init(
 							accountAddress: try! .init(validatingAddress: "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"),
 							label: "Label",
-							appearanceId: .fromIndex(0)
+							appearanceId: Profile.Network.Account.AppearanceID.fromNumberOfAccounts(0)
 						),
 					]),
 					oneTimePersonaData: .init(

@@ -6,6 +6,7 @@ extension ResourcesList.State {
 
 	var viewState: ResourcesList.ViewState {
 		.init(
+			canModify: canModify,
 			resources: .init(uncheckedUniqueElements: resourcesForDisplay),
 			info: {
 				switch mode {
@@ -31,6 +32,7 @@ extension ResourcesList.State {
 
 extension ResourcesList {
 	public struct ViewState: Equatable {
+		let canModify: Bool
 		let resources: IdentifiedArrayOf<ResourceViewState>
 		let info: String
 		let mode: ResourcesListMode
@@ -65,6 +67,7 @@ extension ResourcesList {
 						viewStore.send(.addAssetTapped)
 					}
 					.buttonStyle(.primaryRectangular)
+					.controlState(viewStore.canModify ? .enabled : .disabled)
 				}
 			}
 		}
@@ -73,7 +76,9 @@ extension ResourcesList {
 
 extension ResourcesList.View {
 	@ViewBuilder
-	func headerView(_ viewStore: ViewStoreOf<ResourcesList>) -> some SwiftUI.View {
+	func headerView(
+		_ viewStore: ViewStoreOf<ResourcesList>
+	) -> some SwiftUI.View {
 		Group {
 			if case let .allowDenyAssets(exceptionRule) = viewStore.mode {
 				Picker(
@@ -94,6 +99,14 @@ extension ResourcesList.View {
 				.textStyle(.body1HighImportance)
 				.foregroundColor(.app.gray2)
 				.multilineTextAlignment(.center)
+
+			if !viewStore.canModify {
+				// FIXME: Stringss
+				Text("⚠️ Sorry, this Account's third-party exceptions and depositor lists are in an unknown state and cannot be viewed or edited because it was imported using only a seed phrase or Ledger. A forthcoming wallet update will enable viewing and editing of these lists.")
+					.textStyle(.body1HighImportance)
+					.foregroundColor(.app.gray2)
+					.multilineTextAlignment(.center)
+			}
 		}
 		.padding(.horizontal, .medium1)
 	}
