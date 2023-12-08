@@ -21,7 +21,7 @@ extension EngineToolkit.SignatureWithPublicKey {
 }
 
 extension EngineToolkit.Signature {
-	public var bytes: [UInt8] {
+	public var bytes: Data {
 		switch self {
 		case let .secp256k1(value):
 			value
@@ -32,7 +32,7 @@ extension EngineToolkit.Signature {
 }
 
 extension EngineToolkit.PublicKey {
-	public var bytes: [UInt8] {
+	public var bytes: Data {
 		switch self {
 		case let .secp256k1(value):
 			value

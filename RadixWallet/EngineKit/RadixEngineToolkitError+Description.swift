@@ -51,6 +51,8 @@ extension RadixEngineToolkitError: LocalizedError {
 			"InvalidEntityTypeIdError - \(error)"
 		case .DecimalError:
 			"DecimalError"
+		case let .SignerError(error):
+			"SignerError - \(error)"
 		}
 
 		return Self.errorPrefix + errorMessage

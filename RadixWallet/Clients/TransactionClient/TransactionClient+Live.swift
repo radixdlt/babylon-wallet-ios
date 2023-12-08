@@ -171,7 +171,7 @@ extension TransactionClient {
 			guard transactionPreviewResponse.receipt.status == .succeeded else {
 				throw TransactionFailure.fromFailedTXReviewResponse(transactionPreviewResponse)
 			}
-			let receiptBytes = try [UInt8](hex: transactionPreviewResponse.encodedReceipt)
+			let receiptBytes = try Data(hex: transactionPreviewResponse.encodedReceipt)
 
 			/// Analyze the manifest
 			let analyzedManifestToReview = try request.manifestToSign.analyzeExecution(transactionReceipt: receiptBytes)
