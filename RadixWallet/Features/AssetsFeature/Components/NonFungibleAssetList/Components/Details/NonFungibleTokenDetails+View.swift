@@ -25,7 +25,7 @@ extension NonFungibleTokenDetails.ViewState.TokenDetails {
 			keyImage: token.data?.keyImageURL,
 			nonFungibleGlobalID: token.id,
 			name: token.data?.name,
-			description: token.data?.tokenDescription,
+			description: token.data?.tokenDescription?.nilIfEmpty,
 			dataFields: token.data?.dataFields ?? []
 		)
 	}
@@ -256,7 +256,7 @@ extension GatewayAPI.ProgrammaticScryptoSborValue {
 		case let .i8(content):
 			content.value.asPrimitiveDataField
 		case let .i16(content):
-			"asnd wis adiu dw idbwdb soahdbwobd sdiwudbsd sdwbdwd sdwdsd sduiwdidn sdiowdb sdwiod sdiwdw dwodbsdnwh asnd wis adiu dw idbwdb soahdbwobd sdiwudbsd sdwbdwd sdwdsd sduiwdidn sdiowdb sdwiod sdiwdw dwodbsdnwh asnd wis adiu dw idbwdb soahdbwobd sdiwudbsd sdwbdwd sdwdsd sduiwdidn sdiowdb sdwiod sdiwdw dwodbsdnwh ".asPrimitiveDataField
+			content.value.asPrimitiveDataField
 		case let .i32(content):
 			content.value.asPrimitiveDataField
 		case let .i64(content):

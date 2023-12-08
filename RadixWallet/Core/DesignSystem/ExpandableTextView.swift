@@ -45,6 +45,5 @@ struct ExpandableTextView: View {
 				}
 			}
 		}
-		.padding(.zero)
 	}
 }
