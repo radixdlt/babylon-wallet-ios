@@ -6,6 +6,7 @@ extension ImportMnemonic.State {
 	var viewState: ImportMnemonic.ViewState {
 		var viewState = ImportMnemonic.ViewState(
 			readonlyMode: mode.readonly?.context,
+			hideAdvancedMode: mode.write?.hideAdvancedMode ?? false,
 			isProgressing: mode.write?.isProgressing ?? false,
 			isWordCountFixed: isWordCountFixed,
 			isAdvancedMode: isAdvancedMode,
@@ -36,6 +37,7 @@ extension ImportMnemonic {
 		}
 
 		let readonlyMode: ImportMnemonic.State.ReadonlyMode.Context?
+		let hideAdvancedMode: Bool
 		let isProgressing: Bool // irrelevant for read only mode
 		let isWordCountFixed: Bool
 		let isAdvancedMode: Bool
@@ -46,6 +48,11 @@ extension ImportMnemonic {
 		let completedWords: [BIP39.Word]
 		let mnemonic: Mnemonic?
 		let bip39Passphrase: String
+
+		var showModeButton: Bool {
+			!isReadonlyMode && !hideAdvancedMode
+		}
+
 		var showBackButton: Bool {
 			guard let readonlyMode, case .fromSettings = readonlyMode else { return false }
 			return true
@@ -103,7 +110,7 @@ extension ImportMnemonic {
 					VStack(spacing: 0) {
 						if let header = viewStore.header {
 							HeaderView(header: header)
-								.padding(.bottom, viewStore.isWordCountFixed ? .medium1 : 0)
+								.padding(.bottom, viewStore.isWordCountFixed ? .medium3 : 0)
 						}
 
 						if let warning = viewStore.warning {
@@ -134,81 +141,7 @@ extension ImportMnemonic {
 						}
 
 						#if DEBUG
-						if viewStore.isReadonlyMode {
-							Button("DEBUG ONLY Copy") {
-								viewStore.send(.debugCopyMnemonic)
-							}
-							.buttonStyle(
-								.secondaryRectangular(
-									shouldExpand: true,
-									isDestructive: true,
-									isInToolbar: true
-								)
-							)
-							.padding(.horizontal, .medium2)
-							.padding(.bottom, .medium3)
-						} else {
-							if !(viewStore.isWordCountFixed && viewStore.wordCount == .twentyFour) {
-								Button("DEBUG AccRecScan Olympia 15") {
-									viewStore.send(.debugUseOlympiaTestingMnemonicWithActiveAccounts)
-								}
-								.buttonStyle(
-									.secondaryRectangular(
-										shouldExpand: true,
-										isDestructive: true,
-										isInToolbar: true
-									)
-								)
-								.padding(.horizontal, .medium2)
-								.padding(.bottom, .medium3)
-							}
-
-							Button("DEBUG AccRecScan Babylon 24") {
-								viewStore.send(.debugUseBabylonTestingMnemonicWithActiveAccounts)
-							}
-							.buttonStyle(
-								.secondaryRectangular(
-									shouldExpand: true,
-									isDestructive: true,
-									isInToolbar: true
-								)
-							)
-							.padding(.horizontal, .medium2)
-							.padding(.bottom, .medium3)
-
-							Button(
-								"DEBUG zoo..vote (24)"
-							) {
-								viewStore.send(
-									.debugUseTestingMnemonicZooVote
-								)
-							}
-							.buttonStyle(
-								.secondaryRectangular(
-									shouldExpand: true,
-									isDestructive: true,
-									isInToolbar: true
-								)
-							)
-							.padding(.horizontal, .medium2)
-							.padding(.bottom, .medium3)
-
-							AppTextField(
-								placeholder: "DEBUG ONLY paste mnemonic",
-								text: viewStore.binding(
-									get: { $0.debugMnemonicPhraseSingleField },
-									send: { .debugMnemonicChanged($0) }
-								),
-								innerAccessory: {
-									Button("Paste") {
-										viewStore.send(.debugPasteMnemonic)
-									}
-									.buttonStyle(.borderedProminent)
-								}
-							)
-							.padding(.horizontal, .medium2)
-							.padding(.bottom, .medium2)
-						}
+						debugSection(with: viewStore)
 						#endif
 
 						wordsGrid(with: viewStore)
@@ -221,7 +154,7 @@ extension ImportMnemonic {
 								.padding(.bottom, .medium2)
 						}
 
-						if !viewStore.isReadonlyMode {
+						if viewStore.showModeButton {
 							Button(viewStore.modeButtonTitle) {
 								viewStore.send(.toggleModeButtonTapped)
 							}
@@ -338,7 +271,7 @@ private extension View {
 
 extension ImportMnemonic.View {
 	@ViewBuilder
-	private func wordsGrid(with viewStore: ViewStoreOf<ImportMnemonic>) -> some SwiftUI.View {
+	private func wordsGrid(with viewStore: ViewStoreOf<ImportMnemonic>) -> some View {
 		LazyVGrid(
 			columns: .init(
 				repeating: .init(.flexible()),
@@ -367,7 +300,7 @@ extension ImportMnemonic.View {
 	}
 
 	@ViewBuilder
-	private func footer(with viewStore: ViewStoreOf<ImportMnemonic>) -> some SwiftUI.View {
+	private func footer(with viewStore: ViewStoreOf<ImportMnemonic>) -> some View {
 		WithControlRequirements(
 			viewStore.mnemonic,
 			forAction: { viewStore.send(.continueButtonTapped($0)) }
@@ -388,4 +321,85 @@ extension ImportMnemonic.View {
 		}
 		.padding([.horizontal, .bottom], .medium2)
 	}
+
+	#if DEBUG
+	@ViewBuilder
+	private func debugSection(with viewStore: ViewStoreOf<ImportMnemonic>) -> some View {
+		if viewStore.isReadonlyMode {
+			Button("DEBUG ONLY Copy") {
+				viewStore.send(.debugCopyMnemonic)
+			}
+			.buttonStyle(
+				.secondaryRectangular(
+					shouldExpand: true,
+					isDestructive: true,
+					isInToolbar: true
+				)
+			)
+			.padding(.horizontal, .medium2)
+			.padding(.bottom, .medium3)
+		} else {
+			if !(viewStore.isWordCountFixed && viewStore.wordCount == .twentyFour) {
+				Button("DEBUG AccRecScan Olympia 15") {
+					viewStore.send(.debugUseOlympiaTestingMnemonicWithActiveAccounts)
+				}
+				.buttonStyle(
+					.secondaryRectangular(
+						shouldExpand: true,
+						isDestructive: true,
+						isInToolbar: true
+					)
+				)
+				.padding(.horizontal, .medium2)
+				.padding(.bottom, .medium3)
+			}
+
+			Button("DEBUG AccRecScan Babylon 24") {
+				viewStore.send(.debugUseBabylonTestingMnemonicWithActiveAccounts)
+			}
+			.buttonStyle(
+				.secondaryRectangular(
+					shouldExpand: true,
+					isDestructive: true,
+					isInToolbar: true
+				)
+			)
+			.padding(.horizontal, .medium2)
+			.padding(.bottom, .medium3)
+
+			Button(
+				"DEBUG zoo..vote (24)"
+			) {
+				viewStore.send(
+					.debugUseTestingMnemonicZooVote
+				)
+			}
+			.buttonStyle(
+				.secondaryRectangular(
+					shouldExpand: true,
+					isDestructive: true,
+					isInToolbar: true
+				)
+			)
+			.padding(.horizontal, .medium2)
+			.padding(.bottom, .medium3)
+
+			AppTextField(
+				placeholder: "DEBUG ONLY paste mnemonic",
+				text: viewStore.binding(
+					get: { $0.debugMnemonicPhraseSingleField },
+					send: { .debugMnemonicChanged($0) }
+				),
+				innerAccessory: {
+					Button("Paste") {
+						viewStore.send(.debugPasteMnemonic)
+					}
+					.buttonStyle(.borderedProminent)
+				}
+			)
+			.padding(.horizontal, .medium2)
+			.padding(.bottom, .medium2)
+		}
+	}
+	#endif
 }

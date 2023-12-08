@@ -37,7 +37,6 @@ extension ManualAccountRecoverySeedPhrase.View {
 					Text("Choose Seed Phrase") // FIXME: Strings
 						.multilineTextAlignment(.center)
 						.textStyle(.sheetTitle)
-						.foregroundStyle(.app.gray1)
 						.padding(.top, .medium3)
 						.padding(.horizontal, .large2)
 						.padding(.bottom, .large3)
@@ -45,7 +44,6 @@ extension ManualAccountRecoverySeedPhrase.View {
 					Text(subtitle(isOlympia: viewStore.isOlympia))
 						.multilineTextAlignment(.center)
 						.textStyle(.body1Header)
-						.foregroundStyle(.app.gray1)
 						.padding(.horizontal, .huge2)
 						.padding(.bottom, .huge3)
 
@@ -60,6 +58,7 @@ extension ManualAccountRecoverySeedPhrase.View {
 					Spacer(minLength: 0)
 				}
 			}
+			.foregroundStyle(.app.gray1)
 		}
 		.footer {
 			WithViewStore(store, observe: \.selected) { viewStore in
@@ -91,16 +90,11 @@ private extension StoreOf<ManualAccountRecoverySeedPhrase> {
 private extension View {
 	func destinations(with store: StoreOf<ManualAccountRecoverySeedPhrase>) -> some View {
 		let destinationStore = store.destination
-		return sheet(
+		return navigationDestination(
 			store: destinationStore,
 			state: /ManualAccountRecoverySeedPhrase.Destination.State.importMnemoninc,
 			action: ManualAccountRecoverySeedPhrase.Destination.Action.importMnemoninc,
-			content: {
-				ImportMnemonic.View(store: $0)
-					.withNavigationBar {
-						store.send(.view(.closeEnterMnemonicButtonTapped))
-					}
-			}
+			destination: { ImportMnemonic.View(store: $0) }
 		)
 	}
 }
@@ -109,17 +103,17 @@ private extension View {
 private extension ManualAccountRecoverySeedPhrase.View {
 	private func subtitle(isOlympia: Bool) -> String {
 		if isOlympia {
-			"Choose the Olympia seed phrase to use for derivation" // FIXME: Strings
+			"Choose the \"Legacy\" Olympia seed phrase for use for derivation:" // FIXME: Strings
 		} else {
-			"Choose the Babylon seed phrase to use for derivation" // FIXME: Strings
+			"Choose the Babylon seed phrase for use for derivation:" // FIXME: Strings
 		}
 	}
 
 	private func buttonText(isOlympia: Bool) -> String {
 		if isOlympia {
-			"Add Olympia seed phrase" // FIXME: Strings
+			"Add Olympia Seed Phrase" // FIXME: Strings
 		} else {
-			"Add Babylon seed phrase" // FIXME: Strings
+			"Add Babylon Seed Phrase" // FIXME: Strings
 		}
 	}
 
@@ -135,7 +129,12 @@ private extension ManualAccountRecoverySeedPhrase.View {
 			} contents: {
 				DisplayEntitiesControlledByMnemonic.MnemonicView(
 					viewState: .init(
-						headingState: .defaultHeading(type: .selectable(item.isSelected)),
+						headingState: .init(
+							title: "Seed Phrase", // FIXME: Strings - L10n.SeedPhrases.SeedPhrase.plainTitle
+							imageAsset: AssetResource.signingKey,
+							type: .scanning(selected: item.isSelected),
+							isError: false
+						),
 						promptUserToBackUpMnemonic: false,
 						accounts: item.value.accounts.filter {
 							switch $0.securityState {

@@ -26,14 +26,17 @@ extension ManualAccountRecoveryCoordinator.View {
 
 	private func root() -> some View {
 		ScrollView {
-			VStack(spacing: .zero) {
-				babylonHeader()
+			VStack(spacing: .large3) {
+				header()
+				separator()
 				babylonSection()
-				olympiaHeader()
+				separator()
 				olympiaSection()
 			}
+			.foregroundStyle(.app.gray1)
+			.padding(.bottom, .small1)
 		}
-		.background(.app.gray5)
+		.background(.app.white)
 		.toolbar {
 			ToolbarItem(placement: .automatic) {
 				CloseButton {
@@ -43,99 +46,85 @@ extension ManualAccountRecoveryCoordinator.View {
 		}
 	}
 
-	private func babylonHeader() -> some View {
+	private func header() -> some View {
 		VStack(spacing: .zero) {
 			Text("Account Recovery Scan") // FIXME: Strings
 				.textStyle(.sheetTitle)
 				.multilineTextAlignment(.center)
-				.foregroundColor(.app.gray1)
 				.padding(.top, .small1)
-				.padding(.horizontal, .medium1)
-				.padding(.bottom, .medium3)
-
-			Text(LocalizedStringKey(text))
-				.textStyle(.body1Regular)
-				.foregroundStyle(.app.gray2)
+				.padding(.horizontal, .large1)
 				.padding(.bottom, .medium1)
 
-			Text("Babylon Accounts") // FIXME: Strings
-				.textStyle(.sectionHeader)
-				.foregroundStyle(.app.gray1)
-				.padding(.bottom, .medium3)
-
-			Text(LocalizedStringKey("Scan for Accounts originally created on the **Babylon** network:")) // FIXME: Strings
+			Text("The Radix Wallet can scan for previously used accounts using a bare seed phrase or Ledger hardware wallet device.") // FIXME: Strings
 				.textStyle(.body1Regular)
-				.foregroundStyle(.app.gray2)
-				.flushedLeft
-				.padding(.bottom, .medium3)
+				.padding(.horizontal, .large2)
 		}
-		.padding(.horizontal, .medium2)
+	}
+
+	private func separator() -> some View {
+		Divider()
+			.padding(.horizontal, .medium1)
 	}
 
 	private func babylonSection() -> some View {
-		VStack(spacing: 0) {
+		VStack(spacing: .zero) {
+			Text("Babylon Accounts") // FIXME: Strings
+				.textStyle(.sectionHeader)
+				.padding(.horizontal, .medium1)
+				.padding(.bottom, .medium2)
+
+			Text(LocalizedStringKey("Scan for Accounts originally created on the **Babylon** network.")) // FIXME: Strings
+				.multilineTextAlignment(.center)
+				.textStyle(.body1Regular)
+				.padding(.horizontal, .large2)
+				.padding(.bottom, .large3)
+
 			Button("Use Seed Phrase") { // FIXME: Strings - repeated
 				store.send(.view(.useSeedPhraseTapped(isOlympia: false)))
 			}
-			.padding(.bottom, .medium2)
+			.padding(.horizontal, .medium3)
+			.padding(.bottom, .small1)
 
 			Button("Use Ledger Hardware Wallet") { // FIXME: Strings - repeated
 				store.send(.view(.useLedgerTapped(isOlympia: false)))
 			}
+			.padding(.horizontal, .medium3)
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
-		.padding(.top, .medium2)
-		.padding(.horizontal, .medium1)
-		.padding(.bottom, .large3)
-		.background(.app.white)
-	}
-
-	private func olympiaHeader() -> some View {
-		VStack(spacing: .zero) {
-			Text("Olympia Accounts") // FIXME: Strings
-				.textStyle(.sectionHeader)
-				.foregroundStyle(.app.gray1)
-				.padding(.top, .medium1)
-
-			Text(LocalizedStringKey("Scan for Accounts originally created on the **Olympia** network:")) // FIXME: Strings
-				.textStyle(.body1Regular)
-				.foregroundStyle(.app.gray2)
-				.flushedLeft
-				.padding(.vertical, .medium3)
-		}
-		.padding(.horizontal, .medium2)
 	}
 
 	private func olympiaSection() -> some View {
-		VStack(spacing: 0) {
+		VStack(spacing: .zero) {
+			Text("Olympia Accounts") // FIXME: Strings
+				.textStyle(.sectionHeader)
+				.padding(.bottom, .medium2)
+
+			Text(LocalizedStringKey("Scan for Accounts originally created on the **Olympia** network.\n\n(If you have Olympia Accounts in the Radix Olympia Desktop Wallet, consider using **Import from a Legacy Wallet** instead.)")) // FIXME: Strings
+				.multilineTextAlignment(.center)
+				.textStyle(.body1Regular)
+				.padding(.horizontal, .large2)
+				.padding(.bottom, .large3)
+
 			Button("Use Seed Phrase") { // FIXME: Strings - repeated
 				store.send(.view(.useSeedPhraseTapped(isOlympia: true)))
 			}
-			.padding(.bottom, .medium2)
+			.padding(.horizontal, .medium3)
+			.padding(.bottom, .small1)
 
 			Button("Use Ledger Hardware Wallet") { // FIXME: Strings - repeated
 				store.send(.view(.useLedgerTapped(isOlympia: true)))
 			}
-			.padding(.bottom, .small2)
+			.padding(.horizontal, .medium3)
+			.padding(.bottom, .medium1)
 
-			Text(LocalizedStringKey("Note: You will still use the new **Radix Babylon** app on your Ledger device.")) // FIXME: Strings
+			Text(LocalizedStringKey("Note: You will still use the new **Radix Babylon** app on your Ledger device, not the old Radix Ledger app.")) // FIXME: Strings
 				.textStyle(.body1Regular)
-				.foregroundStyle(.app.gray2)
 				.flushedLeft
+				.padding(.horizontal, .large2)
 		}
 		.buttonStyle(.secondaryRectangular(shouldExpand: true))
-		.padding(.top, .medium2)
-		.padding(.horizontal, .medium1)
-		.padding(.bottom, .small1)
-		.background(.app.white)
 	}
 }
-
-private let text: String =
-	"""
-	The Radix Wallet can scan for previously used accounts using a bare seed phrase or Ledger hardware wallet device.
-	(If you have Olympia Accounts in the Radix Olympia Desktop Wallet, consider using **Import from a Legacy Wallet** instead.)
-	""" // FIXME: Strings
 
 // MARK: - ManualAccountRecoveryCoordinator.View.PathView
 private extension ManualAccountRecoveryCoordinator.View {
@@ -167,7 +156,7 @@ private extension ManualAccountRecoveryCoordinator.View {
 					CaseLet(
 						/ManualAccountRecoveryCoordinator.Path.State.recoveryComplete,
 						action: ManualAccountRecoveryCoordinator.Path.Action.recoveryComplete,
-						then: { ManualAccountRecoveryCompletion.View(store: $0) }
+						then: { RecoverWalletControlWithBDFSComplete.View(store: $0) }
 					)
 				}
 			}

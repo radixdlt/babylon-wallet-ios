@@ -69,7 +69,8 @@ extension ChooseAccountsRow {
 						)
 					}
 				}
-				.padding(.medium1)
+				.padding(.vertical, .medium3)
+				.padding(.horizontal, .medium1)
 				.background(
 					viewState.appearanceID.gradient
 						.brightness(isSelected ? -0.1 : 0)
