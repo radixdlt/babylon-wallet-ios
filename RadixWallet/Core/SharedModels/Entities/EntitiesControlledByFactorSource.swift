@@ -26,7 +26,7 @@ public struct EntitiesControlledByFactorSource: Sendable, Hashable, Identifiable
 }
 
 extension EntitiesControlledByFactorSource {
-	public struct PerCurve: Equatable, Sendable {
+	public struct AccountsControlledByKeysOnSameCurve: Equatable, Sendable {
 		public struct ID: Sendable, Hashable {
 			public let factorSourceID: FactorSource.ID.FromHash
 			public let isOlympia: Bool
@@ -37,18 +37,18 @@ extension EntitiesControlledByFactorSource {
 		public let hiddenAccounts: NonEmptyAccounts?
 	}
 
-	public var olympia: PerCurve? {
+	public var olympia: AccountsControlledByKeysOnSameCurve? {
 		guard let olympiaAccounts else { return nil }
-		return PerCurve(
+		return AccountsControlledByKeysOnSameCurve(
 			id: .init(factorSourceID: deviceFactorSource.id, isOlympia: true),
 			accounts: olympiaAccounts,
 			hiddenAccounts: olympiaAccountsHidden
 		)
 	}
 
-	public var babylon: PerCurve? {
+	public var babylon: AccountsControlledByKeysOnSameCurve? {
 		guard let babylonAccounts else { return nil }
-		return PerCurve(
+		return AccountsControlledByKeysOnSameCurve(
 			id: .init(factorSourceID: deviceFactorSource.id, isOlympia: false),
 			accounts: babylonAccounts,
 			hiddenAccounts: babylonAccountsHidden

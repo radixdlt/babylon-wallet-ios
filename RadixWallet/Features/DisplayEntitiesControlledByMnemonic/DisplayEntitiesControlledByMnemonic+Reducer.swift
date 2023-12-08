@@ -5,12 +5,23 @@ import SwiftUI
 public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public enum ID: Sendable, Hashable {
-			case mixingBabylonAndOlympiaAccounts(FactorSourceID.FromHash)
-			case oneCurveOnly(FactorSourceID.FromHash, isOlympia: Bool)
+			/// Mixture of account sets, including both:
+			/// * "Babylon accounts" (controlled by keys on `Curve25519`)
+			/// * "Olympia accounts" (controlled by keys on curve `secp256k1`)
+			case mixedCurves(FactorSourceID.FromHash)
+
+			/// Only of accounts in one of the sets:
+			/// - "Babylon accounts" (controlled by keys on `Curve25519`)
+			///
+			/// **OR**
+			///
+			/// - "Olympia accounts" (controlled by keys on curve `secp256k1`)
+			case singleCurve(FactorSourceID.FromHash, isOlympia: Bool)
+
 			public var factorSourceID: FactorSourceID.FromHash {
 				switch self {
-				case let .mixingBabylonAndOlympiaAccounts(id): id
-				case let .oneCurveOnly(id, _): id
+				case let .mixedCurves(id): id
+				case let .singleCurve(id, _): id
 				}
 			}
 		}
@@ -46,17 +57,17 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 		}
 
 		public init(
-			perCurve: EntitiesControlledByFactorSource.PerCurve,
+			accountsControlledByKeysOnSameCurve accountSet: EntitiesControlledByFactorSource.AccountsControlledByKeysOnSameCurve,
 			isMnemonicMarkedAsBackedUp: Bool,
 			isMnemonicPresentInKeychain: Bool,
 			mode: Mode
 		) {
 			self.init(
-				id: .oneCurveOnly(perCurve.id.factorSourceID, isOlympia: perCurve.id.isOlympia),
+				id: .singleCurve(accountSet.id.factorSourceID, isOlympia: accountSet.id.isOlympia),
 				isMnemonicMarkedAsBackedUp: isMnemonicMarkedAsBackedUp,
 				isMnemonicPresentInKeychain: isMnemonicPresentInKeychain,
-				accounts: perCurve.accounts.rawValue,
-				hasHiddenAccounts: perCurve.hiddenAccounts != nil,
+				accounts: accountSet.accounts.rawValue,
+				hasHiddenAccounts: accountSet.hiddenAccounts != nil,
 				mode: mode
 			)
 		}

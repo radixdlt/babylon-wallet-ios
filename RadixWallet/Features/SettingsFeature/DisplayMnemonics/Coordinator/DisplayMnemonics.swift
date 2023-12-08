@@ -85,7 +85,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 							.compactMap { $0 }
 							.map {
 								DisplayEntitiesControlledByMnemonic.State(
-									perCurve: $0,
+									accountsControlledByKeysOnSameCurve: $0,
 									isMnemonicMarkedAsBackedUp: ents.isMnemonicMarkedAsBackedUp,
 									isMnemonicPresentInKeychain: ents.isMnemonicPresentInKeychain,
 									mode: ents.isMnemonicPresentInKeychain ? .mnemonicCanBeDisplayed : .mnemonicNeedsImport
@@ -148,8 +148,8 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			switch delegateAction {
 			case let .doneViewing(idOfBackedUpFactorSource):
 				if let idOfBackedUpFactorSource {
-					state.deviceFactorSources[id: .oneCurveOnly(idOfBackedUpFactorSource, isOlympia: true)]?.backedUp()
-					state.deviceFactorSources[id: .oneCurveOnly(idOfBackedUpFactorSource, isOlympia: false)]?.backedUp()
+					state.deviceFactorSources[id: .singleCurve(idOfBackedUpFactorSource, isOlympia: true)]?.backedUp()
+					state.deviceFactorSources[id: .singleCurve(idOfBackedUpFactorSource, isOlympia: false)]?.backedUp()
 				}
 			case .notPersisted, .persistedMnemonicInKeychainOnly, .persistedNewFactorSourceInProfile:
 				assertionFailure("discrepancy")
@@ -166,8 +166,8 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 			case let .finishedImportingMnemonics(_, importedIDs, notYetSavedNewMainBDFS):
 				assert(notYetSavedNewMainBDFS == nil, "Discrepancy, new Main BDFS should already have been saved.")
 				for imported in importedIDs {
-					state.deviceFactorSources[id: .oneCurveOnly(imported.factorSourceID, isOlympia: true)]?.imported()
-					state.deviceFactorSources[id: .oneCurveOnly(imported.factorSourceID, isOlympia: false)]?.imported()
+					state.deviceFactorSources[id: .singleCurve(imported.factorSourceID, isOlympia: true)]?.imported()
+					state.deviceFactorSources[id: .singleCurve(imported.factorSourceID, isOlympia: false)]?.imported()
 				}
 				state.destination = nil
 

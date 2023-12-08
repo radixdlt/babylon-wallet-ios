@@ -28,9 +28,9 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			case let (.some(babylonAccounts), _):
 				// We prefer Babylon, always.
 				babylonAccounts.rawValue
-			case let (nil, .some(olympiaAccounts)):
+			case let (.none, .some(olympiaAccounts)):
 				olympiaAccounts.rawValue
-			case (nil, nil):
+			case (.none, nil):
 				// no accounts... still possible! i.e. Profile -> Create HARDWARE Account ->
 				// delete passcode -> import missing Mnemonic, which... does not control any
 				// accounts
@@ -38,7 +38,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			}
 
 			self.entities = .init(
-				id: .mixingBabylonAndOlympiaAccounts(
+				id: .mixedCurves(
 					ents.factorSourceID
 				),
 				isMnemonicMarkedAsBackedUp: ents.isMnemonicMarkedAsBackedUp,
