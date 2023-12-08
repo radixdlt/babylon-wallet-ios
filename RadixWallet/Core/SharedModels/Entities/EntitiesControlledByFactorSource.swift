@@ -1,3 +1,5 @@
+public typealias NonEmptyAccounts = NonEmpty<IdentifiedArrayOf<Profile.Network.Account>>
+
 // MARK: - EntitiesControlledByFactorSource
 public struct EntitiesControlledByFactorSource: Sendable, Hashable, Identifiable {
 	public typealias ID = FactorSourceID
@@ -31,8 +33,8 @@ extension EntitiesControlledByFactorSource {
 		}
 
 		public let id: ID
-		public let accounts: NonEmpty<IdentifiedArrayOf<Profile.Network.Account>>
-		public let hiddenAccounts: NonEmpty<IdentifiedArrayOf<Profile.Network.Account>>?
+		public let accounts: NonEmptyAccounts
+		public let hiddenAccounts: NonEmptyAccounts?
 	}
 
 	public var olympia: PerCurve? {
@@ -54,22 +56,22 @@ extension EntitiesControlledByFactorSource {
 	}
 
 	/// Non hidden
-	public var babylonAccounts: NonEmpty<IdentifiedArrayOf<Profile.Network.Account>>? {
-		NonEmpty(rawValue: accounts.filter { !$0.isOlympiaAccount }.asIdentifiable())
+	public var babylonAccounts: NonEmptyAccounts? {
+		NonEmpty(rawValue: accounts.filter(not(\.isOlympiaAccount)).asIdentifiable())
 	}
 
 	/// hidden
-	public var babylonAccountsHidden: NonEmpty<IdentifiedArrayOf<Profile.Network.Account>>? {
-		NonEmpty(rawValue: hiddenAccounts.filter { !$0.isOlympiaAccount }.asIdentifiable())
+	public var babylonAccountsHidden: NonEmptyAccounts? {
+		NonEmpty(rawValue: hiddenAccounts.filter(not(\.isOlympiaAccount)).asIdentifiable())
 	}
 
 	/// Non hidden
-	public var olympiaAccounts: NonEmpty<IdentifiedArrayOf<Profile.Network.Account>>? {
+	public var olympiaAccounts: NonEmptyAccounts? {
 		NonEmpty(rawValue: accounts.filter(\.isOlympiaAccount).asIdentifiable())
 	}
 
 	/// hidden
-	public var olympiaAccountsHidden: NonEmpty<IdentifiedArrayOf<Profile.Network.Account>>? {
+	public var olympiaAccountsHidden: NonEmptyAccounts? {
 		NonEmpty(rawValue: hiddenAccounts.filter(\.isOlympiaAccount).asIdentifiable())
 	}
 
