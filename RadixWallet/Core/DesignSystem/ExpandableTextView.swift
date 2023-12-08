@@ -1,44 +1,35 @@
 // MARK: - ExpandableTextView
 struct ExpandableTextView: View {
-	let fullText: String
-	let maxLength: Int
+	/// The full text to be displayed
+	private let fullText: String
+	/// The text length for collapsed state
+	private let collapsedTextLength: Int
+
 	@State private var showFullText: Bool = false
 	@State private var displayedText: String
 
-	init(fullText: String, maxLength: Int = 80) {
+	init(fullText: String, collapsedTextLength: Int) {
 		self.fullText = fullText
-		self.maxLength = maxLength
+		self.collapsedTextLength = collapsedTextLength
 
-		if fullText.count > maxLength {
-			_displayedText = .init(initialValue: String(fullText.prefix(maxLength)) + "...")
+		if fullText.count > collapsedTextLength {
+			_displayedText = .init(initialValue: String(fullText.prefix(collapsedTextLength)) + "...")
 		} else {
 			_displayedText = .init(initialValue: fullText)
 		}
 	}
 
-	private func collapseText() {
-		if fullText.count > maxLength {
-			displayedText = String(fullText.prefix(maxLength)) + "..."
-		} else {
-			displayedText = fullText
-		}
-	}
-
-	private func expandText() {
-		displayedText = fullText
-	}
-
 	private func toggleText() {
 		showFullText.toggle()
 		if showFullText {
-			expandText()
+			displayedText = fullText
 		} else {
-			collapseText()
+			displayedText = String(fullText.prefix(collapsedTextLength)) + "..."
 		}
 	}
 
 	var body: some View {
-		VStack(alignment: .trailing) {
+		VStack(alignment: .leading) {
 			Text(displayedText)
 				.multilineTextAlignment(.leading)
 				.textStyle(.body1HighImportance)
@@ -46,20 +37,14 @@ struct ExpandableTextView: View {
 				.lineLimit(nil)
 				.animation(.easeInOut, value: showFullText)
 
-			if fullText.count > maxLength {
+			if fullText.count > collapsedTextLength {
 				HStack {
 					Spacer()
-					Button(showFullText ? "Show Less" : "Show more", action: toggleText)
-						.foregroundColor(.blue)
+					Button(showFullText ? L10n.Common.showLess : L10n.Common.showMore, action: toggleText)
+						.foregroundColor(.app.blue2)
 				}
 			}
 		}
-	}
-}
-
-// MARK: - ContentView
-struct ContentView: View {
-	var body: some View {
-		ExpandableTextView(fullText: "Your very long text here...", maxLength: 100)
+		.padding(.zero)
 	}
 }

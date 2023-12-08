@@ -71,8 +71,8 @@ extension NonFungibleTokenDetails {
 
 								KeyValueView(nonFungibleGlobalID: tokenDetails.nonFungibleGlobalID)
 								if let description = tokenDetails.description {
-									KeyValueView(key: "Description") {
-										ExpandableTextView(fullText: description, maxLength: Self.dataFieldTextMaxLength)
+									KeyValueView(key: L10n.AssetDetails.NFTDetails.description) {
+										ExpandableTextView(fullText: description, collapsedTextLength: Self.dataFieldTextMaxLength)
 									}
 								}
 								ForEach(tokenDetails.dataFields.identifiablyEnumerated()) { entry in
@@ -114,15 +114,14 @@ extension NonFungibleTokenDetails {
 						Text(field.name)
 							.textStyle(.body1Regular)
 							.foregroundColor(.app.gray2)
-						ExpandableTextView(fullText: value, maxLength: Self.dataFieldTextMaxLength)
+						ExpandableTextView(fullText: value, collapsedTextLength: Self.dataFieldTextMaxLength)
 					}
 					.flushedLeft
 				}
-			//                KeyValueView(key: field.name) {
-			//                    ExpandableTextView(fullText: value, maxLength: Self.dataFieldTextMaxLength)
-			//                }
+
 			case .complex:
-				KeyValueView(key: field.name, value: "Complex")
+				KeyValueView(key: field.name, value: L10n.AssetDetails.NFTDetails.complexData)
+
 			case let .url(url):
 				VStack(alignment: .leading, spacing: .small3) {
 					Text(field.name)
@@ -134,14 +133,18 @@ extension NonFungibleTokenDetails {
 					.buttonStyle(.url)
 				}
 				.flushedLeft
+
 			case let .address(address):
 				KeyValueView(key: field.name) {
 					AddressView(.address(address))
 				}
+
 			case let .decimal(value):
 				KeyValueView(key: field.name, value: value.formatted())
+
 			case let .enum(variant):
 				KeyValueView(key: field.name, value: variant)
+
 			case let .id(id):
 				KeyValueView(key: field.name, value: try! id.toString())
 			}
