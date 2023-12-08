@@ -141,6 +141,7 @@
 "accountSettings_specificAssetsDeposits_allowDepositorsNoResources" = "Add a specific badge by its resource address to allow all deposits from its holder.";
 "accountSettings_specificAssetsDeposits_allowDepositors" = "The holder of the following badges may always deposit accounts to this account.";
 "accountSettings_specificAssetsDeposits_resourceListPicker" = "Select exception list";
+"accountSettings_specificAssetsDeposits_modificationDisabledForRecoveredAccount" = "⚠️ Sorry, this Account\'s third-party exceptions and depositor lists are in an unknown state and cannot be viewed or edited because it was imported using only a seed phrase or Ledger. A forthcoming wallet update will enable viewing and editing of these lists.";
 "accountSettings_showAssets_text" = "Asset creators can add tags to them. You can choose which tags you want to see in this Account.";
 "accountSettings_showAssets_selectShown" = "Select the ones you’d like shown on all your assets.";
 "accountSettings_showAssets_recommended" = "Recommended";
@@ -575,8 +576,7 @@ You can always change the guarantee from this default in each transaction.";
 "importMnemonic_passphrase" = "Passphrase";
 "importMnemonic_passphrasePlaceholder" = "Passphrase";
 "importMnemonic_passphraseHint" = "Optional BIP39 Passphrase. This is not your wallet password, and the Radix Desktop Wallet did not use a BIP39 passphrase. This is only to support import from other wallets that may have used one.";
-"importMnemonic_fewerWords" = "Fewer words";
-"importMnemonic_moreWords" = "More words";
+"importMnemonic_numberOfWordsPicker" = "Number of Seed Phrase Words";
 "importMnemonic_checksumFailure" = "Incorrect seed phrase";
 "importMnemonic_advancedModeButton" = "Advanced Mode";
 "importMnemonic_regularModeButton" = "Regular Mode";
@@ -817,6 +817,8 @@ Only the **current configuration** of your wallet is backed up with each manual 
 "recoverProfileBackup_importFileButton_title" = "Import from Backup File Instead";
 "recoverProfileBackup_incompatibleWalletDataLabel" = "Incompatible Wallet data";
 "recoverProfileBackup_passwordWrong" = "The password is wrong";
+"recoverProfileBackup_backupNotAvailable" = "Backup not available?";
+"recoverProfileBackup_otherRestoreOptionsButton" = "Other Restore Options";
 "recoverSeedPhrase_header_titleMain" = "Main Seed Phrase Required";
 "recoverSeedPhrase_header_titleNoMainSeedPhrase" = "No Main Seed Phrase?";
 "recoverSeedPhrase_header_titleOther" = "Seed Phrase Required";
@@ -870,3 +872,40 @@ Your old Accounts and Personas will still be listed, but you will have to enter 
 "customizeNetworkFees_tipFieldInfo" = "(%% of Execution + Finalization Fees)";
 "customizeNetworkFees_warning_selectFeePayer" = "Please select a fee payer for the transaction fee";
 "customizeNetworkFees_warning_insufficientBalance" = "Insufficient balance to pay the transaction fee";
+"accountRecoveryScan_inProgress_header_title" = "Scanning in progress";
+"accountRecoveryScan_inProgress_header_subtitle" = "Scanning for Accounts that have been included in at least on transaction, using:";
+"accountRecoveryScan_inProgress_factorSourceName_babylonSeedPhrase" = "**Babylon Seed Phrase**";
+"accountRecoveryScan_inProgress_factorSourceName_olympiaSeedPhrase" = "**Olympia Seed Phrase**";
+"accountRecoveryScan_inProgress_factorSourceName_ledgerHardwareDevice" = "**Ledger hardware wallet device**";
+"accountRecoveryScan_inProgress_factorSourceName_fallback" = "Signing Factor";
+"accountRecoveryScan_inProgress_nameOfRecoveredAccount" = "Unnamed";
+"accountRecoveryScan_inProgress_scanningNetwork" = "Scanning network";
+"accountRecoveryScan_scanComplete_header_title" = "Scan Complete";
+"accountRecoveryScan_scanComplete_theFirstNPotentialAccountWereScanned" = "The first **%d** potential Accounts from this signing factor were scanned. The following Accounts had at least one transaction:";
+"accountRecoveryScan_scanComplete_scanNextBatchButton" = "Tap here to scan the next %d";
+"accountRecoveryScan_scanComplete_continueButton" = "Continue";
+"accountRecoveryScan_selectInactiveAccounts_header_title" = "Add Inactive Accounts?";
+"accountRecoveryScan_selectInactiveAccounts_header_subtitle" = "These Accounts were never used, but you **may** have created them. Select any addresses that you wish to keep:";
+"accountRecoveryScan_selectInactiveAccounts_continueButton" = "Continue";
+"recoverWalletWithoutProfileComplete_header_title" = "Recovery Complete";
+"recoverWalletWithoutProfileComplete_header_subtitle" = "Accounts discovered in the scan have been added to your wallet.
+
+If you have any “Legacy” Accounts (created on the Olympia network) to import - or any Accounts using a Ledger hardware wallet device - please continue and then use the **Account Recovery Scan** option in your Radix Wallet settings under **Account Security**.";
+"recoverWalletWithoutProfileComplete_continueButton" = "Continue";
+"recoverWalletWithoutProfileInfo_header_title" = "Recover Control Without Backup";
+"recoverWalletWithoutProfileInfo_header_subtitle" = "**If you have no wallet backup in the cloud or as an exported backup file**, you can still restore Account access only using your main “Babylon” seed phrase. You cannot recover your Account names or other wallet settings this way.
+
+You will be asked to enter your main seed phrase. This is a set of **24 words** that the Radix Wallet mobile app showed you to write down and save securely.";
+"recoverWalletWithoutProfileInfo_continueButton" = "Continue";
+"recoverWalletWithoutProfileStart_header_title" = "Recover Control Without Backup";
+"recoverWalletWithoutProfileStart_header_subtitle" = "If you have no wallet backup in the cloud, or as an exported backup file, you still have other restore options.";
+"recoverWalletWithoutProfileStart_section_babylon_title" = "**I have my main “Babylon” 24-word seed phrase.**";
+"recoverWalletWithoutProfileStart_section_babylon_button" = "Recover with Main Seed Phrase";
+"recoverWalletWithoutProfileStart_section_olympia_onlyHardwareAccounts_title" = "**I only want to restore Ledger hardware wallet Accounts**";
+"recoverWalletWithoutProfileStart_section_olympia_or" = "OR";
+"recoverWalletWithoutProfileStart_section_olympia_onlySoftwareAccounts_title" = "**I only have Accounts created on the Radix Olympia Network**";
+"recoverWalletWithoutProfileStart_section_olympia_restoreButton" = "Ledger-only or Olympia-only Restore";
+"recoverWalletWithoutProfileStart_useNewWalletInstead_alert_title" = "No Main Seed Phrase";
+"recoverWalletWithoutProfileStart_useNewWalletInstead_alert_message" = "Tap “I\'m a New Wallet User”. After completing wallet creation, you can recover any Olympia or Ledger-based Accounts in Settings.";
+"recoverWalletWithoutProfileStart_useNewWalletInstead_alert_cancelButton" = "Cancel";
+"recoverWalletWithoutProfileStart_useNewWalletInstead_alert_continueButton" = "Continue";
