@@ -3,14 +3,14 @@ import SwiftUI
 
 extension ManualAccountRecoveryCoordinator.State {
 	var viewState: ManualAccountRecoveryCoordinator.ViewState {
-		.init(showOlympiaSection: isMainnet)
+		.init(olympiaControlState: isMainnet ? .enabled : .disabled)
 	}
 }
 
 // MARK: - ManualAccountRecoveryCoordinator.View
 extension ManualAccountRecoveryCoordinator {
 	public struct ViewState: Equatable {
-		let showOlympiaSection: Bool
+		let olympiaControlState: ControlState
 	}
 
 	@MainActor
@@ -36,19 +36,18 @@ extension ManualAccountRecoveryCoordinator.View {
 
 	private func root() -> some View {
 		ScrollView {
-			WithViewStore(store, observe: \.viewState) { viewStore in
-				VStack(spacing: .large3) {
-					header()
-					separator()
-					babylonSection()
-					if viewStore.showOlympiaSection {
-						separator()
-						olympiaSection()
-					}
+			VStack(spacing: .large3) {
+				header()
+				separator()
+				babylonSection()
+				separator()
+				WithViewStore(store, observe: \.viewState) { viewStore in
+					olympiaSection()
+						.controlState(viewStore.olympiaControlState)
 				}
-				.foregroundStyle(.app.gray1)
-				.padding(.bottom, .small1)
 			}
+			.foregroundStyle(.app.gray1)
+			.padding(.bottom, .small1)
 		}
 		.background(.app.white)
 		.toolbar {
