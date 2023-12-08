@@ -22,10 +22,18 @@ extension DeviceFactorSource {
 	public static func babylon(
 		mnemonic: Mnemonic,
 		model: Hint.Model,
+		isMain: Bool = true,
 		name: String,
 		addedOn: Date
 	) throws -> Self {
-		try babylon(mnemonicWithPassphrase: .init(mnemonic: mnemonic), model: model, name: name, addedOn: addedOn, lastUsedOn: addedOn)
+		try babylon(
+			mnemonicWithPassphrase: .init(mnemonic: mnemonic),
+			isMain: isMain,
+			model: model,
+			name: name,
+			addedOn: addedOn,
+			lastUsedOn: addedOn
+		)
 	}
 
 	public static func olympia(

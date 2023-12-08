@@ -72,11 +72,16 @@ extension ProfileBuilder {
 
 extension ProfileBuilder {
 	// TODO: Refactor to use real clients aligning with prod code?
-	public func bdfs(_ maybeMnemonic: Mnemonic? = nil) -> Self {
+	public func bdfs(isMain: Bool = true, _ maybeMnemonic: Mnemonic? = nil) -> Self {
 		let mnemonic = try! maybeMnemonic ?? Mnemonic.generate(wordCount: .twentyFour, language: .english)
 		let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: "")
 		let date = Date.now
-		let deviceFactorSource = try! DeviceFactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, addedOn: date, lastUsedOn: date)
+		let deviceFactorSource = try! DeviceFactorSource.babylon(
+			mnemonicWithPassphrase: mnemonicWithPassphrase,
+			isMain: isMain,
+			addedOn: date,
+			lastUsedOn: date
+		)
 		self.bdfs = try! PrivateHDFactorSource(mnemonicWithPassphrase: mnemonicWithPassphrase, factorSource: deviceFactorSource)
 		return self
 	}

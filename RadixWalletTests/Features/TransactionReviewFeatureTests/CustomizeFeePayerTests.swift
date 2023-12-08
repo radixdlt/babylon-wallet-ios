@@ -27,7 +27,7 @@ final class CustomizeFeePayerTests: TestCase {
 				.dependency(\.factorSourcesClient.getSigningFactors) { request in
 					try [.device: .init(rawValue: Set(request.signers.rawValue.map {
 						try SigningFactor(
-							factorSource: .device(.babylon(mnemonicWithPassphrase: .testValue)),
+							factorSource: .device(.babylon(mnemonicWithPassphrase: .testValue, isMain: true)),
 							signer: .init(factorInstancesRequiredToSign: $0.virtualHierarchicalDeterministicFactorInstances, of: $0)
 						)
 					}))!]
@@ -53,7 +53,7 @@ final class CustomizeFeePayerTests: TestCase {
 		let signingFactor = withDependencies {
 			$0.date = .constant(.init(timeIntervalSince1970: 0))
 		} operation: {
-			accountEntity.signinFactor
+			accountEntity.signingFactor
 		}
 
 		transactionStub.signingFactors = [.device: .init(rawValue: [signingFactor])!]
@@ -69,9 +69,9 @@ final class CustomizeFeePayerTests: TestCase {
 }
 
 extension EntityPotentiallyVirtual {
-	var signinFactor: SigningFactor {
+	var signingFactor: SigningFactor {
 		try! SigningFactor(
-			factorSource: .device(.babylon(mnemonicWithPassphrase: .testValue)),
+			factorSource: .device(.babylon(mnemonicWithPassphrase: .testValue, isMain: true)),
 			signer: .init(factorInstancesRequiredToSign: virtualHierarchicalDeterministicFactorInstances, of: self)
 		)
 	}
