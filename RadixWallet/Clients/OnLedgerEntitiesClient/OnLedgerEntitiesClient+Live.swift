@@ -24,12 +24,12 @@ extension OnLedgerEntitiesClient {
 		for addresses: [Address],
 		_ explicitMetadata: Set<EntityMetadataKey>,
 		ledgerState: AtLedgerState?,
-		forceRefresh: Bool = false
+		cachingStrategy: CachingStrategy
 	) async throws -> [OnLedgerEntity] {
 		try await fetchEntitiesWithCaching(
 			for: addresses.map(\.cachingIdentifier),
-			forceRefresh: forceRefresh,
-			refresh: fetchEntites(explicitMetadata, ledgerState: ledgerState, forceRefresh: forceRefresh)
+			cachingStrategy: cachingStrategy,
+			refresh: fetchEntites(explicitMetadata, ledgerState: ledgerState)
 		)
 	}
 
@@ -37,6 +37,7 @@ extension OnLedgerEntitiesClient {
 	static func getNonFungibleData(_ request: GetNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken] {
 		try await fetchEntitiesWithCaching(
 			for: request.nonFungibleIds.map { .nonFungibleData($0) },
+			cachingStrategy: .useCache,
 			refresh: { identifiers in
 				try await fetchNonFungibleData(.init(
 					atLedgerState: request.atLedgerState,
@@ -186,12 +187,12 @@ extension OnLedgerEntitiesClient {
 	@Sendable
 	static func fetchEntitiesWithCaching(
 		for identifiers: [CacheClient.Entry.OnLedgerEntity],
-		forceRefresh: Bool = false,
+		cachingStrategy: CachingStrategy,
 		refresh: (_ identifiers: [CacheClient.Entry.OnLedgerEntity]) async throws -> [OnLedgerEntity]
 	) async throws -> [OnLedgerEntity] {
 		@Dependency(\.cacheClient) var cacheClient
 
-		guard !forceRefresh else {
+		guard cachingStrategy.read == .fromCache else {
 			let freshEntities = try await refresh(Array(identifiers))
 			freshEntities.forEach {
 				cacheClient.save($0, .onLedgerEntity($0.cachingIdentifier))
@@ -235,9 +236,16 @@ extension OnLedgerEntitiesClient {
 				explicitMetadata: explicitMetadata,
 				selector: ledgerState?.selector
 			)
+
 			return try await response.items.asyncCompactMap { item in
-				let allFungibles = try await gatewayAPIClient.fetchAllFungibleResources(item, ledgerState: response.ledgerState)
-				let allNonFungibles = try await gatewayAPIClient.fetchAllNonFungibleResources(item, ledgerState: response.ledgerState)
+				let allFungibles = try await gatewayAPIClient.fetchAllFungibleResources(
+					item,
+					ledgerState: response.ledgerState
+				)
+				let allNonFungibles = try await gatewayAPIClient.fetchAllNonFungibleResources(
+					item,
+					ledgerState: response.ledgerState
+				)
 
 				let updatedItem = GatewayAPI.StateEntityDetailsResponseItem(
 					address: item.address,
@@ -251,8 +259,10 @@ extension OnLedgerEntitiesClient {
 
 				return try await createEntity(
 					from: updatedItem,
-					ledgerState: .init(version: response.ledgerState.stateVersion, epoch: response.ledgerState.epoch),
-					forceRefresh: forceRefresh
+					ledgerState: .init(
+						version: response.ledgerState.stateVersion,
+						epoch: response.ledgerState.epoch
+					)
 				)
 			}
 		}
