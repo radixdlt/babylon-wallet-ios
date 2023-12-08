@@ -505,6 +505,7 @@ You can always change the guarantee from this default in each transaction.";
 "error_transactionFailure_rejected" = "Transaction rejected";
 "error_transactionFailure_unknown" = "Unknown error";
 "error_transactionFailure_failedToFindLedger" = "Failed to find ledger";
+"error_transactionFailure_doesNotAllowThirdPartyDeposits" = "One of the receiving accounts does not allow third-party deposits";
 "error_transactionFailure_failedToAddLockFee" = "Failed to add Transaction Fee, try a different amount of fee payer.";
 "error_transactionFailure_failedToAddGuarantee" = "Failed to add Guarantee, try a different percentage, or try skip adding a guarantee.";
 "error_transactionFailure_reviewFailure" = "A proposed transaction could not be processed.";
