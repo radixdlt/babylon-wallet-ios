@@ -243,7 +243,7 @@ private extension String {
 	}
 }
 
-extension GatewayAPI.ProgrammaticScryptoSborValue {
+private extension GatewayAPI.ProgrammaticScryptoSborValue {
 	var fieldKind: ArbitraryDataFieldKind? {
 		switch self {
 		case .array, .map, .mapEntry, .tuple:
