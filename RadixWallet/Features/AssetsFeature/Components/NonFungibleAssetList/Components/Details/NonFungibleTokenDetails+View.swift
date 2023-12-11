@@ -196,8 +196,9 @@ extension OnLedgerEntity.NonFungibleToken.NFTData {
 	}
 }
 
+private typealias ArbitraryDataFieldKind = NonFungibleTokenDetails.ViewState.TokenDetails.ArbitraryDataField.Kind
 private extension String {
-	var asDataField: NonFungibleTokenDetails.ViewState.TokenDetails.ArbitraryDataField.Kind? {
+	var asDataField: ArbitraryDataFieldKind? {
 		nilIfEmpty.map {
 			if let url = URL(string: $0), ["http", "https"].contains(url.scheme) {
 				.url(url)
@@ -207,11 +208,11 @@ private extension String {
 		}
 	}
 
-	var asPrimitiveDataField: NonFungibleTokenDetails.ViewState.TokenDetails.ArbitraryDataField.Kind? {
+	var asPrimitiveDataField: ArbitraryDataFieldKind? {
 		nilIfEmpty.map { .primitive($0) }
 	}
 
-	var asLedgerAddressDataField: NonFungibleTokenDetails.ViewState.TokenDetails.ArbitraryDataField.Kind? {
+	var asLedgerAddressDataField: ArbitraryDataFieldKind? {
 		nilIfEmpty.map {
 			if let address = try? LedgerIdentifiable.Address(address: Address(validatingAddress: $0)) {
 				.address(address)
@@ -221,7 +222,7 @@ private extension String {
 		}
 	}
 
-	var asDecimalDataField: NonFungibleTokenDetails.ViewState.TokenDetails.ArbitraryDataField.Kind? {
+	var asDecimalDataField: ArbitraryDataFieldKind? {
 		nilIfEmpty.map {
 			if let decimal = try? RETDecimal(value: $0) {
 				.decimal(decimal)
@@ -231,7 +232,7 @@ private extension String {
 		}
 	}
 
-	var asNonFungibleIDDataField: NonFungibleTokenDetails.ViewState.TokenDetails.ArbitraryDataField.Kind? {
+	var asNonFungibleIDDataField: ArbitraryDataFieldKind? {
 		nilIfEmpty.map {
 			if let id = try? NonFungibleLocalId.from(stringFormat: $0) {
 				.id(id)
@@ -243,7 +244,7 @@ private extension String {
 }
 
 extension GatewayAPI.ProgrammaticScryptoSborValue {
-	var fieldKind: NonFungibleTokenDetails.ViewState.TokenDetails.ArbitraryDataField.Kind? {
+	var fieldKind: ArbitraryDataFieldKind? {
 		switch self {
 		case .array, .map, .mapEntry, .tuple:
 			.complex
