@@ -72,15 +72,19 @@ extension NonFungibleTokenDetails {
 									NFTFullView(url: keyImage)
 								}
 
+								if let description = tokenDetails.description {
+									Text(description)
+										.textStyle(.body1Regular)
+										.flushedLeft
+									AssetDetailsSeparator()
+										.padding(.horizontal, -.large2)
+								}
+
 								KeyValueView(nonFungibleGlobalID: tokenDetails.nonFungibleGlobalID)
 
-								if let description = tokenDetails.description {
-									KeyValueView(key: L10n.AssetDetails.NFTDetails.description) {
-										ExpandableTextView(
-											fullText: description,
-											collapsedTextLength: Self.dataFieldTextCollapseLength
-										)
-									}
+								if !tokenDetails.dataFields.isEmpty {
+									AssetDetailsSeparator()
+										.padding(.horizontal, -.large2)
 								}
 
 								ForEach(tokenDetails.dataFields.identifiablyEnumerated()) { entry in
@@ -115,9 +119,8 @@ extension NonFungibleTokenDetails {
 		private func arbitraryDataFieldView(_ field: ViewState.TokenDetails.ArbitraryDataField, viewStore: ViewStoreOf<NonFungibleTokenDetails>) -> some SwiftUI.View {
 			switch field.kind {
 			case let .primitive(value):
-				if value.count <= Self.dataFieldHorizntalAlignmentThreshold {
+				ViewThatFits(in: .horizontal) {
 					KeyValueView(key: field.name, value: value)
-				} else {
 					VStack(alignment: .leading, spacing: .small3) {
 						Text(field.name)
 							.textStyle(.body1Regular)
@@ -262,7 +265,8 @@ extension GatewayAPI.ProgrammaticScryptoSborValue {
 		case let .i64(content):
 			content.value.asPrimitiveDataField
 		case let .i128(content):
-			content.value.asPrimitiveDataField
+			"asd jiuwd auidbw duadw daiodbwdnasd wdadiwds dwnd snd w dnw dw ds dwd sd wdbbw ds ".asPrimitiveDataField
+		// content.value.asPrimitiveDataField
 		case let .u8(content):
 			content.value.asPrimitiveDataField
 		case let .u16(content):
