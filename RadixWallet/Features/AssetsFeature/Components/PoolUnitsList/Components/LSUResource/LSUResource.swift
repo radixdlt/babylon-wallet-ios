@@ -56,7 +56,7 @@ public struct LSUResource: Sendable, FeatureReducer {
 					let result = await TaskResult {
 						try await onLedgerEntitiesClient.getOwnedStakesDetails(
 							account: state.account,
-							refresh: state.shouldRefresh
+							cachingStrategy: state.shouldRefresh ? .forceUpdate : .useCache
 						)
 					}
 					await send(.internal(.detailsLoaded(result)))

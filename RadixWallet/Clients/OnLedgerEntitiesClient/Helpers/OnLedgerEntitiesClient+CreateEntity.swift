@@ -3,8 +3,7 @@ extension OnLedgerEntitiesClient {
 	@Sendable
 	static func createEntity(
 		from item: GatewayAPI.StateEntityDetailsResponseItem,
-		ledgerState: AtLedgerState,
-		forceRefresh: Bool = false
+		ledgerState: AtLedgerState
 	) async throws -> OnLedgerEntity? {
 		let address = try Address(validatingAddress: item.address)
 		let addressKind = address.decodedKind
@@ -12,8 +11,7 @@ extension OnLedgerEntitiesClient {
 		case _ where AccountEntityType.addressSpace.contains(addressKind):
 			return try await .account(createAccount(
 				item,
-				ledgerState: ledgerState,
-				forceRefresh: forceRefresh
+				ledgerState: ledgerState
 			))
 		case _ where ResourceEntityType.addressSpace.contains(addressKind):
 			return try createResource(item, ledgerState: ledgerState).map(OnLedgerEntity.resource)
@@ -42,8 +40,7 @@ extension OnLedgerEntitiesClient {
 	@Sendable
 	static func createAccount(
 		_ item: GatewayAPI.StateEntityDetailsResponseItem,
-		ledgerState: AtLedgerState,
-		forceRefresh: Bool = false
+		ledgerState: AtLedgerState
 	) async throws -> OnLedgerEntity.Account {
 		let accountAddress = try AccountAddress(validatingAddress: item.address)
 		let fungibleResources = try extractOwnedFungibleResources(item, ledgerState: ledgerState)
@@ -185,7 +182,7 @@ extension OnLedgerEntitiesClient {
 		rawFungibleResources: [OnLedgerEntity.OwnedFungibleResource],
 		rawNonFungibleResources: [OnLedgerEntity.OwnedNonFungibleResource],
 		ledgerState: AtLedgerState,
-		forceRefresh: Bool = false
+		cachingStrategy: CachingStrategy = .useCache
 	) async throws -> OnLedgerEntity.Account.PoolUnitResources {
 		let stakeUnitCandidates = rawFungibleResources.filter {
 			$0.metadata.validator != nil
@@ -233,7 +230,7 @@ extension OnLedgerEntitiesClient {
 			for: Array(stakeAndPoolAddresses),
 			.resourceMetadataKeys,
 			ledgerState: ledgerState,
-			forceRefresh: forceRefresh
+			cachingStrategy: cachingStrategy
 		)
 		let validators = entities.compactMap(\.validator)
 		let resourcesPools = entities.compactMap(\.resourcePool)
@@ -341,14 +338,14 @@ extension OnLedgerEntitiesClient {
 	@Sendable
 	public func getOwnedPoolUnitsDetails(
 		_ account: OnLedgerEntity.Account,
-		refresh: Bool = false
+		cachingStrategy: CachingStrategy = .useCache
 	) async throws -> [OwnedResourcePoolDetails] {
 		let ownedPoolUnits = account.poolUnitResources.poolUnits
 		let pools = try await getEntities(
 			ownedPoolUnits.map(\.resourcePoolAddress.asGeneral),
 			[],
 			account.atLedgerState,
-			refresh
+			cachingStrategy
 		).compactMap(\.resourcePool)
 
 		var allResourceAddresses: [ResourceAddress] = []
@@ -362,7 +359,7 @@ extension OnLedgerEntitiesClient {
 
 		let allResources = try await getResources(
 			allResourceAddresses,
-			forceRefresh: refresh,
+			cachingStrategy: cachingStrategy,
 			atLedgerState: account.atLedgerState
 		)
 
@@ -410,14 +407,14 @@ extension OnLedgerEntitiesClient {
 	/// We don't do any pagination there(yet), since the number of owned stakes will not be big, this can be revised in the future.
 	public func getOwnedStakesDetails(
 		account: OnLedgerEntity.Account,
-		refresh: Bool = false
+		cachingStrategy: CachingStrategy = .useCache
 	) async throws -> [OwnedStakeDetails] {
 		let ownedStakes = account.poolUnitResources.radixNetworkStakes
 		let validators = try await getEntities(
 			ownedStakes.map(\.validatorAddress.asGeneral),
 			.resourceMetadataKeys,
 			account.atLedgerState,
-			refresh
+			cachingStrategy
 		).compactMap(\.validator)
 
 		let resourceAddresses = ownedStakes.flatMap {
@@ -426,7 +423,7 @@ extension OnLedgerEntitiesClient {
 
 		let resourceDetails = try await getResources(
 			resourceAddresses,
-			forceRefresh: refresh,
+			cachingStrategy: cachingStrategy,
 			atLedgerState: account.atLedgerState
 		)
 
