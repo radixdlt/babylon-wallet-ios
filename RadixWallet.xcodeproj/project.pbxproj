@@ -1330,8 +1330,6 @@
 		E6DBA3882ADEBFB300A38425 /* Validation+ExtraTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA3172ADEBFB300A38425 /* Validation+ExtraTests.swift */; };
 		E6DBA3892ADEBFB300A38425 /* String+ExtraTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA3182ADEBFB300A38425 /* String+ExtraTests.swift */; };
 		E6DBA38B2ADEC0CB00A38425 /* SLIP10TestVectorsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA38A2ADEC0CB00A38425 /* SLIP10TestVectorsHelper.swift */; };
-		E6F67EFF2B23548700E73168 /* SyncEntitiesWithStateOnLedger+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F67EFD2B23548700E73168 /* SyncEntitiesWithStateOnLedger+View.swift */; };
-		E6F67F002B23548700E73168 /* SyncEntitiesWithStateOnLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F67EFE2B23548700E73168 /* SyncEntitiesWithStateOnLedger.swift */; };
 		E6FA984A2B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98482B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift */; };
 		E6FA984B2B04B9AC00748F20 /* ConfirmSkippingBDFS.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */; };
 		E6FA984E2B04E3D500748F20 /* NoContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA984D2B04E3D500748F20 /* NoContentView.swift */; };
@@ -2641,8 +2639,6 @@
 		E6DBA3172ADEBFB300A38425 /* Validation+ExtraTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Validation+ExtraTests.swift"; sourceTree = "<group>"; };
 		E6DBA3182ADEBFB300A38425 /* String+ExtraTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+ExtraTests.swift"; sourceTree = "<group>"; };
 		E6DBA38A2ADEC0CB00A38425 /* SLIP10TestVectorsHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SLIP10TestVectorsHelper.swift; sourceTree = "<group>"; };
-		E6F67EFD2B23548700E73168 /* SyncEntitiesWithStateOnLedger+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SyncEntitiesWithStateOnLedger+View.swift"; sourceTree = "<group>"; };
-		E6F67EFE2B23548700E73168 /* SyncEntitiesWithStateOnLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncEntitiesWithStateOnLedger.swift; sourceTree = "<group>"; };
 		E6FA98482B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfirmSkippingBDFS+View.swift"; sourceTree = "<group>"; };
 		E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmSkippingBDFS.swift; sourceTree = "<group>"; };
 		E6FA984D2B04E3D500748F20 /* NoContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoContentView.swift; sourceTree = "<group>"; };
@@ -2819,7 +2815,6 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				E6F67F012B23549700E73168 /* SyncEntitiesWithStateOnLedger */,
 				48AE39D82B0CBE3900813CF3 /* AccountRecoveryScan */,
 				830EA9D42AE94014004C8051 /* AccountAndPersonaHidingFeature */,
 				48CFBC612ADC10D800E77A5C /* SecurityStructureConfigurationList */,
@@ -7584,15 +7579,6 @@
 			path = FeaturePreludeTests;
 			sourceTree = "<group>";
 		};
-		E6F67F012B23549700E73168 /* SyncEntitiesWithStateOnLedger */ = {
-			isa = PBXGroup;
-			children = (
-				E6F67EFD2B23548700E73168 /* SyncEntitiesWithStateOnLedger+View.swift */,
-				E6F67EFE2B23548700E73168 /* SyncEntitiesWithStateOnLedger.swift */,
-			);
-			path = SyncEntitiesWithStateOnLedger;
-			sourceTree = "<group>";
-		};
 		E6FA984C2B04B9C000748F20 /* ConfirmSkippingBDFS */ = {
 			isa = PBXGroup;
 			children = (
@@ -7918,7 +7904,6 @@
 				48CFC2A02ADC10D900E77A5C /* PersonasCoordinator+Reducer.swift in Sources */,
 				48CFC2E82ADC10D900E77A5C /* SimpleCreateSecurityStructureFlow.swift in Sources */,
 				48CFC3332ADC10D900E77A5C /* ImportMnemonic+View.swift in Sources */,
-				E6F67F002B23548700E73168 /* SyncEntitiesWithStateOnLedger.swift in Sources */,
 				48CFC3C22ADC10D900E77A5C /* Mnemonic+FromEntropy.swift in Sources */,
 				48CFC3842ADC10D900E77A5C /* AssetResourceDetails.swift in Sources */,
 				48CFC6932ADC10DB00E77A5C /* ImportLegacyWalletErrors.swift in Sources */,
@@ -8174,7 +8159,6 @@
 				48CFC4D42ADC10DA00E77A5C /* StateEntityDetailsRequest.swift in Sources */,
 				48CFC3B82ADC10D900E77A5C /* Secp256k1+SLIP10.swift in Sources */,
 				83EE478B2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueU32.swift in Sources */,
-				E6F67EFF2B23548700E73168 /* SyncEntitiesWithStateOnLedger+View.swift in Sources */,
 				48CFC3072ADC10D900E77A5C /* DebugUserDefaultsContents.swift in Sources */,
 				48CFC3E52ADC10D900E77A5C /* P2PLinks.swift in Sources */,
 				48CFC5B72ADC10DA00E77A5C /* Card.swift in Sources */,

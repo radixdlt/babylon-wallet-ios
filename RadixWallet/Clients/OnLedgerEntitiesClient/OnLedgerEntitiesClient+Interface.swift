@@ -370,8 +370,6 @@ extension OnLedgerEntitiesClient {
 	) async throws -> [CustomizedOnLedgerThirdPartDepositForAccount] {
 		try await self.getAccounts(
 			Array(addresses),
-			// actually we wanna `resourceMetadataKeys` as well here, but we cannot since
-			// the count will exceed `EntityMetadataKey.maxAllowedKeys`.
 			metadataKeys: [.ownerBadge, .ownerKeys],
 			cachingStrategy: .readFromLedgerSkipWrite
 		)
