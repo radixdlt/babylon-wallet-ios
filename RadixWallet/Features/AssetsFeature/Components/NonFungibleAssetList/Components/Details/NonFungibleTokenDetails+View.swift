@@ -111,7 +111,10 @@ extension NonFungibleTokenDetails {
 		}
 
 		@ViewBuilder
-		private func arbitraryDataFieldView(_ field: ViewState.TokenDetails.ArbitraryDataField, viewStore: ViewStoreOf<NonFungibleTokenDetails>) -> some SwiftUI.View {
+		private func arbitraryDataFieldView(
+			_ field: ViewState.TokenDetails.ArbitraryDataField,
+			viewStore: ViewStoreOf<NonFungibleTokenDetails>
+		) -> some SwiftUI.View {
 			switch field.kind {
 			case let .primitive(value):
 				ViewThatFits(in: .horizontal) {
@@ -156,7 +159,11 @@ extension NonFungibleTokenDetails {
 				KeyValueView(key: field.name, value: variant)
 
 			case let .id(id):
-				KeyValueView(key: field.name, value: try! id.toString())
+				if let idString = try? id.toString() {
+					KeyValueView(key: field.name, value: idString)
+				} else {
+					EmptyView()
+				}
 			}
 		}
 	}

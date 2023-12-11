@@ -14,7 +14,7 @@ public struct ExpandableTextView: View {
 	private var foregroundColor: Color = .app.gray1
 	private var textForDisplay: String {
 		if isExpanded {
-			text + "\n" // Add aditional new line to make sure that "Show Less" does not overlay some actual text
+			text + "\n" // Add additional new line to make sure that "Show Less" does not overlay some actual text
 		} else {
 			text
 		}
@@ -36,7 +36,7 @@ public struct ExpandableTextView: View {
 				isTruncated = truncatedSize != intrinsicSize
 			}
 			.background(
-				Text(.init(text)) // Background text used to determin if the text needs to be truncated or not
+				Text(.init(text)) // Background text used to determine if the text needs to be truncated or not
 					.textStyle(textStyle)
 					.frame(maxWidth: .infinity, alignment: .leading)
 					.lineLimit(nil)
