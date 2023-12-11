@@ -49,11 +49,6 @@ extension NonFungibleTokenDetails {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		/// The text will be collapsed if its length exceeds this value
-		public static let dataFieldTextCollapseLength = 256
-		/// Switch the layout based based on text length
-		public static let dataFieldHorizntalAlignmentThreshold = 40
-
 		private let store: StoreOf<NonFungibleTokenDetails>
 
 		public init(store: StoreOf<NonFungibleTokenDetails>) {
@@ -73,9 +68,9 @@ extension NonFungibleTokenDetails {
 								}
 
 								if let description = tokenDetails.description {
-									Text(description)
+									ExpandableTextView(fullText: description)
 										.textStyle(.body1Regular)
-										.flushedLeft
+										.foregroundColor(.app.gray1)
 									AssetDetailsSeparator()
 										.padding(.horizontal, -.large2)
 								}
@@ -126,9 +121,10 @@ extension NonFungibleTokenDetails {
 							.textStyle(.body1Regular)
 							.foregroundColor(.app.gray2)
 						ExpandableTextView(
-							fullText: value,
-							collapsedTextLength: Self.dataFieldTextCollapseLength
+							fullText: value
 						)
+						.textStyle(.body1HighImportance)
+						.foregroundColor(.app.gray1)
 					}
 					.flushedLeft
 				}
@@ -265,8 +261,7 @@ extension GatewayAPI.ProgrammaticScryptoSborValue {
 		case let .i64(content):
 			content.value.asPrimitiveDataField
 		case let .i128(content):
-			"asd jiuwd auidbw duadw daiodbwdnasd wdadiwds dwnd snd w dnw dw ds dwd sd wdbbw ds ".asPrimitiveDataField
-		// content.value.asPrimitiveDataField
+			content.value.asPrimitiveDataField
 		case let .u8(content):
 			content.value.asPrimitiveDataField
 		case let .u16(content):
