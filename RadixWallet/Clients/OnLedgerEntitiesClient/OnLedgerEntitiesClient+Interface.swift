@@ -307,3 +307,83 @@ extension OnLedgerEntitiesClient {
 		return dappMetadata
 	}
 }
+
+// MARK: - OnLedgerSyncOfAccounts
+public struct OnLedgerSyncOfAccounts: Sendable, Hashable {
+	/// Inactive virtual accounts, unknown to the Ledger OnNetwork.
+	public let inactive: IdentifiedArrayOf<Profile.Network.Account>
+	/// Accounts known to the Ledger OnNetwork, with state updated according to that OnNetwork.
+	public let active: IdentifiedArrayOf<Profile.Network.Account>
+}
+
+extension OnLedgerEntitiesClient {
+	public func syncThirdPartyDepositWithOnLedgerSettings(
+		account: inout Profile.Network.Account
+	) async throws {
+		guard let ruleOfAccount = try await getOnLedgerCustomizedThirdPartyDepositRule(addresses: [account.address]).first else {
+			return
+		}
+		account.onLedgerSettings.thirdPartyDeposits.depositRule = ruleOfAccount.rule
+	}
+
+	public func syncThirdPartyDepositWithOnLedgerSettings(
+		addressesOf accounts: IdentifiedArrayOf<Profile.Network.Account>
+	) async throws -> OnLedgerSyncOfAccounts {
+		let activeAddresses: [CustomizedOnLedgerThirdPartDepositForAccount]
+		do {
+			activeAddresses = try await getOnLedgerCustomizedThirdPartyDepositRule(addresses: accounts.map(\.accountAddress))
+		} catch is GatewayAPIClient.EmptyEntityDetailsResponse {
+			return OnLedgerSyncOfAccounts(inactive: accounts, active: [])
+		} catch {
+			throw error
+		}
+		var inactive: IdentifiedArrayOf<Profile.Network.Account> = []
+		var active: IdentifiedArrayOf<Profile.Network.Account> = []
+		for account in accounts { // iterate with `accounts` to retain insertion order.
+			if let onLedgerActiveAccount = activeAddresses.first(where: { $0.address == account.address }) {
+				var activeAccount = account
+				activeAccount.onLedgerSettings.thirdPartyDeposits.depositRule = onLedgerActiveAccount.rule
+				active.append(activeAccount)
+			} else {
+				inactive.append(account)
+			}
+		}
+		return OnLedgerSyncOfAccounts(inactive: inactive, active: active)
+	}
+
+	public struct CustomizedOnLedgerThirdPartDepositForAccount: Sendable, Hashable {
+		public let address: AccountAddress
+		public let rule: Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule
+	}
+
+	public func getOnLedgerCustomizedThirdPartyDepositRule(
+		addresses: some Collection<AccountAddress>
+	) async throws -> [CustomizedOnLedgerThirdPartDepositForAccount] {
+		try await self.getAccounts(
+			Array(addresses),
+			// actually we wanna `resourceMetadataKeys` as well here, but we cannot since
+			// the count will exceed `EntityMetadataKey.maxAllowedKeys`.
+			metadataKeys: [.ownerBadge, .ownerKeys],
+			cachingStrategy: .readFromLedgerSkipWrite
+		)
+		.compactMap { (onLedgerAccount: OnLedgerEntity.Account) -> CustomizedOnLedgerThirdPartDepositForAccount? in
+			let address = onLedgerAccount.address
+			guard
+				case let metadata = onLedgerAccount.metadata,
+				let ownerKeys = metadata.ownerKeys,
+				let ownerBadge = metadata.ownerBadge
+			else {
+				return nil
+			}
+
+			func hasStateChange(_ list: OnLedgerEntity.Metadata.ValueAtStateVersion<some Any>) -> Bool {
+				list.lastUpdatedAtStateVersion > 0
+			}
+			let isActive = hasStateChange(ownerKeys) || hasStateChange(ownerBadge)
+			guard isActive, let rule = onLedgerAccount.details?.depositRule else {
+				return nil
+			}
+			return CustomizedOnLedgerThirdPartDepositForAccount(address: address, rule: rule)
+		}
+	}
+}
