@@ -170,7 +170,7 @@ public struct Settings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .appSettings(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))):
+		case let .accountSecurity(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))):
 			.send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent)))
 		case .accountSecurity(.delegate(.gotoAccountList)):
 			.run { _ in await dismiss() }
