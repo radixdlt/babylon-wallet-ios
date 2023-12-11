@@ -84,6 +84,12 @@ extension AccountSecurity.View {
 				icon: .asset(AssetResource.appSettings), // TODO: Select asset
 				action: .accountRecoveryButtonTapped
 			),
+			.init(
+				title: L10n.Settings.backups,
+				subtitle: nil, // TODO: Determine, if possible, the date of last backup.
+				icon: .asset(AssetResource.backups),
+				action: .profileBackupSettingsButtonTapped
+			),
 		]
 	}
 
@@ -118,6 +124,7 @@ private extension View {
 			.depositGuarantees(with: destinationStore)
 			.importFromOlympiaLegacyWallet(with: destinationStore)
 			.accountRecovery(with: destinationStore)
+			.profileBackupSettings(with: destinationStore)
 	}
 
 	private func mnemonics(with destinationStore: PresentationStoreOf<AccountSecurity.Destination>) -> some View {
@@ -167,6 +174,15 @@ private extension View {
 			state: /AccountSecurity.Destination.State.accountRecovery,
 			action: AccountSecurity.Destination.Action.accountRecovery,
 			content: { ManualAccountRecoveryCoordinator.View(store: $0) }
+		)
+	}
+
+	private func profileBackupSettings(with destinationStore: PresentationStoreOf<AccountSecurity.Destination>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /AccountSecurity.Destination.State.profileBackupSettings,
+			action: AccountSecurity.Destination.Action.profileBackupSettings,
+			destination: { ProfileBackupSettings.View(store: $0) }
 		)
 	}
 }
