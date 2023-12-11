@@ -306,7 +306,12 @@ extension AccountRecoveryScanInProgress {
 		state.status = .scanningNetworkForActiveAccounts
 		state.destination = nil
 		return .run { send in
-			let onLedgerSyncOfAccounts = try await performScan(accounts: accounts)
+
+			let onLedgerSyncOfAccounts = try await onLedgerEntitiesClient
+				.syncThirdPartyDepositWithOnLedgerSettings(
+					addressesOf: accounts
+				)
+
 			await send(
 				.internal(
 					.foundAccounts(
@@ -315,18 +320,6 @@ extension AccountRecoveryScanInProgress {
 					)
 				)
 			)
-		}
-	}
-
-	private func performScan(
-		accounts: IdentifiedArrayOf<Profile.Network.Account>
-	) async throws -> OnLedgerSyncOfAccounts {
-		do {
-			return try await onLedgerEntitiesClient.syncThirdPartyDepositWithOnLedgerSettings(addressesOf: accounts)
-		} catch is GatewayAPIClient.EmptyEntityDetailsResponse {
-			return OnLedgerSyncOfAccounts(inactive: accounts, active: [])
-		} catch {
-			throw error
 		}
 	}
 }
@@ -352,7 +345,14 @@ extension OnLedgerEntitiesClient {
 	public func syncThirdPartyDepositWithOnLedgerSettings(
 		addressesOf accounts: IdentifiedArrayOf<Profile.Network.Account>
 	) async throws -> OnLedgerSyncOfAccounts {
-		let activeAddresses = try await getOnLedgerCustomizedThirdPartyDepositRule(addresses: accounts.map(\.accountAddress))
+		let activeAddresses: [CustomizedOnLedgerThirdPartDepositForAccount]
+		do {
+			activeAddresses = try await getOnLedgerCustomizedThirdPartyDepositRule(addresses: accounts.map(\.accountAddress))
+		} catch is GatewayAPIClient.EmptyEntityDetailsResponse {
+			return OnLedgerSyncOfAccounts(inactive: accounts, active: [])
+		} catch {
+			throw error
+		}
 		var inactive: IdentifiedArrayOf<Profile.Network.Account> = []
 		var active: IdentifiedArrayOf<Profile.Network.Account> = []
 		for account in accounts { // iterate with `accounts` to retain insertion order.
