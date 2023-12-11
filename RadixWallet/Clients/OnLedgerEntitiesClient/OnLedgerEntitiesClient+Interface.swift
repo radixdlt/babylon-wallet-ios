@@ -317,13 +317,22 @@ public struct OnLedgerSyncOfAccounts: Sendable, Hashable {
 }
 
 extension OnLedgerEntitiesClient {
+	/// returns the updated account, else `nil` if account was not changed,
 	public func syncThirdPartyDepositWithOnLedgerSettings(
-		account: inout Profile.Network.Account
-	) async throws {
+		account: Profile.Network.Account
+	) async throws -> Profile.Network.Account? {
 		guard let ruleOfAccount = try await getOnLedgerCustomizedThirdPartyDepositRule(addresses: [account.address]).first else {
-			return
+			return nil
 		}
-		account.onLedgerSettings.thirdPartyDeposits.depositRule = ruleOfAccount.rule
+		let current = account.onLedgerSettings.thirdPartyDeposits.depositRule
+		if ruleOfAccount.rule == current {
+			return nil
+
+		} else {
+			var account = account
+			account.onLedgerSettings.thirdPartyDeposits.depositRule = ruleOfAccount.rule
+			return account
+		}
 	}
 
 	public func syncThirdPartyDepositWithOnLedgerSettings(

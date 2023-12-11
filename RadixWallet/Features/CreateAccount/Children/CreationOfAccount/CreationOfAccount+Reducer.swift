@@ -56,6 +56,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 
 	public init() {}
@@ -121,7 +122,7 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 
 			return .run { [name = state.name] send in
 				await send(.internal(.createAccountResult(TaskResult {
-					try await accountsClient.newVirtualAccount(.init(
+					let account = try await accountsClient.newVirtualAccount(.init(
 						name: name,
 						factorInstance: .init(
 							factorSourceID: factorSourceID,
@@ -130,6 +131,22 @@ public struct CreationOfAccount: Sendable, FeatureReducer {
 						),
 						networkID: networkID
 					))
+
+					do {
+						if let updated = try await doAsync(
+							withTimeout: .seconds(5),
+							work: { try await onLedgerEntitiesClient.syncThirdPartyDepositWithOnLedgerSettings(account: account) }
+						) {
+							loggerGlobal.notice("Used OnLedger ThirdParty Deposit Settings")
+							return updated
+						} else {
+							return account
+						}
+					} catch {
+						loggerGlobal.notice("Failed to get OnLedger state for newly created account: \(account). Will add it with default third party deposit settings...")
+						return account
+					}
+
 				})))
 			}
 
