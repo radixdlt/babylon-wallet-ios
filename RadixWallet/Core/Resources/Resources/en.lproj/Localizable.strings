@@ -702,6 +702,17 @@ You can always change the guarantee from this default in each transaction.";
 "seedPhrases_seedPhrase_reveal" = "Reveal Seed Phrase";
 "seedPhrases_seedPhrase_oneConnectedAccount" = "Connected to 1 Account";
 "seedPhrases_seedPhrase_multipleConnectedAccounts" = "Connected to %d Accounts";
+"seedPhrases_backupWarning" = "Please write down your Seed Phrase";
+"seedPhrases_hiddenAccountsOnly" = "Hidden Accounts only";
+"seedPhrases_seedPhrase_headingNeedsImport" = "Seed Phrase Entry Required";
+"seedPhrases_seedPhrase_headingReveal" = "Reveal Seed Phrase";
+"seedPhrases_seedPhrase_noConnectedAccountsReveal" = "Not connected to any Accounts";
+"seedPhrases_seedPhrase_oneConnectedAccountReveal" = "Connected to 1 Account";
+"seedPhrases_seedPhrase_multipleConnectedAccountsReveal" = "Connected to %d Accounts";
+"seedPhrases_seedPhrase_headingScan" = "Seed Phrase";
+"seedPhrases_seedPhrase_noConnectedAccountsScan" = "Not yet connected to any Accounts";
+"seedPhrases_seedPhrase_oneConnectedAccountScan" = "Currently connected to 1 Account";
+"seedPhrases_seedPhrase_multipleConnectedAccountsScan" = "Currently connected to %d Accounts";
 "appSettings_title" = "App Settings";
 "appSettings_subtitle" = "Customize your Radix Wallet";
 "appSettings_developerMode_title" = "Developer Mode";
@@ -912,3 +923,20 @@ You will be asked to enter your main seed phrase. This is a set of **24 words** 
 "recoverWalletWithoutProfileStart_useNewWalletInstead_alert_message" = "Tap “I\'m a New Wallet User”. After completing wallet creation, you can recover any Olympia or Ledger-based Accounts in Settings.";
 "recoverWalletWithoutProfileStart_useNewWalletInstead_alert_cancelButton" = "Cancel";
 "recoverWalletWithoutProfileStart_useNewWalletInstead_alert_continueButton" = "Continue";
+"accountRecoveryScan_title" = "Account Recovery Scan";
+"accountRecoveryScan_subtitle" = "The Radix Wallet can scan for previously used accounts using a bare seed phrase or Ledger hardware wallet device";
+"accountRecoveryScan_babylonSection_title" = "Babylon Accounts";
+"accountRecoveryScan_babylonSection_subtitle" = "Scan for Accounts originally created on the **Babylon** network.";
+"accountRecoveryScan_olympiaSection_title" = "Olympia Accounts";
+"accountRecoveryScan_olympiaSection_subtitle" = "Scan for Accounts originally created on the **Olympia** network.
+
+(If you have Olympia Accounts in the Radix Olympia Desktop Wallet, consider using **Import from a Legacy Wallet** instead.";
+"accountRecoveryScan_olympiaSection_footnote" = "Note: You will still use the new **Radix Babylon** app on your Ledger device, not the old Radix Ledger app.";
+"accountRecoveryScan_seedPhraseButtonTitle" = "Use Seed Phrase";
+"accountRecoveryScan_ledgerButtonTitle" = "Use Ledger Hardware Wallet";
+"accountRecoveryScan_chooseSeedPhrase_title" = "Choose Seed Phrase";
+"accountRecoveryScan_chooseSeedPhrase_subtitleBabylon" = "Choose the \"Legacy\" Olympia seed phrase for use for derivation:";
+"accountRecoveryScan_chooseSeedPhrase_subtitleOlympia" = "Choose the Babylon seed phrase for use for derivation:";
+"accountRecoveryScan_chooseSeedPhrase_addButtonBabylon" = "Add Babylon Seed Phrase";
+"accountRecoveryScan_chooseSeedPhrase_addButtonOlympia" = "Add Olympia Seed Phrase";
+"accountRecoveryScan_chooseSeedPhrase_continueButton" = "Continue";
