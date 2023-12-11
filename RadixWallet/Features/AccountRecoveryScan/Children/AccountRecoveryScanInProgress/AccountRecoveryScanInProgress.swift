@@ -306,62 +306,102 @@ extension AccountRecoveryScanInProgress {
 		state.status = .scanningNetworkForActiveAccounts
 		state.destination = nil
 		return .run { send in
-			let (active, inactive) = try await performScan(accounts: accounts)
-			await send(.internal(.foundAccounts(active: active, inactive: inactive)))
+			let onLedgerSyncOfAccounts = try await performScan(accounts: accounts)
+			await send(
+				.internal(
+					.foundAccounts(
+						active: onLedgerSyncOfAccounts.active,
+						inactive: onLedgerSyncOfAccounts.inactive
+					)
+				)
+			)
 		}
 	}
 
 	private func performScan(
 		accounts: IdentifiedArrayOf<Profile.Network.Account>
-	) async throws -> (
-		active: IdentifiedArrayOf<Profile.Network.Account>,
-		inactive: IdentifiedArrayOf<Profile.Network.Account>
-	) {
-		let accountAddresses: [AccountAddress] = accounts.map(\.address)
-
+	) async throws -> OnLedgerSyncOfAccounts {
 		do {
-			let activeAccounts = try await onLedgerEntitiesClient
-				.getAccounts(
-					accountAddresses,
-					// actually we wanna `resourceMetadataKeys` as well here, but we cannot since
-					// the count will exceed `EntityMetadataKey.maxAllowedKeys`.
-					metadataKeys: [.ownerBadge, .ownerKeys],
-					cachingStrategy: .readFromLedgerSkipWrite
-				)
-				.filter { (onLedgerAccount: OnLedgerEntity.Account) -> Bool in
-
-					guard
-						case let metadata = onLedgerAccount.metadata,
-						let ownerKeys = metadata.ownerKeys,
-						let ownerBadge = metadata.ownerBadge
-					else { return false }
-
-					func hasStateChange(_ list: OnLedgerEntity.Metadata.ValueAtStateVersion<some Any>) -> Bool {
-						list.lastUpdatedAtStateVersion > 0
-					}
-					let isActive = hasStateChange(ownerKeys) || hasStateChange(ownerBadge)
-					return isActive
-				}
-
-			var active: IdentifiedArrayOf<Profile.Network.Account> = []
-			var inactive: IdentifiedArrayOf<Profile.Network.Account> = []
-			for account in accounts {
-				if let activeAccount = activeAccounts.first(where: { $0.address == account.address }) {
-					var account = account
-					if let depositRule = activeAccount.details?.depositRule {
-						account.onLedgerSettings.thirdPartyDeposits.depositRule = depositRule
-					}
-					active.append(account)
-				} else {
-					inactive.append(account)
-				}
-			}
-
-			return (active, inactive)
+			return try await onLedgerEntitiesClient.syncThirdPartyDepositWithOnLedgerSettings(addressesOf: accounts)
 		} catch is GatewayAPIClient.EmptyEntityDetailsResponse {
-			return (active: [], inactive: accounts)
+			return OnLedgerSyncOfAccounts(inactive: accounts, active: [])
 		} catch {
 			throw error
+		}
+	}
+}
+
+// MARK: - OnLedgerSyncOfAccounts
+public struct OnLedgerSyncOfAccounts: Sendable, Hashable {
+	/// Inactive virtual accounts, unknown to the Ledger OnNetwork.
+	public let inactive: IdentifiedArrayOf<Profile.Network.Account>
+	/// Accounts known to the Ledger OnNetwork, with state updated according to that OnNetwork.
+	public let active: IdentifiedArrayOf<Profile.Network.Account>
+}
+
+extension OnLedgerEntitiesClient {
+	public func syncThirdPartyDepositWithOnLedgerSettings(
+		account: inout Profile.Network.Account
+	) async throws {
+		guard let ruleOfAccount = try await getOnLedgerCustomizedThirdPartyDepositRule(addresses: [account.address]).first else {
+			return
+		}
+		account.onLedgerSettings.thirdPartyDeposits.depositRule = ruleOfAccount.rule
+	}
+
+	public func syncThirdPartyDepositWithOnLedgerSettings(
+		addressesOf accounts: IdentifiedArrayOf<Profile.Network.Account>
+	) async throws -> OnLedgerSyncOfAccounts {
+		let activeAddresses = try await getOnLedgerCustomizedThirdPartyDepositRule(addresses: accounts.map(\.accountAddress))
+		var inactive: IdentifiedArrayOf<Profile.Network.Account> = []
+		var active: IdentifiedArrayOf<Profile.Network.Account> = []
+		for account in accounts { // iterate with `accounts` to retain insertion order.
+			if let onLedgerActiveAccount = activeAddresses.first(where: { $0.address == account.address }) {
+				var activeAccount = account
+				activeAccount.onLedgerSettings.thirdPartyDeposits.depositRule = onLedgerActiveAccount.rule
+				active.append(activeAccount)
+			} else {
+				inactive.append(account)
+			}
+		}
+		return .init(inactive: inactive, active: active)
+	}
+
+	public struct CustomizedOnLedgerThirdPartDepositForAccount: Sendable, Hashable {
+		public let address: AccountAddress
+		public let rule: Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule
+	}
+
+	public func getOnLedgerCustomizedThirdPartyDepositRule(
+		addresses: some Collection<AccountAddress>
+	) async throws -> [CustomizedOnLedgerThirdPartDepositForAccount] {
+		try await self.getAccounts(
+			Array(addresses),
+			// actually we wanna `resourceMetadataKeys` as well here, but we cannot since
+			// the count will exceed `EntityMetadataKey.maxAllowedKeys`.
+			metadataKeys: [.ownerBadge, .ownerKeys],
+			cachingStrategy: .readFromLedgerSkipWrite
+		)
+		.compactMap { (onLedgerAccount: OnLedgerEntity.Account) -> CustomizedOnLedgerThirdPartDepositForAccount? in
+			let address = onLedgerAccount.address
+			guard
+				case let metadata = onLedgerAccount.metadata,
+				let ownerKeys = metadata.ownerKeys,
+				let ownerBadge = metadata.ownerBadge
+			else {
+				//                    return CustomizedOnLedgerThirdPartDepositForAccount(address: address, rule: nil)
+				return nil
+			}
+
+			func hasStateChange(_ list: OnLedgerEntity.Metadata.ValueAtStateVersion<some Any>) -> Bool {
+				list.lastUpdatedAtStateVersion > 0
+			}
+			let isActive = hasStateChange(ownerKeys) || hasStateChange(ownerBadge)
+			guard isActive, let rule = onLedgerAccount.details?.depositRule else {
+				//                    return CustomizedOnLedgerThirdPartDepositForAccount(address: address, rule: nil)
+				return nil
+			}
+			return CustomizedOnLedgerThirdPartDepositForAccount(address: address, rule: rule)
 		}
 	}
 }
