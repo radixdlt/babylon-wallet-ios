@@ -354,7 +354,7 @@ struct MigrateOlympiaAccountsView: View {
 		.cornerRadius(.medium3)
 		.overlay(alignment: .topTrailing) {
 			CloseButton(action: dismiss)
-				.offset(x: .small3, y: -.small3)
+				.padding(.small3)
 		}
 	}
 }

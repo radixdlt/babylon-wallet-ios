@@ -4,6 +4,7 @@ import DependenciesAdditions
 // MARK: - UserDefaultsKey
 public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case hideMigrateOlympiaButton
+	case hideRadixBanner
 	case epochForWhenLastUsedByAccountAddress
 
 	/// DO NOT CHANGE THIS KEY
@@ -28,7 +29,8 @@ extension UserDefaults.Dependency {
 			} else {
 				Result.success(nil)
 			}
-		}.eraseToAnyAsyncSequence()
+		}
+		.eraseToAnyAsyncSequence()
 	}
 
 	public func bool(key: Key, default defaultTo: Bool = false) -> Bool {
@@ -83,6 +85,14 @@ extension UserDefaults.Dependency {
 
 	public func setHideMigrateOlympiaButton(_ value: Bool) {
 		set(value, forKey: Key.hideMigrateOlympiaButton.rawValue)
+	}
+
+	public var hideRadixBanner: Bool {
+		bool(key: .hideRadixBanner)
+	}
+
+	public func setHideRadixBanner(_ value: Bool) {
+		set(value, forKey: Key.hideRadixBanner.rawValue)
 	}
 
 	public func getActiveProfileID() -> ProfileSnapshot.Header.ID? {

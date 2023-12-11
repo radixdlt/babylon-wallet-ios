@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 extension Home.State {
 	var viewState: Home.ViewState {
-		.init(hasNotification: shouldWriteDownPersonasSeedPhrase)
+		.init(hasNotification: shouldWriteDownPersonasSeedPhrase, showRadixBanner: showRadixBanner)
 	}
 }
 
@@ -10,6 +10,7 @@ extension Home.State {
 extension Home {
 	public struct ViewState: Equatable {
 		let hasNotification: Bool
+		let showRadixBanner: Bool
 	}
 
 	@MainActor
@@ -21,42 +22,52 @@ extension Home {
 		}
 
 		public var body: some SwiftUI.View {
-			ScrollView {
-				VStack(spacing: .medium1) {
-					HeaderView()
+			WithViewStore(store, observe: \.viewState) { viewStore in
+				ScrollView {
+					VStack(spacing: .medium1) {
+						HeaderView()
 
-					VStack(spacing: .medium3) {
-						ForEachStore(
-							store.scope(
-								state: \.accountRows,
-								action: { .child(.account(id: $0, action: $1)) }
-							),
-							content: { Home.AccountRow.View(store: $0) }
-						)
-					}
-					.padding(.horizontal, .medium1)
+						VStack(spacing: .medium3) {
+							ForEachStore(
+								store.scope(
+									state: \.accountRows,
+									action: { .child(.account(id: $0, action: $1)) }
+								),
+								content: { Home.AccountRow.View(store: $0) }
+							)
+						}
+						.padding(.horizontal, .medium1)
 
-					Button(L10n.HomePage.createNewAccount) {
-						store.send(.view(.createAccountButtonTapped))
+						Button(L10n.HomePage.createNewAccount) {
+							store.send(.view(.createAccountButtonTapped))
+						}
+						.buttonStyle(.secondaryRectangular())
+
+						if viewStore.showRadixBanner {
+							RadixBanner {
+								store.send(.view(.radixBannerButtonTapped))
+							} dismiss: {
+								store.send(.view(.radixBannerDismissButtonTapped))
+							}
+							.transition(.scale(scale: 0.8).combined(with: .opacity))
+						}
 					}
-					.buttonStyle(.secondaryRectangular())
+					.padding(.bottom, .medium3)
 				}
-				.padding(.bottom, .medium1)
-			}
-			.toolbar {
-				ToolbarItem(placement: .navigationBarTrailing) {
-					WithViewStore(store, observe: \.viewState) { viewStore in
+				.animation(.default, value: viewStore.showRadixBanner)
+				.toolbar {
+					ToolbarItem(placement: .navigationBarTrailing) {
 						SettingsButton(shouldShowNotification: viewStore.hasNotification) {
 							store.send(.view(.settingsButtonTapped))
 						}
 					}
 				}
-			}
-			.refreshable {
-				await store.send(.view(.pullToRefreshStarted)).finish()
-			}
-			.task { @MainActor in
-				await store.send(.view(.task)).finish()
+				.refreshable {
+					await store.send(.view(.pullToRefreshStarted)).finish()
+				}
+				.task { @MainActor in
+					await store.send(.view(.task)).finish()
+				}
 			}
 			.destinations(with: store)
 		}
@@ -162,6 +173,45 @@ extension View {
 					.offset(x: .small3, y: -.small3)
 			}
 		}
+	}
+}
+
+// MARK: - RadixBanner
+struct RadixBanner: View {
+	let action: () -> Void
+	let dismiss: () -> Void
+
+	var body: some View {
+		VStack(spacing: 0) {
+			Image(asset: AssetResource.radixBanner)
+				.padding(.top, .medium1)
+
+			Text("Start Using Radix") // FIXME: Strings
+				.textStyle(.body1Header)
+				.foregroundColor(.app.gray1)
+				.padding(.bottom, .small2)
+
+			Text("Complete setting up your wallet and start staking, using dApps and more!") // FIXME: Strings
+				.multilineTextAlignment(.center)
+				.textStyle(.body2Regular)
+				.foregroundColor(.app.gray2)
+				.padding(.horizontal, .huge3)
+				.padding(.bottom, .medium3)
+
+			Button("Get Started Now", action: action)
+				.buttonStyle(.secondaryRectangular(
+					shouldExpand: true,
+					image: .init(asset: AssetResource.iconLinkOut)
+				))
+				.padding([.horizontal, .bottom], .medium3)
+		}
+		.background(Color.app.gray5)
+		.cornerRadius(.medium3)
+		.overlay(alignment: .topTrailing) {
+			CloseButton(action: dismiss)
+				.padding(.small3)
+		}
+		.padding([.horizontal, .bottom], .medium3)
 	}
 }
 
