@@ -156,7 +156,7 @@ extension TransactionHeader {
 		startEpochInclusive: 0,
 		endEpochExclusive: 1,
 		nonce: 0,
-		notaryPublicKey: .ed25519(value: Array(Curve25519.Signing.PublicKey.previewValue.rawRepresentation)),
+		notaryPublicKey: .ed25519(value: Curve25519.Signing.PublicKey.previewValue.rawRepresentation),
 		notaryIsSignatory: true,
 		tipPercentage: 0
 	)
