@@ -80,9 +80,15 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 						nil
 					)
 					let deviceFactorSources: [DisplayEntitiesControlledByMnemonic.State] = entitiesForDeviceFactorSources.flatMap { ents in
+						var accountSets: [EntitiesControlledByFactorSource.AccountsControlledByKeysOnSameCurve] = []
+						if let b = ents.babylon {
+							accountSets.append(b)
+						}
+						if let o = ents.olympia {
+							accountSets.append(o)
+						}
 
-						let states = [ents.babylon, ents.olympia]
-							.compactMap { $0 }
+						let states = accountSets
 							.map {
 								DisplayEntitiesControlledByMnemonic.State(
 									accountsControlledByKeysOnSameCurve: $0,

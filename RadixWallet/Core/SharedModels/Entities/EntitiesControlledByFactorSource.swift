@@ -47,6 +47,7 @@ extension EntitiesControlledByFactorSource {
 	}
 
 	public var babylon: AccountsControlledByKeysOnSameCurve? {
+		guard self.deviceFactorSource.hint.mnemonicWordCount == .twentyFour else { return nil }
 		guard let babylonAccounts else { return nil }
 		return AccountsControlledByKeysOnSameCurve(
 			id: .init(factorSourceID: deviceFactorSource.id, isOlympia: false),
