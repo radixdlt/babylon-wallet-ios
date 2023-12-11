@@ -101,6 +101,7 @@ extension OnLedgerEntitiesClient {
 			nextPageCursor: freshPage.nextCursor
 		)
 		cacheClient.save(OnLedgerEntity.accountNonFungibleIds(response), cachingIdentifier)
+
 		return response
 	}
 
