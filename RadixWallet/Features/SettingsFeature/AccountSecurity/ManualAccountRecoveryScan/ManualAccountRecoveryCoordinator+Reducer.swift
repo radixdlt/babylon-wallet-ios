@@ -7,11 +7,9 @@ public struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 
 	public struct State: Sendable, Hashable {
 		public var path: StackState<Path.State> = .init()
-		public var isMainnet: Bool
+		public var isMainnet: Bool = false
 
-		public init() {
-			self.isMainnet = false
-		}
+		public init() {}
 	}
 
 	// MARK: - Path
