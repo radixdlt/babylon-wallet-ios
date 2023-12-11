@@ -10,7 +10,7 @@ extension ManifestBuilder {
 				faucetLockFee()
 			}
 			faucetFreeXrd()
-			try accountTryDepositBatchOrAbort(componentAddress.intoEngine(), [], nil)
+			try accountTryDepositEntireWorktopOrAbort(componentAddress.intoEngine(), nil)
 		}
 		.build(networkId: networkID.rawValue)
 	}
@@ -37,7 +37,7 @@ extension ManifestBuilder {
 				),
 				addressReservation: nil
 			)
-			.accountTryDepositBatchOrAbort(address: account.intoEngine(), buckets: [], authorizedDepositorBadge: nil)
+			.accountTryDepositEntireWorktopOrAbort(accountAddress: account.intoEngine(), authorizedDepositorBadge: nil)
 			.build(networkId: networkID.rawValue)
 	}
 
@@ -65,7 +65,7 @@ extension ManifestBuilder {
 					nil
 				)
 			}
-			try accountTryDepositBatchOrAbort(account.intoEngine(), [], nil)
+			try accountTryDepositEntireWorktopOrAbort(account.intoEngine(), nil)
 		}
 		.build(networkId: networkID.rawValue)
 	}

@@ -13,6 +13,7 @@ extension ManifestBuilder {
 	public static let faucetLockFee = flip(faucetLockFee)
 	public static let faucetFreeXrd = flip(faucetFreeXrd)
 	public static let accountTryDepositBatchOrAbort = flip(accountTryDepositBatchOrAbort)
+	public static let accountTryDepositEntireWorktopOrAbort = flip(accountTryDepositEntireWorktopOrAbort)
 	public static let withdrawAmount = flip(accountWithdraw)
 	public static let withdrawTokens = flip(accountWithdrawNonFungibles)
 	public static let takeFromWorktop = flip(takeFromWorktop)
