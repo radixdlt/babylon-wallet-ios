@@ -186,7 +186,6 @@ extension FeatureReducer {
 		do {
 			guard let mnemonicWithPassphrase = try secureStorageClient.loadMnemonic(
 				factorSourceID: factorSourceID,
-				purpose: .displaySeedPhrase,
 				notifyIfMissing: notifyIfMissing
 			) else {
 				onError(FailedToFindFactorSource())

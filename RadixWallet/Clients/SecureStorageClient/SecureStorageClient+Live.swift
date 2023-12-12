@@ -193,35 +193,9 @@ extension SecureStorageClient: DependencyKey {
 
 		@Sendable func loadMnemonicFor(
 			key: KeychainClient.Key,
-			purpose: LoadMnemonicPurpose,
 			notifyIfMissing: Bool
 		) throws -> MnemonicWithPassphrase? {
-			let authPromptValue: String = {
-				switch purpose {
-				case let .createEntity(kind):
-					let entityKindName = kind == .account ? L10n.Common.account : L10n.Common.persona
-					return L10n.Biometrics.Prompt.creationOfEntity(entityKindName)
-				case .signTransaction:
-					return L10n.Biometrics.Prompt.signTransaction
-				case .signAuthChallenge:
-					return L10n.Biometrics.Prompt.signAuthChallenge
-				case .displaySeedPhrase:
-					return L10n.Biometrics.Prompt.displaySeedPhrase
-				case .createSignAuthKey:
-					return L10n.Biometrics.Prompt.createSignAuthKey
-				case .importOlympiaAccounts:
-					return L10n.Biometrics.Prompt.importOlympiaAccounts
-				case .checkingAccounts:
-					return L10n.Biometrics.Prompt.checkingAccounts
-
-				case .updateAccountMetadata:
-					// This is debug only... for now.
-					return L10n.Biometrics.Prompt.updateAccountMetadata
-				case .accountRecoveryScan:
-					return "Deriving Accounts" // FIXME: Strings
-				}
-			}()
-			let authenticationPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: authPromptValue).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to wallet data secret."
+			let authenticationPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: L10n.Biometrics.Prompt.title).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to continue."
 			guard let data = try keychainClient.getDataWithAuth(
 				forKey: key,
 				authenticationPrompt: authenticationPrompt
@@ -243,9 +217,9 @@ extension SecureStorageClient: DependencyKey {
 			return try jsonDecoder().decode(ProfileSnapshot.self, from: existingSnapshotData)
 		}
 
-		let loadMnemonicByFactorSourceID: LoadMnemonicByFactorSourceID = { factorSourceID, purpose, notifyIfMissing in
-			let key = key(factorSourceID: factorSourceID)
-			return try loadMnemonicFor(key: key, purpose: purpose, notifyIfMissing: notifyIfMissing)
+		let loadMnemonicByFactorSourceID: LoadMnemonicByFactorSourceID = { request in
+			let key = key(factorSourceID: request.factorSourceID)
+			return try loadMnemonicFor(key: key, notifyIfMissing: request.notifyIfMissing)
 		}
 
 		let saveMnemonicForFactorSource: SaveMnemonicForFactorSource = { privateFactorSource in

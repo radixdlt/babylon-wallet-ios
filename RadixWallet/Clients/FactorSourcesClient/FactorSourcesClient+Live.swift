@@ -270,7 +270,6 @@ extension FactorSourcesClient: DependencyKey {
 						guard
 							let mnemonic = try secureStorageClient.loadMnemonic(
 								factorSourceID: factorSourceID,
-								purpose: .importOlympiaAccounts,
 								notifyIfMissing: false
 							)
 						else {
