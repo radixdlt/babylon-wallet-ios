@@ -99,7 +99,7 @@ extension AddressView {
 			}
 		}
 		.multilineTextAlignment(.leading)
-		.minimumScaleFactor(0.5)
+		// .minimumScaleFactor(0.5)
 	}
 
 	private var image: Image {
