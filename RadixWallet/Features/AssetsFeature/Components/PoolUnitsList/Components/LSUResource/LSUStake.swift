@@ -106,7 +106,6 @@ public struct LSUStake: FeatureReducer {
 				state.selectedStakeClaimAssets?.toggle(token)
 			}
 
-			// TODO: Show details
 			state.destination = .stakeClaimDetails(.init(
 				resourceAddress: nftResource.resource.resourceAddress,
 				resourceDetails: .success(nftResource.resource),
