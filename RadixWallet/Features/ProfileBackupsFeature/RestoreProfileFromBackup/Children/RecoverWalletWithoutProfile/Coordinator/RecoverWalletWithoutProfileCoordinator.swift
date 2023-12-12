@@ -147,6 +147,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 				do {
 					let mainBDFS = try DeviceFactorSource.babylon(
 						mnemonicWithPassphrase: mnemonicWithPassphrase,
+						isMain: true,
 						isOlympiaCompatible: false // FIXME: is this what we want?
 					)
 

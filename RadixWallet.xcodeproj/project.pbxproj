@@ -9594,8 +9594,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/radixdlt/swift-engine-toolkit";
 			requirement = {
-				kind = revision;
-				revision = 7a26ed178eaf0cb842276e1b6aa8d7a4b614713c;
+				branch = add_final_classes;
+				kind = branch;
 			};
 		};
 		48FFFAAF2ADC203700B2B213 /* XCRemoteSwiftPackageReference "WebRTC" */ = {

@@ -50,7 +50,7 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 			guard !state.didLoadResource else {
 				return .none
 			}
-			return getOwnedPoolUnitsDetails(state, refresh: false)
+			return getOwnedPoolUnitsDetails(state, cachingStrategy: .useCache)
 
 		case .refresh:
 			state.poolUnits.forEach { unit in
@@ -59,7 +59,7 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 			return .run { send in
 				await send(.child(.lsuResource(.view(.refresh))))
 			}
-			.merge(with: getOwnedPoolUnitsDetails(state, refresh: true))
+			.merge(with: getOwnedPoolUnitsDetails(state, cachingStrategy: .forceUpdate))
 		}
 	}
 
@@ -75,10 +75,18 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 		}
 	}
 
-	private func getOwnedPoolUnitsDetails(_ state: State, refresh: Bool) -> Effect<Action> {
+	private func getOwnedPoolUnitsDetails(
+		_ state: State,
+		cachingStrategy: OnLedgerEntitiesClient.CachingStrategy
+	) -> Effect<Action> {
 		let account = state.account
 		return .run { send in
-			let result = await TaskResult { try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account, refresh: refresh) }
+			let result = await TaskResult {
+				try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(
+					account,
+					cachingStrategy: cachingStrategy
+				)
+			}
 			await send(.internal(.loadedResources(result)))
 		}
 	}

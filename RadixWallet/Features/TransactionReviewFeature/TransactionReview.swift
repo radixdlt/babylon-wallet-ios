@@ -839,7 +839,7 @@ extension TransactionReview {
 	func transferInfo(
 		resourceQuantifier: ResourceTracker,
 		metadataOfCreatedEntities: [String: [String: MetadataValue?]]?,
-		dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: [UInt8]]],
+		dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]],
 		createdEntities: [EngineToolkit.Address],
 		networkID: NetworkID,
 		type: TransferType,
@@ -873,7 +873,7 @@ extension TransactionReview {
 			return try extractTokenInfo(tokenData, for: resourceAddress)
 		}
 
-		func extractTokenInfo(_ tokenData: [NonFungibleLocalId: [UInt8]], for resourceAddress: ResourceAddress) throws -> [NonFungibleToken] {
+		func extractTokenInfo(_ tokenData: [NonFungibleLocalId: Data], for resourceAddress: ResourceAddress) throws -> [NonFungibleToken] {
 			try tokenData.map { id, _ in
 				try .init(
 					id: .fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: id),

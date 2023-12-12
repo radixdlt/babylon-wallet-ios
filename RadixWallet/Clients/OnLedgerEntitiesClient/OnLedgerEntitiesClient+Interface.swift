@@ -16,7 +16,7 @@ extension OnLedgerEntitiesClient {
 	public typealias GetNonFungibleTokenData = @Sendable (GetNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken]
 	public typealias GetAccountOwnedNonFungibleTokenData = @Sendable (GetAccountOwnedNonFungibleTokenDataRequest) async throws -> GetAccountOwnedNonFungibleTokenResponse
 
-	public typealias GetEntities = @Sendable ([Address], Set<EntityMetadataKey>, AtLedgerState?, _ forceRefresh: Bool) async throws -> [OnLedgerEntity]
+	public typealias GetEntities = @Sendable ([Address], Set<EntityMetadataKey>, AtLedgerState?, CachingStrategy) async throws -> [OnLedgerEntity]
 }
 
 // MARK: OnLedgerEntitiesClient.GetNonFungibleTokenDataRequest
@@ -111,18 +111,37 @@ extension OnLedgerEntitiesClient {
 }
 
 extension OnLedgerEntitiesClient {
+	public struct CachingStrategy: Sendable, Hashable {
+		public enum Read: Sendable, Hashable {
+			case fromCache
+			case fromLedger
+		}
+
+		public enum Write: Sendable, Hashable {
+			case toCache
+			case skip
+		}
+
+		public let read: Read
+		public let write: Write
+
+		public static let forceUpdate = Self(read: .fromLedger, write: .toCache)
+		public static let useCache = Self(read: .fromCache, write: .toCache)
+		public static let readFromLedgerSkipWrite = Self(read: .fromLedger, write: .skip)
+	}
+
 	@Sendable
 	public func getEntities(
 		addresses: [Address],
 		metadataKeys: Set<EntityMetadataKey>,
-		forceRefresh: Bool = false,
+		cachingStrategy: CachingStrategy = .useCache,
 		atLedgerState: AtLedgerState? = nil
 	) async throws -> [OnLedgerEntity] {
 		try await getEntities(
 			addresses,
 			metadataKeys,
 			atLedgerState,
-			forceRefresh
+			cachingStrategy
 		)
 	}
 
@@ -130,13 +149,13 @@ extension OnLedgerEntitiesClient {
 	public func getAccounts(
 		_ addresses: [AccountAddress],
 		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys,
-		forceRefresh: Bool = false,
+		cachingStrategy: CachingStrategy = .useCache,
 		atLedgerState: AtLedgerState? = nil
 	) async throws -> [OnLedgerEntity.Account] {
 		try await getEntities(
 			addresses: addresses.map(\.asGeneral),
 			metadataKeys: metadataKeys,
-			forceRefresh: forceRefresh,
+			cachingStrategy: cachingStrategy,
 			atLedgerState: atLedgerState
 		).compactMap(\.account)
 	}
@@ -145,13 +164,13 @@ extension OnLedgerEntitiesClient {
 	public func getEntity(
 		_ address: Address,
 		metadataKeys: Set<EntityMetadataKey>,
-		forceRefresh: Bool = false,
+		cachingStrategy: CachingStrategy = .useCache,
 		atLedgerState: AtLedgerState? = nil
 	) async throws -> OnLedgerEntity {
 		guard let entity = try await getEntities(
 			addresses: [address],
 			metadataKeys: metadataKeys,
-			forceRefresh: forceRefresh,
+			cachingStrategy: cachingStrategy,
 			atLedgerState: atLedgerState
 		).first else {
 			throw Error.emptyResponse
@@ -164,13 +183,13 @@ extension OnLedgerEntitiesClient {
 	public func getAccount(
 		_ address: AccountAddress,
 		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys,
-		forceRefresh: Bool = false,
+		cachingStrategy: CachingStrategy = .useCache,
 		atLedgerState: AtLedgerState? = nil
 	) async throws -> OnLedgerEntity.Account {
 		guard let account = try await getEntity(
 			address.asGeneral,
 			metadataKeys: metadataKeys,
-			forceRefresh: forceRefresh,
+			cachingStrategy: cachingStrategy,
 			atLedgerState: atLedgerState
 		).account else {
 			throw Error.emptyResponse
@@ -181,13 +200,13 @@ extension OnLedgerEntitiesClient {
 	@Sendable
 	public func getAssociatedDapps(
 		_ addresses: [DappDefinitionAddress],
-		forceRefresh: Bool = false,
+		cachingStrategy: CachingStrategy = .useCache,
 		atLedgerState: AtLedgerState? = nil
 	) async throws -> [OnLedgerEntity.AssociatedDapp] {
 		try await getEntities(
 			addresses: addresses.map(\.asGeneral),
 			metadataKeys: .dappMetadataKeys,
-			forceRefresh: forceRefresh,
+			cachingStrategy: cachingStrategy,
 			atLedgerState: atLedgerState
 		)
 		.compactMap(\.account)
@@ -197,11 +216,11 @@ extension OnLedgerEntitiesClient {
 	@Sendable
 	public func getAssociatedDapp(
 		_ address: DappDefinitionAddress,
-		forceRefresh: Bool = false
+		cachingStrategy: CachingStrategy = .useCache
 	) async throws -> OnLedgerEntity.AssociatedDapp {
 		guard let dApp = try await getAssociatedDapps(
 			[address],
-			forceRefresh: forceRefresh
+			cachingStrategy: cachingStrategy
 		).first else {
 			throw Error.emptyResponse
 		}
@@ -212,13 +231,13 @@ extension OnLedgerEntitiesClient {
 	public func getResources(
 		_ addresses: [ResourceAddress],
 		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys,
-		forceRefresh: Bool = false,
+		cachingStrategy: CachingStrategy = .useCache,
 		atLedgerState: AtLedgerState? = nil
 	) async throws -> [OnLedgerEntity.Resource] {
 		try await getEntities(
 			addresses: addresses.map(\.asGeneral),
 			metadataKeys: metadataKeys,
-			forceRefresh: forceRefresh,
+			cachingStrategy: cachingStrategy,
 			atLedgerState: atLedgerState
 		).compactMap(\.resource)
 	}
@@ -268,7 +287,10 @@ extension OnLedgerEntitiesClient {
 	) async throws -> OnLedgerEntity.Metadata {
 		let forceRefresh = component != nil || dappDefinitionAddress != nil || website != nil
 
-		let dappMetadata = try await getAssociatedDapp(dappDefinition, forceRefresh: forceRefresh).metadata
+		let dappMetadata = try await getAssociatedDapp(
+			dappDefinition,
+			cachingStrategy: forceRefresh ? .forceUpdate : .useCache
+		).metadata
 
 		try dappMetadata.validateAccountType()
 
@@ -283,5 +305,92 @@ extension OnLedgerEntitiesClient {
 		}
 
 		return dappMetadata
+	}
+}
+
+// MARK: - OnLedgerSyncOfAccounts
+public struct OnLedgerSyncOfAccounts: Sendable, Hashable {
+	/// Inactive virtual accounts, unknown to the Ledger OnNetwork.
+	public let inactive: IdentifiedArrayOf<Profile.Network.Account>
+	/// Accounts known to the Ledger OnNetwork, with state updated according to that OnNetwork.
+	public let active: IdentifiedArrayOf<Profile.Network.Account>
+}
+
+extension OnLedgerEntitiesClient {
+	/// returns the updated account, else `nil` if account was not changed,
+	public func syncThirdPartyDepositWithOnLedgerSettings(
+		account: Profile.Network.Account
+	) async throws -> Profile.Network.Account? {
+		guard let ruleOfAccount = try await getOnLedgerCustomizedThirdPartyDepositRule(addresses: [account.address]).first else {
+			return nil
+		}
+		let current = account.onLedgerSettings.thirdPartyDeposits.depositRule
+		if ruleOfAccount.rule == current {
+			return nil
+
+		} else {
+			var account = account
+			account.onLedgerSettings.thirdPartyDeposits.depositRule = ruleOfAccount.rule
+			return account
+		}
+	}
+
+	public func syncThirdPartyDepositWithOnLedgerSettings(
+		addressesOf accounts: IdentifiedArrayOf<Profile.Network.Account>
+	) async throws -> OnLedgerSyncOfAccounts {
+		let activeAddresses: [CustomizedOnLedgerThirdPartDepositForAccount]
+		do {
+			activeAddresses = try await getOnLedgerCustomizedThirdPartyDepositRule(addresses: accounts.map(\.accountAddress))
+		} catch is GatewayAPIClient.EmptyEntityDetailsResponse {
+			return OnLedgerSyncOfAccounts(inactive: accounts, active: [])
+		} catch {
+			throw error
+		}
+		var inactive: IdentifiedArrayOf<Profile.Network.Account> = []
+		var active: IdentifiedArrayOf<Profile.Network.Account> = []
+		for account in accounts { // iterate with `accounts` to retain insertion order.
+			if let onLedgerActiveAccount = activeAddresses.first(where: { $0.address == account.address }) {
+				var activeAccount = account
+				activeAccount.onLedgerSettings.thirdPartyDeposits.depositRule = onLedgerActiveAccount.rule
+				active.append(activeAccount)
+			} else {
+				inactive.append(account)
+			}
+		}
+		return OnLedgerSyncOfAccounts(inactive: inactive, active: active)
+	}
+
+	public struct CustomizedOnLedgerThirdPartDepositForAccount: Sendable, Hashable {
+		public let address: AccountAddress
+		public let rule: Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule
+	}
+
+	public func getOnLedgerCustomizedThirdPartyDepositRule(
+		addresses: some Collection<AccountAddress>
+	) async throws -> [CustomizedOnLedgerThirdPartDepositForAccount] {
+		try await self.getAccounts(
+			Array(addresses),
+			metadataKeys: [.ownerBadge, .ownerKeys],
+			cachingStrategy: .readFromLedgerSkipWrite
+		)
+		.compactMap { (onLedgerAccount: OnLedgerEntity.Account) -> CustomizedOnLedgerThirdPartDepositForAccount? in
+			let address = onLedgerAccount.address
+			guard
+				case let metadata = onLedgerAccount.metadata,
+				let ownerKeys = metadata.ownerKeys,
+				let ownerBadge = metadata.ownerBadge
+			else {
+				return nil
+			}
+
+			func hasStateChange(_ list: OnLedgerEntity.Metadata.ValueAtStateVersion<some Any>) -> Bool {
+				list.lastUpdatedAtStateVersion > 0
+			}
+			let isActive = hasStateChange(ownerKeys) || hasStateChange(ownerBadge)
+			guard isActive, let rule = onLedgerAccount.details?.depositRule else {
+				return nil
+			}
+			return CustomizedOnLedgerThirdPartDepositForAccount(address: address, rule: rule)
+		}
 	}
 }

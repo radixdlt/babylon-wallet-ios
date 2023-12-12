@@ -1,8 +1,18 @@
 import ComposableArchitecture
 import SwiftUI
 
+extension ManualAccountRecoveryCoordinator.State {
+	var viewState: ManualAccountRecoveryCoordinator.ViewState {
+		.init(olympiaControlState: isMainnet ? .enabled : .disabled)
+	}
+}
+
 // MARK: - ManualAccountRecoveryCoordinator.View
 extension ManualAccountRecoveryCoordinator {
+	public struct ViewState: Equatable {
+		let olympiaControlState: ControlState
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: Store
@@ -31,7 +41,10 @@ extension ManualAccountRecoveryCoordinator.View {
 				separator()
 				babylonSection()
 				separator()
-				olympiaSection()
+				WithViewStore(store, observe: \.viewState) { viewStore in
+					olympiaSection()
+						.controlState(viewStore.olympiaControlState)
+				}
 			}
 			.foregroundStyle(.app.gray1)
 			.padding(.bottom, .small1)
@@ -43,6 +56,9 @@ extension ManualAccountRecoveryCoordinator.View {
 					store.send(.view(.closeButtonTapped))
 				}
 			}
+		}
+		.onAppear {
+			store.send(.view(.appeared))
 		}
 	}
 

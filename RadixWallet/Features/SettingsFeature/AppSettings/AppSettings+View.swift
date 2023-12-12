@@ -84,12 +84,6 @@ extension AppSettings {
 					action: .gatewaysButtonTapped
 				),
 				.init(
-					title: L10n.Settings.backups,
-					subtitle: nil, // TODO: Determine, if possible, the date of last backup.
-					icon: .asset(AssetResource.backups),
-					action: .profileBackupSettingsButtonTapped
-				),
-				.init(
 					title: L10n.AppSettings.EntityHiding.title,
 					subtitle: L10n.AppSettings.EntityHiding.subtitle,
 					icon: .asset(AssetResource.entityHiding),
@@ -154,7 +148,6 @@ private extension View {
 		let destinationStore = store.destination
 		return manageP2PLinks(with: destinationStore)
 			.gatewaySettings(with: destinationStore)
-			.profileBackupSettings(with: destinationStore)
 			.accountAndPersonasHiding(with: destinationStore)
 	}
 
@@ -173,15 +166,6 @@ private extension View {
 			state: /AppSettings.Destination.State.gatewaySettings,
 			action: AppSettings.Destination.Action.gatewaySettings,
 			destination: { GatewaySettings.View(store: $0) }
-		)
-	}
-
-	private func profileBackupSettings(with destinationStore: PresentationStoreOf<AppSettings.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AppSettings.Destination.State.profileBackupSettings,
-			action: AppSettings.Destination.Action.profileBackupSettings,
-			destination: { ProfileBackupSettings.View(store: $0) }
 		)
 	}
 

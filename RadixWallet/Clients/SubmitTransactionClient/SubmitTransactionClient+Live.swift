@@ -80,7 +80,7 @@ extension SubmitTransactionClient: DependencyKey {
 
 			do {
 				#if DEBUG
-				let decompiledNotarized = try NotarizedTransaction.decompile(compiledNotarizedTransaction: request.compiledNotarizedTXIntent)
+				let decompiledNotarized = try NotarizedTransaction.decompile(compiledNotarizedTransaction: Data(request.compiledNotarizedTXIntent))
 				debugPrintTX(decompiledNotarized)
 				#endif
 			} catch {}

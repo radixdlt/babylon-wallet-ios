@@ -587,6 +587,7 @@ extension ProfileStore {
 
 		let bdfs = try DeviceFactorSource.babylon(
 			mnemonicWithPassphrase: mnemonic,
+			isMain: true,
 			model: "iPhone",
 			name: "iPhone"
 		)

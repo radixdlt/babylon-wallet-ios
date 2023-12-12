@@ -1,5 +1,6 @@
 // MARK: - ExpandableTextView
 /// Based on https://edoardo.fyi/blog/2022/07/swiftui-expandable-text/
+/// https://github.com/n3d1117/ExpandableText
 public struct ExpandableTextView: View {
 	private let text: String
 	private let lineLimit: Int

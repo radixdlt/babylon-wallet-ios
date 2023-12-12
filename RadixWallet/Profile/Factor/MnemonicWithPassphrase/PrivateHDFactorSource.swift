@@ -30,6 +30,7 @@ extension PrivateHDFactorSource {
 	) -> Self {
 		let deviceFactorSource = try! DeviceFactorSource.babylon(
 			mnemonicWithPassphrase: mnemonicWithPassphrase,
+			isMain: true,
 			model: model,
 			name: name,
 			addedOn: .init(timeIntervalSince1970: 0),

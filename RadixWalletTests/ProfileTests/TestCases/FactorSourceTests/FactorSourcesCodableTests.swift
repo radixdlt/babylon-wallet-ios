@@ -21,6 +21,7 @@ final class FactorSourcesCodableTests: TestCase {
 
 			let babylon = try DeviceFactorSource.babylon(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
+				isMain: true,
 				model: "iPhone 16",
 				name: "New phone"
 			)

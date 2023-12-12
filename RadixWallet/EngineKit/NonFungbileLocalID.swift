@@ -56,11 +56,11 @@ extension NonFungibleLocalId: Codable {
 			self = .str(value: value)
 			return
 		}
-		if let value = try? container.decode([UInt8].self, forKey: .bytes) {
+		if let value = try? container.decode(Data.self, forKey: .bytes) {
 			self = .bytes(value: value)
 			return
 		}
-		if let value = try? container.decode([UInt8].self, forKey: .ruid) {
+		if let value = try? container.decode(Data.self, forKey: .ruid) {
 			self = .ruid(value: value)
 			return
 		}

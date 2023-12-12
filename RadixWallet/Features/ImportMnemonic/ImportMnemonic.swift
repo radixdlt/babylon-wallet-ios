@@ -130,7 +130,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		public struct PersistStrategy: Sendable, Hashable {
 			public enum Location: Sendable, Hashable {
 				case intoKeychainAndProfile
-				case intoKeychainOnly
 			}
 
 			public enum OnMnemonicExistsStrategy: Sendable, Hashable {
@@ -367,7 +366,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return updateWord(id: id, input: input, &state, lookupResult: lookUpResult)
 
 		case let .word(id, child: .delegate(.lostFocus(displayText))):
-			switch lookup(input: displayText, state) {
+			let lookupResult = lookup(input: displayText, state)
+			switch lookupResult {
 			case let .known(.ambigous(candidates, input)):
 				if let exactMatch = candidates.first(where: { $0.word == input }) {
 					state.words[id: id]?.value = .complete(
@@ -392,7 +392,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				)
 				return .none
 
-			case .known(.unambiguous), .unknown(.tooShort):
+			case let .known(.unambiguous(word, match, input)):
+				return completeWith(word: word, completion: .auto(match: match), id: id, input: input.rawValue, &state)
+
+			case .unknown(.tooShort):
 				return .none
 			}
 
@@ -516,21 +519,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 						}
 					)))
 				}
-			}
-		case .intoKeychainOnly:
-			return .run { send in
-				await send(.internal(.saveFactorSourceResult(
-					TaskResult {
-						let saveIntoProfile = false
-						let factorSource = try await factorSourcesClient.addOnDeviceFactorSource(
-							onDeviceMnemonicKind: .babylon,
-							mnemonicWithPassphrase: mnemonicWithPassphrase,
-							onMnemonicExistsStrategy: persistStrategy.onMnemonicExistsStrategy,
-							saveIntoProfile: saveIntoProfile
-						)
-						return .init(factorSource: factorSource.embed(), savedIntoProfile: saveIntoProfile)
-					}
-				)))
 			}
 		}
 	}

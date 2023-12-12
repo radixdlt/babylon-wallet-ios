@@ -186,6 +186,7 @@ extension FactorSourcesClient: DependencyKey {
 				loggerGlobal.info("Creating new main BDFS")
 				let newBDFS = try DeviceFactorSource.babylon(
 					mnemonicWithPassphrase: mnemonicWithPassphrase,
+					isMain: true,
 					model: .init(model),
 					name: .init(name)
 				)
