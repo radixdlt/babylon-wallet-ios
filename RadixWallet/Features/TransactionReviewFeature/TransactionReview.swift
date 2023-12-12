@@ -48,8 +48,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case let (.some(_intentSigners), .some(feePayer)):
 				doPrint("Fee payer: \(feePayer.address), intentSigners: \(_intentSigners.map(\.address))")
 			case let (.some(_intentSigners), .none):
-				doPrint("‼️ NO Fee payer, but got intentSigners: \(_intentSigners.map(\.address)) ")
-				assertionFailure("Should not happen")
+				doPrint("No Fee payer, no account with enough money?, got intentSigners: \(_intentSigners.map(\.address)) ")
 			case let (.none, .some(feePayer)):
 				doPrint("‼️Fee payer: \(feePayer.address), but no intentSigners")
 				assertionFailure("Should not happen")
