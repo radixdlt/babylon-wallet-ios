@@ -24,13 +24,13 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			self.isMainBDFS = isMainBDFS
 			self.entitiesControlledByFactorSource = ents
 
-			let accounts: IdentifiedArrayOf<Profile.Network.Account> = switch (ents.babylonAccounts, ents.olympiaAccounts) {
-			case let (.some(babylonAccounts), _):
+			let accounts: IdentifiedArrayOf<Profile.Network.Account> = switch (ents.babylonAccounts.isEmpty, ents.olympiaAccounts.isEmpty) {
+			case (false, _):
 				// We prefer Babylon, always.
-				babylonAccounts.rawValue
-			case let (.none, .some(olympiaAccounts)):
-				olympiaAccounts.rawValue
-			case (.none, nil):
+				ents.babylonAccounts
+			case (true, false):
+				ents.olympiaAccounts
+			case (true, true):
 				// no accounts... still possible! i.e. Profile -> Create HARDWARE Account ->
 				// delete passcode -> import missing Mnemonic, which... does not control any
 				// accounts

@@ -33,12 +33,12 @@ extension EntitiesControlledByFactorSource {
 		}
 
 		public let id: ID
-		public let accounts: NonEmptyAccounts
-		public let hiddenAccounts: NonEmptyAccounts?
+		public let accounts: IdentifiedArrayOf<Profile.Network.Account>
+		public let hiddenAccounts: IdentifiedArrayOf<Profile.Network.Account>
 	}
 
 	public var olympia: AccountsControlledByKeysOnSameCurve? {
-		guard let olympiaAccounts else { return nil }
+		guard deviceFactorSource.supportsOlympia else { return nil }
 		return AccountsControlledByKeysOnSameCurve(
 			id: .init(factorSourceID: deviceFactorSource.id, isOlympia: true),
 			accounts: olympiaAccounts,
@@ -47,7 +47,7 @@ extension EntitiesControlledByFactorSource {
 	}
 
 	public var babylon: AccountsControlledByKeysOnSameCurve? {
-		guard let babylonAccounts else { return nil }
+		guard deviceFactorSource.isBDFS else { return nil }
 		return AccountsControlledByKeysOnSameCurve(
 			id: .init(factorSourceID: deviceFactorSource.id, isOlympia: false),
 			accounts: babylonAccounts,
@@ -56,23 +56,23 @@ extension EntitiesControlledByFactorSource {
 	}
 
 	/// Non hidden
-	public var babylonAccounts: NonEmptyAccounts? {
-		NonEmpty(rawValue: accounts.filter(not(\.isOlympiaAccount)).asIdentifiable())
+	public var babylonAccounts: IdentifiedArrayOf<Profile.Network.Account> {
+		accounts.filter(not(\.isOlympiaAccount)).asIdentifiable()
 	}
 
 	/// hidden
-	public var babylonAccountsHidden: NonEmptyAccounts? {
-		NonEmpty(rawValue: hiddenAccounts.filter(not(\.isOlympiaAccount)).asIdentifiable())
+	public var babylonAccountsHidden: IdentifiedArrayOf<Profile.Network.Account> {
+		hiddenAccounts.filter(not(\.isOlympiaAccount)).asIdentifiable()
 	}
 
 	/// Non hidden
-	public var olympiaAccounts: NonEmptyAccounts? {
-		NonEmpty(rawValue: accounts.filter(\.isOlympiaAccount).asIdentifiable())
+	public var olympiaAccounts: IdentifiedArrayOf<Profile.Network.Account> {
+		accounts.filter(\.isOlympiaAccount).asIdentifiable()
 	}
 
 	/// hidden
-	public var olympiaAccountsHidden: NonEmptyAccounts? {
-		NonEmpty(rawValue: hiddenAccounts.filter(\.isOlympiaAccount).asIdentifiable())
+	public var olympiaAccountsHidden: IdentifiedArrayOf<Profile.Network.Account> {
+		hiddenAccounts.filter(\.isOlympiaAccount).asIdentifiable()
 	}
 
 	public var accounts: [Profile.Network.Account] { entities.compactMap { try? $0.asAccount() } }
