@@ -255,9 +255,7 @@ extension SecureStorageClient: DependencyKey {
 				guard
 					let factorSourceID = FactorSourceID.FromHash(keychainKey: $0),
 					let mnemonicWithPassphrase = try? loadMnemonicByFactorSourceID(
-						factorSourceID,
-						.checkingAccounts,
-						false
+						.init(factorSourceID: factorSourceID, notifyIfMissing: false)
 					)
 				else {
 					return nil
