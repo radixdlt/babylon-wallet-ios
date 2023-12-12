@@ -35,7 +35,7 @@ struct KeyValueView<Content: View>: View {
 	}
 
 	var body: some View {
-		HStack(alignment: .top, spacing: 0) {
+		HStack(alignment: .top, spacing: .medium3) {
 			Text(key)
 				.textStyle(.body1Regular)
 				.foregroundColor(.app.gray2)
@@ -44,6 +44,7 @@ struct KeyValueView<Content: View>: View {
 				.multilineTextAlignment(.trailing)
 				.textStyle(.body1HighImportance)
 				.foregroundColor(.app.gray1)
+				.lineLimit(nil)
 		}
 	}
 }
