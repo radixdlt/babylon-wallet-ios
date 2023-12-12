@@ -11,20 +11,16 @@ extension GatewayAPI {
 	/** Arbitrary SBOR value represented as programmatic JSON with optional property name annotations.  All scalar types (&#x60;Bool&#x60;, &#x60;I*&#x60;, &#x60;U*&#x60;, &#x60;String&#x60;, &#x60;Reference&#x60;, &#x60;Own&#x60;, &#x60;Decimal&#x60;, &#x60;PreciseDecimal&#x60;, &#x60;NonFungibleLocalId&#x60;) convey their value via &#x60;value&#x60; string property with notable exception of &#x60;Bool&#x60; type that uses regular JSON boolean type. Numeric values as string-encoded to preserve accuracy and simplify implementation on platforms with no native support for 64-bit long numerical values.  Common properties represented as nullable strings:   * &#x60;type_name&#x60; is only output when a schema is present and the type has a name,   * &#x60;field_name&#x60; is only output when the value is a child of a &#x60;Tuple&#x60; or &#x60;Enum&#x60;, which has a type with named fields,   * &#x60;variant_name&#x60; is only output when a schema is present and the type is an &#x60;Enum&#x60;.  The following is a non-normative example annotated &#x60;Tuple&#x60; value with &#x60;String&#x60; and &#x60;U32&#x60; fields: &#x60;&#x60;&#x60; {   \&quot;kind\&quot;: \&quot;Tuple\&quot;,   \&quot;type_name\&quot;: \&quot;CustomStructure\&quot;,   \&quot;fields\&quot;: [     {       \&quot;kind\&quot;: \&quot;String\&quot;,       \&quot;field_name\&quot;: \&quot;favorite_color\&quot;,       \&quot;value\&quot;: \&quot;Blue\&quot;     },     {       \&quot;kind\&quot;: \&quot;U32\&quot;,       \&quot;field_name\&quot;: \&quot;usage_counter\&quot;,       \&quot;value\&quot;: \&quot;462231\&quot;     }   ] } &#x60;&#x60;&#x60;  */
 	public indirect enum ProgrammaticScryptoSborValue: Codable, Hashable {
 		case array(ProgrammaticScryptoSborValueArray)
-		case arrayAllOf(ProgrammaticScryptoSborValueArrayAllOf)
 		case bool(ProgrammaticScryptoSborValueBool)
 		case bytes(ProgrammaticScryptoSborValueBytes)
-		case bytesAllOf(ProgrammaticScryptoSborValueBytesAllOf)
 		case decimal(ProgrammaticScryptoSborValueDecimal)
 		case `enum`(ProgrammaticScryptoSborValueEnum)
-		case enumAllOf(ProgrammaticScryptoSborValueEnumAllOf)
 		case i8(ProgrammaticScryptoSborValueI8)
 		case i16(ProgrammaticScryptoSborValueI16)
 		case i32(ProgrammaticScryptoSborValueI32)
 		case i64(ProgrammaticScryptoSborValueI64)
 		case i128(ProgrammaticScryptoSborValueI128)
 		case map(ProgrammaticScryptoSborValueMap)
-		case mapAllOf(ProgrammaticScryptoSborValueMapAllOf)
 		case mapEntry(ProgrammaticScryptoSborValueMapEntry)
 		case nonFungibleLocalId(ProgrammaticScryptoSborValueNonFungibleLocalId)
 		case own(ProgrammaticScryptoSborValueOwn)
@@ -32,7 +28,6 @@ extension GatewayAPI {
 		case reference(ProgrammaticScryptoSborValueReference)
 		case string(ProgrammaticScryptoSborValueString)
 		case tuple(ProgrammaticScryptoSborValueTuple)
-		case tupleAllOf(ProgrammaticScryptoSborValueTupleAllOf)
 		case u8(ProgrammaticScryptoSborValueU8)
 		case u16(ProgrammaticScryptoSborValueU16)
 		case u32(ProgrammaticScryptoSborValueU32)
@@ -106,19 +101,13 @@ extension GatewayAPI {
 			switch self {
 			case let .array(value):
 				try value.encode(to: encoder)
-			case let .arrayAllOf(value):
-				try value.encode(to: encoder)
 			case let .bool(value):
 				try value.encode(to: encoder)
 			case let .bytes(value):
 				try value.encode(to: encoder)
-			case let .bytesAllOf(value):
-				try value.encode(to: encoder)
 			case let .decimal(value):
 				try value.encode(to: encoder)
 			case let .enum(value):
-				try value.encode(to: encoder)
-			case let .enumAllOf(value):
 				try value.encode(to: encoder)
 			case let .i8(value):
 				try value.encode(to: encoder)
@@ -131,8 +120,6 @@ extension GatewayAPI {
 			case let .i128(value):
 				try value.encode(to: encoder)
 			case let .map(value):
-				try value.encode(to: encoder)
-			case let .mapAllOf(value):
 				try value.encode(to: encoder)
 			case let .mapEntry(value):
 				try value.encode(to: encoder)
@@ -147,8 +134,6 @@ extension GatewayAPI {
 			case let .string(value):
 				try value.encode(to: encoder)
 			case let .tuple(value):
-				try value.encode(to: encoder)
-			case let .tupleAllOf(value):
 				try value.encode(to: encoder)
 			case let .u8(value):
 				try value.encode(to: encoder)

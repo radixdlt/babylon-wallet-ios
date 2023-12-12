@@ -1,4 +1,3 @@
-
 extension View {
 	public func onSizeChanged(
 		perform action: @escaping (CGSize) -> Void
@@ -17,7 +16,5 @@ extension View {
 private enum CGSizePreferenceKey: PreferenceKey {
 	static var defaultValue: CGSize = .zero
 
-	static func reduce(value _: inout CGSize, nextValue: () -> CGSize) {
-		_ = nextValue()
-	}
+	static func reduce(value _: inout CGSize, nextValue: () -> CGSize) {}
 }
