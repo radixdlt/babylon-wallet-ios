@@ -163,9 +163,9 @@ extension EngineToolkit.PublicKeyHash {
 
 		switch publicKey {
 		case .ecdsaSecp256k1:
-			self = .secp256k1(value: hashBytes.bytes)
+			self = .secp256k1(value: hashBytes)
 		case .eddsaEd25519:
-			self = .ed25519(value: hashBytes.bytes)
+			self = .ed25519(value: hashBytes)
 		}
 	}
 }
@@ -175,10 +175,10 @@ extension OnLedgerEntity.Metadata {
 		try ownerKeys?.value.map { hash in
 			switch hash {
 			case let .ecdsaSecp256k1(value):
-				let bytes = try [UInt8].init(hex: value)
+				let bytes = try Data(hex: value)
 				return .secp256k1(value: bytes)
 			case let .eddsaEd25519(value):
-				let bytes = try [UInt8].init(hex: value)
+				let bytes = try Data(hex: value)
 				return .ed25519(value: bytes)
 			}
 		}

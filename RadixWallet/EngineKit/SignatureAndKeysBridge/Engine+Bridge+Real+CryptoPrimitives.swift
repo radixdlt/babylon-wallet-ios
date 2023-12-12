@@ -14,9 +14,9 @@ extension SLIP10.PublicKey {
 	public func intoEngine() -> EngineToolkit.PublicKey {
 		switch self {
 		case let .ecdsaSecp256k1(key):
-			.secp256k1(value: Array(key.compressedRepresentation))
+			.secp256k1(value: key.compressedRepresentation)
 		case let .eddsaEd25519(key):
-			.ed25519(value: [UInt8](key.rawRepresentation))
+			.ed25519(value: key.rawRepresentation)
 		}
 	}
 }
@@ -35,7 +35,7 @@ extension SLIP10.Signature {
 
 extension K1.PublicKey {
 	public func intoEngine() -> EngineToolkit.PublicKey {
-		.secp256k1(value: Array(compressedRepresentation))
+		.secp256k1(value: compressedRepresentation)
 	}
 }
 
@@ -43,11 +43,11 @@ extension SignatureWithPublicKey {
 	public func intoEngine() throws -> EngineToolkit.SignatureWithPublicKey {
 		switch self {
 		case let .ecdsaSecp256k1(signature, _):
-			try .secp256k1(signature: Array(signature.radixSerialize()))
+			try .secp256k1(signature: signature.radixSerialize())
 		case let .eddsaEd25519(signature, publicKey):
 			.ed25519(
-				signature: [UInt8](signature),
-				publicKey: [UInt8](publicKey.rawRepresentation)
+				signature: signature,
+				publicKey: publicKey.rawRepresentation
 			)
 		}
 	}
