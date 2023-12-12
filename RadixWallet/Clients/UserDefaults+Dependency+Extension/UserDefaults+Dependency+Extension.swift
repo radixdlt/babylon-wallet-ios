@@ -3,6 +3,7 @@ import DependenciesAdditions
 
 // MARK: - UserDefaultsKey
 public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
+	case isNewUser
 	case hideMigrateOlympiaButton
 	case hideRadixBanner
 	case epochForWhenLastUsedByAccountAddress
@@ -77,6 +78,14 @@ extension UserDefaults.Dependency {
 
 	public func remove(_ key: Key) {
 		self.removeValue(forKey: key.rawValue)
+	}
+
+	public var isNewUser: Bool {
+		bool(key: .isNewUser)
+	}
+
+	public func setIsNewUser(_ value: Bool) {
+		set(value, forKey: Key.isNewUser.rawValue)
 	}
 
 	public var hideMigrateOlympiaButton: Bool {
