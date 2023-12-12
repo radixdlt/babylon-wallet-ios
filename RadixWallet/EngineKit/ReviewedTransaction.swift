@@ -55,7 +55,7 @@ extension TransactionType {
 		public let accountDeposits: [String: [ResourceTracker]]
 		public let addressesInManifest: [EngineToolkit.EntityType: [EngineToolkit.Address]]
 		public let metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]]
-		public let dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: [UInt8]]]
+		public let dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]]
 		public let addressesOfNewlyCreatedEntities: [EngineToolkit.Address]
 
 		public var allAddress: [EngineToolkit.Address] {

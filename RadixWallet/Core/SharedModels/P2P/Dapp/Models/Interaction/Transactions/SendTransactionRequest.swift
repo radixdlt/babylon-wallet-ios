@@ -33,7 +33,7 @@ extension P2P.Dapp.Request {
 			let manifestString = try container.decode(String.self, forKey: .transactionManifestString)
 			let blobsHex = try container.decodeIfPresent([String].self, forKey: .blobsHex) ?? []
 			let blobsBytes = try blobsHex.map {
-				try [UInt8](Data(hex: $0))
+				try Data(hex: $0)
 			}
 
 			let networkID = decoder.userInfo[.networkIdKey] as! UInt8

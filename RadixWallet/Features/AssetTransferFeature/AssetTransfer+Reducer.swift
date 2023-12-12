@@ -258,8 +258,8 @@ func instructionForDepositing(
 
 	return try ManifestBuilder.accountTryDepositOrAbort(
 		recipientAddress.intoEngine(),
-		nil,
-		bucket
+		bucket,
+		nil
 	)
 }
 

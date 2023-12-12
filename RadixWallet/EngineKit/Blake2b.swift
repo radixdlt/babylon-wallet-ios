@@ -5,7 +5,7 @@ public struct Blake2b {
 	private init() {}
 
 	public static func hash(data: Data) throws -> Data {
-		Hash.fromUnhashedBytes(bytes: data.bytes).bytes().data
+		Hash.fromUnhashedBytes(bytes: data).bytes()
 	}
 
 	#if DEBUG

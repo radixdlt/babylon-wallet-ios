@@ -66,8 +66,8 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 				id: .singleCurve(accountSet.id.factorSourceID, isOlympia: accountSet.id.isOlympia),
 				isMnemonicMarkedAsBackedUp: isMnemonicMarkedAsBackedUp,
 				isMnemonicPresentInKeychain: isMnemonicPresentInKeychain,
-				accounts: accountSet.accounts.rawValue,
-				hasHiddenAccounts: accountSet.hiddenAccounts != nil,
+				accounts: accountSet.accounts,
+				hasHiddenAccounts: !accountSet.hiddenAccounts.isEmpty,
 				mode: mode
 			)
 		}

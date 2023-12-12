@@ -306,83 +306,20 @@ extension AccountRecoveryScanInProgress {
 		state.status = .scanningNetworkForActiveAccounts
 		state.destination = nil
 		return .run { send in
-			let (active, inactive) = try await performScan(accounts: accounts)
-			await send(.internal(.foundAccounts(active: active, inactive: inactive)))
-		}
-	}
 
-	private func performScan(
-		accounts: IdentifiedArrayOf<Profile.Network.Account>
-	) async throws -> (
-		active: IdentifiedArrayOf<Profile.Network.Account>,
-		inactive: IdentifiedArrayOf<Profile.Network.Account>
-	) {
-		let accountAddresses: [AccountAddress] = accounts.map(\.address)
-
-		do {
-			let activeAccounts = try await onLedgerEntitiesClient
-				.getAccounts(
-					accountAddresses,
-					// actually we wanna `resourceMetadataKeys` as well here, but we cannot since
-					// the count will exceed `EntityMetadataKey.maxAllowedKeys`.
-					metadataKeys: [.ownerBadge, .ownerKeys],
-					forceRefresh: true
-				)
-				.filter { (onLedgerAccount: OnLedgerEntity.Account) -> Bool in
-
-					guard
-						case let metadata = onLedgerAccount.metadata,
-						let ownerKeys = metadata.ownerKeys,
-						let ownerBadge = metadata.ownerBadge
-					else { return false }
-
-					func hasStateChange(_ list: OnLedgerEntity.Metadata.ValueAtStateVersion<some Any>) -> Bool {
-						list.lastUpdatedAtStateVersion > 0
-					}
-					let isActive = hasStateChange(ownerKeys) || hasStateChange(ownerBadge)
-					return isActive
-				}
-
-			var active: IdentifiedArrayOf<Profile.Network.Account> = []
-			var inactive: IdentifiedArrayOf<Profile.Network.Account> = []
-			for account in accounts {
-				if let activeAccount = activeAccounts.first(where: { $0.address == account.address }) {
-					var account = account
-					if let depositRule = activeAccount.details?.depositRule {
-						account.onLedgerSettings.thirdPartyDeposits.depositRule = depositRule
-					}
-					active.append(account)
-				} else {
-					inactive.append(account)
-				}
-			}
-
-			// Don't remove this, this is in fact needed if we don't
-			// wanna end up in a home page no icons on our tokens.
-			//
-			// Reason:
-			// GW limits the number of metadata items we can fetch:
-			// `EntityMetadataKey.maxAllowedKeys` thus we could not
-			// fetch the `resourceMetadataKeys` when we are fetching
-			// `[.ownerBadge, .ownerKeys]`, and that call gets cached!
-			// But we only need the `[.ownerBadge, .ownerKeys]` to
-			// check for active accounts, which we have finished doing
-			// above. So we now wanna replace that cache which is no
-			// longer useful, with useful metadata, containing token
-			// info including urls.
-			_ = try await onLedgerEntitiesClient
-				.getAccounts(
-					// no need to fetch for `inactive` accounts.
-					activeAccounts.map(\.address),
-					metadataKeys: .resourceMetadataKeys,
-					forceRefresh: true
+			let onLedgerSyncOfAccounts = try await onLedgerEntitiesClient
+				.syncThirdPartyDepositWithOnLedgerSettings(
+					addressesOf: accounts
 				)
 
-			return (active, inactive)
-		} catch is GatewayAPIClient.EmptyEntityDetailsResponse {
-			return (active: [], inactive: accounts)
-		} catch {
-			throw error
+			await send(
+				.internal(
+					.foundAccounts(
+						active: onLedgerSyncOfAccounts.active,
+						inactive: onLedgerSyncOfAccounts.inactive
+					)
+				)
+			)
 		}
 	}
 }

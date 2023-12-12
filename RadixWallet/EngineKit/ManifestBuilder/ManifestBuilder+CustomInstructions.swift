@@ -4,7 +4,7 @@ extension ManifestBuilder {
 		from entity: Address,
 		ownerKeyHashes: [PublicKeyHash]
 	) throws -> ManifestBuilder {
-		try setMetadata(
+		try metadataSet(
 			address: entity.intoEngine(),
 			key: "owner_keys",
 			value: .publicKeyHashArrayValue(value: ownerKeyHashes)
@@ -15,7 +15,7 @@ extension ManifestBuilder {
 		from entity: Address,
 		type: String
 	) throws -> ManifestBuilder {
-		try setMetadata(address: entity.intoEngine(), key: "account_type", value: .stringValue(value: type))
+		try metadataSet(address: entity.intoEngine(), key: "account_type", value: .stringValue(value: type))
 	}
 }
 

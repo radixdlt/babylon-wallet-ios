@@ -33,6 +33,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		case ledgerHardwareWalletsButtonTapped
 		case importFromOlympiaWalletButtonTapped
 		case accountRecoveryButtonTapped
+		case profileBackupSettingsButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -42,6 +43,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case gotoAccountList
+		case deleteProfileAndFactorSources(keepInICloudIfPresent: Bool)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -51,6 +53,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			case depositGuarantees(DefaultDepositGuarantees.State)
 			case importOlympiaWallet(ImportOlympiaWalletCoordinator.State)
 			case accountRecovery(ManualAccountRecoveryCoordinator.State)
+			case profileBackupSettings(ProfileBackupSettings.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -59,6 +62,7 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			case depositGuarantees(DefaultDepositGuarantees.Action)
 			case importOlympiaWallet(ImportOlympiaWalletCoordinator.Action)
 			case accountRecovery(ManualAccountRecoveryCoordinator.Action)
+			case profileBackupSettings(ProfileBackupSettings.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -76,6 +80,9 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.accountRecovery, action: /Action.accountRecovery) {
 				ManualAccountRecoveryCoordinator()
+			}
+			Scope(state: /State.profileBackupSettings, action: /Action.profileBackupSettings) {
+				ProfileBackupSettings()
 			}
 		}
 	}
@@ -133,6 +140,10 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 		case .accountRecoveryButtonTapped:
 			state.destination = .accountRecovery(.init())
 			return .none
+
+		case .profileBackupSettingsButtonTapped:
+			state.destination = .profileBackupSettings(.init())
+			return .none
 		}
 	}
 
@@ -159,6 +170,9 @@ public struct AccountSecurity: Sendable, FeatureReducer {
 				state.destination = nil
 				return .none
 			}
+
+		case let .profileBackupSettings(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))):
+			return .send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent)))
 
 		default:
 			return .none

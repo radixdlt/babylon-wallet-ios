@@ -28,6 +28,7 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case closeButtonTapped
 		case task
+		case openURLTapped(URL)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -39,6 +40,7 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+	@Dependency(\.openURL) var openURL
 
 	public init() {}
 
@@ -55,6 +57,10 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 			}
 		case .closeButtonTapped:
 			return .send(.delegate(.dismiss))
+		case let .openURLTapped(url):
+			return .run { _ in
+				await openURL(url)
+			}
 		}
 	}
 

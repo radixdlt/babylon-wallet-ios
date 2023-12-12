@@ -184,6 +184,10 @@ extension Profile.Network.Account {
 }
 
 extension Profile.Network.Account {
+	public var accountAddress: AccountAddress {
+		address
+	}
+
 	public mutating func hide() {
 		flags.append(.deletedByUser)
 	}
