@@ -19,6 +19,7 @@ public struct Home: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
+		case onFirstAppear
 		case task
 		case pullToRefreshStarted
 		case createAccountButtonTapped
@@ -79,6 +80,7 @@ public struct Home: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+	@Dependency(\.iOSSecurityClient) var iOSSecurityClient
 
 	public init() {}
 
@@ -96,15 +98,19 @@ public struct Home: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .task:
-			state.destination = .acknowledgeJailbreakAlert(.init(
-				title: .init("Possible jailbreak detected"), // FIXME: Strings - get real string
-				message: .init("It appears that your device might be jailbroken. To ensure the security of your Accounts and assets, using the Radix Wallet on rooted devices is not recommended. Please confirm if you wish to continue anyway at your own risk."), // FIXME: Strings - splash_rootDetection_title - should be messageIOS
-				buttons: [
-					.destructive(.init("I Understand the Risk")),
-				]
-			))
+		case .onFirstAppear:
+			if iOSSecurityClient.isJailbroken() {
+				state.destination = .acknowledgeJailbreakAlert(.init(
+					title: .init("Possible jailbreak detected"), // FIXME: Strings - get real string
+					message: .init("It appears that your device might be jailbroken. To ensure the security of your Accounts and assets, using the Radix Wallet on jailbroken devices is not recommended. Please confirm if you wish to continue anyway at your own risk."), // FIXME: Strings - splash_rootDetection_title - should be messageIOS
+					buttons: [
+						.cancel(.init("I Understand the Risk")),
+					]
+				))
+			}
+			return .none
 
+		case .task:
 			return .run { send in
 				for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
 					guard !Task.isCancelled else { return }

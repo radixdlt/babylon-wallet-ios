@@ -59,6 +59,9 @@ extension Home {
 				await store.send(.view(.task)).finish()
 			}
 			.destinations(with: store)
+			.onFirstAppear {
+				store.send(.view(.onFirstAppear))
+			}
 		}
 
 		private struct HeaderView: SwiftUI.View {
@@ -113,6 +116,7 @@ private extension View {
 			.createAccount(with: destinationStore)
 			.exportMnemonic(with: destinationStore)
 			.importMnemonics(with: destinationStore)
+			.acknowledgeJailbreakAlert(with: destinationStore)
 	}
 
 	private func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
