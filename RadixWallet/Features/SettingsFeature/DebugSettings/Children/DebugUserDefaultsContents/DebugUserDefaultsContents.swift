@@ -45,7 +45,8 @@ public struct DebugUserDefaultsContents: Sendable, FeatureReducer {
 					guard !Task.isCancelled else { return }
 					await send(.internal(.gotStringValue(string ?? "<NIL>")))
 				}
-			}.merge(with: .run { _ in
+			}
+			.merge(with: .run { _ in
 				@Sendable func emit() async {
 					try? await clock.sleep(for: .seconds(0.5))
 					guard !Task.isCancelled else { return }
@@ -95,8 +96,12 @@ extension UserDefaults.Dependency.Key {
 			return [value]
 		case .epochForWhenLastUsedByAccountAddress:
 			return userDefaults.loadEpochForWhenLastUsedByAccountAddress().epochForAccounts.map { "epoch: \($0.epoch) account: \($0.accountAddress)" }
+
 		case .hideMigrateOlympiaButton:
 			return [userDefaults.hideMigrateOlympiaButton].map(String.init(describing:))
+
+		case .showRadixBanner:
+			return [userDefaults.showRadixBanner].map(String.init(describing:))
 
 		case .mnemonicsUserClaimsToHaveBackedUp:
 			return userDefaults.getFactorSourceIDOfBackedUpMnemonics().map(String.init(describing:))

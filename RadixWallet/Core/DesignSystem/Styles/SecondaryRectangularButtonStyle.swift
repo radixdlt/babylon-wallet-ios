@@ -5,12 +5,14 @@ public struct SecondaryRectangularButtonStyle: ButtonStyle {
 	let isDestructive: Bool
 	let isInToolbar: Bool
 	let image: Image?
+	let trailingImage: Image?
 
 	public func makeBody(configuration: ButtonStyle.Configuration) -> some View {
 		ZStack {
 			HStack(spacing: .small2) {
 				image
 				configuration.label
+				trailingImage
 			}
 			.foregroundColor(foregroundColor)
 			.font(.app.body1Header)
@@ -53,13 +55,15 @@ extension ButtonStyle where Self == SecondaryRectangularButtonStyle {
 		shouldExpand: Bool = false,
 		isDestructive: Bool = false,
 		isInToolbar: Bool = false,
-		image: Image? = nil
+		image: Image? = nil,
+		trailingImage: Image? = nil
 	) -> Self {
 		Self(
 			shouldExpand: shouldExpand,
 			isDestructive: isDestructive,
 			isInToolbar: isInToolbar,
-			image: image
+			image: image,
+			trailingImage: trailingImage
 		)
 	}
 }

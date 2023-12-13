@@ -3,19 +3,20 @@ import SwiftUI
 
 // MARK: - Home
 public struct Home: Sendable, FeatureReducer {
+	public static let radixBannerURL = URL(string: "https://wallet.radixdlt.com/?collapseStepOne")!
+
 	public struct State: Sendable, Hashable {
 		// MARK: - Components
-		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State>
+		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State> = []
 		public var shouldWriteDownPersonasSeedPhrase: Bool = false
+
+		public var showRadixBanner: Bool = false
 
 		// MARK: - Destination
 		@PresentationState
-		public var destination: Destination.State?
+		public var destination: Destination.State? = nil
 
-		public init() {
-			self.accountRows = []
-			self.destination = nil
-		}
+		public init() {}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -24,6 +25,8 @@ public struct Home: Sendable, FeatureReducer {
 		case pullToRefreshStarted
 		case createAccountButtonTapped
 		case settingsButtonTapped
+		case radixBannerButtonTapped
+		case radixBannerDismissButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -77,7 +80,9 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.openURL) var openURL
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.userDefaults) var userDefaults
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 	@Dependency(\.iOSSecurityClient) var iOSSecurityClient
@@ -111,6 +116,8 @@ public struct Home: Sendable, FeatureReducer {
 			return .none
 
 		case .task:
+			state.showRadixBanner = userDefaults.showRadixBanner
+
 			return .run { send in
 				for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
 					guard !Task.isCancelled else { return }
@@ -136,6 +143,16 @@ public struct Home: Sendable, FeatureReducer {
 			} catch: { error, _ in
 				errorQueue.schedule(error)
 			}
+		case .radixBannerButtonTapped:
+			return .run { _ in
+				await openURL(Home.radixBannerURL)
+			}
+
+		case .radixBannerDismissButtonTapped:
+			userDefaults.setShowRadixBanner(false)
+			state.showRadixBanner = false
+			return .none
+
 		case .settingsButtonTapped:
 			return .send(.delegate(.displaySettings))
 		}

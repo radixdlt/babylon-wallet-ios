@@ -85,6 +85,7 @@ public enum AssetResource {
   public static let homeAggregatedValueHidden = ImageAsset(name: "home-aggregatedValue-hidden")
   public static let homeAggregatedValueShown = ImageAsset(name: "home-aggregatedValue-shown")
   public static let homeHeaderSettings = ImageAsset(name: "home-header-settings")
+  public static let radixBanner = ImageAsset(name: "radix-banner")
   public static let iconMarketCap = ImageAsset(name: "Icon-Market-Cap")
   public static let placeholderSecurityStructure = ImageAsset(name: "PLACEHOLDER_SecurityStructure")
   public static let brokenImagePlaceholder = ImageAsset(name: "broken-image-placeholder")
