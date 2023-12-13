@@ -117,7 +117,7 @@ extension DeviceFactorSource {
 		if hint.mnemonicWordCount == .twentyFour {
 			return true
 		} else {
-			assertionFailure("We should never have added Babylon crypto parameters to a non-24-word mnemonic.")
+			loggerGlobal.error("BDFS with non 24 words mnemonic found, probably this profile originated from Android? Which with 'BDFS Error' with 1.0.0 allowed usage of 12 word Olympia Mnemonic.")
 			return false
 		}
 	}
