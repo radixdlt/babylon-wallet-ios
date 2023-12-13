@@ -104,7 +104,7 @@ public struct Home: Sendable, FeatureReducer {
 					title: .init("Possible jailbreak detected"), // FIXME: Strings - get real string
 					message: .init("It appears that your device might be jailbroken. To ensure the security of your Accounts and assets, using the Radix Wallet on jailbroken devices is not recommended. Please confirm if you wish to continue anyway at your own risk."), // FIXME: Strings - splash_rootDetection_title - should be messageIOS
 					buttons: [
-						.cancel(.init("I Understand the Risk")),
+						.cancel(.init("I Understand the Risk")), // FIXME: Strings
 					]
 				))
 			}
