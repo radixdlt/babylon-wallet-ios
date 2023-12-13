@@ -47,6 +47,7 @@ public struct Home: Sendable, FeatureReducer {
 			case createAccount(CreateAccountCoordinator.State)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
 			case exportMnemonic(ExportMnemonic.State)
+			case acknowledgeJailbreakAlert(AlertState<Action.AcknowledgeJailbreakAlert>)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -54,6 +55,9 @@ public struct Home: Sendable, FeatureReducer {
 			case createAccount(CreateAccountCoordinator.Action)
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
 			case exportMnemonic(ExportMnemonic.Action)
+			case acknowledgeJailbreakAlert(AcknowledgeJailbreakAlert)
+
+			public enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -93,6 +97,14 @@ public struct Home: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
+			state.destination = .acknowledgeJailbreakAlert(.init(
+				title: .init("Possible jailbreak detected"), // FIXME: Strings - get real string
+				message: .init("It appears that your device might be jailbroken. To ensure the security of your Accounts and assets, using the Radix Wallet on rooted devices is not recommended. Please confirm if you wish to continue anyway at your own risk."), // FIXME: Strings - splash_rootDetection_title - should be messageIOS
+				buttons: [
+					.destructive(.init("I Understand the Risk")),
+				]
+			))
+
 			return .run { send in
 				for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
 					guard !Task.isCancelled else { return }

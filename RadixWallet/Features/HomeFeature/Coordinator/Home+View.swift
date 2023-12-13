@@ -150,6 +150,14 @@ private extension View {
 			content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
 		)
 	}
+
+	private func acknowledgeJailbreakAlert(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
+		alert(
+			store: destinationStore,
+			state: /Home.Destination.State.acknowledgeJailbreakAlert,
+			action: Home.Destination.Action.acknowledgeJailbreakAlert
+		)
+	}
 }
 
 extension View {
