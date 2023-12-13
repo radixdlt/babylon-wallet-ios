@@ -85,20 +85,20 @@ extension AddressView {
 		}
 	}
 
+	@ViewBuilder
 	private var addressView: some View {
-		Group {
-			if format == .full {
-				Text("\(identifiable.address.formatted(format))\(image)")
-					.lineLimit(nil)
-			} else {
-				HStack(spacing: .small3) {
-					Text(identifiable.address.formatted(format))
-						.lineLimit(1)
-					image
-				}
+		if format == .full {
+			Text("\(identifiable.address.formatted(format))\(image)")
+				.lineLimit(nil)
+				.multilineTextAlignment(.leading)
+				.minimumScaleFactor(0.5)
+		} else {
+			HStack(spacing: .small3) {
+				Text(identifiable.address.formatted(format))
+					.lineLimit(1)
+				image
 			}
 		}
-		.multilineTextAlignment(.leading)
 	}
 
 	private var image: Image {
