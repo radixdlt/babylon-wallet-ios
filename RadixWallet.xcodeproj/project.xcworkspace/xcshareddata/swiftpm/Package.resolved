@@ -55,6 +55,15 @@
       }
     },
     {
+      "identity" : "iossecuritysuite",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/securing/IOSSecuritySuite.git",
+      "state" : {
+        "revision" : "57dd401a406f9bf81b60dfe6d5305a27e0751dd4",
+        "version" : "1.9.10"
+      }
+    },
+    {
       "identity" : "jsonpreview",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/rakuyoMo/JSONPreview",

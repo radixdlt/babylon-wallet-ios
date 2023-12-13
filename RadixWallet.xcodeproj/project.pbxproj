@@ -1222,6 +1222,10 @@
 		A41266F12B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift */; };
 		A41266F72B160F3F00EA38E9 /* ManualAccountRecoveryCoordinator+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F62B160F3F00EA38E9 /* ManualAccountRecoveryCoordinator+Reducer.swift */; };
 		A41266F92B160F4C00EA38E9 /* ManualAccountRecoveryCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F82B160F4C00EA38E9 /* ManualAccountRecoveryCoordinator+View.swift */; };
+		A47571FF2B29B0860059A95D /* IOSSecuritySuite in Frameworks */ = {isa = PBXBuildFile; productRef = A47571FE2B29B0860059A95D /* IOSSecuritySuite */; };
+		A47572042B29B4EE0059A95D /* IOSSecurityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */; };
+		A47572052B29B4F20059A95D /* IOSSecurityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */; };
+		A47572062B29B4F50059A95D /* IOSSecurityClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572012B29B3CA0059A95D /* IOSSecurityClient+Live.swift */; };
 		E62449D52AFBA61100272C67 /* Home+AccountRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */; };
 		E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */; };
 		E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */; };
@@ -2534,6 +2538,9 @@
 		A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoverySeedPhrase+View.swift"; sourceTree = "<group>"; };
 		A41266F62B160F3F00EA38E9 /* ManualAccountRecoveryCoordinator+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryCoordinator+Reducer.swift"; sourceTree = "<group>"; };
 		A41266F82B160F4C00EA38E9 /* ManualAccountRecoveryCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryCoordinator+View.swift"; sourceTree = "<group>"; };
+		A47572012B29B3CA0059A95D /* IOSSecurityClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Live.swift"; sourceTree = "<group>"; };
+		A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Test.swift"; sourceTree = "<group>"; };
+		A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Interface.swift"; sourceTree = "<group>"; };
 		E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+Reducer.swift"; sourceTree = "<group>"; };
 		E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+View.swift"; sourceTree = "<group>"; };
 		E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportMnemonicTests.swift; sourceTree = "<group>"; };
@@ -2677,6 +2684,7 @@
 				48FFFB0D2ADC744700B2B213 /* TextBuilder in Frameworks */,
 				48FFFB0A2ADC721800B2B213 /* Atomics in Frameworks */,
 				48FFFB002ADC25A200B2B213 /* BigInt in Frameworks */,
+				A47571FF2B29B0860059A95D /* IOSSecuritySuite in Frameworks */,
 				48FFFAFB2ADC241A00B2B213 /* HashTreeCollections in Frameworks */,
 				48FFFAC52ADC211700B2B213 /* JSONTesting in Frameworks */,
 				48FFFB062ADC6FD300B2B213 /* SwiftUINavigation in Frameworks */,
@@ -5128,6 +5136,7 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
+				A47572002B29B3B90059A95D /* IOSSecurityClient */,
 				830EA9D92AEA8750004C8051 /* EntitiesVisibilityClient */,
 				48CFBF8D2ADC10D900E77A5C /* AccountPortfoliosClient */,
 				48CFBF622ADC10D900E77A5C /* AccountsClient */,
@@ -6936,6 +6945,16 @@
 			path = ManualAccountRecoveryScan;
 			sourceTree = "<group>";
 		};
+		A47572002B29B3B90059A95D /* IOSSecurityClient */ = {
+			isa = PBXGroup;
+			children = (
+				A47572012B29B3CA0059A95D /* IOSSecurityClient+Live.swift */,
+				A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */,
+				A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */,
+			);
+			path = IOSSecurityClient;
+			sourceTree = "<group>";
+		};
 		E634CA2C2AFD259000C43DB7 /* DebugKeychainContents */ = {
 			isa = PBXGroup;
 			children = (
@@ -7669,6 +7688,7 @@
 				48FFFB092ADC721800B2B213 /* Atomics */,
 				48FFFB0C2ADC744700B2B213 /* TextBuilder */,
 				E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */,
+				A47571FE2B29B0860059A95D /* IOSSecuritySuite */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -7737,6 +7757,7 @@
 				48FFFB012ADC6F8100B2B213 /* XCRemoteSwiftPackageReference "swift-builders" */,
 				48FFFB042ADC6FD300B2B213 /* XCRemoteSwiftPackageReference "swiftui-navigation" */,
 				48FFFB0B2ADC744700B2B213 /* XCRemoteSwiftPackageReference "TextBuilder" */,
+				A47571FD2B29B0860059A95D /* XCRemoteSwiftPackageReference "IOSSecuritySuite" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -8135,6 +8156,7 @@
 				48CFC63D2ADC10DB00E77A5C /* CustomHierarchicalDeterministicDerivationPath.swift in Sources */,
 				48CFC4192ADC10DA00E77A5C /* Tuple+Extra.swift in Sources */,
 				48CFC6502ADC10DB00E77A5C /* PersonaData+CreditCard.swift in Sources */,
+				A47572052B29B4F20059A95D /* IOSSecurityClient+Test.swift in Sources */,
 				48CFC52F2ADC10DA00E77A5C /* GatewayInfoResponseKnownTarget.swift in Sources */,
 				48CFC23D2ADC10D900E77A5C /* SecurityStructureConfigurationRow+View.swift in Sources */,
 				48CFC24C2ADC10D900E77A5C /* GatewaySettings+View.swift in Sources */,
@@ -8260,6 +8282,7 @@
 				48CFC4812ADC10DA00E77A5C /* ROLAFailure.swift in Sources */,
 				48CFC3662ADC10D900E77A5C /* NonFungibleTokenDetails+Reducer.swift in Sources */,
 				48CFC5032ADC10DA00E77A5C /* MetadataI64Value.swift in Sources */,
+				A47572042B29B4EE0059A95D /* IOSSecurityClient+Interface.swift in Sources */,
 				E6FA984E2B04E3D500748F20 /* NoContentView.swift in Sources */,
 				48CFC27E2ADC10D900E77A5C /* HUD+View.swift in Sources */,
 				48CFC4732ADC10DA00E77A5C /* DeviceFactorSourceClient+Test.swift in Sources */,
@@ -8445,6 +8468,7 @@
 				48CFC3872ADC10D900E77A5C /* AssetsView+View.swift in Sources */,
 				83EE47552AF0DE8F00155F03 /* TransactionPayloadGatewayHandlingStatus.swift in Sources */,
 				48CFC4802ADC10DA00E77A5C /* ROLAClient+Live.swift in Sources */,
+				A47572062B29B4F50059A95D /* IOSSecurityClient+Live.swift in Sources */,
 				48CFC4362ADC10DA00E77A5C /* JSONEncoder+Live.swift in Sources */,
 				48CFC4862ADC10DA00E77A5C /* OnLedgerEntitiesClient+Interface.swift in Sources */,
 				48CFC3982ADC10D900E77A5C /* ReviewedTransaction.swift in Sources */,
@@ -9782,6 +9806,14 @@
 				minimumVersion = 3.0.1;
 			};
 		};
+		A47571FD2B29B0860059A95D /* XCRemoteSwiftPackageReference "IOSSecuritySuite" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/securing/IOSSecuritySuite.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.9.10;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -9979,6 +10011,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFB0B2ADC744700B2B213 /* XCRemoteSwiftPackageReference "TextBuilder" */;
 			productName = TextBuilder;
+		};
+		A47571FE2B29B0860059A95D /* IOSSecuritySuite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A47571FD2B29B0860059A95D /* XCRemoteSwiftPackageReference "IOSSecuritySuite" */;
+			productName = IOSSecuritySuite;
 		};
 		E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */ = {
 			isa = XCSwiftPackageProductDependency;
