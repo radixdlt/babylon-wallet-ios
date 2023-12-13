@@ -429,8 +429,12 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 		case .dAppValidationError:
 			L10n.DAppRequest.ValidationOutcome.invalidRequestMessage
 		case let .wrongNetworkID(ce, wallet):
-			L10n.DAppRequest.RequestWrongNetworkAlert.message(ce, wallet)
+			L10n.DAppRequest.RequestWrongNetworkAlert.message(networkName(for: ce), networkName(for: wallet))
 		}
+	}
+
+	private func networkName(for networkID: NetworkID) -> String {
+		(try? Radix.Network.lookupBy(id: networkID).displayDescription) ?? String(describing: networkID)
 	}
 }
 
