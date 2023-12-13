@@ -112,6 +112,12 @@ public struct SecureStorageClient: Sendable {
 	#endif // DEBUG
 }
 
+// MARK: - LoadMnemonicByFactorSourceIDRequest
+public struct LoadMnemonicByFactorSourceIDRequest: Sendable, Hashable {
+	public let factorSourceID: FactorSourceID.FromHash
+	public let notifyIfMissing: Bool
+}
+
 extension SecureStorageClient {
 	public typealias UpdateIsCloudProfileSyncEnabled = @Sendable (ProfileSnapshot.Header.ID, CloudProfileSyncActivation) throws -> Void
 	public typealias SaveProfileSnapshot = @Sendable (ProfileSnapshot) throws -> Void
@@ -120,7 +126,7 @@ extension SecureStorageClient {
 	public typealias LoadProfile = @Sendable (ProfileSnapshot.Header.ID) throws -> Profile?
 
 	public typealias SaveMnemonicForFactorSource = @Sendable (PrivateHDFactorSource) throws -> Void
-	public typealias LoadMnemonicByFactorSourceID = @Sendable (FactorSourceID.FromHash, LoadMnemonicPurpose, _ notifyIfMissing: Bool) throws -> MnemonicWithPassphrase?
+	public typealias LoadMnemonicByFactorSourceID = @Sendable (LoadMnemonicByFactorSourceIDRequest) throws -> MnemonicWithPassphrase?
 	public typealias ContainsMnemonicIdentifiedByFactorSourceID = @Sendable (FactorSourceID.FromHash) -> Bool
 
 	#if DEBUG
@@ -188,10 +194,9 @@ extension SecureStorageClient {
 	@Sendable
 	public func loadMnemonic(
 		factorSourceID: FactorSourceID.FromHash,
-		purpose: LoadMnemonicPurpose,
 		notifyIfMissing: Bool = true
 	) throws -> MnemonicWithPassphrase? {
-		try self.loadMnemonicByFactorSourceID(factorSourceID, purpose, notifyIfMissing)
+		try self.loadMnemonicByFactorSourceID(.init(factorSourceID: factorSourceID, notifyIfMissing: notifyIfMissing))
 	}
 
 	@Sendable
