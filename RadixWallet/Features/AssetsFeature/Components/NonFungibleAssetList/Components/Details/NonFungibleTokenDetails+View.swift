@@ -189,12 +189,13 @@ extension NonFungibleTokenDetails.ViewState.TokenDetails {
 }
 
 extension OnLedgerEntity.NonFungibleToken.NFTData {
+	private static let standardFields: [OnLedgerEntity.NonFungibleToken.NFTData.StandardField] = [.name, .description, .keyImageURL]
+
 	fileprivate var arbitraryDataFields: [NonFungibleTokenDetails.ViewState.TokenDetails.ArbitraryDataField] {
-		let standardFields = OnLedgerEntity.NonFungibleToken.NFTData.StandardField.allCases.map(\.rawValue)
-		return fields.compactMap { field in
+		fields.compactMap { field in
 			guard let fieldName = field.fieldName,
 			      let kind = field.fieldKind,
-			      !standardFields.contains(fieldName) // Filter out standard fields
+			      !Self.standardFields.map(\.rawValue).contains(fieldName) // Filter out standard fields
 			else {
 				return nil
 			}

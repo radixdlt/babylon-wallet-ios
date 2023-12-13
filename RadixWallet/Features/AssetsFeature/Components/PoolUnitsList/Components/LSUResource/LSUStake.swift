@@ -28,10 +28,12 @@ public struct LSUStake: FeatureReducer {
 	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case details(LSUDetails.State)
+			case stakeClaimDetails(NonFungibleTokenDetails.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case details(LSUDetails.Action)
+			case stakeClaimDetails(NonFungibleTokenDetails.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -39,6 +41,12 @@ public struct LSUStake: FeatureReducer {
 				state: /State.details,
 				action: /Action.details,
 				child: LSUDetails.init
+			)
+
+			Scope(
+				state: /State.stakeClaimDetails,
+				action: /Action.stakeClaimDetails,
+				child: NonFungibleTokenDetails.init
 			)
 		}
 	}
@@ -87,7 +95,9 @@ public struct LSUStake: FeatureReducer {
 			guard case let .success(stakeDetails) = state.stakeDetails else {
 				return .none
 			}
-			guard let token = stakeDetails.stakeClaimTokens?.tokens.first(where: { $0.id == id }) else {
+			guard let nftResource = stakeDetails.stakeClaimTokens,
+			      let token = nftResource.tokens.first(where: { $0.id == id })
+			else {
 				assertionFailure("Did tapp a missing NFT?")
 				return .none
 			}
@@ -96,7 +106,12 @@ public struct LSUStake: FeatureReducer {
 				state.selectedStakeClaimAssets?.toggle(token)
 			}
 
-			// TODO: Show details
+			state.destination = .stakeClaimDetails(.init(
+				resourceAddress: nftResource.resource.resourceAddress,
+				resourceDetails: .success(nftResource.resource),
+				token: token,
+				ledgerState: nftResource.resource.atLedgerState
+			))
 			return .none
 		}
 	}

@@ -201,11 +201,25 @@ private extension StoreOf<LSUStake> {
 private extension View {
 	func destinations(with store: StoreOf<LSUStake>) -> some View {
 		let destinationStore = store.destination
-		return sheet(
+		return lsuDetails(with: destinationStore)
+			.stakeClaimNFTDetails(with: destinationStore)
+	}
+
+	private func lsuDetails(with destinationStore: PresentationStoreOf<LSUStake.Destination>) -> some View {
+		sheet(
 			store: destinationStore,
 			state: /LSUStake.Destination.State.details,
 			action: LSUStake.Destination.Action.details,
 			content: { LSUDetails.View(store: $0) }
+		)
+	}
+
+	private func stakeClaimNFTDetails(with destinationStore: PresentationStoreOf<LSUStake.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /LSUStake.Destination.State.stakeClaimDetails,
+			action: LSUStake.Destination.Action.stakeClaimDetails,
+			content: { NonFungibleTokenDetails.View(store: $0) }
 		)
 	}
 }
