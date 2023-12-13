@@ -318,10 +318,15 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .previewLoaded(.failure(error)):
+		case let .previewLoaded(.failure(failure)):
+			let error = TransactionReviewFailureFailedToGeneratePreview(underylyingError: failure)
 			loggerGlobal.error("Transaction preview failed, error: \(error)")
-			errorQueue.schedule(TransactionReviewFailure(underylying: error))
-			return .send(.delegate(.failed(TransactionFailure.failedToPrepareTXReview(.failedToGenerateTXReview(error)))))
+			errorQueue.schedule(error)
+			if let error = failure as? TransactionFailure.FailedToPreviewTXReview {
+				return .send(.delegate(.failed(TransactionFailure.failedToPrepareTXReview(error))))
+			} else {
+				return .send(.delegate(.failed(.failedToPrepareTXReview(nil))))
+			}
 
 		case let .previewLoaded(.success(preview)):
 			do {
@@ -1166,27 +1171,61 @@ extension ResourceTracker {
 	}
 }
 
-// MARK: - TransactionReviewFailure
-public struct TransactionReviewFailure: LocalizedError {
-	public let underylying: Swift.Error
+// MARK: - TransactionReviewFailureFailedToGeneratePreview
+public struct TransactionReviewFailureFailedToGeneratePreview: LocalizedError {
+	public let underylyingError: Swift.Error
 	public var errorDescription: String? {
-		let additionalInfo = if case TransactionFailure.failedToPrepareTXReview(.oneOfRecevingAccountsDoesNotAllowDeposits) = underylying {
-			// FIXME: strings
-			"\n\n One of the receiving accounts does not allow third-party deposits."
-		} else {
-			""
+		let generic = L10n.Error.TransactionFailure.reviewFailure
+		let baseError: String
+		var specificError: String?
+		var debugMsg: String?
+
+		guard
+			let txFailure = underylyingError as? TransactionFailure,
+			case let .failedToPrepareTXReview(reason) = txFailure
+		else {
+			return generic
 		}
 
+		switch reason {
+		case nil:
+			baseError = generic
+		case let .failedBeforeRequestToGatewayWasMade(inner):
+			baseError = generic
+			debugMsg = String(describing: inner)
+		case let .requestToGatewayFailed(inner):
+			switch inner {
+			case .gatewayPreviewRequestResponseIsOneOfRecevingAccountsDoesNotAllowDeposits:
+				specificError = "One of the receiving accounts does not allow third-party deposits"
+			default: break
+			}
+			baseError = "A proposed transaction had a problem and could not be processed. Please inform the dApp provider." // FIXME: Strings
+			debugMsg = String(describing: inner)
+		case let .analyzeResponseFromGatewayFailed(inner):
+			switch inner {
+			case let .other(inner):
+				debugMsg = inner
+			case let .manifestWithReservedInstructions(reserved):
+				let reservedInstructionsString = reserved.map { String(describing: $0) }.joined(separator: "\n")
+				// should we set `specificError` instead of `debugMsg`???
+				debugMsg = "Transaction Manifest contains forbidden instructions: \(reservedInstructionsString)"
+			}
+			baseError = "A proposed transaction included an action that isn't valid. For example, there might have been insufficient tokens." // FIXME: Strings
+			debugMsg = String(describing: inner)
+		}
+		let additionalInfo = specificError.map { "\n\n \($0)." } ?? ""
+
 		let debugInfo = {
+			guard let debugMsg else { return "" }
 			// https://rdxworks.slack.com/archives/C031A0V1A1W/p1694087946050189?thread_ts=1694085688.749539&cid=C031A0V1A1W
 			#if DEBUG
-			"\n[DEBUG] Underlying error: \(String(describing: underylying))"
+			return "\n[DEBUG] Underlying error: \(debugMsg)"
 			#else
-			""
+			return ""
 			#endif
 		}()
 
-		return L10n.Error.TransactionFailure.reviewFailure + additionalInfo + debugInfo
+		return baseError + additionalInfo + debugInfo
 	}
 }
 

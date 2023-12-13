@@ -156,67 +156,80 @@ extension TransactionClient {
 		}
 
 		let getTransactionReview: GetTransactionReview = { request in
+
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 
-			/// Get all transaction signers.
-			let transactionSigners = try await getTransactionSigners(.init(
-				networkID: networkID,
-				manifest: request.manifestToSign,
-				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
-			))
+			let transactionSigners: TransactionSigners
+			let transactionPreviewRequest: GatewayAPI.TransactionPreviewRequest
+			do {
+				/// Get all transaction signers.
+				transactionSigners = try await getTransactionSigners(.init(
+					networkID: networkID,
+					manifest: request.manifestToSign,
+					ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
+				))
 
+				transactionPreviewRequest = try await createTransactionPreviewRequest(for: request, networkID: networkID, transactionSigners: transactionSigners)
+			} catch {
+				throw TransactionFailure.FailedToPreviewTXReview.failedBeforeRequestToGatewayWasMade(String(describing: error))
+			}
 			/// Get the transaction preview
-			let transactionPreviewRequest = try await createTransactionPreviewRequest(for: request, networkID: networkID, transactionSigners: transactionSigners)
 			let transactionPreviewResponse = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
 			guard transactionPreviewResponse.receipt.status == .succeeded else {
-				throw TransactionFailure.fromFailedTXReviewResponse(transactionPreviewResponse)
-			}
-			let receiptBytes = try Data(hex: transactionPreviewResponse.encodedReceipt)
-
-			/// Analyze the manifest
-			let analyzedManifestToReview = try request.manifestToSign.analyzeExecution(transactionReceipt: receiptBytes)
-
-			/// Transactions created outside of the Wallet are not allowed to use reserved instructions
-			if !request.isWalletTransaction, !analyzedManifestToReview.reservedInstructions.isEmpty {
-				throw TransactionFailure.failedToPrepareTXReview(.manifestWithReservedInstructions(analyzedManifestToReview.reservedInstructions))
+				throw TransactionFailure.FailedToPreviewTXReview.requestToGatewayFailed(.gatewayRequestFailed(with: transactionPreviewResponse))
 			}
 
-			/// Get all of the expected signing factors.
-			let signingFactors = try await {
-				if let nonEmpty = NonEmpty<Set<EntityPotentiallyVirtual>>(transactionSigners.intentSignerEntitiesOrEmpty()) {
-					return try await factorSourcesClient.getSigningFactors(.init(
-						networkID: networkID,
-						signers: nonEmpty,
-						signingPurpose: request.signingPurpose
-					))
+			do {
+				let receiptBytes = try Data(hex: transactionPreviewResponse.encodedReceipt)
+
+				/// Analyze the manifest
+				let analyzedManifestToReview = try request.manifestToSign.analyzeExecution(transactionReceipt: receiptBytes)
+
+				/// Transactions created outside of the Wallet are not allowed to use reserved instructions
+				if !request.isWalletTransaction, !analyzedManifestToReview.reservedInstructions.isEmpty {
+					throw TransactionFailure.FailedToPreviewTXReview.analyzeResponseFromGatewayFailed(.manifestWithReservedInstructions(analyzedManifestToReview.reservedInstructions))
 				}
-				return [:]
-			}()
 
-			/// If notary is signatory, count the signature of the notary that will be added.
-			let signaturesCount = transactionSigners.notaryIsSignatory ? 1 : signingFactors.expectedSignatureCount
-			var transactionFee = try TransactionFee(
-				executionAnalysis: analyzedManifestToReview,
-				signaturesCount: signaturesCount,
-				notaryIsSignatory: transactionSigners.notaryIsSignatory,
-				includeLockFee: false // Calculate without LockFee cost. It is yet to be determined if LockFe will be added or not
-			)
+				/// Get all of the expected signing factors.
+				let signingFactors = try await {
+					if let nonEmpty = NonEmpty<Set<EntityPotentiallyVirtual>>(transactionSigners.intentSignerEntitiesOrEmpty()) {
+						return try await factorSourcesClient.getSigningFactors(.init(
+							networkID: networkID,
+							signers: nonEmpty,
+							signingPurpose: request.signingPurpose
+						))
+					}
+					return [:]
+				}()
 
-			if transactionFee.totalFee.lockFee > .zero {
-				/// LockFee required
-				/// Total cost > `zero`, recalculate the total by adding lockFee cost.
-				transactionFee.addLockFeeCost()
-				/// Fee Payer is required, thus there will be a signature with user account added
-				transactionFee.updateNotarizingCost(notaryIsSignatory: false)
+				/// If notary is signatory, count the signature of the notary that will be added.
+				let signaturesCount = transactionSigners.notaryIsSignatory ? 1 : signingFactors.expectedSignatureCount
+				var transactionFee = try TransactionFee(
+					executionAnalysis: analyzedManifestToReview,
+					signaturesCount: signaturesCount,
+					notaryIsSignatory: transactionSigners.notaryIsSignatory,
+					includeLockFee: false // Calculate without LockFee cost. It is yet to be determined if LockFe will be added or not
+				)
+
+				if transactionFee.totalFee.lockFee > .zero {
+					/// LockFee required
+					/// Total cost > `zero`, recalculate the total by adding lockFee cost.
+					transactionFee.addLockFeeCost()
+					/// Fee Payer is required, thus there will be a signature with user account added
+					transactionFee.updateNotarizingCost(notaryIsSignatory: false)
+				}
+
+				return TransactionToReview(
+					analyzedManifestToReview: analyzedManifestToReview,
+					networkID: networkID,
+					transactionFee: transactionFee,
+					transactionSigners: transactionSigners,
+					signingFactors: signingFactors
+				)
+
+			} catch {
+				throw TransactionFailure.FailedToPreviewTXReview.analyzeResponseFromGatewayFailed(.other(String(describing: error)))
 			}
-
-			return TransactionToReview(
-				analyzedManifestToReview: analyzedManifestToReview,
-				networkID: networkID,
-				transactionFee: transactionFee,
-				transactionSigners: transactionSigners,
-				signingFactors: signingFactors
-			)
 		}
 
 		@Sendable
@@ -366,8 +379,8 @@ extension TransactionClient {
 	}
 }
 
-extension TransactionFailure {
-	static func fromFailedTXReviewResponse(_ response: GatewayAPI.TransactionPreviewResponse) -> Self {
+extension TransactionFailure.FailedToPreviewTXReview.RequestToGatewayFailed {
+	static func gatewayRequestFailed(with response: GatewayAPI.TransactionPreviewResponse) -> Self {
 		let message = response.receipt.errorMessage ?? "Unknown reason"
 
 		// Quite rudimentary, but it is not worth making something smarter,
@@ -376,9 +389,9 @@ extension TransactionFailure {
 			message.contains("AccountError(NotAllBucketsCouldBeDeposited")
 
 		if isFailureDueToDepositRules {
-			return .failedToPrepareTXReview(.oneOfRecevingAccountsDoesNotAllowDeposits)
+			return .gatewayPreviewRequestResponseIsOneOfRecevingAccountsDoesNotAllowDeposits
 		} else {
-			return .failedToPrepareTXReview(.failedToRetrieveTXReceipt(message))
+			return .gatewayPreviewRequestResponseIsGenericError(message)
 		}
 	}
 }
