@@ -61,9 +61,9 @@ extension FactorSourcesClient: DependencyKey {
 						throw FactorSourceAlreadyPresent()
 					case .appendWithCryptoParamaters:
 						var updated = existingInProfile
-						loggerGlobal.critical("🔮 Appending crypto parameters to DeviceFactorSource, BEFORE: \(updated.common.cryptoParameters)....")
-						updated.common.cryptoParameters.append(request.privateHDFactorSource.factorSource.common.cryptoParameters)
-						loggerGlobal.critical("🔮 Appended crypto parameters to DeviceFactorSource, AFTER: \(updated.common.cryptoParameters) ✅")
+						let cryptoParamsToAdd = request.privateHDFactorSource.factorSource.common.cryptoParameters
+						updated.common.cryptoParameters.append(cryptoParamsToAdd)
+						loggerGlobal.notice("Appended crypto parameters \(cryptoParamsToAdd) to DeviceFactorSource.")
 						try await updateFactorSource(updated.embed())
 					}
 				} else {
