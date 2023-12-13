@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - Home
 public struct Home: Sendable, FeatureReducer {
-	public static let radixURL = URL(string: "https://rdx.works")!
+	public static let radixBannerURL = URL(string: "https://wallet.radixdlt.com/?collapseStepOne")!
 
 	public struct State: Sendable, Hashable {
 		// MARK: - Components
@@ -127,7 +127,7 @@ public struct Home: Sendable, FeatureReducer {
 			}
 		case .radixBannerButtonTapped:
 			return .run { _ in
-				await openURL(Home.radixURL)
+				await openURL(Home.radixBannerURL)
 			}
 
 		case .radixBannerDismissButtonTapped:

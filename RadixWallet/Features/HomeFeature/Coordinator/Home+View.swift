@@ -198,10 +198,10 @@ struct RadixBanner: View {
 				.padding(.horizontal, .huge3)
 				.padding(.bottom, .medium3)
 
-			Button("Get Started Now", action: action)
+			Button("Get Started Now", action: action) // FIXME: Strings
 				.buttonStyle(.secondaryRectangular(
 					shouldExpand: true,
-					image: .init(asset: AssetResource.iconLinkOut)
+					trailingImage: .init(asset: AssetResource.iconLinkOut)
 				))
 				.padding([.horizontal, .bottom], .medium3)
 		}
