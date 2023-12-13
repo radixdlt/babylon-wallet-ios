@@ -1222,6 +1222,7 @@
 		A41266F12B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift */; };
 		A41266F72B160F3F00EA38E9 /* ManualAccountRecoveryCoordinator+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F62B160F3F00EA38E9 /* ManualAccountRecoveryCoordinator+Reducer.swift */; };
 		A41266F92B160F4C00EA38E9 /* ManualAccountRecoveryCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F82B160F4C00EA38E9 /* ManualAccountRecoveryCoordinator+View.swift */; };
+		A47571FF2B29B0860059A95D /* IOSSecuritySuite in Frameworks */ = {isa = PBXBuildFile; productRef = A47571FE2B29B0860059A95D /* IOSSecuritySuite */; };
 		E62449D52AFBA61100272C67 /* Home+AccountRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */; };
 		E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */; };
 		E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */; };
@@ -2677,6 +2678,7 @@
 				48FFFB0D2ADC744700B2B213 /* TextBuilder in Frameworks */,
 				48FFFB0A2ADC721800B2B213 /* Atomics in Frameworks */,
 				48FFFB002ADC25A200B2B213 /* BigInt in Frameworks */,
+				A47571FF2B29B0860059A95D /* IOSSecuritySuite in Frameworks */,
 				48FFFAFB2ADC241A00B2B213 /* HashTreeCollections in Frameworks */,
 				48FFFAC52ADC211700B2B213 /* JSONTesting in Frameworks */,
 				48FFFB062ADC6FD300B2B213 /* SwiftUINavigation in Frameworks */,
@@ -7669,6 +7671,7 @@
 				48FFFB092ADC721800B2B213 /* Atomics */,
 				48FFFB0C2ADC744700B2B213 /* TextBuilder */,
 				E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */,
+				A47571FE2B29B0860059A95D /* IOSSecuritySuite */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -7737,6 +7740,7 @@
 				48FFFB012ADC6F8100B2B213 /* XCRemoteSwiftPackageReference "swift-builders" */,
 				48FFFB042ADC6FD300B2B213 /* XCRemoteSwiftPackageReference "swiftui-navigation" */,
 				48FFFB0B2ADC744700B2B213 /* XCRemoteSwiftPackageReference "TextBuilder" */,
+				A47571FD2B29B0860059A95D /* XCRemoteSwiftPackageReference "IOSSecuritySuite" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -9782,6 +9786,14 @@
 				minimumVersion = 3.0.1;
 			};
 		};
+		A47571FD2B29B0860059A95D /* XCRemoteSwiftPackageReference "IOSSecuritySuite" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/securing/IOSSecuritySuite.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.9.10;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -9979,6 +9991,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFB0B2ADC744700B2B213 /* XCRemoteSwiftPackageReference "TextBuilder" */;
 			productName = TextBuilder;
+		};
+		A47571FE2B29B0860059A95D /* IOSSecuritySuite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A47571FD2B29B0860059A95D /* XCRemoteSwiftPackageReference "IOSSecuritySuite" */;
+			productName = IOSSecuritySuite;
 		};
 		E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */ = {
 			isa = XCSwiftPackageProductDependency;
