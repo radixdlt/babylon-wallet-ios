@@ -62,12 +62,12 @@ extension Home {
 						}
 					}
 				}
-				.refreshable {
-					await store.send(.view(.pullToRefreshStarted)).finish()
-				}
-				.task { @MainActor in
-					await store.send(.view(.task)).finish()
-				}
+			}
+			.refreshable {
+				await store.send(.view(.pullToRefreshStarted)).finish()
+			}
+			.task { @MainActor in
+				await store.send(.view(.task)).finish()
 			}
 			.destinations(with: store)
 		}
