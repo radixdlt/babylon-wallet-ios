@@ -19,6 +19,7 @@
 ///		func values() -> AnyAsyncSequence<Profile>
 /// 	func unlockedApp() async -> Profile
 ///	 	func finishedOnboarding() async
+///     func finishOnboarding(with _: AccountsRecoveredFromScanningUsingMnemonic) async throws
 ///		func importCloudProfileSnapshot(_ h: ProfileSnapshot.Header) throws
 ///	 	func importProfileSnapshot(_ s: ProfileSnapshot) throws
 ///	 	func deleteProfile(keepInICloudIfPresent: Bool) throws
@@ -31,6 +32,11 @@
 /// The app is suppose to call `finishedOnboarding` if user just finished onboarding a new wallet, it will
 /// async read `device.name` and `device.model` and update the Profile's header's `creatingDevice`
 /// and `lastUsedOnDevice` to use these values.
+///
+/// If a user creates a Profile using Account Recovery Scan, app is supposed to call `finishOnboarding:with`,
+/// and create a mainnet `network` **even if AccountsRecoveredFromScanningUsingMnemonic.accounts** is empty,
+/// ensuring next time the user starts app, they will not be met with onboarding..., but rather `Home`, with
+/// an empty account list.
 ///
 /// And then a lot of sugar/convenience AsyncSequences using `values` but mapping to other
 /// values inside of `Profile`, e.g.:
@@ -205,14 +211,27 @@ extension ProfileStore {
 		var bdfs = accountsRecoveredFromScanningUsingMnemonic.deviceFactorSource
 		bdfs.hint.name = name
 		bdfs.hint.model = .init(model)
+
 		let accounts = accountsRecoveredFromScanningUsingMnemonic.accounts
-		let network = Profile.Network(networkID: .mainnet, accounts: accounts, personas: [], authorizedDapps: [])
+
+		// It is important that we always create the mainnet `Profile.Network` and
+		// add it, even if `accounts` is empty, since during App launch we check
+		// `profile.networks.isEmpty` to determine if we should onboard the user or not,
+		// thus, this ensures that we do not onboard a user who has created Profile
+		// via Account Recovery Scan with 0 accounts if said user force quits app before
+		// she creates her first account.
+		let network = Profile.Network(
+			networkID: .mainnet,
+			accounts: accounts,
+			personas: [],
+			authorizedDapps: []
+		)
+
 		let profile = Profile(
-			header: .init(
+			header: ProfileSnapshot.Header(
 				creatingDevice: creatingDevice,
 				lastUsedOnDevice: creatingDevice,
 				id: uuid(),
-
 				lastModified: bdfs.addedOn,
 				contentHint: ProfileSnapshot.Header.ContentHint(
 					numberOfAccountsOnAllNetworksInTotal: accounts.count,
@@ -221,7 +240,7 @@ extension ProfileStore {
 				)
 			),
 			deviceFactorSource: bdfs,
-			networks: .init(
+			networks: Profile.Networks(
 				network: network
 			)
 		)
