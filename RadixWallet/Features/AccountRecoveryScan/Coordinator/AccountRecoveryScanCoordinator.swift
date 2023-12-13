@@ -124,7 +124,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case .accountRecoveryScanInProgress(.delegate(.failedToDerivePublicKey)):
+		case .accountRecoveryScanInProgress(.delegate(.failed)):
 			return .send(.delegate(.dismissed))
 
 		case .selectInactiveAccountsToAdd(.delegate(.goBack)):

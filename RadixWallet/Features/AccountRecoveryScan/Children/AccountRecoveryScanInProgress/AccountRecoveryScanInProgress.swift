@@ -69,7 +69,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			active: IdentifiedArrayOf<Profile.Network.Account>,
 			inactive: IdentifiedArrayOf<Profile.Network.Account>
 		)
-		case failedToDerivePublicKey
+		case failed
 	}
 
 	// MARK: - Destination
@@ -109,16 +109,22 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		case let .loadIndicesUsedByFactorSourceResult(.failure(error)):
 			let errorMsg = "Failed to load indices used by factor source, error: \(error)"
 			loggerGlobal.error(.init(stringLiteral: errorMsg))
-			return .send(.delegate(.failedToDerivePublicKey))
+			return .send(.delegate(.failed))
 
 		case let .loadIndicesUsedByFactorSourceResult(.success(indicesUsedByFactorSource)):
-			state.networkID = indicesUsedByFactorSource.currentNetworkID
+			let networkID = indicesUsedByFactorSource.currentNetworkID
+			if state.networkID != networkID {
+				loggerGlobal.notice("Updating networkID to: \(networkID)")
+				state.networkID = networkID
+			}
+
 			state.mode = .factorSourceWithID(
 				id: state.factorSourceIDFromHash,
 				.success(
 					indicesUsedByFactorSource.factorSource
 				)
 			)
+
 			state.indicesOfAlreadyUsedEntities = indicesUsedByFactorSource.indices
 			return derivePublicKeys(state: &state)
 
@@ -148,14 +154,14 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 				state.status = .loadingFactorSource
 				let id = state.factorSourceIDFromHash
 				state.mode = .factorSourceWithID(id: id, .loading)
-				return .run { [networkID = state.networkID, forOlympiaAccounts = state.forOlympiaAccounts] send in
+				return .run { [forOlympiaAccounts = state.forOlympiaAccounts] send in
 					let result = await TaskResult<IndicesUsedByFactorSource> {
 						try await factorSourcesClient.indicesOfEntitiesControlledByFactorSource(
 							.init(
 								entityKind: .account,
 								factorSourceID: id.embed(),
 								derivationPathScheme: forOlympiaAccounts ? .bip44Olympia : .cap26,
-								networkID: networkID
+								networkID: nil // read current, then we will update `state.networkID` with current.
 							)
 						)
 					}
@@ -188,7 +194,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 				let id = state.factorSourceIDFromHash
 				assert(factorSourceID == id.embed())
 				assert(networkID == state.networkID)
-
+				loggerGlobal.debug("Creating accounts with networkID: \(networkID)")
 				return .run { send in
 					let accounts = try await publicHDKeys.enumerated().asyncMap { localOffset, publicHDKey in
 						let offset = localOffset + globalOffset
@@ -214,11 +220,11 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 					let errorMsg = "Failed to create account, error: \(error)"
 					loggerGlobal.critical(.init(stringLiteral: errorMsg))
 					assertionFailure(errorMsg)
-					await send(.delegate(.failedToDerivePublicKey))
+					await send(.delegate(.failed))
 				}
 
 			case .failedToDerivePublicKey:
-				return .send(.delegate(.failedToDerivePublicKey))
+				return .send(.delegate(.failed))
 			}
 
 		default: return .none
@@ -267,7 +273,7 @@ extension AccountRecoveryScanInProgress {
 			let errorMsg = "Failed to calculate next derivation paths"
 			loggerGlobal.error(.init(stringLiteral: errorMsg))
 			assertionFailure(errorMsg)
-			return .send(.delegate(.failedToDerivePublicKey))
+			return .send(.delegate(.failed))
 		}
 		let factorSourceOption: DerivePublicKeys.State.FactorSourceOption
 		switch state.mode {
@@ -279,7 +285,7 @@ extension AccountRecoveryScanInProgress {
 				let errorMsg = "Discrepancy! Expected to loaded the factor source"
 				loggerGlobal.error(.init(stringLiteral: errorMsg))
 				assertionFailure(errorMsg)
-				return .send(.delegate(.failedToDerivePublicKey))
+				return .send(.delegate(.failed))
 			}
 		case let .privateHD(privateHDFactorSource):
 			factorSourceOption = .specificPrivateHDFactorSource(privateHDFactorSource)
@@ -305,6 +311,7 @@ extension AccountRecoveryScanInProgress {
 		assert(accounts.count == batchSize)
 		state.status = .scanningNetworkForActiveAccounts
 		state.destination = nil
+		loggerGlobal.debug("Scanning ledger with accounts with addresses: \(accounts.map(\.address))")
 		return .run { send in
 
 			let onLedgerSyncOfAccounts = try await onLedgerEntitiesClient
@@ -320,6 +327,9 @@ extension AccountRecoveryScanInProgress {
 					)
 				)
 			)
+		} catch: { error, send in
+			loggerGlobal.error("Failed to scan network, error: \(error)")
+			await send(.delegate(.failed))
 		}
 	}
 }
