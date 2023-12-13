@@ -177,6 +177,8 @@ You can always change the guarantee from this default in each transaction.";
 "settings_importFromLegacyWalletHeader_title" = "Radix Olympia Desktop Wallet user?";
 "settings_importFromLegacyWalletHeader_subtitle" = "Get started importing your Olympia accounts into your new Radix Wallet";
 "settings_importFromLegacyWalletHeader_importLegacyAccounts" = "Import Legacy Accounts";
+"settings_accountRecovery" = "Account Recovery Scan";
+"settings_accountRecovery_subtitle" = "Using seed phrase or Ledger device";
 "linkedConnectors_title" = "Linked Connectors";
 "linkedConnectors_subtitle" = "Connect your Radix Wallet to desktop web browsers by linking to the Radix Connector browser extension. Here are your linked Connectors.";
 "linkedConnectors_lastConnected" = "Last connected %@";
@@ -850,6 +852,9 @@ Your old Accounts and Personas will still be listed, but you will have to enter 
 "enterSeedPhrase_header_title" = "Enter Seed Phrase";
 "enterSeedPhrase_warning" = "For your safety, make sure no one is looking at your screen. Never give your seed phrase to anyone for any reason.";
 "recoverSeedPhrase_hidden_accounts_only" = "Hidden accounts only.";
+"enterSeedPhrase_titleBabylonMain" = "Enter Main Seed Phrase";
+"enterSeedPhrase_titleBabylon" = "Enter Babylon Seed Phrase";
+"enterSeedPhrase_titleOlympia" = "Enter Olympia Seed Phrase";
 "factorSources_kind_device" = "Phone";
 "factorSources_kind_ledgerHQHardwareWallet" = "Ledger";
 "factorSources_kind_offDeviceMnemonic" = "Seed phrase";
@@ -940,3 +945,5 @@ You will be asked to enter your main seed phrase. This is a set of **24 words** 
 "accountRecoveryScan_chooseSeedPhrase_addButtonBabylon" = "Add Babylon Seed Phrase";
 "accountRecoveryScan_chooseSeedPhrase_addButtonOlympia" = "Add Olympia Seed Phrase";
 "accountRecoveryScan_chooseSeedPhrase_continueButton" = "Continue";
+"accountRecoveryScan_olympiaLedgerNote" = "Note: You must still use the new *Radix Babylon* app on your Ledger device, not the old Radix Ledger app.";
+"accountRecoveryScan_derivingAccounts" = "Deriving Accounts";
