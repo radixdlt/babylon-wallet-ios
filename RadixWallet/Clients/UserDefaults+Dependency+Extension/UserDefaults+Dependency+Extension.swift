@@ -3,9 +3,8 @@ import DependenciesAdditions
 
 // MARK: - UserDefaultsKey
 public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
-	case isNewUser
 	case hideMigrateOlympiaButton
-	case hideRadixBanner
+	case showRadixBanner
 	case epochForWhenLastUsedByAccountAddress
 
 	/// DO NOT CHANGE THIS KEY
@@ -80,14 +79,6 @@ extension UserDefaults.Dependency {
 		self.removeValue(forKey: key.rawValue)
 	}
 
-	public var isNewUser: Bool {
-		bool(key: .isNewUser)
-	}
-
-	public func setIsNewUser(_ value: Bool) {
-		set(value, forKey: Key.isNewUser.rawValue)
-	}
-
 	public var hideMigrateOlympiaButton: Bool {
 		bool(key: .hideMigrateOlympiaButton)
 	}
@@ -96,12 +87,12 @@ extension UserDefaults.Dependency {
 		set(value, forKey: Key.hideMigrateOlympiaButton.rawValue)
 	}
 
-	public var hideRadixBanner: Bool {
-		bool(key: .hideRadixBanner)
+	public var showRadixBanner: Bool {
+		bool(key: .showRadixBanner)
 	}
 
-	public func setHideRadixBanner(_ value: Bool) {
-		set(value, forKey: Key.hideRadixBanner.rawValue)
+	public func setShowRadixBanner(_ value: Bool) {
+		set(value, forKey: Key.showRadixBanner.rawValue)
 	}
 
 	public func getActiveProfileID() -> ProfileSnapshot.Header.ID? {

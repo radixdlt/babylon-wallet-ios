@@ -97,14 +97,11 @@ extension UserDefaults.Dependency.Key {
 		case .epochForWhenLastUsedByAccountAddress:
 			return userDefaults.loadEpochForWhenLastUsedByAccountAddress().epochForAccounts.map { "epoch: \($0.epoch) account: \($0.accountAddress)" }
 
-		case .isNewUser:
-			return [userDefaults.isNewUser].map(String.init(describing:))
-
 		case .hideMigrateOlympiaButton:
 			return [userDefaults.hideMigrateOlympiaButton].map(String.init(describing:))
 
-		case .hideRadixBanner:
-			return [userDefaults.hideRadixBanner].map(String.init(describing:))
+		case .showRadixBanner:
+			return [userDefaults.showRadixBanner].map(String.init(describing:))
 
 		case .mnemonicsUserClaimsToHaveBackedUp:
 			return userDefaults.getFactorSourceIDOfBackedUpMnemonics().map(String.init(describing:))

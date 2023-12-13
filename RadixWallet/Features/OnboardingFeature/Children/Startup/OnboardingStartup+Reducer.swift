@@ -49,11 +49,11 @@ public struct OnboardingStartup: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .selectedNewWalletUser:
-			userDefaults.setIsNewUser(true)
+			userDefaults.setShowRadixBanner(true)
 			return .send(.delegate(.setupNewUser))
 
 		case .selectedRestoreFromBackup:
-			userDefaults.setIsNewUser(false)
+			userDefaults.setShowRadixBanner(false)
 			state.destination = .restoreFromBackup(.init())
 			return .none
 		}

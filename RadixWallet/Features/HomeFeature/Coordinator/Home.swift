@@ -98,7 +98,7 @@ public struct Home: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			state.showRadixBanner = userDefaults.isNewUser && !userDefaults.hideRadixBanner
+			state.showRadixBanner = userDefaults.showRadixBanner
 
 			return .run { send in
 				for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
@@ -131,7 +131,7 @@ public struct Home: Sendable, FeatureReducer {
 			}
 
 		case .radixBannerDismissButtonTapped:
-			userDefaults.setHideRadixBanner(true)
+			userDefaults.setShowRadixBanner(false)
 			state.showRadixBanner = false
 			return .none
 
