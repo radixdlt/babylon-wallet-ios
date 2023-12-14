@@ -6,9 +6,6 @@ import SwiftUI
 extension OnboardingStartup {
 	@MainActor
 	public struct View: SwiftUI.View {
-		@SwiftUI.State private var offsetX: CGFloat = 0
-		@SwiftUI.State private var offsetY: CGFloat = 0
-
 		let store: StoreOf<OnboardingStartup>
 
 		public init(store: StoreOf<OnboardingStartup>) {
