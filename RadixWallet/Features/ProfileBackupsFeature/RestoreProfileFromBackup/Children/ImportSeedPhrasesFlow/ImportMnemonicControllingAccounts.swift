@@ -119,6 +119,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		case .inputMnemonicButtonTapped:
 			state.destination = .importMnemonic(.init(
 				warning: L10n.RevealSeedPhrase.warning,
+				showCloseButton: true,
 				isWordCountFixed: true,
 				persistStrategy: nil,
 				wordCount: state.entitiesControlledByFactorSource.mnemonicWordCount

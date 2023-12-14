@@ -89,6 +89,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			public var isProgressing: Bool
 			public let persistStrategy: PersistStrategy?
 			public let hideAdvancedMode: Bool
+			public let showCloseButton: Bool
 		}
 
 		public enum Mode: Sendable, Hashable {
@@ -168,6 +169,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			header: Header? = nil,
 			warning: String? = nil,
 			hideAdvancedMode: Bool = false,
+			showCloseButton: Bool = false,
 			warningOnContinue: OnContinueWarning? = nil,
 			isWordCountFixed: Bool = false,
 			persistStrategy: PersistStrategy?,
@@ -182,7 +184,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				.init(
 					isProgressing: false,
 					persistStrategy: persistStrategy,
-					hideAdvancedMode: hideAdvancedMode
+					hideAdvancedMode: hideAdvancedMode,
+					showCloseButton: showCloseButton
 				)
 			)
 			self.language = language
@@ -334,6 +337,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.mnemonicClient) var mnemonicClient
 	@Dependency(\.continuousClock) var clock
@@ -447,8 +451,14 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return markAsBackedUpIfNeeded(&state)
 
 		case .closeButtonTapped:
-			assert(state.mode.readonly?.context == .fromBackupPrompt)
-			return markAsBackedUpIfNeeded(&state)
+			if state.mode.readonly?.context == .fromBackupPrompt {
+				return markAsBackedUpIfNeeded(&state)
+			} else if state.mode.write?.showCloseButton == true {
+				return .run { _ in await dismiss() }
+			} else {
+				assertionFailure("Invalid mode: No close button should be visible")
+				return .none
+			}
 
 		#if DEBUG
 		case .debugCopyMnemonic:

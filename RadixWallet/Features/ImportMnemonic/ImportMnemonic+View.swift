@@ -7,6 +7,7 @@ extension ImportMnemonic.State {
 		var viewState = ImportMnemonic.ViewState(
 			readonlyMode: mode.readonly?.context,
 			hideAdvancedMode: mode.write?.hideAdvancedMode ?? false,
+			showCloseButton: showCloseButton,
 			isProgressing: mode.write?.isProgressing ?? false,
 			isWordCountFixed: isWordCountFixed,
 			isAdvancedMode: isAdvancedMode,
@@ -24,6 +25,15 @@ extension ImportMnemonic.State {
 		return viewState
 	}
 
+	private var showCloseButton: Bool {
+		switch mode {
+		case let .readonly(readOnlyMode):
+			readOnlyMode.context == .fromBackupPrompt
+		case let .write(writeMode):
+			writeMode.showCloseButton
+		}
+	}
+
 	var rowCount: Int {
 		words.count / ImportMnemonic.wordsPerRow
 	}
@@ -38,6 +48,7 @@ extension ImportMnemonic {
 
 		let readonlyMode: ImportMnemonic.State.ReadonlyMode.Context?
 		let hideAdvancedMode: Bool
+		let showCloseButton: Bool
 		let isProgressing: Bool // irrelevant for read only mode
 		let isWordCountFixed: Bool
 		let isAdvancedMode: Bool
@@ -55,11 +66,6 @@ extension ImportMnemonic {
 
 		var showBackButton: Bool {
 			guard let readonlyMode, case .fromSettings = readonlyMode else { return false }
-			return true
-		}
-
-		var showCloseButton: Bool {
-			guard let readonlyMode, case .fromBackupPrompt = readonlyMode else { return false }
 			return true
 		}
 
