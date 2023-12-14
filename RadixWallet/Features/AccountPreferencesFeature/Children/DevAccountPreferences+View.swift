@@ -91,6 +91,7 @@ extension DevAccountPreferences {
 						deleteAccountButton { store.send(.view(.deleteAccountButtonTapped)) }
 						#endif // DEBUG
 					}
+					.multilineTextAlignment(.center)
 					.frame(maxHeight: .infinity, alignment: .top)
 					.padding(.medium1)
 					.onAppear {
@@ -142,19 +143,16 @@ private extension StoreOf<DevAccountPreferences> {
 private extension View {
 	func destinations(with store: StoreOf<DevAccountPreferences>) -> some View {
 		let destinationStore = store.destination
-		return reviewTransaction(with: destinationStore)
-	}
-
-	private func reviewTransaction(with destinationStore: PresentationStoreOf<DevAccountPreferences.Destination>) -> some View {
-		sheet(
+		return sheet(
 			store: destinationStore,
 			state: /DevAccountPreferences.Destination.State.reviewTransaction,
 			action: DevAccountPreferences.Destination.Action.reviewTransaction
-		) { store in
+		) {
 			// FIXME: Should use DappInteractionClient instead to schedule a transaction
-			NavigationView {
-				TransactionReview.View(store: store)
-			}
+			TransactionReview.View(store: $0)
+				.withNavigationBar {
+					store.send(.view(.closeTransactionButtonTapped))
+				}
 		}
 	}
 }
