@@ -74,6 +74,13 @@ public extension AccountRecoveryScanInProgress {
 					}
 					.destinations(with: store)
 			}
+			.toolbar {
+				ToolbarItem(placement: .automatic) {
+					CloseButton {
+						store.send(.view(.closeButtonTapped))
+					}
+				}
+			}
 		}
 
 		@ViewBuilder

@@ -62,6 +62,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		case onFirstAppear
 		case scanMore
 		case continueTapped
+		case closeButtonTapped
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -70,6 +71,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			inactive: IdentifiedArrayOf<Profile.Network.Account>
 		)
 		case failed
+		case close
 	}
 
 	// MARK: - Destination
@@ -182,6 +184,9 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			} else {
 				return .send(.delegate(.foundAccounts(active: [], inactive: [])))
 			}
+
+		case .closeButtonTapped:
+			return .send(.delegate(.close))
 		}
 	}
 

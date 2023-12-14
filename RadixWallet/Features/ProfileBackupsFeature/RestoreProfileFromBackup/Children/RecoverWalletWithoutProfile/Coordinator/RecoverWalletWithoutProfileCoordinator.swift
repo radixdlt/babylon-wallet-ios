@@ -66,10 +66,6 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-		case closeRecoveryScanTapped
-	}
-
 	public enum ChildAction: Sendable, Equatable {
 		case root(Path.Action)
 		case path(StackActionOf<Path>)
@@ -102,14 +98,6 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 	}
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
-
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
-		switch viewAction {
-		case .closeRecoveryScanTapped:
-			state.destination = nil
-			return .none
-		}
-	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
@@ -189,6 +177,10 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 			state.path = .init()
 			// replace root so we cannot go back from `recoveryComplete`
 			state.root = .recoveryComplete(.init())
+			return .none
+
+		case .accountRecoveryScanCoordinator(.delegate(.dismissed)):
+			state.destination = nil
 			return .none
 
 		default:
