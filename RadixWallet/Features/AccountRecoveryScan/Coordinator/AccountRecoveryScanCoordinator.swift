@@ -73,7 +73,6 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.onboardingClient) var onboardingClient
 	@Dependency(\.accountsClient) var accountsClient
-	@Dependency(\.dismiss) var dismiss
 
 	public init() {}
 
@@ -124,7 +123,8 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case .accountRecoveryScanInProgress(.delegate(.failed)):
+		case .accountRecoveryScanInProgress(.delegate(.failed)),
+		     .accountRecoveryScanInProgress(.delegate(.close)):
 			return .send(.delegate(.dismissed))
 
 		case .selectInactiveAccountsToAdd(.delegate(.goBack)):

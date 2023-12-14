@@ -48,6 +48,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case closeButtonTapped
+		case closeTransactionButtonTapped
 		case faucetButtonTapped
 
 		#if DEBUG
@@ -139,6 +140,10 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 			return .run { send in
 				await send(.delegate(.dismiss))
 			}
+
+		case .closeTransactionButtonTapped:
+			state.destination = nil
+			return .none
 
 		case .faucetButtonTapped:
 			return call(buttonState: \.faucetButtonState, into: &state) {

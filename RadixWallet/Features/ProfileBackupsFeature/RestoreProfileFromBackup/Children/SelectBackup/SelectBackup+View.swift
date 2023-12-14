@@ -14,6 +14,13 @@ extension SelectBackup {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				coreView(store, with: viewStore)
+					.toolbar {
+						ToolbarItem(placement: .automatic) {
+							CloseButton {
+								store.send(.view(.closeButtonTapped))
+							}
+						}
+					}
 					.footer {
 						WithControlRequirements(
 							viewStore.selectedProfileHeader,
@@ -37,7 +44,6 @@ extension SelectBackup {
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()
 			}
-			.navigationTitle(L10n.RecoverProfileBackup.Header.title)
 		}
 	}
 }
@@ -48,6 +54,10 @@ extension SelectBackup.View {
 	private func coreView(_ store: StoreOf<SelectBackup>, with viewStore: ViewStoreOf<SelectBackup>) -> some SwiftUI.View {
 		ScrollView {
 			VStack(spacing: .medium1) {
+				Text(L10n.RecoverProfileBackup.Header.title)
+					.multilineTextAlignment(.center)
+					.textStyle(.sheetTitle)
+
 				Text(L10n.RecoverProfileBackup.Header.subtitle)
 					.textStyle(.body1Regular)
 

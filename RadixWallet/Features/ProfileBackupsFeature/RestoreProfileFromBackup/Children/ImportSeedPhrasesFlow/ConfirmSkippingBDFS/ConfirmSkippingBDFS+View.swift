@@ -1,15 +1,5 @@
-extension ConfirmSkippingBDFS.State {
-	var viewState: ConfirmSkippingBDFS.ViewState {
-		.init(flashScrollIndicators: flashScrollIndicators)
-	}
-}
-
 // MARK: - ConfirmSkippingBDFS.View
 extension ConfirmSkippingBDFS {
-	public struct ViewState: Equatable {
-		let flashScrollIndicators: Bool
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<ConfirmSkippingBDFS>
@@ -19,38 +9,29 @@ extension ConfirmSkippingBDFS {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(spacing: .medium2) {
-					Text(L10n.RecoverSeedPhrase.Header.titleNoMainSeedPhrase)
-						.textStyle(.sheetTitle)
-						.foregroundColor(.app.gray1)
-						.multilineTextAlignment(.center)
+			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { _ in
+				ScrollView(.vertical, showsIndicators: false) {
+					VStack(spacing: .medium2) {
+						Text(L10n.RecoverSeedPhrase.Header.titleNoMainSeedPhrase)
+							.multilineTextAlignment(.center)
+							.textStyle(.sheetTitle)
+							.foregroundColor(.app.gray1)
+							.padding(.horizontal, .large3)
 
-					ScrollView(.vertical, showsIndicators: true) {
-						// Contains bold text segments.
 						Text(LocalizedStringKey(L10n.RecoverSeedPhrase.Header.subtitleNoMainSeedPhrase))
+							.multilineTextAlignment(.leading)
 							.textStyle(.body1Regular)
 							.foregroundColor(.app.gray1)
-							.multilineTextAlignment(.leading)
-					}
-					.modifier {
-						if #available(iOS 17, *) {
-							$0.scrollIndicatorsFlash(trigger: viewStore.flashScrollIndicators)
-						} else {
-							$0
-						}
-					}
+							.padding(.horizontal, .large3)
 
-					Button(L10n.RecoverSeedPhrase.skipMainSeedPhraseButton) {
-						store.send(.view(.confirmTapped))
+						Button(L10n.RecoverSeedPhrase.skipMainSeedPhraseButton) {
+							store.send(.view(.confirmTapped))
+						}
+						.buttonStyle(.primaryRectangular)
+						.padding(.horizontal, .medium3)
 					}
-					.buttonStyle(.primaryRectangular)
+					.padding(.bottom, .medium2)
 				}
-				.task { @MainActor in
-					await store.send(.view(.task)).finish()
-				}
-				.padding(.horizontal, .large3)
-				.padding(.bottom, .medium2)
 				.toolbar {
 					ToolbarItem(placement: .primaryAction) {
 						CloseButton {

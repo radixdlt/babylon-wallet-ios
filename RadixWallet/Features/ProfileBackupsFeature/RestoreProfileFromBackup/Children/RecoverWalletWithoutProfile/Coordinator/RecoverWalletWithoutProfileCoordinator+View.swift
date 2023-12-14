@@ -78,9 +78,7 @@ private extension View {
 			action: RecoverWalletWithoutProfileCoordinator.Destination.Action.accountRecoveryScanCoordinator,
 			content: {
 				AccountRecoveryScanCoordinator.View(store: $0)
-					.withNavigationBar {
-						store.send(.view(.closeRecoveryScanTapped))
-					}
+					.inNavigationStack
 			}
 		)
 	}

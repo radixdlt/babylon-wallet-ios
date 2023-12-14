@@ -123,7 +123,9 @@ extension ImportMnemonic {
 						if !viewStore.isWordCountFixed {
 							VStack(alignment: .center) {
 								let label = "Number of Seed Phrase Words" // FIXME: Strings
-								Text("\(label)").textStyle(.body1HighImportance).foregroundStyle(Color.app.gray1)
+								Text("\(label)")
+									.textStyle(.body1HighImportance)
+									.foregroundStyle(.app.gray1)
 
 								Picker(label, selection: viewStore.binding(
 									get: \.wordCount,
@@ -164,6 +166,7 @@ extension ImportMnemonic {
 						}
 
 						footer(with: viewStore)
+							.padding(.bottom, .medium2)
 					}
 					.navigationBarBackButtonHidden(viewStore.showBackButton || viewStore.showCloseButton) // need to be able to hook "back" button press
 					.toolbar {
@@ -301,25 +304,26 @@ extension ImportMnemonic.View {
 
 	@ViewBuilder
 	private func footer(with viewStore: ViewStoreOf<ImportMnemonic>) -> some View {
-		WithControlRequirements(
-			viewStore.mnemonic,
-			forAction: { viewStore.send(.continueButtonTapped($0)) }
-		) { action in
-			if !viewStore.isReadonlyMode {
+		if viewStore.isReadonlyMode {
+			Button(L10n.Common.done) {
+				viewStore.send(.doneViewing)
+			}
+			.buttonStyle(.primaryRectangular)
+			.padding(.horizontal, .medium2)
+		} else {
+			WithControlRequirements(
+				viewStore.mnemonic,
+				forAction: { viewStore.send(.continueButtonTapped($0)) }
+			) { action in
 				if viewStore.isNonChecksummed {
 					WarningErrorView(text: L10n.ImportMnemonic.checksumFailure, type: .error)
 				}
 				Button(L10n.ImportMnemonic.importSeedPhrase, action: action)
 					.buttonStyle(.primaryRectangular)
-					.controlState(viewStore.isProgressing ? .loading(.local) : .enabled)
-			} else {
-				Button(L10n.Common.done) {
-					viewStore.send(.doneViewing)
-				}
-				.buttonStyle(.primaryRectangular)
 			}
+			.controlState(viewStore.isProgressing ? .loading(.local) : .enabled)
+			.padding(.horizontal, .medium2)
 		}
-		.padding([.horizontal, .bottom], .medium2)
 	}
 
 	#if DEBUG

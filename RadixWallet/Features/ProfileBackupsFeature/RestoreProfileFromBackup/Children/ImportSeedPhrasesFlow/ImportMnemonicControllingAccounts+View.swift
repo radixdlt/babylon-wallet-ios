@@ -41,27 +41,27 @@ extension ImportMnemonicControllingAccounts {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(spacing: 0) {
-					Text(viewStore.navigationTitle)
-						.textStyle(.sheetTitle)
-						.foregroundColor(.app.gray1)
-						.multilineTextAlignment(.center)
-						.padding(.bottom, .medium2)
+				ScrollView {
+					VStack(spacing: 0) {
+						Text(viewStore.navigationTitle)
+							.textStyle(.sheetTitle)
+							.foregroundColor(.app.gray1)
+							.multilineTextAlignment(.center)
+							.padding(.bottom, .medium2)
 
-					Text(viewStore.subtitle)
-						.textStyle(.body1Regular)
-						.foregroundColor(.app.gray1)
-						.padding(.bottom, .medium3)
+						Text(viewStore.subtitle)
+							.textStyle(.body1Regular)
+							.foregroundColor(.app.gray1)
+							.padding(.bottom, .medium3)
 
-					ScrollView {
 						DisplayEntitiesControlledByMnemonic.View(
 							store: store.scope(state: \.entities, action: { .child(.entities($0)) })
 						)
-					}
 
-					Spacer(minLength: 0)
+						Spacer(minLength: 0)
+					}
+					.padding(.horizontal, .medium3)
 				}
-				.padding(.horizontal, .medium3)
 				.footer {
 					skipButton(title: viewStore.skipButtonTitle)
 

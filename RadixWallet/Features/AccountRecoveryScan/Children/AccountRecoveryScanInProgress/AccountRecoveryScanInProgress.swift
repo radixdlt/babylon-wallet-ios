@@ -9,6 +9,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			case scanComplete
 		}
 
+		public var mode: Mode
 		public var status: Status
 		public var networkID: NetworkID = .mainnet
 		public var batchNumber: Int = 0
@@ -36,8 +37,6 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			}
 		}
 
-		public var mode: Mode
-
 		public init(
 			mode: Mode,
 			forOlympiaAccounts: Bool = false,
@@ -62,6 +61,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		case onFirstAppear
 		case scanMore
 		case continueTapped
+		case closeButtonTapped
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -70,6 +70,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			inactive: IdentifiedArrayOf<Profile.Network.Account>
 		)
 		case failed
+		case close
 	}
 
 	// MARK: - Destination
@@ -182,6 +183,9 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			} else {
 				return .send(.delegate(.foundAccounts(active: [], inactive: [])))
 			}
+
+		case .closeButtonTapped:
+			return .send(.delegate(.close))
 		}
 	}
 

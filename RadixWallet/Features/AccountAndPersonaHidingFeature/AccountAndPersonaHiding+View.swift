@@ -42,39 +42,36 @@ extension AccountAndPersonaHiding {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState) { viewStore in
-				List {
-					Section {
-						VStack(alignment: .leading, spacing: .zero) {
-							Text(viewStore.hiddenAccountsText)
-							Text(viewStore.hiddenPersonasText)
-						}
+				VStack(spacing: .medium3) {
+					Text(L10n.AppSettings.EntityHiding.info)
+						.textStyle(.body1Regular)
 						.foregroundColor(.app.gray2)
-						.textStyle(.body1Header)
-						.listRowSeparator(.hidden)
-						.listRowBackground(Color.clear)
-						.centered
-					} header: {
-						Text(L10n.AppSettings.EntityHiding.info)
-							.foregroundColor(.app.gray2)
-							.textStyle(.body1Regular)
-							.textCase(nil)
-					}
+						.flushedLeft
+						.padding(.top, .medium3)
 
-					Section {
-						Button(L10n.AppSettings.EntityHiding.unhideAllButton) {
-							viewStore.send(.view(.unhideAllTapped))
-						}
-						.buttonStyle(.secondaryRectangular(shouldExpand: true))
-						.controlState(viewStore.unhideAllButtonControlState)
-					} header: {
-						Text(L10n.AppSettings.EntityHiding.unhideAllSection)
-							.foregroundColor(.app.gray2)
-							.textStyle(.body1HighImportance)
-							.textCase(nil)
+					VStack(alignment: .leading, spacing: .small3) {
+						Text(viewStore.hiddenAccountsText)
+
+						Text(viewStore.hiddenPersonasText)
 					}
+					.textStyle(.body1Header)
+					.foregroundColor(.app.gray2)
+					.centered
+
+					Text(L10n.AppSettings.EntityHiding.unhideAllSection)
+						.textStyle(.body1HighImportance)
+						.foregroundColor(.app.gray2)
+						.flushedLeft
+
+					Button(L10n.AppSettings.EntityHiding.unhideAllButton) {
+						viewStore.send(.view(.unhideAllTapped))
+					}
+					.buttonStyle(.secondaryRectangular(shouldExpand: true))
+					.controlState(viewStore.unhideAllButtonControlState)
+
+					Spacer()
 				}
-				.listStyle(.grouped)
-				.background(.app.background)
+				.padding(.horizontal, .medium3)
 				.task { @MainActor in
 					await viewStore.send(.view(.task)).finish()
 				}

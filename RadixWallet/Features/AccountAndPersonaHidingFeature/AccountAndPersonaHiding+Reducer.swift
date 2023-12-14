@@ -1,5 +1,5 @@
 // MARK: - AccountAndPersonaHiding
-public struct AccountAndPersonaHiding: FeatureReducer {
+public struct AccountAndPersonaHiding: Sendable, FeatureReducer {
 	public struct State: Hashable, Sendable {
 		public var hiddenEntityCounts: EntitiesVisibilityClient.HiddenEntityCounts?
 

@@ -1,6 +1,7 @@
 extension AccountRecoveryScanInProgress.State {
 	var viewState: AccountRecoveryScanInProgress.ViewState {
 		.init(
+			showToolbar: !isManualScan,
 			status: status,
 			kind: factorSourceIDFromHash.kind,
 			olympia: forOlympiaAccounts,
@@ -8,6 +9,15 @@ extension AccountRecoveryScanInProgress.State {
 			hasFoundAnyAccounts: !active.isEmpty || !inactive.isEmpty,
 			maxIndex: batchNumber * batchSize
 		)
+	}
+
+	private var isManualScan: Bool {
+		switch mode {
+		case .privateHD:
+			false
+		case .factorSourceWithID:
+			true
+		}
 	}
 }
 
@@ -17,18 +27,19 @@ let batchSize = 50
 // MARK: - AccountRecoveryScanInProgress.View
 public extension AccountRecoveryScanInProgress {
 	struct ViewState: Equatable {
+		let showToolbar: Bool
 		let status: AccountRecoveryScanInProgress.State.Status
-		var loadingState: ControlState {
-			status == .scanningNetworkForActiveAccounts
-				? .loading(.global(text: "Scanning network")) // FIXME: Strings
-				: .enabled
-		}
-
 		let kind: FactorSourceKind
 		let olympia: Bool
 		let active: IdentifiedArrayOf<Profile.Network.Account>
 		let hasFoundAnyAccounts: Bool
 		let maxIndex: Int
+
+		var loadingState: ControlState {
+			status == .scanningNetworkForActiveAccounts
+				? .loading(.global(text: "Scanning network")) // FIXME: Strings
+				: .enabled
+		}
 
 		var buttonControlState: ControlState {
 			isScanInProgress ? .disabled : .enabled
@@ -36,6 +47,10 @@ public extension AccountRecoveryScanInProgress {
 
 		var isScanInProgress: Bool {
 			status != .scanComplete
+		}
+
+		var closeButtonControlState: ControlState {
+			isScanInProgress ? .disabled : .enabled
 		}
 
 		// FIXME: Strings
@@ -71,6 +86,16 @@ public extension AccountRecoveryScanInProgress {
 					}
 					.onFirstAppear {
 						viewStore.send(.onFirstAppear)
+					}
+					.toolbar {
+						if viewStore.showToolbar {
+							ToolbarItem(placement: .automatic) {
+								CloseButton {
+									store.send(.view(.closeButtonTapped))
+								}
+								.controlState(viewStore.closeButtonControlState)
+							}
+						}
 					}
 					.destinations(with: store)
 			}
