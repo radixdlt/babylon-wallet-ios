@@ -9,6 +9,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			case scanComplete
 		}
 
+		public var mode: Mode
 		public var status: Status
 		public var networkID: NetworkID = .mainnet
 		public var batchNumber: Int = 0
@@ -35,8 +36,6 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 				id
 			}
 		}
-
-		public var mode: Mode
 
 		public init(
 			mode: Mode,

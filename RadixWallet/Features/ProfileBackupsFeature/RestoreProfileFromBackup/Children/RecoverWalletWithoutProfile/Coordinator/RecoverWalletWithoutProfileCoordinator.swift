@@ -180,6 +180,8 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case .accountRecoveryScanCoordinator(.delegate(.dismissed)):
+			state.path = .init()
+			state.root = .start(.init())
 			state.destination = nil
 			return .none
 
