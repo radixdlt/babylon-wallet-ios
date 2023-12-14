@@ -14,6 +14,13 @@ extension SelectBackup {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				coreView(store, with: viewStore)
+					.toolbar {
+						ToolbarItem(placement: .automatic) {
+							CloseButton {
+								store.send(.view(.closeButtonTapped))
+							}
+						}
+					}
 					.footer {
 						WithControlRequirements(
 							viewStore.selectedProfileHeader,

@@ -27,16 +27,6 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-		case task
-		case selectedProfileHeader(ProfileSnapshot.Header?)
-		case importFromFileInstead
-		case dismissFileImporter
-		case otherRestoreOptionsTapped
-		case profileImportResult(Result<URL, NSError>)
-		case tappedUseCloudBackup(ProfileSnapshot.Header)
-	}
-
 	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.State)
@@ -58,6 +48,17 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		}
 	}
 
+	public enum ViewAction: Sendable, Equatable {
+		case task
+		case selectedProfileHeader(ProfileSnapshot.Header?)
+		case importFromFileInstead
+		case dismissFileImporter
+		case otherRestoreOptionsTapped
+		case profileImportResult(Result<URL, NSError>)
+		case tappedUseCloudBackup(ProfileSnapshot.Header)
+		case closeButtonTapped
+	}
+
 	public enum InternalAction: Sendable, Equatable {
 		case loadBackupProfileHeadersResult(ProfileSnapshot.HeaderList?)
 		case loadThisDeviceIDResult(UUID?)
@@ -70,6 +71,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case profileCreatedFromImportedBDFS
 	}
 
+	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.dataReader) var dataReader
 	@Dependency(\.jsonDecoder) var jsonDecoder
@@ -154,6 +156,11 @@ public struct SelectBackup: Sendable, FeatureReducer {
 				loggerGlobal.error("Failed to import profile, error: \(error)")
 			}
 			return .none
+
+		case .closeButtonTapped:
+			return .run { _ in
+				await dismiss()
+			}
 		}
 	}
 
