@@ -37,7 +37,6 @@ extension SelectBackup {
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()
 			}
-			.navigationTitle(L10n.RecoverProfileBackup.Header.title)
 		}
 	}
 }
@@ -48,6 +47,10 @@ extension SelectBackup.View {
 	private func coreView(_ store: StoreOf<SelectBackup>, with viewStore: ViewStoreOf<SelectBackup>) -> some SwiftUI.View {
 		ScrollView {
 			VStack(spacing: .medium1) {
+				Text(L10n.RecoverProfileBackup.Header.title)
+					.multilineTextAlignment(.center)
+					.textStyle(.sheetTitle)
+
 				Text(L10n.RecoverProfileBackup.Header.subtitle)
 					.textStyle(.body1Regular)
 
