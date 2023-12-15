@@ -111,10 +111,8 @@
                     "displayName": "Sajjon",
                     "personaData":
                     {
-                        "postalAddresses":
-                        [],
-                        "creditCards":
-                        [],
+                        "postalAddresses": [],
+                        "creditCards": [],
                         "emailAddresses":
                         [
                             {
@@ -140,8 +138,7 @@
                                 "value": "0700838198"
                             }
                         ],
-                        "urls":
-                        []
+                        "urls": []
                     },
                     "address": "identity_tdx_e_122k9saakdjazzwm98rlpjlwewy0wvx0csmtvstdut528r0t0z8cy30"
                 }
@@ -189,9 +186,9 @@
                         },
                         "discriminator": "unsecured"
                     },
+                    "flags": ["deletedByUser"],
                     "networkID": 14,
                     "appearanceID": 0,
-                    "flags": [],
                     "displayName": "Zaba 0",
                     "onLedgerSettings":
                     {
@@ -204,9 +201,6 @@
                             []
                         }
                     },
-                    "flags": [
-                        "deletedByUser"
-                    ],
                     "address": "account_tdx_e_128vkt2fur65p4hqhulfv3h0cknrppwtjsstlttkfamj4jnnpm82gsw"
                 },
                 {
@@ -1346,9 +1340,6 @@
                             []
                         }
                     },
-                    "flags": [
-                        "deletedByUser"
-                    ],
                     "address": "account_rdx12x20vgu94d96g3demdumxl6yjpvm0jy8dhrr03g75299ghxrwq76uh"
                 }
             ],
@@ -1392,8 +1383,7 @@
                 },
                 "common":
                 {
-                    "flags":
-                    [],
+                    "flags": [],
                     "addedOn": "2023-09-11T16:05:55Z",
                     "cryptoParameters":
                     {
@@ -1427,8 +1417,7 @@
                 },
                 "common":
                 {
-                    "flags":
-                    [],
+                    "flags": [],
                     "addedOn": "2023-09-11T16:23:40Z",
                     "cryptoParameters":
                     {
@@ -1464,8 +1453,7 @@
                 },
                 "common":
                 {
-                    "flags":
-                    [],
+                    "flags": [],
                     "addedOn": "2023-09-11T16:26:44Z",
                     "cryptoParameters":
                     {
@@ -1501,8 +1489,7 @@
                 },
                 "common":
                 {
-                    "flags":
-                    [],
+                    "flags": [],
                     "addedOn": "2023-09-11T16:35:08Z",
                     "cryptoParameters":
                     {
