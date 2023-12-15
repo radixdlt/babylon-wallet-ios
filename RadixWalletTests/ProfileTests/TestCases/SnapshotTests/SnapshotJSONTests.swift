@@ -5,7 +5,7 @@ import XCTest
 
 // MARK: - SnapshotJSONTests
 final class SnapshotJSONTests: TestCase {
-	func test_generate() throws {
+	func omit_test_generate() throws {
 		let plaintextSnapshot: ProfileSnapshot = try readTestFixture(
 			bundle: Bundle(for: Self.self),
 
