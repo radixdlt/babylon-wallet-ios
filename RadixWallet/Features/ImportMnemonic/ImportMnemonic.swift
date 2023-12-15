@@ -89,6 +89,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			public var isProgressing: Bool
 			public let persistStrategy: PersistStrategy?
 			public let hideAdvancedMode: Bool
+			public let showCloseButton: Bool
 		}
 
 		public enum Mode: Sendable, Hashable {
@@ -168,6 +169,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			header: Header? = nil,
 			warning: String? = nil,
 			hideAdvancedMode: Bool = false,
+			showCloseButton: Bool = false,
 			warningOnContinue: OnContinueWarning? = nil,
 			isWordCountFixed: Bool = false,
 			persistStrategy: PersistStrategy?,
@@ -182,7 +184,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 				.init(
 					isProgressing: false,
 					persistStrategy: persistStrategy,
-					hideAdvancedMode: hideAdvancedMode
+					hideAdvancedMode: hideAdvancedMode,
+					showCloseButton: showCloseButton
 				)
 			)
 			self.language = language
@@ -267,10 +270,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		#if DEBUG
 		case debugCopyMnemonic
-		case debugMnemonicChanged(String)
-		case debugUseBabylonTestingMnemonicWithActiveAccounts
-		case debugUseOlympiaTestingMnemonicWithActiveAccounts
-		case debugUseTestingMnemonicZooVote
+		case debugMnemonicChanged(String, continue: Bool = false)
+		case debugUseBabylonTestingMnemonicWithActiveAccounts(continue: Bool)
+		case debugUseOlympiaTestingMnemonicWithActiveAccounts(continue: Bool)
+		case debugUseTestingMnemonicZooVote(continue: Bool)
 		case debugPasteMnemonic
 		#endif
 	}
@@ -308,10 +311,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		public enum Action: Sendable, Equatable {
 			case offDeviceMnemonicInfoPrompt(OffDeviceMnemonicInfo.Action)
-
 			case backupConfirmation(BackupConfirmation)
 			case verifyMnemonic(VerifyMnemonic.Action)
-
 			case onContinueWarning(OnContinueWarning)
 
 			public enum BackupConfirmation: Sendable, Hashable {
@@ -334,6 +335,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.mnemonicClient) var mnemonicClient
 	@Dependency(\.continuousClock) var clock
@@ -447,8 +449,14 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return markAsBackedUpIfNeeded(&state)
 
 		case .closeButtonTapped:
-			assert(state.mode.readonly?.context == .fromBackupPrompt)
-			return markAsBackedUpIfNeeded(&state)
+			if state.mode.readonly?.context == .fromBackupPrompt {
+				return markAsBackedUpIfNeeded(&state)
+			} else if state.mode.write?.showCloseButton == true {
+				return .run { _ in await dismiss() }
+			} else {
+				assertionFailure("Invalid mode: No close button should be visible")
+				return .none
+			}
 
 		#if DEBUG
 		case .debugCopyMnemonic:
@@ -457,28 +465,30 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			}
 			return .none
 
-		case let .debugMnemonicChanged(mnemonic):
+		case let .debugMnemonicChanged(mnemonic, continueAutomatically):
 			state.debugMnemonicPhraseSingleField = mnemonic
 			if let mnemonic = try? Mnemonic(phrase: mnemonic, language: state.language) {
 				state.words = State.words(from: mnemonic, isReadonlyMode: state.mode.readonly != nil)
-				state.mode.update(isProgressing: true)
-				return .send(.view(.continueButtonTapped(mnemonic)))
-			} else {
-				return .none
+				if continueAutomatically {
+					state.mode.update(isProgressing: true)
+					return .send(.view(.continueButtonTapped(mnemonic)))
+				}
 			}
+
+			return .none
 
 		case .debugPasteMnemonic:
 			let toPaste = pasteboardClient.getString() ?? ""
 			return .send(.view(.debugMnemonicChanged(toPaste)))
 
-		case .debugUseOlympiaTestingMnemonicWithActiveAccounts:
-			return .send(.view(.debugMnemonicChanged("section canoe half crystal crew balcony duty scout half robot avocado gas all effort piece")))
+		case let .debugUseOlympiaTestingMnemonicWithActiveAccounts(continueAutomatically):
+			return .send(.view(.debugMnemonicChanged("section canoe half crystal crew balcony duty scout half robot avocado gas all effort piece", continue: continueAutomatically)))
 
-		case .debugUseBabylonTestingMnemonicWithActiveAccounts:
-			return .send(.view(.debugMnemonicChanged("wine over village stage barrel strategy cushion decline echo fiber salad carry empower fun awful cereal galaxy laundry practice appear bean flat mansion license")))
+		case let .debugUseBabylonTestingMnemonicWithActiveAccounts(continueAutomatically):
+			return .send(.view(.debugMnemonicChanged("wine over village stage barrel strategy cushion decline echo fiber salad carry empower fun awful cereal galaxy laundry practice appear bean flat mansion license", continue: continueAutomatically)))
 
-		case .debugUseTestingMnemonicZooVote:
-			return .send(.view(.debugMnemonicChanged(Mnemonic.testValueZooVote.phrase.rawValue)))
+		case let .debugUseTestingMnemonicZooVote(continueAutomatically):
+			return .send(.view(.debugMnemonicChanged(Mnemonic.testValueZooVote.phrase.rawValue, continue: continueAutomatically)))
 		#endif
 		}
 	}
@@ -493,6 +503,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			passphrase: state.bip39Passphrase
 		)
 		guard let persistStrategy = write.persistStrategy else {
+			state.mode.update(isProgressing: false)
 			return .send(.delegate(.notPersisted(mnemonicWithPassphrase)))
 		}
 		switch persistStrategy.location {
@@ -551,10 +562,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return .none
 
 		case let .saveFactorSourceResult(.success(saved)):
-
 			state.mode.update(isProgressing: false)
 			overlayWindowClient.scheduleHUD(.seedPhraseImported)
 			let factorSource = saved.factorSource
+
 			if saved.savedIntoProfile {
 				return .send(.delegate(.persistedNewFactorSourceInProfile(factorSource)))
 			} else {

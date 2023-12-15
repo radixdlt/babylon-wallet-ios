@@ -7,6 +7,7 @@ extension ImportMnemonic.State {
 		var viewState = ImportMnemonic.ViewState(
 			readonlyMode: mode.readonly?.context,
 			hideAdvancedMode: mode.write?.hideAdvancedMode ?? false,
+			showCloseButton: showCloseButton,
 			isProgressing: mode.write?.isProgressing ?? false,
 			isWordCountFixed: isWordCountFixed,
 			isAdvancedMode: isAdvancedMode,
@@ -24,6 +25,15 @@ extension ImportMnemonic.State {
 		return viewState
 	}
 
+	private var showCloseButton: Bool {
+		switch mode {
+		case let .readonly(readOnlyMode):
+			readOnlyMode.context == .fromBackupPrompt
+		case let .write(writeMode):
+			writeMode.showCloseButton
+		}
+	}
+
 	var rowCount: Int {
 		words.count / ImportMnemonic.wordsPerRow
 	}
@@ -38,6 +48,7 @@ extension ImportMnemonic {
 
 		let readonlyMode: ImportMnemonic.State.ReadonlyMode.Context?
 		let hideAdvancedMode: Bool
+		let showCloseButton: Bool
 		let isProgressing: Bool // irrelevant for read only mode
 		let isWordCountFixed: Bool
 		let isAdvancedMode: Bool
@@ -55,11 +66,6 @@ extension ImportMnemonic {
 
 		var showBackButton: Bool {
 			guard let readonlyMode, case .fromSettings = readonlyMode else { return false }
-			return true
-		}
-
-		var showCloseButton: Bool {
-			guard let readonlyMode, case .fromBackupPrompt = readonlyMode else { return false }
 			return true
 		}
 
@@ -333,58 +339,48 @@ extension ImportMnemonic.View {
 			Button("DEBUG ONLY Copy") {
 				viewStore.send(.debugCopyMnemonic)
 			}
-			.buttonStyle(
-				.secondaryRectangular(
-					shouldExpand: true,
-					isDestructive: true,
-					isInToolbar: true
-				)
-			)
+			.buttonStyle(.secondaryRectangular(shouldExpand: true, isDestructive: true, isInToolbar: true))
 			.padding(.horizontal, .medium2)
 			.padding(.bottom, .medium3)
 		} else {
 			if !(viewStore.isWordCountFixed && viewStore.wordCount == .twentyFour) {
 				Button("DEBUG AccRecScan Olympia 15") {
-					viewStore.send(.debugUseOlympiaTestingMnemonicWithActiveAccounts)
+					viewStore.send(.debugUseOlympiaTestingMnemonicWithActiveAccounts(continue: true))
 				}
-				.buttonStyle(
-					.secondaryRectangular(
-						shouldExpand: true,
-						isDestructive: true,
-						isInToolbar: true
-					)
-				)
+				.buttonStyle(.secondaryRectangular(shouldExpand: true, isDestructive: true, isInToolbar: true))
+				.overlay(alignment: .trailing) {
+					Button("M") {
+						viewStore.send(.debugUseOlympiaTestingMnemonicWithActiveAccounts(continue: false))
+					}
+					.frame(width: 40)
+				}
 				.padding(.horizontal, .medium2)
 				.padding(.bottom, .medium3)
 			}
 
 			Button("DEBUG AccRecScan Babylon 24") {
-				viewStore.send(.debugUseBabylonTestingMnemonicWithActiveAccounts)
+				viewStore.send(.debugUseBabylonTestingMnemonicWithActiveAccounts(continue: true))
 			}
-			.buttonStyle(
-				.secondaryRectangular(
-					shouldExpand: true,
-					isDestructive: true,
-					isInToolbar: true
-				)
-			)
+			.buttonStyle(.secondaryRectangular(shouldExpand: true, isDestructive: true, isInToolbar: true))
+			.overlay(alignment: .trailing) {
+				Button("M") {
+					viewStore.send(.debugUseBabylonTestingMnemonicWithActiveAccounts(continue: false))
+				}
+				.frame(width: 40)
+			}
 			.padding(.horizontal, .medium2)
 			.padding(.bottom, .medium3)
 
-			Button(
-				"DEBUG zoo..vote (24)"
-			) {
-				viewStore.send(
-					.debugUseTestingMnemonicZooVote
-				)
+			Button("DEBUG zoo..vote (24)") {
+				viewStore.send(.debugUseTestingMnemonicZooVote(continue: true))
 			}
-			.buttonStyle(
-				.secondaryRectangular(
-					shouldExpand: true,
-					isDestructive: true,
-					isInToolbar: true
-				)
-			)
+			.buttonStyle(.secondaryRectangular(shouldExpand: true, isDestructive: true, isInToolbar: true))
+			.overlay(alignment: .trailing) {
+				Button("M") {
+					viewStore.send(.debugUseTestingMnemonicZooVote(continue: false))
+				}
+				.frame(width: 40)
+			}
 			.padding(.horizontal, .medium2)
 			.padding(.bottom, .medium3)
 
