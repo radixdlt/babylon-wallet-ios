@@ -54,11 +54,10 @@ extension ManualAccountRecoverySeedPhrase.View {
 						store.send(.view(.addButtonTapped))
 					}
 					.buttonStyle(.secondaryRectangular)
-
-					Spacer(minLength: 0)
 				}
 			}
 			.foregroundStyle(.app.gray1)
+			.padding(.bottom, .medium3)
 		}
 		.footer {
 			WithViewStore(store, observe: \.selected) { viewStore in
