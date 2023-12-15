@@ -174,7 +174,7 @@ jobs:
 
       - uses: RDXWorks-actions/setup-xcode@master
         with:
-          xcode-version: "15.0.1"
+          xcode-version: "15.1"
 
       - name: "Set up ruby"
         uses: ruby/setup-ruby@v1
