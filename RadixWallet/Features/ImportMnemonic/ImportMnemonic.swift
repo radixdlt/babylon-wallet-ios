@@ -311,10 +311,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		public enum Action: Sendable, Equatable {
 			case offDeviceMnemonicInfoPrompt(OffDeviceMnemonicInfo.Action)
-
 			case backupConfirmation(BackupConfirmation)
 			case verifyMnemonic(VerifyMnemonic.Action)
-
 			case onContinueWarning(OnContinueWarning)
 
 			public enum BackupConfirmation: Sendable, Hashable {
@@ -503,6 +501,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			passphrase: state.bip39Passphrase
 		)
 		guard let persistStrategy = write.persistStrategy else {
+			state.mode.update(isProgressing: false)
 			return .send(.delegate(.notPersisted(mnemonicWithPassphrase)))
 		}
 		switch persistStrategy.location {
@@ -561,10 +560,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return .none
 
 		case let .saveFactorSourceResult(.success(saved)):
-
 			state.mode.update(isProgressing: false)
 			overlayWindowClient.scheduleHUD(.seedPhraseImported)
 			let factorSource = saved.factorSource
+
 			if saved.savedIntoProfile {
 				return .send(.delegate(.persistedNewFactorSourceInProfile(factorSource)))
 			} else {
