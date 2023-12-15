@@ -339,58 +339,48 @@ extension ImportMnemonic.View {
 			Button("DEBUG ONLY Copy") {
 				viewStore.send(.debugCopyMnemonic)
 			}
-			.buttonStyle(
-				.secondaryRectangular(
-					shouldExpand: true,
-					isDestructive: true,
-					isInToolbar: true
-				)
-			)
+			.buttonStyle(.secondaryRectangular(shouldExpand: true, isDestructive: true, isInToolbar: true))
 			.padding(.horizontal, .medium2)
 			.padding(.bottom, .medium3)
 		} else {
 			if !(viewStore.isWordCountFixed && viewStore.wordCount == .twentyFour) {
 				Button("DEBUG AccRecScan Olympia 15") {
-					viewStore.send(.debugUseOlympiaTestingMnemonicWithActiveAccounts)
+					viewStore.send(.debugUseOlympiaTestingMnemonicWithActiveAccounts(continue: true))
 				}
-				.buttonStyle(
-					.secondaryRectangular(
-						shouldExpand: true,
-						isDestructive: true,
-						isInToolbar: true
-					)
-				)
+				.buttonStyle(.secondaryRectangular(shouldExpand: true, isDestructive: true, isInToolbar: true))
+				.overlay(alignment: .trailing) {
+					Button("M") {
+						viewStore.send(.debugUseOlympiaTestingMnemonicWithActiveAccounts(continue: false))
+					}
+					.frame(width: 40)
+				}
 				.padding(.horizontal, .medium2)
 				.padding(.bottom, .medium3)
 			}
 
 			Button("DEBUG AccRecScan Babylon 24") {
-				viewStore.send(.debugUseBabylonTestingMnemonicWithActiveAccounts)
+				viewStore.send(.debugUseBabylonTestingMnemonicWithActiveAccounts(continue: true))
 			}
-			.buttonStyle(
-				.secondaryRectangular(
-					shouldExpand: true,
-					isDestructive: true,
-					isInToolbar: true
-				)
-			)
+			.buttonStyle(.secondaryRectangular(shouldExpand: true, isDestructive: true, isInToolbar: true))
+			.overlay(alignment: .trailing) {
+				Button("M") {
+					viewStore.send(.debugUseBabylonTestingMnemonicWithActiveAccounts(continue: false))
+				}
+				.frame(width: 40)
+			}
 			.padding(.horizontal, .medium2)
 			.padding(.bottom, .medium3)
 
-			Button(
-				"DEBUG zoo..vote (24)"
-			) {
-				viewStore.send(
-					.debugUseTestingMnemonicZooVote
-				)
+			Button("DEBUG zoo..vote (24)") {
+				viewStore.send(.debugUseTestingMnemonicZooVote(continue: true))
 			}
-			.buttonStyle(
-				.secondaryRectangular(
-					shouldExpand: true,
-					isDestructive: true,
-					isInToolbar: true
-				)
-			)
+			.buttonStyle(.secondaryRectangular(shouldExpand: true, isDestructive: true, isInToolbar: true))
+			.overlay(alignment: .trailing) {
+				Button("M") {
+					viewStore.send(.debugUseTestingMnemonicZooVote(continue: false))
+				}
+				.frame(width: 40)
+			}
 			.padding(.horizontal, .medium2)
 			.padding(.bottom, .medium3)
 

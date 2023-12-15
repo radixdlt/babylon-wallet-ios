@@ -270,10 +270,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		#if DEBUG
 		case debugCopyMnemonic
-		case debugMnemonicChanged(String)
-		case debugUseBabylonTestingMnemonicWithActiveAccounts
-		case debugUseOlympiaTestingMnemonicWithActiveAccounts
-		case debugUseTestingMnemonicZooVote
+		case debugMnemonicChanged(String, continue: Bool = false)
+		case debugUseBabylonTestingMnemonicWithActiveAccounts(continue: Bool)
+		case debugUseOlympiaTestingMnemonicWithActiveAccounts(continue: Bool)
+		case debugUseTestingMnemonicZooVote(continue: Bool)
 		case debugPasteMnemonic
 		#endif
 	}
@@ -465,28 +465,30 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			}
 			return .none
 
-		case let .debugMnemonicChanged(mnemonic):
+		case let .debugMnemonicChanged(mnemonic, continueAutomatically):
 			state.debugMnemonicPhraseSingleField = mnemonic
 			if let mnemonic = try? Mnemonic(phrase: mnemonic, language: state.language) {
 				state.words = State.words(from: mnemonic, isReadonlyMode: state.mode.readonly != nil)
-				state.mode.update(isProgressing: true)
-				return .send(.view(.continueButtonTapped(mnemonic)))
-			} else {
-				return .none
+				if continueAutomatically {
+					state.mode.update(isProgressing: true)
+					return .send(.view(.continueButtonTapped(mnemonic)))
+				}
 			}
+
+			return .none
 
 		case .debugPasteMnemonic:
 			let toPaste = pasteboardClient.getString() ?? ""
 			return .send(.view(.debugMnemonicChanged(toPaste)))
 
-		case .debugUseOlympiaTestingMnemonicWithActiveAccounts:
-			return .send(.view(.debugMnemonicChanged("section canoe half crystal crew balcony duty scout half robot avocado gas all effort piece")))
+		case let .debugUseOlympiaTestingMnemonicWithActiveAccounts(continueAutomatically):
+			return .send(.view(.debugMnemonicChanged("section canoe half crystal crew balcony duty scout half robot avocado gas all effort piece", continue: continueAutomatically)))
 
-		case .debugUseBabylonTestingMnemonicWithActiveAccounts:
-			return .send(.view(.debugMnemonicChanged("wine over village stage barrel strategy cushion decline echo fiber salad carry empower fun awful cereal galaxy laundry practice appear bean flat mansion license")))
+		case let .debugUseBabylonTestingMnemonicWithActiveAccounts(continueAutomatically):
+			return .send(.view(.debugMnemonicChanged("wine over village stage barrel strategy cushion decline echo fiber salad carry empower fun awful cereal galaxy laundry practice appear bean flat mansion license", continue: continueAutomatically)))
 
-		case .debugUseTestingMnemonicZooVote:
-			return .send(.view(.debugMnemonicChanged(Mnemonic.testValueZooVote.phrase.rawValue)))
+		case let .debugUseTestingMnemonicZooVote(continueAutomatically):
+			return .send(.view(.debugMnemonicChanged(Mnemonic.testValueZooVote.phrase.rawValue, continue: continueAutomatically)))
 		#endif
 		}
 	}
