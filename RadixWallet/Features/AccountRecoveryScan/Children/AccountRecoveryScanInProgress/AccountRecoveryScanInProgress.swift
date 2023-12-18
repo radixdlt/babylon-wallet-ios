@@ -101,6 +101,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
+	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
@@ -233,6 +234,10 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 		default: return .none
 		}
+	}
+
+	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		.run { _ in await dismiss() }
 	}
 }
 
