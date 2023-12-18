@@ -58,6 +58,7 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.userDefaults) var userDefaults
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -142,6 +143,10 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 
 				state.deviceFactorSources.append(entitiesControlledByFactorSource)
 				state.selected = entitiesControlledByFactorSource
+
+				// Not important enough to throw.
+				try? userDefaults.addFactorSourceIDOfBackedUpMnemonic(deviceFactorSource.id)
+
 				state.destination = nil
 			} catch {
 				loggerGlobal.error("Failed to add mnemonic \(error)")

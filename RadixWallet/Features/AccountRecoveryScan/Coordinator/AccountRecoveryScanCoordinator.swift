@@ -73,6 +73,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.onboardingClient) var onboardingClient
 	@Dependency(\.accountsClient) var accountsClient
+	@Dependency(\.userDefaults) var userDefaults
 
 	public init() {}
 
@@ -161,6 +162,10 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 			return .run { send in
 				let result = await TaskResult<EqVoid> {
 					try secureStorageClient.saveMnemonicForFactorSource(privateHD)
+
+					// Not important enough to throw.
+					try? userDefaults.addFactorSourceIDOfBackedUpMnemonic(privateHD.factorSource.id)
+
 					return try await onboardingClient.finishOnboardingWithRecoveredAccountAndBDFS(recoveredAccountAndBDFS)
 				}
 				await send(.internal(.createProfileResult(result)))
