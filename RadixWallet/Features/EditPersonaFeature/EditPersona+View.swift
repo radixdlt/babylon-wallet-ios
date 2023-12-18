@@ -62,8 +62,7 @@ extension EditPersona {
 
 							Separator()
 
-							// FIXME: Strings
-							Text("dApps can request permission from you to share the following fields of information.")
+							Text(L10n.EditPersona.sharedInformationHeading)
 								.multilineTextAlignment(.leading)
 								.textStyle(.body1HighImportance)
 								.foregroundColor(.app.gray2)

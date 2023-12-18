@@ -44,7 +44,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 	public struct Destination: DestinationReducer {
 		static let confirmCloudSyncDisableAlert: Self.State = .confirmCloudSyncDisable(.init(
 			title: {
-				TextState(L10n.AppSettings.ConfirmCloudSyncDisableAlert.title)
+				TextState(L10n.IOSProfileBackup.ConfirmCloudSyncDisableAlert.title)
 			},
 			actions: {
 				ButtonState(role: .destructive, action: .confirm) {
@@ -293,28 +293,28 @@ struct LackedPermissionToAccessSecurityScopedResource: Error {}
 
 extension ConfirmationDialogState<ProfileBackupSettings.Destination.Action.DeleteProfileConfirmationDialogAction> {
 	static let deleteProfileConfirmationDialog = ConfirmationDialogState {
-		TextState(L10n.AppSettings.ResetWalletDialog.title)
+		TextState(L10n.ProfileBackup.ResetWalletDialog.title)
 	} actions: {
 		ButtonState(role: .destructive, action: .deleteProfileLocalKeepInICloudIfPresent) {
-			TextState(L10n.AppSettings.ResetWalletDialog.resetButtonTitle)
+			TextState(L10n.ProfileBackup.ResetWalletDialog.resetButtonTitle)
 		}
 		ButtonState(role: .destructive, action: .deleteProfile) {
-			TextState(L10n.AppSettings.ResetWalletDialog.resetAndDeleteBackupButtonTitle)
+			TextState(L10n.ProfileBackup.ResetWalletDialog.resetAndDeleteBackupButtonTitle)
 		}
 		ButtonState(role: .cancel, action: .cancel) {
 			TextState(L10n.Common.cancel)
 		}
 	} message: {
-		TextState(L10n.AppSettings.ResetWalletDialog.message)
+		TextState(L10n.ProfileBackup.ResetWalletDialog.message)
 	}
 }
 
 extension ProfileBackupSettings.Destination.State {
 	fileprivate static let cloudSyncTakesLongTimeAlert = Self.syncTakesLongTimeAlert(.init(
-		title: { TextState(L10n.AppSettings.ICloudSyncEnabledAlert.title) },
+		title: { TextState(L10n.IOSProfileBackup.ICloudSyncEnabledAlert.title) },
 		actions: {
 			ButtonState(action: .ok, label: { TextState(L10n.Common.ok) })
 		},
-		message: { TextState(L10n.AppSettings.ICloudSyncEnabledAlert.message) }
+		message: { TextState(L10n.IOSProfileBackup.ICloudSyncEnabledAlert.message) }
 	))
 }

@@ -34,7 +34,7 @@ extension ManualAccountRecoverySeedPhrase.View {
 		ScrollView {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: .zero) {
-					Text("Choose Seed Phrase") // FIXME: Strings
+					Text(L10n.AccountRecoveryScan.ChooseSeedPhrase.title)
 						.multilineTextAlignment(.center)
 						.textStyle(.sheetTitle)
 						.padding(.top, .medium3)
@@ -64,7 +64,7 @@ extension ManualAccountRecoverySeedPhrase.View {
 				WithControlRequirements(viewStore.state) { selection in
 					store.send(.view(.continueButtonTapped(selection)))
 				} control: { action in
-					Button("Continue", action: action) // FIXME: Strings
+					Button(L10n.AccountRecoveryScan.ChooseSeedPhrase.continueButton, action: action)
 						.buttonStyle(.primaryRectangular(shouldExpand: true))
 				}
 			}
@@ -91,8 +91,8 @@ private extension View {
 		let destinationStore = store.destination
 		return navigationDestination(
 			store: destinationStore,
-			state: /ManualAccountRecoverySeedPhrase.Destination.State.importMnemoninc,
-			action: ManualAccountRecoverySeedPhrase.Destination.Action.importMnemoninc,
+			state: /ManualAccountRecoverySeedPhrase.Destination.State.importMnemonic,
+			action: ManualAccountRecoverySeedPhrase.Destination.Action.importMnemonic,
 			destination: { ImportMnemonic.View(store: $0) }
 		)
 	}
@@ -102,17 +102,17 @@ private extension View {
 private extension ManualAccountRecoverySeedPhrase.View {
 	private func subtitle(isOlympia: Bool) -> String {
 		if isOlympia {
-			"Choose the \"Legacy\" Olympia seed phrase for use for derivation:" // FIXME: Strings
+			L10n.AccountRecoveryScan.ChooseSeedPhrase.subtitleOlympia
 		} else {
-			"Choose the Babylon seed phrase for use for derivation:" // FIXME: Strings
+			L10n.AccountRecoveryScan.ChooseSeedPhrase.subtitleBabylon
 		}
 	}
 
 	private func buttonText(isOlympia: Bool) -> String {
 		if isOlympia {
-			"Add Olympia Seed Phrase" // FIXME: Strings
+			L10n.AccountRecoveryScan.ChooseSeedPhrase.addButtonOlympia
 		} else {
-			"Add Babylon Seed Phrase" // FIXME: Strings
+			L10n.AccountRecoveryScan.ChooseSeedPhrase.addButtonBabylon
 		}
 	}
 
@@ -129,7 +129,7 @@ private extension ManualAccountRecoverySeedPhrase.View {
 				DisplayEntitiesControlledByMnemonic.MnemonicView(
 					viewState: .init(
 						headingState: .init(
-							title: "Seed Phrase", // FIXME: Strings - L10n.SeedPhrases.SeedPhrase.plainTitle
+							title: L10n.SeedPhrases.SeedPhrase.headingScan,
 							imageAsset: AssetResource.signingKey,
 							type: .scanning(selected: item.isSelected),
 							isError: false

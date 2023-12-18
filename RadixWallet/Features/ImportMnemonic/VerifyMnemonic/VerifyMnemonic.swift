@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - DisplayMnemonic
+// MARK: - VerifyMnemonic
 public struct VerifyMnemonic: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public static let numberOfRandomWordsToConfirm = 3
@@ -98,4 +98,8 @@ public struct VerifyMnemonic: Sendable, FeatureReducer {
 		#endif
 		}
 	}
+}
+
+private extension OverlayWindowClient.Item.HUD {
+	static let succeeded = Self(text: L10n.ImportMnemonic.verificationSuccess)
 }

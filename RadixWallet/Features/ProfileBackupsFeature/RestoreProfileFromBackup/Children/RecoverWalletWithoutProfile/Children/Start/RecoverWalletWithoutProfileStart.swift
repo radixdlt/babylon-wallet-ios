@@ -48,13 +48,15 @@ public struct RecoverWalletWithoutProfileStart: Sendable, FeatureReducer {
 
 		case .ledgerOnlyTapped:
 			state.destination = .alert(.alert(
-				message: "Tap “I’m a New Wallet User”. After completing wallet creation, in Settings you can perform an “account recovery scan” using your Ledger device." // FIXME: Strings
+				title: L10n.RecoverWalletWithoutProfile.Start.useNewWalletAlertTitle,
+				message: L10n.RecoverWalletWithoutProfile.Start.useNewWalletAlertMessageHardware
 			))
 			return .none
 
 		case .olympiaOnlyTapped:
 			state.destination = .alert(.alert(
-				message: "Tap “I’m a New Wallet User”. After completing wallet creation, in Settings you can perform an “account recovery scan” using your Olympia seed phrase." // FIXME: Strings
+				title: L10n.RecoverWalletWithoutProfile.Start.useNewWalletAlertTitle,
+				message: L10n.RecoverWalletWithoutProfile.Start.useNewWalletAlertMessageOlympia
 			))
 			return .none
 
@@ -77,13 +79,13 @@ public struct RecoverWalletWithoutProfileStart: Sendable, FeatureReducer {
 }
 
 private extension AlertState<RecoverWalletWithoutProfileStart.Destination.Action.AlertAction> {
-	static func alert(message: String) -> Self {
+	static func alert(title: String, message: String) -> Self {
 		AlertState(
-			title: .init("No Babylon Seed Phrase"), // FIXME: Strings
+			title: .init(title),
 			message: .init(message),
 			buttons: [
-				.default(.init(L10n.Common.continue), action: .send(.continueTapped)),
-				.cancel(.init(L10n.Common.cancel), action: .send(.cancelTapped)),
+				.default(.init(L10n.RecoverWalletWithoutProfile.Start.useNewWalletAlertContinue), action: .send(.continueTapped)),
+				.cancel(.init(L10n.RecoverWalletWithoutProfile.Start.useNewWalletAlertCancel), action: .send(.cancelTapped)),
 			]
 		)
 	}

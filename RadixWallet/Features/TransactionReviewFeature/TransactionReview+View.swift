@@ -245,7 +245,8 @@ extension TransactionReview {
 			let accountDepositSettingsStore = store.scope(state: \.accountDepositSettings) { .child(.accountDepositSettings($0)) }
 			IfLetStore(accountDepositSettingsStore) { childStore in
 				VStack(spacing: .small2) {
-					TransactionHeading("Account Deposit Settings") // FIXME: Strings
+					TransactionHeading(L10n.TransactionReview.AccountDepositSettings.subtitle)
+
 					AccountDepositSettings.View(store: childStore)
 						.padding(.bottom, .medium1)
 				}

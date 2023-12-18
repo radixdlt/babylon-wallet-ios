@@ -39,7 +39,7 @@ extension DebugSettingsCoordinator.View {
 	private var rows: [SettingsRowModel<DebugSettingsCoordinator>] {
 		[
 			.init(
-				title: L10n.Settings.multiFactor,
+				title: "Multi-Factor Setup",
 				icon: .systemImage("lock.square.stack.fill"),
 				action: .securityStructureConfigsButtonTapped
 			),

@@ -866,7 +866,7 @@ Your old Accounts and Personas will still be listed, but you will have to enter 
 "customizeNetworkFees_warning_selectFeePayer" = "Please select a fee payer for the transaction fee";
 "customizeNetworkFees_warning_insufficientBalance" = "Insufficient balance to pay the transaction fee";
 "accountRecoveryScan_inProgress_headerTitle" = "Scanning in progress";
-"accountRecoveryScan_inProgress_headerSubtitle" = "Scanning for Accounts that have been included in at least on transaction, using:";
+"accountRecoveryScan_inProgress_headerSubtitle" = "Scanning for Accounts that have been included in at least one transaction, using:";
 "accountRecoveryScan_inProgress_factorSourceBabylonSeedPhrase" = "**Babylon Seed Phrase**";
 "accountRecoveryScan_inProgress_factorSourceOlympiaSeedPhrase" = "**Olympia Seed Phrase**";
 "accountRecoveryScan_inProgress_factorSourceLedgerHardwareDevice" = "**Ledger hardware wallet device**";
@@ -887,9 +887,7 @@ Your old Accounts and Personas will still be listed, but you will have to enter 
 If you have any “Legacy” Accounts (created on the Olympia network) to import - or any Accounts using a Ledger hardware wallet device - please continue and then use the **Account Recovery Scan** option in your Radix Wallet settings under **Account Security**.";
 "recoverWalletWithoutProfileComplete_continueButton" = "Continue";
 "recoverWalletWithoutProfileInfo_header_title" = "Recover Control Without Backup";
-"recoverWalletWithoutProfileInfo_header_subtitle" = "**If you have no wallet backup in the cloud or as an exported backup file**, you can still restore Account access only using your main “Babylon” seed phrase. You cannot recover your Account names or other wallet settings this way.
-
-You will be asked to enter your main seed phrase. This is a set of **24 words** that the Radix Wallet mobile app showed you to write down and save securely.";
+"recoverWalletWithoutProfileInfo_header_subtitle" = "**If you have no wallet backup in the cloud or as an exported backup file**, you can still restore Account access only using your main “Babylon” seed phrase. You cannot recover your Account names or other wallet settings this way.\n\nYou will be asked to enter your main seed phrase. This is a set of **24 words** that the Radix Wallet mobile app showed you to write down and save securely.";
 "recoverWalletWithoutProfileInfo_continueButton" = "Continue";
 "recoverWalletWithoutProfileStart_header_title" = "Recover Control Without Backup";
 "recoverWalletWithoutProfileStart_header_subtitle" = "If you have no wallet backup in the cloud, or as an exported backup file, you still have other restore options.";
@@ -939,3 +937,84 @@ You can always change the guarantee from this default in each transaction.";
 "enterSeedPhrase_titleBabylonMain" = "Enter Main Seed Phrase";
 "enterSeedPhrase_titleBabylon" = "Enter Babylon Seed Phrase";
 "enterSeedPhrase_titleOlympia" = "Enter Olympia Seed Phrase";
+
+
+
+
+
+
+
+
+
+"recoverWalletWithoutProfile_start_headerTitle" = "Recover Control Without Backup";
+"recoverWalletWithoutProfile_start_headerSubtitle" = "If you have no wallet backup in the cloud, or as an exported backup file, you still have other restore options.";
+
+"recoverWalletWithoutProfile_start_babylonSectionTitle" = "I have my main “Babylon” 24-word seed phrase.";
+"recoverWalletWithoutProfile_start_babylonSectionButton" = "Recover with Main Seed Phrase";
+
+"recoverWalletWithoutProfile_start_hardwareSectionTitle" = "I only want to restore Ledger hardware wallet Accounts.";
+"recoverWalletWithoutProfile_start_hardwareSectionButton" = "Ledger-only Restore";
+
+"recoverWalletWithoutProfile_start_olympiaSectionTitle" = "I only have Accounts created on the Radix Olympia network.";
+"recoverWalletWithoutProfile_start_olympiaSectionButton" = "Olympia-only Restore";
+
+"recoverWalletWithoutProfile_start_useNewWalletAlertTitle" = "No Main Seed Phrase?";
+
+"recoverWalletWithoutProfile_start_useNewWalletAlertMessageHardware" = "Tap “I'm a New Wallet User”. After completing wallet creation, in Settings you can perform an “account recovery scan” using your Ledger device.";
+"recoverWalletWithoutProfile_start_useNewWalletAlertMessageOlympia" = "Tap “I'm a New Wallet User”. After completing wallet creation, in Settings you can perform an “account recovery scan” using your Olympia seed phrase.";
+"recoverWalletWithoutProfile_start_useNewWalletAlertCancel" = "Cancel";
+"recoverWalletWithoutProfile_start_useNewWalletAlertContinue" = "Continue";
+
+"recoverWalletWithoutProfile_info_headerTitle" = "Recover Control Without Backup";
+"recoverWalletWithoutProfile_info_headerSubtitle" = "**If you have no wallet backup in the cloud or as an exported backup file**, you can still restore Account access only using your main “Babylon” seed phrase. You cannot recover your Account names or other wallet settings this way.\n\nYou will be asked to enter your main seed phrase. This is a set of **24 words** that the Radix Wallet mobile app showed you to write down and save securely.";
+"recoverWalletWithoutProfile_info_continueButton" = "Continue";
+
+"recoverWalletWithoutProfile_complete_headerTitle" = "Recovery Complete";
+"recoverWalletWithoutProfile_complete_headerSubtitle" = "Accounts discovered in the scan have been added to your wallet.\n\nIf you have any “Legacy” Accounts (created on the Olympia network) to import - or any Accounts using a Ledger hardware wallet device - please continue and then use the **Account Recovery Scan** option in your Radix Wallet settings under **Account Security**.";
+"recoverWalletWithoutProfile_complete_continueButton" = "Continue";
+
+
+"derivePublicKeys_createAccount_title" = "Creating Account";
+"derivePublicKeys_createAccount_subtitle" = "Deriving public keys";
+
+"derivePublicKeys_createPersona_title" = "Creating Persona";
+"derivePublicKeys_createPersona_subtitle" = "Authenticate to your phone to complete using your phone’s signing key.";
+
+"derivePublicKeys_importLegacyAccount_title" = "Deriving Accounts";
+"derivePublicKeys_importLegacyAccount_subtitle" = "Authenticate to your phone to complete using your phone’s signing key.";
+
+"derivePublicKeys_accountRecoveryScan_title" = "Deriving Accounts";
+"derivePublicKeys_accountRecoveryScan_subtitle" = "Authenticate to your phone to complete using your phone’s signing key.";
+
+"derivePublicKeys_createAuthSignKeyForAccount_title" = "Creating Key";
+"derivePublicKeys_createAuthSignKeyForAccount_subtitle" = "Authenticate to your phone to complete using your phone’s signing key.";
+
+"derivePublicKeys_createAuthSignKeyForPersona_title" = "Creating Key";
+"derivePublicKeys_createAuthSignKeyForPersona_subtitle" = "Authenticate to your phone to complete using your phone’s signing key.";
+
+"settings_importFromLegacyWalletHeader_importLegacyAccounts" = "Import Legacy Accounts";
+
+"settings_personasSeedPhrasePrompt" = "Please write down the seed phrase for your Personas";
+
+"accountRecoveryScan_chooseSeedPhrase_importMnemonicTitleOlympia" = "Enter Legacy Seed Phrase";
+"accountRecoveryScan_chooseSeedPhrase_importMnemonicTitleBabylon" = "Enter Seed Phrase";
+"accountSettings_accountHidden" = "Account Hidden";
+
+
+"splash_profileOnAnotherDeviceAlert_title" = "Claim This Wallet?";
+"splash_profileOnAnotherDeviceAlert_claimExisting" = "Claim Existing Wallet";
+"splash_profileOnAnotherDeviceAlert_claimHere" = "Clear Wallet on This Phone";
+"splash_profileOnAnotherDeviceAlert_askLater" = "Ask Later (no changes)";
+"splash_profileOnAnotherDeviceAlert_message" = "This wallet is currently configured with a set of Accounts and Personas in use by  different phone.\n\nTo make changes to this wallet, you must claim it for use on this phone instead, removing access by the other phone.\n\nOr you can clear this wallet from this phone and start fresh.";
+
+"splash_tapAnywhereToUnlock" = "Tap anywhere to unlock?";
+
+"authorizedDapps_personaDetails_personaHidden" = "Persona Hidden";
+
+"splash_rootDetection_messageAndroid" = "It appears that your device might be rooted. To ensure the security of your Accounts and assets, using the Radix Wallet on rooted devices is not recommended. Please confirm if you wish to continue anyway at your own risk.";
+"splash_rootDetection_titleIOS" = "Possible jailbreak detected";
+
+"splash_rootDetection_messageIOS" = "It appears that your device might be jailbroken. To ensure the security of your Accounts and assets, using the Radix Wallet on jailbroken devices is not recommended. Please confirm if you wish to continue anyway at your own risk.";
+"splash_rootDetection_acknowledgeButton" = "I Understand the Risk";
+
+"importMnemonic_verificationSuccess" = "Success";

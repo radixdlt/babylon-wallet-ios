@@ -21,16 +21,16 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 	public struct Destination: DestinationReducer {
 		@CasePathable
 		public enum State: Sendable, Hashable {
-			case importMnemoninc(ImportMnemonic.State)
+			case importMnemonic(ImportMnemonic.State)
 		}
 
 		@CasePathable
 		public enum Action: Sendable, Equatable {
-			case importMnemoninc(ImportMnemonic.Action)
+			case importMnemonic(ImportMnemonic.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: \.importMnemoninc, action: \.importMnemoninc) {
+			Scope(state: \.importMnemonic, action: \.importMnemonic) {
 				ImportMnemonic()
 			}
 		}
@@ -79,7 +79,7 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 			return .none
 
 		case .addButtonTapped:
-			let title = state.isOlympia ? "Enter Legacy Seed Phrase" : "Enter Seed Phrase" // FIXME: Strings
+			let title = state.isOlympia ? L10n.AccountRecoveryScan.ChooseSeedPhrase.importMnemonicTitleOlympia : L10n.AccountRecoveryScan.ChooseSeedPhrase.importMnemonicTitleBabylon
 
 			let persistStrategy = ImportMnemonic.State.PersistStrategy(
 				factorSourceKindOfMnemonic: .onDevice(state.isOlympia ? .olympia : .babylon(isMain: false)),
@@ -87,7 +87,7 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 				onMnemonicExistsStrategy: .appendWithCryptoParamaters
 			)
 
-			state.destination = .importMnemoninc(.init(
+			state.destination = .importMnemonic(.init(
 				header: .init(title: title),
 				warning: L10n.EnterSeedPhrase.warning,
 				warningOnContinue: nil,
@@ -126,7 +126,7 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .importMnemoninc(.delegate(.persistedNewFactorSourceInProfile(factorSource))):
+		case let .importMnemonic(.delegate(.persistedNewFactorSourceInProfile(factorSource))):
 			do {
 				guard case let .device(deviceFactorSource) = factorSource else {
 					struct NotDeviceFactorSource: Error {}

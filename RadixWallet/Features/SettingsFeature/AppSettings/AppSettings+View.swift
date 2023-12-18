@@ -74,12 +74,12 @@ extension AppSettings {
 		private var rows: [SettingsRowModel<AppSettings>] {
 			[
 				.init(
-					title: L10n.Settings.linkedConnectors,
+					title: L10n.AppSettings.LinkedConnectors.title,
 					icon: .asset(AssetResource.desktopConnections),
 					action: .manageP2PLinksButtonTapped
 				),
 				.init(
-					title: L10n.Settings.gateways,
+					title: L10n.AppSettings.Gateways.title,
 					icon: .asset(AssetResource.gateway),
 					action: .gatewaysButtonTapped
 				),

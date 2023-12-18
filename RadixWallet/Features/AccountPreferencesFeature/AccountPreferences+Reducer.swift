@@ -165,6 +165,10 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	}
 }
 
+private extension OverlayWindowClient.Item.HUD {
+	static let accountHidden = Self(text: L10n.AccountSettings.accountHidden)
+}
+
 extension AccountPreferences {
 	func destination(for row: AccountPreferences.Section.SectionRow, _ state: inout State) -> Effect<Action> {
 		switch row {

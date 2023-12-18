@@ -58,7 +58,6 @@ extension VerifyMnemonic {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				ScrollView {
 					VStack(spacing: .medium1) {
-						// FIXME: Strings
 						Text(L10n.ConfirmMnemonicBackedUp.subtitle)
 							.foregroundStyle(.app.gray1)
 							.textStyle(.body1Regular)
@@ -67,8 +66,7 @@ extension VerifyMnemonic {
 						wordsGrid(viewStore: viewStore)
 
 						if viewStore.verificationFailed {
-							// FIXME: Strings
-							WarningErrorView(text: "Incorrect seed phrase", type: .error)
+							WarningErrorView(text: L10n.ImportMnemonic.checksumFailure, type: .error)
 						}
 
 						#if DEBUG
@@ -89,7 +87,6 @@ extension VerifyMnemonic {
 				}
 				.scrollIndicators(.hidden)
 			}
-			// FIXME: Strings
 			.navigationTitle(L10n.ConfirmMnemonicBackedUp.title)
 		}
 

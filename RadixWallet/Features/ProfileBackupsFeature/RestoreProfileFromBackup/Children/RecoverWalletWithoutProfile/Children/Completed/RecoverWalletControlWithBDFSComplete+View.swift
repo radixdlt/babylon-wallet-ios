@@ -11,7 +11,7 @@ public extension RecoverWalletControlWithBDFSComplete {
 		public var body: some SwiftUI.View {
 			ScrollView {
 				VStack(spacing: .zero) {
-					Text("Recovery Complete") // FIXME: Strings
+					Text(L10n.RecoverWalletWithoutProfile.Complete.headerTitle)
 						.multilineTextAlignment(.center)
 						.textStyle(.sheetTitle)
 						.foregroundStyle(.app.gray1)
@@ -19,7 +19,7 @@ public extension RecoverWalletControlWithBDFSComplete {
 						.padding(.horizontal, .large1)
 						.padding(.bottom, .large3)
 
-					Text(LocalizedStringKey(text))
+					Text(LocalizedStringKey(L10n.RecoverWalletWithoutProfile.Complete.headerSubtitle))
 						.multilineTextAlignment(.leading)
 						.textStyle(.body1Regular)
 						.foregroundStyle(.app.gray1)
@@ -31,7 +31,7 @@ public extension RecoverWalletControlWithBDFSComplete {
 				}
 			}
 			.footer {
-				Button("Continue") { // FIXME: Strings
+				Button(L10n.RecoverWalletWithoutProfile.Complete.continueButton) {
 					store.send(.view(.continueButtonTapped))
 				}
 				.buttonStyle(.primaryRectangular(shouldExpand: true))
@@ -40,5 +40,3 @@ public extension RecoverWalletControlWithBDFSComplete {
 		}
 	}
 }
-
-private let text: String = "Accounts discovered in the scan have been added to your wallet.\n\nIf you have any Olympia or “Legacy” Accounts to import - or any Accounts using a Ledger hardware wallet device - please use the **Account Recovery Scan** option in your Radix Wallet settings under **Account Security**." // FIXME: Strings

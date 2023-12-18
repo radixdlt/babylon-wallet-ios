@@ -198,19 +198,19 @@ struct RadixBanner: View {
 			Image(asset: AssetResource.radixBanner)
 				.padding(.top, .medium1)
 
-			Text("Start Using Radix") // FIXME: Strings
+			Text(L10n.HomePage.RadixBanner.title)
 				.textStyle(.body1Header)
 				.foregroundColor(.app.gray1)
 				.padding(.bottom, .small2)
 
-			Text("Complete setting up your wallet and start staking, using dApps and more!") // FIXME: Strings
+			Text(L10n.HomePage.RadixBanner.subtitle)
 				.multilineTextAlignment(.center)
 				.textStyle(.body2Regular)
 				.foregroundColor(.app.gray2)
 				.padding(.horizontal, .huge3)
 				.padding(.bottom, .medium3)
 
-			Button("Get Started Now", action: action) // FIXME: Strings
+			Button(L10n.HomePage.RadixBanner.action, action: action)
 				.buttonStyle(.secondaryRectangular(
 					shouldExpand: true,
 					trailingImage: .init(asset: AssetResource.iconLinkOut)

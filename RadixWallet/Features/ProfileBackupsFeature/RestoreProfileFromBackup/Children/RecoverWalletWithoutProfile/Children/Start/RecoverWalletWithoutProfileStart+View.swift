@@ -12,11 +12,11 @@ extension RecoverWalletWithoutProfileStart {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { _ in
 				ScrollView {
 					VStack(alignment: .center, spacing: .large3) {
-						Text("Recover Control Without Backup") // FIXME: Strings
+						Text(L10n.RecoverWalletWithoutProfileStart.Header.title)
 							.textStyle(.sheetTitle)
 							.padding(.horizontal, .medium3)
 
-						Text("If you have no wallet backup in the cloud or as an exported backup file, you still have other restore options.") // FIXME: Strings
+						Text(LocalizedStringKey(L10n.RecoverWalletWithoutProfileStart.Header.subtitle))
 							.multilineTextAlignment(.leading)
 							.textStyle(.body1Regular)
 							.padding(.horizontal, .large2)
@@ -24,11 +24,11 @@ extension RecoverWalletWithoutProfileStart {
 						Divider()
 							.padding(.horizontal, .medium1)
 
-						Text("I have my main “Babylon” 24-word seed phrase.") // FIXME: Strings
+						Text(L10n.RecoverWalletWithoutProfile.Start.babylonSectionTitle)
 							.textStyle(.body1Header)
 							.padding(.horizontal, .large2)
 
-						Button("Recover with Main Seed Phrase") { // FIXME: Strings
+						Button(L10n.RecoverWalletWithoutProfile.Start.babylonSectionButton) {
 							store.send(.view(.recoverWithBDFSTapped))
 						}
 						.padding(.horizontal, .medium3)
@@ -36,11 +36,11 @@ extension RecoverWalletWithoutProfileStart {
 						Divider()
 							.padding(.horizontal, .medium1)
 
-						Text("I only want to restore Ledger hardware wallet Accounts.") // FIXME: Strings
+						Text(L10n.RecoverWalletWithoutProfile.Start.hardwareSectionTitle)
 							.textStyle(.body1Header)
 							.padding(.horizontal, .large2)
 
-						Button("Ledger-only Restore") { // FIXME: Strings
+						Button(L10n.RecoverWalletWithoutProfile.Start.hardwareSectionButton) {
 							store.send(.view(.ledgerOnlyTapped))
 						}
 						.padding(.horizontal, .medium3)
@@ -48,11 +48,11 @@ extension RecoverWalletWithoutProfileStart {
 						Divider()
 							.padding(.horizontal, .medium1)
 
-						Text("I only have Accounts created on the Radix Olympia network.") // FIXME: Strings
+						Text(L10n.RecoverWalletWithoutProfile.Start.olympiaSectionTitle)
 							.textStyle(.body1Header)
 							.padding(.horizontal, .large2)
 
-						Button("Olympia-only Restore") { // FIXME: Strings
+						Button(L10n.RecoverWalletWithoutProfile.Start.olympiaSectionButton) {
 							store.send(.view(.olympiaOnlyTapped))
 						}
 						.padding(.horizontal, .medium3)
