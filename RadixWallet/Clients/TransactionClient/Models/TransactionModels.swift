@@ -233,7 +233,7 @@ public struct FeePayerCandidate: Sendable, Hashable, Identifiable {
 
 // MARK: - TransactionToReview
 public struct TransactionToReview: Sendable, Hashable {
-	public let analyzedManifestToReview: ExecutionAnalysis
+	public let analyzedManifestToReview: ExecutionSummary
 	public let networkID: NetworkID
 
 	public var transactionFee: TransactionFee

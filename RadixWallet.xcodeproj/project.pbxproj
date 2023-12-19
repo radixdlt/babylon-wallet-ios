@@ -9626,7 +9626,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/radixdlt/swift-engine-toolkit";
 			requirement = {
-				branch = add_final_classes;
+				branch = main;
 				kind = branch;
 			};
 		};

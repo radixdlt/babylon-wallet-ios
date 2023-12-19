@@ -1168,6 +1168,8 @@ extension Collection where Element: Equatable {
 	}
 }
 
+extension ResourceIndicator {}
+
 extension ResourceTracker {
 	var transferType: TransactionReview.TransferType {
 		switch decimalSource {

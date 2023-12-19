@@ -56,11 +56,13 @@ extension TransactionClient {
 				try await .init(validating: extract().asSpecific().asyncMap(identityFromComponentAddress))
 			}
 
+			let summary = manifest.summary(networkId: networkID.rawValue)
+
 			return try await MyEntitiesInvolvedInTransaction(
-				identitiesRequiringAuth: mapIdentity(manifest.identitiesRequiringAuth),
-				accountsRequiringAuth: mapAccount(manifest.accountsRequiringAuth),
-				accountsWithdrawnFrom: mapAccount(manifest.accountsWithdrawnFrom),
-				accountsDepositedInto: mapAccount(manifest.accountsDepositedInto)
+				identitiesRequiringAuth: mapIdentity(summary.identitiesRequiringAuth),
+				accountsRequiringAuth: mapAccount(summary.accountsRequiringAuth),
+				accountsWithdrawnFrom: mapAccount(summary.accountsWithdrawnFrom),
+				accountsDepositedInto: mapAccount(summary.accountsDepositedInto)
 			)
 		}
 
