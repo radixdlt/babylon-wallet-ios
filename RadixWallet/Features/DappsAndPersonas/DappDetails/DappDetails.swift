@@ -114,7 +114,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case personas(PersonaList.Action)
+		case personaList(PersonaList.Action)
 	}
 
 	// MARK: - Destination
@@ -167,7 +167,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.personaList, action: /Action.child .. ChildAction.personas) {
+		Scope(state: \.personaList, action: /Action.child .. ChildAction.personaList) {
 			PersonaList()
 		}
 		Reduce(core)
@@ -234,13 +234,13 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .personas(.delegate(.openDetails(persona))):
+		case let .personaList(.delegate(.openDetails(persona))):
 			guard let dApp = state.authorizedDapp, let detailedPersona = dApp.detailedAuthorizedPersonas[id: persona.id] else { return .none }
 			let personaDetailsState = PersonaDetails.State(.dApp(dApp, persona: detailedPersona))
 			state.destination = .personaDetails(personaDetailsState)
 			return .none
 
-		case .personas:
+		case .personaList:
 			return .none
 		}
 	}

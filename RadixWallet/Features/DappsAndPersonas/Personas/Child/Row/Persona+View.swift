@@ -7,10 +7,12 @@ extension Persona {
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<Persona>
 		private let tappable: Bool
+		private let showShield: Bool
 
-		public init(store: StoreOf<Persona>, tappable: Bool) {
+		public init(store: StoreOf<Persona>, tappable: Bool, showShield: Bool) {
 			self.store = store
 			self.tappable = tappable
+			self.showShield = showShield
 		}
 
 		public var body: some SwiftUI.View {
@@ -23,7 +25,7 @@ extension Persona {
 							PlainListRow(title: viewStore.displayName) {
 								PersonaThumbnail(viewStore.thumbnail)
 							}
-							if viewStore.shouldWriteDownMnemonic {
+							if showShield, viewStore.shouldWriteDownMnemonic {
 								shieldPromptView(
 									// FIXME: Strings
 									text: "Write down this Persona's seed phrase",
@@ -64,7 +66,8 @@ struct Persona_Preview: PreviewProvider {
 				initialState: .previewValue,
 				reducer: Persona.init
 			),
-			tappable: true
+			tappable: true,
+			showShield: true
 		)
 	}
 }

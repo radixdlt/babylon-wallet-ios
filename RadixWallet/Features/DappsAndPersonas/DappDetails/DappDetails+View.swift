@@ -72,7 +72,7 @@ private extension StoreOf<DappDetails> {
 	}
 
 	var personas: StoreOf<PersonaList> {
-		scope(state: \.personaList) { .child(.personas($0)) }
+		scope(state: \.personaList) { .child(.personaList($0)) }
 	}
 }
 
@@ -286,7 +286,7 @@ extension DappDetails.View {
 					Separator()
 						.padding(.bottom, .small2)
 
-					PersonaListCoreView(store: store, tappable: tappablePersonas)
+					PersonaListCoreView(store: store, tappable: tappablePersonas, showShield: false)
 				} else {
 					Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
 						.sectionHeading
