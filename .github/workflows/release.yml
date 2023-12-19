@@ -10,8 +10,8 @@ jobs:
   publish_sbom:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
-      - uses: actions/setup-node@v2
+      - uses: RDXWorks-actions/checkout@main
+      - uses: RDXWorks-actions/setup-node@main
         with:
           node-version: '14'
       - uses: RDXWorks-actions/ssh-agent@master
