@@ -106,7 +106,7 @@ public struct Home: Sendable, FeatureReducer {
 		case .onFirstAppear:
 			if iOSSecurityClient.isJailbroken() {
 				state.destination = .acknowledgeJailbreakAlert(.init(
-					title: .init(L10n.Splash.RootDetection.title),
+					title: .init(L10n.Splash.RootDetection.titleIOS),
 					message: .init(L10n.Splash.RootDetection.messageIOS),
 					buttons: [
 						.cancel(.init(L10n.Splash.RootDetection.acknowledgeButton)),

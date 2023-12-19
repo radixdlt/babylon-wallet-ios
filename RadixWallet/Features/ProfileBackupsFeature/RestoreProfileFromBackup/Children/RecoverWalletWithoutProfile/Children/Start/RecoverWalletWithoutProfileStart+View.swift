@@ -12,11 +12,11 @@ extension RecoverWalletWithoutProfileStart {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { _ in
 				ScrollView {
 					VStack(alignment: .center, spacing: .large3) {
-						Text(L10n.RecoverWalletWithoutProfileStart.Header.title)
+						Text(L10n.RecoverWalletWithoutProfile.Start.headerTitle)
 							.textStyle(.sheetTitle)
 							.padding(.horizontal, .medium3)
 
-						Text(LocalizedStringKey(L10n.RecoverWalletWithoutProfileStart.Header.subtitle))
+						Text(LocalizedStringKey(L10n.RecoverWalletWithoutProfile.Start.headerSubtitle))
 							.multilineTextAlignment(.leading)
 							.textStyle(.body1Regular)
 							.padding(.horizontal, .large2)

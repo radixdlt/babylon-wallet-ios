@@ -889,12 +889,6 @@ public enum L10n {
       /// Your Account has been created.
       public static let subtitleNotFirst = L10n.tr("Localizable", "createAccount_completion_subtitleNotFirst", fallback: "Your Account has been created.")
     }
-    public enum DerivePublicKeys {
-      /// Deriving public keys
-      public static let subtitle = L10n.tr("Localizable", "createAccount_derivePublicKeys_subtitle", fallback: "Deriving public keys")
-      /// Creating Account
-      public static let title = L10n.tr("Localizable", "createAccount_derivePublicKeys_title", fallback: "Creating Account")
-    }
     public enum Introduction {
       /// Create an Account
       public static let title = L10n.tr("Localizable", "createAccount_introduction_title", fallback: "Create an Account")
@@ -958,10 +952,6 @@ public enum L10n {
       public static let subtitleFirst = L10n.tr("Localizable", "createPersona_completion_subtitleFirst", fallback: "You’ve created your first Persona!")
       /// Your Persona has been created.
       public static let subtitleNotFirst = L10n.tr("Localizable", "createPersona_completion_subtitleNotFirst", fallback: "Your Persona has been created.")
-    }
-    public enum DerivePublicKeys {
-      /// Creating Persona
-      public static let title = L10n.tr("Localizable", "createPersona_derivePublicKeys_title", fallback: "Creating Persona")
     }
     public enum Explanation {
       /// Some dApps may request personal information, like name or email address, that can be added to your Persona. Add some data now if you like.
@@ -2180,72 +2170,6 @@ public enum L10n {
       public static let useNewWalletAlertTitle = L10n.tr("Localizable", "recoverWalletWithoutProfile_start_useNewWalletAlertTitle", fallback: "No Main Seed Phrase?")
     }
   }
-  public enum RecoverWalletWithoutProfileComplete {
-    /// Continue
-    public static let continueButton = L10n.tr("Localizable", "recoverWalletWithoutProfileComplete_continueButton", fallback: "Continue")
-    public enum Header {
-      /// Accounts discovered in the scan have been added to your wallet.
-      /// 
-      /// If you have any “Legacy” Accounts (created on the Olympia network) to import - or any Accounts using a Ledger hardware wallet device - please continue and then use the **Account Recovery Scan** option in your Radix Wallet settings under **Account Security**.
-      public static let subtitle = L10n.tr("Localizable", "recoverWalletWithoutProfileComplete_header_subtitle", fallback: "Accounts discovered in the scan have been added to your wallet.\n\nIf you have any “Legacy” Accounts (created on the Olympia network) to import - or any Accounts using a Ledger hardware wallet device - please continue and then use the **Account Recovery Scan** option in your Radix Wallet settings under **Account Security**.")
-      /// Recovery Complete
-      public static let title = L10n.tr("Localizable", "recoverWalletWithoutProfileComplete_header_title", fallback: "Recovery Complete")
-    }
-  }
-  public enum RecoverWalletWithoutProfileInfo {
-    /// Continue
-    public static let continueButton = L10n.tr("Localizable", "recoverWalletWithoutProfileInfo_continueButton", fallback: "Continue")
-    public enum Header {
-      /// **If you have no wallet backup in the cloud or as an exported backup file**, you can still restore Account access only using your main “Babylon” seed phrase. You cannot recover your Account names or other wallet settings this way.
-      /// 
-      /// You will be asked to enter your main seed phrase. This is a set of **24 words** that the Radix Wallet mobile app showed you to write down and save securely.
-      public static let subtitle = L10n.tr("Localizable", "recoverWalletWithoutProfileInfo_header_subtitle", fallback: "**If you have no wallet backup in the cloud or as an exported backup file**, you can still restore Account access only using your main “Babylon” seed phrase. You cannot recover your Account names or other wallet settings this way.\n\nYou will be asked to enter your main seed phrase. This is a set of **24 words** that the Radix Wallet mobile app showed you to write down and save securely.")
-      /// Recover Control Without Backup
-      public static let title = L10n.tr("Localizable", "recoverWalletWithoutProfileInfo_header_title", fallback: "Recover Control Without Backup")
-    }
-  }
-  public enum RecoverWalletWithoutProfileStart {
-    public enum Header {
-      /// If you have no wallet backup in the cloud, or as an exported backup file, you still have other restore options.
-      public static let subtitle = L10n.tr("Localizable", "recoverWalletWithoutProfileStart_header_subtitle", fallback: "If you have no wallet backup in the cloud, or as an exported backup file, you still have other restore options.")
-      /// Recover Control Without Backup
-      public static let title = L10n.tr("Localizable", "recoverWalletWithoutProfileStart_header_title", fallback: "Recover Control Without Backup")
-    }
-    public enum Section {
-      public enum Babylon {
-        /// Recover with Main Seed Phrase
-        public static let button = L10n.tr("Localizable", "recoverWalletWithoutProfileStart_section_babylon_button", fallback: "Recover with Main Seed Phrase")
-        /// **I have my main “Babylon” 24-word seed phrase.**
-        public static let title = L10n.tr("Localizable", "recoverWalletWithoutProfileStart_section_babylon_title", fallback: "**I have my main “Babylon” 24-word seed phrase.**")
-      }
-      public enum Olympia {
-        /// OR
-        public static let or = L10n.tr("Localizable", "recoverWalletWithoutProfileStart_section_olympia_or", fallback: "OR")
-        /// Ledger-only or Olympia-only Restore
-        public static let restoreButton = L10n.tr("Localizable", "recoverWalletWithoutProfileStart_section_olympia_restoreButton", fallback: "Ledger-only or Olympia-only Restore")
-        public enum OnlyHardwareAccounts {
-          /// **I only want to restore Ledger hardware wallet Accounts**
-          public static let title = L10n.tr("Localizable", "recoverWalletWithoutProfileStart_section_olympia_onlyHardwareAccounts_title", fallback: "**I only want to restore Ledger hardware wallet Accounts**")
-        }
-        public enum OnlySoftwareAccounts {
-          /// **I only have Accounts created on the Radix Olympia Network**
-          public static let title = L10n.tr("Localizable", "recoverWalletWithoutProfileStart_section_olympia_onlySoftwareAccounts_title", fallback: "**I only have Accounts created on the Radix Olympia Network**")
-        }
-      }
-    }
-    public enum UseNewWalletInstead {
-      public enum Alert {
-        /// Cancel
-        public static let cancelButton = L10n.tr("Localizable", "recoverWalletWithoutProfileStart_useNewWalletInstead_alert_cancelButton", fallback: "Cancel")
-        /// Continue
-        public static let continueButton = L10n.tr("Localizable", "recoverWalletWithoutProfileStart_useNewWalletInstead_alert_continueButton", fallback: "Continue")
-        /// Tap “I'm a New Wallet User”. After completing wallet creation, you can recover any Olympia or Ledger-based Accounts in Settings.
-        public static let message = L10n.tr("Localizable", "recoverWalletWithoutProfileStart_useNewWalletInstead_alert_message", fallback: "Tap “I'm a New Wallet User”. After completing wallet creation, you can recover any Olympia or Ledger-based Accounts in Settings.")
-        /// No Main Seed Phrase
-        public static let title = L10n.tr("Localizable", "recoverWalletWithoutProfileStart_useNewWalletInstead_alert_title", fallback: "No Main Seed Phrase")
-      }
-    }
-  }
   public enum RevealSeedPhrase {
     /// Passphrase
     public static let passphrase = L10n.tr("Localizable", "revealSeedPhrase_passphrase", fallback: "Passphrase")
@@ -2396,12 +2320,12 @@ public enum L10n {
       public static let claimExisting = L10n.tr("Localizable", "splash_profileOnAnotherDeviceAlert_claimExisting", fallback: "Claim Existing Wallet")
       /// Clear Wallet on This Phone
       public static let claimHere = L10n.tr("Localizable", "splash_profileOnAnotherDeviceAlert_claimHere", fallback: "Clear Wallet on This Phone")
-      /// This wallet is currently configured with a set of Accounts and Personas in use by  different phone.
+      /// This wallet is currently configured with a set of Accounts and Personas in use by a different phone.
       /// 
       /// To make changes to this wallet, you must claim it for use on this phone instead, removing access by the other phone.
       /// 
       /// Or you can clear this wallet from this phone and start fresh.
-      public static let message = L10n.tr("Localizable", "splash_profileOnAnotherDeviceAlert_message", fallback: "This wallet is currently configured with a set of Accounts and Personas in use by  different phone.\n\nTo make changes to this wallet, you must claim it for use on this phone instead, removing access by the other phone.\n\nOr you can clear this wallet from this phone and start fresh.")
+      public static let message = L10n.tr("Localizable", "splash_profileOnAnotherDeviceAlert_message", fallback: "This wallet is currently configured with a set of Accounts and Personas in use by a different phone.\n\nTo make changes to this wallet, you must claim it for use on this phone instead, removing access by the other phone.\n\nOr you can clear this wallet from this phone and start fresh.")
       /// Claim This Wallet?
       public static let title = L10n.tr("Localizable", "splash_profileOnAnotherDeviceAlert_title", fallback: "Claim This Wallet?")
     }
@@ -2412,8 +2336,6 @@ public enum L10n {
       public static let messageAndroid = L10n.tr("Localizable", "splash_rootDetection_messageAndroid", fallback: "It appears that your device might be rooted. To ensure the security of your Accounts and assets, using the Radix Wallet on rooted devices is not recommended. Please confirm if you wish to continue anyway at your own risk.")
       /// It appears that your device might be jailbroken. To ensure the security of your Accounts and assets, using the Radix Wallet on jailbroken devices is not recommended. Please confirm if you wish to continue anyway at your own risk.
       public static let messageIOS = L10n.tr("Localizable", "splash_rootDetection_messageIOS", fallback: "It appears that your device might be jailbroken. To ensure the security of your Accounts and assets, using the Radix Wallet on jailbroken devices is not recommended. Please confirm if you wish to continue anyway at your own risk.")
-      /// It appears that your device might be rooted. To ensure the security of your Accounts and assets, using the Radix Wallet on rooted devices is not recommended. Please confirm if you wish to continue anyway at your own risk.
-      public static let title = L10n.tr("Localizable", "splash_rootDetection_title", fallback: "It appears that your device might be rooted. To ensure the security of your Accounts and assets, using the Radix Wallet on rooted devices is not recommended. Please confirm if you wish to continue anyway at your own risk.")
       /// Possible jailbreak detected
       public static let titleIOS = L10n.tr("Localizable", "splash_rootDetection_titleIOS", fallback: "Possible jailbreak detected")
     }
