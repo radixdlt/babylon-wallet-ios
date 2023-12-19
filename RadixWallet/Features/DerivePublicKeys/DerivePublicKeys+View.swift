@@ -19,44 +19,30 @@ extension DerivePublicKeys {
 		var title: String {
 			switch purpose {
 			case .createNewEntity(.account):
-				L10n.DerivePublicKeys.CreateAccount.title
+				L10n.DerivePublicKeys.titleCreateAccount
 
 			case .createNewEntity(.identity):
-				L10n.DerivePublicKeys.CreatePersona.title
+				L10n.DerivePublicKeys.titleCreatePersona
 
 			case .accountRecoveryScan:
-				L10n.DerivePublicKeys.AccountRecoveryScan.title
+				L10n.DerivePublicKeys.titleAccountRecoveryScan
 
 			case .importLegacyAccounts:
-				L10n.DerivePublicKeys.ImportLegacyAccount.title
+				L10n.DerivePublicKeys.titleImportLegacyAccount
 
 			case .createAuthSigningKey(.account):
-				L10n.DerivePublicKeys.CreateAuthSignKeyForAccount.title
+				L10n.DerivePublicKeys.titleCreateAuthSignKeyForAccount
 
 			case .createAuthSigningKey(.identity):
-				L10n.DerivePublicKeys.CreateAuthSignKeyForPersona.title
+				L10n.DerivePublicKeys.titleCreateAuthSignKeyForPersona
 			}
 		}
 
 		var subtitle: String {
-			switch purpose {
-			case .createNewEntity(.account):
-				L10n.DerivePublicKeys.CreateAccount.subtitle
-
-			case .createNewEntity(.identity):
-				L10n.DerivePublicKeys.CreatePersona.subtitle
-
-			case .accountRecoveryScan:
-				L10n.DerivePublicKeys.AccountRecoveryScan.subtitle
-
-			case .importLegacyAccounts:
-				L10n.DerivePublicKeys.ImportLegacyAccount.subtitle
-
-			case .createAuthSigningKey(.account):
-				L10n.DerivePublicKeys.CreateAuthSignKeyForAccount.subtitle
-
-			case .createAuthSigningKey(.identity):
-				L10n.DerivePublicKeys.CreateAuthSignKeyForPersona.subtitle
+			if ledger != nil {
+				L10n.DerivePublicKeys.subtitleLedger
+			} else {
+				L10n.DerivePublicKeys.subtitleDevice
 			}
 		}
 	}
@@ -77,14 +63,12 @@ extension DerivePublicKeys {
 						.frame(.medium)
 						.padding(.vertical, .medium2)
 
-					Text(
-						viewStore.title
-					)
-					.textStyle(.sheetTitle)
-					.foregroundColor(.app.gray1)
-					.padding(.bottom, .medium1)
+					Text(viewStore.title)
+						.textStyle(.sheetTitle)
+						.foregroundColor(.app.gray1)
+						.padding(.bottom, .medium1)
 
-					Text(viewStore.subtitle)
+					Text(LocalizedStringKey(viewStore.subtitle))
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 						.padding(.horizontal, .medium1)
