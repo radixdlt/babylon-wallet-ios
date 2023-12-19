@@ -64,7 +64,7 @@ extension ManualAccountRecoveryCoordinator.View {
 
 	private func header() -> some View {
 		VStack(spacing: .zero) {
-			Text(L10n.AccountRecoveryScan.subtitle)
+			Text(L10n.AccountRecoveryScan.title)
 				.textStyle(.sheetTitle)
 				.multilineTextAlignment(.center)
 				.padding(.top, .small1)
