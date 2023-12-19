@@ -68,7 +68,7 @@ extension AccountPreferences {
 					.padding(.horizontal, .medium3)
 					.padding(.bottom, .medium3)
 
-				Button("Show Address QR Code") { // FIXME: Strings - L10n.AccountSettings.showQR
+				Button(L10n.AddressAction.showAccountQR) {
 					viewStore.send(.qrCodeButtonTapped)
 				}
 				.buttonStyle(.secondaryRectangular(shouldExpand: true))

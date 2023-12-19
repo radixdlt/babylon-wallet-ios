@@ -3,41 +3,38 @@ extension OverlayWindowClient.Item.AlertState {
 		conflictingOwners: ConflictingOwners
 	) -> Self {
 		.init(
-			title: { TextState("Claim This Wallet?") }, // FIXME: Strings
+			title: { TextState(L10n.Splash.ProfileOnAnotherDeviceAlert.title) },
 			actions: {
 				ButtonState(
 					role: .none,
 					action: .claimAndContinueUseOnThisPhone,
 					label: {
-						// FIXME: Strings
-						TextState("Claim Existing Wallet")
+						TextState(L10n.Splash.ProfileOnAnotherDeviceAlert.claimExisting)
 					}
 				)
 				ButtonState(
 					role: .destructive,
 					action: .deleteProfileFromThisPhone,
 					label: {
-						// FIXME: Strings
-						TextState("Clear Wallet on This Phone")
+						TextState(L10n.Splash.ProfileOnAnotherDeviceAlert.claimHere)
 					}
 				)
 				ButtonState(
 					role: .cancel,
 					action: .dismissed,
 					label: {
-						// FIXME: Strings
-						TextState("Ask Later (no changes)")
+						TextState(L10n.Splash.ProfileOnAnotherDeviceAlert.askLater)
 					}
 				)
 			},
 			message: {
-				overlayClientProfileStoreOwnershipConflictTextState
+				TextState(overlayClientProfileStoreOwnershipConflictTextState)
 			}
 		)
 	}
 }
 
-let overlayClientProfileStoreOwnershipConflictTextState = TextState("This wallet is currently configured with a set of Accounts and Personas in use by a different phone.\n\nTo make changes to this wallet, you must claim it for use on this phone instead, removing access by the other phone.\n\nOr you can clear this wallet from this phone and start fresh.") // FIXME: Strings
+let overlayClientProfileStoreOwnershipConflictTextState = L10n.Splash.ProfileOnAnotherDeviceAlert.message
 
 extension OverlayWindowClient.Item.AlertAction {
 	static var claimAndContinueUseOnThisPhone: Self {

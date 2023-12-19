@@ -18,45 +18,31 @@ extension DerivePublicKeys {
 
 		var title: String {
 			switch purpose {
-			case .createNewEntity(kind: .account):
-				L10n.CreateAccount.DerivePublicKeys.title
+			case .createNewEntity(.account):
+				L10n.DerivePublicKeys.titleCreateAccount
 
-			case .createNewEntity(kind: .identity):
-				L10n.CreatePersona.DerivePublicKeys.title
-
-			case .importLegacyAccounts:
-				"Deriving Accounts" // FIXME: String
+			case .createNewEntity(.identity):
+				L10n.DerivePublicKeys.titleCreatePersona
 
 			case .accountRecoveryScan:
-				"Deriving Accounts" // FIXME: Strings
+				L10n.DerivePublicKeys.titleAccountRecoveryScan
 
-			case .createAuthSigningKey(forEntityKind: .account):
-				"Creating Key" // FIXME: Strings
+			case .importLegacyAccounts:
+				L10n.DerivePublicKeys.titleImportLegacyAccount
 
-			case .createAuthSigningKey(forEntityKind: .identity):
-				"Creating Key" // FIXME: Strings
+			case .createAuthSigningKey(.account):
+				L10n.DerivePublicKeys.titleCreateAuthSignKeyForAccount
+
+			case .createAuthSigningKey(.identity):
+				L10n.DerivePublicKeys.titleCreateAuthSignKeyForPersona
 			}
 		}
 
 		var subtitle: String {
-			switch purpose {
-			case .createNewEntity(.account):
-				"Authenticate to your phone to complete using your phone’s signing key." // FIXME: Strings delete `createAccount_derivePublicKeys_subtitle` add new key `L10n.DerivePublicKeys.CreateNewAccount.subtitle`
-
-			case .createNewEntity(.identity):
-				"Authenticate to your phone to complete using your phone’s signing key." // FIXME: Strings is this correct?  add new key `L10n.DerivePublicKeys.CreateNewPersona.subtitle`
-
-			case .accountRecoveryScan:
-				"Authenticate to your phone to complete using your phone's signing key" // FIXME: Strings is this correct?  add new key `L10n.DerivePublicKeys.AccountRecoveryScan.subtitle`
-
-			case .importLegacyAccounts:
-				"Authenticate to your phone to complete using your phone's signing key" // FIXME: Strings is this correct?  add new key `L10n.DerivePublicKeys.ImportLegacyAccount.subtitle`
-
-			case .createAuthSigningKey(.account):
-				"Authenticate to your phone to complete using your phone's signing key" // FIXME: Strings is this correct?  add new key `L10n.DerivePublicKeys.CreateAuthSignKeyForAccount.subtitle`
-
-			case .createAuthSigningKey(.identity):
-				"Authenticate to your phone to complete using your phone's signing key" // FIXME: Strings is this correct?  add new key `L10n.DerivePublicKeys.CreateAuthSignKeyForIdentity.subtitle`
+			if ledger != nil {
+				L10n.DerivePublicKeys.subtitleLedger
+			} else {
+				L10n.DerivePublicKeys.subtitleDevice
 			}
 		}
 	}
@@ -77,14 +63,12 @@ extension DerivePublicKeys {
 						.frame(.medium)
 						.padding(.vertical, .medium2)
 
-					Text(
-						viewStore.title
-					)
-					.textStyle(.sheetTitle)
-					.foregroundColor(.app.gray1)
-					.padding(.bottom, .medium1)
+					Text(viewStore.title)
+						.textStyle(.sheetTitle)
+						.foregroundColor(.app.gray1)
+						.padding(.bottom, .medium1)
 
-					Text(viewStore.subtitle)
+					Text(LocalizedStringKey(viewStore.subtitle))
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 						.padding(.horizontal, .medium1)

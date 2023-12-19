@@ -8,14 +8,14 @@ extension DisplayEntitiesControlledByMnemonic.State {
 				switch mode {
 				case .mnemonicCanBeDisplayed:
 					.init(
-						title: L10n.SeedPhrases.SeedPhrase.reveal,
+						title: L10n.SeedPhrases.SeedPhrase.headingReveal,
 						imageAsset: AssetResource.signingKey,
 						type: .standard,
 						isError: false
 					)
 				case .mnemonicNeedsImport:
 					.init(
-						title: "Seed Phrase Entry Required", // FIXME: String
+						title: L10n.SeedPhrases.SeedPhrase.headingNeedsImport,
 						imageAsset: AssetResource.error,
 						type: .standard,
 						isError: true
@@ -52,19 +52,19 @@ extension DisplayEntitiesControlledByMnemonic {
 				switch type {
 				case .standard:
 					if accounts == 0 {
-						"Not connected to any Accounts" // FIXME: Strings
+						L10n.SeedPhrases.SeedPhrase.noConnectedAccountsReveal
 					} else if accounts == 1 {
-						L10n.SeedPhrases.SeedPhrase.oneConnectedAccount
+						L10n.SeedPhrases.SeedPhrase.oneConnectedAccountReveal
 					} else {
-						L10n.SeedPhrases.SeedPhrase.multipleConnectedAccounts(accounts)
+						L10n.SeedPhrases.SeedPhrase.multipleConnectedAccountsReveal(accounts)
 					}
 				case .scanning:
 					if accounts == 0 {
-						"Not yet connected to any Accounts" // FIXME: Strings
+						L10n.SeedPhrases.SeedPhrase.noConnectedAccountsScan
 					} else if accounts == 1 {
-						"Currently connected to 1 account" // FIXME: Strings
+						L10n.SeedPhrases.SeedPhrase.oneConnectedAccountScan
 					} else {
-						"Currently connected to \(accounts) accounts" // FIXME: Strings
+						L10n.SeedPhrases.SeedPhrase.multipleConnectedAccountsScan(accounts)
 					}
 				}
 			}
@@ -113,14 +113,14 @@ extension DisplayEntitiesControlledByMnemonic {
 						Button(action: action) {
 							heading(headingState)
 						}
-					case let .scanning(selected):
+					case .scanning:
 						heading(headingState)
 					}
 				}
 
 				if viewState.promptUserToBackUpMnemonic {
 					WarningErrorView(
-						text: "Please write down your Seed Phrase", // FIXME: Strings
+						text: L10n.SeedPhrases.backupWarning,
 						type: .error,
 						useNarrowSpacing: true
 					)
@@ -134,7 +134,7 @@ extension DisplayEntitiesControlledByMnemonic {
 						}
 					}
 				} else if viewState.hasHiddenAccounts {
-					NoContentView("Hidden Accounts only.") // FIXME: Strings
+					NoContentView(L10n.SeedPhrases.hiddenAccountsOnly)
 						.frame(maxWidth: .infinity)
 						.frame(height: .huge2)
 						.padding(.vertical, .medium1)

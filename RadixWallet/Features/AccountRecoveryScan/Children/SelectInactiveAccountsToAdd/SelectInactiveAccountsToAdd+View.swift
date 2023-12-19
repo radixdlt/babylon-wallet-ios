@@ -34,7 +34,7 @@ public extension SelectInactiveAccountsToAdd {
 			) { viewStore in
 				ScrollView {
 					VStack(spacing: 0) {
-						Text("Add Inactive Accounts?") // FIXME: Strings
+						Text(L10n.AccountRecoveryScan.SelectInactiveAccounts.Header.title)
 							.multilineTextAlignment(.center)
 							.textStyle(.sheetTitle)
 							.foregroundColor(.app.gray1)
@@ -42,8 +42,7 @@ public extension SelectInactiveAccountsToAdd {
 							.padding(.horizontal, .medium1)
 							.padding(.bottom, .medium1)
 
-						// FIXME: Strings
-						Text("These Accounts were never used, but you **may** have created them. Check any addresses that you wish to keep:")
+						Text(L10n.AccountRecoveryScan.SelectInactiveAccounts.Header.subtitle)
 							.multilineTextAlignment(.center)
 							.textStyle(.body1Regular)
 							.foregroundColor(.app.gray1)
@@ -73,7 +72,7 @@ public extension SelectInactiveAccountsToAdd {
 					Spacer(minLength: 0)
 				}
 				.footer {
-					Button("Continue") { // FIXME: Strings
+					Button(L10n.AccountRecoveryScan.SelectInactiveAccounts.continueButton) {
 						store.send(.view(.doneTapped))
 					}
 					.buttonStyle(.primaryRectangular)

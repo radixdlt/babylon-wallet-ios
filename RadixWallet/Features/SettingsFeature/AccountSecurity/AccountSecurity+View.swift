@@ -68,24 +68,24 @@ extension AccountSecurity.View {
 				action: .mnemonicsButtonTapped
 			),
 			.init(
-				title: L10n.Settings.ledgerHardwareWallets,
+				title: L10n.AccountSecuritySettings.LedgerHardwareWallets.title,
 				icon: .asset(AssetResource.ledger),
 				action: .ledgerHardwareWalletsButtonTapped
 			),
 			.init(
-				title: L10n.Settings.DepositGuarantees.title,
-				subtitle: L10n.Settings.DepositGuarantees.subtitle,
+				title: L10n.AccountSecuritySettings.DepositGuarantees.title,
+				subtitle: L10n.AccountSecuritySettings.DepositGuarantees.subtitle,
 				icon: .asset(AssetResource.depositGuarantees),
 				action: .defaultDepositGuaranteeButtonTapped
 			),
 			.init(
-				title: "Account Recovery Scan", // FIXME: Strings - L10n.Settings.AccountRecovery.title
-				subtitle: "Using seed phrase or Ledger device", // FIXME: Strings - L10n.Settings.AccountRecovery.subtitle
+				title: L10n.AccountSecuritySettings.AccountRecoveryScan.title,
+				subtitle: L10n.AccountSecuritySettings.AccountRecoveryScan.subtitle,
 				icon: .asset(AssetResource.appSettings), // TODO: Select asset
 				action: .accountRecoveryButtonTapped
 			),
 			.init(
-				title: L10n.Settings.backups,
+				title: L10n.AccountSecuritySettings.Backups.title,
 				subtitle: nil, // TODO: Determine, if possible, the date of last backup.
 				icon: .asset(AssetResource.backups),
 				action: .profileBackupSettingsButtonTapped
@@ -96,7 +96,7 @@ extension AccountSecurity.View {
 	@MainActor
 	private var importOlympiaRow: SettingsRowModel<AccountSecurity> {
 		.init(
-			title: L10n.Settings.importFromLegacyWallet,
+			title: L10n.AccountSecuritySettings.ImportFromLegacyWallet.title,
 			subtitle: nil,
 			icon: .asset(AssetResource.appSettings),
 			action: .importFromOlympiaWalletButtonTapped
@@ -144,7 +144,7 @@ private extension View {
 			destination: {
 				LedgerHardwareDevices.View(store: $0)
 					.background(.app.gray5)
-					.navigationTitle(L10n.Settings.ledgerHardwareWallets)
+					.navigationTitle(L10n.AccountSecuritySettings.LedgerHardwareWallets.title)
 					.toolbarBackground(.visible, for: .navigationBar)
 			}
 		)

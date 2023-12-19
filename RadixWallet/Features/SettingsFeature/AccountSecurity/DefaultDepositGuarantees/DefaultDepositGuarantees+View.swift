@@ -19,7 +19,7 @@ extension DefaultDepositGuarantees {
 extension DefaultDepositGuarantees.View {
 	public var body: some View {
 		VStack(spacing: .medium1) {
-			Text(L10n.Settings.DepositGuarantees.text)
+			Text(L10n.AccountSecuritySettings.DepositGuarantees.text)
 				.textStyle(.body1HighImportance)
 				.foregroundColor(.app.gray2)
 				.allowsHitTesting(false)
@@ -40,6 +40,6 @@ extension DefaultDepositGuarantees.View {
 					focused = false
 				}
 		}
-		.navigationTitle(L10n.Settings.DepositGuarantees.title)
+		.navigationTitle(L10n.AccountSecuritySettings.DepositGuarantees.title)
 	}
 }

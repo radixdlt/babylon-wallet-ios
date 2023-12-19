@@ -326,6 +326,10 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	}
 }
 
+private extension OverlayWindowClient.Item.HUD {
+	static let personaHidden = Self(text: L10n.AuthorizedDapps.PersonaDetails.personaHidden)
+}
+
 extension AlertState<PersonaDetails.Destination.Action.ConfirmForgetAlert> {
 	static var confirmForget: AlertState {
 		AlertState {

@@ -26,8 +26,7 @@ extension ImportMnemonicControllingAccounts {
 		}
 
 		var skipButtonTitle: String {
-			// FIXME: Strings
-			isMain ? "I Don't Have the Main Seed Phrase" : L10n.RecoverSeedPhrase.skipButton
+			isMain ? L10n.RecoverSeedPhrase.noMainSeedPhraseButton : L10n.RecoverSeedPhrase.skipButton
 		}
 	}
 

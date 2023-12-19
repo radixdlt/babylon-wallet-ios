@@ -101,8 +101,7 @@ extension ResourcesList.View {
 				.multilineTextAlignment(.center)
 
 			if !viewStore.canModify {
-				// FIXME: Stringss
-				Text("⚠️ Sorry, this Account's third-party exceptions and depositor lists are in an unknown state and cannot be viewed or edited because it was imported using only a seed phrase or Ledger. A forthcoming wallet update will enable viewing and editing of these lists.")
+				Text(L10n.AccountSettings.SpecificAssetsDeposits.modificationDisabledForRecoveredAccount)
 					.textStyle(.body1HighImportance)
 					.foregroundColor(.app.gray2)
 					.multilineTextAlignment(.center)

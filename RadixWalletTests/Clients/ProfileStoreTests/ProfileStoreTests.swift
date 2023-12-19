@@ -977,7 +977,7 @@ final class ProfileStoreExistingProfileTests: TestCase {
 			func then(_ d: inout DependencyValues) {
 				d.overlayWindowClient.scheduleAlertAwaitAction = { alert in
 					XCTAssertNoDifference(
-						alert.message, overlayClientProfileStoreOwnershipConflictTextState
+						alert.message, TextState(overlayClientProfileStoreOwnershipConflictTextState)
 					)
 					// THEN ownership conflict alert is shown
 					ownership_conflict_alert_is_shown.fulfill()
@@ -1137,7 +1137,7 @@ extension ProfileStoreExistingProfileTests {
 			func when(_ d: inout DependencyValues) {
 				d.overlayWindowClient.scheduleAlertAwaitAction = { alert in
 					XCTAssertNoDifference(
-						alert.message, overlayClientProfileStoreOwnershipConflictTextState
+						alert.message, TextState(overlayClientProfileStoreOwnershipConflictTextState)
 					)
 					alertScheduled.fulfill()
 					return action

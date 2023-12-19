@@ -215,7 +215,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 								factorSourceID: id,
 								publicHDKey: publicHDKey
 							),
-							displayName: "Unnamed", // FIXME: Strings
+							displayName: .init(rawValue: L10n.AccountRecoveryScan.InProgress.nameOfRecoveredAccount) ?? "Unnamed",
 							extraProperties: .init(
 								appearanceID: appearanceID,
 								// We will be replacing the `depositRule` with one fetched from GW

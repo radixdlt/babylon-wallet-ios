@@ -117,7 +117,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 			state.path.append(
 				.importMnemonic(
 					.init(
-						header: .init(title: L10n.EnterSeedPhrase.Header.title), // FIXME: strings - should use "main"
+						header: .init(title: L10n.EnterSeedPhrase.Header.titleMain),
 						warning: L10n.EnterSeedPhrase.warning,
 						hideAdvancedMode: true,
 						// we require 24 word Babylon mnemonic

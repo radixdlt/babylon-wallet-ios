@@ -26,7 +26,7 @@ extension Splash {
 							Image(systemName: "lock.circle.fill")
 								.resizable()
 								.frame(.small)
-							Text("Tap anywhere to unlock") // FIXME: Strings
+							Text(L10n.Splash.tapAnywhereToUnlock)
 								.textStyle(.body1HighImportance)
 						}
 					}

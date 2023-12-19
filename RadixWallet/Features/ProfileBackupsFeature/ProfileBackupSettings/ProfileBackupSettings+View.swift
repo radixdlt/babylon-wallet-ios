@@ -38,7 +38,7 @@ extension ProfileBackupSettings {
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()
 			}
-			.navigationTitle(L10n.Settings.backups)
+			.navigationTitle(L10n.AccountSecuritySettings.Backups.title)
 		}
 	}
 }
@@ -69,7 +69,7 @@ extension ProfileBackupSettings.View {
 					}
 				}
 
-				section(L10n.ProfileBackup.DeleteWallet.title) {
+				section(L10n.ProfileBackup.DeleteWallet.buttonTitle) {
 					VStack(alignment: .leading, spacing: .medium1) {
 						// Contains bold text segments.
 						Text(LocalizedStringKey(L10n.IOSProfileBackup.DeleteWallet.subtitle))

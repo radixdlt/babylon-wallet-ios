@@ -52,11 +52,139 @@ public enum L10n {
       }
     }
   }
+  public enum AccountRecoveryScan {
+    /// Deriving Accounts
+    public static let derivingAccounts = L10n.tr("Localizable", "accountRecoveryScan_derivingAccounts", fallback: "Deriving Accounts")
+    /// Use Ledger Hardware Wallet
+    public static let ledgerButtonTitle = L10n.tr("Localizable", "accountRecoveryScan_ledgerButtonTitle", fallback: "Use Ledger Hardware Wallet")
+    /// Note: You must still use the new *Radix Babylon* app on your Ledger device, not the old Radix Ledger app.
+    public static let olympiaLedgerNote = L10n.tr("Localizable", "accountRecoveryScan_olympiaLedgerNote", fallback: "Note: You must still use the new *Radix Babylon* app on your Ledger device, not the old Radix Ledger app.")
+    /// Use Seed Phrase
+    public static let seedPhraseButtonTitle = L10n.tr("Localizable", "accountRecoveryScan_seedPhraseButtonTitle", fallback: "Use Seed Phrase")
+    /// The Radix Wallet can scan for previously used accounts using a bare seed phrase or Ledger hardware wallet device
+    public static let subtitle = L10n.tr("Localizable", "accountRecoveryScan_subtitle", fallback: "The Radix Wallet can scan for previously used accounts using a bare seed phrase or Ledger hardware wallet device")
+    /// Account Recovery Scan
+    public static let title = L10n.tr("Localizable", "accountRecoveryScan_title", fallback: "Account Recovery Scan")
+    public enum BabylonSection {
+      /// Scan for Accounts originally created on the **Babylon** network.
+      public static let subtitle = L10n.tr("Localizable", "accountRecoveryScan_babylonSection_subtitle", fallback: "Scan for Accounts originally created on the **Babylon** network.")
+      /// Babylon Accounts
+      public static let title = L10n.tr("Localizable", "accountRecoveryScan_babylonSection_title", fallback: "Babylon Accounts")
+    }
+    public enum ChooseSeedPhrase {
+      /// Add Babylon Seed Phrase
+      public static let addButtonBabylon = L10n.tr("Localizable", "accountRecoveryScan_chooseSeedPhrase_addButtonBabylon", fallback: "Add Babylon Seed Phrase")
+      /// Add Olympia Seed Phrase
+      public static let addButtonOlympia = L10n.tr("Localizable", "accountRecoveryScan_chooseSeedPhrase_addButtonOlympia", fallback: "Add Olympia Seed Phrase")
+      /// Continue
+      public static let continueButton = L10n.tr("Localizable", "accountRecoveryScan_chooseSeedPhrase_continueButton", fallback: "Continue")
+      /// Enter Seed Phrase
+      public static let importMnemonicTitleBabylon = L10n.tr("Localizable", "accountRecoveryScan_chooseSeedPhrase_importMnemonicTitleBabylon", fallback: "Enter Seed Phrase")
+      /// Enter Legacy Seed Phrase
+      public static let importMnemonicTitleOlympia = L10n.tr("Localizable", "accountRecoveryScan_chooseSeedPhrase_importMnemonicTitleOlympia", fallback: "Enter Legacy Seed Phrase")
+      /// Choose the Babylon seed phrase for use for derivation:
+      public static let subtitleBabylon = L10n.tr("Localizable", "accountRecoveryScan_chooseSeedPhrase_subtitleBabylon", fallback: "Choose the Babylon seed phrase for use for derivation:")
+      /// Choose the "Legacy" Olympia seed phrase for use for derivation:
+      public static let subtitleOlympia = L10n.tr("Localizable", "accountRecoveryScan_chooseSeedPhrase_subtitleOlympia", fallback: "Choose the \"Legacy\" Olympia seed phrase for use for derivation:")
+      /// Choose Seed Phrase
+      public static let title = L10n.tr("Localizable", "accountRecoveryScan_chooseSeedPhrase_title", fallback: "Choose Seed Phrase")
+    }
+    public enum InProgress {
+      /// **Babylon Seed Phrase**
+      public static let factorSourceBabylonSeedPhrase = L10n.tr("Localizable", "accountRecoveryScan_inProgress_factorSourceBabylonSeedPhrase", fallback: "**Babylon Seed Phrase**")
+      /// Signing Factor
+      public static let factorSourceFallback = L10n.tr("Localizable", "accountRecoveryScan_inProgress_factorSourceFallback", fallback: "Signing Factor")
+      /// **Ledger hardware wallet device**
+      public static let factorSourceLedgerHardwareDevice = L10n.tr("Localizable", "accountRecoveryScan_inProgress_factorSourceLedgerHardwareDevice", fallback: "**Ledger hardware wallet device**")
+      /// **Olympia Seed Phrase**
+      public static let factorSourceOlympiaSeedPhrase = L10n.tr("Localizable", "accountRecoveryScan_inProgress_factorSourceOlympiaSeedPhrase", fallback: "**Olympia Seed Phrase**")
+      /// Scanning for Accounts that have been included in at least one transaction, using:
+      public static let headerSubtitle = L10n.tr("Localizable", "accountRecoveryScan_inProgress_headerSubtitle", fallback: "Scanning for Accounts that have been included in at least one transaction, using:")
+      /// Scanning in progress
+      public static let headerTitle = L10n.tr("Localizable", "accountRecoveryScan_inProgress_headerTitle", fallback: "Scanning in progress")
+      /// Unnamed
+      public static let nameOfRecoveredAccount = L10n.tr("Localizable", "accountRecoveryScan_inProgress_nameOfRecoveredAccount", fallback: "Unnamed")
+      /// Scanning network
+      public static let scanningNetwork = L10n.tr("Localizable", "accountRecoveryScan_inProgress_scanningNetwork", fallback: "Scanning network")
+    }
+    public enum OlympiaSection {
+      /// Note: You will still use the new **Radix Babylon** app on your Ledger device, not the old Radix Ledger app.
+      public static let footnote = L10n.tr("Localizable", "accountRecoveryScan_olympiaSection_footnote", fallback: "Note: You will still use the new **Radix Babylon** app on your Ledger device, not the old Radix Ledger app.")
+      /// Scan for Accounts originally created on the **Olympia** network.
+      /// 
+      /// (If you have Olympia Accounts in the Radix Olympia Desktop Wallet, consider using **Import from a Legacy Wallet** instead.
+      public static let subtitle = L10n.tr("Localizable", "accountRecoveryScan_olympiaSection_subtitle", fallback: "Scan for Accounts originally created on the **Olympia** network.\n\n(If you have Olympia Accounts in the Radix Olympia Desktop Wallet, consider using **Import from a Legacy Wallet** instead.")
+      /// Olympia Accounts
+      public static let title = L10n.tr("Localizable", "accountRecoveryScan_olympiaSection_title", fallback: "Olympia Accounts")
+    }
+    public enum ScanComplete {
+      /// Continue
+      public static let continueButton = L10n.tr("Localizable", "accountRecoveryScan_scanComplete_continueButton", fallback: "Continue")
+      /// The first **%d** potential Accounts from this signing factor were scanned. The following Accounts had at least one transaction:
+      public static func headerSubtitle(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "accountRecoveryScan_scanComplete_headerSubtitle", p1, fallback: "The first **%d** potential Accounts from this signing factor were scanned. The following Accounts had at least one transaction:")
+      }
+      /// Scan Complete
+      public static let headerTitle = L10n.tr("Localizable", "accountRecoveryScan_scanComplete_headerTitle", fallback: "Scan Complete")
+      /// No new accounts found
+      public static let noAccounts = L10n.tr("Localizable", "accountRecoveryScan_scanComplete_noAccounts", fallback: "No new accounts found")
+      /// Tap here to scan the next %d
+      public static func scanNextBatchButton(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "accountRecoveryScan_scanComplete_scanNextBatchButton", p1, fallback: "Tap here to scan the next %d")
+      }
+    }
+    public enum SelectInactiveAccounts {
+      /// Continue
+      public static let continueButton = L10n.tr("Localizable", "accountRecoveryScan_selectInactiveAccounts_continueButton", fallback: "Continue")
+      public enum Header {
+        /// These Accounts were never used, but you **may** have created them. Select any addresses that you wish to keep:
+        public static let subtitle = L10n.tr("Localizable", "accountRecoveryScan_selectInactiveAccounts_header_subtitle", fallback: "These Accounts were never used, but you **may** have created them. Select any addresses that you wish to keep:")
+        /// Add Inactive Accounts?
+        public static let title = L10n.tr("Localizable", "accountRecoveryScan_selectInactiveAccounts_header_title", fallback: "Add Inactive Accounts?")
+      }
+    }
+  }
+  public enum AccountSecuritySettings {
+    public enum AccountRecoveryScan {
+      /// Using seed phrase or Ledger device
+      public static let subtitle = L10n.tr("Localizable", "accountSecuritySettings_accountRecoveryScan_subtitle", fallback: "Using seed phrase or Ledger device")
+      /// Account Recovery Scan
+      public static let title = L10n.tr("Localizable", "accountSecuritySettings_accountRecoveryScan_title", fallback: "Account Recovery Scan")
+    }
+    public enum Backups {
+      /// Backups
+      public static let title = L10n.tr("Localizable", "accountSecuritySettings_backups_title", fallback: "Backups")
+    }
+    public enum DepositGuarantees {
+      /// Set your default guaranteed minimum for estimated deposits
+      public static let subtitle = L10n.tr("Localizable", "accountSecuritySettings_depositGuarantees_subtitle", fallback: "Set your default guaranteed minimum for estimated deposits")
+      /// Set the guaranteed minimum deposit to be applied whenever a deposit in a transaction can only be estimated.
+      /// 
+      /// You can always change the guarantee from this default in each transaction.
+      public static let text = L10n.tr("Localizable", "accountSecuritySettings_depositGuarantees_text", fallback: "Set the guaranteed minimum deposit to be applied whenever a deposit in a transaction can only be estimated.\n\nYou can always change the guarantee from this default in each transaction.")
+      /// Default Deposit Guarantees
+      public static let title = L10n.tr("Localizable", "accountSecuritySettings_depositGuarantees_title", fallback: "Default Deposit Guarantees")
+    }
+    public enum ImportFromLegacyWallet {
+      /// Import from a Legacy Wallet
+      public static let title = L10n.tr("Localizable", "accountSecuritySettings_importFromLegacyWallet_title", fallback: "Import from a Legacy Wallet")
+    }
+    public enum LedgerHardwareWallets {
+      /// Ledger Hardware Wallets
+      public static let title = L10n.tr("Localizable", "accountSecuritySettings_ledgerHardwareWallets_title", fallback: "Ledger Hardware Wallets")
+    }
+    public enum SeedPhrases {
+      /// Seed Phrases
+      public static let title = L10n.tr("Localizable", "accountSecuritySettings_seedPhrases_title", fallback: "Seed Phrases")
+    }
+  }
   public enum AccountSettings {
     /// Account Color
     public static let accountColor = L10n.tr("Localizable", "accountSettings_accountColor", fallback: "Account Color")
     /// Select from a list of unique colors
     public static let accountColorSubtitle = L10n.tr("Localizable", "accountSettings_accountColorSubtitle", fallback: "Select from a list of unique colors")
+    /// Account Hidden
+    public static let accountHidden = L10n.tr("Localizable", "accountSettings_accountHidden", fallback: "Account Hidden")
     /// Account Label
     public static let accountLabel = L10n.tr("Localizable", "accountSettings_accountLabel", fallback: "Account Label")
     /// Set development preferences
@@ -150,6 +278,8 @@ public enum L10n {
       public static let emptyAllowAll = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_emptyAllowAll", fallback: "Add a specific asset by its resource address to allow all third-party deposits")
       /// Add a specific asset by its resource address to deny all third-party deposits
       public static let emptyDenyAll = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_emptyDenyAll", fallback: "Add a specific asset by its resource address to deny all third-party deposits")
+      /// ⚠️ Sorry, this Account's third-party exceptions and depositor lists are in an unknown state and cannot be viewed or edited because it was imported using only a seed phrase or Ledger. A forthcoming wallet update will enable viewing and editing of these lists.
+      public static let modificationDisabledForRecoveredAccount = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_modificationDisabledForRecoveredAccount", fallback: "⚠️ Sorry, this Account's third-party exceptions and depositor lists are in an unknown state and cannot be viewed or edited because it was imported using only a seed phrase or Ledger. A forthcoming wallet update will enable viewing and editing of these lists.")
       /// Remove Asset
       public static let removeAsset = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_removeAsset", fallback: "Remove Asset")
       /// The asset will be removed from the allow list
@@ -311,10 +441,6 @@ public enum L10n {
     public static let subtitle = L10n.tr("Localizable", "appSettings_subtitle", fallback: "Customize your Radix Wallet")
     /// App Settings
     public static let title = L10n.tr("Localizable", "appSettings_title", fallback: "App Settings")
-    public enum ConfirmCloudSyncDisableAlert {
-      /// Disabling iCloud sync will delete the iCloud backup data, are you sure you want to disable iCloud sync?
-      public static let title = L10n.tr("Localizable", "appSettings_confirmCloudSyncDisableAlert_title", fallback: "Disabling iCloud sync will delete the iCloud backup data, are you sure you want to disable iCloud sync?")
-    }
     public enum DeveloperMode {
       /// Warning: Disables website validity checks
       public static let subtitle = L10n.tr("Localizable", "appSettings_developerMode_subtitle", fallback: "Warning: Disables website validity checks")
@@ -338,10 +464,10 @@ public enum L10n {
       public static func hiddenPersonas(_ p1: Int) -> String {
         return L10n.tr("Localizable", "appSettings_entityHiding_hiddenPersonas", p1, fallback: "%d Personas currently hidden")
       }
-      /// Accounts and Personas you have created can be hidden in your Radix Wallet, acting as if “deleted”.
-      public static let info = L10n.tr("Localizable", "appSettings_entityHiding_info", fallback: "Accounts and Personas you have created can be hidden in your Radix Wallet, acting as if “deleted”.")
       /// Manage hiding
       public static let subtitle = L10n.tr("Localizable", "appSettings_entityHiding_subtitle", fallback: "Manage hiding")
+      /// Accounts and Personas you have created can be hidden in your Radix Wallet, acting as if “deleted”.
+      public static let text = L10n.tr("Localizable", "appSettings_entityHiding_text", fallback: "Accounts and Personas you have created can be hidden in your Radix Wallet, acting as if “deleted”.")
       /// Account & Persona Hiding
       public static let title = L10n.tr("Localizable", "appSettings_entityHiding_title", fallback: "Account & Persona Hiding")
       /// Unhide All
@@ -351,35 +477,13 @@ public enum L10n {
       /// Unhide Accounts & Personas
       public static let unhideAllSection = L10n.tr("Localizable", "appSettings_entityHiding_unhideAllSection", fallback: "Unhide Accounts & Personas")
     }
-    public enum ICloudSyncEnabledAlert {
-      /// iCloud sync is now enabled, but it might take up to an hour before your wallet data is uploaded to iCloud.
-      public static let message = L10n.tr("Localizable", "appSettings_iCloudSyncEnabledAlert_message", fallback: "iCloud sync is now enabled, but it might take up to an hour before your wallet data is uploaded to iCloud.")
-      /// Enabling iCloud sync
-      public static let title = L10n.tr("Localizable", "appSettings_iCloudSyncEnabledAlert_title", fallback: "Enabling iCloud sync")
+    public enum Gateways {
+      /// Network Gateways
+      public static let title = L10n.tr("Localizable", "appSettings_gateways_title", fallback: "Network Gateways")
     }
-    public enum ResetWallet {
-      /// Reset
-      public static let buttonTitle = L10n.tr("Localizable", "appSettings_resetWallet_buttonTitle", fallback: "Reset")
-      /// Clear all data in this Wallet
-      public static let subtitle = L10n.tr("Localizable", "appSettings_resetWallet_subtitle", fallback: "Clear all data in this Wallet")
-      /// Reset Wallet
-      public static let title = L10n.tr("Localizable", "appSettings_resetWallet_title", fallback: "Reset Wallet")
-    }
-    public enum ResetWalletDialog {
-      /// WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.
-      public static let message = L10n.tr("Localizable", "appSettings_resetWalletDialog_message", fallback: "WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.")
-      /// Reset and Delete iCloud Backup
-      public static let resetAndDeleteBackupButtonTitle = L10n.tr("Localizable", "appSettings_resetWalletDialog_resetAndDeleteBackupButtonTitle", fallback: "Reset and Delete iCloud Backup")
-      /// Reset Wallet
-      public static let resetButtonTitle = L10n.tr("Localizable", "appSettings_resetWalletDialog_resetButtonTitle", fallback: "Reset Wallet")
-      /// Reset Wallet?
-      public static let title = L10n.tr("Localizable", "appSettings_resetWalletDialog_title", fallback: "Reset Wallet?")
-    }
-    public enum VerboseLedgerMode {
-      /// When signing with your Ledger hardware wallet, should all instructions be displayed?
-      public static let subtitle = L10n.tr("Localizable", "appSettings_verboseLedgerMode_subtitle", fallback: "When signing with your Ledger hardware wallet, should all instructions be displayed?")
-      /// Verbose Ledger transaction signing
-      public static let title = L10n.tr("Localizable", "appSettings_verboseLedgerMode_title", fallback: "Verbose Ledger transaction signing")
+    public enum LinkedConnectors {
+      /// Linked Connectors
+      public static let title = L10n.tr("Localizable", "appSettings_linkedConnectors_title", fallback: "Linked Connectors")
     }
   }
   public enum AssetDetails {
@@ -662,6 +766,8 @@ public enum L10n {
       public static func notSharingAnything(_ p1: Any) -> String {
         return L10n.tr("Localizable", "authorizedDapps_personaDetails_notSharingAnything", String(describing: p1), fallback: "You are not sharing any personal data with %@.")
       }
+      /// Persona Hidden
+      public static let personaHidden = L10n.tr("Localizable", "authorizedDapps_personaDetails_personaHidden", fallback: "Persona Hidden")
       /// Persona Label
       public static let personaLabelHeading = L10n.tr("Localizable", "authorizedDapps_personaDetails_personaLabelHeading", fallback: "Persona Label")
       /// Here is the personal data that you are sharing with %@.
@@ -783,12 +889,6 @@ public enum L10n {
       /// Your Account has been created.
       public static let subtitleNotFirst = L10n.tr("Localizable", "createAccount_completion_subtitleNotFirst", fallback: "Your Account has been created.")
     }
-    public enum DerivePublicKeys {
-      /// Deriving public keys
-      public static let subtitle = L10n.tr("Localizable", "createAccount_derivePublicKeys_subtitle", fallback: "Deriving public keys")
-      /// Creating Account
-      public static let title = L10n.tr("Localizable", "createAccount_derivePublicKeys_title", fallback: "Creating Account")
-    }
     public enum Introduction {
       /// Create an Account
       public static let title = L10n.tr("Localizable", "createAccount_introduction_title", fallback: "Create an Account")
@@ -852,10 +952,6 @@ public enum L10n {
       public static let subtitleFirst = L10n.tr("Localizable", "createPersona_completion_subtitleFirst", fallback: "You’ve created your first Persona!")
       /// Your Persona has been created.
       public static let subtitleNotFirst = L10n.tr("Localizable", "createPersona_completion_subtitleNotFirst", fallback: "Your Persona has been created.")
-    }
-    public enum DerivePublicKeys {
-      /// Creating Persona
-      public static let title = L10n.tr("Localizable", "createPersona_derivePublicKeys_title", fallback: "Creating Persona")
     }
     public enum Explanation {
       /// Some dApps may request personal information, like name or email address, that can be added to your Persona. Add some data now if you like.
@@ -1176,6 +1272,24 @@ public enum L10n {
       public static let subtitleWrongNetworkID = L10n.tr("Localizable", "dAppRequest_validationOutcome_subtitleWrongNetworkID", fallback: "Network mismatch")
     }
   }
+  public enum DerivePublicKeys {
+    /// Authenticate to your phone to sign.
+    public static let subtitleDevice = L10n.tr("Localizable", "derivePublicKeys_subtitleDevice", fallback: "Authenticate to your phone to sign.")
+    /// Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension. Complete signing on the device.
+    public static let subtitleLedger = L10n.tr("Localizable", "derivePublicKeys_subtitleLedger", fallback: "Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension. Complete signing on the device.")
+    /// Deriving Accounts
+    public static let titleAccountRecoveryScan = L10n.tr("Localizable", "derivePublicKeys_titleAccountRecoveryScan", fallback: "Deriving Accounts")
+    /// Creating Account
+    public static let titleCreateAccount = L10n.tr("Localizable", "derivePublicKeys_titleCreateAccount", fallback: "Creating Account")
+    /// Creating Key
+    public static let titleCreateAuthSignKeyForAccount = L10n.tr("Localizable", "derivePublicKeys_titleCreateAuthSignKeyForAccount", fallback: "Creating Key")
+    /// Creating Key
+    public static let titleCreateAuthSignKeyForPersona = L10n.tr("Localizable", "derivePublicKeys_titleCreateAuthSignKeyForPersona", fallback: "Creating Key")
+    /// Creating Persona
+    public static let titleCreatePersona = L10n.tr("Localizable", "derivePublicKeys_titleCreatePersona", fallback: "Creating Persona")
+    /// Deriving Accounts
+    public static let titleImportLegacyAccount = L10n.tr("Localizable", "derivePublicKeys_titleImportLegacyAccount", fallback: "Deriving Accounts")
+  }
   public enum DisplayMnemonics {
     /// Write Down this Seed Phrase
     public static let backUpWarning = L10n.tr("Localizable", "displayMnemonics_backUpWarning", fallback: "Write Down this Seed Phrase")
@@ -1265,11 +1379,19 @@ public enum L10n {
     }
   }
   public enum EnterSeedPhrase {
+    /// Enter Babylon Seed Phrase
+    public static let titleBabylon = L10n.tr("Localizable", "enterSeedPhrase_titleBabylon", fallback: "Enter Babylon Seed Phrase")
+    /// Enter Main Seed Phrase
+    public static let titleBabylonMain = L10n.tr("Localizable", "enterSeedPhrase_titleBabylonMain", fallback: "Enter Main Seed Phrase")
+    /// Enter Olympia Seed Phrase
+    public static let titleOlympia = L10n.tr("Localizable", "enterSeedPhrase_titleOlympia", fallback: "Enter Olympia Seed Phrase")
     /// For your safety, make sure no one is looking at your screen. Never give your seed phrase to anyone for any reason.
     public static let warning = L10n.tr("Localizable", "enterSeedPhrase_warning", fallback: "For your safety, make sure no one is looking at your screen. Never give your seed phrase to anyone for any reason.")
     public enum Header {
       /// Enter Seed Phrase
       public static let title = L10n.tr("Localizable", "enterSeedPhrase_header_title", fallback: "Enter Seed Phrase")
+      /// Enter Main Seed Phrase
+      public static let titleMain = L10n.tr("Localizable", "enterSeedPhrase_header_titleMain", fallback: "Enter Main Seed Phrase")
     }
   }
   public enum Error {
@@ -1304,6 +1426,8 @@ public enum L10n {
       public static let blindSigningNotEnabledButRequired = L10n.tr("Localizable", "error_transactionFailure_blindSigningNotEnabledButRequired", fallback: "Your current Ledger settings only allow signing of simple token transfers. Please either enable \"verbose mode\" (to see full transaction manifests) or \"blind signing mode\" (to enable signing of complex transaction manifest hashes) on your Ledger app device.")
       /// Failed to commit transaction
       public static let commit = L10n.tr("Localizable", "error_transactionFailure_commit", fallback: "Failed to commit transaction")
+      /// One of the receiving accounts does not allow Third-Party deposits
+      public static let doesNotAllowThirdPartyDeposits = L10n.tr("Localizable", "error_transactionFailure_doesNotAllowThirdPartyDeposits", fallback: "One of the receiving accounts does not allow Third-Party deposits")
       /// Failed to convert transaction manifest
       public static let duplicate = L10n.tr("Localizable", "error_transactionFailure_duplicate", fallback: "Failed to convert transaction manifest")
       /// Failed to get epoch
@@ -1423,6 +1547,14 @@ public enum L10n {
       /// SERIOUS ERROR - PLEASE READ
       public static let title = L10n.tr("Localizable", "homePage_profileOlympiaError_title", fallback: "SERIOUS ERROR - PLEASE READ")
     }
+    public enum RadixBanner {
+      /// Get Started Now
+      public static let action = L10n.tr("Localizable", "homePage_radixBanner_action", fallback: "Get Started Now")
+      /// Complete setting up your wallet and start staking, using dApps and more!
+      public static let subtitle = L10n.tr("Localizable", "homePage_radixBanner_subtitle", fallback: "Complete setting up your wallet and start staking, using dApps and more!")
+      /// Start Using Radix
+      public static let title = L10n.tr("Localizable", "homePage_radixBanner_title", fallback: "Start Using Radix")
+    }
     public enum VisitDashboard {
       /// Ready to get started using the Radix Network and your Wallet?
       public static let subtitle = L10n.tr("Localizable", "homePage_visitDashboard_subtitle", fallback: "Ready to get started using the Radix Network and your Wallet?")
@@ -1481,6 +1613,10 @@ public enum L10n {
       /// Automatic continuous backups
       public static let subtitle = L10n.tr("Localizable", "iOSProfileBackup_automaticBackups_subtitle", fallback: "Automatic continuous backups")
     }
+    public enum ConfirmCloudSyncDisableAlert {
+      /// Disabling iCloud sync will delete the iCloud backup data, are you sure you want to disable iCloud sync?
+      public static let title = L10n.tr("Localizable", "iOSProfileBackup_confirmCloudSyncDisableAlert_title", fallback: "Disabling iCloud sync will delete the iCloud backup data, are you sure you want to disable iCloud sync?")
+    }
     public enum DeleteWallet {
       /// Delete Wallet and iCloud Backup
       public static let confirmButton = L10n.tr("Localizable", "iOSProfileBackup_deleteWallet_confirmButton", fallback: "Delete Wallet and iCloud Backup")
@@ -1488,6 +1624,12 @@ public enum L10n {
       /// 
       /// **Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**
       public static let subtitle = L10n.tr("Localizable", "iOSProfileBackup_deleteWallet_subtitle", fallback: "You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any iCloud backup.\n\n**Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**")
+    }
+    public enum ICloudSyncEnabledAlert {
+      /// iCloud sync is now enabled, but it might take up to an hour before your wallet data is uploaded to iCloud.
+      public static let message = L10n.tr("Localizable", "iOSProfileBackup_iCloudSyncEnabledAlert_message", fallback: "iCloud sync is now enabled, but it might take up to an hour before your wallet data is uploaded to iCloud.")
+      /// Enabling iCloud sync
+      public static let title = L10n.tr("Localizable", "iOSProfileBackup_iCloudSyncEnabledAlert_title", fallback: "Enabling iCloud sync")
     }
     public enum ProfileSync {
       /// Warning: If disabled you might lose access to your Accounts and Personas.
@@ -1511,16 +1653,14 @@ public enum L10n {
     public static let checksumFailure = L10n.tr("Localizable", "importMnemonic_checksumFailure", fallback: "Incorrect seed phrase")
     /// Failed to validate all accounts against mnemonic
     public static let failedToValidateAllAccounts = L10n.tr("Localizable", "importMnemonic_failedToValidateAllAccounts", fallback: "Failed to validate all accounts against mnemonic")
-    /// Fewer words
-    public static let fewerWords = L10n.tr("Localizable", "importMnemonic_fewerWords", fallback: "Fewer words")
     /// Import
     public static let importSeedPhrase = L10n.tr("Localizable", "importMnemonic_importSeedPhrase", fallback: "Import")
-    /// More words
-    public static let moreWords = L10n.tr("Localizable", "importMnemonic_moreWords", fallback: "More words")
     /// Import Seed Phrase
     public static let navigationTitle = L10n.tr("Localizable", "importMnemonic_navigationTitle", fallback: "Import Seed Phrase")
     /// Backup Seed Phrase
     public static let navigationTitleBackup = L10n.tr("Localizable", "importMnemonic_navigationTitleBackup", fallback: "Backup Seed Phrase")
+    /// Number of Seed Phrase Words
+    public static let numberOfWordsPicker = L10n.tr("Localizable", "importMnemonic_numberOfWordsPicker", fallback: "Number of Seed Phrase Words")
     /// Passphrase
     public static let passphrase = L10n.tr("Localizable", "importMnemonic_passphrase", fallback: "Passphrase")
     /// Optional BIP39 Passphrase. This is not your wallet password, and the Radix Desktop Wallet did not use a BIP39 passphrase. This is only to support import from other wallets that may have used one.
@@ -1531,6 +1671,8 @@ public enum L10n {
     public static let regularModeButton = L10n.tr("Localizable", "importMnemonic_regularModeButton", fallback: "Regular Mode")
     /// Imported Seed Phrase
     public static let seedPhraseImported = L10n.tr("Localizable", "importMnemonic_seedPhraseImported", fallback: "Imported Seed Phrase")
+    /// Success
+    public static let verificationSuccess = L10n.tr("Localizable", "importMnemonic_verificationSuccess", fallback: "Success")
     /// Word %d
     public static func wordHeading(_ p1: Int) -> String {
       return L10n.tr("Localizable", "importMnemonic_wordHeading", p1, fallback: "Word %d")
@@ -1566,8 +1708,8 @@ public enum L10n {
       public static let storyPrimaryHeading = L10n.tr("Localizable", "importMnemonic_offDevice_storyPrimaryHeading", fallback: "Tell a story")
     }
     public enum ShieldPrompt {
-      /// Backup this Account's seed phrase
-      public static let backupSeedPhrase = L10n.tr("Localizable", "importMnemonic_shieldPrompt_backupSeedPhrase", fallback: "Backup this Account's seed phrase")
+      /// Please write down this Account's seed phrase
+      public static let backupSeedPhrase = L10n.tr("Localizable", "importMnemonic_shieldPrompt_backupSeedPhrase", fallback: "Please write down this Account's seed phrase")
       /// Enter this Account's seed phrase
       public static let enterSeedPhrase = L10n.tr("Localizable", "importMnemonic_shieldPrompt_enterSeedPhrase", fallback: "Enter this Account's seed phrase")
     }
@@ -1847,7 +1989,7 @@ public enum L10n {
     }
     public enum DeleteWallet {
       /// Delete Wallet
-      public static let title = L10n.tr("Localizable", "profileBackup_deleteWallet_title", fallback: "Delete Wallet")
+      public static let buttonTitle = L10n.tr("Localizable", "profileBackup_deleteWallet_buttonTitle", fallback: "Delete Wallet")
     }
     public enum DeleteWalletDialog {
       /// Delete Wallet
@@ -1901,12 +2043,24 @@ public enum L10n {
       /// Manual Backups
       public static let title = L10n.tr("Localizable", "profileBackup_manualBackups_title", fallback: "Manual Backups")
     }
+    public enum ResetWalletDialog {
+      /// WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.
+      public static let message = L10n.tr("Localizable", "profileBackup_resetWalletDialog_message", fallback: "WARNING. This will clear all contents of your Wallet. If you have no backup, you will lose access to your Accounts and Personas permanently.")
+      /// Reset and Delete iCloud Backup
+      public static let resetAndDeleteBackupButtonTitle = L10n.tr("Localizable", "profileBackup_resetWalletDialog_resetAndDeleteBackupButtonTitle", fallback: "Reset and Delete iCloud Backup")
+      /// Reset Wallet
+      public static let resetButtonTitle = L10n.tr("Localizable", "profileBackup_resetWalletDialog_resetButtonTitle", fallback: "Reset Wallet")
+      /// Reset Wallet?
+      public static let title = L10n.tr("Localizable", "profileBackup_resetWalletDialog_title", fallback: "Reset Wallet?")
+    }
   }
   public enum RecoverProfileBackup {
     /// **Backup from:** %@
     public static func backupFrom(_ p1: Any) -> String {
       return L10n.tr("Localizable", "recoverProfileBackup_backupFrom", String(describing: p1), fallback: "**Backup from:** %@")
     }
+    /// Backup not available?
+    public static let backupNotAvailable = L10n.tr("Localizable", "recoverProfileBackup_backupNotAvailable", fallback: "Backup not available?")
     /// Incompatible Wallet data
     public static let incompatibleWalletDataLabel = L10n.tr("Localizable", "recoverProfileBackup_incompatibleWalletDataLabel", fallback: "Incompatible Wallet data")
     /// **Last modified:** %@
@@ -1921,6 +2075,8 @@ public enum L10n {
     public static func numberOfPersonas(_ p1: Int) -> String {
       return L10n.tr("Localizable", "recoverProfileBackup_numberOfPersonas", p1, fallback: "**Number of personas:** %d")
     }
+    /// Other Restore Options
+    public static let otherRestoreOptionsButton = L10n.tr("Localizable", "recoverProfileBackup_otherRestoreOptionsButton", fallback: "Other Restore Options")
     /// The password is wrong
     public static let passwordWrong = L10n.tr("Localizable", "recoverProfileBackup_passwordWrong", fallback: "The password is wrong")
     public enum Header {
@@ -1937,6 +2093,8 @@ public enum L10n {
   public enum RecoverSeedPhrase {
     /// Enter This Seed Phrase
     public static let enterButton = L10n.tr("Localizable", "recoverSeedPhrase_enterButton", fallback: "Enter This Seed Phrase")
+    /// Hidden accounts only.
+    public static let hiddenAccountsOnly = L10n.tr("Localizable", "recoverSeedPhrase_hiddenAccountsOnly", fallback: "Hidden accounts only.")
     /// I Don’t Have the Main Seed Phrase
     public static let noMainSeedPhraseButton = L10n.tr("Localizable", "recoverSeedPhrase_noMainSeedPhraseButton", fallback: "I Don’t Have the Main Seed Phrase")
     /// Skip This Seed Phrase For Now
@@ -1961,11 +2119,55 @@ public enum L10n {
       /// Seed Phrase Required
       public static let titleOther = L10n.tr("Localizable", "recoverSeedPhrase_header_titleOther", fallback: "Seed Phrase Required")
     }
-    public enum Hidden {
-      public enum Accounts {
-        /// Hidden accounts only.
-        public static let only = L10n.tr("Localizable", "recoverSeedPhrase_hidden_accounts_only", fallback: "Hidden accounts only.")
-      }
+  }
+  public enum RecoverWalletWithoutProfile {
+    public enum Complete {
+      /// Continue
+      public static let continueButton = L10n.tr("Localizable", "recoverWalletWithoutProfile_complete_continueButton", fallback: "Continue")
+      /// Accounts discovered in the scan have been added to your wallet.
+      /// 
+      /// If you have any “Legacy” Accounts (created on the Olympia network) to import - or any Accounts using a Ledger hardware wallet device - please continue and then use the **Account Recovery Scan** option in your Radix Wallet settings under **Account Security**.
+      public static let headerSubtitle = L10n.tr("Localizable", "recoverWalletWithoutProfile_complete_headerSubtitle", fallback: "Accounts discovered in the scan have been added to your wallet.\n\nIf you have any “Legacy” Accounts (created on the Olympia network) to import - or any Accounts using a Ledger hardware wallet device - please continue and then use the **Account Recovery Scan** option in your Radix Wallet settings under **Account Security**.")
+      /// Recovery Complete
+      public static let headerTitle = L10n.tr("Localizable", "recoverWalletWithoutProfile_complete_headerTitle", fallback: "Recovery Complete")
+    }
+    public enum Info {
+      /// Continue
+      public static let continueButton = L10n.tr("Localizable", "recoverWalletWithoutProfile_info_continueButton", fallback: "Continue")
+      /// **If you have no wallet backup in the cloud or as an exported backup file**, you can still restore Account access only using your main “Babylon” seed phrase. You cannot recover your Account names or other wallet settings this way.
+      /// 
+      /// You will be asked to enter your main seed phrase. This is a set of **24 words** that the Radix Wallet mobile app showed you to write down and save securely.
+      public static let headerSubtitle = L10n.tr("Localizable", "recoverWalletWithoutProfile_info_headerSubtitle", fallback: "**If you have no wallet backup in the cloud or as an exported backup file**, you can still restore Account access only using your main “Babylon” seed phrase. You cannot recover your Account names or other wallet settings this way.\n\nYou will be asked to enter your main seed phrase. This is a set of **24 words** that the Radix Wallet mobile app showed you to write down and save securely.")
+      /// Recover Control Without Backup
+      public static let headerTitle = L10n.tr("Localizable", "recoverWalletWithoutProfile_info_headerTitle", fallback: "Recover Control Without Backup")
+    }
+    public enum Start {
+      /// Recover with Main Seed Phrase
+      public static let babylonSectionButton = L10n.tr("Localizable", "recoverWalletWithoutProfile_start_babylonSectionButton", fallback: "Recover with Main Seed Phrase")
+      /// I have my main “Babylon” 24-word seed phrase.
+      public static let babylonSectionTitle = L10n.tr("Localizable", "recoverWalletWithoutProfile_start_babylonSectionTitle", fallback: "I have my main “Babylon” 24-word seed phrase.")
+      /// Ledger-only Restore
+      public static let hardwareSectionButton = L10n.tr("Localizable", "recoverWalletWithoutProfile_start_hardwareSectionButton", fallback: "Ledger-only Restore")
+      /// I only want to restore Ledger hardware wallet Accounts.
+      public static let hardwareSectionTitle = L10n.tr("Localizable", "recoverWalletWithoutProfile_start_hardwareSectionTitle", fallback: "I only want to restore Ledger hardware wallet Accounts.")
+      /// If you have no wallet backup in the cloud, or as an exported backup file, you still have other restore options.
+      public static let headerSubtitle = L10n.tr("Localizable", "recoverWalletWithoutProfile_start_headerSubtitle", fallback: "If you have no wallet backup in the cloud, or as an exported backup file, you still have other restore options.")
+      /// Recover Control Without Backup
+      public static let headerTitle = L10n.tr("Localizable", "recoverWalletWithoutProfile_start_headerTitle", fallback: "Recover Control Without Backup")
+      /// Olympia-only Restore
+      public static let olympiaSectionButton = L10n.tr("Localizable", "recoverWalletWithoutProfile_start_olympiaSectionButton", fallback: "Olympia-only Restore")
+      /// I only have Accounts created on the Radix Olympia network.
+      public static let olympiaSectionTitle = L10n.tr("Localizable", "recoverWalletWithoutProfile_start_olympiaSectionTitle", fallback: "I only have Accounts created on the Radix Olympia network.")
+      /// Cancel
+      public static let useNewWalletAlertCancel = L10n.tr("Localizable", "recoverWalletWithoutProfile_start_useNewWalletAlertCancel", fallback: "Cancel")
+      /// Continue
+      public static let useNewWalletAlertContinue = L10n.tr("Localizable", "recoverWalletWithoutProfile_start_useNewWalletAlertContinue", fallback: "Continue")
+      /// Tap “I'm a New Wallet User”. After completing wallet creation, in Settings you can perform an “account recovery scan” using your Ledger device.
+      public static let useNewWalletAlertMessageHardware = L10n.tr("Localizable", "recoverWalletWithoutProfile_start_useNewWalletAlertMessageHardware", fallback: "Tap “I'm a New Wallet User”. After completing wallet creation, in Settings you can perform an “account recovery scan” using your Ledger device.")
+      /// Tap “I'm a New Wallet User”. After completing wallet creation, in Settings you can perform an “account recovery scan” using your Olympia seed phrase.
+      public static let useNewWalletAlertMessageOlympia = L10n.tr("Localizable", "recoverWalletWithoutProfile_start_useNewWalletAlertMessageOlympia", fallback: "Tap “I'm a New Wallet User”. After completing wallet creation, in Settings you can perform an “account recovery scan” using your Olympia seed phrase.")
+      /// No Main Seed Phrase?
+      public static let useNewWalletAlertTitle = L10n.tr("Localizable", "recoverWalletWithoutProfile_start_useNewWalletAlertTitle", fallback: "No Main Seed Phrase?")
     }
   }
   public enum RevealSeedPhrase {
@@ -1989,6 +2191,10 @@ public enum L10n {
     }
   }
   public enum SeedPhrases {
+    /// Please write down your Seed Phrase
+    public static let backupWarning = L10n.tr("Localizable", "seedPhrases_backupWarning", fallback: "Please write down your Seed Phrase")
+    /// Hidden Accounts only
+    public static let hiddenAccountsOnly = L10n.tr("Localizable", "seedPhrases_hiddenAccountsOnly", fallback: "Hidden Accounts only")
     /// A Seed Phrase provides full access to your accounts and funds. When viewing, ensure you’re in a safe environment and no one is looking at your screen.
     public static let message = L10n.tr("Localizable", "seedPhrases_message", fallback: "A Seed Phrase provides full access to your accounts and funds. When viewing, ensure you’re in a safe environment and no one is looking at your screen.")
     /// Seed Phrases
@@ -1996,14 +2202,28 @@ public enum L10n {
     /// You are responsible for the security of your Seed Phrase
     public static let warning = L10n.tr("Localizable", "seedPhrases_warning", fallback: "You are responsible for the security of your Seed Phrase")
     public enum SeedPhrase {
-      /// Connected to %d Accounts
-      public static func multipleConnectedAccounts(_ p1: Int) -> String {
-        return L10n.tr("Localizable", "seedPhrases_seedPhrase_multipleConnectedAccounts", p1, fallback: "Connected to %d Accounts")
-      }
-      /// Connected to 1 Account
-      public static let oneConnectedAccount = L10n.tr("Localizable", "seedPhrases_seedPhrase_oneConnectedAccount", fallback: "Connected to 1 Account")
+      /// Seed Phrase Entry Required
+      public static let headingNeedsImport = L10n.tr("Localizable", "seedPhrases_seedPhrase_headingNeedsImport", fallback: "Seed Phrase Entry Required")
       /// Reveal Seed Phrase
-      public static let reveal = L10n.tr("Localizable", "seedPhrases_seedPhrase_reveal", fallback: "Reveal Seed Phrase")
+      public static let headingReveal = L10n.tr("Localizable", "seedPhrases_seedPhrase_headingReveal", fallback: "Reveal Seed Phrase")
+      /// Seed Phrase
+      public static let headingScan = L10n.tr("Localizable", "seedPhrases_seedPhrase_headingScan", fallback: "Seed Phrase")
+      /// Connected to %d Accounts
+      public static func multipleConnectedAccountsReveal(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "seedPhrases_seedPhrase_multipleConnectedAccountsReveal", p1, fallback: "Connected to %d Accounts")
+      }
+      /// Currently connected to %d Accounts
+      public static func multipleConnectedAccountsScan(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "seedPhrases_seedPhrase_multipleConnectedAccountsScan", p1, fallback: "Currently connected to %d Accounts")
+      }
+      /// Not connected to any Accounts
+      public static let noConnectedAccountsReveal = L10n.tr("Localizable", "seedPhrases_seedPhrase_noConnectedAccountsReveal", fallback: "Not connected to any Accounts")
+      /// Not yet connected to any Accounts
+      public static let noConnectedAccountsScan = L10n.tr("Localizable", "seedPhrases_seedPhrase_noConnectedAccountsScan", fallback: "Not yet connected to any Accounts")
+      /// Connected to 1 Account
+      public static let oneConnectedAccountReveal = L10n.tr("Localizable", "seedPhrases_seedPhrase_oneConnectedAccountReveal", fallback: "Connected to 1 Account")
+      /// Currently connected to 1 Account
+      public static let oneConnectedAccountScan = L10n.tr("Localizable", "seedPhrases_seedPhrase_oneConnectedAccountScan", fallback: "Currently connected to 1 Account")
     }
   }
   public enum Settings {
@@ -2017,36 +2237,12 @@ public enum L10n {
     }
     /// Authorized dApps
     public static let authorizedDapps = L10n.tr("Localizable", "settings_authorizedDapps", fallback: "Authorized dApps")
-    /// Backups
-    public static let backups = L10n.tr("Localizable", "settings_backups", fallback: "Backups")
-    /// Delete Wallet Data
-    public static let deleteWalletData = L10n.tr("Localizable", "settings_deleteWalletData", fallback: "Delete Wallet Data")
-    /// Gateways
-    public static let gateways = L10n.tr("Localizable", "settings_gateways", fallback: "Gateways")
-    /// Import from a Legacy Wallet
-    public static let importFromLegacyWallet = L10n.tr("Localizable", "settings_importFromLegacyWallet", fallback: "Import from a Legacy Wallet")
-    /// Ledger Hardware Wallets
-    public static let ledgerHardwareWallets = L10n.tr("Localizable", "settings_ledgerHardwareWallets", fallback: "Ledger Hardware Wallets")
-    /// Linked Connectors
-    public static let linkedConnectors = L10n.tr("Localizable", "settings_linkedConnectors", fallback: "Linked Connectors")
-    /// Multi-Factor Setup
-    public static let multiFactor = L10n.tr("Localizable", "settings_multiFactor", fallback: "Multi-Factor Setup")
-    /// No Wallet Data Found
-    public static let noProfileText = L10n.tr("Localizable", "settings_noProfileText", fallback: "No Wallet Data Found")
     /// Personas
     public static let personas = L10n.tr("Localizable", "settings_personas", fallback: "Personas")
+    /// Please write down the seed phrase for your Personas
+    public static let personasSeedPhrasePrompt = L10n.tr("Localizable", "settings_personasSeedPhrasePrompt", fallback: "Please write down the seed phrase for your Personas")
     /// Settings
     public static let title = L10n.tr("Localizable", "settings_title", fallback: "Settings")
-    public enum DepositGuarantees {
-      /// Set your default guaranteed minimum for estimated deposits
-      public static let subtitle = L10n.tr("Localizable", "settings_depositGuarantees_subtitle", fallback: "Set your default guaranteed minimum for estimated deposits")
-      /// Set the guaranteed minimum deposit to be applied whenever a deposit in a transaction can only be estimated.
-      /// 
-      /// You can always change the guarantee from this default in each transaction.
-      public static let text = L10n.tr("Localizable", "settings_depositGuarantees_text", fallback: "Set the guaranteed minimum deposit to be applied whenever a deposit in a transaction can only be estimated.\n\nYou can always change the guarantee from this default in each transaction.")
-      /// Deposit Guarantees
-      public static let title = L10n.tr("Localizable", "settings_depositGuarantees_title", fallback: "Deposit Guarantees")
-    }
     public enum ImportFromLegacyWalletHeader {
       /// Import Legacy Accounts
       public static let importLegacyAccounts = L10n.tr("Localizable", "settings_importFromLegacyWalletHeader_importLegacyAccounts", fallback: "Import Legacy Accounts")
@@ -2101,6 +2297,8 @@ public enum L10n {
     public static let passcodeNotSetMessage = L10n.tr("Localizable", "splash_passcodeNotSetMessage", fallback: "This app requires your phone to have a passcode set up")
     /// Passcode not set up
     public static let passcodeNotSetTitle = L10n.tr("Localizable", "splash_passcodeNotSetTitle", fallback: "Passcode not set up")
+    /// Tap anywhere to unlock?
+    public static let tapAnywhereToUnlock = L10n.tr("Localizable", "splash_tapAnywhereToUnlock", fallback: "Tap anywhere to unlock?")
     public enum IncompatibleProfileVersionAlert {
       /// Delete Wallet Data
       public static let delete = L10n.tr("Localizable", "splash_incompatibleProfileVersionAlert_delete", fallback: "Delete Wallet Data")
@@ -2115,11 +2313,31 @@ public enum L10n {
       /// Warning
       public static let title = L10n.tr("Localizable", "splash_passcodeCheckFailedAlert_title", fallback: "Warning")
     }
+    public enum ProfileOnAnotherDeviceAlert {
+      /// Ask Later (no changes)
+      public static let askLater = L10n.tr("Localizable", "splash_profileOnAnotherDeviceAlert_askLater", fallback: "Ask Later (no changes)")
+      /// Claim Existing Wallet
+      public static let claimExisting = L10n.tr("Localizable", "splash_profileOnAnotherDeviceAlert_claimExisting", fallback: "Claim Existing Wallet")
+      /// Clear Wallet on This Phone
+      public static let claimHere = L10n.tr("Localizable", "splash_profileOnAnotherDeviceAlert_claimHere", fallback: "Clear Wallet on This Phone")
+      /// This wallet is currently configured with a set of Accounts and Personas in use by a different phone.
+      /// 
+      /// To make changes to this wallet, you must claim it for use on this phone instead, removing access by the other phone.
+      /// 
+      /// Or you can clear this wallet from this phone and start fresh.
+      public static let message = L10n.tr("Localizable", "splash_profileOnAnotherDeviceAlert_message", fallback: "This wallet is currently configured with a set of Accounts and Personas in use by a different phone.\n\nTo make changes to this wallet, you must claim it for use on this phone instead, removing access by the other phone.\n\nOr you can clear this wallet from this phone and start fresh.")
+      /// Claim This Wallet?
+      public static let title = L10n.tr("Localizable", "splash_profileOnAnotherDeviceAlert_title", fallback: "Claim This Wallet?")
+    }
     public enum RootDetection {
       /// I Understand the Risk
       public static let acknowledgeButton = L10n.tr("Localizable", "splash_rootDetection_acknowledgeButton", fallback: "I Understand the Risk")
       /// It appears that your device might be rooted. To ensure the security of your Accounts and assets, using the Radix Wallet on rooted devices is not recommended. Please confirm if you wish to continue anyway at your own risk.
-      public static let title = L10n.tr("Localizable", "splash_rootDetection_title", fallback: "It appears that your device might be rooted. To ensure the security of your Accounts and assets, using the Radix Wallet on rooted devices is not recommended. Please confirm if you wish to continue anyway at your own risk.")
+      public static let messageAndroid = L10n.tr("Localizable", "splash_rootDetection_messageAndroid", fallback: "It appears that your device might be rooted. To ensure the security of your Accounts and assets, using the Radix Wallet on rooted devices is not recommended. Please confirm if you wish to continue anyway at your own risk.")
+      /// It appears that your device might be jailbroken. To ensure the security of your Accounts and assets, using the Radix Wallet on jailbroken devices is not recommended. Please confirm if you wish to continue anyway at your own risk.
+      public static let messageIOS = L10n.tr("Localizable", "splash_rootDetection_messageIOS", fallback: "It appears that your device might be jailbroken. To ensure the security of your Accounts and assets, using the Radix Wallet on jailbroken devices is not recommended. Please confirm if you wish to continue anyway at your own risk.")
+      /// Possible jailbreak detected
+      public static let titleIOS = L10n.tr("Localizable", "splash_rootDetection_titleIOS", fallback: "Possible jailbreak detected")
     }
   }
   public enum TransactionReview {
@@ -2170,18 +2388,18 @@ public enum L10n {
       return L10n.tr("Localizable", "transactionReview_xrdAmount", String(describing: p1), fallback: "%@ XRD")
     }
     public enum AccountDepositSettings {
-      /// Allow third parties to deposit *any asset* to this account.
-      public static let acceptAllRule = L10n.tr("Localizable", "transactionReview_accountDepositSettings_acceptAllRule", fallback: "Allow third parties to deposit *any asset* to this account.")
-      /// Allow third parties to deposit *only assets this account has already held*.
-      public static let acceptKnownRule = L10n.tr("Localizable", "transactionReview_accountDepositSettings_acceptKnownRule", fallback: "Allow third parties to deposit *only assets this account has already held*.")
+      /// Allow third parties to deposit **any asset** to this account.
+      public static let acceptAllRule = L10n.tr("Localizable", "transactionReview_accountDepositSettings_acceptAllRule", fallback: "Allow third parties to deposit **any asset** to this account.")
+      /// Allow third parties to deposit **only assets this account has already held**.
+      public static let acceptKnownRule = L10n.tr("Localizable", "transactionReview_accountDepositSettings_acceptKnownRule", fallback: "Allow third parties to deposit **only assets this account has already held**.")
       /// Allow
       public static let assetChangeAllow = L10n.tr("Localizable", "transactionReview_accountDepositSettings_assetChangeAllow", fallback: "Allow")
       /// Clear Exception
       public static let assetChangeClear = L10n.tr("Localizable", "transactionReview_accountDepositSettings_assetChangeClear", fallback: "Clear Exception")
       /// Disallow
       public static let assetChangeDisallow = L10n.tr("Localizable", "transactionReview_accountDepositSettings_assetChangeDisallow", fallback: "Disallow")
-      /// *Disallow* all deposits from third parties without your consent.
-      public static let denyAllRule = L10n.tr("Localizable", "transactionReview_accountDepositSettings_denyAllRule", fallback: "*Disallow* all deposits from third parties without your consent.")
+      /// **Disallow** all deposits from third parties without your consent.
+      public static let denyAllRule = L10n.tr("Localizable", "transactionReview_accountDepositSettings_denyAllRule", fallback: "**Disallow** all deposits from third parties without your consent.")
       /// Add Depositor
       public static let depositorChangeAdd = L10n.tr("Localizable", "transactionReview_accountDepositSettings_depositorChangeAdd", fallback: "Add Depositor")
       /// Remove Depositor

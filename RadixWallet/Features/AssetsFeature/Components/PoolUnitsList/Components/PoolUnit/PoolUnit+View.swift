@@ -75,7 +75,7 @@ extension PoolUnitResourceViewState {
 			}
 			guard poolUnitTotalSupply > 0 else {
 				loggerGlobal.error("Total supply is 0 for \(resourcesDetails.poolUnitResource.resource.resourceAddress.address)")
-				return "Total supply is 0 - could not calculate redemption value" // FIXME: strings
+				return L10n.Account.PoolUnits.noTotalSupply
 			}
 			let redemptionValue = poolUnit.resource.amount * (resourceDetails.amount / poolUnitTotalSupply)
 			let decimalPlaces = resourceDetails.resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility

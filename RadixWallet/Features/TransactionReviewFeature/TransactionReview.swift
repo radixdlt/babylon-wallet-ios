@@ -1171,8 +1171,7 @@ public struct TransactionReviewFailure: LocalizedError {
 	public let underylying: Swift.Error
 	public var errorDescription: String? {
 		let additionalInfo = if case TransactionFailure.failedToPrepareTXReview(.oneOfRecevingAccountsDoesNotAllowDeposits) = underylying {
-			// FIXME: strings
-			"\n\n One of the receiving accounts does not allow third-party deposits."
+			"\n\n" + L10n.Error.TransactionFailure.doesNotAllowThirdPartyDeposits
 		} else {
 			""
 		}

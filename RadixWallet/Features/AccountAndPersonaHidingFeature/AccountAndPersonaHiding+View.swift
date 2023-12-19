@@ -43,7 +43,7 @@ extension AccountAndPersonaHiding {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState) { viewStore in
 				VStack(spacing: .medium3) {
-					Text(L10n.AppSettings.EntityHiding.info)
+					Text(L10n.AppSettings.EntityHiding.text)
 						.textStyle(.body1Regular)
 						.foregroundColor(.app.gray2)
 						.flushedLeft

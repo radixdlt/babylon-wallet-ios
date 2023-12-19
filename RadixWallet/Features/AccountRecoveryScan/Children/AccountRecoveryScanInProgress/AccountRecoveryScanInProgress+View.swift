@@ -37,7 +37,7 @@ public extension AccountRecoveryScanInProgress {
 
 		var loadingState: ControlState {
 			status == .scanningNetworkForActiveAccounts
-				? .loading(.global(text: "Scanning network")) // FIXME: Strings
+				? .loading(.global(text: L10n.AccountRecoveryScan.InProgress.scanningNetwork))
 				: .enabled
 		}
 
@@ -53,18 +53,18 @@ public extension AccountRecoveryScanInProgress {
 			isScanInProgress ? .disabled : .enabled
 		}
 
-		// FIXME: Strings
 		var factorSourceDescription: String {
 			switch kind {
 			case .device:
 				if olympia {
-					"Olympia Seed Phrase" // FIXME: Strings
+					L10n.AccountRecoveryScan.InProgress.factorSourceOlympiaSeedPhrase
 				} else {
-					"Babylon Seed Phrase" // FIXME: Strings
+					L10n.AccountRecoveryScan.InProgress.factorSourceBabylonSeedPhrase
 				}
 			case .ledgerHQHardwareWallet:
-				"Ledger hardware wallet device" // FIXME: Strings
-			default: "Factor" // FIXME: Strings
+				L10n.AccountRecoveryScan.InProgress.factorSourceLedgerHardwareDevice
+			default:
+				L10n.AccountRecoveryScan.InProgress.factorSourceFallback
 			}
 		}
 	}
@@ -118,17 +118,17 @@ public extension AccountRecoveryScanInProgress {
 		@ViewBuilder
 		func scanInProgressView(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
 			VStack(alignment: .center, spacing: 0) {
-				Text("Scan in progress") // FIXME: Strings
+				Text(L10n.AccountRecoveryScan.InProgress.headerTitle)
 					.textStyle(.sheetTitle)
 					.foregroundColor(.app.gray1)
 					.padding(.bottom, .medium1)
 
-				Text("Scanning for Accounts that have been included in at least on transaction, using:") // FIXME: Strings
+				Text(L10n.AccountRecoveryScan.InProgress.headerSubtitle)
 					.textStyle(.body1Regular)
 					.foregroundColor(.app.gray1)
 					.padding(.bottom, .medium2)
 
-				Text(viewStore.factorSourceDescription) // FIXME: Strings
+				Text(LocalizedStringKey(viewStore.factorSourceDescription))
 					.textStyle(.body1HighImportance)
 					.foregroundColor(.app.gray1)
 
@@ -142,19 +142,19 @@ public extension AccountRecoveryScanInProgress {
 		func scanCompleteView(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
 			ScrollView {
 				VStack(alignment: .center, spacing: 0) {
-					Text("Scan Complete") // FIXME: Strings
+					Text(L10n.AccountRecoveryScan.ScanComplete.headerTitle)
 						.textStyle(.sheetTitle)
 						.foregroundColor(.app.gray1)
 						.padding(.bottom, .medium1)
 
-					Text("The first **\(viewStore.maxIndex)** potential Accounts from this signing factor were scanned. The following Accounts had at least one transaction:") // FIXME: Strings
+					Text(LocalizedStringKey(L10n.AccountRecoveryScan.ScanComplete.headerSubtitle(viewStore.maxIndex)))
 						.multilineTextAlignment(.center)
 						.textStyle(.body1Regular)
 						.foregroundColor(.app.gray1)
 						.padding(.bottom, .medium1)
 
 					if viewStore.active.isEmpty {
-						NoContentView("No new accounts found.") // FIXME: Strings
+						NoContentView(L10n.AccountRecoveryScan.ScanComplete.noAccounts)
 					} else {
 						VStack(alignment: .leading, spacing: .medium3) {
 							ForEach(viewStore.active) { account in
@@ -170,13 +170,13 @@ public extension AccountRecoveryScanInProgress {
 
 		@ViewBuilder
 		func footerContent(with viewStore: ViewStoreOf<AccountRecoveryScanInProgress>) -> some SwiftUI.View {
-			Button("Tap here to scan the next \(batchSize)") { // FIXME: Strings
+			Button(L10n.AccountRecoveryScan.ScanComplete.scanNextBatchButton(batchSize)) {
 				store.send(.view(.scanMore))
 			}
 			.buttonStyle(.alternativeRectangular)
 			.controlState(viewStore.buttonControlState)
 
-			Button("Continue") { // FIXME: Strings
+			Button(L10n.AccountRecoveryScan.ScanComplete.continueButton) {
 				store.send(.view(.continueTapped))
 			}
 			.buttonStyle(.primaryRectangular)

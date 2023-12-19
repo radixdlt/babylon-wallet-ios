@@ -51,7 +51,7 @@ extension SelectBackup {
 extension SelectBackup.View {
 	@MainActor
 	@ViewBuilder
-	private func coreView(_ store: StoreOf<SelectBackup>, with viewStore: ViewStoreOf<SelectBackup>) -> some SwiftUI.View {
+	private func coreView(_ store: StoreOf<SelectBackup>, with viewStore: ViewStoreOf<SelectBackup>) -> some View {
 		ScrollView {
 			VStack(spacing: .medium1) {
 				Text(L10n.RecoverProfileBackup.Header.title)
@@ -85,7 +85,7 @@ extension SelectBackup.View {
 	}
 
 	@MainActor
-	private func backupsList(with viewStore: ViewStoreOf<SelectBackup>) -> some SwiftUI.View {
+	private func backupsList(with viewStore: ViewStoreOf<SelectBackup>) -> some View {
 		// TODO: This is speculative design, needs to be updated once we have the proper design
 		VStack(spacing: .medium1) {
 			if let backupProfileHeaders = viewStore.backupProfileHeaders {
@@ -152,24 +152,22 @@ extension SelectBackup.View {
 	}
 
 	@MainActor
-	private func selectFileInsteadButton(with store: StoreOf<SelectBackup>) -> some SwiftUI.View {
+	private func selectFileInsteadButton(with store: StoreOf<SelectBackup>) -> some View {
 		secondaryButton(title: L10n.RecoverProfileBackup.ImportFileButton.title, store: store, action: .importFromFileInstead)
 	}
 
 	@MainActor
 	@ViewBuilder
-	private func restoreWithoutProfile(with store: StoreOf<SelectBackup>) -> some SwiftUI.View {
-		// FIXME: Strings
-		Text("Backup not available?")
+	private func restoreWithoutProfile(with store: StoreOf<SelectBackup>) -> some View {
+		Text(L10n.RecoverProfileBackup.backupNotAvailable)
 			.textStyle(.body1Header)
 			.foregroundColor(.app.gray1)
 
-		// FIXME: Strings
-		secondaryButton(title: "Other Restore Options", store: store, action: .otherRestoreOptionsTapped)
+		secondaryButton(title: L10n.RecoverProfileBackup.otherRestoreOptionsButton, store: store, action: .otherRestoreOptionsTapped)
 	}
 
 	@MainActor
-	private func secondaryButton(title: String, store: StoreOf<SelectBackup>, action: SelectBackup.ViewAction) -> some SwiftUI.View {
+	private func secondaryButton(title: String, store: StoreOf<SelectBackup>, action: SelectBackup.ViewAction) -> some View {
 		Button(title) {
 			store.send(.view(action))
 		}
