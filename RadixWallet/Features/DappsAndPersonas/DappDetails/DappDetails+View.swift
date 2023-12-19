@@ -83,7 +83,6 @@ private extension View {
 		return personaDetails(with: destinationStore)
 			.fungibleDetails(with: destinationStore)
 			.nonFungibleDetails(with: destinationStore)
-			.exportMnemonic(with: destinationStore)
 			.confirmDisconnectAlert(with: destinationStore)
 	}
 
@@ -111,15 +110,6 @@ private extension View {
 			state: /DappDetails.Destination.State.nonFungibleDetails,
 			action: DappDetails.Destination.Action.nonFungibleDetails,
 			content: { NonFungibleTokenDetails.View(store: $0) }
-		)
-	}
-
-	private func exportMnemonic(with destinationStore: PresentationStoreOf<DappDetails.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /DappDetails.Destination.State.exportMnemonic,
-			action: DappDetails.Destination.Action.exportMnemonic,
-			content: { ExportMnemonic.View(store: $0).inNavigationStack }
 		)
 	}
 
