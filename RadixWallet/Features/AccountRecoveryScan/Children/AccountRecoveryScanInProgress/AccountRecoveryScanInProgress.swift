@@ -55,6 +55,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			active: IdentifiedArrayOf<Profile.Network.Account>,
 			inactive: IdentifiedArrayOf<Profile.Network.Account>
 		)
+		case initiate
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -108,6 +109,29 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
+		case .initiate:
+			switch state.mode {
+			case .privateHD:
+				return derivePublicKeys(state: &state)
+			case .factorSourceWithID:
+				state.status = .loadingFactorSource
+				let id = state.factorSourceIDFromHash
+				state.mode = .factorSourceWithID(id: id, .loading)
+				return .run { [forOlympiaAccounts = state.forOlympiaAccounts] send in
+					let result = await TaskResult<IndicesUsedByFactorSource> {
+						try await factorSourcesClient.indicesOfEntitiesControlledByFactorSource(
+							.init(
+								entityKind: .account,
+								factorSourceID: id.embed(),
+								derivationPathScheme: forOlympiaAccounts ? .bip44Olympia : .cap26,
+								networkID: nil // read current, then we will update `state.networkID` with current.
+							)
+						)
+					}
+					await send(.internal(.loadIndicesUsedByFactorSourceResult(result)))
+				}
+			}
+
 		case let .loadIndicesUsedByFactorSourceResult(.failure(error)):
 			let errorMsg = "Failed to load indices used by factor source, error: \(error)"
 			loggerGlobal.error(.init(stringLiteral: errorMsg))
@@ -149,27 +173,8 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 				return .none
 			}
 
-			switch state.mode {
-			case .privateHD:
-				return derivePublicKeys(state: &state)
-			case .factorSourceWithID:
-				state.status = .loadingFactorSource
-				let id = state.factorSourceIDFromHash
-				state.mode = .factorSourceWithID(id: id, .loading)
-				return .run { [forOlympiaAccounts = state.forOlympiaAccounts] send in
-					let result = await TaskResult<IndicesUsedByFactorSource> {
-						try await factorSourcesClient.indicesOfEntitiesControlledByFactorSource(
-							.init(
-								entityKind: .account,
-								factorSourceID: id.embed(),
-								derivationPathScheme: forOlympiaAccounts ? .bip44Olympia : .cap26,
-								networkID: nil // read current, then we will update `state.networkID` with current.
-							)
-						)
-					}
-					await send(.internal(.loadIndicesUsedByFactorSourceResult(result)))
-				}
-			}
+			/// A temporary hack to fix ABW-2657. When the deriving public keys slide up will not show
+			return delayedShortEffect(for: .internal(.initiate))
 
 		case .scanMore:
 			loggerGlobal.debug("Scan more requested.")
