@@ -31,33 +31,33 @@ jobs:
     runs-on: macos-13-xlarge
 
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+      - uses: RDXWorks-actions/checkout@main
       - name: Configure AWS credentials to fetch secrets
-        uses: aws-actions/configure-aws-credentials@97271860067ec931c45b8d104fbf0d15954ab85c # branch v1-node16
+        uses: RDXWorks-actions/configure-aws-credentials@main
         with:
           role-to-assume: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
           aws-region: "eu-west-2"
           role-session-name: 'babylon-wallet-ios-${{ github.run_id }}-${{ github.run_attempt }}'
       - name: Fetch AWS secrets
-        uses: aws-actions/aws-secretsmanager-get-secrets@022e8919774ecb75e8e375656d7b1898936ab878 # v1.0.4
+        uses: RDXWorks-actions/aws-secretsmanager-get-secrets@main
         with:
           secret-ids: |
             WALLET, ${{ secrets.AWS_SECRET_NAME_WALLET }}
           parse-json-secrets: true
       - name: Fetch AWS secrets
-        uses: aws-actions/aws-secretsmanager-get-secrets@022e8919774ecb75e8e375656d7b1898936ab878 # v1.0.4
+        uses: RDXWorks-actions/aws-secretsmanager-get-secrets@main
         with:
           secret-ids: |
             SWIFT_SSH, ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
           parse-json-secrets: true
       - name: Fetch AWS secrets
-        uses: aws-actions/aws-secretsmanager-get-secrets@022e8919774ecb75e8e375656d7b1898936ab878 # v1.0.4
+        uses: RDXWorks-actions/aws-secretsmanager-get-secrets@main
         with:
           secret-ids: |
             FASTLANE_MATCH_REPO_SSH_KEY, ${{ secrets.AWS_SECRET_NAME_WALLET_FASTLANE_SSH }}
           parse-json-secrets: true
       - name: Fetch webhook AWS secrets
-        uses: aws-actions/aws-secretsmanager-get-secrets@022e8919774ecb75e8e375656d7b1898936ab878 # v1.0.4
+        uses: RDXWorks-actions/aws-secretsmanager-get-secrets@main
         with:
           secret-ids: |
             WEBHOOK, ${{ secrets.AWS_SECRET_NAME_SLACK_WEBHOOK }}
@@ -67,11 +67,11 @@ jobs:
           ssh-private-key: |
             ${{ env.SWIFT_SSH }}
             ${{ env.FASTLANE_MATCH_REPO_SSH_KEY }}
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+      - uses: RDXWorks-actions/checkout@main
         with:
           token: ${{ env.WALLET_RADIX_BOT_PAT }}
 
-      - uses: ruby/setup-ruby@v1
+      - uses: RDXWorks-actions/setup-ruby@master
         with:
           ruby-version: 3.1.2
           bundler-cache: true
