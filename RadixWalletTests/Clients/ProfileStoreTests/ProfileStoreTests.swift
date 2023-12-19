@@ -1137,7 +1137,7 @@ extension ProfileStoreExistingProfileTests {
 			func when(_ d: inout DependencyValues) {
 				d.overlayWindowClient.scheduleAlertAwaitAction = { alert in
 					XCTAssertNoDifference(
-						alert.message, overlayClientProfileStoreOwnershipConflictTextState
+						alert.message, TextState(overlayClientProfileStoreOwnershipConflictTextState)
 					)
 					alertScheduled.fulfill()
 					return action
