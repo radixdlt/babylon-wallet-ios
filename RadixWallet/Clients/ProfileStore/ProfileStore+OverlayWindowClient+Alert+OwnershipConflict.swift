@@ -28,11 +28,13 @@ extension OverlayWindowClient.Item.AlertState {
 				)
 			},
 			message: {
-				TextState(L10n.Splash.ProfileOnAnotherDeviceAlert.message)
+				TextState(overlayClientProfileStoreOwnershipConflictTextState)
 			}
 		)
 	}
 }
+
+let overlayClientProfileStoreOwnershipConflictTextState = L10n.Splash.ProfileOnAnotherDeviceAlert.message
 
 extension OverlayWindowClient.Item.AlertAction {
 	static var claimAndContinueUseOnThisPhone: Self {

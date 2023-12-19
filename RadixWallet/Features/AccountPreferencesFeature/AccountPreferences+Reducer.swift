@@ -165,7 +165,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	}
 }
 
-private extension OverlayWindowClient.Item.HUD {
+extension OverlayWindowClient.Item.HUD {
 	static let accountHidden = Self(text: L10n.AccountSettings.accountHidden)
 }
 
