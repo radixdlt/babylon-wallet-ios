@@ -286,7 +286,7 @@ extension DappDetails.View {
 					Separator()
 						.padding(.bottom, .small2)
 
-					PersonaListCoreView(store: store, tappable: tappablePersonas)
+					PersonaListCoreView(store: store, tappable: tappablePersonas, showShield: false)
 				} else {
 					Text(L10n.AuthorizedDapps.DAppDetails.noPersonasHeading)
 						.sectionHeading
