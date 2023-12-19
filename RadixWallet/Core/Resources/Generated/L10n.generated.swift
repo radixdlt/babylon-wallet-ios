@@ -98,8 +98,8 @@ public enum L10n {
       public static let factorSourceLedgerHardwareDevice = L10n.tr("Localizable", "accountRecoveryScan_inProgress_factorSourceLedgerHardwareDevice", fallback: "**Ledger hardware wallet device**")
       /// **Olympia Seed Phrase**
       public static let factorSourceOlympiaSeedPhrase = L10n.tr("Localizable", "accountRecoveryScan_inProgress_factorSourceOlympiaSeedPhrase", fallback: "**Olympia Seed Phrase**")
-      /// Scanning for Accounts that have been included in at least on transaction, using:
-      public static let headerSubtitle = L10n.tr("Localizable", "accountRecoveryScan_inProgress_headerSubtitle", fallback: "Scanning for Accounts that have been included in at least on transaction, using:")
+      /// Scanning for Accounts that have been included in at least one transaction, using:
+      public static let headerSubtitle = L10n.tr("Localizable", "accountRecoveryScan_inProgress_headerSubtitle", fallback: "Scanning for Accounts that have been included in at least one transaction, using:")
       /// Scanning in progress
       public static let headerTitle = L10n.tr("Localizable", "accountRecoveryScan_inProgress_headerTitle", fallback: "Scanning in progress")
       /// Unnamed
@@ -1283,42 +1283,22 @@ public enum L10n {
     }
   }
   public enum DerivePublicKeys {
-    public enum AccountRecoveryScan {
-      /// Authenticate to your phone to complete using your phone’s signing key.
-      public static let subtitle = L10n.tr("Localizable", "derivePublicKeys_accountRecoveryScan_subtitle", fallback: "Authenticate to your phone to complete using your phone’s signing key.")
-      /// Deriving Accounts
-      public static let title = L10n.tr("Localizable", "derivePublicKeys_accountRecoveryScan_title", fallback: "Deriving Accounts")
-    }
-    public enum CreateAccount {
-      /// Deriving public keys
-      public static let subtitle = L10n.tr("Localizable", "derivePublicKeys_createAccount_subtitle", fallback: "Deriving public keys")
-      /// Creating Account
-      public static let title = L10n.tr("Localizable", "derivePublicKeys_createAccount_title", fallback: "Creating Account")
-    }
-    public enum CreateAuthSignKeyForAccount {
-      /// Authenticate to your phone to complete using your phone’s signing key.
-      public static let subtitle = L10n.tr("Localizable", "derivePublicKeys_createAuthSignKeyForAccount_subtitle", fallback: "Authenticate to your phone to complete using your phone’s signing key.")
-      /// Creating Key
-      public static let title = L10n.tr("Localizable", "derivePublicKeys_createAuthSignKeyForAccount_title", fallback: "Creating Key")
-    }
-    public enum CreateAuthSignKeyForPersona {
-      /// Authenticate to your phone to complete using your phone’s signing key.
-      public static let subtitle = L10n.tr("Localizable", "derivePublicKeys_createAuthSignKeyForPersona_subtitle", fallback: "Authenticate to your phone to complete using your phone’s signing key.")
-      /// Creating Key
-      public static let title = L10n.tr("Localizable", "derivePublicKeys_createAuthSignKeyForPersona_title", fallback: "Creating Key")
-    }
-    public enum CreatePersona {
-      /// Authenticate to your phone to complete using your phone’s signing key.
-      public static let subtitle = L10n.tr("Localizable", "derivePublicKeys_createPersona_subtitle", fallback: "Authenticate to your phone to complete using your phone’s signing key.")
-      /// Creating Persona
-      public static let title = L10n.tr("Localizable", "derivePublicKeys_createPersona_title", fallback: "Creating Persona")
-    }
-    public enum ImportLegacyAccount {
-      /// Authenticate to your phone to complete using your phone’s signing key.
-      public static let subtitle = L10n.tr("Localizable", "derivePublicKeys_importLegacyAccount_subtitle", fallback: "Authenticate to your phone to complete using your phone’s signing key.")
-      /// Deriving Accounts
-      public static let title = L10n.tr("Localizable", "derivePublicKeys_importLegacyAccount_title", fallback: "Deriving Accounts")
-    }
+    /// Authenticate to your phone to sign.
+    public static let subtitleDevice = L10n.tr("Localizable", "derivePublicKeys_subtitleDevice", fallback: "Authenticate to your phone to sign.")
+    /// Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension. Complete signing on the device.
+    public static let subtitleLedger = L10n.tr("Localizable", "derivePublicKeys_subtitleLedger", fallback: "Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension. Complete signing on the device.")
+    /// Deriving Accounts
+    public static let titleAccountRecoveryScan = L10n.tr("Localizable", "derivePublicKeys_titleAccountRecoveryScan", fallback: "Deriving Accounts")
+    /// Creating Account
+    public static let titleCreateAccount = L10n.tr("Localizable", "derivePublicKeys_titleCreateAccount", fallback: "Creating Account")
+    /// Creating Key
+    public static let titleCreateAuthSignKeyForAccount = L10n.tr("Localizable", "derivePublicKeys_titleCreateAuthSignKeyForAccount", fallback: "Creating Key")
+    /// Creating Key
+    public static let titleCreateAuthSignKeyForPersona = L10n.tr("Localizable", "derivePublicKeys_titleCreateAuthSignKeyForPersona", fallback: "Creating Key")
+    /// Creating Persona
+    public static let titleCreatePersona = L10n.tr("Localizable", "derivePublicKeys_titleCreatePersona", fallback: "Creating Persona")
+    /// Deriving Accounts
+    public static let titleImportLegacyAccount = L10n.tr("Localizable", "derivePublicKeys_titleImportLegacyAccount", fallback: "Deriving Accounts")
   }
   public enum DisplayMnemonics {
     /// Write Down this Seed Phrase

@@ -974,24 +974,6 @@ You can always change the guarantee from this default in each transaction.";
 "recoverWalletWithoutProfile_complete_continueButton" = "Continue";
 
 
-"derivePublicKeys_createAccount_title" = "Creating Account";
-"derivePublicKeys_createAccount_subtitle" = "Deriving public keys";
-
-"derivePublicKeys_createPersona_title" = "Creating Persona";
-"derivePublicKeys_createPersona_subtitle" = "Authenticate to your phone to complete using your phone’s signing key.";
-
-"derivePublicKeys_importLegacyAccount_title" = "Deriving Accounts";
-"derivePublicKeys_importLegacyAccount_subtitle" = "Authenticate to your phone to complete using your phone’s signing key.";
-
-"derivePublicKeys_accountRecoveryScan_title" = "Deriving Accounts";
-"derivePublicKeys_accountRecoveryScan_subtitle" = "Authenticate to your phone to complete using your phone’s signing key.";
-
-"derivePublicKeys_createAuthSignKeyForAccount_title" = "Creating Key";
-"derivePublicKeys_createAuthSignKeyForAccount_subtitle" = "Authenticate to your phone to complete using your phone’s signing key.";
-
-"derivePublicKeys_createAuthSignKeyForPersona_title" = "Creating Key";
-"derivePublicKeys_createAuthSignKeyForPersona_subtitle" = "Authenticate to your phone to complete using your phone’s signing key.";
-
 "settings_importFromLegacyWalletHeader_importLegacyAccounts" = "Import Legacy Accounts";
 
 "settings_personasSeedPhrasePrompt" = "Please write down the seed phrase for your Personas";
@@ -1018,3 +1000,17 @@ You can always change the guarantee from this default in each transaction.";
 "splash_rootDetection_acknowledgeButton" = "I Understand the Risk";
 
 "importMnemonic_verificationSuccess" = "Success";
+
+
+
+
+
+"derivePublicKeys_titleCreateAccount" = "Creating Account";
+"derivePublicKeys_titleCreatePersona" = "Creating Persona";
+"derivePublicKeys_titleImportLegacyAccount" = "Deriving Accounts";
+"derivePublicKeys_titleAccountRecoveryScan" = "Deriving Accounts";
+"derivePublicKeys_titleCreateAuthSignKeyForAccount" = "Creating Key";
+"derivePublicKeys_titleCreateAuthSignKeyForPersona" = "Creating Key";
+
+"derivePublicKeys_subtitleDevice" = "Authenticate to your phone to sign.";
+"derivePublicKeys_subtitleLedger" = "Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension. Complete signing on the device.";
