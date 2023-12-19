@@ -59,17 +59,12 @@ private extension View {
 		)
 	}
 
-	@MainActor
-	private func exportMnemonic(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination>) -> some SwiftUI.View {
+	private func exportMnemonic(with destinationStore: PresentationStoreOf<PersonasCoordinator.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
 			state: /PersonasCoordinator.Destination.State.exportMnemonic,
 			action: PersonasCoordinator.Destination.Action.exportMnemonic,
-			content: { childStore in
-				NavigationStack {
-					ExportMnemonic.View(store: childStore)
-				}
-			}
+			content: { ExportMnemonic.View(store: $0).inNavigationStack }
 		)
 	}
 }

@@ -9,6 +9,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+	@Dependency(\.personasClient) var personasClient
 
 	public struct FailedToLoadMetadata: Error, Hashable {}
 
@@ -111,10 +112,11 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case resourcesLoaded(Loadable<State.Resources>)
 		case associatedDappsLoaded(Loadable<[OnLedgerEntity.AssociatedDapp]>)
 		case dAppUpdated(Profile.Network.AuthorizedDappDetailed)
+		case finishedWritingDownMnemonicForPersonas(ids: Set<Profile.Network.Persona.ID>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case personas(PersonaList.Action)
+		case personaList(PersonaList.Action)
 	}
 
 	// MARK: - Destination
@@ -125,6 +127,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			case fungibleDetails(FungibleTokenDetails.State)
 			case nonFungibleDetails(NonFungibleTokenDetails.State)
 			case dappDetails(DappDetails.State)
+			case exportMnemonic(ExportMnemonic.State)
 			case confirmDisconnectAlert(AlertState<Action.ConfirmDisconnectAlert>)
 		}
 
@@ -133,6 +136,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			case fungibleDetails(FungibleTokenDetails.Action)
 			case nonFungibleDetails(NonFungibleTokenDetails.Action)
 			case dappDetails(DappDetails.Action)
+			case exportMnemonic(ExportMnemonic.Action)
 			case confirmDisconnectAlert(ConfirmDisconnectAlert)
 
 			public enum ConfirmDisconnectAlert: Sendable, Equatable {
@@ -151,6 +155,9 @@ public struct DappDetails: Sendable, FeatureReducer {
 			Scope(state: /State.nonFungibleDetails, action: /Action.nonFungibleDetails) {
 				NonFungibleTokenDetails()
 			}
+			Scope(state: /State.exportMnemonic, action: /Action.exportMnemonic) {
+				ExportMnemonic()
+			}
 		}
 	}
 
@@ -167,7 +174,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.personaList, action: /Action.child .. ChildAction.personas) {
+		Scope(state: \.personaList, action: /Action.child .. ChildAction.personaList) {
 			PersonaList()
 		}
 		Reduce(core)
@@ -234,13 +241,16 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .personas(.delegate(.openDetails(persona))):
+		case let .personaList(.delegate(.openDetails(persona))):
 			guard let dApp = state.authorizedDapp, let detailedPersona = dApp.detailedAuthorizedPersonas[id: persona.id] else { return .none }
 			let personaDetailsState = PersonaDetails.State(.dApp(dApp, persona: detailedPersona))
 			state.destination = .personaDetails(personaDetailsState)
 			return .none
 
-		case .personas:
+		case let .personaList(.delegate(.exportMnemonic(persona))):
+			return exportMnemonic(controlling: persona, state: &state)
+
+		case .personaList:
 			return .none
 		}
 	}
@@ -277,6 +287,14 @@ public struct DappDetails: Sendable, FeatureReducer {
 			state.personaList = .init(dApp: dApp)
 
 			return .none
+
+		case let .finishedWritingDownMnemonicForPersonas(ids):
+			state.personaList.personas.mutateAll { persona in
+				if ids.contains(persona.id) {
+					persona.shouldWriteDownMnemonic = false
+				}
+			}
+			return .none
 		}
 	}
 
@@ -297,6 +315,22 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case .nonFungibleDetails(.delegate(.dismiss)):
 			state.destination = nil
 			return .none
+
+		case let .exportMnemonic(.delegate(.doneViewing(idOfBackedUpFactorSource))):
+			state.destination = nil
+			guard let idOfBackedUpFactorSource else {
+				return .none
+			}
+
+			return .run { send in
+				let personas = try await personasClient.getPersonas()
+				let personasToRefresh = personas.filter {
+					$0.deviceFactorSourceID == idOfBackedUpFactorSource
+				}
+				.map(\.id)
+
+				await send(.internal(.finishedWritingDownMnemonicForPersonas(ids: Set(personasToRefresh))))
+			}
 
 		case .confirmDisconnectAlert(.confirmTapped):
 			assert(state.authorizedDapp != nil, "Can only disconnect a dApp that has been authorized")
@@ -376,6 +410,22 @@ public struct DappDetails: Sendable, FeatureReducer {
 		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}
+	}
+
+	private func exportMnemonic(
+		controlling persona: Profile.Network.Persona,
+		state: inout State
+	) -> Effect<Action> {
+		exportMnemonic(
+			controlling: persona,
+			onSuccess: {
+				state.destination = .exportMnemonic(.export(
+					$0,
+					title: L10n.RevealSeedPhrase.title,
+					context: .fromBackupPrompt
+				))
+			}
+		)
 	}
 }
 
