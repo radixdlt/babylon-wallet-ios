@@ -38,7 +38,7 @@ extension TransactionReviewDappsUsed {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(alignment: .trailing, spacing: .medium2) {
+				VStack(spacing: .medium2) {
 					Button {
 						viewStore.send(.expandTapped)
 					} label: {
@@ -70,13 +70,9 @@ extension TransactionReviewDappsUsed {
 					Text(L10n.TransactionReview.usingDappsHeading)
 						.textStyle(.body1Header)
 						.foregroundColor(.app.gray2)
+						.textCase(.uppercase)
 					Image(asset: isExpanded ? AssetResource.chevronUp : AssetResource.chevronDown)
 						.renderingMode(.original)
-				}
-				.background {
-					Rectangle()
-						.fill(.app.gray5)
-						.blur(radius: 2)
 				}
 			}
 		}
@@ -93,37 +89,31 @@ extension TransactionReviewDappsUsed {
 			let action: (TransactionReview.DappEntity.ID) -> Void
 
 			var body: some SwiftUI.View {
-				HStack(spacing: 0) {
-					switch viewState {
-					case let .known(name, url, id):
-						Button {
-							action(id)
-						} label: {
-							HStack(spacing: 0) {
-								DappThumbnail(.known(url), size: .smaller)
-									.padding(.trailing, .small2)
-								Text(name)
-									.lineLimit(2)
+				Card {
+					HStack(spacing: 0) {
+						switch viewState {
+						case let .known(name, url, id):
+							Button {
+								action(id)
+							} label: {
+								HStack(spacing: 0) {
+									DappThumbnail(.known(url), size: .smaller)
+										.padding(.trailing, .small2)
+									Text(name)
+										.textStyle(.body1Header)
+										.foregroundColor(.app.gray1)
+										.lineLimit(2)
+								}
 							}
+						case let .unknown(count):
+							DappThumbnail(.unknown, size: .smaller)
+								.padding(.trailing, .small2)
+							Text(L10n.TransactionReview.unknownComponents(count))
+								.lineLimit(2)
 						}
-					case let .unknown(count):
-						DappThumbnail(.unknown, size: .smaller)
-							.padding(.trailing, .small2)
-						Text(L10n.TransactionReview.unknownComponents(count))
-							.lineLimit(2)
+						Spacer()
 					}
-
-					Spacer(minLength: 0)
-				}
-				.lineSpacing(0)
-				.textStyle(.body2HighImportance)
-				.foregroundColor(.app.gray2)
-				.multilineTextAlignment(.leading)
-				.padding(.small2)
-				.frame(width: dAppBoxWidth)
-				.background {
-					RoundedRectangle(cornerRadius: .small2)
-						.stroke(.app.gray3, style: .transactionReview)
+					.frame(minWidth: .infinity, minHeight: .standardButtonHeight)
 				}
 			}
 		}

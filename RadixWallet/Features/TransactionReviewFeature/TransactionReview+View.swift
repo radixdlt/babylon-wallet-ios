@@ -215,31 +215,9 @@ extension TransactionReview {
 
 		@ViewBuilder
 		private func usingDappsSection(for viewStore: ViewStoreOf<TransactionReview>) -> some SwiftUI.View {
-			VStack(alignment: .trailing, spacing: 0) {
-				let usedDappsStore = store.scope(state: \.dAppsUsed) { .child(.dAppsUsed($0)) }
-				IfLetStore(usedDappsStore) { childStore in
-					TransactionReviewDappsUsed.View(store: childStore, isExpanded: viewStore.isExpandedDappUsed)
-						.padding(.top, viewStore.hasMessageOrWithdrawals ? .medium2 : 0)
-						.padding(.bottom, viewStore.hasDeposits ? .medium2 : 0)
-				} else: {
-					if viewStore.hasMessageOrWithdrawals, viewStore.hasDeposits {
-						FixedSpacer(height: .medium2)
-					}
-				}
-
-				if viewStore.hasDeposits {
-					TransactionHeading(L10n.TransactionReview.depositsHeading)
-						.padding(.bottom, .small2)
-				}
-			}
-			.frame(maxWidth: .infinity, alignment: .trailing)
-			.background(alignment: .trailing) {
-				if viewStore.hasMessageOrWithdrawals, viewStore.hasDeposits {
-					VLine()
-						.stroke(.app.gray3, style: .transactionReview)
-						.frame(width: 1)
-						.padding(.trailing, SpeechbubbleShape.triangleInset)
-				}
+			let usedDappsStore = store.scope(state: \.dAppsUsed) { .child(.dAppsUsed($0)) }
+			IfLetStore(usedDappsStore) { childStore in
+				TransactionReviewDappsUsed.View(store: childStore, isExpanded: viewStore.isExpandedDappUsed)
 			}
 		}
 
@@ -247,7 +225,11 @@ extension TransactionReview {
 		private var depositsSection: some SwiftUI.View {
 			let depositsStore = store.scope(state: \.deposits) { .child(.deposits($0)) }
 			IfLetStore(depositsStore) { childStore in
-				TransactionReviewAccounts.View(store: childStore)
+				VStack(alignment: .leading) {
+					TransactionHeading(L10n.TransactionReview.depositsHeading)
+						.padding(.bottom, .small2)
+					TransactionReviewAccounts.View(store: childStore)
+				}
 			}
 		}
 
