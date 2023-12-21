@@ -198,7 +198,7 @@ extension TransactionClient {
 			/// If notary is signatory, count the signature of the notary that will be added.
 			let signaturesCount = transactionSigners.notaryIsSignatory ? 1 : signingFactors.expectedSignatureCount
 			var transactionFee = try TransactionFee(
-				executionAnalysis: analyzedManifestToReview,
+				executionSummary: analyzedManifestToReview,
 				signaturesCount: signaturesCount,
 				notaryIsSignatory: transactionSigners.notaryIsSignatory,
 				includeLockFee: false // Calculate without LockFee cost. It is yet to be determined if LockFe will be added or not

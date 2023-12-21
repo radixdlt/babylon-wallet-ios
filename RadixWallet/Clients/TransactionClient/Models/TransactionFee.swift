@@ -20,25 +20,25 @@ public struct TransactionFee: Hashable, Sendable {
 	}
 
 	public init(
-		executionAnalysis: ExecutionSummary,
+		executionSummary: ExecutionSummary,
 		signaturesCount: Int,
 		notaryIsSignatory: Bool,
 		includeLockFee: Bool
 	) throws {
 		let feeSummary: FeeSummary = try .init(
-			executionCost: executionAnalysis.feeSummary.executionCost,
-			finalizationCost: executionAnalysis.feeSummary.finalizationCost,
-			storageExpansionCost: executionAnalysis.feeSummary.storageExpansionCost,
-			royaltyCost: executionAnalysis.feeSummary.royaltyCost,
-			guaranteesCost: executionAnalysis.guranteesCost(),
+			executionCost: executionSummary.feeSummary.executionCost,
+			finalizationCost: executionSummary.feeSummary.finalizationCost,
+			storageExpansionCost: executionSummary.feeSummary.storageExpansionCost,
+			royaltyCost: executionSummary.feeSummary.royaltyCost,
+			guaranteesCost: executionSummary.guranteesCost(),
 			signaturesCost: PredefinedFeeConstants.signaturesCost(signaturesCount),
 			lockFeeCost: includeLockFee ? PredefinedFeeConstants.lockFeeInstructionCost : .zero,
 			notarizingCost: PredefinedFeeConstants.notarizingCost(notaryIsSignatory)
 		)
 
 		let feeLocks: FeeLocks = .init(
-			nonContingentLock: executionAnalysis.feeLocks.lock,
-			contingentLock: executionAnalysis.feeLocks.contingentLock
+			nonContingentLock: executionSummary.feeLocks.lock,
+			contingentLock: executionSummary.feeLocks.contingentLock
 		)
 
 		self.init(

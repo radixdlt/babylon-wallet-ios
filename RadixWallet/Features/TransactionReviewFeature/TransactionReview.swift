@@ -319,7 +319,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			state.destination = .customizeFees(.init(
 				reviewedTransaction: reviewedTransaction,
-				manifest: reviewedTransaction.executionSummary,
+				executionSummary: reviewedTransaction.executionSummary,
 				signingPurpose: .signTransaction(state.signTransactionPurpose)
 			))
 			return .none
