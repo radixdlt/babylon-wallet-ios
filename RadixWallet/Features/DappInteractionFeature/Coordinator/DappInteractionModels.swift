@@ -13,7 +13,7 @@ extension DappInteraction {
 /// Metadata for a dapp, either from a request or fetched from ledger.
 /// not to be confused with `P2P.Dapp.Request.Metadata` which is the
 /// associated value of one of the cases of this enum.
-enum DappMetadata: Sendable, Hashable {
+public enum DappMetadata: Sendable, Hashable {
 	/// The metadata sent with the request from the Dapp.
 	/// We only allow this case `request` to be passed around if `isDeveloperModeEnabled` is `true`.
 	case request(P2P.Dapp.Request.Metadata)
@@ -26,7 +26,7 @@ enum DappMetadata: Sendable, Hashable {
 
 extension DappMetadata {
 	static let wallet: Wallet = .init()
-	struct Wallet: Sendable, Hashable {
+	public struct Wallet: Sendable, Hashable {
 		let origin: DappOrigin = .wallet
 		let name: NonEmptyString = "Radix Wallet"
 		let description: String? = nil
@@ -37,7 +37,7 @@ extension DappMetadata {
 // MARK: DappMetadata.Ledger
 extension DappMetadata {
 	/// A detailed DappMetaData fetched from Ledger.
-	struct Ledger: Sendable, Hashable, Codable {
+	public struct Ledger: Sendable, Hashable, Codable {
 		static let defaultName = NonEmptyString(rawValue: L10n.DAppRequest.Metadata.unknownName)!
 
 		let origin: P2P.Dapp.Request.Metadata.Origin
@@ -77,6 +77,13 @@ extension DappMetadata {
 			return nil
 		}
 		return fromLedgerDappMetadata.thumbnail
+	}
+
+	public var ledger: Ledger? {
+		guard case let .ledger(fromLedgerDappMetadata) = self else {
+			return nil
+		}
+		return fromLedgerDappMetadata
 	}
 }
 

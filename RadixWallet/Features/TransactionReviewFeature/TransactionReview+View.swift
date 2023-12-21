@@ -33,7 +33,8 @@ extension TransactionReview.State {
 			canApproveTX: canApproveTX && reviewedTransaction?.feePayingValidation.wrappedValue == .valid,
 			sliderResetDate: sliderResetDate,
 			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction?.transaction != .nonConforming,
-			viewRawTransactionButtonState: reviewedTransaction?.feePayer.isSuccess == true ? .enabled : .disabled
+			viewRawTransactionButtonState: reviewedTransaction?.feePayer.isSuccess == true ? .enabled : .disabled,
+			proposingDappMetadata: proposingDappMetadata
 		)
 	}
 
@@ -60,6 +61,7 @@ extension TransactionReview {
 		let sliderResetDate: Date
 		let canToggleViewMode: Bool
 		let viewRawTransactionButtonState: ControlState
+		let proposingDappMetadata: DappMetadata.Ledger?
 
 		var approvalSliderControlState: ControlState {
 			// TODO: Is this the logic we want?
@@ -104,12 +106,7 @@ extension TransactionReview {
 		private func coreView(with viewStore: ViewStoreOf<TransactionReview>) -> some SwiftUI.View {
 			ScrollView(showsIndicators: false) {
 				VStack(spacing: 0) {
-					Text(L10n.TransactionReview.title)
-						.textStyle(.sheetTitle)
-						.lineLimit(2)
-						.multilineTextAlignment(.leading)
-						.foregroundColor(.app.gray1)
-						.flushedLeft
+					header(viewStore.proposingDappMetadata)
 						.padding(.horizontal, .medium3)
 						.padding(.bottom, .medium3)
 						.background {
@@ -166,6 +163,30 @@ extension TransactionReview {
 		}
 
 		private let shadowColor: Color = .app.gray2.opacity(0.4)
+
+		@ViewBuilder
+		private func header(_ proposingDappMetadata: DappMetadata.Ledger?) -> some SwiftUI.View {
+			VStack(alignment: .leading) {
+				HStack {
+					Text(L10n.TransactionReview.title)
+						.textStyle(.sheetTitle)
+						.lineLimit(2)
+						.multilineTextAlignment(.leading)
+						.foregroundColor(.app.gray1)
+
+					Spacer(minLength: 0)
+					if let thumbnail = proposingDappMetadata?.thumbnail {
+						DappThumbnail(.known(thumbnail), size: .medium)
+					}
+				}
+
+				if let name = proposingDappMetadata?.name {
+					Text("Proposed by \(name.rawValue)")
+						.textStyle(.body2HighImportance)
+						.foregroundColor(.app.gray1)
+				}
+			}
+		}
 
 		@ViewBuilder
 		private func messageSection(with message: String?) -> some SwiftUI.View {
@@ -515,7 +536,8 @@ extension TransactionReview.State {
 		nonce: .zero,
 		signTransactionPurpose: .manifestFromDapp,
 		message: .none,
-		isWalletTransaction: false
+		isWalletTransaction: false,
+		proposingDappMetadata: nil
 	)
 }
 #endif
