@@ -365,6 +365,7 @@
 "dAppRequest_personalDataBox_edit" = "Edit";
 "dAppRequest_personalDataBox_requiredInformation" = "Required information:";
 "transactionReview_title" = "Review Your Transaction";
+"transactionReview_proposingDappSubtitle" = "Proposed by %@";
 "transactionReview_transferTitle" = "Review Your Transfer";
 "transactionReview_approveButtonTitle" = "Approve";
 "transactionReview_customizeGuaranteesButtonTitle" = "Customize Guarantees";
