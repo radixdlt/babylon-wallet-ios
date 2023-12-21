@@ -25,8 +25,7 @@ extension TransactionReview.State {
 				return nil
 			}(),
 			isExpandedDappUsed: dAppsUsed?.isExpanded == true,
-			hasMessageOrWithdrawals: message != .none || withdrawals != nil,
-			hasDeposits: deposits != nil,
+			showTransferLine: withdrawals != nil && deposits != nil,
 			viewControlState: viewControlState,
 			rawTransaction: displayMode.rawTransaction,
 			showApprovalSlider: reviewedTransaction != nil,
@@ -52,8 +51,7 @@ extension TransactionReview {
 	public struct ViewState: Equatable {
 		let message: String?
 		let isExpandedDappUsed: Bool
-		let hasMessageOrWithdrawals: Bool
-		let hasDeposits: Bool
+		let showTransferLine: Bool
 		let viewControlState: ControlState
 		let rawTransaction: String?
 		let showApprovalSlider: Bool
@@ -117,15 +115,21 @@ extension TransactionReview {
 						RawTransactionView(transaction: rawTransaction)
 					} else {
 						VStack(spacing: 0) {
-							VStack(spacing: .medium2) {
-								messageSection(with: viewStore.message)
+							messageSection(with: viewStore.message)
 
-								withdrawalsSection
+							withdrawalsSection
+							Group {
+								usingDappsSection(for: viewStore)
+								depositsSection
 							}
-
-							usingDappsSection(for: viewStore)
-
-							depositsSection
+							.background(alignment: .trailing) {
+								if viewStore.showTransferLine {
+									VLine()
+										.stroke(.app.gray3, style: .transactionReview)
+										.frame(width: 1)
+										.padding(.trailing, .huge3)
+								}
+							}
 
 							accountDepositSettingsSection
 						}
@@ -195,7 +199,6 @@ extension TransactionReview {
 			if let message {
 				VStack(spacing: .small2) {
 					TransactionHeading(L10n.TransactionReview.messageHeading)
-
 					TransactionMessageView(message: message)
 				}
 			}
@@ -207,7 +210,6 @@ extension TransactionReview {
 			IfLetStore(withdrawalsStore) { childStore in
 				VStack(spacing: .small2) {
 					TransactionHeading(L10n.TransactionReview.withdrawalsHeading)
-
 					TransactionReviewAccounts.View(store: childStore)
 				}
 			}
