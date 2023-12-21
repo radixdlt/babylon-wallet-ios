@@ -218,6 +218,7 @@ extension TransactionReview {
 			let usedDappsStore = store.scope(state: \.dAppsUsed) { .child(.dAppsUsed($0)) }
 			IfLetStore(usedDappsStore) { childStore in
 				TransactionReviewDappsUsed.View(store: childStore, isExpanded: viewStore.isExpandedDappUsed)
+					.padding(.top, .medium1)
 			}
 		}
 
@@ -230,6 +231,7 @@ extension TransactionReview {
 						.padding(.bottom, .small2)
 					TransactionReviewAccounts.View(store: childStore)
 				}
+				.padding(.top, .medium1)
 			}
 		}
 

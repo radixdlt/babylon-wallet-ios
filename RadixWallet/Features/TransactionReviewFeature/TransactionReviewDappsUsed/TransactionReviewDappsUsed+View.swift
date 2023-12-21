@@ -38,13 +38,12 @@ extension TransactionReviewDappsUsed {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(spacing: .medium2) {
+				VStack(alignment: .leading, spacing: .small2) {
 					Button {
 						viewStore.send(.expandTapped)
 					} label: {
-						HeadingLabel(isExpanded: isExpanded)
+						Heading(isExpanded: isExpanded)
 					}
-					.padding(.trailing, .medium3)
 
 					if isExpanded {
 						VStack(spacing: .small2) {
@@ -52,7 +51,6 @@ extension TransactionReviewDappsUsed {
 								DappView(viewState: rowViewState) { id in
 									viewStore.send(.dappTapped(id))
 								}
-								.background(.app.gray5)
 							}
 						}
 						.transition(.opacity.combined(with: .scale(scale: 0.95)))
@@ -62,24 +60,24 @@ extension TransactionReviewDappsUsed {
 			}
 		}
 
-		struct HeadingLabel: SwiftUI.View {
+		struct Heading: SwiftUI.View {
 			let isExpanded: Bool
 
 			var body: some SwiftUI.View {
 				HStack(spacing: .small3) {
+					Image(asset: AssetResource.transactionReviewDapps)
 					Text(L10n.TransactionReview.usingDappsHeading)
 						.textStyle(.body1Header)
 						.foregroundColor(.app.gray2)
 						.textCase(.uppercase)
 					Image(asset: isExpanded ? AssetResource.chevronUp : AssetResource.chevronDown)
 						.renderingMode(.original)
+					Spacer()
 				}
 			}
 		}
 
 		struct DappView: SwiftUI.View {
-			private let dAppBoxWidth: CGFloat = 190
-
 			enum ViewState: Hashable {
 				case known(name: String, thumbnail: URL?, id: TransactionReview.DappEntity.ID)
 				case unknown(count: Int)
@@ -89,31 +87,24 @@ extension TransactionReviewDappsUsed {
 			let action: (TransactionReview.DappEntity.ID) -> Void
 
 			var body: some SwiftUI.View {
-				Card {
-					HStack(spacing: 0) {
-						switch viewState {
-						case let .known(name, url, id):
-							Button {
-								action(id)
-							} label: {
-								HStack(spacing: 0) {
-									DappThumbnail(.known(url), size: .smaller)
-										.padding(.trailing, .small2)
-									Text(name)
-										.textStyle(.body1Header)
-										.foregroundColor(.app.gray1)
-										.lineLimit(2)
-								}
-							}
-						case let .unknown(count):
-							DappThumbnail(.unknown, size: .smaller)
-								.padding(.trailing, .small2)
-							Text(L10n.TransactionReview.unknownComponents(count))
-								.lineLimit(2)
+				switch viewState {
+				case let .known(name, url, id):
+					Card {
+						action(id)
+					} contents: {
+						PlainListRow(title: name, accessory: nil) {
+							DappThumbnail(.known(url))
 						}
-						Spacer()
 					}
-					.frame(minWidth: .infinity, minHeight: .standardButtonHeight)
+
+				case let .unknown(count):
+					Card {
+						// action(id)
+					} contents: {
+						PlainListRow(title: L10n.TransactionReview.unknownComponents(count), accessory: nil) {
+							DappThumbnail(.unknown)
+						}
+					}
 				}
 			}
 		}
