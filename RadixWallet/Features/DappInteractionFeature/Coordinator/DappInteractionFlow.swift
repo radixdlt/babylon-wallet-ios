@@ -1030,7 +1030,8 @@ extension DappInteractionFlow.Path.State {
 					Message.plainText(value: .init(mimeType: "text", message: .str(value: $0)))
 				} ?? .none,
 				waitsForTransactionToBeComitted: interaction.id.isWalletAccountDepositSettingsInteraction,
-				isWalletTransaction: interaction.id.isWalletInteraction
+				isWalletTransaction: interaction.id.isWalletInteraction,
+				proposingDappMetadata: dappMetadata.onLedger
 			)))
 		}
 	}
