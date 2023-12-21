@@ -3211,8 +3211,9 @@
 		48CFBCD02ADC10D800E77A5C /* TransactionReviewFeature */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBCD12ADC10D800E77A5C /* SelectFeePayer */,
 				48CFBCD42ADC10D800E77A5C /* TransactionReview.swift */,
+				48CFBCF52ADC10D800E77A5C /* TransactionReview+View.swift */,
+				48CFBCD12ADC10D800E77A5C /* SelectFeePayer */,
 				48CFBCD52ADC10D800E77A5C /* SubmitTransaction */,
 				48CFBCD82ADC10D800E77A5C /* TransactionReviewGuarantees */,
 				48CFBCDE2ADC10D800E77A5C /* TransactionReviewProofs */,
@@ -3221,7 +3222,6 @@
 				48CFBCE72ADC10D800E77A5C /* TransactionReviewNetworkFee */,
 				48CFBCEA2ADC10D800E77A5C /* CustomizeFees */,
 				48CFBCF22ADC10D800E77A5C /* TransactionReviewDappsUsed */,
-				48CFBCF52ADC10D800E77A5C /* TransactionReview+View.swift */,
 				48CFBCF62ADC10D800E77A5C /* AccountDepositSettings */,
 			);
 			path = TransactionReviewFeature;
