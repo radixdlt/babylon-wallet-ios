@@ -1071,3 +1071,329 @@ extension ResourceOrNonFungible: Hashable {
 		}
 	}
 }
+
+// MARK: - ManifestSummary + Hashable, Equatable
+extension ManifestSummary: Hashable, Equatable {
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(presentedProofs)
+		hasher.combine(accountsWithdrawnFrom)
+		hasher.combine(accountsDepositedInto)
+		hasher.combine(encounteredEntities)
+		hasher.combine(accountsRequiringAuth)
+		hasher.combine(identitiesRequiringAuth)
+		hasher.combine(reservedInstructions)
+		hasher.combine(classification)
+	}
+
+	public static func == (lhs: ManifestSummary, rhs: ManifestSummary) -> Bool {
+		lhs.presentedProofs == rhs.presentedProofs &&
+			lhs.accountsWithdrawnFrom == rhs.accountsWithdrawnFrom &&
+			lhs.accountsDepositedInto == rhs.accountsDepositedInto &&
+			lhs.encounteredEntities == rhs.encounteredEntities &&
+			lhs.accountsRequiringAuth == rhs.accountsRequiringAuth &&
+			lhs.identitiesRequiringAuth == rhs.identitiesRequiringAuth &&
+			lhs.reservedInstructions == rhs.reservedInstructions &&
+			lhs.classification == rhs.classification
+	}
+}
+
+// MARK: - ExecutionSummary + Hashable, Equatable
+extension ExecutionSummary: Hashable, Equatable {
+	public static func == (lhs: ExecutionSummary, rhs: ExecutionSummary) -> Bool {
+		lhs.accountWithdraws == rhs.accountWithdraws &&
+			lhs.accountDeposits == rhs.accountDeposits &&
+			lhs.presentedProofs == rhs.presentedProofs &&
+			lhs.newEntities == rhs.newEntities &&
+			lhs.encounteredEntities == rhs.encounteredEntities &&
+			lhs.accountsRequiringAuth == rhs.accountsRequiringAuth &&
+			lhs.identitiesRequiringAuth == rhs.identitiesRequiringAuth &&
+			lhs.reservedInstructions == rhs.reservedInstructions &&
+			lhs.feeLocks == rhs.feeLocks &&
+			lhs.feeSummary == rhs.feeSummary &&
+			lhs.detailedClassification == rhs.detailedClassification
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(accountWithdraws)
+		hasher.combine(accountDeposits)
+		hasher.combine(presentedProofs)
+		hasher.combine(newEntities)
+		hasher.combine(encounteredEntities)
+		hasher.combine(accountsRequiringAuth)
+		hasher.combine(identitiesRequiringAuth)
+		hasher.combine(reservedInstructions)
+		hasher.combine(feeLocks)
+		hasher.combine(feeSummary)
+		hasher.combine(detailedClassification)
+	}
+}
+
+// MARK: - ResourceIndicator + Hashable, Equatable
+extension ResourceIndicator: Hashable, Equatable {
+	public static func == (lhs: ResourceIndicator, rhs: ResourceIndicator) -> Bool {
+		switch (lhs, rhs) {
+		case let (.fungible(lhsAddress, lhsIndicator), .fungible(rhsAddress, rhsIndicator)):
+			lhsAddress == rhsAddress && lhsIndicator == rhsIndicator
+		case let (.nonFungible(lhsAddress, lhsIndicator), .nonFungible(rhsAddress, rhsIndicator)):
+			lhsAddress == rhsAddress && lhsIndicator == rhsIndicator
+		default:
+			false
+		}
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		switch self {
+		case let .fungible(resourceAddress, indicator):
+			hasher.combine(resourceAddress)
+			hasher.combine(indicator)
+		case let .nonFungible(resourceAddress, indicator):
+			hasher.combine(resourceAddress)
+			hasher.combine(indicator)
+		}
+	}
+}
+
+// MARK: - FungibleResourceIndicator + Hashable, Equatable
+extension FungibleResourceIndicator: Hashable, Equatable {
+	public static func == (lhs: FungibleResourceIndicator, rhs: FungibleResourceIndicator) -> Bool {
+		switch (lhs, rhs) {
+		case let (.guaranteed(lhsAmount), .guaranteed(rhsAmount)):
+			lhsAmount == rhsAmount
+		case let (.predicted(lhsPredictedAmount), .predicted(rhsPredictedAmount)):
+			lhsPredictedAmount == rhsPredictedAmount
+		default:
+			false
+		}
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		switch self {
+		case let .guaranteed(amount):
+			hasher.combine(amount)
+		case let .predicted(predictedAmount):
+			hasher.combine(predictedAmount)
+		}
+	}
+}
+
+// MARK: - NonFungibleResourceIndicator + Hashable, Equatable
+extension NonFungibleResourceIndicator: Hashable, Equatable {
+	public static func == (lhs: NonFungibleResourceIndicator, rhs: NonFungibleResourceIndicator) -> Bool {
+		switch (lhs, rhs) {
+		case let (.byAll(lhsPredictedAmount, lhsPredictedIds), .byAll(rhsPredictedAmount, rhsPredictedIds)):
+			lhsPredictedAmount == rhsPredictedAmount && lhsPredictedIds == rhsPredictedIds
+		case let (.byAmount(lhsAmount, lhsPredictedIds), .byAmount(rhsAmount, rhsPredictedIds)):
+			lhsAmount == rhsAmount && lhsPredictedIds == rhsPredictedIds
+		case let (.byIds(lhsIds), .byIds(rhsIds)):
+			lhsIds == rhsIds
+		default:
+			false
+		}
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		switch self {
+		case let .byAll(predictedAmount, predictedIds):
+			hasher.combine(predictedAmount)
+			hasher.combine(predictedIds)
+		case let .byAmount(amount, predictedIds):
+			hasher.combine(amount)
+			hasher.combine(predictedIds)
+		case let .byIds(ids):
+			hasher.combine(ids)
+		}
+	}
+}
+
+// MARK: - PredictedDecimal + Hashable, Equatable
+extension PredictedDecimal: Hashable, Equatable {
+	public static func == (lhs: PredictedDecimal, rhs: PredictedDecimal) -> Bool {
+		lhs.value == rhs.value &&
+			lhs.instructionIndex == rhs.instructionIndex
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(value)
+		hasher.combine(instructionIndex)
+	}
+}
+
+// MARK: - NewEntities + Hashable, Equatable
+extension NewEntities: Hashable, Equatable {
+	public static func == (lhs: NewEntities, rhs: NewEntities) -> Bool {
+		lhs.componentAddresses == rhs.componentAddresses &&
+			lhs.resourceAddresses == rhs.resourceAddresses &&
+			lhs.packageAddresses == rhs.packageAddresses &&
+			lhs.metadata == rhs.metadata
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(componentAddresses)
+		hasher.combine(resourceAddresses)
+		hasher.combine(packageAddresses)
+		hasher.combine(metadata)
+	}
+}
+
+// MARK: - DetailedManifestClass + Hashable, Equatable
+extension DetailedManifestClass: Hashable, Equatable {
+	public static func == (lhs: DetailedManifestClass, rhs: DetailedManifestClass) -> Bool {
+		switch (lhs, rhs) {
+		case (.general, .general):
+			true
+
+		case let (.transfer(lhsIsOneToOne), .transfer(rhsIsOneToOne)):
+			lhsIsOneToOne == rhsIsOneToOne
+
+		case let (.poolContribution(lhsPoolAddresses, lhsPoolContributions), .poolContribution(rhsPoolAddresses, rhsPoolContributions)):
+			lhsPoolAddresses == rhsPoolAddresses && lhsPoolContributions == rhsPoolContributions
+
+		case let (.poolRedemption(lhsPoolAddresses, lhsPoolRedemptions), .poolRedemption(rhsPoolAddresses, rhsPoolRedemptions)):
+			lhsPoolAddresses == rhsPoolAddresses && lhsPoolRedemptions == rhsPoolRedemptions
+
+		case let (.validatorStake(lhsValidatorAddresses, lhsValidatorStakes), .validatorStake(rhsValidatorAddresses, rhsValidatorStakes)):
+			lhsValidatorAddresses == rhsValidatorAddresses && lhsValidatorStakes == rhsValidatorStakes
+
+		case let (.validatorUnstake(lhsValidatorAddresses, lhsValidatorUnstakes), .validatorUnstake(rhsValidatorAddresses, rhsValidatorUnstakes)):
+			lhsValidatorAddresses == rhsValidatorAddresses && lhsValidatorUnstakes == rhsValidatorUnstakes
+
+		case let (.validatorClaim(lhsValidatorAddresses, lhsValidatorClaims), .validatorClaim(rhsValidatorAddresses, rhsValidatorClaims)):
+			lhsValidatorAddresses == rhsValidatorAddresses && lhsValidatorClaims == rhsValidatorClaims
+
+		case let (
+			.accountDepositSettingsUpdate(lhsResourcePreferencesUpdates, lhsDepositModeUpdates, lhsAuthorizedDepositorsAdded, lhsAuthorizedDepositorsRemoved),
+			.accountDepositSettingsUpdate(rhsResourcePreferencesUpdates, rhsDepositModeUpdates, rhsAuthorizedDepositorsAdded, rhsAuthorizedDepositorsRemoved)
+		):
+			lhsResourcePreferencesUpdates == rhsResourcePreferencesUpdates &&
+				lhsDepositModeUpdates == rhsDepositModeUpdates &&
+				lhsAuthorizedDepositorsAdded == rhsAuthorizedDepositorsAdded &&
+				lhsAuthorizedDepositorsRemoved == rhsAuthorizedDepositorsRemoved
+
+		default:
+			false
+		}
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		switch self {
+		case .general:
+			hasher.combine("general")
+		case let .transfer(isOneToOne):
+			hasher.combine("transfer")
+			hasher.combine(isOneToOne)
+		case let .poolContribution(poolAddresses, poolContributions):
+			hasher.combine("poolContribution")
+			hasher.combine(poolAddresses)
+			hasher.combine(poolContributions)
+		case let .poolRedemption(poolAddresses, poolRedemptions):
+			hasher.combine("poolRedemption")
+			hasher.combine(poolAddresses)
+			hasher.combine(poolRedemptions)
+		case let .validatorStake(validatorAddresses, validatorStakes):
+			hasher.combine("validatorStake")
+			hasher.combine(validatorAddresses)
+			hasher.combine(validatorStakes)
+		case let .validatorUnstake(validatorAddresses, validatorUnstakes):
+			hasher.combine("validatorUnstake")
+			hasher.combine(validatorAddresses)
+			hasher.combine(validatorUnstakes)
+		case let .validatorClaim(validatorAddresses, validatorClaims):
+			hasher.combine("validatorClaim")
+			hasher.combine(validatorAddresses)
+			hasher.combine(validatorClaims)
+		case let .accountDepositSettingsUpdate(resourcePreferencesUpdates, depositModeUpdates, authorizedDepositorsAdded, authorizedDepositorsRemoved):
+			hasher.combine("accountDepositSettingsUpdate")
+			hasher.combine(resourcePreferencesUpdates)
+			hasher.combine(depositModeUpdates)
+			hasher.combine(authorizedDepositorsAdded)
+			hasher.combine(authorizedDepositorsRemoved)
+		}
+	}
+}
+
+// MARK: - TrackedPoolContribution + Hashable, Equatable
+extension TrackedPoolContribution: Hashable, Equatable {
+	public static func == (lhs: TrackedPoolContribution, rhs: TrackedPoolContribution) -> Bool {
+		lhs.poolAddress == rhs.poolAddress &&
+			lhs.contributedResources == rhs.contributedResources &&
+			lhs.poolUnitsResourceAddress == rhs.poolUnitsResourceAddress &&
+			lhs.poolUnitsAmount == rhs.poolUnitsAmount
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(poolAddress)
+		hasher.combine(contributedResources)
+		hasher.combine(poolUnitsResourceAddress)
+		hasher.combine(poolUnitsAmount)
+	}
+}
+
+// MARK: - TrackedPoolRedemption + Hashable, Equatable
+extension TrackedPoolRedemption: Hashable, Equatable {
+	public static func == (lhs: TrackedPoolRedemption, rhs: TrackedPoolRedemption) -> Bool {
+		lhs.poolAddress == rhs.poolAddress &&
+			lhs.poolUnitsResourceAddress == rhs.poolUnitsResourceAddress &&
+			lhs.poolUnitsAmount == rhs.poolUnitsAmount &&
+			lhs.redeemedResources == rhs.redeemedResources
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(poolAddress)
+		hasher.combine(poolUnitsResourceAddress)
+		hasher.combine(poolUnitsAmount)
+		hasher.combine(redeemedResources)
+	}
+}
+
+// MARK: - TrackedValidatorStake + Hashable, Equatable
+extension TrackedValidatorStake: Hashable, Equatable {
+	public static func == (lhs: TrackedValidatorStake, rhs: TrackedValidatorStake) -> Bool {
+		lhs.validatorAddress == rhs.validatorAddress &&
+			lhs.xrdAmount == rhs.xrdAmount &&
+			lhs.liquidStakeUnitAddress == rhs.liquidStakeUnitAddress &&
+			lhs.liquidStakeUnitAmount == rhs.liquidStakeUnitAmount
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(validatorAddress)
+		hasher.combine(xrdAmount)
+		hasher.combine(liquidStakeUnitAddress)
+		hasher.combine(liquidStakeUnitAmount)
+	}
+}
+
+// MARK: - TrackedValidatorUnstake + Hashable, Equatable
+extension TrackedValidatorUnstake: Hashable, Equatable {
+	public static func == (lhs: TrackedValidatorUnstake, rhs: TrackedValidatorUnstake) -> Bool {
+		lhs.validatorAddress == rhs.validatorAddress &&
+			lhs.liquidStakeUnitAddress == rhs.liquidStakeUnitAddress &&
+			lhs.liquidStakeUnitAmount == rhs.liquidStakeUnitAmount &&
+			lhs.claimNftAddress == rhs.claimNftAddress &&
+			lhs.claimNftIds == rhs.claimNftIds
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(validatorAddress)
+		hasher.combine(liquidStakeUnitAddress)
+		hasher.combine(liquidStakeUnitAmount)
+		hasher.combine(claimNftAddress)
+		hasher.combine(claimNftIds)
+	}
+}
+
+// MARK: - TrackedValidatorClaim + Hashable, Equatable
+extension TrackedValidatorClaim: Hashable, Equatable {
+	public static func == (lhs: TrackedValidatorClaim, rhs: TrackedValidatorClaim) -> Bool {
+		lhs.validatorAddress == rhs.validatorAddress &&
+			lhs.claimNftAddress == rhs.claimNftAddress &&
+			lhs.claimNftIds == rhs.claimNftIds &&
+			lhs.xrdAmount == rhs.xrdAmount
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(validatorAddress)
+		hasher.combine(claimNftAddress)
+		hasher.combine(claimNftIds)
+		hasher.combine(xrdAmount)
+	}
+}

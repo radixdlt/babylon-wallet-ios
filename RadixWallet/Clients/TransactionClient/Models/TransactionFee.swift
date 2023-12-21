@@ -20,7 +20,7 @@ public struct TransactionFee: Hashable, Sendable {
 	}
 
 	public init(
-		executionAnalysis: ExecutionAnalysis,
+		executionAnalysis: ExecutionSummary,
 		signaturesCount: Int,
 		notaryIsSignatory: Bool,
 		includeLockFee: Bool

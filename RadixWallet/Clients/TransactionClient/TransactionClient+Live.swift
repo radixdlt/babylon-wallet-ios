@@ -49,11 +49,11 @@ extension TransactionClient {
 			func identityFromComponentAddress(_ identityAddress: IdentityAddress) async throws -> Profile.Network.Persona {
 				try await personasClient.getPersona(id: identityAddress)
 			}
-			func mapAccount(_ extract: () -> [EngineToolkit.Address]) throws -> OrderedSet<Profile.Network.Account> {
-				try .init(validating: extract().asSpecific().compactMap(accountFromComponentAddress))
+			func mapAccount(_ addresses: [EngineToolkit.Address]) throws -> OrderedSet<Profile.Network.Account> {
+				try .init(validating: addresses.asSpecific().compactMap(accountFromComponentAddress))
 			}
-			func mapIdentity(_ extract: () -> [EngineToolkit.Address]) async throws -> OrderedSet<Profile.Network.Persona> {
-				try await .init(validating: extract().asSpecific().asyncMap(identityFromComponentAddress))
+			func mapIdentity(_ addresses: [EngineToolkit.Address]) async throws -> OrderedSet<Profile.Network.Persona> {
+				try await .init(validating: addresses.asSpecific().asyncMap(identityFromComponentAddress))
 			}
 
 			let summary = manifest.summary(networkId: networkID.rawValue)
@@ -176,7 +176,7 @@ extension TransactionClient {
 			let receiptBytes = try Data(hex: transactionPreviewResponse.encodedReceipt)
 
 			/// Analyze the manifest
-			let analyzedManifestToReview = try request.manifestToSign.analyzeExecution(transactionReceipt: receiptBytes)
+			let analyzedManifestToReview = try request.manifestToSign.executionSummary(networkId: networkID.rawValue, encodedReceipt: receiptBytes)
 
 			/// Transactions created outside of the Wallet are not allowed to use reserved instructions
 			if !request.isWalletTransaction, !analyzedManifestToReview.reservedInstructions.isEmpty {

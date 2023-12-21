@@ -50,3 +50,12 @@ extension MetadataValue: @unchecked Sendable {}
 
 // MARK: - NonFungibleLocalId + Sendable
 extension NonFungibleLocalId: @unchecked Sendable {}
+
+// MARK: - ResourceIndicator + Sendable
+extension ResourceIndicator: @unchecked Sendable {}
+
+// MARK: - ResourcePreferenceUpdate + Sendable
+extension ResourcePreferenceUpdate: @unchecked Sendable {}
+
+// MARK: - AccountDefaultDepositRule + Sendable
+extension AccountDefaultDepositRule: @unchecked Sendable {}

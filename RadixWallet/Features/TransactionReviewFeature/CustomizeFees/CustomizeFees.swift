@@ -9,7 +9,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 			case advanced(AdvancedFeesCustomization.State)
 		}
 
-		let manifest: TransactionManifest
+		let manifest: ExecutionSummary
 		let signingPurpose: SigningPurpose
 		var reviewedTransaction: ReviewedTransaction
 		var modeState: CustomizationModeState
@@ -31,7 +31,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 
 		init(
 			reviewedTransaction: ReviewedTransaction,
-			manifest: TransactionManifest,
+			manifest: ExecutionSummary,
 			signingPurpose: SigningPurpose
 		) {
 			self.reviewedTransaction = reviewedTransaction
@@ -144,13 +144,13 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 			let signingPurpose = state.signingPurpose
 
 			@Sendable
-			func replaceFeePayer(_ feePayer: FeePayerCandidate, _ reviewedTransaction: ReviewedTransaction, manifest: TransactionManifest) -> Effect<Action> {
+			func replaceFeePayer(_ feePayer: FeePayerCandidate, _ reviewedTransaction: ReviewedTransaction, manifest: ExecutionSummary) -> Effect<Action> {
 				.run { send in
 					var reviewedTransaction = reviewedTransaction
 					var newSigners = OrderedSet(reviewedTransaction.transactionSigners.intentSignerEntitiesOrEmpty() + [.account(feePayer.account)])
 
 					/// Remove the previous Fee Payer Signature if it is not required
-					if let previousFeePayer, !manifest.accountsRequiringAuth().contains(where: { $0.addressString() == previousFeePayer.account.address.address }) {
+					if let previousFeePayer, !manifest.accountsRequiringAuth.contains(where: { $0.addressString() == previousFeePayer.account.address.address }) {
 						// removed, need to recalculate signing factors
 						newSigners.remove(.account(previousFeePayer.account))
 					}

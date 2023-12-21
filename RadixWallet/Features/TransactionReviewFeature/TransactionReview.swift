@@ -319,7 +319,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			state.destination = .customizeFees(.init(
 				reviewedTransaction: reviewedTransaction,
-				manifest: state.transactionManifest,
+				manifest: reviewedTransaction.executionSummary,
 				signingPurpose: .signTransaction(state.signTransactionPurpose)
 			))
 			return .none
@@ -340,12 +340,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			do {
 				let reviewedTransaction = try ReviewedTransaction(
 					networkId: preview.networkID,
-					transaction: preview.analyzedManifestToReview.transactionTypes.transactionKind(),
+					transaction: preview.analyzedManifestToReview.transactionKind(),
+					executionSummary: preview.analyzedManifestToReview,
 					feePayer: .loading,
 					transactionFee: preview.transactionFee,
 					transactionSigners: preview.transactionSigners,
 					signingFactors: preview.signingFactors
 				)
+
 				state.reviewedTransaction = reviewedTransaction
 				return review(&state)
 					.concatenate(with: determineFeePayer(state, reviewedTransaction: reviewedTransaction))
@@ -715,7 +717,7 @@ extension TransactionReview {
 		case estimated(instructionIndex: UInt64)
 	}
 
-	private func extractUserAccounts(_ transaction: TransactionType.GeneralTransaction) async throws -> [Account] {
+	private func extractUserAccounts(_ transaction: ExecutionSummary.GeneralTransaction) async throws -> [Account] {
 		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 
 		return transaction.allAddress
@@ -764,7 +766,7 @@ extension TransactionReview {
 		}
 	}
 
-	private func exctractProofs(_ transaction: TransactionType.GeneralTransaction) async throws -> TransactionReviewProofs.State? {
+	private func exctractProofs(_ transaction: ExecutionSummary.GeneralTransaction) async throws -> TransactionReviewProofs.State? {
 		let proofs = try await transaction.accountProofs
 			.map { try ResourceAddress(validatingAddress: $0.addressString()) }
 			.asyncMap(extractProofInfo)
@@ -781,7 +783,7 @@ extension TransactionReview {
 	}
 
 	private func extractWithdrawals(
-		_ transaction: TransactionType.GeneralTransaction,
+		_ transaction: ExecutionSummary.GeneralTransaction,
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
@@ -812,7 +814,7 @@ extension TransactionReview {
 	}
 
 	private func extractDeposits(
-		_ transaction: TransactionType.GeneralTransaction,
+		_ transaction: ExecutionSummary.GeneralTransaction,
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
@@ -848,7 +850,7 @@ extension TransactionReview {
 	}
 
 	func transferInfo(
-		resourceQuantifier: ResourceTracker,
+		resourceQuantifier: ResourceIndicator,
 		metadataOfCreatedEntities: [String: [String: MetadataValue?]]?,
 		dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]],
 		createdEntities: [EngineToolkit.Address],
@@ -868,31 +870,6 @@ extension TransactionReview {
 
 		typealias NonFungibleToken = OnLedgerEntity.NonFungibleToken
 
-		func tokenInfo(_ ids: [NonFungibleLocalId], for resourceAddress: ResourceAddress) async throws -> [NonFungibleToken] {
-			if let tokenData = dataOfNewlyMintedNonFungibles[resourceAddress.address] {
-				try extractTokenInfo(tokenData, for: resourceAddress)
-			} else {
-				try await existingTokenInfo(ids, for: resourceAddress)
-			}
-		}
-
-		func newTokenInfo(_ ids: [NonFungibleLocalId], for resourceAddress: ResourceAddress) throws -> [NonFungibleToken] {
-			guard let tokenData = dataOfNewlyMintedNonFungibles[resourceAddress.address] else {
-				struct MissingNewlyMintedNFTData: Error {}
-				throw MissingNewlyMintedNFTData()
-			}
-			return try extractTokenInfo(tokenData, for: resourceAddress)
-		}
-
-		func extractTokenInfo(_ tokenData: [NonFungibleLocalId: Data], for resourceAddress: ResourceAddress) throws -> [NonFungibleToken] {
-			try tokenData.map { id, _ in
-				try .init(
-					id: .fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: id),
-					data: nil
-				)
-			}
-		}
-
 		func existingTokenInfo(_ ids: [NonFungibleLocalId], for resourceAddress: ResourceAddress) async throws -> [NonFungibleToken] {
 			try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
 				resource: resourceAddress,
@@ -907,7 +884,12 @@ extension TransactionReview {
 
 		switch resourceQuantifier {
 		case let .fungible(_, source):
-			let amount = source.amount
+			let amount = switch source {
+			case let .guaranteed(amount):
+				amount
+			case let .predicted(predictedAmount):
+				predictedAmount.value
+			}
 
 			switch try await resourceInfo() {
 			case let .left(resource):
@@ -915,11 +897,11 @@ extension TransactionReview {
 				let isXRD = resourceAddress.isXRD(on: networkID)
 
 				func guarantee() -> TransactionClient.Guarantee? {
-					guard case let .predicted(instructionIndex, _) = source else { return nil }
+					guard case let .predicted(predictedAmount) = source else { return nil }
 					let guaranteedAmount = defaultDepositGuarantee * amount
 					return .init(
 						amount: guaranteedAmount,
-						instructionIndex: instructionIndex,
+						instructionIndex: predictedAmount.instructionIndex,
 						resourceAddress: resourceAddress,
 						resourceDivisibility: resource.divisibility
 					)
@@ -949,9 +931,9 @@ extension TransactionReview {
 
 				return [.init(resource: resource, details: .fungible(details))]
 			}
-		case let .nonFungible(_, _, .guaranteed(ids)),
-		     let .nonFungible(_, _, ids: .predicted(instructionIndex: _, value: ids)):
 
+		case let .nonFungible(_, indicator):
+			let ids = indicator.ids
 			let result: [Transfer]
 
 			switch try await resourceInfo() {
@@ -959,19 +941,26 @@ extension TransactionReview {
 				// A non-fungible resource existing on ledger
 
 				// Existing or newly minted tokens
-				result = try await tokenInfo(ids, for: resourceAddress).map { token in
+				//
+				// This is not entirely correct, we should not attempt to fetch NFT data the tokens
+				// that are about to be minted, but current RET does not retur the information about the freshly minted tokens anymore.
+				// Needs to be addressed in RET.
+				result = try await existingTokenInfo(ids, for: resource.resourceAddress).map { token in
 					.init(resource: resource, details: .nonFungible(token))
 				}
 
 			case let .right(newEntityMetadata):
 				// A newly created non-fungible resource
-
 				let resource = OnLedgerEntity.Resource(resourceAddress: resourceAddress, metadata: newEntityMetadata)
 
 				// Newly minted tokens
-				result = try newTokenInfo(ids, for: resourceAddress).map { token in
-					.init(resource: resource, details: .nonFungible(token))
-				}
+				result = try ids
+					.map { localId in
+						try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: localId)
+					}
+					.map { id in
+						Transfer(resource: resource, details: .nonFungible(.init(id: id, data: nil)))
+					}
 			}
 
 			guard result.count == ids.count else {
@@ -983,9 +972,10 @@ extension TransactionReview {
 		}
 	}
 
-	func extractAccountDepositSettings(_ settings: TransactionType.AccountDepositSettings) async throws -> AccountDepositSettings.State {
+	func extractAccountDepositSettings(_ settings: ExecutionSummary.AccountDepositSettings) async throws -> AccountDepositSettings.State {
 		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
-		let allAccountAddress = Set(settings.authorizedDepositorsChanges.keys)
+		let allAccountAddress = Set(settings.authorizedDepositorsAdded.keys)
+			.union(settings.authorizedDepositorsRemoved.keys)
 			.union(settings.defaultDepositRuleChanges.keys)
 			.union(settings.resourcePreferenceChanges.keys)
 		let validAccounts = allAccountAddress.compactMap { address in
@@ -1005,25 +995,29 @@ extension TransactionReview {
 				} ?? []
 
 			let authorizedDepositorChanges = try await {
-				if let depositorChanges = settings.authorizedDepositorsChanges[account.address] {
-					let added = try await depositorChanges.added.asyncMap { resourceOrNonFungible in
+				var changes = [AccountDepositSettingsChange.AllowedDepositorChange]()
+				if let authorizedDepositorsAdded = settings.authorizedDepositorsAdded[account.address] {
+					let added = try await authorizedDepositorsAdded.asyncMap { resourceOrNonFungible in
 						let resourceAddress = try resourceOrNonFungible.resourceAddress()
 						return try await AccountDepositSettingsChange.AllowedDepositorChange(
 							resource: onLedgerEntitiesClient.getResource(resourceAddress),
 							change: .added
 						)
 					}
-					let removed = try await depositorChanges.removed.asyncMap { resourceOrNonFungible in
+					changes.append(contentsOf: added)
+				}
+				if let authorizedDepositorsRemoved = settings.authorizedDepositorsRemoved[account.address] {
+					let removed = try await authorizedDepositorsRemoved.asyncMap { resourceOrNonFungible in
 						let resourceAddress = try resourceOrNonFungible.resourceAddress()
 						return try await AccountDepositSettingsChange.AllowedDepositorChange(
 							resource: onLedgerEntitiesClient.getResource(resourceAddress),
 							change: .removed
 						)
 					}
-
-					return added + removed
+					changes.append(contentsOf: removed)
 				}
-				return []
+
+				return changes
 			}()
 
 			return AccountDepositSettingsChange(
@@ -1168,15 +1162,13 @@ extension Collection where Element: Equatable {
 	}
 }
 
-extension ResourceIndicator {}
-
-extension ResourceTracker {
+extension ResourceIndicator {
 	var transferType: TransactionReview.TransferType {
-		switch decimalSource {
-		case .guaranteed:
+		switch self {
+		case .fungible(_, .guaranteed), .nonFungible: // we don't yet handle NFT predicted amounts
 			.exact
-		case let .predicted(instructionIndex, _):
-			.estimated(instructionIndex: instructionIndex)
+		case let .fungible(_, .predicted(predictedAmount)):
+			.estimated(instructionIndex: predictedAmount.instructionIndex)
 		}
 	}
 }
@@ -1208,6 +1200,7 @@ public struct TransactionReviewFailure: LocalizedError {
 public struct ReviewedTransaction: Hashable, Sendable {
 	let networkId: NetworkID
 	let transaction: TransactionKind
+	let executionSummary: ExecutionSummary
 
 	var feePayer: Loadable<FeePayerCandidate?> = .idle
 
@@ -1240,8 +1233,8 @@ extension ReviewedTransaction {
 				let xrdAddress = knownAddresses(networkId: networkId.rawValue).resourceAddresses.xrd
 
 				let xrdTotalTransfer: RETDecimal = feePayerWithdraws.reduce(.zero) { partialResult, resource in
-					if case let .fungible(resourceAddress, source) = resource, resourceAddress == xrdAddress {
-						return (try? partialResult.add(other: source.amount)) ?? partialResult
+					if case let .fungible(resourceAddress, indicator) = resource, resourceAddress == xrdAddress {
+						return (try? partialResult.add(other: indicator.amount)) ?? partialResult
 					}
 					return partialResult
 				}

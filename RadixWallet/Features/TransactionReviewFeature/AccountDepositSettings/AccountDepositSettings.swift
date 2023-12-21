@@ -42,9 +42,9 @@ extension AccountDepositSettingsChange {
 		}
 
 		public let resource: OnLedgerEntity.Resource
-		public let change: ResourcePreferenceAction
+		public let change: ResourcePreferenceUpdate
 
-		public init(resource: OnLedgerEntity.Resource, preferenceChange: ResourcePreferenceAction) {
+		public init(resource: OnLedgerEntity.Resource, preferenceChange: ResourcePreferenceUpdate) {
 			self.resource = resource
 			self.change = preferenceChange
 		}
