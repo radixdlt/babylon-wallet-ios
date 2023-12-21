@@ -181,7 +181,7 @@ extension TransactionReview {
 				}
 
 				if let name = proposingDappMetadata?.name {
-					Text("Proposed by \(name.rawValue)")
+					Text("Proposed by \(name.rawValue)") // FIXME: Strings
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray1)
 				}
