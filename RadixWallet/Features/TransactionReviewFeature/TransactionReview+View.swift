@@ -166,8 +166,8 @@ extension TransactionReview {
 
 		@ViewBuilder
 		private func header(_ proposingDappMetadata: DappMetadata.Ledger?) -> some SwiftUI.View {
-			VStack(alignment: .leading) {
-				HStack {
+			VStack(alignment: .leading, spacing: .small3) {
+				HStack(spacing: .small2) {
 					Text(L10n.TransactionReview.title)
 						.textStyle(.sheetTitle)
 						.lineLimit(2)
