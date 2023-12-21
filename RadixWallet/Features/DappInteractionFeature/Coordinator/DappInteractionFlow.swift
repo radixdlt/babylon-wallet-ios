@@ -1031,7 +1031,7 @@ extension DappInteractionFlow.Path.State {
 				} ?? .none,
 				waitsForTransactionToBeComitted: interaction.id.isWalletAccountDepositSettingsInteraction,
 				isWalletTransaction: interaction.id.isWalletInteraction,
-				proposingDappMetadata: dappMetadata.ledger
+				proposingDappMetadata: dappMetadata.onLedger
 			)))
 		}
 	}

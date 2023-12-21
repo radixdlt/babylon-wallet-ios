@@ -167,7 +167,7 @@ extension TransactionReview {
 		@ViewBuilder
 		private func header(_ proposingDappMetadata: DappMetadata.Ledger?) -> some SwiftUI.View {
 			VStack(alignment: .leading, spacing: .small3) {
-				HStack(spacing: .small2) {
+				HStack(spacing: .zero) {
 					Text(L10n.TransactionReview.title)
 						.textStyle(.sheetTitle)
 						.lineLimit(2)
@@ -175,13 +175,15 @@ extension TransactionReview {
 						.foregroundColor(.app.gray1)
 
 					Spacer(minLength: 0)
+
 					if let thumbnail = proposingDappMetadata?.thumbnail {
 						DappThumbnail(.known(thumbnail), size: .medium)
+							.padding(.leading, .small2)
 					}
 				}
 
 				if let name = proposingDappMetadata?.name {
-					Text("Proposed by \(name.rawValue)") // FIXME: Strings
+					Text(L10n.TransactionReview.proposingDappSubtitle(name.rawValue))
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray1)
 				}

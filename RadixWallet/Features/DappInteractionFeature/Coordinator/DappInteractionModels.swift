@@ -79,7 +79,7 @@ extension DappMetadata {
 		return fromLedgerDappMetadata.thumbnail
 	}
 
-	public var ledger: Ledger? {
+	public var onLedger: Ledger? {
 		guard case let .ledger(fromLedgerDappMetadata) = self else {
 			return nil
 		}

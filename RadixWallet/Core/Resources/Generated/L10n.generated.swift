@@ -2361,6 +2361,10 @@ public enum L10n {
     public static let messageHeading = L10n.tr("Localizable", "transactionReview_messageHeading", fallback: "Message")
     /// Presenting
     public static let presentingHeading = L10n.tr("Localizable", "transactionReview_presentingHeading", fallback: "Presenting")
+    /// Proposed by %s
+    public static func proposingDappSubtitle(_ p1: UnsafePointer<CChar>) -> String {
+      return L10n.tr("Localizable", "transactionReview_proposingDappSubtitle", p1, fallback: "Proposed by %s")
+    }
     /// Raw Transaction
     public static let rawTransactionTitle = L10n.tr("Localizable", "transactionReview_rawTransactionTitle", fallback: "Raw Transaction")
     /// Sending to
