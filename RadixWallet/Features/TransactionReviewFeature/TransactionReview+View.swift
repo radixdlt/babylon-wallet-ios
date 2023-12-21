@@ -197,8 +197,8 @@ extension TransactionReview {
 		@ViewBuilder
 		private func messageSection(with message: String?) -> some SwiftUI.View {
 			if let message {
-				VStack(spacing: .small2) {
-					TransactionHeading(L10n.TransactionReview.messageHeading)
+				VStack(alignment: .leading, spacing: .small2) {
+					TransactionHeading.message
 					TransactionMessageView(message: message)
 				}
 			}
@@ -208,10 +208,11 @@ extension TransactionReview {
 		private var withdrawalsSection: some SwiftUI.View {
 			let withdrawalsStore = store.scope(state: \.withdrawals) { .child(.withdrawals($0)) }
 			IfLetStore(withdrawalsStore) { childStore in
-				VStack(spacing: .small2) {
-					TransactionHeading(L10n.TransactionReview.withdrawalsHeading)
+				VStack(alignment: .leading, spacing: .small2) {
+					TransactionHeading.withdrawing
 					TransactionReviewAccounts.View(store: childStore)
 				}
+				.padding(.top, .medium1)
 			}
 		}
 
@@ -229,7 +230,7 @@ extension TransactionReview {
 			let depositsStore = store.scope(state: \.deposits) { .child(.deposits($0)) }
 			IfLetStore(depositsStore) { childStore in
 				VStack(alignment: .leading) {
-					TransactionHeading(L10n.TransactionReview.depositsHeading)
+					TransactionHeading.depositing
 						.padding(.bottom, .small2)
 					TransactionReviewAccounts.View(store: childStore)
 				}
@@ -253,8 +254,8 @@ extension TransactionReview {
 		private var accountDepositSettingsSection: some SwiftUI.View {
 			let accountDepositSettingsStore = store.scope(state: \.accountDepositSettings) { .child(.accountDepositSettings($0)) }
 			IfLetStore(accountDepositSettingsStore) { childStore in
-				VStack(spacing: .small2) {
-					TransactionHeading(L10n.TransactionReview.AccountDepositSettings.subtitle)
+				VStack(alignment: .leading, spacing: .small2) {
+					TransactionHeading.depositSettings
 
 					AccountDepositSettings.View(store: childStore)
 						.padding(.bottom, .medium1)
@@ -370,16 +371,46 @@ private extension View {
 // MARK: - TransactionHeading
 struct TransactionHeading: View {
 	let heading: String
+	let icon: ImageAsset
 
-	init(_ heading: String) {
+	init(_ heading: String, icon: ImageAsset) {
 		self.heading = heading
+		self.icon = icon
 	}
 
 	var body: some View {
-		Text(heading)
-			.sectionHeading
-			.textCase(.uppercase)
-			.flushedLeft(padding: .medium3)
+		HStack(spacing: .small2) {
+			Image(asset: icon)
+				.padding(.small3)
+				.overlay {
+					Circle()
+						.stroke(style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
+						.foregroundColor(.app.gray3)
+				}
+			Text(heading)
+				.sectionHeading
+				.textCase(.uppercase)
+		}
+	}
+
+	static var message: TransactionHeading {
+		TransactionHeading(L10n.TransactionReview.messageHeading, icon: AssetResource.transactionReviewMessage)
+	}
+
+	static var withdrawing: TransactionHeading {
+		TransactionHeading(L10n.TransactionReview.withdrawalsHeading, icon: AssetResource.transactionReviewWithdrawing)
+	}
+
+	static var depositing: TransactionHeading {
+		TransactionHeading(L10n.TransactionReview.depositsHeading, icon: AssetResource.transactionReviewDepositing)
+	}
+
+	static var usingDapps: TransactionHeading {
+		TransactionHeading(L10n.TransactionReview.usingDappsHeading, icon: AssetResource.transactionReviewDapps)
+	}
+
+	static var depositSettings: TransactionHeading {
+		TransactionHeading(L10n.TransactionReview.AccountDepositSettings.subtitle, icon: AssetResource.transactionReviewDepositSetting)
 	}
 }
 

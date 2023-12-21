@@ -65,11 +65,7 @@ extension TransactionReviewDappsUsed {
 
 			var body: some SwiftUI.View {
 				HStack(spacing: .small3) {
-					Image(asset: AssetResource.transactionReviewDapps)
-					Text(L10n.TransactionReview.usingDappsHeading)
-						.textStyle(.body1Header)
-						.foregroundColor(.app.gray2)
-						.textCase(.uppercase)
+					TransactionHeading.usingDapps
 					Image(asset: isExpanded ? AssetResource.chevronUp : AssetResource.chevronDown)
 						.renderingMode(.original)
 					Spacer()
