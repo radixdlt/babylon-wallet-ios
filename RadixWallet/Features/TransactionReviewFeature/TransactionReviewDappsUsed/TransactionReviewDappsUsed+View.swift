@@ -3,8 +3,8 @@ import SwiftUI
 extension TransactionReviewDappsUsed.State {
 	var viewState: TransactionReviewDappsUsed.ViewState {
 		var dApps = knownDapps.map(\.knownDapp)
-		if unknownDapps > 0 {
-			dApps.append(.unknown(count: unknownDapps))
+		if !unknownDapps.isEmpty {
+			dApps.append(.unknown(count: unknownDapps.count))
 		}
 		return .init(rows: dApps)
 	}

@@ -725,33 +725,36 @@ extension TransactionReview {
 	}
 
 	private func extractUsedDapps(_ transaction: TransactionType.GeneralTransaction) async throws -> TransactionReviewDappsUsed.State? {
-		let dApps = try await transaction.allAddress
+		let dAppsInfo = try await transaction.allAddress
 			.filter { $0.entityType() == .globalGenericComponent }
 			.map { try $0.asSpecific() }
 			.asyncMap(extractDappInfo)
 
-		guard !dApps.isEmpty else { return nil }
+		guard !dAppsInfo.isEmpty else { return nil }
 
-		let knownDapps = Set(dApps.compacted())
+		let knownDapps = dAppsInfo.compactMap(\.left).asIdentifiable()
+		let unknownDapps = dAppsInfo.compactMap(\.right).asIdentifiable()
 
 		return TransactionReviewDappsUsed.State(
 			isExpanded: true,
-			knownDapps: .init(uniqueElements: knownDapps),
-			unknownDapps: dApps.count(of: nil)
+			knownDapps: knownDapps,
+			unknownDapps: unknownDapps
 		)
 	}
 
-	private func extractDappInfo(_ component: ComponentAddress) async -> DappEntity? {
+	private func extractDappInfo(_ component: ComponentAddress) async -> Either<DappEntity, UnknownDapp> {
 		do {
 			let dAppDefinitionAddress = try await onLedgerEntitiesClient.getDappDefinitionAddress(component)
-			let metadata = try await onLedgerEntitiesClient.getDappMetadata(
-				dAppDefinitionAddress,
-				validatingDappComponent: component
-			)
-			return DappEntity(id: dAppDefinitionAddress, metadata: metadata)
+			let metadata = try await onLedgerEntitiesClient.getDappMetadata(dAppDefinitionAddress)
+			do {
+				try metadata.validate(dAppComponent: component)
+			} catch {
+				return .right(.dApp(DappEntity(id: dAppDefinitionAddress, metadata: metadata)))
+			}
+			return .left(DappEntity(id: dAppDefinitionAddress, metadata: metadata))
 		} catch {
 			loggerGlobal.info("Failed to extract dApp definition from \(component.address): \(error)")
-			return nil
+			return .right(.component(component))
 		}
 	}
 
@@ -1051,6 +1054,20 @@ extension TransactionReview {
 	public struct DappEntity: Sendable, Identifiable, Hashable {
 		public let id: DappDefinitionAddress
 		public let metadata: OnLedgerEntity.Metadata
+	}
+
+	public enum UnknownDapp: Hashable, Sendable, Identifiable {
+		public var id: ComponentAddress {
+			switch self {
+			case let .component(componentAddress):
+				componentAddress
+			case let .dApp(dappEntity):
+				dappEntity.id.asComponentAddress
+			}
+		}
+
+		case component(ComponentAddress)
+		case dApp(DappEntity)
 	}
 
 	public enum Account: Sendable, Hashable {

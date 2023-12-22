@@ -6,9 +6,9 @@ public struct TransactionReviewDappsUsed: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var isExpanded: Bool
 		public var knownDapps: IdentifiedArrayOf<TransactionReview.DappEntity>
-		public var unknownDapps: Int
+		public var unknownDapps: IdentifiedArrayOf<TransactionReview.UnknownDapp>
 
-		public init(isExpanded: Bool, knownDapps: IdentifiedArrayOf<TransactionReview.DappEntity>, unknownDapps: Int) {
+		public init(isExpanded: Bool, knownDapps: IdentifiedArrayOf<TransactionReview.DappEntity>, unknownDapps: IdentifiedArrayOf<TransactionReview.UnknownDapp>) {
 			self.isExpanded = isExpanded
 			self.knownDapps = knownDapps
 			self.unknownDapps = unknownDapps
