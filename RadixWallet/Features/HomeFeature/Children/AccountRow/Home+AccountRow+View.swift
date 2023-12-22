@@ -126,6 +126,11 @@ extension Home.AccountRow {
 extension Home.AccountRow.View {
 	private enum Constants {
 		static let iconSize = HitTargetSize.smaller
+		static let borderWidth: CGFloat = 1
+
+		static var diameter: CGFloat {
+			iconSize.rawValue + 2 * borderWidth
+		}
 	}
 
 	@ViewBuilder
@@ -151,7 +156,7 @@ extension Home.AccountRow.View {
 				if !viewStore.fungibleResourceIcons.isEmpty {
 					// FIXME: Workaround to avoid ViewThatFits
 					let limit = viewStore.state.itemLimit(
-						iconSize: Constants.iconSize.rawValue,
+						iconSize: Constants.diameter,
 						width: proxy.size.width
 					)
 
@@ -173,23 +178,15 @@ extension Home.AccountRow.View {
 				}
 
 				if viewStore.nonFungibleResourcesCount > 0 {
-					Labeled(text: "\(viewStore.nonFungibleResourcesCount)") {
-						Image(asset: AssetResource.nft)
-							.resizable()
-							.frame(Constants.iconSize)
-					}
+					LabelledIcon(rectIcon: AssetResource.nft, label: "\(viewStore.nonFungibleResourcesCount)")
 				}
 
 				if viewStore.poolUnitsCount > 0 {
-					Labeled(text: "\(viewStore.poolUnitsCount)") {
-						Image(asset: AssetResource.poolUnit)
-							.resizable()
-							.frame(Constants.iconSize)
-					}
+					LabelledIcon(roundIcon: AssetResource.poolUnit, label: "\(viewStore.poolUnitsCount)")
 				}
 			}
 		}
-		.frame(height: Constants.iconSize.rawValue)
+		.frame(height: Constants.diameter)
 		.shimmer(active: viewStore.isLoadingResources, config: .accountResourcesLoading)
 		.cornerRadius(Constants.iconSize.rawValue / 4)
 	}
@@ -204,10 +201,14 @@ extension Home.AccountRow.View {
 			let hiddenCount = fungibles.count - displayedIconCount
 			let label = hiddenCount > 0 ? "+\(hiddenCount)" : nil
 
-			HStack(alignment: .center, spacing: -Constants.iconSize.rawValue / 3) {
+			HStack(alignment: .center, spacing: -Constants.diameter / 3) {
 				ForEach(displayedIcons) { item in
-					Labeled(text: item.offset == displayedIconCount - 1 ? label : nil, isFungible: true) {
-						TokenThumbnail(item.element, size: Constants.iconSize)
+					ZStack(alignment: .leading) {
+						if item.offset == displayedIconCount - 1, let label {
+							ResourceLabel(text: label, tighten: true)
+								.padding([.leading, .vertical], Constants.borderWidth)
+						}
+						TokenIcon(icon: item.element)
 					}
 					.zIndex(Double(-item.offset))
 				}
@@ -215,25 +216,69 @@ extension Home.AccountRow.View {
 		}
 	}
 
-	// Resources container to display a combination of any View + additional text. Tighten when used on round icons.
-	struct Labeled<Content: View>: View {
-		let text: String?
-		var isFungible: Bool = false
-		let content: () -> Content
+	struct TokenIcon: View {
+		let icon: TokenThumbnail.Content
 
 		var body: some View {
-			if let text {
-				ResourceLabel(text: text, isFungible: isFungible)
-					.overlay(alignment: .leading, content: content)
-			} else {
-				content()
+			ZStack {
+				Circle()
+					.fill(.app.whiteTransparent2)
+
+				TokenThumbnail(icon, size: Constants.iconSize)
+					.frame(Constants.iconSize)
+					.padding(Constants.borderWidth)
+			}
+		}
+	}
+
+	struct LabelledIcon<S: Shape>: View {
+		private let icon: ImageAsset
+		private let label: String
+		private let tighten: Bool
+		private let innerShape: S
+		private let outerShape: S
+
+		init(roundIcon: ImageAsset, label: String) where S == Circle {
+			self.icon = roundIcon
+			self.label = label
+			self.tighten = true
+			self.innerShape = Circle()
+			self.outerShape = Circle()
+		}
+
+		init(rectIcon: ImageAsset, label: String) where S == RoundedRectangle {
+			self.icon = rectIcon
+			self.label = label
+			self.tighten = false
+			self.innerShape = RoundedRectangle(cornerRadius: .small2)
+			self.outerShape = RoundedRectangle(cornerRadius: .small2 + Constants.borderWidth)
+		}
+
+		var body: some View {
+			ZStack(alignment: .leading) {
+				ResourceLabel(text: label, tighten: tighten)
+					.padding([.leading, .vertical], Constants.borderWidth)
+
+				outerShape
+					.fill(.app.whiteTransparent2)
+					.frame(width: Constants.diameter, height: Constants.diameter)
+
+				innerShape
+					.fill(.app.whiteTransparent)
+					.frame(Constants.iconSize)
+					.padding(Constants.borderWidth)
+
+				Image(asset: icon)
+					.resizable()
+					.frame(Constants.iconSize)
+					.padding(Constants.borderWidth)
 			}
 		}
 	}
 
 	struct ResourceLabel: View {
 		let text: String
-		let isFungible: Bool
+		let tighten: Bool
 
 		var body: some View {
 			Text(text)
@@ -243,7 +288,7 @@ extension Home.AccountRow.View {
 				.foregroundColor(.white)
 				.padding(.horizontal, .small2)
 				.frame(minWidth: .medium1, minHeight: Constants.iconSize.rawValue)
-				.padding(.leading, Constants.iconSize.rawValue - (isFungible ? .small3 : 0))
+				.padding(.leading, Constants.diameter - Constants.borderWidth - (tighten ? .small3 : 0))
 				.background(.app.whiteTransparent2)
 				.cornerRadius(Constants.iconSize.rawValue / 2)
 				.layoutPriority(100)
@@ -275,7 +320,7 @@ private extension Home.AccountRow.ViewState {
 		let hasItems = itemsShown > 0
 		let hasPoolUnits = poolUnitsCount > 0
 		let hasNFTs = nonFungibleResourcesCount > 0
-		let sections = (hasItems ? 1 : 0) + (hasPoolUnits ? 1 : 0) + (hasNFTs ? 1 : 0)
+		let sections = [hasItems, hasPoolUnits, hasNFTs].count(of: true)
 
 		var width: CGFloat = 0
 
