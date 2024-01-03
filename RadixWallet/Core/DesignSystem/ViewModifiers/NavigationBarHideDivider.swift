@@ -19,6 +19,7 @@ struct NavigationBarHideDividerModifier: ViewModifier {
 			appearance.shadowColor = .clear
 			appearance.backgroundColor = .white
 			navigationController.navigationBar.scrollEdgeAppearance = appearance
+			navigationController.navigationBar.standardAppearance = appearance
 		}
 	}
 }

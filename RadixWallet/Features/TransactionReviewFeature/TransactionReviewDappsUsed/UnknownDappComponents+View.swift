@@ -8,24 +8,17 @@ extension UnknownDappComponents {
 
 		public var body: some SwiftUI.View {
 			store.withState { state in
-				VStack(spacing: .large1) {
-					HStack {
-						CloseButton {
-							store.send(.view(.closeButtonTapped))
-						}
-						.padding(.trailing, .medium3)
-
-						Spacer()
-						Text(L10n.TransactionReview.unknownComponents(state.components.count))
-							.textStyle(.body1Header)
-							.foregroundColor(.app.gray1)
-						Spacer()
-					}
-
-					List(state.components) { componentAddress in
+				ScrollView {
+					ForEach(state.components) { componentAddress in
 						row(componentAddress)
 					}
-					.listStyle(.plain)
+				}
+				.navigationTitle(L10n.TransactionReview.unknownComponents(state.components.count))
+			}
+			.navigationBarTitleDisplayMode(.inline)
+			.toolbar {
+				ToolbarItem(placement: .primaryAction) {
+					CloseButton { store.send(.view(.closeButtonTapped)) }
 				}
 			}
 		}
@@ -45,12 +38,8 @@ extension UnknownDappComponents {
 				}
 				Spacer()
 			}
-			.alignmentGuide(.listRowSeparatorLeading) { _ in
-				.medium3
-			}
-			.alignmentGuide(.listRowSeparatorTrailing) { viewDimensions in
-				viewDimensions[.listRowSeparatorTrailing] - .medium3
-			}
+			.padding(.medium3)
+			.withSeparator
 		}
 	}
 }

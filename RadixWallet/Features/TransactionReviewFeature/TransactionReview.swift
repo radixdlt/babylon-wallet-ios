@@ -132,7 +132,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case customizeFees(CustomizeFees.State)
 			case fungibleTokenDetails(FungibleTokenDetails.State)
 			case nonFungibleTokenDetails(NonFungibleTokenDetails.State)
-			case unknownComponents(UnknownDappComponents.State)
+			case unknownDappComponents(UnknownDappComponents.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -143,7 +143,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case customizeFees(CustomizeFees.Action)
 			case fungibleTokenDetails(FungibleTokenDetails.Action)
 			case nonFungibleTokenDetails(NonFungibleTokenDetails.Action)
-			case unknownComponents(UnknownDappComponents.Action)
+			case unknownDappComponents(UnknownDappComponents.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -168,7 +168,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			Scope(state: /State.nonFungibleTokenDetails, action: /Action.nonFungibleTokenDetails) {
 				NonFungibleTokenDetails()
 			}
-			Scope(state: /State.unknownComponents, action: /Action.unknownComponents) {
+			Scope(state: /State.unknownDappComponents, action: /Action.unknownDappComponents) {
 				UnknownDappComponents()
 			}
 		}
@@ -303,7 +303,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .dAppsUsed(.delegate(.openUnknownComponents(components))):
-			state.destination = .unknownComponents(.init(components: components))
+			state.destination = .unknownDappComponents(.init(components: components))
 			return .none
 
 		case .deposits(.delegate(.showCustomizeGuarantees)):

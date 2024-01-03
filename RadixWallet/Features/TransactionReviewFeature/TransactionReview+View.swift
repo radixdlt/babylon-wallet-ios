@@ -326,9 +326,13 @@ private extension View {
 	private func unknownComponents(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /TransactionReview.Destination.State.unknownComponents,
-			action: TransactionReview.Destination.Action.unknownComponents,
-			content: { UnknownDappComponents.View(store: $0) }
+			state: /TransactionReview.Destination.State.unknownDappComponents,
+			action: TransactionReview.Destination.Action.unknownDappComponents,
+			content: { store in
+				NavigationStack {
+					UnknownDappComponents.View(store: store)
+				}
+			}
 		)
 	}
 
