@@ -135,7 +135,3 @@ extension URL {
 		appending(path: path.rawValue)
 	}
 }
-
-extension Radix.Dashboard {
-	func openURL() {}
-}
