@@ -735,10 +735,6 @@ extension TransactionReview {
 	}
 
 	private func extractUsedDapps(_ transaction: TransactionType.GeneralTransaction) async throws -> TransactionReviewDappsUsed.State? {
-		let addresses: [ComponentAddress] = try transaction.allAddress
-			.filter { $0.entityType() == .globalGenericComponent }
-			.map { try $0.asSpecific() }
-
 		let dAppsInfo = try await transaction.allAddress
 			.filter { $0.entityType() == .globalGenericComponent }
 			.map { try $0.asSpecific() }
@@ -747,8 +743,7 @@ extension TransactionReview {
 		guard !dAppsInfo.isEmpty else { return nil }
 
 		let knownDapps = dAppsInfo.compactMap(\.left).asIdentifiable()
-		// let unknownDapps = dAppsInfo.compactMap(\.right).asIdentifiable()
-		let unknownDapps = addresses.asIdentifiable()
+		let unknownDapps = dAppsInfo.compactMap(\.right).asIdentifiable()
 
 		return TransactionReviewDappsUsed.State(
 			isExpanded: true,

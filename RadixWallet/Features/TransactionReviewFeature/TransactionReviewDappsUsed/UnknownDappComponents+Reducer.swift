@@ -1,11 +1,9 @@
-import ComposableArchitecture
-
-public struct UnknownDappComponents: FeatureReducer {
+public struct UnknownDappComponents: FeatureReducer, Sendable {
 	public struct State: Hashable, Sendable {
 		let components: IdentifiedArrayOf<ComponentAddress>
 	}
 
-	public enum ViewAction {
+	public enum ViewAction: Sendable {
 		case closeButtonTapped
 	}
 

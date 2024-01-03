@@ -1170,7 +1170,7 @@
 		832880692AE664C30014FBF3 /* EntityFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832880682AE664C30014FBF3 /* EntityFlag.swift */; };
 		8328806C2AE6725F0014FBF3 /* AccountPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */; };
 		8338B9E52AFAB20700D1D8EA /* TransactionFee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */; };
-		835F196D2B3581C300E0B71D /* UnknownDappComponentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835F196C2B3581C300E0B71D /* UnknownDappComponentsView.swift */; };
+		835F196D2B3581C300E0B71D /* UnknownDappComponents+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835F196C2B3581C300E0B71D /* UnknownDappComponents+View.swift */; };
 		836878612B4551910029C808 /* UnknownDappComponents+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 836878602B4551910029C808 /* UnknownDappComponents+Reducer.swift */; };
 		83856D622B0279080026452A /* VerifyMnemonic+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83856D602B0279080026452A /* VerifyMnemonic+View.swift */; };
 		83856D632B0279080026452A /* VerifyMnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83856D612B0279080026452A /* VerifyMnemonic.swift */; };
@@ -2488,7 +2488,7 @@
 		832880682AE664C30014FBF3 /* EntityFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityFlag.swift; sourceTree = "<group>"; };
 		8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPreferencesTests.swift; sourceTree = "<group>"; };
 		8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionFee.swift; sourceTree = "<group>"; };
-		835F196C2B3581C300E0B71D /* UnknownDappComponentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnknownDappComponentsView.swift; sourceTree = "<group>"; };
+		835F196C2B3581C300E0B71D /* UnknownDappComponents+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UnknownDappComponents+View.swift"; sourceTree = "<group>"; };
 		836878602B4551910029C808 /* UnknownDappComponents+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UnknownDappComponents+Reducer.swift"; sourceTree = "<group>"; };
 		83856D602B0279080026452A /* VerifyMnemonic+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "VerifyMnemonic+View.swift"; sourceTree = "<group>"; };
 		83856D612B0279080026452A /* VerifyMnemonic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VerifyMnemonic.swift; sourceTree = "<group>"; };
@@ -3324,7 +3324,7 @@
 				48CFBCF32ADC10D800E77A5C /* TransactionReviewDappsUsed+View.swift */,
 				48CFBCF42ADC10D800E77A5C /* TransactionReviewDappsUsed.swift */,
 				836878602B4551910029C808 /* UnknownDappComponents+Reducer.swift */,
-				835F196C2B3581C300E0B71D /* UnknownDappComponentsView.swift */,
+				835F196C2B3581C300E0B71D /* UnknownDappComponents+View.swift */,
 			);
 			path = TransactionReviewDappsUsed;
 			sourceTree = "<group>";
@@ -8233,7 +8233,7 @@
 				48CFC3292ADC10D900E77A5C /* CameraPermission+Reducer.swift in Sources */,
 				48CFC53A2ADC10DA00E77A5C /* NotSyncedUpError.swift in Sources */,
 				48CFC54E2ADC10DA00E77A5C /* StateEntityNonFungibleResourceVaultsPageResponse.swift in Sources */,
-				835F196D2B3581C300E0B71D /* UnknownDappComponentsView.swift in Sources */,
+				835F196D2B3581C300E0B71D /* UnknownDappComponents+View.swift in Sources */,
 				48CFC6472ADC10DB00E77A5C /* PersonaDataEntryProtocol.swift in Sources */,
 				48CFC5942ADC10DA00E77A5C /* WalletApp.swift in Sources */,
 				48CFC58E2ADC10DA00E77A5C /* CameraPermissionClient+Interface.swift in Sources */,
