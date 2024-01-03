@@ -20,9 +20,9 @@ extension LSUStake.ViewState {
 		fileprivate var localized: String {
 			switch self {
 			case .unstaking:
-				L10n.Account.PoolUnits.unstaking
+				L10n.Account.Staking.unstaking
 			case .readyToClaim:
-				L10n.Account.PoolUnits.readyToClaim
+				L10n.Account.Staking.readyToClaim
 			}
 		}
 
@@ -79,7 +79,7 @@ extension LSUStake {
 
 		@ViewBuilder
 		private func liquidStakeUnitView(viewState: PoolUnitResourceViewState) -> some SwiftUI.View {
-			Text(L10n.Account.PoolUnits.liquidStakeUnits)
+			Text(L10n.Account.Staking.liquidStakeUnits)
 				.stakeHeaderStyle
 
 			PoolUnitResourceView(viewState: viewState) {
@@ -88,7 +88,7 @@ extension LSUStake {
 						.foregroundColor(.app.gray1)
 						.textStyle(.body2HighImportance)
 
-					Text(L10n.Account.PoolUnits.staked)
+					Text(L10n.Account.Staking.staked)
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2HighImportance)
 				}
