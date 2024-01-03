@@ -17,39 +17,55 @@ public enum L10n {
     public static let nfts = L10n.tr("Localizable", "account_nfts", fallback: "NFTs")
     /// Pool Units
     public static let poolUnits = L10n.tr("Localizable", "account_poolUnits", fallback: "Pool Units")
+    /// Staking
+    public static let staking = L10n.tr("Localizable", "account_staking", fallback: "Staking")
     /// Tokens
     public static let tokens = L10n.tr("Localizable", "account_tokens", fallback: "Tokens")
     /// Transfer
     public static let transfer = L10n.tr("Localizable", "account_transfer", fallback: "Transfer")
     public enum PoolUnits {
-      /// LIQUID STAKE UNITS
-      public static let liquidStakeUnits = L10n.tr("Localizable", "account_poolUnits_liquidStakeUnits", fallback: "LIQUID STAKE UNITS")
-      /// Radix Network XRD Stake
-      public static let lsuResourceHeader = L10n.tr("Localizable", "account_poolUnits_lsuResourceHeader", fallback: "Radix Network XRD Stake")
       /// Missing Total supply - could not calculate redemption value
       public static let noTotalSupply = L10n.tr("Localizable", "account_poolUnits_noTotalSupply", fallback: "Missing Total supply - could not calculate redemption value")
       /// %d Stakes
       public static func numberOfStakes(_ p1: Int) -> String {
         return L10n.tr("Localizable", "account_poolUnits_numberOfStakes", p1, fallback: "%d Stakes")
       }
-      /// Ready to Claim
-      public static let readyToClaim = L10n.tr("Localizable", "account_poolUnits_readyToClaim", fallback: "Ready to Claim")
       /// STAKE CLAIM NFTS
       public static let stakeClaimNFTs = L10n.tr("Localizable", "account_poolUnits_stakeClaimNFTs", fallback: "STAKE CLAIM NFTS")
-      /// Staked
-      public static let staked = L10n.tr("Localizable", "account_poolUnits_staked", fallback: "Staked")
       /// Unknown
       public static let unknownPoolUnitName = L10n.tr("Localizable", "account_poolUnits_unknownPoolUnitName", fallback: "Unknown")
       /// Unknown
       public static let unknownSymbolName = L10n.tr("Localizable", "account_poolUnits_unknownSymbolName", fallback: "Unknown")
       /// Unknown
       public static let unknownValidatorName = L10n.tr("Localizable", "account_poolUnits_unknownValidatorName", fallback: "Unknown")
-      /// Unstaking
-      public static let unstaking = L10n.tr("Localizable", "account_poolUnits_unstaking", fallback: "Unstaking")
       public enum Details {
         /// Current Redeemable Value
         public static let currentRedeemableValue = L10n.tr("Localizable", "account_poolUnits_details_currentRedeemableValue", fallback: "Current Redeemable Value")
       }
+    }
+    public enum Staking {
+      /// Claim
+      public static let claim = L10n.tr("Localizable", "account_staking_claim", fallback: "Claim")
+      /// Liquid Stake Units
+      public static let liquidStakeUnits = L10n.tr("Localizable", "account_staking_liquidStakeUnits", fallback: "Liquid Stake Units")
+      /// Radix Network XRD Stake Summary
+      public static let lsuResourceHeader = L10n.tr("Localizable", "account_staking_lsuResourceHeader", fallback: "Radix Network XRD Stake Summary")
+      /// Ready to be claimed
+      public static let readyToBeClaimed = L10n.tr("Localizable", "account_staking_readyToBeClaimed", fallback: "Ready to be claimed")
+      /// Ready to Claim
+      public static let readyToClaim = L10n.tr("Localizable", "account_staking_readyToClaim", fallback: "Ready to Claim")
+      /// Stake Claim NFTs
+      public static let stakeClaimNFTs = L10n.tr("Localizable", "account_staking_stakeClaimNFTs", fallback: "Stake Claim NFTs")
+      /// Staked
+      public static let staked = L10n.tr("Localizable", "account_staking_staked", fallback: "Staked")
+      /// STAKED VALIDATORS (%d)
+      public static func stakedValidators(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "account_staking_stakedValidators", p1, fallback: "STAKED VALIDATORS (%d)")
+      }
+      /// Unstaking
+      public static let unstaking = L10n.tr("Localizable", "account_staking_unstaking", fallback: "Unstaking")
+      /// WORTH
+      public static let worth = L10n.tr("Localizable", "account_staking_worth", fallback: "WORTH")
     }
   }
   public enum AccountRecoveryScan {
@@ -587,6 +603,22 @@ public enum L10n {
       /// What are Pool units?
       public static let whatArePoolUnits = L10n.tr("Localizable", "assetDetails_poolUnitDetails_whatArePoolUnits", fallback: "What are Pool units?")
     }
+    public enum Staking {
+      /// Ready to Claim %@ XRD
+      public static func readyToClaim(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "assetDetails_staking_readyToClaim", String(describing: p1), fallback: "Ready to Claim %@ XRD")
+      }
+      /// Ready to Claim %@ XRD in approx. less than %d minutes
+      public static func unstaking(_ p1: Any, _ p2: Int) -> String {
+        return L10n.tr("Localizable", "assetDetails_staking_unstaking", String(describing: p1), p2, fallback: "Ready to Claim %@ XRD in approx. less than %d minutes")
+      }
+    }
+    public enum StakingDetails {
+      /// You have no Stakes
+      public static let noStakes = L10n.tr("Localizable", "assetDetails_stakingDetails_noStakes", fallback: "You have no Stakes")
+      /// What is Staking?
+      public static let whatIsStaking = L10n.tr("Localizable", "assetDetails_stakingDetails_whatIsStaking", fallback: "What is Staking?")
+    }
     public enum Tags {
       /// Official Radix
       public static let officialRadix = L10n.tr("Localizable", "assetDetails_tags_officialRadix", fallback: "Official Radix")
@@ -829,6 +861,8 @@ public enum L10n {
     public static let cancel = L10n.tr("Localizable", "common_cancel", fallback: "Cancel")
     /// Choose
     public static let choose = L10n.tr("Localizable", "common_choose", fallback: "Choose")
+    /// Component
+    public static let component = L10n.tr("Localizable", "common_component", fallback: "Component")
     /// Confirm
     public static let confirm = L10n.tr("Localizable", "common_confirm", fallback: "Confirm")
     /// Continue
@@ -869,6 +903,8 @@ public enum L10n {
     public static let somethingWentWrong = L10n.tr("Localizable", "common_somethingWentWrong", fallback: "Something went wrong")
     /// Settings
     public static let systemSettings = L10n.tr("Localizable", "common_systemSettings", fallback: "Settings")
+    /// Unauthorized
+    public static let unauthorized = L10n.tr("Localizable", "common_unauthorized", fallback: "Unauthorized")
   }
   public enum ConfirmMnemonicBackedUp {
     /// Confirm you have written down the seed phrase by entering the missing words below.
@@ -1030,8 +1066,8 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "customizeNetworkFees_advancedMode_title", fallback: "Advanced Customize Fees")
     }
     public enum NormalMode {
-      /// Choose what account to pay the transaction fee from, or add a up your transaction if necessary.
-      public static let subtitle = L10n.tr("Localizable", "customizeNetworkFees_normalMode_subtitle", fallback: "Choose what account to pay the transaction fee from, or add a up your transaction if necessary.")
+      /// Choose what account to pay the transaction fee from, or add a "tip" to speed up your transaction if necessary.
+      public static let subtitle = L10n.tr("Localizable", "customizeNetworkFees_normalMode_subtitle", fallback: "Choose what account to pay the transaction fee from, or add a \"tip\" to speed up your transaction if necessary.")
       /// Customize Fees
       public static let title = L10n.tr("Localizable", "customizeNetworkFees_normalMode_title", fallback: "Customize Fees")
     }
@@ -2361,9 +2397,9 @@ public enum L10n {
     public static let messageHeading = L10n.tr("Localizable", "transactionReview_messageHeading", fallback: "Message")
     /// Presenting
     public static let presentingHeading = L10n.tr("Localizable", "transactionReview_presentingHeading", fallback: "Presenting")
-    /// Proposed by %s
-    public static func proposingDappSubtitle(_ p1: UnsafePointer<CChar>) -> String {
-      return L10n.tr("Localizable", "transactionReview_proposingDappSubtitle", p1, fallback: "Proposed by %s")
+    /// Proposed by %@
+    public static func proposingDappSubtitle(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "transactionReview_proposingDappSubtitle", String(describing: p1), fallback: "Proposed by %@")
     }
     /// Raw Transaction
     public static let rawTransactionTitle = L10n.tr("Localizable", "transactionReview_rawTransactionTitle", fallback: "Raw Transaction")

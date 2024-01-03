@@ -39,7 +39,7 @@ extension LSUResource {
 		) -> some SwiftUI.View {
 			PoolUnitHeaderView(viewState: .init(iconURL: viewStore.iconURL)) {
 				VStack(alignment: .leading, spacing: .small3) {
-					Text(L10n.Account.PoolUnits.lsuResourceHeader)
+					Text("Radix Network XRD Stake") // This is temporary, stakes will be redesigned.
 						.lineSpacing(-12)
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
