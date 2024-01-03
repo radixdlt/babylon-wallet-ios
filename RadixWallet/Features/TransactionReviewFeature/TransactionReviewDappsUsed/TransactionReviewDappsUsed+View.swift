@@ -15,7 +15,8 @@ extension TransactionReview.DappEntity {
 		.known(
 			name: metadata.name ?? L10n.TransactionReview.unnamedDapp,
 			thumbnail: metadata.iconURL,
-			id: id
+			id: id,
+			unauthorizedHint: isAuthorized ? nil : L10n.Common.unauthorized
 		)
 	}
 }
@@ -48,8 +49,13 @@ extension TransactionReviewDappsUsed {
 					if isExpanded {
 						VStack(spacing: .small2) {
 							ForEach(viewStore.rows, id: \.self) { rowViewState in
-								DappView(viewState: rowViewState) { id in
-									viewStore.send(.dappTapped(id))
+								DappView(viewState: rowViewState) { action in
+									switch action {
+									case let .knownDappTapped(id):
+										viewStore.send(.dappTapped(id))
+									case .unknownComponentsTapped:
+										viewStore.send(.unknownComponentsTapped)
+									}
 								}
 							}
 						}
@@ -75,27 +81,32 @@ extension TransactionReviewDappsUsed {
 
 		struct DappView: SwiftUI.View {
 			enum ViewState: Hashable {
-				case known(name: String, thumbnail: URL?, id: TransactionReview.DappEntity.ID)
+				case known(name: String, thumbnail: URL?, id: TransactionReview.DappEntity.ID, unauthorizedHint: String?)
 				case unknown(count: Int)
 			}
 
+			enum Action {
+				case knownDappTapped(TransactionReview.DappEntity.ID)
+				case unknownComponentsTapped
+			}
+
 			let viewState: ViewState
-			let action: (TransactionReview.DappEntity.ID) -> Void
+			let action: (Action) -> Void
 
 			var body: some SwiftUI.View {
 				switch viewState {
-				case let .known(name, url, id):
+				case let .known(name, url, id, unauthorizedHint):
 					Card {
-						action(id)
+						action(.knownDappTapped(id))
 					} contents: {
-						PlainListRow(title: name, accessory: nil) {
+						PlainListRow(title: name, subtitle: unauthorizedHint, accessory: nil) {
 							DappThumbnail(.known(url))
 						}
 					}
 
 				case let .unknown(count):
 					Card {
-						// action(id)
+						action(.unknownComponentsTapped)
 					} contents: {
 						PlainListRow(title: L10n.TransactionReview.unknownComponents(count), accessory: nil) {
 							DappThumbnail(.unknown)

@@ -296,6 +296,7 @@ private extension View {
 			.customizeFees(with: destinationStore)
 			.signing(with: destinationStore)
 			.submitting(with: destinationStore)
+			.unknownComponents(with: destinationStore)
 	}
 
 	private func customizeGuarantees(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
@@ -319,6 +320,15 @@ private extension View {
 					DappDetails.View(store: detailsStore)
 				}
 			}
+		)
+	}
+
+	private func unknownComponents(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /TransactionReview.Destination.State.unknownComponents,
+			action: TransactionReview.Destination.Action.unknownComponents,
+			content: { UnknownDappComponents.View(store: $0) }
 		)
 	}
 

@@ -113,6 +113,10 @@ extension AuthorizedDappsClient {
 			}
 		}
 	}
+
+	public func isDappAuthorized(_ address: DappDefinitionAddress) async -> Bool {
+		await (try? getAuthorizedDapps().contains { $0.id == address }) ?? false
+	}
 }
 
 extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData {
