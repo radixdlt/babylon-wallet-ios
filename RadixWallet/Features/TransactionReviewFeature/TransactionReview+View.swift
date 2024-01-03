@@ -328,10 +328,10 @@ private extension View {
 			store: destinationStore,
 			state: /TransactionReview.Destination.State.unknownDappComponents,
 			action: TransactionReview.Destination.Action.unknownDappComponents,
-			content: { store in
-				NavigationStack {
-					UnknownDappComponents.View(store: store)
-				}
+			content: {
+				UnknownDappComponents.View(store: $0)
+					.inNavigationStack
+					.presentationDetents([.medium])
 			}
 		)
 	}
