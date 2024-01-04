@@ -113,6 +113,9 @@ public struct AssetsView: Sendable, FeatureReducer {
 			.ifLet(\.nonFungibleTokenList, action: /Action.child .. ChildAction.nonFungibleTokenList) {
 				NonFungibleAssetList()
 			}
+			.ifLet(\.stakeUnitList, action: /Action.child .. ChildAction.stakeUnitList) {
+				StakeUnitList()
+			}
 			.ifLet(\.poolUnitsList, action: /Action.child .. ChildAction.poolUnitsList) {
 				PoolUnitsList()
 			}
@@ -201,21 +204,18 @@ public struct AssetsView: Sendable, FeatureReducer {
 			)
 		}
 
-		let lsuResource: LSUResource.State? = {
+		let lsuResource: IdentifiedArrayOf<LSUStake.State>? = {
 			guard !portfolio.poolUnitResources.radixNetworkStakes.isEmpty else {
 				return nil
 			}
-			return .init(
-				account: portfolio,
-				stakes: portfolio.poolUnitResources.radixNetworkStakes.map { stake in
-					LSUStake.State(
-						stake: stake,
-						stakeDetails: .loading,
-						isStakeSelected: stake.stakeUnitResource.flatMap { mode.nonXrdRowSelected($0.resourceAddress) },
-						selectedStakeClaimAssets: stake.stakeClaimResource.flatMap { mode.nftRowSelectedAssets($0.resourceAddress) }
-					)
-				}.asIdentifiable()
-			)
+			return portfolio.poolUnitResources.radixNetworkStakes.map { stake in
+				LSUStake.State(
+					stake: stake,
+					stakeDetails: .loading,
+					isStakeSelected: stake.stakeUnitResource.flatMap { mode.nonXrdRowSelected($0.resourceAddress) },
+					selectedStakeClaimAssets: stake.stakeClaimResource.flatMap { mode.nftRowSelectedAssets($0.resourceAddress) }
+				)
+			}.asIdentifiable()
 		}()
 
 		let poolUnitList: PoolUnitsList.State? = {
@@ -258,7 +258,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		return .init(
 			fungibleTokenList: fungibleTokenList,
 			nonFungibleTokenList: !nfts.isEmpty ? .init(rows: .init(uniqueElements: nfts)) : nil,
-			stakeUnitList: nil,
+			stakeUnitList: lsuResource.map { StakeUnitList.State(account: portfolio, stakes: $0) },
 			poolUnitsList: poolUnitList
 		)
 	}
@@ -269,7 +269,7 @@ extension AssetsView.State {
 	public var selectedAssets: Mode.SelectedAssets? {
 		guard case .selection = mode else { return nil }
 
-		let selectedLsuTokens = stakeUnitList?.lsuResource?.stakes
+		let selectedLsuTokens = stakeUnitList?.stakes
 			.compactMap(SelectedResourceProvider.init)
 			.compactMap(\.selectedResource) ?? []
 		let selectedPoolUnitTokens = poolUnitsList?.poolUnits
@@ -286,7 +286,7 @@ extension AssetsView.State {
 			.map(SelectedResourceProvider.init)
 			.compactMap(\.selectedResource) ?? []
 
-		let selectedStakeClaimNonFungibleResources = (stakeUnitList?.lsuResource?.stakes)
+		let selectedStakeClaimNonFungibleResources = (stakeUnitList?.stakes)
 			.map { $0.compactMap(NonFungibleTokensPerResourceProvider.init) } ?? []
 		let selectedNonFungibleResources = nonFungibleTokenList?.rows.compactMap(NonFungibleTokensPerResourceProvider.init) ?? []
 

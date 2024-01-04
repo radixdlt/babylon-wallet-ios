@@ -20,34 +20,24 @@ public extension StakeUnitList {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				// TODO: implement
-				Text("Implement: StakeUnitList")
-					.background(Color.yellow)
-					.foregroundColor(.red)
-					.onAppear { viewStore.send(.appeared) }
-			}
+			componentsView
+				.onAppear {
+					store.send(.view(.appeared))
+				}
+		}
+
+		private var componentsView: some SwiftUI.View {
+			ForEachStore(
+				store.scope(
+					state: \.stakes,
+					action: (
+						/StakeUnitList.Action.child
+							.. StakeUnitList.ChildAction.stake
+					).embed
+				),
+				content: LSUStake.View.init
+			)
+			.rowStyle()
 		}
 	}
 }
-
-#if DEBUG
-import SwiftUI // NB: necessary for previews to appear
-
-// MARK: - StakeUnitList_Preview
-
-struct StakeUnitList_Preview: PreviewProvider {
-	static var previews: some View {
-		StakeUnitList.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: StakeUnitList.init
-			)
-		)
-	}
-}
-
-public extension StakeUnitList.State {
-	static let previewValue = Self()
-}
-#endif

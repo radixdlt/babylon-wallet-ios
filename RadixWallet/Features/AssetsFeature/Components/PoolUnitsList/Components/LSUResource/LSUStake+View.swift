@@ -56,23 +56,25 @@ extension LSUStake {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: Action.view) { viewStore in
-				VStack(alignment: .leading, spacing: .medium1) {
-					loadable(viewStore.content) { content in
-						ValidatorNameView(viewState: content.validatorNameViewState)
+				Section {
+					VStack(alignment: .leading, spacing: .medium1) {
+						loadable(viewStore.content) { content in
+							ValidatorNameView(viewState: content.validatorNameViewState)
 
-						if let liquidStakeUnitViewState = content.liquidStakeUnit {
-							liquidStakeUnitView(viewState: liquidStakeUnitViewState)
-								.onTapGesture { viewStore.send(.didTap) }
-						}
+							if let liquidStakeUnitViewState = content.liquidStakeUnit {
+								liquidStakeUnitView(viewState: liquidStakeUnitViewState)
+									.onTapGesture { viewStore.send(.didTap) }
+							}
 
-						if let stakeClaimNFTsViewState = content.stakeClaimNFTs {
-							stakeClaimNFTsView(viewState: stakeClaimNFTsViewState) {
-								viewStore.send(.didTapStakeClaimNFT(withID: $0))
+							if let stakeClaimNFTsViewState = content.stakeClaimNFTs {
+								stakeClaimNFTsView(viewState: stakeClaimNFTsViewState) {
+									viewStore.send(.didTapStakeClaimNFT(withID: $0))
+								}
 							}
 						}
 					}
+					.padding(.medium1)
 				}
-				.padding(.medium1)
 			}
 			.destinations(with: store)
 		}
