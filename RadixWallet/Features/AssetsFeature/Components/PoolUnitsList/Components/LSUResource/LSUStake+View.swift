@@ -45,7 +45,7 @@ extension LSUStake {
 		struct Content: Sendable, Equatable {
 			let validatorNameViewState: ValidatorNameView.ViewState
 			let liquidStakeUnit: LiquidStakeUnitView.ViewState?
-			let stakeClaimNFTs: StakeClaimNFTsViewState?
+			let stakeClaimNFTs: StakeClaimNFTSView.ViewState?
 		}
 
 		let content: Loadable<Content>
@@ -77,6 +77,7 @@ extension LSUStake {
 								stakeClaimNFTsView(viewState: stakeClaimNFTsViewState) {
 									viewStore.send(.didTapStakeClaimNFT(withID: $0))
 								}
+								.rowStyle()
 							}
 						}
 					}
@@ -99,48 +100,28 @@ extension LSUStake {
 		}
 
 		private func stakeClaimNFTsView(
-			viewState: ViewState.StakeClaimNFTsViewState,
-			handleTapGesture: @escaping (ViewState.StakeClaimNFTViewState.ID) -> Void
+			viewState: StakeClaimNFTSView.ViewState,
+			handleTapGesture: @escaping (NonFungibleGlobalId) -> Void
 		) -> some SwiftUI.View {
-			VStack(alignment: .leading, spacing: .medium1) {
-				Text(L10n.Account.PoolUnits.stakeClaimNFTs)
-					.stakeHeaderStyle
+			VStack(spacing: .zero) {
+				Divider()
+					.frame(height: .small3)
+					.overlay(.app.gray5)
 
-				ForEach(viewState) { stakeClaimNFTViewState in
-					HStack(spacing: .zero) {
-						TokenThumbnail(stakeClaimNFTViewState.thumbnail, size: .smallest)
-							.padding(.trailing, .small1)
-
-						Text(stakeClaimNFTViewState.status.localized)
-							.foregroundColor(stakeClaimNFTViewState.status.foregroundColor)
-							.textStyle(.body2HighImportance)
-							.padding(.trailing, .small1)
-
-						Spacer(minLength: 0)
-
-						Text(stakeClaimNFTViewState.tokenAmount)
-							.foregroundColor(.app.gray1)
-							.textStyle(.secondaryHeader)
-
-						if let isSelected = stakeClaimNFTViewState.isSelected {
-							CheckmarkView(appearance: .dark, isChecked: isSelected)
-						}
-					}
-					.borderAround
-					.onTapGesture { handleTapGesture(stakeClaimNFTViewState.id) }
-				}
+				StakeClaimNFTSView(viewState: viewState, onTap: handleTapGesture)
+					.padding(.medium1)
 			}
 		}
 	}
 }
 
 extension View {
-	fileprivate var stakeHeaderStyle: some View {
+	private var stakeHeaderStyle: some View {
 		foregroundColor(.app.gray2)
 			.textStyle(.body2HighImportance)
 	}
 
-	fileprivate var borderAround: some View {
+	private var borderAround: some View {
 		padding(.small2)
 			.overlay(
 				RoundedRectangle(cornerRadius: .small1)
@@ -161,23 +142,28 @@ extension LSUStake.State {
 						LiquidStakeUnitView.ViewState(resource: resource.resource, worth: details.xrdRedemptionValue)
 					},
 					stakeClaimNFTs: details.stakeClaimTokens.flatMap { stakeClaim in
-						.init(rawValue:
-							stakeClaim.tokens.map { token in
-								let status: LSUStake.ViewState.StakeClaimNFTStatus = {
-									guard let claimEpoch = token.data?.claimEpoch else {
-										return .unstaking
+						StakeClaimNFTSView.ViewState(
+							resource: stakeClaim.resource,
+							sections: {
+								var unstakingTokens: StakeClaimNFTSView.StakeClaims = .init()
+								var readyToClaimTokens: StakeClaimNFTSView.StakeClaims = .init()
+								for token in stakeClaim.tokens {
+									if let claimEpoch = token.data?.claimEpoch, claimEpoch <= details.currentEpoch {
+										readyToClaimTokens.append(.init(id: token.id, worth: token.data?.claimAmount ?? 0))
+									} else {
+										unstakingTokens.append(.init(id: token.id, worth: token.data?.claimAmount ?? 0))
 									}
+								}
+								var sections: IdentifiedArrayOf<StakeClaimNFTSView.Section> = []
+								if !unstakingTokens.isEmpty {
+									sections.append(.unstaking(unstakingTokens))
+								}
 
-									return claimEpoch <= details.currentEpoch ? .readyToClaim : .unstaking
-								}()
-								return LSUStake.ViewState.StakeClaimNFTViewState(
-									id: token.id,
-									thumbnail: .xrd,
-									status: status,
-									tokenAmount: (token.data?.claimAmount ?? 0).formatted(),
-									isSelected: self.selectedStakeClaimAssets?.contains(token)
-								)
-							}.asIdentifiable()
+								if !readyToClaimTokens.isEmpty {
+									sections.append(.readyToBeClaimed(readyToClaimTokens))
+								}
+								return sections
+							}()
 						)
 					}
 				)
