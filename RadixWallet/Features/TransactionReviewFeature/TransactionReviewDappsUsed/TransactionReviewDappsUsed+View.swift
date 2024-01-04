@@ -3,8 +3,8 @@ import SwiftUI
 extension TransactionReviewDappsUsed.State {
 	var viewState: TransactionReviewDappsUsed.ViewState {
 		var dApps = knownDapps.map(\.knownDapp)
-		if unknownDapps > 0 {
-			dApps.append(.unknown(count: unknownDapps))
+		if !unknownDapps.isEmpty {
+			dApps.append(.unknown(count: unknownDapps.count))
 		}
 		return .init(rows: dApps)
 	}
@@ -15,7 +15,8 @@ extension TransactionReview.DappEntity {
 		.known(
 			name: metadata.name ?? L10n.TransactionReview.unnamedDapp,
 			thumbnail: metadata.iconURL,
-			id: id
+			id: id,
+			unauthorizedHint: isAuthorized ? nil : L10n.Common.unauthorized
 		)
 	}
 }
@@ -38,21 +39,24 @@ extension TransactionReviewDappsUsed {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(alignment: .trailing, spacing: .medium2) {
+				VStack(alignment: .leading, spacing: .small2) {
 					Button {
 						viewStore.send(.expandTapped)
 					} label: {
-						HeadingLabel(isExpanded: isExpanded)
+						Heading(isExpanded: isExpanded)
 					}
-					.padding(.trailing, .medium3)
 
 					if isExpanded {
 						VStack(spacing: .small2) {
 							ForEach(viewStore.rows, id: \.self) { rowViewState in
-								DappView(viewState: rowViewState) { id in
-									viewStore.send(.dappTapped(id))
+								DappView(viewState: rowViewState) { action in
+									switch action {
+									case let .knownDappTapped(id):
+										viewStore.send(.dappTapped(id))
+									case .unknownComponentsTapped:
+										viewStore.send(.unknownComponentsTapped)
+									}
 								}
-								.background(.app.gray5)
 							}
 						}
 						.transition(.opacity.combined(with: .scale(scale: 0.95)))
@@ -62,68 +66,52 @@ extension TransactionReviewDappsUsed {
 			}
 		}
 
-		struct HeadingLabel: SwiftUI.View {
+		struct Heading: SwiftUI.View {
 			let isExpanded: Bool
 
 			var body: some SwiftUI.View {
 				HStack(spacing: .small3) {
-					Text(L10n.TransactionReview.usingDappsHeading)
-						.textStyle(.body1Header)
-						.foregroundColor(.app.gray2)
+					TransactionHeading.usingDapps
 					Image(asset: isExpanded ? AssetResource.chevronUp : AssetResource.chevronDown)
 						.renderingMode(.original)
-				}
-				.background {
-					Rectangle()
-						.fill(.app.gray5)
-						.blur(radius: 2)
+					Spacer()
 				}
 			}
 		}
 
 		struct DappView: SwiftUI.View {
-			private let dAppBoxWidth: CGFloat = 190
-
 			enum ViewState: Hashable {
-				case known(name: String, thumbnail: URL?, id: TransactionReview.DappEntity.ID)
+				case known(name: String, thumbnail: URL?, id: TransactionReview.DappEntity.ID, unauthorizedHint: String?)
 				case unknown(count: Int)
 			}
 
+			enum Action {
+				case knownDappTapped(TransactionReview.DappEntity.ID)
+				case unknownComponentsTapped
+			}
+
 			let viewState: ViewState
-			let action: (TransactionReview.DappEntity.ID) -> Void
+			let action: (Action) -> Void
 
 			var body: some SwiftUI.View {
-				HStack(spacing: 0) {
-					switch viewState {
-					case let .known(name, url, id):
-						Button {
-							action(id)
-						} label: {
-							HStack(spacing: 0) {
-								DappThumbnail(.known(url), size: .smaller)
-									.padding(.trailing, .small2)
-								Text(name)
-									.lineLimit(2)
-							}
+				switch viewState {
+				case let .known(name, url, id, unauthorizedHint):
+					Card {
+						action(.knownDappTapped(id))
+					} contents: {
+						PlainListRow(title: name, subtitle: unauthorizedHint, accessory: nil) {
+							DappThumbnail(.known(url))
 						}
-					case let .unknown(count):
-						DappThumbnail(.unknown, size: .smaller)
-							.padding(.trailing, .small2)
-						Text(L10n.TransactionReview.unknownComponents(count))
-							.lineLimit(2)
 					}
 
-					Spacer(minLength: 0)
-				}
-				.lineSpacing(0)
-				.textStyle(.body2HighImportance)
-				.foregroundColor(.app.gray2)
-				.multilineTextAlignment(.leading)
-				.padding(.small2)
-				.frame(width: dAppBoxWidth)
-				.background {
-					RoundedRectangle(cornerRadius: .small2)
-						.stroke(.app.gray3, style: .transactionReview)
+				case let .unknown(count):
+					Card {
+						action(.unknownComponentsTapped)
+					} contents: {
+						PlainListRow(title: L10n.TransactionReview.unknownComponents(count), accessory: nil) {
+							DappThumbnail(.unknown)
+						}
+					}
 				}
 			}
 		}
