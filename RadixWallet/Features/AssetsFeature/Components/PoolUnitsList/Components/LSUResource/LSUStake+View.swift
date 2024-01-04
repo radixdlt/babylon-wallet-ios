@@ -44,7 +44,7 @@ extension LSUStake {
 
 		struct Content: Sendable, Equatable {
 			let validatorNameViewState: ValidatorNameView.ViewState
-			let liquidStakeUnit: PoolUnitResourceViewState?
+			let liquidStakeUnit: LiquidStakeUnitView.ViewState?
 			let stakeClaimNFTs: StakeClaimNFTsViewState?
 		}
 
@@ -87,31 +87,14 @@ extension LSUStake {
 		}
 
 		@ViewBuilder
-		private func liquidStakeUnitView(viewState: PoolUnitResourceViewState) -> some SwiftUI.View {
+		private func liquidStakeUnitView(viewState: LiquidStakeUnitView.ViewState) -> some SwiftUI.View {
 			VStack(spacing: .zero) {
 				Divider()
 					.frame(height: .small3)
 					.overlay(.app.gray5)
 
-				VStack(alignment: .leading) {
-					Text(L10n.Account.Staking.liquidStakeUnits)
-						.stakeHeaderStyle
-
-					PoolUnitResourceView(viewState: viewState) {
-						VStack(alignment: .leading) {
-							Text(viewState.symbol)
-								.foregroundColor(.app.gray1)
-								.textStyle(.body2HighImportance)
-
-							Text(L10n.Account.Staking.staked)
-								.foregroundColor(.app.gray2)
-								.textStyle(.body2HighImportance)
-						}
-					}
-					.background(.app.white)
-					.borderAround
-				}
-				.padding(.medium1)
+				LiquidStakeUnitView(viewState: viewState)
+					.padding(.medium1)
 			}
 		}
 
@@ -175,13 +158,7 @@ extension LSUStake.State {
 				LSUStake.ViewState.Content(
 					validatorNameViewState: .init(with: details.validator, stakedAmount: details.xrdRedemptionValue),
 					liquidStakeUnit: details.stakeUnitResource.map { resource in
-						.init(
-							id: resource.resource.resourceAddress, // FIXME: IS THIS CORRECT
-							thumbnail: .xrd,
-							symbol: Constants.xrdTokenName,
-							tokenAmount: details.xrdRedemptionValue.formatted(),
-							isSelected: isStakeSelected
-						)
+						LiquidStakeUnitView.ViewState(resource: resource.resource, worth: details.xrdRedemptionValue)
 					},
 					stakeClaimNFTs: details.stakeClaimTokens.flatMap { stakeClaim in
 						.init(rawValue:
