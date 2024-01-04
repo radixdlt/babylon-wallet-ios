@@ -97,28 +97,35 @@ extension AssetsView {
 		}
 
 		private func assetTypeSelectorView(_ viewStore: ViewStoreOf<AssetsView>) -> some SwiftUI.View {
-			HStack(spacing: .zero) {
-				Spacer()
+			ScrollViewReader { value in
+				ScrollView(.horizontal) {
+					HStack(spacing: .zero) {
+						Spacer()
 
-				ForEach(viewStore.assetKinds) { kind in
-					let isSelected = viewStore.activeAssetKind == kind
-					Text(kind.displayText)
-						.foregroundColor(isSelected ? .app.white : .app.gray1)
-						.textStyle(.body1HighImportance)
-						.frame(height: .large1)
-						.padding(.horizontal, .medium2)
-						.background(
-							isSelected
-								? RoundedRectangle(cornerRadius: .medium2).fill(.app.gray1)
-								: nil
-						)
-						.id(kind)
-						.onTapGesture {
-							viewStore.send(.didSelectList(kind))
+						ForEach(viewStore.assetKinds) { kind in
+							let isSelected = viewStore.activeAssetKind == kind
+							Text(kind.displayText)
+								.foregroundColor(isSelected ? .app.white : .app.gray1)
+								.textStyle(.body1HighImportance)
+								.frame(height: .large1)
+								.padding(.horizontal, .medium2)
+								.background(
+									isSelected
+										? RoundedRectangle(cornerRadius: .medium2).fill(.app.gray1)
+										: nil
+								)
+								.id(kind)
+								.onTapGesture {
+									viewStore.send(.didSelectList(kind))
+									withAnimation {
+										value.scrollTo(kind, anchor: .center)
+									}
+								}
 						}
-				}
 
-				Spacer()
+						Spacer()
+					}
+				}
 			}
 		}
 	}
