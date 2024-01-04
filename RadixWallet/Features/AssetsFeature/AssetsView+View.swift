@@ -47,6 +47,15 @@ extension AssetsView {
 								then: { NonFungibleAssetList.View(store: $0) },
 								else: { EmptyAssetListView.nonFungibleResources }
 							)
+						case .stakeUnits:
+							IfLetStore(
+								store.scope(
+									state: \.stakeUnitList,
+									action: { .child(.stakeUnitList($0)) }
+								),
+								then: { StakeUnitList.View(store: $0) },
+								else: { EmptyAssetListView.stakes }
+							)
 						case .poolUnits:
 							IfLetStore(
 								store.scope(

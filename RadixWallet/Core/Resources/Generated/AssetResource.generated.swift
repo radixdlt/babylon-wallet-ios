@@ -28,6 +28,7 @@ public enum AssetResource {
   public static let fungibleTokens = ImageAsset(name: "fungible-tokens")
   public static let nonfungbileTokens = ImageAsset(name: "nonfungbile-tokens")
   public static let poolUnits = ImageAsset(name: "pool-units")
+  public static let stakes = ImageAsset(name: "stakes")
   public static let freezableByAnyone = ImageAsset(name: "freezable-by-anyone")
   public static let freezableByThirdParty = ImageAsset(name: "freezable-by-third-party")
   public static let informationChangeableByAnyone = ImageAsset(name: "information-changeable-by-anyone")

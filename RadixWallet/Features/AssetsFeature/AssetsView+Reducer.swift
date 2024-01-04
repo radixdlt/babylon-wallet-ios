@@ -8,6 +8,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		public enum AssetKind: String, Sendable, Hashable, CaseIterable, Identifiable {
 			case fungible
 			case nonFungible
+			case stakeUnits
 			case poolUnits
 
 			var displayText: String {
@@ -16,6 +17,8 @@ public struct AssetsView: Sendable, FeatureReducer {
 					L10n.Account.tokens
 				case .nonFungible:
 					L10n.Account.nfts
+				case .stakeUnits:
+					L10n.Account.staking
 				case .poolUnits:
 					L10n.Account.poolUnits
 				}
@@ -27,6 +30,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 		public var fungibleTokenList: FungibleAssetList.State?
 		public var nonFungibleTokenList: NonFungibleAssetList.State?
+		public var stakeUnitList: StakeUnitList.State?
 		public var poolUnitsList: PoolUnitsList.State?
 
 		public let account: Profile.Network.Account
@@ -39,6 +43,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 				account: account,
 				fungibleTokenList: nil,
 				nonFungibleTokenList: nil,
+				stakeUnitList: nil,
 				poolUnitsList: nil,
 				mode: mode
 			)
@@ -49,6 +54,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			assetKinds: NonEmpty<[AssetKind]> = .init(rawValue: AssetKind.allCases)!,
 			fungibleTokenList: FungibleAssetList.State?,
 			nonFungibleTokenList: NonFungibleAssetList.State?,
+			stakeUnitList: StakeUnitList.State?,
 			poolUnitsList: PoolUnitsList.State?,
 			mode: Mode
 		) {
@@ -57,6 +63,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			self.activeAssetKind = assetKinds.first
 			self.fungibleTokenList = fungibleTokenList
 			self.nonFungibleTokenList = nonFungibleTokenList
+			self.stakeUnitList = stakeUnitList
 			self.poolUnitsList = poolUnitsList
 			self.mode = mode
 		}
@@ -73,6 +80,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 	public enum ChildAction: Sendable, Equatable {
 		case fungibleTokenList(FungibleAssetList.Action)
 		case nonFungibleTokenList(NonFungibleAssetList.Action)
+		case stakeUnitList(StakeUnitList.Action)
 		case poolUnitsList(PoolUnitsList.Action)
 	}
 
@@ -80,6 +88,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		public struct ResourcesState: Sendable, Equatable {
 			public let fungibleTokenList: FungibleAssetList.State?
 			public let nonFungibleTokenList: NonFungibleAssetList.State?
+			public let stakeUnitList: StakeUnitList.State?
 			public let poolUnitsList: PoolUnitsList.State?
 		}
 
@@ -149,6 +158,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			state.isLoadingResources = false
 			state.fungibleTokenList = resourcesState.fungibleTokenList
 			state.nonFungibleTokenList = resourcesState.nonFungibleTokenList
+			state.stakeUnitList = resourcesState.stakeUnitList
 			state.poolUnitsList = resourcesState.poolUnitsList
 
 			/// Not the happiest about this, will need to find a better way
@@ -209,9 +219,8 @@ public struct AssetsView: Sendable, FeatureReducer {
 		}()
 
 		let poolUnitList: PoolUnitsList.State? = {
-			if lsuResource != nil || !portfolio.poolUnitResources.poolUnits.isEmpty {
+			if !portfolio.poolUnitResources.poolUnits.isEmpty {
 				return .init(
-					lsuResource: lsuResource,
 					poolUnits: .init(
 						uncheckedUniqueElements: portfolio.poolUnitResources.poolUnits
 							.map {
@@ -249,6 +258,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		return .init(
 			fungibleTokenList: fungibleTokenList,
 			nonFungibleTokenList: !nfts.isEmpty ? .init(rows: .init(uniqueElements: nfts)) : nil,
+			stakeUnitList: nil,
 			poolUnitsList: poolUnitList
 		)
 	}
@@ -259,7 +269,7 @@ extension AssetsView.State {
 	public var selectedAssets: Mode.SelectedAssets? {
 		guard case .selection = mode else { return nil }
 
-		let selectedLsuTokens = poolUnitsList?.lsuResource?.stakes
+		let selectedLsuTokens = stakeUnitList?.lsuResource?.stakes
 			.compactMap(SelectedResourceProvider.init)
 			.compactMap(\.selectedResource) ?? []
 		let selectedPoolUnitTokens = poolUnitsList?.poolUnits
@@ -276,7 +286,7 @@ extension AssetsView.State {
 			.map(SelectedResourceProvider.init)
 			.compactMap(\.selectedResource) ?? []
 
-		let selectedStakeClaimNonFungibleResources = (poolUnitsList?.lsuResource?.stakes)
+		let selectedStakeClaimNonFungibleResources = (stakeUnitList?.lsuResource?.stakes)
 			.map { $0.compactMap(NonFungibleTokensPerResourceProvider.init) } ?? []
 		let selectedNonFungibleResources = nonFungibleTokenList?.rows.compactMap(NonFungibleTokensPerResourceProvider.init) ?? []
 

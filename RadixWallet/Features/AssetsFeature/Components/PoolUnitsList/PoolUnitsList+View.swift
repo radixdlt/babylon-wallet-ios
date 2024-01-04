@@ -12,17 +12,6 @@ extension PoolUnitsList {
 		}
 
 		public var body: some SwiftUI.View {
-			IfLetStore(
-				store.scope(
-					state: \.lsuResource,
-					action: (
-						/PoolUnitsList.Action.child
-							.. PoolUnitsList.ChildAction.lsuResource
-					).embed
-				),
-				then: LSUResource.View.init
-			)
-
 			ForEachStore(
 				store.scope(
 					state: \.poolUnits,

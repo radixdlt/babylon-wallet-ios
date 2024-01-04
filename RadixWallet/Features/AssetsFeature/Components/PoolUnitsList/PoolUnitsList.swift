@@ -4,7 +4,6 @@ import SwiftUI
 // MARK: - PoolUnitsList
 public struct PoolUnitsList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		var lsuResource: LSUResource.State?
 		var poolUnits: IdentifiedArrayOf<PoolUnit.State> = []
 		let account: OnLedgerEntity.Account
 
@@ -17,7 +16,6 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case lsuResource(LSUResource.Action)
 		case poolUnit(id: PoolUnit.State.ID, action: PoolUnit.Action)
 	}
 
@@ -36,9 +34,6 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.lsuResource, action: /Action.child .. ChildAction.lsuResource) {
-				LSUResource()
-			}
 			.forEach(\.poolUnits, action: /Action.child .. ChildAction.poolUnit) {
 				PoolUnit()
 			}
@@ -56,10 +51,7 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 			state.poolUnits.forEach { unit in
 				state.poolUnits[id: unit.poolUnit.resourcePoolAddress]?.resourceDetails = .loading
 			}
-			return .run { send in
-				await send(.child(.lsuResource(.view(.refresh))))
-			}
-			.merge(with: getOwnedPoolUnitsDetails(state, cachingStrategy: .forceUpdate))
+			return getOwnedPoolUnitsDetails(state, cachingStrategy: .forceUpdate)
 		}
 	}
 
