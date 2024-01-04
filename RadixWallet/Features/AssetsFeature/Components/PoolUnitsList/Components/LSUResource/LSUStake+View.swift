@@ -49,6 +49,7 @@ extension LSUStake {
 		}
 
 		let content: Loadable<Content>
+		let isExpanded: Bool
 	}
 
 	public struct View: SwiftUI.View {
@@ -57,13 +58,19 @@ extension LSUStake {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: Action.view) { viewStore in
 				Section {
-					VStack(alignment: .leading, spacing: .medium1) {
-						loadable(viewStore.content) { content in
-							ValidatorNameView(viewState: content.validatorNameViewState)
+					loadable(viewStore.content) { content in
+						ValidatorNameView(viewState: content.validatorNameViewState)
+							.onTapGesture {
+								viewStore.send(.expandToggled)
+							}
+							.rowStyle()
+							.padding(.medium1)
 
+						if viewStore.isExpanded {
 							if let liquidStakeUnitViewState = content.liquidStakeUnit {
 								liquidStakeUnitView(viewState: liquidStakeUnitViewState)
 									.onTapGesture { viewStore.send(.didTap) }
+									.rowStyle()
 							}
 
 							if let stakeClaimNFTsViewState = content.stakeClaimNFTs {
@@ -73,7 +80,7 @@ extension LSUStake {
 							}
 						}
 					}
-					.padding(.medium1)
+					.background(.app.white)
 				}
 			}
 			.destinations(with: store)
@@ -81,22 +88,31 @@ extension LSUStake {
 
 		@ViewBuilder
 		private func liquidStakeUnitView(viewState: PoolUnitResourceViewState) -> some SwiftUI.View {
-			Text(L10n.Account.Staking.liquidStakeUnits)
-				.stakeHeaderStyle
+			VStack(spacing: .zero) {
+				Divider()
+					.frame(height: .small3)
+					.overlay(.app.gray5)
 
-			PoolUnitResourceView(viewState: viewState) {
 				VStack(alignment: .leading) {
-					Text(viewState.symbol)
-						.foregroundColor(.app.gray1)
-						.textStyle(.body2HighImportance)
+					Text(L10n.Account.Staking.liquidStakeUnits)
+						.stakeHeaderStyle
 
-					Text(L10n.Account.Staking.staked)
-						.foregroundColor(.app.gray2)
-						.textStyle(.body2HighImportance)
+					PoolUnitResourceView(viewState: viewState) {
+						VStack(alignment: .leading) {
+							Text(viewState.symbol)
+								.foregroundColor(.app.gray1)
+								.textStyle(.body2HighImportance)
+
+							Text(L10n.Account.Staking.staked)
+								.foregroundColor(.app.gray2)
+								.textStyle(.body2HighImportance)
+						}
+					}
+					.background(.app.white)
+					.borderAround
 				}
+				.padding(.medium1)
 			}
-			.background(.app.white)
-			.borderAround
 		}
 
 		private func stakeClaimNFTsView(
@@ -153,40 +169,44 @@ extension View {
 
 extension LSUStake.State {
 	var viewState: LSUStake.ViewState {
-		LSUStake.ViewState(id: stake.validatorAddress, content: stakeDetails.map { details in
-			LSUStake.ViewState.Content(
-				validatorNameViewState: .init(with: details.validator),
-				liquidStakeUnit: details.stakeUnitResource.map { resource in
-					.init(
-						id: resource.resource.resourceAddress, // FIXME: IS THIS CORRECT
-						thumbnail: .xrd,
-						symbol: Constants.xrdTokenName,
-						tokenAmount: details.xrdRedemptionValue.formatted(),
-						isSelected: isStakeSelected
-					)
-				},
-				stakeClaimNFTs: details.stakeClaimTokens.flatMap { stakeClaim in
-					.init(rawValue:
-						stakeClaim.tokens.map { token in
-							let status: LSUStake.ViewState.StakeClaimNFTStatus = {
-								guard let claimEpoch = token.data?.claimEpoch else {
-									return .unstaking
-								}
+		LSUStake.ViewState(
+			id: stake.validatorAddress,
+			content: stakeDetails.map { details in
+				LSUStake.ViewState.Content(
+					validatorNameViewState: .init(with: details.validator, stakedAmount: details.xrdRedemptionValue),
+					liquidStakeUnit: details.stakeUnitResource.map { resource in
+						.init(
+							id: resource.resource.resourceAddress, // FIXME: IS THIS CORRECT
+							thumbnail: .xrd,
+							symbol: Constants.xrdTokenName,
+							tokenAmount: details.xrdRedemptionValue.formatted(),
+							isSelected: isStakeSelected
+						)
+					},
+					stakeClaimNFTs: details.stakeClaimTokens.flatMap { stakeClaim in
+						.init(rawValue:
+							stakeClaim.tokens.map { token in
+								let status: LSUStake.ViewState.StakeClaimNFTStatus = {
+									guard let claimEpoch = token.data?.claimEpoch else {
+										return .unstaking
+									}
 
-								return claimEpoch <= details.currentEpoch ? .readyToClaim : .unstaking
-							}()
-							return LSUStake.ViewState.StakeClaimNFTViewState(
-								id: token.id,
-								thumbnail: .xrd,
-								status: status,
-								tokenAmount: (token.data?.claimAmount ?? 0).formatted(),
-								isSelected: self.selectedStakeClaimAssets?.contains(token)
-							)
-						}.asIdentifiable()
-					)
-				}
-			)
-		})
+									return claimEpoch <= details.currentEpoch ? .readyToClaim : .unstaking
+								}()
+								return LSUStake.ViewState.StakeClaimNFTViewState(
+									id: token.id,
+									thumbnail: .xrd,
+									status: status,
+									tokenAmount: (token.data?.claimAmount ?? 0).formatted(),
+									isSelected: self.selectedStakeClaimAssets?.contains(token)
+								)
+							}.asIdentifiable()
+						)
+					}
+				)
+			},
+			isExpanded: isExpanded
+		)
 	}
 }
 

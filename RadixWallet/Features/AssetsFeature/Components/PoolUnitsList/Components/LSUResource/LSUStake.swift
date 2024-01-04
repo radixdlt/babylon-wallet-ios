@@ -15,12 +15,14 @@ public struct LSUStake: FeatureReducer {
 
 		var isStakeSelected: Bool?
 		var selectedStakeClaimAssets: OrderedSet<OnLedgerEntity.NonFungibleToken>?
+		var isExpanded: Bool = false
 
 		@PresentationState
 		var destination: Destination.State?
 	}
 
 	public enum ViewAction: Sendable, Equatable {
+		case expandToggled
 		case didTap
 		case didTapStakeClaimNFT(withID: ViewState.StakeClaimNFTViewState.ID)
 	}
@@ -65,6 +67,9 @@ public struct LSUStake: FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
+		case .expandToggled:
+			state.isExpanded.toggle()
+			return .none
 		case .didTap:
 			guard case let .success(stakeDetails) = state.stakeDetails else {
 				return .none

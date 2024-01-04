@@ -37,7 +37,6 @@ public extension StakeUnitList {
 				),
 				content: LSUStake.View.init
 			)
-			.rowStyle()
 		}
 	}
 }
