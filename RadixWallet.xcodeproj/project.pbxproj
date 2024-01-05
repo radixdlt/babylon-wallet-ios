@@ -1179,6 +1179,8 @@
 		839B6C542B21D28400402651 /* ExpandableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839B6C532B21D28400402651 /* ExpandableTextView.swift */; };
 		83AAAC682B46FC4100222B64 /* LiquidStakeUnitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AAAC672B46FC4100222B64 /* LiquidStakeUnitView.swift */; };
 		83AAAC6A2B46FC5800222B64 /* StakeClaimNFTsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AAAC692B46FC5800222B64 /* StakeClaimNFTsView.swift */; };
+		83AAAC6D2B483D1B00222B64 /* StakeSummary+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AAAC6B2B483D1B00222B64 /* StakeSummary+View.swift */; };
+		83AAAC6E2B483D1B00222B64 /* StakeSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AAAC6C2B483D1B00222B64 /* StakeSummary.swift */; };
 		83D0B5692AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */; };
 		83D663B02B271D0100D1AB9E /* TruncationMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D663AF2B271D0100D1AB9E /* TruncationMask.swift */; };
 		83EE47502AF027DF00155F03 /* AssetTransferDepositRuleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */; };
@@ -2501,6 +2503,8 @@
 		839B6C532B21D28400402651 /* ExpandableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandableTextView.swift; sourceTree = "<group>"; };
 		83AAAC672B46FC4100222B64 /* LiquidStakeUnitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidStakeUnitView.swift; sourceTree = "<group>"; };
 		83AAAC692B46FC5800222B64 /* StakeClaimNFTsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StakeClaimNFTsView.swift; sourceTree = "<group>"; };
+		83AAAC6B2B483D1B00222B64 /* StakeSummary+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StakeSummary+View.swift"; sourceTree = "<group>"; };
+		83AAAC6C2B483D1B00222B64 /* StakeSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StakeSummary.swift; sourceTree = "<group>"; };
 		83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixEngineToolkitError+Description.swift"; sourceTree = "<group>"; };
 		83D663AF2B271D0100D1AB9E /* TruncationMask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TruncationMask.swift; sourceTree = "<group>"; };
 		83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetTransferDepositRuleTests.swift; sourceTree = "<group>"; };
@@ -6948,6 +6952,8 @@
 				8397D82B2B46ACB50016365A /* StakeUnitList.swift */,
 				83AAAC672B46FC4100222B64 /* LiquidStakeUnitView.swift */,
 				83AAAC692B46FC5800222B64 /* StakeClaimNFTsView.swift */,
+				83AAAC6B2B483D1B00222B64 /* StakeSummary+View.swift */,
+				83AAAC6C2B483D1B00222B64 /* StakeSummary.swift */,
 			);
 			path = StakeUnitList;
 			sourceTree = "<group>";
@@ -8508,6 +8514,7 @@
 				48CFC46B2ADC10DA00E77A5C /* ImportLegacyWalletClient+Interface.swift in Sources */,
 				48CFC4D82ADC10DA00E77A5C /* TransactionStatusResponseKnownPayloadItem.swift in Sources */,
 				48CFC4522ADC10DA00E77A5C /* NetworkSwitchingClient+Interface.swift in Sources */,
+				83AAAC6D2B483D1B00222B64 /* StakeSummary+View.swift in Sources */,
 				48CFC3422ADC10D900E77A5C /* AccountPermissionChooseAccounts+Reducer.swift in Sources */,
 				48CFC37F2ADC10D900E77A5C /* PoolUnitsList+View.swift in Sources */,
 				48CFC39C2ADC10D900E77A5C /* TXVersion.swift in Sources */,
@@ -8727,6 +8734,7 @@
 				48CFC3F52ADC10D900E77A5C /* SignalingClientTypes.swift in Sources */,
 				48CFC4792ADC10DA00E77A5C /* LocalAuthenticationClient+Live.swift in Sources */,
 				48CFC4A62ADC10DA00E77A5C /* MetadataPublicKeyHashArrayValue.swift in Sources */,
+				83AAAC6E2B483D1B00222B64 /* StakeSummary.swift in Sources */,
 				48CFC5192ADC10DA00E77A5C /* StateNonFungibleDataResponseAllOf.swift in Sources */,
 				48CFC6812ADC10DB00E77A5C /* SecurityStructureConfigurationReference.swift in Sources */,
 				48CFC2F42ADC10D900E77A5C /* IntroductionToPersonas+View.swift in Sources */,

@@ -745,10 +745,13 @@ extension TransactionReview {
 		let knownDapps = dAppsInfo.compactMap(\.left).asIdentifiable()
 		let unknownDapps = dAppsInfo.compactMap(\.right).asIdentifiable()
 
-		return TransactionReviewDappsUsed.State(
+		return try TransactionReviewDappsUsed.State(
 			isExpanded: true,
 			knownDapps: knownDapps,
-			unknownDapps: unknownDapps
+			unknownDapps: transaction.allAddress
+				.filter { $0.entityType() == .globalGenericComponent }
+				.map { try $0.asSpecific() }
+				.asIdentifiable()
 		)
 	}
 
