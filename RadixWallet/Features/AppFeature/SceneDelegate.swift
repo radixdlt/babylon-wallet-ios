@@ -17,6 +17,17 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		{
 			overlayWindow(in: windowScene)
 		}
+
+		loggerGlobal.error("has urlContext: \(connectionOptions.urlContexts)")
+		if let connectURL = connectionOptions.urlContexts.first?.url {
+			let connectionPassword = URLComponents(url: connectURL, resolvingAgainstBaseURL: true)?.queryItems?.first?.value
+			if let connectionPassword {
+				@Dependency(\.radixConnectClient) var radixConnectionClient
+				Task {
+					try await radixConnectionClient.addP2PWithPassword(ConnectionPassword(.init(hex: connectionPassword)))
+				}
+			}
+		}
 	}
 
 	func overlayWindow(in scene: UIWindowScene) {
@@ -41,5 +52,15 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		}
 
 		self.overlayWindow = overlayWindow
+	}
+
+	public func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+		let connectionPassword = URLComponents(url: URLContexts.first!.url, resolvingAgainstBaseURL: true)?.queryItems?.first?.value
+		if let connectionPassword {
+			@Dependency(\.radixConnectClient) var radixConnectionClient
+			Task {
+				try await radixConnectionClient.addP2PWithPassword(ConnectionPassword(.init(hex: connectionPassword)))
+			}
+		}
 	}
 }

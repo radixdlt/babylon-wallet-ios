@@ -2,13 +2,21 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.radixpublishing.radixwallet.ios.dev</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>radixwallet</string>
+			</array>
+		</dict>
+	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
-	<key>NSBonjourServices</key>
-	<array>
-		<string>_bonjour._tcp</string>
-		<string>_lnp._tcp.</string>
-	</array>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>undecimus</string>
@@ -16,6 +24,11 @@
 		<string>zbra</string>
 		<string>filza</string>
 		<string>activator</string>
+	</array>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_bonjour._tcp</string>
+		<string>_lnp._tcp.</string>
 	</array>
 </dict>
 </plist>
