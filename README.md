@@ -29,9 +29,19 @@ The Radix Wallet takes advantage of the advanced native features of the Radix Ne
 To get started contributing to the Radix Wallet iOS code base [head over to the development guide](./DEVELOPMENT.md)
 
 # License
-The code for the iOS Radix Wallet is released under the [Apache 2.0 license](./LICENSE.txt). Binaries are licensed under the [Radix Wallet Software EULA](https://www.radixdlt.com/terms/walletEULA).
+The iOS Radix Wallet binaries are licensed under the [Radix Wallet Software EULA](https://www.radixdlt.com/terms/walletEULA).
 
-[dashboard]: https://dashboard.radixdlt.com
-[radixdlt]: https://radixdlt.com
-[appStoreLink]: https://apps.apple.com/se/app/radix-wallet/id6448950995
-[walletGuide]: https://wallet.radixdlt.com
+The iOS Radix Wallet code is released under the [Apache 2.0 license](./LICENSE).
+
+
+      Copyright 2023 Radix Publishing Ltd
+
+      Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
+
+      You may obtain a copy of the License at: http://www.apache.org/licenses/LICENSE-2.0
+
+      Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
+      See the License for the specific language governing permissions and limitations under the License.
+
+
