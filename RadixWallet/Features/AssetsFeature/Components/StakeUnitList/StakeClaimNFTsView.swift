@@ -30,7 +30,8 @@ struct StakeClaimNFTSView: View {
 			Text(section.title)
 				.textStyle(.body2HighImportance)
 				.foregroundColor(.app.gray2)
-				.textCase(nil)
+				.textCase(.uppercase)
+
 			ForEach(section.stakeClaims) { claim in
 				TokenBalanceView.xrd(balance: claim.worth)
 					.padding(.small1)
@@ -42,8 +43,6 @@ struct StakeClaimNFTSView: View {
 		}
 	}
 }
-
-import EngineToolkit
 
 extension StakeClaimNFTSView {
 	public struct StakeClaim: Sendable, Hashable, Identifiable {
