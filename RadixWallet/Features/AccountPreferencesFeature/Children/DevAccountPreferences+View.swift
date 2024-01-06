@@ -76,7 +76,7 @@ extension DevAccountPreferences {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				NavigationStack {
-					VStack(alignment: .leading) {
+					VStack {
 						if !viewStore.isOnMainnet {
 							faucetButton(with: viewStore)
 						}
@@ -150,7 +150,7 @@ private extension View {
 		) {
 			// FIXME: Should use DappInteractionClient instead to schedule a transaction
 			TransactionReview.View(store: $0)
-				.withNavigationBar {
+				.withNavigationBar(.topBarLeading) {
 					store.send(.view(.closeTransactionButtonTapped))
 				}
 		}

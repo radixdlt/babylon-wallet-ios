@@ -134,9 +134,9 @@ extension TransactionReview {
 
 							accountDepositSettingsSection
 						}
-						.padding(.top, .medium1)
+						.padding(.top, .small1)
 						.padding(.horizontal, .medium3)
-						.padding(.bottom, .large2)
+						.padding(.bottom, .large1)
 					}
 
 					VStack(spacing: .medium1) {
@@ -184,6 +184,8 @@ extension TransactionReview {
 					if let thumbnail = proposingDappMetadata?.thumbnail {
 						DappThumbnail(.known(thumbnail), size: .medium)
 							.padding(.leading, .small2)
+					} else {
+						Spacer(minLength: .small2 + HitTargetSize.medium.rawValue)
 					}
 				}
 
@@ -235,7 +237,6 @@ extension TransactionReview {
 						.padding(.bottom, .small2)
 					TransactionReviewAccounts.View(store: childStore)
 				}
-				.padding(.top, .medium1)
 			}
 		}
 
