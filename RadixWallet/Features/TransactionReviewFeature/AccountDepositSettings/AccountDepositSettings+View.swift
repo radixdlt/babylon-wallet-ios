@@ -1,6 +1,58 @@
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - TransactionReviewDepositSetting.View
+extension TransactionReviewDepositSetting {
+	@MainActor
+	public struct View: SwiftUI.View {
+		private let store: StoreOf<TransactionReviewDepositSetting>
+
+		public init(store: StoreOf<TransactionReviewDepositSetting>) {
+			self.store = store
+		}
+
+		public var body: some SwiftUI.View {
+			WithViewStore(store, observe: { $0 }) { viewStore in
+				Card {
+					VStack(spacing: .small1) {
+						ForEach(viewStore.changes) { change in
+							InnerCard {
+								SmallAccountCard(account: change.account)
+
+								HStack(spacing: .medium3) {
+									Image(asset: change.ruleChange.image)
+										.frame(.smallest)
+
+									Text(LocalizedStringKey(change.ruleChange.string))
+										.foregroundColor(.app.gray1)
+										.textStyle(.body1Regular)
+								}
+								.padding(.medium3)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+// MARK: - TransactionReviewDepositExceptions.View
+extension TransactionReviewDepositExceptions {
+	@MainActor
+	public struct View: SwiftUI.View {
+		private let store: StoreOf<TransactionReviewDepositExceptions>
+
+		public init(store: StoreOf<TransactionReviewDepositExceptions>) {
+			self.store = store
+		}
+
+		public var body: some SwiftUI.View {
+			EmptyView()
+		}
+	}
+}
+
 // MARK: - AccountDepositSettings.View
 extension AccountDepositSettings {
 	@MainActor
@@ -49,6 +101,13 @@ struct AccountDepositSettingsChangeView: View {
 		var hasChanges: Bool {
 			!resourcePreferenceChanges.isEmpty || !allowedDepositorChanges.isEmpty
 		}
+
+		init(account: Profile.Network.Account, resourcePreferenceChanges: IdentifiedArrayOf<ResourceChangeView.ViewState>, allowedDepositorChanges: IdentifiedArrayOf<ResourceChangeView.ViewState>, depositRuleChange: AccountDefaultDepositRule?) {
+			self.account = account
+			self.resourcePreferenceChanges = resourcePreferenceChanges
+			self.allowedDepositorChanges = allowedDepositorChanges
+			self.depositRuleChange = depositRuleChange
+		}
 	}
 
 	let viewState: ViewState
@@ -57,22 +116,28 @@ struct AccountDepositSettingsChangeView: View {
 		Card {
 			InnerCard {
 				SmallAccountCard(account: viewState.account)
+					.border(.red)
+
 				VStack(spacing: .medium2) {
 					if let depositRuleChange = viewState.depositRuleChange {
 						Text(LocalizedStringKey(depositRuleChange.string))
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1Regular)
+							.border(.purple)
 						if viewState.hasChanges {
 							Separator()
 						}
 					}
 					ForEach(viewState.resourcePreferenceChanges) { viewState in
 						ResourceChangeView(viewState: viewState)
+							.border(.yellow)
 					}
 					ForEach(viewState.allowedDepositorChanges) { viewState in
 						ResourceChangeView(viewState: viewState)
+							.border(.green)
 					}
 				}
+				.border(.pink)
 				.padding(.medium3)
 				.frame(maxWidth: .infinity)
 				.background(.app.gray5)
@@ -139,6 +204,17 @@ extension AccountDefaultDepositRule {
 			L10n.TransactionReview.AccountDepositSettings.denyAllRule
 		case .allowExisting:
 			L10n.TransactionReview.AccountDepositSettings.acceptKnownRule
+		}
+	}
+
+	var image: ImageAsset {
+		switch self {
+		case .accept:
+			AssetResource.iconAcceptAirdrop
+		case .reject:
+			AssetResource.iconDeclineAirdrop
+		case .allowExisting:
+			AssetResource.iconAcceptKnownAirdrop
 		}
 	}
 }

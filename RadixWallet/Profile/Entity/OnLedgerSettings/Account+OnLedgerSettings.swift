@@ -24,6 +24,7 @@ extension Profile.Network.Account {
 extension Profile.Network.Account.OnLedgerSettings {
 	public struct ThirdPartyDeposits: Hashable, Sendable, Codable {
 		/// The general deposit rule to apply
+		// FIXME: Is this actually different from AccountDefaultDepositRule
 		public enum DepositRule: String, Hashable, Sendable, Codable, CaseIterable {
 			case acceptAll
 			case acceptKnown

@@ -1,6 +1,36 @@
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - TransactionReviewDepositSetting
+public struct TransactionReviewDepositSetting: Sendable, FeatureReducer {
+	public struct State: Sendable, Hashable {
+		public init(changes: IdentifiedArrayOf<DepositSettingChange>) {
+			self.changes = changes
+		}
+
+		public var changes: IdentifiedArrayOf<DepositSettingChange>
+	}
+
+	public init() {}
+}
+
+// MARK: TransactionReviewDepositSetting.DepositSettingChange
+extension TransactionReviewDepositSetting {
+	// MARK: - AccountDepositSettingChange
+	public struct DepositSettingChange: Sendable, Identifiable, Hashable {
+		public var id: AccountAddress.ID { account.address.id }
+		public let account: Profile.Network.Account
+		public let ruleChange: AccountDefaultDepositRule
+	}
+}
+
+// MARK: - TransactionReviewDepositExceptions
+public struct TransactionReviewDepositExceptions: Sendable, FeatureReducer {
+	public struct State: Sendable, Hashable {}
+
+	public init() {}
+}
+
 // MARK: - AccountDepositSettings
 public struct AccountDepositSettings: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {

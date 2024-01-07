@@ -14,7 +14,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public let isWalletTransaction: Bool
 		public let proposingDappMetadata: DappMetadata.Ledger?
 
-		public var networkID: NetworkID? { reviewedTransaction?.networkId }
+		public var networkID: NetworkID? { reviewedTransaction?.networkID }
 
 		public var reviewedTransaction: ReviewedTransaction? = nil
 
@@ -23,6 +23,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var deposits: TransactionReviewAccounts.State? = nil
 		public var proofs: TransactionReviewProofs.State? = nil
 		public var accountDepositSettings: AccountDepositSettings.State? = nil
+
+		public var accountDepositSetting: TransactionReviewDepositSetting.State? = nil
+		public var accountDepositExceptions: TransactionReviewDepositExceptions.State? = nil
+
 		public var networkFee: TransactionReviewNetworkFee.State? = nil
 		public let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
 		public var canApproveTX: Bool = true
@@ -105,6 +109,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case dAppsUsed(TransactionReviewDappsUsed.Action)
 		case proofs(TransactionReviewProofs.Action)
 		case accountDepositSettings(AccountDepositSettings.Action)
+
+		case accountDepositSetting(TransactionReviewDepositSetting.Action)
+		case accountDepositExceptions(TransactionReviewDepositExceptions.Action)
+
 		case networkFee(TransactionReviewNetworkFee.Action)
 	}
 
@@ -205,6 +213,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			.ifLet(\.accountDepositSettings, action: /Action.child .. ChildAction.accountDepositSettings) {
 				AccountDepositSettings()
 			}
+			.ifLet(\.accountDepositSetting, action: /Action.child .. ChildAction.accountDepositSetting) {
+				TransactionReviewDepositSetting()
+			}
+			.ifLet(\.accountDepositExceptions, action: /Action.child .. ChildAction.accountDepositExceptions) {
+				TransactionReviewDepositExceptions()
+			}
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
 			}
@@ -256,7 +270,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				}
 
 				let request = BuildTransactionIntentRequest(
-					networkID: reviewedTransaction.networkId,
+					networkID: reviewedTransaction.networkID,
 					manifest: manifest,
 					message: state.message,
 					makeTransactionHeaderInput: MakeTransactionHeaderInput(tipPercentage: tipPercentage),
@@ -339,7 +353,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .previewLoaded(.success(preview)):
 			do {
 				let reviewedTransaction = try ReviewedTransaction(
-					networkId: preview.networkID,
+					networkID: preview.networkID,
 					transaction: preview.analyzedManifestToReview.transactionKind(),
 					feePayer: .loading,
 					transactionFee: preview.transactionFee,
@@ -360,8 +374,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.dAppsUsed = content.dAppsUsed
 			state.deposits = content.deposits
 			state.accountDepositSettings = content.accountDepositSettings
+			state.accountDepositSetting = content.accountDepositSetting
+//			state.accountDepositExceptions = content.accountDepositExceptions
 			state.proofs = content.proofs
-			state.networkFee = content.networkFee
 			return .none
 
 		case let .buildTransactionItentResult(.success(intent)):
@@ -520,7 +535,7 @@ extension Collection<TransactionReviewAccount.State> {
 
 extension TransactionReview {
 	func review(_ state: inout State) -> Effect<Action> {
-		guard let transactionToReview = state.reviewedTransaction else {
+		guard let reviewedTransaction = state.reviewedTransaction else {
 			assertionFailure("Bad implementation, expected `analyzedManifestToReview`")
 			return .none
 		}
@@ -529,50 +544,52 @@ extension TransactionReview {
 			return .none
 		}
 
-		switch transactionToReview.transaction {
-		case let .conforming(.general(transaction)):
-			return .run { send in
-				let userAccounts = try await extractUserAccounts(transaction)
+		state.networkFee = .init(reviewedTransaction: reviewedTransaction)
 
-				let content = await TransactionReview.TransactionContent(
-					withdrawals: try? extractWithdrawals(
-						transaction,
-						userAccounts: userAccounts,
-						networkID: networkID
-					),
-					dAppsUsed: try? extractUsedDapps(transaction),
-					deposits: try? extractDeposits(
-						transaction,
-						userAccounts: userAccounts,
-						networkID: networkID
-					),
-					proofs: try? exctractProofs(transaction),
-					accountDepositSettings: nil,
-					networkFee: .init(reviewedTransaction: transactionToReview)
-				)
-				await send(.internal(.createTransactionReview(content)))
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to extract user accounts, error: \(error)")
-				// FIXME: propagate/display error?
-			}
-		case let .conforming(.accountDepositSettings(depositSettings)):
+		switch reviewedTransaction.transaction {
+		case let .conforming(conformingTransaction):
 			return .run { send in
-				let content = try await TransactionReview.TransactionContent(
-					withdrawals: nil,
-					dAppsUsed: nil,
-					deposits: nil,
-					proofs: nil,
-					accountDepositSettings: extractAccountDepositSettings(depositSettings),
-					networkFee: .init(reviewedTransaction: transactionToReview)
-				)
+				let content = try await content(for: conformingTransaction, networkID: networkID)
 				await send(.internal(.createTransactionReview(content)))
 			} catch: { error, _ in
-				loggerGlobal.error("Failed to extract user accounts, error: \(error)")
+				loggerGlobal.error("Failed to extract transaction content, error: \(error)")
 				// FIXME: propagate/display error?
 			}
 		case .nonConforming:
-			state.networkFee = .init(reviewedTransaction: transactionToReview)
 			return showRawTransaction(&state)
+		}
+	}
+
+	func content(for transaction: TransactionKind.ConformingTransaction, networkID: NetworkID) async throws -> TransactionReview.TransactionContent {
+		switch transaction {
+		case let .general(generalTransaction):
+			let userAccounts = try await extractUserAccounts(generalTransaction)
+
+			return await TransactionReview.TransactionContent(
+				withdrawals: try? extractWithdrawals(
+					generalTransaction,
+					userAccounts: userAccounts,
+					networkID: networkID
+				),
+				dAppsUsed: try? extractUsedDapps(generalTransaction),
+				deposits: try? extractDeposits(
+					generalTransaction,
+					userAccounts: userAccounts,
+					networkID: networkID
+				),
+				proofs: try? exctractProofs(generalTransaction),
+				accountDepositSettings: nil,
+				accountDepositSetting: nil
+			)
+		case let .accountDepositSettings(accountDepositSettings):
+			return try await TransactionReview.TransactionContent(
+				withdrawals: nil,
+				dAppsUsed: nil,
+				deposits: nil,
+				proofs: nil,
+				accountDepositSettings: extractAccountDepositSettings(accountDepositSettings),
+				accountDepositSetting: .init(changes: [])
+			)
 		}
 	}
 
@@ -639,7 +656,7 @@ extension TransactionReview {
 			.run { send in
 				let result = await TaskResult {
 					try await transactionClient.determineFeePayer(.init(
-						networkId: reviewedTransaction.networkId,
+						networkId: reviewedTransaction.networkID,
 						transactionFee: reviewedTransaction.transactionFee,
 						transactionSigners: reviewedTransaction.transactionSigners,
 						signingFactors: reviewedTransaction.signingFactors,
@@ -707,7 +724,11 @@ extension TransactionReview {
 		let deposits: TransactionReviewAccounts.State?
 		let proofs: TransactionReviewProofs.State?
 		let accountDepositSettings: AccountDepositSettings.State?
-		let networkFee: TransactionReviewNetworkFee.State?
+
+		let accountDepositSetting: TransactionReviewDepositSetting.State?
+//		let accountDepositExceptions: AccountDepositExceptions.State?
+
+//		let networkFee: TransactionReviewNetworkFee.State?
 	}
 
 	// MARK: - TransferType
@@ -1197,7 +1218,7 @@ public struct TransactionReviewFailure: LocalizedError {
 
 // MARK: - ReviewedTransaction
 public struct ReviewedTransaction: Hashable, Sendable {
-	let networkId: NetworkID
+	let networkID: NetworkID
 	let transaction: TransactionKind
 
 	var feePayer: Loadable<FeePayerCandidate?> = .idle
@@ -1228,7 +1249,7 @@ extension ReviewedTransaction {
 					return selected.validateBalance(forFee: transactionFee)
 				}
 
-				let xrdAddress = knownAddresses(networkId: networkId.rawValue).resourceAddresses.xrd
+				let xrdAddress = knownAddresses(networkId: networkID.rawValue).resourceAddresses.xrd
 
 				let xrdTotalTransfer: RETDecimal = feePayerWithdraws.reduce(.zero) { partialResult, resource in
 					if case let .fungible(resourceAddress, indicator) = resource, resourceAddress == xrdAddress {
