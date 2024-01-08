@@ -3,6 +3,7 @@
 public struct StakeUnitList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		let account: OnLedgerEntity.Account
+		public var stakeSummary: StakeSummaryView.ViewState = .init(staked: .zero(), unstaking: .zero(), readyToClaim: .zero())
 		public var stakes: IdentifiedArrayOf<LSUStake.State>
 		var isLoadingResources: Bool = false
 		var shouldRefresh = false
@@ -64,6 +65,12 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		case let .detailsLoaded(.success(details)):
 			state.shouldRefresh = false
 			state.isLoadingResources = false
+			let stakes = details
+			var totalStaked: RETDecimal = .zero()
+			for stake in stakes {
+				totalStaked = totalStaked + stake.xrdRedemptionValue
+			}
+
 			details.forEach { details in
 				state.stakes[id: details.validator.address.address]?.stakeDetails = .success(details)
 			}

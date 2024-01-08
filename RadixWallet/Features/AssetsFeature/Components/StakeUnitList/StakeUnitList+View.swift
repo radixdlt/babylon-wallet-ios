@@ -20,6 +20,13 @@ public extension StakeUnitList {
 		}
 
 		public var body: some SwiftUI.View {
+			Section {
+				store.withState { store in
+					StakeSummaryView(viewState: store.stakeSummary) {}
+						.rowStyle()
+						.padding(.medium1)
+				}
+			}
 			componentsView
 				.onAppear {
 					store.send(.view(.appeared))

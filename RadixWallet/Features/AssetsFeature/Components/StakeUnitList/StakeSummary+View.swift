@@ -1,36 +1,45 @@
+// MARK: - StakeSummaryView
 public struct StakeSummaryView: View {
-	struct ViewState: Equatable {
-		let staked: RETDecimal
-		let unstaking: RETDecimal
-		let readyToClaim: RETDecimal
+	public struct ViewState: Hashable, Sendable {
+		public let staked: RETDecimal
+		public let unstaking: RETDecimal
+		public let readyToClaim: RETDecimal
 	}
 
-	let viewState: ViewState
-	let onReadyToClaimTapped: () -> Void
+	public let viewState: ViewState
+	public let onReadyToClaimTapped: () -> Void
 
 	public var body: some View {
-		VStack {
+		VStack(spacing: .medium1) {
 			HStack {
 				Image(asset: AssetResource.stakes)
-				Text("Radix Network")
-					.textStyle(.body1Header)
-				Text("XRD Stake Summary")
-					.textStyle(.body1Header)
-
+				Text(L10n.Account.Staking.lsuResourceHeader)
+					.textStyle(.secondaryHeader)
+					.foregroundColor(.app.gray1)
 				Spacer()
 			}
-			HStack {
-				Text("Staked")
-				Text(viewState.staked.formatted())
+			.padding(.leading, -8)
+			VStack(spacing: .small2) {
+				summaryRow(L10n.Account.Staking.staked, amount: viewState.staked)
+				summaryRow(L10n.Account.Staking.unstaking, amount: viewState.unstaking)
+				summaryRow(L10n.Account.Staking.readyToClaim, amount: viewState.readyToClaim)
 			}
-			HStack {
-				Text("Unstaking")
-				Text(viewState.unstaking.formatted())
-			}
-			HStack {
-				Text("Ready to Claim")
-				Text(viewState.readyToClaim.formatted())
-			}
+		}
+	}
+}
+
+extension StakeSummaryView {
+	@ViewBuilder
+	private func summaryRow(_ name: String, amount: RETDecimal) -> some View {
+		HStack {
+			Text(name)
+				.textStyle(.body2HighImportance)
+				.foregroundColor(.app.gray2)
+				.padding(.trailing, .medium3)
+			Spacer()
+			Text("\(amount.formatted()) XRD")
+				.textStyle(.body2HighImportance)
+				.foregroundColor(amount.isZero() ? .app.gray2 : .app.gray1)
 		}
 	}
 }
