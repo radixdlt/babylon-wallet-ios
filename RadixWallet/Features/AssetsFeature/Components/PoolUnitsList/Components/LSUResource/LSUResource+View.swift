@@ -44,7 +44,7 @@ extension LSUResource {
 						.foregroundColor(.app.gray1)
 						.textStyle(.secondaryHeader)
 
-					Text(L10n.Account.PoolUnits.numberOfStakes(viewStore.numberOfStakes))
+					Text("\(viewStore.numberOfStakes) Stakes") // This is temporary, stakes will be redesigned.
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2HighImportance)
 				}

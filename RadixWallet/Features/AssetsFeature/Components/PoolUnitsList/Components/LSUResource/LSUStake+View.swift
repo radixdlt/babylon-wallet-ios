@@ -102,7 +102,7 @@ extension LSUStake {
 			handleTapGesture: @escaping (ViewState.StakeClaimNFTViewState.ID) -> Void
 		) -> some SwiftUI.View {
 			VStack(alignment: .leading, spacing: .medium1) {
-				Text(L10n.Account.PoolUnits.stakeClaimNFTs)
+				Text(L10n.Account.Staking.stakeClaimNFTs)
 					.stakeHeaderStyle
 
 				ForEach(viewState) { stakeClaimNFTViewState in

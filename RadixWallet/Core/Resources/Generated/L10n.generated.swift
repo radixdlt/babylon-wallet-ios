@@ -26,12 +26,6 @@ public enum L10n {
     public enum PoolUnits {
       /// Missing Total supply - could not calculate redemption value
       public static let noTotalSupply = L10n.tr("Localizable", "account_poolUnits_noTotalSupply", fallback: "Missing Total supply - could not calculate redemption value")
-      /// %d Stakes
-      public static func numberOfStakes(_ p1: Int) -> String {
-        return L10n.tr("Localizable", "account_poolUnits_numberOfStakes", p1, fallback: "%d Stakes")
-      }
-      /// STAKE CLAIM NFTS
-      public static let stakeClaimNFTs = L10n.tr("Localizable", "account_poolUnits_stakeClaimNFTs", fallback: "STAKE CLAIM NFTS")
       /// Unknown
       public static let unknownPoolUnitName = L10n.tr("Localizable", "account_poolUnits_unknownPoolUnitName", fallback: "Unknown")
       /// Unknown
@@ -2407,6 +2401,10 @@ public enum L10n {
     public static let sendingToHeading = L10n.tr("Localizable", "transactionReview_sendingToHeading", fallback: "Sending to")
     /// Slide to Sign
     public static let slideToSign = L10n.tr("Localizable", "transactionReview_slideToSign", fallback: "Slide to Sign")
+    /// Third-party deposit exceptions
+    public static let thirdPartyDepositExceptionsHeading = L10n.tr("Localizable", "transactionReview_thirdPartyDepositExceptionsHeading", fallback: "Third-party deposit exceptions")
+    /// Third-party deposit setting
+    public static let thirdPartyDepositSettingHeading = L10n.tr("Localizable", "transactionReview_thirdPartyDepositSettingHeading", fallback: "Third-party deposit setting")
     /// Review Your Transaction
     public static let title = L10n.tr("Localizable", "transactionReview_title", fallback: "Review Your Transaction")
     /// Review Your Transfer
