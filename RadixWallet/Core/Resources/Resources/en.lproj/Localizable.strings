@@ -33,8 +33,6 @@
 "account_staking_worth" = "WORTH";
 "account_staking_claim" = "Claim";
 "account_poolUnits" = "Pool Units";
-"account_poolUnits_stakeClaimNFTs" = "STAKE CLAIM NFTS";
-"account_poolUnits_numberOfStakes" = "%d Stakes";
 "account_poolUnits_unknownValidatorName" = "Unknown";
 "account_poolUnits_unknownSymbolName" = "Unknown";
 "account_poolUnits_unknownPoolUnitName" = "Unknown";
@@ -390,6 +388,8 @@
 "transactionReview_unknown" = "Unknown";
 "transactionReview_unnamedDapp" = "Unnamed dApp";
 "transactionReview_usingDappsHeading" = "Using dApps";
+"transactionReview_thirdPartyDepositSettingHeading" = "Third-party deposit setting";
+"transactionReview_thirdPartyDepositExceptionsHeading" = "Third-party deposit exceptions";
 "transactionReview_unknownComponents" = "%d Unknown Components";
 "transactionReview_withdrawalsHeading" = "Withdrawing From";
 "transactionReview_slideToSign" = "Slide to Sign";
