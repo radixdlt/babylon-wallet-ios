@@ -736,7 +736,7 @@ extension TransactionReview {
 			}
 	}
 
-	private func extractUsedDapps(_ transaction: TransactionType.GeneralTransaction) async throws -> TransactionReviewDappsUsed.State? {
+	private func extractUsedDapps(_ transaction: ExecutionSummary.GeneralTransaction) async throws -> TransactionReviewDappsUsed.State? {
 		let dAppsInfo = try await transaction.allAddress
 			.filter { $0.entityType() == .globalGenericComponent }
 			.map { try $0.asSpecific() }
