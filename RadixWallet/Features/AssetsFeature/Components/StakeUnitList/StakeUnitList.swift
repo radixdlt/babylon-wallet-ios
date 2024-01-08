@@ -1,27 +1,13 @@
 // MARK: - StakeUnitList
-
 public struct StakeUnitList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		let account: OnLedgerEntity.Account
-		public var stakeSummary: StakeSummaryView.ViewState = .init(staked: .zero(), unstaking: .zero(), readyToClaim: .zero())
-		public var stakes: IdentifiedArrayOf<LSUStake.State>
-		var isLoadingResources: Bool = false
+		public var stakeDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>> = .idle
 		var shouldRefresh = false
-
-		var didLoadResources: Bool {
-			if case .success = stakes.first?.stakeDetails {
-				return true
-			}
-			return false
-		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-	}
-
-	public enum ChildAction: Sendable, Equatable {
-		case stake(id: LSUStake.State.ID, action: LSUStake.Action)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -33,21 +19,15 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public var body: some ReducerOf<Self> {
-		Reduce(core)
-			.forEach(
-				\.stakes,
-				action: /Action.child .. ChildAction.stake,
-				element: LSUStake.init
-			)
-	}
-
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			guard !state.didLoadResources, !state.isLoadingResources else {
+			guard !state.stakeDetails.isSuccess else {
 				return .none
 			}
+
+			state.stakeDetails = .loading
+
 			return .run { [state = state] send in
 				let result = await TaskResult {
 					try await onLedgerEntitiesClient.getOwnedStakesDetails(
@@ -64,21 +44,20 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .detailsLoaded(.success(details)):
 			state.shouldRefresh = false
-			state.isLoadingResources = false
-			let stakes = details
-			var totalStaked: RETDecimal = .zero()
-			for stake in stakes {
-				totalStaked = totalStaked + stake.xrdRedemptionValue
-			}
+			state.stakeDetails = .success(details.asIdentifiable())
 
-			details.forEach { details in
-				state.stakes[id: details.validator.address.address]?.stakeDetails = .success(details)
-			}
 			return .none
 		case let .detailsLoaded(.failure(error)):
-			state.isLoadingResources = false
+			state.stakeDetails = .failure(error)
 			errorQueue.schedule(error)
 			return .none
 		}
+	}
+}
+
+// MARK: - OnLedgerEntitiesClient.OwnedStakeDetails + Identifiable
+extension OnLedgerEntitiesClient.OwnedStakeDetails: Identifiable {
+	public var id: ValidatorAddress {
+		validator.address
 	}
 }

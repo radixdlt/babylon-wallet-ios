@@ -329,8 +329,6 @@
 		48CFC3712ADC10D900E77A5C /* PoolUnitsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE4D2ADC10D800E77A5C /* PoolUnitsList.swift */; };
 		48CFC3722ADC10D900E77A5C /* LSUDetails+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE502ADC10D800E77A5C /* LSUDetails+View.swift */; };
 		48CFC3732ADC10D900E77A5C /* ValidatorNameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE512ADC10D800E77A5C /* ValidatorNameView.swift */; };
-		48CFC3742ADC10D900E77A5C /* LSUResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE522ADC10D800E77A5C /* LSUResource.swift */; };
-		48CFC3752ADC10D900E77A5C /* LSUResource+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE532ADC10D800E77A5C /* LSUResource+View.swift */; };
 		48CFC3762ADC10D900E77A5C /* LSUStake+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE542ADC10D800E77A5C /* LSUStake+View.swift */; };
 		48CFC3772ADC10D900E77A5C /* LSUDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE552ADC10D800E77A5C /* LSUDetails.swift */; };
 		48CFC3782ADC10D900E77A5C /* LSUStake.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE562ADC10D800E77A5C /* LSUStake.swift */; };
@@ -1685,8 +1683,6 @@
 		48CFBE4D2ADC10D800E77A5C /* PoolUnitsList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PoolUnitsList.swift; sourceTree = "<group>"; };
 		48CFBE502ADC10D800E77A5C /* LSUDetails+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LSUDetails+View.swift"; sourceTree = "<group>"; };
 		48CFBE512ADC10D800E77A5C /* ValidatorNameView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidatorNameView.swift; sourceTree = "<group>"; };
-		48CFBE522ADC10D800E77A5C /* LSUResource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LSUResource.swift; sourceTree = "<group>"; };
-		48CFBE532ADC10D800E77A5C /* LSUResource+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LSUResource+View.swift"; sourceTree = "<group>"; };
 		48CFBE542ADC10D800E77A5C /* LSUStake+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LSUStake+View.swift"; sourceTree = "<group>"; };
 		48CFBE552ADC10D800E77A5C /* LSUDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LSUDetails.swift; sourceTree = "<group>"; };
 		48CFBE562ADC10D800E77A5C /* LSUStake.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LSUStake.swift; sourceTree = "<group>"; };
@@ -4578,8 +4574,6 @@
 			children = (
 				48CFBE502ADC10D800E77A5C /* LSUDetails+View.swift */,
 				48CFBE512ADC10D800E77A5C /* ValidatorNameView.swift */,
-				48CFBE522ADC10D800E77A5C /* LSUResource.swift */,
-				48CFBE532ADC10D800E77A5C /* LSUResource+View.swift */,
 				48CFBE542ADC10D800E77A5C /* LSUStake+View.swift */,
 				48CFBE552ADC10D800E77A5C /* LSUDetails.swift */,
 				48CFBE562ADC10D800E77A5C /* LSUStake.swift */,
@@ -8179,7 +8173,6 @@
 				48CFC4B52ADC10DA00E77A5C /* StateNonFungibleIdsResponse.swift in Sources */,
 				48CFC4642ADC10DA00E77A5C /* OverlayWindowClient+Interface.swift in Sources */,
 				48CFC53E2ADC10DA00E77A5C /* TransactionSubmitRequest.swift in Sources */,
-				48CFC3752ADC10D900E77A5C /* LSUResource+View.swift in Sources */,
 				48CFC58C2ADC10DA00E77A5C /* OnboardingClient+Live.swift in Sources */,
 				48CFC3A92ADC10D900E77A5C /* PrivateKey.swift in Sources */,
 				48CFC4872ADC10DA00E77A5C /* OnLedgerEntitiesClient+Test.swift in Sources */,
@@ -8863,7 +8856,6 @@
 				48CFC4A22ADC10DA00E77A5C /* StateEntityDetailsResponseFungibleResourceDetailsAllOf.swift in Sources */,
 				48CFC3242ADC10D900E77A5C /* ConnectUsingSecrets+View.swift in Sources */,
 				48CFC2412ADC10D900E77A5C /* DevAccountPreferences+Reducer.swift in Sources */,
-				48CFC3742ADC10D900E77A5C /* LSUResource.swift in Sources */,
 				48CFC5062ADC10DA00E77A5C /* EntityMetadataItem.swift in Sources */,
 				48CFC3232ADC10D900E77A5C /* ConnectUsingSecrets+Reducer.swift in Sources */,
 				48CFC5FF2ADC10DA00E77A5C /* Persona+PreviewValues.swift in Sources */,

@@ -448,18 +448,30 @@ extension OnLedgerEntitiesClient {
 				return nil
 			}()
 
-			let stakeClaimTokens: NonFunbileResourceWithTokens? = try await {
+			let stakeClaimTokens: NonFunbileResourceWithTokens? = try await { () -> NonFunbileResourceWithTokens? in
 				if let stakeClaimResource = stake.stakeClaimResource, stakeClaimResource.nonFungibleIdsCount > 0 {
 					guard let stakeClaimResourceDetails = resourceDetails.first(where: { $0.resourceAddress == stakeClaimResource.resourceAddress }) else {
 						assertionFailure("Did not load stake unit details")
 						return nil
 					}
-					let tokenData = try await getAccountOwnedNonFungibleTokenData(.init(
+					let tokens = try await getAccountOwnedNonFungibleTokenData(.init(
 						accountAddress: account.address,
 						resource: stakeClaimResource,
 						mode: .loadAll
 					)).tokens
-					return .init(resource: stakeClaimResourceDetails, tokens: tokenData)
+
+					var unstakingTokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken> = []
+					var readyToClaimTokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken> = []
+
+					for token in tokens {
+						if let claimEpoch = token.data?.claimEpoch, claimEpoch > currentEpoch {
+							unstakingTokens.append(token)
+						} else {
+							readyToClaimTokens.append(token)
+						}
+					}
+
+					return .init(resource: stakeClaimResourceDetails, unstaking: unstakingTokens, readyToClaim: readyToClaimTokens)
 				}
 
 				return nil
@@ -557,7 +569,8 @@ extension OnLedgerEntitiesClient {
 
 	public struct NonFunbileResourceWithTokens: Hashable, Sendable {
 		public let resource: OnLedgerEntity.Resource
-		public let tokens: [OnLedgerEntity.NonFungibleToken]
+		public let unstaking: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>
+		public let readyToClaim: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>
 	}
 }
 

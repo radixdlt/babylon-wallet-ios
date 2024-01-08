@@ -1,9 +1,9 @@
 // MARK: - StakeSummaryView
 public struct StakeSummaryView: View {
 	public struct ViewState: Hashable, Sendable {
-		public let staked: RETDecimal
-		public let unstaking: RETDecimal
-		public let readyToClaim: RETDecimal
+		public let staked: Loadable<RETDecimal>
+		public let unstaking: Loadable<RETDecimal>
+		public let readyToClaim: Loadable<RETDecimal>
 	}
 
 	public let viewState: ViewState
@@ -30,16 +30,18 @@ public struct StakeSummaryView: View {
 
 extension StakeSummaryView {
 	@ViewBuilder
-	private func summaryRow(_ name: String, amount: RETDecimal) -> some View {
+	private func summaryRow(_ name: String, amount: Loadable<RETDecimal>) -> some View {
 		HStack {
 			Text(name)
 				.textStyle(.body2HighImportance)
 				.foregroundColor(.app.gray2)
 				.padding(.trailing, .medium3)
 			Spacer()
-			Text("\(amount.formatted()) XRD")
-				.textStyle(.body2HighImportance)
-				.foregroundColor(amount.isZero() ? .app.gray2 : .app.gray1)
+			loadable(amount) { amount in
+				Text("\(amount.formatted()) XRD")
+					.textStyle(.body2HighImportance)
+					.foregroundColor(amount.isZero() ? .app.gray2 : .app.gray1)
+			}
 		}
 	}
 }
