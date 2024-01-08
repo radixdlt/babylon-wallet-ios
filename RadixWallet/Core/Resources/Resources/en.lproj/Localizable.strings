@@ -388,6 +388,8 @@
 "transactionReview_unknown" = "Unknown";
 "transactionReview_unnamedDapp" = "Unnamed dApp";
 "transactionReview_usingDappsHeading" = "Using dApps";
+"transactionReview_thirdPartyDepositSettingHeading" = "Third-party deposit setting";
+"transactionReview_thirdPartyDepositExceptionsHeading" = "Third-party deposit exceptions";
 "transactionReview_unknownComponents" = "%d Unknown Components";
 "transactionReview_withdrawalsHeading" = "Withdrawing From";
 "transactionReview_slideToSign" = "Slide to Sign";
