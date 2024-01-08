@@ -8,7 +8,7 @@ final class CustomizeFeePayerTests: TestCase {
 		let manifestStub = try TransactionManifest(instructions: .fromInstructions(instructions: [], networkId: NetworkID.enkinet.rawValue), blobs: [])
 		let notaryKey = Curve25519.Signing.PrivateKey()
 		var transactionStub = ReviewedTransaction(
-			networkId: NetworkID.enkinet,
+			networkID: NetworkID.enkinet,
 			transaction: .nonConforming,
 			feePayer: .success(nil),
 			transactionFee: .nonContingentLockPaying,
