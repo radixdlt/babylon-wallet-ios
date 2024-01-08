@@ -24,9 +24,9 @@ public typealias AssetImageTypeAlias = ImageAsset.Image
 public enum AssetResource {
   public static let iconAcceptAirdrop = ImageAsset(name: "icon-accept-airdrop")
   public static let iconAcceptKnownAirdrop = ImageAsset(name: "icon-accept-known-airdrop")
-  public static let iconAddCircle = ImageAsset(name: "icon-add-circle")
   public static let iconDeclineAirdrop = ImageAsset(name: "icon-decline-airdrop")
   public static let iconMinusCircle = ImageAsset(name: "icon-minus-circle")
+  public static let iconPlusCircle = ImageAsset(name: "icon-plus-circle")
   public static let addAccount = ImageAsset(name: "addAccount")
   public static let addMessage = ImageAsset(name: "addMessage")
   public static let transfer = ImageAsset(name: "transfer")

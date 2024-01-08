@@ -132,11 +132,9 @@ extension TransactionReview {
 								}
 							}
 
-							accountDepositSettingsSection
+							accountDepositSettingSection
 
-//							accountDepositSettingSection
-//
-//							accountDepositExceptionsSection
+							accountDepositExceptionsSection
 						}
 						.padding(.top, .small1)
 						.padding(.horizontal, .medium3)
@@ -246,18 +244,6 @@ extension TransactionReview {
 			return IfLetStore(proofsStore) { childStore in
 				TransactionReviewProofs.View(store: childStore)
 					.padding(.bottom, .medium1)
-			}
-		}
-
-		private var accountDepositSettingsSection: some SwiftUI.View {
-			let accountDepositSettingsStore = store.scope(state: \.accountDepositSettings) { .child(.accountDepositSettings($0)) }
-			return IfLetStore(accountDepositSettingsStore) { childStore in
-				VStack(alignment: .leading, spacing: .small2) {
-					TransactionHeading.depositSettings
-
-					AccountDepositSettings.View(store: childStore)
-						.padding(.bottom, .medium1)
-				}
 			}
 		}
 
