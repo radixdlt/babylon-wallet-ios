@@ -4,6 +4,8 @@ import EngineToolkit
 public enum TransactionKind: Hashable, Sendable {
 	public enum ConformingTransaction: Hashable, Sendable {
 		case general(ExecutionSummary.GeneralTransaction)
+		case poolContribution(ExecutionSummary.PoolContribution)
+		case poolRedemption(ExecutionSummary.PoolRedemption)
 		case accountDepositSettings(ExecutionSummary.AccountDepositSettings)
 
 		public var general: ExecutionSummary.GeneralTransaction? {
@@ -52,6 +54,10 @@ extension ExecutionSummary {
 		}
 	}
 
+	public struct PoolContribution: Hashable, Sendable {}
+
+	public struct PoolRedemption: Hashable, Sendable {}
+
 	public struct AccountDepositSettings: Hashable, Sendable {
 		public let resourcePreferenceChanges: [AccountAddress: [ResourceAddress: ResourcePreferenceUpdate]]
 		public let defaultDepositRuleChanges: [AccountAddress: AccountDefaultDepositRule]
@@ -85,7 +91,14 @@ extension ExecutionSummary {
 					authorizedDepositorsRemoved: authorizedDepositorsRemoved.mapKeys(AccountAddress.init(validatingAddress:))
 				)
 			))
-		case .poolContribution, .poolRedemption, .validatorStake, .validatorUnstake, .validatorClaim:
+		case let .poolContribution(addresses, contributions):
+//		case poolContribution(poolAddresses: [Address], poolContributions: [TrackedPoolContribution])
+
+			.conforming(.poolContribution(.init()))
+		case .poolRedemption:
+//		case poolRedemption(poolAddresses: [Address], poolRedemptions: [TrackedPoolRedemption])
+			.conforming(.poolRedemption(.init()))
+		case .validatorStake, .validatorUnstake, .validatorClaim:
 			.nonConforming
 		}
 	}
