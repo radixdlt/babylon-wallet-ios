@@ -34,7 +34,9 @@ extension TransactionReview.State {
 			sliderResetDate: sliderResetDate,
 			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction?.transaction != .nonConforming,
 			viewRawTransactionButtonState: reviewedTransaction?.feePayer.isSuccess == true ? .enabled : .disabled,
-			proposingDappMetadata: proposingDappMetadata
+			proposingDappMetadata: proposingDappMetadata,
+			depositSettingSection: accountDepositSetting,
+			depositExceptionsSection: accountDepositExceptions
 		)
 	}
 
@@ -61,6 +63,8 @@ extension TransactionReview {
 		let canToggleViewMode: Bool
 		let viewRawTransactionButtonState: ControlState
 		let proposingDappMetadata: DappMetadata.Ledger?
+		let depositSettingSection: DepositSettingState?
+		let depositExceptionsSection: DepositExceptionsState?
 
 		var approvalSliderControlState: ControlState {
 			// TODO: Is this the logic we want?
@@ -132,9 +136,13 @@ extension TransactionReview {
 								}
 							}
 
-							accountDepositSettingSection
+							if let depositSettingViewState = viewStore.depositSettingSection {
+								accountDepositSettingSection(depositSettingViewState)
+							}
 
-							accountDepositExceptionsSection
+							if let depositExceptionsViewState = viewStore.depositExceptionsSection {
+								accountDepositExceptionsSection(depositExceptionsViewState)
+							}
 						}
 						.padding(.top, .small1)
 						.padding(.horizontal, .medium3)
@@ -247,28 +255,22 @@ extension TransactionReview {
 			}
 		}
 
-		private var accountDepositSettingSection: some SwiftUI.View {
-			let accountDepositSettingStore = store.scope(state: \.accountDepositSetting) { .child(.accountDepositSetting($0)) }
-			return IfLetStore(accountDepositSettingStore) { childStore in
-				VStack(alignment: .leading, spacing: .small2) {
-					TransactionHeading.depositSetting
+		private func accountDepositSettingSection(_ viewState: TransactionReview.DepositSettingState) -> some SwiftUI.View {
+			VStack(alignment: .leading, spacing: .small2) {
+				TransactionHeading.depositSetting
 
-					TransactionReviewDepositSetting.View(store: childStore)
-				}
-				.padding(.bottom, .medium1)
+				DepositSettingView(viewState: viewState)
 			}
+			.padding(.bottom, .medium1)
 		}
 
-		private var accountDepositExceptionsSection: some SwiftUI.View {
-			let accountDepositExceptionsStore = store.scope(state: \.accountDepositExceptions) { .child(.accountDepositExceptions($0)) }
-			return IfLetStore(accountDepositExceptionsStore) { childStore in
-				VStack(alignment: .leading, spacing: .small2) {
-					TransactionHeading.depositExceptions
+		private func accountDepositExceptionsSection(_ viewState: TransactionReview.DepositExceptionsState) -> some SwiftUI.View {
+			VStack(alignment: .leading, spacing: .small2) {
+				TransactionHeading.depositExceptions
 
-					TransactionReviewDepositExceptions.View(store: childStore)
-				}
-				.padding(.bottom, .medium1)
+				DepositExceptionsView(viewState: viewState)
 			}
+			.padding(.bottom, .medium1)
 		}
 
 		private var feeSection: some SwiftUI.View {

@@ -22,8 +22,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var dAppsUsed: TransactionReviewDappsUsed.State? = nil
 		public var deposits: TransactionReviewAccounts.State? = nil
 		public var proofs: TransactionReviewProofs.State? = nil
-		public var accountDepositSetting: TransactionReviewDepositSetting.State? = nil
-		public var accountDepositExceptions: TransactionReviewDepositExceptions.State? = nil
+		public var accountDepositSetting: DepositSettingState? = nil
+		public var accountDepositExceptions: DepositExceptionsState? = nil
 
 		public var networkFee: TransactionReviewNetworkFee.State? = nil
 		public let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
@@ -106,8 +106,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case deposits(TransactionReviewAccounts.Action)
 		case dAppsUsed(TransactionReviewDappsUsed.Action)
 		case proofs(TransactionReviewProofs.Action)
-		case accountDepositSetting(TransactionReviewDepositSetting.Action)
-		case accountDepositExceptions(TransactionReviewDepositExceptions.Action)
 		case networkFee(TransactionReviewNetworkFee.Action)
 	}
 
@@ -204,12 +202,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			.ifLet(\.proofs, action: /Action.child .. ChildAction.proofs) {
 				TransactionReviewProofs()
-			}
-			.ifLet(\.accountDepositSetting, action: /Action.child .. ChildAction.accountDepositSetting) {
-				TransactionReviewDepositSetting()
-			}
-			.ifLet(\.accountDepositExceptions, action: /Action.child .. ChildAction.accountDepositExceptions) {
-				TransactionReviewDepositExceptions()
 			}
 			.ifLet(destinationPath, action: /Action.destination) {
 				Destination()
@@ -723,8 +715,8 @@ extension TransactionReview {
 		let dAppsUsed: TransactionReviewDappsUsed.State?
 		let deposits: TransactionReviewAccounts.State?
 		let proofs: TransactionReviewProofs.State?
-		let accountDepositSetting: TransactionReviewDepositSetting.State?
-		let accountDepositExceptions: TransactionReviewDepositExceptions.State?
+		let accountDepositSetting: DepositSettingState?
+		let accountDepositExceptions: DepositExceptionsState?
 	}
 
 	// MARK: - TransferType
@@ -991,8 +983,8 @@ extension TransactionReview {
 	func extractAccountDepositSetting(
 		for validAccounts: [Profile.Network.Account],
 		from settings: ExecutionSummary.AccountDepositSettings
-	) -> TransactionReviewDepositSetting.State? {
-		let depositSettingChanges: [TransactionReviewDepositSetting.AccountChange] = validAccounts.compactMap { account in
+	) -> DepositSettingState? {
+		let depositSettingChanges: [TransactionReview.DepositSettingChange] = validAccounts.compactMap { account in
 			guard let depositRuleChange = settings.defaultDepositRuleChanges[account.address] else { return nil }
 			return .init(account: account, ruleChange: depositRuleChange)
 		}
@@ -1005,23 +997,23 @@ extension TransactionReview {
 	func extractAccountDepositExceptions(
 		for validAccounts: [Profile.Network.Account],
 		from settings: ExecutionSummary.AccountDepositSettings
-	) async throws -> TransactionReviewDepositExceptions.State? {
-		let exceptionChanges: [TransactionReviewDepositExceptions.AccountChange] = try await validAccounts.asyncCompactMap { account in
+	) async throws -> DepositExceptionsState? {
+		let exceptionChanges: [DepositExceptionsChange] = try await validAccounts.asyncCompactMap { account in
 			let resourcePreferenceChanges = try await settings
 				.resourcePreferenceChanges[account.address]?
 				.asyncMap { resourcePreference in
-					try await TransactionReviewDepositExceptions.AccountChange.ResourcePreferenceChange(
+					try await DepositExceptionsChange.ResourcePreferenceChange(
 						resource: onLedgerEntitiesClient.getResource(resourcePreference.key),
 						change: resourcePreference.value
 					)
 				} ?? []
 
 			let authorizedDepositorChanges = try await {
-				var changes: [TransactionReviewDepositExceptions.AccountChange.AllowedDepositorChange] = []
+				var changes: [DepositExceptionsChange.AllowedDepositorChange] = []
 				if let authorizedDepositorsAdded = settings.authorizedDepositorsAdded[account.address] {
 					let added = try await authorizedDepositorsAdded.asyncMap { resourceOrNonFungible in
 						let resourceAddress = try resourceOrNonFungible.resourceAddress()
-						return try await TransactionReviewDepositExceptions.AccountChange.AllowedDepositorChange(
+						return try await DepositExceptionsChange.AllowedDepositorChange(
 							resource: onLedgerEntitiesClient.getResource(resourceAddress),
 							change: .added
 						)
@@ -1031,7 +1023,7 @@ extension TransactionReview {
 				if let authorizedDepositorsRemoved = settings.authorizedDepositorsRemoved[account.address] {
 					let removed = try await authorizedDepositorsRemoved.asyncMap { resourceOrNonFungible in
 						let resourceAddress = try resourceOrNonFungible.resourceAddress()
-						return try await TransactionReviewDepositExceptions.AccountChange.AllowedDepositorChange(
+						return try await DepositExceptionsChange.AllowedDepositorChange(
 							resource: onLedgerEntitiesClient.getResource(resourceAddress),
 							change: .removed
 						)
@@ -1044,7 +1036,7 @@ extension TransactionReview {
 
 			guard !resourcePreferenceChanges.isEmpty || !authorizedDepositorChanges.isEmpty else { return nil }
 
-			return TransactionReviewDepositExceptions.AccountChange(
+			return DepositExceptionsChange(
 				account: account,
 				resourcePreferenceChanges: IdentifiedArray(uncheckedUniqueElements: resourcePreferenceChanges),
 				allowedDepositorChanges: IdentifiedArray(uncheckedUniqueElements: authorizedDepositorChanges)
@@ -1053,7 +1045,7 @@ extension TransactionReview {
 
 		guard !exceptionChanges.isEmpty else { return nil }
 
-		return TransactionReviewDepositExceptions.State(changes: IdentifiedArray(uncheckedUniqueElements: exceptionChanges))
+		return DepositExceptionsState(changes: IdentifiedArray(uncheckedUniqueElements: exceptionChanges))
 	}
 }
 
