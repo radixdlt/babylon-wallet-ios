@@ -24,17 +24,18 @@ struct ValidatorStakeView: View {
 		Section {
 			loadable(viewState.content) { content in
 				ValidatorNameView(viewState: content.validatorNameViewState)
+					.contentShape(Rectangle())
+					.rowStyle()
+					.padding(.medium1)
 					.onTapGesture {
 						isExpanded.toggle()
 					}
-					.rowStyle()
-					.padding(.medium1)
 
 				if isExpanded {
 					if let liquidStakeUnitViewState = content.liquidStakeUnit {
 						liquidStakeUnitView(viewState: liquidStakeUnitViewState)
-							.onTapGesture { onLiquidStakeUnitTapped() }
 							.rowStyle()
+							.onTapGesture { onLiquidStakeUnitTapped() }
 					}
 
 					if let stakeClaimNFTsViewState = content.stakeClaimNFTs {
@@ -57,6 +58,7 @@ struct ValidatorStakeView: View {
 			LiquidStakeUnitView(viewState: viewState)
 				.padding(.medium1)
 		}
+		.contentShape(Rectangle())
 	}
 
 	private func stakeClaimNFTsView(

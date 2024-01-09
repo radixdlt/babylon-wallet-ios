@@ -77,13 +77,58 @@ public extension StakeUnitList {
 
 				loadable(viewStore.stakedValidators) {
 					ForEach($0) { viewState in
-						ValidatorStakeView(viewState: viewState, onLiquidStakeUnitTapped: {}, onStakeClaimTokenTapped: { _ in })
+						ValidatorStakeView(
+							viewState: viewState,
+							onLiquidStakeUnitTapped: {
+								viewStore.send(.view(.didTapLiquidStakeUnit(forValidator: viewState.id)))
+							},
+							onStakeClaimTokenTapped: { id in
+								viewStore.send(.view(.didTapStakeClaimNFT(forValidator: viewState.id, id: id)))
+							}
+						)
 					}
 				}
 			}
 			.onAppear {
 				store.send(.view(.appeared))
 			}
+			.destinations(with: store)
 		}
+	}
+}
+
+private extension StoreOf<StakeUnitList> {
+	var destination: PresentationStoreOf<StakeUnitList.Destination> {
+		func scopeState(state: State) -> PresentationState<StakeUnitList.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<StakeUnitList>) -> some View {
+		let destinationStore = store.destination
+		return lsuDetails(with: destinationStore)
+			.stakeClaimNFTDetails(with: destinationStore)
+	}
+
+	private func lsuDetails(with destinationStore: PresentationStoreOf<StakeUnitList.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /StakeUnitList.Destination.State.details,
+			action: StakeUnitList.Destination.Action.details,
+			content: { LSUDetails.View(store: $0) }
+		)
+	}
+
+	private func stakeClaimNFTDetails(with destinationStore: PresentationStoreOf<StakeUnitList.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /StakeUnitList.Destination.State.stakeClaimDetails,
+			action: StakeUnitList.Destination.Action.stakeClaimDetails,
+			content: { NonFungibleTokenDetails.View(store: $0) }
+		)
 	}
 }
