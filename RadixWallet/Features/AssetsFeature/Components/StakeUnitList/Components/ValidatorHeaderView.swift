@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - ValidatorNameView
-struct ValidatorNameView: View {
+struct ValidatorHeaderView: View {
 	struct ViewState: Equatable {
 		let imageURL: URL?
 		let name: String

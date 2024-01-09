@@ -7,7 +7,7 @@ struct ValidatorStakeView: View {
 		public var id: ValidatorAddress
 
 		struct Content: Sendable, Equatable {
-			let validatorNameViewState: ValidatorNameView.ViewState
+			let validatorNameViewState: ValidatorHeaderView.ViewState
 			let liquidStakeUnit: LiquidStakeUnitView.ViewState?
 			let stakeClaimNFTs: StakeClaimNFTSView.ViewState?
 		}
@@ -23,7 +23,7 @@ struct ValidatorStakeView: View {
 	public var body: some SwiftUI.View {
 		Section {
 			loadable(viewState.content) { content in
-				ValidatorNameView(viewState: content.validatorNameViewState)
+				ValidatorHeaderView(viewState: content.validatorNameViewState)
 					.contentShape(Rectangle())
 					.rowStyle()
 					.padding(.medium1)

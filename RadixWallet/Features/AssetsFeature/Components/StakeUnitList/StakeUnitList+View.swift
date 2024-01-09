@@ -1,53 +1,78 @@
 extension StakeUnitList.State {
 	var viewState: StakeUnitList.ViewState {
-		let totalStaked = stakeDetails.map {
-			var staked: RETDecimal = .zero()
-			for stake in $0 {
-				staked = staked + stake.xrdRedemptionValue
-			}
-			return staked
+		guard case let .success(stakesDetail) = stakeDetails else {
+			// Loading state
+			return .init(
+				stakeSummary: .init(staked: .loading, unstaking: .loading, readyToClaim: .loading),
+				stakedValidators: account.poolUnitResources.radixNetworkStakes.map {
+					ValidatorStakeView.ViewState(id: $0.validatorAddress, content: .loading)
+				}.asIdentifiable()
+			)
 		}
+		return processStakesDetail(stakesDetail)
+	}
 
-		let unstaking = stakeDetails.map {
-			var unstaking: RETDecimal = .zero()
-			for stakeClaim in $0.compactMap(\.stakeClaimTokens) {
-				for token in stakeClaim.unstaking {
-					unstaking = unstaking + (token.data?.claimAmount ?? .zero())
+	fileprivate func processStakeTokens(
+		_ stakeClaimTokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>,
+		_ amount: inout RETDecimal,
+		_ stakeClaims: inout IdentifiedArrayOf<StakeClaimNFTSView.StakeClaim>
+	) {
+		for token in stakeClaimTokens {
+			guard let claimAmount = token.data?.claimAmount, claimAmount > .zero() else {
+				continue
+			}
+			amount = amount + claimAmount
+			stakeClaims.append(.init(id: token.id, worth: claimAmount))
+		}
+	}
+
+	fileprivate func processStakesDetail(_ stakesDetail: IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>) -> StakeUnitList.ViewState {
+		var stakedAmount: RETDecimal = .zero()
+		var unstakingAmount: RETDecimal = .zero()
+		var readyToClaimAmount: RETDecimal = .zero()
+		var validatorStakes: IdentifiedArrayOf<ValidatorStakeView.ViewState> = []
+
+		for stake in stakesDetail {
+			let stakeXRDRedemptionValue = stake.xrdRedemptionValue
+			stakedAmount = stakedAmount + stakeXRDRedemptionValue
+
+			var unstakingTokens: IdentifiedArrayOf<StakeClaimNFTSView.StakeClaim> = []
+			var readyToClaimTokens: IdentifiedArrayOf<StakeClaimNFTSView.StakeClaim> = []
+
+			if let stakeClaimTokens = stake.stakeClaimTokens {
+				processStakeTokens(stakeClaimTokens.unstaking, &unstakingAmount, &unstakingTokens)
+				processStakeTokens(stakeClaimTokens.readyToClaim, &readyToClaimTokens, &unstakingTokens)
+			}
+
+			let stakeClaimNFTs = stake.stakeClaimTokens.map { stakeClaim in
+				var sections: IdentifiedArrayOf<StakeClaimNFTSView.Section> = []
+				if !unstakingTokens.isEmpty {
+					sections.append(.unstaking(unstakingTokens))
 				}
-			}
-			return unstaking
-		}
-		let stakeClaim = stakeDetails.map {
-			var unstaking: RETDecimal = .zero()
-			for stakeClaim in $0.compactMap(\.stakeClaimTokens) {
-				for token in stakeClaim.readyToClaim {
-					unstaking = unstaking + (token.data?.claimAmount ?? .zero())
+				if !readyToClaimTokens.isEmpty {
+					sections.append(.readyToBeClaimed(readyToClaimTokens))
 				}
+				return StakeClaimNFTSView.ViewState(resource: stakeClaim.resource, sections: sections)
 			}
-			return unstaking
+
+			let content = ValidatorStakeView.ViewState.Content(
+				validatorNameViewState: .init(imageURL: stake.validator.metadata.iconURL, name: stake.validator.metadata.name ?? L10n.Account.PoolUnits.unknownValidatorName, stakedAmount: stakeXRDRedemptionValue),
+				liquidStakeUnit: stake.stakeUnitResource.map { .init(resource: $0.resource, worth: stakeXRDRedemptionValue) },
+				stakeClaimNFTs: stakeClaimNFTs
+			)
+
+			let validatorStake = ValidatorStakeView.ViewState(id: stake.validator.address, content: .success(content))
+			validatorStakes.append(validatorStake)
 		}
 
-		let stakedValidators = stakeDetails.map { stakes in
-			stakes.map { stake in
-				let content = ValidatorStakeView.ViewState.Content(
-					validatorNameViewState: .init(imageURL: stake.validator.metadata.iconURL, name: stake.validator.metadata.name ?? L10n.Account.PoolUnits.unknownValidatorName, stakedAmount: stake.xrdRedemptionValue),
-					liquidStakeUnit: stake.stakeUnitResource.map { .init(resource: $0.resource, worth: stake.xrdRedemptionValue) },
-					stakeClaimNFTs: stake.stakeClaimTokens.map {
-						var sections: IdentifiedArrayOf<StakeClaimNFTSView.Section> = []
-						if !$0.unstaking.isEmpty {
-							sections.append(.unstaking($0.unstaking.map { StakeClaimNFTSView.StakeClaim(id: $0.id, worth: $0.data?.claimAmount ?? .zero()) }.asIdentifiable()))
-						}
-						if !$0.readyToClaim.isEmpty {
-							sections.append(.readyToBeClaimed($0.readyToClaim.map { StakeClaimNFTSView.StakeClaim(id: $0.id, worth: $0.data?.claimAmount ?? .zero()) }.asIdentifiable()))
-						}
-						return .init(resource: $0.resource, sections: sections)
-					}
-				)
-
-				return ValidatorStakeView.ViewState(id: stake.validator.address, content: .success(content))
-			}.asIdentifiable()
-		}
-		return .init(stakeSummary: .init(staked: totalStaked, unstaking: unstaking, readyToClaim: stakeClaim), stakedValidators: stakedValidators)
+		return .init(
+			stakeSummary: .init(
+				staked: .success(stakedAmount),
+				unstaking: .success(unstakingAmount),
+				readyToClaim: .success(readyToClaimAmount)
+			),
+			stakedValidators: validatorStakes
+		)
 	}
 }
 
@@ -56,7 +81,7 @@ extension StakeUnitList.State {
 public extension StakeUnitList {
 	struct ViewState: Equatable {
 		let stakeSummary: StakeSummaryView.ViewState
-		let stakedValidators: Loadable<IdentifiedArrayOf<ValidatorStakeView.ViewState>>
+		let stakedValidators: IdentifiedArrayOf<ValidatorStakeView.ViewState>
 	}
 
 	@MainActor
@@ -75,18 +100,16 @@ public extension StakeUnitList {
 						.padding(.medium1)
 				}
 
-				loadable(viewStore.stakedValidators) {
-					ForEach($0) { viewState in
-						ValidatorStakeView(
-							viewState: viewState,
-							onLiquidStakeUnitTapped: {
-								viewStore.send(.view(.didTapLiquidStakeUnit(forValidator: viewState.id)))
-							},
-							onStakeClaimTokenTapped: { id in
-								viewStore.send(.view(.didTapStakeClaimNFT(forValidator: viewState.id, id: id)))
-							}
-						)
-					}
+				ForEach(viewStore.stakedValidators) { viewState in
+					ValidatorStakeView(
+						viewState: viewState,
+						onLiquidStakeUnitTapped: {
+							viewStore.send(.view(.didTapLiquidStakeUnit(forValidator: viewState.id)))
+						},
+						onStakeClaimTokenTapped: { id in
+							viewStore.send(.view(.didTapStakeClaimNFT(forValidator: viewState.id, id: id)))
+						}
+					)
 				}
 			}
 			.onAppear {
