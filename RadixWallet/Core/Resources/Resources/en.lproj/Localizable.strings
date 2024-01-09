@@ -421,7 +421,7 @@
 "transactionReview_accountDepositSettings_denyAllRule" = "**Disallow** all deposits from third parties without your consent.";
 "transactionReview_accountDepositSettings_assetChangeAllow" = "Allow";
 "transactionReview_accountDepositSettings_assetChangeDisallow" = "Disallow";
-"transactionReview_accountDepositSettings_assetChangeClear" = "Clear Exception";
+"transactionReview_accountDepositSettings_assetChangeClear" = "Remove Exception";
 "transactionReview_accountDepositSettings_depositorChangeAdd" = "Add Depositor";
 "transactionReview_accountDepositSettings_depositorChangeRemove" = "Remove Depositor";
 "transactionReview_unacceptableManifest_rejected" = "A proposed transaction was rejected because it contains one or more reserved instructions.";
