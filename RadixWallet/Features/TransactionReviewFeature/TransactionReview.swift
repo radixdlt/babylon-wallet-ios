@@ -111,7 +111,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case previewLoaded(TaskResult<TransactionToReview>)
-		case createTransactionReview(TransactionReview.TransactionContent)
+		case updateSections(TransactionReview.Sections)
 		case buildTransactionItentResult(TaskResult<TransactionIntent>)
 		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
 		case determineFeePayerResult(TaskResult<FeePayerSelectionResult?>)
@@ -353,13 +353,13 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case let .createTransactionReview(content):
-			state.withdrawals = content.withdrawals
-			state.dAppsUsed = content.dAppsUsed
-			state.deposits = content.deposits
-			state.accountDepositSetting = content.accountDepositSetting
-			state.accountDepositExceptions = content.accountDepositExceptions
-			state.proofs = content.proofs
+		case let .updateSections(sections):
+			state.withdrawals = sections.withdrawals
+			state.dAppsUsed = sections.dAppsUsed
+			state.deposits = sections.deposits
+			state.accountDepositSetting = sections.accountDepositSetting
+			state.accountDepositExceptions = sections.accountDepositExceptions
+			state.proofs = sections.proofs
 			return .none
 
 		case let .buildTransactionItentResult(.success(intent)):
@@ -528,8 +528,8 @@ extension TransactionReview {
 		switch reviewedTransaction.transaction {
 		case let .conforming(conformingTransaction):
 			return .run { send in
-				let content = try await content(for: conformingTransaction, networkID: networkID)
-				await send(.internal(.createTransactionReview(content)))
+				let sections = try await sections(for: conformingTransaction, networkID: networkID)
+				await send(.internal(.updateSections(sections)))
 			} catch: { error, _ in
 				loggerGlobal.error("Failed to extract transaction content, error: \(error)")
 				// FIXME: propagate/display error?
@@ -539,12 +539,12 @@ extension TransactionReview {
 		}
 	}
 
-	func content(for transaction: TransactionKind.ConformingTransaction, networkID: NetworkID) async throws -> TransactionReview.TransactionContent {
+	func sections(for transaction: TransactionKind.ConformingTransaction, networkID: NetworkID) async throws -> Sections {
 		switch transaction {
 		case let .general(generalTransaction):
 			let userAccounts = try await extractUserAccounts(generalTransaction)
 
-			return await TransactionReview.TransactionContent(
+			return await Sections(
 				withdrawals: try? extractWithdrawals(
 					generalTransaction,
 					userAccounts: userAccounts,
@@ -556,10 +556,14 @@ extension TransactionReview {
 					userAccounts: userAccounts,
 					networkID: networkID
 				),
-				proofs: try? exctractProofs(generalTransaction),
-				accountDepositSetting: nil,
-				accountDepositExceptions: nil
+				proofs: try? exctractProofs(generalTransaction)
 			)
+		case let .poolContribution(poolContribution):
+			return Sections()
+
+		case let .poolRedemption(poolRedemption):
+			return Sections()
+
 		case let .accountDepositSettings(accountDepositSettings):
 			let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 			let allAccountAddress = Set(accountDepositSettings.authorizedDepositorsAdded.keys)
@@ -570,11 +574,7 @@ extension TransactionReview {
 				userAccounts.first { $0.address == address }
 			}
 
-			return try await TransactionReview.TransactionContent(
-				withdrawals: nil,
-				dAppsUsed: nil,
-				deposits: nil,
-				proofs: nil,
+			return try await Sections(
 				accountDepositSetting: extractAccountDepositSetting(for: validAccounts, from: accountDepositSettings),
 				accountDepositExceptions: extractAccountDepositExceptions(for: validAccounts, from: accountDepositSettings)
 			)
@@ -706,6 +706,15 @@ extension TransactionReview {
 }
 
 extension TransactionReview {
+	public struct Sections: Sendable, Hashable {
+		var withdrawals: TransactionReviewAccounts.State? = nil
+		var dAppsUsed: TransactionReviewDappsUsed.State? = nil
+		var deposits: TransactionReviewAccounts.State? = nil
+		var proofs: TransactionReviewProofs.State? = nil
+		var accountDepositSetting: DepositSettingState? = nil
+		var accountDepositExceptions: DepositExceptionsState? = nil
+	}
+
 	public struct TransactionContent: Sendable, Hashable {
 		let withdrawals: TransactionReviewAccounts.State?
 		let dAppsUsed: TransactionReviewDappsUsed.State?
@@ -1233,6 +1242,13 @@ extension ReviewedTransaction {
 		feePayer.map { selected in
 			switch transaction {
 			case .nonConforming, .conforming(.accountDepositSettings):
+				return selected.validateBalance(forFee: transactionFee)
+			case .conforming(.poolContribution):
+				// TODO: What to return here?
+				return selected.validateBalance(forFee: transactionFee)
+
+			case .conforming(.poolRedemption):
+				// TODO: What to return here?
 				return selected.validateBalance(forFee: transactionFee)
 
 			case let .conforming(.general(generalTransaction)):
