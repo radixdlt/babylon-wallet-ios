@@ -9,7 +9,7 @@ extension LSUDetails.State {
 				symbol: .success(stakeUnitResource.resource.metadata.symbol)
 			),
 			thumbnailURL: stakeUnitResource.resource.metadata.iconURL,
-			validatorNameViewState: .init(with: validator, stakedAmount: xrdRedemptionValue),
+			validatorNameViewState: .init(with: validator),
 			redeemableTokenAmount: .init(.init(
 				id: stakeUnitResource.resource.resourceAddress, // FIXME: IS THIS CORRECT
 				xrdAmount: xrdRedemptionValue.formatted()
@@ -80,13 +80,12 @@ extension LSUDetails {
 
 extension ValidatorHeaderView.ViewState {
 	init(
-		with validator: OnLedgerEntity.Validator,
-		stakedAmount: RETDecimal
+		with validator: OnLedgerEntity.Validator
 	) {
 		self.init(
 			imageURL: validator.metadata.iconURL,
 			name: validator.metadata.name ?? L10n.Account.PoolUnits.unknownValidatorName,
-			stakedAmount: stakedAmount
+			stakedAmount: nil
 		)
 	}
 }

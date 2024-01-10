@@ -170,6 +170,11 @@ public struct AssetsView: Sendable, FeatureReducer {
 					await send(.child(.poolUnitsList(.view(.refresh))))
 				}
 			}
+			if resourcesState.stakeUnitList != nil, state.activeAssetKind == .stakeUnits || state.isRefreshing {
+				return .run { send in
+					await send(.child(.stakeUnitList(.view(.refresh))))
+				}
+			}
 			state.isRefreshing = false
 
 			return .none

@@ -11,7 +11,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-
+		case refresh
 		case didTapLiquidStakeUnit(forValidator: ValidatorAddress)
 		case didTapStakeClaimNFT(forValidator: ValidatorAddress, id: NonFungibleGlobalId)
 	}
@@ -67,17 +67,10 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 				return .none
 			}
 
-			state.stakeDetails = .loading
+			return loadStakingDetails(&state)
 
-			return .run { [state = state] send in
-				let result = await TaskResult {
-					try await onLedgerEntitiesClient.getOwnedStakesDetails(
-						account: state.account,
-						cachingStrategy: state.shouldRefresh ? .forceUpdate : .useCache
-					)
-				}
-				await send(.internal(.detailsLoaded(result)))
-			}
+		case .refresh:
+			return loadStakingDetails(&state)
 
 		case let .didTapLiquidStakeUnit(address):
 			guard case let .success(stakeDetails) = state.stakeDetails,
@@ -126,6 +119,20 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 			state.stakeDetails = .failure(error)
 			errorQueue.schedule(error)
 			return .none
+		}
+	}
+
+	private func loadStakingDetails(_ state: inout State) -> Effect<Action> {
+		state.stakeDetails = .loading
+
+		return .run { [state = state] send in
+			let result = await TaskResult {
+				try await onLedgerEntitiesClient.getOwnedStakesDetails(
+					account: state.account,
+					cachingStrategy: state.shouldRefresh ? .forceUpdate : .useCache
+				)
+			}
+			await send(.internal(.detailsLoaded(result)))
 		}
 	}
 }

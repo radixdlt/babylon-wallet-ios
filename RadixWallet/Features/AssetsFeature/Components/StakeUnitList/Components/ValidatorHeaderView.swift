@@ -6,7 +6,7 @@ struct ValidatorHeaderView: View {
 	struct ViewState: Equatable {
 		let imageURL: URL?
 		let name: String
-		let stakedAmount: RETDecimal
+		let stakedAmount: RETDecimal?
 	}
 
 	let viewState: ViewState
@@ -20,9 +20,11 @@ struct ValidatorHeaderView: View {
 				Text(viewState.name)
 					.textStyle(.secondaryHeader)
 					.foregroundColor(.app.gray1)
-				Text("Staked \(viewState.stakedAmount.formatted()) XRD")
-					.textStyle(.body2HighImportance)
-					.foregroundColor(.app.gray2)
+				if let stakedAmount = viewState.stakedAmount {
+					Text("Staked \(stakedAmount.formatted()) XRD")
+						.textStyle(.body2HighImportance)
+						.foregroundColor(.app.gray2)
+				}
 			}
 
 			Spacer(minLength: 0)
