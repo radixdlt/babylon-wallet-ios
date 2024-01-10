@@ -1231,6 +1231,7 @@
 		A47572052B29B4F20059A95D /* IOSSecurityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */; };
 		A47572062B29B4F50059A95D /* IOSSecurityClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572012B29B3CA0059A95D /* IOSSecurityClient+Live.swift */; };
 		A4B017F72B4C099D00B42B8E /* TransactionReview+DepositSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4B017F42B4BF59000B42B8E /* TransactionReview+DepositSettingView.swift */; };
+		A4B017FA2B4E9A1400B42B8E /* TransactionReview+ContributingToPoolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4B017F92B4E9A1400B42B8E /* TransactionReview+ContributingToPoolsView.swift */; };
 		E62449D52AFBA61100272C67 /* Home+AccountRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */; };
 		E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */; };
 		E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */; };
@@ -2551,6 +2552,7 @@
 		A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Test.swift"; sourceTree = "<group>"; };
 		A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Interface.swift"; sourceTree = "<group>"; };
 		A4B017F42B4BF59000B42B8E /* TransactionReview+DepositSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionReview+DepositSettingView.swift"; sourceTree = "<group>"; };
+		A4B017F92B4E9A1400B42B8E /* TransactionReview+ContributingToPoolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionReview+ContributingToPoolsView.swift"; sourceTree = "<group>"; };
 		E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+Reducer.swift"; sourceTree = "<group>"; };
 		E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+View.swift"; sourceTree = "<group>"; };
 		E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportMnemonicTests.swift; sourceTree = "<group>"; };
@@ -3221,6 +3223,7 @@
 		48CFBCD02ADC10D800E77A5C /* TransactionReviewFeature */ = {
 			isa = PBXGroup;
 			children = (
+				A4B017F82B4E99EF00B42B8E /* TransactionReviewContributingToPools */,
 				48CFBCD42ADC10D800E77A5C /* TransactionReview.swift */,
 				48CFBCF52ADC10D800E77A5C /* TransactionReview+View.swift */,
 				48CFBCD12ADC10D800E77A5C /* SelectFeePayer */,
@@ -6978,6 +6981,14 @@
 			path = TransactionReviewDepositSetting;
 			sourceTree = "<group>";
 		};
+		A4B017F82B4E99EF00B42B8E /* TransactionReviewContributingToPools */ = {
+			isa = PBXGroup;
+			children = (
+				A4B017F92B4E9A1400B42B8E /* TransactionReview+ContributingToPoolsView.swift */,
+			);
+			path = TransactionReviewContributingToPools;
+			sourceTree = "<group>";
+		};
 		E634CA2C2AFD259000C43DB7 /* DebugKeychainContents */ = {
 			isa = PBXGroup;
 			children = (
@@ -8794,6 +8805,7 @@
 				48CFC4D92ADC10DA00E77A5C /* MetadataBoolValue.swift in Sources */,
 				48CFC5962ADC10DA00E77A5C /* ControlRequirements.swift in Sources */,
 				48CFC4262ADC10DA00E77A5C /* LocalizedError+Equatable.swift in Sources */,
+				A4B017FA2B4E9A1400B42B8E /* TransactionReview+ContributingToPoolsView.swift in Sources */,
 				48CFC32A2ADC10D900E77A5C /* CameraPermission+View.swift in Sources */,
 				48CFC5C62ADC10DA00E77A5C /* ApprovalSlider.swift in Sources */,
 				48CFC3B12ADC10D900E77A5C /* HD+ExtendedKey.swift in Sources */,

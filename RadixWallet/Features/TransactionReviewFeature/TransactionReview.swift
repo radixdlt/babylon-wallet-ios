@@ -546,20 +546,43 @@ extension TransactionReview {
 
 			return await Sections(
 				withdrawals: try? extractWithdrawals(
-					generalTransaction,
+					accountWithdraws: generalTransaction.accountWithdraws,
+					metadataOfNewlyCreatedEntities: generalTransaction.metadataOfNewlyCreatedEntities,
+					dataOfNewlyMintedNonFungibles: generalTransaction.dataOfNewlyMintedNonFungibles,
+					addressesOfNewlyCreatedEntities: generalTransaction.addressesOfNewlyCreatedEntities,
 					userAccounts: userAccounts,
 					networkID: networkID
 				),
 				dAppsUsed: try? extractUsedDapps(generalTransaction),
 				deposits: try? extractDeposits(
-					generalTransaction,
+					accountDeposits: generalTransaction.accountDeposits,
+					metadataOfNewlyCreatedEntities: generalTransaction.metadataOfNewlyCreatedEntities,
+					dataOfNewlyMintedNonFungibles: generalTransaction.dataOfNewlyMintedNonFungibles,
+					addressesOfNewlyCreatedEntities: generalTransaction.addressesOfNewlyCreatedEntities,
 					userAccounts: userAccounts,
 					networkID: networkID
 				),
 				proofs: try? exctractProofs(generalTransaction)
 			)
 		case let .poolContribution(poolContribution):
-			return Sections()
+			return await Sections(
+				withdrawals: try? extractWithdrawals(
+					accountWithdraws: poolContribution.accountWithdraws,
+					metadataOfNewlyCreatedEntities: [:],
+					dataOfNewlyMintedNonFungibles: [:],
+					addressesOfNewlyCreatedEntities: [],
+					userAccounts: [],
+					networkID: networkID
+				),
+				deposits: try? extractDeposits(
+					accountDeposits: poolContribution.accountDeposits,
+					metadataOfNewlyCreatedEntities: [:],
+					dataOfNewlyMintedNonFungibles: [:],
+					addressesOfNewlyCreatedEntities: [],
+					userAccounts: [],
+					networkID: networkID
+				)
+			)
 
 		case let .poolRedemption(poolRedemption):
 			return Sections()
@@ -713,15 +736,8 @@ extension TransactionReview {
 		var proofs: TransactionReviewProofs.State? = nil
 		var accountDepositSetting: DepositSettingState? = nil
 		var accountDepositExceptions: DepositExceptionsState? = nil
-	}
 
-	public struct TransactionContent: Sendable, Hashable {
-		let withdrawals: TransactionReviewAccounts.State?
-		let dAppsUsed: TransactionReviewDappsUsed.State?
-		let deposits: TransactionReviewAccounts.State?
-		let proofs: TransactionReviewProofs.State?
-		let accountDepositSetting: DepositSettingState?
-		let accountDepositExceptions: DepositExceptionsState?
+		var contributingToPools: DepositExceptionsState? = nil
 	}
 
 	// MARK: - TransferType
@@ -796,20 +812,22 @@ extension TransactionReview {
 	}
 
 	private func extractWithdrawals(
-		_ transaction: ExecutionSummary.GeneralTransaction,
+		accountWithdraws: [String: [ResourceIndicator]],
+		metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]],
+		dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]],
+		addressesOfNewlyCreatedEntities: [EngineToolkit.Address],
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
 		var withdrawals: [Account: [Transfer]] = [:]
-		for (accountAddress, resources) in transaction.accountWithdraws {
+		for (accountAddress, resources) in accountWithdraws {
 			let account = try userAccounts.account(for: .init(validatingAddress: accountAddress))
-
 			let transfers = try await resources.asyncFlatMap {
 				try await transferInfo(
 					resourceQuantifier: $0,
-					metadataOfCreatedEntities: transaction.metadataOfNewlyCreatedEntities,
-					dataOfNewlyMintedNonFungibles: transaction.dataOfNewlyMintedNonFungibles,
-					createdEntities: transaction.addressesOfNewlyCreatedEntities,
+					metadataOfCreatedEntities: metadataOfNewlyCreatedEntities,
+					dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles,
+					createdEntities: addressesOfNewlyCreatedEntities,
 					networkID: networkID,
 					type: .exact
 				)
@@ -827,7 +845,11 @@ extension TransactionReview {
 	}
 
 	private func extractDeposits(
-		_ transaction: ExecutionSummary.GeneralTransaction,
+		accountDeposits: [String: [ResourceIndicator]],
+		metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]],
+		dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]],
+		addressesOfNewlyCreatedEntities: [EngineToolkit.Address],
+
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
@@ -835,14 +857,14 @@ extension TransactionReview {
 
 		var deposits: [Account: [Transfer]] = [:]
 
-		for (accountAddress, accountDeposits) in transaction.accountDeposits {
+		for (accountAddress, accountDeposits) in accountDeposits {
 			let account = try userAccounts.account(for: .init(validatingAddress: accountAddress))
 			let transfers = try await accountDeposits.asyncFlatMap {
 				try await transferInfo(
 					resourceQuantifier: $0,
-					metadataOfCreatedEntities: transaction.metadataOfNewlyCreatedEntities,
-					dataOfNewlyMintedNonFungibles: transaction.dataOfNewlyMintedNonFungibles,
-					createdEntities: transaction.addressesOfNewlyCreatedEntities,
+					metadataOfCreatedEntities: metadataOfNewlyCreatedEntities,
+					dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles,
+					createdEntities: addressesOfNewlyCreatedEntities,
 					networkID: networkID,
 					type: $0.transferType,
 					defaultDepositGuarantee: defaultDepositGuarantee

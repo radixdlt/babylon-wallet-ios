@@ -54,7 +54,48 @@ extension ExecutionSummary {
 		}
 	}
 
-	public struct PoolContribution: Hashable, Sendable {}
+	public struct PoolContribution: Hashable, Sendable {
+		public let accountWithdraws: [String: [ResourceIndicator]]
+		public let accountDeposits: [String: [ResourceIndicator]]
+		public let poolAddresses: [EngineToolkit.Address]
+		public let poolContributions: [TrackedPoolContribution]
+
+		init(accountWithdraws: [String: [ResourceIndicator]], accountDeposits: [String: [ResourceIndicator]], poolAddresses: [EngineToolkit.Address], poolContributions: [TrackedPoolContribution]) {
+			self.accountWithdraws = accountWithdraws
+			self.accountDeposits = accountDeposits
+			self.poolAddresses = poolAddresses
+			self.poolContributions = poolContributions
+
+			print("accountWithdraws")
+			for (key, addresses) in accountWithdraws {
+				print("  \(key):")
+				for address in addresses {
+					print("    \(address.transferType): \(address.resourceAddress.entityType())")
+				}
+			}
+
+			print("accountDeposits")
+			for (key, addresses) in accountDeposits {
+				print("  \(key):")
+				for address in addresses {
+					print("    \(address.transferType): \(address.resourceAddress.entityType())")
+				}
+			}
+
+			print("poolAddresses")
+			for poolAddress in poolAddresses {
+				print("  \(poolAddress.entityType()): \(poolAddress.asStr())")
+			}
+
+			print("poolContributions")
+			for poolContribution in poolContributions {
+				print("  Addr: \(poolContribution.poolAddress.entityType()): \(poolContribution.poolAddress.asStr())")
+				print("  UAdr: \(poolContribution.poolUnitsResourceAddress.entityType()): \(poolContribution.poolUnitsResourceAddress.asStr())")
+				print("  Amnt: \(poolContribution.poolUnitsAmount)")
+				print("  Rsrc: \(poolContribution.contributedResources.map(\.key))")
+			}
+		}
+	}
 
 	public struct PoolRedemption: Hashable, Sendable {}
 
@@ -91,10 +132,13 @@ extension ExecutionSummary {
 					authorizedDepositorsRemoved: authorizedDepositorsRemoved.mapKeys(AccountAddress.init(validatingAddress:))
 				)
 			))
-		case let .poolContribution(addresses, contributions):
-//		case poolContribution(poolAddresses: [Address], poolContributions: [TrackedPoolContribution])
-
-			.conforming(.poolContribution(.init()))
+		case let .poolContribution(poolAddresses, poolContributions):
+			.conforming(.poolContribution(.init(
+				accountWithdraws: accountWithdraws,
+				accountDeposits: accountDeposits,
+				poolAddresses: poolAddresses,
+				poolContributions: poolContributions
+			)))
 		case .poolRedemption:
 //		case poolRedemption(poolAddresses: [Address], poolRedemptions: [TrackedPoolRedemption])
 			.conforming(.poolRedemption(.init()))

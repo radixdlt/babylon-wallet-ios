@@ -119,10 +119,11 @@ extension TransactionReview {
 					if let rawTransaction = viewStore.rawTransaction {
 						RawTransactionView(transaction: rawTransaction)
 					} else {
-						VStack(spacing: 0) {
+						VStack(spacing: .medium1) {
 							messageSection(with: viewStore.message)
 
 							withdrawalsSection
+
 							Group {
 								usingDappsSection(for: viewStore)
 								depositsSection
@@ -223,7 +224,6 @@ extension TransactionReview {
 					TransactionHeading.withdrawing
 					TransactionReviewAccounts.View(store: childStore)
 				}
-				.padding(.top, .medium1)
 			}
 		}
 
@@ -231,19 +231,30 @@ extension TransactionReview {
 			let usedDappsStore = store.scope(state: \.dAppsUsed) { .child(.dAppsUsed($0)) }
 			return IfLetStore(usedDappsStore) { childStore in
 				TransactionReviewDappsUsed.View(store: childStore, isExpanded: viewStore.isExpandedDappUsed)
-					.padding(.top, .medium1)
 			}
 		}
 
 		private var depositsSection: some SwiftUI.View {
 			let depositsStore = store.scope(state: \.deposits) { .child(.deposits($0)) }
 			return IfLetStore(depositsStore) { childStore in
-				VStack(alignment: .leading) {
+				VStack(alignment: .leading, spacing: .small2) {
 					TransactionHeading.depositing
-						.padding(.bottom, .small2)
-
 					TransactionReviewAccounts.View(store: childStore)
 				}
+			}
+		}
+
+		private func accountDepositSettingSection(_ viewState: TransactionReview.DepositSettingState) -> some SwiftUI.View {
+			VStack(alignment: .leading, spacing: .small2) {
+				TransactionHeading.depositSetting
+				DepositSettingView(viewState: viewState)
+			}
+		}
+
+		private func accountDepositExceptionsSection(_ viewState: TransactionReview.DepositExceptionsState) -> some SwiftUI.View {
+			VStack(alignment: .leading, spacing: .small2) {
+				TransactionHeading.depositExceptions
+				DepositExceptionsView(viewState: viewState)
 			}
 		}
 
@@ -253,24 +264,6 @@ extension TransactionReview {
 				TransactionReviewProofs.View(store: childStore)
 					.padding(.bottom, .medium1)
 			}
-		}
-
-		private func accountDepositSettingSection(_ viewState: TransactionReview.DepositSettingState) -> some SwiftUI.View {
-			VStack(alignment: .leading, spacing: .small2) {
-				TransactionHeading.depositSetting
-
-				DepositSettingView(viewState: viewState)
-			}
-			.padding(.bottom, .medium1)
-		}
-
-		private func accountDepositExceptionsSection(_ viewState: TransactionReview.DepositExceptionsState) -> some SwiftUI.View {
-			VStack(alignment: .leading, spacing: .small2) {
-				TransactionHeading.depositExceptions
-
-				DepositExceptionsView(viewState: viewState)
-			}
-			.padding(.bottom, .medium1)
 		}
 
 		private var feeSection: some SwiftUI.View {
