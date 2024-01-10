@@ -246,10 +246,29 @@ public struct AssetsView: Sendable, FeatureReducer {
 			return .init(sections: sections)
 		}()
 
+		let stakes = portfolio.poolUnitResources.radixNetworkStakes
+		let stakeUnitList: StakeUnitList.State? = stakes.isEmpty ? nil : .init(
+			account: portfolio,
+			selectedLiquidStakeUnits: mode.selectedAssets.map { assets in
+				let stakeUnitResources = stakes.map(\.stakeUnitResource)
+				return assets
+					.fungibleResources
+					.nonXrdResources
+					.filter(stakeUnitResources.contains)
+					.asIdentifiable()
+			},
+			selectedStakeClaimTokens: mode.isSelection ?
+				stakes
+				.compactMap(\.stakeClaimResource?.resourceAddress)
+				.compactMap(mode.nftRowSelectedAssets)
+				.flatMap(\.self.elements)
+				.asIdentifiable() : nil
+		)
+
 		return .init(
 			fungibleTokenList: fungibleTokenList,
 			nonFungibleTokenList: !nfts.isEmpty ? .init(rows: .init(uniqueElements: nfts)) : nil,
-			stakeUnitList: .init(account: portfolio),
+			stakeUnitList: stakeUnitList,
 			poolUnitsList: poolUnitList
 		)
 	}

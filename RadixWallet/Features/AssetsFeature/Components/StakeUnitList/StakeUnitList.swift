@@ -2,7 +2,9 @@
 public struct StakeUnitList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		let account: OnLedgerEntity.Account
-		public var stakeDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>> = .idle
+		var selectedLiquidStakeUnits: IdentifiedArrayOf<OnLedgerEntity.OwnedFungibleResource>?
+		var selectedStakeClaimTokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>?
+		var stakeDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>> = .idle
 		var shouldRefresh = false
 
 		@PresentationState
@@ -73,20 +75,28 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 			return loadStakingDetails(&state)
 
 		case let .didTapLiquidStakeUnit(address):
-			guard case let .success(stakeDetails) = state.stakeDetails,
-			      let stake = stakeDetails[id: address],
-			      let stakeUnitResource = stake.stakeUnitResource
-			else {
-				return .none
-			}
+			if state.selectedLiquidStakeUnits != nil {
+				guard let resource = state.account.poolUnitResources.radixNetworkStakes[id: address]?.stakeUnitResource else {
+					return .none
+				}
 
-			state.destination = .details(
-				.init(
-					validator: stake.validator,
-					stakeUnitResource: stakeUnitResource,
-					xrdRedemptionValue: stake.xrdRedemptionValue
+				state.selectedLiquidStakeUnits?.toggle(resource)
+				return .none
+			} else {
+				guard case let .success(stakeDetails) = state.stakeDetails,
+				      let stake = stakeDetails[id: address],
+				      let stakeUnitResource = stake.stakeUnitResource
+				else {
+					return .none
+				}
+				state.destination = .details(
+					.init(
+						validator: stake.validator,
+						stakeUnitResource: stakeUnitResource,
+						xrdRedemptionValue: stake.xrdRedemptionValue
+					)
 				)
-			)
+			}
 
 			return .none
 
@@ -96,6 +106,11 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 			      let stakeClaimTokens = stake.stakeClaimTokens,
 			      let token = stakeClaimTokens.allTokens[id: id]
 			else {
+				return .none
+			}
+
+			if state.selectedStakeClaimTokens != nil {
+				state.selectedStakeClaimTokens?.toggle(token)
 				return .none
 			}
 			state.destination = .stakeClaimDetails(.init(

@@ -22,7 +22,11 @@ extension StakeUnitList.State {
 				continue
 			}
 			amount = amount + claimAmount
-			stakeClaims.append(.init(id: token.id, worth: claimAmount))
+			stakeClaims.append(.init(
+				id: token.id,
+				worth: claimAmount,
+				isSelected: selectedStakeClaimTokens?.contains(token)
+			))
 		}
 
 		return stakeClaims
@@ -55,7 +59,13 @@ extension StakeUnitList.State {
 
 			let content = ValidatorStakeView.ViewState.Content(
 				validatorNameViewState: .init(imageURL: stake.validator.metadata.iconURL, name: stake.validator.metadata.name ?? L10n.Account.PoolUnits.unknownValidatorName, stakedAmount: stakeXRDRedemptionValue),
-				liquidStakeUnit: stake.stakeUnitResource.map { .init(resource: $0.resource, worth: stakeXRDRedemptionValue) },
+				liquidStakeUnit: stake.stakeUnitResource.map { stakeUnitResource in
+					.init(
+						resource: stakeUnitResource.resource,
+						worth: stakeXRDRedemptionValue,
+						isSelected: selectedLiquidStakeUnits?.contains { $0.id == stakeUnitResource.resource.resourceAddress }
+					)
+				},
 				stakeClaimNFTs: stakeClaimNFTsViewState
 			)
 

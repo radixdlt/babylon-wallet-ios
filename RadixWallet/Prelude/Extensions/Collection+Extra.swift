@@ -33,6 +33,17 @@ extension OrderedSet where Element: Hashable {
 	}
 }
 
+extension IdentifiedArray {
+	/// Add or remove the given element
+	public mutating func toggle(_ element: Element) {
+		if contains(element) {
+			remove(element)
+		} else {
+			append(element)
+		}
+	}
+}
+
 extension MutableCollection {
 	/// Mutates in place the elements of the collection
 	public mutating func mutateAll(_ mutate: (inout Self.Element) -> Void) {

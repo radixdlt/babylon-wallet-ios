@@ -33,13 +33,19 @@ struct StakeClaimNFTSView: View {
 				.textCase(.uppercase)
 
 			ForEach(section.stakeClaims) { claim in
-				TokenBalanceView.xrd(balance: claim.worth)
-					.padding(.small1)
-					.roundedCorners(strokeColor: .app.gray3)
-					.contentShape(Rectangle())
-					.onTapGesture {
-						onTap(claim.id)
+				HStack {
+					TokenBalanceView.xrd(balance: claim.worth)
+						.padding(.small1)
+						.roundedCorners(strokeColor: .app.gray3)
+						.contentShape(Rectangle())
+
+					if let isSelected = claim.isSelected {
+						CheckmarkView(appearance: .dark, isChecked: isSelected)
 					}
+				}
+				.onTapGesture {
+					onTap(claim.id)
+				}
 			}
 		}
 	}
@@ -49,6 +55,7 @@ extension StakeClaimNFTSView {
 	public struct StakeClaim: Sendable, Hashable, Identifiable {
 		let id: NonFungibleGlobalId
 		let worth: RETDecimal
+		let isSelected: Bool?
 	}
 
 	public typealias StakeClaims = IdentifiedArrayOf<StakeClaim>

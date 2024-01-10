@@ -288,7 +288,7 @@ extension OnLedgerEntitiesClient {
 			return OnLedgerEntity.Account.PoolUnit(resource: poolUnitResource, resourcePoolAddress: pool.address)
 		}
 
-		return .init(radixNetworkStakes: stakeUnits, poolUnits: poolUnits)
+		return .init(radixNetworkStakes: stakeUnits.asIdentifiable(), poolUnits: poolUnits)
 	}
 
 	static func extractOwnedFungibleResources(
@@ -514,7 +514,7 @@ extension OnLedgerEntity.Account.PoolUnitResources {
 			return nil
 		}
 
-		return .init(radixNetworkStakes: stakes, poolUnits: poolUnits)
+		return .init(radixNetworkStakes: stakes.asIdentifiable(), poolUnits: poolUnits)
 	}
 }
 
