@@ -21,21 +21,31 @@ public enum TransactionKind: Hashable, Sendable {
 }
 
 extension ExecutionSummary {
-	public func transactionKind() throws -> TransactionKind {
-		// Empty array means non conforming transaction. ET was not able to map it to any type
-		guard !detailedClassification.isEmpty else {
-			return .nonConforming
-		}
-
-		// First try to get the general transaction if present
-		return try if detailedClassification.contains(where: {
-			if case .general = $0 { true } else { false }
-		}) {
-			transactionKind(.general)
+	/// Returns `nil` for non-conforming transactions
+	public var detailedManifestClass: DetailedManifestClass? {
+		if detailedClassification.contains(.general) {
+			.general
 		} else {
-			transactionKind(detailedClassification.first!)
+			// Empty array means non conforming transaction. ET was not able to map it to any type
+			detailedClassification.first
 		}
 	}
+
+//	public func transactionKind() throws -> TransactionKind {
+//		// Empty array means non conforming transaction. ET was not able to map it to any type
+//		guard !detailedClassification.isEmpty else {
+//			return .nonConforming
+//		}
+//
+//		// First try to get the general transaction if present
+//		return try if detailedClassification.contains(where: {
+//			if case .general = $0 { true } else { false }
+//		}) {
+//			transactionKind(.general)
+//		} else {
+//			transactionKind(detailedClassification.first!)
+//		}
+//	}
 }
 
 /// This is a temporary conversion of all transaction types into GeneralTransaction, until we have UI support for all transaction kinds
@@ -57,44 +67,83 @@ extension ExecutionSummary {
 	public struct PoolContribution: Hashable, Sendable {
 		public let accountWithdraws: [String: [ResourceIndicator]]
 		public let accountDeposits: [String: [ResourceIndicator]]
+		public let addressesInManifest: [EngineToolkit.Address]
 		public let poolAddresses: [EngineToolkit.Address]
 		public let poolContributions: [TrackedPoolContribution]
 
-		init(accountWithdraws: [String: [ResourceIndicator]], accountDeposits: [String: [ResourceIndicator]], poolAddresses: [EngineToolkit.Address], poolContributions: [TrackedPoolContribution]) {
+		init(
+			accountWithdraws: [String: [ResourceIndicator]],
+			accountDeposits: [String: [ResourceIndicator]],
+			addressesInManifest: [EngineToolkit.Address],
+			poolAddresses: [EngineToolkit.Address],
+			poolContributions: [TrackedPoolContribution]
+		) {
 			self.accountWithdraws = accountWithdraws
 			self.accountDeposits = accountDeposits
+			self.addressesInManifest = addressesInManifest
 			self.poolAddresses = poolAddresses
 			self.poolContributions = poolContributions
 
+			print("PoolContribution •••••••••••••••••••••••")
+
+			func debugIndicator(ind: ResourceIndicator) -> String {
+				let addr = ind.resourceAddress.addressString().formatted(.full)
+				switch ind {
+				case let .fungible(_, indicator):
+					return "(fun) \(ind.transferType): \(indicator.amount.formatted()) \(addr)"
+				case let .nonFungible(_, indicator):
+					return "(non) \(ind.transferType): \(indicator.ids.count) \(addr)"
+				}
+			}
+
 			print("accountWithdraws")
-			for (key, addresses) in accountWithdraws {
-				print("  \(key):")
-				for address in addresses {
-					print("    \(address.transferType): \(address.resourceAddress.entityType())")
+			for (account, addresses) in accountWithdraws {
+				print("  \(account):")
+				for ind in addresses {
+					print("    \(debugIndicator(ind: ind))")
 				}
 			}
 
 			print("accountDeposits")
-			for (key, addresses) in accountDeposits {
-				print("  \(key):")
-				for address in addresses {
-					print("    \(address.transferType): \(address.resourceAddress.entityType())")
+			for (account, addresses) in accountDeposits {
+				print("  \(account):")
+				for ind in addresses {
+					print("    \(debugIndicator(ind: ind))")
 				}
+			}
+
+			print("addressesInManifest")
+			for address in addressesInManifest {
+				print("  \(address.entityType())")
+				print("    \(address.asStr().formatted(.full))")
 			}
 
 			print("poolAddresses")
 			for poolAddress in poolAddresses {
-				print("  \(poolAddress.entityType()): \(poolAddress.asStr())")
+				print("  \(poolAddress.entityType())")
+				print("    \(poolAddress.asStr().formatted(.full))")
 			}
 
 			print("poolContributions")
 			for poolContribution in poolContributions {
 				print("  Addr: \(poolContribution.poolAddress.entityType()): \(poolContribution.poolAddress.asStr())")
 				print("  UAdr: \(poolContribution.poolUnitsResourceAddress.entityType()): \(poolContribution.poolUnitsResourceAddress.asStr())")
-				print("  Amnt: \(poolContribution.poolUnitsAmount)")
+				print("  Amnt: \(poolContribution.poolUnitsAmount.formattedPlain())")
 				print("  Rsrc: \(poolContribution.contributedResources.map(\.key))")
 			}
 		}
+	}
+
+	public var metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]] {
+		newEntities.metadata
+	}
+
+	public var dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]] {
+		[:] // TODO: Is this never populated for .general?
+	}
+
+	public var addressesOfNewlyCreatedEntities: [EngineToolkit.Address] {
+		newEntities.componentAddresses + newEntities.packageAddresses + newEntities.resourceAddresses
 	}
 
 	public struct PoolRedemption: Hashable, Sendable {}
@@ -109,17 +158,15 @@ extension ExecutionSummary {
 	public func transactionKind(_ manifestClass: DetailedManifestClass) throws -> TransactionKind {
 		switch manifestClass {
 		case .general, .transfer:
-			.conforming(.general(
-				.init(
-					accountProofs: presentedProofs,
-					accountWithdraws: accountWithdraws,
-					accountDeposits: accountDeposits,
-					addressesInManifest: encounteredEntities,
-					metadataOfNewlyCreatedEntities: newEntities.metadata,
-					dataOfNewlyMintedNonFungibles: [:],
-					addressesOfNewlyCreatedEntities: newEntities.componentAddresses + newEntities.packageAddresses + newEntities.resourceAddresses
-				)
-			))
+			fatalError()
+
+		case let .poolContribution(poolAddresses, poolContributions):
+			fatalError()
+
+		case .poolRedemption:
+//		case poolRedemption(poolAddresses: [Address], poolRedemptions: [TrackedPoolRedemption])
+			.conforming(.poolRedemption(.init()))
+
 		case let .accountDepositSettingsUpdate(resourcePreferencesUpdates, depositModeUpdates, authorizedDepositorsAdded, authorizedDepositorsRemoved):
 			try .conforming(.accountDepositSettings(
 				.init(
@@ -132,16 +179,6 @@ extension ExecutionSummary {
 					authorizedDepositorsRemoved: authorizedDepositorsRemoved.mapKeys(AccountAddress.init(validatingAddress:))
 				)
 			))
-		case let .poolContribution(poolAddresses, poolContributions):
-			.conforming(.poolContribution(.init(
-				accountWithdraws: accountWithdraws,
-				accountDeposits: accountDeposits,
-				poolAddresses: poolAddresses,
-				poolContributions: poolContributions
-			)))
-		case .poolRedemption:
-//		case poolRedemption(poolAddresses: [Address], poolRedemptions: [TrackedPoolRedemption])
-			.conforming(.poolRedemption(.init()))
 		case .validatorStake, .validatorUnstake, .validatorClaim:
 			.nonConforming
 		}

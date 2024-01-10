@@ -302,21 +302,14 @@ public struct FeePayerSelectionResult: Equatable, Sendable {
 
 extension ExecutionSummary {
 	func guranteesCost() throws -> RETDecimal {
-		let transaction = try transactionKind()
-		switch transaction {
-		case .nonConforming:
-			return .zero
-		case let .conforming(.general(transaction)):
-			return transaction.accountDeposits.flatMap(\.value).reduce(.zero) { result, resource in
-				switch resource {
-				case .fungible(_, .predicted):
-					result + TransactionFee.PredefinedFeeConstants.fungibleGuaranteeInstructionCost
-				default:
-					result
-				}
+		guard detailedManifestClass == .general else { return .zero() }
+		return accountDeposits.flatMap(\.value).reduce(.zero) { result, resource in
+			switch resource {
+			case .fungible(_, .predicted):
+				result + TransactionFee.PredefinedFeeConstants.fungibleGuaranteeInstructionCost
+			default:
+				result
 			}
-		case .conforming:
-			return .zero
 		}
 	}
 }

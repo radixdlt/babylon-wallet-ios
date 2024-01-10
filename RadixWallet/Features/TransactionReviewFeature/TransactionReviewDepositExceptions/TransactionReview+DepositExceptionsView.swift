@@ -47,10 +47,10 @@ extension TransactionReview.View {
 			}
 		}
 
-		struct AccountView: SwiftUI.View {
+		struct AccountView: View {
 			let change: TransactionReview.DepositExceptionsChange
 
-			var body: some SwiftUI.View {
+			var body: some View {
 				InnerCard {
 					SmallAccountCard(account: change.account)
 

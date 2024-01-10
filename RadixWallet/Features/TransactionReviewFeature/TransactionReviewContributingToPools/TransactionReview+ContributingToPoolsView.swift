@@ -1,28 +1,44 @@
 import ComposableArchitecture
 import SwiftUI
 
-/*
- 1. DetailedManifestClass.poolContribution(poolAddresses: [Address], poolContributions: [TrackedPoolContribution])
- 2. ExecutionSummary.PoolContribution
-
- */
-
 extension TransactionReview {
 	public struct ContributingToPoolsState: Sendable, Hashable {
 		public var pools: IdentifiedArrayOf<Pool>
+	}
 
-		public struct Pool: Sendable, Identifiable, Hashable {
-			public var id: AccountAddress.ID { account.address.id }
-			public let account: Profile.Network.Account
-		}
+	public struct Pool: Sendable, Identifiable, Hashable {
+//			public var id: AccountAddress.ID { account.address.id }
+//			public let account: Profile.Network.Account
+		public var id: String { name }
+		public let name: String
 	}
 }
 
-/*
- public struct TrackedPoolContribution {
- 	public var poolAddress: Address
- 	public var contributedResources: [String: Decimal]
- 	public var poolUnitsResourceAddress: Address
- 	public var poolUnitsAmount: Decimal
- }
- */
+// MARK: - TransactionReview.View.ContributingToPoolsView
+extension TransactionReview.View {
+	public struct ContributingToPoolsView: View {
+		public var viewState: TransactionReview.ContributingToPoolsState
+
+		public var body: some View {
+			Card {
+				VStack(spacing: .small1) {
+					ForEach(viewState.pools) { pool in
+						PoolView(pool: pool)
+					}
+				}
+				.padding(.small1)
+			}
+		}
+
+		struct PoolView: View {
+			let pool: TransactionReview.Pool
+
+			var body: some View {
+				Card {
+					PlainListRow(.asset(AssetResource.xrd), title: pool.name)
+				}
+				.cardShadow
+			}
+		}
+	}
+}

@@ -32,9 +32,10 @@ extension TransactionReview.State {
 			showApprovalSlider: reviewedTransaction != nil,
 			canApproveTX: canApproveTX && reviewedTransaction?.feePayingValidation.wrappedValue == .valid,
 			sliderResetDate: sliderResetDate,
-			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction?.transaction != .nonConforming,
+			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction?.isNonConforming != false,
 			viewRawTransactionButtonState: reviewedTransaction?.feePayer.isSuccess == true ? .enabled : .disabled,
 			proposingDappMetadata: proposingDappMetadata,
+			contributingToPools: contributingToPools,
 			depositSettingSection: accountDepositSetting,
 			depositExceptionsSection: accountDepositExceptions
 		)
@@ -63,6 +64,9 @@ extension TransactionReview {
 		let canToggleViewMode: Bool
 		let viewRawTransactionButtonState: ControlState
 		let proposingDappMetadata: DappMetadata.Ledger?
+
+		let contributingToPools: ContributingToPoolsState?
+
 		let depositSettingSection: DepositSettingState?
 		let depositExceptionsSection: DepositExceptionsState?
 

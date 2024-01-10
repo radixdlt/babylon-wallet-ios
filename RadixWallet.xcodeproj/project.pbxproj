@@ -3223,7 +3223,6 @@
 		48CFBCD02ADC10D800E77A5C /* TransactionReviewFeature */ = {
 			isa = PBXGroup;
 			children = (
-				A4B017F82B4E99EF00B42B8E /* TransactionReviewContributingToPools */,
 				48CFBCD42ADC10D800E77A5C /* TransactionReview.swift */,
 				48CFBCF52ADC10D800E77A5C /* TransactionReview+View.swift */,
 				48CFBCD12ADC10D800E77A5C /* SelectFeePayer */,
@@ -3237,6 +3236,7 @@
 				48CFBCF22ADC10D800E77A5C /* TransactionReviewDappsUsed */,
 				A4B017F32B4BF57B00B42B8E /* TransactionReviewDepositSetting */,
 				48CFBCF62ADC10D800E77A5C /* TransactionReviewDepositExceptions */,
+				A4B017F82B4E99EF00B42B8E /* TransactionReviewContributingToPools */,
 			);
 			path = TransactionReviewFeature;
 			sourceTree = "<group>";

@@ -21,10 +21,13 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var withdrawals: TransactionReviewAccounts.State? = nil
 		public var dAppsUsed: TransactionReviewDappsUsed.State? = nil
 		public var deposits: TransactionReviewAccounts.State? = nil
-		public var proofs: TransactionReviewProofs.State? = nil
+
+		public var contributingToPools: ContributingToPoolsState? = nil
+
 		public var accountDepositSetting: DepositSettingState? = nil
 		public var accountDepositExceptions: DepositExceptionsState? = nil
 
+		public var proofs: TransactionReviewProofs.State? = nil
 		public var networkFee: TransactionReviewNetworkFee.State? = nil
 		public let ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey
 		public var canApproveTX: Bool = true
@@ -336,9 +339,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .previewLoaded(.success(preview)):
 			do {
-				let reviewedTransaction = try ReviewedTransaction(
+				let reviewedTransaction = ReviewedTransaction(
 					networkID: preview.networkID,
-					transaction: preview.analyzedManifestToReview.transactionKind(),
+//					transaction: preview.analyzedManifestToReview.transactionKind(),
+					executionSummary: preview.analyzedManifestToReview,
 					feePayer: .loading,
 					transactionFee: preview.transactionFee,
 					transactionSigners: preview.transactionSigners,
@@ -357,8 +361,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.withdrawals = sections.withdrawals
 			state.dAppsUsed = sections.dAppsUsed
 			state.deposits = sections.deposits
+
+			state.contributingToPools = sections.contributingToPools
+
 			state.accountDepositSetting = sections.accountDepositSetting
 			state.accountDepositExceptions = sections.accountDepositExceptions
+
 			state.proofs = sections.proofs
 			return .none
 
@@ -418,7 +426,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.reviewedTransaction = reviewedTransaction
 			state.networkFee?.reviewedTransaction = reviewedTransaction
 
-			if reviewedTransaction.transaction == .nonConforming {
+			if reviewedTransaction.executionSummary.detailedManifestClass == nil {
+				// Manifest is non-conforming
 				return showRawTransaction(&state)
 			}
 			return .none
@@ -525,53 +534,32 @@ extension TransactionReview {
 
 		state.networkFee = .init(reviewedTransaction: reviewedTransaction)
 
-		switch reviewedTransaction.transaction {
-		case let .conforming(conformingTransaction):
-			return .run { send in
-				let sections = try await sections(for: conformingTransaction, networkID: networkID)
-				await send(.internal(.updateSections(sections)))
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to extract transaction content, error: \(error)")
-				// FIXME: propagate/display error?
-			}
-		case .nonConforming:
-			return showRawTransaction(&state)
+		return .run { send in
+			let sections = try await sections(for: reviewedTransaction.executionSummary, networkID: networkID)
+			await send(.internal(.updateSections(sections)))
+		} catch: { error, _ in
+			loggerGlobal.error("Failed to extract transaction content, error: \(error)")
+			// FIXME: propagate/display error?
 		}
+		//			return showRawTransaction(&state)
 	}
 
 	func sections(for transaction: TransactionKind.ConformingTransaction, networkID: NetworkID) async throws -> Sections {
 		switch transaction {
 		case let .general(generalTransaction):
-			let userAccounts = try await extractUserAccounts(generalTransaction)
-
-			return await Sections(
-				withdrawals: try? extractWithdrawals(
-					accountWithdraws: generalTransaction.accountWithdraws,
-					metadataOfNewlyCreatedEntities: generalTransaction.metadataOfNewlyCreatedEntities,
-					dataOfNewlyMintedNonFungibles: generalTransaction.dataOfNewlyMintedNonFungibles,
-					addressesOfNewlyCreatedEntities: generalTransaction.addressesOfNewlyCreatedEntities,
-					userAccounts: userAccounts,
-					networkID: networkID
-				),
-				dAppsUsed: try? extractUsedDapps(generalTransaction),
-				deposits: try? extractDeposits(
-					accountDeposits: generalTransaction.accountDeposits,
-					metadataOfNewlyCreatedEntities: generalTransaction.metadataOfNewlyCreatedEntities,
-					dataOfNewlyMintedNonFungibles: generalTransaction.dataOfNewlyMintedNonFungibles,
-					addressesOfNewlyCreatedEntities: generalTransaction.addressesOfNewlyCreatedEntities,
-					userAccounts: userAccounts,
-					networkID: networkID
-				),
-				proofs: try? exctractProofs(generalTransaction)
-			)
+			let userAccounts = try await extractUserAccounts(generalTransaction.addressesInManifest)
+			fatalError()
 		case let .poolContribution(poolContribution):
+			print("Sections from .poolContribution")
+			let userAccounts = try await extractUserAccounts(poolContribution.addressesInManifest)
+
 			return await Sections(
 				withdrawals: try? extractWithdrawals(
 					accountWithdraws: poolContribution.accountWithdraws,
 					metadataOfNewlyCreatedEntities: [:],
 					dataOfNewlyMintedNonFungibles: [:],
 					addressesOfNewlyCreatedEntities: [],
-					userAccounts: [],
+					userAccounts: userAccounts,
 					networkID: networkID
 				),
 				deposits: try? extractDeposits(
@@ -579,13 +567,15 @@ extension TransactionReview {
 					metadataOfNewlyCreatedEntities: [:],
 					dataOfNewlyMintedNonFungibles: [:],
 					addressesOfNewlyCreatedEntities: [],
-					userAccounts: [],
+					userAccounts: userAccounts,
 					networkID: networkID
-				)
+				),
+				contributingToPools: try? extractPools(poolContribution.poolContributions),
+				conforming: true
 			)
 
 		case let .poolRedemption(poolRedemption):
-			return Sections()
+			return Sections(conforming: false)
 
 		case let .accountDepositSettings(accountDepositSettings):
 			let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
@@ -597,9 +587,119 @@ extension TransactionReview {
 				userAccounts.first { $0.address == address }
 			}
 
-			return try await Sections(
-				accountDepositSetting: extractAccountDepositSetting(for: validAccounts, from: accountDepositSettings),
-				accountDepositExceptions: extractAccountDepositExceptions(for: validAccounts, from: accountDepositSettings)
+			fatalError()
+//			return try await Sections(
+//				accountDepositSetting: extractAccountDepositSetting(for: validAccounts, from: accountDepositSettings),
+//				accountDepositExceptions: extractAccountDepositExceptions(for: validAccounts, from: accountDepositSettings),
+//				conforming: true
+//			)
+		}
+	}
+
+	func sections(for summary: ExecutionSummary, networkID: NetworkID) async throws -> Sections {
+		let userAccounts = try await extractUserAccounts(summary.encounteredEntities)
+
+		switch summary.detailedManifestClass {
+		case nil:
+			return Sections(conforming: false)
+		case .general, .transfer:
+			let withdrawals = try? await extractWithdrawals(
+				accountWithdraws: summary.accountWithdraws,
+				metadataOfNewlyCreatedEntities: summary.metadataOfNewlyCreatedEntities,
+				dataOfNewlyMintedNonFungibles: summary.dataOfNewlyMintedNonFungibles, // TODO: Is this never populated for .general?
+				addressesOfNewlyCreatedEntities: summary.addressesOfNewlyCreatedEntities,
+				userAccounts: userAccounts,
+				networkID: networkID
+			)
+
+			let dAppsUsed = try? await extractUsedDapps(summary.encounteredEntities)
+
+			let deposits = try? await extractDeposits(
+				accountDeposits: summary.accountDeposits,
+				metadataOfNewlyCreatedEntities: summary.metadataOfNewlyCreatedEntities,
+				dataOfNewlyMintedNonFungibles: summary.dataOfNewlyMintedNonFungibles, // TODO: Is this never populated for .general?
+				addressesOfNewlyCreatedEntities: summary.addressesOfNewlyCreatedEntities,
+				userAccounts: userAccounts,
+				networkID: networkID
+			)
+
+			let proofs = try? await exctractProofs(summary.presentedProofs)
+
+			return Sections(
+				withdrawals: withdrawals,
+				dAppsUsed: dAppsUsed,
+				deposits: deposits,
+				proofs: proofs,
+				conforming: true
+			)
+
+		case let .poolContribution(poolAddresses: poolAddresses, poolContributions: poolContributions):
+			let withdrawals = try? await extractWithdrawals(
+				accountWithdraws: summary.accountWithdraws,
+				userAccounts: userAccounts,
+				networkID: networkID
+			)
+
+			let deposits = try? await extractDeposits(
+				accountDeposits: summary.accountDeposits,
+				userAccounts: userAccounts,
+				networkID: networkID
+			)
+
+			let contributingToPools = try? extractPools(poolContributions)
+
+			return Sections(
+				withdrawals: withdrawals,
+				deposits: deposits,
+				contributingToPools: contributingToPools,
+				conforming: true
+			)
+
+			return .init(conforming: true)
+		case let .poolRedemption(poolAddresses: poolAddresses, poolRedemptions: poolRedemptions):
+			return .init(conforming: false)
+		case let .validatorStake(validatorAddresses: validatorAddresses, validatorStakes: validatorStakes):
+			return .init(conforming: false)
+		case let .validatorUnstake(validatorAddresses: validatorAddresses, validatorUnstakes: validatorUnstakes):
+			return .init(conforming: false)
+		case let .validatorClaim(validatorAddresses: validatorAddresses, validatorClaims: validatorClaims):
+			return .init(conforming: false)
+		case let .accountDepositSettingsUpdate(resourcePreferencesUpdates: resourcePreferencesUpdates, depositModeUpdates: depositModeUpdates, authorizedDepositorsAdded: authorizedDepositorsAdded, authorizedDepositorsRemoved: authorizedDepositorsRemoved):
+
+			let resourcePreferenceChanges = try resourcePreferencesUpdates.mapKeyValues(
+				AccountAddress.init(validatingAddress:),
+				fValue: { try $0.mapKeys(ResourceAddress.init(validatingAddress:)) }
+			)
+			let defaultDepositRuleChanges = try depositModeUpdates.mapKeys(AccountAddress.init(validatingAddress:))
+			let authorizedDepositorsAdded = try authorizedDepositorsAdded.mapKeys(AccountAddress.init(validatingAddress:))
+			let authorizedDepositorsRemoved = try authorizedDepositorsRemoved.mapKeys(AccountAddress.init(validatingAddress:))
+
+			let allAccountAddress = Set(authorizedDepositorsAdded.keys)
+				.union(authorizedDepositorsRemoved.keys)
+				.union(defaultDepositRuleChanges.keys)
+				.union(resourcePreferenceChanges.keys)
+
+			let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork() // TODO: Use general one
+
+			let validAccounts = allAccountAddress.compactMap { address in
+				userAccounts.first { $0.address == address }
+			}
+
+			let accountDepositSetting = extractAccountDepositSetting(
+				for: validAccounts,
+				defaultDepositRuleChanges: defaultDepositRuleChanges
+			)
+			let accountDepositExceptions = try await extractAccountDepositExceptions(
+				for: validAccounts,
+				resourcePreferenceChanges: resourcePreferenceChanges,
+				authorizedDepositorsAdded: authorizedDepositorsAdded,
+				authorizedDepositorsRemoved: authorizedDepositorsRemoved
+			)
+
+			return Sections(
+				accountDepositSetting: accountDepositSetting,
+				accountDepositExceptions: accountDepositExceptions,
+				conforming: true
 			)
 		}
 	}
@@ -733,11 +833,15 @@ extension TransactionReview {
 		var withdrawals: TransactionReviewAccounts.State? = nil
 		var dAppsUsed: TransactionReviewDappsUsed.State? = nil
 		var deposits: TransactionReviewAccounts.State? = nil
-		var proofs: TransactionReviewProofs.State? = nil
+
+		var contributingToPools: ContributingToPoolsState? = nil
+
 		var accountDepositSetting: DepositSettingState? = nil
 		var accountDepositExceptions: DepositExceptionsState? = nil
 
-		var contributingToPools: DepositExceptionsState? = nil
+		var proofs: TransactionReviewProofs.State? = nil
+
+		let conforming: Bool
 	}
 
 	// MARK: - TransferType
@@ -746,10 +850,10 @@ extension TransactionReview {
 		case estimated(instructionIndex: UInt64)
 	}
 
-	private func extractUserAccounts(_ transaction: ExecutionSummary.GeneralTransaction) async throws -> [Account] {
+	private func extractUserAccounts(_ allAddress: [EngineToolkit.Address]) async throws -> [Account] {
 		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 
-		return transaction.allAddress
+		return allAddress
 			.compactMap {
 				try? AccountAddress(validatingAddress: $0.addressString())
 			}
@@ -765,8 +869,8 @@ extension TransactionReview {
 			}
 	}
 
-	private func extractUsedDapps(_ transaction: ExecutionSummary.GeneralTransaction) async throws -> TransactionReviewDappsUsed.State? {
-		let dAppsInfo = try await transaction.allAddress
+	private func extractUsedDapps(_ allAddress: [EngineToolkit.Address]) async throws -> TransactionReviewDappsUsed.State? {
+		let dAppsInfo = try await allAddress
 			.filter { $0.entityType() == .globalGenericComponent }
 			.map { try $0.asSpecific() }
 			.asyncMap(extractDappInfo)
@@ -795,8 +899,8 @@ extension TransactionReview {
 		}
 	}
 
-	private func exctractProofs(_ transaction: ExecutionSummary.GeneralTransaction) async throws -> TransactionReviewProofs.State? {
-		let proofs = try await transaction.accountProofs
+	private func exctractProofs(_ accountProofs: [EngineToolkit.Address]) async throws -> TransactionReviewProofs.State? {
+		let proofs = try await accountProofs
 			.map { try ResourceAddress(validatingAddress: $0.addressString()) }
 			.asyncMap(extractProofInfo)
 		guard !proofs.isEmpty else { return nil }
@@ -813,9 +917,9 @@ extension TransactionReview {
 
 	private func extractWithdrawals(
 		accountWithdraws: [String: [ResourceIndicator]],
-		metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]],
-		dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]],
-		addressesOfNewlyCreatedEntities: [EngineToolkit.Address],
+		metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]] = [:],
+		dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]] = [:],
+		addressesOfNewlyCreatedEntities: [EngineToolkit.Address] = [],
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
@@ -846,10 +950,9 @@ extension TransactionReview {
 
 	private func extractDeposits(
 		accountDeposits: [String: [ResourceIndicator]],
-		metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]],
-		dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]],
-		addressesOfNewlyCreatedEntities: [EngineToolkit.Address],
-
+		metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]] = [:],
+		dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]] = [:],
+		addressesOfNewlyCreatedEntities: [EngineToolkit.Address] = [],
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
@@ -1007,12 +1110,20 @@ extension TransactionReview {
 		}
 	}
 
+	private func extractPools(
+		_ poolContributions: [TrackedPoolContribution]
+	) throws -> ContributingToPoolsState {
+		let pools = poolContributions.map(\.poolAddress).map { Pool(name: String($0.addressString().formatted(.default))) }
+		print("••• EXTRACT POOLS \(pools)")
+		return .init(pools: IdentifiedArray(uncheckedUniqueElements: pools))
+	}
+
 	func extractAccountDepositSetting(
 		for validAccounts: [Profile.Network.Account],
-		from settings: ExecutionSummary.AccountDepositSettings
+		defaultDepositRuleChanges: [AccountAddress: AccountDefaultDepositRule]
 	) -> DepositSettingState? {
 		let depositSettingChanges: [TransactionReview.DepositSettingChange] = validAccounts.compactMap { account in
-			guard let depositRuleChange = settings.defaultDepositRuleChanges[account.address] else { return nil }
+			guard let depositRuleChange = defaultDepositRuleChanges[account.address] else { return nil }
 			return .init(account: account, ruleChange: depositRuleChange)
 		}
 
@@ -1023,11 +1134,12 @@ extension TransactionReview {
 
 	func extractAccountDepositExceptions(
 		for validAccounts: [Profile.Network.Account],
-		from settings: ExecutionSummary.AccountDepositSettings
+		resourcePreferenceChanges: [AccountAddress: [ResourceAddress: ResourcePreferenceUpdate]],
+		authorizedDepositorsAdded: [AccountAddress: [ResourceOrNonFungible]],
+		authorizedDepositorsRemoved: [AccountAddress: [ResourceOrNonFungible]]
 	) async throws -> DepositExceptionsState? {
 		let exceptionChanges: [DepositExceptionsChange] = try await validAccounts.asyncCompactMap { account in
-			let resourcePreferenceChanges = try await settings
-				.resourcePreferenceChanges[account.address]?
+			let resourcePreferenceChanges = try await resourcePreferenceChanges[account.address]?
 				.asyncMap { resourcePreference in
 					try await DepositExceptionsChange.ResourcePreferenceChange(
 						resource: onLedgerEntitiesClient.getResource(resourcePreference.key),
@@ -1037,7 +1149,7 @@ extension TransactionReview {
 
 			let authorizedDepositorChanges = try await {
 				var changes: [DepositExceptionsChange.AllowedDepositorChange] = []
-				if let authorizedDepositorsAdded = settings.authorizedDepositorsAdded[account.address] {
+				if let authorizedDepositorsAdded = authorizedDepositorsAdded[account.address] {
 					let added = try await authorizedDepositorsAdded.asyncMap { resourceOrNonFungible in
 						let resourceAddress = try resourceOrNonFungible.resourceAddress()
 						return try await DepositExceptionsChange.AllowedDepositorChange(
@@ -1047,7 +1159,7 @@ extension TransactionReview {
 					}
 					changes.append(contentsOf: added)
 				}
-				if let authorizedDepositorsRemoved = settings.authorizedDepositorsRemoved[account.address] {
+				if let authorizedDepositorsRemoved = authorizedDepositorsRemoved[account.address] {
 					let removed = try await authorizedDepositorsRemoved.asyncMap { resourceOrNonFungible in
 						let resourceAddress = try resourceOrNonFungible.resourceAddress()
 						return try await DepositExceptionsChange.AllowedDepositorChange(
@@ -1243,13 +1355,17 @@ public struct TransactionReviewFailure: LocalizedError {
 // MARK: - ReviewedTransaction
 public struct ReviewedTransaction: Hashable, Sendable {
 	let networkID: NetworkID
-	let transaction: TransactionKind
+	let executionSummary: ExecutionSummary
 
 	var feePayer: Loadable<FeePayerCandidate?> = .idle
 
 	var transactionFee: TransactionFee
 	var transactionSigners: TransactionSigners
 	var signingFactors: SigningFactors
+
+	var isNonConforming: Bool {
+		executionSummary.detailedManifestClass == nil
+	}
 }
 
 // MARK: - FeeValidationOutcome
@@ -1262,20 +1378,13 @@ enum FeeValidationOutcome {
 extension ReviewedTransaction {
 	var feePayingValidation: Loadable<FeeValidationOutcome> {
 		feePayer.map { selected in
-			switch transaction {
-			case .nonConforming, .conforming(.accountDepositSettings):
-				return selected.validateBalance(forFee: transactionFee)
-			case .conforming(.poolContribution):
-				// TODO: What to return here?
-				return selected.validateBalance(forFee: transactionFee)
 
-			case .conforming(.poolRedemption):
-				// TODO: What to return here?
+			switch executionSummary.detailedManifestClass {
+			case .none: // Non-conforming
 				return selected.validateBalance(forFee: transactionFee)
-
-			case let .conforming(.general(generalTransaction)):
+			case .general:
 				guard let feePayer = selected,
-				      let feePayerWithdraws = generalTransaction.accountWithdraws[feePayer.account.address.address]
+				      let feePayerWithdraws = executionSummary.accountWithdraws[feePayer.account.address.address]
 				else {
 					return selected.validateBalance(forFee: transactionFee)
 				}
@@ -1297,6 +1406,9 @@ extension ReviewedTransaction {
 				}
 
 				return .valid
+
+			default:
+				return selected.validateBalance(forFee: transactionFee)
 			}
 		}
 	}
@@ -1341,13 +1453,6 @@ func printSigners(_ reviewedTransaction: ReviewedTransaction) {
 	}
 }
 #endif // DEBUG
-
-extension ReviewedTransaction {
-	func metadataForNewlyCreatedResource(_ resource: ResourceAddress) -> [String: MetadataValue?]? {
-		guard case let .conforming(.general(conforming)) = transaction else { return nil }
-		return conforming.metadataOfNewlyCreatedEntities[resource.address]
-	}
-}
 
 #if DEBUG
 extension TransactionSigners {
