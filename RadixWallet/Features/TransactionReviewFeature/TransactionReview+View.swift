@@ -35,7 +35,10 @@ extension TransactionReview.State {
 			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction?.isNonConforming != false,
 			viewRawTransactionButtonState: reviewedTransaction?.feePayer.isSuccess == true ? .enabled : .disabled,
 			proposingDappMetadata: proposingDappMetadata,
+			isExpandedContributingToPools: isExpandedContributingToPools,
 			contributingToPools: contributingToPools,
+			isExpandedRedeemingFromPools: isExpandedRedeemingFromPools,
+			redeemingFromPools: redeemingFromPools,
 			depositSettingSection: accountDepositSetting,
 			depositExceptionsSection: accountDepositExceptions
 		)
@@ -65,7 +68,11 @@ extension TransactionReview {
 		let viewRawTransactionButtonState: ControlState
 		let proposingDappMetadata: DappMetadata.Ledger?
 
+		let isExpandedContributingToPools: Bool
 		let contributingToPools: ContributingToPoolsState?
+
+		let isExpandedRedeemingFromPools: Bool
+		let redeemingFromPools: ContributingToPoolsState?
 
 		let depositSettingSection: DepositSettingState?
 		let depositExceptionsSection: DepositExceptionsState?
@@ -129,7 +136,12 @@ extension TransactionReview {
 							withdrawalsSection
 
 							Group {
+								contributingToPools(viewStore.contributingToPools, isExpanded: viewStore.isExpandedContributingToPools)
+
+//								redeemingFromPools(viewStore.redeemingFromPools, isExpanded: viewStore.isExpandedRedeemingFromPools)
+
 								usingDappsSection(for: viewStore)
+
 								depositsSection
 							}
 							.background(alignment: .trailing) {
@@ -141,13 +153,9 @@ extension TransactionReview {
 								}
 							}
 
-							if let depositSettingViewState = viewStore.depositSettingSection {
-								accountDepositSettingSection(depositSettingViewState)
-							}
+							accountDepositSettingSection(viewStore.depositSettingSection)
 
-							if let depositExceptionsViewState = viewStore.depositExceptionsSection {
-								accountDepositExceptionsSection(depositExceptionsViewState)
-							}
+							accountDepositExceptionsSection(viewStore.depositExceptionsSection)
 						}
 						.padding(.top, .small1)
 						.padding(.horizontal, .medium3)
@@ -248,17 +256,38 @@ extension TransactionReview {
 			}
 		}
 
-		private func accountDepositSettingSection(_ viewState: TransactionReview.DepositSettingState) -> some SwiftUI.View {
-			VStack(alignment: .leading, spacing: .small2) {
-				TransactionHeading.depositSetting
-				DepositSettingView(viewState: viewState)
+		@ViewBuilder
+		private func contributingToPools(_ viewState: ContributingToPoolsState?, isExpanded: Bool) -> some SwiftUI.View {
+			if let viewState {
+				VStack(alignment: .leading, spacing: .small2) {
+					ExpandableTransactionHeading(heading: .contributingToPools, isExpanded: isExpanded) {
+						store.send(.view(.expandContributingToPoolsTapped))
+					}
+
+					if isExpanded {
+						ContributingToPoolsView(viewState: viewState)
+					}
+				}
 			}
 		}
 
-		private func accountDepositExceptionsSection(_ viewState: TransactionReview.DepositExceptionsState) -> some SwiftUI.View {
-			VStack(alignment: .leading, spacing: .small2) {
-				TransactionHeading.depositExceptions
-				DepositExceptionsView(viewState: viewState)
+		@ViewBuilder
+		private func accountDepositSettingSection(_ viewState: DepositSettingState?) -> some SwiftUI.View {
+			if let viewState {
+				VStack(alignment: .leading, spacing: .small2) {
+					TransactionHeading.depositSetting
+					DepositSettingView(viewState: viewState)
+				}
+			}
+		}
+
+		@ViewBuilder
+		private func accountDepositExceptionsSection(_ viewState: DepositExceptionsState?) -> some SwiftUI.View {
+			if let viewState {
+				VStack(alignment: .leading, spacing: .small2) {
+					TransactionHeading.depositExceptions
+					DepositExceptionsView(viewState: viewState)
+				}
 			}
 		}
 
@@ -385,6 +414,26 @@ private extension View {
 	}
 }
 
+// MARK: - ExpandableTransactionHeading
+struct ExpandableTransactionHeading: View {
+	let heading: TransactionHeading
+	let isExpanded: Bool
+	let action: () -> Void
+
+	var body: some SwiftUI.View {
+		Button(action: action) {
+			HStack(spacing: .small3) {
+				heading
+
+				Image(asset: isExpanded ? AssetResource.chevronUp : AssetResource.chevronDown)
+					.renderingMode(.original)
+
+				Spacer(minLength: 0)
+			}
+		}
+	}
+}
+
 // MARK: - TransactionHeading
 struct TransactionHeading: View {
 	let heading: String
@@ -430,9 +479,10 @@ struct TransactionHeading: View {
 		icon: AssetResource.transactionReviewDapps
 	)
 
-	static let depositSettings = TransactionHeading(
-		L10n.TransactionReview.thirdPartyDepositSettingHeading,
-		icon: AssetResource.transactionReviewDepositSetting
+	static let contributingToPools = TransactionHeading(
+		//		L10n.TransactionReview.contributingToPoolsHeading,
+		"Contributing to pools", // FIXME: strings
+		icon: AssetResource.transactionReviewDepositSetting // FIXME: asset
 	)
 
 	static let depositSetting = TransactionHeading(

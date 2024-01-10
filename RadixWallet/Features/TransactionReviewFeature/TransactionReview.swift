@@ -22,7 +22,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var dAppsUsed: TransactionReviewDappsUsed.State? = nil
 		public var deposits: TransactionReviewAccounts.State? = nil
 
+		public var isExpandedContributingToPools = true
 		public var contributingToPools: ContributingToPoolsState? = nil
+
+		public var isExpandedRedeemingFromPools = true
+		public var redeemingFromPools: ContributingToPoolsState? = nil
 
 		public var accountDepositSetting: DepositSettingState? = nil
 		public var accountDepositExceptions: DepositExceptionsState? = nil
@@ -100,6 +104,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case showRawTransactionTapped
+		case expandContributingToPoolsTapped
+		case expandRedeemingFromPoolsTapped
 
 		case approvalSliderSlid
 	}
@@ -239,6 +245,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				return .none
 			}
 
+		case .expandContributingToPoolsTapped:
+			state.isExpandedContributingToPools.toggle()
+			return .none
+
+		case .expandRedeemingFromPoolsTapped:
+			state.isExpandedContributingToPools.toggle()
+			return .none
+
 		case .approvalSliderSlid:
 			state.canApproveTX = false
 			state.printFeePayerInfo()
@@ -341,7 +355,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			do {
 				let reviewedTransaction = ReviewedTransaction(
 					networkID: preview.networkID,
-//					transaction: preview.analyzedManifestToReview.transactionKind(),
 					executionSummary: preview.analyzedManifestToReview,
 					feePayer: .loading,
 					transactionFee: preview.transactionFee,
@@ -426,8 +439,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.reviewedTransaction = reviewedTransaction
 			state.networkFee?.reviewedTransaction = reviewedTransaction
 
-			if reviewedTransaction.executionSummary.detailedManifestClass == nil {
-				// Manifest is non-conforming
+			if reviewedTransaction.isNonConforming {
 				return showRawTransaction(&state)
 			}
 			return .none
@@ -544,58 +556,6 @@ extension TransactionReview {
 		//			return showRawTransaction(&state)
 	}
 
-	func sections(for transaction: TransactionKind.ConformingTransaction, networkID: NetworkID) async throws -> Sections {
-		switch transaction {
-		case let .general(generalTransaction):
-			let userAccounts = try await extractUserAccounts(generalTransaction.addressesInManifest)
-			fatalError()
-		case let .poolContribution(poolContribution):
-			print("Sections from .poolContribution")
-			let userAccounts = try await extractUserAccounts(poolContribution.addressesInManifest)
-
-			return await Sections(
-				withdrawals: try? extractWithdrawals(
-					accountWithdraws: poolContribution.accountWithdraws,
-					metadataOfNewlyCreatedEntities: [:],
-					dataOfNewlyMintedNonFungibles: [:],
-					addressesOfNewlyCreatedEntities: [],
-					userAccounts: userAccounts,
-					networkID: networkID
-				),
-				deposits: try? extractDeposits(
-					accountDeposits: poolContribution.accountDeposits,
-					metadataOfNewlyCreatedEntities: [:],
-					dataOfNewlyMintedNonFungibles: [:],
-					addressesOfNewlyCreatedEntities: [],
-					userAccounts: userAccounts,
-					networkID: networkID
-				),
-				contributingToPools: try? extractPools(poolContribution.poolContributions),
-				conforming: true
-			)
-
-		case let .poolRedemption(poolRedemption):
-			return Sections(conforming: false)
-
-		case let .accountDepositSettings(accountDepositSettings):
-			let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
-			let allAccountAddress = Set(accountDepositSettings.authorizedDepositorsAdded.keys)
-				.union(accountDepositSettings.authorizedDepositorsRemoved.keys)
-				.union(accountDepositSettings.defaultDepositRuleChanges.keys)
-				.union(accountDepositSettings.resourcePreferenceChanges.keys)
-			let validAccounts = allAccountAddress.compactMap { address in
-				userAccounts.first { $0.address == address }
-			}
-
-			fatalError()
-//			return try await Sections(
-//				accountDepositSetting: extractAccountDepositSetting(for: validAccounts, from: accountDepositSettings),
-//				accountDepositExceptions: extractAccountDepositExceptions(for: validAccounts, from: accountDepositSettings),
-//				conforming: true
-//			)
-		}
-	}
-
 	func sections(for summary: ExecutionSummary, networkID: NetworkID) async throws -> Sections {
 		let userAccounts = try await extractUserAccounts(summary.encounteredEntities)
 
@@ -606,7 +566,7 @@ extension TransactionReview {
 			let withdrawals = try? await extractWithdrawals(
 				accountWithdraws: summary.accountWithdraws,
 				metadataOfNewlyCreatedEntities: summary.metadataOfNewlyCreatedEntities,
-				dataOfNewlyMintedNonFungibles: summary.dataOfNewlyMintedNonFungibles, // TODO: Is this never populated for .general?
+				dataOfNewlyMintedNonFungibles: summary.dataOfNewlyMintedNonFungibles, // TODO: Is this never populated?
 				addressesOfNewlyCreatedEntities: summary.addressesOfNewlyCreatedEntities,
 				userAccounts: userAccounts,
 				networkID: networkID
@@ -617,7 +577,7 @@ extension TransactionReview {
 			let deposits = try? await extractDeposits(
 				accountDeposits: summary.accountDeposits,
 				metadataOfNewlyCreatedEntities: summary.metadataOfNewlyCreatedEntities,
-				dataOfNewlyMintedNonFungibles: summary.dataOfNewlyMintedNonFungibles, // TODO: Is this never populated for .general?
+				dataOfNewlyMintedNonFungibles: summary.dataOfNewlyMintedNonFungibles, // TODO: Is this never populated?
 				addressesOfNewlyCreatedEntities: summary.addressesOfNewlyCreatedEntities,
 				userAccounts: userAccounts,
 				networkID: networkID
@@ -647,6 +607,37 @@ extension TransactionReview {
 			)
 
 			let contributingToPools = try? extractPools(poolContributions)
+
+			print("PoolContribution •••••••••••••••••••••••")
+			func debugIndicator(ind: ResourceIndicator) -> String {
+				let addr = ind.resourceAddress.addressString().formatted(.full)
+				switch ind {
+				case let .fungible(_, indicator):
+					return "(fun) \(ind.transferType): \(indicator.amount.formatted()) \(addr)"
+				case let .nonFungible(_, indicator):
+					return "(non) \(ind.transferType): \(indicator.ids.count) \(addr)"
+				}
+			}
+
+			print("addressesInManifest")
+			for address in summary.encounteredEntities {
+				print("  \(address.entityType())")
+				print("    \(address.asStr().formatted(.full))")
+			}
+
+			print("poolAddresses")
+			for poolAddress in poolAddresses {
+				print("  \(poolAddress.entityType())")
+				print("    \(poolAddress.asStr().formatted(.full))")
+			}
+
+			print("poolContributions")
+			for poolContribution in poolContributions {
+				print("  Addr: \(poolContribution.poolAddress.entityType()): \(poolContribution.poolAddress.asStr())")
+				print("  UAdr: \(poolContribution.poolUnitsResourceAddress.entityType()): \(poolContribution.poolUnitsResourceAddress.asStr())")
+				print("  Amnt: \(poolContribution.poolUnitsAmount.formattedPlain())")
+				print("  Rsrc: \(poolContribution.contributedResources.map(\.key))")
+			}
 
 			return Sections(
 				withdrawals: withdrawals,

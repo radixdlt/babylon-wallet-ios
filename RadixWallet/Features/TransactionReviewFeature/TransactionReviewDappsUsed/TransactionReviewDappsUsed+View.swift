@@ -41,10 +41,8 @@ extension TransactionReviewDappsUsed {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .small2) {
-					Button {
+					ExpandableTransactionHeading(heading: .usingDapps, isExpanded: isExpanded) {
 						viewStore.send(.expandTapped)
-					} label: {
-						Heading(isExpanded: isExpanded)
 					}
 
 					if isExpanded {
@@ -64,19 +62,6 @@ extension TransactionReviewDappsUsed {
 					}
 				}
 				.animation(.easeInOut, value: isExpanded)
-			}
-		}
-
-		struct Heading: SwiftUI.View {
-			let isExpanded: Bool
-
-			var body: some SwiftUI.View {
-				HStack(spacing: .small3) {
-					TransactionHeading.usingDapps
-					Image(asset: isExpanded ? AssetResource.chevronUp : AssetResource.chevronDown)
-						.renderingMode(.original)
-					Spacer()
-				}
 			}
 		}
 
