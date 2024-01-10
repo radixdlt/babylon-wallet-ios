@@ -70,6 +70,7 @@ public enum AssetResource {
   public static let iconHardwareLedger = ImageAsset(name: "icon-hardware-ledger")
   public static let iconHistory = ImageAsset(name: "icon-history")
   public static let iconLinkOut = ImageAsset(name: "icon-link-out")
+  public static let iconValidator = ImageAsset(name: "icon-validator")
   public static let info = ImageAsset(name: "info")
   public static let lock = ImageAsset(name: "lock")
   public static let minusCircle = ImageAsset(name: "minus-circle")

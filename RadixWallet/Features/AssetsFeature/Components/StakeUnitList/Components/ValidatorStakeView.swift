@@ -21,31 +21,29 @@ struct ValidatorStakeView: View {
 	var onStakeClaimTokenTapped: (NonFungibleGlobalId) -> Void
 
 	public var body: some SwiftUI.View {
-		Section {
-			loadable(viewState.content) { content in
-				ValidatorHeaderView(viewState: content.validatorNameViewState)
-					.contentShape(Rectangle())
-					.rowStyle()
-					.padding(.medium1)
-					.onTapGesture {
-						isExpanded.toggle()
-					}
+		loadable(viewState.content) { content in
+			ValidatorHeaderView(viewState: content.validatorNameViewState)
+				.contentShape(Rectangle())
+				.rowStyle()
+				.padding(.medium1)
+				.onTapGesture {
+					isExpanded.toggle()
+				}
 
-				if isExpanded {
-					if let liquidStakeUnitViewState = content.liquidStakeUnit {
-						liquidStakeUnitView(viewState: liquidStakeUnitViewState)
-							.rowStyle()
-							.onTapGesture { onLiquidStakeUnitTapped() }
-					}
+			if isExpanded {
+				if let liquidStakeUnitViewState = content.liquidStakeUnit {
+					liquidStakeUnitView(viewState: liquidStakeUnitViewState)
+						.rowStyle()
+						.onTapGesture { onLiquidStakeUnitTapped() }
+				}
 
-					if let stakeClaimNFTsViewState = content.stakeClaimNFTs {
-						stakeClaimNFTsView(viewState: stakeClaimNFTsViewState, handleTapGesture: onStakeClaimTokenTapped)
-							.rowStyle()
-					}
+				if let stakeClaimNFTsViewState = content.stakeClaimNFTs {
+					stakeClaimNFTsView(viewState: stakeClaimNFTsViewState, handleTapGesture: onStakeClaimTokenTapped)
+						.rowStyle()
 				}
 			}
-			.background(.app.white)
 		}
+		.background(.app.white)
 	}
 
 	@ViewBuilder

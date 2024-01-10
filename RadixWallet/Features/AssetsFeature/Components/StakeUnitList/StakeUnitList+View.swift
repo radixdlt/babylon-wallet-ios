@@ -80,6 +80,14 @@ public extension StakeUnitList {
 	struct ViewState: Equatable {
 		let stakeSummary: StakeSummaryView.ViewState
 		let stakedValidators: IdentifiedArrayOf<ValidatorStakeView.ViewState>
+
+		var firstStakedValidator: ValidatorStakeView.ViewState {
+			stakedValidators.first!
+		}
+
+		var remainingStakedValidators: IdentifiedArrayOf<ValidatorStakeView.ViewState> {
+			Array(stakedValidators.dropFirst()).asIdentifiable()
+		}
 	}
 
 	@MainActor
@@ -98,22 +106,40 @@ public extension StakeUnitList {
 						.padding(.medium1)
 				}
 
-				ForEach(viewStore.stakedValidators) { viewState in
-					ValidatorStakeView(
-						viewState: viewState,
-						onLiquidStakeUnitTapped: {
-							viewStore.send(.view(.didTapLiquidStakeUnit(forValidator: viewState.id)))
-						},
-						onStakeClaimTokenTapped: { id in
-							viewStore.send(.view(.didTapStakeClaimNFT(forValidator: viewState.id, id: id)))
-						}
-					)
+				Section {
+					validatorStakeView(viewStore.firstStakedValidator)
+				} header: {
+					HStack {
+						Image(asset: AssetResource.iconValidator).withDottedCircleOverlay()
+						Text(L10n.Account.Staking.stakedValidators(viewStore.stakedValidators.count))
+							.textStyle(.body1Link)
+							.foregroundColor(.app.gray2)
+					}
+					.rowStyle()
+					.padding(.bottom, .small2)
+				}
+
+				ForEach(viewStore.remainingStakedValidators) { viewState in
+					validatorStakeView(viewState)
 				}
 			}
 			.onAppear {
 				store.send(.view(.appeared))
 			}
 			.destinations(with: store)
+		}
+
+		@ViewBuilder
+		private func validatorStakeView(_ viewState: ValidatorStakeView.ViewState) -> some SwiftUI.View {
+			ValidatorStakeView(
+				viewState: viewState,
+				onLiquidStakeUnitTapped: {
+					store.send(.view(.didTapLiquidStakeUnit(forValidator: viewState.id)))
+				},
+				onStakeClaimTokenTapped: { id in
+					store.send(.view(.didTapStakeClaimNFT(forValidator: viewState.id, id: id)))
+				}
+			)
 		}
 	}
 }
