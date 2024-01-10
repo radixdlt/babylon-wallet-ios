@@ -746,6 +746,8 @@ Or you can clear this wallet from this phone and start fresh.";
 "appSettings_entityHiding_unhideAllConfirmation" = "Are you sure you wish to unhide all Accounts and Personas? This cannot be undone.";
 "appSettings_developerMode_title" = "Developer Mode";
 "appSettings_developerMode_subtitle" = "Warning: Disables website validity checks";
+"appSettings_crashReporting_title" = "Crash Reporting";
+"appSettings_crashReporting_subtitle" = "I\'m aware Radix Wallet will send crash reports together with device state from the moment of crash.";
 "addLedgerDevice_alreadyAddedAlert_title" = "Ledger Already Added";
 "addLedgerDevice_alreadyAddedAlert_message" = "You have already added this Ledger as: %@";
 "addLedgerDevice_addDevice_title" = "Add Ledger Device";
