@@ -4,7 +4,9 @@ import SwiftUI
 extension NonFungibleTokenDetails.State {
 	var viewState: NonFungibleTokenDetails.ViewState {
 		.init(
-			tokenDetails: token.map(NonFungibleTokenDetails.ViewState.TokenDetails.init),
+			tokenDetails: token.map {
+				NonFungibleTokenDetails.ViewState.TokenDetails(token: $0, stakeClaimStatus: stakeClaimStatus)
+			},
 			resourceThumbnail: ownedResource.map { .success($0.metadata.iconURL) } ?? resourceDetails.metadata.iconURL,
 			resourceDetails: .init(
 				description: resourceDetails.metadata.description,
@@ -21,12 +23,13 @@ extension NonFungibleTokenDetails.State {
 }
 
 extension NonFungibleTokenDetails.ViewState.TokenDetails {
-	init(token: OnLedgerEntity.NonFungibleToken) {
+	init(token: OnLedgerEntity.NonFungibleToken, stakeClaimStatus: NonFungibleTokenDetails.State.StakeClaimStatus?) {
 		self.init(
 			keyImage: token.data?.keyImageURL,
 			nonFungibleGlobalID: token.id,
 			name: token.data?.name,
 			description: token.data?.tokenDescription?.nilIfEmpty,
+			stakeClaimStatus: stakeClaimStatus,
 			dataFields: token.data?.arbitraryDataFields ?? []
 		)
 	}
@@ -44,6 +47,7 @@ extension NonFungibleTokenDetails {
 			let nonFungibleGlobalID: NonFungibleGlobalId
 			let name: String?
 			let description: String?
+			let stakeClaimStatus: State.StakeClaimStatus?
 			let dataFields: [ArbitraryDataField]
 		}
 	}
@@ -77,6 +81,14 @@ extension NonFungibleTokenDetails {
 								}
 
 								KeyValueView(nonFungibleGlobalID: tokenDetails.nonFungibleGlobalID)
+
+								if let stakeClaimStatus = tokenDetails.stakeClaimStatus {
+									Button(stakeClaimStatus.description) {
+										viewStore.send(.tappedClaimStake)
+									}
+									.buttonStyle(.primaryRectangular)
+									.controlState(stakeClaimStatus.isReadyToClaim ? .enabled : .disabled)
+								}
 
 								if !tokenDetails.dataFields.isEmpty {
 									AssetDetailsSeparator()
@@ -170,6 +182,24 @@ extension NonFungibleTokenDetails {
 	}
 }
 
+extension NonFungibleTokenDetails.State.StakeClaimStatus {
+	var description: String {
+		switch self {
+		case let .readyToClaim(amount):
+			L10n.AssetDetails.Staking.readyToClaim(amount.formatted())
+		case let .unstaking(amount, remainingEpochs):
+			L10n.AssetDetails.Staking.unstaking(amount.formatted(), remainingEpochs * 5)
+		}
+	}
+
+	var isReadyToClaim: Bool {
+		if case .readyToClaim = self {
+			return true
+		}
+		return false
+	}
+}
+
 // MARK: - NonFungibleTokenDetails.ViewState.TokenDetails.ArbitraryDataField
 extension NonFungibleTokenDetails.ViewState.TokenDetails {
 	/// Arbitrary data fields that are not standardized in the Wallet
@@ -190,7 +220,7 @@ extension NonFungibleTokenDetails.ViewState.TokenDetails {
 }
 
 extension OnLedgerEntity.NonFungibleToken.NFTData {
-	private static let standardFields: [OnLedgerEntity.NonFungibleToken.NFTData.StandardField] = [.name, .description, .keyImageURL]
+	private static let standardFields = OnLedgerEntity.NonFungibleToken.NFTData.StandardField.allCases
 
 	fileprivate var arbitraryDataFields: [NonFungibleTokenDetails.ViewState.TokenDetails.ArbitraryDataField] {
 		fields.compactMap { field in

@@ -4,24 +4,32 @@ import SwiftUI
 // MARK: - NonFungibleTokenDetails
 public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		public enum StakeClaimStatus: Sendable, Hashable {
+			case readyToClaim(amount: RETDecimal)
+			case unstaking(amount: RETDecimal, remainingEpochs: Int)
+		}
+
 		public let resourceAddress: ResourceAddress
 		public var resourceDetails: Loadable<OnLedgerEntity.Resource>
 		public let ownedResource: OnLedgerEntity.OwnedNonFungibleResource?
 		public let token: OnLedgerEntity.NonFungibleToken?
 		public let ledgerState: AtLedgerState
+		public let stakeClaimStatus: StakeClaimStatus?
 
 		public init(
 			resourceAddress: ResourceAddress,
 			resourceDetails: Loadable<OnLedgerEntity.Resource> = .idle,
 			ownedResource: OnLedgerEntity.OwnedNonFungibleResource? = nil,
 			token: OnLedgerEntity.NonFungibleToken? = nil,
-			ledgerState: AtLedgerState
+			ledgerState: AtLedgerState,
+			stakeClaimStatus: StakeClaimStatus? = nil
 		) {
 			self.resourceAddress = resourceAddress
 			self.resourceDetails = resourceDetails
 			self.token = token
 			self.ownedResource = ownedResource
 			self.ledgerState = ledgerState
+			self.stakeClaimStatus = stakeClaimStatus
 		}
 	}
 
@@ -29,12 +37,14 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 		case closeButtonTapped
 		case task
 		case openURLTapped(URL)
+		case tappedClaimStake
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case resourceLoadResult(TaskResult<OnLedgerEntity.Resource>)
 	}
 
+	@Dependency(\.dappInteractionClient) var dappInteractionClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.dismiss) var dismiss
@@ -59,6 +69,9 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 		case let .openURLTapped(url):
 			return .run { _ in
 				await openURL(url)
+			}
+		case .tappedClaimStake:
+			return .run { _ in
 			}
 		}
 	}

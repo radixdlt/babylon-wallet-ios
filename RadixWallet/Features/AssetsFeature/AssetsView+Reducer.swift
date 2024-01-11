@@ -257,12 +257,15 @@ public struct AssetsView: Sendable, FeatureReducer {
 					.filter(stakeUnitResources.contains)
 					.asIdentifiable()
 			},
-			selectedStakeClaimTokens: mode.isSelection ?
+			selectedStakeClaimTokens:
+			mode.isSelection ?
 				stakes
-				.compactMap(\.stakeClaimResource?.resourceAddress)
-				.compactMap(mode.nftRowSelectedAssets)
-				.flatMap(\.self.elements)
-				.asIdentifiable() : nil
+				.compactMap(\.stakeClaimResource)
+				.reduce(into: [OnLedgerEntity.OwnedNonFungibleResource: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>]()) { dict, resource in
+					if let selectedtokens = mode.nftRowSelectedAssets(resource.resourceAddress)?.elements.asIdentifiable() {
+						dict[resource] = selectedtokens
+					}
+				} : nil
 		)
 
 		return .init(
@@ -296,6 +299,9 @@ extension AssetsView.State {
 			.compactMap(\.selectedResource) ?? []
 
 		let selectedNonFungibleResources = nonFungibleTokenList?.rows.compactMap(NonFungibleTokensPerResourceProvider.init) ?? []
+		let selectedStakeClaims = stakeUnitList?.selectedStakeClaimTokens?.map { resource, tokens in
+			NonFungibleTokensPerResourceProvider(selectedAssets: .init(tokens), resource: resource)
+		} ?? []
 
 		let selectedFungibleResources = OnLedgerEntity.OwnedFungibleResources(
 			xrdResource: selectedXRDResource,
@@ -303,7 +309,7 @@ extension AssetsView.State {
 		)
 
 		let selectedNonFungibleTokensPerResource =
-			selectedNonFungibleResources
+			(selectedNonFungibleResources + selectedStakeClaims)
 				.compactMap(\.nonFungibleTokensPerResource)
 
 		guard

@@ -24,11 +24,11 @@ public struct LiquidStakeUnitView: View {
 
 			HStack {
 				TokenBalanceView.xrd(balance: viewState.worth)
-					.padding(.small1)
 				if let isSelected = viewState.isSelected {
 					CheckmarkView(appearance: .dark, isChecked: isSelected)
 				}
 			}
+			.padding(.small1)
 			.roundedCorners(strokeColor: .app.gray3)
 		}
 	}

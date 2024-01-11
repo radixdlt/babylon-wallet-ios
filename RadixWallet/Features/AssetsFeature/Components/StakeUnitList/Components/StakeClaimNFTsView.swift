@@ -35,12 +35,12 @@ struct StakeClaimNFTSView: View {
 			ForEach(section.stakeClaims) { claim in
 				HStack {
 					TokenBalanceView.xrd(balance: claim.worth)
-						.padding(.small1)
 
 					if let isSelected = claim.isSelected {
 						CheckmarkView(appearance: .dark, isChecked: isSelected)
 					}
 				}
+				.padding(.small1)
 				.roundedCorners(strokeColor: .app.gray3)
 				.contentShape(Rectangle())
 				.onTapGesture {

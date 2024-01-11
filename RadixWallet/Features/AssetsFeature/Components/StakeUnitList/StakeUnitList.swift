@@ -144,6 +144,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 				content.stakeClaimNFTs?.sections.mutateAll {
 					$0.stakeClaims[id: id]?.isSelected?.toggle()
 				}
+				state.stakedValidators[id: validatorAddress]?.content = .success(content)
 				state.selectedStakeClaimTokens?[ownedStakeClaim, default: []].toggle(token)
 
 				return .none
@@ -193,6 +194,7 @@ extension StakeUnitList {
 		_ state: inout State,
 		details: IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>
 	) {
+		let allSelectedTokens = state.selectedStakeClaimTokens?.values.flatMap { $0 }
 		func processStakeTokens(
 			_ stakeClaimTokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>,
 			_ amount: inout RETDecimal
@@ -206,7 +208,7 @@ extension StakeUnitList {
 				stakeClaims.append(.init(
 					id: token.id,
 					worth: claimAmount,
-					isSelected: state.selectedStakeClaimTokens?.contains(token)
+					isSelected: allSelectedTokens?.contains(token)
 				))
 			}
 
