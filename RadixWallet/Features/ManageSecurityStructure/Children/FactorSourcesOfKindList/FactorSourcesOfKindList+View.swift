@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension FactorSourcesOfKindList.State {
 	var viewState: FactorSourcesOfKindList.ViewState {
 		.init(state: self)

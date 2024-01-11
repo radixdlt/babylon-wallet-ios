@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension Collection<FactorSource> {
 	func filter(
 		supportedByRole role: SecurityStructureRole

@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension CreatePersonaCoordinator.State {
 	fileprivate var viewState: CreatePersonaCoordinator.ViewState {
 		.init(shouldDisplayNavBar: shouldDisplayNavBar)

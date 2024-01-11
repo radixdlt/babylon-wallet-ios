@@ -1,4 +1,5 @@
 import CryptoKit
+
 // swiftlint:disable file_length
 extension BIP39.WordList {
 	public static let spanish: [String] = {

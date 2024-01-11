@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 public struct AssetTransferMessage: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Kind: Sendable, Hashable {

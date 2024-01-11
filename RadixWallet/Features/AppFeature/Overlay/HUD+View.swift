@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension HUD.State {
 	var viewState: HUD.ViewState {
 		.init(offset: offset, text: content.text, icon: content.icon)

@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 public typealias EncryptionPassword = String
 
 // MARK: - EncryptOrDecryptProfile

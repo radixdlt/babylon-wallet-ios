@@ -802,7 +802,7 @@ extension SLIP10TestVectorsTests {
 	) throws where C: SLIP10CurveProtocol, C.PrivateKey: Equatable, C.PublicKey: Equatable {
 		let root = try HD.Root(seed: vector.seed)
 
-		try vector.testCases.enumerated().forEach { testCaseIndex, testCase in
+		for (testCaseIndex, testCase) in vector.testCases.enumerated() {
 			try doTestCase(
 				root: root,
 				case: testCase,

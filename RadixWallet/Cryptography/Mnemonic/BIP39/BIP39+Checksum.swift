@@ -1,4 +1,5 @@
 import CryptoKit
+
 extension BIP39 {
 	@discardableResult
 	static func validateChecksumOf(

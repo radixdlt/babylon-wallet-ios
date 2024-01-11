@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension LSUDetails.State {
 	var viewState: LSUDetails.ViewState {
 		.init(

@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension SignWithFactorSourcesOfKindDevice.State {
 	var viewState: SignWithFactorSourcesOfKindDevice.ViewState {
 		.init(currentSigningFactor: currentSigningFactor)

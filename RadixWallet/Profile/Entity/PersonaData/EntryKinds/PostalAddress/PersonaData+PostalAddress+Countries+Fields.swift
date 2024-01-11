@@ -1,4 +1,5 @@
 import EngineToolkit
+
 extension PersonaData.PostalAddress.CountryOrRegion {
 	var fields: [[PersonaData.PostalAddress.Field.Discriminator]] {
 		switch self {

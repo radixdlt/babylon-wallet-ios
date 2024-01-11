@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension CompletionMigrateOlympiaAccountsToBabylon.State {
 	var viewState: CompletionMigrateOlympiaAccountsToBabylon.ViewState {
 		let accounts = previouslyMigrated.map(\.viewStateAccount) + migrated.map(\.viewStateAccount)

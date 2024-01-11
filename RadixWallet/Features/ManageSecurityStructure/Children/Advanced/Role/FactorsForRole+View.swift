@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension FactorsForRole.State {
 	var viewState: FactorsForRole.ViewState {
 		.init(
@@ -287,6 +288,7 @@ public struct FactorsListView: SwiftUI.View {
 // #if DEBUG
 // import SwiftUI
 import ComposableArchitecture //
+
 //// MARK: - FactorsForRole_Preview
 // struct FactorsForRole_Preview: PreviewProvider {
 //	static var previews: some View {

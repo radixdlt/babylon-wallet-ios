@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension Main.State {
 	public var showIsUsingTestnetBanner: Bool {
 		!isOnMainnet
@@ -63,6 +64,7 @@ private extension View {
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
+
 struct MainView_Previews: PreviewProvider {
 	static var previews: some SwiftUI.View {
 		Main.View(

@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension EditPersonaAddEntryKinds.State {
 	var viewState: EditPersonaAddEntryKinds.ViewState {
 		.init(

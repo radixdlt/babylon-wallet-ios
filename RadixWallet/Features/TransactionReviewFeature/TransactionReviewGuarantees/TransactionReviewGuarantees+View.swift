@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension TransactionReviewGuarantees.State {
 	var viewState: TransactionReviewGuarantees.ViewState {
 		.init(isValid: isValid)

@@ -1,4 +1,5 @@
 import EngineToolkit
+
 extension PersonaData {
 	public struct PhoneNumber: Sendable, Hashable, Codable, PersonaDataEntryProtocol, CustomStringConvertible {
 		public static var casePath: CasePath<PersonaData.Entry, Self> = /PersonaData.Entry.phoneNumber

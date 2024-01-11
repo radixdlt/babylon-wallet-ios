@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 typealias RequestEnvelope = DappInteractionClient.RequestEnvelope
 
 // MARK: Identifiable

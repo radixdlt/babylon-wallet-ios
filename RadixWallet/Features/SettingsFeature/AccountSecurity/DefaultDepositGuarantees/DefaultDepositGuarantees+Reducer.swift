@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 public struct DefaultDepositGuarantees: Sendable, FeatureReducer {
 	public typealias Store = StoreOf<Self>
 

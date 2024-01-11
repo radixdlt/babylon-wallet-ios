@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension FungibleResourceAsset {
 	public typealias ViewState = State
 

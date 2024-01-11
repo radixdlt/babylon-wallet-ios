@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension EditPersona.State {
 	var viewState: EditPersona.ViewState {
 		.init(

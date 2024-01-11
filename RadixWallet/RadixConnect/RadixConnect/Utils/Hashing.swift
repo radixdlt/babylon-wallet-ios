@@ -1,4 +1,5 @@
 import WebRTC
+
 extension Data {
 	func hash() throws -> Data {
 		try blake2b(data: self)

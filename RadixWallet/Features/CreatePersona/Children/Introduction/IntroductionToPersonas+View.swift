@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension IntroductionToPersonas {
 	public struct ViewState: Equatable {
 		let titleText: String
@@ -83,6 +84,7 @@ private extension View {
 // #if DEBUG
 // import SwiftUI
 import ComposableArchitecture //
+
 //// MARK: - IntroductionToEntity_Preview
 // struct IntroductionToEntity_Preview: PreviewProvider {
 //	static var previews: some View {

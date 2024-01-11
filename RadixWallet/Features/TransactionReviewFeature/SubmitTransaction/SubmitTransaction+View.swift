@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension SubmitTransaction.State {
 	var viewState: SubmitTransaction.ViewState {
 		.init(

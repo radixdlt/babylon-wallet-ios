@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension DebugManageFactorSources.State {
 	var viewState: DebugManageFactorSources.ViewState {
 		.init(factorSources: self.factorSources)
@@ -123,6 +124,7 @@ private extension View {
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
+
 struct DebugManageFactorSources_Preview: PreviewProvider {
 	static var previews: some View {
 		DebugManageFactorSources.View(

@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension ScanMultipleOlympiaQRCodes.State {
 	var viewState: ScanMultipleOlympiaQRCodes.ViewState {
 		.init(

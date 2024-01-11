@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension AddNewGateway.State {
 	var viewState: AddNewGateway.ViewState {
 		.init(

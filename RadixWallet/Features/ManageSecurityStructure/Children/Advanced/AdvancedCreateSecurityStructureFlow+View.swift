@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension AdvancedManageSecurityStructureFlow.State {
 	var viewState: AdvancedManageSecurityStructureFlow.ViewState {
 		.init(state: self)
@@ -250,6 +251,7 @@ struct FactorsForRoleButton<R: RoleProtocol>: SwiftUI.View {
 // #if DEBUG
 // import SwiftUI
 import ComposableArchitecture //
+
 //// MARK: - AdvancedManageSecurityStructureFlow_Preview
 // struct AdvancedManageSecurityStructureFlow_Preview: PreviewProvider {
 //	static var previews: some View {

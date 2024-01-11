@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension SimpleManageSecurityStructureFlow.State {
 	var viewState: SimpleManageSecurityStructureFlow.ViewState {
 		.init(state: self)
@@ -171,6 +172,7 @@ private extension View {
 // #if DEBUG
 // import SwiftUI
 import ComposableArchitecture //
+
 //// MARK: - SimpleManageSecurityStructureFlow_Preview
 // struct SimpleManageSecurityStructureFlow_Preview: PreviewProvider {
 //	static var previews: some View {

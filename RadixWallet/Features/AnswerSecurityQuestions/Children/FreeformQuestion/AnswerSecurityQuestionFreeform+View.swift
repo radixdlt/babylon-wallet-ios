@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 public extension AnswerSecurityQuestionFreeform.State {
 	var viewState: AnswerSecurityQuestionFreeform.ViewState {
 		.init(state: self)

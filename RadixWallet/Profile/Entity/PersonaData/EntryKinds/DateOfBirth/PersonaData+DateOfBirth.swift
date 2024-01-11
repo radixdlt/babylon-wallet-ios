@@ -1,4 +1,5 @@
 import EngineToolkit
+
 extension PersonaData {
 	public struct DateOfBirth: Sendable, Hashable, Codable, PersonaDataEntryProtocol, CustomStringConvertible {
 		public static let casePath: CasePath<PersonaData.Entry, Self> = /PersonaData.Entry.dateOfBirth

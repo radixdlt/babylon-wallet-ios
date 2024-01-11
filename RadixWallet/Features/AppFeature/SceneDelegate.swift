@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
 	public weak var windowScene: UIWindowScene?
 	public var overlayWindow: UIWindow?

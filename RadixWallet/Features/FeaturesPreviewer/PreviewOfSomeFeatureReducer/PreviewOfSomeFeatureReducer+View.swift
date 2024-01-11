@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension PreviewOfSomeFeatureReducer {
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<F>

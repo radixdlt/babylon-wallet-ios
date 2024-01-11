@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension SelectFeePayer.State {
 	var viewState: SelectFeePayer.ViewState {
 		.init(

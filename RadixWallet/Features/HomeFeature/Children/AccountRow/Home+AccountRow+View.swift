@@ -384,6 +384,7 @@ extension Home.AccountRow.ViewState.AccountTag {
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
+
 struct Row_Preview: PreviewProvider {
 	static var previews: some View {
 		Home.AccountRow.View(

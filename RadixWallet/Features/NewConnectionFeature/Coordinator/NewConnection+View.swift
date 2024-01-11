@@ -74,6 +74,7 @@ extension View {
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
+
 struct NewConnection_Preview: PreviewProvider {
 	static var previews: some View {
 		NewConnection.View(

@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension NameAccount.State {
 	var viewState: NameAccount.ViewState {
 		.init(state: self)
@@ -132,6 +133,7 @@ extension NameAccount.View {
 // #if DEBUG
 // import SwiftUI
 import ComposableArchitecture //
+
 // struct NameAccount_Previews: PreviewProvider {
 //	static var previews: some View {
 //		NameAccount.View(
