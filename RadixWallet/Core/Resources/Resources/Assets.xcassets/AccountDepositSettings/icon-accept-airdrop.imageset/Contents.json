@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "icon-accept-airdrop.pdf",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

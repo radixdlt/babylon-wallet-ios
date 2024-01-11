@@ -451,6 +451,12 @@ public enum L10n {
     public static let subtitle = L10n.tr("Localizable", "appSettings_subtitle", fallback: "Customize your Radix Wallet")
     /// App Settings
     public static let title = L10n.tr("Localizable", "appSettings_title", fallback: "App Settings")
+    public enum CrashReporting {
+      /// I'm aware Radix Wallet will send crash reports together with device state from the moment of crash.
+      public static let subtitle = L10n.tr("Localizable", "appSettings_crashReporting_subtitle", fallback: "I'm aware Radix Wallet will send crash reports together with device state from the moment of crash.")
+      /// Crash Reporting
+      public static let title = L10n.tr("Localizable", "appSettings_crashReporting_title", fallback: "Crash Reporting")
+    }
     public enum DeveloperMode {
       /// Warning: Disables website validity checks
       public static let subtitle = L10n.tr("Localizable", "appSettings_developerMode_subtitle", fallback: "Warning: Disables website validity checks")
@@ -883,6 +889,8 @@ public enum L10n {
     public static let persona = L10n.tr("Localizable", "common_persona", fallback: "Persona")
     /// Public
     public static let `public` = L10n.tr("Localizable", "common_public", fallback: "Public")
+    /// Too many requests. Blocked due to rate limiting.
+    public static let rateLimitReached = L10n.tr("Localizable", "common_rateLimitReached", fallback: "Too many requests. Blocked due to rate limiting.")
     /// Remove
     public static let remove = L10n.tr("Localizable", "common_remove", fallback: "Remove")
     /// Retry
@@ -2407,6 +2415,8 @@ public enum L10n {
     public static let thirdPartyDepositSettingHeading = L10n.tr("Localizable", "transactionReview_thirdPartyDepositSettingHeading", fallback: "Third-party deposit setting")
     /// Review Your Transaction
     public static let title = L10n.tr("Localizable", "transactionReview_title", fallback: "Review Your Transaction")
+    /// TO BE CLAIMED
+    public static let toBeClaimed = L10n.tr("Localizable", "transactionReview_toBeClaimed", fallback: "TO BE CLAIMED")
     /// Review Your Transfer
     public static let transferTitle = L10n.tr("Localizable", "transactionReview_transferTitle", fallback: "Review Your Transfer")
     /// Unknown
@@ -2421,6 +2431,8 @@ public enum L10n {
     public static let usingDappsHeading = L10n.tr("Localizable", "transactionReview_usingDappsHeading", fallback: "Using dApps")
     /// Withdrawing From
     public static let withdrawalsHeading = L10n.tr("Localizable", "transactionReview_withdrawalsHeading", fallback: "Withdrawing From")
+    /// WORTH
+    public static let worth = L10n.tr("Localizable", "transactionReview_worth", fallback: "WORTH")
     /// %@ XRD
     public static func xrdAmount(_ p1: Any) -> String {
       return L10n.tr("Localizable", "transactionReview_xrdAmount", String(describing: p1), fallback: "%@ XRD")
@@ -2432,8 +2444,8 @@ public enum L10n {
       public static let acceptKnownRule = L10n.tr("Localizable", "transactionReview_accountDepositSettings_acceptKnownRule", fallback: "Allow third parties to deposit **only assets this account has already held**.")
       /// Allow
       public static let assetChangeAllow = L10n.tr("Localizable", "transactionReview_accountDepositSettings_assetChangeAllow", fallback: "Allow")
-      /// Clear Exception
-      public static let assetChangeClear = L10n.tr("Localizable", "transactionReview_accountDepositSettings_assetChangeClear", fallback: "Clear Exception")
+      /// Remove Exception
+      public static let assetChangeClear = L10n.tr("Localizable", "transactionReview_accountDepositSettings_assetChangeClear", fallback: "Remove Exception")
       /// Disallow
       public static let assetChangeDisallow = L10n.tr("Localizable", "transactionReview_accountDepositSettings_assetChangeDisallow", fallback: "Disallow")
       /// **Disallow** all deposits from third parties without your consent.
@@ -2500,6 +2512,14 @@ public enum L10n {
     public enum UnacceptableManifest {
       /// A proposed transaction was rejected because it contains one or more reserved instructions.
       public static let rejected = L10n.tr("Localizable", "transactionReview_unacceptableManifest_rejected", fallback: "A proposed transaction was rejected because it contains one or more reserved instructions.")
+    }
+    public enum Validators {
+      /// Claim from validators
+      public static let claim = L10n.tr("Localizable", "transactionReview_validators_claim", fallback: "Claim from validators")
+      /// Staking to Validators
+      public static let stake = L10n.tr("Localizable", "transactionReview_validators_stake", fallback: "Staking to Validators")
+      /// Requesting unstake from validators
+      public static let unstake = L10n.tr("Localizable", "transactionReview_validators_unstake", fallback: "Requesting unstake from validators")
     }
   }
   public enum TransactionSigning {

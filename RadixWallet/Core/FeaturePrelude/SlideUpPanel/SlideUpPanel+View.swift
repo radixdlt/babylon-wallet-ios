@@ -10,15 +10,28 @@ extension SlideUpPanel.State {
 
 // MARK: - WithNavigationBar
 public struct WithNavigationBar<Content: View>: View {
+	private let closeButtonLocation: ToolbarItemPlacement
 	private let closeAction: () -> Void
 	private let content: Content
 
-	public init(closeAction: @escaping () -> Void, @ViewBuilder content: () -> Content) {
-		self.content = content()
-		self.closeAction = closeAction
+	public init(
+		_ closeButtonLocation: ToolbarItemPlacement = .primaryAction,
+		closeAction: @escaping () -> Void,
+		@ViewBuilder content: () -> Content
+	) {
+		self.init(
+			closeButtonLocation,
+			closeAction: closeAction,
+			content: content()
+		)
 	}
 
-	init(closeAction: @escaping () -> Void, content: Content) {
+	init(
+		_ closeButtonLocation: ToolbarItemPlacement = .primaryAction,
+		closeAction: @escaping () -> Void,
+		content: Content
+	) {
+		self.closeButtonLocation = closeButtonLocation
 		self.content = content
 		self.closeAction = closeAction
 	}
@@ -28,7 +41,7 @@ public struct WithNavigationBar<Content: View>: View {
 			content
 				.presentationDragIndicator(.visible)
 				.toolbar {
-					ToolbarItem(placement: .primaryAction) {
+					ToolbarItem(placement: closeButtonLocation) {
 						CloseButton(action: closeAction)
 					}
 				}
@@ -50,8 +63,11 @@ extension View {
 		}
 	}
 
-	public func withNavigationBar(closeAction: @escaping () -> Void) -> some View {
-		WithNavigationBar(closeAction: closeAction, content: self)
+	public func withNavigationBar(
+		_ closeButtonLocation: ToolbarItemPlacement = .primaryAction,
+		closeAction: @escaping () -> Void
+	) -> some View {
+		WithNavigationBar(closeButtonLocation, closeAction: closeAction, content: self)
 	}
 }
 

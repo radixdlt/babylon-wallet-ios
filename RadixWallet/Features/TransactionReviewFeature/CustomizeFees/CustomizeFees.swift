@@ -174,7 +174,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 
 					do {
 						let factors = try await factorSourcesClient.getSigningFactors(.init(
-							networkID: reviewedTransaction.networkId,
+							networkID: reviewedTransaction.networkID,
 							signers: .init(rawValue: Set(newSigners))!,
 							signingPurpose: signingPurpose
 						))

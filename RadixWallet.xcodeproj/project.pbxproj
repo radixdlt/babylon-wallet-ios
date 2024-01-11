@@ -120,8 +120,7 @@
 		48CFC29A2ADC10D900E77A5C /* TransactionReviewDappsUsed+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF32ADC10D800E77A5C /* TransactionReviewDappsUsed+View.swift */; };
 		48CFC29B2ADC10D900E77A5C /* TransactionReviewDappsUsed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF42ADC10D800E77A5C /* TransactionReviewDappsUsed.swift */; };
 		48CFC29C2ADC10D900E77A5C /* TransactionReview+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF52ADC10D800E77A5C /* TransactionReview+View.swift */; };
-		48CFC29D2ADC10D900E77A5C /* AccountDepositSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF72ADC10D800E77A5C /* AccountDepositSettings.swift */; };
-		48CFC29E2ADC10D900E77A5C /* AccountDepositSettings+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF82ADC10D800E77A5C /* AccountDepositSettings+View.swift */; };
+		48CFC29E2ADC10D900E77A5C /* TransactionReview+DepositExceptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF82ADC10D800E77A5C /* TransactionReview+DepositExceptionsView.swift */; };
 		48CFC29F2ADC10D900E77A5C /* PersonasCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCFC2ADC10D800E77A5C /* PersonasCoordinator+View.swift */; };
 		48CFC2A02ADC10D900E77A5C /* PersonasCoordinator+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCFD2ADC10D800E77A5C /* PersonasCoordinator+Reducer.swift */; };
 		48CFC2A12ADC10D900E77A5C /* Persona+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD002ADC10D800E77A5C /* Persona+Reducer.swift */; };
@@ -1228,6 +1227,7 @@
 		A47572042B29B4EE0059A95D /* IOSSecurityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */; };
 		A47572052B29B4F20059A95D /* IOSSecurityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */; };
 		A47572062B29B4F50059A95D /* IOSSecurityClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572012B29B3CA0059A95D /* IOSSecurityClient+Live.swift */; };
+		A4B017F72B4C099D00B42B8E /* TransactionReview+DepositSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4B017F42B4BF59000B42B8E /* TransactionReview+DepositSettingView.swift */; };
 		E62449D52AFBA61100272C67 /* Home+AccountRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */; };
 		E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */; };
 		E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */; };
@@ -1470,8 +1470,7 @@
 		48CFBCF32ADC10D800E77A5C /* TransactionReviewDappsUsed+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransactionReviewDappsUsed+View.swift"; sourceTree = "<group>"; };
 		48CFBCF42ADC10D800E77A5C /* TransactionReviewDappsUsed.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionReviewDappsUsed.swift; sourceTree = "<group>"; };
 		48CFBCF52ADC10D800E77A5C /* TransactionReview+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransactionReview+View.swift"; sourceTree = "<group>"; };
-		48CFBCF72ADC10D800E77A5C /* AccountDepositSettings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccountDepositSettings.swift; sourceTree = "<group>"; };
-		48CFBCF82ADC10D800E77A5C /* AccountDepositSettings+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AccountDepositSettings+View.swift"; sourceTree = "<group>"; };
+		48CFBCF82ADC10D800E77A5C /* TransactionReview+DepositExceptionsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransactionReview+DepositExceptionsView.swift"; sourceTree = "<group>"; };
 		48CFBCFC2ADC10D800E77A5C /* PersonasCoordinator+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PersonasCoordinator+View.swift"; sourceTree = "<group>"; };
 		48CFBCFD2ADC10D800E77A5C /* PersonasCoordinator+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PersonasCoordinator+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBD002ADC10D800E77A5C /* Persona+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Persona+Reducer.swift"; sourceTree = "<group>"; };
@@ -2545,6 +2544,7 @@
 		A47572012B29B3CA0059A95D /* IOSSecurityClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Live.swift"; sourceTree = "<group>"; };
 		A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Test.swift"; sourceTree = "<group>"; };
 		A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Interface.swift"; sourceTree = "<group>"; };
+		A4B017F42B4BF59000B42B8E /* TransactionReview+DepositSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionReview+DepositSettingView.swift"; sourceTree = "<group>"; };
 		E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+Reducer.swift"; sourceTree = "<group>"; };
 		E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+View.swift"; sourceTree = "<group>"; };
 		E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportMnemonicTests.swift; sourceTree = "<group>"; };
@@ -3226,7 +3226,8 @@
 				48CFBCE72ADC10D800E77A5C /* TransactionReviewNetworkFee */,
 				48CFBCEA2ADC10D800E77A5C /* CustomizeFees */,
 				48CFBCF22ADC10D800E77A5C /* TransactionReviewDappsUsed */,
-				48CFBCF62ADC10D800E77A5C /* AccountDepositSettings */,
+				A4B017F32B4BF57B00B42B8E /* TransactionReviewDepositSetting */,
+				48CFBCF62ADC10D800E77A5C /* TransactionReviewDepositExceptions */,
 			);
 			path = TransactionReviewFeature;
 			sourceTree = "<group>";
@@ -3329,13 +3330,12 @@
 			path = TransactionReviewDappsUsed;
 			sourceTree = "<group>";
 		};
-		48CFBCF62ADC10D800E77A5C /* AccountDepositSettings */ = {
+		48CFBCF62ADC10D800E77A5C /* TransactionReviewDepositExceptions */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBCF72ADC10D800E77A5C /* AccountDepositSettings.swift */,
-				48CFBCF82ADC10D800E77A5C /* AccountDepositSettings+View.swift */,
+				48CFBCF82ADC10D800E77A5C /* TransactionReview+DepositExceptionsView.swift */,
 			);
-			path = AccountDepositSettings;
+			path = TransactionReviewDepositExceptions;
 			sourceTree = "<group>";
 		};
 		48CFBCF92ADC10D800E77A5C /* DappsAndPersonas */ = {
@@ -6961,6 +6961,14 @@
 			path = IOSSecurityClient;
 			sourceTree = "<group>";
 		};
+		A4B017F32B4BF57B00B42B8E /* TransactionReviewDepositSetting */ = {
+			isa = PBXGroup;
+			children = (
+				A4B017F42B4BF59000B42B8E /* TransactionReview+DepositSettingView.swift */,
+			);
+			path = TransactionReviewDepositSetting;
+			sourceTree = "<group>";
+		};
 		E634CA2C2AFD259000C43DB7 /* DebugKeychainContents */ = {
 			isa = PBXGroup;
 			children = (
@@ -8303,6 +8311,7 @@
 				48CFC6412ADC10DB00E77A5C /* Persona.swift in Sources */,
 				48CFC3282ADC10D900E77A5C /* ScanQRCoordinator+View.swift in Sources */,
 				48CFC4122ADC10DA00E77A5C /* ErrorQueue+Interface.swift in Sources */,
+				A4B017F72B4C099D00B42B8E /* TransactionReview+DepositSettingView.swift in Sources */,
 				48CFC26A2ADC10D900E77A5C /* Signing+View.swift in Sources */,
 				48CFC60D2ADC10DA00E77A5C /* WalletInteractionSuccessResponseItems.swift in Sources */,
 				48CFC5302ADC10DA00E77A5C /* StateEntityNonFungiblesPageRequestAllOf.swift in Sources */,
@@ -8696,7 +8705,6 @@
 				48CFC4682ADC10DA00E77A5C /* ImportLegacyWalletClient+Test.swift in Sources */,
 				48CFC6362ADC10DB00E77A5C /* EntityDerivationPathProtocol.swift in Sources */,
 				48CFC4C52ADC10DA00E77A5C /* StateEntityNonFungibleResourceVaultsPageRequestAllOf.swift in Sources */,
-				48CFC29D2ADC10D900E77A5C /* AccountDepositSettings.swift in Sources */,
 				48CFC5882ADC10DA00E77A5C /* FaucetClient+Test.swift in Sources */,
 				48CFC2802ADC10D900E77A5C /* App+Reducer.swift in Sources */,
 				48CFC4912ADC10DA00E77A5C /* GatewayAPIClient+Mock.swift in Sources */,
@@ -8718,7 +8726,7 @@
 				48CFC42F2ADC10DA00E77A5C /* Tagged+Comparable.swift in Sources */,
 				48CFC5D92ADC10DA00E77A5C /* NavigationBarBackButtonFont.swift in Sources */,
 				48CFC4EE2ADC10DA00E77A5C /* PackageVmType.swift in Sources */,
-				48CFC29E2ADC10D900E77A5C /* AccountDepositSettings+View.swift in Sources */,
+				48CFC29E2ADC10D900E77A5C /* TransactionReview+DepositExceptionsView.swift in Sources */,
 				48CFC4922ADC10DA00E77A5C /* ValidatorsUptimeRequestAllOf.swift in Sources */,
 				48CFC43C2ADC10DA00E77A5C /* Validation.swift in Sources */,
 				48CFC36E2ADC10D900E77A5C /* FungibleAssetList+Row+View.swift in Sources */,

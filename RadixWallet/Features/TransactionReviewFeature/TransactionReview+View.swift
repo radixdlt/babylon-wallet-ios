@@ -34,7 +34,9 @@ extension TransactionReview.State {
 			sliderResetDate: sliderResetDate,
 			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction?.transaction != .nonConforming,
 			viewRawTransactionButtonState: reviewedTransaction?.feePayer.isSuccess == true ? .enabled : .disabled,
-			proposingDappMetadata: proposingDappMetadata
+			proposingDappMetadata: proposingDappMetadata,
+			depositSettingSection: accountDepositSetting,
+			depositExceptionsSection: accountDepositExceptions
 		)
 	}
 
@@ -61,6 +63,8 @@ extension TransactionReview {
 		let canToggleViewMode: Bool
 		let viewRawTransactionButtonState: ControlState
 		let proposingDappMetadata: DappMetadata.Ledger?
+		let depositSettingSection: DepositSettingState?
+		let depositExceptionsSection: DepositExceptionsState?
 
 		var approvalSliderControlState: ControlState {
 			// TODO: Is this the logic we want?
@@ -132,11 +136,17 @@ extension TransactionReview {
 								}
 							}
 
-							accountDepositSettingsSection
+							if let depositSettingViewState = viewStore.depositSettingSection {
+								accountDepositSettingSection(depositSettingViewState)
+							}
+
+							if let depositExceptionsViewState = viewStore.depositExceptionsSection {
+								accountDepositExceptionsSection(depositExceptionsViewState)
+							}
 						}
-						.padding(.top, .medium1)
+						.padding(.top, .small1)
 						.padding(.horizontal, .medium3)
-						.padding(.bottom, .large2)
+						.padding(.bottom, .large1)
 					}
 
 					VStack(spacing: .medium1) {
@@ -169,7 +179,6 @@ extension TransactionReview {
 
 		private let shadowColor: Color = .app.gray2.opacity(0.4)
 
-		@ViewBuilder
 		private func header(_ proposingDappMetadata: DappMetadata.Ledger?) -> some SwiftUI.View {
 			VStack(alignment: .leading, spacing: .small3) {
 				HStack(spacing: .zero) {
@@ -184,6 +193,8 @@ extension TransactionReview {
 					if let thumbnail = proposingDappMetadata?.thumbnail {
 						DappThumbnail(.known(thumbnail), size: .medium)
 							.padding(.leading, .small2)
+					} else {
+						Spacer(minLength: .small2 + HitTargetSize.medium.rawValue)
 					}
 				}
 
@@ -205,10 +216,9 @@ extension TransactionReview {
 			}
 		}
 
-		@ViewBuilder
 		private var withdrawalsSection: some SwiftUI.View {
 			let withdrawalsStore = store.scope(state: \.withdrawals) { .child(.withdrawals($0)) }
-			IfLetStore(withdrawalsStore) { childStore in
+			return IfLetStore(withdrawalsStore) { childStore in
 				VStack(alignment: .leading, spacing: .small2) {
 					TransactionHeading.withdrawing
 					TransactionReviewAccounts.View(store: childStore)
@@ -217,60 +227,55 @@ extension TransactionReview {
 			}
 		}
 
-		@ViewBuilder
 		private func usingDappsSection(for viewStore: ViewStoreOf<TransactionReview>) -> some SwiftUI.View {
 			let usedDappsStore = store.scope(state: \.dAppsUsed) { .child(.dAppsUsed($0)) }
-			IfLetStore(usedDappsStore) { childStore in
+			return IfLetStore(usedDappsStore) { childStore in
 				TransactionReviewDappsUsed.View(store: childStore, isExpanded: viewStore.isExpandedDappUsed)
 					.padding(.top, .medium1)
 			}
 		}
 
-		@ViewBuilder
 		private var depositsSection: some SwiftUI.View {
 			let depositsStore = store.scope(state: \.deposits) { .child(.deposits($0)) }
-			IfLetStore(depositsStore) { childStore in
+			return IfLetStore(depositsStore) { childStore in
 				VStack(alignment: .leading) {
 					TransactionHeading.depositing
 						.padding(.bottom, .small2)
+
 					TransactionReviewAccounts.View(store: childStore)
 				}
-				.padding(.top, .medium1)
 			}
 		}
 
-		@ViewBuilder
 		private var proofsSection: some SwiftUI.View {
 			let proofsStore = store.scope(state: \.proofs) { .child(.proofs($0)) }
-			IfLetStore(proofsStore) { childStore in
+			return IfLetStore(proofsStore) { childStore in
 				TransactionReviewProofs.View(store: childStore)
 					.padding(.bottom, .medium1)
-
-				Separator()
-					.padding(.horizontal, -.small3)
 			}
 		}
 
-		@ViewBuilder
-		private var accountDepositSettingsSection: some SwiftUI.View {
-			let accountDepositSettingsStore = store.scope(state: \.accountDepositSettings) { .child(.accountDepositSettings($0)) }
-			IfLetStore(accountDepositSettingsStore) { childStore in
-				VStack(alignment: .leading, spacing: .small2) {
-					TransactionHeading.depositSettings
+		private func accountDepositSettingSection(_ viewState: TransactionReview.DepositSettingState) -> some SwiftUI.View {
+			VStack(alignment: .leading, spacing: .small2) {
+				TransactionHeading.depositSetting
 
-					AccountDepositSettings.View(store: childStore)
-						.padding(.bottom, .medium1)
-				}
-
-				Separator()
-					.padding(.horizontal, -.small3)
+				DepositSettingView(viewState: viewState)
 			}
+			.padding(.bottom, .medium1)
 		}
 
-		@ViewBuilder
+		private func accountDepositExceptionsSection(_ viewState: TransactionReview.DepositExceptionsState) -> some SwiftUI.View {
+			VStack(alignment: .leading, spacing: .small2) {
+				TransactionHeading.depositExceptions
+
+				DepositExceptionsView(viewState: viewState)
+			}
+			.padding(.bottom, .medium1)
+		}
+
 		private var feeSection: some SwiftUI.View {
 			let feeStore = store.scope(state: \.networkFee) { .child(.networkFee($0)) }
-			IfLetStore(feeStore) { childStore in
+			return IfLetStore(feeStore) { childStore in
 				TransactionReviewNetworkFee.View(store: childStore)
 			}
 		}
@@ -408,25 +413,40 @@ struct TransactionHeading: View {
 		}
 	}
 
-	static var message: TransactionHeading {
-		TransactionHeading(L10n.TransactionReview.messageHeading, icon: AssetResource.transactionReviewMessage)
-	}
+	static let message = TransactionHeading(
+		L10n.TransactionReview.messageHeading,
+		icon: AssetResource.transactionReviewMessage
+	)
 
-	static var withdrawing: TransactionHeading {
-		TransactionHeading(L10n.TransactionReview.withdrawalsHeading, icon: AssetResource.transactionReviewWithdrawing)
-	}
+	static let withdrawing = TransactionHeading(
+		L10n.TransactionReview.withdrawalsHeading,
+		icon: AssetResource.transactionReviewWithdrawing
+	)
 
-	static var depositing: TransactionHeading {
-		TransactionHeading(L10n.TransactionReview.depositsHeading, icon: AssetResource.transactionReviewDepositing)
-	}
+	static let depositing = TransactionHeading(
+		L10n.TransactionReview.depositsHeading,
+		icon: AssetResource.transactionReviewDepositing
+	)
 
-	static var usingDapps: TransactionHeading {
-		TransactionHeading(L10n.TransactionReview.usingDappsHeading, icon: AssetResource.transactionReviewDapps)
-	}
+	static let usingDapps = TransactionHeading(
+		L10n.TransactionReview.usingDappsHeading,
+		icon: AssetResource.transactionReviewDapps
+	)
 
-	static var depositSettings: TransactionHeading {
-		TransactionHeading(L10n.TransactionReview.AccountDepositSettings.subtitle, icon: AssetResource.transactionReviewDepositSetting)
-	}
+	static let depositSettings = TransactionHeading(
+		L10n.TransactionReview.thirdPartyDepositSettingHeading,
+		icon: AssetResource.transactionReviewDepositSetting
+	)
+
+	static let depositSetting = TransactionHeading(
+		L10n.TransactionReview.thirdPartyDepositSettingHeading,
+		icon: AssetResource.transactionReviewDepositSetting
+	)
+
+	static let depositExceptions = TransactionHeading(
+		L10n.TransactionReview.thirdPartyDepositExceptionsHeading,
+		icon: AssetResource.transactionReviewDepositSetting
+	)
 }
 
 // MARK: - TransactionMessageView
