@@ -5,7 +5,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		var stakeSummary: StakeSummaryView.ViewState
 		var stakedValidators: IdentifiedArrayOf<ValidatorStakeView.ViewState>
 		var selectedLiquidStakeUnits: IdentifiedArrayOf<OnLedgerEntity.OwnedFungibleResource>?
-		var selectedStakeClaimTokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>?
+		var selectedStakeClaimTokens: [OnLedgerEntity.OwnedNonFungibleResource: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>]?
 		var stakeDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>> = .idle
 		var shouldRefresh = false
 
@@ -15,7 +15,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		init(
 			account: OnLedgerEntity.Account,
 			selectedLiquidStakeUnits: IdentifiedArrayOf<OnLedgerEntity.OwnedFungibleResource>?,
-			selectedStakeClaimTokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>?
+			selectedStakeClaimTokens: [OnLedgerEntity.OwnedNonFungibleResource: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>]?
 		) {
 			self.account = account
 			self.selectedLiquidStakeUnits = selectedLiquidStakeUnits
@@ -129,6 +129,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 			guard case let .success(stakeDetails) = state.stakeDetails,
 			      let stake = stakeDetails[id: validatorAddress],
 			      let stakeClaimTokens = stake.stakeClaimTokens,
+			      let ownedStakeClaim = state.account.poolUnitResources.radixNetworkStakes[id: validatorAddress]?.stakeClaimResource,
 			      let token = stakeClaimTokens.allTokens[id: id]
 			else {
 				return .none
@@ -143,9 +144,11 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 				content.stakeClaimNFTs?.sections.mutateAll {
 					$0.stakeClaims[id: id]?.isSelected?.toggle()
 				}
-				state.selectedStakeClaimTokens?.toggle(token)
+				state.selectedStakeClaimTokens?[ownedStakeClaim, default: []].toggle(token)
+
 				return .none
 			}
+
 			state.destination = .stakeClaimDetails(.init(
 				resourceAddress: stakeClaimTokens.resource.resourceAddress,
 				resourceDetails: .success(stakeClaimTokens.resource),
