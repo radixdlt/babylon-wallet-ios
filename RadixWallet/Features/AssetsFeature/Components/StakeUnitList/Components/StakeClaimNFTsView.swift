@@ -1,12 +1,12 @@
 // MARK: - StakeClaimNFTSView
-struct StakeClaimNFTSView: View {
-	struct ViewState: Sendable, Hashable {
+public struct StakeClaimNFTSView: View {
+	public struct ViewState: Sendable, Hashable {
 		public let resource: OnLedgerEntity.Resource
 		public var sections: IdentifiedArrayOf<Section>
 	}
 
 	public var viewState: ViewState
-	public let onTap: (NonFungibleGlobalId) -> Void
+	public let onTap: (StakeClaim) -> Void
 
 	public var body: some View {
 		VStack(alignment: .leading, spacing: .small2) {
@@ -44,7 +44,7 @@ struct StakeClaimNFTSView: View {
 				.roundedCorners(strokeColor: .app.gray3)
 				.contentShape(Rectangle())
 				.onTapGesture {
-					onTap(claim.id)
+					onTap(claim)
 				}
 			}
 		}
@@ -53,9 +53,9 @@ struct StakeClaimNFTSView: View {
 
 extension StakeClaimNFTSView {
 	public struct StakeClaim: Sendable, Hashable, Identifiable {
-		let id: NonFungibleGlobalId
-		let worth: RETDecimal
-		var isSelected: Bool?
+		public let id: NonFungibleGlobalId
+		public let worth: RETDecimal
+		public var isSelected: Bool?
 	}
 
 	public typealias StakeClaims = IdentifiedArrayOf<StakeClaim>

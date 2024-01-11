@@ -5,7 +5,7 @@ extension NonFungibleTokenDetails.State {
 	var viewState: NonFungibleTokenDetails.ViewState {
 		.init(
 			tokenDetails: token.map {
-				NonFungibleTokenDetails.ViewState.TokenDetails(token: $0, stakeClaimStatus: stakeClaimStatus)
+				NonFungibleTokenDetails.ViewState.TokenDetails(token: $0, stakeClaim: stakeClaim)
 			},
 			resourceThumbnail: ownedResource.map { .success($0.metadata.iconURL) } ?? resourceDetails.metadata.iconURL,
 			resourceDetails: .init(
@@ -23,13 +23,13 @@ extension NonFungibleTokenDetails.State {
 }
 
 extension NonFungibleTokenDetails.ViewState.TokenDetails {
-	init(token: OnLedgerEntity.NonFungibleToken, stakeClaimStatus: NonFungibleTokenDetails.State.StakeClaimStatus?) {
+	init(token: OnLedgerEntity.NonFungibleToken, stakeClaim: NonFungibleTokenDetails.State.StakeClaim?) {
 		self.init(
 			keyImage: token.data?.keyImageURL,
 			nonFungibleGlobalID: token.id,
 			name: token.data?.name,
 			description: token.data?.tokenDescription?.nilIfEmpty,
-			stakeClaimStatus: stakeClaimStatus,
+			stakeClaim: stakeClaim,
 			dataFields: token.data?.arbitraryDataFields ?? []
 		)
 	}
@@ -47,7 +47,7 @@ extension NonFungibleTokenDetails {
 			let nonFungibleGlobalID: NonFungibleGlobalId
 			let name: String?
 			let description: String?
-			let stakeClaimStatus: State.StakeClaimStatus?
+			let stakeClaim: State.StakeClaim?
 			let dataFields: [ArbitraryDataField]
 		}
 	}
@@ -82,12 +82,12 @@ extension NonFungibleTokenDetails {
 
 								KeyValueView(nonFungibleGlobalID: tokenDetails.nonFungibleGlobalID)
 
-								if let stakeClaimStatus = tokenDetails.stakeClaimStatus {
-									Button(stakeClaimStatus.description) {
+								if let stakeClaim = tokenDetails.stakeClaim {
+									Button(stakeClaim.description) {
 										viewStore.send(.tappedClaimStake)
 									}
 									.buttonStyle(.primaryRectangular)
-									.controlState(stakeClaimStatus.isReadyToClaim ? .enabled : .disabled)
+									.controlState(stakeClaim.isReadyToClaim ? .enabled : .disabled)
 								}
 
 								if !tokenDetails.dataFields.isEmpty {
@@ -182,21 +182,17 @@ extension NonFungibleTokenDetails {
 	}
 }
 
-extension NonFungibleTokenDetails.State.StakeClaimStatus {
+extension NonFungibleTokenDetails.State.StakeClaim {
 	var description: String {
-		switch self {
-		case let .readyToClaim(amount):
+		if isReadyToClaim {
 			L10n.AssetDetails.Staking.readyToClaim(amount.formatted())
-		case let .unstaking(amount, remainingEpochs):
-			L10n.AssetDetails.Staking.unstaking(amount.formatted(), remainingEpochs * 5)
+		} else {
+			L10n.AssetDetails.Staking.unstaking(amount.formatted(), remainingEpochsUntilClaim * 5)
 		}
 	}
 
 	var isReadyToClaim: Bool {
-		if case .readyToClaim = self {
-			return true
-		}
-		return false
+		remainingEpochsUntilClaim <= 0
 	}
 }
 

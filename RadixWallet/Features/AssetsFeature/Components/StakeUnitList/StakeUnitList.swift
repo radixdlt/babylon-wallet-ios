@@ -31,7 +31,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		case appeared
 		case refresh
 		case didTapLiquidStakeUnit(forValidator: ValidatorAddress)
-		case didTapStakeClaimNFT(forValidator: ValidatorAddress, id: NonFungibleGlobalId)
+		case didTapStakeClaimNFT(forValidator: ValidatorAddress, claim: StakeClaimNFTSView.StakeClaim)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -64,6 +64,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.dappInteractionClient) var dappInteractionClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.errorQueue) var errorQueue
 
@@ -125,12 +126,13 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 
 			return .none
 
-		case let .didTapStakeClaimNFT(validatorAddress, id):
+		case let .didTapStakeClaimNFT(validatorAddress, stakeClaim):
 			guard case let .success(stakeDetails) = state.stakeDetails,
-			      let stake = stakeDetails[id: validatorAddress],
-			      let stakeClaimTokens = stake.stakeClaimTokens,
-			      let ownedStakeClaim = state.account.poolUnitResources.radixNetworkStakes[id: validatorAddress]?.stakeClaimResource,
-			      let token = stakeClaimTokens.allTokens[id: id]
+			      let stake = state.account.poolUnitResources.radixNetworkStakes[id: validatorAddress],
+			      let stakeDetails = stakeDetails[id: validatorAddress],
+			      let stakeClaimTokens = stakeDetails.stakeClaimTokens,
+			      let ownedStakeClaim = stake.stakeClaimResource,
+			      let token = stakeClaimTokens.allTokens[id: stakeClaim.id]
 			else {
 				return .none
 			}
@@ -142,7 +144,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 				}
 
 				content.stakeClaimNFTs?.sections.mutateAll {
-					$0.stakeClaims[id: id]?.isSelected?.toggle()
+					$0.stakeClaims[id: stakeClaim.id]?.isSelected?.toggle()
 				}
 				state.stakedValidators[id: validatorAddress]?.content = .success(content)
 				state.selectedStakeClaimTokens?[ownedStakeClaim, default: []].toggle(token)
@@ -154,7 +156,8 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 				resourceAddress: stakeClaimTokens.resource.resourceAddress,
 				resourceDetails: .success(stakeClaimTokens.resource),
 				token: token,
-				ledgerState: stakeClaimTokens.resource.atLedgerState
+				ledgerState: stakeClaimTokens.resource.atLedgerState,
+				stakeClaim: .init(amount: stakeClaim.worth, remainingEpochsUntilClaim: 0, validatorAddress: validatorAddress)
 			))
 			return .none
 		}
@@ -174,6 +177,15 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		}
 	}
 
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .stakeClaimDetails(.delegate(.tappedClaimStake(id, stakeClaim))):
+			sendStakeClaimTransaction(state, validatorAddress: stakeClaim.validatorAddress, ids: [id])
+		case .stakeClaimDetails, .details:
+			.none
+		}
+	}
+
 	private func loadStakingDetails(_ state: inout State) -> Effect<Action> {
 		state.stakeDetails = .loading
 
@@ -185,6 +197,28 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 				)
 			}
 			await send(.internal(.detailsLoaded(result)))
+		}
+	}
+
+	private func sendStakeClaimTransaction(_ state: State, validatorAddress: ValidatorAddress, ids: [NonFungibleGlobalId]) -> Effect<Action> {
+		.run { _ in
+			let manifest = try ManifestBuilder.stakeClaimManifest(
+				accountAddress: state.account.address.intoEngine(),
+				validatorAddress: validatorAddress.intoEngine(),
+				resourceAddress: ids.first!.resourceAddress(),
+				networkId: state.account.address.intoEngine().networkId(),
+				ids: ids.map { $0.localId() }
+			)
+			_ = await dappInteractionClient.addWalletInteraction(
+				.transaction(.init(
+					send: .init(
+						version: .default,
+						transactionManifest: manifest,
+						message: ""
+					)
+				)),
+				.accountTransfer
+			)
 		}
 	}
 }

@@ -59,8 +59,8 @@ public extension StakeUnitList {
 				onLiquidStakeUnitTapped: {
 					store.send(.view(.didTapLiquidStakeUnit(forValidator: viewState.id)))
 				},
-				onStakeClaimTokenTapped: { id in
-					store.send(.view(.didTapStakeClaimNFT(forValidator: viewState.id, id: id)))
+				onStakeClaimTokenTapped: { claim in
+					store.send(.view(.didTapStakeClaimNFT(forValidator: viewState.id, claim: claim)))
 				}
 			)
 		}

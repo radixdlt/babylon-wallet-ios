@@ -1,6 +1,30 @@
 import EngineToolkit
 
 extension ManifestBuilder {
+	public static func stakeClaimManifest(
+		accountAddress: EngineToolkit.Address,
+		validatorAddress: EngineToolkit.Address,
+		resourceAddress: EngineToolkit.Address,
+		networkId: UInt8,
+		ids: [NonFungibleLocalId]
+	) throws -> TransactionManifest {
+		let bucket = ManifestBuilderBucket.unique
+		return try make {
+			accountWithdrawNonFungibles(
+				accountAddress,
+				resourceAddress,
+				ids
+			)
+			takeAllFromWorktop(resourceAddress, bucket)
+			validatorClaimXrd(validatorAddress, bucket)
+			accountDepositEntireWorktop(accountAddress)
+		}
+		.build(networkId: networkId)
+	}
+}
+
+// MARK: Manifests for testing
+extension ManifestBuilder {
 	public static func manifestForFaucet(
 		includeLockFeeInstruction: Bool,
 		networkID: NetworkID,

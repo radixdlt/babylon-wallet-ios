@@ -4,9 +4,10 @@ import SwiftUI
 // MARK: - NonFungibleTokenDetails
 public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public enum StakeClaimStatus: Sendable, Hashable {
-			case readyToClaim(amount: RETDecimal)
-			case unstaking(amount: RETDecimal, remainingEpochs: Int)
+		public struct StakeClaim: Sendable, Hashable {
+			let amount: RETDecimal
+			let remainingEpochsUntilClaim: Int
+			let validatorAddress: ValidatorAddress
 		}
 
 		public let resourceAddress: ResourceAddress
@@ -14,7 +15,7 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 		public let ownedResource: OnLedgerEntity.OwnedNonFungibleResource?
 		public let token: OnLedgerEntity.NonFungibleToken?
 		public let ledgerState: AtLedgerState
-		public let stakeClaimStatus: StakeClaimStatus?
+		public let stakeClaim: StakeClaim?
 
 		public init(
 			resourceAddress: ResourceAddress,
@@ -22,14 +23,14 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 			ownedResource: OnLedgerEntity.OwnedNonFungibleResource? = nil,
 			token: OnLedgerEntity.NonFungibleToken? = nil,
 			ledgerState: AtLedgerState,
-			stakeClaimStatus: StakeClaimStatus? = nil
+			stakeClaim: StakeClaim? = nil
 		) {
 			self.resourceAddress = resourceAddress
 			self.resourceDetails = resourceDetails
 			self.token = token
 			self.ownedResource = ownedResource
 			self.ledgerState = ledgerState
-			self.stakeClaimStatus = stakeClaimStatus
+			self.stakeClaim = stakeClaim
 		}
 	}
 
@@ -44,7 +45,10 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 		case resourceLoadResult(TaskResult<OnLedgerEntity.Resource>)
 	}
 
-	@Dependency(\.dappInteractionClient) var dappInteractionClient
+	public enum DelegateAction: Sendable, Equatable {
+		case tappedClaimStake(id: NonFungibleGlobalId, claim: State.StakeClaim)
+	}
+
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.dismiss) var dismiss
@@ -71,8 +75,10 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 				await openURL(url)
 			}
 		case .tappedClaimStake:
-			return .run { _ in
+			guard let stakeClaim = state.stakeClaim, let token = state.token else {
+				return .none
 			}
+			return .send(.delegate(.tappedClaimStake(id: token.id, claim: stakeClaim)))
 		}
 	}
 
