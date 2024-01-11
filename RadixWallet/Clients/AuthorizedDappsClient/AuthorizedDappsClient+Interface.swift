@@ -166,8 +166,8 @@ extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaDa
 	}
 
 	mutating func remove(ids: Set<PersonaDataEntryID>) {
-		ids.forEach {
-			remove(id: $0)
+		for item in ids {
+			remove(id: item)
 		}
 	}
 }

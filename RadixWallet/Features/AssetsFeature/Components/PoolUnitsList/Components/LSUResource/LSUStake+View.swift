@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension LSUStake.ViewState {
 	typealias StakeClaimNFTsViewState = NonEmpty<IdentifiedArrayOf<StakeClaimNFTViewState>>
 

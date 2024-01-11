@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension NonFungibleAssetList {
 	public struct Row: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable, Identifiable {

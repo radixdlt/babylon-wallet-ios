@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension DebugUserDefaultsContents.State {
 	var viewState: DebugUserDefaultsContents.ViewState {
 		.init(keyedValues: keyedValues, stringValuesOverTime: stringValuesOverTime)

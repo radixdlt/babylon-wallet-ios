@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension NormalFeesCustomization.State {
 	var viewState: NormalFeesCustomization.ViewState {
 		.init(

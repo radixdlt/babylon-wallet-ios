@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension SignWithFactorSourcesOfKindLedger.State {
 	var viewState: SignWithFactorSourcesOfKindLedger.ViewState {
 		.init(currentSigningFactor: currentSigningFactor)

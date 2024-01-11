@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 public struct CreationOfPersona: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let name: NonEmptyString

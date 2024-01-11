@@ -38,6 +38,7 @@ extension OnboardingCoordinator {
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
+
 struct Onboarding_Preview: PreviewProvider {
 	static var previews: some View {
 		OnboardingCoordinator.View(

@@ -159,8 +159,8 @@ extension HD.Path.Component.Child {
 
 	public init(depth: Depth, string: String) throws {
 		var string = string
-		Self.acceptedDelimitors.forEach {
-			string = string.replacingOccurrences(of: $0, with: Self.canonicalDelimitor)
+		for acceptedDelimitor in Self.acceptedDelimitors {
+			string = string.replacingOccurrences(of: acceptedDelimitor, with: Self.canonicalDelimitor)
 		}
 		let isHardened = string.hasSuffix(Self.canonicalDelimitor)
 

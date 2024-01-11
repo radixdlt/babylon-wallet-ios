@@ -65,7 +65,7 @@ public struct LSUResource: Sendable, FeatureReducer {
 			return .none
 		case .refresh:
 			state.shouldRefresh = true
-			state.stakes.forEach { stake in
+			for stake in state.stakes {
 				state.stakes[id: stake.id]?.stakeDetails = .loading
 			}
 			return .none
@@ -77,7 +77,7 @@ public struct LSUResource: Sendable, FeatureReducer {
 		case let .detailsLoaded(.success(details)):
 			state.shouldRefresh = false
 			state.isLoadingResources = false
-			details.forEach { details in
+			for details in details {
 				state.stakes[id: details.validator.address.address]?.stakeDetails = .success(details)
 			}
 			return .none

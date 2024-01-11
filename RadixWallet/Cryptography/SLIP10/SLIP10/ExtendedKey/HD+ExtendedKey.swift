@@ -137,13 +137,11 @@ extension HD.ExtendedKey {
 		parent: Self,
 		component: HD.Path.Component.Child
 	) throws -> Self {
-		let derivationPath: HD.Path
-
-		switch parent.derivationPath {
+		let derivationPath: HD.Path = switch parent.derivationPath {
 		case let .full(parentFullPath):
-			derivationPath = try .full(parentFullPath.appending(child: component))
+			try .full(parentFullPath.appending(child: component))
 		case let .relative(parentRelativePath):
-			derivationPath = try .relative(parentRelativePath.appending(child: component))
+			try .relative(parentRelativePath.appending(child: component))
 		}
 
 		if Curve.isCurve25519 {

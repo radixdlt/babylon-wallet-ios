@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension ManageTrustedContactFactorSource.State {
 	var viewState: ManageTrustedContactFactorSource.ViewState {
 		.init(canEditRadixAddress: canEditRadixAddress, isCreatingNewFromScratch: mode == .new, radixAddress: radixAddress, emailAddress: emailAddress, name: name)

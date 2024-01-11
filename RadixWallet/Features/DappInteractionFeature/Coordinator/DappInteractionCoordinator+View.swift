@@ -40,6 +40,7 @@ extension DappInteractionCoordinator {
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
+
 struct DappInteractionCoordinator_Previews: PreviewProvider {
 	static var previews: some View {
 		DappInteractionCoordinator.View(

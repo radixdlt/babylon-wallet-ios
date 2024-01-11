@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension LSUResource {
 	public struct ViewState: Sendable, Equatable {
 		let isExpanded: Bool

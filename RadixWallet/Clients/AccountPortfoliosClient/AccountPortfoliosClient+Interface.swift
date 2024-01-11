@@ -70,8 +70,8 @@ extension AccountPortfoliosClient {
 			}
 
 			if let resourceAddressesToRefresh {
-				resourceAddressesToRefresh.forEach {
-					cacheClient.removeFile(.onLedgerEntity(.resource($0.asGeneral)))
+				for item in resourceAddressesToRefresh {
+					cacheClient.removeFile(.onLedgerEntity(.resource(item.asGeneral)))
 				}
 			}
 

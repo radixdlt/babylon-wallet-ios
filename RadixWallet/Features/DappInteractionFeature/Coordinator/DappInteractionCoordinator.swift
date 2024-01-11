@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 struct DappInteractionCoordinator: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		enum ChildState: Sendable, Hashable {

@@ -1,4 +1,5 @@
 import CryptoKit
+
 public typealias SECP256K1 = K1
 
 // MARK: - K1 + SLIP10CurveProtocol

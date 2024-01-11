@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension MinimumPercentageStepper.State {
 	var isValid: Bool {
 		value != nil

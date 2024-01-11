@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension Radix.Gateway {
 	var displayName: String {
 		if isWellknown {

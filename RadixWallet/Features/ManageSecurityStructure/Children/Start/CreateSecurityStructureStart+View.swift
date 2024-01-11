@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension ManageSecurityStructureStart.State {
 	var viewState: ManageSecurityStructureStart.ViewState {
 		.init()

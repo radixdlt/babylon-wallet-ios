@@ -178,8 +178,8 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 		case let .switchToGatewayResult(.success(gateway)):
 			state.currentGateway = gateway
-			state.gatewayList.gateways.forEach {
-				state.gatewayList.gateways[id: $0.id]?.isSelected = $0.id == gateway.id
+			for item in state.gatewayList.gateways {
+				state.gatewayList.gateways[id: item.id]?.isSelected = item.id == gateway.id
 			}
 			state.gatewayList.gateways.sort()
 

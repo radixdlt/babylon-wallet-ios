@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension LedgerHardwareDevices.State {
 	var viewState: LedgerHardwareDevices.ViewState {
 		.init(state: self)
@@ -228,6 +229,7 @@ private extension View {
 // #if DEBUG
 // import SwiftUI
 import ComposableArchitecture //
+
 //// MARK: - ChooseLedgerHardwareDevice_Preview
 // struct ChooseLedgerHardwareDevice_Preview: PreviewProvider {
 //	static var previews: some View {

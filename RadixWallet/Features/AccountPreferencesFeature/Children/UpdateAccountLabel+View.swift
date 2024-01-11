@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension UpdateAccountLabel.State {
 	var viewState: UpdateAccountLabel.ViewState {
 		let (controlState, hint) = hintAndControlState

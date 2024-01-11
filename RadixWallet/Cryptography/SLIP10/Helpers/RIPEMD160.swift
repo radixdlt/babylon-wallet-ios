@@ -1,4 +1,5 @@
 import CryptoKit
+
 // https://stackoverflow.com/a/43193583
 public struct RIPEMD160 {
 	private var MDbuf: (UInt32, UInt32, UInt32, UInt32, UInt32)

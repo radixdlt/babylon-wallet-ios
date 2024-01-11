@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension AccountDetails.State {
 	var viewState: AccountDetails.ViewState {
 		.init(
@@ -175,6 +176,7 @@ private extension View {
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
+
 struct AccountDetails_Preview: PreviewProvider {
 	static var previews: some View {
 		NavigationStack {

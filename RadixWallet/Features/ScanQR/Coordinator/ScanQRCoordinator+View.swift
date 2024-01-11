@@ -35,6 +35,7 @@ extension ScanQRCoordinator {
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
+
 struct ScannQR_Preview: PreviewProvider {
 	static var previews: some View {
 		ScanQRCoordinator.View(

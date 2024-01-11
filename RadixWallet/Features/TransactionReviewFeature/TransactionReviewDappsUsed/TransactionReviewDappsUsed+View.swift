@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension TransactionReviewDappsUsed.State {
 	var viewState: TransactionReviewDappsUsed.ViewState {
 		var dApps = knownDapps.map(\.knownDapp)

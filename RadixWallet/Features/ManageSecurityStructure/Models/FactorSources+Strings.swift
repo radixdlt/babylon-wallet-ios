@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension BaseFactorSourceProtocol {
 	var display: String {
 		kind.display

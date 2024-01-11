@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension AddLedgerFactorSource.State {
 	var viewState: AddLedgerFactorSource.ViewState {
 		.init(continueButtonControlState: isWaitingForResponseFromLedger ? .loading(.local) : .enabled)

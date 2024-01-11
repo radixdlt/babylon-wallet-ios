@@ -1,4 +1,5 @@
 import EngineToolkit
+
 public typealias AnyIdentifiedPersonaEntry = PersonaData.IdentifiedEntry<PersonaData.Entry>
 
 extension PersonaData.IdentifiedEntry {

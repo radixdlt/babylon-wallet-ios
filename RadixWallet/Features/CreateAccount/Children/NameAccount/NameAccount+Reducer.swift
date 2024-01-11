@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 public struct NameAccount: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var isFirst: Bool

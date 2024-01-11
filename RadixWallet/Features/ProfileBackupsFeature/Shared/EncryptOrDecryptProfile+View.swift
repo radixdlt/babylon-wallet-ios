@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension EncryptOrDecryptProfile.State {
 	var viewState: EncryptOrDecryptProfile.ViewState {
 		.init(

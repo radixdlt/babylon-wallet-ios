@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 public struct NewPersonaInfo: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum InputField: String, Sendable, Hashable {

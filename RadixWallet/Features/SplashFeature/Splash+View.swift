@@ -85,6 +85,7 @@ private extension View {
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
+
 struct SplashView_Previews: PreviewProvider {
 	static var previews: some View {
 		Splash.View(

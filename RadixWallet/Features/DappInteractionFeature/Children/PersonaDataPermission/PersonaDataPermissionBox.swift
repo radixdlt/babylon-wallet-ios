@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 struct PersonaDataPermissionBox: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable, Identifiable {
 		var id: Profile.Network.Persona.ID { persona.id }

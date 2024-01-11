@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension AppSettings.State {
 	var viewState: AppSettings.ViewState {
 		let isDeveloperModeEnabled = preferences?.security.isDeveloperModeEnabled ?? false

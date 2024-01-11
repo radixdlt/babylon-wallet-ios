@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension AddAsset.State {
 	var viewState: AddAsset.ViewState {
 		.init(

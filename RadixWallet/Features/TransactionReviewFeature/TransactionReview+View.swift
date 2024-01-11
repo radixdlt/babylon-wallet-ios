@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension View {
 	var sectionHeading: some View {
 		textStyle(.body1Header)
@@ -553,6 +554,7 @@ extension StrokeStyle {
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
+
 struct TransactionReview_Previews: PreviewProvider {
 	static var previews: some SwiftUI.View {
 		TransactionReview.View(

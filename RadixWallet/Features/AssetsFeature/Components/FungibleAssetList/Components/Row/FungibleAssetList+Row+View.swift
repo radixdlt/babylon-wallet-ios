@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension FungibleAssetList.Section.Row.State {
 	var viewState: FungibleAssetList.Section.Row.ViewState {
 		.init(
