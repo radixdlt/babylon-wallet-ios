@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 struct DappHeader: View {
 	let thumbnail: URL?
 	let title: String

@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension DebugInspectProfile.State {
 	var viewState: DebugInspectProfile.ViewState {
 		.init(profile: profile, mode: mode, json: json)

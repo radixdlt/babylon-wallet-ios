@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension Home.State {
 	var viewState: Home.ViewState {
 		.init(hasNotification: shouldWriteDownPersonasSeedPhrase, showRadixBanner: showRadixBanner)
@@ -230,6 +231,7 @@ struct RadixBanner: View {
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
+
 struct HomeView_Previews: PreviewProvider {
 	static var previews: some SwiftUI.View {
 		Home.View(

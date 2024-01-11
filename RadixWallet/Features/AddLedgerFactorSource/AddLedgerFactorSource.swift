@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 public typealias LedgerDeviceInfo = P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
 
 // MARK: - AddLedgerFactorSource

@@ -36,32 +36,26 @@ extension Hash: @unchecked Sendable {}
 // MARK: - TransactionIntent + Sendable
 extension TransactionIntent: @unchecked Sendable {}
 
-// MARK: - ExecutionAnalysis + Sendable
-extension ExecutionAnalysis: @unchecked Sendable {}
-
 // MARK: - FeeLocks + Sendable
 extension FeeLocks: @unchecked Sendable {}
 
 // MARK: - FeeSummary + Sendable
 extension FeeSummary: @unchecked Sendable {}
 
-// MARK: - TransactionType + Sendable
-extension TransactionType: @unchecked Sendable {}
-
 // MARK: - ResourceSpecifier + Sendable
 extension ResourceSpecifier: @unchecked Sendable {}
-
-// MARK: - Resources + Sendable
-extension Resources: @unchecked Sendable {}
-
-// MARK: - ResourceTracker + Sendable
-extension ResourceTracker: @unchecked Sendable {}
-
-// MARK: - DecimalSource + Sendable
-extension DecimalSource: @unchecked Sendable {}
 
 // MARK: - MetadataValue + Sendable
 extension MetadataValue: @unchecked Sendable {}
 
 // MARK: - NonFungibleLocalId + Sendable
 extension NonFungibleLocalId: @unchecked Sendable {}
+
+// MARK: - ResourceIndicator + Sendable
+extension ResourceIndicator: @unchecked Sendable {}
+
+// MARK: - ResourcePreferenceUpdate + Sendable
+extension ResourcePreferenceUpdate: @unchecked Sendable {}
+
+// MARK: - AccountDefaultDepositRule + Sendable
+extension AccountDefaultDepositRule: @unchecked Sendable {}

@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension SelectFactorKindThenFactor.State {
 	var viewState: SelectFactorKindThenFactor.ViewState {
 		.init(role: role)
@@ -86,6 +87,7 @@ private extension View {
 // #if DEBUG
 // import SwiftUI
 import ComposableArchitecture //
+
 //// MARK: - SelectFactorKindThenFactor_Preview
 // struct SelectFactorKindThenFactor_Preview: PreviewProvider {
 //	static var previews: some View {

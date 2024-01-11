@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 public struct Main: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		// MARK: - Components

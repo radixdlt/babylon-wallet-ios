@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension View {
 	public func presentsDappInteractions() -> some View {
 		self.presentsDappInteractions(

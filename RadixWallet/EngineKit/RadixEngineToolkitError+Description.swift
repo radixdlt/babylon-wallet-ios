@@ -53,6 +53,8 @@ extension RadixEngineToolkitError: LocalizedError {
 			"DecimalError"
 		case let .SignerError(error):
 			"SignerError - \(error)"
+		case .InvalidReceipt:
+			"InvalidReceipt"
 		}
 
 		return Self.errorPrefix + errorMessage

@@ -1,4 +1,5 @@
 import CryptoKit
+
 public protocol ECPublicKey {
 	var rawRepresentation: Data { get }
 	var compressedRepresentation: Data { get }

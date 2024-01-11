@@ -1,4 +1,5 @@
 import CryptoKit
+
 extension Mnemonic {
 	/// Translates this mnemonic into the original entropy that was used to
 	/// create this mnemonic.

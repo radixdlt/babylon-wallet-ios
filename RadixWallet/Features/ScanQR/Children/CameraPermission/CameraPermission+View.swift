@@ -27,6 +27,7 @@ extension CameraPermission {
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
+
 struct CameraPermission_Preview: PreviewProvider {
 	static var previews: some View {
 		CameraPermission.View(

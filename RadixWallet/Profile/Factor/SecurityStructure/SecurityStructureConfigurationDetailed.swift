@@ -1,4 +1,5 @@
 import EngineToolkit
+
 public typealias SecurityStructureConfigurationDetailed = AbstractSecurityStructureConfiguration<FactorSource>
 
 extension SecurityStructureConfigurationDetailed {

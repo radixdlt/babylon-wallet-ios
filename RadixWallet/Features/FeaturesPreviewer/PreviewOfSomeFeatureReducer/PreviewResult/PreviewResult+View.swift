@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension PreviewResult {
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<PreviewResult<ResultFromFeature>>

@@ -1,4 +1,5 @@
 import CryptoKit
+
 public protocol ECPrivateKey {
 	associatedtype PublicKey: ECPublicKey
 	var publicKey: PublicKey { get }

@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension FungibleAssetList.Section {
 	public struct Row: Sendable, FeatureReducer {
 		public struct State: Sendable, Hashable, Identifiable {

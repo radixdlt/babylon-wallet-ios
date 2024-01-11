@@ -866,14 +866,13 @@ extension DappInteractionFlow {
 			}()
 		)
 
-		let sharedAccounts: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts?
-		if let (numberOfAccounts, accounts) = sharedAccountsInfo {
-			sharedAccounts = try .init(
+		let sharedAccounts: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts? = if let (numberOfAccounts, accounts) = sharedAccountsInfo {
+			try .init(
 				ids: OrderedSet(accounts.map(\.address)),
 				forRequest: numberOfAccounts
 			)
 		} else {
-			sharedAccounts = nil
+			nil
 		}
 
 		let sharedPersonaData: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData?

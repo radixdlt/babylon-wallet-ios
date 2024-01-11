@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension TransactionReviewAccounts.State {
 	var viewState: TransactionReviewAccounts.ViewState {
 		.init(showCustomizeGuaranteesButton: enableCustomizeGuarantees)

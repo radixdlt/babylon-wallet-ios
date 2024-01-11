@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension NewPersonaCompletion.State {
 	var viewState: NewPersonaCompletion.ViewState {
 		.init(state: self)

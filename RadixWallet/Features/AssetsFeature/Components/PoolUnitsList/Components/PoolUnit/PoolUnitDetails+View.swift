@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension PoolUnitDetails.State {
 	var viewState: PoolUnitDetails.ViewState {
 		let resource = poolUnit.resource

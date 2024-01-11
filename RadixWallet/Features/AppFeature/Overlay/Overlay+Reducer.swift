@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 struct OverlayReducer: Sendable, FeatureReducer {
 	struct State: Hashable, Sendable {
 		var itemsQueue: OrderedSet<OverlayWindowClient.Item> = []

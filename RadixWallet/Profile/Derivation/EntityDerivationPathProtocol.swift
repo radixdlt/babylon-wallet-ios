@@ -1,4 +1,5 @@
 import EngineToolkit
+
 extension HD.Path.Component.Child {
 	public static let bip44Purpose: Self = .init(nonHardenedValue: 44, isHardened: true)
 

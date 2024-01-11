@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension CreationOfAccount {
 	@MainActor
 	public struct View: SwiftUI.View {

@@ -106,7 +106,7 @@ struct ResourceChangeView: View {
 	}
 }
 
-extension ResourcePreferenceAction {
+extension ResourcePreferenceUpdate {
 	var description: String {
 		switch self {
 		case .remove:

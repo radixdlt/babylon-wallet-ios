@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension NewAccountCompletion.State {
 	var viewState: NewAccountCompletion.ViewState {
 		.init(state: self)

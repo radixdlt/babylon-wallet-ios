@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 	public typealias Store = StoreOf<Self>
 

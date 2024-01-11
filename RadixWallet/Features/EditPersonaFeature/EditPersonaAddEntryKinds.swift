@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 public typealias EntryKind = PersonaData.Entry.Kind
 
 // MARK: - EditPersonaAddEntryKinds

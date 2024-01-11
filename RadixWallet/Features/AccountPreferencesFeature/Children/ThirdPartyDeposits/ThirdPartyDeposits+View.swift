@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension ManageThirdPartyDeposits.State {
 	var viewState: ManageThirdPartyDeposits.ViewState {
 		.init(sections: [

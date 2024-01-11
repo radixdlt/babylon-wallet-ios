@@ -1,4 +1,5 @@
 import CryptoKit
+
 extension Mnemonic {
 	public static let wordSeparator: Character = " "
 

@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension NameSecurityStructure.State {
 	var viewState: NameSecurityStructure.ViewState {
 		.init(name: metadata.label)
@@ -54,6 +55,7 @@ extension NameSecurityStructure {
 // #if DEBUG
 // import SwiftUI
 import ComposableArchitecture //
+
 //// MARK: - NameNewSecurityStructure_Preview
 // struct NameNewSecurityStructure_Preview: PreviewProvider {
 //	static var previews: some View {

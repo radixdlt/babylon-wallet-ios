@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension NonFungibleTokenDetails.State {
 	var viewState: NonFungibleTokenDetails.ViewState {
 		.init(

@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension EditPersonaEntries {
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<EditPersonaEntries>

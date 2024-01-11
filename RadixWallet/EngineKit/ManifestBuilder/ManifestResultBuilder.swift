@@ -62,9 +62,9 @@ extension ManifestBuilder {
 	public static func make(@InstructionsChain _ content: () throws -> InstructionsChain.Instructions) throws -> ManifestBuilder {
 		var builder = ManifestBuilder()
 		// Collect all partial instructions to be built
-		try content().forEach {
+		for item in try content() {
 			// Build each instruction by updating the builder
-			builder = try $0(builder)
+			builder = try item(builder)
 		}
 		return builder
 	}
@@ -72,9 +72,9 @@ extension ManifestBuilder {
 	public static func make(@InstructionsChain _ content: () async throws -> InstructionsChain.Instructions) async throws -> ManifestBuilder {
 		var builder = ManifestBuilder()
 		// Collect all partial instructions to be built
-		try await content().forEach {
+		for item in try await content() {
 			// Build each instruction by updating the builder
-			builder = try $0(builder)
+			builder = try item(builder)
 		}
 		return builder
 	}

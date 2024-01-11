@@ -46,6 +46,7 @@ private extension View {
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
+
 struct NonFungibleTokenList_Preview: PreviewProvider {
 	static var previews: some View {
 		NonFungibleAssetList.View(

@@ -1,4 +1,5 @@
 import EngineToolkit
+
 extension PersonaData {
 	public struct EmailAddress: Sendable, Hashable, Codable, PersonaDataEntryProtocol, CustomStringConvertible {
 		public static var casePath: CasePath<PersonaData.Entry, Self> = /PersonaData.Entry.emailAddress

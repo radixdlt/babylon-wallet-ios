@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 public struct NormalFeesCustomization: FeatureReducer {
 	public struct State: Hashable, Sendable {
 		let fees: TransactionFee.NormalFeeCustomization

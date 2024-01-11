@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension AccountSecurity.State {
 	var viewState: AccountSecurity.ViewState {
 		.init(state: self)

@@ -54,6 +54,7 @@ extension FactorSourcesClient {
 }
 
 import AppPreferencesClient
+
 extension AppPreferencesClient {
 	static let previewApp: Self = update(noop) {
 		$0.updatePreferences = { _ in }

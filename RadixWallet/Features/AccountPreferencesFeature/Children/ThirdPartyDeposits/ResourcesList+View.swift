@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension ResourcesList.State {
 	// Need to disable, since broken in swiftformat 0.52.7
 	// swiftformat:disable redundantClosure

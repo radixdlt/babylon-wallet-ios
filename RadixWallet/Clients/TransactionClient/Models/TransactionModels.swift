@@ -233,7 +233,7 @@ public struct FeePayerCandidate: Sendable, Hashable, Identifiable {
 
 // MARK: - TransactionToReview
 public struct TransactionToReview: Sendable, Hashable {
-	public let analyzedManifestToReview: ExecutionAnalysis
+	public let analyzedManifestToReview: ExecutionSummary
 	public let networkID: NetworkID
 
 	public var transactionFee: TransactionFee
@@ -300,9 +300,9 @@ public struct FeePayerSelectionResult: Equatable, Sendable {
 	}
 }
 
-extension ExecutionAnalysis {
+extension ExecutionSummary {
 	func guranteesCost() throws -> RETDecimal {
-		let transaction = try transactionTypes.transactionKind()
+		let transaction = try transactionKind()
 		switch transaction {
 		case .nonConforming:
 			return .zero

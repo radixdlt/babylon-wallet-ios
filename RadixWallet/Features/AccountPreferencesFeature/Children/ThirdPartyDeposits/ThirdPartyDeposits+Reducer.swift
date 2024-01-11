@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 public typealias ThirdPartyDeposits = Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits
 
 // MARK: - ManageThirdPartyDeposits

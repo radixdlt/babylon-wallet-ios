@@ -31,6 +31,7 @@ struct AddTrustedContactPreviewApp: SwiftUI.App {
 }
 
 import FactorSourcesClient
+
 extension FactorSourcesClient {
 	static let previewApp: Self =
 		update(noop) {

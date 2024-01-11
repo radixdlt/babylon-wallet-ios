@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension EditPersonaField {
 	public struct ViewState: Equatable {
 		let primaryHeading: String

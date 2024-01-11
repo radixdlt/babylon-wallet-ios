@@ -45,6 +45,7 @@ extension App {
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
+
 struct AppView_Previews: PreviewProvider {
 	static var previews: some View {
 		App.View(

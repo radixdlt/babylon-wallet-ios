@@ -1,4 +1,5 @@
 import CryptoKit
+
 extension Mnemonic {
 	public enum Error: Swift.Error {
 		/// Might occur when trying to create a mnemonic from a list of words

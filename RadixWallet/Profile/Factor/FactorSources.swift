@@ -1,4 +1,5 @@
 import EngineToolkit
+
 public typealias FactorSources = NonEmpty<IdentifiedArrayOf<FactorSource>>
 
 extension FactorSources {
