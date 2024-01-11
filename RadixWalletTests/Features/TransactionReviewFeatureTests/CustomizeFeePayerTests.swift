@@ -18,7 +18,7 @@ final class CustomizeFeePayerTests: TestCase {
 
 		let state = CustomizeFees.State(
 			reviewedTransaction: transactionStub,
-			manifestSummary: manifestStub.summary(networkId: transactionStub.networkId.rawValue),
+			manifestSummary: manifestStub.summary(networkId: transactionStub.networkID.rawValue),
 			signingPurpose: .signTransaction(.internalManifest(.transfer))
 		)
 		let sut = TestStore(initialState: state) {
