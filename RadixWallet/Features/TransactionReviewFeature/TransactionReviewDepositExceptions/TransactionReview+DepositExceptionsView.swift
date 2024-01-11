@@ -107,8 +107,7 @@ extension ResourcePreferenceUpdate {
 		case .set(.disallowed):
 			AssetResource.iconDeclineAirdrop
 		case .remove:
-			// FIXME: Is this the correct icon?
-			AssetResource.iconAcceptKnownAirdrop
+			AssetResource.iconMinusCircle
 		}
 	}
 
