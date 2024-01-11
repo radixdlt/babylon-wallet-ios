@@ -9,7 +9,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 			case advanced(AdvancedFeesCustomization.State)
 		}
 
-		let executionSummary: ExecutionSummary
+		let manifestSummary: ManifestSummary
 		let signingPurpose: SigningPurpose
 		var reviewedTransaction: ReviewedTransaction
 		var modeState: CustomizationModeState
@@ -31,11 +31,11 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 
 		init(
 			reviewedTransaction: ReviewedTransaction,
-			executionSummary: ExecutionSummary,
+			manifestSummary: ManifestSummary,
 			signingPurpose: SigningPurpose
 		) {
 			self.reviewedTransaction = reviewedTransaction
-			self.executionSummary = executionSummary
+			self.manifestSummary = manifestSummary
 			self.signingPurpose = signingPurpose
 			self.modeState = reviewedTransaction.transactionFee.customizationModeState
 		}
@@ -144,13 +144,17 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 			let signingPurpose = state.signingPurpose
 
 			@Sendable
-			func replaceFeePayer(_ feePayer: FeePayerCandidate, _ reviewedTransaction: ReviewedTransaction, executionSummary: ExecutionSummary) -> Effect<Action> {
+			func replaceFeePayer(
+				_ feePayer: FeePayerCandidate,
+				_ reviewedTransaction: ReviewedTransaction,
+				manifestSummary: ManifestSummary
+			) -> Effect<Action> {
 				.run { send in
 					var reviewedTransaction = reviewedTransaction
 					var newSigners = OrderedSet(reviewedTransaction.transactionSigners.intentSignerEntitiesOrEmpty() + [.account(feePayer.account)])
 
 					/// Remove the previous Fee Payer Signature if it is not required
-					if let previousFeePayer, !executionSummary.accountsRequiringAuth.contains(where: { $0.addressString() == previousFeePayer.account.address.address }) {
+					if let previousFeePayer, !manifestSummary.accountsRequiringAuth.contains(where: { $0.addressString() == previousFeePayer.account.address.address }) {
 						// removed, need to recalculate signing factors
 						newSigners.remove(.account(previousFeePayer.account))
 					}
@@ -190,7 +194,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 				}
 			}
 
-			return replaceFeePayer(selection, state.reviewedTransaction, executionSummary: state.executionSummary)
+			return replaceFeePayer(selection, state.reviewedTransaction, manifestSummary: state.manifestSummary)
 
 		default:
 			return .none

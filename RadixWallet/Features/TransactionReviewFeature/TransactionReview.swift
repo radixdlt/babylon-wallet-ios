@@ -319,7 +319,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			state.destination = .customizeFees(.init(
 				reviewedTransaction: reviewedTransaction,
-				executionSummary: reviewedTransaction.executionSummary,
+				manifestSummary: state.transactionManifest.summary(networkId: reviewedTransaction.networkId.rawValue),
 				signingPurpose: .signTransaction(state.signTransactionPurpose)
 			))
 			return .none
@@ -341,7 +341,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				let reviewedTransaction = try ReviewedTransaction(
 					networkId: preview.networkID,
 					transaction: preview.analyzedManifestToReview.transactionKind(),
-					executionSummary: preview.analyzedManifestToReview,
 					feePayer: .loading,
 					transactionFee: preview.transactionFee,
 					transactionSigners: preview.transactionSigners,
@@ -1200,7 +1199,6 @@ public struct TransactionReviewFailure: LocalizedError {
 public struct ReviewedTransaction: Hashable, Sendable {
 	let networkId: NetworkID
 	let transaction: TransactionKind
-	let executionSummary: ExecutionSummary
 
 	var feePayer: Loadable<FeePayerCandidate?> = .idle
 
