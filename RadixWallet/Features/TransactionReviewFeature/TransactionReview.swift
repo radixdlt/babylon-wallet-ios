@@ -352,23 +352,18 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .send(.delegate(.failed(TransactionFailure.failedToPrepareTXReview(.failedToGenerateTXReview(error)))))
 
 		case let .previewLoaded(.success(preview)):
-			do {
-				let reviewedTransaction = ReviewedTransaction(
-					networkID: preview.networkID,
-					executionSummary: preview.analyzedManifestToReview,
-					feePayer: .loading,
-					transactionFee: preview.transactionFee,
-					transactionSigners: preview.transactionSigners,
-					signingFactors: preview.signingFactors
-				)
+			let reviewedTransaction = ReviewedTransaction(
+				networkID: preview.networkID,
+				executionSummary: preview.analyzedManifestToReview,
+				feePayer: .loading,
+				transactionFee: preview.transactionFee,
+				transactionSigners: preview.transactionSigners,
+				signingFactors: preview.signingFactors
+			)
 
-				state.reviewedTransaction = reviewedTransaction
-				return review(&state)
-					.concatenate(with: determineFeePayer(state, reviewedTransaction: reviewedTransaction))
-			} catch {
-				errorQueue.schedule(error)
-				return .none
-			}
+			state.reviewedTransaction = reviewedTransaction
+			return review(&state)
+				.concatenate(with: determineFeePayer(state, reviewedTransaction: reviewedTransaction))
 
 		case let .updateSections(sections):
 			state.withdrawals = sections.withdrawals
