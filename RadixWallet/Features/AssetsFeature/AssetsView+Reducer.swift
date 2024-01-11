@@ -279,6 +279,14 @@ extension AssetsView.State {
 	public var selectedAssets: Mode.SelectedAssets? {
 		guard case .selection = mode else { return nil }
 
+		let selectedLiquidStakeUnits: [OnLedgerEntity.OwnedFungibleResource] = stakeUnitList?.stakedValidators.compactMap {
+			if case let .success(.some(isSelected)) = $0.content.liquidStakeUnit.unwrap()?.isSelected, isSelected {
+				return stakeUnitList?.account.poolUnitResources.radixNetworkStakes[id: $0.id]?.stakeUnitResource
+			}
+
+			return nil
+		} ?? []
+
 		let selectedPoolUnitTokens = poolUnitsList?.poolUnits
 			.map(SelectedResourceProvider.init)
 			.compactMap(\.selectedResource) ?? []
@@ -297,7 +305,7 @@ extension AssetsView.State {
 
 		let selectedFungibleResources = OnLedgerEntity.OwnedFungibleResources(
 			xrdResource: selectedXRDResource,
-			nonXrdResources: selectedNonXrdResources + selectedPoolUnitTokens
+			nonXrdResources: selectedNonXrdResources + selectedLiquidStakeUnits + selectedPoolUnitTokens
 		)
 
 		let selectedNonFungibleTokensPerResource =

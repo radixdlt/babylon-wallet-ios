@@ -2,10 +2,10 @@
 struct StakeClaimNFTSView: View {
 	struct ViewState: Sendable, Hashable {
 		public let resource: OnLedgerEntity.Resource
-		public let sections: IdentifiedArrayOf<Section>
+		public var sections: IdentifiedArrayOf<Section>
 	}
 
-	public let viewState: ViewState
+	public var viewState: ViewState
 	public let onTap: (NonFungibleGlobalId) -> Void
 
 	public var body: some View {
@@ -55,40 +55,29 @@ extension StakeClaimNFTSView {
 	public struct StakeClaim: Sendable, Hashable, Identifiable {
 		let id: NonFungibleGlobalId
 		let worth: RETDecimal
-		let isSelected: Bool?
+		var isSelected: Bool?
 	}
 
 	public typealias StakeClaims = IdentifiedArrayOf<StakeClaim>
 
-	public enum Section: Sendable, Hashable, Identifiable {
-		var id: Int {
-			switch self {
-			case .unstaking:
-				0
-			case .readyToBeClaimed:
-				1
-			}
+	public struct Section: Sendable, Hashable, Identifiable {
+		public enum Kind: Sendable {
+			case unstaking
+			case readyToBeClaimed
 		}
 
-		case unstaking(StakeClaims)
-		case readyToBeClaimed(StakeClaims)
+		public let id: Kind
+		public var stakeClaims: StakeClaims
 	}
 }
 
 extension StakeClaimNFTSView.Section {
 	var title: String {
-		switch self {
+		switch self.id {
 		case .unstaking:
 			L10n.Account.Staking.unstaking
 		case .readyToBeClaimed:
 			L10n.Account.Staking.readyToBeClaimed
-		}
-	}
-
-	var stakeClaims: StakeClaimNFTSView.StakeClaims {
-		switch self {
-		case let .unstaking(claims), let .readyToBeClaimed(claims):
-			claims
 		}
 	}
 }

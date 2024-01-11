@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - ValidatorNameView
 struct ValidatorHeaderView: View {
-	struct ViewState: Equatable {
+	struct ViewState: Hashable {
 		let imageURL: URL?
 		let name: String
 		let stakedAmount: RETDecimal?

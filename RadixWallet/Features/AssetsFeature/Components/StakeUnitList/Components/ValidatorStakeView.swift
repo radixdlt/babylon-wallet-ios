@@ -3,16 +3,16 @@ import SwiftUI
 
 // MARK: - ValidatorStakeView
 struct ValidatorStakeView: View {
-	public struct ViewState: Sendable, Equatable, Identifiable {
+	public struct ViewState: Sendable, Hashable, Identifiable {
 		public var id: ValidatorAddress
 
-		struct Content: Sendable, Equatable {
+		struct Content: Sendable, Hashable {
 			let validatorNameViewState: ValidatorHeaderView.ViewState
-			let liquidStakeUnit: LiquidStakeUnitView.ViewState?
-			let stakeClaimNFTs: StakeClaimNFTSView.ViewState?
+			var liquidStakeUnit: LiquidStakeUnitView.ViewState?
+			var stakeClaimNFTs: StakeClaimNFTSView.ViewState?
 		}
 
-		let content: Loadable<Content>
+		var content: Loadable<Content>
 	}
 
 	let viewState: ViewState

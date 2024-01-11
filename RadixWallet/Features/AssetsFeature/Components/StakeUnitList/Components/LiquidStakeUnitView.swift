@@ -2,7 +2,7 @@ public struct LiquidStakeUnitView: View {
 	struct ViewState: Sendable, Hashable {
 		public let resource: OnLedgerEntity.Resource
 		public let worth: RETDecimal
-		public let isSelected: Bool?
+		public var isSelected: Bool?
 	}
 
 	let viewState: ViewState
