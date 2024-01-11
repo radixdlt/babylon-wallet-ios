@@ -317,7 +317,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			state.destination = .customizeFees(.init(
 				reviewedTransaction: reviewedTransaction,
-				manifestSummary: state.transactionManifest.summary(networkId: reviewedTransaction.networkId.rawValue),
+				manifestSummary: state.transactionManifest.summary(networkId: reviewedTransaction.networkID.rawValue),
 				signingPurpose: .signTransaction(state.signTransactionPurpose)
 			))
 			return .none
