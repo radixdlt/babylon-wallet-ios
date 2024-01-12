@@ -567,7 +567,7 @@
 "onboarding_eula_headerTitle" = "User Terms";
 "onboarding_eula_headerSubtitle" = "To proceed, you must accept the user terms below.";
 "onboarding_eula_accept" = "Accept";
-"splash_tapAnywhereToUnlock" = "Tap anywhere to unlock?";
+"splash_tapAnywhereToUnlock" = "Tap to unlock";
 "splash_passcodeNotSetTitle" = "Passcode not set up";
 "splash_passcodeNotSetMessage" = "This app requires your phone to have a passcode set up";
 "splash_incompatibleProfileVersionAlert_delete" = "Delete Wallet Data";
