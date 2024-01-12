@@ -97,6 +97,8 @@ extension TransactionReview {
 					.controlState(viewStore.viewControlState)
 					.background(.white)
 					.animation(.easeInOut, value: viewStore.isExpandedDappUsed)
+					.animation(.easeInOut, value: viewStore.isExpandedContributingToPools)
+					.animation(.easeInOut, value: viewStore.isExpandedRedeemingFromPools)
 					.toolbar {
 						ToolbarItem(placement: .automatic) {
 							if viewStore.canToggleViewMode {
@@ -135,7 +137,7 @@ extension TransactionReview {
 
 							withdrawalsSection
 
-							Group {
+							VStack(spacing: .medium1) {
 								contributingToPools(viewStore.contributingToPools, isExpanded: viewStore.isExpandedContributingToPools)
 
 //								redeemingFromPools(viewStore.redeemingFromPools, isExpanded: viewStore.isExpandedRedeemingFromPools)
@@ -150,6 +152,7 @@ extension TransactionReview {
 										.stroke(.app.gray3, style: .transactionReview)
 										.frame(width: 1)
 										.padding(.trailing, .huge3)
+										.padding(.top, -.medium1)
 								}
 							}
 

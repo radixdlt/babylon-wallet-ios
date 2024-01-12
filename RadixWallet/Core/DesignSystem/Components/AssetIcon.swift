@@ -10,18 +10,23 @@ public struct AssetIcon: View {
 	}
 
 	public init(_ content: Content, verySmall: Bool = true) {
+		self.init(content, size: verySmall ? .verySmall : .small)
+	}
+
+	public init(_ content: Content, size: HitTargetSize) {
 		switch content {
 		case let .asset(asset):
 			self.image = Image(asset: asset)
 		case let .systemImage(systemName):
 			self.image = Image(systemName: systemName)
 		}
-		self.hitTargetSize = verySmall ? .verySmall : .small
-		self.cornerRadius = verySmall ? .small3 : .small2
+		self.hitTargetSize = size
+		self.cornerRadius = size.cornerRadius
 	}
 
 	public var body: some View {
 		image
+			.resizable()
 			.frame(hitTargetSize)
 			.cornerRadius(cornerRadius)
 	}

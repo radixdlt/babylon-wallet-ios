@@ -18,7 +18,7 @@ public struct TransactionReviewAccounts: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case account(id: AccountAddress.ID, action: TransactionReviewAccount.Action)
+		case account(id: AccountAddress, action: TransactionReviewAccount.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -55,7 +55,7 @@ public struct TransactionReviewAccounts: Sendable, FeatureReducer {
 // MARK: - TransactionReviewAccount
 public struct TransactionReviewAccount: Sendable, FeatureReducer {
 	public struct State: Sendable, Identifiable, Hashable {
-		public var id: AccountAddress.ID { account.address.id }
+		public var id: AccountAddress { account.address }
 		public let account: TransactionReview.Account
 		public var transfers: IdentifiedArrayOf<TransactionReview.Transfer>
 

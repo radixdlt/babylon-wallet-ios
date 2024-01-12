@@ -1226,6 +1226,7 @@
 		A41266F12B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift */; };
 		A41266F72B160F3F00EA38E9 /* ManualAccountRecoveryCoordinator+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F62B160F3F00EA38E9 /* ManualAccountRecoveryCoordinator+Reducer.swift */; };
 		A41266F92B160F4C00EA38E9 /* ManualAccountRecoveryCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F82B160F4C00EA38E9 /* ManualAccountRecoveryCoordinator+View.swift */; };
+		A43715202B509BAE0010EA4A /* TransferPoolUnitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A437151F2B509BAE0010EA4A /* TransferPoolUnitView.swift */; };
 		A47571FF2B29B0860059A95D /* IOSSecuritySuite in Frameworks */ = {isa = PBXBuildFile; productRef = A47571FE2B29B0860059A95D /* IOSSecuritySuite */; };
 		A47572042B29B4EE0059A95D /* IOSSecurityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */; };
 		A47572052B29B4F20059A95D /* IOSSecurityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */; };
@@ -2548,6 +2549,7 @@
 		A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoverySeedPhrase+View.swift"; sourceTree = "<group>"; };
 		A41266F62B160F3F00EA38E9 /* ManualAccountRecoveryCoordinator+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryCoordinator+Reducer.swift"; sourceTree = "<group>"; };
 		A41266F82B160F4C00EA38E9 /* ManualAccountRecoveryCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryCoordinator+View.swift"; sourceTree = "<group>"; };
+		A437151F2B509BAE0010EA4A /* TransferPoolUnitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferPoolUnitView.swift; sourceTree = "<group>"; };
 		A47572012B29B3CA0059A95D /* IOSSecurityClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Live.swift"; sourceTree = "<group>"; };
 		A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Test.swift"; sourceTree = "<group>"; };
 		A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Interface.swift"; sourceTree = "<group>"; };
@@ -5948,6 +5950,7 @@
 				48CFC1012ADC10D900E77A5C /* CheckmarkView.swift */,
 				48CFC1022ADC10D900E77A5C /* AssetIcon.swift */,
 				48CFC1032ADC10D900E77A5C /* TransferNFTView.swift */,
+				A437151F2B509BAE0010EA4A /* TransferPoolUnitView.swift */,
 				48CFC1042ADC10D900E77A5C /* ForceFullScreen.swift */,
 				48CFC1052ADC10D900E77A5C /* Footer.swift */,
 				48CFC1062ADC10D900E77A5C /* JaggedEdge.swift */,
@@ -9068,6 +9071,7 @@
 				48CFC5692ADC10DA00E77A5C /* EntityMetadataItemValueAllOf.swift in Sources */,
 				48CFC36A2ADC10D900E77A5C /* FungibleAssetListSection+Reducer.swift in Sources */,
 				48CFC3A62ADC10D900E77A5C /* SignatureWithPublicKey.swift in Sources */,
+				A43715202B509BAE0010EA4A /* TransferPoolUnitView.swift in Sources */,
 				48CFC45A2ADC10DA00E77A5C /* LedgerHardwareWalletClient+Test.swift in Sources */,
 				48CFC29B2ADC10D900E77A5C /* TransactionReviewDappsUsed.swift in Sources */,
 				48CFC3C92ADC10D900E77A5C /* WordList+Japanese.swift in Sources */,

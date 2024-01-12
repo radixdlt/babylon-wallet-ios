@@ -309,6 +309,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					token: details,
 					ledgerState: transfer.resource.atLedgerState
 				))
+			case let .poolUnit(details):
+				return .none
 			}
 
 			return .none
@@ -595,43 +597,90 @@ extension TransactionReview {
 				networkID: networkID
 			)
 
-			let deposits = try? await extractDeposits(
+			let contributingToPools = try? extractPools(poolContributions)
+
+			var deposits = try await extractDeposits(
 				accountDeposits: summary.accountDeposits,
 				userAccounts: userAccounts,
 				networkID: networkID
 			)
 
-			let contributingToPools = try? extractPools(poolContributions)
+			let poolUnitAddresses = try poolContributions.map(\.poolUnitsResourceAddress).map {
+				try $0.asSpecific() as Address
+			}
+			let contributedAddresses = try poolContributions.flatMap(\.contributedResources.keys).map {
+				try Address(validatingAddress: $0)
+			}
 
-			print("PoolContribution •••••••••••••••••••••••")
-			func debugIndicator(ind: ResourceIndicator) -> String {
-				let addr = ind.resourceAddress.addressString().formatted(.full)
-				switch ind {
-				case let .fungible(_, indicator):
-					return "(fun) \(ind.transferType): \(indicator.amount.formatted()) \(addr)"
-				case let .nonFungible(_, indicator):
-					return "(non) \(ind.transferType): \(indicator.ids.count) \(addr)"
+			let poolAddresses = try poolAddresses.map { try $0.asSpecific() as Address }
+
+			let entities = try await onLedgerEntitiesClient.getEntities(
+				addresses: poolUnitAddresses + contributedAddresses + poolAddresses,
+				metadataKeys: .poolUnitMetadataKeys
+			)
+
+			// The entities for the pool units and the contributed resources
+			let resourceEntities = entities.compactMap(\.resource)
+
+			print("poolUnitEntities •••••••••••••••••••••••")
+
+			for poolUnitEntity in entities {
+				switch poolUnitEntity {
+				case let .resource(res):
+					print("  RES: \(res.title)")
+				case let .resourcePool(pool):
+					print("  POOL: \(pool.metadata.name ?? "nil") \(pool.metadata)")
+				default:
+					print("  OTHR: \(poolUnitEntity)")
 				}
+				print("   \(poolUnitEntity)")
 			}
 
-			print("addressesInManifest")
-			for address in summary.encounteredEntities {
-				print("  \(address.entityType())")
-				print("    \(address.asStr().formatted(.full))")
+			func findTransfer(amount: RETDecimal, resource: ResourceAddress) -> (AccountAddress, Transfer)? {
+				for account in deposits?.accounts ?? [] {
+					for transfer in account.transfers {
+						if transfer.resource.resourceAddress == resource, case let .fungible(details) = transfer.details, details.amount == amount {
+							return (account.id, transfer)
+						}
+					}
+				}
+				return nil
 			}
 
-			print("poolAddresses")
-			for poolAddress in poolAddresses {
-				print("  \(poolAddress.entityType())")
-				print("    \(poolAddress.asStr().formatted(.full))")
-			}
-
-			print("poolContributions")
 			for poolContribution in poolContributions {
+				let resourceAddress = try poolContribution.poolUnitsResourceAddress.asSpecific() as ResourceAddress
+
+				guard let poolUnitResource = resourceEntities.first(where: { $0.resourceAddress == resourceAddress }) else { continue }
+
+				guard let (account, transfer) = findTransfer(amount: poolContribution.poolUnitsAmount, resource: resourceAddress) else { continue }
+
+				let contributedResources = try poolContribution.contributedResources.mapKeys {
+					try ResourceAddress(validatingAddress: $0)
+				}
+
+				var resources: [Transfer.Details.PoolUnit.Resource] = []
+				for contribution in contributedResources {
+					if let entity = resourceEntities.first(where: { $0.id == contribution.key }) {
+						resources.append(.init(
+							isXRD: entity.resourceAddress.isXRD(on: networkID),
+							symbol: entity.metadata.symbol,
+							address: entity.resourceAddress,
+							icon: entity.metadata.iconURL,
+							amount: contribution.value
+						))
+					}
+				}
+
+				deposits?.accounts[id: account]?.transfers[id: transfer.id]?.details = .poolUnit(.init(
+					poolName: poolUnitResource.title,
+					resources: resources,
+					guarantee: transfer.fungibleGuarantee
+				))
+
 				print("  Addr: \(poolContribution.poolAddress.entityType()): \(poolContribution.poolAddress.asStr())")
 				print("  UAdr: \(poolContribution.poolUnitsResourceAddress.entityType()): \(poolContribution.poolUnitsResourceAddress.asStr())")
 				print("  Amnt: \(poolContribution.poolUnitsAmount.formattedPlain())")
-				print("  Rsrc: \(poolContribution.contributedResources.map(\.key))")
+				print("  Rsrc: \(poolContribution.contributedResources.mapValues { $0.formattedPlain() })")
 			}
 
 			return Sections(
@@ -641,7 +690,6 @@ extension TransactionReview {
 				conforming: true
 			)
 
-			return .init(conforming: true)
 		case let .poolRedemption(poolAddresses: poolAddresses, poolRedemptions: poolRedemptions):
 			return .init(conforming: false)
 		case let .validatorStake(validatorAddresses: validatorAddresses, validatorStakes: validatorStakes):
@@ -910,6 +958,8 @@ extension TransactionReview {
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
 		var withdrawals: [Account: [Transfer]] = [:]
+		print("••••• extractWithdrawals")
+
 		for (accountAddress, resources) in accountWithdraws {
 			let account = try userAccounts.account(for: .init(validatingAddress: accountAddress))
 			let transfers = try await resources.asyncFlatMap {
@@ -945,6 +995,7 @@ extension TransactionReview {
 		let defaultDepositGuarantee = await appPreferencesClient.getPreferences().transaction.defaultDepositGuarantee
 
 		var deposits: [Account: [Transfer]] = [:]
+		print("••••• extractDeposits")
 
 		for (accountAddress, accountDeposits) in accountDeposits {
 			let account = try userAccounts.account(for: .init(validatingAddress: accountAddress))
@@ -983,6 +1034,17 @@ extension TransactionReview {
 		defaultDepositGuarantee: RETDecimal = 1
 	) async throws -> [Transfer] {
 		let resourceAddress: ResourceAddress = try resourceQuantifier.resourceAddress.asSpecific()
+
+		func debugIndicator(ind: ResourceIndicator) -> String {
+			let addr = ind.resourceAddress.addressString().formatted(.full)
+			switch ind {
+			case let .fungible(_, indicator):
+				return "(fun) \(ind.transferType): \(indicator.amount.formatted()) \(addr)"
+			case let .nonFungible(_, indicator):
+				return "(non) \(ind.transferType): \(indicator.ids.count) \(addr)"
+			}
+		}
+		print("   • transferInfo: \(debugIndicator(ind: resourceQuantifier))")
 
 		func resourceInfo() async throws -> Either<OnLedgerEntity.Resource, [String: MetadataValue?]> {
 			if let newlyCreatedMetadata = metadataOfCreatedEntities?[resourceAddress.address] {
@@ -1100,7 +1162,6 @@ extension TransactionReview {
 		_ poolContributions: [TrackedPoolContribution]
 	) throws -> ContributingToPoolsState {
 		let pools = poolContributions.map(\.poolAddress).map { Pool(name: String($0.addressString().formatted(.default))) }
-		print("••• EXTRACT POOLS \(pools)")
 		return .init(pools: IdentifiedArray(uncheckedUniqueElements: pools))
 	}
 
@@ -1232,6 +1293,7 @@ extension TransactionReview {
 		public enum Details: Sendable, Hashable {
 			case fungible(Fungible)
 			case nonFungible(NonFungible)
+			case poolUnit(PoolUnit)
 
 			public struct Fungible: Sendable, Hashable {
 				public let isXRD: Bool
@@ -1240,6 +1302,21 @@ extension TransactionReview {
 			}
 
 			public typealias NonFungible = OnLedgerEntity.NonFungibleToken
+
+			public struct PoolUnit: Sendable, Hashable {
+				public let poolName: String
+				public let resources: [Resource]
+				public var guarantee: TransactionClient.Guarantee?
+
+				public struct Resource: Identifiable, Sendable, Hashable {
+					public var id: ResourceAddress { address }
+					public let isXRD: Bool
+					public let symbol: String?
+					public let address: ResourceAddress
+					public let icon: URL?
+					public let amount: RETDecimal
+				}
+			}
 		}
 
 		/// The guarantee, for a fungible resource
@@ -1267,7 +1344,7 @@ extension TransactionReview.State {
 		deposits?.accounts[id: accountID]?.transfers[id: transferID]?.fungibleGuarantee = updated
 	}
 
-	private func accountID(for transferID: TransactionReview.Transfer.ID) -> AccountAddress.ID? {
+	private func accountID(for transferID: TransactionReview.Transfer.ID) -> AccountAddress? {
 		for account in deposits?.accounts ?? [] {
 			for transfer in account.transfers {
 				if transfer.id == transferID {

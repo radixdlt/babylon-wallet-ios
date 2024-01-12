@@ -7,10 +7,9 @@ extension TransactionReview {
 	}
 
 	public struct Pool: Sendable, Identifiable, Hashable {
-//			public var id: AccountAddress.ID { account.address.id }
-//			public let account: Profile.Network.Account
 		public var id: String { name }
 		public let name: String
+		public let image: URL? = nil
 	}
 }
 
@@ -35,9 +34,15 @@ extension TransactionReview.View {
 
 			var body: some View {
 				Card {
-					PlainListRow(.asset(AssetResource.xrd), title: pool.name)
+					HStack(spacing: .medium3) {
+						AssetIcon(.asset(AssetResource.xrd), verySmall: false)
+
+						Text(pool.name)
+							.textStyle(.body1Header)
+							.foregroundColor(.app.gray1)
+					}
 				}
-				.cardShadow
+//				.cardShadow
 			}
 		}
 	}
