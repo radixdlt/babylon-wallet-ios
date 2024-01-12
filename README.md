@@ -45,3 +45,9 @@ The iOS Radix Wallet code is released under the [Apache 2.0 license](./LICENSE).
       See the License for the specific language governing permissions and limitations under the License.
 
 
+[dashboard]: https://dashboard.radixdlt.com
+[radixdlt]: https://radixdlt.com
+[appStoreLink]: https://apps.apple.com/se/app/radix-wallet/id6448950995
+[walletGuide]: https://wallet.radixdlt.com
+
+
