@@ -27,7 +27,7 @@ public struct StakeClaimNFTSView: View {
 	public let onClaimAllTapped: () -> Void
 
 	public var body: some View {
-		VStack(alignment: .leading, spacing: .small2) {
+		VStack(alignment: .leading, spacing: .small1) {
 			HStack {
 				TokenThumbnail(.known(viewState.resourceMetadata.iconURL), size: .smaller)
 				Text(viewState.resourceMetadata.name ?? "Stake Claim NFTs")
@@ -60,7 +60,7 @@ public struct StakeClaimNFTSView: View {
 				if case .readyToBeClaimed = kind,
 				   viewState.selectedStakeClaims == nil // No selection mode
 				{
-					Button("Claim") {
+					Text("Claim").onTapGesture {
 						onClaimAllTapped()
 					}
 					.textStyle(.body2Link)

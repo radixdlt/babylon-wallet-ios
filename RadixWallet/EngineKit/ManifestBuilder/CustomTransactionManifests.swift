@@ -7,10 +7,9 @@ extension ManifestBuilder {
 		public let ids: [NonFungibleLocalId]
 	}
 
-	public static func stakeClaimManifest(
+	public static func stakeClaimsManifest(
 		accountAddress: AccountAddress,
-		stakeClaims: [StakeClaim],
-		networkId: UInt8
+		stakeClaims: [StakeClaim]
 	) throws -> TransactionManifest {
 		try make {
 			for stakeClaim in stakeClaims {
@@ -25,7 +24,7 @@ extension ManifestBuilder {
 			}
 			try accountDepositEntireWorktop(accountAddress.intoEngine())
 		}
-		.build(networkId: networkId)
+		.build(networkId: accountAddress.intoEngine().networkId())
 	}
 }
 

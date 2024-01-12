@@ -221,8 +221,8 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 
 //	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 //		switch presentedAction {
-//		case let .stakeClaimDetails(.delegate(.tappedClaimStake(id, stakeClaim))):
-//			try! sendStakeClaimTransaction(
+//		case let .stakeClaimDetails(.delegate(.tappedClaimStake(stakeClaim))):
+//			return sendStakeClaimTransaction(
 //				state.account.address,
 //				stakeClaims: [
 //					.init(
@@ -253,17 +253,16 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 
 	private func sendStakeClaimTransaction(_ acccountAddress: AccountAddress, stakeClaims: [ManifestBuilder.StakeClaim]) -> Effect<Action> {
 		.run { _ in
-			let manifest = try ManifestBuilder.stakeClaimManifest(
+			let manifest = try ManifestBuilder.stakeClaimsManifest(
 				accountAddress: acccountAddress,
-				stakeClaims: stakeClaims,
-				networkId: acccountAddress.intoEngine().networkId()
+				stakeClaims: stakeClaims
 			)
 			_ = await dappInteractionClient.addWalletInteraction(
 				.transaction(.init(
 					send: .init(
 						version: .default,
 						transactionManifest: manifest,
-						message: ""
+						message: nil
 					)
 				)),
 				.accountTransfer
@@ -277,9 +276,9 @@ extension StakeUnitList {
 		_ state: inout State,
 		details: IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>
 	) {
-		let allSelectedTokens = state.selectedStakeClaimTokens?.values.flatMap { $0 }
-		let stakeClaims = details.compactMap(\.stakeClaimTokens).flatMap(\.stakeClaims)
+		let allSelectedTokens = state.selectedStakeClaimTokens?.values.flatMap { $0 }.map(\.id).asIdentifiable()
 
+		let stakeClaims = details.compactMap(\.stakeClaimTokens).flatMap(\.stakeClaims)
 		let stakedAmount = details.map(\.xrdRedemptionValue).reduce(.zero(), +)
 		let unstakingAmount = stakeClaims.filter(not(\.isReadyToBeClaimed)).map(\.claimAmount).reduce(.zero(), +)
 		let readyToClaimAmount = stakeClaims.filter(\.isReadyToBeClaimed).map(\.claimAmount).reduce(.zero(), +)
@@ -298,7 +297,7 @@ extension StakeUnitList {
 					)
 				},
 				stakeClaimNFTs: stake.stakeClaimTokens.map { stakeClaimTokens in
-					StakeClaimNFTSView.ViewState(stakeClaimTokens: stakeClaimTokens, selectedStakeClaims: nil)
+					StakeClaimNFTSView.ViewState(stakeClaimTokens: stakeClaimTokens, selectedStakeClaims: allSelectedTokens)
 				}
 			)
 
