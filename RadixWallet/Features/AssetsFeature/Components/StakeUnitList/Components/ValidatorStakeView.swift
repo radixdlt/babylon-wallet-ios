@@ -19,6 +19,7 @@ struct ValidatorStakeView: View {
 	@State var isExpanded: Bool = false
 	var onLiquidStakeUnitTapped: () -> Void
 	var onStakeClaimTokenTapped: (StakeClaimNFTSView.StakeClaim) -> Void
+	var onClaimAllStakeClaimsTapped: () -> Void
 
 	public var body: some SwiftUI.View {
 		loadable(viewState.content) { content in
@@ -38,8 +39,12 @@ struct ValidatorStakeView: View {
 				}
 
 				if let stakeClaimNFTsViewState = content.stakeClaimNFTs {
-					stakeClaimNFTsView(viewState: stakeClaimNFTsViewState, handleTapGesture: onStakeClaimTokenTapped)
-						.rowStyle()
+					stakeClaimNFTsView(
+						viewState: stakeClaimNFTsViewState,
+						handleTapGesture: onStakeClaimTokenTapped,
+						onClaimAllTapped: onClaimAllStakeClaimsTapped
+					)
+					.rowStyle()
 				}
 			}
 		}
@@ -61,14 +66,15 @@ struct ValidatorStakeView: View {
 
 	private func stakeClaimNFTsView(
 		viewState: StakeClaimNFTSView.ViewState,
-		handleTapGesture: @escaping (StakeClaimNFTSView.StakeClaim) -> Void
+		handleTapGesture: @escaping (StakeClaimNFTSView.StakeClaim) -> Void,
+		onClaimAllTapped: @escaping () -> Void
 	) -> some SwiftUI.View {
 		VStack(spacing: .zero) {
 			Divider()
 				.frame(height: .small3)
 				.overlay(.app.gray5)
 
-			StakeClaimNFTSView(viewState: viewState, onTap: handleTapGesture)
+			StakeClaimNFTSView(viewState: viewState, onTap: handleTapGesture, onClaimAllTapped: onClaimAllTapped)
 				.padding(.medium1)
 		}
 	}

@@ -7,6 +7,7 @@ public struct StakeClaimNFTSView: View {
 
 	public var viewState: ViewState
 	public let onTap: (StakeClaim) -> Void
+	public let onClaimAllTapped: () -> Void
 
 	public var body: some View {
 		VStack(alignment: .leading, spacing: .small2) {
@@ -27,11 +28,22 @@ public struct StakeClaimNFTSView: View {
 	@ViewBuilder
 	func sectionView(_ section: Section) -> some View {
 		VStack(alignment: .leading, spacing: .small2) {
-			Text(section.title)
-				.textStyle(.body2HighImportance)
-				.foregroundColor(.app.gray2)
-				.textCase(.uppercase)
+			HStack {
+				Text(section.title)
+					.textStyle(.body2HighImportance)
+					.foregroundColor(.app.gray2)
+					.textCase(.uppercase)
 
+				Spacer()
+
+				if case let .readyToBeClaimed(canBeClaimed) = section.id, canBeClaimed {
+					Button("Claim") {
+						onClaimAllTapped()
+					}
+					.textStyle(.body2Link)
+					.foregroundColor(.app.blue1)
+				}
+			}
 			ForEach(section.stakeClaims) { claim in
 				HStack {
 					TokenBalanceView.xrd(balance: claim.worth)
@@ -61,9 +73,9 @@ extension StakeClaimNFTSView {
 	public typealias StakeClaims = IdentifiedArrayOf<StakeClaim>
 
 	public struct Section: Sendable, Hashable, Identifiable {
-		public enum Kind: Sendable {
+		public enum Kind: Sendable, Hashable {
 			case unstaking
-			case readyToBeClaimed
+			case readyToBeClaimed(canBeClaimed: Bool)
 		}
 
 		public let id: Kind

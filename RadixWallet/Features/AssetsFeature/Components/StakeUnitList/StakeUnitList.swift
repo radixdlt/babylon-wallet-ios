@@ -20,7 +20,12 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 			self.account = account
 			self.selectedLiquidStakeUnits = selectedLiquidStakeUnits
 			self.selectedStakeClaimTokens = selectedStakeClaimTokens
-			self.stakeSummary = .init(staked: .loading, unstaking: .loading, readyToClaim: .loading)
+			self.stakeSummary = .init(
+				staked: .loading,
+				unstaking: .loading,
+				readyToClaim: .loading,
+				canClaimStakes: selectedStakeClaimTokens == nil
+			)
 			self.stakedValidators = account.poolUnitResources.radixNetworkStakes.map {
 				ValidatorStakeView.ViewState(id: $0.validatorAddress, content: .loading)
 			}.asIdentifiable()
@@ -32,6 +37,8 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		case refresh
 		case didTapLiquidStakeUnit(forValidator: ValidatorAddress)
 		case didTapStakeClaimNFT(forValidator: ValidatorAddress, claim: StakeClaimNFTSView.StakeClaim)
+		case didTapClaimAll(forValidator: ValidatorAddress)
+		case didTapClaimAllStakes
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -157,9 +164,51 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 				resourceDetails: .success(stakeClaimTokens.resource),
 				token: token,
 				ledgerState: stakeClaimTokens.resource.atLedgerState,
-				stakeClaim: .init(amount: stakeClaim.worth, remainingEpochsUntilClaim: 0, validatorAddress: validatorAddress)
+				stakeClaim: .init(
+					amount: stakeClaim.worth,
+					remainingEpochsUntilClaim: Int(token.data!.claimEpoch!) - Int(stakeDetails.currentEpoch.rawValue),
+					validatorAddress: validatorAddress
+				)
 			))
 			return .none
+
+		case let .didTapClaimAll(validatorAddress):
+			guard case let .success(stakeDetails) = state.stakeDetails,
+			      let stakeClaim = stakeDetails[id: validatorAddress]?.stakeClaimTokens
+			else {
+				return .none
+			}
+
+			return sendStakeClaimTransaction(
+				state.account.address,
+				stakeClaims: [
+					.init(
+						validatorAddress: validatorAddress,
+						resourceAddress: stakeClaim.resource.resourceAddress,
+						ids: stakeClaim.readyToClaim.map { $0.id.localId() }
+					),
+				]
+			)
+
+		case .didTapClaimAllStakes:
+			guard case let .success(stakeDetails) = state.stakeDetails else {
+				return .none
+			}
+
+			return sendStakeClaimTransaction(
+				state.account.address,
+				stakeClaims: stakeDetails.compactMap { stake in
+					guard let stakeClaims = stake.stakeClaimTokens, !stakeClaims.readyToClaim.isEmpty else {
+						return nil
+					}
+
+					return .init(
+						validatorAddress: stake.validator.address,
+						resourceAddress: stakeClaims.resource.resourceAddress,
+						ids: stakeClaims.readyToClaim.map { $0.id.localId() }
+					)
+				}
+			)
 		}
 	}
 
@@ -180,7 +229,16 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .stakeClaimDetails(.delegate(.tappedClaimStake(id, stakeClaim))):
-			sendStakeClaimTransaction(state, validatorAddress: stakeClaim.validatorAddress, ids: [id])
+			try! sendStakeClaimTransaction(
+				state.account.address,
+				stakeClaims: [
+					.init(
+						validatorAddress: stakeClaim.validatorAddress,
+						resourceAddress: id.resourceAddress().asSpecific(),
+						ids: [id.localId()]
+					),
+				]
+			)
 		case .stakeClaimDetails, .details:
 			.none
 		}
@@ -200,14 +258,12 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		}
 	}
 
-	private func sendStakeClaimTransaction(_ state: State, validatorAddress: ValidatorAddress, ids: [NonFungibleGlobalId]) -> Effect<Action> {
+	private func sendStakeClaimTransaction(_ acccountAddress: AccountAddress, stakeClaims: [ManifestBuilder.StakeClaim]) -> Effect<Action> {
 		.run { _ in
 			let manifest = try ManifestBuilder.stakeClaimManifest(
-				accountAddress: state.account.address.intoEngine(),
-				validatorAddress: validatorAddress.intoEngine(),
-				resourceAddress: ids.first!.resourceAddress(),
-				networkId: state.account.address.intoEngine().networkId(),
-				ids: ids.map { $0.localId() }
+				accountAddress: acccountAddress,
+				stakeClaims: stakeClaims,
+				networkId: acccountAddress.intoEngine().networkId()
 			)
 			_ = await dappInteractionClient.addWalletInteraction(
 				.transaction(.init(
@@ -268,7 +324,10 @@ extension StakeUnitList {
 					sections.append(.init(id: .unstaking, stakeClaims: unstakingTokens))
 				}
 				if !readyToClaimTokens.isEmpty {
-					sections.append(.init(id: .readyToBeClaimed, stakeClaims: readyToClaimTokens))
+					sections.append(.init(
+						id: .readyToBeClaimed(canBeClaimed: state.selectedStakeClaimTokens == nil),
+						stakeClaims: readyToClaimTokens
+					))
 				}
 				stakeClaimNFTsViewState = StakeClaimNFTSView.ViewState(resource: stakeClaimTokens.resource, sections: sections)
 			}
@@ -292,7 +351,8 @@ extension StakeUnitList {
 		state.stakeSummary = .init(
 			staked: .success(stakedAmount),
 			unstaking: .success(unstakingAmount),
-			readyToClaim: .success(readyToClaimAmount)
+			readyToClaim: .success(readyToClaimAmount),
+			canClaimStakes: state.selectedStakeClaimTokens == nil
 		)
 
 		state.stakedValidators = validatorStakes

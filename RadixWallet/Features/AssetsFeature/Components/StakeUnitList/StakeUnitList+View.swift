@@ -22,9 +22,11 @@ public extension StakeUnitList {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				Section {
-					StakeSummaryView(viewState: viewStore.stakeSummary) {}
-						.rowStyle()
-						.padding(.medium1)
+					StakeSummaryView(viewState: viewStore.stakeSummary) {
+						viewStore.send(.view(.didTapClaimAllStakes))
+					}
+					.rowStyle()
+					.padding(.medium1)
 				}
 
 				Section {
@@ -61,6 +63,9 @@ public extension StakeUnitList {
 				},
 				onStakeClaimTokenTapped: { claim in
 					store.send(.view(.didTapStakeClaimNFT(forValidator: viewState.id, claim: claim)))
+				},
+				onClaimAllStakeClaimsTapped: {
+					store.send(.view(.didTapClaimAll(forValidator: viewState.id)))
 				}
 			)
 		}

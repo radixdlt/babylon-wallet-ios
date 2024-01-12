@@ -1,23 +1,29 @@
 import EngineToolkit
 
 extension ManifestBuilder {
+	public struct StakeClaim: Sendable {
+		public let validatorAddress: ValidatorAddress
+		public let resourceAddress: ResourceAddress
+		public let ids: [NonFungibleLocalId]
+	}
+
 	public static func stakeClaimManifest(
-		accountAddress: EngineToolkit.Address,
-		validatorAddress: EngineToolkit.Address,
-		resourceAddress: EngineToolkit.Address,
-		networkId: UInt8,
-		ids: [NonFungibleLocalId]
+		accountAddress: AccountAddress,
+		stakeClaims: [StakeClaim],
+		networkId: UInt8
 	) throws -> TransactionManifest {
-		let bucket = ManifestBuilderBucket.unique
-		return try make {
-			accountWithdrawNonFungibles(
-				accountAddress,
-				resourceAddress,
-				ids
-			)
-			takeAllFromWorktop(resourceAddress, bucket)
-			validatorClaimXrd(validatorAddress, bucket)
-			accountDepositEntireWorktop(accountAddress)
+		try make {
+			for stakeClaim in stakeClaims {
+				let bucket = ManifestBuilderBucket.unique
+				try accountWithdrawNonFungibles(
+					accountAddress.intoEngine(),
+					stakeClaim.resourceAddress.intoEngine(),
+					stakeClaim.ids
+				)
+				try takeAllFromWorktop(stakeClaim.resourceAddress.intoEngine(), bucket)
+				try validatorClaimXrd(stakeClaim.validatorAddress.intoEngine(), bucket)
+			}
+			try accountDepositEntireWorktop(accountAddress.intoEngine())
 		}
 		.build(networkId: networkId)
 	}

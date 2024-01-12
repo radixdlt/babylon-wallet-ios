@@ -4,6 +4,7 @@ public struct StakeSummaryView: View {
 		public let staked: Loadable<RETDecimal>
 		public let unstaking: Loadable<RETDecimal>
 		public let readyToClaim: Loadable<RETDecimal>
+		public let canClaimStakes: Bool
 	}
 
 	public let viewState: ViewState
@@ -22,7 +23,16 @@ public struct StakeSummaryView: View {
 			VStack(spacing: .small2) {
 				summaryRow(L10n.Account.Staking.staked, amount: viewState.staked)
 				summaryRow(L10n.Account.Staking.unstaking, amount: viewState.unstaking)
-				summaryRow(L10n.Account.Staking.readyToClaim, amount: viewState.readyToClaim)
+				summaryRow(
+					L10n.Account.Staking.readyToClaim,
+					amount: viewState.readyToClaim,
+					textColor: viewState.canClaimStakes ? .app.blue2 : .app.gray2
+				)
+				.onTapGesture {
+					if viewState.canClaimStakes {
+						onReadyToClaimTapped()
+					}
+				}
 			}
 		}
 	}
@@ -30,11 +40,15 @@ public struct StakeSummaryView: View {
 
 extension StakeSummaryView {
 	@ViewBuilder
-	private func summaryRow(_ name: String, amount: Loadable<RETDecimal>) -> some View {
+	private func summaryRow(
+		_ name: String,
+		amount: Loadable<RETDecimal>,
+		textColor: Color = .app.gray2
+	) -> some View {
 		HStack {
 			Text(name)
 				.textStyle(.body2HighImportance)
-				.foregroundColor(.app.gray2)
+				.foregroundColor(textColor)
 				.padding(.trailing, .medium3)
 			Spacer()
 			loadable(amount) { amount in
