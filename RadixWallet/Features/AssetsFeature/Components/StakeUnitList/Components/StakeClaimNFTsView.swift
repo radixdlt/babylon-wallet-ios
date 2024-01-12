@@ -1,42 +1,65 @@
 // MARK: - StakeClaimNFTSView
 public struct StakeClaimNFTSView: View {
 	public struct ViewState: Sendable, Hashable {
-		public let resource: OnLedgerEntity.Resource
-		public var sections: IdentifiedArrayOf<Section>
+		public let stakeClaimTokens: OnLedgerEntitiesClient.NonFunbileResourceWithTokens
+		var selectedStakeClaims: IdentifiedArrayOf<NonFungibleGlobalId>?
+
+		var unstaking: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim> {
+			stakeClaimTokens.stakeClaims.filter(not(\.isReadyToBeClaimed))
+		}
+
+		var readyToBeClaimed: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim> {
+			stakeClaimTokens.stakeClaims.filter(\.isReadyToBeClaimed)
+		}
+
+		var resourceMetadata: OnLedgerEntity.Metadata {
+			stakeClaimTokens.resource.metadata
+		}
+	}
+
+	enum SectionKind {
+		case unstaking
+		case readyToBeClaimed
 	}
 
 	public var viewState: ViewState
-	public let onTap: (StakeClaim) -> Void
+	public let onTap: (OnLedgerEntitiesClient.StakeClaim) -> Void
 	public let onClaimAllTapped: () -> Void
 
 	public var body: some View {
 		VStack(alignment: .leading, spacing: .small2) {
 			HStack {
-				TokenThumbnail(.known(viewState.resource.metadata.iconURL), size: .smaller)
-				Text(viewState.resource.metadata.name ?? "Stake Claim NFTs")
+				TokenThumbnail(.known(viewState.resourceMetadata.iconURL), size: .smaller)
+				Text(viewState.resourceMetadata.name ?? "Stake Claim NFTs")
 					.textStyle(.body1Header)
 
 				Spacer()
 			}
 
-			ForEach(viewState.sections) { section in
-				sectionView(section)
+			if !viewState.unstaking.isEmpty {
+				sectionView(viewState.unstaking, kind: .unstaking)
+			}
+
+			if !viewState.readyToBeClaimed.isEmpty {
+				sectionView(viewState.readyToBeClaimed, kind: .readyToBeClaimed)
 			}
 		}
 	}
 
 	@ViewBuilder
-	func sectionView(_ section: Section) -> some View {
+	func sectionView(_ claims: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim>, kind: SectionKind) -> some View {
 		VStack(alignment: .leading, spacing: .small2) {
 			HStack {
-				Text(section.title)
+				Text(kind.title)
 					.textStyle(.body2HighImportance)
 					.foregroundColor(.app.gray2)
 					.textCase(.uppercase)
 
 				Spacer()
 
-				if case let .readyToBeClaimed(canBeClaimed) = section.id, canBeClaimed {
+				if case .readyToBeClaimed = kind,
+				   viewState.selectedStakeClaims == nil // No selection mode
+				{
 					Button("Claim") {
 						onClaimAllTapped()
 					}
@@ -44,11 +67,11 @@ public struct StakeClaimNFTSView: View {
 					.foregroundColor(.app.blue1)
 				}
 			}
-			ForEach(section.stakeClaims) { claim in
+			ForEach(claims) { claim in
 				HStack {
-					TokenBalanceView.xrd(balance: claim.worth)
+					TokenBalanceView.xrd(balance: claim.claimAmount)
 
-					if let isSelected = claim.isSelected {
+					if let isSelected = viewState.selectedStakeClaims?.contains(claim.id) {
 						CheckmarkView(appearance: .dark, isChecked: isSelected)
 					}
 				}
@@ -63,29 +86,9 @@ public struct StakeClaimNFTSView: View {
 	}
 }
 
-extension StakeClaimNFTSView {
-	public struct StakeClaim: Sendable, Hashable, Identifiable {
-		public let id: NonFungibleGlobalId
-		public let worth: RETDecimal
-		public var isSelected: Bool?
-	}
-
-	public typealias StakeClaims = IdentifiedArrayOf<StakeClaim>
-
-	public struct Section: Sendable, Hashable, Identifiable {
-		public enum Kind: Sendable, Hashable {
-			case unstaking
-			case readyToBeClaimed(canBeClaimed: Bool)
-		}
-
-		public let id: Kind
-		public var stakeClaims: StakeClaims
-	}
-}
-
-extension StakeClaimNFTSView.Section {
+extension StakeClaimNFTSView.SectionKind {
 	var title: String {
-		switch self.id {
+		switch self {
 		case .unstaking:
 			L10n.Account.Staking.unstaking
 		case .readyToBeClaimed:

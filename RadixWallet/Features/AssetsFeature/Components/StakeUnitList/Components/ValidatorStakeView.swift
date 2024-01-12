@@ -18,7 +18,7 @@ struct ValidatorStakeView: View {
 	let viewState: ViewState
 	@State var isExpanded: Bool = false
 	var onLiquidStakeUnitTapped: () -> Void
-	var onStakeClaimTokenTapped: (StakeClaimNFTSView.StakeClaim) -> Void
+	var onStakeClaimTokenTapped: (OnLedgerEntitiesClient.StakeClaim) -> Void
 	var onClaimAllStakeClaimsTapped: () -> Void
 
 	public var body: some SwiftUI.View {
@@ -66,7 +66,7 @@ struct ValidatorStakeView: View {
 
 	private func stakeClaimNFTsView(
 		viewState: StakeClaimNFTSView.ViewState,
-		handleTapGesture: @escaping (StakeClaimNFTSView.StakeClaim) -> Void,
+		handleTapGesture: @escaping (OnLedgerEntitiesClient.StakeClaim) -> Void,
 		onClaimAllTapped: @escaping () -> Void
 	) -> some SwiftUI.View {
 		VStack(spacing: .zero) {

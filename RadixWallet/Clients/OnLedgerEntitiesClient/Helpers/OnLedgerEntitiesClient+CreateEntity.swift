@@ -460,18 +460,23 @@ extension OnLedgerEntitiesClient {
 						mode: .loadAll
 					)).tokens
 
-					var unstakingTokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken> = []
-					var readyToClaimTokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken> = []
+					return .init(
+						resource: stakeClaimResourceDetails,
+						stakeClaims: tokens.compactMap { token -> OnLedgerEntitiesClient.StakeClaim? in
+							guard let claimEpoch = token.data?.claimEpoch,
+							      let claimAmount = token.data?.claimAmount, claimAmount > 0
+							else {
+								return nil
+							}
 
-					for token in tokens {
-						if let claimEpoch = token.data?.claimEpoch, claimEpoch > currentEpoch {
-							unstakingTokens.append(token)
-						} else {
-							readyToClaimTokens.append(token)
-						}
-					}
-
-					return .init(resource: stakeClaimResourceDetails, unstaking: unstakingTokens, readyToClaim: readyToClaimTokens)
+							return OnLedgerEntitiesClient.StakeClaim(
+								validatorAddress: stake.validatorAddress,
+								token: token,
+								claimAmount: claimAmount,
+								reamainingEpochsUntilClaim: Int(claimEpoch) - Int(currentEpoch.rawValue)
+							)
+						}.asIdentifiable()
+					)
 				}
 
 				return nil
@@ -567,10 +572,24 @@ extension OnLedgerEntitiesClient {
 		public let amount: RETDecimal
 	}
 
+	public struct StakeClaim: Hashable, Sendable, Identifiable {
+		public var id: NonFungibleGlobalId {
+			token.id
+		}
+
+		let validatorAddress: ValidatorAddress
+		let token: OnLedgerEntity.NonFungibleToken
+		let claimAmount: RETDecimal
+		let reamainingEpochsUntilClaim: Int
+
+		var isReadyToBeClaimed: Bool {
+			reamainingEpochsUntilClaim <= .zero
+		}
+	}
+
 	public struct NonFunbileResourceWithTokens: Hashable, Sendable {
 		public let resource: OnLedgerEntity.Resource
-		public let unstaking: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>
-		public let readyToClaim: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>
+		public let stakeClaims: IdentifiedArrayOf<StakeClaim>
 	}
 }
 

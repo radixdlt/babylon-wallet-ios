@@ -23,7 +23,7 @@ extension NonFungibleTokenDetails.State {
 }
 
 extension NonFungibleTokenDetails.ViewState.TokenDetails {
-	init(token: OnLedgerEntity.NonFungibleToken, stakeClaim: NonFungibleTokenDetails.State.StakeClaim?) {
+	init(token: OnLedgerEntity.NonFungibleToken, stakeClaim: OnLedgerEntitiesClient.StakeClaim?) {
 		self.init(
 			keyImage: token.data?.keyImageURL,
 			nonFungibleGlobalID: token.id,
@@ -47,7 +47,7 @@ extension NonFungibleTokenDetails {
 			let nonFungibleGlobalID: NonFungibleGlobalId
 			let name: String?
 			let description: String?
-			let stakeClaim: State.StakeClaim?
+			let stakeClaim: OnLedgerEntitiesClient.StakeClaim?
 			let dataFields: [ArbitraryDataField]
 		}
 	}
@@ -87,7 +87,7 @@ extension NonFungibleTokenDetails {
 										viewStore.send(.tappedClaimStake)
 									}
 									.buttonStyle(.primaryRectangular)
-									.controlState(stakeClaim.isReadyToClaim ? .enabled : .disabled)
+									.controlState(stakeClaim.isReadyToBeClaimed ? .enabled : .disabled)
 								}
 
 								if !tokenDetails.dataFields.isEmpty {
@@ -182,17 +182,13 @@ extension NonFungibleTokenDetails {
 	}
 }
 
-extension NonFungibleTokenDetails.State.StakeClaim {
+extension OnLedgerEntitiesClient.StakeClaim {
 	var description: String {
-		if isReadyToClaim {
-			L10n.AssetDetails.Staking.readyToClaim(amount.formatted())
+		if isReadyToBeClaimed {
+			L10n.AssetDetails.Staking.readyToClaim(claimAmount.formatted())
 		} else {
-			L10n.AssetDetails.Staking.unstaking(amount.formatted(), remainingEpochsUntilClaim * 5)
+			L10n.AssetDetails.Staking.unstaking(claimAmount.formatted(), reamainingEpochsUntilClaim * 5)
 		}
-	}
-
-	var isReadyToClaim: Bool {
-		remainingEpochsUntilClaim <= 0
 	}
 }
 

@@ -4,18 +4,12 @@ import SwiftUI
 // MARK: - NonFungibleTokenDetails
 public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public struct StakeClaim: Sendable, Hashable {
-			let amount: RETDecimal
-			let remainingEpochsUntilClaim: Int
-			let validatorAddress: ValidatorAddress
-		}
-
 		public let resourceAddress: ResourceAddress
 		public var resourceDetails: Loadable<OnLedgerEntity.Resource>
 		public let ownedResource: OnLedgerEntity.OwnedNonFungibleResource?
 		public let token: OnLedgerEntity.NonFungibleToken?
 		public let ledgerState: AtLedgerState
-		public let stakeClaim: StakeClaim?
+		public let stakeClaim: OnLedgerEntitiesClient.StakeClaim?
 
 		public init(
 			resourceAddress: ResourceAddress,
@@ -23,7 +17,7 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 			ownedResource: OnLedgerEntity.OwnedNonFungibleResource? = nil,
 			token: OnLedgerEntity.NonFungibleToken? = nil,
 			ledgerState: AtLedgerState,
-			stakeClaim: StakeClaim? = nil
+			stakeClaim: OnLedgerEntitiesClient.StakeClaim? = nil
 		) {
 			self.resourceAddress = resourceAddress
 			self.resourceDetails = resourceDetails
@@ -46,7 +40,7 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case tappedClaimStake(id: NonFungibleGlobalId, claim: State.StakeClaim)
+		case tappedClaimStake(OnLedgerEntitiesClient.StakeClaim)
 	}
 
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
@@ -75,10 +69,10 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 				await openURL(url)
 			}
 		case .tappedClaimStake:
-			guard let stakeClaim = state.stakeClaim, let token = state.token else {
+			guard let stakeClaim = state.stakeClaim else {
 				return .none
 			}
-			return .send(.delegate(.tappedClaimStake(id: token.id, claim: stakeClaim)))
+			return .send(.delegate(.tappedClaimStake(stakeClaim)))
 		}
 	}
 
