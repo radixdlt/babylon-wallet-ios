@@ -2,27 +2,46 @@ import ComposableArchitecture
 import SwiftUI
 
 extension TransactionReview {
-	public struct ContributingToPoolsState: Sendable, Hashable {
-		public var pools: IdentifiedArrayOf<Pool>
+	public struct InteractWithPoolsState: Sendable, Hashable {
+		public var pools: IdentifiedArrayOf<ResourcePoolItem>
 	}
 
-	public struct Pool: Sendable, Identifiable, Hashable {
-		public var id: String { name }
-		public let name: String
-		public let image: URL? = nil
+	public enum ResourcePoolItem: Identifiable, Sendable, Hashable {
+		case known(ResourcePool)
+		case unknown([ResourcePoolAddress])
+
+		public var id: ResourcePoolAddress? {
+			switch self {
+			case let .known(resourcePool):
+				resourcePool.address
+			case .unknown:
+				nil
+			}
+		}
+	}
+
+	public struct ResourcePool: Sendable, Hashable {
+		public let address: ResourcePoolAddress
+		public let icon: URL?
+		public let name: String?
 	}
 }
 
-// MARK: - TransactionReview.View.ContributingToPoolsView
+// MARK: - TransactionReview.View.InteractWithPoolsView
 extension TransactionReview.View {
-	public struct ContributingToPoolsView: View {
-		public var viewState: TransactionReview.ContributingToPoolsState
+	public struct InteractWithPoolsView: View {
+		public var viewState: TransactionReview.InteractWithPoolsState
 
 		public var body: some View {
 			Card {
 				VStack(spacing: .small1) {
 					ForEach(viewState.pools) { pool in
-						PoolView(pool: pool)
+						switch pool {
+						case let .known(knownPool):
+							PoolView(pool: knownPool)
+						case let .unknown(pools):
+							UnkownPoolsView(count: pools.count)
+						}
 					}
 				}
 				.padding(.small1)
@@ -30,19 +49,48 @@ extension TransactionReview.View {
 		}
 
 		struct PoolView: View {
-			let pool: TransactionReview.Pool
+			let pool: TransactionReview.ResourcePool
 
 			var body: some View {
 				Card {
 					HStack(spacing: .medium3) {
-						AssetIcon(.asset(AssetResource.xrd), verySmall: false)
+						DappThumbnail(.known(pool.icon), size: .small)
 
-						Text(pool.name)
-							.textStyle(.body1Header)
-							.foregroundColor(.app.gray1)
+						let addressView = AddressView(.address(.resourcePool(pool.address)))
+
+						if let name = pool.name {
+							VStack(alignment: .leading, spacing: .small3) {
+								Text(name)
+									.textStyle(.body1Header)
+									.foregroundColor(.app.gray1)
+
+								addressView
+							}
+						} else {
+							addressView
+						}
+
+						Spacer(minLength: 0)
 					}
 				}
-//				.cardShadow
+			}
+		}
+
+		struct UnkownPoolsView: View {
+			let count: Int
+
+			var body: some View {
+				Card {
+					HStack(spacing: .medium3) {
+						DappThumbnail(.unknown, size: .small)
+
+						Text("\(count) unknown pools")
+							.textStyle(.body1Header)
+							.foregroundColor(.app.gray1)
+
+						Spacer(minLength: 0)
+					}
+				}
 			}
 		}
 	}

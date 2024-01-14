@@ -61,13 +61,13 @@ extension OnLedgerEntity.Metadata {
 		}
 	}
 
-	/// Check that `claimed_entities` is present and contains the provided `ComponentAddress`
-	public func validate(dAppComponent component: ComponentAddress) throws {
+	/// Check that `claimed_entities` is present and contains the provided `Address`
+	public func validate(dAppEntity entity: Address) throws {
 		guard let claimedEntities else {
 			throw MetadataError.missingClaimedEntities
 		}
 
-		guard claimedEntities.contains(component.address) else {
+		guard claimedEntities.contains(entity.address) else {
 			throw MetadataError.entityNotClaimed
 		}
 	}

@@ -1,13 +1,19 @@
 import EngineToolkit
 
 extension ExecutionSummary {
-	/// Returns `nil` for non-conforming transactions
+	/// Use the first supported manifest class. Returns `nil` for non-conforming transactions
 	public var detailedManifestClass: DetailedManifestClass? {
-		if detailedClassification.contains(.general) {
-			.general
-		} else {
-			// Empty array means non conforming transaction. ET was not able to map it to any type
-			detailedClassification.first
+		detailedClassification.first(where: \.isSupported)
+	}
+}
+
+private extension DetailedManifestClass {
+	var isSupported: Bool {
+		switch self {
+		case .general, .transfer, .poolContribution, .poolRedemption, .accountDepositSettingsUpdate:
+			true
+		case .validatorStake, .validatorUnstake, .validatorClaim:
+			false
 		}
 	}
 }

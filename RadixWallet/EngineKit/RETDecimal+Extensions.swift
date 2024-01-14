@@ -43,12 +43,24 @@ extension RETDecimal {
 		try! lhs.add(other: rhs)
 	}
 
+	public static func += (lhs: inout RETDecimal, rhs: RETDecimal) {
+		lhs = lhs + rhs
+	}
+
 	public static func - (lhs: RETDecimal, rhs: RETDecimal) -> RETDecimal {
 		try! lhs.sub(other: rhs)
 	}
 
+	public static func -= (lhs: inout RETDecimal, rhs: RETDecimal) {
+		lhs = lhs - rhs
+	}
+
 	public static func * (lhs: RETDecimal, rhs: RETDecimal) -> RETDecimal {
 		try! lhs.mul(other: rhs)
+	}
+
+	public static func *= (lhs: inout RETDecimal, rhs: RETDecimal) {
+		lhs = lhs * rhs
 	}
 
 	public static func / (lhs: RETDecimal, rhs: RETDecimal) -> RETDecimal {
