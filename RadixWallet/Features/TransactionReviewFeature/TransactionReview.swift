@@ -618,17 +618,16 @@ extension TransactionReview {
 				networkID: networkID
 			)
 
-			// Extract Deposits section
-			var deposits = try await extractDeposits(
+			// Extract Contributing to Pools section
+			let pools: TransactionReviewPools.State? = try await extractDapps(poolAddresses, unknownTitle: L10n.TransactionReview.unknownPools)
+
+			// Extract Deposits section, passing in poolcontributions so that pool units can be updated
+			let deposits = try await extractDeposits(
 				accountDeposits: summary.accountDeposits,
+				poolContributions: poolContributions,
 				userAccounts: userAccounts,
 				networkID: networkID
 			)
-
-			try await updateAccounts(&deposits, with: poolContributions, networkID: networkID)
-
-			// Extract Contributing to Pools section
-			let pools: TransactionReviewPools.State? = try await extractDapps(poolAddresses, unknownTitle: L10n.TransactionReview.unknownPools)
 
 			return Sections(
 				withdrawals: withdrawals,
@@ -638,14 +637,16 @@ extension TransactionReview {
 			)
 
 		case let .poolRedemption(poolAddresses: poolAddresses, poolRedemptions: poolRedemptions):
-			// Extract Withdrawals section
-			var withdrawals = try await extractWithdrawals(
+			// Extract Withdrawals section, passing in poolRedemptions so that withdrawn pool units can be updated
+			let withdrawals = try await extractWithdrawals(
 				accountWithdraws: summary.accountWithdraws,
+				poolRedemptions: poolRedemptions,
 				userAccounts: userAccounts,
 				networkID: networkID
 			)
 
-			try await updateAccounts(&withdrawals, with: poolRedemptions, networkID: networkID)
+			// Extract Redeeming from Pools section
+			let pools: TransactionReviewPools.State? = try await extractDapps(poolAddresses, unknownTitle: L10n.TransactionReview.unknownPools)
 
 			// Extract Deposits section
 			let deposits = try await extractDeposits(
@@ -653,9 +654,6 @@ extension TransactionReview {
 				userAccounts: userAccounts,
 				networkID: networkID
 			)
-
-			// Extract Contributing to Pools section
-			let pools: TransactionReviewPools.State? = try await extractDapps(poolAddresses, unknownTitle: L10n.TransactionReview.unknownPools)
 
 			return Sections(
 				withdrawals: withdrawals,
@@ -710,7 +708,11 @@ extension TransactionReview {
 		}
 	}
 
-	private func updateAccounts(_ accounts: inout TransactionReviewAccounts.State?, with interactions: [some TrackedPoolInteraction], networkID: NetworkID) async throws {
+	private func updateAccounts(
+		_ accounts: inout IdentifiedArrayOf<TransactionReviewAccount.State>,
+		with interactions: [some TrackedPoolInteraction],
+		networkID: NetworkID
+	) async throws {
 		let aggregatedInteractions = interactions.aggregated
 
 		let resourceEntities = try await resourceEntities(for: aggregatedInteractions)
@@ -723,7 +725,7 @@ extension TransactionReview {
 			// The resources in the pool
 			let poolResources = try poolResources(for: contribution.resourcesInInteraction, entities: resourceEntities, networkID: networkID)
 
-			for account in accounts?.accounts ?? [] {
+			for account in accounts {
 				for transfer in account.transfers {
 					if transfer.resource.id == resourceAddress, case let .fungible(details) = transfer.details {
 						var resources = poolResources
@@ -736,7 +738,7 @@ extension TransactionReview {
 							}
 						}
 
-						accounts?.accounts[id: account.id]?.transfers[id: transfer.id]?.details = .poolUnit(.init(
+						accounts[id: account.id]?.transfers[id: transfer.id]?.details = .poolUnit(.init(
 							poolName: poolUnitResource.title,
 							resources: resources,
 							guarantee: transfer.fungibleGuarantee
@@ -995,6 +997,7 @@ extension TransactionReview {
 		metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]] = [:],
 		dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]] = [:],
 		addressesOfNewlyCreatedEntities: [EngineToolkit.Address] = [],
+		poolRedemptions: [TrackedPoolRedemption] = [],
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
@@ -1018,10 +1021,17 @@ extension TransactionReview {
 
 		guard !withdrawals.isEmpty else { return nil }
 
-		let accounts = withdrawals.map {
+		let withdrawalAccounts = withdrawals.map {
 			TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value))
 		}
-		return .init(accounts: .init(uniqueElements: accounts), enableCustomizeGuarantees: false)
+
+		var accounts = IdentifiedArray(uniqueElements: withdrawalAccounts)
+
+		if !poolRedemptions.isEmpty {
+			try await updateAccounts(&accounts, with: poolRedemptions, networkID: networkID)
+		}
+
+		return .init(accounts: accounts, enableCustomizeGuarantees: false)
 	}
 
 	private func extractDeposits(
@@ -1029,6 +1039,7 @@ extension TransactionReview {
 		metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]] = [:],
 		dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]] = [:],
 		addressesOfNewlyCreatedEntities: [EngineToolkit.Address] = [],
+		poolContributions: [TrackedPoolContribution] = [],
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
@@ -1053,14 +1064,20 @@ extension TransactionReview {
 			deposits[account, default: []].append(contentsOf: transfers)
 		}
 
-		let reviewAccounts = deposits
+		var depositAccounts = deposits
 			.filter { !$0.value.isEmpty }
 			.map { TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value)) }
 
-		guard !reviewAccounts.isEmpty else { return nil }
+		let requiresGuarantees = !depositAccounts.customizableGuarantees.isEmpty
 
-		let requiresGuarantees = !reviewAccounts.customizableGuarantees.isEmpty
-		return .init(accounts: .init(uniqueElements: reviewAccounts), enableCustomizeGuarantees: requiresGuarantees)
+		guard !depositAccounts.isEmpty else { return nil }
+
+		var accounts = IdentifiedArray(uniqueElements: depositAccounts)
+
+		if !poolContributions.isEmpty {
+			try await updateAccounts(&accounts, with: poolContributions, networkID: networkID)
+		}
+		return .init(accounts: accounts, enableCustomizeGuarantees: requiresGuarantees)
 	}
 
 	func transferInfo(

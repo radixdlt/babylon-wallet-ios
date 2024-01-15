@@ -496,15 +496,13 @@ struct TransactionHeading: View {
 	)
 
 	static let contributingToPools = TransactionHeading(
-		//		L10n.TransactionReview.contributingToPoolsHeading,
-		"Contributing to pools", // FIXME: strings
-		icon: AssetResource.transactionReviewDepositSetting // FIXME: asset
+		L10n.TransactionReview.contributingToPoolsHeading,
+		icon: AssetResource.transactionReviewPools
 	)
 
 	static let redeemingFromPools = TransactionHeading(
-		//		L10n.TransactionReview.redeemingFromPoolsHeading,
-		"Redeeming from pools", // FIXME: strings
-		icon: AssetResource.transactionReviewDepositSetting // FIXME: asset
+		L10n.TransactionReview.redeemingFromPoolsHeading,
+		icon: AssetResource.transactionReviewPools
 	)
 
 	static let depositSetting = TransactionHeading(
