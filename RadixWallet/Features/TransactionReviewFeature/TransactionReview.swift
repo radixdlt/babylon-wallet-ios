@@ -575,39 +575,6 @@ extension TransactionReview {
 	func sections(for summary: ExecutionSummary, networkID: NetworkID) async throws -> Sections {
 		let userAccounts = try await extractUserAccounts(summary.encounteredEntities)
 
-		func entitiesPerPoolUnit(_ addresses: [Address]) async throws -> [ResourceAddress: [OnLedgerEntity.Resource]] {
-			// The entities for the pool units and the redeemed resources
-			let resourceEntities = try await onLedgerEntitiesClient.getEntities(
-				addresses: addresses,
-				metadataKeys: .poolUnitMetadataKeys
-			)
-			.compactMap(\.resource)
-
-			fatalError()
-		}
-
-		func transferResources(for resources: [String: RETDecimal], entities: [OnLedgerEntity.Resource]) throws -> [Transfer.Details.PoolUnit.Resource] {
-			try resources
-				.map { addressString, amount in
-					let address = try ResourceAddress(validatingAddress: addressString)
-
-					guard let entity = entities.first(where: { $0.id == address }) else {
-						struct ResourceEntityNotFound: Error {
-							let address: String
-						}
-						throw ResourceEntityNotFound(address: addressString)
-					}
-
-					return Transfer.Details.PoolUnit.Resource(
-						isXRD: entity.resourceAddress.isXRD(on: networkID),
-						symbol: entity.metadata.symbol,
-						address: entity.resourceAddress,
-						icon: entity.metadata.iconURL,
-						amount: amount
-					)
-				}
-		}
-
 		switch summary.detailedManifestClass {
 		case nil:
 			return Sections(conforming: false)
@@ -661,18 +628,8 @@ extension TransactionReview {
 			// Extract Contributing to Pools section
 			let pools: TransactionReviewPools.State? = try await extractDapps(poolAddresses, unknownTitle: L10n.TransactionReview.unknownPools)
 
-			let poolUnitAddresses = try poolContributions.map(\.poolUnitsResourceAddress).map {
-				try $0.asSpecific() as Address
-			}
-			let contributedAddresses = try poolContributions.flatMap(\.contributedResources.keys).map {
-				try Address(validatingAddress: $0)
-			}
-
 			// The entities for the pool units and the contributed resources
-			let resourceEntities = try await onLedgerEntitiesClient.getEntities(
-				addresses: poolUnitAddresses + contributedAddresses,
-				metadataKeys: .poolUnitMetadataKeys
-			).compactMap(\.resource)
+			let resourceEntities = try await resourceEntities(for: poolContributions)
 
 			// Aggregate all contributions that belong to the same pool and distribute across the deposits that receive the corresponding pool unit
 			for contribution in poolContributions.aggregated {
@@ -681,7 +638,7 @@ extension TransactionReview {
 				guard let poolUnitResource = resourceEntities.first(where: { $0.resourceAddress == resourceAddress }) else { continue }
 
 				// The resources in the pool
-				let poolResources = try transferResources(for: contribution.contributedResources, entities: resourceEntities)
+				let poolResources = try poolResources(for: contribution.resourcesInInteraction, entities: resourceEntities, networkID: networkID)
 
 				for account in deposits?.accounts ?? [] {
 					for transfer in account.transfers {
@@ -731,18 +688,8 @@ extension TransactionReview {
 			// Extract Contributing to Pools section
 			let pools: TransactionReviewPools.State? = try await extractDapps(poolAddresses, unknownTitle: L10n.TransactionReview.unknownPools)
 
-			let poolUnitAddresses = try poolRedemptions.map(\.poolUnitsResourceAddress).map {
-				try $0.asSpecific() as Address
-			}
-			let redeemedAddresses = try poolRedemptions.flatMap(\.redeemedResources.keys).map {
-				try Address(validatingAddress: $0)
-			}
-
 			// The entities for the pool units and the redeemed resources
-			let resourceEntities = try await onLedgerEntitiesClient.getEntities(
-				addresses: poolUnitAddresses + redeemedAddresses,
-				metadataKeys: .poolUnitMetadataKeys
-			).compactMap(\.resource)
+			let resourceEntities = try await resourceEntities(for: poolRedemptions)
 
 			// Aggregate all redepmtions that belong to the same pool and distribute across the withdrawals that provide the corresponding pool unit
 			for redemption in poolRedemptions.aggregated {
@@ -751,7 +698,7 @@ extension TransactionReview {
 				guard let poolUnitResource = resourceEntities.first(where: { $0.resourceAddress == resourceAddress }) else { continue }
 
 				// The resources in the pool
-				let poolResources = try transferResources(for: redemption.redeemedResources, entities: resourceEntities)
+				let poolResources = try poolResources(for: redemption.resourcesInInteraction, entities: resourceEntities, networkID: networkID)
 
 				for account in withdrawals?.accounts ?? [] {
 					for transfer in account.transfers {
@@ -827,6 +774,44 @@ extension TransactionReview {
 				conforming: true
 			)
 		}
+	}
+
+	private func resourceEntities(for poolInteractions: [some TrackedPoolInteraction]) async throws -> [OnLedgerEntity.Resource] {
+		let poolUnitAddresses = try poolInteractions.map(\.poolUnitsResourceAddress).map {
+			try $0.asSpecific() as Address
+		}
+		let resourceAddresses = try poolInteractions.flatMap(\.resourcesInInteraction.keys).map {
+			try Address(validatingAddress: $0)
+		}
+
+		// The entities for the pool units and the redeemed resources
+		return try await onLedgerEntitiesClient.getEntities(
+			addresses: poolUnitAddresses + resourceAddresses,
+			metadataKeys: .poolUnitMetadataKeys
+		)
+		.compactMap(\.resource)
+	}
+
+	private func poolResources(for resources: [String: RETDecimal], entities: [OnLedgerEntity.Resource], networkID: NetworkID) throws -> [Transfer.Details.PoolUnit.Resource] {
+		try resources
+			.map { addressString, amount in
+				let address = try ResourceAddress(validatingAddress: addressString)
+
+				guard let entity = entities.first(where: { $0.id == address }) else {
+					struct ResourceEntityNotFound: Error {
+						let address: String
+					}
+					throw ResourceEntityNotFound(address: addressString)
+				}
+
+				return Transfer.Details.PoolUnit.Resource(
+					isXRD: entity.resourceAddress.isXRD(on: networkID),
+					symbol: entity.metadata.symbol,
+					address: entity.resourceAddress,
+					icon: entity.metadata.iconURL,
+					amount: amount
+				)
+			}
 	}
 
 	public func addingGuarantees(
@@ -907,123 +892,7 @@ extension TransactionReview {
 	}
 }
 
-// MARK: - TrackedPoolInteraction
-protocol TrackedPoolInteraction {
-	var poolAddress: EngineToolkit.Address { get }
-	var poolUnitsResourceAddress: EngineToolkit.Address { get }
-	var poolUnitsAmount: RETDecimal { get set }
-	var resourcesInInteraction: [String: RETDecimal] { get set }
-}
-
-// MARK: - TrackedPoolContribution + TrackedPoolInteraction
-extension TrackedPoolContribution: TrackedPoolInteraction {
-	var resourcesInInteraction: [String: RETDecimal] {
-		get { contributedResources }
-		set { contributedResources = newValue }
-	}
-}
-
-// MARK: - TrackedPoolRedemption + TrackedPoolInteraction
-extension TrackedPoolRedemption: TrackedPoolInteraction {
-	var resourcesInInteraction: [String: RETDecimal] {
-		get { redeemedResources }
-		set { redeemedResources = newValue }
-	}
-}
-
-// extension Collection<TrackedPoolContribution> {
-//	public var aggregated: [TrackedPoolContribution] {
-//		var result: [TrackedPoolContribution] = []
-//		for poolContribution in self {
-//			// Make sure no contribution is empty
-//			guard poolContribution.poolUnitsAmount > 0 else { continue }
-//			if let i = result.firstIndex(where: { $0.poolAddress == poolContribution.poolAddress }) {
-//				result[i].add(poolContribution)
-//			} else {
-//				result.append(poolContribution)
-//			}
-//		}
-//		return result
-//	}
-// }
-//
-
-extension Collection where Element: TrackedPoolInteraction {
-	var aggregated: [Element] {
-		var result: [Element] = []
-		for poolInteraction in self {
-			// Make sure no contribution is empty
-			guard poolInteraction.poolUnitsAmount > 0 else { continue }
-			if let i = result.firstIndex(where: { $0.poolAddress == poolInteraction.poolAddress }) {
-				result[i].add(poolInteraction)
-			} else {
-				result.append(poolInteraction)
-			}
-		}
-		return result
-	}
-}
-
-private extension TrackedPoolInteraction {
-	mutating func add(_ other: Self) {
-		guard other.poolAddress == poolAddress, other.poolUnitsResourceAddress == poolUnitsResourceAddress else { return }
-		for (resource, amount) in other.resourcesInInteraction {
-			guard let currentInteraction = resourcesInInteraction[resource] else {
-				assertionFailure("The pools should have the same resources")
-				return
-			}
-			resourcesInInteraction[resource] = currentInteraction + amount
-		}
-		poolUnitsAmount = poolUnitsAmount + other.poolUnitsAmount
-	}
-}
-
 // MARK: - FailedToAddLockFee
-//
-// private extension TrackedPoolContribution {
-//	mutating func add(_ other: TrackedPoolContribution) {
-//		guard other.poolAddress == poolAddress, other.poolUnitsResourceAddress == poolUnitsResourceAddress else { return }
-//		for (resource, contribution) in other.contributedResources {
-//			guard let currentContribution = contributedResources[resource] else {
-//				assertionFailure("The pools should have the same resources")
-//				return
-//			}
-//			contributedResources[resource] = currentContribution + contribution
-//		}
-//		poolUnitsAmount = poolUnitsAmount + other.poolUnitsAmount
-//	}
-// }
-//
-// extension Collection<TrackedPoolRedemption> {
-//	public var aggregated: [TrackedPoolRedemption] {
-//		var result: [TrackedPoolRedemption] = []
-//		for poolRedemption in self {
-//			// Make sure no contribution is empty
-//			guard poolRedemption.poolUnitsAmount > 0 else { continue }
-//			if let i = result.firstIndex(where: { $0.poolAddress == poolRedemption.poolAddress }) {
-//				result[i].add(poolRedemption)
-//			} else {
-//				result.append(poolRedemption)
-//			}
-//		}
-//		return result
-//	}
-// }
-//
-// private extension TrackedPoolRedemption {
-//	mutating func add(_ other: TrackedPoolRedemption) {
-//		guard other.poolAddress == poolAddress, other.poolUnitsResourceAddress == poolUnitsResourceAddress else { return }
-//		for (resource, redemption) in other.redeemedResources {
-//			guard let currentRedemption = redeemedResources[resource] else {
-//				assertionFailure("The pools should have the same resources")
-//				return
-//			}
-//			redeemedResources[resource] = currentRedemption + redemption
-//		}
-//		poolUnitsAmount = poolUnitsAmount + other.poolUnitsAmount
-//	}
-// }
-
 public struct FailedToAddLockFee: LocalizedError {
 	public let underlyingError: Swift.Error
 	public init(underlyingError: Swift.Error) {
@@ -1710,3 +1579,59 @@ extension TransactionSigners {
 	}
 }
 #endif
+
+// MARK: - TrackedPoolInteraction
+// TODO: MOVE
+
+public protocol TrackedPoolInteraction {
+	var poolAddress: EngineToolkit.Address { get }
+	var poolUnitsResourceAddress: EngineToolkit.Address { get }
+	var poolUnitsAmount: RETDecimal { get set }
+	var resourcesInInteraction: [String: RETDecimal] { get set }
+}
+
+// MARK: - TrackedPoolContribution + TrackedPoolInteraction
+extension TrackedPoolContribution: TrackedPoolInteraction {
+	public var resourcesInInteraction: [String: RETDecimal] {
+		get { contributedResources }
+		set { contributedResources = newValue }
+	}
+}
+
+// MARK: - TrackedPoolRedemption + TrackedPoolInteraction
+extension TrackedPoolRedemption: TrackedPoolInteraction {
+	public var resourcesInInteraction: [String: RETDecimal] {
+		get { redeemedResources }
+		set { redeemedResources = newValue }
+	}
+}
+
+extension Collection where Element: TrackedPoolInteraction {
+	public var aggregated: [Element] {
+		var result: [Element] = []
+		for poolInteraction in self {
+			// Make sure no contribution is empty
+			guard poolInteraction.poolUnitsAmount > 0 else { continue }
+			if let i = result.firstIndex(where: { $0.poolAddress == poolInteraction.poolAddress }) {
+				result[i].add(poolInteraction)
+			} else {
+				result.append(poolInteraction)
+			}
+		}
+		return result
+	}
+}
+
+private extension TrackedPoolInteraction {
+	mutating func add(_ other: Self) {
+		guard other.poolAddress == poolAddress, other.poolUnitsResourceAddress == poolUnitsResourceAddress else { return }
+		for (resource, amount) in other.resourcesInInteraction {
+			guard let currentInteraction = resourcesInInteraction[resource] else {
+				assertionFailure("The pools should have the same resources")
+				return
+			}
+			resourcesInInteraction[resource] = currentInteraction + amount
+		}
+		poolUnitsAmount = poolUnitsAmount + other.poolUnitsAmount
+	}
+}
