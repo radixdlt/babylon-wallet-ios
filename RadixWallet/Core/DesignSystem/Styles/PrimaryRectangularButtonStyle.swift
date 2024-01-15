@@ -45,7 +45,7 @@ extension PrimaryRectangularButtonStyle {
 		case .loading:
 			.clear
 		case .disabled:
-			.app.gray3
+			.app.gray2
 		}
 	}
 }

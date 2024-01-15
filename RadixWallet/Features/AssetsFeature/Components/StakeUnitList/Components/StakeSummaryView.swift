@@ -70,7 +70,7 @@ extension StakeSummaryView {
 				.foregroundColor(titleTextColor)
 				.padding(.trailing, .medium3)
 			Spacer()
-			loadable(amount) { amount in
+			loadable(amount, loadingViewHeight: .small1) { amount in
 				Text("\(amount.formatted()) XRD")
 					.textStyle(.body2HighImportance)
 					.foregroundColor(amountTextColor)
