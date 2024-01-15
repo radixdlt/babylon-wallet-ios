@@ -10,10 +10,10 @@ extension UnknownDappComponents {
 			store.withState { state in
 				ScrollView {
 					ForEach(state.addresses, id: \.address) { address in
-						row(address)
+						row(address, heading: state.rowHeading)
 					}
 				}
-				.navigationTitle(L10n.TransactionReview.unknownComponents(state.addresses.count))
+				.navigationTitle(state.title)
 			}
 			.navigationBarTitleDisplayMode(.inline)
 			.toolbar {
@@ -24,11 +24,11 @@ extension UnknownDappComponents {
 		}
 
 		@ViewBuilder
-		private func row(_ address: LedgerIdentifiable.Address) -> some SwiftUI.View {
+		private func row(_ address: LedgerIdentifiable.Address, heading: String) -> some SwiftUI.View {
 			HStack(spacing: .medium3) {
 				DappThumbnail(.unknown)
 				VStack(alignment: .leading, spacing: .zero) {
-					Text(L10n.Common.component)
+					Text(heading)
 						.textStyle(.body1Header)
 						.foregroundColor(.app.gray1)
 

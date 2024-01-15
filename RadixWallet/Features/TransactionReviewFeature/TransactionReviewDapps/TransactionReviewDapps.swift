@@ -12,10 +12,12 @@ public struct TransactionReviewDapps<Kind: SpecificEntityType>: Sendable, Featur
 		public var knownDapps: IdentifiedArrayOf<TransactionReview.DappEntity>
 		public var unknownDapps: IdentifiedArrayOf<AddressType>
 		public var isExpanded: Bool = true
+		public let unknownTitle: String
 
-		public init(knownDapps: IdentifiedArrayOf<TransactionReview.DappEntity>, unknownDapps: IdentifiedArrayOf<AddressType>) {
+		public init(knownDapps: IdentifiedArrayOf<TransactionReview.DappEntity>, unknownDapps: IdentifiedArrayOf<AddressType>, unknownTitle: (Int) -> String) {
 			self.knownDapps = knownDapps
 			self.unknownDapps = unknownDapps
+			self.unknownTitle = unknownTitle(unknownDapps.count)
 		}
 	}
 

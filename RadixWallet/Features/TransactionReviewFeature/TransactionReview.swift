@@ -328,11 +328,19 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .dAppsUsed(.delegate(.openUnknownAddresses(components))):
-			state.destination = .unknownDappComponents(.init(addresses: components.map { .component($0) }))
+			state.destination = .unknownDappComponents(.init(
+				title: L10n.TransactionReview.unknownComponents(components.count),
+				rowHeading: L10n.Common.component,
+				addresses: components.map { .component($0) }
+			))
 			return .none
 
 		case let .contributingToPools(.delegate(.openUnknownAddresses(pools))), let .redeemingFromPools(.delegate(.openUnknownAddresses(pools))):
-			state.destination = .unknownDappComponents(.init(addresses: pools.map { .resourcePool($0) }))
+			state.destination = .unknownDappComponents(.init(
+				title: L10n.TransactionReview.unknownPools(pools.count),
+				rowHeading: L10n.Common.pool,
+				addresses: pools.map { .resourcePool($0) }
+			))
 			return .none
 
 		case .deposits(.delegate(.showCustomizeGuarantees)):
@@ -382,10 +390,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .updateSections(sections):
 			state.withdrawals = sections.withdrawals
 			state.dAppsUsed = sections.dAppsUsed
-			state.deposits = sections.deposits
-
 			state.contributingToPools = sections.contributingToPools
-
+			state.redeemingFromPools = sections.redeemingFromPools
+			state.deposits = sections.deposits
 			state.accountDepositSetting = sections.accountDepositSetting
 			state.accountDepositExceptions = sections.accountDepositExceptions
 
@@ -568,6 +575,28 @@ extension TransactionReview {
 	func sections(for summary: ExecutionSummary, networkID: NetworkID) async throws -> Sections {
 		let userAccounts = try await extractUserAccounts(summary.encounteredEntities)
 
+		func transferResources(for resources: [String: RETDecimal], entities: [OnLedgerEntity.Resource]) throws -> [Transfer.Details.PoolUnit.Resource] {
+			try resources
+				.map { addressString, amount in
+					let address = try ResourceAddress(validatingAddress: addressString)
+
+					guard let entity = entities.first(where: { $0.id == address }) else {
+						struct ResourceEntityNotFound: Error {
+							let address: String
+						}
+						throw ResourceEntityNotFound(address: addressString)
+					}
+
+					return Transfer.Details.PoolUnit.Resource(
+						isXRD: entity.resourceAddress.isXRD(on: networkID),
+						symbol: entity.metadata.symbol,
+						address: entity.resourceAddress,
+						icon: entity.metadata.iconURL,
+						amount: amount
+					)
+				}
+		}
+
 		switch summary.detailedManifestClass {
 		case nil:
 			return Sections(conforming: false)
@@ -582,7 +611,7 @@ extension TransactionReview {
 			)
 
 			let dAppAddresses = summary.encounteredEntities.filter { $0.entityType() == .globalGenericComponent }
-			let dAppsUsed: TransactionReviewDappsUsed.State? = try await extractDapps(dAppAddresses)
+			let dAppsUsed: TransactionReviewDappsUsed.State? = try await extractDapps(dAppAddresses, unknownTitle: L10n.TransactionReview.unknownComponents)
 
 			let deposits = try? await extractDeposits(
 				accountDeposits: summary.accountDeposits,
@@ -604,17 +633,22 @@ extension TransactionReview {
 			)
 
 		case let .poolContribution(poolAddresses: poolAddresses, poolContributions: poolContributions):
-			let withdrawals = try? await extractWithdrawals(
+			// Extract Withdrawals section
+			let withdrawals = try await extractWithdrawals(
 				accountWithdraws: summary.accountWithdraws,
 				userAccounts: userAccounts,
 				networkID: networkID
 			)
 
+			// Extract Deposits section
 			var deposits = try await extractDeposits(
 				accountDeposits: summary.accountDeposits,
 				userAccounts: userAccounts,
 				networkID: networkID
 			)
+
+			// Extract Contributing to Pools section
+			let pools: TransactionReviewPools.State? = try await extractDapps(poolAddresses, unknownTitle: L10n.TransactionReview.unknownPools)
 
 			let poolUnitAddresses = try poolContributions.map(\.poolUnitsResourceAddress).map {
 				try $0.asSpecific() as Address
@@ -623,60 +657,20 @@ extension TransactionReview {
 				try Address(validatingAddress: $0)
 			}
 
-			// Extract Contributing to Pools section
-			let contributingToPools: TransactionReviewPools.State? = try await extractDapps(poolAddresses)
-
-			let entities = try await onLedgerEntitiesClient.getEntities(
+			// The entities for the pool units and the contributed resources
+			let resourceEntities = try await onLedgerEntitiesClient.getEntities(
 				addresses: poolUnitAddresses + contributedAddresses,
 				metadataKeys: .poolUnitMetadataKeys
-			)
+			).compactMap(\.resource)
 
-			func resources(for contribution: TrackedPoolContribution) throws -> [Transfer.Details.PoolUnit.Resource] {
-				try contribution.contributedResources
-					.map { addressString, amount in
-						let address = try ResourceAddress(validatingAddress: addressString)
-
-						guard let entity = resourceEntities.first(where: { $0.id == address }) else {
-							struct ResourceEntityNotFound: Error {
-								let address: String
-							}
-							throw ResourceEntityNotFound(address: addressString)
-						}
-
-						return Transfer.Details.PoolUnit.Resource(
-							isXRD: entity.resourceAddress.isXRD(on: networkID),
-							symbol: entity.metadata.symbol,
-							address: entity.resourceAddress,
-							icon: entity.metadata.iconURL,
-							amount: amount
-						)
-					}
-			}
-
-			// The entities for the pool units and the contributed resources
-			let resourceEntities = entities.compactMap(\.resource)
-
-			// Aggregate all contributions that belong to the same pool
-			var aggregatedContributions: [TrackedPoolContribution] = []
-
-			for poolContribution in poolContributions {
-				// Make sure no contribution is empty
-				guard poolContribution.poolUnitsAmount > 0 else { continue }
-				if let i = aggregatedContributions.firstIndex(where: { $0.poolAddress == poolContribution.poolAddress }) {
-					aggregatedContributions[i].add(poolContribution)
-				} else {
-					aggregatedContributions.append(poolContribution)
-				}
-			}
-
-			// Distribute the contributions across the deposits that receive the corresponding pool unit
-			for aggregatedContribution in aggregatedContributions {
-				let resourceAddress = try aggregatedContribution.poolUnitsResourceAddress.asSpecific() as ResourceAddress
+			// Aggregate all contributions that belong to the same pool and distribute across the deposits that receive the corresponding pool unit
+			for contribution in poolContributions.aggregated {
+				let resourceAddress = try contribution.poolUnitsResourceAddress.asSpecific() as ResourceAddress
 
 				guard let poolUnitResource = resourceEntities.first(where: { $0.resourceAddress == resourceAddress }) else { continue }
 
 				// The resources in the pool
-				let poolResources = try resources(for: aggregatedContribution)
+				let poolResources = try transferResources(for: contribution.contributedResources, entities: resourceEntities)
 
 				for account in deposits?.accounts ?? [] {
 					for transfer in account.transfers {
@@ -684,8 +678,8 @@ extension TransactionReview {
 							var resources = poolResources
 
 							// If this transfer does not contain all the pool units, scale the resource amounts pro rata
-							if details.amount != aggregatedContribution.poolUnitsAmount {
-								let factor = details.amount / aggregatedContribution.poolUnitsAmount
+							if details.amount != contribution.poolUnitsAmount {
+								let factor = details.amount / contribution.poolUnitsAmount
 								for index in resources.indices {
 									resources[index].amount *= factor // TODO: Round according to divisibility
 								}
@@ -704,12 +698,80 @@ extension TransactionReview {
 			return Sections(
 				withdrawals: withdrawals,
 				deposits: deposits,
-				contributingToPools: contributingToPools,
+				contributingToPools: pools,
 				conforming: true
 			)
 
 		case let .poolRedemption(poolAddresses: poolAddresses, poolRedemptions: poolRedemptions):
-			return .init(conforming: false)
+			// Extract Withdrawals section
+			var withdrawals = try await extractWithdrawals(
+				accountWithdraws: summary.accountWithdraws,
+				userAccounts: userAccounts,
+				networkID: networkID
+			)
+
+			// Extract Deposits section
+			let deposits = try await extractDeposits(
+				accountDeposits: summary.accountDeposits,
+				userAccounts: userAccounts,
+				networkID: networkID
+			)
+
+			// Extract Contributing to Pools section
+			let pools: TransactionReviewPools.State? = try await extractDapps(poolAddresses, unknownTitle: L10n.TransactionReview.unknownPools)
+
+			let poolUnitAddresses = try poolRedemptions.map(\.poolUnitsResourceAddress).map {
+				try $0.asSpecific() as Address
+			}
+			let redeemedAddresses = try poolRedemptions.flatMap(\.redeemedResources.keys).map {
+				try Address(validatingAddress: $0)
+			}
+
+			// The entities for the pool units and the redeemed resources
+			let resourceEntities = try await onLedgerEntitiesClient.getEntities(
+				addresses: poolUnitAddresses + redeemedAddresses,
+				metadataKeys: .poolUnitMetadataKeys
+			).compactMap(\.resource)
+
+			// Aggregate all redepmtions that belong to the same pool and distribute across the withdrawals that provide the corresponding pool unit
+			for redemption in poolRedemptions.aggregated {
+				let resourceAddress = try redemption.poolUnitsResourceAddress.asSpecific() as ResourceAddress
+
+				guard let poolUnitResource = resourceEntities.first(where: { $0.resourceAddress == resourceAddress }) else { continue }
+
+				// The resources in the pool
+				let poolResources = try transferResources(for: redemption.redeemedResources, entities: resourceEntities)
+
+				for account in withdrawals?.accounts ?? [] {
+					for transfer in account.transfers {
+						if transfer.resource.id == resourceAddress, case let .fungible(details) = transfer.details {
+							var resources = poolResources
+
+							// If this transfer does not contain all the pool units, scale the resource amounts pro rata
+							if details.amount != redemption.poolUnitsAmount {
+								let factor = details.amount / redemption.poolUnitsAmount
+								for index in resources.indices {
+									resources[index].amount *= factor // TODO: Round according to divisibility
+								}
+							}
+
+							withdrawals?.accounts[id: account.id]?.transfers[id: transfer.id]?.details = .poolUnit(.init(
+								poolName: poolUnitResource.title,
+								resources: resources,
+								guarantee: transfer.fungibleGuarantee
+							))
+						}
+					}
+				}
+			}
+
+			return Sections(
+				withdrawals: withdrawals,
+				deposits: deposits,
+				redeemingFromPools: pools,
+				conforming: true
+			)
+
 		case let .validatorStake(validatorAddresses: validatorAddresses, validatorStakes: validatorStakes):
 			return .init(conforming: false)
 		case let .validatorUnstake(validatorAddresses: validatorAddresses, validatorUnstakes: validatorUnstakes):
@@ -834,7 +896,23 @@ extension TransactionReview {
 	}
 }
 
-public extension TrackedPoolContribution {
+extension Collection<TrackedPoolContribution> {
+	public var aggregated: [TrackedPoolContribution] {
+		var result: [TrackedPoolContribution] = []
+		for poolContribution in self {
+			// Make sure no contribution is empty
+			guard poolContribution.poolUnitsAmount > 0 else { continue }
+			if let i = result.firstIndex(where: { $0.poolAddress == poolContribution.poolAddress }) {
+				result[i].add(poolContribution)
+			} else {
+				result.append(poolContribution)
+			}
+		}
+		return result
+	}
+}
+
+private extension TrackedPoolContribution {
 	mutating func add(_ other: TrackedPoolContribution) {
 		guard other.poolAddress == poolAddress, other.poolUnitsResourceAddress == poolUnitsResourceAddress else { return }
 		for (resource, contribution) in other.contributedResources {
@@ -843,6 +921,36 @@ public extension TrackedPoolContribution {
 				return
 			}
 			contributedResources[resource] = currentContribution + contribution
+		}
+		poolUnitsAmount = poolUnitsAmount + other.poolUnitsAmount
+	}
+}
+
+extension Collection<TrackedPoolRedemption> {
+	public var aggregated: [TrackedPoolRedemption] {
+		var result: [TrackedPoolRedemption] = []
+		for poolRedemption in self {
+			// Make sure no contribution is empty
+			guard poolRedemption.poolUnitsAmount > 0 else { continue }
+			if let i = result.firstIndex(where: { $0.poolAddress == poolRedemption.poolAddress }) {
+				result[i].add(poolRedemption)
+			} else {
+				result.append(poolRedemption)
+			}
+		}
+		return result
+	}
+}
+
+private extension TrackedPoolRedemption {
+	mutating func add(_ other: TrackedPoolRedemption) {
+		guard other.poolAddress == poolAddress, other.poolUnitsResourceAddress == poolUnitsResourceAddress else { return }
+		for (resource, redemption) in other.redeemedResources {
+			guard let currentRedemption = redeemedResources[resource] else {
+				assertionFailure("The pools should have the same resources")
+				return
+			}
+			redeemedResources[resource] = currentRedemption + redemption
 		}
 		poolUnitsAmount = poolUnitsAmount + other.poolUnitsAmount
 	}
@@ -936,7 +1044,10 @@ extension TransactionReview {
 			}
 	}
 
-	private func extractDapps<Kind: SpecificEntityType>(_ addresses: [EngineToolkit.Address]) async throws -> TransactionReviewDapps<Kind>.State? {
+	private func extractDapps<Kind: SpecificEntityType>(
+		_ addresses: [EngineToolkit.Address],
+		unknownTitle: (Int) -> String
+	) async throws -> TransactionReviewDapps<Kind>.State? {
 		let dApps = await addresses.asyncMap {
 			await (address: $0, entity: try? extractDappEntity($0.asSpecific()))
 		}
@@ -946,7 +1057,7 @@ extension TransactionReview {
 
 		guard knownDapps.count + unknownDapps.count > 0 else { return nil }
 
-		return .init(knownDapps: knownDapps, unknownDapps: unknownDapps)
+		return .init(knownDapps: knownDapps, unknownDapps: unknownDapps, unknownTitle: unknownTitle)
 	}
 
 	private func extractDappEntity(_ entity: Address) async throws -> DappEntity {

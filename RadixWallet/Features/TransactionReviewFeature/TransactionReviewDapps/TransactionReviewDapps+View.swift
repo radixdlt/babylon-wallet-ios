@@ -5,7 +5,7 @@ extension TransactionReviewDapps.State {
 	var viewState: TransactionReviewDapps.ViewState {
 		var dApps = knownDapps.map(\.knownDapp)
 		if !unknownDapps.isEmpty {
-			dApps.append(.unknown(count: unknownDapps.count))
+			dApps.append(.unknown(unknownTitle))
 		}
 		return .init(rows: dApps)
 	}
@@ -60,7 +60,7 @@ extension TransactionReview {
 	struct DappView: SwiftUI.View {
 		enum ViewState: Hashable {
 			case known(name: String, thumbnail: URL?, id: TransactionReview.DappEntity.ID, unauthorizedHint: String?)
-			case unknown(count: Int)
+			case unknown(String)
 		}
 
 		enum Action {
@@ -82,11 +82,11 @@ extension TransactionReview {
 					}
 				}
 
-			case let .unknown(count):
+			case let .unknown(title):
 				Card {
 					action(.unknownComponentsTapped)
 				} contents: {
-					PlainListRow(title: L10n.TransactionReview.unknownComponents(count), accessory: nil) {
+					PlainListRow(title: title, accessory: nil) {
 						DappThumbnail(.unknown)
 					}
 				}
