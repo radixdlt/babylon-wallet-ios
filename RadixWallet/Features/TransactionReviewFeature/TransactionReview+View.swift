@@ -237,13 +237,15 @@ extension TransactionReview {
 		}
 
 		private func usingDappsSection(isExpanded: Bool) -> some SwiftUI.View {
-			VStack(alignment: .leading, spacing: .small2) {
-				ExpandableTransactionHeading(heading: .usingDapps, isExpanded: isExpanded) {
-					store.send(.view(.expandRedeemingFromPoolsTapped))
-				}
-				IfLetStore(store.scope(state: \.dAppsUsed) { .child(.dAppsUsed($0)) }) { childStore in
-					TransactionReviewDappsUsed.View(store: childStore)
-						.transition(.opacity.combined(with: .scale(scale: 0.95)))
+			IfLetStore(store.scope(state: \.dAppsUsed) { .child(.dAppsUsed($0)) }) { childStore in
+				VStack(alignment: .leading, spacing: .small2) {
+					ExpandableTransactionHeading(heading: .usingDapps, isExpanded: isExpanded) {
+						store.send(.view(.expandRedeemingFromPoolsTapped))
+					}
+					if isExpanded {
+						TransactionReviewDappsUsed.View(store: childStore)
+							.transition(.opacity.combined(with: .scale(scale: 0.95)))
+					}
 				}
 			}
 		}
@@ -254,8 +256,10 @@ extension TransactionReview {
 					ExpandableTransactionHeading(heading: .contributingToPools, isExpanded: isExpanded) {
 						store.send(.view(.expandContributingToPoolsTapped))
 					}
-					TransactionReviewPools.View(store: childStore)
-						.transition(.opacity.combined(with: .scale(scale: 0.95)))
+					if isExpanded {
+						TransactionReviewPools.View(store: childStore)
+							.transition(.opacity.combined(with: .scale(scale: 0.95)))
+					}
 				}
 			}
 		}
@@ -266,8 +270,10 @@ extension TransactionReview {
 					ExpandableTransactionHeading(heading: .redeemingFromPools, isExpanded: isExpanded) {
 						store.send(.view(.expandRedeemingFromPoolsTapped))
 					}
-					TransactionReviewPools.View(store: childStore)
-						.transition(.opacity.combined(with: .scale(scale: 0.95)))
+					if isExpanded {
+						TransactionReviewPools.View(store: childStore)
+							.transition(.opacity.combined(with: .scale(scale: 0.95)))
+					}
 				}
 			}
 		}

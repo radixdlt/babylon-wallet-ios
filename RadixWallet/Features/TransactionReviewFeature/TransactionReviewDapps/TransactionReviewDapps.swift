@@ -26,7 +26,7 @@ public struct TransactionReviewDapps<Kind: SpecificEntityType>: Sendable, Featur
 
 	public enum DelegateAction: Sendable, Equatable {
 		case openDapp(TransactionReview.DappEntity.ID)
-		case openUnknownComponents(IdentifiedArrayOf<AddressType>)
+		case openUnknownAddresses(IdentifiedArrayOf<AddressType>)
 	}
 
 	public init() {}
@@ -37,7 +37,7 @@ public struct TransactionReviewDapps<Kind: SpecificEntityType>: Sendable, Featur
 			.send(.delegate(.openDapp(id)))
 
 		case .unknownComponentsTapped:
-			.send(.delegate(.openUnknownComponents(state.unknownDapps)))
+			.send(.delegate(.openUnknownAddresses(state.unknownDapps)))
 		}
 	}
 }

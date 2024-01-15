@@ -117,8 +117,8 @@
 		48CFC2972ADC10D900E77A5C /* AdvancedFeesCustomization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCEF2ADC10D800E77A5C /* AdvancedFeesCustomization.swift */; };
 		48CFC2982ADC10D900E77A5C /* CustomizeFees+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF02ADC10D800E77A5C /* CustomizeFees+View.swift */; };
 		48CFC2992ADC10D900E77A5C /* CustomizeFees.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF12ADC10D800E77A5C /* CustomizeFees.swift */; };
-		48CFC29A2ADC10D900E77A5C /* TransactionReviewDappsUsed+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF32ADC10D800E77A5C /* TransactionReviewDappsUsed+View.swift */; };
-		48CFC29B2ADC10D900E77A5C /* TransactionReviewDappsUsed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF42ADC10D800E77A5C /* TransactionReviewDappsUsed.swift */; };
+		48CFC29A2ADC10D900E77A5C /* TransactionReviewDapps+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF32ADC10D800E77A5C /* TransactionReviewDapps+View.swift */; };
+		48CFC29B2ADC10D900E77A5C /* TransactionReviewDapps.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF42ADC10D800E77A5C /* TransactionReviewDapps.swift */; };
 		48CFC29C2ADC10D900E77A5C /* TransactionReview+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF52ADC10D800E77A5C /* TransactionReview+View.swift */; };
 		48CFC29E2ADC10D900E77A5C /* TransactionReview+DepositExceptionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCF82ADC10D800E77A5C /* TransactionReview+DepositExceptionsView.swift */; };
 		48CFC29F2ADC10D900E77A5C /* PersonasCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBCFC2ADC10D800E77A5C /* PersonasCoordinator+View.swift */; };
@@ -1232,7 +1232,6 @@
 		A47572052B29B4F20059A95D /* IOSSecurityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */; };
 		A47572062B29B4F50059A95D /* IOSSecurityClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572012B29B3CA0059A95D /* IOSSecurityClient+Live.swift */; };
 		A4B017F72B4C099D00B42B8E /* TransactionReview+DepositSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4B017F42B4BF59000B42B8E /* TransactionReview+DepositSettingView.swift */; };
-		A4B017FA2B4E9A1400B42B8E /* TransactionReview+ContributingToPoolsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4B017F92B4E9A1400B42B8E /* TransactionReview+ContributingToPoolsView.swift */; };
 		E62449D52AFBA61100272C67 /* Home+AccountRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */; };
 		E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */; };
 		E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */; };
@@ -1472,8 +1471,8 @@
 		48CFBCEF2ADC10D800E77A5C /* AdvancedFeesCustomization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AdvancedFeesCustomization.swift; sourceTree = "<group>"; };
 		48CFBCF02ADC10D800E77A5C /* CustomizeFees+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CustomizeFees+View.swift"; sourceTree = "<group>"; };
 		48CFBCF12ADC10D800E77A5C /* CustomizeFees.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomizeFees.swift; sourceTree = "<group>"; };
-		48CFBCF32ADC10D800E77A5C /* TransactionReviewDappsUsed+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransactionReviewDappsUsed+View.swift"; sourceTree = "<group>"; };
-		48CFBCF42ADC10D800E77A5C /* TransactionReviewDappsUsed.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionReviewDappsUsed.swift; sourceTree = "<group>"; };
+		48CFBCF32ADC10D800E77A5C /* TransactionReviewDapps+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransactionReviewDapps+View.swift"; sourceTree = "<group>"; };
+		48CFBCF42ADC10D800E77A5C /* TransactionReviewDapps.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionReviewDapps.swift; sourceTree = "<group>"; };
 		48CFBCF52ADC10D800E77A5C /* TransactionReview+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransactionReview+View.swift"; sourceTree = "<group>"; };
 		48CFBCF82ADC10D800E77A5C /* TransactionReview+DepositExceptionsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransactionReview+DepositExceptionsView.swift"; sourceTree = "<group>"; };
 		48CFBCFC2ADC10D800E77A5C /* PersonasCoordinator+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PersonasCoordinator+View.swift"; sourceTree = "<group>"; };
@@ -2554,7 +2553,6 @@
 		A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Test.swift"; sourceTree = "<group>"; };
 		A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Interface.swift"; sourceTree = "<group>"; };
 		A4B017F42B4BF59000B42B8E /* TransactionReview+DepositSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionReview+DepositSettingView.swift"; sourceTree = "<group>"; };
-		A4B017F92B4E9A1400B42B8E /* TransactionReview+ContributingToPoolsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionReview+ContributingToPoolsView.swift"; sourceTree = "<group>"; };
 		E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+Reducer.swift"; sourceTree = "<group>"; };
 		E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+View.swift"; sourceTree = "<group>"; };
 		E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportMnemonicTests.swift; sourceTree = "<group>"; };
@@ -3235,10 +3233,9 @@
 				48CFBCE42ADC10D800E77A5C /* TransactionReviewAccount */,
 				48CFBCE72ADC10D800E77A5C /* TransactionReviewNetworkFee */,
 				48CFBCEA2ADC10D800E77A5C /* CustomizeFees */,
-				48CFBCF22ADC10D800E77A5C /* TransactionReviewDappsUsed */,
+				48CFBCF22ADC10D800E77A5C /* TransactionReviewDapps */,
 				A4B017F32B4BF57B00B42B8E /* TransactionReviewDepositSetting */,
 				48CFBCF62ADC10D800E77A5C /* TransactionReviewDepositExceptions */,
-				A4B017F82B4E99EF00B42B8E /* TransactionReviewContributingToPools */,
 			);
 			path = TransactionReviewFeature;
 			sourceTree = "<group>";
@@ -3330,15 +3327,15 @@
 			path = CustomizeFees;
 			sourceTree = "<group>";
 		};
-		48CFBCF22ADC10D800E77A5C /* TransactionReviewDappsUsed */ = {
+		48CFBCF22ADC10D800E77A5C /* TransactionReviewDapps */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBCF32ADC10D800E77A5C /* TransactionReviewDappsUsed+View.swift */,
-				48CFBCF42ADC10D800E77A5C /* TransactionReviewDappsUsed.swift */,
+				48CFBCF32ADC10D800E77A5C /* TransactionReviewDapps+View.swift */,
+				48CFBCF42ADC10D800E77A5C /* TransactionReviewDapps.swift */,
 				836878602B4551910029C808 /* UnknownDappComponents+Reducer.swift */,
 				835F196C2B3581C300E0B71D /* UnknownDappComponents+View.swift */,
 			);
-			path = TransactionReviewDappsUsed;
+			path = TransactionReviewDapps;
 			sourceTree = "<group>";
 		};
 		48CFBCF62ADC10D800E77A5C /* TransactionReviewDepositExceptions */ = {
@@ -6984,14 +6981,6 @@
 			path = TransactionReviewDepositSetting;
 			sourceTree = "<group>";
 		};
-		A4B017F82B4E99EF00B42B8E /* TransactionReviewContributingToPools */ = {
-			isa = PBXGroup;
-			children = (
-				A4B017F92B4E9A1400B42B8E /* TransactionReview+ContributingToPoolsView.swift */,
-			);
-			path = TransactionReviewContributingToPools;
-			sourceTree = "<group>";
-		};
 		E634CA2C2AFD259000C43DB7 /* DebugKeychainContents */ = {
 			isa = PBXGroup;
 			children = (
@@ -8442,7 +8431,7 @@
 				48CFC3162ADC10D900E77A5C /* ScanMultipleOlympiaQRCodes.swift in Sources */,
 				48CFC2F72ADC10D900E77A5C /* CreationOfPersona+View.swift in Sources */,
 				48CFC2CC2ADC10D900E77A5C /* FungibleResourceAsset+Reducer.swift in Sources */,
-				48CFC29A2ADC10D900E77A5C /* TransactionReviewDappsUsed+View.swift in Sources */,
+				48CFC29A2ADC10D900E77A5C /* TransactionReviewDapps+View.swift in Sources */,
 				48CFC36B2ADC10D900E77A5C /* FungibleTokenDetails+Reducer.swift in Sources */,
 				48CFC3322ADC10D900E77A5C /* ImportMnemonic.swift in Sources */,
 				E66EEB9B2B06694E007624BC /* RecoverWalletWithoutProfileStart+View.swift in Sources */,
@@ -8808,7 +8797,6 @@
 				48CFC4D92ADC10DA00E77A5C /* MetadataBoolValue.swift in Sources */,
 				48CFC5962ADC10DA00E77A5C /* ControlRequirements.swift in Sources */,
 				48CFC4262ADC10DA00E77A5C /* LocalizedError+Equatable.swift in Sources */,
-				A4B017FA2B4E9A1400B42B8E /* TransactionReview+ContributingToPoolsView.swift in Sources */,
 				48CFC32A2ADC10D900E77A5C /* CameraPermission+View.swift in Sources */,
 				48CFC5C62ADC10DA00E77A5C /* ApprovalSlider.swift in Sources */,
 				48CFC3B12ADC10D900E77A5C /* HD+ExtendedKey.swift in Sources */,
@@ -9073,7 +9061,7 @@
 				48CFC3A62ADC10D900E77A5C /* SignatureWithPublicKey.swift in Sources */,
 				A43715202B509BAE0010EA4A /* TransferPoolUnitView.swift in Sources */,
 				48CFC45A2ADC10DA00E77A5C /* LedgerHardwareWalletClient+Test.swift in Sources */,
-				48CFC29B2ADC10D900E77A5C /* TransactionReviewDappsUsed.swift in Sources */,
+				48CFC29B2ADC10D900E77A5C /* TransactionReviewDapps.swift in Sources */,
 				48CFC3C92ADC10D900E77A5C /* WordList+Japanese.swift in Sources */,
 				48CFC3532ADC10D900E77A5C /* DappInteractor+ViewModifier.swift in Sources */,
 				48CFC3A12ADC10D900E77A5C /* Epoch.swift in Sources */,

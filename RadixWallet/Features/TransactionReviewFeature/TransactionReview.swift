@@ -323,13 +323,16 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 			return .none
 
-		case let .dAppsUsed(.delegate(.openDapp(dAppID))):
+		case let .dAppsUsed(.delegate(.openDapp(dAppID))), let .contributingToPools(.delegate(.openDapp(dAppID))), let .redeemingFromPools(.delegate(.openDapp(dAppID))):
 			state.destination = .dApp(.init(dAppDefinitionAddress: dAppID))
 			return .none
 
-		case let .dAppsUsed(.delegate(.openUnknownComponents(components))):
-			let addresses = components.map { LedgerIdentifiable.Address.component($0) }
-			state.destination = .unknownDappComponents(.init(addresses: addresses))
+		case let .dAppsUsed(.delegate(.openUnknownAddresses(components))):
+			state.destination = .unknownDappComponents(.init(addresses: components.map { .component($0) }))
+			return .none
+
+		case let .contributingToPools(.delegate(.openUnknownAddresses(pools))), let .redeemingFromPools(.delegate(.openUnknownAddresses(pools))):
+			state.destination = .unknownDappComponents(.init(addresses: pools.map { .resourcePool($0) }))
 			return .none
 
 		case .deposits(.delegate(.showCustomizeGuarantees)):
@@ -572,18 +575,19 @@ extension TransactionReview {
 			let withdrawals = try? await extractWithdrawals(
 				accountWithdraws: summary.accountWithdraws,
 				metadataOfNewlyCreatedEntities: summary.metadataOfNewlyCreatedEntities,
-				dataOfNewlyMintedNonFungibles: summary.dataOfNewlyMintedNonFungibles, // TODO: Is this never populated?
+				dataOfNewlyMintedNonFungibles: summary.dataOfNewlyMintedNonFungibles,
 				addressesOfNewlyCreatedEntities: summary.addressesOfNewlyCreatedEntities,
 				userAccounts: userAccounts,
 				networkID: networkID
 			)
 
-			let dAppsUsed = try? await extractUsedDapps(summary.encounteredEntities)
+			let dAppAddresses = summary.encounteredEntities.filter { $0.entityType() == .globalGenericComponent }
+			let dAppsUsed: TransactionReviewDappsUsed.State? = try await extractDapps(dAppAddresses)
 
 			let deposits = try? await extractDeposits(
 				accountDeposits: summary.accountDeposits,
 				metadataOfNewlyCreatedEntities: summary.metadataOfNewlyCreatedEntities,
-				dataOfNewlyMintedNonFungibles: summary.dataOfNewlyMintedNonFungibles, // TODO: Is this never populated?
+				dataOfNewlyMintedNonFungibles: summary.dataOfNewlyMintedNonFungibles,
 				addressesOfNewlyCreatedEntities: summary.addressesOfNewlyCreatedEntities,
 				userAccounts: userAccounts,
 				networkID: networkID
@@ -619,10 +623,11 @@ extension TransactionReview {
 				try Address(validatingAddress: $0)
 			}
 
-			let poolAddressesAsGeneral = try poolAddresses.map { try $0.asSpecific() as Address }
+			// Extract Contributing to Pools section
+			let contributingToPools: TransactionReviewPools.State? = try await extractDapps(poolAddresses)
 
 			let entities = try await onLedgerEntitiesClient.getEntities(
-				addresses: poolUnitAddresses + contributedAddresses + poolAddressesAsGeneral,
+				addresses: poolUnitAddresses + contributedAddresses,
 				metadataKeys: .poolUnitMetadataKeys
 			)
 
@@ -647,10 +652,6 @@ extension TransactionReview {
 						)
 					}
 			}
-
-			// Extract Contributing to Pools section
-			let poolEntities = entities.compactMap(\.resourcePool)
-			let contributingToPools = try await extractPools(poolAddresses)
 
 			// The entities for the pool units and the contributed resources
 			let resourceEntities = entities.compactMap(\.resource)
@@ -935,21 +936,7 @@ extension TransactionReview {
 			}
 	}
 
-	private func extractPools(_ poolAddresses: [EngineToolkit.Address]) async throws -> TransactionReviewPools.State {
-		let (known, unknown) = try await extractDapps(poolAddresses, kind: ResourcePoolEntityType.self)
-		return .init(knownDapps: known, unknownDapps: unknown)
-	}
-
-	private func extractUsedDapps(_ allAddress: [EngineToolkit.Address]) async throws -> TransactionReviewDappsUsed.State? {
-		let addresses = allAddress.filter { $0.entityType() == .globalGenericComponent }
-
-		let (known, unknown) = try await extractDapps(addresses, kind: ComponentEntityType.self)
-		guard known.count + unknown.count > 0 else { return nil }
-
-		return .init(knownDapps: known, unknownDapps: unknown)
-	}
-
-	private func extractDapps<Kind: SpecificEntityType>(_ addresses: [EngineToolkit.Address], kind: Kind.Type) async throws -> (known: IdentifiedArrayOf<DappEntity>, unknown: IdentifiedArrayOf<SpecificAddress<Kind>>) {
+	private func extractDapps<Kind: SpecificEntityType>(_ addresses: [EngineToolkit.Address]) async throws -> TransactionReviewDapps<Kind>.State? {
 		let dApps = await addresses.asyncMap {
 			await (address: $0, entity: try? extractDappEntity($0.asSpecific()))
 		}
@@ -957,7 +944,9 @@ extension TransactionReview {
 		let unknownDapps = try dApps.filter { $0.entity == nil }
 			.map { try $0.address.asSpecific() as SpecificAddress<Kind> }.asIdentifiable()
 
-		return (knownDapps, unknownDapps)
+		guard knownDapps.count + unknownDapps.count > 0 else { return nil }
+
+		return .init(knownDapps: knownDapps, unknownDapps: unknownDapps)
 	}
 
 	private func extractDappEntity(_ entity: Address) async throws -> DappEntity {
