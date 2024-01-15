@@ -303,7 +303,7 @@ extension StakeUnitList {
 					StakeClaimNFTSView.ViewState(stakeClaimTokens: stakeClaimTokens, selectedStakeClaims: allSelectedTokens)
 				}
 			)
-		}.asIdentifiable()
+		}.sorted(by: \.id.address).asIdentifiable()
 
 		state.stakeSummary = .init(
 			staked: .success(stakedAmount),
