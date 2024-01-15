@@ -29,29 +29,56 @@ public extension StakeUnitList {
 					.padding(.medium1)
 				}
 
-				Section {
-					validatorStakeView(viewStore.firstStakedValidator)
-				} header: {
-					HStack {
-						Image(asset: AssetResource.iconValidator).withDottedCircleOverlay()
-						Text(L10n.Account.Staking.stakedValidators(viewStore.stakedValidators.count))
-							.textStyle(.body1Link)
-							.foregroundColor(.app.gray2)
-					}
-					.rowStyle()
-					.padding(.bottom, .small2)
-				}
-
-				ForEach(viewStore.remainingStakedValidators) { viewState in
+				if !viewStore.stakedValidators.isEmpty {
 					Section {
-						validatorStakeView(viewState)
+						validatorStakeView(viewStore.firstStakedValidator)
+					} header: {
+						stakedValidatorsSectionHeader(viewStore.ownedStakes.count)
 					}
+
+					ForEach(viewStore.remainingStakedValidators) { viewState in
+						Section {
+							validatorStakeView(viewState)
+						}
+					}
+				} else {
+					loadingView(viewStore.ownedStakes)
 				}
 			}
 			.onAppear {
 				store.send(.view(.appeared))
 			}
 			.destinations(with: store)
+		}
+
+		@ViewBuilder
+		private func loadingView(_ ownedStakes: IdentifiedArrayOf<OnLedgerEntity.Account.RadixNetworkStake>) -> some SwiftUI.View {
+			Section {
+				shimmeringLoadingView()
+			} header: {
+				stakedValidatorsSectionHeader(ownedStakes.count)
+			}
+
+			ForEach(ownedStakes.dropFirst()) { _ in
+				Section {
+					shimmeringLoadingView()
+				}
+			}
+		}
+
+		@ViewBuilder
+		private func loadedView(_ ownedStakes: IdentifiedArrayOf<OnLedgerEntity.Account.RadixNetworkStake>) -> some SwiftUI.View {
+			Section {
+				shimmeringLoadingView()
+			} header: {
+				stakedValidatorsSectionHeader(ownedStakes.count)
+			}
+
+			ForEach(ownedStakes.dropFirst()) { _ in
+				Section {
+					shimmeringLoadingView()
+				}
+			}
 		}
 
 		@ViewBuilder
@@ -62,12 +89,24 @@ public extension StakeUnitList {
 					store.send(.view(.didTapLiquidStakeUnit(forValidator: viewState.id)))
 				},
 				onStakeClaimTokenTapped: { claim in
-					store.send(.view(.didTapStakeClaimNFT(forValidator: viewState.id, claim: claim)))
+					store.send(.view(.didTapStakeClaimNFT(claim)))
 				},
 				onClaimAllStakeClaimsTapped: {
 					store.send(.view(.didTapClaimAll(forValidator: viewState.id)))
 				}
 			)
+		}
+
+		@ViewBuilder
+		private func stakedValidatorsSectionHeader(_ validatorsCount: Int) -> some SwiftUI.View {
+			HStack {
+				Image(asset: AssetResource.iconValidator).withDottedCircleOverlay()
+				Text(L10n.Account.Staking.stakedValidators(validatorsCount))
+					.textStyle(.body1Link)
+					.foregroundColor(.app.gray2)
+			}
+			.rowStyle()
+			.padding(.bottom, .small2)
 		}
 	}
 }

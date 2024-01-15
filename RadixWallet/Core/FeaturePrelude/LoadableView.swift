@@ -25,13 +25,18 @@ extension View {
 		self.loadable(
 			loadable,
 			loadingView: {
-				Spacer()
-					.frame(height: .large1)
-					.background(.app.gray4)
-					.shimmer(active: true, config: .accountResourcesLoading)
-					.cornerRadius(.small1)
+				shimmeringLoadingView()
 			},
 			successContent: successContent
 		)
+	}
+
+	@ViewBuilder
+	func shimmeringLoadingView() -> some View {
+		Spacer()
+			.frame(height: .large1)
+			.background(.app.gray4)
+			.shimmer(active: true, config: .accountResourcesLoading)
+			.cornerRadius(.small1)
 	}
 }

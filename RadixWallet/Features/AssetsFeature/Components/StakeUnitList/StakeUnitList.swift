@@ -2,12 +2,21 @@
 public struct StakeUnitList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		let account: OnLedgerEntity.Account
+		var ownedStakes: IdentifiedArrayOf<OnLedgerEntity.Account.RadixNetworkStake> {
+			account.poolUnitResources.radixNetworkStakes
+		}
+
+		// Child states
 		var stakeSummary: StakeSummaryView.ViewState
 		var stakedValidators: IdentifiedArrayOf<ValidatorStakeView.ViewState>
+
+		// Selection states
 		var selectedLiquidStakeUnits: IdentifiedArrayOf<OnLedgerEntity.OwnedFungibleResource>?
 		var selectedStakeClaimTokens: [OnLedgerEntity.OwnedNonFungibleResource: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>]?
-		var stakeDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>> = .idle
-		var shouldRefresh = false
+
+		// Loading state
+		var isLoading: Bool
+		var shouldRefresh: Bool
 
 		@PresentationState
 		var destination: Destination.State?
@@ -26,9 +35,10 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 				readyToClaim: .loading,
 				canClaimStakes: selectedStakeClaimTokens == nil
 			)
-			self.stakedValidators = account.poolUnitResources.radixNetworkStakes.map {
-				ValidatorStakeView.ViewState(id: $0.validatorAddress, content: .loading)
-			}.asIdentifiable()
+			self.stakedValidators = []
+
+			self.isLoading = false
+			self.shouldRefresh = false
 		}
 	}
 
@@ -36,7 +46,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		case appeared
 		case refresh
 		case didTapLiquidStakeUnit(forValidator: ValidatorAddress)
-		case didTapStakeClaimNFT(forValidator: ValidatorAddress, claim: OnLedgerEntitiesClient.StakeClaim)
+		case didTapStakeClaimNFT(OnLedgerEntitiesClient.StakeClaim)
 		case didTapClaimAll(forValidator: ValidatorAddress)
 		case didTapClaimAllStakes
 	}
@@ -89,68 +99,63 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			guard !state.stakeDetails.isSuccess else {
+			guard !state.isLoading else {
 				return .none
 			}
 
 			return loadStakingDetails(&state)
 
 		case .refresh:
+			state.shouldRefresh = true
 			return loadStakingDetails(&state)
 
-		case let .didTapLiquidStakeUnit(address):
+		case let .didTapLiquidStakeUnit(validatorAddress):
 			if state.selectedLiquidStakeUnits != nil {
-				let stakedValidator = state.stakedValidators[id: address]
-				guard case var .success(content) = stakedValidator?.content,
-				      let resource = state.account.poolUnitResources.radixNetworkStakes[id: address]?.stakeUnitResource
+				guard let resource = state.ownedStakes[id: validatorAddress]?.stakeUnitResource
 				else {
 					return .none
 				}
 
-				content.liquidStakeUnit?.isSelected?.toggle()
-				state.stakedValidators[id: address]?.content = .success(content)
+				state.stakedValidators[id: validatorAddress]?.liquidStakeUnit?.isSelected?.toggle()
 
 				state.selectedLiquidStakeUnits?.toggle(resource)
 				return .none
 			} else {
-				guard case let .success(stakeDetails) = state.stakeDetails,
-				      let stake = stakeDetails[id: address],
-				      let stakeUnitResource = stake.stakeUnitResource
+				guard let stakeDetails = state.stakedValidators[id: validatorAddress]?.stakeDetails,
+				      let stakeUnitResource = stakeDetails.stakeUnitResource
 				else {
 					return .none
 				}
 				state.destination = .details(
 					.init(
-						validator: stake.validator,
+						validator: stakeDetails.validator,
 						stakeUnitResource: stakeUnitResource,
-						xrdRedemptionValue: stake.xrdRedemptionValue
+						xrdRedemptionValue: stakeDetails.xrdRedemptionValue
 					)
 				)
 			}
 
 			return .none
 
-		case let .didTapStakeClaimNFT(validatorAddress, stakeClaim):
-			guard case let .success(stakeDetails) = state.stakeDetails,
-			      let stake = state.account.poolUnitResources.radixNetworkStakes[id: validatorAddress],
-			      let stakeDetails = stakeDetails[id: validatorAddress],
-			      let stakeClaimTokens = stakeDetails.stakeClaimTokens,
-			      let ownedStakeClaim = stake.stakeClaimResource
-			else {
+		case let .didTapStakeClaimNFT(stakeClaim):
+			guard let stakedValidator = state.stakedValidators[id: stakeClaim.validatorAddress] else {
 				return .none
 			}
 
 			if state.selectedStakeClaimTokens != nil {
-				let stakedValidator = state.stakedValidators[id: stakeClaim.validatorAddress]
-				guard case var .success(content) = stakedValidator?.content else {
+				guard let stake = state.ownedStakes[id: stakeClaim.validatorAddress],
+				      let ownedStakeClaim = stake.stakeClaimResource
+				else {
 					return .none
 				}
 
-				content.stakeClaimNFTs?.selectedStakeClaims?.toggle(stakeClaim.token.id)
-
-				state.stakedValidators[id: validatorAddress]?.content = .success(content)
+				state.stakedValidators[id: stakeClaim.validatorAddress]?.stakeClaimNFTs?.selectedStakeClaims?.toggle(stakeClaim.token.id)
 				state.selectedStakeClaimTokens?[ownedStakeClaim, default: []].toggle(stakeClaim.token)
 
+				return .none
+			}
+
+			guard let stakeClaimTokens = stakedValidator.stakeDetails.stakeClaimTokens else {
 				return .none
 			}
 
@@ -164,9 +169,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 			return .none
 
 		case let .didTapClaimAll(validatorAddress):
-			guard case let .success(stakeDetails) = state.stakeDetails,
-			      let stakeClaim = stakeDetails[id: validatorAddress]?.stakeClaimTokens
-			else {
+			guard let stakeClaimTokens = state.stakedValidators[id: validatorAddress]?.stakeDetails.stakeClaimTokens else {
 				return .none
 			}
 
@@ -175,20 +178,16 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 				stakeClaims: [
 					.init(
 						validatorAddress: validatorAddress,
-						resourceAddress: stakeClaim.resource.resourceAddress,
-						ids: stakeClaim.stakeClaims.filter(\.isReadyToBeClaimed).map { $0.id.localId() }
+						resourceAddress: stakeClaimTokens.resource.resourceAddress,
+						ids: stakeClaimTokens.stakeClaims.filter(\.isReadyToBeClaimed).map { $0.id.localId() }
 					),
 				]
 			)
 
 		case .didTapClaimAllStakes:
-			guard case let .success(stakeDetails) = state.stakeDetails else {
-				return .none
-			}
-
 			return sendStakeClaimTransaction(
 				state.account.address,
-				stakeClaims: stakeDetails.compactMap { stake in
+				stakeClaims: state.stakedValidators.map(\.stakeDetails).compactMap { stake in
 					guard let stakeClaimTokens = stake.stakeClaimTokens,
 					      let stakeClaims = stakeClaimTokens.stakeClaims.filter(\.isReadyToBeClaimed).nilIfEmpty
 					else {
@@ -208,12 +207,13 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .detailsLoaded(.success(details)):
+			state.isLoading = false
 			state.shouldRefresh = false
-			state.stakeDetails = .success(details.asIdentifiable())
 			updateAfterLoading(&state, details: details.asIdentifiable())
 			return .none
 		case let .detailsLoaded(.failure(error)):
-			state.stakeDetails = .failure(error)
+			state.isLoading = false
+			state.shouldRefresh = false
 			errorQueue.schedule(error)
 			return .none
 		}
@@ -238,7 +238,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 	}
 
 	private func loadStakingDetails(_ state: inout State) -> Effect<Action> {
-		state.stakeDetails = .loading
+		state.isLoading = true
 
 		return .run { [state = state] send in
 			let result = await TaskResult {
@@ -282,8 +282,10 @@ extension StakeUnitList {
 		let stakedAmount = details.map(\.xrdRedemptionValue).reduce(.zero(), +)
 		let unstakingAmount = stakeClaims.filter(not(\.isReadyToBeClaimed)).map(\.claimAmount).reduce(.zero(), +)
 		let readyToClaimAmount = stakeClaims.filter(\.isReadyToBeClaimed).map(\.claimAmount).reduce(.zero(), +)
+
 		let validatorStakes = details.map { stake in
-			let content = ValidatorStakeView.ViewState.Content(
+			ValidatorStakeView.ViewState(
+				stakeDetails: stake,
 				validatorNameViewState: .init(
 					imageURL: stake.validator.metadata.iconURL,
 					name: stake.validator.metadata.name ?? L10n.Account.PoolUnits.unknownValidatorName,
@@ -300,8 +302,6 @@ extension StakeUnitList {
 					StakeClaimNFTSView.ViewState(stakeClaimTokens: stakeClaimTokens, selectedStakeClaims: allSelectedTokens)
 				}
 			)
-
-			return ValidatorStakeView.ViewState(id: stake.validator.address, content: .success(content))
 		}.asIdentifiable()
 
 		state.stakeSummary = .init(

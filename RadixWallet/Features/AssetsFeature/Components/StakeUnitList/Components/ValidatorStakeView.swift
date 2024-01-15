@@ -4,15 +4,15 @@ import SwiftUI
 // MARK: - ValidatorStakeView
 struct ValidatorStakeView: View {
 	public struct ViewState: Sendable, Hashable, Identifiable {
-		public var id: ValidatorAddress
-
-		struct Content: Sendable, Hashable {
-			let validatorNameViewState: ValidatorHeaderView.ViewState
-			var liquidStakeUnit: LiquidStakeUnitView.ViewState?
-			var stakeClaimNFTs: StakeClaimNFTSView.ViewState?
+		public var id: ValidatorAddress {
+			stakeDetails.id
 		}
 
-		var content: Loadable<Content>
+		let stakeDetails: OnLedgerEntitiesClient.OwnedStakeDetails
+
+		let validatorNameViewState: ValidatorHeaderView.ViewState
+		var liquidStakeUnit: LiquidStakeUnitView.ViewState?
+		var stakeClaimNFTs: StakeClaimNFTSView.ViewState?
 	}
 
 	let viewState: ViewState
@@ -22,33 +22,30 @@ struct ValidatorStakeView: View {
 	var onClaimAllStakeClaimsTapped: () -> Void
 
 	public var body: some SwiftUI.View {
-		loadable(viewState.content) { content in
-			ValidatorHeaderView(viewState: content.validatorNameViewState)
-				.contentShape(Rectangle())
-				.rowStyle()
-				.padding(.medium1)
-				.onTapGesture {
-					isExpanded.toggle()
-				}
+		ValidatorHeaderView(viewState: viewState.validatorNameViewState)
+			.contentShape(Rectangle())
+			.rowStyle()
+			.padding(.medium1)
+			.onTapGesture {
+				isExpanded.toggle()
+			}
 
-			if isExpanded {
-				if let liquidStakeUnitViewState = content.liquidStakeUnit {
-					liquidStakeUnitView(viewState: liquidStakeUnitViewState)
-						.rowStyle()
-						.onTapGesture { onLiquidStakeUnitTapped() }
-				}
-
-				if let stakeClaimNFTsViewState = content.stakeClaimNFTs {
-					stakeClaimNFTsView(
-						viewState: stakeClaimNFTsViewState,
-						handleTapGesture: onStakeClaimTokenTapped,
-						onClaimAllTapped: onClaimAllStakeClaimsTapped
-					)
+		if isExpanded {
+			if let liquidStakeUnitViewState = viewState.liquidStakeUnit {
+				liquidStakeUnitView(viewState: liquidStakeUnitViewState)
 					.rowStyle()
-				}
+					.onTapGesture { onLiquidStakeUnitTapped() }
+			}
+
+			if let stakeClaimNFTsViewState = viewState.stakeClaimNFTs {
+				stakeClaimNFTsView(
+					viewState: stakeClaimNFTsViewState,
+					handleTapGesture: onStakeClaimTokenTapped,
+					onClaimAllTapped: onClaimAllStakeClaimsTapped
+				)
+				.rowStyle()
 			}
 		}
-		.background(.app.white)
 	}
 
 	@ViewBuilder

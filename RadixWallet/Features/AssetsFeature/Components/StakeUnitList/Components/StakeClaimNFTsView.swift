@@ -60,7 +60,7 @@ public struct StakeClaimNFTSView: View {
 				if case .readyToBeClaimed = kind,
 				   viewState.selectedStakeClaims == nil // No selection mode
 				{
-					Text("Claim").onTapGesture {
+					Text(L10n.Account.Staking.claim).onTapGesture {
 						onClaimAllTapped()
 					}
 					.textStyle(.body2Link)
