@@ -625,43 +625,10 @@ extension TransactionReview {
 				networkID: networkID
 			)
 
+			try await updateAccounts(&deposits, with: poolContributions, networkID: networkID)
+
 			// Extract Contributing to Pools section
 			let pools: TransactionReviewPools.State? = try await extractDapps(poolAddresses, unknownTitle: L10n.TransactionReview.unknownPools)
-
-			// The entities for the pool units and the contributed resources
-			let resourceEntities = try await resourceEntities(for: poolContributions)
-
-			// Aggregate all contributions that belong to the same pool and distribute across the deposits that receive the corresponding pool unit
-			for contribution in poolContributions.aggregated {
-				let resourceAddress = try contribution.poolUnitsResourceAddress.asSpecific() as ResourceAddress
-
-				guard let poolUnitResource = resourceEntities.first(where: { $0.resourceAddress == resourceAddress }) else { continue }
-
-				// The resources in the pool
-				let poolResources = try poolResources(for: contribution.resourcesInInteraction, entities: resourceEntities, networkID: networkID)
-
-				for account in deposits?.accounts ?? [] {
-					for transfer in account.transfers {
-						if transfer.resource.id == resourceAddress, case let .fungible(details) = transfer.details {
-							var resources = poolResources
-
-							// If this transfer does not contain all the pool units, scale the resource amounts pro rata
-							if details.amount != contribution.poolUnitsAmount {
-								let factor = details.amount / contribution.poolUnitsAmount
-								for index in resources.indices {
-									resources[index].amount *= factor // TODO: Round according to divisibility
-								}
-							}
-
-							deposits?.accounts[id: account.id]?.transfers[id: transfer.id]?.details = .poolUnit(.init(
-								poolName: poolUnitResource.title,
-								resources: resources,
-								guarantee: transfer.fungibleGuarantee
-							))
-						}
-					}
-				}
-			}
 
 			return Sections(
 				withdrawals: withdrawals,
@@ -678,6 +645,8 @@ extension TransactionReview {
 				networkID: networkID
 			)
 
+			try await updateAccounts(&withdrawals, with: poolRedemptions, networkID: networkID)
+
 			// Extract Deposits section
 			let deposits = try await extractDeposits(
 				accountDeposits: summary.accountDeposits,
@@ -687,41 +656,6 @@ extension TransactionReview {
 
 			// Extract Contributing to Pools section
 			let pools: TransactionReviewPools.State? = try await extractDapps(poolAddresses, unknownTitle: L10n.TransactionReview.unknownPools)
-
-			// The entities for the pool units and the redeemed resources
-			let resourceEntities = try await resourceEntities(for: poolRedemptions)
-
-			// Aggregate all redepmtions that belong to the same pool and distribute across the withdrawals that provide the corresponding pool unit
-			for redemption in poolRedemptions.aggregated {
-				let resourceAddress = try redemption.poolUnitsResourceAddress.asSpecific() as ResourceAddress
-
-				guard let poolUnitResource = resourceEntities.first(where: { $0.resourceAddress == resourceAddress }) else { continue }
-
-				// The resources in the pool
-				let poolResources = try poolResources(for: redemption.resourcesInInteraction, entities: resourceEntities, networkID: networkID)
-
-				for account in withdrawals?.accounts ?? [] {
-					for transfer in account.transfers {
-						if transfer.resource.id == resourceAddress, case let .fungible(details) = transfer.details {
-							var resources = poolResources
-
-							// If this transfer does not contain all the pool units, scale the resource amounts pro rata
-							if details.amount != redemption.poolUnitsAmount {
-								let factor = details.amount / redemption.poolUnitsAmount
-								for index in resources.indices {
-									resources[index].amount *= factor // TODO: Round according to divisibility
-								}
-							}
-
-							withdrawals?.accounts[id: account.id]?.transfers[id: transfer.id]?.details = .poolUnit(.init(
-								poolName: poolUnitResource.title,
-								resources: resources,
-								guarantee: transfer.fungibleGuarantee
-							))
-						}
-					}
-				}
-			}
 
 			return Sections(
 				withdrawals: withdrawals,
@@ -773,6 +707,43 @@ extension TransactionReview {
 				accountDepositExceptions: accountDepositExceptions,
 				conforming: true
 			)
+		}
+	}
+
+	private func updateAccounts(_ accounts: inout TransactionReviewAccounts.State?, with interactions: [some TrackedPoolInteraction], networkID: NetworkID) async throws {
+		let aggregatedInteractions = interactions.aggregated
+
+		let resourceEntities = try await resourceEntities(for: aggregatedInteractions)
+
+		for contribution in aggregatedInteractions {
+			let resourceAddress = try contribution.poolUnitsResourceAddress.asSpecific() as ResourceAddress
+
+			guard let poolUnitResource = resourceEntities.first(where: { $0.resourceAddress == resourceAddress }) else { continue }
+
+			// The resources in the pool
+			let poolResources = try poolResources(for: contribution.resourcesInInteraction, entities: resourceEntities, networkID: networkID)
+
+			for account in accounts?.accounts ?? [] {
+				for transfer in account.transfers {
+					if transfer.resource.id == resourceAddress, case let .fungible(details) = transfer.details {
+						var resources = poolResources
+
+						// If this transfer does not contain all the pool units, scale the resource amounts pro rata
+						if details.amount != contribution.poolUnitsAmount {
+							let factor = details.amount / contribution.poolUnitsAmount
+							for index in resources.indices {
+								resources[index].amount *= factor // TODO: Round according to divisibility
+							}
+						}
+
+						accounts?.accounts[id: account.id]?.transfers[id: transfer.id]?.details = .poolUnit(.init(
+							poolName: poolUnitResource.title,
+							resources: resources,
+							guarantee: transfer.fungibleGuarantee
+						))
+					}
+				}
+			}
 		}
 	}
 
