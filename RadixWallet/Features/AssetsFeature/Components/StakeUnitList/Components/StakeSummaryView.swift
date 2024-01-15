@@ -20,13 +20,23 @@ public struct StakeSummaryView: View {
 				Spacer()
 			}
 			.padding(.leading, -8)
+
 			VStack(spacing: .small2) {
-				summaryRow(L10n.Account.Staking.staked, amount: viewState.staked)
-				summaryRow(L10n.Account.Staking.unstaking, amount: viewState.unstaking)
+				summaryRow(
+					L10n.Account.Staking.staked,
+					amount: viewState.staked,
+					amountTextColor: .app.gray1
+				)
+
+				summaryRow(
+					L10n.Account.Staking.unstaking,
+					amount: viewState.unstaking
+				)
+
 				summaryRow(
 					L10n.Account.Staking.readyToClaim,
 					amount: viewState.readyToClaim,
-					textColor: viewState.canClaimStakes ? .app.blue2 : .app.gray2
+					titleTextColor: viewState.canClaimStakes && viewState.readyToClaim.wrappedValue != .zero() ? .app.blue2 : .app.gray2
 				)
 				.onTapGesture {
 					if viewState.canClaimStakes {
@@ -43,18 +53,19 @@ extension StakeSummaryView {
 	private func summaryRow(
 		_ name: String,
 		amount: Loadable<RETDecimal>,
-		textColor: Color = .app.gray2
+		titleTextColor: Color = .app.gray2,
+		amountTextColor: Color = .app.gray2
 	) -> some View {
 		HStack {
 			Text(name)
 				.textStyle(.body2HighImportance)
-				.foregroundColor(textColor)
+				.foregroundColor(titleTextColor)
 				.padding(.trailing, .medium3)
 			Spacer()
 			loadable(amount) { amount in
 				Text("\(amount.formatted()) XRD")
 					.textStyle(.body2HighImportance)
-					.foregroundColor(amount.isZero() ? .app.gray2 : .app.gray1)
+					.foregroundColor(amountTextColor)
 			}
 		}
 	}

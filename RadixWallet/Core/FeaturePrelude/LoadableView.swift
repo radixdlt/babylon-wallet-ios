@@ -26,7 +26,7 @@ extension View {
 			loadable,
 			loadingView: {
 				Spacer()
-					.frame(height: .small1)
+					.frame(height: .large1)
 					.background(.app.gray4)
 					.shimmer(active: true, config: .accountResourcesLoading)
 					.cornerRadius(.small1)

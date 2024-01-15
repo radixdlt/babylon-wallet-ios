@@ -219,23 +219,23 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		}
 	}
 
-//	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-//		switch presentedAction {
-//		case let .stakeClaimDetails(.delegate(.tappedClaimStake(stakeClaim))):
-//			return sendStakeClaimTransaction(
-//				state.account.address,
-//				stakeClaims: [
-//					.init(
-//						validatorAddress: stakeClaim.validatorAddress,
-//						resourceAddress: id.resourceAddress().asSpecific(),
-//						ids: [id.localId()]
-//					),
-//				]
-//			)
-//		case .stakeClaimDetails, .details:
-//			.none
-//		}
-//	}
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .stakeClaimDetails(.delegate(.tappedClaimStake(stakeClaim))):
+			sendStakeClaimTransaction(
+				state.account.address,
+				stakeClaims: [
+					.init(
+						validatorAddress: stakeClaim.validatorAddress,
+						resourceAddress: try! stakeClaim.id.resourceAddress().asSpecific(),
+						ids: [stakeClaim.id.localId()]
+					),
+				]
+			)
+		case .stakeClaimDetails, .details:
+			.none
+		}
+	}
 
 	private func loadStakingDetails(_ state: inout State) -> Effect<Action> {
 		state.stakeDetails = .loading

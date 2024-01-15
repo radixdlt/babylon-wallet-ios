@@ -137,10 +137,10 @@ extension AddressView {
 		guard let path else { return }
 		Task { [openURL, gatewaysClient] in
 			let currentNetwork = await gatewaysClient.getCurrentGateway().network
-			await openURL(URL(string: "safari://")!
-//				Radix.Dashboard.dashboard(forNetwork: currentNetwork)
-//					.url
-//					.appending(path: path)
+			await openURL(
+				Radix.Dashboard.dashboard(forNetwork: currentNetwork)
+					.url
+					.appending(path: path)
 			)
 		}
 	}
