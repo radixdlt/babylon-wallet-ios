@@ -507,6 +507,7 @@
 "error_transactionFailure_epoch" = "Failed to get epoch";
 "error_transactionFailure_header" = "Failed to build transaction header";
 "error_transactionFailure_manifest" = "Failed to convert transaction manifest";
+"error_transactionFailure_missingSigners" = "You don\'t have access to some accounts or personas required to authorise this transaction";
 "error_transactionFailure_network" = "Wrong network";
 "error_transactionFailure_noFundsToApproveTransaction" = "No funds to approve transaction";
 "error_transactionFailure_pollStatus" = "Failed to poll transaction status";
