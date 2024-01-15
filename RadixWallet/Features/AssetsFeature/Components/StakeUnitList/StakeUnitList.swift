@@ -222,7 +222,8 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .stakeClaimDetails(.delegate(.tappedClaimStake(stakeClaim))):
-			sendStakeClaimTransaction(
+			state.destination = nil
+			return sendStakeClaimTransaction(
 				state.account.address,
 				stakeClaims: [
 					.init(
@@ -233,7 +234,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 				]
 			)
 		case .stakeClaimDetails, .details:
-			.none
+			return .none
 		}
 	}
 

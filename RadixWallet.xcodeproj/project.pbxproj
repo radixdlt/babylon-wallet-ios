@@ -6930,13 +6930,13 @@
 		83DFAF2C2B4D48E2008B70CE /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBE542ADC10D800E77A5C /* ValidatorStakeView.swift */,
-				48CFBE512ADC10D800E77A5C /* ValidatorHeaderView.swift */,
 				48CFBE502ADC10D800E77A5C /* LSUDetails+View.swift */,
 				48CFBE552ADC10D800E77A5C /* LSUDetails.swift */,
 				83AAAC672B46FC4100222B64 /* LiquidStakeUnitView.swift */,
 				83AAAC692B46FC5800222B64 /* StakeClaimNFTsView.swift */,
 				83AAAC6B2B483D1B00222B64 /* StakeSummaryView.swift */,
+				48CFBE542ADC10D800E77A5C /* ValidatorStakeView.swift */,
+				48CFBE512ADC10D800E77A5C /* ValidatorHeaderView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
