@@ -13,16 +13,14 @@ extension TransactionReview {
 		var accountDepositExceptions: DepositExceptionsState? = nil
 
 		var proofs: TransactionReviewProofs.State? = nil
-
-		let conforming: Bool
 	}
 
-	func sections(for summary: ExecutionSummary, networkID: NetworkID) async throws -> Sections {
+	func sections(for summary: ExecutionSummary, networkID: NetworkID) async throws -> Sections? {
 		let userAccounts = try await extractUserAccounts(summary.encounteredEntities)
 
 		switch summary.detailedManifestClass {
 		case nil:
-			return Sections(conforming: false)
+			return nil
 		case .general, .transfer:
 			let withdrawals = try? await extractWithdrawals(
 				accountWithdraws: summary.accountWithdraws,
@@ -51,8 +49,7 @@ extension TransactionReview {
 				withdrawals: withdrawals,
 				dAppsUsed: dAppsUsed,
 				deposits: deposits,
-				proofs: proofs,
-				conforming: true
+				proofs: proofs
 			)
 
 		case let .poolContribution(poolAddresses: poolAddresses, poolContributions: poolContributions):
@@ -77,8 +74,7 @@ extension TransactionReview {
 			return Sections(
 				withdrawals: withdrawals,
 				deposits: deposits,
-				contributingToPools: pools,
-				conforming: true
+				contributingToPools: pools
 			)
 
 		case let .poolRedemption(poolAddresses: poolAddresses, poolRedemptions: poolRedemptions):
@@ -103,16 +99,18 @@ extension TransactionReview {
 			return Sections(
 				withdrawals: withdrawals,
 				deposits: deposits,
-				redeemingFromPools: pools,
-				conforming: true
+				redeemingFromPools: pools
 			)
 
 		case let .validatorStake(validatorAddresses: validatorAddresses, validatorStakes: validatorStakes):
-			return .init(conforming: false)
+			return nil
+
 		case let .validatorUnstake(validatorAddresses: validatorAddresses, validatorUnstakes: validatorUnstakes):
-			return .init(conforming: false)
+			return nil
+
 		case let .validatorClaim(validatorAddresses: validatorAddresses, validatorClaims: validatorClaims):
-			return .init(conforming: false)
+			return nil
+
 		case let .accountDepositSettingsUpdate(resourcePreferencesUpdates: resourcePreferencesUpdates, depositModeUpdates: depositModeUpdates, authorizedDepositorsAdded: authorizedDepositorsAdded, authorizedDepositorsRemoved: authorizedDepositorsRemoved):
 
 			let resourcePreferenceChanges = try resourcePreferencesUpdates.mapKeyValues(
@@ -147,8 +145,7 @@ extension TransactionReview {
 
 			return Sections(
 				accountDepositSetting: accountDepositSetting,
-				accountDepositExceptions: accountDepositExceptions,
-				conforming: true
+				accountDepositExceptions: accountDepositExceptions
 			)
 		}
 	}
@@ -362,7 +359,7 @@ extension TransactionReview {
 			deposits[account, default: []].append(contentsOf: transfers)
 		}
 
-		var depositAccounts = deposits
+		let depositAccounts = deposits
 			.filter { !$0.value.isEmpty }
 			.map { TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value)) }
 

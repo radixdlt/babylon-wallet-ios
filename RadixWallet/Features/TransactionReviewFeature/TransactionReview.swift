@@ -118,7 +118,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case previewLoaded(TaskResult<TransactionToReview>)
-		case updateSections(TransactionReview.Sections)
+		case updateSections(TransactionReview.Sections?)
 		case buildTransactionItentResult(TaskResult<TransactionIntent>)
 		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
 		case determineFeePayerResult(TaskResult<FeePayerSelectionResult?>)
@@ -388,6 +388,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				.concatenate(with: determineFeePayer(state, reviewedTransaction: reviewedTransaction))
 
 		case let .updateSections(sections):
+			guard let sections else {
+				return showRawTransaction(&state)
+			}
+
 			state.withdrawals = sections.withdrawals
 			state.dAppsUsed = sections.dAppsUsed
 			state.contributingToPools = sections.contributingToPools
@@ -395,12 +399,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.deposits = sections.deposits
 			state.accountDepositSetting = sections.accountDepositSetting
 			state.accountDepositExceptions = sections.accountDepositExceptions
-
 			state.proofs = sections.proofs
-
-			guard sections.conforming else {
-				return showRawTransaction(&state)
-			}
 
 			return .none
 
@@ -579,7 +578,7 @@ extension TransactionReview {
 		} catch: { error, send in
 			loggerGlobal.error("Failed to extract transaction content, error: \(error)")
 			// FIXME: propagate/display error?
-			await send(.internal(.updateSections(.init(conforming: false))))
+			await send(.internal(.updateSections(nil)))
 		}
 	}
 
