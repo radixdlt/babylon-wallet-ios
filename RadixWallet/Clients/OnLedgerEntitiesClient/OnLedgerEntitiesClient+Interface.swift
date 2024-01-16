@@ -264,10 +264,8 @@ extension OnLedgerEntitiesClient {
 	public func getDappDefinitionAddress(
 		_ address: Address
 	) async throws -> DappDefinitionAddress {
-		let entityMetadata = try await getEntity(address, metadataKeys: [.dappDefinition]).genericComponent?.metadata
-
-		guard let dappDefinitionAddress = entityMetadata?.dappDefinition
-		else {
+		let entityMetadata = try await getEntity(address, metadataKeys: [.dappDefinition]).metadata
+		guard let dappDefinitionAddress = entityMetadata?.dappDefinition else {
 			throw OnLedgerEntity.Metadata.MetadataError.missingDappDefinition
 		}
 

@@ -56,6 +56,23 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable {
 		}
 		return genericComponent
 	}
+
+	public var metadata: Metadata? {
+		switch self {
+		case let .resource(resource):
+			resource.metadata
+		case let .account(account):
+			account.metadata
+		case let .resourcePool(resourcePool):
+			resourcePool.metadata
+		case let .validator(validator):
+			validator.metadata
+		case .nonFungibleToken, .accountNonFungibleIds:
+			nil
+		case let .genericComponent(genericComponent):
+			genericComponent.metadata
+		}
+	}
 }
 
 // MARK: - OnLedgerEntity.Metadata.ValueAtStateVersion + Sendable
