@@ -588,6 +588,207 @@ extension TransactionReview {
 		}
 	}
 
+	func sections(for summary: ExecutionSummary, networkID: NetworkID) async throws -> Sections {
+		let userAccounts = try await extractUserAccounts(summary.encounteredEntities)
+
+		switch summary.detailedManifestClass {
+		case nil:
+			return Sections(conforming: false)
+		case .general, .transfer:
+			let withdrawals = try? await extractWithdrawals(
+				accountWithdraws: summary.accountWithdraws,
+				metadataOfNewlyCreatedEntities: summary.metadataOfNewlyCreatedEntities,
+				dataOfNewlyMintedNonFungibles: summary.dataOfNewlyMintedNonFungibles,
+				addressesOfNewlyCreatedEntities: summary.addressesOfNewlyCreatedEntities,
+				userAccounts: userAccounts,
+				networkID: networkID
+			)
+
+			let dAppAddresses = summary.encounteredEntities.filter { $0.entityType() == .globalGenericComponent }
+			let dAppsUsed: TransactionReviewDappsUsed.State? = try await extractDapps(dAppAddresses, unknownTitle: L10n.TransactionReview.unknownComponents)
+
+			let deposits = try? await extractDeposits(
+				accountDeposits: summary.accountDeposits,
+				metadataOfNewlyCreatedEntities: summary.metadataOfNewlyCreatedEntities,
+				dataOfNewlyMintedNonFungibles: summary.dataOfNewlyMintedNonFungibles,
+				addressesOfNewlyCreatedEntities: summary.addressesOfNewlyCreatedEntities,
+				userAccounts: userAccounts,
+				networkID: networkID
+			)
+
+			let proofs = try? await exctractProofs(summary.presentedProofs)
+
+			return Sections(
+				withdrawals: withdrawals,
+				dAppsUsed: dAppsUsed,
+				deposits: deposits,
+				proofs: proofs,
+				conforming: true
+			)
+
+		case let .poolContribution(poolAddresses: poolAddresses, poolContributions: poolContributions):
+			let poolUnitAddresses = try poolContributions.map(\.poolUnitsResourceAddress).map {
+				try $0.asSpecific() as Address
+			}
+
+			let withdrawals = try? await extractWithdrawals(
+				accountWithdraws: summary.accountWithdraws.mapValues { resources in
+					resources.filter { resource in
+						poolUnitAddresses.contains { $0.address == resource.resourceAddress.asStr() }
+					}
+				},
+				userAccounts: userAccounts,
+				networkID: networkID
+			)
+
+			var deposits = try await extractDeposits(
+				accountDeposits: summary.accountDeposits.mapValues { resources in
+					resources.filter { resource in
+						poolUnitAddresses.contains { $0.address == resource.resourceAddress.asStr() }
+					}
+				},
+				userAccounts: userAccounts,
+				networkID: networkID
+			)
+
+			let contributedAddresses = try poolContributions.flatMap(\.contributedResources.keys).map {
+				try Address(validatingAddress: $0)
+			}
+
+			// Extract Contributing to Pools section
+			let contributingToPools: TransactionReviewPools.State? = try await extractDapps(poolAddresses, unknownTitle: L10n.TransactionReview.unknownPools)
+
+			let entities = try await onLedgerEntitiesClient.getEntities(
+				addresses: poolUnitAddresses + contributedAddresses,
+				metadataKeys: .poolUnitMetadataKeys
+			)
+
+			func resources(for contribution: TrackedPoolContribution) throws -> [Transfer.Details.PoolUnit.Resource] {
+				try contribution.contributedResources
+					.map { addressString, amount in
+						let address = try ResourceAddress(validatingAddress: addressString)
+
+						guard let entity = resourceEntities.first(where: { $0.id == address }) else {
+							struct ResourceEntityNotFound: Error {
+								let address: String
+							}
+							throw ResourceEntityNotFound(address: addressString)
+						}
+
+						return Transfer.Details.PoolUnit.Resource(
+							isXRD: entity.resourceAddress.isXRD(on: networkID),
+							symbol: entity.metadata.symbol,
+							address: entity.resourceAddress,
+							icon: entity.metadata.iconURL,
+							amount: amount
+						)
+					}
+			}
+
+			// The entities for the pool units and the contributed resources
+			let resourceEntities = entities.compactMap(\.resource)
+
+			// Aggregate all contributions that belong to the same pool
+			var aggregatedContributions: [TrackedPoolContribution] = []
+
+			for poolContribution in poolContributions {
+				// Make sure no contribution is empty
+				guard poolContribution.poolUnitsAmount > 0 else { continue }
+				if let i = aggregatedContributions.firstIndex(where: { $0.poolAddress == poolContribution.poolAddress }) {
+					aggregatedContributions[i].add(poolContribution)
+				} else {
+					aggregatedContributions.append(poolContribution)
+				}
+			}
+
+			// Distribute the contributions across the deposits that receive the corresponding pool unit
+			for aggregatedContribution in aggregatedContributions {
+				let resourceAddress = try aggregatedContribution.poolUnitsResourceAddress.asSpecific() as ResourceAddress
+
+				guard let poolUnitResource = resourceEntities.first(where: { $0.resourceAddress == resourceAddress }) else { continue }
+
+				// The resources in the pool
+				let poolResources = try resources(for: aggregatedContribution)
+
+				for account in deposits?.accounts ?? [] {
+					for transfer in account.transfers {
+						if transfer.resource.id == resourceAddress, case let .fungible(details) = transfer.details {
+							var resources = poolResources
+
+							// If this transfer does not contain all the pool units, scale the resource amounts pro rata
+							if details.amount != aggregatedContribution.poolUnitsAmount {
+								let factor = details.amount / aggregatedContribution.poolUnitsAmount
+								for index in resources.indices {
+									resources[index].amount *= factor // TODO: Round according to divisibility
+								}
+							}
+
+							deposits?.accounts[id: account.id]?.transfers[id: transfer.id]?.details = .poolUnit(.init(
+								poolName: poolUnitResource.title,
+								resources: resources,
+								guarantee: transfer.fungibleGuarantee
+							))
+						}
+					}
+				}
+			}
+
+			return Sections(
+				withdrawals: withdrawals,
+				deposits: deposits,
+				contributingToPools: contributingToPools,
+				conforming: true
+			)
+
+		case let .poolRedemption(poolAddresses: poolAddresses, poolRedemptions: poolRedemptions):
+			return .init(conforming: false)
+		case let .validatorStake(validatorAddresses: validatorAddresses, validatorStakes: validatorStakes):
+			return .init(conforming: false)
+		case let .validatorUnstake(validatorAddresses: validatorAddresses, validatorUnstakes: validatorUnstakes):
+			return .init(conforming: false)
+		case let .validatorClaim(validatorAddresses: validatorAddresses, validatorClaims: validatorClaims):
+			return .init(conforming: false)
+		case let .accountDepositSettingsUpdate(resourcePreferencesUpdates: resourcePreferencesUpdates, depositModeUpdates: depositModeUpdates, authorizedDepositorsAdded: authorizedDepositorsAdded, authorizedDepositorsRemoved: authorizedDepositorsRemoved):
+
+			let resourcePreferenceChanges = try resourcePreferencesUpdates.mapKeyValues(
+				AccountAddress.init(validatingAddress:),
+				fValue: { try $0.mapKeys(ResourceAddress.init(validatingAddress:)) }
+			)
+			let defaultDepositRuleChanges = try depositModeUpdates.mapKeys(AccountAddress.init(validatingAddress:))
+			let authorizedDepositorsAdded = try authorizedDepositorsAdded.mapKeys(AccountAddress.init(validatingAddress:))
+			let authorizedDepositorsRemoved = try authorizedDepositorsRemoved.mapKeys(AccountAddress.init(validatingAddress:))
+
+			let allAccountAddress = Set(authorizedDepositorsAdded.keys)
+				.union(authorizedDepositorsRemoved.keys)
+				.union(defaultDepositRuleChanges.keys)
+				.union(resourcePreferenceChanges.keys)
+
+			let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork() // TODO: Use general one
+
+			let validAccounts = allAccountAddress.compactMap { address in
+				userAccounts.first { $0.address == address }
+			}
+
+			let accountDepositSetting = extractAccountDepositSetting(
+				for: validAccounts,
+				defaultDepositRuleChanges: defaultDepositRuleChanges
+			)
+			let accountDepositExceptions = try await extractAccountDepositExceptions(
+				for: validAccounts,
+				resourcePreferenceChanges: resourcePreferenceChanges,
+				authorizedDepositorsAdded: authorizedDepositorsAdded,
+				authorizedDepositorsRemoved: authorizedDepositorsRemoved
+			)
+
+			return Sections(
+				accountDepositSetting: accountDepositSetting,
+				accountDepositExceptions: accountDepositExceptions,
+				conforming: true
+			)
+>>>>>>> 0c62543a4 (wip)
+		}
+	}
+
 	public func addingGuarantees(
 		to manifest: TransactionManifest,
 		guarantees: [TransactionClient.Guarantee]

@@ -389,3 +389,85 @@ extension OnLedgerEntitiesClient {
 		}
 	}
 }
+
+extension OnLedgerEntitiesClient {
+	public func isPoolUnitresource(_ resource: OnLedgerEntity.Resource) async throws -> Bool {
+		guard let poolAddress = resource.metadata.poolUnit?.asGeneral else {
+			return false // no declared pool unit
+		}
+
+		guard ResourcePoolEntityType.addressSpace.contains(poolAddress.decodedKind) else {
+			return false // pool unit declared, but it is not a pool address. Invalid specification.
+		}
+
+		// Fetch pool unit info
+
+		let pool = try await getEntities(
+			[poolAddress],
+			.resourceMetadataKeys,
+			resource.atLedgerState,
+			.useCache
+		)
+		.map(\.resourcePool)
+		.first
+
+		guard let pool else {
+			return false // didn't load any pool
+		}
+
+		guard pool?.poolUnitResourceAddress == resource.resourceAddress else {
+			return false // The resource pool decalred a different pool unit reosource address
+		}
+
+		return true // It is a pool unit resource address
+	}
+
+	public func getPoolUnitDetails(_ resource: OnLedgerEntity.Resource, forAmount amount: RETDecimal) async throws -> OwnedResourcePoolDetails? {
+		let pool = try await getEntities(
+			[resource.metadata.poolUnit!.asGeneral],
+			[],
+			resource.atLedgerState,
+			.useCache
+		).compactMap(\.resourcePool).first!
+
+		var allResourceAddresses: [ResourceAddress] = []
+		allResourceAddresses += pool.resources.nonXrdResources.map(\.resourceAddress)
+		if let xrdResource = pool.resources.xrdResource {
+			allResourceAddresses.append(xrdResource.resourceAddress)
+		}
+
+		let allResources = try await getResources(
+			allResourceAddresses,
+			cachingStrategy: .useCache,
+			atLedgerState: resource.atLedgerState
+		)
+
+		var nonXrdResourceDetails: [ResourceWithVaultAmount] = []
+
+		for resource in pool.resources.nonXrdResources {
+			guard let resourceDetails = allResources.first(where: { $0.resourceAddress == resource.resourceAddress }) else {
+				assertionFailure("Did not load resource details")
+				return nil
+			}
+			nonXrdResourceDetails.append(.init(resource: resourceDetails, amount: resource.amount))
+		}
+
+		let xrdResourceDetails: ResourceWithVaultAmount?
+		if let xrdResource = pool.resources.xrdResource {
+			guard let details = allResources.first(where: { $0.resourceAddress == xrdResource.resourceAddress }) else {
+				assertionFailure("Did not load xrd resource details")
+				return nil
+			}
+			xrdResourceDetails = .init(resource: details, amount: xrdResource.amount)
+		} else {
+			xrdResourceDetails = nil
+		}
+
+		return .init(
+			address: pool.address,
+			poolUnitResource: .init(resource: resource, amount: amount),
+			xrdResource: xrdResourceDetails,
+			nonXrdResources: nonXrdResourceDetails
+		)
+	}
+}

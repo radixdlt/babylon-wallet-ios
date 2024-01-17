@@ -7,7 +7,7 @@ extension PoolUnitDetails.State {
 		return .init(
 			containerWithHeader: .init(resource: resource),
 			thumbnailURL: resource.metadata.iconURL,
-			resources: PoolUnitResourceViewState.viewStates(poolUnit: poolUnit, resourcesDetails: resourcesDetails),
+			resources: PoolUnitResourceViewState.viewStates(amount: poolUnit.resource.amount, resourcesDetails: resourcesDetails),
 			resourceDetails: .init(
 				description: .success(resourcesDetails.poolUnitResource.resource.metadata.description),
 				resourceAddress: resource.resourceAddress,
