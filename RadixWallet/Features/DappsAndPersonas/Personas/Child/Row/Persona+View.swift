@@ -27,7 +27,7 @@ extension Persona {
 							}
 							if showShield, viewStore.shouldWriteDownMnemonic {
 								shieldPromptView(
-									text: "Please write down this Persona's seed phrase", // FIXME: strings
+									text: L10n.Personas.writePersonaSeedPhrase,
 									action: {
 										viewStore.send(.writeDownSeedPhrasePromptTapped)
 									}

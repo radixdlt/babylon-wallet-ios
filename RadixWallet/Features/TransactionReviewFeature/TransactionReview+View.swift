@@ -496,12 +496,12 @@ struct TransactionHeading: View {
 	)
 
 	static let contributingToPools = TransactionHeading(
-		L10n.TransactionReview.contributingToPoolsHeading,
+		L10n.TransactionReview.poolContributionHeading,
 		icon: AssetResource.transactionReviewPools
 	)
 
 	static let redeemingFromPools = TransactionHeading(
-		L10n.TransactionReview.redeemingFromPoolsHeading,
+		L10n.TransactionReview.poolRedemptionHeading,
 		icon: AssetResource.transactionReviewPools
 	)
 

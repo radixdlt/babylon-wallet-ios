@@ -21,7 +21,7 @@ public struct TransferPoolUnitView: View {
 					}
 
 					VStack(alignment: .leading, spacing: 0) {
-						Text("Pool Units") // FIXME: Strings
+						Text(L10n.TransactionReview.poolUnits)
 							.textStyle(.body1Header)
 							.foregroundColor(.app.gray1)
 
