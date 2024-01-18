@@ -22,6 +22,18 @@ extension OnLedgerEntity.Metadata {
 }
 
 extension OnLedgerEntity.Metadata {
+	public init(_ raw: [String: MetadataValue?]) {
+		self.init(
+			name: raw.name,
+			symbol: raw.symbol,
+			description: raw.description,
+			iconURL: raw.iconURL,
+			tags: raw.tags
+		)
+	}
+}
+
+extension OnLedgerEntity.Metadata {
 	public enum MetadataError: Error, CustomStringConvertible {
 		case missingName
 		case missingDappDefinition

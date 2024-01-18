@@ -391,7 +391,7 @@ extension OnLedgerEntitiesClient {
 }
 
 extension OnLedgerEntitiesClient {
-	public func isPoolUnitresource(_ resource: OnLedgerEntity.Resource) async throws -> Bool {
+	public func isPoolUnitResource(_ resource: OnLedgerEntity.Resource) async throws -> Bool {
 		guard let poolAddress = resource.metadata.poolUnit?.asGeneral else {
 			return false // no declared pool unit
 		}

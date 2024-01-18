@@ -1,6 +1,9 @@
 import Foundation
 
 extension TransactionReview {
+	typealias ResourceInfo = Either<OnLedgerEntity.Resource, OnLedgerEntity.Metadata>
+	typealias ResourcesInfo = [ResourceAddress: ResourceInfo]
+
 	public struct Sections: Sendable, Hashable {
 		var withdrawals: TransactionReviewAccounts.State? = nil
 		var dAppsUsed: TransactionReviewDappsUsed.State? = nil
@@ -18,15 +21,40 @@ extension TransactionReview {
 	func sections(for summary: ExecutionSummary, networkID: NetworkID) async throws -> Sections? {
 		let userAccounts = try await extractUserAccounts(summary.encounteredEntities)
 
+		let allWithdrawAddresses = summary.accountWithdraws.values.flatMap { $0 }.map(\.resourceAddress)
+		let allDepositAddresses = summary.accountDeposits.values.flatMap { $0 }.map(\.resourceAddress)
+		// Prepoluate with all resource addresses from withdraw and deposit.
+		// Can be updated in each kind of manifest class if needed to load more details
+		let allAddresses: IdentifiedArrayOf<ResourceAddress> = try (allWithdrawAddresses + allDepositAddresses).map { try $0.asSpecific() }.asIdentifiable()
+
+		func resourcesInfo(_ resourceAddresses: [ResourceAddress]) async throws -> ResourcesInfo {
+			var newlyCreatedMetadata = Dictionary(uniqueKeysWithValues: resourceAddresses.compactMap { resourceAddress in
+				summary.metadataOfNewlyCreatedEntities[resourceAddress.address].map { (resourceAddress, ResourceInfo.right(.init($0))) }
+			})
+
+			let existingResources = resourceAddresses.filter {
+				newlyCreatedMetadata[$0] == nil
+			}
+
+			let existingResourceDetails = try await onLedgerEntitiesClient.getResources(existingResources)
+				.reduce(into: ResourcesInfo()) { partialResult, next in
+					partialResult[next.resourceAddress] = .left(next)
+				}
+
+			newlyCreatedMetadata.append(contentsOf: existingResourceDetails)
+
+			return newlyCreatedMetadata
+		}
+
 		switch summary.detailedManifestClass {
 		case nil:
 			return nil
 		case .general, .transfer:
+			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 			let withdrawals = try? await extractWithdrawals(
 				accountWithdraws: summary.accountWithdraws,
-				metadataOfNewlyCreatedEntities: summary.metadataOfNewlyCreatedEntities,
 				dataOfNewlyMintedNonFungibles: summary.dataOfNewlyMintedNonFungibles,
-				addressesOfNewlyCreatedEntities: summary.addressesOfNewlyCreatedEntities,
+				entities: resourcesInfo,
 				userAccounts: userAccounts,
 				networkID: networkID
 			)
@@ -36,9 +64,8 @@ extension TransactionReview {
 
 			let deposits = try? await extractDeposits(
 				accountDeposits: summary.accountDeposits,
-				metadataOfNewlyCreatedEntities: summary.metadataOfNewlyCreatedEntities,
 				dataOfNewlyMintedNonFungibles: summary.dataOfNewlyMintedNonFungibles,
-				addressesOfNewlyCreatedEntities: summary.addressesOfNewlyCreatedEntities,
+				entities: resourcesInfo,
 				userAccounts: userAccounts,
 				networkID: networkID
 			)
@@ -52,10 +79,19 @@ extension TransactionReview {
 				proofs: proofs
 			)
 
-		case let .poolContribution(poolAddresses: poolAddresses, poolContributions: poolContributions):
+		case let .poolContribution(poolAddresses, poolContributions):
+			let resourceAddresses = try poolContributions.flatMap(\.contributedResources.keys).map {
+				try ResourceAddress(validatingAddress: $0)
+			}
+
+			let allAddresses = allAddresses + resourceAddresses.asIdentifiable()
+
+			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
+
 			// Extract Withdrawals section
 			let withdrawals = try await extractWithdrawals(
 				accountWithdraws: summary.accountWithdraws,
+				entities: resourcesInfo,
 				userAccounts: userAccounts,
 				networkID: networkID
 			)
@@ -66,7 +102,8 @@ extension TransactionReview {
 			// Extract Deposits section, passing in poolcontributions so that pool units can be updated
 			let deposits = try await extractDeposits(
 				accountDeposits: summary.accountDeposits,
-				poolContributions: poolContributions,
+				poolContributions: poolContributions.aggregated,
+				entities: resourcesInfo,
 				userAccounts: userAccounts,
 				networkID: networkID
 			)
@@ -111,7 +148,12 @@ extension TransactionReview {
 		case let .validatorClaim(validatorAddresses: validatorAddresses, validatorClaims: validatorClaims):
 			return nil
 
-		case let .accountDepositSettingsUpdate(resourcePreferencesUpdates: resourcePreferencesUpdates, depositModeUpdates: depositModeUpdates, authorizedDepositorsAdded: authorizedDepositorsAdded, authorizedDepositorsRemoved: authorizedDepositorsRemoved):
+		case let .accountDepositSettingsUpdate(
+			resourcePreferencesUpdates,
+			depositModeUpdates,
+			authorizedDepositorsAdded,
+			authorizedDepositorsRemoved
+		):
 
 			let resourcePreferenceChanges = try resourcePreferencesUpdates.mapKeyValues(
 				AccountAddress.init(validatingAddress:),
@@ -148,85 +190,6 @@ extension TransactionReview {
 				accountDepositExceptions: accountDepositExceptions
 			)
 		}
-	}
-
-	private func updateAccounts(
-		_ accounts: inout IdentifiedArrayOf<TransactionReviewAccount.State>,
-		with interactions: [some TrackedPoolInteraction],
-		networkID: NetworkID
-	) async throws {
-		let aggregatedInteractions = interactions.aggregated
-
-		let resourceEntities = try await resourceEntities(for: aggregatedInteractions)
-
-		for contribution in aggregatedInteractions {
-			let resourceAddress = try contribution.poolUnitsResourceAddress.asSpecific() as ResourceAddress
-
-			guard let poolUnitResource = resourceEntities.first(where: { $0.resourceAddress == resourceAddress }) else { continue }
-
-			// The resources in the pool
-			let poolResources = try poolResources(for: contribution.resourcesInInteraction, entities: resourceEntities, networkID: networkID)
-
-			for account in accounts {
-				for transfer in account.transfers {
-					if transfer.resource.id == resourceAddress, case let .fungible(details) = transfer.details {
-						var resources = poolResources
-
-						// If this transfer does not contain all the pool units, scale the resource amounts pro rata
-						if details.amount != contribution.poolUnitsAmount {
-							let factor = details.amount / contribution.poolUnitsAmount
-							for index in resources.indices {
-								resources[index].amount *= factor // TODO: Round according to divisibility
-							}
-						}
-
-						accounts[id: account.id]?.transfers[id: transfer.id]?.details = .poolUnit(.init(
-							poolName: poolUnitResource.title,
-							resources: resources,
-							guarantee: transfer.fungibleGuarantee
-						))
-					}
-				}
-			}
-		}
-	}
-
-	private func resourceEntities(for poolInteractions: [some TrackedPoolInteraction]) async throws -> [OnLedgerEntity.Resource] {
-		let poolUnitAddresses = try poolInteractions.map(\.poolUnitsResourceAddress).map {
-			try $0.asSpecific() as Address
-		}
-		let resourceAddresses = try poolInteractions.flatMap(\.resourcesInInteraction.keys).map {
-			try Address(validatingAddress: $0)
-		}
-
-		// The entities for the pool units and the redeemed resources
-		return try await onLedgerEntitiesClient.getEntities(
-			addresses: poolUnitAddresses + resourceAddresses,
-			metadataKeys: .poolUnitMetadataKeys
-		)
-		.compactMap(\.resource)
-	}
-
-	private func poolResources(for resources: [String: RETDecimal], entities: [OnLedgerEntity.Resource], networkID: NetworkID) throws -> [Transfer.Details.PoolUnit.Resource] {
-		try resources
-			.map { addressString, amount in
-				let address = try ResourceAddress(validatingAddress: addressString)
-
-				guard let entity = entities.first(where: { $0.id == address }) else {
-					struct ResourceEntityNotFound: Error {
-						let address: String
-					}
-					throw ResourceEntityNotFound(address: addressString)
-				}
-
-				return Transfer.Details.PoolUnit.Resource(
-					isXRD: entity.resourceAddress.isXRD(on: networkID),
-					symbol: entity.metadata.symbol,
-					address: entity.resourceAddress,
-					icon: entity.metadata.iconURL,
-					amount: amount
-				)
-			}
 	}
 
 	private func extractUserAccounts(_ allAddress: [EngineToolkit.Address]) async throws -> [Account] {
@@ -289,10 +252,9 @@ extension TransactionReview {
 
 	private func extractWithdrawals(
 		accountWithdraws: [String: [ResourceIndicator]],
-		metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]] = [:],
 		dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]] = [:],
-		addressesOfNewlyCreatedEntities: [EngineToolkit.Address] = [],
 		poolRedemptions: [TrackedPoolRedemption] = [],
+		entities: ResourcesInfo = [:],
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
@@ -303,9 +265,9 @@ extension TransactionReview {
 			let transfers = try await resources.asyncFlatMap {
 				try await transferInfo(
 					resourceQuantifier: $0,
-					metadataOfCreatedEntities: metadataOfNewlyCreatedEntities,
 					dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles,
-					createdEntities: addressesOfNewlyCreatedEntities,
+					poolContributions: poolRedemptions,
+					entities: entities,
 					networkID: networkID,
 					type: .exact
 				)
@@ -318,23 +280,16 @@ extension TransactionReview {
 
 		let withdrawalAccounts = withdrawals.map {
 			TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value))
-		}
+		}.asIdentifiable()
 
-		var accounts = IdentifiedArray(uniqueElements: withdrawalAccounts)
-
-		if !poolRedemptions.isEmpty {
-			try await updateAccounts(&accounts, with: poolRedemptions, networkID: networkID)
-		}
-
-		return .init(accounts: accounts, enableCustomizeGuarantees: false)
+		return .init(accounts: withdrawalAccounts, enableCustomizeGuarantees: false)
 	}
 
 	private func extractDeposits(
 		accountDeposits: [String: [ResourceIndicator]],
-		metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]] = [:],
 		dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]] = [:],
-		addressesOfNewlyCreatedEntities: [EngineToolkit.Address] = [],
 		poolContributions: [TrackedPoolContribution] = [],
+		entities: ResourcesInfo = [:],
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
@@ -347,9 +302,9 @@ extension TransactionReview {
 			let transfers = try await accountDeposits.asyncFlatMap {
 				try await transferInfo(
 					resourceQuantifier: $0,
-					metadataOfCreatedEntities: metadataOfNewlyCreatedEntities,
 					dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles,
-					createdEntities: addressesOfNewlyCreatedEntities,
+					poolContributions: poolContributions,
+					entities: entities,
 					networkID: networkID,
 					type: $0.transferType,
 					defaultDepositGuarantee: defaultDepositGuarantee
@@ -362,140 +317,12 @@ extension TransactionReview {
 		let depositAccounts = deposits
 			.filter { !$0.value.isEmpty }
 			.map { TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value)) }
-
-		let requiresGuarantees = !depositAccounts.customizableGuarantees.isEmpty
+			.asIdentifiable()
 
 		guard !depositAccounts.isEmpty else { return nil }
 
-		var accounts = IdentifiedArray(uniqueElements: depositAccounts)
-
-		if !poolContributions.isEmpty {
-			try await updateAccounts(&accounts, with: poolContributions, networkID: networkID)
-		}
-		return .init(accounts: accounts, enableCustomizeGuarantees: requiresGuarantees)
-	}
-
-	func transferInfo(
-		resourceQuantifier: ResourceIndicator,
-		metadataOfCreatedEntities: [String: [String: MetadataValue?]]?,
-		dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]],
-		createdEntities: [EngineToolkit.Address],
-		networkID: NetworkID,
-		type: TransferType,
-		defaultDepositGuarantee: RETDecimal = 1
-	) async throws -> [Transfer] {
-		let resourceAddress: ResourceAddress = try resourceQuantifier.resourceAddress.asSpecific()
-
-		func resourceInfo() async throws -> Either<OnLedgerEntity.Resource, [String: MetadataValue?]> {
-			if let newlyCreatedMetadata = metadataOfCreatedEntities?[resourceAddress.address] {
-				.right(newlyCreatedMetadata)
-			} else {
-				try await .left(onLedgerEntitiesClient.getResource(resourceAddress))
-			}
-		}
-
-		typealias NonFungibleToken = OnLedgerEntity.NonFungibleToken
-
-		func existingTokenInfo(_ ids: [NonFungibleLocalId], for resourceAddress: ResourceAddress) async throws -> [NonFungibleToken] {
-			try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
-				resource: resourceAddress,
-				nonFungibleIds: ids.map {
-					try NonFungibleGlobalId.fromParts(
-						resourceAddress: resourceAddress.intoEngine(),
-						nonFungibleLocalId: $0
-					)
-				}
-			))
-		}
-
-		switch resourceQuantifier {
-		case let .fungible(_, source):
-			let amount = switch source {
-			case let .guaranteed(amount):
-				amount
-			case let .predicted(predictedAmount):
-				predictedAmount.value
-			}
-
-			switch try await resourceInfo() {
-			case let .left(resource):
-				// A fungible resource existing on ledger
-				let isXRD = resourceAddress.isXRD(on: networkID)
-
-				func guarantee() -> TransactionClient.Guarantee? {
-					guard case let .predicted(predictedAmount) = source else { return nil }
-					let guaranteedAmount = defaultDepositGuarantee * amount
-					return .init(
-						amount: guaranteedAmount,
-						instructionIndex: predictedAmount.instructionIndex,
-						resourceAddress: resourceAddress,
-						resourceDivisibility: resource.divisibility
-					)
-				}
-
-				let details: Transfer.Details.Fungible = .init(
-					isXRD: isXRD,
-					amount: amount,
-					guarantee: guarantee()
-				)
-
-				return [.init(resource: resource, details: .fungible(details))]
-
-			case let .right(newEntityMetadata):
-				// A newly created fungible resource
-
-				let resource: OnLedgerEntity.Resource = .init(
-					resourceAddress: resourceAddress,
-					metadata: newEntityMetadata
-				)
-
-				let details: Transfer.Details.Fungible = .init(
-					isXRD: false,
-					amount: amount,
-					guarantee: nil
-				)
-
-				return [.init(resource: resource, details: .fungible(details))]
-			}
-
-		case let .nonFungible(_, indicator):
-			let ids = indicator.ids
-			let result: [Transfer]
-
-			switch try await resourceInfo() {
-			case let .left(resource):
-				// A non-fungible resource existing on ledger
-
-				// Existing or newly minted tokens
-				//
-				// This is not entirely correct, we should not attempt to fetch NFT data the tokens
-				// that are about to be minted, but current RET does not retur the information about the freshly minted tokens anymore.
-				// Needs to be addressed in RET.
-				result = try await existingTokenInfo(ids, for: resource.resourceAddress).map { token in
-					.init(resource: resource, details: .nonFungible(token))
-				}
-
-			case let .right(newEntityMetadata):
-				// A newly created non-fungible resource
-				let resource = OnLedgerEntity.Resource(resourceAddress: resourceAddress, metadata: newEntityMetadata)
-
-				// Newly minted tokens
-				result = try ids
-					.map { localId in
-						try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: localId)
-					}
-					.map { id in
-						Transfer(resource: resource, details: .nonFungible(.init(id: id, data: nil)))
-					}
-			}
-
-			guard result.count == ids.count else {
-				struct FailedToGetDataForAllNFTs: Error {}
-				throw FailedToGetDataForAllNFTs()
-			}
-
-			return result
-		}
+		let requiresGuarantees = !depositAccounts.customizableGuarantees.isEmpty
+		return .init(accounts: depositAccounts, enableCustomizeGuarantees: requiresGuarantees)
 	}
 
 	func extractAccountDepositSetting(
@@ -565,5 +392,213 @@ extension TransactionReview {
 		guard !exceptionChanges.isEmpty else { return nil }
 
 		return DepositExceptionsState(changes: IdentifiedArray(uncheckedUniqueElements: exceptionChanges))
+	}
+}
+
+extension TransactionReview {
+	struct ResourceEntityNotFound: Error {
+		let address: String
+	}
+
+	func transferInfo(
+		resourceQuantifier: ResourceIndicator,
+		dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]],
+		poolContributions: [some TrackedPoolInteraction] = [],
+		entities: ResourcesInfo = [:],
+		networkID: NetworkID,
+		type: TransferType,
+		defaultDepositGuarantee: RETDecimal = 1
+	) async throws -> [Transfer] {
+		let resourceAddress: ResourceAddress = try resourceQuantifier.resourceAddress.asSpecific()
+
+		func resourceInfo() -> ResourceInfo {
+			entities[resourceAddress]!
+		}
+
+		typealias NonFungibleToken = OnLedgerEntity.NonFungibleToken
+
+		func existingTokenInfo(_ ids: [NonFungibleLocalId], for resourceAddress: ResourceAddress) async throws -> [NonFungibleToken] {
+			try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
+				resource: resourceAddress,
+				nonFungibleIds: ids.map {
+					try NonFungibleGlobalId.fromParts(
+						resourceAddress: resourceAddress.intoEngine(),
+						nonFungibleLocalId: $0
+					)
+				}
+			))
+		}
+
+		switch resourceQuantifier {
+		case let .fungible(_, source):
+			switch resourceInfo() {
+			case let .left(resource):
+				return try await fungibleTransferInfo(
+					resource,
+					resourceQuantifier: source,
+					poolContributions: poolContributions,
+					entities: entities,
+					networkID: networkID,
+					defaultDepositGuarantee: defaultDepositGuarantee
+				)
+			case let .right(newEntityMetadata):
+				// A newly created fungible resource
+
+				let resource: OnLedgerEntity.Resource = .init(
+					resourceAddress: resourceAddress,
+					metadata: newEntityMetadata
+				)
+
+				let details: Transfer.Details.Fungible = .init(
+					isXRD: false,
+					amount: source.amount,
+					guarantee: nil
+				)
+
+				return [.init(resource: resource, details: .fungible(details))]
+			}
+
+		case let .nonFungible(_, indicator):
+			let ids = indicator.ids
+			let result: [Transfer]
+
+			switch resourceInfo() {
+			case let .left(resource):
+				// A non-fungible resource existing on ledger
+
+				// Existing or newly minted tokens
+				//
+				// This is not entirely correct, we should not attempt to fetch NFT data the tokens
+				// that are about to be minted, but current RET does not retur the information about the freshly minted tokens anymore.
+				// Needs to be addressed in RET.
+				result = try await existingTokenInfo(ids, for: resource.resourceAddress).map { token in
+					.init(resource: resource, details: .nonFungible(token))
+				}
+
+			case let .right(newEntityMetadata):
+				// A newly created non-fungible resource
+				let resource = OnLedgerEntity.Resource(resourceAddress: resourceAddress, metadata: newEntityMetadata)
+
+				// Newly minted tokens
+				result = try ids
+					.map { localId in
+						try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: localId)
+					}
+					.map { id in
+						Transfer(resource: resource, details: .nonFungible(.init(id: id, data: nil)))
+					}
+			}
+
+			guard result.count == ids.count else {
+				fatalError()
+				//                struct FailedToGetDataForAllNFTs: Error {}
+				//                throw FailedToGetDataForAllNFTs()
+			}
+
+			return result
+		}
+	}
+
+	func fungibleTransferInfo(
+		_ resource: OnLedgerEntity.Resource,
+		resourceQuantifier: FungibleResourceIndicator,
+		poolContributions: [some TrackedPoolInteraction] = [],
+		entities: ResourcesInfo = [:],
+		networkID: NetworkID,
+		defaultDepositGuarantee: RETDecimal = 1
+	) async throws -> [Transfer] {
+		let amount = resourceQuantifier.amount
+		let resourceAddress = resource.resourceAddress
+
+		// Check if the fungible resource is a pool unit resource
+		if try await onLedgerEntitiesClient.isPoolUnitResource(resource) {
+			if let poolContribution = try poolContributions.first(where: { try $0.poolUnitsResourceAddress.asSpecific() == resourceAddress }) {
+				// If this transfer does not contain all the pool units, scale the resource amounts pro rata
+				let adjustmentFactor = amount != poolContribution.poolUnitsAmount ? (amount / poolContribution.poolUnitsAmount) : 1
+
+				let resources = try poolContribution.resourcesInInteraction.map { resourceAddress, resourceAmount in
+					let address = try ResourceAddress(validatingAddress: resourceAddress)
+
+					guard let entity = entities[address] else {
+						throw ResourceEntityNotFound(address: resourceAddress)
+					}
+
+					return Transfer.Details.PoolUnit.Resource(
+						isXRD: address.isXRD(on: networkID),
+						symbol: entity.metadata.symbol,
+						address: address,
+						icon: entity.metadata.iconURL,
+						amount: resourceAmount * adjustmentFactor
+					)
+				}
+
+				return [.init(
+					resource: resource,
+					details: .poolUnit(.init(
+						poolName: resource.title,
+						resources: resources
+					))
+				)]
+			} else {
+				let details = try await onLedgerEntitiesClient.getPoolUnitDetails(resource, forAmount: amount)!
+
+				let xrdResource = details.xrdResource.map {
+					TransactionReview.Transfer.Details.PoolUnit.Resource(
+						isXRD: true,
+						symbol: $0.resource.metadata.symbol,
+						address: $0.resource.resourceAddress,
+						icon: $0.resource.metadata.iconURL,
+						amount: $0.poolRedemptionValue(for: amount, poolUnitResource: resource)
+					)
+				}
+
+				let nonXrdResources = details.nonXrdResources.map {
+					TransactionReview.Transfer.Details.PoolUnit.Resource(
+						isXRD: false,
+						symbol: $0.resource.metadata.symbol,
+						address: $0.resource.resourceAddress,
+						icon: $0.resource.metadata.iconURL,
+						amount: $0.poolRedemptionValue(for: amount, poolUnitResource: resource)
+					)
+				}
+
+				let all = xrdResource.asArray(\.self) + nonXrdResources
+
+				return [.init(resource: resource, details: .poolUnit(.init(poolName: resource.metadata.name ?? "unknown", resources: all)))]
+			}
+		}
+
+		// Normal fungible resource
+		let isXRD = resourceAddress.isXRD(on: networkID)
+
+		func guarantee() -> TransactionClient.Guarantee? {
+			guard case let .predicted(predictedAmount) = resourceQuantifier else { return nil }
+			let guaranteedAmount = defaultDepositGuarantee * amount
+			return .init(
+				amount: guaranteedAmount,
+				instructionIndex: predictedAmount.instructionIndex,
+				resourceAddress: resourceAddress,
+				resourceDivisibility: resource.divisibility
+			)
+		}
+
+		let details: Transfer.Details.Fungible = .init(
+			isXRD: isXRD,
+			amount: amount,
+			guarantee: guarantee()
+		)
+
+		return [.init(resource: resource, details: .fungible(details))]
+	}
+}
+
+extension TransactionReview.ResourceInfo {
+	var metadata: OnLedgerEntity.Metadata {
+		switch self {
+		case let .left(resource):
+			resource.metadata
+		case let .right(metadata):
+			metadata
+		}
 	}
 }
