@@ -1,4 +1,4 @@
-"homePage_securityPromptBackup" = "Please write down this Account\'s seed phrase";
+"homePage_securityPromptBackup" = "Please write down seed phrase to ensure Account control";
 "homePage_securityPromptRecover" = "Seed phrase required - begin entry";
 "homePage_backedUpMnemonicHeading" = "I have written down this seed phrase";
 "homePage_createNewAccount" = "Create a New Account";
@@ -391,7 +391,9 @@
 "transactionReview_thirdPartyDepositSettingHeading" = "Third-party deposit setting";
 "transactionReview_thirdPartyDepositExceptionsHeading" = "Third-party deposit exceptions";
 "transactionReview_unknownComponents" = "%d Unknown Components";
+"transactionReview_unknownPools" = "%d Pool Components";
 "transactionReview_withdrawalsHeading" = "Withdrawing From";
+"transactionReview_poolUnits" = "Pool Units";
 "transactionReview_slideToSign" = "Slide to Sign";
 "transactionReview_xrdAmount" = "%@ XRD";
 "transactionReview_insufficientBalance" = "Insufficient Balance";
@@ -432,6 +434,9 @@
 "transactionReview_validators_stake" = "Staking to Validators";
 "transactionReview_validators_unstake" = "Requesting unstake from validators";
 "transactionReview_validators_claim" = "Claim from validators";
+"transactionReview_poolContributionHeading" = "Contributing to pools";
+"transactionReview_poolRedemptionHeading" = "Redeeming from pools";
+"transactionReview_poolName_unknown" = "Unknown pool";
 "transactionStatus_completing_text" = "Completing Transaction…";
 "transactionStatus_transactionID_text" = "Transaction ID: ";
 "transactionStatus_success_title" = "Transaction Success";
@@ -482,6 +487,7 @@
 "common_done" = "Done";
 "common_persona" = "Persona";
 "common_history" = "History";
+"common_pool" = "Pool";
 "common_retry" = "Retry";
 "common_remove" = "Remove";
 "common_somethingWentWrong" = "Something went wrong";
@@ -497,7 +503,7 @@
 "common_showLess" = "Show Less";
 "common_component" = "Component";
 "common_unauthorized" = "Unauthorized";
-"common_rateLimitReached" = "Too many requests. Blocked due to rate limiting.";
+"common_rateLimitReached" = "Gateway access blocked due to exceeding rate limit. Please wait a few minutes to retry.";
 "error_dappRequest_invalidPersonaId" = "Invalid Persona specified by dApp";
 "error_dappRequest_invalidRequest" = "Invalid request";
 "error_profileLoad_decodingError" = "Failed to import Radix Wallet backup: %@";
@@ -507,6 +513,7 @@
 "error_transactionFailure_epoch" = "Failed to get epoch";
 "error_transactionFailure_header" = "Failed to build transaction header";
 "error_transactionFailure_manifest" = "Failed to convert transaction manifest";
+"error_transactionFailure_missingSigners" = "You don\'t have access to some accounts or personas required to authorise this transaction";
 "error_transactionFailure_network" = "Wrong network";
 "error_transactionFailure_noFundsToApproveTransaction" = "No funds to approve transaction";
 "error_transactionFailure_pollStatus" = "Failed to poll transaction status";
@@ -567,7 +574,7 @@
 "onboarding_eula_headerTitle" = "User Terms";
 "onboarding_eula_headerSubtitle" = "To proceed, you must accept the user terms below.";
 "onboarding_eula_accept" = "Accept";
-"splash_tapAnywhereToUnlock" = "Tap anywhere to unlock?";
+"splash_tapAnywhereToUnlock" = "Tap to unlock";
 "splash_passcodeNotSetTitle" = "Passcode not set up";
 "splash_passcodeNotSetMessage" = "This app requires your phone to have a passcode set up";
 "splash_incompatibleProfileVersionAlert_delete" = "Delete Wallet Data";
@@ -605,7 +612,7 @@ Or you can clear this wallet from this phone and start fresh.";
 "importMnemonic_regularModeButton" = "Regular Mode";
 "importMnemonic_importSeedPhrase" = "Import";
 "importMnemonic_seedPhraseImported" = "Imported Seed Phrase";
-"importMnemonic_backedUpAlert_title" = "Confirm Backup";
+"importMnemonic_backedUpAlert_title" = "Confirm Seed Phrase Saved";
 "importMnemonic_backedUpAlert_message" = "Are you sure you have securely written down this seed phrase? You will need it to recover access if you lose your phone.";
 "importMnemonic_backedUpAlert_confirmAction" = "Yes, I have backed it up";
 "importMnemonic_backedUpAlert_noAction" = "No, not yet";
@@ -620,7 +627,7 @@ Or you can clear this wallet from this phone and start fresh.";
 "importMnemonic_offDevice_saveWithDescription" = "Save with description";
 "importMnemonic_offDevice_saveWithoutDescription" = "Save without description";
 "importMnemonic_shieldPrompt_enterSeedPhrase" = "Enter this Account\'s seed phrase";
-"importMnemonic_shieldPrompt_backupSeedPhrase" = "Please write down this Account\'s seed phrase";
+"importMnemonic_shieldPrompt_backupSeedPhrase" = "Please write down seed phrase to ensure Account control";
 "importMnemonic_tempAndroid_changeSeedPhrase" = "Change seed phrase length";
 "importMnemonic_tempAndroid_seedLength" = "%d word seed phrase";
 "importMnemonic_tempAndroid_heading" = "Recover Mnemonic";
