@@ -1,6 +1,7 @@
 import Foundation
 
 extension TransactionReview {
+	// Either the resource from ledger or metadata extracted from the TX manifest
 	typealias ResourceInfo = Either<OnLedgerEntity.Resource, OnLedgerEntity.Metadata>
 	typealias ResourcesInfo = [ResourceAddress: ResourceInfo]
 
@@ -24,8 +25,9 @@ extension TransactionReview {
 		let allWithdrawAddresses = summary.accountWithdraws.values.flatMap { $0 }.map(\.resourceAddress)
 		let allDepositAddresses = summary.accountDeposits.values.flatMap { $0 }.map(\.resourceAddress)
 		// Prepoluate with all resource addresses from withdraw and deposit.
-		// Can be updated in each kind of manifest class if needed to load more details
-		let allAddresses: IdentifiedArrayOf<ResourceAddress> = try (allWithdrawAddresses + allDepositAddresses).map { try $0.asSpecific() }.asIdentifiable()
+		let allAddresses: IdentifiedArrayOf<ResourceAddress> = try (allWithdrawAddresses + allDepositAddresses)
+			.map { try $0.asSpecific() }
+			.asIdentifiable()
 
 		func resourcesInfo(_ resourceAddresses: [ResourceAddress]) async throws -> ResourcesInfo {
 			var newlyCreatedMetadata = Dictionary(uniqueKeysWithValues: resourceAddresses.compactMap { resourceAddress in
@@ -80,12 +82,12 @@ extension TransactionReview {
 			)
 
 		case let .poolContribution(poolAddresses, poolContributions):
+			// All resources that are part of the pool
 			let resourceAddresses = try poolContributions.flatMap(\.contributedResources.keys).map {
 				try ResourceAddress(validatingAddress: $0)
 			}
 
 			let allAddresses = allAddresses + resourceAddresses.asIdentifiable()
-
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 
 			// Extract Withdrawals section
@@ -114,11 +116,20 @@ extension TransactionReview {
 				contributingToPools: pools
 			)
 
-		case let .poolRedemption(poolAddresses: poolAddresses, poolRedemptions: poolRedemptions):
+		case let .poolRedemption(poolAddresses, poolRedemptions):
+			// All resources that are part of the pool
+			let resourceAddresses = try poolRedemptions.flatMap(\.redeemedResources.keys).map {
+				try ResourceAddress(validatingAddress: $0)
+			}
+
+			let allAddresses = allAddresses + resourceAddresses.asIdentifiable()
+			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
+
 			// Extract Withdrawals section, passing in poolRedemptions so that withdrawn pool units can be updated
 			let withdrawals = try await extractWithdrawals(
 				accountWithdraws: summary.accountWithdraws,
-				poolRedemptions: poolRedemptions,
+				poolRedemptions: poolRedemptions.aggregated,
+				entities: resourcesInfo,
 				userAccounts: userAccounts,
 				networkID: networkID
 			)
@@ -129,6 +140,7 @@ extension TransactionReview {
 			// Extract Deposits section
 			let deposits = try await extractDeposits(
 				accountDeposits: summary.accountDeposits,
+				entities: resourcesInfo,
 				userAccounts: userAccounts,
 				networkID: networkID
 			)
@@ -266,7 +278,7 @@ extension TransactionReview {
 				try await transferInfo(
 					resourceQuantifier: $0,
 					dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles,
-					poolContributions: poolRedemptions,
+					poolInteractions: poolRedemptions,
 					entities: entities,
 					networkID: networkID,
 					type: .exact
@@ -303,7 +315,7 @@ extension TransactionReview {
 				try await transferInfo(
 					resourceQuantifier: $0,
 					dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles,
-					poolContributions: poolContributions,
+					poolInteractions: poolContributions,
 					entities: entities,
 					networkID: networkID,
 					type: $0.transferType,
@@ -400,10 +412,12 @@ extension TransactionReview {
 		let address: String
 	}
 
+	struct FailedToGetDataForAllNFTs: Error {}
+
 	func transferInfo(
 		resourceQuantifier: ResourceIndicator,
 		dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]],
-		poolContributions: [some TrackedPoolInteraction] = [],
+		poolInteractions: [some TrackedPoolInteraction] = [],
 		entities: ResourcesInfo = [:],
 		networkID: NetworkID,
 		type: TransferType,
@@ -411,13 +425,11 @@ extension TransactionReview {
 	) async throws -> [Transfer] {
 		let resourceAddress: ResourceAddress = try resourceQuantifier.resourceAddress.asSpecific()
 
-		func resourceInfo() -> ResourceInfo {
-			entities[resourceAddress]!
+		guard let resourceInfo = entities[resourceAddress] else {
+			throw ResourceEntityNotFound(address: resourceAddress.address)
 		}
 
-		typealias NonFungibleToken = OnLedgerEntity.NonFungibleToken
-
-		func existingTokenInfo(_ ids: [NonFungibleLocalId], for resourceAddress: ResourceAddress) async throws -> [NonFungibleToken] {
+		func existingTokenInfo(_ ids: [NonFungibleLocalId], for resourceAddress: ResourceAddress) async throws -> [OnLedgerEntity.NonFungibleToken] {
 			try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
 				resource: resourceAddress,
 				nonFungibleIds: ids.map {
@@ -431,12 +443,12 @@ extension TransactionReview {
 
 		switch resourceQuantifier {
 		case let .fungible(_, source):
-			switch resourceInfo() {
+			switch resourceInfo {
 			case let .left(resource):
 				return try await fungibleTransferInfo(
 					resource,
 					resourceQuantifier: source,
-					poolContributions: poolContributions,
+					poolContributions: poolInteractions,
 					entities: entities,
 					networkID: networkID,
 					defaultDepositGuarantee: defaultDepositGuarantee
@@ -462,7 +474,7 @@ extension TransactionReview {
 			let ids = indicator.ids
 			let result: [Transfer]
 
-			switch resourceInfo() {
+			switch resourceInfo {
 			case let .left(resource):
 				// A non-fungible resource existing on ledger
 
@@ -490,9 +502,7 @@ extension TransactionReview {
 			}
 
 			guard result.count == ids.count else {
-				fatalError()
-				//                struct FailedToGetDataForAllNFTs: Error {}
-				//                throw FailedToGetDataForAllNFTs()
+				throw FailedToGetDataForAllNFTs()
 			}
 
 			return result
@@ -564,7 +574,7 @@ extension TransactionReview {
 
 				let all = xrdResource.asArray(\.self) + nonXrdResources
 
-				return [.init(resource: resource, details: .poolUnit(.init(poolName: resource.metadata.name ?? "unknown", resources: all)))]
+				return [.init(resource: resource, details: .poolUnit(.init(poolName: resource.title, resources: all)))]
 			}
 		}
 
