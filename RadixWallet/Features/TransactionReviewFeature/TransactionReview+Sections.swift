@@ -413,6 +413,7 @@ extension TransactionReview {
 	}
 
 	struct FailedToGetDataForAllNFTs: Error {}
+	struct FailedToGetPoolUnitDetails: Error {}
 
 	func transferInfo(
 		resourceQuantifier: ResourceIndicator,
@@ -520,6 +521,17 @@ extension TransactionReview {
 		let amount = resourceQuantifier.amount
 		let resourceAddress = resource.resourceAddress
 
+		func guarantee() -> TransactionClient.Guarantee? {
+			guard case let .predicted(predictedAmount) = resourceQuantifier else { return nil }
+			let guaranteedAmount = defaultDepositGuarantee * predictedAmount.value
+			return .init(
+				amount: guaranteedAmount,
+				instructionIndex: predictedAmount.instructionIndex,
+				resourceAddress: resourceAddress,
+				resourceDivisibility: resource.divisibility
+			)
+		}
+
 		// Check if the fungible resource is a pool unit resource
 		if try await onLedgerEntitiesClient.isPoolUnitResource(resource) {
 			if let poolContribution = try poolContributions.first(where: { try $0.poolUnitsResourceAddress.asSpecific() == resourceAddress }) {
@@ -546,52 +558,39 @@ extension TransactionReview {
 					resource: resource,
 					details: .poolUnit(.init(
 						poolName: resource.title,
-						resources: resources
+						resources: resources,
+						guarantee: guarantee()
 					))
 				)]
 			} else {
-				let details = try await onLedgerEntitiesClient.getPoolUnitDetails(resource, forAmount: amount)!
+				guard let details = try await onLedgerEntitiesClient.getPoolUnitDetails(resource, forAmount: amount) else {
+					throw FailedToGetPoolUnitDetails()
+				}
 
-				let xrdResource = details.xrdResource.map {
+				let allResources = details.xrdResource.asArray(\.self) + details.nonXrdResources
+
+				let poolUnitResources = allResources.map {
 					TransactionReview.Transfer.Details.PoolUnit.Resource(
-						isXRD: true,
+						isXRD: $0.resource.resourceAddress.isXRD(on: networkID),
 						symbol: $0.resource.metadata.symbol,
 						address: $0.resource.resourceAddress,
 						icon: $0.resource.metadata.iconURL,
 						amount: $0.poolRedemptionValue(for: amount, poolUnitResource: resource)
 					)
 				}
-
-				let nonXrdResources = details.nonXrdResources.map {
-					TransactionReview.Transfer.Details.PoolUnit.Resource(
-						isXRD: false,
-						symbol: $0.resource.metadata.symbol,
-						address: $0.resource.resourceAddress,
-						icon: $0.resource.metadata.iconURL,
-						amount: $0.poolRedemptionValue(for: amount, poolUnitResource: resource)
-					)
-				}
-
-				let all = xrdResource.asArray(\.self) + nonXrdResources
-
-				return [.init(resource: resource, details: .poolUnit(.init(poolName: resource.title, resources: all)))]
+				return [.init(
+					resource: resource,
+					details: .poolUnit(.init(
+						poolName: resource.title,
+						resources: poolUnitResources,
+						guarantee: guarantee()
+					))
+				)]
 			}
 		}
 
 		// Normal fungible resource
 		let isXRD = resourceAddress.isXRD(on: networkID)
-
-		func guarantee() -> TransactionClient.Guarantee? {
-			guard case let .predicted(predictedAmount) = resourceQuantifier else { return nil }
-			let guaranteedAmount = defaultDepositGuarantee * amount
-			return .init(
-				amount: guaranteedAmount,
-				instructionIndex: predictedAmount.instructionIndex,
-				resourceAddress: resourceAddress,
-				resourceDivisibility: resource.divisibility
-			)
-		}
-
 		let details: Transfer.Details.Fungible = .init(
 			isXRD: isXRD,
 			amount: amount,

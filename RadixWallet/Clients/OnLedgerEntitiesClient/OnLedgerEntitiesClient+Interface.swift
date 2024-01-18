@@ -422,13 +422,21 @@ extension OnLedgerEntitiesClient {
 		return true // It is a pool unit resource address
 	}
 
-	public func getPoolUnitDetails(_ resource: OnLedgerEntity.Resource, forAmount amount: RETDecimal) async throws -> OwnedResourcePoolDetails? {
-		let pool = try await getEntities(
-			[resource.metadata.poolUnit!.asGeneral],
-			[],
-			resource.atLedgerState,
-			.useCache
-		).compactMap(\.resourcePool).first!
+	public func getPoolUnitDetails(_ poolUnitResource: OnLedgerEntity.Resource, forAmount amount: RETDecimal) async throws -> OwnedResourcePoolDetails? {
+		guard let poolAddress = poolUnitResource.metadata.poolUnit?.asGeneral else {
+			return nil
+		}
+
+		let pool = try await getEntity(
+			poolAddress,
+			metadataKeys: .poolUnitMetadataKeys,
+			cachingStrategy: .useCache,
+			atLedgerState: poolUnitResource.atLedgerState
+		).resourcePool
+
+		guard let pool else {
+			return nil
+		}
 
 		var allResourceAddresses: [ResourceAddress] = []
 		allResourceAddresses += pool.resources.nonXrdResources.map(\.resourceAddress)
@@ -439,7 +447,7 @@ extension OnLedgerEntitiesClient {
 		let allResources = try await getResources(
 			allResourceAddresses,
 			cachingStrategy: .useCache,
-			atLedgerState: resource.atLedgerState
+			atLedgerState: poolUnitResource.atLedgerState
 		)
 
 		var nonXrdResourceDetails: [ResourceWithVaultAmount] = []
@@ -465,7 +473,7 @@ extension OnLedgerEntitiesClient {
 
 		return .init(
 			address: pool.address,
-			poolUnitResource: .init(resource: resource, amount: amount),
+			poolUnitResource: .init(resource: poolUnitResource, amount: amount),
 			xrdResource: xrdResourceDetails,
 			nonXrdResources: nonXrdResourceDetails
 		)
