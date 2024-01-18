@@ -187,7 +187,10 @@ extension OnLedgerEntitiesClient.StakeClaim {
 		if isReadyToBeClaimed {
 			L10n.AssetDetails.Staking.readyToClaim(claimAmount.formatted())
 		} else {
-			L10n.AssetDetails.Staking.unstaking(claimAmount.formatted(), reamainingEpochsUntilClaim * 5)
+			L10n.AssetDetails.Staking.unstaking(
+				claimAmount.formatted(),
+				reamainingEpochsUntilClaim * epochDurationInMinutes
+			)
 		}
 	}
 }

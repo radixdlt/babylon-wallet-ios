@@ -6,7 +6,7 @@ public struct StakeSummaryView: View {
 		public let readyToClaim: Loadable<RETDecimal>
 		public let canClaimStakes: Bool
 
-		public var readyToClaimControState: ControlState {
+		public var readyToClaimControlState: ControlState {
 			if !canClaimStakes || readyToClaim.isLoading || readyToClaim.wrappedValue == .zero() {
 				.disabled
 			} else {
@@ -44,10 +44,10 @@ public struct StakeSummaryView: View {
 				summaryRow(
 					L10n.Account.Staking.readyToClaim,
 					amount: viewState.readyToClaim,
-					titleTextColor: viewState.readyToClaimControState == .enabled ? .app.blue2 : .app.gray2
+					titleTextColor: viewState.readyToClaimControlState == .enabled ? .app.blue2 : .app.gray2
 				)
 				.onTapGesture {
-					if viewState.readyToClaimControState == .enabled {
+					if viewState.readyToClaimControlState == .enabled {
 						onReadyToClaimTapped()
 					}
 				}

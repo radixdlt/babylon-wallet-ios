@@ -165,16 +165,24 @@ public struct AssetsView: Sendable, FeatureReducer {
 			state.poolUnitsList = resourcesState.poolUnitsList
 
 			/// Not the happiest about this, will need to find a better way
-			if resourcesState.poolUnitsList != nil, state.activeAssetKind == .poolUnits || state.isRefreshing {
+			let shouldRefreshPoolUnitList = resourcesState.poolUnitsList != nil
+				&& (state.activeAssetKind == .poolUnits || state.isRefreshing)
+
+			if shouldRefreshPoolUnitList {
 				return .run { send in
 					await send(.child(.poolUnitsList(.view(.refresh))))
 				}
 			}
-			if resourcesState.stakeUnitList != nil, state.activeAssetKind == .stakeUnits || state.isRefreshing {
+
+			let shouldRefreshStakeUnitList = resourcesState.stakeUnitList != nil
+				&& (state.activeAssetKind == .stakeUnits || state.isRefreshing)
+
+			if shouldRefreshStakeUnitList {
 				return .run { send in
 					await send(.child(.stakeUnitList(.view(.refresh))))
 				}
 			}
+
 			state.isRefreshing = false
 
 			return .none
@@ -261,7 +269,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			mode.isSelection ?
 				stakes
 				.compactMap(\.stakeClaimResource)
-				.reduce(into: [OnLedgerEntity.OwnedNonFungibleResource: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>]()) { dict, resource in
+				.reduce(into: StakeUnitList.SelectedStakeClaimTokens()) { dict, resource in
 					if let selectedtokens = mode.nftRowSelectedAssets(resource.resourceAddress)?.elements.asIdentifiable() {
 						dict[resource] = selectedtokens
 					}

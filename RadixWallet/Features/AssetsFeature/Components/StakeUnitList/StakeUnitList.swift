@@ -1,5 +1,7 @@
 // MARK: - StakeUnitList
 public struct StakeUnitList: Sendable, FeatureReducer {
+	typealias SelectedStakeClaimTokens = [OnLedgerEntity.OwnedNonFungibleResource: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>]
+
 	public struct State: Sendable, Hashable {
 		let account: OnLedgerEntity.Account
 		var ownedStakes: IdentifiedArrayOf<OnLedgerEntity.Account.RadixNetworkStake> {
@@ -12,7 +14,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 
 		// Selection states
 		var selectedLiquidStakeUnits: IdentifiedArrayOf<OnLedgerEntity.OwnedFungibleResource>?
-		var selectedStakeClaimTokens: [OnLedgerEntity.OwnedNonFungibleResource: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>]?
+		var selectedStakeClaimTokens: SelectedStakeClaimTokens?
 
 		// Loading state
 		var isLoading: Bool
@@ -24,7 +26,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		init(
 			account: OnLedgerEntity.Account,
 			selectedLiquidStakeUnits: IdentifiedArrayOf<OnLedgerEntity.OwnedFungibleResource>?,
-			selectedStakeClaimTokens: [OnLedgerEntity.OwnedNonFungibleResource: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>]?
+			selectedStakeClaimTokens: SelectedStakeClaimTokens?
 		) {
 			self.account = account
 			self.selectedLiquidStakeUnits = selectedLiquidStakeUnits
@@ -118,7 +120,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 
 				state.stakedValidators[id: validatorAddress]?.liquidStakeUnit?.isSelected?.toggle()
 
-				state.selectedLiquidStakeUnits?.toggle(resource)
+				state.selectedLiquidStakeUnits?.togglePresence(of: resource)
 				return .none
 			} else {
 				guard let stakeDetails = state.stakedValidators[id: validatorAddress]?.stakeDetails,
@@ -149,8 +151,8 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 					return .none
 				}
 
-				state.stakedValidators[id: stakeClaim.validatorAddress]?.stakeClaimNFTs?.selectedStakeClaims?.toggle(stakeClaim.token.id)
-				state.selectedStakeClaimTokens?[ownedStakeClaim, default: []].toggle(stakeClaim.token)
+				state.stakedValidators[id: stakeClaim.validatorAddress]?.stakeClaimNFTs?.selectedStakeClaims?.togglePresence(of: stakeClaim.token.id)
+				state.selectedStakeClaimTokens?[ownedStakeClaim, default: []].togglePresence(of: stakeClaim.token)
 
 				return .none
 			}
@@ -221,14 +223,14 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .stakeClaimDetails(.delegate(.tappedClaimStake(stakeClaim))):
+		case let .stakeClaimDetails(.delegate(.tappedClaimStake(resourceAddress, stakeClaim))):
 			state.destination = nil
 			return sendStakeClaimTransaction(
 				state.account.address,
 				stakeClaims: [
 					.init(
 						validatorAddress: stakeClaim.validatorAddress,
-						resourceAddress: try! stakeClaim.id.resourceAddress().asSpecific(),
+						resourceAddress: resourceAddress,
 						ids: [stakeClaim.id.localId()]
 					),
 				]

@@ -45,6 +45,12 @@ public struct TokenBalanceView: View {
 
 extension TokenBalanceView {
 	public static func xrd(balance: RETDecimal) -> Self {
-		TokenBalanceView(viewState: .init(thumbnail: .xrd, name: "XRD", balance: balance))
+		TokenBalanceView(
+			viewState: .init(
+				thumbnail: .xrd,
+				name: "XRD",
+				balance: balance
+			)
+		)
 	}
 }

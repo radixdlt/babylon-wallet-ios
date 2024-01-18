@@ -30,7 +30,7 @@ public struct StakeClaimNFTSView: View {
 		VStack(alignment: .leading, spacing: .small1) {
 			HStack {
 				TokenThumbnail(.known(viewState.resourceMetadata.iconURL), size: .smaller)
-				Text(viewState.resourceMetadata.name ?? "Stake Claim NFTs")
+				Text(viewState.resourceMetadata.name ?? "")
 					.textStyle(.body1Header)
 
 				Spacer()

@@ -35,7 +35,7 @@ extension OrderedSet where Element: Hashable {
 
 extension IdentifiedArray {
 	/// Add or remove the given element
-	public mutating func toggle(_ element: Element) {
+	public mutating func togglePresence(of element: Element) {
 		if contains(element) {
 			remove(element)
 		} else {

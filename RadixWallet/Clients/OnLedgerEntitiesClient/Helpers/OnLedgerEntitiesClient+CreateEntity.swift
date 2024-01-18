@@ -463,8 +463,10 @@ extension OnLedgerEntitiesClient {
 					return .init(
 						resource: stakeClaimResourceDetails,
 						stakeClaims: tokens.compactMap { token -> OnLedgerEntitiesClient.StakeClaim? in
-							guard let claimEpoch = token.data?.claimEpoch,
-							      let claimAmount = token.data?.claimAmount, claimAmount > 0
+							guard
+								let claimEpoch = token.data?.claimEpoch,
+								let claimAmount = token.data?.claimAmount,
+								claimAmount > 0
 							else {
 								return nil
 							}
