@@ -140,6 +140,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case customizeFees(CustomizeFees.State)
 			case fungibleTokenDetails(FungibleTokenDetails.State)
 			case nonFungibleTokenDetails(NonFungibleTokenDetails.State)
+			case poolUnitDetails(PoolUnitDetails.State)
 			case unknownDappComponents(UnknownDappComponents.State)
 		}
 
@@ -151,6 +152,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case customizeFees(CustomizeFees.Action)
 			case fungibleTokenDetails(FungibleTokenDetails.Action)
 			case nonFungibleTokenDetails(NonFungibleTokenDetails.Action)
+			case poolUnitDetails(PoolUnitDetails.Action)
 			case unknownDappComponents(UnknownDappComponents.Action)
 		}
 
@@ -175,6 +177,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.nonFungibleTokenDetails, action: /Action.nonFungibleTokenDetails) {
 				NonFungibleTokenDetails()
+			}
+			Scope(state: /State.poolUnitDetails, action: /Action.poolUnitDetails) {
+				PoolUnitDetails()
 			}
 			Scope(state: /State.unknownDappComponents, action: /Action.unknownDappComponents) {
 				UnknownDappComponents()
@@ -912,38 +917,29 @@ enum FeeValidationOutcome {
 extension ReviewedTransaction {
 	var feePayingValidation: Loadable<FeeValidationOutcome> {
 		feePayer.map { selected in
-
-			switch executionSummary.detailedManifestClass {
-			case .none: // Non-conforming
-				return selected.validateBalance(forFee: transactionFee)
-			case .general:
-				guard let feePayer = selected,
-				      let feePayerWithdraws = executionSummary.accountWithdraws[feePayer.account.address.address]
-				else {
-					return selected.validateBalance(forFee: transactionFee)
-				}
-
-				let xrdAddress = knownAddresses(networkId: networkID.rawValue).resourceAddresses.xrd
-
-				let xrdTotalTransfer: RETDecimal = feePayerWithdraws.reduce(.zero) { partialResult, resource in
-					if case let .fungible(resourceAddress, indicator) = resource, resourceAddress == xrdAddress {
-						return (try? partialResult.add(other: indicator.amount)) ?? partialResult
-					}
-					return partialResult
-				}
-
-				let total = xrdTotalTransfer + transactionFee.totalFee.lockFee
-
-				guard feePayer.xrdBalance >= total else {
-					// Insufficient balance to pay for withdraws and transaction fee
-					return .insufficientBalance
-				}
-
-				return .valid
-
-			default:
+			guard let feePayer = selected,
+			      let feePayerWithdraws = executionSummary.accountWithdraws[feePayer.account.address.address]
+			else {
 				return selected.validateBalance(forFee: transactionFee)
 			}
+
+			let xrdAddress = knownAddresses(networkId: networkID.rawValue).resourceAddresses.xrd
+
+			let xrdTotalTransfer: RETDecimal = feePayerWithdraws.reduce(.zero) { partialResult, resource in
+				if case let .fungible(resourceAddress, indicator) = resource, resourceAddress == xrdAddress {
+					return (try? partialResult.add(other: indicator.amount)) ?? partialResult
+				}
+				return partialResult
+			}
+
+			let total = xrdTotalTransfer + transactionFee.totalFee.lockFee
+
+			guard feePayer.xrdBalance >= total else {
+				// Insufficient balance to pay for withdraws and transaction fee
+				return .insufficientBalance
+			}
+
+			return .valid
 		}
 	}
 }

@@ -34,7 +34,7 @@ extension TransactionReview.State {
 			showApprovalSlider: reviewedTransaction != nil,
 			canApproveTX: canApproveTX && reviewedTransaction?.feePayingValidation.wrappedValue == .valid,
 			sliderResetDate: sliderResetDate,
-			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction?.isNonConforming != false,
+			canToggleViewMode: reviewedTransaction != nil && reviewedTransaction?.isNonConforming == false,
 			viewRawTransactionButtonState: reviewedTransaction?.feePayer.isSuccess == true ? .enabled : .disabled,
 			proposingDappMetadata: proposingDappMetadata,
 			depositSettingSection: accountDepositSetting,
