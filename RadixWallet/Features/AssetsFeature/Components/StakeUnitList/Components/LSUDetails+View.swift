@@ -34,7 +34,7 @@ extension LSUDetails {
 		let containerWithHeader: DetailsContainerWithHeaderViewState
 		let thumbnailURL: URL?
 
-		let validatorNameViewState: ValidatorNameView.ViewState
+		let validatorNameViewState: ValidatorHeaderView.ViewState
 		let redeemableTokenAmount: NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>>
 		let resourceDetails: AssetResourceDetailsSection.ViewState
 	}
@@ -64,7 +64,7 @@ extension LSUDetails {
 							.textStyle(.secondaryHeader)
 							.foregroundColor(.app.gray1)
 
-						ValidatorNameView(viewState: viewStore.validatorNameViewState)
+						ValidatorHeaderView(viewState: viewStore.validatorNameViewState)
 							.padding(.horizontal, .large2)
 
 						PoolUnitResourcesView(resources: viewStore.redeemableTokenAmount)
@@ -79,13 +79,14 @@ extension LSUDetails {
 	}
 }
 
-extension ValidatorNameView.ViewState {
+extension ValidatorHeaderView.ViewState {
 	init(
 		with validator: OnLedgerEntity.Validator
 	) {
 		self.init(
 			imageURL: validator.metadata.iconURL,
-			name: validator.metadata.name ?? L10n.Account.PoolUnits.unknownValidatorName
+			name: validator.metadata.name ?? L10n.Account.PoolUnits.unknownValidatorName,
+			stakedAmount: nil
 		)
 	}
 }

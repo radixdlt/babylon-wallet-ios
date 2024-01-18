@@ -32,10 +32,11 @@ extension Home.AccountRow {
 
 		let fungibleResourceIcons: [TokenThumbnail.Content]
 		let nonFungibleResourcesCount: Int
+		let stakedValidatorsCount: Int
 		let poolUnitsCount: Int
 
 		var showMoreFungibles: Bool {
-			nonFungibleResourcesCount == 0 && poolUnitsCount == 0
+			nonFungibleResourcesCount == 0 && stakedValidatorsCount == 0 && poolUnitsCount == 0
 		}
 
 		init(state: State) {
@@ -53,6 +54,7 @@ extension Home.AccountRow {
 			guard let portfolio = state.portfolio.wrappedValue else {
 				self.fungibleResourceIcons = []
 				self.nonFungibleResourcesCount = 0
+				self.stakedValidatorsCount = 0
 				self.poolUnitsCount = 0
 
 				return
@@ -65,7 +67,8 @@ extension Home.AccountRow {
 
 			self.nonFungibleResourcesCount = portfolio.nonFungibleResources.count
 
-			self.poolUnitsCount = portfolio.poolUnitResources.radixNetworkStakes.count + portfolio.poolUnitResources.poolUnits.count
+			self.stakedValidatorsCount = portfolio.poolUnitResources.radixNetworkStakes.count
+			self.poolUnitsCount = portfolio.poolUnitResources.poolUnits.count
 		}
 	}
 
@@ -179,6 +182,10 @@ extension Home.AccountRow.View {
 
 				if viewStore.nonFungibleResourcesCount > 0 {
 					LabelledIcon(rectIcon: AssetResource.nft, label: "\(viewStore.nonFungibleResourcesCount)")
+				}
+
+				if viewStore.stakedValidatorsCount > 0 {
+					LabelledIcon(roundIcon: AssetResource.stakes, label: "\(viewStore.stakedValidatorsCount)")
 				}
 
 				if viewStore.poolUnitsCount > 0 {

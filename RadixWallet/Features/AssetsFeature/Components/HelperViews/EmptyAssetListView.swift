@@ -32,6 +32,10 @@ extension EmptyAssetListView {
 		.init(viewState: .init(imageAsset: AssetResource.nonfungbileTokens, description: L10n.AssetDetails.NFTDetails.noNfts))
 	}
 
+	static var stakes: Self {
+		.init(viewState: .init(imageAsset: AssetResource.stakes, description: L10n.AssetDetails.StakingDetails.noStakes))
+	}
+
 	static var poolUnits: Self {
 		.init(viewState: .init(imageAsset: AssetResource.poolUnits, description: L10n.AssetDetails.PoolUnitDetails.noPoolUnits))
 	}

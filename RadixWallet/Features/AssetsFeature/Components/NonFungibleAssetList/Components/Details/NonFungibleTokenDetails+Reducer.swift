@@ -9,19 +9,22 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 		public let ownedResource: OnLedgerEntity.OwnedNonFungibleResource?
 		public let token: OnLedgerEntity.NonFungibleToken?
 		public let ledgerState: AtLedgerState
+		public let stakeClaim: OnLedgerEntitiesClient.StakeClaim?
 
 		public init(
 			resourceAddress: ResourceAddress,
 			resourceDetails: Loadable<OnLedgerEntity.Resource> = .idle,
 			ownedResource: OnLedgerEntity.OwnedNonFungibleResource? = nil,
 			token: OnLedgerEntity.NonFungibleToken? = nil,
-			ledgerState: AtLedgerState
+			ledgerState: AtLedgerState,
+			stakeClaim: OnLedgerEntitiesClient.StakeClaim? = nil
 		) {
 			self.resourceAddress = resourceAddress
 			self.resourceDetails = resourceDetails
 			self.token = token
 			self.ownedResource = ownedResource
 			self.ledgerState = ledgerState
+			self.stakeClaim = stakeClaim
 		}
 	}
 
@@ -29,18 +32,20 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 		case closeButtonTapped
 		case task
 		case openURLTapped(URL)
-	}
-
-	public enum DelegateAction: Sendable, Equatable {
-		case dismiss
+		case tappedClaimStake
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case resourceLoadResult(TaskResult<OnLedgerEntity.Resource>)
 	}
 
+	public enum DelegateAction: Sendable, Equatable {
+		case tappedClaimStake(ResourceAddress, OnLedgerEntitiesClient.StakeClaim)
+	}
+
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.openURL) var openURL
+	@Dependency(\.dismiss) var dismiss
 
 	public init() {}
 
@@ -56,11 +61,18 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 				await send(.internal(.resourceLoadResult(result)))
 			}
 		case .closeButtonTapped:
-			return .send(.delegate(.dismiss))
+			return .run { _ in
+				await dismiss()
+			}
 		case let .openURLTapped(url):
 			return .run { _ in
 				await openURL(url)
 			}
+		case .tappedClaimStake:
+			guard let stakeClaim = state.stakeClaim else {
+				return .none
+			}
+			return .send(.delegate(.tappedClaimStake(state.resourceAddress, stakeClaim)))
 		}
 	}
 

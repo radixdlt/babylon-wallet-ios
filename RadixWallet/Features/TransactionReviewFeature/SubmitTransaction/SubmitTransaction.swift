@@ -1,13 +1,13 @@
 import ComposableArchitecture
 import SwiftUI
 
+let epochDurationInMinutes = 5
+
 // MARK: - SubmitTransaction
 public struct SubmitTransaction: Sendable, FeatureReducer {
 	private enum CancellableId: Hashable {
 		case transactionStatus
 	}
-
-	static let epochDurationInMinutes = 5
 
 	public struct State: Sendable, Hashable {
 		public enum TXStatus: Sendable, Hashable {
@@ -135,7 +135,9 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 						await send(.internal(.statusUpdate(.permanentlyRejected)))
 					case let .temporarilyRejected(epoch):
 						await send(.internal(.statusUpdate(
-							.temporarilyRejected(remainingProcessingTime: Int(endEpoch - epoch.rawValue) * Self.epochDurationInMinutes)
+							.temporarilyRejected(
+								remainingProcessingTime: Int(endEpoch - epoch.rawValue) * epochDurationInMinutes
+							)
 						)))
 					case .failed:
 						await send(.internal(.statusUpdate(.failed)))

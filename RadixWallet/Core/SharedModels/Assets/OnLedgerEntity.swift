@@ -461,16 +461,15 @@ extension OnLedgerEntity {
 
 extension OnLedgerEntity.Account {
 	public struct PoolUnitResources: Sendable, Hashable, Codable {
-		public let radixNetworkStakes: [RadixNetworkStake]
+		public let radixNetworkStakes: IdentifiedArrayOf<RadixNetworkStake>
 		public let poolUnits: [PoolUnit]
-
-		public init(radixNetworkStakes: [RadixNetworkStake], poolUnits: [PoolUnit]) {
-			self.radixNetworkStakes = radixNetworkStakes
-			self.poolUnits = poolUnits
-		}
 	}
 
-	public struct RadixNetworkStake: Sendable, Hashable, Codable {
+	public struct RadixNetworkStake: Sendable, Hashable, Codable, Identifiable {
+		public var id: ValidatorAddress {
+			validatorAddress
+		}
+
 		public let validatorAddress: ValidatorAddress
 		public let stakeUnitResource: OnLedgerEntity.OwnedFungibleResource?
 		public let stakeClaimResource: OnLedgerEntity.OwnedNonFungibleResource?

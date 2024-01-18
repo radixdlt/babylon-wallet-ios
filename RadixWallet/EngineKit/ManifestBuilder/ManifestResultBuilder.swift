@@ -14,14 +14,18 @@ extension ManifestBuilder {
 	public static let faucetFreeXrd = flip(faucetFreeXrd)
 	public static let accountTryDepositBatchOrAbort = flip(accountTryDepositBatchOrAbort)
 	public static let accountTryDepositEntireWorktopOrAbort = flip(accountTryDepositEntireWorktopOrAbort)
+	public static let accountDepositEntireWorktop = flip(accountDepositEntireWorktop)
 	public static let withdrawAmount = flip(accountWithdraw)
 	public static let withdrawTokens = flip(accountWithdrawNonFungibles)
 	public static let takeFromWorktop = flip(takeFromWorktop)
+	public static let takeAllFromWorktop = flip(takeAllFromWorktop)
 	public static let accountTryDepositOrAbort = flip(accountTryDepositOrAbort)
 	public static let accountDeposit = flip(accountDeposit)
 	public static let takeNonFungiblesFromWorktop = flip(takeNonFungiblesFromWorktop)
+	public static let accountWithdrawNonFungibles = flip(accountWithdrawNonFungibles)
 	public static let setOwnerKeys = flip(setOwnerKeys)
 	public static let createFungibleResourceManager = flip(createFungibleResourceManager)
+	public static let validatorClaimXrd = flip(validatorClaimXrd)
 
 	@resultBuilder
 	public enum InstructionsChain {

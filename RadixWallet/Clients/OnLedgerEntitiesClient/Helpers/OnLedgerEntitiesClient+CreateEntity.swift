@@ -288,7 +288,7 @@ extension OnLedgerEntitiesClient {
 			return OnLedgerEntity.Account.PoolUnit(resource: poolUnitResource, resourcePoolAddress: pool.address)
 		}
 
-		return .init(radixNetworkStakes: stakeUnits, poolUnits: poolUnits)
+		return .init(radixNetworkStakes: stakeUnits.asIdentifiable(), poolUnits: poolUnits)
 	}
 
 	static func extractOwnedFungibleResources(
@@ -448,18 +448,37 @@ extension OnLedgerEntitiesClient {
 				return nil
 			}()
 
-			let stakeClaimTokens: NonFunbileResourceWithTokens? = try await {
+			let stakeClaimTokens: NonFunbileResourceWithTokens? = try await { () -> NonFunbileResourceWithTokens? in
 				if let stakeClaimResource = stake.stakeClaimResource, stakeClaimResource.nonFungibleIdsCount > 0 {
 					guard let stakeClaimResourceDetails = resourceDetails.first(where: { $0.resourceAddress == stakeClaimResource.resourceAddress }) else {
 						assertionFailure("Did not load stake unit details")
 						return nil
 					}
-					let tokenData = try await getAccountOwnedNonFungibleTokenData(.init(
+					let tokens = try await getAccountOwnedNonFungibleTokenData(.init(
 						accountAddress: account.address,
 						resource: stakeClaimResource,
 						mode: .loadAll
 					)).tokens
-					return .init(resource: stakeClaimResourceDetails, tokens: tokenData)
+
+					return .init(
+						resource: stakeClaimResourceDetails,
+						stakeClaims: tokens.compactMap { token -> OnLedgerEntitiesClient.StakeClaim? in
+							guard
+								let claimEpoch = token.data?.claimEpoch,
+								let claimAmount = token.data?.claimAmount,
+								claimAmount > 0
+							else {
+								return nil
+							}
+
+							return OnLedgerEntitiesClient.StakeClaim(
+								validatorAddress: stake.validatorAddress,
+								token: token,
+								claimAmount: claimAmount,
+								reamainingEpochsUntilClaim: Int(claimEpoch) - Int(currentEpoch.rawValue)
+							)
+						}.asIdentifiable()
+					)
 				}
 
 				return nil
@@ -502,7 +521,7 @@ extension OnLedgerEntity.Account.PoolUnitResources {
 			return nil
 		}
 
-		return .init(radixNetworkStakes: stakes, poolUnits: poolUnits)
+		return .init(radixNetworkStakes: stakes.asIdentifiable(), poolUnits: poolUnits)
 	}
 }
 
@@ -555,9 +574,24 @@ extension OnLedgerEntitiesClient {
 		public let amount: RETDecimal
 	}
 
+	public struct StakeClaim: Hashable, Sendable, Identifiable {
+		public var id: NonFungibleGlobalId {
+			token.id
+		}
+
+		let validatorAddress: ValidatorAddress
+		let token: OnLedgerEntity.NonFungibleToken
+		let claimAmount: RETDecimal
+		let reamainingEpochsUntilClaim: Int
+
+		var isReadyToBeClaimed: Bool {
+			reamainingEpochsUntilClaim <= .zero
+		}
+	}
+
 	public struct NonFunbileResourceWithTokens: Hashable, Sendable {
 		public let resource: OnLedgerEntity.Resource
-		public let tokens: [OnLedgerEntity.NonFungibleToken]
+		public let stakeClaims: IdentifiedArrayOf<StakeClaim>
 	}
 }
 

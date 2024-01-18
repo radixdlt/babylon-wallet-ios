@@ -6,6 +6,9 @@ extension TransactionManifest: @unchecked Sendable {}
 // MARK: - NonFungibleGlobalId + Sendable
 extension NonFungibleGlobalId: @unchecked Sendable {}
 
+// MARK: - NonFungibleGlobalId + Identifiable
+extension NonFungibleGlobalId: Identifiable {}
+
 // MARK: - Instructions + Sendable
 extension Instructions: @unchecked Sendable {}
 

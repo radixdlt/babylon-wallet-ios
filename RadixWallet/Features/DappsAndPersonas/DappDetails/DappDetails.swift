@@ -294,10 +294,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case .nonFungibleDetails(.delegate(.dismiss)):
-			state.destination = nil
-			return .none
-
 		case .confirmDisconnectAlert(.confirmTapped):
 			assert(state.authorizedDapp != nil, "Can only disconnect a dApp that has been authorized")
 			guard let networkID = state.authorizedDapp?.networkID else { return .none }
