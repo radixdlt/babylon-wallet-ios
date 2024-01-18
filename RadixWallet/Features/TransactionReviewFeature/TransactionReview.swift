@@ -992,7 +992,7 @@ extension TransactionReview {
 					public let symbol: String?
 					public let address: ResourceAddress
 					public let icon: URL?
-					public var amount: RETDecimal
+					public var amount: String
 				}
 			}
 		}

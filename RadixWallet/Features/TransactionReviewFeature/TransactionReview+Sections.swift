@@ -550,7 +550,7 @@ extension TransactionReview {
 						symbol: entity.metadata.symbol,
 						address: address,
 						icon: entity.metadata.iconURL,
-						amount: resourceAmount * adjustmentFactor
+						amount: (resourceAmount * adjustmentFactor).formatted()
 					)
 				}
 

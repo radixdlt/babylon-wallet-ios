@@ -78,7 +78,7 @@ public struct TransferPoolUnitResourceView: View {
 		public var id: ResourceAddress
 		public let symbol: String?
 		public let icon: TokenThumbnail.Content
-		public let amount: RETDecimal
+		public let amount: String
 	}
 
 	public let viewState: ViewState
@@ -96,7 +96,7 @@ public struct TransferPoolUnitResourceView: View {
 
 			Spacer(minLength: .small2)
 
-			Text(viewState.amount.formattedPlain())
+			Text(viewState.amount)
 				.lineLimit(1)
 				.minimumScaleFactor(0.8)
 				.truncationMode(.tail)

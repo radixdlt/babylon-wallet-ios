@@ -401,7 +401,6 @@ extension OnLedgerEntitiesClient {
 		}
 
 		// Fetch pool unit info
-
 		let pool = try await getEntities(
 			[poolAddress],
 			.resourceMetadataKeys,
@@ -416,7 +415,7 @@ extension OnLedgerEntitiesClient {
 		}
 
 		guard pool?.poolUnitResourceAddress == resource.resourceAddress else {
-			return false // The resource pool decalred a different pool unit reosource address
+			return false // The resource pool declared a different pool unit resource address
 		}
 
 		return true // It is a pool unit resource address
