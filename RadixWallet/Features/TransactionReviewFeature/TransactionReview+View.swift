@@ -341,6 +341,7 @@ private extension View {
 			.dApp(with: destinationStore)
 			.fungibleTokenDetails(with: destinationStore)
 			.nonFungibleTokenDetails(with: destinationStore)
+			.poolUnitDetails(with: destinationStore)
 			.customizeFees(with: destinationStore)
 			.signing(with: destinationStore)
 			.submitting(with: destinationStore)
@@ -399,6 +400,15 @@ private extension View {
 			state: /TransactionReview.Destination.State.nonFungibleTokenDetails,
 			action: TransactionReview.Destination.Action.nonFungibleTokenDetails,
 			content: { NonFungibleTokenDetails.View(store: $0) }
+		)
+	}
+
+	private func poolUnitDetails(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /TransactionReview.Destination.State.poolUnitDetails,
+			action: TransactionReview.Destination.Action.poolUnitDetails,
+			content: { PoolUnitDetails.View(store: $0) }
 		)
 	}
 
