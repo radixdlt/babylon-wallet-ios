@@ -164,28 +164,29 @@ public struct AssetsView: Sendable, FeatureReducer {
 			state.stakeUnitList = resourcesState.stakeUnitList
 			state.poolUnitsList = resourcesState.poolUnitsList
 
+			state.isRefreshing = false
+
 			/// Not the happiest about this, will need to find a better way
 			let shouldRefreshPoolUnitList = resourcesState.poolUnitsList != nil
 				&& (state.activeAssetKind == .poolUnits || state.isRefreshing)
 
+			var effect: Effect<Action> = .none
 			if shouldRefreshPoolUnitList {
-				return .run { send in
+				effect = effect.merge(with: .run { send in
 					await send(.child(.poolUnitsList(.view(.refresh))))
-				}
+				})
 			}
 
 			let shouldRefreshStakeUnitList = resourcesState.stakeUnitList != nil
 				&& (state.activeAssetKind == .stakeUnits || state.isRefreshing)
 
 			if shouldRefreshStakeUnitList {
-				return .run { send in
+				effect = effect.merge(with: .run { send in
 					await send(.child(.stakeUnitList(.view(.refresh))))
-				}
+				})
 			}
 
-			state.isRefreshing = false
-
-			return .none
+			return effect
 		}
 	}
 

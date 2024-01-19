@@ -157,8 +157,28 @@ extension TransactionReview {
 		case let .validatorUnstake(validatorAddresses: validatorAddresses, validatorUnstakes: validatorUnstakes):
 			return nil
 
-		case let .validatorClaim(validatorAddresses: validatorAddresses, validatorClaims: validatorClaims):
-			return nil
+		case let .validatorClaim(validatorAddresses, validatorClaims):
+			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
+			let withdrawals = try? await extractWithdrawals(
+				accountWithdraws: summary.accountWithdraws,
+				dataOfNewlyMintedNonFungibles: summary.dataOfNewlyMintedNonFungibles,
+				entities: resourcesInfo,
+				userAccounts: userAccounts,
+				networkID: networkID
+			)
+
+			let deposits = try? await extractDeposits(
+				accountDeposits: summary.accountDeposits,
+				dataOfNewlyMintedNonFungibles: summary.dataOfNewlyMintedNonFungibles,
+				entities: resourcesInfo,
+				userAccounts: userAccounts,
+				networkID: networkID
+			)
+
+			return Sections(
+				withdrawals: withdrawals,
+				deposits: deposits
+			)
 
 		case let .accountDepositSettingsUpdate(
 			resourcePreferencesUpdates,
@@ -484,8 +504,43 @@ extension TransactionReview {
 				// This is not entirely correct, we should not attempt to fetch NFT data the tokens
 				// that are about to be minted, but current RET does not retur the information about the freshly minted tokens anymore.
 				// Needs to be addressed in RET.
-				result = try await existingTokenInfo(ids, for: resource.resourceAddress).map { token in
-					.init(resource: resource, details: .nonFungible(token))
+
+				let tokens = try await existingTokenInfo(ids, for: resource.resourceAddress)
+
+				let stakeClaimValidator = try await onLedgerEntitiesClient.isStakeClaimNFT(resource)
+				if let stakeClaimValidator {
+					var stakeClaimTokens: [OnLedgerEntitiesClient.StakeClaim] = []
+					for token in tokens {
+						guard let data = token.data, let claimAmount = data.claimAmount, let claimEpoch = data.claimEpoch else {
+							fatalError()
+						}
+						let stakeCLaim = OnLedgerEntitiesClient.StakeClaim(
+							validatorAddress: stakeClaimValidator.address,
+							token: token,
+							claimAmount: claimAmount,
+							reamainingEpochsUntilClaim: Int(claimEpoch) - Int(resource.atLedgerState.epoch)
+						)
+						stakeClaimTokens.append(stakeCLaim)
+					}
+					result = [.init(
+						resource: resource,
+						details: .stakeClaimNFT(.init(
+							canClaimTokens: false,
+							stakeClaimTokens: .init(
+								resource: resource,
+								stakeClaims: stakeClaimTokens.asIdentifiable()
+							),
+							validatorName: stakeClaimValidator.metadata.name ?? "Unknown"
+						))
+					)]
+				} else {
+					result = tokens.map { token in
+						.init(resource: resource, details: .nonFungible(token))
+					}
+
+					guard result.count == ids.count else {
+						throw FailedToGetDataForAllNFTs()
+					}
 				}
 
 			case let .right(newEntityMetadata):
@@ -500,10 +555,10 @@ extension TransactionReview {
 					.map { id in
 						Transfer(resource: resource, details: .nonFungible(.init(id: id, data: nil)))
 					}
-			}
 
-			guard result.count == ids.count else {
-				throw FailedToGetDataForAllNFTs()
+				guard result.count == ids.count else {
+					throw FailedToGetDataForAllNFTs()
+				}
 			}
 
 			return result

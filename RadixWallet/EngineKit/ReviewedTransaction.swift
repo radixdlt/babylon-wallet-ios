@@ -10,9 +10,9 @@ extension ExecutionSummary {
 private extension DetailedManifestClass {
 	var isSupported: Bool {
 		switch self {
-		case .general, .transfer, .poolContribution, .poolRedemption, .accountDepositSettingsUpdate:
+		case .general, .transfer, .poolContribution, .poolRedemption, .accountDepositSettingsUpdate, .validatorClaim:
 			true
-		case .validatorStake, .validatorUnstake, .validatorClaim:
+		case .validatorStake, .validatorUnstake:
 			false
 		}
 	}

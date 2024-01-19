@@ -302,7 +302,11 @@ extension StakeUnitList {
 					)
 				},
 				stakeClaimNFTs: stake.stakeClaimTokens.map { stakeClaimTokens in
-					StakeClaimNFTSView.ViewState(stakeClaimTokens: stakeClaimTokens, selectedStakeClaims: allSelectedTokens)
+					StakeClaimNFTSView.ViewState(
+						canClaimTokens: allSelectedTokens == nil, // cannot claim in selection mode
+						stakeClaimTokens: stakeClaimTokens,
+						selectedStakeClaims: allSelectedTokens
+					)
 				}
 			)
 		}.sorted(by: \.id.address).asIdentifiable()

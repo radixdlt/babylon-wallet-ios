@@ -23,7 +23,7 @@ public struct TransactionReviewAccounts: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case showCustomizeGuarantees
-		case showAsset(TransactionReview.Transfer)
+		case showAsset(TransactionReview.Transfer, OnLedgerEntity.NonFungibleToken?)
 	}
 
 	public init() {}
@@ -44,8 +44,8 @@ public struct TransactionReviewAccounts: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .account(id: _, action: .delegate(.showAsset(let transfer))):
-			.send(.delegate(.showAsset(transfer)))
+		case let .account(id: _, action: .delegate(.showAsset(transfer, id))):
+			.send(.delegate(.showAsset(transfer, id)))
 		case .account:
 			.none
 		}
@@ -67,11 +67,12 @@ public struct TransactionReviewAccount: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case transferTapped(TransactionReview.Transfer)
+		case transferTapped(TransactionReview.Transfer, OnLedgerEntity.NonFungibleToken?)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case showAsset(TransactionReview.Transfer)
+		case showAsset(TransactionReview.Transfer, OnLedgerEntity.NonFungibleToken?)
+		case showStakeClaim(OnLedgerEntitiesClient.StakeClaim)
 	}
 
 	public init() {}
@@ -80,8 +81,8 @@ public struct TransactionReviewAccount: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			.none
-		case let .transferTapped(transfer):
-			.send(.delegate(.showAsset(transfer)))
+		case let .transferTapped(transfer, id):
+			.send(.delegate(.showAsset(transfer, id)))
 		}
 	}
 }

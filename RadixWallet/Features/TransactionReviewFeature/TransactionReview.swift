@@ -310,11 +310,17 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .withdrawals(.delegate(.showAsset(transfer))),
-		     let .deposits(.delegate(.showAsset(transfer))):
+		case let .withdrawals(.delegate(.showAsset(transfer, id))),
+		     let .deposits(.delegate(.showAsset(transfer, id))):
 			switch transfer.details {
 			case let .fungible(details):
-				state.destination = .fungibleTokenDetails(.init(resourceAddress: transfer.resource.resourceAddress, resource: .success(transfer.resource), isXRD: details.isXRD))
+				state.destination = .fungibleTokenDetails(
+					.init(
+						resourceAddress: transfer.resource.resourceAddress,
+						resource: .success(transfer.resource),
+						isXRD: details.isXRD
+					)
+				)
 			case let .nonFungible(details):
 				state.destination = .nonFungibleTokenDetails(.init(
 					resourceAddress: transfer.resource.resourceAddress,
@@ -324,6 +330,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				))
 			case let .poolUnit(details):
 				return .none
+
+			case let .stakeClaimNFT(details):
+				state.destination = .nonFungibleTokenDetails(.init(
+					resourceAddress: transfer.resource.resourceAddress,
+					resourceDetails: .success(transfer.resource),
+					token: id,
+					ledgerState: transfer.resource.atLedgerState
+				))
 			}
 
 			return .none
@@ -771,6 +785,7 @@ extension TransactionReview {
 			case fungible(Fungible)
 			case nonFungible(NonFungible)
 			case poolUnit(PoolUnit)
+			case stakeClaimNFT(StakeClaimNFT)
 
 			public struct Fungible: Sendable, Hashable {
 				public let isXRD: Bool
@@ -779,6 +794,7 @@ extension TransactionReview {
 			}
 
 			public typealias NonFungible = OnLedgerEntity.NonFungibleToken
+			public typealias StakeClaimNFT = StakeClaimNFTSView.ViewState
 
 			public struct PoolUnit: Sendable, Hashable {
 				public let poolName: String
