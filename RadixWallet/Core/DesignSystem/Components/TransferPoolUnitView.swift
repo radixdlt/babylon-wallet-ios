@@ -45,6 +45,7 @@ public struct TransferPoolUnitView: View {
 				TransferPoolUnitResourcesView(resources: viewState.resources)
 			}
 		}
+		.disabled(true) // Temporarily disabled
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.padding(.medium3)
 		.background(.app.gray5)
