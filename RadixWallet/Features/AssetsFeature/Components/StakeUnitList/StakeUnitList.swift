@@ -181,7 +181,8 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 					.init(
 						validatorAddress: validatorAddress,
 						resourceAddress: stakeClaimTokens.resource.resourceAddress,
-						ids: stakeClaimTokens.stakeClaims.filter(\.isReadyToBeClaimed).map { $0.id.localId() }
+						ids: stakeClaimTokens.stakeClaims.filter(\.isReadyToBeClaimed).map { $0.id.localId() },
+						amount: stakeClaimTokens.stakeClaims.map(\.claimAmount).reduce(0, +)
 					),
 				]
 			)
@@ -199,7 +200,8 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 					return .init(
 						validatorAddress: stake.validator.address,
 						resourceAddress: stakeClaimTokens.resource.resourceAddress,
-						ids: stakeClaims.map { $0.id.localId() }
+						ids: stakeClaims.map { $0.id.localId() },
+						amount: stakeClaimTokens.stakeClaims.map(\.claimAmount).reduce(0, +)
 					)
 				}
 			)
@@ -231,7 +233,8 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 					.init(
 						validatorAddress: stakeClaim.validatorAddress,
 						resourceAddress: resourceAddress,
-						ids: [stakeClaim.id.localId()]
+						ids: [stakeClaim.id.localId()],
+						amount: stakeClaim.claimAmount
 					),
 				]
 			)

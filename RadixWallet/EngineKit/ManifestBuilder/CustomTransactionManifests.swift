@@ -5,6 +5,7 @@ extension ManifestBuilder {
 		public let validatorAddress: ValidatorAddress
 		public let resourceAddress: ResourceAddress
 		public let ids: [NonFungibleLocalId]
+		public let amount: RETDecimal
 	}
 
 	public static func stakeClaimsManifest(
@@ -12,17 +13,27 @@ extension ManifestBuilder {
 		stakeClaims: [StakeClaim]
 	) throws -> TransactionManifest {
 		try make {
+			let accountAddress = try accountAddress.intoEngine()
+			let xrdAddress = EngineToolkit.Address.xrd(accountAddress.networkId())
+
 			for stakeClaim in stakeClaims {
 				let bucket = ManifestBuilderBucket.unique
+				// Withdraw non fungibles from account
 				try accountWithdrawNonFungibles(
-					accountAddress.intoEngine(),
+					accountAddress,
 					stakeClaim.resourceAddress.intoEngine(),
 					stakeClaim.ids
 				)
 				try takeAllFromWorktop(stakeClaim.resourceAddress.intoEngine(), bucket)
+
+				// Claim XRDs for the given nft ids.
 				try validatorClaimXrd(stakeClaim.validatorAddress.intoEngine(), bucket)
+
+				// Deposit the claimed amount
+				let xrdBucket = ManifestBuilderBucket.unique
+				takeFromWorktop(xrdAddress, stakeClaim.amount, xrdBucket)
+				accountDeposit(accountAddress, xrdBucket)
 			}
-			try accountDepositEntireWorktop(accountAddress.intoEngine())
 		}
 		.build(networkId: accountAddress.intoEngine().networkId())
 	}
