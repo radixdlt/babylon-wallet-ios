@@ -56,7 +56,7 @@ extension PoolUnit.State {
 			iconURL: poolUnit.resource.metadata.iconURL,
 			name: poolUnit.resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
 			resources: resourceDetails.map { details in
-				PoolUnitResourceViewState.viewStates(poolUnit: poolUnit, resourcesDetails: details)
+				PoolUnitResourceViewState.viewStates(amount: poolUnit.resource.amount, resourcesDetails: details)
 			},
 			isSelected: isSelected
 		)
@@ -65,31 +65,15 @@ extension PoolUnit.State {
 
 extension PoolUnitResourceViewState {
 	static func viewStates(
-		poolUnit: OnLedgerEntity.Account.PoolUnit,
+		amount: RETDecimal,
 		resourcesDetails: OnLedgerEntitiesClient.OwnedResourcePoolDetails
 	) -> NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>> {
-		func redemptionValue(for resourceDetails: OnLedgerEntitiesClient.ResourceWithVaultAmount) -> String {
-			guard let poolUnitTotalSupply = resourcesDetails.poolUnitResource.resource.totalSupply else {
-				loggerGlobal.error("Missing total supply for \(resourcesDetails.poolUnitResource.resource.resourceAddress.address)")
-				return L10n.Account.PoolUnits.noTotalSupply
-			}
-			guard poolUnitTotalSupply > 0 else {
-				loggerGlobal.error("Total supply is 0 for \(resourcesDetails.poolUnitResource.resource.resourceAddress.address)")
-				return L10n.Account.PoolUnits.noTotalSupply
-			}
-			let redemptionValue = poolUnit.resource.amount * (resourceDetails.amount / poolUnitTotalSupply)
-			let decimalPlaces = resourceDetails.resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
-			let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
-
-			return roundedRedemptionValue.formatted()
-		}
-
 		let xrdResourceViewState = resourcesDetails.xrdResource.map {
 			PoolUnitResourceViewState(
 				id: $0.resource.resourceAddress,
 				thumbnail: .xrd,
 				symbol: Constants.xrdTokenName,
-				tokenAmount: redemptionValue(for: $0)
+				tokenAmount: $0.poolRedemptionValue(for: amount, poolUnitResource: resourcesDetails.poolUnitResource.resource)
 			)
 		}
 		let nonXrdResources = resourcesDetails.nonXrdResources.map { resourceDetails in
@@ -97,7 +81,7 @@ extension PoolUnitResourceViewState {
 				id: resourceDetails.resource.resourceAddress,
 				thumbnail: .known(resourceDetails.resource.metadata.iconURL),
 				symbol: resourceDetails.resource.metadata.symbol ?? resourceDetails.resource.metadata.name ?? L10n.Account.PoolUnits.unknownSymbolName,
-				tokenAmount: redemptionValue(for: resourceDetails)
+				tokenAmount: resourceDetails.poolRedemptionValue(for: amount, poolUnitResource: resourcesDetails.poolUnitResource.resource)
 			)
 		}
 
