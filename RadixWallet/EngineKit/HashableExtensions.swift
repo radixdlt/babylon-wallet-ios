@@ -1254,8 +1254,8 @@ extension DetailedManifestClass: Hashable, Equatable {
 		case let (.validatorStake(lhsValidatorAddresses, lhsValidatorStakes), .validatorStake(rhsValidatorAddresses, rhsValidatorStakes)):
 			lhsValidatorAddresses == rhsValidatorAddresses && lhsValidatorStakes == rhsValidatorStakes
 
-		case let (.validatorUnstake(lhsValidatorAddresses, lhsValidatorUnstakes), .validatorUnstake(rhsValidatorAddresses, rhsValidatorUnstakes)):
-			lhsValidatorAddresses == rhsValidatorAddresses && lhsValidatorUnstakes == rhsValidatorUnstakes
+		case let (.validatorUnstake(lhsValidatorAddresses, lhsValidatorUnstakes, lhsClaimsNonFugibleData), .validatorUnstake(rhsValidatorAddresses, rhsValidatorUnstakes, rhsClaimsNonFugibleData)):
+			lhsValidatorAddresses == rhsValidatorAddresses && lhsValidatorUnstakes == rhsValidatorUnstakes && lhsClaimsNonFugibleData == rhsClaimsNonFugibleData
 
 		case let (.validatorClaim(lhsValidatorAddresses, lhsValidatorClaims), .validatorClaim(rhsValidatorAddresses, rhsValidatorClaims)):
 			lhsValidatorAddresses == rhsValidatorAddresses && lhsValidatorClaims == rhsValidatorClaims
@@ -1293,10 +1293,11 @@ extension DetailedManifestClass: Hashable, Equatable {
 			hasher.combine("validatorStake")
 			hasher.combine(validatorAddresses)
 			hasher.combine(validatorStakes)
-		case let .validatorUnstake(validatorAddresses, validatorUnstakes):
+		case let .validatorUnstake(validatorAddresses, validatorUnstakes, claimsNonFugibleData):
 			hasher.combine("validatorUnstake")
 			hasher.combine(validatorAddresses)
 			hasher.combine(validatorUnstakes)
+			hasher.combine(claimsNonFugibleData)
 		case let .validatorClaim(validatorAddresses, validatorClaims):
 			hasher.combine("validatorClaim")
 			hasher.combine(validatorAddresses)
@@ -1308,6 +1309,33 @@ extension DetailedManifestClass: Hashable, Equatable {
 			hasher.combine(authorizedDepositorsAdded)
 			hasher.combine(authorizedDepositorsRemoved)
 		}
+	}
+}
+
+// MARK: - UnstakeDataEntry + Hashable
+extension UnstakeDataEntry: Hashable {
+	public static func == (lhs: UnstakeDataEntry, rhs: UnstakeDataEntry) -> Bool {
+		lhs.nonFungibleGlobalId == rhs.nonFungibleGlobalId && lhs.data == rhs.data
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(nonFungibleGlobalId)
+		hasher.combine(data)
+	}
+}
+
+// MARK: - UnstakeData + Hashable
+extension UnstakeData: Hashable {
+	public static func == (lhs: UnstakeData, rhs: UnstakeData) -> Bool {
+		lhs.claimAmount == rhs.claimAmount &&
+			lhs.claimEpoch == rhs.claimEpoch &&
+			lhs.name == rhs.name
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(claimAmount)
+		hasher.combine(claimEpoch)
+		hasher.combine(name)
 	}
 }
 
