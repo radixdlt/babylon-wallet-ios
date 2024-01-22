@@ -1,7 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - TransactionReviewDappsUsed.View
 extension TransactionReviewNetworkFee {
 	@MainActor
 	public struct View: SwiftUI.View {

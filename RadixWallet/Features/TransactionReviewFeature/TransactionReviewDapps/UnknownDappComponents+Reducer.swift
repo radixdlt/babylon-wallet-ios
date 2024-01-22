@@ -1,6 +1,8 @@
 public struct UnknownDappComponents: FeatureReducer, Sendable {
 	public struct State: Hashable, Sendable {
-		let components: IdentifiedArrayOf<ComponentAddress>
+		let title: String
+		let rowHeading: String
+		let addresses: [LedgerIdentifiable.Address]
 	}
 
 	public enum ViewAction: Sendable {

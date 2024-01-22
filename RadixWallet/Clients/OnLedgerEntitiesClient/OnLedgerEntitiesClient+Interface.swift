@@ -259,33 +259,28 @@ extension OnLedgerEntitiesClient {
 		return resource
 	}
 
-	/// Extracts the dApp definition address from a component, if one is present
+	/// Extracts the dApp definition address from an entity, if one is present
 	@Sendable
 	public func getDappDefinitionAddress(
-		_ component: ComponentAddress
+		_ address: Address
 	) async throws -> DappDefinitionAddress {
-		let entityMetadata = try await getEntity(
-			component.asGeneral,
-			metadataKeys: [.dappDefinition]
-		).genericComponent?.metadata
-
-		guard let dappDefinitionAddress = entityMetadata?.dappDefinition
-		else {
+		let entityMetadata = try await getEntity(address, metadataKeys: [.dappDefinition]).metadata
+		guard let dappDefinitionAddress = entityMetadata?.dappDefinition else {
 			throw OnLedgerEntity.Metadata.MetadataError.missingDappDefinition
 		}
 
 		return dappDefinitionAddress
 	}
 
-	/// Fetches the metadata for a dApp. If the component address is supplied, it validates that it is contained in `claimed_entities`
+	/// Fetches the metadata for a dApp. If an entity address is supplied, it validates that it is contained in `claimed_entities`
 	@Sendable
 	public func getDappMetadata(
 		_ dappDefinition: DappDefinitionAddress,
-		validatingDappComponent component: ComponentAddress? = nil,
+		validatingDappEntity entity: Address? = nil,
 		validatingDappDefinitionAddress dappDefinitionAddress: DappDefinitionAddress? = nil,
 		validatingWebsite website: URL? = nil
 	) async throws -> OnLedgerEntity.Metadata {
-		let forceRefresh = component != nil || dappDefinitionAddress != nil || website != nil
+		let forceRefresh = entity != nil || dappDefinitionAddress != nil || website != nil
 
 		let dappMetadata = try await getAssociatedDapp(
 			dappDefinition,
@@ -294,8 +289,8 @@ extension OnLedgerEntitiesClient {
 
 		try dappMetadata.validateAccountType()
 
-		if let component {
-			try dappMetadata.validate(dAppComponent: component)
+		if let entity {
+			try dappMetadata.validate(dAppEntity: entity)
 		}
 		if let dappDefinitionAddress {
 			try dappMetadata.validate(dAppDefinitionAddress: dappDefinitionAddress)

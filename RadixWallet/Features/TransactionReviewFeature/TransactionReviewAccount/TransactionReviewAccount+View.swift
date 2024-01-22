@@ -75,12 +75,15 @@ extension TransactionReviewAccount {
 				InnerCard {
 					SmallAccountCard(account: viewStore.account)
 
-					ForEach(viewStore.transfers) { transfer in
-						TransactionReviewResourceView(transfer: transfer) {
-							viewStore.send(.transferTapped(transfer))
+					VStack(spacing: 1) {
+						ForEach(viewStore.transfers) { transfer in
+							TransactionReviewResourceView(transfer: transfer) {
+								viewStore.send(.transferTapped(transfer))
+							}
 						}
+						.background(.app.gray5)
 					}
-					.background(.app.gray5)
+					.background(.app.gray4)
 				}
 			}
 		}
@@ -99,6 +102,8 @@ struct TransactionReviewResourceView: View {
 			TransactionReviewTokenView(viewState: viewState, onTap: onTap)
 		case let .nonFungible(details):
 			TransferNFTView(viewState: .init(resource: transfer.resource, details: details), onTap: onTap)
+		case let .poolUnit(details):
+			TransferPoolUnitView(viewState: .init(resource: transfer.resource, details: details), onTap: onTap)
 		}
 	}
 }
@@ -121,6 +126,26 @@ extension TransferNFTView.ViewState {
 			tokenID: details.id.localId().toUserFacingString(),
 			tokenName: details.data?.name,
 			thumbnail: resource.metadata.iconURL
+		)
+	}
+}
+
+extension TransferPoolUnitView.ViewState {
+	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.PoolUnit) {
+		self.init(
+			poolName: resource.title,
+			resources: details.resources.map(TransferPoolUnitResourceView.ViewState.init)
+		)
+	}
+}
+
+extension TransferPoolUnitResourceView.ViewState {
+	init(resource: TransactionReview.Transfer.Details.PoolUnit.Resource) {
+		self.init(
+			id: resource.id,
+			symbol: resource.symbol,
+			icon: resource.isXRD ? .xrd : .known(resource.icon),
+			amount: resource.amount
 		)
 	}
 }

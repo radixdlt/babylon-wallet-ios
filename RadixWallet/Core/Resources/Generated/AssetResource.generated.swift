@@ -125,6 +125,7 @@ public enum AssetResource {
   public static let officialTagIcon = ImageAsset(name: "official-tag-icon")
   public static let tagIcon = ImageAsset(name: "tag-icon")
   public static let transactionReviewMessage = ImageAsset(name: "transactionReview-message")
+  public static let transactionReviewPools = ImageAsset(name: "transactionReview-pools")
   public static let transactionReviewDapps = ImageAsset(name: "transactionReview_dapps")
   public static let transactionReviewDepositSetting = ImageAsset(name: "transactionReview_depositSetting")
   public static let transactionReviewDepositing = ImageAsset(name: "transactionReview_depositing")
