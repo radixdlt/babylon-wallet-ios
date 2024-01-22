@@ -46,12 +46,16 @@ public struct StakeClaimNFTSView: View {
 
 	public var body: some View {
 		VStack(alignment: .leading, spacing: .small1) {
-			HStack {
+			HStack(spacing: .zero) {
 				TokenThumbnail(.known(viewState.resourceMetadata.iconURL), size: .smaller)
+					.padding(.trailing, .small1)
+
 				VStack(alignment: .leading, spacing: .zero) {
-					Text(viewState.resourceMetadata.name ?? "")
-						.textStyle(.body1Header)
-						.foregroundStyle(.app.gray1)
+					if let name = viewState.resourceMetadata.name {
+						Text(name)
+							.textStyle(.body1Header)
+							.foregroundStyle(.app.gray1)
+					}
 
 					if let validatorName = viewState.validatorName {
 						Text(validatorName)

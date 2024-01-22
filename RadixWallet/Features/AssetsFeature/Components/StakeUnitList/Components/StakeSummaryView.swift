@@ -44,7 +44,7 @@ public struct StakeSummaryView: View {
 				summaryRow(
 					L10n.Account.Staking.readyToClaim,
 					amount: viewState.readyToClaim,
-					titleTextColor: viewState.readyToClaimControlState == .enabled ? .app.blue2 : .app.gray2
+					titleTextColor: viewState.readyToClaimControlState == .enabled ? .app.blue1 : .app.gray2
 				)
 				.onTapGesture {
 					if viewState.readyToClaimControlState == .enabled {
