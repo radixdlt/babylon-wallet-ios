@@ -171,7 +171,9 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 			return .none
 
 		case let .didTapClaimAll(validatorAddress):
-			guard let stakeClaimTokens = state.stakedValidators[id: validatorAddress]?.stakeDetails.stakeClaimTokens else {
+			guard let stakeClaimTokens = state.stakedValidators[id: validatorAddress]?.stakeDetails.stakeClaimTokens,
+			      let stakeClaims = stakeClaimTokens.stakeClaims.filter(\.isReadyToBeClaimed).nonEmpty
+			else {
 				return .none
 			}
 
@@ -181,7 +183,8 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 					.init(
 						validatorAddress: validatorAddress,
 						resourceAddress: stakeClaimTokens.resource.resourceAddress,
-						ids: stakeClaimTokens.stakeClaims.filter(\.isReadyToBeClaimed).map { $0.id.localId() }
+						ids: stakeClaims.map { $0.id.localId() },
+						amount: stakeClaims.map(\.claimAmount).reduce(0, +)
 					),
 				]
 			)
@@ -191,7 +194,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 				state.account.address,
 				stakeClaims: state.stakedValidators.map(\.stakeDetails).compactMap { stake in
 					guard let stakeClaimTokens = stake.stakeClaimTokens,
-					      let stakeClaims = stakeClaimTokens.stakeClaims.filter(\.isReadyToBeClaimed).nilIfEmpty
+					      let stakeClaims = stakeClaimTokens.stakeClaims.filter(\.isReadyToBeClaimed).nonEmpty
 					else {
 						return nil
 					}
@@ -199,7 +202,8 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 					return .init(
 						validatorAddress: stake.validator.address,
 						resourceAddress: stakeClaimTokens.resource.resourceAddress,
-						ids: stakeClaims.map { $0.id.localId() }
+						ids: stakeClaims.map { $0.id.localId() },
+						amount: stakeClaims.map(\.claimAmount).reduce(0, +)
 					)
 				}
 			)
@@ -231,7 +235,8 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 					.init(
 						validatorAddress: stakeClaim.validatorAddress,
 						resourceAddress: resourceAddress,
-						ids: [stakeClaim.id.localId()]
+						ids: .init(stakeClaim.id.localId()),
+						amount: stakeClaim.claimAmount
 					),
 				]
 			)
@@ -302,7 +307,11 @@ extension StakeUnitList {
 					)
 				},
 				stakeClaimNFTs: stake.stakeClaimTokens.map { stakeClaimTokens in
-					StakeClaimNFTSView.ViewState(stakeClaimTokens: stakeClaimTokens, selectedStakeClaims: allSelectedTokens)
+					StakeClaimNFTSView.ViewState(
+						canClaimTokens: allSelectedTokens == nil, // cannot claim in selection mode
+						stakeClaimTokens: stakeClaimTokens,
+						selectedStakeClaims: allSelectedTokens
+					)
 				}
 			)
 		}.sorted(by: \.id.address).asIdentifiable()

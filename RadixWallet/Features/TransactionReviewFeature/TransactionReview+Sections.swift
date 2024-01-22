@@ -55,7 +55,7 @@ extension TransactionReview {
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 			let withdrawals = try? await extractWithdrawals(
 				accountWithdraws: summary.accountWithdraws,
-				dataOfNewlyMintedNonFungibles: summary.dataOfNewlyMintedNonFungibles,
+				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
 				entities: resourcesInfo,
 				userAccounts: userAccounts,
 				networkID: networkID
@@ -66,7 +66,7 @@ extension TransactionReview {
 
 			let deposits = try? await extractDeposits(
 				accountDeposits: summary.accountDeposits,
-				dataOfNewlyMintedNonFungibles: summary.dataOfNewlyMintedNonFungibles,
+				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
 				entities: resourcesInfo,
 				userAccounts: userAccounts,
 				networkID: networkID
@@ -93,6 +93,7 @@ extension TransactionReview {
 			// Extract Withdrawals section
 			let withdrawals = try await extractWithdrawals(
 				accountWithdraws: summary.accountWithdraws,
+				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
 				entities: resourcesInfo,
 				userAccounts: userAccounts,
 				networkID: networkID
@@ -104,6 +105,7 @@ extension TransactionReview {
 			// Extract Deposits section, passing in poolcontributions so that pool units can be updated
 			let deposits = try await extractDeposits(
 				accountDeposits: summary.accountDeposits,
+				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
 				poolContributions: poolContributions.aggregated,
 				entities: resourcesInfo,
 				userAccounts: userAccounts,
@@ -128,6 +130,7 @@ extension TransactionReview {
 			// Extract Withdrawals section, passing in poolRedemptions so that withdrawn pool units can be updated
 			let withdrawals = try await extractWithdrawals(
 				accountWithdraws: summary.accountWithdraws,
+				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
 				poolRedemptions: poolRedemptions.aggregated,
 				entities: resourcesInfo,
 				userAccounts: userAccounts,
@@ -140,6 +143,7 @@ extension TransactionReview {
 			// Extract Deposits section
 			let deposits = try await extractDeposits(
 				accountDeposits: summary.accountDeposits,
+				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
 				entities: resourcesInfo,
 				userAccounts: userAccounts,
 				networkID: networkID
@@ -154,11 +158,31 @@ extension TransactionReview {
 		case let .validatorStake(validatorAddresses: validatorAddresses, validatorStakes: validatorStakes):
 			return nil
 
-		case let .validatorUnstake(validatorAddresses: validatorAddresses, validatorUnstakes: validatorUnstakes):
+		case let .validatorUnstake(validatorAddresses, validatorUnstakes, claimsNonFungibleData):
 			return nil
 
-		case let .validatorClaim(validatorAddresses: validatorAddresses, validatorClaims: validatorClaims):
-			return nil
+		case let .validatorClaim(validatorAddresses, validatorClaims):
+			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
+			let withdrawals = try? await extractWithdrawals(
+				accountWithdraws: summary.accountWithdraws,
+				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+				entities: resourcesInfo,
+				userAccounts: userAccounts,
+				networkID: networkID
+			)
+
+			let deposits = try? await extractDeposits(
+				accountDeposits: summary.accountDeposits,
+				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+				entities: resourcesInfo,
+				userAccounts: userAccounts,
+				networkID: networkID
+			)
+
+			return Sections(
+				withdrawals: withdrawals,
+				deposits: deposits
+			)
 
 		case let .accountDepositSettingsUpdate(
 			resourcePreferencesUpdates,
@@ -264,7 +288,7 @@ extension TransactionReview {
 
 	private func extractWithdrawals(
 		accountWithdraws: [String: [ResourceIndicator]],
-		dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]] = [:],
+		newlyCreatedNonFungibles: [NonFungibleGlobalId] = [],
 		poolRedemptions: [TrackedPoolRedemption] = [],
 		entities: ResourcesInfo = [:],
 		userAccounts: [Account],
@@ -277,7 +301,7 @@ extension TransactionReview {
 			let transfers = try await resources.asyncFlatMap {
 				try await transferInfo(
 					resourceQuantifier: $0,
-					dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles,
+					newlyCreatedNonFungibles: newlyCreatedNonFungibles,
 					poolInteractions: poolRedemptions,
 					entities: entities,
 					networkID: networkID,
@@ -299,7 +323,7 @@ extension TransactionReview {
 
 	private func extractDeposits(
 		accountDeposits: [String: [ResourceIndicator]],
-		dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]] = [:],
+		newlyCreatedNonFungibles: [NonFungibleGlobalId] = [],
 		poolContributions: [TrackedPoolContribution] = [],
 		entities: ResourcesInfo = [:],
 		userAccounts: [Account],
@@ -314,7 +338,7 @@ extension TransactionReview {
 			let transfers = try await accountDeposits.asyncFlatMap {
 				try await transferInfo(
 					resourceQuantifier: $0,
-					dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles,
+					newlyCreatedNonFungibles: newlyCreatedNonFungibles,
 					poolInteractions: poolContributions,
 					entities: entities,
 					networkID: networkID,
@@ -417,7 +441,7 @@ extension TransactionReview {
 
 	func transferInfo(
 		resourceQuantifier: ResourceIndicator,
-		dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]],
+		newlyCreatedNonFungibles: [NonFungibleGlobalId] = [],
 		poolInteractions: [some TrackedPoolInteraction] = [],
 		entities: ResourcesInfo = [:],
 		networkID: NetworkID,
@@ -428,18 +452,6 @@ extension TransactionReview {
 
 		guard let resourceInfo = entities[resourceAddress] else {
 			throw ResourceEntityNotFound(address: resourceAddress.address)
-		}
-
-		func existingTokenInfo(_ ids: [NonFungibleLocalId], for resourceAddress: ResourceAddress) async throws -> [OnLedgerEntity.NonFungibleToken] {
-			try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
-				resource: resourceAddress,
-				nonFungibleIds: ids.map {
-					try NonFungibleGlobalId.fromParts(
-						resourceAddress: resourceAddress.intoEngine(),
-						nonFungibleLocalId: $0
-					)
-				}
-			))
 		}
 
 		switch resourceQuantifier {
@@ -472,41 +484,12 @@ extension TransactionReview {
 			}
 
 		case let .nonFungible(_, indicator):
-			let ids = indicator.ids
-			let result: [Transfer]
-
-			switch resourceInfo {
-			case let .left(resource):
-				// A non-fungible resource existing on ledger
-
-				// Existing or newly minted tokens
-				//
-				// This is not entirely correct, we should not attempt to fetch NFT data the tokens
-				// that are about to be minted, but current RET does not retur the information about the freshly minted tokens anymore.
-				// Needs to be addressed in RET.
-				result = try await existingTokenInfo(ids, for: resource.resourceAddress).map { token in
-					.init(resource: resource, details: .nonFungible(token))
-				}
-
-			case let .right(newEntityMetadata):
-				// A newly created non-fungible resource
-				let resource = OnLedgerEntity.Resource(resourceAddress: resourceAddress, metadata: newEntityMetadata)
-
-				// Newly minted tokens
-				result = try ids
-					.map { localId in
-						try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: localId)
-					}
-					.map { id in
-						Transfer(resource: resource, details: .nonFungible(.init(id: id, data: nil)))
-					}
-			}
-
-			guard result.count == ids.count else {
-				throw FailedToGetDataForAllNFTs()
-			}
-
-			return result
+			return try await nonFungibleResourceTransfer(
+				resourceInfo,
+				resourceAddress: resourceAddress,
+				resourceQuantifier: indicator,
+				newlyCreatedNonFungibles: newlyCreatedNonFungibles
+			)
 		}
 	}
 
@@ -553,6 +536,79 @@ extension TransactionReview {
 		)
 
 		return [.init(resource: resource, details: .fungible(details))]
+	}
+
+	private func nonFungibleResourceTransfer(
+		_ resourceInfo: ResourceInfo,
+		resourceAddress: ResourceAddress,
+		resourceQuantifier: NonFungibleResourceIndicator,
+		newlyCreatedNonFungibles: [NonFungibleGlobalId] = []
+	) async throws -> [Transfer] {
+		let ids = resourceQuantifier.ids
+		let result: [Transfer]
+
+		switch resourceInfo {
+		case let .left(resource):
+			let existingTokenIds = ids.filter { id in
+				!newlyCreatedNonFungibles.contains { newId in
+					newId.resourceAddress().asStr() == resourceAddress.address && newId.localId() == id
+				}
+			}
+
+			let newTokens = try ids.filter { id in
+				newlyCreatedNonFungibles.contains { newId in
+					newId.resourceAddress().asStr() == resourceAddress.address && newId.localId() == id
+				}
+			}.map {
+				try OnLedgerEntity.NonFungibleToken(resourceAddress: resourceAddress, nftID: $0, nftData: nil)
+			}
+
+			let tokens = try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
+				resource: resourceAddress,
+				nonFungibleIds: existingTokenIds.map {
+					try NonFungibleGlobalId.fromParts(
+						resourceAddress: resourceAddress.intoEngine(),
+						nonFungibleLocalId: $0
+					)
+				}
+			)) + newTokens
+
+			let stakeClaimValidator = await onLedgerEntitiesClient.isStakeClaimNFT(resource)
+			if let stakeClaimValidator {
+				result = try stakeClaimTransfer(
+					resource,
+					stakeClaimValidator: stakeClaimValidator,
+					tokens: tokens
+				)
+			} else {
+				result = tokens.map { token in
+					.init(resource: resource, details: .nonFungible(token))
+				}
+
+				guard result.count == ids.count else {
+					throw FailedToGetDataForAllNFTs()
+				}
+			}
+
+		case let .right(newEntityMetadata):
+			// A newly created non-fungible resource
+			let resource = OnLedgerEntity.Resource(resourceAddress: resourceAddress, metadata: newEntityMetadata)
+
+			// Newly minted tokens
+			result = try ids
+				.map { localId in
+					try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: localId)
+				}
+				.map { id in
+					Transfer(resource: resource, details: .nonFungible(.init(id: id, data: nil)))
+				}
+
+			guard result.count == ids.count else {
+				throw FailedToGetDataForAllNFTs()
+			}
+		}
+
+		return result
 	}
 
 	private func poolUnitTransfer(
@@ -618,6 +674,38 @@ extension TransactionReview {
 				))
 			)]
 		}
+	}
+
+	private func stakeClaimTransfer(
+		_ resource: OnLedgerEntity.Resource,
+		stakeClaimValidator: OnLedgerEntity.Validator,
+		tokens: [OnLedgerEntity.NonFungibleToken]
+	) throws -> [Transfer] {
+		struct InvalidStakeClaimToken: Error {}
+
+		let stakeClaimTokens = try tokens.map { token in
+			guard let data = token.data, let claimAmount = data.claimAmount else {
+				throw InvalidStakeClaimToken()
+			}
+			return OnLedgerEntitiesClient.StakeClaim(
+				validatorAddress: stakeClaimValidator.address,
+				token: token,
+				claimAmount: claimAmount,
+				reamainingEpochsUntilClaim: data.claimEpoch.map { Int($0) - Int(resource.atLedgerState.epoch) }
+			)
+		}
+
+		return [.init(
+			resource: resource,
+			details: .stakeClaimNFT(.init(
+				canClaimTokens: false,
+				stakeClaimTokens: .init(
+					resource: resource,
+					stakeClaims: stakeClaimTokens.asIdentifiable()
+				),
+				validatorName: stakeClaimValidator.metadata.name ?? L10n.TransactionReview.unknown
+			))
+		)]
 	}
 }
 

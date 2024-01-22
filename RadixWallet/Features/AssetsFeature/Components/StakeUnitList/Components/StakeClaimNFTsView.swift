@@ -1,6 +1,8 @@
 // MARK: - StakeClaimNFTSView
 public struct StakeClaimNFTSView: View {
 	public struct ViewState: Sendable, Hashable {
+		public let canClaimTokens: Bool
+		public let validatorName: String?
 		public let stakeClaimTokens: OnLedgerEntitiesClient.NonFunbileResourceWithTokens
 		var selectedStakeClaims: IdentifiedArrayOf<NonFungibleGlobalId>?
 
@@ -12,8 +14,24 @@ public struct StakeClaimNFTSView: View {
 			stakeClaimTokens.stakeClaims.filter(\.isReadyToBeClaimed)
 		}
 
+		var toBeClaimed: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim> {
+			stakeClaimTokens.stakeClaims.filter(\.isReadyToBeClaimed)
+		}
+
 		var resourceMetadata: OnLedgerEntity.Metadata {
 			stakeClaimTokens.resource.metadata
+		}
+
+		init(
+			canClaimTokens: Bool,
+			stakeClaimTokens: OnLedgerEntitiesClient.NonFunbileResourceWithTokens,
+			validatorName: String? = nil,
+			selectedStakeClaims: IdentifiedArrayOf<NonFungibleGlobalId>? = nil
+		) {
+			self.canClaimTokens = canClaimTokens
+			self.validatorName = validatorName
+			self.stakeClaimTokens = stakeClaimTokens
+			self.selectedStakeClaims = selectedStakeClaims
 		}
 	}
 
@@ -28,10 +46,23 @@ public struct StakeClaimNFTSView: View {
 
 	public var body: some View {
 		VStack(alignment: .leading, spacing: .small1) {
-			HStack {
+			HStack(spacing: .zero) {
 				TokenThumbnail(.known(viewState.resourceMetadata.iconURL), size: .smaller)
-				Text(viewState.resourceMetadata.name ?? "")
-					.textStyle(.body1Header)
+					.padding(.trailing, .small1)
+
+				VStack(alignment: .leading, spacing: .zero) {
+					if let name = viewState.resourceMetadata.name {
+						Text(name)
+							.textStyle(.body1Header)
+							.foregroundStyle(.app.gray1)
+					}
+
+					if let validatorName = viewState.validatorName {
+						Text(validatorName)
+							.textStyle(.body2Regular)
+							.foregroundStyle(.app.gray2)
+					}
+				}
 
 				Spacer()
 			}
@@ -57,9 +88,7 @@ public struct StakeClaimNFTSView: View {
 
 				Spacer()
 
-				if case .readyToBeClaimed = kind,
-				   viewState.selectedStakeClaims == nil // No selection mode
-				{
+				if case .readyToBeClaimed = kind, viewState.canClaimTokens {
 					Text(L10n.Account.Staking.claim).onTapGesture {
 						onClaimAllTapped()
 					}

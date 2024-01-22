@@ -477,4 +477,27 @@ extension OnLedgerEntitiesClient {
 			nonXrdResources: nonXrdResourceDetails
 		)
 	}
+
+	public func isStakeClaimNFT(_ resource: OnLedgerEntity.Resource) async -> OnLedgerEntity.Validator? {
+		guard let validatorAddress = resource.metadata.validator else {
+			return nil // no declared pool unit
+		}
+
+		let validator = try? await getEntity(
+			validatorAddress.asGeneral,
+			metadataKeys: .poolUnitMetadataKeys,
+			cachingStrategy: .useCache,
+			atLedgerState: resource.atLedgerState
+		).validator
+
+		guard let validator else {
+			return nil
+		}
+
+		guard validator.stakeClaimFungibleResourceAddress == resource.resourceAddress else {
+			return nil
+		}
+
+		return validator
+	}
 }

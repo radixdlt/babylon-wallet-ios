@@ -582,10 +582,15 @@ extension OnLedgerEntitiesClient {
 		let validatorAddress: ValidatorAddress
 		let token: OnLedgerEntity.NonFungibleToken
 		let claimAmount: RETDecimal
-		let reamainingEpochsUntilClaim: Int
+		let reamainingEpochsUntilClaim: Int?
 
 		var isReadyToBeClaimed: Bool {
-			reamainingEpochsUntilClaim <= .zero
+			guard let reamainingEpochsUntilClaim else { return false }
+			return reamainingEpochsUntilClaim <= .zero
+		}
+
+		var isToBeClaimed: Bool {
+			reamainingEpochsUntilClaim == nil
 		}
 	}
 

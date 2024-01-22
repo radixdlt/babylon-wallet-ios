@@ -77,8 +77,8 @@ extension TransactionReviewAccount {
 
 					VStack(spacing: 1) {
 						ForEach(viewStore.transfers) { transfer in
-							TransactionReviewResourceView(transfer: transfer) {
-								viewStore.send(.transferTapped(transfer))
+							TransactionReviewResourceView(transfer: transfer) { token in
+								viewStore.send(.transferTapped(transfer, token))
 							}
 						}
 						.background(.app.gray5)
@@ -93,17 +93,31 @@ extension TransactionReviewAccount {
 // MARK: - TransactionReviewResourceView
 struct TransactionReviewResourceView: View {
 	let transfer: TransactionReview.Transfer
-	let onTap: () -> Void
+	let onTap: (OnLedgerEntity.NonFungibleToken?) -> Void
 
 	var body: some View {
 		switch transfer.details {
 		case let .fungible(details):
 			let viewState = TransactionReviewTokenView.ViewState(resource: transfer.resource, details: details)
-			TransactionReviewTokenView(viewState: viewState, onTap: onTap)
+			TransactionReviewTokenView(viewState: viewState, onTap: {
+				onTap(nil)
+			})
 		case let .nonFungible(details):
-			TransferNFTView(viewState: .init(resource: transfer.resource, details: details), onTap: onTap)
+			TransferNFTView(viewState: .init(resource: transfer.resource, details: details), onTap: {
+				onTap(nil)
+			})
 		case let .poolUnit(details):
-			TransferPoolUnitView(viewState: .init(resource: transfer.resource, details: details), onTap: onTap)
+			TransferPoolUnitView(viewState: .init(resource: transfer.resource, details: details), onTap: {
+				onTap(nil)
+			})
+		case let .stakeClaimNFT(details):
+			StakeClaimNFTSView(
+				viewState: details,
+				onTap: { stakeClaim in
+					onTap(stakeClaim.token)
+				},
+				onClaimAllTapped: {}
+			).padding()
 		}
 	}
 }
