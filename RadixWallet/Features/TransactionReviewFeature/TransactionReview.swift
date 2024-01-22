@@ -381,15 +381,16 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case let .previewLoaded(.success(preview)):
 			let reviewedTransaction = ReviewedTransaction(
 				networkID: preview.networkID,
-				executionSummary: preview.analyzedManifestToReview,
 				feePayer: .loading,
 				transactionFee: preview.transactionFee,
 				transactionSigners: preview.transactionSigners,
-				signingFactors: preview.signingFactors
+				signingFactors: preview.signingFactors,
+				accountWithdraws: preview.analyzedManifestToReview.accountWithdraws,
+				isNonConforming: preview.analyzedManifestToReview.detailedManifestClass == nil
 			)
 
 			state.reviewedTransaction = reviewedTransaction
-			return review(&state)
+			return review(&state, executionSummary: preview.analyzedManifestToReview)
 				.concatenate(with: determineFeePayer(state, reviewedTransaction: reviewedTransaction))
 
 		case let .updateSections(sections):
@@ -565,7 +566,7 @@ extension TransactionReview {
 		case estimated(instructionIndex: UInt64)
 	}
 
-	func review(_ state: inout State) -> Effect<Action> {
+	func review(_ state: inout State, executionSummary: ExecutionSummary) -> Effect<Action> {
 		guard let reviewedTransaction = state.reviewedTransaction else {
 			assertionFailure("Bad implementation, expected `analyzedManifestToReview`")
 			return .none
@@ -578,7 +579,7 @@ extension TransactionReview {
 		state.networkFee = .init(reviewedTransaction: reviewedTransaction)
 
 		return .run { send in
-			let sections = try await sections(for: reviewedTransaction.executionSummary, networkID: networkID)
+			let sections = try await sections(for: executionSummary, networkID: networkID)
 			await send(.internal(.updateSections(sections)))
 		} catch: { error, send in
 			loggerGlobal.error("Failed to extract transaction content, error: \(error)")
@@ -894,17 +895,14 @@ public struct TransactionReviewFailure: LocalizedError {
 // MARK: - ReviewedTransaction
 public struct ReviewedTransaction: Hashable, Sendable {
 	let networkID: NetworkID
-	let executionSummary: ExecutionSummary
-
 	var feePayer: Loadable<FeePayerCandidate?> = .idle
 
 	var transactionFee: TransactionFee
 	var transactionSigners: TransactionSigners
 	var signingFactors: SigningFactors
 
-	var isNonConforming: Bool {
-		executionSummary.detailedManifestClass == nil
-	}
+	let accountWithdraws: [String: [ResourceIndicator]]
+	let isNonConforming: Bool
 }
 
 // MARK: - FeeValidationOutcome
@@ -918,7 +916,7 @@ extension ReviewedTransaction {
 	var feePayingValidation: Loadable<FeeValidationOutcome> {
 		feePayer.map { selected in
 			guard let feePayer = selected,
-			      let feePayerWithdraws = executionSummary.accountWithdraws[feePayer.account.address.address]
+			      let feePayerWithdraws = accountWithdraws[feePayer.account.address.address]
 			else {
 				return selected.validateBalance(forFee: transactionFee)
 			}
