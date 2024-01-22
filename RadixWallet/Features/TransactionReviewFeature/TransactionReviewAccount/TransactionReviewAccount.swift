@@ -44,8 +44,8 @@ public struct TransactionReviewAccounts: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .account(id: _, action: .delegate(.showAsset(transfer, id))):
-			.send(.delegate(.showAsset(transfer, id)))
+		case let .account(id: _, action: .delegate(.showAsset(transfer, token))):
+			.send(.delegate(.showAsset(transfer, token)))
 		case .account:
 			.none
 		}
@@ -81,8 +81,8 @@ public struct TransactionReviewAccount: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			.none
-		case let .transferTapped(transfer, id):
-			.send(.delegate(.showAsset(transfer, id)))
+		case let .transferTapped(transfer, token):
+			.send(.delegate(.showAsset(transfer, token)))
 		}
 	}
 }

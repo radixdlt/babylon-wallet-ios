@@ -77,8 +77,8 @@ extension TransactionReviewAccount {
 
 					VStack(spacing: 1) {
 						ForEach(viewStore.transfers) { transfer in
-							TransactionReviewResourceView(transfer: transfer) { id in
-								viewStore.send(.transferTapped(transfer, id))
+							TransactionReviewResourceView(transfer: transfer) { token in
+								viewStore.send(.transferTapped(transfer, token))
 							}
 						}
 						.background(.app.gray5)

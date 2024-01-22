@@ -310,8 +310,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .withdrawals(.delegate(.showAsset(transfer, id))),
-		     let .deposits(.delegate(.showAsset(transfer, id))):
+		case let .withdrawals(.delegate(.showAsset(transfer, token))),
+		     let .deposits(.delegate(.showAsset(transfer, token))):
 			switch transfer.details {
 			case let .fungible(details):
 				state.destination = .fungibleTokenDetails(
@@ -335,7 +335,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				state.destination = .nonFungibleTokenDetails(.init(
 					resourceAddress: transfer.resource.resourceAddress,
 					resourceDetails: .success(transfer.resource),
-					token: id,
+					token: token,
 					ledgerState: transfer.resource.atLedgerState
 				))
 			}

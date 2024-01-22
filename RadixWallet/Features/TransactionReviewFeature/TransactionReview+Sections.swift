@@ -154,7 +154,7 @@ extension TransactionReview {
 		case let .validatorStake(validatorAddresses: validatorAddresses, validatorStakes: validatorStakes):
 			return nil
 
-		case let .validatorUnstake(validatorAddresses: validatorAddresses, validatorUnstakes: validatorUnstakes):
+		case let .validatorUnstake(validatorAddresses, validatorUnstakes, claimsNonFungibleData):
 			return nil
 
 		case let .validatorClaim(validatorAddresses, validatorClaims):
@@ -555,7 +555,7 @@ extension TransactionReview {
 
 			let stakeClaimValidator = await onLedgerEntitiesClient.isStakeClaimNFT(resource)
 			if let stakeClaimValidator {
-				result = stakeClaimTransfer(
+				result = try stakeClaimTransfer(
 					resource,
 					stakeClaimValidator: stakeClaimValidator,
 					tokens: tokens
@@ -660,20 +660,21 @@ extension TransactionReview {
 		_ resource: OnLedgerEntity.Resource,
 		stakeClaimValidator: OnLedgerEntity.Validator,
 		tokens: [OnLedgerEntity.NonFungibleToken]
-	) -> [Transfer] {
-		var stakeClaimTokens: [OnLedgerEntitiesClient.StakeClaim] = []
-		for token in tokens {
+	) throws -> [Transfer] {
+		struct InvalidStakeClaimToken: Error {}
+
+		let stakeClaimTokens = try tokens.map { token in
 			guard let data = token.data, let claimAmount = data.claimAmount else {
-				fatalError()
+				throw InvalidStakeClaimToken()
 			}
-			let stakeCLaim = OnLedgerEntitiesClient.StakeClaim(
+			return OnLedgerEntitiesClient.StakeClaim(
 				validatorAddress: stakeClaimValidator.address,
 				token: token,
 				claimAmount: claimAmount,
 				reamainingEpochsUntilClaim: data.claimEpoch.map { Int($0) - Int(resource.atLedgerState.epoch) }
 			)
-			stakeClaimTokens.append(stakeCLaim)
 		}
+
 		return [.init(
 			resource: resource,
 			details: .stakeClaimNFT(.init(
@@ -682,7 +683,7 @@ extension TransactionReview {
 					resource: resource,
 					stakeClaims: stakeClaimTokens.asIdentifiable()
 				),
-				validatorName: stakeClaimValidator.metadata.name ?? "Unknown"
+				validatorName: stakeClaimValidator.metadata.name ?? L10n.TransactionReview.unknown
 			))
 		)]
 	}
