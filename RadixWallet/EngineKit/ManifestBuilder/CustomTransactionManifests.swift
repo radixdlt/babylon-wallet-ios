@@ -4,7 +4,8 @@ extension ManifestBuilder {
 	public struct StakeClaim: Sendable {
 		public let validatorAddress: ValidatorAddress
 		public let resourceAddress: ResourceAddress
-		public let ids: [NonFungibleLocalId]
+		public let ids: NonEmpty<[NonFungibleLocalId]>
+		/// The summed claim amount across ids
 		public let amount: RETDecimal
 	}
 
@@ -12,17 +13,18 @@ extension ManifestBuilder {
 		accountAddress: AccountAddress,
 		stakeClaims: [StakeClaim]
 	) throws -> TransactionManifest {
-		try make {
-			let accountAddress = try accountAddress.intoEngine()
-			let xrdAddress = EngineToolkit.Address.xrd(accountAddress.networkId())
+		let accountAddress = try accountAddress.intoEngine()
+		let networkId = accountAddress.networkId()
+		let xrdAddress = EngineToolkit.Address.xrd(networkId)
 
+		return try make {
 			for stakeClaim in stakeClaims {
 				let bucket = ManifestBuilderBucket.unique
 				// Withdraw non fungibles from account
 				try accountWithdrawNonFungibles(
 					accountAddress,
 					stakeClaim.resourceAddress.intoEngine(),
-					stakeClaim.ids
+					stakeClaim.ids.rawValue
 				)
 				try takeAllFromWorktop(stakeClaim.resourceAddress.intoEngine(), bucket)
 
@@ -35,7 +37,7 @@ extension ManifestBuilder {
 				accountDeposit(accountAddress, xrdBucket)
 			}
 		}
-		.build(networkId: accountAddress.intoEngine().networkId())
+		.build(networkId: networkId)
 	}
 }
 
