@@ -9658,7 +9658,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/radixdlt/swift-engine-toolkit";
 			requirement = {
-				branch = 1.7.0_update;
+				branch = 1.0.9_update;
 				kind = branch;
 			};
 		};
