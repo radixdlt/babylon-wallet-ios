@@ -450,18 +450,6 @@ extension TransactionReview {
 			throw ResourceEntityNotFound(address: resourceAddress.address)
 		}
 
-		func existingTokenInfo(_ ids: [NonFungibleLocalId], for resourceAddress: ResourceAddress) async throws -> [OnLedgerEntity.NonFungibleToken] {
-			try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
-				resource: resourceAddress,
-				nonFungibleIds: ids.map {
-					try NonFungibleGlobalId.fromParts(
-						resourceAddress: resourceAddress.intoEngine(),
-						nonFungibleLocalId: $0
-					)
-				}
-			))
-		}
-
 		switch resourceQuantifier {
 		case let .fungible(_, source):
 			switch resourceInfo {
@@ -492,76 +480,11 @@ extension TransactionReview {
 			}
 
 		case let .nonFungible(_, indicator):
-			let ids = indicator.ids
-			let result: [Transfer]
-
-			switch resourceInfo {
-			case let .left(resource):
-				// A non-fungible resource existing on ledger
-
-				// Existing or newly minted tokens
-				//
-				// This is not entirely correct, we should not attempt to fetch NFT data the tokens
-				// that are about to be minted, but current RET does not retur the information about the freshly minted tokens anymore.
-				// Needs to be addressed in RET.
-
-				let tokens = try await existingTokenInfo(ids, for: resource.resourceAddress)
-
-				let stakeClaimValidator = try await onLedgerEntitiesClient.isStakeClaimNFT(resource)
-				if let stakeClaimValidator {
-					var stakeClaimTokens: [OnLedgerEntitiesClient.StakeClaim] = []
-					for token in tokens {
-						guard let data = token.data, let claimAmount = data.claimAmount, let claimEpoch = data.claimEpoch else {
-							fatalError()
-						}
-						let stakeCLaim = OnLedgerEntitiesClient.StakeClaim(
-							validatorAddress: stakeClaimValidator.address,
-							token: token,
-							claimAmount: claimAmount,
-							reamainingEpochsUntilClaim: Int(claimEpoch) - Int(resource.atLedgerState.epoch)
-						)
-						stakeClaimTokens.append(stakeCLaim)
-					}
-					result = [.init(
-						resource: resource,
-						details: .stakeClaimNFT(.init(
-							canClaimTokens: false,
-							stakeClaimTokens: .init(
-								resource: resource,
-								stakeClaims: stakeClaimTokens.asIdentifiable()
-							),
-							validatorName: stakeClaimValidator.metadata.name ?? "Unknown"
-						))
-					)]
-				} else {
-					result = tokens.map { token in
-						.init(resource: resource, details: .nonFungible(token))
-					}
-
-					guard result.count == ids.count else {
-						throw FailedToGetDataForAllNFTs()
-					}
-				}
-
-			case let .right(newEntityMetadata):
-				// A newly created non-fungible resource
-				let resource = OnLedgerEntity.Resource(resourceAddress: resourceAddress, metadata: newEntityMetadata)
-
-				// Newly minted tokens
-				result = try ids
-					.map { localId in
-						try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: localId)
-					}
-					.map { id in
-						Transfer(resource: resource, details: .nonFungible(.init(id: id, data: nil)))
-					}
-
-				guard result.count == ids.count else {
-					throw FailedToGetDataForAllNFTs()
-				}
-			}
-
-			return result
+			return try await nonFungibleResourceTransfer(
+				resourceInfo,
+				resourceAddress: resourceAddress,
+				resourceQuantifier: indicator
+			)
 		}
 	}
 
@@ -608,6 +531,64 @@ extension TransactionReview {
 		)
 
 		return [.init(resource: resource, details: .fungible(details))]
+	}
+
+	private func nonFungibleResourceTransfer(
+		_ resourceInfo: ResourceInfo,
+		resourceAddress: ResourceAddress,
+		resourceQuantifier: NonFungibleResourceIndicator
+	) async throws -> [Transfer] {
+		let ids = resourceQuantifier.ids
+		let result: [Transfer]
+
+		switch resourceInfo {
+		case let .left(resource):
+			let tokens = try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(
+				resource: resourceAddress,
+				nonFungibleIds: ids.map {
+					try NonFungibleGlobalId.fromParts(
+						resourceAddress: resourceAddress.intoEngine(),
+						nonFungibleLocalId: $0
+					)
+				}
+			))
+
+			let stakeClaimValidator = await onLedgerEntitiesClient.isStakeClaimNFT(resource)
+			if let stakeClaimValidator {
+				result = stakeClaimTransfer(
+					resource,
+					stakeClaimValidator: stakeClaimValidator,
+					tokens: tokens
+				)
+			} else {
+				result = tokens.map { token in
+					.init(resource: resource, details: .nonFungible(token))
+				}
+
+				guard result.count == ids.count else {
+					throw FailedToGetDataForAllNFTs()
+				}
+			}
+
+		case let .right(newEntityMetadata):
+			// A newly created non-fungible resource
+			let resource = OnLedgerEntity.Resource(resourceAddress: resourceAddress, metadata: newEntityMetadata)
+
+			// Newly minted tokens
+			result = try ids
+				.map { localId in
+					try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: localId)
+				}
+				.map { id in
+					Transfer(resource: resource, details: .nonFungible(.init(id: id, data: nil)))
+				}
+
+			guard result.count == ids.count else {
+				throw FailedToGetDataForAllNFTs()
+			}
+		}
+
+		return result
 	}
 
 	private func poolUnitTransfer(
@@ -673,6 +654,37 @@ extension TransactionReview {
 				))
 			)]
 		}
+	}
+
+	private func stakeClaimTransfer(
+		_ resource: OnLedgerEntity.Resource,
+		stakeClaimValidator: OnLedgerEntity.Validator,
+		tokens: [OnLedgerEntity.NonFungibleToken]
+	) -> [Transfer] {
+		var stakeClaimTokens: [OnLedgerEntitiesClient.StakeClaim] = []
+		for token in tokens {
+			guard let data = token.data, let claimAmount = data.claimAmount else {
+				fatalError()
+			}
+			let stakeCLaim = OnLedgerEntitiesClient.StakeClaim(
+				validatorAddress: stakeClaimValidator.address,
+				token: token,
+				claimAmount: claimAmount,
+				reamainingEpochsUntilClaim: data.claimEpoch.map { Int($0) - Int(resource.atLedgerState.epoch) }
+			)
+			stakeClaimTokens.append(stakeCLaim)
+		}
+		return [.init(
+			resource: resource,
+			details: .stakeClaimNFT(.init(
+				canClaimTokens: false,
+				stakeClaimTokens: .init(
+					resource: resource,
+					stakeClaims: stakeClaimTokens.asIdentifiable()
+				),
+				validatorName: stakeClaimValidator.metadata.name ?? "Unknown"
+			))
+		)]
 	}
 }
 

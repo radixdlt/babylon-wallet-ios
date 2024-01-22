@@ -478,12 +478,12 @@ extension OnLedgerEntitiesClient {
 		)
 	}
 
-	public func isStakeClaimNFT(_ resource: OnLedgerEntity.Resource) async throws -> OnLedgerEntity.Validator? {
+	public func isStakeClaimNFT(_ resource: OnLedgerEntity.Resource) async -> OnLedgerEntity.Validator? {
 		guard let validatorAddress = resource.metadata.validator else {
 			return nil // no declared pool unit
 		}
 
-		let validator = try await getEntity(
+		let validator = try? await getEntity(
 			validatorAddress.asGeneral,
 			metadataKeys: .poolUnitMetadataKeys,
 			cachingStrategy: .useCache,
