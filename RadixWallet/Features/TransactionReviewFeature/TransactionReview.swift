@@ -798,6 +798,7 @@ extension TransactionReview {
 
 			public struct PoolUnit: Sendable, Hashable {
 				public let poolName: String
+				public let dAppName: String?
 				public let resources: [Resource]
 				public var guarantee: TransactionClient.Guarantee?
 

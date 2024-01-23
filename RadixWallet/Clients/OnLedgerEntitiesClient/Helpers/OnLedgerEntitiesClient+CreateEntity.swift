@@ -333,76 +333,6 @@ extension OnLedgerEntitiesClient {
 }
 
 extension OnLedgerEntitiesClient {
-	/// This loads all of the related pool unit details required by the Pool units screen.
-	/// We don't do any pagination there(yet), since the number of owned pools will not be big, this can be revised in the future.
-	@Sendable
-	public func getOwnedPoolUnitsDetails(
-		_ account: OnLedgerEntity.Account,
-		cachingStrategy: CachingStrategy = .useCache
-	) async throws -> [OwnedResourcePoolDetails] {
-		let ownedPoolUnits = account.poolUnitResources.poolUnits
-		let pools = try await getEntities(
-			ownedPoolUnits.map(\.resourcePoolAddress.asGeneral),
-			[],
-			account.atLedgerState,
-			cachingStrategy
-		).compactMap(\.resourcePool)
-
-		var allResourceAddresses: [ResourceAddress] = []
-		for pool in pools {
-			allResourceAddresses.append(pool.poolUnitResourceAddress)
-			allResourceAddresses += pool.resources.nonXrdResources.map(\.resourceAddress)
-			if let xrdResource = pool.resources.xrdResource {
-				allResourceAddresses.append(xrdResource.resourceAddress)
-			}
-		}
-
-		let allResources = try await getResources(
-			allResourceAddresses,
-			cachingStrategy: cachingStrategy,
-			atLedgerState: account.atLedgerState
-		)
-
-		return ownedPoolUnits.compactMap { ownedPoolUnit -> OwnedResourcePoolDetails? in
-			guard let pool = pools.first(where: { $0.address == ownedPoolUnit.resourcePoolAddress }) else {
-				assertionFailure("Did not load pool details")
-				return nil
-			}
-			guard let poolUnitResource = allResources.first(where: { $0.resourceAddress == pool.poolUnitResourceAddress }) else {
-				assertionFailure("Did not load poolUnitResource details")
-				return nil
-			}
-
-			var nonXrdResourceDetails: [ResourceWithVaultAmount] = []
-
-			for resource in pool.resources.nonXrdResources {
-				guard let resourceDetails = allResources.first(where: { $0.resourceAddress == resource.resourceAddress }) else {
-					assertionFailure("Did not load resource details")
-					return nil
-				}
-				nonXrdResourceDetails.append(.init(resource: resourceDetails, amount: resource.amount))
-			}
-
-			let xrdResourceDetails: ResourceWithVaultAmount?
-			if let xrdResource = pool.resources.xrdResource {
-				guard let details = allResources.first(where: { $0.resourceAddress == xrdResource.resourceAddress }) else {
-					assertionFailure("Did not load xrd resource details")
-					return nil
-				}
-				xrdResourceDetails = .init(resource: details, amount: xrdResource.amount)
-			} else {
-				xrdResourceDetails = nil
-			}
-
-			return .init(
-				address: pool.address,
-				poolUnitResource: .init(resource: poolUnitResource, amount: ownedPoolUnit.resource.amount),
-				xrdResource: xrdResourceDetails,
-				nonXrdResources: nonXrdResourceDetails
-			)
-		}
-	}
-
 	/// This loads all of the related stake unit details required by the Pool Units screen.
 	/// We don't do any pagination there(yet), since the number of owned stakes will not be big, this can be revised in the future.
 	public func getOwnedStakesDetails(
@@ -564,6 +494,7 @@ extension OnLedgerEntitiesClient {
 
 	public struct OwnedResourcePoolDetails: Hashable, Sendable {
 		public let address: ResourcePoolAddress
+		public let dAppName: String?
 		public let poolUnitResource: ResourceWithVaultAmount
 		public let xrdResource: ResourceWithVaultAmount?
 		public let nonXrdResources: [ResourceWithVaultAmount]

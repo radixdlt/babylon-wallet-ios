@@ -6,6 +6,7 @@ extension PoolUnit {
 	public struct ViewState: Equatable {
 		let iconURL: URL?
 		let name: String
+		let dAppName: String?
 		let resources: Loadable<NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>>>
 		let isSelected: Bool?
 	}
@@ -21,27 +22,28 @@ extension PoolUnit {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: PoolUnit.Action.view) { viewStore in
 				Section {
-					VStack(spacing: .large2) {
-						PoolUnitHeaderView(viewState: .init(iconURL: viewStore.iconURL)) {
-							Text(viewStore.name)
-								.foregroundColor(.app.gray1)
-								.textStyle(.secondaryHeader)
-						}
-						.padding(-.small3)
-						loadable(viewStore.resources) { resources in
-							HStack {
-								PoolUnitResourcesView(resources: resources)
-									.padding(-.small2)
-
-								if let isSelected = viewStore.isSelected {
-									CheckmarkView(appearance: .dark, isChecked: isSelected)
+					TransferPoolUnitView(
+						viewState: .init(
+							poolName: viewStore.name,
+							dAppName: viewStore.dAppName,
+							poolIcon: viewStore.iconURL,
+							resources: viewStore.resources.map {
+								$0.map {
+									.init(
+										id: $0.id,
+										symbol: $0.symbol,
+										icon: $0.thumbnail,
+										amount: $0.tokenAmount
+									)
 								}
-							}
-							.onTapGesture { viewStore.send(.didTap) }
+							},
+							isSelected: viewStore.isSelected
+						),
+						backgroundColor: .app.white,
+						onTap: {
+							viewStore.send(.didTap)
 						}
-					}
-					.padding(.medium1)
-					.background(.app.white)
+					)
 					.rowStyle()
 				}
 			}
@@ -55,6 +57,7 @@ extension PoolUnit.State {
 		.init(
 			iconURL: poolUnit.resource.metadata.iconURL,
 			name: poolUnit.resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
+			dAppName: resourceDetails.dAppName.unwrap()?.wrappedValue,
 			resources: resourceDetails.map { details in
 				PoolUnitResourceViewState.viewStates(amount: poolUnit.resource.amount, resourcesDetails: details)
 			},
