@@ -185,7 +185,7 @@ extension NonFungibleTokenDetails {
 extension OnLedgerEntitiesClient.StakeClaim {
 	var description: String {
 		guard let reamainingEpochsUntilClaim else {
-			return L10n.TransactionReview.toBeClaimed
+			return L10n.TransactionReview.toBeClaimed.uppercased()
 		}
 
 		if isReadyToBeClaimed {

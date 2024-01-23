@@ -99,32 +99,38 @@ struct TransactionReviewResourceView: View {
 		switch transfer.details {
 		case let .fungible(details):
 			let viewState = TransactionReviewTokenView.ViewState(resource: transfer.resource, details: details)
-			TransactionReviewTokenView(viewState: viewState, onTap: {
+			TransactionReviewTokenView(viewState: viewState) {
 				onTap(nil)
-			})
+			}
 		case let .nonFungible(details):
-			TransferNFTView(viewState: .init(resource: transfer.resource, details: details), onTap: {
+			TransferNFTView(viewState: .init(resource: transfer.resource, details: details)) {
 				onTap(nil)
-			})
+			}
+		case let .liquidStakeUnit(details):
+			LiquidStakeUnitView(viewState: .init(resource: transfer.resource, details: details)) {
+				onTap(nil)
+			}
+			.padding(.medium3)
 		case let .poolUnit(details):
-			PoolUnitView(
-				viewState: .init(
-					details: details.details
-				),
-				backgroundColor: .app.gray5,
-				onTap: {
-					onTap(nil)
-				}
-			)
+			PoolUnitView(viewState: .init(details: details.details), backgroundColor: .app.gray5) {
+				onTap(nil)
+			}
 		case let .stakeClaimNFT(details):
-			StakeClaimNFTSView(
-				viewState: details,
-				onTap: { stakeClaim in
-					onTap(stakeClaim.token)
-				},
-				onClaimAllTapped: {}
-			).padding()
+			StakeClaimNFTSView(viewState: details) { stakeClaim in
+				onTap(stakeClaim.token)
+			}
+			.padding()
 		}
+	}
+}
+
+extension LiquidStakeUnitView.ViewState {
+	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.LiquidStakeUnit) {
+		self.init(
+			resource: resource,
+			worth: details.worth,
+			validatorName: details.validator.metadata.name
+		)
 	}
 }
 

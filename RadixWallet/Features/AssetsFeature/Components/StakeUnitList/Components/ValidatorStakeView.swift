@@ -32,9 +32,8 @@ struct ValidatorStakeView: View {
 
 		if isExpanded {
 			if let liquidStakeUnitViewState = viewState.liquidStakeUnit {
-				liquidStakeUnitView(viewState: liquidStakeUnitViewState)
+				liquidStakeUnitView(viewState: liquidStakeUnitViewState, action: onLiquidStakeUnitTapped)
 					.rowStyle()
-					.onTapGesture { onLiquidStakeUnitTapped() }
 			}
 
 			if let stakeClaimNFTsViewState = viewState.stakeClaimNFTs {
@@ -49,13 +48,13 @@ struct ValidatorStakeView: View {
 	}
 
 	@ViewBuilder
-	private func liquidStakeUnitView(viewState: LiquidStakeUnitView.ViewState) -> some SwiftUI.View {
+	private func liquidStakeUnitView(viewState: LiquidStakeUnitView.ViewState, action: @escaping () -> Void) -> some SwiftUI.View {
 		VStack(spacing: .zero) {
 			Divider()
 				.frame(height: .small3)
 				.overlay(.app.gray5)
 
-			LiquidStakeUnitView(viewState: viewState)
+			LiquidStakeUnitView(viewState: viewState, action: action)
 				.padding(.medium1)
 		}
 		.contentShape(Rectangle())

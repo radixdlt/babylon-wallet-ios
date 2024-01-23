@@ -208,6 +208,10 @@ extension EngineToolkit.Address {
 	public func asSpecific<T>() throws -> SpecificAddress<T> {
 		try .init(validatingAddress: addressString())
 	}
+
+	public func asGeneral() throws -> Address {
+		try asSpecific()
+	}
 }
 
 extension [EngineToolkit.Address] {

@@ -45,7 +45,7 @@ extension TransactionReviewDapps {
 							case let .knownDappTapped(id):
 								viewStore.send(.dappTapped(id))
 							case .unknownComponentsTapped:
-								viewStore.send(.unknownComponentsTapped)
+								viewStore.send(.unknownsTapped)
 							}
 						}
 					}

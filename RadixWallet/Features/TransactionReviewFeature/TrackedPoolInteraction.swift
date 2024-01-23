@@ -6,6 +6,7 @@ public protocol TrackedPoolInteraction {
 	var poolUnitsResourceAddress: EngineToolkit.Address { get }
 	var poolUnitsAmount: RETDecimal { get set }
 	var resourcesInInteraction: [String: RETDecimal] { get set }
+	mutating func add(_ other: Self)
 }
 
 // MARK: - TrackedPoolContribution + TrackedPoolInteraction
@@ -40,9 +41,12 @@ extension Collection where Element: TrackedPoolInteraction {
 	}
 }
 
-private extension TrackedPoolInteraction {
-	mutating func add(_ other: Self) {
-		guard other.poolAddress == poolAddress, other.poolUnitsResourceAddress == poolUnitsResourceAddress else { return }
+extension TrackedPoolInteraction {
+	public mutating func add(_ other: Self) {
+		guard other.poolAddress == poolAddress, other.poolUnitsResourceAddress == poolUnitsResourceAddress else {
+			assertionFailure("The pools should have the same address and pool unit")
+			return
+		}
 		for (resource, amount) in other.resourcesInInteraction {
 			guard let currentInteraction = resourcesInInteraction[resource] else {
 				assertionFailure("The pools should have the same resources")

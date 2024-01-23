@@ -1233,6 +1233,7 @@
 		A48FD15F2B55E671009295E9 /* TrackedPoolInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48FD15E2B55E671009295E9 /* TrackedPoolInteraction.swift */; };
 		A48FD1612B55F8F0009295E9 /* TransactionReview+Sections.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48FD1602B55F8F0009295E9 /* TransactionReview+Sections.swift */; };
 		A4B017F72B4C099D00B42B8E /* TransactionReview+DepositSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4B017F42B4BF59000B42B8E /* TransactionReview+DepositSettingView.swift */; };
+		A4EB37C82B6272F3003FE31D /* TrackedValidatorInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4EB37C72B6272F3003FE31D /* TrackedValidatorInteraction.swift */; };
 		E62449D52AFBA61100272C67 /* Home+AccountRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */; };
 		E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */; };
 		E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */; };
@@ -2555,6 +2556,7 @@
 		A48FD15E2B55E671009295E9 /* TrackedPoolInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackedPoolInteraction.swift; sourceTree = "<group>"; };
 		A48FD1602B55F8F0009295E9 /* TransactionReview+Sections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionReview+Sections.swift"; sourceTree = "<group>"; };
 		A4B017F42B4BF59000B42B8E /* TransactionReview+DepositSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionReview+DepositSettingView.swift"; sourceTree = "<group>"; };
+		A4EB37C72B6272F3003FE31D /* TrackedValidatorInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackedValidatorInteraction.swift; sourceTree = "<group>"; };
 		E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+Reducer.swift"; sourceTree = "<group>"; };
 		E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+View.swift"; sourceTree = "<group>"; };
 		E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportMnemonicTests.swift; sourceTree = "<group>"; };
@@ -3229,6 +3231,7 @@
 				48CFBCF52ADC10D800E77A5C /* TransactionReview+View.swift */,
 				A48FD1602B55F8F0009295E9 /* TransactionReview+Sections.swift */,
 				A48FD15E2B55E671009295E9 /* TrackedPoolInteraction.swift */,
+				A4EB37C72B6272F3003FE31D /* TrackedValidatorInteraction.swift */,
 				48CFBCD12ADC10D800E77A5C /* SelectFeePayer */,
 				48CFBCD52ADC10D800E77A5C /* SubmitTransaction */,
 				48CFBCD82ADC10D800E77A5C /* TransactionReviewGuarantees */,
@@ -8804,6 +8807,7 @@
 				48CFC4262ADC10DA00E77A5C /* LocalizedError+Equatable.swift in Sources */,
 				48CFC32A2ADC10D900E77A5C /* CameraPermission+View.swift in Sources */,
 				48CFC5C62ADC10DA00E77A5C /* ApprovalSlider.swift in Sources */,
+				A4EB37C82B6272F3003FE31D /* TrackedValidatorInteraction.swift in Sources */,
 				48CFC3B12ADC10D900E77A5C /* HD+ExtendedKey.swift in Sources */,
 				48CFC3572ADC10D900E77A5C /* ShowQR+Reducer.swift in Sources */,
 				48CFC6772ADC10DB00E77A5C /* SignatureOfEntity.swift in Sources */,

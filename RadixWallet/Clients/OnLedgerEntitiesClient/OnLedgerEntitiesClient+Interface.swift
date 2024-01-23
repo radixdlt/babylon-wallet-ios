@@ -391,6 +391,32 @@ extension OnLedgerEntitiesClient {
 }
 
 extension OnLedgerEntitiesClient {
+	/// Returns the validator of a correctly linked LSU, and `nil` for any other resource
+	public func isLiquidStakeUnit(_ resource: OnLedgerEntity.Resource) async -> OnLedgerEntity.Validator? {
+		guard let validatorAddress = resource.metadata.validator?.asGeneral else {
+			return nil
+		}
+
+		// Fetch validator info
+		let validator = try? await getEntity(
+			validatorAddress,
+			metadataKeys: .resourceMetadataKeys,
+			cachingStrategy: .useCache,
+			atLedgerState: resource.atLedgerState
+		)
+		.validator
+
+		guard let validator else {
+			return nil
+		}
+
+		guard validator.stakeUnitResourceAddress == resource.resourceAddress else {
+			return nil
+		}
+
+		return validator
+	}
+
 	public func isPoolUnitResource(_ resource: OnLedgerEntity.Resource) async -> Bool {
 		guard let poolAddress = resource.metadata.poolUnit?.asGeneral else {
 			return false // no declared pool unit
