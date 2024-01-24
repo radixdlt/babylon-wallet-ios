@@ -415,6 +415,54 @@ extension OnLedgerEntitiesClient {
 		return true // It is a pool unit resource address
 	}
 
+	private func extractedFunc(
+		_ pool: OnLedgerEntity.ResourcePool,
+		_ allResources: IdentifiedArray<ResourceAddress, OnLedgerEntity.Resource>,
+		_ poolUnitResource: OnLedgerEntitiesClient.ResourceWithVaultAmount
+	) async -> OnLedgerEntitiesClient.OwnedResourcePoolDetails? {
+		var nonXrdResourceDetails: [OwnedResourcePoolDetails.ResourceWithRedemptionValue] = []
+
+		for resource in pool.resources.nonXrdResources {
+			guard let resourceDetails = allResources[id: resource.resourceAddress] else {
+				assertionFailure("Did not load resource details")
+				return nil
+			}
+
+			nonXrdResourceDetails.append(.init(
+				resource: resourceDetails,
+				redemptionValue: resourceDetails.poolRedemptionValue(for: resource.amount, poolUnitResource: poolUnitResource)
+			))
+		}
+
+		let xrdResourceDetails: OwnedResourcePoolDetails.ResourceWithRedemptionValue?
+		if let xrdResource = pool.resources.xrdResource {
+			guard let details = allResources[id: xrdResource.resourceAddress] else {
+				assertionFailure("Did not load xrd resource details")
+				return nil
+			}
+			xrdResourceDetails = .init(
+				resource: details,
+				redemptionValue: details.poolRedemptionValue(for: xrdResource.amount, poolUnitResource: poolUnitResource)
+			)
+		} else {
+			xrdResourceDetails = nil
+		}
+
+		let dAppName: String? = if let dAppDefinition = pool.metadata.dappDefinition {
+			try? await getDappMetadata(dAppDefinition, validatingDappEntity: pool.address.asGeneral).name
+		} else {
+			nil
+		}
+
+		return .init(
+			address: pool.address,
+			dAppName: dAppName,
+			poolUnitResource: poolUnitResource,
+			xrdResource: xrdResourceDetails,
+			nonXrdResources: nonXrdResourceDetails
+		)
+	}
+
 	public func getPoolUnitDetails(_ poolUnitResource: OnLedgerEntity.Resource, forAmount amount: RETDecimal) async throws -> OwnedResourcePoolDetails? {
 		guard let poolAddress = poolUnitResource.metadata.poolUnit?.asGeneral else {
 			return nil
@@ -449,41 +497,26 @@ extension OnLedgerEntitiesClient {
 			return nil
 		}
 
-		var nonXrdResourceDetails: [ResourceWithVaultAmount] = []
+		let poolUnitResource = ResourceWithVaultAmount(resource: poolUnitResource, amount: amount)
 
-		for resource in pool.resources.nonXrdResources {
-			guard let resourceDetails = allResources[id: resource.resourceAddress] else {
-				assertionFailure("Did not load resource details")
-				return nil
-			}
-			nonXrdResourceDetails.append(.init(resource: resourceDetails, amount: resource.amount))
-		}
-
-		let xrdResourceDetails: ResourceWithVaultAmount?
-		if let xrdResource = pool.resources.xrdResource {
-			guard let details = allResources[id: xrdResource.resourceAddress] else {
-				assertionFailure("Did not load xrd resource details")
-				return nil
-			}
-			xrdResourceDetails = .init(resource: details, amount: xrdResource.amount)
-		} else {
-			xrdResourceDetails = nil
-		}
-
-		let dAppName: String? = if let dAppDefinition = pool.metadata.dappDefinition {
-			try? await getDappMetadata(dAppDefinition, validatingDappEntity: pool.address.asGeneral).name
-		} else {
-			nil
-		}
-
-		return .init(
-			address: pool.address,
-			dAppName: dAppName,
-			poolUnitResource: .init(resource: poolUnitResource, amount: amount),
-			xrdResource: xrdResourceDetails,
-			nonXrdResources: nonXrdResourceDetails
-		)
+		return await extractedFunc(pool, allResources, poolUnitResource)
 	}
+
+	//    func poolRedemptionValue(poolUnitResource: OnLedgerEntitiesClient.ResourceWithVaultAmount) -> String {
+	//        guard let poolUnitTotalSupply = poolUnitResource.resource.totalSupply else {
+	//            loggerGlobal.error("Missing total supply for \(poolUnitResource.resource.resourceAddress.address)")
+	//            return L10n.Account.PoolUnits.noTotalSupply
+	//        }
+	//        guard poolUnitTotalSupply > 0 else {
+	//            loggerGlobal.error("Total supply is 0 for \(poolUnitResource.resource.resourceAddress.address)")
+	//            return L10n.Account.PoolUnits.noTotalSupply
+	//        }
+	//        let redemptionValue = poolUnitResource.amount * (amount / poolUnitTotalSupply)
+	//        let decimalPlaces = resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
+	//        let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
+//
+	//        return roundedRedemptionValue.formatted()
+	//    }
 
 	public func isStakeClaimNFT(_ resource: OnLedgerEntity.Resource) async -> OnLedgerEntity.Validator? {
 		guard let validatorAddress = resource.metadata.validator else {
@@ -539,52 +572,21 @@ extension OnLedgerEntitiesClient {
 			allResourceAddresses,
 			cachingStrategy: cachingStrategy,
 			atLedgerState: account.atLedgerState
-		)
+		).asIdentifiable()
 
 		return await ownedPoolUnits.asyncCompactMap { ownedPoolUnit -> OwnedResourcePoolDetails? in
 			guard let pool = pools.first(where: { $0.address == ownedPoolUnit.resourcePoolAddress }) else {
 				assertionFailure("Did not load pool details")
 				return nil
 			}
-			guard let poolUnitResource = allResources.first(where: { $0.resourceAddress == pool.poolUnitResourceAddress }) else {
+			guard let poolUnitResourcee = allResources.first(where: { $0.resourceAddress == pool.poolUnitResourceAddress }) else {
 				assertionFailure("Did not load poolUnitResource details")
 				return nil
 			}
 
-			var nonXrdResourceDetails: [ResourceWithVaultAmount] = []
+			let poolUnitResource = ResourceWithVaultAmount(resource: poolUnitResourcee, amount: ownedPoolUnit.resource.amount)
 
-			for resource in pool.resources.nonXrdResources {
-				guard let resourceDetails = allResources.first(where: { $0.resourceAddress == resource.resourceAddress }) else {
-					assertionFailure("Did not load resource details")
-					return nil
-				}
-				nonXrdResourceDetails.append(.init(resource: resourceDetails, amount: resource.amount))
-			}
-
-			let xrdResourceDetails: ResourceWithVaultAmount?
-			if let xrdResource = pool.resources.xrdResource {
-				guard let details = allResources.first(where: { $0.resourceAddress == xrdResource.resourceAddress }) else {
-					assertionFailure("Did not load xrd resource details")
-					return nil
-				}
-				xrdResourceDetails = .init(resource: details, amount: xrdResource.amount)
-			} else {
-				xrdResourceDetails = nil
-			}
-
-			let dAppName: String? = if let dAppDefinition = pool.metadata.dappDefinition {
-				try? await getDappMetadata(dAppDefinition, validatingDappEntity: pool.address.asGeneral).name
-			} else {
-				nil
-			}
-
-			return .init(
-				address: pool.address,
-				dAppName: dAppName,
-				poolUnitResource: .init(resource: poolUnitResource, amount: ownedPoolUnit.resource.amount),
-				xrdResource: xrdResourceDetails,
-				nonXrdResources: nonXrdResourceDetails
-			)
+			return await extractedFunc(pool, allResources, poolUnitResource)
 		}
 	}
 }

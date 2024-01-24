@@ -588,8 +588,8 @@ extension OnLedgerEntity.Account {
 	}
 }
 
-extension OnLedgerEntitiesClient.ResourceWithVaultAmount {
-	func poolRedemptionValue(poolUnitResource: OnLedgerEntitiesClient.ResourceWithVaultAmount) -> String {
+extension OnLedgerEntity.Resource {
+	func poolRedemptionValue(for amount: RETDecimal, poolUnitResource: OnLedgerEntitiesClient.ResourceWithVaultAmount) -> String {
 		guard let poolUnitTotalSupply = poolUnitResource.resource.totalSupply else {
 			loggerGlobal.error("Missing total supply for \(poolUnitResource.resource.resourceAddress.address)")
 			return L10n.Account.PoolUnits.noTotalSupply
@@ -599,7 +599,7 @@ extension OnLedgerEntitiesClient.ResourceWithVaultAmount {
 			return L10n.Account.PoolUnits.noTotalSupply
 		}
 		let redemptionValue = poolUnitResource.amount * (amount / poolUnitTotalSupply)
-		let decimalPlaces = resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
+		let decimalPlaces = divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
 		let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
 
 		return roundedRedemptionValue.formatted()

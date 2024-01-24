@@ -496,8 +496,13 @@ extension OnLedgerEntitiesClient {
 		public let address: ResourcePoolAddress
 		public let dAppName: String?
 		public let poolUnitResource: ResourceWithVaultAmount
-		public let xrdResource: ResourceWithVaultAmount?
-		public let nonXrdResources: [ResourceWithVaultAmount]
+		public let xrdResource: ResourceWithRedemptionValue?
+		public let nonXrdResources: [ResourceWithRedemptionValue]
+
+		public struct ResourceWithRedemptionValue: Hashable, Sendable {
+			public let resource: OnLedgerEntity.Resource
+			public let redemptionValue: String
+		}
 	}
 
 	public struct ResourceWithVaultAmount: Hashable, Sendable {

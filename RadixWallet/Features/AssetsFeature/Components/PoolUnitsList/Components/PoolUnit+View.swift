@@ -55,7 +55,7 @@ extension PoolUnitResourceView.ViewState {
 				id: $0.resource.resourceAddress,
 				symbol: Constants.xrdTokenName,
 				icon: .xrd,
-				amount: $0.poolRedemptionValue(poolUnitResource: resourcesDetails.poolUnitResource)
+				amount: $0.redemptionValue
 			)
 		}
 		let nonXrdResources = resourcesDetails.nonXrdResources.map { resourceDetails in
@@ -63,7 +63,7 @@ extension PoolUnitResourceView.ViewState {
 				id: resourceDetails.resource.resourceAddress,
 				symbol: resourceDetails.resource.metadata.symbol ?? resourceDetails.resource.metadata.name ?? L10n.Account.PoolUnits.unknownSymbolName,
 				icon: .known(resourceDetails.resource.metadata.iconURL),
-				amount: resourceDetails.poolRedemptionValue(poolUnitResource: resourcesDetails.poolUnitResource)
+				amount: resourceDetails.redemptionValue
 			)
 		}
 

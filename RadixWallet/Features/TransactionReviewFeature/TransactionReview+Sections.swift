@@ -148,7 +148,10 @@ extension TransactionReview {
 
 			let perPoolUnitDapps = Dictionary(uniqueKeysWithValues: dApps.compactMap { data -> (ResourceAddress, OnLedgerEntity.Metadata)? in
 				guard let dAppMetadata = data.entity?.metadata,
-				      let poolUnitResource: ResourceAddress = try? poolRedemptions.first { $0.poolAddress == data.address }?.poolUnitsResourceAddress.asSpecific()
+				      let poolUnitResource: ResourceAddress = try? poolRedemptions
+				      .first(where: { $0.poolAddress == data.address })?
+				      .poolUnitsResourceAddress
+				      .asSpecific()
 				else {
 					return nil
 				}
@@ -675,29 +678,37 @@ extension TransactionReview {
 		if let poolContribution = try poolContributions.first(where: { try $0.poolUnitsResourceAddress.asSpecific() == resourceAddress }) {
 			// If this transfer does not contain all the pool units, scale the resource amounts pro rata
 			let adjustmentFactor = amount != poolContribution.poolUnitsAmount ? (amount / poolContribution.poolUnitsAmount) : 1
-
-			let resources = try poolContribution.resourcesInInteraction.map { resourceAddress, resourceAmount in
+			var xrdResource: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue?
+			var nonXrdResources: [OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue] = []
+			for (resourceAddress, resourceAmount) in poolContribution.resourcesInInteraction {
 				let address = try ResourceAddress(validatingAddress: resourceAddress)
 
 				guard let entity = entities[address] else {
 					throw ResourceEntityNotFound(address: resourceAddress)
 				}
 
-				return Transfer.Details.PoolUnit.Resource(
-					isXRD: address.isXRD(on: networkID),
-					symbol: entity.metadata.symbol,
-					address: address,
-					icon: entity.metadata.iconURL,
-					amount: (resourceAmount * adjustmentFactor).formatted()
+				let resource = OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue(
+					resource: .init(resourceAddress: address, metadata: entity.metadata),
+					redemptionValue: (resourceAmount * adjustmentFactor).formatted()
 				)
+
+				if address.isXRD(on: networkID) {
+					xrdResource = resource
+				} else {
+					nonXrdResources.append(resource)
+				}
 			}
 
-			return [.init(
+			return try [.init(
 				resource: resource,
 				details: .poolUnit(.init(
-					poolName: resource.fungibleResourceName,
-					dAppName: resourceAssociatedDapps?[resourceAddress]?.name,
-					resources: resources,
+					details: .init(
+						address: poolContribution.poolAddress.asSpecific(),
+						dAppName: resourceAssociatedDapps?[resourceAddress]?.name,
+						poolUnitResource: .init(resource: resource, amount: amount),
+						xrdResource: xrdResource,
+						nonXrdResources: nonXrdResources
+					),
 					guarantee: guarantee
 				))
 			)]
@@ -706,23 +717,10 @@ extension TransactionReview {
 				throw FailedToGetPoolUnitDetails()
 			}
 
-			let allResources = details.xrdResource.asArray(\.self) + details.nonXrdResources
-
-			let poolUnitResources = allResources.map {
-				TransactionReview.Transfer.Details.PoolUnit.Resource(
-					isXRD: $0.resource.resourceAddress.isXRD(on: networkID),
-					symbol: $0.resource.metadata.symbol,
-					address: $0.resource.resourceAddress,
-					icon: $0.resource.metadata.iconURL,
-					amount: $0.poolRedemptionValue(poolUnitResource: .init(resource: resource, amount: amount))
-				)
-			}
 			return [.init(
 				resource: resource,
 				details: .poolUnit(.init(
-					poolName: resource.fungibleResourceName,
-					dAppName: details.dAppName,
-					resources: poolUnitResources,
+					details: details,
 					guarantee: guarantee
 				))
 			)]

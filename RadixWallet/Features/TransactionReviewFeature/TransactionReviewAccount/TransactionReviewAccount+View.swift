@@ -109,9 +109,7 @@ struct TransactionReviewResourceView: View {
 		case let .poolUnit(details):
 			PoolUnitView(
 				viewState: .init(
-					resource: transfer.resource,
-					details: details,
-					dAppName: details.dAppName
+					details: details.details
 				),
 				backgroundColor: .app.gray5,
 				onTap: {
@@ -153,24 +151,35 @@ extension TransferNFTView.ViewState {
 }
 
 extension PoolUnitView.ViewState {
-	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.PoolUnit, dAppName: String?) {
+	init(details: OnLedgerEntitiesClient.OwnedResourcePoolDetails) {
 		self.init(
-			poolName: resource.fungibleResourceName,
-			dAppName: .success(dAppName),
-			poolIcon: resource.metadata.iconURL,
-			resources: .success(.init(details.resources.map(PoolUnitResourceView.ViewState.init).asIdentifiable())),
+			poolName: details.poolUnitResource.resource.fungibleResourceName,
+			dAppName: .success(details.dAppName),
+			poolIcon: details.poolUnitResource.resource.metadata.iconURL,
+			resources: {
+				let xrdResource = details.xrdResource.map {
+					PoolUnitResourceView.ViewState(resourceWithRedemptionValue: $0, isXRD: true)
+				}
+				.asArray(\.self)
+
+				let nonXrdResources = details.nonXrdResources.map {
+					PoolUnitResourceView.ViewState(resourceWithRedemptionValue: $0, isXRD: false)
+				}
+
+				return .success(xrdResource + nonXrdResources)
+			}(),
 			isSelected: nil
 		)
 	}
 }
 
 extension PoolUnitResourceView.ViewState {
-	init(resource: TransactionReview.Transfer.Details.PoolUnit.Resource) {
+	init(resourceWithRedemptionValue: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
 		self.init(
-			id: resource.id,
-			symbol: resource.symbol,
-			icon: resource.isXRD ? .xrd : .known(resource.icon),
-			amount: resource.amount
+			id: resourceWithRedemptionValue.resource.id,
+			symbol: resourceWithRedemptionValue.resource.metadata.symbol,
+			icon: isXRD ? .xrd : .known(resourceWithRedemptionValue.resource.metadata.iconURL),
+			amount: resourceWithRedemptionValue.redemptionValue
 		)
 	}
 }

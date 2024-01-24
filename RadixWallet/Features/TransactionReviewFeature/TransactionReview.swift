@@ -329,7 +329,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					ledgerState: transfer.resource.atLedgerState
 				))
 			case let .poolUnit(details):
-				return .none
+				state.destination = .poolUnitDetails(.init(resourcesDetails: details.details))
 
 			case let .stakeClaimNFT(details):
 				state.destination = .nonFungibleTokenDetails(.init(
@@ -797,9 +797,7 @@ extension TransactionReview {
 			public typealias StakeClaimNFT = StakeClaimNFTSView.ViewState
 
 			public struct PoolUnit: Sendable, Hashable {
-				public let poolName: String?
-				public let dAppName: String?
-				public let resources: [Resource]
+				public let details: OnLedgerEntitiesClient.OwnedResourcePoolDetails
 				public var guarantee: TransactionClient.Guarantee?
 
 				public struct Resource: Identifiable, Sendable, Hashable {
