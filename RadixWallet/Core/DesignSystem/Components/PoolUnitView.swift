@@ -1,10 +1,10 @@
-// MARK: - TransferPoolUnitView
-public struct TransferPoolUnitView: View {
+// MARK: - PoolUnitView
+public struct PoolUnitView: View {
 	public struct ViewState: Equatable {
 		public let poolName: String?
-		public let dAppName: String?
+		public let dAppName: Loadable<String?>
 		public let poolIcon: URL?
-		public let resources: Loadable<[TransferPoolUnitResourceView.ViewState]>
+		public let resources: Loadable<[PoolUnitResourceView.ViewState]>
 		public let isSelected: Bool?
 	}
 
@@ -34,10 +34,12 @@ public struct TransferPoolUnitView: View {
 							.foregroundColor(.app.gray1)
 					}
 
-					if let dAppName = viewState.dAppName {
-						Text(dAppName)
-							.textStyle(.body2Regular)
-							.foregroundColor(.app.gray2)
+					loadable(viewState.dAppName, loadingViewHeight: .small1) { dAppName in
+						if let dAppName {
+							Text(dAppName)
+								.textStyle(.body2Regular)
+								.foregroundColor(.app.gray2)
+						}
 					}
 				}
 
@@ -55,7 +57,7 @@ public struct TransferPoolUnitView: View {
 
 			loadable(viewState.resources) { resources in
 				HStack(spacing: .zero) {
-					TransferPoolUnitResourcesView(resources: resources, resourceBackgroundColor: backgroundColor)
+					PoolUnitResourcesView(resources: resources, resourceBackgroundColor: backgroundColor)
 						.padding(.trailing, .small2)
 
 					if let isSelected = viewState.isSelected {
@@ -73,15 +75,15 @@ public struct TransferPoolUnitView: View {
 	}
 }
 
-// MARK: - TransferPoolUnitResourcesView
-public struct TransferPoolUnitResourcesView: View {
-	public let resources: [TransferPoolUnitResourceView.ViewState]
+// MARK: - PoolUnitResourcesView
+public struct PoolUnitResourcesView: View {
+	public let resources: [PoolUnitResourceView.ViewState]
 	public let resourceBackgroundColor: Color
 
 	public var body: some View {
 		VStack(spacing: 1) {
 			ForEach(resources) { resource in
-				TransferPoolUnitResourceView(viewState: resource)
+				PoolUnitResourceView(viewState: resource)
 			}
 			.padding(.small1)
 			.background(resourceBackgroundColor)
@@ -94,8 +96,8 @@ public struct TransferPoolUnitResourcesView: View {
 	}
 }
 
-// MARK: - TransferPoolUnitResourceView
-public struct TransferPoolUnitResourceView: View {
+// MARK: - PoolUnitResourceView
+public struct PoolUnitResourceView: View {
 	public struct ViewState: Identifiable, Equatable {
 		public var id: ResourceAddress
 		public let symbol: String?

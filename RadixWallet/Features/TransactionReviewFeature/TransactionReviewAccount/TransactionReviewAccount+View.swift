@@ -107,7 +107,7 @@ struct TransactionReviewResourceView: View {
 				onTap(nil)
 			})
 		case let .poolUnit(details):
-			TransferPoolUnitView(
+			PoolUnitView(
 				viewState: .init(
 					resource: transfer.resource,
 					details: details,
@@ -152,19 +152,19 @@ extension TransferNFTView.ViewState {
 	}
 }
 
-extension TransferPoolUnitView.ViewState {
+extension PoolUnitView.ViewState {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.PoolUnit, dAppName: String?) {
 		self.init(
 			poolName: resource.metadata.name ?? resource.metadata.symbol,
-			dAppName: dAppName,
+			dAppName: .success(dAppName),
 			poolIcon: resource.metadata.iconURL,
-			resources: .success(details.resources.map(TransferPoolUnitResourceView.ViewState.init)),
+			resources: .success(.init(details.resources.map(PoolUnitResourceView.ViewState.init).asIdentifiable())),
 			isSelected: nil
 		)
 	}
 }
 
-extension TransferPoolUnitResourceView.ViewState {
+extension PoolUnitResourceView.ViewState {
 	init(resource: TransactionReview.Transfer.Details.PoolUnit.Resource) {
 		self.init(
 			id: resource.id,

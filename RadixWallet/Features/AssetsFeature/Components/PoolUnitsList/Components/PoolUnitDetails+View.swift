@@ -7,7 +7,7 @@ extension PoolUnitDetails.State {
 		return .init(
 			containerWithHeader: .init(resource: resource),
 			thumbnailURL: resource.metadata.iconURL,
-			resources: PoolUnitResourceViewState.viewStates(amount: poolUnit.resource.amount, resourcesDetails: resourcesDetails),
+			resources: PoolUnitResourceView.ViewState.viewStates(amount: poolUnit.resource.amount, resourcesDetails: resourcesDetails),
 			resourceDetails: .init(
 				description: .success(resourcesDetails.poolUnitResource.resource.metadata.description),
 				resourceAddress: resource.resourceAddress,
@@ -27,7 +27,7 @@ extension PoolUnitDetails {
 	public struct ViewState: Equatable {
 		let containerWithHeader: DetailsContainerWithHeaderViewState
 		let thumbnailURL: URL?
-		let resources: NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>>
+		let resources: [PoolUnitResourceView.ViewState]
 		let resourceDetails: AssetResourceDetailsSection.ViewState
 	}
 
@@ -57,7 +57,7 @@ extension PoolUnitDetails {
 							.textStyle(.secondaryHeader)
 							.foregroundColor(.app.gray1)
 
-						PoolUnitResourcesView(resources: viewStore.resources)
+						PoolUnitResourcesView(resources: viewStore.resources, resourceBackgroundColor: .app.white)
 							.padding(.horizontal, .large2)
 
 						AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
