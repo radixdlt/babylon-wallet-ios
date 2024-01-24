@@ -97,7 +97,10 @@ extension TransactionReview {
 
 			let perPoolUnitDapps = Dictionary(uniqueKeysWithValues: dApps.compactMap { data -> (ResourceAddress, OnLedgerEntity.Metadata)? in
 				guard let dAppMetadata = data.entity?.metadata,
-				      let poolUnitResource: ResourceAddress = try? poolContributions.first { $0.poolAddress == data.address }?.poolUnitsResourceAddress.asSpecific()
+				      let poolUnitResource: ResourceAddress = try? poolContributions
+				      .first(where: { $0.poolAddress == data.address })?
+				      .poolUnitsResourceAddress
+				      .asSpecific()
 				else {
 					return nil
 				}
