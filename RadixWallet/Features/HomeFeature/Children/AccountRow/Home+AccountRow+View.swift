@@ -64,9 +64,7 @@ extension Home.AccountRow {
 			let xrdIcon: [TokenThumbnail.Content] = fungibleResources.xrdResource != nil ? [.xrd] : []
 			let otherIcons: [TokenThumbnail.Content] = fungibleResources.nonXrdResources.map { .known($0.metadata.iconURL) }
 			self.fungibleResourceIcons = xrdIcon + otherIcons
-
 			self.nonFungibleResourcesCount = portfolio.nonFungibleResources.count
-
 			self.stakedValidatorsCount = portfolio.poolUnitResources.radixNetworkStakes.count
 			self.poolUnitsCount = portfolio.poolUnitResources.poolUnits.count
 		}
@@ -80,7 +78,7 @@ extension Home.AccountRow {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: ViewState.init(state:), send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: ViewState.init, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .medium3) {
 					VStack(alignment: .leading, spacing: .zero) {
 						Text(viewStore.name)
@@ -90,11 +88,9 @@ extension Home.AccountRow {
 							.frame(maxWidth: .infinity, alignment: .leading)
 
 						HStack {
-							AddressView(
-								.address(.account(viewStore.address, isLedgerHWAccount: viewStore.isLedgerAccount))
-							)
-							.foregroundColor(.app.whiteTransparent)
-							.textStyle(.body2HighImportance)
+							AddressView(.address(.account(viewStore.address, isLedgerHWAccount: viewStore.isLedgerAccount)))
+								.foregroundColor(.app.whiteTransparent)
+								.textStyle(.body2HighImportance)
 
 							if let tag = viewStore.tag {
 								Text("•")
@@ -106,9 +102,7 @@ extension Home.AccountRow {
 
 					ownedResourcesList(viewStore)
 
-					prompts(
-						mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction
-					)
+					prompts(mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction)
 				}
 				.padding(.horizontal, .medium1)
 				.padding(.vertical, .medium2)
