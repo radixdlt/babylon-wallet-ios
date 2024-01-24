@@ -306,7 +306,7 @@ extension Home.AccountRow.View {
 // FIXME: Workaround to avoid ViewThatFits
 private extension Home.AccountRow.ViewState {
 	func itemLimit(iconSize: CGFloat, width: CGFloat) -> Int? {
-		itemLimit(trying: showMoreFungibles ? [nil, 10] : [5, 4, 3], iconSize: iconSize, width: width)
+		itemLimit(trying: showMoreFungibles ? [nil, 10] : [5, 4, 3, 2, 1], iconSize: iconSize, width: width)
 	}
 
 	func itemLimit(trying limits: [Int?], iconSize: CGFloat, width: CGFloat) -> Int? {
@@ -316,7 +316,7 @@ private extension Home.AccountRow.ViewState {
 			}
 		}
 
-		return 3
+		return 1
 	}
 
 	func usedWidth(itemLimit: Int?, iconSize: CGFloat) -> CGFloat {
