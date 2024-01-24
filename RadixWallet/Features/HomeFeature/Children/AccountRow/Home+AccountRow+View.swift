@@ -326,8 +326,10 @@ private extension Home.AccountRow.ViewState {
 
 		let hasItems = itemsShown > 0
 		let hasPoolUnits = poolUnitsCount > 0
+		let hasStakedValidators = stakedValidatorsCount > 0
 		let hasNFTs = nonFungibleResourcesCount > 0
-		let sections = [hasItems, hasPoolUnits, hasNFTs].count(of: true)
+
+		let sections = [hasItems, hasPoolUnits, hasStakedValidators, hasNFTs].count(of: true)
 
 		var width: CGFloat = 0
 
@@ -340,6 +342,9 @@ private extension Home.AccountRow.ViewState {
 		}
 		if hasPoolUnits {
 			width += iconSize + labelWidthForCount(poolUnitsCount)
+		}
+		if hasStakedValidators {
+			width += iconSize + labelWidthForCount(stakedValidatorsCount)
 		}
 		if hasNFTs {
 			width += iconSize + labelWidthForCount(nonFungibleResourcesCount)
