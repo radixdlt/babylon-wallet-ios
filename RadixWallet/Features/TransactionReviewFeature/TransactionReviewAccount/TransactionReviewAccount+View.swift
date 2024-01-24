@@ -155,7 +155,7 @@ extension TransferNFTView.ViewState {
 extension PoolUnitView.ViewState {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.PoolUnit, dAppName: String?) {
 		self.init(
-			poolName: resource.metadata.name ?? resource.metadata.symbol,
+			poolName: resource.fungibleResourceName,
 			dAppName: .success(dAppName),
 			poolIcon: resource.metadata.iconURL,
 			resources: .success(.init(details.resources.map(PoolUnitResourceView.ViewState.init).asIdentifiable())),

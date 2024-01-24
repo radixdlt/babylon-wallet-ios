@@ -695,7 +695,7 @@ extension TransactionReview {
 			return [.init(
 				resource: resource,
 				details: .poolUnit(.init(
-					poolName: resource.title,
+					poolName: resource.fungibleResourceName,
 					dAppName: resourceAssociatedDapps?[resourceAddress]?.name,
 					resources: resources,
 					guarantee: guarantee
@@ -720,7 +720,7 @@ extension TransactionReview {
 			return [.init(
 				resource: resource,
 				details: .poolUnit(.init(
-					poolName: resource.title,
+					poolName: resource.fungibleResourceName,
 					dAppName: details.dAppName,
 					resources: poolUnitResources,
 					guarantee: guarantee

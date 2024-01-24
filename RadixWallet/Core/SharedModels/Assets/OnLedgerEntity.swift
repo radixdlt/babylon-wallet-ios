@@ -605,3 +605,15 @@ extension OnLedgerEntitiesClient.ResourceWithVaultAmount {
 		return roundedRedemptionValue.formatted()
 	}
 }
+
+extension OnLedgerEntity.Resource {
+	public var fungibleResourceName: String? {
+		metadata.fungibleResourceName
+	}
+}
+
+extension OnLedgerEntity.Metadata {
+	public var fungibleResourceName: String? {
+		name ?? symbol
+	}
+}

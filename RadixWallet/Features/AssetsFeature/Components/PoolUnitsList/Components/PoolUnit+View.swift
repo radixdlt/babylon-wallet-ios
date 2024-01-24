@@ -35,7 +35,7 @@ extension PoolUnit {
 extension PoolUnit.State {
 	var viewState: PoolUnit.ViewState {
 		.init(
-			poolName: poolUnit.resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
+			poolName: poolUnit.resource.metadata.fungibleResourceName,
 			dAppName: resourceDetails.dAppName,
 			poolIcon: poolUnit.resource.metadata.iconURL,
 			resources: resourceDetails.map { details in

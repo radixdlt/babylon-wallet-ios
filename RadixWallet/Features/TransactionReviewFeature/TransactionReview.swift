@@ -797,7 +797,7 @@ extension TransactionReview {
 			public typealias StakeClaimNFT = StakeClaimNFTSView.ViewState
 
 			public struct PoolUnit: Sendable, Hashable {
-				public let poolName: String
+				public let poolName: String?
 				public let dAppName: String?
 				public let resources: [Resource]
 				public var guarantee: TransactionClient.Guarantee?

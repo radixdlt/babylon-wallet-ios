@@ -288,7 +288,7 @@ extension OnLedgerEntitiesClient {
 			return OnLedgerEntity.Account.PoolUnit(resource: poolUnitResource, resourcePoolAddress: pool.address)
 		}
 
-		return .init(radixNetworkStakes: stakeUnits.asIdentifiable(), poolUnits: poolUnits)
+		return .init(radixNetworkStakes: stakeUnits.asIdentifiable(), poolUnits: poolUnits.sorted())
 	}
 
 	static func extractOwnedFungibleResources(
@@ -598,6 +598,16 @@ extension OnLedgerEntity.OwnedNonFungibleResource: Comparable {
 		default:
 			lhs.resourceAddress.address < rhs.resourceAddress.address
 		}
+	}
+}
+
+// MARK: - OnLedgerEntity.Account.PoolUnit + Comparable
+extension OnLedgerEntity.Account.PoolUnit: Comparable {
+	public static func < (
+		lhs: OnLedgerEntity.Account.PoolUnit,
+		rhs: OnLedgerEntity.Account.PoolUnit
+	) -> Bool {
+		lhs.resource < rhs.resource
 	}
 }
 
