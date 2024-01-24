@@ -64,9 +64,7 @@ extension Home.AccountRow {
 			let xrdIcon: [TokenThumbnail.Content] = fungibleResources.xrdResource != nil ? [.xrd] : []
 			let otherIcons: [TokenThumbnail.Content] = fungibleResources.nonXrdResources.map { .known($0.metadata.iconURL) }
 			self.fungibleResourceIcons = xrdIcon + otherIcons
-
 			self.nonFungibleResourcesCount = portfolio.nonFungibleResources.count
-
 			self.stakedValidatorsCount = portfolio.poolUnitResources.radixNetworkStakes.count
 			self.poolUnitsCount = portfolio.poolUnitResources.poolUnits.count
 		}
@@ -80,7 +78,7 @@ extension Home.AccountRow {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: ViewState.init(state:), send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: ViewState.init, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .medium3) {
 					VStack(alignment: .leading, spacing: .zero) {
 						Text(viewStore.name)
@@ -90,11 +88,9 @@ extension Home.AccountRow {
 							.frame(maxWidth: .infinity, alignment: .leading)
 
 						HStack {
-							AddressView(
-								.address(.account(viewStore.address, isLedgerHWAccount: viewStore.isLedgerAccount))
-							)
-							.foregroundColor(.app.whiteTransparent)
-							.textStyle(.body2HighImportance)
+							AddressView(.address(.account(viewStore.address, isLedgerHWAccount: viewStore.isLedgerAccount)))
+								.foregroundColor(.app.whiteTransparent)
+								.textStyle(.body2HighImportance)
 
 							if let tag = viewStore.tag {
 								Text("•")
@@ -106,9 +102,7 @@ extension Home.AccountRow {
 
 					ownedResourcesList(viewStore)
 
-					prompts(
-						mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction
-					)
+					prompts(mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction)
 				}
 				.padding(.horizontal, .medium1)
 				.padding(.vertical, .medium2)
@@ -306,7 +300,7 @@ extension Home.AccountRow.View {
 // FIXME: Workaround to avoid ViewThatFits
 private extension Home.AccountRow.ViewState {
 	func itemLimit(iconSize: CGFloat, width: CGFloat) -> Int? {
-		itemLimit(trying: showMoreFungibles ? [nil, 10] : [5, 4, 3], iconSize: iconSize, width: width)
+		itemLimit(trying: showMoreFungibles ? [nil, 10] : [5, 4, 3, 2, 1], iconSize: iconSize, width: width)
 	}
 
 	func itemLimit(trying limits: [Int?], iconSize: CGFloat, width: CGFloat) -> Int? {
@@ -316,7 +310,7 @@ private extension Home.AccountRow.ViewState {
 			}
 		}
 
-		return 3
+		return 1
 	}
 
 	func usedWidth(itemLimit: Int?, iconSize: CGFloat) -> CGFloat {
@@ -326,8 +320,10 @@ private extension Home.AccountRow.ViewState {
 
 		let hasItems = itemsShown > 0
 		let hasPoolUnits = poolUnitsCount > 0
+		let hasStakedValidators = stakedValidatorsCount > 0
 		let hasNFTs = nonFungibleResourcesCount > 0
-		let sections = [hasItems, hasPoolUnits, hasNFTs].count(of: true)
+
+		let sections = [hasItems, hasPoolUnits, hasStakedValidators, hasNFTs].count(of: true)
 
 		var width: CGFloat = 0
 
@@ -340,6 +336,9 @@ private extension Home.AccountRow.ViewState {
 		}
 		if hasPoolUnits {
 			width += iconSize + labelWidthForCount(poolUnitsCount)
+		}
+		if hasStakedValidators {
+			width += iconSize + labelWidthForCount(stakedValidatorsCount)
 		}
 		if hasNFTs {
 			width += iconSize + labelWidthForCount(nonFungibleResourcesCount)
