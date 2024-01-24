@@ -3,20 +3,20 @@ import SwiftUI
 
 extension PoolUnitDetails.State {
 	var viewState: PoolUnitDetails.ViewState {
-		let resource = poolUnit.resource
+		let resource = resourcesDetails.poolUnitResource.resource
 		return .init(
-			containerWithHeader: .init(resource: resource),
+			containerWithHeader: .init(resourcesDetails.poolUnitResource),
 			thumbnailURL: resource.metadata.iconURL,
-			resources: PoolUnitResourceView.ViewState.viewStates(amount: poolUnit.resource.amount, resourcesDetails: resourcesDetails),
+			resources: PoolUnitResourceView.ViewState.viewStates(resourcesDetails: resourcesDetails),
 			resourceDetails: .init(
-				description: .success(resourcesDetails.poolUnitResource.resource.metadata.description),
+				description: .success(resource.metadata.description),
 				resourceAddress: resource.resourceAddress,
 				isXRD: false,
 				validatorAddress: nil,
-				resourceName: .success(resourcesDetails.poolUnitResource.resource.metadata.name), // FIXME: Is this correct?
-				currentSupply: .success(resourcesDetails.poolUnitResource.resource.totalSupply?.formatted() ?? L10n.AssetDetails.supplyUnkown),
-				behaviors: .success(resourcesDetails.poolUnitResource.resource.behaviors),
-				tags: .success(resourcesDetails.poolUnitResource.resource.metadata.tags)
+				resourceName: .success(resource.metadata.name), // FIXME: Is this correct?
+				currentSupply: .success(resource.totalSupply?.formatted() ?? L10n.AssetDetails.supplyUnkown),
+				behaviors: .success(resource.behaviors),
+				tags: .success(resource.metadata.tags)
 			)
 		)
 	}

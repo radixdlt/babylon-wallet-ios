@@ -39,7 +39,7 @@ extension PoolUnit.State {
 			dAppName: resourceDetails.dAppName,
 			poolIcon: poolUnit.resource.metadata.iconURL,
 			resources: resourceDetails.map { details in
-				PoolUnitResourceView.ViewState.viewStates(amount: poolUnit.resource.amount, resourcesDetails: details)
+				PoolUnitResourceView.ViewState.viewStates(resourcesDetails: details)
 			},
 			isSelected: isSelected
 		)
@@ -48,7 +48,6 @@ extension PoolUnit.State {
 
 extension PoolUnitResourceView.ViewState {
 	static func viewStates(
-		amount: RETDecimal,
 		resourcesDetails: OnLedgerEntitiesClient.OwnedResourcePoolDetails
 	) -> [PoolUnitResourceView.ViewState] {
 		let xrdResourceViewState = resourcesDetails.xrdResource.map {
@@ -56,7 +55,7 @@ extension PoolUnitResourceView.ViewState {
 				id: $0.resource.resourceAddress,
 				symbol: Constants.xrdTokenName,
 				icon: .xrd,
-				amount: $0.poolRedemptionValue(for: amount, poolUnitResource: resourcesDetails.poolUnitResource.resource)
+				amount: $0.poolRedemptionValue(poolUnitResource: resourcesDetails.poolUnitResource)
 			)
 		}
 		let nonXrdResources = resourcesDetails.nonXrdResources.map { resourceDetails in
@@ -64,7 +63,7 @@ extension PoolUnitResourceView.ViewState {
 				id: resourceDetails.resource.resourceAddress,
 				symbol: resourceDetails.resource.metadata.symbol ?? resourceDetails.resource.metadata.name ?? L10n.Account.PoolUnits.unknownSymbolName,
 				icon: .known(resourceDetails.resource.metadata.iconURL),
-				amount: resourceDetails.poolRedemptionValue(for: amount, poolUnitResource: resourcesDetails.poolUnitResource.resource)
+				amount: resourceDetails.poolRedemptionValue(poolUnitResource: resourcesDetails.poolUnitResource)
 			)
 		}
 

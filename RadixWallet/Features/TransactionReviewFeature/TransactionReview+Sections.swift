@@ -714,7 +714,7 @@ extension TransactionReview {
 					symbol: $0.resource.metadata.symbol,
 					address: $0.resource.resourceAddress,
 					icon: $0.resource.metadata.iconURL,
-					amount: $0.poolRedemptionValue(for: amount, poolUnitResource: resource)
+					amount: $0.poolRedemptionValue(poolUnitResource: .init(resource: resource, amount: amount))
 				)
 			}
 			return [.init(
