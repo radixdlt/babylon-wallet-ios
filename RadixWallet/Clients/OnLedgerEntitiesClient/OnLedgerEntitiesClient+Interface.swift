@@ -470,9 +470,15 @@ extension OnLedgerEntitiesClient {
 			xrdResourceDetails = nil
 		}
 
+		let dAppName: String? = if let dAppDefinition = pool.metadata.dappDefinition {
+			try? await getDappMetadata(dAppDefinition, validatingDappEntity: pool.address.asGeneral).name
+		} else {
+			nil
+		}
+
 		return .init(
 			address: pool.address,
-			dAppName: nil,
+			dAppName: dAppName,
 			poolUnitResource: .init(resource: poolUnitResource, amount: amount),
 			xrdResource: xrdResourceDetails,
 			nonXrdResources: nonXrdResourceDetails
