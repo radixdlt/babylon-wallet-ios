@@ -375,6 +375,15 @@ private extension View {
 			.signing(with: destinationStore)
 			.submitting(with: destinationStore)
 			.unknownComponents(with: destinationStore)
+			.rawTransactionAlert(with: destinationStore)
+	}
+
+	private func rawTransactionAlert(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
+		alert(
+			store: destinationStore,
+			state: /TransactionReview.Destination.State.rawTransactionAlert,
+			action: TransactionReview.Destination.Action.rawTransactionAlert
+		)
 	}
 
 	private func customizeGuarantees(with destinationStore: PresentationStoreOf<TransactionReview.Destination>) -> some View {
