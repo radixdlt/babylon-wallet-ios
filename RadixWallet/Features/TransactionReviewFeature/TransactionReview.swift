@@ -86,26 +86,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			self.proposingDappMetadata = proposingDappMetadata
 		}
 
-//		public init(
-//			transactionManifest: TransactionManifest,
-//			nonce: Nonce,
-//			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
-//			message: Message,
-//			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init(),
-//			waitsForTransactionToBeComitted: Bool = false,
-//			isWalletTransaction: Bool,
-//			proposingDappMetadata: DappMetadata.Ledger?
-//		) {
-//			self.nonce = nonce
-//			self.transactionManifest = transactionManifest
-//			self.signTransactionPurpose = signTransactionPurpose
-//			self.message = message
-//			self.ephemeralNotaryPrivateKey = ephemeralNotaryPrivateKey
-//			self.waitsForTransactionToBeComitted = waitsForTransactionToBeComitted
-//			self.isWalletTransaction = isWalletTransaction
-//			self.proposingDappMetadata = proposingDappMetadata
-//		}
-
 		public enum DisplayMode: Sendable, Hashable {
 			case review
 			case raw(String)
@@ -660,7 +640,8 @@ extension TransactionReview {
 
 	func transactionManifestWithWalletInstructionsAdded(_ state: State) throws -> TransactionManifest {
 		guard let reviewedTransaction = state.reviewedTransaction else {
-			fatalError()
+			struct MissingReviewedTransaction: Error {}
+			throw MissingReviewedTransaction()
 		}
 
 		var manifest = reviewedTransaction.transactionManifest
