@@ -265,14 +265,8 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 				accountAddress: acccountAddress,
 				stakeClaims: stakeClaims
 			)
-			_ = await dappInteractionClient.addWalletInteraction(
-				.transaction(.init(
-					send: .init(
-						version: .default,
-						transactionManifest: manifest,
-						message: nil
-					)
-				)),
+			_ = try await dappInteractionClient.addWalletInteraction(
+				.transaction(.init(send: .init(transactionManifest: manifest))),
 				.accountTransfer
 			)
 		}

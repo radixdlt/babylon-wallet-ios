@@ -1022,7 +1022,7 @@ extension DappInteractionFlow.Path.State {
 
 		case let .remote(.send(item)):
 			self = .relayed(anyItem, with: .reviewTransaction(.init(
-				transactionManifest: item.transactionManifest,
+				rawTransactionManifest: item.rawTransactionManifest,
 				nonce: .secureRandom(),
 				signTransactionPurpose: .manifestFromDapp,
 				message: item.message.map {

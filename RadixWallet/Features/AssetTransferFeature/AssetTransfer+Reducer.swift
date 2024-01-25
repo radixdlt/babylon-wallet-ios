@@ -75,14 +75,8 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 			return .run { [accounts = state.accounts, message = state.message?.message] send in
 				let manifest = try await createManifest(accounts)
 				Task {
-					_ = await dappInteractionClient.addWalletInteraction(
-						.transaction(.init(
-							send: .init(
-								version: .default,
-								transactionManifest: manifest,
-								message: message
-							)
-						)),
+					_ = try await dappInteractionClient.addWalletInteraction(
+						.transaction(.init(send: .init(transactionManifest: manifest))),
 						.accountTransfer
 					)
 				}

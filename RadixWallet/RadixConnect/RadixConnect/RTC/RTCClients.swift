@@ -379,7 +379,7 @@ extension RTCClient {
 			.receivedMessagesStream()
 			.map { (messageResult: Result<DataChannelClient.AssembledMessage, Error>) in
 				let route = P2P.RTCRoute(connectionId: self.id, peerConnectionId: connection.id)
-				return await P2P.RTCIncomingMessage(
+				return P2P.RTCIncomingMessage(
 					result: decode(messageResult),
 					route: .rtc(route)
 				)
@@ -409,14 +409,9 @@ extension RTCClient {
 // FIXME: once we have merge together the separated message formats `Dapp` and `Ledger` in CAP21, clean up!
 func decode(
 	_ messageResult: Result<DataChannelClient.AssembledMessage, Error>
-) async -> Result<P2P.RTCMessageFromPeer, Error> {
-	@Dependency(\.gatewaysClient) var gatewaysClient
-	let currentNetwork = await gatewaysClient.getCurrentNetworkID()
+) -> Result<P2P.RTCMessageFromPeer, Error> {
 	let jsonDecoder = JSONDecoder()
-	jsonDecoder.userInfo[.networkIdKey] = currentNetwork.rawValue
-
 	return messageResult.flatMap { (message: DataChannelClient.AssembledMessage) in
-
 		let jsonData = message.messageContent
 		do {
 			let request = try jsonDecoder.decode(
