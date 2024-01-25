@@ -91,22 +91,9 @@ extension TransactionReview {
 			let allAddresses = allAddresses + resourceAddresses.asIdentifiable()
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 
-			// Per pool dapp
-
 			let dApps = await extractDappEntities(poolAddresses)
 
-			let perPoolUnitDapps = Dictionary(uniqueKeysWithValues: dApps.compactMap { data -> (ResourceAddress, OnLedgerEntity.Metadata)? in
-				guard let dAppMetadata = data.entity?.metadata,
-				      let poolUnitResource: ResourceAddress = try? poolContributions
-				      .first(where: { $0.poolAddress == data.address })?
-				      .poolUnitsResourceAddress
-				      .asSpecific()
-				else {
-					return nil
-				}
-
-				return (poolUnitResource, dAppMetadata)
-			})
+			let perPoolUnitDapps = perPoolUnitDapps(dApps, poolInteractions: poolContributions)
 
 			// Extract Contributing to Pools section
 			let pools: TransactionReviewPools.State? = try await extractDapps(dApps, unknownTitle: L10n.TransactionReview.unknownPools)
@@ -149,18 +136,7 @@ extension TransactionReview {
 
 			let dApps = await extractDappEntities(poolAddresses)
 
-			let perPoolUnitDapps = Dictionary(uniqueKeysWithValues: dApps.compactMap { data -> (ResourceAddress, OnLedgerEntity.Metadata)? in
-				guard let dAppMetadata = data.entity?.metadata,
-				      let poolUnitResource: ResourceAddress = try? poolRedemptions
-				      .first(where: { $0.poolAddress == data.address })?
-				      .poolUnitsResourceAddress
-				      .asSpecific()
-				else {
-					return nil
-				}
-
-				return (poolUnitResource, dAppMetadata)
-			})
+			let perPoolUnitDapps = perPoolUnitDapps(dApps, poolInteractions: poolRedemptions)
 
 			// Extract Contributing to Pools section
 			let pools: TransactionReviewPools.State? = try await extractDapps(dApps, unknownTitle: L10n.TransactionReview.unknownPools)
@@ -480,6 +456,26 @@ extension TransactionReview {
 		guard !exceptionChanges.isEmpty else { return nil }
 
 		return DepositExceptionsState(changes: IdentifiedArray(uncheckedUniqueElements: exceptionChanges))
+	}
+
+	private func perPoolUnitDapps(
+		_ dappEntities: [(address: EngineToolkit.Address, entity: TransactionReview.DappEntity?)],
+		poolInteractions: [some TrackedPoolInteraction]
+	) -> ResourceAssociatedDapps {
+		Dictionary(uniqueKeysWithValues: dappEntities.compactMap { data -> (ResourceAddress, OnLedgerEntity.Metadata)? in
+			let poolUnitResource: ResourceAddress? = try? poolInteractions
+				.first(where: { $0.poolAddress == data.address })?
+				.poolUnitsResourceAddress
+				.asSpecific()
+
+			guard let poolUnitResource,
+			      let dAppMetadata = data.entity?.metadata
+			else {
+				return nil
+			}
+
+			return (poolUnitResource, dAppMetadata)
+		})
 	}
 }
 
