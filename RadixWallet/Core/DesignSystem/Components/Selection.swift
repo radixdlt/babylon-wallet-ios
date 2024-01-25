@@ -10,27 +10,21 @@ public struct SelectionItem<Value> {
 extension SelectionItem: Sendable where Value: Sendable {}
 
 // MARK: - SelectionRequirement
-public enum SelectionRequirement: Sendable, Hashable {
-	case exactly(Int)
-	case atLeast(Int)
+public struct SelectionRequirement: Sendable, Hashable {
+	public let quantifier: Quantifier
+	public let count: Int
+
+	static func exactly(_ count: Int) -> Self {
+		SelectionRequirement(quantifier: .exactly, count: count)
+	}
+
+	static func atLeast(_ count: Int) -> Self {
+		SelectionRequirement(quantifier: .atLeast, count: count)
+	}
 
 	public enum Quantifier: Sendable, Hashable {
 		case exactly
 		case atLeast
-	}
-
-	public var quantifier: Quantifier {
-		switch self {
-		case .exactly: .exactly
-		case .atLeast: .atLeast
-		}
-	}
-
-	public var count: Int {
-		switch self {
-		case let .exactly(count), let .atLeast(count):
-			count
-		}
 	}
 }
 
@@ -88,15 +82,15 @@ public struct Selection<Value: Hashable, Content: View>: View {
 				guard !selectedValues.contains(value) else {
 					return false
 				}
-				switch requirement {
-				case let .exactly(count):
-					if count == 1 {
+				switch requirement.quantifier {
+				case .exactly:
+					if requirement.count == 1 {
 						return false
 					} else {
-						return selectedValues.count >= count
+						return selectedValues.count >= requirement.count
 					}
 				case .atLeast:
-					return false
+					return true
 				}
 			}()
 			content(
