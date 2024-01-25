@@ -123,6 +123,9 @@ public struct Selection<Value: Hashable, Content: View>: View {
 			.disabled(isDisabled)
 		}
 		.onAppear {
+			if selectedValues.isEmpty, values.count == 1, let value = values.first {
+				selectedValues = [value]
+			}
 			updateResult(with: selectedValues, in: values, requiring: requirement)
 		}
 		.onChange(of: selectedValues) { selectedValues in
