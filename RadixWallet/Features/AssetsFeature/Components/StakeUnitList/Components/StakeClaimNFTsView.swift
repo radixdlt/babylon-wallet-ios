@@ -106,20 +106,19 @@ public struct StakeClaimNFTSView: View {
 				}
 			}
 			ForEach(claims) { claim in
-				Button {
-					onTap(claim)
-				} label: {
-					HStack {
+				HStack {
+					Button {
+						onTap(claim)
+					} label: {
 						TokenBalanceView.xrd(balance: claim.claimAmount)
-
-						if let isSelected = viewState.selectedStakeClaims?.contains(claim.id) {
-							CheckmarkView(appearance: .dark, isChecked: isSelected)
-						}
+							.contentShape(Rectangle())
 					}
-					.padding(.small1)
-					.roundedCorners(strokeColor: .app.gray3)
-					.contentShape(Rectangle())
+					if let isSelected = viewState.selectedStakeClaims?.contains(claim.id) {
+						CheckmarkView(appearance: .dark, isChecked: isSelected)
+					}
 				}
+				.padding(.small1)
+				.roundedCorners(strokeColor: .app.gray3)
 			}
 		}
 	}
