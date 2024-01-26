@@ -39,6 +39,7 @@ extension TransactionReview.State {
 			proposingDappMetadata: proposingDappMetadata,
 			stakingToValidators: stakingToValidators,
 			unstakingFromValidators: unstakingFromValidators,
+			claimingFromValidators: claimingFromValidators,
 			depositSettingSection: accountDepositSetting,
 			depositExceptionsSection: accountDepositExceptions
 		)
@@ -62,6 +63,7 @@ extension TransactionReview {
 		let isExpandedRedeemingFromPools: Bool
 		var isExpandedStakingToValidators: Bool { stakingToValidators?.isExpanded == true }
 		var isExpandedUnstakingFromValidators: Bool { unstakingFromValidators?.isExpanded == true }
+		var isExpandedClaimingFromValidators: Bool { claimingFromValidators?.isExpanded == true }
 
 		let showTransferLine: Bool
 		let viewControlState: ControlState
@@ -75,6 +77,7 @@ extension TransactionReview {
 
 		let stakingToValidators: ValidatorsState?
 		let unstakingFromValidators: ValidatorsState?
+		let claimingFromValidators: ValidatorsState?
 		let depositSettingSection: DepositSettingState?
 		let depositExceptionsSection: DepositExceptionsState?
 
@@ -102,6 +105,7 @@ extension TransactionReview {
 					.animation(.easeInOut, value: viewStore.isExpandedRedeemingFromPools)
 					.animation(.easeInOut, value: viewStore.isExpandedStakingToValidators)
 					.animation(.easeInOut, value: viewStore.isExpandedUnstakingFromValidators)
+					.animation(.easeInOut, value: viewStore.isExpandedClaimingFromValidators)
 					.toolbar {
 						ToolbarItem(placement: .automatic) {
 							if viewStore.canToggleViewMode {
@@ -151,6 +155,10 @@ extension TransactionReview {
 
 								if let viewState = viewStore.unstakingFromValidators {
 									unstakingFromValidatorsSection(viewState)
+								}
+
+								if let viewState = viewStore.claimingFromValidators {
+									claimingFromValidatorsSection(viewState)
 								}
 
 								usingDappsSection(isExpanded: viewStore.isExpandedDappUsed)
@@ -307,6 +315,12 @@ extension TransactionReview {
 		private func unstakingFromValidatorsSection(_ viewState: TransactionReview.ValidatorsView.ViewState) -> some SwiftUI.View {
 			ValidatorsView(heading: .unstakingFromValidators, viewState: viewState) {
 				store.send(.view(.expandUnstakingFromValidatorsTapped))
+			}
+		}
+
+		private func claimingFromValidatorsSection(_ viewState: TransactionReview.ValidatorsView.ViewState) -> some SwiftUI.View {
+			ValidatorsView(heading: .claimingFromValidators, viewState: viewState) {
+				store.send(.view(.expandClaimingFromValidatorsTapped))
 			}
 		}
 
@@ -563,6 +577,11 @@ struct TransactionHeading: View {
 
 	static let unstakingFromValidators = TransactionHeading(
 		L10n.TransactionReview.unstakingFromValidatorsHeading,
+		icon: AssetResource.iconValidator
+	)
+
+	static let claimingFromValidators = TransactionHeading(
+		L10n.TransactionReview.claimFromValidatorsHeading,
 		icon: AssetResource.iconValidator
 	)
 

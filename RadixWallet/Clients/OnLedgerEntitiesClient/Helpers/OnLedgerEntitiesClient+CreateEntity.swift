@@ -525,6 +525,11 @@ extension OnLedgerEntitiesClient {
 			return reamainingEpochsUntilClaim <= .zero
 		}
 
+		var isUnstaking: Bool {
+			guard let reamainingEpochsUntilClaim else { return false }
+			return reamainingEpochsUntilClaim > .zero
+		}
+
 		var isToBeClaimed: Bool {
 			reamainingEpochsUntilClaim == nil
 		}

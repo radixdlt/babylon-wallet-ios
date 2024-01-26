@@ -7,7 +7,7 @@ public struct StakeClaimNFTSView: View {
 		var selectedStakeClaims: IdentifiedArrayOf<NonFungibleGlobalId>?
 
 		var unstaking: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim> {
-			stakeClaimTokens.stakeClaims.filter(not(\.isReadyToBeClaimed))
+			stakeClaimTokens.stakeClaims.filter(\.isUnstaking)
 		}
 
 		var readyToBeClaimed: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim> {
@@ -15,7 +15,7 @@ public struct StakeClaimNFTSView: View {
 		}
 
 		var toBeClaimed: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim> {
-			stakeClaimTokens.stakeClaims.filter(\.isReadyToBeClaimed)
+			stakeClaimTokens.stakeClaims.filter(\.isToBeClaimed)
 		}
 
 		var resourceMetadata: OnLedgerEntity.Metadata {
@@ -38,6 +38,7 @@ public struct StakeClaimNFTSView: View {
 	enum SectionKind {
 		case unstaking
 		case readyToBeClaimed
+		case toBeClaimed
 	}
 
 	public let viewState: ViewState
@@ -79,6 +80,10 @@ public struct StakeClaimNFTSView: View {
 
 			if !viewState.readyToBeClaimed.isEmpty {
 				sectionView(viewState.readyToBeClaimed, kind: .readyToBeClaimed)
+			}
+
+			if !viewState.toBeClaimed.isEmpty {
+				sectionView(viewState.toBeClaimed, kind: .toBeClaimed)
 			}
 		}
 	}
@@ -132,6 +137,8 @@ extension StakeClaimNFTSView.SectionKind {
 			L10n.Account.Staking.unstaking
 		case .readyToBeClaimed:
 			L10n.Account.Staking.readyToBeClaimed
+		case .toBeClaimed:
+			L10n.TransactionReview.toBeClaimed
 		}
 	}
 }
