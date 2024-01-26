@@ -664,7 +664,7 @@ struct TransactionReview_Previews: PreviewProvider {
 
 extension TransactionReview.State {
 	public static let previewValue: Self = .init(
-		transactionManifest: .previewValue,
+		unvalidatedManifest: try! .init(manifest: .previewValue),
 		nonce: .zero,
 		signTransactionPurpose: .manifestFromDapp,
 		message: .none,

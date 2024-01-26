@@ -236,7 +236,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		#if DEBUG
 		case let .reviewTransaction(manifest):
 			state.destination = .reviewTransaction(.init(
-				transactionManifest: manifest,
+				unvalidatedManifest: try! .init(manifest: manifest),
 				nonce: .secureRandom(),
 				signTransactionPurpose: .internalManifest(.debugModifyAccount),
 				message: .none,

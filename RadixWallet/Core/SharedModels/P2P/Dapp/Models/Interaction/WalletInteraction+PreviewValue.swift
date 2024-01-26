@@ -25,7 +25,7 @@ extension P2P.Dapp.Request.PersonaDataRequestItem {
 }
 
 extension P2P.Dapp.Request.SendTransactionItem {
-	public static let previewValue = Self(version: .default, transactionManifest: .previewValue, message: nil)
+	public static let previewValue = try! Self(transactionManifest: .previewValue)
 }
 
 extension P2P.Dapp.Request.ID {

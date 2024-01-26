@@ -160,15 +160,22 @@ extension TransactionClient {
 		let getTransactionReview: GetTransactionReview = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 
+			let manifestToSign = try request.unvalidatedManifest.transactionManifest(onNetwork: networkID)
+
 			/// Get all transaction signers.
 			let transactionSigners = try await getTransactionSigners(.init(
 				networkID: networkID,
-				manifest: request.manifestToSign,
+				manifest: manifestToSign,
 				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
 			))
 
 			/// Get the transaction preview
-			let transactionPreviewRequest = try await createTransactionPreviewRequest(for: request, networkID: networkID, transactionSigners: transactionSigners)
+			let transactionPreviewRequest = try await createTransactionPreviewRequest(
+				for: request,
+				networkID: networkID,
+				transactionManifest: manifestToSign,
+				transactionSigners: transactionSigners
+			)
 			let transactionPreviewResponse = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
 			guard transactionPreviewResponse.receipt.status == .succeeded else {
 				throw TransactionFailure.fromFailedTXReviewResponse(transactionPreviewResponse)
@@ -176,7 +183,7 @@ extension TransactionClient {
 			let receiptBytes = try Data(hex: transactionPreviewResponse.encodedReceipt)
 
 			/// Analyze the manifest
-			let analyzedManifestToReview = try request.manifestToSign.executionSummary(networkId: networkID.rawValue, encodedReceipt: receiptBytes)
+			let analyzedManifestToReview = try manifestToSign.executionSummary(networkId: networkID.rawValue, encodedReceipt: receiptBytes)
 
 			/// Transactions created outside of the Wallet are not allowed to use reserved instructions
 			if !request.isWalletTransaction, !analyzedManifestToReview.reservedInstructions.isEmpty {
@@ -213,6 +220,7 @@ extension TransactionClient {
 			}
 
 			return TransactionToReview(
+				transactionManifest: manifestToSign,
 				analyzedManifestToReview: analyzedManifestToReview,
 				networkID: networkID,
 				transactionFee: transactionFee,
@@ -225,11 +233,12 @@ extension TransactionClient {
 		func createTransactionPreviewRequest(
 			for request: ManifestReviewRequest,
 			networkID: NetworkID,
+			transactionManifest: TransactionManifest,
 			transactionSigners: TransactionSigners
 		) async throws -> GatewayAPI.TransactionPreviewRequest {
 			let intent = try await buildTransactionIntent(.init(
-				networkID: gatewaysClient.getCurrentNetworkID(),
-				manifest: request.manifestToSign,
+				networkID: networkID,
+				manifest: transactionManifest,
 				message: request.message,
 				nonce: request.nonce,
 				makeTransactionHeaderInput: request.makeTransactionHeaderInput,
@@ -237,7 +246,7 @@ extension TransactionClient {
 			))
 
 			return try .init(
-				rawManifest: request.manifestToSign,
+				rawManifest: transactionManifest,
 				header: intent.header(),
 				transactionSigners: transactionSigners
 			)

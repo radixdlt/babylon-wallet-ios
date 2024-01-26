@@ -14,6 +14,7 @@ final class CustomizeFeePayerTests: TestCase {
 		)
 		let notaryKey = Curve25519.Signing.PrivateKey()
 		var transactionStub = ReviewedTransaction(
+			transactionManifest: manifestStub,
 			networkID: NetworkID.enkinet,
 			feePayer: .success(nil),
 			transactionFee: .nonContingentLockPaying,

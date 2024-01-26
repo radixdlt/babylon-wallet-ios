@@ -7,7 +7,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var displayMode: DisplayMode = .review
 
 		public let nonce: Nonce
-		public let transactionManifest: TransactionManifest
+		public let unvalidatedManifest: UnvalidatedTransactionManifest
 		public let message: Message
 		public let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
 		public let waitsForTransactionToBeComitted: Bool
@@ -67,7 +67,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 
 		public init(
-			transactionManifest: TransactionManifest,
+			unvalidatedManifest: UnvalidatedTransactionManifest,
 			nonce: Nonce,
 			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
 			message: Message,
@@ -77,7 +77,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			proposingDappMetadata: DappMetadata.Ledger?
 		) {
 			self.nonce = nonce
-			self.transactionManifest = transactionManifest
+			self.unvalidatedManifest = unvalidatedManifest
 			self.signTransactionPurpose = signTransactionPurpose
 			self.message = message
 			self.ephemeralNotaryPrivateKey = ephemeralNotaryPrivateKey
@@ -234,7 +234,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .run { [state = state] send in
 				let preview = await TaskResult {
 					try await transactionClient.getTransactionReview(.init(
-						manifestToSign: state.transactionManifest,
+						unvalidatedManifest: state.unvalidatedManifest,
 						message: state.message,
 						nonce: state.nonce,
 						ephemeralNotaryPublicKey: state.ephemeralNotaryPrivateKey.publicKey,
@@ -375,7 +375,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			state.destination = .customizeFees(.init(
 				reviewedTransaction: reviewedTransaction,
-				manifestSummary: state.transactionManifest.summary(networkId: reviewedTransaction.networkID.rawValue),
+				manifestSummary: reviewedTransaction.transactionManifest.summary(networkId: reviewedTransaction.networkID.rawValue),
 				signingPurpose: .signTransaction(state.signTransactionPurpose)
 			))
 			return .none
@@ -394,6 +394,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .previewLoaded(.success(preview)):
 			let reviewedTransaction = ReviewedTransaction(
+				transactionManifest: preview.transactionManifest,
 				networkID: preview.networkID,
 				feePayer: .loading,
 				transactionFee: preview.transactionFee,
@@ -638,10 +639,15 @@ extension TransactionReview {
 	}
 
 	func transactionManifestWithWalletInstructionsAdded(_ state: State) throws -> TransactionManifest {
-		var manifest = state.transactionManifest
-		if let reviewedTransaction = state.reviewedTransaction, case let .success(feePayerAccount) = reviewedTransaction.feePayer.unwrap()?.account {
+		guard let reviewedTransaction = state.reviewedTransaction else {
+			struct MissingReviewedTransaction: Error {}
+			throw MissingReviewedTransaction()
+		}
+
+		var manifest = reviewedTransaction.transactionManifest
+		if case let .success(feePayerAccount) = reviewedTransaction.feePayer.unwrap()?.account {
 			do {
-				manifest = try manifest.withLockFeeCallMethodAdded(
+				manifest = try reviewedTransaction.transactionManifest.withLockFeeCallMethodAdded(
 					address: feePayerAccount.address.asGeneral,
 					fee: reviewedTransaction.transactionFee.totalFee.lockFee
 				)
@@ -670,7 +676,7 @@ extension TransactionReview {
 						transactionSigners: reviewedTransaction.transactionSigners,
 						signingFactors: reviewedTransaction.signingFactors,
 						signingPurpose: .signTransaction(state.signTransactionPurpose),
-						manifest: state.transactionManifest
+						manifest: reviewedTransaction.transactionManifest
 					))
 				}
 
@@ -910,6 +916,7 @@ public struct TransactionReviewFailure: LocalizedError {
 
 // MARK: - ReviewedTransaction
 public struct ReviewedTransaction: Hashable, Sendable {
+	let transactionManifest: TransactionManifest
 	let networkID: NetworkID
 	var feePayer: Loadable<FeePayerCandidate?> = .idle
 
