@@ -501,7 +501,7 @@ extension OnLedgerEntitiesClient {
 
 		public struct ResourceWithRedemptionValue: Hashable, Sendable {
 			public let resource: OnLedgerEntity.Resource
-			public let redemptionValue: String
+			public let redemptionValue: RETDecimal?
 		}
 	}
 

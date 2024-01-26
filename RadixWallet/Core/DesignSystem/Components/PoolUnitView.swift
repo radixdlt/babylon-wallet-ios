@@ -103,6 +103,30 @@ public struct PoolUnitResourceView: View {
 		public let symbol: String?
 		public let icon: TokenThumbnail.Content
 		public let amount: String
+
+		public init(
+			id: ResourceAddress,
+			symbol: String?,
+			icon: TokenThumbnail.Content,
+			amount: String
+		) {
+			self.id = id
+			self.symbol = symbol
+			self.icon = icon
+			self.amount = amount
+		}
+
+		public init(
+			id: ResourceAddress,
+			symbol: String?,
+			icon: TokenThumbnail.Content,
+			amount: RETDecimal?
+		) {
+			self.id = id
+			self.symbol = symbol
+			self.icon = icon
+			self.amount = amount.map { $0.formatted() } ?? L10n.Account.PoolUnits.noTotalSupply
+		}
 	}
 
 	public let viewState: ViewState
