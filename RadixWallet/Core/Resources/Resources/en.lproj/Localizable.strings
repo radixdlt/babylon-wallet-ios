@@ -146,7 +146,7 @@
 "accountSettings_specificAssetsDeposits_addAnAssetSubtitle" = "Enter the asset’s resource address (starting with “reso”)";
 "accountSettings_specificAssetsDeposits_addAnAssetInputHint" = "Resource Address";
 "accountSettings_specificAssetsDeposits_addAnAssetAllow" = "Allow Deposits";
-"accountSettings_specificAssetsDeposits_addAnAssetDeny" = "Deny Deposit";
+"accountSettings_specificAssetsDeposits_addAnAssetDeny" = "Deny Deposits";
 "accountSettings_specificAssetsDeposits_addAnAssetButton" = "Add Asset";
 "accountSettings_specificAssetsDeposits_allowInfo" = "The following resource addresses may always be deposited to this account by third parties.";
 "accountSettings_specificAssetsDeposits_denyInfo" = "The following resource addresses may never be deposited to this account by third parties.";
