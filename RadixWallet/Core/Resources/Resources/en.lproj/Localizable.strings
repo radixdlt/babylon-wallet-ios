@@ -641,7 +641,7 @@ Or you can clear this wallet from this phone and start fresh.";
 "assetTransfer_accountList_externalAccountName" = "Account";
 "assetTransfer_accountList_fromLabel" = "From";
 "assetTransfer_accountList_toLabel" = "To";
-"assetTransfer_accountList_addAccountButton" = "Add Account";
+"assetTransfer_accountList_addAccountButton" = "Add Transfer";
 "assetTransfer_header_transfer" = "Transfer";
 "assetTransfer_header_addMessageButton" = "Add Message";
 "assetTransfer_chooseReceivingAccount_invalidAddressError" = "Invalid address";
