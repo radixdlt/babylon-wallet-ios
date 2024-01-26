@@ -589,7 +589,10 @@ extension OnLedgerEntity.Account {
 }
 
 extension OnLedgerEntity.Resource {
-	func poolRedemptionValue(for amount: RETDecimal, poolUnitResource: OnLedgerEntitiesClient.ResourceWithVaultAmount) -> RETDecimal? {
+	func poolRedemptionValue(
+		for amount: RETDecimal,
+		poolUnitResource: OnLedgerEntitiesClient.ResourceWithVaultAmount
+	) -> RETDecimal? {
 		guard let poolUnitTotalSupply = poolUnitResource.resource.totalSupply else {
 			loggerGlobal.error("Missing total supply for \(poolUnitResource.resource.resourceAddress.address)")
 			return nil

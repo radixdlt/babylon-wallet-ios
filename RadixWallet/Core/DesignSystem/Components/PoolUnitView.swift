@@ -13,65 +13,67 @@ public struct PoolUnitView: View {
 	public let onTap: () -> Void
 
 	public var body: some View {
-		VStack(alignment: .leading, spacing: .zero) {
-			HStack(spacing: .zero) {
-				LoadableImage(url: viewState.poolIcon, size: .fixedSize(.verySmall)) {
-					ZStack {
-						Circle()
-							.fill(.app.gray4)
-							.frame(width: .large1, height: .large1)
-						Image(asset: AssetResource.poolUnits)
-							.resizable()
-							.frame(.verySmall)
+		Button(action: onTap) {
+			VStack(alignment: .leading, spacing: .zero) {
+				HStack(spacing: .zero) {
+					LoadableImage(url: viewState.poolIcon, size: .fixedSize(.verySmall)) {
+						ZStack {
+							Circle()
+								.fill(.app.gray4)
+								.frame(width: .large1, height: .large1)
+							Image(asset: AssetResource.poolUnits)
+								.resizable()
+								.frame(.verySmall)
+						}
 					}
+					.padding(.trailing, .medium3)
+
+					VStack(alignment: .leading, spacing: 0) {
+						if let poolName = viewState.poolName {
+							Text(poolName)
+								.textStyle(.body1Header)
+								.foregroundColor(.app.gray1)
+						}
+
+						loadable(viewState.dAppName, loadingViewHeight: .small1) { dAppName in
+							if let dAppName {
+								Text(dAppName)
+									.textStyle(.body2Regular)
+									.foregroundColor(.app.gray2)
+							}
+						}
+					}
+
+					Spacer(minLength: 0)
+
+					//					AssetIcon(.asset(AssetResource.info), size: .smallest)
+					//						.tint(.app.gray3)
 				}
-				.padding(.trailing, .medium3)
+				.padding(.bottom, .small2)
 
-				VStack(alignment: .leading, spacing: 0) {
-					if let poolName = viewState.poolName {
-						Text(poolName)
-							.textStyle(.body1Header)
-							.foregroundColor(.app.gray1)
-					}
+				Text(L10n.TransactionReview.worth)
+					.textStyle(.body2HighImportance)
+					.foregroundColor(.app.gray2)
+					.padding(.bottom, .small3)
 
-					loadable(viewState.dAppName, loadingViewHeight: .small1) { dAppName in
-						if let dAppName {
-							Text(dAppName)
-								.textStyle(.body2Regular)
-								.foregroundColor(.app.gray2)
+				loadable(viewState.resources) { resources in
+					HStack(spacing: .zero) {
+						PoolUnitResourcesView(resources: resources, resourceBackgroundColor: backgroundColor)
+							.padding(.trailing, .small2)
+
+						if let isSelected = viewState.isSelected {
+							CheckmarkView(appearance: .dark, isChecked: isSelected)
 						}
 					}
 				}
-
-				Spacer(minLength: 0)
-
-				//					AssetIcon(.asset(AssetResource.info), size: .smallest)
-				//						.tint(.app.gray3)
 			}
-			.padding(.bottom, .small2)
-
-			Text(L10n.TransactionReview.worth)
-				.textStyle(.body2HighImportance)
-				.foregroundColor(.app.gray2)
-				.padding(.bottom, .small3)
-
-			loadable(viewState.resources) { resources in
-				HStack(spacing: .zero) {
-					PoolUnitResourcesView(resources: resources, resourceBackgroundColor: backgroundColor)
-						.padding(.trailing, .small2)
-
-					if let isSelected = viewState.isSelected {
-						CheckmarkView(appearance: .dark, isChecked: isSelected)
-					}
-				}
-			}
+			.background(backgroundColor)
+			.padding(.medium1)
 		}
-		.background(backgroundColor)
-		.padding(.medium1)
-		.contentShape(Rectangle())
-		.onTapGesture {
-			onTap()
-		}
+		// .contentShape(Rectangle())
+//		.onTapGesture {
+//
+//		}
 	}
 }
 

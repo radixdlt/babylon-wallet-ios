@@ -590,8 +590,8 @@ extension OnLedgerEntity.OwnedFungibleResource: Comparable {
 // MARK: - OnLedgerEntity.OwnedNonFungibleResource + Comparable
 extension OnLedgerEntity.OwnedNonFungibleResource: Comparable {
 	public static func < (
-		lhs: OnLedgerEntity.OwnedNonFungibleResource,
-		rhs: OnLedgerEntity.OwnedNonFungibleResource
+		lhs: Self,
+		rhs: Self
 	) -> Bool {
 		switch (lhs.metadata.name, rhs.metadata.name) {
 		case let (.some(lhsName), .some(rhsName)):
@@ -609,8 +609,8 @@ extension OnLedgerEntity.OwnedNonFungibleResource: Comparable {
 // MARK: - OnLedgerEntity.Account.PoolUnit + Comparable
 extension OnLedgerEntity.Account.PoolUnit: Comparable {
 	public static func < (
-		lhs: OnLedgerEntity.Account.PoolUnit,
-		rhs: OnLedgerEntity.Account.PoolUnit
+		lhs: Self,
+		rhs: Self
 	) -> Bool {
 		lhs.resource < rhs.resource
 	}

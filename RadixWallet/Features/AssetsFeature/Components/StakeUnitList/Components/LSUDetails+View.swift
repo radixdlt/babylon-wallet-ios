@@ -12,7 +12,7 @@ extension LSUDetails.State {
 			thumbnailURL: stakeUnitResource.resource.metadata.iconURL,
 			validatorNameViewState: .init(with: validator),
 			redeemableTokenAmount: [.init(
-				id: stakeUnitResource.resource.resourceAddress, // FIXME: IS THIS CORRECT
+				id: stakeUnitResource.resource.resourceAddress,
 				xrdAmount: xrdRedemptionValue.formatted()
 			)],
 			resourceDetails: .init(
@@ -99,6 +99,11 @@ extension PoolUnitResourceView.ViewState {
 		xrdAmount: String,
 		isSelected: Bool? = nil
 	) {
-		self.init(id: id, symbol: Constants.xrdTokenName, icon: .xrd, amount: xrdAmount)
+		self.init(
+			id: id,
+			symbol: Constants.xrdTokenName,
+			icon: .xrd,
+			amount: xrdAmount
+		)
 	}
 }
