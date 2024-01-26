@@ -509,6 +509,7 @@ struct ExpandableTransactionHeading: View {
 				Spacer(minLength: 0)
 			}
 		}
+		.padding(.trailing, .huge2) // padding from the vertical dotted line
 	}
 }
 
