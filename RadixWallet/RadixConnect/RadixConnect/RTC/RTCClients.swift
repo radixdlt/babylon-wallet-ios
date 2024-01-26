@@ -410,7 +410,9 @@ extension RTCClient {
 func decode(
 	_ messageResult: Result<DataChannelClient.AssembledMessage, Error>
 ) -> Result<P2P.RTCMessageFromPeer, Error> {
-	let jsonDecoder = JSONDecoder()
+	@Dependency(\.jsonDecoder) var jsonDecoderDep
+	let jsonDecoder = jsonDecoderDep()
+
 	return messageResult.flatMap { (message: DataChannelClient.AssembledMessage) in
 		let jsonData = message.messageContent
 		do {
