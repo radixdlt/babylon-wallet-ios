@@ -190,7 +190,7 @@ extension TransactionClient {
 
 // MARK: - ManifestReviewRequest
 public struct ManifestReviewRequest: Sendable {
-	public let manifestToSign: RawTransactionManifest
+	public let unvalidatedManifest: UnvalidatedTransactionManifest
 	public let message: Message
 	public let nonce: Nonce
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
@@ -199,7 +199,7 @@ public struct ManifestReviewRequest: Sendable {
 	public let isWalletTransaction: Bool
 
 	public init(
-		manifestToSign: RawTransactionManifest,
+		unvalidatedManifest: UnvalidatedTransactionManifest,
 		message: Message,
 		nonce: Nonce,
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
@@ -207,7 +207,7 @@ public struct ManifestReviewRequest: Sendable {
 		signingPurpose: SigningPurpose,
 		isWalletTransaction: Bool
 	) {
-		self.manifestToSign = manifestToSign
+		self.unvalidatedManifest = unvalidatedManifest
 		self.message = message
 		self.nonce = nonce
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput

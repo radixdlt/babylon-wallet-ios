@@ -160,7 +160,7 @@ extension TransactionClient {
 		let getTransactionReview: GetTransactionReview = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 
-			let manifestToSign = try request.manifestToSign.transactionManifest(onNetwork: networkID)
+			let manifestToSign = try request.unvalidatedManifest.transactionManifest(onNetwork: networkID)
 
 			/// Get all transaction signers.
 			let transactionSigners = try await getTransactionSigners(.init(

@@ -1,5 +1,5 @@
-// MARK: - RawTransactionManifest
-public struct RawTransactionManifest: Sendable, Hashable {
+// MARK: - UnvalidatedTransactionManifest
+public struct UnvalidatedTransactionManifest: Sendable, Hashable {
 	public let transactionManifestString: String
 	public let blobsBytes: [Data]
 
@@ -26,17 +26,17 @@ public struct RawTransactionManifest: Sendable, Hashable {
 // MARK: - P2P.Dapp.Request.SendTransactionItem
 extension P2P.Dapp.Request {
 	public struct SendTransactionItem: Sendable, Hashable, Decodable {
-		public let rawTransactionManifest: RawTransactionManifest
+		public let unvalidatedManifest: UnvalidatedTransactionManifest
 		public let version: TXVersion
 		public let message: String?
 
 		public init(
 			version: TXVersion,
-			rawTransactionManifest: RawTransactionManifest,
+			unvalidatedManifest: UnvalidatedTransactionManifest,
 			message: String?
 		) {
 			self.version = version
-			self.rawTransactionManifest = rawTransactionManifest
+			self.unvalidatedManifest = unvalidatedManifest
 			self.message = message
 		}
 
@@ -47,7 +47,7 @@ extension P2P.Dapp.Request {
 		) throws {
 			try self.init(
 				version: version,
-				rawTransactionManifest: .init(
+				unvalidatedManifest: .init(
 					transactionManifestString: transactionManifest.instructions().asStr(),
 					blobsBytes: transactionManifest.blobs()
 				),
@@ -71,7 +71,7 @@ extension P2P.Dapp.Request {
 
 			try self.init(
 				version: container.decode(TXVersion.self, forKey: .version),
-				rawTransactionManifest: .init(transactionManifestString: manifestString, blobsBytes: blobsBytes),
+				unvalidatedManifest: .init(transactionManifestString: manifestString, blobsBytes: blobsBytes),
 				message: container.decodeIfPresent(String.self, forKey: .message)
 			)
 		}

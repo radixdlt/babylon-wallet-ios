@@ -7,7 +7,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var displayMode: DisplayMode = .review
 
 		public let nonce: Nonce
-		public let rawTransactionManifest: RawTransactionManifest
+		public let unvalidatedManifest: UnvalidatedTransactionManifest
 		public let message: Message
 		public let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
 		public let waitsForTransactionToBeComitted: Bool
@@ -67,7 +67,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 
 		public init(
-			rawTransactionManifest: RawTransactionManifest,
+			unvalidatedManifest: UnvalidatedTransactionManifest,
 			nonce: Nonce,
 			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
 			message: Message,
@@ -77,7 +77,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			proposingDappMetadata: DappMetadata.Ledger?
 		) {
 			self.nonce = nonce
-			self.rawTransactionManifest = rawTransactionManifest
+			self.unvalidatedManifest = unvalidatedManifest
 			self.signTransactionPurpose = signTransactionPurpose
 			self.message = message
 			self.ephemeralNotaryPrivateKey = ephemeralNotaryPrivateKey
@@ -234,7 +234,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .run { [state = state] send in
 				let preview = await TaskResult {
 					try await transactionClient.getTransactionReview(.init(
-						manifestToSign: state.rawTransactionManifest,
+						unvalidatedManifest: state.unvalidatedManifest,
 						message: state.message,
 						nonce: state.nonce,
 						ephemeralNotaryPublicKey: state.ephemeralNotaryPrivateKey.publicKey,
