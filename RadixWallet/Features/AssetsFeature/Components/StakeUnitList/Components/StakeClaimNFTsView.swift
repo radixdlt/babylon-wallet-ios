@@ -118,6 +118,7 @@ public struct StakeClaimNFTSView: View {
 					}
 				}
 				.padding(.small1)
+				.background(.white)
 				.roundedCorners(strokeColor: .app.gray3)
 			}
 		}

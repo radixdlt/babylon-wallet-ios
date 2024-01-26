@@ -41,6 +41,7 @@ public struct LiquidStakeUnitView: View {
 					}
 				}
 				.padding(.small1)
+				.background(.white)
 				.roundedCorners(strokeColor: .app.gray3)
 			}
 		}

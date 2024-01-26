@@ -17,18 +17,19 @@ struct ValidatorStakeView: View {
 
 	let viewState: ViewState
 	@State var isExpanded: Bool = false
-	var onLiquidStakeUnitTapped: () -> Void
-	var onStakeClaimTokenTapped: (OnLedgerEntitiesClient.StakeClaim) -> Void
-	var onClaimAllStakeClaimsTapped: () -> Void
+	let onLiquidStakeUnitTapped: () -> Void
+	let onStakeClaimTokenTapped: (OnLedgerEntitiesClient.StakeClaim) -> Void
+	let onClaimAllStakeClaimsTapped: () -> Void
 
 	public var body: some SwiftUI.View {
-		ValidatorHeaderView(viewState: viewState.validatorNameViewState)
-			.contentShape(Rectangle())
-			.rowStyle()
-			.padding(.medium1)
-			.onTapGesture {
-				isExpanded.toggle()
-			}
+		Button {
+			isExpanded.toggle()
+		} label: {
+			ValidatorHeaderView(viewState: viewState.validatorNameViewState)
+				.contentShape(Rectangle())
+				.rowStyle()
+				.padding(.medium1)
+		}
 
 		if isExpanded {
 			if let liquidStakeUnitViewState = viewState.liquidStakeUnit {
