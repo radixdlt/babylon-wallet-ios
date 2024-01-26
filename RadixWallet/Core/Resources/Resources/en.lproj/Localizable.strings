@@ -449,7 +449,7 @@
 "transactionStatus_failed_text" = "Your transaction was processed, but had a problem that caused it to fail permanently";
 "transactionStatus_error_text" = "This transaction was rejected and is unlikely to be processed, but could potentially be processed within the next %@ minutes. It is likely that the dApp you are using proposed a transaction that includes an action that is not currently valid.";
 "transactionStatus_rejected_text" = "Your transaction was improperly constructed and cannot be processed";
-"transactionStatus_failure_title" = "Something went wrong";
+"transactionStatus_failure_title" = "Something Went Wrong";
 "transactionStatus_failure_text" = "Transaction was rejected as invalid by the Radix Network.";
 "transactionStatus_dismissDialog_message" = "Stop waiting for transaction result? The transaction will not be canceled.";
 "transactionStatus_dismissalDisabledDialog_title" = "Dismiss";
@@ -492,7 +492,7 @@
 "common_pool" = "Pool";
 "common_retry" = "Retry";
 "common_remove" = "Remove";
-"common_somethingWentWrong" = "Something went wrong";
+"common_somethingWentWrong" = "Something Went Wrong";
 "common_systemSettings" = "Settings";
 "common_confirm" = "Confirm";
 "common_save" = "Save";
