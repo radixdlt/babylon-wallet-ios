@@ -148,6 +148,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case poolUnitDetails(PoolUnitDetails.State)
 			case lsuDetails(LSUDetails.State)
 			case unknownDappComponents(UnknownDappComponents.State)
+			case rawTransactionAlert(AlertState<Action.RawTransactionAlert>)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -161,6 +162,11 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case lsuDetails(LSUDetails.Action)
 			case poolUnitDetails(PoolUnitDetails.Action)
 			case unknownDappComponents(UnknownDappComponents.Action)
+			case rawTransactionAlert(RawTransactionAlert)
+
+			public enum RawTransactionAlert: Sendable, Equatable {
+				case continueTapped
+			}
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -439,6 +445,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .updateSections(sections):
 			guard let sections else {
+				state.destination = .rawTransactionAlert(.rawTransaction)
 				return showRawTransaction(&state)
 			}
 
@@ -594,6 +601,20 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 
 		return .none
+	}
+}
+
+extension AlertState<TransactionReview.Destination.Action.RawTransactionAlert> {
+	static var rawTransaction: AlertState {
+		AlertState {
+			TextState(L10n.TransactionReview.NonConformingManifestWarning.title)
+		} actions: {
+			ButtonState(action: .continueTapped) {
+				TextState(L10n.Common.continue)
+			}
+		} message: {
+			TextState(L10n.TransactionReview.NonConformingManifestWarning.message)
+		}
 	}
 }
 
