@@ -70,10 +70,6 @@ public struct PoolUnitView: View {
 			.background(backgroundColor)
 			.padding(.medium1)
 		}
-		// .contentShape(Rectangle())
-//		.onTapGesture {
-//
-//		}
 	}
 }
 
