@@ -415,6 +415,31 @@ extension OnLedgerEntitiesClient {
 		return true // It is a pool unit resource address
 	}
 
+	public func isStakeClaimNFT(_ resource: OnLedgerEntity.Resource) async -> OnLedgerEntity.Validator? {
+		guard let validatorAddress = resource.metadata.validator else {
+			return nil // no declared pool unit
+		}
+
+		let validator = try? await getEntity(
+			validatorAddress.asGeneral,
+			metadataKeys: .poolUnitMetadataKeys,
+			cachingStrategy: .useCache,
+			atLedgerState: resource.atLedgerState
+		).validator
+
+		guard let validator else {
+			return nil
+		}
+
+		guard validator.stakeClaimFungibleResourceAddress == resource.resourceAddress else {
+			return nil
+		}
+
+		return validator
+	}
+}
+
+extension OnLedgerEntitiesClient {
 	public func getPoolUnitDetails(_ poolUnitResource: OnLedgerEntity.Resource, forAmount amount: RETDecimal) async throws -> OwnedResourcePoolDetails? {
 		guard let poolAddress = poolUnitResource.metadata.poolUnit?.asGeneral else {
 			return nil
@@ -449,55 +474,103 @@ extension OnLedgerEntitiesClient {
 			return nil
 		}
 
-		var nonXrdResourceDetails: [ResourceWithVaultAmount] = []
+		let poolUnitResource = ResourceWithVaultAmount(resource: poolUnitResource, amount: amount)
+
+		return await populatePoolDetails(pool, allResources, poolUnitResource)
+	}
+
+	// TODO: This function should be uniffied with `getPoolUnitDetails` for a single pool unit resource.
+	/// This loads all of the related pool unit details required by the Pool units screen.
+	/// We don't do any pagination there(yet), since the number of owned pools will not be big, this can be revised in the future.
+	@Sendable
+	public func getOwnedPoolUnitsDetails(
+		_ account: OnLedgerEntity.Account,
+		cachingStrategy: CachingStrategy = .useCache
+	) async throws -> [OwnedResourcePoolDetails] {
+		let ownedPoolUnits = account.poolUnitResources.poolUnits
+		let pools = try await getEntities(
+			ownedPoolUnits.map(\.resourcePoolAddress.asGeneral),
+			[.dappDefinition],
+			account.atLedgerState,
+			cachingStrategy
+		).compactMap(\.resourcePool)
+
+		var allResourceAddresses: [ResourceAddress] = []
+		for pool in pools {
+			allResourceAddresses.append(pool.poolUnitResourceAddress)
+			allResourceAddresses += pool.resources.nonXrdResources.map(\.resourceAddress)
+			if let xrdResource = pool.resources.xrdResource {
+				allResourceAddresses.append(xrdResource.resourceAddress)
+			}
+		}
+
+		let allResources = try await getResources(
+			allResourceAddresses,
+			cachingStrategy: cachingStrategy,
+			atLedgerState: account.atLedgerState
+		).asIdentifiable()
+
+		return await ownedPoolUnits.asyncCompactMap { ownedPoolUnit -> OwnedResourcePoolDetails? in
+			guard let pool = pools.first(where: { $0.address == ownedPoolUnit.resourcePoolAddress }) else {
+				assertionFailure("Did not load pool details")
+				return nil
+			}
+			guard let poolUnitResourcee = allResources.first(where: { $0.resourceAddress == pool.poolUnitResourceAddress }) else {
+				assertionFailure("Did not load poolUnitResource details")
+				return nil
+			}
+
+			let poolUnitResource = ResourceWithVaultAmount(resource: poolUnitResourcee, amount: ownedPoolUnit.resource.amount)
+
+			return await populatePoolDetails(pool, allResources, poolUnitResource)
+		}
+	}
+
+	private func populatePoolDetails(
+		_ pool: OnLedgerEntity.ResourcePool,
+		_ allResources: IdentifiedArray<ResourceAddress, OnLedgerEntity.Resource>,
+		_ poolUnitResource: OnLedgerEntitiesClient.ResourceWithVaultAmount
+	) async -> OnLedgerEntitiesClient.OwnedResourcePoolDetails? {
+		var nonXrdResourceDetails: [OwnedResourcePoolDetails.ResourceWithRedemptionValue] = []
 
 		for resource in pool.resources.nonXrdResources {
 			guard let resourceDetails = allResources[id: resource.resourceAddress] else {
 				assertionFailure("Did not load resource details")
 				return nil
 			}
-			nonXrdResourceDetails.append(.init(resource: resourceDetails, amount: resource.amount))
+
+			nonXrdResourceDetails.append(.init(
+				resource: resourceDetails,
+				redemptionValue: resourceDetails.poolRedemptionValue(for: resource.amount, poolUnitResource: poolUnitResource)
+			))
 		}
 
-		let xrdResourceDetails: ResourceWithVaultAmount?
+		let xrdResourceDetails: OwnedResourcePoolDetails.ResourceWithRedemptionValue?
 		if let xrdResource = pool.resources.xrdResource {
 			guard let details = allResources[id: xrdResource.resourceAddress] else {
 				assertionFailure("Did not load xrd resource details")
 				return nil
 			}
-			xrdResourceDetails = .init(resource: details, amount: xrdResource.amount)
+			xrdResourceDetails = .init(
+				resource: details,
+				redemptionValue: details.poolRedemptionValue(for: xrdResource.amount, poolUnitResource: poolUnitResource)
+			)
 		} else {
 			xrdResourceDetails = nil
 		}
 
+		let dAppName: String? = if let dAppDefinition = pool.metadata.dappDefinition {
+			try? await getDappMetadata(dAppDefinition, validatingDappEntity: pool.address.asGeneral).name
+		} else {
+			nil
+		}
+
 		return .init(
 			address: pool.address,
-			poolUnitResource: .init(resource: poolUnitResource, amount: amount),
+			dAppName: dAppName,
+			poolUnitResource: poolUnitResource,
 			xrdResource: xrdResourceDetails,
 			nonXrdResources: nonXrdResourceDetails
 		)
-	}
-
-	public func isStakeClaimNFT(_ resource: OnLedgerEntity.Resource) async -> OnLedgerEntity.Validator? {
-		guard let validatorAddress = resource.metadata.validator else {
-			return nil // no declared pool unit
-		}
-
-		let validator = try? await getEntity(
-			validatorAddress.asGeneral,
-			metadataKeys: .poolUnitMetadataKeys,
-			cachingStrategy: .useCache,
-			atLedgerState: resource.atLedgerState
-		).validator
-
-		guard let validator else {
-			return nil
-		}
-
-		guard validator.stakeClaimFungibleResourceAddress == resource.resourceAddress else {
-			return nil
-		}
-
-		return validator
 	}
 }

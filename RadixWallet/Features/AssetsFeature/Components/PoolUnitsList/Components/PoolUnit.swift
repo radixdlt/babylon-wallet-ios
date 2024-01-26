@@ -69,7 +69,7 @@ public struct PoolUnit: Sendable, FeatureReducer {
 				state.isSelected?.toggle()
 			} else {
 				state.destination = .details(
-					.init(poolUnit: state.poolUnit, resourcesDetails: details)
+					.init(resourcesDetails: details)
 				)
 			}
 

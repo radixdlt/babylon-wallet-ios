@@ -588,20 +588,35 @@ extension OnLedgerEntity.Account {
 	}
 }
 
-extension OnLedgerEntitiesClient.ResourceWithVaultAmount {
-	func poolRedemptionValue(for poolUnitsAmount: RETDecimal, poolUnitResource: OnLedgerEntity.Resource) -> String {
-		guard let poolUnitTotalSupply = poolUnitResource.totalSupply else {
-			loggerGlobal.error("Missing total supply for \(poolUnitResource.resourceAddress.address)")
-			return L10n.Account.PoolUnits.noTotalSupply
+extension OnLedgerEntity.Resource {
+	func poolRedemptionValue(
+		for amount: RETDecimal,
+		poolUnitResource: OnLedgerEntitiesClient.ResourceWithVaultAmount
+	) -> RETDecimal? {
+		guard let poolUnitTotalSupply = poolUnitResource.resource.totalSupply else {
+			loggerGlobal.error("Missing total supply for \(poolUnitResource.resource.resourceAddress.address)")
+			return nil
 		}
 		guard poolUnitTotalSupply > 0 else {
-			loggerGlobal.error("Total supply is 0 for \(poolUnitResource.resourceAddress.address)")
-			return L10n.Account.PoolUnits.noTotalSupply
+			loggerGlobal.error("Total supply is 0 for \(poolUnitResource.resource.resourceAddress.address)")
+			return nil
 		}
-		let redemptionValue = poolUnitsAmount * (amount / poolUnitTotalSupply)
-		let decimalPlaces = resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
+		let redemptionValue = poolUnitResource.amount * (amount / poolUnitTotalSupply)
+		let decimalPlaces = divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
 		let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
 
-		return roundedRedemptionValue.formatted()
+		return roundedRedemptionValue
+	}
+}
+
+extension OnLedgerEntity.Resource {
+	public var fungibleResourceName: String? {
+		metadata.fungibleResourceName
+	}
+}
+
+extension OnLedgerEntity.Metadata {
+	public var fungibleResourceName: String? {
+		name ?? symbol
 	}
 }

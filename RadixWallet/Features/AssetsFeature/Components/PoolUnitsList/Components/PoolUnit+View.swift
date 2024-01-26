@@ -2,13 +2,9 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - PoolUnit.View
+// TODO: This should go away, by removing the TCA stack for Pool Unit, instead PoolUnitView should be used directly.
 extension PoolUnit {
-	public struct ViewState: Equatable {
-		let iconURL: URL?
-		let name: String
-		let resources: Loadable<NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>>>
-		let isSelected: Bool?
-	}
+	public typealias ViewState = PoolUnitView.ViewState
 
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<PoolUnit>
@@ -21,27 +17,13 @@ extension PoolUnit {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: PoolUnit.Action.view) { viewStore in
 				Section {
-					VStack(spacing: .large2) {
-						PoolUnitHeaderView(viewState: .init(iconURL: viewStore.iconURL)) {
-							Text(viewStore.name)
-								.foregroundColor(.app.gray1)
-								.textStyle(.secondaryHeader)
+					PoolUnitView(
+						viewState: viewStore.state,
+						backgroundColor: .app.white,
+						onTap: {
+							viewStore.send(.didTap)
 						}
-						.padding(-.small3)
-						loadable(viewStore.resources) { resources in
-							HStack {
-								PoolUnitResourcesView(resources: resources)
-									.padding(-.small2)
-
-								if let isSelected = viewStore.isSelected {
-									CheckmarkView(appearance: .dark, isChecked: isSelected)
-								}
-							}
-							.onTapGesture { viewStore.send(.didTap) }
-						}
-					}
-					.padding(.medium1)
-					.background(.app.white)
+					)
 					.rowStyle()
 				}
 			}
@@ -53,41 +35,39 @@ extension PoolUnit {
 extension PoolUnit.State {
 	var viewState: PoolUnit.ViewState {
 		.init(
-			iconURL: poolUnit.resource.metadata.iconURL,
-			name: poolUnit.resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName,
+			poolName: poolUnit.resource.metadata.fungibleResourceName,
+			dAppName: resourceDetails.dAppName,
+			poolIcon: poolUnit.resource.metadata.iconURL,
 			resources: resourceDetails.map { details in
-				PoolUnitResourceViewState.viewStates(amount: poolUnit.resource.amount, resourcesDetails: details)
+				PoolUnitResourceView.ViewState.viewStates(resourcesDetails: details)
 			},
 			isSelected: isSelected
 		)
 	}
 }
 
-extension PoolUnitResourceViewState {
+extension PoolUnitResourceView.ViewState {
 	static func viewStates(
-		amount: RETDecimal,
 		resourcesDetails: OnLedgerEntitiesClient.OwnedResourcePoolDetails
-	) -> NonEmpty<IdentifiedArrayOf<PoolUnitResourceViewState>> {
+	) -> [PoolUnitResourceView.ViewState] {
 		let xrdResourceViewState = resourcesDetails.xrdResource.map {
-			PoolUnitResourceViewState(
+			PoolUnitResourceView.ViewState(
 				id: $0.resource.resourceAddress,
-				thumbnail: .xrd,
 				symbol: Constants.xrdTokenName,
-				tokenAmount: $0.poolRedemptionValue(for: amount, poolUnitResource: resourcesDetails.poolUnitResource.resource)
+				icon: .xrd,
+				amount: $0.redemptionValue
 			)
 		}
 		let nonXrdResources = resourcesDetails.nonXrdResources.map { resourceDetails in
-			PoolUnitResourceViewState(
+			PoolUnitResourceView.ViewState(
 				id: resourceDetails.resource.resourceAddress,
-				thumbnail: .known(resourceDetails.resource.metadata.iconURL),
 				symbol: resourceDetails.resource.metadata.symbol ?? resourceDetails.resource.metadata.name ?? L10n.Account.PoolUnits.unknownSymbolName,
-				tokenAmount: resourceDetails.poolRedemptionValue(for: amount, poolUnitResource: resourcesDetails.poolUnitResource.resource)
+				icon: .known(resourceDetails.resource.metadata.iconURL),
+				amount: resourceDetails.redemptionValue
 			)
 		}
 
-		return .init(
-			rawValue: (xrdResourceViewState.map { [$0] } ?? []) + nonXrdResources
-		)! // Safe to unwrap, guaranteed to not be empty
+		return (xrdResourceViewState.map { [$0] } ?? []) + nonXrdResources
 	}
 }
 

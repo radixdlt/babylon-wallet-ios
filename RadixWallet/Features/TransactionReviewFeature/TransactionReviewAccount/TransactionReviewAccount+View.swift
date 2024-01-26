@@ -107,9 +107,15 @@ struct TransactionReviewResourceView: View {
 				onTap(nil)
 			})
 		case let .poolUnit(details):
-			TransferPoolUnitView(viewState: .init(resource: transfer.resource, details: details), onTap: {
-				onTap(nil)
-			})
+			PoolUnitView(
+				viewState: .init(
+					details: details.details
+				),
+				backgroundColor: .app.gray5,
+				onTap: {
+					onTap(nil)
+				}
+			)
 		case let .stakeClaimNFT(details):
 			StakeClaimNFTSView(
 				viewState: details,
@@ -144,22 +150,36 @@ extension TransferNFTView.ViewState {
 	}
 }
 
-extension TransferPoolUnitView.ViewState {
-	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.PoolUnit) {
+extension PoolUnitView.ViewState {
+	init(details: OnLedgerEntitiesClient.OwnedResourcePoolDetails) {
 		self.init(
-			poolName: resource.title,
-			resources: details.resources.map(TransferPoolUnitResourceView.ViewState.init)
+			poolName: details.poolUnitResource.resource.fungibleResourceName,
+			dAppName: .success(details.dAppName),
+			poolIcon: details.poolUnitResource.resource.metadata.iconURL,
+			resources: {
+				let xrdResource = details.xrdResource.map {
+					PoolUnitResourceView.ViewState(resourceWithRedemptionValue: $0, isXRD: true)
+				}
+				.asArray(\.self)
+
+				let nonXrdResources = details.nonXrdResources.map {
+					PoolUnitResourceView.ViewState(resourceWithRedemptionValue: $0, isXRD: false)
+				}
+
+				return .success(xrdResource + nonXrdResources)
+			}(),
+			isSelected: nil
 		)
 	}
 }
 
-extension TransferPoolUnitResourceView.ViewState {
-	init(resource: TransactionReview.Transfer.Details.PoolUnit.Resource) {
+extension PoolUnitResourceView.ViewState {
+	init(resourceWithRedemptionValue: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
 		self.init(
-			id: resource.id,
-			symbol: resource.symbol,
-			icon: resource.isXRD ? .xrd : .known(resource.icon),
-			amount: resource.amount
+			id: resourceWithRedemptionValue.resource.id,
+			symbol: resourceWithRedemptionValue.resource.metadata.symbol,
+			icon: isXRD ? .xrd : .known(resourceWithRedemptionValue.resource.metadata.iconURL),
+			amount: resourceWithRedemptionValue.redemptionValue
 		)
 	}
 }

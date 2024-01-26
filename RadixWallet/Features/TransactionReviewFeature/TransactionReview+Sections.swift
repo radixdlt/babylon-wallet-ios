@@ -4,6 +4,7 @@ extension TransactionReview {
 	// Either the resource from ledger or metadata extracted from the TX manifest
 	typealias ResourceInfo = Either<OnLedgerEntity.Resource, OnLedgerEntity.Metadata>
 	typealias ResourcesInfo = [ResourceAddress: ResourceInfo]
+	typealias ResourceAssociatedDapps = [ResourceAddress: OnLedgerEntity.Metadata]
 
 	public struct Sections: Sendable, Hashable {
 		var withdrawals: TransactionReviewAccounts.State? = nil
@@ -90,17 +91,22 @@ extension TransactionReview {
 			let allAddresses = allAddresses + resourceAddresses.asIdentifiable()
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 
+			let dApps = await extractDappEntities(poolAddresses)
+
+			let perPoolUnitDapps = perPoolUnitDapps(dApps, poolInteractions: poolContributions)
+
+			// Extract Contributing to Pools section
+			let pools: TransactionReviewPools.State? = try await extractDapps(dApps, unknownTitle: L10n.TransactionReview.unknownPools)
+
 			// Extract Withdrawals section
 			let withdrawals = try await extractWithdrawals(
 				accountWithdraws: summary.accountWithdraws,
 				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
 				entities: resourcesInfo,
+				resourceAssociatedDapps: perPoolUnitDapps,
 				userAccounts: userAccounts,
 				networkID: networkID
 			)
-
-			// Extract Contributing to Pools section
-			let pools: TransactionReviewPools.State? = try await extractDapps(poolAddresses, unknownTitle: L10n.TransactionReview.unknownPools)
 
 			// Extract Deposits section, passing in poolcontributions so that pool units can be updated
 			let deposits = try await extractDeposits(
@@ -108,6 +114,7 @@ extension TransactionReview {
 				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
 				poolContributions: poolContributions.aggregated,
 				entities: resourcesInfo,
+				resourceAssociatedDapps: perPoolUnitDapps,
 				userAccounts: userAccounts,
 				networkID: networkID
 			)
@@ -127,24 +134,30 @@ extension TransactionReview {
 			let allAddresses = allAddresses + resourceAddresses.asIdentifiable()
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 
+			let dApps = await extractDappEntities(poolAddresses)
+
+			let perPoolUnitDapps = perPoolUnitDapps(dApps, poolInteractions: poolRedemptions)
+
+			// Extract Contributing to Pools section
+			let pools: TransactionReviewPools.State? = try await extractDapps(dApps, unknownTitle: L10n.TransactionReview.unknownPools)
+
 			// Extract Withdrawals section, passing in poolRedemptions so that withdrawn pool units can be updated
 			let withdrawals = try await extractWithdrawals(
 				accountWithdraws: summary.accountWithdraws,
 				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
 				poolRedemptions: poolRedemptions.aggregated,
 				entities: resourcesInfo,
+				resourceAssociatedDapps: perPoolUnitDapps,
 				userAccounts: userAccounts,
 				networkID: networkID
 			)
-
-			// Extract Redeeming from Pools section
-			let pools: TransactionReviewPools.State? = try await extractDapps(poolAddresses, unknownTitle: L10n.TransactionReview.unknownPools)
 
 			// Extract Deposits section
 			let deposits = try await extractDeposits(
 				accountDeposits: summary.accountDeposits,
 				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
 				entities: resourcesInfo,
+				resourceAssociatedDapps: perPoolUnitDapps,
 				userAccounts: userAccounts,
 				networkID: networkID
 			)
@@ -251,16 +264,27 @@ extension TransactionReview {
 		_ addresses: [EngineToolkit.Address],
 		unknownTitle: (Int) -> String
 	) async throws -> TransactionReviewDapps<Kind>.State? {
-		let dApps = await addresses.asyncMap {
-			await (address: $0, entity: try? extractDappEntity($0.asSpecific()))
-		}
-		let knownDapps = dApps.compactMap(\.entity).asIdentifiable()
-		let unknownDapps = try dApps.filter { $0.entity == nil }
+		let dApps = await extractDappEntities(addresses)
+		return try await extractDapps(dApps, unknownTitle: unknownTitle)
+	}
+
+	private func extractDapps<Kind: SpecificEntityType>(
+		_ dAppEntities: [(address: EngineToolkit.Address, entity: DappEntity?)],
+		unknownTitle: (Int) -> String
+	) async throws -> TransactionReviewDapps<Kind>.State? {
+		let knownDapps = dAppEntities.compactMap(\.entity).asIdentifiable()
+		let unknownDapps = try dAppEntities.filter { $0.entity == nil }
 			.map { try $0.address.asSpecific() as SpecificAddress<Kind> }.asIdentifiable()
 
 		guard knownDapps.count + unknownDapps.count > 0 else { return nil }
 
 		return .init(knownDapps: knownDapps, unknownDapps: unknownDapps, unknownTitle: unknownTitle)
+	}
+
+	private func extractDappEntities(_ addresses: [EngineToolkit.Address]) async -> [(address: EngineToolkit.Address, entity: DappEntity?)] {
+		await addresses.asyncMap {
+			await (address: $0, entity: try? extractDappEntity($0.asSpecific()))
+		}
 	}
 
 	private func extractDappEntity(_ entity: Address) async throws -> DappEntity {
@@ -291,6 +315,7 @@ extension TransactionReview {
 		newlyCreatedNonFungibles: [NonFungibleGlobalId] = [],
 		poolRedemptions: [TrackedPoolRedemption] = [],
 		entities: ResourcesInfo = [:],
+		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
@@ -304,6 +329,7 @@ extension TransactionReview {
 					newlyCreatedNonFungibles: newlyCreatedNonFungibles,
 					poolInteractions: poolRedemptions,
 					entities: entities,
+					resourceAssociatedDapps: resourceAssociatedDapps,
 					networkID: networkID,
 					type: .exact
 				)
@@ -326,6 +352,7 @@ extension TransactionReview {
 		newlyCreatedNonFungibles: [NonFungibleGlobalId] = [],
 		poolContributions: [TrackedPoolContribution] = [],
 		entities: ResourcesInfo = [:],
+		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
@@ -341,6 +368,7 @@ extension TransactionReview {
 					newlyCreatedNonFungibles: newlyCreatedNonFungibles,
 					poolInteractions: poolContributions,
 					entities: entities,
+					resourceAssociatedDapps: resourceAssociatedDapps,
 					networkID: networkID,
 					type: $0.transferType,
 					defaultDepositGuarantee: defaultDepositGuarantee
@@ -429,6 +457,26 @@ extension TransactionReview {
 
 		return DepositExceptionsState(changes: IdentifiedArray(uncheckedUniqueElements: exceptionChanges))
 	}
+
+	private func perPoolUnitDapps(
+		_ dappEntities: [(address: EngineToolkit.Address, entity: TransactionReview.DappEntity?)],
+		poolInteractions: [some TrackedPoolInteraction]
+	) -> ResourceAssociatedDapps {
+		Dictionary(uniqueKeysWithValues: dappEntities.compactMap { data -> (ResourceAddress, OnLedgerEntity.Metadata)? in
+			let poolUnitResource: ResourceAddress? = try? poolInteractions
+				.first(where: { $0.poolAddress == data.address })?
+				.poolUnitsResourceAddress
+				.asSpecific()
+
+			guard let poolUnitResource,
+			      let dAppMetadata = data.entity?.metadata
+			else {
+				return nil
+			}
+
+			return (poolUnitResource, dAppMetadata)
+		})
+	}
 }
 
 extension TransactionReview {
@@ -444,6 +492,7 @@ extension TransactionReview {
 		newlyCreatedNonFungibles: [NonFungibleGlobalId] = [],
 		poolInteractions: [some TrackedPoolInteraction] = [],
 		entities: ResourcesInfo = [:],
+		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
 		type: TransferType,
 		defaultDepositGuarantee: RETDecimal = 1
@@ -463,6 +512,7 @@ extension TransactionReview {
 					resourceQuantifier: source,
 					poolContributions: poolInteractions,
 					entities: entities,
+					resourceAssociatedDapps: resourceAssociatedDapps,
 					networkID: networkID,
 					defaultDepositGuarantee: defaultDepositGuarantee
 				)
@@ -498,6 +548,7 @@ extension TransactionReview {
 		resourceQuantifier: FungibleResourceIndicator,
 		poolContributions: [some TrackedPoolInteraction] = [],
 		entities: ResourcesInfo = [:],
+		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
 		defaultDepositGuarantee: RETDecimal = 1
 	) async throws -> [Transfer] {
@@ -522,6 +573,7 @@ extension TransactionReview {
 				amount: amount,
 				poolContributions: poolContributions,
 				entities: entities,
+				resourceAssociatedDapps: resourceAssociatedDapps,
 				networkID: networkID,
 				guarantee: guarantee
 			)
@@ -616,6 +668,7 @@ extension TransactionReview {
 		amount: RETDecimal,
 		poolContributions: [some TrackedPoolInteraction] = [],
 		entities: ResourcesInfo = [:],
+		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
 		guarantee: TransactionClient.Guarantee?
 	) async throws -> [Transfer] {
@@ -624,28 +677,37 @@ extension TransactionReview {
 		if let poolContribution = try poolContributions.first(where: { try $0.poolUnitsResourceAddress.asSpecific() == resourceAddress }) {
 			// If this transfer does not contain all the pool units, scale the resource amounts pro rata
 			let adjustmentFactor = amount != poolContribution.poolUnitsAmount ? (amount / poolContribution.poolUnitsAmount) : 1
-
-			let resources = try poolContribution.resourcesInInteraction.map { resourceAddress, resourceAmount in
+			var xrdResource: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue?
+			var nonXrdResources: [OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue] = []
+			for (resourceAddress, resourceAmount) in poolContribution.resourcesInInteraction {
 				let address = try ResourceAddress(validatingAddress: resourceAddress)
 
 				guard let entity = entities[address] else {
 					throw ResourceEntityNotFound(address: resourceAddress)
 				}
 
-				return Transfer.Details.PoolUnit.Resource(
-					isXRD: address.isXRD(on: networkID),
-					symbol: entity.metadata.symbol,
-					address: address,
-					icon: entity.metadata.iconURL,
-					amount: (resourceAmount * adjustmentFactor).formatted()
+				let resource = OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue(
+					resource: .init(resourceAddress: address, metadata: entity.metadata),
+					redemptionValue: resourceAmount * adjustmentFactor
 				)
+
+				if address.isXRD(on: networkID) {
+					xrdResource = resource
+				} else {
+					nonXrdResources.append(resource)
+				}
 			}
 
-			return [.init(
+			return try [.init(
 				resource: resource,
 				details: .poolUnit(.init(
-					poolName: resource.title,
-					resources: resources,
+					details: .init(
+						address: poolContribution.poolAddress.asSpecific(),
+						dAppName: resourceAssociatedDapps?[resourceAddress]?.name,
+						poolUnitResource: .init(resource: resource, amount: amount),
+						xrdResource: xrdResource,
+						nonXrdResources: nonXrdResources
+					),
 					guarantee: guarantee
 				))
 			)]
@@ -654,22 +716,10 @@ extension TransactionReview {
 				throw FailedToGetPoolUnitDetails()
 			}
 
-			let allResources = details.xrdResource.asArray(\.self) + details.nonXrdResources
-
-			let poolUnitResources = allResources.map {
-				TransactionReview.Transfer.Details.PoolUnit.Resource(
-					isXRD: $0.resource.resourceAddress.isXRD(on: networkID),
-					symbol: $0.resource.metadata.symbol,
-					address: $0.resource.resourceAddress,
-					icon: $0.resource.metadata.iconURL,
-					amount: $0.poolRedemptionValue(for: amount, poolUnitResource: resource)
-				)
-			}
 			return [.init(
 				resource: resource,
 				details: .poolUnit(.init(
-					poolName: resource.title,
-					resources: poolUnitResources,
+					details: details,
 					guarantee: guarantee
 				))
 			)]

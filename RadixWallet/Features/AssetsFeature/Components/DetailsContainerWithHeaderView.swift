@@ -9,11 +9,11 @@ struct DetailsContainerWithHeaderViewState: Equatable {
 }
 
 extension DetailsContainerWithHeaderViewState {
-	init(resource: OnLedgerEntity.OwnedFungibleResource) {
+	init(_ resourceWithAmount: OnLedgerEntitiesClient.ResourceWithVaultAmount) {
 		self.init(
-			title: .success(resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName),
-			amount: resource.amount.formatted(),
-			symbol: .success(resource.metadata.symbol)
+			title: .success(resourceWithAmount.resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName),
+			amount: resourceWithAmount.amount.formatted(),
+			symbol: .success(resourceWithAmount.resource.metadata.symbol)
 		)
 	}
 }
