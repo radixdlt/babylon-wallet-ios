@@ -177,6 +177,9 @@ extension NonFungibleTokenDetails {
 				} else {
 					EmptyView()
 				}
+
+			case let .instant(date):
+				KeyValueView(key: field.name, value: date.formatted())
 			}
 		}
 	}
@@ -211,6 +214,7 @@ extension NonFungibleTokenDetails.ViewState.TokenDetails {
 			case decimal(RETDecimal)
 			case `enum`(variant: String)
 			case id(NonFungibleLocalId)
+			case instant(Date)
 		}
 
 		public let kind: Kind
@@ -279,9 +283,23 @@ private extension String {
 			}
 		}
 	}
+
+	var asInstantDataField: ArbitraryDataFieldKind? {
+		nilIfEmpty.map {
+			if let timeInterval = Int64($0) {
+				.instant(Date(timeIntervalSince1970: TimeInterval(timeInterval)))
+			} else {
+				.primitive(self)
+			}
+		}
+	}
 }
 
 private extension GatewayAPI.ProgrammaticScryptoSborValue {
+	enum TypeName: String {
+		case instant = "Instant"
+	}
+
 	var fieldKind: ArbitraryDataFieldKind? {
 		switch self {
 		case .array, .map, .mapEntry, .tuple:
@@ -298,7 +316,11 @@ private extension GatewayAPI.ProgrammaticScryptoSborValue {
 		case let .i32(content):
 			content.value.asPrimitiveDataField
 		case let .i64(content):
-			content.value.asPrimitiveDataField
+			if content.typeName == TypeName.instant.rawValue {
+				content.value.asInstantDataField
+			} else {
+				content.value.asPrimitiveDataField
+			}
 		case let .i128(content):
 			content.value.asPrimitiveDataField
 		case let .u8(content):
