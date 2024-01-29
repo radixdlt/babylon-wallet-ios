@@ -20,8 +20,12 @@ extension P2P {
 
 // MARK: - RadixConnectClient
 public struct RadixConnectClient: DependencyKey, Sendable {
+	/// Connects to the p2p links stored in the current profile
 	public var loadFromProfileAndConnectAll: LoadFromProfileAndConnectAll
 	public var disconnectAll: DisconnectAll
+
+	/// Connects to a given list of p2p links
+	public var connectToP2PLinks: ConnectToP2PLinks
 
 	public var getLocalNetworkAccess: GetLocalNetworkAccess
 
@@ -60,4 +64,6 @@ extension RadixConnectClient {
 	public typealias SendRequest = @Sendable (_ request: P2P.RTCOutgoingMessage.Request, _ sendStrategy: P2P.RTCOutgoingMessage.Request.SendStrategy) async throws -> Int
 
 	public typealias SendResponse = @Sendable (_ response: P2P.RTCOutgoingMessage.Response, _ origin: P2P.RTCRoute) async throws -> Void
+
+	public typealias ConnectToP2PLinks = @Sendable (P2PLinks) async throws -> Void
 }
