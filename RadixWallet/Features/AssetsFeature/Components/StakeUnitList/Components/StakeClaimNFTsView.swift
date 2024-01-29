@@ -4,6 +4,7 @@ public struct StakeClaimNFTSView: View {
 		public let canClaimTokens: Bool
 		public let validatorName: String?
 		public let stakeClaimTokens: OnLedgerEntitiesClient.NonFunbileResourceWithTokens
+
 		var selectedStakeClaims: IdentifiedArrayOf<NonFungibleGlobalId>?
 
 		var unstaking: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim> {
@@ -42,11 +43,18 @@ public struct StakeClaimNFTSView: View {
 	}
 
 	public let viewState: ViewState
+	public let backgroundColor: Color
 	public let onTap: (OnLedgerEntitiesClient.StakeClaim) -> Void
 	public let onClaimAllTapped: (() -> Void)?
 
-	public init(viewState: ViewState, onTap: @escaping (OnLedgerEntitiesClient.StakeClaim) -> Void, onClaimAllTapped: (() -> Void)? = nil) {
+	public init(
+		viewState: ViewState,
+		backgroundColor: Color,
+		onTap: @escaping (OnLedgerEntitiesClient.StakeClaim) -> Void,
+		onClaimAllTapped: (() -> Void)? = nil
+	) {
 		self.viewState = viewState
+		self.backgroundColor = backgroundColor
 		self.onTap = onTap
 		self.onClaimAllTapped = onClaimAllTapped
 	}
@@ -111,19 +119,20 @@ public struct StakeClaimNFTSView: View {
 				}
 			}
 			ForEach(claims) { claim in
-				HStack {
-					Button {
-						onTap(claim)
-					} label: {
+				Button {
+					onTap(claim)
+				} label: {
+					HStack {
 						TokenBalanceView.xrd(balance: claim.claimAmount)
 							.contentShape(Rectangle())
-					}
-					if let isSelected = viewState.selectedStakeClaims?.contains(claim.id) {
-						CheckmarkView(appearance: .dark, isChecked: isSelected)
+						if let isSelected = viewState.selectedStakeClaims?.contains(claim.id) {
+							CheckmarkView(appearance: .dark, isChecked: isSelected)
+						}
 					}
 				}
+				.buttonStyle(.borderless)
 				.padding(.small1)
-				.background(.white)
+				.background(backgroundColor)
 				.roundedCorners(strokeColor: .app.gray3)
 			}
 		}
