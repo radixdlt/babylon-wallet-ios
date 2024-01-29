@@ -37,15 +37,6 @@ extension RadixConnectClient {
 				}
 				return await getP2PLinksWithConnectionStatusUpdates()
 			},
-			disconnectAndRemoveAll: {
-				loggerGlobal.info("🔌 Disconnecting and removing all P2P connections")
-				await rtcClients.disconnectAndRemoveAll()
-				do {
-					try await p2pLinksClient.deleteAllP2PLinks()
-				} catch {
-					loggerGlobal.error("Failed to delete P2PLinks -> \(error)")
-				}
-			},
 			disconnectAll: {
 				loggerGlobal.info("🔌 Disconnecting all P2P connections")
 				await rtcClients.disconnectAndRemoveAll()

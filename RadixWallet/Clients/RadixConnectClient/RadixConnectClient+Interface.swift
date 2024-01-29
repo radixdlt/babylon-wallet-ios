@@ -21,7 +21,6 @@ extension P2P {
 // MARK: - RadixConnectClient
 public struct RadixConnectClient: DependencyKey, Sendable {
 	public var loadFromProfileAndConnectAll: LoadFromProfileAndConnectAll
-	public var disconnectAndRemoveAll: DisconnectAndRemoveAll
 	public var disconnectAll: DisconnectAll
 
 	public var getLocalNetworkAccess: GetLocalNetworkAccess
@@ -43,7 +42,6 @@ extension RadixConnectClient {
 	// Returns an async sequence of connection events
 	public typealias LoadFromProfileAndConnectAll = @Sendable () async -> AnyAsyncSequence<[P2P.LinkConnectionUpdate]>
 
-	public typealias DisconnectAndRemoveAll = @Sendable () async -> Void
 	public typealias DisconnectAll = @Sendable () async -> Void
 
 	public typealias GetLocalNetworkAccess = @Sendable () async -> Bool
