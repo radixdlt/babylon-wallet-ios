@@ -10,7 +10,7 @@ public struct Home: Sendable, FeatureReducer {
 		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State> = []
 		public var shouldWriteDownPersonasSeedPhrase: Bool = false
 
-		public var showRadixBanner: Bool = true // false
+		public var showRadixBanner: Bool = false
 
 		// MARK: - Destination
 		@PresentationState
@@ -116,7 +116,7 @@ public struct Home: Sendable, FeatureReducer {
 			return .none
 
 		case .task:
-			state.showRadixBanner = true // userDefaults.showRadixBanner
+			state.showRadixBanner = userDefaults.showRadixBanner
 
 			return .run { send in
 				for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
