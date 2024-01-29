@@ -858,8 +858,8 @@ public enum L10n {
     /// Account
     public static let account = L10n.tr("Localizable", "common_account", fallback: "Account")
     /// Bad HTTP response status code %d
-    public static func badHttpStatusResponseCode(_ p1: Int) -> String {
-      return L10n.tr("Localizable", "common_badHttpStatusResponseCode", p1, fallback: "Bad HTTP response status code %d")
+    public static func badHttpResponseStatusCode(_ p1: Int) -> String {
+      return L10n.tr("Localizable", "common_badHttpResponseStatusCode", p1, fallback: "Bad HTTP response status code %d")
     }
     /// Cancel
     public static let cancel = L10n.tr("Localizable", "common_cancel", fallback: "Cancel")

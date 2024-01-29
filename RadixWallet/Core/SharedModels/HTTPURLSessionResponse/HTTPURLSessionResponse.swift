@@ -18,7 +18,7 @@ public struct BadHTTPResponseCode: LocalizedError {
 		case 429:
 			L10n.Common.rateLimitReached
 		default:
-			L10n.Common.badHttpStatusResponseCode(got)
+			L10n.Common.badHttpResponseStatusCode(got)
 		}
 	}
 }
