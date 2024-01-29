@@ -2385,6 +2385,8 @@ public enum L10n {
   public enum TransactionReview {
     /// Approve
     public static let approveButtonTitle = L10n.tr("Localizable", "transactionReview_approveButtonTitle", fallback: "Approve")
+    /// Claim from validators
+    public static let claimFromValidatorsHeading = L10n.tr("Localizable", "transactionReview_claimFromValidatorsHeading", fallback: "Claim from validators")
     /// Customize Guarantees
     public static let customizeGuaranteesButtonTitle = L10n.tr("Localizable", "transactionReview_customizeGuaranteesButtonTitle", fallback: "Customize Guarantees")
     /// Depositing To
@@ -2403,6 +2405,8 @@ public enum L10n {
     public static let messageHeading = L10n.tr("Localizable", "transactionReview_messageHeading", fallback: "Message")
     /// Contributing to pools
     public static let poolContributionHeading = L10n.tr("Localizable", "transactionReview_poolContributionHeading", fallback: "Contributing to pools")
+    /// Unknown pool
+    public static let poolNameUnknown = L10n.tr("Localizable", "transactionReview_poolNameUnknown", fallback: "Unknown pool")
     /// Redeeming from pools
     public static let poolRedemptionHeading = L10n.tr("Localizable", "transactionReview_poolRedemptionHeading", fallback: "Redeeming from pools")
     /// Pool Units
@@ -2419,14 +2423,16 @@ public enum L10n {
     public static let sendingToHeading = L10n.tr("Localizable", "transactionReview_sendingToHeading", fallback: "Sending to")
     /// Slide to Sign
     public static let slideToSign = L10n.tr("Localizable", "transactionReview_slideToSign", fallback: "Slide to Sign")
+    /// Staking to Validators
+    public static let stakingToValidatorsHeading = L10n.tr("Localizable", "transactionReview_stakingToValidatorsHeading", fallback: "Staking to Validators")
     /// Third-party deposit exceptions
     public static let thirdPartyDepositExceptionsHeading = L10n.tr("Localizable", "transactionReview_thirdPartyDepositExceptionsHeading", fallback: "Third-party deposit exceptions")
     /// Third-party deposit setting
     public static let thirdPartyDepositSettingHeading = L10n.tr("Localizable", "transactionReview_thirdPartyDepositSettingHeading", fallback: "Third-party deposit setting")
     /// Review Your Transaction
     public static let title = L10n.tr("Localizable", "transactionReview_title", fallback: "Review Your Transaction")
-    /// TO BE CLAIMED
-    public static let toBeClaimed = L10n.tr("Localizable", "transactionReview_toBeClaimed", fallback: "TO BE CLAIMED")
+    /// To be claimed
+    public static let toBeClaimed = L10n.tr("Localizable", "transactionReview_toBeClaimed", fallback: "To be claimed")
     /// Review Your Transfer
     public static let transferTitle = L10n.tr("Localizable", "transactionReview_transferTitle", fallback: "Review Your Transfer")
     /// Unknown
@@ -2441,12 +2447,14 @@ public enum L10n {
     }
     /// Unnamed dApp
     public static let unnamedDapp = L10n.tr("Localizable", "transactionReview_unnamedDapp", fallback: "Unnamed dApp")
+    /// Requesting unstake from validators
+    public static let unstakingFromValidatorsHeading = L10n.tr("Localizable", "transactionReview_unstakingFromValidatorsHeading", fallback: "Requesting unstake from validators")
     /// Using dApps
     public static let usingDappsHeading = L10n.tr("Localizable", "transactionReview_usingDappsHeading", fallback: "Using dApps")
     /// Withdrawing From
     public static let withdrawalsHeading = L10n.tr("Localizable", "transactionReview_withdrawalsHeading", fallback: "Withdrawing From")
-    /// WORTH
-    public static let worth = L10n.tr("Localizable", "transactionReview_worth", fallback: "WORTH")
+    /// Worth
+    public static let worth = L10n.tr("Localizable", "transactionReview_worth", fallback: "Worth")
     /// %@ XRD
     public static func xrdAmount(_ p1: Any) -> String {
       return L10n.tr("Localizable", "transactionReview_xrdAmount", String(describing: p1), fallback: "%@ XRD")
@@ -2499,9 +2507,11 @@ public enum L10n {
       /// Could Not Complete
       public static let title = L10n.tr("Localizable", "transactionReview_noMnemonicError_title", fallback: "Could Not Complete")
     }
-    public enum PoolName {
-      /// Unknown pool
-      public static let unknown = L10n.tr("Localizable", "transactionReview_poolName_unknown", fallback: "Unknown pool")
+    public enum NonConformingManifestWarning {
+      /// This is a complex transaction that cannot be summarized - the raw transaction manifest will be shown. Do not submit unless you understand the contents.
+      public static let message = L10n.tr("Localizable", "transactionReview_nonConformingManifestWarning_message", fallback: "This is a complex transaction that cannot be summarized - the raw transaction manifest will be shown. Do not submit unless you understand the contents.")
+      /// Warning
+      public static let title = L10n.tr("Localizable", "transactionReview_nonConformingManifestWarning_title", fallback: "Warning")
     }
     public enum PrepareForSigning {
       /// Preparing transaction for signing
@@ -2531,14 +2541,6 @@ public enum L10n {
       /// A proposed transaction was rejected because it contains one or more reserved instructions.
       public static let rejected = L10n.tr("Localizable", "transactionReview_unacceptableManifest_rejected", fallback: "A proposed transaction was rejected because it contains one or more reserved instructions.")
     }
-    public enum Validators {
-      /// Claim from validators
-      public static let claim = L10n.tr("Localizable", "transactionReview_validators_claim", fallback: "Claim from validators")
-      /// Staking to Validators
-      public static let stake = L10n.tr("Localizable", "transactionReview_validators_stake", fallback: "Staking to Validators")
-      /// Requesting unstake from validators
-      public static let unstake = L10n.tr("Localizable", "transactionReview_validators_unstake", fallback: "Requesting unstake from validators")
-    }
   }
   public enum TransactionSigning {
     /// Incoming Transaction
@@ -2566,9 +2568,9 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "transactionStatus_dismissalDisabledDialog_title", fallback: "Dismiss")
     }
     public enum Error {
-      /// Your transaction could not be processed, but could potentially still be processed within the next %@ minutes
+      /// This transaction was rejected and is unlikely to be processed, but could potentially be processed within the next %@ minutes. It is likely that the dApp you are using proposed a transaction that includes an action that is not currently valid.
       public static func text(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "transactionStatus_error_text", String(describing: p1), fallback: "Your transaction could not be processed, but could potentially still be processed within the next %@ minutes")
+        return L10n.tr("Localizable", "transactionStatus_error_text", String(describing: p1), fallback: "This transaction was rejected and is unlikely to be processed, but could potentially be processed within the next %@ minutes. It is likely that the dApp you are using proposed a transaction that includes an action that is not currently valid.")
       }
       /// Transaction Error
       public static let title = L10n.tr("Localizable", "transactionStatus_error_title", fallback: "Transaction Error")

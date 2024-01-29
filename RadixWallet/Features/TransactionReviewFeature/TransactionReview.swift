@@ -24,6 +24,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		public var redeemingFromPools: TransactionReviewPools.State? = nil
 		public var deposits: TransactionReviewAccounts.State? = nil
 
+		public var stakingToValidators: ValidatorsState? = nil
+		public var unstakingFromValidators: ValidatorsState? = nil
+
 		public var accountDepositSetting: DepositSettingState? = nil
 		public var accountDepositExceptions: DepositExceptionsState? = nil
 
@@ -102,6 +105,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case showRawTransactionTapped
 		case expandContributingToPoolsTapped
 		case expandRedeemingFromPoolsTapped
+		case expandStakingToValidatorsTapped
+		case expandUnstakingFromValidatorsTapped
 		case expandUsingDappsTapped
 		case approvalSliderSlid
 	}
@@ -141,7 +146,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case fungibleTokenDetails(FungibleTokenDetails.State)
 			case nonFungibleTokenDetails(NonFungibleTokenDetails.State)
 			case poolUnitDetails(PoolUnitDetails.State)
+			case lsuDetails(LSUDetails.State)
 			case unknownDappComponents(UnknownDappComponents.State)
+			case rawTransactionAlert(AlertState<Action.RawTransactionAlert>)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -152,8 +159,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case customizeFees(CustomizeFees.Action)
 			case fungibleTokenDetails(FungibleTokenDetails.Action)
 			case nonFungibleTokenDetails(NonFungibleTokenDetails.Action)
+			case lsuDetails(LSUDetails.Action)
 			case poolUnitDetails(PoolUnitDetails.Action)
 			case unknownDappComponents(UnknownDappComponents.Action)
+			case rawTransactionAlert(RawTransactionAlert)
+
+			public enum RawTransactionAlert: Sendable, Equatable {
+				case continueTapped
+			}
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -180,6 +193,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.poolUnitDetails, action: /Action.poolUnitDetails) {
 				PoolUnitDetails()
+			}
+			Scope(state: /State.lsuDetails, action: /Action.lsuDetails) {
+				LSUDetails()
 			}
 			Scope(state: /State.unknownDappComponents, action: /Action.unknownDappComponents) {
 				UnknownDappComponents()
@@ -262,6 +278,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.redeemingFromPools?.isExpanded.toggle()
 			return .none
 
+		case .expandStakingToValidatorsTapped:
+			state.stakingToValidators?.isExpanded.toggle()
+			return .none
+
+		case .expandUnstakingFromValidatorsTapped:
+			state.unstakingFromValidators?.isExpanded.toggle()
+			return .none
+
 		case .expandUsingDappsTapped:
 			state.dAppsUsed?.isExpanded.toggle()
 			return .none
@@ -321,6 +345,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 						isXRD: details.isXRD
 					)
 				)
+
 			case let .nonFungible(details):
 				state.destination = .nonFungibleTokenDetails(.init(
 					resourceAddress: transfer.resource.resourceAddress,
@@ -328,6 +353,16 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					token: details,
 					ledgerState: transfer.resource.atLedgerState
 				))
+
+			case let .liquidStakeUnit(details):
+				state.destination = .lsuDetails(.init(
+					validator: details.validator,
+					stakeUnitResource: .init(resource: details.resource, amount: details.amount),
+					xrdRedemptionValue: details.worth
+				))
+
+				return .none
+
 			case let .poolUnit(details):
 				state.destination = .poolUnitDetails(.init(resourcesDetails: details.details))
 
@@ -410,6 +445,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case let .updateSections(sections):
 			guard let sections else {
+				state.destination = .rawTransactionAlert(.rawTransaction)
 				return showRawTransaction(&state)
 			}
 
@@ -417,6 +453,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.dAppsUsed = sections.dAppsUsed
 			state.contributingToPools = sections.contributingToPools
 			state.redeemingFromPools = sections.redeemingFromPools
+			state.stakingToValidators = sections.stakingToValidators
+			state.unstakingFromValidators = sections.unstakingFromValidators
 			state.deposits = sections.deposits
 			state.accountDepositSetting = sections.accountDepositSetting
 			state.accountDepositExceptions = sections.accountDepositExceptions
@@ -563,6 +601,20 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		}
 
 		return .none
+	}
+}
+
+extension AlertState<TransactionReview.Destination.Action.RawTransactionAlert> {
+	static var rawTransaction: AlertState {
+		AlertState {
+			TextState(L10n.TransactionReview.NonConformingManifestWarning.title)
+		} actions: {
+			ButtonState(action: .continueTapped) {
+				TextState(L10n.Common.continue)
+			}
+		} message: {
+			TextState(L10n.TransactionReview.NonConformingManifestWarning.message)
+		}
 	}
 }
 
@@ -791,6 +843,7 @@ extension TransactionReview {
 			case fungible(Fungible)
 			case nonFungible(NonFungible)
 			case poolUnit(PoolUnit)
+			case liquidStakeUnit(LiquidStakeUnit)
 			case stakeClaimNFT(StakeClaimNFT)
 
 			public struct Fungible: Sendable, Hashable {
@@ -802,18 +855,17 @@ extension TransactionReview {
 			public typealias NonFungible = OnLedgerEntity.NonFungibleToken
 			public typealias StakeClaimNFT = StakeClaimNFTSView.ViewState
 
+			public struct LiquidStakeUnit: Sendable, Hashable {
+				public let resource: OnLedgerEntity.Resource
+				public let amount: RETDecimal
+				public let worth: RETDecimal
+				public let validator: OnLedgerEntity.Validator
+				public let guarantee: TransactionClient.Guarantee?
+			}
+
 			public struct PoolUnit: Sendable, Hashable {
 				public let details: OnLedgerEntitiesClient.OwnedResourcePoolDetails
 				public var guarantee: TransactionClient.Guarantee?
-
-				public struct Resource: Identifiable, Sendable, Hashable {
-					public var id: ResourceAddress { address }
-					public let isXRD: Bool
-					public let symbol: String?
-					public let address: ResourceAddress
-					public let icon: URL?
-					public var amount: String
-				}
 			}
 		}
 

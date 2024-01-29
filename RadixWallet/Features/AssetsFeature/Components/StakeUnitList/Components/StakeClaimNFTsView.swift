@@ -40,9 +40,15 @@ public struct StakeClaimNFTSView: View {
 		case readyToBeClaimed
 	}
 
-	public var viewState: ViewState
+	public let viewState: ViewState
 	public let onTap: (OnLedgerEntitiesClient.StakeClaim) -> Void
-	public let onClaimAllTapped: () -> Void
+	public let onClaimAllTapped: (() -> Void)?
+
+	public init(viewState: ViewState, onTap: @escaping (OnLedgerEntitiesClient.StakeClaim) -> Void, onClaimAllTapped: (() -> Void)? = nil) {
+		self.viewState = viewState
+		self.onTap = onTap
+		self.onClaimAllTapped = onClaimAllTapped
+	}
 
 	public var body: some View {
 		VStack(alignment: .leading, spacing: .small1) {
@@ -89,27 +95,31 @@ public struct StakeClaimNFTSView: View {
 				Spacer()
 
 				if case .readyToBeClaimed = kind, viewState.canClaimTokens {
-					Text(L10n.Account.Staking.claim).onTapGesture {
-						onClaimAllTapped()
+					let label = Text(L10n.Account.Staking.claim)
+						.textStyle(.body2Link)
+						.foregroundColor(.app.blue1)
+					if let onClaimAllTapped {
+						Button(action: onClaimAllTapped) { label }
+					} else {
+						label
 					}
-					.textStyle(.body2Link)
-					.foregroundColor(.app.blue1)
 				}
 			}
 			ForEach(claims) { claim in
 				HStack {
-					TokenBalanceView.xrd(balance: claim.claimAmount)
-
+					Button {
+						onTap(claim)
+					} label: {
+						TokenBalanceView.xrd(balance: claim.claimAmount)
+							.contentShape(Rectangle())
+					}
 					if let isSelected = viewState.selectedStakeClaims?.contains(claim.id) {
 						CheckmarkView(appearance: .dark, isChecked: isSelected)
 					}
 				}
 				.padding(.small1)
+				.background(.white)
 				.roundedCorners(strokeColor: .app.gray3)
-				.contentShape(Rectangle())
-				.onTapGesture {
-					onTap(claim)
-				}
 			}
 		}
 	}

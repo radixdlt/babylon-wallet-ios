@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - Home
 public struct Home: Sendable, FeatureReducer {
-	public static let radixBannerURL = URL(string: "https://wallet.radixdlt.com/?collapseStepOne")!
+	public static let radixBannerURL = URL(string: "https://wallet.radixdlt.com/?wallet=downloaded")!
 
 	public struct State: Sendable, Hashable {
 		// MARK: - Components

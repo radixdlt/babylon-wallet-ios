@@ -14,6 +14,9 @@ extension TransactionReview {
 		var contributingToPools: TransactionReviewPools.State? = nil
 		var redeemingFromPools: TransactionReviewPools.State? = nil
 
+		var stakingToValidators: ValidatorsState? = nil
+		var unstakingFromValidators: ValidatorsState? = nil
+
 		var accountDepositSetting: DepositSettingState? = nil
 		var accountDepositExceptions: DepositExceptionsState? = nil
 
@@ -54,7 +57,7 @@ extension TransactionReview {
 			return nil
 		case .general, .transfer:
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
-			let withdrawals = try? await extractWithdrawals(
+			let withdrawals = try await extractWithdrawals(
 				accountWithdraws: summary.accountWithdraws,
 				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
 				entities: resourcesInfo,
@@ -65,7 +68,7 @@ extension TransactionReview {
 			let dAppAddresses = summary.encounteredEntities.filter { $0.entityType() == .globalGenericComponent }
 			let dAppsUsed: TransactionReviewDappsUsed.State? = try await extractDapps(dAppAddresses, unknownTitle: L10n.TransactionReview.unknownComponents)
 
-			let deposits = try? await extractDeposits(
+			let deposits = try await extractDeposits(
 				accountDeposits: summary.accountDeposits,
 				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
 				entities: resourcesInfo,
@@ -73,7 +76,7 @@ extension TransactionReview {
 				networkID: networkID
 			)
 
-			let proofs = try? await exctractProofs(summary.presentedProofs)
+			let proofs = try await exctractProofs(summary.presentedProofs)
 
 			return Sections(
 				withdrawals: withdrawals,
@@ -169,10 +172,64 @@ extension TransactionReview {
 			)
 
 		case let .validatorStake(validatorAddresses: validatorAddresses, validatorStakes: validatorStakes):
-			return nil
+			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
+
+			let withdrawals = try await extractWithdrawals(
+				accountWithdraws: summary.accountWithdraws,
+				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+				entities: resourcesInfo,
+				userAccounts: userAccounts,
+				networkID: networkID
+			)
+
+			// Extract validators
+			let stakingToValidators = try await extractValidators(for: validatorAddresses)
+
+			// Extract Deposits section
+			let deposits = try await extractDeposits(
+				accountDeposits: summary.accountDeposits,
+				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+				validatorStakes: validatorStakes.aggregated,
+				entities: resourcesInfo,
+				userAccounts: userAccounts,
+				networkID: networkID
+			)
+
+			return Sections(
+				withdrawals: withdrawals,
+				deposits: deposits,
+				stakingToValidators: stakingToValidators
+			)
 
 		case let .validatorUnstake(validatorAddresses, validatorUnstakes, claimsNonFungibleData):
-			return nil
+			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
+
+			let withdrawals = try await extractWithdrawals(
+				accountWithdraws: summary.accountWithdraws,
+				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+				entities: resourcesInfo,
+				userAccounts: userAccounts,
+				networkID: networkID
+			)
+
+			// Extract validators
+			let unstakingFromValidators = try await extractValidators(for: validatorAddresses)
+
+			// Extract Deposits section
+			let deposits = try await extractDeposits(
+				accountDeposits: summary.accountDeposits,
+				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+				unstakeData: claimsNonFungibleData,
+				entities: resourcesInfo,
+				userAccounts: userAccounts,
+				networkID: networkID
+			)
+
+			return Sections(
+				withdrawals: withdrawals,
+				deposits: deposits,
+				unstakingFromValidators: unstakingFromValidators
+			)
 
 		case let .validatorClaim(validatorAddresses, validatorClaims):
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
@@ -246,7 +303,7 @@ extension TransactionReview {
 
 		return allAddress
 			.compactMap {
-				try? AccountAddress(validatingAddress: $0.addressString())
+				try? $0.asSpecific()
 			}
 			.map { (address: AccountAddress) in
 				let userAccount = userAccounts.first { userAccount in
@@ -351,6 +408,8 @@ extension TransactionReview {
 		accountDeposits: [String: [ResourceIndicator]],
 		newlyCreatedNonFungibles: [NonFungibleGlobalId] = [],
 		poolContributions: [TrackedPoolContribution] = [],
+		validatorStakes: [TrackedValidatorStake] = [],
+		unstakeData: [UnstakeDataEntry] = [],
 		entities: ResourcesInfo = [:],
 		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		userAccounts: [Account],
@@ -367,6 +426,8 @@ extension TransactionReview {
 					resourceQuantifier: $0,
 					newlyCreatedNonFungibles: newlyCreatedNonFungibles,
 					poolInteractions: poolContributions,
+					validatorStakes: validatorStakes,
+					unstakeData: unstakeData,
 					entities: entities,
 					resourceAssociatedDapps: resourceAssociatedDapps,
 					networkID: networkID,
@@ -387,6 +448,29 @@ extension TransactionReview {
 
 		let requiresGuarantees = !depositAccounts.customizableGuarantees.isEmpty
 		return .init(accounts: depositAccounts, enableCustomizeGuarantees: requiresGuarantees)
+	}
+
+	func extractValidators(for addresses: [EngineToolkit.Address]) async throws -> ValidatorsState? {
+		guard !addresses.isEmpty else { return nil }
+
+		let generalAddresses = try addresses.map { try $0.asGeneral() }
+
+		let validators = try await onLedgerEntitiesClient.getEntities(addresses: generalAddresses, metadataKeys: .resourceMetadataKeys)
+			.compactMap { entity -> ValidatorState? in
+				guard let validator = entity.validator else { return nil }
+				return .init(
+					address: validator.address,
+					name: validator.metadata.name,
+					thumbnail: validator.metadata.iconURL
+				)
+			}
+
+		guard validators.count == addresses.count else {
+			struct FailedToExtractValidatorInformation: Error {}
+			throw FailedToExtractValidatorInformation()
+		}
+
+		return .init(validators: validators)
 	}
 
 	func extractAccountDepositSetting(
@@ -486,11 +570,18 @@ extension TransactionReview {
 
 	struct FailedToGetDataForAllNFTs: Error {}
 	struct FailedToGetPoolUnitDetails: Error {}
+	struct StakeUnitAddressMismatch: Error {}
+	struct MissingTrackedValidatorStake: Error {}
+	struct MissingPositiveTotalSupply: Error {}
+	struct InvalidStakeClaimToken: Error {}
+	struct MissingStakeClaimTokenData: Error {}
 
 	func transferInfo(
 		resourceQuantifier: ResourceIndicator,
 		newlyCreatedNonFungibles: [NonFungibleGlobalId] = [],
 		poolInteractions: [some TrackedPoolInteraction] = [],
+		validatorStakes: [TrackedValidatorStake] = [],
+		unstakeData: [UnstakeDataEntry] = [],
 		entities: ResourcesInfo = [:],
 		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
@@ -511,6 +602,7 @@ extension TransactionReview {
 					resource,
 					resourceQuantifier: source,
 					poolContributions: poolInteractions,
+					validatorStakes: validatorStakes,
 					entities: entities,
 					resourceAssociatedDapps: resourceAssociatedDapps,
 					networkID: networkID,
@@ -538,6 +630,7 @@ extension TransactionReview {
 				resourceInfo,
 				resourceAddress: resourceAddress,
 				resourceQuantifier: indicator,
+				unstakeData: unstakeData,
 				newlyCreatedNonFungibles: newlyCreatedNonFungibles
 			)
 		}
@@ -547,6 +640,7 @@ extension TransactionReview {
 		_ resource: OnLedgerEntity.Resource,
 		resourceQuantifier: FungibleResourceIndicator,
 		poolContributions: [some TrackedPoolInteraction] = [],
+		validatorStakes: [TrackedValidatorStake] = [],
 		entities: ResourcesInfo = [:],
 		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
@@ -579,6 +673,17 @@ extension TransactionReview {
 			)
 		}
 
+		// Check if the fungible resource is an LSU
+		if let validator = await onLedgerEntitiesClient.isLiquidStakeUnit(resource) {
+			return try await liquidStakeUnitTransfer(
+				resource,
+				amount: amount,
+				validator: validator,
+				validatorStakes: validatorStakes,
+				guarantee: guarantee
+			)
+		}
+
 		// Normal fungible resource
 		let isXRD = resourceAddress.isXRD(on: networkID)
 		let details: Transfer.Details.Fungible = .init(
@@ -594,6 +699,7 @@ extension TransactionReview {
 		_ resourceInfo: ResourceInfo,
 		resourceAddress: ResourceAddress,
 		resourceQuantifier: NonFungibleResourceIndicator,
+		unstakeData: [UnstakeDataEntry] = [],
 		newlyCreatedNonFungibles: [NonFungibleGlobalId] = []
 	) async throws -> [Transfer] {
 		let ids = resourceQuantifier.ids
@@ -625,11 +731,11 @@ extension TransactionReview {
 				}
 			)) + newTokens
 
-			let stakeClaimValidator = await onLedgerEntitiesClient.isStakeClaimNFT(resource)
-			if let stakeClaimValidator {
+			if let stakeClaimValidator = await onLedgerEntitiesClient.isStakeClaimNFT(resource) {
 				result = try stakeClaimTransfer(
 					resource,
 					stakeClaimValidator: stakeClaimValidator,
+					unstakeData: unstakeData,
 					tokens: tokens
 				)
 			} else {
@@ -661,6 +767,47 @@ extension TransactionReview {
 		}
 
 		return result
+	}
+
+	private func liquidStakeUnitTransfer(
+		_ resource: OnLedgerEntity.Resource,
+		amount: RETDecimal,
+		validator: OnLedgerEntity.Validator,
+		validatorStakes: [TrackedValidatorStake] = [],
+		guarantee: TransactionClient.Guarantee?
+	) async throws -> [Transfer] {
+		let worth: RETDecimal
+		if !validatorStakes.isEmpty {
+			if let stake = try validatorStakes.first(where: { try $0.validatorAddress.asSpecific() == validator.address }) {
+				guard try stake.liquidStakeUnitAddress.asSpecific() == validator.stakeUnitResourceAddress else {
+					throw StakeUnitAddressMismatch()
+				}
+				// Distribute the worth in proportion to the amounts, if needed
+				if stake.liquidStakeUnitAmount == amount {
+					worth = stake.xrdAmount
+				} else {
+					worth = (amount / stake.liquidStakeUnitAmount) * stake.xrdAmount
+				}
+			} else {
+				throw MissingTrackedValidatorStake()
+			}
+		} else {
+			guard let totalSupply = resource.totalSupply, totalSupply.isPositive() else {
+				throw MissingPositiveTotalSupply()
+			}
+
+			worth = amount * validator.xrdVaultBalance / totalSupply
+		}
+
+		let details = Transfer.Details.LiquidStakeUnit(
+			resource: resource,
+			amount: amount,
+			worth: worth,
+			validator: validator,
+			guarantee: guarantee
+		)
+
+		return [.init(resource: resource, details: .liquidStakeUnit(details))]
 	}
 
 	private func poolUnitTransfer(
@@ -729,20 +876,34 @@ extension TransactionReview {
 	private func stakeClaimTransfer(
 		_ resource: OnLedgerEntity.Resource,
 		stakeClaimValidator: OnLedgerEntity.Validator,
+		unstakeData: [UnstakeDataEntry],
 		tokens: [OnLedgerEntity.NonFungibleToken]
 	) throws -> [Transfer] {
-		struct InvalidStakeClaimToken: Error {}
+		let stakeClaimTokens: [OnLedgerEntitiesClient.StakeClaim] = if !unstakeData.isEmpty {
+			try tokens.map { token in
+				guard let data = unstakeData.first(where: { $0.nonFungibleGlobalId == token.id })?.data else {
+					throw MissingStakeClaimTokenData()
+				}
 
-		let stakeClaimTokens = try tokens.map { token in
-			guard let data = token.data, let claimAmount = data.claimAmount else {
-				throw InvalidStakeClaimToken()
+				return OnLedgerEntitiesClient.StakeClaim(
+					validatorAddress: stakeClaimValidator.address,
+					token: token,
+					claimAmount: data.claimAmount,
+					reamainingEpochsUntilClaim: nil
+				)
 			}
-			return OnLedgerEntitiesClient.StakeClaim(
-				validatorAddress: stakeClaimValidator.address,
-				token: token,
-				claimAmount: claimAmount,
-				reamainingEpochsUntilClaim: data.claimEpoch.map { Int($0) - Int(resource.atLedgerState.epoch) }
-			)
+		} else {
+			try tokens.map { token in
+				guard let data = token.data, let claimAmount = data.claimAmount else {
+					throw InvalidStakeClaimToken()
+				}
+				return OnLedgerEntitiesClient.StakeClaim(
+					validatorAddress: stakeClaimValidator.address,
+					token: token,
+					claimAmount: claimAmount,
+					reamainingEpochsUntilClaim: data.claimEpoch.map { Int($0) - Int(resource.atLedgerState.epoch) }
+				)
+			}
 		}
 
 		return [.init(

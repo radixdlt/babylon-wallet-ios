@@ -68,6 +68,7 @@ extension AssetsView {
 						}
 					}
 				}
+				.buttonStyle(.plain)
 				.scrollContentBackground(.hidden)
 				.listStyle(.insetGrouped)
 				.padding(.top, .zero)
