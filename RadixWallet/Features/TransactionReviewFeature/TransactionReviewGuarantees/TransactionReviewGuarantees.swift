@@ -92,6 +92,8 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 			self.resource = transfer.resource
 			self.details = details
 			self.percentageStepper = .init(value: 100 * guarantee.amount / details.amount)
+
+			updateAmount()
 		}
 	}
 
@@ -115,19 +117,22 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .percentageStepper(.delegate(.valueChanged)):
-			guard let value = state.percentageStepper.value else {
-				return .none
-			}
-
-			let newMinimumDecimal = value * 0.01
-			let divisibility = state.resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
-			let newAmount = (newMinimumDecimal * state.details.amount).rounded(decimalPlaces: divisibility)
-			state.details.guarantee?.amount = newAmount
-
+			state.updateAmount()
 			return .none
 
 		case .percentageStepper:
 			return .none
 		}
+	}
+}
+
+extension TransactionReviewGuarantee.State {
+	mutating func updateAmount() {
+		guard let value = percentageStepper.value else { return }
+
+		let newMinimumDecimal = value * 0.01
+		let divisibility = resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
+		let newAmount = (newMinimumDecimal * details.amount).rounded(decimalPlaces: divisibility)
+		details.guarantee?.amount = newAmount
 	}
 }
