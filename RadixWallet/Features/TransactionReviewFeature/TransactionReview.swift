@@ -398,7 +398,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case .deposits(.delegate(.showCustomizeGuarantees)):
-			// TODO: Handle?
 			guard let guarantees = state.deposits?.accounts.customizableGuarantees, !guarantees.isEmpty else { return .none }
 			state.destination = .customizeGuarantees(.init(guarantees: .init(uniqueElements: guarantees)))
 
@@ -891,6 +890,22 @@ extension TransactionReview.State {
 
 	public mutating func applyGuarantee(_ updated: TransactionClient.Guarantee, transferID: TransactionReview.Transfer.ID) {
 		guard let accountID = accountID(for: transferID) else { return }
+
+		guard let transfer = deposits?.accounts[id: accountID]?.transfers[id: transferID], case .fungible = transfer.details else {
+			loggerGlobal.warning("applyGuarantee: Transfer missing or not fungible")
+			return
+		}
+
+		var updated = updated
+
+		if let divisibility = transfer.resource.divisibility {
+			updated.amount = updated.amount.rounded(decimalPlaces: UInt(divisibility))
+		} else {
+			let message = "Fungible resource lacks divisibility: \(transfer.resource.resourceAddress)"
+			assertionFailure(message)
+			loggerGlobal.warning(.init(stringLiteral: message))
+		}
+
 		deposits?.accounts[id: accountID]?.transfers[id: transferID]?.fungibleGuarantee = updated
 	}
 
