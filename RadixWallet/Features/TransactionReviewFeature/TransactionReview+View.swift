@@ -631,6 +631,7 @@ struct RawTransactionView: SwiftUI.View {
 
 	var body: some SwiftUI.View {
 		Text(transaction)
+			.textSelection(.enabled)
 			.textStyle(.monospace)
 			.multilineTextAlignment(.leading)
 			.foregroundColor(.app.gray1)
