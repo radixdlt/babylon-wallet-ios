@@ -506,6 +506,7 @@
 "common_component" = "Component";
 "common_unauthorized" = "Unauthorized";
 "common_rateLimitReached" = "Gateway access blocked due to exceeding rate limit. Please wait a few minutes to retry.";
+"common_badHttpResponseStatusCode" = "Bad HTTP response status code %d";
 "error_dappRequest_invalidPersonaId" = "Invalid Persona specified by dApp";
 "error_dappRequest_invalidRequest" = "Invalid request";
 "error_profileLoad_decodingError" = "Failed to import Radix Wallet backup: %@";
