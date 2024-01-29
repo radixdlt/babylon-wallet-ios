@@ -26,6 +26,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		public var stakingToValidators: ValidatorsState? = nil
 		public var unstakingFromValidators: ValidatorsState? = nil
+		public var claimingFromValidators: ValidatorsState? = nil
 
 		public var accountDepositSetting: DepositSettingState? = nil
 		public var accountDepositExceptions: DepositExceptionsState? = nil
@@ -107,6 +108,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		case expandRedeemingFromPoolsTapped
 		case expandStakingToValidatorsTapped
 		case expandUnstakingFromValidatorsTapped
+		case expandClaimingFromValidatorsTapped
 		case expandUsingDappsTapped
 		case approvalSliderSlid
 	}
@@ -286,6 +288,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.unstakingFromValidators?.isExpanded.toggle()
 			return .none
 
+		case .expandClaimingFromValidatorsTapped:
+			state.claimingFromValidators?.isExpanded.toggle()
+			return .none
+
 		case .expandUsingDappsTapped:
 			state.dAppsUsed?.isExpanded.toggle()
 			return .none
@@ -455,6 +461,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.redeemingFromPools = sections.redeemingFromPools
 			state.stakingToValidators = sections.stakingToValidators
 			state.unstakingFromValidators = sections.unstakingFromValidators
+			state.claimingFromValidators = sections.claimingFromValidators
 			state.deposits = sections.deposits
 			state.accountDepositSetting = sections.accountDepositSetting
 			state.accountDepositExceptions = sections.accountDepositExceptions
