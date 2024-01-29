@@ -1,6 +1,10 @@
 import ComposableArchitecture
 import SwiftUI
 
+private extension CGFloat {
+	static let transferLineTrailingPadding = CGFloat.huge3
+}
+
 extension View {
 	var sectionHeading: some View {
 		textStyle(.body1Header)
@@ -170,7 +174,7 @@ extension TransactionReview {
 									VLine()
 										.stroke(.app.gray3, style: .transactionReview)
 										.frame(width: 1)
-										.padding(.trailing, .huge3)
+										.padding(.trailing, .transferLineTrailingPadding)
 										.padding(.top, -.medium1)
 								}
 							}
@@ -509,7 +513,7 @@ struct ExpandableTransactionHeading: View {
 				Spacer(minLength: 0)
 			}
 		}
-		.padding(.trailing, .huge2) // padding from the vertical dotted line
+		.padding(.trailing, .transferLineTrailingPadding + .small3) // padding from the vertical dotted line
 	}
 }
 
