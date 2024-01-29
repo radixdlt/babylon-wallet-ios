@@ -92,7 +92,13 @@ extension TransactionReviewGuarantee.State {
 		.init(
 			id: id,
 			account: account,
-			token: .init(resource: resource, details: details)
+			token: .init(
+				name: resource.title,
+				thumbnail: isXRD ? .xrd : .known(resource.metadata.iconURL),
+				amount: amount,
+				guaranteedAmount: guarantee.amount,
+				fiatAmount: nil
+			)
 		)
 	}
 }
