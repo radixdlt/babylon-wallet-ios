@@ -16,7 +16,8 @@ public struct MinimumPercentageStepper: FeatureReducer {
 		public init(value: RETDecimal) {
 			let clamped = value.clamped
 			self.value = clamped
-			self.string = clamped.formattedPlain()
+			// When first showing this view, we round the _displayed_ number, in case you don't touch it and return
+			self.string = clamped.rounded(decimalPlaces: 2).formattedPlain()
 		}
 	}
 
