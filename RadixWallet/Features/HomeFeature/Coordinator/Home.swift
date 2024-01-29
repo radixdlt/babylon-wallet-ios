@@ -3,14 +3,14 @@ import SwiftUI
 
 // MARK: - Home
 public struct Home: Sendable, FeatureReducer {
-	public static let radixBannerURL = URL(string: "https://wallet.radixdlt.com/?collapseStepOne")!
+	public static let radixBannerURL = URL(string: "https://wallet.radixdlt.com/?wallet=downloaded")!
 
 	public struct State: Sendable, Hashable {
 		// MARK: - Components
 		public var accountRows: IdentifiedArrayOf<Home.AccountRow.State> = []
 		public var shouldWriteDownPersonasSeedPhrase: Bool = false
 
-		public var showRadixBanner: Bool = false
+		public var showRadixBanner: Bool = true // false
 
 		// MARK: - Destination
 		@PresentationState
@@ -116,7 +116,7 @@ public struct Home: Sendable, FeatureReducer {
 			return .none
 
 		case .task:
-			state.showRadixBanner = userDefaults.showRadixBanner
+			state.showRadixBanner = true // userDefaults.showRadixBanner
 
 			return .run { send in
 				for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
