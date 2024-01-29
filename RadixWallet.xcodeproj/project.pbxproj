@@ -9667,7 +9667,7 @@
 			repositoryURL = "https://github.com/stasel/WebRTC/";
 			requirement = {
 				kind = exactVersion;
-				version = 116.0.0;
+				version = 120.0.0;
 			};
 		};
 		48FFFAB22ADC206300B2B213 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */ = {
