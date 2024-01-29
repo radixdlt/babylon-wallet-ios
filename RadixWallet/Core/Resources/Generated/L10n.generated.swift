@@ -264,8 +264,8 @@ public enum L10n {
       public static let addAnAssetAllow = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_addAnAssetAllow", fallback: "Allow Deposits")
       /// Add Asset
       public static let addAnAssetButton = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_addAnAssetButton", fallback: "Add Asset")
-      /// Deny Deposit
-      public static let addAnAssetDeny = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_addAnAssetDeny", fallback: "Deny Deposit")
+      /// Deny Deposits
+      public static let addAnAssetDeny = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_addAnAssetDeny", fallback: "Deny Deposits")
       /// Resource Address
       public static let addAnAssetInputHint = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_addAnAssetInputHint", fallback: "Resource Address")
       /// Enter the asset’s resource address (starting with “reso”)
@@ -857,6 +857,10 @@ public enum L10n {
   public enum Common {
     /// Account
     public static let account = L10n.tr("Localizable", "common_account", fallback: "Account")
+    /// Bad HTTP response status code %d
+    public static func badHttpStatusResponseCode(_ p1: Int) -> String {
+      return L10n.tr("Localizable", "common_badHttpStatusResponseCode", p1, fallback: "Bad HTTP response status code %d")
+    }
     /// Cancel
     public static let cancel = L10n.tr("Localizable", "common_cancel", fallback: "Cancel")
     /// Choose
