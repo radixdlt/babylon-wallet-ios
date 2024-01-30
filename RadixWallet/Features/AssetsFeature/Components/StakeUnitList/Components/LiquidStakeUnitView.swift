@@ -37,10 +37,9 @@ public struct LiquidStakeUnitView: View {
 				}
 
 				VStack(alignment: .leading, spacing: .small3) {
-					Text(L10n.Account.Staking.worth)
+					Text(L10n.Account.Staking.worth.uppercased())
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray2)
-						.textCase(nil)
 
 					TokenBalanceView.Bordered(viewState: .xrd(balance: viewState.worth))
 				}

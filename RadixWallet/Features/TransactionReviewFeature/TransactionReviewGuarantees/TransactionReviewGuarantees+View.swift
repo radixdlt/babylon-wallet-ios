@@ -107,7 +107,7 @@ extension TransactionReviewGuarantee {
 	public struct ViewState: Identifiable, Equatable {
 		public let id: TransactionReview.Transfer.ID
 		let account: TransactionReview.Account
-		let token: TransactionReviewTokenView.ViewState
+		let token: TransactionReviewFungibleView.ViewState
 	}
 
 	public struct View: SwiftUI.View {
@@ -123,7 +123,7 @@ extension TransactionReviewGuarantee {
 					VStack(spacing: 0) {
 						SmallAccountCard(account: viewStore.account)
 
-						TransactionReviewTokenView(viewState: viewStore.token)
+						TransactionReviewFungibleView(viewState: viewStore.token, background: .clear)
 
 						Separator()
 

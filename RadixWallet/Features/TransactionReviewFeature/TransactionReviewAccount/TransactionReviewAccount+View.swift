@@ -75,15 +75,19 @@ extension TransactionReviewAccount {
 				InnerCard {
 					SmallAccountCard(account: viewStore.account)
 
-					VStack(spacing: 1) {
+					VStack(spacing: .zero) {
 						ForEach(viewStore.transfers) { transfer in
 							TransactionReviewResourceView(transfer: transfer) { token in
 								viewStore.send(.transferTapped(transfer, token))
 							}
+
+							if transfer.id != viewStore.transfers.last?.id {
+								Rectangle()
+									.fill(.app.gray4)
+									.frame(height: 1)
+							}
 						}
-						.background(.app.gray5)
 					}
-					.background(.app.gray4)
 				}
 			}
 		}
@@ -98,11 +102,11 @@ struct TransactionReviewResourceView: View {
 	var body: some View {
 		switch transfer.details {
 		case let .fungible(details):
-			TransactionReviewTokenView(viewState: .init(resource: transfer.resource, details: details)) {
+			TransactionReviewFungibleView(viewState: .init(resource: transfer.resource, details: details), background: .app.gray5) {
 				onTap(nil)
 			}
 		case let .nonFungible(details):
-			TransferNFTView(viewState: .init(resource: transfer.resource, details: details)) {
+			TransferNFTView(viewState: .init(resource: transfer.resource, details: details), background: .app.gray5) {
 				onTap(nil)
 			}
 		case let .liquidStakeUnit(details):
@@ -131,7 +135,7 @@ extension LiquidStakeUnitView.ViewState {
 	}
 }
 
-extension TransactionReviewTokenView.ViewState {
+extension TransactionReviewFungibleView.ViewState {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.Fungible) {
 		self.init(
 			name: resource.metadata.symbol ?? resource.metadata.name ?? L10n.TransactionReview.unknown,

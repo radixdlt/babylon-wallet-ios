@@ -39,7 +39,7 @@ extension NonFungibleResourceAsset.State {
 extension NonFungibleResourceAsset.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState) { viewStore in
-			TransferNFTView(viewState: viewStore.state)
+			TransferNFTView(viewState: viewStore.state, background: .app.white)
 				.frame(height: .largeButtonHeight)
 		}
 	}

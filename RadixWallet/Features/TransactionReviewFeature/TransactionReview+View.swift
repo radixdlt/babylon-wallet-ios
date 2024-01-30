@@ -661,8 +661,8 @@ struct RawTransactionView: SwiftUI.View {
 	}
 }
 
-// MARK: - TransactionReviewTokenView
-struct TransactionReviewTokenView: View {
+// MARK: - TransactionReviewFungibleView
+struct TransactionReviewFungibleView: View {
 	struct ViewState: Equatable {
 		let name: String?
 		let thumbnail: TokenThumbnail.Content
@@ -673,18 +673,20 @@ struct TransactionReviewTokenView: View {
 	}
 
 	let viewState: ViewState
+	let background: Color
 	let onTap: () -> Void
 	let disabled: Bool
 
-	init(viewState: ViewState, onTap: (() -> Void)? = nil) {
+	init(viewState: ViewState, background: Color, onTap: (() -> Void)? = nil) {
 		self.viewState = viewState
+		self.background = background
 		self.onTap = onTap ?? {}
 		self.disabled = onTap == nil
 	}
 
 	var body: some View {
-		HStack(spacing: .small1) {
-			Button(action: onTap) {
+		Button(action: onTap) {
+			HStack(spacing: .small1) {
 				TokenThumbnail(viewState.thumbnail, size: .small)
 					.padding(.vertical, .small1)
 
@@ -694,39 +696,41 @@ struct TransactionReviewTokenView: View {
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray1)
 				}
-			}
-			.disabled(disabled)
 
-			Spacer(minLength: 0)
+				Spacer(minLength: 0)
 
-			VStack(alignment: .trailing, spacing: 0) {
-				if viewState.guaranteedAmount != nil {
-					Text(L10n.TransactionReview.estimated)
-						.textStyle(.body2HighImportance)
+				VStack(alignment: .trailing, spacing: 0) {
+					if viewState.guaranteedAmount != nil {
+						Text(L10n.TransactionReview.estimated)
+							.textStyle(.body2HighImportance)
+							.foregroundColor(.app.gray1)
+					}
+					Text(viewState.amount.formatted())
+						.textStyle(.secondaryHeader)
 						.foregroundColor(.app.gray1)
-				}
-				Text(viewState.amount.formatted())
-					.textStyle(.secondaryHeader)
-					.foregroundColor(.app.gray1)
 
-				if let fiatAmount = viewState.fiatAmount {
-					// Text(fiatAmount.formatted(.currency(code: "USD")))
-					Text(fiatAmount.formatted())
-						.textStyle(.body2HighImportance)
-						.foregroundColor(.app.gray1)
-						.padding(.top, .small2)
-				}
+					if let fiatAmount = viewState.fiatAmount {
+						// Text(fiatAmount.formatted(.currency(code: "USD")))
+						Text(fiatAmount.formatted())
+							.textStyle(.body2HighImportance)
+							.foregroundColor(.app.gray1)
+							.padding(.top, .small2)
+					}
 
-				if let guaranteedAmount = viewState.guaranteedAmount {
-					Text("\(L10n.TransactionReview.guaranteed) **\(guaranteedAmount.formatted())**")
-						.textStyle(.body2HighImportance)
-						.foregroundColor(.app.gray2)
-						.padding(.top, .small1)
+					if let guaranteedAmount = viewState.guaranteedAmount {
+						Text("\(L10n.TransactionReview.guaranteed) **\(guaranteedAmount.formatted())**")
+							.textStyle(.body2HighImportance)
+							.foregroundColor(.app.gray2)
+							.padding(.top, .small1)
+					}
 				}
+				.padding(.vertical, .medium3)
 			}
-			.padding(.vertical, .medium3)
+			.padding(.horizontal, .medium3)
+			.background(background)
 		}
-		.padding(.horizontal, .medium3)
+		.buttonStyle(.borderless)
+		.disabled(disabled)
 	}
 }
 
