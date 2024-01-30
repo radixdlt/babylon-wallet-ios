@@ -25,8 +25,8 @@ extension RadixConnectClient {
 			.eraseToAnyAsyncSequence()
 		}
 
-		let connectToP2PLinks: ConnectToP2PLinks = { _ in
-			for client in await p2pLinksClient.getP2PLinks() {
+		let connectToP2PLinks: ConnectToP2PLinks = { links in
+			for client in links {
 				try await rtcClients.connect(
 					client.connectionPassword
 				)
