@@ -57,6 +57,7 @@ struct ValidatorStakeView: View {
 
 			LiquidStakeUnitView(viewState: viewState, action: action)
 				.padding(.medium1)
+				.background(.app.white)
 		}
 		.contentShape(Rectangle())
 	}
@@ -71,8 +72,13 @@ struct ValidatorStakeView: View {
 				.frame(height: .small3)
 				.overlay(.app.gray5)
 
-			StakeClaimNFTSView(viewState: viewState, onTap: handleTapGesture, onClaimAllTapped: onClaimAllTapped)
-				.padding(.medium1)
+			StakeClaimNFTSView(
+				viewState: viewState,
+				backgroundColor: .app.white,
+				onTap: handleTapGesture,
+				onClaimAllTapped: onClaimAllTapped
+			)
+			.padding(.medium1)
 		}
 	}
 }

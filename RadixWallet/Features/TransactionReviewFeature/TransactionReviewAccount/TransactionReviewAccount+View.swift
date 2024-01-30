@@ -111,12 +111,13 @@ struct TransactionReviewResourceView: View {
 				onTap(nil)
 			}
 			.padding(.medium3)
+			.background(.app.gray5)
 		case let .poolUnit(details):
 			PoolUnitView(viewState: .init(details: details.details), backgroundColor: .app.gray5) {
 				onTap(nil)
 			}
 		case let .stakeClaimNFT(details):
-			StakeClaimNFTSView(viewState: details) { stakeClaim in
+			StakeClaimNFTSView(viewState: details, backgroundColor: .app.gray5) { stakeClaim in
 				onTap(stakeClaim.token)
 			}
 			.padding()

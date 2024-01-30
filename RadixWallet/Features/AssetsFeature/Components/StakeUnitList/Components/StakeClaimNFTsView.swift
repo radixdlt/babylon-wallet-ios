@@ -124,7 +124,7 @@ public struct StakeClaimNFTSView: View {
 				} label: {
 					HStack {
 						TokenBalanceView.xrd(balance: claim.claimAmount)
-							.contentShape(Rectangle())
+
 						if let isSelected = viewState.selectedStakeClaims?.contains(claim.id) {
 							CheckmarkView(appearance: .dark, isChecked: isSelected)
 						}

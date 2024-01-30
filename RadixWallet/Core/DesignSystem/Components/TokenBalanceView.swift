@@ -26,7 +26,7 @@ public struct TokenBalanceView: View {
 	}
 
 	public var body: some View {
-		HStack(alignment: .center) {
+		HStack(alignment: .center, spacing: .zero) {
 			TokenThumbnail(viewState.thumbnail, size: viewState.iconSize)
 				.padding(.trailing, .small1)
 
