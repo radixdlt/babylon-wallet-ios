@@ -874,7 +874,9 @@ extension TransactionReview {
 					fungible.guarantee
 				case let .liquidStakeUnit(liquidStakeUnit):
 					liquidStakeUnit.guarantee
-				case .nonFungible, .poolUnit, .stakeClaimNFT:
+				case let .poolUnit(poolUnit):
+					poolUnit.guarantee
+				case .nonFungible, .stakeClaimNFT:
 					nil
 				}
 			}
@@ -886,7 +888,10 @@ extension TransactionReview {
 				case var .liquidStakeUnit(liquidStakeUnit):
 					liquidStakeUnit.guarantee = newValue
 					details = .liquidStakeUnit(liquidStakeUnit)
-				case .nonFungible, .poolUnit, .stakeClaimNFT:
+				case var .poolUnit(poolUnit):
+					poolUnit.guarantee = newValue
+					details = .poolUnit(poolUnit)
+				case .nonFungible, .stakeClaimNFT:
 					return
 				}
 			}
@@ -899,7 +904,9 @@ extension TransactionReview {
 				fungible.amount
 			case let .liquidStakeUnit(liquidStakeUnit):
 				liquidStakeUnit.amount
-			case .nonFungible, .poolUnit, .stakeClaimNFT:
+			case let .poolUnit(poolUnit):
+				poolUnit.details.poolUnitResource.amount
+			case .nonFungible, .stakeClaimNFT:
 				nil
 			}
 		}
