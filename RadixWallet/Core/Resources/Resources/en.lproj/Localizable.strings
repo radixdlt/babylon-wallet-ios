@@ -487,6 +487,7 @@
 "common_none" = "None";
 "common_ok" = "OK";
 "common_done" = "Done";
+"common_copy" = "Copy";
 "common_persona" = "Persona";
 "common_history" = "History";
 "common_pool" = "Pool";
