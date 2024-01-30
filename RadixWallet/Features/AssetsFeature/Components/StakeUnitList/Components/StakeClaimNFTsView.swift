@@ -43,24 +43,24 @@ public struct StakeClaimNFTSView: View {
 	}
 
 	public let viewState: ViewState
-	public let backgroundColor: Color
+	public let background: Color
 	public let onTap: (OnLedgerEntitiesClient.StakeClaim) -> Void
 	public let onClaimAllTapped: (() -> Void)?
 
 	public init(
 		viewState: ViewState,
-		backgroundColor: Color,
+		background: Color,
 		onTap: @escaping (OnLedgerEntitiesClient.StakeClaim) -> Void,
 		onClaimAllTapped: (() -> Void)? = nil
 	) {
 		self.viewState = viewState
-		self.backgroundColor = backgroundColor
+		self.background = background
 		self.onTap = onTap
 		self.onClaimAllTapped = onClaimAllTapped
 	}
 
 	public var body: some View {
-		VStack(alignment: .leading, spacing: .small1) {
+		VStack(alignment: .leading, spacing: .medium3) {
 			HStack(spacing: .zero) {
 				TokenThumbnail(.known(viewState.resourceMetadata.iconURL), size: .smaller)
 					.padding(.trailing, .small1)
@@ -94,11 +94,13 @@ public struct StakeClaimNFTSView: View {
 				sectionView(viewState.toBeClaimed, kind: .toBeClaimed)
 			}
 		}
+		.padding(.medium3)
+		.background(background)
 	}
 
 	@ViewBuilder
 	func sectionView(_ claims: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim>, kind: SectionKind) -> some View {
-		VStack(alignment: .leading, spacing: .small2) {
+		VStack(alignment: .leading, spacing: .zero) {
 			HStack {
 				Text(kind.title)
 					.textStyle(.body2HighImportance)
@@ -118,22 +120,26 @@ public struct StakeClaimNFTSView: View {
 					}
 				}
 			}
-			ForEach(claims) { claim in
-				Button {
-					onTap(claim)
-				} label: {
-					HStack {
-						TokenBalanceView(viewState: .xrd(balance: claim.claimAmount))
+			.padding(.bottom, .small3)
 
-						if let isSelected = viewState.selectedStakeClaims?.contains(claim.id) {
-							CheckmarkView(appearance: .dark, isChecked: isSelected)
+			VStack(alignment: .leading, spacing: .small2) {
+				ForEach(claims) { claim in
+					Button {
+						onTap(claim)
+					} label: {
+						HStack {
+							TokenBalanceView(viewState: .xrd(balance: claim.claimAmount))
+
+							if let isSelected = viewState.selectedStakeClaims?.contains(claim.id) {
+								CheckmarkView(appearance: .dark, isChecked: isSelected)
+							}
 						}
+						.padding(.small1)
+						.background(background)
 					}
-					.padding(.small1)
-					.background(backgroundColor)
+					.buttonStyle(.borderless)
 					.roundedCorners(strokeColor: .app.gray3)
 				}
-				.buttonStyle(.borderless)
 			}
 		}
 	}

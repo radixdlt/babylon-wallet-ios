@@ -27,9 +27,11 @@ struct ValidatorStakeView: View {
 		} label: {
 			ValidatorHeaderView(viewState: viewState.validatorNameViewState)
 				.contentShape(Rectangle())
+				.padding(.vertical, .medium3)
+				.padding(.horizontal, .small1)
 				.rowStyle()
-				.padding(.medium1)
 		}
+		.buttonStyle(.borderless)
 
 		if isExpanded {
 			if let liquidStakeUnitViewState = viewState.liquidStakeUnit {
@@ -40,7 +42,7 @@ struct ValidatorStakeView: View {
 			if let stakeClaimNFTsViewState = viewState.stakeClaimNFTs {
 				stakeClaimNFTsView(
 					viewState: stakeClaimNFTsViewState,
-					handleTapGesture: onStakeClaimTokenTapped,
+					onTap: onStakeClaimTokenTapped,
 					onClaimAllTapped: onClaimAllStakeClaimsTapped
 				)
 				.rowStyle()
@@ -55,16 +57,13 @@ struct ValidatorStakeView: View {
 				.frame(height: .small3)
 				.overlay(.app.gray5)
 
-			LiquidStakeUnitView(viewState: viewState, action: action)
-				.padding(.medium1)
-				.background(.app.white)
+			LiquidStakeUnitView(viewState: viewState, background: .app.white, onTap: action)
 		}
-		.contentShape(Rectangle())
 	}
 
 	private func stakeClaimNFTsView(
 		viewState: StakeClaimNFTSView.ViewState,
-		handleTapGesture: @escaping (OnLedgerEntitiesClient.StakeClaim) -> Void,
+		onTap: @escaping (OnLedgerEntitiesClient.StakeClaim) -> Void,
 		onClaimAllTapped: @escaping () -> Void
 	) -> some SwiftUI.View {
 		VStack(spacing: .zero) {
@@ -74,11 +73,10 @@ struct ValidatorStakeView: View {
 
 			StakeClaimNFTSView(
 				viewState: viewState,
-				backgroundColor: .app.white,
-				onTap: handleTapGesture,
+				background: .app.white,
+				onTap: onTap,
 				onClaimAllTapped: onClaimAllTapped
 			)
-			.padding(.medium1)
 		}
 	}
 }

@@ -9,7 +9,7 @@ public struct PoolUnitView: View {
 	}
 
 	public let viewState: ViewState
-	public let backgroundColor: Color
+	public let background: Color
 	public let onTap: () -> Void
 
 	public var body: some View {
@@ -55,7 +55,7 @@ public struct PoolUnitView: View {
 				}
 				.padding(.bottom, .small2)
 
-				Text(L10n.TransactionReview.worth)
+				Text(L10n.TransactionReview.worth.uppercased())
 					.textStyle(.body2HighImportance)
 					.foregroundColor(.app.gray2)
 					.padding(.bottom, .small3)
@@ -64,8 +64,8 @@ public struct PoolUnitView: View {
 					PoolUnitResourcesView(resources: resources)
 				}
 			}
-			.padding(.medium1)
-			.background(backgroundColor)
+			.padding(.medium3)
+			.background(background)
 		}
 		.buttonStyle(.borderless)
 	}

@@ -98,8 +98,7 @@ struct TransactionReviewResourceView: View {
 	var body: some View {
 		switch transfer.details {
 		case let .fungible(details):
-			let viewState = TransactionReviewTokenView.ViewState(resource: transfer.resource, details: details)
-			TransactionReviewTokenView(viewState: viewState) {
+			TransactionReviewTokenView(viewState: .init(resource: transfer.resource, details: details)) {
 				onTap(nil)
 			}
 		case let .nonFungible(details):
@@ -107,20 +106,17 @@ struct TransactionReviewResourceView: View {
 				onTap(nil)
 			}
 		case let .liquidStakeUnit(details):
-			LiquidStakeUnitView(viewState: .init(resource: transfer.resource, details: details)) {
+			LiquidStakeUnitView(viewState: .init(resource: transfer.resource, details: details), background: .app.gray5) {
 				onTap(nil)
 			}
-			.padding(.medium3)
-			.background(.app.gray5)
 		case let .poolUnit(details):
-			PoolUnitView(viewState: .init(details: details.details), backgroundColor: .app.gray5) {
+			PoolUnitView(viewState: .init(details: details.details), background: .app.gray5) {
 				onTap(nil)
 			}
 		case let .stakeClaimNFT(details):
-			StakeClaimNFTSView(viewState: details, backgroundColor: .app.gray5) { stakeClaim in
+			StakeClaimNFTSView(viewState: details, background: .app.gray5) { stakeClaim in
 				onTap(stakeClaim.token)
 			}
-			.padding()
 		}
 	}
 }

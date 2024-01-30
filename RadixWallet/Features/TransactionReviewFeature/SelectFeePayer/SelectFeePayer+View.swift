@@ -125,11 +125,9 @@ enum SelectAccountToPayForFeeRow {
 					VStack(spacing: 0) {
 						SmallAccountCard(account: viewState.account)
 						HStack {
-							TokenBalanceView(viewState: .init(thumbnail: .xrd, name: Constants.xrdTokenName, balance: viewState.xrdBalance))
-							RadioButton(
-								appearance: .dark,
-								state: isSelected ? .selected : .unselected
-							)
+							TokenBalanceView(viewState: .xrd(balance: viewState.xrdBalance))
+
+							RadioButton(appearance: .dark, state: isSelected ? .selected : .unselected)
 						}
 						.padding(.medium3)
 					}

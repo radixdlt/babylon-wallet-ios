@@ -17,10 +17,7 @@ extension PoolUnit {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: PoolUnit.Action.view) { viewStore in
 				Section {
-					PoolUnitView(
-						viewState: viewStore.state,
-						backgroundColor: .app.white
-					) {
+					PoolUnitView(viewState: viewStore.state, background: .app.white) {
 						viewStore.send(.didTap)
 					}
 					.rowStyle()
