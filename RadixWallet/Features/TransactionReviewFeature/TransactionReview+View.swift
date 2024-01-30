@@ -113,7 +113,7 @@ extension TransactionReview {
 					.toolbar {
 						ToolbarItem(placement: .automatic) {
 							if viewStore.canToggleViewMode {
-								Button(asset: AssetResource.code) {
+								Button(asset: AssetResource.iconTxnBlocks) {
 									viewStore.send(.showRawTransactionTapped)
 								}
 								.controlState(viewStore.viewRawTransactionButtonState)
@@ -141,7 +141,9 @@ extension TransactionReview {
 						}
 
 					if let rawTransaction = viewStore.rawTransaction {
-						RawTransactionView(transaction: rawTransaction)
+						RawTransactionView(transaction: rawTransaction) {
+							viewStore.send(.copyRawTransactionTapped)
+						}
 					} else {
 						VStack(spacing: .medium1) {
 							messageSection(with: viewStore.message)
@@ -628,19 +630,34 @@ struct TransactionMessageView: View {
 // MARK: - RawTransactionView
 struct RawTransactionView: SwiftUI.View {
 	let transaction: String
+	let copyTapped: () -> Void
 
 	var body: some SwiftUI.View {
-		Text(transaction)
-			.textSelection(.enabled)
-			.textStyle(.monospace)
-			.multilineTextAlignment(.leading)
-			.foregroundColor(.app.gray1)
-			.frame(
-				maxWidth: .infinity,
-				maxHeight: .infinity,
-				alignment: .topLeading
-			)
-			.padding()
+		VStack(alignment: .trailing) {
+			Button(action: copyTapped) {
+				HStack(spacing: .small3) {
+					AssetIcon(.asset(AssetResource.copy))
+					Text(L10n.Common.copy)
+						.textStyle(.body1Header)
+				}
+				.foregroundColor(.app.gray1)
+			}
+			.buttonStyle(.secondaryRectangular)
+			.padding([.trailing, .top], .medium3)
+			.padding(.bottom, .medium1)
+
+			Text(transaction)
+				.textSelection(.enabled)
+				.textStyle(.monospace)
+				.multilineTextAlignment(.leading)
+				.foregroundColor(.app.gray1)
+				.frame(
+					maxWidth: .infinity,
+					maxHeight: .infinity,
+					alignment: .topLeading
+				)
+				.padding([.horizontal, .bottom], .medium1)
+		}
 	}
 }
 
