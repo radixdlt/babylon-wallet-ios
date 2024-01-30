@@ -24,7 +24,7 @@ public struct RadixConnectClient: DependencyKey, Sendable {
 	public var loadFromProfileAndConnectAll: LoadFromProfileAndConnectAll
 	public var disconnectAll: DisconnectAll
 
-	/// Connects to a given list of p2p links
+	/// Connects to a given list of p2p links, those will not be stored in profile.
 	public var connectToP2PLinks: ConnectToP2PLinks
 
 	public var getLocalNetworkAccess: GetLocalNetworkAccess
