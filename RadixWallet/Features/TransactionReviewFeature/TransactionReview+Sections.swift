@@ -232,7 +232,7 @@ extension TransactionReview {
 				unstakingFromValidators: unstakingFromValidators
 			)
 
-		case let .validatorClaim(validatorAddresses, claims):
+		case let .validatorClaim(validatorAddresses, _):
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 			let withdrawals = try? await extractWithdrawals(
 				accountWithdraws: summary.accountWithdraws.aggregated,
