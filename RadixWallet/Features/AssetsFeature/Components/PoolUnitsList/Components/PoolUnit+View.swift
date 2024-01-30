@@ -19,11 +19,10 @@ extension PoolUnit {
 				Section {
 					PoolUnitView(
 						viewState: viewStore.state,
-						backgroundColor: .app.white,
-						onTap: {
-							viewStore.send(.didTap)
-						}
-					)
+						backgroundColor: .app.white
+					) {
+						viewStore.send(.didTap)
+					}
 					.rowStyle()
 				}
 			}

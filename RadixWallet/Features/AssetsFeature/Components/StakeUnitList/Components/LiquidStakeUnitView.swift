@@ -42,7 +42,7 @@ public struct LiquidStakeUnitView: View {
 					.textCase(nil)
 					.padding(.bottom, .small3)
 
-				TokenBalanceView.xrd(balance: viewState.worth)
+				TokenBalanceView(viewState: .xrd(balance: viewState.worth))
 					.padding(.small1)
 					.roundedCorners(strokeColor: .app.gray3)
 			}

@@ -123,17 +123,17 @@ public struct StakeClaimNFTSView: View {
 					onTap(claim)
 				} label: {
 					HStack {
-						TokenBalanceView.xrd(balance: claim.claimAmount)
+						TokenBalanceView(viewState: .xrd(balance: claim.claimAmount))
 
 						if let isSelected = viewState.selectedStakeClaims?.contains(claim.id) {
 							CheckmarkView(appearance: .dark, isChecked: isSelected)
 						}
 					}
+					.padding(.small1)
+					.background(backgroundColor)
+					.roundedCorners(strokeColor: .app.gray3)
 				}
 				.buttonStyle(.borderless)
-				.padding(.small1)
-				.background(backgroundColor)
-				.roundedCorners(strokeColor: .app.gray3)
 			}
 		}
 	}
