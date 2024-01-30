@@ -232,10 +232,10 @@ extension TransactionReview {
 				unstakingFromValidators: unstakingFromValidators
 			)
 
-		case let .validatorClaim(validatorAddresses, _):
+		case let .validatorClaim(validatorAddresses, claims):
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 			let withdrawals = try? await extractWithdrawals(
-				accountWithdraws: summary.accountWithdraws,
+				accountWithdraws: summary.accountWithdraws.aggregated,
 				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
 				entities: resourcesInfo,
 				userAccounts: userAccounts,
@@ -245,7 +245,7 @@ extension TransactionReview {
 			let claimingFromValidators = try await extractValidators(for: validatorAddresses)
 
 			let deposits = try? await extractDeposits(
-				accountDeposits: summary.accountDeposits,
+				accountDeposits: summary.accountDeposits.aggregated,
 				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
 				entities: resourcesInfo,
 				userAccounts: userAccounts,
@@ -931,6 +931,96 @@ extension TransactionReview.ResourceInfo {
 			resource.metadata
 		case let .right(metadata):
 			metadata
+		}
+	}
+}
+
+extension [String: [ResourceIndicator]] {
+	/// Aggregate the transfer amounts for the same resource for the same account.
+	///
+	/// The RET analysis might return multiple withdrawls/deposits for the same resource,
+	/// instead of showing separate entries for each withdral/deposit, we aggregate
+	/// the fungible amounts or the non fungible ids.
+	///
+	/// Important note: This aggregates only the guranteed amounts,
+	/// predicted amounts cannot be aggregated since each amount will have a specific instruction index attached.
+	///
+	/// This function is only used curently for stake claim transactions, when the Dapp might sent a manifest
+	/// which is interpreted by RET as having multiple distinct withdrawls/deposits for the same resource.
+	///
+	/// This should eventually be moved to RET, so it should return the aggregated amounts
+	var aggregated: Self {
+		var aggregatedResult: Self = [:]
+
+		for (key, value) in self {
+			var result: [ResourceIndicator] = []
+			for indicator in value {
+				if let i = result.firstIndex(where: {
+					$0.resourceAddress == indicator.resourceAddress &&
+						$0.isGuaranteedAmount &&
+						indicator.isGuaranteedAmount
+				}) {
+					result[i].add(indicator)
+				} else {
+					result.append(indicator)
+				}
+			}
+
+			aggregatedResult[key] = result
+		}
+		return aggregatedResult
+	}
+}
+
+extension ResourceIndicator {
+	var isGuaranteedAmount: Bool {
+		switch self {
+		case .fungible(_, .guaranteed):
+			true
+		case .nonFungible(_, .byIds):
+			true
+		default:
+			false // Cannot sum up the predicted amounts, as each predicted amount has a specific instruction index
+		}
+	}
+
+	public mutating func add(_ other: Self) {
+		guard other.resourceAddress == resourceAddress else {
+			assertionFailure("The indicators should have the same resource address")
+			return
+		}
+		switch (self, other) {
+		case (.fungible(_, var fungibleIndicator), let .fungible(_, otherFungibleIndicator)):
+			fungibleIndicator.add(otherFungibleIndicator)
+			self = .fungible(resourceAddress: resourceAddress, indicator: fungibleIndicator)
+			return
+		case (.nonFungible(_, var nonFungibleIndicator), let .nonFungible(_, otherNonFungibleIndicator)):
+			nonFungibleIndicator.add(otherNonFungibleIndicator)
+			self = .nonFungible(resourceAddress: resourceAddress, indicator: nonFungibleIndicator)
+		default:
+			return
+		}
+	}
+}
+
+extension FungibleResourceIndicator {
+	public mutating func add(_ other: Self) {
+		switch (self, other) {
+		case let (.guaranteed(amount), .guaranteed(otherAmount)):
+			self = .guaranteed(amount: amount + otherAmount)
+		default:
+			return
+		}
+	}
+}
+
+extension NonFungibleResourceIndicator {
+	public mutating func add(_ other: Self) {
+		switch (self, other) {
+		case let (.byIds(ids), .byIds(otherIds)):
+			self = .byIds(ids: ids + otherIds)
+		default:
+			return
 		}
 	}
 }
