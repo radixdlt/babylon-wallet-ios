@@ -104,6 +104,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case showRawTransactionTapped
+		case copyRawTransactionTapped
 		case expandContributingToPoolsTapped
 		case expandRedeemingFromPoolsTapped
 		case expandStakingToValidatorsTapped
@@ -213,6 +214,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
+	@Dependency(\.pasteboardClient) var pasteboardClient
 
 	public init() {}
 
@@ -271,6 +273,14 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				state.displayMode = .review
 				return .none
 			}
+
+		case let .copyRawTransactionTapped:
+			guard case let .raw(manifest) = state.displayMode else {
+				assertionFailure("Copy raw manifest button should only be visible in raw transaction mode")
+				return .none
+			}
+			pasteboardClient.copyString(manifest)
+			return .none
 
 		case .expandContributingToPoolsTapped:
 			state.contributingToPools?.isExpanded.toggle()
