@@ -25,31 +25,27 @@ extension RadixConnectClient {
 			.eraseToAnyAsyncSequence()
 		}
 
+		let connectToP2PLinks: ConnectToP2PLinks = { links in
+			for client in links {
+				try await rtcClients.connect(
+					client.connectionPassword
+				)
+			}
+		}
+
 		return Self(
 			loadFromProfileAndConnectAll: {
 				Task {
 					loggerGlobal.info("🔌 Loading and connecting all P2P connections")
-					for client in await p2pLinksClient.getP2PLinks() {
-						try await rtcClients.connect(
-							client.connectionPassword
-						)
-					}
+					try await connectToP2PLinks(p2pLinksClient.getP2PLinks())
 				}
 				return await getP2PLinksWithConnectionStatusUpdates()
-			},
-			disconnectAndRemoveAll: {
-				loggerGlobal.info("🔌 Disconnecting and removing all P2P connections")
-				await rtcClients.disconnectAndRemoveAll()
-				do {
-					try await p2pLinksClient.deleteAllP2PLinks()
-				} catch {
-					loggerGlobal.error("Failed to delete P2PLinks -> \(error)")
-				}
 			},
 			disconnectAll: {
 				loggerGlobal.info("🔌 Disconnecting all P2P connections")
 				await rtcClients.disconnectAndRemoveAll()
 			},
+			connectToP2PLinks: connectToP2PLinks,
 			getLocalNetworkAccess: {
 				await localNetworkAuthorization.requestAuthorization()
 			},
