@@ -1,5 +1,5 @@
-// MARK: - StakeClaimNFTSView
-public struct StakeClaimNFTSView: View {
+// MARK: - StakeClaimResourceView
+public struct StakeClaimResourceView: View {
 	public struct ViewState: Sendable, Hashable {
 		public let canClaimTokens: Bool
 		public let validatorName: String?
@@ -19,7 +19,11 @@ public struct StakeClaimNFTSView: View {
 			self.canClaimTokens = canClaimTokens
 			self.validatorName = validatorName
 			self.stakeClaimResource = stakeClaimTokens.resource
-			self.stakeClaimTokens = .init(canClaimTokens: canClaimTokens, stakeClaims: stakeClaimTokens.stakeClaims, selectedStakeClaims: selectedStakeClaims)
+			self.stakeClaimTokens = .init(
+				canClaimTokens: canClaimTokens,
+				stakeClaims: stakeClaimTokens.stakeClaims,
+				selectedStakeClaims: selectedStakeClaims
+			)
 		}
 	}
 
@@ -61,10 +65,17 @@ public struct StakeClaimNFTSView: View {
 				}
 
 				Spacer()
-
-				StakeClaimTokensView(viewState: viewState.stakeClaimTokens, onClaimAllTapped: onClaimAllTapped)
 			}
+
+			StakeClaimTokensView(
+				viewState: viewState.stakeClaimTokens,
+				background: background,
+				onTap: onTap,
+				onClaimAllTapped: onClaimAllTapped
+			)
 		}
+		.padding(.medium3)
+		.background(background)
 	}
 }
 
@@ -95,15 +106,18 @@ public struct StakeClaimTokensView: View {
 	}
 
 	public var viewState: ViewState
+	public let background: Color
 	public let onTap: ((OnLedgerEntitiesClient.StakeClaim) -> Void)?
 	public let onClaimAllTapped: (() -> Void)?
 
 	init(
 		viewState: ViewState,
-		onTap: (@escaping (OnLedgerEntitiesClient.StakeClaim) -> Void)? = nil,
-		onClaimAllTapped: (@escaping () -> Void)? = nil
+		background: Color,
+		onTap: ((OnLedgerEntitiesClient.StakeClaim) -> Void)? = nil,
+		onClaimAllTapped: (() -> Void)? = nil
 	) {
 		self.viewState = viewState
+		self.background = background
 		self.onTap = onTap
 		self.onClaimAllTapped = onClaimAllTapped
 	}
@@ -120,12 +134,13 @@ public struct StakeClaimTokensView: View {
 		if !viewState.toBeClaimed.isEmpty {
 			sectionView(viewState.toBeClaimed, kind: .toBeClaimed)
 		}
-		.padding(.medium3)
-		.background(background)
 	}
 
 	@ViewBuilder
-	func sectionView(_ claims: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim>, kind: SectionKind) -> some View {
+	func sectionView(
+		_ claims: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim>,
+		kind: SectionKind
+	) -> some View {
 		VStack(alignment: .leading, spacing: .zero) {
 			HStack {
 				Text(kind.title)
@@ -151,7 +166,9 @@ public struct StakeClaimTokensView: View {
 			VStack(alignment: .leading, spacing: .small2) {
 				ForEach(claims) { claim in
 					Button {
-						onTap(claim)
+						if let onTap {
+							onTap(claim)
+						}
 					} label: {
 						HStack {
 							TokenBalanceView(viewState: .xrd(balance: claim.claimAmount))
@@ -163,7 +180,7 @@ public struct StakeClaimTokensView: View {
 						.padding(.small1)
 						.background(background)
 					}
-                    .disabled(onTap == nil)
+					.disabled(onTap == nil)
 					.buttonStyle(.borderless)
 					.roundedCorners(strokeColor: .app.gray3)
 				}

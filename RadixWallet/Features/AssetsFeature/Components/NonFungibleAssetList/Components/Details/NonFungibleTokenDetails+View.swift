@@ -83,8 +83,21 @@ extension NonFungibleTokenDetails {
 								KeyValueView(nonFungibleGlobalID: tokenDetails.nonFungibleGlobalID)
 
 								if let stakeClaim = tokenDetails.stakeClaim {
-									StakeClaimTokensView(viewState: .init(canClaimTokens: true, stakeClaims: [stakeClaim]), onTap: {}) {
-										viewStore.send(.tappedClaimStake)
+									VStack(alignment: .leading, spacing: .small3) {
+										StakeClaimTokensView(
+											viewState: .init(
+												canClaimTokens: true,
+												stakeClaims: [stakeClaim]
+											),
+											background: .app.white,
+											onClaimAllTapped: { viewStore.send(.tappedClaimStake) }
+										)
+
+										if let unstakingDurationDescription = stakeClaim.unstakingDurationDescription {
+											Text(unstakingDescription)
+												.textStyle(.body2HighImportance)
+												.foregroundColor(.app.gray2)
+										}
 									}
 								}
 
@@ -184,19 +197,13 @@ extension NonFungibleTokenDetails {
 }
 
 extension OnLedgerEntitiesClient.StakeClaim {
-	var description: String {
-		guard let reamainingEpochsUntilClaim else {
-			return L10n.TransactionReview.toBeClaimed.uppercased()
+	var unstakingDurationDescription: String? {
+		guard let reamainingEpochsUntilClaim, isUnstaking else {
+			return nil
 		}
-
-		if isReadyToBeClaimed {
-			return L10n.AssetDetails.Staking.readyToClaim(claimAmount.formatted())
-		} else {
-			return L10n.AssetDetails.Staking.unstaking(
-				claimAmount.formatted(),
-				reamainingEpochsUntilClaim * epochDurationInMinutes
-			)
-		}
+		return L10n.AssetDetails.Staking.unstaking(
+			reamainingEpochsUntilClaim * epochDurationInMinutes
+		)
 	}
 }
 
