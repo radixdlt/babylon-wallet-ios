@@ -83,11 +83,9 @@ extension NonFungibleTokenDetails {
 								KeyValueView(nonFungibleGlobalID: tokenDetails.nonFungibleGlobalID)
 
 								if let stakeClaim = tokenDetails.stakeClaim {
-									Button(stakeClaim.description) {
+									StakeClaimTokensView(viewState: .init(canClaimTokens: true, stakeClaims: [stakeClaim]), onTap: {}) {
 										viewStore.send(.tappedClaimStake)
 									}
-									.buttonStyle(.primaryRectangular)
-									.controlState(stakeClaim.isReadyToBeClaimed ? .enabled : .disabled)
 								}
 
 								if !tokenDetails.dataFields.isEmpty {
