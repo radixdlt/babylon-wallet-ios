@@ -996,3 +996,4 @@ You will be asked to enter your main seed phrase. This is a set of **24 words** 
 
 If you have any “Legacy” Accounts (created on the Olympia network) to import - or any Accounts using a Ledger hardware wallet device - please continue and then use the **Account Recovery Scan** option in your Radix Wallet settings under **Account Security**.";
 "recoverWalletWithoutProfile_complete_continueButton" = "Continue";
+
