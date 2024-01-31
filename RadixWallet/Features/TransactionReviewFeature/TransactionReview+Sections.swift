@@ -975,12 +975,11 @@ extension [String: [ResourceIndicator]] {
 extension ResourceIndicator {
 	var isGuaranteedAmount: Bool {
 		switch self {
-		case .fungible(_, .guaranteed):
-			true
-		case .nonFungible(_, .byIds):
-			true
+		case .fungible(_, .guaranteed), .nonFungible(_, .byIds):
+			return true
 		default:
-			false // Cannot sum up the predicted amounts, as each predicted amount has a specific instruction index
+			assertionFailure("Cannot sum up the predicted amounts")
+			return false // Cannot sum up the predicted amounts, as each predicted amount has a specific instruction index
 		}
 	}
 
@@ -990,37 +989,43 @@ extension ResourceIndicator {
 			return
 		}
 		switch (self, other) {
-		case (.fungible(_, var fungibleIndicator), let .fungible(_, otherFungibleIndicator)):
-			fungibleIndicator.add(otherFungibleIndicator)
-			self = .fungible(resourceAddress: resourceAddress, indicator: fungibleIndicator)
-			return
-		case (.nonFungible(_, var nonFungibleIndicator), let .nonFungible(_, otherNonFungibleIndicator)):
-			nonFungibleIndicator.add(otherNonFungibleIndicator)
-			self = .nonFungible(resourceAddress: resourceAddress, indicator: nonFungibleIndicator)
+		case let (.fungible(_, fungibleIndicator), .fungible(_, otherFungibleIndicator)):
+			self = .fungible(
+				resourceAddress: resourceAddress,
+				indicator: fungibleIndicator.adding(otherFungibleIndicator)
+			)
+		case let (.nonFungible(_, nonFungibleIndicator), .nonFungible(_, otherNonFungibleIndicator)):
+			self = .nonFungible(
+				resourceAddress: resourceAddress,
+				indicator: nonFungibleIndicator.adding(otherNonFungibleIndicator)
+			)
 		default:
+			assertionFailure("Trying to add together two different kinds of resources")
 			return
 		}
 	}
 }
 
 extension FungibleResourceIndicator {
-	public mutating func add(_ other: Self) {
+	public func adding(_ other: Self) -> Self {
 		switch (self, other) {
 		case let (.guaranteed(amount), .guaranteed(otherAmount)):
-			self = .guaranteed(amount: amount + otherAmount)
+			return .guaranteed(amount: amount + otherAmount)
 		default:
-			return
+			assertionFailure("Cannot sum up the predicted amounts")
+			return self
 		}
 	}
 }
 
 extension NonFungibleResourceIndicator {
-	public mutating func add(_ other: Self) {
+	public func adding(_ other: Self) -> Self {
 		switch (self, other) {
 		case let (.byIds(ids), .byIds(otherIds)):
-			self = .byIds(ids: ids + otherIds)
+			return .byIds(ids: ids + otherIds)
 		default:
-			return
+			assertionFailure("Cannot sum up the predicted amounts")
+			return self
 		}
 	}
 }
