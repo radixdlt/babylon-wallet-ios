@@ -638,8 +638,8 @@ public enum L10n {
     /// Message
     public static let transactionMessage = L10n.tr("Localizable", "assetTransfer_transactionMessage", fallback: "Message")
     public enum AccountList {
-      /// Add Account
-      public static let addAccountButton = L10n.tr("Localizable", "assetTransfer_accountList_addAccountButton", fallback: "Add Account")
+      /// Add Transfer
+      public static let addAccountButton = L10n.tr("Localizable", "assetTransfer_accountList_addAccountButton", fallback: "Add Transfer")
       /// Account
       public static let externalAccountName = L10n.tr("Localizable", "assetTransfer_accountList_externalAccountName", fallback: "Account")
       /// From
@@ -871,6 +871,8 @@ public enum L10n {
     public static let confirm = L10n.tr("Localizable", "common_confirm", fallback: "Confirm")
     /// Continue
     public static let `continue` = L10n.tr("Localizable", "common_continue", fallback: "Continue")
+    /// Copy
+    public static let copy = L10n.tr("Localizable", "common_copy", fallback: "Copy")
     /// Connected to a test network, not Radix main network.
     public static let developerDisclaimerText = L10n.tr("Localizable", "common_developerDisclaimerText", fallback: "Connected to a test network, not Radix main network.")
     /// Done
@@ -907,8 +909,8 @@ public enum L10n {
     public static let showLess = L10n.tr("Localizable", "common_showLess", fallback: "Show Less")
     /// Show More
     public static let showMore = L10n.tr("Localizable", "common_showMore", fallback: "Show More")
-    /// Something went wrong
-    public static let somethingWentWrong = L10n.tr("Localizable", "common_somethingWentWrong", fallback: "Something went wrong")
+    /// Something Went Wrong
+    public static let somethingWentWrong = L10n.tr("Localizable", "common_somethingWentWrong", fallback: "Something Went Wrong")
     /// Settings
     public static let systemSettings = L10n.tr("Localizable", "common_systemSettings", fallback: "Settings")
     /// Unauthorized
@@ -2588,8 +2590,8 @@ public enum L10n {
     public enum Failure {
       /// Transaction was rejected as invalid by the Radix Network.
       public static let text = L10n.tr("Localizable", "transactionStatus_failure_text", fallback: "Transaction was rejected as invalid by the Radix Network.")
-      /// Something went wrong
-      public static let title = L10n.tr("Localizable", "transactionStatus_failure_title", fallback: "Something went wrong")
+      /// Something Went Wrong
+      public static let title = L10n.tr("Localizable", "transactionStatus_failure_title", fallback: "Something Went Wrong")
     }
     public enum Rejected {
       /// Your transaction was improperly constructed and cannot be processed

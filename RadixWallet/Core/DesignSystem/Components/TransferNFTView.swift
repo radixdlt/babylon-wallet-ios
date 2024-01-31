@@ -20,6 +20,7 @@ public struct TransferNFTView: View {
 					Text(viewState.tokenID)
 						.textStyle(.body2Regular)
 						.foregroundColor(.app.gray2)
+						.lineLimit(1)
 
 					if let tokenName = viewState.tokenName {
 						Text(tokenName)
@@ -29,6 +30,7 @@ public struct TransferNFTView: View {
 				}
 			}
 		}
+		.disabled(disabled)
 		.frame(maxWidth: .infinity, alignment: .leading)
 		.padding(.horizontal, .medium3)
 	}

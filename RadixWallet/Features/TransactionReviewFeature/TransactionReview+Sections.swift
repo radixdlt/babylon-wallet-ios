@@ -16,6 +16,7 @@ extension TransactionReview {
 
 		var stakingToValidators: ValidatorsState? = nil
 		var unstakingFromValidators: ValidatorsState? = nil
+		var claimingFromValidators: ValidatorsState? = nil
 
 		var accountDepositSetting: DepositSettingState? = nil
 		var accountDepositExceptions: DepositExceptionsState? = nil
@@ -231,7 +232,7 @@ extension TransactionReview {
 				unstakingFromValidators: unstakingFromValidators
 			)
 
-		case let .validatorClaim(validatorAddresses, validatorClaims):
+		case let .validatorClaim(validatorAddresses, _):
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 			let withdrawals = try? await extractWithdrawals(
 				accountWithdraws: summary.accountWithdraws,
@@ -240,6 +241,8 @@ extension TransactionReview {
 				userAccounts: userAccounts,
 				networkID: networkID
 			)
+
+			let claimingFromValidators = try await extractValidators(for: validatorAddresses)
 
 			let deposits = try? await extractDeposits(
 				accountDeposits: summary.accountDeposits,
@@ -251,7 +254,8 @@ extension TransactionReview {
 
 			return Sections(
 				withdrawals: withdrawals,
-				deposits: deposits
+				deposits: deposits,
+				claimingFromValidators: claimingFromValidators
 			)
 
 		case let .accountDepositSettingsUpdate(
