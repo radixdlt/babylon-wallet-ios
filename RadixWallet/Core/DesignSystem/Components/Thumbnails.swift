@@ -195,26 +195,6 @@ public struct NFTThumbnail: View {
 	}
 }
 
-// MARK: - PersonaThumbnail
-public struct PersonaThumbnail: View {
-	private let url: URL?
-	private let size: HitTargetSize
-
-	public init(_ url: URL?, size hitTargetSize: HitTargetSize = .small) {
-		self.url = url
-		self.size = hitTargetSize
-	}
-
-	public var body: some View {
-		LoadableImage(url: url, size: .fixedSize(size)) {
-			Image(asset: AssetResource.persona)
-				.resizable()
-		}
-		.clipShape(Circle())
-		.frame(size)
-	}
-}
-
 // MARK: - LoadableImage
 /// A helper view that handles the loading state, and potentially the error state
 public struct LoadableImage<Placeholder: View>: View {

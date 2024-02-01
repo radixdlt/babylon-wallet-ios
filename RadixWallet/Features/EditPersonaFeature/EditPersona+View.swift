@@ -57,7 +57,7 @@ extension EditPersona {
 				WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 					ScrollView(showsIndicators: false) {
 						VStack(spacing: .medium1) {
-							PersonaThumbnail(viewStore.avatarURL, size: .veryLarge)
+							Thumbnail(.persona, url: viewStore.avatarURL, size: .veryLarge)
 
 							EditPersonaField.View(store: store.labelField)
 
