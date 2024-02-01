@@ -45,8 +45,7 @@
 "assetDetails_currentSupply" = "Current Supply";
 "assetDetails_supplyUnkown" = "Unknown";
 "assetDetails_behavior" = "Behavior";
-"assetDetails_staking_readyToClaim" = "Ready to Claim %@ XRD";
-"assetDetails_staking_unstaking" = "Ready to Claim %@ XRD in approx. less than %d minutes";
+"assetDetails_staking_unstaking" = "Ready to claim in about %d minutes or less.";
 "assetDetails_tags" = "Tags";
 "assetDetails_tags_officialRadix" = "Official Radix";
 "assetDetails_associatedDapps" = "Associated dApps";

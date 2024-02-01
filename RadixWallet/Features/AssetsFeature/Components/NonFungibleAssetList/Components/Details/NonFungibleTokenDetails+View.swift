@@ -192,10 +192,9 @@ extension OnLedgerEntitiesClient.StakeClaim {
 		}
 
 		if isReadyToBeClaimed {
-			return L10n.AssetDetails.Staking.readyToClaim(claimAmount.formatted())
+			return "" // Temporary, will be replaced
 		} else {
 			return L10n.AssetDetails.Staking.unstaking(
-				claimAmount.formatted(),
 				reamainingEpochsUntilClaim * epochDurationInMinutes
 			)
 		}
