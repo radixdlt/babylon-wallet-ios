@@ -274,7 +274,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case let .copyRawTransactionTapped:
+		case .copyRawTransactionTapped:
 			guard case let .raw(manifest) = state.displayMode else {
 				assertionFailure("Copy raw manifest button should only be visible in raw transaction mode")
 				return .none
@@ -358,6 +358,12 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					.init(
 						resourceAddress: transfer.resource.resourceAddress,
 						resource: .success(transfer.resource),
+						ownedFungibleResource: .init(
+							resourceAddress: transfer.resource.resourceAddress,
+							atLedgerState: transfer.resource.atLedgerState,
+							amount: details.amount,
+							metadata: transfer.resource.metadata
+						),
 						isXRD: details.isXRD
 					)
 				)
