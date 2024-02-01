@@ -222,7 +222,7 @@ extension DappDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.nonFungibles, send: { .view($0) }) { viewStore in
 				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.nfts, elements: viewStore.state, title: \.title) { resource in
-					NFTThumbnail(resource.metadata.iconURL, size: .small)
+					Thumbnail(.nft, url: resource.metadata.iconURL, size: .small)
 				} action: { id in
 					viewStore.send(.nonFungibleTapped(id))
 				}

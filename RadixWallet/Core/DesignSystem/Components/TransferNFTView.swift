@@ -15,7 +15,7 @@ public struct TransferNFTView: View {
 	public var body: some View {
 		Button(action: onTap) {
 			HStack(spacing: .zero) {
-				NFTThumbnail(viewState.thumbnail, size: .small)
+				Thumbnail(.nft, url: viewState.thumbnail, size: .small)
 					.padding([.vertical, .trailing], .small1)
 
 				Spacer(minLength: 0)

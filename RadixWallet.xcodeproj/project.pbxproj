@@ -334,7 +334,6 @@
 		48CFC37A2ADC10D900E77A5C /* PoolUnitDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE592ADC10D800E77A5C /* PoolUnitDetails.swift */; };
 		48CFC37B2ADC10D900E77A5C /* PoolUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE5A2ADC10D800E77A5C /* PoolUnit.swift */; };
 		48CFC37C2ADC10D900E77A5C /* PoolUnitDetails+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE5B2ADC10D800E77A5C /* PoolUnitDetails+View.swift */; };
-		48CFC37D2ADC10D900E77A5C /* PoolUnitHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE5C2ADC10D800E77A5C /* PoolUnitHeaderView.swift */; };
 		48CFC37F2ADC10D900E77A5C /* PoolUnitsList+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE5E2ADC10D800E77A5C /* PoolUnitsList+View.swift */; };
 		48CFC3802ADC10D900E77A5C /* AssetTagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE602ADC10D800E77A5C /* AssetTagsView.swift */; };
 		48CFC3812ADC10D900E77A5C /* NFTHelperViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE612ADC10D800E77A5C /* NFTHelperViews.swift */; };
@@ -1690,7 +1689,6 @@
 		48CFBE592ADC10D800E77A5C /* PoolUnitDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PoolUnitDetails.swift; sourceTree = "<group>"; };
 		48CFBE5A2ADC10D800E77A5C /* PoolUnit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PoolUnit.swift; sourceTree = "<group>"; };
 		48CFBE5B2ADC10D800E77A5C /* PoolUnitDetails+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PoolUnitDetails+View.swift"; sourceTree = "<group>"; };
-		48CFBE5C2ADC10D800E77A5C /* PoolUnitHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PoolUnitHeaderView.swift; sourceTree = "<group>"; };
 		48CFBE5E2ADC10D800E77A5C /* PoolUnitsList+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PoolUnitsList+View.swift"; sourceTree = "<group>"; };
 		48CFBE602ADC10D800E77A5C /* AssetTagsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetTagsView.swift; sourceTree = "<group>"; };
 		48CFBE612ADC10D800E77A5C /* NFTHelperViews.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NFTHelperViews.swift; sourceTree = "<group>"; };
@@ -4572,7 +4570,6 @@
 				48CFBE582ADC10D800E77A5C /* PoolUnit+View.swift */,
 				48CFBE592ADC10D800E77A5C /* PoolUnitDetails.swift */,
 				48CFBE5B2ADC10D800E77A5C /* PoolUnitDetails+View.swift */,
-				48CFBE5C2ADC10D800E77A5C /* PoolUnitHeaderView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -9120,7 +9117,6 @@
 				48CFC45D2ADC10DA00E77A5C /* TransactionClient+TestValue.swift in Sources */,
 				48CFC2F32ADC10D900E77A5C /* CreatePersonaCoordinator+Models.swift in Sources */,
 				48CFC2772ADC10D900E77A5C /* P2PLinksFeature+View.swift in Sources */,
-				48CFC37D2ADC10D900E77A5C /* PoolUnitHeaderView.swift in Sources */,
 				48CFC2EC2ADC10D900E77A5C /* SecurityStructureTutorialHeader.swift in Sources */,
 				48CFC4052ADC10D900E77A5C /* NoopError.swift in Sources */,
 				48076E402B14F5CA004575F8 /* OnFirstAppearViewModifier.swift in Sources */,

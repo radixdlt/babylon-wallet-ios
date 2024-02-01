@@ -47,7 +47,7 @@ extension NonFungibleAssetList.Row.View {
 
 	private func rowView(_ viewStore: ViewStoreOf<NonFungibleAssetList.Row>) -> some SwiftUI.View {
 		HStack(spacing: .small1) {
-			NFTThumbnail(viewStore.resource.metadata.iconURL, size: .small)
+			Thumbnail(.nft, url: viewStore.resource.metadata.iconURL, size: .small)
 
 			VStack(alignment: .leading, spacing: .small2) {
 				Text(viewStore.resource.metadata.name ?? "")
