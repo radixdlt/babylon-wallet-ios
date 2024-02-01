@@ -4,6 +4,7 @@ public struct StakeClaimNFTSView: View {
 		public let canClaimTokens: Bool
 		public let validatorName: String?
 		public let stakeClaimTokens: OnLedgerEntitiesClient.NonFunbileResourceWithTokens
+
 		var selectedStakeClaims: IdentifiedArrayOf<NonFungibleGlobalId>?
 
 		var unstaking: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim> {
@@ -42,17 +43,24 @@ public struct StakeClaimNFTSView: View {
 	}
 
 	public let viewState: ViewState
+	public let background: Color
 	public let onTap: (OnLedgerEntitiesClient.StakeClaim) -> Void
 	public let onClaimAllTapped: (() -> Void)?
 
-	public init(viewState: ViewState, onTap: @escaping (OnLedgerEntitiesClient.StakeClaim) -> Void, onClaimAllTapped: (() -> Void)? = nil) {
+	public init(
+		viewState: ViewState,
+		background: Color,
+		onTap: @escaping (OnLedgerEntitiesClient.StakeClaim) -> Void,
+		onClaimAllTapped: (() -> Void)? = nil
+	) {
 		self.viewState = viewState
+		self.background = background
 		self.onTap = onTap
 		self.onClaimAllTapped = onClaimAllTapped
 	}
 
 	public var body: some View {
-		VStack(alignment: .leading, spacing: .small1) {
+		VStack(alignment: .leading, spacing: .medium3) {
 			HStack(spacing: .zero) {
 				TokenThumbnail(.known(viewState.resourceMetadata.iconURL), size: .smaller)
 					.padding(.trailing, .small1)
@@ -86,11 +94,13 @@ public struct StakeClaimNFTSView: View {
 				sectionView(viewState.toBeClaimed, kind: .toBeClaimed)
 			}
 		}
+		.padding(.medium3)
+		.background(background)
 	}
 
 	@ViewBuilder
 	func sectionView(_ claims: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim>, kind: SectionKind) -> some View {
-		VStack(alignment: .leading, spacing: .small2) {
+		VStack(alignment: .leading, spacing: .zero) {
 			HStack {
 				Text(kind.title)
 					.textStyle(.body2HighImportance)
@@ -110,21 +120,26 @@ public struct StakeClaimNFTSView: View {
 					}
 				}
 			}
-			ForEach(claims) { claim in
-				HStack {
+			.padding(.bottom, .small3)
+
+			VStack(alignment: .leading, spacing: .small2) {
+				ForEach(claims) { claim in
 					Button {
 						onTap(claim)
 					} label: {
-						TokenBalanceView.xrd(balance: claim.claimAmount)
-							.contentShape(Rectangle())
+						HStack {
+							TokenBalanceView(viewState: .xrd(balance: claim.claimAmount))
+
+							if let isSelected = viewState.selectedStakeClaims?.contains(claim.id) {
+								CheckmarkView(appearance: .dark, isChecked: isSelected)
+							}
+						}
+						.padding(.small1)
+						.background(background)
 					}
-					if let isSelected = viewState.selectedStakeClaims?.contains(claim.id) {
-						CheckmarkView(appearance: .dark, isChecked: isSelected)
-					}
+					.buttonStyle(.borderless)
+					.roundedCorners(strokeColor: .app.gray3)
 				}
-				.padding(.small1)
-				.background(.white)
-				.roundedCorners(strokeColor: .app.gray3)
 			}
 		}
 	}

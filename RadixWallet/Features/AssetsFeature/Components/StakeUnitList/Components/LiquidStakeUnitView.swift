@@ -7,13 +7,15 @@ public struct LiquidStakeUnitView: View {
 	}
 
 	let viewState: ViewState
-	let action: () -> Void
+	let background: Color
+	let onTap: () -> Void
 
 	public var body: some View {
-		Button(action: action) {
-			VStack(alignment: .leading, spacing: .small2) {
-				HStack {
+		Button(action: onTap) {
+			VStack(alignment: .leading, spacing: .medium3) {
+				HStack(spacing: .zero) {
 					TokenThumbnail(.known(viewState.resource.metadata.iconURL), size: .smaller)
+						.padding(.trailing, .small2)
 
 					VStack(alignment: .leading, spacing: .zero) {
 						Text(viewState.resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName)
@@ -25,25 +27,26 @@ public struct LiquidStakeUnitView: View {
 								.textStyle(.body2Regular)
 						}
 					}
+					.padding(.trailing, .small2)
 
-					Spacer()
-				}
+					Spacer(minLength: 0)
 
-				Text(L10n.Account.Staking.worth)
-					.textStyle(.body2HighImportance)
-					.foregroundColor(.app.gray2)
-					.textCase(nil)
-
-				HStack {
-					TokenBalanceView.xrd(balance: viewState.worth)
 					if let isSelected = viewState.isSelected {
 						CheckmarkView(appearance: .dark, isChecked: isSelected)
 					}
 				}
-				.padding(.small1)
-				.background(.white)
-				.roundedCorners(strokeColor: .app.gray3)
+
+				VStack(alignment: .leading, spacing: .small3) {
+					Text(L10n.Account.Staking.worth.uppercased())
+						.textStyle(.body2HighImportance)
+						.foregroundColor(.app.gray2)
+
+					TokenBalanceView.Bordered(viewState: .xrd(balance: viewState.worth))
+				}
 			}
+			.padding(.medium3)
+			.background(background)
 		}
+		.buttonStyle(.borderless)
 	}
 }

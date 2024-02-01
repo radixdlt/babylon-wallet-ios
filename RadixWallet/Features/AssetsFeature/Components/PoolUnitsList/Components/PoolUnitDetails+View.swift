@@ -57,7 +57,7 @@ extension PoolUnitDetails {
 							.textStyle(.secondaryHeader)
 							.foregroundColor(.app.gray1)
 
-						PoolUnitResourcesView(resources: viewStore.resources, resourceBackgroundColor: .app.white)
+						PoolUnitResourcesView(resources: viewStore.resources)
 							.padding(.horizontal, .large2)
 
 						AssetResourceDetailsSection(viewState: viewStore.resourceDetails)

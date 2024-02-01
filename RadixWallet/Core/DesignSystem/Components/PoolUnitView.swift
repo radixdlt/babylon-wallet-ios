@@ -9,7 +9,7 @@ public struct PoolUnitView: View {
 	}
 
 	public let viewState: ViewState
-	public let backgroundColor: Color
+	public let background: Color
 	public let onTap: () -> Void
 
 	public var body: some View {
@@ -46,51 +46,49 @@ public struct PoolUnitView: View {
 
 					Spacer(minLength: 0)
 
+					if let isSelected = viewState.isSelected {
+						CheckmarkView(appearance: .dark, isChecked: isSelected)
+					}
+
 					//					AssetIcon(.asset(AssetResource.info), size: .smallest)
 					//						.tint(.app.gray3)
 				}
 				.padding(.bottom, .small2)
 
-				Text(L10n.TransactionReview.worth)
+				Text(L10n.TransactionReview.worth.uppercased())
 					.textStyle(.body2HighImportance)
 					.foregroundColor(.app.gray2)
 					.padding(.bottom, .small3)
 
 				loadable(viewState.resources) { resources in
-					HStack(spacing: .zero) {
-						PoolUnitResourcesView(resources: resources, resourceBackgroundColor: backgroundColor)
-							.padding(.trailing, .small2)
-
-						if let isSelected = viewState.isSelected {
-							CheckmarkView(appearance: .dark, isChecked: isSelected)
-						}
-					}
+					PoolUnitResourcesView(resources: resources)
 				}
 			}
-			.background(backgroundColor)
-			.padding(.medium1)
+			.padding(.medium3)
+			.background(background)
 		}
+		.buttonStyle(.borderless)
 	}
 }
 
 // MARK: - PoolUnitResourcesView
 public struct PoolUnitResourcesView: View {
 	public let resources: [PoolUnitResourceView.ViewState]
-	public let resourceBackgroundColor: Color
 
 	public var body: some View {
-		VStack(spacing: 1) {
+		VStack(spacing: 0) {
 			ForEach(resources) { resource in
 				PoolUnitResourceView(viewState: resource)
+					.padding(.small1)
+
+				if resource.id != resources.last?.id {
+					Rectangle()
+						.fill(.app.gray3)
+						.frame(height: 1)
+				}
 			}
-			.padding(.small1)
-			.background(resourceBackgroundColor)
 		}
-		.background(.app.gray3)
-		.overlay(
-			RoundedRectangle(cornerRadius: .small2)
-				.stroke(.app.gray3, lineWidth: 1)
-		)
+		.roundedCorners(strokeColor: .app.gray3)
 	}
 }
 
@@ -101,18 +99,6 @@ public struct PoolUnitResourceView: View {
 		public let symbol: String?
 		public let icon: TokenThumbnail.Content
 		public let amount: String
-
-		public init(
-			id: ResourceAddress,
-			symbol: String?,
-			icon: TokenThumbnail.Content,
-			amount: String
-		) {
-			self.id = id
-			self.symbol = symbol
-			self.icon = icon
-			self.amount = amount
-		}
 
 		public init(
 			id: ResourceAddress,

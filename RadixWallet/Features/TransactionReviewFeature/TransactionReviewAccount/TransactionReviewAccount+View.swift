@@ -75,15 +75,19 @@ extension TransactionReviewAccount {
 				InnerCard {
 					SmallAccountCard(account: viewStore.account)
 
-					VStack(spacing: 1) {
+					VStack(spacing: .zero) {
 						ForEach(viewStore.transfers) { transfer in
 							TransactionReviewResourceView(transfer: transfer) { token in
 								viewStore.send(.transferTapped(transfer, token))
 							}
+
+							if transfer.id != viewStore.transfers.last?.id {
+								Rectangle()
+									.fill(.app.gray4)
+									.frame(height: 1)
+							}
 						}
-						.background(.app.gray5)
 					}
-					.background(.app.gray4)
 				}
 			}
 		}
@@ -98,28 +102,25 @@ struct TransactionReviewResourceView: View {
 	var body: some View {
 		switch transfer.details {
 		case let .fungible(details):
-			let viewState = TransactionReviewTokenView.ViewState(resource: transfer.resource, details: details)
-			TransactionReviewTokenView(viewState: viewState) {
+			TransactionReviewFungibleView(viewState: .init(resource: transfer.resource, details: details), background: .app.gray5) {
 				onTap(nil)
 			}
 		case let .nonFungible(details):
-			TransferNFTView(viewState: .init(resource: transfer.resource, details: details)) {
+			TransferNFTView(viewState: .init(resource: transfer.resource, details: details), background: .app.gray5) {
 				onTap(nil)
 			}
 		case let .liquidStakeUnit(details):
-			LiquidStakeUnitView(viewState: .init(resource: transfer.resource, details: details)) {
+			LiquidStakeUnitView(viewState: .init(resource: transfer.resource, details: details), background: .app.gray5) {
 				onTap(nil)
 			}
-			.padding(.medium3)
 		case let .poolUnit(details):
-			PoolUnitView(viewState: .init(details: details.details), backgroundColor: .app.gray5) {
+			PoolUnitView(viewState: .init(details: details.details), background: .app.gray5) {
 				onTap(nil)
 			}
 		case let .stakeClaimNFT(details):
-			StakeClaimNFTSView(viewState: details) { stakeClaim in
+			StakeClaimNFTSView(viewState: details, background: .app.gray5) { stakeClaim in
 				onTap(stakeClaim.token)
 			}
-			.padding()
 		}
 	}
 }
@@ -134,7 +135,7 @@ extension LiquidStakeUnitView.ViewState {
 	}
 }
 
-extension TransactionReviewTokenView.ViewState {
+extension TransactionReviewFungibleView.ViewState {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.Fungible) {
 		self.init(
 			name: resource.metadata.symbol ?? resource.metadata.name ?? L10n.TransactionReview.unknown,
