@@ -1,6 +1,94 @@
 import NukeUI
 import SwiftUI
 
+// MARK: - Thumbnail
+public struct Thumbnail: View {
+	private let type: ContentType
+	private let url: URL?
+	private let size: HitTargetSize
+
+	public enum TokenContent: Sendable, Hashable {
+		case xrd
+		case other(URL?)
+	}
+
+	public enum ContentType: Sendable, Hashable {
+		case token(Token)
+		case poolUnit
+		case lsu
+		case nft
+		case persona
+		case dapp
+		case pool
+		case validator
+
+		public enum Token: Sendable, Hashable {
+			case xrd
+			case other
+		}
+	}
+
+	private init(token: TokenContent, size: HitTargetSize = .small) {
+		switch token {
+		case .xrd:
+			self.init(.token(.xrd), url: nil, size: size)
+		case let .other(url):
+			self.init(.token(.other), url: url, size: size)
+		}
+	}
+
+	public init(_ type: ContentType, url: URL?, size: HitTargetSize = .small) {
+		self.type = type
+		self.url = url
+		self.size = size
+	}
+
+	public var body: some View {
+		switch type {
+		case .token(.xrd):
+			Image(asset: AssetResource.xrd)
+				.resizable()
+				.frame(size)
+
+		case .token(.other):
+			circularImage(placeholder: AssetResource.token)
+
+		case .poolUnit, .lsu:
+			circularImage(placeholder: AssetResource.poolUnit)
+
+		case .nft:
+			roundedRectImage(placeholder: AssetResource.nft)
+
+		case .persona:
+			circularImage(placeholder: AssetResource.persona)
+
+		case .dapp, .pool:
+			roundedRectImage(placeholder: AssetResource.unknownComponent)
+
+		case .validator:
+			roundedRectImage(placeholder: AssetResource.iconValidator)
+		}
+	}
+
+	private func circularImage(placeholder: ImageAsset) -> some View {
+		LoadableImage(url: url, size: .fixedSize(size)) {
+			Image(asset: placeholder)
+				.resizable()
+		}
+		.clipShape(Circle())
+		.frame(size)
+	}
+
+	private func roundedRectImage(placeholder: ImageAsset) -> some View {
+		LoadableImage(url: url, size: .fixedSize(size)) {
+			Image(asset: placeholder)
+				.resizable()
+		}
+		.cornerRadius(size.cornerRadius)
+		.frame(size)
+	}
+}
+
 // MARK: - DappThumbnail
 public struct DappThumbnail: View {
 	private let content: Content
@@ -123,26 +211,6 @@ public struct PersonaThumbnail: View {
 				.resizable()
 		}
 		.clipShape(Circle())
-		.frame(size)
-	}
-}
-
-// MARK: - ValidatorThumbnail
-public struct ValidatorThumbnail: View {
-	private let url: URL?
-	private let size: HitTargetSize
-
-	public init(_ url: URL?, size hitTargetSize: HitTargetSize = .small) {
-		self.url = url
-		self.size = hitTargetSize
-	}
-
-	public var body: some View {
-		LoadableImage(url: url, size: .fixedSize(size)) {
-			Image(asset: AssetResource.iconValidator)
-				.resizable()
-		}
-		.cornerRadius(size.cornerRadius)
 		.frame(size)
 	}
 }
