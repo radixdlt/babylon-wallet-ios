@@ -78,18 +78,23 @@ public struct PoolUnitResourcesView: View {
 	public var body: some View {
 		VStack(spacing: 0) {
 			ForEach(resources) { resource in
+				let isNotLast = resource.id != resources.last?.id
 				PoolUnitResourceView(viewState: resource)
 					.padding(.small1)
-
-				if resource.id != resources.last?.id {
-					Rectangle()
-						.fill(.app.gray3)
-						.frame(height: 1)
-				}
+					.padding(.bottom, isNotLast ? dividerHeight : 0)
+					.overlay(alignment: .bottom) {
+						if isNotLast {
+							Rectangle()
+								.fill(.app.gray3)
+								.frame(height: dividerHeight)
+						}
+					}
 			}
 		}
 		.roundedCorners(strokeColor: .app.gray3)
 	}
+
+	private let dividerHeight: CGFloat = 1
 }
 
 // MARK: - PoolUnitResourceView
