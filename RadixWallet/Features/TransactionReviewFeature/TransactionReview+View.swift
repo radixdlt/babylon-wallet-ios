@@ -236,7 +236,7 @@ extension TransactionReview {
 					Spacer(minLength: 0)
 
 					if let thumbnail = proposingDappMetadata?.thumbnail {
-						DappThumbnail(.known(thumbnail), size: .medium)
+						Thumbnail(.dapp, url: thumbnail, size: .medium)
 							.padding(.leading, .small2)
 					} else {
 						Spacer(minLength: .small2 + HitTargetSize.medium.rawValue)

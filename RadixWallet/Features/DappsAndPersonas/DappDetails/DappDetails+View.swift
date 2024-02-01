@@ -32,7 +32,7 @@ extension DappDetails.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: 0) {
-					DappThumbnail(.known(viewStore.thumbnail), size: .veryLarge)
+					Thumbnail(.dapp, url: viewStore.thumbnail, size: .veryLarge)
 						.padding(.vertical, .large2)
 
 					InfoBlock(store: store)

@@ -250,7 +250,7 @@ extension PersonaDetails.View {
 							viewStore.send(.dAppTapped(dApp.id))
 						} contents: {
 							PlainListRow(title: dApp.displayName) {
-								DappThumbnail(.known(dApp.thumbnail))
+								Thumbnail(.dapp, url: dApp.thumbnail)
 							}
 						}
 						.padding(.horizontal, .medium3)

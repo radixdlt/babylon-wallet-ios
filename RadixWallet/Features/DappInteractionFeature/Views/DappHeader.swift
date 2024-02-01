@@ -9,7 +9,7 @@ struct DappHeader: View {
 
 	var body: some View {
 		VStack(spacing: .medium3) {
-			DappThumbnail(.known(thumbnail), size: .medium)
+			Thumbnail(.dapp, url: thumbnail, size: .medium)
 
 			Text(title)
 				.foregroundColor(.app.gray1)

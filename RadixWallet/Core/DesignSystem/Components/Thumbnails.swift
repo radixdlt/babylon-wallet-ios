@@ -89,47 +89,6 @@ public struct Thumbnail: View {
 	}
 }
 
-// MARK: - DappThumbnail
-public struct DappThumbnail: View {
-	private let content: Content
-	private let size: HitTargetSize
-
-	public enum Content: Sendable, Hashable {
-		case known(URL?)
-		case unknown
-	}
-
-	public init(_ content: Content, size hitTargetSize: HitTargetSize = .small) {
-		self.content = content
-		self.size = hitTargetSize
-	}
-
-	public var body: some View {
-		image
-			.cornerRadius(size.cornerRadius)
-			.frame(size)
-	}
-
-	@ViewBuilder
-	@MainActor
-	private var image: some View {
-		switch content {
-		case let .known(url):
-			LoadableImage(url: url, size: .fixedSize(size)) {
-				placeholder
-			}
-		case .unknown:
-			// TODO: Show different icon if unknown
-			placeholder
-		}
-	}
-
-	private var placeholder: some View {
-		Image(asset: AssetResource.unknownComponent)
-			.resizable()
-	}
-}
-
 // MARK: - TokenThumbnail
 public struct TokenThumbnail: View {
 	private let content: Content
