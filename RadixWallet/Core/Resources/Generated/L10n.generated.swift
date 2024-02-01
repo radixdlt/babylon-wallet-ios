@@ -604,10 +604,6 @@ public enum L10n {
       public static let whatArePoolUnits = L10n.tr("Localizable", "assetDetails_poolUnitDetails_whatArePoolUnits", fallback: "What are Pool units?")
     }
     public enum Staking {
-      /// Ready to Claim %@ XRD
-      public static func readyToClaim(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "assetDetails_staking_readyToClaim", String(describing: p1), fallback: "Ready to Claim %@ XRD")
-      }
       /// Ready to claim in about %d minutes or less.
       public static func unstaking(_ p1: Int) -> String {
         return L10n.tr("Localizable", "assetDetails_staking_unstaking", p1, fallback: "Ready to claim in about %d minutes or less.")
