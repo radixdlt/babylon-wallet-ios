@@ -130,7 +130,6 @@ public struct PoolUnitResourceView: View {
 
 			Text(viewState.amount)
 				.lineLimit(1)
-				.minimumScaleFactor(0.8)
 				.truncationMode(.tail)
 				.textStyle(.secondaryHeader)
 				.foregroundColor(.app.gray1)
