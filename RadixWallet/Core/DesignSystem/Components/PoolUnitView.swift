@@ -16,17 +16,8 @@ public struct PoolUnitView: View {
 		Button(action: onTap) {
 			VStack(alignment: .leading, spacing: .zero) {
 				HStack(spacing: .zero) {
-					LoadableImage(url: viewState.poolIcon, size: .fixedSize(.verySmall)) {
-						ZStack {
-							Circle()
-								.fill(.app.gray4)
-								.frame(width: .large1, height: .large1)
-							Image(asset: AssetResource.poolUnits)
-								.resizable()
-								.frame(.verySmall)
-						}
-					}
-					.padding(.trailing, .medium3)
+					Thumbnail(.poolUnit, url: viewState.poolIcon, size: .small)
+						.padding(.trailing, .medium3)
 
 					VStack(alignment: .leading, spacing: 0) {
 						if let poolName = viewState.poolName {

@@ -54,7 +54,16 @@ public struct Thumbnail: View {
 			circularImage(placeholder: AssetResource.token)
 
 		case .poolUnit, .lsu:
-			circularImage(placeholder: AssetResource.poolUnit)
+			LoadableImage(url: url, size: .fixedSize(size)) {
+				ZStack {
+					Circle()
+						.fill(.app.gray4)
+						.frame(size)
+					Image(asset: AssetResource.poolUnits)
+						.resizable()
+						.frame(width: size.rawValue * 0.75, height: size.rawValue * 0.75)
+				}
+			}
 
 		case .nft:
 			roundedRectImage(placeholder: AssetResource.nft)

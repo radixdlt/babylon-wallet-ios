@@ -48,7 +48,7 @@ extension PoolUnitDetails {
 				DetailsContainerWithHeaderView(viewState: viewStore.containerWithHeader) {
 					viewStore.send(.closeButtonTapped)
 				} thumbnailView: {
-					Thumbnail(.nft, url: viewStore.thumbnailURL, size: .veryLarge)
+					Thumbnail(.poolUnit, url: viewStore.thumbnailURL, size: .veryLarge)
 				} detailsView: {
 					VStack(spacing: .medium1) {
 						AssetDetailsSeparator()
