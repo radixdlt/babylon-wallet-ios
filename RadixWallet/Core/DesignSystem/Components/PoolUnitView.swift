@@ -20,11 +20,9 @@ public struct PoolUnitView: View {
 						.padding(.trailing, .medium3)
 
 					VStack(alignment: .leading, spacing: 0) {
-						if let poolName = viewState.poolName {
-							Text(poolName)
-								.textStyle(.body1Header)
-								.foregroundColor(.app.gray1)
-						}
+						Text(viewState.poolName ?? L10n.TransactionReview.poolUnits)
+							.textStyle(.body1Header)
+							.foregroundColor(.app.gray1)
 
 						loadable(viewState.dAppName, loadingViewHeight: .small1) { dAppName in
 							if let dAppName {
