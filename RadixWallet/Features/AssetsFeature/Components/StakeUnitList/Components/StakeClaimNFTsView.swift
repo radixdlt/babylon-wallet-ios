@@ -164,9 +164,7 @@ public struct StakeClaimTokensView: View {
 			VStack(alignment: .leading, spacing: .small2) {
 				ForEach(claims) { claim in
 					Button {
-						if let onTap {
-							onTap(claim)
-						}
+						onTap?(claim)
 					} label: {
 						HStack {
 							TokenBalanceView(viewState: .xrd(balance: claim.claimAmount))
