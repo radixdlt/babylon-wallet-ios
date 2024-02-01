@@ -13,13 +13,15 @@ struct ValidatorHeaderView: View {
 
 	var body: some View {
 		HStack(spacing: .zero) {
-			NFTThumbnail(viewState.imageURL, size: .small)
+			ValidatorThumbnail(viewState.imageURL, size: .small)
 				.padding(.trailing, .small1)
 
 			VStack(alignment: .leading) {
 				Text(viewState.name)
 					.textStyle(.secondaryHeader)
 					.foregroundColor(.app.gray1)
+					.multilineTextAlignment(.leading)
+
 				if let stakedAmount = viewState.stakedAmount {
 					// This localization does not look right, should be only one string.
 					Text(L10n.Account.Staking.staked + " \(stakedAmount.formatted()) XRD")
