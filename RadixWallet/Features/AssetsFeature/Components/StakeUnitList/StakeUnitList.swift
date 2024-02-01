@@ -151,7 +151,11 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 					return .none
 				}
 
-				state.stakedValidators[id: stakeClaim.validatorAddress]?.stakeClaimNFTs?.selectedStakeClaims?.togglePresence(of: stakeClaim.token.id)
+				state.stakedValidators[id: stakeClaim.validatorAddress]?
+					.stakeClaimResource?
+					.stakeClaimTokens
+					.selectedStakeClaims?
+					.togglePresence(of: stakeClaim.token.id)
 				state.selectedStakeClaimTokens?[ownedStakeClaim, default: []].togglePresence(of: stakeClaim.token)
 
 				return .none
@@ -300,8 +304,8 @@ extension StakeUnitList {
 						isSelected: state.selectedLiquidStakeUnits?.contains { $0.id == stakeUnitResource.resource.resourceAddress }
 					)
 				},
-				stakeClaimNFTs: stake.stakeClaimTokens.map { stakeClaimTokens in
-					StakeClaimNFTSView.ViewState(
+				stakeClaimResource: stake.stakeClaimTokens.map { stakeClaimTokens in
+					StakeClaimResourceView.ViewState(
 						canClaimTokens: allSelectedTokens == nil, // cannot claim in selection mode
 						stakeClaimTokens: stakeClaimTokens,
 						selectedStakeClaims: allSelectedTokens

@@ -881,7 +881,7 @@ extension TransactionReview {
 			}
 
 			public typealias NonFungible = OnLedgerEntity.NonFungibleToken
-			public typealias StakeClaimNFT = StakeClaimNFTSView.ViewState
+			public typealias StakeClaimNFT = StakeClaimResourceView.ViewState
 
 			public struct PoolUnit: Sendable, Hashable {
 				public let details: OnLedgerEntitiesClient.OwnedResourcePoolDetails

@@ -118,7 +118,7 @@ struct TransactionReviewResourceView: View {
 				onTap(nil)
 			}
 		case let .stakeClaimNFT(details):
-			StakeClaimNFTSView(viewState: details, background: .app.gray5) { stakeClaim in
+			StakeClaimResourceView(viewState: details, background: .app.gray5) { stakeClaim in
 				onTap(stakeClaim.token)
 			}
 		}

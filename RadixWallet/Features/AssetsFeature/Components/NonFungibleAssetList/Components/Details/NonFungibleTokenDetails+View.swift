@@ -83,11 +83,9 @@ extension NonFungibleTokenDetails {
 								KeyValueView(nonFungibleGlobalID: tokenDetails.nonFungibleGlobalID)
 
 								if let stakeClaim = tokenDetails.stakeClaim {
-									Button(stakeClaim.description) {
+									stakeClaimView(stakeClaim) {
 										viewStore.send(.tappedClaimStake)
 									}
-									.buttonStyle(.primaryRectangular)
-									.controlState(stakeClaim.isReadyToBeClaimed ? .enabled : .disabled)
 								}
 
 								if !tokenDetails.dataFields.isEmpty {
@@ -185,19 +183,38 @@ extension NonFungibleTokenDetails {
 	}
 }
 
-extension OnLedgerEntitiesClient.StakeClaim {
-	var description: String {
-		guard let reamainingEpochsUntilClaim else {
-			return L10n.TransactionReview.toBeClaimed.uppercased()
-		}
-
-		if isReadyToBeClaimed {
-			return "" // Temporary, will be replaced
-		} else {
-			return L10n.AssetDetails.Staking.unstaking(
-				reamainingEpochsUntilClaim * epochDurationInMinutes
+extension NonFungibleTokenDetails.View {
+	fileprivate func stakeClaimView(
+		_ stakeClaim: OnLedgerEntitiesClient.StakeClaim,
+		onClaimTap: @escaping () -> Void
+	) -> some SwiftUI.View {
+		VStack(alignment: .leading, spacing: .small3) {
+			StakeClaimTokensView(
+				viewState: .init(
+					canClaimTokens: true,
+					stakeClaims: [stakeClaim]
+				),
+				background: .app.white,
+				onClaimAllTapped: onClaimTap
 			)
+
+			if let unstakingDurationDescription = stakeClaim.unstakingDurationDescription {
+				Text(unstakingDurationDescription)
+					.textStyle(.body2HighImportance)
+					.foregroundColor(.app.gray2)
+			}
 		}
+	}
+}
+
+extension OnLedgerEntitiesClient.StakeClaim {
+	var unstakingDurationDescription: String? {
+		guard let reamainingEpochsUntilClaim, isUnstaking else {
+			return nil
+		}
+		return L10n.AssetDetails.Staking.unstaking(
+			reamainingEpochsUntilClaim * epochDurationInMinutes
+		)
 	}
 }
 

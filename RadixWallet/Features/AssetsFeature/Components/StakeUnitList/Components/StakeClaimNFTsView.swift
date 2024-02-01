@@ -1,26 +1,12 @@
-// MARK: - StakeClaimNFTSView
-public struct StakeClaimNFTSView: View {
+// MARK: - StakeClaimResourceView
+public struct StakeClaimResourceView: View {
 	public struct ViewState: Sendable, Hashable {
-		public let canClaimTokens: Bool
 		public let validatorName: String?
-		public let stakeClaimTokens: OnLedgerEntitiesClient.NonFunbileResourceWithTokens
-
-		var selectedStakeClaims: IdentifiedArrayOf<NonFungibleGlobalId>?
-
-		var unstaking: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim> {
-			stakeClaimTokens.stakeClaims.filter(\.isUnstaking)
-		}
-
-		var readyToBeClaimed: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim> {
-			stakeClaimTokens.stakeClaims.filter(\.isReadyToBeClaimed)
-		}
-
-		var toBeClaimed: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim> {
-			stakeClaimTokens.stakeClaims.filter(\.isToBeClaimed)
-		}
+		public var stakeClaimTokens: StakeClaimTokensView.ViewState
+		public let stakeClaimResource: OnLedgerEntity.Resource
 
 		var resourceMetadata: OnLedgerEntity.Metadata {
-			stakeClaimTokens.resource.metadata
+			stakeClaimResource.metadata
 		}
 
 		init(
@@ -29,17 +15,14 @@ public struct StakeClaimNFTSView: View {
 			validatorName: String? = nil,
 			selectedStakeClaims: IdentifiedArrayOf<NonFungibleGlobalId>? = nil
 		) {
-			self.canClaimTokens = canClaimTokens
 			self.validatorName = validatorName
-			self.stakeClaimTokens = stakeClaimTokens
-			self.selectedStakeClaims = selectedStakeClaims
+			self.stakeClaimResource = stakeClaimTokens.resource
+			self.stakeClaimTokens = .init(
+				canClaimTokens: canClaimTokens,
+				stakeClaims: stakeClaimTokens.stakeClaims,
+				selectedStakeClaims: selectedStakeClaims
+			)
 		}
-	}
-
-	enum SectionKind {
-		case unstaking
-		case readyToBeClaimed
-		case toBeClaimed
 	}
 
 	public let viewState: ViewState
@@ -82,24 +65,80 @@ public struct StakeClaimNFTSView: View {
 				Spacer()
 			}
 
-			if !viewState.unstaking.isEmpty {
-				sectionView(viewState.unstaking, kind: .unstaking)
-			}
-
-			if !viewState.readyToBeClaimed.isEmpty {
-				sectionView(viewState.readyToBeClaimed, kind: .readyToBeClaimed)
-			}
-
-			if !viewState.toBeClaimed.isEmpty {
-				sectionView(viewState.toBeClaimed, kind: .toBeClaimed)
-			}
+			StakeClaimTokensView(
+				viewState: viewState.stakeClaimTokens,
+				background: background,
+				onTap: onTap,
+				onClaimAllTapped: onClaimAllTapped
+			)
 		}
 		.padding(.medium3)
 		.background(background)
 	}
+}
+
+// MARK: - StakeClaimTokensView
+public struct StakeClaimTokensView: View {
+	enum SectionKind {
+		case unstaking
+		case readyToBeClaimed
+		case toBeClaimed
+	}
+
+	public struct ViewState: Sendable, Hashable {
+		public let canClaimTokens: Bool
+		public let stakeClaims: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim>
+		var selectedStakeClaims: IdentifiedArrayOf<NonFungibleGlobalId>?
+
+		var unstaking: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim> {
+			stakeClaims.filter(\.isUnstaking)
+		}
+
+		var readyToBeClaimed: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim> {
+			stakeClaims.filter(\.isReadyToBeClaimed)
+		}
+
+		var toBeClaimed: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim> {
+			stakeClaims.filter(\.isToBeClaimed)
+		}
+	}
+
+	public var viewState: ViewState
+	public let background: Color
+	public let onTap: ((OnLedgerEntitiesClient.StakeClaim) -> Void)?
+	public let onClaimAllTapped: (() -> Void)?
+
+	init(
+		viewState: ViewState,
+		background: Color,
+		onTap: ((OnLedgerEntitiesClient.StakeClaim) -> Void)? = nil,
+		onClaimAllTapped: (() -> Void)? = nil
+	) {
+		self.viewState = viewState
+		self.background = background
+		self.onTap = onTap
+		self.onClaimAllTapped = onClaimAllTapped
+	}
+
+	public var body: some View {
+		if !viewState.unstaking.isEmpty {
+			sectionView(viewState.unstaking, kind: .unstaking)
+		}
+
+		if !viewState.readyToBeClaimed.isEmpty {
+			sectionView(viewState.readyToBeClaimed, kind: .readyToBeClaimed)
+		}
+
+		if !viewState.toBeClaimed.isEmpty {
+			sectionView(viewState.toBeClaimed, kind: .toBeClaimed)
+		}
+	}
 
 	@ViewBuilder
-	func sectionView(_ claims: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim>, kind: SectionKind) -> some View {
+	func sectionView(
+		_ claims: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim>,
+		kind: SectionKind
+	) -> some View {
 		VStack(alignment: .leading, spacing: .zero) {
 			HStack {
 				Text(kind.title)
@@ -125,7 +164,7 @@ public struct StakeClaimNFTSView: View {
 			VStack(alignment: .leading, spacing: .small2) {
 				ForEach(claims) { claim in
 					Button {
-						onTap(claim)
+						onTap?(claim)
 					} label: {
 						HStack {
 							TokenBalanceView(viewState: .xrd(balance: claim.claimAmount))
@@ -137,6 +176,7 @@ public struct StakeClaimNFTSView: View {
 						.padding(.small1)
 						.background(background)
 					}
+					.disabled(onTap == nil)
 					.buttonStyle(.borderless)
 					.roundedCorners(strokeColor: .app.gray3)
 				}
@@ -145,7 +185,7 @@ public struct StakeClaimNFTSView: View {
 	}
 }
 
-extension StakeClaimNFTSView.SectionKind {
+extension StakeClaimTokensView.SectionKind {
 	var title: String {
 		switch self {
 		case .unstaking:

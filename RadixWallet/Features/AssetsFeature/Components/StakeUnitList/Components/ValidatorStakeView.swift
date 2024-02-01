@@ -12,7 +12,7 @@ struct ValidatorStakeView: View {
 
 		let validatorNameViewState: ValidatorHeaderView.ViewState
 		var liquidStakeUnit: LiquidStakeUnitView.ViewState?
-		var stakeClaimNFTs: StakeClaimNFTSView.ViewState?
+		var stakeClaimResource: StakeClaimResourceView.ViewState?
 	}
 
 	let viewState: ViewState
@@ -39,7 +39,7 @@ struct ValidatorStakeView: View {
 					.rowStyle()
 			}
 
-			if let stakeClaimNFTsViewState = viewState.stakeClaimNFTs {
+			if let stakeClaimNFTsViewState = viewState.stakeClaimResource {
 				stakeClaimNFTsView(
 					viewState: stakeClaimNFTsViewState,
 					onTap: onStakeClaimTokenTapped,
@@ -62,7 +62,7 @@ struct ValidatorStakeView: View {
 	}
 
 	private func stakeClaimNFTsView(
-		viewState: StakeClaimNFTSView.ViewState,
+		viewState: StakeClaimResourceView.ViewState,
 		onTap: @escaping (OnLedgerEntitiesClient.StakeClaim) -> Void,
 		onClaimAllTapped: @escaping () -> Void
 	) -> some SwiftUI.View {
@@ -71,7 +71,7 @@ struct ValidatorStakeView: View {
 				.frame(height: .small3)
 				.overlay(.app.gray5)
 
-			StakeClaimNFTSView(
+			StakeClaimResourceView(
 				viewState: viewState,
 				background: .app.white,
 				onTap: onTap,
