@@ -92,9 +92,9 @@ extension TransactionReviewGuarantee.State {
 		.init(
 			id: id,
 			account: account,
-			token: .init(
+			fungible: .init(
 				name: resource.title,
-				thumbnail: isXRD ? .xrd : .other(resource.metadata.iconURL),
+				thumbnail: thumbnail,
 				amount: amount,
 				guaranteedAmount: guarantee.amount,
 				fiatAmount: nil
@@ -107,7 +107,7 @@ extension TransactionReviewGuarantee {
 	public struct ViewState: Identifiable, Equatable {
 		public let id: TransactionReview.Transfer.ID
 		let account: TransactionReview.Account
-		let token: TransactionReviewFungibleView.ViewState
+		let fungible: TransactionReviewFungibleView.ViewState
 	}
 
 	public struct View: SwiftUI.View {
@@ -123,7 +123,7 @@ extension TransactionReviewGuarantee {
 					VStack(spacing: 0) {
 						SmallAccountCard(account: viewStore.account)
 
-						TransactionReviewFungibleView(viewState: viewStore.token, background: .clear)
+						TransactionReviewFungibleView(viewState: viewStore.fungible, background: .clear)
 
 						Separator()
 

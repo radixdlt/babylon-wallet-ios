@@ -139,7 +139,7 @@ extension TransactionReviewFungibleView.ViewState {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.Fungible) {
 		self.init(
 			name: resource.metadata.symbol ?? resource.metadata.name ?? L10n.TransactionReview.unknown,
-			thumbnail: details.isXRD ? .xrd : .other(resource.metadata.iconURL),
+			thumbnail: .token(details.isXRD ? .xrd : .other(resource.metadata.iconURL)),
 			amount: details.amount,
 			guaranteedAmount: details.guarantee?.amount,
 			fiatAmount: nil

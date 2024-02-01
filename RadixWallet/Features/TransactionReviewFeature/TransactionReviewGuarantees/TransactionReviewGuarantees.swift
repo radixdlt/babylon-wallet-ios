@@ -76,11 +76,17 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 		public let id: TransactionReview.Transfer.ID
 		public let account: TransactionReview.Account
 		public let resource: OnLedgerEntity.Resource
-		public let isXRD: Bool
+		public let thumbnail: Thumbnail.FungibleContent
 		public let amount: RETDecimal
 		public var guarantee: TransactionClient.Guarantee
 
 		public var percentageStepper: MinimumPercentageStepper.State
+
+		public enum Fungible: Sendable, Hashable {
+			case token(isXRD: Bool)
+			case poolUnit
+			case lsu
+		}
 
 		init?(
 			account: TransactionReview.Account,
@@ -89,7 +95,19 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 			self.id = transfer.id
 			self.account = account
 			self.resource = transfer.resource
-			self.isXRD = transfer.isXRD
+
+			let url = resource.metadata.iconURL
+			switch transfer.details {
+			case let .fungible(fungible):
+				self.thumbnail = .token(fungible.isXRD ? .xrd : .other(url))
+			case .poolUnit:
+				self.thumbnail = .poolUnit(url)
+			case .liquidStakeUnit:
+				self.thumbnail = .lsu(url)
+			case .stakeClaimNFT, .nonFungible:
+				assertionFailure("Should not be called with non-fungible transfer")
+				return nil
+			}
 
 			guard let amount = transfer.fungibleTransferAmount, amount > 0 else { return nil }
 			self.amount = amount

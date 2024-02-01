@@ -7,6 +7,12 @@ public struct Thumbnail: View {
 	private let url: URL?
 	private let size: HitTargetSize
 
+	public enum FungibleContent: Sendable, Hashable {
+		case token(TokenContent)
+		case poolUnit(URL?)
+		case lsu(URL?)
+	}
+
 	public enum TokenContent: Sendable, Hashable {
 		case xrd
 		case other(URL?)
@@ -25,6 +31,17 @@ public struct Thumbnail: View {
 		public enum Token: Sendable, Hashable {
 			case xrd
 			case other
+		}
+	}
+
+	public init(fungible: FungibleContent, size: HitTargetSize = .small) {
+		switch fungible {
+		case let .token(token):
+			self.init(token: token, size: size)
+		case let .poolUnit(url):
+			self.init(.poolUnit, url: url, size: size)
+		case let .lsu(url):
+			self.init(.lsu, url: url, size: size)
 		}
 	}
 
