@@ -151,13 +151,15 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 			) -> Effect<Action> {
 				.run { send in
 					var reviewedTransaction = reviewedTransaction
-					var newSigners = OrderedSet(reviewedTransaction.transactionSigners.intentSignerEntitiesOrEmpty() + [.account(feePayer.account)])
+					var newSigners = OrderedSet(reviewedTransaction.transactionSigners.intentSignerEntitiesOrEmpty())
 
 					/// Remove the previous Fee Payer Signature if it is not required
-					if let previousFeePayer, feePayer.account != previousFeePayer.account, !manifestSummary.accountsRequiringAuth.contains(where: { $0.addressString() == previousFeePayer.account.address.address }) {
+					if let previousFeePayer, !manifestSummary.accountsRequiringAuth.contains(where: { $0.addressString() == previousFeePayer.account.address.address }) {
 						// removed, need to recalculate signing factors
 						newSigners.remove(.account(previousFeePayer.account))
 					}
+
+					newSigners.append(.account(feePayer.account))
 
 					// Update transaction signers
 					reviewedTransaction.transactionSigners = .init(
@@ -173,9 +175,15 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 					@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 					do {
+						guard let signers = NonEmpty(rawValue: Set(newSigners)) else {
+							assertionFailure("NewSigners can not be empty here, barring programmer errors")
+							struct InternalError: Error {}
+							throw InternalError()
+						}
+
 						let factors = try await factorSourcesClient.getSigningFactors(.init(
 							networkID: reviewedTransaction.networkID,
-							signers: .init(rawValue: Set(newSigners))!,
+							signers: signers,
 							signingPurpose: signingPurpose
 						))
 
@@ -194,7 +202,11 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 				}
 			}
 
-			return replaceFeePayer(selection, state.reviewedTransaction, manifestSummary: state.manifestSummary)
+			if selection != previousFeePayer {
+				return replaceFeePayer(selection, state.reviewedTransaction, manifestSummary: state.manifestSummary)
+			} else {
+				return .none
+			}
 
 		default:
 			return .none
