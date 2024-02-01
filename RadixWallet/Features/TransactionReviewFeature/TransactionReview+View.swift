@@ -803,7 +803,7 @@ extension TransactionReview {
 		public var body: some SwiftUI.View {
 			Card {
 				HStack(spacing: .zero) {
-					ValidatorThumbnail(viewState.thumbnail)
+					Thumbnail(.validator, url: viewState.thumbnail)
 						.padding(.trailing, .medium3)
 
 					VStack(alignment: .leading, spacing: .zero) {
