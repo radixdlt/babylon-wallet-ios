@@ -54,19 +54,10 @@ public struct Thumbnail: View {
 			circularImage(placeholder: AssetResource.token)
 
 		case .poolUnit, .lsu:
-			LoadableImage(url: url, size: .fixedSize(size)) {
-				ZStack {
-					Circle()
-						.fill(.app.gray4)
-						.frame(size)
-					Image(asset: AssetResource.poolUnits)
-						.resizable()
-						.frame(width: size.rawValue * 0.75, height: size.rawValue * 0.75)
-				}
-			}
+			circularImage(placeholder: AssetResource.poolUnits, placeholderBackground: true)
 
 		case .nft:
-			roundedRectImage(placeholder: AssetResource.nft)
+			roundedRectImage(placeholder: AssetResource.nft, placeholderBackground: true)
 
 		case .persona:
 			circularImage(placeholder: AssetResource.persona)
@@ -79,22 +70,34 @@ public struct Thumbnail: View {
 		}
 	}
 
-	private func circularImage(placeholder: ImageAsset) -> some View {
-		LoadableImage(url: url, size: .fixedSize(size)) {
-			Image(asset: placeholder)
-				.resizable()
-		}
-		.clipShape(Circle())
-		.frame(size)
+	private func circularImage(placeholder: ImageAsset, placeholderBackground: Bool = false) -> some View {
+		baseImage(placeholder: placeholder, placeholderBackground: placeholderBackground)
+			.clipShape(Circle())
+			.frame(size)
 	}
 
-	private func roundedRectImage(placeholder: ImageAsset) -> some View {
+	private func roundedRectImage(placeholder: ImageAsset, placeholderBackground: Bool = false) -> some View {
+		baseImage(placeholder: placeholder, placeholderBackground: placeholderBackground)
+			.cornerRadius(size.cornerRadius)
+			.frame(size)
+	}
+
+	private func baseImage(placeholder: ImageAsset, placeholderBackground: Bool) -> some View {
 		LoadableImage(url: url, size: .fixedSize(size)) {
-			Image(asset: placeholder)
-				.resizable()
+			ZStack {
+				if placeholderBackground {
+					Rectangle()
+						.fill(.app.gray4)
+						.frame(size)
+					Image(asset: placeholder)
+						.resizable()
+						.frame(width: size.rawValue * 0.75, height: size.rawValue * 0.75)
+				} else {
+					Image(asset: placeholder)
+						.resizable()
+				}
+			}
 		}
-		.cornerRadius(size.cornerRadius)
-		.frame(size)
 	}
 }
 
