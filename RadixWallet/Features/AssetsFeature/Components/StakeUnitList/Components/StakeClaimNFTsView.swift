@@ -45,7 +45,7 @@ public struct StakeClaimResourceView: View {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: .medium3) {
 			HStack(spacing: .zero) {
-				Thumbnail(token: .other(viewState.resourceMetadata.iconURL), size: .smaller)
+				Thumbnail(token: .other(viewState.resourceMetadata.iconURL), size: .extraSmall)
 					.padding(.trailing, .small1)
 
 				VStack(alignment: .leading, spacing: .zero) {

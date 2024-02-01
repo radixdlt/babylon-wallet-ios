@@ -16,7 +16,7 @@ public struct PoolUnitView: View {
 		Button(action: onTap) {
 			VStack(alignment: .leading, spacing: .zero) {
 				HStack(spacing: .zero) {
-					Thumbnail(.poolUnit, url: viewState.poolIcon, size: .small)
+					Thumbnail(.poolUnit, url: viewState.poolIcon, size: .extraSmall)
 						.padding(.trailing, .medium3)
 
 					VStack(alignment: .leading, spacing: 0) {
