@@ -1,7 +1,6 @@
 // MARK: - StakeClaimResourceView
 public struct StakeClaimResourceView: View {
 	public struct ViewState: Sendable, Hashable {
-		public let canClaimTokens: Bool
 		public let validatorName: String?
 		public var stakeClaimTokens: StakeClaimTokensView.ViewState
 		public let stakeClaimResource: OnLedgerEntity.Resource
@@ -16,7 +15,6 @@ public struct StakeClaimResourceView: View {
 			validatorName: String? = nil,
 			selectedStakeClaims: IdentifiedArrayOf<NonFungibleGlobalId>? = nil
 		) {
-			self.canClaimTokens = canClaimTokens
 			self.validatorName = validatorName
 			self.stakeClaimResource = stakeClaimTokens.resource
 			self.stakeClaimTokens = .init(

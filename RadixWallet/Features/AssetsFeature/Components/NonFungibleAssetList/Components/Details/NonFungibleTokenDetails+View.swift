@@ -83,21 +83,8 @@ extension NonFungibleTokenDetails {
 								KeyValueView(nonFungibleGlobalID: tokenDetails.nonFungibleGlobalID)
 
 								if let stakeClaim = tokenDetails.stakeClaim {
-									VStack(alignment: .leading, spacing: .small3) {
-										StakeClaimTokensView(
-											viewState: .init(
-												canClaimTokens: true,
-												stakeClaims: [stakeClaim]
-											),
-											background: .app.white,
-											onClaimAllTapped: { viewStore.send(.tappedClaimStake) }
-										)
-
-										if let unstakingDurationDescription = stakeClaim.unstakingDurationDescription {
-											Text(unstakingDescription)
-												.textStyle(.body2HighImportance)
-												.foregroundColor(.app.gray2)
-										}
+									stakeClaimView(stakeClaim) {
+										viewStore.send(.tappedClaimStake)
 									}
 								}
 
@@ -191,6 +178,30 @@ extension NonFungibleTokenDetails {
 
 			case let .instant(date):
 				KeyValueView(key: field.name, value: date.formatted())
+			}
+		}
+	}
+}
+
+extension NonFungibleTokenDetails.View {
+	fileprivate func stakeClaimView(
+		_ stakeClaim: OnLedgerEntitiesClient.StakeClaim,
+		onClaimTap: @escaping () -> Void
+	) -> some SwiftUI.View {
+		VStack(alignment: .leading, spacing: .small3) {
+			StakeClaimTokensView(
+				viewState: .init(
+					canClaimTokens: true,
+					stakeClaims: [stakeClaim]
+				),
+				background: .app.white,
+				onClaimAllTapped: onClaimTap
+			)
+
+			if let unstakingDurationDescription = stakeClaim.unstakingDurationDescription {
+				Text(unstakingDurationDescription)
+					.textStyle(.body2HighImportance)
+					.foregroundColor(.app.gray2)
 			}
 		}
 	}
