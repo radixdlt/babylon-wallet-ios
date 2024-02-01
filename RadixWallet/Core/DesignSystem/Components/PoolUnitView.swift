@@ -80,12 +80,13 @@ public struct PoolUnitResourcesView: View {
 			ForEach(resources) { resource in
 				PoolUnitResourceView(viewState: resource)
 					.padding(.small1)
-
-				if resource.id != resources.last?.id {
-					Rectangle()
-						.fill(.app.gray3)
-						.frame(height: 1)
-				}
+					.overlay(alignment: .bottom) {
+						if resource.id != resources.last?.id {
+							Rectangle()
+								.fill(.app.gray3)
+								.frame(height: 1)
+						}
+					}
 			}
 		}
 		.roundedCorners(strokeColor: .app.gray3)
