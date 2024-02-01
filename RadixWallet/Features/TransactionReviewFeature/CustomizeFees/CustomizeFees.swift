@@ -154,7 +154,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 					var newSigners = OrderedSet(reviewedTransaction.transactionSigners.intentSignerEntitiesOrEmpty() + [.account(feePayer.account)])
 
 					/// Remove the previous Fee Payer Signature if it is not required
-					if let previousFeePayer, !manifestSummary.accountsRequiringAuth.contains(where: { $0.addressString() == previousFeePayer.account.address.address }) {
+					if let previousFeePayer, feePayer.account != previousFeePayer.account, !manifestSummary.accountsRequiringAuth.contains(where: { $0.addressString() == previousFeePayer.account.address.address }) {
 						// removed, need to recalculate signing factors
 						newSigners.remove(.account(previousFeePayer.account))
 					}
