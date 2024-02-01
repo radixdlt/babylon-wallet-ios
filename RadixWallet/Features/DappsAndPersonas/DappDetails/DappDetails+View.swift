@@ -147,9 +147,9 @@ private extension DappDetails.State {
 	}
 }
 
-extension OnLedgerEntity.Resource {
+private extension OnLedgerEntity.Resource {
 	var title: String {
-		metadata.name ?? metadata.symbol ?? L10n.DAppRequest.Metadata.unknownName
+		metadata.name ?? metadata.symbol ?? L10n.TransactionReview.unknown
 	}
 }
 

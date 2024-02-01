@@ -93,7 +93,7 @@ extension TransactionReviewGuarantee.State {
 			id: id,
 			account: account,
 			fungible: .init(
-				name: resource.title,
+				name: resource.metadata.name ?? resource.metadata.symbol ?? L10n.TransactionReview.unknown,
 				thumbnail: thumbnail,
 				amount: amount,
 				guaranteedAmount: guarantee.amount,
