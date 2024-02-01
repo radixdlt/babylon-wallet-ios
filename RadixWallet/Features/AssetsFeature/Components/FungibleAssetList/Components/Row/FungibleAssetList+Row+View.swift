@@ -4,7 +4,7 @@ import SwiftUI
 extension FungibleAssetList.Section.Row.State {
 	var viewState: FungibleAssetList.Section.Row.ViewState {
 		.init(
-			thumbnail: isXRD ? .xrd : .known(token.metadata.iconURL),
+			thumbnail: isXRD ? .xrd : .other(token.metadata.iconURL),
 			symbol: token.metadata.symbol ?? token.metadata.name ?? "",
 			tokenAmount: token.amount.formatted(),
 			isSelected: isSelected
@@ -15,7 +15,7 @@ extension FungibleAssetList.Section.Row.State {
 // MARK: - FungibleTokenList.Row.View
 extension FungibleAssetList.Section.Row {
 	public struct ViewState: Equatable {
-		let thumbnail: TokenThumbnail.Content
+		let thumbnail: Thumbnail.TokenContent
 		let symbol: String
 		let tokenAmount: String
 		let isSelected: Bool?
@@ -33,7 +33,7 @@ extension FungibleAssetList.Section.Row {
 			WithViewStore(store, observe: \.viewState, send: FeatureAction.view) { viewStore in
 				HStack(alignment: .center) {
 					HStack(spacing: .small1) {
-						TokenThumbnail(viewStore.thumbnail, size: .small)
+						Thumbnail(token: viewStore.thumbnail, size: .small)
 
 						Text(viewStore.symbol)
 							.foregroundColor(.app.gray1)

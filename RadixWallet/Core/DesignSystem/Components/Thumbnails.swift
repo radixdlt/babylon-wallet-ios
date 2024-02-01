@@ -28,7 +28,7 @@ public struct Thumbnail: View {
 		}
 	}
 
-	private init(token: TokenContent, size: HitTargetSize = .small) {
+	public init(token: TokenContent, size: HitTargetSize = .small) {
 		switch token {
 		case .xrd:
 			self.init(.token(.xrd), url: nil, size: size)
@@ -86,51 +86,6 @@ public struct Thumbnail: View {
 		}
 		.cornerRadius(size.cornerRadius)
 		.frame(size)
-	}
-}
-
-// MARK: - TokenThumbnail
-public struct TokenThumbnail: View {
-	private let content: Content
-	private let size: HitTargetSize
-
-	public enum Content: Sendable, Hashable {
-		case xrd
-		case known(URL?)
-		case unknown
-	}
-
-	public init(_ content: Content, size hitTargetSize: HitTargetSize = .small) {
-		self.content = content
-		self.size = hitTargetSize
-	}
-
-	public var body: some View {
-		image
-			.clipShape(Circle())
-			.frame(size)
-	}
-
-	@ViewBuilder
-	@MainActor
-	private var image: some View {
-		switch content {
-		case .xrd:
-			Image(asset: AssetResource.xrd)
-				.resizable()
-		case let .known(url):
-			LoadableImage(url: url, size: .fixedSize(size)) {
-				placeholder
-			}
-		case .unknown:
-			// TODO: Show different icon if unknown?
-			placeholder
-		}
-	}
-
-	private var placeholder: some View {
-		Image(asset: AssetResource.token)
-			.resizable()
 	}
 }
 

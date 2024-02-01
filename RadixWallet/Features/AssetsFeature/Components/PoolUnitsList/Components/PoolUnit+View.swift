@@ -58,7 +58,7 @@ extension PoolUnitResourceView.ViewState {
 			PoolUnitResourceView.ViewState(
 				id: resourceDetails.resource.resourceAddress,
 				symbol: resourceDetails.resource.metadata.symbol ?? resourceDetails.resource.metadata.name ?? L10n.Account.PoolUnits.unknownSymbolName,
-				icon: .known(resourceDetails.resource.metadata.iconURL),
+				icon: .other(resourceDetails.resource.metadata.iconURL),
 				amount: resourceDetails.redemptionValue
 			)
 		}

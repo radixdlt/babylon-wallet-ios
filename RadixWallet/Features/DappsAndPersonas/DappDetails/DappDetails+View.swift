@@ -207,7 +207,7 @@ extension DappDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.fungibles, send: { .view($0) }) { viewStore in
 				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.tokens, elements: viewStore.state, title: \.title) { resource in
-					TokenThumbnail(.known(resource.metadata.iconURL), size: .small)
+					Thumbnail(token: .other(resource.metadata.iconURL), size: .small)
 				} action: { id in
 					viewStore.send(.fungibleTapped(id))
 				}

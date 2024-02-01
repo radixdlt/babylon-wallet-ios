@@ -14,7 +14,7 @@ public struct LiquidStakeUnitView: View {
 		Button(action: onTap) {
 			VStack(alignment: .leading, spacing: .medium3) {
 				HStack(spacing: .zero) {
-					TokenThumbnail(.known(viewState.resource.metadata.iconURL), size: .smaller)
+					Thumbnail(token: .other(viewState.resource.metadata.iconURL), size: .smaller)
 						.padding(.trailing, .small2)
 
 					VStack(alignment: .leading, spacing: .zero) {

@@ -128,7 +128,7 @@ extension ResourcesList.View {
 			if case .globalNonFungibleResourceManager = viewState.address.resourceAddress.decodedKind {
 				Thumbnail(.nft, url: viewState.iconURL)
 			} else {
-				TokenThumbnail(.known(viewState.iconURL))
+				Thumbnail(token: .other(viewState.iconURL))
 			}
 
 			VStack(alignment: .leading, spacing: .zero) {

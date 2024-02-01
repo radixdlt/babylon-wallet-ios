@@ -665,7 +665,7 @@ struct RawTransactionView: SwiftUI.View {
 struct TransactionReviewFungibleView: View {
 	struct ViewState: Equatable {
 		let name: String?
-		let thumbnail: TokenThumbnail.Content
+		let thumbnail: Thumbnail.TokenContent
 
 		let amount: RETDecimal
 		let guaranteedAmount: RETDecimal?
@@ -687,7 +687,7 @@ struct TransactionReviewFungibleView: View {
 	var body: some View {
 		Button(action: onTap) {
 			HStack(spacing: .small1) {
-				TokenThumbnail(viewState.thumbnail, size: .small)
+				Thumbnail(token: viewState.thumbnail, size: .small)
 					.padding(.vertical, .small1)
 
 				if let name = viewState.name {

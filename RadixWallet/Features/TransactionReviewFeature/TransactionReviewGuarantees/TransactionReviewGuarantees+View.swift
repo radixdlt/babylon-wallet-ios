@@ -94,7 +94,7 @@ extension TransactionReviewGuarantee.State {
 			account: account,
 			token: .init(
 				name: resource.title,
-				thumbnail: isXRD ? .xrd : .known(resource.metadata.iconURL),
+				thumbnail: isXRD ? .xrd : .other(resource.metadata.iconURL),
 				amount: amount,
 				guaranteedAmount: guarantee.amount,
 				fiatAmount: nil

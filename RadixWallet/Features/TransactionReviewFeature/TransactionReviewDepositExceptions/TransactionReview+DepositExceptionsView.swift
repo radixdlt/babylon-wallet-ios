@@ -152,7 +152,7 @@ struct ResourceIconNameView: View {
 			if case .globalNonFungibleResourceManager = resource.resourceAddress.decodedKind {
 				Thumbnail(.nft, url: resource.metadata.iconURL)
 			} else {
-				TokenThumbnail(.known(resource.metadata.iconURL))
+				Thumbnail(token: .other(resource.metadata.iconURL))
 			}
 			Text(resource.metadata.name ?? "")
 				.foregroundColor(.app.gray1)
