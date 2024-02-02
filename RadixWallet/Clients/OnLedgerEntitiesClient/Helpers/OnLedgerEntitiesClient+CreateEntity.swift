@@ -541,6 +541,12 @@ extension OnLedgerEntitiesClient {
 	}
 }
 
+extension OnLedgerEntity.Resource {
+	var title: String? {
+		metadata.symbol ?? metadata.name
+	}
+}
+
 extension [OnLedgerEntity.OwnedFungibleResource] {
 	func sorted() async -> OnLedgerEntity.OwnedFungibleResources {
 		@Dependency(\.gatewaysClient) var gatewaysClient

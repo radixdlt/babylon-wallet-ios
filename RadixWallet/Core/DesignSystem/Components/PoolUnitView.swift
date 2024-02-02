@@ -2,6 +2,8 @@
 public struct PoolUnitView: View {
 	public struct ViewState: Equatable {
 		public let poolName: String?
+		public let amount: RETDecimal?
+		public let guaranteedAmount: RETDecimal?
 		public let dAppName: Loadable<String?>
 		public let poolIcon: URL?
 		public let resources: Loadable<[PoolUnitResourceView.ViewState]>
@@ -16,24 +18,13 @@ public struct PoolUnitView: View {
 		Button(action: onTap) {
 			VStack(alignment: .leading, spacing: .zero) {
 				HStack(spacing: .zero) {
-					LoadableImage(url: viewState.poolIcon, size: .fixedSize(.verySmall)) {
-						ZStack {
-							Circle()
-								.fill(.app.gray4)
-								.frame(width: .large1, height: .large1)
-							Image(asset: AssetResource.poolUnits)
-								.resizable()
-								.frame(.verySmall)
-						}
-					}
-					.padding(.trailing, .medium3)
+					Thumbnail(.poolUnit, url: viewState.poolIcon, size: .extraSmall)
+						.padding(.trailing, .small1)
 
 					VStack(alignment: .leading, spacing: 0) {
-						if let poolName = viewState.poolName {
-							Text(poolName)
-								.textStyle(.body1Header)
-								.foregroundColor(.app.gray1)
-						}
+						Text(viewState.poolName ?? L10n.TransactionReview.poolUnits)
+							.textStyle(.body1Header)
+							.foregroundColor(.app.gray1)
 
 						loadable(viewState.dAppName, loadingViewHeight: .small1) { dAppName in
 							if let dAppName {
@@ -45,6 +36,11 @@ public struct PoolUnitView: View {
 					}
 
 					Spacer(minLength: 0)
+
+					if let amount = viewState.amount {
+						TransactionReviewAmountView(amount: amount, guaranteedAmount: viewState.guaranteedAmount)
+							.padding(.leading, viewState.isSelected != nil ? .small2 : 0)
+					}
 
 					if let isSelected = viewState.isSelected {
 						CheckmarkView(appearance: .dark, isChecked: isSelected)
@@ -102,13 +98,13 @@ public struct PoolUnitResourceView: View {
 	public struct ViewState: Identifiable, Equatable {
 		public var id: ResourceAddress
 		public let symbol: String?
-		public let icon: TokenThumbnail.Content
+		public let icon: Thumbnail.FungibleContent
 		public let amount: String
 
 		public init(
 			id: ResourceAddress,
 			symbol: String?,
-			icon: TokenThumbnail.Content,
+			icon: Thumbnail.FungibleContent,
 			amount: RETDecimal?
 		) {
 			self.id = id
@@ -122,7 +118,7 @@ public struct PoolUnitResourceView: View {
 
 	public var body: some View {
 		HStack(spacing: .zero) {
-			TokenThumbnail(viewState.icon, size: .smallest)
+			Thumbnail(fungible: viewState.icon, size: .smallest)
 				.padding(.trailing, .small1)
 
 			if let symbol = viewState.symbol {

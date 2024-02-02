@@ -54,7 +54,7 @@ extension TransactionReviewProofs {
 			var body: some SwiftUI.View {
 				Button(action: action) {
 					HStack(spacing: 0) {
-						DappThumbnail(.known(thumbnail), size: .smallest)
+						Thumbnail(.dapp, url: thumbnail, size: .smallest)
 							.padding(.trailing, .small1)
 
 						Text(name)

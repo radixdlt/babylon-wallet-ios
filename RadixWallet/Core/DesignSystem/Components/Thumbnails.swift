@@ -1,149 +1,120 @@
 import NukeUI
 import SwiftUI
 
-// MARK: - DappThumbnail
-public struct DappThumbnail: View {
-	private let content: Content
+// MARK: - Thumbnail
+public struct Thumbnail: View {
+	private let type: ContentType
+	private let url: URL?
 	private let size: HitTargetSize
 
-	public enum Content: Sendable, Hashable {
-		case known(URL?)
-		case unknown
+	public enum FungibleContent: Sendable, Hashable {
+		case token(TokenContent)
+		case poolUnit(URL?)
+		case lsu(URL?)
 	}
 
-	public init(_ content: Content, size hitTargetSize: HitTargetSize = .small) {
-		self.content = content
-		self.size = hitTargetSize
+	public enum TokenContent: Sendable, Hashable {
+		case xrd
+		case other(URL?)
 	}
 
-	public var body: some View {
-		image
-			.cornerRadius(size.cornerRadius)
-			.frame(size)
-	}
+	public enum ContentType: Sendable, Hashable {
+		case token(Token)
+		case poolUnit
+		case lsu
+		case nft
+		case persona
+		case dapp
+		case pool
+		case validator
 
-	@ViewBuilder
-	@MainActor
-	private var image: some View {
-		switch content {
-		case let .known(url):
-			LoadableImage(url: url, size: .fixedSize(size)) {
-				placeholder
-			}
-		case .unknown:
-			// TODO: Show different icon if unknown
-			placeholder
+		public enum Token: Sendable, Hashable {
+			case xrd
+			case other
 		}
 	}
 
-	private var placeholder: some View {
-		Image(asset: AssetResource.unknownComponent)
-			.resizable()
-	}
-}
-
-// MARK: - TokenThumbnail
-public struct TokenThumbnail: View {
-	private let content: Content
-	private let size: HitTargetSize
-
-	public enum Content: Sendable, Hashable {
-		case xrd
-		case known(URL?)
-		case unknown
+	public init(fungible: FungibleContent, size: HitTargetSize = .small) {
+		switch fungible {
+		case let .token(token):
+			self.init(token: token, size: size)
+		case let .poolUnit(url):
+			self.init(.poolUnit, url: url, size: size)
+		case let .lsu(url):
+			self.init(.lsu, url: url, size: size)
+		}
 	}
 
-	public init(_ content: Content, size hitTargetSize: HitTargetSize = .small) {
-		self.content = content
-		self.size = hitTargetSize
+	public init(token: TokenContent, size: HitTargetSize = .small) {
+		switch token {
+		case .xrd:
+			self.init(.token(.xrd), url: nil, size: size)
+		case let .other(url):
+			self.init(.token(.other), url: url, size: size)
+		}
+	}
+
+	public init(_ type: ContentType, url: URL?, size: HitTargetSize = .small) {
+		self.type = type
+		self.url = url
+		self.size = size
 	}
 
 	public var body: some View {
-		image
+		switch type {
+		case .token(.xrd):
+			Image(asset: AssetResource.xrd)
+				.resizable()
+				.frame(size)
+
+		case .token(.other):
+			circularImage(placeholder: AssetResource.token)
+
+		case .poolUnit, .lsu:
+			circularImage(placeholder: AssetResource.poolUnits, placeholderBackground: true)
+
+		case .nft:
+			roundedRectImage(placeholder: AssetResource.nft, placeholderBackground: true)
+
+		case .persona:
+			circularImage(placeholder: AssetResource.persona)
+
+		case .dapp, .pool:
+			roundedRectImage(placeholder: AssetResource.unknownComponent)
+
+		case .validator:
+			roundedRectImage(placeholder: AssetResource.iconValidator)
+		}
+	}
+
+	private func circularImage(placeholder: ImageAsset, placeholderBackground: Bool = false) -> some View {
+		baseImage(placeholder: placeholder, placeholderBackground: placeholderBackground)
 			.clipShape(Circle())
 			.frame(size)
 	}
 
-	@ViewBuilder
-	@MainActor
-	private var image: some View {
-		switch content {
-		case .xrd:
-			Image(asset: AssetResource.xrd)
-				.resizable()
-		case let .known(url):
-			LoadableImage(url: url, size: .fixedSize(size)) {
-				placeholder
+	private func roundedRectImage(placeholder: ImageAsset, placeholderBackground: Bool = false) -> some View {
+		baseImage(placeholder: placeholder, placeholderBackground: placeholderBackground)
+			.cornerRadius(size.cornerRadius)
+			.frame(size)
+	}
+
+	private func baseImage(placeholder: ImageAsset, placeholderBackground: Bool) -> some View {
+		LoadableImage(url: url, size: .fixedSize(size)) {
+			ZStack {
+				if placeholderBackground {
+					Rectangle()
+						.fill(.app.gray4)
+						.frame(size)
+					Image(asset: placeholder)
+						.resizable()
+						.frame(width: size.rawValue * 0.75, height: size.rawValue * 0.75)
+				} else {
+					Image(asset: placeholder)
+						.resizable()
+				}
 			}
-		case .unknown:
-			// TODO: Show different icon if unknown?
-			placeholder
 		}
-	}
-
-	private var placeholder: some View {
-		Image(asset: AssetResource.token)
-			.resizable()
-	}
-}
-
-// MARK: - NFTThumbnail
-public struct NFTThumbnail: View {
-	private let url: URL?
-	private let size: HitTargetSize
-
-	public init(_ url: URL?, size hitTargetSize: HitTargetSize = .small) {
-		self.url = url
-		self.size = hitTargetSize
-	}
-
-	public var body: some View {
-		LoadableImage(url: url, size: .fixedSize(size)) {
-			Image(asset: AssetResource.nft)
-				.resizable()
-		}
-		.cornerRadius(size.cornerRadius)
-		.frame(size)
-	}
-}
-
-// MARK: - PersonaThumbnail
-public struct PersonaThumbnail: View {
-	private let url: URL?
-	private let size: HitTargetSize
-
-	public init(_ url: URL?, size hitTargetSize: HitTargetSize = .small) {
-		self.url = url
-		self.size = hitTargetSize
-	}
-
-	public var body: some View {
-		LoadableImage(url: url, size: .fixedSize(size)) {
-			Image(asset: AssetResource.persona)
-				.resizable()
-		}
-		.clipShape(Circle())
-		.frame(size)
-	}
-}
-
-// MARK: - ValidatorThumbnail
-public struct ValidatorThumbnail: View {
-	private let url: URL?
-	private let size: HitTargetSize
-
-	public init(_ url: URL?, size hitTargetSize: HitTargetSize = .small) {
-		self.url = url
-		self.size = hitTargetSize
-	}
-
-	public var body: some View {
-		LoadableImage(url: url, size: .fixedSize(size)) {
-			Image(asset: AssetResource.iconValidator)
-				.resizable()
-		}
-		.cornerRadius(size.cornerRadius)
-		.frame(size)
 	}
 }
 

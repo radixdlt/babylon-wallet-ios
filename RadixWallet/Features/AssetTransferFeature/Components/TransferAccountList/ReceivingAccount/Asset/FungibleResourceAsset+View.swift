@@ -17,6 +17,12 @@ extension FungibleResourceAsset {
 	}
 }
 
+extension FungibleResourceAsset.ViewState {
+	var thumbnail: Thumbnail.TokenContent {
+		isXRD ? .xrd : .other(resource.metadata.iconURL)
+	}
+}
+
 extension ViewStore<FungibleResourceAsset.State, FungibleResourceAsset.ViewAction> {
 	var focusedBinding: Binding<Bool> {
 		binding(get: \.focused, send: ViewAction.focusChanged)
@@ -28,7 +34,7 @@ extension FungibleResourceAsset.View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			VStack(alignment: .trailing) {
 				HStack {
-					TokenThumbnail(viewStore.isXRD ? .xrd : .known(viewStore.resource.metadata.iconURL), size: .smallest)
+					Thumbnail(token: viewStore.thumbnail, size: .smallest)
 					if let name = viewStore.resource.metadata.name {
 						Text(name)
 							.textStyle(.body2HighImportance)

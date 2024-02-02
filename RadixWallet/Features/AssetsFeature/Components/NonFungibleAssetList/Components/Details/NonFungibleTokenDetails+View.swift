@@ -103,8 +103,8 @@ extension NonFungibleTokenDetails {
 						}
 
 						VStack(spacing: .medium1) {
-							loadable(viewStore.resourceThumbnail) { value in
-								NFTThumbnail(value, size: .veryLarge)
+							loadable(viewStore.resourceThumbnail) { url in
+								Thumbnail(.nft, url: url, size: .veryLarge)
 							}
 
 							AssetResourceDetailsSection(viewState: viewStore.resourceDetails)

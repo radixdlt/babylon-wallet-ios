@@ -150,9 +150,9 @@ struct ResourceIconNameView: View {
 	var body: some View {
 		HStack(spacing: .small1) {
 			if case .globalNonFungibleResourceManager = resource.resourceAddress.decodedKind {
-				NFTThumbnail(resource.metadata.iconURL)
+				Thumbnail(.nft, url: resource.metadata.iconURL)
 			} else {
-				TokenThumbnail(.known(resource.metadata.iconURL))
+				Thumbnail(token: .other(resource.metadata.iconURL))
 			}
 			Text(resource.metadata.name ?? "")
 				.foregroundColor(.app.gray1)

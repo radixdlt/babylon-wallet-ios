@@ -32,7 +32,7 @@ extension DappDetails.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: 0) {
-					DappThumbnail(.known(viewStore.thumbnail), size: .veryLarge)
+					Thumbnail(.dapp, url: viewStore.thumbnail, size: .veryLarge)
 						.padding(.vertical, .large2)
 
 					InfoBlock(store: store)
@@ -147,12 +147,6 @@ private extension DappDetails.State {
 	}
 }
 
-extension OnLedgerEntity.Resource {
-	var title: String {
-		metadata.name ?? metadata.symbol ?? L10n.DAppRequest.Metadata.unknownName
-	}
-}
-
 // MARK: Child Views
 
 extension DappDetails.View {
@@ -207,7 +201,7 @@ extension DappDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.fungibles, send: { .view($0) }) { viewStore in
 				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.tokens, elements: viewStore.state, title: \.title) { resource in
-					TokenThumbnail(.known(resource.metadata.iconURL), size: .small)
+					Thumbnail(token: .other(resource.metadata.iconURL), size: .small)
 				} action: { id in
 					viewStore.send(.fungibleTapped(id))
 				}
@@ -222,7 +216,7 @@ extension DappDetails.View {
 		var body: some View {
 			WithViewStore(store, observe: \.nonFungibles, send: { .view($0) }) { viewStore in
 				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.nfts, elements: viewStore.state, title: \.title) { resource in
-					NFTThumbnail(resource.metadata.iconURL, size: .small)
+					Thumbnail(.nft, url: resource.metadata.iconURL, size: .small)
 				} action: { id in
 					viewStore.send(.nonFungibleTapped(id))
 				}
@@ -234,7 +228,7 @@ extension DappDetails.View {
 	struct ListWithHeading<Element: Identifiable, Icon: View>: View {
 		let heading: String
 		let elements: [Element]
-		let title: (Element) -> String
+		let title: (Element) -> String?
 		let icon: (Element) -> Icon
 		let action: (Element.ID) -> Void
 
@@ -249,7 +243,7 @@ extension DappDetails.View {
 						Card {
 							action(element.id)
 						} contents: {
-							PlainListRow(title: title(element), accessory: nil) {
+							PlainListRow(title: title(element) ?? L10n.TransactionReview.unknown, accessory: nil) {
 								icon(element)
 							}
 						}

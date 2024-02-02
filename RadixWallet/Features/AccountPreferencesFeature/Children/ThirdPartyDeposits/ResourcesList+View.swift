@@ -126,9 +126,9 @@ extension ResourcesList.View {
 	func resourceRowView(_ viewState: ResourceViewState, _ viewStore: ViewStoreOf<ResourcesList>) -> some SwiftUI.View {
 		HStack {
 			if case .globalNonFungibleResourceManager = viewState.address.resourceAddress.decodedKind {
-				NFTThumbnail(viewState.iconURL)
+				Thumbnail(.nft, url: viewState.iconURL)
 			} else {
-				TokenThumbnail(.known(viewState.iconURL))
+				Thumbnail(token: .other(viewState.iconURL))
 			}
 
 			VStack(alignment: .leading, spacing: .zero) {

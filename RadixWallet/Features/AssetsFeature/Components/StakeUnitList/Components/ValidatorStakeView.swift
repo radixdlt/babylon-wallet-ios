@@ -80,19 +80,3 @@ struct ValidatorStakeView: View {
 		}
 	}
 }
-
-extension View {
-	private var stakeHeaderStyle: some View {
-		foregroundColor(.app.gray2)
-			.textStyle(.body2HighImportance)
-	}
-
-	private var borderAround: some View {
-		padding(.small2)
-			.overlay(
-				RoundedRectangle(cornerRadius: .small1)
-					.stroke(.app.gray4, lineWidth: 1)
-					.padding(.small2 * -1)
-			)
-	}
-}

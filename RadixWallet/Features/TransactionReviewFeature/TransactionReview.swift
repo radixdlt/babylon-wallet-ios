@@ -933,14 +933,6 @@ extension TransactionReview {
 				nil
 			}
 		}
-
-		public var isXRD: Bool {
-			guard case let .fungible(fungible) = details else {
-				return false
-			}
-
-			return fungible.isXRD
-		}
 	}
 }
 

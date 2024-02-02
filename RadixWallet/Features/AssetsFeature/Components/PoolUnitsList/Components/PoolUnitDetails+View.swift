@@ -7,7 +7,7 @@ extension PoolUnitDetails.State {
 		return .init(
 			containerWithHeader: .init(resourcesDetails.poolUnitResource),
 			thumbnailURL: resource.metadata.iconURL,
-			resources: PoolUnitResourceView.ViewState.viewStates(resourcesDetails: resourcesDetails),
+			resources: .init(resources: resourcesDetails),
 			resourceDetails: .init(
 				description: .success(resource.metadata.description),
 				resourceAddress: resource.resourceAddress,
@@ -48,7 +48,7 @@ extension PoolUnitDetails {
 				DetailsContainerWithHeaderView(viewState: viewStore.containerWithHeader) {
 					viewStore.send(.closeButtonTapped)
 				} thumbnailView: {
-					NFTThumbnail(viewStore.thumbnailURL, size: .veryLarge)
+					Thumbnail(.poolUnit, url: viewStore.thumbnailURL, size: .veryLarge)
 				} detailsView: {
 					VStack(spacing: .medium1) {
 						AssetDetailsSeparator()

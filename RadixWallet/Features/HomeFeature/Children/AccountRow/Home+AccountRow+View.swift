@@ -30,7 +30,7 @@ extension Home.AccountRow {
 		let isLedgerAccount: Bool
 		let mnemonicHandlingCallToAction: MnemonicHandling?
 
-		let fungibleResourceIcons: [TokenThumbnail.Content]
+		let fungibleResourceIcons: [Thumbnail.TokenContent]
 		let nonFungibleResourcesCount: Int
 		let stakedValidatorsCount: Int
 		let poolUnitsCount: Int
@@ -61,8 +61,8 @@ extension Home.AccountRow {
 			}
 
 			let fungibleResources = portfolio.fungibleResources
-			let xrdIcon: [TokenThumbnail.Content] = fungibleResources.xrdResource != nil ? [.xrd] : []
-			let otherIcons: [TokenThumbnail.Content] = fungibleResources.nonXrdResources.map { .known($0.metadata.iconURL) }
+			let xrdIcon: [Thumbnail.TokenContent] = fungibleResources.xrdResource != nil ? [.xrd] : []
+			let otherIcons: [Thumbnail.TokenContent] = fungibleResources.nonXrdResources.map { .other($0.metadata.iconURL) }
 			self.fungibleResourceIcons = xrdIcon + otherIcons
 			self.nonFungibleResourcesCount = portfolio.nonFungibleResources.count
 			self.stakedValidatorsCount = portfolio.poolUnitResources.radixNetworkStakes.count
@@ -193,7 +193,7 @@ extension Home.AccountRow.View {
 	}
 
 	struct FungibleResourcesSection: View {
-		let fungibles: [TokenThumbnail.Content]
+		let fungibles: [Thumbnail.TokenContent]
 		let itemLimit: Int?
 
 		var body: some View {
@@ -218,15 +218,14 @@ extension Home.AccountRow.View {
 	}
 
 	struct TokenIcon: View {
-		let icon: TokenThumbnail.Content
+		let icon: Thumbnail.TokenContent
 
 		var body: some View {
 			ZStack {
 				Circle()
 					.fill(.app.whiteTransparent2)
 
-				TokenThumbnail(icon, size: Constants.iconSize)
-					.frame(Constants.iconSize)
+				Thumbnail(token: icon, size: Constants.iconSize)
 					.padding(Constants.borderWidth)
 			}
 		}

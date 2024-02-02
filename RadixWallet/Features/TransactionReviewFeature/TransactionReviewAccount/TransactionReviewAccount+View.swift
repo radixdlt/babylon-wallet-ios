@@ -114,7 +114,7 @@ struct TransactionReviewResourceView: View {
 				onTap(nil)
 			}
 		case let .poolUnit(details):
-			PoolUnitView(viewState: .init(details: details.details), background: .app.gray5) {
+			PoolUnitView(viewState: .init(resource: transfer.resource, details: details), background: .app.gray5) {
 				onTap(nil)
 			}
 		case let .stakeClaimNFT(details):
@@ -125,10 +125,43 @@ struct TransactionReviewResourceView: View {
 	}
 }
 
+// MARK: - TransactionReviewAmountView
+struct TransactionReviewAmountView: View {
+	let amount: RETDecimal
+	let guaranteedAmount: RETDecimal?
+
+	var body: some View {
+		VStack(alignment: .trailing, spacing: 0) {
+			if guaranteedAmount != nil {
+				Text(L10n.TransactionReview.estimated)
+					.textStyle(.body2HighImportance)
+					.foregroundColor(.app.gray1)
+			}
+			Text(amount.formatted())
+				.textStyle(.body1Header)
+				.foregroundColor(.app.gray1)
+
+			if let guaranteedAmount {
+				Text(L10n.TransactionReview.guaranteed)
+					.textStyle(.body2HighImportance)
+					.foregroundColor(.app.gray2)
+					.padding(.top, .small3)
+
+				Text(guaranteedAmount.formatted())
+					.textStyle(.body1Header)
+					.foregroundColor(.app.gray2)
+			}
+		}
+		.minimumScaleFactor(0.8)
+	}
+}
+
 extension LiquidStakeUnitView.ViewState {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.LiquidStakeUnit) {
 		self.init(
 			resource: resource,
+			amount: details.amount,
+			guaranteedAmount: details.guarantee?.amount,
 			worth: details.worth,
 			validatorName: details.validator.metadata.name
 		)
@@ -139,7 +172,7 @@ extension TransactionReviewFungibleView.ViewState {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.Fungible) {
 		self.init(
 			name: resource.metadata.symbol ?? resource.metadata.name ?? L10n.TransactionReview.unknown,
-			thumbnail: details.isXRD ? .xrd : .known(resource.metadata.iconURL),
+			thumbnail: .token(details.isXRD ? .xrd : .other(resource.metadata.iconURL)),
 			amount: details.amount,
 			guaranteedAmount: details.guarantee?.amount,
 			fiatAmount: nil
@@ -158,35 +191,39 @@ extension TransferNFTView.ViewState {
 }
 
 extension PoolUnitView.ViewState {
-	init(details: OnLedgerEntitiesClient.OwnedResourcePoolDetails) {
+	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.PoolUnit) {
 		self.init(
-			poolName: details.poolUnitResource.resource.fungibleResourceName,
-			dAppName: .success(details.dAppName),
-			poolIcon: details.poolUnitResource.resource.metadata.iconURL,
-			resources: {
-				let xrdResource = details.xrdResource.map {
-					PoolUnitResourceView.ViewState(resourceWithRedemptionValue: $0, isXRD: true)
-				}
-				.asArray(\.self)
-
-				let nonXrdResources = details.nonXrdResources.map {
-					PoolUnitResourceView.ViewState(resourceWithRedemptionValue: $0, isXRD: false)
-				}
-
-				return .success(xrdResource + nonXrdResources)
-			}(),
+			poolName: resource.fungibleResourceName,
+			amount: details.details.poolUnitResource.amount,
+			guaranteedAmount: details.guarantee?.amount,
+			dAppName: .success(details.details.dAppName),
+			poolIcon: resource.metadata.iconURL,
+			resources: .success(.init(resources: details.details)),
 			isSelected: nil
 		)
 	}
 }
 
+extension [PoolUnitResourceView.ViewState] {
+	init(resources: OnLedgerEntitiesClient.OwnedResourcePoolDetails) {
+		let xrdResource = resources.xrdResource.map {
+			PoolUnitResourceView.ViewState(resourceWithRedemptionValue: $0, isXRD: true)
+		}
+		let nonXrdResources = resources.nonXrdResources.map {
+			PoolUnitResourceView.ViewState(resourceWithRedemptionValue: $0, isXRD: false)
+		}
+
+		self = (xrdResource.map { [$0] } ?? []) + nonXrdResources
+	}
+}
+
 extension PoolUnitResourceView.ViewState {
-	init(resourceWithRedemptionValue: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
+	init(resourceWithRedemptionValue resource: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
 		self.init(
-			id: resourceWithRedemptionValue.resource.id,
-			symbol: resourceWithRedemptionValue.resource.metadata.symbol,
-			icon: isXRD ? .xrd : .known(resourceWithRedemptionValue.resource.metadata.iconURL),
-			amount: resourceWithRedemptionValue.redemptionValue
+			id: resource.resource.id,
+			symbol: isXRD ? Constants.xrdTokenName : resource.resource.title ?? L10n.TransactionReview.unknown,
+			icon: .token(isXRD ? .xrd : .other(resource.resource.metadata.iconURL)),
+			amount: resource.redemptionValue
 		)
 	}
 }

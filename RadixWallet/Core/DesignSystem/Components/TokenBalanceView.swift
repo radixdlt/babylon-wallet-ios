@@ -1,13 +1,13 @@
 // MARK: - TokenBalanceView
 public struct TokenBalanceView: View {
 	public struct ViewState: Equatable {
-		public let thumbnail: TokenThumbnail.Content
+		public let thumbnail: Thumbnail.TokenContent
 		public let name: String
 		public let balance: RETDecimal
 		public let iconSize: HitTargetSize
 
 		public init(
-			thumbnail: TokenThumbnail.Content,
+			thumbnail: Thumbnail.TokenContent,
 			name: String,
 			balance: RETDecimal,
 			iconSize: HitTargetSize = .smallest
@@ -27,7 +27,7 @@ public struct TokenBalanceView: View {
 
 	public var body: some View {
 		HStack(alignment: .center, spacing: .zero) {
-			TokenThumbnail(viewState.thumbnail, size: viewState.iconSize)
+			Thumbnail(token: viewState.thumbnail, size: viewState.iconSize)
 				.padding(.trailing, .small1)
 
 			Text(viewState.name)

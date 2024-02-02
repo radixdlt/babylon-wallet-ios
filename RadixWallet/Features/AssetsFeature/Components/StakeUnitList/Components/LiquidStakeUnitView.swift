@@ -1,6 +1,8 @@
 public struct LiquidStakeUnitView: View {
 	public struct ViewState: Sendable, Hashable {
 		public let resource: OnLedgerEntity.Resource
+		public let amount: RETDecimal?
+		public let guaranteedAmount: RETDecimal?
 		public let worth: RETDecimal
 		public var validatorName: String? = nil
 		public var isSelected: Bool? = nil
@@ -14,7 +16,7 @@ public struct LiquidStakeUnitView: View {
 		Button(action: onTap) {
 			VStack(alignment: .leading, spacing: .medium3) {
 				HStack(spacing: .zero) {
-					TokenThumbnail(.known(viewState.resource.metadata.iconURL), size: .smaller)
+					Thumbnail(.lsu, url: viewState.resource.metadata.iconURL, size: .extraSmall)
 						.padding(.trailing, .small2)
 
 					VStack(alignment: .leading, spacing: .zero) {
@@ -31,8 +33,9 @@ public struct LiquidStakeUnitView: View {
 
 					Spacer(minLength: 0)
 
-					if let isSelected = viewState.isSelected {
-						CheckmarkView(appearance: .dark, isChecked: isSelected)
+					if let amount = viewState.amount {
+						TransactionReviewAmountView(amount: amount, guaranteedAmount: viewState.guaranteedAmount)
+							.padding(.leading, viewState.isSelected != nil ? .small2 : 0)
 					}
 				}
 

@@ -9,6 +9,9 @@ public enum HitTargetSize: CGFloat {
 	/// 34
 	case smaller = 34
 
+	/// 40
+	case extraSmall = 40
+
 	/// 44
 	case small = 44
 
@@ -36,6 +39,8 @@ public enum HitTargetSize: CGFloat {
 			.small3
 		case .smaller:
 			.small3
+		case .extraSmall:
+			.small2
 		case .small:
 			.small2
 		case .medium:

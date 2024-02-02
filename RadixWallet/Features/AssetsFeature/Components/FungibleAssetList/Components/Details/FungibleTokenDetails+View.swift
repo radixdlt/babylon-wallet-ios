@@ -7,7 +7,7 @@ extension FungibleTokenDetails.State {
 			detailsHeader: detailsHeader,
 			thumbnail: {
 				let iconURL = resource.metadata.get(\.iconURL, prefetched: ownedFungibleResource?.metadata)
-				return isXRD ? .success(.xrd) : iconURL.map { .known($0) }
+				return isXRD ? .success(.xrd) : iconURL.map { .other($0) }
 			}(),
 			details: .init(
 				description: resource.metadata.get(\.description, prefetched: ownedFungibleResource?.metadata),
@@ -38,7 +38,7 @@ extension FungibleTokenDetails.State {
 extension FungibleTokenDetails {
 	public struct ViewState: Equatable {
 		let detailsHeader: DetailsContainerWithHeaderViewState
-		let thumbnail: Loadable<TokenThumbnail.Content>
+		let thumbnail: Loadable<Thumbnail.TokenContent>
 		let details: AssetResourceDetailsSection.ViewState
 	}
 
@@ -55,7 +55,7 @@ extension FungibleTokenDetails {
 				DetailsContainerWithHeaderView(viewState: viewStore.detailsHeader) {
 					viewStore.send(.closeButtonTapped)
 				} thumbnailView: {
-					TokenThumbnail(viewStore.thumbnail.wrappedValue ?? .unknown, size: .veryLarge)
+					Thumbnail(token: viewStore.thumbnail.wrappedValue ?? .other(nil), size: .veryLarge)
 				} detailsView: {
 					AssetResourceDetailsSection(viewState: viewStore.details)
 						.padding(.bottom, .medium1)

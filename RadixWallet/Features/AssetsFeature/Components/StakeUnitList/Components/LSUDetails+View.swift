@@ -56,7 +56,7 @@ extension LSUDetails {
 				DetailsContainerWithHeaderView(viewState: viewStore.containerWithHeader) {
 					viewStore.send(.closeButtonTapped)
 				} thumbnailView: {
-					NFTThumbnail(viewStore.thumbnailURL, size: .veryLarge)
+					Thumbnail(.nft, url: viewStore.thumbnailURL, size: .veryLarge)
 				} detailsView: {
 					VStack(spacing: .medium1) {
 						AssetDetailsSeparator()
