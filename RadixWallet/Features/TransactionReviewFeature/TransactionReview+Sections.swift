@@ -57,6 +57,10 @@ extension TransactionReview {
 		case nil:
 			return nil
 		case .general, .transfer:
+			if summary.detailedManifestClass == .general {
+				guard !summary.accountDeposits.isEmpty || !summary.accountWithdraws.isEmpty else { return nil }
+			}
+
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 			let withdrawals = try await extractWithdrawals(
 				accountWithdraws: summary.accountWithdraws,
