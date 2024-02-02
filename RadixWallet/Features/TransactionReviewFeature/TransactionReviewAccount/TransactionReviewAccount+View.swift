@@ -184,7 +184,7 @@ extension PoolUnitResourceView.ViewState {
 	init(resourceWithRedemptionValue resource: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
 		self.init(
 			id: resource.resource.id,
-			symbol: isXRD ? Constants.xrdTokenName : resource.resource.title,
+			symbol: isXRD ? Constants.xrdTokenName : resource.resource.title ?? L10n.TransactionReview.unknown,
 			icon: .token(isXRD ? .xrd : .other(resource.resource.metadata.iconURL)),
 			amount: resource.redemptionValue
 		)

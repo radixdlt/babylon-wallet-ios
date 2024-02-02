@@ -542,8 +542,8 @@ extension OnLedgerEntitiesClient {
 }
 
 extension OnLedgerEntity.Resource {
-	var title: String {
-		metadata.name ?? metadata.symbol ?? L10n.TransactionReview.unknown
+	var title: String? {
+		metadata.symbol ?? metadata.name
 	}
 }
 

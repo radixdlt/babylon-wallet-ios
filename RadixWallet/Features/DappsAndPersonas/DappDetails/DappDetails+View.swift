@@ -228,7 +228,7 @@ extension DappDetails.View {
 	struct ListWithHeading<Element: Identifiable, Icon: View>: View {
 		let heading: String
 		let elements: [Element]
-		let title: (Element) -> String
+		let title: (Element) -> String?
 		let icon: (Element) -> Icon
 		let action: (Element.ID) -> Void
 
@@ -243,7 +243,7 @@ extension DappDetails.View {
 						Card {
 							action(element.id)
 						} contents: {
-							PlainListRow(title: title(element), accessory: nil) {
+							PlainListRow(title: title(element) ?? L10n.TransactionReview.unknown, accessory: nil) {
 								icon(element)
 							}
 						}
