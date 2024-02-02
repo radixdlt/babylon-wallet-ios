@@ -32,24 +32,13 @@ extension PoolUnit.State {
 	var viewState: PoolUnit.ViewState {
 		.init(
 			poolName: poolUnit.resource.metadata.fungibleResourceName,
+			amount: nil, // In this contextwe don't want to show any amount
+			guaranteedAmount: nil,
 			dAppName: resourceDetails.dAppName,
 			poolIcon: poolUnit.resource.metadata.iconURL,
 			resources: resourceDetails.map { .init(resources: $0) },
 			isSelected: isSelected
 		)
-	}
-}
-
-extension [PoolUnitResourceView.ViewState] {
-	init(resources: OnLedgerEntitiesClient.OwnedResourcePoolDetails) {
-		let xrdResource = resources.xrdResource.map {
-			PoolUnitResourceView.ViewState(resourceWithRedemptionValue: $0, isXRD: true)
-		}
-		let nonXrdResources = resources.nonXrdResources.map {
-			PoolUnitResourceView.ViewState(resourceWithRedemptionValue: $0, isXRD: false)
-		}
-
-		self = (xrdResource.map { [$0] } ?? []) + nonXrdResources
 	}
 }
 
