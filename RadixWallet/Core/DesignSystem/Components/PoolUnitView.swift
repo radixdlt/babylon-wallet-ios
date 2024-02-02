@@ -2,6 +2,8 @@
 public struct PoolUnitView: View {
 	public struct ViewState: Equatable {
 		public let poolName: String?
+		public let amount: RETDecimal
+		public let guaranteedAmount: RETDecimal?
 		public let dAppName: Loadable<String?>
 		public let poolIcon: URL?
 		public let resources: Loadable<[PoolUnitResourceView.ViewState]>
@@ -17,7 +19,7 @@ public struct PoolUnitView: View {
 			VStack(alignment: .leading, spacing: .zero) {
 				HStack(spacing: .zero) {
 					Thumbnail(.poolUnit, url: viewState.poolIcon, size: .extraSmall)
-						.padding(.trailing, .medium3)
+						.padding(.trailing, .small1)
 
 					VStack(alignment: .leading, spacing: 0) {
 						Text(viewState.poolName ?? L10n.TransactionReview.poolUnits)
@@ -35,8 +37,11 @@ public struct PoolUnitView: View {
 
 					Spacer(minLength: 0)
 
+					TransactionReviewAmountView(amount: viewState.amount, guaranteedAmount: viewState.guaranteedAmount)
+
 					if let isSelected = viewState.isSelected {
 						CheckmarkView(appearance: .dark, isChecked: isSelected)
+							.padding(.leading, .small2)
 					}
 
 					//					AssetIcon(.asset(AssetResource.info), size: .smallest)

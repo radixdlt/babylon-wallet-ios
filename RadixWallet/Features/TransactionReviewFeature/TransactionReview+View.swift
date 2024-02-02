@@ -484,7 +484,7 @@ private extension View {
 			store: destinationStore,
 			state: /TransactionReview.Destination.State.customizeFees,
 			action: TransactionReview.Destination.Action.customizeFees,
-			content: { store in NavigationView { CustomizeFees.View(store: store) } }
+			content: { CustomizeFees.View(store: $0).inNavigationView }
 		)
 	}
 
@@ -687,7 +687,7 @@ struct TransactionReviewFungibleView: View {
 	var body: some View {
 		Button(action: onTap) {
 			HStack(spacing: .small1) {
-				Thumbnail(fungible: viewState.thumbnail, size: .small)
+				Thumbnail(fungible: viewState.thumbnail, size: .extraSmall)
 					.padding(.vertical, .small1)
 
 				if let name = viewState.name {
@@ -699,32 +699,8 @@ struct TransactionReviewFungibleView: View {
 
 				Spacer(minLength: 0)
 
-				VStack(alignment: .trailing, spacing: 0) {
-					if viewState.guaranteedAmount != nil {
-						Text(L10n.TransactionReview.estimated)
-							.textStyle(.body2HighImportance)
-							.foregroundColor(.app.gray1)
-					}
-					Text(viewState.amount.formatted())
-						.textStyle(.secondaryHeader)
-						.foregroundColor(.app.gray1)
-
-					if let fiatAmount = viewState.fiatAmount {
-						// Text(fiatAmount.formatted(.currency(code: "USD")))
-						Text(fiatAmount.formatted())
-							.textStyle(.body2HighImportance)
-							.foregroundColor(.app.gray1)
-							.padding(.top, .small2)
-					}
-
-					if let guaranteedAmount = viewState.guaranteedAmount {
-						Text("\(L10n.TransactionReview.guaranteed) **\(guaranteedAmount.formatted())**")
-							.textStyle(.body2HighImportance)
-							.foregroundColor(.app.gray2)
-							.padding(.top, .small1)
-					}
-				}
-				.padding(.vertical, .medium3)
+				TransactionReviewAmountView(amount: viewState.amount, guaranteedAmount: viewState.guaranteedAmount)
+					.padding(.vertical, .medium3)
 			}
 			.padding(.horizontal, .medium3)
 			.background(background)
