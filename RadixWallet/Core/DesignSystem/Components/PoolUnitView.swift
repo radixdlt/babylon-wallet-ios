@@ -2,7 +2,7 @@
 public struct PoolUnitView: View {
 	public struct ViewState: Equatable {
 		public let poolName: String?
-		public let amount: RETDecimal
+		public let amount: RETDecimal?
 		public let guaranteedAmount: RETDecimal?
 		public let dAppName: Loadable<String?>
 		public let poolIcon: URL?
@@ -37,11 +37,13 @@ public struct PoolUnitView: View {
 
 					Spacer(minLength: 0)
 
-					TransactionReviewAmountView(amount: viewState.amount, guaranteedAmount: viewState.guaranteedAmount)
+					if let amount = viewState.amount {
+						TransactionReviewAmountView(amount: amount, guaranteedAmount: viewState.guaranteedAmount)
+							.padding(.leading, viewState.isSelected != nil ? .small2 : 0)
+					}
 
 					if let isSelected = viewState.isSelected {
 						CheckmarkView(appearance: .dark, isChecked: isSelected)
-							.padding(.leading, .small2)
 					}
 
 					//					AssetIcon(.asset(AssetResource.info), size: .smallest)

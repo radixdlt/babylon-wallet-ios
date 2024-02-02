@@ -32,7 +32,7 @@ extension PoolUnit.State {
 	var viewState: PoolUnit.ViewState {
 		.init(
 			poolName: poolUnit.resource.metadata.fungibleResourceName,
-			amount: poolUnit.resource.amount,
+			amount: nil, // In this contextwe don't want to show any amount
 			guaranteedAmount: nil,
 			dAppName: resourceDetails.dAppName,
 			poolIcon: poolUnit.resource.metadata.iconURL,
