@@ -181,12 +181,12 @@ extension PoolUnitView.ViewState {
 }
 
 extension PoolUnitResourceView.ViewState {
-	init(resourceWithRedemptionValue: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
+	init(resourceWithRedemptionValue resource: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
 		self.init(
-			id: resourceWithRedemptionValue.resource.id,
-			symbol: resourceWithRedemptionValue.resource.metadata.symbol,
-			icon: isXRD ? .xrd : .other(resourceWithRedemptionValue.resource.metadata.iconURL),
-			amount: resourceWithRedemptionValue.redemptionValue
+			id: resource.resource.id,
+			symbol: isXRD ? Constants.xrdTokenName : resource.resource.title,
+			icon: .token(isXRD ? .xrd : .other(resource.resource.metadata.iconURL)),
+			amount: resource.redemptionValue
 		)
 	}
 }

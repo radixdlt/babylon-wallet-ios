@@ -91,13 +91,13 @@ public struct PoolUnitResourceView: View {
 	public struct ViewState: Identifiable, Equatable {
 		public var id: ResourceAddress
 		public let symbol: String?
-		public let icon: Thumbnail.TokenContent
+		public let icon: Thumbnail.FungibleContent
 		public let amount: String
 
 		public init(
 			id: ResourceAddress,
 			symbol: String?,
-			icon: Thumbnail.TokenContent,
+			icon: Thumbnail.FungibleContent,
 			amount: RETDecimal?
 		) {
 			self.id = id
@@ -111,7 +111,7 @@ public struct PoolUnitResourceView: View {
 
 	public var body: some View {
 		HStack(spacing: .zero) {
-			Thumbnail(token: viewState.icon, size: .smallest)
+			Thumbnail(fungible: viewState.icon, size: .smallest)
 				.padding(.trailing, .small1)
 
 			if let symbol = viewState.symbol {

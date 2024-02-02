@@ -147,12 +147,6 @@ private extension DappDetails.State {
 	}
 }
 
-private extension OnLedgerEntity.Resource {
-	var title: String {
-		metadata.name ?? metadata.symbol ?? L10n.TransactionReview.unknown
-	}
-}
-
 // MARK: Child Views
 
 extension DappDetails.View {

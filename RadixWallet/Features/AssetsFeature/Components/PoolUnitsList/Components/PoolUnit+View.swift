@@ -34,36 +34,22 @@ extension PoolUnit.State {
 			poolName: poolUnit.resource.metadata.fungibleResourceName,
 			dAppName: resourceDetails.dAppName,
 			poolIcon: poolUnit.resource.metadata.iconURL,
-			resources: resourceDetails.map { details in
-				PoolUnitResourceView.ViewState.viewStates(resourcesDetails: details)
-			},
+			resources: resourceDetails.map { .init(resources: $0) },
 			isSelected: isSelected
 		)
 	}
 }
 
-extension PoolUnitResourceView.ViewState {
-	static func viewStates(
-		resourcesDetails: OnLedgerEntitiesClient.OwnedResourcePoolDetails
-	) -> [PoolUnitResourceView.ViewState] {
-		let xrdResourceViewState = resourcesDetails.xrdResource.map {
-			PoolUnitResourceView.ViewState(
-				id: $0.resource.resourceAddress,
-				symbol: Constants.xrdTokenName,
-				icon: .xrd,
-				amount: $0.redemptionValue
-			)
+extension [PoolUnitResourceView.ViewState] {
+	init(resources: OnLedgerEntitiesClient.OwnedResourcePoolDetails) {
+		let xrdResource = resources.xrdResource.map {
+			PoolUnitResourceView.ViewState(resourceWithRedemptionValue: $0, isXRD: true)
 		}
-		let nonXrdResources = resourcesDetails.nonXrdResources.map { resourceDetails in
-			PoolUnitResourceView.ViewState(
-				id: resourceDetails.resource.resourceAddress,
-				symbol: resourceDetails.resource.metadata.symbol ?? resourceDetails.resource.metadata.name ?? L10n.Account.PoolUnits.unknownSymbolName,
-				icon: .other(resourceDetails.resource.metadata.iconURL),
-				amount: resourceDetails.redemptionValue
-			)
+		let nonXrdResources = resources.nonXrdResources.map {
+			PoolUnitResourceView.ViewState(resourceWithRedemptionValue: $0, isXRD: false)
 		}
 
-		return (xrdResourceViewState.map { [$0] } ?? []) + nonXrdResources
+		self = (xrdResource.map { [$0] } ?? []) + nonXrdResources
 	}
 }
 

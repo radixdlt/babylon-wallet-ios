@@ -541,6 +541,12 @@ extension OnLedgerEntitiesClient {
 	}
 }
 
+extension OnLedgerEntity.Resource {
+	var title: String {
+		metadata.name ?? metadata.symbol ?? L10n.TransactionReview.unknown
+	}
+}
+
 extension [OnLedgerEntity.OwnedFungibleResource] {
 	func sorted() async -> OnLedgerEntity.OwnedFungibleResources {
 		@Dependency(\.gatewaysClient) var gatewaysClient
