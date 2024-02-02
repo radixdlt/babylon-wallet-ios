@@ -20,7 +20,7 @@ public struct LiquidStakeUnitView: View {
 						.padding(.trailing, .small2)
 
 					VStack(alignment: .leading, spacing: .zero) {
-						Text(viewState.resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName)
+						Text(viewState.resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName) // FIXME: ???
 							.textStyle(.body1Header)
 
 						if let validatorName = viewState.validatorName {

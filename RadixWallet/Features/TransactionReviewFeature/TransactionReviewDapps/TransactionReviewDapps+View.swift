@@ -14,7 +14,7 @@ extension TransactionReviewDapps.State {
 extension TransactionReview.DappEntity {
 	fileprivate var knownDapp: TransactionReview.DappView.ViewState {
 		.known(
-			name: metadata.name ?? L10n.TransactionReview.unnamedDapp,
+			name: metadata.name ?? L10n.TransactionReview.unnamedDapp, // FIXME: ???
 			thumbnail: metadata.iconURL,
 			id: id,
 			unauthorizedHint: isAuthorized ? nil : L10n.Common.unauthorized

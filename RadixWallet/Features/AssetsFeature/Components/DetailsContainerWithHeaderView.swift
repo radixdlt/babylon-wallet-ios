@@ -11,7 +11,7 @@ struct DetailsContainerWithHeaderViewState: Equatable {
 extension DetailsContainerWithHeaderViewState {
 	init(_ resourceWithAmount: OnLedgerEntitiesClient.ResourceWithVaultAmount) {
 		self.init(
-			title: .success(resourceWithAmount.resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName),
+			title: .success(resourceWithAmount.resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName), // FIXME: ???
 			amount: resourceWithAmount.amount.formatted(),
 			symbol: .success(resourceWithAmount.resource.metadata.symbol)
 		)
@@ -60,7 +60,7 @@ struct DetailsContainerWithHeaderView<ThumbnailView: View, DetailsView: View>: V
 				Text(amount)
 					.font(.app.sheetTitle)
 					.kerning(-0.5)
-					+ Text((viewState.symbol.wrappedValue.flatMap(identity)).map { " " + $0 } ?? "")
+					+ Text((viewState.symbol.wrappedValue.flatMap(identity)).map { " " + $0 } ?? "") // FIXME: ???
 					.font(.app.sectionHeader)
 			}
 		}

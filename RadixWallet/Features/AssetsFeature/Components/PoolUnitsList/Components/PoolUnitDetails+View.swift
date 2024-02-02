@@ -13,7 +13,7 @@ extension PoolUnitDetails.State {
 				resourceAddress: resource.resourceAddress,
 				isXRD: false,
 				validatorAddress: nil,
-				resourceName: .success(resource.metadata.name), // FIXME: Is this correct?
+				resourceName: .success(resource.metadata.name), // FIXME: ??? Is this correct?
 				currentSupply: .success(resource.totalSupply?.formatted() ?? L10n.AssetDetails.supplyUnkown),
 				behaviors: .success(resource.behaviors),
 				tags: .success(resource.metadata.tags)

@@ -468,7 +468,7 @@ extension TransactionReview {
 				guard let validator = entity.validator else { return nil }
 				return .init(
 					address: validator.address,
-					name: validator.metadata.name,
+					name: validator.metadata.name, // FIXME: ???
 					thumbnail: validator.metadata.iconURL
 				)
 			}
@@ -922,7 +922,7 @@ extension TransactionReview {
 					resource: resource,
 					stakeClaims: stakeClaimTokens.asIdentifiable()
 				),
-				validatorName: stakeClaimValidator.metadata.name ?? L10n.TransactionReview.unknown
+				validatorName: stakeClaimValidator.metadata.name ?? L10n.TransactionReview.unknown // FIXME: ???
 			))
 		)]
 	}
