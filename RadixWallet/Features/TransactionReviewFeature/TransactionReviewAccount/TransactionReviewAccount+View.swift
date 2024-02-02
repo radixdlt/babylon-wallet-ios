@@ -160,6 +160,8 @@ extension LiquidStakeUnitView.ViewState {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.LiquidStakeUnit) {
 		self.init(
 			resource: resource,
+			amount: details.amount,
+			guaranteedAmount: details.guarantee?.amount,
 			worth: details.worth,
 			validatorName: details.validator.metadata.name
 		)
