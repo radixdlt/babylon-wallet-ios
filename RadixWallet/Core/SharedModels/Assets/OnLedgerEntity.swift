@@ -617,6 +617,6 @@ extension OnLedgerEntity.Resource {
 
 extension OnLedgerEntity.Metadata {
 	public var fungibleResourceName: String? {
-		name ?? symbol
+		symbol ?? name
 	}
 }
