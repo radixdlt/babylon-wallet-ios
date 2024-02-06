@@ -37,6 +37,10 @@ public struct LiquidStakeUnitView: View {
 						TransactionReviewAmountView(amount: amount, guaranteedAmount: viewState.guaranteedAmount)
 							.padding(.leading, viewState.isSelected != nil ? .small2 : 0)
 					}
+
+					if let isSelected = viewState.isSelected {
+						CheckmarkView(appearance: .dark, isChecked: isSelected)
+					}
 				}
 
 				VStack(alignment: .leading, spacing: .small3) {
