@@ -17,8 +17,18 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			}
 		}
 
+		public mutating func showDestination(_ destination: Destination.State, id: ReceivingAccount.State.ID) {
+			self.destinationReceivingAccountID = id
+			self.destination = destination
+		}
+
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State? {
+			didSet { if destination == nil { destinationReceivingAccountID = nil } }
+		}
+
+		// This identifies which row we are showing a sheet for, in destination
+		public var destinationReceivingAccountID: ReceivingAccount.State.ID?
 
 		public init(fromAccount: Profile.Network.Account, receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>) {
 			self.fromAccount = fromAccount
@@ -38,7 +48,6 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Equatable, Sendable {
-		case destination(PresentationAction<Destinations.Action>)
 		case receivingAccount(id: ReceivingAccount.State.ID, action: ReceivingAccount.Action)
 	}
 
@@ -54,43 +63,38 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		)
 	}
 
-	public struct Destinations: Sendable, Reducer {
-		public typealias State = RelayState<ReceivingAccount.State.ID, MainState>
-		public typealias Action = RelayAction<ReceivingAccount.State.ID, MainAction>
-
-		public enum MainState: Sendable, Hashable {
+	public struct Destination: DestinationReducer {
+		public enum State: Sendable, Hashable {
 			case chooseAccount(ChooseReceivingAccount.State)
 			case addAsset(AssetsView.State)
 		}
 
-		public enum MainAction: Sendable, Equatable {
+		public enum Action: Sendable, Equatable {
 			case chooseAccount(ChooseReceivingAccount.Action)
 			case addAsset(AssetsView.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Relay {
-				Scope(state: /MainState.chooseAccount, action: /MainAction.chooseAccount) {
-					ChooseReceivingAccount()
-				}
-				Scope(state: /MainState.addAsset, action: /MainAction.addAsset) {
-					AssetsView()
-				}
+			Scope(state: /State.chooseAccount, action: /Action.chooseAccount) {
+				ChooseReceivingAccount()
+			}
+			Scope(state: /State.addAsset, action: /Action.addAsset) {
+				AssetsView()
 			}
 		}
 	}
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 			.forEach(\.receivingAccounts, action: /Action.child .. ChildAction.receivingAccount) {
 				ReceivingAccount()
 			}
 	}
 
-	private let destinationPath: WritableKeyPath<State, PresentationState<Destinations.State>> = \.$destination
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -125,29 +129,35 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			default:
 				return .none
 			}
+		}
+	}
 
-		case let .destination(.presented(.relay(id, destinationAction))):
-			switch destinationAction {
-			case let .chooseAccount(.delegate(.handleResult(account))):
-				state.receivingAccounts[id: id]?.account = account
-				state.destination = nil
-				return .none
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		guard let id = state.destinationReceivingAccountID else {
+			let error = "A destination requires a receiving Account ID to be set"
+			assertionFailure(error)
+			loggerGlobal.error(.init(stringLiteral: error))
+			return .none
+		}
 
-			case .chooseAccount(.delegate(.dismiss)):
-				state.destination = nil
-				return .none
+		switch presentedAction {
+		case let .chooseAccount(.delegate(.handleResult(account))):
+			state.receivingAccounts[id: id]?.account = account
+			state.destination = nil
+			return .none
 
-			case let .addAsset(.delegate(.handleSelectedAssets(selectedAssets))):
-				state.destination = nil
-				return handleSelectedAssets(selectedAssets, id: id, state: &state)
+		case .chooseAccount(.delegate(.dismiss)):
+			state.destination = nil
+			return .none
 
-			case .addAsset(.delegate(.dismiss)):
-				state.destination = nil
-				return .none
+		case let .addAsset(.delegate(.handleSelectedAssets(selectedAssets))):
+			state.destination = nil
+			return handleSelectedAssets(selectedAssets, id: id, state: &state)
 
-			default:
-				return .none
-			}
+		case .addAsset(.delegate(.dismiss)):
+			state.destination = nil
+			return .none
+
 		default:
 			return .none
 		}
@@ -237,7 +247,7 @@ extension TransferAccountList {
 			)
 		)
 
-		state.destination = .relayed(id, with: .chooseAccount(chooseAccount))
+		state.showDestination(.chooseAccount(chooseAccount), id: id)
 		return .none
 	}
 
@@ -273,17 +283,15 @@ extension TransferAccountList {
 			.nonFungibleAssets
 			.map(\.nftToken.id)
 
-		state.destination = .relayed(
-			id,
-			with: .addAsset(.init(
-				account: state.fromAccount,
-				mode: .selection(.init(
-					fungibleResources: selectedFungibleResources,
-					nonFungibleResources: selectedNonFungibleResources,
-					disabledNFTs: Set(nftsSelectedForOtherAccounts)
-				))
+		state.showDestination(.addAsset(.init(
+			account: state.fromAccount,
+			mode: .selection(.init(
+				fungibleResources: selectedFungibleResources,
+				nonFungibleResources: selectedNonFungibleResources,
+				disabledNFTs: Set(nftsSelectedForOtherAccounts)
 			))
-		)
+		)), id: id)
+
 		return .none
 	}
 

@@ -59,46 +59,58 @@ extension TransferAccountList.View {
 				.flushedRight
 				.padding(.top, .medium1)
 			}
-			.sheet(store: store.destination) { destinationStore in
-				destinations(destinationStore)
-			}
-		}
-	}
-
-	private func destinations(_ store: StoreOf<TransferAccountList.Destinations>) -> some View {
-		SwitchStore(store.relay()) { state in
-			switch state {
-			case .chooseAccount:
-				CaseLet(
-					/TransferAccountList.Destinations.MainState.chooseAccount,
-					action: TransferAccountList.Destinations.MainAction.chooseAccount,
-					then: { ChooseReceivingAccount.View(store: $0) }
-				)
-
-			case .addAsset:
-				CaseLet(
-					/TransferAccountList.Destinations.MainState.addAsset,
-					action: TransferAccountList.Destinations.MainAction.addAsset,
-					then: { assetsStore in
-						WithNavigationBar {
-							assetsStore.send(.view(.closeButtonTapped))
-						} content: {
-							AssetsView.View(store: assetsStore)
-								.navigationTitle(L10n.AssetTransfer.AddAssets.navigationTitle)
-								.navigationBarTitleDisplayMode(.inline)
-						}
-					}
-				)
-			}
+			.destinations(with: store)
 		}
 	}
 }
 
 private extension StoreOf<TransferAccountList> {
-	var destination: PresentationStoreOf<TransferAccountList.Destinations> {
-		func scopeState(state: State) -> PresentationState<TransferAccountList.Destinations.State> {
+	var destination: PresentationStoreOf<TransferAccountList.Destination> {
+		func scopeState(state: State) -> PresentationState<TransferAccountList.Destination.State> {
 			state.$destination
 		}
-		return scope(state: scopeState) { .child(.destination($0)) }
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<TransferAccountList>) -> some View {
+		let destinationStore = store.destination
+		return chooseAccount(with: destinationStore)
+			.addAsset(with: destinationStore)
+	}
+
+	private func chooseAccount(with destinationStore: PresentationStoreOf<TransferAccountList.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /TransferAccountList.Destination.State.chooseAccount,
+			action: TransferAccountList.Destination.Action.chooseAccount
+		) {
+			ChooseReceivingAccount.View(store: $0)
+		}
+	}
+
+	private func addAsset(with destinationStore: PresentationStoreOf<TransferAccountList.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /TransferAccountList.Destination.State.addAsset,
+			action: TransferAccountList.Destination.Action.addAsset
+		) { assetsStore in
+//			WithNavigationBar {
+//				assetsStore.send(.view(.closeButtonTapped))
+//			} content: {
+//				AssetsView.View(store: assetsStore)
+//					.navigationTitle(L10n.AssetTransfer.AddAssets.navigationTitle)
+//					.navigationBarTitleDisplayMode(.inline)
+//			}
+
+			AssetsView.View(store: assetsStore)
+				.withNavigationBar {
+					assetsStore.send(.view(.closeButtonTapped))
+				}
+				.navigationTitle(L10n.AssetTransfer.AddAssets.navigationTitle)
+				.navigationBarTitleDisplayMode(.inline)
+		}
 	}
 }
