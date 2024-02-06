@@ -3,7 +3,7 @@ import SwiftUI
 
 // MARK: - DetailsContainerWithHeaderViewState
 struct DetailsContainerWithHeaderViewState: Equatable {
-	let title: Loadable<String>
+	let title: Loadable<String?>
 	let amount: String?
 	let symbol: Loadable<String?>
 }
@@ -11,7 +11,7 @@ struct DetailsContainerWithHeaderViewState: Equatable {
 extension DetailsContainerWithHeaderViewState {
 	init(_ resourceWithAmount: OnLedgerEntitiesClient.ResourceWithVaultAmount) {
 		self.init(
-			title: .success(resourceWithAmount.resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName), // FIXME: ???
+			title: .success(resourceWithAmount.resource.metadata.title),
 			amount: resourceWithAmount.amount.formatted(),
 			symbol: .success(resourceWithAmount.resource.metadata.symbol)
 		)
