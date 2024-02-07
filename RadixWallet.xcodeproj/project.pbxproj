@@ -938,7 +938,6 @@
 		48CFC5EE2ADC10DA00E77A5C /* SlideUpPanel+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1472ADC10D900E77A5C /* SlideUpPanel+View.swift */; };
 		48CFC5EF2ADC10DA00E77A5C /* SmallAccountCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1482ADC10D900E77A5C /* SmallAccountCard.swift */; };
 		48CFC5F02ADC10DA00E77A5C /* UserDefaultsClient+AccountRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1492ADC10D900E77A5C /* UserDefaultsClient+AccountRecovery.swift */; };
-		48CFC5F12ADC10DA00E77A5C /* Relay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC14A2ADC10D900E77A5C /* Relay.swift */; };
 		48CFC5F22ADC10DA00E77A5C /* AssetResource.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC14D2ADC10D900E77A5C /* AssetResource.generated.swift */; };
 		48CFC5F32ADC10DA00E77A5C /* Fonts.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC14E2ADC10D900E77A5C /* Fonts.generated.swift */; };
 		48CFC5F42ADC10DA00E77A5C /* L10n.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC14F2ADC10D900E77A5C /* L10n.generated.swift */; };
@@ -2294,7 +2293,6 @@
 		48CFC1472ADC10D900E77A5C /* SlideUpPanel+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SlideUpPanel+View.swift"; sourceTree = "<group>"; };
 		48CFC1482ADC10D900E77A5C /* SmallAccountCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SmallAccountCard.swift; sourceTree = "<group>"; };
 		48CFC1492ADC10D900E77A5C /* UserDefaultsClient+AccountRecovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaultsClient+AccountRecovery.swift"; sourceTree = "<group>"; };
-		48CFC14A2ADC10D900E77A5C /* Relay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Relay.swift; sourceTree = "<group>"; };
 		48CFC14D2ADC10D900E77A5C /* AssetResource.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetResource.generated.swift; sourceTree = "<group>"; };
 		48CFC14E2ADC10D900E77A5C /* Fonts.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Fonts.generated.swift; sourceTree = "<group>"; };
 		48CFC14F2ADC10D900E77A5C /* L10n.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = L10n.generated.swift; sourceTree = "<group>"; };
@@ -6021,7 +6019,6 @@
 				48CFC1452ADC10D900E77A5C /* SlideUpPanel */,
 				48CFC1482ADC10D900E77A5C /* SmallAccountCard.swift */,
 				48CFC1492ADC10D900E77A5C /* UserDefaultsClient+AccountRecovery.swift */,
-				48CFC14A2ADC10D900E77A5C /* Relay.swift */,
 			);
 			path = FeaturePrelude;
 			sourceTree = "<group>";
@@ -9046,7 +9043,6 @@
 				83EE47912AF0EE3C00155F03 /* FromLedgerStateMixin.swift in Sources */,
 				48CFC5BD2ADC10DA00E77A5C /* Hint.swift in Sources */,
 				48CFC3622ADC10D900E77A5C /* LedgerHardwareDevices+Reducer.swift in Sources */,
-				48CFC5F12ADC10DA00E77A5C /* Relay.swift in Sources */,
 				48CFC2B22ADC10D900E77A5C /* DerivePublicKeys.swift in Sources */,
 				48CFC3D72ADC10D900E77A5C /* BIP39+Entropy.swift in Sources */,
 				48CFC34D2ADC10D900E77A5C /* Login.swift in Sources */,
