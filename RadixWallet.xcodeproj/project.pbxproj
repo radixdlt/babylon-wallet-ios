@@ -9586,8 +9586,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/radixdlt/swift-composable-architecture";
 			requirement = {
-				branch = "full-scope-1.4.2";
-				kind = branch;
+				kind = upToNextMinorVersion;
+				minimumVersion = 1.4.0;
 			};
 		};
 		48FFFA972ADC1EEC00B2B213 /* XCRemoteSwiftPackageReference "AsyncExtensions" */ = {
