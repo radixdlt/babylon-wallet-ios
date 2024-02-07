@@ -1,6 +1,5 @@
-import EngineToolkit
-
 // MARK: - NoEntityFoundMatchingCriteria
+
 struct NoEntityFoundMatchingCriteria: Swift.Error {}
 
 // MARK: - IncorrectEntityType

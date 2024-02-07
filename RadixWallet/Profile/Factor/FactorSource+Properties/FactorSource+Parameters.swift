@@ -1,6 +1,5 @@
-import EngineToolkit
-
 // MARK: - FactorSource.CryptoParameters
+
 extension FactorSource {
 	public struct CryptoParameters: Sendable, Hashable, Codable {
 		/// either Curve25519 or secp256k1 (or P256?)

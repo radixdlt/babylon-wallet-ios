@@ -1,4 +1,4 @@
-import EngineToolkit
+
 
 extension EntityType {
 	public var isResourcePool: Bool {

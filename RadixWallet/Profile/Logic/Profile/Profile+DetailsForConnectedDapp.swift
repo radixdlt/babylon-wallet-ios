@@ -1,4 +1,4 @@
-import EngineToolkit
+
 
 extension Profile {
 	public func detailsForAuthorizedDapp(_ dapp: Profile.Network.AuthorizedDapp) throws -> Profile.Network.AuthorizedDappDetailed {

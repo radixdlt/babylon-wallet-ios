@@ -1,6 +1,5 @@
-import EngineToolkit
-
 // MARK: - EncryptedProfileSnapshot
+
 /// An encryption of a `ProfileSnapshot` with crypto metadata about how it was encrypted, which can
 /// be used to decrypt it, given a user provided password.
 public struct EncryptedProfileSnapshot: Sendable, Codable, Hashable {

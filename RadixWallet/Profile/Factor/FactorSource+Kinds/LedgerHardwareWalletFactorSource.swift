@@ -1,6 +1,5 @@
-import EngineToolkit
-
 // MARK: - LedgerHardwareWalletFactorSource
+
 public struct LedgerHardwareWalletFactorSource: FactorSourceProtocol {
 	public typealias ID = FactorSourceID.FromHash
 	public let id: ID

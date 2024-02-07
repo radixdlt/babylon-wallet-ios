@@ -1,6 +1,5 @@
-import EngineToolkit
-
 // MARK: - LegacyOlympiaAccountAddress
+
 public struct LegacyOlympiaAccountAddress: Sendable, Hashable, CustomDebugStringConvertible {
 	/// Bech32, NOT Bech32m, encoded Olympia address
 	public let address: NonEmptyString

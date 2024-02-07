@@ -1,6 +1,5 @@
-import EngineToolkit
-
 // MARK: - SLIP10.PublicKey + Codable
+
 extension SLIP10.PublicKey: Codable {}
 extension SLIP10.PublicKey {
 	private enum CodingKeys: String, CodingKey {

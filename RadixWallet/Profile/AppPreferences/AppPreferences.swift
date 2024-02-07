@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - AppPreferences
 /// Security structure, connected P2P clients, and display settings.
 public struct AppPreferences:

@@ -1,6 +1,5 @@
-import EngineToolkit
-
 // MARK: - FactorSourceKind
+
 /// The **kind** (or "type") of FactorSource describes how it is used.
 public enum FactorSourceKind:
 	String,

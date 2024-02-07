@@ -1,11 +1,11 @@
-import EngineToolkit
 
-// MARK: - NonFungibleGlobalId + Hashable
+
 /// Conformance of RET models to Hashable. An improvement would be if RET could add the below two new APIs:
 /// - `equals(other:_)-> Bool`
 /// - `hashed() -> [UInt8]` // speculative.
 /// That would allow to use a tool like Sourcery to autogenerate Equatable and Hashable conformances.
 
+// MARK: - NonFungibleGlobalId + Hashable
 extension NonFungibleGlobalId: Hashable {
 	public static func == (lhs: EngineToolkit.NonFungibleGlobalId, rhs: EngineToolkit.NonFungibleGlobalId) -> Bool {
 		lhs.asStr() == rhs.asStr()

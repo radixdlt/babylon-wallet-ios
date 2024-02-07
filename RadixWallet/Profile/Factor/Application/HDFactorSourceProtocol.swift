@@ -1,6 +1,5 @@
-import EngineToolkit
-
 // MARK: - HDFactorSourceProtocol
+
 // Empty marker protocol only
 public protocol HDFactorSourceProtocol: BaseFactorSourceProtocol {
 	var factorSourceID: FactorSourceID { get }

@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - AccountDerivationPath
 public enum AccountDerivationPath: DerivationPathProtocol, Sendable, Hashable, Codable, Identifiable, CustomStringConvertible, CustomDumpStringConvertible {
 	public var derivationPath: String {

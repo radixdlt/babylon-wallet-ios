@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - EntityExtraProperties
 public enum EntityExtraProperties {
 	case forAccount(Profile.Network.Account.ExtraProperties)

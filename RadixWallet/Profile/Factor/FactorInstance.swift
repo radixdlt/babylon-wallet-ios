@@ -1,6 +1,5 @@
-import EngineToolkit
-
 // MARK: - FactorInstance
+
 /// An factor instance created from a FactorSource.
 public struct FactorInstance: Sendable, Hashable, Codable, Identifiable, FactorOfTierProtocol {
 	// FIXME: COMPLETELY incorrectly implemented, MUST be sent in probably, because Profile cannot

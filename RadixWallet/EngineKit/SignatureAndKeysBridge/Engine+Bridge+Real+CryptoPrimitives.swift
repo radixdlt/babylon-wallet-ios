@@ -1,4 +1,4 @@
-import EngineToolkit
+
 
 extension SLIP10.PublicKey {
 	public init(engine enginePublicKey: EngineToolkit.PublicKey) throws {
