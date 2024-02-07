@@ -9587,7 +9587,7 @@
 			repositoryURL = "https://github.com/radixdlt/swift-composable-architecture";
 			requirement = {
 				kind = upToNextMinorVersion;
-				minimumVersion = 1.4.0;
+				minimumVersion = 1.7.0;
 			};
 		};
 		48FFFA972ADC1EEC00B2B213 /* XCRemoteSwiftPackageReference "AsyncExtensions" */ = {
