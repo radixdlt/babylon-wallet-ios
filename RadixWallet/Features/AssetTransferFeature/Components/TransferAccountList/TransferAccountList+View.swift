@@ -97,14 +97,6 @@ private extension View {
 			state: /TransferAccountList.Destination.State.addAsset,
 			action: TransferAccountList.Destination.Action.addAsset
 		) { assetsStore in
-//			WithNavigationBar {
-//				assetsStore.send(.view(.closeButtonTapped))
-//			} content: {
-//				AssetsView.View(store: assetsStore)
-//					.navigationTitle(L10n.AssetTransfer.AddAssets.navigationTitle)
-//					.navigationBarTitleDisplayMode(.inline)
-//			}
-
 			AssetsView.View(store: assetsStore)
 				.withNavigationBar {
 					assetsStore.send(.view(.closeButtonTapped))

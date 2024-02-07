@@ -965,47 +965,7 @@ extension DappInteractionFlow.ChildAction {
 	}
 }
 
-// extension SelectionRequirement {
-//	var requestedNumber: RequestedNumber {
-//		switch self {
-//		case .exactly(let quantity):
-//			.exactly(quantity)
-//		case .atLeast(let quantity):
-//			.atLeast(quantity)
-//		}
-//	}
-// }
-
 extension DappInteractionFlow.Path.State {
-//	var item: DappInteractionFlow.State.AnyInteractionItem {
-//		switch self {
-//		case .login(let state):
-//			return .remote(.auth(.login(
-//				state.loginRequest
-//			)))
-//		case .accountPermission(let state):
-//			return .local(.accountPermissionRequested(
-//				state.numberOfAccounts
-//			))
-//		case .chooseAccounts(let state):
-//			return .remote(.ongoingAccounts(.init(
-//				numberOfAccounts: state.chooseAccounts.selectionRequirement.requestedNumber,
-//				challenge: state.challenge
-//			)))
-//		case .personaDataPermission(let state):
-//			return .remote(.ongoingPersonaData(
-//				state.requested
-//			))
-//		case .oneTimePersonaData(let state):
-//			return .remote(.oneTimePersonaData(
-//				state.requested
-//			))
-//		case .reviewTransaction(let state):
-//			fatalError()
-	////			return .remote(.send(.init(transactionManifest: state.reviewedTransaction?.transactionManifest)))
-//		}
-//	}
-
 	init?(
 		for anyItem: DappInteractionFlow.State.AnyInteractionItem,
 		interaction: DappInteractionFlow.State.RemoteInteraction,
