@@ -1121,7 +1121,6 @@
 		48FFFAA52ADC1F9600B2B213 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAA42ADC1F9600B2B213 /* AsyncAlgorithms */; };
 		48FFFAA82ADC1FBE00B2B213 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAA72ADC1FBE00B2B213 /* Atomics */; };
 		48FFFAAB2ADC1FE900B2B213 /* DependenciesAdditions in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAAA2ADC1FE900B2B213 /* DependenciesAdditions */; };
-		48FFFAAE2ADC200300B2B213 /* EngineToolkit in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAAD2ADC200300B2B213 /* EngineToolkit */; };
 		48FFFAB12ADC203700B2B213 /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAB02ADC203700B2B213 /* WebRTC */; };
 		48FFFAB72ADC207B00B2B213 /* NavigationTransitions in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAB62ADC207B00B2B213 /* NavigationTransitions */; };
 		48FFFABA2ADC209100B2B213 /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAB92ADC209100B2B213 /* Nuke */; };
@@ -2713,7 +2712,6 @@
 				48FFFAD82ADC21D200B2B213 /* NonEmpty in Frameworks */,
 				48FFFAE12ADC220F00B2B213 /* Tagged in Frameworks */,
 				48FFFAD22ADC218400B2B213 /* Either in Frameworks */,
-				48FFFAAE2ADC200300B2B213 /* EngineToolkit in Frameworks */,
 				48FFFAA52ADC1F9600B2B213 /* AsyncAlgorithms in Frameworks */,
 				48FFFAEA2ADC225B00B2B213 /* ScreenshotPreventing in Frameworks */,
 				48FFFAA82ADC1FBE00B2B213 /* Atomics in Frameworks */,
@@ -7685,7 +7683,6 @@
 				48FFFAA42ADC1F9600B2B213 /* AsyncAlgorithms */,
 				48FFFAA72ADC1FBE00B2B213 /* Atomics */,
 				48FFFAAA2ADC1FE900B2B213 /* DependenciesAdditions */,
-				48FFFAAD2ADC200300B2B213 /* EngineToolkit */,
 				48FFFAB02ADC203700B2B213 /* WebRTC */,
 				48FFFAB62ADC207B00B2B213 /* NavigationTransitions */,
 				48FFFAB92ADC209100B2B213 /* Nuke */,
@@ -7762,7 +7759,6 @@
 				48FFFAA32ADC1F9600B2B213 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 				48FFFAA62ADC1FBE00B2B213 /* XCRemoteSwiftPackageReference "swift-atomics" */,
 				48FFFAA92ADC1FE900B2B213 /* XCRemoteSwiftPackageReference "swift-dependencies-additions" */,
-				48FFFAAC2ADC200300B2B213 /* XCRemoteSwiftPackageReference "swift-engine-toolkit" */,
 				48FFFAAF2ADC203700B2B213 /* XCRemoteSwiftPackageReference "WebRTC" */,
 				48FFFAB22ADC206300B2B213 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
 				48FFFAB52ADC207B00B2B213 /* XCRemoteSwiftPackageReference "swiftui-navigation-transitions" */,
@@ -9650,14 +9646,6 @@
 				minimumVersion = 1.0.0;
 			};
 		};
-		48FFFAAC2ADC200300B2B213 /* XCRemoteSwiftPackageReference "swift-engine-toolkit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/radixdlt/swift-engine-toolkit";
-			requirement = {
-				branch = 1.0.9_update;
-				kind = branch;
-			};
-		};
 		48FFFAAF2ADC203700B2B213 /* XCRemoteSwiftPackageReference "WebRTC" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/stasel/WebRTC/";
@@ -9892,11 +9880,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFAA92ADC1FE900B2B213 /* XCRemoteSwiftPackageReference "swift-dependencies-additions" */;
 			productName = DependenciesAdditions;
-		};
-		48FFFAAD2ADC200300B2B213 /* EngineToolkit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 48FFFAAC2ADC200300B2B213 /* XCRemoteSwiftPackageReference "swift-engine-toolkit" */;
-			productName = EngineToolkit;
 		};
 		48FFFAB02ADC203700B2B213 /* WebRTC */ = {
 			isa = XCSwiftPackageProductDependency;

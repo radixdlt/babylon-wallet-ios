@@ -235,15 +235,6 @@
       }
     },
     {
-      "identity" : "swift-engine-toolkit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/radixdlt/swift-engine-toolkit",
-      "state" : {
-        "branch" : "1.0.9_update",
-        "revision" : "aa806f3c0ea38784408e70859dc3f17810fd429f"
-      }
-    },
-    {
       "identity" : "swift-identified-collections",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-identified-collections",
