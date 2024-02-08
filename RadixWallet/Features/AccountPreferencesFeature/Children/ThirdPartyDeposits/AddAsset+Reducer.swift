@@ -40,7 +40,7 @@ public struct AddAsset: FeatureReducer, Sendable {
 				address = ThirdPartyDeposits.DepositorAddress(raw: resourceAddress).map { .allowedDepositor($0) }
 			}
 
-			guard let address, let engineAddress = try? address.resourceAddress.intoEngine() else {
+			guard let address, let engineAddress = try? address.resourceAddress else {
 				return .invalid
 			}
 

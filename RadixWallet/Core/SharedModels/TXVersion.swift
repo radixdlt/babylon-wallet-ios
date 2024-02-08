@@ -1,3 +1,5 @@
+import Foundation
+
 // MARK: - TXVersionTag
 public enum TXVersionTag: Sendable {}
 

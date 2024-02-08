@@ -67,7 +67,7 @@ struct FeesView: View {
 			Spacer()
 			Text(state.amount.formatted(showsZero: state.isUserConfigurable))
 				.textStyle(.body1HighImportance)
-				.foregroundColor(state.amount == .zero ? .app.gray2 : .app.gray1)
+				.foregroundColor(state.amount == RETDecimal.zero() ? .app.gray2 : .app.gray1)
 		}
 	}
 }
@@ -117,7 +117,7 @@ extension TransactionFee.AdvancedFeeCustomization {
 			),
 		])
 
-		if paidByDapps > .zero {
+		if paidByDapps > RETDecimal.zero() {
 			displayedFees.append(
 				.init(
 					name: L10n.CustomizeNetworkFees.paidByDApps,

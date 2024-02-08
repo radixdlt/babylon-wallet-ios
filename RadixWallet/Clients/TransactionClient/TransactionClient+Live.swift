@@ -49,11 +49,13 @@ extension TransactionClient {
 			func identityFromComponentAddress(_ identityAddress: IdentityAddress) async throws -> Profile.Network.Persona {
 				try await personasClient.getPersona(id: identityAddress)
 			}
-			func mapAccount(_ addresses: [EngineToolkit.Address]) throws -> OrderedSet<Profile.Network.Account> {
-				try .init(validating: addresses.asSpecific().compactMap(accountFromComponentAddress))
+			func mapAccount(_ addresses: [Address]) throws -> OrderedSet<Profile.Network.Account> {
+//				try .init(validating: addresses..compactMap(accountFromComponentAddress))
+				fixme()
 			}
-			func mapIdentity(_ addresses: [EngineToolkit.Address]) async throws -> OrderedSet<Profile.Network.Persona> {
-				try await .init(validating: addresses.asSpecific().asyncMap(identityFromComponentAddress))
+			func mapIdentity(_ addresses: [Address]) async throws -> OrderedSet<Profile.Network.Persona> {
+//				try await .init(validating: addresses.asyncMap(identityFromComponentAddress))
+				fixme()
 			}
 
 			let summary = manifest.summary(networkId: networkID.rawValue)
@@ -99,7 +101,7 @@ extension TransactionClient {
 
 				return FeePayerCandidate(
 					account: account,
-					xrdBalance: portfolio.fungibleResources.xrdResource?.amount ?? .zero
+					xrdBalance: portfolio.fungibleResources.xrdResource?.amount ?? .zero()
 				)
 			}
 
@@ -121,7 +123,7 @@ extension TransactionClient {
 				startEpochInclusive: epoch.rawValue,
 				endEpochExclusive: (epoch + request.makeTransactionHeaderInput.epochWindow).rawValue,
 				nonce: request.nonce.rawValue,
-				notaryPublicKey: SLIP10.PublicKey.eddsaEd25519(request.transactionSigners.notaryPublicKey).intoEngine(),
+				notaryPublicKey: SLIP10.PublicKey.eddsaEd25519(request.transactionSigners.notaryPublicKey),
 				notaryIsSignatory: request.transactionSigners.notaryIsSignatory,
 				tipPercentage: request.makeTransactionHeaderInput.tipPercentage
 			)
@@ -143,7 +145,7 @@ extension TransactionClient {
 
 			let uncompiledNotarized = try NotarizedTransaction(
 				signedIntent: signedTransactionIntent,
-				notarySignature: notarySignature.intoEngine().signature
+				notarySignature: notarySignature
 			)
 
 			let compiledNotarizedTXIntent = try uncompiledNotarized.compile()
@@ -211,7 +213,7 @@ extension TransactionClient {
 				includeLockFee: false // Calculate without LockFee cost. It is yet to be determined if LockFe will be added or not
 			)
 
-			if transactionFee.totalFee.lockFee > .zero {
+			if transactionFee.totalFee.lockFee > RETDecimal.zero() {
 				/// LockFee required
 				/// Total cost > `zero`, recalculate the total by adding lockFee cost.
 				transactionFee.addLockFeeCost()

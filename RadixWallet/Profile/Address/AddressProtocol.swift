@@ -15,6 +15,3 @@ extension CustomStringConvertible where Self: AddressProtocol {
 		address
 	}
 }
-
-// MARK: - SpecificAddress + AddressProtocol
-extension SpecificAddress: AddressProtocol {}

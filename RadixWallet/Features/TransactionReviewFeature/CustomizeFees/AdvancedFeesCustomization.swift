@@ -39,7 +39,7 @@ public struct AdvancedFeesCustomization: FeatureReducer {
 		switch viewAction {
 		case let .paddingAmountChanged(amount):
 			state.paddingAmount = amount
-			state.fees.paddingFee = state.parsedPaddingFee ?? .zero
+			state.fees.paddingFee = state.parsedPaddingFee ?? RETDecimal.zero()
 			return .send(.delegate(.updated(state.fees)))
 		case let .tipPercentageChanged(percentage):
 			state.tipPercentage = percentage
@@ -54,7 +54,7 @@ public struct AdvancedFeesCustomization: FeatureReducer {
 
 extension AdvancedFeesCustomization.State {
 	var parsedPaddingFee: RETDecimal? {
-		paddingAmount.isEmpty ? .zero : try? RETDecimal(formattedString: paddingAmount)
+		paddingAmount.isEmpty ? RETDecimal.zero() : try? RETDecimal(formattedString: paddingAmount)
 	}
 
 	var parsedTipPercentage: UInt16? {

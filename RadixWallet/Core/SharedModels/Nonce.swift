@@ -1,4 +1,10 @@
+import Foundation
 
+// MARK: - NonceTag
+public enum NonceTag: Sendable {}
+
+/// Secure random unique 4 bytes.
+public typealias Nonce = Tagged<NonceTag, UInt32>
 
 extension Nonce {
 	public static func secureRandom() -> Self {
@@ -12,9 +18,3 @@ extension Nonce {
 		return Self(rawValue: rawValue)
 	}
 }
-
-// MARK: - NonceTag
-public enum NonceTag: Sendable {}
-
-/// Secure random unique 4 bytes.
-public typealias Nonce = Tagged<NonceTag, UInt32>

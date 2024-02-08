@@ -83,7 +83,7 @@ extension FaucetClient: DependencyKey {
 			let manifest = try ManifestBuilder.manifestForFaucet(
 				includeLockFeeInstruction: true,
 				networkID: networkID,
-				componentAddress: accountAddress.asGeneral
+				componentAddress: accountAddress
 			)
 
 			try await signSubmitTX(manifest: manifest)

@@ -88,7 +88,7 @@ extension OnLedgerEntitiesClient {
 
 		let items = try freshPage.items.map {
 			try NonFungibleGlobalId.fromParts(
-				resourceAddress: request.resource.resourceAddress.intoEngine(),
+				resourceAddress: request.resource.resourceAddress,
 				nonFungibleLocalId: .from(stringFormat: $0)
 			)
 		}
@@ -176,7 +176,9 @@ extension OnLedgerEntitiesClient {
 				try item.nonFungibleIds.map { id in
 					try OnLedgerEntity.nonFungibleToken(.init(
 						id: .fromParts(
-							resourceAddress: .init(address: request.resource.address),
+							resourceAddress: .init(
+								address: request.resource.address
+							),
 							nonFungibleLocalId: .from(stringFormat: id.nonFungibleId)
 						),
 						data: id.data?.programmaticJson.tuple
@@ -310,7 +312,10 @@ extension CacheClient.Entry.OnLedgerEntity {
 		case let .genericComponent(genericComponent):
 			genericComponent.asGeneral
 		case let .nonFungibleData(nonFungibleId):
-			.init(address: nonFungibleId.resourceAddress().asStr(), decodedKind: .globalNonFungibleResourceManager)
+			.init(
+				address: nonFungibleId.resourceAddress().asStr(),
+				decodedKind: .globalNonFungibleResourceManager
+			)
 		case let .nonFungibleIdPage(_, resourceAddress, _):
 			resourceAddress.asGeneral
 		}
@@ -319,20 +324,21 @@ extension CacheClient.Entry.OnLedgerEntity {
 
 extension Address {
 	var cachingIdentifier: CacheClient.Entry.OnLedgerEntity {
-		switch self.decodedKind {
-		case _ where AccountEntityType.addressSpace.contains(self.decodedKind):
-			.account(self)
-		case _ where ResourceEntityType.addressSpace.contains(self.decodedKind):
-			.resource(self)
-		case _ where ResourcePoolEntityType.addressSpace.contains(self.decodedKind):
-			.resourcePool(self)
-		case _ where ValidatorEntityType.addressSpace.contains(self.decodedKind):
-			.validator(self)
-		case _ where ComponentEntityType.addressSpace.contains(self.decodedKind):
-			.genericComponent(self)
-		default:
-			.genericComponent(self)
-		}
+//		switch self.decodedKind {
+//		case _ where AccountEntityType.addressSpace.contains(self.decodedKind):
+//			.account(self)
+//		case _ where ResourceEntityType.addressSpace.contains(self.decodedKind):
+//			.resource(self)
+//		case _ where ResourcePoolEntityType.addressSpace.contains(self.decodedKind):
+//			.resourcePool(self)
+//		case _ where ValidatorEntityType.addressSpace.contains(self.decodedKind):
+//			.validator(self)
+//		case _ where ComponentEntityType.addressSpace.contains(self.decodedKind):
+//			.genericComponent(self)
+//		default:
+//			.genericComponent(self)
+//		}
+		fixme()
 	}
 }
 

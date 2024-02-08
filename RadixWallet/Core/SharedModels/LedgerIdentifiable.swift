@@ -102,21 +102,22 @@ extension LedgerIdentifiable {
 
 extension LedgerIdentifiable.Address {
 	public init?(address: Address) {
-		switch address.decodedKind {
-		case _ where AccountEntityType.addressSpace.contains(address.decodedKind):
-			self = .account(.init(address: address.address, decodedKind: address.decodedKind), isLedgerHWAccount: false)
-		case _ where ResourceEntityType.addressSpace.contains(address.decodedKind):
-			self = .resource(.init(address: address.address, decodedKind: address.decodedKind))
-		case _ where ResourcePoolEntityType.addressSpace.contains(address.decodedKind):
-			self = .resourcePool(.init(address: address.address, decodedKind: address.decodedKind))
-		case _ where PackageEntityType.addressSpace.contains(address.decodedKind):
-			self = .package(.init(address: address.address, decodedKind: address.decodedKind))
-		case _ where ValidatorEntityType.addressSpace.contains(address.decodedKind):
-			self = .validator(.init(address: address.address, decodedKind: address.decodedKind))
-		case _ where ComponentEntityType.addressSpace.contains(address.decodedKind):
-			self = .component(.init(address: address.address, decodedKind: address.decodedKind))
-		default:
-			return nil
-		}
+		panic()
+//		switch address.decodedKind {
+//		case _ where AccountEntityType.addressSpace.contains(address.decodedKind):
+//			self = .account(.init(address: address.address, decodedKind: address.decodedKind), isLedgerHWAccount: false)
+//		case _ where ResourceEntityType.addressSpace.contains(address.decodedKind):
+//			self = .resource(.init(address: address.address, decodedKind: address.decodedKind))
+//		case _ where ResourcePoolEntityType.addressSpace.contains(address.decodedKind):
+//			self = .resourcePool(.init(address: address.address, decodedKind: address.decodedKind))
+//		case _ where PackageEntityType.addressSpace.contains(address.decodedKind):
+//			self = .package(.init(address: address.address, decodedKind: address.decodedKind))
+//		case _ where ValidatorEntityType.addressSpace.contains(address.decodedKind):
+//			self = .validator(.init(address: address.address, decodedKind: address.decodedKind))
+//		case _ where ComponentEntityType.addressSpace.contains(address.decodedKind):
+//			self = .component(.init(address: address.address, decodedKind: address.decodedKind))
+//		default:
+//			return nil
+//		}
 	}
 }

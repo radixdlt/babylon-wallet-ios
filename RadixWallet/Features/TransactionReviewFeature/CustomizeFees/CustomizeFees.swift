@@ -189,7 +189,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 
 						reviewedTransaction.signingFactors = factors
 						reviewedTransaction.feePayer = .success(selection)
-						if previousFeePayer == nil, reviewedTransaction.transactionFee.totalFee.max == .zero {
+						if previousFeePayer == nil, reviewedTransaction.transactionFee.totalFee.max == RETDecimal.zero() {
 							/// The case when no FeePayer is required, but users chooses to add a FeePayer.
 							reviewedTransaction.transactionFee.addLockFeeCost()
 							reviewedTransaction.transactionFee.updateNotarizingCost(notaryIsSignatory: false)

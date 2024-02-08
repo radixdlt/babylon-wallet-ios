@@ -229,11 +229,11 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 }
 
 extension ManifestBuilder {
-	static let setDefaultDepositorRule = flip(setDefaultDepositorRule)
-	static let setResourcePreference = flip(setResourcePreference)
-	static let removeResourcePreference = flip(removeResourcePreference)
-	static let addAuthorizedDepositor = flip(addAuthorizedDepositor)
-	static let removeAuthorizedDepositor = flip(removeAuthorizedDepositor)
+//	static let setDefaultDepositorRule = flip(setDefaultDepositorRule)
+//	static let setResourcePreference = flip(setResourcePreference)
+//	static let removeResourcePreference = flip(removeResourcePreference)
+//	static let addAuthorizedDepositor = flip(addAuthorizedDepositor)
+//	static let removeAuthorizedDepositor = flip(removeAuthorizedDepositor)
 
 	func setDefaultDepositorRule(
 		for account: AccountAddress,
@@ -293,23 +293,24 @@ extension ManifestBuilder {
 
 extension ThirdPartyDeposits.DepositorAddress {
 	func manifestValue() throws -> ManifestBuilderValue {
-		switch self {
-		case let .resourceAddress(resourceAddress):
-			try .enumValue(
-				discriminator: 1,
-				fields: [.addressValue(value: resourceAddress.intoManifestBuilderAddress())]
-			)
-		case let .nonFungibleGlobalID(nft):
-			.enumValue(
-				discriminator: 0,
-				fields: [
-					.tupleValue(fields: [
-						.addressValue(value: .static(value: nft.resourceAddress())),
-						.nonFungibleLocalIdValue(value: nft.localId()),
-					]),
-				]
-			)
-		}
+//		switch self {
+//		case let .resourceAddress(resourceAddress):
+//			try .enumValue(
+//				discriminator: 1,
+//				fields: [.addressValue(value: resourceAddress.intoManifestBuilderAddress())]
+//			)
+//		case let .nonFungibleGlobalID(nft):
+//			.enumValue(
+//				discriminator: 0,
+//				fields: [
+//					.tupleValue(fields: [
+//						.addressValue(value: .static(value: nft.resourceAddress())),
+//						.nonFungibleLocalIdValue(value: nft.localId()),
+//					]),
+//				]
+//			)
+//		}
+		fixme()
 	}
 }
 

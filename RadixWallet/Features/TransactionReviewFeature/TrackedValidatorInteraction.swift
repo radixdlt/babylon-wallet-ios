@@ -2,8 +2,8 @@ import Foundation
 
 // MARK: - TrackedValidatorInteraction
 public protocol TrackedValidatorInteraction {
-	var validatorAddress: EngineToolkit.Address { get }
-	var liquidStakeUnitAddress: EngineToolkit.Address { get }
+	var validatorAddress: Address { get }
+	var liquidStakeUnitAddress: Address { get }
 	var liquidStakeUnitAmount: RETDecimal { get set }
 	mutating func add(_ other: Self)
 }

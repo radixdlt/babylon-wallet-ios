@@ -176,7 +176,10 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		case .createNonFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
 				let accountAddress = try await accountsClient.getAccountByAddress(accountAddress)
-				let manifest = try ManifestBuilder.manifestForCreateNonFungibleToken(account: accountAddress.address, networkID: accountAddress.networkID)
+				let manifest = try ManifestBuilder.manifestForCreateNonFungibleToken(
+					account: accountAddress.address,
+					networkID: accountAddress.networkID
+				)
 				await send(.internal(.reviewTransaction(manifest)))
 			} catch: { error, _ in
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")

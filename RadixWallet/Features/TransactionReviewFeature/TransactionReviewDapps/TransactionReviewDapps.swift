@@ -5,8 +5,8 @@ public typealias TransactionReviewPools = TransactionReviewDapps<ResourcePoolEnt
 public typealias TransactionReviewDappsUsed = TransactionReviewDapps<ComponentEntityType>
 
 // MARK: - TransactionReviewDapps
-public struct TransactionReviewDapps<Kind: SpecificEntityType>: Sendable, FeatureReducer {
-	public typealias AddressType = SpecificAddress<Kind>
+public struct TransactionReviewDapps<Kind: Identifiable & Hashable>: Sendable, FeatureReducer {
+	public typealias AddressType = Kind
 
 	public struct State: Sendable, Hashable {
 		public var knownDapps: IdentifiedArrayOf<TransactionReview.DappEntity>

@@ -688,7 +688,7 @@ extension TransactionReview {
 		for guarantee in guarantees {
 			let decimalplaces = guarantee.resourceDivisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
 			let guaranteeInstruction: Instruction = try .assertWorktopContains(
-				resourceAddress: guarantee.resourceAddress.intoEngine(),
+				resourceAddress: guarantee.resourceAddress,
 				amount: guarantee.amount.rounded(decimalPlaces: decimalplaces)
 			)
 
@@ -720,7 +720,7 @@ extension TransactionReview {
 		if case let .success(feePayerAccount) = reviewedTransaction.feePayer.unwrap()?.account {
 			do {
 				manifest = try reviewedTransaction.transactionManifest.withLockFeeCallMethodAdded(
-					address: feePayerAccount.address.asGeneral,
+					address: feePayerAccount.address,
 					fee: reviewedTransaction.transactionFee.totalFee.lockFee
 				)
 			} catch {

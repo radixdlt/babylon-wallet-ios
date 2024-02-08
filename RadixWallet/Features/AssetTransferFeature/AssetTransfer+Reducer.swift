@@ -176,15 +176,15 @@ extension AssetTransfer {
 			for resource in involvedFungibleResources {
 				let divisibility = resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
 				try ManifestBuilder.withdrawAmount(
-					accounts.fromAccount.address.intoEngine(),
-					resource.address.intoEngine(),
+					accounts.fromAccount.address,
+					resource.address,
 					resource.totalTransferAmount.rounded(decimalPlaces: divisibility)
 				)
 
 				for account in resource.accounts {
 					let bucket = ManifestBuilderBucket.unique
 					try ManifestBuilder.takeFromWorktop(
-						resource.address.intoEngine(),
+						resource.address,
 						account.amount.rounded(decimalPlaces: divisibility),
 						bucket
 					)
@@ -199,8 +199,8 @@ extension AssetTransfer {
 
 			for resource in involvedNonFungibles {
 				try ManifestBuilder.withdrawTokens(
-					accounts.fromAccount.address.intoEngine(),
-					resource.address.intoEngine(),
+					accounts.fromAccount.address,
+					resource.address,
 					resource.allTokens.map { $0.id.localId() }
 				)
 
@@ -209,7 +209,7 @@ extension AssetTransfer {
 					let localIds = account.tokens.map { $0.id.localId() }
 
 					try ManifestBuilder.takeNonFungiblesFromWorktop(
-						resource.address.intoEngine(),
+						resource.address,
 						localIds,
 						bucket
 					)
@@ -244,14 +244,14 @@ func instructionForDepositing(
 
 		if needsSignatureForDepositing, isSoftwareAccount && userHasAccessToMnemonic || !isSoftwareAccount {
 			return try ManifestBuilder.accountDeposit(
-				recipientAddress.intoEngine(),
+				recipientAddress,
 				bucket
 			)
 		}
 	}
 
 	return try ManifestBuilder.accountTryDepositOrAbort(
-		recipientAddress.intoEngine(),
+		recipientAddress,
 		bucket,
 		nil
 	)

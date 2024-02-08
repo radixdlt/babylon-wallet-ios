@@ -1,3 +1,5 @@
+import Foundation
+
 // MARK: - EpochTag
 public enum EpochTag: Sendable {}
 

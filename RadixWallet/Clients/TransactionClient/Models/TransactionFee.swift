@@ -32,7 +32,7 @@ public struct TransactionFee: Hashable, Sendable {
 			royaltyCost: executionSummary.feeSummary.royaltyCost,
 			guaranteesCost: executionSummary.guranteesCost(),
 			signaturesCost: PredefinedFeeConstants.signaturesCost(signaturesCount),
-			lockFeeCost: includeLockFee ? PredefinedFeeConstants.lockFeeInstructionCost : .zero,
+			lockFeeCost: includeLockFee ? PredefinedFeeConstants.lockFeeInstructionCost : RETDecimal.zero(),
 			notarizingCost: PredefinedFeeConstants.notarizingCost(notaryIsSignatory)
 		)
 

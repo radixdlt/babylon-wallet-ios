@@ -1,6 +1,10 @@
 import ComposableArchitecture
 import SwiftUI
 
+public func fixme(line: UInt = #line, file: StaticString = #file) -> Never {
+	fatalError("Fix me: \(file)\(line)")
+}
+
 // MARK: - WalletApp
 @main
 struct WalletApp: SwiftUI.App {
