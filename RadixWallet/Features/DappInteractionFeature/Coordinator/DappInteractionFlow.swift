@@ -35,10 +35,25 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		@PresentationState
 		var personaNotFoundErrorAlert: AlertState<ViewAction.PersonaNotFoundErrorAlertAction>? = nil
 
-		var root: Path.State?
-		var path: StackState<Path.State> = .init()
-		// Always set this whenever changing root or path
-		var interactionItem: AnyInteractionItem? = nil
+		struct PathState {
+			let item: AnyInteractionItem
+			let state: Path.State
+		}
+
+		var root: PathState?
+		var path: StackState<PathState> = .init()
+
+		/// An index in `interactionItems` that tracks which `interactionItem` we are currently working with.
+		var currentItemIndex = 0 {
+			didSet {
+				if !interactionItems.indices.contains(currentItemIndex) {
+					let message: Logger.Message = "Programmer error: currentItemIndex outside the range"
+					assertionFailure(message.description)
+					loggerGlobal.error(message)
+					currentItemIndex = min(currentItemIndex, interactionItems.index(before: interactionItems.endIndex))
+				}
+			}
+		}
 
 		init?(
 			dappMetadata: DappMetadata,
@@ -49,7 +64,6 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 			if let interactionItems = NonEmpty(rawValue: OrderedSet<AnyInteractionItem>(for: remoteInteraction.erasedItems)) {
 				self.interactionItems = interactionItems
-				self.interactionItem = interactionItems.first
 				self.root = Path.State(
 					for: interactionItems.first,
 					interaction: remoteInteraction,
@@ -82,7 +96,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 		)
 		case presentPersonaNotFoundErrorAlert(reason: String)
 		case autofillOngoingResponseItemsIfPossible(AutofillOngoingResponseItemsPayload)
-		case delayedAppendToPath(DappInteractionFlow.Path.State, State.AnyInteractionItem)
+		case delayedAppendToPath(DappInteractionFlow.Path.State, Int)
 
 		struct AutofillOngoingResponseItemsPayload: Sendable, Equatable {
 			struct AccountsPayload: Sendable, Equatable {
@@ -261,8 +275,8 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			}
 			return continueEffect(for: &state)
 
-		case let .delayedAppendToPath(destination, item):
-			state.interactionItem = item
+		case let .delayedAppendToPath(destination, requestIndex):
+			state.currentItemIndex = requestIndex
 			state.path.append(destination)
 			return .none
 
@@ -400,7 +414,8 @@ extension DappInteractionFlow {
 			return dismissEffect(for: state, errorKind: errorKind, message: message)
 		}
 
-		guard let item = state.interactionItem else { return .none }
+		let item = state.interactionItems[state.currentItemIndex]
+
 		guard let action = childAction.action else { return .none }
 		switch action {
 		case .login(.delegate(.failedToSignAuthChallenge)):
@@ -754,22 +769,22 @@ extension DappInteractionFlow {
 
 	func continueEffect(for state: inout State) -> Effect<Action> {
 		if
-			let nextRequest = state.interactionItems.first(where: { state.responseItems[$0] == nil }),
+			let nextRequestIndex = state.interactionItems.firstIndex(where: { state.responseItems[$0] == nil }),
 			let destination = Path.State(
-				for: nextRequest,
+				for: state.interactionItems[nextRequestIndex],
 				interaction: state.remoteInteraction,
 				dappMetadata: state.dappMetadata,
 				persona: state.persona
 			)
 		{
 			if state.root == nil {
-				state.interactionItem = nextRequest
 				state.root = destination
+				state.currentItemIndex = nextRequestIndex
 			} else if state.path.last != destination {
 				return .run { send in
 					/// For more information about that `sleep` and not setting it directly here please check [this discussion in Slack](https://rdxworks.slack.com/archives/C03QFAWBRNX/p1693395346047829?thread_ts=1693388110.800679&cid=C03QFAWBRNX)
 					try? await clock.sleep(for: .milliseconds(250))
-					await send(.internal(.delayedAppendToPath(destination, nextRequest)))
+					await send(.internal(.delayedAppendToPath(destination, nextRequestIndex)))
 				}
 			}
 			return .none
@@ -1130,4 +1145,82 @@ struct SavedPersonaDataInPersonaDoesNotMatchWalletInteractionResponseItem: Swift
 // MARK: - PersonaDataEntryNotFoundInResponse
 struct PersonaDataEntryNotFoundInResponse: Swift.Error {
 	let kind: PersonaData.Entry.Kind
+}
+
+// MARK: - AnyInteractionType discriminators
+
+extension DappInteractionFlow.Path.State {
+	var interactionType: DappInteractionFlow.State.InteractionType {
+		switch self {
+		case .login:
+			return .remote(.auth(.loginWithoutChallenge))
+			return .remote(.auth(.loginWithChallenge))
+			return .remote(.auth(.usePersona))
+		case .accountPermission:
+			return .local(.accountPermissionRequested)
+		case let .chooseAccounts(state):
+			switch state.accessKind {
+			case .ongoing:
+				return .remote(.ongoingAccounts)
+			case .oneTime:
+				return .remote(.oneTimeAccounts)
+			}
+		case .personaDataPermission:
+			return .remote(.ongoingPersonaData)
+		case .oneTimePersonaData:
+			return .remote(.oneTimePersonaData)
+		case .reviewTransaction:
+			return .remote(.send)
+		}
+	}
+}
+
+extension DappInteractionFlow.State {
+	enum InteractionType {
+		case remote(RemoteInteractionType)
+		case local(LocalInteractionType)
+	}
+
+	enum RemoteInteractionType {
+		case auth(P2P.Dapp.Request.AuthRequestItem.Discriminator)
+		case oneTimeAccounts
+		case ongoingAccounts
+		case oneTimePersonaData
+		case ongoingPersonaData
+		case send
+	}
+
+	enum LocalInteractionType {
+		case accountPermissionRequested
+	}
+}
+
+extension DappInteractionFlow.State.AnyInteractionItem {
+	var type: DappInteractionFlow.State.InteractionType {
+		switch self {
+		case let .remote(item): .remote(item.type)
+		case let .local(item): .local(item.type)
+		}
+	}
+}
+
+extension DappInteractionFlow.State.RemoteInteractionItem {
+	var type: DappInteractionFlow.State.RemoteInteractionType {
+		switch self {
+		case .auth: fatalError()
+		case .oneTimeAccounts: .oneTimeAccounts
+		case .ongoingAccounts: .ongoingAccounts
+		case .oneTimePersonaData: .oneTimePersonaData
+		case .ongoingPersonaData: .ongoingPersonaData
+		case .send: .send
+		}
+	}
+}
+
+extension DappInteractionFlow.State.LocalInteractionItem {
+	var type: DappInteractionFlow.State.LocalInteractionType {
+		switch self {
+		case .accountPermissionRequested: .accountPermissionRequested
+		}
+	}
 }
