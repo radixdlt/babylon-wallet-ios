@@ -26,7 +26,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		public var stakingToValidators: ValidatorsState? = nil
 		public var unstakingFromValidators: ValidatorsState? = nil
-		public var claimingFromValidators: ValidatorsState? = nil
 
 		public var accountDepositSetting: DepositSettingState? = nil
 		public var accountDepositExceptions: DepositExceptionsState? = nil
@@ -104,12 +103,10 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case showRawTransactionTapped
-		case copyRawTransactionTapped
 		case expandContributingToPoolsTapped
 		case expandRedeemingFromPoolsTapped
 		case expandStakingToValidatorsTapped
 		case expandUnstakingFromValidatorsTapped
-		case expandClaimingFromValidatorsTapped
 		case expandUsingDappsTapped
 		case approvalSliderSlid
 	}
@@ -214,7 +211,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
-	@Dependency(\.pasteboardClient) var pasteboardClient
 
 	public init() {}
 
@@ -274,14 +270,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case .copyRawTransactionTapped:
-			guard case let .raw(manifest) = state.displayMode else {
-				assertionFailure("Copy raw manifest button should only be visible in raw transaction mode")
-				return .none
-			}
-			pasteboardClient.copyString(manifest)
-			return .none
-
 		case .expandContributingToPoolsTapped:
 			state.contributingToPools?.isExpanded.toggle()
 			return .none
@@ -296,10 +284,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case .expandUnstakingFromValidatorsTapped:
 			state.unstakingFromValidators?.isExpanded.toggle()
-			return .none
-
-		case .expandClaimingFromValidatorsTapped:
-			state.claimingFromValidators?.isExpanded.toggle()
 			return .none
 
 		case .expandUsingDappsTapped:
@@ -358,12 +342,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 					.init(
 						resourceAddress: transfer.resource.resourceAddress,
 						resource: .success(transfer.resource),
-						ownedFungibleResource: .init(
-							resourceAddress: transfer.resource.resourceAddress,
-							atLedgerState: transfer.resource.atLedgerState,
-							amount: details.amount,
-							metadata: transfer.resource.metadata
-						),
 						isXRD: details.isXRD
 					)
 				)
@@ -404,24 +382,23 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .dAppsUsed(.delegate(.openUnknownAddresses(components))):
-//			state.destination = .unknownDappComponents(.init(
-//				title: L10n.TransactionReview.unknownComponents(components.count),
-//				rowHeading: L10n.Common.component,
-//				addresses: components.map { .component($0) }
-//			))
-			fixme()
+			state.destination = .unknownDappComponents(.init(
+				title: L10n.TransactionReview.unknownComponents(components.count),
+				rowHeading: L10n.Common.component,
+				addresses: components.map { .component($0) }
+			))
 			return .none
 
 		case let .contributingToPools(.delegate(.openUnknownAddresses(pools))), let .redeemingFromPools(.delegate(.openUnknownAddresses(pools))):
-//			state.destination = .unknownDappComponents(.init(
-//				title: L10n.TransactionReview.unknownPools(pools.count),
-//				rowHeading: L10n.Common.pool,
-//				addresses: pools.map { .resourcePool($0) }
-//			))
-			fixme()
+			state.destination = .unknownDappComponents(.init(
+				title: L10n.TransactionReview.unknownPools(pools.count),
+				rowHeading: L10n.Common.pool,
+				addresses: pools.map { .resourcePool($0) }
+			))
 			return .none
 
 		case .deposits(.delegate(.showCustomizeGuarantees)):
+			// TODO: Handle?
 			guard let guarantees = state.deposits?.accounts.customizableGuarantees, !guarantees.isEmpty else { return .none }
 			state.destination = .customizeGuarantees(.init(guarantees: .init(uniqueElements: guarantees)))
 
@@ -478,7 +455,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			state.redeemingFromPools = sections.redeemingFromPools
 			state.stakingToValidators = sections.stakingToValidators
 			state.unstakingFromValidators = sections.unstakingFromValidators
-			state.claimingFromValidators = sections.claimingFromValidators
 			state.deposits = sections.deposits
 			state.accountDepositSetting = sections.accountDepositSetting
 			state.accountDepositExceptions = sections.accountDepositExceptions
@@ -558,7 +534,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 		switch presentedAction {
 		case let .customizeGuarantees(.delegate(.applyGuarantees(guaranteeStates))):
 			for guaranteeState in guaranteeStates {
-				state.applyGuarantee(guaranteeState.guarantee, transferID: guaranteeState.id)
+				if let guarantee = guaranteeState.details.guarantee {
+					state.applyGuarantee(guarantee, transferID: guaranteeState.id)
+				}
 			}
 
 			return .none
@@ -690,7 +668,7 @@ extension TransactionReview {
 		for guarantee in guarantees {
 			let decimalplaces = guarantee.resourceDivisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
 			let guaranteeInstruction: Instruction = try .assertWorktopContains(
-				resourceAddress: guarantee.resourceAddress,
+				resourceAddress: guarantee.resourceAddress.intoEngine(),
 				amount: guarantee.amount.rounded(decimalPlaces: decimalplaces)
 			)
 
@@ -722,7 +700,7 @@ extension TransactionReview {
 		if case let .success(feePayerAccount) = reviewedTransaction.feePayer.unwrap()?.account {
 			do {
 				manifest = try reviewedTransaction.transactionManifest.withLockFeeCallMethodAdded(
-					address: feePayerAccount.address,
+					address: feePayerAccount.address.asGeneral,
 					fee: reviewedTransaction.transactionFee.totalFee.lockFee
 				)
 			} catch {
@@ -739,7 +717,7 @@ extension TransactionReview {
 	}
 
 	func determineFeePayer(_ state: State, reviewedTransaction: ReviewedTransaction) -> Effect<Action> {
-		if reviewedTransaction.transactionFee.totalFee.lockFee == RETDecimal.zero() {
+		if reviewedTransaction.transactionFee.totalFee.lockFee == .zero {
 			.send(.internal(.determineFeePayerResult(.success(nil))))
 		} else {
 			.run { send in
@@ -808,13 +786,12 @@ extension TransactionReview {
 
 extension ResourceOrNonFungible {
 	func resourceAddress() throws -> ResourceAddress {
-//		switch self {
-//		case let .resource(address):
-//			try address.asSpecific()
-//		case let .nonFungible(globalID):
-//			try globalID.resourceAddress().asSpecific()
-//		}
-		fixme()
+		switch self {
+		case let .resource(address):
+			try address.asSpecific()
+		case let .nonFungible(globalID):
+			try globalID.resourceAddress().asSpecific()
+		}
 	}
 }
 
@@ -875,16 +852,16 @@ extension TransactionReview {
 				public var guarantee: TransactionClient.Guarantee?
 			}
 
+			public typealias NonFungible = OnLedgerEntity.NonFungibleToken
+			public typealias StakeClaimNFT = StakeClaimNFTSView.ViewState
+
 			public struct LiquidStakeUnit: Sendable, Hashable {
 				public let resource: OnLedgerEntity.Resource
 				public let amount: RETDecimal
 				public let worth: RETDecimal
 				public let validator: OnLedgerEntity.Validator
-				public var guarantee: TransactionClient.Guarantee?
+				public let guarantee: TransactionClient.Guarantee?
 			}
-
-			public typealias NonFungible = OnLedgerEntity.NonFungibleToken
-			public typealias StakeClaimNFT = StakeClaimResourceView.ViewState
 
 			public struct PoolUnit: Sendable, Hashable {
 				public let details: OnLedgerEntitiesClient.OwnedResourcePoolDetails
@@ -895,45 +872,13 @@ extension TransactionReview {
 		/// The guarantee, for a fungible resource
 		public var fungibleGuarantee: TransactionClient.Guarantee? {
 			get {
-				switch details {
-				case let .fungible(fungible):
-					fungible.guarantee
-				case let .liquidStakeUnit(liquidStakeUnit):
-					liquidStakeUnit.guarantee
-				case let .poolUnit(poolUnit):
-					poolUnit.guarantee
-				case .nonFungible, .stakeClaimNFT:
-					nil
-				}
+				guard case let .fungible(fungible) = details else { return nil }
+				return fungible.guarantee
 			}
 			set {
-				switch details {
-				case var .fungible(fungible):
-					fungible.guarantee = newValue
-					details = .fungible(fungible)
-				case var .liquidStakeUnit(liquidStakeUnit):
-					liquidStakeUnit.guarantee = newValue
-					details = .liquidStakeUnit(liquidStakeUnit)
-				case var .poolUnit(poolUnit):
-					poolUnit.guarantee = newValue
-					details = .poolUnit(poolUnit)
-				case .nonFungible, .stakeClaimNFT:
-					return
-				}
-			}
-		}
-
-		/// The transferred amount, for a fungible resource
-		public var fungibleTransferAmount: RETDecimal? {
-			switch details {
-			case let .fungible(fungible):
-				fungible.amount
-			case let .liquidStakeUnit(liquidStakeUnit):
-				liquidStakeUnit.amount
-			case let .poolUnit(poolUnit):
-				poolUnit.details.poolUnitResource.amount
-			case .nonFungible, .stakeClaimNFT:
-				nil
+				guard case var .fungible(fungible) = details else { return }
+				fungible.guarantee = newValue
+				details = .fungible(fungible)
 			}
 		}
 	}
@@ -1052,7 +997,7 @@ extension ReviewedTransaction {
 
 			let xrdAddress = knownAddresses(networkId: networkID.rawValue).resourceAddresses.xrd
 
-			let xrdTotalTransfer: RETDecimal = feePayerWithdraws.reduce(RETDecimal.zero()) { partialResult, resource in
+			let xrdTotalTransfer: RETDecimal = feePayerWithdraws.reduce(.zero) { partialResult, resource in
 				if case let .fungible(resourceAddress, indicator) = resource, resourceAddress == xrdAddress {
 					return (try? partialResult.add(other: indicator.amount)) ?? partialResult
 				}
@@ -1073,7 +1018,7 @@ extension ReviewedTransaction {
 
 extension FeePayerCandidate? {
 	func validateBalance(forFee transactionFee: TransactionFee) -> FeeValidationOutcome {
-		if transactionFee.totalFee.lockFee == RETDecimal.zero() {
+		if transactionFee.totalFee.lockFee == .zero {
 			// If no fee is required - valid
 			return .valid
 		}

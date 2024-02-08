@@ -101,7 +101,7 @@ extension TransactionClient {
 
 				return FeePayerCandidate(
 					account: account,
-					xrdBalance: portfolio.fungibleResources.xrdResource?.amount ?? .zero()
+					xrdBalance: portfolio.fungibleResources.xrdResource?.amount ?? .zero
 				)
 			}
 
@@ -213,7 +213,7 @@ extension TransactionClient {
 				includeLockFee: false // Calculate without LockFee cost. It is yet to be determined if LockFe will be added or not
 			)
 
-			if transactionFee.totalFee.lockFee > RETDecimal.zero() {
+			if transactionFee.totalFee.lockFee > .zero {
 				/// LockFee required
 				/// Total cost > `zero`, recalculate the total by adding lockFee cost.
 				transactionFee.addLockFeeCost()

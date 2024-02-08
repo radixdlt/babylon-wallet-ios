@@ -579,11 +579,11 @@ extension OnLedgerEntity.OwnedFungibleResource: Comparable {
 		lhs: OnLedgerEntity.OwnedFungibleResource,
 		rhs: OnLedgerEntity.OwnedFungibleResource
 	) -> Bool {
-		if lhs.amount > RETDecimal.zero(), rhs.amount > RETDecimal.zero() {
+		if lhs.amount > .zero, rhs.amount > .zero {
 			return lhs.amount > rhs.amount // Sort descending by amount
 		}
-		if lhs.amount != RETDecimal.zero() || rhs.amount != RETDecimal.zero() {
-			return lhs.amount != RETDecimal.zero()
+		if lhs.amount != .zero || rhs.amount != .zero {
+			return lhs.amount != .zero
 		}
 
 		if let lhsSymbol = lhs.metadata.symbol, let rhsSymbol = rhs.metadata.symbol {

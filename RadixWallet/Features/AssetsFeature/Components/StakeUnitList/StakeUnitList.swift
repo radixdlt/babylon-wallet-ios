@@ -288,9 +288,9 @@ extension StakeUnitList {
 		let allSelectedTokens = state.selectedStakeClaimTokens?.values.flatMap { $0 }.map(\.id).asIdentifiable()
 
 		let stakeClaims = details.compactMap(\.stakeClaimTokens).flatMap(\.stakeClaims)
-		let stakedAmount = details.map(\.xrdRedemptionValue).reduce(.zero(), +)
-		let unstakingAmount = stakeClaims.filter(not(\.isReadyToBeClaimed)).map(\.claimAmount).reduce(.zero(), +)
-		let readyToClaimAmount = stakeClaims.filter(\.isReadyToBeClaimed).map(\.claimAmount).reduce(.zero(), +)
+		let stakedAmount = details.map(\.xrdRedemptionValue).reduce(RETDecimal.zero, +)
+		let unstakingAmount = stakeClaims.filter(not(\.isReadyToBeClaimed)).map(\.claimAmount).reduce(RETDecimal.zero, +)
+		let readyToClaimAmount = stakeClaims.filter(\.isReadyToBeClaimed).map(\.claimAmount).reduce(RETDecimal.zero, +)
 
 		let validatorStakes = details.map { stake in
 			ValidatorStakeView.ViewState(

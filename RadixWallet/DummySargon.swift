@@ -404,7 +404,7 @@ public struct RETDecimal: DummySargon, Comparable, ExpressibleByIntegerLiteral, 
 	}
 
 	public static prefix func - (value: Self) -> Self {
-		zero() - value
+		zero - value
 	}
 
 	public init(integerLiteral value: Int) {
@@ -415,7 +415,7 @@ public struct RETDecimal: DummySargon, Comparable, ExpressibleByIntegerLiteral, 
 		panic()
 	}
 
-	public static func zero() -> Self {
+	public static var zero: Self {
 		panic()
 	}
 
@@ -714,8 +714,8 @@ public struct UnstakeData: DummySargon {
 public enum DetailedManifestClass: DummySargon {
 	case general, transfer
 	case validatorClaim(Set<ValidatorAddress>, Bool)
-	case validatorStake(validatorAddresses: Set<ComponentAddress>, validatorStakes: [TrackedValidatorStake])
-	case validatorUnstake(validatorAddresses: Set<ComponentAddress>, validatorUnstakes: [TrackedValidatorUnstake], claimsNonFungibleData: [NonFungibleGlobalId: UnstakeData])
+	case validatorStake(validatorAddresses: [Address], validatorStakes: [TrackedValidatorStake])
+	case validatorUnstake(validatorAddresses: [Address], validatorUnstakes: [TrackedValidatorUnstake], claimsNonFungibleData: [UnstakeDataEntry])
 	case accountDepositSettingsUpdate(
 		resourcePreferencesUpdates: [String: [String: ResourcePreferenceUpdate]],
 		depositModeUpdates: [String: AccountDefaultDepositRule],
@@ -726,7 +726,7 @@ public enum DetailedManifestClass: DummySargon {
 	)
 
 	case poolContribution(poolAddresses: [Address], poolContributions: [TrackedPoolContribution])
-	case roolRedemption(poolAddresses: [Address], poolContributions: [TrackedPoolRedemption])
+	case poolRedemption(poolAddresses: [Address], poolContributions: [TrackedPoolRedemption])
 }
 
 // MARK: - ExecutionSummary
@@ -762,15 +762,15 @@ public struct ExecutionSummary: DummySargon {
 		panic()
 	}
 
-	public var newlyCreatedNonFungibles: Set<NonFungibleGlobalId> {
+	public var newlyCreatedNonFungibles: [NonFungibleGlobalId] {
 		panic()
 	}
 
-	public var presentedProofs: Set<ResourceAddress> {
+	public var presentedProofs: [ResourceAddress] {
 		panic()
 	}
 
-	public var encounteredEntities: Set<Address> {
+	public var encounteredEntities: [Address] {
 		panic()
 	}
 

@@ -78,7 +78,7 @@ extension TransactionReview {
 					action(.knownDappTapped(id))
 				} contents: {
 					PlainListRow(title: name, subtitle: unauthorizedHint, accessory: nil) {
-						Thumbnail(.dapp, url: url)
+						DappThumbnail(.known(url))
 					}
 				}
 
@@ -87,7 +87,7 @@ extension TransactionReview {
 					action(.unknownComponentsTapped)
 				} contents: {
 					PlainListRow(title: title, accessory: nil) {
-						Thumbnail(.dapp, url: nil)
+						DappThumbnail(.unknown)
 					}
 				}
 			}

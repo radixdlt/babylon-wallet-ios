@@ -1,10 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
 
-private extension CGFloat {
-	static let transferLineTrailingPadding = CGFloat.huge3
-}
-
 extension View {
 	var sectionHeading: some View {
 		textStyle(.body1Header)
@@ -43,7 +39,6 @@ extension TransactionReview.State {
 			proposingDappMetadata: proposingDappMetadata,
 			stakingToValidators: stakingToValidators,
 			unstakingFromValidators: unstakingFromValidators,
-			claimingFromValidators: claimingFromValidators,
 			depositSettingSection: accountDepositSetting,
 			depositExceptionsSection: accountDepositExceptions
 		)
@@ -67,7 +62,6 @@ extension TransactionReview {
 		let isExpandedRedeemingFromPools: Bool
 		var isExpandedStakingToValidators: Bool { stakingToValidators?.isExpanded == true }
 		var isExpandedUnstakingFromValidators: Bool { unstakingFromValidators?.isExpanded == true }
-		var isExpandedClaimingFromValidators: Bool { claimingFromValidators?.isExpanded == true }
 
 		let showTransferLine: Bool
 		let viewControlState: ControlState
@@ -81,7 +75,6 @@ extension TransactionReview {
 
 		let stakingToValidators: ValidatorsState?
 		let unstakingFromValidators: ValidatorsState?
-		let claimingFromValidators: ValidatorsState?
 		let depositSettingSection: DepositSettingState?
 		let depositExceptionsSection: DepositExceptionsState?
 
@@ -109,11 +102,10 @@ extension TransactionReview {
 					.animation(.easeInOut, value: viewStore.isExpandedRedeemingFromPools)
 					.animation(.easeInOut, value: viewStore.isExpandedStakingToValidators)
 					.animation(.easeInOut, value: viewStore.isExpandedUnstakingFromValidators)
-					.animation(.easeInOut, value: viewStore.isExpandedClaimingFromValidators)
 					.toolbar {
 						ToolbarItem(placement: .automatic) {
 							if viewStore.canToggleViewMode {
-								Button(asset: AssetResource.iconTxnBlocks) {
+								Button(asset: AssetResource.code) {
 									viewStore.send(.showRawTransactionTapped)
 								}
 								.controlState(viewStore.viewRawTransactionButtonState)
@@ -141,9 +133,7 @@ extension TransactionReview {
 						}
 
 					if let rawTransaction = viewStore.rawTransaction {
-						RawTransactionView(transaction: rawTransaction) {
-							viewStore.send(.copyRawTransactionTapped)
-						}
+						RawTransactionView(transaction: rawTransaction)
 					} else {
 						VStack(spacing: .medium1) {
 							messageSection(with: viewStore.message)
@@ -163,10 +153,6 @@ extension TransactionReview {
 									unstakingFromValidatorsSection(viewState)
 								}
 
-								if let viewState = viewStore.claimingFromValidators {
-									claimingFromValidatorsSection(viewState)
-								}
-
 								usingDappsSection(isExpanded: viewStore.isExpandedDappUsed)
 
 								depositsSection
@@ -176,7 +162,7 @@ extension TransactionReview {
 									VLine()
 										.stroke(.app.gray3, style: .transactionReview)
 										.frame(width: 1)
-										.padding(.trailing, .transferLineTrailingPadding)
+										.padding(.trailing, .huge3)
 										.padding(.top, -.medium1)
 								}
 							}
@@ -236,7 +222,7 @@ extension TransactionReview {
 					Spacer(minLength: 0)
 
 					if let thumbnail = proposingDappMetadata?.thumbnail {
-						Thumbnail(.dapp, url: thumbnail, size: .medium)
+						DappThumbnail(.known(thumbnail), size: .medium)
 							.padding(.leading, .small2)
 					} else {
 						Spacer(minLength: .small2 + HitTargetSize.medium.rawValue)
@@ -321,12 +307,6 @@ extension TransactionReview {
 		private func unstakingFromValidatorsSection(_ viewState: TransactionReview.ValidatorsView.ViewState) -> some SwiftUI.View {
 			ValidatorsView(heading: .unstakingFromValidators, viewState: viewState) {
 				store.send(.view(.expandUnstakingFromValidatorsTapped))
-			}
-		}
-
-		private func claimingFromValidatorsSection(_ viewState: TransactionReview.ValidatorsView.ViewState) -> some SwiftUI.View {
-			ValidatorsView(heading: .claimingFromValidators, viewState: viewState) {
-				store.send(.view(.expandClaimingFromValidatorsTapped))
 			}
 		}
 
@@ -484,7 +464,7 @@ private extension View {
 			store: destinationStore,
 			state: /TransactionReview.Destination.State.customizeFees,
 			action: TransactionReview.Destination.Action.customizeFees,
-			content: { CustomizeFees.View(store: $0).inNavigationView }
+			content: { store in NavigationView { CustomizeFees.View(store: store) } }
 		)
 	}
 
@@ -524,7 +504,6 @@ struct ExpandableTransactionHeading: View {
 				Spacer(minLength: 0)
 			}
 		}
-		.padding(.trailing, .transferLineTrailingPadding + .small3) // padding from the vertical dotted line
 	}
 }
 
@@ -596,11 +575,6 @@ struct TransactionHeading: View {
 		icon: AssetResource.iconValidator
 	)
 
-	static let claimingFromValidators = TransactionHeading(
-		L10n.TransactionReview.claimFromValidatorsHeading,
-		icon: AssetResource.iconValidator
-	)
-
 	static let depositSetting = TransactionHeading(
 		L10n.TransactionReview.thirdPartyDepositSettingHeading,
 		icon: AssetResource.transactionReviewDepositSetting
@@ -630,42 +604,26 @@ struct TransactionMessageView: View {
 // MARK: - RawTransactionView
 struct RawTransactionView: SwiftUI.View {
 	let transaction: String
-	let copyTapped: () -> Void
 
 	var body: some SwiftUI.View {
-		VStack(alignment: .trailing) {
-			Button(action: copyTapped) {
-				HStack(spacing: .small3) {
-					AssetIcon(.asset(AssetResource.copy))
-					Text(L10n.Common.copy)
-						.textStyle(.body1Header)
-				}
-				.foregroundColor(.app.gray1)
-			}
-			.buttonStyle(.secondaryRectangular)
-			.padding([.trailing, .top], .medium3)
-			.padding(.bottom, .medium1)
-
-			Text(transaction)
-				.textSelection(.enabled)
-				.textStyle(.monospace)
-				.multilineTextAlignment(.leading)
-				.foregroundColor(.app.gray1)
-				.frame(
-					maxWidth: .infinity,
-					maxHeight: .infinity,
-					alignment: .topLeading
-				)
-				.padding([.horizontal, .bottom], .medium1)
-		}
+		Text(transaction)
+			.textStyle(.monospace)
+			.multilineTextAlignment(.leading)
+			.foregroundColor(.app.gray1)
+			.frame(
+				maxWidth: .infinity,
+				maxHeight: .infinity,
+				alignment: .topLeading
+			)
+			.padding()
 	}
 }
 
-// MARK: - TransactionReviewFungibleView
-struct TransactionReviewFungibleView: View {
+// MARK: - TransactionReviewTokenView
+struct TransactionReviewTokenView: View {
 	struct ViewState: Equatable {
 		let name: String?
-		let thumbnail: Thumbnail.FungibleContent
+		let thumbnail: TokenThumbnail.Content
 
 		let amount: RETDecimal
 		let guaranteedAmount: RETDecimal?
@@ -673,21 +631,19 @@ struct TransactionReviewFungibleView: View {
 	}
 
 	let viewState: ViewState
-	let background: Color
 	let onTap: () -> Void
 	let disabled: Bool
 
-	init(viewState: ViewState, background: Color, onTap: (() -> Void)? = nil) {
+	init(viewState: ViewState, onTap: (() -> Void)? = nil) {
 		self.viewState = viewState
-		self.background = background
 		self.onTap = onTap ?? {}
 		self.disabled = onTap == nil
 	}
 
 	var body: some View {
-		Button(action: onTap) {
-			HStack(spacing: .small1) {
-				Thumbnail(fungible: viewState.thumbnail, size: .extraSmall)
+		HStack(spacing: .small1) {
+			Button(action: onTap) {
+				TokenThumbnail(viewState.thumbnail, size: .small)
 					.padding(.vertical, .small1)
 
 				if let name = viewState.name {
@@ -696,17 +652,39 @@ struct TransactionReviewFungibleView: View {
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray1)
 				}
-
-				Spacer(minLength: 0)
-
-				TransactionReviewAmountView(amount: viewState.amount, guaranteedAmount: viewState.guaranteedAmount)
-					.padding(.vertical, .medium3)
 			}
-			.padding(.horizontal, .medium3)
-			.background(background)
+			.disabled(disabled)
+
+			Spacer(minLength: 0)
+
+			VStack(alignment: .trailing, spacing: 0) {
+				if viewState.guaranteedAmount != nil {
+					Text(L10n.TransactionReview.estimated)
+						.textStyle(.body2HighImportance)
+						.foregroundColor(.app.gray1)
+				}
+				Text(viewState.amount.formatted())
+					.textStyle(.secondaryHeader)
+					.foregroundColor(.app.gray1)
+
+				if let fiatAmount = viewState.fiatAmount {
+					// Text(fiatAmount.formatted(.currency(code: "USD")))
+					Text(fiatAmount.formatted())
+						.textStyle(.body2HighImportance)
+						.foregroundColor(.app.gray1)
+						.padding(.top, .small2)
+				}
+
+				if let guaranteedAmount = viewState.guaranteedAmount {
+					Text("\(L10n.TransactionReview.guaranteed) **\(guaranteedAmount.formatted())**")
+						.textStyle(.body2HighImportance)
+						.foregroundColor(.app.gray2)
+						.padding(.top, .small1)
+				}
+			}
+			.padding(.vertical, .medium3)
 		}
-		.buttonStyle(.borderless)
-		.disabled(disabled)
+		.padding(.horizontal, .medium3)
 	}
 }
 
@@ -779,7 +757,7 @@ extension TransactionReview {
 		public var body: some SwiftUI.View {
 			Card {
 				HStack(spacing: .zero) {
-					Thumbnail(.validator, url: viewState.thumbnail)
+					DappThumbnail(.known(viewState.thumbnail))
 						.padding(.trailing, .medium3)
 
 					VStack(alignment: .leading, spacing: .zero) {

@@ -26,8 +26,7 @@ extension UnknownDappComponents {
 		@ViewBuilder
 		private func row(_ address: LedgerIdentifiable.Address, heading: String) -> some SwiftUI.View {
 			HStack(spacing: .medium3) {
-				Thumbnail(.dapp, url: nil)
-
+				DappThumbnail(.unknown)
 				VStack(alignment: .leading, spacing: .zero) {
 					Text(heading)
 						.textStyle(.body1Header)

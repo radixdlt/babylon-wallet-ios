@@ -294,7 +294,7 @@ extension ExecutionSummary {
 	func guranteesCost() throws -> RETDecimal {
 		switch detailedManifestClass {
 		case .general, .transfer:
-			accountDeposits.flatMap(\.value).reduce(RETDecimal.zero()) { result, resource in
+			accountDeposits.flatMap(\.value).reduce(.zero) { result, resource in
 				switch resource {
 				case .fungible(_, .predicted):
 					result + TransactionFee.PredefinedFeeConstants.fungibleGuaranteeInstructionCost
@@ -303,7 +303,7 @@ extension ExecutionSummary {
 				}
 			}
 		default:
-			RETDecimal.zero()
+			.zero
 		}
 	}
 }

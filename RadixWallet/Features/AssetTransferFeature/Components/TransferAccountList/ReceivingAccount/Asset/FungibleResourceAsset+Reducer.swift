@@ -36,7 +36,7 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 
 		public var focused: Bool = false
 
-		init(resource: OnLedgerEntity.OwnedFungibleResource, isXRD: Bool, totalTransferSum: RETDecimal = RETDecimal.zero()) {
+		init(resource: OnLedgerEntity.OwnedFungibleResource, isXRD: Bool, totalTransferSum: RETDecimal = .zero) {
 			self.resource = resource
 			self.isXRD = isXRD
 			self.totalTransferSum = totalTransferSum
@@ -86,7 +86,7 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 			return .send(.delegate(.amountChanged))
 
 		case .maxAmountTapped:
-			let sumOfOthers = state.totalTransferSum - (state.transferAmount ?? RETDecimal.zero())
+			let sumOfOthers = state.totalTransferSum - (state.transferAmount ?? .zero)
 			let remainingAmount = (state.balance - sumOfOthers).clamped
 
 			if state.isXRD {
