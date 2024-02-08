@@ -75,12 +75,10 @@ extension AccountAndPersonaHiding {
 				.task { @MainActor in
 					await viewStore.send(.view(.task)).finish()
 				}
-				.alert(
-					store: store.scope(
-						state: \.$confirmUnhideAllAlert,
-						action: { .view(.confirmUnhideAllAlert($0)) }
-					)
-				)
+				.alert(store: store.scope(
+					state: \.$destination.confirmUnhideAllAlert,
+					action: \.destination.confirmUnhideAllAlert
+				))
 			}
 			.navigationTitle(L10n.AppSettings.EntityHiding.title)
 			.toolbarBackground(.app.background, for: .navigationBar)
