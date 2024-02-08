@@ -5,36 +5,39 @@ extension OnLedgerEntitiesClient {
 		from item: GatewayAPI.StateEntityDetailsResponseItem,
 		ledgerState: AtLedgerState
 	) async throws -> OnLedgerEntity? {
-		let address = try Address(validatingAddress: item.address)
-		let addressKind = address.decodedKind
-		switch addressKind {
-		case _ where AccountEntityType.addressSpace.contains(addressKind):
-			return try await .account(createAccount(
-				item,
-				ledgerState: ledgerState
-			))
-		case _ where ResourceEntityType.addressSpace.contains(addressKind):
-			return try createResource(item, ledgerState: ledgerState).map(OnLedgerEntity.resource)
-		case _ where ResourcePoolEntityType.addressSpace.contains(addressKind):
-			guard let resourcePool = try await createResourcePool(
-				item,
-				ledgerState: ledgerState
-			) else {
-				return nil
-			}
+		/*
+		 let address = try Address(validatingAddress: item.address)
+		 let addressKind = address.decodedKind
+		 switch addressKind {
+		 case _ where AccountEntityType.addressSpace.contains(addressKind):
+		 	return try await .account(createAccount(
+		 		item,
+		 		ledgerState: ledgerState
+		 	))
+		 case _ where ResourceEntityType.addressSpace.contains(addressKind):
+		 	return try createResource(item, ledgerState: ledgerState).map(OnLedgerEntity.resource)
+		 case _ where ResourcePoolEntityType.addressSpace.contains(addressKind):
+		 	guard let resourcePool = try await createResourcePool(
+		 		item,
+		 		ledgerState: ledgerState
+		 	) else {
+		 		return nil
+		 	}
 
-			return .resourcePool(resourcePool)
-		case _ where ValidatorEntityType.addressSpace.contains(addressKind):
-			guard let validator = try await createValidator(
-				item,
-				ledgerState: ledgerState
-			) else {
-				return nil
-			}
-			return .validator(validator)
-		default:
-			return try .genericComponent(createGenericComponent(item, ledgerState: ledgerState))
-		}
+		 	return .resourcePool(resourcePool)
+		 case _ where ValidatorEntityType.addressSpace.contains(addressKind):
+		 	guard let validator = try await createValidator(
+		 		item,
+		 		ledgerState: ledgerState
+		 	) else {
+		 		return nil
+		 	}
+		 	return .validator(validator)
+		 default:
+		 	return try .genericComponent(createGenericComponent(item, ledgerState: ledgerState))
+		 }
+		  */
+		fixme()
 	}
 
 	@Sendable

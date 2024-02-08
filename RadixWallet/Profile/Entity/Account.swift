@@ -120,13 +120,12 @@ extension Profile.Network.Account {
 	public static func deriveVirtualAddress(
 		networkID: NetworkID,
 		factorInstance: HierarchicalDeterministicFactorInstance
-	) throws -> EntityAddress {
-		_ = try factorInstance.derivationPath.asAccountPath()
-		let engineAddress = try deriveVirtualAccountAddressFromPublicKey(
+	) throws -> AccountAddress {
+		_ = try factorInstance.derivationPath.asAccountPath() // assert we have the correct path
+		return try deriveVirtualAccountAddressFromPublicKey(
 			publicKey: factorInstance.publicKey,
 			networkId: networkID.rawValue
 		)
-		return AccountAddress(address: engineAddress.addressString(), decodedKind: engineAddress.entityType())
 	}
 
 	public var isOlympiaAccount: Bool {

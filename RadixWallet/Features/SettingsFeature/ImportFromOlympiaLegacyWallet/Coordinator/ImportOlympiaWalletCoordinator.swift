@@ -585,7 +585,7 @@ extension ImportOlympiaWalletCoordinator {
 			let babylonAddress: AccountAddress = try deriveVirtualAccountAddressFromPublicKey(
 				publicKey: account.publicKey,
 				networkId: networkID.rawValue
-			).asSpecific()
+			)
 
 			return MigratableAccount(
 				id: account.id,

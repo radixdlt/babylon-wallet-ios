@@ -1,20 +1,18 @@
 import ComposableArchitecture
 import SwiftUI
 
-public typealias TransactionReviewPools = TransactionReviewDapps<ResourcePoolEntityType>
-public typealias TransactionReviewDappsUsed = TransactionReviewDapps<ComponentEntityType>
+public typealias TransactionReviewPools = TransactionReviewDapps
+public typealias TransactionReviewDappsUsed = TransactionReviewDapps
 
 // MARK: - TransactionReviewDapps
-public struct TransactionReviewDapps<Kind: Identifiable & Hashable>: Sendable, FeatureReducer {
-	public typealias AddressType = Kind
-
+public struct TransactionReviewDapps: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var knownDapps: IdentifiedArrayOf<TransactionReview.DappEntity>
-		public var unknownDapps: IdentifiedArrayOf<AddressType>
+		public var unknownDapps: IdentifiedArrayOf<Address>
 		public var isExpanded: Bool = true
 		public let unknownTitle: String
 
-		public init(knownDapps: IdentifiedArrayOf<TransactionReview.DappEntity>, unknownDapps: IdentifiedArrayOf<AddressType>, unknownTitle: (Int) -> String) {
+		public init(knownDapps: IdentifiedArrayOf<TransactionReview.DappEntity>, unknownDapps: IdentifiedArrayOf<Address>, unknownTitle: (Int) -> String) {
 			self.knownDapps = knownDapps
 			self.unknownDapps = unknownDapps
 			self.unknownTitle = unknownTitle(unknownDapps.count)
@@ -28,7 +26,7 @@ public struct TransactionReviewDapps<Kind: Identifiable & Hashable>: Sendable, F
 
 	public enum DelegateAction: Sendable, Equatable {
 		case openDapp(TransactionReview.DappEntity.ID)
-		case openUnknownAddresses(IdentifiedArrayOf<AddressType>)
+		case openUnknownAddresses(IdentifiedArrayOf<Address>)
 	}
 
 	public init() {}

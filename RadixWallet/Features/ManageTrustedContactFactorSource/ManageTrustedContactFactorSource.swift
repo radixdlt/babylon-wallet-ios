@@ -12,8 +12,9 @@ extension AccountAddress {
 			publicKey: SLIP10.PublicKey.eddsaEd25519(curve25519PublicKey),
 			networkId: networkID.rawValue
 		)
-
-		return .init(address: address.addressString(), decodedKind: address.entityType())
+//
+//		return .init(address: address.addressString(), decodedKind: address.entityType())
+		fixme()
 	}
 }
 #endif

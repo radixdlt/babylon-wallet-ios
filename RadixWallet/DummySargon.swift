@@ -116,13 +116,16 @@ public enum TrackedPoolRedemption: TrackedPoolInteractionStuff {}
 
 // MARK: - ResourceIndicator
 public enum ResourceIndicator: DummySargon {
-	case fungible(ResourceAddress, FungibleResourceIndicator)
-	case nonFungible(ResourceAddress, NonFungibleResourceIndicator)
+	case fungible(resourceAddress: ResourceAddress, indicator: FungibleResourceIndicator)
+	case nonFungible(resourceAddress: ResourceAddress, indicator: NonFungibleResourceIndicator)
+	public var resourceAddress: ResourceAddress {
+		panic()
+	}
 }
 
 // MARK: - FungibleResourceIndicator
 public enum FungibleResourceIndicator: DummySargon {
-	case guaranteed(PredictedDecimal)
+	case guaranteed(amount: PredictedDecimal)
 	case predicted(PredictedDecimal)
 	public var amount: RETDecimal {
 		panic()
@@ -135,17 +138,24 @@ public struct PredictedDecimal: DummySargon {
 	public let instructionIndex: UInt64
 }
 
+public func + (lhs: PredictedDecimal, rhs: PredictedDecimal) -> PredictedDecimal {
+	panic()
+}
+
 // MARK: - NonFungibleResourceIndicator
 public enum NonFungibleResourceIndicator: DummySargon {
 	case byAll(
 		predictedAmount: PredictedDecimal,
-		predictedIds: Set<NonFungibleLocalId>
+		predictedIds: [NonFungibleLocalId]
 	)
 	case byAmount(
 		amount: PredictedDecimal,
-		predictedIds: Set<NonFungibleLocalId>
+		predictedIds: [NonFungibleLocalId]
 	)
-	case byIds(Set<NonFungibleLocalId>)
+	case byIds(ids: [NonFungibleLocalId])
+	public var ids: [NonFungibleLocalId] {
+		panic()
+	}
 }
 
 // MARK: - ReservedInstruction
@@ -302,6 +312,10 @@ public struct ResourceAddress: DummySargonAddress {
 	public func asStr() -> String {
 		panic()
 	}
+
+	public func isXRD(on: Any) -> Bool {
+		panic()
+	}
 }
 
 // MARK: - VaultAddress
@@ -378,6 +392,10 @@ public struct RETDecimal: DummySargon, Comparable, ExpressibleByIntegerLiteral, 
 	}
 
 	public func isZero() -> Bool {
+		panic()
+	}
+
+	public func isPositive() -> Bool {
 		panic()
 	}
 
@@ -674,13 +692,60 @@ public struct TransactionManifest: DummySargon {
 	}
 }
 
+// MARK: - UnstakeDataEntry
+public struct UnstakeDataEntry: DummySargon {
+	public var nonFungibleGlobalId: NonFungibleGlobalId {
+		panic()
+	}
+
+	public var data: UnstakeData {
+		panic()
+	}
+}
+
+// MARK: - UnstakeData
+public struct UnstakeData: DummySargon {
+	public var name: String
+	public var claimEpoch: Epoch
+	public var claimAmount: RETDecimal
+}
+
 // MARK: - DetailedManifestClass
 public enum DetailedManifestClass: DummySargon {
 	case general, transfer
+	case validatorClaim(Set<ValidatorAddress>, Bool)
+	case validatorStake(validatorAddresses: Set<ComponentAddress>, validatorStakes: [TrackedValidatorStake])
+	case validatorUnstake(validatorAddresses: Set<ComponentAddress>, validatorUnstakes: [TrackedValidatorUnstake], claimsNonFungibleData: [NonFungibleGlobalId: UnstakeData])
+	case accountDepositSettingsUpdate(
+		resourcePreferencesUpdates: [String: [String: ResourcePreferenceUpdate]],
+		depositModeUpdates: [String: AccountDefaultDepositRule],
+		authorizedDepositorsAdded:
+		[String: [ResourceOrNonFungible]],
+		authorizedDepositorsRemoved:
+		[String: [ResourceOrNonFungible]]
+	)
+
+	case poolContribution(poolAddresses: [Address], poolContributions: [TrackedPoolContribution])
+	case roolRedemption(poolAddresses: [Address], poolContributions: [TrackedPoolRedemption])
 }
 
 // MARK: - ExecutionSummary
 public struct ExecutionSummary: DummySargon {
+	public struct NewEntities: DummySargon {
+		public var metadata: [String: [String: MetadataValue?]] {
+			panic()
+		}
+	}
+
+	public var newEntities: NewEntities {
+		panic()
+	}
+
+	/// Added by iOS team, not in RET
+	public var metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]] {
+		newEntities.metadata
+	}
+
 	public var accountWithdraws: [String: [ResourceIndicator]] {
 		panic()
 	}
@@ -694,6 +759,18 @@ public struct ExecutionSummary: DummySargon {
 	}
 
 	public var reservedInstructions: [ReservedInstruction] {
+		panic()
+	}
+
+	public var newlyCreatedNonFungibles: Set<NonFungibleGlobalId> {
+		panic()
+	}
+
+	public var presentedProofs: Set<ResourceAddress> {
+		panic()
+	}
+
+	public var encounteredEntities: Set<Address> {
 		panic()
 	}
 
@@ -1035,14 +1112,14 @@ public func buildInformation() -> BuildInformation {
 public func deriveVirtualAccountAddressFromPublicKey(
 	publicKey: Any,
 	networkId: Any
-) throws -> Address {
+) throws -> AccountAddress {
 	panic()
 }
 
 public func deriveVirtualIdentityAddressFromPublicKey(
 	publicKey: Any,
 	networkId: Any
-) throws -> Address {
+) throws -> IdentityAddress {
 	panic()
 }
 
