@@ -300,25 +300,26 @@ extension OnLedgerEntity {
 
 extension CacheClient.Entry.OnLedgerEntity {
 	var address: Address {
-		switch self {
-		case let .resource(resource):
-			resource.asGeneral
-		case let .account(account):
-			account.asGeneral
-		case let .resourcePool(resourcePool):
-			resourcePool.asGeneral
-		case let .validator(validator):
-			validator.asGeneral
-		case let .genericComponent(genericComponent):
-			genericComponent.asGeneral
-		case let .nonFungibleData(nonFungibleId):
-			.init(
-				address: nonFungibleId.resourceAddress().asStr(),
-				decodedKind: .globalNonFungibleResourceManager
-			)
-		case let .nonFungibleIdPage(_, resourceAddress, _):
-			resourceAddress.asGeneral
-		}
+//		switch self {
+//		case let .resource(resource):
+//			resource.asGeneral
+//		case let .account(account):
+//			account.asGeneral
+//		case let .resourcePool(resourcePool):
+//			resourcePool.asGeneral
+//		case let .validator(validator):
+//			validator.asGeneral
+//		case let .genericComponent(genericComponent):
+//			genericComponent.asGeneral
+//		case let .nonFungibleData(nonFungibleId):
+//			.init(
+//				address: nonFungibleId.resourceAddress().asStr(),
+//				decodedKind: .globalNonFungibleResourceManager
+//			)
+//		case let .nonFungibleIdPage(_, resourceAddress, _):
+//			resourceAddress.asGeneral
+//		}
+		fixme()
 	}
 }
 

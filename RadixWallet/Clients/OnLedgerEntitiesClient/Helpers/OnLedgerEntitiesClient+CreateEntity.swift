@@ -142,7 +142,7 @@ extension OnLedgerEntitiesClient {
 	) async throws -> OnLedgerEntity.Validator? {
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		let networkId = await gatewaysClient.getCurrentNetworkID()
-		let xrdAddress = knownAddresses(networkId: networkId.rawValue).resourceAddresses.xrd.addressString()
+		let xrdAddress = knownAddresses(networkId: networkId.rawValue).resourceAddresses.xrd.address
 
 		guard let state: GatewayAPI.ValidatorState = try? item.details?.component?.decodeState() else {
 			assertionFailure("Invalid validator state")
@@ -579,11 +579,11 @@ extension OnLedgerEntity.OwnedFungibleResource: Comparable {
 		lhs: OnLedgerEntity.OwnedFungibleResource,
 		rhs: OnLedgerEntity.OwnedFungibleResource
 	) -> Bool {
-		if lhs.amount > .zero, rhs.amount > .zero {
+		if lhs.amount > RETDecimal.zero(), rhs.amount > RETDecimal.zero() {
 			return lhs.amount > rhs.amount // Sort descending by amount
 		}
-		if lhs.amount != .zero || rhs.amount != .zero {
-			return lhs.amount != .zero
+		if lhs.amount != RETDecimal.zero() || rhs.amount != RETDecimal.zero() {
+			return lhs.amount != RETDecimal.zero()
 		}
 
 		if let lhsSymbol = lhs.metadata.symbol, let rhsSymbol = rhs.metadata.symbol {

@@ -808,12 +808,13 @@ extension TransactionReview {
 
 extension ResourceOrNonFungible {
 	func resourceAddress() throws -> ResourceAddress {
-		switch self {
-		case let .resource(address):
-			try address.asSpecific()
-		case let .nonFungible(globalID):
-			try globalID.resourceAddress().asSpecific()
-		}
+//		switch self {
+//		case let .resource(address):
+//			try address.asSpecific()
+//		case let .nonFungible(globalID):
+//			try globalID.resourceAddress().asSpecific()
+//		}
+		fixme()
 	}
 }
 

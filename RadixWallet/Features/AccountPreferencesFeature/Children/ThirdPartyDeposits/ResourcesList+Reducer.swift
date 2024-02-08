@@ -269,12 +269,13 @@ extension ResourcesListMode {
 
 extension ThirdPartyDeposits.DepositorAddress {
 	var resourceAddress: ResourceAddress {
-		switch self {
-		case let .resourceAddress(address):
-			address
-		case let .nonFungibleGlobalID(nonFungibleGlobalID):
-			try! nonFungibleGlobalID.resourceAddress().asSpecific()
-		}
+//		switch self {
+//		case let .resourceAddress(address):
+//			address
+//		case let .nonFungibleGlobalID(nonFungibleGlobalID):
+//			try! nonFungibleGlobalID.resourceAddress().asSpecific()
+//		}
+		fixme()
 	}
 }
 

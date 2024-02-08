@@ -675,7 +675,7 @@ public struct TransactionManifest: DummySargon {
 		panic()
 	}
 
-	public func setAccountType(from: Any, type: String) -> Self {
+	public func setAccountType(from: String, type: String) -> Self {
 		panic()
 	}
 
@@ -951,7 +951,14 @@ public enum ManifestBuilder: DeprecatedDummySargon {
 		panic()
 	}
 
-	public enum StakeClaim: DeprecatedDummySargon {}
+	// iOS wallet construct
+	public struct StakeClaim: DeprecatedDummySargon {
+		public let validatorAddress: ValidatorAddress
+		public let resourceAddress: ResourceAddress
+		public let ids: NonEmpty<[NonFungibleLocalId]>
+		/// The summed claim amount across ids
+		public let amount: RETDecimal
+	}
 
 	public enum InstructionsChain: DeprecatedDummySargon {
 		public enum Instruction: DeprecatedDummySargon {}
@@ -1026,13 +1033,6 @@ public enum ManifestBuilder: DeprecatedDummySargon {
 		panic()
 	}
 
-//	public func callMethod(
-//		address: Any,
-//		methodName: Any,
-//		args: [ResolvableArguments]
-//	) throws -> ManifestBuilder {
-//		panic()
-//	}
 	public func callMethod(
 		address: Any,
 		methodName: Any,
