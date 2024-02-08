@@ -222,7 +222,7 @@ extension TransactionReview {
 					Spacer(minLength: 0)
 
 					if let thumbnail = proposingDappMetadata?.thumbnail {
-						DappThumbnail(.known(thumbnail), size: .medium)
+						Thumbnail(.dapp, url: thumbnail, size: .medium)
 							.padding(.leading, .small2)
 					} else {
 						Spacer(minLength: .small2 + HitTargetSize.medium.rawValue)
@@ -623,7 +623,7 @@ struct RawTransactionView: SwiftUI.View {
 struct TransactionReviewTokenView: View {
 	struct ViewState: Equatable {
 		let name: String?
-		let thumbnail: TokenThumbnail.Content
+		let thumbnail: Thumbnail.FungibleContent
 
 		let amount: RETDecimal
 		let guaranteedAmount: RETDecimal?
@@ -643,7 +643,7 @@ struct TransactionReviewTokenView: View {
 	var body: some View {
 		HStack(spacing: .small1) {
 			Button(action: onTap) {
-				TokenThumbnail(viewState.thumbnail, size: .small)
+				Thumbnail(fungible: viewState.thumbnail, size: .small)
 					.padding(.vertical, .small1)
 
 				if let name = viewState.name {
