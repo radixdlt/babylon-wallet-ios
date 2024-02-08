@@ -10,7 +10,7 @@ extension ROLAClient {
 			let entity = request.entity
 			let newPublicKey = request.newPublicKey
 
-			let entityAddress: Address = panic()
+			var entityAddress: Address! = nil
 			let metadata = try await onLedgerEntitiesClient.getEntity(entityAddress, metadataKeys: [.ownerKeys]).genericComponent?.metadata
 			var ownerKeyHashes = try metadata?.ownerKeyHashes() ?? []
 

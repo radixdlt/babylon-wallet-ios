@@ -31,7 +31,7 @@ extension CustomizeFees.State {
 			}(),
 			feePayer: feePayer,
 			noFeePayerText: {
-				if transactionFee.totalFee.lockFee == .zero {
+				if transactionFee.totalFee.lockFee == RETDecimal.zero() {
 					L10n.CustomizeNetworkFees.noneRequired
 				} else {
 					L10n.CustomizeNetworkFees.noAccountSelected

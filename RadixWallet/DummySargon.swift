@@ -199,7 +199,7 @@ public struct EnginePublicKeyHash: DeprecatedDummySargon {
 }
 
 // MARK: - ManifestSummary
-public struct ManifestSummary: DummySargonAddress {
+public struct ManifestSummary: DummySargon {
 	public var accountsDepositedInto: [Address] {
 		panic()
 	}
@@ -235,6 +235,10 @@ public enum Address: DummySargonAddress {
 	public func bytes() -> Data {
 		panic()
 	}
+
+	public func entityType() -> EntityType {
+		panic()
+	}
 }
 
 // MARK: - DummySargonAddress
@@ -242,7 +246,23 @@ public protocol DummySargonAddress: DummySargon, AddressProtocol {
 	init(validatingAddress: Any) throws
 }
 
+// MARK: - ResourcePreference
+public enum ResourcePreference: DummySargon {
+	case allowed
+	case disallowed
+}
+
+// MARK: - ResourcePreferenceUpdate
+public enum ResourcePreferenceUpdate: DummySargon {
+	case set(value: ResourcePreference)
+	case remove
+}
+
 extension DummySargonAddress {
+	public init(address: Any, decodedKind: Any) {
+		panic()
+	}
+
 	public init(validatingAddress: Any) throws {
 		panic()
 	}
@@ -312,6 +332,10 @@ public enum NonFungibleLocalId: DummySargon {
 	}
 
 	public func toString() -> String {
+		panic()
+	}
+
+	public static func integer(value: Int) -> Self {
 		panic()
 	}
 
@@ -608,6 +632,9 @@ public struct NotarizedTransaction: DummySargon {
 	}
 }
 
+// MARK: - SpecificEntityType
+public protocol SpecificEntityType: DummySargonAddress {}
+
 // MARK: - TransactionManifest
 public struct TransactionManifest: DummySargon {
 	public func extractAddresses() -> [EntityType: [Address]] {
@@ -627,6 +654,10 @@ public struct TransactionManifest: DummySargon {
 	}
 
 	public func withInstructionAdded(_ guarantee: Any, at: Int) throws -> Self {
+		panic()
+	}
+
+	public func setAccountType(from: Any, type: String) -> Self {
 		panic()
 	}
 
@@ -722,8 +753,22 @@ public struct Instructions: DummySargon {
 
 // MARK: - Message
 public enum Message: DummySargon {
+	public enum PlaintextMessage: DummySargon {
+		public init(mimeType: String, message: PlaintextMessageInner) {
+			panic()
+		}
+
+		public enum PlaintextMessageInner: DummySargon {
+			case str(value: String)
+		}
+
+		public var message: PlaintextMessageInner {
+			panic()
+		}
+	}
+
 	static var none: Self { panic() }
-	static func plainText(value: Any) -> Self { panic() }
+	case plainText(value: PlaintextMessage)
 	static func encrypted(value: Any) -> Self { panic() }
 }
 
@@ -975,11 +1020,29 @@ public enum OlympiaNetwork: DummySargon {
 	case mainnet
 }
 
+// MARK: - BuildInformation
+public enum BuildInformation: DummySargon {
+	public var version: String {
+		panic()
+	}
+}
+
 // MARK: Global Functions
+public func buildInformation() -> BuildInformation {
+	panic()
+}
+
 public func deriveVirtualAccountAddressFromPublicKey(
 	publicKey: Any,
 	networkId: Any
-) throws -> String {
+) throws -> Address {
+	panic()
+}
+
+public func deriveVirtualIdentityAddressFromPublicKey(
+	publicKey: Any,
+	networkId: Any
+) throws -> Address {
 	panic()
 }
 

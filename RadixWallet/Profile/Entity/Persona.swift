@@ -133,11 +133,11 @@ extension Profile.Network.Persona {
 		}
 
 		let engineAddress = try deriveVirtualIdentityAddressFromPublicKey(
-			publicKey: factorInstance.publicKey.intoEngine(),
+			publicKey: factorInstance.publicKey,
 			networkId: networkID.rawValue
 		)
 
-		return .init(address: engineAddress.addressString(), decodedKind: engineAddress.entityType())
+		return .init(address: engineAddress.address, decodedKind: engineAddress.entityType())
 	}
 }
 

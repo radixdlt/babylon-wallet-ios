@@ -404,19 +404,21 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .dAppsUsed(.delegate(.openUnknownAddresses(components))):
-			state.destination = .unknownDappComponents(.init(
-				title: L10n.TransactionReview.unknownComponents(components.count),
-				rowHeading: L10n.Common.component,
-				addresses: components.map { .component($0) }
-			))
+//			state.destination = .unknownDappComponents(.init(
+//				title: L10n.TransactionReview.unknownComponents(components.count),
+//				rowHeading: L10n.Common.component,
+//				addresses: components.map { .component($0) }
+//			))
+			fixme()
 			return .none
 
 		case let .contributingToPools(.delegate(.openUnknownAddresses(pools))), let .redeemingFromPools(.delegate(.openUnknownAddresses(pools))):
-			state.destination = .unknownDappComponents(.init(
-				title: L10n.TransactionReview.unknownPools(pools.count),
-				rowHeading: L10n.Common.pool,
-				addresses: pools.map { .resourcePool($0) }
-			))
+//			state.destination = .unknownDappComponents(.init(
+//				title: L10n.TransactionReview.unknownPools(pools.count),
+//				rowHeading: L10n.Common.pool,
+//				addresses: pools.map { .resourcePool($0) }
+//			))
+			fixme()
 			return .none
 
 		case .deposits(.delegate(.showCustomizeGuarantees)):
@@ -737,7 +739,7 @@ extension TransactionReview {
 	}
 
 	func determineFeePayer(_ state: State, reviewedTransaction: ReviewedTransaction) -> Effect<Action> {
-		if reviewedTransaction.transactionFee.totalFee.lockFee == .zero {
+		if reviewedTransaction.transactionFee.totalFee.lockFee == RETDecimal.zero() {
 			.send(.internal(.determineFeePayerResult(.success(nil))))
 		} else {
 			.run { send in
@@ -1049,7 +1051,7 @@ extension ReviewedTransaction {
 
 			let xrdAddress = knownAddresses(networkId: networkID.rawValue).resourceAddresses.xrd
 
-			let xrdTotalTransfer: RETDecimal = feePayerWithdraws.reduce(.zero) { partialResult, resource in
+			let xrdTotalTransfer: RETDecimal = feePayerWithdraws.reduce(RETDecimal.zero()) { partialResult, resource in
 				if case let .fungible(resourceAddress, indicator) = resource, resourceAddress == xrdAddress {
 					return (try? partialResult.add(other: indicator.amount)) ?? partialResult
 				}
@@ -1070,7 +1072,7 @@ extension ReviewedTransaction {
 
 extension FeePayerCandidate? {
 	func validateBalance(forFee transactionFee: TransactionFee) -> FeeValidationOutcome {
-		if transactionFee.totalFee.lockFee == .zero {
+		if transactionFee.totalFee.lockFee == RETDecimal.zero() {
 			// If no fee is required - valid
 			return .valid
 		}

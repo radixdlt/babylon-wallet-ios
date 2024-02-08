@@ -306,27 +306,28 @@ extension TransactionReview {
 		}
 	}
 
-	private func extractUserAccounts(_ allAddress: [EngineToolkit.Address]) async throws -> [Account] {
+	private func extractUserAccounts(_ allAddress: [Address]) async throws -> [Account] {
 		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 
-		return allAddress
-			.compactMap {
-				try? $0.asSpecific()
-			}
-			.map { (address: AccountAddress) in
-				let userAccount = userAccounts.first { userAccount in
-					userAccount.address.address == address.address
-				}
-				if let userAccount {
-					return .user(userAccount)
-				} else {
-					return .external(address, approved: false)
-				}
-			}
+//		return allAddress
+//			.compactMap {
+//				try? $0.asSpecific()
+//			}
+//			.map { (address: AccountAddress) in
+//				let userAccount = userAccounts.first { userAccount in
+//					userAccount.address.address == address.address
+//				}
+//				if let userAccount {
+//					return .user(userAccount)
+//				} else {
+//					return .external(address, approved: false)
+//				}
+//			}
+		fixme()
 	}
 
 	private func extractDapps<Kind: SpecificEntityType>(
-		_ addresses: [EngineToolkit.Address],
+		_ addresses: [Address],
 		unknownTitle: (Int) -> String
 	) async throws -> TransactionReviewDapps<Kind>.State? {
 		let dApps = await extractDappEntities(addresses)
@@ -334,19 +335,20 @@ extension TransactionReview {
 	}
 
 	private func extractDapps<Kind: SpecificEntityType>(
-		_ dAppEntities: [(address: EngineToolkit.Address, entity: DappEntity?)],
+		_ dAppEntities: [(address: Address, entity: DappEntity?)],
 		unknownTitle: (Int) -> String
 	) async throws -> TransactionReviewDapps<Kind>.State? {
-		let knownDapps = dAppEntities.compactMap(\.entity).asIdentifiable()
-		let unknownDapps = try dAppEntities.filter { $0.entity == nil }
-			.map { try $0.address.asSpecific() as SpecificAddress<Kind> }.asIdentifiable()
-
-		guard knownDapps.count + unknownDapps.count > 0 else { return nil }
-
-		return .init(knownDapps: knownDapps, unknownDapps: unknownDapps, unknownTitle: unknownTitle)
+//		let knownDapps = dAppEntities.compactMap(\.entity).asIdentifiable()
+//		let unknownDapps = try dAppEntities.filter { $0.entity == nil }
+//			.map { try $0.address.asSpecific() as SpecificAddress<Kind> }.asIdentifiable()
+//
+//		guard knownDapps.count + unknownDapps.count > 0 else { return nil }
+//
+//		return .init(knownDapps: knownDapps, unknownDapps: unknownDapps, unknownTitle: unknownTitle)
+		fixme()
 	}
 
-	private func extractDappEntities(_ addresses: [EngineToolkit.Address]) async -> [(address: EngineToolkit.Address, entity: DappEntity?)] {
+	private func extractDappEntities(_ addresses: [Address]) async -> [(address: Address, entity: DappEntity?)] {
 		await addresses.asyncMap {
 			await (address: $0, entity: try? extractDappEntity($0.asSpecific()))
 		}
@@ -359,7 +361,7 @@ extension TransactionReview {
 		return DappEntity(id: dAppDefinitionAddress, metadata: metadata, isAuthorized: isAuthorized)
 	}
 
-	private func exctractProofs(_ accountProofs: [EngineToolkit.Address]) async throws -> TransactionReviewProofs.State? {
+	private func exctractProofs(_ accountProofs: [Address]) async throws -> TransactionReviewProofs.State? {
 		let proofs = try await accountProofs
 			.map { try ResourceAddress(validatingAddress: $0.addressString()) }
 			.asyncMap(extractProofInfo)
@@ -458,7 +460,7 @@ extension TransactionReview {
 		return .init(accounts: depositAccounts, enableCustomizeGuarantees: requiresGuarantees)
 	}
 
-	func extractValidators(for addresses: [EngineToolkit.Address]) async throws -> ValidatorsState? {
+	func extractValidators(for addresses: [Address]) async throws -> ValidatorsState? {
 		guard !addresses.isEmpty else { return nil }
 
 		let generalAddresses = try addresses.map { try $0.asGeneral() }
@@ -551,7 +553,7 @@ extension TransactionReview {
 	}
 
 	private func perPoolUnitDapps(
-		_ dappEntities: [(address: EngineToolkit.Address, entity: TransactionReview.DappEntity?)],
+		_ dappEntities: [(address: Address, entity: TransactionReview.DappEntity?)],
 		poolInteractions: [some TrackedPoolInteraction]
 	) -> ResourceAssociatedDapps {
 		Dictionary(uniqueKeysWithValues: dappEntities.compactMap { data -> (ResourceAddress, OnLedgerEntity.Metadata)? in
@@ -733,7 +735,7 @@ extension TransactionReview {
 				resource: resourceAddress,
 				nonFungibleIds: existingTokenIds.map {
 					try NonFungibleGlobalId.fromParts(
-						resourceAddress: resourceAddress.intoEngine(),
+						resourceAddress: resourceAddress,
 						nonFungibleLocalId: $0
 					)
 				}
@@ -763,7 +765,7 @@ extension TransactionReview {
 			// Newly minted tokens
 			result = try ids
 				.map { localId in
-					try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: localId)
+					try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress, nonFungibleLocalId: localId)
 				}
 				.map { id in
 					Transfer(resource: resource, details: .nonFungible(.init(id: id, data: nil)))

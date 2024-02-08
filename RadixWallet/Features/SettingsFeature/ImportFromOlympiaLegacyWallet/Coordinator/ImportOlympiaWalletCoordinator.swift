@@ -583,7 +583,7 @@ extension ImportOlympiaWalletCoordinator {
 	) throws -> NonEmpty<[MigratableAccount]> {
 		let result = try scannedAccounts.enumerated().map { index, account in
 			let babylonAddress: AccountAddress = try deriveVirtualAccountAddressFromPublicKey(
-				publicKey: account.publicKey.intoEngine(),
+				publicKey: account.publicKey,
 				networkId: networkID.rawValue
 			).asSpecific()
 

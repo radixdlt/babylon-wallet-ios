@@ -6,7 +6,6 @@ public protocol TrackedPoolInteraction {
 	var poolUnitsResourceAddress: Address { get }
 	var poolUnitsAmount: RETDecimal { get set }
 	var resourcesInInteraction: [String: RETDecimal] { get set }
-	mutating func add(_ other: Self)
 }
 
 // MARK: - TrackedPoolContribution + TrackedPoolInteraction

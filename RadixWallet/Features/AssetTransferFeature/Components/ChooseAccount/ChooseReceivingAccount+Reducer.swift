@@ -29,7 +29,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 			}
 			guard
 				let addressOnSomeNetwork = try? AccountAddress(validatingAddress: manualAccountAddress),
-				let engineAddress = try? addressOnSomeNetwork.intoEngine()
+				let engineAddress = try? addressOnSomeNetwork
 			else {
 				return .invalid
 			}
