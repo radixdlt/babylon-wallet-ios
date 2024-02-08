@@ -34,6 +34,7 @@ public protocol FeatureReducer: Reducer where State: Sendable & Hashable, Action
 }
 
 // MARK: - FeatureAction
+@CasePathable
 public enum FeatureAction<Feature: FeatureReducer>: Sendable, Equatable {
 	case destination(PresentationAction<Feature.Destination.Action>)
 	case view(Feature.ViewAction)
