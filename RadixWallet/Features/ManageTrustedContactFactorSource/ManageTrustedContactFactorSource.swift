@@ -8,12 +8,12 @@ extension AccountAddress {
 		networkID: NetworkID = Radix.Gateway.default.network.id
 	) -> Self {
 		let curve25519PublicKey = Curve25519.PrivateKey().publicKey
-		let address = try! deriveVirtualAccountAddressFromPublicKey(
+		return try! deriveVirtualAccountAddressFromPublicKey(
 			publicKey: SLIP10.PublicKey.eddsaEd25519(curve25519PublicKey).intoEngine(),
 			networkId: networkID.rawValue
 		)
 
-		return .init(address: address.addressString(), decodedKind: address.entityType())
+//		return .init(address: address.addressString(), decodedKind: address.entityType())
 	}
 }
 #endif

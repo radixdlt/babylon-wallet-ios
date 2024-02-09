@@ -246,7 +246,9 @@ extension TransactionReview {
 				networkID: networkID
 			)
 
-			let claimingFromValidators = try await extractValidators(for: validatorAddresses)
+			let claimingFromValidators = try await extractValidators(
+				for: validatorAddresses
+			)
 
 			let deposits = try? await extractDeposits(
 				accountDeposits: summary.accountDeposits.aggregated,

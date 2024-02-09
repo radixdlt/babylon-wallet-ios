@@ -27,6 +27,10 @@ extension RETDecimal {
 		panic()
 	}
 
+	public func isPositive() -> Bool {
+		panic()
+	}
+
 	public func isZero() -> Bool {
 		panic()
 	}

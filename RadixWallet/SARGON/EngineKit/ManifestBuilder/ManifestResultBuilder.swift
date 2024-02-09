@@ -27,10 +27,10 @@ extension ManifestBuilder {
 		panic()
 	}
 
-	public static func accountTryDepositEntireWorktopOrAbort(
+	public func accountTryDepositEntireWorktopOrAbort(
 		accountAddress: RETAddress,
 		authorizedDepositorBadge: ResourceOrNonFungible?
-	) -> ManifestBuilder.InstructionsChain.Instruction {
+	) -> ManifestBuilder {
 		panic()
 	}
 

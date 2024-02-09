@@ -132,12 +132,10 @@ extension Profile.Network.Persona {
 			throw WrongEntityInDerivationPath()
 		}
 
-		let engineAddress = try deriveVirtualIdentityAddressFromPublicKey(
+		return try deriveVirtualIdentityAddressFromPublicKey(
 			publicKey: factorInstance.publicKey.intoEngine(),
 			networkId: networkID.rawValue
 		)
-
-		return .init(address: engineAddress.addressString(), decodedKind: engineAddress.entityType())
 	}
 }
 

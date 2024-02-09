@@ -6,8 +6,13 @@ public protocol DummySargon: Sendable, Equatable, Hashable, Codable, Identifiabl
 // MARK: - DeprecatedDummySargon
 @available(*, deprecated, message: "Remove completely")
 public protocol DeprecatedDummySargon: DummySargon {}
+
 public func panic(line: UInt = #line) -> Never {
 	fatalError("DummySargon: \(line)")
+}
+
+public func sargon(line: UInt = #line) -> Never {
+	fatalError("FIX THIS part of Sargon migration: \(line)")
 }
 
 extension DummySargon {
@@ -604,7 +609,7 @@ public struct UnstakeData: DummySargon {
 // MARK: - DetailedManifestClass
 public enum DetailedManifestClass: DummySargon {
 	case general, transfer
-	case validatorClaim(Set<ValidatorAddress>, Bool)
+	case validatorClaim([RETAddress], Bool)
 	case validatorStake(validatorAddresses: [RETAddress], validatorStakes: [TrackedValidatorStake])
 	case validatorUnstake(validatorAddresses: [RETAddress], validatorUnstakes: [TrackedValidatorUnstake], claimsNonFungibleData: [UnstakeDataEntry])
 	case accountDepositSettingsUpdate(
@@ -640,6 +645,10 @@ public struct ExecutionSummary: DummySargon {
 		}
 	}
 
+	public var detailedClassification: [DetailedManifestClass] {
+		panic()
+	}
+
 	public var newEntities: NewEntities {
 		panic()
 	}
@@ -660,7 +669,7 @@ public struct ExecutionSummary: DummySargon {
 		panic()
 	}
 
-	public var presentedProofs: [ResourceAddress] {
+	public var presentedProofs: [RETAddress] {
 		panic()
 	}
 
@@ -675,7 +684,7 @@ public struct ExecutionSummary: DummySargon {
 
 // MARK: - ResourceOrNonFungible
 public enum ResourceOrNonFungible: DummySargon {
-	case resource(ResourceAddress)
+	case resource(RETAddress)
 	case nonFungible(NonFungibleGlobalId)
 }
 
@@ -847,7 +856,7 @@ public enum ManifestBuilder: DeprecatedDummySargon {
 
 	public static func withdrawTokens(
 		_ args: Any...
-	) throws -> TransactionManifest {
+	) throws -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
 
@@ -987,5 +996,9 @@ public func knownAddresses(
 }
 
 public func nonFungibleLocalIdAsStr(value: NonFungibleLocalId) -> String {
+	panic()
+}
+
+public func nonFungibleLocalIdFromStr(string: String) throws -> NonFungibleLocalId {
 	panic()
 }

@@ -57,12 +57,16 @@ extension ResourceSpecifier {
 	}
 
 	public var toResourceTracker: ResourceIndicator {
-		switch self {
-		case let .amount(resourceAddress, amount):
-			.fungible(resourceAddress: resourceAddress, indicator: .guaranteed(amount: amount))
-		case let .ids(resourceAddress, ids):
-			.nonFungible(resourceAddress: resourceAddress, indicator: .byIds(ids: ids))
-		}
+//		switch self {
+//		case let .amount(resourceAddress, amount):
+//			.fungible(
+		//                resourceAddress: resourceAddress,
+		//                indicator: .guaranteed(amount: amount)
+		//            )
+//		case let .ids(resourceAddress, ids):
+//			.nonFungible(resourceAddress: resourceAddress, indicator: .byIds(ids: ids))
+//		}
+		sargon()
 	}
 }
 
@@ -92,12 +96,13 @@ extension ResourceIndicator {
 
 extension FungibleResourceIndicator {
 	public var amount: RETDecimal {
-		switch self {
-		case let .guaranteed(amount):
-			amount
-		case let .predicted(predictedAmount):
-			predictedAmount.value
-		}
+//		switch self {
+//		case let .guaranteed(amount):
+//			amount
+//		case let .predicted(predictedAmount):
+//			predictedAmount.value
+//		}
+		sargon()
 	}
 }
 
