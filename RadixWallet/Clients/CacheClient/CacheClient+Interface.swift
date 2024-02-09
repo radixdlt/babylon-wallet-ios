@@ -72,13 +72,13 @@ extension CacheClient {
 extension CacheClient {
 	public enum Entry: Equatable {
 		public enum OnLedgerEntity: Hashable {
-			case account(RETAddress)
-			case resource(RETAddress)
-			case resourcePool(RETAddress)
-			case validator(RETAddress)
-			case genericComponent(RETAddress)
+			case account(Address)
+			case resource(Address)
+			case resourcePool(Address)
+			case validator(Address)
+			case genericComponent(Address)
 			case nonFungibleData(NonFungibleGlobalId)
-			case nonFungibleIdPage(accountAddress: RETAddress, resourceAddress: RETAddress, pageCursor: String?)
+			case nonFungibleIdPage(accountAddress: Address, resourceAddress: Address, pageCursor: String?)
 		}
 
 		case onLedgerEntity(OnLedgerEntity)

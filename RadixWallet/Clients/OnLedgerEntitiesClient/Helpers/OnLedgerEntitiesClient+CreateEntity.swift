@@ -198,7 +198,7 @@ extension OnLedgerEntitiesClient {
 
 		func matchPoolUnitCandidate(
 			for poolUnitResourceAddress: ResourceAddress,
-			itemAddress: RETAddress,
+			itemAddress: Address,
 			candidates: [OnLedgerEntity.OwnedFungibleResource],
 			metadataAddressMatch: KeyPath<OnLedgerEntity.Metadata, String?>
 		) -> OnLedgerEntity.OwnedFungibleResource? {

@@ -16,7 +16,7 @@ extension OnLedgerEntitiesClient {
 	public typealias GetNonFungibleTokenData = @Sendable (GetNonFungibleTokenDataRequest) async throws -> [OnLedgerEntity.NonFungibleToken]
 	public typealias GetAccountOwnedNonFungibleTokenData = @Sendable (GetAccountOwnedNonFungibleTokenDataRequest) async throws -> GetAccountOwnedNonFungibleTokenResponse
 
-	public typealias GetEntities = @Sendable ([RETAddress], Set<EntityMetadataKey>, AtLedgerState?, CachingStrategy) async throws -> [OnLedgerEntity]
+	public typealias GetEntities = @Sendable ([Address], Set<EntityMetadataKey>, AtLedgerState?, CachingStrategy) async throws -> [OnLedgerEntity]
 }
 
 // MARK: OnLedgerEntitiesClient.GetNonFungibleTokenDataRequest
@@ -132,7 +132,7 @@ extension OnLedgerEntitiesClient {
 
 	@Sendable
 	public func getEntities(
-		addresses: [RETAddress],
+		addresses: [Address],
 		metadataKeys: Set<EntityMetadataKey>,
 		cachingStrategy: CachingStrategy = .useCache,
 		atLedgerState: AtLedgerState? = nil
@@ -162,7 +162,7 @@ extension OnLedgerEntitiesClient {
 
 	@Sendable
 	public func getEntity(
-		_ address: RETAddress,
+		_ address: Address,
 		metadataKeys: Set<EntityMetadataKey>,
 		cachingStrategy: CachingStrategy = .useCache,
 		atLedgerState: AtLedgerState? = nil
@@ -262,7 +262,7 @@ extension OnLedgerEntitiesClient {
 	/// Extracts the dApp definition address from an entity, if one is present
 	@Sendable
 	public func getDappDefinitionAddress(
-		_ address: RETAddress
+		_ address: Address
 	) async throws -> DappDefinitionAddress {
 		let entityMetadata = try await getEntity(address, metadataKeys: [.dappDefinition]).metadata
 		guard let dappDefinitionAddress = entityMetadata?.dappDefinition else {
@@ -276,7 +276,7 @@ extension OnLedgerEntitiesClient {
 	@Sendable
 	public func getDappMetadata(
 		_ dappDefinition: DappDefinitionAddress,
-		validatingDappEntity entity: RETAddress? = nil,
+		validatingDappEntity entity: Address? = nil,
 		validatingDappDefinitionAddress dappDefinitionAddress: DappDefinitionAddress? = nil,
 		validatingWebsite website: URL? = nil
 	) async throws -> OnLedgerEntity.Metadata {

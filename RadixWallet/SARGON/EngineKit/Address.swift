@@ -15,6 +15,10 @@ public struct RETAddress: DummySargonAddress {
 	public init(address: String, decodedKind: EntityType) {
 		panic()
 	}
+
+	public func bytes() -> [UInt8] {
+		panic()
+	}
 }
 
 public typealias PackageAddress = SpecificAddress<PackageEntityType>
@@ -213,7 +217,7 @@ extension SpecificAddress: CustomStringConvertible {
 }
 
 extension SpecificAddress {
-	public var asGeneral: RETAddress {
+	public var asGeneral: Address {
 		.init(address: address, decodedKind: decodedKind)
 	}
 }
@@ -235,7 +239,7 @@ extension RETAddress {
 		try .init(validatingAddress: addressString())
 	}
 
-	public func asGeneral() throws -> RETAddress {
+	public func asGeneral() throws -> Address {
 		try asSpecific()
 	}
 }

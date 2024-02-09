@@ -21,7 +21,7 @@ extension OnLedgerEntitiesClient {
 	@Sendable
 	@discardableResult
 	static func getEntities(
-		for addresses: [RETAddress],
+		for addresses: [Address],
 		_ explicitMetadata: Set<EntityMetadataKey>,
 		ledgerState: AtLedgerState?,
 		cachingStrategy: CachingStrategy
@@ -297,7 +297,7 @@ extension OnLedgerEntity {
 }
 
 extension CacheClient.Entry.OnLedgerEntity {
-	var address: RETAddress {
+	var address: Address {
 		switch self {
 		case let .resource(resource):
 			resource.asGeneral
@@ -320,7 +320,7 @@ extension CacheClient.Entry.OnLedgerEntity {
 	}
 }
 
-extension RETAddress {
+extension Address {
 	var cachingIdentifier: CacheClient.Entry.OnLedgerEntity {
 		switch self.decodedKind {
 		case _ where AccountEntityType.addressSpace.contains(self.decodedKind):

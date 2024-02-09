@@ -46,7 +46,7 @@ extension ManifestBuilder {
 	public static func manifestForFaucet(
 		includeLockFeeInstruction: Bool,
 		networkID: NetworkID,
-		componentAddress: RETAddress
+		componentAddress: Address
 	) throws -> TransactionManifest {
 		try make {
 			if includeLockFeeInstruction {

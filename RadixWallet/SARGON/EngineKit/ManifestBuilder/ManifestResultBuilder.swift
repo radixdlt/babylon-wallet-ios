@@ -12,25 +12,25 @@ extension ManifestBuilder {
 	///
 	///
 
-	public static func faucetLockFee() -> ManifestBuilder {
+	public static func faucetLockFee() -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
 
-	public static func faucetFreeXrd() -> ManifestBuilder {
+	public static func faucetFreeXrd() -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
 
 	public static func accountTryDepositEntireWorktopOrAbort(
 		_ accountAddress: RETAddress,
 		_ authorizedDepositorBadge: ResourceOrNonFungible?
-	) -> ManifestBuilder {
+	) -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
 
 	public static func accountTryDepositEntireWorktopOrAbort(
 		accountAddress: RETAddress,
 		authorizedDepositorBadge: ResourceOrNonFungible?
-	) -> ManifestBuilder {
+	) -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
 
@@ -38,7 +38,7 @@ extension ManifestBuilder {
 		_ from: RETAddress,
 		_ resourceAddress: RETAddress,
 		_ amount: RETDecimal
-	) -> ManifestBuilder {
+	) -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
 
@@ -46,7 +46,7 @@ extension ManifestBuilder {
 		_ from: RETAddress,
 		_ resourceAddress: RETAddress,
 		ids: [NonFungibleLocalId]
-	) -> ManifestBuilder {
+	) -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
 
@@ -54,7 +54,7 @@ extension ManifestBuilder {
 		_ address: RETAddress,
 		_ amount: RETDecimal,
 		_ bucket: ManifestBuilderBucket
-	) -> ManifestBuilder {
+	) -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
 
@@ -62,7 +62,7 @@ extension ManifestBuilder {
 	public static func takeAllFromWorktop(
 		_ resourceAddress: RETAddress,
 		_ bucket: ManifestBuilderBucket
-	) -> ManifestBuilder {
+	) -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
 
@@ -71,14 +71,14 @@ extension ManifestBuilder {
 		_ address: RETAddress,
 		_ bucket: ManifestBuilderBucket,
 		_ authorizedDepositorBadge: ResourceOrNonFungible?
-	) -> ManifestBuilder {
+	) -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
 
 	public static func accountDeposit(
 		_ recipientAddress: RETAddress,
 		_ bucket: ManifestBuilderBucket
-	) -> ManifestBuilder {
+	) -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
 
@@ -87,7 +87,7 @@ extension ManifestBuilder {
 		_ resourceAddress: RETAddress,
 		_ localIds: [NonFungibleLocalId],
 		_ bucket: ManifestBuilderBucket
-	) -> ManifestBuilder {
+	) -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
 
@@ -99,6 +99,18 @@ extension ManifestBuilder {
 		panic()
 	}
 
+	public func createFungibleResourceManager(
+		ownerRole: OwnerRole,
+		trackTotalSupply: Bool,
+		divisibility: UInt8,
+		initialSupply: RETDecimal,
+		resourceRoles: FungibleResourceRoles,
+		metadata: MetadataModuleConfig,
+		addressReservation: ManifestBuilderAddressReservation?
+	) -> ManifestBuilder {
+		panic()
+	}
+
 	public static func createFungibleResourceManager(
 		_ ownerRole: OwnerRole,
 		_ trackTotalSupply: Bool,
@@ -107,14 +119,14 @@ extension ManifestBuilder {
 		_ resourceRoles: FungibleResourceRoles,
 		_ metadata: MetadataModuleConfig,
 		_ addressReservation: ManifestBuilderAddressReservation?
-	) -> ManifestBuilder {
+	) -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
 
 	public static func validatorClaimXrd(
 		_ validatorAddress: RETAddress,
 		_ bucket: ManifestBuilderBucket
-	) -> ManifestBuilder {
+	) -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
 

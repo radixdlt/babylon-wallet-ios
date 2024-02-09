@@ -27,6 +27,10 @@ extension RETDecimal {
 		panic()
 	}
 
+	public func isZero() -> Bool {
+		panic()
+	}
+
 	public static var zero: RETDecimal {
 		panic()
 	}
@@ -273,12 +277,13 @@ extension RETDecimal {
 
 	/// The digits of the number, without separators or sign. The scale is fixed at 18, meaning the last 18 digits correspond to the decimal part.
 	public func digits() -> String {
-		do {
-			return try abs().mantissa()
-		} catch {
-			assertionFailure("RETDecimal: Failed to get digits from \(asStr())")
-			return mantissa().replacingOccurrences(of: "-", with: "")
-		}
+//		do {
+//			return try abs().mantissa()
+//		} catch {
+//			assertionFailure("RETDecimal: Failed to get digits from \(asStr())")
+//			return mantissa().replacingOccurrences(of: "-", with: "")
+//		}
+		panic()
 	}
 
 	/// Rounds to `totalPlaces` digits, counting both the integer and decimal parts, as well as any leading zeros
@@ -297,8 +302,9 @@ extension RETDecimal {
 	}
 
 	private func multiplier() -> Multiplier? {
-		guard let abs = try? abs() else { return nil }
-		return Multiplier.allCases.last(where: { $0.value <= abs })
+//		guard let abs = try? abs() else { return nil }
+//		return Multiplier.allCases.last(where: { $0.value <= abs })
+		panic()
 	}
 }
 

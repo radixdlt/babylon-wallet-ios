@@ -101,7 +101,7 @@ extension LedgerIdentifiable {
 }
 
 extension LedgerIdentifiable.Address {
-	public init?(address: RETAddress) {
+	public init?(address: Address) {
 		switch address.decodedKind {
 		case _ where AccountEntityType.addressSpace.contains(address.decodedKind):
 			self = .account(.init(address: address.address, decodedKind: address.decodedKind), isLedgerHWAccount: false)

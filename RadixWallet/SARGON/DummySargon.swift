@@ -111,7 +111,11 @@ public struct ManifestBlobRef: DummySargon {
 public struct Hash: DummySargon {}
 
 // MARK: - RETDecimal
-public struct RETDecimal: DummySargon {}
+public struct RETDecimal: DummySargon {
+	public init(value: String) throws {
+		panic()
+	}
+}
 
 // MARK: - PreciseDecimal
 public struct PreciseDecimal: DummySargon {}
@@ -199,10 +203,6 @@ extension TrackedPoolInteractionStuff {
 		}
 	}
 
-	public mutating func add(_ other: Self) {
-		panic()
-	}
-
 	public var contributedResources: [String: RETDecimal] {
 		get {
 			panic()
@@ -230,8 +230,8 @@ public enum TrackedPoolRedemption: TrackedPoolInteractionStuff {}
 
 // MARK: - ResourceIndicator
 public enum ResourceIndicator: DummySargon {
-	case fungible(resourceAddress: ResourceAddress, indicator: FungibleResourceIndicator)
-	case nonFungible(resourceAddress: ResourceAddress, indicator: NonFungibleResourceIndicator)
+	case fungible(resourceAddress: RETAddress, indicator: FungibleResourceIndicator)
+	case nonFungible(resourceAddress: RETAddress, indicator: NonFungibleResourceIndicator)
 }
 
 // MARK: - FungibleResourceIndicator
@@ -240,11 +240,14 @@ public enum FungibleResourceIndicator: DummySargon {
 	case predicted(PredictedDecimal)
 }
 
-// MARK: - PredictedDecimal
-public struct PredictedDecimal: DummySargon {
-	public let value: RETDecimal
+// MARK: - AbstractPredictedValue
+public struct AbstractPredictedValue<Value>: DummySargon where Value: Sendable & Hashable {
+	public let value: Value
 	public let instructionIndex: UInt64
 }
+
+public typealias PredictedDecimal = AbstractPredictedValue<RETDecimal>
+public typealias PredictedNonFungibleIds = AbstractPredictedValue<[NonFungibleLocalId]>
 
 public func + (lhs: PredictedDecimal, rhs: PredictedDecimal) -> PredictedDecimal {
 	panic()
@@ -254,16 +257,13 @@ public func + (lhs: PredictedDecimal, rhs: PredictedDecimal) -> PredictedDecimal
 public enum NonFungibleResourceIndicator: DummySargon {
 	case byAll(
 		predictedAmount: PredictedDecimal,
-		predictedIds: [NonFungibleLocalId]
+		predictedIds: PredictedNonFungibleIds
 	)
 	case byAmount(
 		amount: PredictedDecimal,
-		predictedIds: [NonFungibleLocalId]
+		predictedIds: PredictedNonFungibleIds
 	)
 	case byIds(ids: [NonFungibleLocalId])
-//	public var ids: [NonFungibleLocalId] {
-//		panic()
-//	}
 }
 
 // MARK: - ReservedInstruction
@@ -277,6 +277,7 @@ public enum MetadataValue: DummySargon {
 	case stringValue(value: String)
 	case urlValue(value: String)
 	case publicKeyHashArrayValue(value: [RETPublicKeyHash])
+	case stringArrayValue(value: [String])
 }
 
 // MARK: - RETPublicKeyHash
@@ -401,14 +402,6 @@ extension DummySargonAddress {
 		panic()
 	}
 
-	public func asSpecific() throws -> RETAddress {
-		panic()
-	}
-
-	public var asGeneral: RETAddress {
-		panic()
-	}
-
 	public func intoManifestBuilderAddress() -> ManifestBuilderAddress {
 		panic()
 	}
@@ -476,7 +469,7 @@ public struct TransactionHeader: DummySargon {
 		panic()
 	}
 
-	public var networkId: NetworkID {
+	public var networkId: UInt8 {
 		panic()
 	}
 
@@ -492,7 +485,7 @@ public struct TransactionHeader: DummySargon {
 		panic()
 	}
 
-	public var notaryPublicKey: SLIP10.PublicKey {
+	public var notaryPublicKey: RETPublicKey {
 		panic()
 	}
 
@@ -519,7 +512,7 @@ public struct SignedIntent: DummySargon {
 		panic()
 	}
 
-	public func intentSignatures() -> [RETSignature] {
+	public func intentSignatures() -> [RETSignatureWithPublicKey] {
 		panic()
 	}
 
@@ -633,6 +626,18 @@ public struct ExecutionSummary: DummySargon {
 		public var metadata: [String: [String: MetadataValue?]] {
 			panic()
 		}
+
+		public var componentAddresses: [RETAddress] {
+			panic()
+		}
+
+		public var resourceAddresses: [RETAddress] {
+			panic()
+		}
+
+		public var packageAddresses: [RETAddress] {
+			panic()
+		}
 	}
 
 	public var newEntities: NewEntities {
@@ -677,7 +682,7 @@ public enum ResourceOrNonFungible: DummySargon {
 // MARK: - KnownAddresses
 public struct KnownAddresses: DummySargon {
 	public struct ResourceAddresses: DummySargon {
-		public var xrd: ResourceAddress {
+		public var xrd: RETAddress {
 			panic()
 		}
 	}
@@ -814,10 +819,6 @@ public enum ManifestBuilder: DeprecatedDummySargon {
 	}
 
 	public func setOwnerKeys(from: Any, ownerKeyHashes: [Any]) throws -> ManifestBuilder {
-		panic()
-	}
-
-	public static func make(body: () async throws -> Void) -> ManifestBuilder {
 		panic()
 	}
 
