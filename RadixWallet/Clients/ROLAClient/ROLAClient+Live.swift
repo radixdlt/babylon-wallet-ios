@@ -10,7 +10,7 @@ extension ROLAClient {
 			let entity = request.entity
 			let newPublicKey = request.newPublicKey
 
-			let entityAddress: RETAddress = switch entity {
+			let entityAddress: Address = switch entity {
 			case let .account(account):
 				account.address.asGeneral
 			case let .persona(persona):

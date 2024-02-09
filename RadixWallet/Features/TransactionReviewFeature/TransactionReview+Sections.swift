@@ -352,7 +352,7 @@ extension TransactionReview {
 		}
 	}
 
-	private func extractDappEntity(_ entity: RETAddress) async throws -> DappEntity {
+	private func extractDappEntity(_ entity: Address) async throws -> DappEntity {
 		let dAppDefinitionAddress = try await onLedgerEntitiesClient.getDappDefinitionAddress(entity)
 		let metadata = try await onLedgerEntitiesClient.getDappMetadata(dAppDefinitionAddress, validatingDappEntity: entity)
 		let isAuthorized = await authorizedDappsClient.isDappAuthorized(dAppDefinitionAddress)

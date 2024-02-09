@@ -300,7 +300,7 @@ extension FactorInstance.ID.BadgeAddress {
 		} else if var resourceAddressContainer = try? container.nestedUnkeyedContainer(forKey: .resourceAddress) {
 			self = try .resourceAddress(.init(validatingAddress: resourceAddressContainer.decode(String.self)))
 		} else {
-			throw DecodingError.dataCorruptedError(forKey: .virtual, in: container, debugDescription: "Invalid Badge RETAddress")
+			throw DecodingError.dataCorruptedError(forKey: .virtual, in: container, debugDescription: "Invalid Badge Address")
 		}
 	}
 

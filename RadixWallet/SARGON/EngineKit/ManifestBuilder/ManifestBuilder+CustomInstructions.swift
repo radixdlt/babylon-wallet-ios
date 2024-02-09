@@ -50,7 +50,7 @@ extension TransactionManifest {
 	}
 
 	public func withLockFeeCallMethodAdded(
-		address: RETAddress,
+		address: Address,
 		fee: RETDecimal = .temporaryStandardFee
 	) throws -> TransactionManifest {
 		try withInstructionAdded(
@@ -70,7 +70,7 @@ extension Instructions {
 
 extension Instruction {
 	static func lockFeeCall(
-		address: RETAddress,
+		address: Address,
 		fee: RETDecimal
 	) throws -> Instruction {
 		try .callMethod(

@@ -27,11 +27,11 @@ extension PersonaData.Entry.Kind {
 		case .fullName:
 			L10n.AuthorizedDapps.PersonaDetails.fullName
 		case .emailAddress:
-			"Email RETAddress"
+			"Email Address"
 		case .phoneNumber:
 			"Phone Number"
 		case .postalAddress:
-			"Postal RETAddress"
+			"Postal Address"
 		case .dateOfBirth:
 			"NA"
 		case .companyName:

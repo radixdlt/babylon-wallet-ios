@@ -10,9 +10,9 @@ public enum AddressKind:
 	CustomStringConvertible,
 	CustomDumpRepresentable
 {
-	/// RETAddress to an `Account`
+	/// Address to an `Account`
 	case account
 
-	/// RETAddress to an `Identity` (used by `Persona`s)
+	/// Address to an `Identity` (used by `Persona`s)
 	case identity
 }

@@ -5,7 +5,7 @@ extension OnLedgerEntitiesClient {
 		from item: GatewayAPI.StateEntityDetailsResponseItem,
 		ledgerState: AtLedgerState
 	) async throws -> OnLedgerEntity? {
-		let address = try RETAddress(validatingAddress: item.address)
+		let address = try Address(validatingAddress: item.address)
 		let addressKind = address.decodedKind
 		switch addressKind {
 		case _ where AccountEntityType.addressSpace.contains(addressKind):

@@ -23,7 +23,7 @@ extension Profile.Network {
 	public struct AuthorizedPersonaDetailed: Sendable, Hashable, Identifiable {
 		public typealias ID = IdentityAddress
 		public var id: ID { identityAddress }
-		/// RETAddress that globally abnd uniquely identifies this Persona.
+		/// Address that globally abnd uniquely identifies this Persona.
 		public let identityAddress: IdentityAddress
 
 		/// The display name of the Persona, as stored in `Profile.Network.Persona`

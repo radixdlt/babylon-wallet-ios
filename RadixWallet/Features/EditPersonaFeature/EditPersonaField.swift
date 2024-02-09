@@ -133,7 +133,7 @@ extension DynamicFieldID: EditPersonaFieldKindBehaviour {
 		case .emailAddress: L10n.AuthorizedDapps.PersonaDetails.emailAddress
 		case .phoneNumber: L10n.AuthorizedDapps.PersonaDetails.phoneNumber
 		case .url: "URL"
-		case .postalAddress: "Postal RETAddress"
+		case .postalAddress: "Postal Address"
 		case .creditCard: "Credit Card"
 		}
 	}
