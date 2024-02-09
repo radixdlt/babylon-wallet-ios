@@ -16,6 +16,14 @@ extension DummySargon {
 		panic()
 	}
 
+	public static func == (lhs: Self, rhs: Self) -> Bool {
+		panic()
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		panic()
+	}
+
 	public var description: String {
 		panic()
 	}
@@ -27,24 +35,112 @@ extension DummySargon {
 	public init(from decoder: Decoder) throws {
 		panic()
 	}
+
+	public func asStr() -> String {
+		panic()
+	}
 }
 
+public typealias TransactionIntent = Intent
+
+// MARK: - Intent
+public struct Intent: DummySargon {
+	public init(header: Any, manifest: Any, message: Any) {
+		panic()
+	}
+
+	public func header() -> TransactionHeader {
+		panic()
+	}
+
+	public func description(lookupNetworkName: (NetworkID) throws -> Void) rethrows -> String {
+		panic()
+	}
+
+	public func manifest() -> TransactionManifest {
+		panic()
+	}
+
+	public func intentHash() throws -> TransactionHash {
+		panic()
+	}
+
+	public func compile() throws -> Data {
+		panic()
+	}
+}
+
+// MARK: - ResourceSpecifier
+public enum ResourceSpecifier: DummySargon {
+	case amount(
+		resourceAddress: RETAddress,
+		amount: RETDecimal
+	)
+	case ids(
+		resourceAddress: RETAddress,
+		ids: [NonFungibleLocalId]
+	)
+}
+
+// MARK: - FeeLocks
+public enum FeeLocks: DummySargon {
+	public var lock: RETDecimal { panic() }
+	public var contingentLock: RETDecimal { panic() }
+}
+
+// MARK: - FeeSummary
+public enum FeeSummary: DummySargon {
+	public var executionCost: RETDecimal { panic() }
+	public var finalizationCost: RETDecimal { panic() }
+	public var storageExpansionCost: RETDecimal { panic() }
+	public var royaltyCost: RETDecimal { panic() }
+}
+
+// MARK: - MapEntry
+public struct MapEntry: DummySargon {
+	public let key: ManifestValue
+	public let value: ManifestValue
+}
+
+// MARK: - ManifestBlobRef
+public struct ManifestBlobRef: DummySargon {
+	public let value: Hash
+}
+
+// MARK: - Hash
+public struct Hash: DummySargon {}
+
 // MARK: - RETDecimal
-public final class RETDecimal: DummySargon {}
+public struct RETDecimal: DummySargon {}
 
 // MARK: - PreciseDecimal
-public final class PreciseDecimal: DummySargon {}
+public struct PreciseDecimal: DummySargon {}
 
 // MARK: - NodeId
-public enum NodeId: DummySargon {}
+public enum NodeId: DummySargon {
+	public init(address: String) {
+		panic()
+	}
+}
 
 // MARK: - ManifestAddress
-public enum ManifestAddress {
+public enum ManifestAddress: DummySargon {
 	/// Static address, either global or internal, with entity type byte checked.
 	/// TODO: prevent direct construction, as in `NonFungibleLocalId`
 	case `static`(value: NodeId)
 	/// Named address, global only at the moment.
 	case named(value: UInt32)
+}
+
+// MARK: - ManifestBuilderNamedAddress
+public struct ManifestBuilderNamedAddress: DummySargon {
+	public let name: String
+}
+
+// MARK: - ManifestBuilderAddress
+public enum ManifestBuilderAddress: DummySargon {
+	case named(value: ManifestBuilderNamedAddress)
+	case `static`(value: RETAddress)
 }
 
 // MARK: - TrackedValidatorUnstake
@@ -57,11 +153,11 @@ public enum TrackedValidatorStake: TrackedPoolInteractionStuff {}
 public protocol TrackedPoolInteractionStuff: DummySargon {}
 
 extension TrackedPoolInteractionStuff {
-	public var validatorAddress: EngineToolkitAddress {
+	public var validatorAddress: RETAddress {
 		panic()
 	}
 
-	public var liquidStakeUnitAddress: EngineToolkitAddress {
+	public var liquidStakeUnitAddress: RETAddress {
 		panic()
 	}
 
@@ -83,8 +179,8 @@ extension TrackedPoolInteractionStuff {
 		}
 	}
 
-	public var poolAddress: EngineToolkitAddress { panic() }
-	public var poolUnitsResourceAddress: EngineToolkitAddress { panic() }
+	public var poolAddress: RETAddress { panic() }
+	public var poolUnitsResourceAddress: RETAddress { panic() }
 	public var poolUnitsAmount: RETDecimal {
 		get {
 			panic()
@@ -136,9 +232,6 @@ public enum TrackedPoolRedemption: TrackedPoolInteractionStuff {}
 public enum ResourceIndicator: DummySargon {
 	case fungible(resourceAddress: ResourceAddress, indicator: FungibleResourceIndicator)
 	case nonFungible(resourceAddress: ResourceAddress, indicator: NonFungibleResourceIndicator)
-	public var resourceAddress: ResourceAddress {
-		panic()
-	}
 }
 
 // MARK: - FungibleResourceIndicator
@@ -180,10 +273,14 @@ public enum ReservedInstruction: DummySargon {}
 public enum DummySargonPublicKey: DummySargon {}
 
 // MARK: - MetadataValue
-public enum MetadataValue: DummySargon {}
+public enum MetadataValue: DummySargon {
+	case stringValue(value: String)
+	case urlValue(value: String)
+	case publicKeyHashArrayValue(value: [RETPublicKeyHash])
+}
 
-// MARK: - EnginePublicKeyHash
-public struct EnginePublicKeyHash: DeprecatedDummySargon {
+// MARK: - RETPublicKeyHash
+public struct RETPublicKeyHash: DeprecatedDummySargon {
 	public static func secp256k1(value: Any) -> Self {
 		panic()
 	}
@@ -199,19 +296,19 @@ public struct EnginePublicKeyHash: DeprecatedDummySargon {
 
 // MARK: - ManifestSummary
 public struct ManifestSummary: DummySargon {
-	public var accountsDepositedInto: [EngineToolkitAddress] {
+	public var accountsDepositedInto: [RETAddress] {
 		panic()
 	}
 
-	public var accountsWithdrawnFrom: [EngineToolkitAddress] {
+	public var accountsWithdrawnFrom: [RETAddress] {
 		panic()
 	}
 
-	public var accountsRequiringAuth: [EngineToolkitAddress] {
+	public var accountsRequiringAuth: [RETAddress] {
 		panic()
 	}
 
-	public var identitiesRequiringAuth: [EngineToolkitAddress] {
+	public var identitiesRequiringAuth: [RETAddress] {
 		panic()
 	}
 }
@@ -219,6 +316,51 @@ public struct ManifestSummary: DummySargon {
 // MARK: - DummySargonAddress
 public protocol DummySargonAddress: DummySargon, AddressProtocol {
 	init(validatingAddress: Any) throws
+}
+
+// MARK: - AccessRule
+public enum AccessRule: DummySargon {}
+
+// MARK: - OwnerRole
+public enum OwnerRole: DummySargon {
+	case none
+	case fixed(value: AccessRule)
+	case updatable(value: AccessRule)
+}
+
+// MARK: - ResourceManagerRole
+public struct ResourceManagerRole: DummySargon {
+	public let role: AccessRule?
+	public let roleUpdater: AccessRule?
+}
+
+public typealias MetadataInit = [String: MetadataInitEntry]
+
+// MARK: - MetadataInitEntry
+public struct MetadataInitEntry: DummySargon {
+	public let value: MetadataValue
+	public let lock: Bool
+}
+
+// MARK: - ManifestBuilderAddressReservation
+public struct ManifestBuilderAddressReservation: DummySargon {
+	public let name: String
+}
+
+// MARK: - MetadataModuleConfig
+public struct MetadataModuleConfig: DummySargon {
+	public let `init`: MetadataInit
+	public let roles: [String: AccessRule?]
+}
+
+// MARK: - FungibleResourceRoles
+public struct FungibleResourceRoles: DummySargon {
+	public let mintRoles: ResourceManagerRole?
+	public let burnRoles: ResourceManagerRole?
+	public let freezeRoles: ResourceManagerRole?
+	public let recallRoles: ResourceManagerRole?
+	public let withdrawRoles: ResourceManagerRole?
+	public let depositRoles: ResourceManagerRole?
 }
 
 // MARK: - ResourcePreference
@@ -259,15 +401,15 @@ extension DummySargonAddress {
 		panic()
 	}
 
-	public func asSpecific() throws -> EngineToolkitAddress {
+	public func asSpecific() throws -> RETAddress {
 		panic()
 	}
 
-	public var asGeneral: EngineToolkitAddress {
+	public var asGeneral: RETAddress {
 		panic()
 	}
 
-	public func intoManifestBuilderAddress() -> Self {
+	public func intoManifestBuilderAddress() -> ManifestBuilderAddress {
 		panic()
 	}
 }
@@ -294,7 +436,7 @@ public struct NonFungibleGlobalId: DummySargon {
 	}
 
 	public static func fromParts(
-		resourceAddress: ResourceAddress,
+		resourceAddress: RETAddress,
 		nonFungibleLocalId: NonFungibleLocalId
 	) -> Self {
 		panic()
@@ -304,7 +446,7 @@ public struct NonFungibleGlobalId: DummySargon {
 		panic()
 	}
 
-	public func resourceAddress() -> ResourceAddress {
+	public func resourceAddress() -> RETAddress {
 		panic()
 	}
 }
@@ -320,39 +462,6 @@ public struct TransactionHash: DummySargon {
 	}
 }
 
-// MARK: - EnginePublicKey
-public enum EnginePublicKey: DummySargon {
-	case secp256k1(value: Data)
-	case ed25519(value: Data)
-	public var bytes: Data {
-		panic()
-	}
-}
-
-// MARK: - EngineSignatureWithPublicKey
-public enum EngineSignatureWithPublicKey: DummySargon {
-	public init(from: Any) {
-		panic()
-	}
-}
-
-// MARK: - EngineSignature
-public enum EngineSignature: DummySargon {
-	case secp256k1(value: Data)
-	case ed25519(value: Data)
-	public var bytes: Data {
-		panic()
-	}
-
-	public var publicKey: EnginePublicKey? {
-		panic()
-	}
-
-	public var signature: Data {
-		panic()
-	}
-}
-
 // MARK: - TransactionHeader
 public struct TransactionHeader: DummySargon {
 	public init(
@@ -364,6 +473,10 @@ public struct TransactionHeader: DummySargon {
 		notaryIsSignatory: Bool,
 		tipPercentage: Any
 	) {
+		panic()
+	}
+
+	public var networkId: NetworkID {
 		panic()
 	}
 
@@ -406,38 +519,11 @@ public struct SignedIntent: DummySargon {
 		panic()
 	}
 
-	public func intentSignatures() -> [EngineSignature] {
+	public func intentSignatures() -> [RETSignature] {
 		panic()
 	}
 
 	public func signedIntentHash() -> TransactionHash {
-		panic()
-	}
-}
-
-// MARK: - TransactionIntent
-public struct TransactionIntent: DummySargon {
-	public init(header: Any, manifest: Any, message: Any) {
-		panic()
-	}
-
-	public func header() -> TransactionHeader {
-		panic()
-	}
-
-	public func description(lookupNetworkName: (NetworkID) throws -> Void) rethrows -> String {
-		panic()
-	}
-
-	public func manifest() -> TransactionManifest {
-		panic()
-	}
-
-	public func intentHash() throws -> TransactionHash {
-		panic()
-	}
-
-	public func compile() throws -> Data {
 		panic()
 	}
 }
@@ -460,14 +546,14 @@ public struct NotarizedTransaction: DummySargon {
 		panic()
 	}
 
-	public func notarySignature() -> EngineSignature {
+	public func notarySignature() -> RETSignature {
 		panic()
 	}
 }
 
 // MARK: - TransactionManifest
 public struct TransactionManifest: DummySargon {
-	public func extractAddresses() -> [EntityType: [EngineToolkitAddress]] {
+	public func extractAddresses() -> [EntityType: [RETAddress]] {
 		panic()
 	}
 
@@ -475,7 +561,7 @@ public struct TransactionManifest: DummySargon {
 		panic()
 	}
 
-	public init(instructions: Instructions, blobs: [Data]) throws {
+	public init(instructions: Instructions, blobs: [Data]) {
 		panic()
 	}
 
@@ -526,8 +612,8 @@ public struct UnstakeData: DummySargon {
 public enum DetailedManifestClass: DummySargon {
 	case general, transfer
 	case validatorClaim(Set<ValidatorAddress>, Bool)
-	case validatorStake(validatorAddresses: [EngineToolkitAddress], validatorStakes: [TrackedValidatorStake])
-	case validatorUnstake(validatorAddresses: [EngineToolkitAddress], validatorUnstakes: [TrackedValidatorUnstake], claimsNonFungibleData: [UnstakeDataEntry])
+	case validatorStake(validatorAddresses: [RETAddress], validatorStakes: [TrackedValidatorStake])
+	case validatorUnstake(validatorAddresses: [RETAddress], validatorUnstakes: [TrackedValidatorUnstake], claimsNonFungibleData: [UnstakeDataEntry])
 	case accountDepositSettingsUpdate(
 		resourcePreferencesUpdates: [String: [String: ResourcePreferenceUpdate]],
 		depositModeUpdates: [String: AccountDefaultDepositRule],
@@ -537,8 +623,8 @@ public enum DetailedManifestClass: DummySargon {
 		[String: [ResourceOrNonFungible]]
 	)
 
-	case poolContribution(poolAddresses: [EngineToolkitAddress], poolContributions: [TrackedPoolContribution])
-	case poolRedemption(poolAddresses: [EngineToolkitAddress], poolContributions: [TrackedPoolRedemption])
+	case poolContribution(poolAddresses: [RETAddress], poolContributions: [TrackedPoolContribution])
+	case poolRedemption(poolAddresses: [RETAddress], poolContributions: [TrackedPoolRedemption])
 }
 
 // MARK: - ExecutionSummary
@@ -573,23 +659,13 @@ public struct ExecutionSummary: DummySargon {
 		panic()
 	}
 
-	public var encounteredEntities: [EngineToolkitAddress] {
+	public var encounteredEntities: [RETAddress] {
 		panic()
 	}
 
 	public var feeLocks: FeeLocks { panic() }
-	public enum FeeLocks: DummySargon {
-		public var lock: RETDecimal { panic() }
-		public var contingentLock: RETDecimal { panic() }
-	}
 
 	public var feeSummary: FeeSummary { panic() }
-	public enum FeeSummary: DummySargon {
-		public var executionCost: RETDecimal { panic() }
-		public var finalizationCost: RETDecimal { panic() }
-		public var storageExpansionCost: RETDecimal { panic() }
-		public var royaltyCost: RETDecimal { panic() }
-	}
 }
 
 // MARK: - ResourceOrNonFungible
@@ -615,9 +691,8 @@ public struct KnownAddresses: DummySargon {
 
 // MARK: - Instruction
 public enum Instruction: DummySargon {
-	public static func assertWorktopContains(resourceAddress: Any, amount: Any) throws -> Self {
-		panic()
-	}
+	case assertWorktopContains(resourceAddress: Any, amount: Any)
+	case callMethod(address: ManifestAddress, methodName: String, args: ManifestValue)
 }
 
 // MARK: - Instructions
@@ -626,7 +701,19 @@ public struct Instructions: DummySargon {
 		panic()
 	}
 
+	public func networkId() -> UInt8 {
+		panic()
+	}
+
 	public static func fromString(string: Any, networkId: UInt8) -> Self {
+		panic()
+	}
+
+	public func instructionsList() -> [Instruction] {
+		panic()
+	}
+
+	public static func fromInstructions(instructions: [Instruction], networkId: Any) throws -> Self {
 		panic()
 	}
 }
@@ -703,21 +790,11 @@ public enum ManifestBuilderValue: DeprecatedDummySargon {
 
 // MARK: - ManifestValue
 public enum ManifestValue: DeprecatedDummySargon {
-	public static func enumValue(discriminator: Any, fields: [ManifestValue]) -> Self {
-		panic()
-	}
-
-	public static func addressValue(value: Any) -> Self {
-		panic()
-	}
-
-	public static func `static`(value: Any) -> Self {
-		panic()
-	}
-
-	public static func tupleValue(fields: [ManifestValue]) -> Self {
-		panic()
-	}
+	case enumValue(discriminator: UInt8, fields: [ManifestValue])
+	case addressValue(value: ManifestBuilderAddress)
+	case tupleValue(fields: [ManifestValue])
+	case decimalValue(value: RETDecimal)
+	case nonFungibleLocalIdValue(value: NonFungibleLocalId)
 }
 
 // MARK: - ManifestBuilderBucket
@@ -787,10 +864,6 @@ public enum ManifestBuilder: DeprecatedDummySargon {
 	}
 
 	public static func accountDeposit(_ args: Any...) throws -> ManifestBuilder.InstructionsChain.Instruction {
-		panic()
-	}
-
-	public static func accountTryDepositOrAbort(_ args: Any?...) throws -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
 
@@ -909,5 +982,9 @@ public func deriveOlympiaAccountAddressFromPublicKey(
 public func knownAddresses(
 	networkId: UInt8
 ) -> KnownAddresses {
+	panic()
+}
+
+public func nonFungibleLocalIdAsStr(value: NonFungibleLocalId) -> String {
 	panic()
 }

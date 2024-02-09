@@ -26,7 +26,7 @@ extension ExecutionSummary {
 		[:] // TODO: Is this never populated for .general?
 	}
 
-	public var addressesOfNewlyCreatedEntities: [EngineToolkitAddress] {
+	public var addressesOfNewlyCreatedEntities: [RETAddress] {
 		newEntities.componentAddresses + newEntities.packageAddresses + newEntities.resourceAddresses
 	}
 }
@@ -47,7 +47,7 @@ extension ResourceSpecifier {
 		return nil
 	}
 
-	public var resourceAddress: EngineToolkitAddress {
+	public var resourceAddress: RETAddress {
 		switch self {
 		case let .amount(resourceAddress, _):
 			resourceAddress
@@ -67,7 +67,7 @@ extension ResourceSpecifier {
 }
 
 extension ResourceIndicator {
-	public var resourceAddress: EngineToolkitAddress {
+	public var resourceAddress: RETAddress {
 		switch self {
 		case let .fungible(address, _):
 			address

@@ -1,9 +1,9 @@
 // MARK: - AccessController
 public struct AccessController: Sendable, Hashable, Codable {
-	public struct EngineToolkitAddress: Sendable, Hashable, Codable {}
+	public struct Address: Sendable, Hashable, Codable {}
 
 	/// On ledger component address
-	public let address: EngineToolkitAddress
+	public let address: Address
 
 	/// Time factor, used e.g. by recovery role, as a countdown until recovery automaticall
 	/// goes through.

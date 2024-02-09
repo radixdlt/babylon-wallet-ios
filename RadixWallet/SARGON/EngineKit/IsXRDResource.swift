@@ -4,8 +4,8 @@ extension ResourceAddress {
 	}
 }
 
-extension EngineToolkitAddress {
-	static func xrd(_ networkId: UInt8) -> EngineToolkitAddress {
+extension RETAddress {
+	static func xrd(_ networkId: UInt8) -> RETAddress {
 		knownAddresses(networkId: networkId).resourceAddresses.xrd
 	}
 }

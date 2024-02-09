@@ -6,9 +6,9 @@ extension AddAsset.State {
 		.init(
 			resourceAddress: resourceAddress,
 			validatedResourceAddress: validatedResourceAddress.validAddress,
-			addressHint: {
+			addressHint: { () -> Hint? in
 				guard !resourceAddressFieldFocused, !resourceAddress.isEmpty else {
-					return .none
+					return nil
 				}
 
 				switch validatedResourceAddress {
@@ -31,7 +31,7 @@ extension AddAsset.State {
 extension AddAsset {
 	public struct ViewState: Equatable {
 		let resourceAddress: String
-		let validatedResourceAddress: ResourceViewState.EngineToolkitAddress?
+		let validatedResourceAddress: ResourceViewState.Address?
 		let addressHint: Hint?
 		let resourceAddressFieldFocused: Bool
 		let mode: ResourcesListMode

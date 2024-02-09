@@ -306,7 +306,7 @@ extension TransactionReview {
 		}
 	}
 
-	private func extractUserAccounts(_ allAddress: [EngineToolkitAddress]) async throws -> [Account] {
+	private func extractUserAccounts(_ allAddress: [RETAddress]) async throws -> [Account] {
 		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 
 		return allAddress
@@ -326,7 +326,7 @@ extension TransactionReview {
 	}
 
 	private func extractDapps<Kind: SpecificEntityType>(
-		_ addresses: [EngineToolkitAddress],
+		_ addresses: [RETAddress],
 		unknownTitle: (Int) -> String
 	) async throws -> TransactionReviewDapps<Kind>.State? {
 		let dApps = await extractDappEntities(addresses)
@@ -334,7 +334,7 @@ extension TransactionReview {
 	}
 
 	private func extractDapps<Kind: SpecificEntityType>(
-		_ dAppEntities: [(address: EngineToolkitAddress, entity: DappEntity?)],
+		_ dAppEntities: [(address: RETAddress, entity: DappEntity?)],
 		unknownTitle: (Int) -> String
 	) async throws -> TransactionReviewDapps<Kind>.State? {
 		let knownDapps = dAppEntities.compactMap(\.entity).asIdentifiable()
@@ -346,20 +346,20 @@ extension TransactionReview {
 		return .init(knownDapps: knownDapps, unknownDapps: unknownDapps, unknownTitle: unknownTitle)
 	}
 
-	private func extractDappEntities(_ addresses: [EngineToolkitAddress]) async -> [(address: EngineToolkitAddress, entity: DappEntity?)] {
+	private func extractDappEntities(_ addresses: [RETAddress]) async -> [(address: RETAddress, entity: DappEntity?)] {
 		await addresses.asyncMap {
 			await (address: $0, entity: try? extractDappEntity($0.asSpecific()))
 		}
 	}
 
-	private func extractDappEntity(_ entity: EngineToolkitAddress) async throws -> DappEntity {
+	private func extractDappEntity(_ entity: RETAddress) async throws -> DappEntity {
 		let dAppDefinitionAddress = try await onLedgerEntitiesClient.getDappDefinitionAddress(entity)
 		let metadata = try await onLedgerEntitiesClient.getDappMetadata(dAppDefinitionAddress, validatingDappEntity: entity)
 		let isAuthorized = await authorizedDappsClient.isDappAuthorized(dAppDefinitionAddress)
 		return DappEntity(id: dAppDefinitionAddress, metadata: metadata, isAuthorized: isAuthorized)
 	}
 
-	private func exctractProofs(_ accountProofs: [EngineToolkitAddress]) async throws -> TransactionReviewProofs.State? {
+	private func exctractProofs(_ accountProofs: [RETAddress]) async throws -> TransactionReviewProofs.State? {
 		let proofs = try await accountProofs
 			.map { try ResourceAddress(validatingAddress: $0.addressString()) }
 			.asyncMap(extractProofInfo)
@@ -458,7 +458,7 @@ extension TransactionReview {
 		return .init(accounts: depositAccounts, enableCustomizeGuarantees: requiresGuarantees)
 	}
 
-	func extractValidators(for addresses: [EngineToolkitAddress]) async throws -> ValidatorsState? {
+	func extractValidators(for addresses: [RETAddress]) async throws -> ValidatorsState? {
 		guard !addresses.isEmpty else { return nil }
 
 		let generalAddresses = try addresses.map { try $0.asGeneral() }
@@ -551,7 +551,7 @@ extension TransactionReview {
 	}
 
 	private func perPoolUnitDapps(
-		_ dappEntities: [(address: EngineToolkitAddress, entity: TransactionReview.DappEntity?)],
+		_ dappEntities: [(address: RETAddress, entity: TransactionReview.DappEntity?)],
 		poolInteractions: [some TrackedPoolInteraction]
 	) -> ResourceAssociatedDapps {
 		Dictionary(uniqueKeysWithValues: dappEntities.compactMap { data -> (ResourceAddress, OnLedgerEntity.Metadata)? in

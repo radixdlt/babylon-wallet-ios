@@ -350,7 +350,6 @@
 		48CFC38C2ADC10D900E77A5C /* SignatureWithPublicKey+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE6E2ADC10D800E77A5C /* SignatureWithPublicKey+Utils.swift */; };
 		48CFC38D2ADC10D900E77A5C /* Address.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE6F2ADC10D800E77A5C /* Address.swift */; };
 		48CFC38E2ADC10D900E77A5C /* NonFungibleGlobalID+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE712ADC10D800E77A5C /* NonFungibleGlobalID+Codable.swift */; };
-		48CFC3902ADC10D900E77A5C /* HashableExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE732ADC10D800E77A5C /* HashableExtensions.swift */; };
 		48CFC3912ADC10D900E77A5C /* ManifestResultBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE752ADC10D800E77A5C /* ManifestResultBuilder.swift */; };
 		48CFC3922ADC10D900E77A5C /* ManifestBuilder+CustomInstructions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE762ADC10D800E77A5C /* ManifestBuilder+CustomInstructions.swift */; };
 		48CFC3932ADC10D900E77A5C /* CustomTransactionManifests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE772ADC10D800E77A5C /* CustomTransactionManifests.swift */; };
@@ -1706,7 +1705,6 @@
 		48CFBE6E2ADC10D800E77A5C /* SignatureWithPublicKey+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SignatureWithPublicKey+Utils.swift"; sourceTree = "<group>"; };
 		48CFBE6F2ADC10D800E77A5C /* Address.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Address.swift; sourceTree = "<group>"; };
 		48CFBE712ADC10D800E77A5C /* NonFungibleGlobalID+Codable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NonFungibleGlobalID+Codable.swift"; sourceTree = "<group>"; };
-		48CFBE732ADC10D800E77A5C /* HashableExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HashableExtensions.swift; sourceTree = "<group>"; };
 		48CFBE752ADC10D800E77A5C /* ManifestResultBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManifestResultBuilder.swift; sourceTree = "<group>"; };
 		48CFBE762ADC10D800E77A5C /* ManifestBuilder+CustomInstructions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ManifestBuilder+CustomInstructions.swift"; sourceTree = "<group>"; };
 		48CFBE772ADC10D800E77A5C /* CustomTransactionManifests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTransactionManifests.swift; sourceTree = "<group>"; };
@@ -4606,7 +4604,6 @@
 				48CFBE6E2ADC10D800E77A5C /* SignatureWithPublicKey+Utils.swift */,
 				48CFBE6F2ADC10D800E77A5C /* Address.swift */,
 				48CFBE702ADC10D800E77A5C /* Codable */,
-				48CFBE732ADC10D800E77A5C /* HashableExtensions.swift */,
 				48CFBE742ADC10D800E77A5C /* ManifestBuilder */,
 				48CFBE792ADC10D800E77A5C /* Models+Sendable.swift */,
 				48CFBE7A2ADC10D800E77A5C /* NonFungbileLocalID.swift */,
@@ -8092,7 +8089,6 @@
 				83EE47962AF0EE3C00155F03 /* ProgrammaticScryptoSborValueMapAllOf.swift in Sources */,
 				48CFC23E2ADC10D900E77A5C /* SecurityStructureConfigurationRow.swift in Sources */,
 				48CFC6152ADC10DA00E77A5C /* ResetRequestItem.swift in Sources */,
-				48CFC3902ADC10D900E77A5C /* HashableExtensions.swift in Sources */,
 				48CFC3ED2ADC10D900E77A5C /* DataChannelMessage+Codable.swift in Sources */,
 				48CFC5DA2ADC10DA00E77A5C /* PresentationDetentIntrinsicHeight.swift in Sources */,
 				48CFC2E22ADC10D900E77A5C /* ManageSomeFactorSource+View.swift in Sources */,

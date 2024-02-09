@@ -5,7 +5,7 @@ extension OnLedgerEntitiesClient {
 		from item: GatewayAPI.StateEntityDetailsResponseItem,
 		ledgerState: AtLedgerState
 	) async throws -> OnLedgerEntity? {
-		let address = try EngineToolkitAddress(validatingAddress: item.address)
+		let address = try RETAddress(validatingAddress: item.address)
 		let addressKind = address.decodedKind
 		switch addressKind {
 		case _ where AccountEntityType.addressSpace.contains(addressKind):
@@ -198,7 +198,7 @@ extension OnLedgerEntitiesClient {
 
 		func matchPoolUnitCandidate(
 			for poolUnitResourceAddress: ResourceAddress,
-			itemAddress: EngineToolkitAddress,
+			itemAddress: RETAddress,
 			candidates: [OnLedgerEntity.OwnedFungibleResource],
 			metadataAddressMatch: KeyPath<OnLedgerEntity.Metadata, String?>
 		) -> OnLedgerEntity.OwnedFungibleResource? {

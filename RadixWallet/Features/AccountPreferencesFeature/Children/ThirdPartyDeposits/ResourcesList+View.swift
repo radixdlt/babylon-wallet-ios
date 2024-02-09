@@ -220,7 +220,7 @@ extension ResourcesListMode {
 	}
 }
 
-extension ResourceViewState.EngineToolkitAddress {
+extension ResourceViewState.Address {
 	var ledgerIdentifiable: LedgerIdentifiable {
 		switch self {
 		case let .assetException(exception):

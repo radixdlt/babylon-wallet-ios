@@ -1,5 +1,4 @@
 // MARK: - Blake2b
-
 public struct Blake2b {
 	private init() {}
 
@@ -10,7 +9,8 @@ public struct Blake2b {
 
 	#if DEBUG
 	fileprivate static func hash(hex: String) throws -> String {
-		try Hash.fromHexString(hash: hex).asStr()
+//		try Hash.fromHexString(hash: hex).asStr()
+		panic()
 	}
 	#endif
 }

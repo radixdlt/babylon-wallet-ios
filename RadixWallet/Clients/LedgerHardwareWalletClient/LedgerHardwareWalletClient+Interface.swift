@@ -162,7 +162,7 @@ extension LedgerHardwareWalletClient {
 			}
 
 			if address != account.address.address {
-				let errMsg = "Re-derived EngineToolkitAddress on Ledger does not matched the account. \(address) != \(account.address.address)"
+				let errMsg = "Re-derived RETAddress on Ledger does not matched the account. \(address) != \(account.address.address)"
 				loggerGlobal.error(.init(stringLiteral: errMsg))
 				return .mismatch(.addressMismatch)
 			}

@@ -10,22 +10,113 @@ extension ManifestBuilder {
 	/// `(args...) -> (ManifestBuilder) -> throws -> ManifestBuilder`
 	/// This allows to create partial instruction which are then build once put together.
 	///
-	public static let faucetLockFee = flip(faucetLockFee)
-	public static let faucetFreeXrd = flip(faucetFreeXrd)
-	public static let accountTryDepositBatchOrAbort = flip(accountTryDepositBatchOrAbort)
-	public static let accountTryDepositEntireWorktopOrAbort = flip(accountTryDepositEntireWorktopOrAbort)
-	public static let accountDepositEntireWorktop = flip(accountDepositEntireWorktop)
-	public static let withdrawAmount = flip(accountWithdraw)
-	public static let withdrawTokens = flip(accountWithdrawNonFungibles)
-	public static let takeFromWorktop = flip(takeFromWorktop)
-	public static let takeAllFromWorktop = flip(takeAllFromWorktop)
-	public static let accountTryDepositOrAbort = flip(accountTryDepositOrAbort)
-	public static let accountDeposit = flip(accountDeposit)
-	public static let takeNonFungiblesFromWorktop = flip(takeNonFungiblesFromWorktop)
-	public static let accountWithdrawNonFungibles = flip(accountWithdrawNonFungibles)
-	public static let setOwnerKeys = flip(setOwnerKeys)
-	public static let createFungibleResourceManager = flip(createFungibleResourceManager)
-	public static let validatorClaimXrd = flip(validatorClaimXrd)
+	///
+
+	public static func faucetLockFee() -> ManifestBuilder {
+		panic()
+	}
+
+	public static func faucetFreeXrd() -> ManifestBuilder {
+		panic()
+	}
+
+	public static func accountTryDepositEntireWorktopOrAbort(
+		_ accountAddress: RETAddress,
+		_ authorizedDepositorBadge: ResourceOrNonFungible?
+	) -> ManifestBuilder {
+		panic()
+	}
+
+	public static func accountTryDepositEntireWorktopOrAbort(
+		accountAddress: RETAddress,
+		authorizedDepositorBadge: ResourceOrNonFungible?
+	) -> ManifestBuilder {
+		panic()
+	}
+
+	public static func withdrawAmount(
+		_ from: RETAddress,
+		_ resourceAddress: RETAddress,
+		_ amount: RETDecimal
+	) -> ManifestBuilder {
+		panic()
+	}
+
+	public static func withdrawTokens(
+		_ from: RETAddress,
+		_ resourceAddress: RETAddress,
+		ids: [NonFungibleLocalId]
+	) -> ManifestBuilder {
+		panic()
+	}
+
+	public static func takeFromWorktop(
+		_ address: RETAddress,
+		_ amount: RETDecimal,
+		_ bucket: ManifestBuilderBucket
+	) -> ManifestBuilder {
+		panic()
+	}
+
+	///	= flip(takeAllFromWorktop)
+	public static func takeAllFromWorktop(
+		_ resourceAddress: RETAddress,
+		_ bucket: ManifestBuilderBucket
+	) -> ManifestBuilder {
+		panic()
+	}
+
+	///	= flip(accountTryDepositOrAbort)
+	public static func accountTryDepositOrAbort(
+		_ address: RETAddress,
+		_ bucket: ManifestBuilderBucket,
+		_ authorizedDepositorBadge: ResourceOrNonFungible?
+	) -> ManifestBuilder {
+		panic()
+	}
+
+	public static func accountDeposit(
+		_ recipientAddress: RETAddress,
+		_ bucket: ManifestBuilderBucket
+	) -> ManifestBuilder {
+		panic()
+	}
+
+	///	= flip(takeNonFungiblesFromWorktop)
+	public static func takeNonFungiblesFromWorktop(
+		_ resourceAddress: RETAddress,
+		_ localIds: [NonFungibleLocalId],
+		_ bucket: ManifestBuilderBucket
+	) -> ManifestBuilder {
+		panic()
+	}
+
+	public static func accountWithdrawNonFungibles(
+		_ account: RETAddress,
+		_ resourceAddress: RETAddress,
+		_ ids: [NonFungibleLocalId]
+	) -> ManifestBuilder.InstructionsChain.Instruction {
+		panic()
+	}
+
+	public static func createFungibleResourceManager(
+		_ ownerRole: OwnerRole,
+		_ trackTotalSupply: Bool,
+		_ divisibility: UInt8,
+		_ initialSupply: RETDecimal,
+		_ resourceRoles: FungibleResourceRoles,
+		_ metadata: MetadataModuleConfig,
+		_ addressReservation: ManifestBuilderAddressReservation?
+	) -> ManifestBuilder {
+		panic()
+	}
+
+	public static func validatorClaimXrd(
+		_ validatorAddress: RETAddress,
+		_ bucket: ManifestBuilderBucket
+	) -> ManifestBuilder {
+		panic()
+	}
 
 	@resultBuilder
 	public enum InstructionsChain {

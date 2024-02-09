@@ -10,16 +10,16 @@ public enum ResourcesListMode: Hashable, Sendable {
 
 // MARK: - ResourceViewState
 public struct ResourceViewState: Hashable, Sendable, Identifiable {
-	public enum EngineToolkitAddress: Hashable, Sendable {
+	public enum Address: Hashable, Sendable {
 		case assetException(ThirdPartyDeposits.AssetException)
 		case allowedDepositor(ThirdPartyDeposits.DepositorAddress)
 	}
 
-	public var id: EngineToolkitAddress { address }
+	public var id: Address { address }
 
 	let iconURL: URL?
 	let name: String?
-	let address: EngineToolkitAddress
+	let address: Address
 }
 
 // MARK: - ResourcesList
@@ -29,7 +29,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 	public struct State: Hashable, Sendable {
 		let canModify: Bool
 
-		var allDepositorAddresses: OrderedSet<ResourceViewState.EngineToolkitAddress> {
+		var allDepositorAddresses: OrderedSet<ResourceViewState.Address> {
 			switch mode {
 			case .allowDenyAssets:
 				OrderedSet(thirdPartyDeposits.assetsExceptionSet().map { .assetException($0) })
@@ -41,7 +41,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		var resourcesForDisplay: [ResourceViewState] {
 			switch mode {
 			case let .allowDenyAssets(exception):
-				let addresses: [ResourceViewState.EngineToolkitAddress] = thirdPartyDeposits.assetsExceptionSet()
+				let addresses: [ResourceViewState.Address] = thirdPartyDeposits.assetsExceptionSet()
 					.filter { $0.exceptionRule == exception }
 					.map { .assetException($0) }
 
@@ -65,7 +65,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 	public enum ViewAction: Equatable, Sendable {
 		case task
 		case addAssetTapped
-		case assetRemove(ResourceViewState.EngineToolkitAddress)
+		case assetRemove(ResourceViewState.Address)
 		case exceptionListChanged(ThirdPartyDeposits.DepositAddressExceptionRule)
 	}
 
@@ -74,7 +74,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 	}
 
 	public enum InternalAction: Equatable, Sendable {
-		case resourceLoaded(OnLedgerEntity.Resource?, ResourceViewState.EngineToolkitAddress)
+		case resourceLoaded(OnLedgerEntity.Resource?, ResourceViewState.Address)
 		case resourcesLoaded([OnLedgerEntity.Resource]?)
 	}
 
@@ -91,7 +91,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 			case confirmAssetDeletion(ConfirmDeletionAlert)
 
 			public enum ConfirmDeletionAlert: Hashable, Sendable {
-				case confirmTapped(ResourceViewState.EngineToolkitAddress)
+				case confirmTapped(ResourceViewState.Address)
 				case cancelTapped
 			}
 		}
@@ -217,7 +217,7 @@ extension AlertState<ResourcesList.Destination.Action.ConfirmDeletionAlert> {
 	static func confirmAssetDeletion(
 		_ title: String,
 		_ message: String,
-		resourceAddress: ResourceViewState.EngineToolkitAddress
+		resourceAddress: ResourceViewState.Address
 	) -> AlertState {
 		AlertState {
 			TextState(title)
@@ -234,7 +234,7 @@ extension AlertState<ResourcesList.Destination.Action.ConfirmDeletionAlert> {
 	}
 }
 
-extension ResourceViewState.EngineToolkitAddress {
+extension ResourceViewState.Address {
 	var resourceAddress: ResourceAddress {
 		switch self {
 		case let .assetException(resource):
@@ -273,7 +273,8 @@ extension ThirdPartyDeposits.DepositorAddress {
 		case let .resourceAddress(address):
 			address
 		case let .nonFungibleGlobalID(nonFungibleGlobalID):
-			try! nonFungibleGlobalID.resourceAddress().asSpecific()
+//			try! nonFungibleGlobalID.resourceAddress().asSpecific()
+			panic()
 		}
 	}
 }

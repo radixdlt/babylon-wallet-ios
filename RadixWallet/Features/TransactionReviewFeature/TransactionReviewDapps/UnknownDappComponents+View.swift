@@ -24,7 +24,7 @@ extension UnknownDappComponents {
 		}
 
 		@ViewBuilder
-		private func row(_ address: LedgerIdentifiable.EngineToolkitAddress, heading: String) -> some SwiftUI.View {
+		private func row(_ address: LedgerIdentifiable.RETAddress, heading: String) -> some SwiftUI.View {
 			HStack(spacing: .medium3) {
 				Thumbnail(.dapp, url: nil)
 

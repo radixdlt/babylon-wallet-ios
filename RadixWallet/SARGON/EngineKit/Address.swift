@@ -1,6 +1,21 @@
 
 
-public typealias EngineToolkitAddress = SpecificAddress<GeneralEntityType>
+public typealias Address = SpecificAddress<GeneralEntityType>
+
+// MARK: - RETAddress
+public struct RETAddress: DummySargonAddress {
+	public func entityType() -> EntityType {
+		panic()
+	}
+
+	public func addressString() -> String {
+		panic()
+	}
+
+	public init(address: String, decodedKind: EntityType) {
+		panic()
+	}
+}
 
 public typealias PackageAddress = SpecificAddress<PackageEntityType>
 public typealias ResourceAddress = SpecificAddress<ResourceEntityType>
@@ -154,13 +169,17 @@ public struct SpecificAddress<Kind: SpecificEntityType>: Sendable, Hashable, Ide
 
 	public let decodedKind: EntityType
 
+	public init(address: String) throws {
+		panic()
+	}
+
 	public init(address: String, decodedKind: EntityType) {
 		self.address = address
 		self.decodedKind = decodedKind
 	}
 
 	public init(validatingAddress address: String) throws {
-		let type = try EngineToolkitAddress(address: address).entityType()
+		let type = try RETAddress(address: address).entityType()
 		guard Kind.addressSpace.contains(type) else {
 			throw InvalidAddress(decodedKind: type, addressSpace: Kind.addressSpace)
 		}
@@ -194,13 +213,13 @@ extension SpecificAddress: CustomStringConvertible {
 }
 
 extension SpecificAddress {
-	public var asGeneral: EngineToolkitAddress {
+	public var asGeneral: RETAddress {
 		.init(address: address, decodedKind: decodedKind)
 	}
 }
 
 extension SpecificAddress {
-	public func intoEngine() throws -> EngineToolkitAddress {
+	public func intoEngine() throws -> RETAddress {
 		try .init(address: address)
 	}
 }
@@ -211,17 +230,17 @@ extension AccountAddress {
 	}
 }
 
-extension EngineToolkitAddress {
+extension RETAddress {
 	public func asSpecific<T>() throws -> SpecificAddress<T> {
 		try .init(validatingAddress: addressString())
 	}
 
-	public func asGeneral() throws -> EngineToolkitAddress {
+	public func asGeneral() throws -> RETAddress {
 		try asSpecific()
 	}
 }
 
-extension [EngineToolkitAddress] {
+extension [RETAddress] {
 	public func asSpecific<T>() throws -> [SpecificAddress<T>] {
 		try map { try $0.asSpecific() }
 	}

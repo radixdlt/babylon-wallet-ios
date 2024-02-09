@@ -2,7 +2,7 @@ public struct UnknownDappComponents: FeatureReducer, Sendable {
 	public struct State: Hashable, Sendable {
 		let title: String
 		let rowHeading: String
-		let addresses: [LedgerIdentifiable.EngineToolkitAddress]
+		let addresses: [LedgerIdentifiable.RETAddress]
 	}
 
 	public enum ViewAction: Sendable {

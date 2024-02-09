@@ -7,36 +7,74 @@ extension RETDecimal {
 
 // MARK: - RETDecimal + ExpressibleByIntegerLiteral
 extension RETDecimal: ExpressibleByIntegerLiteral {
-	public convenience init(integerLiteral value: Int) {
-		self.init(integer: value)
+	public init(integerLiteral value: Int) {
+//		self.init(integer: value)
+		panic()
 	}
 }
 
 // MARK: - RETDecimal + ExpressibleByFloatLiteral
 extension RETDecimal: ExpressibleByFloatLiteral {
-	public convenience init(floatLiteral value: Double) {
-		try! self.init(value: String(value))
+	public init(floatLiteral value: Double) {
+		panic()
 	}
 }
 
 extension RETDecimal {
 	public static let maxDivisibility: UInt = 18
 
+	public func isNegative() -> Bool {
+		panic()
+	}
+
 	public static var zero: RETDecimal {
 		panic()
 	}
 
-	public convenience init(integer: Int) {
-		try! self.init(value: String(integer))
+	public init(integer: Int) {
+		panic()
 	}
 
 	/// Creates the Decimal `10^exponent`
-	public convenience init(exponent: UInt) {
-		try! self.init(value: "1" + .zeros(length: Int(exponent)))
+	public init(exponent: UInt) {
+		panic()
 	}
 }
 
 // MARK: Arithmetic operators
+extension RETDecimal {
+	public func sub(other: RETDecimal) throws -> RETDecimal {
+		panic()
+	}
+
+	public func add(other: RETDecimal) throws -> RETDecimal {
+		panic()
+	}
+
+	public func mul(other: RETDecimal) throws -> RETDecimal {
+		panic()
+	}
+
+	public func div(other: RETDecimal) throws -> RETDecimal {
+		panic()
+	}
+
+	public func lessThan(other: RETDecimal) -> Bool {
+		panic()
+	}
+
+	public func lessThanOrEqual(other: RETDecimal) -> Bool {
+		panic()
+	}
+
+	public func greaterThan(other: RETDecimal) -> Bool {
+		panic()
+	}
+
+	public func greaterThanOrEqual(other: RETDecimal) -> Bool {
+		panic()
+	}
+}
 
 extension RETDecimal {
 	public static func + (lhs: RETDecimal, rhs: RETDecimal) -> RETDecimal {
@@ -92,7 +130,7 @@ extension RETDecimal {
 
 extension RETDecimal {
 	public var clamped: RETDecimal {
-		isNegative() ? .zero() : self
+		isNegative() ? .zero : self
 	}
 }
 
@@ -101,17 +139,20 @@ extension RETDecimal {
 extension RETDecimal {
 	/// Rounds to `decimalPlaces` decimals, in the direction of 0
 	public func floor(decimalPlaces: UInt) -> RETDecimal {
-		try! round(decimalPlaces: Int32(decimalPlaces), roundingMode: .toZero)
+//		try! round(decimalPlaces: Int32(decimalPlaces), roundingMode: .toZero)
+		panic()
 	}
 
 	/// Rounds to `decimalPlaces` decimals, in the direction away from zero
 	public func ceil(decimalPlaces: UInt) -> RETDecimal {
-		try! round(decimalPlaces: Int32(decimalPlaces), roundingMode: .awayFromZero)
+		panic()
+//		try! round(decimalPlaces: Int32(decimalPlaces), roundingMode: .awayFromZero)
 	}
 
 	/// Rounds to `decimalPlaces` decimals
 	public func rounded(decimalPlaces: UInt = 0) -> RETDecimal {
-		try! round(decimalPlaces: Int32(decimalPlaces), roundingMode: .toNearestMidpointAwayFromZero)
+		panic()
+//		try! round(decimalPlaces: Int32(decimalPlaces), roundingMode: .toNearestMidpointAwayFromZero)
 	}
 }
 
@@ -124,7 +165,7 @@ extension RETDecimal: Codable {
 	}
 
 	@inlinable
-	public convenience init(from decoder: Decoder) throws {
+	public init(from decoder: Decoder) throws {
 		let container = try decoder.singleValueContainer()
 		let string = try container.decode(String.self)
 		try self.init(value: string)
@@ -143,7 +184,7 @@ extension RETDecimal {
 	public static let scale: Int = 18
 
 	/// Parse a local respecting string
-	public convenience init(
+	public init(
 		formattedString: String,
 		locale: Locale = .autoupdatingCurrent
 	) throws {
@@ -158,7 +199,8 @@ extension RETDecimal {
 			string.replace(decimalSeparator, with: RETDecimal.machineReadableDecimalSeparator)
 		}
 
-		try self.init(value: string)
+//		try self.init(value: string)
+		panic()
 	}
 
 	/// A human readable, locale respecting string, rounded to `totalPlaces` places, counting all digits

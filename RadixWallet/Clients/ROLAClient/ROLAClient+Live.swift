@@ -10,7 +10,7 @@ extension ROLAClient {
 			let entity = request.entity
 			let newPublicKey = request.newPublicKey
 
-			let entityAddress: EngineToolkitAddress = switch entity {
+			let entityAddress: RETAddress = switch entity {
 			case let .account(account):
 				account.address.asGeneral
 			case let .persona(persona):
@@ -19,7 +19,7 @@ extension ROLAClient {
 			let metadata = try await onLedgerEntitiesClient.getEntity(entityAddress, metadataKeys: [.ownerKeys]).genericComponent?.metadata
 			var ownerKeyHashes = try metadata?.ownerKeyHashes() ?? []
 
-			let transactionSigningKeyHash: PublicKeyHash = switch entity.securityState {
+			let transactionSigningKeyHash: RETPublicKeyHash = switch entity.securityState {
 			case let .unsecured(control):
 				try .init(hashing: control.transactionSigning.publicKey)
 			}

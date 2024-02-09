@@ -1,5 +1,4 @@
 // MARK: - TransactionManifest + Sendable
-
 extension TransactionManifest: @unchecked Sendable {}
 
 // MARK: - NonFungibleGlobalId + Sendable
@@ -14,8 +13,8 @@ extension Instructions: @unchecked Sendable {}
 // MARK: - Instruction + Sendable
 extension Instruction: @unchecked Sendable {}
 
-// MARK: - EngineToolkitAddress + Sendable
-extension EngineToolkitAddress: @unchecked Sendable {}
+// MARK: - RETAddress + Sendable
+extension RETAddress: @unchecked Sendable {}
 
 // MARK: - ManifestValue + Sendable
 extension ManifestValue: @unchecked Sendable {}

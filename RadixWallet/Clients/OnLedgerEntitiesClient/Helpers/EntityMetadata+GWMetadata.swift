@@ -73,8 +73,8 @@ extension OnLedgerEntity.Metadata {
 		}
 	}
 
-	/// Check that `claimed_entities` is present and contains the provided `EngineToolkitAddress`
-	public func validate(dAppEntity entity: EngineToolkitAddress) throws {
+	/// Check that `claimed_entities` is present and contains the provided `RETAddress`
+	public func validate(dAppEntity entity: RETAddress) throws {
 		guard let claimedEntities else {
 			throw MetadataError.missingClaimedEntities
 		}

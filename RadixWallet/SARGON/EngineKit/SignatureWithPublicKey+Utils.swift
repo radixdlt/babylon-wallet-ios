@@ -1,33 +1,32 @@
-// MARK: - EngineToolkitSignature
-
-public enum EngineToolkitSignature {
+// MARK: - RETSignature
+public enum RETSignature: DummySargon {
 	case secp256k1(value: Data)
 	case ed25519(value: Data)
 }
 
-// MARK: - EngineToolkitSecp256k1Signature
-public struct EngineToolkitSecp256k1Signature {}
+// MARK: - RETSecp256k1Signature
+public struct RETSecp256k1Signature: DummySargon {}
 
-// MARK: - EngineToolkitSecp256k1PublicKey
-public struct EngineToolkitSecp256k1PublicKey {}
+// MARK: - RETSecp256k1PublicKey
+public struct RETSecp256k1PublicKey: DummySargon {}
 
-// MARK: - EngineToolkitEd25519PublicKey
-public struct EngineToolkitEd25519PublicKey {}
+// MARK: - RETEd25519PublicKey
+public struct RETEd25519PublicKey: DummySargon {}
 
-// MARK: - EngineToolkitPublicKey
-public enum EngineToolkitPublicKey {
+// MARK: - RETPublicKey
+public enum RETPublicKey: DummySargon {
 	case secp256k1(value: Data)
 	case ed25519(value: Data)
 }
 
-// MARK: - EngineToolkitSignatureWithPublicKey
-public enum EngineToolkitSignatureWithPublicKey {
-	case secp256k1(Data)
-	case ed25519(Data, Data)
+// MARK: - RETSignatureWithPublicKey
+public enum RETSignatureWithPublicKey: DummySargon {
+	case secp256k1(signature: Data)
+	case ed25519(signature: Data, publicKey: Data)
 }
 
-extension EngineToolkitSignatureWithPublicKey {
-	public var signature: EngineToolkitSignature {
+extension RETSignatureWithPublicKey {
+	public var signature: RETSignature {
 		switch self {
 		case let .secp256k1(signature):
 			.secp256k1(value: signature)
@@ -36,7 +35,7 @@ extension EngineToolkitSignatureWithPublicKey {
 		}
 	}
 
-	public var publicKey: EngineToolkitPublicKey? {
+	public var publicKey: RETPublicKey? {
 		switch self {
 		case .secp256k1:
 			nil
@@ -46,7 +45,7 @@ extension EngineToolkitSignatureWithPublicKey {
 	}
 }
 
-extension EngineToolkitSignature {
+extension RETSignature {
 	public var bytes: Data {
 		switch self {
 		case let .secp256k1(value):
@@ -57,7 +56,7 @@ extension EngineToolkitSignature {
 	}
 }
 
-extension EngineToolkitPublicKey {
+extension RETPublicKey {
 	public var bytes: Data {
 		switch self {
 		case let .secp256k1(value):

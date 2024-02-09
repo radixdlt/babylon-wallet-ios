@@ -2,7 +2,7 @@
 /// An factor instance created from a FactorSource.
 public struct FactorInstance: Sendable, Hashable, Codable, Identifiable, FactorOfTierProtocol {
 	// FIXME: COMPLETELY incorrectly implemented, MUST be sent in probably, because Profile cannot
-	// use EngineToolkit which we must, to do Blake hash.
+	// use RET which we must, to do Blake hash.
 	/// A string uniquely identifying this Factor Source, on format:
 	/// `FactorSourceKind(1) || "#" || BadgeAddress(String)` e.g.
 	/// `de#resource_sim1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs64j5z6:[9f58abcbc2ebd2da349acb10773ffbc37b6af91fa8df2486c9ea]"`
@@ -28,7 +28,7 @@ public struct FactorInstance: Sendable, Hashable, Codable, Identifiable, FactorO
 	public let factorSourceID: FactorSourceID
 
 	// FIXME: CHANGE TO STORED PROPERTY, COMPLETELY incorrectly implemented, MUST be sent in probably, because Profile cannot
-	// use EngineToolkit which we must, to do Blake hash.
+	// use RET which we must, to do Blake hash.
 	/// FactorInstanceID is a referenced by security structure
 	public var id: ID {
 		switch badge {
@@ -300,7 +300,7 @@ extension FactorInstance.ID.BadgeAddress {
 		} else if var resourceAddressContainer = try? container.nestedUnkeyedContainer(forKey: .resourceAddress) {
 			self = try .resourceAddress(.init(validatingAddress: resourceAddressContainer.decode(String.self)))
 		} else {
-			throw DecodingError.dataCorruptedError(forKey: .virtual, in: container, debugDescription: "Invalid Badge EngineToolkitAddress")
+			throw DecodingError.dataCorruptedError(forKey: .virtual, in: container, debugDescription: "Invalid Badge RETAddress")
 		}
 	}
 

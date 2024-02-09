@@ -2,8 +2,8 @@
 
 extension ManifestBuilder {
 	public func setOwnerKeys(
-		from entity: EngineToolkitAddress,
-		ownerKeyHashes: [PublicKeyHash]
+		from entity: Address,
+		ownerKeyHashes: [RETPublicKeyHash]
 	) throws -> ManifestBuilder {
 		try metadataSet(
 			address: entity.intoEngine(),
@@ -13,16 +13,25 @@ extension ManifestBuilder {
 	}
 
 	public func setAccountType(
-		from entity: EngineToolkitAddress,
+		from entity: Address,
 		type: String
 	) throws -> ManifestBuilder {
 		try metadataSet(address: entity.intoEngine(), key: "account_type", value: .stringValue(value: type))
+	}
+
+	public func metadataSet(
+		address: RETAddress,
+		key: String,
+		value: MetadataValue
+	) throws -> ManifestBuilder {
+		panic()
 	}
 }
 
 extension ManifestBuilderBucket {
 	public static var unique: ManifestBuilderBucket {
-		.init(name: UUID().uuidString)
+//		.init(name: UUID().uuidString)
+		panic()
 	}
 }
 
@@ -41,7 +50,7 @@ extension TransactionManifest {
 	}
 
 	public func withLockFeeCallMethodAdded(
-		address: EngineToolkitAddress,
+		address: RETAddress,
 		fee: RETDecimal = .temporaryStandardFee
 	) throws -> TransactionManifest {
 		try withInstructionAdded(
@@ -61,7 +70,7 @@ extension Instructions {
 
 extension Instruction {
 	static func lockFeeCall(
-		address: EngineToolkitAddress,
+		address: RETAddress,
 		fee: RETDecimal
 	) throws -> Instruction {
 		try .callMethod(

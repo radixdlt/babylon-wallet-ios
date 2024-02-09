@@ -1,7 +1,5 @@
+// MARK: - TransactionIntent + CustomStringConvertible
 
-public typealias TransactionIntent = Intent
-
-// MARK: CustomStringConvertible
 extension TransactionIntent: CustomStringConvertible {}
 
 // MARK: - TransactionHeader + CustomStringConvertible
