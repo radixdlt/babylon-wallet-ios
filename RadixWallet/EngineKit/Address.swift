@@ -153,7 +153,7 @@ public struct SpecificAddress<Kind: SpecificEntityType>: Sendable, Hashable, Ide
 	}
 
 	public init(validatingAddress address: String) throws {
-		let type = try EngineToolkit.Address(address: address).entityType()
+		let type = try RETAddress(address: address).entityType()
 		guard Kind.addressSpace.contains(type) else {
 			throw InvalidAddress(decodedKind: type, addressSpace: Kind.addressSpace)
 		}
@@ -193,7 +193,7 @@ extension SpecificAddress {
 }
 
 extension SpecificAddress {
-	public func intoEngine() throws -> EngineToolkit.Address {
+	public func intoEngine() throws -> RETAddress {
 		try .init(address: address)
 	}
 }
@@ -204,7 +204,7 @@ extension AccountAddress {
 	}
 }
 
-extension EngineToolkit.Address {
+extension RETAddress {
 	public func asSpecific<T>() throws -> SpecificAddress<T> {
 		try .init(validatingAddress: addressString())
 	}
@@ -214,7 +214,7 @@ extension EngineToolkit.Address {
 	}
 }
 
-extension [EngineToolkit.Address] {
+extension [RETAddress] {
 	public func asSpecific<T>() throws -> [SpecificAddress<T>] {
 		try map { try $0.asSpecific() }
 	}

@@ -26,23 +26,8 @@ extension ExecutionSummary {
 		[:] // TODO: Is this never populated for .general?
 	}
 
-	public var addressesOfNewlyCreatedEntities: [EngineToolkit.Address] {
+	public var addressesOfNewlyCreatedEntities: [RETAddress] {
 		newEntities.componentAddresses + newEntities.packageAddresses + newEntities.resourceAddresses
-	}
-}
-
-extension Dictionary {
-	func mapKeys<U>(_ f: (Key) throws -> U) throws -> [U: Value] {
-		try mapKeyValues(f, fValue: { $0 })
-	}
-
-	func mapKeyValues<U, T>(_ fKey: (Key) throws -> U, fValue: (Value) throws -> T) throws -> [U: T] {
-		try .init(
-			map {
-				try (fKey($0.key), fValue($0.value))
-			},
-			uniquingKeysWith: { first, _ in first }
-		)
 	}
 }
 
@@ -62,7 +47,7 @@ extension ResourceSpecifier {
 		return nil
 	}
 
-	public var resourceAddress: EngineToolkit.Address {
+	public var resourceAddress: RETAddress {
 		switch self {
 		case let .amount(resourceAddress, _):
 			resourceAddress
@@ -82,7 +67,7 @@ extension ResourceSpecifier {
 }
 
 extension ResourceIndicator {
-	public var resourceAddress: EngineToolkit.Address {
+	public var resourceAddress: RETAddress {
 		switch self {
 		case let .fungible(address, _):
 			address

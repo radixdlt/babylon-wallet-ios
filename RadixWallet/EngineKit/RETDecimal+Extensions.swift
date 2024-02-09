@@ -1,6 +1,6 @@
-import EngineToolkit
+// MARK: - RETDecimal
 
-public typealias RETDecimal = EngineToolkit.Decimal
+public final class RETDecimal {}
 
 extension RETDecimal {
 	// Used for development purposes

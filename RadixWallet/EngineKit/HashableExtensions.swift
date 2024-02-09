@@ -658,9 +658,9 @@ extension Hash: Equatable {
 	}
 }
 
-// MARK: - EngineToolkit.Address + Hashable
-extension EngineToolkit.Address: Hashable {
-	public static func == (lhs: EngineToolkit.Address, rhs: EngineToolkit.Address) -> Bool {
+// MARK: - RETAddress + Hashable
+extension RETAddress: Hashable {
+	public static func == (lhs: RETAddress, rhs: RETAddress) -> Bool {
 		lhs.addressString() == rhs.addressString()
 	}
 

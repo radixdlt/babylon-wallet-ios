@@ -144,7 +144,7 @@ extension ROLAClient {
 	}
 }
 
-extension EngineToolkit.PublicKeyHash {
+extension RETPublicKeyHash {
 	public struct InvalidPublicKeyHashLength: Error {
 		public let got: Int
 		public let expected: Int
@@ -171,7 +171,7 @@ extension EngineToolkit.PublicKeyHash {
 }
 
 extension OnLedgerEntity.Metadata {
-	public func ownerKeyHashes() throws -> [EngineToolkit.PublicKeyHash]? {
+	public func ownerKeyHashes() throws -> [RETPublicKeyHash]? {
 		try ownerKeys?.value.map { hash in
 			switch hash {
 			case let .ecdsaSecp256k1(value):

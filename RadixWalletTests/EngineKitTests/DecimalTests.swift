@@ -259,7 +259,7 @@ final class DecimalTests: TestCase {
 	}
 
 	func test_parse_formatted_decimal() throws {
-		func doTest(_ formattedString: String, locale: Locale, expected: EngineToolkit.Decimal, line: UInt = #line) throws {
+		func doTest(_ formattedString: String, locale: Locale, expected: RETDecimal, line: UInt = #line) throws {
 			let result = try RETDecimal(formattedString: formattedString, locale: locale)
 			XCTAssertEqual(result, expected, line: line)
 		}

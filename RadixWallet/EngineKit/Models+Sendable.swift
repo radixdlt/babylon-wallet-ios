@@ -15,8 +15,8 @@ extension Instructions: @unchecked Sendable {}
 // MARK: - Instruction + Sendable
 extension Instruction: @unchecked Sendable {}
 
-// MARK: - EngineToolkit.Address + Sendable
-extension EngineToolkit.Address: @unchecked Sendable {}
+// MARK: - RETAddress + Sendable
+extension RETAddress: @unchecked Sendable {}
 
 // MARK: - ManifestValue + Sendable
 extension ManifestValue: @unchecked Sendable {}

@@ -15,7 +15,7 @@ extension ManifestBuilder {
 	) throws -> TransactionManifest {
 		let accountAddress = try accountAddress.intoEngine()
 		let networkId = accountAddress.networkId()
-		let xrdAddress = EngineToolkit.Address.xrd(networkId)
+		let xrdAddress = RETAddress.xrd(networkId)
 
 		return try make {
 			for stakeClaim in stakeClaims {
