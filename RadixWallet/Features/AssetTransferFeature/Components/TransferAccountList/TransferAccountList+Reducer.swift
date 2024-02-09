@@ -18,7 +18,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		}
 
 		@PresentationState
-		public var destination: Destinations.State?
+		public var destination: Destination.State?
 
 		public init(fromAccount: Profile.Network.Account, receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>) {
 			self.fromAccount = fromAccount
@@ -37,8 +37,8 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		case addAccountTapped
 	}
 
+	@CasePathable
 	public enum ChildAction: Equatable, Sendable {
-		case destination(PresentationAction<Destinations.Action>)
 		case receivingAccount(id: ReceivingAccount.State.ID, action: ReceivingAccount.Action)
 	}
 
@@ -54,26 +54,30 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		)
 	}
 
-	public struct Destinations: Sendable, Reducer {
-		public typealias State = RelayState<ReceivingAccount.State.ID, MainState>
-		public typealias Action = RelayAction<ReceivingAccount.State.ID, MainAction>
+	public struct Destination: DestinationReducer {
+		public struct State: Sendable, Hashable {
+			let id: ReceivingAccount.State.ID
+			var state: MainState
+		}
 
+		@CasePathable
 		public enum MainState: Sendable, Hashable {
 			case chooseAccount(ChooseReceivingAccount.State)
 			case addAsset(AssetsView.State)
 		}
 
-		public enum MainAction: Sendable, Equatable {
+		@CasePathable
+		public enum Action: Sendable, Equatable {
 			case chooseAccount(ChooseReceivingAccount.Action)
 			case addAsset(AssetsView.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Relay {
-				Scope(state: /MainState.chooseAccount, action: /MainAction.chooseAccount) {
+			Scope(state: \.state, action: \.self) {
+				Scope(state: \.chooseAccount, action: \.chooseAccount) {
 					ChooseReceivingAccount()
 				}
-				Scope(state: /MainState.addAsset, action: /MainAction.addAsset) {
+				Scope(state: \.addAsset, action: \.addAsset) {
 					AssetsView()
 				}
 			}
@@ -82,15 +86,15 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(destinationPath, action: /Action.child .. ChildAction.destination) {
-				Destinations()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 			.forEach(\.receivingAccounts, action: /Action.child .. ChildAction.receivingAccount) {
 				ReceivingAccount()
 			}
 	}
 
-	private let destinationPath: WritableKeyPath<State, PresentationState<Destinations.State>> = \.$destination
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -125,29 +129,30 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			default:
 				return .none
 			}
+		}
+	}
 
-		case let .destination(.presented(.relay(id, destinationAction))):
-			switch destinationAction {
-			case let .chooseAccount(.delegate(.handleResult(account))):
-				state.receivingAccounts[id: id]?.account = account
-				state.destination = nil
-				return .none
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		guard let id = state.destination?.id else { return .none }
 
-			case .chooseAccount(.delegate(.dismiss)):
-				state.destination = nil
-				return .none
+		switch presentedAction {
+		case let .chooseAccount(.delegate(.handleResult(account))):
+			state.receivingAccounts[id: id]?.account = account
+			state.destination = nil
+			return .none
 
-			case let .addAsset(.delegate(.handleSelectedAssets(selectedAssets))):
-				state.destination = nil
-				return handleSelectedAssets(selectedAssets, id: id, state: &state)
+		case .chooseAccount(.delegate(.dismiss)):
+			state.destination = nil
+			return .none
 
-			case .addAsset(.delegate(.dismiss)):
-				state.destination = nil
-				return .none
+		case let .addAsset(.delegate(.handleSelectedAssets(selectedAssets))):
+			state.destination = nil
+			return handleSelectedAssets(selectedAssets, id: id, state: &state)
 
-			default:
-				return .none
-			}
+		case .addAsset(.delegate(.dismiss)):
+			state.destination = nil
+			return .none
+
 		default:
 			return .none
 		}
@@ -237,7 +242,7 @@ extension TransferAccountList {
 			)
 		)
 
-		state.destination = .relayed(id, with: .chooseAccount(chooseAccount))
+		state.destination = .init(id: id, state: .chooseAccount(chooseAccount))
 		return .none
 	}
 
@@ -273,9 +278,9 @@ extension TransferAccountList {
 			.nonFungibleAssets
 			.map(\.nftToken.id)
 
-		state.destination = .relayed(
-			id,
-			with: .addAsset(.init(
+		state.destination = .init(
+			id: id,
+			state: .addAsset(.init(
 				account: state.fromAccount,
 				mode: .selection(.init(
 					fungibleResources: selectedFungibleResources,
@@ -284,6 +289,7 @@ extension TransferAccountList {
 				))
 			))
 		)
+
 		return .none
 	}
 

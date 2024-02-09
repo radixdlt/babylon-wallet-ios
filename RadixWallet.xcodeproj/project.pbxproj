@@ -938,7 +938,6 @@
 		48CFC5EE2ADC10DA00E77A5C /* SlideUpPanel+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1472ADC10D900E77A5C /* SlideUpPanel+View.swift */; };
 		48CFC5EF2ADC10DA00E77A5C /* SmallAccountCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1482ADC10D900E77A5C /* SmallAccountCard.swift */; };
 		48CFC5F02ADC10DA00E77A5C /* UserDefaultsClient+AccountRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1492ADC10D900E77A5C /* UserDefaultsClient+AccountRecovery.swift */; };
-		48CFC5F12ADC10DA00E77A5C /* Relay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC14A2ADC10D900E77A5C /* Relay.swift */; };
 		48CFC5F22ADC10DA00E77A5C /* AssetResource.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC14D2ADC10D900E77A5C /* AssetResource.generated.swift */; };
 		48CFC5F32ADC10DA00E77A5C /* Fonts.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC14E2ADC10D900E77A5C /* Fonts.generated.swift */; };
 		48CFC5F42ADC10DA00E77A5C /* L10n.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC14F2ADC10D900E77A5C /* L10n.generated.swift */; };
@@ -1113,7 +1112,6 @@
 		48F9CFE52B03A09400657755 /* ProfileBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F9CFE32B0375A500657755 /* ProfileBuilder.swift */; };
 		48F9CFE72B03A0A000657755 /* ProfileBuilderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F9CFE62B03A0A000657755 /* ProfileBuilderTest.swift */; };
 		48FF43152AE43C7C00C568B9 /* TimeLimit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48FF43142AE43C7C00C568B9 /* TimeLimit.swift */; };
-		48FFFA962ADC1EBC00B2B213 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFA952ADC1EBC00B2B213 /* ComposableArchitecture */; };
 		48FFFA992ADC1EEC00B2B213 /* AsyncExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFA982ADC1EEC00B2B213 /* AsyncExtensions */; };
 		48FFFA9C2ADC1F1600B2B213 /* K1 in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFA9B2ADC1F1600B2B213 /* K1 */; };
 		48FFFA9F2ADC1F2700B2B213 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFA9E2ADC1F2700B2B213 /* KeychainAccess */; };
@@ -1224,6 +1222,7 @@
 		A41266F12B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift */; };
 		A41266F72B160F3F00EA38E9 /* ManualAccountRecoveryCoordinator+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F62B160F3F00EA38E9 /* ManualAccountRecoveryCoordinator+Reducer.swift */; };
 		A41266F92B160F4C00EA38E9 /* ManualAccountRecoveryCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F82B160F4C00EA38E9 /* ManualAccountRecoveryCoordinator+View.swift */; };
+		A41557502B757C5E0040AD4E /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = A415574F2B757C5E0040AD4E /* ComposableArchitecture */; };
 		A43715202B509BAE0010EA4A /* PoolUnitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A437151F2B509BAE0010EA4A /* PoolUnitView.swift */; };
 		A47571FF2B29B0860059A95D /* IOSSecuritySuite in Frameworks */ = {isa = PBXBuildFile; productRef = A47571FE2B29B0860059A95D /* IOSSecuritySuite */; };
 		A47572042B29B4EE0059A95D /* IOSSecurityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */; };
@@ -2294,7 +2293,6 @@
 		48CFC1472ADC10D900E77A5C /* SlideUpPanel+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SlideUpPanel+View.swift"; sourceTree = "<group>"; };
 		48CFC1482ADC10D900E77A5C /* SmallAccountCard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SmallAccountCard.swift; sourceTree = "<group>"; };
 		48CFC1492ADC10D900E77A5C /* UserDefaultsClient+AccountRecovery.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaultsClient+AccountRecovery.swift"; sourceTree = "<group>"; };
-		48CFC14A2ADC10D900E77A5C /* Relay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Relay.swift; sourceTree = "<group>"; };
 		48CFC14D2ADC10D900E77A5C /* AssetResource.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetResource.generated.swift; sourceTree = "<group>"; };
 		48CFC14E2ADC10D900E77A5C /* Fonts.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Fonts.generated.swift; sourceTree = "<group>"; };
 		48CFC14F2ADC10D900E77A5C /* L10n.generated.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = L10n.generated.swift; sourceTree = "<group>"; };
@@ -2687,7 +2685,6 @@
 				48FFFA9C2ADC1F1600B2B213 /* K1 in Frameworks */,
 				48FFFAF72ADC241A00B2B213 /* Collections in Frameworks */,
 				48FFFAF92ADC241A00B2B213 /* DequeModule in Frameworks */,
-				48FFFA962ADC1EBC00B2B213 /* ComposableArchitecture in Frameworks */,
 				48FFFAAB2ADC1FE900B2B213 /* DependenciesAdditions in Frameworks */,
 				48FFFAA22ADC1F5D00B2B213 /* Algorithms in Frameworks */,
 				48FFFAC12ADC20C400B2B213 /* JSONPreview in Frameworks */,
@@ -2707,6 +2704,7 @@
 				48FFFA992ADC1EEC00B2B213 /* AsyncExtensions in Frameworks */,
 				E63D123D2ADD1FC00001CBB1 /* SwiftUIIntrospect in Frameworks */,
 				48FFFABC2ADC209100B2B213 /* NukeExtensions in Frameworks */,
+				A41557502B757C5E0040AD4E /* ComposableArchitecture in Frameworks */,
 				48FFFAFD2ADC241A00B2B213 /* HeapModule in Frameworks */,
 				48FFFAD52ADC21B900B2B213 /* LegibleError in Frameworks */,
 				48FFFB082ADC6FD300B2B213 /* SwiftUINavigationCore in Frameworks */,
@@ -6021,7 +6019,6 @@
 				48CFC1452ADC10D900E77A5C /* SlideUpPanel */,
 				48CFC1482ADC10D900E77A5C /* SmallAccountCard.swift */,
 				48CFC1492ADC10D900E77A5C /* UserDefaultsClient+AccountRecovery.swift */,
-				48CFC14A2ADC10D900E77A5C /* Relay.swift */,
 			);
 			path = FeaturePrelude;
 			sourceTree = "<group>";
@@ -7677,7 +7674,6 @@
 			);
 			name = RadixWallet;
 			packageProductDependencies = (
-				48FFFA952ADC1EBC00B2B213 /* ComposableArchitecture */,
 				48FFFA982ADC1EEC00B2B213 /* AsyncExtensions */,
 				48FFFA9B2ADC1F1600B2B213 /* K1 */,
 				48FFFA9E2ADC1F2700B2B213 /* KeychainAccess */,
@@ -7718,6 +7714,7 @@
 				48FFFB0C2ADC744700B2B213 /* TextBuilder */,
 				E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */,
 				A47571FE2B29B0860059A95D /* IOSSecuritySuite */,
+				A415574F2B757C5E0040AD4E /* ComposableArchitecture */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -7754,7 +7751,6 @@
 			);
 			mainGroup = 48CFBC462ADC106300E77A5C;
 			packageReferences = (
-				48FFFA942ADC1EBC00B2B213 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 				48FFFA972ADC1EEC00B2B213 /* XCRemoteSwiftPackageReference "AsyncExtensions" */,
 				48FFFA9A2ADC1F1600B2B213 /* XCRemoteSwiftPackageReference "K1" */,
 				48FFFA9D2ADC1F2700B2B213 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
@@ -7787,6 +7783,7 @@
 				48FFFB042ADC6FD300B2B213 /* XCRemoteSwiftPackageReference "swiftui-navigation" */,
 				48FFFB0B2ADC744700B2B213 /* XCRemoteSwiftPackageReference "TextBuilder" */,
 				A47571FD2B29B0860059A95D /* XCRemoteSwiftPackageReference "IOSSecuritySuite" */,
+				A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -9046,7 +9043,6 @@
 				83EE47912AF0EE3C00155F03 /* FromLedgerStateMixin.swift in Sources */,
 				48CFC5BD2ADC10DA00E77A5C /* Hint.swift in Sources */,
 				48CFC3622ADC10D900E77A5C /* LedgerHardwareDevices+Reducer.swift in Sources */,
-				48CFC5F12ADC10DA00E77A5C /* Relay.swift in Sources */,
 				48CFC2B22ADC10D900E77A5C /* DerivePublicKeys.swift in Sources */,
 				48CFC3D72ADC10D900E77A5C /* BIP39+Entropy.swift in Sources */,
 				48CFC34D2ADC10D900E77A5C /* Login.swift in Sources */,
@@ -9586,14 +9582,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		48FFFA942ADC1EBC00B2B213 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/radixdlt/swift-composable-architecture";
-			requirement = {
-				branch = "full-scope-1.4.2";
-				kind = branch;
-			};
-		};
 		48FFFA972ADC1EEC00B2B213 /* XCRemoteSwiftPackageReference "AsyncExtensions" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sideeffect-io/AsyncExtensions.git";
@@ -9842,6 +9830,14 @@
 				minimumVersion = 3.0.1;
 			};
 		};
+		A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.7.3;
+			};
+		};
 		A47571FD2B29B0860059A95D /* XCRemoteSwiftPackageReference "IOSSecuritySuite" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/securing/IOSSecuritySuite.git";
@@ -9853,11 +9849,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		48FFFA952ADC1EBC00B2B213 /* ComposableArchitecture */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 48FFFA942ADC1EBC00B2B213 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
-			productName = ComposableArchitecture;
-		};
 		48FFFA982ADC1EEC00B2B213 /* AsyncExtensions */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFA972ADC1EEC00B2B213 /* XCRemoteSwiftPackageReference "AsyncExtensions" */;
@@ -10047,6 +10038,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFB0B2ADC744700B2B213 /* XCRemoteSwiftPackageReference "TextBuilder" */;
 			productName = TextBuilder;
+		};
+		A415574F2B757C5E0040AD4E /* ComposableArchitecture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			productName = ComposableArchitecture;
 		};
 		A47571FE2B29B0860059A95D /* IOSSecuritySuite */ = {
 			isa = XCSwiftPackageProductDependency;

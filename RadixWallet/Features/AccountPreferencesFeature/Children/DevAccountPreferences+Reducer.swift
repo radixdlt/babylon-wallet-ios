@@ -84,12 +84,14 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 	// MARK: - Destination
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Hashable, Sendable {
 			#if DEBUG
 			case reviewTransaction(TransactionReview.State)
 			#endif // DEBUG
 		}
 
+		@CasePathable
 		public enum Action: Equatable, Sendable {
 			#if DEBUG
 			case reviewTransaction(TransactionReview.Action)

@@ -20,6 +20,7 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 		case loadDetailsForSecurityStructureResult(TaskResult<SecurityStructureConfigurationDetailed>)
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case configList(SecurityStructureConfigurationList.Action)
 	}
@@ -27,10 +28,12 @@ public struct SecurityStructureConfigurationListCoordinator: Sendable, FeatureRe
 	// MARK: - Destination
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Hashable, Sendable {
 			case manageSecurityStructureCoordinator(ManageSecurityStructureCoordinator.State)
 		}
 
+		@CasePathable
 		public enum Action: Equatable, Sendable {
 			case manageSecurityStructureCoordinator(ManageSecurityStructureCoordinator.Action)
 		}

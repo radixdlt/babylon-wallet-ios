@@ -1,10 +1,13 @@
 // MARK: - AccountAndPersonaHiding
+@Reducer
 public struct AccountAndPersonaHiding: Sendable, FeatureReducer {
+	// MARK: - State
+
 	public struct State: Hashable, Sendable {
 		public var hiddenEntityCounts: EntitiesVisibilityClient.HiddenEntityCounts?
 
 		@PresentationState
-		public var confirmUnhideAllAlert: AlertState<ViewAction.ConfirmUnhideAllAlert>?
+		public var destination: Destination.State? = nil
 	}
 
 	public enum ViewAction: Hashable, Sendable {
@@ -24,9 +27,40 @@ public struct AccountAndPersonaHiding: Sendable, FeatureReducer {
 		case didUnhideAllEntities
 	}
 
+	@Reducer
+	public struct Destination: DestinationReducer {
+		public enum State: Sendable, Hashable {
+			case confirmUnhideAllAlert(AlertState<Action.ConfirmUnhideAllAlert>)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case confirmUnhideAllAlert(ConfirmUnhideAllAlert)
+
+			public enum ConfirmUnhideAllAlert: Hashable, Sendable {
+				case confirmTapped
+				case cancelTapped
+			}
+		}
+
+		public var body: some ReducerOf<Self> {
+			EmptyReducer()
+		}
+	}
+
+	// MARK: - Reducer
+
 	@Dependency(\.entitiesVisibilityClient) var entitiesVisibilityClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.errorQueue) var errorQueue
+
+	public var body: some ReducerOf<Self> {
+		Reduce(core)
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
+			}
+	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -36,19 +70,19 @@ public struct AccountAndPersonaHiding: Sendable, FeatureReducer {
 				await send(.internal(.hiddenEntityCountsLoaded(counts)))
 			}
 		case .unhideAllTapped:
-			state.confirmUnhideAllAlert = .init(
+			state.destination = .confirmUnhideAllAlert(.init(
 				title: .init(L10n.AppSettings.EntityHiding.unhideAllSection),
 				message: .init(L10n.AppSettings.EntityHiding.unhideAllConfirmation),
 				buttons: [
 					.default(.init(L10n.Common.continue), action: .send(.confirmTapped)),
 					.cancel(.init(L10n.Common.cancel), action: .send(.cancelTapped)),
 				]
-			)
+			))
 			return .none
 
 		case let .confirmUnhideAllAlert(action):
 			defer {
-				state.confirmUnhideAllAlert = nil
+				state.destination = nil
 			}
 
 			switch action {

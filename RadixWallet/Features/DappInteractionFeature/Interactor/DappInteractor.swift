@@ -78,18 +78,18 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	struct Modal: Sendable, Reducer {
 		enum State: Sendable, Hashable {
-			case dappInteraction(RelayState<RequestEnvelope, DappInteractionCoordinator.State>)
+			case dappInteraction(DappInteractionCoordinator.State)
 			case dappInteractionCompletion(Completion.State)
 		}
 
 		enum Action: Sendable, Equatable {
-			case dappInteraction(RelayAction<RequestEnvelope, DappInteractionCoordinator.Action>)
+			case dappInteraction(DappInteractionCoordinator.Action)
 			case dappInteractionCompletion(Completion.Action)
 		}
 
 		var body: some ReducerOf<Self> {
 			Scope(state: /State.dappInteraction, action: /Action.dappInteraction) {
-				Relay { DappInteractionCoordinator() }
+				DappInteractionCoordinator()
 			}
 			Scope(state: /State.dappInteractionCompletion, action: /Action.dappInteractionCompletion) {
 				Completion()
@@ -249,15 +249,30 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 	func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.submit(responseToDapp, dappMetadata)))))):
-			return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
-		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismiss(dappMetadata, txID)))))):
-			dismissCurrentModalAndRequest(request, for: &state)
-			return .send(.internal(.presentResponseSuccessView(dappMetadata, txID)))
+		case let .modal(.presented(.dappInteraction(.delegate(delegateAction)))):
+			guard case let .dappInteraction(dappInteraction) = state.currentModal else {
+				let message = "We should only get actions from this modal if it is showing"
+				assertionFailure(message)
+				loggerGlobal.error(.init(stringLiteral: message))
+				return .none
+			}
+			guard let request = state.requestQueue[id: dappInteraction.interaction.id] else {
+				let message = "The request for this interaction is missing"
+				assertionFailure(message)
+				loggerGlobal.error(.init(stringLiteral: message))
+				return .none
+			}
 
-		case let .modal(.presented(.dappInteraction(.relay(request, .delegate(.dismissSilently))))):
-			dismissCurrentModalAndRequest(request, for: &state)
-			return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
+			switch delegateAction {
+			case let .submit(responseToDapp, dappMetadata):
+				return sendResponseToDappEffect(responseToDapp, for: request, dappMetadata: dappMetadata)
+			case let .dismiss(dappMetadata, txID):
+				dismissCurrentModalAndRequest(request, for: &state)
+				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID)))
+			case .dismissSilently:
+				dismissCurrentModalAndRequest(request, for: &state)
+				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
+			}
 
 		case .modal(.dismiss):
 			if case .dappInteractionCompletion = state.currentModal {
@@ -280,7 +295,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 		else {
 			return .none
 		}
-		state.currentModal = .dappInteraction(.relayed(next, with: .init(interaction: next.request)))
+
+		state.currentModal = .dappInteraction(.init(interaction: next.request))
 
 		return .none
 	}
