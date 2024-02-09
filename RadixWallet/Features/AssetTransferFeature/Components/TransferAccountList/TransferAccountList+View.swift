@@ -46,7 +46,7 @@ extension TransferAccountList.View {
 
 				VStack(spacing: .medium3) {
 					ForEachStore(
-						store.scope(state: \.receivingAccounts, action: { .child(.receivingAccount(id: $0, action: $1)) }),
+						store.scope(state: \.receivingAccounts, action: \.child.receivingAccount),
 						content: { ReceivingAccount.View(store: $0) }
 					)
 				}
@@ -82,21 +82,13 @@ private extension View {
 	}
 
 	private func chooseAccount(with destinationStore: PresentationStoreOf<TransferAccountList.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /TransferAccountList.Destination.State.chooseAccount,
-			action: TransferAccountList.Destination.Action.chooseAccount
-		) {
+		sheet(store: destinationStore.scope(state: \.state.chooseAccount, action: \.chooseAccount)) {
 			ChooseReceivingAccount.View(store: $0)
 		}
 	}
 
 	private func addAsset(with destinationStore: PresentationStoreOf<TransferAccountList.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /TransferAccountList.Destination.State.addAsset,
-			action: TransferAccountList.Destination.Action.addAsset
-		) { assetsStore in
+		sheet(store: destinationStore.scope(state: \.state.addAsset, action: \.addAsset)) { assetsStore in
 			AssetsView.View(store: assetsStore)
 				.withNavigationBar {
 					assetsStore.send(.view(.closeButtonTapped))

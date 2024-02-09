@@ -17,18 +17,8 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 			}
 		}
 
-		public mutating func showDestination(_ destination: Destination.State, id: ReceivingAccount.State.ID) {
-			self.destinationReceivingAccountID = id
-			self.destination = destination
-		}
-
 		@PresentationState
-		public var destination: Destination.State? {
-			didSet { if destination == nil { destinationReceivingAccountID = nil } }
-		}
-
-		// This identifies which row we are showing a sheet for, in destination
-		public var destinationReceivingAccountID: ReceivingAccount.State.ID?
+		public var destination: Destination.State?
 
 		public init(fromAccount: Profile.Network.Account, receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>) {
 			self.fromAccount = fromAccount
@@ -47,6 +37,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		case addAccountTapped
 	}
 
+	@CasePathable
 	public enum ChildAction: Equatable, Sendable {
 		case receivingAccount(id: ReceivingAccount.State.ID, action: ReceivingAccount.Action)
 	}
@@ -64,22 +55,31 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 	}
 
 	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
+		public struct State: Sendable, Hashable {
+			let id: ReceivingAccount.State.ID
+			var state: MainState
+		}
+
+		@CasePathable
+		public enum MainState: Sendable, Hashable {
 			case chooseAccount(ChooseReceivingAccount.State)
 			case addAsset(AssetsView.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case chooseAccount(ChooseReceivingAccount.Action)
 			case addAsset(AssetsView.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.chooseAccount, action: /Action.chooseAccount) {
-				ChooseReceivingAccount()
-			}
-			Scope(state: /State.addAsset, action: /Action.addAsset) {
-				AssetsView()
+			Scope(state: \.state, action: \.self) {
+				Scope(state: \.chooseAccount, action: \.chooseAccount) {
+					ChooseReceivingAccount()
+				}
+				Scope(state: \.addAsset, action: \.addAsset) {
+					AssetsView()
+				}
 			}
 		}
 	}
@@ -133,12 +133,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 	}
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		guard let id = state.destinationReceivingAccountID else {
-			let error = "A destination requires a receiving Account ID to be set"
-			assertionFailure(error)
-			loggerGlobal.error(.init(stringLiteral: error))
-			return .none
-		}
+		guard let id = state.destination?.id else { return .none }
 
 		switch presentedAction {
 		case let .chooseAccount(.delegate(.handleResult(account))):
@@ -247,7 +242,7 @@ extension TransferAccountList {
 			)
 		)
 
-		state.showDestination(.chooseAccount(chooseAccount), id: id)
+		state.destination = .init(id: id, state: .chooseAccount(chooseAccount))
 		return .none
 	}
 
@@ -283,14 +278,17 @@ extension TransferAccountList {
 			.nonFungibleAssets
 			.map(\.nftToken.id)
 
-		state.showDestination(.addAsset(.init(
-			account: state.fromAccount,
-			mode: .selection(.init(
-				fungibleResources: selectedFungibleResources,
-				nonFungibleResources: selectedNonFungibleResources,
-				disabledNFTs: Set(nftsSelectedForOtherAccounts)
+		state.destination = .init(
+			id: id,
+			state: .addAsset(.init(
+				account: state.fromAccount,
+				mode: .selection(.init(
+					fungibleResources: selectedFungibleResources,
+					nonFungibleResources: selectedNonFungibleResources,
+					disabledNFTs: Set(nftsSelectedForOtherAccounts)
+				))
 			))
-		)), id: id)
+		)
 
 		return .none
 	}
