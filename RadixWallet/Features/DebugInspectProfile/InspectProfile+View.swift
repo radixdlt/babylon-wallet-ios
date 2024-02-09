@@ -480,7 +480,7 @@ public struct DappAuthorizedPersonaView: IndentedView {
 	public let indentation: Indentation
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Labeled("Address", value: detailedAuthorizedPersona.identityAddress.address)
+			Labeled("EngineToolkitAddress", value: detailedAuthorizedPersona.identityAddress.address)
 			Labeled("Name", value: detailedAuthorizedPersona.displayName.rawValue)
 
 			Text("Shared Fields")
@@ -690,7 +690,7 @@ extension EntityView {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Labeled("DisplayName", value: entity.displayName.rawValue)
-			Labeled("Address", value: entity.address.address)
+			Labeled("EngineToolkitAddress", value: entity.address.address)
 
 			switch entity.securityState {
 			case let .unsecured(unsecuredControl):

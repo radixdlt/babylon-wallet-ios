@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - AddressProtocol
 /// A type which represents some kind of addressed component on the Radix ledger, e.g.
 /// the address for an `Account`, `Identity` or  other `Component` e.g. a `Dapp`,

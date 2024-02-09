@@ -1,4 +1,4 @@
-import EngineToolkit
+
 
 extension ExecutionSummary {
 	/// Use the first supported manifest class. Returns `nil` for non-conforming transactions
@@ -26,13 +26,13 @@ extension ExecutionSummary {
 		[:] // TODO: Is this never populated for .general?
 	}
 
-	public var addressesOfNewlyCreatedEntities: [RETAddress] {
+	public var addressesOfNewlyCreatedEntities: [EngineToolkitAddress] {
 		newEntities.componentAddresses + newEntities.packageAddresses + newEntities.resourceAddresses
 	}
 }
 
 extension ResourceSpecifier {
-	public var amount: EngineToolkit.Decimal? {
+	public var amount: RETDecimal? {
 		if case let .amount(_, amount) = self {
 			return amount
 		}
@@ -47,7 +47,7 @@ extension ResourceSpecifier {
 		return nil
 	}
 
-	public var resourceAddress: RETAddress {
+	public var resourceAddress: EngineToolkitAddress {
 		switch self {
 		case let .amount(resourceAddress, _):
 			resourceAddress
@@ -67,7 +67,7 @@ extension ResourceSpecifier {
 }
 
 extension ResourceIndicator {
-	public var resourceAddress: RETAddress {
+	public var resourceAddress: EngineToolkitAddress {
 		switch self {
 		case let .fungible(address, _):
 			address

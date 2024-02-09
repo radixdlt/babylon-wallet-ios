@@ -1,8 +1,6 @@
-import EngineToolkit
 
-public typealias Address = SpecificAddress<GeneralEntityType>
 
-// public typealias EntityAddress = SpecificAddress<EntityEntityType>
+public typealias EngineToolkitAddress = SpecificAddress<GeneralEntityType>
 
 public typealias PackageAddress = SpecificAddress<PackageEntityType>
 public typealias ResourceAddress = SpecificAddress<ResourceEntityType>
@@ -140,11 +138,20 @@ public struct SpecificAddress<Kind: SpecificEntityType>: Sendable, Hashable, Ide
 		}
 	}
 
+	public func asStr() -> String {
+		panic()
+	}
+
 	public var id: String {
 		address
 	}
 
 	public let address: String
+
+	public func addressString() -> String {
+		address
+	}
+
 	public let decodedKind: EntityType
 
 	public init(address: String, decodedKind: EntityType) {
@@ -153,7 +160,7 @@ public struct SpecificAddress<Kind: SpecificEntityType>: Sendable, Hashable, Ide
 	}
 
 	public init(validatingAddress address: String) throws {
-		let type = try RETAddress(address: address).entityType()
+		let type = try EngineToolkitAddress(address: address).entityType()
 		guard Kind.addressSpace.contains(type) else {
 			throw InvalidAddress(decodedKind: type, addressSpace: Kind.addressSpace)
 		}
@@ -187,13 +194,13 @@ extension SpecificAddress: CustomStringConvertible {
 }
 
 extension SpecificAddress {
-	public var asGeneral: Address {
+	public var asGeneral: EngineToolkitAddress {
 		.init(address: address, decodedKind: decodedKind)
 	}
 }
 
 extension SpecificAddress {
-	public func intoEngine() throws -> RETAddress {
+	public func intoEngine() throws -> EngineToolkitAddress {
 		try .init(address: address)
 	}
 }
@@ -204,17 +211,17 @@ extension AccountAddress {
 	}
 }
 
-extension RETAddress {
+extension EngineToolkitAddress {
 	public func asSpecific<T>() throws -> SpecificAddress<T> {
 		try .init(validatingAddress: addressString())
 	}
 
-	public func asGeneral() throws -> Address {
+	public func asGeneral() throws -> EngineToolkitAddress {
 		try asSpecific()
 	}
 }
 
-extension [RETAddress] {
+extension [EngineToolkitAddress] {
 	public func asSpecific<T>() throws -> [SpecificAddress<T>] {
 		try map { try $0.asSpecific() }
 	}

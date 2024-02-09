@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - IdentityHierarchicalDeterministicDerivationPath
 /// The **default** derivation path used to derive `Identity` (Persiba) keys
 /// for signing authentication, at a certain (Persona) index (`ENTITY_INDEX`)

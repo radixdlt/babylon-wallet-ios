@@ -40,7 +40,7 @@ extension AccountPortfoliosClient {
 			@Dependency(\.cacheClient) var cacheClient
 
 			let changedAccounts: [Profile.Network.Account.EntityAddress]?
-			let resourceAddressesToRefresh: [Address]?
+			let resourceAddressesToRefresh: [EngineToolkitAddress]?
 			do {
 				let manifest = intent.manifest()
 

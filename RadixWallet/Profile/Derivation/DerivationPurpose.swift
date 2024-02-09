@@ -1,7 +1,5 @@
-import EngineToolkit
-
 // MARK: - DerivationPurpose
-/// The purpose for deriving a key pair, e.g. to derive and `Address`, or
+/// The purpose for deriving a key pair, e.g. to derive and `EngineToolkitAddress`, or
 /// to create a cryptography based ID (e.g. Ledger Nano Device ID)
 public enum DerivationPurpose:
 	Sendable,

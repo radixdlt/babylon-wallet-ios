@@ -5,19 +5,19 @@ import SwiftUI
 public struct AddAsset: FeatureReducer, Sendable {
 	public struct State: Hashable, Sendable {
 		var mode: ResourcesListMode
-		let alreadyAddedResources: OrderedSet<ResourceViewState.Address>
+		let alreadyAddedResources: OrderedSet<ResourceViewState.EngineToolkitAddress>
 		let networkID: NetworkID
 
 		var resourceAddress: String = ""
 		var resourceAddressFieldFocused: Bool = false
 
 		public enum AddressValidation: Sendable, Hashable {
-			case valid(ResourceViewState.Address)
-			case wrongNetwork(ResourceViewState.Address, incorrectNetwork: UInt8)
+			case valid(ResourceViewState.EngineToolkitAddress)
+			case wrongNetwork(ResourceViewState.EngineToolkitAddress, incorrectNetwork: UInt8)
 			case alreadyAdded
 			case invalid
 
-			var validAddress: ResourceViewState.Address? {
+			var validAddress: ResourceViewState.EngineToolkitAddress? {
 				guard case let .valid(address) = self else {
 					return nil
 				}
@@ -31,7 +31,7 @@ public struct AddAsset: FeatureReducer, Sendable {
 				return .invalid
 			}
 
-			let address: ResourceViewState.Address?
+			let address: ResourceViewState.EngineToolkitAddress?
 
 			switch mode {
 			case let .allowDenyAssets(exceptionRule):
@@ -58,7 +58,7 @@ public struct AddAsset: FeatureReducer, Sendable {
 	}
 
 	public enum ViewAction: Hashable, Sendable {
-		case addAssetTapped(ResourceViewState.Address)
+		case addAssetTapped(ResourceViewState.EngineToolkitAddress)
 		case resourceAddressChanged(String)
 		case exceptionRuleChanged(ResourcesListMode.ExceptionRule)
 		case focusChanged(Bool)
@@ -66,7 +66,7 @@ public struct AddAsset: FeatureReducer, Sendable {
 	}
 
 	public enum DelegateAction: Hashable, Sendable {
-		case addAddress(ResourcesListMode, ResourceViewState.Address)
+		case addAddress(ResourcesListMode, ResourceViewState.EngineToolkitAddress)
 	}
 
 	@Dependency(\.dismiss) var dismiss

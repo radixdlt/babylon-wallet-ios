@@ -1,8 +1,8 @@
-import EngineToolkit
+
 
 extension ManifestBuilder {
 	public func setOwnerKeys(
-		from entity: Address,
+		from entity: EngineToolkitAddress,
 		ownerKeyHashes: [PublicKeyHash]
 	) throws -> ManifestBuilder {
 		try metadataSet(
@@ -13,7 +13,7 @@ extension ManifestBuilder {
 	}
 
 	public func setAccountType(
-		from entity: Address,
+		from entity: EngineToolkitAddress,
 		type: String
 	) throws -> ManifestBuilder {
 		try metadataSet(address: entity.intoEngine(), key: "account_type", value: .stringValue(value: type))
@@ -41,7 +41,7 @@ extension TransactionManifest {
 	}
 
 	public func withLockFeeCallMethodAdded(
-		address: Address,
+		address: EngineToolkitAddress,
 		fee: RETDecimal = .temporaryStandardFee
 	) throws -> TransactionManifest {
 		try withInstructionAdded(
@@ -61,7 +61,7 @@ extension Instructions {
 
 extension Instruction {
 	static func lockFeeCall(
-		address: Address,
+		address: EngineToolkitAddress,
 		fee: RETDecimal
 	) throws -> Instruction {
 		try .callMethod(

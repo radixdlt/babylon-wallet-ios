@@ -138,7 +138,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 					let setOfExistingData = try Set(babylonAddresses.map {
 						// the first byte is an address type discriminator byte, which differs between Babylon and Olympia,
 						// so we must remove it.
-						try Data(RETAddress(address: $0.address).bytes().dropFirst())
+						try Data(EngineToolkitAddress(address: $0.address).bytes().dropFirst())
 					})
 					guard let payloadByteCount = setOfExistingData.first?.count else {
 						return []

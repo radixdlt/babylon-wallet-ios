@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - AppPreferences.Display
 extension AppPreferences {
 	/// Display settings in the wallet app, such as appearences, currency etc.

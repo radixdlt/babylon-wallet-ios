@@ -1,11 +1,11 @@
-import EngineToolkit
-
 // MARK: - Blake2b
+
 public struct Blake2b {
 	private init() {}
 
 	public static func hash(data: Data) throws -> Data {
-		Hash.fromUnhashedBytes(bytes: data).bytes()
+//		Hash.fromUnhashedBytes(bytes: data).bytes()
+		panic()
 	}
 
 	#if DEBUG

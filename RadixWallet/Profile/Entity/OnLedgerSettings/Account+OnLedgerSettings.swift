@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - Profile.Network.Account.OnLedgerSettings
 extension Profile.Network.Account {
 	public struct OnLedgerSettings: Hashable, Sendable, Codable {

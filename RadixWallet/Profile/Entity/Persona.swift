@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - Profile.Network.Persona
 extension Profile.Network {
 	/// A network unique account with a unique public address and a set of cryptographic

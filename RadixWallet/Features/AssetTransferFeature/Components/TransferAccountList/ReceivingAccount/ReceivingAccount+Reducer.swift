@@ -10,7 +10,7 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		public typealias ID = UUID
 		public let id = ID()
 
-		// Either user owned account, or foreign account Address
+		// Either user owned account, or foreign account EngineToolkitAddress
 		public var account: Account?
 		public var assets: IdentifiedArrayOf<ResourceAsset.State>
 		public var canBeRemoved: Bool

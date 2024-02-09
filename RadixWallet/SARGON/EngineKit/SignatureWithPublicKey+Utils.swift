@@ -1,6 +1,5 @@
-import EngineToolkit
-
 // MARK: - EngineToolkitSignature
+
 public enum EngineToolkitSignature {
 	case secp256k1(value: Data)
 	case ed25519(value: Data)

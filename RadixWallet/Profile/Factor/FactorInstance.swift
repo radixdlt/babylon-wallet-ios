@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - FactorInstance
 /// An factor instance created from a FactorSource.
 public struct FactorInstance: Sendable, Hashable, Codable, Identifiable, FactorOfTierProtocol {
@@ -302,7 +300,7 @@ extension FactorInstance.ID.BadgeAddress {
 		} else if var resourceAddressContainer = try? container.nestedUnkeyedContainer(forKey: .resourceAddress) {
 			self = try .resourceAddress(.init(validatingAddress: resourceAddressContainer.decode(String.self)))
 		} else {
-			throw DecodingError.dataCorruptedError(forKey: .virtual, in: container, debugDescription: "Invalid Badge Address")
+			throw DecodingError.dataCorruptedError(forKey: .virtual, in: container, debugDescription: "Invalid Badge EngineToolkitAddress")
 		}
 	}
 

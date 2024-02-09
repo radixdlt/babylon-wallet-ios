@@ -1,4 +1,4 @@
-import EngineToolkit
+
 
 // MARK: - ProfileSnapshot.Header
 extension ProfileSnapshot {
@@ -153,7 +153,7 @@ extension ProfileSnapshot.Header.Version {
 	/// - 36: Add `structureConfigurations` to `AppPreferences.Security`
 	/// - 37: Change `FactorSourceID` -> enum
 	/// - 38: Added `updatedOn` date to `SecurityStructureConfiguration`
-	/// - 39: Address format changed with `Birch` update
+	/// - 39: EngineToolkitAddress format changed with `Birch` update
 	/// - 40: Changed Persona data/field format
 	/// - 41: Nickname is not optional
 	/// - 42: Change counter to not be factor source based.

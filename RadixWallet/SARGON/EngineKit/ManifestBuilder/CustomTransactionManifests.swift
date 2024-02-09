@@ -1,4 +1,4 @@
-import EngineToolkit
+
 
 extension ManifestBuilder {
 	public struct StakeClaim: Sendable {
@@ -15,7 +15,7 @@ extension ManifestBuilder {
 	) throws -> TransactionManifest {
 		let accountAddress = try accountAddress.intoEngine()
 		let networkId = accountAddress.networkId()
-		let xrdAddress = RETAddress.xrd(networkId)
+		let xrdAddress = EngineToolkitAddress.xrd(networkId)
 
 		return try make {
 			for stakeClaim in stakeClaims {
@@ -46,7 +46,7 @@ extension ManifestBuilder {
 	public static func manifestForFaucet(
 		includeLockFeeInstruction: Bool,
 		networkID: NetworkID,
-		componentAddress: Address
+		componentAddress: EngineToolkitAddress
 	) throws -> TransactionManifest {
 		try make {
 			if includeLockFeeInstruction {
@@ -859,7 +859,7 @@ extension ManifestBuilder {
 		return """
 		\(instructions)
 		CALL_METHOD
-		Address("\(account.address)")
+		EngineToolkitAddress("\(account.address)")
 		"try_deposit_batch_or_abort"
 		Expression("ENTIRE_WORKTOP")
 		Enum<0u8>();

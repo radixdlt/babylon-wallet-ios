@@ -226,7 +226,7 @@ extension NonFungibleTokenDetails.ViewState.TokenDetails {
 			case primitive(String)
 			case complex
 			case url(URL)
-			case address(LedgerIdentifiable.Address)
+			case address(LedgerIdentifiable.EngineToolkitAddress)
 			case decimal(RETDecimal)
 			case `enum`(variant: String)
 			case id(NonFungibleLocalId)
@@ -272,7 +272,7 @@ private extension String {
 
 	var asLedgerAddressDataField: ArbitraryDataFieldKind? {
 		nilIfEmpty.map {
-			if let address = try? LedgerIdentifiable.Address(address: Address(validatingAddress: $0)) {
+			if let address = try? LedgerIdentifiable.EngineToolkitAddress(address: EngineToolkitAddress(validatingAddress: $0)) {
 				.address(address)
 			} else {
 				.primitive(self)

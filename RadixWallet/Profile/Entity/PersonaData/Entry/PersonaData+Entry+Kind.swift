@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - PersonaData.Entry.Kind
 extension PersonaData.Entry {
 	public enum Kind: String, Sendable, Hashable, Codable {
@@ -29,11 +27,11 @@ extension PersonaData.Entry.Kind {
 		case .fullName:
 			L10n.AuthorizedDapps.PersonaDetails.fullName
 		case .emailAddress:
-			"Email Address"
+			"Email EngineToolkitAddress"
 		case .phoneNumber:
 			"Phone Number"
 		case .postalAddress:
-			"Postal Address"
+			"Postal EngineToolkitAddress"
 		case .dateOfBirth:
 			"NA"
 		case .companyName:

@@ -1,6 +1,6 @@
 // MARK: - LedgerIdentifiable
 public enum LedgerIdentifiable: Sendable {
-	case address(Address)
+	case address(EngineToolkitAddress)
 	case identifier(Identifier)
 
 	public static func address(of account: Profile.Network.Account) -> Self {
@@ -50,7 +50,7 @@ extension LedgerIdentifiable {
 		}
 	}
 
-	public enum Address: Hashable, Sendable {
+	public enum EngineToolkitAddress: Hashable, Sendable {
 		case account(AccountAddress, isLedgerHWAccount: Bool = false)
 		case package(PackageAddress)
 		case resource(ResourceAddress)
@@ -100,8 +100,8 @@ extension LedgerIdentifiable {
 	}
 }
 
-extension LedgerIdentifiable.Address {
-	public init?(address: Address) {
+extension LedgerIdentifiable.EngineToolkitAddress {
+	public init?(address: EngineToolkitAddress) {
 		switch address.decodedKind {
 		case _ where AccountEntityType.addressSpace.contains(address.decodedKind):
 			self = .account(.init(address: address.address, decodedKind: address.decodedKind), isLedgerHWAccount: false)

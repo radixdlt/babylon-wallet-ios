@@ -7,7 +7,7 @@ final class TransactionManifestTests: TestCase {
 		func manifest(recipient: String) throws -> TransactionManifest {
 			let string = """
 			ALLOCATE_GLOBAL_ADDRESS
-			    Address("package_tdx_2_1pkgxxxxxxxxxresrcexxxxxxxxx000538436477xxxxxxxxxmn4mes")
+			    EngineToolkitAddress("package_tdx_2_1pkgxxxxxxxxxresrcexxxxxxxxx000538436477xxxxxxxxxmn4mes")
 			    "FungibleResourceManager"
 			    AddressReservation("owner_address_reservation")
 			    NamedAddress("owner_address")
@@ -34,7 +34,7 @@ final class TransactionManifestTests: TestCase {
 			    )
 			;
 			CALL_METHOD
-			    Address("\(recipient)")
+			    EngineToolkitAddress("\(recipient)")
 			    "deposit_batch"
 			    Expression("ENTIRE_WORKTOP")
 			;
@@ -63,36 +63,36 @@ final class TransactionManifestTests: TestCase {
 		func manifest(account: String) throws -> TransactionManifest {
 			let string = """
 			CALL_METHOD
-			    Address("\(account)")
+			    EngineToolkitAddress("\(account)")
 			    "withdraw"
-			    Address("resource_rdx1tkk83magp3gjyxrpskfsqwkg4g949rmcjee4tu2xmw93ltw2cz94sq")
+			    EngineToolkitAddress("resource_rdx1tkk83magp3gjyxrpskfsqwkg4g949rmcjee4tu2xmw93ltw2cz94sq")
 			    Decimal("0")
 			;
 			CALL_METHOD
-			    Address("\(account)")
+			    EngineToolkitAddress("\(account)")
 			    "withdraw"
-			    Address("resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd")
+			    EngineToolkitAddress("resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd")
 			    Decimal("0")
 			;
 			TAKE_ALL_FROM_WORKTOP
-			    Address("resource_rdx1tkk83magp3gjyxrpskfsqwkg4g949rmcjee4tu2xmw93ltw2cz94sq")
+			    EngineToolkitAddress("resource_rdx1tkk83magp3gjyxrpskfsqwkg4g949rmcjee4tu2xmw93ltw2cz94sq")
 			    Bucket("bucket1")
 			;
 			TAKE_ALL_FROM_WORKTOP
-			    Address("resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd")
+			    EngineToolkitAddress("resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd")
 			    Bucket("bucket2")
 			;
 			ALLOCATE_GLOBAL_ADDRESS
-			    Address("package_rdx1pktjwpsjw3le09znnaxjxfzfy47sq8gt7r3p5v2wrn7ertcdtgs537")
+			    EngineToolkitAddress("package_rdx1pktjwpsjw3le09znnaxjxfzfy47sq8gt7r3p5v2wrn7ertcdtgs537")
 			    "QuantaSwap"
 			    AddressReservation("reservation1")
 			    NamedAddress("address1")
 			;
 			CALL_METHOD
-			    Address("component_rdx1czw7wqlfyum0ythajk5f2nnc6egq5y2wla39v5rfwxg9xvxe50vl5q")
+			    EngineToolkitAddress("component_rdx1czw7wqlfyum0ythajk5f2nnc6egq5y2wla39v5rfwxg9xvxe50vl5q")
 			    "new_pool"
-			    Address("resource_rdx1tkk83magp3gjyxrpskfsqwkg4g949rmcjee4tu2xmw93ltw2cz94sq")
-			    Address("resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd")
+			    EngineToolkitAddress("resource_rdx1tkk83magp3gjyxrpskfsqwkg4g949rmcjee4tu2xmw93ltw2cz94sq")
+			    EngineToolkitAddress("resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd")
 			    5u32
 			    Enum<1u8>(
 			        AddressReservation("reservation1")
@@ -142,7 +142,7 @@ final class TransactionManifestTests: TestCase {
 			    )
 			;
 			CALL_METHOD
-			    Address("\(account)")
+			    EngineToolkitAddress("\(account)")
 			    "try_deposit_batch_or_abort"
 			    Expression("ENTIRE_WORKTOP")
 			    Enum<0u8>()

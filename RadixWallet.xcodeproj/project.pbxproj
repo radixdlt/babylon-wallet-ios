@@ -1240,6 +1240,7 @@
 		E6390FB32AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6390FB22AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift */; };
 		E63D123D2ADD1FC00001CBB1 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */; };
 		E64463FE2B75304C0006CAF8 /* Dictionary+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E64463FD2B75304C0006CAF8 /* Dictionary+Extensions.swift */; };
+		E655D14A2B762B2C00A119DF /* DummySargon.swift in Sources */ = {isa = PBXBuildFile; fileRef = E655D1492B762B2C00A119DF /* DummySargon.swift */; };
 		E657773C2B0BAB35002DB237 /* RecoverWalletControlWithBDFSOnly+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E657773A2B0BAB35002DB237 /* RecoverWalletControlWithBDFSOnly+View.swift */; };
 		E657773D2B0BAB35002DB237 /* RecoverWalletControlWithBDFSOnly.swift in Sources */ = {isa = PBXBuildFile; fileRef = E657773B2B0BAB35002DB237 /* RecoverWalletControlWithBDFSOnly.swift */; };
 		E65777402B14AC6A002DB237 /* only_plaintext_profile_snapshot_version_100_patch_after_app_version_120.json in Resources */ = {isa = PBXBuildFile; fileRef = E657773F2B14AC6A002DB237 /* only_plaintext_profile_snapshot_version_100_patch_after_app_version_120.json */; };
@@ -2562,6 +2563,7 @@
 		E634CA2E2AFD25B100C43DB7 /* DebugKeychainContents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugKeychainContents.swift; sourceTree = "<group>"; };
 		E6390FB22AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift"; sourceTree = "<group>"; };
 		E64463FD2B75304C0006CAF8 /* Dictionary+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Dictionary+Extensions.swift"; sourceTree = "<group>"; };
+		E655D1492B762B2C00A119DF /* DummySargon.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DummySargon.swift; sourceTree = "<group>"; };
 		E657773A2B0BAB35002DB237 /* RecoverWalletControlWithBDFSOnly+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecoverWalletControlWithBDFSOnly+View.swift"; sourceTree = "<group>"; };
 		E657773B2B0BAB35002DB237 /* RecoverWalletControlWithBDFSOnly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverWalletControlWithBDFSOnly.swift; sourceTree = "<group>"; };
 		E657773F2B14AC6A002DB237 /* only_plaintext_profile_snapshot_version_100_patch_after_app_version_120.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = only_plaintext_profile_snapshot_version_100_patch_after_app_version_120.json; sourceTree = "<group>"; };
@@ -2822,11 +2824,11 @@
 		48CFBC512ADC106300E77A5C /* RadixWallet */ = {
 			isa = PBXGroup;
 			children = (
+				E655D1482B762AD700A119DF /* SARGON */,
 				48649AD42ADC7CAC006307CF /* AppIcon.xcassets */,
 				48CFBF522ADC10D900E77A5C /* Clients */,
 				48CFC0E42ADC10D900E77A5C /* Core */,
 				48CFBE892ADC10D800E77A5C /* Cryptography */,
-				48CFBE6B2ADC10D800E77A5C /* EngineKit */,
 				48CFBC602ADC10D800E77A5C /* Features */,
 				48CFBF0A2ADC10D900E77A5C /* Prelude */,
 				48CFC19E2ADC10D900E77A5C /* Profile */,
@@ -7001,6 +7003,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		E655D1482B762AD700A119DF /* SARGON */ = {
+			isa = PBXGroup;
+			children = (
+				E655D1492B762B2C00A119DF /* DummySargon.swift */,
+				48CFBE6B2ADC10D800E77A5C /* EngineKit */,
+			);
+			path = SARGON;
+			sourceTree = "<group>";
+		};
 		E657773E2B0BAF77002DB237 /* Info */ = {
 			isa = PBXGroup;
 			children = (
@@ -8316,6 +8327,7 @@
 				48CFC5032ADC10DA00E77A5C /* MetadataI64Value.swift in Sources */,
 				A47572042B29B4EE0059A95D /* IOSSecurityClient+Interface.swift in Sources */,
 				E6FA984E2B04E3D500748F20 /* NoContentView.swift in Sources */,
+				E655D14A2B762B2C00A119DF /* DummySargon.swift in Sources */,
 				48CFC27E2ADC10D900E77A5C /* HUD+View.swift in Sources */,
 				48CFC4732ADC10DA00E77A5C /* DeviceFactorSourceClient+Test.swift in Sources */,
 				48CFC38D2ADC10D900E77A5C /* Address.swift in Sources */,

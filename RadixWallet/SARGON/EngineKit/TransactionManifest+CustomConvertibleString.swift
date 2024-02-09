@@ -1,6 +1,5 @@
-import EngineToolkit
-
 // MARK: - TransactionManifest + CustomStringConvertible
+
 extension TransactionManifest: CustomStringConvertible {}
 
 extension TransactionManifest {

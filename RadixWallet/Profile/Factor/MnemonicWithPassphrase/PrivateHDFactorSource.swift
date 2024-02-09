@@ -1,6 +1,5 @@
-import EngineToolkit
-
 // MARK: - PrivateHDFactorSource
+
 public struct PrivateHDFactorSource: Sendable, Hashable {
 	public let mnemonicWithPassphrase: MnemonicWithPassphrase
 	public let factorSource: DeviceFactorSource

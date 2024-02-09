@@ -1,20 +1,18 @@
 // MARK: - RETDecimal
 
-public final class RETDecimal {}
-
 extension RETDecimal {
 	// Used for development purposes
 	public static let temporaryStandardFee: RETDecimal = 25
 }
 
-// MARK: ExpressibleByIntegerLiteral
+// MARK: - RETDecimal + ExpressibleByIntegerLiteral
 extension RETDecimal: ExpressibleByIntegerLiteral {
 	public convenience init(integerLiteral value: Int) {
 		self.init(integer: value)
 	}
 }
 
-// MARK: ExpressibleByFloatLiteral
+// MARK: - RETDecimal + ExpressibleByFloatLiteral
 extension RETDecimal: ExpressibleByFloatLiteral {
 	public convenience init(floatLiteral value: Double) {
 		try! self.init(value: String(value))
@@ -24,7 +22,9 @@ extension RETDecimal: ExpressibleByFloatLiteral {
 extension RETDecimal {
 	public static let maxDivisibility: UInt = 18
 
-	public static let zero: RETDecimal = .zero()
+	public static var zero: RETDecimal {
+		panic()
+	}
 
 	public convenience init(integer: Int) {
 		try! self.init(value: String(integer))
@@ -115,7 +115,7 @@ extension RETDecimal {
 	}
 }
 
-// MARK: Codable
+// MARK: - RETDecimal + Codable
 extension RETDecimal: Codable {
 	@inlinable
 	public func encode(to encoder: Encoder) throws {

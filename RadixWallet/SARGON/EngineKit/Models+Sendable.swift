@@ -1,6 +1,5 @@
-import EngineToolkit
-
 // MARK: - TransactionManifest + Sendable
+
 extension TransactionManifest: @unchecked Sendable {}
 
 // MARK: - NonFungibleGlobalId + Sendable
@@ -15,8 +14,8 @@ extension Instructions: @unchecked Sendable {}
 // MARK: - Instruction + Sendable
 extension Instruction: @unchecked Sendable {}
 
-// MARK: - RETAddress + Sendable
-extension RETAddress: @unchecked Sendable {}
+// MARK: - EngineToolkitAddress + Sendable
+extension EngineToolkitAddress: @unchecked Sendable {}
 
 // MARK: - ManifestValue + Sendable
 extension ManifestValue: @unchecked Sendable {}
@@ -24,8 +23,8 @@ extension ManifestValue: @unchecked Sendable {}
 // MARK: - MapEntry + Sendable
 extension MapEntry: @unchecked Sendable {}
 
-// MARK: - EngineToolkit.Decimal + Sendable
-extension EngineToolkit.Decimal: @unchecked Sendable {}
+// MARK: - RETDecimal + Sendable
+extension RETDecimal: @unchecked Sendable {}
 
 // MARK: - PreciseDecimal + Sendable
 extension PreciseDecimal: @unchecked Sendable {}

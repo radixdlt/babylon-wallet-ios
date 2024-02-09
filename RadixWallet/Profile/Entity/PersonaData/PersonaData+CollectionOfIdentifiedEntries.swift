@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - PersonaData.CollectionOfIdentifiedEntries
 extension PersonaData {
 	public struct CollectionOfIdentifiedEntries<Value: Sendable & Hashable & Codable & BasePersonaDataEntryProtocol>: Sendable, Hashable, Codable, CustomStringConvertible {
