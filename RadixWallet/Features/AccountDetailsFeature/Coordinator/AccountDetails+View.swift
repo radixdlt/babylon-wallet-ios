@@ -9,7 +9,8 @@ extension AccountDetails.State {
 			displayName: account.displayName.rawValue,
 			mnemonicHandlingCallToAction: mnemonicHandlingCallToAction,
 			isLedgerAccount: account.isLedgerAccount,
-			showToolbar: destination == nil
+			showToolbar: destination == nil,
+			account: account
 		)
 	}
 }
@@ -23,6 +24,7 @@ extension AccountDetails {
 		let mnemonicHandlingCallToAction: MnemonicHandling?
 		let isLedgerAccount: Bool
 		let showToolbar: Bool
+		let account: Profile.Network.Account
 	}
 
 	@MainActor
@@ -79,6 +81,9 @@ extension AccountDetails {
 							.foregroundColor(.app.white)
 						}
 					}
+				}
+				.sheet(isPresented: .constant(true)) {
+					TransactionHistory.View(store: .transactionHistory(account: viewStore.account))
 				}
 			}
 			.destinations(with: store)
