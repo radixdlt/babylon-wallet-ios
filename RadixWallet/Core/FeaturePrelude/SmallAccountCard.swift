@@ -19,20 +19,7 @@ public struct SmallAccountCard<Accessory: View>: View {
 		self.verticalPadding = verticalPadding
 		self.accessory = accessory()
 	}
-}
 
-extension SmallAccountCard where Accessory == EmptyView {
-	public init(account: Profile.Network.Account) {
-		self.init(
-			account.displayName.rawValue,
-			identifiable: .address(of: account),
-			gradient: .init(account.appearanceID),
-			verticalPadding: .small1 - 1
-		)
-	}
-}
-
-extension SmallAccountCard {
 	public var body: some View {
 		HStack(spacing: 0) {
 			if let name {
@@ -54,5 +41,16 @@ extension SmallAccountCard {
 		.background {
 			LinearGradient(gradient: gradient, startPoint: .leading, endPoint: .trailing)
 		}
+	}
+}
+
+extension SmallAccountCard where Accessory == EmptyView {
+	public init(account: Profile.Network.Account) {
+		self.init(
+			account.displayName.rawValue,
+			identifiable: .address(of: account),
+			gradient: .init(account.appearanceID),
+			verticalPadding: .small1 - 1
+		)
 	}
 }

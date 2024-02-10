@@ -1,14 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension StoreOf<TransactionHistory> {
-	static func transactionHistory(account: Profile.Network.Account) -> Store {
-		Store(initialState: State(account: account)) {
-			TransactionHistory()
-		}
-	}
-}
-
 let items: [HScrollBar.Item] = [
 	HScrollBar.Item(id: .init(), text: "Jan"),
 	HScrollBar.Item(id: .init(), text: "Feb"),
@@ -36,17 +28,45 @@ extension TransactionHistory {
 		public var body: some SwiftUI.View {
 			NavigationStack {
 				WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-					ScrollView {
-						VStack(spacing: .zero) {
-							SmallAccountCard(account: viewStore.account)
-								.roundedCorners(radius: .small1)
-								.padding(.horizontal, .medium3)
-								.padding(.vertical, .medium3)
+					VStack(spacing: .zero) {
+						HScrollBar.Dummy()
+							.padding(.vertical, .small3)
 
+						ScrollView {
+							LazyVStack(spacing: .zero, pinnedViews: [.sectionHeaders]) {
+								SmallAccountCard(account: viewStore.account)
+									.roundedCorners(radius: .small1)
+									.padding(.horizontal, .medium3)
+									.padding(.vertical, .medium3)
+									.measurePosition("SmallAccountCardDummy", coordSpace: View.coordSpace)
+									.opacity(0)
+
+								ForEach(viewStore.sections) { section in
+									SectionView(section: section)
+								}
+							}
+						}
+						.scrollIndicators(.never)
+						.coordinateSpace(name: View.coordSpace)
+					}
+					.overlayPreferenceValue(PositionsPreferenceKey.self, alignment: .top) { positions in
+						let rect = positions["SmallAccountCardDummy"]
+						ZStack(alignment: .top) {
+							if let rect {
+								SmallAccountCard(account: viewStore.account)
+									.roundedCorners(radius: .small1)
+									.padding(.horizontal, .medium3)
+									.padding(.vertical, .medium3)
+									.offset(y: rect.minY)
+							}
+
+							let scrollBarOffset = max(rect?.maxY ?? 0, 0)
 							HScrollBar(items: items, selection: $selection)
+								.padding(.vertical, .small3)
+								.offset(y: scrollBarOffset)
 						}
 					}
-					.scrollIndicators(.never)
+					.clipShape(Rectangle())
 				}
 				.toolbar {
 					ToolbarItem(placement: .topBarLeading) {
@@ -60,6 +80,31 @@ extension TransactionHistory {
 				}
 				.navigationTitle("History")
 				.navigationBarTitleDisplayMode(.inline)
+			}
+		}
+
+		static let coordSpace = "TransactionHistory"
+	}
+
+	struct SectionView: SwiftUI.View {
+		let section: TransactionHistory.State.TransferSection
+
+		var body: some SwiftUI.View {
+			Section {
+				ForEach(section.transfers, id: \.self) { transfer in
+					Card {
+						Text(transfer.string)
+							.padding(.vertical, .small1)
+							.frame(maxWidth: .infinity)
+					}
+					.padding(.vertical, .small2)
+				}
+			} header: {
+				Text(section.date.formatted(date: .abbreviated, time: .omitted))
+					.foregroundStyle(.red)
+					.padding(.vertical, .small1)
+					.frame(maxWidth: .infinity)
+					.background(.red.opacity(0.2))
 			}
 		}
 	}
@@ -88,12 +133,12 @@ struct HScrollBar: View {
 					}
 					.padding(.horizontal, .medium3)
 					.padding(.vertical, .small2)
-					.measurePosition(id: item.id, coordSpace: HScrollBar.coordSpace)
+					.measurePosition(item.id, coordSpace: HScrollBar.coordSpace)
 					.animation(.default, value: isSelected)
 				}
 			}
 			.coordinateSpace(name: HScrollBar.coordSpace)
-			.backgroundPreferenceValue(PositionPreferenceKey.self) { positions in
+			.backgroundPreferenceValue(PositionsPreferenceKey.self) { positions in
 				if let rect = positions[selection] {
 					Capsule()
 						.fill(.app.gray4)
@@ -105,30 +150,60 @@ struct HScrollBar: View {
 			.padding(.horizontal, .medium3)
 		}
 		.scrollIndicators(.never)
+//		.background(.ultraThinMaterial)
 	}
 
 	static let coordSpace = "HScrollBar.HStack"
+
+	struct Dummy: View {
+		var body: some View {
+			Text("DUMMY")
+				.foregroundStyle(.clear)
+				.padding(.vertical, .small2)
+				.frame(maxWidth: .infinity)
+		}
+	}
 }
 
 extension View {
-	public func measurePosition(id: UUID, coordSpace: String) -> some View {
+	public func measurePosition(_ id: AnyHashable, coordSpace: String) -> some View {
 		background {
 			GeometryReader { proxy in
 				Color.clear
-					.preference(key: PositionPreferenceKey.self, value: [id: proxy.frame(in: .named(coordSpace))])
+					.preference(key: PositionsPreferenceKey.self, value: [id: proxy.frame(in: .named(coordSpace))])
 			}
 		}
 	}
 }
 
-// MARK: - PositionPreferenceKey
-private enum PositionPreferenceKey: PreferenceKey {
-	static var defaultValue: [UUID: CGRect] = [:]
+// MARK: - PositionsPreferenceKey
+private enum PositionsPreferenceKey: PreferenceKey {
+	static var defaultValue: [AnyHashable: CGRect] = [:]
 
-	static func reduce(value: inout [UUID: CGRect], nextValue: () -> [UUID: CGRect]) {
+	static func reduce(value: inout [AnyHashable: CGRect], nextValue: () -> [AnyHashable: CGRect]) {
 		value.merge(nextValue()) { $1 }
 	}
 }
+
+// extension View {
+//	public func measurePosition(coordSpace: String) -> some View {
+//		background {
+//			GeometryReader { proxy in
+//				Color.clear
+//					.preference(key: PositionPreferenceKey.self, value: proxy.frame(in: .named(coordSpace)))
+//			}
+//		}
+//	}
+// }
+//
+//// MARK: - PositionPreferenceKey
+// private enum PositionPreferenceKey: PreferenceKey {
+//	static var defaultValue: CGRect = .zero
+//
+//	static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
+//		value = nextValue()
+//	}
+// }
 
 // struct DateBar: View {
 //	let dates: [DateComponents]
