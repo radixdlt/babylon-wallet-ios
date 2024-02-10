@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		48076E402B14F5CA004575F8 /* OnFirstAppearViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48076E3F2B14F5CA004575F8 /* OnFirstAppearViewModifier.swift */; };
 		480E50D52B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 480E50D32B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift */; };
+		4843CA3D2B7829D100163C27 /* CAP26KeyAndAddressTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4843CA3C2B7829D100163C27 /* CAP26KeyAndAddressTests.swift */; };
 		48581B2F2B0206E600F885C0 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48581B2E2B0206E600F885C0 /* TestUtils.swift */; };
 		48649AD52ADC7CAC006307CF /* AppIcon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 48649AD42ADC7CAC006307CF /* AppIcon.xcassets */; };
 		489122782B186F61005F2EEE /* AlternativeRectangularButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 489122772B186F61005F2EEE /* AlternativeRectangularButtonStyle.swift */; };
@@ -1363,6 +1364,7 @@
 		480E50D32B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecoverWalletWithoutProfileCoordinator+View.swift"; sourceTree = "<group>"; };
 		481B43B02ADC7F1A007945C1 /* RadixWalletTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RadixWalletTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		481B44022ADC7FB3007945C1 /* RadixWallet.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = RadixWallet.xctestplan; sourceTree = "<group>"; };
+		4843CA3C2B7829D100163C27 /* CAP26KeyAndAddressTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CAP26KeyAndAddressTests.swift; sourceTree = "<group>"; };
 		48581B2E2B0206E600F885C0 /* TestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUtils.swift; sourceTree = "<group>"; };
 		48649AD42ADC7CAC006307CF /* AppIcon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppIcon.xcassets; sourceTree = "<group>"; };
 		489122772B186F61005F2EEE /* AlternativeRectangularButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlternativeRectangularButtonStyle.swift; sourceTree = "<group>"; };
@@ -7339,6 +7341,7 @@
 				E6DBA2B82ADEBFB300A38425 /* SLIP10TestLargeVectorsTests.swift */,
 				E6DBA2BA2ADEBFB300A38425 /* SLIP10PathTests.swift */,
 				E6DBA2BB2ADEBFB300A38425 /* CAP26Tests.swift */,
+				4843CA3C2B7829D100163C27 /* CAP26KeyAndAddressTests.swift */,
 				E6DBA2BC2ADEBFB300A38425 /* EdgeCasesTests.swift */,
 				E6DBA2BD2ADEBFB300A38425 /* SLIP10InterfaceTests.swift */,
 				E6DBA2BE2ADEBFB300A38425 /* SLIP10ComboTests.swift */,
@@ -7899,6 +7902,7 @@
 				E6DBA3642ADEBFB300A38425 /* SnapshotTestVector.swift in Sources */,
 				830EA9E02AEB8219004C8051 /* AccountAndPersonaHidingTests.swift in Sources */,
 				E6DBA31A2ADEBFB300A38425 /* DataChannelClientTests.swift in Sources */,
+				4843CA3D2B7829D100163C27 /* CAP26KeyAndAddressTests.swift in Sources */,
 				E6DBA32B2ADEBFB300A38425 /* JSON+Sendable.swift in Sources */,
 				E6DBA3582ADEBFB300A38425 /* SLIP10ComboTests.swift in Sources */,
 				E6DBA3202ADEBFB300A38425 /* PeerConnectionMocks.swift in Sources */,
