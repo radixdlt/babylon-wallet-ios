@@ -125,6 +125,7 @@ public enum AssetResource {
   public static let splashPhoneFrame = ImageAsset(name: "splash-phone-frame")
   public static let officialTagIcon = ImageAsset(name: "official-tag-icon")
   public static let tagIcon = ImageAsset(name: "tag-icon")
+  public static let filterList = ImageAsset(name: "filter_list")
   public static let transactionReviewMessage = ImageAsset(name: "transactionReview-message")
   public static let transactionReviewPools = ImageAsset(name: "transactionReview-pools")
   public static let transactionReviewDapps = ImageAsset(name: "transactionReview_dapps")
