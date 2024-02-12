@@ -228,12 +228,6 @@ extension SpecificAddress {
 	}
 }
 
-extension SpecificAddress {
-	public func intoEngine() throws -> RETAddress {
-		try .init(address: address)
-	}
-}
-
 extension AccountAddress {
 	public var asComponentAddress: ComponentAddress {
 		.init(address: address, decodedKind: decodedKind)
