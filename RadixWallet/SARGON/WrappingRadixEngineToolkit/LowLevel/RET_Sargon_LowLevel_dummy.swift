@@ -78,46 +78,6 @@ public struct Intent: DummySargon {
 // MARK: - RadixEngineToolkitError
 public struct RadixEngineToolkitError: DummySargon {}
 
-// MARK: - ResourceSpecifier
-public enum ResourceSpecifier: DummySargon {
-	case amount(
-		resourceAddress: ResourceAddress,
-		amount: RETDecimal
-	)
-	case ids(
-		resourceAddress: ResourceAddress,
-		ids: [NonFungibleLocalId]
-	)
-
-	public var amount: RETDecimal? {
-		if case let .amount(_, amount) = self {
-			return amount
-		}
-
-		return nil
-	}
-
-	public var ids: [NonFungibleLocalId]? {
-		if case let .ids(_, ids) = self {
-			return ids
-		}
-		return nil
-	}
-
-	public var resourceAddress: ResourceAddress {
-		switch self {
-		case let .amount(resourceAddress, _):
-			resourceAddress
-		case let .ids(resourceAddress, _):
-			resourceAddress
-		}
-	}
-
-	public var toResourceTracker: ResourceIndicator {
-		sargon()
-	}
-}
-
 // MARK: - FeeLocks
 public enum FeeLocks: DummySargon {
 	public var lock: RETDecimal { panic() }
