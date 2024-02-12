@@ -22,10 +22,8 @@ extension TransactionReview.State {
 		.init(
 			message: {
 				// TODO: handle the rest of types
-				if case let .plainText(value) = message,
-				   case let .str(str) = value.message
-				{
-					return str
+				if case let .plainText(value) = message {
+					return value
 				}
 				return nil
 			}(),

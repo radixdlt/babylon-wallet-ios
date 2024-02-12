@@ -121,14 +121,14 @@ public struct BuildTransactionIntentRequest: Sendable {
 	public let networkID: NetworkID
 	public let nonce: Nonce
 	public let manifest: TransactionManifest
-	public let message: Message
+	public let message: Message?
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
 	public let transactionSigners: TransactionSigners
 
 	public init(
 		networkID: NetworkID,
 		manifest: TransactionManifest,
-		message: Message,
+		message: Message?,
 		nonce: Nonce = .secureRandom(),
 		makeTransactionHeaderInput: MakeTransactionHeaderInput,
 		transactionSigners: TransactionSigners
@@ -148,7 +148,11 @@ public struct GetTransactionSignersRequest: Sendable, Hashable {
 	public let manifest: TransactionManifest
 	public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 
-	public init(networkID: NetworkID, manifest: TransactionManifest, ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey) {
+	public init(
+		networkID: NetworkID,
+		manifest: TransactionManifest,
+		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
+	) {
 		self.networkID = networkID
 		self.manifest = manifest
 		self.ephemeralNotaryPublicKey = ephemeralNotaryPublicKey
@@ -158,7 +162,7 @@ public struct GetTransactionSignersRequest: Sendable, Hashable {
 // MARK: - ManifestReviewRequest
 public struct ManifestReviewRequest: Sendable {
 	public let unvalidatedManifest: UnvalidatedTransactionManifest
-	public let message: Message
+	public let message: Message?
 	public let nonce: Nonce
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
 	public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
@@ -167,7 +171,7 @@ public struct ManifestReviewRequest: Sendable {
 
 	public init(
 		unvalidatedManifest: UnvalidatedTransactionManifest,
-		message: Message,
+		message: Message?,
 		nonce: Nonce,
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
 		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey,

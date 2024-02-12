@@ -139,7 +139,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				let compiledTransactionIntent = try request.transactionIntent.compile()
 				return try await sign(
 					signers: request.signers,
-					expectedHashedMessage: hashedMsg.bytes().data
+					expectedHashedMessage: hashedMsg.bytes()
 				) {
 					try await makeRequest(
 						.signTransaction(.init(

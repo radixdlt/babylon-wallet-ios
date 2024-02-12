@@ -56,7 +56,7 @@ extension TransactionClient {
 				try await .init(validating: addresses.asyncMap(identityFromComponentAddress))
 			}
 
-			let summary = manifest.summary(networkId: networkID.rawValue)
+			let summary = manifest.summary(networkId: networkID)
 
 			return try await MyEntitiesInvolvedInTransaction(
 				identitiesRequiringAuth: mapIdentity(summary.identitiesRequiringAuth),

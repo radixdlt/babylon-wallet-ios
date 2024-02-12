@@ -9,7 +9,7 @@ public struct TransactionHash: DummySargon {
 		sargon()
 	}
 
-	public func bytes() -> [UInt8] {
+	public func bytes() -> Data {
 		sargon()
 	}
 }

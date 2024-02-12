@@ -8,7 +8,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		public let nonce: Nonce
 		public let unvalidatedManifest: UnvalidatedTransactionManifest
-		public let message: Message
+		public let message: Message?
 		public let signTransactionPurpose: SigningPurpose.SignTransactionPurpose
 		public let waitsForTransactionToBeComitted: Bool
 		public let isWalletTransaction: Bool
@@ -74,7 +74,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			unvalidatedManifest: UnvalidatedTransactionManifest,
 			nonce: Nonce,
 			signTransactionPurpose: SigningPurpose.SignTransactionPurpose,
-			message: Message,
+			message: Message?,
 			ephemeralNotaryPrivateKey: Curve25519.Signing.PrivateKey = .init(),
 			waitsForTransactionToBeComitted: Bool = false,
 			isWalletTransaction: Bool,
@@ -431,7 +431,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			state.destination = .customizeFees(.init(
 				reviewedTransaction: reviewedTransaction,
-				manifestSummary: reviewedTransaction.transactionManifest.summary(networkId: reviewedTransaction.networkID.rawValue),
+				manifestSummary: reviewedTransaction
+					.transactionManifest
+					.summary(networkId: reviewedTransaction.networkID),
 				signingPurpose: .signTransaction(state.signTransactionPurpose)
 			))
 			return .none
