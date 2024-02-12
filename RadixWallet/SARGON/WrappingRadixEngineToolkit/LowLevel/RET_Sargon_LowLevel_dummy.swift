@@ -92,55 +92,11 @@ public enum FeeSummary: DummySargon {
 	public var royaltyCost: RETDecimal { panic() }
 }
 
-// MARK: - MapEntry
-public struct MapEntry: DummySargon {
-	public let key: ManifestValue
-	public let value: ManifestValue
-}
-
-// MARK: - ManifestBlobRef
-public struct ManifestBlobRef: DummySargon {
-	public let value: Hash
-}
-
-// MARK: - Hash
-public struct Hash: DummySargon {}
-
 // MARK: - RETDecimal
 public struct RETDecimal: DummySargon {
 	public init(value: String) throws {
 		panic()
 	}
-}
-
-// MARK: - PreciseDecimal
-public struct PreciseDecimal: DummySargon {}
-
-// MARK: - NodeId
-public enum NodeId: DummySargon {
-	public init(address: String) {
-		panic()
-	}
-}
-
-// MARK: - ManifestAddress
-public enum ManifestAddress: DummySargon {
-	/// Static address, either global or internal, with entity type byte checked.
-	/// TODO: prevent direct construction, as in `NonFungibleLocalId`
-	case `static`(value: NodeId)
-	/// Named address, global only at the moment.
-	case named(value: UInt32)
-}
-
-// MARK: - ManifestBuilderNamedAddress
-public struct ManifestBuilderNamedAddress: DummySargon {
-	public let name: String
-}
-
-// MARK: - ManifestBuilderAddress
-public enum ManifestBuilderAddress: DummySargon {
-	case named(value: ManifestBuilderNamedAddress)
-	case `static`(value: Address)
 }
 
 // MARK: - TrackedValidatorUnstake
@@ -777,17 +733,7 @@ public struct KnownAddresses: DummySargon {
 		}
 	}
 
-	public struct PackageAddresses: DummySargon {}
-	public struct ComponentAddresses: DummySargon {}
 	public var resourceAddresses: ResourceAddresses
-//	public var package_addresses: PackageAddresses,
-//	public var component_addresses: ComponentAddresses,
-}
-
-// MARK: - Instruction
-public enum Instruction: DummySargon {
-	case assertWorktopContains(resourceAddress: ResourceAddress, amount: RETDecimal)
-	case callMethod(address: ManifestAddress, methodName: String, args: ManifestValue)
 }
 
 // MARK: - Instructions
@@ -801,14 +747,6 @@ public struct Instructions: DummySargon {
 	}
 
 	public static func fromString(string: Any, networkId: UInt8) -> Self {
-		panic()
-	}
-
-	public func instructionsList() -> [Instruction] {
-		panic()
-	}
-
-	public static func fromInstructions(instructions: [Instruction], networkId: Any) throws -> Self {
 		panic()
 	}
 }
@@ -890,7 +828,6 @@ public enum ManifestBuilderValue: DeprecatedDummySargon {
 // MARK: - ManifestValue
 public enum ManifestValue: DeprecatedDummySargon {
 	case enumValue(discriminator: UInt8, fields: [ManifestValue])
-	case addressValue(value: ManifestBuilderAddress)
 	case tupleValue(fields: [ManifestValue])
 	case decimalValue(value: RETDecimal)
 	case nonFungibleLocalIdValue(value: NonFungibleLocalId)
