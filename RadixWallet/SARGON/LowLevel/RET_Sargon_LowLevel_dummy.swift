@@ -581,10 +581,6 @@ public struct TransactionManifest: DummySargon {
 		panic()
 	}
 
-	public func withLockFeeCallMethodAdded(address: AccountAddress, fee: RETDecimal) throws -> Self {
-		panic()
-	}
-
 	public func summary(networkId: UInt8) -> ManifestSummary {
 		panic()
 	}

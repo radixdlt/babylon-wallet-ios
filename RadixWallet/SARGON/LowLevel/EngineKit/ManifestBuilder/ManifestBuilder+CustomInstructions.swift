@@ -30,7 +30,6 @@ extension ManifestBuilder {
 
 extension ManifestBuilderBucket {
 	public static var unique: ManifestBuilderBucket {
-//		.init(name: UUID().uuidString)
 		panic()
 	}
 }
@@ -48,16 +47,6 @@ extension TransactionManifest {
 			blobs: blobs()
 		)
 	}
-
-	public func withLockFeeCallMethodAdded(
-		address: Address,
-		fee: RETDecimal = .temporaryStandardFee
-	) throws -> TransactionManifest {
-		try withInstructionAdded(
-			.lockFeeCall(address: address, fee: fee),
-			at: 0
-		)
-	}
 }
 
 extension Instructions {
@@ -65,22 +54,5 @@ extension Instructions {
 		var instructionList = self.instructionsList()
 		instructionList.insert(instruction, at: index)
 		return try .fromInstructions(instructions: instructionList, networkId: self.networkId())
-	}
-}
-
-extension Instruction {
-	static func lockFeeCall(
-		address: Address,
-		fee: RETDecimal
-	) throws -> Instruction {
-		try .callMethod(
-			address: .static(value: .init(address: address.address)),
-			methodName: "lock_fee",
-			args: .tupleValue(
-				fields: [
-					.decimalValue(value: fee),
-				]
-			)
-		)
 	}
 }

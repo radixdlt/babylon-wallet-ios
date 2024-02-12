@@ -719,8 +719,9 @@ extension TransactionReview {
 		var manifest = reviewedTransaction.transactionManifest
 		if case let .success(feePayerAccount) = reviewedTransaction.feePayer.unwrap()?.account {
 			do {
-				manifest = try reviewedTransaction.transactionManifest.withLockFeeCallMethodAdded(
-					address: feePayerAccount.address.asGeneral,
+				manifest = try Sargon.updatingManifest(
+					reviewedTransaction.transactionManifest,
+					addressOfFeePayer: feePayerAccount.address,
 					fee: reviewedTransaction.transactionFee.totalFee.lockFee
 				)
 			} catch {

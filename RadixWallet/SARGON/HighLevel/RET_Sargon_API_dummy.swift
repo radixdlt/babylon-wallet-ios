@@ -1,6 +1,10 @@
 import Foundation
 
-public enum Sargon {
+// MARK: - Sargon
+public enum Sargon {}
+
+// MARK: Manifests
+extension Sargon {
 	public static func manifestThirdPartyDepositUpdate(
 		to new: ThirdPartyDeposits
 	) throws -> (manifest: TransactionManifest, updatedAccount: Profile.Network.Account) {
@@ -15,6 +19,16 @@ public enum Sargon {
 		panic()
 	}
 
+	public static func updatingManifest(
+		_ manifest: TransactionManifest,
+		addressOfFeePayer: AccountAddress,
+		fee: RETDecimal = .temporaryStandardFee
+	) throws -> TransactionManifest {
+		panic()
+	}
+}
+
+extension Sargon {
 	public static func buildInformation() -> BuildInformation {
 		BuildInformation(version: "Sargon MOCKED")
 	}
