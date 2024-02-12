@@ -705,7 +705,7 @@ public struct KnownAddresses: DummySargon {
 
 // MARK: - Instruction
 public enum Instruction: DummySargon {
-	case assertWorktopContains(resourceAddress: Any, amount: Any)
+	case assertWorktopContains(resourceAddress: RETAddress, amount: RETDecimal)
 	case callMethod(address: ManifestAddress, methodName: String, args: ManifestValue)
 }
 
@@ -809,6 +809,27 @@ public enum ManifestValue: DeprecatedDummySargon {
 	case tupleValue(fields: [ManifestValue])
 	case decimalValue(value: RETDecimal)
 	case nonFungibleLocalIdValue(value: NonFungibleLocalId)
+
+	case boolValue(value: Any)
+	case i8Value(value: Any)
+	case i16Value(value: Any)
+	case i32Value(value: Any)
+	case i64Value(value: Any)
+	case i128Value(value: Any)
+	case u8Value(value: Any)
+	case u16Value(value: Any)
+	case u32Value(value: Any)
+	case u64Value(value: Any)
+	case u128Value(value: Any)
+	case stringValue(value: Any)
+	case arrayValue(elementValueKind: Any, elements: Any)
+	case mapValue(keyValueKind: Any, valueValueKind: Any, entries: Any)
+	case bucketValue(value: Any)
+	case proofValue(value: Any)
+	case expressionValue(value: Any)
+	case blobValue(value: Any)
+	case preciseDecimalValue(value: Any)
+	case addressReservationValue(value: Any)
 }
 
 // MARK: - ManifestBuilderBucket
