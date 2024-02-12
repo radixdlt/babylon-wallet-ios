@@ -73,3 +73,20 @@ public struct ExecutionSummary: DummySargon {
 		newEntities.componentAddresses.map(\.asGeneral) + newEntities.packageAddresses.map(\.asGeneral) + newEntities.resourceAddresses.map(\.asGeneral)
 	}
 }
+
+// MARK: - FeeSummary
+public enum FeeSummary: DummySargon {
+	public var executionCost: RETDecimal { panic() }
+	public var finalizationCost: RETDecimal { panic() }
+	public var storageExpansionCost: RETDecimal { panic() }
+	public var royaltyCost: RETDecimal { panic() }
+}
+
+// MARK: - FeeLocks
+public enum FeeLocks: DummySargon {
+	public var lock: RETDecimal { panic() }
+	public var contingentLock: RETDecimal { panic() }
+}
+
+// MARK: - ReservedInstruction
+public enum ReservedInstruction: DummySargon {}

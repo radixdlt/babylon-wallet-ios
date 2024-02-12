@@ -1341,6 +1341,11 @@
 		E6EF00262B7A5B0E00676549 /* DetailedManifestClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF00252B7A5B0E00676549 /* DetailedManifestClass.swift */; };
 		E6EF00282B7A5B2200676549 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF00272B7A5B2200676549 /* Message.swift */; };
 		E6EF002A2B7A5B3200676549 /* Instructions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF00292B7A5B3200676549 /* Instructions.swift */; };
+		E6EF002E2B7A5C3A00676549 /* TrackedValidatorStake+Unstake.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF002D2B7A5C3A00676549 /* TrackedValidatorStake+Unstake.swift */; };
+		E6EF00302B7A5C5900676549 /* ResourceIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF002F2B7A5C5900676549 /* ResourceIndicator.swift */; };
+		E6EF00322B7A5C9000676549 /* MetadataValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF00312B7A5C9000676549 /* MetadataValue.swift */; };
+		E6EF00342B7A5C9B00676549 /* ManifestSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF00332B7A5C9B00676549 /* ManifestSummary.swift */; };
+		E6EF00362B7A5CB300676549 /* RETPublicKeyHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF00352B7A5CB300676549 /* RETPublicKeyHash.swift */; };
 		E6FA984A2B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98482B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift */; };
 		E6FA984B2B04B9AC00748F20 /* ConfirmSkippingBDFS.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */; };
 		E6FA984E2B04E3D500748F20 /* NoContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA984D2B04E3D500748F20 /* NoContentView.swift */; };
@@ -2661,6 +2666,11 @@
 		E6EF00252B7A5B0E00676549 /* DetailedManifestClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailedManifestClass.swift; sourceTree = "<group>"; };
 		E6EF00272B7A5B2200676549 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		E6EF00292B7A5B3200676549 /* Instructions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Instructions.swift; sourceTree = "<group>"; };
+		E6EF002D2B7A5C3A00676549 /* TrackedValidatorStake+Unstake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TrackedValidatorStake+Unstake.swift"; sourceTree = "<group>"; };
+		E6EF002F2B7A5C5900676549 /* ResourceIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceIndicator.swift; sourceTree = "<group>"; };
+		E6EF00312B7A5C9000676549 /* MetadataValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataValue.swift; sourceTree = "<group>"; };
+		E6EF00332B7A5C9B00676549 /* ManifestSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManifestSummary.swift; sourceTree = "<group>"; };
+		E6EF00352B7A5CB300676549 /* RETPublicKeyHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RETPublicKeyHash.swift; sourceTree = "<group>"; };
 		E6FA98482B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfirmSkippingBDFS+View.swift"; sourceTree = "<group>"; };
 		E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmSkippingBDFS.swift; sourceTree = "<group>"; };
 		E6FA984D2B04E3D500748F20 /* NoContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoContentView.swift; sourceTree = "<group>"; };
@@ -6822,10 +6832,15 @@
 				E6EF00232B7A5AEB00676549 /* ExecutionSummary.swift */,
 				E6EF00272B7A5B2200676549 /* Message.swift */,
 				48CFBE832ADC10D800E77A5C /* NetworkID.swift */,
+				E6EF002F2B7A5C5900676549 /* ResourceIndicator.swift */,
+				E6EF00352B7A5CB300676549 /* RETPublicKeyHash.swift */,
+				E6EF00332B7A5C9B00676549 /* ManifestSummary.swift */,
 				E655D1492B762B2C00A119DF /* RET_Sargon_LowLevel_dummy.swift */,
+				E6EF00312B7A5C9000676549 /* MetadataValue.swift */,
 				E6EF00212B7A5A8000676549 /* TransactionIntent.swift */,
 				E6EF00252B7A5B0E00676549 /* DetailedManifestClass.swift */,
 				E6EF00292B7A5B3200676549 /* Instructions.swift */,
+				E6EF002D2B7A5C3A00676549 /* TrackedValidatorStake+Unstake.swift */,
 			);
 			path = LowLevel;
 			sourceTree = "<group>";
@@ -8097,6 +8112,7 @@
 				83EE47962AF0EE3C00155F03 /* ProgrammaticScryptoSborValueMapAllOf.swift in Sources */,
 				48CFC23E2ADC10D900E77A5C /* SecurityStructureConfigurationRow.swift in Sources */,
 				48CFC6152ADC10DA00E77A5C /* ResetRequestItem.swift in Sources */,
+				E6EF002E2B7A5C3A00676549 /* TrackedValidatorStake+Unstake.swift in Sources */,
 				48CFC3ED2ADC10D900E77A5C /* DataChannelMessage+Codable.swift in Sources */,
 				48CFC5DA2ADC10DA00E77A5C /* PresentationDetentIntrinsicHeight.swift in Sources */,
 				48CFC2E22ADC10D900E77A5C /* ManageSomeFactorSource+View.swift in Sources */,
@@ -8201,6 +8217,7 @@
 				48CFC44C2ADC10DA00E77A5C /* MnemonicClient+Test.swift in Sources */,
 				48CFC6802ADC10DB00E77A5C /* Profile+DetailedSecurityStructureConfiguration.swift in Sources */,
 				48CFC63D2ADC10DB00E77A5C /* CustomHierarchicalDeterministicDerivationPath.swift in Sources */,
+				E6EF00342B7A5C9B00676549 /* ManifestSummary.swift in Sources */,
 				48CFC4192ADC10DA00E77A5C /* Tuple+Extra.swift in Sources */,
 				48CFC6502ADC10DB00E77A5C /* PersonaData+CreditCard.swift in Sources */,
 				A47572052B29B4F20059A95D /* IOSSecurityClient+Test.swift in Sources */,
@@ -8366,6 +8383,7 @@
 				48CFC3512ADC10D900E77A5C /* DappHeader.swift in Sources */,
 				48CFC5C32ADC10DA00E77A5C /* Thumbnails.swift in Sources */,
 				48CFC5B82ADC10DA00E77A5C /* DeveloperDisclaimerBanner.swift in Sources */,
+				E6EF00322B7A5C9000676549 /* MetadataValue.swift in Sources */,
 				48CFC4B62ADC10DA00E77A5C /* StateEntityMetadataPageResponse.swift in Sources */,
 				48CFC4742ADC10DA00E77A5C /* DeviceFactorSourceClient+Live.swift in Sources */,
 				48CFC64A2ADC10DB00E77A5C /* PersonaData+CompanyName.swift in Sources */,
@@ -8537,6 +8555,7 @@
 				48CFC39C2ADC10D900E77A5C /* TXVersion.swift in Sources */,
 				48CFC5742ADC10DA00E77A5C /* GatewayAPI+Utils.swift in Sources */,
 				48CFC2432ADC10D900E77A5C /* UpdateAccountLabel+View.swift in Sources */,
+				E6EF00302B7A5C5900676549 /* ResourceIndicator.swift in Sources */,
 				48CFC3182ADC10D900E77A5C /* CreateAccountCoordinator+Models.swift in Sources */,
 				48CFC2822ADC10D900E77A5C /* SelectFeePayer.swift in Sources */,
 				48CFC5D52ADC10DA00E77A5C /* TokenShadowModifier.swift in Sources */,
@@ -8751,6 +8770,7 @@
 				48CFC4792ADC10DA00E77A5C /* LocalAuthenticationClient+Live.swift in Sources */,
 				48CFC4A62ADC10DA00E77A5C /* MetadataPublicKeyHashArrayValue.swift in Sources */,
 				48CFC5192ADC10DA00E77A5C /* StateNonFungibleDataResponseAllOf.swift in Sources */,
+				E6EF00362B7A5CB300676549 /* RETPublicKeyHash.swift in Sources */,
 				48CFC6812ADC10DB00E77A5C /* SecurityStructureConfigurationReference.swift in Sources */,
 				48CFC2F42ADC10D900E77A5C /* IntroductionToPersonas+View.swift in Sources */,
 				48CFC6142ADC10DA00E77A5C /* AccountsRequestItem.swift in Sources */,

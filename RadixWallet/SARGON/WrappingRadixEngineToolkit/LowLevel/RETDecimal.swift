@@ -1,4 +1,9 @@
 // MARK: - RETDecimal
+public struct RETDecimal: DummySargon {
+	public init(value: String) throws {
+		panic()
+	}
+}
 
 extension RETDecimal {
 	// Used for development purposes
