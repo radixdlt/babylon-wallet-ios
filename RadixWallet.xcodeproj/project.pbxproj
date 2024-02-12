@@ -1346,6 +1346,16 @@
 		E6EF00322B7A5C9000676549 /* MetadataValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF00312B7A5C9000676549 /* MetadataValue.swift */; };
 		E6EF00342B7A5C9B00676549 /* ManifestSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF00332B7A5C9B00676549 /* ManifestSummary.swift */; };
 		E6EF00362B7A5CB300676549 /* RETPublicKeyHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF00352B7A5CB300676549 /* RETPublicKeyHash.swift */; };
+		E6EF00382B7A5E0600676549 /* ResourcePreferenceUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF00372B7A5E0600676549 /* ResourcePreferenceUpdate.swift */; };
+		E6EF003A2B7A5E1500676549 /* NonFungibleLocalId.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF00392B7A5E1500676549 /* NonFungibleLocalId.swift */; };
+		E6EF003C2B7A5E2A00676549 /* NonFungibleGlobalId.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF003B2B7A5E2A00676549 /* NonFungibleGlobalId.swift */; };
+		E6EF003E2B7A5E3F00676549 /* TransactionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF003D2B7A5E3E00676549 /* TransactionHeader.swift */; };
+		E6EF00402B7A5E5100676549 /* SignedIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF003F2B7A5E5100676549 /* SignedIntent.swift */; };
+		E6EF00422B7A5E5F00676549 /* NotarizedTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF00412B7A5E5F00676549 /* NotarizedTransaction.swift */; };
+		E6EF00442B7A5E6E00676549 /* TransactionManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF00432B7A5E6E00676549 /* TransactionManifest.swift */; };
+		E6EF00462B7A5E8200676549 /* UnstakeDataEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF00452B7A5E8200676549 /* UnstakeDataEntry.swift */; };
+		E6EF00482B7A5E9500676549 /* ResourceOrNonFungible.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF00472B7A5E9500676549 /* ResourceOrNonFungible.swift */; };
+		E6EF004A2B7A5EAA00676549 /* TransactionHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF00492B7A5EAA00676549 /* TransactionHash.swift */; };
 		E6FA984A2B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98482B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift */; };
 		E6FA984B2B04B9AC00748F20 /* ConfirmSkippingBDFS.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */; };
 		E6FA984E2B04E3D500748F20 /* NoContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA984D2B04E3D500748F20 /* NoContentView.swift */; };
@@ -2671,6 +2681,16 @@
 		E6EF00312B7A5C9000676549 /* MetadataValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetadataValue.swift; sourceTree = "<group>"; };
 		E6EF00332B7A5C9B00676549 /* ManifestSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManifestSummary.swift; sourceTree = "<group>"; };
 		E6EF00352B7A5CB300676549 /* RETPublicKeyHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RETPublicKeyHash.swift; sourceTree = "<group>"; };
+		E6EF00372B7A5E0600676549 /* ResourcePreferenceUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourcePreferenceUpdate.swift; sourceTree = "<group>"; };
+		E6EF00392B7A5E1500676549 /* NonFungibleLocalId.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonFungibleLocalId.swift; sourceTree = "<group>"; };
+		E6EF003B2B7A5E2A00676549 /* NonFungibleGlobalId.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NonFungibleGlobalId.swift; sourceTree = "<group>"; };
+		E6EF003D2B7A5E3E00676549 /* TransactionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionHeader.swift; sourceTree = "<group>"; };
+		E6EF003F2B7A5E5100676549 /* SignedIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignedIntent.swift; sourceTree = "<group>"; };
+		E6EF00412B7A5E5F00676549 /* NotarizedTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotarizedTransaction.swift; sourceTree = "<group>"; };
+		E6EF00432B7A5E6E00676549 /* TransactionManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionManifest.swift; sourceTree = "<group>"; };
+		E6EF00452B7A5E8200676549 /* UnstakeDataEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnstakeDataEntry.swift; sourceTree = "<group>"; };
+		E6EF00472B7A5E9500676549 /* ResourceOrNonFungible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceOrNonFungible.swift; sourceTree = "<group>"; };
+		E6EF00492B7A5EAA00676549 /* TransactionHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionHash.swift; sourceTree = "<group>"; };
 		E6FA98482B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfirmSkippingBDFS+View.swift"; sourceTree = "<group>"; };
 		E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmSkippingBDFS.swift; sourceTree = "<group>"; };
 		E6FA984D2B04E3D500748F20 /* NoContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoContentView.swift; sourceTree = "<group>"; };
@@ -6831,9 +6851,18 @@
 				48CFBE6F2ADC10D800E77A5C /* Address.swift */,
 				E6EF00232B7A5AEB00676549 /* ExecutionSummary.swift */,
 				E6EF00272B7A5B2200676549 /* Message.swift */,
+				E6EF00472B7A5E9500676549 /* ResourceOrNonFungible.swift */,
+				E6EF003B2B7A5E2A00676549 /* NonFungibleGlobalId.swift */,
 				48CFBE832ADC10D800E77A5C /* NetworkID.swift */,
 				E6EF002F2B7A5C5900676549 /* ResourceIndicator.swift */,
+				E6EF00492B7A5EAA00676549 /* TransactionHash.swift */,
+				E6EF00452B7A5E8200676549 /* UnstakeDataEntry.swift */,
+				E6EF003D2B7A5E3E00676549 /* TransactionHeader.swift */,
 				E6EF00352B7A5CB300676549 /* RETPublicKeyHash.swift */,
+				E6EF00432B7A5E6E00676549 /* TransactionManifest.swift */,
+				E6EF00412B7A5E5F00676549 /* NotarizedTransaction.swift */,
+				E6EF00392B7A5E1500676549 /* NonFungibleLocalId.swift */,
+				E6EF003F2B7A5E5100676549 /* SignedIntent.swift */,
 				E6EF00332B7A5C9B00676549 /* ManifestSummary.swift */,
 				E655D1492B762B2C00A119DF /* RET_Sargon_LowLevel_dummy.swift */,
 				E6EF00312B7A5C9000676549 /* MetadataValue.swift */,
@@ -6841,6 +6870,7 @@
 				E6EF00252B7A5B0E00676549 /* DetailedManifestClass.swift */,
 				E6EF00292B7A5B3200676549 /* Instructions.swift */,
 				E6EF002D2B7A5C3A00676549 /* TrackedValidatorStake+Unstake.swift */,
+				E6EF00372B7A5E0600676549 /* ResourcePreferenceUpdate.swift */,
 			);
 			path = LowLevel;
 			sourceTree = "<group>";
@@ -8094,6 +8124,7 @@
 				E6FA984A2B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift in Sources */,
 				48CFC57F2ADC10DA00E77A5C /* GatewayAPI.swift in Sources */,
 				48CFC3022ADC10D900E77A5C /* DebugManageFactorSources+View.swift in Sources */,
+				E6EF004A2B7A5EAA00676549 /* TransactionHash.swift in Sources */,
 				48CFC4702ADC10DA00E77A5C /* URLFormatterClient+Live.swift in Sources */,
 				48CFC25B2ADC10D900E77A5C /* OnboardingStartup+Reducer.swift in Sources */,
 				48CFC2562ADC10D900E77A5C /* DebugInspectProfile.swift in Sources */,
@@ -8239,6 +8270,7 @@
 				48CFC3472ADC10D900E77A5C /* PersonaDataPermissionBox+View.swift in Sources */,
 				48CFC4882ADC10DA00E77A5C /* EntityBehaviors.swift in Sources */,
 				48CFC44A2ADC10DA00E77A5C /* AuthorizedDappsClient+Interface.swift in Sources */,
+				E6EF00382B7A5E0600676549 /* ResourcePreferenceUpdate.swift in Sources */,
 				48CFC49F2ADC10DA00E77A5C /* TransactionDetailsOptIns.swift in Sources */,
 				48CFC4FF2ADC10DA00E77A5C /* StateEntityDetailsResponsePackageDetailsSchemaItem.swift in Sources */,
 				48CFC31E2ADC10D900E77A5C /* NewAccountCompletion+View.swift in Sources */,
@@ -8308,6 +8340,7 @@
 				83EE47882AF0EE3C00155F03 /* ProgrammaticScryptoSborValueBytes.swift in Sources */,
 				48CFC2C92ADC10D900E77A5C /* FungibleResourceAsset+View.swift in Sources */,
 				48CFC50D2ADC10DA00E77A5C /* FungibleResourcesCollection.swift in Sources */,
+				E6EF003E2B7A5E3F00676549 /* TransactionHeader.swift in Sources */,
 				48CFC40F2ADC10DA00E77A5C /* Logger.swift in Sources */,
 				48CFC36C2ADC10D900E77A5C /* FungibleTokenDetails+View.swift in Sources */,
 				48CFC6712ADC10DB00E77A5C /* FactorSourceKindOfMnemonic.swift in Sources */,
@@ -8458,6 +8491,7 @@
 				48CFC2F92ADC10D900E77A5C /* InfoOfNewPersona+Reducer.swift in Sources */,
 				48CFC44D2ADC10DA00E77A5C /* MnemonicClient+Live.swift in Sources */,
 				48CFC57E2ADC10DA00E77A5C /* ValidatorState.swift in Sources */,
+				E6EF00422B7A5E5F00676549 /* NotarizedTransaction.swift in Sources */,
 				48CFC56C2ADC10DA00E77A5C /* StateEntityFungiblesPageRequestOptIns.swift in Sources */,
 				48CFC3882ADC10D900E77A5C /* DisplayEntitiesControlledByMnemonic+View.swift in Sources */,
 				48CFC64C2ADC10DB00E77A5C /* PersonaData+PostalAddress+Country.swift in Sources */,
@@ -8475,6 +8509,7 @@
 				48CFC29A2ADC10D900E77A5C /* TransactionReviewDapps+View.swift in Sources */,
 				E6EF002A2B7A5B3200676549 /* Instructions.swift in Sources */,
 				48CFC36B2ADC10D900E77A5C /* FungibleTokenDetails+Reducer.swift in Sources */,
+				E6EF00462B7A5E8200676549 /* UnstakeDataEntry.swift in Sources */,
 				48CFC3322ADC10D900E77A5C /* ImportMnemonic.swift in Sources */,
 				E66EEB9B2B06694E007624BC /* RecoverWalletWithoutProfileStart+View.swift in Sources */,
 				48CFC5182ADC10DA00E77A5C /* ScryptoSborValue.swift in Sources */,
@@ -8706,6 +8741,7 @@
 				48CFC5442ADC10DA00E77A5C /* NonFungibleResourcesCollectionItemVaultAggregatedVaultAllOf.swift in Sources */,
 				48CFC55A2ADC10DA00E77A5C /* MetadataNonFungibleGlobalIdArrayValue.swift in Sources */,
 				83EE47572AF0DE8F00155F03 /* TransactionIntentStatus.swift in Sources */,
+				E6EF003A2B7A5E1500676549 /* NonFungibleLocalId.swift in Sources */,
 				48CFC2BD2ADC10D900E77A5C /* ImportMnemonicControllingAccounts+View.swift in Sources */,
 				48CFC50E2ADC10DA00E77A5C /* InternalServerError.swift in Sources */,
 				48CFC30E2ADC10D900E77A5C /* AppSettings+View.swift in Sources */,
@@ -8717,6 +8753,7 @@
 				E6A2D9E12AFA6BFE001857EC /* DeviceFactorSourceControlled.swift in Sources */,
 				48CFC4B82ADC10DA00E77A5C /* NotSyncedUpErrorAllOf.swift in Sources */,
 				48CFC6652ADC10DB00E77A5C /* BaseFactorSourceProtocol.swift in Sources */,
+				E6EF00482B7A5E9500676549 /* ResourceOrNonFungible.swift in Sources */,
 				48CFC2F12ADC10D900E77A5C /* CreatePersonaCoordinator+Reducer.swift in Sources */,
 				48CFC5702ADC10DA00E77A5C /* TransactionConstructionResponse.swift in Sources */,
 				48CFC31A2ADC10D900E77A5C /* CreateAccountCoordinator+Reducer.swift in Sources */,
@@ -8803,6 +8840,7 @@
 				48CFC6632ADC10DB00E77A5C /* FactorSourceProtocol.swift in Sources */,
 				48CFC4CE2ADC10DA00E77A5C /* NonFungibleResourcesCollectionItemVaultAggregatedAllOf.swift in Sources */,
 				48CFC3A82ADC10D900E77A5C /* Signature.swift in Sources */,
+				E6EF003C2B7A5E2A00676549 /* NonFungibleGlobalId.swift in Sources */,
 				48CFC3692ADC10D900E77A5C /* NonFungibleAssetList+Reducer.swift in Sources */,
 				48CFC2752ADC10D900E77A5C /* Main+View.swift in Sources */,
 				48CFC39E2ADC10D900E77A5C /* NetworkID.swift in Sources */,
@@ -8868,6 +8906,7 @@
 				E657773C2B0BAB35002DB237 /* RecoverWalletControlWithBDFSOnly+View.swift in Sources */,
 				48CFC3552ADC10D900E77A5C /* ImportOlympiaLedgerAccountsAndFactorSources+View.swift in Sources */,
 				48CFC5422ADC10DA00E77A5C /* ValidatorsUptimeResponseAllOf.swift in Sources */,
+				E6EF00442B7A5E6E00676549 /* TransactionManifest.swift in Sources */,
 				48CFC4E12ADC10DA00E77A5C /* StateEntityDetailsResponseFungibleVaultDetails.swift in Sources */,
 				48CFC5B22ADC10DA00E77A5C /* Footer.swift in Sources */,
 				48CFC6922ADC10DB00E77A5C /* LegacyOlympiaAccountAddress.swift in Sources */,
@@ -9119,6 +9158,7 @@
 				48CFC5EB2ADC10DA00E77A5C /* AddressView.swift in Sources */,
 				48CFC2A82ADC10D900E77A5C /* AuthorizedDApps.swift in Sources */,
 				48CFC6322ADC10DB00E77A5C /* SLIP10+PublicKey+Codable.swift in Sources */,
+				E6EF00402B7A5E5100676549 /* SignedIntent.swift in Sources */,
 				8397D82C2B46ACB50016365A /* StakeUnitList+View.swift in Sources */,
 				48CFC5632ADC10DA00E77A5C /* MetadataOriginValue.swift in Sources */,
 				E6A2D9E52AFA6C1E001857EC /* AccountWithInfoHolder.swift in Sources */,
