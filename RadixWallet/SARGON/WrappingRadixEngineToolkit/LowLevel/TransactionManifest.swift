@@ -6,11 +6,15 @@ public struct TransactionManifest: DummySargon {
 		sargon()
 	}
 
-	public func instructions() -> Instructions {
+	public func instructionsString() -> String {
 		sargon()
 	}
 
-	public init(instructions: Instructions, blobs: [Data]) {
+	public init(
+		instructionsString: String,
+		networkID: NetworkID,
+		blobs: [Data]
+	) {
 		sargon()
 	}
 
@@ -22,7 +26,10 @@ public struct TransactionManifest: DummySargon {
 		sargon()
 	}
 
-	public func executionSummary(networkId: UInt8, encodedReceipt: Any) -> ExecutionSummary {
+	public func executionSummary(
+		networkId: NetworkID,
+		encodedReceipt: Data // TODO: Replace with TYPE - read from GW.
+	) -> ExecutionSummary {
 		sargon()
 	}
 }

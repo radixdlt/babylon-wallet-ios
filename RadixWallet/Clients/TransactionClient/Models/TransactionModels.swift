@@ -38,7 +38,7 @@ extension GatewayAPI.TransactionPreviewRequest {
 		let notaryIsSignatory = transactionSigners.notaryIsSignatory
 
 		try self.init(
-			manifest: rawManifest.instructions().asStr(),
+			manifest: rawManifest.instructionsString(),
 			blobsHex: rawManifest.blobs().map(\.hex),
 			startEpochInclusive: .init(header.startEpochInclusive),
 			endEpochExclusive: .init(header.endEpochExclusive),

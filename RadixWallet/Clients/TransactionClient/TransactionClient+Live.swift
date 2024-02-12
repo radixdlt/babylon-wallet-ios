@@ -183,7 +183,10 @@ extension TransactionClient {
 			let receiptBytes = try Data(hex: transactionPreviewResponse.encodedReceipt)
 
 			/// Analyze the manifest
-			let analyzedManifestToReview = try manifestToSign.executionSummary(networkId: networkID.rawValue, encodedReceipt: receiptBytes)
+			let analyzedManifestToReview = try manifestToSign.executionSummary(
+				networkId: networkID,
+				encodedReceipt: receiptBytes
+			)
 
 			/// Transactions created outside of the Wallet are not allowed to use reserved instructions
 			if !request.isWalletTransaction, !analyzedManifestToReview.reservedInstructions.isEmpty {

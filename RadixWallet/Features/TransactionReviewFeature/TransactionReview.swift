@@ -678,7 +678,7 @@ extension TransactionReview {
 	func showRawTransaction(_ state: inout State) -> Effect<Action> {
 		do {
 			let manifest = try transactionManifestWithWalletInstructionsAdded(state)
-			let rawTransaction = try manifest.instructions().asStr()
+			let rawTransaction = try manifest.instructionsString()
 			state.displayMode = .raw(rawTransaction)
 		} catch {
 			errorQueue.schedule(error)

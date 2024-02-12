@@ -10,14 +10,15 @@ public struct UnvalidatedTransactionManifest: Sendable, Hashable {
 
 	public init(manifest: TransactionManifest) throws {
 		try self.init(
-			transactionManifestString: manifest.instructions().asStr(),
+			transactionManifestString: manifest.instructionsString(),
 			blobsBytes: manifest.blobs()
 		)
 	}
 
 	public func transactionManifest(onNetwork networkID: NetworkID) throws -> TransactionManifest {
 		try .init(
-			instructions: .fromString(string: transactionManifestString, networkId: networkID.rawValue),
+			instructionsString: transactionManifestString,
+			networkID: networkID,
 			blobs: blobsBytes
 		)
 	}
@@ -48,7 +49,7 @@ extension P2P.Dapp.Request {
 			try self.init(
 				version: version,
 				unvalidatedManifest: .init(
-					transactionManifestString: transactionManifest.instructions().asStr(),
+					transactionManifestString: transactionManifest.instructionsString(),
 					blobsBytes: transactionManifest.blobs()
 				),
 				message: message
