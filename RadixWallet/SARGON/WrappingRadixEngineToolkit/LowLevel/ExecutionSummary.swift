@@ -8,10 +8,6 @@ public struct ExecutionSummary: DummySargon {
 		}
 	}
 
-	public var detailedClassification: [DetailedManifestClass] {
-		sargon()
-	}
-
 	public var newEntities: NewEntities {
 		sargon()
 	}
@@ -44,9 +40,8 @@ public struct ExecutionSummary: DummySargon {
 
 	public var feeSummary: FeeSummary { sargon() }
 
-	/// Use the first supported manifest class. Returns `nil` for non-conforming transactions
 	public var detailedManifestClass: DetailedManifestClass? {
-		detailedClassification.first(where: \.isSupported)
+		sargon()
 	}
 
 	public var metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]] {
