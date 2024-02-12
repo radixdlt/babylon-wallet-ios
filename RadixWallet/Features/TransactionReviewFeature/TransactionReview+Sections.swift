@@ -790,8 +790,8 @@ extension TransactionReview {
 	) async throws -> [Transfer] {
 		let worth: RETDecimal
 		if !validatorStakes.isEmpty {
-			if let stake = try validatorStakes.first(where: { try $0.validatorAddress.asSpecific() == validator.address }) {
-				guard try stake.liquidStakeUnitAddress.asSpecific() == validator.stakeUnitResourceAddress else {
+			if let stake = try validatorStakes.first(where: { $0.validatorAddress == validator.address }) {
+				guard try stake.liquidStakeUnitAddress == validator.stakeUnitResourceAddress else {
 					throw StakeUnitAddressMismatch()
 				}
 				// Distribute the worth in proportion to the amounts, if needed

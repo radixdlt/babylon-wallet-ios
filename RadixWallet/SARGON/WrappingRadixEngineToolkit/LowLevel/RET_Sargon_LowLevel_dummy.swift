@@ -193,11 +193,11 @@ public enum TrackedValidatorStake: TrackedPoolInteractionStuff {}
 public protocol TrackedPoolInteractionStuff: DummySargon {}
 
 extension TrackedPoolInteractionStuff {
-	public var validatorAddress: RETAddress {
+	public var validatorAddress: ValidatorAddress {
 		panic()
 	}
 
-	public var liquidStakeUnitAddress: RETAddress {
+	public var liquidStakeUnitAddress: ResourceAddress {
 		panic()
 	}
 
