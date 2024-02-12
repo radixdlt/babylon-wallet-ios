@@ -27,8 +27,4 @@ extension DummySargon {
 	public init(from decoder: Decoder) throws {
 		sargon()
 	}
-
-	public func asStr() -> String {
-		sargon()
-	}
 }
