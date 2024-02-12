@@ -776,6 +776,10 @@ public enum EntityType: DeprecatedDummySargon {
 	case internalNonFungibleVault
 	case internalGenericComponent
 	case internalKeyValueStore
+
+	public var isResourcePool: Bool {
+		panic()
+	}
 }
 
 // MARK: - AccountDefaultDepositRule

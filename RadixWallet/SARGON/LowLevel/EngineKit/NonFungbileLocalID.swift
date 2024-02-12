@@ -49,38 +49,10 @@ extension NonFungibleLocalId: Codable {
 
 	public init(from decoder: Decoder) throws {
 		panic()
-//		let container = try decoder.container(keyedBy: CodingKeys.self)
-//		if let value = try? container.decode(UInt64.self, forKey: .integer) {
-//			self = .integer(value: value)
-//			return
-//		}
-//		if let value = try? container.decode(String.self, forKey: .str) {
-//			self = .str(value: value)
-//			return
-//		}
-//		if let value = try? container.decode(Data.self, forKey: .bytes) {
-//			self = .bytes(value: value)
-//			return
-//		}
-//		if let value = try? container.decode(Data.self, forKey: .ruid) {
-//			self = .ruid(value: value)
-//			return
-//		}
-//		throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: decoder.codingPath, debugDescription: "Unable to decode values."))
 	}
 
 	public func encode(to encoder: Encoder) throws {
-//		var container = encoder.container(keyedBy: CodingKeys.self)
-//		switch self {
-//		case let .integer(value):
-//			try container.encode(value, forKey: .integer)
-//		case let .str(value):
-//			try container.encode(value, forKey: .str)
-//		case let .bytes(value):
-//			try container.encode(value, forKey: .bytes)
-//		case let .ruid(value):
-//			try container.encode(value, forKey: .ruid)
-//		}
+//
 		panic()
 	}
 }
