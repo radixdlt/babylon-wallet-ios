@@ -80,7 +80,7 @@ public enum PackageEntityType: SpecificEntityType {
 }
 
 // MARK: - EntityType
-public enum EntityType: DeprecatedDummySargon {
+public enum EntityType: DummySargon {
 	case globalPackage
 	case globalFungibleResourceManager
 	case globalNonFungibleResourceManager

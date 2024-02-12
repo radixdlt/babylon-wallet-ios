@@ -1,22 +1,13 @@
 import Foundation
 
 // MARK: - DummySargon
-public protocol DummySargon: Sendable, Equatable, Hashable, Codable, Identifiable, CustomStringConvertible {}
-
-// MARK: - DeprecatedDummySargon
-@available(*, deprecated, message: "Remove completely")
-public protocol DeprecatedDummySargon: DummySargon {}
+public protocol DummySargon: Sendable, Equatable, Hashable, Codable, CustomStringConvertible {}
 
 public func sargon(line: UInt = #line, file: StaticString = #file) -> Never {
 	fatalError("Sargon migration: \(line), in \(file)")
 }
 
 extension DummySargon {
-	public typealias ID = UUID
-	public var id: ID {
-		sargon()
-	}
-
 	public static func == (lhs: Self, rhs: Self) -> Bool {
 		sargon()
 	}
@@ -40,12 +31,4 @@ extension DummySargon {
 	public func asStr() -> String {
 		sargon()
 	}
-}
-
-// MARK: - RadixEngineToolkitError
-public struct RadixEngineToolkitError: DummySargon {}
-
-// MARK: - BuildInformation
-public struct BuildInformation: DummySargon {
-	public let version: String
 }

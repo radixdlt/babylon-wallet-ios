@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - NonFungibleGlobalId
-public struct NonFungibleGlobalId: DummySargon {
+public struct NonFungibleGlobalId: DummySargon, Identifiable {
 	public init(nonFungibleGlobalId: String) throws {
 		sargon()
 	}
@@ -23,5 +23,9 @@ public struct NonFungibleGlobalId: DummySargon {
 
 	public var resourceAddress: ResourceAddress {
 		sargon()
+	}
+
+	public var id: String {
+		asStr()
 	}
 }

@@ -103,8 +103,8 @@ extension Sargon {
 		sargon()
 	}
 
-	public static func buildInformation() -> BuildInformation {
-		BuildInformation(version: "Sargon MOCKED")
+	public static func buildInformation() -> SargonBuildInformation {
+		SargonBuildInformation()
 	}
 
 	public static func hash(data: Data) -> Data {
