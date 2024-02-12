@@ -6,9 +6,9 @@ extension AddAsset.State {
 		.init(
 			resourceAddress: resourceAddress,
 			validatedResourceAddress: validatedResourceAddress.validAddress,
-			addressHint: { () -> Hint? in
+			addressHint: {
 				guard !resourceAddressFieldFocused, !resourceAddress.isEmpty else {
-					return nil
+					return .none
 				}
 
 				switch validatedResourceAddress {
