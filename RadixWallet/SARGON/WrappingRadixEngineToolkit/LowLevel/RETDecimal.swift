@@ -80,20 +80,17 @@ extension RETDecimal {
 extension RETDecimal {
 	/// Rounds to `decimalPlaces` decimals, in the direction of 0
 	public func floor(decimalPlaces: UInt) -> RETDecimal {
-//		try! round(decimalPlaces: Int32(decimalPlaces), roundingMode: .toZero)
 		panic()
 	}
 
 	/// Rounds to `decimalPlaces` decimals, in the direction away from zero
 	public func ceil(decimalPlaces: UInt) -> RETDecimal {
 		panic()
-//		try! round(decimalPlaces: Int32(decimalPlaces), roundingMode: .awayFromZero)
 	}
 
 	/// Rounds to `decimalPlaces` decimals
 	public func rounded(decimalPlaces: UInt = 0) -> RETDecimal {
 		panic()
-//		try! round(decimalPlaces: Int32(decimalPlaces), roundingMode: .toNearestMidpointAwayFromZero)
 	}
 }
 
