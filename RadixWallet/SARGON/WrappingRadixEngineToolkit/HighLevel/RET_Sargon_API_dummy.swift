@@ -27,14 +27,6 @@ extension Sargon {
 		panic()
 	}
 
-	public static func manifestWithdrawAmount(
-		from: AccountAddress,
-		resource: ResourceAddress,
-		amount: RETDecimal
-	) -> ManifestBuilder.InstructionsChain.Instruction {
-		panic()
-	}
-
 	public static func manifestForCreateFungibleToken(
 		addressOfOwner: AccountAddress,
 		networkID: NetworkID
@@ -83,14 +75,6 @@ extension Sargon {
 	) async throws -> TransactionManifest {
 		panic()
 	}
-
-	/// REQUIRES NETWORK CALL (and probable cache)	///
-	public static func needsSignatureForDepositting(
-		intoAccount: Profile.Network.Account,
-		resource: ResourceAddress
-	) async throws -> Bool {
-		panic()
-	}
 }
 
 extension Sargon {
@@ -111,6 +95,14 @@ extension Sargon {
 }
 
 extension Sargon {
+	/// REQUIRES NETWORK CALL (and probable cache)	///
+	public static func needsSignatureForDepositting(
+		intoAccount: Profile.Network.Account,
+		resource: ResourceAddress
+	) async throws -> Bool {
+		panic()
+	}
+
 	public static func buildInformation() -> BuildInformation {
 		BuildInformation(version: "Sargon MOCKED")
 	}

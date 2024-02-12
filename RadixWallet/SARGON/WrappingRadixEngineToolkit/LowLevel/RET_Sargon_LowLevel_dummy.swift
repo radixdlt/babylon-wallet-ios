@@ -957,25 +957,9 @@ public enum ManifestValue: DeprecatedDummySargon {
 	case addressReservationValue(value: Any)
 }
 
-// MARK: - ManifestBuilderBucket
-public enum ManifestBuilderBucket: DeprecatedDummySargon {}
-
 // MARK: - ResolvableArguments
 public enum ResolvableArguments: DummySargon {
 	public static func addressValue(value: Any) -> Self {
-		panic()
-	}
-}
-
-// MARK: - ManifestBuilder
-public enum ManifestBuilder: DeprecatedDummySargon {
-	public init() {
-		panic()
-	}
-
-	public func build(
-		networkId: NetworkID
-	) -> TransactionManifest {
 		panic()
 	}
 }
