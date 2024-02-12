@@ -806,18 +806,6 @@ public enum AccountDefaultDepositRule: DeprecatedDummySargon {
 	case accept, reject, allowExisting
 }
 
-// MARK: - ResolvableArguments
-public enum ResolvableArguments: DummySargon {
-	public static func addressValue(value: Any) -> Self {
-		panic()
-	}
-}
-
-// MARK: - OlympiaNetwork
-public enum OlympiaNetwork: DummySargon {
-	case mainnet
-}
-
 // MARK: - BuildInformation
 public struct BuildInformation: DummySargon {
 	public let version: String
@@ -837,9 +825,8 @@ public func deriveVirtualIdentityAddressFromPublicKey(
 	panic()
 }
 
-public func deriveOlympiaAccountAddressFromPublicKey(
-	publicKey: Any,
-	olympiaNetwork: OlympiaNetwork
+public func deriveOlympiaMainnetAccountAddressFromPublicKey(
+	publicKey: K1.PublicKey
 ) throws -> AccountAddress {
 	panic()
 }

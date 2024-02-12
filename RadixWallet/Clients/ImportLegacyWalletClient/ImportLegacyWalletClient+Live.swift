@@ -168,9 +168,8 @@ extension ImportLegacyWalletClient: DependencyKey {
 func convert(
 	parsedOlympiaAccount raw: Olympia.Parsed.Account
 ) throws -> OlympiaAccountToMigrate {
-	let bech32Address = try deriveOlympiaAccountAddressFromPublicKey(
-		publicKey: raw.publicKey,
-		olympiaNetwork: .mainnet
+	let bech32Address = try deriveOlympiaMainnetAccountAddressFromPublicKey(
+		publicKey: raw.publicKey
 	).asStr()
 
 	guard let nonEmptyString = NonEmptyString(rawValue: bech32Address) else {
