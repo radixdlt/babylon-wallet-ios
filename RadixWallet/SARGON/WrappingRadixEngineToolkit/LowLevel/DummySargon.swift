@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - DummySargon
-public protocol DummySargon: Sendable, Equatable, Hashable, Codable, CustomStringConvertible {}
+public protocol DummySargon: Sendable, Equatable, Hashable, Codable {}
 
 public func sargon(line: UInt = #line, file: StaticString = #file) -> Never {
 	fatalError("Sargon migration: \(line), in \(file)")
@@ -13,10 +13,6 @@ extension DummySargon {
 	}
 
 	public func hash(into hasher: inout Hasher) {
-		sargon()
-	}
-
-	public var description: String {
 		sargon()
 	}
 
