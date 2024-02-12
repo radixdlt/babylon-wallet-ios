@@ -218,11 +218,7 @@ private extension View {
 	}
 
 	private func derivePublicKeys(with destinationStore: PresentationStoreOf<AccountRecoveryScanInProgress.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /AccountRecoveryScanInProgress.Destination.State.derivePublicKeys,
-			action: AccountRecoveryScanInProgress.Destination.Action.derivePublicKeys
-		) {
+		sheet(store: destinationStore.scope(state: \.derivePublicKeys, action: \.derivePublicKeys)) {
 			DerivePublicKeys.View(store: $0)
 		}
 	}

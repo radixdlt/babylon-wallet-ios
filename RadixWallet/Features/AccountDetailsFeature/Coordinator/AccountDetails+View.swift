@@ -51,7 +51,7 @@ extension AccountDetails {
 						transferButton()
 					}
 
-					AssetsView.View(store: store.scope(state: \.assets, action: { .child(.assets($0)) }))
+					AssetsView.View(store: store.scope(state: \.assets, action: \.child.assets))
 						.roundedCorners(.top, radius: .medium1)
 						.ignoresSafeArea(edges: .bottom)
 				}

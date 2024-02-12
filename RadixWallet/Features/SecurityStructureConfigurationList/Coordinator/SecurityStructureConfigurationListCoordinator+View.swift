@@ -13,10 +13,7 @@ extension SecurityStructureConfigurationListCoordinator {
 
 		public var body: some SwiftUI.View {
 			SecurityStructureConfigurationList.View(
-				store: store.scope(
-					state: \.configList,
-					action: { .child(.configList($0)) }
-				)
+				store: store.scope(state: \.configList, action: \.child.configList)
 			)
 			.destinations(with: store)
 		}
@@ -41,11 +38,8 @@ private extension View {
 
 	@MainActor
 	private func manageSecurityStructureCoordinator(with destinationStore: PresentationStoreOf<SecurityStructureConfigurationListCoordinator.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /SecurityStructureConfigurationListCoordinator.Destination.State.manageSecurityStructureCoordinator,
-			action: SecurityStructureConfigurationListCoordinator.Destination.Action.manageSecurityStructureCoordinator,
-			content: { ManageSecurityStructureCoordinator.View(store: $0) }
-		)
+		sheet(store: destinationStore.scope(state: \.manageSecurityStructureCoordinator, action: \.manageSecurityStructureCoordinator)) {
+			ManageSecurityStructureCoordinator.View(store: $0)
+		}
 	}
 }

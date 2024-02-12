@@ -105,7 +105,6 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 			case .liquidStakeUnit:
 				self.thumbnail = .lsu(url)
 			case .stakeClaimNFT, .nonFungible:
-				assertionFailure("Should not be called with non-fungible transfer")
 				return nil
 			}
 
