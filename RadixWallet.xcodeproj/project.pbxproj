@@ -1103,6 +1103,8 @@
 		48DA94882B7A1DB400C7A6F6 /* AddressOfAccountOrPersona.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA94872B7A1DB400C7A6F6 /* AddressOfAccountOrPersona.swift */; };
 		48DA948A2B7A254F00C7A6F6 /* TransactionGuarantee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA94892B7A254F00C7A6F6 /* TransactionGuarantee.swift */; };
 		48DA948C2B7A2DA100C7A6F6 /* AssetTransferRepresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA948B2B7A2DA100C7A6F6 /* AssetTransferRepresentation.swift */; };
+		48DA948E2B7A9F8B00C7A6F6 /* Sargon+Swift+Codable+NonFungibleIDs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA948D2B7A9F8B00C7A6F6 /* Sargon+Swift+Codable+NonFungibleIDs.swift */; };
+		48DA94902B7A9F9E00C7A6F6 /* DummySargonCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA948F2B7A9F9E00C7A6F6 /* DummySargonCodable.swift */; };
 		48F9CFE52B03A09400657755 /* ProfileBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F9CFE32B0375A500657755 /* ProfileBuilder.swift */; };
 		48F9CFE72B03A0A000657755 /* ProfileBuilderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F9CFE62B03A0A000657755 /* ProfileBuilderTest.swift */; };
 		48FF43152AE43C7C00C568B9 /* TimeLimit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48FF43142AE43C7C00C568B9 /* TimeLimit.swift */; };
@@ -2481,6 +2483,8 @@
 		48DA94872B7A1DB400C7A6F6 /* AddressOfAccountOrPersona.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressOfAccountOrPersona.swift; sourceTree = "<group>"; };
 		48DA94892B7A254F00C7A6F6 /* TransactionGuarantee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionGuarantee.swift; sourceTree = "<group>"; };
 		48DA948B2B7A2DA100C7A6F6 /* AssetTransferRepresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetTransferRepresentation.swift; sourceTree = "<group>"; };
+		48DA948D2B7A9F8B00C7A6F6 /* Sargon+Swift+Codable+NonFungibleIDs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sargon+Swift+Codable+NonFungibleIDs.swift"; sourceTree = "<group>"; };
+		48DA948F2B7A9F9E00C7A6F6 /* DummySargonCodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DummySargonCodable.swift; sourceTree = "<group>"; };
 		48F9CFE32B0375A500657755 /* ProfileBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileBuilder.swift; sourceTree = "<group>"; };
 		48F9CFE62B03A0A000657755 /* ProfileBuilderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileBuilderTest.swift; sourceTree = "<group>"; };
 		48FF43142AE43C7C00C568B9 /* TimeLimit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeLimit.swift; sourceTree = "<group>"; };
@@ -6913,6 +6917,8 @@
 				48DA947D2B7A19E200C7A6F6 /* Sargon+Swift+Signature.swift */,
 				48DA947F2B7A1A2B00C7A6F6 /* Sargon+Swift+PublicKey.swift */,
 				48DA94822B7A1A6800C7A6F6 /* Sargon+Swift+Decimal.swift */,
+				48DA948D2B7A9F8B00C7A6F6 /* Sargon+Swift+Codable+NonFungibleIDs.swift */,
+				48DA948F2B7A9F9E00C7A6F6 /* DummySargonCodable.swift */,
 			);
 			path = OnlyPossibleInSwift;
 			sourceTree = "<group>";
@@ -8470,6 +8476,7 @@
 				83EE47952AF0EE3C00155F03 /* ProgrammaticScryptoSborValueDecimal.swift in Sources */,
 				48CFC2D92ADC10D900E77A5C /* ManageSecurityStructureCoordinator.swift in Sources */,
 				E6FA984B2B04B9AC00748F20 /* ConfirmSkippingBDFS.swift in Sources */,
+				48DA948E2B7A9F8B00C7A6F6 /* Sargon+Swift+Codable+NonFungibleIDs.swift in Sources */,
 				48CFC25F2ADC10D900E77A5C /* EditPersonaName+View.swift in Sources */,
 				48CFC3582ADC10D900E77A5C /* ShowQR+View.swift in Sources */,
 				48CFC4542ADC10DA00E77A5C /* QRGeneratorClient+Live.swift in Sources */,
@@ -8633,6 +8640,7 @@
 				48CFC26E2ADC10D900E77A5C /* SignWithFactorSourcesOfKindDevice.swift in Sources */,
 				48CFC5DC2ADC10DA00E77A5C /* Modifier.swift in Sources */,
 				48CFC4CF2ADC10DA00E77A5C /* EntityMetadataItemValue.swift in Sources */,
+				48DA94902B7A9F9E00C7A6F6 /* DummySargonCodable.swift in Sources */,
 				48CFC67C2ADC10DB00E77A5C /* SecurityStructureMetadata.swift in Sources */,
 				48CFC3112ADC10D900E77A5C /* AccountsToImport+View.swift in Sources */,
 				48CFC5A12ADC10DA00E77A5C /* Stroke.swift in Sources */,

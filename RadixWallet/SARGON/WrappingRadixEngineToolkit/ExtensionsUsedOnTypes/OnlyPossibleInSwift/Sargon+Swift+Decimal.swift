@@ -1,6 +1,10 @@
-// RATIONALE: UniFFI does not support ExpressibleByIntegerLiteral / ExpressibleByFloatLiteral
+// MARK: - RETDecimal + DummySargonCodable
+
+extension RETDecimal: DummySargonCodable {}
 
 // MARK: - RETDecimal + ExpressibleByIntegerLiteral
+// RATIONALE: UniFFI does not support ExpressibleByIntegerLiteral / ExpressibleByFloatLiteral
+
 extension RETDecimal: ExpressibleByIntegerLiteral {
 	public init(integerLiteral value: Int) {
 		sargon()
