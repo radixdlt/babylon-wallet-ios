@@ -8,6 +8,20 @@ public struct ResourceAsset: Sendable, FeatureReducer {
 		public enum Kind: Sendable, Hashable {
 			case fungibleAsset(FungibleResourceAsset.State)
 			case nonFungibleAsset(NonFungibleResourceAsset.State)
+
+			public var fungible: FungibleResourceAsset.State? {
+				switch self {
+				case let .fungibleAsset(asset): asset
+				case .nonFungibleAsset: nil
+				}
+			}
+
+			public var nonFungible: NonFungibleResourceAsset.State? {
+				switch self {
+				case let .nonFungibleAsset(asset): asset
+				case .fungibleAsset: nil
+				}
+			}
 		}
 
 		public typealias ID = String

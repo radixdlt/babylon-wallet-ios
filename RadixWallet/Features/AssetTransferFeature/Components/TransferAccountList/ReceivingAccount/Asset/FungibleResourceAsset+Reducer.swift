@@ -36,7 +36,11 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 
 		public var focused: Bool = false
 
-		init(resource: OnLedgerEntity.OwnedFungibleResource, isXRD: Bool, totalTransferSum: RETDecimal = .zero) {
+		init(
+			resource: OnLedgerEntity.OwnedFungibleResource,
+			isXRD: Bool,
+			totalTransferSum: RETDecimal = .zero
+		) {
 			self.resource = resource
 			self.isXRD = isXRD
 			self.totalTransferSum = totalTransferSum

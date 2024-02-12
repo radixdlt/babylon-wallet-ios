@@ -4,6 +4,27 @@ import SwiftUI
 // MARK: - TransferAccountList
 public struct TransferAccountList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		public var transferRepresentation: AssetsTransfersTransactionPrototype {
+			AssetsTransfersTransactionPrototype(
+				fromAccount: fromAccount.accountAddress,
+				transfers: receivingAccounts.filter { $0.recipient != nil }.map { receivingAccount in
+					AssetsTransfersToRecipient(
+						recipient: receivingAccount.recipient!,
+						fungibles: receivingAccount.assets
+							.compactMap(\.kind.fungible)
+							.filter { $0.transferAmount != nil }
+							.map { fungible in
+								FungiblePositiveAmount(
+									resourceAddress: fungible.resource.resourceAddress,
+									amount: fungible.transferAmount!
+								)
+							},
+						nonFungibles: receivingAccount.assets.compactMap { $0.kind.nonFungible?.nftGlobalID }
+					)
+				}.asIdentifiable()
+			)
+		}
+
 		public let fromAccount: Profile.Network.Account
 		public var receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State> {
 			didSet {
@@ -129,7 +150,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		case let .destination(.presented(.relay(id, destinationAction))):
 			switch destinationAction {
 			case let .chooseAccount(.delegate(.handleResult(account))):
-				state.receivingAccounts[id: id]?.account = account
+				state.receivingAccounts[id: id]?.recipient = account
 				state.destination = nil
 				return .none
 
@@ -226,7 +247,7 @@ extension TransferAccountList {
 	}
 
 	private func navigateToChooseAccounts(_ state: inout State, id: ReceivingAccount.State.ID) -> Effect<Action> {
-		let filteredAccounts = state.receivingAccounts.compactMap(\.account?.left?.address) + [state.fromAccount.address]
+		let filteredAccounts = state.receivingAccounts.compactMap(\.recipient?.id) + [state.fromAccount.address]
 		let chooseAccount: ChooseReceivingAccount.State = .init(
 			networkID: state.fromAccount.networkID,
 			chooseAccounts: .init(
@@ -291,11 +312,14 @@ extension TransferAccountList {
 		_ receivingAccount: ReceivingAccount.State,
 		forAssets assets: IdentifiedArrayOf<ResourceAsset.State>
 	) -> Effect<Action> {
-		if case let .left(userOwnedAccount) = receivingAccount.account {
+		if case let .myOwnAccount(userOwnedAccount) = receivingAccount.recipient {
 			return .run { send in
 				for asset in assets {
 					let resourceAddress = asset.resourceAddress
-					let signatureNeeded = await needsSignatureForDepositting(into: userOwnedAccount, resource: resourceAddress)
+					let signatureNeeded = try await Sargon.needsSignatureForDepositting(
+						intoAccount: userOwnedAccount,
+						resource: resourceAddress
+					)
 					await send(.internal(.updateSignatureStatus(
 						accountID: receivingAccount.id,
 						assetID: asset.id,

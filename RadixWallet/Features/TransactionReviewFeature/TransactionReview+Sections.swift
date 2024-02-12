@@ -719,13 +719,13 @@ extension TransactionReview {
 		case let .left(resource):
 			let existingTokenIds = ids.filter { id in
 				!newlyCreatedNonFungibles.contains { newId in
-					newId.resourceAddress().asStr() == resourceAddress.address && newId.localId() == id
+					newId.resourceAddress.asStr() == resourceAddress.address && newId.localId() == id
 				}
 			}
 
 			let newTokens = try ids.filter { id in
 				newlyCreatedNonFungibles.contains { newId in
-					newId.resourceAddress().asStr() == resourceAddress.address && newId.localId() == id
+					newId.resourceAddress.asStr() == resourceAddress.address && newId.localId() == id
 				}
 			}.map {
 				try OnLedgerEntity.NonFungibleToken(resourceAddress: resourceAddress, nftID: $0, nftData: nil)
@@ -735,7 +735,7 @@ extension TransactionReview {
 				resource: resourceAddress,
 				nonFungibleIds: existingTokenIds.map {
 					try NonFungibleGlobalId.fromParts(
-						resourceAddress: resourceAddress.intoEngine(),
+						resourceAddress: resourceAddress,
 						nonFungibleLocalId: $0
 					)
 				}
@@ -765,7 +765,10 @@ extension TransactionReview {
 			// Newly minted tokens
 			result = try ids
 				.map { localId in
-					try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: localId)
+					try NonFungibleGlobalId.fromParts(
+						resourceAddress: resourceAddress,
+						nonFungibleLocalId: localId
+					)
 				}
 				.map { id in
 					Transfer(resource: resource, details: .nonFungible(.init(id: id, data: nil)))

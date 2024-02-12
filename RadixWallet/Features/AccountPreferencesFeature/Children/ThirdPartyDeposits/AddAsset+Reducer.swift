@@ -40,13 +40,13 @@ public struct AddAsset: FeatureReducer, Sendable {
 				address = ThirdPartyDeposits.DepositorAddress(raw: resourceAddress).map { .allowedDepositor($0) }
 			}
 
-			guard let address, let engineAddress = try? address.resourceAddress.intoEngine() else {
+			guard let address else {
 				return .invalid
 			}
 
-			guard engineAddress.networkId() == networkID.rawValue else {
+			guard address.resourceAddress.networkId() == networkID.rawValue else {
 				// On wrong network
-				return .wrongNetwork(address, incorrectNetwork: engineAddress.networkId())
+				return .wrongNetwork(address, incorrectNetwork: address.resourceAddress.networkId().rawValue)
 			}
 
 			guard !alreadyAddedResources.contains(where: { $0.resourceAddress == address.resourceAddress }) else {

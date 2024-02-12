@@ -40,7 +40,7 @@ extension ReceivingAccount.View {
 
 	private func account(_ viewStore: ViewStoreOf<ReceivingAccount>) -> some View {
 		Group {
-			if let account = viewStore.account {
+			if let account = viewStore.recipient {
 				SmallAccountCard(
 					account.name,
 					identifiable: account.identifer,

@@ -102,9 +102,3 @@ extension ManifestBuilderBucket {
 		panic()
 	}
 }
-
-extension TransactionManifest {
-	public func withInstructionAdded(_ instruction: Instruction, at index: Int) throws -> Self {
-		panic()
-	}
-}

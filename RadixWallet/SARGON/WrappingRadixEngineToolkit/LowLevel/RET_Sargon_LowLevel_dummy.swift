@@ -540,7 +540,7 @@ public struct NonFungibleGlobalId: DummySargon {
 	}
 
 	public static func fromParts(
-		resourceAddress: RETAddress,
+		resourceAddress: ResourceAddress,
 		nonFungibleLocalId: NonFungibleLocalId
 	) -> Self {
 		panic()
@@ -550,7 +550,7 @@ public struct NonFungibleGlobalId: DummySargon {
 		panic()
 	}
 
-	public func resourceAddress() -> RETAddress {
+	public var resourceAddress: ResourceAddress {
 		panic()
 	}
 }

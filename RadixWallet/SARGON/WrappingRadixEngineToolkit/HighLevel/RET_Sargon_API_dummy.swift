@@ -75,6 +75,22 @@ extension Sargon {
 	) throws -> TransactionManifest {
 		panic()
 	}
+
+	/// REQUIRES NETWORK CALL (and probable cache)
+	public static func manifestAssetsTransfers(
+		transfers: AssetsTransfersTransactionPrototype,
+		message: String?
+	) async throws -> TransactionManifest {
+		panic()
+	}
+
+	/// REQUIRES NETWORK CALL (and probable cache)	///
+	public static func needsSignatureForDepositting(
+		intoAccount: Profile.Network.Account,
+		resource: ResourceAddress
+	) async throws -> Bool {
+		panic()
+	}
 }
 
 extension Sargon {

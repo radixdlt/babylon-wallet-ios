@@ -88,7 +88,7 @@ extension OnLedgerEntitiesClient {
 
 		let items = try freshPage.items.map {
 			try NonFungibleGlobalId.fromParts(
-				resourceAddress: request.resource.resourceAddress.intoEngine(),
+				resourceAddress: request.resource.resourceAddress,
 				nonFungibleLocalId: .from(stringFormat: $0)
 			)
 		}
@@ -310,10 +310,7 @@ extension CacheClient.Entry.OnLedgerEntity {
 		case let .genericComponent(genericComponent):
 			genericComponent.asGeneral
 		case let .nonFungibleData(nonFungibleId):
-			.init(
-				address: nonFungibleId.resourceAddress().asStr(),
-				decodedKind: .globalNonFungibleResourceManager
-			)
+			nonFungibleId.resourceAddress.asGeneral
 		case let .nonFungibleIdPage(_, resourceAddress, _):
 			resourceAddress.asGeneral
 		}

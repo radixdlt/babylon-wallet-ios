@@ -6,6 +6,12 @@ public protocol AddressProtocol {
 	var address: String { get }
 }
 
+extension AddressProtocol {
+	public func networkId() -> NetworkID {
+		panic()
+	}
+}
+
 extension AddressProtocol where Self: Identifiable, ID == String {
 	public var id: String { address }
 }

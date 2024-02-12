@@ -11,6 +11,9 @@ public struct NonFungibleResourceAsset: Sendable, FeatureReducer {
 		public let resourceName: String?
 		public let resourceAddress: ResourceAddress
 		public let nftToken: OnLedgerEntity.NonFungibleToken
+		public var nftGlobalID: NonFungibleGlobalId {
+			nftToken.id
+		}
 	}
 }
 

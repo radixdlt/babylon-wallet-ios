@@ -790,7 +790,7 @@ extension ResourceOrNonFungible {
 		case let .resource(address):
 			try address.asSpecific()
 		case let .nonFungible(globalID):
-			try globalID.resourceAddress().asSpecific()
+			globalID.resourceAddress
 		}
 	}
 }
