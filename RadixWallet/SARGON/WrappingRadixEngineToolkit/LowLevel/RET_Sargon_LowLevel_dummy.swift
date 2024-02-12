@@ -266,10 +266,10 @@ public enum TrackedPoolRedemption: TrackedPoolInteractionStuff {}
 
 // MARK: - ResourceIndicator
 public enum ResourceIndicator: DummySargon {
-	case fungible(resourceAddress: RETAddress, indicator: FungibleResourceIndicator)
-	case nonFungible(resourceAddress: RETAddress, indicator: NonFungibleResourceIndicator)
+	case fungible(resourceAddress: ResourceAddress, indicator: FungibleResourceIndicator)
+	case nonFungible(resourceAddress: ResourceAddress, indicator: NonFungibleResourceIndicator)
 
-	public var resourceAddress: RETAddress {
+	public var resourceAddress: ResourceAddress {
 		switch self {
 		case let .fungible(address, _):
 			address
@@ -812,7 +812,7 @@ public enum ResourceOrNonFungible: DummySargon {
 // MARK: - KnownAddresses
 public struct KnownAddresses: DummySargon {
 	public struct ResourceAddresses: DummySargon {
-		public var xrd: RETAddress {
+		public var xrd: ResourceAddress {
 			panic()
 		}
 	}
@@ -826,7 +826,7 @@ public struct KnownAddresses: DummySargon {
 
 // MARK: - Instruction
 public enum Instruction: DummySargon {
-	case assertWorktopContains(resourceAddress: RETAddress, amount: RETDecimal)
+	case assertWorktopContains(resourceAddress: ResourceAddress, amount: RETDecimal)
 	case callMethod(address: ManifestAddress, methodName: String, args: ManifestValue)
 }
 

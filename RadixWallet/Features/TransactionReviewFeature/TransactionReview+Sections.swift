@@ -31,7 +31,6 @@ extension TransactionReview {
 		let allDepositAddresses = summary.accountDeposits.values.flatMap { $0 }.map(\.resourceAddress)
 		// Prepoluate with all resource addresses from withdraw and deposit.
 		let allAddresses: IdentifiedArrayOf<ResourceAddress> = try (allWithdrawAddresses + allDepositAddresses)
-			.map { try $0.asSpecific() }
 			.asIdentifiable()
 
 		func resourcesInfo(_ resourceAddresses: [ResourceAddress]) async throws -> ResourcesInfo {
@@ -598,7 +597,7 @@ extension TransactionReview {
 		type: TransferType,
 		defaultDepositGuarantee: RETDecimal = 1
 	) async throws -> [Transfer] {
-		let resourceAddress: ResourceAddress = try resourceQuantifier.resourceAddress.asSpecific()
+		let resourceAddress = resourceQuantifier.resourceAddress
 
 		guard let resourceInfo = entities[resourceAddress] else {
 			throw ResourceEntityNotFound(address: resourceAddress.address)

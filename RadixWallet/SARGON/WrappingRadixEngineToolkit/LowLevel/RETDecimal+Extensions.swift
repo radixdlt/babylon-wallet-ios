@@ -146,7 +146,7 @@ extension RETDecimal {
 }
 
 extension RETAddress {
-	static func xrd(_ networkId: UInt8) -> RETAddress {
+	static func xrd(_ networkId: UInt8) -> ResourceAddress {
 		knownAddresses(networkId: networkId).resourceAddresses.xrd
 	}
 }
