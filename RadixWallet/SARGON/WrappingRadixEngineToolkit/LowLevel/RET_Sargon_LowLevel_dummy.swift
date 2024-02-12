@@ -492,10 +492,6 @@ extension DummySargonAddress {
 	public func networkId() -> UInt8 {
 		panic()
 	}
-
-	public func intoManifestBuilderAddress() -> ManifestBuilderAddress {
-		panic()
-	}
 }
 
 // MARK: - NonFungibleLocalId
@@ -677,10 +673,6 @@ public struct TransactionManifest: DummySargon {
 	}
 
 	public func blobs() -> [Data] {
-		panic()
-	}
-
-	public func withInstructionAdded(_ guarantee: Any, at: Int) throws -> Self {
 		panic()
 	}
 

@@ -659,7 +659,7 @@ extension TransactionReview {
 		let amount = resourceQuantifier.amount
 		let resourceAddress = resource.resourceAddress
 
-		let guarantee: TransactionClient.Guarantee? = {
+		let guarantee: TransactionGuarantee? = {
 			guard case let .predicted(predictedAmount) = resourceQuantifier else { return nil }
 			let guaranteedAmount = defaultDepositGuarantee * predictedAmount.value
 			return .init(
@@ -784,7 +784,7 @@ extension TransactionReview {
 		amount: RETDecimal,
 		validator: OnLedgerEntity.Validator,
 		validatorStakes: [TrackedValidatorStake] = [],
-		guarantee: TransactionClient.Guarantee?
+		guarantee: TransactionGuarantee?
 	) async throws -> [Transfer] {
 		let worth: RETDecimal
 		if !validatorStakes.isEmpty {
@@ -827,7 +827,7 @@ extension TransactionReview {
 		entities: ResourcesInfo = [:],
 		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
-		guarantee: TransactionClient.Guarantee?
+		guarantee: TransactionGuarantee?
 	) async throws -> [Transfer] {
 		let resourceAddress = resource.resourceAddress
 

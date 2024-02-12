@@ -675,30 +675,6 @@ extension TransactionReview {
 		}
 	}
 
-	public func addingGuarantees(
-		to manifest: TransactionManifest,
-		guarantees: [TransactionClient.Guarantee]
-	) throws -> TransactionManifest {
-		guard !guarantees.isEmpty else { return manifest }
-
-		var manifest = manifest
-
-		/// Will be increased with each added guarantee to account for the difference in indexes from the initial manifest.
-		var indexInc = 1 // LockFee was added, start from 1
-		for guarantee in guarantees {
-			let decimalplaces = guarantee.resourceDivisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
-			let guaranteeInstruction: Instruction = try .assertWorktopContains(
-				resourceAddress: guarantee.resourceAddress.intoEngine(),
-				amount: guarantee.amount.rounded(decimalPlaces: decimalplaces)
-			)
-
-			manifest = try manifest.withInstructionAdded(guaranteeInstruction, at: Int(guarantee.instructionIndex) + indexInc)
-
-			indexInc += 1
-		}
-		return manifest
-	}
-
 	func showRawTransaction(_ state: inout State) -> Effect<Action> {
 		do {
 			let manifest = try transactionManifestWithWalletInstructionsAdded(state)
@@ -719,7 +695,7 @@ extension TransactionReview {
 		var manifest = reviewedTransaction.transactionManifest
 		if case let .success(feePayerAccount) = reviewedTransaction.feePayer.unwrap()?.account {
 			do {
-				manifest = try Sargon.updatingManifest(
+				manifest = try Sargon.updatingManifestLockFee(
 					reviewedTransaction.transactionManifest,
 					addressOfFeePayer: feePayerAccount.address,
 					fee: reviewedTransaction.transactionFee.totalFee.lockFee
@@ -730,7 +706,10 @@ extension TransactionReview {
 			}
 		}
 		do {
-			return try addingGuarantees(to: manifest, guarantees: state.allGuarantees)
+			return try Sargon.updatingManifestAddGuarantees(
+				manifest,
+				guarantees: state.allGuarantees
+			)
 		} catch {
 			loggerGlobal.error("Failed to add guarantee, error: \(error)")
 			throw FailedToAddGuarantee(underlyingError: error)
@@ -870,7 +849,7 @@ extension TransactionReview {
 			public struct Fungible: Sendable, Hashable {
 				public let isXRD: Bool
 				public let amount: RETDecimal
-				public var guarantee: TransactionClient.Guarantee?
+				public var guarantee: TransactionGuarantee?
 			}
 
 			public struct LiquidStakeUnit: Sendable, Hashable {
@@ -878,7 +857,7 @@ extension TransactionReview {
 				public let amount: RETDecimal
 				public let worth: RETDecimal
 				public let validator: OnLedgerEntity.Validator
-				public var guarantee: TransactionClient.Guarantee?
+				public var guarantee: TransactionGuarantee?
 			}
 
 			public typealias NonFungible = OnLedgerEntity.NonFungibleToken
@@ -886,12 +865,12 @@ extension TransactionReview {
 
 			public struct PoolUnit: Sendable, Hashable {
 				public let details: OnLedgerEntitiesClient.OwnedResourcePoolDetails
-				public var guarantee: TransactionClient.Guarantee?
+				public var guarantee: TransactionGuarantee?
 			}
 		}
 
 		/// The guarantee, for a fungible resource
-		public var fungibleGuarantee: TransactionClient.Guarantee? {
+		public var fungibleGuarantee: TransactionGuarantee? {
 			get {
 				switch details {
 				case let .fungible(fungible):
@@ -938,11 +917,11 @@ extension TransactionReview {
 }
 
 extension TransactionReview.State {
-	public var allGuarantees: [TransactionClient.Guarantee] {
+	public var allGuarantees: [TransactionGuarantee] {
 		deposits?.accounts.flatMap { $0.transfers.compactMap(\.fungibleGuarantee) } ?? []
 	}
 
-	public mutating func applyGuarantee(_ updated: TransactionClient.Guarantee, transferID: TransactionReview.Transfer.ID) {
+	public mutating func applyGuarantee(_ updated: TransactionGuarantee, transferID: TransactionReview.Transfer.ID) {
 		guard let accountID = accountID(for: transferID) else { return }
 		deposits?.accounts[id: accountID]?.transfers[id: transferID]?.fungibleGuarantee = updated
 	}

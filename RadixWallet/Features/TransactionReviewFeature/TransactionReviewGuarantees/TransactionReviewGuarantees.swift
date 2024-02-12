@@ -78,7 +78,7 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 		public let resource: OnLedgerEntity.Resource
 		public let thumbnail: Thumbnail.FungibleContent
 		public let amount: RETDecimal
-		public var guarantee: TransactionClient.Guarantee
+		public var guarantee: TransactionGuarantee
 
 		public var percentageStepper: MinimumPercentageStepper.State
 

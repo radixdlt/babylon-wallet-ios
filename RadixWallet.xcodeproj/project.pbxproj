@@ -1102,6 +1102,7 @@
 		48DA94832B7A1A6800C7A6F6 /* Sargon+Swift+Decimal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA94822B7A1A6800C7A6F6 /* Sargon+Swift+Decimal.swift */; };
 		48DA94862B7A1B3F00C7A6F6 /* NEW_SARGON_TYPES.md in Resources */ = {isa = PBXBuildFile; fileRef = 48DA94852B7A1B3F00C7A6F6 /* NEW_SARGON_TYPES.md */; };
 		48DA94882B7A1DB400C7A6F6 /* AddressOfAccountOrPersona.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA94872B7A1DB400C7A6F6 /* AddressOfAccountOrPersona.swift */; };
+		48DA948A2B7A254F00C7A6F6 /* TransactionGuarantee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA94892B7A254F00C7A6F6 /* TransactionGuarantee.swift */; };
 		48F9CFE52B03A09400657755 /* ProfileBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F9CFE32B0375A500657755 /* ProfileBuilder.swift */; };
 		48F9CFE72B03A0A000657755 /* ProfileBuilderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F9CFE62B03A0A000657755 /* ProfileBuilderTest.swift */; };
 		48FF43152AE43C7C00C568B9 /* TimeLimit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48FF43142AE43C7C00C568B9 /* TimeLimit.swift */; };
@@ -2456,6 +2457,7 @@
 		48DA94822B7A1A6800C7A6F6 /* Sargon+Swift+Decimal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Sargon+Swift+Decimal.swift"; sourceTree = "<group>"; };
 		48DA94852B7A1B3F00C7A6F6 /* NEW_SARGON_TYPES.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = NEW_SARGON_TYPES.md; sourceTree = "<group>"; };
 		48DA94872B7A1DB400C7A6F6 /* AddressOfAccountOrPersona.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddressOfAccountOrPersona.swift; sourceTree = "<group>"; };
+		48DA94892B7A254F00C7A6F6 /* TransactionGuarantee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionGuarantee.swift; sourceTree = "<group>"; };
 		48F9CFE32B0375A500657755 /* ProfileBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileBuilder.swift; sourceTree = "<group>"; };
 		48F9CFE62B03A0A000657755 /* ProfileBuilderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileBuilderTest.swift; sourceTree = "<group>"; };
 		48FF43142AE43C7C00C568B9 /* TimeLimit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeLimit.swift; sourceTree = "<group>"; };
@@ -6823,6 +6825,7 @@
 				48DA94792B7A149600C7A6F6 /* StakeClaim.swift */,
 				48DA94852B7A1B3F00C7A6F6 /* NEW_SARGON_TYPES.md */,
 				48DA94872B7A1DB400C7A6F6 /* AddressOfAccountOrPersona.swift */,
+				48DA94892B7A254F00C7A6F6 /* TransactionGuarantee.swift */,
 			);
 			path = NewSargonTypes;
 			sourceTree = "<group>";
@@ -8702,6 +8705,7 @@
 				A41266F92B160F4C00EA38E9 /* ManualAccountRecoveryCoordinator+View.swift in Sources */,
 				48CFC2CA2ADC10D900E77A5C /* NonFungibleResourceAsset+Reducer+View.swift in Sources */,
 				48CFC4B72ADC10DA00E77A5C /* TransactionPreviewResponse.swift in Sources */,
+				48DA948A2B7A254F00C7A6F6 /* TransactionGuarantee.swift in Sources */,
 				48CFC3CA2ADC10D900E77A5C /* BIP39+Wordlists.swift in Sources */,
 				48CFC3452ADC10D900E77A5C /* Completion+View.swift in Sources */,
 				48CFC63F2ADC10DB00E77A5C /* Account+OnLedgerSettings.swift in Sources */,

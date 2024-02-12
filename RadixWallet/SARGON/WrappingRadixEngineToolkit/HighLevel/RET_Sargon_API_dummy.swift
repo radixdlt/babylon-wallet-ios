@@ -78,10 +78,17 @@ extension Sargon {
 }
 
 extension Sargon {
-	public static func updatingManifest(
+	public static func updatingManifestLockFee(
 		_ manifest: TransactionManifest,
 		addressOfFeePayer: AccountAddress,
 		fee: RETDecimal = .temporaryStandardFee
+	) throws -> TransactionManifest {
+		panic()
+	}
+
+	public static func updatingManifestAddGuarantees(
+		_ manifest: TransactionManifest,
+		guarantees: [TransactionGuarantee]
 	) throws -> TransactionManifest {
 		panic()
 	}
