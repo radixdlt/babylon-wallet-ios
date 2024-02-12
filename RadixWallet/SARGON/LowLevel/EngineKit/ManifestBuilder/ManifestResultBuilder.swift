@@ -11,9 +11,9 @@ extension ManifestBuilder {
 	}
 
 	public static func withdrawTokens(
-		_ from: RETAddress,
-		_ resourceAddress: RETAddress,
-		ids: [NonFungibleLocalId]
+		fungible: ResourceAddress,
+		nonFungibleIDs: [NonFungibleLocalId],
+		fromOwner: AccountAddress
 	) -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
@@ -26,15 +26,6 @@ extension ManifestBuilder {
 		panic()
 	}
 
-	///	= flip(takeAllFromWorktop)
-	public static func takeAllFromWorktop(
-		_ resourceAddress: RETAddress,
-		_ bucket: ManifestBuilderBucket
-	) -> ManifestBuilder.InstructionsChain.Instruction {
-		panic()
-	}
-
-	///	= flip(accountTryDepositOrAbort)
 	public static func accountTryDepositOrAbort(
 		_ address: RETAddress,
 		_ bucket: ManifestBuilderBucket,

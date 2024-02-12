@@ -854,91 +854,9 @@ public enum ManifestBuilder: DeprecatedDummySargon {
 		panic()
 	}
 
-	public func setOwnerKeys(from: Any, ownerKeyHashes: [Any]) throws -> ManifestBuilder {
-		panic()
-	}
-
-	public func build(networkId: Any) -> TransactionManifest {
-		panic()
-	}
-
-	public static func withdrawAmount(
-		_ args: Any...
-	) throws -> TransactionManifest {
-		panic()
-	}
-
-	public static func withdrawTokens(
-		_ args: Any...
-	) throws -> ManifestBuilder.InstructionsChain.Instruction {
-		panic()
-	}
-
-	public static func takeNonFungiblesFromWorktop(
-		_ args: Any...
-	) throws -> TransactionManifest {
-		panic()
-	}
-
-	public static func accountDeposit(_ args: Any...) throws -> ManifestBuilder.InstructionsChain.Instruction {
-		panic()
-	}
-
-	public static func manifestForCreateNonFungibleToken(
-		account: Any,
-		networkID: Any
-	) throws -> TransactionManifest {
-		panic()
-	}
-
-	public func callMethod(
-		address: Any,
-		methodName: Any,
-		args: [ManifestBuilderValue]
-	) throws -> ManifestBuilder {
-		panic()
-	}
-
-	public static func setDefaultDepositorRule(
-		accountAddress: Any
-	) throws -> TransactionManifest {
-		panic()
-	}
-
-	public static func setResourcePreference(
-		_ args: Any...
+	public func build(
+		networkId: NetworkID
 	) -> TransactionManifest {
-		panic()
-	}
-
-	public static func setDefaultDepositorRule(
-		_ args: Any...
-	) -> TransactionManifest {
-		panic()
-	}
-
-	public static func removeResourcePreference(
-		_ args: Any...
-	) -> TransactionManifest {
-		panic()
-	}
-
-	public static func removeAuthorizedDepositor(
-		_ args: Any...
-	) -> TransactionManifest {
-		panic()
-	}
-
-	public static func addAuthorizedDepositor(
-		_ args: Any...
-	) -> TransactionManifest {
-		panic()
-	}
-
-	public static func manifestForCreateMultipleNonFungibleTokens(
-		account: Any,
-		networkID: Any
-	) throws -> TransactionManifest {
 		panic()
 	}
 }

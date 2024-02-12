@@ -199,9 +199,9 @@ extension AssetTransfer {
 
 			for resource in involvedNonFungibles {
 				try ManifestBuilder.withdrawTokens(
-					accounts.fromAccount.address.intoEngine(),
-					resource.address.intoEngine(),
-					resource.allTokens.map { $0.id.localId() }
+					fungible: resource.address,
+					nonFungibleIDs: resource.allTokens.map { $0.id.localId() },
+					fromOwner: accounts.fromAccount.address
 				)
 
 				for account in resource.accounts {
