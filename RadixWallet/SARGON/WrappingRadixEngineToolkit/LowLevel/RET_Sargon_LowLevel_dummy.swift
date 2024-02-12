@@ -806,54 +806,6 @@ public enum AccountDefaultDepositRule: DeprecatedDummySargon {
 	case accept, reject, allowExisting
 }
 
-// MARK: - ManifestBuilderValue
-public enum ManifestBuilderValue: DeprecatedDummySargon {
-	public static func enumValue(discriminator: Any, fields: [ManifestValue]) -> Self {
-		panic()
-	}
-
-	public static func addressValue(value: Any) -> Self {
-		panic()
-	}
-
-	public static func `static`(value: Any) -> Self {
-		panic()
-	}
-
-	public static func tupleValue(fields: [ManifestValue]) -> Self {
-		panic()
-	}
-}
-
-// MARK: - ManifestValue
-public enum ManifestValue: DeprecatedDummySargon {
-	case enumValue(discriminator: UInt8, fields: [ManifestValue])
-	case tupleValue(fields: [ManifestValue])
-	case decimalValue(value: RETDecimal)
-	case nonFungibleLocalIdValue(value: NonFungibleLocalId)
-
-	case boolValue(value: Any)
-	case i8Value(value: Any)
-	case i16Value(value: Any)
-	case i32Value(value: Any)
-	case i64Value(value: Any)
-	case i128Value(value: Any)
-	case u8Value(value: Any)
-	case u16Value(value: Any)
-	case u32Value(value: Any)
-	case u64Value(value: Any)
-	case u128Value(value: Any)
-	case stringValue(value: Any)
-	case arrayValue(elementValueKind: Any, elements: Any)
-	case mapValue(keyValueKind: Any, valueValueKind: Any, entries: Any)
-	case bucketValue(value: Any)
-	case proofValue(value: Any)
-	case expressionValue(value: Any)
-	case blobValue(value: Any)
-	case preciseDecimalValue(value: Any)
-	case addressReservationValue(value: Any)
-}
-
 // MARK: - ResolvableArguments
 public enum ResolvableArguments: DummySargon {
 	public static func addressValue(value: Any) -> Self {
