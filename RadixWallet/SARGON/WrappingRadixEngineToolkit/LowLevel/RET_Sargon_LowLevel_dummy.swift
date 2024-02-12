@@ -81,11 +81,11 @@ public struct RadixEngineToolkitError: DummySargon {}
 // MARK: - ResourceSpecifier
 public enum ResourceSpecifier: DummySargon {
 	case amount(
-		resourceAddress: RETAddress,
+		resourceAddress: ResourceAddress,
 		amount: RETDecimal
 	)
 	case ids(
-		resourceAddress: RETAddress,
+		resourceAddress: ResourceAddress,
 		ids: [NonFungibleLocalId]
 	)
 
@@ -104,7 +104,7 @@ public enum ResourceSpecifier: DummySargon {
 		return nil
 	}
 
-	public var resourceAddress: RETAddress {
+	public var resourceAddress: ResourceAddress {
 		switch self {
 		case let .amount(resourceAddress, _):
 			resourceAddress
