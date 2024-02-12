@@ -139,7 +139,7 @@ extension OnLedgerEntitiesClient {
 	) async throws -> OnLedgerEntity.Validator? {
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		let networkId = await gatewaysClient.getCurrentNetworkID()
-		let xrdAddress = knownAddresses(networkId: networkId.rawValue).resourceAddresses.xrd.addressString()
+		let xrdAddress = Sargon.xrdAddressOfNetwork(networkId: networkId)
 
 		guard let state: GatewayAPI.ValidatorState = try? item.details?.component?.decodeState() else {
 			assertionFailure("Invalid validator state")
@@ -150,7 +150,7 @@ extension OnLedgerEntitiesClient {
 		guard let xrdResource = item
 			.fungibleResources?
 			.items
-			.first(where: { $0.resourceAddress == xrdAddress })
+			.first(where: { $0.resourceAddress == xrdAddress.address })
 		else {
 			assertionFailure("A validator didn't contain an xrd resource")
 			return nil

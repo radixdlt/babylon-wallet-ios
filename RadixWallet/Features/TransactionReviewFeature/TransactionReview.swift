@@ -1027,7 +1027,7 @@ extension ReviewedTransaction {
 				return selected.validateBalance(forFee: transactionFee)
 			}
 
-			let xrdAddress = knownAddresses(networkId: networkID.rawValue).resourceAddresses.xrd
+			let xrdAddress = Sargon.xrdAddressOfNetwork(networkId: networkID)
 
 			let xrdTotalTransfer: RETDecimal = feePayerWithdraws.reduce(.zero) { partialResult, resource in
 				if case let .fungible(resourceAddress, indicator) = resource, resourceAddress == xrdAddress {

@@ -110,4 +110,36 @@ extension Sargon {
 	public static func hash(data: Data) -> Data {
 		panic()
 	}
+
+	public static func xrdAddressOfNetwork(networkId: NetworkID) -> ResourceAddress {
+		panic()
+	}
+
+	public static func nonFungibleLocalIdAsStr(value: NonFungibleLocalId) -> String {
+		panic()
+	}
+
+	public static func nonFungibleLocalIdFromStr(string: String) throws -> NonFungibleLocalId {
+		panic()
+	}
+
+	public static func deriveOlympiaMainnetAccountAddressFromPublicKey(
+		publicKey: K1.PublicKey
+	) throws -> AccountAddress {
+		panic()
+	}
+
+	public static func deriveVirtualAccountAddressFromPublicKey(
+		publicKey: SLIP10.PublicKey,
+		networkId: NetworkID
+	) throws -> AccountAddress {
+		panic()
+	}
+
+	public static func deriveVirtualIdentityAddressFromPublicKey(
+		publicKey: SLIP10.PublicKey,
+		networkId: NetworkID
+	) throws -> IdentityAddress {
+		panic()
+	}
 }

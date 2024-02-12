@@ -132,9 +132,9 @@ extension Profile.Network.Persona {
 			throw WrongEntityInDerivationPath()
 		}
 
-		return try deriveVirtualIdentityAddressFromPublicKey(
+		return try Sargon.deriveVirtualIdentityAddressFromPublicKey(
 			publicKey: factorInstance.publicKey,
-			networkId: networkID.rawValue
+			networkId: networkID
 		)
 	}
 }

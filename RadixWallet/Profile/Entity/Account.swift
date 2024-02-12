@@ -121,9 +121,9 @@ extension Profile.Network.Account {
 		networkID: NetworkID,
 		factorInstance: HierarchicalDeterministicFactorInstance
 	) throws -> EntityAddress {
-		try deriveVirtualAccountAddressFromPublicKey(
+		try Sargon.deriveVirtualAccountAddressFromPublicKey(
 			publicKey: factorInstance.publicKey,
-			networkId: networkID.rawValue
+			networkId: networkID
 		)
 	}
 

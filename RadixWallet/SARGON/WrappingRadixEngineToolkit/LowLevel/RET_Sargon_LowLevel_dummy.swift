@@ -421,11 +421,11 @@ public enum NonFungibleLocalId: DummySargon {
 	}
 
 	public static func from(stringFormat: String) throws -> Self {
-		try nonFungibleLocalIdFromStr(string: stringFormat)
+		try Sargon.nonFungibleLocalIdFromStr(string: stringFormat)
 	}
 
 	public func toString() throws -> String {
-		nonFungibleLocalIdAsStr(value: self)
+		Sargon.nonFungibleLocalIdAsStr(value: self)
 	}
 
 	public func toUserFacingString() -> String {
@@ -809,38 +809,4 @@ public enum AccountDefaultDepositRule: DeprecatedDummySargon {
 // MARK: - BuildInformation
 public struct BuildInformation: DummySargon {
 	public let version: String
-}
-
-public func deriveVirtualAccountAddressFromPublicKey(
-	publicKey: Any,
-	networkId: Any
-) throws -> AccountAddress {
-	panic()
-}
-
-public func deriveVirtualIdentityAddressFromPublicKey(
-	publicKey: Any,
-	networkId: Any
-) throws -> IdentityAddress {
-	panic()
-}
-
-public func deriveOlympiaMainnetAccountAddressFromPublicKey(
-	publicKey: K1.PublicKey
-) throws -> AccountAddress {
-	panic()
-}
-
-public func knownAddresses(
-	networkId: UInt8
-) -> KnownAddresses {
-	panic()
-}
-
-public func nonFungibleLocalIdAsStr(value: NonFungibleLocalId) -> String {
-	panic()
-}
-
-public func nonFungibleLocalIdFromStr(string: String) throws -> NonFungibleLocalId {
-	panic()
 }
