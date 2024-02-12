@@ -544,7 +544,7 @@ public struct NotarizedTransaction: DummySargon {
 		panic()
 	}
 
-	public func notarySignature() -> RETSignature {
+	public func notarySignature() -> SLIP10.Signature {
 		panic()
 	}
 }
