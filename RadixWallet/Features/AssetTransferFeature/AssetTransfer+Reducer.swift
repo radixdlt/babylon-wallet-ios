@@ -175,10 +175,10 @@ extension AssetTransfer {
 		return try await ManifestBuilder.make {
 			for resource in involvedFungibleResources {
 				let divisibility = resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
-				try ManifestBuilder.withdrawAmount(
-					accounts.fromAccount.address.intoEngine(),
-					resource.address.intoEngine(),
-					resource.totalTransferAmount.rounded(decimalPlaces: divisibility)
+				try Sargon.manifestWithdrawAmount(
+					from: accounts.fromAccount.address,
+					resource: resource.address,
+					amount: resource.totalTransferAmount.rounded(decimalPlaces: divisibility)
 				)
 
 				for account in resource.accounts {

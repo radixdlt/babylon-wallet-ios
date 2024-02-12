@@ -3,7 +3,7 @@ import Foundation
 // MARK: - Sargon
 public enum Sargon {}
 
-// MARK: Manifests
+// MARK: Declare Manifests
 extension Sargon {
 	public static func manifestThirdPartyDepositUpdate(
 		to new: ThirdPartyDeposits
@@ -19,11 +19,11 @@ extension Sargon {
 		panic()
 	}
 
-	public static func updatingManifest(
-		_ manifest: TransactionManifest,
-		addressOfFeePayer: AccountAddress,
-		fee: RETDecimal = .temporaryStandardFee
-	) throws -> TransactionManifest {
+	public static func manifestWithdrawAmount(
+		from: AccountAddress,
+		resource: ResourceAddress,
+		amount: RETDecimal
+	) -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
 
@@ -44,6 +44,16 @@ extension Sargon {
 	public static func manifestStakesClaim(
 		accountAddress: AccountAddress,
 		stakeClaims: [StakeClaim]
+	) throws -> TransactionManifest {
+		panic()
+	}
+}
+
+extension Sargon {
+	public static func updatingManifest(
+		_ manifest: TransactionManifest,
+		addressOfFeePayer: AccountAddress,
+		fee: RETDecimal = .temporaryStandardFee
 	) throws -> TransactionManifest {
 		panic()
 	}

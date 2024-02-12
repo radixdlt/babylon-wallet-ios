@@ -1,14 +1,6 @@
 
 
 extension ManifestBuilder {
-	public static func withdrawAmount(
-		_ from: RETAddress,
-		_ resourceAddress: RETAddress,
-		_ amount: RETDecimal
-	) -> ManifestBuilder.InstructionsChain.Instruction {
-		panic()
-	}
-
 	public static func withdrawTokens(
 		fungible: ResourceAddress,
 		nonFungibleIDs: [NonFungibleLocalId],
