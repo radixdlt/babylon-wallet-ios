@@ -121,7 +121,7 @@ extension TransactionClient {
 				startEpochInclusive: epoch.rawValue,
 				endEpochExclusive: (epoch + request.makeTransactionHeaderInput.epochWindow).rawValue,
 				nonce: request.nonce.rawValue,
-				notaryPublicKey: SLIP10.PublicKey.eddsaEd25519(request.transactionSigners.notaryPublicKey).intoEngine(),
+				notaryPublicKey: SLIP10.PublicKey.eddsaEd25519(request.transactionSigners.notaryPublicKey),
 				notaryIsSignatory: request.transactionSigners.notaryIsSignatory,
 				tipPercentage: request.makeTransactionHeaderInput.tipPercentage
 			)

@@ -9,7 +9,7 @@ extension AccountAddress {
 	) -> Self {
 		let curve25519PublicKey = Curve25519.PrivateKey().publicKey
 		return try! deriveVirtualAccountAddressFromPublicKey(
-			publicKey: SLIP10.PublicKey.eddsaEd25519(curve25519PublicKey).intoEngine(),
+			publicKey: SLIP10.PublicKey.eddsaEd25519(curve25519PublicKey),
 			networkId: networkID.rawValue
 		)
 	}

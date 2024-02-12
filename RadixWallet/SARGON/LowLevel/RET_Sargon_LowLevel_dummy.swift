@@ -490,7 +490,7 @@ public struct TransactionHeader: DummySargon {
 		panic()
 	}
 
-	public var notaryPublicKey: RETPublicKey {
+	public var notaryPublicKey: SLIP10.PublicKey {
 		panic()
 	}
 

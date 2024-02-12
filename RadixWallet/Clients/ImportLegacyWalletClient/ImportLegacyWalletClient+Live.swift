@@ -166,7 +166,10 @@ extension ImportLegacyWalletClient: DependencyKey {
 func convert(
 	parsedOlympiaAccount raw: Olympia.Parsed.Account
 ) throws -> OlympiaAccountToMigrate {
-	let bech32Address = try deriveOlympiaAccountAddressFromPublicKey(publicKey: raw.publicKey.intoEngine(), olympiaNetwork: .mainnet).asStr()
+	let bech32Address = try deriveOlympiaAccountAddressFromPublicKey(
+		publicKey: raw.publicKey,
+		olympiaNetwork: .mainnet
+	).asStr()
 
 	guard let nonEmptyString = NonEmptyString(rawValue: bech32Address) else {
 		struct FailedToCreateNonEmptyOlympiaAddress: Swift.Error {}

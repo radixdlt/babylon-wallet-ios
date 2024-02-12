@@ -122,7 +122,7 @@ extension Profile.Network.Account {
 		factorInstance: HierarchicalDeterministicFactorInstance
 	) throws -> EntityAddress {
 		try deriveVirtualAccountAddressFromPublicKey(
-			publicKey: factorInstance.publicKey.intoEngine(),
+			publicKey: factorInstance.publicKey,
 			networkId: networkID.rawValue
 		)
 	}

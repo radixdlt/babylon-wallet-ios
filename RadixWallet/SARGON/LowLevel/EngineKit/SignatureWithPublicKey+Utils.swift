@@ -13,12 +13,6 @@ public struct RETSecp256k1PublicKey: DummySargon {}
 // MARK: - RETEd25519PublicKey
 public struct RETEd25519PublicKey: DummySargon {}
 
-// MARK: - RETPublicKey
-public enum RETPublicKey: DummySargon {
-	case secp256k1(value: Data)
-	case ed25519(value: Data)
-}
-
 // MARK: - RETSignatureWithPublicKey
 public enum RETSignatureWithPublicKey: DummySargon {
 	case secp256k1(signature: Data)
@@ -35,13 +29,8 @@ extension RETSignatureWithPublicKey {
 		}
 	}
 
-	public var publicKey: RETPublicKey? {
-		switch self {
-		case .secp256k1:
-			nil
-		case let .ed25519(_, key):
-			.ed25519(value: key)
-		}
+	public var publicKey: SLIP10.PublicKey? {
+		panic()
 	}
 }
 
@@ -56,13 +45,13 @@ extension RETSignature {
 	}
 }
 
-extension RETPublicKey {
+extension SLIP10.PublicKey {
 	public var bytes: Data {
 		switch self {
-		case let .secp256k1(value):
-			value
-		case let .ed25519(value):
-			value
+		case let .ecdsaSecp256k1(key):
+			key.compressedRepresentation
+		case let .eddsaEd25519(key):
+			key.rawRepresentation
 		}
 	}
 }

@@ -133,7 +133,7 @@ extension Profile.Network.Persona {
 		}
 
 		return try deriveVirtualIdentityAddressFromPublicKey(
-			publicKey: factorInstance.publicKey.intoEngine(),
+			publicKey: factorInstance.publicKey,
 			networkId: networkID.rawValue
 		)
 	}
