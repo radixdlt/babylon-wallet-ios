@@ -129,7 +129,7 @@ extension Sargon {
 
 	public static func deriveOlympiaMainnetAccountAddressFromPublicKey(
 		publicKey: K1.PublicKey
-	) throws -> AccountAddress {
+	) throws -> LegacyOlympiaAccountAddress {
 		sargon()
 	}
 

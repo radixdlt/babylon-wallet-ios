@@ -168,15 +168,10 @@ extension ImportLegacyWalletClient: DependencyKey {
 func convert(
 	parsedOlympiaAccount raw: Olympia.Parsed.Account
 ) throws -> OlympiaAccountToMigrate {
-	let bech32Address = try Sargon.deriveOlympiaMainnetAccountAddressFromPublicKey(
+	let address = try Sargon.deriveOlympiaMainnetAccountAddressFromPublicKey(
 		publicKey: raw.publicKey
-	).asStr()
+	)
 
-	guard let nonEmptyString = NonEmptyString(rawValue: bech32Address) else {
-		struct FailedToCreateNonEmptyOlympiaAddress: Swift.Error {}
-		throw FailedToCreateNonEmptyOlympiaAddress()
-	}
-	let address = LegacyOlympiaAccountAddress(address: nonEmptyString)
 	let derivationPath = try LegacyOlympiaBIP44LikeDerivationPath(
 		index: raw.addressIndex
 	)
