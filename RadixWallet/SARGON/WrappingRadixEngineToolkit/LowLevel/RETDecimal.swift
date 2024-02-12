@@ -138,30 +138,4 @@ extension RETDecimal {
 	) -> String {
 		sargon()
 	}
-
-	/// The digits of the number, without separators or sign. The scale is fixed at 18, meaning the last 18 digits correspond to the decimal part.
-	public func digits() -> String {
-		sargon()
-	}
-}
-
-// MARK: - RETDecimal.Multiplier
-extension RETDecimal {
-	public enum Multiplier: UInt, CaseIterable {
-		case million = 6, billion = 9, trillion = 12
-
-		var value: RETDecimal {
-			.init(exponent: rawValue)
-		}
-	}
-}
-
-extension RETDecimal.Multiplier {
-	var suffix: String {
-		switch self {
-		case .million: "M"
-		case .billion: "B"
-		case .trillion: "T"
-		}
-	}
 }

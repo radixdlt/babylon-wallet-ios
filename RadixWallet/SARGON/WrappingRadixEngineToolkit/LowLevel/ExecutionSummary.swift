@@ -6,18 +6,6 @@ public struct ExecutionSummary: DummySargon {
 		public var metadata: [String: [String: MetadataValue?]] {
 			sargon()
 		}
-
-		public var componentAddresses: [ComponentAddress] {
-			sargon()
-		}
-
-		public var resourceAddresses: [ResourceAddress] {
-			sargon()
-		}
-
-		public var packageAddresses: [PackageAddress] {
-			sargon()
-		}
 	}
 
 	public var detailedClassification: [DetailedManifestClass] {
@@ -65,12 +53,8 @@ public struct ExecutionSummary: DummySargon {
 		newEntities.metadata
 	}
 
-	public var dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]] {
-		[:] // TODO: Is this never populated for .general?
-	}
-
 	public var addressesOfNewlyCreatedEntities: [Address] {
-		newEntities.componentAddresses.map(\.asGeneral) + newEntities.packageAddresses.map(\.asGeneral) + newEntities.resourceAddresses.map(\.asGeneral)
+		sargon()
 	}
 }
 
