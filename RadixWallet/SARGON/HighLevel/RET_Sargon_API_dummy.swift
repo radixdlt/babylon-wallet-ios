@@ -26,6 +26,27 @@ extension Sargon {
 	) throws -> TransactionManifest {
 		panic()
 	}
+
+	public static func manifestForCreateFungibleToken(
+		addressOfOwner: AccountAddress,
+		networkID: NetworkID
+	) throws -> TransactionManifest {
+		panic()
+	}
+
+	public static func manifestForCreateMultipleFungibleTokens(
+		addressOfOwner: AccountAddress,
+		networkID: NetworkID
+	) throws -> TransactionManifest {
+		panic()
+	}
+
+	public static func manifestStakesClaim(
+		accountAddress: AccountAddress,
+		stakeClaims: [StakeClaim]
+	) throws -> TransactionManifest {
+		panic()
+	}
 }
 
 extension Sargon {

@@ -2,38 +2,6 @@
 
 // MARK: - Result Builder
 extension ManifestBuilder {
-	/// Every Manifest builder function signature of form `(ManifestBuilder) -> (args...) throws -> ManifestBuilder`
-	///
-	/// To be able to use manifest builder, it is required to transform all functions to have the same signature.
-	/// So this ResultBuilder defines an instruction as `(ManifestBuilder) throws -> ManifestBuilder`.
-	/// To achive this we flip the arguments order of the manifest builder functions to a form of:
-	/// `(args...) -> (ManifestBuilder) -> throws -> ManifestBuilder`
-	/// This allows to create partial instruction which are then build once put together.
-	///
-	///
-
-	public static func faucetLockFee() -> ManifestBuilder.InstructionsChain.Instruction {
-		panic()
-	}
-
-	public static func faucetFreeXrd() -> ManifestBuilder.InstructionsChain.Instruction {
-		panic()
-	}
-
-	public static func accountTryDepositEntireWorktopOrAbort(
-		_ accountAddress: RETAddress,
-		_ authorizedDepositorBadge: ResourceOrNonFungible?
-	) -> ManifestBuilder.InstructionsChain.Instruction {
-		panic()
-	}
-
-	public func accountTryDepositEntireWorktopOrAbort(
-		accountAddress: RETAddress,
-		authorizedDepositorBadge: ResourceOrNonFungible?
-	) -> ManifestBuilder {
-		panic()
-	}
-
 	public static func withdrawAmount(
 		_ from: RETAddress,
 		_ resourceAddress: RETAddress,

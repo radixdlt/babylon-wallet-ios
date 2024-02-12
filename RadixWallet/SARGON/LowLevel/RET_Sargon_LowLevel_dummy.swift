@@ -862,20 +862,7 @@ public enum ManifestBuilder: DeprecatedDummySargon {
 		panic()
 	}
 
-	public static func manifestForCreateFungibleToken(
-		account: Any,
-		networkID: Any
-	) throws -> TransactionManifest {
-		panic()
-	}
-
 	public static func withdrawAmount(
-		_ args: Any...
-	) throws -> TransactionManifest {
-		panic()
-	}
-
-	public static func takeFromWorktop(
 		_ args: Any...
 	) throws -> TransactionManifest {
 		panic()
@@ -884,13 +871,6 @@ public enum ManifestBuilder: DeprecatedDummySargon {
 	public static func withdrawTokens(
 		_ args: Any...
 	) throws -> ManifestBuilder.InstructionsChain.Instruction {
-		panic()
-	}
-
-	public static func stakeClaimsManifest(
-		accountAddress: AccountAddress,
-		stakeClaims: [Any]
-	) throws -> TransactionManifest {
 		panic()
 	}
 
@@ -951,13 +931,6 @@ public enum ManifestBuilder: DeprecatedDummySargon {
 
 	public static func addAuthorizedDepositor(
 		_ args: Any...
-	) -> TransactionManifest {
-		panic()
-	}
-
-	public static func manifestForCreateMultipleFungibleTokens(
-		account: Any,
-		networkID: Any
 	) -> TransactionManifest {
 		panic()
 	}

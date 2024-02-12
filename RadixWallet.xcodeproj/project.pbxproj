@@ -1101,6 +1101,7 @@
 		48CFC6BE2ADC110800E77A5C /* Project-PreAlpha.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 48CFC6AB2ADC110800E77A5C /* Project-PreAlpha.xcconfig */; };
 		48CFC6BF2ADC110800E77A5C /* Project-Release-Opt.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 48CFC6AC2ADC110800E77A5C /* Project-Release-Opt.xcconfig */; };
 		48DA94762B7A026300C7A6F6 /* RET_Sargon_API_dummy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA94752B7A026300C7A6F6 /* RET_Sargon_API_dummy.swift */; };
+		48DA947A2B7A149600C7A6F6 /* StakeClaim.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DA94792B7A149600C7A6F6 /* StakeClaim.swift */; };
 		48F9CFE52B03A09400657755 /* ProfileBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F9CFE32B0375A500657755 /* ProfileBuilder.swift */; };
 		48F9CFE72B03A0A000657755 /* ProfileBuilderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F9CFE62B03A0A000657755 /* ProfileBuilderTest.swift */; };
 		48FF43152AE43C7C00C568B9 /* TimeLimit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48FF43142AE43C7C00C568B9 /* TimeLimit.swift */; };
@@ -2454,6 +2455,7 @@
 		48CFC6AC2ADC110800E77A5C /* Project-Release-Opt.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Project-Release-Opt.xcconfig"; sourceTree = "<group>"; };
 		48CFC6AD2ADC110800E77A5C /* Radix-Wallet--iOS--Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Radix-Wallet--iOS--Info.plist"; sourceTree = "<group>"; };
 		48DA94752B7A026300C7A6F6 /* RET_Sargon_API_dummy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RET_Sargon_API_dummy.swift; sourceTree = "<group>"; };
+		48DA94792B7A149600C7A6F6 /* StakeClaim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StakeClaim.swift; sourceTree = "<group>"; };
 		48F9CFE32B0375A500657755 /* ProfileBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileBuilder.swift; sourceTree = "<group>"; };
 		48F9CFE62B03A0A000657755 /* ProfileBuilderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileBuilderTest.swift; sourceTree = "<group>"; };
 		48FF43142AE43C7C00C568B9 /* TimeLimit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeLimit.swift; sourceTree = "<group>"; };
@@ -6822,6 +6824,7 @@
 		48DA94742B7A024C00C7A6F6 /* HighLevel */ = {
 			isa = PBXGroup;
 			children = (
+				48DA94782B7A148900C7A6F6 /* NewSargonTypes */,
 				48DA94752B7A026300C7A6F6 /* RET_Sargon_API_dummy.swift */,
 			);
 			path = HighLevel;
@@ -6834,6 +6837,14 @@
 				48CFBE6B2ADC10D800E77A5C /* EngineKit */,
 			);
 			path = LowLevel;
+			sourceTree = "<group>";
+		};
+		48DA94782B7A148900C7A6F6 /* NewSargonTypes */ = {
+			isa = PBXGroup;
+			children = (
+				48DA94792B7A149600C7A6F6 /* StakeClaim.swift */,
+			);
+			path = NewSargonTypes;
 			sourceTree = "<group>";
 		};
 		48FF43132AE4364000C568B9 /* KeychainClientTests */ = {
@@ -8826,6 +8837,7 @@
 				48CFC6492ADC10DB00E77A5C /* PersonaData+DateOfBirth.swift in Sources */,
 				48CFC4DB2ADC10DA00E77A5C /* MetadataPublicKeyArrayValue.swift in Sources */,
 				48CFC4AC2ADC10DA00E77A5C /* MetadataGlobalAddressValue.swift in Sources */,
+				48DA947A2B7A149600C7A6F6 /* StakeClaim.swift in Sources */,
 				48CFC6062ADC10DA00E77A5C /* P2P+Dapp+Response+Persona.swift in Sources */,
 				48CFC4AE2ADC10DA00E77A5C /* TransactionCommittedDetailsRequest.swift in Sources */,
 				48CFC3012ADC10D900E77A5C /* DebugSettingsCoordinator+Reducer.swift in Sources */,

@@ -263,9 +263,12 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		}
 	}
 
-	private func sendStakeClaimTransaction(_ acccountAddress: AccountAddress, stakeClaims: [ManifestBuilder.StakeClaim]) -> Effect<Action> {
+	private func sendStakeClaimTransaction(
+		_ acccountAddress: AccountAddress,
+		stakeClaims: [StakeClaim]
+	) -> Effect<Action> {
 		.run { _ in
-			let manifest = try ManifestBuilder.stakeClaimsManifest(
+			let manifest = try Sargon.manifestStakesClaim(
 				accountAddress: acccountAddress,
 				stakeClaims: stakeClaims
 			)

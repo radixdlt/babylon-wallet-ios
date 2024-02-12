@@ -107,13 +107,13 @@ extension FaucetClient: DependencyKey {
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 			// TODO: Re-enable. With new manifest builder that is not easy to handle.
 			let manifest = if request.numberOfTokens == 1 {
-				try ManifestBuilder.manifestForCreateFungibleToken(
-					account: request.recipientAccountAddress,
+				try Sargon.manifestForCreateFungibleToken(
+					addressOfOwner: request.recipientAccountAddress,
 					networkID: networkID
 				)
 			} else {
-				try ManifestBuilder.manifestForCreateMultipleFungibleTokens(
-					account: request.recipientAccountAddress,
+				try Sargon.manifestForCreateMultipleFungibleTokens(
+					addressOfOwner: request.recipientAccountAddress,
 					networkID: networkID
 				)
 			}
