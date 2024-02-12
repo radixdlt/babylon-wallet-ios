@@ -26,6 +26,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 }
 
+// TEMPORARY: MOCK
+
 extension TransactionHistory.State {
 	init(account: Profile.Network.Account) {
 		self.init(

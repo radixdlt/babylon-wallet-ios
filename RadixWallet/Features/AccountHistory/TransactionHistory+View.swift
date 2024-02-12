@@ -33,7 +33,7 @@ extension TransactionHistory {
 							.padding(.vertical, .small3)
 
 						ScrollView {
-							LazyVStack(spacing: .zero, pinnedViews: [.sectionHeaders]) {
+							LazyVStack(spacing: .small1, pinnedViews: [.sectionHeaders]) {
 								SmallAccountCard(account: viewStore.account)
 									.roundedCorners(radius: .small1)
 									.padding(.horizontal, .medium3)
@@ -49,6 +49,7 @@ extension TransactionHistory {
 						.scrollIndicators(.never)
 						.coordinateSpace(name: View.coordSpace)
 					}
+					.background(.app.gray5)
 					.overlayPreferenceValue(PositionsPreferenceKey.self, alignment: .top) { positions in
 						let rect = positions["SmallAccountCardDummy"]
 						ZStack(alignment: .top) {
@@ -57,12 +58,14 @@ extension TransactionHistory {
 									.roundedCorners(radius: .small1)
 									.padding(.horizontal, .medium3)
 									.padding(.vertical, .medium3)
+									.background(.app.white)
 									.offset(y: rect.minY)
 							}
 
 							let scrollBarOffset = max(rect?.maxY ?? 0, 0)
 							HScrollBar(items: items, selection: $selection)
 								.padding(.vertical, .small3)
+								.background(.app.white)
 								.offset(y: scrollBarOffset)
 						}
 					}
@@ -92,21 +95,42 @@ extension TransactionHistory {
 		var body: some SwiftUI.View {
 			Section {
 				ForEach(section.transfers, id: \.self) { transfer in
-					Card {
+					Card(.app.white) {
 						Text(transfer.string)
 							.padding(.vertical, .small1)
 							.frame(maxWidth: .infinity)
 					}
-					.padding(.vertical, .small2)
+					.padding(.horizontal, .medium3)
+//					.padding(.bottom, .small1)
 				}
 			} header: {
-				Text(section.date.formatted(date: .abbreviated, time: .omitted))
-					.foregroundStyle(.red)
-					.padding(.vertical, .small1)
-					.frame(maxWidth: .infinity)
-					.background(.red.opacity(0.2))
+				SectionHeaderView(title: section.title)
+//					.padding(.bottom, .small1)
 			}
 		}
+	}
+
+	struct SectionHeaderView: SwiftUI.View {
+		let title: String
+
+		var body: some SwiftUI.View {
+			Text(title)
+				.textStyle(.body2Header)
+				.foregroundStyle(.app.gray2)
+				.padding(.horizontal, .medium3)
+				.padding(.top, .small1)
+				.padding(.bottom, .small2)
+				.frame(maxWidth: .infinity, alignment: .leading)
+				.background(.app.gray5)
+		}
+	}
+}
+
+// "ViewState"
+
+extension TransactionHistory.State.TransferSection {
+	var title: String {
+		date.formatted(date: .abbreviated, time: .omitted)
 	}
 }
 
@@ -144,7 +168,7 @@ struct HScrollBar: View {
 						.fill(.app.gray4)
 						.frame(width: rect.width, height: rect.height)
 						.position(x: rect.midX, y: rect.midY)
-						.animation(.default.speed(2), value: rect)
+						.animation(.default, value: rect)
 				}
 			}
 			.padding(.horizontal, .medium3)
