@@ -361,7 +361,6 @@
 		48CFC39A2ADC10D900E77A5C /* TransactionIntent+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE7E2ADC10D800E77A5C /* TransactionIntent+Utils.swift */; };
 		48CFC39B2ADC10D900E77A5C /* Blake2b.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE7F2ADC10D800E77A5C /* Blake2b.swift */; };
 		48CFC39C2ADC10D900E77A5C /* TXVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE802ADC10D800E77A5C /* TXVersion.swift */; };
-		48CFC39D2ADC10D900E77A5C /* Engine+Bridge+Real+CryptoPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE822ADC10D800E77A5C /* Engine+Bridge+Real+CryptoPrimitives.swift */; };
 		48CFC39E2ADC10D900E77A5C /* NetworkID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE832ADC10D800E77A5C /* NetworkID.swift */; };
 		48CFC39F2ADC10D900E77A5C /* TransactionManifest+CustomConvertibleString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE842ADC10D800E77A5C /* TransactionManifest+CustomConvertibleString.swift */; };
 		48CFC3A02ADC10D900E77A5C /* IsXRDResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE852ADC10D800E77A5C /* IsXRDResource.swift */; };
@@ -1717,7 +1716,6 @@
 		48CFBE7E2ADC10D800E77A5C /* TransactionIntent+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransactionIntent+Utils.swift"; sourceTree = "<group>"; };
 		48CFBE7F2ADC10D800E77A5C /* Blake2b.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Blake2b.swift; sourceTree = "<group>"; };
 		48CFBE802ADC10D800E77A5C /* TXVersion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TXVersion.swift; sourceTree = "<group>"; };
-		48CFBE822ADC10D800E77A5C /* Engine+Bridge+Real+CryptoPrimitives.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Engine+Bridge+Real+CryptoPrimitives.swift"; sourceTree = "<group>"; };
 		48CFBE832ADC10D800E77A5C /* NetworkID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkID.swift; sourceTree = "<group>"; };
 		48CFBE842ADC10D800E77A5C /* TransactionManifest+CustomConvertibleString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransactionManifest+CustomConvertibleString.swift"; sourceTree = "<group>"; };
 		48CFBE852ADC10D800E77A5C /* IsXRDResource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IsXRDResource.swift; sourceTree = "<group>"; };
@@ -4614,7 +4612,6 @@
 				48CFBE7E2ADC10D800E77A5C /* TransactionIntent+Utils.swift */,
 				48CFBE7F2ADC10D800E77A5C /* Blake2b.swift */,
 				48CFBE802ADC10D800E77A5C /* TXVersion.swift */,
-				48CFBE812ADC10D800E77A5C /* SignatureAndKeysBridge */,
 				48CFBE832ADC10D800E77A5C /* NetworkID.swift */,
 				48CFBE842ADC10D800E77A5C /* TransactionManifest+CustomConvertibleString.swift */,
 				48CFBE852ADC10D800E77A5C /* IsXRDResource.swift */,
@@ -4639,14 +4636,6 @@
 				48CFBE772ADC10D800E77A5C /* CustomTransactionManifests.swift */,
 			);
 			path = ManifestBuilder;
-			sourceTree = "<group>";
-		};
-		48CFBE812ADC10D800E77A5C /* SignatureAndKeysBridge */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBE822ADC10D800E77A5C /* Engine+Bridge+Real+CryptoPrimitives.swift */,
-			);
-			path = SignatureAndKeysBridge;
 			sourceTree = "<group>";
 		};
 		48CFBE892ADC10D800E77A5C /* Cryptography */ = {
@@ -9148,7 +9137,6 @@
 				48CFC2EC2ADC10D900E77A5C /* SecurityStructureTutorialHeader.swift in Sources */,
 				48CFC4052ADC10D900E77A5C /* NoopError.swift in Sources */,
 				48076E402B14F5CA004575F8 /* OnFirstAppearViewModifier.swift in Sources */,
-				48CFC39D2ADC10D900E77A5C /* Engine+Bridge+Real+CryptoPrimitives.swift in Sources */,
 				48CFC3A72ADC10D900E77A5C /* SLIP10+PublicKey.swift in Sources */,
 				48CFC4692ADC10DA00E77A5C /* ImportLegacyWalletClient+Request+Response.swift in Sources */,
 				48CFC3CC2ADC10D900E77A5C /* WordList+French.swift in Sources */,

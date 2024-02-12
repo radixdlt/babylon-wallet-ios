@@ -90,11 +90,11 @@ extension GatewayAPI.PublicKey {
 
 // MARK: - NotarizeTransactionRequest
 public struct NotarizeTransactionRequest: Sendable, Hashable {
-	public let intentSignatures: Set<RETSignatureWithPublicKey>
+	public let intentSignatures: Set<SignatureWithPublicKey>
 	public let transactionIntent: TransactionIntent
 	public let notary: SLIP10.PrivateKey
 	public init(
-		intentSignatures: Set<RETSignatureWithPublicKey>,
+		intentSignatures: Set<SignatureWithPublicKey>,
 		transactionIntent: TransactionIntent,
 		notary: SLIP10.PrivateKey
 	) {

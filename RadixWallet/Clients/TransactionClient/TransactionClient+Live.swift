@@ -143,7 +143,7 @@ extension TransactionClient {
 
 			let uncompiledNotarized = try NotarizedTransaction(
 				signedIntent: signedTransactionIntent,
-				notarySignature: notarySignature.intoEngine().signature
+				notarySignature: notarySignature.signature
 			)
 
 			let compiledNotarizedTXIntent = try uncompiledNotarized.compile()

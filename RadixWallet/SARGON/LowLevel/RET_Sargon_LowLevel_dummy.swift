@@ -517,7 +517,7 @@ public struct SignedIntent: DummySargon {
 		panic()
 	}
 
-	public func intentSignatures() -> [RETSignatureWithPublicKey] {
+	public func intentSignatures() -> [SignatureWithPublicKey] {
 		panic()
 	}
 
