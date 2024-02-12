@@ -13,4 +13,3 @@ INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationLand
 LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks
 TARGETED_DEVICE_FAMILY = 1
 IPHONEOS_DEPLOYMENT_TARGET = 16.4
-SWIFT_ENABLE_BATCH_MODE = NO

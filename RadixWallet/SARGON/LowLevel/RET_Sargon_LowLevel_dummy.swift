@@ -978,15 +978,8 @@ public enum OlympiaNetwork: DummySargon {
 }
 
 // MARK: - BuildInformation
-public enum BuildInformation: DummySargon {
-	public var version: String {
-		panic()
-	}
-}
-
-// MARK: Global Functions
-public func buildInformation() -> BuildInformation {
-	panic()
+public struct BuildInformation: DummySargon {
+	public let version: String
 }
 
 public func deriveVirtualAccountAddressFromPublicKey(

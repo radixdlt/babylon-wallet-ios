@@ -1,5 +1,4 @@
 // MARK: - TransactionIntent + CustomStringConvertible
-
 extension TransactionIntent: CustomStringConvertible {}
 
 // MARK: - TransactionHeader + CustomStringConvertible

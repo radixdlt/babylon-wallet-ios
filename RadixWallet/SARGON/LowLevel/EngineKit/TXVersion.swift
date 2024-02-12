@@ -1,5 +1,4 @@
 // MARK: - TXVersionTag
-
 public enum TXVersionTag: Sendable {}
 
 /// Transaction Version
