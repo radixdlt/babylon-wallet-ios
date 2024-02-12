@@ -3,26 +3,26 @@ import Foundation
 // MARK: - TransactionHeader
 public struct TransactionHeader: DummySargon {
 	public init(
-		networkId: UInt8,
-		startEpochInclusive: UInt64,
-		endEpochExclusive: UInt64,
-		nonce: UInt32,
-		notaryPublicKey: Any,
+		networkId: NetworkID,
+		startEpochInclusive: Epoch,
+		endEpochExclusive: Epoch,
+		nonce: Nonce,
+		notaryPublicKey: SLIP10.PublicKey,
 		notaryIsSignatory: Bool,
-		tipPercentage: Any
+		tipPercentage: UInt16
 	) {
 		sargon()
 	}
 
-	public var networkId: UInt8 {
+	public var networkId: NetworkID {
 		sargon()
 	}
 
-	public var startEpochInclusive: UInt64 {
+	public var startEpochInclusive: Epoch {
 		sargon()
 	}
 
-	public var endEpochExclusive: UInt64 {
+	public var endEpochExclusive: Epoch {
 		sargon()
 	}
 
@@ -34,15 +34,11 @@ public struct TransactionHeader: DummySargon {
 		sargon()
 	}
 
-	public var nonce: UInt32 {
+	public var nonce: Nonce {
 		sargon()
 	}
 
-	public var tipPercentage: Float {
-		sargon()
-	}
-
-	public func description(lookupNetworkName: (NetworkID) throws -> Void) rethrows -> String {
+	public var tipPercentage: UInt16 {
 		sargon()
 	}
 }

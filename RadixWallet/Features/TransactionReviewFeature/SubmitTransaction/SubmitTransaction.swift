@@ -136,7 +136,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 					case let .temporarilyRejected(epoch):
 						await send(.internal(.statusUpdate(
 							.temporarilyRejected(
-								remainingProcessingTime: Int(endEpoch - epoch.rawValue) * epochDurationInMinutes
+								remainingProcessingTime: Int((endEpoch - epoch).rawValue) * epochDurationInMinutes
 							)
 						)))
 					case .failed:

@@ -9,10 +9,6 @@ public struct TransactionIntent: DummySargon {
 		sargon()
 	}
 
-	public func description(lookupNetworkName: (NetworkID) throws -> Void) rethrows -> String {
-		sargon()
-	}
-
 	public func manifest() -> TransactionManifest {
 		sargon()
 	}

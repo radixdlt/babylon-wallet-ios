@@ -117,10 +117,10 @@ extension TransactionClient {
 			let epoch = try await gatewayAPIClient.getEpoch()
 
 			let header = TransactionHeader(
-				networkId: request.networkID.rawValue,
-				startEpochInclusive: epoch.rawValue,
-				endEpochExclusive: (epoch + request.makeTransactionHeaderInput.epochWindow).rawValue,
-				nonce: request.nonce.rawValue,
+				networkId: request.networkID,
+				startEpochInclusive: epoch,
+				endEpochExclusive: epoch + request.makeTransactionHeaderInput.epochWindow,
+				nonce: request.nonce,
 				notaryPublicKey: SLIP10.PublicKey.eddsaEd25519(request.transactionSigners.notaryPublicKey),
 				notaryIsSignatory: request.transactionSigners.notaryIsSignatory,
 				tipPercentage: request.makeTransactionHeaderInput.tipPercentage

@@ -40,12 +40,12 @@ extension GatewayAPI.TransactionPreviewRequest {
 		try self.init(
 			manifest: rawManifest.instructionsString(),
 			blobsHex: rawManifest.blobs().map(\.hex),
-			startEpochInclusive: .init(header.startEpochInclusive),
-			endEpochExclusive: .init(header.endEpochExclusive),
+			startEpochInclusive: .init(header.startEpochInclusive.rawValue),
+			endEpochExclusive: .init(header.endEpochExclusive.rawValue),
 			notaryPublicKey: GatewayAPI.PublicKey(from: header.notaryPublicKey),
 			notaryIsSignatory: notaryIsSignatory,
 			tipPercentage: .init(header.tipPercentage),
-			nonce: .init(header.nonce),
+			nonce: .init(header.nonce.rawValue),
 			signerPublicKeys: transactionSigners.signerPublicKeys.map(GatewayAPI.PublicKey.init(from:)),
 			flags: flags
 		)
