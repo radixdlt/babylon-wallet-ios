@@ -38,7 +38,7 @@ extension ROLAClient {
 					from: entityAddress,
 					ownerKeyHashes: ownerKeyHashes
 				)
-				.build(networkId: request.entity.networkID.rawValue)
+				.build(networkId: request.entity.networkID)
 		}
 
 		return Self(

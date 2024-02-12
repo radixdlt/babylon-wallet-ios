@@ -222,7 +222,7 @@ extension AssetTransfer {
 				}
 			}
 		}
-		.build(networkId: networkID.rawValue)
+		.build(networkId: networkID)
 	}
 }
 

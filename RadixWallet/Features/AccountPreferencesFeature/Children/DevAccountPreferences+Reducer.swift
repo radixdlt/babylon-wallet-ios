@@ -347,7 +347,7 @@ extension TransactionManifest {
 	) throws -> TransactionManifest {
 		try ManifestBuilder()
 			.setAccountType(from: accountAddress.address.asGeneral, type: "dapp definition")
-			.build(networkId: accountAddress.networkID.rawValue)
+			.build(networkId: accountAddress.networkID)
 	}
 }
 #endif
