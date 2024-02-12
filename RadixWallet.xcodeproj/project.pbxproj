@@ -5803,8 +5803,6 @@
 		48CFC0E42ADC10D900E77A5C /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBE862ADC10D800E77A5C /* Epoch.swift */,
-				48CFBE782ADC10D800E77A5C /* Nonce.swift */,
 				48CFC0E52ADC10D900E77A5C /* DesignSystem */,
 				48CFC1322ADC10D900E77A5C /* FeaturePrelude */,
 				48CFC14B2ADC10D900E77A5C /* Resources */,
@@ -6818,6 +6816,8 @@
 			isa = PBXGroup;
 			children = (
 				48CFBE802ADC10D800E77A5C /* TXVersion.swift */,
+				48CFBE862ADC10D800E77A5C /* Epoch.swift */,
+				48CFBE782ADC10D800E77A5C /* Nonce.swift */,
 				48DA94792B7A149600C7A6F6 /* StakeClaim.swift */,
 				48DA94852B7A1B3F00C7A6F6 /* NEW_SARGON_TYPES.md */,
 			);
