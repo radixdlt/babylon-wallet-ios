@@ -8,7 +8,7 @@ public protocol AddressProtocol {
 
 extension AddressProtocol {
 	public func networkId() -> NetworkID {
-		panic()
+		sargon()
 	}
 }
 

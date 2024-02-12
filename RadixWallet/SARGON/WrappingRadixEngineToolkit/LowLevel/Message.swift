@@ -4,7 +4,7 @@ import Foundation
 public enum Message: DummySargon {
 	public enum PlaintextMessage: DummySargon {
 		public init(mimeType: String, message: PlaintextMessageInner) {
-			panic()
+			sargon()
 		}
 
 		public enum PlaintextMessageInner: DummySargon {
@@ -12,11 +12,11 @@ public enum Message: DummySargon {
 		}
 
 		public var message: PlaintextMessageInner {
-			panic()
+			sargon()
 		}
 	}
 
-	static var none: Self { panic() }
+	static var none: Self { sargon() }
 	case plainText(value: PlaintextMessage)
-	static func encrypted(value: Any) -> Self { panic() }
+	static func encrypted(value: Any) -> Self { sargon() }
 }

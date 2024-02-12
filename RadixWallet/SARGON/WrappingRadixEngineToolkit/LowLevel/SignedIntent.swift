@@ -3,18 +3,18 @@ import Foundation
 // MARK: - SignedIntent
 public struct SignedIntent: DummySargon {
 	public init(intent: TransactionIntent, intentSignatures: [Any]) {
-		panic()
+		sargon()
 	}
 
 	public func intent() -> TransactionIntent {
-		panic()
+		sargon()
 	}
 
 	public func intentSignatures() -> [SignatureWithPublicKey] {
-		panic()
+		sargon()
 	}
 
 	public func signedIntentHash() -> TransactionHash {
-		panic()
+		sargon()
 	}
 }

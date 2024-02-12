@@ -8,7 +8,7 @@ extension Sargon {
 	public static func manifestThirdPartyDepositUpdate(
 		to new: ThirdPartyDeposits
 	) throws -> (manifest: TransactionManifest, updatedAccount: Profile.Network.Account) {
-		panic()
+		sargon()
 	}
 
 	public static func manifestForFaucet(
@@ -16,7 +16,7 @@ extension Sargon {
 		networkID: NetworkID,
 		addressOfReceivingAccount: AccountAddress
 	) throws -> TransactionManifest {
-		panic()
+		sargon()
 	}
 
 	public static func manifestSetOwnerKeys(
@@ -24,48 +24,48 @@ extension Sargon {
 		ownerKeyHashes: [RETPublicKeyHash],
 		networkId: NetworkID
 	) -> TransactionManifest {
-		panic()
+		sargon()
 	}
 
 	public static func manifestForCreateFungibleToken(
 		addressOfOwner: AccountAddress,
 		networkID: NetworkID
 	) throws -> TransactionManifest {
-		panic()
+		sargon()
 	}
 
 	public static func manifestForCreateMultipleFungibleTokens(
 		addressOfOwner: AccountAddress,
 		networkID: NetworkID
 	) throws -> TransactionManifest {
-		panic()
+		sargon()
 	}
 
 	public static func manifestForCreateMultipleNonFungibleTokens(
 		addressOfOwner: AccountAddress,
 		networkID: NetworkID
 	) throws -> TransactionManifest {
-		panic()
+		sargon()
 	}
 
 	public static func manifestForCreateNonFungibleToken(
 		addressOfOwner: AccountAddress,
 		networkID: NetworkID
 	) throws -> TransactionManifest {
-		panic()
+		sargon()
 	}
 
 	public static func manifestMarkingAccountAsDappDefinitionType(
 		accountAddress: AccountAddress
 	) throws -> TransactionManifest {
-		panic()
+		sargon()
 	}
 
 	public static func manifestStakesClaim(
 		accountAddress: AccountAddress,
 		stakeClaims: [StakeClaim]
 	) throws -> TransactionManifest {
-		panic()
+		sargon()
 	}
 
 	/// REQUIRES NETWORK CALL (and probable cache)
@@ -73,7 +73,7 @@ extension Sargon {
 		transfers: AssetsTransfersTransactionPrototype,
 		message: String?
 	) async throws -> TransactionManifest {
-		panic()
+		sargon()
 	}
 }
 
@@ -83,14 +83,14 @@ extension Sargon {
 		addressOfFeePayer: AccountAddress,
 		fee: RETDecimal = .temporaryStandardFee
 	) throws -> TransactionManifest {
-		panic()
+		sargon()
 	}
 
 	public static func updatingManifestAddGuarantees(
 		_ manifest: TransactionManifest,
 		guarantees: [TransactionGuarantee]
 	) throws -> TransactionManifest {
-		panic()
+		sargon()
 	}
 }
 
@@ -100,7 +100,7 @@ extension Sargon {
 		intoAccount: Profile.Network.Account,
 		resource: ResourceAddress
 	) async throws -> Bool {
-		panic()
+		sargon()
 	}
 
 	public static func buildInformation() -> BuildInformation {
@@ -108,38 +108,38 @@ extension Sargon {
 	}
 
 	public static func hash(data: Data) -> Data {
-		panic()
+		sargon()
 	}
 
 	public static func xrdAddressOfNetwork(networkId: NetworkID) -> ResourceAddress {
-		panic()
+		sargon()
 	}
 
 	public static func nonFungibleLocalIdAsStr(value: NonFungibleLocalId) -> String {
-		panic()
+		sargon()
 	}
 
 	public static func nonFungibleLocalIdFromStr(string: String) throws -> NonFungibleLocalId {
-		panic()
+		sargon()
 	}
 
 	public static func deriveOlympiaMainnetAccountAddressFromPublicKey(
 		publicKey: K1.PublicKey
 	) throws -> AccountAddress {
-		panic()
+		sargon()
 	}
 
 	public static func deriveVirtualAccountAddressFromPublicKey(
 		publicKey: SLIP10.PublicKey,
 		networkId: NetworkID
 	) throws -> AccountAddress {
-		panic()
+		sargon()
 	}
 
 	public static func deriveVirtualIdentityAddressFromPublicKey(
 		publicKey: SLIP10.PublicKey,
 		networkId: NetworkID
 	) throws -> IdentityAddress {
-		panic()
+		sargon()
 	}
 }

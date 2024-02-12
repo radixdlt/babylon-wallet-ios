@@ -3,14 +3,14 @@ import Foundation
 // MARK: - Instructions
 public struct Instructions: DummySargon {
 	public func asStr() -> String {
-		panic()
+		sargon()
 	}
 
 	public func networkId() -> UInt8 {
-		panic()
+		sargon()
 	}
 
 	public static func fromString(string: Any, networkId: UInt8) -> Self {
-		panic()
+		sargon()
 	}
 }

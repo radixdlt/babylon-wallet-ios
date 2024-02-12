@@ -2,26 +2,26 @@ import Foundation
 
 public struct TransactionIntent: DummySargon {
 	public init(header: Any, manifest: Any, message: Any) {
-		panic()
+		sargon()
 	}
 
 	public func header() -> TransactionHeader {
-		panic()
+		sargon()
 	}
 
 	public func description(lookupNetworkName: (NetworkID) throws -> Void) rethrows -> String {
-		panic()
+		sargon()
 	}
 
 	public func manifest() -> TransactionManifest {
-		panic()
+		sargon()
 	}
 
 	public func intentHash() throws -> TransactionHash {
-		panic()
+		sargon()
 	}
 
 	public func compile() throws -> Data {
-		panic()
+		sargon()
 	}
 }

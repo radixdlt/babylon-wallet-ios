@@ -3,25 +3,25 @@ import Foundation
 // MARK: - NonFungibleGlobalId
 public struct NonFungibleGlobalId: DummySargon {
 	public init(nonFungibleGlobalId: String) throws {
-		panic()
+		sargon()
 	}
 
 	public func localId() -> NonFungibleLocalId {
-		panic()
+		sargon()
 	}
 
 	public static func fromParts(
 		resourceAddress: ResourceAddress,
 		nonFungibleLocalId: NonFungibleLocalId
 	) -> Self {
-		panic()
+		sargon()
 	}
 
 	public func asStr() -> String {
-		panic()
+		sargon()
 	}
 
 	public var resourceAddress: ResourceAddress {
-		panic()
+		sargon()
 	}
 }

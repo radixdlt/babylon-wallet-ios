@@ -6,10 +6,10 @@ public typealias TXID = TransactionHash
 // MARK: - TransactionHash
 public struct TransactionHash: DummySargon {
 	public func asStr() -> String {
-		panic()
+		sargon()
 	}
 
 	public func bytes() -> [UInt8] {
-		panic()
+		sargon()
 	}
 }

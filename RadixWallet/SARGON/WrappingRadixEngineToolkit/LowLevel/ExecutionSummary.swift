@@ -4,57 +4,57 @@ import Foundation
 public struct ExecutionSummary: DummySargon {
 	public struct NewEntities: DummySargon {
 		public var metadata: [String: [String: MetadataValue?]] {
-			panic()
+			sargon()
 		}
 
 		public var componentAddresses: [ComponentAddress] {
-			panic()
+			sargon()
 		}
 
 		public var resourceAddresses: [ResourceAddress] {
-			panic()
+			sargon()
 		}
 
 		public var packageAddresses: [PackageAddress] {
-			panic()
+			sargon()
 		}
 	}
 
 	public var detailedClassification: [DetailedManifestClass] {
-		panic()
+		sargon()
 	}
 
 	public var newEntities: NewEntities {
-		panic()
+		sargon()
 	}
 
 	public var accountWithdraws: [String: [ResourceIndicator]] {
-		panic()
+		sargon()
 	}
 
 	public var accountDeposits: [String: [ResourceIndicator]] {
-		panic()
+		sargon()
 	}
 
 	public var reservedInstructions: [ReservedInstruction] {
-		panic()
+		sargon()
 	}
 
 	public var newlyCreatedNonFungibles: [NonFungibleGlobalId] {
-		panic()
+		sargon()
 	}
 
 	public var presentedProofs: [ResourceAddress] {
-		panic()
+		sargon()
 	}
 
 	public var encounteredEntities: [Address] {
-		panic()
+		sargon()
 	}
 
-	public var feeLocks: FeeLocks { panic() }
+	public var feeLocks: FeeLocks { sargon() }
 
-	public var feeSummary: FeeSummary { panic() }
+	public var feeSummary: FeeSummary { sargon() }
 
 	/// Use the first supported manifest class. Returns `nil` for non-conforming transactions
 	public var detailedManifestClass: DetailedManifestClass? {
@@ -76,16 +76,16 @@ public struct ExecutionSummary: DummySargon {
 
 // MARK: - FeeSummary
 public enum FeeSummary: DummySargon {
-	public var executionCost: RETDecimal { panic() }
-	public var finalizationCost: RETDecimal { panic() }
-	public var storageExpansionCost: RETDecimal { panic() }
-	public var royaltyCost: RETDecimal { panic() }
+	public var executionCost: RETDecimal { sargon() }
+	public var finalizationCost: RETDecimal { sargon() }
+	public var storageExpansionCost: RETDecimal { sargon() }
+	public var royaltyCost: RETDecimal { sargon() }
 }
 
 // MARK: - FeeLocks
 public enum FeeLocks: DummySargon {
-	public var lock: RETDecimal { panic() }
-	public var contingentLock: RETDecimal { panic() }
+	public var lock: RETDecimal { sargon() }
+	public var contingentLock: RETDecimal { sargon() }
 }
 
 // MARK: - ReservedInstruction

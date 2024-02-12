@@ -4,15 +4,15 @@ public typealias Address = SpecificAddress<GeneralEntityType>
 
 extension Address {
 	public func entityType() -> EntityType {
-		panic()
+		sargon()
 	}
 
 	public init(address: String, decodedKind: EntityType) {
-		panic()
+		sargon()
 	}
 
 	public func bytes() -> [UInt8] {
-		panic()
+		sargon()
 	}
 }
 
@@ -77,6 +77,35 @@ public enum ResourceEntityType: SpecificEntityType {
 // MARK: - PackageEntityType
 public enum PackageEntityType: SpecificEntityType {
 	public static let addressSpace: Set<EntityType> = [.globalPackage]
+}
+
+// MARK: - EntityType
+public enum EntityType: DeprecatedDummySargon {
+	case globalPackage
+	case globalFungibleResourceManager
+	case globalNonFungibleResourceManager
+	case globalConsensusManager
+	case globalValidator
+	case globalAccessController
+	case globalAccount
+	case globalIdentity
+	case globalGenericComponent
+	case globalVirtualSecp256k1Account
+	case globalVirtualEd25519Account
+	case globalVirtualSecp256k1Identity
+	case globalVirtualEd25519Identity
+	case globalOneResourcePool
+	case globalTwoResourcePool
+	case globalMultiResourcePool
+	case globalTransactionTracker
+	case internalFungibleVault
+	case internalNonFungibleVault
+	case internalGenericComponent
+	case internalKeyValueStore
+
+	public var isResourcePool: Bool {
+		sargon()
+	}
 }
 
 // MARK: - ComponentEntityType
@@ -159,7 +188,7 @@ public struct SpecificAddress<Kind: SpecificEntityType>: Sendable, Hashable, Ide
 	}
 
 	public func asStr() -> String {
-		panic()
+		sargon()
 	}
 
 	public var id: String {
@@ -175,11 +204,11 @@ public struct SpecificAddress<Kind: SpecificEntityType>: Sendable, Hashable, Ide
 	public let decodedKind: EntityType
 
 	public func bytes() -> Data {
-		panic()
+		sargon()
 	}
 
 	public init(address: String) throws {
-		panic()
+		sargon()
 	}
 
 	public init(address: String, decodedKind: EntityType) {
@@ -188,7 +217,7 @@ public struct SpecificAddress<Kind: SpecificEntityType>: Sendable, Hashable, Ide
 	}
 
 	public init(validatingAddress address: String) throws {
-		panic()
+		sargon()
 	}
 
 	public static func == (lhs: Self, rhs: Self) -> Bool {

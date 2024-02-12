@@ -3,26 +3,26 @@ import Foundation
 // MARK: - TransactionManifest
 public struct TransactionManifest: DummySargon {
 	public func extractAddresses() -> [EntityType: [Address]] {
-		panic()
+		sargon()
 	}
 
 	public func instructions() -> Instructions {
-		panic()
+		sargon()
 	}
 
 	public init(instructions: Instructions, blobs: [Data]) {
-		panic()
+		sargon()
 	}
 
 	public func blobs() -> [Data] {
-		panic()
+		sargon()
 	}
 
 	public func summary(networkId: UInt8) -> ManifestSummary {
-		panic()
+		sargon()
 	}
 
 	public func executionSummary(networkId: UInt8, encodedReceipt: Any) -> ExecutionSummary {
-		panic()
+		sargon()
 	}
 }

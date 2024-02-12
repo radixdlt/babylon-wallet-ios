@@ -3,11 +3,11 @@ import Foundation
 // MARK: - NonFungibleLocalId
 public enum NonFungibleLocalId: DummySargon {
 	public static func from(stringFormat: Any) -> Self {
-		panic()
+		sargon()
 	}
 
 	public static func integer(value: Int) -> Self {
-		panic()
+		sargon()
 	}
 
 	public static func from(stringFormat: String) throws -> Self {

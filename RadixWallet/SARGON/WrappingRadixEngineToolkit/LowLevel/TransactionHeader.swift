@@ -11,38 +11,38 @@ public struct TransactionHeader: DummySargon {
 		notaryIsSignatory: Bool,
 		tipPercentage: Any
 	) {
-		panic()
+		sargon()
 	}
 
 	public var networkId: UInt8 {
-		panic()
+		sargon()
 	}
 
 	public var startEpochInclusive: UInt64 {
-		panic()
+		sargon()
 	}
 
 	public var endEpochExclusive: UInt64 {
-		panic()
+		sargon()
 	}
 
 	public var notaryIsSignatory: Bool {
-		panic()
+		sargon()
 	}
 
 	public var notaryPublicKey: SLIP10.PublicKey {
-		panic()
+		sargon()
 	}
 
 	public var nonce: UInt32 {
-		panic()
+		sargon()
 	}
 
 	public var tipPercentage: Float {
-		panic()
+		sargon()
 	}
 
 	public func description(lookupNetworkName: (NetworkID) throws -> Void) rethrows -> String {
-		panic()
+		sargon()
 	}
 }

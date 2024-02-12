@@ -11,66 +11,66 @@ public protocol TrackedPoolInteractionStuff: DummySargon {}
 
 extension TrackedPoolInteractionStuff {
 	public var validatorAddress: ValidatorAddress {
-		panic()
+		sargon()
 	}
 
 	public var liquidStakeUnitAddress: ResourceAddress {
-		panic()
+		sargon()
 	}
 
 	public var liquidStakeUnitAmount: RETDecimal {
 		get {
-			panic()
+			sargon()
 		}
 		set {
-			panic()
+			sargon()
 		}
 	}
 
 	public var xrdAmount: RETDecimal {
 		get {
-			panic()
+			sargon()
 		}
 		set {
-			panic()
+			sargon()
 		}
 	}
 
-	public var poolAddress: ComponentAddress { panic() }
-	public var poolUnitsResourceAddress: ResourceAddress { panic() }
+	public var poolAddress: ComponentAddress { sargon() }
+	public var poolUnitsResourceAddress: ResourceAddress { sargon() }
 	public var poolUnitsAmount: RETDecimal {
 		get {
-			panic()
+			sargon()
 		}
 		set {
-			panic()
+			sargon()
 		}
 	}
 
 	public var resourcesInInteraction: [String: RETDecimal] {
 		get {
-			panic()
+			sargon()
 		}
 		set {
-			panic()
+			sargon()
 		}
 	}
 
 	public var contributedResources: [String: RETDecimal] {
 		get {
-			panic()
+			sargon()
 		}
 		set {
-			panic()
+			sargon()
 		}
 	}
 
 	public var redeemedResources: [String: RETDecimal] {
 		get {
-			panic()
+			sargon()
 		}
 		set {
-			panic()
+			sargon()
 		}
 	}
 }

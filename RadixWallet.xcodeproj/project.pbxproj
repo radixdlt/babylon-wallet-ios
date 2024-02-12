@@ -1356,6 +1356,7 @@
 		E6EF00462B7A5E8200676549 /* UnstakeDataEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF00452B7A5E8200676549 /* UnstakeDataEntry.swift */; };
 		E6EF00482B7A5E9500676549 /* ResourceOrNonFungible.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF00472B7A5E9500676549 /* ResourceOrNonFungible.swift */; };
 		E6EF004A2B7A5EAA00676549 /* TransactionHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF00492B7A5EAA00676549 /* TransactionHash.swift */; };
+		E6EF004C2B7A60EB00676549 /* AccountDefaultDepositRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6EF004B2B7A60EB00676549 /* AccountDefaultDepositRule.swift */; };
 		E6FA984A2B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98482B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift */; };
 		E6FA984B2B04B9AC00748F20 /* ConfirmSkippingBDFS.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */; };
 		E6FA984E2B04E3D500748F20 /* NoContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA984D2B04E3D500748F20 /* NoContentView.swift */; };
@@ -2691,6 +2692,7 @@
 		E6EF00452B7A5E8200676549 /* UnstakeDataEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnstakeDataEntry.swift; sourceTree = "<group>"; };
 		E6EF00472B7A5E9500676549 /* ResourceOrNonFungible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceOrNonFungible.swift; sourceTree = "<group>"; };
 		E6EF00492B7A5EAA00676549 /* TransactionHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionHash.swift; sourceTree = "<group>"; };
+		E6EF004B2B7A60EB00676549 /* AccountDefaultDepositRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDefaultDepositRule.swift; sourceTree = "<group>"; };
 		E6FA98482B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfirmSkippingBDFS+View.swift"; sourceTree = "<group>"; };
 		E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmSkippingBDFS.swift; sourceTree = "<group>"; };
 		E6FA984D2B04E3D500748F20 /* NoContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoContentView.swift; sourceTree = "<group>"; };
@@ -6860,6 +6862,7 @@
 				E6EF003D2B7A5E3E00676549 /* TransactionHeader.swift */,
 				E6EF00352B7A5CB300676549 /* RETPublicKeyHash.swift */,
 				E6EF00432B7A5E6E00676549 /* TransactionManifest.swift */,
+				E6EF004B2B7A60EB00676549 /* AccountDefaultDepositRule.swift */,
 				E6EF00412B7A5E5F00676549 /* NotarizedTransaction.swift */,
 				E6EF00392B7A5E1500676549 /* NonFungibleLocalId.swift */,
 				E6EF003F2B7A5E5100676549 /* SignedIntent.swift */,
@@ -9006,6 +9009,7 @@
 				83EE477F2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueEnumAllOf.swift in Sources */,
 				48CFC4D32ADC10DA00E77A5C /* StreamTransactionsRequest.swift in Sources */,
 				48CFC64D2ADC10DB00E77A5C /* PersonaData+PostalAddress.swift in Sources */,
+				E6EF004C2B7A60EB00676549 /* AccountDefaultDepositRule.swift in Sources */,
 				48CFC5EE2ADC10DA00E77A5C /* SlideUpPanel+View.swift in Sources */,
 				48CFC3492ADC10D900E77A5C /* PersonaDataPermissionBox.swift in Sources */,
 				48CFC68E2ADC10DB00E77A5C /* AddressKind.swift in Sources */,

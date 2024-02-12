@@ -3,11 +3,11 @@ import Foundation
 // MARK: - UnstakeDataEntry
 public struct UnstakeDataEntry: DummySargon {
 	public var nonFungibleGlobalId: NonFungibleGlobalId {
-		panic()
+		sargon()
 	}
 
 	public var data: UnstakeData {
-		panic()
+		sargon()
 	}
 }
 

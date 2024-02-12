@@ -28,6 +28,19 @@ public enum ResourceIndicator: DummySargon {
 	}
 }
 
+// MARK: - AbstractPredictedValue
+public struct AbstractPredictedValue<Value>: DummySargon where Value: Sendable & Hashable {
+	public let value: Value
+	public let instructionIndex: UInt64
+}
+
+public typealias PredictedDecimal = AbstractPredictedValue<RETDecimal>
+public typealias PredictedNonFungibleIds = AbstractPredictedValue<[NonFungibleLocalId]>
+
+public func + (lhs: PredictedDecimal, rhs: PredictedDecimal) -> PredictedDecimal {
+	sargon()
+}
+
 // MARK: - FungibleResourceIndicator
 public enum FungibleResourceIndicator: DummySargon {
 	case guaranteed(amount: PredictedDecimal)

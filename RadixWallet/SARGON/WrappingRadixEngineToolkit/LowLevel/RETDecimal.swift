@@ -1,7 +1,7 @@
 // MARK: - RETDecimal
 public struct RETDecimal: DummySargon {
 	public init(value: String) throws {
-		panic()
+		sargon()
 	}
 }
 
@@ -12,63 +12,63 @@ extension RETDecimal {
 	public static let maxDivisibility: UInt = 18
 
 	public func isNegative() -> Bool {
-		panic()
+		sargon()
 	}
 
 	public func isPositive() -> Bool {
-		panic()
+		sargon()
 	}
 
 	public func isZero() -> Bool {
-		panic()
+		sargon()
 	}
 
 	public static var zero: RETDecimal {
-		panic()
+		sargon()
 	}
 
 	public init(integer: Int) {
-		panic()
+		sargon()
 	}
 
 	/// Creates the Decimal `10^exponent`
 	public init(exponent: UInt) {
-		panic()
+		sargon()
 	}
 }
 
 // MARK: Arithmetic operators
 extension RETDecimal {
 	public func sub(other: RETDecimal) throws -> RETDecimal {
-		panic()
+		sargon()
 	}
 
 	public func add(other: RETDecimal) throws -> RETDecimal {
-		panic()
+		sargon()
 	}
 
 	public func mul(other: RETDecimal) throws -> RETDecimal {
-		panic()
+		sargon()
 	}
 
 	public func div(other: RETDecimal) throws -> RETDecimal {
-		panic()
+		sargon()
 	}
 
 	public func lessThan(other: RETDecimal) -> Bool {
-		panic()
+		sargon()
 	}
 
 	public func lessThanOrEqual(other: RETDecimal) -> Bool {
-		panic()
+		sargon()
 	}
 
 	public func greaterThan(other: RETDecimal) -> Bool {
-		panic()
+		sargon()
 	}
 
 	public func greaterThanOrEqual(other: RETDecimal) -> Bool {
-		panic()
+		sargon()
 	}
 }
 
@@ -85,17 +85,17 @@ extension RETDecimal {
 extension RETDecimal {
 	/// Rounds to `decimalPlaces` decimals, in the direction of 0
 	public func floor(decimalPlaces: UInt) -> RETDecimal {
-		panic()
+		sargon()
 	}
 
 	/// Rounds to `decimalPlaces` decimals, in the direction away from zero
 	public func ceil(decimalPlaces: UInt) -> RETDecimal {
-		panic()
+		sargon()
 	}
 
 	/// Rounds to `decimalPlaces` decimals
 	public func rounded(decimalPlaces: UInt = 0) -> RETDecimal {
-		panic()
+		sargon()
 	}
 }
 
@@ -112,7 +112,7 @@ extension RETDecimal {
 		formattedString: String,
 		locale: Locale = .autoupdatingCurrent
 	) throws {
-		panic()
+		sargon()
 	}
 
 	/// A human readable, locale respecting string, rounded to `totalPlaces` places, counting all digits
@@ -121,14 +121,14 @@ extension RETDecimal {
 		totalPlaces: UInt = .defaultMaxPlacesFormatted,
 		useGroupingSeparator: Bool = true
 	) -> String {
-		panic()
+		sargon()
 	}
 
 	public func formattedEngineeringNotation(
 		locale: Locale = .autoupdatingCurrent,
 		totalPlaces: UInt = .maxPlacesEngineeringNotation
 	) -> String {
-		panic()
+		sargon()
 	}
 
 	/// A human readable, locale respecting string. Does not perform any rounding or truncation.
@@ -136,12 +136,12 @@ extension RETDecimal {
 		locale: Locale = .autoupdatingCurrent,
 		useGroupingSeparator: Bool = true
 	) -> String {
-		panic()
+		sargon()
 	}
 
 	/// The digits of the number, without separators or sign. The scale is fixed at 18, meaning the last 18 digits correspond to the decimal part.
 	public func digits() -> String {
-		panic()
+		sargon()
 	}
 }
 

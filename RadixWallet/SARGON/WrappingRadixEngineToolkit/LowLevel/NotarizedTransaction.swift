@@ -3,22 +3,22 @@ import Foundation
 // MARK: - NotarizedTransaction
 public struct NotarizedTransaction: DummySargon {
 	public func compile() throws -> Data {
-		panic()
+		sargon()
 	}
 
 	public init(signedIntent: Any, notarySignature: Any) throws {
-		panic()
+		sargon()
 	}
 
 	public static func decompile(compiledNotarizedTransaction: Any) -> Self {
-		panic()
+		sargon()
 	}
 
 	public func signedIntent() -> SignedIntent {
-		panic()
+		sargon()
 	}
 
 	public func notarySignature() -> SLIP10.Signature {
-		panic()
+		sargon()
 	}
 }

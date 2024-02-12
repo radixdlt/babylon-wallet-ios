@@ -3,18 +3,18 @@ import Foundation
 // MARK: - ManifestSummary
 public struct ManifestSummary: DummySargon {
 	public var accountsDepositedInto: [AccountAddress] {
-		panic()
+		sargon()
 	}
 
 	public var accountsWithdrawnFrom: [AccountAddress] {
-		panic()
+		sargon()
 	}
 
 	public var accountsRequiringAuth: [AccountAddress] {
-		panic()
+		sargon()
 	}
 
 	public var identitiesRequiringAuth: [IdentityAddress] {
-		panic()
+		sargon()
 	}
 }
