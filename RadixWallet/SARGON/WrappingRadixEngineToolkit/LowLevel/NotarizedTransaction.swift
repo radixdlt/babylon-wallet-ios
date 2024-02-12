@@ -10,10 +10,6 @@ public struct NotarizedTransaction: DummySargon {
 		sargon()
 	}
 
-	public static func decompile(compiledNotarizedTransaction: Any) -> Self {
-		sargon()
-	}
-
 	public func signedIntent() -> SignedIntent {
 		sargon()
 	}

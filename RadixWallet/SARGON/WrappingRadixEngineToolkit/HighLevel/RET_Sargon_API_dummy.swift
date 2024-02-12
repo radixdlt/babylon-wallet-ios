@@ -123,6 +123,10 @@ extension Sargon {
 		sargon()
 	}
 
+	public static func debugPrintCompiledNotarizedIntent(data: Data) -> String {
+		sargon()
+	}
+
 	public static func deriveOlympiaMainnetAccountAddressFromPublicKey(
 		publicKey: K1.PublicKey
 	) throws -> AccountAddress {
