@@ -25,11 +25,3 @@ extension NonFungibleLocalId {
 		}
 	}
 }
-
-// MARK: - NonFungibleLocalId + Identifiable
-extension NonFungibleLocalId: Identifiable {
-	public typealias ID = String
-	public var id: String {
-		nonFungibleLocalIdAsStr(value: self)
-	}
-}

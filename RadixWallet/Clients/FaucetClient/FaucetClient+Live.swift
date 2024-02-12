@@ -80,10 +80,11 @@ extension FaucetClient: DependencyKey {
 			}
 
 			let networkID = await gatewaysClient.getCurrentNetworkID()
-			let manifest = try ManifestBuilder.manifestForFaucet(
+
+			let manifest = try Sargon.manifestForFaucet(
 				includeLockFeeInstruction: true,
 				networkID: networkID,
-				componentAddress: accountAddress.asGeneral
+				addressOfReceivingAccount: accountAddress
 			)
 
 			try await signSubmitTX(manifest: manifest)

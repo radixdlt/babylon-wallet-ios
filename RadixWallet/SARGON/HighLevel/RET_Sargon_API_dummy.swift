@@ -7,6 +7,14 @@ public enum Sargon {
 		panic()
 	}
 
+	public static func manifestForFaucet(
+		includeLockFeeInstruction: Bool,
+		networkID: NetworkID,
+		addressOfReceivingAccount: AccountAddress
+	) throws -> TransactionManifest {
+		panic()
+	}
+
 	public static func buildInformation() -> BuildInformation {
 		BuildInformation(version: "Sargon MOCKED")
 	}

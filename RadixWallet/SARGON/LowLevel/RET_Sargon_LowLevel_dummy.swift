@@ -908,14 +908,6 @@ public enum ManifestBuilder: DeprecatedDummySargon {
 		panic()
 	}
 
-	public static func manifestForFaucet(
-		includeLockFeeInstruction: Any,
-		networkID: Any,
-		componentAddress: Any
-	) throws -> TransactionManifest {
-		panic()
-	}
-
 	public static func manifestForCreateNonFungibleToken(
 		account: Any,
 		networkID: Any

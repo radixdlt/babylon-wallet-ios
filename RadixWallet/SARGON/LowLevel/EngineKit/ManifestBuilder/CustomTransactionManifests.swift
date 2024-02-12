@@ -43,21 +43,6 @@ extension ManifestBuilder {
 
 // MARK: Manifests for testing
 extension ManifestBuilder {
-	public static func manifestForFaucet(
-		includeLockFeeInstruction: Bool,
-		networkID: NetworkID,
-		componentAddress: Address
-	) throws -> TransactionManifest {
-		try make {
-			if includeLockFeeInstruction {
-				faucetLockFee()
-			}
-			faucetFreeXrd()
-			try accountTryDepositEntireWorktopOrAbort(componentAddress.intoEngine(), nil)
-		}
-		.build(networkId: networkID.rawValue)
-	}
-
 	public static func manifestForCreateFungibleToken(
 		account: AccountAddress,
 		networkID: NetworkID
