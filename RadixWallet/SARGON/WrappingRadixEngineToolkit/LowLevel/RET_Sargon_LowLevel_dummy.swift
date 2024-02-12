@@ -180,7 +180,7 @@ public struct ManifestBuilderNamedAddress: DummySargon {
 // MARK: - ManifestBuilderAddress
 public enum ManifestBuilderAddress: DummySargon {
 	case named(value: ManifestBuilderNamedAddress)
-	case `static`(value: RETAddress)
+	case `static`(value: Address)
 }
 
 // MARK: - TrackedValidatorUnstake
@@ -219,8 +219,8 @@ extension TrackedPoolInteractionStuff {
 		}
 	}
 
-	public var poolAddress: RETAddress { panic() }
-	public var poolUnitsResourceAddress: RETAddress { panic() }
+	public var poolAddress: ComponentAddress { panic() }
+	public var poolUnitsResourceAddress: ResourceAddress { panic() }
 	public var poolUnitsAmount: RETDecimal {
 		get {
 			panic()
@@ -388,19 +388,19 @@ public struct RETPublicKeyHash: DeprecatedDummySargon {
 
 // MARK: - ManifestSummary
 public struct ManifestSummary: DummySargon {
-	public var accountsDepositedInto: [RETAddress] {
+	public var accountsDepositedInto: [AccountAddress] {
 		panic()
 	}
 
-	public var accountsWithdrawnFrom: [RETAddress] {
+	public var accountsWithdrawnFrom: [AccountAddress] {
 		panic()
 	}
 
-	public var accountsRequiringAuth: [RETAddress] {
+	public var accountsRequiringAuth: [AccountAddress] {
 		panic()
 	}
 
-	public var identitiesRequiringAuth: [RETAddress] {
+	public var identitiesRequiringAuth: [IdentityAddress] {
 		panic()
 	}
 }
@@ -660,7 +660,7 @@ public struct NotarizedTransaction: DummySargon {
 
 // MARK: - TransactionManifest
 public struct TransactionManifest: DummySargon {
-	public func extractAddresses() -> [EntityType: [RETAddress]] {
+	public func extractAddresses() -> [EntityType: [Address]] {
 		panic()
 	}
 
@@ -706,9 +706,9 @@ public struct UnstakeData: DummySargon {
 // MARK: - DetailedManifestClass
 public enum DetailedManifestClass: DummySargon {
 	case general, transfer
-	case validatorClaim([RETAddress], Bool)
-	case validatorStake(validatorAddresses: [RETAddress], validatorStakes: [TrackedValidatorStake])
-	case validatorUnstake(validatorAddresses: [RETAddress], validatorUnstakes: [TrackedValidatorUnstake], claimsNonFungibleData: [UnstakeDataEntry])
+	case validatorClaim([ValidatorAddress], Bool)
+	case validatorStake(validatorAddresses: [ValidatorAddress], validatorStakes: [TrackedValidatorStake])
+	case validatorUnstake(validatorAddresses: [ValidatorAddress], validatorUnstakes: [TrackedValidatorUnstake], claimsNonFungibleData: [UnstakeDataEntry])
 	case accountDepositSettingsUpdate(
 		resourcePreferencesUpdates: [String: [String: ResourcePreferenceUpdate]],
 		depositModeUpdates: [String: AccountDefaultDepositRule],
@@ -718,8 +718,8 @@ public enum DetailedManifestClass: DummySargon {
 		[String: [ResourceOrNonFungible]]
 	)
 
-	case poolContribution(poolAddresses: [RETAddress], poolContributions: [TrackedPoolContribution])
-	case poolRedemption(poolAddresses: [RETAddress], poolContributions: [TrackedPoolRedemption])
+	case poolContribution(poolAddresses: [ComponentAddress], poolContributions: [TrackedPoolContribution])
+	case poolRedemption(poolAddresses: [ComponentAddress], poolContributions: [TrackedPoolRedemption])
 
 	var isSupported: Bool {
 		switch self {
@@ -736,15 +736,15 @@ public struct ExecutionSummary: DummySargon {
 			panic()
 		}
 
-		public var componentAddresses: [RETAddress] {
+		public var componentAddresses: [ComponentAddress] {
 			panic()
 		}
 
-		public var resourceAddresses: [RETAddress] {
+		public var resourceAddresses: [ResourceAddress] {
 			panic()
 		}
 
-		public var packageAddresses: [RETAddress] {
+		public var packageAddresses: [PackageAddress] {
 			panic()
 		}
 	}
@@ -773,11 +773,11 @@ public struct ExecutionSummary: DummySargon {
 		panic()
 	}
 
-	public var presentedProofs: [RETAddress] {
+	public var presentedProofs: [ResourceAddress] {
 		panic()
 	}
 
-	public var encounteredEntities: [RETAddress] {
+	public var encounteredEntities: [Address] {
 		panic()
 	}
 
@@ -798,14 +798,14 @@ public struct ExecutionSummary: DummySargon {
 		[:] // TODO: Is this never populated for .general?
 	}
 
-	public var addressesOfNewlyCreatedEntities: [RETAddress] {
-		newEntities.componentAddresses + newEntities.packageAddresses + newEntities.resourceAddresses
+	public var addressesOfNewlyCreatedEntities: [Address] {
+		newEntities.componentAddresses.map(\.asGeneral) + newEntities.packageAddresses.map(\.asGeneral) + newEntities.resourceAddresses.map(\.asGeneral)
 	}
 }
 
 // MARK: - ResourceOrNonFungible
 public enum ResourceOrNonFungible: DummySargon {
-	case resource(RETAddress)
+	case resource(ResourceAddress)
 	case nonFungible(NonFungibleGlobalId)
 }
 

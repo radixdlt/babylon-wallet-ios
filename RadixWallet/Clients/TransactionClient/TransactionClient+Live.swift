@@ -49,11 +49,11 @@ extension TransactionClient {
 			func identityFromComponentAddress(_ identityAddress: IdentityAddress) async throws -> Profile.Network.Persona {
 				try await personasClient.getPersona(id: identityAddress)
 			}
-			func mapAccount(_ addresses: [RETAddress]) throws -> OrderedSet<Profile.Network.Account> {
-				try .init(validating: addresses.asSpecific().compactMap(accountFromComponentAddress))
+			func mapAccount(_ addresses: [AccountAddress]) throws -> OrderedSet<Profile.Network.Account> {
+				try .init(validating: addresses.compactMap(accountFromComponentAddress))
 			}
-			func mapIdentity(_ addresses: [RETAddress]) async throws -> OrderedSet<Profile.Network.Persona> {
-				try await .init(validating: addresses.asSpecific().asyncMap(identityFromComponentAddress))
+			func mapIdentity(_ addresses: [IdentityAddress]) async throws -> OrderedSet<Profile.Network.Persona> {
+				try await .init(validating: addresses.asyncMap(identityFromComponentAddress))
 			}
 
 			let summary = manifest.summary(networkId: networkID.rawValue)

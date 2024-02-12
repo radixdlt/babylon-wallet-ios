@@ -2,8 +2,8 @@ import Foundation
 
 // MARK: - TrackedPoolInteraction
 public protocol TrackedPoolInteraction {
-	var poolAddress: RETAddress { get }
-	var poolUnitsResourceAddress: RETAddress { get }
+	var poolAddress: ComponentAddress { get }
+	var poolUnitsResourceAddress: ResourceAddress { get }
 	var poolUnitsAmount: RETDecimal { get set }
 	var resourcesInInteraction: [String: RETDecimal] { get set }
 	mutating func add(_ other: Self)

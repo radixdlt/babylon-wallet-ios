@@ -788,7 +788,7 @@ extension ResourceOrNonFungible {
 	func resourceAddress() throws -> ResourceAddress {
 		switch self {
 		case let .resource(address):
-			try address.asSpecific()
+			address
 		case let .nonFungible(globalID):
 			globalID.resourceAddress
 		}

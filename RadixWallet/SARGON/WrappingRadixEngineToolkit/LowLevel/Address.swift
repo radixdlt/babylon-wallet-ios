@@ -2,13 +2,8 @@
 
 public typealias Address = SpecificAddress<GeneralEntityType>
 
-// MARK: - RETAddress
-public struct RETAddress: DummySargonAddress {
+extension Address {
 	public func entityType() -> EntityType {
-		panic()
-	}
-
-	public func addressString() -> String {
 		panic()
 	}
 
@@ -179,6 +174,10 @@ public struct SpecificAddress<Kind: SpecificEntityType>: Sendable, Hashable, Ide
 
 	public let decodedKind: EntityType
 
+	public func bytes() -> Data {
+		panic()
+	}
+
 	public init(address: String) throws {
 		panic()
 	}
@@ -189,11 +188,7 @@ public struct SpecificAddress<Kind: SpecificEntityType>: Sendable, Hashable, Ide
 	}
 
 	public init(validatingAddress address: String) throws {
-		let type = try RETAddress(address: address).entityType()
-		guard Kind.addressSpace.contains(type) else {
-			throw InvalidAddress(decodedKind: type, addressSpace: Kind.addressSpace)
-		}
-		self.init(address: address, decodedKind: type)
+		panic()
 	}
 
 	public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -234,17 +229,13 @@ extension AccountAddress {
 	}
 }
 
-extension RETAddress {
+extension Address {
 	public func asSpecific<T>() throws -> SpecificAddress<T> {
 		try .init(validatingAddress: addressString())
 	}
-
-	public func asGeneral() throws -> Address {
-		try asSpecific()
-	}
 }
 
-extension [RETAddress] {
+extension [Address] {
 	public func asSpecific<T>() throws -> [SpecificAddress<T>] {
 		try map { try $0.asSpecific() }
 	}

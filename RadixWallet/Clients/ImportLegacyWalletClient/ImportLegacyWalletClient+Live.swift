@@ -135,10 +135,10 @@ extension ImportLegacyWalletClient: DependencyKey {
 				do {
 					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
 					let babylonAddresses = Set<AccountAddress>(accounts.map(\.address))
-					let setOfExistingData = try Set(babylonAddresses.map {
+					let setOfExistingData: Set<Data> = try Set(babylonAddresses.map {
 						// the first byte is an address type discriminator byte, which differs between Babylon and Olympia,
 						// so we must remove it.
-						try Data(RETAddress(address: $0.address).bytes().dropFirst())
+						Data($0.bytes().dropFirst())
 					})
 					guard let payloadByteCount = setOfExistingData.first?.count else {
 						return []

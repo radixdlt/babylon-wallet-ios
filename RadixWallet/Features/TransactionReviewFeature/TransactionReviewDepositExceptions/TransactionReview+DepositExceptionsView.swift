@@ -7,7 +7,7 @@ extension TransactionReview {
 	}
 
 	public struct DepositExceptionsChange: Sendable, Identifiable, Hashable {
-		public var id: AccountAddress.ID { account.address.id }
+		public var id: AccountAddress.ID { panic() }
 		public let account: Profile.Network.Account
 		public let resourcePreferenceChanges: IdentifiedArrayOf<ResourcePreferenceChange>
 		public let allowedDepositorChanges: IdentifiedArrayOf<AllowedDepositorChange>
