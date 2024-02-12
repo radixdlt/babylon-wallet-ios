@@ -354,7 +354,6 @@
 		48CFC3942ADC10D900E77A5C /* Nonce.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE782ADC10D800E77A5C /* Nonce.swift */; };
 		48CFC3962ADC10D900E77A5C /* NonFungbileLocalID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE7A2ADC10D800E77A5C /* NonFungbileLocalID.swift */; };
 		48CFC3982ADC10D900E77A5C /* ReviewedTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE7C2ADC10D800E77A5C /* ReviewedTransaction.swift */; };
-		48CFC3992ADC10D900E77A5C /* TXID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE7D2ADC10D800E77A5C /* TXID.swift */; };
 		48CFC39C2ADC10D900E77A5C /* TXVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE802ADC10D800E77A5C /* TXVersion.swift */; };
 		48CFC39E2ADC10D900E77A5C /* NetworkID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE832ADC10D800E77A5C /* NetworkID.swift */; };
 		48CFC3A12ADC10D900E77A5C /* Epoch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE862ADC10D800E77A5C /* Epoch.swift */; };
@@ -1701,7 +1700,6 @@
 		48CFBE782ADC10D800E77A5C /* Nonce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Nonce.swift; sourceTree = "<group>"; };
 		48CFBE7A2ADC10D800E77A5C /* NonFungbileLocalID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NonFungbileLocalID.swift; sourceTree = "<group>"; };
 		48CFBE7C2ADC10D800E77A5C /* ReviewedTransaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReviewedTransaction.swift; sourceTree = "<group>"; };
-		48CFBE7D2ADC10D800E77A5C /* TXID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TXID.swift; sourceTree = "<group>"; };
 		48CFBE802ADC10D800E77A5C /* TXVersion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TXVersion.swift; sourceTree = "<group>"; };
 		48CFBE832ADC10D800E77A5C /* NetworkID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkID.swift; sourceTree = "<group>"; };
 		48CFBE862ADC10D800E77A5C /* Epoch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Epoch.swift; sourceTree = "<group>"; };
@@ -4586,22 +4584,13 @@
 				48CFBE6D2ADC10D800E77A5C /* RETDecimal+Extensions.swift */,
 				48CFBE6E2ADC10D800E77A5C /* SignatureWithPublicKey+Utils.swift */,
 				48CFBE6F2ADC10D800E77A5C /* Address.swift */,
-				48CFBE702ADC10D800E77A5C /* Codable */,
 				48CFBE742ADC10D800E77A5C /* ManifestBuilder */,
 				48CFBE7A2ADC10D800E77A5C /* NonFungbileLocalID.swift */,
 				48CFBE7C2ADC10D800E77A5C /* ReviewedTransaction.swift */,
-				48CFBE7D2ADC10D800E77A5C /* TXID.swift */,
 				48CFBE802ADC10D800E77A5C /* TXVersion.swift */,
 				48CFBE832ADC10D800E77A5C /* NetworkID.swift */,
 			);
 			path = EngineKit;
-			sourceTree = "<group>";
-		};
-		48CFBE702ADC10D800E77A5C /* Codable */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Codable;
 			sourceTree = "<group>";
 		};
 		48CFBE742ADC10D800E77A5C /* ManifestBuilder */ = {
@@ -8906,7 +8895,6 @@
 				48CFC57D2ADC10DA00E77A5C /* StateEntityDetailsResponseItemDetails.swift in Sources */,
 				48CFC5802ADC10DA00E77A5C /* BackupsClient+Live.swift in Sources */,
 				48CFC6082ADC10DA00E77A5C /* AccountsRequestResponseItem.swift in Sources */,
-				48CFC3992ADC10D900E77A5C /* TXID.swift in Sources */,
 				48AE39E82B0CBEA800813CF3 /* SelectInactiveAccountsToAdd.swift in Sources */,
 				48CFC59A2ADC10DA00E77A5C /* HitTargetSize.swift in Sources */,
 				48CFC68A2ADC10DB00E77A5C /* AppPreferences+Display.swift in Sources */,

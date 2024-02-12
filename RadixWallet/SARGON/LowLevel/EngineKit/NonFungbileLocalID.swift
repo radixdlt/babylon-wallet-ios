@@ -6,7 +6,7 @@ extension NonFungibleLocalId {
 	}
 
 	public func toString() throws -> String {
-		try nonFungibleLocalIdAsStr(value: self)
+		nonFungibleLocalIdAsStr(value: self)
 	}
 
 	public func toUserFacingString() -> String {
@@ -28,31 +28,8 @@ extension NonFungibleLocalId {
 
 // MARK: - NonFungibleLocalId + Identifiable
 extension NonFungibleLocalId: Identifiable {
+	public typealias ID = String
 	public var id: String {
-		do {
-			return try nonFungibleLocalIdAsStr(value: self)
-		} catch {
-			assertionFailure("Failed to convert nft id to string!! \(error)")
-			return ""
-		}
-	}
-}
-
-// MARK: - NonFungibleLocalId + Codable
-extension NonFungibleLocalId: Codable {
-	enum CodingKeys: CodingKey {
-		case integer
-		case str
-		case bytes
-		case ruid
-	}
-
-	public init(from decoder: Decoder) throws {
-		panic()
-	}
-
-	public func encode(to encoder: Encoder) throws {
-//
-		panic()
+		nonFungibleLocalIdAsStr(value: self)
 	}
 }

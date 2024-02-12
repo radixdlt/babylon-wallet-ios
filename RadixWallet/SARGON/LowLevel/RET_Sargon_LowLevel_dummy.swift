@@ -453,6 +453,9 @@ public struct NonFungibleGlobalId: DummySargon {
 }
 
 // MARK: - TransactionHash
+public typealias TXID = TransactionHash
+
+// MARK: - TransactionHash
 public struct TransactionHash: DummySargon {
 	public func asStr() -> String {
 		panic()
