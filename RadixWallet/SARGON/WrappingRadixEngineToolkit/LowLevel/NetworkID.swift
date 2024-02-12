@@ -15,17 +15,3 @@ extension NetworkID {
 	public static let mardunet: Self = 0x24
 	public static let simulator: Self = 0xF2
 }
-
-extension NetworkID {
-	public typealias AllCases = [Self]
-
-	public static var allCases: [NetworkID] {
-		[.mainnet, .stokenet, .adapanet, .nebunet, .kisharnet, .gilganet, .enkinet, .hammunet, .nergalnet, .mardunet, .zabanet, .simulator]
-	}
-
-	public static func all(but excluded: NetworkID) -> AllCases {
-		var allBut = allCases
-		allBut.removeAll(where: { $0 == excluded })
-		return allBut
-	}
-}

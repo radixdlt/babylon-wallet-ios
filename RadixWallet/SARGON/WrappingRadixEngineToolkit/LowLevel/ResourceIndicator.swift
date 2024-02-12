@@ -13,19 +13,6 @@ public enum ResourceIndicator: DummySargon {
 			address
 		}
 	}
-
-	public var ids: [NonFungibleLocalId]? {
-		switch self {
-		case .fungible:
-			nil
-		case let .nonFungible(_, .byAll(_, ids)):
-			ids.value
-		case let .nonFungible(_, .byIds(ids)):
-			ids
-		case let .nonFungible(_, .byAmount(_, ids)):
-			ids.value
-		}
-	}
 }
 
 // MARK: - AbstractPredictedValue

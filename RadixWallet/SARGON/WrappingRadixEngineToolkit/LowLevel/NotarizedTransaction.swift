@@ -6,7 +6,10 @@ public struct NotarizedTransaction: DummySargon {
 		sargon()
 	}
 
-	public init(signedIntent: SignedIntent, notarySignature: SLIP10.Signature) throws {
+	public init(
+		signedIntent: SignedIntent,
+		notarySignature: SLIP10.Signature
+	) throws {
 		sargon()
 	}
 }
