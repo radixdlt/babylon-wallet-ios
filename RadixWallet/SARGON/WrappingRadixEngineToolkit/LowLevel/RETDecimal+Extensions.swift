@@ -3,24 +3,7 @@
 extension RETDecimal {
 	// Used for development purposes
 	public static let temporaryStandardFee: RETDecimal = 25
-}
 
-// MARK: - RETDecimal + ExpressibleByIntegerLiteral
-extension RETDecimal: ExpressibleByIntegerLiteral {
-	public init(integerLiteral value: Int) {
-//		self.init(integer: value)
-		panic()
-	}
-}
-
-// MARK: - RETDecimal + ExpressibleByFloatLiteral
-extension RETDecimal: ExpressibleByFloatLiteral {
-	public init(floatLiteral value: Double) {
-		panic()
-	}
-}
-
-extension RETDecimal {
 	public static let maxDivisibility: UInt = 18
 
 	public func isNegative() -> Bool {
@@ -82,9 +65,7 @@ extension RETDecimal {
 	public func greaterThanOrEqual(other: RETDecimal) -> Bool {
 		panic()
 	}
-}
 
-extension RETDecimal {
 	public static func + (lhs: RETDecimal, rhs: RETDecimal) -> RETDecimal {
 		try! lhs.add(other: rhs)
 	}
@@ -161,22 +142,6 @@ extension RETDecimal {
 	public func rounded(decimalPlaces: UInt = 0) -> RETDecimal {
 		panic()
 //		try! round(decimalPlaces: Int32(decimalPlaces), roundingMode: .toNearestMidpointAwayFromZero)
-	}
-}
-
-// MARK: - RETDecimal + Codable
-extension RETDecimal: Codable {
-	@inlinable
-	public func encode(to encoder: Encoder) throws {
-		var container = encoder.singleValueContainer()
-		try container.encode(asStr())
-	}
-
-	@inlinable
-	public init(from decoder: Decoder) throws {
-		let container = try decoder.singleValueContainer()
-		let string = try container.decode(String.self)
-		try self.init(value: string)
 	}
 }
 

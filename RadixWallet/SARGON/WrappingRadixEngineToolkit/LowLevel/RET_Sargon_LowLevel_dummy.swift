@@ -88,6 +88,34 @@ public enum ResourceSpecifier: DummySargon {
 		resourceAddress: RETAddress,
 		ids: [NonFungibleLocalId]
 	)
+
+	public var amount: RETDecimal? {
+		if case let .amount(_, amount) = self {
+			return amount
+		}
+
+		return nil
+	}
+
+	public var ids: [NonFungibleLocalId]? {
+		if case let .ids(_, ids) = self {
+			return ids
+		}
+		return nil
+	}
+
+	public var resourceAddress: RETAddress {
+		switch self {
+		case let .amount(resourceAddress, _):
+			resourceAddress
+		case let .ids(resourceAddress, _):
+			resourceAddress
+		}
+	}
+
+	public var toResourceTracker: ResourceIndicator {
+		sargon()
+	}
 }
 
 // MARK: - FeeLocks
@@ -240,12 +268,37 @@ public enum TrackedPoolRedemption: TrackedPoolInteractionStuff {}
 public enum ResourceIndicator: DummySargon {
 	case fungible(resourceAddress: RETAddress, indicator: FungibleResourceIndicator)
 	case nonFungible(resourceAddress: RETAddress, indicator: NonFungibleResourceIndicator)
+
+	public var resourceAddress: RETAddress {
+		switch self {
+		case let .fungible(address, _):
+			address
+		case let .nonFungible(address, _):
+			address
+		}
+	}
+
+	public var ids: [NonFungibleLocalId]? {
+		switch self {
+		case .fungible:
+			nil
+		case let .nonFungible(_, .byAll(_, ids)):
+			ids.value
+		case let .nonFungible(_, .byIds(ids)):
+			ids
+		case let .nonFungible(_, .byAmount(_, ids)):
+			ids.value
+		}
+	}
 }
 
 // MARK: - FungibleResourceIndicator
 public enum FungibleResourceIndicator: DummySargon {
 	case guaranteed(amount: PredictedDecimal)
 	case predicted(PredictedDecimal)
+	public var amount: RETDecimal {
+		sargon()
+	}
 }
 
 // MARK: - AbstractPredictedValue
@@ -272,6 +325,15 @@ public enum NonFungibleResourceIndicator: DummySargon {
 		predictedIds: PredictedNonFungibleIds
 	)
 	case byIds(ids: [NonFungibleLocalId])
+
+	public var ids: [NonFungibleLocalId] {
+		switch self {
+		case let .byIds(ids):
+			ids
+		case let .byAll(_, ids), let .byAmount(_, ids):
+			ids.value
+		}
+	}
 }
 
 // MARK: - ReservedInstruction
@@ -286,6 +348,27 @@ public enum MetadataValue: DummySargon {
 	case urlValue(value: String)
 	case publicKeyHashArrayValue(value: [RETPublicKeyHash])
 	case stringArrayValue(value: [String])
+
+	public var string: String? {
+		if case let .stringValue(value) = self {
+			return value
+		}
+		return nil
+	}
+
+	public var stringArray: [String]? {
+		if case let .stringArrayValue(value) = self {
+			return value
+		}
+		return nil
+	}
+
+	public var url: URL? {
+		if case let .urlValue(value) = self {
+			return URL(string: value)
+		}
+		return nil
+	}
 }
 
 // MARK: - RETPublicKeyHash
@@ -423,6 +506,30 @@ public enum NonFungibleLocalId: DummySargon {
 
 	public static func integer(value: Int) -> Self {
 		panic()
+	}
+
+	public static func from(stringFormat: String) throws -> Self {
+		try nonFungibleLocalIdFromStr(string: stringFormat)
+	}
+
+	public func toString() throws -> String {
+		nonFungibleLocalIdAsStr(value: self)
+	}
+
+	public func toUserFacingString() -> String {
+		do {
+			let rawValue = try toString()
+			// Just a safety guard. Each NFT Id should be of format <prefix>value<suffix>
+			guard rawValue.count >= 3 else {
+				loggerGlobal.warning("Invalid nft id: \(rawValue)")
+				return rawValue
+			}
+			// Nothing fancy, just remove the prefix and suffix.
+			return String(rawValue.dropLast().dropFirst())
+		} catch {
+			// Should not happen, just to not throw an error.
+			return ""
+		}
 	}
 }
 
@@ -625,6 +732,13 @@ public enum DetailedManifestClass: DummySargon {
 
 	case poolContribution(poolAddresses: [RETAddress], poolContributions: [TrackedPoolContribution])
 	case poolRedemption(poolAddresses: [RETAddress], poolContributions: [TrackedPoolRedemption])
+
+	var isSupported: Bool {
+		switch self {
+		case .general, .transfer, .poolContribution, .poolRedemption, .validatorStake, .validatorUnstake, .accountDepositSettingsUpdate, .validatorClaim:
+			true
+		}
+	}
 }
 
 // MARK: - ExecutionSummary
@@ -682,6 +796,23 @@ public struct ExecutionSummary: DummySargon {
 	public var feeLocks: FeeLocks { panic() }
 
 	public var feeSummary: FeeSummary { panic() }
+
+	/// Use the first supported manifest class. Returns `nil` for non-conforming transactions
+	public var detailedManifestClass: DetailedManifestClass? {
+		detailedClassification.first(where: \.isSupported)
+	}
+
+	public var metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]] {
+		newEntities.metadata
+	}
+
+	public var dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]] {
+		[:] // TODO: Is this never populated for .general?
+	}
+
+	public var addressesOfNewlyCreatedEntities: [RETAddress] {
+		newEntities.componentAddresses + newEntities.packageAddresses + newEntities.resourceAddresses
+	}
 }
 
 // MARK: - ResourceOrNonFungible
