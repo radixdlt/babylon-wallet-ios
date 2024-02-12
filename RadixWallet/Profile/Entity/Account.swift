@@ -121,14 +121,10 @@ extension Profile.Network.Account {
 		networkID: NetworkID,
 		factorInstance: HierarchicalDeterministicFactorInstance
 	) throws -> EntityAddress {
-		_ = try factorInstance.derivationPath.asAccountPath()
-
-		return try deriveVirtualAccountAddressFromPublicKey(
+		try deriveVirtualAccountAddressFromPublicKey(
 			publicKey: factorInstance.publicKey.intoEngine(),
 			networkId: networkID.rawValue
 		)
-
-//		return AccountAddress(address: engineAddress.addressString(), decodedKind: engineAddress.entityType())
 	}
 
 	public var isOlympiaAccount: Bool {

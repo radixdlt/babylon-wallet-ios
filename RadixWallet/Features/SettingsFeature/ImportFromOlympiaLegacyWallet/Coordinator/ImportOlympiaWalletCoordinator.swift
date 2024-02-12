@@ -586,7 +586,6 @@ extension ImportOlympiaWalletCoordinator {
 				publicKey: account.publicKey.intoEngine(),
 				networkId: networkID.rawValue
 			)
-			//                .asSpecific()
 
 			return MigratableAccount(
 				id: account.id,
