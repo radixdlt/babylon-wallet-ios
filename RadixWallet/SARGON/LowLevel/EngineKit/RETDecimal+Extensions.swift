@@ -180,6 +180,12 @@ extension RETDecimal: Codable {
 	}
 }
 
+extension RETAddress {
+	static func xrd(_ networkId: UInt8) -> RETAddress {
+		knownAddresses(networkId: networkId).resourceAddresses.xrd
+	}
+}
+
 // MARK: Parsing and formatting for human readable strings
 
 extension UInt {

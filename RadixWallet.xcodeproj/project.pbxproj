@@ -355,12 +355,9 @@
 		48CFC3962ADC10D900E77A5C /* NonFungbileLocalID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE7A2ADC10D800E77A5C /* NonFungbileLocalID.swift */; };
 		48CFC3982ADC10D900E77A5C /* ReviewedTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE7C2ADC10D800E77A5C /* ReviewedTransaction.swift */; };
 		48CFC3992ADC10D900E77A5C /* TXID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE7D2ADC10D800E77A5C /* TXID.swift */; };
-		48CFC39A2ADC10D900E77A5C /* TransactionIntent+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE7E2ADC10D800E77A5C /* TransactionIntent+Utils.swift */; };
 		48CFC39B2ADC10D900E77A5C /* Blake2b.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE7F2ADC10D800E77A5C /* Blake2b.swift */; };
 		48CFC39C2ADC10D900E77A5C /* TXVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE802ADC10D800E77A5C /* TXVersion.swift */; };
 		48CFC39E2ADC10D900E77A5C /* NetworkID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE832ADC10D800E77A5C /* NetworkID.swift */; };
-		48CFC39F2ADC10D900E77A5C /* TransactionManifest+CustomConvertibleString.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE842ADC10D800E77A5C /* TransactionManifest+CustomConvertibleString.swift */; };
-		48CFC3A02ADC10D900E77A5C /* IsXRDResource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE852ADC10D800E77A5C /* IsXRDResource.swift */; };
 		48CFC3A12ADC10D900E77A5C /* Epoch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE862ADC10D800E77A5C /* Epoch.swift */; };
 		48CFC3A32ADC10D900E77A5C /* EncryptionScheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE8B2ADC10D800E77A5C /* EncryptionScheme.swift */; };
 		48CFC3A42ADC10D900E77A5C /* VersionedAlgorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE8C2ADC10D800E77A5C /* VersionedAlgorithm.swift */; };
@@ -1169,7 +1166,6 @@
 		83AAAC682B46FC4100222B64 /* LiquidStakeUnitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AAAC672B46FC4100222B64 /* LiquidStakeUnitView.swift */; };
 		83AAAC6A2B46FC5800222B64 /* StakeClaimNFTsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AAAC692B46FC5800222B64 /* StakeClaimNFTsView.swift */; };
 		83AAAC6D2B483D1B00222B64 /* StakeSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AAAC6B2B483D1B00222B64 /* StakeSummaryView.swift */; };
-		83D0B5692AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */; };
 		83D663B02B271D0100D1AB9E /* TruncationMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D663AF2B271D0100D1AB9E /* TruncationMask.swift */; };
 		83DFAF2E2B4E8A51008B70CE /* View+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83DFAF2D2B4E8A51008B70CE /* View+Extra.swift */; };
 		83EE47502AF027DF00155F03 /* AssetTransferDepositRuleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */; };
@@ -1707,12 +1703,9 @@
 		48CFBE7A2ADC10D800E77A5C /* NonFungbileLocalID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NonFungbileLocalID.swift; sourceTree = "<group>"; };
 		48CFBE7C2ADC10D800E77A5C /* ReviewedTransaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReviewedTransaction.swift; sourceTree = "<group>"; };
 		48CFBE7D2ADC10D800E77A5C /* TXID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TXID.swift; sourceTree = "<group>"; };
-		48CFBE7E2ADC10D800E77A5C /* TransactionIntent+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransactionIntent+Utils.swift"; sourceTree = "<group>"; };
 		48CFBE7F2ADC10D800E77A5C /* Blake2b.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Blake2b.swift; sourceTree = "<group>"; };
 		48CFBE802ADC10D800E77A5C /* TXVersion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TXVersion.swift; sourceTree = "<group>"; };
 		48CFBE832ADC10D800E77A5C /* NetworkID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkID.swift; sourceTree = "<group>"; };
-		48CFBE842ADC10D800E77A5C /* TransactionManifest+CustomConvertibleString.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TransactionManifest+CustomConvertibleString.swift"; sourceTree = "<group>"; };
-		48CFBE852ADC10D800E77A5C /* IsXRDResource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IsXRDResource.swift; sourceTree = "<group>"; };
 		48CFBE862ADC10D800E77A5C /* Epoch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Epoch.swift; sourceTree = "<group>"; };
 		48CFBE8B2ADC10D800E77A5C /* EncryptionScheme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EncryptionScheme.swift; sourceTree = "<group>"; };
 		48CFBE8C2ADC10D800E77A5C /* VersionedAlgorithm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersionedAlgorithm.swift; sourceTree = "<group>"; };
@@ -2490,7 +2483,6 @@
 		83AAAC672B46FC4100222B64 /* LiquidStakeUnitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidStakeUnitView.swift; sourceTree = "<group>"; };
 		83AAAC692B46FC5800222B64 /* StakeClaimNFTsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StakeClaimNFTsView.swift; sourceTree = "<group>"; };
 		83AAAC6B2B483D1B00222B64 /* StakeSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StakeSummaryView.swift; sourceTree = "<group>"; };
-		83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixEngineToolkitError+Description.swift"; sourceTree = "<group>"; };
 		83D663AF2B271D0100D1AB9E /* TruncationMask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TruncationMask.swift; sourceTree = "<group>"; };
 		83DFAF2D2B4E8A51008B70CE /* View+Extra.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "View+Extra.swift"; sourceTree = "<group>"; };
 		83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetTransferDepositRuleTests.swift; sourceTree = "<group>"; };
@@ -4601,13 +4593,9 @@
 				48CFBE7A2ADC10D800E77A5C /* NonFungbileLocalID.swift */,
 				48CFBE7C2ADC10D800E77A5C /* ReviewedTransaction.swift */,
 				48CFBE7D2ADC10D800E77A5C /* TXID.swift */,
-				48CFBE7E2ADC10D800E77A5C /* TransactionIntent+Utils.swift */,
 				48CFBE7F2ADC10D800E77A5C /* Blake2b.swift */,
 				48CFBE802ADC10D800E77A5C /* TXVersion.swift */,
 				48CFBE832ADC10D800E77A5C /* NetworkID.swift */,
-				48CFBE842ADC10D800E77A5C /* TransactionManifest+CustomConvertibleString.swift */,
-				48CFBE852ADC10D800E77A5C /* IsXRDResource.swift */,
-				83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */,
 			);
 			path = EngineKit;
 			sourceTree = "<group>";
@@ -8683,7 +8671,6 @@
 				48CFC2E72ADC10D900E77A5C /* CreateSecurityStructureStart+View.swift in Sources */,
 				E6A2D9E12AFA6BFE001857EC /* DeviceFactorSourceControlled.swift in Sources */,
 				48CFC4B82ADC10DA00E77A5C /* NotSyncedUpErrorAllOf.swift in Sources */,
-				48CFC3A02ADC10D900E77A5C /* IsXRDResource.swift in Sources */,
 				48CFC6652ADC10DB00E77A5C /* BaseFactorSourceProtocol.swift in Sources */,
 				48CFC2F12ADC10D900E77A5C /* CreatePersonaCoordinator+Reducer.swift in Sources */,
 				48CFC5702ADC10DA00E77A5C /* TransactionConstructionResponse.swift in Sources */,
@@ -8701,7 +8688,6 @@
 				48CFC3E62ADC10D900E77A5C /* P2PLink.swift in Sources */,
 				830EA9DB2AEA8770004C8051 /* EntitiesVisibilityClient+Interface.swift in Sources */,
 				48CFC2682ADC10D900E77A5C /* EditPersonaField+View.swift in Sources */,
-				48CFC39F2ADC10D900E77A5C /* TransactionManifest+CustomConvertibleString.swift in Sources */,
 				48CFC3672ADC10D900E77A5C /* NonFungbileAssetRow+Reducer.swift in Sources */,
 				48CFC25C2ADC10D900E77A5C /* OnboardingStartup+View.swift in Sources */,
 				48CFC3B02ADC10D900E77A5C /* HD+Path+Component.swift in Sources */,
@@ -8743,7 +8729,6 @@
 				48CFC6142ADC10DA00E77A5C /* AccountsRequestItem.swift in Sources */,
 				48CFC3C62ADC10D900E77A5C /* Mnemonic+ToEntropy.swift in Sources */,
 				48CFC5452ADC10DA00E77A5C /* ResultSetCursorMixin.swift in Sources */,
-				48CFC39A2ADC10D900E77A5C /* TransactionIntent+Utils.swift in Sources */,
 				48CFC5BB2ADC10DA00E77A5C /* PlainListRow.swift in Sources */,
 				48CFC2AB2ADC10D900E77A5C /* Home.swift in Sources */,
 				48CFC42F2ADC10DA00E77A5C /* Tagged+Comparable.swift in Sources */,
@@ -8857,7 +8842,6 @@
 				48CFC4AC2ADC10DA00E77A5C /* MetadataGlobalAddressValue.swift in Sources */,
 				48CFC6062ADC10DA00E77A5C /* P2P+Dapp+Response+Persona.swift in Sources */,
 				48CFC4AE2ADC10DA00E77A5C /* TransactionCommittedDetailsRequest.swift in Sources */,
-				83D0B5692AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift in Sources */,
 				48CFC3012ADC10D900E77A5C /* DebugSettingsCoordinator+Reducer.swift in Sources */,
 				83AAAC682B46FC4100222B64 /* LiquidStakeUnitView.swift in Sources */,
 				48CFC4F42ADC10DA00E77A5C /* StateNonFungibleLocationResponse.swift in Sources */,

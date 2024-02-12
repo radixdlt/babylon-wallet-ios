@@ -24,6 +24,12 @@ public struct RETAddress: DummySargonAddress {
 public typealias PackageAddress = SpecificAddress<PackageEntityType>
 public typealias ResourceAddress = SpecificAddress<ResourceEntityType>
 
+extension ResourceAddress {
+	public func isXRD(on networkID: NetworkID) -> Bool {
+		address == knownAddresses(networkId: networkID.rawValue).resourceAddresses.xrd.addressString()
+	}
+}
+
 public typealias ComponentAddress = SpecificAddress<ComponentEntityType>
 public typealias AccountAddress = SpecificAddress<AccountEntityType>
 public typealias IdentityAddress = SpecificAddress<IdentityEntityType>

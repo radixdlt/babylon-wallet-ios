@@ -75,6 +75,9 @@ public struct Intent: DummySargon {
 	}
 }
 
+// MARK: - RadixEngineToolkitError
+public struct RadixEngineToolkitError: DummySargon {}
+
 // MARK: - ResourceSpecifier
 public enum ResourceSpecifier: DummySargon {
 	case amount(
