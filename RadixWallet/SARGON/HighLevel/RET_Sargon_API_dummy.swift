@@ -7,8 +7,11 @@ public enum Sargon {
 		panic()
 	}
 
-	// MARK: Global Functions
 	public static func buildInformation() -> BuildInformation {
 		BuildInformation(version: "Sargon MOCKED")
+	}
+
+	public static func hash(data: Data) -> Data {
+		panic()
 	}
 }

@@ -145,7 +145,9 @@ extension ImportLegacyWalletClient: DependencyKey {
 					}
 					var alreadyImported = Set<OlympiaAccountToMigrate.ID>()
 					for scannedAccount in scannedAccounts {
-						let hash = try Blake2b.hash(data: scannedAccount.publicKey.compressedRepresentation)
+						let hash = try Sargon.hash(
+							data: scannedAccount.publicKey.compressedRepresentation
+						)
 						let data = Data(hash.suffix(payloadByteCount))
 						if setOfExistingData.contains(data) {
 							alreadyImported.insert(scannedAccount.id)

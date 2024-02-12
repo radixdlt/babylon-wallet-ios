@@ -103,7 +103,7 @@ struct Login: Sendable, FeatureReducer {
 
 				let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
 					signerEntity: .persona(persona),
-					hashedDataToSign: blake2b(data: authToSignResponse.payloadToHashAndSign),
+					hashedDataToSign: Sargon.hash(data: authToSignResponse.payloadToHashAndSign),
 					purpose: .signAuth
 				)
 				let signedAuthChallenge = SignedAuthChallenge(challenge: challenge, entitySignatures: Set([signature]))

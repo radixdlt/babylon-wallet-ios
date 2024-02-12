@@ -153,7 +153,7 @@ extension RETPublicKeyHash {
 	static let hashLength = 29
 
 	public init(hashing publicKey: SLIP10.PublicKey) throws {
-		let hashBytes = try blake2b(data: publicKey.compressedData).suffix(Self.hashLength)
+		let hashBytes = try Sargon.hash(data: publicKey.compressedData).suffix(Self.hashLength)
 
 		guard
 			hashBytes.count == Self.hashLength
