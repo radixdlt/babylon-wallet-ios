@@ -184,9 +184,9 @@ extension AssetTransfer {
 				for account in resource.accounts {
 					let bucket = ManifestBuilderBucket.unique
 					try ManifestBuilder.takeFromWorktop(
-						resource.address.intoEngine(),
-						account.amount.rounded(decimalPlaces: divisibility),
-						bucket
+						resource: resource.address,
+						amount: account.amount.rounded(decimalPlaces: divisibility),
+						bucket: bucket
 					)
 
 					try await instructionForDepositing(
@@ -209,9 +209,9 @@ extension AssetTransfer {
 					let localIds = account.tokens.map { $0.id.localId() }
 
 					try ManifestBuilder.takeNonFungiblesFromWorktop(
-						resource.address.intoEngine(),
-						localIds,
-						bucket
+						resource: resource.address,
+						localIds: localIds,
+						bucket: bucket
 					)
 
 					try await instructionForDepositing(
@@ -244,16 +244,16 @@ func instructionForDepositing(
 
 		if needsSignatureForDepositing, isSoftwareAccount && userHasAccessToMnemonic || !isSoftwareAccount {
 			return try ManifestBuilder.accountDeposit(
-				recipientAddress.intoEngine(),
-				bucket
+				recipientAddress: recipientAddress,
+				bucket: bucket
 			)
 		}
 	}
 
 	return try ManifestBuilder.accountTryDepositOrAbort(
-		recipientAddress.intoEngine(),
-		bucket,
-		nil
+		recipientAddress: recipientAddress,
+		bucket: bucket,
+		authorizedDepositorBadge: nil
 	)
 }
 

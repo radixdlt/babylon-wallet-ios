@@ -10,13 +10,14 @@ extension ROLAClient {
 			let entity = request.entity
 			let newPublicKey = request.newPublicKey
 
-			let entityAddress: Address = switch entity {
+			let entityAddress = switch entity {
 			case let .account(account):
-				account.address.asGeneral
+				AddressOfAccountOrPersona.account(account.address)
 			case let .persona(persona):
-				persona.address.asGeneral
+				AddressOfAccountOrPersona.persona(persona.address)
 			}
-			let metadata = try await onLedgerEntitiesClient.getEntity(entityAddress, metadataKeys: [.ownerKeys]).genericComponent?.metadata
+
+			let metadata = try await onLedgerEntitiesClient.getEntity(entityAddress.address, metadataKeys: [.ownerKeys]).genericComponent?.metadata
 			var ownerKeyHashes = try metadata?.ownerKeyHashes() ?? []
 
 			let transactionSigningKeyHash: RETPublicKeyHash = switch entity.securityState {
@@ -33,12 +34,12 @@ extension ROLAClient {
 			}
 
 			loggerGlobal.notice("Setting ownerKeyHashes to: \(ownerKeyHashes)")
-			return try ManifestBuilder()
-				.setOwnerKeys(
-					from: entityAddress,
-					ownerKeyHashes: ownerKeyHashes
-				)
-				.build(networkId: request.entity.networkID)
+
+			return try Sargon.manifestSetOwnerKeys(
+				addressOfAccountOrPersona: entityAddress,
+				ownerKeyHashes: ownerKeyHashes,
+				networkId: request.entity.networkID
+			)
 		}
 
 		return Self(

@@ -19,6 +19,14 @@ extension Sargon {
 		panic()
 	}
 
+	public static func manifestSetOwnerKeys(
+		addressOfAccountOrPersona: AddressOfAccountOrPersona,
+		ownerKeyHashes: [RETPublicKeyHash],
+		networkId: NetworkID
+	) -> TransactionManifest {
+		panic()
+	}
+
 	public static func manifestWithdrawAmount(
 		from: AccountAddress,
 		resource: ResourceAddress,
@@ -37,6 +45,26 @@ extension Sargon {
 	public static func manifestForCreateMultipleFungibleTokens(
 		addressOfOwner: AccountAddress,
 		networkID: NetworkID
+	) throws -> TransactionManifest {
+		panic()
+	}
+
+	public static func manifestForCreateMultipleNonFungibleTokens(
+		addressOfOwner: AccountAddress,
+		networkID: NetworkID
+	) throws -> TransactionManifest {
+		panic()
+	}
+
+	public static func manifestForCreateNonFungibleToken(
+		addressOfOwner: AccountAddress,
+		networkID: NetworkID
+	) throws -> TransactionManifest {
+		panic()
+	}
+
+	public static func manifestMarkingAccountAsDappDefinitionType(
+		accountAddress: AccountAddress
 	) throws -> TransactionManifest {
 		panic()
 	}

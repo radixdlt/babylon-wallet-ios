@@ -684,10 +684,6 @@ public struct TransactionManifest: DummySargon {
 		panic()
 	}
 
-	public func setAccountType(from: String, type: String) -> Self {
-		panic()
-	}
-
 	public func summary(networkId: UInt8) -> ManifestSummary {
 		panic()
 	}

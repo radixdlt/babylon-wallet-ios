@@ -10,73 +10,33 @@ extension ManifestBuilder {
 	}
 
 	public static func takeFromWorktop(
-		_ address: RETAddress,
-		_ amount: RETDecimal,
-		_ bucket: ManifestBuilderBucket
-	) -> ManifestBuilder.InstructionsChain.Instruction {
+		resource: ResourceAddress,
+		amount: RETDecimal,
+		bucket: ManifestBuilderBucket
+	) throws -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
 
 	public static func accountTryDepositOrAbort(
-		_ address: RETAddress,
-		_ bucket: ManifestBuilderBucket,
-		_ authorizedDepositorBadge: ResourceOrNonFungible?
+		recipientAddress: AccountAddress,
+		bucket: ManifestBuilderBucket,
+		authorizedDepositorBadge: ResourceOrNonFungible?
 	) -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
 
 	public static func accountDeposit(
-		_ recipientAddress: RETAddress,
-		_ bucket: ManifestBuilderBucket
-	) -> ManifestBuilder.InstructionsChain.Instruction {
+		recipientAddress: AccountAddress,
+		bucket: ManifestBuilderBucket
+	) throws -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
 
-	///	= flip(takeNonFungiblesFromWorktop)
 	public static func takeNonFungiblesFromWorktop(
-		_ resourceAddress: RETAddress,
-		_ localIds: [NonFungibleLocalId],
-		_ bucket: ManifestBuilderBucket
-	) -> ManifestBuilder.InstructionsChain.Instruction {
-		panic()
-	}
-
-	public static func accountWithdrawNonFungibles(
-		_ account: RETAddress,
-		_ resourceAddress: RETAddress,
-		_ ids: [NonFungibleLocalId]
-	) -> ManifestBuilder.InstructionsChain.Instruction {
-		panic()
-	}
-
-	public func createFungibleResourceManager(
-		ownerRole: OwnerRole,
-		trackTotalSupply: Bool,
-		divisibility: UInt8,
-		initialSupply: RETDecimal,
-		resourceRoles: FungibleResourceRoles,
-		metadata: MetadataModuleConfig,
-		addressReservation: ManifestBuilderAddressReservation?
-	) -> ManifestBuilder {
-		panic()
-	}
-
-	public static func createFungibleResourceManager(
-		_ ownerRole: OwnerRole,
-		_ trackTotalSupply: Bool,
-		_ divisibility: UInt8,
-		_ initialSupply: RETDecimal,
-		_ resourceRoles: FungibleResourceRoles,
-		_ metadata: MetadataModuleConfig,
-		_ addressReservation: ManifestBuilderAddressReservation?
-	) -> ManifestBuilder.InstructionsChain.Instruction {
-		panic()
-	}
-
-	public static func validatorClaimXrd(
-		_ validatorAddress: RETAddress,
-		_ bucket: ManifestBuilderBucket
-	) -> ManifestBuilder.InstructionsChain.Instruction {
+		resource: ResourceAddress,
+		localIds: [NonFungibleLocalId],
+		bucket: ManifestBuilderBucket
+	) throws -> ManifestBuilder.InstructionsChain.Instruction {
 		panic()
 	}
 
@@ -137,48 +97,6 @@ extension ManifestBuilder {
 	}
 }
 
-/// Flips the argument order of a five-argument curried function.
-///
-/// - Parameter function: A five-argument, curried function.
-/// - Returns: A curried function with its first two arguments flipped.
-public func flip<A, B, C, D, E, F, G, H, I>(_ function: @escaping (A) -> (B, C, D, E, F, G, H) throws -> I)
-	-> (B, C, D, E, F, G, H) -> (A) throws -> I
-{
-	{ (b: B, c: C, d: D, e: E, f: F, g: G, h: H) -> (A) throws -> I in
-		{ (a: A) throws -> I in
-			try function(a)(b, c, d, e, f, g, h)
-		}
-	}
-}
-
-extension ManifestBuilder {
-	public func setOwnerKeys(
-		from entity: Address,
-		ownerKeyHashes: [RETPublicKeyHash]
-	) throws -> ManifestBuilder {
-		try metadataSet(
-			address: entity.intoEngine(),
-			key: "owner_keys",
-			value: .publicKeyHashArrayValue(value: ownerKeyHashes)
-		)
-	}
-
-	public func setAccountType(
-		from entity: Address,
-		type: String
-	) throws -> ManifestBuilder {
-		try metadataSet(address: entity.intoEngine(), key: "account_type", value: .stringValue(value: type))
-	}
-
-	public func metadataSet(
-		address: RETAddress,
-		key: String,
-		value: MetadataValue
-	) throws -> ManifestBuilder {
-		panic()
-	}
-}
-
 extension ManifestBuilderBucket {
 	public static var unique: ManifestBuilderBucket {
 		panic()
@@ -208,160 +126,7 @@ extension Instructions {
 	}
 }
 
-// MARK: Manifests for testing
 extension ManifestBuilder {
-	public static func manifestForCreateNonFungibleToken(
-		account: AccountAddress,
-		networkID: NetworkID
-	) throws -> TransactionManifest {
-		let instructions = try Instructions.fromString(
-			string: createNonFungibleTokensRawManifest(account: account),
-			networkId: networkID.rawValue
-		)
-
-		return TransactionManifest(instructions: instructions, blobs: [])
-	}
-
-	public static func manifestForCreateMultipleNonFungibleTokens(
-		account: AccountAddress,
-		networkID: NetworkID
-	) throws -> TransactionManifest {
-		let instructions = try Instructions.fromString(
-			string: createNonFungibleTokensRawManifest(account: account, nrOfTokens: 15),
-			networkId: networkID.rawValue
-		)
-		return TransactionManifest(instructions: instructions, blobs: [])
-	}
-}
-
-extension ManifestBuilder {
-	static var createSmallNonFungbileResourceRawInstruction: String {
-		"""
-						CREATE_NON_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY
-							Enum<0u8>()
-							Enum<1u8>()
-							true
-							Enum<0u8>(
-							Enum<0u8>(
-							Tuple(
-							Array<Enum>(
-							Enum<14u8>(
-							Array<Enum>(
-							Enum<0u8>(
-							12u8
-							),
-							Enum<0u8>(
-							12u8
-							),
-							Enum<0u8>(
-							198u8
-							),
-							Enum<0u8>(
-							10u8
-							)
-							)
-							)
-							),
-							Array<Tuple>(
-							Tuple(
-							Enum<1u8>(
-							"MetadataStandardNonFungibleData"
-							),
-							Enum<1u8>(
-							Enum<0u8>(
-							Array<String>(
-							"name",
-							"description",
-							"key_image_url",
-							"arbitrary_coolness_rating"
-							)
-							)
-							)
-							)
-							),
-							Array<Enum>(
-
-							Enum<0u8>()
-							)
-							)
-							),
-							Enum<1u8>(
-							0u64
-							),
-							Array<String>()
-							)
-							Map<NonFungibleLocalId,    Tuple>(
-							NonFungibleLocalId("#0#")    =>    Tuple(
-							Tuple(
-							"URL    With    white    space",
-							"URL    with    white    space",
-							"https://image-service-test-images.s3.eu-west-2.amazonaws.com/wallet_test_images/KL    Haze-medium.jpg",
-							45u64
-							)
-							)
-							)
-							Tuple(
-							Enum<0u8>(),
-							Enum<0u8>(),
-							Enum<0u8>(),
-							Enum<0u8>(),
-							Enum<0u8>(),
-							Enum<0u8>(),
-							Enum<0u8>()
-							)
-							Tuple(
-							Map<String,    Tuple>(
-							"description"    =>    Tuple(
-							Enum<1u8>(
-							Enum<0u8>(
-							"A    very    innovative    and    important    resource"
-							)
-							),
-							true
-							),
-							"icon_url"    =>    Tuple(
-							Enum<1u8>(
-							Enum<13u8>(
-							"https://upload.wikimedia.org/wikipedia/commons/b/be/VeKings.png"
-							)
-							),
-							true
-							),
-							"info_url"    =>    Tuple(
-							Enum<1u8>(
-							Enum<13u8>(
-							"https://developers.radixdlt.com/ecosystem"
-							)
-							),
-							true
-							),
-							"name"    =>    Tuple(
-							Enum<1u8>(
-							Enum<0u8>(
-							"SandboxNFT"
-							)
-							),
-							true
-							),
-							"tags"    =>    Tuple(
-							Enum<1u8>(
-							Enum<128u8>(
-							Array<String>(
-							"collection",
-							"sandbox",
-							"example-tag"
-							)
-							)
-							),
-							true
-							)
-							),
-							Map<String,    Enum>()
-							)
-							Enum<0u8>();
-		"""
-	}
-
 	static var createMultipleIdsNonFungibleResourceRawInstruction: String {
 		"""
 				CREATE_NON_FUNGIBLE_RESOURCE_WITH_INITIAL_SUPPLY
@@ -943,23 +708,6 @@ extension ManifestBuilder {
 					Map<String,    Enum>()
 					)
 					Enum<0u8>();
-		"""
-	}
-
-	static func createNonFungibleTokensRawManifest(account: AccountAddress, nrOfTokens: Int = 1) -> String {
-		let instructions = if nrOfTokens == 1 {
-			createMultipleIdsNonFungibleResourceRawInstruction
-		} else {
-			Array(repeating: createSmallNonFungbileResourceRawInstruction, count: nrOfTokens).joined(separator: "\n")
-		}
-
-		return """
-		\(instructions)
-		CALL_METHOD
-		Address("\(account.address)")
-		"try_deposit_batch_or_abort"
-		Expression("ENTIRE_WORKTOP")
-		Enum<0u8>();
 		"""
 	}
 }

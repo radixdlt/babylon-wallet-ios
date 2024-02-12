@@ -124,22 +124,6 @@ extension FaucetClient: DependencyKey {
 		let createNonFungibleToken: CreateNonFungibleToken = { _ in
 			fatalError()
 			// TODO: Re-enable. With new manifest builder that is not easy to handle.
-//			let networkID = await gatewaysClient.getCurrentNetworkID()
-//			let manifest = try {
-//				if request.numberOfTokens == 1 {
-//					return try TransactionManifest.manifestForCreateNonFungibleToken(
-//						account: request.recipientAccountAddress,
-//						network: networkID
-//					)
-//				} else {
-//					return try TransactionManifest.manifestForCreateMultipleNonFungibleTokens(
-//						account: request.recipientAccountAddress,
-//						network: networkID
-//					)
-//				}
-//			}()
-
-//			try await signSubmitTX(manifest: manifest)
 		}
 
 		return Self(
