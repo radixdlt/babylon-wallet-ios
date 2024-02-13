@@ -73,7 +73,10 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 			state.message?.focused = false
 
 			return .run { [accounts = state.accounts, message = state.message?.message] send in
-				let manifest = try await Sargon.manifestAssetsTransfers(transfers: accounts.transferRepresentation, message: message)
+				let manifest = try await Sargon.manifestAssetsTransfers(
+					transfers: accounts.transferRepresentation,
+					message: message.map(Message.plainText)
+				)
 				Task {
 					_ = try await dappInteractionClient.addWalletInteraction(
 						.transaction(.init(send: .init(transactionManifest: manifest))),
