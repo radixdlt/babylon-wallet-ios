@@ -28,17 +28,15 @@ extension TransactionHistory {
 		public var body: some SwiftUI.View {
 			NavigationStack {
 				WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+					let accountHeader = AccountHeaderView(account: viewStore.account)
 					VStack(spacing: .zero) {
 						HScrollBar.Dummy()
 							.padding(.vertical, .small3)
 
 						ScrollView {
 							LazyVStack(spacing: .small1, pinnedViews: [.sectionHeaders]) {
-								SmallAccountCard(account: viewStore.account)
-									.roundedCorners(radius: .small1)
-									.padding(.horizontal, .medium3)
-									.padding(.vertical, .medium3)
-									.measurePosition("SmallAccountCardDummy", coordSpace: View.coordSpace)
+								accountHeader
+									.measurePosition(View.accountDummy, coordSpace: View.coordSpace)
 									.opacity(0)
 
 								ForEach(viewStore.sections) { section in
@@ -51,14 +49,10 @@ extension TransactionHistory {
 					}
 					.background(.app.gray5)
 					.overlayPreferenceValue(PositionsPreferenceKey.self, alignment: .top) { positions in
-						let rect = positions["SmallAccountCardDummy"]
+						let rect = positions[View.accountDummy]
 						ZStack(alignment: .top) {
 							if let rect {
-								SmallAccountCard(account: viewStore.account)
-									.roundedCorners(radius: .small1)
-									.padding(.horizontal, .medium3)
-									.padding(.vertical, .medium3)
-									.background(.app.white)
+								accountHeader
 									.offset(y: rect.minY)
 							}
 
@@ -86,7 +80,8 @@ extension TransactionHistory {
 			}
 		}
 
-		static let coordSpace = "TransactionHistory"
+		private static let coordSpace = "TransactionHistory"
+		private static let accountDummy = "SmallAccountCardDummy"
 	}
 
 	struct SectionView: SwiftUI.View {
@@ -101,12 +96,22 @@ extension TransactionHistory {
 							.frame(maxWidth: .infinity)
 					}
 					.padding(.horizontal, .medium3)
-//					.padding(.bottom, .small1)
 				}
 			} header: {
 				SectionHeaderView(title: section.title)
-//					.padding(.bottom, .small1)
 			}
+		}
+	}
+
+	struct AccountHeaderView: SwiftUI.View {
+		let account: Profile.Network.Account
+
+		var body: some SwiftUI.View {
+			SmallAccountCard(account: account)
+				.roundedCorners(radius: .small1)
+				.padding(.horizontal, .medium3)
+				.padding(.top, .medium3)
+				.background(.app.white)
 		}
 	}
 
@@ -158,6 +163,7 @@ struct HScrollBar: View {
 					.padding(.horizontal, .medium3)
 					.padding(.vertical, .small2)
 					.measurePosition(item.id, coordSpace: HScrollBar.coordSpace)
+					.padding(.horizontal, .small3)
 					.animation(.default, value: isSelected)
 				}
 			}
@@ -171,19 +177,19 @@ struct HScrollBar: View {
 						.animation(.default, value: rect)
 				}
 			}
+			.padding(.vertical, .small1)
 			.padding(.horizontal, .medium3)
 		}
 		.scrollIndicators(.never)
-//		.background(.ultraThinMaterial)
 	}
 
-	static let coordSpace = "HScrollBar.HStack"
+	private static let coordSpace = "HScrollBar.HStack"
 
 	struct Dummy: View {
 		var body: some View {
 			Text("DUMMY")
 				.foregroundStyle(.clear)
-				.padding(.vertical, .small2)
+				.padding(.vertical, 2 * .small2)
 				.frame(maxWidth: .infinity)
 		}
 	}
@@ -208,26 +214,6 @@ private enum PositionsPreferenceKey: PreferenceKey {
 		value.merge(nextValue()) { $1 }
 	}
 }
-
-// extension View {
-//	public func measurePosition(coordSpace: String) -> some View {
-//		background {
-//			GeometryReader { proxy in
-//				Color.clear
-//					.preference(key: PositionPreferenceKey.self, value: proxy.frame(in: .named(coordSpace)))
-//			}
-//		}
-//	}
-// }
-//
-//// MARK: - PositionPreferenceKey
-// private enum PositionPreferenceKey: PreferenceKey {
-//	static var defaultValue: CGRect = .zero
-//
-//	static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
-//		value = nextValue()
-//	}
-// }
 
 // struct DateBar: View {
 //	let dates: [DateComponents]
