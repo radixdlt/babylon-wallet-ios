@@ -659,7 +659,7 @@ extension TransactionReview {
 			return .none
 		}
 		guard let networkID = state.networkID else {
-			assertionFailure("Bad implementation, expected `networkID`")
+			"Bad implementation, expected `networkID`"
 			return .none
 		}
 
