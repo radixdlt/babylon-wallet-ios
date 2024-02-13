@@ -1,7 +1,7 @@
 import ComposableArchitecture
 import SwiftUI
 
-let items: [HScrollBar.Item] = [
+let items: [HScrollBar<UUID>.Item] = [
 	HScrollBar.Item(id: .init(), text: "Jan"),
 	HScrollBar.Item(id: .init(), text: "Feb"),
 	HScrollBar.Item(id: .init(), text: "Mar"),
@@ -30,7 +30,7 @@ extension TransactionHistory {
 				WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 					let accountHeader = AccountHeaderView(account: viewStore.account)
 					VStack(spacing: .zero) {
-						HScrollBar.Dummy()
+						HScrollBarDummy()
 							.padding(.vertical, .small3)
 
 						ScrollView {
@@ -132,14 +132,14 @@ extension TransactionHistory {
 }
 
 // MARK: - HScrollBar
-struct HScrollBar: View {
+struct HScrollBar<ID: Hashable>: View {
 	struct Item: Identifiable {
-		let id: UUID
+		let id: ID
 		let text: String
 	}
 
 	let items: [Item]
-	@Binding var selection: UUID
+	@Binding var selection: Item.ID
 
 	var body: some View {
 		ScrollView(.horizontal) {
@@ -175,15 +175,16 @@ struct HScrollBar: View {
 		.scrollIndicators(.never)
 	}
 
-	private static let coordSpace = "HScrollBar.HStack"
+	private static var coordSpace: String { "HScrollBar.HStack" }
+}
 
-	struct Dummy: View {
-		var body: some View {
-			Text("DUMMY")
-				.foregroundStyle(.clear)
-				.padding(.vertical, 2 * .small2)
-				.frame(maxWidth: .infinity)
-		}
+// MARK: - HScrollBarDummy
+struct HScrollBarDummy: View {
+	var body: some View {
+		Text("DUMMY")
+			.foregroundStyle(.clear)
+			.padding(.vertical, 2 * .small2)
+			.frame(maxWidth: .infinity)
 	}
 }
 
