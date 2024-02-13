@@ -1,25 +1,13 @@
 import ComposableArchitecture
 import SwiftUI
 
-let items: [HScrollBar<UUID>.Item] = [
-	HScrollBar.Item(id: .init(), text: "Jan"),
-	HScrollBar.Item(id: .init(), text: "Feb"),
-	HScrollBar.Item(id: .init(), text: "Mar"),
-	HScrollBar.Item(id: .init(), text: "Apr"),
-	HScrollBar.Item(id: .init(), text: "May"),
-	HScrollBar.Item(id: .init(), text: "Jun"),
-	HScrollBar.Item(id: .init(), text: "Jul"),
-	HScrollBar.Item(id: .init(), text: "Aug"),
-	HScrollBar.Item(id: .init(), text: "Sep"),
-]
-
 // MARK: - TransactionHistory.View
 extension TransactionHistory {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<TransactionHistory>
 
-		@SwiftUI.State var selection: UUID = items[0].id
+//		@SwiftUI.State var selection: UUID = items[0].id
 
 		public init(store: StoreOf<TransactionHistory>) {
 			self.store = store
@@ -57,7 +45,8 @@ extension TransactionHistory {
 							}
 
 							let scrollBarOffset = max(rect?.maxY ?? 0, 0)
-							HScrollBar(items: items, selection: $selection)
+//							HScrollBar(items: viewStore.items, selection: $selection)
+							HScrollBar(items: viewStore.items)
 								.padding(.vertical, .small3)
 								.background(.app.white)
 								.offset(y: scrollBarOffset)
@@ -139,36 +128,36 @@ struct HScrollBar<ID: Hashable>: View {
 	}
 
 	let items: [Item]
-	@Binding var selection: Item.ID
+//	@Binding var selection: Item.ID
 
 	var body: some View {
 		ScrollView(.horizontal) {
 			HStack(spacing: .zero) {
 				ForEach(items) { item in
-					let isSelected = item.id == selection
+//					let isSelected = item.id == selection
 					Button {
-						selection = item.id
+//						selection = item.id
 					} label: {
 						Text(item.text.localizedUppercase)
-							.foregroundStyle(isSelected ? .app.gray1 : .app.gray2)
+//							.foregroundStyle(isSelected ? .app.gray1 : .app.gray2)
 					}
 					.padding(.horizontal, .medium3)
 					.padding(.vertical, .small2)
 					.measurePosition(item.id, coordSpace: HScrollBar.coordSpace)
 					.padding(.horizontal, .small3)
-					.animation(.default, value: isSelected)
+//					.animation(.default, value: isSelected)
 				}
 			}
 			.coordinateSpace(name: HScrollBar.coordSpace)
-			.backgroundPreferenceValue(PositionsPreferenceKey.self) { positions in
-				if let rect = positions[selection] {
-					Capsule()
-						.fill(.app.gray4)
-						.frame(width: rect.width, height: rect.height)
-						.position(x: rect.midX, y: rect.midY)
-						.animation(.default, value: rect)
-				}
-			}
+//			.backgroundPreferenceValue(PositionsPreferenceKey.self) { positions in
+//				if let rect = positions[selection] {
+//					Capsule()
+//						.fill(.app.gray4)
+//						.frame(width: rect.width, height: rect.height)
+//						.position(x: rect.midX, y: rect.midY)
+//						.animation(.default, value: rect)
+//				}
+//			}
 			.padding(.vertical, .small1)
 			.padding(.horizontal, .medium3)
 		}
@@ -216,34 +205,57 @@ extension TransactionHistory.State.TransferSection {
 	}
 }
 
-// struct DateBar: View {
-//	let dates: [DateComponents]
-//	let showYear: Bool
-//
-//	enum TimeUnit {
-//		case year
-//		case month
-//		case day
-//	}
-//
-//	init(_ steps: Int, unit: Calendar.Component) {
-//		let today = Date.now
-//		let calendar = Calendar.current
-//		switch unit {
-//		case .year:
-//			let last = calendar.dat
-//			<#code#>
-//		case .month:
-//			<#code#>
-//		case .day:
-//			<#code#>
-//		}
-//	}
-//
-//	var body: some View {
-//		ScrollView(.horizontal) {
-//			Text("")
-//		}
-//		.scrollIndicators(.never)
-//	}
-// }
+extension Calendar {
+	func startOfMonth(_ date: Date) throws -> Date {
+		var components = dateComponents([.year, .month, .day, .hour, .minute, .second, .nanosecond], from: date)
+		components.day = 1
+		components.hour = 0
+		components.minute = 0
+		components.second = 0
+		components.nanosecond = 0
+
+		guard let start = self.date(from: components) else {
+			struct FailedToFindMonthStart: Error {
+				let date: Date
+			}
+			throw FailedToFindMonthStart(date: date)
+		}
+
+		print("• startOfMonth IN: \(date.formatted(date: .long, time: .omitted)) -> \(start.formatted(date: .long, time: .omitted))")
+
+		return start
+	}
+}
+
+extension TransactionHistory.State {
+	var items: [HScrollBar<Range<Date>>.Item] {
+		let result = (try? dateRangeItems(monthsBack: 5)) ?? []
+
+		for result_ in result {
+			print("  • \(result_.id.lowerBound.formatted(date: .long, time: .standard)) -> \(result_.id.upperBound.formatted(date: .long, time: .standard))")
+		}
+
+		return result
+	}
+
+	func dateRangeItems(monthsBack months: Int) throws -> [HScrollBar<Range<Date>>.Item] {
+		let calendar: Calendar = .current
+		let monthStart = try calendar.startOfMonth(.now)
+		let dates = ((1 - months) ... 1).compactMap { calendar.date(byAdding: .month, value: $0, to: monthStart) }
+
+		guard dates.count == months + 1 else {
+			struct FailedToCalculateDate: Error {}
+			throw FailedToCalculateDate()
+		}
+
+		return zip(dates, dates.dropFirst()).map { start, end in
+			.init(id: start ..< end, text: start.formatted(date: .abbreviated, time: .omitted))
+		}
+	}
+
+	enum TimeUnit {
+		case year
+		case month
+		case day
+	}
+}
