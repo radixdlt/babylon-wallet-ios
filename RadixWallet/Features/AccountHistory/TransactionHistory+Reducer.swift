@@ -1,7 +1,6 @@
 import ComposableArchitecture
 
 // MARK: - TransactionHistory
-////@Reducer
 public struct TransactionHistory: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		let account: Profile.Network.Account
@@ -19,10 +18,17 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		}
 	}
 
-	public struct ViewAction: Sendable, Hashable {}
+	public enum ViewAction: Sendable, Hashable {
+		case closeTapped
+	}
 
-	public var body: some ReducerOf<Self> {
-		EmptyReducer()
+	@Dependency(\.dismiss) var dismiss
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+		switch viewAction {
+		case .closeTapped:
+			.run { _ in await dismiss() }
+		}
 	}
 }
 
