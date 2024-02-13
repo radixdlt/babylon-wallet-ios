@@ -29,11 +29,8 @@ public typealias ComponentAddress = SpecificAddress<ComponentEntityType>
 public typealias AccountAddress = SpecificAddress<AccountEntityType>
 public typealias IdentityAddress = SpecificAddress<IdentityEntityType>
 public typealias AccessControllerAddress = SpecificAddress<AccessControllerEntityType>
-public typealias ConsensusManagerAddress = SpecificAddress<ConsensusManagerEntityType>
-public typealias GenericComponentAddress = SpecificAddress<GenericComponentEntityType>
 public typealias VaultAddress = SpecificAddress<VaultEntityType>
 public typealias ValidatorAddress = SpecificAddress<ValidatorEntityType>
-public typealias KeyValueStoreAddress = SpecificAddress<KeyValueStoreEntityType>
 public typealias ResourcePoolAddress = SpecificAddress<ResourcePoolEntityType>
 
 // MARK: - EntityType + CaseIterable
@@ -113,16 +110,8 @@ public enum ComponentEntityType: SpecificEntityType {
 	public static let addressSpace: Set<EntityType> = AccountEntityType.addressSpace
 		.union(IdentityEntityType.addressSpace)
 		.union(AccessControllerEntityType.addressSpace)
-		.union(ConsensusManagerEntityType.addressSpace)
-		.union(GenericComponentEntityType.addressSpace)
 		.union(VaultEntityType.addressSpace)
 		.union(ValidatorEntityType.addressSpace)
-		.union(KeyValueStoreEntityType.addressSpace)
-}
-
-// MARK: - EntityEntityType
-public enum EntityEntityType: SpecificEntityType {
-	public static let addressSpace: Set<EntityType> = AccountEntityType.addressSpace.union(IdentityEntityType.addressSpace)
 }
 
 // MARK: - AccountEntityType
@@ -140,16 +129,6 @@ public enum AccessControllerEntityType: SpecificEntityType {
 	public static let addressSpace: Set<EntityType> = [.globalAccessController]
 }
 
-// MARK: - ConsensusManagerEntityType
-public enum ConsensusManagerEntityType: SpecificEntityType {
-	public static let addressSpace: Set<EntityType> = [.globalConsensusManager]
-}
-
-// MARK: - GenericComponentEntityType
-public enum GenericComponentEntityType: SpecificEntityType {
-	public static let addressSpace: Set<EntityType> = [.globalGenericComponent, .internalGenericComponent]
-}
-
 // MARK: - VaultEntityType
 public enum VaultEntityType: SpecificEntityType {
 	public static let addressSpace: Set<EntityType> = [.internalFungibleVault, .internalNonFungibleVault]
@@ -163,11 +142,6 @@ public enum ValidatorEntityType: SpecificEntityType {
 // MARK: - ResourcePoolEntityType
 public enum ResourcePoolEntityType: SpecificEntityType {
 	public static let addressSpace: Set<EntityType> = [.globalOneResourcePool, .globalTwoResourcePool, .globalMultiResourcePool]
-}
-
-// MARK: - KeyValueStoreEntityType
-public enum KeyValueStoreEntityType: SpecificEntityType {
-	public static let addressSpace: Set<EntityType> = [.internalKeyValueStore]
 }
 
 // MARK: - SpecificEntityType
