@@ -68,7 +68,7 @@ extension TransactionHistory {
 				.toolbar {
 					ToolbarItem(placement: .topBarLeading) {
 						CloseButton {
-							print("• close")
+							store.send(.view(.closeTapped))
 						}
 					}
 					ToolbarItem(placement: .topBarTrailing) {
@@ -128,14 +128,6 @@ extension TransactionHistory {
 				.frame(maxWidth: .infinity, alignment: .leading)
 				.background(.app.gray5)
 		}
-	}
-}
-
-// "ViewState"
-
-extension TransactionHistory.State.TransferSection {
-	var title: String {
-		date.formatted(date: .abbreviated, time: .omitted)
 	}
 }
 
@@ -212,6 +204,14 @@ private enum PositionsPreferenceKey: PreferenceKey {
 
 	static func reduce(value: inout [AnyHashable: CGRect], nextValue: () -> [AnyHashable: CGRect]) {
 		value.merge(nextValue()) { $1 }
+	}
+}
+
+// "ViewState"
+
+extension TransactionHistory.State.TransferSection {
+	var title: String {
+		date.formatted(date: .abbreviated, time: .omitted)
 	}
 }
 
