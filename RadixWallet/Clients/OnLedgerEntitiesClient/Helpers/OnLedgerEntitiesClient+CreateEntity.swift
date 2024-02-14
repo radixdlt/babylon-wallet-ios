@@ -543,13 +543,7 @@ extension OnLedgerEntitiesClient {
 
 extension OnLedgerEntity.Metadata {
 	var title: String? {
-//		symbol ?? name
-		"**TITLE**"
-	}
-
-	var title_: String? {
-//		symbol ?? name
-		"---- TITLE -----"
+		symbol ?? name
 	}
 }
 

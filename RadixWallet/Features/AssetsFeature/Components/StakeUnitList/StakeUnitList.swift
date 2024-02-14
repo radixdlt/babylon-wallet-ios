@@ -294,7 +294,7 @@ extension StakeUnitList {
 				stakeDetails: stake,
 				validatorNameViewState: .init(
 					imageURL: stake.validator.metadata.iconURL,
-					name: stake.validator.metadata.name ?? L10n.Account.PoolUnits.unknownValidatorName, // FIXME: ???
+					name: stake.validator.metadata.name,
 					stakedAmount: stake.xrdRedemptionValue
 				),
 				liquidStakeUnit: stake.stakeUnitResource.map { stakeUnitResource in

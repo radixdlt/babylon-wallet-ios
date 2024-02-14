@@ -163,7 +163,7 @@ extension LiquidStakeUnitView.ViewState {
 			amount: details.amount,
 			guaranteedAmount: details.guarantee?.amount,
 			worth: details.worth,
-			validatorName: details.validator.metadata.name // FIXME: ???
+			validatorName: details.validator.metadata.name
 		)
 	}
 }

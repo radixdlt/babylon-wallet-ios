@@ -30,8 +30,8 @@ extension TransactionReviewProofs {
 
 					ForEach(viewStore.proofs) { proof in
 						VStack(spacing: 0) {
-							let metadata = proof.metadata // FIXME: ???
-							ProofView(thumbnail: metadata.iconURL, name: metadata.name ?? L10n.TransactionReview.unknown) {
+							let metadata = proof.metadata
+							ProofView(thumbnail: metadata.iconURL, name: metadata.name) {
 								viewStore.send(.proofTapped(id: proof.id))
 							}
 							.padding(.bottom, .medium3)
@@ -48,7 +48,7 @@ extension TransactionReviewProofs {
 
 		struct ProofView: SwiftUI.View {
 			let thumbnail: URL?
-			let name: String
+			let name: String?
 			let action: () -> Void
 
 			var body: some SwiftUI.View {
@@ -57,9 +57,11 @@ extension TransactionReviewProofs {
 						Thumbnail(.dapp, url: thumbnail, size: .smallest)
 							.padding(.trailing, .small1)
 
-						Text(name)
-							.textStyle(.body1HighImportance)
-							.foregroundColor(.app.gray1)
+						if let name {
+							Text(name)
+								.textStyle(.body1HighImportance)
+								.foregroundColor(.app.gray1)
+						}
 
 						Spacer(minLength: 0)
 					}
