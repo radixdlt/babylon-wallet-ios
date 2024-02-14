@@ -204,41 +204,26 @@ extension PoolUnitView.ViewState {
 	}
 }
 
-extension [PoolUnitResourceView.ViewState] {
+extension [CompactFungibleView.ViewState] {
 	init(resources: OnLedgerEntitiesClient.OwnedResourcePoolDetails) {
 		let xrdResource = resources.xrdResource.map {
-			PoolUnitResourceView.ViewState(resourceWithRedemptionValue: $0, isXRD: true)
+			CompactFungibleView.ViewState(resourceWithRedemptionValue: $0, isXRD: true)
 		}
 		let nonXrdResources = resources.nonXrdResources.map {
-			PoolUnitResourceView.ViewState(resourceWithRedemptionValue: $0, isXRD: false)
+			CompactFungibleView.ViewState(resourceWithRedemptionValue: $0, isXRD: false)
 		}
-
 		self = (xrdResource.map { [$0] } ?? []) + nonXrdResources
 	}
 }
 
-// extension [ResourcesListView.ResourceViewState] {
-//	init(resources: OnLedgerEntitiesClient.OwnedResourcePoolDetails) {
-//		let xrdResource = resources.xrdResource.map {
-//			PoolUnitResourceView.ViewState(resourceWithRedemptionValue: $0, isXRD: true)
-//		}
-//		let nonXrdResources = resources.nonXrdResources.map {
-//			PoolUnitResourceView.ViewState(resourceWithRedemptionValue: $0, isXRD: false)
-//		}
-//
-//		self = (xrdResource.map { [$0] } ?? []) + nonXrdResources
-//	}
-// }
-
-// L10n.Account.PoolUnits.noTotalSupply
-
-extension PoolUnitResourceView.ViewState {
+extension CompactFungibleView.ViewState {
 	init(resourceWithRedemptionValue resource: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
 		self.init(
-			id: resource.resource.id,
-			symbol: isXRD ? Constants.xrdTokenName : resource.resource.metadata.title,
+			address: resource.resource.resourceAddress,
+			title: isXRD ? Constants.xrdTokenName : resource.resource.metadata.title,
 			icon: .token(isXRD ? .xrd : .other(resource.resource.metadata.iconURL)),
-			amount: resource.redemptionValue
+			amount: resource.redemptionValue,
+			fallback: L10n.Account.PoolUnits.noTotalSupply
 		)
 	}
 }
