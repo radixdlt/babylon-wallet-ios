@@ -6,7 +6,8 @@ public struct PoolUnitView: View {
 		public let guaranteedAmount: RETDecimal?
 		public let dAppName: Loadable<String?>
 		public let poolIcon: URL?
-		public let resources: Loadable<[PoolUnitResourceView.ViewState]>
+//		public let resources: Loadable<[PoolUnitResourceView.ViewState]>
+		public let resources: Loadable<[ResourcesListView.ResourceViewState]>
 		public let isSelected: Bool?
 	}
 
@@ -56,8 +57,12 @@ public struct PoolUnitView: View {
 					.foregroundColor(.app.gray2)
 					.padding(.bottom, .small3)
 
+//				loadable(viewState.resources) { resources in
+//					PoolUnitResourcesView(resources: resources)
+//				}
+
 				loadable(viewState.resources) { resources in
-					PoolUnitResourcesView(resources: resources)
+					ResourcesListView(resources: resources)
 				}
 			}
 			.padding(.medium3)
@@ -135,6 +140,94 @@ public struct PoolUnitResourceView: View {
 				.truncationMode(.tail)
 				.textStyle(.secondaryHeader)
 				.foregroundColor(.app.gray1)
+		}
+	}
+}
+
+// MARK: - ResourcesListView
+public struct ResourcesListView: View {
+	public enum ResourceViewState: Identifiable, Equatable {
+		case fungible(CompactFungibleView.ViewState)
+		//		case nonFungible(SmallNonfungibleResourceView.ViewState)
+
+		public var id: ResourceAddress {
+			switch self {
+			case let .fungible(fungible):
+				fungible.id
+			}
+		}
+	}
+
+	public let resources: [ResourceViewState]
+
+	public var body: some View {
+		VStack(spacing: 0) {
+			ForEach(resources) { resource in
+				let isNotLast = resource.id != resources.last?.id
+				resourceView(resource)
+					.padding(.small1)
+					.padding(.bottom, isNotLast ? dividerHeight : 0)
+					.overlay(alignment: .bottom) {
+						if isNotLast {
+							Rectangle()
+								.fill(.app.gray3)
+								.frame(height: dividerHeight)
+						}
+					}
+			}
+		}
+		.roundedCorners(strokeColor: .app.gray3)
+	}
+
+	private func resourceView(_ resource: ResourceViewState) -> some View {
+		switch resource {
+		case let .fungible(fungible):
+			CompactFungibleView(viewState: fungible)
+		}
+	}
+
+	private let dividerHeight: CGFloat = 1
+}
+
+// MARK: - CompactFungibleView
+public struct CompactFungibleView: View {
+	public struct ViewState: Identifiable, Equatable {
+		public var id: ResourceAddress { address }
+
+		public let address: ResourceAddress
+		public let symbol: String?
+		public let icon: Thumbnail.FungibleContent
+		public let amount: RETDecimal?
+		public let fallback: String?
+
+		var amountString: String? {
+			amount.map { $0.formatted() } ?? fallback
+		}
+	}
+
+	public let viewState: ViewState
+
+	public var body: some View {
+		HStack(spacing: .zero) {
+			Thumbnail(fungible: viewState.icon, size: .smallest)
+				.padding(.trailing, .small1)
+
+			if let symbol = viewState.symbol {
+				Text(symbol)
+					.textStyle(.body2HighImportance)
+					.foregroundColor(.app.gray1)
+			}
+
+			Spacer(minLength: .small2)
+
+			if let amountString = viewState.amountString {
+				Text(amountString)
+					.lineLimit(1)
+					.minimumScaleFactor(0.8)
+					.truncationMode(.tail)
+					.textStyle(.secondaryHeader)
+					.foregroundColor(.app.gray1)
+			}
 		}
 	}
 }
