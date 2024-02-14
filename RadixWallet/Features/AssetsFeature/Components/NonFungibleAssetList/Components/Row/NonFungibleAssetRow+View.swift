@@ -50,10 +50,12 @@ extension NonFungibleAssetList.Row.View {
 			Thumbnail(.nft, url: viewStore.resource.metadata.iconURL, size: .small)
 
 			VStack(alignment: .leading, spacing: .small2) {
-				Text(viewStore.resource.metadata.name ?? "")
-					.foregroundColor(.app.gray1)
-					.lineSpacing(-4)
-					.textStyle(.secondaryHeader)
+				if let title = viewStore.resource.metadata.title {
+					Text(title)
+						.foregroundColor(.app.gray1)
+						.lineSpacing(-4)
+						.textStyle(.secondaryHeader)
+				}
 
 				Text("\(viewStore.resource.nonFungibleIdsCount)")
 					.font(.app.body2HighImportance)

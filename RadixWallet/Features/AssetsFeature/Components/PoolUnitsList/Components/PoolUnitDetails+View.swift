@@ -13,7 +13,7 @@ extension PoolUnitDetails.State {
 				resourceAddress: resource.resourceAddress,
 				isXRD: false,
 				validatorAddress: nil,
-				resourceName: .success(resource.metadata.name), // FIXME: Is this correct?
+				resourceName: .success(resource.metadata.name),
 				currentSupply: .success(resource.totalSupply?.formatted() ?? L10n.AssetDetails.supplyUnkown),
 				behaviors: .success(resource.behaviors),
 				tags: .success(resource.metadata.tags)
@@ -40,11 +40,7 @@ extension PoolUnitDetails {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: \.viewState,
-				send: PoolUnitDetails.Action.view
-			) { viewStore in
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				DetailsContainerWithHeaderView(viewState: viewStore.containerWithHeader) {
 					viewStore.send(.closeButtonTapped)
 				} thumbnailView: {

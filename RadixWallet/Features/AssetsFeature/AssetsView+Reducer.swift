@@ -471,7 +471,7 @@ private struct NonFungibleTokensPerResourceProvider {
 			return .init(
 				resourceAddress: resource.resourceAddress,
 				resourceImage: resource.metadata.iconURL,
-				resourceName: resource.metadata.name,
+				resourceName: resource.metadata.title,
 				tokens: .init(uncheckedUniqueElements: selectedAssets)
 			)
 		}

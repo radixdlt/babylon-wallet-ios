@@ -177,7 +177,7 @@
       "location" : "https://github.com/apple/swift-collections.git",
       "state" : {
         "branch" : "main",
-        "revision" : "73471fccab461f1138e5a17d72d176c838646120"
+        "revision" : "b2c7faa198164f3d928b1ceec9ce373e22febb96"
       }
     },
     {
@@ -185,8 +185,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
-        "revision" : "f815e76b520aacfad4ff35c7e1f036f8add6f4b4",
-        "version" : "1.7.3"
+        "revision" : "cf967a28a8605629559533320d604168d733fc9c",
+        "version" : "1.8.0"
       }
     },
     {
