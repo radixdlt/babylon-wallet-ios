@@ -217,6 +217,21 @@ extension [PoolUnitResourceView.ViewState] {
 	}
 }
 
+// extension [ResourcesListView.ResourceViewState] {
+//	init(resources: OnLedgerEntitiesClient.OwnedResourcePoolDetails) {
+//		let xrdResource = resources.xrdResource.map {
+//			PoolUnitResourceView.ViewState(resourceWithRedemptionValue: $0, isXRD: true)
+//		}
+//		let nonXrdResources = resources.nonXrdResources.map {
+//			PoolUnitResourceView.ViewState(resourceWithRedemptionValue: $0, isXRD: false)
+//		}
+//
+//		self = (xrdResource.map { [$0] } ?? []) + nonXrdResources
+//	}
+// }
+
+// L10n.Account.PoolUnits.noTotalSupply
+
 extension PoolUnitResourceView.ViewState {
 	init(resourceWithRedemptionValue resource: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
 		self.init(
