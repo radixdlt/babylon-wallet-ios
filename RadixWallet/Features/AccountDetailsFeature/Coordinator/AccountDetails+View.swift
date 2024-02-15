@@ -156,25 +156,26 @@ private extension View {
 	func destinations(with store: StoreOf<AccountDetails>) -> some SwiftUI.View {
 		let destinationStore = store.destination
 		return preferences(with: destinationStore)
+			.history(with: destinationStore)
 			.transfer(with: destinationStore)
 	}
 
-	private func preferences(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AccountDetails.Destination.State.preferences,
-			action: AccountDetails.Destination.Action.preferences,
-			destination: { AccountPreferences.View(store: $0) }
-		)
+	private func preferences(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.preferences, action: \.preferences)) {
+			AccountPreferences.View(store: $0)
+		}
 	}
 
-	private func transfer(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
-		fullScreenCover(
-			store: destinationStore,
-			state: /AccountDetails.Destination.State.transfer,
-			action: AccountDetails.Destination.Action.transfer,
-			content: { AssetTransfer.SheetView(store: $0) }
-		)
+	private func history(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		fullScreenCover(store: destinationStore.scope(state: \.history, action: \.history)) {
+			TransactionHistory.View(store: $0)
+		}
+	}
+
+	private func transfer(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		fullScreenCover(store: destinationStore.scope(state: \.transfer, action: \.transfer)) {
+			AssetTransfer.SheetView(store: $0)
+		}
 	}
 }
 
