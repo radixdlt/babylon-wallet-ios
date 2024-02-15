@@ -120,7 +120,7 @@ extension TransactionHistory {
 
 		var body: some SwiftUI.View {
 			Card(.app.white) {
-				Text(transaction.string)
+				Text(transaction.message ?? "MESS")
 					.padding(.vertical, .small1)
 					.frame(maxWidth: .infinity)
 			}

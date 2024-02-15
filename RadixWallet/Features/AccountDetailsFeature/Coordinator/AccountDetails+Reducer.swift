@@ -53,21 +53,28 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case preferences(AccountPreferences.State)
+			case history(TransactionHistory.State)
 			case transfer(AssetTransfer.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case preferences(AccountPreferences.Action)
+			case history(TransactionHistory.Action)
 			case transfer(AssetTransfer.Action)
 		}
 
 		public var body: some Reducer<State, Action> {
-			Scope(state: /State.preferences, action: /Action.preferences) {
+			Scope(state: \.preferences, action: \.preferences) {
 				AccountPreferences()
 			}
-			Scope(state: /State.transfer, action: /Action.transfer) {
+			Scope(state: \.history, action: \.history) {
+				TransactionHistory()
+			}
+			Scope(state: \.transfer, action: \.transfer) {
 				AssetTransfer()
 			}
 		}
