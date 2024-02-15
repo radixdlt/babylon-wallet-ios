@@ -74,17 +74,13 @@ extension TransactionHistory {
 	}
 
 	struct SectionView: SwiftUI.View {
-		let section: TransactionHistory.State.TransferSection
+		let section: TransactionHistory.State.TransactionSection
 
 		var body: some SwiftUI.View {
 			Section {
-				ForEach(section.transfers, id: \.self) { transfer in
-					Card(.app.white) {
-						Text(transfer.string)
-							.padding(.vertical, .small1)
-							.frame(maxWidth: .infinity)
-					}
-					.padding(.horizontal, .medium3)
+				ForEach(section.transactions, id: \.self) { transaction in
+					TransactionView(transaction: transaction)
+						.padding(.horizontal, .medium3)
 				}
 			} header: {
 				SectionHeaderView(title: section.title)
@@ -116,6 +112,18 @@ extension TransactionHistory {
 				.padding(.bottom, .small2)
 				.frame(maxWidth: .infinity, alignment: .leading)
 				.background(.app.gray5)
+		}
+	}
+
+	struct TransactionView: SwiftUI.View {
+		let transaction: TransactionHistory.State.Transaction
+
+		var body: some SwiftUI.View {
+			Card(.app.white) {
+				Text(transaction.string)
+					.padding(.vertical, .small1)
+					.frame(maxWidth: .infinity)
+			}
 		}
 	}
 }
@@ -208,7 +216,7 @@ private enum PositionsPreferenceKey: PreferenceKey {
 
 // "ViewState"
 
-extension TransactionHistory.State.TransferSection {
+extension TransactionHistory.State.TransactionSection {
 	var title: String {
 		date.formatted(date: .abbreviated, time: .omitted)
 	}

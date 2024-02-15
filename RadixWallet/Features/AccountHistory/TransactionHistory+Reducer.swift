@@ -9,22 +9,22 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		var selectedPeriod: DateRangeItem.ID
 
-		let sections: [TransferSection]
+		let sections: [TransactionSection]
 
-		init(account: Profile.Network.Account, sections: [TransferSection]) {
+		init(account: Profile.Network.Account, sections: [TransactionSection]) {
 			self.account = account
 			self.periods = try! .init(months: 7)
 			self.selectedPeriod = periods[0].id
 			self.sections = sections
 		}
 
-		public struct TransferSection: Sendable, Hashable, Identifiable {
+		public struct TransactionSection: Sendable, Hashable, Identifiable {
 			public var id: Date { date }
 			let date: Date
-			let transfers: [Transfer]
+			let transactions: [Transaction]
 		}
 
-		public struct Transfer: Sendable, Hashable {
+		public struct Transaction: Sendable, Hashable {
 			let string: String
 		}
 	}
@@ -138,16 +138,16 @@ extension StoreOf<TransactionHistory> {
 	}
 }
 
-extension TransactionHistory.State.TransferSection {
+extension TransactionHistory.State.TransactionSection {
 	static var mock: Self {
 		.init(
 			date: Date(timeIntervalSince1970: 1000 * .random(in: 100 ... 100_000)),
-			transfers: (1 ... 5).map { _ in .mock }
+			transactions: (1 ... 5).map { _ in .mock }
 		)
 	}
 }
 
-extension TransactionHistory.State.Transfer {
+extension TransactionHistory.State.Transaction {
 	static var mock: Self {
 		.init(string: "Transfer " + String(Int.random(in: 100 ... 1000)))
 	}
