@@ -6,7 +6,7 @@ public struct PoolUnitView: View {
 		public let guaranteedAmount: RETDecimal?
 		public let dAppName: Loadable<String?>
 		public let poolIcon: URL?
-		public let resources: Loadable<[CompactFungibleView.ViewState]>
+		public let resources: Loadable<[ResourceBalanceView.Resource.Fungible]>
 		public let isSelected: Bool?
 	}
 
@@ -18,7 +18,7 @@ public struct PoolUnitView: View {
 		Button(action: onTap) {
 			VStack(alignment: .leading, spacing: .zero) {
 				HStack(spacing: .zero) {
-					Thumbnail(.poolUnit, url: viewState.poolIcon, size: .extraSmall)
+					Thumbnail(.poolUnit, url: viewState.poolIcon, size: .slightlySmaller)
 						.padding(.trailing, .small1)
 
 					VStack(alignment: .leading, spacing: 0) {
@@ -57,7 +57,7 @@ public struct PoolUnitView: View {
 					.padding(.bottom, .small3)
 
 				loadable(viewState.resources) { fungibles in
-					ResourcesListView(fungibles: fungibles)
+					ResourceBalancesView(fungibles: fungibles)
 				}
 			}
 			.padding(.medium3)
