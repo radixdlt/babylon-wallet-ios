@@ -126,7 +126,7 @@ struct TransactionReviewResourceView: View {
 }
 
 // MARK: - TransactionReviewAmountView
-struct TransactionReviewAmountView: View {
+struct TransactionReviewAmountView: View { // FIXME: REMOVE
 	let amount: RETDecimal
 	let guaranteedAmount: RETDecimal?
 
@@ -204,25 +204,25 @@ extension PoolUnitView.ViewState {
 	}
 }
 
-extension [CompactFungibleView.ViewState] {
+extension [ResourceBalanceView.Resource.Fungible] {
 	init(resources: OnLedgerEntitiesClient.OwnedResourcePoolDetails) {
 		let xrdResource = resources.xrdResource.map {
-			CompactFungibleView.ViewState(resourceWithRedemptionValue: $0, isXRD: true)
+			Element(resourceWithRedemptionValue: $0, isXRD: true)
 		}
 		let nonXrdResources = resources.nonXrdResources.map {
-			CompactFungibleView.ViewState(resourceWithRedemptionValue: $0, isXRD: false)
+			Element(resourceWithRedemptionValue: $0, isXRD: false)
 		}
 		self = (xrdResource.map { [$0] } ?? []) + nonXrdResources
 	}
 }
 
-extension CompactFungibleView.ViewState {
+extension ResourceBalanceView.Resource.Fungible {
 	init(resourceWithRedemptionValue resource: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
 		self.init(
 			address: resource.resource.resourceAddress,
 			title: isXRD ? Constants.xrdTokenName : resource.resource.metadata.title,
-			icon: .token(isXRD ? .xrd : .other(resource.resource.metadata.iconURL)),
-			amount: resource.redemptionValue,
+			icon: isXRD ? .xrd : .other(resource.resource.metadata.iconURL),
+			amount: resource.redemptionValue.map { .init($0) },
 			fallback: L10n.Account.PoolUnits.noTotalSupply
 		)
 	}
