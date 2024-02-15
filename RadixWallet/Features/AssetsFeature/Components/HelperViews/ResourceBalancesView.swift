@@ -82,9 +82,9 @@ extension ResourceBalanceView.Resource {
 	}
 
 	public struct NonFungible: Equatable {
-		public let resource: ResourceAddress
-		public let resourceTitle: String?
-		public let itemTitle: String?
+		public let id: NonFungibleGlobalId
+		public let resourceName: String?
+		public let nonFungibleName: String?
 		public let icon: URL?
 	}
 
@@ -120,7 +120,7 @@ extension ResourceBalanceView.Resource: Identifiable {
 		case let .fungible(fungible):
 			fungible.address
 		case let .nonFungible(nonFungible):
-			nonFungible.resource
+			nonFungible.id
 		}
 	}
 }
@@ -166,20 +166,18 @@ extension ResourceBalanceView {
 					.padding(.trailing, .small1)
 
 				if compact {
-					if let title = viewState.resourceTitle {
-						Text(title)
-							.textStyle(.body2HighImportance)
-							.foregroundColor(.app.gray1)
-					}
+					Text(compactTitle)
+						.textStyle(.body2HighImportance)
+						.foregroundColor(.app.gray1)
 				} else {
 					VStack(alignment: .leading, spacing: .small3) {
-						if let title = viewState.itemTitle {
-							Text(title)
+						if let nonFungibleName = viewState.nonFungibleName {
+							Text(nonFungibleName)
 								.textStyle(.body2Regular)
 								.foregroundColor(.app.gray1)
 						}
-						if let title = viewState.resourceTitle {
-							Text(title)
+						if let resourceName = viewState.resourceName {
+							Text(resourceName)
 								.textStyle(.body1HighImportance)
 								.foregroundColor(.app.gray1)
 						}
@@ -194,8 +192,8 @@ extension ResourceBalanceView {
 			compact ? .smallest : .smallish
 		}
 
-		private var combinedTitle: String {
-			(viewState.resourceTitle ?? "") + " " + (viewState.itemTitle ?? "")
+		private var compactTitle: String {
+			viewState.nonFungibleName ?? viewState.id.localId().toUserFacingString()
 		}
 	}
 
