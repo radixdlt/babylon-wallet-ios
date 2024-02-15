@@ -1,5 +1,5 @@
 // MARK: - TokenBalanceView
-public struct TokenBalanceView: View {
+public struct TokenBalanceView: View { // FIXME: REMOVE
 	public struct ViewState: Equatable {
 		public let thumbnail: Thumbnail.TokenContent
 		public let name: String

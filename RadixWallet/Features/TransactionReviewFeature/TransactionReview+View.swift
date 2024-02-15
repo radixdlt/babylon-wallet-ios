@@ -687,7 +687,7 @@ struct TransactionReviewFungibleView: View {
 	var body: some View {
 		Button(action: onTap) {
 			HStack(spacing: .small1) {
-				Thumbnail(fungible: viewState.thumbnail, size: .extraSmall)
+				Thumbnail(fungible: viewState.thumbnail, size: .slightlySmaller)
 					.padding(.vertical, .small1)
 
 				if let name = viewState.name {

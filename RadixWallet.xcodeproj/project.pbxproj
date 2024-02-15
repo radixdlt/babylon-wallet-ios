@@ -1155,7 +1155,7 @@
 		A41557502B757C5E0040AD4E /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = A415574F2B757C5E0040AD4E /* ComposableArchitecture */; };
 		A41557532B7645E70040AD4E /* TransactionHistory+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41557522B7645E70040AD4E /* TransactionHistory+Reducer.swift */; };
 		A41557552B7645F70040AD4E /* TransactionHistory+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41557542B7645F70040AD4E /* TransactionHistory+View.swift */; };
-		A41557572B7D4BF10040AD4E /* ResourcesListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41557562B7D4BF10040AD4E /* ResourcesListView.swift */; };
+		A41557572B7D4BF10040AD4E /* ResourceBalancesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41557562B7D4BF10040AD4E /* ResourceBalancesView.swift */; };
 		A43715202B509BAE0010EA4A /* PoolUnitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A437151F2B509BAE0010EA4A /* PoolUnitView.swift */; };
 		A462B57D2B83656900C26D20 /* MetadataNonFungibleGlobalIdArrayValueAllOfValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B57C2B83656900C26D20 /* MetadataNonFungibleGlobalIdArrayValueAllOfValues.swift */; };
 		A462B5812B83671100C26D20 /* ValidatorCollectionItemEffectiveFeeFactorCurrent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B57E2B83671100C26D20 /* ValidatorCollectionItemEffectiveFeeFactorCurrent.swift */; };
@@ -2430,7 +2430,7 @@
 		A41266F82B160F4C00EA38E9 /* ManualAccountRecoveryCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoveryCoordinator+View.swift"; sourceTree = "<group>"; };
 		A41557522B7645E70040AD4E /* TransactionHistory+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistory+Reducer.swift"; sourceTree = "<group>"; };
 		A41557542B7645F70040AD4E /* TransactionHistory+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistory+View.swift"; sourceTree = "<group>"; };
-		A41557562B7D4BF10040AD4E /* ResourcesListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourcesListView.swift; sourceTree = "<group>"; };
+		A41557562B7D4BF10040AD4E /* ResourceBalancesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceBalancesView.swift; sourceTree = "<group>"; };
 		A437151F2B509BAE0010EA4A /* PoolUnitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoolUnitView.swift; sourceTree = "<group>"; };
 		A462B57C2B83656900C26D20 /* MetadataNonFungibleGlobalIdArrayValueAllOfValues.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MetadataNonFungibleGlobalIdArrayValueAllOfValues.swift; sourceTree = "<group>"; };
 		A462B57E2B83671100C26D20 /* ValidatorCollectionItemEffectiveFeeFactorCurrent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidatorCollectionItemEffectiveFeeFactorCurrent.swift; sourceTree = "<group>"; };
@@ -4488,7 +4488,7 @@
 				48CFBE632ADC10D800E77A5C /* GeneralHelperViews.swift */,
 				48CFBE642ADC10D800E77A5C /* AssetResourceDetails.swift */,
 				48CFBE652ADC10D800E77A5C /* EmptyAssetListView.swift */,
-				A41557562B7D4BF10040AD4E /* ResourcesListView.swift */,
+				A41557562B7D4BF10040AD4E /* ResourceBalancesView.swift */,
 			);
 			path = HelperViews;
 			sourceTree = "<group>";
@@ -8180,7 +8180,7 @@
 				48CFC27E2ADC10D900E77A5C /* HUD+View.swift in Sources */,
 				48CFC4732ADC10DA00E77A5C /* DeviceFactorSourceClient+Test.swift in Sources */,
 				48CFC38D2ADC10D900E77A5C /* Address.swift in Sources */,
-				A41557572B7D4BF10040AD4E /* ResourcesListView.swift in Sources */,
+				A41557572B7D4BF10040AD4E /* ResourceBalancesView.swift in Sources */,
 				48CFC2942ADC10D900E77A5C /* NormalFeesCustomization+View.swift in Sources */,
 				48CFC54A2ADC10DA00E77A5C /* LedgerStateSelector.swift in Sources */,
 				48CFC6882ADC10DB00E77A5C /* AppPreferences.swift in Sources */,
