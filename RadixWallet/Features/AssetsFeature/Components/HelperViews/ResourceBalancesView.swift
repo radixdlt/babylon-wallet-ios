@@ -32,7 +32,8 @@ public struct ResourceBalancesView: View {
 					}
 			}
 		}
-		.roundedCorners(strokeColor: .app.gray3)
+//		.roundedCorners(strokeColor: .app.gray3)
+		.roundedCorners(strokeColor: .green)
 	}
 
 	private let dividerHeight: CGFloat = 1
@@ -66,7 +67,8 @@ public struct ResourceBalanceView: View {
 extension ResourceBalanceView {
 	var bordered: some View {
 		padding(.small1)
-			.roundedCorners(strokeColor: .app.gray3)
+//			.roundedCorners(strokeColor: .app.gray3)
+			.roundedCorners(strokeColor: .yellow)
 	}
 }
 
@@ -96,6 +98,18 @@ extension ResourceBalanceView.Resource {
 			self.amount = amount
 			self.guaranteed = guaranteed
 		}
+	}
+}
+
+extension ResourceBalanceView.Resource.Fungible {
+	public static func xrd(balance: RETDecimal) -> Self {
+		.init(
+			address: try! .init(validatingAddress: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"), // FIXME: REMOVE
+			title: Constants.xrdTokenName,
+			icon: .xrd,
+			amount: .init(balance),
+			fallback: nil
+		)
 	}
 }
 
