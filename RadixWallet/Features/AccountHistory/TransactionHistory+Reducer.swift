@@ -25,7 +25,24 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		}
 
 		public struct Transaction: Sendable, Hashable {
-			let string: String
+			let time: Date
+			let message: String?
+			let actions: [Action]
+			let manifestType: ManifestType
+
+			enum Action {
+				case deposit
+				case withdrawal
+				case settings
+			}
+
+			enum ManifestType {
+				case transfer
+				case contribute
+				case claim
+				case depositSettings
+				case other
+			}
 		}
 	}
 
@@ -149,6 +166,33 @@ extension TransactionHistory.State.TransactionSection {
 
 extension TransactionHistory.State.Transaction {
 	static var mock: Self {
-		.init(string: "Transfer " + String(Int.random(in: 100 ... 1000)))
+		.init(
+			time: Date(timeIntervalSince1970: 1000 * .random(in: 100 ... 100_000)),
+			message: Bool.random() ? "This is a message" : nil,
+			actions: [],
+			manifestType: .random()
+		)
+	}
+}
+
+extension TransactionHistory.State.Transaction.ManifestType {
+	static func random() -> Self {
+		switch Int.random(in: 0 ... 4) {
+		case 0: .transfer
+		case 1: .contribute
+		case 2: .claim
+		case 3: .depositSettings
+		default: .other
+		}
+	}
+}
+
+extension TransactionHistory.State.Transaction.Action {
+	static func random() -> Self {
+		switch Int.random(in: 0 ... 2) {
+		case 0: .deposit
+		case 1: .withdrawal
+		default: .settings
+		}
 	}
 }
