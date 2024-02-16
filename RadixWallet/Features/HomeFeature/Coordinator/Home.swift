@@ -11,6 +11,8 @@ public struct Home: Sendable, FeatureReducer {
 		public var shouldWriteDownPersonasSeedPhrase: Bool = false
 
 		public var showRadixBanner: Bool = false
+		var showFiatWorth: Bool = true
+		var accountPortfolios: Loadable<[OnLedgerEntity.Account]> = .idle
 
 		// MARK: - Destination
 		@PresentationState
@@ -27,6 +29,7 @@ public struct Home: Sendable, FeatureReducer {
 		case settingsButtonTapped
 		case radixBannerButtonTapped
 		case radixBannerDismissButtonTapped
+		case showFiatWorthToggled
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -35,6 +38,8 @@ public struct Home: Sendable, FeatureReducer {
 		case exportMnemonic(account: Profile.Network.Account)
 		case importMnemonic
 		case loadedShouldWriteDownPersonasSeedPhrase(Bool)
+		case loadIsCurrencyAmountVisible(Bool)
+		case loadedPortfolios([OnLedgerEntity.Account])
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -85,6 +90,7 @@ public struct Home: Sendable, FeatureReducer {
 	@Dependency(\.userDefaults) var userDefaults
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.iOSSecurityClient) var iOSSecurityClient
 
 	public init() {}
@@ -113,7 +119,7 @@ public struct Home: Sendable, FeatureReducer {
 					]
 				))
 			}
-			return .none
+			return loadAccountsPortfolios()
 
 		case .task:
 			state.showRadixBanner = userDefaults.showRadixBanner
@@ -128,6 +134,7 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			.merge(with: checkAccountsAccessToMnemonic(state: state))
 			.merge(with: loadShouldWriteDownPersonasSeedPhrase())
+			.merge(with: loadIsCurrencyAmountVisible())
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(
@@ -155,6 +162,12 @@ public struct Home: Sendable, FeatureReducer {
 
 		case .settingsButtonTapped:
 			return .send(.delegate(.displaySettings))
+
+		case .showFiatWorthToggled:
+
+			return .run { [isCurrencyAmountVisible = state.showFiatWorth] _ in
+				try await appPreferencesClient.update(isCurrencyAmountVisible: !isCurrencyAmountVisible)
+			}
 		}
 	}
 
@@ -174,12 +187,25 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			.merge(with: checkAccountsAccessToMnemonic(state: state))
 
+		case let .loadedPortfolios(portfolios):
+			state.accountPortfolios = .success(portfolios)
+			state.accountRows.mutateAll { rowState in
+				if let portfolio = portfolios.first(where: { $0.address == rowState.id }) {
+					rowState.portfolio = .success(portfolio)
+				}
+			}
+			return .none
+
 		case let .accountsLoadedResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
 
 		case let .loadedShouldWriteDownPersonasSeedPhrase(shouldBackup):
 			state.shouldWriteDownPersonasSeedPhrase = shouldBackup
+			return .none
+
+		case let .loadIsCurrencyAmountVisible(isVisible):
+			state.showFiatWorth = isVisible
 			return .none
 
 		case let .exportMnemonic(account):
@@ -288,6 +314,27 @@ public struct Home: Sendable, FeatureReducer {
 			for try await shouldBackup in await personasClient.shouldWriteDownSeedPhraseForSomePersonaSequence() {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.loadedShouldWriteDownPersonasSeedPhrase(shouldBackup)))
+			}
+		}
+	}
+
+	private func loadIsCurrencyAmountVisible() -> Effect<Action> {
+		.run { send in
+			for try await isCurrencyAmountVisible in await appPreferencesClient.appPreferenceUpdates().map(\.display.isCurrencyAmountVisible) {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.loadIsCurrencyAmountVisible(isCurrencyAmountVisible)))
+			}
+		}
+	}
+
+	public func loadAccountsPortfolios() -> Effect<Action> {
+		.run { send in
+			for try await portfolios in await accountPortfoliosClient.portfoliosUpdates().debounce(for: .seconds(0.1)) {
+				guard !Task.isCancelled else { return }
+
+				await send(.internal(.loadedPortfolios(
+					portfolios
+				)))
 			}
 		}
 	}

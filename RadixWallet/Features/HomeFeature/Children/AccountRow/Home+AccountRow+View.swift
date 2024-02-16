@@ -5,6 +5,7 @@ extension Home.AccountRow {
 	public struct ViewState: Equatable {
 		let name: String
 		let address: AccountAddress
+		let fiatWorth: Loadable<AttributedString>?
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let isLoadingResources: Bool
 
@@ -43,6 +44,13 @@ extension Home.AccountRow {
 			self.name = state.account.displayName.rawValue
 			self.address = state.account.address
 			self.appearanceID = state.account.appearanceID
+			self.fiatWorth = state.portfolio.totalFiatWorth.map {
+				if $0.worth == .zero {
+					""
+				} else {
+					$0.currencyFormatted(applyCustomFont: false) ?? ""
+				}
+			}
 			self.isLoadingResources = state.portfolio.isLoading
 
 			self.tag = .init(state: state)
@@ -81,11 +89,21 @@ extension Home.AccountRow {
 			WithViewStore(store, observe: ViewState.init, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .medium3) {
 					VStack(alignment: .leading, spacing: .zero) {
-						Text(viewStore.name)
-							.lineLimit(1)
-							.textStyle(.body1Header)
-							.foregroundColor(.app.white)
-							.frame(maxWidth: .infinity, alignment: .leading)
+						HStack {
+							Text(viewStore.name)
+								.lineLimit(1)
+								.textStyle(.body1Header)
+								.foregroundColor(.app.white)
+								.frame(maxWidth: .infinity, alignment: .leading)
+
+							if let fiatWorth = viewStore.fiatWorth {
+								loadable(fiatWorth, loadingViewHeight: .medium1) { fiatWorth in
+									Text(fiatWorth)
+										.textStyle(.secondaryHeader)
+										.foregroundStyle(.app.white)
+								}
+							}
+						}
 
 						HStack {
 							AddressView(.address(.account(viewStore.address, isLedgerHWAccount: viewStore.isLedgerAccount)))

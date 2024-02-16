@@ -34,6 +34,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		public var poolUnitsList: PoolUnitsList.State?
 
 		public let account: Profile.Network.Account
+		public var accountPortfolio: Loadable<OnLedgerEntity.Account> = .idle
 		public var isLoadingResources: Bool = false
 		public var isRefreshing: Bool = false
 		public let mode: Mode
@@ -86,6 +87,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		public struct ResourcesState: Sendable, Equatable {
+			public let portfolio: OnLedgerEntity.Account
 			public let fungibleTokenList: FungibleAssetList.State?
 			public let nonFungibleTokenList: NonFungibleAssetList.State?
 			public let stakeUnitList: StakeUnitList.State?
@@ -125,6 +127,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			state.isLoadingResources = true
+			state.accountPortfolio = .loading
 			return .run { [address = state.account.address, mode = state.mode] send in
 				for try await portfolio in await accountPortfoliosClient.portfolioForAccount(address).debounce(for: .seconds(0.1)) {
 					guard !Task.isCancelled else { return }
@@ -143,6 +146,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			return .none
 		case .pullToRefreshStarted:
 			state.isRefreshing = true
+			state.accountPortfolio = .loading
 			return .run { [address = state.account.address] _ in
 				_ = try await accountPortfoliosClient.fetchAccountPortfolio(address, true)
 			} catch: { error, _ in
@@ -158,6 +162,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .resourcesStateUpdated(resourcesState):
+			state.accountPortfolio = .success(resourcesState.portfolio)
 			state.isLoadingResources = false
 			state.fungibleTokenList = resourcesState.fungibleTokenList
 			state.nonFungibleTokenList = resourcesState.nonFungibleTokenList
@@ -271,6 +276,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		)
 
 		return .init(
+			portfolio: portfolio,
 			fungibleTokenList: fungibleTokenList,
 			nonFungibleTokenList: !nfts.isEmpty ? .init(rows: .init(uniqueElements: nfts)) : nil,
 			stakeUnitList: stakeUnitList,

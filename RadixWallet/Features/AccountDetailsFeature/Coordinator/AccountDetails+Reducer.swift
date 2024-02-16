@@ -6,6 +6,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, AccountWithInfoHolder {
 		public var accountWithInfo: AccountWithInfo
 		var assets: AssetsView.State
+		var showFiatWorth: Bool = true
 
 		@PresentationState
 		var destination: Destination.State?
@@ -30,6 +31,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 		case exportMnemonicButtonTapped
 		case importMnemonicButtonTapped
+
+		case showFiatWorthToggled
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -44,6 +47,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case accountUpdated(Profile.Network.Account)
+		case loadIsCurrencyAmountVisible(Bool)
 	}
 
 	public struct MnemonicWithPassphraseAndFactorSourceInfo: Sendable, Hashable {
@@ -77,6 +81,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.openURL) var openURL
+	@Dependency(\.appPreferencesClient) var appPreferencesClient
 
 	public init() {}
 
@@ -101,6 +106,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 					await send(.internal(.accountUpdated(accountUpdate)))
 				}
 			}
+			.merge(with: loadIsCurrencyAmountVisible())
 
 		case .backButtonTapped:
 			return .send(.delegate(.dismiss))
@@ -129,6 +135,11 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 		case .importMnemonicButtonTapped:
 			return .send(.delegate(.importMnemonics))
+
+		case .showFiatWorthToggled:
+			return .run { [isCurrencyAmountVisible = state.showFiatWorth] _ in
+				try await appPreferencesClient.update(isCurrencyAmountVisible: !isCurrencyAmountVisible)
+			}
 		}
 	}
 
@@ -148,6 +159,9 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case let .accountUpdated(account):
 			state.account = account
 			checkAccountAccessToMnemonic(state: &state)
+			return .none
+		case let .loadIsCurrencyAmountVisible(isVisible):
+			state.showFiatWorth = isVisible
 			return .none
 		}
 	}
@@ -169,5 +183,14 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	private func checkAccountAccessToMnemonic(state: inout State) {
 		let xrdResource = state.assets.fungibleTokenList?.sections[id: .xrd]?.rows.first?.token
 		state.checkAccountAccessToMnemonic(xrdResource: xrdResource)
+	}
+
+	private func loadIsCurrencyAmountVisible() -> Effect<Action> {
+		.run { send in
+			for try await isCurrencyAmountVisible in await appPreferencesClient.appPreferenceUpdates().map(\.display.isCurrencyAmountVisible) {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.loadIsCurrencyAmountVisible(isCurrencyAmountVisible)))
+			}
+		}
 	}
 }

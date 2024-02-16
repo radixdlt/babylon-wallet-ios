@@ -7,6 +7,7 @@ extension LSUDetails.State {
 			containerWithHeader: .init(
 				title: .success(stakeUnitResource.resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName),
 				amount: stakeUnitResource.amount.formatted(),
+				currencyWorth: nil,
 				symbol: .success(stakeUnitResource.resource.metadata.symbol)
 			),
 			thumbnailURL: stakeUnitResource.resource.metadata.iconURL,

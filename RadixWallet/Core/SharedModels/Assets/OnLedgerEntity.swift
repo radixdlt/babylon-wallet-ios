@@ -319,9 +319,14 @@ extension OnLedgerEntity {
 }
 
 extension OnLedgerEntity {
+	public struct FiatWorth: Sendable, Hashable, Codable {
+		let worth: Double
+		let currency: FiatCurrency
+	}
+
 	public struct OwnedFungibleResources: Sendable, Hashable, Codable {
-		public let xrdResource: OwnedFungibleResource?
-		public let nonXrdResources: [OwnedFungibleResource]
+		public var xrdResource: OwnedFungibleResource?
+		public var nonXrdResources: [OwnedFungibleResource]
 
 		public init(xrdResource: OwnedFungibleResource? = nil, nonXrdResources: [OwnedFungibleResource] = []) {
 			self.xrdResource = xrdResource
@@ -338,17 +343,20 @@ extension OnLedgerEntity {
 		public let atLedgerState: AtLedgerState
 		public let amount: RETDecimal
 		public let metadata: Metadata
+		public var fiatWorth: FiatWorth?
 
 		public init(
 			resourceAddress: ResourceAddress,
 			atLedgerState: AtLedgerState,
 			amount: RETDecimal,
-			metadata: Metadata
+			metadata: Metadata,
+			fiatWorth: FiatWorth? = nil
 		) {
 			self.resourceAddress = resourceAddress
 			self.atLedgerState = atLedgerState
 			self.amount = amount
 			self.metadata = metadata
+			self.fiatWorth = fiatWorth
 		}
 	}
 
@@ -478,7 +486,7 @@ extension OnLedgerEntity {
 
 extension OnLedgerEntity.Account {
 	public struct PoolUnitResources: Sendable, Hashable, Codable {
-		public let radixNetworkStakes: IdentifiedArrayOf<RadixNetworkStake>
+		public var radixNetworkStakes: IdentifiedArrayOf<RadixNetworkStake>
 		public let poolUnits: [PoolUnit]
 	}
 
@@ -488,7 +496,7 @@ extension OnLedgerEntity.Account {
 		}
 
 		public let validatorAddress: ValidatorAddress
-		public let stakeUnitResource: OnLedgerEntity.OwnedFungibleResource?
+		public var stakeUnitResource: OnLedgerEntity.OwnedFungibleResource?
 		public let stakeClaimResource: OnLedgerEntity.OwnedNonFungibleResource?
 
 		public init(

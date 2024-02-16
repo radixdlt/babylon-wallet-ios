@@ -185,6 +185,14 @@ extension RETDecimal {
 		}
 	}
 
+	public func currencyFormatted() -> String {
+		if self >= 1 {
+			self.formatted(totalPlaces: 2)
+		} else {
+			self.formatted()
+		}
+	}
+
 	public func formattedEngineeringNotation(
 		locale: Locale = .autoupdatingCurrent,
 		totalPlaces: UInt = .maxPlacesEngineeringNotation
@@ -257,6 +265,17 @@ extension RETDecimal {
 	private func multiplier() -> Multiplier? {
 		guard let abs = try? abs() else { return nil }
 		return Multiplier.allCases.last(where: { $0.value <= abs })
+	}
+}
+
+extension RETDecimal {
+	func asDouble() throws -> Double {
+		guard let double = Double(self.asStr()) else {
+			assertionFailure("Invalid decimal? how is it possible?")
+			struct InvalidDecimalValue: Error {}
+			throw InvalidDecimalValue()
+		}
+		return double
 	}
 }
 

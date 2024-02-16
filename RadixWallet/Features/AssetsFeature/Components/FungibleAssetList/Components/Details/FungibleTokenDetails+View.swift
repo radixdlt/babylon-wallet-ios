@@ -29,6 +29,7 @@ extension FungibleTokenDetails.State {
 		.init(
 			title: resource.metadata.get(\.name, prefetched: ownedFungibleResource?.metadata).map { $0 ?? L10n.Account.PoolUnits.unknownPoolUnitName },
 			amount: ownedFungibleResource?.amount.formatted(),
+			currencyWorth: ownedFungibleResource?.fiatWorth?.currencyFormatted(applyCustomFont: false),
 			symbol: resource.metadata.get(\.symbol, prefetched: ownedFungibleResource?.metadata)
 		)
 	}

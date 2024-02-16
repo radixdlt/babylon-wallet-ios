@@ -35,9 +35,9 @@ extension View {
 	@ViewBuilder
 	func shimmeringLoadingView(height: CGFloat = .large1) -> some View {
 		Spacer()
-			.frame(height: height)
 			.background(.app.gray4)
 			.shimmer(active: true, config: .accountResourcesLoading)
+			.frame(height: height)
 			.cornerRadius(.small1)
 	}
 }

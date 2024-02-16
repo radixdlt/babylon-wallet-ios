@@ -13,6 +13,8 @@ public struct AccountPortfoliosClient: Sendable {
 	/// Subscribe to portfolio changes for a given account address
 	public var portfolioForAccount: PortfolioForAccount
 
+	public var portfoliosUpdates: PortfoliosUpdates
+
 	/// Currently loaded portfolios
 	public var portfolios: Portfolios
 }
@@ -21,6 +23,7 @@ extension AccountPortfoliosClient {
 	public typealias FetchAccountPortfolio = @Sendable (_ address: AccountAddress, _ forceResfresh: Bool) async throws -> OnLedgerEntity.Account
 	public typealias FetchAccountPortfolios = @Sendable (_ addresses: [AccountAddress], _ forceResfresh: Bool) async throws -> [OnLedgerEntity.Account]
 	public typealias PortfolioForAccount = @Sendable (_ address: AccountAddress) async -> AnyAsyncSequence<OnLedgerEntity.Account>
+	public typealias PortfoliosUpdates = @Sendable () async -> AnyAsyncSequence<[OnLedgerEntity.Account]>
 	public typealias Portfolios = @Sendable () -> [OnLedgerEntity.Account]
 }
 

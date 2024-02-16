@@ -3,7 +3,15 @@ import SwiftUI
 
 extension Home.State {
 	var viewState: Home.ViewState {
-		.init(hasNotification: shouldWriteDownPersonasSeedPhrase, showRadixBanner: showRadixBanner)
+		.init(
+			hasNotification: shouldWriteDownPersonasSeedPhrase,
+			showRadixBanner: showRadixBanner,
+			totalFiatWorth: accountPortfolios.map {
+				let totalFiatWorth = $0.map(\.totalFiatWorth.worth).reduce(0, +)
+				return OnLedgerEntity.FiatWorth(worth: totalFiatWorth, currency: .usd).currencyFormatted(applyCustomFont: true)!
+			},
+			isShowingFiatWorth: showFiatWorth
+		)
 	}
 }
 
@@ -12,6 +20,8 @@ extension Home {
 	public struct ViewState: Equatable {
 		let hasNotification: Bool
 		let showRadixBanner: Bool
+		let totalFiatWorth: Loadable<AttributedString>
+		let isShowingFiatWorth: Bool
 	}
 
 	@MainActor
@@ -27,6 +37,17 @@ extension Home {
 				ScrollView {
 					VStack(spacing: .medium1) {
 						HeaderView()
+
+						VStack {
+							Text("TOTAL VALUE")
+								.foregroundStyle(.app.gray2)
+								.textStyle(.body1Header)
+							TotalCurrencyWorthView(state: .init(isShowingCurrencyWorth: viewStore.isShowingFiatWorth, totalCurrencyWorth: viewStore.totalFiatWorth)) {
+								viewStore.send(.view(.showFiatWorthToggled))
+							}
+							.foregroundColor(viewStore.isShowingFiatWorth ? .app.gray1 : .app.gray3)
+						}
+						.padding(.medium1)
 
 						VStack(spacing: .medium3) {
 							ForEachStore(

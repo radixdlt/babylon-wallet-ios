@@ -487,7 +487,7 @@ extension OnLedgerEntity.Account {
 extension OnLedgerEntitiesClient {
 	public struct OwnedStakeDetails: Hashable, Sendable {
 		public let validator: OnLedgerEntity.Validator
-		public let stakeUnitResource: ResourceWithVaultAmount?
+		public var stakeUnitResource: ResourceWithVaultAmount?
 		public let stakeClaimTokens: NonFunbileResourceWithTokens?
 		public let currentEpoch: Epoch
 	}
@@ -576,6 +576,10 @@ extension OnLedgerEntity.OwnedFungibleResource: Comparable {
 		lhs: OnLedgerEntity.OwnedFungibleResource,
 		rhs: OnLedgerEntity.OwnedFungibleResource
 	) -> Bool {
+		if let lhsFiatWorth = lhs.fiatWorth, let rhsFiathWorth = rhs.fiatWorth {
+			return lhsFiatWorth > rhsFiathWorth // Sort descending by fiat worth
+		}
+
 		if lhs.amount > .zero, rhs.amount > .zero {
 			return lhs.amount > rhs.amount // Sort descending by amount
 		}
@@ -595,6 +599,16 @@ extension OnLedgerEntity.OwnedFungibleResource: Comparable {
 		}
 
 		return lhs.resourceAddress.address < rhs.resourceAddress.address // Sort by address
+	}
+}
+
+// MARK: - OnLedgerEntity.FiatWorth + Comparable
+extension OnLedgerEntity.FiatWorth: Comparable {
+	public static func < (
+		lhs: Self,
+		rhs: Self
+	) -> Bool {
+		lhs.worth < rhs.worth
 	}
 }
 

@@ -5,6 +5,7 @@ import SwiftUI
 struct DetailsContainerWithHeaderViewState: Equatable {
 	let title: Loadable<String>
 	let amount: String?
+	let currencyWorth: AttributedString?
 	let symbol: Loadable<String?>
 }
 
@@ -13,6 +14,7 @@ extension DetailsContainerWithHeaderViewState {
 		self.init(
 			title: .success(resourceWithAmount.resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName),
 			amount: resourceWithAmount.amount.formatted(),
+			currencyWorth: nil,
 			symbol: .success(resourceWithAmount.resource.metadata.symbol)
 		)
 	}
@@ -53,15 +55,25 @@ struct DetailsContainerWithHeaderView<ThumbnailView: View, DetailsView: View>: V
 	private func header(
 		with viewState: DetailsContainerWithHeaderViewState
 	) -> some View {
-		VStack(spacing: .medium3) {
+		VStack(spacing: .zero) {
 			thumbnailView
 
 			if let amount = viewState.amount {
-				Text(amount)
-					.font(.app.sheetTitle)
-					.kerning(-0.5)
-					+ Text((viewState.symbol.wrappedValue.flatMap(identity)).map { " " + $0 } ?? "")
-					.font(.app.sectionHeader)
+				Group {
+					Text(amount)
+						.font(.app.sheetTitle)
+						.kerning(-0.5)
+						+ Text((viewState.symbol.wrappedValue.flatMap(identity)).map { " " + $0 } ?? "")
+						.font(.app.sectionHeader)
+				}
+				.padding(.top, .medium3)
+			}
+
+			if let currencyWorth = viewState.currencyWorth {
+				Text(currencyWorth)
+					.textStyle(.body2HighImportance)
+					.foregroundStyle(.app.gray2)
+					.padding(.top, .small2)
 			}
 		}
 		.padding(.vertical, .small2)

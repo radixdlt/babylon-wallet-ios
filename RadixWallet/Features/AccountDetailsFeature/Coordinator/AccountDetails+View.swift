@@ -9,7 +9,9 @@ extension AccountDetails.State {
 			displayName: account.displayName.rawValue,
 			mnemonicHandlingCallToAction: mnemonicHandlingCallToAction,
 			isLedgerAccount: account.isLedgerAccount,
-			showToolbar: destination == nil
+			showToolbar: destination == nil,
+			totalFiatWorth: assets.accountPortfolio.totalFiatWorth.map { $0.currencyFormatted(applyCustomFont: true)! },
+			isShowingFiatWorth: showFiatWorth
 		)
 	}
 }
@@ -23,6 +25,8 @@ extension AccountDetails {
 		let mnemonicHandlingCallToAction: MnemonicHandling?
 		let isLedgerAccount: Bool
 		let showToolbar: Bool
+		let totalFiatWorth: Loadable<AttributedString>?
+		let isShowingFiatWorth: Bool
 	}
 
 	@MainActor
@@ -40,6 +44,17 @@ extension AccountDetails {
 						.foregroundColor(.app.whiteTransparent)
 						.textStyle(.body2HighImportance)
 						.padding(.bottom, .medium1)
+
+					if let totalFiatWorth = viewStore.totalFiatWorth {
+						TotalCurrencyWorthView(state: .init(
+							isShowingCurrencyWorth: viewStore.isShowingFiatWorth,
+							totalCurrencyWorth: totalFiatWorth
+						)) {
+							viewStore.send(.showFiatWorthToggled)
+						}
+						.foregroundColor(.app.white)
+						.padding(.medium1)
+					}
 
 					prompts(
 						mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction
