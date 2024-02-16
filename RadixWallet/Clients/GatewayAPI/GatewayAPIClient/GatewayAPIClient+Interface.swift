@@ -26,6 +26,7 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 	public var submitTransaction: SubmitTransaction
 	public var transactionStatus: GetTransactionStatus
 	public var transactionPreview: TransactionPreview
+	public var transactionHistory: TransactionHistory
 }
 
 extension GatewayAPIClient {
@@ -50,6 +51,7 @@ extension GatewayAPIClient {
 	public typealias SubmitTransaction = @Sendable (GatewayAPI.TransactionSubmitRequest) async throws -> GatewayAPI.TransactionSubmitResponse
 	public typealias GetTransactionStatus = @Sendable (GatewayAPI.TransactionStatusRequest) async throws -> GatewayAPI.TransactionStatusResponse
 	public typealias TransactionPreview = @Sendable (GatewayAPI.TransactionPreviewRequest) async throws -> GatewayAPI.TransactionPreviewResponse
+	public typealias TransactionHistory = @Sendable (GatewayAPI.StreamTransactionsRequest) async throws -> GatewayAPI.StreamTransactionsResponse
 }
 
 extension GatewayAPIClient {
