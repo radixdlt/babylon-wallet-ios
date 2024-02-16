@@ -218,6 +218,6 @@ private enum PositionsPreferenceKey: PreferenceKey {
 
 extension TransactionHistory.State.TransactionSection {
 	var title: String {
-		date.formatted(date: .abbreviated, time: .omitted)
+		day.formatted(date: .abbreviated, time: .omitted)
 	}
 }

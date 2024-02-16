@@ -82,9 +82,6 @@ extension AccountDetails {
 						}
 					}
 				}
-				.sheet(isPresented: .constant(true)) {
-					TransactionHistory.View(store: .transactionHistory(account: viewStore.account))
-				}
 			}
 			.destinations(with: store)
 		}
