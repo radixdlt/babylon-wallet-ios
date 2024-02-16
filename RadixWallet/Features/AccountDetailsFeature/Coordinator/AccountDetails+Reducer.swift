@@ -124,13 +124,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .historyButtonTapped:
-			let url = Radix.Dashboard
-				.dashboard(forNetworkID: state.account.networkID)
-				.recentTransactionsURL(state.account.address)
-
-			return .run { _ in
-				await openURL(url)
-			}
+			state.destination = .history(.init(account: state.account))
+			return .none
 
 		case .exportMnemonicButtonTapped:
 			return .send(.delegate(.exportMnemonic(controlling: state.account)))

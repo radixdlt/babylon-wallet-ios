@@ -237,6 +237,11 @@ extension GatewayAPIClient {
 				try await post(
 					request: transactionPreviewRequest
 				) { $0.appendingPathComponent("transaction/preview") }
+			},
+			transactionHistory: { transactionHistoryRequest in
+				try await post(
+					request: transactionHistoryRequest
+				) { $0.appendingPathComponent("stream/transactions") }
 			}
 		)
 	}
