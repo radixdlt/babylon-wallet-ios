@@ -15,7 +15,8 @@ extension LSUDetails.State {
 			redeemableTokenAmount: .init(
 				thumbnail: .xrd,
 				name: Constants.xrdTokenName,
-				balance: xrdRedemptionValue
+				balance: xrdRedemptionValue,
+				balanceFiatWorth: stakeUnitResource.amounFiatWorth.map { .init(worth: $0, currency: .usd) }
 			),
 			resourceDetails: .init(
 				description: .success(stakeUnitResource.resource.metadata.description),

@@ -1,5 +1,4 @@
 // MARK: - AccountPortfoliosClient + DependencyKey
-
 extension AccountPortfoliosClient: DependencyKey {
 	/// Internal state that holds all loaded portfolios.
 	actor State {
@@ -149,7 +148,8 @@ extension AccountPortfoliosClient: DependencyKey {
 
 extension OnLedgerEntity.Account {
 	var totalFiatWorth: OnLedgerEntity.FiatWorth {
-		let tokensWorth = fungibleResources.nonXrdResources.compactMap(\.fiatWorth?.worth).reduce(.zero, +)
+		let xrdWorth = fungibleResources.xrdResource?.fiatWorth?.worth ?? .zero
+		let tokensWorth = xrdWorth + fungibleResources.nonXrdResources.compactMap(\.fiatWorth?.worth).reduce(.zero, +)
 		let lsusWorth = poolUnitResources.radixNetworkStakes.compactMap(\.stakeUnitResource?.fiatWorth?.worth).reduce(.zero, +)
 		let total = tokensWorth + lsusWorth
 		return .init(worth: total, currency: .usd)

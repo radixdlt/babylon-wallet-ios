@@ -301,6 +301,7 @@ extension StakeUnitList {
 					.init(
 						resource: stakeUnitResource.resource,
 						amount: nil,
+						amountFiatWorth: stakeUnitResource.amounFiatWorth,
 						guaranteedAmount: nil,
 						worth: stake.xrdRedemptionValue,
 						isSelected: state.selectedLiquidStakeUnits?.contains { $0.id == stakeUnitResource.resource.resourceAddress }

@@ -379,7 +379,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case let .liquidStakeUnit(details):
 				state.destination = .lsuDetails(.init(
 					validator: details.validator,
-					stakeUnitResource: .init(resource: details.resource, amount: details.amount),
+					stakeUnitResource: .init(resource: details.resource, amount: details.amount, amounFiatWorth: nil),
 					xrdRedemptionValue: details.worth
 				))
 

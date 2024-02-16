@@ -358,7 +358,10 @@ extension OnLedgerEntitiesClient {
 		)
 
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+		@Dependency(\.tokenPriceClient) var tokenPriceClient
+		@Dependency(\.appPreferencesClient) var appPreferencesClient
 		let currentEpoch = try await gatewayAPIClient.getEpoch()
+		let xrdPrice = await appPreferencesClient.getPreferences().display.isCurrencyAmountVisible ? 0.043 : nil // try? await tokenPriceClient.getTokenPrices()
 
 		return try await ownedStakes.asyncCompactMap { stake -> OwnedStakeDetails? in
 			guard let validatorDetails = validators.first(where: { $0.address == stake.validatorAddress }) else {
@@ -370,9 +373,18 @@ extension OnLedgerEntitiesClient {
 				if let stakeUnitResource = stake.stakeUnitResource, stakeUnitResource.amount > 0 {
 					guard let stakeUnitDetails = resourceDetails.first(where: { $0.resourceAddress == stakeUnitResource.resourceAddress }) else {
 						assertionFailure("Did not load stake unit details")
-						return nil
+						fatalError()
 					}
-					return .init(resource: stakeUnitDetails, amount: stakeUnitResource.amount)
+					return .init(
+						resource: stakeUnitDetails,
+						amount: stakeUnitResource.amount,
+						amounFiatWorth: {
+							if let claimAmount = try? stakeUnitResource.amount.asDouble(), let xrdPrice {
+								return claimAmount * xrdPrice
+							}
+							return nil
+						}()
+					)
 				}
 
 				return nil
@@ -405,6 +417,12 @@ extension OnLedgerEntitiesClient {
 								validatorAddress: stake.validatorAddress,
 								token: token,
 								claimAmount: claimAmount,
+								claimFiatWorth: {
+									if let claimAmount = try? claimAmount.asDouble(), let xrdPrice {
+										return claimAmount * xrdPrice
+									}
+									return nil
+								}(),
 								reamainingEpochsUntilClaim: Int(claimEpoch) - Int(currentEpoch.rawValue)
 							)
 						}.asIdentifiable()
@@ -508,6 +526,7 @@ extension OnLedgerEntitiesClient {
 	public struct ResourceWithVaultAmount: Hashable, Sendable {
 		public let resource: OnLedgerEntity.Resource
 		public let amount: RETDecimal
+		public let amounFiatWorth: Double?
 	}
 
 	public struct StakeClaim: Hashable, Sendable, Identifiable {
@@ -518,6 +537,7 @@ extension OnLedgerEntitiesClient {
 		let validatorAddress: ValidatorAddress
 		let token: OnLedgerEntity.NonFungibleToken
 		let claimAmount: RETDecimal
+		let claimFiatWorth: Double?
 		let reamainingEpochsUntilClaim: Int?
 
 		var isReadyToBeClaimed: Bool {

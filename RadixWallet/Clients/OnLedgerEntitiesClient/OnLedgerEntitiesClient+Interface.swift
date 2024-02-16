@@ -500,7 +500,7 @@ extension OnLedgerEntitiesClient {
 			return nil
 		}
 
-		let poolUnitResource = ResourceWithVaultAmount(resource: poolUnitResource, amount: amount)
+		let poolUnitResource = ResourceWithVaultAmount(resource: poolUnitResource, amount: amount, amounFiatWorth: nil)
 
 		return await populatePoolDetails(pool, allResources, poolUnitResource)
 	}
@@ -546,7 +546,7 @@ extension OnLedgerEntitiesClient {
 				return nil
 			}
 
-			let poolUnitResource = ResourceWithVaultAmount(resource: poolUnitResourcee, amount: ownedPoolUnit.resource.amount)
+			let poolUnitResource = ResourceWithVaultAmount(resource: poolUnitResourcee, amount: ownedPoolUnit.resource.amount, amounFiatWorth: nil)
 
 			return await populatePoolDetails(pool, allResources, poolUnitResource)
 		}

@@ -128,6 +128,7 @@ struct TransactionReviewResourceView: View {
 // MARK: - TransactionReviewAmountView
 struct TransactionReviewAmountView: View {
 	let amount: RETDecimal
+	let amountFiatWorth: OnLedgerEntity.FiatWorth?
 	let guaranteedAmount: RETDecimal?
 
 	var body: some View {
@@ -140,6 +141,12 @@ struct TransactionReviewAmountView: View {
 			Text(amount.formatted())
 				.textStyle(.body1Header)
 				.foregroundColor(.app.gray1)
+
+			if let worth = amountFiatWorth {
+				Text(worth.currencyFormatted(applyCustomFont: false)!)
+					.textStyle(.body2HighImportance)
+					.foregroundStyle(.app.gray2)
+			}
 
 			if let guaranteedAmount {
 				Text(L10n.TransactionReview.guaranteed)
@@ -161,6 +168,7 @@ extension LiquidStakeUnitView.ViewState {
 		self.init(
 			resource: resource,
 			amount: details.amount,
+			amountFiatWorth: nil,
 			guaranteedAmount: details.guarantee?.amount,
 			worth: details.worth,
 			validatorName: details.validator.metadata.name

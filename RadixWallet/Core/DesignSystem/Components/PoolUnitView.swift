@@ -38,7 +38,7 @@ public struct PoolUnitView: View {
 					Spacer(minLength: 0)
 
 					if let amount = viewState.amount {
-						TransactionReviewAmountView(amount: amount, guaranteedAmount: viewState.guaranteedAmount)
+						TransactionReviewAmountView(amount: amount, amountFiatWorth: nil, guaranteedAmount: viewState.guaranteedAmount)
 							.padding(.leading, viewState.isSelected != nil ? .small2 : 0)
 					}
 

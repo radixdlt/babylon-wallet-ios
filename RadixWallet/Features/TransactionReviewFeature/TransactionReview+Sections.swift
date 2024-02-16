@@ -859,7 +859,7 @@ extension TransactionReview {
 					details: .init(
 						address: poolContribution.poolAddress.asSpecific(),
 						dAppName: resourceAssociatedDapps?[resourceAddress]?.name,
-						poolUnitResource: .init(resource: resource, amount: amount),
+						poolUnitResource: .init(resource: resource, amount: amount, amounFiatWorth: nil),
 						xrdResource: xrdResource,
 						nonXrdResources: nonXrdResources
 					),
@@ -897,6 +897,7 @@ extension TransactionReview {
 					validatorAddress: stakeClaimValidator.address,
 					token: token,
 					claimAmount: data.claimAmount,
+					claimFiatWorth: nil,
 					reamainingEpochsUntilClaim: nil
 				)
 			}
@@ -909,6 +910,7 @@ extension TransactionReview {
 					validatorAddress: stakeClaimValidator.address,
 					token: token,
 					claimAmount: claimAmount,
+					claimFiatWorth: nil,
 					reamainingEpochsUntilClaim: data.claimEpoch.map { Int($0) - Int(resource.atLedgerState.epoch) }
 				)
 			}

@@ -88,13 +88,57 @@ extension Home.AccountRow {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: ViewState.init, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .medium3) {
-					VStack(alignment: .leading, spacing: .zero) {
-						HStack {
+					ViewThatFits(in: .horizontal) {
+						VStack(alignment: .leading, spacing: .zero) {
+							HStack(spacing: .zero) {
+								Text(viewStore.name)
+									.lineLimit(1)
+									.textStyle(.body1Header)
+									.foregroundColor(.app.white)
+								// .frame(maxWidth: .infinity, alignment: .leading)
+
+								if let fiatWorth = viewStore.fiatWorth {
+									Spacer()
+									loadable(fiatWorth, loadingViewHeight: .medium1) { fiatWorth in
+										Text(fiatWorth)
+											.textStyle(.secondaryHeader)
+											.foregroundStyle(.app.white)
+									}
+									.padding(.leading, .small1)
+								}
+							}
+
+							HStack {
+								AddressView(.address(.account(viewStore.address, isLedgerHWAccount: viewStore.isLedgerAccount)))
+									.foregroundColor(.app.whiteTransparent)
+									.textStyle(.body2HighImportance)
+
+								if let tag = viewStore.tag {
+									Text("•")
+									Text("\(tag.display)")
+								}
+							}
+							.foregroundColor(.app.whiteTransparent)
+						}
+
+						VStack(alignment: .leading, spacing: .zero) {
 							Text(viewStore.name)
 								.lineLimit(1)
 								.textStyle(.body1Header)
 								.foregroundColor(.app.white)
-								.frame(maxWidth: .infinity, alignment: .leading)
+							// .frame(maxWidth: .infinity, alignment: .leading)
+
+							HStack {
+								AddressView(.address(.account(viewStore.address, isLedgerHWAccount: viewStore.isLedgerAccount)))
+									.foregroundColor(.app.whiteTransparent)
+									.textStyle(.body2HighImportance)
+
+								if let tag = viewStore.tag {
+									Text("•")
+									Text("\(tag.display)")
+								}
+							}
+							.foregroundColor(.app.whiteTransparent)
 
 							if let fiatWorth = viewStore.fiatWorth {
 								loadable(fiatWorth, loadingViewHeight: .medium1) { fiatWorth in
@@ -104,18 +148,6 @@ extension Home.AccountRow {
 								}
 							}
 						}
-
-						HStack {
-							AddressView(.address(.account(viewStore.address, isLedgerHWAccount: viewStore.isLedgerAccount)))
-								.foregroundColor(.app.whiteTransparent)
-								.textStyle(.body2HighImportance)
-
-							if let tag = viewStore.tag {
-								Text("•")
-								Text("\(tag.display)")
-							}
-						}
-						.foregroundColor(.app.whiteTransparent)
 					}
 
 					ownedResourcesList(viewStore)
