@@ -16,7 +16,7 @@ extension GatewayAPIClient: TestDependencyKey {
 		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
 		transactionStatus: unimplemented("\(Self.self).transactionStatus"),
 		transactionPreview: unimplemented("\(Self.self).transactionPreview"),
-		transactionHistory: unimplemented("\(Self.self).transactionHistory")
+		streamTransactions: unimplemented("\(Self.self).streamTransactions")
 	)
 
 	// TODO: convert to noop, don't use in tests.
@@ -51,7 +51,7 @@ extension GatewayAPIClient: TestDependencyKey {
 				)
 			},
 			transactionPreview: unimplemented("\(self).transactionPreview"),
-			transactionHistory: unimplemented("\(self).transactionHistory")
+			streamTransactions: unimplemented("\(self).streamTransactions")
 		)
 	}
 }

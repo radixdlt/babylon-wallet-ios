@@ -6,7 +6,7 @@ public struct PoolUnitView: View {
 		public let guaranteedAmount: RETDecimal?
 		public let dAppName: Loadable<String?>
 		public let poolIcon: URL?
-		public let resources: Loadable<[ResourceBalanceView.Resource.Fungible]>
+		public let resources: Loadable<[ResourceBalance.Fungible]>
 		public let isSelected: Bool?
 	}
 

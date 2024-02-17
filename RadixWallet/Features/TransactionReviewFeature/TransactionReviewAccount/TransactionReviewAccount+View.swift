@@ -204,7 +204,7 @@ extension PoolUnitView.ViewState {
 	}
 }
 
-extension [ResourceBalanceView.Resource.Fungible] {
+extension [ResourceBalance.Fungible] {
 	init(resources: OnLedgerEntitiesClient.OwnedResourcePoolDetails) {
 		let xrdResource = resources.xrdResource.map {
 			Element(resourceWithRedemptionValue: $0, isXRD: true)
@@ -216,7 +216,7 @@ extension [ResourceBalanceView.Resource.Fungible] {
 	}
 }
 
-extension ResourceBalanceView.Resource.Fungible {
+extension ResourceBalance.Fungible {
 	init(resourceWithRedemptionValue resource: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
 		self.init(
 			address: resource.resource.resourceAddress,
