@@ -63,9 +63,9 @@ extension GatewayAPIClient {
 		let actions: [Action]
 		let manifestType: ManifestType
 
-		enum Action {
-			case deposit
-			case withdrawal
+		enum Action: Sendable, Hashable {
+			case deposit(RETDecimal, ResourceBalance)
+			case withdrawal(RETDecimal, ResourceBalance)
 			case settings
 		}
 
@@ -79,11 +79,11 @@ extension GatewayAPIClient {
 	}
 
 	@Sendable
-	public func transactionHistory(account: AccountAddress) async throws -> [TransactionHistoryItem] {
+	public func transactionHistory(account: AccountAddress, cursor: String? = nil) async throws -> [TransactionHistoryItem] {
 		let request = GatewayAPI.StreamTransactionsRequest(
 			// atLedgerState: GatewayAPI.LedgerStateSelector?,
 			// fromLedgerState: GatewayAPI.LedgerStateSelector?,
-			// cursor: String?,
+			cursor: cursor,
 			limitPerPage: 100,
 			// kindFilter: GatewayAPI.StreamTransactionsRequest.KindFilter?,
 			manifestAccountsWithdrawnFromFilter: [account.address],
@@ -99,9 +99,21 @@ extension GatewayAPIClient {
 		)
 
 		let response = try await streamTransactions(request)
-		return response.items.compactMap { _ in
-			nil
+
+		func resourceAddresses(for balanceChanges: GatewayAPI.TransactionBalanceChanges) -> [String] {
+			balanceChanges.fungibleBalanceChanges.map(\.resourceAddress)
+				+ balanceChanges.fungibleFeeBalanceChanges.map(\.resourceAddress)
+				+ balanceChanges.nonFungibleBalanceChanges.map(\.resourceAddress)
 		}
+
+		let addresses = response.items.flatMap { $0.balanceChanges.map(resourceAddresses) ?? [] }
+		let resourceEntityDetails = try await fetchEntitiesDetails(addresses, explicitMetadata: .resourceMetadataKeys)
+
+		var result: [TransactionHistoryItem] = []
+
+		for item in response.items {}
+
+		fatalError()
 	}
 
 	/*

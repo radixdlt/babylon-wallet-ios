@@ -1,31 +1,9 @@
 import ComposableArchitecture
 
-extension GatewayAPI.CommittedTransactionInfo {
-	/// The day of the transaction, as a date with hours, minutes, seconds and nanoseconds set to 0
-	var transaction: TransactionHistory.State.Transaction? {
-		guard let time = confirmedAt else { return nil }
-
-//		print("  •• \(time.formatted()): \(affectedGlobalEntities ?? [])")
-
-		if let balanceChanges {
-			for change in balanceChanges.fungibleBalanceChanges {
-				print("    • \(change.balanceChange) of \(change.resourceAddress.formatted(.default)) for \(change.entityAddress.formatted(.default))")
-			}
-		} else {
-			print("    • No balance change")
-		}
-
-		return .init(
-			time: time,
-			message: "----",
-			actions: [],
-			manifestType: .random()
-		)
-	}
-}
-
 // MARK: - TransactionHistory
 public struct TransactionHistory: Sendable, FeatureReducer {
+	public typealias Transaction = GatewayAPIClient.TransactionHistoryItem
+
 	public struct State: Sendable, Hashable {
 		let account: Profile.Network.Account
 
@@ -49,7 +27,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			let day: Date
 			/// The month, in the form of a `Date` with all time components set to 0 and the day set to 1
 			let month: Date
-			var transactions: [GatewayAPIClient.TransactionHistoryItem]
+			var transactions: [Transaction]
 		}
 	}
 
@@ -59,7 +37,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Hashable {
-		case updateSections([State.TransactionSection])
+		case updateTransactions([Transaction])
 	}
 
 	@Dependency(\.dismiss) var dismiss
@@ -82,9 +60,9 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .updateSections(sections):
-//			state.sections = sections
-			.none
+		case let .updateTransactions(transactions):
+			state.updateTransactions(transactions)
+			return .none
 		}
 	}
 
@@ -92,9 +70,13 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 }
 
 extension TransactionHistory.State {
-	mutating func updateSections(_ transactions: [TransactionSection.Transaction]) {
-		let newSections = [TransactionSection](grouping: transactions)
+	///  Presupposes that transactions are loaded in chunks of full months
+	mutating func updateTransactions(_ transactions: [TransactionHistory.Transaction]) {
+		let newSections = transactions.inSections
+		var sections = self.sections
 		sections.append(contentsOf: newSections)
+		sections.sort(by: \.day)
+		self.sections = sections
 		monthsLoaded.append(contentsOf: newSections.map(\.month))
 	}
 
@@ -104,30 +86,29 @@ extension TransactionHistory.State {
 	}
 }
 
-extension IdentifiedArrayOf<TransactionHistory.State.TransactionSection> {
-	init(grouping transactions: [GatewayAPIClient.TransactionHistoryItem]) {
+extension [TransactionHistory.Transaction] {
+	var inSections: [TransactionHistory.State.TransactionSection] {
 		let calendar: Calendar = .current
 
-		let sortedBackwards = transactions.sorted(by: \.time, >)
-		var result: Self = []
+		let sortedBackwards = sorted(by: \.time, >)
+		var result: [TransactionHistory.State.TransactionSection] = []
 
 		for transaction in sortedBackwards {
 			let day = calendar.startOfDay(for: transaction.time)
-			guard let month = try? calendar.startOfMonth(for: transaction.time) else { continue }
+			let month = calendar.startOfMonth(for: transaction.time)
 
-			if result[id: day] == nil {
-				result[id: day] = .init(day: day, month: month, transactions: [transaction])
+			if result.last?.day == day {
+				result[result.endIndex - 1].append(transaction)
 			} else {
-				result[id: day]?.append(transaction)
+				result.append(.init(day: day, month: month, transactions: [transaction]))
 			}
 		}
-
-		self = result
+		return result
 	}
 }
 
 extension [TransactionHistory.State.TransactionSection] {
-	init(grouping transactions: [GatewayAPIClient.TransactionHistoryItem]) {
+	init(grouping transactions: [TransactionHistory.Transaction]) {
 		let calendar: Calendar = .current
 
 		let sortedBackwards = transactions.sorted(by: \.time, >)
@@ -149,9 +130,7 @@ extension [TransactionHistory.State.TransactionSection] {
 }
 
 extension TransactionHistory.State.TransactionSection {
-	typealias Transaction = GatewayAPIClient.TransactionHistoryItem
-
-	mutating func append(_ transaction: Transaction) {
+	mutating func append(_ transaction: GatewayAPIClient.TransactionHistoryItem) {
 		transactions.append(transaction)
 	}
 }
@@ -206,7 +185,7 @@ extension Calendar {
 		component(.year, from: date) == component(.year, from: otherDate)
 	}
 
-	func startOfMonth(for date: Date) throws -> Date {
+	func startOfMonth(for date: Date) -> Date {
 		var components = dateComponents([.year, .month, .day, .hour, .minute, .second, .nanosecond], from: date)
 		components.day = 1
 		components.hour = 0
@@ -215,10 +194,9 @@ extension Calendar {
 		components.nanosecond = 0
 
 		guard let start = self.date(from: components) else {
-			struct FailedToFindStartOfMonth: Error {
-				let date: Date
-			}
-			throw FailedToFindStartOfMonth(date: date)
+			assertionFailure("Could not create date from \(components)")
+			loggerGlobal.error("Could not create date from \(components)")
+			return date
 		}
 
 		return start
@@ -227,53 +205,56 @@ extension Calendar {
 
 // TEMPORARY: MOCK
 
-extension TransactionHistory.State {
-	init(account: Profile.Network.Account) {
-		self.init(
-			account: account,
-			sections: (1 ... 5).map { _ in .mock }
-		)
-	}
-}
-
-extension TransactionHistory.State.TransactionSection {
-	static var mock: Self {
-		.init(
-			day: Date(timeIntervalSince1970: 1000 * .random(in: 100 ... 100_000)),
-			transactions: (1 ... 5).map { _ in .mock }
-		)
-	}
-}
-
-extension GatewayAPIClient.TransactionHistoryItem {
-	static var mock: Self {
-		.init(
-			time: Date(timeIntervalSince1970: 1000 * .random(in: 100 ... 100_000)),
-			message: Bool.random() ? "This is a message" : nil,
-			actions: [],
-			manifestType: .random()
-		)
-	}
-}
-
-extension GatewayAPIClient.TransactionHistoryItem.ManifestType {
-	static func random() -> Self {
-		switch Int.random(in: 0 ... 4) {
-		case 0: .transfer
-		case 1: .contribute
-		case 2: .claim
-		case 3: .depositSettings
-		default: .other
-		}
-	}
-}
-
-extension GatewayAPIClient.TransactionHistoryItem.Action {
-	static func random() -> Self {
-		switch Int.random(in: 0 ... 2) {
-		case 0: .deposit
-		case 1: .withdrawal
-		default: .settings
-		}
-	}
-}
+// extension TransactionHistory.State {
+//	init(account: Profile.Network.Account) {
+//		self.init(
+//			account: account,
+//			sections: (1 ... 5).map { _ in .mock }
+//		)
+//	}
+// }
+//
+// extension TransactionHistory.State.TransactionSection {
+//	static var mock: Self {
+//		let calendar = Calendar.current
+//		let time = Date(timeIntervalSince1970: 1000 * .random(in: 100 ... 100_000))
+//		return .init(
+//			day: calendar.startOfDay(for: time),
+//			month: calendar.startOfMonth(for: time),
+//			transactions: (1 ... 5).map { _ in .mock }
+//		)
+//	}
+// }
+//
+// extension GatewayAPIClient.TransactionHistoryItem {
+//	static var mock: Self {
+//		.init(
+//			time: Date(timeIntervalSince1970: 1000 * .random(in: 100 ... 100_000)),
+//			message: Bool.random() ? "This is a message" : nil,
+//			actions: [],
+//			manifestType: .random()
+//		)
+//	}
+// }
+//
+// extension GatewayAPIClient.TransactionHistoryItem.ManifestType {
+//	static func random() -> Self {
+//		switch Int.random(in: 0 ... 4) {
+//		case 0: .transfer
+//		case 1: .contribute
+//		case 2: .claim
+//		case 3: .depositSettings
+//		default: .other
+//		}
+//	}
+// }
+//
+// extension GatewayAPIClient.TransactionHistoryItem.Action {
+//	static func random() -> Self {
+//		switch Int.random(in: 0 ... 2) {
+//		case 0: .deposit
+//		case 1: .withdrawal
+//		default: .settings
+//		}
+//	}
+// }
