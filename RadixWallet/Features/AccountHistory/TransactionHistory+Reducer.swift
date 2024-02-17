@@ -1,45 +1,5 @@
 import ComposableArchitecture
 
-/*
- public private(set) var stateVersion: Int64
- public private(set) var epoch: Int64
- public private(set) var round: Int64
- public private(set) var roundTimestamp: String
- public private(set) var transactionStatus: TransactionStatus
- /** Bech32m-encoded hash. */
- public private(set) var payloadHash: String?
- /** Bech32m-encoded hash. */
- public private(set) var intentHash: String?
- /** String-encoded decimal representing the amount of a related fungible resource. */
- public private(set) var feePaid: String?
- public private(set) var affectedGlobalEntities: [String]?
- public private(set) var confirmedAt: Date?
- public private(set) var errorMessage: String?
- /** Hex-encoded binary blob. */
- public private(set) var rawHex: String?
- public private(set) var receipt: TransactionReceipt?
- /** The optional transaction message. This type is defined in the Core API as `TransactionMessage`. See the Core API documentation for more details.  */
- public private(set) var message: AnyCodable?
- public private(set) var balanceChanges: TransactionBalanceChanges?
- */
-
-extension [GatewayAPI.CommittedTransactionInfo] {
-	/// The day of the transaction, as a date with hours, minutes, seconds and nanoseconds set to 0
-	var sections: [TransactionHistory.State.TransactionSection] {
-		let calendar: Calendar = .current
-		let groupedTransactions = Dictionary(grouping: self) { $0.confirmedAt.map(calendar.startOfDay) }
-		let days = groupedTransactions.keys.compacted().sorted()
-
-		print("••••• \(self.count)")
-
-		return days.compactMap { day -> TransactionHistory.State.TransactionSection? in
-			guard let transactionInfos = groupedTransactions[day] else { return nil }
-			print("•••••• \(day.formatted(date: .abbreviated, time: .shortened)) :: \(transactionInfos.count)")
-			return .init(day: day, transactions: transactionInfos.compactMap(\.transaction))
-		}
-	}
-}
-
 extension GatewayAPI.CommittedTransactionInfo {
 	/// The day of the transaction, as a date with hours, minutes, seconds and nanoseconds set to 0
 	var transaction: TransactionHistory.State.Transaction? {
@@ -73,41 +33,23 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		var selectedPeriod: DateRangeItem.ID
 
-		var sections: [TransactionSection]
+		var sections: IdentifiedArrayOf<TransactionSection>
+		var monthsLoaded: Set<Date> = []
 
 		init(account: Profile.Network.Account, sections: [TransactionSection] = []) {
 			self.account = account
 			self.periods = try! .init(months: 7)
 			self.selectedPeriod = periods[0].id
-			self.sections = sections
+			self.sections = sections.asIdentifiable()
 		}
 
 		public struct TransactionSection: Sendable, Hashable, Identifiable {
 			public var id: Date { day }
 			/// The day, in the form of a `Date` with all time components set to 0
 			let day: Date
-			let transactions: [Transaction]
-		}
-
-		public struct Transaction: Sendable, Hashable {
-			let time: Date
-			let message: String?
-			let actions: [Action]
-			let manifestType: ManifestType
-
-			enum Action {
-				case deposit
-				case withdrawal
-				case settings
-			}
-
-			enum ManifestType {
-				case transfer
-				case contribute
-				case claim
-				case depositSettings
-				case other
-			}
+			/// The month, in the form of a `Date` with all time components set to 0 and the day set to 1
+			let month: Date
+			var transactions: [GatewayAPIClient.TransactionHistoryItem]
 		}
 	}
 
@@ -127,26 +69,10 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		switch viewAction {
 		case let .selectedPeriod(period):
 			state.selectedPeriod = period
-
-			let request = GatewayAPI.StreamTransactionsRequest(
-				//				atLedgerState: .some(.),
-//				fromLedgerState: <#T##GatewayAPI.LedgerStateSelector?#>,
-//				cursor: <#T##String?#>,
-				limitPerPage: 100,
-//				kindFilter: <#T##GatewayAPI.StreamTransactionsRequest.KindFilter?#>,
-				manifestAccountsWithdrawnFromFilter: [state.account.address.address],
-//				manifestAccountsDepositedIntoFilter: [state.account.address.address]
-//				manifestResourcesFilter: <#T##[String]?#>,
-//				affectedGlobalEntitiesFilter: <#T##[String]?#>,
-//				eventsFilter: <#T##[GatewayAPI.StreamTransactionsRequestEventFilterItem]?#>,
-//				order: <#T##GatewayAPI.StreamTransactionsRequest.Order?#>,
-				optIns: .init(affectedGlobalEntities: true, balanceChanges: true)
-			)
-
-			return .run { send in
-				let response = try await gatewayAPIClient.transactionHistory(request)
-				print("•••••• updateSections \(response.totalCount) \(response.items.count)")
-				await send(.internal(.updateSections(response.items.sections)))
+			return .run { [account = state.account.address] _ in
+				let sections = try await gatewayAPIClient.transactionHistory(account: account)
+				print("•••••• updateSections \(sections.count)")
+//				await send(.internal(.updateSections(sections)))
 			}
 
 		case .closeTapped:
@@ -157,12 +83,77 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .updateSections(sections):
-			state.sections = sections
-			return .none
+//			state.sections = sections
+			.none
 		}
 	}
 
 	// Helper methods
+}
+
+extension TransactionHistory.State {
+	mutating func updateSections(_ transactions: [TransactionSection.Transaction]) {
+		let newSections = [TransactionSection](grouping: transactions)
+		sections.append(contentsOf: newSections)
+		monthsLoaded.append(contentsOf: newSections.map(\.month))
+	}
+
+	mutating func clearSections() {
+		sections.removeAll(keepingCapacity: true)
+		monthsLoaded.removeAll(keepingCapacity: true)
+	}
+}
+
+extension IdentifiedArrayOf<TransactionHistory.State.TransactionSection> {
+	init(grouping transactions: [GatewayAPIClient.TransactionHistoryItem]) {
+		let calendar: Calendar = .current
+
+		let sortedBackwards = transactions.sorted(by: \.time, >)
+		var result: Self = []
+
+		for transaction in sortedBackwards {
+			let day = calendar.startOfDay(for: transaction.time)
+			guard let month = try? calendar.startOfMonth(for: transaction.time) else { continue }
+
+			if result[id: day] == nil {
+				result[id: day] = .init(day: day, month: month, transactions: [transaction])
+			} else {
+				result[id: day]?.append(transaction)
+			}
+		}
+
+		self = result
+	}
+}
+
+extension [TransactionHistory.State.TransactionSection] {
+	init(grouping transactions: [GatewayAPIClient.TransactionHistoryItem]) {
+		let calendar: Calendar = .current
+
+		let sortedBackwards = transactions.sorted(by: \.time, >)
+		var result: Self = []
+
+		for transaction in sortedBackwards {
+			let day = calendar.startOfDay(for: transaction.time)
+			guard let month = try? calendar.startOfMonth(for: transaction.time) else { continue }
+
+			if result.last?.day == day {
+				result[result.endIndex - 1].append(transaction)
+			} else {
+				result.append(.init(day: day, month: month, transactions: [transaction]))
+			}
+		}
+
+		self = result
+	}
+}
+
+extension TransactionHistory.State.TransactionSection {
+	typealias Transaction = GatewayAPIClient.TransactionHistoryItem
+
+	mutating func append(_ transaction: Transaction) {
+		transactions.append(transaction)
+	}
 }
 
 // MARK: - FailedToCalculateDate
@@ -254,7 +245,7 @@ extension TransactionHistory.State.TransactionSection {
 	}
 }
 
-extension TransactionHistory.State.Transaction {
+extension GatewayAPIClient.TransactionHistoryItem {
 	static var mock: Self {
 		.init(
 			time: Date(timeIntervalSince1970: 1000 * .random(in: 100 ... 100_000)),
@@ -265,7 +256,7 @@ extension TransactionHistory.State.Transaction {
 	}
 }
 
-extension TransactionHistory.State.Transaction.ManifestType {
+extension GatewayAPIClient.TransactionHistoryItem.ManifestType {
 	static func random() -> Self {
 		switch Int.random(in: 0 ... 4) {
 		case 0: .transfer
@@ -277,7 +268,7 @@ extension TransactionHistory.State.Transaction.ManifestType {
 	}
 }
 
-extension TransactionHistory.State.Transaction.Action {
+extension GatewayAPIClient.TransactionHistoryItem.Action {
 	static func random() -> Self {
 		switch Int.random(in: 0 ... 2) {
 		case 0: .deposit
