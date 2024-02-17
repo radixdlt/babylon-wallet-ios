@@ -2,18 +2,18 @@ import SwiftUI
 
 // MARK: - ResourceBalancesView
 public struct ResourceBalancesView: View {
-	public let resources: [ResourceBalanceView.Resource]
+	public let resources: [ResourceBalance]
 
-	public init(resources: [ResourceBalanceView.Resource]) {
+	public init(resources: [ResourceBalance]) {
 		self.resources = resources
 	}
 
-	public init(fungibles: [ResourceBalanceView.Resource.Fungible]) {
-		self.resources = fungibles.map(ResourceBalanceView.Resource.fungible)
+	public init(fungibles: [ResourceBalance.Fungible]) {
+		self.resources = fungibles.map(ResourceBalance.fungible)
 	}
 
-	public init(nonFungibles: [ResourceBalanceView.Resource.NonFungible]) {
-		self.resources = nonFungibles.map(ResourceBalanceView.Resource.nonFungible)
+	public init(nonFungibles: [ResourceBalance.NonFungible]) {
+		self.resources = nonFungibles.map(ResourceBalance.nonFungible)
 	}
 
 	public var body: some View {
@@ -39,17 +39,45 @@ public struct ResourceBalancesView: View {
 	private let dividerHeight: CGFloat = 1
 }
 
-// MARK: - ResourceBalanceView
-public struct ResourceBalanceView: View {
-	public enum Resource: Equatable {
-		case fungible(Fungible)
-		case nonFungible(NonFungible)
+// MARK: - ResourceBalance
+public enum ResourceBalance: Sendable, Hashable {
+	case fungible(Fungible)
+	case nonFungible(NonFungible)
+
+	public struct Fungible: Sendable, Hashable {
+		public let address: ResourceAddress
+		public let title: String?
+		public let icon: Thumbnail.TokenContent
+		public let amount: Amount?
+		public let fallback: String?
 	}
 
-	public let resource: Resource
+	public struct NonFungible: Sendable, Hashable {
+		public let id: NonFungibleGlobalId
+		public let resourceName: String?
+		public let nonFungibleName: String?
+		public let icon: URL?
+	}
+
+	// Helper types
+
+	public struct Amount: Sendable, Hashable {
+		public let amount: RETDecimal
+		public let guaranteed: RETDecimal?
+
+		init(_ amount: RETDecimal, guaranteed: RETDecimal? = nil) {
+			self.amount = amount
+			self.guaranteed = guaranteed
+		}
+	}
+}
+
+// MARK: - ResourceBalanceView
+public struct ResourceBalanceView: View {
+	public let resource: ResourceBalance
 	public let compact: Bool
 
-	init(resource: Resource, compact: Bool) {
+	init(resource: ResourceBalance, compact: Bool) {
 		self.resource = resource
 		self.compact = compact
 	}
@@ -72,36 +100,7 @@ extension ResourceBalanceView {
 	}
 }
 
-extension ResourceBalanceView.Resource {
-	public struct Fungible: Equatable {
-		public let address: ResourceAddress
-		public let title: String?
-		public let icon: Thumbnail.TokenContent
-		public let amount: Amount?
-		public let fallback: String?
-	}
-
-	public struct NonFungible: Equatable {
-		public let id: NonFungibleGlobalId
-		public let resourceName: String?
-		public let nonFungibleName: String?
-		public let icon: URL?
-	}
-
-	// Helper types
-
-	public struct Amount: Equatable {
-		public let amount: RETDecimal
-		public let guaranteed: RETDecimal?
-
-		init(_ amount: RETDecimal, guaranteed: RETDecimal? = nil) {
-			self.amount = amount
-			self.guaranteed = guaranteed
-		}
-	}
-}
-
-extension ResourceBalanceView.Resource.Fungible {
+extension ResourceBalance.Fungible {
 	public static func xrd(balance: RETDecimal) -> Self {
 		.init(
 			address: try! .init(validatingAddress: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"), // FIXME: REMOVE
@@ -113,8 +112,8 @@ extension ResourceBalanceView.Resource.Fungible {
 	}
 }
 
-// MARK: - ResourceBalanceView.Resource + Identifiable
-extension ResourceBalanceView.Resource: Identifiable {
+// MARK: - ResourceBalance + Identifiable
+extension ResourceBalance: Identifiable {
 	public var id: AnyHashable {
 		switch self {
 		case let .fungible(fungible):
@@ -127,7 +126,7 @@ extension ResourceBalanceView.Resource: Identifiable {
 
 extension ResourceBalanceView {
 	public struct Fungible: View {
-		public let viewState: Resource.Fungible
+		public let viewState: ResourceBalance.Fungible
 		public let compact: Bool
 
 		public var body: some View {
@@ -157,7 +156,7 @@ extension ResourceBalanceView {
 	}
 
 	public struct NonFungible: View {
-		public let viewState: Resource.NonFungible
+		public let viewState: ResourceBalance.NonFungible
 		public let compact: Bool
 
 		public var body: some View {
@@ -200,7 +199,7 @@ extension ResourceBalanceView {
 	// Helper Views
 
 	struct AmountView: View {
-		let amount: Resource.Amount?
+		let amount: ResourceBalance.Amount?
 		let fallback: String?
 		let compact: Bool
 
@@ -215,7 +214,7 @@ extension ResourceBalanceView {
 		}
 
 		@ViewBuilder
-		private func core(amount: Resource.Amount, compact: Bool) -> some View {
+		private func core(amount: ResourceBalance.Amount, compact: Bool) -> some View {
 			if compact {
 				Text(amount.amount.formatted())
 					.textStyle(amountTextStyle)
