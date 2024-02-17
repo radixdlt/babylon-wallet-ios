@@ -17,7 +17,8 @@ extension RadixConnectClient: TestDependencyKey {
 		addP2PWithPassword: unimplemented("\(Self.self).addP2PWithPassword"),
 		receiveMessages: unimplemented("\(Self.self).receiveMessages"),
 		sendResponse: unimplemented("\(Self.self).sendResponse"),
-		sendRequest: unimplemented("\(Self.self).sendRequest")
+		sendRequest: unimplemented("\(Self.self).sendRequest"),
+		handleDappDeepLink: unimplemented("\(Self.self).sendRequest")
 	)
 }
 
@@ -35,7 +36,8 @@ extension RadixConnectClient {
 		addP2PWithPassword: { _ in },
 		receiveMessages: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		sendResponse: { _, _ in },
-		sendRequest: { _, _ in 0 }
+		sendRequest: { _, _ in 0 },
+		handleDappDeepLink: { _ in }
 	)
 }
 #endif // DEBUG

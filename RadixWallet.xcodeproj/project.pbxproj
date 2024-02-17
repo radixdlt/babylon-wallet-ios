@@ -1177,6 +1177,7 @@
 		839B6C542B21D28400402651 /* ExpandableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839B6C532B21D28400402651 /* ExpandableTextView.swift */; };
 		83D0B5692AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */; };
 		83D663B02B271D0100D1AB9E /* TruncationMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D663AF2B271D0100D1AB9E /* TruncationMask.swift */; };
+		83D94D772B8087AB00CB506A /* RaMS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D94D762B8087AB00CB506A /* RaMS.swift */; };
 		83EE47502AF027DF00155F03 /* AssetTransferDepositRuleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */; };
 		83EE47552AF0DE8F00155F03 /* TransactionPayloadGatewayHandlingStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47512AF0DE8E00155F03 /* TransactionPayloadGatewayHandlingStatus.swift */; };
 		83EE47562AF0DE8F00155F03 /* TransactionPayloadStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE47522AF0DE8E00155F03 /* TransactionPayloadStatus.swift */; };
@@ -2495,6 +2496,7 @@
 		839B6C532B21D28400402651 /* ExpandableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandableTextView.swift; sourceTree = "<group>"; };
 		83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixEngineToolkitError+Description.swift"; sourceTree = "<group>"; };
 		83D663AF2B271D0100D1AB9E /* TruncationMask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TruncationMask.swift; sourceTree = "<group>"; };
+		83D94D762B8087AB00CB506A /* RaMS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RaMS.swift; sourceTree = "<group>"; };
 		83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetTransferDepositRuleTests.swift; sourceTree = "<group>"; };
 		83EE47512AF0DE8E00155F03 /* TransactionPayloadGatewayHandlingStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionPayloadGatewayHandlingStatus.swift; sourceTree = "<group>"; };
 		83EE47522AF0DE8E00155F03 /* TransactionPayloadStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionPayloadStatus.swift; sourceTree = "<group>"; };
@@ -4869,6 +4871,7 @@
 		48CFBEE12ADC10D900E77A5C /* RadixConnect */ = {
 			isa = PBXGroup;
 			children = (
+				83D94D752B80878C00CB506A /* RaMS */,
 				48CFBEE22ADC10D900E77A5C /* RadixConnectModels */,
 				48CFBEE72ADC10D900E77A5C /* RadixConnect */,
 			);
@@ -6932,6 +6935,14 @@
 			path = VerifyMnemonic;
 			sourceTree = "<group>";
 		};
+		83D94D752B80878C00CB506A /* RaMS */ = {
+			isa = PBXGroup;
+			children = (
+				83D94D762B8087AB00CB506A /* RaMS.swift */,
+			);
+			path = RaMS;
+			sourceTree = "<group>";
+		};
 		83EE474E2AF027CE00155F03 /* AssetTransferTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -8986,6 +8997,7 @@
 				48CFC49C2ADC10DA00E77A5C /* ValidatorCollectionAllOf.swift in Sources */,
 				48CFC2BC2ADC10D900E77A5C /* ImportMnemonicsFlowCoordinator+View.swift in Sources */,
 				48CFC6312ADC10DB00E77A5C /* Profile+UTType.swift in Sources */,
+				83D94D772B8087AB00CB506A /* RaMS.swift in Sources */,
 				48CFC5002ADC10DA00E77A5C /* GatewayStatusResponseAllOf.swift in Sources */,
 				48CFC4842ADC10DA00E77A5C /* QRGeneratorClient+Test.swift in Sources */,
 				48CFC6352ADC10DB00E77A5C /* AccountHierarchicalDeterministicDerivationPath.swift in Sources */,

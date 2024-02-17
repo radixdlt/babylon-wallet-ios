@@ -1,8 +1,11 @@
 import ComposableArchitecture
 import SwiftUI
+
 public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObject {
 	public weak var windowScene: UIWindowScene?
 	public var overlayWindow: UIWindow?
+
+	@Dependency(\.radixConnectClient) var radixConnectionClient
 
 	public func scene(
 		_ scene: UIScene,
@@ -22,9 +25,9 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		if let connectURL = connectionOptions.urlContexts.first?.url {
 			let connectionPassword = URLComponents(url: connectURL, resolvingAgainstBaseURL: true)?.queryItems?.first?.value
 			if let connectionPassword {
-				@Dependency(\.radixConnectClient) var radixConnectionClient
+				let cp = try! ConnectionPassword(.init(hex: connectionPassword))
 				Task {
-					try await radixConnectionClient.addP2PWithPassword(ConnectionPassword(.init(hex: connectionPassword)))
+					try await radixConnectionClient.handleDappDeepLink(cp)
 				}
 			}
 		}
@@ -56,11 +59,15 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 
 	public func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
 		let connectionPassword = URLComponents(url: URLContexts.first!.url, resolvingAgainstBaseURL: true)?.queryItems?.first?.value
+		loggerGlobal.error("has urlContext: \(connectionPassword)")
 		if let connectionPassword {
-			@Dependency(\.radixConnectClient) var radixConnectionClient
+			let cp = try! ConnectionPassword(.init(hex: connectionPassword))
 			Task {
-				try await radixConnectionClient.addP2PWithPassword(ConnectionPassword(.init(hex: connectionPassword)))
+				try await radixConnectionClient.handleDappDeepLink(cp)
 			}
+//			Task {
+//				try await radixConnectionClient.addP2PWithPassword(ConnectionPassword(.init(hex: connectionPassword)))
+//			}
 		}
 	}
 }

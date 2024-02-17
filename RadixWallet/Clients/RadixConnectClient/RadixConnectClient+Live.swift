@@ -5,6 +5,7 @@ extension RadixConnectClient {
 	public static let liveValue: Self = {
 		@Dependency(\.p2pLinksClient) var p2pLinksClient
 
+		let raMS = RaMS()
 		let rtcClients = RTCClients()
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
@@ -79,12 +80,23 @@ extension RadixConnectClient {
 			addP2PWithPassword: { password in
 				try await rtcClients.connect(password, waitsForConnectionToBeEstablished: true)
 			},
-			receiveMessages: { await rtcClients.incomingMessages() },
+			receiveMessages: { await raMS.incomingMessages() },
 			sendResponse: { response, route in
-				try await rtcClients.sendResponse(response, to: route)
+				switch route {
+				case let .deepLink(password):
+					try await raMS.sendResponse(response, password: password)
+				case let .rtc(route):
+					try await rtcClients.sendResponse(response, to: route)
+				case .wallet:
+					break
+				}
+
 			},
 			sendRequest: { request, strategy in
 				try await rtcClients.sendRequest(request, strategy: strategy)
+			},
+			handleDappDeepLink: { password in
+				let request = try await raMS.recieveRequest(onConnectioId: password)
 			}
 		)
 	}()
