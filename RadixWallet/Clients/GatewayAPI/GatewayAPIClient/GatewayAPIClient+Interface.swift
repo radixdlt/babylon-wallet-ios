@@ -26,7 +26,7 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 	public var submitTransaction: SubmitTransaction
 	public var transactionStatus: GetTransactionStatus
 	public var transactionPreview: TransactionPreview
-	public var transactionHistory: TransactionHistory
+	public var streamTransactions: StreamTransactions
 }
 
 extension GatewayAPIClient {
@@ -51,10 +51,82 @@ extension GatewayAPIClient {
 	public typealias SubmitTransaction = @Sendable (GatewayAPI.TransactionSubmitRequest) async throws -> GatewayAPI.TransactionSubmitResponse
 	public typealias GetTransactionStatus = @Sendable (GatewayAPI.TransactionStatusRequest) async throws -> GatewayAPI.TransactionStatusResponse
 	public typealias TransactionPreview = @Sendable (GatewayAPI.TransactionPreviewRequest) async throws -> GatewayAPI.TransactionPreviewResponse
-	public typealias TransactionHistory = @Sendable (GatewayAPI.StreamTransactionsRequest) async throws -> GatewayAPI.StreamTransactionsResponse
+	public typealias StreamTransactions = @Sendable (GatewayAPI.StreamTransactionsRequest) async throws -> GatewayAPI.StreamTransactionsResponse
 }
 
+extension GatewayAPIClient.TransactionHistoryItem {}
+
 extension GatewayAPIClient {
+	public struct TransactionHistoryItem: Sendable, Hashable {
+		let time: Date
+		let message: String?
+		let actions: [Action]
+		let manifestType: ManifestType
+
+		enum Action {
+			case deposit
+			case withdrawal
+			case settings
+		}
+
+		enum ManifestType {
+			case transfer
+			case contribute
+			case claim
+			case depositSettings
+			case other
+		}
+	}
+
+	@Sendable
+	public func transactionHistory(account: AccountAddress) async throws -> [TransactionHistoryItem] {
+		let request = GatewayAPI.StreamTransactionsRequest(
+			// atLedgerState: GatewayAPI.LedgerStateSelector?,
+			// fromLedgerState: GatewayAPI.LedgerStateSelector?,
+			// cursor: String?,
+			limitPerPage: 100,
+			// kindFilter: GatewayAPI.StreamTransactionsRequest.KindFilter?,
+			manifestAccountsWithdrawnFromFilter: [account.address],
+			manifestAccountsDepositedIntoFilter: [account.address]
+			// manifestResourcesFilter: [String]?,
+			// affectedGlobalEntitiesFilter: [String]?,
+			// eventsFilter: [GatewayAPI.StreamTransactionsRequestEventFilterItem]?,
+			// accountsWithManifestOwnerMethodCalls: [String]?,
+			// accountsWithoutManifestOwnerMethodCalls: [String]?,
+			// manifestClassFilter: <<error type>>,
+			// order: GatewayAPI.StreamTransactionsRequest.Order?,
+			// optIns: GatewayAPI.TransactionDetailsOptIns(affectedGlobalEntities: true, manifestInstructions: true, balanceChanges: true)
+		)
+
+		let response = try await streamTransactions(request)
+		return response.items.compactMap { _ in
+			nil
+		}
+	}
+
+	/*
+	 public private(set) var stateVersion: Int64
+	 public private(set) var epoch: Int64
+	 public private(set) var round: Int64
+	 public private(set) var roundTimestamp: String
+	 public private(set) var transactionStatus: TransactionStatus
+	 /** Bech32m-encoded hash. */
+	 public private(set) var payloadHash: String?
+	 /** Bech32m-encoded hash. */
+	 public private(set) var intentHash: String?
+	 /** String-encoded decimal representing the amount of a related fungible resource. */
+	 public private(set) var feePaid: String?
+	 public private(set) var affectedGlobalEntities: [String]?
+	 public private(set) var confirmedAt: Date?
+	 public private(set) var errorMessage: String?
+	 /** Hex-encoded binary blob. */
+	 public private(set) var rawHex: String?
+	 public private(set) var receipt: TransactionReceipt?
+	 /** The optional transaction message. This type is defined in the Core API as `TransactionMessage`. See the Core API documentation for more details.  */
+	 public private(set) var message: AnyCodable?
+	 public private(set) var balanceChanges: TransactionBalanceChanges?
+	 */
+
 	@Sendable
 	public func getSingleEntityDetails(
 		_ address: String,
