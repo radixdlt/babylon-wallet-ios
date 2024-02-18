@@ -65,9 +65,6 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 			Task {
 				try await radixConnectionClient.handleDappDeepLink(cp)
 			}
-//			Task {
-//				try await radixConnectionClient.addP2PWithPassword(ConnectionPassword(.init(hex: connectionPassword)))
-//			}
 		}
 	}
 }

@@ -1,3 +1,4 @@
+import AsyncAlgorithms
 import ComposableArchitecture // actually CasePaths... but CI fails if we do `import CasePaths` 🤷‍♂️
 import Network
 
@@ -80,7 +81,14 @@ extension RadixConnectClient {
 			addP2PWithPassword: { password in
 				try await rtcClients.connect(password, waitsForConnectionToBeEstablished: true)
 			},
-			receiveMessages: { await raMS.incomingMessages() },
+			receiveMessages: {
+				await AsyncAlgorithms.merge(
+					rtcClients.incomingMessages(),
+					raMS.incomingMessages()
+				)
+				.share()
+				.eraseToAnyAsyncSequence()
+			},
 			sendResponse: { response, route in
 				switch route {
 				case let .deepLink(password):
