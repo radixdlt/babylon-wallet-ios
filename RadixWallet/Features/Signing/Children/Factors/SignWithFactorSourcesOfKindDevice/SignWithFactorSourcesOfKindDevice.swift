@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindReducer {
 	public typealias Factor = DeviceFactorSource
 	public typealias State = SignWithFactorSourcesOfKindState<Factor>

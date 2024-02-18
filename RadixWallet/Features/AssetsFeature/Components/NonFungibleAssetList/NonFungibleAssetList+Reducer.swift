@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 public struct NonFungibleAssetList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var rows: IdentifiedArrayOf<NonFungibleAssetList.Row.State>
@@ -63,17 +64,6 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 			return .none
 
 		case .asset:
-			return .none
-		}
-	}
-
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		switch presentedAction {
-		case .details(.delegate(.dismiss)):
-			state.destination = nil
-			return .none
-
-		default:
 			return .none
 		}
 	}

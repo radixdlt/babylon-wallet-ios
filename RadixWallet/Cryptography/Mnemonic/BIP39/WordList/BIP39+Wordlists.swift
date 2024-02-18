@@ -1,4 +1,5 @@
 import CryptoKit
+
 extension BIP39 {
 	fileprivate static var cachedWordLists: [Language: WordList] = [:]
 

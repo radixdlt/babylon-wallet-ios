@@ -1,10 +1,11 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension FungibleAssetList.Section.Row.State {
 	var viewState: FungibleAssetList.Section.Row.ViewState {
 		.init(
-			thumbnail: isXRD ? .xrd : .known(token.metadata.iconURL),
-			symbol: token.metadata.symbol ?? token.metadata.name ?? "",
+			thumbnail: isXRD ? .xrd : .other(token.metadata.iconURL),
+			title: token.metadata.title,
 			tokenAmount: token.amount.formatted(),
 			isSelected: isSelected
 		)
@@ -14,8 +15,8 @@ extension FungibleAssetList.Section.Row.State {
 // MARK: - FungibleTokenList.Row.View
 extension FungibleAssetList.Section.Row {
 	public struct ViewState: Equatable {
-		let thumbnail: TokenThumbnail.Content
-		let symbol: String
+		let thumbnail: Thumbnail.TokenContent
+		let title: String?
 		let tokenAmount: String
 		let isSelected: Bool?
 	}
@@ -32,11 +33,13 @@ extension FungibleAssetList.Section.Row {
 			WithViewStore(store, observe: \.viewState, send: FeatureAction.view) { viewStore in
 				HStack(alignment: .center) {
 					HStack(spacing: .small1) {
-						TokenThumbnail(viewStore.thumbnail, size: .small)
+						Thumbnail(token: viewStore.thumbnail, size: .small)
 
-						Text(viewStore.symbol)
-							.foregroundColor(.app.gray1)
-							.textStyle(.body2HighImportance)
+						if let title = viewStore.title {
+							Text(title)
+								.foregroundColor(.app.gray1)
+								.textStyle(.body2HighImportance)
+						}
 					}
 
 					Spacer()

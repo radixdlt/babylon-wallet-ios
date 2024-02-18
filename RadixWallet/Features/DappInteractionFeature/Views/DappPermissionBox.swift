@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 struct DappPermissionBox<Header: View, Content: View>: View {
 	let header: Header
 	let content: Content

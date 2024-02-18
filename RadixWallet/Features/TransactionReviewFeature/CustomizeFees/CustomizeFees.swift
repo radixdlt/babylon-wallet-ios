@@ -9,7 +9,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 			case advanced(AdvancedFeesCustomization.State)
 		}
 
-		let manifest: TransactionManifest
+		let manifestSummary: ManifestSummary
 		let signingPurpose: SigningPurpose
 		var reviewedTransaction: ReviewedTransaction
 		var modeState: CustomizationModeState
@@ -31,11 +31,11 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 
 		init(
 			reviewedTransaction: ReviewedTransaction,
-			manifest: TransactionManifest,
+			manifestSummary: ManifestSummary,
 			signingPurpose: SigningPurpose
 		) {
 			self.reviewedTransaction = reviewedTransaction
-			self.manifest = manifest
+			self.manifestSummary = manifestSummary
 			self.signingPurpose = signingPurpose
 			self.modeState = reviewedTransaction.transactionFee.customizationModeState
 		}
@@ -144,16 +144,22 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 			let signingPurpose = state.signingPurpose
 
 			@Sendable
-			func replaceFeePayer(_ feePayer: FeePayerCandidate, _ reviewedTransaction: ReviewedTransaction, manifest: TransactionManifest) -> Effect<Action> {
+			func replaceFeePayer(
+				_ feePayer: FeePayerCandidate,
+				_ reviewedTransaction: ReviewedTransaction,
+				manifestSummary: ManifestSummary
+			) -> Effect<Action> {
 				.run { send in
 					var reviewedTransaction = reviewedTransaction
-					var newSigners = OrderedSet(reviewedTransaction.transactionSigners.intentSignerEntitiesOrEmpty() + [.account(feePayer.account)])
+					var newSigners = OrderedSet(reviewedTransaction.transactionSigners.intentSignerEntitiesOrEmpty())
 
 					/// Remove the previous Fee Payer Signature if it is not required
-					if let previousFeePayer, !manifest.accountsRequiringAuth().contains(where: { $0.addressString() == previousFeePayer.account.address.address }) {
+					if let previousFeePayer, !manifestSummary.accountsRequiringAuth.contains(where: { $0.addressString() == previousFeePayer.account.address.address }) {
 						// removed, need to recalculate signing factors
 						newSigners.remove(.account(previousFeePayer.account))
 					}
+
+					newSigners.append(.account(feePayer.account))
 
 					// Update transaction signers
 					reviewedTransaction.transactionSigners = .init(
@@ -169,9 +175,15 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 					@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 					do {
+						guard let signers = NonEmpty(rawValue: Set(newSigners)) else {
+							assertionFailure("NewSigners can not be empty here, barring programmer errors")
+							struct InternalError: Error {}
+							throw InternalError()
+						}
+
 						let factors = try await factorSourcesClient.getSigningFactors(.init(
-							networkID: reviewedTransaction.networkId,
-							signers: .init(rawValue: Set(newSigners))!,
+							networkID: reviewedTransaction.networkID,
+							signers: signers,
 							signingPurpose: signingPurpose
 						))
 
@@ -190,7 +202,11 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 				}
 			}
 
-			return replaceFeePayer(selection, state.reviewedTransaction, manifest: state.manifest)
+			if selection != previousFeePayer {
+				return replaceFeePayer(selection, state.reviewedTransaction, manifestSummary: state.manifestSummary)
+			} else {
+				return .none
+			}
 
 		default:
 			return .none

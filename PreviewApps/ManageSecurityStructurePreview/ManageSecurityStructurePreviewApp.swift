@@ -40,6 +40,7 @@ struct ManageSecurityStructurePreviewApp: SwiftUI.App {
 }
 
 import FactorSourcesClient
+
 extension FactorSourcesClient {
 	static let previewApp: Self =
 		update(noop) {
@@ -56,6 +57,7 @@ extension FactorSourcesClient {
 }
 
 import AppPreferencesClient
+
 extension AppPreferencesClient {
 	static let previewApp: Self = update(noop) {
 		$0.updatePreferences = { _ in }

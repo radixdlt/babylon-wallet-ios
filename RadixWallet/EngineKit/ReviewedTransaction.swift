@@ -1,191 +1,33 @@
 import EngineToolkit
 
-// MARK: - TransactionKind
-public enum TransactionKind: Hashable, Sendable {
-	public enum ConformingTransaction: Hashable, Sendable {
-		case general(TransactionType.GeneralTransaction)
-		case accountDepositSettings(TransactionType.AccountDepositSettings)
-
-		public var general: TransactionType.GeneralTransaction? {
-			guard case let .general(wrapped) = self else {
-				return nil
-			}
-			return wrapped
-		}
-	}
-
-	case conforming(ConformingTransaction)
-	case nonConforming
-}
-
-extension [TransactionType] {
-	public func transactionKind() throws -> TransactionKind {
-		// Empty array means non conforming transaction. ET was not able to map it to any type
-		guard !isEmpty else {
-			return .nonConforming
-		}
-
-		// First try to get the general transaction if present
-		return try firstNonNil(\.generalTransaction).map { .conforming(.general($0)) } ?? first!.transactionKind()
+extension ExecutionSummary {
+	/// Use the first supported manifest class. Returns `nil` for non-conforming transactions
+	public var detailedManifestClass: DetailedManifestClass? {
+		detailedClassification.first(where: \.isSupported)
 	}
 }
 
-/// This is kinda temporary conversion of all transaction types into GeneralTransaction, until(not sure if needed) we will want to
-/// have specific UI for different transaction types
-extension TransactionType {
-	public var generalTransaction: GeneralTransaction? {
-		if case let .generalTransaction(accountProofs, accountWithdraws, accountDeposits, addressesInManifest, metadataOfNewlyCreatedEntities, dataOfNewlyMintedNonFungibles, addressesOfNewlyCreatedEntities) = self {
-			return .init(
-				accountProofs: accountProofs,
-				accountWithdraws: accountWithdraws,
-				accountDeposits: accountDeposits,
-				addressesInManifest: addressesInManifest,
-				metadataOfNewlyCreatedEntities: metadataOfNewlyCreatedEntities,
-				dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles,
-				addressesOfNewlyCreatedEntities: addressesOfNewlyCreatedEntities
-			)
-		}
-
-		return nil
-	}
-
-	public struct GeneralTransaction: Hashable, Sendable {
-		public let accountProofs: [EngineToolkit.Address]
-		public let accountWithdraws: [String: [ResourceTracker]]
-		public let accountDeposits: [String: [ResourceTracker]]
-		public let addressesInManifest: [EngineToolkit.EntityType: [EngineToolkit.Address]]
-		public let metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]]
-		public let dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]]
-		public let addressesOfNewlyCreatedEntities: [EngineToolkit.Address]
-
-		public var allAddress: [EngineToolkit.Address] {
-			addressesInManifest.flatMap(\.value)
-		}
-	}
-
-	public struct AccountDepositSettings: Hashable, Sendable {
-		public let resourcePreferenceChanges: [AccountAddress: [ResourceAddress: ResourcePreferenceAction]]
-		public let defaultDepositRuleChanges: [AccountAddress: AccountDefaultDepositRule]
-		public let authorizedDepositorsChanges: [AccountAddress: AuthorizedDepositorsChanges]
-	}
-
-	public func transactionKind() throws -> TransactionKind {
+private extension DetailedManifestClass {
+	var isSupported: Bool {
 		switch self {
-		case let .simpleTransfer(from, to, transferred):
-			let addressesInManifest = [
-				from,
-				to,
-				transferred.resourceAddress,
-			].reduce(into: [EngineToolkit.EntityType: [EngineToolkit.Address]]()) { partialResult, address in
-				partialResult[address.entityType(), default: []].append(address)
-			}
-
-			return .conforming(.general(
-				.init(
-					accountProofs: [],
-					accountWithdraws: [from.addressString(): [transferred.toResourceTracker]],
-					accountDeposits: [to.addressString(): [transferred.toResourceTracker]],
-					addressesInManifest: addressesInManifest,
-					metadataOfNewlyCreatedEntities: [:],
-					dataOfNewlyMintedNonFungibles: [:],
-					addressesOfNewlyCreatedEntities: []
-				)
-			))
-
-		case let .transfer(from, transfers):
-			var withdraws: [String: ResourceTracker] = [:]
-			var deposits: [String: [ResourceTracker]] = [:]
-			var allAddresses: Set<EngineToolkit.Address> = [from]
-
-			for (address, resouceTransfers) in transfers {
-				let accountAddress = try EngineToolkit.Address(address: address)
-				allAddresses.insert(accountAddress)
-
-				for (rawResourceAddress, resource) in resouceTransfers {
-					let resourceAddress = try EngineToolkit.Address(address: rawResourceAddress)
-					allAddresses.insert(resourceAddress)
-
-					let existingResource = withdraws[rawResourceAddress]
-					var total: ResourceTracker
-					let transfered: ResourceTracker
-
-					switch resource {
-					case let .amount(amount):
-						transfered = .fungible(
-							resourceAddress: resourceAddress,
-							amount: .guaranteed(value: amount)
-						)
-						total = transfered
-						if let totalAmount = existingResource?.decimalSource.amount {
-							let sum = try totalAmount.add(other: amount)
-							total = .fungible(
-								resourceAddress: resourceAddress,
-								amount: .guaranteed(value: sum)
-							)
-						}
-					case let .ids(ids):
-						transfered = try! .nonFungible(
-							resourceAddress: resourceAddress,
-							amount: .guaranteed(value: .init(value: "\(ids.count)")),
-							ids: .guaranteed(value: ids)
-						)
-						total = transfered
-						if let allIds = existingResource?.ids {
-							let sum = allIds + ids
-							total = try! .nonFungible(
-								resourceAddress: resourceAddress,
-								amount: .guaranteed(value: .init(value: "\(sum.count)")),
-								ids: .guaranteed(value: sum)
-							)
-						}
-					}
-
-					withdraws[rawResourceAddress] = total
-					deposits[address, default: []].append(transfered)
-				}
-			}
-
-			let addressesInManifest = allAddresses.reduce(into: [EngineToolkit.EntityType: [EngineToolkit.Address]]()) { partialResult, address in
-				partialResult[address.entityType(), default: []].append(address)
-			}
-
-			return .conforming(.general(
-				.init(
-					accountProofs: [],
-					accountWithdraws: [from.addressString(): Array(withdraws.values)],
-					accountDeposits: deposits,
-					addressesInManifest: addressesInManifest,
-					metadataOfNewlyCreatedEntities: [:],
-					dataOfNewlyMintedNonFungibles: [:],
-					addressesOfNewlyCreatedEntities: []
-				)
-			))
-		case let .generalTransaction(accountProofs, accountWithdraws, accountDeposits, addressesInManifest, metadataOfNewlyCreatedEntities, dataOfNewlyMintedNonFungibles, addressesOfNewlyCreatedEntities):
-			return .conforming(.general(
-				.init(
-					accountProofs: accountProofs,
-					accountWithdraws: accountWithdraws,
-					accountDeposits: accountDeposits,
-					addressesInManifest: addressesInManifest,
-					metadataOfNewlyCreatedEntities: metadataOfNewlyCreatedEntities,
-					dataOfNewlyMintedNonFungibles: dataOfNewlyMintedNonFungibles,
-					addressesOfNewlyCreatedEntities: addressesOfNewlyCreatedEntities
-				)
-			))
-		case let .accountDepositSettings(resourcePreferenceChanges, defaultDepositRuleChanges, authorizedDepositorsChanges):
-			return try .conforming(.accountDepositSettings(
-				.init(
-					resourcePreferenceChanges: resourcePreferenceChanges.mapKeyValues(
-						AccountAddress.init(validatingAddress:),
-						fValue: { try $0.mapKeys(ResourceAddress.init(validatingAddress:)) }
-					),
-					defaultDepositRuleChanges: defaultDepositRuleChanges.mapKeys(AccountAddress.init(validatingAddress:)),
-					authorizedDepositorsChanges: authorizedDepositorsChanges.mapKeys(AccountAddress.init(validatingAddress:))
-				)
-			))
-		case .stakeTransaction, .unstakeTransaction, .claimStakeTransaction:
-			return .nonConforming
+		case .general, .transfer, .poolContribution, .poolRedemption, .validatorStake, .validatorUnstake, .accountDepositSettingsUpdate, .validatorClaim:
+			true
 		}
+	}
+}
+
+/// This is a temporary conversion of all transaction types into GeneralTransaction, until we have UI support for all transaction kinds
+extension ExecutionSummary {
+	public var metadataOfNewlyCreatedEntities: [String: [String: MetadataValue?]] {
+		newEntities.metadata
+	}
+
+	public var dataOfNewlyMintedNonFungibles: [String: [NonFungibleLocalId: Data]] {
+		[:] // TODO: Is this never populated for .general?
+	}
+
+	public var addressesOfNewlyCreatedEntities: [EngineToolkit.Address] {
+		newEntities.componentAddresses + newEntities.packageAddresses + newEntities.resourceAddresses
 	}
 }
 
@@ -229,31 +71,22 @@ extension ResourceSpecifier {
 		}
 	}
 
-	public var toResourceTracker: ResourceTracker {
+	public var toResourceTracker: ResourceIndicator {
 		switch self {
 		case let .amount(resourceAddress, amount):
-			.fungible(resourceAddress: resourceAddress, amount: .guaranteed(value: amount))
+			.fungible(resourceAddress: resourceAddress, indicator: .guaranteed(amount: amount))
 		case let .ids(resourceAddress, ids):
-			try! .nonFungible(resourceAddress: resourceAddress, amount: .guaranteed(value: .init(value: "\(ids.count)")), ids: .guaranteed(value: ids))
+			.nonFungible(resourceAddress: resourceAddress, indicator: .byIds(ids: ids))
 		}
 	}
 }
 
-extension ResourceTracker {
-	public var decimalSource: DecimalSource {
-		switch self {
-		case let .fungible(_, amount):
-			amount
-		case let .nonFungible(_, amount, _):
-			amount
-		}
-	}
-
+extension ResourceIndicator {
 	public var resourceAddress: EngineToolkit.Address {
 		switch self {
 		case let .fungible(address, _):
 			address
-		case let .nonFungible(address, _, _):
+		case let .nonFungible(address, _):
 			address
 		}
 	}
@@ -262,19 +95,34 @@ extension ResourceTracker {
 		switch self {
 		case .fungible:
 			nil
-		case let .nonFungible(_, _, source):
-			source.ids
+		case let .nonFungible(_, .byAll(_, ids)):
+			ids.value
+		case let .nonFungible(_, .byIds(ids)):
+			ids
+		case let .nonFungible(_, .byAmount(_, ids)):
+			ids.value
 		}
 	}
 }
 
-extension NonFungibleLocalIdVecSource {
+extension FungibleResourceIndicator {
+	public var amount: RETDecimal {
+		switch self {
+		case let .guaranteed(amount):
+			amount
+		case let .predicted(predictedAmount):
+			predictedAmount.value
+		}
+	}
+}
+
+extension NonFungibleResourceIndicator {
 	public var ids: [NonFungibleLocalId] {
 		switch self {
-		case let .guaranteed(value):
-			value
-		case let .predicted(_, value):
-			value
+		case let .byIds(ids):
+			ids
+		case let .byAll(_, ids), let .byAmount(_, ids):
+			ids.value
 		}
 	}
 }
@@ -299,16 +147,5 @@ extension MetadataValue {
 			return URL(string: value)
 		}
 		return nil
-	}
-}
-
-extension DecimalSource {
-	public var amount: RETDecimal {
-		switch self {
-		case let .guaranteed(value):
-			value
-		case let .predicted(_, value):
-			value
-		}
 	}
 }

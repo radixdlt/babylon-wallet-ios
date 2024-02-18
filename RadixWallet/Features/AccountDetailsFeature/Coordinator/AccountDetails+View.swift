@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension AccountDetails.State {
 	var viewState: AccountDetails.ViewState {
 		.init(
@@ -50,7 +51,7 @@ extension AccountDetails {
 						transferButton()
 					}
 
-					AssetsView.View(store: store.scope(state: \.assets, action: { .child(.assets($0)) }))
+					AssetsView.View(store: store.scope(state: \.assets, action: \.child.assets))
 						.roundedCorners(.top, radius: .medium1)
 						.ignoresSafeArea(edges: .bottom)
 				}
@@ -175,6 +176,7 @@ private extension View {
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
+
 struct AccountDetails_Preview: PreviewProvider {
 	static var previews: some View {
 		NavigationStack {

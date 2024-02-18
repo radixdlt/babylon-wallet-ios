@@ -294,10 +294,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case .nonFungibleDetails(.delegate(.dismiss)):
-			state.destination = nil
-			return .none
-
 		case .confirmDisconnectAlert(.confirmTapped):
 			assert(state.authorizedDapp != nil, "Can only disconnect a dApp that has been authorized")
 			guard let networkID = state.authorizedDapp?.networkID else { return .none }
@@ -339,9 +335,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 		let associatedDapps = loadedDApps.filter { dApp in
 			do {
 				try dApp.metadata.validate(dAppDefinitionAddress: dApp.address)
-				guard dApp.metadata.name != nil else {
-					throw OnLedgerEntity.Metadata.MetadataError.missingName
-				}
 				return true
 			} catch {
 				loggerGlobal.warning("Invalida dApp \(error)")

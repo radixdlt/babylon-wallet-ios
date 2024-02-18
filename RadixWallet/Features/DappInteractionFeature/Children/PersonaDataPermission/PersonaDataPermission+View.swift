@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension PersonaDataPermission.State {
 	var viewState: PersonaDataPermission.ViewState {
 		.init(

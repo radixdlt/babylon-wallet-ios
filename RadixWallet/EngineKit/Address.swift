@@ -1,4 +1,5 @@
 import EngineToolkit
+
 public typealias Address = SpecificAddress<GeneralEntityType>
 
 // public typealias EntityAddress = SpecificAddress<EntityEntityType>
@@ -206,6 +207,10 @@ extension AccountAddress {
 extension EngineToolkit.Address {
 	public func asSpecific<T>() throws -> SpecificAddress<T> {
 		try .init(validatingAddress: addressString())
+	}
+
+	public func asGeneral() throws -> Address {
+		try asSpecific()
 	}
 }
 

@@ -95,6 +95,7 @@ public struct WithControlRequirements<Control: View>: View {
 
 #if DEBUG
 import struct SwiftUINavigation.WithState
+
 struct WithControlRequirements_Previews: PreviewProvider {
 	static var previews: some View {
 		WithState(initialValue: "") { $name in

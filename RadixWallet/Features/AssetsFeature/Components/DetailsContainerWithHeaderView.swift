@@ -3,17 +3,17 @@ import SwiftUI
 
 // MARK: - DetailsContainerWithHeaderViewState
 struct DetailsContainerWithHeaderViewState: Equatable {
-	let title: Loadable<String>
+	let title: Loadable<String?>
 	let amount: String?
 	let symbol: Loadable<String?>
 }
 
 extension DetailsContainerWithHeaderViewState {
-	init(resource: OnLedgerEntity.OwnedFungibleResource) {
+	init(_ resourceWithAmount: OnLedgerEntitiesClient.ResourceWithVaultAmount) {
 		self.init(
-			title: .success(resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName),
-			amount: resource.amount.formatted(),
-			symbol: .success(resource.metadata.symbol)
+			title: .success(resourceWithAmount.resource.metadata.name),
+			amount: resourceWithAmount.amount.formatted(),
+			symbol: .success(resourceWithAmount.resource.metadata.symbol)
 		)
 	}
 }
@@ -57,11 +57,15 @@ struct DetailsContainerWithHeaderView<ThumbnailView: View, DetailsView: View>: V
 			thumbnailView
 
 			if let amount = viewState.amount {
-				Text(amount)
+				let amountView = Text(amount)
 					.font(.app.sheetTitle)
 					.kerning(-0.5)
-					+ Text((viewState.symbol.wrappedValue.flatMap(identity)).map { " " + $0 } ?? "")
-					.font(.app.sectionHeader)
+
+				if let wrappedValue = viewState.symbol.wrappedValue, let symbol = wrappedValue {
+					amountView + Text(" " + symbol).font(.app.sectionHeader)
+				} else {
+					amountView
+				}
 			}
 		}
 		.padding(.vertical, .small2)
@@ -70,12 +74,12 @@ struct DetailsContainerWithHeaderView<ThumbnailView: View, DetailsView: View>: V
 
 // MARK: - DetailsContainer
 struct DetailsContainer<Contents: View>: View {
-	let title: Loadable<String>
+	let title: Loadable<String?>
 	let closeButtonAction: () -> Void
 	let contents: Contents
 
 	init(
-		title: Loadable<String>,
+		title: Loadable<String?>,
 		closeButtonAction: @escaping () -> Void,
 		@ViewBuilder contents: () -> Contents
 	) {
@@ -89,7 +93,7 @@ struct DetailsContainer<Contents: View>: View {
 			ScrollView {
 				contents
 			}
-			.navigationBarTitle(title.wrappedValue ?? "")
+			.navigationBarTitle(titleString)
 			.navigationBarTitleColor(.app.gray1)
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarInlineTitleFont(.app.secondaryHeader)
@@ -101,5 +105,9 @@ struct DetailsContainer<Contents: View>: View {
 		}
 		.tint(.app.gray1)
 		.foregroundColor(.app.gray1)
+	}
+
+	private var titleString: String {
+		title.wrappedValue?.flatMap { $0 } ?? ""
 	}
 }

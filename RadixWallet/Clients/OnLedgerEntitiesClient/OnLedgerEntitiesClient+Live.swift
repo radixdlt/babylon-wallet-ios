@@ -195,8 +195,8 @@ extension OnLedgerEntitiesClient {
 
 		func cacheIfSpecified(_ freshEntities: [OnLedgerEntity]) {
 			guard cachingStrategy.write == .toCache else { return }
-			freshEntities.forEach {
-				cacheClient.save($0, .onLedgerEntity($0.cachingIdentifier))
+			for freshEntity in freshEntities {
+				cacheClient.save(freshEntity, .onLedgerEntity(freshEntity.cachingIdentifier))
 			}
 		}
 

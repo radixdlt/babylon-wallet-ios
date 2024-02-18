@@ -56,6 +56,23 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable {
 		}
 		return genericComponent
 	}
+
+	public var metadata: Metadata? {
+		switch self {
+		case let .resource(resource):
+			resource.metadata
+		case let .account(account):
+			account.metadata
+		case let .resourcePool(resourcePool):
+			resourcePool.metadata
+		case let .validator(validator):
+			validator.metadata
+		case .nonFungibleToken, .accountNonFungibleIds:
+			nil
+		case let .genericComponent(genericComponent):
+			genericComponent.metadata
+		}
+	}
 }
 
 // MARK: - OnLedgerEntity.Metadata.ValueAtStateVersion + Sendable
@@ -461,16 +478,15 @@ extension OnLedgerEntity {
 
 extension OnLedgerEntity.Account {
 	public struct PoolUnitResources: Sendable, Hashable, Codable {
-		public let radixNetworkStakes: [RadixNetworkStake]
+		public let radixNetworkStakes: IdentifiedArrayOf<RadixNetworkStake>
 		public let poolUnits: [PoolUnit]
-
-		public init(radixNetworkStakes: [RadixNetworkStake], poolUnits: [PoolUnit]) {
-			self.radixNetworkStakes = radixNetworkStakes
-			self.poolUnits = poolUnits
-		}
 	}
 
-	public struct RadixNetworkStake: Sendable, Hashable, Codable {
+	public struct RadixNetworkStake: Sendable, Hashable, Codable, Identifiable {
+		public var id: ValidatorAddress {
+			validatorAddress
+		}
+
 		public let validatorAddress: ValidatorAddress
 		public let stakeUnitResource: OnLedgerEntity.OwnedFungibleResource?
 		public let stakeClaimResource: OnLedgerEntity.OwnedNonFungibleResource?
@@ -569,5 +585,38 @@ extension OnLedgerEntity.Account {
 
 	public func hasResource(_ resourceAddress: ResourceAddress) -> Bool {
 		allResourceAddresses.contains(resourceAddress)
+	}
+}
+
+extension OnLedgerEntity.Resource {
+	func poolRedemptionValue(
+		for amount: RETDecimal,
+		poolUnitResource: OnLedgerEntitiesClient.ResourceWithVaultAmount
+	) -> RETDecimal? {
+		guard let poolUnitTotalSupply = poolUnitResource.resource.totalSupply else {
+			loggerGlobal.error("Missing total supply for \(poolUnitResource.resource.resourceAddress.address)")
+			return nil
+		}
+		guard poolUnitTotalSupply > 0 else {
+			loggerGlobal.error("Total supply is 0 for \(poolUnitResource.resource.resourceAddress.address)")
+			return nil
+		}
+		let redemptionValue = poolUnitResource.amount * (amount / poolUnitTotalSupply)
+		let decimalPlaces = divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
+		let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
+
+		return roundedRedemptionValue
+	}
+}
+
+extension OnLedgerEntity.Resource {
+	public var fungibleResourceName: String? {
+		metadata.fungibleResourceName
+	}
+}
+
+extension OnLedgerEntity.Metadata {
+	public var fungibleResourceName: String? {
+		name ?? symbol
 	}
 }

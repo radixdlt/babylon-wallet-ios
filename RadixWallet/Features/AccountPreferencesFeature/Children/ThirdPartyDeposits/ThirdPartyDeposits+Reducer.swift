@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 public typealias ThirdPartyDeposits = Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits
 
 // MARK: - ManageThirdPartyDeposits
@@ -130,15 +131,8 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		.run { send in
 			do {
 				/// Wait for user to complete the interaction with Transaction Review
-				let result = await dappInteractionClient.addWalletInteraction(
-					.transaction(
-						.init(
-							send: .init(
-								version: .default,
-								transactionManifest: manifest,
-								message: nil
-							))
-					),
+				let result = try await dappInteractionClient.addWalletInteraction(
+					.transaction(.init(send: .init(transactionManifest: manifest))),
 					.accountDepositSettings
 				)
 

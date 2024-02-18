@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 public struct NewAccountCompletion: Sendable, FeatureReducer {
 	public struct State: Sendable & Hashable {
 		public let account: Profile.Network.Account

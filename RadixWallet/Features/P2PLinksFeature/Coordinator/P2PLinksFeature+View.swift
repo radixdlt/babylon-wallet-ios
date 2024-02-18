@@ -107,6 +107,7 @@ private extension View {
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
+
 struct P2PLinksFeature_Preview: PreviewProvider {
 	static var previews: some View {
 		NavigationStack {

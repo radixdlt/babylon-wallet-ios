@@ -5,20 +5,28 @@ import XCTest
 @MainActor
 final class CustomizeFeePayerTests: TestCase {
 	func test_from_noFeePayer_toFeePayerSelected() async throws {
-		let manifestStub = try TransactionManifest(instructions: .fromInstructions(instructions: [], networkId: NetworkID.enkinet.rawValue), blobs: [])
+		let manifestStub = try TransactionManifest(
+			instructions: .fromInstructions(
+				instructions: [],
+				networkId: NetworkID.enkinet.rawValue
+			),
+			blobs: []
+		)
 		let notaryKey = Curve25519.Signing.PrivateKey()
 		var transactionStub = ReviewedTransaction(
-			networkId: NetworkID.enkinet,
-			transaction: .nonConforming,
+			transactionManifest: manifestStub,
+			networkID: NetworkID.enkinet,
 			feePayer: .success(nil),
 			transactionFee: .nonContingentLockPaying,
 			transactionSigners: .init(notaryPublicKey: notaryKey.publicKey, intentSigning: .notaryIsSignatory),
-			signingFactors: [:]
+			signingFactors: [:],
+			accountWithdraws: [:],
+			isNonConforming: true
 		)
 
 		let state = CustomizeFees.State(
 			reviewedTransaction: transactionStub,
-			manifest: manifestStub,
+			manifestSummary: manifestStub.summary(networkId: transactionStub.networkID.rawValue),
 			signingPurpose: .signTransaction(.internalManifest(.transfer))
 		)
 		let sut = TestStore(initialState: state) {

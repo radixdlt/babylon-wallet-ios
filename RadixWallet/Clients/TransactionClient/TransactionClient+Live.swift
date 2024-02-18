@@ -49,18 +49,20 @@ extension TransactionClient {
 			func identityFromComponentAddress(_ identityAddress: IdentityAddress) async throws -> Profile.Network.Persona {
 				try await personasClient.getPersona(id: identityAddress)
 			}
-			func mapAccount(_ extract: () -> [EngineToolkit.Address]) throws -> OrderedSet<Profile.Network.Account> {
-				try .init(validating: extract().asSpecific().compactMap(accountFromComponentAddress))
+			func mapAccount(_ addresses: [EngineToolkit.Address]) throws -> OrderedSet<Profile.Network.Account> {
+				try .init(validating: addresses.asSpecific().compactMap(accountFromComponentAddress))
 			}
-			func mapIdentity(_ extract: () -> [EngineToolkit.Address]) async throws -> OrderedSet<Profile.Network.Persona> {
-				try await .init(validating: extract().asSpecific().asyncMap(identityFromComponentAddress))
+			func mapIdentity(_ addresses: [EngineToolkit.Address]) async throws -> OrderedSet<Profile.Network.Persona> {
+				try await .init(validating: addresses.asSpecific().asyncMap(identityFromComponentAddress))
 			}
 
+			let summary = manifest.summary(networkId: networkID.rawValue)
+
 			return try await MyEntitiesInvolvedInTransaction(
-				identitiesRequiringAuth: mapIdentity(manifest.identitiesRequiringAuth),
-				accountsRequiringAuth: mapAccount(manifest.accountsRequiringAuth),
-				accountsWithdrawnFrom: mapAccount(manifest.accountsWithdrawnFrom),
-				accountsDepositedInto: mapAccount(manifest.accountsDepositedInto)
+				identitiesRequiringAuth: mapIdentity(summary.identitiesRequiringAuth),
+				accountsRequiringAuth: mapAccount(summary.accountsRequiringAuth),
+				accountsWithdrawnFrom: mapAccount(summary.accountsWithdrawnFrom),
+				accountsDepositedInto: mapAccount(summary.accountsDepositedInto)
 			)
 		}
 
@@ -158,15 +160,22 @@ extension TransactionClient {
 		let getTransactionReview: GetTransactionReview = { request in
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 
+			let manifestToSign = try request.unvalidatedManifest.transactionManifest(onNetwork: networkID)
+
 			/// Get all transaction signers.
 			let transactionSigners = try await getTransactionSigners(.init(
 				networkID: networkID,
-				manifest: request.manifestToSign,
+				manifest: manifestToSign,
 				ephemeralNotaryPublicKey: request.ephemeralNotaryPublicKey
 			))
 
 			/// Get the transaction preview
-			let transactionPreviewRequest = try await createTransactionPreviewRequest(for: request, networkID: networkID, transactionSigners: transactionSigners)
+			let transactionPreviewRequest = try await createTransactionPreviewRequest(
+				for: request,
+				networkID: networkID,
+				transactionManifest: manifestToSign,
+				transactionSigners: transactionSigners
+			)
 			let transactionPreviewResponse = try await gatewayAPIClient.transactionPreview(transactionPreviewRequest)
 			guard transactionPreviewResponse.receipt.status == .succeeded else {
 				throw TransactionFailure.fromFailedTXReviewResponse(transactionPreviewResponse)
@@ -174,7 +183,7 @@ extension TransactionClient {
 			let receiptBytes = try Data(hex: transactionPreviewResponse.encodedReceipt)
 
 			/// Analyze the manifest
-			let analyzedManifestToReview = try request.manifestToSign.analyzeExecution(transactionReceipt: receiptBytes)
+			let analyzedManifestToReview = try manifestToSign.executionSummary(networkId: networkID.rawValue, encodedReceipt: receiptBytes)
 
 			/// Transactions created outside of the Wallet are not allowed to use reserved instructions
 			if !request.isWalletTransaction, !analyzedManifestToReview.reservedInstructions.isEmpty {
@@ -196,7 +205,7 @@ extension TransactionClient {
 			/// If notary is signatory, count the signature of the notary that will be added.
 			let signaturesCount = transactionSigners.notaryIsSignatory ? 1 : signingFactors.expectedSignatureCount
 			var transactionFee = try TransactionFee(
-				executionAnalysis: analyzedManifestToReview,
+				executionSummary: analyzedManifestToReview,
 				signaturesCount: signaturesCount,
 				notaryIsSignatory: transactionSigners.notaryIsSignatory,
 				includeLockFee: false // Calculate without LockFee cost. It is yet to be determined if LockFe will be added or not
@@ -211,6 +220,7 @@ extension TransactionClient {
 			}
 
 			return TransactionToReview(
+				transactionManifest: manifestToSign,
 				analyzedManifestToReview: analyzedManifestToReview,
 				networkID: networkID,
 				transactionFee: transactionFee,
@@ -223,11 +233,12 @@ extension TransactionClient {
 		func createTransactionPreviewRequest(
 			for request: ManifestReviewRequest,
 			networkID: NetworkID,
+			transactionManifest: TransactionManifest,
 			transactionSigners: TransactionSigners
 		) async throws -> GatewayAPI.TransactionPreviewRequest {
 			let intent = try await buildTransactionIntent(.init(
-				networkID: gatewaysClient.getCurrentNetworkID(),
-				manifest: request.manifestToSign,
+				networkID: networkID,
+				manifest: transactionManifest,
 				message: request.message,
 				nonce: request.nonce,
 				makeTransactionHeaderInput: request.makeTransactionHeaderInput,
@@ -235,7 +246,7 @@ extension TransactionClient {
 			))
 
 			return try .init(
-				rawManifest: request.manifestToSign,
+				rawManifest: transactionManifest,
 				header: intent.header(),
 				transactionSigners: transactionSigners
 			)

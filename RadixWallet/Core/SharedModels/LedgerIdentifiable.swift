@@ -54,6 +54,7 @@ extension LedgerIdentifiable {
 		case account(AccountAddress, isLedgerHWAccount: Bool = false)
 		case package(PackageAddress)
 		case resource(ResourceAddress)
+		case resourcePool(ResourcePoolAddress)
 		case component(ComponentAddress)
 		case validator(ValidatorAddress)
 		// Will be displayd with full ResourceAddress+NFTLocalID
@@ -67,6 +68,8 @@ extension LedgerIdentifiable {
 				packageAddress.address
 			case let .resource(resourceAddress):
 				resourceAddress.address
+			case let .resourcePool(resourcePoolAddress):
+				resourcePoolAddress.address
 			case let .component(componentAddress):
 				componentAddress.address
 			case let .validator(validatorAddress):
@@ -84,6 +87,8 @@ extension LedgerIdentifiable {
 				"package"
 			case .resource:
 				"resource"
+			case .resourcePool:
+				"pool" // TODO: Correct?
 			case .component:
 				"component"
 			case .validator:
@@ -102,6 +107,8 @@ extension LedgerIdentifiable.Address {
 			self = .account(.init(address: address.address, decodedKind: address.decodedKind), isLedgerHWAccount: false)
 		case _ where ResourceEntityType.addressSpace.contains(address.decodedKind):
 			self = .resource(.init(address: address.address, decodedKind: address.decodedKind))
+		case _ where ResourcePoolEntityType.addressSpace.contains(address.decodedKind):
+			self = .resourcePool(.init(address: address.address, decodedKind: address.decodedKind))
 		case _ where PackageEntityType.addressSpace.contains(address.decodedKind):
 			self = .package(.init(address: address.address, decodedKind: address.decodedKind))
 		case _ where ValidatorEntityType.addressSpace.contains(address.decodedKind):

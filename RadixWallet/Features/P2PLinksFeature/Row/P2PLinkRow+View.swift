@@ -54,6 +54,7 @@ extension P2PLinkRow {
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
+
 struct P2PLinkRow_Preview: PreviewProvider {
 	static var previews: some View {
 		P2PLinkRow.View(

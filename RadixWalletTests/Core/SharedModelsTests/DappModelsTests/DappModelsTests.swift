@@ -5,11 +5,7 @@ import XCTest
 
 // MARK: - ToDappResponseTests
 final class ToDappResponseTests: TestCase {
-	let decoder: JSONDecoder = {
-		let decoder = JSONDecoder()
-		decoder.userInfo[.networkIdKey] = Radix.Gateway.default.network.id.rawValue
-		return decoder
-	}()
+	let decoder = JSONDecoder()
 
 	func test_encode_response() throws {
 		let sut = P2P.Dapp.Response.success(.init(

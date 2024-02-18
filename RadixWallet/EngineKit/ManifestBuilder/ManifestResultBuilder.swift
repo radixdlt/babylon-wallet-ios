@@ -14,14 +14,18 @@ extension ManifestBuilder {
 	public static let faucetFreeXrd = flip(faucetFreeXrd)
 	public static let accountTryDepositBatchOrAbort = flip(accountTryDepositBatchOrAbort)
 	public static let accountTryDepositEntireWorktopOrAbort = flip(accountTryDepositEntireWorktopOrAbort)
+	public static let accountDepositEntireWorktop = flip(accountDepositEntireWorktop)
 	public static let withdrawAmount = flip(accountWithdraw)
 	public static let withdrawTokens = flip(accountWithdrawNonFungibles)
 	public static let takeFromWorktop = flip(takeFromWorktop)
+	public static let takeAllFromWorktop = flip(takeAllFromWorktop)
 	public static let accountTryDepositOrAbort = flip(accountTryDepositOrAbort)
 	public static let accountDeposit = flip(accountDeposit)
 	public static let takeNonFungiblesFromWorktop = flip(takeNonFungiblesFromWorktop)
+	public static let accountWithdrawNonFungibles = flip(accountWithdrawNonFungibles)
 	public static let setOwnerKeys = flip(setOwnerKeys)
 	public static let createFungibleResourceManager = flip(createFungibleResourceManager)
+	public static let validatorClaimXrd = flip(validatorClaimXrd)
 
 	@resultBuilder
 	public enum InstructionsChain {
@@ -62,9 +66,9 @@ extension ManifestBuilder {
 	public static func make(@InstructionsChain _ content: () throws -> InstructionsChain.Instructions) throws -> ManifestBuilder {
 		var builder = ManifestBuilder()
 		// Collect all partial instructions to be built
-		try content().forEach {
+		for item in try content() {
 			// Build each instruction by updating the builder
-			builder = try $0(builder)
+			builder = try item(builder)
 		}
 		return builder
 	}
@@ -72,9 +76,9 @@ extension ManifestBuilder {
 	public static func make(@InstructionsChain _ content: () async throws -> InstructionsChain.Instructions) async throws -> ManifestBuilder {
 		var builder = ManifestBuilder()
 		// Collect all partial instructions to be built
-		try await content().forEach {
+		for item in try await content() {
 			// Build each instruction by updating the builder
-			builder = try $0(builder)
+			builder = try item(builder)
 		}
 		return builder
 	}

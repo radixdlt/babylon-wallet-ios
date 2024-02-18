@@ -26,12 +26,6 @@ public enum L10n {
     public enum PoolUnits {
       /// Missing Total supply - could not calculate redemption value
       public static let noTotalSupply = L10n.tr("Localizable", "account_poolUnits_noTotalSupply", fallback: "Missing Total supply - could not calculate redemption value")
-      /// %d Stakes
-      public static func numberOfStakes(_ p1: Int) -> String {
-        return L10n.tr("Localizable", "account_poolUnits_numberOfStakes", p1, fallback: "%d Stakes")
-      }
-      /// STAKE CLAIM NFTS
-      public static let stakeClaimNFTs = L10n.tr("Localizable", "account_poolUnits_stakeClaimNFTs", fallback: "STAKE CLAIM NFTS")
       /// Unknown
       public static let unknownPoolUnitName = L10n.tr("Localizable", "account_poolUnits_unknownPoolUnitName", fallback: "Unknown")
       /// Unknown
@@ -270,8 +264,8 @@ public enum L10n {
       public static let addAnAssetAllow = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_addAnAssetAllow", fallback: "Allow Deposits")
       /// Add Asset
       public static let addAnAssetButton = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_addAnAssetButton", fallback: "Add Asset")
-      /// Deny Deposit
-      public static let addAnAssetDeny = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_addAnAssetDeny", fallback: "Deny Deposit")
+      /// Deny Deposits
+      public static let addAnAssetDeny = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_addAnAssetDeny", fallback: "Deny Deposits")
       /// Resource Address
       public static let addAnAssetInputHint = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_addAnAssetInputHint", fallback: "Resource Address")
       /// Enter the asset’s resource address (starting with “reso”)
@@ -457,6 +451,12 @@ public enum L10n {
     public static let subtitle = L10n.tr("Localizable", "appSettings_subtitle", fallback: "Customize your Radix Wallet")
     /// App Settings
     public static let title = L10n.tr("Localizable", "appSettings_title", fallback: "App Settings")
+    public enum CrashReporting {
+      /// I'm aware Radix Wallet will send crash reports together with device state from the moment of crash.
+      public static let subtitle = L10n.tr("Localizable", "appSettings_crashReporting_subtitle", fallback: "I'm aware Radix Wallet will send crash reports together with device state from the moment of crash.")
+      /// Crash Reporting
+      public static let title = L10n.tr("Localizable", "appSettings_crashReporting_title", fallback: "Crash Reporting")
+    }
     public enum DeveloperMode {
       /// Warning: Disables website validity checks
       public static let subtitle = L10n.tr("Localizable", "appSettings_developerMode_subtitle", fallback: "Warning: Disables website validity checks")
@@ -604,13 +604,9 @@ public enum L10n {
       public static let whatArePoolUnits = L10n.tr("Localizable", "assetDetails_poolUnitDetails_whatArePoolUnits", fallback: "What are Pool units?")
     }
     public enum Staking {
-      /// Ready to Claim %@ XRD
-      public static func readyToClaim(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "assetDetails_staking_readyToClaim", String(describing: p1), fallback: "Ready to Claim %@ XRD")
-      }
-      /// Ready to Claim %@ XRD in approx. less than %d minutes
-      public static func unstaking(_ p1: Any, _ p2: Int) -> String {
-        return L10n.tr("Localizable", "assetDetails_staking_unstaking", String(describing: p1), p2, fallback: "Ready to Claim %@ XRD in approx. less than %d minutes")
+      /// Ready to claim in about %d minutes or less.
+      public static func unstaking(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "assetDetails_staking_unstaking", p1, fallback: "Ready to claim in about %d minutes or less.")
       }
     }
     public enum StakingDetails {
@@ -638,8 +634,8 @@ public enum L10n {
     /// Message
     public static let transactionMessage = L10n.tr("Localizable", "assetTransfer_transactionMessage", fallback: "Message")
     public enum AccountList {
-      /// Add Account
-      public static let addAccountButton = L10n.tr("Localizable", "assetTransfer_accountList_addAccountButton", fallback: "Add Account")
+      /// Add Transfer
+      public static let addAccountButton = L10n.tr("Localizable", "assetTransfer_accountList_addAccountButton", fallback: "Add Transfer")
       /// Account
       public static let externalAccountName = L10n.tr("Localizable", "assetTransfer_accountList_externalAccountName", fallback: "Account")
       /// From
@@ -857,6 +853,10 @@ public enum L10n {
   public enum Common {
     /// Account
     public static let account = L10n.tr("Localizable", "common_account", fallback: "Account")
+    /// Bad HTTP response status code %d
+    public static func badHttpResponseStatusCode(_ p1: Int) -> String {
+      return L10n.tr("Localizable", "common_badHttpResponseStatusCode", p1, fallback: "Bad HTTP response status code %d")
+    }
     /// Cancel
     public static let cancel = L10n.tr("Localizable", "common_cancel", fallback: "Cancel")
     /// Choose
@@ -867,6 +867,8 @@ public enum L10n {
     public static let confirm = L10n.tr("Localizable", "common_confirm", fallback: "Confirm")
     /// Continue
     public static let `continue` = L10n.tr("Localizable", "common_continue", fallback: "Continue")
+    /// Copy
+    public static let copy = L10n.tr("Localizable", "common_copy", fallback: "Copy")
     /// Connected to a test network, not Radix main network.
     public static let developerDisclaimerText = L10n.tr("Localizable", "common_developerDisclaimerText", fallback: "Connected to a test network, not Radix main network.")
     /// Done
@@ -887,8 +889,12 @@ public enum L10n {
     public static let `optional` = L10n.tr("Localizable", "common_optional", fallback: "Optional")
     /// Persona
     public static let persona = L10n.tr("Localizable", "common_persona", fallback: "Persona")
+    /// Pool
+    public static let pool = L10n.tr("Localizable", "common_pool", fallback: "Pool")
     /// Public
     public static let `public` = L10n.tr("Localizable", "common_public", fallback: "Public")
+    /// Gateway access blocked due to exceeding rate limit. Please wait a few minutes to retry.
+    public static let rateLimitReached = L10n.tr("Localizable", "common_rateLimitReached", fallback: "Gateway access blocked due to exceeding rate limit. Please wait a few minutes to retry.")
     /// Remove
     public static let remove = L10n.tr("Localizable", "common_remove", fallback: "Remove")
     /// Retry
@@ -899,8 +905,8 @@ public enum L10n {
     public static let showLess = L10n.tr("Localizable", "common_showLess", fallback: "Show Less")
     /// Show More
     public static let showMore = L10n.tr("Localizable", "common_showMore", fallback: "Show More")
-    /// Something went wrong
-    public static let somethingWentWrong = L10n.tr("Localizable", "common_somethingWentWrong", fallback: "Something went wrong")
+    /// Something Went Wrong
+    public static let somethingWentWrong = L10n.tr("Localizable", "common_somethingWentWrong", fallback: "Something Went Wrong")
     /// Settings
     public static let systemSettings = L10n.tr("Localizable", "common_systemSettings", fallback: "Settings")
     /// Unauthorized
@@ -1478,6 +1484,8 @@ public enum L10n {
       public static let header = L10n.tr("Localizable", "error_transactionFailure_header", fallback: "Failed to build transaction header")
       /// Failed to convert transaction manifest
       public static let manifest = L10n.tr("Localizable", "error_transactionFailure_manifest", fallback: "Failed to convert transaction manifest")
+      /// You don't have access to some accounts or personas required to authorise this transaction
+      public static let missingSigners = L10n.tr("Localizable", "error_transactionFailure_missingSigners", fallback: "You don't have access to some accounts or personas required to authorise this transaction")
       /// Wrong network
       public static let network = L10n.tr("Localizable", "error_transactionFailure_network", fallback: "Wrong network")
       /// No funds to approve transaction
@@ -1553,8 +1561,8 @@ public enum L10n {
     public static let createNewAccount = L10n.tr("Localizable", "homePage_createNewAccount", fallback: "Create a New Account")
     /// Legacy
     public static let legacyAccountHeading = L10n.tr("Localizable", "homePage_legacyAccountHeading", fallback: "Legacy")
-    /// Please write down this Account's seed phrase
-    public static let securityPromptBackup = L10n.tr("Localizable", "homePage_securityPromptBackup", fallback: "Please write down this Account's seed phrase")
+    /// Please write down seed phrase to ensure Account control
+    public static let securityPromptBackup = L10n.tr("Localizable", "homePage_securityPromptBackup", fallback: "Please write down seed phrase to ensure Account control")
     /// Seed phrase required - begin entry
     public static let securityPromptRecover = L10n.tr("Localizable", "homePage_securityPromptRecover", fallback: "Seed phrase required - begin entry")
     /// Welcome. Here are all your Accounts on the Radix Network.
@@ -1722,8 +1730,8 @@ public enum L10n {
       public static let message = L10n.tr("Localizable", "importMnemonic_backedUpAlert_message", fallback: "Are you sure you have securely written down this seed phrase? You will need it to recover access if you lose your phone.")
       /// No, not yet
       public static let noAction = L10n.tr("Localizable", "importMnemonic_backedUpAlert_noAction", fallback: "No, not yet")
-      /// Confirm Backup
-      public static let title = L10n.tr("Localizable", "importMnemonic_backedUpAlert_title", fallback: "Confirm Backup")
+      /// Confirm Seed Phrase Saved
+      public static let title = L10n.tr("Localizable", "importMnemonic_backedUpAlert_title", fallback: "Confirm Seed Phrase Saved")
     }
     public enum OffDevice {
       /// Without revealing location, vague hint on where this mnemonic is backed up, if anywhere.
@@ -1744,8 +1752,8 @@ public enum L10n {
       public static let storyPrimaryHeading = L10n.tr("Localizable", "importMnemonic_offDevice_storyPrimaryHeading", fallback: "Tell a story")
     }
     public enum ShieldPrompt {
-      /// Please write down this Account's seed phrase
-      public static let backupSeedPhrase = L10n.tr("Localizable", "importMnemonic_shieldPrompt_backupSeedPhrase", fallback: "Please write down this Account's seed phrase")
+      /// Please write down seed phrase to ensure Account control
+      public static let backupSeedPhrase = L10n.tr("Localizable", "importMnemonic_shieldPrompt_backupSeedPhrase", fallback: "Please write down seed phrase to ensure Account control")
       /// Enter this Account's seed phrase
       public static let enterSeedPhrase = L10n.tr("Localizable", "importMnemonic_shieldPrompt_enterSeedPhrase", fallback: "Enter this Account's seed phrase")
     }
@@ -2333,8 +2341,8 @@ public enum L10n {
     public static let passcodeNotSetMessage = L10n.tr("Localizable", "splash_passcodeNotSetMessage", fallback: "This app requires your phone to have a passcode set up")
     /// Passcode not set up
     public static let passcodeNotSetTitle = L10n.tr("Localizable", "splash_passcodeNotSetTitle", fallback: "Passcode not set up")
-    /// Tap anywhere to unlock?
-    public static let tapAnywhereToUnlock = L10n.tr("Localizable", "splash_tapAnywhereToUnlock", fallback: "Tap anywhere to unlock?")
+    /// Tap to unlock
+    public static let tapAnywhereToUnlock = L10n.tr("Localizable", "splash_tapAnywhereToUnlock", fallback: "Tap to unlock")
     public enum IncompatibleProfileVersionAlert {
       /// Delete Wallet Data
       public static let delete = L10n.tr("Localizable", "splash_incompatibleProfileVersionAlert_delete", fallback: "Delete Wallet Data")
@@ -2379,6 +2387,8 @@ public enum L10n {
   public enum TransactionReview {
     /// Approve
     public static let approveButtonTitle = L10n.tr("Localizable", "transactionReview_approveButtonTitle", fallback: "Approve")
+    /// Claim from validators
+    public static let claimFromValidatorsHeading = L10n.tr("Localizable", "transactionReview_claimFromValidatorsHeading", fallback: "Claim from validators")
     /// Customize Guarantees
     public static let customizeGuaranteesButtonTitle = L10n.tr("Localizable", "transactionReview_customizeGuaranteesButtonTitle", fallback: "Customize Guarantees")
     /// Depositing To
@@ -2395,6 +2405,14 @@ public enum L10n {
     public static let insufficientBalance = L10n.tr("Localizable", "transactionReview_insufficientBalance", fallback: "Insufficient Balance")
     /// Message
     public static let messageHeading = L10n.tr("Localizable", "transactionReview_messageHeading", fallback: "Message")
+    /// Contributing to pools
+    public static let poolContributionHeading = L10n.tr("Localizable", "transactionReview_poolContributionHeading", fallback: "Contributing to pools")
+    /// Unknown pool
+    public static let poolNameUnknown = L10n.tr("Localizable", "transactionReview_poolNameUnknown", fallback: "Unknown pool")
+    /// Redeeming from pools
+    public static let poolRedemptionHeading = L10n.tr("Localizable", "transactionReview_poolRedemptionHeading", fallback: "Redeeming from pools")
+    /// Pool Units
+    public static let poolUnits = L10n.tr("Localizable", "transactionReview_poolUnits", fallback: "Pool Units")
     /// Presenting
     public static let presentingHeading = L10n.tr("Localizable", "transactionReview_presentingHeading", fallback: "Presenting")
     /// Proposed by %@
@@ -2407,8 +2425,16 @@ public enum L10n {
     public static let sendingToHeading = L10n.tr("Localizable", "transactionReview_sendingToHeading", fallback: "Sending to")
     /// Slide to Sign
     public static let slideToSign = L10n.tr("Localizable", "transactionReview_slideToSign", fallback: "Slide to Sign")
+    /// Staking to Validators
+    public static let stakingToValidatorsHeading = L10n.tr("Localizable", "transactionReview_stakingToValidatorsHeading", fallback: "Staking to Validators")
+    /// Third-party deposit exceptions
+    public static let thirdPartyDepositExceptionsHeading = L10n.tr("Localizable", "transactionReview_thirdPartyDepositExceptionsHeading", fallback: "Third-party deposit exceptions")
+    /// Third-party deposit setting
+    public static let thirdPartyDepositSettingHeading = L10n.tr("Localizable", "transactionReview_thirdPartyDepositSettingHeading", fallback: "Third-party deposit setting")
     /// Review Your Transaction
     public static let title = L10n.tr("Localizable", "transactionReview_title", fallback: "Review Your Transaction")
+    /// To be claimed
+    public static let toBeClaimed = L10n.tr("Localizable", "transactionReview_toBeClaimed", fallback: "To be claimed")
     /// Review Your Transfer
     public static let transferTitle = L10n.tr("Localizable", "transactionReview_transferTitle", fallback: "Review Your Transfer")
     /// Unknown
@@ -2417,12 +2443,20 @@ public enum L10n {
     public static func unknownComponents(_ p1: Int) -> String {
       return L10n.tr("Localizable", "transactionReview_unknownComponents", p1, fallback: "%d Unknown Components")
     }
+    /// %d Pool Components
+    public static func unknownPools(_ p1: Int) -> String {
+      return L10n.tr("Localizable", "transactionReview_unknownPools", p1, fallback: "%d Pool Components")
+    }
     /// Unnamed dApp
     public static let unnamedDapp = L10n.tr("Localizable", "transactionReview_unnamedDapp", fallback: "Unnamed dApp")
+    /// Requesting unstake from validators
+    public static let unstakingFromValidatorsHeading = L10n.tr("Localizable", "transactionReview_unstakingFromValidatorsHeading", fallback: "Requesting unstake from validators")
     /// Using dApps
     public static let usingDappsHeading = L10n.tr("Localizable", "transactionReview_usingDappsHeading", fallback: "Using dApps")
     /// Withdrawing From
     public static let withdrawalsHeading = L10n.tr("Localizable", "transactionReview_withdrawalsHeading", fallback: "Withdrawing From")
+    /// Worth
+    public static let worth = L10n.tr("Localizable", "transactionReview_worth", fallback: "Worth")
     /// %@ XRD
     public static func xrdAmount(_ p1: Any) -> String {
       return L10n.tr("Localizable", "transactionReview_xrdAmount", String(describing: p1), fallback: "%@ XRD")
@@ -2434,8 +2468,8 @@ public enum L10n {
       public static let acceptKnownRule = L10n.tr("Localizable", "transactionReview_accountDepositSettings_acceptKnownRule", fallback: "Allow third parties to deposit **only assets this account has already held**.")
       /// Allow
       public static let assetChangeAllow = L10n.tr("Localizable", "transactionReview_accountDepositSettings_assetChangeAllow", fallback: "Allow")
-      /// Clear Exception
-      public static let assetChangeClear = L10n.tr("Localizable", "transactionReview_accountDepositSettings_assetChangeClear", fallback: "Clear Exception")
+      /// Remove Exception
+      public static let assetChangeClear = L10n.tr("Localizable", "transactionReview_accountDepositSettings_assetChangeClear", fallback: "Remove Exception")
       /// Disallow
       public static let assetChangeDisallow = L10n.tr("Localizable", "transactionReview_accountDepositSettings_assetChangeDisallow", fallback: "Disallow")
       /// **Disallow** all deposits from third parties without your consent.
@@ -2474,6 +2508,12 @@ public enum L10n {
       public static let text = L10n.tr("Localizable", "transactionReview_noMnemonicError_text", fallback: "The required seed phrase is missing. Please return to the account and begin the recovery process.")
       /// Could Not Complete
       public static let title = L10n.tr("Localizable", "transactionReview_noMnemonicError_title", fallback: "Could Not Complete")
+    }
+    public enum NonConformingManifestWarning {
+      /// This is a complex transaction that cannot be summarized - the raw transaction manifest will be shown. Do not submit unless you understand the contents.
+      public static let message = L10n.tr("Localizable", "transactionReview_nonConformingManifestWarning_message", fallback: "This is a complex transaction that cannot be summarized - the raw transaction manifest will be shown. Do not submit unless you understand the contents.")
+      /// Warning
+      public static let title = L10n.tr("Localizable", "transactionReview_nonConformingManifestWarning_title", fallback: "Warning")
     }
     public enum PrepareForSigning {
       /// Preparing transaction for signing
@@ -2530,9 +2570,9 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "transactionStatus_dismissalDisabledDialog_title", fallback: "Dismiss")
     }
     public enum Error {
-      /// Your transaction could not be processed, but could potentially still be processed within the next %@ minutes
+      /// This transaction was rejected and is unlikely to be processed, but could potentially be processed within the next %@ minutes. It is likely that the dApp you are using proposed a transaction that includes an action that is not currently valid.
       public static func text(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "transactionStatus_error_text", String(describing: p1), fallback: "Your transaction could not be processed, but could potentially still be processed within the next %@ minutes")
+        return L10n.tr("Localizable", "transactionStatus_error_text", String(describing: p1), fallback: "This transaction was rejected and is unlikely to be processed, but could potentially be processed within the next %@ minutes. It is likely that the dApp you are using proposed a transaction that includes an action that is not currently valid.")
       }
       /// Transaction Error
       public static let title = L10n.tr("Localizable", "transactionStatus_error_title", fallback: "Transaction Error")
@@ -2546,8 +2586,8 @@ public enum L10n {
     public enum Failure {
       /// Transaction was rejected as invalid by the Radix Network.
       public static let text = L10n.tr("Localizable", "transactionStatus_failure_text", fallback: "Transaction was rejected as invalid by the Radix Network.")
-      /// Something went wrong
-      public static let title = L10n.tr("Localizable", "transactionStatus_failure_title", fallback: "Something went wrong")
+      /// Something Went Wrong
+      public static let title = L10n.tr("Localizable", "transactionStatus_failure_title", fallback: "Something Went Wrong")
     }
     public enum Rejected {
       /// Your transaction was improperly constructed and cannot be processed

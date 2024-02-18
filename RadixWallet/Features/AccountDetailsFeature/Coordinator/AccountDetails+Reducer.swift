@@ -32,6 +32,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case importMnemonicButtonTapped
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case assets(AssetsView.Action)
 	}

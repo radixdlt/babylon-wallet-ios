@@ -6,8 +6,8 @@ extension RadixConnectClient: TestDependencyKey {
 
 	public static let testValue = Self(
 		loadFromProfileAndConnectAll: unimplemented("\(Self.self).loadFromProfileAndConnectAll"),
-		disconnectAndRemoveAll: unimplemented("\(Self.self).disconnectAndRemoveAll"),
 		disconnectAll: unimplemented("\(Self.self).disconnectAll"),
+		connectToP2PLinks: unimplemented("\(Self.self).connectToP2PLinks"),
 		getLocalNetworkAccess: unimplemented("\(Self.self).getLocalNetworkAccess"),
 		getP2PLinks: unimplemented("\(Self.self).getP2PLinks"),
 		getP2PLinksWithConnectionStatusUpdates: unimplemented("\(Self.self).getP2PLinksWithConnectionStatusUpdates"),
@@ -25,8 +25,8 @@ extension RadixConnectClient: TestDependencyKey {
 extension RadixConnectClient {
 	static let noop = Self(
 		loadFromProfileAndConnectAll: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
-		disconnectAndRemoveAll: {},
 		disconnectAll: {},
+		connectToP2PLinks: { _ in },
 		getLocalNetworkAccess: { false },
 		getP2PLinks: { [] },
 		getP2PLinksWithConnectionStatusUpdates: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },

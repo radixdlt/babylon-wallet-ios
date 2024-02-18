@@ -61,6 +61,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
+	@Dependency(\.radixConnectClient) var radixConnectClient
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
@@ -88,6 +89,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			state.profileSelection = .init(snapshot: profileSnapshot, isInCloud: isInCloud)
 			return .run { send in
 				try? await clock.sleep(for: .milliseconds(300))
+				try await radixConnectClient.connectToP2PLinks(profileSnapshot.appPreferences.p2pLinks)
 				await send(.internal(.delayedAppendToPath(
 					.importMnemonicsFlow(.init(context: .fromOnboarding(profileSnapshot: profileSnapshot))
 					))))
@@ -121,7 +123,12 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 
 		case let .path(.element(_, action: .importMnemonicsFlow(.delegate(.finishedEarly(didFail))))):
 			state.path.removeLast()
-			return didFail ? .send(.delegate(.failedToImportProfileDueToMnemonics)) : .none
+			return .run { send in
+				await radixConnectClient.disconnectAll()
+				if didFail {
+					await send(.delegate(.failedToImportProfileDueToMnemonics))
+				}
+			}
 
 		default:
 			return .none

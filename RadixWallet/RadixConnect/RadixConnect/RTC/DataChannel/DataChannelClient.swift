@@ -95,8 +95,8 @@ actor DataChannelClient {
 			id: id
 		)
 
-		try assembledMessage.split().forEach {
-			try sendMessageOverDataChannel(.chunkedMessage($0))
+		for item in assembledMessage.split() {
+			try sendMessageOverDataChannel(.chunkedMessage(item))
 		}
 
 		loggerGlobal.info("DataChannel: Sent message \(assembledMessage)")

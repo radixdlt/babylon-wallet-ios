@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 public struct EditPersonaEntry<ContentReducer>: FeatureReducer where ContentReducer: FeatureReducer & EmptyInitializable {
 	public struct State: Sendable, Hashable {
 		typealias ID = EntryKind

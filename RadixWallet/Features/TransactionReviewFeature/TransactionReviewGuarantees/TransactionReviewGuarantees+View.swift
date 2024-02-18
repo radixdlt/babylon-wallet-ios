@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension TransactionReviewGuarantees.State {
 	var viewState: TransactionReviewGuarantees.ViewState {
 		.init(isValid: isValid)
@@ -91,7 +92,13 @@ extension TransactionReviewGuarantee.State {
 		.init(
 			id: id,
 			account: account,
-			token: .init(resource: resource, details: details)
+			fungible: .init(
+				name: resource.metadata.title,
+				thumbnail: thumbnail,
+				amount: amount,
+				guaranteedAmount: guarantee.amount,
+				fiatAmount: nil
+			)
 		)
 	}
 }
@@ -100,7 +107,7 @@ extension TransactionReviewGuarantee {
 	public struct ViewState: Identifiable, Equatable {
 		public let id: TransactionReview.Transfer.ID
 		let account: TransactionReview.Account
-		let token: TransactionReviewTokenView.ViewState
+		let fungible: TransactionReviewFungibleView.ViewState
 	}
 
 	public struct View: SwiftUI.View {
@@ -116,7 +123,7 @@ extension TransactionReviewGuarantee {
 					VStack(spacing: 0) {
 						SmallAccountCard(account: viewStore.account)
 
-						TransactionReviewTokenView(viewState: viewStore.token)
+						TransactionReviewFungibleView(viewState: viewStore.fungible, background: .clear)
 
 						Separator()
 

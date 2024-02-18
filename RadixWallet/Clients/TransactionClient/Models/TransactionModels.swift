@@ -190,7 +190,7 @@ extension TransactionClient {
 
 // MARK: - ManifestReviewRequest
 public struct ManifestReviewRequest: Sendable {
-	public let manifestToSign: TransactionManifest
+	public let unvalidatedManifest: UnvalidatedTransactionManifest
 	public let message: Message
 	public let nonce: Nonce
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
@@ -199,7 +199,7 @@ public struct ManifestReviewRequest: Sendable {
 	public let isWalletTransaction: Bool
 
 	public init(
-		manifestToSign: TransactionManifest,
+		unvalidatedManifest: UnvalidatedTransactionManifest,
 		message: Message,
 		nonce: Nonce,
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
@@ -207,7 +207,7 @@ public struct ManifestReviewRequest: Sendable {
 		signingPurpose: SigningPurpose,
 		isWalletTransaction: Bool
 	) {
-		self.manifestToSign = manifestToSign
+		self.unvalidatedManifest = unvalidatedManifest
 		self.message = message
 		self.nonce = nonce
 		self.makeTransactionHeaderInput = makeTransactionHeaderInput
@@ -233,7 +233,8 @@ public struct FeePayerCandidate: Sendable, Hashable, Identifiable {
 
 // MARK: - TransactionToReview
 public struct TransactionToReview: Sendable, Hashable {
-	public let analyzedManifestToReview: ExecutionAnalysis
+	public let transactionManifest: TransactionManifest
+	public let analyzedManifestToReview: ExecutionSummary
 	public let networkID: NetworkID
 
 	public var transactionFee: TransactionFee
@@ -300,14 +301,11 @@ public struct FeePayerSelectionResult: Equatable, Sendable {
 	}
 }
 
-extension ExecutionAnalysis {
+extension ExecutionSummary {
 	func guranteesCost() throws -> RETDecimal {
-		let transaction = try transactionTypes.transactionKind()
-		switch transaction {
-		case .nonConforming:
-			return .zero
-		case let .conforming(.general(transaction)):
-			return transaction.accountDeposits.flatMap(\.value).reduce(.zero) { result, resource in
+		switch detailedManifestClass {
+		case .general, .transfer:
+			accountDeposits.flatMap(\.value).reduce(.zero) { result, resource in
 				switch resource {
 				case .fungible(_, .predicted):
 					result + TransactionFee.PredefinedFeeConstants.fungibleGuaranteeInstructionCost
@@ -315,8 +313,8 @@ extension ExecutionAnalysis {
 					result
 				}
 			}
-		case .conforming:
-			return .zero
+		default:
+			.zero
 		}
 	}
 }

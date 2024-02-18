@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension OffDeviceMnemonicInfo.State {
 	var viewState: OffDeviceMnemonicInfo.ViewState {
 		.init(label: label)
@@ -57,6 +58,7 @@ extension OffDeviceMnemonicInfo {
 // #if DEBUG
 // import SwiftUI
 import ComposableArchitecture //
+
 //// MARK: - OffDeviceMnemonicInfo_Preview
 // struct OffDeviceMnemonicInfo_Preview: PreviewProvider {
 //	static var previews: some View {

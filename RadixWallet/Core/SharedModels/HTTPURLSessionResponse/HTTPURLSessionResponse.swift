@@ -4,13 +4,22 @@ public struct ExpectedHTTPURLResponse: Swift.Error {
 }
 
 // MARK: - BadHTTPResponseCode
-public struct BadHTTPResponseCode: Swift.Error {
+public struct BadHTTPResponseCode: LocalizedError {
 	public let got: Int
 	public let butExpected = Self.expected
 	public static let expected = 200
 
 	public init(got: Int) {
 		self.got = got
+	}
+
+	public var errorDescription: String? {
+		switch got {
+		case 429:
+			L10n.Common.rateLimitReached
+		default:
+			L10n.Common.badHttpResponseStatusCode(got)
+		}
 	}
 }
 

@@ -14,7 +14,9 @@ extension NonFungibleAssetList {
 		public var body: some SwiftUI.View {
 			ForEachStore(
 				store.scope(state: \.rows) { .child(.asset($0, $1)) },
-				content: { NonFungibleAssetList.Row.View(store: $0) }
+				content: {
+					NonFungibleAssetList.Row.View(store: $0)
+				}
 			)
 			.destinations(with: store)
 		}
@@ -46,6 +48,7 @@ private extension View {
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
+
 struct NonFungibleTokenList_Preview: PreviewProvider {
 	static var previews: some View {
 		NonFungibleAssetList.View(

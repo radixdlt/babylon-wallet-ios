@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension NewPersonaInfo.State {
 	var viewState: NewPersonaInfo.ViewState {
 		.init(state: self)
@@ -126,6 +127,7 @@ extension NewPersonaInfo.View {
 // #if DEBUG
 // import SwiftUI
 import ComposableArchitecture //
+
 // struct InfoOfNewPersona_Previews: PreviewProvider {
 //	static var previews: some View {
 //		NameNewEntity<Profile.Network.Account>.View(

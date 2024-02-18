@@ -43,7 +43,7 @@ extension AuthorizedDapps.View {
 								viewStore.send(.didSelectDapp(dApp.id))
 							} contents: {
 								PlainListRow(title: dApp.name) {
-									DappThumbnail(.known(dApp.thumbnail))
+									Thumbnail(.dapp, url: dApp.thumbnail)
 								}
 							}
 						}

@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension AdvancedFeesCustomization.State {
 	var viewState: AdvancedFeesCustomization.ViewState {
 		.init(

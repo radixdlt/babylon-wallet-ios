@@ -27,7 +27,7 @@ extension PersonaDetails.View {
 		ScrollView(showsIndicators: false) {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: 0) {
-					PersonaThumbnail(viewStore.thumbnail, size: .veryLarge)
+					Thumbnail(.persona, url: viewStore.thumbnail, size: .veryLarge)
 						.padding(.vertical, .large2)
 
 					InfoSection(store: store)
@@ -250,7 +250,7 @@ extension PersonaDetails.View {
 							viewStore.send(.dAppTapped(dApp.id))
 						} contents: {
 							PlainListRow(title: dApp.displayName) {
-								DappThumbnail(.known(dApp.thumbnail))
+								Thumbnail(.dapp, url: dApp.thumbnail)
 							}
 						}
 						.padding(.horizontal, .medium3)

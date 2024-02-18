@@ -35,7 +35,7 @@ public struct PlainListRow<Icon: View>: View {
 	}
 
 	public init(
-		title: String,
+		title: String?,
 		subtitle: String? = nil,
 		accessory: ImageAsset? = AssetResource.chevronRight,
 		@ViewBuilder icon: () -> Icon
@@ -45,7 +45,7 @@ public struct PlainListRow<Icon: View>: View {
 
 	public init(
 		_ content: AssetIcon.Content?,
-		title: String,
+		title: String?,
 		subtitle: String? = nil,
 		accessory: ImageAsset? = AssetResource.chevronRight
 	) where Icon == AssetIcon {
@@ -76,12 +76,12 @@ public struct PlainListRow<Icon: View>: View {
 // MARK: - PlainListRowCore
 public struct PlainListRowCore: View {
 	public struct ViewState {
-		public let title: String
+		public let title: String?
 		public let subtitle: String?
 		public let hint: Hint.ViewState?
 
 		init(
-			title: String,
+			title: String?,
 			subtitle: String? = nil,
 			hint: Hint.ViewState? = nil
 		) {
@@ -99,17 +99,19 @@ public struct PlainListRowCore: View {
 		self.viewState = viewState
 	}
 
-	public init(title: String, subtitle: String?) {
+	public init(title: String?, subtitle: String?) {
 		self.viewState = ViewState(title: title, subtitle: subtitle)
 	}
 
 	public var body: some View {
 		VStack(alignment: .leading, spacing: .zero) {
-			Text(viewState.title)
-				.lineSpacing(-6)
-				.lineLimit(1)
-				.textStyle(.secondaryHeader)
-				.foregroundColor(.app.gray1)
+			if let title = viewState.title {
+				Text(title)
+					.lineSpacing(-6)
+					.lineLimit(1)
+					.textStyle(.secondaryHeader)
+					.foregroundColor(.app.gray1)
+			}
 
 			if let subtitle = viewState.subtitle {
 				Text(subtitle)

@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 struct DappHeader: View {
 	let thumbnail: URL?
 	let title: String
@@ -8,7 +9,7 @@ struct DappHeader: View {
 
 	var body: some View {
 		VStack(spacing: .medium3) {
-			DappThumbnail(.known(thumbnail), size: .medium)
+			Thumbnail(.dapp, url: thumbnail, size: .medium)
 
 			Text(title)
 				.foregroundColor(.app.gray1)

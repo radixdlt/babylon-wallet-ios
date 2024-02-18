@@ -47,13 +47,15 @@ extension NonFungibleAssetList.Row.View {
 
 	private func rowView(_ viewStore: ViewStoreOf<NonFungibleAssetList.Row>) -> some SwiftUI.View {
 		HStack(spacing: .small1) {
-			NFTThumbnail(viewStore.resource.metadata.iconURL, size: .small)
+			Thumbnail(.nft, url: viewStore.resource.metadata.iconURL, size: .small)
 
 			VStack(alignment: .leading, spacing: .small2) {
-				Text(viewStore.resource.metadata.name ?? "")
-					.foregroundColor(.app.gray1)
-					.lineSpacing(-4)
-					.textStyle(.secondaryHeader)
+				if let title = viewStore.resource.metadata.title {
+					Text(title)
+						.foregroundColor(.app.gray1)
+						.lineSpacing(-4)
+						.textStyle(.secondaryHeader)
+				}
 
 				Text("\(viewStore.resource.nonFungibleIdsCount)")
 					.font(.app.body2HighImportance)
@@ -83,41 +85,34 @@ extension NonFungibleAssetList.Row.View {
 		loadable(asset) {
 			/// Placeholder Loading view
 			VStack(spacing: .medium3) {
-				Spacer()
-					.frame(height: .imagePlaceholderHeight)
-					.background(.app.gray4)
-					.shimmer(active: true, config: .accountResourcesLoading)
-					.cornerRadius(.small1)
-
-				Spacer()
-					.frame(height: .medium1)
-					.background(.app.gray4)
-					.shimmer(active: true, config: .accountResourcesLoading)
-					.cornerRadius(.small1)
-				Spacer()
-					.frame(height: .medium1)
-					.background(.app.gray4)
-					.shimmer(active: true, config: .accountResourcesLoading)
-					.cornerRadius(.small1)
+				shimmeringLoadingView(height: .imagePlaceholderHeight)
+				shimmeringLoadingView(height: .medium1)
+				shimmeringLoadingView(height: .medium1)
 			}
 			.padding(.medium1)
 			.frame(minHeight: headerHeight)
 		} successContent: { asset in
 			let isDisabled = viewStore.disabled.contains(asset.id)
-			HStack {
-				NFTIDView(
-					id: asset.id.localId().toUserFacingString(),
-					name: asset.data?.name,
-					thumbnail: asset.data?.keyImageURL
-				)
-				if let selectedAssets = viewStore.selectedAssets {
-					CheckmarkView(appearance: .dark, isChecked: selectedAssets.contains(asset))
+			VStack(spacing: .zero) {
+				Divider()
+					.frame(height: .small3)
+					.overlay(.app.gray5)
+
+				HStack {
+					NFTIDView(
+						id: asset.id.localId().toUserFacingString(),
+						name: asset.data?.name,
+						thumbnail: asset.data?.keyImageURL
+					)
+					if let selectedAssets = viewStore.selectedAssets {
+						CheckmarkView(appearance: .dark, isChecked: selectedAssets.contains(asset))
+					}
 				}
+				.opacity(isDisabled ? 0.35 : 1)
+				.padding(.medium1)
+				.frame(minHeight: headerHeight)
+				.background(.app.white)
 			}
-			.opacity(isDisabled ? 0.35 : 1)
-			.padding(.medium1)
-			.frame(minHeight: headerHeight)
-			.background(.app.white)
 			.onTapGesture { viewStore.send(.assetTapped(asset)) }
 		}
 	}

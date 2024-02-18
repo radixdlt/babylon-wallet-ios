@@ -1,16 +1,19 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension NonFungibleTokenDetails.State {
 	var viewState: NonFungibleTokenDetails.ViewState {
 		.init(
-			tokenDetails: token.map(NonFungibleTokenDetails.ViewState.TokenDetails.init),
+			tokenDetails: token.map {
+				NonFungibleTokenDetails.ViewState.TokenDetails(token: $0, stakeClaim: stakeClaim)
+			},
 			resourceThumbnail: ownedResource.map { .success($0.metadata.iconURL) } ?? resourceDetails.metadata.iconURL,
 			resourceDetails: .init(
 				description: resourceDetails.metadata.description,
 				resourceAddress: resourceAddress,
 				isXRD: false,
 				validatorAddress: nil,
-				resourceName: resourceDetails.metadata.name,
+				resourceName: resourceDetails.metadata.title,
 				currentSupply: resourceDetails.totalSupply.map { $0?.formatted() },
 				behaviors: resourceDetails.behaviors,
 				tags: ownedResource.map { .success($0.metadata.tags) } ?? resourceDetails.metadata.tags
@@ -20,12 +23,13 @@ extension NonFungibleTokenDetails.State {
 }
 
 extension NonFungibleTokenDetails.ViewState.TokenDetails {
-	init(token: OnLedgerEntity.NonFungibleToken) {
+	init(token: OnLedgerEntity.NonFungibleToken, stakeClaim: OnLedgerEntitiesClient.StakeClaim?) {
 		self.init(
 			keyImage: token.data?.keyImageURL,
 			nonFungibleGlobalID: token.id,
 			name: token.data?.name,
 			description: token.data?.tokenDescription?.nilIfEmpty,
+			stakeClaim: stakeClaim,
 			dataFields: token.data?.arbitraryDataFields ?? []
 		)
 	}
@@ -43,6 +47,7 @@ extension NonFungibleTokenDetails {
 			let nonFungibleGlobalID: NonFungibleGlobalId
 			let name: String?
 			let description: String?
+			let stakeClaim: OnLedgerEntitiesClient.StakeClaim?
 			let dataFields: [ArbitraryDataField]
 		}
 	}
@@ -77,6 +82,12 @@ extension NonFungibleTokenDetails {
 
 								KeyValueView(nonFungibleGlobalID: tokenDetails.nonFungibleGlobalID)
 
+								if let stakeClaim = tokenDetails.stakeClaim {
+									stakeClaimView(stakeClaim) {
+										viewStore.send(.tappedClaimStake)
+									}
+								}
+
 								if !tokenDetails.dataFields.isEmpty {
 									AssetDetailsSeparator()
 										.padding(.horizontal, -.large2)
@@ -92,8 +103,8 @@ extension NonFungibleTokenDetails {
 						}
 
 						VStack(spacing: .medium1) {
-							loadable(viewStore.resourceThumbnail) { value in
-								NFTThumbnail(value, size: .veryLarge)
+							loadable(viewStore.resourceThumbnail) { url in
+								Thumbnail(.nft, url: url, size: .veryLarge)
 							}
 
 							AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
@@ -164,8 +175,46 @@ extension NonFungibleTokenDetails {
 				} else {
 					EmptyView()
 				}
+
+			case let .instant(date):
+				KeyValueView(key: field.name, value: date.formatted())
 			}
 		}
+	}
+}
+
+extension NonFungibleTokenDetails.View {
+	fileprivate func stakeClaimView(
+		_ stakeClaim: OnLedgerEntitiesClient.StakeClaim,
+		onClaimTap: @escaping () -> Void
+	) -> some SwiftUI.View {
+		VStack(alignment: .leading, spacing: .small3) {
+			StakeClaimTokensView(
+				viewState: .init(
+					canClaimTokens: true,
+					stakeClaims: [stakeClaim]
+				),
+				background: .app.white,
+				onClaimAllTapped: onClaimTap
+			)
+
+			if let unstakingDurationDescription = stakeClaim.unstakingDurationDescription {
+				Text(unstakingDurationDescription)
+					.textStyle(.body2HighImportance)
+					.foregroundColor(.app.gray2)
+			}
+		}
+	}
+}
+
+extension OnLedgerEntitiesClient.StakeClaim {
+	var unstakingDurationDescription: String? {
+		guard let reamainingEpochsUntilClaim, isUnstaking else {
+			return nil
+		}
+		return L10n.AssetDetails.Staking.unstaking(
+			reamainingEpochsUntilClaim * epochDurationInMinutes
+		)
 	}
 }
 
@@ -181,6 +230,7 @@ extension NonFungibleTokenDetails.ViewState.TokenDetails {
 			case decimal(RETDecimal)
 			case `enum`(variant: String)
 			case id(NonFungibleLocalId)
+			case instant(Date)
 		}
 
 		public let kind: Kind
@@ -189,7 +239,7 @@ extension NonFungibleTokenDetails.ViewState.TokenDetails {
 }
 
 extension OnLedgerEntity.NonFungibleToken.NFTData {
-	private static let standardFields: [OnLedgerEntity.NonFungibleToken.NFTData.StandardField] = [.name, .description, .keyImageURL]
+	private static let standardFields = OnLedgerEntity.NonFungibleToken.NFTData.StandardField.allCases
 
 	fileprivate var arbitraryDataFields: [NonFungibleTokenDetails.ViewState.TokenDetails.ArbitraryDataField] {
 		fields.compactMap { field in
@@ -249,9 +299,23 @@ private extension String {
 			}
 		}
 	}
+
+	var asInstantDataField: ArbitraryDataFieldKind? {
+		nilIfEmpty.map {
+			if let timeInterval = Int64($0) {
+				.instant(Date(timeIntervalSince1970: TimeInterval(timeInterval)))
+			} else {
+				.primitive(self)
+			}
+		}
+	}
 }
 
 private extension GatewayAPI.ProgrammaticScryptoSborValue {
+	enum TypeName: String {
+		case instant = "Instant"
+	}
+
 	var fieldKind: ArbitraryDataFieldKind? {
 		switch self {
 		case .array, .map, .mapEntry, .tuple:
@@ -268,7 +332,11 @@ private extension GatewayAPI.ProgrammaticScryptoSborValue {
 		case let .i32(content):
 			content.value.asPrimitiveDataField
 		case let .i64(content):
-			content.value.asPrimitiveDataField
+			if content.typeName == TypeName.instant.rawValue {
+				content.value.asInstantDataField
+			} else {
+				content.value.asPrimitiveDataField
+			}
 		case let .i128(content):
 			content.value.asPrimitiveDataField
 		case let .u8(content):

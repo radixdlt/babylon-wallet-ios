@@ -12,20 +12,14 @@ extension OnLedgerEntity.NonFungibleToken {
 }
 
 extension OnLedgerEntity.Resource {
-	public init(resourceAddress: ResourceAddress, metadata: [String: MetadataValue?]) {
+	public init(resourceAddress: ResourceAddress, metadata: OnLedgerEntity.Metadata) {
 		self.init(
 			resourceAddress: resourceAddress,
 			atLedgerState: .init(version: 0, epoch: 0),
 			divisibility: nil,
 			behaviors: [],
 			totalSupply: nil,
-			metadata: .init(
-				name: metadata.name,
-				symbol: metadata.symbol,
-				description: metadata.description,
-				iconURL: metadata.iconURL,
-				tags: metadata.tags
-			)
+			metadata: metadata
 		)
 	}
 }

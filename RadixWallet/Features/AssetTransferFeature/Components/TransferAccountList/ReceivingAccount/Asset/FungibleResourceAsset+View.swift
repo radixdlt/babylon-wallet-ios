@@ -1,5 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
+
 extension FungibleResourceAsset {
 	public typealias ViewState = State
 
@@ -16,6 +17,12 @@ extension FungibleResourceAsset {
 	}
 }
 
+extension FungibleResourceAsset.ViewState {
+	var thumbnail: Thumbnail.TokenContent {
+		isXRD ? .xrd : .other(resource.metadata.iconURL)
+	}
+}
+
 extension ViewStore<FungibleResourceAsset.State, FungibleResourceAsset.ViewAction> {
 	var focusedBinding: Binding<Bool> {
 		binding(get: \.focused, send: ViewAction.focusChanged)
@@ -27,15 +34,16 @@ extension FungibleResourceAsset.View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			VStack(alignment: .trailing) {
 				HStack {
-					TokenThumbnail(viewStore.isXRD ? .xrd : .known(viewStore.resource.metadata.iconURL), size: .smallest)
-					if let name = viewStore.resource.metadata.name {
-						Text(name)
+					Thumbnail(token: viewStore.thumbnail, size: .smallest)
+
+					if let title = viewStore.resource.metadata.title {
+						Text(title)
 							.textStyle(.body2HighImportance)
 							.foregroundColor(.app.gray1)
 					}
 
 					TextField(
-						"0.00",
+						RETDecimal.zero().formatted(),
 						text: viewStore.binding(
 							get: \.transferAmountStr,
 							send: { .amountChanged($0) }

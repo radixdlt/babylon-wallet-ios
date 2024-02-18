@@ -1,4 +1,5 @@
 import WebRTC
+
 extension DataChannelClient.Message {
 	enum PackageType: String, Codable {
 		case metaData

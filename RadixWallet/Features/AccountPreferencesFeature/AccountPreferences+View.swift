@@ -127,48 +127,31 @@ private extension View {
 	}
 
 	private func showQRCode(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /AccountPreferences.Destination.State.showQR,
-			action: AccountPreferences.Destination.Action.showQR
-		) {
+		sheet(store: destinationStore.scope(state: \.showQR, action: \.showQR)) {
 			ShowQR.View(store: $0)
 		}
 	}
 
 	private func updateAccountLabel(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AccountPreferences.Destination.State.updateAccountLabel,
-			action: AccountPreferences.Destination.Action.updateAccountLabel,
-			destination: { UpdateAccountLabel.View(store: $0) }
-		)
+		navigationDestination(store: destinationStore.scope(state: \.updateAccountLabel, action: \.updateAccountLabel)) {
+			UpdateAccountLabel.View(store: $0)
+		}
 	}
 
 	private func thirdPartyDeposits(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AccountPreferences.Destination.State.thirdPartyDeposits,
-			action: AccountPreferences.Destination.Action.thirdPartyDeposits,
-			destination: { ManageThirdPartyDeposits.View(store: $0) }
-		)
+		navigationDestination(store: destinationStore.scope(state: \.thirdPartyDeposits, action: \.thirdPartyDeposits)) {
+			ManageThirdPartyDeposits.View(store: $0)
+		}
 	}
 
 	private func devAccountPreferences(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AccountPreferences.Destination.State.devPreferences,
-			action: AccountPreferences.Destination.Action.devPreferences,
-			destination: { DevAccountPreferences.View(store: $0) }
-		)
+		navigationDestination(store: destinationStore.scope(state: \.devPreferences, action: \.devPreferences)) {
+			DevAccountPreferences.View(store: $0)
+		}
 	}
 
 	private func confirmHideAccountAlert(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
-		alert(
-			store: destinationStore,
-			state: /AccountPreferences.Destination.State.confirmHideAccount,
-			action: AccountPreferences.Destination.Action.confirmHideAccount
-		)
+		alert(store: destinationStore.scope(state: \.confirmHideAccount, action: \.confirmHideAccount))
 	}
 }
 

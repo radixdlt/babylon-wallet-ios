@@ -20,18 +20,24 @@ extension View {
 	@ViewBuilder
 	public func loadable<T>(
 		_ loadable: Loadable<T>,
+		loadingViewHeight: CGFloat = .large1,
 		@ViewBuilder successContent: (T) -> some View
 	) -> some View {
 		self.loadable(
 			loadable,
 			loadingView: {
-				Spacer()
-					.frame(height: .large1)
-					.background(.app.gray4)
-					.shimmer(active: true, config: .accountResourcesLoading)
-					.cornerRadius(.small1)
+				shimmeringLoadingView(height: loadingViewHeight)
 			},
 			successContent: successContent
 		)
+	}
+
+	@ViewBuilder
+	func shimmeringLoadingView(height: CGFloat = .large1) -> some View {
+		Spacer()
+			.frame(height: height)
+			.background(.app.gray4)
+			.shimmer(active: true, config: .accountResourcesLoading)
+			.cornerRadius(.small1)
 	}
 }

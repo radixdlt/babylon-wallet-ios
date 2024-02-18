@@ -1,4 +1,5 @@
 import EngineToolkit
+
 extension FactorSource {
 	public static func id(
 		publicKey: SLIP10.PublicKey,

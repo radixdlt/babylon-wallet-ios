@@ -76,22 +76,47 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 		public let id: TransactionReview.Transfer.ID
 		public let account: TransactionReview.Account
 		public let resource: OnLedgerEntity.Resource
-		public var details: TransactionReview.Transfer.Details.Fungible
+		public let thumbnail: Thumbnail.FungibleContent
+		public let amount: RETDecimal
+		public var guarantee: TransactionClient.Guarantee
 
 		public var percentageStepper: MinimumPercentageStepper.State
+
+		public enum Fungible: Sendable, Hashable {
+			case token(isXRD: Bool)
+			case poolUnit
+			case lsu
+		}
 
 		init?(
 			account: TransactionReview.Account,
 			transfer: TransactionReview.Transfer
 		) {
-			guard case let .fungible(details) = transfer.details, details.amount > 0 else { return nil }
-			guard let guarantee = details.guarantee, guarantee.amount >= 0 else { return nil }
-
 			self.id = transfer.id
 			self.account = account
 			self.resource = transfer.resource
-			self.details = details
-			self.percentageStepper = .init(value: 100 * guarantee.amount / details.amount)
+
+			let url = resource.metadata.iconURL
+			switch transfer.details {
+			case let .fungible(fungible):
+				self.thumbnail = .token(fungible.isXRD ? .xrd : .other(url))
+			case .poolUnit:
+				self.thumbnail = .poolUnit(url)
+			case .liquidStakeUnit:
+				self.thumbnail = .lsu(url)
+			case .stakeClaimNFT, .nonFungible:
+				return nil
+			}
+
+			guard let amount = transfer.fungibleTransferAmount, amount > 0 else { return nil }
+			self.amount = amount
+
+			guard let guarantee = transfer.fungibleGuarantee, guarantee.amount >= 0 else { return nil }
+			self.guarantee = guarantee
+
+			self.percentageStepper = .init(value: 100 * guarantee.amount / amount)
+
+			self.updateAmount()
 		}
 	}
 
@@ -115,19 +140,21 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .percentageStepper(.delegate(.valueChanged)):
-			guard let value = state.percentageStepper.value else {
-				return .none
-			}
-
-			let newMinimumDecimal = value * 0.01
-			let divisibility = state.resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
-			let newAmount = (newMinimumDecimal * state.details.amount).rounded(decimalPlaces: divisibility)
-			state.details.guarantee?.amount = newAmount
-
+			state.updateAmount()
 			return .none
 
 		case .percentageStepper:
 			return .none
 		}
+	}
+}
+
+extension TransactionReviewGuarantee.State {
+	mutating func updateAmount() {
+		guard let value = percentageStepper.value else { return }
+
+		let newMinimumDecimal = value * 0.01
+		let divisibility: UInt = resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
+		guarantee.amount = (newMinimumDecimal * amount).rounded(decimalPlaces: divisibility)
 	}
 }

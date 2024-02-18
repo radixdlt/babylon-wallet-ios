@@ -326,7 +326,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 			return OlympiaAccountsValidation(validated: [], unvalidated: olympiaAccountsToValidate)
 		}
 
-		olympiaAccountsToMigrate.forEach { verifiedAccountToMigrate in
+		for verifiedAccountToMigrate in olympiaAccountsToMigrate {
 			olympiaAccountsToValidate.remove(verifiedAccountToMigrate)
 		}
 

@@ -9,6 +9,7 @@ public struct PrimaryRectangularButtonStyle: ButtonStyle {
 	public func makeBody(configuration: ButtonStyle.Configuration) -> some View {
 		ZStack {
 			configuration.label
+				.lineLimit(nil)
 				.foregroundColor(foregroundColor)
 				.font(.app.body1Header)
 				.frame(maxWidth: shouldExpand ? .infinity : nil)
@@ -44,7 +45,7 @@ extension PrimaryRectangularButtonStyle {
 		case .loading:
 			.clear
 		case .disabled:
-			.app.gray3
+			.app.gray2
 		}
 	}
 }

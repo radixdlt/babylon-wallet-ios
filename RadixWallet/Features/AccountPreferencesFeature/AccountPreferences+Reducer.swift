@@ -33,6 +33,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Hashable, Sendable {
 			case showQR(ShowQR.State)
 			case updateAccountLabel(UpdateAccountLabel.State)
@@ -41,6 +42,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			case confirmHideAccount(AlertState<Action.ConfirmHideAccountAlert>)
 		}
 
+		@CasePathable
 		public enum Action: Equatable, Sendable {
 			case showQR(ShowQR.Action)
 			case updateAccountLabel(UpdateAccountLabel.Action)

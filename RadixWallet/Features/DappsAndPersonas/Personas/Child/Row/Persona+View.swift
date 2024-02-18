@@ -23,11 +23,11 @@ extension Persona {
 					} contents: {
 						VStack {
 							PlainListRow(title: viewStore.displayName) {
-								PersonaThumbnail(viewStore.thumbnail)
+								Thumbnail(.persona, url: viewStore.thumbnail)
 							}
 							if showShield, viewStore.shouldWriteDownMnemonic {
 								shieldPromptView(
-									text: "Please write down this Persona's seed phrase", // FIXME: strings
+									text: L10n.Personas.writeSeedPhrase,
 									action: {
 										viewStore.send(.writeDownSeedPhrasePromptTapped)
 									}
@@ -42,7 +42,7 @@ extension Persona {
 				} else {
 					Card {
 						PlainListRow(title: viewStore.displayName, accessory: nil) {
-							PersonaThumbnail(viewStore.thumbnail)
+							Thumbnail(.persona, url: viewStore.thumbnail)
 						}
 					}
 				}

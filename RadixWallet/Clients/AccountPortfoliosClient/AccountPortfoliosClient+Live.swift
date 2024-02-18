@@ -31,8 +31,8 @@ extension AccountPortfoliosClient: DependencyKey {
 		return AccountPortfoliosClient(
 			fetchAccountPortfolios: { accountAddresses, forceRefresh in
 				if forceRefresh {
-					accountAddresses.forEach {
-						cacheClient.removeFolder(.onLedgerEntity(.account($0.asGeneral)))
+					for accountAddress in accountAddresses {
+						cacheClient.removeFolder(.onLedgerEntity(.account(accountAddress.asGeneral)))
 					}
 				}
 

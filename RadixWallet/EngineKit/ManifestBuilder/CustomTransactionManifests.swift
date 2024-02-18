@@ -1,4 +1,47 @@
 import EngineToolkit
+
+extension ManifestBuilder {
+	public struct StakeClaim: Sendable {
+		public let validatorAddress: ValidatorAddress
+		public let resourceAddress: ResourceAddress
+		public let ids: NonEmpty<[NonFungibleLocalId]>
+		/// The summed claim amount across ids
+		public let amount: RETDecimal
+	}
+
+	public static func stakeClaimsManifest(
+		accountAddress: AccountAddress,
+		stakeClaims: [StakeClaim]
+	) throws -> TransactionManifest {
+		let accountAddress = try accountAddress.intoEngine()
+		let networkId = accountAddress.networkId()
+		let xrdAddress = EngineToolkit.Address.xrd(networkId)
+
+		return try make {
+			for stakeClaim in stakeClaims {
+				let bucket = ManifestBuilderBucket.unique
+				// Withdraw non fungibles from account
+				try accountWithdrawNonFungibles(
+					accountAddress,
+					stakeClaim.resourceAddress.intoEngine(),
+					stakeClaim.ids.rawValue
+				)
+				try takeAllFromWorktop(stakeClaim.resourceAddress.intoEngine(), bucket)
+
+				// Claim XRDs for the given nft ids.
+				try validatorClaimXrd(stakeClaim.validatorAddress.intoEngine(), bucket)
+
+				// Deposit the claimed amount
+				let xrdBucket = ManifestBuilderBucket.unique
+				takeFromWorktop(xrdAddress, stakeClaim.amount, xrdBucket)
+				accountDeposit(accountAddress, xrdBucket)
+			}
+		}
+		.build(networkId: networkId)
+	}
+}
+
+// MARK: Manifests for testing
 extension ManifestBuilder {
 	public static func manifestForFaucet(
 		includeLockFeeInstruction: Bool,

@@ -281,7 +281,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 	private func deleteProfile(keepInICloudIfPresent: Bool) -> Effect<Action> {
 		.run { send in
 			cacheClient.removeAll()
-			await radixConnectClient.disconnectAndRemoveAll()
+			await radixConnectClient.disconnectAll()
 			userDefaults.removeAll()
 			await send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent)))
 		}

@@ -1,4 +1,5 @@
 import CryptoKit
+
 extension BIP39 {
 	static func languageFromWords(_ wordsNonChecked: [String]) -> Language? {
 		let words = wordsNonChecked.compactMap {

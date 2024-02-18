@@ -134,6 +134,7 @@ extension ScanQR.View {
 #if DEBUG
 import ComposableArchitecture
 import SwiftUI
+
 struct ScanQR_Preview: PreviewProvider {
 	static var previews: some View {
 		ScanQR.View(

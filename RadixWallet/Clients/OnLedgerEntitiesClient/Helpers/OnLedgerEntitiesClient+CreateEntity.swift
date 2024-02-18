@@ -288,7 +288,7 @@ extension OnLedgerEntitiesClient {
 			return OnLedgerEntity.Account.PoolUnit(resource: poolUnitResource, resourcePoolAddress: pool.address)
 		}
 
-		return .init(radixNetworkStakes: stakeUnits, poolUnits: poolUnits)
+		return .init(radixNetworkStakes: stakeUnits.asIdentifiable(), poolUnits: poolUnits.sorted())
 	}
 
 	static func extractOwnedFungibleResources(
@@ -333,76 +333,6 @@ extension OnLedgerEntitiesClient {
 }
 
 extension OnLedgerEntitiesClient {
-	/// This loads all of the related pool unit details required by the Pool units screen.
-	/// We don't do any pagination there(yet), since the number of owned pools will not be big, this can be revised in the future.
-	@Sendable
-	public func getOwnedPoolUnitsDetails(
-		_ account: OnLedgerEntity.Account,
-		cachingStrategy: CachingStrategy = .useCache
-	) async throws -> [OwnedResourcePoolDetails] {
-		let ownedPoolUnits = account.poolUnitResources.poolUnits
-		let pools = try await getEntities(
-			ownedPoolUnits.map(\.resourcePoolAddress.asGeneral),
-			[],
-			account.atLedgerState,
-			cachingStrategy
-		).compactMap(\.resourcePool)
-
-		var allResourceAddresses: [ResourceAddress] = []
-		for pool in pools {
-			allResourceAddresses.append(pool.poolUnitResourceAddress)
-			allResourceAddresses += pool.resources.nonXrdResources.map(\.resourceAddress)
-			if let xrdResource = pool.resources.xrdResource {
-				allResourceAddresses.append(xrdResource.resourceAddress)
-			}
-		}
-
-		let allResources = try await getResources(
-			allResourceAddresses,
-			cachingStrategy: cachingStrategy,
-			atLedgerState: account.atLedgerState
-		)
-
-		return ownedPoolUnits.compactMap { ownedPoolUnit -> OwnedResourcePoolDetails? in
-			guard let pool = pools.first(where: { $0.address == ownedPoolUnit.resourcePoolAddress }) else {
-				assertionFailure("Did not load pool details")
-				return nil
-			}
-			guard let poolUnitResource = allResources.first(where: { $0.resourceAddress == pool.poolUnitResourceAddress }) else {
-				assertionFailure("Did not load poolUnitResource details")
-				return nil
-			}
-
-			var nonXrdResourceDetails: [ResourceWithVaultAmount] = []
-
-			for resource in pool.resources.nonXrdResources {
-				guard let resourceDetails = allResources.first(where: { $0.resourceAddress == resource.resourceAddress }) else {
-					assertionFailure("Did not load resource details")
-					return nil
-				}
-				nonXrdResourceDetails.append(.init(resource: resourceDetails, amount: resource.amount))
-			}
-
-			let xrdResourceDetails: ResourceWithVaultAmount?
-			if let xrdResource = pool.resources.xrdResource {
-				guard let details = allResources.first(where: { $0.resourceAddress == xrdResource.resourceAddress }) else {
-					assertionFailure("Did not load xrd resource details")
-					return nil
-				}
-				xrdResourceDetails = .init(resource: details, amount: xrdResource.amount)
-			} else {
-				xrdResourceDetails = nil
-			}
-
-			return .init(
-				address: pool.address,
-				poolUnitResource: .init(resource: poolUnitResource, amount: ownedPoolUnit.resource.amount),
-				xrdResource: xrdResourceDetails,
-				nonXrdResources: nonXrdResourceDetails
-			)
-		}
-	}
-
 	/// This loads all of the related stake unit details required by the Pool Units screen.
 	/// We don't do any pagination there(yet), since the number of owned stakes will not be big, this can be revised in the future.
 	public func getOwnedStakesDetails(
@@ -448,18 +378,37 @@ extension OnLedgerEntitiesClient {
 				return nil
 			}()
 
-			let stakeClaimTokens: NonFunbileResourceWithTokens? = try await {
+			let stakeClaimTokens: NonFunbileResourceWithTokens? = try await { () -> NonFunbileResourceWithTokens? in
 				if let stakeClaimResource = stake.stakeClaimResource, stakeClaimResource.nonFungibleIdsCount > 0 {
 					guard let stakeClaimResourceDetails = resourceDetails.first(where: { $0.resourceAddress == stakeClaimResource.resourceAddress }) else {
 						assertionFailure("Did not load stake unit details")
 						return nil
 					}
-					let tokenData = try await getAccountOwnedNonFungibleTokenData(.init(
+					let tokens = try await getAccountOwnedNonFungibleTokenData(.init(
 						accountAddress: account.address,
 						resource: stakeClaimResource,
 						mode: .loadAll
 					)).tokens
-					return .init(resource: stakeClaimResourceDetails, tokens: tokenData)
+
+					return .init(
+						resource: stakeClaimResourceDetails,
+						stakeClaims: tokens.compactMap { token -> OnLedgerEntitiesClient.StakeClaim? in
+							guard
+								let claimEpoch = token.data?.claimEpoch,
+								let claimAmount = token.data?.claimAmount,
+								claimAmount > 0
+							else {
+								return nil
+							}
+
+							return OnLedgerEntitiesClient.StakeClaim(
+								validatorAddress: stake.validatorAddress,
+								token: token,
+								claimAmount: claimAmount,
+								reamainingEpochsUntilClaim: Int(claimEpoch) - Int(currentEpoch.rawValue)
+							)
+						}.asIdentifiable()
+					)
 				}
 
 				return nil
@@ -502,7 +451,7 @@ extension OnLedgerEntity.Account.PoolUnitResources {
 			return nil
 		}
 
-		return .init(radixNetworkStakes: stakes, poolUnits: poolUnits)
+		return .init(radixNetworkStakes: stakes.asIdentifiable(), poolUnits: poolUnits)
 	}
 }
 
@@ -545,9 +494,15 @@ extension OnLedgerEntitiesClient {
 
 	public struct OwnedResourcePoolDetails: Hashable, Sendable {
 		public let address: ResourcePoolAddress
+		public let dAppName: String?
 		public let poolUnitResource: ResourceWithVaultAmount
-		public let xrdResource: ResourceWithVaultAmount?
-		public let nonXrdResources: [ResourceWithVaultAmount]
+		public let xrdResource: ResourceWithRedemptionValue?
+		public let nonXrdResources: [ResourceWithRedemptionValue]
+
+		public struct ResourceWithRedemptionValue: Hashable, Sendable {
+			public let resource: OnLedgerEntity.Resource
+			public let redemptionValue: RETDecimal?
+		}
 	}
 
 	public struct ResourceWithVaultAmount: Hashable, Sendable {
@@ -555,9 +510,40 @@ extension OnLedgerEntitiesClient {
 		public let amount: RETDecimal
 	}
 
+	public struct StakeClaim: Hashable, Sendable, Identifiable {
+		public var id: NonFungibleGlobalId {
+			token.id
+		}
+
+		let validatorAddress: ValidatorAddress
+		let token: OnLedgerEntity.NonFungibleToken
+		let claimAmount: RETDecimal
+		let reamainingEpochsUntilClaim: Int?
+
+		var isReadyToBeClaimed: Bool {
+			guard let reamainingEpochsUntilClaim else { return false }
+			return reamainingEpochsUntilClaim <= .zero
+		}
+
+		var isUnstaking: Bool {
+			guard let reamainingEpochsUntilClaim else { return false }
+			return reamainingEpochsUntilClaim > .zero
+		}
+
+		var isToBeClaimed: Bool {
+			reamainingEpochsUntilClaim == nil
+		}
+	}
+
 	public struct NonFunbileResourceWithTokens: Hashable, Sendable {
 		public let resource: OnLedgerEntity.Resource
-		public let tokens: [OnLedgerEntity.NonFungibleToken]
+		public let stakeClaims: IdentifiedArrayOf<StakeClaim>
+	}
+}
+
+extension OnLedgerEntity.Metadata {
+	var title: String? {
+		symbol ?? name
 	}
 }
 
@@ -615,8 +601,8 @@ extension OnLedgerEntity.OwnedFungibleResource: Comparable {
 // MARK: - OnLedgerEntity.OwnedNonFungibleResource + Comparable
 extension OnLedgerEntity.OwnedNonFungibleResource: Comparable {
 	public static func < (
-		lhs: OnLedgerEntity.OwnedNonFungibleResource,
-		rhs: OnLedgerEntity.OwnedNonFungibleResource
+		lhs: Self,
+		rhs: Self
 	) -> Bool {
 		switch (lhs.metadata.name, rhs.metadata.name) {
 		case let (.some(lhsName), .some(rhsName)):
@@ -628,6 +614,16 @@ extension OnLedgerEntity.OwnedNonFungibleResource: Comparable {
 		default:
 			lhs.resourceAddress.address < rhs.resourceAddress.address
 		}
+	}
+}
+
+// MARK: - OnLedgerEntity.Account.PoolUnit + Comparable
+extension OnLedgerEntity.Account.PoolUnit: Comparable {
+	public static func < (
+		lhs: Self,
+		rhs: Self
+	) -> Bool {
+		lhs.resource < rhs.resource
 	}
 }
 

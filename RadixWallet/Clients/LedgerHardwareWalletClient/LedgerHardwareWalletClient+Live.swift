@@ -233,12 +233,11 @@ extension HierarchicalDeterministicPublicKey {
 			loggerGlobal.error("Bad curve")
 			throw BadCurve()
 		}
-		let publicKey: SLIP10.PublicKey
-		switch curve {
+		let publicKey: SLIP10.PublicKey = switch curve {
 		case .secp256k1:
-			publicKey = try .ecdsaSecp256k1(.init(compressedRepresentation: keyData))
+			try .ecdsaSecp256k1(.init(compressedRepresentation: keyData))
 		case .curve25519:
-			publicKey = try .eddsaEd25519(.init(compressedRepresentation: keyData))
+			try .eddsaEd25519(.init(compressedRepresentation: keyData))
 		}
 
 		let derivationPath: DerivationPath
