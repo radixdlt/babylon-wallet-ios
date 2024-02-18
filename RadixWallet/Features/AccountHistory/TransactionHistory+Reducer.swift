@@ -2,8 +2,6 @@ import ComposableArchitecture
 
 // MARK: - TransactionHistory
 public struct TransactionHistory: Sendable, FeatureReducer {
-	public typealias Transaction = GatewayAPIClient.TransactionHistoryItem
-
 	public struct State: Sendable, Hashable {
 		let account: Profile.Network.Account
 
@@ -12,7 +10,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		var selectedPeriod: DateRangeItem.ID
 
 		var sections: IdentifiedArrayOf<TransactionSection>
-		var monthsLoaded: Set<Date> = []
+		var loadedPeriods: Set<Date> = []
 
 		init(account: Profile.Network.Account, sections: [TransactionSection] = []) {
 			self.account = account
@@ -27,7 +25,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			let day: Date
 			/// The month, in the form of a `Date` with all time components set to 0 and the day set to 1
 			let month: Date
-			var transactions: [Transaction]
+			var transactions: [TransactionHistoryItem]
 		}
 	}
 
@@ -37,20 +35,20 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Hashable {
-		case updateTransactions([Transaction])
+		case updateTransactions([TransactionHistoryItem])
 	}
 
 	@Dependency(\.dismiss) var dismiss
-	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+	@Dependency(\.transactionHistoryClient) var transactionHistoryClient
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .selectedPeriod(period):
 			state.selectedPeriod = period
-			return .run { [account = state.account.address] _ in
-				let sections = try await gatewayAPIClient.transactionHistory(account: account)
-				print("•••••• updateSections \(sections.count)")
-//				await send(.internal(.updateSections(sections)))
+			return .run { [account = state.account.address] send in
+				let transactions = try await transactionHistoryClient.getTransactionHistory(account, nil)
+				print("•••••• updateTransactions \(transactions.items.count)")
+				await send(.internal(.updateTransactions(transactions.items)))
 			}
 
 		case .closeTapped:
@@ -71,22 +69,22 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 extension TransactionHistory.State {
 	///  Presupposes that transactions are loaded in chunks of full months
-	mutating func updateTransactions(_ transactions: [TransactionHistory.Transaction]) {
+	mutating func updateTransactions(_ transactions: [TransactionHistoryItem]) {
 		let newSections = transactions.inSections
 		var sections = self.sections
 		sections.append(contentsOf: newSections)
 		sections.sort(by: \.day)
 		self.sections = sections
-		monthsLoaded.append(contentsOf: newSections.map(\.month))
+		loadedPeriods.append(contentsOf: newSections.map(\.month))
 	}
 
 	mutating func clearSections() {
 		sections.removeAll(keepingCapacity: true)
-		monthsLoaded.removeAll(keepingCapacity: true)
+		loadedPeriods.removeAll(keepingCapacity: true)
 	}
 }
 
-extension [TransactionHistory.Transaction] {
+extension [TransactionHistoryItem] {
 	var inSections: [TransactionHistory.State.TransactionSection] {
 		let calendar: Calendar = .current
 
@@ -107,30 +105,8 @@ extension [TransactionHistory.Transaction] {
 	}
 }
 
-extension [TransactionHistory.State.TransactionSection] {
-	init(grouping transactions: [TransactionHistory.Transaction]) {
-		let calendar: Calendar = .current
-
-		let sortedBackwards = transactions.sorted(by: \.time, >)
-		var result: Self = []
-
-		for transaction in sortedBackwards {
-			let day = calendar.startOfDay(for: transaction.time)
-			guard let month = try? calendar.startOfMonth(for: transaction.time) else { continue }
-
-			if result.last?.day == day {
-				result[result.endIndex - 1].append(transaction)
-			} else {
-				result.append(.init(day: day, month: month, transactions: [transaction]))
-			}
-		}
-
-		self = result
-	}
-}
-
 extension TransactionHistory.State.TransactionSection {
-	mutating func append(_ transaction: GatewayAPIClient.TransactionHistoryItem) {
+	mutating func append(_ transaction: TransactionHistoryItem) {
 		transactions.append(transaction)
 	}
 }
@@ -141,7 +117,7 @@ struct FailedToCalculateDate: Error {}
 extension [DateRangeItem] {
 	init(months: Int, upTo now: Date = .now) throws {
 		let calendar: Calendar = .current
-		let monthStart = try calendar.startOfMonth(for: now)
+		let monthStart = calendar.startOfMonth(for: now)
 		let dates = ((1 - months) ... 1).compactMap { calendar.date(byAdding: .month, value: $0, to: monthStart) }
 
 		guard dates.count == months + 1 else {
@@ -237,17 +213,18 @@ extension Calendar {
 //	}
 // }
 //
-// extension GatewayAPIClient.TransactionHistoryItem.ManifestType {
-//	static func random() -> Self {
-//		switch Int.random(in: 0 ... 4) {
-//		case 0: .transfer
-//		case 1: .contribute
-//		case 2: .claim
-//		case 3: .depositSettings
-//		default: .other
-//		}
-//	}
-// }
+extension TransactionHistoryItem.ManifestType {
+	static func random() -> Self {
+		switch Int.random(in: 0 ... 4) {
+		case 0: .transfer
+		case 1: .contribute
+		case 2: .claim
+		case 3: .depositSettings
+		default: .other
+		}
+	}
+}
+
 //
 // extension GatewayAPIClient.TransactionHistoryItem.Action {
 //	static func random() -> Self {

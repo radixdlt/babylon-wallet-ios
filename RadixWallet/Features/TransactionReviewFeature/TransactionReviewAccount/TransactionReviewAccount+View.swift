@@ -25,10 +25,7 @@ extension TransactionReviewAccounts {
 				Card {
 					VStack(spacing: .small1) {
 						ForEachStore(
-							store.scope(
-								state: \.accounts,
-								action: { .child(.account(id: $0, action: $1)) }
-							),
+							store.scope(state: \.accounts, action: \.child.account),
 							content: { TransactionReviewAccount.View(store: $0) }
 						)
 
