@@ -116,7 +116,7 @@ extension TransactionHistory {
 	}
 
 	struct TransactionView: SwiftUI.View {
-		let transaction: TransactionHistory.Transaction
+		let transaction: TransactionHistoryItem
 
 		var body: some SwiftUI.View {
 			Card(.app.white) {

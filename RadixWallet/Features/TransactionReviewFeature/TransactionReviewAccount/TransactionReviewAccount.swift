@@ -17,6 +17,7 @@ public struct TransactionReviewAccounts: Sendable, FeatureReducer {
 		case customizeGuaranteesTapped
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case account(id: AccountAddress, action: TransactionReviewAccount.Action)
 	}
