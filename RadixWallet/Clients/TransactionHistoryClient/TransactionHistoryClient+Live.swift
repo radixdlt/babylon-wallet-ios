@@ -14,7 +14,7 @@ extension TransactionHistoryClient {
 				limitPerPage: 100,
 				// kindFilter: GatewayAPI.StreamTransactionsRequest.KindFilter?,
 				manifestAccountsWithdrawnFromFilter: [account.address],
-				manifestAccountsDepositedIntoFilter: [account.address]
+				manifestAccountsDepositedIntoFilter: [account.address],
 				// manifestResourcesFilter: [String]?,
 				// affectedGlobalEntitiesFilter: [String]?,
 				// eventsFilter: [GatewayAPI.StreamTransactionsRequestEventFilterItem]?,
@@ -22,10 +22,13 @@ extension TransactionHistoryClient {
 				// accountsWithoutManifestOwnerMethodCalls: [String]?,
 				// manifestClassFilter: <<error type>>,
 				// order: GatewayAPI.StreamTransactionsRequest.Order?,
-				// optIns: GatewayAPI.TransactionDetailsOptIns(affectedGlobalEntities: true, manifestInstructions: true, balanceChanges: true)
+				optIns: .init(affectedGlobalEntities: true, balanceChanges: true)
+//				optIns: GatewayAPI.TransactionDetailsOptIns(affectedGlobalEntities: true, manifestInstructions: true, balanceChanges: true)
 			)
 
 			let response = try await gatewayAPIClient.streamTransactions(request)
+
+			print("• getTransactionHistory: #\(response.items.count)")
 
 			func resourceAddresses(for changes: GatewayAPI.TransactionBalanceChanges) -> [String] {
 				changes.fungibleBalanceChanges.map(\.resourceAddress)
@@ -33,21 +36,16 @@ extension TransactionHistoryClient {
 					+ changes.nonFungibleBalanceChanges.map(\.resourceAddress)
 			}
 
-			let addressStrings = response.items
-				.flatMap { $0.balanceChanges.map(resourceAddresses) ?? [] }
+			let addressStrings = Set(response.items.flatMap { $0.balanceChanges.map(resourceAddresses) ?? [] })
+//			let addressStrings = ["resource_rdx1t4m25xaasa45dxs0548fdnzf76xk6m62yzltq070plmzdr4clyctuh"]
 
-			let addresses = try addressStrings
-				.map(ResourceAddress.init)
+			print("• addressStrings: \(addressStrings.count)")
 
-			print("• resourceAddresses: \(addressStrings.count) -> \(addresses.count)")
-
-			let resourceAddresses = try response.items
-				.flatMap { $0.balanceChanges.map(resourceAddresses) ?? [] }
-				.map(ResourceAddress.init)
+			let resourceAddresses = try addressStrings.map(ResourceAddress.init)
 
 			let entityDetails = try await onLedgerEntitiesClient.getEntities(
 				addresses: resourceAddresses.map(\.asGeneral),
-				metadataKeys: .resourceMetadataKeys
+				metadataKeys: .poolUnitMetadataKeys
 			)
 
 //			let keyedResourceDetails = IdentifiedArray(entityDetails.compactMap(\.resource), id: \.resourceAddress) { $1 }
