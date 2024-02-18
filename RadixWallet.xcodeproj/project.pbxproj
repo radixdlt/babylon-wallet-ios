@@ -1177,6 +1177,9 @@
 		A462B5A42B8384FB00C26D20 /* CoreAPI_PlaintextMessageContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5A12B8384FB00C26D20 /* CoreAPI_PlaintextMessageContent.swift */; };
 		A462B5B02B84078D00C26D20 /* CoreAPI_StringPlaintextMessageContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5AF2B84078D00C26D20 /* CoreAPI_StringPlaintextMessageContent.swift */; };
 		A462B5B22B8407D300C26D20 /* CoreAPI_BinaryPlaintextMessageContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5B12B8407D300C26D20 /* CoreAPI_BinaryPlaintextMessageContent.swift */; };
+		A462B5792B8210A400C26D20 /* TransactionHistoryClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5782B820D2300C26D20 /* TransactionHistoryClient+Interface.swift */; };
+		A462B57A2B8210A600C26D20 /* TransactionHistoryClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5762B820D2200C26D20 /* TransactionHistoryClient+Live.swift */; };
+		A462B57B2B8210A900C26D20 /* TransactionHistoryClient+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5772B820D2300C26D20 /* TransactionHistoryClient+Mock.swift */; };
 		A47571FF2B29B0860059A95D /* IOSSecuritySuite in Frameworks */ = {isa = PBXBuildFile; productRef = A47571FE2B29B0860059A95D /* IOSSecuritySuite */; };
 		A47572042B29B4EE0059A95D /* IOSSecurityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */; };
 		A47572052B29B4F20059A95D /* IOSSecurityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */; };
@@ -2452,6 +2455,9 @@
 		A462B5A12B8384FB00C26D20 /* CoreAPI_PlaintextMessageContent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreAPI_PlaintextMessageContent.swift; sourceTree = "<group>"; };
 		A462B5AF2B84078D00C26D20 /* CoreAPI_StringPlaintextMessageContent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreAPI_StringPlaintextMessageContent.swift; sourceTree = "<group>"; };
 		A462B5B12B8407D300C26D20 /* CoreAPI_BinaryPlaintextMessageContent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreAPI_BinaryPlaintextMessageContent.swift; sourceTree = "<group>"; };
+		A462B5762B820D2200C26D20 /* TransactionHistoryClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistoryClient+Live.swift"; sourceTree = "<group>"; };
+		A462B5772B820D2300C26D20 /* TransactionHistoryClient+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistoryClient+Mock.swift"; sourceTree = "<group>"; };
+		A462B5782B820D2300C26D20 /* TransactionHistoryClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistoryClient+Interface.swift"; sourceTree = "<group>"; };
 		A47572012B29B3CA0059A95D /* IOSSecurityClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Live.swift"; sourceTree = "<group>"; };
 		A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Test.swift"; sourceTree = "<group>"; };
 		A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Interface.swift"; sourceTree = "<group>"; };
@@ -5037,6 +5043,7 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
+				A462B5752B820D1200C26D20 /* TransactionHistoryClient */,
 				A47572002B29B3B90059A95D /* IOSSecurityClient */,
 				830EA9D92AEA8750004C8051 /* EntitiesVisibilityClient */,
 				48CFBF8D2ADC10D900E77A5C /* AccountPortfoliosClient */,
@@ -6838,6 +6845,16 @@
 			path = AccountHistory;
 			sourceTree = "<group>";
 		};
+		A462B5752B820D1200C26D20 /* TransactionHistoryClient */ = {
+			isa = PBXGroup;
+			children = (
+				A462B5782B820D2300C26D20 /* TransactionHistoryClient+Interface.swift */,
+				A462B5762B820D2200C26D20 /* TransactionHistoryClient+Live.swift */,
+				A462B5772B820D2300C26D20 /* TransactionHistoryClient+Mock.swift */,
+			);
+			path = TransactionHistoryClient;
+			sourceTree = "<group>";
+		};
 		A47572002B29B3B90059A95D /* IOSSecurityClient */ = {
 			isa = PBXGroup;
 			children = (
@@ -7836,6 +7853,7 @@
 				48CFC3842ADC10D900E77A5C /* AssetResourceDetails.swift in Sources */,
 				48CFC6932ADC10DB00E77A5C /* ImportLegacyWalletErrors.swift in Sources */,
 				48CFC61E2ADC10DA00E77A5C /* LedgerIdentifiable.swift in Sources */,
+				A462B57B2B8210A900C26D20 /* TransactionHistoryClient+Mock.swift in Sources */,
 				48CFC4662ADC10DA00E77A5C /* AccountPortfoliosClient+Mock.swift in Sources */,
 				48CFC2F02ADC10D900E77A5C /* AddLedgerFactorSource+View.swift in Sources */,
 				48CFC62E2ADC10DA00E77A5C /* ProfileSnapshot.swift in Sources */,
@@ -8229,6 +8247,7 @@
 				48CFC4EB2ADC10DA00E77A5C /* FungibleResourcesCollectionItemVaultAggregated.swift in Sources */,
 				48CFC4322ADC10DA00E77A5C /* Async+Extra.swift in Sources */,
 				48CFC3F72ADC10D900E77A5C /* IncomingMessage.swift in Sources */,
+				A462B5792B8210A400C26D20 /* TransactionHistoryClient+Interface.swift in Sources */,
 				48CFC45E2ADC10DA00E77A5C /* TransactionClient+Interface.swift in Sources */,
 				48CFC61C2ADC10DA00E77A5C /* P2P+RTCMessageFromPeer.swift in Sources */,
 				48CFC4582ADC10DA00E77A5C /* LedgerHardwareWalletClient+Live.swift in Sources */,
@@ -8922,6 +8941,7 @@
 				48CFC2AC2ADC10D900E77A5C /* Home+View.swift in Sources */,
 				48CFC24F2ADC10D900E77A5C /* GatewayRow+Reducer.swift in Sources */,
 				48CFC4252ADC10DA00E77A5C /* String+Extra.swift in Sources */,
+				A462B57A2B8210A600C26D20 /* TransactionHistoryClient+Live.swift in Sources */,
 				48CFC39B2ADC10D900E77A5C /* Blake2b.swift in Sources */,
 				48CFC55B2ADC10DA00E77A5C /* StateEntityFungibleResourceVaultsPageResponse.swift in Sources */,
 				48CFC4D12ADC10DA00E77A5C /* CommittedTransactionInfo.swift in Sources */,
