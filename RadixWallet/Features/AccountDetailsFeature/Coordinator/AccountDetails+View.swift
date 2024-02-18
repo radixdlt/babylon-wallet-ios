@@ -115,11 +115,6 @@ extension AccountDetails {
 			} label: {
 				HStack(alignment: .center) {
 					Label(L10n.Common.history, asset: AssetResource.iconHistory)
-					Image(asset: AssetResource.iconLinkOut)
-						.resizable()
-						.renderingMode(.template)
-						.frame(width: .medium3, height: .medium3)
-						.opacity(0.5)
 				}
 			}
 			.headerButtonStyle
