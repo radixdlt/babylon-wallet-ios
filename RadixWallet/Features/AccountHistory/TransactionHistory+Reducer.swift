@@ -46,8 +46,10 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case let .selectedPeriod(period):
 			state.selectedPeriod = period
 			return .run { [account = state.account.address] send in
+
+				let account = try AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l")
+
 				let transactions = try await transactionHistoryClient.getTransactionHistory(account, nil)
-				print("•••••• updateTransactions \(transactions.items.count)")
 				await send(.internal(.updateTransactions(transactions.items)))
 			}
 
