@@ -9,6 +9,11 @@ extension CoreAPI {
 			case type
 		}
 
+		public var string: String? {
+			guard case let .string(value) = self else { return nil }
+			return value.value
+		}
+
 		public init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
 
