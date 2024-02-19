@@ -24,8 +24,9 @@ public struct TransactionHistoryItem: Sendable, Hashable {
 	let manifestType: ManifestType
 
 	enum Action: Sendable, Hashable {
-		case deposit(RETDecimal, ResourceBalance)
-		case withdrawal(RETDecimal, ResourceBalance)
+		case deposit(ResourceBalance)
+		case withdrawal(ResourceBalance)
+		case otherBalanceChange(ResourceBalance.Fungible, GatewayAPI.TransactionFungibleFeeBalanceChangeType)
 		case settings
 	}
 
