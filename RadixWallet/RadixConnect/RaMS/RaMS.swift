@@ -69,10 +69,10 @@ public actor RaMS {
 
 		let (data, dataResponse) = try await session.data(for: urlRequest)
 
-		//        @Dependency(\.openURL) var openURL
-		//        Task {
-		//            await openURL(.init(string: "https://ddjdmrlme9v4i.cloudfront.net/deep-link")!)
-		//        }
+		@Dependency(\.openURL) var openURL
+		Task {
+			await openURL(.init(string: "https://ddjdmrlme9v4i.cloudfront.net/wallet-response")!)
+		}
 	}
 }
 
