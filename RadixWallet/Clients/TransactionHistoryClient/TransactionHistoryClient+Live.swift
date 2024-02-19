@@ -128,12 +128,10 @@ extension TransactionHistoryClient {
 
 			func transaction(for info: GatewayAPI.CommittedTransactionInfo) throws -> TransactionHistoryItem? {
 				guard let time = info.confirmedAt else { return nil }
-
-				// let message = info.message as? GatewayAPI.TransactionMessageView
+				let message = info.message?.plaintext?.content.string
 				let transferActions = try info.balanceChanges.map(actions(for:)) ?? []
-//				let otherActions =
 
-				return .init(time: time, message: nil, actions: transferActions, manifestType: .random())
+				return .init(time: time, message: message, actions: transferActions, manifestType: .random())
 			}
 
 			return try .init(
