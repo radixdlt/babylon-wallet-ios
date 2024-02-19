@@ -1166,7 +1166,19 @@
 		A462B58F2B83674100C26D20 /* StateEntityDetailsResponsePackageDetailsCodeCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B58E2B83674000C26D20 /* StateEntityDetailsResponsePackageDetailsCodeCollection.swift */; };
 		A462B5912B83675000C26D20 /* PackageCodeCollectionItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5902B83675000C26D20 /* PackageCodeCollectionItem.swift */; };
 		A462B5932B83676200C26D20 /* ManifestClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5922B83676200C26D20 /* ManifestClass.swift */; };
-		A462B5952B837CA800C26D20 /* CoreAPITypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5942B837CA800C26D20 /* CoreAPITypes.swift */; };
+		A462B5952B837CA800C26D20 /* CoreAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5942B837CA800C26D20 /* CoreAPI.swift */; };
+		A462B59B2B83838600C26D20 /* CoreAPI_TransactionMessageType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5972B83838600C26D20 /* CoreAPI_TransactionMessageType.swift */; };
+		A462B59C2B83838600C26D20 /* CoreAPI_TransactionStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5982B83838600C26D20 /* CoreAPI_TransactionStatus.swift */; };
+		A462B59D2B83838600C26D20 /* CoreAPI_TransactionReceipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5992B83838600C26D20 /* CoreAPI_TransactionReceipt.swift */; };
+		A462B59E2B83838600C26D20 /* CoreAPI_TransactionMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B59A2B83838600C26D20 /* CoreAPI_TransactionMessage.swift */; };
+		A462B5A22B8384FB00C26D20 /* CoreAPI_PlaintextMessageContentType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B59F2B8384FB00C26D20 /* CoreAPI_PlaintextMessageContentType.swift */; };
+		A462B5A32B8384FB00C26D20 /* CoreAPI_PlaintextTransactionMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5A02B8384FB00C26D20 /* CoreAPI_PlaintextTransactionMessage.swift */; };
+		A462B5A42B8384FB00C26D20 /* CoreAPI_PlaintextMessageContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5A12B8384FB00C26D20 /* CoreAPI_PlaintextMessageContent.swift */; };
+		A462B5A82B83851900C26D20 /* CoreAPI_EncryptedTransactionMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5A52B83851900C26D20 /* CoreAPI_EncryptedTransactionMessage.swift */; };
+		A462B5A92B83851900C26D20 /* CoreAPI_EncryptedMessageDecryptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5A62B83851900C26D20 /* CoreAPI_EncryptedMessageDecryptor.swift */; };
+		A462B5AA2B83851900C26D20 /* CoreAPI_EncryptedMessageCurveDecryptorSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5A72B83851900C26D20 /* CoreAPI_EncryptedMessageCurveDecryptorSet.swift */; };
+		A462B5AD2B8385BC00C26D20 /* CoreAPI_PublicKeyType.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5AB2B8385BC00C26D20 /* CoreAPI_PublicKeyType.swift */; };
+		A462B5AE2B8385BC00C26D20 /* CoreAPI_PublicKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5AC2B8385BC00C26D20 /* CoreAPI_PublicKey.swift */; };
 		A47571FF2B29B0860059A95D /* IOSSecuritySuite in Frameworks */ = {isa = PBXBuildFile; productRef = A47571FE2B29B0860059A95D /* IOSSecuritySuite */; };
 		A47572042B29B4EE0059A95D /* IOSSecurityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */; };
 		A47572052B29B4F20059A95D /* IOSSecurityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */; };
@@ -2431,7 +2443,19 @@
 		A462B58E2B83674000C26D20 /* StateEntityDetailsResponsePackageDetailsCodeCollection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateEntityDetailsResponsePackageDetailsCodeCollection.swift; sourceTree = "<group>"; };
 		A462B5902B83675000C26D20 /* PackageCodeCollectionItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PackageCodeCollectionItem.swift; sourceTree = "<group>"; };
 		A462B5922B83676200C26D20 /* ManifestClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManifestClass.swift; sourceTree = "<group>"; };
-		A462B5942B837CA800C26D20 /* CoreAPITypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreAPITypes.swift; sourceTree = "<group>"; };
+		A462B5942B837CA800C26D20 /* CoreAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreAPI.swift; sourceTree = "<group>"; };
+		A462B5972B83838600C26D20 /* CoreAPI_TransactionMessageType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreAPI_TransactionMessageType.swift; sourceTree = "<group>"; };
+		A462B5982B83838600C26D20 /* CoreAPI_TransactionStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreAPI_TransactionStatus.swift; sourceTree = "<group>"; };
+		A462B5992B83838600C26D20 /* CoreAPI_TransactionReceipt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreAPI_TransactionReceipt.swift; sourceTree = "<group>"; };
+		A462B59A2B83838600C26D20 /* CoreAPI_TransactionMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreAPI_TransactionMessage.swift; sourceTree = "<group>"; };
+		A462B59F2B8384FB00C26D20 /* CoreAPI_PlaintextMessageContentType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreAPI_PlaintextMessageContentType.swift; sourceTree = "<group>"; };
+		A462B5A02B8384FB00C26D20 /* CoreAPI_PlaintextTransactionMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreAPI_PlaintextTransactionMessage.swift; sourceTree = "<group>"; };
+		A462B5A12B8384FB00C26D20 /* CoreAPI_PlaintextMessageContent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreAPI_PlaintextMessageContent.swift; sourceTree = "<group>"; };
+		A462B5A52B83851900C26D20 /* CoreAPI_EncryptedTransactionMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreAPI_EncryptedTransactionMessage.swift; sourceTree = "<group>"; };
+		A462B5A62B83851900C26D20 /* CoreAPI_EncryptedMessageDecryptor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreAPI_EncryptedMessageDecryptor.swift; sourceTree = "<group>"; };
+		A462B5A72B83851900C26D20 /* CoreAPI_EncryptedMessageCurveDecryptorSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreAPI_EncryptedMessageCurveDecryptorSet.swift; sourceTree = "<group>"; };
+		A462B5AB2B8385BC00C26D20 /* CoreAPI_PublicKeyType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreAPI_PublicKeyType.swift; sourceTree = "<group>"; };
+		A462B5AC2B8385BC00C26D20 /* CoreAPI_PublicKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreAPI_PublicKey.swift; sourceTree = "<group>"; };
 		A47572012B29B3CA0059A95D /* IOSSecurityClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Live.swift"; sourceTree = "<group>"; };
 		A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Test.swift"; sourceTree = "<group>"; };
 		A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Interface.swift"; sourceTree = "<group>"; };
@@ -5342,7 +5366,7 @@
 				48CFC0B62ADC10D900E77A5C /* GatewayAPI+Utils.swift */,
 				48CFC0B72ADC10D900E77A5C /* CreatedModels */,
 				48CFC0C22ADC10D900E77A5C /* GatewayAPI.swift */,
-				A462B5942B837CA800C26D20 /* CoreAPITypes.swift */,
+				A462B5962B83834E00C26D20 /* CoreAPI */,
 			);
 			path = GatewayAPI;
 			sourceTree = "<group>";
@@ -6792,6 +6816,26 @@
 			path = ManualAccountRecoveryScan;
 			sourceTree = "<group>";
 		};
+		A462B5962B83834E00C26D20 /* CoreAPI */ = {
+			isa = PBXGroup;
+			children = (
+				A462B5942B837CA800C26D20 /* CoreAPI.swift */,
+				A462B5992B83838600C26D20 /* CoreAPI_TransactionReceipt.swift */,
+				A462B5982B83838600C26D20 /* CoreAPI_TransactionStatus.swift */,
+				A462B59A2B83838600C26D20 /* CoreAPI_TransactionMessage.swift */,
+				A462B5972B83838600C26D20 /* CoreAPI_TransactionMessageType.swift */,
+				A462B5A12B8384FB00C26D20 /* CoreAPI_PlaintextMessageContent.swift */,
+				A462B59F2B8384FB00C26D20 /* CoreAPI_PlaintextMessageContentType.swift */,
+				A462B5A02B8384FB00C26D20 /* CoreAPI_PlaintextTransactionMessage.swift */,
+				A462B5A72B83851900C26D20 /* CoreAPI_EncryptedMessageCurveDecryptorSet.swift */,
+				A462B5A62B83851900C26D20 /* CoreAPI_EncryptedMessageDecryptor.swift */,
+				A462B5A52B83851900C26D20 /* CoreAPI_EncryptedTransactionMessage.swift */,
+				A462B5AC2B8385BC00C26D20 /* CoreAPI_PublicKey.swift */,
+				A462B5AB2B8385BC00C26D20 /* CoreAPI_PublicKeyType.swift */,
+			);
+			path = CoreAPI;
+			sourceTree = "<group>";
+		};
 		A47572002B29B3B90059A95D /* IOSSecurityClient */ = {
 			isa = PBXGroup;
 			children = (
@@ -7828,6 +7872,7 @@
 				48CFC55D2ADC10DA00E77A5C /* PublicKeyHashEddsaEd25519.swift in Sources */,
 				48CFC3922ADC10D900E77A5C /* ManifestBuilder+CustomInstructions.swift in Sources */,
 				48CFC5CD2ADC10DA00E77A5C /* ShimmeringAnimation.swift in Sources */,
+				A462B59B2B83838600C26D20 /* CoreAPI_TransactionMessageType.swift in Sources */,
 				48CFC34F2ADC10D900E77A5C /* PersonaRow+View.swift in Sources */,
 				48CFC40A2ADC10DA00E77A5C /* EmailAddress.swift in Sources */,
 				48CFC6522ADC10DB00E77A5C /* PersonaData+Email.swift in Sources */,
@@ -8129,6 +8174,7 @@
 				48CFC5032ADC10DA00E77A5C /* MetadataI64Value.swift in Sources */,
 				A47572042B29B4EE0059A95D /* IOSSecurityClient+Interface.swift in Sources */,
 				E6FA984E2B04E3D500748F20 /* NoContentView.swift in Sources */,
+				A462B5A22B8384FB00C26D20 /* CoreAPI_PlaintextMessageContentType.swift in Sources */,
 				48CFC27E2ADC10D900E77A5C /* HUD+View.swift in Sources */,
 				48CFC4732ADC10DA00E77A5C /* DeviceFactorSourceClient+Test.swift in Sources */,
 				48CFC38D2ADC10D900E77A5C /* Address.swift in Sources */,
@@ -8283,6 +8329,7 @@
 				48CFC33B2ADC10D900E77A5C /* DappInteractionLoading.swift in Sources */,
 				48CFC34A2ADC10D900E77A5C /* PersonaDataPermission+View.swift in Sources */,
 				48CFC53D2ADC10DA00E77A5C /* MetadataI32ArrayValue.swift in Sources */,
+				A462B5A42B8384FB00C26D20 /* CoreAPI_PlaintextMessageContent.swift in Sources */,
 				48CFC4312ADC10DA00E77A5C /* PublicKey+CustomDebug.swift in Sources */,
 				48CFC6092ADC10DA00E77A5C /* AuthRequestResponseItem.swift in Sources */,
 				48CFC3BA2ADC10D900E77A5C /* DataReader.swift in Sources */,
@@ -8308,6 +8355,7 @@
 				48CFC4362ADC10DA00E77A5C /* JSONEncoder+Live.swift in Sources */,
 				48CFC4862ADC10DA00E77A5C /* OnLedgerEntitiesClient+Interface.swift in Sources */,
 				48CFC3982ADC10D900E77A5C /* ReviewedTransaction.swift in Sources */,
+				A462B5AE2B8385BC00C26D20 /* CoreAPI_PublicKey.swift in Sources */,
 				48CFC5A22ADC10DA00E77A5C /* JSONView.swift in Sources */,
 				48CFC45B2ADC10DA00E77A5C /* P2PLinksClient+Test.swift in Sources */,
 				48CFC5562ADC10DA00E77A5C /* GatewayInfoResponseReleaseInfo.swift in Sources */,
@@ -8378,16 +8426,18 @@
 				48CFC2EA2ADC10D900E77A5C /* NameSecurityStructure.swift in Sources */,
 				48CFC62C2ADC10DA00E77A5C /* AppearanceID.swift in Sources */,
 				48CFC5D62ADC10DA00E77A5C /* NavigationBarLargeTitleInsets.swift in Sources */,
-				A462B5952B837CA800C26D20 /* CoreAPITypes.swift in Sources */,
+				A462B5952B837CA800C26D20 /* CoreAPI.swift in Sources */,
 				48CFC4832ADC10DA00E77A5C /* QRGeneratorClient+Interface.swift in Sources */,
 				48CFC2812ADC10D900E77A5C /* SceneDelegate.swift in Sources */,
 				48CFC5C82ADC10DA00E77A5C /* Fonts.swift in Sources */,
+				A462B59E2B83838600C26D20 /* CoreAPI_TransactionMessage.swift in Sources */,
 				48CFC6452ADC10DB00E77A5C /* PersonaData+Entry+Codable.swift in Sources */,
 				48CFC3342ADC10D900E77A5C /* PreviewedFeature.swift in Sources */,
 				83EE478C2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueMapEntry.swift in Sources */,
 				48CFC3272ADC10D900E77A5C /* ScanQRCoordinator+Reducer.swift in Sources */,
 				48AE39DC2B0CBE3900813CF3 /* AccountRecoveryScanCoordinator.swift in Sources */,
 				48CFC5762ADC10DA00E77A5C /* TransactionReceiptStatus.swift in Sources */,
+				A462B59C2B83838600C26D20 /* CoreAPI_TransactionStatus.swift in Sources */,
 				48CFC5DE2ADC10DA00E77A5C /* OnFirstTaskViewModifier.swift in Sources */,
 				48CFC4F92ADC10DA00E77A5C /* OptionalNonFungibleIdsCollection.swift in Sources */,
 				48CFC32D2ADC10D900E77A5C /* OffDeviceMnemonicInfo+View.swift in Sources */,
@@ -8441,6 +8491,7 @@
 				48CFC36D2ADC10D900E77A5C /* FungibleAssetList+Row+Reducer.swift in Sources */,
 				48CFC3D12ADC10D900E77A5C /* WordList+SimplifiedChinese.swift in Sources */,
 				48CFC4BE2ADC10DA00E77A5C /* StateEntityDetailsResponsePackageDetailsSchemaCollection.swift in Sources */,
+				A462B5A92B83851900C26D20 /* CoreAPI_EncryptedMessageDecryptor.swift in Sources */,
 				48CFC4EC2ADC10DA00E77A5C /* NonFungibleResourcesCollectionItemVaultAggregatedVault.swift in Sources */,
 				48CFC28F2ADC10D900E77A5C /* TransactionReviewAccount+View.swift in Sources */,
 				48CFC33D2ADC10D900E77A5C /* DappInteractionCoordinator.swift in Sources */,
@@ -8475,6 +8526,7 @@
 				48CFC2E72ADC10D900E77A5C /* CreateSecurityStructureStart+View.swift in Sources */,
 				E6A2D9E12AFA6BFE001857EC /* DeviceFactorSourceControlled.swift in Sources */,
 				48CFC3A02ADC10D900E77A5C /* IsXRDResource.swift in Sources */,
+				A462B59D2B83838600C26D20 /* CoreAPI_TransactionReceipt.swift in Sources */,
 				48CFC6652ADC10DB00E77A5C /* BaseFactorSourceProtocol.swift in Sources */,
 				48CFC2F12ADC10D900E77A5C /* CreatePersonaCoordinator+Reducer.swift in Sources */,
 				48CFC5702ADC10DA00E77A5C /* TransactionConstructionResponse.swift in Sources */,
@@ -8552,6 +8604,7 @@
 				48CFC65D2ADC10DB00E77A5C /* Profile+AuthorizedDapps+Edit.swift in Sources */,
 				48CFC5552ADC10DA00E77A5C /* MetadataU64ArrayValue.swift in Sources */,
 				48CFC3CD2ADC10D900E77A5C /* WordList+Italian.swift in Sources */,
+				A462B5AA2B83851900C26D20 /* CoreAPI_EncryptedMessageCurveDecryptorSet.swift in Sources */,
 				48CFC5242ADC10DA00E77A5C /* MetadataI32Value.swift in Sources */,
 				48CFC2522ADC10D900E77A5C /* AddNewGateway+Reducer.swift in Sources */,
 				48CFC3FA2ADC10D900E77A5C /* SignalingClient.swift in Sources */,
@@ -8698,6 +8751,7 @@
 				83EE47892AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI16.swift in Sources */,
 				48CFC5212ADC10DA00E77A5C /* StateValidatorsListResponse.swift in Sources */,
 				48CFC43D2ADC10DA00E77A5C /* FactorSourcesClient+Test.swift in Sources */,
+				A462B5A32B8384FB00C26D20 /* CoreAPI_PlaintextTransactionMessage.swift in Sources */,
 				48CFC3D92ADC10D900E77A5C /* BIP39+Checksum.swift in Sources */,
 				48CFC2A22ADC10D900E77A5C /* Persona+View.swift in Sources */,
 				48CFC5582ADC10DA00E77A5C /* NonFungibleIdType.swift in Sources */,
@@ -8768,6 +8822,7 @@
 				48CFC49D2ADC10DA00E77A5C /* TransactionNotFoundError.swift in Sources */,
 				48CFC3E82ADC10D900E77A5C /* Async.swift in Sources */,
 				48CFC51A2ADC10DA00E77A5C /* StateEntityNonFungibleIdsPageRequest.swift in Sources */,
+				A462B5AD2B8385BC00C26D20 /* CoreAPI_PublicKeyType.swift in Sources */,
 				48CFC4FD2ADC10DA00E77A5C /* StateNonFungibleIdsRequest.swift in Sources */,
 				48CFC5C12ADC10DA00E77A5C /* Selection.swift in Sources */,
 				E634CA302AFD25B100C43DB7 /* DebugKeychainContents.swift in Sources */,
@@ -8861,6 +8916,7 @@
 				48CFC2402ADC10D900E77A5C /* AccountPreferences+Reducer.swift in Sources */,
 				48CFC5EF2ADC10DA00E77A5C /* SmallAccountCard.swift in Sources */,
 				48CFC48C2ADC10DA00E77A5C /* DiskPersistenceClient+Test.swift in Sources */,
+				A462B5A82B83851900C26D20 /* CoreAPI_EncryptedTransactionMessage.swift in Sources */,
 				48CFC5A72ADC10DA00E77A5C /* InfoButtonStyle.swift in Sources */,
 				48CFC61F2ADC10DA00E77A5C /* AssetBehavior.swift in Sources */,
 				48CFC2AC2ADC10D900E77A5C /* Home+View.swift in Sources */,
