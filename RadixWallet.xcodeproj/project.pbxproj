@@ -1166,6 +1166,7 @@
 		A462B58F2B83674100C26D20 /* StateEntityDetailsResponsePackageDetailsCodeCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B58E2B83674000C26D20 /* StateEntityDetailsResponsePackageDetailsCodeCollection.swift */; };
 		A462B5912B83675000C26D20 /* PackageCodeCollectionItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5902B83675000C26D20 /* PackageCodeCollectionItem.swift */; };
 		A462B5932B83676200C26D20 /* ManifestClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5922B83676200C26D20 /* ManifestClass.swift */; };
+		A462B5952B837CA800C26D20 /* CoreAPITypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5942B837CA800C26D20 /* CoreAPITypes.swift */; };
 		A47571FF2B29B0860059A95D /* IOSSecuritySuite in Frameworks */ = {isa = PBXBuildFile; productRef = A47571FE2B29B0860059A95D /* IOSSecuritySuite */; };
 		A47572042B29B4EE0059A95D /* IOSSecurityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */; };
 		A47572052B29B4F20059A95D /* IOSSecurityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */; };
@@ -2430,6 +2431,7 @@
 		A462B58E2B83674000C26D20 /* StateEntityDetailsResponsePackageDetailsCodeCollection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateEntityDetailsResponsePackageDetailsCodeCollection.swift; sourceTree = "<group>"; };
 		A462B5902B83675000C26D20 /* PackageCodeCollectionItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PackageCodeCollectionItem.swift; sourceTree = "<group>"; };
 		A462B5922B83676200C26D20 /* ManifestClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ManifestClass.swift; sourceTree = "<group>"; };
+		A462B5942B837CA800C26D20 /* CoreAPITypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreAPITypes.swift; sourceTree = "<group>"; };
 		A47572012B29B3CA0059A95D /* IOSSecurityClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Live.swift"; sourceTree = "<group>"; };
 		A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Test.swift"; sourceTree = "<group>"; };
 		A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Interface.swift"; sourceTree = "<group>"; };
@@ -5340,6 +5342,7 @@
 				48CFC0B62ADC10D900E77A5C /* GatewayAPI+Utils.swift */,
 				48CFC0B72ADC10D900E77A5C /* CreatedModels */,
 				48CFC0C22ADC10D900E77A5C /* GatewayAPI.swift */,
+				A462B5942B837CA800C26D20 /* CoreAPITypes.swift */,
 			);
 			path = GatewayAPI;
 			sourceTree = "<group>";
@@ -8375,6 +8378,7 @@
 				48CFC2EA2ADC10D900E77A5C /* NameSecurityStructure.swift in Sources */,
 				48CFC62C2ADC10DA00E77A5C /* AppearanceID.swift in Sources */,
 				48CFC5D62ADC10DA00E77A5C /* NavigationBarLargeTitleInsets.swift in Sources */,
+				A462B5952B837CA800C26D20 /* CoreAPITypes.swift in Sources */,
 				48CFC4832ADC10DA00E77A5C /* QRGeneratorClient+Interface.swift in Sources */,
 				48CFC2812ADC10D900E77A5C /* SceneDelegate.swift in Sources */,
 				48CFC5C82ADC10DA00E77A5C /* Fonts.swift in Sources */,
