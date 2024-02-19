@@ -11,6 +11,11 @@ extension CoreAPI {
 			case type
 		}
 
+		public var plaintext: PlaintextTransactionMessage? {
+			guard case let .plaintext(value) = self else { return nil }
+			return value
+		}
+
 		public init(from decoder: Decoder) throws {
 			let container = try decoder.container(keyedBy: CodingKeys.self)
 
