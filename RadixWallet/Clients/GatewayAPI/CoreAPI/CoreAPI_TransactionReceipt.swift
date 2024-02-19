@@ -14,13 +14,5 @@ extension CoreAPI {
 			case status
 			case errorMessage = "error_message"
 		}
-
-		// Encodable protocol methods
-
-		public func encode(to encoder: Encoder) throws {
-			var container = encoder.container(keyedBy: CodingKeys.self)
-			try container.encode(status, forKey: .status)
-			try container.encodeIfPresent(errorMessage, forKey: .errorMessage)
-		}
 	}
 }

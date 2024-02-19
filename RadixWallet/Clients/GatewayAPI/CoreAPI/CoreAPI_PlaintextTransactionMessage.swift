@@ -18,14 +18,5 @@ extension CoreAPI {
 			case mimeType = "mime_type"
 			case content
 		}
-
-		// Encodable protocol methods
-
-		public func encode(to encoder: Encoder) throws {
-			var container = encoder.container(keyedBy: CodingKeys.self)
-			try container.encode(type, forKey: .type)
-			try container.encode(mimeType, forKey: .mimeType)
-			try container.encode(content, forKey: .content)
-		}
 	}
 }
