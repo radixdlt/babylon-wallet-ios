@@ -21,20 +21,12 @@ public struct TransactionHistoryItem: Sendable, Hashable {
 	let time: Date
 	let message: String?
 	let actions: [Action]
-	let manifestType: ManifestType
+	let manifestClass: GatewayAPI.ManifestClass
 
 	enum Action: Sendable, Hashable {
 		case deposit(ResourceBalance)
 		case withdrawal(ResourceBalance)
 		case otherBalanceChange(ResourceBalance.Fungible, GatewayAPI.TransactionFungibleFeeBalanceChangeType)
 		case settings
-	}
-
-	enum ManifestType {
-		case transfer
-		case contribute
-		case claim
-		case depositSettings
-		case other
 	}
 }
