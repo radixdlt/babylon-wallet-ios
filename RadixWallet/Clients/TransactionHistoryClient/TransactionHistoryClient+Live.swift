@@ -1,36 +1,14 @@
+import EngineToolkit
+
 extension TransactionHistoryClient {
+	struct MissingAmountError: Error {}
+	struct MissingManifestClassError: Error {}
+
 	public static let liveValue = TransactionHistoryClient.live()
 
 	public static func live() -> Self {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
-
-		@Sendable
-		func resourceAddresses(for changes: GatewayAPI.TransactionBalanceChanges) throws -> [ResourceAddress] {
-			try (changes.fungibleBalanceChanges.map(\.resourceAddress)
-				+ changes.fungibleFeeBalanceChanges.map(\.resourceAddress)
-				+ changes.nonFungibleBalanceChanges.map(\.resourceAddress)).map(ResourceAddress.init)
-		}
-
-		@Sendable
-		func nonFungibleIDs(for changes: GatewayAPI.TransactionBalanceChanges) throws -> [NonFungibleGlobalId] {
-			let allChanges = try changes.nonFungibleBalanceChanges.flatMap { change in
-				let additions = try change.added.map { try NonFungibleGlobalId(nonFungibleGlobalId: change.resourceAddress + ":" + $0) }
-				let removals = try change.added.map { try NonFungibleGlobalId(nonFungibleGlobalId: change.resourceAddress + ":" + $0) }
-				return additions + removals
-			}
-
-			//			let strings = changes.nonFungibleBalanceChanges.flatMap { $0.added + $0.removed }
-
-			for change in changes.nonFungibleBalanceChanges {
-				for added in change.added {
-					let id = try? NonFungibleGlobalId(nonFungibleGlobalId: change.resourceAddress + ":" + added)
-					print(" •• NFT id: \(added) -> \(id?.asStr() ?? "nil")")
-				}
-			}
-
-			return allChanges
-		}
 
 		@Sendable
 		func getTransactionHistory(account: AccountAddress, cursor: String?) async throws -> TransactionHistoryResponse {
@@ -40,8 +18,8 @@ extension TransactionHistoryClient {
 				cursor: cursor,
 				limitPerPage: 100,
 				// kindFilter: GatewayAPI.StreamTransactionsRequest.KindFilter?,
-				manifestAccountsWithdrawnFromFilter: [account.address],
-				manifestAccountsDepositedIntoFilter: [account.address],
+//				manifestAccountsWithdrawnFromFilter: [account.address],
+//				manifestAccountsDepositedIntoFilter: [account.address],
 				// manifestResourcesFilter: [String]?,
 				// affectedGlobalEntitiesFilter: [String]?,
 				// eventsFilter: [GatewayAPI.StreamTransactionsRequestEventFilterItem]?,
@@ -49,18 +27,16 @@ extension TransactionHistoryClient {
 				// accountsWithoutManifestOwnerMethodCalls: [String]?,
 				// manifestClassFilter: <<error type>>,
 				// order: GatewayAPI.StreamTransactionsRequest.Order?,
-				optIns: .init(affectedGlobalEntities: true, balanceChanges: true)
-//				optIns: GatewayAPI.TransactionDetailsOptIns(affectedGlobalEntities: true, manifestInstructions: true, balanceChanges: true)
+				optIns: .init(balanceChanges: true)
+				// optIns: GatewayAPI.TransactionDetailsOptIns(affectedGlobalEntities: true, manifestInstructions: true, balanceChanges: true)
 			)
 
 			let response = try await gatewayAPIClient.streamTransactions(request)
 
 			print("• getTransactionHistory: #\(response.items.count)")
 
-			let resourceAddresses = try Set(response.items.flatMap { try $0.balanceChanges.map(resourceAddresses) ?? [] })
+			let resourceAddresses = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
 			//	let resourceAddresses = ["resource_rdx1t4m25xaasa45dxs0548fdnzf76xk6m62yzltq070plmzdr4clyctuh"]
-
-			print("• resourceAddresses: \(resourceAddresses.count)")
 
 			let resourceDetails = try await onLedgerEntitiesClient.getEntities(
 				addresses: resourceAddresses.map(\.asGeneral),
@@ -82,8 +58,6 @@ extension TransactionHistoryClient {
 				)
 			}
 
-			struct MissingAmountError: Error {}
-
 			func action(for changes: GatewayAPI.TransactionFungibleFeeBalanceChanges) throws -> TransactionHistoryItem.Action {
 				let balance = try fungibleBalance(changes.resourceAddress, balanceChange: changes.balanceChange)
 				return .otherBalanceChange(balance, changes.type)
@@ -97,7 +71,7 @@ extension TransactionHistoryClient {
 
 			// Non-fungible
 
-			let nonFungibleIDs = try Set(response.items.flatMap { try $0.balanceChanges.map(nonFungibleIDs) ?? [] })
+			let nonFungibleIDs = try Set(response.items.flatMap { try $0.balanceChanges.map(extractAllNonFungibleIDs) ?? [] })
 			let groupedNonFungibleIDs = Dictionary(grouping: nonFungibleIDs) { $0.resourceAddress() }
 			let nftData = try await groupedNonFungibleIDs.parallelMap { address, ids in
 				try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(resource: address.asSpecific(), nonFungibleIds: ids))
@@ -109,29 +83,47 @@ extension TransactionHistoryClient {
 				}
 			}
 
-			for d in nftData {
-				print("• \(d.count) -<<<")
-				for g in d {
-					print("•• \(g.data?.name ?? "nil")")
-				}
+			func nonFungibleBalance(_ id: NonFungibleGlobalId) throws -> ResourceBalance.NonFungible {
+				let resourceAddress: ResourceAddress = try id.resourceAddress().asSpecific()
+				let resourceName = keyedResourceDetails[id: resourceAddress]?.metadata.name
+				let iconURL = keyedResourceDetails[id: resourceAddress]?.metadata.iconURL
+				return .init(
+					id: id,
+					resourceName: resourceName,
+					nonFungibleName: keyedNFTData[id]?.data?.name,
+					icon: iconURL
+				)
 			}
 
-			func action(for changes: GatewayAPI.TransactionNonFungibleBalanceChanges) -> TransactionHistoryItem.Action {
-				fatalError()
+			func action(for changes: GatewayAPI.TransactionNonFungibleBalanceChanges) throws -> [TransactionHistoryItem.Action] {
+				let added = try extractNonFungibleIDs(.added, from: changes)
+					.map { try TransactionHistoryItem.Action.deposit(.nonFungible(nonFungibleBalance($0))) }
+				let removed = try extractNonFungibleIDs(.removed, from: changes)
+					.map { try TransactionHistoryItem.Action.withdrawal(.nonFungible(nonFungibleBalance($0))) }
+
+				return added + removed
 			}
 
 			func actions(for changes: GatewayAPI.TransactionBalanceChanges) throws -> [TransactionHistoryItem.Action] {
 				try changes.fungibleBalanceChanges.map(action(for:))
 					+ changes.fungibleFeeBalanceChanges.map(action(for:))
-//					+ changes.nonFungibleBalanceChanges.map(action(for:))
+					+ changes.nonFungibleBalanceChanges.flatMap(action(for:))
 			}
 
 			func transaction(for info: GatewayAPI.CommittedTransactionInfo) throws -> TransactionHistoryItem? {
 				guard let time = info.confirmedAt else { return nil }
+				guard let manifestClass = info.manifestClasses?.first else { throw MissingManifestClassError() }
 				let message = info.message?.plaintext?.content.string
-				let transferActions = try info.balanceChanges.map(actions(for:)) ?? []
+				var actions = try info.balanceChanges.map(actions(for:)) ?? []
+				if info.manifestClasses?.contains(.accountDepositSettingsUpdate) == true {
+					actions.append(.settings)
+				}
 
-				return .init(time: time, message: message, actions: transferActions, manifestType: .random())
+				for action in actions {
+					print("• action: \(action)")
+				}
+
+				return .init(time: time, message: message, actions: actions, manifestClass: manifestClass)
 			}
 
 			return try .init(
@@ -158,48 +150,46 @@ extension TransactionHistoryClient {
 		 /** Hex-encoded binary blob. */
 		 public private(set) var rawHex: String?
 		 public private(set) var receipt: TransactionReceipt?
-		 /** The optional transaction message. This type is defined in the Core API as `TransactionMessage`. See the Core API documentation for more details.  */
-		 public private(set) var message: AnyCodable?
+		 /** A text-representation of a transaction manifest. This field will be present only for user transactions
+		  and when explicitly opted-in using `manifest_instructions` flag.  */
+		 public private(set) var manifestInstructions: String?
+		 /** A collection of zero or more manifest classes ordered from the most specific class to the least specific one.
+		  This field will be present only for user transactions.  */
+		 public private(set) var manifestClasses: [ManifestClass]?
+		 public private(set) var message: CoreAPI.TransactionMessage?
 		 public private(set) var balanceChanges: TransactionBalanceChanges?
-		 */
 
+		 */
 		return TransactionHistoryClient(
 			getTransactionHistory: getTransactionHistory
 		)
 	}
-}
 
-// MARK: - TransactionHistoryResponse__
-/*
- (AccountAddress, String?) async throws -> [TransactionHistoryItem]
-
- (SpecificAddress<AccountEntityType>, Optional<String>) async throws -> TransactionHistoryResponse')
- */
-
-public struct TransactionHistoryResponse__: Sendable, Hashable {
-	public let cursor: String?
-	public let items: [TransactionHistoryItem]
-}
-
-// MARK: - TransactionHistoryItem__
-public struct TransactionHistoryItem__: Sendable, Hashable {
-	let time: Date
-	let message: String?
-	let actions: [Action]
-	let manifestType: ManifestType
-
-	enum Action: Sendable, Hashable {
-		case deposit(ResourceBalance)
-		case withdrawal(ResourceBalance)
-		case otherBalanceChange(ResourceBalance)
-		case settings
+	@Sendable
+	private static func extractResourceAddresses(from changes: GatewayAPI.TransactionBalanceChanges) throws -> [ResourceAddress] {
+		try (changes.fungibleBalanceChanges.map(\.resourceAddress)
+			+ changes.fungibleFeeBalanceChanges.map(\.resourceAddress)
+			+ changes.nonFungibleBalanceChanges.map(\.resourceAddress))
+			.map(ResourceAddress.init)
 	}
 
-	enum ManifestType {
-		case transfer
-		case contribute
-		case claim
-		case depositSettings
-		case other
+	@Sendable
+	private static func extractAllNonFungibleIDs(from changes: GatewayAPI.TransactionBalanceChanges) throws -> [NonFungibleGlobalId] {
+		try changes.nonFungibleBalanceChanges.flatMap { change in
+			try extractNonFungibleIDs(.added, from: change) + extractNonFungibleIDs(.removed, from: change)
+		}
+	}
+
+	enum ChangeType {
+		case added, removed
+	}
+
+	@Sendable
+	private static func extractNonFungibleIDs(_ type: ChangeType, from changes: GatewayAPI.TransactionNonFungibleBalanceChanges) throws -> [NonFungibleGlobalId] {
+		let localIDStrings = type == .added ? changes.added : changes.removed
+		let resourceAddress = try EngineToolkit.Address(address: changes.resourceAddress)
+		return try localIDStrings
+			.map(nonFungibleLocalIdFromStr)
+			.map { try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress, nonFungibleLocalId: $0) }
 	}
 }
