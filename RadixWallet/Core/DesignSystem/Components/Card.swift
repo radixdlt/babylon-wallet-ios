@@ -95,6 +95,13 @@ extension View {
 			.cardShadow
 	}
 
+	public func inFlatBottomSpeechbubble(inset: CGFloat = 0) -> some View {
+		frame(minHeight: 2 * (.medium3 - inset))
+			.padding(.bottom, SpeechbubbleShape.triangleSize.height)
+			.background(.app.gray4)
+			.clipShape(SpeechbubbleShape(cornerRadius: .medium3 - inset, flatBottom: true))
+	}
+
 	/// Gives the view rounded corners  (12 px) and no shadow, useful for inner views
 	public var inFlatCard: some View {
 		clipShape(RoundedRectangle(cornerRadius: .small1))
@@ -108,11 +115,14 @@ extension View {
 // MARK: - SpeechbubbleShape
 public struct SpeechbubbleShape: Shape {
 	let cornerRadius: CGFloat
-	public static let triangleSize: CGSize = .init(width: 20, height: 10)
+	let flatBottom: Bool
+
+	public static let triangleSize: CGSize = .init(width: 20, height: 12)
 	public static let triangleInset: CGFloat = 50
 
-	public init(cornerRadius: CGFloat) {
+	public init(cornerRadius: CGFloat, flatBottom: Bool = false) {
 		self.cornerRadius = cornerRadius
+		self.flatBottom = flatBottom
 	}
 
 	public func path(in rect: CGRect) -> SwiftUI.Path {
@@ -129,20 +139,26 @@ public struct SpeechbubbleShape: Shape {
 			                    startAngle: -.radians(.pi / 2),
 			                    delta: .radians(.pi / 2))
 
-			path.addRelativeArc(center: .init(x: arcCenters.maxX, y: arcCenters.maxY),
-			                    radius: cornerRadius,
-			                    startAngle: .zero,
-			                    delta: .radians(.pi / 2))
-
-			path.addLine(to: .init(x: inner.maxX - Self.triangleInset - Self.triangleSize.width / 2, y: inner.maxY))
-			path.addLine(to: .init(x: inner.maxX - Self.triangleInset, y: rect.maxY))
+			if flatBottom {
+				path.addLine(to: .init(x: rect.maxX, y: inner.maxY))
+			} else {
+				path.addRelativeArc(center: .init(x: arcCenters.maxX, y: arcCenters.maxY),
+				                    radius: cornerRadius,
+				                    startAngle: .zero,
+				                    delta: .radians(.pi / 2))
+			}
 			path.addLine(to: .init(x: inner.maxX - Self.triangleInset + Self.triangleSize.width / 2, y: inner.maxY))
+			path.addLine(to: .init(x: inner.maxX - Self.triangleInset, y: rect.maxY))
+			path.addLine(to: .init(x: inner.maxX - Self.triangleInset - Self.triangleSize.width / 2, y: inner.maxY))
 
-			path.addRelativeArc(center: .init(x: arcCenters.minX, y: arcCenters.maxY),
-			                    radius: cornerRadius,
-			                    startAngle: .radians(.pi / 2),
-			                    delta: .radians(.pi / 2))
-
+			if flatBottom {
+				path.addLine(to: .init(x: rect.minX, y: inner.maxY))
+			} else {
+				path.addRelativeArc(center: .init(x: arcCenters.minX, y: arcCenters.maxY),
+				                    radius: cornerRadius,
+				                    startAngle: .radians(.pi / 2),
+				                    delta: .radians(.pi / 2))
+			}
 			path.closeSubpath()
 		}
 	}
