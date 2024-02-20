@@ -39,7 +39,7 @@ extension TokenPriceClient {
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		@Dependency(\.jsonEncoder) var jsonEncoder
 		@Dependency(\.cacheClient) var cacheClient
-		let rootURL = URL(string: "https://token-price.extratools.works")!
+		let rootURL = URL(string: "https://dev-token-price.extratools.works")!
 
 		@Sendable
 		func getTokenPrices(_ fetchRequest: FetchPricesRequest) async throws -> TokenPrices {

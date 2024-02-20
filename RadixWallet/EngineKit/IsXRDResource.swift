@@ -2,6 +2,10 @@ extension ResourceAddress {
 	public func isXRD(on networkID: NetworkID) -> Bool {
 		address == knownAddresses(networkId: networkID.rawValue).resourceAddresses.xrd.addressString()
 	}
+
+	public static func xrd(on networkID: NetworkID) throws -> Self {
+		try EngineToolkit.Address.xrd(networkID.rawValue).asSpecific()
+	}
 }
 
 extension EngineToolkit.Address {
