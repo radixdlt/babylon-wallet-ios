@@ -120,9 +120,21 @@ extension TransactionHistory {
 
 		var body: some SwiftUI.View {
 			Card(.app.white) {
-				Text(transaction.message ?? "MESS")
-					.padding(.vertical, .small1)
-					.frame(maxWidth: .infinity)
+				VStack {
+					if let message = transaction.message {
+						let inset: CGFloat = 2
+						Text(message)
+							.textStyle(.body2Regular)
+							.foregroundColor(.app.gray1)
+							.padding(.medium3)
+							.frame(maxWidth: .infinity, alignment: .leading)
+							.inFlatBottomSpeechbubble(inset: inset)
+							.padding(.top, inset)
+							.padding(.horizontal, inset)
+					}
+
+					Spacer(minLength: 30)
+				}
 			}
 		}
 	}
