@@ -1,9 +1,6 @@
 import EngineToolkit
 
 extension TransactionHistoryClient {
-	struct MissingAmountError: Error {}
-	struct MissingManifestClassError: Error {}
-
 	public static let liveValue = TransactionHistoryClient.live()
 
 	public static func live() -> Self {
@@ -16,7 +13,7 @@ extension TransactionHistoryClient {
 				// atLedgerState: GatewayAPI.LedgerStateSelector?,
 				// fromLedgerState: GatewayAPI.LedgerStateSelector?,
 				cursor: cursor,
-				limitPerPage: 100,
+				limitPerPage: 25,
 				// kindFilter: GatewayAPI.StreamTransactionsRequest.KindFilter?,
 //				manifestAccountsWithdrawnFromFilter: [account.address],
 //				manifestAccountsDepositedIntoFilter: [account.address],
@@ -64,6 +61,7 @@ extension TransactionHistoryClient {
 			}
 
 			func action(for changes: GatewayAPI.TransactionFungibleBalanceChanges) throws -> TransactionHistoryItem.Action {
+				struct MissingAmountError: Error {}
 				let balance = try fungibleBalance(changes.resourceAddress, balanceChange: changes.balanceChange)
 				guard let amount = balance.amount?.amount else { throw MissingAmountError() }
 				return amount.isPositive() ? .deposit(.fungible(balance)) : .withdrawal(.fungible(balance))
@@ -112,7 +110,7 @@ extension TransactionHistoryClient {
 
 			func transaction(for info: GatewayAPI.CommittedTransactionInfo) throws -> TransactionHistoryItem? {
 				guard let time = info.confirmedAt else { return nil }
-				guard let manifestClass = info.manifestClasses?.first else { throw MissingManifestClassError() }
+				let manifestClass = info.manifestClasses?.first
 				let message = info.message?.plaintext?.content.string
 				var actions = try info.balanceChanges.map(actions(for:)) ?? []
 				if info.manifestClasses?.contains(.accountDepositSettingsUpdate) == true {
