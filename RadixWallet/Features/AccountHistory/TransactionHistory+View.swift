@@ -188,8 +188,6 @@ extension TransactionHistory {
 				AssetResource.transactionHistoryDeposit
 			case .withdrawal:
 				AssetResource.transactionHistoryWithdrawal
-			case .otherBalanceChange:
-				fatalError()
 			case .settings:
 				AssetResource.transactionHistorySettings
 			}
@@ -201,8 +199,6 @@ extension TransactionHistory {
 				"Deposited"
 			case .withdrawal:
 				"Withdrawn"
-			case .otherBalanceChange:
-				fatalError()
 			case .settings:
 				"Deposit"
 			}
@@ -212,7 +208,7 @@ extension TransactionHistory {
 			switch action {
 			case .deposit:
 				.app.green1
-			case .withdrawal, .otherBalanceChange, .settings:
+			case .withdrawal, .settings:
 				.app.gray1
 			}
 		}
