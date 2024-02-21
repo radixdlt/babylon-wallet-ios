@@ -31,7 +31,6 @@ extension TransactionHistoryClient {
 			let response = try await gatewayAPIClient.streamTransactions(request)
 
 			let resourceAddresses = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
-			//	let resourceAddresses = ["resource_rdx1t4m25xaasa45dxs0548fdnzf76xk6m62yzltq070plmzdr4clyctuh"]
 
 			let resourceDetails = try await onLedgerEntitiesClient.getEntities(
 				addresses: resourceAddresses.map(\.asGeneral),
@@ -87,17 +86,16 @@ extension TransactionHistoryClient {
 			}
 
 			func action(for changes: GatewayAPI.TransactionNonFungibleBalanceChanges) throws -> [TransactionHistoryItem.Action] {
-				let added = try extractNonFungibleIDs(.added, from: changes)
-					.map { try TransactionHistoryItem.Action.deposit(.nonFungible(nonFungibleBalance($0))) }
 				let removed = try extractNonFungibleIDs(.removed, from: changes)
 					.map { try TransactionHistoryItem.Action.withdrawal(.nonFungible(nonFungibleBalance($0))) }
+				let added = try extractNonFungibleIDs(.added, from: changes)
+					.map { try TransactionHistoryItem.Action.deposit(.nonFungible(nonFungibleBalance($0))) }
 
-				return added + removed
+				return removed + added
 			}
 
 			func actions(for changes: GatewayAPI.TransactionBalanceChanges) throws -> [TransactionHistoryItem.Action] {
-				try changes.fungibleBalanceChanges.map(action(for:))
-					+ changes.nonFungibleBalanceChanges.flatMap(action(for:))
+				try changes.fungibleBalanceChanges.map(action(for:)) + changes.nonFungibleBalanceChanges.flatMap(action(for:))
 			}
 
 			func transaction(for info: GatewayAPI.CommittedTransactionInfo) throws -> TransactionHistoryItem? {
@@ -108,10 +106,7 @@ extension TransactionHistoryClient {
 				if info.manifestClasses?.contains(.accountDepositSettingsUpdate) == true {
 					actions.append(.settings)
 				}
-
-				for action in actions {
-					print("• action: \(action)")
-				}
+				actions.sort()
 
 				return .init(time: time, message: message, actions: actions, manifestClass: manifestClass)
 			}
