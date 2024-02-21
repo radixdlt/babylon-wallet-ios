@@ -617,7 +617,7 @@ Or you can clear this wallet from this phone and start fresh.";
 "importMnemonic_seedPhraseImported" = "Imported Seed Phrase";
 "importMnemonic_backedUpAlert_title" = "Confirm Seed Phrase Saved";
 "importMnemonic_backedUpAlert_message" = "Are you sure you have securely written down this seed phrase? You will need it to recover access if you lose your phone.";
-"importMnemonic_backedUpAlert_confirmAction" = "Yes, I have backed it up";
+"importMnemonic_backedUpAlert_confirmAction" = "Yes, I have written it down";
 "importMnemonic_backedUpAlert_noAction" = "No, not yet";
 "importMnemonic_failedToValidateAllAccounts" = "Failed to validate all accounts against mnemonic";
 "importMnemonic_wrongMnemonicHUD" = "Wrong mnemmonic";
