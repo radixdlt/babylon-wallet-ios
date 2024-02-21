@@ -28,6 +28,15 @@ extension PoolUnit {
 	}
 }
 
+extension View {
+	/// The common style for rows displayed in AssetsView
+	func rowStyle() -> some View {
+		self
+			.listRowInsets(.init())
+			.listRowSeparator(.hidden)
+	}
+}
+
 extension PoolUnit.State {
 	var viewState: PoolUnit.ViewState {
 		.init(
