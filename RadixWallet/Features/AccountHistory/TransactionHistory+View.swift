@@ -61,7 +61,7 @@ extension TransactionHistory {
 						}
 					}
 					ToolbarItem(placement: .topBarTrailing) {
-						Button(asset: AssetResource.filterList) {}
+						Button(asset: AssetResource.transactionHistoryFilterList) {}
 					}
 				}
 				.navigationTitle("History")
@@ -125,16 +125,23 @@ extension TransactionHistory {
 						TransactionMessageView(message: message)
 							.padding(.bottom, -.small3)
 					}
-
-					TransactionHeaderView(transaction: transaction)
-						.padding(.top, .small1)
-						.padding(.horizontal, .medium3)
-						.padding(.bottom, .small1)
-
-					RoundedRectangle(cornerRadius: 5)
-						.stroke(.gray)
+					ForEach(transaction.actions.identifiablyEnumerated()) { tuple in
+						TransactionActionView(action: tuple.element, manifestClass: manifestClass, time: time, showTime: tuple.offset == 0)
+							.padding(.top, .small1)
+							.padding(.horizontal, .medium3)
+							.padding(.bottom, .small1)
+					}
 				}
+				.padding(.bottom, .medium3)
 			}
+		}
+
+		var time: Date {
+			transaction.time
+		}
+
+		var manifestClass: GatewayAPI.ManifestClass? {
+			transaction.manifestClass
 		}
 	}
 
@@ -154,31 +161,34 @@ extension TransactionHistory {
 		}
 	}
 
-	struct TransactionHeaderView: SwiftUI.View {
+	struct TransactionActionView: SwiftUI.View {
 		let action: TransactionHistoryItem.Action
-		let manifestClass: ManifestClass?
+		let manifestClass: GatewayAPI.ManifestClass?
 		let time: Date
-
-		init(transaction: TransactionHistoryItem) {
-			self.action = transaction.action
-			self.manifestClass = transaction.manifestClass
-			self.time = transaction.time
-		}
+		let showTime: Bool
 
 		var body: some SwiftUI.View {
-			HStack(spacing: .zero) {
-				Image(asset: asset)
-					.padding(.trailing, .small3)
+			VStack {
+				HStack(spacing: .zero) {
+					Image(asset: asset)
+						.padding(.trailing, .small3)
 
-				Text(label)
-					.textStyle(.body2Header)
-					.foregroundColor(textColor)
+					Text(label)
+						.textStyle(.body2Header)
+						.foregroundColor(textColor)
 
-				Spacer()
+					Spacer()
 
-				Text(manifestClassLabel + "•" + dateLabel)
-					.textStyle(.body2HighImportance)
-					.foregroundColor(.app.gray2)
+					if showTime {
+						Text("\(manifestClassLabel) • \(timeLabel)")
+							.textStyle(.body2HighImportance)
+							.foregroundColor(.app.gray2)
+					}
+				}
+
+				RoundedCorners(radius: 10)
+					.stroke(.gray)
+					.frame(height: 20)
 			}
 		}
 
@@ -227,7 +237,7 @@ extension TransactionHistory {
 			}
 		}
 
-		private var dateLabel: String {
+		private var timeLabel: String {
 			time.formatted(date: .omitted, time: .shortened)
 		}
 	}

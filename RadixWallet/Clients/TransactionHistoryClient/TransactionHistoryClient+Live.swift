@@ -13,10 +13,10 @@ extension TransactionHistoryClient {
 				// atLedgerState: GatewayAPI.LedgerStateSelector?,
 				// fromLedgerState: GatewayAPI.LedgerStateSelector?,
 				cursor: cursor,
-				limitPerPage: 25,
+				limitPerPage: 100,
 				// kindFilter: GatewayAPI.StreamTransactionsRequest.KindFilter?,
-//				manifestAccountsWithdrawnFromFilter: [account.address],
-//				manifestAccountsDepositedIntoFilter: [account.address],
+				manifestAccountsWithdrawnFromFilter: [account.address],
+				manifestAccountsDepositedIntoFilter: [account.address],
 				// manifestResourcesFilter: [String]?,
 				// affectedGlobalEntitiesFilter: [String]?,
 				// eventsFilter: [GatewayAPI.StreamTransactionsRequestEventFilterItem]?,
@@ -29,8 +29,6 @@ extension TransactionHistoryClient {
 			)
 
 			let response = try await gatewayAPIClient.streamTransactions(request)
-
-			print("• getTransactionHistory: #\(response.items.count)")
 
 			let resourceAddresses = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
 			//	let resourceAddresses = ["resource_rdx1t4m25xaasa45dxs0548fdnzf76xk6m62yzltq070plmzdr4clyctuh"]
