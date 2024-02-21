@@ -55,11 +55,6 @@ extension TransactionHistoryClient {
 				)
 			}
 
-			func action(for changes: GatewayAPI.TransactionFungibleFeeBalanceChanges) throws -> TransactionHistoryItem.Action {
-				let balance = try fungibleBalance(changes.resourceAddress, balanceChange: changes.balanceChange)
-				return .otherBalanceChange(balance, changes.type)
-			}
-
 			func action(for changes: GatewayAPI.TransactionFungibleBalanceChanges) throws -> TransactionHistoryItem.Action {
 				struct MissingAmountError: Error {}
 				let balance = try fungibleBalance(changes.resourceAddress, balanceChange: changes.balanceChange)
@@ -104,7 +99,6 @@ extension TransactionHistoryClient {
 
 			func actions(for changes: GatewayAPI.TransactionBalanceChanges) throws -> [TransactionHistoryItem.Action] {
 				try changes.fungibleBalanceChanges.map(action(for:))
-					+ changes.fungibleFeeBalanceChanges.map(action(for:))
 					+ changes.nonFungibleBalanceChanges.flatMap(action(for:))
 			}
 
@@ -166,7 +160,6 @@ extension TransactionHistoryClient {
 	@Sendable
 	private static func extractResourceAddresses(from changes: GatewayAPI.TransactionBalanceChanges) throws -> [ResourceAddress] {
 		try (changes.fungibleBalanceChanges.map(\.resourceAddress)
-			+ changes.fungibleFeeBalanceChanges.map(\.resourceAddress)
 			+ changes.nonFungibleBalanceChanges.map(\.resourceAddress))
 			.map(ResourceAddress.init)
 	}

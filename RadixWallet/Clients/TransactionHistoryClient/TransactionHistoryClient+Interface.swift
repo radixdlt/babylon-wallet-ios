@@ -26,7 +26,6 @@ public struct TransactionHistoryItem: Sendable, Hashable {
 	enum Action: Sendable, Hashable {
 		case deposit(ResourceBalance)
 		case withdrawal(ResourceBalance)
-		case otherBalanceChange(ResourceBalance.Fungible, GatewayAPI.TransactionFungibleFeeBalanceChangeType)
 		case settings
 	}
 }
