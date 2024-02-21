@@ -120,22 +120,119 @@ extension TransactionHistory {
 
 		var body: some SwiftUI.View {
 			Card(.app.white) {
-				VStack {
+				VStack(spacing: 0) {
 					if let message = transaction.message {
-						let inset: CGFloat = 2
-						Text(message)
-							.textStyle(.body2Regular)
-							.foregroundColor(.app.gray1)
-							.padding(.medium3)
-							.frame(maxWidth: .infinity, alignment: .leading)
-							.inFlatBottomSpeechbubble(inset: inset)
-							.padding(.top, inset)
-							.padding(.horizontal, inset)
+						TransactionMessageView(message: message)
+							.padding(.bottom, -.small3)
 					}
 
-					Spacer(minLength: 30)
+					TransactionHeaderView(transaction: transaction)
+						.padding(.top, .small1)
+						.padding(.horizontal, .medium3)
+						.padding(.bottom, .small1)
+
+					RoundedRectangle(cornerRadius: 5)
+						.stroke(.gray)
 				}
 			}
+		}
+	}
+
+	struct TransactionMessageView: SwiftUI.View {
+		let message: String
+
+		var body: some SwiftUI.View {
+			let inset: CGFloat = 2
+			Text(message)
+				.textStyle(.body2Regular)
+				.foregroundColor(.app.gray1)
+				.padding(.medium3)
+				.frame(maxWidth: .infinity, alignment: .leading)
+				.inFlatBottomSpeechbubble(inset: inset)
+				.padding(.top, inset)
+				.padding(.horizontal, inset)
+		}
+	}
+
+	struct TransactionHeaderView: SwiftUI.View {
+		let action: TransactionHistoryItem.Action
+		let manifestClass: ManifestClass?
+		let time: Date
+
+		init(transaction: TransactionHistoryItem) {
+			self.action = transaction.action
+			self.manifestClass = transaction.manifestClass
+			self.time = transaction.time
+		}
+
+		var body: some SwiftUI.View {
+			HStack(spacing: .zero) {
+				Image(asset: asset)
+					.padding(.trailing, .small3)
+
+				Text(label)
+					.textStyle(.body2Header)
+					.foregroundColor(textColor)
+
+				Spacer()
+
+				Text(manifestClassLabel + "•" + dateLabel)
+					.textStyle(.body2HighImportance)
+					.foregroundColor(.app.gray2)
+			}
+		}
+
+		private var asset: ImageAsset {
+			switch action {
+			case .deposit:
+				AssetResource.transactionHistoryDeposit
+			case .withdrawal:
+				AssetResource.transactionHistoryWithdrawal
+			case .otherBalanceChange:
+				fatalError()
+			case .settings:
+				AssetResource.transactionHistorySettings
+			}
+		}
+
+		private var label: String {
+			switch action {
+			case .deposit:
+				"Deposited"
+			case .withdrawal:
+				"Withdrawn"
+			case .otherBalanceChange:
+				fatalError()
+			case .settings:
+				"Deposit"
+			}
+		}
+
+		private var textColor: Color {
+			switch action {
+			case .deposit:
+				.app.green1
+			case .withdrawal, .otherBalanceChange, .settings:
+				.app.gray1
+			}
+		}
+
+		private var manifestClassLabel: String {
+			switch manifestClass {
+			case .general: "General"
+			case .transfer: "Transfer"
+			case .poolContribution: "Contribution"
+			case .poolRedemption: "Redemption"
+			case .validatorStake: "Stake"
+			case .validatorUnstake: "Unstake"
+			case .validatorClaim: "Claim"
+			case .accountDepositSettingsUpdate: "Deposit Settings"
+			case .none: "Other"
+			}
+		}
+
+		private var dateLabel: String {
+			time.formatted(date: .omitted, time: .shortened)
 		}
 	}
 }
