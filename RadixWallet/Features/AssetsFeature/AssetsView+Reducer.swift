@@ -77,6 +77,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		case closeButtonTapped
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case fungibleTokenList(FungibleAssetList.Action)
 		case nonFungibleTokenList(NonFungibleAssetList.Action)
