@@ -31,15 +31,21 @@ extension ResourceBalance: Comparable {
 	public static func < (lhs: ResourceBalance, rhs: ResourceBalance) -> Bool {
 		switch (lhs, rhs) {
 		case let (.fungible(lhsValue), .fungible(rhsValue)):
-			switch (try? lhsValue.amount?.amount.abs(), try? rhsValue.amount?.amount.abs()) {
-			case let (lhsAmount?, rhsAmount?):
-				lhsAmount < rhsAmount
-			case (nil, _?):
-				true
-			case (_?, nil):
-				false
-			case (nil, nil):
-				lhsValue.address.address < rhsValue.address.address
+			if lhsValue.address == rhsValue.address {
+				// If it's the same resource, sort by the amount
+				lhsValue.amount ?? .init(.min()) < rhsValue.amount ?? .init(.min())
+			} else {
+				// Else sort alphabetically by title, or failing that, address
+				switch (lhsValue.title, rhsValue.title) {
+				case let (lhsTitle?, rhsTitle?):
+					lhsTitle < rhsTitle
+				case (nil, _?):
+					true
+				case (_?, nil):
+					false
+				case (nil, nil):
+					lhsValue.address.address < rhsValue.address.address
+				}
 			}
 		case let (.nonFungible(lhsValue), .nonFungible(rhsValue)):
 			if lhsValue.id.resourceAddress() == rhsValue.id.resourceAddress() {
@@ -53,4 +59,17 @@ extension ResourceBalance: Comparable {
 			false
 		}
 	}
+}
+
+// MARK: - ResourceBalance.Amount + Comparable
+extension ResourceBalance.Amount: Comparable {
+	public static func < (lhs: ResourceBalance.Amount, rhs: ResourceBalance.Amount) -> Bool {
+		if lhs.amount == rhs.amount {
+			lhs.guaranteed ?? 0 < rhs.guaranteed ?? 0
+		} else {
+			lhs.amount < rhs.amount
+		}
+	}
+
+	public static let zero = ResourceBalance.Amount(0)
 }
