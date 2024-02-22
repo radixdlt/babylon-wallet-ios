@@ -20,37 +20,10 @@ public struct TransactionHistoryResponse: Sendable, Hashable {
 public struct TransactionHistoryItem: Sendable, Hashable {
 	let time: Date
 	let message: String?
-	let actions: [Action]
 	let manifestClass: GatewayAPI.ManifestClass?
-
-	enum Action: Sendable, Hashable {
-		case withdrawal(ResourceBalance)
-		case deposit(ResourceBalance)
-		case settings
-	}
-}
-
-// MARK: - TransactionHistoryItem.Action + Comparable
-extension TransactionHistoryItem.Action: Comparable {
-	public static func < (lhs: TransactionHistoryItem.Action, rhs: TransactionHistoryItem.Action) -> Bool {
-		switch (lhs, rhs) {
-		case let (.withdrawal(lhsBalance), .withdrawal(rhsBalance)), let (.deposit(lhsBalance), .deposit(rhsBalance)):
-			lhsBalance < rhsBalance
-		default:
-			lhs.ordinal < rhs.ordinal
-		}
-	}
-
-	private var ordinal: Int {
-		switch self {
-		case .withdrawal:
-			0
-		case .deposit:
-			1
-		case .settings:
-			2
-		}
-	}
+	let withdrawals: [ResourceBalance]
+	let deposits: [ResourceBalance]
+	let depositSettingsUpdated: Bool
 }
 
 // MARK: - ResourceBalance + Comparable
@@ -58,9 +31,9 @@ extension ResourceBalance: Comparable {
 	public static func < (lhs: ResourceBalance, rhs: ResourceBalance) -> Bool {
 		switch (lhs, rhs) {
 		case let (.fungible(lhsValue), .fungible(rhsValue)):
-			switch (lhsValue.amount, rhsValue.amount) {
+			switch (try? lhsValue.amount?.amount.abs(), try? rhsValue.amount?.amount.abs()) {
 			case let (lhsAmount?, rhsAmount?):
-				lhsAmount.amount < rhsAmount.amount
+				lhsAmount < rhsAmount
 			case (nil, _?):
 				true
 			case (_?, nil):
