@@ -114,7 +114,10 @@ extension TransactionHistory {
 				.background(.app.gray5)
 		}
 	}
+}
 
+// MARK: - TransactionHistory.TransactionView
+extension TransactionHistory {
 	struct TransactionView: SwiftUI.View {
 		let transaction: TransactionHistoryItem
 
@@ -122,14 +125,23 @@ extension TransactionHistory {
 			Card(.app.white) {
 				VStack(spacing: 0) {
 					if let message = transaction.message {
-						TransactionMessageView(message: message)
+						MessageView(message: message)
 							.padding(.bottom, -.small3)
 					}
-					ForEach(transaction.actions.identifiablyEnumerated()) { tuple in
-						TransactionActionView(action: tuple.element, manifestClass: manifestClass, time: time, showTime: tuple.offset == 0)
-							.padding(.top, .small1)
-							.padding(.horizontal, .medium3)
-							.padding(.bottom, .small1)
+
+					VStack(spacing: .small1) {
+						if !transaction.withdrawals.isEmpty {
+							TransfersActionView(type: .withdrawal, resources: transaction.withdrawals)
+								.padding(.horizontal, .medium3)
+						}
+
+						if !transaction.deposits.isEmpty {
+							TransfersActionView(type: .deposit, resources: transaction.deposits)
+								.padding(.horizontal, .medium3)
+						}
+					}
+					.overlay(alignment: .topTrailing) {
+						TimeStampView(manifestClass: transaction.manifestClass, time: transaction.time)
 					}
 				}
 				.padding(.bottom, .medium3)
@@ -143,102 +155,104 @@ extension TransactionHistory {
 		var manifestClass: GatewayAPI.ManifestClass? {
 			transaction.manifestClass
 		}
-	}
 
-	struct TransactionMessageView: SwiftUI.View {
-		let message: String
+		struct MessageView: SwiftUI.View {
+			let message: String
 
-		var body: some SwiftUI.View {
-			let inset: CGFloat = 2
-			Text(message)
-				.textStyle(.body2Regular)
-				.foregroundColor(.app.gray1)
-				.padding(.medium3)
-				.frame(maxWidth: .infinity, alignment: .leading)
-				.inFlatBottomSpeechbubble(inset: inset)
-				.padding(.top, inset)
-				.padding(.horizontal, inset)
+			var body: some SwiftUI.View {
+				let inset: CGFloat = 2
+				Text(message)
+					.textStyle(.body2Regular)
+					.foregroundColor(.app.gray1)
+					.padding(.medium3)
+					.frame(maxWidth: .infinity, alignment: .leading)
+					.inFlatBottomSpeechbubble(inset: inset)
+					.padding(.top, inset)
+					.padding(.horizontal, inset)
+			}
 		}
-	}
 
-	struct TransactionActionView: SwiftUI.View {
-		let action: TransactionHistoryItem.Action
-		let manifestClass: GatewayAPI.ManifestClass?
-		let time: Date
-		let showTime: Bool
+		struct TimeStampView: SwiftUI.View {
+			let manifestClass: GatewayAPI.ManifestClass?
+			let time: Date
 
-		var body: some SwiftUI.View {
-			VStack {
-				HStack(spacing: .zero) {
-					Image(asset: asset)
-						.padding(.trailing, .small3)
+			var body: some SwiftUI.View {
+				Text("\(manifestClassLabel) • \(timeLabel)")
+					.textStyle(.body2HighImportance)
+					.foregroundColor(.app.gray2)
+			}
 
-					Text(label)
-						.textStyle(.body2Header)
-						.foregroundColor(textColor)
-
-					Spacer()
-
-					if showTime {
-						Text("\(manifestClassLabel) • \(timeLabel)")
-							.textStyle(.body2HighImportance)
-							.foregroundColor(.app.gray2)
-					}
+			private var manifestClassLabel: String {
+				switch manifestClass {
+				case .general: "General" // FIXME: Strings
+				case .transfer: "Transfer"
+				case .poolContribution: "Contribution"
+				case .poolRedemption: "Redemption"
+				case .validatorStake: "Stake"
+				case .validatorUnstake: "Unstake"
+				case .validatorClaim: "Claim"
+				case .accountDepositSettingsUpdate: "Deposit Settings"
+				case .none: "Other"
 				}
+			}
 
-				RoundedCorners(radius: 10)
-					.stroke(.gray)
-					.frame(height: 20)
+			private var timeLabel: String {
+				time.formatted(date: .omitted, time: .shortened)
 			}
 		}
 
-		private var asset: ImageAsset {
-			switch action {
-			case .deposit:
-				AssetResource.transactionHistoryDeposit
-			case .withdrawal:
-				AssetResource.transactionHistoryWithdrawal
-			case .settings:
-				AssetResource.transactionHistorySettings
-			}
-		}
+		struct TransfersActionView: SwiftUI.View {
+			let type: TransferType
+			let resources: [ResourceBalance]
 
-		private var label: String {
-			switch action {
-			case .deposit:
-				"Deposited"
-			case .withdrawal:
-				"Withdrawn"
-			case .settings:
-				"Deposit"
+			enum TransferType {
+				case withdrawal
+				case deposit
 			}
-		}
 
-		private var textColor: Color {
-			switch action {
-			case .deposit:
-				.app.green1
-			case .withdrawal, .settings:
-				.app.gray1
+			var body: some SwiftUI.View {
+				VStack {
+					HStack(spacing: .zero) {
+						Image(asset: asset)
+							.padding(.trailing, .small3)
+
+						Text(label)
+							.textStyle(.body2Header)
+							.foregroundColor(textColor)
+
+						Spacer()
+					}
+
+					ResourceBalancesView(resources: resources)
+				}
 			}
-		}
 
-		private var manifestClassLabel: String {
-			switch manifestClass {
-			case .general: "General"
-			case .transfer: "Transfer"
-			case .poolContribution: "Contribution"
-			case .poolRedemption: "Redemption"
-			case .validatorStake: "Stake"
-			case .validatorUnstake: "Unstake"
-			case .validatorClaim: "Claim"
-			case .accountDepositSettingsUpdate: "Deposit Settings"
-			case .none: "Other"
+			private var asset: ImageAsset {
+				switch type {
+				case .deposit:
+					AssetResource.transactionHistoryDeposit
+				case .withdrawal:
+					AssetResource.transactionHistoryWithdrawal
+				}
 			}
-		}
 
-		private var timeLabel: String {
-			time.formatted(date: .omitted, time: .shortened)
+			private var label: String {
+				switch type {
+				case .deposit:
+					"Deposited"
+				case .withdrawal:
+					"Withdrawn"
+				}
+			}
+
+			private var textColor: Color {
+				switch type {
+				case .deposit:
+					.app.green1
+				case .withdrawal:
+					.app.gray1
+				}
+			}
 		}
 	}
 }

@@ -52,13 +52,6 @@ extension TransactionHistoryClient {
 				)
 			}
 
-			func action(for changes: GatewayAPI.TransactionFungibleBalanceChanges) throws -> TransactionHistoryItem.Action {
-				struct MissingAmountError: Error {}
-				let balance = try fungibleBalance(changes.resourceAddress, balanceChange: changes.balanceChange)
-				guard let amount = balance.amount?.amount else { throw MissingAmountError() }
-				return amount.isPositive() ? .deposit(.fungible(balance)) : .withdrawal(.fungible(balance))
-			}
-
 			// Non-fungible
 
 			let nonFungibleIDs = try Set(response.items.flatMap { try $0.balanceChanges.map(extractAllNonFungibleIDs) ?? [] })
@@ -85,30 +78,43 @@ extension TransactionHistoryClient {
 				)
 			}
 
-			func action(for changes: GatewayAPI.TransactionNonFungibleBalanceChanges) throws -> [TransactionHistoryItem.Action] {
-				let removed = try extractNonFungibleIDs(.removed, from: changes)
-					.map { try TransactionHistoryItem.Action.withdrawal(.nonFungible(nonFungibleBalance($0))) }
-				let added = try extractNonFungibleIDs(.added, from: changes)
-					.map { try TransactionHistoryItem.Action.deposit(.nonFungible(nonFungibleBalance($0))) }
-
-				return removed + added
-			}
-
-			func actions(for changes: GatewayAPI.TransactionBalanceChanges) throws -> [TransactionHistoryItem.Action] {
-				try changes.fungibleBalanceChanges.map(action(for:)) + changes.nonFungibleBalanceChanges.flatMap(action(for:))
-			}
-
 			func transaction(for info: GatewayAPI.CommittedTransactionInfo) throws -> TransactionHistoryItem? {
 				guard let time = info.confirmedAt else { return nil }
-				let manifestClass = info.manifestClasses?.first
 				let message = info.message?.plaintext?.content.string
-				var actions = try info.balanceChanges.map(actions(for:)) ?? []
-				if info.manifestClasses?.contains(.accountDepositSettingsUpdate) == true {
-					actions.append(.settings)
-				}
-				actions.sort()
+				let manifestClass = info.manifestClasses?.first
 
-				return .init(time: time, message: message, actions: actions, manifestClass: manifestClass)
+				var withdrawals: [ResourceBalance] = []
+				var deposits: [ResourceBalance] = []
+
+				if let changes = info.balanceChanges {
+					for change in changes.nonFungibleBalanceChanges {
+						for nonFungibleID in try extractNonFungibleIDs(.removed, from: change) {
+							try withdrawals.append(.nonFungible(nonFungibleBalance(nonFungibleID)))
+						}
+						for nonFungibleID in try extractNonFungibleIDs(.added, from: change) {
+							try deposits.append(.nonFungible(nonFungibleBalance(nonFungibleID)))
+						}
+
+						for fungible in changes.fungibleBalanceChanges {
+							let balance = try fungibleBalance(fungible.resourceAddress, balanceChange: fungible.balanceChange)
+							guard let amount = balance.amount?.amount, !amount.isZero() else { continue }
+							if amount.isNegative() {
+								withdrawals.append(.fungible(balance))
+							} else {
+								deposits.append(.fungible(balance))
+							}
+						}
+					}
+				}
+
+				return .init(
+					time: time,
+					message: message,
+					manifestClass: manifestClass,
+					withdrawals: withdrawals.sorted(),
+					deposits: deposits.sorted(),
+					depositSettingsUpdated: true
+				)
 			}
 
 			return try .init(

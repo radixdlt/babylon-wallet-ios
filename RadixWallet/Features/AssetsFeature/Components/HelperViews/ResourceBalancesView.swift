@@ -192,7 +192,7 @@ extension ResourceBalanceView {
 		}
 
 		private var compactTitle: String {
-			viewState.nonFungibleName ?? viewState.id.localId().toUserFacingString()
+			viewState.nonFungibleName ?? viewState.id.localId().toUserFacingString().formatted(.default)
 		}
 	}
 
