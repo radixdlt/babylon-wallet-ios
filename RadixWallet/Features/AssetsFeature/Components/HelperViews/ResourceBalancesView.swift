@@ -9,11 +9,11 @@ public struct ResourceBalancesView: View {
 	}
 
 	public init(fungibles: [ResourceBalance.Fungible]) {
-		self.resources = fungibles.map(ResourceBalance.fungible)
+		self.init(resources: fungibles.map(ResourceBalance.fungible))
 	}
 
 	public init(nonFungibles: [ResourceBalance.NonFungible]) {
-		self.resources = nonFungibles.map(ResourceBalance.nonFungible)
+		self.init(resources: nonFungibles.map(ResourceBalance.nonFungible))
 	}
 
 	public var body: some View {
@@ -32,8 +32,8 @@ public struct ResourceBalancesView: View {
 					}
 			}
 		}
-//		.roundedCorners(strokeColor: .app.gray3)
-		.roundedCorners(strokeColor: .green)
+		.roundedCorners(strokeColor: .app.gray3)
+//		.roundedCorners(strokeColor: .green)
 	}
 
 	private let dividerHeight: CGFloat = 1
@@ -95,8 +95,8 @@ public struct ResourceBalanceView: View {
 extension ResourceBalanceView {
 	var bordered: some View {
 		padding(.small1)
-//			.roundedCorners(strokeColor: .app.gray3)
-			.roundedCorners(strokeColor: .yellow)
+			.roundedCorners(strokeColor: .app.gray3)
+//			.roundedCorners(strokeColor: .yellow)
 	}
 }
 
@@ -115,12 +115,7 @@ extension ResourceBalance.Fungible {
 // MARK: - ResourceBalance + Identifiable
 extension ResourceBalance: Identifiable {
 	public var id: AnyHashable {
-		switch self {
-		case let .fungible(fungible):
-			fungible.address
-		case let .nonFungible(nonFungible):
-			nonFungible.id
-		}
+		self
 	}
 }
 
