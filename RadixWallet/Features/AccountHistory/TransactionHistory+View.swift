@@ -121,6 +121,10 @@ extension TransactionHistory {
 	struct TransactionView: SwiftUI.View {
 		let transaction: TransactionHistoryItem
 
+		init(transaction: TransactionHistoryItem) {
+			self.transaction = transaction
+		}
+
 		var body: some SwiftUI.View {
 			Card(.app.white) {
 				VStack(spacing: 0) {
@@ -142,7 +146,9 @@ extension TransactionHistory {
 					}
 					.overlay(alignment: .topTrailing) {
 						TimeStampView(manifestClass: transaction.manifestClass, time: transaction.time)
+							.padding(.trailing, .medium3)
 					}
+					.padding(.top, .small1)
 				}
 				.padding(.bottom, .medium3)
 			}

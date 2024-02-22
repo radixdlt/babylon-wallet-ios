@@ -30,6 +30,8 @@ extension TransactionHistoryClient {
 
 			let response = try await gatewayAPIClient.streamTransactions(request)
 
+			// Pre-loading the details for all the resources involved
+
 			let resourceAddresses = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
 
 			let resourceDetails = try await onLedgerEntitiesClient.getEntities(
@@ -38,21 +40,20 @@ extension TransactionHistoryClient {
 			)
 			let keyedResourceDetails = IdentifiedArray(resourceDetails.compactMap(\.resource), id: \.resourceAddress) { $1 }
 
-			func fungibleBalance(_ address: String, balanceChange: String) throws -> ResourceBalance.Fungible {
-				let resourceAddress = try ResourceAddress(validatingAddress: address)
+			/// Returns a fungible ResourceBalance for the given resource and amount
+			func fungibleBalance(_ resourceAddress: ResourceAddress, amount: RETDecimal) -> ResourceBalance.Fungible {
 				let title = keyedResourceDetails[id: resourceAddress]?.metadata.title
 				let iconURL = keyedResourceDetails[id: resourceAddress]?.metadata.iconURL
-				let amount = try RETDecimal(value: balanceChange)
-				return try .init(
+				return .init(
 					address: resourceAddress,
 					title: title,
 					icon: .other(iconURL),
-					amount: .init(amount.abs()),
+					amount: .init(amount),
 					fallback: nil
 				)
 			}
 
-			// Non-fungible
+			// Pre-loading NFT data
 
 			let nonFungibleIDs = try Set(response.items.flatMap { try $0.balanceChanges.map(extractAllNonFungibleIDs) ?? [] })
 			let groupedNonFungibleIDs = Dictionary(grouping: nonFungibleIDs) { $0.resourceAddress() }
@@ -66,6 +67,7 @@ extension TransactionHistoryClient {
 				}
 			}
 
+			/// Returns a non-fungible ResourceBalance for the given global non-fungbile ID
 			func nonFungibleBalance(_ id: NonFungibleGlobalId) throws -> ResourceBalance.NonFungible {
 				let resourceAddress: ResourceAddress = try id.resourceAddress().asSpecific()
 				let resourceName = keyedResourceDetails[id: resourceAddress]?.metadata.name
@@ -87,23 +89,43 @@ extension TransactionHistoryClient {
 				var deposits: [ResourceBalance] = []
 
 				if let changes = info.balanceChanges {
-					for change in changes.nonFungibleBalanceChanges {
-						for nonFungibleID in try extractNonFungibleIDs(.removed, from: change) {
+					for nonFungible in changes.nonFungibleBalanceChanges {
+						for nonFungibleID in try extractNonFungibleIDs(.removed, from: nonFungible) {
 							try withdrawals.append(.nonFungible(nonFungibleBalance(nonFungibleID)))
 						}
-						for nonFungibleID in try extractNonFungibleIDs(.added, from: change) {
+						for nonFungibleID in try extractNonFungibleIDs(.added, from: nonFungible) {
 							try deposits.append(.nonFungible(nonFungibleBalance(nonFungibleID)))
 						}
+					}
 
-						for fungible in changes.fungibleBalanceChanges {
-							let balance = try fungibleBalance(fungible.resourceAddress, balanceChange: fungible.balanceChange)
-							guard let amount = balance.amount?.amount, !amount.isZero() else { continue }
-							if amount.isNegative() {
-								withdrawals.append(.fungible(balance))
-							} else {
-								deposits.append(.fungible(balance))
-							}
+					for fungible in changes.fungibleBalanceChanges {
+						let resourceAddress = try ResourceAddress(validatingAddress: fungible.resourceAddress)
+						let amount = try RETDecimal(value: fungible.balanceChange)
+						guard !amount.isZero() else { continue }
+
+						// NB: The sign of the amount in the balance is made positive, negative balances are treated as withdrawals
+						let balance = try fungibleBalance(resourceAddress, amount: amount.abs())
+
+						if amount.isNegative() {
+							withdrawals.append(.fungible(balance))
+						} else {
+							deposits.append(.fungible(balance))
 						}
+					}
+				}
+
+				withdrawals.sort(by: >)
+				deposits.sort(by: >)
+
+				for withdrawal in withdrawals {
+					if case let .fungible(fun) = withdrawal {
+						print("   • WDR \(fun.amount?.amount.formatted() ?? "??") of \(fun.title ?? "nil") [\(fun.address.address.formatted(.default))]")
+					}
+				}
+
+				for deposit in deposits {
+					if case let .fungible(fun) = deposit {
+						print("   • DEP \(fun.amount?.amount.formatted() ?? "??") of \(fun.title ?? "nil") [\(fun.address.address.formatted(.default))]")
 					}
 				}
 
@@ -111,8 +133,8 @@ extension TransactionHistoryClient {
 					time: time,
 					message: message,
 					manifestClass: manifestClass,
-					withdrawals: withdrawals.sorted(),
-					deposits: deposits.sorted(),
+					withdrawals: withdrawals,
+					deposits: deposits,
 					depositSettingsUpdated: true
 				)
 			}
