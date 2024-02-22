@@ -1,22 +1,28 @@
 // MARK: - AccountPortfoliosClient + DependencyKey
 extension AccountPortfoliosClient: DependencyKey {
+	public struct AccountPortfolio: Sendable, Hashable {
+		public var account: OnLedgerEntity.Account
+		public var poolUnitDetails: [OnLedgerEntitiesClient.OwnedResourcePoolDetails]
+		public var stakeUnitDetails: [OnLedgerEntitiesClient.OwnedStakeDetails]
+	}
+
 	/// Internal state that holds all loaded portfolios.
 	actor State {
-		let portfoliosSubject: AsyncCurrentValueSubject<[AccountAddress: OnLedgerEntity.Account]> = .init([:])
+		let portfoliosSubject: AsyncCurrentValueSubject<[AccountAddress: AccountPortfolio]> = .init([:])
 
-		func setOrUpdateAccountPortfolio(_ portfolio: OnLedgerEntity.Account) {
-			portfoliosSubject.value.updateValue(portfolio, forKey: portfolio.address)
+		func setOrUpdateAccountPortfolio(_ portfolio: AccountPortfolio) {
+			portfoliosSubject.value.updateValue(portfolio, forKey: portfolio.account.address)
 		}
 
-		func setOrUpdateAccountPortfolios(_ portfolios: [OnLedgerEntity.Account]) {
+		func setOrUpdateAccountPortfolios(_ portfolios: [AccountPortfolio]) {
 			var newValue = portfoliosSubject.value
 			for portfolio in portfolios {
-				newValue[portfolio.address] = portfolio
+				newValue[portfolio.account.address] = portfolio
 			}
 			portfoliosSubject.value = newValue
 		}
 
-		func portfolioForAccount(_ address: AccountAddress) -> AnyAsyncSequence<OnLedgerEntity.Account> {
+		func portfolioForAccount(_ address: AccountAddress) -> AnyAsyncSequence<AccountPortfolio> {
 			portfoliosSubject.compactMap { $0[address] }.eraseToAnyAsyncSequence()
 		}
 	}
@@ -29,30 +35,30 @@ extension AccountPortfoliosClient: DependencyKey {
 		@Dependency(\.tokenPriceClient) var tokenPriceClient
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
 
-		Task {
-			for try await isCurrencyAmountVisible in await appPreferencesClient.appPreferenceUpdates().map(\.display.isCurrencyAmountVisible) {
-				guard !Task.isCancelled else { return }
-				let updated = await updateWithCurrencyVisibility(isCurrencyAmountVisible, Array(state.portfoliosSubject.value.values))
-				await state.setOrUpdateAccountPortfolios(updated)
-			}
-		}
+//		Task {
+//			for try await isCurrencyAmountVisible in await appPreferencesClient.appPreferenceUpdates().map(\.display.isCurrencyAmountVisible) {
+//				guard !Task.isCancelled else { return }
+//				let updated = await updateWithCurrencyVisibility(isCurrencyAmountVisible, Array(state.portfoliosSubject.value.values))
+//				await state.setOrUpdateAccountPortfolios(updated)
+//			}
+//		}
 
 		@Sendable
 		func updateWithCurrencyVisibility(
 			_ isCurrencyAmountVisible: Bool,
-			_ portfolios: [OnLedgerEntity.Account]
-		) async -> [OnLedgerEntity.Account] {
+			_ portfolios: [AccountPortfolio]
+		) async -> [AccountPortfolio] {
 			var portfolios = portfolios
 			if !isCurrencyAmountVisible {
-				portfolios.mutateAll { account in
-					account.fungibleResources.nonXrdResources.mutateAll { resource in
-						resource.fiatWorth = nil
+				portfolios.mutateAll { portfolio in
+					portfolio.account.fungibleResources.nonXrdResources.mutateAll { resource in
+						resource.fiatWorth?.isVisible = false
 					}
-					account.fungibleResources.xrdResource?.fiatWorth = nil
-					account.poolUnitResources.radixNetworkStakes.mutateAll { stake in
-						stake.stakeUnitResource?.fiatWorth = nil
+					portfolio.account.fungibleResources.xrdResource?.fiatWorth?.isVisible = false
+					portfolio.account.poolUnitResources.radixNetworkStakes.mutateAll { stake in
+						stake.stakeUnitResource?.fiatWorth?.isVisible = false
 					}
-					account.fungibleResources.nonXrdResources.sort(by: <)
+					portfolio.account.fungibleResources.nonXrdResources.sort(by: <)
 				}
 
 				return portfolios
@@ -81,29 +87,31 @@ extension AccountPortfoliosClient: DependencyKey {
 
 				let new = portfolios.map { portfolio in
 					var portfolio = portfolio
-					let sortedByPrice = portfolio.fungibleResources.nonXrdResources.map { resource in
+					let sortedByPrice = portfolio.account.fungibleResources.nonXrdResources.map { resource in
 						let price = tokenPrices?.tokens.randomElement()?.price
 						var resource = resource
 						resource.fiatWorth = price.map {
 							.init(
+								isVisible: true,
 								worth: $0.price * (try! resource.amount.asDouble()),
 								currency: $0.currency
 							)
 						}
 						return resource
 					}.sorted(by: <)
-					let xrdResource = portfolio.fungibleResources.xrdResource.map {
+					let xrdResource = portfolio.account.fungibleResources.xrdResource.map {
 						var res = $0
 						let price = tokenPrices?.tokens[id: .init(address: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd", decodedKind: .globalFungibleResourceManager)]?.price
 						res.fiatWorth = price.map {
 							.init(
+								isVisible: true,
 								worth: $0.price * (try! res.amount.asDouble()),
 								currency: $0.currency
 							)
 						}
 						return res
 					}
-					portfolio.fungibleResources = .init(xrdResource: xrdResource, nonXrdResources: sortedByPrice)
+					portfolio.account.fungibleResources = .init(xrdResource: xrdResource, nonXrdResources: sortedByPrice)
 					return portfolio
 				}
 
@@ -120,17 +128,32 @@ extension AccountPortfoliosClient: DependencyKey {
 				}
 
 				let accounts = try await onLedgerEntitiesClient.getAccounts(accountAddresses)
-				let isCurrencyAmountVisible = await appPreferencesClient.getPreferences().display.isCurrencyAmountVisible
-				await state.setOrUpdateAccountPortfolios(updateWithCurrencyVisibility(isCurrencyAmountVisible, accounts))
+				let allPoolAndStakeUnitAddresses = accounts.flatMap { account in
+					account.poolUnitResources.fungibleResourceAddresses + account.poolUnitResources.nonFungibleResourceAddresses
+				}
 
-				return accounts
+				let portfolios = try await accounts.asyncMap {
+					let detailsS = try await onLedgerEntitiesClient.getOwnedStakesDetails(account: $0)
+					let detailsP = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails($0)
+
+					return AccountPortfolio(account: $0, poolUnitDetails: detailsP, stakeUnitDetails: detailsS)
+				}
+				let isCurrencyAmountVisible = await appPreferencesClient.getPreferences().display.isCurrencyAmountVisible
+				await state.setOrUpdateAccountPortfolios(updateWithCurrencyVisibility(isCurrencyAmountVisible, portfolios))
+
+				return portfolios
 			},
 			fetchAccountPortfolio: { accountAddress, forceRefresh in
 				if forceRefresh {
 					cacheClient.removeFolder(.onLedgerEntity(.account(accountAddress.asGeneral)))
 				}
 
-				var portfolio = try await onLedgerEntitiesClient.getAccount(accountAddress)
+				var account = try await onLedgerEntitiesClient.getAccount(accountAddress)
+				let detailsS = try await onLedgerEntitiesClient.getOwnedStakesDetails(account: account)
+				let detailsP = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account)
+
+				let portfolio = AccountPortfolio(account: account, poolUnitDetails: detailsP, stakeUnitDetails: detailsS)
+
 				await state.setOrUpdateAccountPortfolio(portfolio)
 
 				return portfolio
@@ -152,7 +175,7 @@ extension OnLedgerEntity.Account {
 		let tokensWorth = xrdWorth + fungibleResources.nonXrdResources.compactMap(\.fiatWorth?.worth).reduce(.zero, +)
 		let lsusWorth = poolUnitResources.radixNetworkStakes.compactMap(\.stakeUnitResource?.fiatWorth?.worth).reduce(.zero, +)
 		let total = tokensWorth + lsusWorth
-		return .init(worth: total, currency: .usd)
+		return .init(isVisible: true, worth: total, currency: .usd)
 	}
 }
 

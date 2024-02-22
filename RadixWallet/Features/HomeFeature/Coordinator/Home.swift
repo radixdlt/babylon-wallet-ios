@@ -12,7 +12,7 @@ public struct Home: Sendable, FeatureReducer {
 
 		public var showRadixBanner: Bool = false
 		var showFiatWorth: Bool = true
-		var accountPortfolios: Loadable<[OnLedgerEntity.Account]> = .idle
+		var accountPortfolios: Loadable<[OnLedgerEntity.Account]> = .loading
 
 		// MARK: - Destination
 		@PresentationState
@@ -333,7 +333,7 @@ public struct Home: Sendable, FeatureReducer {
 				guard !Task.isCancelled else { return }
 
 				await send(.internal(.loadedPortfolios(
-					portfolios
+					portfolios.map(\.account)
 				)))
 			}
 		}

@@ -55,7 +55,7 @@ extension Home {
 						guard !Task.isCancelled else {
 							return
 						}
-						await send(.internal(.accountPortfolioUpdate(accountPortfolio.nonEmptyVaults)))
+						await send(.internal(.accountPortfolioUpdate(accountPortfolio.account.nonEmptyVaults)))
 					}
 				}
 			case .exportMnemonicButtonTapped:

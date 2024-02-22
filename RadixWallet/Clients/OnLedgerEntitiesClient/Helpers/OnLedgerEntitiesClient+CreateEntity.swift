@@ -288,7 +288,8 @@ extension OnLedgerEntitiesClient {
 			return OnLedgerEntity.Account.PoolUnit(resource: poolUnitResource, resourcePoolAddress: pool.address)
 		}
 
-		return .init(radixNetworkStakes: stakeUnits.asIdentifiable(), poolUnits: poolUnits.sorted())
+		let poolUnitResources = OnLedgerEntity.Account.PoolUnitResources(radixNetworkStakes: stakeUnits.asIdentifiable(), poolUnits: poolUnits.sorted())
+		return poolUnitResources
 	}
 
 	static func extractOwnedFungibleResources(
@@ -361,7 +362,24 @@ extension OnLedgerEntitiesClient {
 		@Dependency(\.tokenPriceClient) var tokenPriceClient
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
 		let currentEpoch = try await gatewayAPIClient.getEpoch()
-		let xrdPrice = await appPreferencesClient.getPreferences().display.isCurrencyAmountVisible ? 0.043 : nil // try? await tokenPriceClient.getTokenPrices()
+		// let xrdPrice = await appPreferencesClient.getPreferences().display.isCurrencyAmountVisible ? 0.043 : nil // try? await tokenPriceClient.getTokenPrices()
+
+		let allStakeClaimTokens = try await ownedStakes.compactMap { validator -> (ValidatorAddress, OnLedgerEntity.OwnedNonFungibleResource)? in
+			guard let stakeClaimResource = validator.stakeClaimResource else {
+				return nil
+			}
+
+			return (validator.validatorAddress, stakeClaimResource)
+		}
+		.parallelMap { validatorAddress, stakeClaimResource -> (ValidatorAddress, [OnLedgerEntity.NonFungibleToken]) in
+			let tokens = try await getAccountOwnedNonFungibleTokenData(.init(
+				accountAddress: account.address,
+				resource: stakeClaimResource,
+				mode: .loadAll
+			)).tokens
+
+			return (validatorAddress, tokens)
+		}
 
 		return try await ownedStakes.asyncCompactMap { stake -> OwnedStakeDetails? in
 			guard let validatorDetails = validators.first(where: { $0.address == stake.validatorAddress }) else {
@@ -378,33 +396,23 @@ extension OnLedgerEntitiesClient {
 					return .init(
 						resource: stakeUnitDetails,
 						amount: stakeUnitResource.amount,
-						amounFiatWorth: {
-							if let claimAmount = try? stakeUnitResource.amount.asDouble(), let xrdPrice {
-								return claimAmount * xrdPrice
-							}
-							return nil
-						}()
+						amounFiatWorth: nil
 					)
 				}
 
 				return nil
 			}()
 
-			let stakeClaimTokens: NonFunbileResourceWithTokens? = try await { () -> NonFunbileResourceWithTokens? in
+			let stakeClaimTokens: NonFunbileResourceWithTokens? = try { () -> NonFunbileResourceWithTokens? in
 				if let stakeClaimResource = stake.stakeClaimResource, stakeClaimResource.nonFungibleIdsCount > 0 {
 					guard let stakeClaimResourceDetails = resourceDetails.first(where: { $0.resourceAddress == stakeClaimResource.resourceAddress }) else {
 						assertionFailure("Did not load stake unit details")
 						return nil
 					}
-					let tokens = try await getAccountOwnedNonFungibleTokenData(.init(
-						accountAddress: account.address,
-						resource: stakeClaimResource,
-						mode: .loadAll
-					)).tokens
 
 					return .init(
 						resource: stakeClaimResourceDetails,
-						stakeClaims: tokens.compactMap { token -> OnLedgerEntitiesClient.StakeClaim? in
+						stakeClaims: (allStakeClaimTokens.first { $0.0 == stake.validatorAddress }?.1 ?? []).compactMap { token -> OnLedgerEntitiesClient.StakeClaim? in
 							guard
 								let claimEpoch = token.data?.claimEpoch,
 								let claimAmount = token.data?.claimAmount,
@@ -417,12 +425,7 @@ extension OnLedgerEntitiesClient {
 								validatorAddress: stake.validatorAddress,
 								token: token,
 								claimAmount: claimAmount,
-								claimFiatWorth: {
-									if let claimAmount = try? claimAmount.asDouble(), let xrdPrice {
-										return claimAmount * xrdPrice
-									}
-									return nil
-								}(),
+								claimFiatWorth: nil,
 								reamainingEpochsUntilClaim: Int(claimEpoch) - Int(currentEpoch.rawValue)
 							)
 						}.asIdentifiable()

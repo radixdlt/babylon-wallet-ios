@@ -320,6 +320,7 @@ extension OnLedgerEntity {
 
 extension OnLedgerEntity {
 	public struct FiatWorth: Sendable, Hashable, Codable {
+		var isVisible: Bool
 		let worth: Double
 		let currency: FiatCurrency
 	}
@@ -442,6 +443,7 @@ extension OnLedgerEntity {
 		public var fungibleResources: OwnedFungibleResources
 		public var nonFungibleResources: [OwnedNonFungibleResource]
 		public var poolUnitResources: PoolUnitResources
+
 		public struct Details: Sendable, Hashable, Codable {
 			public let depositRule: Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule
 			public init(depositRule: Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule) {

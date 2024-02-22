@@ -8,7 +8,7 @@ extension Home.State {
 			showRadixBanner: showRadixBanner,
 			totalFiatWorth: accountPortfolios.map {
 				let totalFiatWorth = $0.map(\.totalFiatWorth.worth).reduce(0, +)
-				return OnLedgerEntity.FiatWorth(worth: totalFiatWorth, currency: .usd).currencyFormatted(applyCustomFont: true)!
+				return OnLedgerEntity.FiatWorth(isVisible: true, worth: totalFiatWorth, currency: .usd).currencyFormatted(applyCustomFont: true)!
 			},
 			isShowingFiatWorth: showFiatWorth
 		)

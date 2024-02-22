@@ -133,7 +133,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 					guard !Task.isCancelled else { return }
 
 					await send(.internal(.resourcesStateUpdated(createResourcesState(
-						from: portfolio.nonEmptyVaults,
+						from: portfolio.account.nonEmptyVaults,
 						mode: mode
 					)
 					)))

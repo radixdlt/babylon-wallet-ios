@@ -53,7 +53,7 @@ public struct LiquidStakeUnitView: View {
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray2)
 
-					TokenBalanceView.Bordered(viewState: .xrd(balance: viewState.worth, balanceFiatWorth: viewState.amountFiatWorth.map { .init(worth: $0, currency: .usd) }))
+					TokenBalanceView.Bordered(viewState: .xrd(balance: viewState.worth, balanceFiatWorth: viewState.amountFiatWorth.map { .init(isVisible: true, worth: $0, currency: .usd) }))
 				}
 			}
 			.padding(.medium3)

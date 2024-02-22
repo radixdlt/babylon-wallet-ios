@@ -20,11 +20,11 @@ public struct AccountPortfoliosClient: Sendable {
 }
 
 extension AccountPortfoliosClient {
-	public typealias FetchAccountPortfolio = @Sendable (_ address: AccountAddress, _ forceResfresh: Bool) async throws -> OnLedgerEntity.Account
-	public typealias FetchAccountPortfolios = @Sendable (_ addresses: [AccountAddress], _ forceResfresh: Bool) async throws -> [OnLedgerEntity.Account]
-	public typealias PortfolioForAccount = @Sendable (_ address: AccountAddress) async -> AnyAsyncSequence<OnLedgerEntity.Account>
-	public typealias PortfoliosUpdates = @Sendable () async -> AnyAsyncSequence<[OnLedgerEntity.Account]>
-	public typealias Portfolios = @Sendable () -> [OnLedgerEntity.Account]
+	public typealias FetchAccountPortfolio = @Sendable (_ address: AccountAddress, _ forceResfresh: Bool) async throws -> AccountPortfolio
+	public typealias FetchAccountPortfolios = @Sendable (_ addresses: [AccountAddress], _ forceResfresh: Bool) async throws -> [AccountPortfolio]
+	public typealias PortfolioForAccount = @Sendable (_ address: AccountAddress) async -> AnyAsyncSequence<AccountPortfolio>
+	public typealias PortfoliosUpdates = @Sendable () async -> AnyAsyncSequence<[AccountPortfolio]>
+	public typealias Portfolios = @Sendable () -> [AccountPortfolio]
 }
 
 extension DependencyValues {
