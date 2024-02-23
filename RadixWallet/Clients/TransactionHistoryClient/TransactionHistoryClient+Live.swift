@@ -98,36 +98,24 @@ extension TransactionHistoryClient {
 						}
 					}
 
-					for fungible in changes.fungibleBalanceChanges {
-						let resourceAddress = try ResourceAddress(validatingAddress: fungible.resourceAddress)
-						let amount = try RETDecimal(value: fungible.balanceChange)
-						guard !amount.isZero() else { continue }
-
-						// NB: The sign of the amount in the balance is made positive, negative balances are treated as withdrawals
-						let balance = try fungibleBalance(resourceAddress, amount: amount.abs())
-
-						if amount.isNegative() {
-							withdrawals.append(.fungible(balance))
-						} else {
-							deposits.append(.fungible(balance))
-						}
-					}
+//					for fungible in changes.fungibleBalanceChanges {
+//						let resourceAddress = try ResourceAddress(validatingAddress: fungible.resourceAddress)
+//						let amount = try RETDecimal(value: fungible.balanceChange)
+//						guard !amount.isZero() else { continue }
+//
+//						// NB: The sign of the amount in the balance is made positive, negative balances are treated as withdrawals
+//						let balance = try fungibleBalance(resourceAddress, amount: amount.abs())
+//
+//						if amount.isNegative() {
+//							withdrawals.append(.fungible(balance))
+//						} else {
+//							deposits.append(.fungible(balance))
+//						}
+//					}
 				}
 
 				withdrawals.sort(by: >)
 				deposits.sort(by: >)
-
-				for withdrawal in withdrawals {
-					if case let .fungible(fun) = withdrawal {
-						print("   • WDR \(fun.amount?.amount.formatted() ?? "??") of \(fun.title ?? "nil") [\(fun.address.address.formatted(.default))]")
-					}
-				}
-
-				for deposit in deposits {
-					if case let .fungible(fun) = deposit {
-						print("   • DEP \(fun.amount?.amount.formatted() ?? "??") of \(fun.title ?? "nil") [\(fun.address.address.formatted(.default))]")
-					}
-				}
 
 				return .init(
 					time: time,
