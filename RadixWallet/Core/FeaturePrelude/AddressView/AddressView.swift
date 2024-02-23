@@ -2,7 +2,7 @@
 public struct AddressView: View {
 	let identifiable: LedgerIdentifiable
 	let isTappable: Bool
-	private let format: AddressFormat
+	private let showFull: Bool
 	private let action: Action
 
 	@Dependency(\.gatewaysClient) var gatewaysClient
@@ -19,21 +19,14 @@ public struct AddressView: View {
 		isTappable: Bool = true
 	) {
 		self.identifiable = identifiable
+		self.showFull = showFull
 		self.isTappable = isTappable
 
 		switch identifiable {
-		case .address:
-			self.format = showFull ? .full : .default
+		case .address, .identifier(.nonFungibleGlobalID):
 			self.action = .copy
-		case let .identifier(identifier):
-			switch identifier {
-			case .transaction:
-				self.format = showFull ? .full : .default
-				self.action = .viewOnDashboard
-			case .nonFungibleGlobalID:
-				self.format = showFull ? .full : .nonFungibleLocalId
-				self.action = .copy
-			}
+		case .identifier(.transaction):
+			self.action = .viewOnDashboard
 		}
 	}
 }
@@ -87,14 +80,14 @@ extension AddressView {
 
 	@ViewBuilder
 	private var addressView: some View {
-		if format == .full {
-			Text("\(identifiable.address.formatted(format))\(image)")
+		if showFull {
+			Text("\(identifiable.formatted(.full))\(image)")
 				.lineLimit(nil)
 				.multilineTextAlignment(.leading)
 				.minimumScaleFactor(0.5)
 		} else {
 			HStack(spacing: .small3) {
-				Text(identifiable.address.formatted(format))
+				Text(identifiable.formatted(.default))
 					.lineLimit(1)
 				image
 			}

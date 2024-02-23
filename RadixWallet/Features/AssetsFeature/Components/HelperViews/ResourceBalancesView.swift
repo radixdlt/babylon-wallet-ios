@@ -178,11 +178,11 @@ extension ResourceBalanceView {
 		}
 
 		private var line1: String {
-			viewState.resourceName ?? viewState.id.resourceAddress().addressString().formatted(.default)
+			viewState.resourceName ?? viewState.id.resourceAddress().formatted()
 		}
 
 		private var line2: String {
-			viewState.nonFungibleName ?? viewState.id.localId().toUserFacingString().formatted(.nonFungibleLocalId)
+			viewState.nonFungibleName ?? viewState.id.localId().formatted()
 		}
 	}
 

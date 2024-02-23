@@ -1,42 +1,31 @@
 // MARK: - AddressFormat
 public enum AddressFormat: String, Sendable {
 	case `default`
-	case olympia
 	case full
-	case nonFungibleLocalId
+	case raw
 }
 
-// FIXME: All this should be revisited when the LocalID support in ET is available
-extension String {
-	public func formatted(_ format: AddressFormat) -> Self {
+extension LegacyOlympiaAccountAddress {
+	public func formatted(_ format: AddressFormat = .default) -> String {
 		switch format {
 		case .default:
-			return truncatedMiddle(keepFirst: 4, last: 6)
-		case .olympia:
-			return truncatedMiddle(keepFirst: 3, last: 9)
-		case .full:
-			return self
-		case .nonFungibleLocalId:
-			guard let local = local(), local.count >= 3 else { return self }
-			return String(local.dropFirst().dropLast())
+			address.rawValue.truncatedMiddle(keepFirst: 3, last: 9)
+		case .full, .raw:
+			address.rawValue
 		}
-	}
-
-	private func local() -> String? {
-		let parts = split(separator: ":")
-		guard parts.count == 2 else { return nil }
-		return String(parts[1])
 	}
 }
 
 extension SpecificAddress {
-	public func formatted(_ format: AddressFormat) -> String {
+	/// The default format is truncated in the middle
+	public func formatted(_ format: AddressFormat = .default) -> String {
 		address.formattedAsAddressString(format)
 	}
 }
 
 extension EngineToolkit.Address {
-	public func formatted(_ format: AddressFormat) -> String {
+	/// The default format is truncated in the middle
+	public func formatted(_ format: AddressFormat = .default) -> String {
 		addressString().formattedAsAddressString(format)
 	}
 }
@@ -46,12 +35,8 @@ private extension String {
 		switch format {
 		case .default:
 			truncatedMiddle(keepFirst: 4, last: 6)
-		case .olympia:
-			truncatedMiddle(keepFirst: 3, last: 9)
-		case .full:
+		case .full, .raw:
 			self
-		case .nonFungibleLocalId:
-			String(dropFirst().dropLast())
 		}
 	}
 
@@ -61,20 +46,11 @@ private extension String {
 	}
 }
 
-// MARK: - NonFungibleFormat
-public enum NonFungibleFormat: String, Sendable {
-	case `default`
-	case full
-	case raw
-}
-
 extension NonFungibleGlobalId {
-	public func formatted(_ format: NonFungibleFormat = .default) -> String {
+	public func formatted(_ format: AddressFormat = .default) -> String {
 		switch format {
-		case .default:
-			resourceAddress().formatted(.default) + ":" + localId().formatted(.default)
-		case .full:
-			resourceAddress().formatted(.full) + ":" + localId().formatted(.full)
+		case .default, .full:
+			resourceAddress().formatted(format) + ":" + localId().formatted(format)
 		case .raw:
 			asStr()
 		}
@@ -82,7 +58,7 @@ extension NonFungibleGlobalId {
 }
 
 extension NonFungibleLocalId {
-	public func formatted(_ format: NonFungibleFormat = .default) -> String {
+	public func formatted(_ format: AddressFormat = .default) -> String {
 		switch format {
 		case .default:
 			switch self {
