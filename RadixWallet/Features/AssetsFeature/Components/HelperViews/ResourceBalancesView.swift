@@ -182,7 +182,7 @@ extension ResourceBalanceView {
 		}
 
 		private var line2: String {
-			viewState.nonFungibleName ?? viewState.id.localId().toUserFacingString()
+			viewState.nonFungibleName ?? viewState.id.localId().toUserFacingString().formatted(.nonFungibleLocalId)
 		}
 	}
 
