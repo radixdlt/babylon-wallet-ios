@@ -69,12 +69,12 @@ public struct AccountView: View {
 
 				VPair(
 					heading: L10n.ImportOlympiaAccounts.AccountsToImport.olympiaAddressLabel,
-					value: viewState.olympiaAddress.address.rawValue.formatted(.olympia)
+					value: viewState.olympiaAddress.formatted()
 				)
 
 				VPair(
 					heading: L10n.ImportOlympiaAccounts.AccountsToImport.newAddressLabel,
-					value: viewState.babylonAddress.address.formatted(.default)
+					value: viewState.babylonAddress.formatted()
 				)
 			}
 
