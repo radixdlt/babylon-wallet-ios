@@ -26,14 +26,15 @@ public struct ResourceBalancesView: View {
 					.overlay(alignment: .bottom) {
 						if isNotLast {
 							Rectangle()
-								.fill(.app.gray3)
+//								.fill(.app.gray3)
+								.fill(.green)
 								.frame(height: dividerHeight)
 						}
 					}
 			}
 		}
-		.roundedCorners(strokeColor: .app.gray3)
-//		.roundedCorners(strokeColor: .green)
+//		.roundedCorners(strokeColor: .app.gray3)
+		.roundedCorners(strokeColor: .green)
 	}
 
 	private let dividerHeight: CGFloat = 1
@@ -95,8 +96,8 @@ public struct ResourceBalanceView: View {
 extension ResourceBalanceView {
 	var bordered: some View {
 		padding(.small1)
-			.roundedCorners(strokeColor: .app.gray3)
-//			.roundedCorners(strokeColor: .yellow)
+//			.roundedCorners(strokeColor: .app.gray3)
+			.roundedCorners(strokeColor: .blue)
 	}
 }
 
@@ -159,23 +160,13 @@ extension ResourceBalanceView {
 				Thumbnail(.nft, url: viewState.icon, size: size)
 					.padding(.trailing, .small1)
 
-				if compact {
-					Text(compactTitle)
-						.textStyle(.body2HighImportance)
+				VStack(alignment: .leading, spacing: 0 * .small3) {
+					Text(line1)
+						.textStyle(compact ? .body2HighImportance : .body1HighImportance)
 						.foregroundColor(.app.gray1)
-				} else {
-					VStack(alignment: .leading, spacing: .small3) {
-						if let nonFungibleName = viewState.nonFungibleName {
-							Text(nonFungibleName)
-								.textStyle(.body2Regular)
-								.foregroundColor(.app.gray1)
-						}
-						if let resourceName = viewState.resourceName {
-							Text(resourceName)
-								.textStyle(.body1HighImportance)
-								.foregroundColor(.app.gray1)
-						}
-					}
+					Text(line2)
+						.textStyle(.body2Regular)
+						.foregroundColor(.app.gray1)
 				}
 
 				Spacer(minLength: 0)
@@ -186,8 +177,12 @@ extension ResourceBalanceView {
 			compact ? .smallest : .smallish
 		}
 
-		private var compactTitle: String {
-			viewState.nonFungibleName ?? viewState.id.localId().toUserFacingString().formatted(.default)
+		private var line1: String {
+			viewState.resourceName ?? viewState.id.resourceAddress().addressString().formatted(.default)
+		}
+
+		private var line2: String {
+			viewState.nonFungibleName ?? viewState.id.localId().toUserFacingString()
 		}
 	}
 
