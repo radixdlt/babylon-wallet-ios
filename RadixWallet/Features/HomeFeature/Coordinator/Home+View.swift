@@ -7,8 +7,13 @@ extension Home.State {
 			hasNotification: shouldWriteDownPersonasSeedPhrase,
 			showRadixBanner: showRadixBanner,
 			totalFiatWorth: accountPortfolios.map {
+				guard let first = $0.first else {}
+
+				let isShowingFiatWorth = first.isCurrencyAmountVisible
+				let currency = first.fiatCurrency
+
 				let totalFiatWorth = $0.map(\.totalFiatWorth.worth).reduce(0, +)
-				return OnLedgerEntity.FiatWorth(isVisible: true, worth: totalFiatWorth, currency: .usd).currencyFormatted(applyCustomFont: true)!
+				return OnLedgerEntity.FiatWorth(isVisible: isShowingFiatWorth, worth: totalFiatWorth, currency: currency).currencyFormatted(applyCustomFont: true)!
 			},
 			isShowingFiatWorth: showFiatWorth
 		)
@@ -20,7 +25,7 @@ extension Home {
 	public struct ViewState: Equatable {
 		let hasNotification: Bool
 		let showRadixBanner: Bool
-		let totalFiatWorth: Loadable<AttributedString>
+		let totalFiatWorth: Loadable<AttributedString>?
 		let isShowingFiatWorth: Bool
 	}
 

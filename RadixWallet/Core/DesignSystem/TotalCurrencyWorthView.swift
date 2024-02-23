@@ -13,7 +13,7 @@ struct TotalCurrencyWorthView: View {
 				onTap()
 			} label: {
 				HStack {
-					Text("\(state.isShowingCurrencyWorth ? totalCurrencyWorth : "• • • •")")
+					Text(totalCurrencyWorth)
 						.textStyle(.sheetTitle)
 
 					Image(asset: state.isShowingCurrencyWorth ? AssetResource.homeAggregatedValueShown : AssetResource.homeAggregatedValueHidden)

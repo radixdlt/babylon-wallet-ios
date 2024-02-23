@@ -167,7 +167,7 @@ public struct StakeClaimTokensView: View {
 						onTap?(claim)
 					} label: {
 						HStack {
-							TokenBalanceView(viewState: .xrd(balance: claim.claimAmount, balanceFiatWorth: claim.claimFiatWorth.map { .init(isVisible: true, worth: $0, currency: .usd) }))
+							TokenBalanceView(viewState: .xrd(balance: claim.claimAmount, balanceFiatWorth: claim.claimFiatWorth))
 
 							if let isSelected = viewState.selectedStakeClaims?.contains(claim.id) {
 								CheckmarkView(appearance: .dark, isChecked: isSelected)

@@ -2,7 +2,7 @@ public struct LiquidStakeUnitView: View {
 	public struct ViewState: Sendable, Hashable {
 		public let resource: OnLedgerEntity.Resource
 		public let amount: RETDecimal?
-		public let amountFiatWorth: Double?
+		public let amountFiatWorth: OnLedgerEntity.FiatWorth?
 		public let guaranteedAmount: RETDecimal?
 		public let worth: RETDecimal
 		public var validatorName: String? = nil
@@ -53,7 +53,7 @@ public struct LiquidStakeUnitView: View {
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray2)
 
-					TokenBalanceView.Bordered(viewState: .xrd(balance: viewState.worth, balanceFiatWorth: viewState.amountFiatWorth.map { .init(isVisible: true, worth: $0, currency: .usd) }))
+					TokenBalanceView.Bordered(viewState: .xrd(balance: viewState.worth, balanceFiatWorth: viewState.amountFiatWorth))
 				}
 			}
 			.padding(.medium3)

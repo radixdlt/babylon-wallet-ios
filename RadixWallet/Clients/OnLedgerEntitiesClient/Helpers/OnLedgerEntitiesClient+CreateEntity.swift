@@ -509,7 +509,7 @@ extension OnLedgerEntitiesClient {
 	public struct OwnedStakeDetails: Hashable, Sendable {
 		public let validator: OnLedgerEntity.Validator
 		public var stakeUnitResource: ResourceWithVaultAmount?
-		public let stakeClaimTokens: NonFunbileResourceWithTokens?
+		public var stakeClaimTokens: NonFunbileResourceWithTokens?
 		public let currentEpoch: Epoch
 	}
 
@@ -529,7 +529,7 @@ extension OnLedgerEntitiesClient {
 	public struct ResourceWithVaultAmount: Hashable, Sendable {
 		public let resource: OnLedgerEntity.Resource
 		public let amount: RETDecimal
-		public let amounFiatWorth: Double?
+		public var amounFiatWorth: OnLedgerEntity.FiatWorth?
 	}
 
 	public struct StakeClaim: Hashable, Sendable, Identifiable {
@@ -540,7 +540,7 @@ extension OnLedgerEntitiesClient {
 		let validatorAddress: ValidatorAddress
 		let token: OnLedgerEntity.NonFungibleToken
 		let claimAmount: RETDecimal
-		let claimFiatWorth: Double?
+		var claimFiatWorth: OnLedgerEntity.FiatWorth?
 		let reamainingEpochsUntilClaim: Int?
 
 		var isReadyToBeClaimed: Bool {
@@ -560,7 +560,7 @@ extension OnLedgerEntitiesClient {
 
 	public struct NonFunbileResourceWithTokens: Hashable, Sendable {
 		public let resource: OnLedgerEntity.Resource
-		public let stakeClaims: IdentifiedArrayOf<StakeClaim>
+		public var stakeClaims: IdentifiedArrayOf<StakeClaim>
 	}
 }
 

@@ -12,7 +12,7 @@ public struct Home: Sendable, FeatureReducer {
 
 		public var showRadixBanner: Bool = false
 		var showFiatWorth: Bool = true
-		var accountPortfolios: Loadable<[OnLedgerEntity.Account]> = .loading
+		var accountPortfolios: Loadable<[AccountPortfoliosClient.AccountPortfolio]> = .loading
 
 		// MARK: - Destination
 		@PresentationState
@@ -39,7 +39,7 @@ public struct Home: Sendable, FeatureReducer {
 		case importMnemonic
 		case loadedShouldWriteDownPersonasSeedPhrase(Bool)
 		case loadIsCurrencyAmountVisible(Bool)
-		case loadedPortfolios([OnLedgerEntity.Account])
+		case loadedPortfolios([AccountPortfoliosClient.AccountPortfolio])
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -190,7 +190,7 @@ public struct Home: Sendable, FeatureReducer {
 		case let .loadedPortfolios(portfolios):
 			state.accountPortfolios = .success(portfolios)
 			state.accountRows.mutateAll { rowState in
-				if let portfolio = portfolios.first(where: { $0.address == rowState.id }) {
+				if let portfolio = portfolios.first(where: { $0.account.address == rowState.id }) {
 					rowState.portfolio = .success(portfolio)
 				}
 			}
@@ -333,7 +333,7 @@ public struct Home: Sendable, FeatureReducer {
 				guard !Task.isCancelled else { return }
 
 				await send(.internal(.loadedPortfolios(
-					portfolios.map(\.account)
+					portfolios
 				)))
 			}
 		}

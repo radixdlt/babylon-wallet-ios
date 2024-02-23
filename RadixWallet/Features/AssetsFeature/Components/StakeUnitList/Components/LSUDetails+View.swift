@@ -16,7 +16,7 @@ extension LSUDetails.State {
 				thumbnail: .xrd,
 				name: Constants.xrdTokenName,
 				balance: xrdRedemptionValue,
-				balanceFiatWorth: stakeUnitResource.amounFiatWorth.map { .init(isVisible: true, worth: $0, currency: .usd) }
+				balanceFiatWorth: stakeUnitResource.amounFiatWorth
 			),
 			resourceDetails: .init(
 				description: .success(stakeUnitResource.resource.metadata.description),

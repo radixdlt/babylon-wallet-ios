@@ -45,11 +45,7 @@ extension Home.AccountRow {
 			self.address = state.account.address
 			self.appearanceID = state.account.appearanceID
 			self.fiatWorth = state.portfolio.totalFiatWorth.map {
-				if $0.worth == .zero {
-					""
-				} else {
-					$0.currencyFormatted(applyCustomFont: false) ?? ""
-				}
+				$0.currencyFormatted(applyCustomFont: false) ?? ""
 			}
 			self.isLoadingResources = state.portfolio.isLoading
 
@@ -68,13 +64,13 @@ extension Home.AccountRow {
 				return
 			}
 
-			let fungibleResources = portfolio.fungibleResources
+			let fungibleResources = portfolio.account.fungibleResources
 			let xrdIcon: [Thumbnail.TokenContent] = fungibleResources.xrdResource != nil ? [.xrd] : []
 			let otherIcons: [Thumbnail.TokenContent] = fungibleResources.nonXrdResources.map { .other($0.metadata.iconURL) }
 			self.fungibleResourceIcons = xrdIcon + otherIcons
-			self.nonFungibleResourcesCount = portfolio.nonFungibleResources.count
-			self.stakedValidatorsCount = portfolio.poolUnitResources.radixNetworkStakes.count
-			self.poolUnitsCount = portfolio.poolUnitResources.poolUnits.count
+			self.nonFungibleResourcesCount = portfolio.account.nonFungibleResources.count
+			self.stakedValidatorsCount = portfolio.account.poolUnitResources.radixNetworkStakes.count
+			self.poolUnitsCount = portfolio.account.poolUnitResources.poolUnits.count
 		}
 	}
 

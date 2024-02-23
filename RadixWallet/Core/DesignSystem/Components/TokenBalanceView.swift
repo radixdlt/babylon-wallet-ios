@@ -38,7 +38,7 @@ public struct TokenBalanceView: View {
 				.textStyle(.body2HighImportance)
 
 			Spacer()
-			VStack {
+			VStack(alignment: .trailing) {
 				Text(viewState.balance.formatted())
 					.foregroundColor(.app.gray1)
 					.textStyle(.secondaryHeader)

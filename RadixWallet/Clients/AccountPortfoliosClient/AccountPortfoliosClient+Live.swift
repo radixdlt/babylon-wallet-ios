@@ -4,6 +4,25 @@ extension AccountPortfoliosClient: DependencyKey {
 		public var account: OnLedgerEntity.Account
 		public var poolUnitDetails: [OnLedgerEntitiesClient.OwnedResourcePoolDetails]
 		public var stakeUnitDetails: [OnLedgerEntitiesClient.OwnedStakeDetails]
+
+		var isCurrencyAmountVisible: Bool = true
+		var fiatCurrency: FiatCurrency = .usd
+
+		var totalFiatWorth: OnLedgerEntity.FiatWorth {
+			let xrdFiatWorth = account.fungibleResources.xrdResource?.fiatWorth?.worth ?? .zero
+			let nonXrdFiatWorth = account.fungibleResources.nonXrdResources.compactMap(\.fiatWorth?.worth).reduce(0, +)
+			let fungibleTokensFiatWorth = xrdFiatWorth + nonXrdFiatWorth
+
+			let stakeUnitsFiatWorth: Double = stakeUnitDetails.map {
+				let stakeUnitFiatWorth = $0.stakeUnitResource?.amounFiatWorth?.worth ?? .zero
+				let stakeClaimsFiatWorth = $0.stakeClaimTokens?.stakeClaims.compactMap(\.claimFiatWorth?.worth).reduce(0, +) ?? .zero
+				return stakeUnitFiatWorth + stakeClaimsFiatWorth
+			}.reduce(0, +)
+
+			let totalFiatWorth = fungibleTokensFiatWorth + stakeUnitsFiatWorth
+
+			return .init(isVisible: isCurrencyAmountVisible, worth: totalFiatWorth, currency: fiatCurrency)
+		}
 	}
 
 	/// Internal state that holds all loaded portfolios.
@@ -35,13 +54,13 @@ extension AccountPortfoliosClient: DependencyKey {
 		@Dependency(\.tokenPriceClient) var tokenPriceClient
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
 
-//		Task {
-//			for try await isCurrencyAmountVisible in await appPreferencesClient.appPreferenceUpdates().map(\.display.isCurrencyAmountVisible) {
-//				guard !Task.isCancelled else { return }
-//				let updated = await updateWithCurrencyVisibility(isCurrencyAmountVisible, Array(state.portfoliosSubject.value.values))
-//				await state.setOrUpdateAccountPortfolios(updated)
-//			}
-//		}
+		Task {
+			for try await isCurrencyAmountVisible in await appPreferencesClient.appPreferenceUpdates().map(\.display.isCurrencyAmountVisible) {
+				guard !Task.isCancelled else { return }
+				let updated = await updateWithCurrencyVisibility(isCurrencyAmountVisible, Array(state.portfoliosSubject.value.values))
+				await state.setOrUpdateAccountPortfolios(updated)
+			}
+		}
 
 		@Sendable
 		func updateWithCurrencyVisibility(
@@ -51,6 +70,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			var portfolios = portfolios
 			if !isCurrencyAmountVisible {
 				portfolios.mutateAll { portfolio in
+					portfolio.isCurrencyAmountVisible = false
 					portfolio.account.fungibleResources.nonXrdResources.mutateAll { resource in
 						resource.fiatWorth?.isVisible = false
 					}
@@ -84,9 +104,11 @@ extension AccountPortfoliosClient: DependencyKey {
 				//                }
 
 				let tokenPrices = try? await tokenPriceClient.getTokenPrices(.init(tokens: Array(allTokens.prefix(5)), lsus: Array(allLsus)))
+				let xrdPrice = tokenPrices!.tokens[id: .init(address: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd", decodedKind: .globalFungibleResourceManager)]!.price
 
 				let new = portfolios.map { portfolio in
 					var portfolio = portfolio
+					portfolio.isCurrencyAmountVisible = true
 					let sortedByPrice = portfolio.account.fungibleResources.nonXrdResources.map { resource in
 						let price = tokenPrices?.tokens.randomElement()?.price
 						var resource = resource
@@ -112,6 +134,24 @@ extension AccountPortfoliosClient: DependencyKey {
 						return res
 					}
 					portfolio.account.fungibleResources = .init(xrdResource: xrdResource, nonXrdResources: sortedByPrice)
+					portfolio.stakeUnitDetails.mutateAll { details in
+						let stakeUnitAmount = details.stakeUnitResource?.amount
+						details.stakeUnitResource?.amounFiatWorth = stakeUnitAmount.map {
+							.init(
+								isVisible: true,
+								worth: xrdPrice.price * (try! $0.asDouble()),
+								currency: xrdPrice.currency
+							)
+						}
+						details.stakeClaimTokens?.stakeClaims.mutateAll { token in
+							let xrdAmount = token.claimAmount
+							token.claimFiatWorth = .init(
+								isVisible: true,
+								worth: xrdPrice.price * (try! xrdAmount.asDouble()),
+								currency: xrdPrice.currency
+							)
+						}
+					}
 					return portfolio
 				}
 
@@ -132,13 +172,14 @@ extension AccountPortfoliosClient: DependencyKey {
 					account.poolUnitResources.fungibleResourceAddresses + account.poolUnitResources.nonFungibleResourceAddresses
 				}
 
-				let portfolios = try await accounts.asyncMap {
+				let isCurrencyAmountVisible = await appPreferencesClient.getPreferences().display.isCurrencyAmountVisible
+
+				let portfolios = try await accounts.parallelMap {
 					let detailsS = try await onLedgerEntitiesClient.getOwnedStakesDetails(account: $0)
 					let detailsP = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails($0)
 
 					return AccountPortfolio(account: $0, poolUnitDetails: detailsP, stakeUnitDetails: detailsS)
 				}
-				let isCurrencyAmountVisible = await appPreferencesClient.getPreferences().display.isCurrencyAmountVisible
 				await state.setOrUpdateAccountPortfolios(updateWithCurrencyVisibility(isCurrencyAmountVisible, portfolios))
 
 				return portfolios
@@ -169,16 +210,6 @@ extension AccountPortfoliosClient: DependencyKey {
 	}()
 }
 
-extension OnLedgerEntity.Account {
-	var totalFiatWorth: OnLedgerEntity.FiatWorth {
-		let xrdWorth = fungibleResources.xrdResource?.fiatWorth?.worth ?? .zero
-		let tokensWorth = xrdWorth + fungibleResources.nonXrdResources.compactMap(\.fiatWorth?.worth).reduce(.zero, +)
-		let lsusWorth = poolUnitResources.radixNetworkStakes.compactMap(\.stakeUnitResource?.fiatWorth?.worth).reduce(.zero, +)
-		let total = tokensWorth + lsusWorth
-		return .init(isVisible: true, worth: total, currency: .usd)
-	}
-}
-
 extension NumberFormatter {
 	static let currencyFormatter: NumberFormatter = {
 		let formatter = NumberFormatter()
@@ -199,6 +230,18 @@ extension OnLedgerEntity.FiatWorth {
 
 		var attributedString = AttributedString(formatter.string(for: self.worth)!)
 
+		let currencySymbol = formatter.currencySymbol ?? ""
+		let symbolRange = attributedString.range(of: currencySymbol)
+
+		guard isVisible else {
+			let hiddenValue = "• • • •"
+			if symbolRange!.lowerBound == attributedString.startIndex {
+				return AttributedString(currencySymbol + hiddenValue)
+			} else {
+				return AttributedString(hiddenValue + currencySymbol)
+			}
+		}
+
 		guard applyCustomFont else {
 			return attributedString
 		}
@@ -211,7 +254,6 @@ extension OnLedgerEntity.FiatWorth {
 		attributedString.font = .app.sheetTitle
 		attributedString.kern = -0.5
 
-		let currencySymbol = formatter.currencySymbol ?? ""
 		let decimalSeparator = formatter.decimalSeparator ?? "."
 
 		if let symbolRange = attributedString.range(of: currencySymbol) {

@@ -34,7 +34,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		public var poolUnitsList: PoolUnitsList.State?
 
 		public let account: Profile.Network.Account
-		public var accountPortfolio: Loadable<OnLedgerEntity.Account> = .idle
+		public var accountPortfolio: Loadable<AccountPortfoliosClient.AccountPortfolio> = .idle
 		public var isLoadingResources: Bool = false
 		public var isRefreshing: Bool = false
 		public let mode: Mode
@@ -87,7 +87,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		public struct ResourcesState: Sendable, Equatable {
-			public let portfolio: OnLedgerEntity.Account
+			public let portfolio: AccountPortfoliosClient.AccountPortfolio
 			public let fungibleTokenList: FungibleAssetList.State?
 			public let nonFungibleTokenList: NonFungibleAssetList.State?
 			public let stakeUnitList: StakeUnitList.State?
@@ -133,7 +133,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 					guard !Task.isCancelled else { return }
 
 					await send(.internal(.resourcesStateUpdated(createResourcesState(
-						from: portfolio.account.nonEmptyVaults,
+						from: portfolio,
 						mode: mode
 					)
 					)))
@@ -189,16 +189,16 @@ public struct AssetsView: Sendable, FeatureReducer {
 	}
 
 	private func createResourcesState(
-		from portfolio: OnLedgerEntity.Account,
+		from portfolio: AccountPortfoliosClient.AccountPortfolio,
 		mode: State.Mode
 	) async -> InternalAction.ResourcesState {
-		let xrd = portfolio.fungibleResources.xrdResource.map { token in
+		let xrd = portfolio.account.fungibleResources.xrdResource.map { token in
 			FungibleAssetList.Section.Row.State(
 				xrdToken: token,
 				isSelected: mode.xrdRowSelected
 			)
 		}
-		let nonXrd = portfolio.fungibleResources.nonXrdResources
+		let nonXrd = portfolio.account.fungibleResources.nonXrdResources
 			.map { token in
 				FungibleAssetList.Section.Row.State(
 					nonXRDToken: token,
@@ -207,9 +207,9 @@ public struct AssetsView: Sendable, FeatureReducer {
 			}
 			.asIdentifiable()
 
-		let nfts = portfolio.nonFungibleResources.map { resource in
+		let nfts = portfolio.account.nonFungibleResources.map { resource in
 			NonFungibleAssetList.Row.State(
-				accountAddress: portfolio.address,
+				accountAddress: portfolio.account.address,
 				resource: resource,
 				disabled: mode.selectedAssets?.disabledNFTs ?? [],
 				selectedAssets: mode.nftRowSelectedAssets(resource.resourceAddress)
@@ -217,10 +217,10 @@ public struct AssetsView: Sendable, FeatureReducer {
 		}
 
 		let poolUnitList: PoolUnitsList.State? = {
-			if !portfolio.poolUnitResources.poolUnits.isEmpty {
+			if !portfolio.account.poolUnitResources.poolUnits.isEmpty {
 				return .init(
 					poolUnits: .init(
-						uncheckedUniqueElements: portfolio.poolUnitResources.poolUnits
+						uncheckedUniqueElements: portfolio.account.poolUnitResources.poolUnits
 							.map {
 								PoolUnit.State(
 									poolUnit: $0,
@@ -229,7 +229,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 								)
 							}
 					),
-					account: portfolio
+					account: portfolio.account
 				)
 			}
 
@@ -253,9 +253,9 @@ public struct AssetsView: Sendable, FeatureReducer {
 			return .init(sections: sections)
 		}()
 
-		let stakes = portfolio.poolUnitResources.radixNetworkStakes
+		let stakes = portfolio.account.poolUnitResources.radixNetworkStakes
 		let stakeUnitList: StakeUnitList.State? = stakes.isEmpty ? nil : .init(
-			account: portfolio,
+			account: portfolio.account,
 			selectedLiquidStakeUnits: mode.selectedAssets.map { assets in
 				let stakeUnitResources = stakes.map(\.stakeUnitResource)
 				return assets
@@ -272,7 +272,8 @@ public struct AssetsView: Sendable, FeatureReducer {
 					if let selectedtokens = mode.nftRowSelectedAssets(resource.resourceAddress)?.elements.asIdentifiable() {
 						dict[resource] = selectedtokens
 					}
-				} : nil
+				} : nil,
+			stakeUnitDetails: portfolio.stakeUnitDetails.asIdentifiable()
 		)
 
 		return .init(
