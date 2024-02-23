@@ -29,34 +29,60 @@ extension String {
 	}
 }
 
+extension SpecificAddress {
+	public func formatted(_ format: AddressFormat) -> String {
+		address.formattedAsAddressString(format)
+	}
+}
+
+extension EngineToolkit.Address {
+	public func formatted(_ format: AddressFormat) -> String {
+		addressString().formattedAsAddressString(format)
+	}
+}
+
 private extension String {
+	func formattedAsAddressString(_ format: AddressFormat) -> Self {
+		switch format {
+		case .default:
+			truncatedMiddle(keepFirst: 4, last: 6)
+		case .olympia:
+			truncatedMiddle(keepFirst: 3, last: 9)
+		case .full:
+			self
+		case .nonFungibleLocalId:
+			String(dropFirst().dropLast())
+		}
+	}
+
 	func truncatedMiddle(keepFirst first: Int, last: Int) -> Self {
 		guard count > first + last else { return self }
 		return prefix(first) + "..." + suffix(last)
 	}
 }
 
-extension SpecificAddress {
-	public func formatted(_ format: Format) -> String {
+// MARK: - NonFungibleFormat
+public enum NonFungibleFormat: String, Sendable {
+	case `default`
+	case full
+	case raw
+}
+
+extension NonFungibleGlobalId {
+	public func formatted(_ format: NonFungibleFormat = .default) -> String {
 		switch format {
 		case .default:
-			address.truncatedMiddle(keepFirst: 4, last: 6)
-		case .olympia:
-			address.truncatedMiddle(keepFirst: 3, last: 9)
+			resourceAddress().formatted(.default) + ":" + localId().formatted(.default)
 		case .full:
-			address
+			resourceAddress().formatted(.full) + ":" + localId().formatted(.full)
+		case .raw:
+			asStr()
 		}
-	}
-
-	public enum Format: String, Sendable {
-		case `default`
-		case olympia
-		case full
 	}
 }
 
 extension NonFungibleLocalId {
-	public func formatted(_ format: Format) -> String {
+	public func formatted(_ format: NonFungibleFormat = .default) -> String {
 		switch format {
 		case .default:
 			switch self {
@@ -67,11 +93,8 @@ extension NonFungibleLocalId {
 			}
 		case .full:
 			toUserFacingString()
+		case .raw:
+			(try? toString()) ?? "" // Should never throw
 		}
-	}
-
-	public enum Format: String, Sendable {
-		case `default`
-		case full
 	}
 }
