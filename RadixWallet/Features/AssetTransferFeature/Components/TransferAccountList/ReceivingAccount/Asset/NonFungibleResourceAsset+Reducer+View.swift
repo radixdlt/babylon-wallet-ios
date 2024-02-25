@@ -5,17 +5,17 @@ import SwiftUI
 public struct NonFungibleResourceAsset: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public typealias ID = String
-		public var id: ID { nftToken.id.asStr() }
+		public var id: ID { token.id.asStr() }
 
 		public let resourceImage: URL?
 		public let resourceName: String?
 		public let resourceAddress: ResourceAddress
-		public let nftToken: OnLedgerEntity.NonFungibleToken
+		public let token: OnLedgerEntity.NonFungibleToken
 	}
 }
 
 extension NonFungibleResourceAsset {
-	public typealias ViewState = TransferNFTView.ViewState
+	public typealias ViewState = ResourceBalance
 
 	@MainActor
 	public struct View: SwiftUI.View {
@@ -28,19 +28,20 @@ extension NonFungibleResourceAsset {
 
 extension NonFungibleResourceAsset.State {
 	var viewState: NonFungibleResourceAsset.ViewState {
-		.init(
-			tokenID: nftToken.id.localId().toUserFacingString(),
-			tokenName: nftToken.data?.name,
-			thumbnail: resourceImage
-		)
+		.nonFungible(.init(
+			id: token.id,
+			resourceImage: resourceImage,
+			resourceName: resourceName,
+			nonFungibleName: "modern kunst music" // token.data?.name
+		))
 	}
 }
 
 extension NonFungibleResourceAsset.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState) { viewStore in
-			TransferNFTView(viewState: viewStore.state, background: .app.white)
-				.frame(height: .largeButtonHeight)
+			ResourceBalanceView(resource: viewStore.state, appearance: .compact)
+				.padding(.medium3)
 		}
 	}
 }

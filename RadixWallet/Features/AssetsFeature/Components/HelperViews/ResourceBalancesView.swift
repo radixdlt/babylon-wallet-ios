@@ -63,7 +63,7 @@ public enum ResourceBalance: Sendable, Hashable {
 
 	public struct NonFungible: Sendable, Hashable {
 		public let id: NonFungibleGlobalId
-		public let icon: URL?
+		public let resourceImage: URL?
 		public let resourceName: String?
 		public let nonFungibleName: String?
 	}
@@ -170,7 +170,6 @@ extension ResourceBalanceView {
 						.textStyle(titleTextStyle)
 						.foregroundColor(.app.green1)
 //						.foregroundColor(.app.gray1)
-						.border(.red)
 				}
 
 				if useSpacer {
@@ -179,7 +178,6 @@ extension ResourceBalanceView {
 
 				AmountView(amount: viewState.amount, fallback: viewState.fallback, compact: compact)
 			}
-			.border(.yellow)
 		}
 
 		private var size: HitTargetSize {
@@ -201,10 +199,10 @@ extension ResourceBalanceView {
 
 		public var body: some View {
 			HStack(spacing: .zero) {
-				Thumbnail(.nft, url: viewState.icon, size: size)
+				Thumbnail(.nft, url: viewState.resourceImage, size: size)
 					.padding(.trailing, .small1)
 
-				VStack(alignment: .leading, spacing: 0 * .small3) {
+				VStack(alignment: .leading, spacing: 0) {
 					Text(line1)
 						.textStyle(compact ? .body2HighImportance : .body1HighImportance)
 						.foregroundColor(.app.green1)
