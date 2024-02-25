@@ -46,8 +46,8 @@ extension TransactionHistoryClient {
 				let iconURL = keyedResourceDetails[id: resourceAddress]?.metadata.iconURL
 				return .init(
 					address: resourceAddress,
-					title: title,
 					icon: .other(iconURL),
+					title: title,
 					amount: .init(amount),
 					fallback: nil
 				)
@@ -74,9 +74,9 @@ extension TransactionHistoryClient {
 				let iconURL = keyedResourceDetails[id: resourceAddress]?.metadata.iconURL
 				return .init(
 					id: id,
+					icon: iconURL,
 					resourceName: resourceName,
-					nonFungibleName: keyedNFTData[id]?.data?.name,
-					icon: iconURL
+					nonFungibleName: keyedNFTData[id]?.data?.name
 				)
 			}
 
@@ -98,20 +98,20 @@ extension TransactionHistoryClient {
 						}
 					}
 
-//					for fungible in changes.fungibleBalanceChanges {
-//						let resourceAddress = try ResourceAddress(validatingAddress: fungible.resourceAddress)
-//						let amount = try RETDecimal(value: fungible.balanceChange)
-//						guard !amount.isZero() else { continue }
-//
-//						// NB: The sign of the amount in the balance is made positive, negative balances are treated as withdrawals
-//						let balance = try fungibleBalance(resourceAddress, amount: amount.abs())
-//
-//						if amount.isNegative() {
-//							withdrawals.append(.fungible(balance))
-//						} else {
-//							deposits.append(.fungible(balance))
-//						}
-//					}
+					for fungible in changes.fungibleBalanceChanges {
+						let resourceAddress = try ResourceAddress(validatingAddress: fungible.resourceAddress)
+						let amount = try RETDecimal(value: fungible.balanceChange)
+						guard !amount.isZero() else { continue }
+
+						// NB: The sign of the amount in the balance is made positive, negative balances are treated as withdrawals
+						let balance = try fungibleBalance(resourceAddress, amount: amount.abs())
+
+						if amount.isNegative() {
+							withdrawals.append(.fungible(balance))
+						} else {
+							deposits.append(.fungible(balance))
+						}
+					}
 				}
 
 				withdrawals.sort(by: >)
