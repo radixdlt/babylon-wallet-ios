@@ -1,3 +1,5 @@
+// FIXME: REMOVE
+
 // MARK: - TransferNFTView
 public struct TransferNFTView: View {
 	let viewState: ViewState
