@@ -38,17 +38,11 @@ extension FungibleAssetList.Section.Row {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: FeatureAction.view) { viewStore in
-				HStack(alignment: .center) {
-					ResourceBalanceView(resource: .fungible(viewStore.resource))
-
-					if let isSelected = viewStore.isSelected {
-						CheckmarkView(appearance: .dark, isChecked: isSelected)
-					}
-				}
-				.frame(height: 2 * .large1)
-				.padding(.horizontal, .medium1)
-				.contentShape(Rectangle())
-				.onTapGesture { viewStore.send(.tapped) }
+				ResourceBalanceView(resource: .fungible(viewStore.resource), isSelected: viewStore.isSelected)
+					.frame(height: 2 * .large1)
+					.padding(.horizontal, .medium1)
+					.contentShape(Rectangle())
+					.onTapGesture { viewStore.send(.tapped) }
 			}
 		}
 	}
