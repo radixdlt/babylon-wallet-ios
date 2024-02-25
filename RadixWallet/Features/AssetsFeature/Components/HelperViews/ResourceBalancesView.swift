@@ -127,9 +127,10 @@ public struct ResourceBalanceView: View {
 }
 
 extension ResourceBalanceView {
-	func withAuxiliary(_ content: () -> some View) -> some View {
-		HStack {
+	func withAuxiliary(spacing: CGFloat = 0, _ content: () -> some View) -> some View {
+		HStack(spacing: 0) {
 			self
+			Spacer(minLength: spacing)
 			content()
 		}
 	}
@@ -172,7 +173,7 @@ extension ResourceBalanceView {
 						.border(.red)
 				}
 
-				if viewState.amount != nil || viewState.fallback != nil {
+				if useSpacer {
 					Spacer(minLength: .small2)
 				}
 
@@ -187,6 +188,10 @@ extension ResourceBalanceView {
 
 		private var titleTextStyle: TextStyle {
 			compact ? .body1HighImportance : .body2HighImportance
+		}
+
+		private var useSpacer: Bool {
+			viewState.amount != nil || viewState.fallback != nil
 		}
 	}
 

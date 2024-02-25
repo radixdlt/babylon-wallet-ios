@@ -37,24 +37,23 @@ extension FungibleResourceAsset.View {
 	public var body: some View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			VStack(alignment: .trailing) {
-				HStack {
-					ResourceBalanceView(resource: viewStore.resourceBalance, appearance: .compact)
-
-					TextField(
-						RETDecimal.zero().formatted(),
-						text: viewStore.binding(
-							get: \.transferAmountStr,
-							send: { .amountChanged($0) }
+				ResourceBalanceView(resource: viewStore.resourceBalance, appearance: .compact)
+					.withAuxiliary(spacing: .small1) {
+						TextField(
+							RETDecimal.zero().formatted(),
+							text: viewStore.binding(
+								get: \.transferAmountStr,
+								send: { .amountChanged($0) }
+							)
 						)
-					)
-					.keyboardType(.decimalPad)
-					.lineLimit(1)
-					.multilineTextAlignment(.trailing)
-					.foregroundColor(.app.gray1)
-					.textStyle(.sectionHeader)
-					.focused($focused)
-					.bind(viewStore.focusedBinding, to: $focused)
-				}
+						.keyboardType(.decimalPad)
+						.lineLimit(1)
+						.multilineTextAlignment(.trailing)
+						.foregroundColor(.app.gray1)
+						.textStyle(.sectionHeader)
+						.focused($focused)
+						.bind(viewStore.focusedBinding, to: $focused)
+					}
 
 				if viewStore.totalExceedsBalance {
 					// TODO: Add better style
