@@ -167,7 +167,7 @@ public struct StakeClaimTokensView: View {
 						onTap?(claim)
 					} label: {
 						let isSelected = viewState.selectedStakeClaims?.contains(claim.id)
-						ResourceBalanceView(resource: .fungible(.xrd(balance: claim.claimAmount)), mode: .compact, isSelected: isSelected)
+						ResourceBalanceView(resource: .fungible(.xrd(balance: claim.claimAmount)), appearance: .compact, isSelected: isSelected)
 							.padding(.small1)
 							.background(background)
 					}
