@@ -20,7 +20,7 @@ public struct ResourceBalancesView: View {
 		VStack(spacing: 0) {
 			ForEach(resources) { resource in
 				let isNotLast = resource.id != resources.last?.id
-				ResourceBalanceView(resource: resource, mode: .compact)
+				ResourceBalanceView(resource: resource, appearance: .compact)
 					.padding(.small1)
 					.padding(.bottom, isNotLast ? dividerHeight : 0)
 					.overlay(alignment: .bottom) {
@@ -52,7 +52,7 @@ public enum ResourceBalance: Sendable, Hashable {
 		public let amount: Amount?
 		public let fallback: String?
 
-		init(address: ResourceAddress, icon: Thumbnail.TokenContent, title: String?, amount: Amount?, fallback: String? = nil) {
+		init(address: ResourceAddress, icon: Thumbnail.TokenContent, title: String?, amount: Amount? = nil, fallback: String? = nil) {
 			self.address = address
 			self.icon = icon
 			self.title = title
@@ -94,14 +94,14 @@ public struct ResourceBalanceView: View {
 		static let compact: Appearance = .compact(border: false)
 	}
 
-	init(resource: ResourceBalance, mode: Appearance = .standard, isSelected: Bool? = nil) {
+	init(resource: ResourceBalance, appearance: Appearance = .standard, isSelected: Bool? = nil) {
 		self.resource = resource
-		self.appearance = mode
+		self.appearance = appearance
 		self.isSelected = isSelected
 	}
 
 	public var body: some View {
-		HStack(alignment: .center) {
+		HStack(alignment: .center, spacing: .small2) {
 			switch resource {
 			case let .fungible(viewState):
 				Fungible(viewState: viewState, compact: compact)
@@ -123,6 +123,15 @@ public struct ResourceBalanceView: View {
 
 	var border: Bool {
 		appearance == .compact(border: true)
+	}
+}
+
+extension ResourceBalanceView {
+	func withAuxiliary(_ content: () -> some View) -> some View {
+		HStack {
+			self
+			content()
+		}
 	}
 }
 
@@ -160,12 +169,16 @@ extension ResourceBalanceView {
 						.textStyle(titleTextStyle)
 						.foregroundColor(.app.green1)
 //						.foregroundColor(.app.gray1)
+						.border(.red)
 				}
 
-				Spacer(minLength: .small2)
+				if viewState.amount != nil || viewState.fallback != nil {
+					Spacer(minLength: .small2)
+				}
 
 				AmountView(amount: viewState.amount, fallback: viewState.fallback, compact: compact)
 			}
+			.border(.yellow)
 		}
 
 		private var size: HitTargetSize {

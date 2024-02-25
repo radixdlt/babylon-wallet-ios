@@ -18,6 +18,10 @@ extension FungibleResourceAsset {
 }
 
 extension FungibleResourceAsset.ViewState {
+	var resourceBalance: ResourceBalance {
+		.fungible(.init(resource: resource, isXRD: isXRD, includeAmount: false))
+	}
+
 	var thumbnail: Thumbnail.TokenContent {
 		isXRD ? .xrd : .other(resource.metadata.iconURL)
 	}
@@ -34,13 +38,7 @@ extension FungibleResourceAsset.View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			VStack(alignment: .trailing) {
 				HStack {
-					Thumbnail(token: viewStore.thumbnail, size: .smallest)
-
-					if let title = viewStore.resource.metadata.title {
-						Text(title)
-							.textStyle(.body2HighImportance)
-							.foregroundColor(.app.gray1)
-					}
+					ResourceBalanceView(resource: viewStore.resourceBalance, appearance: .compact)
 
 					TextField(
 						RETDecimal.zero().formatted(),
