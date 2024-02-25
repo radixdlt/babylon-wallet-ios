@@ -31,6 +31,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		case sendTransferTapped
 	}
 
+	@CasePathable
 	public enum ChildAction: Equatable, Sendable {
 		case message(AssetTransferMessage.Action)
 		case accounts(TransferAccountList.Action)
