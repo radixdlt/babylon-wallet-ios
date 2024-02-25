@@ -20,7 +20,7 @@ public struct ResourceBalancesView: View {
 		VStack(spacing: 0) {
 			ForEach(resources) { resource in
 				let isNotLast = resource.id != resources.last?.id
-				ResourceBalanceView(resource: resource, compact: true)
+				ResourceBalanceView(resource: resource, mode: .compact)
 					.padding(.small1)
 					.padding(.bottom, isNotLast ? dividerHeight : 0)
 					.overlay(alignment: .bottom) {
@@ -47,17 +47,25 @@ public enum ResourceBalance: Sendable, Hashable {
 
 	public struct Fungible: Sendable, Hashable {
 		public let address: ResourceAddress
-		public let title: String?
 		public let icon: Thumbnail.TokenContent
+		public let title: String?
 		public let amount: Amount?
 		public let fallback: String?
+
+		init(address: ResourceAddress, icon: Thumbnail.TokenContent, title: String?, amount: Amount?, fallback: String? = nil) {
+			self.address = address
+			self.icon = icon
+			self.title = title
+			self.amount = amount
+			self.fallback = fallback
+		}
 	}
 
 	public struct NonFungible: Sendable, Hashable {
 		public let id: NonFungibleGlobalId
+		public let icon: URL?
 		public let resourceName: String?
 		public let nonFungibleName: String?
-		public let icon: URL?
 	}
 
 	// Helper types
@@ -76,28 +84,39 @@ public enum ResourceBalance: Sendable, Hashable {
 // MARK: - ResourceBalanceView
 public struct ResourceBalanceView: View {
 	public let resource: ResourceBalance
-	public let compact: Bool
+	public let mode: Mode
 
-	init(resource: ResourceBalance, compact: Bool) {
+	public enum Mode: Equatable {
+		case standard
+		case compact(border: Bool)
+
+		static let compact: Mode = .compact(border: false)
+	}
+
+	init(resource: ResourceBalance, mode: Mode = .standard) {
 		self.resource = resource
-		self.compact = compact
+		self.mode = mode
 	}
 
 	public var body: some View {
-		switch resource {
-		case let .fungible(viewState):
-			Fungible(viewState: viewState, compact: compact)
-		case let .nonFungible(viewState):
-			NonFungible(viewState: viewState, compact: compact)
+		Group {
+			switch resource {
+			case let .fungible(viewState):
+				Fungible(viewState: viewState, compact: compact)
+			case let .nonFungible(viewState):
+				NonFungible(viewState: viewState, compact: compact)
+			}
 		}
+		.roundedCorners(strokeColor: .blue, active: border)
+//		.roundedCorners(strokeColor: .app.gray3, active: border)
 	}
-}
 
-extension ResourceBalanceView {
-	var bordered: some View {
-		padding(.small1)
-//			.roundedCorners(strokeColor: .app.gray3)
-			.roundedCorners(strokeColor: .blue)
+	var compact: Bool {
+		mode != .standard
+	}
+
+	var border: Bool {
+		mode == .compact(border: true)
 	}
 }
 
@@ -105,8 +124,8 @@ extension ResourceBalance.Fungible {
 	public static func xrd(balance: RETDecimal) -> Self {
 		.init(
 			address: try! .init(validatingAddress: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"), // FIXME: REMOVE
-			title: Constants.xrdTokenName,
 			icon: .xrd,
+			title: Constants.xrdTokenName,
 			amount: .init(balance),
 			fallback: nil
 		)
@@ -133,7 +152,8 @@ extension ResourceBalanceView {
 				if let title = viewState.title {
 					Text(title)
 						.textStyle(titleTextStyle)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.app.green1)
+//						.foregroundColor(.app.gray1)
 				}
 
 				Spacer(minLength: .small2)
@@ -163,10 +183,12 @@ extension ResourceBalanceView {
 				VStack(alignment: .leading, spacing: 0 * .small3) {
 					Text(line1)
 						.textStyle(compact ? .body2HighImportance : .body1HighImportance)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.app.green1)
+//						.foregroundColor(.app.gray1)
 					Text(line2)
 						.textStyle(.body2Regular)
-						.foregroundColor(.app.gray1)
+						.foregroundColor(.app.green1)
+//						.foregroundColor(.app.gray2)
 				}
 
 				Spacer(minLength: 0)
@@ -220,7 +242,7 @@ extension ResourceBalanceView {
 						.lineLimit(1)
 						.minimumScaleFactor(0.8)
 						.truncationMode(.tail)
-						.textStyle(.body1Header)
+						.textStyle(.secondaryHeader)
 						.foregroundColor(.app.gray1)
 
 					if let guaranteedAmount = amount.guaranteed {

@@ -22,6 +22,7 @@ extension FungibleAssetList {
 			}
 		}
 
+		@CasePathable
 		public enum ChildAction: Sendable, Equatable {
 			case row(Row.State.ID, Row.Action)
 		}

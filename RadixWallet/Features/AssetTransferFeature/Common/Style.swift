@@ -2,13 +2,17 @@ import ComposableArchitecture
 import SwiftUI
 
 extension View {
-	func roundedCorners(_ corners: UIRectCorner = .allCorners, strokeColor: Color) -> some View {
-		self
-			.clipShape(RoundedCorners(corners: corners, radius: .small2))
-			.background(
-				RoundedCorners(corners: corners, radius: .small2)
-					.stroke(strokeColor, lineWidth: 1)
-			)
+	@ViewBuilder
+	func roundedCorners(_ corners: UIRectCorner = .allCorners, strokeColor: Color, active: Bool = true) -> some View {
+		if active {
+			clipShape(RoundedCorners(corners: corners, radius: .small2))
+				.background(
+					RoundedCorners(corners: corners, radius: .small2)
+						.stroke(strokeColor, lineWidth: 1)
+				)
+		} else {
+			self
+		}
 	}
 }
 
