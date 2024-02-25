@@ -217,8 +217,8 @@ extension ResourceBalance.Fungible {
 	init(resourceWithRedemptionValue resource: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
 		self.init(
 			address: resource.resource.resourceAddress,
-			title: isXRD ? Constants.xrdTokenName : resource.resource.metadata.title,
 			icon: isXRD ? .xrd : .other(resource.resource.metadata.iconURL),
+			title: isXRD ? Constants.xrdTokenName : resource.resource.metadata.title,
 			amount: resource.redemptionValue.map { .init($0) },
 			fallback: L10n.Account.PoolUnits.noTotalSupply
 		)
