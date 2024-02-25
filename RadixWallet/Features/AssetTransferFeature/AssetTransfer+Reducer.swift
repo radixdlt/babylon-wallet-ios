@@ -361,10 +361,10 @@ extension AssetTransfer {
 			for nonFungibleAsset in assets {
 				if resources[id: nonFungibleAsset.resourceAddress] != nil {
 					if resources[id: nonFungibleAsset.resourceAddress]?.accounts[id: accountAddress] != nil {
-						resources[id: nonFungibleAsset.resourceAddress]?.accounts[id: accountAddress]?.tokens.append(nonFungibleAsset.nftToken)
+						resources[id: nonFungibleAsset.resourceAddress]?.accounts[id: accountAddress]?.tokens.append(nonFungibleAsset.token)
 					} else {
 						resources[id: nonFungibleAsset.resourceAddress]?.accounts.append(.init(
-							tokens: [nonFungibleAsset.nftToken],
+							tokens: [nonFungibleAsset.token],
 							recipient: account
 						))
 					}
@@ -372,7 +372,7 @@ extension AssetTransfer {
 					resources.append(.init(
 						address: nonFungibleAsset.resourceAddress,
 						accounts: [.init(
-							tokens: [nonFungibleAsset.nftToken],
+							tokens: [nonFungibleAsset.token],
 							recipient: account
 						)]
 					))
