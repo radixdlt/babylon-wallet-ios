@@ -85,7 +85,7 @@ public enum ResourceBalance: Sendable, Hashable {
 public struct ResourceBalanceView: View {
 	public let resource: ResourceBalance
 	public let appearance: Appearance
-	public let selected: Bool?
+	public let isSelected: Bool?
 
 	public enum Appearance: Equatable {
 		case standard
@@ -94,25 +94,23 @@ public struct ResourceBalanceView: View {
 		static let compact: Appearance = .compact(border: false)
 	}
 
-	init(resource: ResourceBalance, mode: Appearance = .standard, selected: Bool) {
+	init(resource: ResourceBalance, mode: Appearance = .standard, isSelected: Bool? = nil) {
 		self.resource = resource
 		self.appearance = mode
-		self.selected = selected
-	}
-
-	init(resource: ResourceBalance, mode: Appearance = .standard) {
-		self.resource = resource
-		self.appearance = mode
-		self.selected = nil
+		self.isSelected = isSelected
 	}
 
 	public var body: some View {
-		Group {
+		HStack(alignment: .center) {
 			switch resource {
 			case let .fungible(viewState):
 				Fungible(viewState: viewState, compact: compact)
 			case let .nonFungible(viewState):
 				NonFungible(viewState: viewState, compact: compact)
+			}
+
+			if let isSelected {
+				CheckmarkView(appearance: .dark, isChecked: isSelected)
 			}
 		}
 		.roundedCorners(strokeColor: .blue, active: border)
