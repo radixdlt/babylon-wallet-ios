@@ -84,18 +84,26 @@ public enum ResourceBalance: Sendable, Hashable {
 // MARK: - ResourceBalanceView
 public struct ResourceBalanceView: View {
 	public let resource: ResourceBalance
-	public let mode: Mode
+	public let appearance: Appearance
+	public let selected: Bool?
 
-	public enum Mode: Equatable {
+	public enum Appearance: Equatable {
 		case standard
 		case compact(border: Bool)
 
-		static let compact: Mode = .compact(border: false)
+		static let compact: Appearance = .compact(border: false)
 	}
 
-	init(resource: ResourceBalance, mode: Mode = .standard) {
+	init(resource: ResourceBalance, mode: Appearance = .standard, selected: Bool) {
 		self.resource = resource
-		self.mode = mode
+		self.appearance = mode
+		self.selected = selected
+	}
+
+	init(resource: ResourceBalance, mode: Appearance = .standard) {
+		self.resource = resource
+		self.appearance = mode
+		self.selected = nil
 	}
 
 	public var body: some View {
@@ -112,11 +120,11 @@ public struct ResourceBalanceView: View {
 	}
 
 	var compact: Bool {
-		mode != .standard
+		appearance != .standard
 	}
 
 	var border: Bool {
-		mode == .compact(border: true)
+		appearance == .compact(border: true)
 	}
 }
 
