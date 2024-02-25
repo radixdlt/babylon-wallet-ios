@@ -74,7 +74,7 @@ extension TransactionHistoryClient {
 				let iconURL = keyedResourceDetails[id: resourceAddress]?.metadata.iconURL
 				return .init(
 					id: id,
-					icon: iconURL,
+					resourceImage: iconURL,
 					resourceName: resourceName,
 					nonFungibleName: keyedNFTData[id]?.data?.name
 				)
