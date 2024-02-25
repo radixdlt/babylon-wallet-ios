@@ -166,15 +166,10 @@ public struct StakeClaimTokensView: View {
 					Button {
 						onTap?(claim)
 					} label: {
-						HStack {
-							ResourceBalanceView(resource: .fungible(.xrd(balance: claim.claimAmount)), mode: .compact)
-
-							if let isSelected = viewState.selectedStakeClaims?.contains(claim.id) {
-								CheckmarkView(appearance: .dark, isChecked: isSelected)
-							}
-						}
-						.padding(.small1)
-						.background(background)
+						let isSelected = viewState.selectedStakeClaims?.contains(claim.id)
+						ResourceBalanceView(resource: .fungible(.xrd(balance: claim.claimAmount)), mode: .compact, isSelected: isSelected)
+							.padding(.small1)
+							.background(background)
 					}
 					.disabled(onTap == nil)
 					.buttonStyle(.borderless)
