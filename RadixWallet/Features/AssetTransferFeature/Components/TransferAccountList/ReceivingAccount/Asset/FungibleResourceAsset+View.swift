@@ -48,7 +48,6 @@ extension FungibleResourceAsset.View {
 						)
 						.keyboardType(.decimalPad)
 						.lineLimit(1)
-						.multilineTextAlignment(.trailing)
 						.foregroundColor(.app.gray1)
 						.textStyle(.sectionHeader)
 						.focused($focused)

@@ -101,14 +101,14 @@ extension ResourceBalance {
 		case let .poolUnit(details):
 			fatalError()
 		case let .liquidStakeUnit(details):
-			fatalError()
+			self = .lsu(.init(resource: transfer.resource, details: details))
 		case let .stakeClaimNFT(details):
 			fatalError()
 		}
 	}
 }
 
-extension ResourceBalance.Fungible {
+private extension ResourceBalance.Fungible {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.Fungible) {
 		self.init(
 			address: resource.resourceAddress,
@@ -119,13 +119,24 @@ extension ResourceBalance.Fungible {
 	}
 }
 
-extension ResourceBalance.NonFungible {
+private extension ResourceBalance.NonFungible {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.NonFungible) {
 		self.init(
 			id: details.id,
 			resourceImage: resource.metadata.iconURL,
 			resourceName: resource.metadata.name,
 			nonFungibleName: details.data?.name
+		)
+	}
+}
+
+private extension ResourceBalance.LSU {
+	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.LiquidStakeUnit) {
+		self.init(
+			resource: resource,
+			amount: .init(details.amount, guaranteed: details.guarantee?.amount),
+			worth: details.worth,
+			validatorName: details.validator.metadata.name
 		)
 	}
 }
@@ -137,12 +148,8 @@ struct TransactionReviewResourceView: View {
 
 	var body: some View {
 		switch transfer.details {
-		case .fungible, .nonFungible:
+		case .fungible, .nonFungible, .liquidStakeUnit:
 			ResourceBalanceButton(resource: .init(transfer: transfer), appearance: .transactionReview) {
-				onTap(nil)
-			}
-		case let .liquidStakeUnit(details):
-			LiquidStakeUnitView(viewState: .init(resource: transfer.resource, details: details), background: .app.gray5) {
 				onTap(nil)
 			}
 		case let .poolUnit(details):
@@ -154,49 +161,6 @@ struct TransactionReviewResourceView: View {
 				onTap(stakeClaim.token)
 			}
 		}
-	}
-}
-
-// MARK: - TransactionReviewAmountView
-struct TransactionReviewAmountView: View { // FIXME: REMOVE
-	let amount: RETDecimal
-	let guaranteedAmount: RETDecimal?
-
-	var body: some View {
-		VStack(alignment: .trailing, spacing: 0) {
-			if guaranteedAmount != nil {
-				Text(L10n.TransactionReview.estimated)
-					.textStyle(.body2HighImportance)
-					.foregroundColor(.app.gray1)
-			}
-			Text(amount.formatted())
-				.textStyle(.body1Header)
-				.foregroundColor(.app.gray1)
-
-			if let guaranteedAmount {
-				Text(L10n.TransactionReview.guaranteed)
-					.textStyle(.body2HighImportance)
-					.foregroundColor(.app.gray2)
-					.padding(.top, .small3)
-
-				Text(guaranteedAmount.formatted())
-					.textStyle(.body1Header)
-					.foregroundColor(.app.gray2)
-			}
-		}
-		.minimumScaleFactor(0.8)
-	}
-}
-
-extension LiquidStakeUnitView.ViewState {
-	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.LiquidStakeUnit) {
-		self.init(
-			resource: resource,
-			amount: details.amount,
-			guaranteedAmount: details.guarantee?.amount,
-			worth: details.worth,
-			validatorName: details.validator.metadata.name
-		)
 	}
 }
 
