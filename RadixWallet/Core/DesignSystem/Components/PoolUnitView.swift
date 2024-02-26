@@ -41,6 +41,7 @@ public struct PoolUnitView: View {
 
 					Spacer(minLength: 0)
 
+					// FIXME: UPDATE viewstate
 					ResourceBalanceView.AmountView(amount: viewState.amount_, compact: false)
 						.padding(.leading, viewState.isSelected != nil ? .small2 : 0)
 

@@ -11,6 +11,7 @@ extension FungibleAssetList.Section.Row.State {
 }
 
 extension ResourceBalance.Fungible {
+	// FIXME: Add .withoutAmount
 	init(resource: OnLedgerEntity.OwnedFungibleResource, isXRD: Bool, includeAmount: Bool = true) {
 		self.init(
 			address: resource.resourceAddress,
