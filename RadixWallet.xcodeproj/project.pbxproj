@@ -1105,7 +1105,6 @@
 		8397D82C2B46ACB50016365A /* StakeUnitList+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8397D82A2B46ACB50016365A /* StakeUnitList+View.swift */; };
 		8397D82D2B46ACB50016365A /* StakeUnitList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8397D82B2B46ACB50016365A /* StakeUnitList.swift */; };
 		839B6C542B21D28400402651 /* ExpandableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839B6C532B21D28400402651 /* ExpandableTextView.swift */; };
-		83AAAC682B46FC4100222B64 /* LiquidStakeUnitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AAAC672B46FC4100222B64 /* LiquidStakeUnitView.swift */; };
 		83AAAC6A2B46FC5800222B64 /* StakeClaimNFTsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AAAC692B46FC5800222B64 /* StakeClaimNFTsView.swift */; };
 		83AAAC6D2B483D1B00222B64 /* StakeSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AAAC6B2B483D1B00222B64 /* StakeSummaryView.swift */; };
 		83D0B5692AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */; };
@@ -2383,7 +2382,6 @@
 		8397D82A2B46ACB50016365A /* StakeUnitList+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StakeUnitList+View.swift"; sourceTree = "<group>"; };
 		8397D82B2B46ACB50016365A /* StakeUnitList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StakeUnitList.swift; sourceTree = "<group>"; };
 		839B6C532B21D28400402651 /* ExpandableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandableTextView.swift; sourceTree = "<group>"; };
-		83AAAC672B46FC4100222B64 /* LiquidStakeUnitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidStakeUnitView.swift; sourceTree = "<group>"; };
 		83AAAC692B46FC5800222B64 /* StakeClaimNFTsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StakeClaimNFTsView.swift; sourceTree = "<group>"; };
 		83AAAC6B2B483D1B00222B64 /* StakeSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StakeSummaryView.swift; sourceTree = "<group>"; };
 		83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixEngineToolkitError+Description.swift"; sourceTree = "<group>"; };
@@ -6790,7 +6788,6 @@
 			children = (
 				48CFBE502ADC10D800E77A5C /* LSUDetails+View.swift */,
 				48CFBE552ADC10D800E77A5C /* LSUDetails.swift */,
-				83AAAC672B46FC4100222B64 /* LiquidStakeUnitView.swift */,
 				83AAAC692B46FC5800222B64 /* StakeClaimNFTsView.swift */,
 				83AAAC6B2B483D1B00222B64 /* StakeSummaryView.swift */,
 				48CFBE542ADC10D800E77A5C /* ValidatorStakeView.swift */,
@@ -8711,7 +8708,6 @@
 				83D0B5692AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift in Sources */,
 				48CFC3012ADC10D900E77A5C /* DebugSettingsCoordinator+Reducer.swift in Sources */,
 				A462B5B22B8407D300C26D20 /* CoreAPI_BinaryPlaintextMessageContent.swift in Sources */,
-				83AAAC682B46FC4100222B64 /* LiquidStakeUnitView.swift in Sources */,
 				48CFC4F42ADC10DA00E77A5C /* StateNonFungibleLocationResponse.swift in Sources */,
 				48CFC35F2ADC10D900E77A5C /* ChooseQuestions.swift in Sources */,
 				48CFC3952ADC10D900E77A5C /* Models+Sendable.swift in Sources */,

@@ -297,12 +297,15 @@ extension StakeUnitList {
 					name: stake.validator.metadata.name,
 					stakedAmount: stake.xrdRedemptionValue
 				),
-				liquidStakeUnit: stake.stakeUnitResource.map { stakeUnitResource in
+				liquidStakeUnit: stake.stakeUnitResource.map {
+					stakeUnitResource in
 					.init(
-						resource: stakeUnitResource.resource,
-						amount: nil,
-						guaranteedAmount: nil,
-						worth: stake.xrdRedemptionValue,
+						lsu: .init(
+							resource: stakeUnitResource.resource,
+							amount: nil,
+							worth: stake.xrdRedemptionValue,
+							validatorName: nil
+						),
 						isSelected: state.selectedLiquidStakeUnits?.contains { $0.id == stakeUnitResource.resource.resourceAddress }
 					)
 				},
