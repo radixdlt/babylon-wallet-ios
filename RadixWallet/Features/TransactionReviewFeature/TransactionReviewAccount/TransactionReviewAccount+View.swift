@@ -138,7 +138,7 @@ struct TransactionReviewResourceView: View {
 	var body: some View {
 		switch transfer.details {
 		case .fungible, .nonFungible:
-			ResourceBalanceButton(resource: .init(transfer: transfer)) {
+			ResourceBalanceButton(resource: .init(transfer: transfer), appearance: .transactionReview) {
 				onTap(nil)
 			}
 		case let .liquidStakeUnit(details):
