@@ -546,7 +546,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .determineFeePayerResult(.failure(error)):
-//			assertionFailure("Failed to determine fee payer \(error)")
 			errorQueue.schedule(error)
 			state.reviewedTransaction?.feePayer = .success(nil)
 			return .none
