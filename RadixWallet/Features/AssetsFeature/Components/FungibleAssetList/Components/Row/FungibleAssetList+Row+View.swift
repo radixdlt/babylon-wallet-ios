@@ -14,7 +14,7 @@ extension ResourceBalance.Fungible {
 	init(resource: OnLedgerEntity.OwnedFungibleResource, isXRD: Bool, includeAmount: Bool = true) {
 		self.init(
 			address: resource.resourceAddress,
-			icon: isXRD ? .xrd : .other(resource.metadata.iconURL),
+			tokenIcon: isXRD ? .xrd : .other(resource.metadata.iconURL),
 			title: resource.metadata.title,
 			amount: includeAmount ? .init(resource.amount) : nil
 		)

@@ -49,13 +49,9 @@ extension TransactionReviewGuarantees {
 					.frame(maxWidth: .infinity)
 
 					VStack(spacing: .medium2) {
-						ForEachStore(
-							store.scope(
-								state: \.guarantees,
-								action: { .child(.guarantee(id: $0, action: $1)) }
-							),
-							content: { TransactionReviewGuarantee.View(store: $0) }
-						)
+						ForEachStore(store.scope(state: \.guarantees, action: \.child.guarantee)) {
+							TransactionReviewGuarantee.View(store: $0)
+						}
 					}
 					.padding(.medium1)
 					.background(.app.gray5)
@@ -69,7 +65,7 @@ extension TransactionReviewGuarantees {
 						.controlState(viewStore.isValid ? .enabled : .disabled)
 					}
 				}
-				.sheet(store: store.scope(state: \.$info, action: { .child(.info($0)) })) {
+				.sheet(store: store.scope(state: \.$info, action: \.child.info)) {
 					SlideUpPanel.View(store: $0)
 						.presentationDetents([.medium])
 						.presentationDragIndicator(.visible)
@@ -93,11 +89,10 @@ extension TransactionReviewGuarantee.State {
 			id: id,
 			account: account,
 			fungible: .init(
-				name: resource.metadata.title,
-				thumbnail: thumbnail,
-				amount: amount,
-				guaranteedAmount: guarantee.amount,
-				fiatAmount: nil
+				address: resource.resourceAddress,
+				icon: thumbnail,
+				title: resource.metadata.title,
+				amount: .init(amount, guaranteed: guarantee.amount)
 			)
 		)
 	}
@@ -107,7 +102,7 @@ extension TransactionReviewGuarantee {
 	public struct ViewState: Identifiable, Equatable {
 		public let id: TransactionReview.Transfer.ID
 		let account: TransactionReview.Account
-		let fungible: TransactionReviewFungibleView.ViewState
+		let fungible: ResourceBalance.Fungible
 	}
 
 	public struct View: SwiftUI.View {
@@ -123,7 +118,9 @@ extension TransactionReviewGuarantee {
 					VStack(spacing: 0) {
 						SmallAccountCard(account: viewStore.account)
 
-						TransactionReviewFungibleView(viewState: viewStore.fungible, background: .clear)
+						ResourceBalanceView(resource: .fungible(viewStore.fungible))
+							.padding(.horizontal, .medium3)
+							.padding(.vertical, .small1)
 
 						Separator()
 

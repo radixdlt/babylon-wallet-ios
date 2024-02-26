@@ -26,6 +26,7 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 		case closeTapped
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case guarantee(id: TransactionReviewGuarantee.State.ID, action: TransactionReviewGuarantee.Action)
 		case info(PresentationAction<SlideUpPanel.Action>)
@@ -81,12 +82,6 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 		public var guarantee: TransactionClient.Guarantee
 
 		public var percentageStepper: MinimumPercentageStepper.State
-
-		public enum Fungible: Sendable, Hashable {
-			case token(isXRD: Bool)
-			case poolUnit
-			case lsu
-		}
 
 		init?(
 			account: TransactionReview.Account,
