@@ -289,35 +289,40 @@ extension StakeUnitList {
 		let unstakingAmount = stakeClaims.filter(not(\.isReadyToBeClaimed)).map(\.claimAmount).reduce(.zero(), +)
 		let readyToClaimAmount = stakeClaims.filter(\.isReadyToBeClaimed).map(\.claimAmount).reduce(.zero(), +)
 
-		let validatorStakes = details.map { stake in
-			ValidatorStakeView.ViewState(
-				stakeDetails: stake,
-				validatorNameViewState: .init(
-					imageURL: stake.validator.metadata.iconURL,
-					name: stake.validator.metadata.name,
-					stakedAmount: stake.xrdRedemptionValue
-				),
-				liquidStakeUnit: stake.stakeUnitResource.map {
-					stakeUnitResource in
-					.init(
-						lsu: .init(
-							resource: stakeUnitResource.resource,
-							amount: nil,
-							worth: stake.xrdRedemptionValue,
-							validatorName: nil
-						),
-						isSelected: state.selectedLiquidStakeUnits?.contains { $0.id == stakeUnitResource.resource.resourceAddress }
-					)
-				},
-				stakeClaimResource: stake.stakeClaimTokens.map { stakeClaimTokens in
-					StakeClaimResourceView.ViewState(
-						canClaimTokens: allSelectedTokens == nil, // cannot claim in selection mode
-						stakeClaimTokens: stakeClaimTokens,
-						selectedStakeClaims: allSelectedTokens
-					)
-				}
-			)
-		}.sorted(by: \.id.address).asIdentifiable()
+		let validatorStakes = details
+			.map { stake in
+				ValidatorStakeView.ViewState(
+					stakeDetails: stake,
+					validatorNameViewState: .init(
+						imageURL: stake.validator.metadata.iconURL,
+						name: stake.validator.metadata.name,
+						stakedAmount: stake.xrdRedemptionValue
+					),
+					liquidStakeUnit: stake.stakeUnitResource.map {
+						stakeUnitResource in
+						.init(
+							lsu: .init(
+								address: stakeUnitResource.resource.resourceAddress,
+								icon: stakeUnitResource.resource.metadata.iconURL,
+								title: stakeUnitResource.resource.metadata.title,
+								amount: nil,
+								worth: stake.xrdRedemptionValue,
+								validatorName: nil
+							),
+							isSelected: state.selectedLiquidStakeUnits?.contains { $0.id == stakeUnitResource.resource.resourceAddress }
+						)
+					},
+					stakeClaimResource: stake.stakeClaimTokens.map { stakeClaimTokens in
+						StakeClaimResourceView.ViewState(
+							canClaimTokens: allSelectedTokens == nil, // cannot claim in selection mode
+							stakeClaimTokens: stakeClaimTokens,
+							selectedStakeClaims: allSelectedTokens
+						)
+					}
+				)
+			}
+			.sorted(by: \.id.address)
+			.asIdentifiable()
 
 		state.stakeSummary = .init(
 			staked: .success(stakedAmount),

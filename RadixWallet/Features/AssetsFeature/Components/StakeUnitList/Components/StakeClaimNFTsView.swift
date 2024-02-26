@@ -173,7 +173,7 @@ public struct StakeClaimTokensView: View {
 					}
 					.disabled(onTap == nil)
 					.buttonStyle(.borderless)
-					.roundedCorners(strokeColor: .app.gray3)
+					.roundedCorners(strokeColor: .red) // .app.gray3
 				}
 			}
 		}

@@ -98,10 +98,10 @@ extension ResourceBalance {
 			self = .fungible(.init(resource: transfer.resource, details: details))
 		case let .nonFungible(details):
 			self = .nonFungible(.init(resource: transfer.resource, details: details))
-		case let .poolUnit(details):
-			fatalError()
 		case let .liquidStakeUnit(details):
 			self = .lsu(.init(resource: transfer.resource, details: details))
+		case let .poolUnit(details):
+			self = .poolUnit(.init(resource: transfer.resource, details: details))
 		case let .stakeClaimNFT(details):
 			fatalError()
 		}
@@ -133,10 +133,25 @@ private extension ResourceBalance.NonFungible {
 private extension ResourceBalance.LSU {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.LiquidStakeUnit) {
 		self.init(
-			resource: resource,
+			address: resource.resourceAddress,
+			icon: resource.metadata.iconURL,
+			title: resource.metadata.title,
 			amount: .init(details.amount, guaranteed: details.guarantee?.amount),
 			worth: details.worth,
 			validatorName: details.validator.metadata.name
+		)
+	}
+}
+
+private extension ResourceBalance.PoolUnit {
+	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.PoolUnit) {
+		self.init(
+			address: resource.resourceAddress,
+			poolIcon: resource.metadata.iconURL,
+			poolName: resource.fungibleResourceName,
+			amount: .init(details.details.poolUnitResource.amount, guaranteed: details.guarantee?.amount),
+			dAppName: .success(details.details.dAppName),
+			resources: .success(.init(resources: details.details))
 		)
 	}
 }
@@ -148,12 +163,8 @@ struct TransactionReviewResourceView: View {
 
 	var body: some View {
 		switch transfer.details {
-		case .fungible, .nonFungible, .liquidStakeUnit:
+		case .fungible, .nonFungible, .liquidStakeUnit, .poolUnit:
 			ResourceBalanceButton(resource: .init(transfer: transfer), appearance: .transactionReview) {
-				onTap(nil)
-			}
-		case let .poolUnit(details):
-			PoolUnitView(viewState: .init(resource: transfer.resource, details: details), background: .app.gray5) {
 				onTap(nil)
 			}
 		case let .stakeClaimNFT(details):
@@ -161,20 +172,6 @@ struct TransactionReviewResourceView: View {
 				onTap(stakeClaim.token)
 			}
 		}
-	}
-}
-
-extension PoolUnitView.ViewState {
-	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.PoolUnit) {
-		self.init(
-			poolName: resource.fungibleResourceName,
-			amount: details.details.poolUnitResource.amount,
-			guaranteedAmount: details.guarantee?.amount,
-			dAppName: .success(details.details.dAppName),
-			poolIcon: resource.metadata.iconURL,
-			resources: .success(.init(resources: details.details)),
-			isSelected: nil
-		)
 	}
 }
 

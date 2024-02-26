@@ -15,6 +15,7 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 		}
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case poolUnit(id: PoolUnit.State.ID, action: PoolUnit.Action)
 	}
