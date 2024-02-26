@@ -3,16 +3,12 @@ import SwiftUI
 
 extension View {
 	@ViewBuilder
-	func roundedCorners(_ corners: UIRectCorner = .allCorners, strokeColor: Color, active: Bool = true) -> some View {
-		if active {
-			clipShape(RoundedCorners(corners: corners, radius: .small2))
-				.background(
-					RoundedCorners(corners: corners, radius: .small2)
-						.stroke(strokeColor, lineWidth: 1)
-				)
-		} else {
-			self
-		}
+	func roundedCorners(_ corners: UIRectCorner = .allCorners, strokeColor: Color) -> some View {
+		clipShape(RoundedCorners(corners: corners, radius: .small2))
+			.background(
+				RoundedCorners(corners: corners, radius: .small2)
+					.stroke(strokeColor, lineWidth: 1)
+			)
 	}
 }
 

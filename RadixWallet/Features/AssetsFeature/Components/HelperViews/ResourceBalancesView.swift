@@ -27,14 +27,14 @@ public struct ResourceBalancesView: View {
 						if isNotLast {
 							Rectangle()
 //								.fill(.app.gray3)
-								.fill(.green)
+								.fill(.yellow)
 								.frame(height: dividerHeight)
 						}
 					}
 			}
 		}
 //		.roundedCorners(strokeColor: .app.gray3)
-		.roundedCorners(strokeColor: .green)
+		.roundedCorners(strokeColor: .yellow)
 	}
 
 	private let dividerHeight: CGFloat = 1
@@ -44,6 +44,7 @@ public struct ResourceBalancesView: View {
 public enum ResourceBalance: Sendable, Hashable {
 	case fungible(Fungible)
 	case nonFungible(NonFungible)
+	case lsu(LSU)
 
 	public struct Fungible: Sendable, Hashable {
 		public let address: ResourceAddress
@@ -76,6 +77,13 @@ public enum ResourceBalance: Sendable, Hashable {
 		public let resourceImage: URL?
 		public let resourceName: String?
 		public let nonFungibleName: String?
+	}
+
+	public struct LSU: Sendable, Hashable {
+		public let resource: OnLedgerEntity.Resource
+		public let amount: Amount?
+		public let worth: RETDecimal
+		public var validatorName: String? = nil
 	}
 
 	// Helper types
@@ -132,7 +140,12 @@ public struct ResourceBalanceButton: View {
 	private var verticalSpacing: CGFloat {
 		switch appearance {
 		case .assetList:
-			.medium2
+			switch resource {
+			case .fungible, .nonFungible:
+				.medium2
+			case .lsu:
+				.medium3
+			}
 		case .transactionReview:
 			.medium2
 		}
@@ -141,7 +154,12 @@ public struct ResourceBalanceButton: View {
 	private var horizontalSpacing: CGFloat {
 		switch appearance {
 		case .assetList:
-			.large3
+			switch resource {
+			case .fungible, .nonFungible:
+				.large3
+			case .lsu:
+				.medium3
+			}
 		case .transactionReview:
 			.medium2
 		}
@@ -177,20 +195,32 @@ public struct ResourceBalanceView: View {
 	}
 
 	public var body: some View {
+		if border {
+			core
+				.padding(.small1)
+				.roundedCorners(strokeColor: .blue)
+			//		.roundedCorners(strokeColor: .app.gray3)
+		} else {
+			core
+		}
+	}
+
+	private var core: some View {
 		HStack(alignment: .center, spacing: .small2) {
 			switch resource {
 			case let .fungible(viewState):
 				Fungible(viewState: viewState, compact: compact)
 			case let .nonFungible(viewState):
 				NonFungible(viewState: viewState, compact: compact)
+			case let .lsu(viewState):
+				LSU(viewState: viewState, isSelected: isSelected)
 			}
 
-			if let isSelected {
+			if !delegateSelection, let isSelected {
 				CheckmarkView(appearance: .dark, isChecked: isSelected)
 			}
 		}
-		.roundedCorners(strokeColor: .blue, active: border)
-//		.roundedCorners(strokeColor: .app.gray3, active: border)
+		.overlay(.green.opacity(0.1))
 	}
 
 	var compact: Bool {
@@ -199,6 +229,16 @@ public struct ResourceBalanceView: View {
 
 	var border: Bool {
 		appearance == .compact(border: true)
+	}
+
+	/// Delegate showing the selection state to the particular resource view
+	var delegateSelection: Bool {
+		switch resource {
+		case .fungible, .nonFungible:
+			false
+		case .lsu:
+			true
+		}
 	}
 }
 
@@ -306,12 +346,64 @@ extension ResourceBalanceView {
 		}
 	}
 
+	public struct LSU: View {
+		let viewState: ResourceBalance.LSU
+		let isSelected: Bool?
+
+		public var body: some View {
+			VStack(alignment: .leading, spacing: .medium3) {
+				HStack(spacing: .zero) {
+					Thumbnail(.lsu, url: viewState.resource.metadata.iconURL, size: .slightlySmaller)
+						.padding(.trailing, .small2)
+
+					VStack(alignment: .leading, spacing: .zero) {
+						if let title = viewState.resource.metadata.title {
+							Text(title)
+								.textStyle(.body1Header)
+						}
+
+						if let validatorName = viewState.validatorName {
+							Text(validatorName)
+								.foregroundStyle(.app.gray2)
+								.textStyle(.body2Regular)
+						}
+					}
+					.padding(.trailing, .small2)
+
+					Spacer(minLength: 0)
+
+					AmountView(amount: viewState.amount, compact: false)
+						.border(.yellow)
+						.padding(.leading, isSelected != nil ? .small2 : 0)
+
+					if let isSelected {
+						CheckmarkView(appearance: .dark, isChecked: isSelected)
+					}
+				}
+
+				VStack(alignment: .leading, spacing: .small3) {
+					Text(L10n.Account.Staking.worth.uppercased())
+						.textStyle(.body2HighImportance)
+						.foregroundColor(.app.gray2)
+
+					ResourceBalanceView(resource: .fungible(.xrd(balance: viewState.worth)), appearance: .compact(border: true))
+				}
+			}
+		}
+	}
+
 	// Helper Views
 
 	struct AmountView: View {
 		let amount: ResourceBalance.Amount?
 		let fallback: String?
 		let compact: Bool
+
+		init(amount: ResourceBalance.Amount?, fallback: String? = nil, compact: Bool) {
+			self.amount = amount
+			self.fallback = fallback
+			self.compact = compact
+		}
 
 		var body: some View {
 			if let amount {
