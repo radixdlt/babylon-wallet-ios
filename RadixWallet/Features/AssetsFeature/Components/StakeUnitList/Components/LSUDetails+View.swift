@@ -11,11 +11,7 @@ extension LSUDetails.State {
 			),
 			thumbnailURL: stakeUnitResource.resource.metadata.iconURL,
 			validatorNameViewState: .init(with: validator),
-			redeemableTokenAmount: .init(
-				thumbnail: .xrd,
-				name: Constants.xrdTokenName,
-				balance: xrdRedemptionValue
-			),
+			redeemableTokenAmount: .xrd(balance: xrdRedemptionValue),
 			resourceDetails: .init(
 				description: .success(stakeUnitResource.resource.metadata.description),
 				resourceAddress: stakeUnitResource.resource.resourceAddress,
@@ -36,7 +32,7 @@ extension LSUDetails {
 		let thumbnailURL: URL?
 
 		let validatorNameViewState: ValidatorHeaderView.ViewState
-		let redeemableTokenAmount: TokenBalanceView.ViewState
+		let redeemableTokenAmount: ResourceBalance.Fungible
 		let resourceDetails: AssetResourceDetailsSection.ViewState
 	}
 
@@ -68,7 +64,7 @@ extension LSUDetails {
 						ValidatorHeaderView(viewState: viewStore.validatorNameViewState)
 							.padding(.horizontal, .large2)
 
-						TokenBalanceView.Bordered(viewState: viewStore.redeemableTokenAmount)
+						ResourceBalanceView(resource: .fungible(viewStore.redeemableTokenAmount), appearance: .compact(border: true))
 							.padding(.horizontal, .large2)
 
 						AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
