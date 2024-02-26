@@ -8,6 +8,10 @@ public struct PoolUnitView: View {
 		public let poolIcon: URL?
 		public let resources: Loadable<[ResourceBalance.Fungible]>
 		public let isSelected: Bool?
+
+		var amount_: ResourceBalance.Amount? {
+			amount.map { .init($0, guaranteed: guaranteedAmount) }
+		}
 	}
 
 	public let viewState: ViewState
@@ -37,10 +41,8 @@ public struct PoolUnitView: View {
 
 					Spacer(minLength: 0)
 
-					if let amount = viewState.amount {
-						TransactionReviewAmountView(amount: amount, guaranteedAmount: viewState.guaranteedAmount)
-							.padding(.leading, viewState.isSelected != nil ? .small2 : 0)
-					}
+					ResourceBalanceView.AmountView(amount: viewState.amount_, compact: false)
+						.padding(.leading, viewState.isSelected != nil ? .small2 : 0)
 
 					if let isSelected = viewState.isSelected {
 						CheckmarkView(appearance: .dark, isChecked: isSelected)
@@ -62,6 +64,7 @@ public struct PoolUnitView: View {
 			}
 			.padding(.medium3)
 			.background(background)
+			.overlay(.red.opacity(0.1))
 		}
 		.buttonStyle(.borderless)
 	}

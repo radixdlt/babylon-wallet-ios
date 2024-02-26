@@ -28,6 +28,8 @@ extension TransactionHistoryClient {
 				// optIns: GatewayAPI.TransactionDetailsOptIns(affectedGlobalEntities: true, manifestInstructions: true, balanceChanges: true)
 			)
 
+			// 8f1d4891e89d323082361677b221055bd9f7585c66cf0a3f5568dd0fc180dc3e
+
 			let response = try await gatewayAPIClient.streamTransactions(request)
 
 			// Pre-loading the details for all the resources involved
