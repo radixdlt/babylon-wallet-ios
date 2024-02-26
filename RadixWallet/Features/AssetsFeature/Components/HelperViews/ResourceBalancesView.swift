@@ -33,8 +33,7 @@ public struct ResourceBalancesView: View {
 					}
 			}
 		}
-//		.roundedCorners(strokeColor: .app.gray3)
-		.roundedCorners(strokeColor: .yellow)
+		.roundedCorners(strokeColor: .app.gray3)
 	}
 
 	private let dividerHeight: CGFloat = 1
@@ -45,6 +44,7 @@ public enum ResourceBalance: Sendable, Hashable {
 	case fungible(Fungible)
 	case nonFungible(NonFungible)
 	case lsu(LSU)
+	case poolUnit(PoolUnit)
 
 	public struct Fungible: Sendable, Hashable {
 		public let address: ResourceAddress
@@ -53,6 +53,7 @@ public enum ResourceBalance: Sendable, Hashable {
 		public let amount: Amount?
 		public let fallback: String?
 
+		// FIXME: REMOVE
 		init(address: ResourceAddress, tokenIcon: Thumbnail.TokenContent, title: String?, amount: Amount? = nil, fallback: String? = nil) {
 			self.init(
 				address: address,
@@ -80,10 +81,21 @@ public enum ResourceBalance: Sendable, Hashable {
 	}
 
 	public struct LSU: Sendable, Hashable {
-		public let resource: OnLedgerEntity.Resource
+		public let address: ResourceAddress
+		public let icon: URL?
+		public let title: String?
 		public let amount: Amount?
 		public let worth: RETDecimal
 		public var validatorName: String? = nil
+	}
+
+	public struct PoolUnit: Sendable, Hashable {
+		public let address: ResourceAddress
+		public let poolIcon: URL?
+		public let poolName: String?
+		public let amount: ResourceBalance.Amount?
+		public let dAppName: Loadable<String?>
+		public let resources: Loadable<[ResourceBalance.Fungible]>
 	}
 
 	// Helper types
@@ -143,7 +155,7 @@ public struct ResourceBalanceButton: View {
 			switch resource {
 			case .fungible, .nonFungible:
 				.medium2
-			case .lsu:
+			case .lsu, .poolUnit:
 				.medium3
 			}
 		case .transactionReview:
@@ -157,7 +169,7 @@ public struct ResourceBalanceButton: View {
 			switch resource {
 			case .fungible, .nonFungible:
 				.large3
-			case .lsu:
+			case .lsu, .poolUnit:
 				.medium3
 			}
 		case .transactionReview:
@@ -198,8 +210,7 @@ public struct ResourceBalanceView: View {
 		if border {
 			core
 				.padding(.small1)
-				.roundedCorners(strokeColor: .blue)
-			//		.roundedCorners(strokeColor: .app.gray3)
+				.roundedCorners(strokeColor: .app.gray3)
 		} else {
 			core
 		}
@@ -214,6 +225,8 @@ public struct ResourceBalanceView: View {
 				NonFungible(viewState: viewState, compact: compact)
 			case let .lsu(viewState):
 				LSU(viewState: viewState, isSelected: isSelected)
+			case let .poolUnit(viewState):
+				PoolUnit(viewState: viewState, isSelected: isSelected)
 			}
 
 			if !delegateSelection, let isSelected {
@@ -236,7 +249,7 @@ public struct ResourceBalanceView: View {
 		switch resource {
 		case .fungible, .nonFungible:
 			false
-		case .lsu:
+		case .lsu, .poolUnit:
 			true
 		}
 	}
@@ -359,11 +372,11 @@ extension ResourceBalanceView {
 		public var body: some View {
 			VStack(alignment: .leading, spacing: .medium3) {
 				HStack(spacing: .zero) {
-					Thumbnail(.lsu, url: viewState.resource.metadata.iconURL, size: .slightlySmaller)
+					Thumbnail(.lsu, url: viewState.icon, size: .slightlySmaller)
 						.padding(.trailing, .small2)
 
 					VStack(alignment: .leading, spacing: .zero) {
-						if let title = viewState.resource.metadata.title {
+						if let title = viewState.title {
 							Text(title)
 								.textStyle(.body1Header)
 						}
@@ -392,6 +405,57 @@ extension ResourceBalanceView {
 						.foregroundColor(.app.gray2)
 
 					ResourceBalanceView(resource: .fungible(.xrd(balance: viewState.worth)), appearance: .compact(border: true))
+				}
+			}
+		}
+	}
+
+	public struct PoolUnit: View {
+		public let viewState: ResourceBalance.PoolUnit
+		public let isSelected: Bool?
+
+		public var body: some View {
+			VStack(alignment: .leading, spacing: .zero) {
+				HStack(spacing: .zero) {
+					Thumbnail(.poolUnit, url: viewState.poolIcon, size: .slightlySmaller)
+						.padding(.trailing, .small1)
+
+					VStack(alignment: .leading, spacing: 0) {
+						Text(viewState.poolName ?? L10n.TransactionReview.poolUnits)
+							.textStyle(.body1Header)
+							.foregroundColor(.app.gray1)
+
+						loadable(viewState.dAppName, loadingViewHeight: .small1) { dAppName in
+							if let dAppName {
+								Text(dAppName)
+									.textStyle(.body2Regular)
+									.foregroundColor(.app.gray2)
+							}
+						}
+					}
+
+					Spacer(minLength: 0)
+
+					// FIXME: UPDATE viewstate
+					ResourceBalanceView.AmountView(amount: viewState.amount, compact: false)
+						.padding(.leading, isSelected != nil ? .small2 : 0)
+
+					if let isSelected {
+						CheckmarkView(appearance: .dark, isChecked: isSelected)
+					}
+
+					//					AssetIcon(.asset(AssetResource.info), size: .smallest)
+					//						.tint(.app.gray3)
+				}
+				.padding(.bottom, .small2)
+
+				Text(L10n.TransactionReview.worth.uppercased())
+					.textStyle(.body2HighImportance)
+					.foregroundColor(.app.gray2)
+					.padding(.bottom, .small3)
+
+				loadable(viewState.resources) { fungibles in
+					ResourceBalancesView(fungibles: fungibles)
 				}
 			}
 		}
