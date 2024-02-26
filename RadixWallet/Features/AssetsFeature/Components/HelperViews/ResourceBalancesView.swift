@@ -81,6 +81,39 @@ public enum ResourceBalance: Sendable, Hashable {
 	}
 }
 
+// MARK: - ResourceBalanceButton
+public struct ResourceBalanceButton: View {
+	public let resource: ResourceBalance
+	public let appearance: ResourceBalanceView.Appearance
+	public let background: Color = .app.gray5
+	public let onTap: () -> Void
+
+	init(resource: ResourceBalance, appearance: ResourceBalanceView.Appearance = .standard, onTap: @escaping () -> Void) {
+		self.resource = resource
+		self.appearance = appearance
+		self.onTap = onTap
+	}
+
+	public var body: some View {
+		HStack(alignment: .center, spacing: .small2) {
+			Button(action: onTap) {
+				ResourceBalanceView(resource: resource)
+					.padding(.vertical, verticalSpacing)
+					.padding(.horizontal, horizontalSpacing)
+					.background(background)
+			}
+		}
+	}
+
+	private var verticalSpacing: CGFloat {
+		appearance == .standard ? .small1 : .small2
+	}
+
+	private var horizontalSpacing: CGFloat {
+		appearance == .standard ? .medium3 : .small1
+	}
+}
+
 // MARK: - ResourceBalanceView
 public struct ResourceBalanceView: View {
 	public let resource: ResourceBalance
