@@ -112,7 +112,7 @@ extension ResourceBalance.Fungible {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.Fungible) {
 		self.init(
 			address: resource.resourceAddress,
-			icon: details.isXRD ? .xrd : .other(resource.metadata.iconURL),
+			tokenIcon: details.isXRD ? .xrd : .other(resource.metadata.iconURL),
 			title: resource.metadata.title,
 			amount: .init(details.amount, guaranteed: details.guarantee?.amount)
 		)
@@ -200,18 +200,6 @@ extension LiquidStakeUnitView.ViewState {
 	}
 }
 
-extension TransactionReviewFungibleView.ViewState {
-	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.Fungible) {
-		self.init(
-			name: resource.metadata.title,
-			thumbnail: .token(details.isXRD ? .xrd : .other(resource.metadata.iconURL)),
-			amount: details.amount,
-			guaranteedAmount: details.guarantee?.amount,
-			fiatAmount: nil
-		)
-	}
-}
-
 extension PoolUnitView.ViewState {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.PoolUnit) {
 		self.init(
@@ -242,7 +230,7 @@ extension ResourceBalance.Fungible {
 	init(resourceWithRedemptionValue resource: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
 		self.init(
 			address: resource.resource.resourceAddress,
-			icon: isXRD ? .xrd : .other(resource.resource.metadata.iconURL),
+			tokenIcon: isXRD ? .xrd : .other(resource.resource.metadata.iconURL),
 			title: isXRD ? Constants.xrdTokenName : resource.resource.metadata.title,
 			amount: resource.redemptionValue.map { .init($0) },
 			fallback: L10n.Account.PoolUnits.noTotalSupply

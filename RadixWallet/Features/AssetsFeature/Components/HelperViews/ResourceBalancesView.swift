@@ -47,12 +47,22 @@ public enum ResourceBalance: Sendable, Hashable {
 
 	public struct Fungible: Sendable, Hashable {
 		public let address: ResourceAddress
-		public let icon: Thumbnail.TokenContent
+		public let icon: Thumbnail.FungibleContent
 		public let title: String?
 		public let amount: Amount?
 		public let fallback: String?
 
-		init(address: ResourceAddress, icon: Thumbnail.TokenContent, title: String?, amount: Amount? = nil, fallback: String? = nil) {
+		init(address: ResourceAddress, tokenIcon: Thumbnail.TokenContent, title: String?, amount: Amount? = nil, fallback: String? = nil) {
+			self.init(
+				address: address,
+				icon: .token(tokenIcon),
+				title: title,
+				amount: amount,
+				fallback: fallback
+			)
+		}
+
+		init(address: ResourceAddress, icon: Thumbnail.FungibleContent, title: String?, amount: Amount? = nil, fallback: String? = nil) {
 			self.address = address
 			self.icon = icon
 			self.title = title
@@ -173,7 +183,7 @@ extension ResourceBalance.Fungible {
 	public static func xrd(balance: RETDecimal) -> Self {
 		.init(
 			address: try! .init(validatingAddress: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"), // FIXME: REMOVE
-			icon: .xrd,
+			tokenIcon: .xrd,
 			title: Constants.xrdTokenName,
 			amount: .init(balance),
 			fallback: nil
@@ -195,7 +205,7 @@ extension ResourceBalanceView {
 
 		public var body: some View {
 			HStack(spacing: .zero) {
-				Thumbnail(token: viewState.icon, size: size)
+				Thumbnail(fungible: viewState.icon, size: size)
 					.padding(.trailing, .small1)
 
 				if let title = viewState.title {

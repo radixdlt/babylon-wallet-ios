@@ -661,57 +661,6 @@ struct RawTransactionView: SwiftUI.View {
 	}
 }
 
-// MARK: - TransactionReviewFungibleView
-// FIXME: REMOVE
-
-struct TransactionReviewFungibleView: View {
-	struct ViewState: Equatable {
-		let name: String?
-		let thumbnail: Thumbnail.FungibleContent
-
-		let amount: RETDecimal
-		let guaranteedAmount: RETDecimal?
-		let fiatAmount: RETDecimal?
-	}
-
-	let viewState: ViewState
-	let background: Color
-	let onTap: () -> Void
-	let disabled: Bool
-
-	init(viewState: ViewState, background: Color, onTap: (() -> Void)? = nil) {
-		self.viewState = viewState
-		self.background = background
-		self.onTap = onTap ?? {}
-		self.disabled = onTap == nil
-	}
-
-	var body: some View {
-		Button(action: onTap) {
-			HStack(spacing: .small1) {
-				Thumbnail(fungible: viewState.thumbnail, size: .slightlySmaller)
-					.padding(.vertical, .small1)
-
-				if let name = viewState.name {
-					Text(name)
-						.multilineTextAlignment(.leading)
-						.textStyle(.body2HighImportance)
-						.foregroundColor(.app.gray1)
-				}
-
-				Spacer(minLength: 0)
-
-				TransactionReviewAmountView(amount: viewState.amount, guaranteedAmount: viewState.guaranteedAmount)
-					.padding(.vertical, .medium3)
-			}
-			.padding(.horizontal, .medium3)
-			.background(background)
-		}
-		.buttonStyle(.borderless)
-		.disabled(disabled)
-	}
-}
-
 // MARK: - TransactionReviewInfoButton
 public struct TransactionReviewInfoButton: View {
 	private let action: () -> Void
