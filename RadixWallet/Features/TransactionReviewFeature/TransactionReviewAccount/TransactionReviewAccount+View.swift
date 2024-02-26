@@ -91,6 +91,45 @@ extension TransactionReviewAccount {
 	}
 }
 
+extension ResourceBalance {
+	init(transfer: TransactionReview.Transfer) {
+		switch transfer.details {
+		case let .fungible(details):
+			self = .fungible(.init(resource: transfer.resource, details: details))
+		case let .nonFungible(details):
+			self = .nonFungible(.init(resource: transfer.resource, details: details))
+		case let .poolUnit(details):
+			fatalError()
+		case let .liquidStakeUnit(details):
+			fatalError()
+		case let .stakeClaimNFT(details):
+			fatalError()
+		}
+	}
+}
+
+extension ResourceBalance.Fungible {
+	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.Fungible) {
+		self.init(
+			address: resource.resourceAddress,
+			icon: details.isXRD ? .xrd : .other(resource.metadata.iconURL),
+			title: resource.metadata.title,
+			amount: .init(details.amount, guaranteed: details.guarantee?.amount)
+		)
+	}
+}
+
+extension ResourceBalance.NonFungible {
+	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.NonFungible) {
+		self.init(
+			id: details.id,
+			resourceImage: resource.metadata.iconURL,
+			resourceName: resource.metadata.name,
+			nonFungibleName: details.data?.name
+		)
+	}
+}
+
 // MARK: - TransactionReviewResourceView
 struct TransactionReviewResourceView: View {
 	let transfer: TransactionReview.Transfer
@@ -98,12 +137,8 @@ struct TransactionReviewResourceView: View {
 
 	var body: some View {
 		switch transfer.details {
-		case let .fungible(details):
-			TransactionReviewFungibleView(viewState: .init(resource: transfer.resource, details: details), background: .app.gray5) {
-				onTap(nil)
-			}
-		case let .nonFungible(details):
-			TransferNFTView(viewState: .init(resource: transfer.resource, details: details), background: .app.gray5) {
+		case .fungible, .nonFungible:
+			ResourceBalanceButton(resource: .init(transfer: transfer)) {
 				onTap(nil)
 			}
 		case let .liquidStakeUnit(details):
@@ -173,16 +208,6 @@ extension TransactionReviewFungibleView.ViewState {
 			amount: details.amount,
 			guaranteedAmount: details.guarantee?.amount,
 			fiatAmount: nil
-		)
-	}
-}
-
-extension TransferNFTView.ViewState {
-	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.NonFungible) {
-		self.init(
-			tokenID: details.id.localId().toUserFacingString(),
-			tokenName: details.data?.name,
-			thumbnail: resource.metadata.iconURL
 		)
 	}
 }

@@ -662,6 +662,8 @@ struct RawTransactionView: SwiftUI.View {
 }
 
 // MARK: - TransactionReviewFungibleView
+// FIXME: REMOVE
+
 struct TransactionReviewFungibleView: View {
 	struct ViewState: Equatable {
 		let name: String?

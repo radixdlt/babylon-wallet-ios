@@ -120,6 +120,7 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 		}
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case percentageStepper(MinimumPercentageStepper.Action)
 	}

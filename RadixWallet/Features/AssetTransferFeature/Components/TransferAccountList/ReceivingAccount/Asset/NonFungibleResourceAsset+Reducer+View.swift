@@ -32,7 +32,7 @@ extension NonFungibleResourceAsset.State {
 			id: token.id,
 			resourceImage: resourceImage,
 			resourceName: resourceName,
-			nonFungibleName: "modern kunst music" // token.data?.name
+			nonFungibleName: token.data?.name
 		))
 	}
 }
