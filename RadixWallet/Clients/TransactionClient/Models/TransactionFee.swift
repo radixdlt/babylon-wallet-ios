@@ -255,9 +255,9 @@ extension TransactionFee {
 
 		public var displayedTotalFee: String {
 			if max > min {
-				return "\(min.formatted()) - \(max.formatted()) XRD"
+				return "\(min.formatted()) - \(max.formatted())"
 			}
-			return "\(max.formatted()) XRD"
+			return max.formatted()
 		}
 	}
 }
