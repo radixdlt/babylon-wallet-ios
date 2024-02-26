@@ -127,9 +127,8 @@ extension TransactionReviewGuarantee {
 
 						Separator()
 
-						let stepperStore = store.scope(state: \.percentageStepper) { .child(.percentageStepper($0)) }
 						MinimumPercentageStepper.View(
-							store: stepperStore,
+							store: store.scope(state: \.percentageStepper, action: \.child.percentageStepper),
 							title: L10n.TransactionReview.Guarantees.setGuaranteedMinimum
 						)
 						.padding(.medium3)
