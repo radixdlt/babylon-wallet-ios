@@ -808,7 +808,6 @@
 		48CFC5A92ADC10DA00E77A5C /* SecondaryRectangularButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC0FB2ADC10D900E77A5C /* SecondaryRectangularButtonStyle.swift */; };
 		48CFC5AA2ADC10DA00E77A5C /* PrimaryRectangularButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC0FC2ADC10D900E77A5C /* PrimaryRectangularButtonStyle.swift */; };
 		48CFC5AB2ADC10DA00E77A5C /* InertButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC0FD2ADC10D900E77A5C /* InertButtonStyle.swift */; };
-		48CFC5AC2ADC10DA00E77A5C /* TokenBalanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC0FF2ADC10D900E77A5C /* TokenBalanceView.swift */; };
 		48CFC5AD2ADC10DA00E77A5C /* WarningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1002ADC10D900E77A5C /* WarningView.swift */; };
 		48CFC5AE2ADC10DA00E77A5C /* CheckmarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1012ADC10D900E77A5C /* CheckmarkView.swift */; };
 		48CFC5AF2ADC10DA00E77A5C /* AssetIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1022ADC10D900E77A5C /* AssetIcon.swift */; };
@@ -2117,7 +2116,6 @@
 		48CFC0FB2ADC10D900E77A5C /* SecondaryRectangularButtonStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecondaryRectangularButtonStyle.swift; sourceTree = "<group>"; };
 		48CFC0FC2ADC10D900E77A5C /* PrimaryRectangularButtonStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrimaryRectangularButtonStyle.swift; sourceTree = "<group>"; };
 		48CFC0FD2ADC10D900E77A5C /* InertButtonStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InertButtonStyle.swift; sourceTree = "<group>"; };
-		48CFC0FF2ADC10D900E77A5C /* TokenBalanceView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenBalanceView.swift; sourceTree = "<group>"; };
 		48CFC1002ADC10D900E77A5C /* WarningView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WarningView.swift; sourceTree = "<group>"; };
 		48CFC1012ADC10D900E77A5C /* CheckmarkView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CheckmarkView.swift; sourceTree = "<group>"; };
 		48CFC1022ADC10D900E77A5C /* AssetIcon.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetIcon.swift; sourceTree = "<group>"; };
@@ -5797,7 +5795,6 @@
 			isa = PBXGroup;
 			children = (
 				E6FA984D2B04E3D500748F20 /* NoContentView.swift */,
-				48CFC0FF2ADC10D900E77A5C /* TokenBalanceView.swift */,
 				48CFC1002ADC10D900E77A5C /* WarningView.swift */,
 				48CFC1012ADC10D900E77A5C /* CheckmarkView.swift */,
 				48CFC1022ADC10D900E77A5C /* AssetIcon.swift */,
@@ -8483,7 +8480,6 @@
 				48CFC4352ADC10DA00E77A5C /* ByteArray+Hex.swift in Sources */,
 				48CFC5AF2ADC10DA00E77A5C /* AssetIcon.swift in Sources */,
 				48CFC25E2ADC10D900E77A5C /* EditPersonaEntry.swift in Sources */,
-				48CFC5AC2ADC10DA00E77A5C /* TokenBalanceView.swift in Sources */,
 				48CFC3732ADC10D900E77A5C /* ValidatorHeaderView.swift in Sources */,
 				48CFC6852ADC10DB00E77A5C /* FactorSourceFlag.swift in Sources */,
 				48CFC2B62ADC10D900E77A5C /* EncryptOrDecryptProfile+Reducer.swift in Sources */,
