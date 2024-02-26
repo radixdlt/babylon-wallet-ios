@@ -12,18 +12,9 @@ extension PoolUnitsList {
 		}
 
 		public var body: some SwiftUI.View {
-			ForEachStore(
-				store.scope(
-					state: \.poolUnits,
-					action: (
-						/PoolUnitsList.Action.child
-							.. PoolUnitsList.ChildAction.poolUnit
-					).embed
-				),
-				content: {
-					PoolUnit.View(store: $0)
-				}
-			)
+			ForEachStore(store.scope(state: \.poolUnits, action: \.child.poolUnit)) {
+				PoolUnit.View(store: $0)
+			}
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()
 			}

@@ -49,14 +49,24 @@ extension ResourceBalance: Comparable {
 		case let (.lsu(lhsValue), .lsu(rhsValue)):
 			order(lhs: lhsValue.validatorName, rhs: rhsValue.validatorName) {
 				// If it's the same validator (name), sort by the resource
-				if lhsValue.resource == rhsValue.resource {
+				if lhsValue.address == rhsValue.address {
 					// If it's the same resource, sort by the amount
 					order(lhs: lhsValue.amount, rhs: rhsValue.amount, minValue: .init(.min()))
 				} else {
 					// Else sort alphabetically by resource title, or failing that, address
-					order(lhs: lhsValue.resource.metadata.title, rhs: rhsValue.resource.metadata.title) {
-						lhsValue.resource.resourceAddress.address < rhsValue.resource.resourceAddress.address
+					order(lhs: lhsValue.title, rhs: rhsValue.title) {
+						lhsValue.address.address < rhsValue.address.address
 					}
+				}
+			}
+		case let (.poolUnit(lhsValue), .poolUnit(rhsValue)):
+			if lhsValue.address == rhsValue.address {
+				// If it's the same resource, sort by the amount
+				order(lhs: lhsValue.amount, rhs: rhsValue.amount, minValue: .init(.min()))
+			} else {
+				// Else sort alphabetically by resource title, or failing that, address
+				order(lhs: lhsValue.poolName, rhs: rhsValue.poolName) {
+					lhsValue.address.address < rhsValue.address.address
 				}
 			}
 		default:
@@ -72,6 +82,8 @@ extension ResourceBalance: Comparable {
 			1
 		case .lsu:
 			2
+		case .poolUnit:
+			3
 		}
 	}
 }

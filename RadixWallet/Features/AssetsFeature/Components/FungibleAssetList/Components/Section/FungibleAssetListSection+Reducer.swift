@@ -33,9 +33,9 @@ extension FungibleAssetList {
 
 		public var body: some ReducerOf<Self> {
 			Reduce(core)
-				.forEach(\.rows, action: /Action.child .. ChildAction.row, element: {
+				.forEach(\.rows, action: /Action.child .. ChildAction.row) {
 					FungibleAssetList.Section.Row()
-				})
+				}
 		}
 
 		public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
