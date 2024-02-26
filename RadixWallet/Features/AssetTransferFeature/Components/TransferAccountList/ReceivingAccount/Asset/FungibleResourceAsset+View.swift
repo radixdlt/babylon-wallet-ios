@@ -38,7 +38,7 @@ extension FungibleResourceAsset.View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			VStack(alignment: .trailing) {
 				ResourceBalanceView(resource: viewStore.resourceBalance, appearance: .compact)
-					.withAuxiliary(spacing: .small1) {
+					.withAuxiliary(spacing: .small2) {
 						TextField(
 							RETDecimal.zero().formatted(),
 							text: viewStore.binding(
@@ -47,7 +47,9 @@ extension FungibleResourceAsset.View {
 							)
 						)
 						.keyboardType(.decimalPad)
+						.multilineTextAlignment(.trailing)
 						.lineLimit(1)
+						.minimumScaleFactor(0.7)
 						.foregroundColor(.app.gray1)
 						.textStyle(.sectionHeader)
 						.focused($focused)

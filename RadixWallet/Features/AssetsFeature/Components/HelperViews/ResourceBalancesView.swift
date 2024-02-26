@@ -246,8 +246,12 @@ extension ResourceBalanceView {
 	func withAuxiliary(spacing: CGFloat = 0, _ content: () -> some View) -> some View {
 		HStack(spacing: 0) {
 			self
+				.layoutPriority(1)
+
 			Spacer(minLength: spacing)
+
 			content()
+				.layoutPriority(-1)
 		}
 	}
 }
@@ -283,6 +287,7 @@ extension ResourceBalanceView {
 
 				if let title = viewState.title {
 					Text(title)
+						.lineLimit(1)
 						.textStyle(titleTextStyle)
 						.foregroundColor(.app.green1)
 //						.foregroundColor(.app.gray1)
@@ -328,6 +333,7 @@ extension ResourceBalanceView {
 						.foregroundColor(.app.green1)
 //						.foregroundColor(.app.gray2)
 				}
+				.lineLimit(1)
 
 				Spacer(minLength: 0)
 			}
@@ -373,7 +379,6 @@ extension ResourceBalanceView {
 					Spacer(minLength: 0)
 
 					AmountView(amount: viewState.amount, compact: false)
-						.border(.yellow)
 						.padding(.leading, isSelected != nil ? .small2 : 0)
 
 					if let isSelected {
@@ -408,10 +413,12 @@ extension ResourceBalanceView {
 		var body: some View {
 			if let amount {
 				core(amount: amount, compact: compact)
+					.overlay(.green.opacity(0.1))
 			} else if let fallback {
 				Text(fallback)
 					.textStyle(amountTextStyle)
 					.foregroundColor(.app.gray2)
+					.overlay(.green.opacity(0.1))
 			}
 		}
 
