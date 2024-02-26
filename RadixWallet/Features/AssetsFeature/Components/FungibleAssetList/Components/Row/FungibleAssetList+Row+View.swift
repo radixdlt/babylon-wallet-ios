@@ -38,11 +38,9 @@ extension FungibleAssetList.Section.Row {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: FeatureAction.view) { viewStore in
-				ResourceBalanceView(resource: .fungible(viewStore.resource), isSelected: viewStore.isSelected)
-					.frame(height: 2 * .large1)
-					.padding(.horizontal, .medium1)
-					.contentShape(Rectangle())
-					.onTapGesture { viewStore.send(.tapped) }
+				ResourceBalanceButton(resource: .fungible(viewStore.resource), appearance: .assetList, isSelected: viewStore.isSelected) {
+					viewStore.send(.tapped)
+				}
 			}
 		}
 	}
