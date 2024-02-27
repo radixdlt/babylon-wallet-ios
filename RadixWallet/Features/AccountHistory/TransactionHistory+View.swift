@@ -64,8 +64,11 @@ extension TransactionHistory {
 						Button(asset: AssetResource.transactionHistoryFilterList) {}
 					}
 				}
-				.navigationTitle("History")
+				.navigationTitle("History") // FIXME: Strings
 				.navigationBarTitleDisplayMode(.inline)
+			}
+			.onAppear {
+				store.send(.view(.onAppear))
 			}
 		}
 
