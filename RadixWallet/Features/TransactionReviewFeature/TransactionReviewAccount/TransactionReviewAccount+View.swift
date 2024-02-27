@@ -146,7 +146,8 @@ private extension ResourceBalance.LSU {
 private extension ResourceBalance.PoolUnit {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.PoolUnit) {
 		self.init(
-			address: resource.resourceAddress,
+			resourcePoolAddress: details.details.address,
+			poolUnitAddress: resource.resourceAddress,
 			poolIcon: resource.metadata.iconURL,
 			poolName: resource.fungibleResourceName,
 			amount: .init(details.details.poolUnitResource.amount, guaranteed: details.guarantee?.amount),
