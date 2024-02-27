@@ -5,19 +5,23 @@ import SwiftUI
 public struct PoolUnitsList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		let account: OnLedgerEntity.Account
-		var poolUnits: IdentifiedArrayOf<ResourceBalance.PoolUnit>
-		var selected: [ResourceBalance.PoolUnit.ID: Bool]
-
-		var poolDetailsArray: [OnLedgerEntitiesClient.OwnedResourcePoolDetails] = []
+		var poolUnits: IdentifiedArrayOf<PoolUnitState>
 
 		@PresentationState
 		var destination: Destination.State?
 
 		var didLoadResource: Bool {
-			if case .success = poolUnits.first?.resources {
+			if case .success = poolUnits.first?.resourceDetails {
 				return true
 			}
 			return false
+		}
+
+		public struct PoolUnitState: Sendable, Hashable, Identifiable {
+			public var id: ResourcePoolAddress { poolUnit.resourcePoolAddress }
+			public let poolUnit: OnLedgerEntity.Account.PoolUnit
+			public var resourceDetails: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails> = .idle
+			public var isSelected: Bool? = nil
 		}
 	}
 
@@ -71,20 +75,18 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 			return getOwnedPoolUnitsDetails(state, cachingStrategy: .useCache)
 
 		case .refresh:
-			for unit in state.poolUnits {
-				state.poolUnits[id: unit.resourcePoolAddress]?.resources = .loading
+			for poolUnit in state.poolUnits {
+				state.poolUnits[id: poolUnit.id]?.resourceDetails = .loading
 			}
 			return getOwnedPoolUnitsDetails(state, cachingStrategy: .forceUpdate)
 		case let .poolUnitWasTapped(id):
-			if let isSelected = state.selected[id] {
-				state.selected[id] = !isSelected
+			if let isSelected = state.poolUnits[id: id]?.isSelected {
+				state.poolUnits[id: id]?.isSelected = !isSelected
 			} else {
-				guard let details = state.poolDetailsArray.first(where: { $0.address == id }) else {
+				guard let poolUnit = state.poolUnits[id: id], case let .success(details) = poolUnit.resourceDetails else {
 					return .none
 				}
-				state.destination = .details(
-					.init(resourcesDetails: details)
-				)
+				state.destination = .details(.init(resourcesDetails: details))
 			}
 
 			return .none
@@ -93,12 +95,9 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadedResources(.success(poolDetailsArray)):
-			state.poolDetailsArray = poolDetailsArray
-
-			for poolDetails in poolDetailsArray {
-				state.poolUnits[id: poolDetails.address]?.resources = .success(.init(resources: poolDetails))
-				state.poolUnits[id: poolDetails.address]?.dAppName = .success(poolDetails.dAppName)
+		case let .loadedResources(.success(poolDetails)):
+			for details in poolDetails {
+				state.poolUnits[id: details.address]?.resourceDetails = .success(details)
 			}
 			return .none
 		case .loadedResources:

@@ -131,3 +131,12 @@ extension AssetsView {
 		}
 	}
 }
+
+extension View {
+	/// The common style for rows displayed in AssetsView
+	func rowStyle() -> some View {
+		self
+			.listRowInsets(.init())
+			.listRowSeparator(.hidden)
+	}
+}
