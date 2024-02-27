@@ -30,6 +30,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Hashable {
+		case onAppear
 		case closeTapped
 		case selectedPeriod(DateRangeItem.ID)
 	}
@@ -43,12 +44,11 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
+		case .onAppear:
+			return loadSelectedPeriod(state: &state)
 		case let .selectedPeriod(period):
 			state.selectedPeriod = period
-			return .run { [account = state.account.address] send in
-				let transactions = try await transactionHistoryClient.getTransactionHistory(account, nil)
-				await send(.internal(.updateTransactions(transactions.items)))
-			}
+			return loadSelectedPeriod(state: &state)
 
 		case .closeTapped:
 			return .run { _ in await dismiss() }
@@ -64,17 +64,41 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	// Helper methods
+
+	func loadSelectedPeriod(state: inout State) -> Effect<Action> {
+		guard let range = state.periods.first(where: { $0.id == state.selectedPeriod })?.range.clamped else {
+			return .none
+		}
+
+		return .run { [account = state.account.address] send in
+			let transactions = try await transactionHistoryClient.getTransactionHistory(account, range, nil)
+			await send(.internal(.updateTransactions(transactions.items)))
+		}
+	}
+}
+
+private extension Range<Date> {
+	var clamped: Range? {
+		let now: Date = .now
+		guard lowerBound < now else { return nil }
+		return lowerBound ..< Swift.min(upperBound, now.addingTimeInterval(0)) // FIXME: Figure out end date
+	}
 }
 
 extension TransactionHistory.State {
 	///  Presupposes that transactions are loaded in chunks of full months
 	mutating func updateTransactions(_ transactions: [TransactionHistoryItem]) {
-		let newSections = transactions.inSections
-		var sections = self.sections
-		sections.append(contentsOf: newSections)
+//		let newSections = transactions.inSections
+//		var sections = self.sections
+//		sections.append(contentsOf: newSections)
+//		sections.sort(by: \.day)
+//		self.sections = sections
+//		loadedPeriods.append(contentsOf: newSections.map(\.month))
+
+		sections.removeAll()
+		sections.append(contentsOf: transactions.inSections)
 		sections.sort(by: \.day)
-		self.sections = sections
-		loadedPeriods.append(contentsOf: newSections.map(\.month))
+		loadedPeriods.append(contentsOf: sections.map(\.month))
 	}
 
 	mutating func clearSections() {

@@ -8,10 +8,13 @@ extension TransactionHistoryClient {
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
 		@Sendable
-		func getTransactionHistory(account: AccountAddress, cursor: String?) async throws -> TransactionHistoryResponse {
+		func getTransactionHistory(account: AccountAddress, period: Range<Date>, cursor: String?) async throws -> TransactionHistoryResponse {
+			// FIXME: REMOVE THIS
+			let account = try AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l")
+
 			let request = GatewayAPI.StreamTransactionsRequest(
-				// atLedgerState: GatewayAPI.LedgerStateSelector?,
-				// fromLedgerState: GatewayAPI.LedgerStateSelector?,
+				atLedgerState: .init(timestamp: period.upperBound),
+				fromLedgerState: .init(timestamp: period.lowerBound),
 				cursor: cursor,
 				limitPerPage: 100,
 				// kindFilter: GatewayAPI.StreamTransactionsRequest.KindFilter?,
@@ -33,6 +36,8 @@ extension TransactionHistoryClient {
 			let response = try await gatewayAPIClient.streamTransactions(request)
 
 			// Pre-loading the details for all the resources involved
+
+			print("• RESPONSE: \(period.lowerBound.formatted(date: .abbreviated, time: .omitted)) -> \(period.upperBound.formatted(date: .abbreviated, time: .omitted)) \(response.items.count)")
 
 			let resourceAddresses = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
 
