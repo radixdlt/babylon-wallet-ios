@@ -71,7 +71,6 @@ extension AssetsView {
 				.buttonStyle(.plain)
 				.scrollContentBackground(.hidden)
 				.listStyle(.insetGrouped)
-				.padding(.top, .zero)
 				.tokenRowShadow()
 				.scrollIndicators(.hidden)
 				.refreshable {
@@ -101,8 +100,6 @@ extension AssetsView {
 			ScrollViewReader { value in
 				ScrollView(.horizontal) {
 					HStack(spacing: .zero) {
-//						Spacer()
-
 						ForEach(viewStore.assetKinds) { kind in
 							let isSelected = viewStore.activeAssetKind == kind
 							Text(kind.displayText)
@@ -123,8 +120,6 @@ extension AssetsView {
 									}
 								}
 						}
-
-//						Spacer()
 					}
 				}
 			}
