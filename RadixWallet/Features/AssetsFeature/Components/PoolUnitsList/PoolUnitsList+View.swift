@@ -14,9 +14,8 @@ extension PoolUnitsList {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				ForEach(viewStore.poolUnits) { poolUnit in
-					let isSelected = viewStore.selected[poolUnit.id]
 					Section {
-						ResourceBalanceButton(resource: .poolUnit(poolUnit), appearance: .assetList, isSelected: isSelected) {
+						ResourceBalanceButton(resource: .poolUnit(poolUnit.viewState), appearance: .assetList, isSelected: poolUnit.isSelected) {
 							viewStore.send(.poolUnitWasTapped(poolUnit.id))
 						}
 						.rowStyle()
@@ -28,6 +27,12 @@ extension PoolUnitsList {
 				await store.send(.view(.task)).finish()
 			}
 		}
+	}
+}
+
+private extension PoolUnitsList.State.PoolUnitState {
+	var viewState: ResourceBalance.PoolUnit {
+		.init(poolUnit: poolUnit, details: resourceDetails)
 	}
 }
 

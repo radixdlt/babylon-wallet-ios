@@ -522,3 +522,17 @@ extension ResourceBalanceView {
 		}
 	}
 }
+
+extension ResourceBalance.PoolUnit {
+	public init(poolUnit: OnLedgerEntity.Account.PoolUnit, details: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails> = .idle) {
+		self.init(
+			resourcePoolAddress: poolUnit.resourcePoolAddress,
+			poolUnitAddress: poolUnit.resource.resourceAddress,
+			poolIcon: poolUnit.resource.metadata.iconURL,
+			poolName: poolUnit.resource.metadata.fungibleResourceName,
+			amount: nil,
+			dAppName: details.dAppName,
+			resources: details.map { .init(resources: $0) }
+		)
+	}
+}

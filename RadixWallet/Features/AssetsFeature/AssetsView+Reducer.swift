@@ -217,15 +217,17 @@ public struct AssetsView: Sendable, FeatureReducer {
 				return nil
 			}
 
-			var poolUnits: IdentifiedArrayOf<ResourceBalance.PoolUnit> = []
-			var selected: [ResourceBalance.PoolUnit.ID: Bool] = [:]
-
-			for poolUnit in portfolio.poolUnitResources.poolUnits {
-				poolUnits.append(.init(poolUnit: poolUnit))
-				selected[poolUnit.resourcePoolAddress] = mode.nonXrdRowSelected(poolUnit.resource.resourceAddress)
+			let poolUnits = portfolio.poolUnitResources.poolUnits.map {
+				PoolUnitsList.State.PoolUnitState(
+					poolUnit: $0,
+					isSelected: mode.nonXrdRowSelected($0.resource.resourceAddress)
+				)
 			}
 
-			return .init(account: portfolio, poolUnits: poolUnits, selected: selected)
+			return .init(
+				account: portfolio,
+				poolUnits: .init(uncheckedUniqueElements: poolUnits)
+			)
 		}()
 
 		let fungibleTokenList: FungibleAssetList.State? = {
@@ -276,20 +278,6 @@ public struct AssetsView: Sendable, FeatureReducer {
 	}
 }
 
-extension ResourceBalance.PoolUnit {
-	init(poolUnit: OnLedgerEntity.Account.PoolUnit) {
-		self.init(
-			resourcePoolAddress: poolUnit.resourcePoolAddress,
-			poolUnitAddress: poolUnit.resource.resourceAddress,
-			poolIcon: poolUnit.resource.metadata.iconURL,
-			poolName: poolUnit.resource.metadata.fungibleResourceName,
-			amount: nil,
-			dAppName: .idle,
-			resources: .idle
-		)
-	}
-}
-
 extension AssetsView.State {
 	/// Computed property of currently selected assets
 	public var selectedAssets: Mode.SelectedAssets? {
@@ -297,9 +285,9 @@ extension AssetsView.State {
 
 		let selectedLiquidStakeUnits = stakeUnitList?.selectedLiquidStakeUnits ?? []
 
-//		let selectedPoolUnitTokens = poolUnitsList?.poolUnits
-//			.map(SelectedResourceProvider.init)
-//			.compactMap(\.selectedResource) ?? []
+		let selectedPoolUnitTokens = poolUnitsList?.poolUnits
+			.map(SelectedResourceProvider.init)
+			.compactMap(\.selectedResource) ?? []
 
 		let selectedXRDResource = fungibleTokenList?.sections[id: .xrd]?
 			.rows
@@ -318,7 +306,7 @@ extension AssetsView.State {
 
 		let selectedFungibleResources = OnLedgerEntity.OwnedFungibleResources(
 			xrdResource: selectedXRDResource,
-			nonXrdResources: selectedNonXrdResources + selectedLiquidStakeUnits /* + selectedPoolUnitTokens */
+			nonXrdResources: selectedNonXrdResources + selectedLiquidStakeUnits + selectedPoolUnitTokens
 		)
 
 		let selectedNonFungibleTokensPerResource =
@@ -452,7 +440,7 @@ extension SelectedResourceProvider<OnLedgerEntity.OwnedFungibleResource> {
 		)
 	}
 
-	init(with poolUnit: PoolUnit.State) {
+	init(with poolUnit: PoolUnitsList.State.PoolUnitState) {
 		self.init(
 			isSelected: poolUnit.isSelected,
 			resource: poolUnit.poolUnit.resource
