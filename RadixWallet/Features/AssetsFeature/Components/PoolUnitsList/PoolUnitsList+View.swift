@@ -13,8 +13,8 @@ extension PoolUnitsList {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-				ForEach(viewStore.poolUnits_) { poolUnit in
-					let isSelected = viewStore.isSelected[poolUnit.id]
+				ForEach(viewStore.poolUnits) { poolUnit in
+					let isSelected = viewStore.selected[poolUnit.id]
 					Section {
 						ResourceBalanceButton(resource: .poolUnit(poolUnit), appearance: .assetList, isSelected: isSelected) {
 							viewStore.send(.poolUnitWasTapped(poolUnit.id))
