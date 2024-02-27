@@ -330,9 +330,7 @@
 		48CFC3732ADC10D900E77A5C /* ValidatorHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE512ADC10D800E77A5C /* ValidatorHeaderView.swift */; };
 		48CFC3762ADC10D900E77A5C /* ValidatorStakeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE542ADC10D800E77A5C /* ValidatorStakeView.swift */; };
 		48CFC3772ADC10D900E77A5C /* LSUDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE552ADC10D800E77A5C /* LSUDetails.swift */; };
-		48CFC3792ADC10D900E77A5C /* PoolUnit+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE582ADC10D800E77A5C /* PoolUnit+View.swift */; };
 		48CFC37A2ADC10D900E77A5C /* PoolUnitDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE592ADC10D800E77A5C /* PoolUnitDetails.swift */; };
-		48CFC37B2ADC10D900E77A5C /* PoolUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE5A2ADC10D800E77A5C /* PoolUnit.swift */; };
 		48CFC37C2ADC10D900E77A5C /* PoolUnitDetails+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE5B2ADC10D800E77A5C /* PoolUnitDetails+View.swift */; };
 		48CFC37F2ADC10D900E77A5C /* PoolUnitsList+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE5E2ADC10D800E77A5C /* PoolUnitsList+View.swift */; };
 		48CFC3802ADC10D900E77A5C /* AssetTagsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE602ADC10D800E77A5C /* AssetTagsView.swift */; };
@@ -1153,7 +1151,6 @@
 		A41557532B7645E70040AD4E /* TransactionHistory+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41557522B7645E70040AD4E /* TransactionHistory+Reducer.swift */; };
 		A41557552B7645F70040AD4E /* TransactionHistory+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41557542B7645F70040AD4E /* TransactionHistory+View.swift */; };
 		A41557572B7D4BF10040AD4E /* ResourceBalancesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41557562B7D4BF10040AD4E /* ResourceBalancesView.swift */; };
-		A43715202B509BAE0010EA4A /* PoolUnitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A437151F2B509BAE0010EA4A /* PoolUnitView.swift */; };
 		A462B5792B8210A400C26D20 /* TransactionHistoryClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5782B820D2300C26D20 /* TransactionHistoryClient+Interface.swift */; };
 		A462B57A2B8210A600C26D20 /* TransactionHistoryClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5762B820D2200C26D20 /* TransactionHistoryClient+Live.swift */; };
 		A462B57B2B8210A900C26D20 /* TransactionHistoryClient+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5772B820D2300C26D20 /* TransactionHistoryClient+Mock.swift */; };
@@ -1637,9 +1634,7 @@
 		48CFBE512ADC10D800E77A5C /* ValidatorHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidatorHeaderView.swift; sourceTree = "<group>"; };
 		48CFBE542ADC10D800E77A5C /* ValidatorStakeView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ValidatorStakeView.swift; sourceTree = "<group>"; };
 		48CFBE552ADC10D800E77A5C /* LSUDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LSUDetails.swift; sourceTree = "<group>"; };
-		48CFBE582ADC10D800E77A5C /* PoolUnit+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PoolUnit+View.swift"; sourceTree = "<group>"; };
 		48CFBE592ADC10D800E77A5C /* PoolUnitDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PoolUnitDetails.swift; sourceTree = "<group>"; };
-		48CFBE5A2ADC10D800E77A5C /* PoolUnit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PoolUnit.swift; sourceTree = "<group>"; };
 		48CFBE5B2ADC10D800E77A5C /* PoolUnitDetails+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PoolUnitDetails+View.swift"; sourceTree = "<group>"; };
 		48CFBE5E2ADC10D800E77A5C /* PoolUnitsList+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PoolUnitsList+View.swift"; sourceTree = "<group>"; };
 		48CFBE602ADC10D800E77A5C /* AssetTagsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetTagsView.swift; sourceTree = "<group>"; };
@@ -2428,7 +2423,6 @@
 		A41557522B7645E70040AD4E /* TransactionHistory+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistory+Reducer.swift"; sourceTree = "<group>"; };
 		A41557542B7645F70040AD4E /* TransactionHistory+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistory+View.swift"; sourceTree = "<group>"; };
 		A41557562B7D4BF10040AD4E /* ResourceBalancesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceBalancesView.swift; sourceTree = "<group>"; };
-		A437151F2B509BAE0010EA4A /* PoolUnitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoolUnitView.swift; sourceTree = "<group>"; };
 		A462B5762B820D2200C26D20 /* TransactionHistoryClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistoryClient+Live.swift"; sourceTree = "<group>"; };
 		A462B5772B820D2300C26D20 /* TransactionHistoryClient+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistoryClient+Mock.swift"; sourceTree = "<group>"; };
 		A462B5782B820D2300C26D20 /* TransactionHistoryClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistoryClient+Interface.swift"; sourceTree = "<group>"; };
@@ -4471,8 +4465,6 @@
 		48CFBE4E2ADC10D800E77A5C /* Components */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBE5A2ADC10D800E77A5C /* PoolUnit.swift */,
-				48CFBE582ADC10D800E77A5C /* PoolUnit+View.swift */,
 				48CFBE592ADC10D800E77A5C /* PoolUnitDetails.swift */,
 				48CFBE5B2ADC10D800E77A5C /* PoolUnitDetails+View.swift */,
 			);
@@ -5798,7 +5790,6 @@
 				48CFC1002ADC10D900E77A5C /* WarningView.swift */,
 				48CFC1012ADC10D900E77A5C /* CheckmarkView.swift */,
 				48CFC1022ADC10D900E77A5C /* AssetIcon.swift */,
-				A437151F2B509BAE0010EA4A /* PoolUnitView.swift */,
 				48CFC1042ADC10D900E77A5C /* ForceFullScreen.swift */,
 				48CFC1052ADC10D900E77A5C /* Footer.swift */,
 				48CFC1062ADC10D900E77A5C /* JaggedEdge.swift */,
@@ -7946,7 +7937,6 @@
 				48CFC2562ADC10D900E77A5C /* DebugInspectProfile.swift in Sources */,
 				48CFC5912ADC10DA00E77A5C /* ProfileStore.swift in Sources */,
 				48CFC3FB2ADC10D900E77A5C /* AsyncWebSocket.swift in Sources */,
-				48CFC3792ADC10D900E77A5C /* PoolUnit+View.swift in Sources */,
 				48CFC3712ADC10D900E77A5C /* PoolUnitsList.swift in Sources */,
 				48CFC58B2ADC10DA00E77A5C /* SubmitTransactionClient+Test.swift in Sources */,
 				48CFC5642ADC10DA00E77A5C /* MetadataU32ArrayValue.swift in Sources */,
@@ -8720,7 +8710,6 @@
 				48CFC2912ADC10D900E77A5C /* TransactionReviewNetworkFee+View.swift in Sources */,
 				83EE47982AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI64.swift in Sources */,
 				48CFC41F2ADC10DA00E77A5C /* Array+Identifiable.swift in Sources */,
-				48CFC37B2ADC10D900E77A5C /* PoolUnit.swift in Sources */,
 				48CFC6382ADC10DB00E77A5C /* LegacyOlympiaBIP44LikeDerivationPath.swift in Sources */,
 				48CFC3052ADC10D900E77A5C /* DebugKeychainTest+View.swift in Sources */,
 				48CFC2D42ADC10D900E77A5C /* ShieldCallToActionButton.swift in Sources */,
@@ -8901,7 +8890,6 @@
 				48CFC4672ADC10DA00E77A5C /* AccountPortfoliosClient+Interface.swift in Sources */,
 				48CFC36A2ADC10D900E77A5C /* FungibleAssetListSection+Reducer.swift in Sources */,
 				48CFC3A62ADC10D900E77A5C /* SignatureWithPublicKey.swift in Sources */,
-				A43715202B509BAE0010EA4A /* PoolUnitView.swift in Sources */,
 				48CFC45A2ADC10DA00E77A5C /* LedgerHardwareWalletClient+Test.swift in Sources */,
 				48CFC29B2ADC10D900E77A5C /* TransactionReviewDapps.swift in Sources */,
 				48CFC3C92ADC10D900E77A5C /* WordList+Japanese.swift in Sources */,
