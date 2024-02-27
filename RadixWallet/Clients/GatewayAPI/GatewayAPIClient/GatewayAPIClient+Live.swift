@@ -131,14 +131,12 @@ extension GatewayAPIClient {
 		@Sendable
 		func post<Response>(
 			request: some Encodable,
+			dateEncodingStrategy: JSONEncoder.DateEncodingStrategy = .deferredToDate,
 			urlFromBase: @escaping @Sendable (URL) -> URL
-		) async throws -> Response
-			where
-			Response: Decodable
-		{
+		) async throws -> Response where Response: Decodable {
 			jsonEncoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+			jsonEncoder.dateEncodingStrategy = dateEncodingStrategy
 			let httpBody = try jsonEncoder.encode(request)
-
 			return try await makeRequest(httpBodyData: httpBody, urlFromBase: urlFromBase)
 		}
 
@@ -240,7 +238,8 @@ extension GatewayAPIClient {
 			},
 			streamTransactions: { streamTransactionsRequest in
 				try await post(
-					request: streamTransactionsRequest
+					request: streamTransactionsRequest,
+					dateEncodingStrategy: .iso8601
 				) { $0.appendingPathComponent("stream/transactions") }
 			}
 		)
