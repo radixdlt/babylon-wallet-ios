@@ -213,23 +213,33 @@ public struct AssetsView: Sendable, FeatureReducer {
 		}
 
 		let poolUnitList: PoolUnitsList.State? = {
-			if !portfolio.poolUnitResources.poolUnits.isEmpty {
-				return .init(
-					poolUnits: .init(
-						uncheckedUniqueElements: portfolio.poolUnitResources.poolUnits
-							.map {
-								PoolUnit.State(
-									poolUnit: $0,
-									isSelected: mode
-										.nonXrdRowSelected($0.resource.resourceAddress)
-								)
-							}
-					),
-					account: portfolio
-				)
+			guard !portfolio.poolUnitResources.poolUnits.isEmpty else {
+				return nil
 			}
 
-			return nil
+			var poolUnits: IdentifiedArrayOf<ResourceBalance.PoolUnit> = []
+			var isSelected: [ResourceBalance.PoolUnit.ID: Bool] = [:]
+
+			for poolUnit in portfolio.poolUnitResources.poolUnits {
+				poolUnits.append(.init(poolUnit: poolUnit))
+				isSelected[poolUnit.resourcePoolAddress] = mode.nonXrdRowSelected(poolUnit.resource.resourceAddress)
+			}
+
+			return .init(
+				account: portfolio,
+				poolUnits: .init(
+					uncheckedUniqueElements: portfolio.poolUnitResources.poolUnits
+						.map {
+							PoolUnit.State(
+								poolUnit: $0,
+								isSelected: mode
+									.nonXrdRowSelected($0.resource.resourceAddress)
+							)
+						}
+				),
+				poolUnits_: poolUnits,
+				isSelected: isSelected
+			)
 		}()
 
 		let fungibleTokenList: FungibleAssetList.State? = {
@@ -280,6 +290,20 @@ public struct AssetsView: Sendable, FeatureReducer {
 	}
 }
 
+extension ResourceBalance.PoolUnit {
+	init(poolUnit: OnLedgerEntity.Account.PoolUnit) {
+		self.init(
+			resourcePoolAddress: poolUnit.resourcePoolAddress,
+			poolUnitAddress: poolUnit.resource.resourceAddress,
+			poolIcon: poolUnit.resource.metadata.iconURL,
+			poolName: poolUnit.resource.metadata.fungibleResourceName,
+			amount: nil,
+			dAppName: .idle,
+			resources: .idle
+		)
+	}
+}
+
 extension AssetsView.State {
 	/// Computed property of currently selected assets
 	public var selectedAssets: Mode.SelectedAssets? {
@@ -290,6 +314,12 @@ extension AssetsView.State {
 		let selectedPoolUnitTokens = poolUnitsList?.poolUnits
 			.map(SelectedResourceProvider.init)
 			.compactMap(\.selectedResource) ?? []
+
+//		let selectedPoolUnitTokens_ = poolUnitsList?.poolUnits_
+//			.map { poolUnit in
+//				SelectedResourceProvider(isSelected: poolUnitsList?.isSelected[poolUnit.id], resource: poolUnit.resources)
+//			}
+//			.compactMap(\.selectedResource) ?? []
 
 		let selectedXRDResource = fungibleTokenList?.sections[id: .xrd]?
 			.rows

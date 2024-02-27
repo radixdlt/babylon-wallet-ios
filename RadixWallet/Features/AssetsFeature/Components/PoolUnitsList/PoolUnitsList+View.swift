@@ -12,12 +12,40 @@ extension PoolUnitsList {
 		}
 
 		public var body: some SwiftUI.View {
-			ForEachStore(store.scope(state: \.poolUnits, action: \.child.poolUnit)) {
-				PoolUnit.View(store: $0)
+			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+				ForEach(viewStore.poolUnits_) { poolUnit in
+					let isSelected = viewStore.isSelected[poolUnit.id]
+					Section {
+						ResourceBalanceButton(resource: .poolUnit(poolUnit), appearance: .assetList, isSelected: isSelected) {
+							viewStore.send(.poolUnitWasTapped(poolUnit.id))
+						}
+						.rowStyle()
+					}
+				}
 			}
+			.destinations(with: store)
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()
 			}
+		}
+	}
+}
+
+private extension StoreOf<PoolUnitsList> {
+	var destination: PresentationStoreOf<PoolUnitsList.Destination> {
+		func scopeState(state: State) -> PresentationState<PoolUnitsList.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<PoolUnitsList>) -> some View {
+		let destinationStore = store.destination
+		return sheet(store: destinationStore.scope(state: \.details, action: \.details)) {
+			PoolUnitDetails.View(store: $0)
 		}
 	}
 }
