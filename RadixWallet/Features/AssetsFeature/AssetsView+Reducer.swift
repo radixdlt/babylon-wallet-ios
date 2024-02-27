@@ -218,28 +218,14 @@ public struct AssetsView: Sendable, FeatureReducer {
 			}
 
 			var poolUnits: IdentifiedArrayOf<ResourceBalance.PoolUnit> = []
-			var isSelected: [ResourceBalance.PoolUnit.ID: Bool] = [:]
+			var selected: [ResourceBalance.PoolUnit.ID: Bool] = [:]
 
 			for poolUnit in portfolio.poolUnitResources.poolUnits {
 				poolUnits.append(.init(poolUnit: poolUnit))
-				isSelected[poolUnit.resourcePoolAddress] = mode.nonXrdRowSelected(poolUnit.resource.resourceAddress)
+				selected[poolUnit.resourcePoolAddress] = mode.nonXrdRowSelected(poolUnit.resource.resourceAddress)
 			}
 
-			return .init(
-				account: portfolio,
-				poolUnits: .init(
-					uncheckedUniqueElements: portfolio.poolUnitResources.poolUnits
-						.map {
-							PoolUnit.State(
-								poolUnit: $0,
-								isSelected: mode
-									.nonXrdRowSelected($0.resource.resourceAddress)
-							)
-						}
-				),
-				poolUnits_: poolUnits,
-				isSelected: isSelected
-			)
+			return .init(account: portfolio, poolUnits: poolUnits, selected: selected)
 		}()
 
 		let fungibleTokenList: FungibleAssetList.State? = {
@@ -311,14 +297,8 @@ extension AssetsView.State {
 
 		let selectedLiquidStakeUnits = stakeUnitList?.selectedLiquidStakeUnits ?? []
 
-		let selectedPoolUnitTokens = poolUnitsList?.poolUnits
-			.map(SelectedResourceProvider.init)
-			.compactMap(\.selectedResource) ?? []
-
-//		let selectedPoolUnitTokens_ = poolUnitsList?.poolUnits_
-//			.map { poolUnit in
-//				SelectedResourceProvider(isSelected: poolUnitsList?.isSelected[poolUnit.id], resource: poolUnit.resources)
-//			}
+//		let selectedPoolUnitTokens = poolUnitsList?.poolUnits
+//			.map(SelectedResourceProvider.init)
 //			.compactMap(\.selectedResource) ?? []
 
 		let selectedXRDResource = fungibleTokenList?.sections[id: .xrd]?
@@ -338,7 +318,7 @@ extension AssetsView.State {
 
 		let selectedFungibleResources = OnLedgerEntity.OwnedFungibleResources(
 			xrdResource: selectedXRDResource,
-			nonXrdResources: selectedNonXrdResources + selectedLiquidStakeUnits + selectedPoolUnitTokens
+			nonXrdResources: selectedNonXrdResources + selectedLiquidStakeUnits /* + selectedPoolUnitTokens */
 		)
 
 		let selectedNonFungibleTokensPerResource =
