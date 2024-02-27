@@ -22,7 +22,6 @@ extension PoolUnit {
 					}
 					.rowStyle()
 				}
-				.border(.black, width: 5)
 			}
 			.destinations(with: store)
 		}

@@ -60,13 +60,13 @@ extension ResourceBalance: Comparable {
 				}
 			}
 		case let (.poolUnit(lhsValue), .poolUnit(rhsValue)):
-			if lhsValue.address == rhsValue.address {
+			if lhsValue.id == rhsValue.id {
 				// If it's the same resource, sort by the amount
 				order(lhs: lhsValue.amount, rhs: rhsValue.amount, minValue: .init(.min()))
 			} else {
 				// Else sort alphabetically by resource title, or failing that, address
 				order(lhs: lhsValue.poolName, rhs: rhsValue.poolName) {
-					lhsValue.address.address < rhsValue.address.address
+					lhsValue.id.address < rhsValue.id.address
 				}
 			}
 		default:

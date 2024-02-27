@@ -26,8 +26,7 @@ public struct ResourceBalancesView: View {
 					.overlay(alignment: .bottom) {
 						if isNotLast {
 							Rectangle()
-//								.fill(.app.gray3)
-								.fill(.yellow)
+								.fill(.app.gray3)
 								.frame(height: dividerHeight)
 						}
 					}
@@ -89,13 +88,15 @@ public enum ResourceBalance: Sendable, Hashable {
 		public var validatorName: String? = nil
 	}
 
-	public struct PoolUnit: Sendable, Hashable {
-		public let address: ResourceAddress
+	public struct PoolUnit: Sendable, Hashable, Identifiable {
+		public var id: ResourcePoolAddress { resourcePoolAddress }
+		public let resourcePoolAddress: ResourcePoolAddress
+		public let poolUnitAddress: ResourceAddress
 		public let poolIcon: URL?
 		public let poolName: String?
 		public let amount: ResourceBalance.Amount?
-		public let dAppName: Loadable<String?>
-		public let resources: Loadable<[ResourceBalance.Fungible]>
+		public var dAppName: Loadable<String?>
+		public var resources: Loadable<[ResourceBalance.Fungible]>
 	}
 
 	// Helper types
@@ -302,8 +303,7 @@ extension ResourceBalanceView {
 					Text(title)
 						.lineLimit(1)
 						.textStyle(titleTextStyle)
-						.foregroundColor(.app.green1)
-//						.foregroundColor(.app.gray1)
+						.foregroundColor(.app.gray1)
 				}
 
 				if useSpacer {
@@ -339,12 +339,10 @@ extension ResourceBalanceView {
 				VStack(alignment: .leading, spacing: 0) {
 					Text(line1)
 						.textStyle(compact ? .body2HighImportance : .body1HighImportance)
-						.foregroundColor(.app.green1)
-//						.foregroundColor(.app.gray1)
+						.foregroundColor(.app.gray1)
 					Text(line2)
 						.textStyle(.body2Regular)
-						.foregroundColor(.app.green1)
-//						.foregroundColor(.app.gray2)
+						.foregroundColor(.app.gray2)
 				}
 				.lineLimit(1)
 
@@ -436,7 +434,6 @@ extension ResourceBalanceView {
 
 					Spacer(minLength: 0)
 
-					// FIXME: UPDATE viewstate
 					ResourceBalanceView.AmountView(amount: viewState.amount, compact: false)
 						.padding(.leading, isSelected != nil ? .small2 : 0)
 
