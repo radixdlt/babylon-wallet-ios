@@ -54,8 +54,7 @@ extension TransactionHistoryClient {
 					address: resourceAddress,
 					tokenIcon: .other(iconURL),
 					title: title,
-					amount: .init(amount),
-					fallback: nil
+					amount: .init(amount)
 				)
 			}
 
