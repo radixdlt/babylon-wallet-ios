@@ -213,7 +213,7 @@ extension ResourceBalance.Fungible {
 	public static func xrd(balance: RETDecimal) -> Self {
 		.init(
 			address: try! .init(validatingAddress: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"), // FIXME: REMOVE
-			tokenIcon: .xrd,
+			icon: .token(.xrd),
 			title: Constants.xrdTokenName,
 			amount: .init(balance)
 		)
