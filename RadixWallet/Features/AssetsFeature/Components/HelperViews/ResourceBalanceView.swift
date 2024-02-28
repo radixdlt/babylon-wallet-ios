@@ -114,6 +114,19 @@ public struct ResourceBalanceButton: View {
 	}
 }
 
+extension EnvironmentValues {
+	/// The fallback string when the amount value is missing
+	var missingFungibleAmountFallback: String? {
+		get { self[MissingFungibleAmountKey.self] }
+		set { self[MissingFungibleAmountKey.self] = newValue }
+	}
+}
+
+// MARK: - MissingFungibleAmountKey
+private struct MissingFungibleAmountKey: EnvironmentKey {
+	static let defaultValue: String? = nil
+}
+
 // MARK: - ResourceBalanceView
 public struct ResourceBalanceView: View {
 	public let resource: ResourceBalance
@@ -202,8 +215,7 @@ extension ResourceBalance.Fungible {
 			address: try! .init(validatingAddress: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"), // FIXME: REMOVE
 			tokenIcon: .xrd,
 			title: Constants.xrdTokenName,
-			amount: .init(balance),
-			fallback: nil
+			amount: .init(balance)
 		)
 	}
 }
@@ -217,6 +229,7 @@ extension ResourceBalance: Identifiable {
 
 extension ResourceBalanceView {
 	public struct Fungible: View {
+		@Environment(\.missingFungibleAmountFallback) var fallback
 		public let viewState: ResourceBalance.Fungible
 		public let compact: Bool
 
@@ -236,7 +249,7 @@ extension ResourceBalanceView {
 					Spacer(minLength: .small2)
 				}
 
-				AmountView(amount: viewState.amount, fallback: viewState.fallback, compact: compact)
+				AmountView(amount: viewState.amount, fallback: fallback, compact: compact)
 			}
 		}
 
@@ -249,7 +262,7 @@ extension ResourceBalanceView {
 		}
 
 		private var useSpacer: Bool {
-			viewState.amount != nil || viewState.fallback != nil
+			viewState.amount != nil || fallback != nil
 		}
 	}
 
@@ -379,6 +392,7 @@ extension ResourceBalanceView {
 
 				loadable(viewState.resources) { fungibles in
 					ResourceBalancesView(fungibles: fungibles)
+						.environment(\.missingFungibleAmountFallback, L10n.Account.PoolUnits.noTotalSupply)
 				}
 			}
 		}
