@@ -52,7 +52,7 @@ extension TransactionHistoryClient {
 				let iconURL = keyedResourceDetails[id: resourceAddress]?.metadata.iconURL
 				return .init(
 					address: resourceAddress,
-					tokenIcon: .other(iconURL),
+					icon: .token(.other(iconURL)),
 					title: title,
 					amount: .init(amount)
 				)

@@ -11,16 +11,6 @@ public enum ResourceBalance: Sendable, Hashable {
 		public let title: String?
 		public let amount: Amount?
 
-		// FIXME: REMOVE
-		init(address: ResourceAddress, tokenIcon: Thumbnail.TokenContent, title: String?, amount: Amount? = nil) {
-			self.init(
-				address: address,
-				icon: .token(tokenIcon),
-				title: title,
-				amount: amount
-			)
-		}
-
 		init(address: ResourceAddress, icon: Thumbnail.FungibleContent, title: String?, amount: Amount? = nil) {
 			self.address = address
 			self.icon = icon
