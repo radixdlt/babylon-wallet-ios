@@ -10,7 +10,7 @@ extension TransactionHistoryClient {
 		@Sendable
 		func getTransactionHistory(account: AccountAddress, period: Range<Date>, cursor: String?) async throws -> TransactionHistoryResponse {
 			// FIXME: REMOVE THIS
-//			let account = try AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l")
+			let account = try AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l")
 
 			let request = GatewayAPI.StreamTransactionsRequest(
 				atLedgerState: .init(timestamp: period.upperBound),
@@ -43,6 +43,7 @@ extension TransactionHistoryClient {
 				addresses: resourceAddresses.map(\.asGeneral),
 				metadataKeys: .poolUnitMetadataKeys
 			)
+
 			let keyedResourceDetails = IdentifiedArray(resourceDetails.compactMap(\.resource), id: \.resourceAddress) { $1 }
 
 			/// Returns a fungible ResourceBalance for the given resource and amount
