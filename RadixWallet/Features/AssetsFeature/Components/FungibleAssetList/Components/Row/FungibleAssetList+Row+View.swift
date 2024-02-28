@@ -11,14 +11,17 @@ extension FungibleAssetList.Section.Row.State {
 }
 
 extension ResourceBalance.Fungible {
-	// FIXME: GK Add .withoutAmount
-	init(resource: OnLedgerEntity.OwnedFungibleResource, isXRD: Bool, includeAmount: Bool = true) {
+	init(resource: OnLedgerEntity.OwnedFungibleResource, isXRD: Bool) {
 		self.init(
 			address: resource.resourceAddress,
 			icon: .token(isXRD ? .xrd : .other(resource.metadata.iconURL)),
 			title: resource.metadata.title,
-			amount: includeAmount ? .init(resource.amount) : nil
+			amount: .init(resource.amount)
 		)
+	}
+
+	var withoutAmount: Self {
+		.init(address: address, icon: icon, title: title, amount: nil)
 	}
 }
 
