@@ -47,7 +47,7 @@ extension TransactionHistoryClient {
 			let keyedResourceDetails = IdentifiedArray(resourceDetails.compactMap(\.resource), id: \.resourceAddress) { $1 }
 
 			/// Returns a fungible ResourceBalance for the given resource and amount
-			func fungibleBalance(_ resourceAddress: ResourceAddress, amount: RETDecimal) -> ResourceBalanceViewState.Fungible { // FIXME: GK use full
+			func fungibleBalance(_ resourceAddress: ResourceAddress, amount: RETDecimal) -> ResourceBalance.ViewState.Fungible { // FIXME: GK use full
 				let title = keyedResourceDetails[id: resourceAddress]?.metadata.title
 				let iconURL = keyedResourceDetails[id: resourceAddress]?.metadata.iconURL
 				return .init(
@@ -73,7 +73,7 @@ extension TransactionHistoryClient {
 			}
 
 			/// Returns a non-fungible ResourceBalance for the given global non-fungbile ID
-			func nonFungibleBalance(_ id: NonFungibleGlobalId) throws -> ResourceBalanceViewState.NonFungible { // FIXME: GK use full
+			func nonFungibleBalance(_ id: NonFungibleGlobalId) throws -> ResourceBalance.ViewState.NonFungible { // FIXME: GK use full
 				let resourceAddress: ResourceAddress = try id.resourceAddress().asSpecific()
 				let resourceName = keyedResourceDetails[id: resourceAddress]?.metadata.name
 				let iconURL = keyedResourceDetails[id: resourceAddress]?.metadata.iconURL
@@ -90,8 +90,8 @@ extension TransactionHistoryClient {
 				let message = info.message?.plaintext?.content.string
 				let manifestClass = info.manifestClasses?.first
 
-				var withdrawals: [ResourceBalanceViewState] = []
-				var deposits: [ResourceBalanceViewState] = [] // FIXME: GK use full
+				var withdrawals: [ResourceBalance.ViewState] = []
+				var deposits: [ResourceBalance.ViewState] = [] // FIXME: GK use full
 
 				if let changes = info.balanceChanges {
 					for nonFungible in changes.nonFungibleBalanceChanges {

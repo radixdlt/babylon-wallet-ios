@@ -15,7 +15,7 @@ extension PoolUnitsList {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				ForEach(viewStore.poolUnits) { poolUnit in
 					Section {
-						ResourceBalanceButton(resource: .poolUnit(poolUnit.viewState), appearance: .assetList, isSelected: poolUnit.isSelected) {
+						ResourceBalanceButton(.poolUnit(poolUnit.viewState), appearance: .assetList, isSelected: poolUnit.isSelected) {
 							viewStore.send(.poolUnitWasTapped(poolUnit.id))
 						}
 						.rowStyle()
@@ -31,7 +31,7 @@ extension PoolUnitsList {
 }
 
 private extension PoolUnitsList.State.PoolUnitState {
-	var viewState: ResourceBalanceViewState.PoolUnit {
+	var viewState: ResourceBalance.ViewState.PoolUnit {
 		.init(poolUnit: poolUnit, details: resourceDetails)
 	}
 }

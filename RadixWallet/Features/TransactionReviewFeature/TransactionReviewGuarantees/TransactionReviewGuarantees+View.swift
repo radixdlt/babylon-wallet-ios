@@ -102,7 +102,7 @@ extension TransactionReviewGuarantee {
 	public struct ViewState: Identifiable, Equatable {
 		public let id: TransactionReview.Transfer.ID
 		let account: TransactionReview.Account
-		let fungible: ResourceBalanceViewState.Fungible
+		let fungible: ResourceBalance.ViewState.Fungible
 	}
 
 	public struct View: SwiftUI.View {
@@ -118,7 +118,7 @@ extension TransactionReviewGuarantee {
 					VStack(spacing: 0) {
 						SmallAccountCard(account: viewStore.account)
 
-						ResourceBalanceView(resource: .fungible(viewStore.fungible))
+						ResourceBalanceView(.fungible(viewStore.fungible))
 							.padding(.horizontal, .medium3)
 							.padding(.vertical, .small1)
 

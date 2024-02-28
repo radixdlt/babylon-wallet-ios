@@ -18,7 +18,7 @@ extension FungibleResourceAsset {
 }
 
 extension FungibleResourceAsset.ViewState {
-	var resourceBalance: ResourceBalanceViewState {
+	var resourceBalance: ResourceBalance.ViewState {
 		.fungible(.init(resource: resource, isXRD: isXRD).withoutAmount)
 	}
 
@@ -37,7 +37,7 @@ extension FungibleResourceAsset.View {
 	public var body: some View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			VStack(alignment: .trailing) {
-				ResourceBalanceView(resource: viewStore.resourceBalance, appearance: .compact)
+				ResourceBalanceView(viewStore.resourceBalance, appearance: .compact)
 					.withAuxiliary(spacing: .small2) {
 						TextField(
 							RETDecimal.zero().formatted(),
