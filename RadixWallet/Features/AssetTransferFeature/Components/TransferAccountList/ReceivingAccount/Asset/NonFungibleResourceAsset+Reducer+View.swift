@@ -15,7 +15,7 @@ public struct NonFungibleResourceAsset: Sendable, FeatureReducer {
 }
 
 extension NonFungibleResourceAsset {
-	public typealias ViewState = ResourceBalance
+	public typealias ViewState = ResourceBalanceViewState // FIXME: GK use .nonFungbile
 
 	@MainActor
 	public struct View: SwiftUI.View {

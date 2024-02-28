@@ -21,14 +21,14 @@ public struct TransactionHistoryItem: Sendable, Hashable {
 	let time: Date
 	let message: String?
 	let manifestClass: GatewayAPI.ManifestClass?
-	let withdrawals: [ResourceBalance]
-	let deposits: [ResourceBalance]
+	let withdrawals: [ResourceBalanceViewState] // FIXME: GK use full
+	let deposits: [ResourceBalanceViewState]
 	let depositSettingsUpdated: Bool
 }
 
-// MARK: - ResourceBalance + Comparable
-extension ResourceBalance: Comparable {
-	public static func < (lhs: ResourceBalance, rhs: ResourceBalance) -> Bool {
+// MARK: - ResourceBalanceViewState + Comparable
+extension ResourceBalanceViewState: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
 		switch (lhs, rhs) {
 		case let (.fungible(lhsValue), .fungible(rhsValue)):
 			if lhsValue.address == rhsValue.address {
@@ -90,7 +90,7 @@ extension ResourceBalance: Comparable {
 
 // MARK: - ResourceBalance.Amount + Comparable
 extension ResourceBalance.Amount: Comparable {
-	public static func < (lhs: ResourceBalance.Amount, rhs: ResourceBalance.Amount) -> Bool {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
 		// If RETDecimal were comparable:
 //		order(lhs: lhs.amount, rhs: rhs.amount) {
 //			order(lhs: lhs.guaranteed, rhs: rhs.guaranteed, minValue: 0)

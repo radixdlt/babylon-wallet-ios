@@ -212,7 +212,7 @@ extension TransactionHistory {
 
 		struct TransfersActionView: SwiftUI.View {
 			let type: TransferType
-			let resources: [ResourceBalance]
+			let resources: [ResourceBalanceViewState]
 
 			enum TransferType {
 				case withdrawal

@@ -31,7 +31,7 @@ extension PoolUnitsList {
 }
 
 private extension PoolUnitsList.State.PoolUnitState {
-	var viewState: ResourceBalance.PoolUnit {
+	var viewState: ResourceBalanceViewState.PoolUnit {
 		.init(poolUnit: poolUnit, details: resourceDetails)
 	}
 }

@@ -10,7 +10,7 @@ extension FungibleAssetList.Section.Row.State {
 	}
 }
 
-extension ResourceBalance.Fungible {
+extension ResourceBalanceViewState.Fungible {
 	init(resource: OnLedgerEntity.OwnedFungibleResource, isXRD: Bool) {
 		self.init(
 			address: resource.resourceAddress,
@@ -28,7 +28,7 @@ extension ResourceBalance.Fungible {
 // MARK: - FungibleTokenList.Row.View
 extension FungibleAssetList.Section.Row {
 	public struct ViewState: Equatable {
-		let resource: ResourceBalance.Fungible
+		let resource: ResourceBalanceViewState.Fungible
 		let isSelected: Bool?
 	}
 

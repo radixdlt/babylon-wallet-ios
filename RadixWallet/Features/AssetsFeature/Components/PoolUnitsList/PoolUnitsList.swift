@@ -28,7 +28,7 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case task
 		case refresh
-		case poolUnitWasTapped(ResourceBalance.PoolUnit.ID)
+		case poolUnitWasTapped(ResourcePoolAddress)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
