@@ -32,7 +32,7 @@ extension LSUDetails {
 		let thumbnailURL: URL?
 
 		let validatorNameViewState: ValidatorHeaderView.ViewState
-		let redeemableTokenAmount: ResourceBalance.Fungible
+		let redeemableTokenAmount: ResourceBalanceViewState.Fungible
 		let resourceDetails: AssetResourceDetailsSection.ViewState
 	}
 
