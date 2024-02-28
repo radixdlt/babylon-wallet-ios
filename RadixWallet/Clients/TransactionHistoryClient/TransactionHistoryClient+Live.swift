@@ -10,7 +10,9 @@ extension TransactionHistoryClient {
 		@Sendable
 		func getTransactionHistory(account: AccountAddress, period: Range<Date>, cursor: String?) async throws -> TransactionHistoryResponse {
 			// FIXME: GK REMOVE THIS
-			let account = try AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l")
+//			let account = try AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l")
+
+			let account = try AccountAddress(validatingAddress: "account_rdx16x9gfj2dt82e3qvp0j775fnc06clllvf9gj86us497hyxrye656530")
 
 			let request = GatewayAPI.StreamTransactionsRequest(
 				atLedgerState: .init(timestamp: period.upperBound),
@@ -18,10 +20,10 @@ extension TransactionHistoryClient {
 				cursor: cursor,
 				limitPerPage: 100,
 				// kindFilter: GatewayAPI.StreamTransactionsRequest.KindFilter?,
-				manifestAccountsWithdrawnFromFilter: [account.address],
-				manifestAccountsDepositedIntoFilter: [account.address],
+//				manifestAccountsWithdrawnFromFilter: [account.address],
+//				manifestAccountsDepositedIntoFilter: [account.address],
 				// manifestResourcesFilter: [String]?,
-				// affectedGlobalEntitiesFilter: [String]?,
+				affectedGlobalEntitiesFilter: [account.address],
 				// eventsFilter: [GatewayAPI.StreamTransactionsRequestEventFilterItem]?,
 				// accountsWithManifestOwnerMethodCalls: [String]?,
 				// accountsWithoutManifestOwnerMethodCalls: [String]?,
@@ -36,6 +38,10 @@ extension TransactionHistoryClient {
 			// Pre-loading the details for all the resources involved
 
 			print("• RESPONSE: \(period.lowerBound.formatted(date: .abbreviated, time: .omitted)) -> \(period.upperBound.formatted(date: .abbreviated, time: .omitted)) \(response.items.count)")
+
+//			for item in response.items {
+//				print("• item: \(item)")
+//			}
 
 			let resourceAddresses = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
 
@@ -94,7 +100,7 @@ extension TransactionHistoryClient {
 				var deposits: [ResourceBalance.ViewState] = [] // FIXME: GK use full
 
 				if let changes = info.balanceChanges {
-					for nonFungible in changes.nonFungibleBalanceChanges {
+					for nonFungible in changes.nonFungibleBalanceChanges where nonFungible.entityAddress == account.address {
 						for nonFungibleID in try extractNonFungibleIDs(.removed, from: nonFungible) {
 							try withdrawals.append(.nonFungible(nonFungibleBalance(nonFungibleID)))
 						}
@@ -103,7 +109,7 @@ extension TransactionHistoryClient {
 						}
 					}
 
-					for fungible in changes.fungibleBalanceChanges {
+					for fungible in changes.fungibleBalanceChanges where fungible.entityAddress == account.address {
 						let resourceAddress = try ResourceAddress(validatingAddress: fungible.resourceAddress)
 						let amount = try RETDecimal(value: fungible.balanceChange)
 						guard !amount.isZero() else { continue }

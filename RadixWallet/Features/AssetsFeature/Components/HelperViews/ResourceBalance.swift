@@ -36,6 +36,29 @@ public struct ResourceBalance: Sendable, Hashable {
 	}
 }
 
+extension ResourceBalance {
+	var viewState: ViewState {
+		switch details {
+		case .fungible:
+//			return .fungible(
+//				.init(
+//					address: <#T##ResourceAddress#>,
+//					icon: <#T##Thumbnail.FungibleContent#>,
+//					title: <#T##String?#>,
+//					amount: <#T##Amount?#>
+//				)
+//			)
+			fatalError()
+		case let .nonFungibleToken(details):
+			fatalError()
+		case let .lsu(details):
+			fatalError()
+		case let .poolUnit(details):
+			fatalError()
+		}
+	}
+}
+
 // MARK: ResourceBalance.ViewState
 extension ResourceBalance {
 	// MARK: - ViewState
