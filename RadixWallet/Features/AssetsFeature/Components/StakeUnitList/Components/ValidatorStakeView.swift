@@ -15,7 +15,7 @@ struct ValidatorStakeView: View {
 		var stakeClaimResource: StakeClaimResourceView.ViewState?
 
 		public struct LiquidStakeUnit: Sendable, Hashable {
-			let lsu: ResourceBalanceViewState.LSU
+			let lsu: ResourceBalance.ViewState.LSU
 			var isSelected: Bool?
 		}
 	}
@@ -62,7 +62,7 @@ struct ValidatorStakeView: View {
 				.frame(height: .small3)
 				.overlay(.app.gray5)
 
-			ResourceBalanceButton(resource: .lsu(viewState.lsu), appearance: .assetList, isSelected: viewState.isSelected, onTap: action)
+			ResourceBalanceButton(.lsu(viewState.lsu), appearance: .assetList, isSelected: viewState.isSelected, onTap: action)
 		}
 	}
 
