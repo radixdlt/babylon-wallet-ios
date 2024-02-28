@@ -91,7 +91,7 @@ extension TransactionReviewAccount {
 	}
 }
 
-extension ResourceBalance {
+extension ResourceBalanceViewState { // FIXME: GK use full?
 	init(transfer: TransactionReview.Transfer) {
 		switch transfer.details {
 		case let .fungible(details):
@@ -108,7 +108,7 @@ extension ResourceBalance {
 	}
 }
 
-private extension ResourceBalance.Fungible {
+private extension ResourceBalanceViewState.Fungible {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.Fungible) {
 		self.init(
 			address: resource.resourceAddress,
@@ -119,7 +119,7 @@ private extension ResourceBalance.Fungible {
 	}
 }
 
-private extension ResourceBalance.NonFungible {
+private extension ResourceBalanceViewState.NonFungible {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.NonFungible) {
 		self.init(
 			id: details.id,
@@ -130,7 +130,7 @@ private extension ResourceBalance.NonFungible {
 	}
 }
 
-private extension ResourceBalance.LSU {
+private extension ResourceBalanceViewState.LSU {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.LiquidStakeUnit) {
 		self.init(
 			address: resource.resourceAddress,
@@ -143,7 +143,7 @@ private extension ResourceBalance.LSU {
 	}
 }
 
-private extension ResourceBalance.PoolUnit {
+private extension ResourceBalanceViewState.PoolUnit {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.PoolUnit) {
 		self.init(
 			resourcePoolAddress: details.details.address,
@@ -176,7 +176,7 @@ struct TransactionReviewResourceView: View {
 	}
 }
 
-extension [ResourceBalance.Fungible] {
+extension [ResourceBalanceViewState.Fungible] { // FIXME: GK use full
 	init(resources: OnLedgerEntitiesClient.OwnedResourcePoolDetails) {
 		let xrdResource = resources.xrdResource.map {
 			Element(resourceWithRedemptionValue: $0, isXRD: true)
@@ -188,7 +188,7 @@ extension [ResourceBalance.Fungible] {
 	}
 }
 
-extension ResourceBalance.Fungible {
+extension ResourceBalanceViewState.Fungible { // FIXME: GK use full
 	init(resourceWithRedemptionValue resource: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
 		self.init(
 			address: resource.resource.resourceAddress,

@@ -102,7 +102,7 @@ extension TransactionReviewGuarantee {
 	public struct ViewState: Identifiable, Equatable {
 		public let id: TransactionReview.Transfer.ID
 		let account: TransactionReview.Account
-		let fungible: ResourceBalance.Fungible
+		let fungible: ResourceBalanceViewState.Fungible
 	}
 
 	public struct View: SwiftUI.View {
