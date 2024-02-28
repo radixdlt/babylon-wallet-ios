@@ -91,7 +91,7 @@ extension TransactionReviewAccount {
 	}
 }
 
-extension ResourceBalanceViewState { // FIXME: GK use full?
+extension ResourceBalance.ViewState { // FIXME: GK use full?
 	init(transfer: TransactionReview.Transfer) {
 		switch transfer.details {
 		case let .fungible(details):
@@ -108,7 +108,7 @@ extension ResourceBalanceViewState { // FIXME: GK use full?
 	}
 }
 
-private extension ResourceBalanceViewState.Fungible {
+private extension ResourceBalance.ViewState.Fungible {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.Fungible) {
 		self.init(
 			address: resource.resourceAddress,
@@ -119,7 +119,7 @@ private extension ResourceBalanceViewState.Fungible {
 	}
 }
 
-private extension ResourceBalanceViewState.NonFungible {
+private extension ResourceBalance.ViewState.NonFungible {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.NonFungible) {
 		self.init(
 			id: details.id,
@@ -130,7 +130,7 @@ private extension ResourceBalanceViewState.NonFungible {
 	}
 }
 
-private extension ResourceBalanceViewState.LSU {
+private extension ResourceBalance.ViewState.LSU {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.LiquidStakeUnit) {
 		self.init(
 			address: resource.resourceAddress,
@@ -143,7 +143,7 @@ private extension ResourceBalanceViewState.LSU {
 	}
 }
 
-private extension ResourceBalanceViewState.PoolUnit {
+private extension ResourceBalance.ViewState.PoolUnit {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.PoolUnit) {
 		self.init(
 			resourcePoolAddress: details.details.address,
@@ -165,7 +165,7 @@ struct TransactionReviewResourceView: View {
 	var body: some View {
 		switch transfer.details {
 		case .fungible, .nonFungible, .liquidStakeUnit, .poolUnit:
-			ResourceBalanceButton(resource: .init(transfer: transfer), appearance: .transactionReview) {
+			ResourceBalanceButton(.init(transfer: transfer), appearance: .transactionReview) {
 				onTap(nil)
 			}
 		case let .stakeClaimNFT(details):
@@ -176,7 +176,7 @@ struct TransactionReviewResourceView: View {
 	}
 }
 
-extension [ResourceBalanceViewState.Fungible] { // FIXME: GK use full
+extension [ResourceBalance.ViewState.Fungible] { // FIXME: GK use full
 	init(resources: OnLedgerEntitiesClient.OwnedResourcePoolDetails) {
 		let xrdResource = resources.xrdResource.map {
 			Element(resourceWithRedemptionValue: $0, isXRD: true)
@@ -188,7 +188,7 @@ extension [ResourceBalanceViewState.Fungible] { // FIXME: GK use full
 	}
 }
 
-extension ResourceBalanceViewState.Fungible { // FIXME: GK use full
+extension ResourceBalance.ViewState.Fungible { // FIXME: GK use full
 	init(resourceWithRedemptionValue resource: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
 		self.init(
 			address: resource.resource.resourceAddress,
