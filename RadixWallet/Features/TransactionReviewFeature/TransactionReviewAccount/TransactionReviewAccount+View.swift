@@ -112,7 +112,7 @@ private extension ResourceBalance.Fungible {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.Fungible) {
 		self.init(
 			address: resource.resourceAddress,
-			tokenIcon: details.isXRD ? .xrd : .other(resource.metadata.iconURL),
+			icon: .token(details.isXRD ? .xrd : .other(resource.metadata.iconURL)),
 			title: resource.metadata.title,
 			amount: .init(details.amount, guaranteed: details.guarantee?.amount)
 		)
@@ -192,7 +192,7 @@ extension ResourceBalance.Fungible {
 	init(resourceWithRedemptionValue resource: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
 		self.init(
 			address: resource.resource.resourceAddress,
-			tokenIcon: isXRD ? .xrd : .other(resource.resource.metadata.iconURL),
+			icon: .token(isXRD ? .xrd : .other(resource.resource.metadata.iconURL)),
 			title: isXRD ? Constants.xrdTokenName : resource.resource.metadata.title,
 			amount: resource.redemptionValue.map { .init($0) }
 		)
