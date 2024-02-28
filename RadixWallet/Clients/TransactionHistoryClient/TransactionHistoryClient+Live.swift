@@ -9,7 +9,7 @@ extension TransactionHistoryClient {
 
 		@Sendable
 		func getTransactionHistory(account: AccountAddress, period: Range<Date>, cursor: String?) async throws -> TransactionHistoryResponse {
-			// FIXME: REMOVE THIS
+			// FIXME: GK REMOVE THIS
 			let account = try AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l")
 
 			let request = GatewayAPI.StreamTransactionsRequest(
@@ -47,7 +47,7 @@ extension TransactionHistoryClient {
 			let keyedResourceDetails = IdentifiedArray(resourceDetails.compactMap(\.resource), id: \.resourceAddress) { $1 }
 
 			/// Returns a fungible ResourceBalance for the given resource and amount
-			func fungibleBalance(_ resourceAddress: ResourceAddress, amount: RETDecimal) -> ResourceBalance.Fungible {
+			func fungibleBalance(_ resourceAddress: ResourceAddress, amount: RETDecimal) -> ResourceBalanceViewState.Fungible { // FIXME: GK use full
 				let title = keyedResourceDetails[id: resourceAddress]?.metadata.title
 				let iconURL = keyedResourceDetails[id: resourceAddress]?.metadata.iconURL
 				return .init(
@@ -73,7 +73,7 @@ extension TransactionHistoryClient {
 			}
 
 			/// Returns a non-fungible ResourceBalance for the given global non-fungbile ID
-			func nonFungibleBalance(_ id: NonFungibleGlobalId) throws -> ResourceBalance.NonFungible {
+			func nonFungibleBalance(_ id: NonFungibleGlobalId) throws -> ResourceBalanceViewState.NonFungible { // FIXME: GK use full
 				let resourceAddress: ResourceAddress = try id.resourceAddress().asSpecific()
 				let resourceName = keyedResourceDetails[id: resourceAddress]?.metadata.name
 				let iconURL = keyedResourceDetails[id: resourceAddress]?.metadata.iconURL
@@ -90,8 +90,8 @@ extension TransactionHistoryClient {
 				let message = info.message?.plaintext?.content.string
 				let manifestClass = info.manifestClasses?.first
 
-				var withdrawals: [ResourceBalance] = []
-				var deposits: [ResourceBalance] = []
+				var withdrawals: [ResourceBalanceViewState] = []
+				var deposits: [ResourceBalanceViewState] = [] // FIXME: GK use full
 
 				if let changes = info.balanceChanges {
 					for nonFungible in changes.nonFungibleBalanceChanges {

@@ -2,18 +2,18 @@ import SwiftUI
 
 // MARK: - ResourceBalancesView
 public struct ResourceBalancesView: View {
-	public let resources: [ResourceBalance]
+	public let resources: [ResourceBalanceViewState]
 
-	public init(resources: [ResourceBalance]) {
+	public init(resources: [ResourceBalanceViewState]) {
 		self.resources = resources
 	}
 
-	public init(fungibles: [ResourceBalance.Fungible]) {
-		self.init(resources: fungibles.map(ResourceBalance.fungible))
+	public init(fungibles: [ResourceBalanceViewState.Fungible]) {
+		self.init(resources: fungibles.map(ResourceBalanceViewState.fungible))
 	}
 
-	public init(nonFungibles: [ResourceBalance.NonFungible]) {
-		self.init(resources: nonFungibles.map(ResourceBalance.nonFungible))
+	public init(nonFungibles: [ResourceBalanceViewState.NonFungible]) {
+		self.init(resources: nonFungibles.map(ResourceBalanceViewState.nonFungible))
 	}
 
 	public var body: some View {
@@ -40,7 +40,7 @@ public struct ResourceBalancesView: View {
 
 // MARK: - ResourceBalanceButton
 public struct ResourceBalanceButton: View {
-	public let resource: ResourceBalance
+	public let resource: ResourceBalanceViewState
 	public let appearance: Appearance
 	public let isSelected: Bool?
 	public let onTap: () -> Void
@@ -50,7 +50,7 @@ public struct ResourceBalanceButton: View {
 		case transactionReview
 	}
 
-	init(resource: ResourceBalance, appearance: Appearance, isSelected: Bool? = nil, onTap: @escaping () -> Void) {
+	init(resource: ResourceBalanceViewState, appearance: Appearance, isSelected: Bool? = nil, onTap: @escaping () -> Void) {
 		self.resource = resource
 		self.appearance = appearance
 		self.isSelected = isSelected
@@ -129,7 +129,7 @@ private struct MissingFungibleAmountKey: EnvironmentKey {
 
 // MARK: - ResourceBalanceView
 public struct ResourceBalanceView: View {
-	public let resource: ResourceBalance
+	public let resource: ResourceBalanceViewState
 	public let appearance: Appearance
 	public let isSelected: Bool?
 
@@ -140,7 +140,7 @@ public struct ResourceBalanceView: View {
 		static let compact: Appearance = .compact(border: false)
 	}
 
-	init(resource: ResourceBalance, appearance: Appearance = .standard, isSelected: Bool? = nil) {
+	init(resource: ResourceBalanceViewState, appearance: Appearance = .standard, isSelected: Bool? = nil) {
 		self.resource = resource
 		self.appearance = appearance
 		self.isSelected = isSelected
@@ -209,7 +209,7 @@ extension ResourceBalanceView {
 	}
 }
 
-extension ResourceBalance.Fungible {
+extension ResourceBalanceViewState.Fungible {
 	public static func xrd(balance: RETDecimal) -> Self {
 		.init(
 			address: try! .init(validatingAddress: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"), // FIXME: REMOVE
@@ -220,8 +220,8 @@ extension ResourceBalance.Fungible {
 	}
 }
 
-// MARK: - ResourceBalance + Identifiable
-extension ResourceBalance: Identifiable {
+// MARK: - ResourceBalanceViewState + Identifiable
+extension ResourceBalanceViewState: Identifiable {
 	public var id: AnyHashable {
 		self
 	}
@@ -230,7 +230,7 @@ extension ResourceBalance: Identifiable {
 extension ResourceBalanceView {
 	public struct Fungible: View {
 		@Environment(\.missingFungibleAmountFallback) var fallback
-		public let viewState: ResourceBalance.Fungible
+		public let viewState: ResourceBalanceViewState.Fungible
 		public let compact: Bool
 
 		public var body: some View {
@@ -267,7 +267,7 @@ extension ResourceBalanceView {
 	}
 
 	public struct NonFungible: View {
-		public let viewState: ResourceBalance.NonFungible
+		public let viewState: ResourceBalanceViewState.NonFungible
 		public let compact: Bool
 
 		public var body: some View {
@@ -303,7 +303,7 @@ extension ResourceBalanceView {
 	}
 
 	public struct LSU: View {
-		let viewState: ResourceBalance.LSU
+		let viewState: ResourceBalanceViewState.LSU
 		let isSelected: Bool?
 
 		public var body: some View {
@@ -348,7 +348,7 @@ extension ResourceBalanceView {
 	}
 
 	public struct PoolUnit: View {
-		public let viewState: ResourceBalance.PoolUnit
+		public let viewState: ResourceBalanceViewState.PoolUnit
 		public let isSelected: Bool?
 
 		public var body: some View {
@@ -463,7 +463,7 @@ extension ResourceBalanceView {
 	}
 }
 
-extension ResourceBalance.PoolUnit {
+extension ResourceBalanceViewState.PoolUnit {
 	public init(poolUnit: OnLedgerEntity.Account.PoolUnit, details: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails> = .idle) {
 		self.init(
 			resourcePoolAddress: poolUnit.resourcePoolAddress,

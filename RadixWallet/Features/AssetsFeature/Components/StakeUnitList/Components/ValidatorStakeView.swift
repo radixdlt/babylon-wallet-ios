@@ -15,7 +15,7 @@ struct ValidatorStakeView: View {
 		var stakeClaimResource: StakeClaimResourceView.ViewState?
 
 		public struct LiquidStakeUnit: Sendable, Hashable {
-			let lsu: ResourceBalance.LSU
+			let lsu: ResourceBalanceViewState.LSU
 			var isSelected: Bool?
 		}
 	}
