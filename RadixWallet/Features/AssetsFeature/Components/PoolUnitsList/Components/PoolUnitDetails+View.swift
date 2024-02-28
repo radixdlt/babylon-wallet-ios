@@ -27,7 +27,7 @@ extension PoolUnitDetails {
 	public struct ViewState: Equatable {
 		let containerWithHeader: DetailsContainerWithHeaderViewState
 		let thumbnailURL: URL?
-		let resources: [ResourceBalanceViewState.Fungible]
+		let resources: [ResourceBalance.ViewState.Fungible]
 
 		let resourceDetails: AssetResourceDetailsSection.ViewState
 	}

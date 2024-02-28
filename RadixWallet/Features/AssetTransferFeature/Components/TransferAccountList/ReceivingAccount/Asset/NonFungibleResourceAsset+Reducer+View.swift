@@ -15,7 +15,7 @@ public struct NonFungibleResourceAsset: Sendable, FeatureReducer {
 }
 
 extension NonFungibleResourceAsset {
-	public typealias ViewState = ResourceBalanceViewState // FIXME: GK use .nonFungbile
+	public typealias ViewState = ResourceBalance.ViewState // FIXME: GK use .nonFungbile
 
 	@MainActor
 	public struct View: SwiftUI.View {
@@ -40,7 +40,7 @@ extension NonFungibleResourceAsset.State {
 extension NonFungibleResourceAsset.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState) { viewStore in
-			ResourceBalanceView(resource: viewStore.state, appearance: .compact)
+			ResourceBalanceView(viewStore.state, appearance: .compact)
 				.padding(.medium3)
 		}
 	}

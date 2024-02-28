@@ -32,7 +32,7 @@ extension LSUDetails {
 		let thumbnailURL: URL?
 
 		let validatorNameViewState: ValidatorHeaderView.ViewState
-		let redeemableTokenAmount: ResourceBalanceViewState.Fungible
+		let redeemableTokenAmount: ResourceBalance.ViewState.Fungible
 		let resourceDetails: AssetResourceDetailsSection.ViewState
 	}
 
@@ -64,7 +64,7 @@ extension LSUDetails {
 						ValidatorHeaderView(viewState: viewStore.validatorNameViewState)
 							.padding(.horizontal, .large2)
 
-						ResourceBalanceView(resource: .fungible(viewStore.redeemableTokenAmount), appearance: .compact(border: true))
+						ResourceBalanceView(.fungible(viewStore.redeemableTokenAmount), appearance: .compact(border: true))
 							.padding(.horizontal, .large2)
 
 						AssetResourceDetailsSection(viewState: viewStore.resourceDetails)

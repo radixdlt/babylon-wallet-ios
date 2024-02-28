@@ -2,25 +2,25 @@ import SwiftUI
 
 // MARK: - ResourceBalancesView
 public struct ResourceBalancesView: View {
-	public let resources: [ResourceBalanceViewState]
+	public let viewState: [ResourceBalance.ViewState]
 
-	public init(resources: [ResourceBalanceViewState]) {
-		self.resources = resources
+	public init(_ viewState: [ResourceBalance.ViewState]) {
+		self.viewState = viewState
 	}
 
-	public init(fungibles: [ResourceBalanceViewState.Fungible]) {
-		self.init(resources: fungibles.map(ResourceBalanceViewState.fungible))
+	public init(fungibles: [ResourceBalance.ViewState.Fungible]) {
+		self.init(fungibles.map(ResourceBalance.ViewState.fungible))
 	}
 
-	public init(nonFungibles: [ResourceBalanceViewState.NonFungible]) {
-		self.init(resources: nonFungibles.map(ResourceBalanceViewState.nonFungible))
+	public init(nonFungibles: [ResourceBalance.ViewState.NonFungible]) {
+		self.init(nonFungibles.map(ResourceBalance.ViewState.nonFungible))
 	}
 
 	public var body: some View {
 		VStack(spacing: 0) {
-			ForEach(resources) { resource in
-				let isNotLast = resource.id != resources.last?.id
-				ResourceBalanceView(resource: resource, appearance: .compact)
+			ForEach(viewState) { resource in
+				let isNotLast = resource.id != viewState.last?.id
+				ResourceBalanceView(resource, appearance: .compact)
 					.padding(.small1)
 					.padding(.bottom, isNotLast ? dividerHeight : 0)
 					.overlay(alignment: .bottom) {
@@ -40,7 +40,7 @@ public struct ResourceBalancesView: View {
 
 // MARK: - ResourceBalanceButton
 public struct ResourceBalanceButton: View {
-	public let resource: ResourceBalanceViewState
+	public let viewState: ResourceBalance.ViewState
 	public let appearance: Appearance
 	public let isSelected: Bool?
 	public let onTap: () -> Void
@@ -50,8 +50,8 @@ public struct ResourceBalanceButton: View {
 		case transactionReview
 	}
 
-	init(resource: ResourceBalanceViewState, appearance: Appearance, isSelected: Bool? = nil, onTap: @escaping () -> Void) {
-		self.resource = resource
+	init(_ viewState: ResourceBalance.ViewState, appearance: Appearance, isSelected: Bool? = nil, onTap: @escaping () -> Void) {
+		self.viewState = viewState
 		self.appearance = appearance
 		self.isSelected = isSelected
 		self.onTap = onTap
@@ -60,7 +60,7 @@ public struct ResourceBalanceButton: View {
 	public var body: some View {
 		HStack(alignment: .center, spacing: .small2) {
 			Button(action: onTap) {
-				ResourceBalanceView(resource: resource, appearance: viewAppearance, isSelected: isSelected)
+				ResourceBalanceView(viewState, appearance: viewAppearance, isSelected: isSelected)
 					.padding(.vertical, verticalSpacing)
 					.padding(.horizontal, horizontalSpacing)
 					.contentShape(Rectangle())
@@ -79,7 +79,7 @@ public struct ResourceBalanceButton: View {
 	private var verticalSpacing: CGFloat {
 		switch appearance {
 		case .assetList:
-			switch resource {
+			switch viewState {
 			case .fungible, .nonFungible:
 				.medium2
 			case .lsu, .poolUnit:
@@ -93,7 +93,7 @@ public struct ResourceBalanceButton: View {
 	private var horizontalSpacing: CGFloat {
 		switch appearance {
 		case .assetList:
-			switch resource {
+			switch viewState {
 			case .fungible, .nonFungible:
 				.large3
 			case .lsu, .poolUnit:
@@ -129,7 +129,7 @@ private struct MissingFungibleAmountKey: EnvironmentKey {
 
 // MARK: - ResourceBalanceView
 public struct ResourceBalanceView: View {
-	public let resource: ResourceBalanceViewState
+	public let viewState: ResourceBalance.ViewState
 	public let appearance: Appearance
 	public let isSelected: Bool?
 
@@ -140,8 +140,8 @@ public struct ResourceBalanceView: View {
 		static let compact: Appearance = .compact(border: false)
 	}
 
-	init(resource: ResourceBalanceViewState, appearance: Appearance = .standard, isSelected: Bool? = nil) {
-		self.resource = resource
+	init(_ viewState: ResourceBalance.ViewState, appearance: Appearance = .standard, isSelected: Bool? = nil) {
+		self.viewState = viewState
 		self.appearance = appearance
 		self.isSelected = isSelected
 	}
@@ -158,7 +158,7 @@ public struct ResourceBalanceView: View {
 
 	private var core: some View {
 		HStack(alignment: .center, spacing: .small2) {
-			switch resource {
+			switch viewState {
 			case let .fungible(viewState):
 				Fungible(viewState: viewState, compact: compact)
 			case let .nonFungible(viewState):
@@ -186,7 +186,7 @@ public struct ResourceBalanceView: View {
 
 	/// Delegate showing the selection state to the particular resource view
 	var delegateSelection: Bool {
-		switch resource {
+		switch viewState {
 		case .fungible, .nonFungible:
 			false
 		case .lsu, .poolUnit:
@@ -209,7 +209,7 @@ extension ResourceBalanceView {
 	}
 }
 
-extension ResourceBalanceViewState.Fungible {
+extension ResourceBalance.ViewState.Fungible {
 	public static func xrd(balance: RETDecimal) -> Self {
 		.init(
 			address: try! .init(validatingAddress: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"), // FIXME: REMOVE
@@ -220,8 +220,8 @@ extension ResourceBalanceViewState.Fungible {
 	}
 }
 
-// MARK: - ResourceBalanceViewState + Identifiable
-extension ResourceBalanceViewState: Identifiable {
+// MARK: - ResourceBalance.ViewState + Identifiable
+extension ResourceBalance.ViewState: Identifiable {
 	public var id: AnyHashable {
 		self
 	}
@@ -230,7 +230,7 @@ extension ResourceBalanceViewState: Identifiable {
 extension ResourceBalanceView {
 	public struct Fungible: View {
 		@Environment(\.missingFungibleAmountFallback) var fallback
-		public let viewState: ResourceBalanceViewState.Fungible
+		public let viewState: ResourceBalance.ViewState.Fungible
 		public let compact: Bool
 
 		public var body: some View {
@@ -267,7 +267,7 @@ extension ResourceBalanceView {
 	}
 
 	public struct NonFungible: View {
-		public let viewState: ResourceBalanceViewState.NonFungible
+		public let viewState: ResourceBalance.ViewState.NonFungible
 		public let compact: Bool
 
 		public var body: some View {
@@ -303,7 +303,7 @@ extension ResourceBalanceView {
 	}
 
 	public struct LSU: View {
-		let viewState: ResourceBalanceViewState.LSU
+		let viewState: ResourceBalance.ViewState.LSU
 		let isSelected: Bool?
 
 		public var body: some View {
@@ -341,14 +341,14 @@ extension ResourceBalanceView {
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray2)
 
-					ResourceBalanceView(resource: .fungible(.xrd(balance: viewState.worth)), appearance: .compact(border: true))
+					ResourceBalanceView(.fungible(.xrd(balance: viewState.worth)), appearance: .compact(border: true))
 				}
 			}
 		}
 	}
 
 	public struct PoolUnit: View {
-		public let viewState: ResourceBalanceViewState.PoolUnit
+		public let viewState: ResourceBalance.ViewState.PoolUnit
 		public let isSelected: Bool?
 
 		public var body: some View {
@@ -463,7 +463,7 @@ extension ResourceBalanceView {
 	}
 }
 
-extension ResourceBalanceViewState.PoolUnit {
+extension ResourceBalance.ViewState.PoolUnit {
 	public init(poolUnit: OnLedgerEntity.Account.PoolUnit, details: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails> = .idle) {
 		self.init(
 			resourcePoolAddress: poolUnit.resourcePoolAddress,

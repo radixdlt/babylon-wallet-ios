@@ -10,7 +10,7 @@ extension FungibleAssetList.Section.Row.State {
 	}
 }
 
-extension ResourceBalanceViewState.Fungible {
+extension ResourceBalance.ViewState.Fungible {
 	init(resource: OnLedgerEntity.OwnedFungibleResource, isXRD: Bool) {
 		self.init(
 			address: resource.resourceAddress,
@@ -28,7 +28,7 @@ extension ResourceBalanceViewState.Fungible {
 // MARK: - FungibleTokenList.Row.View
 extension FungibleAssetList.Section.Row {
 	public struct ViewState: Equatable {
-		let resource: ResourceBalanceViewState.Fungible
+		let resource: ResourceBalance.ViewState.Fungible
 		let isSelected: Bool?
 	}
 
@@ -42,7 +42,7 @@ extension FungibleAssetList.Section.Row {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: FeatureAction.view) { viewStore in
-				ResourceBalanceButton(resource: .fungible(viewStore.resource), appearance: .assetList, isSelected: viewStore.isSelected) {
+				ResourceBalanceButton(.fungible(viewStore.resource), appearance: .assetList, isSelected: viewStore.isSelected) {
 					viewStore.send(.tapped)
 				}
 			}

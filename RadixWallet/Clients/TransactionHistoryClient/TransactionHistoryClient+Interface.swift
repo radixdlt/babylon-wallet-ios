@@ -21,13 +21,13 @@ public struct TransactionHistoryItem: Sendable, Hashable {
 	let time: Date
 	let message: String?
 	let manifestClass: GatewayAPI.ManifestClass?
-	let withdrawals: [ResourceBalanceViewState] // FIXME: GK use full
-	let deposits: [ResourceBalanceViewState]
+	let withdrawals: [ResourceBalance.ViewState] // FIXME: GK use full
+	let deposits: [ResourceBalance.ViewState]
 	let depositSettingsUpdated: Bool
 }
 
-// MARK: - ResourceBalanceViewState + Comparable
-extension ResourceBalanceViewState: Comparable {
+// MARK: - ResourceBalance.ViewState + Comparable
+extension ResourceBalance.ViewState: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
 		switch (lhs, rhs) {
 		case let (.fungible(lhsValue), .fungible(rhsValue)):
