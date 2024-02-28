@@ -194,8 +194,7 @@ extension ResourceBalance.Fungible {
 			address: resource.resource.resourceAddress,
 			tokenIcon: isXRD ? .xrd : .other(resource.resource.metadata.iconURL),
 			title: isXRD ? Constants.xrdTokenName : resource.resource.metadata.title,
-			amount: resource.redemptionValue.map { .init($0) },
-			fallback: L10n.Account.PoolUnits.noTotalSupply
+			amount: resource.redemptionValue.map { .init($0) }
 		)
 	}
 }
