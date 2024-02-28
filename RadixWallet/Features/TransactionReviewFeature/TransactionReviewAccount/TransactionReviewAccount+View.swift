@@ -128,7 +128,6 @@ struct TransactionReviewResourceView: View {
 // MARK: - TransactionReviewAmountView
 struct TransactionReviewAmountView: View {
 	let amount: RETDecimal
-	let amountFiatWorth: OnLedgerEntity.FiatWorth?
 	let guaranteedAmount: RETDecimal?
 
 	var body: some View {
@@ -141,12 +140,6 @@ struct TransactionReviewAmountView: View {
 			Text(amount.formatted())
 				.textStyle(.body1Header)
 				.foregroundColor(.app.gray1)
-
-			if let worth = amountFiatWorth {
-				Text(worth.currencyFormatted(applyCustomFont: false)!)
-					.textStyle(.body2HighImportance)
-					.foregroundStyle(.app.gray2)
-			}
 
 			if let guaranteedAmount {
 				Text(L10n.TransactionReview.guaranteed)
@@ -168,9 +161,8 @@ extension LiquidStakeUnitView.ViewState {
 		self.init(
 			resource: resource,
 			amount: details.amount,
-			amountFiatWorth: nil,
 			guaranteedAmount: details.guarantee?.amount,
-			worth: details.worth,
+			worth: .init(nominalAmount: details.worth),
 			validatorName: details.validator.metadata.name
 		)
 	}
@@ -202,7 +194,7 @@ extension PoolUnitView.ViewState {
 	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.PoolUnit) {
 		self.init(
 			poolName: resource.fungibleResourceName,
-			amount: details.details.poolUnitResource.amount,
+			amount: details.details.poolUnitResource.amount.nominalAmount,
 			guaranteedAmount: details.guarantee?.amount,
 			dAppName: .success(details.details.dAppName),
 			poolIcon: resource.metadata.iconURL,
@@ -231,7 +223,8 @@ extension PoolUnitResourceView.ViewState {
 			id: resource.resource.id,
 			symbol: isXRD ? Constants.xrdTokenName : resource.resource.title ?? L10n.TransactionReview.unknown,
 			icon: .token(isXRD ? .xrd : .other(resource.resource.metadata.iconURL)),
-			amount: resource.redemptionValue
+			amount: resource.redemptionValue,
+			fiatWorth: resource.fiatWorth
 		)
 	}
 }

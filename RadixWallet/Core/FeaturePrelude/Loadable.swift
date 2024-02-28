@@ -258,6 +258,65 @@ extension Loadable {
 			.failure(error)
 		}
 	}
+
+    public func flatten<InnerValue>() -> Loadable<InnerValue> where Value == Loadable<InnerValue> {
+        switch self {
+        case .idle:
+            return .idle
+        case .loading:
+            return .loading
+        case let .success(value):
+            return value
+        case .failure(let error):
+            return .failure(error)
+        }
+    }
+
+    public func reduce(_ other: Loadable<Value>, join: (Value, Value) -> Value) -> Loadable<Value> {
+        concat(other).map(join)
+    }
+
+    public mutating func mutateValue(_ mutate: (inout Value) -> Void) {
+        switch self {
+        case .idle, .loading, .failure:
+            return
+        case var .success(value):
+            mutate(&value)
+            self = .success(value)
+        }
+    }
+
+    public mutating func refresh(
+        from other: Loadable<Value>,
+        valueChangeMap: (_ old: Value, _ new: Value) -> Value = { _, new in new }
+    ) {
+        switch (self, other) {
+        // If `other` is success, update the content regardless of the current state
+        case let (.success(oldValue), .success(newValue)):
+            self = .success(valueChangeMap(oldValue, newValue))
+        case let (_, .success(otherValue)):
+            self = .success(otherValue)
+        // If current state is success, don't update if `other` is loading or failed
+        case (.success, _):
+            break
+        // If current state is other than .success
+        case let (_, other):
+            self = other
+        }
+    }
+}
+
+extension Array {
+    func reduce<Value>(_ join: (Value, Value) -> Value) -> Loadable<Value>? where Element == Loadable<Value> {
+        guard var result = first else {
+            return nil
+        }
+
+        for item in dropFirst() {
+            result = result.reduce(item, join: join)
+        }
+        return result
+    }
 }
 
 extension Loadable {

@@ -38,7 +38,7 @@ public struct PoolUnitView: View {
 					Spacer(minLength: 0)
 
 					if let amount = viewState.amount {
-						TransactionReviewAmountView(amount: amount, amountFiatWorth: nil, guaranteedAmount: viewState.guaranteedAmount)
+						TransactionReviewAmountView(amount: amount, guaranteedAmount: viewState.guaranteedAmount)
 							.padding(.leading, viewState.isSelected != nil ? .small2 : 0)
 					}
 
@@ -100,17 +100,20 @@ public struct PoolUnitResourceView: View {
 		public let symbol: String?
 		public let icon: Thumbnail.FungibleContent
 		public let amount: String
+		public let fiatWorth: FiatWorth?
 
 		public init(
 			id: ResourceAddress,
 			symbol: String?,
 			icon: Thumbnail.FungibleContent,
-			amount: RETDecimal?
+			amount: RETDecimal?,
+			fiatWorth: FiatWorth?
 		) {
 			self.id = id
 			self.symbol = symbol
 			self.icon = icon
 			self.amount = amount.map { $0.formatted() } ?? L10n.Account.PoolUnits.noTotalSupply
+			self.fiatWorth = fiatWorth
 		}
 	}
 
@@ -129,12 +132,20 @@ public struct PoolUnitResourceView: View {
 
 			Spacer(minLength: .small2)
 
-			Text(viewState.amount)
-				.lineLimit(1)
-				.minimumScaleFactor(0.8)
-				.truncationMode(.tail)
-				.textStyle(.secondaryHeader)
-				.foregroundColor(.app.gray1)
+			VStack(alignment: .trailing) {
+				Text(viewState.amount)
+					.lineLimit(1)
+					.minimumScaleFactor(0.8)
+					.truncationMode(.tail)
+					.textStyle(.secondaryHeader)
+					.foregroundColor(.app.gray1)
+
+				if let fiatWorth = viewState.fiatWorth {
+					Text(fiatWorth.currencyFormatted(applyCustomFont: false)!)
+						.textStyle(.body2HighImportance)
+						.foregroundStyle(.app.gray2)
+				}
+			}
 		}
 	}
 }

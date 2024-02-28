@@ -6,18 +6,16 @@ extension LSUDetails.State {
 		.init(
 			containerWithHeader: .init(
 				title: .success(stakeUnitResource.resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName),
-				amount: stakeUnitResource.amount.formatted(),
+				amount: stakeUnitResource.amount.nominalAmount.formatted(),
 				currencyWorth: nil,
 				symbol: .success(stakeUnitResource.resource.metadata.symbol)
 			),
 			thumbnailURL: stakeUnitResource.resource.metadata.iconURL,
 			validatorNameViewState: .init(with: validator),
-			redeemableTokenAmount: .init(
-				thumbnail: .xrd,
-				name: Constants.xrdTokenName,
-				balance: xrdRedemptionValue,
-				balanceFiatWorth: stakeUnitResource.amounFiatWorth
-			),
+			redeemableTokenAmount: .xrd(balance: .init(
+				nominalAmount: xrdRedemptionValue,
+				fiatWorth: stakeUnitResource.amount.fiatWorth
+			)),
 			resourceDetails: .init(
 				description: .success(stakeUnitResource.resource.metadata.description),
 				resourceAddress: stakeUnitResource.resource.resourceAddress,

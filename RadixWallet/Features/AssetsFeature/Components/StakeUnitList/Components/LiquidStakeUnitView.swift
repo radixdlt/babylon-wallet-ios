@@ -2,9 +2,8 @@ public struct LiquidStakeUnitView: View {
 	public struct ViewState: Sendable, Hashable {
 		public let resource: OnLedgerEntity.Resource
 		public let amount: RETDecimal?
-		public let amountFiatWorth: OnLedgerEntity.FiatWorth?
 		public let guaranteedAmount: RETDecimal?
-		public let worth: RETDecimal
+		public let worth: ResourceAmount
 		public var validatorName: String? = nil
 		public var isSelected: Bool? = nil
 	}
@@ -37,7 +36,6 @@ public struct LiquidStakeUnitView: View {
 					if let amount = viewState.amount {
 						TransactionReviewAmountView(
 							amount: amount,
-							amountFiatWorth: nil,
 							guaranteedAmount: viewState.guaranteedAmount
 						)
 						.padding(.leading, viewState.isSelected != nil ? .small2 : 0)
@@ -53,7 +51,7 @@ public struct LiquidStakeUnitView: View {
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray2)
 
-					TokenBalanceView.Bordered(viewState: .xrd(balance: viewState.worth, balanceFiatWorth: viewState.amountFiatWorth))
+					TokenBalanceView.Bordered(viewState: .xrd(balance: viewState.worth))
 				}
 			}
 			.padding(.medium3)

@@ -6,15 +6,7 @@ extension Home.State {
 		.init(
 			hasNotification: shouldWriteDownPersonasSeedPhrase,
 			showRadixBanner: showRadixBanner,
-			totalFiatWorth: accountPortfolios.map {
-				guard let first = $0.first else {}
-
-				let isShowingFiatWorth = first.isCurrencyAmountVisible
-				let currency = first.fiatCurrency
-
-				let totalFiatWorth = $0.map(\.totalFiatWorth.worth).reduce(0, +)
-				return OnLedgerEntity.FiatWorth(isVisible: isShowingFiatWorth, worth: totalFiatWorth, currency: currency).currencyFormatted(applyCustomFont: true)!
-			},
+			totalFiatWorth: totalFiatWorth,
 			isShowingFiatWorth: showFiatWorth
 		)
 	}
@@ -25,7 +17,7 @@ extension Home {
 	public struct ViewState: Equatable {
 		let hasNotification: Bool
 		let showRadixBanner: Bool
-		let totalFiatWorth: Loadable<AttributedString>?
+		let totalFiatWorth: Loadable<FiatWorth>
 		let isShowingFiatWorth: Bool
 	}
 
@@ -43,16 +35,19 @@ extension Home {
 					VStack(spacing: .medium1) {
 						HeaderView()
 
-						VStack {
+						VStack(spacing: .small2) {
 							Text("TOTAL VALUE")
 								.foregroundStyle(.app.gray2)
 								.textStyle(.body1Header)
-							TotalCurrencyWorthView(state: .init(isShowingCurrencyWorth: viewStore.isShowingFiatWorth, totalCurrencyWorth: viewStore.totalFiatWorth)) {
+							TotalCurrencyWorthView(
+								state: .init(totalCurrencyWorth: viewStore.totalFiatWorth),
+								backgroundColor: .app.gray4
+							) {
 								viewStore.send(.view(.showFiatWorthToggled))
 							}
 							.foregroundColor(viewStore.isShowingFiatWorth ? .app.gray1 : .app.gray3)
 						}
-						.padding(.medium1)
+						.padding(.horizontal, .medium1)
 
 						VStack(spacing: .medium3) {
 							ForEachStore(

@@ -75,6 +75,12 @@ extension AppPreferencesClient {
 			display.isCurrencyAmountVisible = isCurrencyAmountVisible
 		}
 	}
+
+	public func toggleIsCurrencyAmountVisible() async throws {
+		try await updatingDisplay { display in
+			display.isCurrencyAmountVisible.toggle()
+		}
+	}
 }
 
 // MARK: AppPreferencesClient.Error

@@ -699,7 +699,7 @@ struct TransactionReviewFungibleView: View {
 
 				Spacer(minLength: 0)
 
-				TransactionReviewAmountView(amount: viewState.amount, amountFiatWorth: nil, guaranteedAmount: viewState.guaranteedAmount)
+				TransactionReviewAmountView(amount: viewState.amount, guaranteedAmount: viewState.guaranteedAmount)
 					.padding(.vertical, .medium3)
 			}
 			.padding(.horizontal, .medium3)

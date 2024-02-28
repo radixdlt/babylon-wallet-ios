@@ -99,7 +99,7 @@ extension TransactionClient {
 
 				return FeePayerCandidate(
 					account: account,
-					xrdBalance: portfolio.fungibleResources.xrdResource?.amount ?? .zero
+					xrdBalance: portfolio.fungibleResources.xrdResource?.amount.nominalAmount ?? .zero
 				)
 			}
 

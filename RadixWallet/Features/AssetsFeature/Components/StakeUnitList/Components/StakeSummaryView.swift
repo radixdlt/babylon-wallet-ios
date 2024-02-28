@@ -1,13 +1,13 @@
 // MARK: - StakeSummaryView
 public struct StakeSummaryView: View {
 	public struct ViewState: Hashable, Sendable {
-		public let staked: Loadable<RETDecimal>
-		public let unstaking: Loadable<RETDecimal>
-		public let readyToClaim: Loadable<RETDecimal>
+		public let staked: Loadable<ResourceAmount>
+		public let unstaking: Loadable<ResourceAmount>
+		public let readyToClaim: Loadable<ResourceAmount>
 		public let canClaimStakes: Bool
 
 		public var readyToClaimControlState: ControlState {
-			if !canClaimStakes || readyToClaim.isLoading || readyToClaim.wrappedValue == .zero() {
+			if !canClaimStakes || readyToClaim.isLoading || readyToClaim.wrappedValue?.nominalAmount == .zero() {
 				.disabled
 			} else {
 				.enabled
@@ -60,20 +60,29 @@ extension StakeSummaryView {
 	@ViewBuilder
 	private func summaryRow(
 		_ name: String,
-		amount: Loadable<RETDecimal>,
+		amount: Loadable<ResourceAmount>,
 		titleTextColor: Color = .app.gray2,
 		amountTextColor: Color = .app.gray2
 	) -> some View {
-		HStack {
+		HStack(alignment: .firstTextBaseline) {
 			Text(name)
 				.textStyle(.body2HighImportance)
 				.foregroundColor(titleTextColor)
 				.padding(.trailing, .medium3)
+
 			Spacer()
+
 			loadable(amount, loadingViewHeight: .small1) { amount in
-				Text("\(amount.formatted()) XRD")
-					.textStyle(.body2HighImportance)
-					.foregroundColor(amountTextColor)
+				VStack(alignment: .trailing) {
+					Text("\(amount.nominalAmount.formatted()) XRD")
+						.textStyle(.body2HighImportance)
+						.foregroundColor(amountTextColor)
+					if let fiatWorth = amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
+						Text(fiatWorth)
+							.textStyle(.body2HighImportance)
+							.foregroundStyle(.app.gray2)
+					}
+				}
 			}
 		}
 	}

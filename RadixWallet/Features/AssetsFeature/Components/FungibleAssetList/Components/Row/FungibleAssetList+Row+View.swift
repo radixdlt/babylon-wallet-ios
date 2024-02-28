@@ -6,8 +6,8 @@ extension FungibleAssetList.Section.Row.State {
 		.init(
 			thumbnail: isXRD ? .xrd : .other(token.metadata.iconURL),
 			symbol: token.metadata.symbol ?? token.metadata.name ?? "",
-			tokenAmount: token.amount.formatted(),
-			fiatWorth: token.fiatWorth?.currencyFormatted(applyCustomFont: false),
+			tokenAmount: token.amount.nominalAmount.formatted(),
+			fiatWorth: token.amount.fiatWorth?.currencyFormatted(applyCustomFont: false),
 			isSelected: isSelected
 		)
 	}

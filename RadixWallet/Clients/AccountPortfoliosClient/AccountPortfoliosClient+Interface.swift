@@ -17,6 +17,8 @@ public struct AccountPortfoliosClient: Sendable {
 
 	/// Currently loaded portfolios
 	public var portfolios: Portfolios
+
+	public var totalFiatWorth: TotalFiatWorth
 }
 
 extension AccountPortfoliosClient {
@@ -25,6 +27,7 @@ extension AccountPortfoliosClient {
 	public typealias PortfolioForAccount = @Sendable (_ address: AccountAddress) async -> AnyAsyncSequence<AccountPortfolio>
 	public typealias PortfoliosUpdates = @Sendable () async -> AnyAsyncSequence<[AccountPortfolio]>
 	public typealias Portfolios = @Sendable () -> [AccountPortfolio]
+	public typealias TotalFiatWorth = @Sendable () async -> AnyAsyncSequence<Loadable<FiatWorth>>
 }
 
 extension DependencyValues {

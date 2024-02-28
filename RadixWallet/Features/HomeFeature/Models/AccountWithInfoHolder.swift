@@ -52,7 +52,7 @@ extension DeviceFactorSourceControlled {
 			return
 		}
 
-		let hasValue = xrdResource.amount > 0
+		let hasValue = xrdResource.amount.nominalAmount > 0
 		let hasAlreadyBackedUpMnemonic = userDefaults.getFactorSourceIDOfBackedUpMnemonics().contains(factorSourceID)
 		let exportMnemonicNeeded = !hasAlreadyBackedUpMnemonic && hasValue
 

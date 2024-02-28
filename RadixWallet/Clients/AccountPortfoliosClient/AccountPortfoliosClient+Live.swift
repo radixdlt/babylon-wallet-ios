@@ -1,51 +1,5 @@
 // MARK: - AccountPortfoliosClient + DependencyKey
 extension AccountPortfoliosClient: DependencyKey {
-	public struct AccountPortfolio: Sendable, Hashable {
-		public var account: OnLedgerEntity.Account
-		public var poolUnitDetails: [OnLedgerEntitiesClient.OwnedResourcePoolDetails]
-		public var stakeUnitDetails: [OnLedgerEntitiesClient.OwnedStakeDetails]
-
-		var isCurrencyAmountVisible: Bool = true
-		var fiatCurrency: FiatCurrency = .usd
-
-		var totalFiatWorth: OnLedgerEntity.FiatWorth {
-			let xrdFiatWorth = account.fungibleResources.xrdResource?.fiatWorth?.worth ?? .zero
-			let nonXrdFiatWorth = account.fungibleResources.nonXrdResources.compactMap(\.fiatWorth?.worth).reduce(0, +)
-			let fungibleTokensFiatWorth = xrdFiatWorth + nonXrdFiatWorth
-
-			let stakeUnitsFiatWorth: Double = stakeUnitDetails.map {
-				let stakeUnitFiatWorth = $0.stakeUnitResource?.amounFiatWorth?.worth ?? .zero
-				let stakeClaimsFiatWorth = $0.stakeClaimTokens?.stakeClaims.compactMap(\.claimFiatWorth?.worth).reduce(0, +) ?? .zero
-				return stakeUnitFiatWorth + stakeClaimsFiatWorth
-			}.reduce(0, +)
-
-			let totalFiatWorth = fungibleTokensFiatWorth + stakeUnitsFiatWorth
-
-			return .init(isVisible: isCurrencyAmountVisible, worth: totalFiatWorth, currency: fiatCurrency)
-		}
-	}
-
-	/// Internal state that holds all loaded portfolios.
-	actor State {
-		let portfoliosSubject: AsyncCurrentValueSubject<[AccountAddress: AccountPortfolio]> = .init([:])
-
-		func setOrUpdateAccountPortfolio(_ portfolio: AccountPortfolio) {
-			portfoliosSubject.value.updateValue(portfolio, forKey: portfolio.account.address)
-		}
-
-		func setOrUpdateAccountPortfolios(_ portfolios: [AccountPortfolio]) {
-			var newValue = portfoliosSubject.value
-			for portfolio in portfolios {
-				newValue[portfolio.account.address] = portfolio
-			}
-			portfoliosSubject.value = newValue
-		}
-
-		func portfolioForAccount(_ address: AccountAddress) -> AnyAsyncSequence<AccountPortfolio> {
-			portfoliosSubject.compactMap { $0[address] }.eraseToAnyAsyncSequence()
-		}
-	}
-
 	public static let liveValue: AccountPortfoliosClient = {
 		let state = State()
 
@@ -54,109 +8,44 @@ extension AccountPortfoliosClient: DependencyKey {
 		@Dependency(\.tokenPriceClient) var tokenPriceClient
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
 
+		/// Update currency amount visibility based on the profile state
 		Task {
 			for try await isCurrencyAmountVisible in await appPreferencesClient.appPreferenceUpdates().map(\.display.isCurrencyAmountVisible) {
 				guard !Task.isCancelled else { return }
-				let updated = await updateWithCurrencyVisibility(isCurrencyAmountVisible, Array(state.portfoliosSubject.value.values))
-				await state.setOrUpdateAccountPortfolios(updated)
+				await state.setIsCurrencyAmountVisble(isCurrencyAmountVisible)
 			}
 		}
 
-		@Sendable
-		func updateWithCurrencyVisibility(
-			_ isCurrencyAmountVisible: Bool,
-			_ portfolios: [AccountPortfolio]
-		) async -> [AccountPortfolio] {
-			var portfolios = portfolios
-			if !isCurrencyAmountVisible {
-				portfolios.mutateAll { portfolio in
-					portfolio.isCurrencyAmountVisible = false
-					portfolio.account.fungibleResources.nonXrdResources.mutateAll { resource in
-						resource.fiatWorth?.isVisible = false
-					}
-					portfolio.account.fungibleResources.xrdResource?.fiatWorth?.isVisible = false
-					portfolio.account.poolUnitResources.radixNetworkStakes.mutateAll { stake in
-						stake.stakeUnitResource?.fiatWorth?.isVisible = false
-					}
-					portfolio.account.fungibleResources.nonXrdResources.sort(by: <)
-				}
-
-				return portfolios
-			} else {
-				// all resources and lsus
-				let allTokens: [ResourceAddress] = try! [
-					.init(validatingAddress: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"),
-					.init(validatingAddress: "resource_rdx1t4zrksrzh7ucny7r57ss99nsrxscqwh8crjn6k22m8e9qyxh8c05pl"),
-					.init(validatingAddress: "resource_rdx1t4nxvalrqpqaxv9cvmghk5yyl5u47mgj33npthwfupszvm8ezgy5x0"),
-					.init(validatingAddress: "resource_rdx1t5n6agexw646tgu3lkr8n0nvt69z00384mhrlfuxz75wprtg9wwllq"),
-					.init(validatingAddress: "resource_rdx1thsg68perylkawv6w9vuf9ctrjl6pjhh2vrhp5v4q0vxul7a5ws8wz"),
-				]
-
-				// accounts.flatMap { $0.fungibleResources.nonXrdResources.map { $0.resourceAddress } }
-				let allLsus: [ResourceAddress] = try! [
-					.init(validatingAddress: "resource_rdx1tkfxrsffdlh82fjxjwpgrgrgcmc7cfe0sy99c7vm6gsnujelupglnj"),
-					.init(validatingAddress: "resource_rdx1t5x9fx6vjyk5x77vtqtzchxdlk5p9hgp8vpz8v3s0dzdu0dmps58pu"),
-					.init(validatingAddress: "resource_rdx1thnr43ane3jrxlj6m230n6mf2n5fmmpj029maw9u60jhmjs6p4tfun"),
-					.init(validatingAddress: "resource_rdx1th3adk93ale3n8nzrypghtkasczmpt42qamq7x5dy8lsu3uwycvh4n"),
-					.init(validatingAddress: "resource_rdx1t493qnkufdgy57p034e2rny6gn7lf8a4zh8v68fpecs7vl7lv5qajv"),
-				]
-				//                accounts.flatMap { $0.poolUnitResources.radixNetworkStakes.compactMap(\.stakeClaimResource?.resourceAddress)
-				//                }
-
-				let tokenPrices = try? await tokenPriceClient.getTokenPrices(.init(tokens: Array(allTokens.prefix(5)), lsus: Array(allLsus)))
-				let xrdPrice = tokenPrices!.tokens[id: .init(address: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd", decodedKind: .globalFungibleResourceManager)]!.price
-
-				let new = portfolios.map { portfolio in
-					var portfolio = portfolio
-					portfolio.isCurrencyAmountVisible = true
-					let sortedByPrice = portfolio.account.fungibleResources.nonXrdResources.map { resource in
-						let price = tokenPrices?.tokens.randomElement()?.price
-						var resource = resource
-						resource.fiatWorth = price.map {
-							.init(
-								isVisible: true,
-								worth: $0.price * (try! resource.amount.asDouble()),
-								currency: $0.currency
-							)
-						}
-						return resource
-					}.sorted(by: <)
-					let xrdResource = portfolio.account.fungibleResources.xrdResource.map {
-						var res = $0
-						let price = tokenPrices?.tokens[id: .init(address: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd", decodedKind: .globalFungibleResourceManager)]?.price
-						res.fiatWorth = price.map {
-							.init(
-								isVisible: true,
-								worth: $0.price * (try! res.amount.asDouble()),
-								currency: $0.currency
-							)
-						}
-						return res
-					}
-					portfolio.account.fungibleResources = .init(xrdResource: xrdResource, nonXrdResources: sortedByPrice)
-					portfolio.stakeUnitDetails.mutateAll { details in
-						let stakeUnitAmount = details.stakeUnitResource?.amount
-						details.stakeUnitResource?.amounFiatWorth = stakeUnitAmount.map {
-							.init(
-								isVisible: true,
-								worth: xrdPrice.price * (try! $0.asDouble()),
-								currency: xrdPrice.currency
-							)
-						}
-						details.stakeClaimTokens?.stakeClaims.mutateAll { token in
-							let xrdAmount = token.claimAmount
-							token.claimFiatWorth = .init(
-								isVisible: true,
-								worth: xrdPrice.price * (try! xrdAmount.asDouble()),
-								currency: xrdPrice.currency
-							)
-						}
-					}
-					return portfolio
-				}
-
-				return new
+		/// Update used currency based on the profile state
+		Task {
+			for try await fiatCurrency in await appPreferencesClient.appPreferenceUpdates().map(\.display.fiatCurrencyPriceTarget) {
+				guard !Task.isCancelled else { return }
+				await state.setSelectedCurrency(fiatCurrency)
 			}
+		}
+
+		/// Fetches the pool and stake units details for a given account; Will update the portfolio accordingly
+		@Sendable
+		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.Account) async {
+			async let pooldetailsFetch = Task {
+				do {
+					let poolUnitDetails = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account)
+					await state.set(poolDetails: .success(poolUnitDetails), forAccount: account.address)
+				} catch {
+					await state.set(poolDetails: .failure(error), forAccount: account.address)
+				}
+			}.result
+			async let poolUnitsFetch = Task {
+				do {
+					try await Task.sleep(for: .seconds(Double.random(in: 3 ..< 5)))
+					let stakeUnitDetails = try await onLedgerEntitiesClient.getOwnedStakesDetails(account: account)
+					await state.set(stakeUnitDetails: .success(stakeUnitDetails.asIdentifiable()), forAccount: account.address)
+				} catch {
+					await state.set(stakeUnitDetails: .failure(error), forAccount: account.address)
+				}
+			}.result
+
+			_ = await (pooldetailsFetch, pooldetailsFetch)
 		}
 
 		return AccountPortfoliosClient(
@@ -167,35 +56,54 @@ extension AccountPortfoliosClient: DependencyKey {
 					}
 				}
 
-				let accounts = try await onLedgerEntitiesClient.getAccounts(accountAddresses)
-				let allPoolAndStakeUnitAddresses = accounts.flatMap { account in
-					account.poolUnitResources.fungibleResourceAddresses + account.poolUnitResources.nonFungibleResourceAddresses
+				/// Explicetely load and set the currency target and visibility to make sure
+				/// it is available for usage before resources are loaded
+				let preferences = await appPreferencesClient.getPreferences().display
+				await state.setSelectedCurrency(preferences.fiatCurrencyPriceTarget)
+				await state.setIsCurrencyAmountVisble(preferences.isCurrencyAmountVisible)
+
+				let accounts = try await onLedgerEntitiesClient.getAccounts(accountAddresses).map(\.nonEmptyVaults)
+				let portfolios = accounts.map { AccountPortfolio(account: $0) }
+
+				let allResources = accounts.flatMap {
+					$0.allFungibleResourceAddresses + $0.poolUnitResources.poolUnits.flatMap(\.poolResources)
 				}
 
-				let isCurrencyAmountVisible = await appPreferencesClient.getPreferences().display.isCurrencyAmountVisible
+				// Temporary for testing purposes
+				let allTokens: [ResourceAddress] = try! [
+					.init(validatingAddress: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"),
+					.init(validatingAddress: "resource_rdx1t4zrksrzh7ucny7r57ss99nsrxscqwh8crjn6k22m8e9qyxh8c05pl"),
+					.init(validatingAddress: "resource_rdx1t4nxvalrqpqaxv9cvmghk5yyl5u47mgj33npthwfupszvm8ezgy5x0"),
+					.init(validatingAddress: "resource_rdx1t5n6agexw646tgu3lkr8n0nvt69z00384mhrlfuxz75wprtg9wwllq"),
+					.init(validatingAddress: "resource_rdx1thsg68perylkawv6w9vuf9ctrjl6pjhh2vrhp5v4q0vxul7a5ws8wz"),
+				]
 
-				let portfolios = try await accounts.parallelMap {
-					let detailsS = try await onLedgerEntitiesClient.getOwnedStakesDetails(account: $0)
-					let detailsP = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails($0)
+				let prices = try await tokenPriceClient.getTokenPrices(.init(
+					tokens: allTokens,
+					currency: preferences.fiatCurrencyPriceTarget
+				))
+				await state.setTokenPrices(prices)
 
-					return AccountPortfolio(account: $0, poolUnitDetails: detailsP, stakeUnitDetails: detailsS)
-				}
-				await state.setOrUpdateAccountPortfolios(updateWithCurrencyVisibility(isCurrencyAmountVisible, portfolios))
+				await state.handlePortfoliosUpdated(portfolios)
 
-				return portfolios
+				// Load additional details
+				_ = await accounts.parallelMap(fetchPoolAndStakeUnitsDetails)
+
+				return Array(state.portfoliosSubject.value.wrappedValue!.values)
 			},
 			fetchAccountPortfolio: { accountAddress, forceRefresh in
 				if forceRefresh {
 					cacheClient.removeFolder(.onLedgerEntity(.account(accountAddress.asGeneral)))
 				}
 
-				var account = try await onLedgerEntitiesClient.getAccount(accountAddress)
-				let detailsS = try await onLedgerEntitiesClient.getOwnedStakesDetails(account: account)
-				let detailsP = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account)
+				let account = try await onLedgerEntitiesClient.getAccount(accountAddress)
+				var portfolio = AccountPortfolio(account: account)
 
-				let portfolio = AccountPortfolio(account: account, poolUnitDetails: detailsP, stakeUnitDetails: detailsS)
-
+				await state.applyCurrencyVisibility(&portfolio)
+				await state.applyTokenPrices(to: &portfolio)
 				await state.setOrUpdateAccountPortfolio(portfolio)
+
+				await fetchPoolAndStakeUnitsDetails(account)
 
 				return portfolio
 			},
@@ -203,9 +111,35 @@ extension AccountPortfoliosClient: DependencyKey {
 				await state.portfolioForAccount(address)
 			},
 			portfoliosUpdates: {
-				state.portfoliosSubject.map { Array($0.values) }.eraseToAnyAsyncSequence()
+				state.portfoliosSubject.compactMap { $0.wrappedValue.map { Array($0.values) } }.eraseToAnyAsyncSequence()
 			},
-			portfolios: { state.portfoliosSubject.value.map(\.value) }
+			portfolios: { state.portfoliosSubject.value.wrappedValue.map { Array($0.values) } ?? [] },
+			totalFiatWorth: {
+				state.portfoliosSubject
+					.eraseToAnyAsyncSequence()
+					.map {
+						let isCurrencyAmountVisible = await state.isCurrencyAmountVisible
+						let selectedCurrency = await state.selectedCurrency
+
+						return $0.values.flatMap { values in
+							let zero = FiatWorth(
+								isVisible: isCurrencyAmountVisible,
+								worth: .zero,
+								currency: selectedCurrency
+							)
+
+							let result: Loadable<FiatWorth> = values
+								.map(\.totalFiatWorth)
+								.reduce(.success(zero)) {
+									$0.reduce($1, join: +)
+								}
+
+							return result
+						}
+					}
+					.removeDuplicates()
+					.eraseToAnyAsyncSequence()
+			}
 		)
 	}()
 }
@@ -219,62 +153,28 @@ extension NumberFormatter {
 	}()
 }
 
-extension OnLedgerEntity.FiatWorth {
-	func currencyFormatted(applyCustomFont: Bool) -> AttributedString? {
-		let formatter = NumberFormatter()
-		formatter.numberStyle = .currency
-		formatter.currencyCode = currency.currencyCode
-		if self.worth < 1 {
-			formatter.maximumFractionDigits = 10
-		}
+// MARK: - TokenAmountWithFiatWorth
+public struct TokenAmountWithFiatWorth: Hashable, Sendable {
+	public let amount: RETDecimal
+	public let fiatWorth: FiatWorth?
 
-		var attributedString = AttributedString(formatter.string(for: self.worth)!)
+	public static let zero = TokenAmountWithFiatWorth(amount: 0, fiatWorth: nil)
 
-		let currencySymbol = formatter.currencySymbol ?? ""
-		let symbolRange = attributedString.range(of: currencySymbol)
-
-		guard isVisible else {
-			let hiddenValue = "• • • •"
-			if symbolRange!.lowerBound == attributedString.startIndex {
-				return AttributedString(currencySymbol + hiddenValue)
-			} else {
-				return AttributedString(hiddenValue + currencySymbol)
-			}
-		}
-
-		guard applyCustomFont else {
-			return attributedString
-		}
-
-		// Define font sizes
-		let symbolFontSize: CGFloat = 12
-		let mainFontSize: CGFloat = 18
-
-		// Apply main font size to entire string
-		attributedString.font = .app.sheetTitle
-		attributedString.kern = -0.5
-
-		let decimalSeparator = formatter.decimalSeparator ?? "."
-
-		if let symbolRange = attributedString.range(of: currencySymbol) {
-			attributedString[symbolRange].font = .app.sectionHeader
-			attributedString[symbolRange].kern = 0.0
-		}
-
-		if let decimalRange = attributedString.range(of: decimalSeparator) {
-			attributedString[decimalRange.lowerBound...].font = .app.sectionHeader
-			attributedString[decimalRange.lowerBound...].kern = 0.0
-		}
-
-		return attributedString
-	}
-}
-
-extension FiatCurrency {
-	var currencyCode: String {
-		switch self {
-		case .usd:
-			"USD"
-		}
+	public static func + (lhs: TokenAmountWithFiatWorth, rhs: TokenAmountWithFiatWorth) -> TokenAmountWithFiatWorth {
+		.init(
+			amount: lhs.amount + rhs.amount,
+			fiatWorth: {
+				switch (lhs.fiatWorth, rhs.fiatWorth) {
+				case let (lhsFiatWorth?, nil):
+					lhsFiatWorth
+				case let (nil, rhsFiatWorth?):
+					rhsFiatWorth
+				case let (lhsFiatWorth?, rhsFiatWorth?):
+					lhsFiatWorth + rhsFiatWorth
+				case (nil, nil):
+					nil
+				}
+			}()
+		)
 	}
 }

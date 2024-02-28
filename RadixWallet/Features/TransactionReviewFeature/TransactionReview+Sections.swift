@@ -859,7 +859,7 @@ extension TransactionReview {
 					details: .init(
 						address: poolContribution.poolAddress.asSpecific(),
 						dAppName: resourceAssociatedDapps?[resourceAddress]?.name,
-						poolUnitResource: .init(resource: resource, amount: amount, amounFiatWorth: nil),
+						poolUnitResource: .init(resource: resource, amount: .init(nominalAmount: amount)),
 						xrdResource: xrdResource,
 						nonXrdResources: nonXrdResources
 					),
@@ -896,8 +896,7 @@ extension TransactionReview {
 				return OnLedgerEntitiesClient.StakeClaim(
 					validatorAddress: stakeClaimValidator.address,
 					token: token,
-					claimAmount: data.claimAmount,
-					claimFiatWorth: nil,
+					claimAmount: .init(nominalAmount: data.claimAmount),
 					reamainingEpochsUntilClaim: nil
 				)
 			}
@@ -909,8 +908,7 @@ extension TransactionReview {
 				return OnLedgerEntitiesClient.StakeClaim(
 					validatorAddress: stakeClaimValidator.address,
 					token: token,
-					claimAmount: claimAmount,
-					claimFiatWorth: nil,
+					claimAmount: .init(nominalAmount: claimAmount),
 					reamainingEpochsUntilClaim: data.claimEpoch.map { Int($0) - Int(resource.atLedgerState.epoch) }
 				)
 			}

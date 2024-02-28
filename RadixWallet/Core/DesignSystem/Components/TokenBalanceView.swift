@@ -3,22 +3,19 @@ public struct TokenBalanceView: View {
 	public struct ViewState: Equatable {
 		public let thumbnail: Thumbnail.TokenContent
 		public let name: String
-		public let balance: RETDecimal
-		public let balanceFiatWorth: OnLedgerEntity.FiatWorth?
+		public let balance: ResourceAmount
 		public let iconSize: HitTargetSize
 
 		public init(
 			thumbnail: Thumbnail.TokenContent,
 			name: String,
-			balance: RETDecimal,
-			iconSize: HitTargetSize = .smallest,
-			balanceFiatWorth: OnLedgerEntity.FiatWorth? = nil
+			balance: ResourceAmount,
+			iconSize: HitTargetSize = .smallest
 		) {
 			self.thumbnail = thumbnail
 			self.name = name
 			self.balance = balance
 			self.iconSize = iconSize
-			self.balanceFiatWorth = balanceFiatWorth
 		}
 	}
 
@@ -39,11 +36,11 @@ public struct TokenBalanceView: View {
 
 			Spacer()
 			VStack(alignment: .trailing) {
-				Text(viewState.balance.formatted())
+				Text(viewState.balance.nominalAmount.formatted())
 					.foregroundColor(.app.gray1)
 					.textStyle(.secondaryHeader)
 
-				if let worth = viewState.balanceFiatWorth {
+				if let worth = viewState.balance.fiatWorth {
 					Text(worth.currencyFormatted(applyCustomFont: false)!)
 						.textStyle(.body2HighImportance)
 						.foregroundStyle(.app.gray2)
@@ -64,12 +61,11 @@ public struct TokenBalanceView: View {
 }
 
 extension TokenBalanceView.ViewState {
-	public static func xrd(balance: RETDecimal, balanceFiatWorth: OnLedgerEntity.FiatWorth?) -> Self {
+	public static func xrd(balance: ResourceAmount) -> Self {
 		.init(
 			thumbnail: .xrd,
 			name: Constants.xrdTokenName,
-			balance: balance,
-			balanceFiatWorth: balanceFiatWorth
+			balance: balance
 		)
 	}
 }

@@ -12,7 +12,7 @@ public struct Home: Sendable, FeatureReducer {
 
 		public var showRadixBanner: Bool = false
 		var showFiatWorth: Bool = true
-		var accountPortfolios: Loadable<[AccountPortfoliosClient.AccountPortfolio]> = .loading
+		var totalFiatWorth: Loadable<FiatWorth> = .loading
 
 		// MARK: - Destination
 		@PresentationState
@@ -38,8 +38,7 @@ public struct Home: Sendable, FeatureReducer {
 		case exportMnemonic(account: Profile.Network.Account)
 		case importMnemonic
 		case loadedShouldWriteDownPersonasSeedPhrase(Bool)
-		case loadIsCurrencyAmountVisible(Bool)
-		case loadedPortfolios([AccountPortfoliosClient.AccountPortfolio])
+		case totalFiatWorthLoaded(Loadable<FiatWorth>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -119,7 +118,7 @@ public struct Home: Sendable, FeatureReducer {
 					]
 				))
 			}
-			return loadAccountsPortfolios()
+			return .none
 
 		case .task:
 			state.showRadixBanner = userDefaults.showRadixBanner
@@ -134,7 +133,7 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			.merge(with: checkAccountsAccessToMnemonic(state: state))
 			.merge(with: loadShouldWriteDownPersonasSeedPhrase())
-			.merge(with: loadIsCurrencyAmountVisible())
+			.merge(with: loadTotalFiatWorth())
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(
@@ -164,9 +163,8 @@ public struct Home: Sendable, FeatureReducer {
 			return .send(.delegate(.displaySettings))
 
 		case .showFiatWorthToggled:
-
 			return .run { [isCurrencyAmountVisible = state.showFiatWorth] _ in
-				try await appPreferencesClient.update(isCurrencyAmountVisible: !isCurrencyAmountVisible)
+				try await appPreferencesClient.toggleIsCurrencyAmountVisible()
 			}
 		}
 	}
@@ -187,13 +185,8 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			.merge(with: checkAccountsAccessToMnemonic(state: state))
 
-		case let .loadedPortfolios(portfolios):
-			state.accountPortfolios = .success(portfolios)
-			state.accountRows.mutateAll { rowState in
-				if let portfolio = portfolios.first(where: { $0.account.address == rowState.id }) {
-					rowState.portfolio = .success(portfolio)
-				}
-			}
+		case let .totalFiatWorthLoaded(totalFiatWorth):
+			state.totalFiatWorth.refresh(from: totalFiatWorth)
 			return .none
 
 		case let .accountsLoadedResult(.failure(error)):
@@ -202,10 +195,6 @@ public struct Home: Sendable, FeatureReducer {
 
 		case let .loadedShouldWriteDownPersonasSeedPhrase(shouldBackup):
 			state.shouldWriteDownPersonasSeedPhrase = shouldBackup
-			return .none
-
-		case let .loadIsCurrencyAmountVisible(isVisible):
-			state.showFiatWorth = isVisible
 			return .none
 
 		case let .exportMnemonic(account):
@@ -318,22 +307,13 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	private func loadIsCurrencyAmountVisible() -> Effect<Action> {
+	public func loadTotalFiatWorth() -> Effect<Action> {
 		.run { send in
-			for try await isCurrencyAmountVisible in await appPreferencesClient.appPreferenceUpdates().map(\.display.isCurrencyAmountVisible) {
-				guard !Task.isCancelled else { return }
-				await send(.internal(.loadIsCurrencyAmountVisible(isCurrencyAmountVisible)))
-			}
-		}
-	}
-
-	public func loadAccountsPortfolios() -> Effect<Action> {
-		.run { send in
-			for try await portfolios in await accountPortfoliosClient.portfoliosUpdates().debounce(for: .seconds(0.1)) {
+			for try await totalFiatWorth in await accountPortfoliosClient.totalFiatWorth() {
 				guard !Task.isCancelled else { return }
 
-				await send(.internal(.loadedPortfolios(
-					portfolios
+				await send(.internal(.totalFiatWorthLoaded(
+					totalFiatWorth
 				)))
 			}
 		}

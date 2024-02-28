@@ -38,6 +38,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		public var isLoadingResources: Bool = false
 		public var isRefreshing: Bool = false
 		public let mode: Mode
+		public var totalFiatWorth: Loadable<FiatWorth> = .loading
 
 		public init(account: Profile.Network.Account, mode: Mode = .normal) {
 			self.init(
@@ -94,7 +95,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			public let poolUnitsList: PoolUnitsList.State?
 		}
 
-		case resourcesStateUpdated(ResourcesState)
+		case portfolioUpdated(AccountPortfoliosClient.AccountPortfolio)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -128,15 +129,11 @@ public struct AssetsView: Sendable, FeatureReducer {
 		case .task:
 			state.isLoadingResources = true
 			state.accountPortfolio = .loading
-			return .run { [address = state.account.address, mode = state.mode] send in
-				for try await portfolio in await accountPortfoliosClient.portfolioForAccount(address).debounce(for: .seconds(0.1)) {
+			return .run { [state] send in
+				for try await portfolio in await accountPortfoliosClient.portfolioForAccount(state.account.address).debounce(for: .seconds(0.1)) {
 					guard !Task.isCancelled else { return }
 
-					await send(.internal(.resourcesStateUpdated(createResourcesState(
-						from: portfolio,
-						mode: mode
-					)
-					)))
+					await send(.internal(.portfolioUpdated(portfolio)))
 				}
 			} catch: { error, _ in
 				loggerGlobal.error("AssetsView portfolioForAccount failed: \(error)")
@@ -146,7 +143,6 @@ public struct AssetsView: Sendable, FeatureReducer {
 			return .none
 		case .pullToRefreshStarted:
 			state.isRefreshing = true
-			state.accountPortfolio = .loading
 			return .run { [address = state.account.address] _ in
 				_ = try await accountPortfoliosClient.fetchAccountPortfolio(address, true)
 			} catch: { error, _ in
@@ -161,37 +157,19 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .resourcesStateUpdated(resourcesState):
-			state.accountPortfolio = .success(resourcesState.portfolio)
+		case let .portfolioUpdated(portfolio):
 			state.isLoadingResources = false
-			state.fungibleTokenList = resourcesState.fungibleTokenList
-			state.nonFungibleTokenList = resourcesState.nonFungibleTokenList
-			state.stakeUnitList = resourcesState.stakeUnitList
-			state.poolUnitsList = resourcesState.poolUnitsList
-
 			state.isRefreshing = false
-
-			let shouldRefreshPoolUnitList = resourcesState.poolUnitsList != nil
-				&& (state.activeAssetKind == .poolUnits || state.isRefreshing)
-
-			let shouldRefreshStakeUnitList = resourcesState.stakeUnitList != nil
-				&& (state.activeAssetKind == .stakeUnits || state.isRefreshing)
-
-			return .run { send in
-				if shouldRefreshPoolUnitList {
-					await send(.child(.poolUnitsList(.view(.refresh))))
-				}
-				if shouldRefreshStakeUnitList {
-					await send(.child(.stakeUnitList(.view(.refresh))))
-				}
-			}
+			updateFromPortfolio(state: &state, from: portfolio)
+			return .none
 		}
 	}
 
-	private func createResourcesState(
-		from portfolio: AccountPortfoliosClient.AccountPortfolio,
-		mode: State.Mode
-	) async -> InternalAction.ResourcesState {
+	private func updateFromPortfolio(
+		state: inout State,
+		from portfolio: AccountPortfoliosClient.AccountPortfolio
+	) {
+		let mode = state.mode
 		let xrd = portfolio.account.fungibleResources.xrdResource.map { token in
 			FungibleAssetList.Section.Row.State(
 				xrdToken: token,
@@ -216,26 +194,6 @@ public struct AssetsView: Sendable, FeatureReducer {
 			)
 		}
 
-		let poolUnitList: PoolUnitsList.State? = {
-			if !portfolio.account.poolUnitResources.poolUnits.isEmpty {
-				return .init(
-					poolUnits: .init(
-						uncheckedUniqueElements: portfolio.account.poolUnitResources.poolUnits
-							.map {
-								PoolUnit.State(
-									poolUnit: $0,
-									isSelected: mode
-										.nonXrdRowSelected($0.resource.resourceAddress)
-								)
-							}
-					),
-					account: portfolio.account
-				)
-			}
-
-			return nil
-		}()
-
 		let fungibleTokenList: FungibleAssetList.State? = {
 			var sections: IdentifiedArrayOf<FungibleAssetList.Section.State> = []
 			if let xrd {
@@ -253,7 +211,32 @@ public struct AssetsView: Sendable, FeatureReducer {
 			return .init(sections: sections)
 		}()
 
+		state.accountPortfolio.refresh(from: .success(portfolio))
+
+		let poolUnitList: PoolUnitsList.State? = {
+			if !portfolio.account.poolUnitResources.poolUnits.isEmpty {
+				return .init(
+					poolUnits: .init(
+						uncheckedUniqueElements: portfolio.account.poolUnitResources.poolUnits
+							.map { poolUnit in
+								PoolUnit.State(
+									poolUnit: poolUnit,
+									resourceDetails: state.accountPortfolio.poolUnitDetails.flatten().map {
+										$0.first { poolUnit.resourcePoolAddress == $0.address }!
+									},
+									isSelected: mode
+										.nonXrdRowSelected(poolUnit.resource.resourceAddress)
+								)
+							}
+					)
+				)
+			}
+
+			return nil
+		}()
+
 		let stakes = portfolio.account.poolUnitResources.radixNetworkStakes
+
 		let stakeUnitList: StakeUnitList.State? = stakes.isEmpty ? nil : .init(
 			account: portfolio.account,
 			selectedLiquidStakeUnits: mode.selectedAssets.map { assets in
@@ -273,16 +256,32 @@ public struct AssetsView: Sendable, FeatureReducer {
 						dict[resource] = selectedtokens
 					}
 				} : nil,
-			stakeUnitDetails: portfolio.stakeUnitDetails.asIdentifiable()
+			stakeUnitDetails: state.accountPortfolio.stakeUnitDetails.flatten()
 		)
 
-		return .init(
-			portfolio: portfolio,
-			fungibleTokenList: fungibleTokenList,
-			nonFungibleTokenList: !nfts.isEmpty ? .init(rows: .init(uniqueElements: nfts)) : nil,
-			stakeUnitList: stakeUnitList,
-			poolUnitsList: poolUnitList
-		)
+		state.totalFiatWorth.refresh(from: portfolio.totalFiatWorth)
+		state.fungibleTokenList = fungibleTokenList
+		state.nonFungibleTokenList = !nfts.isEmpty ? .init(rows: .init(uniqueElements: nfts)) : nil
+		state.stakeUnitList = stakeUnitList
+		state.poolUnitsList = poolUnitList
+	}
+}
+
+extension AccountPortfoliosClient.AccountPortfolio {
+	mutating func update(from portfolio: AccountPortfoliosClient.AccountPortfolio) {
+		self.account = portfolio.account
+		self.stakeUnitDetails.refresh(from: portfolio.stakeUnitDetails)
+		self.poolUnitDetails.refresh(from: portfolio.poolUnitDetails)
+	}
+}
+
+extension Loadable where Value == AccountPortfoliosClient.AccountPortfolio {
+	mutating func refresh(from portfolio: Loadable<Value>) {
+		self.refresh(from: portfolio, valueChangeMap: { old, new in
+			var old = old
+			old.update(from: new)
+			return old
+		})
 	}
 }
 

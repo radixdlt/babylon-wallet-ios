@@ -10,8 +10,7 @@ extension AccountDetails.State {
 			mnemonicHandlingCallToAction: mnemonicHandlingCallToAction,
 			isLedgerAccount: account.isLedgerAccount,
 			showToolbar: destination == nil,
-			totalFiatWorth: assets.accountPortfolio.totalFiatWorth.map { $0.currencyFormatted(applyCustomFont: true)! },
-			isShowingFiatWorth: showFiatWorth
+			totalFiatWorth: assets.totalFiatWorth
 		)
 	}
 }
@@ -25,8 +24,7 @@ extension AccountDetails {
 		let mnemonicHandlingCallToAction: MnemonicHandling?
 		let isLedgerAccount: Bool
 		let showToolbar: Bool
-		let totalFiatWorth: Loadable<AttributedString>?
-		let isShowingFiatWorth: Bool
+		let totalFiatWorth: Loadable<FiatWorth>
 	}
 
 	@MainActor
@@ -43,18 +41,16 @@ extension AccountDetails {
 					AddressView(.address(.account(viewStore.accountAddress, isLedgerHWAccount: viewStore.isLedgerAccount)))
 						.foregroundColor(.app.whiteTransparent)
 						.textStyle(.body2HighImportance)
-						.padding(.bottom, .medium1)
+						.padding(.bottom, .small1)
 
-					if let totalFiatWorth = viewStore.totalFiatWorth {
-						TotalCurrencyWorthView(state: .init(
-							isShowingCurrencyWorth: viewStore.isShowingFiatWorth,
-							totalCurrencyWorth: totalFiatWorth
-						)) {
-							viewStore.send(.showFiatWorthToggled)
-						}
-						.foregroundColor(.app.white)
-						.padding(.medium1)
+					TotalCurrencyWorthView(
+						state: .init(totalCurrencyWorth: viewStore.totalFiatWorth),
+						backgroundColor: .clear
+					) {
+						viewStore.send(.showFiatWorthToggled)
 					}
+					.foregroundColor(.app.white)
+					.padding([.bottom, .horizontal], .medium1)
 
 					prompts(
 						mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction

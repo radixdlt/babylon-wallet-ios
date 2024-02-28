@@ -1,22 +1,22 @@
 struct TotalCurrencyWorthView: View {
 	struct State: Hashable, Sendable {
-		let isShowingCurrencyWorth: Bool
-		let totalCurrencyWorth: Loadable<AttributedString>
+		let totalCurrencyWorth: Loadable<FiatWorth>
 	}
 
 	let state: State
+	let backgroundColor: Color
 	let onTap: () -> Void
 
 	var body: some View {
-		loadable(state.totalCurrencyWorth) { totalCurrencyWorth in
+		loadable(state.totalCurrencyWorth, backgroundColor: backgroundColor) { totalCurrencyWorth in
 			Button {
 				onTap()
 			} label: {
 				HStack {
-					Text(totalCurrencyWorth)
+					Text(totalCurrencyWorth.currencyFormatted(applyCustomFont: true)!)
 						.textStyle(.sheetTitle)
 
-					Image(asset: state.isShowingCurrencyWorth ? AssetResource.homeAggregatedValueShown : AssetResource.homeAggregatedValueHidden)
+					Image(asset: totalCurrencyWorth.isVisible ? AssetResource.homeAggregatedValueShown : AssetResource.homeAggregatedValueHidden)
 				}
 			}
 		}

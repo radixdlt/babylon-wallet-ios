@@ -9,12 +9,14 @@ extension Home {
 			public var accountWithInfo: AccountWithInfo
 
 			public var portfolio: Loadable<AccountPortfoliosClient.AccountPortfolio>
+			public var totalFiatWorth: Loadable<FiatWorth>
 
 			public init(
 				account: Profile.Network.Account
 			) {
 				self.accountWithInfo = .init(account: account)
 				self.portfolio = .loading
+				self.totalFiatWorth = .loading
 			}
 		}
 
@@ -72,11 +74,13 @@ extension Home {
 		public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 			switch internalAction {
 			case let .accountPortfolioUpdate(portfolio):
+				print("Portfolio update called \(portfolio.account.address)")
 				state.isDappDefinitionAccount = portfolio.account.metadata.accountType == .dappDefinition
 
 				assert(portfolio.account.address == state.account.address)
 
 				state.portfolio = .success(portfolio)
+				state.totalFiatWorth.refresh(from: portfolio.totalFiatWorth)
 				return .send(.internal(.checkAccountAccessToMnemonic))
 
 			case .checkAccountAccessToMnemonic:

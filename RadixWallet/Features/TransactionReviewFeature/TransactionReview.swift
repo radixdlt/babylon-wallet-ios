@@ -361,7 +361,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 						ownedFungibleResource: .init(
 							resourceAddress: transfer.resource.resourceAddress,
 							atLedgerState: transfer.resource.atLedgerState,
-							amount: details.amount,
+							amount: .init(nominalAmount: details.amount),
 							metadata: transfer.resource.metadata
 						),
 						isXRD: details.isXRD
@@ -379,7 +379,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			case let .liquidStakeUnit(details):
 				state.destination = .lsuDetails(.init(
 					validator: details.validator,
-					stakeUnitResource: .init(resource: details.resource, amount: details.amount, amounFiatWorth: nil),
+					stakeUnitResource: .init(resource: details.resource, amount: .init(nominalAmount: details.amount)),
 					xrdRedemptionValue: details.worth
 				))
 
@@ -928,7 +928,7 @@ extension TransactionReview {
 			case let .liquidStakeUnit(liquidStakeUnit):
 				liquidStakeUnit.amount
 			case let .poolUnit(poolUnit):
-				poolUnit.details.poolUnitResource.amount
+				poolUnit.details.poolUnitResource.amount.nominalAmount
 			case .nonFungible, .stakeClaimNFT:
 				nil
 			}

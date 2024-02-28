@@ -1178,7 +1178,6 @@
 		83AAAC6D2B483D1B00222B64 /* StakeSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AAAC6B2B483D1B00222B64 /* StakeSummaryView.swift */; };
 		83D0B5692AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */; };
 		83D663B02B271D0100D1AB9E /* TruncationMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D663AF2B271D0100D1AB9E /* TruncationMask.swift */; };
-		83D94D742B7F77E000CB506A /* FiatWorth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D94D732B7F77E000CB506A /* FiatWorth.swift */; };
 		83DFAF2E2B4E8A51008B70CE /* View+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83DFAF2D2B4E8A51008B70CE /* View+Extra.swift */; };
 		83EA887E2B7E68EE00FF8424 /* TotalCurrencyWorthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EA887D2B7E68EE00FF8424 /* TotalCurrencyWorthView.swift */; };
 		83EE47502AF027DF00155F03 /* AssetTransferDepositRuleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */; };
@@ -1223,6 +1222,9 @@
 		83EE47A22AF0EECD00155F03 /* TransactionFungibleBalanceChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE479D2AF0EECD00155F03 /* TransactionFungibleBalanceChanges.swift */; };
 		83EE47A32AF0EECD00155F03 /* TransactionBalanceChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE479E2AF0EECD00155F03 /* TransactionBalanceChanges.swift */; };
 		83EE47A42AF0EECD00155F03 /* TransactionFungibleFeeBalanceChangeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE479F2AF0EECD00155F03 /* TransactionFungibleFeeBalanceChangeType.swift */; };
+		83EE48DE2B8F4081006CE672 /* AccountPortfoliosClient+State.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE48DD2B8F4081006CE672 /* AccountPortfoliosClient+State.swift */; };
+		83EE48E02B8F68B5006CE672 /* FiatWorth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE48DF2B8F68B5006CE672 /* FiatWorth.swift */; };
+		83EE48E22B8F69D6006CE672 /* ResourceAmount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EE48E12B8F69D6006CE672 /* ResourceAmount.swift */; };
 		83FDF7EC2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83FDF7EB2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift */; };
 		A41266EF2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266EE2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift */; };
 		A41266F12B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift */; };
@@ -2505,7 +2507,6 @@
 		83AAAC6B2B483D1B00222B64 /* StakeSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StakeSummaryView.swift; sourceTree = "<group>"; };
 		83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixEngineToolkitError+Description.swift"; sourceTree = "<group>"; };
 		83D663AF2B271D0100D1AB9E /* TruncationMask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TruncationMask.swift; sourceTree = "<group>"; };
-		83D94D732B7F77E000CB506A /* FiatWorth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiatWorth.swift; sourceTree = "<group>"; };
 		83DFAF2D2B4E8A51008B70CE /* View+Extra.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "View+Extra.swift"; sourceTree = "<group>"; };
 		83EA887D2B7E68EE00FF8424 /* TotalCurrencyWorthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalCurrencyWorthView.swift; sourceTree = "<group>"; };
 		83EE474F2AF027DF00155F03 /* AssetTransferDepositRuleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssetTransferDepositRuleTests.swift; sourceTree = "<group>"; };
@@ -2550,6 +2551,9 @@
 		83EE479D2AF0EECD00155F03 /* TransactionFungibleBalanceChanges.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionFungibleBalanceChanges.swift; sourceTree = "<group>"; };
 		83EE479E2AF0EECD00155F03 /* TransactionBalanceChanges.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionBalanceChanges.swift; sourceTree = "<group>"; };
 		83EE479F2AF0EECD00155F03 /* TransactionFungibleFeeBalanceChangeType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionFungibleFeeBalanceChangeType.swift; sourceTree = "<group>"; };
+		83EE48DD2B8F4081006CE672 /* AccountPortfoliosClient+State.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AccountPortfoliosClient+State.swift"; sourceTree = "<group>"; };
+		83EE48DF2B8F68B5006CE672 /* FiatWorth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FiatWorth.swift; sourceTree = "<group>"; };
+		83EE48E12B8F69D6006CE672 /* ResourceAmount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceAmount.swift; sourceTree = "<group>"; };
 		83FDF7EB2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgrammaticScryptoSborValue.swift; sourceTree = "<group>"; };
 		A41266EE2B15578600EA38E9 /* ManualAccountRecoverySeedPhrase+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoverySeedPhrase+Reducer.swift"; sourceTree = "<group>"; };
 		A41266F02B15579E00EA38E9 /* ManualAccountRecoverySeedPhrase+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ManualAccountRecoverySeedPhrase+View.swift"; sourceTree = "<group>"; };
@@ -2887,7 +2891,6 @@
 				48CFBE302ADC10D800E77A5C /* LedgerHardwareDevices */,
 				48CFBE332ADC10D800E77A5C /* AssetsFeature */,
 				48CFBE682ADC10D800E77A5C /* DisplayEntitiesControlledByMnemonic */,
-				83D94D732B7F77E000CB506A /* FiatWorth.swift */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -5341,6 +5344,7 @@
 				48CFBF8E2ADC10D900E77A5C /* AccountPortfoliosClient+Live.swift */,
 				48CFBF8F2ADC10D900E77A5C /* AccountPortfoliosClient+Mock.swift */,
 				48CFBF902ADC10D900E77A5C /* AccountPortfoliosClient+Interface.swift */,
+				83EE48DD2B8F4081006CE672 /* AccountPortfoliosClient+State.swift */,
 			);
 			path = AccountPortfoliosClient;
 			sourceTree = "<group>";
@@ -6322,6 +6326,8 @@
 				48CFC1952ADC10D900E77A5C /* AtLedgerState.swift */,
 				48CFC1962ADC10D900E77A5C /* AssetTag.swift */,
 				48CFC1972ADC10D900E77A5C /* AccountPortfolio+Extensions.swift */,
+				83EE48DF2B8F68B5006CE672 /* FiatWorth.swift */,
+				83EE48E12B8F69D6006CE672 /* ResourceAmount.swift */,
 			);
 			path = Assets;
 			sourceTree = "<group>";
@@ -8564,6 +8570,7 @@
 				48CFC6542ADC10DB00E77A5C /* PersonaData+CollectionOfIdentifiedEntries.swift in Sources */,
 				83EE477C2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueU64.swift in Sources */,
 				48CFC4372ADC10DA00E77A5C /* JSONDecoder+Live.swift in Sources */,
+				83EE48E22B8F69D6006CE672 /* ResourceAmount.swift in Sources */,
 				48CFC6032ADC10DA00E77A5C /* P2P+ConnectorExtension+Response.swift in Sources */,
 				48CFC25D2ADC10D900E77A5C /* EditPersonaField.swift in Sources */,
 				48CFC2672ADC10D900E77A5C /* EditPersonaEntries+View.swift in Sources */,
@@ -8849,6 +8856,7 @@
 				48CFC5CF2ADC10DA00E77A5C /* LinearGradients.swift in Sources */,
 				83EE478D2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueKind.swift in Sources */,
 				48CFC3F82ADC10D900E77A5C /* IncomingMessage+Decoding.swift in Sources */,
+				83EE48E02B8F68B5006CE672 /* FiatWorth.swift in Sources */,
 				48CFC5892ADC10DA00E77A5C /* SubmitTransactionClient+Live.swift in Sources */,
 				48CFC4402ADC10DA00E77A5C /* DappInteractionClient+Test.swift in Sources */,
 				48CFC68F2ADC10DB00E77A5C /* OlympiaAccountToMigrate.swift in Sources */,
@@ -8895,7 +8903,6 @@
 				48CFC3232ADC10D900E77A5C /* ConnectUsingSecrets+Reducer.swift in Sources */,
 				48CFC5FF2ADC10DA00E77A5C /* Persona+PreviewValues.swift in Sources */,
 				83EE47812AF0EE3C00155F03 /* ProgrammaticScryptoSborValueBool.swift in Sources */,
-				83D94D742B7F77E000CB506A /* FiatWorth.swift in Sources */,
 				83EE47992AF0EE3C00155F03 /* ProgrammaticScryptoSborValueEnum.swift in Sources */,
 				48CFC4222ADC10DA00E77A5C /* BitArray+Extra.swift in Sources */,
 				48CFC5872ADC10DA00E77A5C /* FaucetClient+Live.swift in Sources */,
@@ -9067,6 +9074,7 @@
 				48CFC52E2ADC10DA00E77A5C /* NonFungibleIdsCollectionAllOf.swift in Sources */,
 				48CFC50F2ADC10DA00E77A5C /* PublicKeyEddsaEd25519AllOf.swift in Sources */,
 				48CFC4982ADC10DA00E77A5C /* MetadataUrlValue.swift in Sources */,
+				83EE48DE2B8F4081006CE672 /* AccountPortfoliosClient+State.swift in Sources */,
 				48CFC4FA2ADC10DA00E77A5C /* TransactionStatusRequestAllOf.swift in Sources */,
 				48CFC2E52ADC10D900E77A5C /* ManageSomeFactorSource.swift in Sources */,
 				48CFC3AF2ADC10D900E77A5C /* HD+Path.swift in Sources */,

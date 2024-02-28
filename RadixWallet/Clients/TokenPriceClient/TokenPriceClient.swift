@@ -1,12 +1,16 @@
 // MARK: - TokenPriceClient
 public struct TokenPriceClient: Sendable, DependencyKey {
-	public let loadTokenPrices: LoadTokenPrices
-	public let getPriceForToken: GetPriceForToken
+	public let getTokenPrices: GetTokenPrices
 }
 
 extension TokenPriceClient {
-	public typealias LoadTokenPrices = @Sendable () async throws -> Void
-	public typealias GetPriceForToken = @Sendable (ResourceAddress) -> RETDecimal?
+	public typealias TokenPrices = [ResourceAddress: Double]
+	public struct FetchPricesRequest: Encodable {
+		public let tokens: [ResourceAddress]
+		public let currency: FiatCurrency
+	}
+
+	public typealias GetTokenPrices = @Sendable (FetchPricesRequest) async throws -> TokenPrices
 }
 
 private extension NumberFormatter {
@@ -31,23 +35,6 @@ extension Double {
 
 extension TokenPriceClient {
 	public static let liveValue: TokenPriceClient = {
-		typealias TokenPrices = [FiatCurrency: [ResourceAddress: RETDecimal]]
-
-		actor State {
-			var tokenPrices: TokenPrices = [:]
-			var selectedCurrency: FiatCurrency = .usd
-
-			func setTokenPrices(_ tokenPrices: TokenPrices) {
-				self.tokenPrices = tokenPrices
-			}
-
-			func getPrice(_ address: ResourceAddress) -> RETDecimal {
-				tokenPrices[selectedCurrency]?[address]
-			}
-		}
-
-		let state = State()
-
 		@Dependency(\.httpClient) var httpClient
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		@Dependency(\.jsonEncoder) var jsonEncoder
@@ -55,25 +42,27 @@ extension TokenPriceClient {
 		let rootURL = URL(string: "https://dev-token-price.extratools.works")!
 
 		@Sendable
-		func fetchTokenPrices() async throws {
-			let tokensURL = rootURL.appending(component: "tokens")
-			var request = URLRequest(url: tokensURL)
-			request.httpMethod = "POST"
+		func getTokenPrices(_ fetchRequest: FetchPricesRequest) async throws -> TokenPrices {
+			let pricesEndpoint = rootURL.appending(component: "price").appending(component: "tokens")
+			var urlRequest = URLRequest(url: pricesEndpoint)
+			urlRequest.httpMethod = "POST"
+			urlRequest.httpBody = try jsonEncoder().encode(fetchRequest)
 
-			let data = try await httpClient.executeRequest(request)
-			let decoded = try jsonDecoder().decode([FailableDecodable<TokenPriceResponse>].self, from: data)
-			let prices = Set(decoded.compactMap { try? $0.result.get() })
-			var pp = TokenPrices()
-			for price in prices {
-				pp[price.currency, default: [:]][price.resourceAddress] = RETDecimal(floatLiteral: price.price)
-			}
-			await state.setTokenPrices(pp)
+			urlRequest.allHTTPHeaderFields = [
+				"accept": "application/json",
+				"Content-Type": "application/json",
+			]
+
+			let data = try await httpClient.executeRequest(urlRequest)
+			let decodedResponse = try jsonDecoder().decode(TokensPriceResponse.self, from: data)
+			return .init(decodedResponse)
 		}
 
 		return .init(
-			loadTokenPrices: {},
-			getPriceForToken: { _ in
-				nil
+			getTokenPrices: { request in
+				// try await cacheClient.withCaching(cacheEntry: .tokenPrices, request: {
+				try await getTokenPrices(request)
+				// })
 			}
 		)
 	}()
@@ -86,11 +75,30 @@ extension DependencyValues {
 	}
 }
 
-// MARK: - TokenPriceResponse
-struct TokenPriceResponse: Decodable, Hashable {
-	let resourceAddress: ResourceAddress
-	let price: Double
-	let currency: FiatCurrency
+extension TokenPriceClient.TokenPrices {
+	init(_ tokenPricesResponse: TokensPriceResponse) {
+		self = tokenPricesResponse.tokens.reduce(into: [:]) { partialResult, next in
+			partialResult[next.resourceAddress] = next.price
+		}
+	}
+}
+
+// MARK: - TokensPriceResponse
+public struct TokensPriceResponse: Decodable {
+	public let tokens: [TokenPrice]
+}
+
+// MARK: TokensPriceResponse.TokenPrice
+extension TokensPriceResponse {
+	public struct TokenPrice: Decodable {
+		enum CodingKeys: String, CodingKey {
+			case resourceAddress = "resource_address"
+			case price = "usd_price"
+		}
+
+		public let resourceAddress: ResourceAddress
+		public let price: Double
+	}
 }
 
 // MARK: - FailableDecodable

@@ -5,7 +5,7 @@ extension Home.AccountRow {
 	public struct ViewState: Equatable {
 		let name: String
 		let address: AccountAddress
-		let fiatWorth: Loadable<AttributedString>?
+		let fiatWorth: Loadable<FiatWorth>
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let isLoadingResources: Bool
 
@@ -44,9 +44,7 @@ extension Home.AccountRow {
 			self.name = state.account.displayName.rawValue
 			self.address = state.account.address
 			self.appearanceID = state.account.appearanceID
-			self.fiatWorth = state.portfolio.totalFiatWorth.map {
-				$0.currencyFormatted(applyCustomFont: false) ?? ""
-			}
+			self.fiatWorth = state.totalFiatWorth
 			self.isLoadingResources = state.portfolio.isLoading
 
 			self.tag = .init(state: state)
@@ -84,66 +82,44 @@ extension Home.AccountRow {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: ViewState.init, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .medium3) {
-					ViewThatFits(in: .horizontal) {
-						VStack(alignment: .leading, spacing: .zero) {
-							HStack(spacing: .zero) {
-								Text(viewStore.name)
-									.lineLimit(1)
-									.textStyle(.body1Header)
-									.foregroundColor(.app.white)
-								// .frame(maxWidth: .infinity, alignment: .leading)
-
-								if let fiatWorth = viewStore.fiatWorth {
-									Spacer()
-									loadable(fiatWorth, loadingViewHeight: .medium1) { fiatWorth in
-										Text(fiatWorth)
-											.textStyle(.secondaryHeader)
-											.foregroundStyle(.app.white)
-									}
-									.padding(.leading, .small1)
-								}
-							}
-
-							HStack {
-								AddressView(.address(.account(viewStore.address, isLedgerHWAccount: viewStore.isLedgerAccount)))
-									.foregroundColor(.app.whiteTransparent)
-									.textStyle(.body2HighImportance)
-
-								if let tag = viewStore.tag {
-									Text("•")
-									Text("\(tag.display)")
-								}
-							}
-							.foregroundColor(.app.whiteTransparent)
-						}
-
-						VStack(alignment: .leading, spacing: .zero) {
+					VStack(alignment: .leading, spacing: .zero) {
+						HStack(spacing: .zero) {
 							Text(viewStore.name)
 								.lineLimit(1)
 								.textStyle(.body1Header)
 								.foregroundColor(.app.white)
-							// .frame(maxWidth: .infinity, alignment: .leading)
+								.truncationMode(.tail)
+								.layoutPriority(0)
 
-							HStack {
-								AddressView(.address(.account(viewStore.address, isLedgerHWAccount: viewStore.isLedgerAccount)))
-									.foregroundColor(.app.whiteTransparent)
-									.textStyle(.body2HighImportance)
-
-								if let tag = viewStore.tag {
-									Text("•")
-									Text("\(tag.display)")
-								}
-							}
-							.foregroundColor(.app.whiteTransparent)
-
-							if let fiatWorth = viewStore.fiatWorth {
-								loadable(fiatWorth, loadingViewHeight: .medium1) { fiatWorth in
-									Text(fiatWorth)
+							Spacer()
+							loadable(
+								viewStore.fiatWorth,
+								loadingViewHeight: .medium1,
+								backgroundColor: .clear
+							) { fiatWorth in
+								if fiatWorth.worth > .zero {
+									Text(fiatWorth.currencyFormatted(applyCustomFont: false)!)
+										.lineLimit(1)
 										.textStyle(.secondaryHeader)
 										.foregroundStyle(.app.white)
 								}
 							}
+							.padding(.leading, .small1)
+							.frame(maxWidth: viewStore.fiatWorth.isSuccess ? nil : .huge1)
+							.layoutPriority(1)
 						}
+
+						HStack {
+							AddressView(.address(.account(viewStore.address, isLedgerHWAccount: viewStore.isLedgerAccount)))
+								.foregroundColor(.app.whiteTransparent)
+								.textStyle(.body2HighImportance)
+
+							if let tag = viewStore.tag {
+								Text("•")
+								Text("\(tag.display)")
+							}
+						}
+						.foregroundColor(.app.whiteTransparent)
 					}
 
 					ownedResourcesList(viewStore)

@@ -500,7 +500,10 @@ extension OnLedgerEntitiesClient {
 			return nil
 		}
 
-		let poolUnitResource = ResourceWithVaultAmount(resource: poolUnitResource, amount: amount, amounFiatWorth: nil)
+		let poolUnitResource = ResourceWithVaultAmount(
+			resource: poolUnitResource,
+			amount: .init(nominalAmount: amount)
+		)
 
 		return await populatePoolDetails(pool, allResources, poolUnitResource)
 	}
@@ -546,7 +549,10 @@ extension OnLedgerEntitiesClient {
 				return nil
 			}
 
-			let poolUnitResource = ResourceWithVaultAmount(resource: poolUnitResourcee, amount: ownedPoolUnit.resource.amount, amounFiatWorth: nil)
+			let poolUnitResource = ResourceWithVaultAmount(
+				resource: poolUnitResourcee,
+				amount: ownedPoolUnit.resource.amount
+			)
 
 			return await populatePoolDetails(pool, allResources, poolUnitResource)
 		}
@@ -567,7 +573,7 @@ extension OnLedgerEntitiesClient {
 
 			nonXrdResourceDetails.append(.init(
 				resource: resourceDetails,
-				redemptionValue: resourceDetails.poolRedemptionValue(for: resource.amount, poolUnitResource: poolUnitResource)
+				redemptionValue: resourceDetails.poolRedemptionValue(for: resource.amount.nominalAmount, poolUnitResource: poolUnitResource)
 			))
 		}
 
@@ -579,7 +585,7 @@ extension OnLedgerEntitiesClient {
 			}
 			xrdResourceDetails = .init(
 				resource: details,
-				redemptionValue: details.poolRedemptionValue(for: xrdResource.amount, poolUnitResource: poolUnitResource)
+				redemptionValue: details.poolRedemptionValue(for: xrdResource.amount.nominalAmount, poolUnitResource: poolUnitResource)
 			)
 		} else {
 			xrdResourceDetails = nil
