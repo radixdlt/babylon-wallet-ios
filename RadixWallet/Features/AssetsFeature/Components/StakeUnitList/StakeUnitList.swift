@@ -313,7 +313,7 @@ extension StakeUnitList {
 						)
 					},
 					stakeClaimResource: stake.stakeClaimTokens.map { stakeClaimTokens in
-						StakeClaimResourceView.ViewState(
+						ResourceBalance.StakeClaimNFT(
 							canClaimTokens: allSelectedTokens == nil, // cannot claim in selection mode
 							stakeClaimTokens: stakeClaimTokens,
 							selectedStakeClaims: allSelectedTokens
