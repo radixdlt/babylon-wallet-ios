@@ -852,86 +852,52 @@ extension TransactionReview {
 		}
 	}
 
-	public struct Transfer: Sendable, Identifiable, Hashable {
-		public typealias ID = Tagged<Self, UUID>
+	public typealias Transfer = ResourceBalance
+}
 
-		public let id = ID()
-		public let resource: OnLedgerEntity.Resource
-		public var details: Details
-
-		public enum Details: Sendable, Hashable {
-			case fungible(Fungible)
-			case nonFungible(NonFungible)
-			case poolUnit(PoolUnit)
-			case liquidStakeUnit(LiquidStakeUnit)
-			case stakeClaimNFT(StakeClaimNFT)
-
-			public struct Fungible: Sendable, Hashable {
-				public let isXRD: Bool
-				public let amount: RETDecimal
-				public var guarantee: TransactionClient.Guarantee?
-			}
-
-			public struct LiquidStakeUnit: Sendable, Hashable {
-				public let resource: OnLedgerEntity.Resource
-				public let amount: RETDecimal
-				public let worth: RETDecimal
-				public let validator: OnLedgerEntity.Validator
-				public var guarantee: TransactionClient.Guarantee?
-			}
-
-			public typealias NonFungible = OnLedgerEntity.NonFungibleToken
-			public typealias StakeClaimNFT = StakeClaimResourceView.ViewState
-
-			public struct PoolUnit: Sendable, Hashable {
-				public let details: OnLedgerEntitiesClient.OwnedResourcePoolDetails
-				public var guarantee: TransactionClient.Guarantee?
-			}
-		}
-
-		/// The guarantee, for a fungible resource
-		public var fungibleGuarantee: TransactionClient.Guarantee? {
-			get {
-				switch details {
-				case let .fungible(fungible):
-					fungible.guarantee
-				case let .liquidStakeUnit(liquidStakeUnit):
-					liquidStakeUnit.guarantee
-				case let .poolUnit(poolUnit):
-					poolUnit.guarantee
-				case .nonFungible, .stakeClaimNFT:
-					nil
-				}
-			}
-			set {
-				switch details {
-				case var .fungible(fungible):
-					fungible.guarantee = newValue
-					details = .fungible(fungible)
-				case var .liquidStakeUnit(liquidStakeUnit):
-					liquidStakeUnit.guarantee = newValue
-					details = .liquidStakeUnit(liquidStakeUnit)
-				case var .poolUnit(poolUnit):
-					poolUnit.guarantee = newValue
-					details = .poolUnit(poolUnit)
-				case .nonFungible, .stakeClaimNFT:
-					return
-				}
-			}
-		}
-
-		/// The transferred amount, for a fungible resource
-		public var fungibleTransferAmount: RETDecimal? {
+extension ResourceBalance {
+	/// The guarantee, for a fungible resource
+	public var fungibleGuarantee: TransactionClient.Guarantee? {
+		get {
 			switch details {
 			case let .fungible(fungible):
-				fungible.amount
+				fungible.guarantee
 			case let .liquidStakeUnit(liquidStakeUnit):
-				liquidStakeUnit.amount
+				liquidStakeUnit.guarantee
 			case let .poolUnit(poolUnit):
-				poolUnit.details.poolUnitResource.amount
+				poolUnit.guarantee
 			case .nonFungible, .stakeClaimNFT:
 				nil
 			}
+		}
+		set {
+			switch details {
+			case var .fungible(fungible):
+				fungible.guarantee = newValue
+				details = .fungible(fungible)
+			case var .liquidStakeUnit(liquidStakeUnit):
+				liquidStakeUnit.guarantee = newValue
+				details = .liquidStakeUnit(liquidStakeUnit)
+			case var .poolUnit(poolUnit):
+				poolUnit.guarantee = newValue
+				details = .poolUnit(poolUnit)
+			case .nonFungible, .stakeClaimNFT:
+				return
+			}
+		}
+	}
+
+	/// The transferred amount, for a fungible resource
+	public var fungibleTransferAmount: RETDecimal? {
+		switch details {
+		case let .fungible(fungible):
+			fungible.amount
+		case let .liquidStakeUnit(liquidStakeUnit):
+			liquidStakeUnit.amount
+		case let .poolUnit(poolUnit):
+			poolUnit.details.poolUnitResource.amount
+		case .nonFungible, .stakeClaimNFT:
+			nil
 		}
 	}
 }
