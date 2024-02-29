@@ -55,7 +55,7 @@ extension TransactionReviewAccount.State {
 extension TransactionReviewAccount {
 	public struct ViewState: Equatable {
 		let account: TransactionReview.Account
-		let transfers: [TransactionReview.Transfer]
+		let transfers: [ResourceBalance] // FIXME: GK use viewstate?
 		let showApprovedMark: Bool
 	}
 
@@ -93,7 +93,7 @@ extension TransactionReviewAccount {
 
 // MARK: - TransactionReviewResourceView
 struct TransactionReviewResourceView: View {
-	let transfer: TransactionReview.Transfer
+	let transfer: ResourceBalance // FIXME: GK use viewstate
 	let onTap: (OnLedgerEntity.NonFungibleToken?) -> Void
 
 	var body: some View {
