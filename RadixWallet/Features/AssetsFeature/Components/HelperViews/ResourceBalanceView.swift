@@ -82,7 +82,7 @@ public struct ResourceBalanceButton: View {
 			switch viewState {
 			case .fungible, .nonFungible:
 				.medium2
-			case .lsu, .poolUnit:
+			case .lsu, .poolUnit, .stakeClaimNFT:
 				.medium3
 			}
 		case .transactionReview:
@@ -96,7 +96,7 @@ public struct ResourceBalanceButton: View {
 			switch viewState {
 			case .fungible, .nonFungible:
 				.large3
-			case .lsu, .poolUnit:
+			case .lsu, .poolUnit, .stakeClaimNFT:
 				.medium3
 			}
 		case .transactionReview:
@@ -167,6 +167,8 @@ public struct ResourceBalanceView: View {
 				LSU(viewState: viewState, isSelected: isSelected)
 			case let .poolUnit(viewState):
 				PoolUnit(viewState: viewState, isSelected: isSelected)
+			case let .stakeClaimNFT(viewState):
+				fatalError() // FIXME: GK
 			}
 
 			if !delegateSelection, let isSelected {
@@ -189,7 +191,7 @@ public struct ResourceBalanceView: View {
 		switch viewState {
 		case .fungible, .nonFungible:
 			false
-		case .lsu, .poolUnit:
+		case .lsu, .poolUnit, .stakeClaimNFT:
 			true
 		}
 	}
