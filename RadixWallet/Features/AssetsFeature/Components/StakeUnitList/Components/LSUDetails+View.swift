@@ -5,7 +5,7 @@ extension LSUDetails.State {
 	var viewState: LSUDetails.ViewState {
 		.init(
 			containerWithHeader: .init(
-				title: .success(stakeUnitResource.resource.metadata.name ?? L10n.Account.PoolUnits.unknownPoolUnitName),
+				title: .success(stakeUnitResource.resource.metadata.title),
 				amount: stakeUnitResource.amount.nominalAmount.formatted(),
 				currencyWorth: nil,
 				symbol: .success(stakeUnitResource.resource.metadata.symbol)
@@ -21,7 +21,7 @@ extension LSUDetails.State {
 				resourceAddress: stakeUnitResource.resource.resourceAddress,
 				isXRD: false,
 				validatorAddress: validator.address,
-				resourceName: .success(stakeUnitResource.resource.metadata.name),
+				resourceName: .success(stakeUnitResource.resource.metadata.title),
 				currentSupply: .success(validator.xrdVaultBalance.formatted()),
 				behaviors: .success(stakeUnitResource.resource.behaviors),
 				tags: .success(stakeUnitResource.resource.metadata.tags)
@@ -36,7 +36,7 @@ extension LSUDetails {
 		let thumbnailURL: URL?
 
 		let validatorNameViewState: ValidatorHeaderView.ViewState
-		let redeemableTokenAmount: TokenBalanceView.ViewState
+		let redeemableTokenAmount: ResourceBalance.ViewState.Fungible
 		let resourceDetails: AssetResourceDetailsSection.ViewState
 	}
 
@@ -68,7 +68,7 @@ extension LSUDetails {
 						ValidatorHeaderView(viewState: viewStore.validatorNameViewState)
 							.padding(.horizontal, .large2)
 
-						TokenBalanceView.Bordered(viewState: viewStore.redeemableTokenAmount)
+						ResourceBalanceView(.fungible(viewStore.redeemableTokenAmount), appearance: .compact(border: true))
 							.padding(.horizontal, .large2)
 
 						AssetResourceDetailsSection(viewState: viewStore.resourceDetails)
@@ -86,7 +86,7 @@ extension ValidatorHeaderView.ViewState {
 	) {
 		self.init(
 			imageURL: validator.metadata.iconURL,
-			name: validator.metadata.name ?? L10n.Account.PoolUnits.unknownValidatorName,
+			name: validator.metadata.name,
 			stakedAmount: nil
 		)
 	}

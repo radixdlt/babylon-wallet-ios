@@ -42,6 +42,7 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		case addAssets
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case row(id: ResourceAsset.State.ID, child: ResourceAsset.Action)
 	}

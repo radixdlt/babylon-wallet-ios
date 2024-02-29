@@ -25,10 +25,7 @@ extension TransactionReviewAccounts {
 				Card {
 					VStack(spacing: .small1) {
 						ForEachStore(
-							store.scope(
-								state: \.accounts,
-								action: { .child(.account(id: $0, action: $1)) }
-							),
+							store.scope(state: \.accounts, action: \.child.account),
 							content: { TransactionReviewAccount.View(store: $0) }
 						)
 
@@ -94,6 +91,72 @@ extension TransactionReviewAccount {
 	}
 }
 
+extension ResourceBalance.ViewState { // FIXME: GK use full?
+	init(transfer: TransactionReview.Transfer) {
+		switch transfer.details {
+		case let .fungible(details):
+			self = .fungible(.init(resource: transfer.resource, details: details))
+		case let .nonFungible(details):
+			self = .nonFungible(.init(resource: transfer.resource, details: details))
+		case let .liquidStakeUnit(details):
+			self = .lsu(.init(resource: transfer.resource, details: details))
+		case let .poolUnit(details):
+			self = .poolUnit(.init(resource: transfer.resource, details: details))
+		case let .stakeClaimNFT(details):
+			fatalError()
+		}
+	}
+}
+
+private extension ResourceBalance.ViewState.Fungible {
+	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.Fungible) {
+		self.init(
+			address: resource.resourceAddress,
+			icon: .token(details.isXRD ? .xrd : .other(resource.metadata.iconURL)),
+			title: resource.metadata.title,
+			amount: .init(details.amount, guaranteed: details.guarantee?.amount)
+		)
+	}
+}
+
+private extension ResourceBalance.ViewState.NonFungible {
+	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.NonFungible) {
+		self.init(
+			id: details.id,
+			resourceImage: resource.metadata.iconURL,
+			resourceName: resource.metadata.name,
+			nonFungibleName: details.data?.name
+		)
+	}
+}
+
+private extension ResourceBalance.ViewState.LSU {
+	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.LiquidStakeUnit) {
+		self.init(
+			address: resource.resourceAddress,
+			icon: resource.metadata.iconURL,
+			title: resource.metadata.title,
+			amount: .init(details.amount, guaranteed: details.guarantee?.amount),
+			worth: .init(nominalAmount: details.worth),
+			validatorName: details.validator.metadata.name
+		)
+	}
+}
+
+private extension ResourceBalance.ViewState.PoolUnit {
+	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.PoolUnit) {
+		self.init(
+			resourcePoolAddress: details.details.address,
+			poolUnitAddress: resource.resourceAddress,
+			poolIcon: resource.metadata.iconURL,
+			poolName: resource.fungibleResourceName,
+			amount: .init(details.details.poolUnitResource.amount.nominalAmount, guaranteed: details.guarantee?.amount),
+			dAppName: .success(details.details.dAppName),
+			resources: .success(.init(resources: details.details))
+		)
+	}
+}
+
 // MARK: - TransactionReviewResourceView
 struct TransactionReviewResourceView: View {
 	let transfer: TransactionReview.Transfer
@@ -101,20 +164,8 @@ struct TransactionReviewResourceView: View {
 
 	var body: some View {
 		switch transfer.details {
-		case let .fungible(details):
-			TransactionReviewFungibleView(viewState: .init(resource: transfer.resource, details: details), background: .app.gray5) {
-				onTap(nil)
-			}
-		case let .nonFungible(details):
-			TransferNFTView(viewState: .init(resource: transfer.resource, details: details), background: .app.gray5) {
-				onTap(nil)
-			}
-		case let .liquidStakeUnit(details):
-			LiquidStakeUnitView(viewState: .init(resource: transfer.resource, details: details), background: .app.gray5) {
-				onTap(nil)
-			}
-		case let .poolUnit(details):
-			PoolUnitView(viewState: .init(resource: transfer.resource, details: details), background: .app.gray5) {
+		case .fungible, .nonFungible, .liquidStakeUnit, .poolUnit:
+			ResourceBalanceButton(.init(transfer: transfer), appearance: .transactionReview) {
 				onTap(nil)
 			}
 		case let .stakeClaimNFT(details):
@@ -125,106 +176,25 @@ struct TransactionReviewResourceView: View {
 	}
 }
 
-// MARK: - TransactionReviewAmountView
-struct TransactionReviewAmountView: View {
-	let amount: RETDecimal
-	let guaranteedAmount: RETDecimal?
-
-	var body: some View {
-		VStack(alignment: .trailing, spacing: 0) {
-			if guaranteedAmount != nil {
-				Text(L10n.TransactionReview.estimated)
-					.textStyle(.body2HighImportance)
-					.foregroundColor(.app.gray1)
-			}
-			Text(amount.formatted())
-				.textStyle(.body1Header)
-				.foregroundColor(.app.gray1)
-
-			if let guaranteedAmount {
-				Text(L10n.TransactionReview.guaranteed)
-					.textStyle(.body2HighImportance)
-					.foregroundColor(.app.gray2)
-					.padding(.top, .small3)
-
-				Text(guaranteedAmount.formatted())
-					.textStyle(.body1Header)
-					.foregroundColor(.app.gray2)
-			}
-		}
-		.minimumScaleFactor(0.8)
-	}
-}
-
-extension LiquidStakeUnitView.ViewState {
-	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.LiquidStakeUnit) {
-		self.init(
-			resource: resource,
-			amount: details.amount,
-			guaranteedAmount: details.guarantee?.amount,
-			worth: .init(nominalAmount: details.worth),
-			validatorName: details.validator.metadata.name
-		)
-	}
-}
-
-extension TransactionReviewFungibleView.ViewState {
-	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.Fungible) {
-		self.init(
-			name: resource.metadata.symbol ?? resource.metadata.name ?? L10n.TransactionReview.unknown,
-			thumbnail: .token(details.isXRD ? .xrd : .other(resource.metadata.iconURL)),
-			amount: details.amount,
-			guaranteedAmount: details.guarantee?.amount,
-			fiatAmount: nil
-		)
-	}
-}
-
-extension TransferNFTView.ViewState {
-	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.NonFungible) {
-		self.init(
-			tokenID: details.id.localId().toUserFacingString(),
-			tokenName: details.data?.name,
-			thumbnail: resource.metadata.iconURL
-		)
-	}
-}
-
-extension PoolUnitView.ViewState {
-	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.PoolUnit) {
-		self.init(
-			poolName: resource.fungibleResourceName,
-			amount: details.details.poolUnitResource.amount.nominalAmount,
-			guaranteedAmount: details.guarantee?.amount,
-			dAppName: .success(details.details.dAppName),
-			poolIcon: resource.metadata.iconURL,
-			resources: .success(.init(resources: details.details)),
-			isSelected: nil
-		)
-	}
-}
-
-extension [PoolUnitResourceView.ViewState] {
+extension [ResourceBalance.ViewState.Fungible] { // FIXME: GK use full
 	init(resources: OnLedgerEntitiesClient.OwnedResourcePoolDetails) {
 		let xrdResource = resources.xrdResource.map {
-			PoolUnitResourceView.ViewState(resourceWithRedemptionValue: $0, isXRD: true)
+			Element(resourceWithRedemptionValue: $0, isXRD: true)
 		}
 		let nonXrdResources = resources.nonXrdResources.map {
-			PoolUnitResourceView.ViewState(resourceWithRedemptionValue: $0, isXRD: false)
+			Element(resourceWithRedemptionValue: $0, isXRD: false)
 		}
-
 		self = (xrdResource.map { [$0] } ?? []) + nonXrdResources
 	}
 }
 
-extension PoolUnitResourceView.ViewState {
+extension ResourceBalance.ViewState.Fungible { // FIXME: GK use full
 	init(resourceWithRedemptionValue resource: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
 		self.init(
-			id: resource.resource.id,
-			symbol: isXRD ? Constants.xrdTokenName : resource.resource.title ?? L10n.TransactionReview.unknown,
+			address: resource.resource.resourceAddress,
 			icon: .token(isXRD ? .xrd : .other(resource.resource.metadata.iconURL)),
-			amount: resource.redemptionValue,
-			fiatWorth: resource.fiatWorth
+			title: isXRD ? Constants.xrdTokenName : resource.resource.metadata.title,
+			amount: resource.redemptionValue.map { .init($0) }
 		)
 	}
 }

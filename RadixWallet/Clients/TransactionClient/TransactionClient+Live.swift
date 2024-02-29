@@ -28,6 +28,10 @@ public struct MyEntitiesInvolvedInTransaction: Sendable, Hashable {
 }
 
 extension TransactionClient {
+	public struct NoFeePayerCandidate: LocalizedError {
+		public var errorDescription: String? { "No account containing XRD found" }
+	}
+
 	public static var liveValue: Self {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
@@ -89,6 +93,7 @@ extension TransactionClient {
 		func getAllFeePayerCandidates(refreshingBalances: Bool) async throws -> NonEmpty<IdentifiedArrayOf<FeePayerCandidate>> {
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
+
 			let allFeePayerCandidates = try await onLedgerEntitiesClient.getAccounts(allAccounts.map(\.address), cachingStrategy: .forceUpdate).compactMap { portfolio -> FeePayerCandidate? in
 				guard
 					let account = allAccounts.first(where: { account in account.address == portfolio.address })
@@ -103,13 +108,10 @@ extension TransactionClient {
 				)
 			}
 
-			guard
-				let allCandidates = NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>(rawValue: .init(uncheckedUniqueElements: allFeePayerCandidates))
-			else {
-				struct NoFeePayerCandidates: Error {}
-				// Should not ever happen, user should have at least one account
-				throw NoFeePayerCandidates()
+			guard let allCandidates = NonEmpty(rawValue: IdentifiedArray(uncheckedUniqueElements: allFeePayerCandidates)) else {
+				throw NoFeePayerCandidate()
 			}
+
 			return allCandidates
 		}
 

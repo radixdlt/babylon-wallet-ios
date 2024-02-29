@@ -15,7 +15,8 @@ extension GatewayAPIClient: TestDependencyKey {
 		getNonFungibleData: unimplemented("\(Self.self).getNonFungibleData"),
 		submitTransaction: unimplemented("\(Self.self).submitTransaction"),
 		transactionStatus: unimplemented("\(Self.self).transactionStatus"),
-		transactionPreview: unimplemented("\(Self.self).transactionPreview")
+		transactionPreview: unimplemented("\(Self.self).transactionPreview"),
+		streamTransactions: unimplemented("\(Self.self).streamTransactions")
 	)
 
 	// TODO: convert to noop, don't use in tests.
@@ -49,7 +50,8 @@ extension GatewayAPIClient: TestDependencyKey {
 					errorMessage: nil
 				)
 			},
-			transactionPreview: unimplemented("\(self).transactionPreview")
+			transactionPreview: unimplemented("\(self).transactionPreview"),
+			streamTransactions: unimplemented("\(self).streamTransactions")
 		)
 	}
 }

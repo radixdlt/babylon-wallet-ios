@@ -15,6 +15,7 @@ public typealias StateEntityFungiblesPageRequestOptIns = GatewayAPI.StateEntityF
 
 extension GatewayAPI {
 
+/** Check detailed [OptIns](#section/Using-endpoints-with-opt-in-features) documentation for more details */
 public struct StateEntityFungiblesPageRequestOptIns: Codable, Hashable {
 
     /** allows specifying explicitly metadata properties which should be returned in response, limited to max 20 items. */

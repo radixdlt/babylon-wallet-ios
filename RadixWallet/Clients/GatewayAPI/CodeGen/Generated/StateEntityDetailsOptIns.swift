@@ -15,6 +15,7 @@ public typealias StateEntityDetailsOptIns = GatewayAPI.StateEntityDetailsOptIns
 
 extension GatewayAPI {
 
+/** Check detailed [OptIns](#section/Using-endpoints-with-opt-in-features) documentation for more details */
 public struct StateEntityDetailsOptIns: Codable, Hashable {
 
     /** if set to `true`, ancestor addresses - `parent_address`, `owner_address` and `global_address` for entities are returned. */

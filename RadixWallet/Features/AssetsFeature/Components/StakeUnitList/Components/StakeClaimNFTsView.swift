@@ -45,12 +45,12 @@ public struct StakeClaimResourceView: View {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: .medium3) {
 			HStack(spacing: .zero) {
-				Thumbnail(token: .other(viewState.resourceMetadata.iconURL), size: .extraSmall)
+				Thumbnail(token: .other(viewState.resourceMetadata.iconURL), size: .slightlySmaller)
 					.padding(.trailing, .small1)
 
 				VStack(alignment: .leading, spacing: .zero) {
-					if let name = viewState.resourceMetadata.name {
-						Text(name)
+					if let title = viewState.resourceMetadata.title {
+						Text(title)
 							.textStyle(.body1Header)
 							.foregroundStyle(.app.gray1)
 					}
@@ -166,19 +166,14 @@ public struct StakeClaimTokensView: View {
 					Button {
 						onTap?(claim)
 					} label: {
-						HStack {
-							TokenBalanceView(viewState: .xrd(balance: claim.claimAmount))
-
-							if let isSelected = viewState.selectedStakeClaims?.contains(claim.id) {
-								CheckmarkView(appearance: .dark, isChecked: isSelected)
-							}
-						}
-						.padding(.small1)
-						.background(background)
+						let isSelected = viewState.selectedStakeClaims?.contains(claim.id)
+						ResourceBalanceView(.fungible(.xrd(balance: claim.claimAmount)), appearance: .compact, isSelected: isSelected)
+							.padding(.small1)
+							.background(background)
 					}
 					.disabled(onTap == nil)
 					.buttonStyle(.borderless)
-					.roundedCorners(strokeColor: .app.gray3)
+					.roundedCorners(strokeColor: .red) // .app.gray3
 				}
 			}
 		}

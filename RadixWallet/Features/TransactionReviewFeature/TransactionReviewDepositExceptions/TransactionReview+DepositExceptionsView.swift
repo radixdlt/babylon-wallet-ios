@@ -154,9 +154,11 @@ struct ResourceIconNameView: View {
 			} else {
 				Thumbnail(token: .other(resource.metadata.iconURL))
 			}
-			Text(resource.metadata.name ?? "")
-				.foregroundColor(.app.gray1)
-				.textStyle(.body1HighImportance)
+			if let title = resource.metadata.title {
+				Text(title)
+					.foregroundColor(.app.gray1)
+					.textStyle(.body1HighImportance)
+			}
 		}
 	}
 }

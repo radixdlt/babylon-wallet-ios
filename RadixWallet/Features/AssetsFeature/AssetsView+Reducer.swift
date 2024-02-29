@@ -79,6 +79,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		case closeButtonTapped
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case fungibleTokenList(FungibleAssetList.Action)
 		case nonFungibleTokenList(NonFungibleAssetList.Action)
@@ -213,27 +214,18 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 		state.accountPortfolio.refresh(from: .success(portfolio))
 
-		let poolUnitList: PoolUnitsList.State? = {
-			if !portfolio.account.poolUnitResources.poolUnits.isEmpty {
-				return .init(
-					poolUnits: .init(
-						uncheckedUniqueElements: portfolio.account.poolUnitResources.poolUnits
-							.map { poolUnit in
-								PoolUnit.State(
-									poolUnit: poolUnit,
-									resourceDetails: state.accountPortfolio.poolUnitDetails.flatten().map {
-										$0.first { poolUnit.resourcePoolAddress == $0.address }!
-									},
-									isSelected: mode
-										.nonXrdRowSelected(poolUnit.resource.resourceAddress)
-								)
-							}
-					)
+		let poolUnits = portfolio.account.poolUnitResources.poolUnits
+		let poolUnitList: PoolUnitsList.State? = poolUnits.isEmpty ? nil : .init(
+			poolUnits: portfolio.account.poolUnitResources.poolUnits.map { poolUnit in
+				PoolUnitsList.State.PoolUnitState(
+					poolUnit: poolUnit,
+					resourceDetails: state.accountPortfolio.poolUnitDetails.flatten().map {
+						$0.first { poolUnit.resourcePoolAddress == $0.address }!
+					},
+					isSelected: mode.nonXrdRowSelected(poolUnit.resource.resourceAddress)
 				)
-			}
-
-			return nil
-		}()
+			}.asIdentifiable()
+		)
 
 		let stakes = portfolio.account.poolUnitResources.radixNetworkStakes
 
@@ -447,7 +439,7 @@ extension SelectedResourceProvider<OnLedgerEntity.OwnedFungibleResource> {
 		)
 	}
 
-	init(with poolUnit: PoolUnit.State) {
+	init(with poolUnit: PoolUnitsList.State.PoolUnitState) {
 		self.init(
 			isSelected: poolUnit.isSelected,
 			resource: poolUnit.poolUnit.resource
@@ -477,7 +469,7 @@ private struct NonFungibleTokensPerResourceProvider {
 			return .init(
 				resourceAddress: resource.resourceAddress,
 				resourceImage: resource.metadata.iconURL,
-				resourceName: resource.metadata.name,
+				resourceName: resource.metadata.title,
 				tokens: .init(uncheckedUniqueElements: selectedAssets)
 			)
 		}

@@ -4,22 +4,31 @@ import SwiftUI
 extension FungibleAssetList.Section.Row.State {
 	var viewState: FungibleAssetList.Section.Row.ViewState {
 		.init(
-			thumbnail: isXRD ? .xrd : .other(token.metadata.iconURL),
-			symbol: token.metadata.symbol ?? token.metadata.name ?? "",
-			tokenAmount: token.amount.nominalAmount.formatted(),
-			fiatWorth: token.amount.fiatWorth?.currencyFormatted(applyCustomFont: false),
+			resource: .init(resource: token, isXRD: isXRD),
 			isSelected: isSelected
 		)
+	}
+}
+
+extension ResourceBalance.ViewState.Fungible {
+	init(resource: OnLedgerEntity.OwnedFungibleResource, isXRD: Bool) {
+		self.init(
+			address: resource.resourceAddress,
+			icon: .token(isXRD ? .xrd : .other(resource.metadata.iconURL)),
+			title: resource.metadata.title,
+			amount: .init(resource.amount.nominalAmount, fiatWorth: resource.amount.fiatWorth)
+		)
+	}
+
+	var withoutAmount: Self {
+		.init(address: address, icon: icon, title: title, amount: nil)
 	}
 }
 
 // MARK: - FungibleTokenList.Row.View
 extension FungibleAssetList.Section.Row {
 	public struct ViewState: Equatable {
-		let thumbnail: Thumbnail.TokenContent
-		let symbol: String
-		let tokenAmount: String
-		let fiatWorth: AttributedString?
+		let resource: ResourceBalance.ViewState.Fungible
 		let isSelected: Bool?
 	}
 
@@ -33,37 +42,9 @@ extension FungibleAssetList.Section.Row {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: FeatureAction.view) { viewStore in
-				HStack(alignment: .center) {
-					HStack(spacing: .small1) {
-						Thumbnail(token: viewStore.thumbnail, size: .small)
-
-						Text(viewStore.symbol)
-							.foregroundColor(.app.gray1)
-							.textStyle(.body2HighImportance)
-					}
-
-					Spacer()
-
-					VStack(alignment: .trailing, spacing: .small3) {
-						Text(viewStore.tokenAmount)
-							.foregroundColor(.app.gray1)
-							.textStyle(.secondaryHeader)
-
-						if let fiatWorth = viewStore.fiatWorth {
-							Text(fiatWorth)
-								.foregroundColor(.app.gray2)
-								.textStyle(.body2HighImportance)
-						}
-					}
-
-					if let isSelected = viewStore.isSelected {
-						CheckmarkView(appearance: .dark, isChecked: isSelected)
-					}
+				ResourceBalanceButton(.fungible(viewStore.resource), appearance: .assetList, isSelected: viewStore.isSelected) {
+					viewStore.send(.tapped)
 				}
-				.frame(height: 2 * .large1)
-				.padding(.horizontal, .medium1)
-				.contentShape(Rectangle())
-				.onTapGesture { viewStore.send(.tapped) }
 			}
 		}
 	}

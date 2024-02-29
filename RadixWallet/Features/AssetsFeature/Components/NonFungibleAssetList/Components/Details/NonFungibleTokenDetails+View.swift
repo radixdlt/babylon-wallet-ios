@@ -13,7 +13,7 @@ extension NonFungibleTokenDetails.State {
 				resourceAddress: resourceAddress,
 				isXRD: false,
 				validatorAddress: nil,
-				resourceName: resourceDetails.metadata.name,
+				resourceName: resourceDetails.metadata.title,
 				currentSupply: resourceDetails.totalSupply.map { $0?.formatted() },
 				behaviors: resourceDetails.behaviors,
 				tags: ownedResource.map { .success($0.metadata.tags) } ?? resourceDetails.metadata.tags

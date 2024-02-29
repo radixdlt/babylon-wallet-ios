@@ -14,7 +14,7 @@ extension TransactionReviewDapps.State {
 extension TransactionReview.DappEntity {
 	fileprivate var knownDapp: TransactionReview.DappView.ViewState {
 		.known(
-			name: metadata.name ?? L10n.TransactionReview.unnamedDapp,
+			name: metadata.name,
 			thumbnail: metadata.iconURL,
 			id: id,
 			unauthorizedHint: isAuthorized ? nil : L10n.Common.unauthorized
@@ -59,7 +59,7 @@ extension TransactionReviewDapps {
 extension TransactionReview {
 	struct DappView: SwiftUI.View {
 		enum ViewState: Hashable {
-			case known(name: String, thumbnail: URL?, id: TransactionReview.DappEntity.ID, unauthorizedHint: String?)
+			case known(name: String?, thumbnail: URL?, id: TransactionReview.DappEntity.ID, unauthorizedHint: String?)
 			case unknown(String)
 		}
 

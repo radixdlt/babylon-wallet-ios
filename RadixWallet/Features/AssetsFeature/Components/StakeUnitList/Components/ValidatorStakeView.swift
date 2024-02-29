@@ -11,8 +11,13 @@ struct ValidatorStakeView: View {
 		let stakeDetails: OnLedgerEntitiesClient.OwnedStakeDetails
 
 		let validatorNameViewState: ValidatorHeaderView.ViewState
-		var liquidStakeUnit: LiquidStakeUnitView.ViewState?
+		var liquidStakeUnit: LiquidStakeUnit?
 		var stakeClaimResource: StakeClaimResourceView.ViewState?
+
+		public struct LiquidStakeUnit: Sendable, Hashable {
+			let lsu: ResourceBalance.ViewState.LSU
+			var isSelected: Bool?
+		}
 	}
 
 	let viewState: ViewState
@@ -51,13 +56,13 @@ struct ValidatorStakeView: View {
 	}
 
 	@ViewBuilder
-	private func liquidStakeUnitView(viewState: LiquidStakeUnitView.ViewState, action: @escaping () -> Void) -> some SwiftUI.View {
+	private func liquidStakeUnitView(viewState: ViewState.LiquidStakeUnit, action: @escaping () -> Void) -> some SwiftUI.View {
 		VStack(spacing: .zero) {
 			Divider()
 				.frame(height: .small3)
 				.overlay(.app.gray5)
 
-			LiquidStakeUnitView(viewState: viewState, background: .app.white, onTap: action)
+			ResourceBalanceButton(.lsu(viewState.lsu), appearance: .assetList, isSelected: viewState.isSelected, onTap: action)
 		}
 	}
 

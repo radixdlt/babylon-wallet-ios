@@ -76,10 +76,12 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 	// MARK: - Destination
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Hashable, Sendable {
 			case derivePublicKeys(DerivePublicKeys.State)
 		}
 
+		@CasePathable
 		public enum Action: Equatable, Sendable {
 			case derivePublicKeys(DerivePublicKeys.Action)
 		}

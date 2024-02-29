@@ -50,47 +50,47 @@ extension DappInteractionFlow {
 		func destinations(
 			for store: StoreOf<DappInteractionFlow.Path>
 		) -> some SwiftUI.View {
-			SwitchStore(store.relay()) { state in
+			SwitchStore(store.scope(state: \.state, action: \.self)) { state in
 				switch state {
 				case .login:
 					CaseLet(
 						/DappInteractionFlow.Path.MainState.login,
-						action: DappInteractionFlow.Path.MainAction.login,
+						action: DappInteractionFlow.Path.Action.login,
 						then: { Login.View(store: $0) }
 					)
 
 				case .accountPermission:
 					CaseLet(
 						/DappInteractionFlow.Path.MainState.accountPermission,
-						action: DappInteractionFlow.Path.MainAction.accountPermission,
+						action: DappInteractionFlow.Path.Action.accountPermission,
 						then: { AccountPermission.View(store: $0) }
 					)
 
 				case .chooseAccounts:
 					CaseLet(
 						/DappInteractionFlow.Path.MainState.chooseAccounts,
-						action: DappInteractionFlow.Path.MainAction.chooseAccounts,
+						action: DappInteractionFlow.Path.Action.chooseAccounts,
 						then: { AccountPermissionChooseAccounts.View(store: $0) }
 					)
 
 				case .personaDataPermission:
 					CaseLet(
 						/DappInteractionFlow.Path.MainState.personaDataPermission,
-						action: DappInteractionFlow.Path.MainAction.personaDataPermission,
+						action: DappInteractionFlow.Path.Action.personaDataPermission,
 						then: { PersonaDataPermission.View(store: $0) }
 					)
 
 				case .oneTimePersonaData:
 					CaseLet(
 						/DappInteractionFlow.Path.MainState.oneTimePersonaData,
-						action: DappInteractionFlow.Path.MainAction.oneTimePersonaData,
+						action: DappInteractionFlow.Path.Action.oneTimePersonaData,
 						then: { OneTimePersonaData.View(store: $0) }
 					)
 
 				case .reviewTransaction:
 					CaseLet(
 						/DappInteractionFlow.Path.MainState.reviewTransaction,
-						action: DappInteractionFlow.Path.MainAction.reviewTransaction,
+						action: DappInteractionFlow.Path.Action.reviewTransaction,
 						then: { TransactionReview.View(store: $0) }
 					)
 				}

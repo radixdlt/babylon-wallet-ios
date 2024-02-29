@@ -39,11 +39,14 @@ public struct StreamTransactionsRequest: Codable, Hashable {
     public private(set) var manifestResourcesFilter: [String]?
     public private(set) var affectedGlobalEntitiesFilter: [String]?
     public private(set) var eventsFilter: [StreamTransactionsRequestEventFilterItem]?
+    public private(set) var accountsWithManifestOwnerMethodCalls: [String]?
+    public private(set) var accountsWithoutManifestOwnerMethodCalls: [String]?
+    public private(set) var manifestClassFilter: StreamTransactionsRequestAllOfManifestClassFilter?
     /** Configures the order of returned result set. Defaults to `desc`. */
     public private(set) var order: Order?
     public private(set) var optIns: TransactionDetailsOptIns?
 
-    public init(atLedgerState: LedgerStateSelector? = nil, fromLedgerState: LedgerStateSelector? = nil, cursor: String? = nil, limitPerPage: Int? = nil, kindFilter: KindFilter? = nil, manifestAccountsWithdrawnFromFilter: [String]? = nil, manifestAccountsDepositedIntoFilter: [String]? = nil, manifestResourcesFilter: [String]? = nil, affectedGlobalEntitiesFilter: [String]? = nil, eventsFilter: [StreamTransactionsRequestEventFilterItem]? = nil, order: Order? = nil, optIns: TransactionDetailsOptIns? = nil) {
+    public init(atLedgerState: LedgerStateSelector? = nil, fromLedgerState: LedgerStateSelector? = nil, cursor: String? = nil, limitPerPage: Int? = nil, kindFilter: KindFilter? = nil, manifestAccountsWithdrawnFromFilter: [String]? = nil, manifestAccountsDepositedIntoFilter: [String]? = nil, manifestResourcesFilter: [String]? = nil, affectedGlobalEntitiesFilter: [String]? = nil, eventsFilter: [StreamTransactionsRequestEventFilterItem]? = nil, accountsWithManifestOwnerMethodCalls: [String]? = nil, accountsWithoutManifestOwnerMethodCalls: [String]? = nil, manifestClassFilter: StreamTransactionsRequestAllOfManifestClassFilter? = nil, order: Order? = nil, optIns: TransactionDetailsOptIns? = nil) {
         self.atLedgerState = atLedgerState
         self.fromLedgerState = fromLedgerState
         self.cursor = cursor
@@ -54,6 +57,9 @@ public struct StreamTransactionsRequest: Codable, Hashable {
         self.manifestResourcesFilter = manifestResourcesFilter
         self.affectedGlobalEntitiesFilter = affectedGlobalEntitiesFilter
         self.eventsFilter = eventsFilter
+        self.accountsWithManifestOwnerMethodCalls = accountsWithManifestOwnerMethodCalls
+        self.accountsWithoutManifestOwnerMethodCalls = accountsWithoutManifestOwnerMethodCalls
+        self.manifestClassFilter = manifestClassFilter
         self.order = order
         self.optIns = optIns
     }
@@ -69,6 +75,9 @@ public struct StreamTransactionsRequest: Codable, Hashable {
         case manifestResourcesFilter = "manifest_resources_filter"
         case affectedGlobalEntitiesFilter = "affected_global_entities_filter"
         case eventsFilter = "events_filter"
+        case accountsWithManifestOwnerMethodCalls = "accounts_with_manifest_owner_method_calls"
+        case accountsWithoutManifestOwnerMethodCalls = "accounts_without_manifest_owner_method_calls"
+        case manifestClassFilter = "manifest_class_filter"
         case order
         case optIns = "opt_ins"
     }
@@ -87,6 +96,9 @@ public struct StreamTransactionsRequest: Codable, Hashable {
         try container.encodeIfPresent(manifestResourcesFilter, forKey: .manifestResourcesFilter)
         try container.encodeIfPresent(affectedGlobalEntitiesFilter, forKey: .affectedGlobalEntitiesFilter)
         try container.encodeIfPresent(eventsFilter, forKey: .eventsFilter)
+        try container.encodeIfPresent(accountsWithManifestOwnerMethodCalls, forKey: .accountsWithManifestOwnerMethodCalls)
+        try container.encodeIfPresent(accountsWithoutManifestOwnerMethodCalls, forKey: .accountsWithoutManifestOwnerMethodCalls)
+        try container.encodeIfPresent(manifestClassFilter, forKey: .manifestClassFilter)
         try container.encodeIfPresent(order, forKey: .order)
         try container.encodeIfPresent(optIns, forKey: .optIns)
     }

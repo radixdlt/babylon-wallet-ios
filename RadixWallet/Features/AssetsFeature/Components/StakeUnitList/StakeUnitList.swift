@@ -70,15 +70,29 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 						),
 						liquidStakeUnit: stake.stakeUnitResource.map { stakeUnitResource in
 							.init(
-								resource: stakeUnitResource.resource,
-								amount: nil,
-								guaranteedAmount: nil,
-								worth: .init(
-									nominalAmount: stake.xrdRedemptionValue,
-									fiatWorth: stake.stakeUnitResource?.amount.fiatWorth
+								lsu: .init(
+									address: stakeUnitResource.resource.resourceAddress,
+									icon: stakeUnitResource.resource.metadata.iconURL,
+									title: stakeUnitResource.resource.metadata.title,
+									amount: nil,
+									worth: .init(
+										nominalAmount: stake.xrdRedemptionValue,
+										fiatWorth: stake.stakeUnitResource?.amount.fiatWorth
+									),
+									validatorName: nil
 								),
 								isSelected: selectedLiquidStakeUnits?.contains { $0.id == stakeUnitResource.resource.resourceAddress }
 							)
+//							.init(
+//								resource: stakeUnitResource.resource,
+//								amount: nil,
+//								guaranteedAmount: nil,
+//								worth: .init(
+//									nominalAmount: stake.xrdRedemptionValue,
+//									fiatWorth: stake.stakeUnitResource?.amount.fiatWorth
+//								),
+//								isSelected: selectedLiquidStakeUnits?.contains { $0.id == stakeUnitResource.resource.resourceAddress }
+//							)
 						},
 						stakeClaimResource: stake.stakeClaimTokens.map { stakeClaimTokens in
 							StakeClaimResourceView.ViewState(
@@ -119,10 +133,6 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		case didTapStakeClaimNFT(OnLedgerEntitiesClient.StakeClaim)
 		case didTapClaimAll(forValidator: ValidatorAddress)
 		case didTapClaimAllStakes
-	}
-
-	public enum InternalAction: Sendable, Equatable {
-		case detailsLoaded(TaskResult<[OnLedgerEntitiesClient.OwnedStakeDetails]>)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -170,11 +180,6 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .none
-//			guard !state.isLoading else {
-//				return .none
-//			}
-//
-//			return loadStakingDetails(&state)
 
 		case let .didTapLiquidStakeUnit(validatorAddress):
 			if state.selectedLiquidStakeUnits != nil {
@@ -279,21 +284,6 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
-		case let .detailsLoaded(.success(details)):
-			state.isLoading = false
-			state.shouldRefresh = false
-			updateAfterLoading(&state, details: details.asIdentifiable())
-			return .none
-		case let .detailsLoaded(.failure(error)):
-			state.isLoading = false
-			state.shouldRefresh = false
-			errorQueue.schedule(error)
-			return .none
-		}
-	}
-
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .stakeClaimDetails(.delegate(.tappedClaimStake(resourceAddress, stakeClaim))):
@@ -326,13 +316,6 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 			)
 		}
 	}
-}
-
-extension StakeUnitList {
-	private func updateAfterLoading(
-		_ state: inout State,
-		details: IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>
-	) {}
 }
 
 // MARK: - OnLedgerEntitiesClient.OwnedStakeDetails + Identifiable

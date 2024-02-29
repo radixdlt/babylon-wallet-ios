@@ -13,7 +13,7 @@ extension PoolUnitDetails.State {
 				resourceAddress: resource.resourceAddress,
 				isXRD: false,
 				validatorAddress: nil,
-				resourceName: .success(resource.metadata.name), // FIXME: Is this correct?
+				resourceName: .success(resource.metadata.name),
 				currentSupply: .success(resource.totalSupply?.formatted() ?? L10n.AssetDetails.supplyUnkown),
 				behaviors: .success(resource.behaviors),
 				tags: .success(resource.metadata.tags)
@@ -27,7 +27,8 @@ extension PoolUnitDetails {
 	public struct ViewState: Equatable {
 		let containerWithHeader: DetailsContainerWithHeaderViewState
 		let thumbnailURL: URL?
-		let resources: [PoolUnitResourceView.ViewState]
+		let resources: [ResourceBalance.ViewState.Fungible]
+
 		let resourceDetails: AssetResourceDetailsSection.ViewState
 	}
 
@@ -40,11 +41,7 @@ extension PoolUnitDetails {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(
-				store,
-				observe: \.viewState,
-				send: PoolUnitDetails.Action.view
-			) { viewStore in
+			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				DetailsContainerWithHeaderView(viewState: viewStore.containerWithHeader) {
 					viewStore.send(.closeButtonTapped)
 				} thumbnailView: {
@@ -57,7 +54,7 @@ extension PoolUnitDetails {
 							.textStyle(.secondaryHeader)
 							.foregroundColor(.app.gray1)
 
-						PoolUnitResourcesView(resources: viewStore.resources)
+						ResourceBalancesView(fungibles: viewStore.resources)
 							.padding(.horizontal, .large2)
 
 						AssetResourceDetailsSection(viewState: viewStore.resourceDetails)

@@ -10,7 +10,8 @@ extension AccountDetails.State {
 			mnemonicHandlingCallToAction: mnemonicHandlingCallToAction,
 			isLedgerAccount: account.isLedgerAccount,
 			showToolbar: destination == nil,
-			totalFiatWorth: assets.totalFiatWorth
+			totalFiatWorth: assets.totalFiatWorth,
+			account: account
 		)
 	}
 }
@@ -25,6 +26,7 @@ extension AccountDetails {
 		let isLedgerAccount: Bool
 		let showToolbar: Bool
 		let totalFiatWorth: Loadable<FiatWorth>
+		let account: Profile.Network.Account
 	}
 
 	@MainActor
@@ -62,7 +64,7 @@ extension AccountDetails {
 						transferButton()
 					}
 
-					AssetsView.View(store: store.scope(state: \.assets, action: { .child(.assets($0)) }))
+					AssetsView.View(store: store.scope(state: \.assets, action: \.child.assets))
 						.roundedCorners(.top, radius: .medium1)
 						.ignoresSafeArea(edges: .bottom)
 				}
@@ -124,11 +126,6 @@ extension AccountDetails {
 			} label: {
 				HStack(alignment: .center) {
 					Label(L10n.Common.history, asset: AssetResource.iconHistory)
-					Image(asset: AssetResource.iconLinkOut)
-						.resizable()
-						.renderingMode(.template)
-						.frame(width: .medium3, height: .medium3)
-						.opacity(0.5)
 				}
 			}
 			.headerButtonStyle
@@ -162,25 +159,26 @@ private extension View {
 	func destinations(with store: StoreOf<AccountDetails>) -> some SwiftUI.View {
 		let destinationStore = store.destination
 		return preferences(with: destinationStore)
+			.history(with: destinationStore)
 			.transfer(with: destinationStore)
 	}
 
-	private func preferences(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
-		navigationDestination(
-			store: destinationStore,
-			state: /AccountDetails.Destination.State.preferences,
-			action: AccountDetails.Destination.Action.preferences,
-			destination: { AccountPreferences.View(store: $0) }
-		)
+	private func preferences(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.preferences, action: \.preferences)) {
+			AccountPreferences.View(store: $0)
+		}
 	}
 
-	private func transfer(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some SwiftUI.View {
-		fullScreenCover(
-			store: destinationStore,
-			state: /AccountDetails.Destination.State.transfer,
-			action: AccountDetails.Destination.Action.transfer,
-			content: { AssetTransfer.SheetView(store: $0) }
-		)
+	private func history(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		fullScreenCover(store: destinationStore.scope(state: \.history, action: \.history)) {
+			TransactionHistory.View(store: $0)
+		}
+	}
+
+	private func transfer(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		fullScreenCover(store: destinationStore.scope(state: \.transfer, action: \.transfer)) {
+			AssetTransfer.SheetView(store: $0)
+		}
 	}
 }
 

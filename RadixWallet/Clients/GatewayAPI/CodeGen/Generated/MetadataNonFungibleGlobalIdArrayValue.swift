@@ -18,9 +18,9 @@ extension GatewayAPI {
 public struct MetadataNonFungibleGlobalIdArrayValue: Codable, Hashable {
 
     public private(set) var type: MetadataValueType
-    public private(set) var values: [MetadataNonFungibleGlobalIdValueAllOf]
+    public private(set) var values: [MetadataNonFungibleGlobalIdArrayValueAllOfValues]
 
-    public init(type: MetadataValueType, values: [MetadataNonFungibleGlobalIdValueAllOf]) {
+    public init(type: MetadataValueType, values: [MetadataNonFungibleGlobalIdArrayValueAllOfValues]) {
         self.type = type
         self.values = values
     }

@@ -15,6 +15,7 @@ public typealias StateEntityNonFungiblesPageRequestOptIns = GatewayAPI.StateEnti
 
 extension GatewayAPI {
 
+/** Check detailed [OptIns](#section/Using-endpoints-with-opt-in-features) documentation for more details */
 public struct StateEntityNonFungiblesPageRequestOptIns: Codable, Hashable {
 
     /** if set to `true`, first page of non fungible ids are returned for each non fungible resource, with cursor which can be later used at `/state/entity/page/non-fungible-vault/ids` endpoint. */

@@ -78,7 +78,7 @@ extension OneTimePersonaData {
 				PersonaDataPermissionBox.View(
 					store: store.scope(
 						state: { _ in item.value },
-						action: { .child(.persona(id: $0.id, action: $1)) }
+						action: { .child(.persona(id: item.value.id, action: $0)) }
 					),
 					action: item.action,
 					accessory: {

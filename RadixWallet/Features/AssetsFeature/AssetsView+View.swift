@@ -33,7 +33,7 @@ extension AssetsView {
 							IfLetStore(
 								store.scope(
 									state: \.fungibleTokenList,
-									action: { .child(.fungibleTokenList($0)) }
+									action: \.child.fungibleTokenList
 								),
 								then: { FungibleAssetList.View(store: $0) },
 								else: { EmptyAssetListView.fungibleResources }
@@ -42,7 +42,7 @@ extension AssetsView {
 							IfLetStore(
 								store.scope(
 									state: \.nonFungibleTokenList,
-									action: { .child(.nonFungibleTokenList($0)) }
+									action: \.child.nonFungibleTokenList
 								),
 								then: { NonFungibleAssetList.View(store: $0) },
 								else: { EmptyAssetListView.nonFungibleResources }
@@ -51,7 +51,7 @@ extension AssetsView {
 							IfLetStore(
 								store.scope(
 									state: \.stakeUnitList,
-									action: { .child(.stakeUnitList($0)) }
+									action: \.child.stakeUnitList
 								),
 								then: { StakeUnitList.View(store: $0) },
 								else: { EmptyAssetListView.stakes }
@@ -60,7 +60,7 @@ extension AssetsView {
 							IfLetStore(
 								store.scope(
 									state: \.poolUnitsList,
-									action: { .child(.poolUnitsList($0)) }
+									action: \.child.poolUnitsList
 								),
 								then: { PoolUnitsList.View(store: $0) },
 								else: { EmptyAssetListView.poolUnits }
@@ -71,7 +71,6 @@ extension AssetsView {
 				.buttonStyle(.plain)
 				.scrollContentBackground(.hidden)
 				.listStyle(.insetGrouped)
-				.padding(.top, .zero)
 				.tokenRowShadow()
 				.scrollIndicators(.hidden)
 				.refreshable {
@@ -101,8 +100,6 @@ extension AssetsView {
 			ScrollViewReader { value in
 				ScrollView(.horizontal) {
 					HStack(spacing: .zero) {
-						Spacer()
-
 						ForEach(viewStore.assetKinds) { kind in
 							let isSelected = viewStore.activeAssetKind == kind
 							Text(kind.displayText)
@@ -123,8 +120,6 @@ extension AssetsView {
 									}
 								}
 						}
-
-						Spacer()
 					}
 				}
 			}

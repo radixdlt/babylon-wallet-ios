@@ -26,6 +26,7 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 		case closeTapped
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case guarantee(id: TransactionReviewGuarantee.State.ID, action: TransactionReviewGuarantee.Action)
 		case info(PresentationAction<SlideUpPanel.Action>)
@@ -82,12 +83,6 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 
 		public var percentageStepper: MinimumPercentageStepper.State
 
-		public enum Fungible: Sendable, Hashable {
-			case token(isXRD: Bool)
-			case poolUnit
-			case lsu
-		}
-
 		init?(
 			account: TransactionReview.Account,
 			transfer: TransactionReview.Transfer
@@ -105,7 +100,6 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 			case .liquidStakeUnit:
 				self.thumbnail = .lsu(url)
 			case .stakeClaimNFT, .nonFungible:
-				assertionFailure("Should not be called with non-fungible transfer")
 				return nil
 			}
 
@@ -121,6 +115,7 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 		}
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case percentageStepper(MinimumPercentageStepper.Action)
 	}

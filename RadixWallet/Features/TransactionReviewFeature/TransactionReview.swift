@@ -546,7 +546,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			return .none
 
 		case let .determineFeePayerResult(.failure(error)):
-			assertionFailure("Failed to determine fee payer \(error)")
+			errorQueue.schedule(error)
 			state.reviewedTransaction?.feePayer = .success(nil)
 			return .none
 		}
@@ -659,7 +659,7 @@ extension TransactionReview {
 			return .none
 		}
 		guard let networkID = state.networkID else {
-			assertionFailure("Bad implementation, expected `networkID`")
+			"Bad implementation, expected `networkID`"
 			return .none
 		}
 

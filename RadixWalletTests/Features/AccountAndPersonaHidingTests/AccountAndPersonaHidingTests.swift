@@ -35,18 +35,18 @@ final class AccountAndPersonaHidingTests: TestCase {
 		}
 
 		await store.send(.view(.unhideAllTapped)) {
-			$0.confirmUnhideAllAlert = .init(
+			$0.destination = .confirmUnhideAllAlert(.init(
 				title: .init(L10n.AppSettings.EntityHiding.unhideAllSection),
 				message: .init(L10n.AppSettings.EntityHiding.unhideAllConfirmation),
 				buttons: [
 					.default(.init(L10n.Common.continue), action: .send(.confirmTapped)),
 					.cancel(.init(L10n.Common.cancel), action: .send(.cancelTapped)),
 				]
-			)
+			))
 		}
 
 		await store.send(.view(.confirmUnhideAllAlert(.presented(.confirmTapped)))) {
-			$0.confirmUnhideAllAlert = nil
+			$0.destination = nil
 		}
 
 		wait(for: [unhideAllEntitiesExpectation], timeout: 1.0)
@@ -87,18 +87,18 @@ final class AccountAndPersonaHidingTests: TestCase {
 		}
 
 		await store.send(.view(.unhideAllTapped)) {
-			$0.confirmUnhideAllAlert = .init(
+			$0.destination = .confirmUnhideAllAlert(.init(
 				title: .init(L10n.AppSettings.EntityHiding.unhideAllSection),
 				message: .init(L10n.AppSettings.EntityHiding.unhideAllConfirmation),
 				buttons: [
 					.default(.init(L10n.Common.continue), action: .send(.confirmTapped)),
 					.cancel(.init(L10n.Common.cancel), action: .send(.cancelTapped)),
 				]
-			)
+			))
 		}
 
 		await store.send(.view(.confirmUnhideAllAlert(.presented(.confirmTapped)))) {
-			$0.confirmUnhideAllAlert = nil
+			$0.destination = nil
 		}
 
 		wait(for: [scheduleErrorExpectation], timeout: 1.0)

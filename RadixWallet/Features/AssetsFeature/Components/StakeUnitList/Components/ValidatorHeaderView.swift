@@ -5,7 +5,7 @@ import SwiftUI
 struct ValidatorHeaderView: View {
 	struct ViewState: Hashable {
 		let imageURL: URL?
-		let name: String
+		let name: String?
 		let stakedAmount: RETDecimal?
 	}
 
@@ -17,10 +17,12 @@ struct ValidatorHeaderView: View {
 				.padding(.trailing, .small1)
 
 			VStack(alignment: .leading) {
-				Text(viewState.name)
-					.textStyle(.secondaryHeader)
-					.foregroundColor(.app.gray1)
-					.multilineTextAlignment(.leading)
+				if let name = viewState.name {
+					Text(name)
+						.textStyle(.secondaryHeader)
+						.foregroundColor(.app.gray1)
+						.multilineTextAlignment(.leading)
+				}
 
 				if let stakedAmount = viewState.stakedAmount {
 					Text("Current Stake: \(stakedAmount.formatted()) XRD")

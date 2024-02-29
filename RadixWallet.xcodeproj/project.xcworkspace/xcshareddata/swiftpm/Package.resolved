@@ -183,10 +183,10 @@
     {
       "identity" : "swift-composable-architecture",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/radixdlt/swift-composable-architecture",
+      "location" : "https://github.com/pointfreeco/swift-composable-architecture",
       "state" : {
-        "branch" : "full-scope-1.4.2",
-        "revision" : "789fab0d836fb230b5e279f4a62d9112e4d6d81e"
+        "revision" : "856f9b8d82f6851b7f61ec4c5ce9e4c18ebbdb45",
+        "version" : "1.8.2"
       }
     },
     {
@@ -313,6 +313,15 @@
       "state" : {
         "revision" : "7977acd7597f413717058acc1e080731249a1d7e",
         "version" : "0.5.0"
+      }
+    },
+    {
+      "identity" : "swift-perception",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/pointfreeco/swift-perception",
+      "state" : {
+        "revision" : "42240120b2a8797595433288ab4118f8042214c3",
+        "version" : "1.1.1"
       }
     },
     {
