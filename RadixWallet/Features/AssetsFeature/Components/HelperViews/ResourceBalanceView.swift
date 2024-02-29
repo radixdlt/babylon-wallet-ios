@@ -426,9 +426,17 @@ extension ResourceBalanceView {
 		@ViewBuilder
 		private func core(amount: ResourceBalance.Amount, compact: Bool) -> some View {
 			if compact {
-				Text(amount.amount.formatted())
-					.textStyle(amountTextStyle)
-					.foregroundColor(.app.gray1)
+				VStack(alignment: .trailing, spacing: 0) {
+					Text(amount.amount.formatted())
+						.textStyle(amountTextStyle)
+						.foregroundColor(.app.gray1)
+					if let fiatWorth = amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
+						Text(fiatWorth)
+							.textStyle(.body2HighImportance)
+							.foregroundStyle(.app.gray2)
+							.padding(.top, .small3)
+					}
+				}
 			} else {
 				VStack(alignment: .trailing, spacing: 0) {
 					if amount.guaranteed != nil {
@@ -442,6 +450,13 @@ extension ResourceBalanceView {
 						.truncationMode(.tail)
 						.textStyle(.secondaryHeader)
 						.foregroundColor(.app.gray1)
+
+					if let fiatWorth = amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
+						Text(fiatWorth)
+							.textStyle(.body2HighImportance)
+							.foregroundStyle(.app.gray2)
+							.padding(.top, .small3)
+					}
 
 					if let guaranteedAmount = amount.guaranteed {
 						Text(L10n.TransactionReview.guaranteed)

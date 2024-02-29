@@ -194,7 +194,7 @@ extension ResourceBalance.ViewState.Fungible { // FIXME: GK use full
 			address: resource.resource.resourceAddress,
 			icon: .token(isXRD ? .xrd : .other(resource.resource.metadata.iconURL)),
 			title: isXRD ? Constants.xrdTokenName : resource.resource.metadata.title,
-			amount: resource.redemptionValue.map { .init($0) }
+			amount: resource.redemptionValue.map { .init($0, fiatWorth: resource.fiatWorth) }
 		)
 	}
 }
