@@ -92,20 +92,20 @@ extension Home.AccountRow {
 								.layoutPriority(0)
 
 							Spacer()
-							loadable(
-								viewStore.fiatWorth,
-								loadingViewHeight: .medium1,
-								backgroundColor: .clear
-							) { fiatWorth in
-								if fiatWorth.worth > .zero {
-									Text(fiatWorth.currencyFormatted(applyCustomFont: false)!)
-										.lineLimit(1)
-										.textStyle(.secondaryHeader)
-										.foregroundStyle(.app.white)
-								}
+							loadable(viewStore.fiatWorth, loadingView: { shimmeringLoadingView() }) { _ in
+								Text("--")
+									.textStyle(.secondaryHeader)
+									.foregroundStyle(.app.white)
+							} successContent: { fiatWorth in
+								//                                if case .known fiatWorth.worth > .zero {
+								Text(fiatWorth.currencyFormatted(applyCustomFont: false)!)
+									.lineLimit(1)
+									.textStyle(.secondaryHeader)
+									.foregroundStyle(.app.white)
+//								}
 							}
 							.padding(.leading, .small1)
-							.frame(maxWidth: viewStore.fiatWorth.isSuccess ? nil : .huge1)
+							.frame(maxWidth: viewStore.fiatWorth.didLoad ? nil : .huge1)
 							.layoutPriority(1)
 						}
 

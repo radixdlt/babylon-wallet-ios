@@ -561,8 +561,7 @@ extension OnLedgerEntitiesClient {
 
 		public struct ResourceWithRedemptionValue: Hashable, Sendable {
 			public let resource: OnLedgerEntity.Resource
-			public let redemptionValue: RETDecimal?
-			public var fiatWorth: FiatWorth?
+			public var redemptionValue: ResourceAmount?
 		}
 	}
 
@@ -660,16 +659,6 @@ extension OnLedgerEntity.OwnedFungibleResource: Comparable {
 		}
 
 		return lhs.resourceAddress.address < rhs.resourceAddress.address // Sort by address
-	}
-}
-
-// MARK: - FiatWorth + Comparable
-extension FiatWorth: Comparable {
-	public static func < (
-		lhs: Self,
-		rhs: Self
-	) -> Bool {
-		lhs.worth < rhs.worth
 	}
 }
 

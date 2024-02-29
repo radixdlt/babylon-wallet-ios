@@ -60,9 +60,13 @@ extension TokenPriceClient {
 
 		return .init(
 			getTokenPrices: { request in
-				// try await cacheClient.withCaching(cacheEntry: .tokenPrices, request: {
-				try await getTokenPrices(request)
-				// })
+				try await cacheClient.withCaching(
+					cacheEntry: .tokenPrices(request.currency),
+					invalidateCached: {
+						Array($0.keys) != request.tokens ? .cachedIsInvalid : .cachedIsValid
+					},
+					request: { try await getTokenPrices(request) }
+				)
 			}
 		)
 	}()

@@ -83,16 +83,6 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 								),
 								isSelected: selectedLiquidStakeUnits?.contains { $0.id == stakeUnitResource.resource.resourceAddress }
 							)
-//							.init(
-//								resource: stakeUnitResource.resource,
-//								amount: nil,
-//								guaranteedAmount: nil,
-//								worth: .init(
-//									nominalAmount: stake.xrdRedemptionValue,
-//									fiatWorth: stake.stakeUnitResource?.amount.fiatWorth
-//								),
-//								isSelected: selectedLiquidStakeUnits?.contains { $0.id == stakeUnitResource.resource.resourceAddress }
-//							)
 						},
 						stakeClaimResource: stake.stakeClaimTokens.map { stakeClaimTokens in
 							StakeClaimResourceView.ViewState(

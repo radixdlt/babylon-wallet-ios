@@ -1,5 +1,6 @@
 import Foundation
 
+// MARK: - Definition
 extension AccountPortfoliosClient {
 	public struct AccountPortfolio: Sendable, Hashable {
 		public var account: OnLedgerEntity.Account
@@ -21,151 +22,123 @@ extension AccountPortfoliosClient {
 	}
 }
 
+// MARK: - Portfolio Setters/Getters
 extension AccountPortfoliosClient.State {
-	func setTokenPrices(_ tokenPrices: TokenPrices) {
-		self.tokenPrices = tokenPrices
+	func handlePortfolioUpdate(_ portfolio: AccountPortfoliosClient.AccountPortfolio) {
+		var portfolio = portfolio
+		applyFiatWorth(&portfolio)
+		setOrUpdateAccountPortfolio(portfolio)
 	}
 
-	func setSelectedCurrency(_ currency: FiatCurrency) {
-		self.selectedCurrency = currency
-	}
-
-	func setIsCurrencyAmountVisble(_ isVisible: Bool) {
-		self.isCurrencyAmountVisible = isVisible
-		if let existingPortfolios = portfoliosSubject.value.values.wrappedValue {
-			self.setOrUpdateAccountPortfolios(applyCurrencyVisibility(to: Array(existingPortfolios)))
-		}
-	}
-
-	func setOrUpdateAccountPortfolio(_ portfolio: AccountPortfoliosClient.AccountPortfolio) {
-		portfoliosSubject.value.mutateValue {
-			$0.updateValue(portfolio, forKey: portfolio.account.address)
-		}
-	}
-
-	func applyCurrencyVisibility(_ portfolio: inout AccountPortfoliosClient.AccountPortfolio) {
-		portfolio.isCurrencyAmountVisible = isCurrencyAmountVisible
-		portfolio.account.fungibleResources.xrdResource?.amount.fiatWorth?.isVisible = isCurrencyAmountVisible
-		portfolio.account.fungibleResources.nonXrdResources.mutateAll {
-			$0.amount.fiatWorth?.isVisible = isCurrencyAmountVisible
-		}
-
-		portfolio.stakeUnitDetails.mutateValue {
-			$0.mutateAll { details in
-				details.stakeUnitResource?.amount.fiatWorth?.isVisible = isCurrencyAmountVisible
-				details.stakeClaimTokens?.stakeClaims.mutateAll { token in
-					token.claimAmount.fiatWorth?.isVisible = isCurrencyAmountVisible
-				}
-			}
-		}
-
-		portfolio.poolUnitDetails.mutateValue {
-			$0.mutateAll { details in
-				details.xrdResource?.fiatWorth?.isVisible = isCurrencyAmountVisible
-				details.nonXrdResources.mutateAll { resource in
-					resource.fiatWorth?.isVisible = isCurrencyAmountVisible
-				}
-			}
-		}
-	}
-
-	func applyCurrencyVisibility(to portfolios: [AccountPortfoliosClient.AccountPortfolio]) -> [AccountPortfoliosClient.AccountPortfolio] {
+	func handlePortfoliosUpdate(_ portfolios: [AccountPortfoliosClient.AccountPortfolio]) {
 		var portfolios = portfolios
-		portfolios.mutateAll(applyCurrencyVisibility)
-
-		return portfolios
-	}
-
-	func applyTokenPrices(to portfolios: [AccountPortfoliosClient.AccountPortfolio]) -> [AccountPortfoliosClient.AccountPortfolio] {
-		var portfolios = portfolios
-		portfolios.mutateAll(applyTokenPrices)
-
-		return portfolios
-	}
-
-	func applyTokenPrices(to portfolio: inout AccountPortfoliosClient.AccountPortfolio) {
-		portfolio.fiatCurrency = selectedCurrency
-		let sortedByPrice = portfolio.account.fungibleResources.nonXrdResources.map { resource in
-			let price = tokenPrices.values.randomElement()
-			var resource = resource
-			resource.amount.fiatWorth = price.map {
-				.init(
-					isVisible: isCurrencyAmountVisible,
-					worth: $0 * (try! resource.amount.nominalAmount.asDouble()),
-					currency: selectedCurrency
-				)
-			}
-			return resource
-		}.sorted(by: <)
-		let xrdPrice = tokenPrices[.init(address: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd", decodedKind: .globalFungibleResourceManager)]
-
-		let xrdResource = portfolio.account.fungibleResources.xrdResource.map {
-			var res = $0
-			res.amount.fiatWorth = xrdPrice.map {
-				.init(
-					isVisible: isCurrencyAmountVisible,
-					worth: $0 * (try! res.amount.nominalAmount.asDouble()),
-					currency: selectedCurrency
-				)
-			}
-			return res
-		}
-		portfolio.account.fungibleResources = .init(xrdResource: xrdResource, nonXrdResources: sortedByPrice)
-	}
-
-	func handlePortfoliosUpdated(_ portfolios: [AccountPortfoliosClient.AccountPortfolio]) {
-		setOrUpdateAccountPortfolios(applyTokenPrices(to: applyCurrencyVisibility(to: portfolios)))
-	}
-
-	func setOrUpdateAccountPortfolios(_ portfolios: [AccountPortfoliosClient.AccountPortfolio]) {
-		var newValue = portfoliosSubject.value.wrappedValue ?? [:]
-		for portfolio in portfolios {
-			newValue[portfolio.account.address] = portfolio
-		}
-		portfoliosSubject.value = .success(newValue)
+		portfolios.mutateAll(applyFiatWorth)
+		setOrUpdateAccountPortfolios(portfolios)
 	}
 
 	func portfolioForAccount(_ address: AccountAddress) -> AnyAsyncSequence<AccountPortfoliosClient.AccountPortfolio> {
 		portfoliosSubject.compactMap { $0[address].unwrap()?.wrappedValue }.eraseToAnyAsyncSequence()
 	}
 
+	private func setOrUpdateAccountPortfolio(_ portfolio: AccountPortfoliosClient.AccountPortfolio) {
+		portfoliosSubject.value.mutateValue {
+			$0.updateValue(portfolio, forKey: portfolio.account.address)
+		}
+	}
+
+	private func setOrUpdateAccountPortfolios(_ portfolios: [AccountPortfoliosClient.AccountPortfolio]) {
+		var newValue = portfoliosSubject.value.wrappedValue ?? [:]
+		for portfolio in portfolios {
+			newValue[portfolio.account.address] = portfolio
+		}
+		portfoliosSubject.value = .success(newValue)
+	}
+}
+
+// MARK: - Fiat worth setters
+extension AccountPortfoliosClient.State {
+	func applyFiatWorth(_ portfolio: inout AccountPortfoliosClient.AccountPortfolio) {
+		applyTokenPrices(to: &portfolio)
+		applyCurrencyVisibility(&portfolio)
+		applyFiatCurrency(to: &portfolio)
+	}
+
+	func setTokenPrices(_ tokenPrices: TokenPrices) {
+		self.tokenPrices = tokenPrices
+		if var existingPortfolios = portfoliosSubject.value.values.wrappedValue.map(Array.init) {
+			applyTokenPrices(to: &existingPortfolios)
+			self.setOrUpdateAccountPortfolios(existingPortfolios)
+		}
+	}
+
+	func setIsCurrencyAmountVisble(_ isVisible: Bool) {
+		self.isCurrencyAmountVisible = isVisible
+		if var existingPortfolios = portfoliosSubject.value.values.wrappedValue.map(Array.init) {
+			applyCurrencyVisibility(to: &existingPortfolios)
+			setOrUpdateAccountPortfolios(existingPortfolios)
+		}
+	}
+
+	func setSelectedCurrency(_ currency: FiatCurrency) {
+		self.selectedCurrency = currency
+		if var existingPortfolios = portfoliosSubject.value.values.wrappedValue.map(Array.init) {
+			applyFiatCurrency(to: &existingPortfolios)
+			self.setOrUpdateAccountPortfolios(existingPortfolios)
+		}
+	}
+
+	func applyTokenPrices(to portfolios: inout [AccountPortfoliosClient.AccountPortfolio]) {
+		portfolios.mutateAll(applyTokenPrices)
+	}
+
+	func applyTokenPrices(to portfolio: inout AccountPortfoliosClient.AccountPortfolio) {
+		portfolio.updateFiatWorth { _, amount in
+			let price = tokenPrices.values.randomElement()
+
+			return .init(
+				isVisible: isCurrencyAmountVisible,
+				worth: amount.calculateWorth(price),
+				currency: selectedCurrency
+			)
+		}
+	}
+
+	func applyCurrencyVisibility(_ portfolio: inout AccountPortfoliosClient.AccountPortfolio) {
+		portfolio.isCurrencyAmountVisible = isCurrencyAmountVisible
+		portfolio.updateFiatWorth(value: isCurrencyAmountVisible, to: \.isVisible)
+	}
+
+	func applyFiatCurrency(to portfolio: inout AccountPortfoliosClient.AccountPortfolio) {
+		portfolio.fiatCurrency = self.selectedCurrency
+		portfolio.updateFiatWorth(value: selectedCurrency, to: \.currency)
+	}
+
+	func applyFiatCurrency(to portfolios: inout [AccountPortfoliosClient.AccountPortfolio]) {
+		portfolios.mutateAll(applyFiatCurrency)
+	}
+
+	func applyCurrencyVisibility(to portfolios: inout [AccountPortfoliosClient.AccountPortfolio]) {
+		portfolios.mutateAll(applyCurrencyVisibility)
+	}
+}
+
+// MARK: - Stake and Pool details handling
+extension AccountPortfoliosClient.State {
 	func set(poolDetails: Loadable<[OnLedgerEntitiesClient.OwnedResourcePoolDetails]>, forAccount address: AccountAddress) {
 		guard var portfolio = portfoliosSubject.value.wrappedValue?[address] else {
 			return
 		}
-		let xrdPrice = tokenPrices[.init(address: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd", decodedKind: .globalFungibleResourceManager)]
 
 		portfolio.poolUnitDetails = poolDetails.map { details in
 			var details = details
-			details.mutateAll { pool in
-				let xrdResource = pool.xrdResource.map {
-					var res = $0
-					res.fiatWorth = xrdPrice.map {
-						.init(
-							isVisible: isCurrencyAmountVisible,
-							worth: $0 * (try! res.redemptionValue!.asDouble()),
-							currency: selectedCurrency
-						)
-					}
-					return res
-				}
-
-				let nonXrdResources = pool.nonXrdResources.map { resource in
-					let price = tokenPrices.values.randomElement()
-					var resource = resource
-					resource.fiatWorth = price.map {
-						.init(
-							isVisible: isCurrencyAmountVisible,
-							worth: $0 * (try! resource.redemptionValue!.asDouble()),
-							currency: selectedCurrency
-						)
-					}
-					return resource
-				}
-				pool.xrdResource = xrdResource
-				pool.nonXrdResources = nonXrdResources
+			details.updateFiatWorth { _, amount in
+				let price = tokenPrices.values.randomElement()
+				return .init(
+					isVisible: isCurrencyAmountVisible,
+					worth: amount.calculateXRDWorth(price),
+					currency: selectedCurrency
+				)
 			}
-
 			return details
 		}
 		setOrUpdateAccountPortfolio(portfolio)
@@ -175,26 +148,15 @@ extension AccountPortfoliosClient.State {
 		guard var portfolio = portfoliosSubject.value.wrappedValue?[address] else {
 			return
 		}
-		let xrdPrice = tokenPrices[.init(address: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd", decodedKind: .globalFungibleResourceManager)]
-
 		portfolio.stakeUnitDetails = stakeUnitDetails.map { details in
 			var details = details
-			details.mutateAll { details in
-				let stakeUnitAmount = details.xrdRedemptionValue
-				details.stakeUnitResource?.amount.fiatWorth = .init(
+			details.updateFiatWorth { _, amount in
+				let price = tokenPrices.values.randomElement()
+				return .init(
 					isVisible: isCurrencyAmountVisible,
-					worth: xrdPrice! * (try! stakeUnitAmount.asDouble()),
+					worth: amount.calculateWorth(price),
 					currency: selectedCurrency
 				)
-
-				details.stakeClaimTokens?.stakeClaims.mutateAll { token in
-					let xrdAmount = token.claimAmount
-					token.claimAmount.fiatWorth = .init(
-						isVisible: isCurrencyAmountVisible,
-						worth: xrdPrice! * (try! xrdAmount.nominalAmount.asDouble()),
-						currency: selectedCurrency
-					)
-				}
 			}
 			return details
 		}
@@ -202,28 +164,139 @@ extension AccountPortfoliosClient.State {
 	}
 }
 
+private let xrdAddress = ResourceAddress(address: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd", decodedKind: .globalFungibleResourceManager)
+
+// MARK: Fiat Worth changes
+extension AccountPortfoliosClient.AccountPortfolio {
+	mutating func updateFiatWorth<T>(value: T, to keyPath: WritableKeyPath<FiatWorth, T>) {
+		updateFiatWorth { _, worth in
+			var worth = worth.fiatWorth
+			worth?[keyPath: keyPath] = value
+			return worth
+		}
+	}
+
+	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
+		account.fungibleResources.updateFiatWorth(change)
+		stakeUnitDetails.mutateValue { $0.updateFiatWorth(change) }
+		poolUnitDetails.mutateValue { $0.updateFiatWorth(change) }
+	}
+}
+
+extension OnLedgerEntity.OwnedFungibleResources {
+	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
+		xrdResource.mutate { resource in
+			resource.amount.fiatWorth = change(resource.resourceAddress, resource.amount)
+		}
+
+		nonXrdResources.mutateAll { resource in
+			resource.amount.fiatWorth = change(resource.resourceAddress, resource.amount)
+		}
+	}
+}
+
+extension MutableCollection where Element == OnLedgerEntitiesClient.OwnedResourcePoolDetails {
+	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
+		mutateAll { detail in
+			detail.xrdResource?.redemptionValue.mutate { amount in
+				amount.fiatWorth = change(xrdAddress, amount)
+			}
+
+			detail.nonXrdResources.mutateAll { resource in
+				let address = resource.resource.resourceAddress
+				resource.redemptionValue.mutate { amount in
+					amount.fiatWorth = change(address, amount)
+				}
+			}
+		}
+	}
+}
+
+extension MutableCollection where Element == OnLedgerEntitiesClient.OwnedStakeDetails {
+	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
+		mutateAll { detail in
+			detail.stakeUnitResource.mutate {
+				$0.amount.fiatWorth = change(xrdAddress, $0.amount)
+			}
+			detail.stakeClaimTokens.mutate {
+				$0.stakeClaims.mutateAll { token in
+					token.claimAmount.fiatWorth = change(xrdAddress, token.claimAmount)
+				}
+			}
+		}
+	}
+}
+
+extension Optional {
+	mutating func mutate(_ mutate: (inout Wrapped) -> Void) {
+		guard case var .some(wrapped) = self else {
+			return
+		}
+		mutate(&wrapped)
+		self = .some(wrapped)
+	}
+}
+
+extension ResourceAmount {
+	private func calculateWorth(_ price: Double?, shouldReturnUnknownIfPriceMissing: Bool) -> FiatWorth.Worth {
+		guard let price else {
+			return shouldReturnUnknownIfPriceMissing ? .unknown : .zero
+		}
+
+		guard let amount = try? nominalAmount.asDouble() else {
+			return .unknown
+		}
+		return .known(price * amount)
+	}
+
+	func calculateWorth(_ price: Double?) -> FiatWorth.Worth {
+		calculateWorth(price, shouldReturnUnknownIfPriceMissing: false)
+	}
+
+	func calculateXRDWorth(_ price: Double?) -> FiatWorth.Worth {
+		calculateWorth(price, shouldReturnUnknownIfPriceMissing: true)
+	}
+}
+
+// MARK: - Account portfolio fiat worth
 extension AccountPortfoliosClient.AccountPortfolio {
 	var totalFiatWorth: Loadable<FiatWorth> {
 		poolUnitDetails.concat(stakeUnitDetails).map { poolUnitDetails, stakeUnitDetails in
-			let xrdFiatWorth = account.fungibleResources.xrdResource?.amount.fiatWorth?.worth ?? .zero
-			let nonXrdFiatWorth = account.fungibleResources.nonXrdResources.compactMap(\.amount.fiatWorth?.worth).reduce(0, +)
-			let fungibleTokensFiatWorth = xrdFiatWorth + nonXrdFiatWorth
-
-			let stakeUnitsFiatWorth: Double = stakeUnitDetails.reduce(0) { partialResult, next in
-				let stakeUnitFiatWorth = next.stakeUnitResource?.amount.fiatWorth?.worth ?? .zero
-				let stakeClaimsFiatWorth = next.stakeClaimTokens?.stakeClaims.compactMap(\.claimAmount.fiatWorth?.worth).reduce(0, +) ?? .zero
-				return partialResult + stakeUnitFiatWorth + stakeClaimsFiatWorth
-			}
-
-			let poolUnitsFiatWorth: Double = poolUnitDetails.reduce(0) { partialResult, next in
-				let xrdFiatWorth = next.xrdResource?.fiatWorth?.worth ?? .zero
-				let nonXrdFiatWorth = account.fungibleResources.nonXrdResources.compactMap(\.amount.fiatWorth?.worth).reduce(0, +)
-				return partialResult + xrdFiatWorth + nonXrdFiatWorth
-			}
-
-			let totalFiatWorth = fungibleTokensFiatWorth + poolUnitsFiatWorth + stakeUnitsFiatWorth
-
+			let totalFiatWorth = account.fungibleResources.fiatWorth + stakeUnitDetails.fiatWorth + poolUnitDetails.fiatWorth
 			return .init(isVisible: isCurrencyAmountVisible, worth: totalFiatWorth, currency: fiatCurrency)
+		}
+		.errorFallback(.unknownWorth(isVisible: isCurrencyAmountVisible, currency: fiatCurrency))
+	}
+}
+
+extension OnLedgerEntity.OwnedFungibleResources {
+	var fiatWorth: FiatWorth.Worth {
+		let xrdFiatWorth = xrdResource?.amount.fiatWorth?.worth ?? .zero
+		let nonXrdFiatWorth = nonXrdResources.compactMap(\.amount.fiatWorth?.worth).reduce(.zero, +)
+		return xrdFiatWorth + nonXrdFiatWorth
+	}
+}
+
+extension Collection<OnLedgerEntitiesClient.OwnedStakeDetails> {
+	var fiatWorth: FiatWorth.Worth {
+		reduce(.zero) { partialResult, stakeUnitDetail in
+			let stakeUnitFiatWorth = stakeUnitDetail.stakeUnitResource?.amount.fiatWorth?.worth ?? .zero
+			let stakeClaimsFiatWorth = stakeUnitDetail
+				.stakeClaimTokens?
+				.stakeClaims
+				.compactMap(\.claimAmount.fiatWorth?.worth)
+				.reduce(.zero, +) ?? .zero
+			return partialResult + stakeUnitFiatWorth + stakeClaimsFiatWorth
+		}
+	}
+}
+
+extension Collection<OnLedgerEntitiesClient.OwnedResourcePoolDetails> {
+	var fiatWorth: FiatWorth.Worth {
+		reduce(.zero) { partialResult, poolUnitDetail in
+			let xrdFiatWorth = poolUnitDetail.xrdResource?.redemptionValue?.fiatWorth?.worth ?? .zero
+			let nonXrdFiatWorth = poolUnitDetail.nonXrdResources.compactMap(\.redemptionValue?.fiatWorth?.worth).reduce(.zero, +)
+			return partialResult + xrdFiatWorth + nonXrdFiatWorth
 		}
 	}
 }

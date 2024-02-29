@@ -21,7 +21,6 @@ extension View {
 	public func loadable<T>(
 		_ loadable: Loadable<T>,
 		loadingViewHeight: CGFloat = .large1,
-		loadingViewWidth: CGFloat? = nil,
 		backgroundColor: Color = .app.gray4,
 		@ViewBuilder successContent: (T) -> some View
 	) -> some View {

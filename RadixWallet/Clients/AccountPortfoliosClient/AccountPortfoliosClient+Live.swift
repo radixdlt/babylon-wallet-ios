@@ -27,7 +27,7 @@ extension AccountPortfoliosClient: DependencyKey {
 		/// Fetches the pool and stake units details for a given account; Will update the portfolio accordingly
 		@Sendable
 		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.Account) async {
-			async let pooldetailsFetch = Task {
+			async let poolDetailsFetch = Task {
 				do {
 					let poolUnitDetails = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account)
 					await state.set(poolDetails: .success(poolUnitDetails), forAccount: account.address)
@@ -35,9 +35,8 @@ extension AccountPortfoliosClient: DependencyKey {
 					await state.set(poolDetails: .failure(error), forAccount: account.address)
 				}
 			}.result
-			async let poolUnitsFetch = Task {
+			async let stakeUnitDetails = Task {
 				do {
-					try await Task.sleep(for: .seconds(Double.random(in: 3 ..< 5)))
 					let stakeUnitDetails = try await onLedgerEntitiesClient.getOwnedStakesDetails(account: account)
 					await state.set(stakeUnitDetails: .success(stakeUnitDetails.asIdentifiable()), forAccount: account.address)
 				} catch {
@@ -45,7 +44,7 @@ extension AccountPortfoliosClient: DependencyKey {
 				}
 			}.result
 
-			_ = await (pooldetailsFetch, pooldetailsFetch)
+			_ = await (poolDetailsFetch, stakeUnitDetails)
 		}
 
 		return AccountPortfoliosClient(
@@ -63,28 +62,21 @@ extension AccountPortfoliosClient: DependencyKey {
 				await state.setIsCurrencyAmountVisble(preferences.isCurrencyAmountVisible)
 
 				let accounts = try await onLedgerEntitiesClient.getAccounts(accountAddresses).map(\.nonEmptyVaults)
-				let portfolios = accounts.map { AccountPortfolio(account: $0) }
 
-				let allResources = accounts.flatMap {
+				/// Put together all resources from already fetched and new accounts
+				let currentAccounts = state.portfoliosSubject.value.wrappedValue.map { $0.values.map(\.account) } ?? []
+				let allResources = (currentAccounts + accounts).flatMap {
 					$0.allFungibleResourceAddresses + $0.poolUnitResources.poolUnits.flatMap(\.poolResources)
-				}
-
-				// Temporary for testing purposes
-				let allTokens: [ResourceAddress] = try! [
-					.init(validatingAddress: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"),
-					.init(validatingAddress: "resource_rdx1t4zrksrzh7ucny7r57ss99nsrxscqwh8crjn6k22m8e9qyxh8c05pl"),
-					.init(validatingAddress: "resource_rdx1t4nxvalrqpqaxv9cvmghk5yyl5u47mgj33npthwfupszvm8ezgy5x0"),
-					.init(validatingAddress: "resource_rdx1t5n6agexw646tgu3lkr8n0nvt69z00384mhrlfuxz75wprtg9wwllq"),
-					.init(validatingAddress: "resource_rdx1thsg68perylkawv6w9vuf9ctrjl6pjhh2vrhp5v4q0vxul7a5ws8wz"),
-				]
+				}.uniqued()
 
 				let prices = try await tokenPriceClient.getTokenPrices(.init(
-					tokens: allTokens,
+					tokens: Array(allResources),
 					currency: preferences.fiatCurrencyPriceTarget
 				))
 				await state.setTokenPrices(prices)
 
-				await state.handlePortfoliosUpdated(portfolios)
+				let portfolios = accounts.map { AccountPortfolio(account: $0) }
+				await state.handlePortfoliosUpdate(portfolios)
 
 				// Load additional details
 				_ = await accounts.parallelMap(fetchPoolAndStakeUnitsDetails)
@@ -97,12 +89,9 @@ extension AccountPortfoliosClient: DependencyKey {
 				}
 
 				let account = try await onLedgerEntitiesClient.getAccount(accountAddress)
-				var portfolio = AccountPortfolio(account: account)
+				let portfolio = AccountPortfolio(account: account)
 
-				await state.applyCurrencyVisibility(&portfolio)
-				await state.applyTokenPrices(to: &portfolio)
-				await state.setOrUpdateAccountPortfolio(portfolio)
-
+				await state.handlePortfolioUpdate(portfolio)
 				await fetchPoolAndStakeUnitsDetails(account)
 
 				return portfolio
@@ -111,7 +100,9 @@ extension AccountPortfoliosClient: DependencyKey {
 				await state.portfolioForAccount(address)
 			},
 			portfoliosUpdates: {
-				state.portfoliosSubject.compactMap { $0.wrappedValue.map { Array($0.values) } }.eraseToAnyAsyncSequence()
+				state.portfoliosSubject.compactMap {
+					$0.wrappedValue.map { Array($0.values) }
+				}.eraseToAnyAsyncSequence()
 			},
 			portfolios: { state.portfoliosSubject.value.wrappedValue.map { Array($0.values) } ?? [] },
 			totalFiatWorth: {
@@ -142,39 +133,4 @@ extension AccountPortfoliosClient: DependencyKey {
 			}
 		)
 	}()
-}
-
-extension NumberFormatter {
-	static let currencyFormatter: NumberFormatter = {
-		let formatter = NumberFormatter()
-		formatter.numberStyle = .currency
-
-		return formatter
-	}()
-}
-
-// MARK: - TokenAmountWithFiatWorth
-public struct TokenAmountWithFiatWorth: Hashable, Sendable {
-	public let amount: RETDecimal
-	public let fiatWorth: FiatWorth?
-
-	public static let zero = TokenAmountWithFiatWorth(amount: 0, fiatWorth: nil)
-
-	public static func + (lhs: TokenAmountWithFiatWorth, rhs: TokenAmountWithFiatWorth) -> TokenAmountWithFiatWorth {
-		.init(
-			amount: lhs.amount + rhs.amount,
-			fiatWorth: {
-				switch (lhs.fiatWorth, rhs.fiatWorth) {
-				case let (lhsFiatWorth?, nil):
-					lhsFiatWorth
-				case let (nil, rhsFiatWorth?):
-					rhsFiatWorth
-				case let (lhsFiatWorth?, rhsFiatWorth?):
-					lhsFiatWorth + rhsFiatWorth
-				case (nil, nil):
-					nil
-				}
-			}()
-		)
-	}
 }

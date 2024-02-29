@@ -843,7 +843,7 @@ extension TransactionReview {
 
 				let resource = OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue(
 					resource: .init(resourceAddress: address, metadata: entity.metadata),
-					redemptionValue: resourceAmount * adjustmentFactor
+					redemptionValue: .init(nominalAmount: resourceAmount * adjustmentFactor)
 				)
 
 				if address.isXRD(on: networkID) {

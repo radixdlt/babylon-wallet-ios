@@ -1,8 +1,17 @@
 // MARK: - FiatWorth
-public struct FiatWorth: Sendable, Hashable, Codable {
+public struct FiatWorth: Sendable, Hashable {
+	enum Worth: Sendable, Hashable {
+		case known(Double)
+		case unknown
+	}
+
 	var isVisible: Bool
-	let worth: Double
-	let currency: FiatCurrency
+	let worth: Worth
+	var currency: FiatCurrency
+
+	static func unknownWorth(isVisible: Bool, currency: FiatCurrency) -> Self {
+		.init(isVisible: isVisible, worth: .unknown, currency: currency)
+	}
 }
 
 extension FiatWorth {
@@ -15,28 +24,89 @@ extension FiatWorth {
 	}
 }
 
+extension FiatWorth.Worth {
+	public static func + (lhs: Self, rhs: Self) -> Self {
+		switch (lhs, rhs) {
+		case let (.known(lhsValue), .known(rhsValue)):
+			.known(lhsValue + rhsValue)
+		default:
+			.unknown
+		}
+	}
+}
+
+extension FiatWorth.Worth {
+	static let zero: Self = .known(.zero)
+
+	var value: Double? {
+		if case let .known(value) = self {
+			return value
+		}
+		return nil
+	}
+}
+
+// MARK: - FiatWorth + Comparable
+extension FiatWorth: Comparable {
+	public static func < (
+		lhs: Self,
+		rhs: Self
+	) -> Bool {
+		lhs.worth < rhs.worth
+	}
+}
+
+// MARK: - FiatWorth.Worth + Comparable
+extension FiatWorth.Worth: Comparable {
+	public static func < (
+		lhs: Self,
+		rhs: Self
+	) -> Bool {
+		switch (lhs, rhs) {
+		case let (.known(lhsValue), .known(rhsValue)):
+			lhsValue < rhsValue
+		case (.known, .unknown):
+			false
+		case (.unknown, .known):
+			true
+		case (.unknown, .unknown):
+			false
+		}
+	}
+}
+
 extension FiatWorth {
+	private static let hiddenValue = "••••"
+	private static let unknownValue = "—"
+
 	func currencyFormatted(applyCustomFont: Bool) -> AttributedString? {
 		let formatter = NumberFormatter()
 		formatter.numberStyle = .currency
 		formatter.currencyCode = currency.currencyCode
-		if self.worth < 1 {
+
+		let value = worth.value ?? .zero // Zero for the unknown case, just to do to the base formatting
+
+		if value < 1 {
 			formatter.maximumFractionDigits = 10
 		}
 
-		var attributedString = AttributedString(formatter.string(for: self.worth)!)
+		let formattedValue = formatter.string(for: value)! // What to do if formatting failed? show the base value with currency code?
 
-		let currencySymbol = formatter.currencySymbol ?? ""
-		let symbolRange = attributedString.range(of: currencySymbol)
+		let currencySymbol = formatter.currencySymbol ?? currency.currencyCode
+		let symbolRange = formattedValue.range(of: currencySymbol)
 
-		guard isVisible else {
-			let hiddenValue = "••••"
-			if symbolRange!.lowerBound == attributedString.startIndex {
-				return AttributedString(currencySymbol + hiddenValue)
-			} else {
-				return AttributedString(hiddenValue + currencySymbol)
+		var attributedString: AttributedString = {
+			guard isVisible, case .known = worth else {
+				let placeholder = isVisible ? Self.unknownValue : Self.hiddenValue
+				if let symbolRange, symbolRange.lowerBound == formattedValue.startIndex {
+					return AttributedString(currencySymbol + placeholder)
+				} else {
+					return AttributedString(placeholder + currencySymbol)
+				}
 			}
-		}
+
+			return AttributedString(formattedValue)
+		}()
 
 		guard applyCustomFont else {
 			return attributedString

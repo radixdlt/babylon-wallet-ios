@@ -573,7 +573,7 @@ extension OnLedgerEntitiesClient {
 
 			nonXrdResourceDetails.append(.init(
 				resource: resourceDetails,
-				redemptionValue: resourceDetails.poolRedemptionValue(for: resource.amount.nominalAmount, poolUnitResource: poolUnitResource)
+				redemptionValue: resourceDetails.poolRedemptionValue(for: resource.amount.nominalAmount, poolUnitResource: poolUnitResource).map { .init(nominalAmount: $0) }
 			))
 		}
 
@@ -585,7 +585,7 @@ extension OnLedgerEntitiesClient {
 			}
 			xrdResourceDetails = .init(
 				resource: details,
-				redemptionValue: details.poolRedemptionValue(for: xrdResource.amount.nominalAmount, poolUnitResource: poolUnitResource)
+				redemptionValue: details.poolRedemptionValue(for: xrdResource.amount.nominalAmount, poolUnitResource: poolUnitResource).map { .init(nominalAmount: $0) }
 			)
 		} else {
 			xrdResourceDetails = nil

@@ -106,6 +106,15 @@ public enum Loadable<Value> {
         }
         return false
     }
+
+    public var didLoad: Bool {
+        switch self {
+        case .success, .failure:
+            return true
+        case .idle, .loading:
+            return false
+        }
+    }
 }
 
 extension Loadable {
@@ -176,6 +185,13 @@ extension Loadable {
 	public func map<NewValue>(_ transform: (Value) -> NewValue) -> Loadable<NewValue> {
 		flatMap { .success(transform($0)) }
 	}
+
+    public func errorFallback(_ fallback: Value) -> Loadable<Value> {
+        if case .failure = self {
+            return .success(fallback)
+        }
+        return self
+    }
 
 	public func filter(by predicate: (Value.Element) -> Bool) -> Loadable<[Value.Element]> where Value: Sequence {
 		switch self {
