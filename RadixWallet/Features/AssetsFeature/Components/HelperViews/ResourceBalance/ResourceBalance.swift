@@ -115,7 +115,7 @@ extension ResourceBalance.ViewState {
 		case let .poolUnit(details):
 			self = .poolUnit(.init(resource: transfer.resource, details: details))
 		case let .stakeClaimNFT(details):
-			self = .stakeClaimNFT(.init(resource: transfer.resource, details: details))
+			self = .stakeClaimNFT(details)
 		}
 	}
 }
@@ -166,11 +166,5 @@ private extension ResourceBalance.ViewState.PoolUnit {
 			dAppName: .success(details.details.dAppName),
 			resources: .success(.init(resources: details.details))
 		)
-	}
-}
-
-private extension ResourceBalance.StakeClaimNFT {
-	init(resource: OnLedgerEntity.Resource, details: ResourceBalance.StakeClaimNFT) {
-		fatalError()
 	}
 }

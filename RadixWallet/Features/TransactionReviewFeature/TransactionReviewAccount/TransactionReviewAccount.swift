@@ -24,7 +24,7 @@ public struct TransactionReviewAccounts: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case showCustomizeGuarantees
-		case showAsset(TransactionReview.Transfer, OnLedgerEntity.NonFungibleToken?)
+		case showAsset(ResourceBalance, OnLedgerEntity.NonFungibleToken?)
 	}
 
 	public init() {}
@@ -58,9 +58,9 @@ public struct TransactionReviewAccount: Sendable, FeatureReducer {
 	public struct State: Sendable, Identifiable, Hashable {
 		public var id: AccountAddress { account.address }
 		public let account: TransactionReview.Account
-		public var transfers: IdentifiedArrayOf<TransactionReview.Transfer>
+		public var transfers: IdentifiedArrayOf<ResourceBalance>
 
-		public init(account: TransactionReview.Account, transfers: IdentifiedArrayOf<TransactionReview.Transfer>) {
+		public init(account: TransactionReview.Account, transfers: IdentifiedArrayOf<ResourceBalance>) {
 			self.account = account
 			self.transfers = transfers
 		}
@@ -68,11 +68,11 @@ public struct TransactionReviewAccount: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case transferTapped(TransactionReview.Transfer, OnLedgerEntity.NonFungibleToken?)
+		case transferTapped(ResourceBalance, OnLedgerEntity.NonFungibleToken?)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case showAsset(TransactionReview.Transfer, OnLedgerEntity.NonFungibleToken?)
+		case showAsset(ResourceBalance, OnLedgerEntity.NonFungibleToken?)
 		case showStakeClaim(OnLedgerEntitiesClient.StakeClaim)
 	}
 
