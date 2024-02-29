@@ -1,13 +1,3 @@
-// MARK: - SendableAnyHashable
-
-public struct SendableAnyHashable: @unchecked Sendable, Hashable {
-	let wrapped: AnyHashable
-
-	init(wrapped: some Hashable & Sendable) {
-		self.wrapped = .init(wrapped)
-	}
-}
-
 // MARK: - ResourceBalance
 public struct ResourceBalance: Sendable, Hashable, Identifiable {
 	public var id: AnyHashable { _id?.wrapped ?? .init(self) }
@@ -57,7 +47,48 @@ public struct ResourceBalance: Sendable, Hashable, Identifiable {
 		public var guarantee: TransactionClient.Guarantee?
 	}
 
-	public typealias StakeClaimNFT = StakeClaimResourceView.ViewState // FIXME: GK see if this is optimal
+	public struct StakeClaimNFT: Sendable, Hashable {
+		public let validatorName: String?
+		public var stakeClaimTokens: Tokens
+		public let stakeClaimResource: OnLedgerEntity.Resource
+
+		var resourceMetadata: OnLedgerEntity.Metadata {
+			stakeClaimResource.metadata
+		}
+
+		init(
+			canClaimTokens: Bool,
+			stakeClaimTokens: OnLedgerEntitiesClient.NonFungibleResourceWithTokens,
+			validatorName: String? = nil,
+			selectedStakeClaims: IdentifiedArrayOf<NonFungibleGlobalId>? = nil
+		) {
+			self.validatorName = validatorName
+			self.stakeClaimResource = stakeClaimTokens.resource
+			self.stakeClaimTokens = .init(
+				canClaimTokens: canClaimTokens,
+				stakeClaims: stakeClaimTokens.stakeClaims,
+				selectedStakeClaims: selectedStakeClaims
+			)
+		}
+
+		public struct Tokens: Sendable, Hashable {
+			public let canClaimTokens: Bool
+			public let stakeClaims: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim>
+			var selectedStakeClaims: IdentifiedArrayOf<NonFungibleGlobalId>?
+
+			var unstaking: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim> {
+				stakeClaims.filter(\.isUnstaking)
+			}
+
+			var readyToBeClaimed: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim> {
+				stakeClaims.filter(\.isReadyToBeClaimed)
+			}
+
+			var toBeClaimed: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim> {
+				stakeClaims.filter(\.isToBeClaimed)
+			}
+		}
+	}
 
 	// Helper types
 
@@ -138,56 +169,8 @@ private extension ResourceBalance.ViewState.PoolUnit {
 	}
 }
 
-private extension ResourceBalance.ViewState.StakeClaimNFT {
+private extension ResourceBalance.StakeClaimNFT {
 	init(resource: OnLedgerEntity.Resource, details: ResourceBalance.StakeClaimNFT) {
-		self = details
-	}
-}
-
-// MARK: - ResourceBalance.ViewState
-extension ResourceBalance {
-	// MARK: - ViewState
-	public enum ViewState: Sendable, Hashable {
-		case fungible(Fungible)
-		case nonFungible(NonFungible)
-		case lsu(LSU)
-		case poolUnit(PoolUnit)
-		case stakeClaimNFT(StakeClaimNFT)
-
-		public struct Fungible: Sendable, Hashable {
-			public let address: ResourceAddress
-			public let icon: Thumbnail.FungibleContent
-			public let title: String?
-			public let amount: ResourceBalance.Amount?
-		}
-
-		public struct NonFungible: Sendable, Hashable {
-			public let id: NonFungibleGlobalId
-			public let resourceImage: URL?
-			public let resourceName: String?
-			public let nonFungibleName: String?
-		}
-
-		public struct LSU: Sendable, Hashable {
-			public let address: ResourceAddress
-			public let icon: URL?
-			public let title: String?
-			public let amount: ResourceBalance.Amount?
-			public let worth: RETDecimal
-			public var validatorName: String? = nil
-		}
-
-		public struct PoolUnit: Sendable, Hashable, Identifiable {
-			public var id: ResourcePoolAddress { resourcePoolAddress }
-			public let resourcePoolAddress: ResourcePoolAddress
-			public let poolUnitAddress: ResourceAddress
-			public let poolIcon: URL?
-			public let poolName: String?
-			public let amount: ResourceBalance.Amount?
-			public var dAppName: Loadable<String?>
-			public var resources: Loadable<[Fungible]>
-		}
-
-		public typealias StakeClaimNFT = StakeClaimResourceView.ViewState // FIXME: GK see if this is optimal
+		fatalError()
 	}
 }

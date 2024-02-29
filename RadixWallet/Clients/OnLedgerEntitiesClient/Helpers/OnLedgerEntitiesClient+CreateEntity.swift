@@ -378,7 +378,7 @@ extension OnLedgerEntitiesClient {
 				return nil
 			}()
 
-			let stakeClaimTokens: NonFunbileResourceWithTokens? = try await { () -> NonFunbileResourceWithTokens? in
+			let stakeClaimTokens: NonFungibleResourceWithTokens? = try await { () -> NonFungibleResourceWithTokens? in
 				if let stakeClaimResource = stake.stakeClaimResource, stakeClaimResource.nonFungibleIdsCount > 0 {
 					guard let stakeClaimResourceDetails = resourceDetails.first(where: { $0.resourceAddress == stakeClaimResource.resourceAddress }) else {
 						assertionFailure("Did not load stake unit details")
@@ -488,7 +488,7 @@ extension OnLedgerEntitiesClient {
 	public struct OwnedStakeDetails: Hashable, Sendable {
 		public let validator: OnLedgerEntity.Validator
 		public let stakeUnitResource: ResourceWithVaultAmount?
-		public let stakeClaimTokens: NonFunbileResourceWithTokens?
+		public let stakeClaimTokens: NonFungibleResourceWithTokens?
 		public let currentEpoch: Epoch
 	}
 
@@ -535,7 +535,7 @@ extension OnLedgerEntitiesClient {
 		}
 	}
 
-	public struct NonFunbileResourceWithTokens: Hashable, Sendable {
+	public struct NonFungibleResourceWithTokens: Hashable, Sendable {
 		public let resource: OnLedgerEntity.Resource
 		public let stakeClaims: IdentifiedArrayOf<StakeClaim>
 	}

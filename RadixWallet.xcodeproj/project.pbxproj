@@ -1102,7 +1102,6 @@
 		8397D82C2B46ACB50016365A /* StakeUnitList+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8397D82A2B46ACB50016365A /* StakeUnitList+View.swift */; };
 		8397D82D2B46ACB50016365A /* StakeUnitList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8397D82B2B46ACB50016365A /* StakeUnitList.swift */; };
 		839B6C542B21D28400402651 /* ExpandableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 839B6C532B21D28400402651 /* ExpandableTextView.swift */; };
-		83AAAC6A2B46FC5800222B64 /* StakeClaimNFTsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AAAC692B46FC5800222B64 /* StakeClaimNFTsView.swift */; };
 		83AAAC6D2B483D1B00222B64 /* StakeSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83AAAC6B2B483D1B00222B64 /* StakeSummaryView.swift */; };
 		83D0B5692AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */; };
 		83D663B02B271D0100D1AB9E /* TruncationMask.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D663AF2B271D0100D1AB9E /* TruncationMask.swift */; };
@@ -1175,6 +1174,10 @@
 		A462B5B02B84078D00C26D20 /* CoreAPI_StringPlaintextMessageContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5AF2B84078D00C26D20 /* CoreAPI_StringPlaintextMessageContent.swift */; };
 		A462B5B22B8407D300C26D20 /* CoreAPI_BinaryPlaintextMessageContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5B12B8407D300C26D20 /* CoreAPI_BinaryPlaintextMessageContent.swift */; };
 		A462B5B42B8F25BC00C26D20 /* ResourceBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5B32B8F25BC00C26D20 /* ResourceBalance.swift */; };
+		A462B5B72B90C53E00C26D20 /* ResourceBalancesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5B62B90C53E00C26D20 /* ResourceBalancesView.swift */; };
+		A462B5B92B90C57400C26D20 /* ResourceBalanceButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5B82B90C57400C26D20 /* ResourceBalanceButton.swift */; };
+		A462B5BB2B90C5E800C26D20 /* ResourceBalance+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5BA2B90C5E800C26D20 /* ResourceBalance+Helpers.swift */; };
+		A462B5BD2B90C62600C26D20 /* ResourceBalanceView+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5BC2B90C62600C26D20 /* ResourceBalanceView+Helpers.swift */; };
 		A47571FF2B29B0860059A95D /* IOSSecuritySuite in Frameworks */ = {isa = PBXBuildFile; productRef = A47571FE2B29B0860059A95D /* IOSSecuritySuite */; };
 		A47572042B29B4EE0059A95D /* IOSSecurityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */; };
 		A47572052B29B4F20059A95D /* IOSSecurityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */; };
@@ -2376,7 +2379,6 @@
 		8397D82A2B46ACB50016365A /* StakeUnitList+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StakeUnitList+View.swift"; sourceTree = "<group>"; };
 		8397D82B2B46ACB50016365A /* StakeUnitList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StakeUnitList.swift; sourceTree = "<group>"; };
 		839B6C532B21D28400402651 /* ExpandableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandableTextView.swift; sourceTree = "<group>"; };
-		83AAAC692B46FC5800222B64 /* StakeClaimNFTsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StakeClaimNFTsView.swift; sourceTree = "<group>"; };
 		83AAAC6B2B483D1B00222B64 /* StakeSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StakeSummaryView.swift; sourceTree = "<group>"; };
 		83D0B5682AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RadixEngineToolkitError+Description.swift"; sourceTree = "<group>"; };
 		83D663AF2B271D0100D1AB9E /* TruncationMask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TruncationMask.swift; sourceTree = "<group>"; };
@@ -2448,6 +2450,10 @@
 		A462B5AF2B84078D00C26D20 /* CoreAPI_StringPlaintextMessageContent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreAPI_StringPlaintextMessageContent.swift; sourceTree = "<group>"; };
 		A462B5B12B8407D300C26D20 /* CoreAPI_BinaryPlaintextMessageContent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreAPI_BinaryPlaintextMessageContent.swift; sourceTree = "<group>"; };
 		A462B5B32B8F25BC00C26D20 /* ResourceBalance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceBalance.swift; sourceTree = "<group>"; };
+		A462B5B62B90C53E00C26D20 /* ResourceBalancesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceBalancesView.swift; sourceTree = "<group>"; };
+		A462B5B82B90C57400C26D20 /* ResourceBalanceButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceBalanceButton.swift; sourceTree = "<group>"; };
+		A462B5BA2B90C5E800C26D20 /* ResourceBalance+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ResourceBalance+Helpers.swift"; sourceTree = "<group>"; };
+		A462B5BC2B90C62600C26D20 /* ResourceBalanceView+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ResourceBalanceView+Helpers.swift"; sourceTree = "<group>"; };
 		A47572012B29B3CA0059A95D /* IOSSecurityClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Live.swift"; sourceTree = "<group>"; };
 		A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Test.swift"; sourceTree = "<group>"; };
 		A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Interface.swift"; sourceTree = "<group>"; };
@@ -4476,14 +4482,13 @@
 		48CFBE5F2ADC10D800E77A5C /* HelperViews */ = {
 			isa = PBXGroup;
 			children = (
+				A462B5B52B90C4A900C26D20 /* ResourceBalance */,
 				48CFBE602ADC10D800E77A5C /* AssetTagsView.swift */,
 				48CFBE612ADC10D800E77A5C /* NFTHelperViews.swift */,
 				48CFBE622ADC10D800E77A5C /* AssetBehaviorsView.swift */,
 				48CFBE632ADC10D800E77A5C /* GeneralHelperViews.swift */,
 				48CFBE642ADC10D800E77A5C /* AssetResourceDetails.swift */,
 				48CFBE652ADC10D800E77A5C /* EmptyAssetListView.swift */,
-				A41557562B7D4BF10040AD4E /* ResourceBalanceView.swift */,
-				A462B5B32B8F25BC00C26D20 /* ResourceBalance.swift */,
 			);
 			path = HelperViews;
 			sourceTree = "<group>";
@@ -6779,7 +6784,6 @@
 			children = (
 				48CFBE502ADC10D800E77A5C /* LSUDetails+View.swift */,
 				48CFBE552ADC10D800E77A5C /* LSUDetails.swift */,
-				83AAAC692B46FC5800222B64 /* StakeClaimNFTsView.swift */,
 				83AAAC6B2B483D1B00222B64 /* StakeSummaryView.swift */,
 				48CFBE542ADC10D800E77A5C /* ValidatorStakeView.swift */,
 				48CFBE512ADC10D800E77A5C /* ValidatorHeaderView.swift */,
@@ -6838,6 +6842,19 @@
 				A462B5B12B8407D300C26D20 /* CoreAPI_BinaryPlaintextMessageContent.swift */,
 			);
 			path = CoreAPI;
+			sourceTree = "<group>";
+		};
+		A462B5B52B90C4A900C26D20 /* ResourceBalance */ = {
+			isa = PBXGroup;
+			children = (
+				A462B5B32B8F25BC00C26D20 /* ResourceBalance.swift */,
+				A462B5BA2B90C5E800C26D20 /* ResourceBalance+Helpers.swift */,
+				A41557562B7D4BF10040AD4E /* ResourceBalanceView.swift */,
+				A462B5BC2B90C62600C26D20 /* ResourceBalanceView+Helpers.swift */,
+				A462B5B62B90C53E00C26D20 /* ResourceBalancesView.swift */,
+				A462B5B82B90C57400C26D20 /* ResourceBalanceButton.swift */,
+			);
+			path = ResourceBalance;
 			sourceTree = "<group>";
 		};
 		A47572002B29B3B90059A95D /* IOSSecurityClient */ = {
@@ -8493,6 +8510,7 @@
 				48CFC5392ADC10DA00E77A5C /* NonFungibleResourcesCollectionItemVaultAggregated.swift in Sources */,
 				48CFC36D2ADC10D900E77A5C /* FungibleAssetList+Row+Reducer.swift in Sources */,
 				48CFC3D12ADC10D900E77A5C /* WordList+SimplifiedChinese.swift in Sources */,
+				A462B5B92B90C57400C26D20 /* ResourceBalanceButton.swift in Sources */,
 				48CFC4BE2ADC10DA00E77A5C /* StateEntityDetailsResponsePackageDetailsSchemaCollection.swift in Sources */,
 				48CFC4EC2ADC10DA00E77A5C /* NonFungibleResourcesCollectionItemVaultAggregatedVault.swift in Sources */,
 				48CFC28F2ADC10D900E77A5C /* TransactionReviewAccount+View.swift in Sources */,
@@ -8535,6 +8553,7 @@
 				48CFC31A2ADC10D900E77A5C /* CreateAccountCoordinator+Reducer.swift in Sources */,
 				48CFC67E2ADC10DB00E77A5C /* SecurityStructureRole.swift in Sources */,
 				48CFC6242ADC10DA00E77A5C /* EntitiesControlledByFactorSource.swift in Sources */,
+				A462B5B72B90C53E00C26D20 /* ResourceBalancesView.swift in Sources */,
 				48CFC43B2ADC10DA00E77A5C /* QRAddressPrefix.swift in Sources */,
 				48CFC3A32ADC10D900E77A5C /* EncryptionScheme.swift in Sources */,
 				48CFC2952ADC10D900E77A5C /* FeesView.swift in Sources */,
@@ -8627,6 +8646,7 @@
 				83EE47832AF0EE3C00155F03 /* ProgrammaticScryptoSborValuePreciseDecimal.swift in Sources */,
 				48CFC2D62ADC10D900E77A5C /* ChooseAccountsRow.swift in Sources */,
 				48CFC6792ADC10DB00E77A5C /* HDFactorSourceProtocol.swift in Sources */,
+				A462B5BB2B90C5E800C26D20 /* ResourceBalance+Helpers.swift in Sources */,
 				48AE39EC2B0CCA7600813CF3 /* RecoverWalletControlWithBDFSComplete+View.swift in Sources */,
 				48CFC3612ADC10D900E77A5C /* LedgerHardwareDevices+View.swift in Sources */,
 				48CFC5752ADC10DA00E77A5C /* GatewayAPI+PublicKey.swift in Sources */,
@@ -8744,7 +8764,6 @@
 				48CFC3F32ADC10D900E77A5C /* PeerConnectionClient.swift in Sources */,
 				48CFC33E2ADC10D900E77A5C /* DappInteractionFlow+View.swift in Sources */,
 				83EE47902AF0EE3C00155F03 /* ProgrammaticScryptoSborValueU8.swift in Sources */,
-				83AAAC6A2B46FC5800222B64 /* StakeClaimNFTsView.swift in Sources */,
 				48CFC2E62ADC10D900E77A5C /* CreateSecurityStructureStart.swift in Sources */,
 				48CFC3642ADC10D900E77A5C /* NonFungibleAssetList+View.swift in Sources */,
 				48CFC26B2ADC10D900E77A5C /* SignWithFactorSourcesOfKindLedger.swift in Sources */,
@@ -8911,6 +8930,7 @@
 				48CFC5632ADC10DA00E77A5C /* MetadataOriginValue.swift in Sources */,
 				E6A2D9E52AFA6C1E001857EC /* AccountWithInfoHolder.swift in Sources */,
 				48CFC4572ADC10DA00E77A5C /* CacheClient+Interface.swift in Sources */,
+				A462B5BD2B90C62600C26D20 /* ResourceBalanceView+Helpers.swift in Sources */,
 				48CFC5B92ADC10DA00E77A5C /* BackButton.swift in Sources */,
 				48CFC23B2ADC10D900E77A5C /* SecurityStructureConfigurationList.swift in Sources */,
 				48CFC2402ADC10D900E77A5C /* AccountPreferences+Reducer.swift in Sources */,

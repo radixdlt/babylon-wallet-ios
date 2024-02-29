@@ -12,7 +12,7 @@ extension TransactionHistoryClient {
 			// FIXME: GK REMOVE THIS
 //			let account = try AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l")
 
-			let account = try AccountAddress(validatingAddress: "account_rdx16x9gfj2dt82e3qvp0j775fnc06clllvf9gj86us497hyxrye656530")
+//			let account = try AccountAddress(validatingAddress: "account_rdx16x9gfj2dt82e3qvp0j775fnc06clllvf9gj86us497hyxrye656530")
 
 			let request = GatewayAPI.StreamTransactionsRequest(
 				atLedgerState: .init(timestamp: period.upperBound),
