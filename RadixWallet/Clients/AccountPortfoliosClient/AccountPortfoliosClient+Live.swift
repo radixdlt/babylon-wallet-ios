@@ -99,11 +99,6 @@ extension AccountPortfoliosClient: DependencyKey {
 			portfolioForAccount: { address in
 				await state.portfolioForAccount(address)
 			},
-			portfoliosUpdates: {
-				state.portfoliosSubject.compactMap {
-					$0.wrappedValue.map { Array($0.values) }
-				}.eraseToAnyAsyncSequence()
-			},
 			portfolios: { state.portfoliosSubject.value.wrappedValue.map { Array($0.values) } ?? [] },
 			totalFiatWorth: {
 				state.portfoliosSubject

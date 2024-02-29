@@ -13,11 +13,10 @@ public struct AccountPortfoliosClient: Sendable {
 	/// Subscribe to portfolio changes for a given account address
 	public var portfolioForAccount: PortfolioForAccount
 
-	public var portfoliosUpdates: PortfoliosUpdates
-
 	/// Currently loaded portfolios
 	public var portfolios: Portfolios
 
+	/// Total Fiat Worth across all portfolios
 	public var totalFiatWorth: TotalFiatWorth
 }
 
@@ -25,7 +24,6 @@ extension AccountPortfoliosClient {
 	public typealias FetchAccountPortfolio = @Sendable (_ address: AccountAddress, _ forceResfresh: Bool) async throws -> AccountPortfolio
 	public typealias FetchAccountPortfolios = @Sendable (_ addresses: [AccountAddress], _ forceResfresh: Bool) async throws -> [AccountPortfolio]
 	public typealias PortfolioForAccount = @Sendable (_ address: AccountAddress) async -> AnyAsyncSequence<AccountPortfolio>
-	public typealias PortfoliosUpdates = @Sendable () async -> AnyAsyncSequence<[AccountPortfolio]>
 	public typealias Portfolios = @Sendable () -> [AccountPortfolio]
 	public typealias TotalFiatWorth = @Sendable () async -> AnyAsyncSequence<Loadable<FiatWorth>>
 }

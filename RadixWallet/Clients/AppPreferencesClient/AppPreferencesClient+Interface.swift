@@ -70,12 +70,6 @@ extension AppPreferencesClient {
 		await extractProfileSnapshot().appPreferences.security.isDeveloperModeEnabled
 	}
 
-	public func update(isCurrencyAmountVisible: Bool) async throws {
-		try await updatingDisplay { display in
-			display.isCurrencyAmountVisible = isCurrencyAmountVisible
-		}
-	}
-
 	public func toggleIsCurrencyAmountVisible() async throws {
 		try await updatingDisplay { display in
 			display.isCurrencyAmountVisible.toggle()

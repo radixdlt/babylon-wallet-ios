@@ -334,47 +334,6 @@ extension OnLedgerEntitiesClient {
 }
 
 extension OnLedgerEntitiesClient {
-	public func getPoolAndStakeDetails(
-		accounts: [OnLedgerEntity.Account],
-		cachingStrategy: CachingStrategy = .useCache
-	) async throws -> [AccountAddress: (pools: [OwnedResourcePoolDetails], stakes: [OwnedStakeDetails])] {
-		let validators = accounts.flatMap { $0.poolUnitResources.radixNetworkStakes.map(\.validatorAddress.asGeneral) }
-		let poolUnitResources = accounts.flatMap { $0.poolUnitResources.poolUnits.map(\.resource.resourceAddress.asGeneral) }
-		let pools = accounts.flatMap { $0.poolUnitResources.poolUnits.map(\.resourcePoolAddress.asGeneral) }
-
-		let allAddresses = (validators + poolUnitResources + pools).uniqued()
-
-		async let resourceDetails = getEntities(
-			addresses: Array(allAddresses),
-			metadataKeys: .resourceMetadataKeys,
-			cachingStrategy: cachingStrategy,
-			atLedgerState: accounts.first!.atLedgerState
-		)
-
-		async let allStakeClaimTokens = accounts.flatMap { account -> [(AccountAddress, ValidatorAddress, OnLedgerEntity.OwnedNonFungibleResource)] in
-			account.poolUnitResources.radixNetworkStakes.compactMap { validator -> (AccountAddress, ValidatorAddress, OnLedgerEntity.OwnedNonFungibleResource)? in
-				guard let stakeClaimResource = validator.stakeClaimResource else {
-					return nil
-				}
-
-				return (account.address, validator.validatorAddress, stakeClaimResource)
-			}
-		}
-		.parallelMap { accountAddress, validatorAddress, stakeClaimResource -> (AccountAddress, ValidatorAddress, [OnLedgerEntity.NonFungibleToken]) in
-			let tokens = try await getAccountOwnedNonFungibleTokenData(.init(
-				accountAddress: accountAddress,
-				resource: stakeClaimResource,
-				mode: .loadAll
-			)).tokens
-
-			return (accountAddress, validatorAddress, tokens)
-		}
-
-		let (details, stakeClaimTokens) = try await (resourceDetails, allStakeClaimTokens)
-
-		return [:]
-	}
-
 	/// This loads all of the related stake unit details required by the Pool Units screen.
 	/// We don't do any pagination there(yet), since the number of owned stakes will not be big, this can be revised in the future.
 	public func getOwnedStakesDetails(
