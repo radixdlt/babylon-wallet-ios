@@ -189,7 +189,7 @@ extension NonFungibleTokenDetails.View {
 		onClaimTap: @escaping () -> Void
 	) -> some SwiftUI.View {
 		VStack(alignment: .leading, spacing: .small3) {
-			StakeClaimTokensView(
+			ResourceBalanceView.StakeClaimNFT.Tokens(
 				viewState: .init(
 					canClaimTokens: true,
 					stakeClaims: [stakeClaim]
