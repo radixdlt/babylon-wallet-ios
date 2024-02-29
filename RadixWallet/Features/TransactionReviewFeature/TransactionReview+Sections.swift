@@ -624,7 +624,7 @@ extension TransactionReview {
 					metadata: newEntityMetadata
 				)
 
-				let details: Transfer.Details.Fungible = .init(
+				let details: ResourceBalance.Fungible = .init(
 					isXRD: false,
 					amount: source.amount,
 					guarantee: nil
@@ -694,11 +694,7 @@ extension TransactionReview {
 
 		// Normal fungible resource
 		let isXRD = resourceAddress.isXRD(on: networkID)
-		let details: Transfer.Details.Fungible = .init(
-			isXRD: isXRD,
-			amount: amount,
-			guarantee: guarantee
-		)
+		let details: ResourceBalance.Fungible = .init(isXRD: isXRD, amount: amount, guarantee: guarantee)
 
 		return [.init(resource: resource, details: .fungible(details))]
 	}
@@ -807,7 +803,7 @@ extension TransactionReview {
 			worth = amount * validator.xrdVaultBalance / totalSupply
 		}
 
-		let details = Transfer.Details.LiquidStakeUnit(
+		let details = ResourceBalance.LiquidStakeUnit(
 			resource: resource,
 			amount: amount,
 			worth: worth,

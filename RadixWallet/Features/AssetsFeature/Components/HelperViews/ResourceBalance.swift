@@ -1,30 +1,63 @@
+// MARK: - SendableAnyHashable
+
+public struct SendableAnyHashable: @unchecked Sendable, Hashable {
+	let wrapped: AnyHashable
+
+	init(wrapped: some Hashable & Sendable) {
+		self.wrapped = .init(wrapped)
+	}
+}
+
 // MARK: - ResourceBalance
-public struct ResourceBalance: Sendable, Hashable {
+public struct ResourceBalance: Sendable, Hashable, Identifiable {
+	public var id: AnyHashable { _id?.wrapped ?? .init(self) }
+	private let _id: SendableAnyHashable?
+
 	public let resource: OnLedgerEntity.Resource
-	public let details: Details
+	public var details: Details
+
+	public init(resource: OnLedgerEntity.Resource, details: Details, id: some Hashable & Sendable) {
+		self._id = .init(wrapped: id)
+		self.resource = resource
+		self.details = details
+	}
+
+	public init(resource: OnLedgerEntity.Resource, details: Details) {
+		self._id = nil
+		self.resource = resource
+		self.details = details
+	}
 
 	public enum Details: Sendable, Hashable {
 		case fungible(Fungible)
 		case nonFungible(NonFungible)
-		case lsu(LSU)
 		case poolUnit(PoolUnit)
+		case liquidStakeUnit(LiquidStakeUnit)
+		case stakeClaimNFT(StakeClaimNFT)
 	}
 
 	public struct Fungible: Sendable, Hashable {
-		public let amount: Amount?
+		public let isXRD: Bool
+		public let amount: RETDecimal
+		public var guarantee: TransactionClient.Guarantee?
+	}
+
+	public struct LiquidStakeUnit: Sendable, Hashable {
+		public let resource: OnLedgerEntity.Resource
+		public let amount: RETDecimal
+		public let worth: RETDecimal
+		public let validator: OnLedgerEntity.Validator
+		public var guarantee: TransactionClient.Guarantee?
 	}
 
 	public typealias NonFungible = OnLedgerEntity.NonFungibleToken
 
-	public struct LSU: Sendable, Hashable {
-		public let amount: Amount?
-		public let validator: OnLedgerEntity.Validator
+	public struct PoolUnit: Sendable, Hashable {
+		public let details: OnLedgerEntitiesClient.OwnedResourcePoolDetails
+		public var guarantee: TransactionClient.Guarantee?
 	}
 
-	public struct PoolUnit: Sendable, Hashable {
-		public let amount: Amount?
-		public let pool: OnLedgerEntity.ResourcePool
-	}
+	public typealias StakeClaimNFT = StakeClaimResourceView.ViewState // FIXME: GK see if this is optimal
 
 	// Helper types
 
@@ -39,64 +72,8 @@ public struct ResourceBalance: Sendable, Hashable {
 	}
 }
 
-extension ResourceBalance {
-	var viewState: ViewState {
-		switch details {
-		case let .fungible(details):
-			.fungible(.init(
-				address: resource.resourceAddress,
-				icon: .token(.other(resource.metadata.iconURL)),
-				title: resource.metadata.title,
-				amount: details.amount
-			))
-		case let .nonFungible(details):
-			fatalError()
-		case let .lsu(details):
-			fatalError()
-		case let .poolUnit(details):
-			fatalError()
-		}
-	}
-}
-
-extension ResourceBalance {
-	init(_ transfer: TransactionReview.Transfer) {
-		self.resource = transfer.resource
-
-		switch transfer.details {
-		case let .fungible(details):
-			self.details = .fungible(.init(details))
-		case let .nonFungible(details):
-			self.details = .nonFungible(details)
-		case let .liquidStakeUnit(details):
-			fatalError()
-		case let .poolUnit(details):
-			fatalError()
-		case let .stakeClaimNFT(details):
-			fatalError()
-		}
-	}
-}
-
-private extension ResourceBalance.Fungible {
-	init(_ details: TransactionReview.Transfer.Details.Fungible) {
-		self.init(
-			amount: .init(
-				details.amount,
-				guaranteed: details.guarantee?.amount
-			)
-		)
-	}
-}
-
-// private extension ResourceBalance.NonFungible {
-//	init(_ details: TransactionReview.Transfer.Details.NonFungible) {
-//		self = details
-//	}
-// }
-
-extension ResourceBalance.ViewState { // FIXME: GK use full?
-	init(transfer: TransactionReview.Transfer) {
+extension ResourceBalance.ViewState {
+	init(transfer: ResourceBalance) {
 		switch transfer.details {
 		case let .fungible(details):
 			self = .fungible(.init(resource: transfer.resource, details: details))
@@ -107,13 +84,13 @@ extension ResourceBalance.ViewState { // FIXME: GK use full?
 		case let .poolUnit(details):
 			self = .poolUnit(.init(resource: transfer.resource, details: details))
 		case let .stakeClaimNFT(details):
-			fatalError()
+			self = .stakeClaimNFT(.init(resource: transfer.resource, details: details))
 		}
 	}
 }
 
 private extension ResourceBalance.ViewState.Fungible {
-	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.Fungible) {
+	init(resource: OnLedgerEntity.Resource, details: ResourceBalance.Fungible) {
 		self.init(
 			address: resource.resourceAddress,
 			icon: .token(details.isXRD ? .xrd : .other(resource.metadata.iconURL)),
@@ -124,7 +101,7 @@ private extension ResourceBalance.ViewState.Fungible {
 }
 
 private extension ResourceBalance.ViewState.NonFungible {
-	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.NonFungible) {
+	init(resource: OnLedgerEntity.Resource, details: ResourceBalance.NonFungible) {
 		self.init(
 			id: details.id,
 			resourceImage: resource.metadata.iconURL,
@@ -135,7 +112,7 @@ private extension ResourceBalance.ViewState.NonFungible {
 }
 
 private extension ResourceBalance.ViewState.LSU {
-	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.LiquidStakeUnit) {
+	init(resource: OnLedgerEntity.Resource, details: ResourceBalance.LiquidStakeUnit) {
 		self.init(
 			address: resource.resourceAddress,
 			icon: resource.metadata.iconURL,
@@ -148,7 +125,7 @@ private extension ResourceBalance.ViewState.LSU {
 }
 
 private extension ResourceBalance.ViewState.PoolUnit {
-	init(resource: OnLedgerEntity.Resource, details: TransactionReview.Transfer.Details.PoolUnit) {
+	init(resource: OnLedgerEntity.Resource, details: ResourceBalance.PoolUnit) {
 		self.init(
 			resourcePoolAddress: details.details.address,
 			poolUnitAddress: resource.resourceAddress,
@@ -161,6 +138,12 @@ private extension ResourceBalance.ViewState.PoolUnit {
 	}
 }
 
+private extension ResourceBalance.ViewState.StakeClaimNFT {
+	init(resource: OnLedgerEntity.Resource, details: ResourceBalance.StakeClaimNFT) {
+		self = details
+	}
+}
+
 // MARK: - ResourceBalance.ViewState
 extension ResourceBalance {
 	// MARK: - ViewState
@@ -169,6 +152,7 @@ extension ResourceBalance {
 		case nonFungible(NonFungible)
 		case lsu(LSU)
 		case poolUnit(PoolUnit)
+		case stakeClaimNFT(StakeClaimNFT)
 
 		public struct Fungible: Sendable, Hashable {
 			public let address: ResourceAddress
@@ -203,5 +187,7 @@ extension ResourceBalance {
 			public var dAppName: Loadable<String?>
 			public var resources: Loadable<[Fungible]>
 		}
+
+		public typealias StakeClaimNFT = StakeClaimResourceView.ViewState // FIXME: GK see if this is optimal
 	}
 }

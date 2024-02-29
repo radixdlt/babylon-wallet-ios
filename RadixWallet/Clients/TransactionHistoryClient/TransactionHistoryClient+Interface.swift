@@ -84,6 +84,8 @@ extension ResourceBalance.ViewState: Comparable {
 			2
 		case .poolUnit:
 			3
+		case .stakeClaimNFT:
+			4
 		}
 	}
 }
