@@ -28,14 +28,14 @@ public struct ResourceBalance: Sendable, Hashable, Identifiable {
 
 	public struct Fungible: Sendable, Hashable {
 		public let isXRD: Bool
-		public let amount: RETDecimal
+		public let amount: ResourceAmount
 		public var guarantee: TransactionClient.Guarantee?
 	}
 
 	public struct LiquidStakeUnit: Sendable, Hashable {
 		public let resource: OnLedgerEntity.Resource
 		public let amount: RETDecimal
-		public let worth: RETDecimal
+		public let worth: ResourceAmount
 		public let validator: OnLedgerEntity.Validator
 		public var guarantee: TransactionClient.Guarantee?
 	}
@@ -93,12 +93,16 @@ public struct ResourceBalance: Sendable, Hashable, Identifiable {
 	// Helper types
 
 	public struct Amount: Sendable, Hashable {
-		public let amount: RETDecimal
+		public let amount: ResourceAmount
 		public let guaranteed: RETDecimal?
 
-		init(_ amount: RETDecimal, guaranteed: RETDecimal? = nil) {
+		init(_ amount: ResourceAmount, guaranteed: RETDecimal? = nil) {
 			self.amount = amount
 			self.guaranteed = guaranteed
+		}
+
+		init(_ amount: RETDecimal, guaranteed: RETDecimal? = nil) {
+			self.init(.init(nominalAmount: amount), guaranteed: guaranteed)
 		}
 	}
 }

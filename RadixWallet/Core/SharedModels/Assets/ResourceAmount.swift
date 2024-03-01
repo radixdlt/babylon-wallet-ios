@@ -1,3 +1,4 @@
+// MARK: - ResourceAmount
 public struct ResourceAmount: Sendable, Hashable, Codable {
 	let nominalAmount: RETDecimal
 	var fiatWorth: FiatWorth?
@@ -40,5 +41,12 @@ public struct ResourceAmount: Sendable, Hashable, Codable {
 				}
 			}()
 		)
+	}
+}
+
+// MARK: Comparable
+extension ResourceAmount: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		lhs.nominalAmount < rhs.nominalAmount
 	}
 }

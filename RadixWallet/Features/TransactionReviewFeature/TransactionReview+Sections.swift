@@ -626,7 +626,7 @@ extension TransactionReview {
 
 				let details: ResourceBalance.Fungible = .init(
 					isXRD: false,
-					amount: source.amount,
+					amount: .init(nominalAmount: source.amount),
 					guarantee: nil
 				)
 
@@ -694,7 +694,7 @@ extension TransactionReview {
 
 		// Normal fungible resource
 		let isXRD = resourceAddress.isXRD(on: networkID)
-		let details: ResourceBalance.Fungible = .init(isXRD: isXRD, amount: amount, guarantee: guarantee)
+		let details: ResourceBalance.Fungible = .init(isXRD: isXRD, amount: .init(nominalAmount: amount), guarantee: guarantee)
 
 		return [.init(resource: resource, details: .fungible(details))]
 	}
@@ -806,7 +806,7 @@ extension TransactionReview {
 		let details = ResourceBalance.LiquidStakeUnit(
 			resource: resource,
 			amount: amount,
-			worth: worth,
+			worth: .init(nominalAmount: worth),
 			validator: validator,
 			guarantee: guarantee
 		)

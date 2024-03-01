@@ -12,10 +12,7 @@ extension LSUDetails.State {
 			),
 			thumbnailURL: stakeUnitResource.resource.metadata.iconURL,
 			validatorNameViewState: .init(with: validator),
-			redeemableTokenAmount: .xrd(balance: .init(
-				nominalAmount: xrdRedemptionValue,
-				fiatWorth: stakeUnitResource.amount.fiatWorth
-			)),
+			redeemableTokenAmount: .xrd(balance: xrdRedemptionValue),
 			resourceDetails: .init(
 				description: .success(stakeUnitResource.resource.metadata.description),
 				resourceAddress: stakeUnitResource.resource.resourceAddress,
