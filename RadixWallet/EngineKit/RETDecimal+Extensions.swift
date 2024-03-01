@@ -185,14 +185,6 @@ extension RETDecimal {
 		}
 	}
 
-	public func currencyFormatted() -> String {
-		if self >= 1 {
-			self.formatted(totalPlaces: 2)
-		} else {
-			self.formatted()
-		}
-	}
-
 	public func formattedEngineeringNotation(
 		locale: Locale = .autoupdatingCurrent,
 		totalPlaces: UInt = .maxPlacesEngineeringNotation

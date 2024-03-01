@@ -1,7 +1,7 @@
 // MARK: - FiatWorth
 public struct FiatWorth: Sendable, Hashable {
 	enum Worth: Sendable, Hashable {
-		case known(Double)
+		case known(RETDecimal)
 		case unknown
 	}
 
@@ -38,11 +38,18 @@ extension FiatWorth.Worth {
 extension FiatWorth.Worth {
 	static let zero: Self = .known(.zero)
 
-	var value: Double? {
+	var value: RETDecimal? {
 		if case let .known(value) = self {
 			return value
 		}
 		return nil
+	}
+
+	var isUnknown: Bool {
+		if case .unknown = self {
+			return true
+		}
+		return false
 	}
 }
 
@@ -79,7 +86,7 @@ extension FiatWorth {
 	private static let hiddenValue = "••••"
 	private static let unknownValue = "—"
 
-	func currencyFormatted(applyCustomFont: Bool) -> AttributedString? {
+	func currencyFormatted(applyCustomFont: Bool = false) -> AttributedString {
 		let formatter = NumberFormatter()
 		formatter.numberStyle = .currency
 		formatter.currencyCode = currency.currencyCode
@@ -90,7 +97,13 @@ extension FiatWorth {
 			formatter.maximumFractionDigits = 10
 		}
 
-		let formattedValue = formatter.string(for: value)! // What to do if formatting failed? show the base value with currency code?
+		let formattedValue = {
+			guard let double = try? value.asDouble(), let value = formatter.string(for: double) else {
+				// Good enough fallback
+				return "\(currency.currencyCode)\(value.formattedPlain())"
+			}
+			return value
+		}()
 
 		let currencySymbol = formatter.currencySymbol ?? currency.currencyCode
 		let symbolRange = formattedValue.range(of: currencySymbol)

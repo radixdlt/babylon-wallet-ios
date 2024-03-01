@@ -92,17 +92,13 @@ extension Home.AccountRow {
 								.layoutPriority(0)
 
 							Spacer()
-							loadable(viewStore.fiatWorth, loadingView: { shimmeringLoadingView() }) { _ in
-								Text("--")
-									.textStyle(.secondaryHeader)
-									.foregroundStyle(.app.white)
-							} successContent: { fiatWorth in
-								//                                if case .known fiatWorth.worth > .zero {
-								Text(fiatWorth.currencyFormatted(applyCustomFont: false)!)
-									.lineLimit(1)
-									.textStyle(.secondaryHeader)
-									.foregroundStyle(.app.white)
-//								}
+							loadable(viewStore.fiatWorth) { fiatWorth in
+								if fiatWorth.worth.isUnknown || fiatWorth.worth > .zero {
+									Text(fiatWorth.currencyFormatted())
+										.lineLimit(1)
+										.textStyle(.secondaryHeader)
+										.foregroundStyle(.app.white)
+								}
 							}
 							.padding(.leading, .small1)
 							.frame(maxWidth: viewStore.fiatWorth.didLoad ? nil : .huge1)

@@ -13,7 +13,7 @@ extension AccountPortfoliosClient {
 
 	/// Internal state that holds all loaded portfolios.
 	actor State {
-		typealias TokenPrices = [ResourceAddress: Double]
+		typealias TokenPrices = [ResourceAddress: RETDecimal]
 		let portfoliosSubject: AsyncCurrentValueSubject<Loadable<[AccountAddress: AccountPortfolio]>> = .init(.loading)
 		var tokenPrices: TokenPrices = [:]
 
@@ -92,15 +92,7 @@ extension AccountPortfoliosClient.State {
 	}
 
 	func applyTokenPrices(to portfolio: inout AccountPortfoliosClient.AccountPortfolio) {
-		portfolio.updateFiatWorth { _, amount in
-			let price = tokenPrices.values.randomElement()
-
-			return .init(
-				isVisible: isCurrencyAmountVisible,
-				worth: amount.calculateWorth(price),
-				currency: selectedCurrency
-			)
-		}
+		portfolio.updateFiatWorth(calculateWorth)
 	}
 
 	func applyCurrencyVisibility(_ portfolio: inout AccountPortfoliosClient.AccountPortfolio) {
@@ -124,6 +116,17 @@ extension AccountPortfoliosClient.State {
 
 // MARK: - Stake and Pool details handling
 extension AccountPortfoliosClient.State {
+	func calculateWorth(for resourceAddress: ResourceAddress, amount: ResourceAmount) -> FiatWorth? {
+		let price = tokenPrices[resourceAddress]
+		return price.map {
+			.init(
+				isVisible: isCurrencyAmountVisible,
+				worth: .known($0 * amount.nominalAmount),
+				currency: selectedCurrency
+			)
+		}
+	}
+
 	func set(poolDetails: Loadable<[OnLedgerEntitiesClient.OwnedResourcePoolDetails]>, forAccount address: AccountAddress) {
 		guard var portfolio = portfoliosSubject.value.wrappedValue?[address] else {
 			return
@@ -131,14 +134,7 @@ extension AccountPortfoliosClient.State {
 
 		portfolio.poolUnitDetails = poolDetails.map { details in
 			var details = details
-			details.updateFiatWorth { _, amount in
-				let price = tokenPrices.values.randomElement()
-				return .init(
-					isVisible: isCurrencyAmountVisible,
-					worth: amount.calculateXRDWorth(price),
-					currency: selectedCurrency
-				)
-			}
+			details.updateFiatWorth(calculateWorth)
 			return details
 		}
 		setOrUpdateAccountPortfolio(portfolio)
@@ -150,14 +146,7 @@ extension AccountPortfoliosClient.State {
 		}
 		portfolio.stakeUnitDetails = stakeUnitDetails.map { details in
 			var details = details
-			details.updateFiatWorth { _, amount in
-				let price = tokenPrices.values.randomElement()
-				return .init(
-					isVisible: isCurrencyAmountVisible,
-					worth: amount.calculateWorth(price),
-					currency: selectedCurrency
-				)
-			}
+			details.updateFiatWorth(calculateWorth)
 			return details
 		}
 		setOrUpdateAccountPortfolio(portfolio)
@@ -234,27 +223,6 @@ extension Optional {
 		}
 		mutate(&wrapped)
 		self = .some(wrapped)
-	}
-}
-
-extension ResourceAmount {
-	private func calculateWorth(_ price: Double?, shouldReturnUnknownIfPriceMissing: Bool) -> FiatWorth.Worth {
-		guard let price else {
-			return shouldReturnUnknownIfPriceMissing ? .unknown : .zero
-		}
-
-		guard let amount = try? nominalAmount.asDouble() else {
-			return .unknown
-		}
-		return .known(price * amount)
-	}
-
-	func calculateWorth(_ price: Double?) -> FiatWorth.Worth {
-		calculateWorth(price, shouldReturnUnknownIfPriceMissing: false)
-	}
-
-	func calculateXRDWorth(_ price: Double?) -> FiatWorth.Worth {
-		calculateWorth(price, shouldReturnUnknownIfPriceMissing: true)
 	}
 }
 

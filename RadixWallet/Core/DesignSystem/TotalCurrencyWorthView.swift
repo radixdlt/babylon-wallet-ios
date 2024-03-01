@@ -13,7 +13,7 @@ struct TotalCurrencyWorthView: View {
 				onTap()
 			} label: {
 				HStack {
-					Text(totalCurrencyWorth.currencyFormatted(applyCustomFont: true)!)
+					Text(totalCurrencyWorth.currencyFormatted(applyCustomFont: true))
 						.textStyle(.sheetTitle)
 
 					Image(asset: totalCurrencyWorth.isVisible ? AssetResource.homeAggregatedValueShown : AssetResource.homeAggregatedValueHidden)

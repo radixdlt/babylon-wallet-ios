@@ -4,7 +4,7 @@ public struct TokenPriceClient: Sendable, DependencyKey {
 }
 
 extension TokenPriceClient {
-	public typealias TokenPrices = [ResourceAddress: Double]
+	public typealias TokenPrices = [ResourceAddress: RETDecimal]
 	public struct FetchPricesRequest: Encodable {
 		public let tokens: [ResourceAddress]
 		public let currency: FiatCurrency
@@ -82,8 +82,18 @@ extension DependencyValues {
 extension TokenPriceClient.TokenPrices {
 	init(_ tokenPricesResponse: TokensPriceResponse) {
 		self = tokenPricesResponse.tokens.reduce(into: [:]) { partialResult, next in
-			partialResult[next.resourceAddress] = next.price
+			let roundedToRETPrecision = next.price.roundDoubleToDecimalPlaces(Int(RETDecimal.maxDivisibility))
+			partialResult[next.resourceAddress] = RETDecimal(floatLiteral: roundedToRETPrecision)
 		}
+	}
+}
+
+extension Double {
+	func roundDoubleToDecimalPlaces(_ decimalPlaces: Int) -> Double {
+		var decimalValue = Decimal(self)
+		var result = Decimal()
+		NSDecimalRound(&result, &decimalValue, decimalPlaces, .plain)
+		return (result as NSDecimalNumber).doubleValue
 	}
 }
 
