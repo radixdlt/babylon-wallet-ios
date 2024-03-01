@@ -82,10 +82,10 @@ extension TransactionHistoryClient {
 			let nftData = try await groupedNonFungibleIDs.parallelMap { address, ids in
 				try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(resource: address.asSpecific(), nonFungibleIds: ids))
 			}
-			var keyedNFTData: [NonFungibleGlobalId: OnLedgerEntity.NonFungibleToken] = [:]
+			var keyedNFTData: [NonFungibleGlobalId: OnLedgerEntity.NonFungibleToken.NFTData] = [:]
 			for nftDataArray in nftData {
 				for nftDatum in nftDataArray {
-					keyedNFTData[nftDatum.id] = nftDatum
+					keyedNFTData[nftDatum.id] = nftDatum.data
 				}
 			}
 
@@ -101,7 +101,7 @@ extension TransactionHistoryClient {
 				let details = try ResourceBalance.NonFungible(
 					resourceAddress: resourceAddress,
 					nftID: id.localId(),
-					nftData: nil
+					nftData: nftData
 				)
 
 				return ResourceBalance(resource: resource, details: .nonFungible(details))
@@ -117,8 +117,6 @@ extension TransactionHistoryClient {
 
 				if let changes = info.balanceChanges {
 					for nonFungible in changes.nonFungibleBalanceChanges where nonFungible.entityAddress == account.address {
-						let resourceAddress = try ResourceAddress(validatingAddress: nonFungible.resourceAddress)
-
 						for nonFungibleID in try extractNonFungibleIDs(.removed, from: nonFungible) {
 							try withdrawals.append(nonFungibleResource(nonFungibleID))
 						}
@@ -143,8 +141,8 @@ extension TransactionHistoryClient {
 					}
 				}
 
-//				withdrawals.sort(by: >)
-//				deposits.sort(by: >)
+				withdrawals.sort(by: >)
+				deposits.sort(by: >)
 
 				return .init(
 					time: time,
