@@ -21,8 +21,8 @@ public struct TransactionHistoryItem: Sendable, Hashable {
 	let time: Date
 	let message: String?
 	let manifestClass: GatewayAPI.ManifestClass?
-	let withdrawals: [ResourceBalance.ViewState] // FIXME: GK use full
-	let deposits: [ResourceBalance.ViewState]
+	let withdrawals: [ResourceBalance]
+	let deposits: [ResourceBalance]
 	let depositSettingsUpdated: Bool
 }
 
