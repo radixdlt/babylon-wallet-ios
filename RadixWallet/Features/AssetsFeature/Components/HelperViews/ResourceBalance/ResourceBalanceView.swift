@@ -87,7 +87,7 @@ public struct ResourceBalanceView: View {
 			case let .poolUnit(viewState):
 				PoolUnit(viewState: viewState, isSelected: isSelected)
 			case let .stakeClaimNFT(viewState):
-				fatalError() // FIXME: GK
+				StakeClaimNFT(viewState: viewState, background: .blue.opacity(0.2), onTap: { _ in })
 			}
 
 			if !delegateSelection, let isSelected {
