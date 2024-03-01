@@ -138,12 +138,14 @@ extension TransactionHistory {
 
 					VStack(spacing: .small1) {
 						if !transaction.withdrawals.isEmpty {
-							TransfersActionView(type: .withdrawal, resources: transaction.withdrawals)
+							let resources = transaction.withdrawals.map(\.viewState)
+							TransfersActionView(type: .withdrawal, resources: resources)
 								.padding(.horizontal, .medium3)
 						}
 
 						if !transaction.deposits.isEmpty {
-							TransfersActionView(type: .deposit, resources: transaction.deposits)
+							let resources = transaction.deposits.map(\.viewState)
+							TransfersActionView(type: .deposit, resources: resources)
 								.padding(.horizontal, .medium3)
 						}
 					}
