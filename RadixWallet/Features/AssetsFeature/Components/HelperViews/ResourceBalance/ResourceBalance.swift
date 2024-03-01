@@ -103,19 +103,19 @@ public struct ResourceBalance: Sendable, Hashable, Identifiable {
 	}
 }
 
-extension ResourceBalance.ViewState {
-	init(transfer: ResourceBalance) {
-		switch transfer.details {
+extension ResourceBalance {
+	var viewState: ViewState {
+		switch details {
 		case let .fungible(details):
-			self = .fungible(.init(resource: transfer.resource, details: details))
+			.fungible(.init(resource: resource, details: details))
 		case let .nonFungible(details):
-			self = .nonFungible(.init(resource: transfer.resource, details: details))
+			.nonFungible(.init(resource: resource, details: details))
 		case let .liquidStakeUnit(details):
-			self = .lsu(.init(resource: transfer.resource, details: details))
+			.lsu(.init(resource: resource, details: details))
 		case let .poolUnit(details):
-			self = .poolUnit(.init(resource: transfer.resource, details: details))
+			.poolUnit(.init(resource: resource, details: details))
 		case let .stakeClaimNFT(details):
-			self = .stakeClaimNFT(details)
+			.stakeClaimNFT(details)
 		}
 	}
 }
@@ -165,6 +165,7 @@ private extension ResourceBalance.ViewState.PoolUnit {
 			amount: .init(details.details.poolUnitResource.amount, guaranteed: details.guarantee?.amount),
 			dAppName: .success(details.details.dAppName),
 			resources: .success(.init(resources: details.details))
+//			resources: .success()
 		)
 	}
 }
