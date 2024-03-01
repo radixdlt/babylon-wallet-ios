@@ -149,7 +149,7 @@ extension ResourceBalance.Fungible {
 	init(resourceWithRedemptionValue resource: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
 		self.init(
 			isXRD: isXRD,
-			amount: resource.redemptionValue ?? { fatalError() }(),
+			amount: resource.redemptionValue ?? { fatalError() }(), // FIXME: GK - handle nil amount
 			guarantee: nil
 		)
 	}
