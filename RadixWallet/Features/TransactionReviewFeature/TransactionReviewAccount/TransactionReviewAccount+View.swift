@@ -99,7 +99,7 @@ struct TransactionReviewResourceView: View {
 	var body: some View {
 		switch transfer.details {
 		case .fungible, .nonFungible, .liquidStakeUnit, .poolUnit:
-			ResourceBalanceButton(.init(transfer: transfer), appearance: .transactionReview) {
+			ResourceBalanceButton(transfer.viewState, appearance: .transactionReview) {
 				onTap(nil)
 			}
 		case let .stakeClaimNFT(details):
@@ -129,6 +129,28 @@ extension ResourceBalance.ViewState.Fungible { // FIXME: GK use full
 			icon: .token(isXRD ? .xrd : .other(resource.resource.metadata.iconURL)),
 			title: isXRD ? Constants.xrdTokenName : resource.resource.metadata.title,
 			amount: resource.redemptionValue.map { .init($0) }
+		)
+	}
+}
+
+extension [ResourceBalance.Fungible] {
+	init(resources: OnLedgerEntitiesClient.OwnedResourcePoolDetails) {
+		let xrdResource = resources.xrdResource.map {
+			Element(resourceWithRedemptionValue: $0, isXRD: true)
+		}
+		let nonXrdResources = resources.nonXrdResources.map {
+			Element(resourceWithRedemptionValue: $0, isXRD: false)
+		}
+		self = (xrdResource.map { [$0] } ?? []) + nonXrdResources
+	}
+}
+
+extension ResourceBalance.Fungible {
+	init(resourceWithRedemptionValue resource: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
+		self.init(
+			isXRD: isXRD,
+			amount: resource.redemptionValue ?? { fatalError() }(),
+			guarantee: nil
 		)
 	}
 }
