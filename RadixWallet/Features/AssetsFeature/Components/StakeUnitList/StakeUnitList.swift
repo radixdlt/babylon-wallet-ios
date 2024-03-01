@@ -85,7 +85,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 							)
 						},
 						stakeClaimResource: stake.stakeClaimTokens.map { stakeClaimTokens in
-							StakeClaimResourceView.ViewState(
+							ResourceBalance.StakeClaimNFT(
 								canClaimTokens: allSelectedTokens == nil, // cannot claim in selection mode
 								stakeClaimTokens: stakeClaimTokens,
 								selectedStakeClaims: allSelectedTokens
@@ -192,7 +192,10 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 					.init(
 						validator: stakeDetails.validator,
 						stakeUnitResource: stakeUnitResource,
-						xrdRedemptionValue: stakeDetails.xrdRedemptionValue
+						xrdRedemptionValue: .init(
+							nominalAmount: stakeDetails.xrdRedemptionValue,
+							fiatWorth: stakeUnitResource.amount.fiatWorth
+						)
 					)
 				)
 			}

@@ -384,7 +384,7 @@ extension TransactionReview {
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
-		var withdrawals: [Account: [Transfer]] = [:]
+		var withdrawals: [Account: [ResourceBalance]] = [:]
 
 		for (accountAddress, resources) in accountWithdraws {
 			let account = try userAccounts.account(for: .init(validatingAddress: accountAddress))
@@ -425,7 +425,7 @@ extension TransactionReview {
 	) async throws -> TransactionReviewAccounts.State? {
 		let defaultDepositGuarantee = await appPreferencesClient.getPreferences().transaction.defaultDepositGuarantee
 
-		var deposits: [Account: [Transfer]] = [:]
+		var deposits: [Account: [ResourceBalance]] = [:]
 
 		for (accountAddress, accountDeposits) in accountDeposits {
 			let account = try userAccounts.account(for: .init(validatingAddress: accountAddress))
@@ -595,7 +595,7 @@ extension TransactionReview {
 		networkID: NetworkID,
 		type: TransferType,
 		defaultDepositGuarantee: RETDecimal = 1
-	) async throws -> [Transfer] {
+	) async throws -> [ResourceBalance] {
 		let resourceAddress: ResourceAddress = try resourceQuantifier.resourceAddress.asSpecific()
 
 		guard let resourceInfo = entities[resourceAddress] else {
@@ -624,7 +624,7 @@ extension TransactionReview {
 					metadata: newEntityMetadata
 				)
 
-				let details: Transfer.Details.Fungible = .init(
+				let details: ResourceBalance.Fungible = .init(
 					isXRD: false,
 					amount: source.amount,
 					guarantee: nil
@@ -653,7 +653,7 @@ extension TransactionReview {
 		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
 		defaultDepositGuarantee: RETDecimal = 1
-	) async throws -> [Transfer] {
+	) async throws -> [ResourceBalance] {
 		let amount = resourceQuantifier.amount
 		let resourceAddress = resource.resourceAddress
 
@@ -694,11 +694,7 @@ extension TransactionReview {
 
 		// Normal fungible resource
 		let isXRD = resourceAddress.isXRD(on: networkID)
-		let details: Transfer.Details.Fungible = .init(
-			isXRD: isXRD,
-			amount: amount,
-			guarantee: guarantee
-		)
+		let details: ResourceBalance.Fungible = .init(isXRD: isXRD, amount: amount, guarantee: guarantee)
 
 		return [.init(resource: resource, details: .fungible(details))]
 	}
@@ -709,9 +705,9 @@ extension TransactionReview {
 		resourceQuantifier: NonFungibleResourceIndicator,
 		unstakeData: [UnstakeDataEntry] = [],
 		newlyCreatedNonFungibles: [NonFungibleGlobalId] = []
-	) async throws -> [Transfer] {
+	) async throws -> [ResourceBalance] {
 		let ids = resourceQuantifier.ids
-		let result: [Transfer]
+		let result: [ResourceBalance]
 
 		switch resourceInfo {
 		case let .left(resource):
@@ -766,7 +762,7 @@ extension TransactionReview {
 					try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: localId)
 				}
 				.map { id in
-					Transfer(resource: resource, details: .nonFungible(.init(id: id, data: nil)))
+					ResourceBalance(resource: resource, details: .nonFungible(.init(id: id, data: nil)))
 				}
 
 			guard result.count == ids.count else {
@@ -783,7 +779,7 @@ extension TransactionReview {
 		validator: OnLedgerEntity.Validator,
 		validatorStakes: [TrackedValidatorStake] = [],
 		guarantee: TransactionClient.Guarantee?
-	) async throws -> [Transfer] {
+	) async throws -> [ResourceBalance] {
 		let worth: RETDecimal
 		if !validatorStakes.isEmpty {
 			if let stake = try validatorStakes.first(where: { try $0.validatorAddress.asSpecific() == validator.address }) {
@@ -807,7 +803,7 @@ extension TransactionReview {
 			worth = amount * validator.xrdVaultBalance / totalSupply
 		}
 
-		let details = Transfer.Details.LiquidStakeUnit(
+		let details = ResourceBalance.LiquidStakeUnit(
 			resource: resource,
 			amount: amount,
 			worth: worth,
@@ -826,7 +822,7 @@ extension TransactionReview {
 		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
 		guarantee: TransactionClient.Guarantee?
-	) async throws -> [Transfer] {
+	) async throws -> [ResourceBalance] {
 		let resourceAddress = resource.resourceAddress
 
 		if let poolContribution = try poolContributions.first(where: { try $0.poolUnitsResourceAddress.asSpecific() == resourceAddress }) {
@@ -886,7 +882,7 @@ extension TransactionReview {
 		stakeClaimValidator: OnLedgerEntity.Validator,
 		unstakeData: [UnstakeDataEntry],
 		tokens: [OnLedgerEntity.NonFungibleToken]
-	) throws -> [Transfer] {
+	) throws -> [ResourceBalance] {
 		let stakeClaimTokens: [OnLedgerEntitiesClient.StakeClaim] = if !unstakeData.isEmpty {
 			try tokens.map { token in
 				guard let data = unstakeData.first(where: { $0.nonFungibleGlobalId == token.id })?.data else {

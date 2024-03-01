@@ -100,7 +100,7 @@ extension TransactionReviewGuarantee.State {
 
 extension TransactionReviewGuarantee {
 	public struct ViewState: Identifiable, Equatable {
-		public let id: TransactionReview.Transfer.ID
+		public let id: ResourceBalance.ID
 		let account: TransactionReview.Account
 		let fungible: ResourceBalance.ViewState.Fungible
 	}

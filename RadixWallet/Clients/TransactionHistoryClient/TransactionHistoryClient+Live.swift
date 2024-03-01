@@ -10,9 +10,9 @@ extension TransactionHistoryClient {
 		@Sendable
 		func getTransactionHistory(account: AccountAddress, period: Range<Date>, cursor: String?) async throws -> TransactionHistoryResponse {
 			// FIXME: GK REMOVE THIS
-//			let account = try AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l")
+			let account = try AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l")
 
-			let account = try AccountAddress(validatingAddress: "account_rdx16x9gfj2dt82e3qvp0j775fnc06clllvf9gj86us497hyxrye656530")
+//			let account = try AccountAddress(validatingAddress: "account_rdx16x9gfj2dt82e3qvp0j775fnc06clllvf9gj86us497hyxrye656530")
 
 			let request = GatewayAPI.StreamTransactionsRequest(
 				atLedgerState: .init(timestamp: period.upperBound),
@@ -204,104 +204,3 @@ extension TransactionHistoryClient {
 			.map { try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress, nonFungibleLocalId: $0) }
 	}
 }
-
-// func liquidStakeUnitTransfer(
-//			_ resource: OnLedgerEntity.Resource,
-//			amount: RETDecimal,
-//			validator: OnLedgerEntity.Validator,
-//			validatorStakes: [TrackedValidatorStake] = [],
-//			guarantee: TransactionClient.Guarantee?
-//		) async throws -> [TransactionReview.Transfer] {
-//			let worth: RETDecimal
-//			if !validatorStakes.isEmpty {
-//				if let stake = try validatorStakes.first(where: { try $0.validatorAddress.asSpecific() == validator.address }) {
-//					guard try stake.liquidStakeUnitAddress.asSpecific() == validator.stakeUnitResourceAddress else {
-//						throw StakeUnitAddressMismatch()
-//					}
-//					// Distribute the worth in proportion to the amounts, if needed
-//					if stake.liquidStakeUnitAmount == amount {
-//						worth = stake.xrdAmount
-//					} else {
-//						worth = (amount / stake.liquidStakeUnitAmount) * stake.xrdAmount
-//					}
-//				} else {
-//					throw MissingTrackedValidatorStake()
-//				}
-//			} else {
-//				guard let totalSupply = resource.totalSupply, totalSupply.isPositive() else {
-//					throw MissingPositiveTotalSupply()
-//				}
-//
-//				worth = amount * validator.xrdVaultBalance / totalSupply
-//			}
-//
-//			let details = Transfer.Details.LiquidStakeUnit(
-//				resource: resource,
-//				amount: amount,
-//				worth: worth,
-//				validator: validator,
-//				guarantee: guarantee
-//			)
-//
-//			return [.init(resource: resource, details: .liquidStakeUnit(details))]
-//		}
-//
-//
-//		func fungibleTransferInfo(
-//			_ resource: OnLedgerEntity.Resource,
-//			resourceQuantifier: FungibleResourceIndicator,
-//			poolContributions: [some TrackedPoolInteraction] = [],
-//			validatorStakes: [TrackedValidatorStake] = [],
-//			entities: ResourcesInfo = [:],
-//			resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
-//			networkID: NetworkID,
-//			defaultDepositGuarantee: RETDecimal = 1
-//		) async throws -> [TransactionReview.Transfer] {
-//			let amount = resourceQuantifier.amount
-//			let resourceAddress = resource.resourceAddress
-//
-//			let guarantee: TransactionClient.Guarantee? = {
-//				guard case let .predicted(predictedAmount) = resourceQuantifier else { return nil }
-//				let guaranteedAmount = defaultDepositGuarantee * predictedAmount.value
-//				return .init(
-//					amount: guaranteedAmount,
-//					instructionIndex: predictedAmount.instructionIndex,
-//					resourceAddress: resourceAddress,
-//					resourceDivisibility: resource.divisibility
-//				)
-//			}()
-//
-//			// Check if the fungible resource is a pool unit resource
-//			if await onLedgerEntitiesClient.isPoolUnitResource(resource) {
-//				return try await poolUnitTransfer(
-//					resource,
-//					amount: amount,
-//					poolContributions: poolContributions,
-//					entities: entities,
-//					resourceAssociatedDapps: resourceAssociatedDapps,
-//					networkID: networkID,
-//					guarantee: guarantee
-//				)
-//			}
-//
-//			// Check if the fungible resource is an LSU
-//			if let validator = await onLedgerEntitiesClient.isLiquidStakeUnit(resource) {
-//				return try await liquidStakeUnitTransfer(
-//					resource,
-//					amount: amount,
-//					validator: validator,
-//					validatorStakes: validatorStakes,
-//					guarantee: guarantee
-//				)
-//			}
-//
-//			// Normal fungible resource
-//			let isXRD = resourceAddress.isXRD(on: networkID)
-//			let details: Transfer.Details.Fungible = .init(
-//				isXRD: isXRD,
-//				amount: amount,
-//				guarantee: guarantee
-//			)
-//
-//			return [.init(resource: resource, details: .fungible(details))]
-//		}
