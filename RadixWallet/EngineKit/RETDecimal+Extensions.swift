@@ -306,3 +306,14 @@ private extension String {
 		reversed().enumerated().first { $0.element != "0" }?.offset ?? count
 	}
 }
+
+extension RETDecimal {
+	func asDouble() throws -> Double {
+		guard let double = Double(self.asStr()) else {
+			assertionFailure("Invalid decimal? how is it possible?")
+			struct InvalidDecimalValue: Error {}
+			throw InvalidDecimalValue()
+		}
+		return double
+	}
+}

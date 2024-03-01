@@ -12,7 +12,7 @@ extension DetailsContainerWithHeaderViewState {
 	init(_ resourceWithAmount: OnLedgerEntitiesClient.ResourceWithVaultAmount) {
 		self.init(
 			title: .success(resourceWithAmount.resource.metadata.name),
-			amount: resourceWithAmount.amount.formatted(),
+			amount: resourceWithAmount.amount.nominalAmount.formatted(),
 			symbol: .success(resourceWithAmount.resource.metadata.symbol)
 		)
 	}

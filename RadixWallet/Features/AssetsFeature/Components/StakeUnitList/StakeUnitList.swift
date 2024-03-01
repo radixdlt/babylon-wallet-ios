@@ -132,7 +132,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 					.init(
 						validator: stakeDetails.validator,
 						stakeUnitResource: stakeUnitResource,
-						xrdRedemptionValue: stakeDetails.xrdRedemptionValue
+						xrdRedemptionValue: .init(nominalAmount: stakeDetails.xrdRedemptionValue, fiatWorth: stakeUnitResource.amount.fiatWorth)
 					)
 				)
 			}
@@ -188,7 +188,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 						validatorAddress: validatorAddress,
 						resourceAddress: stakeClaimTokens.resource.resourceAddress,
 						ids: stakeClaims.map { $0.id.localId() },
-						amount: stakeClaims.map(\.claimAmount).reduce(0, +)
+						amount: stakeClaims.map(\.claimAmount.nominalAmount).reduce(0, +)
 					),
 				]
 			)
@@ -207,7 +207,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 						validatorAddress: stake.validator.address,
 						resourceAddress: stakeClaimTokens.resource.resourceAddress,
 						ids: stakeClaims.map { $0.id.localId() },
-						amount: stakeClaims.map(\.claimAmount).reduce(0, +)
+						amount: stakeClaims.map(\.claimAmount.nominalAmount).reduce(0, +)
 					)
 				}
 			)
@@ -240,7 +240,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 						validatorAddress: stakeClaim.validatorAddress,
 						resourceAddress: resourceAddress,
 						ids: .init(stakeClaim.id.localId()),
-						amount: stakeClaim.claimAmount
+						amount: stakeClaim.claimAmount.nominalAmount
 					),
 				]
 			)
@@ -286,8 +286,8 @@ extension StakeUnitList {
 
 		let stakeClaims = details.compactMap(\.stakeClaimTokens).flatMap(\.stakeClaims)
 		let stakedAmount = details.map(\.xrdRedemptionValue).reduce(.zero(), +)
-		let unstakingAmount = stakeClaims.filter(not(\.isReadyToBeClaimed)).map(\.claimAmount).reduce(.zero(), +)
-		let readyToClaimAmount = stakeClaims.filter(\.isReadyToBeClaimed).map(\.claimAmount).reduce(.zero(), +)
+		let unstakingAmount = stakeClaims.filter(not(\.isReadyToBeClaimed)).map(\.claimAmount.nominalAmount).reduce(.zero(), +)
+		let readyToClaimAmount = stakeClaims.filter(\.isReadyToBeClaimed).map(\.claimAmount.nominalAmount).reduce(.zero(), +)
 
 		let validatorStakes = details
 			.map { stake in
@@ -306,7 +306,7 @@ extension StakeUnitList {
 								icon: stakeUnitResource.resource.metadata.iconURL,
 								title: stakeUnitResource.resource.metadata.title,
 								amount: nil,
-								worth: stake.xrdRedemptionValue,
+								worth: .init(nominalAmount: stake.xrdRedemptionValue, fiatWorth: stakeUnitResource.amount.fiatWorth),
 								validatorName: nil
 							),
 							isSelected: state.selectedLiquidStakeUnits?.contains { $0.id == stakeUnitResource.resource.resourceAddress }
@@ -344,6 +344,6 @@ extension OnLedgerEntitiesClient.OwnedStakeDetails: Identifiable {
 
 extension OnLedgerEntitiesClient.OwnedStakeDetails {
 	var xrdRedemptionValue: RETDecimal {
-		((stakeUnitResource?.amount ?? 0) * validator.xrdVaultBalance) / (stakeUnitResource?.resource.totalSupply ?? 1)
+		((stakeUnitResource?.amount.nominalAmount ?? 0) * validator.xrdVaultBalance) / (stakeUnitResource?.resource.totalSupply ?? 1)
 	}
 }

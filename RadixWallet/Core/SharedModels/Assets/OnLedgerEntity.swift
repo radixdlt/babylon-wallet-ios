@@ -336,13 +336,13 @@ extension OnLedgerEntity {
 
 		public let resourceAddress: ResourceAddress
 		public let atLedgerState: AtLedgerState
-		public let amount: RETDecimal
+		public let amount: ResourceAmount
 		public let metadata: Metadata
 
 		public init(
 			resourceAddress: ResourceAddress,
 			atLedgerState: AtLedgerState,
-			amount: RETDecimal,
+			amount: ResourceAmount,
 			metadata: Metadata
 		) {
 			self.resourceAddress = resourceAddress
@@ -601,7 +601,7 @@ extension OnLedgerEntity.Resource {
 			loggerGlobal.error("Total supply is 0 for \(poolUnitResource.resource.resourceAddress.address)")
 			return nil
 		}
-		let redemptionValue = poolUnitResource.amount * (amount / poolUnitTotalSupply)
+		let redemptionValue = poolUnitResource.amount.nominalAmount * (amount / poolUnitTotalSupply)
 		let decimalPlaces = divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
 		let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
 

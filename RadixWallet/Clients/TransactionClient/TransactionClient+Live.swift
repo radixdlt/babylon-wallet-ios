@@ -101,7 +101,7 @@ extension TransactionClient {
 						return nil
 					}
 
-					guard let xrdBalance = portfolio.fungibleResources.xrdResource?.amount else {
+					guard let xrdBalance = portfolio.fungibleResources.xrdResource?.amount.nominalAmount else {
 						return nil
 					}
 

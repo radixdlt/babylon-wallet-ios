@@ -626,7 +626,7 @@ extension TransactionReview {
 
 				let details: ResourceBalance.Fungible = .init(
 					isXRD: false,
-					amount: source.amount,
+					amount: .init(nominalAmount: source.amount),
 					guarantee: nil
 				)
 
@@ -694,7 +694,7 @@ extension TransactionReview {
 
 		// Normal fungible resource
 		let isXRD = resourceAddress.isXRD(on: networkID)
-		let details: ResourceBalance.Fungible = .init(isXRD: isXRD, amount: amount, guarantee: guarantee)
+		let details: ResourceBalance.Fungible = .init(isXRD: isXRD, amount: .init(nominalAmount: amount), guarantee: guarantee)
 
 		return [.init(resource: resource, details: .fungible(details))]
 	}
@@ -806,7 +806,7 @@ extension TransactionReview {
 		let details = ResourceBalance.LiquidStakeUnit(
 			resource: resource,
 			amount: amount,
-			worth: worth,
+			worth: .init(nominalAmount: worth),
 			validator: validator,
 			guarantee: guarantee
 		)
@@ -839,7 +839,7 @@ extension TransactionReview {
 
 				let resource = OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue(
 					resource: .init(resourceAddress: address, metadata: entity.metadata),
-					redemptionValue: resourceAmount * adjustmentFactor
+					redemptionValue: .init(nominalAmount: resourceAmount * adjustmentFactor)
 				)
 
 				if address.isXRD(on: networkID) {
@@ -855,7 +855,7 @@ extension TransactionReview {
 					details: .init(
 						address: poolContribution.poolAddress.asSpecific(),
 						dAppName: resourceAssociatedDapps?[resourceAddress]?.name,
-						poolUnitResource: .init(resource: resource, amount: amount),
+						poolUnitResource: .init(resource: resource, amount: .init(nominalAmount: amount)),
 						xrdResource: xrdResource,
 						nonXrdResources: nonXrdResources
 					),
@@ -892,7 +892,7 @@ extension TransactionReview {
 				return OnLedgerEntitiesClient.StakeClaim(
 					validatorAddress: stakeClaimValidator.address,
 					token: token,
-					claimAmount: data.claimAmount,
+					claimAmount: .init(nominalAmount: data.claimAmount),
 					reamainingEpochsUntilClaim: nil
 				)
 			}
@@ -904,7 +904,7 @@ extension TransactionReview {
 				return OnLedgerEntitiesClient.StakeClaim(
 					validatorAddress: stakeClaimValidator.address,
 					token: token,
-					claimAmount: claimAmount,
+					claimAmount: .init(nominalAmount: claimAmount),
 					reamainingEpochsUntilClaim: data.claimEpoch.map { Int($0) - Int(resource.atLedgerState.epoch) }
 				)
 			}

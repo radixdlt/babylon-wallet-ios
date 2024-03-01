@@ -28,7 +28,7 @@ extension FungibleTokenDetails.State {
 	var detailsHeader: DetailsContainerWithHeaderViewState {
 		.init(
 			title: resource.metadata.get(\.name, prefetched: ownedFungibleResource?.metadata).map { $0 ?? L10n.Account.PoolUnits.unknownPoolUnitName },
-			amount: ownedFungibleResource?.amount.formatted(),
+			amount: ownedFungibleResource?.amount.nominalAmount.formatted(),
 			symbol: resource.metadata.get(\.symbol, prefetched: ownedFungibleResource?.metadata)
 		)
 	}

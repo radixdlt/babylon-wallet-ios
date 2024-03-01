@@ -29,7 +29,7 @@ extension ResourceBalance {
 			public let icon: URL?
 			public let title: String?
 			public let amount: ResourceBalance.Amount?
-			public let worth: RETDecimal
+			public let worth: ResourceAmount
 			public var validatorName: String? = nil
 		}
 
@@ -452,7 +452,7 @@ extension ResourceBalanceView {
 		@ViewBuilder
 		private func core(amount: ResourceBalance.Amount, compact: Bool) -> some View {
 			if compact {
-				Text(amount.amount.formatted())
+				Text(amount.amount.nominalAmount.formatted())
 					.textStyle(amountTextStyle)
 					.foregroundColor(.app.gray1)
 			} else {
@@ -462,7 +462,7 @@ extension ResourceBalanceView {
 							.textStyle(.body2HighImportance)
 							.foregroundColor(.app.gray1)
 					}
-					Text(amount.amount.formatted())
+					Text(amount.amount.nominalAmount.formatted())
 						.lineLimit(1)
 						.minimumScaleFactor(0.8)
 						.truncationMode(.tail)

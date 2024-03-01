@@ -305,7 +305,7 @@ extension OnLedgerEntitiesClient {
 			return try .init(
 				resourceAddress: .init(validatingAddress: vaultAggregated.resourceAddress),
 				atLedgerState: ledgerState,
-				amount: amount,
+				amount: .init(nominalAmount: amount),
 				metadata: .init(vaultAggregated.explicitMetadata)
 			)
 		} ?? []
@@ -367,7 +367,7 @@ extension OnLedgerEntitiesClient {
 			}
 
 			let stakeUnitResource: ResourceWithVaultAmount? = {
-				if let stakeUnitResource = stake.stakeUnitResource, stakeUnitResource.amount > 0 {
+				if let stakeUnitResource = stake.stakeUnitResource, stakeUnitResource.amount > .zero {
 					guard let stakeUnitDetails = resourceDetails.first(where: { $0.resourceAddress == stakeUnitResource.resourceAddress }) else {
 						assertionFailure("Did not load stake unit details")
 						return nil
@@ -404,7 +404,7 @@ extension OnLedgerEntitiesClient {
 							return OnLedgerEntitiesClient.StakeClaim(
 								validatorAddress: stake.validatorAddress,
 								token: token,
-								claimAmount: claimAmount,
+								claimAmount: .init(nominalAmount: claimAmount),
 								reamainingEpochsUntilClaim: Int(claimEpoch) - Int(currentEpoch.rawValue)
 							)
 						}.asIdentifiable()
@@ -428,7 +428,7 @@ extension OnLedgerEntity.Account.PoolUnitResources {
 	var nonEmptyVaults: OnLedgerEntity.Account.PoolUnitResources {
 		let stakes = radixNetworkStakes.compactMap { stake in
 			let stakeUnitResource: OnLedgerEntity.OwnedFungibleResource? = {
-				guard let stakeUnitResource = stake.stakeUnitResource, stakeUnitResource.amount > 0 else {
+				guard let stakeUnitResource = stake.stakeUnitResource, stakeUnitResource.amount.nominalAmount > 0 else {
 					return nil
 				}
 				return stakeUnitResource
@@ -464,8 +464,8 @@ extension [OnLedgerEntity.OwnedNonFungibleResource] {
 extension OnLedgerEntity.OwnedFungibleResources {
 	public var nonEmptyVaults: OnLedgerEntity.OwnedFungibleResources {
 		.init(
-			xrdResource: xrdResource.flatMap { $0.amount > 0 ? $0 : nil },
-			nonXrdResources: nonXrdResources.filter { $0.amount > 0 }
+			xrdResource: xrdResource.flatMap { $0.amount > .zero ? $0 : nil },
+			nonXrdResources: nonXrdResources.filter { $0.amount > .zero }
 		)
 	}
 }
@@ -501,13 +501,13 @@ extension OnLedgerEntitiesClient {
 
 		public struct ResourceWithRedemptionValue: Hashable, Sendable {
 			public let resource: OnLedgerEntity.Resource
-			public let redemptionValue: RETDecimal?
+			public let redemptionValue: ResourceAmount?
 		}
 	}
 
 	public struct ResourceWithVaultAmount: Hashable, Sendable {
 		public let resource: OnLedgerEntity.Resource
-		public let amount: RETDecimal
+		public let amount: ResourceAmount
 	}
 
 	public struct StakeClaim: Hashable, Sendable, Identifiable {
@@ -517,7 +517,7 @@ extension OnLedgerEntitiesClient {
 
 		let validatorAddress: ValidatorAddress
 		let token: OnLedgerEntity.NonFungibleToken
-		let claimAmount: RETDecimal
+		let claimAmount: ResourceAmount
 		let reamainingEpochsUntilClaim: Int?
 
 		var isReadyToBeClaimed: Bool {
