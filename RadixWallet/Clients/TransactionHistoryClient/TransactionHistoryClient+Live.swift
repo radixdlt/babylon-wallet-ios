@@ -1,5 +1,11 @@
 import EngineToolkit
 
+extension SpecificAddress {
+	public func networkID() throws -> NetworkID {
+		try .init(intoEngine().networkId())
+	}
+}
+
 extension TransactionHistoryClient {
 	public static let liveValue = TransactionHistoryClient.live()
 
@@ -9,6 +15,8 @@ extension TransactionHistoryClient {
 
 		@Sendable
 		func getTransactionHistory(account: AccountAddress, period: Range<Date>, cursor: String?) async throws -> TransactionHistoryResponse {
+			let networkID = try account.networkID()
+
 			// FIXME: GK REMOVE THIS
 			let account = try AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l")
 
@@ -39,9 +47,9 @@ extension TransactionHistoryClient {
 
 			print("• RESPONSE: \(period.lowerBound.formatted(date: .abbreviated, time: .omitted)) -> \(period.upperBound.formatted(date: .abbreviated, time: .omitted)) \(response.items.count)")
 
-//			for item in response.items {
-//				print("• item: \(item)")
-//			}
+			for item in response.items {
+				print("• item: \(item.roundTimestamp)")
+			}
 
 			let resourceAddresses = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
 
@@ -50,17 +58,13 @@ extension TransactionHistoryClient {
 				metadataKeys: .poolUnitMetadataKeys
 			)
 
-			let keyedResourceDetails = IdentifiedArray(resourceDetails.compactMap(\.resource), id: \.resourceAddress) { $1 }
+			let keyedResources = IdentifiedArray(resourceDetails.compactMap(\.resource), id: \.resourceAddress) { $1 }
 
 			/// Returns a fungible ResourceBalance for the given resource and amount
-			func fungibleBalance(_ resourceAddress: ResourceAddress, amount: RETDecimal) -> ResourceBalance.ViewState.Fungible { // FIXME: GK use full
-				let title = keyedResourceDetails[id: resourceAddress]?.metadata.title
-				let iconURL = keyedResourceDetails[id: resourceAddress]?.metadata.iconURL
-				return .init(
-					address: resourceAddress,
-					icon: .token(.other(iconURL)),
-					title: title,
-					amount: .init(amount)
+			func fungibleDetails(_ address: ResourceAddress, amount: RETDecimal) throws -> ResourceBalance.Fungible {
+				.init(
+					isXRD: address.isXRD(on: networkID),
+					amount: amount // FIXME: GK? guarantee is not relevant here, right?
 				)
 			}
 
@@ -79,15 +83,18 @@ extension TransactionHistoryClient {
 			}
 
 			/// Returns a non-fungible ResourceBalance for the given global non-fungbile ID
-			func nonFungibleBalance(_ id: NonFungibleGlobalId) throws -> ResourceBalance.ViewState.NonFungible { // FIXME: GK use full
+			func nonFungibleDetails(_ id: NonFungibleGlobalId) throws -> ResourceBalance.NonFungible {
 				let resourceAddress: ResourceAddress = try id.resourceAddress().asSpecific()
-				let resourceName = keyedResourceDetails[id: resourceAddress]?.metadata.name
-				let iconURL = keyedResourceDetails[id: resourceAddress]?.metadata.iconURL
-				return .init(
-					id: id,
-					resourceImage: iconURL,
-					resourceName: resourceName,
-					nonFungibleName: keyedNFTData[id]?.data?.name
+
+				guard let nftData = keyedNFTData[id] else {
+					// Impossible
+					fatalError()
+				}
+
+				return try .init(
+					resourceAddress: resourceAddress,
+					nftID: id.localId(),
+					nftData: nil
 				)
 			}
 
@@ -96,16 +103,24 @@ extension TransactionHistoryClient {
 				let message = info.message?.plaintext?.content.string
 				let manifestClass = info.manifestClasses?.first
 
-				var withdrawals: [ResourceBalance.ViewState] = []
-				var deposits: [ResourceBalance.ViewState] = [] // FIXME: GK use full
+				var withdrawals: [ResourceBalance] = []
+				var deposits: [ResourceBalance] = []
 
 				if let changes = info.balanceChanges {
 					for nonFungible in changes.nonFungibleBalanceChanges where nonFungible.entityAddress == account.address {
+						let resourceAddress = try ResourceAddress(validatingAddress: nonFungible.resourceAddress)
+						guard let resource = keyedResources[id: resourceAddress] else {
+							// Impossible
+							fatalError()
+						}
+
 						for nonFungibleID in try extractNonFungibleIDs(.removed, from: nonFungible) {
-							try withdrawals.append(.nonFungible(nonFungibleBalance(nonFungibleID)))
+							let details = try nonFungibleDetails(nonFungibleID)
+							withdrawals.append(.init(resource: resource, details: .nonFungible(details)))
 						}
 						for nonFungibleID in try extractNonFungibleIDs(.added, from: nonFungible) {
-							try deposits.append(.nonFungible(nonFungibleBalance(nonFungibleID)))
+							let details = try nonFungibleDetails(nonFungibleID)
+							deposits.append(.init(resource: resource, details: .nonFungible(details)))
 						}
 					}
 
@@ -113,20 +128,24 @@ extension TransactionHistoryClient {
 						let resourceAddress = try ResourceAddress(validatingAddress: fungible.resourceAddress)
 						let amount = try RETDecimal(value: fungible.balanceChange)
 						guard !amount.isZero() else { continue }
+						guard let resource = keyedResources[id: resourceAddress] else {
+							// Impossible
+							fatalError()
+						}
 
 						// NB: The sign of the amount in the balance is made positive, negative balances are treated as withdrawals
-						let balance = try fungibleBalance(resourceAddress, amount: amount.abs())
+						let fungible = try fungibleDetails(resourceAddress, amount: amount.abs())
 
 						if amount.isNegative() {
-							withdrawals.append(.fungible(balance))
+							withdrawals.append(.init(resource: resource, details: .fungible(fungible)))
 						} else {
-							deposits.append(.fungible(balance))
+							deposits.append(.init(resource: resource, details: .fungible(fungible)))
 						}
 					}
 				}
 
-				withdrawals.sort(by: >)
-				deposits.sort(by: >)
+//				withdrawals.sort(by: >)
+//				deposits.sort(by: >)
 
 				return .init(
 					time: time,
