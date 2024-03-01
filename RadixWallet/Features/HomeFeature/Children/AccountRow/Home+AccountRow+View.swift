@@ -92,7 +92,11 @@ extension Home.AccountRow {
 								.layoutPriority(0)
 
 							Spacer()
-							loadable(viewStore.fiatWorth) { fiatWorth in
+							loadable(
+								viewStore.fiatWorth,
+								loadingViewHeight: .medium1,
+								backgroundColor: .clear
+							) { fiatWorth in
 								if fiatWorth.worth.isUnknown || fiatWorth.worth > .zero {
 									Text(fiatWorth.currencyFormatted())
 										.lineLimit(1)
