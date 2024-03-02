@@ -6,7 +6,7 @@ extension ResourceBalance {
 	public enum ViewState: Sendable, Hashable {
 		case fungible(Fungible)
 		case nonFungible(NonFungible)
-		case lsu(LSU)
+		case lsu(LSU) // FIXME: GK rename
 		case poolUnit(PoolUnit)
 		case stakeClaimNFT(StakeClaimNFT)
 
