@@ -72,6 +72,11 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		return .run { [account = state.account.address] send in
 			let transactions = try await transactionHistoryClient.getTransactionHistory(account, range, nil)
+
+			for trans in transactions.items {
+				print("••• \(trans.time.formatted(date: .abbreviated, time: .shortened)) \(trans.manifestClass?.rawValue ?? "---") \(trans.depositSettingsUpdated)")
+			}
+
 			await send(.internal(.updateTransactions(transactions.items)))
 		}
 	}
