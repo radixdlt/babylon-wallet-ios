@@ -60,10 +60,12 @@ extension TransactionHistoryClient {
 			struct ProgrammerError: Error {}
 
 			/// Returns a fungible ResourceBalance for the given resource and amount
-			func fungibleResource(_ address: ResourceAddress, amount: RETDecimal) throws -> ResourceBalance {
+			func fungibleResource(_ address: ResourceAddress, amount: RETDecimal) async throws -> ResourceBalance {
 				guard let resource = keyedResources[id: address] else {
 					throw ProgrammerError()
 				}
+
+				let resources = try await onLedgerEntitiesClient.fungibleResourceBalances(resource, amount: amount, networkID: networkID)
 
 				let details = ResourceBalance.Fungible(
 					isXRD: address.isXRD(on: networkID),
@@ -106,7 +108,7 @@ extension TransactionHistoryClient {
 			print("• \(dateformatter.formatOptions.contains(.withFractionalSeconds))")
 			dateformatter.formatOptions.insert(.withFractionalSeconds)
 
-			func transaction(for info: GatewayAPI.CommittedTransactionInfo) throws -> TransactionHistoryItem? {
+			func transaction(for info: GatewayAPI.CommittedTransactionInfo) async throws -> TransactionHistoryItem {
 				guard let time = dateformatter.date(from: info.roundTimestamp) else {
 					struct CorruptTimestamp: Error { let roundTimestamd: String }
 					throw CorruptTimestamp(roundTimestamd: info.roundTimestamp)
@@ -133,7 +135,7 @@ extension TransactionHistoryClient {
 						guard !amount.isZero() else { continue }
 
 						// NB: The sign of the amount in the balance is made positive, negative balances are treated as withdrawals
-						let resource = try fungibleResource(resourceAddress, amount: amount.abs())
+						let resource = try await fungibleResource(resourceAddress, amount: amount.abs())
 
 						if amount.isNegative() {
 							withdrawals.append(resource)
@@ -156,9 +158,9 @@ extension TransactionHistoryClient {
 				)
 			}
 
-			return try .init(
+			return try await .init(
 				cursor: response.nextCursor,
-				items: response.items.compactMap(transaction(for:))
+				items: response.items.parallelMap(transaction(for:))
 			)
 		}
 
