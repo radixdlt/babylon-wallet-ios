@@ -47,10 +47,6 @@ extension TransactionHistoryClient {
 
 			print("• RESPONSE: \(period.lowerBound.formatted(date: .abbreviated, time: .omitted)) -> \(period.upperBound.formatted(date: .abbreviated, time: .omitted)) \(response.items.count)")
 
-//			for item in response.items {
-//				print("• item: \(item.roundTimestamp)")
-//			}
-
 			let resourceAddresses = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
 
 			let resourceDetails = try await onLedgerEntitiesClient.getEntities(
@@ -60,11 +56,13 @@ extension TransactionHistoryClient {
 
 			let keyedResources = IdentifiedArray(uniqueElements: resourceDetails.compactMap(\.resource))
 
+			// Thrown if a resource or nonFungibleToken that we loaded is not present, should never happen
+			struct ProgrammerError: Error {}
+
 			/// Returns a fungible ResourceBalance for the given resource and amount
 			func fungibleResource(_ address: ResourceAddress, amount: RETDecimal) throws -> ResourceBalance {
 				guard let resource = keyedResources[id: address] else {
-					// Impossible
-					fatalError()
+					throw ProgrammerError()
 				}
 
 				let details = ResourceBalance.Fungible(
@@ -92,8 +90,7 @@ extension TransactionHistoryClient {
 				let resourceAddress: ResourceAddress = try id.resourceAddress().asSpecific()
 
 				guard let resource = keyedResources[id: resourceAddress], let token = keyedNonFungibleTokens[id: id] else {
-					// Impossible
-					fatalError()
+					throw ProgrammerError()
 				}
 
 				let details = try ResourceBalance.NonFungible(
@@ -105,8 +102,15 @@ extension TransactionHistoryClient {
 				return ResourceBalance(resource: resource, details: .nonFungible(details))
 			}
 
+			let dateformatter = ISO8601DateFormatter()
+			print("• \(dateformatter.formatOptions.contains(.withFractionalSeconds))")
+			dateformatter.formatOptions.insert(.withFractionalSeconds)
+
 			func transaction(for info: GatewayAPI.CommittedTransactionInfo) throws -> TransactionHistoryItem? {
-				guard let time = info.confirmedAt else { return nil }
+				guard let time = dateformatter.date(from: info.roundTimestamp) else {
+					struct CorruptTimestamp: Error { let roundTimestamd: String }
+					throw CorruptTimestamp(roundTimestamd: info.roundTimestamp)
+				}
 				let message = info.message?.plaintext?.content.string
 				let manifestClass = info.manifestClasses?.first
 
@@ -148,7 +152,7 @@ extension TransactionHistoryClient {
 					manifestClass: manifestClass,
 					withdrawals: withdrawals,
 					deposits: deposits,
-					depositSettingsUpdated: true
+					depositSettingsUpdated: info.manifestClasses?.contains(.accountDepositSettingsUpdate) == true
 				)
 			}
 
