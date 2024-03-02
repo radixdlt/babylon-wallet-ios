@@ -47,18 +47,18 @@ extension TransactionHistoryClient {
 
 			print("• RESPONSE: \(period.lowerBound.formatted(date: .abbreviated, time: .omitted)) -> \(period.upperBound.formatted(date: .abbreviated, time: .omitted)) \(response.items.count)")
 
-			for item in response.items {
-				print("• item: \(item.roundTimestamp)")
-			}
+//			for item in response.items {
+//				print("• item: \(item.roundTimestamp)")
+//			}
 
 			let resourceAddresses = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
 
 			let resourceDetails = try await onLedgerEntitiesClient.getEntities(
 				addresses: resourceAddresses.map(\.asGeneral),
-				metadataKeys: .poolUnitMetadataKeys
+				metadataKeys: .resourceMetadataKeys
 			)
 
-			let keyedResources = IdentifiedArray(resourceDetails.compactMap(\.resource), id: \.resourceAddress) { $1 }
+			let keyedResources = IdentifiedArray(uniqueElements: resourceDetails.compactMap(\.resource))
 
 			/// Returns a fungible ResourceBalance for the given resource and amount
 			func fungibleResource(_ address: ResourceAddress, amount: RETDecimal) throws -> ResourceBalance {
@@ -75,25 +75,23 @@ extension TransactionHistoryClient {
 				return .init(resource: resource, details: .fungible(details))
 			}
 
-			// Pre-loading NFT data
+			// Loading all NFT data
 
 			let nonFungibleIDs = try Set(response.items.flatMap { try $0.balanceChanges.map(extractAllNonFungibleIDs) ?? [] })
 			let groupedNonFungibleIDs = Dictionary(grouping: nonFungibleIDs) { $0.resourceAddress() }
-			let nftData = try await groupedNonFungibleIDs.parallelMap { address, ids in
+			let nonFungibleTokenArrays = try await groupedNonFungibleIDs.parallelMap { address, ids in
 				try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(resource: address.asSpecific(), nonFungibleIds: ids))
 			}
-			var keyedNFTData: [NonFungibleGlobalId: OnLedgerEntity.NonFungibleToken.NFTData] = [:]
-			for nftDataArray in nftData {
-				for nftDatum in nftDataArray {
-					keyedNFTData[nftDatum.id] = nftDatum.data
-				}
+			var keyedNonFungibleTokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken> = []
+			for nonFungibleTokenArray in nonFungibleTokenArrays {
+				keyedNonFungibleTokens.append(contentsOf: nonFungibleTokenArray)
 			}
 
 			/// Returns a non-fungible ResourceBalance for the given global non-fungbile ID
 			func nonFungibleResource(_ id: NonFungibleGlobalId) throws -> ResourceBalance {
 				let resourceAddress: ResourceAddress = try id.resourceAddress().asSpecific()
 
-				guard let resource = keyedResources[id: resourceAddress], let nftData = keyedNFTData[id] else {
+				guard let resource = keyedResources[id: resourceAddress], let token = keyedNonFungibleTokens[id: id] else {
 					// Impossible
 					fatalError()
 				}
@@ -101,7 +99,7 @@ extension TransactionHistoryClient {
 				let details = try ResourceBalance.NonFungible(
 					resourceAddress: resourceAddress,
 					nftID: id.localId(),
-					nftData: nftData
+					nftData: token.data
 				)
 
 				return ResourceBalance(resource: resource, details: .nonFungible(details))
