@@ -1178,6 +1178,7 @@
 		A462B5B92B90C57400C26D20 /* ResourceBalanceButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5B82B90C57400C26D20 /* ResourceBalanceButton.swift */; };
 		A462B5BB2B90C5E800C26D20 /* ResourceBalance+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5BA2B90C5E800C26D20 /* ResourceBalance+Helpers.swift */; };
 		A462B5BD2B90C62600C26D20 /* ResourceBalanceView+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5BC2B90C62600C26D20 /* ResourceBalanceView+Helpers.swift */; };
+		A462B5BF2B9382BC00C26D20 /* OnLedgerEntitiesClient+ComplexTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5BE2B9382BC00C26D20 /* OnLedgerEntitiesClient+ComplexTypes.swift */; };
 		A47571FF2B29B0860059A95D /* IOSSecuritySuite in Frameworks */ = {isa = PBXBuildFile; productRef = A47571FE2B29B0860059A95D /* IOSSecuritySuite */; };
 		A47572042B29B4EE0059A95D /* IOSSecurityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */; };
 		A47572052B29B4F20059A95D /* IOSSecurityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */; };
@@ -2454,6 +2455,7 @@
 		A462B5B82B90C57400C26D20 /* ResourceBalanceButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceBalanceButton.swift; sourceTree = "<group>"; };
 		A462B5BA2B90C5E800C26D20 /* ResourceBalance+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ResourceBalance+Helpers.swift"; sourceTree = "<group>"; };
 		A462B5BC2B90C62600C26D20 /* ResourceBalanceView+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ResourceBalanceView+Helpers.swift"; sourceTree = "<group>"; };
+		A462B5BE2B9382BC00C26D20 /* OnLedgerEntitiesClient+ComplexTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OnLedgerEntitiesClient+ComplexTypes.swift"; sourceTree = "<group>"; };
 		A47572012B29B3CA0059A95D /* IOSSecurityClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Live.swift"; sourceTree = "<group>"; };
 		A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Test.swift"; sourceTree = "<group>"; };
 		A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Interface.swift"; sourceTree = "<group>"; };
@@ -5342,6 +5344,7 @@
 				48CFBFC02ADC10D900E77A5C /* EntityBehaviors.swift */,
 				48CFBFC12ADC10D900E77A5C /* EntityMetadata+GWMetadata.swift */,
 				48CFBFC22ADC10D900E77A5C /* OnLedgerEntitiesClient+CreateEntity.swift */,
+				A462B5BE2B9382BC00C26D20 /* OnLedgerEntitiesClient+ComplexTypes.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -8418,6 +8421,7 @@
 				48CFC5832ADC10DA00E77A5C /* SecureStorageClient+Test.swift in Sources */,
 				83FDF7EC2AF260D600D9AA8B /* ProgrammaticScryptoSborValue.swift in Sources */,
 				48CFC63B2ADC10DB00E77A5C /* KeyKind.swift in Sources */,
+				A462B5BF2B9382BC00C26D20 /* OnLedgerEntitiesClient+ComplexTypes.swift in Sources */,
 				48CFC26E2ADC10D900E77A5C /* SignWithFactorSourcesOfKindDevice.swift in Sources */,
 				48CFC5DC2ADC10DA00E77A5C /* Modifier.swift in Sources */,
 				48CFC4CF2ADC10DA00E77A5C /* EntityMetadataItemValue.swift in Sources */,
