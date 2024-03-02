@@ -606,7 +606,7 @@ extension TransactionReview {
 		case let .fungible(_, source):
 			switch resourceInfo {
 			case let .left(resource):
-				return try await onLedgerEntitiesClient.fungibleResourceBalances(
+				return try await [onLedgerEntitiesClient.fungibleResourceBalance(
 					resource,
 					resourceQuantifier: source,
 					poolContributions: poolInteractions,
@@ -615,7 +615,7 @@ extension TransactionReview {
 					resourceAssociatedDapps: resourceAssociatedDapps,
 					networkID: networkID,
 					defaultDepositGuarantee: defaultDepositGuarantee
-				)
+				)]
 			case let .right(newEntityMetadata):
 				// A newly created fungible resource
 
@@ -641,17 +641,6 @@ extension TransactionReview {
 				unstakeData: unstakeData,
 				newlyCreatedNonFungibles: newlyCreatedNonFungibles
 			)
-		}
-	}
-}
-
-extension TransactionReview.ResourceInfo {
-	var metadata: OnLedgerEntity.Metadata {
-		switch self {
-		case let .left(resource):
-			resource.metadata
-		case let .right(metadata):
-			metadata
 		}
 	}
 }

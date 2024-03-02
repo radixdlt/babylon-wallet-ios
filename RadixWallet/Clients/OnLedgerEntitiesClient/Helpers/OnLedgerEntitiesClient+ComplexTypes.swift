@@ -17,14 +17,26 @@ extension OnLedgerEntitiesClient {
 
 	public func fungibleResourceBalances(
 		_ resource: OnLedgerEntity.Resource,
+		amount: RETDecimal,
+		networkID: NetworkID
+	) async throws -> ResourceBalance {
+		try await fungibleResourceBalance(
+			resource,
+			resourceQuantifier: .guaranteed(amount: amount),
+			networkID: networkID
+		)
+	}
+
+	public func fungibleResourceBalance(
+		_ resource: OnLedgerEntity.Resource,
 		resourceQuantifier: FungibleResourceIndicator,
-		poolContributions: [some TrackedPoolInteraction] = [],
+		poolContributions: [some TrackedPoolInteraction] = [] as [TrackedPoolContribution],
 		validatorStakes: [TrackedValidatorStake] = [],
 		entities: TransactionReview.ResourcesInfo = [:],
 		resourceAssociatedDapps: TransactionReview.ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
 		defaultDepositGuarantee: RETDecimal = 1
-	) async throws -> [ResourceBalance] {
+	) async throws -> ResourceBalance {
 		let amount = resourceQuantifier.amount
 		let resourceAddress = resource.resourceAddress
 
@@ -67,7 +79,7 @@ extension OnLedgerEntitiesClient {
 		let isXRD = resourceAddress.isXRD(on: networkID)
 		let details: ResourceBalance.Fungible = .init(isXRD: isXRD, amount: amount, guarantee: guarantee)
 
-		return [.init(resource: resource, details: .fungible(details))]
+		return .init(resource: resource, details: .fungible(details))
 	}
 
 	private func poolUnit(
@@ -78,7 +90,7 @@ extension OnLedgerEntitiesClient {
 		resourceAssociatedDapps: TransactionReview.ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
 		guarantee: TransactionClient.Guarantee?
-	) async throws -> [ResourceBalance] {
+	) async throws -> ResourceBalance {
 		let resourceAddress = resource.resourceAddress
 
 		if let poolContribution = try poolContributions.first(where: { try $0.poolUnitsResourceAddress.asSpecific() == resourceAddress }) {
@@ -105,7 +117,7 @@ extension OnLedgerEntitiesClient {
 				}
 			}
 
-			return try [.init(
+			return try .init(
 				resource: resource,
 				details: .poolUnit(.init(
 					details: .init(
@@ -117,19 +129,19 @@ extension OnLedgerEntitiesClient {
 					),
 					guarantee: guarantee
 				))
-			)]
+			)
 		} else {
 			guard let details = try await getPoolUnitDetails(resource, forAmount: amount) else {
 				throw FailedToGetPoolUnitDetails()
 			}
 
-			return [.init(
+			return .init(
 				resource: resource,
 				details: .poolUnit(.init(
 					details: details,
 					guarantee: guarantee
 				))
-			)]
+			)
 		}
 	}
 
@@ -139,7 +151,7 @@ extension OnLedgerEntitiesClient {
 		validator: OnLedgerEntity.Validator,
 		validatorStakes: [TrackedValidatorStake] = [],
 		guarantee: TransactionClient.Guarantee?
-	) async throws -> [ResourceBalance] {
+	) async throws -> ResourceBalance {
 		let worth: RETDecimal
 		if !validatorStakes.isEmpty {
 			if let stake = try validatorStakes.first(where: { try $0.validatorAddress.asSpecific() == validator.address }) {
@@ -171,7 +183,7 @@ extension OnLedgerEntitiesClient {
 			guarantee: guarantee
 		)
 
-		return [.init(resource: resource, details: .liquidStakeUnit(details))]
+		return .init(resource: resource, details: .liquidStakeUnit(details))
 	}
 
 	// MARK: Non-fungibles
@@ -213,12 +225,12 @@ extension OnLedgerEntitiesClient {
 			)) + newTokens
 
 			if let stakeClaimValidator = await isStakeClaimNFT(resource) {
-				result = try stakeClaimTransfer(
+				result = try [stakeClaim(
 					resource,
 					stakeClaimValidator: stakeClaimValidator,
 					unstakeData: unstakeData,
 					tokens: tokens
-				)
+				)]
 			} else {
 				result = tokens.map { token in
 					.init(resource: resource, details: .nonFungible(token))
@@ -250,12 +262,12 @@ extension OnLedgerEntitiesClient {
 		return result
 	}
 
-	private func stakeClaimTransfer(
+	private func stakeClaim(
 		_ resource: OnLedgerEntity.Resource,
 		stakeClaimValidator: OnLedgerEntity.Validator,
 		unstakeData: [UnstakeDataEntry],
 		tokens: [OnLedgerEntity.NonFungibleToken]
-	) throws -> [ResourceBalance] {
+	) throws -> ResourceBalance {
 		let stakeClaimTokens: [OnLedgerEntitiesClient.StakeClaim] = if !unstakeData.isEmpty {
 			try tokens.map { token in
 				guard let data = unstakeData.first(where: { $0.nonFungibleGlobalId == token.id })?.data else {
@@ -283,7 +295,7 @@ extension OnLedgerEntitiesClient {
 			}
 		}
 
-		return [.init(
+		return .init(
 			resource: resource,
 			details: .stakeClaimNFT(.init(
 				canClaimTokens: false,
@@ -293,6 +305,17 @@ extension OnLedgerEntitiesClient {
 				),
 				validatorName: stakeClaimValidator.metadata.name
 			))
-		)]
+		)
+	}
+}
+
+extension TransactionReview.ResourceInfo {
+	var metadata: OnLedgerEntity.Metadata {
+		switch self {
+		case let .left(resource):
+			resource.metadata
+		case let .right(metadata):
+			metadata
+		}
 	}
 }
