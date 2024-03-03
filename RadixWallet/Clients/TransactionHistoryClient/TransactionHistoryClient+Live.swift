@@ -18,7 +18,7 @@ extension TransactionHistoryClient {
 			let networkID = try account.networkID()
 
 			// FIXME: GK REMOVE THIS
-//			let account = try AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l")
+			let account = try AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l")
 
 //			let account = try AccountAddress(validatingAddress: "account_rdx16x9gfj2dt82e3qvp0j775fnc06clllvf9gj86us497hyxrye656530")
 
@@ -70,10 +70,8 @@ extension TransactionHistoryClient {
 				let address = try ResourceAddress(validatingAddress: changes.resourceAddress)
 				let ids = try extractNonFungibleIDs(type, from: changes)
 
-				guard let resource = keyedResources[id: address] else {
-					// The resource should have been fetched
-					throw ProgrammerError()
-				}
+				// The resource should have been fetched
+				guard let resource = keyedResources[id: address] else { throw ProgrammerError() }
 
 				let tokens = try ids.map { id in
 					// All tokens should have been fetched earlier
@@ -81,7 +79,7 @@ extension TransactionHistoryClient {
 					return token
 				}
 
-				return try await onLedgerEntitiesClient.nonFungibleResourceBalances(resource, tokens: tokens)
+				return await onLedgerEntitiesClient.nonFungibleResourceBalances(resource, tokens: tokens)
 			}
 
 			let dateformatter = ISO8601DateFormatter()
@@ -104,14 +102,10 @@ extension TransactionHistoryClient {
 					print("••• \(time.formatted(date: .abbreviated, time: .shortened)) \(info.manifestClasses?.first?.rawValue ?? "---") N: \(n.count), F: \(f.count)")
 
 					for nonFungible in changes.nonFungibleBalanceChanges where nonFungible.entityAddress == account.address {
-						do {
-							let withdrawn = try await nonFungibleResources(.removed, changes: nonFungible)
-							withdrawals.append(contentsOf: withdrawn)
-							let deposited = try await nonFungibleResources(.added, changes: nonFungible)
-							deposits.append(contentsOf: deposited)
-						} catch {
-							print("    ••• N append failed: \(error)")
-						}
+						let withdrawn = try await nonFungibleResources(.removed, changes: nonFungible)
+						withdrawals.append(contentsOf: withdrawn)
+						let deposited = try await nonFungibleResources(.added, changes: nonFungible)
+						deposits.append(contentsOf: deposited)
 					}
 
 					for fungible in changes.fungibleBalanceChanges where fungible.entityAddress == account.address {
