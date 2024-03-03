@@ -63,26 +63,13 @@ extension TransactionHistoryClient {
 			}
 			var keyedNonFungibleTokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken> = []
 			for nonFungibleTokenArray in nonFungibleTokenArrays {
-				if let res: ResourceAddress = try nonFungibleTokenArray.first?.id.resourceAddress().asSpecific() {
-					if let ress = keyedResources[id: res] {
-						print("• NFT \(nonFungibleTokenArray.count) \(ress.metadata.title ?? "--")")
-						for xxx in nonFungibleTokenArray {
-							if xxx.data == nil {
-								print("  • NO DATA")
-							}
-						}
-					}
-				} else {
-					print("• NFT \(nonFungibleTokenArray.count) error")
-				}
-
 				keyedNonFungibleTokens.append(contentsOf: nonFungibleTokenArray)
 			}
 
-			func nonFungibleResources(_ ids: [NonFungibleGlobalId]) async throws -> [ResourceBalance] {
-				guard let address: ResourceAddress = try ids.first?.resourceAddress().asSpecific() else {
-					return []
-				}
+			func nonFungibleResources(_ type: ChangeType, changes: GatewayAPI.TransactionNonFungibleBalanceChanges) async throws -> [ResourceBalance] {
+				let address = try ResourceAddress(validatingAddress: changes.resourceAddress)
+				let ids = try extractNonFungibleIDs(type, from: changes)
+
 				guard let resource = keyedResources[id: address] else {
 					// The resource should have been fetched
 					throw ProgrammerError()
@@ -116,24 +103,16 @@ extension TransactionHistoryClient {
 					let f = changes.fungibleBalanceChanges.filter { $0.entityAddress == account.address }
 					print("••• \(time.formatted(date: .abbreviated, time: .shortened)) \(info.manifestClasses?.first?.rawValue ?? "---") N: \(n.count), F: \(f.count)")
 
-//					for nonFungible in changes.nonFungibleBalanceChanges where nonFungible.entityAddress == account.address {
-//						let withdrawnIDs = try extractNonFungibleIDs(.removed, from: nonFungible)
-					////						withdrawals.append(contentsOf: try await nonFungibleResources(withdrawnIDs))
-//
-//						let depositedIDs = try extractNonFungibleIDs(.added, from: nonFungible)
-					////						deposits.append(contentsOf: try await nonFungibleResources(depositedIDs))
-//
-//						do {
-//							withdrawals.append(contentsOf: try await nonFungibleResources(withdrawnIDs))
-//						} catch {
-//							print("    ••• N withdrawals failed")
-//						}
-//						do {
-//							deposits.append(contentsOf: try await nonFungibleResources(depositedIDs))
-//						} catch {
-//							print("    ••• N deposits failed")
-//						}
-//					}
+					for nonFungible in changes.nonFungibleBalanceChanges where nonFungible.entityAddress == account.address {
+						do {
+							let withdrawn = try await nonFungibleResources(.removed, changes: nonFungible)
+							withdrawals.append(contentsOf: withdrawn)
+							let deposited = try await nonFungibleResources(.added, changes: nonFungible)
+							deposits.append(contentsOf: deposited)
+						} catch {
+							print("    ••• N append failed: \(error)")
+						}
+					}
 
 					for fungible in changes.fungibleBalanceChanges where fungible.entityAddress == account.address {
 						let resourceAddress = try ResourceAddress(validatingAddress: fungible.resourceAddress)
