@@ -191,22 +191,14 @@ extension OnLedgerEntitiesClient {
 	public func nonFungibleResourceBalances(
 		_ resource: OnLedgerEntity.Resource,
 		tokens: [OnLedgerEntity.NonFungibleToken]
-	) async throws -> [ResourceBalance] {
-		if let stakeClaimValidator = await isStakeClaimNFT(resource) {
-			print("      • N isStakeClaimNFT \(tokens.count)  \(resource.metadata.title ?? "--")")
-
-			return try [stakeClaim(
-				resource,
-				stakeClaimValidator: stakeClaimValidator,
-				unstakeData: [],
-				tokens: tokens
-			)]
+	) async -> [ResourceBalance] {
+		if let validator = await isStakeClaimNFT(resource),
+		   let claim = try? stakeClaim(resource, stakeClaimValidator: validator, unstakeData: [], tokens: tokens)
+		{
+			[claim]
 		} else {
-			print("      • N is normal \(tokens.count) \(resource.metadata.title ?? "--")")
-
-			return tokens.map { token in
-				print("                • NORMAL token: \(resource.metadata.title ?? "---") has\(token.data == nil ? " NO " : " ")data"); return
-					ResourceBalance(resource: resource, details: .nonFungible(token))
+			tokens.map { token in
+				ResourceBalance(resource: resource, details: .nonFungible(token))
 			}
 		}
 	}
@@ -294,7 +286,6 @@ extension OnLedgerEntitiesClient {
 		let stakeClaimTokens: [OnLedgerEntitiesClient.StakeClaim] = if unstakeData.isEmpty {
 			try tokens.map { token in
 				guard let data = token.data else {
-					print(" ••••••••••••••• STAKE CLAIM token: \(token.id.asStr()) has NO data")
 					throw InvalidStakeClaimToken()
 				}
 
