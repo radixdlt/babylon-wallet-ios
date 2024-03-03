@@ -15,7 +15,8 @@ extension OnLedgerEntitiesClient {
 
 	// MARK: Fungibles
 
-	public func fungibleResourceBalances(
+	// Creates a fungible token, a pool unit or a liquid stake unit ResourceBalance
+	public func fungibleResourceBalance(
 		_ resource: OnLedgerEntity.Resource,
 		amount: RETDecimal,
 		networkID: NetworkID
@@ -74,7 +75,6 @@ extension OnLedgerEntitiesClient {
 				guarantee: guarantee
 			)
 		}
-
 		// Normal fungible resource
 		let isXRD = resourceAddress.isXRD(on: networkID)
 		let details: ResourceBalance.Fungible = .init(isXRD: isXRD, amount: amount, guarantee: guarantee)
@@ -189,6 +189,30 @@ extension OnLedgerEntitiesClient {
 	// MARK: Non-fungibles
 
 	public func nonFungibleResourceBalances(
+		_ resource: OnLedgerEntity.Resource,
+		tokens: [OnLedgerEntity.NonFungibleToken]
+	) async throws -> [ResourceBalance] {
+		if let stakeClaimValidator = await isStakeClaimNFT(resource) {
+			print("      • N isStakeClaimNFT \(tokens.count)  \(resource.metadata.title ?? "--")")
+
+			return try [stakeClaim(
+				resource,
+				stakeClaimValidator: stakeClaimValidator,
+				unstakeData: [],
+				tokens: tokens
+			)]
+		} else {
+			print("      • N is normal \(tokens.count) \(resource.metadata.title ?? "--")")
+
+			return tokens.map { token in
+				print("                • NORMAL token: \(resource.metadata.title ?? "---") has\(token.data == nil ? " NO " : " ")data"); return
+
+						ResourceBalance(resource: resource, details: .nonFungible(token))
+			}
+		}
+	}
+
+	public func nonFungibleResourceBalances(
 		_ resourceInfo: TransactionReview.ResourceInfo,
 		resourceAddress: ResourceAddress,
 		resourceQuantifier: NonFungibleResourceIndicator,
@@ -268,7 +292,25 @@ extension OnLedgerEntitiesClient {
 		unstakeData: [UnstakeDataEntry],
 		tokens: [OnLedgerEntity.NonFungibleToken]
 	) throws -> ResourceBalance {
-		let stakeClaimTokens: [OnLedgerEntitiesClient.StakeClaim] = if !unstakeData.isEmpty {
+		let stakeClaimTokens: [OnLedgerEntitiesClient.StakeClaim] = if unstakeData.isEmpty {
+			try tokens.map { token in
+				guard let data = token.data else {
+					print(" ••••••••••••••• STAKE CLAIM token: \(resource.metadata.title ?? "---") has\(token.data == nil ? " NO " : " ")data")
+					throw InvalidStakeClaimToken()
+				}
+
+				guard let claimAmount = data.claimAmount, try token.id.resourceAddress().asSpecific() == resource.resourceAddress else {
+					throw InvalidStakeClaimToken()
+				}
+
+				return OnLedgerEntitiesClient.StakeClaim(
+					validatorAddress: stakeClaimValidator.address,
+					token: token,
+					claimAmount: claimAmount,
+					reamainingEpochsUntilClaim: data.claimEpoch.map { Int($0) - Int(resource.atLedgerState.epoch) }
+				)
+			}
+		} else {
 			try tokens.map { token in
 				guard let data = unstakeData.first(where: { $0.nonFungibleGlobalId == token.id })?.data else {
 					throw MissingStakeClaimTokenData()
@@ -279,18 +321,6 @@ extension OnLedgerEntitiesClient {
 					token: token,
 					claimAmount: data.claimAmount,
 					reamainingEpochsUntilClaim: nil
-				)
-			}
-		} else {
-			try tokens.map { token in
-				guard let data = token.data, let claimAmount = data.claimAmount else {
-					throw InvalidStakeClaimToken()
-				}
-				return OnLedgerEntitiesClient.StakeClaim(
-					validatorAddress: stakeClaimValidator.address,
-					token: token,
-					claimAmount: claimAmount,
-					reamainingEpochsUntilClaim: data.claimEpoch.map { Int($0) - Int(resource.atLedgerState.epoch) }
 				)
 			}
 		}
