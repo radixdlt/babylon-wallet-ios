@@ -206,8 +206,7 @@ extension OnLedgerEntitiesClient {
 
 			return tokens.map { token in
 				print("                • NORMAL token: \(resource.metadata.title ?? "---") has\(token.data == nil ? " NO " : " ")data"); return
-
-						ResourceBalance(resource: resource, details: .nonFungible(token))
+					ResourceBalance(resource: resource, details: .nonFungible(token))
 			}
 		}
 	}
@@ -295,7 +294,7 @@ extension OnLedgerEntitiesClient {
 		let stakeClaimTokens: [OnLedgerEntitiesClient.StakeClaim] = if unstakeData.isEmpty {
 			try tokens.map { token in
 				guard let data = token.data else {
-					print(" ••••••••••••••• STAKE CLAIM token: \(resource.metadata.title ?? "---") has\(token.data == nil ? " NO " : " ")data")
+					print(" ••••••••••••••• STAKE CLAIM token: \(token.id.asStr()) has NO data")
 					throw InvalidStakeClaimToken()
 				}
 
