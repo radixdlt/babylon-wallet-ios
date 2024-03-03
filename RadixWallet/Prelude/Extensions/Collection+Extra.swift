@@ -77,3 +77,9 @@ extension MutableCollection where Self: RangeReplaceableCollection {
 		}
 	}
 }
+
+extension Sequence {
+	func grouped<V: Hashable>(by value: (Element) throws -> V) rethrows -> [V: [Element]] {
+		try Dictionary(grouping: self, by: value)
+	}
+}
