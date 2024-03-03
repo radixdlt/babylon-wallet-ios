@@ -12,6 +12,9 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		var sections: IdentifiedArrayOf<TransactionSection>
 		var loadedPeriods: Set<Date> = []
 
+		@PresentationState
+		public var destination: Destination.State?
+
 		init(account: Profile.Network.Account, sections: [TransactionSection] = []) {
 			self.account = account
 			self.periods = try! .init(months: 7)
@@ -32,11 +35,30 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Hashable {
 		case onAppear
 		case closeTapped
+		case filtersTapped
 		case selectedPeriod(DateRangeItem.ID)
 	}
 
 	public enum InternalAction: Sendable, Hashable {
 		case updateTransactions([TransactionHistoryItem])
+	}
+
+	public struct Destination: DestinationReducer {
+		@CasePathable
+		public enum State: Sendable, Hashable {
+			case filters(TransactionFilters.State)
+		}
+
+		@CasePathable
+		public enum Action: Sendable, Equatable {
+			case filters(TransactionFilters.Action)
+		}
+
+		public var body: some ReducerOf<Self> {
+			Scope(state: \.filters, action: \.filters) {
+				TransactionFilters()
+			}
+		}
 	}
 
 	@Dependency(\.dismiss) var dismiss
@@ -49,6 +71,10 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case let .selectedPeriod(period):
 			state.selectedPeriod = period
 			return loadSelectedPeriod(state: &state)
+
+		case .filtersTapped:
+			state.destination = .filters(.init())
+			return .none
 
 		case .closeTapped:
 			return .run { _ in await dismiss() }

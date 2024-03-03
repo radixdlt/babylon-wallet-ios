@@ -61,7 +61,9 @@ extension TransactionHistory {
 						}
 					}
 					ToolbarItem(placement: .topBarTrailing) {
-						Button(asset: AssetResource.transactionHistoryFilterList) {}
+						Button(asset: AssetResource.transactionHistoryFilterList) {
+							store.send(.view(.filtersTapped))
+						}
 					}
 				}
 				.navigationTitle("History") // FIXME: Strings
@@ -70,6 +72,7 @@ extension TransactionHistory {
 			.onAppear {
 				store.send(.view(.onAppear))
 			}
+			.destinations(with: store)
 		}
 
 		private static let coordSpace = "TransactionHistory"
@@ -115,6 +118,25 @@ extension TransactionHistory {
 				.padding(.bottom, .small2)
 				.frame(maxWidth: .infinity, alignment: .leading)
 				.background(.app.gray5)
+		}
+	}
+}
+
+private extension StoreOf<TransactionHistory> {
+	var destination: PresentationStoreOf<TransactionHistory.Destination> {
+		func scopeState(state: State) -> PresentationState<TransactionHistory.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<TransactionHistory>) -> some View {
+		let destinationStore = store.destination
+		return sheet(store: destinationStore.scope(state: \.filters, action: \.filters)) {
+			TransactionFilters.View(store: $0)
 		}
 	}
 }
