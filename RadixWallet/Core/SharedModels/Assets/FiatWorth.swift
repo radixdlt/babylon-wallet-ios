@@ -83,7 +83,7 @@ extension FiatWorth.Worth: Comparable {
 }
 
 extension FiatWorth {
-	private static let hiddenValue = "••••"
+	private static let hiddenValue = "• • • •"
 	private static let unknownValue = "—"
 
 	func currencyFormatted(applyCustomFont: Bool = false) -> AttributedString {
@@ -112,14 +112,18 @@ extension FiatWorth {
 			guard isVisible, case .known = worth else {
 				let placeholder = isVisible ? Self.unknownValue : Self.hiddenValue
 				if let symbolRange, symbolRange.lowerBound == formattedValue.startIndex {
-					return AttributedString(currencySymbol + placeholder)
+					return AttributedString(currencySymbol + " " + placeholder)
 				} else {
-					return AttributedString(placeholder + currencySymbol)
+					return AttributedString(placeholder + " " + currencySymbol)
 				}
 			}
 
 			return AttributedString(formattedValue)
 		}()
+
+		if !isVisible || worth.isUnknown || value == .zero() {
+			attributedString.foregroundColor = .app.gray3
+		}
 
 		guard applyCustomFont else {
 			return attributedString

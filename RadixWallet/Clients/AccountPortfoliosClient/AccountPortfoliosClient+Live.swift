@@ -65,15 +65,20 @@ extension AccountPortfoliosClient: DependencyKey {
 
 				/// Put together all resources from already fetched and new accounts
 				let currentAccounts = state.portfoliosSubject.value.wrappedValue.map { $0.values.map(\.account) } ?? []
-				let allResources = (currentAccounts + accounts).flatMap {
-					$0.allFungibleResourceAddresses + $0.poolUnitResources.poolUnits.flatMap(\.poolResources)
-				}.uniqued()
+				let allResources = (currentAccounts + accounts)
+					.flatMap {
+						$0.allFungibleResourceAddresses + $0.poolUnitResources.poolUnits.flatMap(\.poolResources)
+					}
+					.uniqued()
 
-				let prices = try await tokenPriceClient.getTokenPrices(.init(
+				let prices = try? await tokenPriceClient.getTokenPrices(.init(
 					tokens: Array(allResources),
 					currency: preferences.fiatCurrencyPriceTarget
 				))
-				await state.setTokenPrices(prices)
+
+				if let prices {
+					await state.setTokenPrices(prices)
+				}
 
 				let portfolios = accounts.map { AccountPortfolio(account: $0) }
 				await state.handlePortfoliosUpdate(portfolios)
