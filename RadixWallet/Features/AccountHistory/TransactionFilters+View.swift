@@ -1,8 +1,29 @@
 import ComposableArchitecture
 import SwiftUI
 
+extension TransactionFilters.State {
+	var viewState: TransactionFilters.ViewState {
+		var secti
+	}
+}
+
 // MARK: - TransactionHistoryFilters.View
 extension TransactionFilters {
+	public struct ViewState: Equatable, Sendable {
+		let sections: [FilterSection]
+
+		public struct FilterSection: Equatable, Sendable {
+			let title: String
+			let filters: [Filter]
+		}
+
+		public struct Filter: Equatable, Sendable, Identifiable {
+			public var id: TransactionFilters.State.Filter { filter }
+			let filter: TransactionFilters.State.Filter
+			let isActive: Bool
+		}
+	}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<TransactionFilters>
