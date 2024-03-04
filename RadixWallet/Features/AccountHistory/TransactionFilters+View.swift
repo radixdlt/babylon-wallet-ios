@@ -1,40 +1,57 @@
 import ComposableArchitecture
 import SwiftUI
 
-// extension TransactionFilters.State {
-//	var viewState: TransactionFilters.ViewState {
-//		typealias FilterViewState = TransactionFilters.ViewState.Filter
-//		var transferTypeFilters: [FilterViewState] = []
-//		var fungibleAssetFilters: [FilterViewState] = []
-//		var nonFungibleAssetFilters: [FilterViewState] = []
-//		var transactionTypeFilters: [FilterViewState] = []
-//
-//		for filter in filters {
-//			switch filter {
-//			case .transferType(let transferType):
-//				transferTypeFilters.append(filter)
-//			case .asset(let resource):
-//				<#code#>
-//			case .transactionType(let transactionType):
-//				<#code#>
-//			}
-//		}
-//	}
-// }
+extension TransactionFilters.State {
+	var viewState: TransactionFilters.ViewState {
+		.init(
+			transferTypes: transferTypes,
+			fungibles: fungibles,
+			nonFungibles: nonFungibles,
+			transactionTypes: transactionTypes
+		)
+	}
+
+	private var transferTypes: [TransactionFilters.ViewState.Filter] {
+		filters.transferTypes.map {
+			let type: FilterType = .transferType($0)
+			return .init(id: type, caption: "", isActive: isActive(type))
+		}
+	}
+
+	private var fungibles: [TransactionFilters.ViewState.Filter] {
+		filters.fungibles.map {
+			let type: FilterType = .asset($0.resourceAddress)
+			return .init(id: type, caption: "", isActive: isActive(type))
+		}
+	}
+
+	private var nonFungibles: [TransactionFilters.ViewState.Filter] {
+		filters.nonFungibles.map {
+			let type: FilterType = .asset($0.resourceAddress)
+			return .init(id: type, caption: "", isActive: isActive(type))
+		}
+	}
+
+	private var transactionTypes: [TransactionFilters.ViewState.Filter] {
+		filters.transactionTypes.map {
+			let type: FilterType = .transactionType($0)
+			return .init(id: type, caption: "", isActive: isActive(type))
+		}
+	}
+}
 
 // MARK: - TransactionHistoryFilters.View
 extension TransactionFilters {
 	public struct ViewState: Equatable, Sendable {
-		let sections: [FilterSection]
-
-		public struct FilterSection: Equatable, Sendable {
-			let title: String
-			let filters: [Filter]
-		}
+		let transferTypes: [Filter]
+		let fungibles: [Filter]
+		let nonFungibles: [Filter]
+		let transactionTypes: [Filter]
 
 		public struct Filter: Equatable, Sendable, Identifiable {
-			public var id: TransactionFilters.State.Filter { filter }
-			let filter: TransactionFilters.State.Filter
+			public let id: State.FilterType
+//			let icon: ImageAsset?
+			let caption: String
 			let isActive: Bool
 		}
 	}
