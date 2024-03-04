@@ -152,10 +152,11 @@ extension AccountPortfoliosClient.State {
 	}
 }
 
-private let xrdAddress = ResourceAddress(address: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd", decodedKind: .globalFungibleResourceManager)
+// Mainnet XRD address; Price is available only on mainnet
+let mainnetXRDAddress = ResourceAddress(address: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd", decodedKind: .globalFungibleResourceManager)
 
 // MARK: Fiat Worth changes
-extension AccountPortfoliosClient.AccountPortfolio {
+private extension AccountPortfoliosClient.AccountPortfolio {
 	mutating func updateFiatWorth<T>(value: T, to keyPath: WritableKeyPath<FiatWorth, T>) {
 		updateFiatWorth { _, worth in
 			var worth = worth.fiatWorth
@@ -171,7 +172,7 @@ extension AccountPortfoliosClient.AccountPortfolio {
 	}
 }
 
-extension OnLedgerEntity.OwnedFungibleResources {
+private extension OnLedgerEntity.OwnedFungibleResources {
 	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
 		xrdResource.mutate { resource in
 			resource.amount.fiatWorth = change(resource.resourceAddress, resource.amount)
@@ -183,11 +184,11 @@ extension OnLedgerEntity.OwnedFungibleResources {
 	}
 }
 
-extension MutableCollection where Element == OnLedgerEntitiesClient.OwnedResourcePoolDetails {
+private extension MutableCollection where Element == OnLedgerEntitiesClient.OwnedResourcePoolDetails {
 	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
 		mutateAll { detail in
 			detail.xrdResource?.redemptionValue.mutate { amount in
-				amount.fiatWorth = change(xrdAddress, amount)
+				amount.fiatWorth = change(mainnetXRDAddress, amount)
 			}
 
 			detail.nonXrdResources.mutateAll { resource in
@@ -200,15 +201,15 @@ extension MutableCollection where Element == OnLedgerEntitiesClient.OwnedResourc
 	}
 }
 
-extension MutableCollection where Element == OnLedgerEntitiesClient.OwnedStakeDetails {
+private extension MutableCollection where Element == OnLedgerEntitiesClient.OwnedStakeDetails {
 	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
 		mutateAll { detail in
 			detail.stakeUnitResource.mutate {
-				$0.amount.fiatWorth = change(xrdAddress, $0.amount)
+				$0.amount.fiatWorth = change(mainnetXRDAddress, $0.amount)
 			}
 			detail.stakeClaimTokens.mutate {
 				$0.stakeClaims.mutateAll { token in
-					token.claimAmount.fiatWorth = change(xrdAddress, token.claimAmount)
+					token.claimAmount.fiatWorth = change(mainnetXRDAddress, token.claimAmount)
 				}
 			}
 		}
@@ -226,7 +227,7 @@ extension AccountPortfoliosClient.AccountPortfolio {
 	}
 }
 
-extension OnLedgerEntity.OwnedFungibleResources {
+private extension OnLedgerEntity.OwnedFungibleResources {
 	var fiatWorth: FiatWorth.Worth {
 		let xrdFiatWorth = xrdResource?.amount.fiatWorth?.worth ?? .zero
 		let nonXrdFiatWorth = nonXrdResources.compactMap(\.amount.fiatWorth?.worth).reduce(.zero, +)
@@ -234,7 +235,7 @@ extension OnLedgerEntity.OwnedFungibleResources {
 	}
 }
 
-extension Collection<OnLedgerEntitiesClient.OwnedStakeDetails> {
+private extension Collection<OnLedgerEntitiesClient.OwnedStakeDetails> {
 	var fiatWorth: FiatWorth.Worth {
 		reduce(.zero) { partialResult, stakeUnitDetail in
 			let stakeUnitFiatWorth = stakeUnitDetail.stakeUnitResource?.amount.fiatWorth?.worth ?? .zero
@@ -248,7 +249,7 @@ extension Collection<OnLedgerEntitiesClient.OwnedStakeDetails> {
 	}
 }
 
-extension Collection<OnLedgerEntitiesClient.OwnedResourcePoolDetails> {
+private extension Collection<OnLedgerEntitiesClient.OwnedResourcePoolDetails> {
 	var fiatWorth: FiatWorth.Worth {
 		reduce(.zero) { partialResult, poolUnitDetail in
 			let xrdFiatWorth = poolUnitDetail.xrdResource?.redemptionValue?.fiatWorth?.worth ?? .zero

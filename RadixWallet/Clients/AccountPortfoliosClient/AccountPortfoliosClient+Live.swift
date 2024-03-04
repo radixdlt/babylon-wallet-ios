@@ -67,7 +67,9 @@ extension AccountPortfoliosClient: DependencyKey {
 				let currentAccounts = state.portfoliosSubject.value.wrappedValue.map { $0.values.map(\.account) } ?? []
 				let allResources = (currentAccounts + accounts)
 					.flatMap {
-						$0.allFungibleResourceAddresses + $0.poolUnitResources.poolUnits.flatMap(\.poolResources)
+						$0.allFungibleResourceAddresses +
+							$0.poolUnitResources.poolUnits.flatMap(\.poolResources) +
+							[mainnetXRDAddress]
 					}
 					.uniqued()
 
