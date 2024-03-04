@@ -1,11 +1,26 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension TransactionFilters.State {
-	var viewState: TransactionFilters.ViewState {
-		var secti
-	}
-}
+// extension TransactionFilters.State {
+//	var viewState: TransactionFilters.ViewState {
+//		typealias FilterViewState = TransactionFilters.ViewState.Filter
+//		var transferTypeFilters: [FilterViewState] = []
+//		var fungibleAssetFilters: [FilterViewState] = []
+//		var nonFungibleAssetFilters: [FilterViewState] = []
+//		var transactionTypeFilters: [FilterViewState] = []
+//
+//		for filter in filters {
+//			switch filter {
+//			case .transferType(let transferType):
+//				transferTypeFilters.append(filter)
+//			case .asset(let resource):
+//				<#code#>
+//			case .transactionType(let transactionType):
+//				<#code#>
+//			}
+//		}
+//	}
+// }
 
 // MARK: - TransactionHistoryFilters.View
 extension TransactionFilters {
