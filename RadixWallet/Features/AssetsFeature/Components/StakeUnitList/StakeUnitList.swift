@@ -16,10 +16,6 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		var selectedLiquidStakeUnits: IdentifiedArrayOf<OnLedgerEntity.OwnedFungibleResource>?
 		var selectedStakeClaimTokens: SelectedStakeClaimTokens?
 
-		// Loading state
-		var isLoading: Bool
-		var shouldRefresh: Bool
-
 		@PresentationState
 		var destination: Destination.State?
 
@@ -35,7 +31,6 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 
 			switch stakeUnitDetails {
 			case .idle, .loading:
-				self.isLoading = true
 				self.stakeSummary = .init(
 					staked: .loading,
 					unstaking: .loading,
@@ -44,7 +39,6 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 				)
 				self.stakedValidators = []
 			case let .success(details):
-				self.isLoading = false
 				let allSelectedTokens = selectedStakeClaimTokens?.values.flatMap { $0 }.map(\.id).asIdentifiable()
 
 				let stakeClaims = details.compactMap(\.stakeClaimTokens).flatMap(\.stakeClaims)
@@ -103,7 +97,6 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 
 				self.stakedValidators = validatorStakes
 			case let .failure(error):
-				self.isLoading = false
 				self.stakeSummary = .init(
 					staked: .loading,
 					unstaking: .loading,
@@ -113,7 +106,6 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 
 				self.stakedValidators = []
 			}
-			self.shouldRefresh = false
 		}
 	}
 

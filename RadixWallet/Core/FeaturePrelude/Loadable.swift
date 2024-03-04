@@ -302,6 +302,8 @@ extension Loadable {
         }
     }
 
+    /// Refreshes from other Loadable by taking into account the current `success` state.
+    /// This is meant to preserve the `success` state while other Loadable is `loading` or `failed`.
     public mutating func refresh(
         from other: Loadable<Value>,
         valueChangeMap: (_ old: Value, _ new: Value) -> Value = { _, new in new }
