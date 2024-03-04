@@ -2486,6 +2486,7 @@
 		832880682AE664C30014FBF3 /* EntityFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityFlag.swift; sourceTree = "<group>"; };
 		8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPreferencesTests.swift; sourceTree = "<group>"; };
 		8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionFee.swift; sourceTree = "<group>"; };
+		834B651C2B96216C00B7E1E8 /* RadixWalletDebug-Dev.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "RadixWalletDebug-Dev.entitlements"; sourceTree = "<group>"; };
 		835F196C2B3581C300E0B71D /* UnknownDappComponents+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UnknownDappComponents+View.swift"; sourceTree = "<group>"; };
 		836878602B4551910029C808 /* UnknownDappComponents+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UnknownDappComponents+Reducer.swift"; sourceTree = "<group>"; };
 		83856D602B0279080026452A /* VerifyMnemonic+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "VerifyMnemonic+View.swift"; sourceTree = "<group>"; };
@@ -2822,6 +2823,7 @@
 		48CFBC512ADC106300E77A5C /* RadixWallet */ = {
 			isa = PBXGroup;
 			children = (
+				834B651C2B96216C00B7E1E8 /* RadixWalletDebug-Dev.entitlements */,
 				48649AD42ADC7CAC006307CF /* AppIcon.xcassets */,
 				48CFBF522ADC10D900E77A5C /* Clients */,
 				48CFC0E42ADC10D900E77A5C /* Core */,
@@ -6923,14 +6925,6 @@
 			path = VerifyMnemonic;
 			sourceTree = "<group>";
 		};
-		83D94D752B80878C00CB506A /* RaMS */ = {
-			isa = PBXGroup;
-			children = (
-				83D94D762B8087AB00CB506A /* RaMS.swift */,
-			);
-			path = RaMS;
-	sourceTree = "<group>";
-		};
 		8397D8292B46AC720016365A /* StakeUnitList */ = {
 			isa = PBXGroup;
 			children = (
@@ -6939,6 +6933,14 @@
 				8397D82B2B46ACB50016365A /* StakeUnitList.swift */,
 			);
 			path = StakeUnitList;
+			sourceTree = "<group>";
+		};
+		83D94D752B80878C00CB506A /* RaMS */ = {
+			isa = PBXGroup;
+			children = (
+				83D94D762B8087AB00CB506A /* RaMS.swift */,
+			);
+			path = RaMS;
 			sourceTree = "<group>";
 		};
 		83DFAF2C2B4D48E2008B70CE /* Components */ = {
@@ -9326,6 +9328,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 48CFC69C2ADC110800E77A5C /* iOS-dev.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "RadixWallet/RadixWalletDebug-Dev.entitlements";
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
