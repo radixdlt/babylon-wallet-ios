@@ -657,4 +657,12 @@ extension Optional {
 		}
 		return []
 	}
+
+	mutating func mutate(_ mutate: (inout Wrapped) -> Void) {
+		guard case var .some(wrapped) = self else {
+			return
+		}
+		mutate(&wrapped)
+		self = .some(wrapped)
+	}
 }

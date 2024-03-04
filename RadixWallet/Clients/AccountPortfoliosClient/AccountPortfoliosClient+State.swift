@@ -59,7 +59,7 @@ extension AccountPortfoliosClient.State {
 extension AccountPortfoliosClient.State {
 	func applyFiatWorth(_ portfolio: inout AccountPortfoliosClient.AccountPortfolio) {
 		applyTokenPrices(to: &portfolio)
-		applyCurrencyVisibility(&portfolio)
+		applyCurrencyVisibility(to: &portfolio)
 		applyFiatCurrency(to: &portfolio)
 	}
 
@@ -67,7 +67,7 @@ extension AccountPortfoliosClient.State {
 		self.tokenPrices = tokenPrices
 		if var existingPortfolios = portfoliosSubject.value.values.wrappedValue.map(Array.init) {
 			applyTokenPrices(to: &existingPortfolios)
-			self.setOrUpdateAccountPortfolios(existingPortfolios)
+			setOrUpdateAccountPortfolios(existingPortfolios)
 		}
 	}
 
@@ -83,7 +83,7 @@ extension AccountPortfoliosClient.State {
 		self.selectedCurrency = currency
 		if var existingPortfolios = portfoliosSubject.value.values.wrappedValue.map(Array.init) {
 			applyFiatCurrency(to: &existingPortfolios)
-			self.setOrUpdateAccountPortfolios(existingPortfolios)
+			setOrUpdateAccountPortfolios(existingPortfolios)
 		}
 	}
 
@@ -95,9 +95,13 @@ extension AccountPortfoliosClient.State {
 		portfolio.updateFiatWorth(calculateWorth)
 	}
 
-	func applyCurrencyVisibility(_ portfolio: inout AccountPortfoliosClient.AccountPortfolio) {
+	func applyCurrencyVisibility(to portfolio: inout AccountPortfoliosClient.AccountPortfolio) {
 		portfolio.isCurrencyAmountVisible = isCurrencyAmountVisible
 		portfolio.updateFiatWorth(value: isCurrencyAmountVisible, to: \.isVisible)
+	}
+
+	func applyCurrencyVisibility(to portfolios: inout [AccountPortfoliosClient.AccountPortfolio]) {
+		portfolios.mutateAll(applyCurrencyVisibility)
 	}
 
 	func applyFiatCurrency(to portfolio: inout AccountPortfoliosClient.AccountPortfolio) {
@@ -108,17 +112,12 @@ extension AccountPortfoliosClient.State {
 	func applyFiatCurrency(to portfolios: inout [AccountPortfoliosClient.AccountPortfolio]) {
 		portfolios.mutateAll(applyFiatCurrency)
 	}
-
-	func applyCurrencyVisibility(to portfolios: inout [AccountPortfoliosClient.AccountPortfolio]) {
-		portfolios.mutateAll(applyCurrencyVisibility)
-	}
 }
 
 // MARK: - Stake and Pool details handling
 extension AccountPortfoliosClient.State {
 	func calculateWorth(for resourceAddress: ResourceAddress, amount: ResourceAmount) -> FiatWorth? {
-		let price = tokenPrices[resourceAddress]
-		return price.map {
+		tokenPrices[resourceAddress].map {
 			.init(
 				isVisible: isCurrencyAmountVisible,
 				worth: .known($0 * amount.nominalAmount),
@@ -213,16 +212,6 @@ extension MutableCollection where Element == OnLedgerEntitiesClient.OwnedStakeDe
 				}
 			}
 		}
-	}
-}
-
-extension Optional {
-	mutating func mutate(_ mutate: (inout Wrapped) -> Void) {
-		guard case var .some(wrapped) = self else {
-			return
-		}
-		mutate(&wrapped)
-		self = .some(wrapped)
 	}
 }
 
