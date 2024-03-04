@@ -3,74 +3,66 @@ import ComposableArchitecture
 // MARK: - TransactionFilters
 public struct TransactionFilters: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let filters: [FilterSection]
-		public var activeFilters: ActiveFilters
+		let filters: Filters
+		var activeFilters: ActiveFilters
 
-		init(assets: [OnLedgerEntity.Resource], activeFilters: ActiveFilters = .init()) {
-			let transferType = FilterSection(
-				title: "", // FIXME: Strings
-				filters: Filter.TransferType.allCases.map(Filter.transferType)
-			)
-			let fungibles = FilterSection(
-				title: "Tokens", // FIXME: Strings
-				filters: Filter.TransferType.allCases.map(Filter.transferType)
-			)
-			let nonFungibles = FilterSection(
-				title: "NFTs", // FIXME: Strings
-				filters: Filter.TransferType.allCases.map(Filter.transferType)
-			)
-
-			let assetFilters = assets.map(Filter.asset)
-			let transaxctionTypeFilters = Filter.TransactionType.allCases.map(Filter.transactionType)
-
-			self.filters = [.init(title: "ddd", filters: tra)]
-			self.activeFilters = activeFilters
+		public enum TransferType: CaseIterable, Sendable {
+			case withdrawal
+			case deposit
 		}
 
-		public struct FilterSection: Hashable, Sendable {
-			let title: String
-			let filters: [Filter]
-		}
+		public typealias TransactionType = GatewayAPI.ManifestClass
 
-		public enum Filter: Hashable, Sendable {
-			case transferType(TransferType)
-			case asset(OnLedgerEntity.Resource)
-			case transactionType(TransactionType)
-
-			public enum TransferType: CaseIterable, Sendable {
-				case withdrawal
-				case deposit
-			}
-
-			public typealias TransactionType = GatewayAPI.ManifestClass
+		public struct Filters: Hashable, Sendable {
+			let transferTypes: [TransferType]
+			let fungibles: [OnLedgerEntity.Resource]
+			let nonFungibles: [OnLedgerEntity.Resource]
+			let transactionTypes: [TransactionType]
 		}
 
 		public struct ActiveFilters: Hashable, Sendable {
-			var transferType: Filter.TransferType? = nil
+			var transferType: TransferType? = nil
 			var asset: ResourceAddress? = nil
-			var transactionType: GatewayAPI.ManifestClass? = nil
+			var transactionType: TransactionType? = nil
+		}
+
+		// This type is used for toggling active filters
+		public enum FilterType: Hashable, Sendable {
+			case transferType(State.TransferType)
+			case asset(ResourceAddress)
+			case transactionType(State.TransactionType)
+		}
+
+		init(assets: [OnLedgerEntity.Resource], activeFilters: ActiveFilters = .init()) {
+			self.filters = .init(
+				transferTypes: TransferType.allCases,
+				fungibles: assets.filter { $0.fungibility == .fungible },
+				nonFungibles: assets.filter { $0.fungibility == .nonFungible },
+				transactionTypes: TransactionType.allCases
+			)
+			self.activeFilters = activeFilters
 		}
 	}
 }
 
 extension TransactionFilters.State {
-	func isActive(_ filter: Filter) -> Bool {
+	func isActive(_ filter: FilterType) -> Bool {
 		switch filter {
 		case let .transferType(type):
 			activeFilters.transferType == type
 		case let .asset(asset):
-			activeFilters.asset == asset.resourceAddress
+			activeFilters.asset == asset
 		case let .transactionType(type):
 			activeFilters.transactionType == type
 		}
 	}
 
-	mutating func setActive(_ active: Bool, filter: Filter) {
+	mutating func setActive(_ active: Bool, filter: FilterType) {
 		switch filter {
 		case let .transferType(type):
 			toggle(\.transferType, on: active, value: type)
 		case let .asset(asset):
-			toggle(\.asset, on: active, value: asset.resourceAddress)
+			toggle(\.asset, on: active, value: asset)
 		case let .transactionType(type):
 			toggle(\.transactionType, on: active, value: type)
 		}
@@ -84,27 +76,6 @@ extension TransactionFilters.State {
 			activeFilters[keyPath: keyPath] = nil
 		} else {
 			assertionFailure("Tried to turn off inactive filter, or vice versa")
-		}
-	}
-
-	// OR:
-
-	mutating func toggle(_ filter: Filter) {
-		switch filter {
-		case let .transferType(type):
-			toggle(\.transferType, value: type)
-		case let .asset(asset):
-			toggle(\.asset, value: asset.resourceAddress)
-		case let .transactionType(type):
-			toggle(\.transactionType, value: type)
-		}
-	}
-
-	private mutating func toggle<V: Equatable>(_ keyPath: WritableKeyPath<ActiveFilters, V?>, value: V) {
-		if activeFilters[keyPath: keyPath] == value {
-			activeFilters[keyPath: keyPath] = nil
-		} else {
-			activeFilters[keyPath: keyPath] = value
 		}
 	}
 }
