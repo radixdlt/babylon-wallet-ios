@@ -3,12 +3,33 @@ import ComposableArchitecture
 // MARK: - TransactionFilters
 public struct TransactionFilters: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let filters: [Filter]
+		public let filters: [FilterSection]
 		public var activeFilters: ActiveFilters
 
 		init(assets: [OnLedgerEntity.Resource], activeFilters: ActiveFilters = .init()) {
-			self.filters = .transferTypeFilters + .assetFilters(assets) + .transactionTypeFilters
+			let transferType = FilterSection(
+				title: "", // FIXME: Strings
+				filters: Filter.TransferType.allCases.map(Filter.transferType)
+			)
+			let fungibles = FilterSection(
+				title: "Tokens", // FIXME: Strings
+				filters: Filter.TransferType.allCases.map(Filter.transferType)
+			)
+			let nonFungibles = FilterSection(
+				title: "NFTs", // FIXME: Strings
+				filters: Filter.TransferType.allCases.map(Filter.transferType)
+			)
+
+			let assetFilters = assets.map(Filter.asset)
+			let transaxctionTypeFilters = Filter.TransactionType.allCases.map(Filter.transactionType)
+
+			self.filters = [.init(title: "ddd", filters: tra)]
 			self.activeFilters = activeFilters
+		}
+
+		public struct FilterSection: Hashable, Sendable {
+			let title: String
+			let filters: [Filter]
 		}
 
 		public enum Filter: Hashable, Sendable {
@@ -30,16 +51,6 @@ public struct TransactionFilters: Sendable, FeatureReducer {
 			var transactionType: GatewayAPI.ManifestClass? = nil
 		}
 	}
-}
-
-extension [TransactionFilters.State.Filter] {
-	static let transferTypeFilters = Element.TransferType.allCases.map(Element.transferType)
-
-	static func assetFilters(_ assets: [OnLedgerEntity.Resource]) -> Self {
-		assets.map(Element.asset)
-	}
-
-	static let transactionTypeFilters = Element.TransactionType.allCases.map(Element.transactionType)
 }
 
 extension TransactionFilters.State {
