@@ -65,12 +65,6 @@ public enum EntityMetadataKey: String, CaseIterable {
 }
 
 extension Set<EntityMetadataKey> {
-	public static var historyMetadataKeys: Set<EntityMetadataKey> {
-		let keys: Set<EntityMetadataKey> = [.name, .symbol, .description, .iconURL, .validator, .pool, .accountType, .tags, .dappDefinition, .poolUnit]
-		assert(keys.count <= EntityMetadataKey.maxAllowedKeys)
-		return keys
-	}
-
 	public static var resourceMetadataKeys: Set<EntityMetadataKey> {
 		let keys: Set<EntityMetadataKey> = [.name, .symbol, .description, .iconURL, .validator, .pool, .accountType, .tags, .dappDefinition, .dappDefinitions]
 		assert(keys.count <= EntityMetadataKey.maxAllowedKeys)
