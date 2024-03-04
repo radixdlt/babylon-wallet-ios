@@ -47,7 +47,7 @@ extension TransactionFilters {
 
 					if active {
 						Button(asset: AssetResource.close, action: action)
-							.tint(.white)
+							.tint(.app.gray3)
 					}
 				}
 				.padding(.horizontal, .medium3)

@@ -73,7 +73,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			return loadSelectedPeriod(state: &state)
 
 		case .filtersTapped:
-			state.destination = .filters(.init())
+//			state.destination = .filters(.init())
 			return .none
 
 		case .closeTapped:
