@@ -61,7 +61,9 @@ extension TransactionHistory {
 						}
 					}
 					ToolbarItem(placement: .topBarTrailing) {
-						Button(asset: AssetResource.transactionHistoryFilterList) {}
+						Button(asset: AssetResource.transactionHistoryFilterList) {
+							store.send(.view(.filtersTapped))
+						}
 					}
 				}
 				.navigationTitle("History") // FIXME: Strings
@@ -70,6 +72,7 @@ extension TransactionHistory {
 			.onAppear {
 				store.send(.view(.onAppear))
 			}
+			.destinations(with: store)
 		}
 
 		private static let coordSpace = "TransactionHistory"
@@ -119,6 +122,25 @@ extension TransactionHistory {
 	}
 }
 
+private extension StoreOf<TransactionHistory> {
+	var destination: PresentationStoreOf<TransactionHistory.Destination> {
+		func scopeState(state: State) -> PresentationState<TransactionHistory.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<TransactionHistory>) -> some View {
+		let destinationStore = store.destination
+		return sheet(store: destinationStore.scope(state: \.filters, action: \.filters)) {
+			TransactionFilters.View(store: $0)
+		}
+	}
+}
+
 // MARK: - TransactionHistory.TransactionView
 extension TransactionHistory {
 	struct TransactionView: SwiftUI.View {
@@ -138,20 +160,24 @@ extension TransactionHistory {
 
 					VStack(spacing: .small1) {
 						if !transaction.withdrawals.isEmpty {
-							TransfersActionView(type: .withdrawal, resources: transaction.withdrawals)
-								.padding(.horizontal, .medium3)
+							let resources = transaction.withdrawals.map(\.viewState)
+							TransfersActionView(type: .withdrawal, resources: resources)
 						}
 
 						if !transaction.deposits.isEmpty {
-							TransfersActionView(type: .deposit, resources: transaction.deposits)
-								.padding(.horizontal, .medium3)
+							let resources = transaction.deposits.map(\.viewState)
+							TransfersActionView(type: .deposit, resources: resources)
+						}
+
+						if transaction.depositSettingsUpdated {
+							DepositSettingsActionView()
 						}
 					}
 					.overlay(alignment: .topTrailing) {
 						TimeStampView(manifestClass: transaction.manifestClass, time: transaction.time)
-							.padding(.trailing, .medium3)
 					}
 					.padding(.top, .small1)
+					.padding(.horizontal, .medium3)
 				}
 				.padding(.bottom, .medium3)
 			}
@@ -221,48 +247,87 @@ extension TransactionHistory {
 
 			var body: some SwiftUI.View {
 				VStack {
-					HStack(spacing: .zero) {
-						Image(asset: asset)
-							.padding(.trailing, .small3)
-
-						Text(label)
-							.textStyle(.body2Header)
-							.foregroundColor(textColor)
-
-						Spacer()
+					switch type {
+					case .withdrawal:
+						EventHeader(event: .withdrawal)
+					case .deposit:
+						EventHeader(event: .deposit)
 					}
 
 					ResourceBalancesView(resources)
 				}
 			}
+		}
+
+		struct DepositSettingsActionView: SwiftUI.View {
+			var body: some SwiftUI.View {
+				VStack {
+					EventHeader(event: .depositSettings)
+
+					Text("Updated Account Deposit Settings") // FIXME: Strings
+						.textStyle(.body2HighImportance)
+						.foregroundColor(.app.gray1)
+						.flushedLeft
+						.padding(.small1)
+						.roundedCorners(strokeColor: .app.gray3)
+				}
+			}
+		}
+
+		struct EventHeader: SwiftUI.View {
+			let event: Event
+
+			var body: some SwiftUI.View {
+				HStack(spacing: .zero) {
+					Image(asset: asset)
+						.padding(.trailing, .small3)
+
+					Text(label)
+						.textStyle(.body2Header)
+						.foregroundColor(textColor)
+
+					Spacer()
+				}
+			}
 
 			private var asset: ImageAsset {
-				switch type {
+				switch event {
 				case .deposit:
 					AssetResource.transactionHistoryDeposit
 				case .withdrawal:
 					AssetResource.transactionHistoryWithdrawal
+				case .depositSettings:
+					AssetResource.transactionHistorySettings
 				}
 			}
 
 			private var label: String {
-				switch type {
+				// FIXME: strings
+				switch event {
 				case .deposit:
 					"Deposited"
 				case .withdrawal:
 					"Withdrawn"
+				case .depositSettings:
+					"Settings"
 				}
 			}
 
 			private var textColor: Color {
-				switch type {
+				switch event {
 				case .deposit:
 					.app.green1
-				case .withdrawal:
+				case .withdrawal, .depositSettings:
 					.app.gray1
 				}
 			}
 		}
+	}
+
+	public enum Event {
+		case deposit
+		case withdrawal
+		case depositSettings
 	}
 }
 

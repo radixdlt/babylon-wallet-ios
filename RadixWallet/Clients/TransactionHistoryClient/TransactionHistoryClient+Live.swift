@@ -1,5 +1,11 @@
 import EngineToolkit
 
+extension SpecificAddress {
+	public func networkID() throws -> NetworkID {
+		try .init(intoEngine().networkId())
+	}
+}
+
 extension TransactionHistoryClient {
 	public static let liveValue = TransactionHistoryClient.live()
 
@@ -9,6 +15,8 @@ extension TransactionHistoryClient {
 
 		@Sendable
 		func getTransactionHistory(account: AccountAddress, period: Range<Date>, cursor: String?) async throws -> TransactionHistoryResponse {
+			let networkID = try account.networkID()
+
 			// FIXME: GK REMOVE THIS
 			let account = try AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l")
 
@@ -37,90 +45,85 @@ extension TransactionHistoryClient {
 
 			// Pre-loading the details for all the resources involved
 
-			print("• RESPONSE: \(period.lowerBound.formatted(date: .abbreviated, time: .omitted)) -> \(period.upperBound.formatted(date: .abbreviated, time: .omitted)) \(response.items.count)")
-
-//			for item in response.items {
-//				print("• item: \(item)")
-//			}
+			print("• RESPONSE: \(period.lowerBound.formatted(date: .abbreviated, time: .omitted)) -> \(period.upperBound.formatted(date: .abbreviated, time: .omitted)) \(response.items.count) •••••••••••••••••••••••")
 
 			let resourceAddresses = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
+			let resourceDetails = try await onLedgerEntitiesClient.getResources(resourceAddresses)
+			let keyedResources = IdentifiedArray(uniqueElements: resourceDetails)
 
-			let resourceDetails = try await onLedgerEntitiesClient.getEntities(
-				addresses: resourceAddresses.map(\.asGeneral),
-				metadataKeys: .poolUnitMetadataKeys
-			)
+			// Thrown if a resource or nonFungibleToken that we loaded is not present, should never happen
+			struct ProgrammerError: Error {}
 
-			let keyedResourceDetails = IdentifiedArray(resourceDetails.compactMap(\.resource), id: \.resourceAddress) { $1 }
-
-			/// Returns a fungible ResourceBalance for the given resource and amount
-			func fungibleBalance(_ resourceAddress: ResourceAddress, amount: RETDecimal) -> ResourceBalance.ViewState.Fungible { // FIXME: GK use full
-				let title = keyedResourceDetails[id: resourceAddress]?.metadata.title
-				let iconURL = keyedResourceDetails[id: resourceAddress]?.metadata.iconURL
-				return .init(
-					address: resourceAddress,
-					icon: .token(.other(iconURL)),
-					title: title,
-					amount: .init(amount)
-				)
-			}
-
-			// Pre-loading NFT data
+			// Loading all NFT data
 
 			let nonFungibleIDs = try Set(response.items.flatMap { try $0.balanceChanges.map(extractAllNonFungibleIDs) ?? [] })
 			let groupedNonFungibleIDs = Dictionary(grouping: nonFungibleIDs) { $0.resourceAddress() }
-			let nftData = try await groupedNonFungibleIDs.parallelMap { address, ids in
+			let nonFungibleTokenArrays = try await groupedNonFungibleIDs.parallelMap { address, ids in
 				try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(resource: address.asSpecific(), nonFungibleIds: ids))
 			}
-			var keyedNFTData: [NonFungibleGlobalId: OnLedgerEntity.NonFungibleToken] = [:]
-			for nftDataArray in nftData {
-				for nftDatum in nftDataArray {
-					keyedNFTData[nftDatum.id] = nftDatum
+			var keyedNonFungibleTokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken> = []
+			for nonFungibleTokenArray in nonFungibleTokenArrays {
+				keyedNonFungibleTokens.append(contentsOf: nonFungibleTokenArray)
+			}
+
+			func nonFungibleResources(_ type: ChangeType, changes: GatewayAPI.TransactionNonFungibleBalanceChanges) async throws -> [ResourceBalance] {
+				let address = try ResourceAddress(validatingAddress: changes.resourceAddress)
+				let ids = try extractNonFungibleIDs(type, from: changes)
+
+				// The resource should have been fetched
+				guard let resource = keyedResources[id: address] else { throw ProgrammerError() }
+
+				let tokens = try ids.map { id in
+					// All tokens should have been fetched earlier
+					guard let token = keyedNonFungibleTokens[id: id] else { throw ProgrammerError() }
+					return token
 				}
+
+				return await onLedgerEntitiesClient.nonFungibleResourceBalances(resource, tokens: tokens)
 			}
 
-			/// Returns a non-fungible ResourceBalance for the given global non-fungbile ID
-			func nonFungibleBalance(_ id: NonFungibleGlobalId) throws -> ResourceBalance.ViewState.NonFungible { // FIXME: GK use full
-				let resourceAddress: ResourceAddress = try id.resourceAddress().asSpecific()
-				let resourceName = keyedResourceDetails[id: resourceAddress]?.metadata.name
-				let iconURL = keyedResourceDetails[id: resourceAddress]?.metadata.iconURL
-				return .init(
-					id: id,
-					resourceImage: iconURL,
-					resourceName: resourceName,
-					nonFungibleName: keyedNFTData[id]?.data?.name
-				)
-			}
+			let dateformatter = ISO8601DateFormatter()
+			dateformatter.formatOptions.insert(.withFractionalSeconds)
 
-			func transaction(for info: GatewayAPI.CommittedTransactionInfo) throws -> TransactionHistoryItem? {
-				guard let time = info.confirmedAt else { return nil }
+			func transaction(for info: GatewayAPI.CommittedTransactionInfo) async throws -> TransactionHistoryItem {
+				guard let time = dateformatter.date(from: info.roundTimestamp) else {
+					struct CorruptTimestamp: Error { let roundTimestamd: String }
+					throw CorruptTimestamp(roundTimestamd: info.roundTimestamp)
+				}
 				let message = info.message?.plaintext?.content.string
 				let manifestClass = info.manifestClasses?.first
 
-				var withdrawals: [ResourceBalance.ViewState] = []
-				var deposits: [ResourceBalance.ViewState] = [] // FIXME: GK use full
+				var withdrawals: [ResourceBalance] = []
+				var deposits: [ResourceBalance] = []
 
 				if let changes = info.balanceChanges {
+					let n = changes.nonFungibleBalanceChanges.filter { $0.entityAddress == account.address }
+					let f = changes.fungibleBalanceChanges.filter { $0.entityAddress == account.address }
+					print("••• \(time.formatted(date: .abbreviated, time: .shortened)) \(info.manifestClasses?.first?.rawValue ?? "---") N: \(n.count), F: \(f.count)")
+
 					for nonFungible in changes.nonFungibleBalanceChanges where nonFungible.entityAddress == account.address {
-						for nonFungibleID in try extractNonFungibleIDs(.removed, from: nonFungible) {
-							try withdrawals.append(.nonFungible(nonFungibleBalance(nonFungibleID)))
-						}
-						for nonFungibleID in try extractNonFungibleIDs(.added, from: nonFungible) {
-							try deposits.append(.nonFungible(nonFungibleBalance(nonFungibleID)))
-						}
+						let withdrawn = try await nonFungibleResources(.removed, changes: nonFungible)
+						withdrawals.append(contentsOf: withdrawn)
+						let deposited = try await nonFungibleResources(.added, changes: nonFungible)
+						deposits.append(contentsOf: deposited)
 					}
 
 					for fungible in changes.fungibleBalanceChanges where fungible.entityAddress == account.address {
 						let resourceAddress = try ResourceAddress(validatingAddress: fungible.resourceAddress)
+						guard let baseResource = keyedResources[id: resourceAddress] else {
+							throw ProgrammerError()
+						}
+
 						let amount = try RETDecimal(value: fungible.balanceChange)
 						guard !amount.isZero() else { continue }
 
 						// NB: The sign of the amount in the balance is made positive, negative balances are treated as withdrawals
-						let balance = try fungibleBalance(resourceAddress, amount: amount.abs())
+						let resource = try await onLedgerEntitiesClient.fungibleResourceBalance(baseResource, amount: amount.abs(), networkID: networkID)
 
 						if amount.isNegative() {
-							withdrawals.append(.fungible(balance))
+							withdrawals.append(resource)
 						} else {
-							deposits.append(.fungible(balance))
+							deposits.append(resource)
 						}
 					}
 				}
@@ -134,14 +137,23 @@ extension TransactionHistoryClient {
 					manifestClass: manifestClass,
 					withdrawals: withdrawals,
 					deposits: deposits,
-					depositSettingsUpdated: true
+					depositSettingsUpdated: info.manifestClasses?.contains(.accountDepositSettingsUpdate) == true
 				)
 			}
 
-			return try .init(
-				cursor: response.nextCursor,
-				items: response.items.compactMap(transaction(for:))
-			)
+			var items: [TransactionHistoryItem] = []
+
+			for item in response.items {
+				let transactionItem = try await transaction(for: item)
+				items.append(transactionItem)
+			}
+
+			return .init(cursor: response.nextCursor, items: items)
+
+//			return try await .init(
+//				cursor: response.nextCursor,
+//				items: response.items.parallelMap(transaction(for:))
+//			)
 		}
 
 		/*
