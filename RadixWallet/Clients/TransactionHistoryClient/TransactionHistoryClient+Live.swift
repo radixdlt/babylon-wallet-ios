@@ -83,7 +83,7 @@ extension TransactionHistoryClient {
 					return token
 				}
 
-				return await onLedgerEntitiesClient.nonFungibleResourceBalances(resource, tokens: tokens)
+				return try await onLedgerEntitiesClient.nonFungibleResourceBalances(resource, tokens: tokens, skipStakeClaimTokens: true)
 			}
 
 			let dateformatter = ISO8601DateFormatter()
