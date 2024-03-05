@@ -14,31 +14,102 @@ extension TransactionFilters {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: \.filters, send: { .view($0) }) { viewStore in
-				VStack {
-					section(filters: viewStore.transferTypes)
+			ScrollView {
+				WithViewStore(store, observe: \.filters, send: { .view($0) }) { viewStore in
+					VStack {
+						SubSection(filters: viewStore.transferTypes, flexible: false, store: store)
 
-					Text("Type of asset")
+						Section("Type of asset") {
+							SubSection("Tokens", filters: viewStore.fungibles, store: store)
 
-					Text("Tokens")
-					section(filters: viewStore.fungibles)
+							SubSection("NFTs", filters: viewStore.nonFungibles, store: store)
+						}
 
-					Text("NFTs")
-					section(filters: viewStore.nonFungibles)
+						Section("Type of transaction") {
+							SubSection(filters: viewStore.transactionTypes, store: store)
+						}
 
-					Text("Type of transaction")
-					section(filters: viewStore.transactionTypes)
+						Spacer(minLength: 0)
+					}
+					.padding(.horizontal, .medium1)
 				}
 			}
 		}
 
-		private func section(filters: IdentifiedArrayOf<State.Filter>) -> some SwiftUI.View {
-			FlowLayout(spacing: .small1) {
-				ForEach(filters) { filter in
-					FilterView(filter: filter) {
-						store.send(.view(.addTapped(filter.id)))
-					} removeAction: {
-						store.send(.view(.removeTapped(filter.id)))
+		struct Section<Content: SwiftUI.View>: SwiftUI.View {
+			@SwiftUI.State private var expanded: Bool = true
+			let name: String
+			let content: Content
+
+			init(_ name: String, @ViewBuilder content: () -> Content) {
+				self.name = name
+				self.content = content()
+			}
+
+			var body: some SwiftUI.View {
+				VStack(spacing: 0) {
+					HStack(spacing: .zero) {
+						Text(name)
+							.textStyle(.body1Header)
+							.foregroundStyle(.app.gray1)
+							.padding(.vertical, .small2)
+
+						Spacer()
+
+						Button {
+							withAnimation(.default) {
+								expanded.toggle()
+							}
+						} label: {
+							Image(expanded ? .chevronUp : .chevronDown)
+						}
+					}
+					.background(.app.gray5)
+
+					if expanded {
+						content
+					}
+				}
+				.clipped()
+			}
+		}
+
+		struct SubSection: SwiftUI.View {
+			let heading: String?
+			let filters: IdentifiedArrayOf<State.Filter>
+			let flexible: Bool
+			let store: StoreOf<TransactionFilters>
+
+			init(_ heading: String? = nil, filters: IdentifiedArrayOf<State.Filter>, flexible: Bool = true, store: StoreOf<TransactionFilters>) {
+				self.heading = heading
+				self.filters = filters
+				self.flexible = flexible
+				self.store = store
+			}
+
+			var body: some SwiftUI.View {
+				if !filters.isEmpty {
+					VStack {
+						if let heading {
+							Text(heading)
+								.textStyle(.body1HighImportance)
+								.foregroundStyle(.app.gray2)
+						}
+
+						HStack(spacing: .zero) {
+							FlowLayout(spacing: .small1) {
+								ForEach(filters) { filter in
+									FilterView(filter: filter) {
+										store.send(.view(.addTapped(filter.id)))
+									} removeAction: {
+										store.send(.view(.removeTapped(filter.id)))
+									}
+								}
+							}
+							.border(.red)
+
+							Spacer(minLength: 0)
+						}
 					}
 				}
 			}
@@ -51,18 +122,11 @@ extension TransactionFilters {
 
 			var body: some SwiftUI.View {
 				Button(action: addAction) {
-					// Animating the foreground color directly causes a glitch
-					ZStack {
-						Text(filter.label)
-							.foregroundStyle(.app.white)
-							.opacity(filter.isActive ? 1 : 0)
-						Text(filter.label)
-							.foregroundStyle(.app.gray1)
-							.opacity(filter.isActive ? 0 : 1)
-					}
-					.textStyle(.body1HighImportance)
-					.padding(.horizontal, .medium3)
-					.padding(.vertical, .small2)
+					Text(filter.label)
+						.foregroundStyle(filter.isActive ? .app.white : .app.gray1)
+						.textStyle(.body1HighImportance)
+						.padding(.horizontal, .medium3)
+						.padding(.vertical, .small2)
 				}
 				.contentShape(Capsule())
 				.disabled(filter.isActive)
