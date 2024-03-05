@@ -190,12 +190,11 @@ extension OnLedgerEntitiesClient {
 
 	public func nonFungibleResourceBalances(
 		_ resource: OnLedgerEntity.Resource,
-		tokens: [OnLedgerEntity.NonFungibleToken]
-	) async -> [ResourceBalance] {
-		if let validator = await isStakeClaimNFT(resource),
-		   let claim = try? stakeClaim(resource, stakeClaimValidator: validator, unstakeData: [], tokens: tokens)
-		{
-			[claim]
+		tokens: [OnLedgerEntity.NonFungibleToken],
+		skipStakeClaimTokens: Bool
+	) async throws -> [ResourceBalance] {
+		if let validator = await isStakeClaimNFT(resource) {
+			try [stakeClaim(resource, stakeClaimValidator: validator, unstakeData: [], tokens: skipStakeClaimTokens ? [] : tokens)]
 		} else {
 			tokens.map { token in
 				ResourceBalance(resource: resource, details: .nonFungible(token))

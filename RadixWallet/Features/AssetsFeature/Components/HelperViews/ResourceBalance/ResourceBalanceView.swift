@@ -6,7 +6,7 @@ extension ResourceBalance {
 	public enum ViewState: Sendable, Hashable {
 		case fungible(Fungible)
 		case nonFungible(NonFungible)
-		case lsu(LSU) // FIXME: GK rename
+		case liquidStakeUnit(LiquidStakeUnit) // FIXME: GK rename
 		case poolUnit(PoolUnit)
 		case stakeClaimNFT(StakeClaimNFT)
 
@@ -24,7 +24,7 @@ extension ResourceBalance {
 			public let nonFungibleName: String?
 		}
 
-		public struct LSU: Sendable, Hashable {
+		public struct LiquidStakeUnit: Sendable, Hashable {
 			public let address: ResourceAddress
 			public let icon: URL?
 			public let title: String?
@@ -54,7 +54,7 @@ extension ResourceBalance {
 		case let .nonFungible(details):
 			.nonFungible(.init(resource: resource, details: details))
 		case let .liquidStakeUnit(details):
-			.lsu(.init(resource: resource, details: details))
+			.liquidStakeUnit(.init(resource: resource, details: details))
 		case let .poolUnit(details):
 			.poolUnit(.init(resource: resource, details: details))
 		case let .stakeClaimNFT(details):
@@ -85,7 +85,7 @@ private extension ResourceBalance.ViewState.NonFungible {
 	}
 }
 
-private extension ResourceBalance.ViewState.LSU {
+private extension ResourceBalance.ViewState.LiquidStakeUnit {
 	init(resource: OnLedgerEntity.Resource, details: ResourceBalance.LiquidStakeUnit) {
 		self.init(
 			address: resource.resourceAddress,
@@ -148,19 +148,18 @@ public struct ResourceBalanceView: View {
 				Fungible(viewState: viewState, compact: compact)
 			case let .nonFungible(viewState):
 				NonFungible(viewState: viewState, compact: compact)
-			case let .lsu(viewState):
+			case let .liquidStakeUnit(viewState):
 				LSU(viewState: viewState, isSelected: isSelected)
 			case let .poolUnit(viewState):
 				PoolUnit(viewState: viewState, isSelected: isSelected)
 			case let .stakeClaimNFT(viewState):
-				StakeClaimNFT(viewState: viewState, background: .blue.opacity(0.2), onTap: { _ in })
+				StakeClaimNFT(viewState: viewState, background: .white, onTap: { _ in })
 			}
 
 			if !delegateSelection, let isSelected {
 				CheckmarkView(appearance: .dark, isChecked: isSelected)
 			}
 		}
-		.overlay(.green.opacity(0.1))
 	}
 
 	var compact: Bool {
@@ -176,7 +175,7 @@ public struct ResourceBalanceView: View {
 		switch viewState {
 		case .fungible, .nonFungible:
 			false
-		case .lsu, .poolUnit, .stakeClaimNFT:
+		case .liquidStakeUnit, .poolUnit, .stakeClaimNFT:
 			true
 		}
 	}
@@ -258,14 +257,14 @@ extension ResourceBalanceView {
 	}
 
 	public struct LSU: View {
-		let viewState: ResourceBalance.ViewState.LSU
+		let viewState: ResourceBalance.ViewState.LiquidStakeUnit
 		let isSelected: Bool?
 
 		public var body: some View {
 			VStack(alignment: .leading, spacing: .medium3) {
 				HStack(spacing: .zero) {
 					Thumbnail(.lsu, url: viewState.icon, size: .slightlySmaller)
-						.padding(.trailing, .small2)
+						.padding(.trailing, .small1)
 
 					VStack(alignment: .leading, spacing: .zero) {
 						if let title = viewState.title {
@@ -279,6 +278,8 @@ extension ResourceBalanceView {
 								.textStyle(.body2Regular)
 						}
 					}
+					.lineLimit(1)
+					.minimumScaleFactor(0.8)
 					.padding(.trailing, .small2)
 
 					Spacer(minLength: 0)
@@ -374,7 +375,7 @@ extension ResourceBalanceView {
 		public var body: some View {
 			VStack(alignment: .leading, spacing: .medium3) {
 				HStack(spacing: .zero) {
-					Thumbnail(token: .other(viewState.resourceMetadata.iconURL), size: .slightlySmaller)
+					Thumbnail(.nft, url: viewState.resourceMetadata.iconURL, size: .slightlySmaller)
 						.padding(.trailing, .small1)
 
 					VStack(alignment: .leading, spacing: .zero) {
@@ -401,7 +402,6 @@ extension ResourceBalanceView {
 					onClaimAllTapped: onClaimAllTapped
 				)
 			}
-			.padding(.medium3)
 			.background(background)
 		}
 
@@ -506,12 +506,10 @@ extension ResourceBalanceView {
 		var body: some View {
 			if let amount {
 				core(amount: amount, compact: compact)
-					.overlay(.green.opacity(0.1))
 			} else if let fallback {
 				Text(fallback)
 					.textStyle(amountTextStyle)
 					.foregroundColor(.app.gray2)
-					.overlay(.green.opacity(0.1))
 			}
 		}
 
