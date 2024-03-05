@@ -83,7 +83,7 @@ extension TransactionHistoryClient {
 					return token
 				}
 
-				return try await onLedgerEntitiesClient.nonFungibleResourceBalances(resource, tokens: tokens, skipStakeClaimTokens: true)
+				return try await onLedgerEntitiesClient.nonFungibleResourceBalances(resource, tokens: tokens, headerOnly: true)
 			}
 
 			let dateformatter = ISO8601DateFormatter()
@@ -122,7 +122,7 @@ extension TransactionHistoryClient {
 						guard !amount.isZero() else { continue }
 
 						// NB: The sign of the amount in the balance is made positive, negative balances are treated as withdrawals
-						let resource = try await onLedgerEntitiesClient.fungibleResourceBalance(baseResource, amount: amount.abs(), networkID: networkID)
+						let resource = try await onLedgerEntitiesClient.fungibleResourceBalance(baseResource, amount: amount.abs(), networkID: networkID, headerOnly: true)
 
 						if amount.isNegative() {
 							withdrawals.append(resource)

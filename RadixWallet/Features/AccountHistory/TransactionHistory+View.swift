@@ -255,6 +255,7 @@ extension TransactionHistory {
 					}
 
 					ResourceBalancesView(resources)
+						.environment(\.resourceBalanceHideDetails, true)
 				}
 			}
 		}
