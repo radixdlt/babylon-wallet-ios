@@ -3,8 +3,45 @@ import ComposableArchitecture
 // MARK: - TransactionFilters
 public struct TransactionFilters: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		let filters: Filters
-		var activeFilters: ActiveFilters
+		public private(set) var filters: Filters
+
+		public struct Filters: Hashable, Sendable {
+			var transferTypes: IdentifiedArrayOf<Filter>
+			var fungibles: IdentifiedArrayOf<Filter>
+			var nonFungibles: IdentifiedArrayOf<Filter>
+			var transactionTypes: IdentifiedArrayOf<Filter>
+
+			init(transferTypes: [Filter], fungibles: [Filter], nonFungibles: [Filter], transactionTypes: [Filter]) {
+				self.transferTypes = transferTypes.asIdentifiable()
+				self.fungibles = fungibles.asIdentifiable()
+				self.nonFungibles = nonFungibles.asIdentifiable()
+				self.transactionTypes = transactionTypes.asIdentifiable()
+			}
+		}
+
+		public struct Filter: Hashable, Sendable, Identifiable {
+			public let id: FilterType
+			let icon: ImageAsset?
+			let label: String
+			var isActive: Bool
+
+			init(id: FilterType, icon: ImageAsset? = nil, label: String, isActive: Bool = false) {
+				self.id = id
+				self.icon = icon
+				self.label = label
+				self.isActive = isActive
+			}
+
+			public func hash(into hasher: inout Hasher) {
+				hasher.combine(id)
+			}
+		}
+
+		public enum FilterType: Hashable, Sendable {
+			case transferType(TransferType)
+			case asset(ResourceAddress)
+			case transactionType(TransactionType)
+		}
 
 		public enum TransferType: CaseIterable, Sendable {
 			case withdrawal
@@ -13,69 +50,80 @@ public struct TransactionFilters: Sendable, FeatureReducer {
 
 		public typealias TransactionType = GatewayAPI.ManifestClass
 
-		public struct Filters: Hashable, Sendable {
-			let transferTypes: [TransferType]
-			let fungibles: [OnLedgerEntity.Resource]
-			let nonFungibles: [OnLedgerEntity.Resource]
-			let transactionTypes: [TransactionType]
+		init(assets: [OnLedgerEntity.Resource], activeFilters: [FilterType] = []) {
+			self.filters = Self.filters(for: assets)
 		}
 
-		public struct ActiveFilters: Hashable, Sendable {
-			var transferType: TransferType? = nil
-			var asset: ResourceAddress? = nil
-			var transactionType: TransactionType? = nil
-		}
-
-		// This type is used for toggling active filters
-		public enum FilterType: Hashable, Sendable {
-			case transferType(State.TransferType)
-			case asset(ResourceAddress)
-			case transactionType(State.TransactionType)
-		}
-
-		init(assets: [OnLedgerEntity.Resource], activeFilters: ActiveFilters = .init()) {
-			self.filters = .init(
-				transferTypes: TransferType.allCases,
-				fungibles: assets.filter { $0.fungibility == .fungible },
-				nonFungibles: assets.filter { $0.fungibility == .nonFungible },
-				transactionTypes: TransactionType.allCases
+		private static func filters(for assets: [OnLedgerEntity.Resource]) -> Filters {
+			.init(
+				transferTypes: TransferType.allCases.map { .init(id: .transferType($0), icon: icon(for: $0), label: label(for: $0)) },
+				fungibles: assets.filter { $0.fungibility == .fungible }.compactMap(assetFilter),
+				nonFungibles: assets.filter { $0.fungibility == .nonFungible }.compactMap(assetFilter),
+				transactionTypes: TransactionType.allCases.map { .init(id: .transactionType($0), label: label(for: $0)) }
 			)
-			self.activeFilters = activeFilters
+		}
+
+		private static func assetFilter(for asset: OnLedgerEntity.Resource) -> Filter? {
+			guard let symbol = asset.metadata.symbol else { return nil }
+			return .init(id: .asset(asset.resourceAddress), label: symbol)
+		}
+
+		private static func icon(for transferType: TransferType) -> ImageAsset {
+			switch transferType {
+			case .withdrawal:
+				AssetResource.transactionHistoryWithdrawal
+			case .deposit:
+				AssetResource.transactionHistoryDeposit
+			}
+		}
+
+		// FIXME: Strings
+		private static func label(for transferType: TransferType) -> String {
+			switch transferType {
+			case .withdrawal:
+				"Withdrawals"
+			case .deposit:
+				"Deposits"
+			}
+		}
+
+		// FIXME: Strings
+		private static func label(for transactionType: TransactionType) -> String {
+			switch transactionType {
+			case .general: "General"
+			case .transfer: "Transfers"
+			case .poolContribution: "Contribute"
+			case .poolRedemption: "Redeem"
+			case .validatorStake: "Stake"
+			case .validatorUnstake: "Unstake"
+			case .validatorClaim: "Claim"
+			case .accountDepositSettingsUpdate: "Third-party Deposit Settings"
+			}
+		}
+	}
+
+//	public
+}
+
+extension TransactionFilters.State.Filters {
+	mutating func setActive(_ active: Bool, filter: TransactionFilters.State.FilterType) {
+		switch filter {
+		case .transferType:
+			transferTypes[id: filter]?.isActive = active
+		case .asset:
+			fungibles.setActive(filter, active: active)
+			nonFungibles.setActive(filter, active: active)
+		case .transactionType:
+			transactionTypes[id: filter]?.isActive = active
 		}
 	}
 }
 
-extension TransactionFilters.State {
-	func isActive(_ filter: FilterType) -> Bool {
-		switch filter {
-		case let .transferType(type):
-			activeFilters.transferType == type
-		case let .asset(asset):
-			activeFilters.asset == asset
-		case let .transactionType(type):
-			activeFilters.transactionType == type
-		}
-	}
-
-	mutating func setActive(_ active: Bool, filter: FilterType) {
-		switch filter {
-		case let .transferType(type):
-			toggle(\.transferType, on: active, value: type)
-		case let .asset(asset):
-			toggle(\.asset, on: active, value: asset)
-		case let .transactionType(type):
-			toggle(\.transactionType, on: active, value: type)
-		}
-	}
-
-	private mutating func toggle<V: Equatable>(_ keyPath: WritableKeyPath<ActiveFilters, V?>, on: Bool, value: V) {
-		let isCurrentlyActive = activeFilters[keyPath: keyPath] == value
-		if on, !isCurrentlyActive {
-			activeFilters[keyPath: keyPath] = value
-		} else if !on, isCurrentlyActive {
-			activeFilters[keyPath: keyPath] = nil
-		} else {
-			assertionFailure("Tried to turn off inactive filter, or vice versa")
+extension IdentifiedArrayOf<TransactionFilters.State.Filter> {
+	/// Sets the `isActive` flag of the filter with the id of `filterType` to `active`, and all others to `false`
+	mutating func setActive(_ filterType: TransactionFilters.State.FilterType, active: Bool) {
+		for id in ids {
+			self[id: id]?.isActive = id == filterType ? active : false
 		}
 	}
 }
