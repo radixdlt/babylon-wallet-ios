@@ -95,6 +95,9 @@ extension Home {
 			.onFirstAppear {
 				store.send(.view(.onFirstAppear))
 			}
+			.sheet(isPresented: .constant(true), content: {
+				FeedbackView()
+			})
 		}
 
 		private struct HeaderView: SwiftUI.View {
