@@ -72,18 +72,24 @@ extension TransactionHistoryClient {
 
 			func nonFungibleResources(_ type: ChangeType, changes: GatewayAPI.TransactionNonFungibleBalanceChanges) async throws -> [ResourceBalance] {
 				let address = try ResourceAddress(validatingAddress: changes.resourceAddress)
-				let ids = try extractNonFungibleIDs(type, from: changes)
 
 				// The resource should have been fetched
 				guard let resource = keyedResources[id: address] else { throw ProgrammerError() }
 
-				let tokens = try ids.map { id in
-					// All tokens should have been fetched earlier
-					guard let token = keyedNonFungibleTokens[id: id] else { throw ProgrammerError() }
-					return token
+				if let validator = await onLedgerEntitiesClient.isStakeClaimNFT(resource) {
+					return try [onLedgerEntitiesClient.stakeClaim(resource, stakeClaimValidator: validator, unstakeData: [], tokens: [])]
+				} else {
+					let nonFungibleIDs = try extractNonFungibleIDs(type, from: changes)
+					return try nonFungibleIDs
+						.map { id in
+							// All tokens should have been fetched earlier
+							guard let token = keyedNonFungibleTokens[id: id] else { throw ProgrammerError() }
+							return token
+						}
+						.map { token in
+							ResourceBalance(resource: resource, details: .nonFungible(token))
+						}
 				}
-
-				return try await onLedgerEntitiesClient.nonFungibleResourceBalances(resource, tokens: tokens, headerOnly: true)
 			}
 
 			let dateformatter = ISO8601DateFormatter()
@@ -122,7 +128,11 @@ extension TransactionHistoryClient {
 						guard !amount.isZero() else { continue }
 
 						// NB: The sign of the amount in the balance is made positive, negative balances are treated as withdrawals
-						let resource = try await onLedgerEntitiesClient.fungibleResourceBalance(baseResource, amount: amount.abs(), networkID: networkID, headerOnly: true)
+						let resource = try await onLedgerEntitiesClient.fungibleResourceBalance(
+							baseResource,
+							resourceQuantifier: .guaranteed(amount: amount.abs()),
+							networkID: networkID
+						)
 
 						if amount.isNegative() {
 							withdrawals.append(resource)
