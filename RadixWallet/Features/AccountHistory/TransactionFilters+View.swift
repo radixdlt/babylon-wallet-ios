@@ -33,10 +33,12 @@ extension TransactionFilters {
 		}
 
 		private func section(filters: IdentifiedArrayOf<State.Filter>) -> some SwiftUI.View {
-			ForEach(filters) { filter in
-				HStack {
+			FlowLayout(spacing: .small1) {
+				ForEach(filters) { filter in
 					FilterView(filter: filter) {
-						store.send(.view(filter.isActive ? .removeTapped(filter.id) : .addTapped(filter.id)))
+						store.send(.view(.addTapped(filter.id)))
+					} removeAction: {
+						store.send(.view(.removeTapped(filter.id)))
 					}
 				}
 			}
@@ -44,42 +46,50 @@ extension TransactionFilters {
 
 		struct FilterView: SwiftUI.View {
 			let filter: State.Filter
-			let action: () -> Void
+			let addAction: () -> Void
+			let removeAction: () -> Void
 
 			var body: some SwiftUI.View {
-				if filter.isActive {
-					core
-				} else {
-					Button(action: action) {
-						core
+				Button(action: addAction) {
+					// Animating the foreground color directly causes a glitch
+					ZStack {
+						Text(filter.label)
+							.foregroundStyle(.app.white)
+							.opacity(filter.isActive ? 1 : 0)
+						Text(filter.label)
+							.foregroundStyle(.app.gray1)
+							.opacity(filter.isActive ? 0 : 1)
 					}
-					.contentShape(Capsule())
+					.textStyle(.body1HighImportance)
+					.padding(.horizontal, .medium3)
+					.padding(.vertical, .small2)
 				}
-			}
-
-			private var core: some SwiftUI.View {
-				HStack(spacing: .small2) {
-					Text(filter.label)
-						.textStyle(.body1HighImportance)
-						.foregroundStyle(filter.isActive ? .app.white : .app.gray1)
-
+				.contentShape(Capsule())
+				.disabled(filter.isActive)
+				.padding(.trailing, filter.isActive ? .medium1 : 0)
+				.background {
+					ZStack {
+						Capsule().fill(filter.isActive ? .app.gray1 : .app.white)
+						Capsule().stroke(filter.isActive ? .clear : .app.gray3)
+					}
+				}
+				.overlay(alignment: .trailing) {
 					if filter.isActive {
-						Button(asset: AssetResource.close, action: action)
+						Button(asset: AssetResource.close, action: removeAction)
 							.tint(.app.gray3)
-							.padding(-.small3)
+							.padding(.vertical, -.small3)
+							.padding(.trailing, .small2)
+							.transition(.scale.combined(with: .opacity))
 					}
 				}
-				.padding(.horizontal, .medium3)
-				.padding(.vertical, .small2)
-				.background(background)
+				.animation(.default.speed(2), value: filter.isActive)
 			}
 
-			@ViewBuilder
-			private var background: some SwiftUI.View {
-				if filter.isActive {
-					Capsule().fill(.app.gray1)
-				} else {
-					Capsule().stroke(.app.gray3)
+			struct Dummy: SwiftUI.View {
+				var body: some SwiftUI.View {
+					Text("ABC")
+						.textStyle(.body1HighImportance)
+						.padding(.vertical, .small2)
 				}
 			}
 		}
