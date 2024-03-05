@@ -15,21 +15,6 @@ extension OnLedgerEntitiesClient {
 
 	// MARK: Fungibles
 
-	// Creates a fungible token, a pool unit or a liquid stake unit ResourceBalance
-	public func fungibleResourceBalance(
-		_ resource: OnLedgerEntity.Resource,
-		amount: RETDecimal,
-		networkID: NetworkID,
-		headerOnly: Bool = false
-	) async throws -> ResourceBalance {
-		try await fungibleResourceBalance(
-			resource,
-			resourceQuantifier: .guaranteed(amount: amount),
-			networkID: networkID,
-			headerOnly: headerOnly
-		)
-	}
-
 	public func fungibleResourceBalance(
 		_ resource: OnLedgerEntity.Resource,
 		resourceQuantifier: FungibleResourceIndicator,
@@ -38,14 +23,13 @@ extension OnLedgerEntitiesClient {
 		entities: TransactionReview.ResourcesInfo = [:],
 		resourceAssociatedDapps: TransactionReview.ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
-		defaultDepositGuarantee: RETDecimal = 1,
-		headerOnly: Bool = false
+		defaultDepositGuarantee: RETDecimal = 1
 	) async throws -> ResourceBalance {
 		let amount = resourceQuantifier.amount
 		let resourceAddress = resource.resourceAddress
 
 		let guarantee: TransactionClient.Guarantee? = {
-			guard !headerOnly, case let .predicted(predictedAmount) = resourceQuantifier else { return nil }
+			guard case let .predicted(predictedAmount) = resourceQuantifier else { return nil }
 			let guaranteedAmount = defaultDepositGuarantee * predictedAmount.value
 			return .init(
 				amount: guaranteedAmount,
@@ -192,20 +176,6 @@ extension OnLedgerEntitiesClient {
 	// MARK: Non-fungibles
 
 	public func nonFungibleResourceBalances(
-		_ resource: OnLedgerEntity.Resource,
-		tokens: [OnLedgerEntity.NonFungibleToken],
-		headerOnly: Bool = false
-	) async throws -> [ResourceBalance] {
-		if let validator = await isStakeClaimNFT(resource) {
-			try [stakeClaim(resource, stakeClaimValidator: validator, unstakeData: [], tokens: headerOnly ? [] : tokens)]
-		} else {
-			tokens.map { token in
-				ResourceBalance(resource: resource, details: .nonFungible(token))
-			}
-		}
-	}
-
-	public func nonFungibleResourceBalances(
 		_ resourceInfo: TransactionReview.ResourceInfo,
 		resourceAddress: ResourceAddress,
 		resourceQuantifier: NonFungibleResourceIndicator,
@@ -279,7 +249,7 @@ extension OnLedgerEntitiesClient {
 		return result
 	}
 
-	private func stakeClaim(
+	public func stakeClaim(
 		_ resource: OnLedgerEntity.Resource,
 		stakeClaimValidator: OnLedgerEntity.Validator,
 		unstakeData: [UnstakeDataEntry],
