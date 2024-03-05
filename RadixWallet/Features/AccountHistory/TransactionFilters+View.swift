@@ -1,60 +1,9 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension TransactionFilters.State {
-	var viewState: TransactionFilters.ViewState {
-		.init(
-			transferTypes: transferTypes,
-			fungibles: fungibles,
-			nonFungibles: nonFungibles,
-			transactionTypes: transactionTypes
-		)
-	}
-
-	private var transferTypes: [TransactionFilters.ViewState.Filter] {
-		filters.transferTypes.map {
-			let type: FilterType = .transferType($0)
-			return .init(id: type, caption: "", isActive: isActive(type))
-		}
-	}
-
-	private var fungibles: [TransactionFilters.ViewState.Filter] {
-		filters.fungibles.map {
-			let type: FilterType = .asset($0.resourceAddress)
-			return .init(id: type, caption: "", isActive: isActive(type))
-		}
-	}
-
-	private var nonFungibles: [TransactionFilters.ViewState.Filter] {
-		filters.nonFungibles.map {
-			let type: FilterType = .asset($0.resourceAddress)
-			return .init(id: type, caption: "", isActive: isActive(type))
-		}
-	}
-
-	private var transactionTypes: [TransactionFilters.ViewState.Filter] {
-		filters.transactionTypes.map {
-			let type: FilterType = .transactionType($0)
-			return .init(id: type, caption: "", isActive: isActive(type))
-		}
-	}
-}
-
 // MARK: - TransactionHistoryFilters.View
 extension TransactionFilters {
-	public struct ViewState: Equatable, Sendable {
-		let transferTypes: [Filter]
-		let fungibles: [Filter]
-		let nonFungibles: [Filter]
-		let transactionTypes: [Filter]
-
-		public struct Filter: Equatable, Sendable, Identifiable {
-			public let id: State.FilterType
-//			let icon: ImageAsset?
-			let caption: String
-			let isActive: Bool
-		}
-	}
+	public typealias ViewState = State.Filters
 
 	@MainActor
 	public struct View: SwiftUI.View {
@@ -65,24 +14,45 @@ extension TransactionFilters {
 		}
 
 		public var body: some SwiftUI.View {
-			VStack {
-				FilterCapsule(category: "XRD", active: true) {
-					print("Tap XRD")
-				}
+			WithViewStore(store, observe: \.filters, send: { .view($0) }) { viewStore in
 
-				FilterCapsule(category: "WIP", active: false) {
-					print("Tap WIP")
+				VStack {
+					FilterSection(filters: viewStore.transferTypes)
+
+					Text("Type of asset")
+
+					Text("Tokens")
+					FilterSection(filters: viewStore.fungibles)
+
+					Text("NFTs")
+					FilterSection(filters: viewStore.nonFungibles)
+
+					Text("Type of transaction")
+					FilterSection(filters: viewStore.transactionTypes)
 				}
 			}
 		}
 
-		struct FilterCapsule: SwiftUI.View {
-			let category: String
-			let active: Bool
+		struct FilterSection: SwiftUI.View {
+			let filters: IdentifiedArrayOf<State.Filter>
+
+			var body: some SwiftUI.View {
+				ForEach(filters) { filter in
+					HStack {
+						FilterView(filter: filter) {
+							print("FILTER \(filter.label)")
+						}
+					}
+				}
+			}
+		}
+
+		struct FilterView: SwiftUI.View {
+			let filter: State.Filter
 			let action: () -> Void
 
 			var body: some SwiftUI.View {
-				if active {
+				if filter.isActive {
 					core
 				} else {
 					Button(action: action) {
@@ -94,24 +64,24 @@ extension TransactionFilters {
 
 			private var core: some SwiftUI.View {
 				HStack(spacing: .small2) {
-					Text(category)
+					Text(filter.label)
 						.textStyle(.body1HighImportance)
-						.foregroundStyle(active ? .app.white : .app.gray1)
+						.foregroundStyle(filter.isActive ? .app.white : .app.gray1)
 
-					if active {
+					if filter.isActive {
 						Button(asset: AssetResource.close, action: action)
 							.tint(.app.gray3)
 					}
 				}
 				.padding(.horizontal, .medium3)
-				.padding(.trailing, active ? -.small3 : 0) // Adjust for spacing inside "X"
+				.padding(.trailing, filter.isActive ? -.small3 : 0) // Adjust for spacing inside "X"
 				.padding(.vertical, .small2)
 				.background(background)
 			}
 
 			@ViewBuilder
 			private var background: some SwiftUI.View {
-				if active {
+				if filter.isActive {
 					Capsule().fill(.app.gray1)
 				} else {
 					Capsule().stroke(.app.gray3)
