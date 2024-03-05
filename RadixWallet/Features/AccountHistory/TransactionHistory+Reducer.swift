@@ -62,7 +62,19 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.dismiss) var dismiss
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.transactionHistoryClient) var transactionHistoryClient
+
+	public init() {}
+
+	public var body: some ReducerOf<Self> {
+		Reduce(core)
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
+			}
+	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -73,7 +85,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			return loadSelectedPeriod(state: &state)
 
 		case .filtersTapped:
-//			state.destination = .filters(.init())
+			state.destination = .filters(.init(assets: []))
 			return .none
 
 		case .closeTapped:
