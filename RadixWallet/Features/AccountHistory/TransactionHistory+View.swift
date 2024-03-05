@@ -36,8 +36,8 @@ extension TransactionHistory {
 						}
 						.scrollIndicators(.never)
 						.coordinateSpace(name: View.coordSpace)
-						.ignoresSafeArea(edges: .bottom)
 					}
+//					.ignoresSafeArea(edges: .bottom)
 					.background(.app.gray5)
 					.overlayPreferenceValue(PositionsPreferenceKey.self, alignment: .top) { positions in
 						let rect = positions[View.accountDummy]
@@ -75,6 +75,7 @@ extension TransactionHistory {
 				store.send(.view(.onAppear))
 			}
 			.destinations(with: store)
+			.ignoresSafeArea(edges: .bottom)
 		}
 
 		private static let coordSpace = "TransactionHistory"
