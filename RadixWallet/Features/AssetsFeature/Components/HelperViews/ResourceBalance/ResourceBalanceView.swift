@@ -6,7 +6,7 @@ extension ResourceBalance {
 	public enum ViewState: Sendable, Hashable {
 		case fungible(Fungible)
 		case nonFungible(NonFungible)
-		case liquidStakeUnit(LiquidStakeUnit) // FIXME: GK rename
+		case liquidStakeUnit(LiquidStakeUnit)
 		case poolUnit(PoolUnit)
 		case stakeClaimNFT(StakeClaimNFT)
 
@@ -33,8 +33,7 @@ extension ResourceBalance {
 			public var validatorName: String? = nil
 		}
 
-		public struct PoolUnit: Sendable, Hashable, Identifiable {
-			public var id: ResourcePoolAddress { resourcePoolAddress }
+		public struct PoolUnit: Sendable, Hashable {
 			public let resourcePoolAddress: ResourcePoolAddress
 			public let poolUnitAddress: ResourceAddress
 			public let poolIcon: URL?
@@ -149,7 +148,7 @@ public struct ResourceBalanceView: View {
 			case let .nonFungible(viewState):
 				NonFungible(viewState: viewState, compact: compact)
 			case let .liquidStakeUnit(viewState):
-				LSU(viewState: viewState, isSelected: isSelected)
+				LiquidStakeUnit(viewState: viewState, isSelected: isSelected)
 			case let .poolUnit(viewState):
 				PoolUnit(viewState: viewState, isSelected: isSelected)
 			case let .stakeClaimNFT(viewState):
@@ -256,7 +255,8 @@ extension ResourceBalanceView {
 		}
 	}
 
-	public struct LSU: View {
+	public struct LiquidStakeUnit: View {
+		@Environment(\.resourceBalanceHideDetails) var hideDetails
 		let viewState: ResourceBalance.ViewState.LiquidStakeUnit
 		let isSelected: Bool?
 
@@ -292,18 +292,21 @@ extension ResourceBalanceView {
 					}
 				}
 
-				VStack(alignment: .leading, spacing: .small3) {
-					Text(L10n.Account.Staking.worth.uppercased())
-						.textStyle(.body2HighImportance)
-						.foregroundColor(.app.gray2)
+				if !hideDetails {
+					VStack(alignment: .leading, spacing: .small3) {
+						Text(L10n.Account.Staking.worth.uppercased())
+							.textStyle(.body2HighImportance)
+							.foregroundColor(.app.gray2)
 
-					ResourceBalanceView(.fungible(.xrd(balance: viewState.worth)), appearance: .compact(border: true))
+						ResourceBalanceView(.fungible(.xrd(balance: viewState.worth)), appearance: .compact(border: true))
+					}
 				}
 			}
 		}
 	}
 
 	public struct PoolUnit: View {
+		@Environment(\.resourceBalanceHideDetails) var hideDetails
 		public let viewState: ResourceBalance.ViewState.PoolUnit
 		public let isSelected: Bool?
 
@@ -346,15 +349,18 @@ extension ResourceBalanceView {
 					.foregroundColor(.app.gray2)
 					.padding(.bottom, .small3)
 
-				loadable(viewState.resources) { fungibles in
-					ResourceBalancesView(fungibles: fungibles)
-						.environment(\.missingFungibleAmountFallback, L10n.Account.PoolUnits.noTotalSupply)
+				if !hideDetails {
+					loadable(viewState.resources) { fungibles in
+						ResourceBalancesView(fungibles: fungibles)
+							.environment(\.missingFungibleAmountFallback, L10n.Account.PoolUnits.noTotalSupply)
+					}
 				}
 			}
 		}
 	}
 
 	public struct StakeClaimNFT: View {
+		@Environment(\.resourceBalanceHideDetails) var hideDetails
 		public let viewState: ResourceBalance.ViewState.StakeClaimNFT
 		public let background: Color
 		public let onTap: (OnLedgerEntitiesClient.StakeClaim) -> Void
@@ -395,12 +401,14 @@ extension ResourceBalanceView {
 					Spacer()
 				}
 
-				Tokens(
-					viewState: viewState.stakeClaimTokens,
-					background: background,
-					onTap: onTap,
-					onClaimAllTapped: onClaimAllTapped
-				)
+				if !hideDetails {
+					Tokens(
+						viewState: viewState.stakeClaimTokens,
+						background: background,
+						onTap: onTap,
+						onClaimAllTapped: onClaimAllTapped
+					)
+				}
 			}
 			.background(background)
 		}

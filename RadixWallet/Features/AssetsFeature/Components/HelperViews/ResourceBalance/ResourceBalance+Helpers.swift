@@ -9,21 +9,6 @@ public struct SendableAnyHashable: @unchecked Sendable, Hashable {
 	}
 }
 
-// MARK: - EnvironmentValues
-
-extension EnvironmentValues {
-	/// The fallback string when the amount value is missing
-	var missingFungibleAmountFallback: String? {
-		get { self[MissingFungibleAmountKey.self] }
-		set { self[MissingFungibleAmountKey.self] = newValue }
-	}
-}
-
-// MARK: - MissingFungibleAmountKey
-private struct MissingFungibleAmountKey: EnvironmentKey {
-	static let defaultValue: String? = nil
-}
-
 // MARK: - ResourceBalance + Comparable
 extension ResourceBalance: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
@@ -135,25 +120,6 @@ private func order<W: Comparable>(lhs: W?, rhs: W?, tieBreak: () -> Bool) -> Boo
 		tieBreak()
 	}
 }
-
-// private func order<T, P: Comparable>(_ lhs: T?, and rhs: T?, by keyPath: KeyPath<T, P>, tieBreak: () -> Bool) -> Bool {
-//	switch (lhs, rhs) {
-//	case let (lhsValue?, rhsValue?):
-//		let lhsProp = lhsValue[keyPath: keyPath]
-//		let rhsProp = rhsValue[keyPath: keyPath]
-//		if lhsProp == rhsProp {
-//			return tieBreak()
-//		} else {
-//			return lhsProp < rhsProp
-//		}
-//	case (nil, _?):
-//		return true
-//	case (_?, nil):
-//		return false
-//	case (nil, nil):
-//		return tieBreak()
-//	}
-// }
 
 private func order(lhs: RETDecimal?, rhs: RETDecimal?) -> Bool {
 	lhs ?? .min() < rhs ?? .min()

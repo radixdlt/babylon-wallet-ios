@@ -19,12 +19,14 @@ extension OnLedgerEntitiesClient {
 	public func fungibleResourceBalance(
 		_ resource: OnLedgerEntity.Resource,
 		amount: RETDecimal,
-		networkID: NetworkID
+		networkID: NetworkID,
+		headerOnly: Bool = false
 	) async throws -> ResourceBalance {
 		try await fungibleResourceBalance(
 			resource,
 			resourceQuantifier: .guaranteed(amount: amount),
-			networkID: networkID
+			networkID: networkID,
+			headerOnly: headerOnly
 		)
 	}
 
@@ -36,13 +38,14 @@ extension OnLedgerEntitiesClient {
 		entities: TransactionReview.ResourcesInfo = [:],
 		resourceAssociatedDapps: TransactionReview.ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
-		defaultDepositGuarantee: RETDecimal = 1
+		defaultDepositGuarantee: RETDecimal = 1,
+		headerOnly: Bool = false
 	) async throws -> ResourceBalance {
 		let amount = resourceQuantifier.amount
 		let resourceAddress = resource.resourceAddress
 
 		let guarantee: TransactionClient.Guarantee? = {
-			guard case let .predicted(predictedAmount) = resourceQuantifier else { return nil }
+			guard !headerOnly, case let .predicted(predictedAmount) = resourceQuantifier else { return nil }
 			let guaranteedAmount = defaultDepositGuarantee * predictedAmount.value
 			return .init(
 				amount: guaranteedAmount,
@@ -153,7 +156,13 @@ extension OnLedgerEntitiesClient {
 		guarantee: TransactionClient.Guarantee?
 	) async throws -> ResourceBalance {
 		let worth: RETDecimal
-		if !validatorStakes.isEmpty {
+		if validatorStakes.isEmpty {
+			guard let totalSupply = resource.totalSupply, totalSupply.isPositive() else {
+				throw MissingPositiveTotalSupply()
+			}
+
+			worth = amount * validator.xrdVaultBalance / totalSupply
+		} else {
 			if let stake = try validatorStakes.first(where: { try $0.validatorAddress.asSpecific() == validator.address }) {
 				guard try stake.liquidStakeUnitAddress.asSpecific() == validator.stakeUnitResourceAddress else {
 					throw StakeUnitAddressMismatch()
@@ -167,12 +176,6 @@ extension OnLedgerEntitiesClient {
 			} else {
 				throw MissingTrackedValidatorStake()
 			}
-		} else {
-			guard let totalSupply = resource.totalSupply, totalSupply.isPositive() else {
-				throw MissingPositiveTotalSupply()
-			}
-
-			worth = amount * validator.xrdVaultBalance / totalSupply
 		}
 
 		let details = ResourceBalance.LiquidStakeUnit(
@@ -191,10 +194,10 @@ extension OnLedgerEntitiesClient {
 	public func nonFungibleResourceBalances(
 		_ resource: OnLedgerEntity.Resource,
 		tokens: [OnLedgerEntity.NonFungibleToken],
-		skipStakeClaimTokens: Bool
+		headerOnly: Bool = false
 	) async throws -> [ResourceBalance] {
 		if let validator = await isStakeClaimNFT(resource) {
-			try [stakeClaim(resource, stakeClaimValidator: validator, unstakeData: [], tokens: skipStakeClaimTokens ? [] : tokens)]
+			try [stakeClaim(resource, stakeClaimValidator: validator, unstakeData: [], tokens: headerOnly ? [] : tokens)]
 		} else {
 			tokens.map { token in
 				ResourceBalance(resource: resource, details: .nonFungible(token))
