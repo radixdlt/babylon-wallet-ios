@@ -32,9 +32,11 @@ extension TransactionHistory {
 									SectionView(section: section)
 								}
 							}
+							.padding(.bottom, .medium3)
 						}
 						.scrollIndicators(.never)
 						.coordinateSpace(name: View.coordSpace)
+						.ignoresSafeArea(edges: .bottom)
 					}
 					.background(.app.gray5)
 					.overlayPreferenceValue(PositionsPreferenceKey.self, alignment: .top) { positions in
