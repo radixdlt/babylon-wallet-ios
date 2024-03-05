@@ -21,6 +21,12 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 			overlayWindow(in: windowScene)
 		}
 
+		for userActivity in connectionOptions.userActivities {
+			if let universalLink = userActivity.webpageURL {
+				loggerGlobal.error("did open from unviersal link \(universalLink), referral: \(userActivity.referrerURL), info: \(userActivity.userInfo)")
+			}
+		}
+
 		loggerGlobal.error("has urlContext: \(connectionOptions.urlContexts)")
 		if let connectURL = connectionOptions.urlContexts.first?.url {
 			let connectionPassword = URLComponents(url: connectURL, resolvingAgainstBaseURL: true)?.queryItems?.first?.value
@@ -31,6 +37,30 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 				}
 			}
 		}
+	}
+
+	public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+		debugPrint(userActivity.webpageURL)
+	}
+
+	public func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+		debugPrint(URLContexts)
+	}
+
+	public func scene(_ scene: UIScene, didUpdate userActivity: NSUserActivity) {
+		debugPrint(userActivity)
+	}
+
+	public func scene(_ scene: UIScene, restoreInteractionStateWith stateRestorationActivity: NSUserActivity) {
+		debugPrint(stateRestorationActivity)
+	}
+
+	public func scene(_ scene: UIScene, willContinueUserActivityWithType userActivityType: String) {
+		debugPrint(userActivityType)
+	}
+
+	public func sceneWillEnterForeground(_ scene: UIScene) {
+		debugPrint("Hola")
 	}
 
 	func overlayWindow(in scene: UIWindowScene) {
@@ -57,14 +87,14 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		self.overlayWindow = overlayWindow
 	}
 
-	public func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-		let connectionPassword = URLComponents(url: URLContexts.first!.url, resolvingAgainstBaseURL: true)?.queryItems?.first?.value
-		loggerGlobal.error("has urlContext: \(connectionPassword)")
-		if let connectionPassword {
-			let cp = try! ConnectionPassword(.init(hex: connectionPassword))
-			Task {
-				try await radixConnectionClient.handleDappDeepLink(cp)
-			}
-		}
-	}
+//	public func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+//		let connectionPassword = URLComponents(url: URLContexts.first!.url, resolvingAgainstBaseURL: true)?.queryItems?.first?.value
+//		loggerGlobal.error("has urlContext: \(connectionPassword)")
+//		if let connectionPassword {
+//			let cp = try! ConnectionPassword(.init(hex: connectionPassword))
+//			Task {
+//				try await radixConnectionClient.handleDappDeepLink(cp)
+//			}
+//		}
+//	}
 }

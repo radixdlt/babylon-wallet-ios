@@ -11,4 +11,12 @@ public final class AppDelegate: NSObject, UIApplicationDelegate {
 		sceneConfig.delegateClass = SceneDelegate.self
 		return sceneConfig
 	}
+
+	public func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+		true
+	}
+
+	public func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+		true
+	}
 }
