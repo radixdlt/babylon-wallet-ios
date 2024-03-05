@@ -15,33 +15,28 @@ extension TransactionFilters {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.filters, send: { .view($0) }) { viewStore in
-
 				VStack {
-					FilterSection(filters: viewStore.transferTypes)
+					section(filters: viewStore.transferTypes)
 
 					Text("Type of asset")
 
 					Text("Tokens")
-					FilterSection(filters: viewStore.fungibles)
+					section(filters: viewStore.fungibles)
 
 					Text("NFTs")
-					FilterSection(filters: viewStore.nonFungibles)
+					section(filters: viewStore.nonFungibles)
 
 					Text("Type of transaction")
-					FilterSection(filters: viewStore.transactionTypes)
+					section(filters: viewStore.transactionTypes)
 				}
 			}
 		}
 
-		struct FilterSection: SwiftUI.View {
-			let filters: IdentifiedArrayOf<State.Filter>
-
-			var body: some SwiftUI.View {
-				ForEach(filters) { filter in
-					HStack {
-						FilterView(filter: filter) {
-							print("FILTER \(filter.label)")
-						}
+		private func section(filters: IdentifiedArrayOf<State.Filter>) -> some SwiftUI.View {
+			ForEach(filters) { filter in
+				HStack {
+					FilterView(filter: filter) {
+						store.send(.view(filter.isActive ? .removeTapped(filter.id) : .addTapped(filter.id)))
 					}
 				}
 			}
@@ -71,10 +66,10 @@ extension TransactionFilters {
 					if filter.isActive {
 						Button(asset: AssetResource.close, action: action)
 							.tint(.app.gray3)
+							.padding(-.small3)
 					}
 				}
 				.padding(.horizontal, .medium3)
-				.padding(.trailing, filter.isActive ? -.small3 : 0) // Adjust for spacing inside "X"
 				.padding(.vertical, .small2)
 				.background(background)
 			}
