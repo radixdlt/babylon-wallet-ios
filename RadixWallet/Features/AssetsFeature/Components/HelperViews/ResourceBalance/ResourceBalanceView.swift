@@ -148,11 +148,11 @@ public struct ResourceBalanceView: View {
 			case let .nonFungible(viewState):
 				NonFungible(viewState: viewState, compact: compact)
 			case let .liquidStakeUnit(viewState):
-				LiquidStakeUnit(viewState: viewState, isSelected: isSelected)
+				LiquidStakeUnit(viewState: viewState, isSelected: isSelected, compact: compact)
 			case let .poolUnit(viewState):
-				PoolUnit(viewState: viewState, isSelected: isSelected)
+				PoolUnit(viewState: viewState, isSelected: isSelected, compact: compact)
 			case let .stakeClaimNFT(viewState):
-				StakeClaimNFT(viewState: viewState, background: .white, onTap: { _ in })
+				StakeClaimNFT(viewState: viewState, background: .white, compact: compact, onTap: { _ in })
 			}
 
 			if !delegateSelection, let isSelected {
@@ -181,6 +181,46 @@ public struct ResourceBalanceView: View {
 }
 
 extension ResourceBalanceView {
+	private struct FungibleView: View {
+		public let thumbnail: Thumbnail.FungibleContent
+		public let caption: String?
+		public let fallback: String?
+		public let amount: ResourceBalance.Amount?
+		public let compact: Bool
+
+		public var body: some View {
+			HStack(spacing: .zero) {
+				Thumbnail(fungible: thumbnail, size: size)
+					.padding(.trailing, .small1)
+
+				if let caption {
+					Text(caption)
+						.lineLimit(1)
+						.textStyle(titleTextStyle)
+						.foregroundColor(.app.gray1)
+				}
+
+				if useSpacer {
+					Spacer(minLength: .small2)
+				}
+
+				AmountView(amount: amount, fallback: fallback, compact: compact)
+			}
+		}
+
+		private var size: HitTargetSize {
+			compact ? .smallest : .small
+		}
+
+		private var titleTextStyle: TextStyle {
+			compact ? .body1HighImportance : .body2HighImportance
+		}
+
+		private var useSpacer: Bool {
+			amount != nil || fallback != nil
+		}
+	}
+
 	public struct Fungible: View {
 		@Environment(\.missingFungibleAmountFallback) var fallback
 		public let viewState: ResourceBalance.ViewState.Fungible
@@ -257,8 +297,9 @@ extension ResourceBalanceView {
 
 	public struct LiquidStakeUnit: View {
 		@Environment(\.resourceBalanceHideDetails) var hideDetails
-		let viewState: ResourceBalance.ViewState.LiquidStakeUnit
-		let isSelected: Bool?
+		public let viewState: ResourceBalance.ViewState.LiquidStakeUnit
+		public let compact: Bool
+		public let isSelected: Bool?
 
 		public var body: some View {
 			VStack(alignment: .leading, spacing: .medium3) {
@@ -308,6 +349,7 @@ extension ResourceBalanceView {
 	public struct PoolUnit: View {
 		@Environment(\.resourceBalanceHideDetails) var hideDetails
 		public let viewState: ResourceBalance.ViewState.PoolUnit
+		public let compact: Bool
 		public let isSelected: Bool?
 
 		public var body: some View {
