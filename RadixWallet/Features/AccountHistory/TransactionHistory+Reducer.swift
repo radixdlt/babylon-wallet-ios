@@ -7,6 +7,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		let periods: [DateRangeItem]
 
+		var activeFilters: IdentifiedArrayOf<TransactionFilters.State.Filter> = []
+
 		var selectedPeriod: DateRangeItem.ID
 
 		var sections: IdentifiedArrayOf<TransactionSection>
@@ -34,9 +36,10 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Hashable {
 		case onAppear
-		case closeTapped
-		case filtersTapped
 		case selectedPeriod(DateRangeItem.ID)
+		case filtersTapped
+		case removeFilterTapped(TransactionFilters.State.Filter.ID)
+		case closeTapped
 	}
 
 	public enum InternalAction: Sendable, Hashable {
@@ -85,7 +88,11 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			return loadSelectedPeriod(state: &state)
 
 		case .filtersTapped:
-			state.destination = .filters(.init(assets: []))
+			state.destination = .filters(.init(assets: [], activeFilters: state.activeFilters.map(\.id)))
+			return .none
+
+		case let .removeFilterTapped(id):
+			state.activeFilters.remove(id: id)
 			return .none
 
 		case .closeTapped:
@@ -101,6 +108,16 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		}
 	}
 
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .filters(.delegate(.updateActiveFilters(filters))):
+			state.activeFilters = filters
+			return .none
+		default:
+			return .none
+		}
+	}
+
 	// Helper methods
 
 	func loadSelectedPeriod(state: inout State) -> Effect<Action> {
@@ -109,7 +126,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		}
 
 		return .run { [account = state.account.address] send in
-			let transactions = try await transactionHistoryClient.getTransactionHistory(account, range, nil)
+			let transactions = try await transactionHistoryClient.getTransactionHistory(account, range, String?.none)
 			await send(.internal(.updateTransactions(transactions.items)))
 		}
 	}

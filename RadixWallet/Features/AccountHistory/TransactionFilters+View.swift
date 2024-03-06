@@ -106,7 +106,6 @@ extension TransactionFilters {
 									}
 								}
 							}
-							.border(.red)
 
 							Spacer(minLength: 0)
 						}
@@ -122,11 +121,18 @@ extension TransactionFilters {
 
 			var body: some SwiftUI.View {
 				Button(action: addAction) {
-					Text(filter.label)
-						.foregroundStyle(filter.isActive ? .app.white : .app.gray1)
-						.textStyle(.body1HighImportance)
-						.padding(.horizontal, .medium3)
-						.padding(.vertical, .small2)
+					HStack(spacing: .small3) {
+						if let icon = filter.icon {
+							Image(asset: icon)
+								.tint(textColor)
+						}
+
+						Text(filter.label)
+							.textStyle(.body1HighImportance)
+							.foregroundStyle(textColor)
+					}
+					.padding(.vertical, .small2)
+					.padding(.horizontal, .medium3)
 				}
 				.contentShape(Capsule())
 				.disabled(filter.isActive)
@@ -147,6 +153,10 @@ extension TransactionFilters {
 					}
 				}
 				.animation(.default.speed(2), value: filter.isActive)
+			}
+
+			private var textColor: Color {
+				filter.isActive ? .app.white : .app.gray1
 			}
 
 			struct Dummy: SwiftUI.View {
