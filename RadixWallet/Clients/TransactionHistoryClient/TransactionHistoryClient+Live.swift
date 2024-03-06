@@ -7,24 +7,29 @@ extension SpecificAddress {
 }
 
 extension TransactionHistoryClient {
-	private static func eventsFilter(_ filters: [TransactionFilter]) -> [GatewayAPI.StreamTransactionsRequestEventFilterItem]? {
+	private static func eventsFilter(_ filters: [TransactionFilter], account: AccountAddress) -> [GatewayAPI.StreamTransactionsRequestEventFilterItem]? {
 		filters
-			.compactMap { filter in
-				guard case let .transferType(transferType) = filter else { return nil }
+			.compactMap(\.transferType)
+			.map { transferType in
 				switch transferType {
-				case .deposit: return .init(event: .deposit)
-				case .withdrawal: return .init(event: .withdrawal)
+				case .deposit: .init(event: .deposit, emitterAddress: account.address)
+				case .withdrawal: .init(event: .withdrawal, emitterAddress: account.address)
 				}
 			}
 			.nilIfEmpty
 	}
 
 	private static func manifestClassFilter(_ filters: [TransactionFilter]) -> GatewayAPI.StreamTransactionsRequestAllOfManifestClassFilter? {
-		filters.compactMap { filter in
-			guard case let .transactionType(manifestClass) = filter else { return nil }
-			return .init(_class: manifestClass, matchOnlyMostSpecific: false)
-		}
-		.first
+		filters
+			.compactMap(\.transactionType)
+			.first
+			.map { .init(_class: $0, matchOnlyMostSpecific: false) }
+	}
+
+	private static func manifestResourcesFilter(_ filters: [TransactionFilter]) -> [String]? {
+		filters
+			.compactMap(\.asset?.address)
+			.nilIfEmpty
 	}
 
 	public static let liveValue = TransactionHistoryClient.live()
@@ -54,12 +59,12 @@ extension TransactionHistoryClient {
 				fromLedgerState: .init(timestamp: period.lowerBound),
 				cursor: cursor,
 				limitPerPage: 100,
-//				kindFilter: T##GatewayAPI.StreamTransactionsRequest.KindFilter?,
+//				kindFilter: T##GatewayAPI.StreamTransactionsRequest.KindFilter,
 //				manifestAccountsWithdrawnFromFilter: <#T##[String]?#>,
 //				manifestAccountsDepositedIntoFilter: <#T##[String]?#>,
-//				manifestResourcesFilter: <#T##[String]?#>,
+				manifestResourcesFilter: manifestResourcesFilter(filters),
 				affectedGlobalEntitiesFilter: [account.address],
-				eventsFilter: eventsFilter(filters),
+				eventsFilter: eventsFilter(filters, account: account),
 //				accountsWithManifestOwnerMethodCalls: <#T##[String]?#>,
 //				accountsWithoutManifestOwnerMethodCalls: <#T##[String]?#>,
 				manifestClassFilter: manifestClassFilter(filters),
@@ -71,6 +76,8 @@ extension TransactionHistoryClient {
 			let response = try await gatewayAPIClient.streamTransactions(request)
 
 			// Pre-loading the details for all the resources involved
+
+			// an LSU: resource_rdx1nfuz9wd3laurnsveh32wuurh0c2t8ceg8hgvdkzl22ex9gqk9cqd2p
 
 			print("• RESPONSE: \(period.lowerBound.formatted(date: .abbreviated, time: .omitted)) -> \(period.upperBound.formatted(date: .abbreviated, time: .omitted)) \(response.items.count) •••••••••••••••••••••••")
 
@@ -154,6 +161,10 @@ extension TransactionHistoryClient {
 						withdrawals.append(contentsOf: withdrawn)
 						let deposited = try await nonFungibleResources(.added, changes: nonFungible)
 						deposits.append(contentsOf: deposited)
+
+						for w in withdrawn {
+							print(" ••  \(w.resource.metadata.title) \(w.resource.id.address)")
+						}
 					}
 
 					for fungible in changes.fungibleBalanceChanges {
