@@ -10,7 +10,8 @@ extension AccountDetails.State {
 			mnemonicHandlingCallToAction: mnemonicHandlingCallToAction,
 			isLedgerAccount: account.isLedgerAccount,
 			showToolbar: destination == nil,
-			account: account
+			account: account,
+			historyButtonEnabled: assets.allResourceAddresses != nil
 		)
 	}
 }
@@ -25,6 +26,7 @@ extension AccountDetails {
 		let isLedgerAccount: Bool
 		let showToolbar: Bool
 		let account: Profile.Network.Account
+		let historyButtonEnabled: Bool
 	}
 
 	@MainActor
@@ -49,7 +51,7 @@ extension AccountDetails {
 					.padding(.medium1)
 
 					HStack {
-						historyButton()
+						historyButton(enabled: viewStore.historyButtonEnabled)
 						transferButton()
 					}
 
@@ -109,15 +111,17 @@ extension AccountDetails {
 			.headerButtonStyle
 		}
 
-		func historyButton() -> some SwiftUI.View {
+		func historyButton(enabled: Bool) -> some SwiftUI.View {
 			Button {
 				store.send(.view(.historyButtonTapped))
 			} label: {
 				HStack(alignment: .center) {
 					Label(L10n.Common.history, asset: AssetResource.iconHistory)
 				}
+				.opacity(enabled ? 1 : 0.5)
 			}
 			.headerButtonStyle
+			.disabled(!enabled)
 		}
 	}
 }

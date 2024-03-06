@@ -7,12 +7,23 @@ public struct TransactionHistoryClient: Sendable, DependencyKey {
 
 // MARK: TransactionHistoryClient.GetTransactionHistory
 extension TransactionHistoryClient {
-	public typealias GetTransactionHistory = @Sendable (AccountAddress, Range<Date>, [TransactionFilter], _ ascending: Bool, _ cursor: String?) async throws -> TransactionHistoryResponse
+	public typealias GetTransactionHistory = @Sendable (TransactionHistoryRequest) async throws -> TransactionHistoryResponse
+}
+
+// MARK: - TransactionHistoryRequest
+public struct TransactionHistoryRequest: Sendable, Hashable {
+	public let account: AccountAddress
+	public let period: Range<Date>
+	public let filters: [TransactionFilter]
+	public let allResources: Set<ResourceAddress>
+	public let ascending: Bool
+	public let cursor: String?
 }
 
 // MARK: - TransactionHistoryResponse
 public struct TransactionHistoryResponse: Sendable, Hashable {
 	public let cursor: String?
+	public let allResources: IdentifiedArrayOf<OnLedgerEntity.Resource>
 	public let items: [TransactionHistoryItem]
 }
 
@@ -54,3 +65,26 @@ public enum TransactionFilter: Hashable, Sendable {
 		return transactionType
 	}
 }
+
+// extension TransactionHistoryClient {
+//	@Sendable
+//	func getTransactionHistory(
+//		account: AccountAddress,
+//		allResourceAddresses: Set<ResourceAddress>,
+//		period: Range<Date>,
+//		filters: [TransactionFilter],
+//		ascending: Bool,
+//		cursor: String?
+//	) async throws -> TransactionHistoryResponse {
+//		getTransactionHistory(
+//			.init(
+//				account: <#T##AccountAddress#>,
+//				period: <#T##Range<Date>#>,
+//				filters: <#T##[TransactionFilter]#>,
+//				allResources: <#T##Set<ResourceAddress>#>,
+//				ascending: <#T##Bool#>,
+//				cursor: <#T##String?#>
+//			)
+//		)
+//	}
+// }
