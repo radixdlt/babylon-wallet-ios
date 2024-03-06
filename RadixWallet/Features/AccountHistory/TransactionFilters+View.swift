@@ -101,7 +101,7 @@ extension TransactionHistoryFilters {
 								ForEach(filters) { filter in
 									FilterView(filter: filter) {
 										store.send(.view(.addTapped(filter.id)))
-									} removeAction: {
+									} crossAction: {
 										store.send(.view(.removeTapped(filter.id)))
 									}
 								}
@@ -116,11 +116,11 @@ extension TransactionHistoryFilters {
 
 		struct FilterView: SwiftUI.View {
 			let filter: State.Filter
-			let addAction: () -> Void
-			let removeAction: () -> Void
+			let action: () -> Void
+			var crossAction: (() -> Void)? = nil
 
 			var body: some SwiftUI.View {
-				Button(action: addAction) {
+				Button(action: action) {
 					HStack(spacing: .small3) {
 						if let icon = filter.icon {
 							Image(icon)
@@ -135,8 +135,8 @@ extension TransactionHistoryFilters {
 					.padding(.horizontal, .medium3)
 				}
 				.contentShape(Capsule())
-				.disabled(filter.isActive)
-				.padding(.trailing, filter.isActive ? .medium1 : 0)
+				.disabled(showCross)
+				.padding(.trailing, showCross ? .medium1 : 0)
 				.background {
 					ZStack {
 						Capsule().fill(filter.isActive ? .app.gray1 : .app.white)
@@ -144,8 +144,8 @@ extension TransactionHistoryFilters {
 					}
 				}
 				.overlay(alignment: .trailing) {
-					if filter.isActive {
-						Button(asset: AssetResource.close, action: removeAction)
+					if showCross, let crossAction {
+						Button(asset: AssetResource.close, action: crossAction)
 							.tint(.app.gray3)
 							.padding(.vertical, -.small3)
 							.padding(.trailing, .small2)
@@ -153,6 +153,10 @@ extension TransactionHistoryFilters {
 					}
 				}
 				.animation(.default.speed(2), value: filter.isActive)
+			}
+
+			private var showCross: Bool {
+				crossAction != nil && filter.isActive
 			}
 
 			private var textColor: Color {
