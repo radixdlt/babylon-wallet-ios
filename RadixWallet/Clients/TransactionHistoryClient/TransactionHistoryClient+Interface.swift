@@ -25,3 +25,17 @@ public struct TransactionHistoryItem: Sendable, Hashable {
 	let deposits: [ResourceBalance]
 	let depositSettingsUpdated: Bool
 }
+
+// MARK: - TransactionFilter
+public enum TransactionFilter: Hashable, Sendable {
+	case transferType(TransferType)
+	case asset(ResourceAddress)
+	case transactionType(TransactionType)
+
+	public enum TransferType: CaseIterable, Sendable {
+		case withdrawal
+		case deposit
+	}
+
+	public typealias TransactionType = GatewayAPI.ManifestClass
+}

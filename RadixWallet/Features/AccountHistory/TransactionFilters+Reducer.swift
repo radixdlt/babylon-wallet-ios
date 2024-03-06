@@ -17,7 +17,7 @@ public struct TransactionFilters: Sendable, FeatureReducer {
 		}
 
 		public struct Filter: Hashable, Sendable, Identifiable {
-			public let id: FilterType
+			public let id: TransactionFilter
 			let icon: ImageAsset?
 			let label: String
 			var isActive: Bool
@@ -26,24 +26,11 @@ public struct TransactionFilters: Sendable, FeatureReducer {
 				hasher.combine(id)
 			}
 		}
-
-		public enum FilterType: Hashable, Sendable {
-			case transferType(TransferType)
-			case asset(ResourceAddress)
-			case transactionType(TransactionType)
-		}
-
-		public enum TransferType: CaseIterable, Sendable {
-			case withdrawal
-			case deposit
-		}
-
-		public typealias TransactionType = GatewayAPI.ManifestClass
 	}
 
 	public enum ViewAction: Equatable, Sendable {
-		case addTapped(State.FilterType)
-		case removeTapped(State.FilterType)
+		case addTapped(TransactionFilter)
+		case removeTapped(TransactionFilter)
 	}
 
 	public enum DelegateAction: Equatable, Sendable {
@@ -69,16 +56,16 @@ public struct TransactionFilters: Sendable, FeatureReducer {
 }
 
 extension TransactionFilters.State {
-	init(assets: [OnLedgerEntity.Resource], activeFilters: [FilterType]) {
-		let transferTypes = TransferType.allCases.map { Filter($0, isActive: activeFilters.contains(.transferType($0))) }
+	init(assets: [OnLedgerEntity.Resource], activeFilters: [Filter.ID]) {
+		let transferTypes = TransactionFilter.TransferType.allCases.map { Filter($0, isActive: activeFilters.contains(.transferType($0))) }
 		let fungibles = assets.filter { $0.fungibility == .fungible }.compactMap { Filter($0, isActive: activeFilters.contains(.asset($0.id))) }
 		let nonFungibles = assets.filter { $0.fungibility == .nonFungible }.compactMap { Filter($0, isActive: activeFilters.contains(.asset($0.id))) }
-		let transactionTypes = TransactionType.allCases.map { Filter($0, isActive: activeFilters.contains(.transactionType($0))) }
+		let transactionTypes = TransactionFilter.TransactionType.allCases.map { Filter($0, isActive: activeFilters.contains(.transactionType($0))) }
 
 		self.filters = .init(transferTypes: transferTypes, fungibles: fungibles, nonFungibles: nonFungibles, transactionTypes: transactionTypes)
 	}
 
-	mutating func setActive(_ active: Bool, filter: TransactionFilters.State.FilterType) {
+	mutating func setActive(_ active: Bool, filter: TransactionFilter) {
 		switch filter {
 		case .transferType:
 			filters.transferTypes.setActive(filter, active: active)
@@ -102,7 +89,7 @@ extension TransactionFilters.State.Filters {
 }
 
 extension TransactionFilters.State.Filter {
-	init(_ transferType: TransactionFilters.State.TransferType, isActive: Bool) {
+	init(_ transferType: TransactionFilter.TransferType, isActive: Bool) {
 		self.init(
 			id: .transferType(transferType),
 			icon: Self.icon(for: transferType),
@@ -111,7 +98,7 @@ extension TransactionFilters.State.Filter {
 		)
 	}
 
-	private static func icon(for transferType: TransactionFilters.State.TransferType) -> ImageAsset {
+	private static func icon(for transferType: TransactionFilter.TransferType) -> ImageAsset {
 		switch transferType {
 		case .withdrawal:
 			AssetResource.transactionHistoryWithdrawal
@@ -121,7 +108,7 @@ extension TransactionFilters.State.Filter {
 	}
 
 	// FIXME: Strings
-	private static func label(for transferType: TransactionFilters.State.TransferType) -> String {
+	private static func label(for transferType: TransactionFilter.TransferType) -> String {
 		switch transferType {
 		case .withdrawal:
 			"Withdrawals"
@@ -135,7 +122,7 @@ extension TransactionFilters.State.Filter {
 		self.init(id: .asset(asset.resourceAddress), icon: nil, label: symbol, isActive: isActive)
 	}
 
-	init(_ transactionType: TransactionFilters.State.TransactionType, isActive: Bool) {
+	init(_ transactionType: TransactionFilter.TransactionType, isActive: Bool) {
 		self.init(
 			id: .transactionType(transactionType),
 			icon: nil,
@@ -145,7 +132,7 @@ extension TransactionFilters.State.Filter {
 	}
 
 	// FIXME: Strings
-	private static func label(for transactionType: TransactionFilters.State.TransactionType) -> String {
+	private static func label(for transactionType: TransactionFilter.TransactionType) -> String {
 		switch transactionType {
 		case .general: "General"
 		case .transfer: "Transfers"
@@ -160,10 +147,10 @@ extension TransactionFilters.State.Filter {
 }
 
 extension IdentifiedArrayOf<TransactionFilters.State.Filter> {
-	/// Sets the `isActive` flag of the filter with the id of `filterType` to `active`, and all others to `false`
-	mutating func setActive(_ filterType: TransactionFilters.State.FilterType, active: Bool) {
-		for id in ids {
-			self[id: id]?.isActive = id == filterType ? active : false
+	/// Sets the `isActive` flag of the filter with the given id to `active`, and all others to `false`
+	mutating func setActive(_ id: TransactionFilters.State.Filter.ID, active: Bool) {
+		for existingID in ids {
+			self[id: existingID]?.isActive = existingID == id ? active : false
 		}
 	}
 }
