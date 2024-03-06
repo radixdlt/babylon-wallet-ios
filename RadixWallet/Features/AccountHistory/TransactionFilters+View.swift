@@ -123,7 +123,7 @@ extension TransactionFilters {
 				Button(action: addAction) {
 					HStack(spacing: .small3) {
 						if let icon = filter.icon {
-							Image(asset: icon)
+							Image(icon)
 								.tint(textColor)
 						}
 

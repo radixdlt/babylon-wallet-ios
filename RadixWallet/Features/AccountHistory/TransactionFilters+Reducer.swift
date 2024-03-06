@@ -18,7 +18,7 @@ public struct TransactionFilters: Sendable, FeatureReducer {
 
 		public struct Filter: Hashable, Sendable, Identifiable {
 			public let id: TransactionFilter
-			let icon: ImageAsset?
+			let icon: ImageResource?
 			let label: String
 			var isActive: Bool
 
@@ -98,12 +98,12 @@ extension TransactionFilters.State.Filter {
 		)
 	}
 
-	private static func icon(for transferType: TransactionFilter.TransferType) -> ImageAsset {
+	private static func icon(for transferType: TransactionFilter.TransferType) -> ImageResource {
 		switch transferType {
 		case .withdrawal:
-			AssetResource.transactionHistoryWithdrawal
+			.transactionHistoryWithdrawal
 		case .deposit:
-			AssetResource.transactionHistoryDeposit
+			.transactionHistoryDeposit
 		}
 	}
 
