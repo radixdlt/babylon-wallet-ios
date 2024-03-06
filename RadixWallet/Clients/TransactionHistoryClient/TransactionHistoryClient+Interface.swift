@@ -38,4 +38,19 @@ public enum TransactionFilter: Hashable, Sendable {
 	}
 
 	public typealias TransactionType = GatewayAPI.ManifestClass
+
+	public var transferType: TransferType? {
+		guard case let .transferType(transferType) = self else { return nil }
+		return transferType
+	}
+
+	public var asset: ResourceAddress? {
+		guard case let .asset(asset) = self else { return nil }
+		return asset
+	}
+
+	public var transactionType: TransactionType? {
+		guard case let .transactionType(transactionType) = self else { return nil }
+		return transactionType
+	}
 }
