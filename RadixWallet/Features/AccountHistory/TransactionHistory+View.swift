@@ -57,9 +57,9 @@ extension TransactionHistory {
 							VStack(spacing: .small2) {
 								HScrollBar(items: viewStore.periods, selection: selection)
 
-								if !viewStore.activeFilters.isEmpty {
-									ActiveFiltersView(filters: viewStore.activeFilters) {
-										store.send(.view(.removeFilterTapped($0)), animation: .default)
+								if !viewStore.filters.isEmpty {
+									ActiveFiltersView(filters: viewStore.filters) { id in
+										store.send(.view(.filterTapped(id)))
 									}
 								}
 							}
@@ -127,15 +127,13 @@ extension TransactionHistory {
 
 	struct ActiveFiltersView: SwiftUI.View {
 		let filters: IdentifiedArrayOf<TransactionHistoryFilters.State.Filter>
-		let removeAction: (TransactionFilter) -> Void
+		let action: (TransactionFilter) -> Void
 
 		var body: some SwiftUI.View {
 			ScrollView(.horizontal) {
 				HStack {
 					ForEach(filters) { filter in
-						TransactionHistoryFilters.View.FilterView(filter: filter, action: {}) {
-							removeAction(filter.id)
-						}
+						TransactionFilterView(filter: filter, action: action)
 					}
 
 					Spacer(minLength: 0)

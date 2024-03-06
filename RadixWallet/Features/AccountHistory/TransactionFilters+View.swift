@@ -19,10 +19,12 @@ extension TransactionHistoryFilters {
 					VStack {
 						SubSection(filters: viewStore.transferTypes, flexible: false, store: store)
 
-						Section("Type of asset") {
-							SubSection("Tokens", filters: viewStore.fungibles, store: store)
+						if viewStore.showAssetsSection {
+							Section("Type of asset") {
+								SubSection("Tokens", filters: viewStore.fungibles, store: store)
 
-							SubSection("NFTs", filters: viewStore.nonFungibles, store: store)
+								SubSection("NFTs", filters: viewStore.nonFungibles, store: store)
+							}
 						}
 
 						Section("Type of transaction") {
@@ -99,10 +101,8 @@ extension TransactionHistoryFilters {
 						HStack(spacing: .zero) {
 							FlowLayout(spacing: .small1) {
 								ForEach(filters) { filter in
-									FilterView(filter: filter) {
-										store.send(.view(.addTapped(filter.id)))
-									} crossAction: {
-										store.send(.view(.removeTapped(filter.id)))
+									TransactionFilterView(filter: filter) { id in
+										store.send(.view(.filterTapped(id)))
 									}
 								}
 							}
@@ -113,63 +113,50 @@ extension TransactionHistoryFilters {
 				}
 			}
 		}
+	}
+}
 
-		struct FilterView: SwiftUI.View {
-			let filter: State.Filter
-			let action: () -> Void
-			var crossAction: (() -> Void)? = nil
+// MARK: - TransactionFilterView
+struct TransactionFilterView: SwiftUI.View {
+	let filter: TransactionHistoryFilters.State.Filter
+	let action: (TransactionFilter) -> Void
 
-			var body: some SwiftUI.View {
-				Button(action: action) {
-					HStack(spacing: .small3) {
-						if let icon = filter.icon {
-							Image(icon)
-								.tint(textColor)
-						}
-
-						Text(filter.label)
-							.textStyle(.body1HighImportance)
-							.foregroundStyle(textColor)
-					}
-					.padding(.vertical, .small2)
-					.padding(.horizontal, .medium3)
+	var body: some SwiftUI.View {
+		Button {
+			action(filter.id)
+		} label: {
+			HStack(spacing: .small3) {
+				if let icon = filter.icon {
+					Image(icon)
+						.tint(textColor)
 				}
-				.contentShape(Capsule())
-				.disabled(showCross)
-				.padding(.trailing, showCross ? .medium1 : 0)
-				.background {
-					ZStack {
-						Capsule().fill(filter.isActive ? .app.gray1 : .app.white)
-						Capsule().stroke(filter.isActive ? .clear : .app.gray3)
-					}
-				}
-				.overlay(alignment: .trailing) {
-					if showCross, let crossAction {
-						Button(asset: AssetResource.close, action: crossAction)
-							.tint(.app.gray3)
-							.padding(.vertical, -.small3)
-							.padding(.trailing, .small2)
-							.transition(.scale.combined(with: .opacity))
-					}
-				}
-				.animation(.default.speed(2), value: filter.isActive)
-			}
 
-			private var showCross: Bool {
-				crossAction != nil && filter.isActive
+				Text(filter.label)
+					.textStyle(.body1HighImportance)
+					.foregroundStyle(textColor)
 			}
+			.padding(.vertical, .small2)
+			.padding(.horizontal, .medium3)
+		}
+		.contentShape(Capsule())
+		.background {
+			ZStack {
+				Capsule().fill(filter.isActive ? .app.gray1 : .app.white)
+				Capsule().stroke(filter.isActive ? .clear : .app.gray3)
+			}
+		}
+		.animation(.default.speed(2), value: filter.isActive)
+	}
 
-			private var textColor: Color {
-				filter.isActive ? .app.white : .app.gray1
-			}
+	private var textColor: Color {
+		filter.isActive ? .app.white : .app.gray1
+	}
 
-			struct Dummy: SwiftUI.View {
-				var body: some SwiftUI.View {
-					Text("ABC")
-						.textStyle(.body1HighImportance)
-						.padding(.vertical, .small2)
-				}
-			}
+	struct Dummy: SwiftUI.View {
+		var body: some SwiftUI.View {
+			Text("ABC")
+				.textStyle(.body1HighImportance)
+				.padding(.vertical, .small2)
 		}
 	}
 }
