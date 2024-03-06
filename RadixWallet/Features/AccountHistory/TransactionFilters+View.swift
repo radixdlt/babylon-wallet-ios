@@ -2,14 +2,14 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - TransactionHistoryFilters.View
-extension TransactionFilters {
+extension TransactionHistoryFilters {
 	public typealias ViewState = State.Filters
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<TransactionFilters>
+		private let store: StoreOf<TransactionHistoryFilters>
 
-		public init(store: StoreOf<TransactionFilters>) {
+		public init(store: StoreOf<TransactionHistoryFilters>) {
 			self.store = store
 		}
 
@@ -78,9 +78,9 @@ extension TransactionFilters {
 			let heading: String?
 			let filters: IdentifiedArrayOf<State.Filter>
 			let flexible: Bool
-			let store: StoreOf<TransactionFilters>
+			let store: StoreOf<TransactionHistoryFilters>
 
-			init(_ heading: String? = nil, filters: IdentifiedArrayOf<State.Filter>, flexible: Bool = true, store: StoreOf<TransactionFilters>) {
+			init(_ heading: String? = nil, filters: IdentifiedArrayOf<State.Filter>, flexible: Bool = true, store: StoreOf<TransactionHistoryFilters>) {
 				self.heading = heading
 				self.filters = filters
 				self.flexible = flexible
