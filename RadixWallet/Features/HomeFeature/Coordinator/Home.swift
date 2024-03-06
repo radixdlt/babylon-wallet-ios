@@ -63,6 +63,7 @@ public struct Home: Sendable, FeatureReducer {
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
 			case exportMnemonic(ExportMnemonic.State)
 			case acknowledgeJailbreakAlert(AlertState<Action.AcknowledgeJailbreakAlert>)
+			case userFeedback(UserFeedback.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -71,6 +72,7 @@ public struct Home: Sendable, FeatureReducer {
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
 			case exportMnemonic(ExportMnemonic.Action)
 			case acknowledgeJailbreakAlert(AcknowledgeJailbreakAlert)
+			case userFeedback(UserFeedback.Action)
 
 			public enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
 		}
@@ -87,6 +89,9 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.exportMnemonic, action: /Action.exportMnemonic) {
 				ExportMnemonic()
+			}
+			Scope(state: /State.userFeedback, action: /Action.userFeedback) {
+				UserFeedback()
 			}
 		}
 	}
@@ -144,11 +149,12 @@ public struct Home: Sendable, FeatureReducer {
 			.merge(with: loadGateways())
 
 		case .createAccountButtonTapped:
-			state.destination = .createAccount(
-				.init(config: .init(
-					purpose: .newAccountFromHome
-				))
-			)
+			state.destination = .userFeedback(.init())
+//			state.destination = .createAccount(
+//				.init(config: .init(
+//					purpose: .newAccountFromHome
+//				))
+//			)
 			return .none
 		case .pullToRefreshStarted:
 			let accountAddresses = state.accounts.map(\.address)
