@@ -133,7 +133,7 @@ extension TransactionHistory {
 			ScrollView(.horizontal) {
 				HStack {
 					ForEach(filters) { filter in
-						TransactionHistoryFilters.View.FilterView(filter: filter, addAction: {}) {
+						TransactionHistoryFilters.View.FilterView(filter: filter, action: {}) {
 							removeAction(filter.id)
 						}
 					}
