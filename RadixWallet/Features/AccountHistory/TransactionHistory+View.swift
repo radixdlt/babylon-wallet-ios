@@ -19,8 +19,15 @@ extension TransactionHistory {
 					let selection = viewStore.binding(get: \.selectedPeriod, send: ViewAction.selectedPeriod)
 
 					VStack(spacing: .zero) {
-						HScrollBarDummy()
-							.padding(.vertical, .small3)
+						VStack(spacing: .small2) {
+							HScrollBarDummy()
+
+							if !viewStore.activeFilters.isEmpty {
+								ActiveFiltersView.Dummy()
+							}
+						}
+						.padding(.top, .small2)
+						.padding(.bottom, .small1)
 
 						ScrollView {
 							LazyVStack(spacing: .small1, pinnedViews: [.sectionHeaders]) {
@@ -37,7 +44,6 @@ extension TransactionHistory {
 						.scrollIndicators(.never)
 						.coordinateSpace(name: View.coordSpace)
 					}
-//					.ignoresSafeArea(edges: .bottom)
 					.background(.app.gray5)
 					.overlayPreferenceValue(PositionsPreferenceKey.self, alignment: .top) { positions in
 						let rect = positions[View.accountDummy]
@@ -48,10 +54,19 @@ extension TransactionHistory {
 							}
 
 							let scrollBarOffset = max(rect?.maxY ?? 0, 0)
-							HScrollBar(items: viewStore.periods, selection: selection)
-								.padding(.vertical, .small3)
-								.background(.app.white)
-								.offset(y: scrollBarOffset)
+							VStack(spacing: .small2) {
+								HScrollBar(items: viewStore.periods, selection: selection)
+
+								if !viewStore.activeFilters.isEmpty {
+									ActiveFiltersView(filters: viewStore.activeFilters) {
+										store.send(.view(.removeFilterTapped($0)), animation: .default)
+									}
+								}
+							}
+							.padding(.top, .small2)
+							.padding(.bottom, .small1)
+							.background(.app.white)
+							.offset(y: scrollBarOffset)
 						}
 					}
 					.clipShape(Rectangle())
@@ -109,6 +124,35 @@ extension TransactionHistory {
 		}
 	}
 
+	struct ActiveFiltersView: SwiftUI.View {
+		let filters: IdentifiedArrayOf<TransactionFilters.State.Filter>
+		let removeAction: (TransactionFilters.State.Filter.ID) -> Void
+
+		var body: some SwiftUI.View {
+			ScrollView(.horizontal) {
+				HStack {
+					ForEach(filters) { filter in
+						TransactionFilters.View.FilterView(filter: filter, addAction: {}) {
+							removeAction(filter.id)
+						}
+					}
+
+					Spacer(minLength: 0)
+				}
+				.padding(.horizontal, .medium3)
+			}
+		}
+
+		struct Dummy: SwiftUI.View {
+			var body: some SwiftUI.View {
+				Text("DUMMY")
+					.textStyle(.body1HighImportance)
+					.foregroundStyle(.clear)
+					.padding(.vertical, .small2)
+			}
+		}
+	}
+
 	struct SectionHeaderView: SwiftUI.View {
 		let title: String
 
@@ -117,8 +161,7 @@ extension TransactionHistory {
 				.textStyle(.body2Header)
 				.foregroundStyle(.app.gray2)
 				.padding(.horizontal, .medium3)
-				.padding(.top, .small1)
-				.padding(.bottom, .small2)
+				.padding(.vertical, .small2)
 				.frame(maxWidth: .infinity, alignment: .leading)
 				.background(.app.gray5)
 		}
@@ -382,7 +425,6 @@ public struct HScrollBar<Item: ScrollBarItem>: View {
 						.animation(.default, value: rect)
 				}
 			}
-			.padding(.vertical, .small1)
 			.padding(.horizontal, .medium3)
 		}
 		.scrollIndicators(.never)
@@ -396,7 +438,7 @@ public struct HScrollBarDummy: View {
 	public var body: some View {
 		Text("DUMMY")
 			.foregroundStyle(.clear)
-			.padding(.vertical, 2 * .small2)
+			.padding(.vertical, .small2)
 			.frame(maxWidth: .infinity)
 	}
 }
