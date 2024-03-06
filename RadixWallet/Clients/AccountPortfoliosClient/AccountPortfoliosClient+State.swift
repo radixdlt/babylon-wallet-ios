@@ -19,11 +19,16 @@ extension AccountPortfoliosClient {
 
 		var selectedCurrency: FiatCurrency = .usd
 		var isCurrencyAmountVisible: Bool = true
+		var gateway: Radix.Gateway = .mainnet
 	}
 }
 
 // MARK: - Portfolio Setters/Getters
 extension AccountPortfoliosClient.State {
+	func setRadixGateway(_ gw: Radix.Gateway) {
+		self.gateway = gw
+	}
+
 	func handlePortfolioUpdate(_ portfolio: AccountPortfoliosClient.AccountPortfolio) {
 		var portfolio = portfolio
 		applyFiatWorth(&portfolio)
@@ -92,7 +97,7 @@ extension AccountPortfoliosClient.State {
 	}
 
 	func applyTokenPrices(to portfolio: inout AccountPortfoliosClient.AccountPortfolio) {
-		portfolio.updateFiatWorth(calculateWorth)
+		portfolio.updateFiatWorth(calculateWorth(gateway))
 	}
 
 	func applyCurrencyVisibility(to portfolio: inout AccountPortfoliosClient.AccountPortfolio) {
@@ -116,13 +121,31 @@ extension AccountPortfoliosClient.State {
 
 // MARK: - Stake and Pool details handling
 extension AccountPortfoliosClient.State {
-	func calculateWorth(for resourceAddress: ResourceAddress, amount: ResourceAmount) -> FiatWorth? {
-		tokenPrices[resourceAddress].map {
-			.init(
-				isVisible: isCurrencyAmountVisible,
-				worth: .known($0 * amount.nominalAmount),
-				currency: selectedCurrency
-			)
+	func calculateWorth(_ gateway: Radix.Gateway) -> (ResourceAddress, ResourceAmount) -> FiatWorth? {
+		{ resourceAddress, amount in
+			let price = {
+				#if DEBUG
+				if gateway != .mainnet {
+					if resourceAddress == mainnetXRDAddress {
+						return self.tokenPrices[resourceAddress]
+					} else {
+						return self.tokenPrices.values.randomElement()
+					}
+				} else {
+					return self.tokenPrices[resourceAddress]
+				}
+				#else
+				return self.tokenPrices[resourceAddress]
+				#endif
+			}()
+
+			return price.map {
+				.init(
+					isVisible: self.isCurrencyAmountVisible,
+					worth: .known($0 * amount.nominalAmount),
+					currency: self.selectedCurrency
+				)
+			}
 		}
 	}
 
@@ -133,7 +156,7 @@ extension AccountPortfoliosClient.State {
 
 		portfolio.poolUnitDetails = poolDetails.map { details in
 			var details = details
-			details.updateFiatWorth(calculateWorth)
+			details.updateFiatWorth(calculateWorth(gateway))
 			return details
 		}
 		setOrUpdateAccountPortfolio(portfolio)
@@ -145,7 +168,7 @@ extension AccountPortfoliosClient.State {
 		}
 		portfolio.stakeUnitDetails = stakeUnitDetails.map { details in
 			var details = details
-			details.updateFiatWorth(calculateWorth)
+			details.updateFiatWorth(calculateWorth(gateway))
 			return details
 		}
 		setOrUpdateAccountPortfolio(portfolio)
@@ -175,7 +198,7 @@ private extension AccountPortfoliosClient.AccountPortfolio {
 private extension OnLedgerEntity.OwnedFungibleResources {
 	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
 		xrdResource.mutate { resource in
-			resource.amount.fiatWorth = change(resource.resourceAddress, resource.amount)
+			resource.amount.fiatWorth = change(mainnetXRDAddress, resource.amount)
 		}
 
 		nonXrdResources.mutateAll { resource in

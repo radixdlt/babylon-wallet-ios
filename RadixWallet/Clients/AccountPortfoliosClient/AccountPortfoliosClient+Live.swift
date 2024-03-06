@@ -7,6 +7,7 @@ extension AccountPortfoliosClient: DependencyKey {
 		@Dependency(\.cacheClient) var cacheClient
 		@Dependency(\.tokenPriceClient) var tokenPriceClient
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
+		@Dependency(\.gatewaysClient) var gatewaysClient
 
 		/// Update currency amount visibility based on the profile state
 		Task {
@@ -49,6 +50,8 @@ extension AccountPortfoliosClient: DependencyKey {
 
 		return AccountPortfoliosClient(
 			fetchAccountPortfolios: { accountAddresses, forceRefresh in
+				let gateway = await gatewaysClient.getCurrentGateway()
+				await state.setRadixGateway(gateway)
 				if forceRefresh {
 					for accountAddress in accountAddresses {
 						cacheClient.removeFolder(.onLedgerEntity(.account(accountAddress.asGeneral)))
@@ -65,13 +68,36 @@ extension AccountPortfoliosClient: DependencyKey {
 
 				/// Put together all resources from already fetched and new accounts
 				let currentAccounts = state.portfoliosSubject.value.wrappedValue.map { $0.values.map(\.account) } ?? []
-				let allResources = (currentAccounts + accounts)
-					.flatMap {
-						$0.allFungibleResourceAddresses +
-							$0.poolUnitResources.poolUnits.flatMap(\.poolResources) +
-							[mainnetXRDAddress]
+				let allResources: [ResourceAddress] = {
+					if gateway == .mainnet {
+						return (currentAccounts + accounts)
+							.flatMap {
+								$0.allFungibleResourceAddresses +
+									$0.poolUnitResources.poolUnits.flatMap(\.poolResources) +
+									[mainnetXRDAddress]
+							}
+					} else {
+						#if DEBUG
+						return [
+							mainnetXRDAddress,
+							try! .init(validatingAddress:
+								"resource_rdx1t4tjx4g3qzd98nayqxm7qdpj0a0u8ns6a0jrchq49dyfevgh6u0gj3"
+							),
+							try! .init(validatingAddress:
+								"resource_rdx1t45js47zxtau85v0tlyayerzrgfpmguftlfwfr5fxzu42qtu72tnt0"
+							),
+							try! .init(validatingAddress:
+								"resource_rdx1tk7g72c0uv2g83g3dqtkg6jyjwkre6qnusgjhrtz0cj9u54djgnk3c"
+							),
+							try! .init(validatingAddress:
+								"resource_rdx1tkk83magp3gjyxrpskfsqwkg4g949rmcjee4tu2xmw93ltw2cz94sq"
+							),
+						]
+						#else
+						return []
+						#endif
 					}
-					.uniqued()
+				}()
 
 				let prices = try? await tokenPriceClient.getTokenPrices(.init(
 					tokens: Array(allResources),
