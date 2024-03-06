@@ -125,14 +125,14 @@ extension TransactionHistory {
 	}
 
 	struct ActiveFiltersView: SwiftUI.View {
-		let filters: IdentifiedArrayOf<TransactionFilters.State.Filter>
-		let removeAction: (TransactionFilters.State.Filter.ID) -> Void
+		let filters: IdentifiedArrayOf<TransactionHistoryFilters.State.Filter>
+		let removeAction: (TransactionFilter) -> Void
 
 		var body: some SwiftUI.View {
 			ScrollView(.horizontal) {
 				HStack {
 					ForEach(filters) { filter in
-						TransactionFilters.View.FilterView(filter: filter, addAction: {}) {
+						TransactionHistoryFilters.View.FilterView(filter: filter, addAction: {}) {
 							removeAction(filter.id)
 						}
 					}
@@ -182,7 +182,7 @@ private extension View {
 	func destinations(with store: StoreOf<TransactionHistory>) -> some View {
 		let destinationStore = store.destination
 		return sheet(store: destinationStore.scope(state: \.filters, action: \.filters)) {
-			TransactionFilters.View(store: $0)
+			TransactionHistoryFilters.View(store: $0)
 		}
 	}
 }
@@ -326,7 +326,7 @@ extension TransactionHistory {
 
 			var body: some SwiftUI.View {
 				HStack(spacing: .zero) {
-					Image(asset: asset)
+					Image(image)
 						.padding(.trailing, .small3)
 
 					Text(label)
@@ -337,14 +337,14 @@ extension TransactionHistory {
 				}
 			}
 
-			private var asset: ImageAsset {
+			private var image: ImageResource {
 				switch event {
 				case .deposit:
-					AssetResource.transactionHistoryDeposit
+					.transactionHistoryDeposit
 				case .withdrawal:
-					AssetResource.transactionHistoryWithdrawal
+					.transactionHistoryWithdrawal
 				case .depositSettings:
-					AssetResource.transactionHistorySettings
+					.transactionHistorySettings
 				}
 			}
 

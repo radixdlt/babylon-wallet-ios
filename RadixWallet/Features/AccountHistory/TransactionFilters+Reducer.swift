@@ -1,7 +1,7 @@
 import ComposableArchitecture
 
-// MARK: - TransactionFilters
-public struct TransactionFilters: Sendable, FeatureReducer {
+// MARK: - TransactionHistoryFilters
+public struct TransactionHistoryFilters: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public private(set) var filters: Filters
 
@@ -55,7 +55,7 @@ public struct TransactionFilters: Sendable, FeatureReducer {
 	}
 }
 
-extension TransactionFilters.State {
+extension TransactionHistoryFilters.State {
 	init(assets: [OnLedgerEntity.Resource], activeFilters: [Filter.ID]) {
 		let transferTypes = TransactionFilter.TransferType.allCases.map { Filter($0, isActive: activeFilters.contains(.transferType($0))) }
 		let fungibles = assets.filter { $0.fungibility == .fungible }.compactMap { Filter($0, isActive: activeFilters.contains(.asset($0.id))) }
@@ -78,8 +78,8 @@ extension TransactionFilters.State {
 	}
 }
 
-extension TransactionFilters.State.Filters {
-	typealias Filter = TransactionFilters.State.Filter
+extension TransactionHistoryFilters.State.Filters {
+	typealias Filter = TransactionHistoryFilters.State.Filter
 	init(transferTypes: [Filter], fungibles: [Filter], nonFungibles: [Filter], transactionTypes: [Filter]) {
 		self.transferTypes = transferTypes.asIdentifiable()
 		self.fungibles = fungibles.asIdentifiable()
@@ -88,7 +88,7 @@ extension TransactionFilters.State.Filters {
 	}
 }
 
-extension TransactionFilters.State.Filter {
+extension TransactionHistoryFilters.State.Filter {
 	init(_ transferType: TransactionFilter.TransferType, isActive: Bool) {
 		self.init(
 			id: .transferType(transferType),
@@ -146,9 +146,9 @@ extension TransactionFilters.State.Filter {
 	}
 }
 
-extension IdentifiedArrayOf<TransactionFilters.State.Filter> {
+extension IdentifiedArrayOf<TransactionHistoryFilters.State.Filter> {
 	/// Sets the `isActive` flag of the filter with the given id to `active`, and all others to `false`
-	mutating func setActive(_ id: TransactionFilters.State.Filter.ID, active: Bool) {
+	mutating func setActive(_ id: TransactionFilter, active: Bool) {
 		for existingID in ids {
 			self[id: existingID]?.isActive = existingID == id ? active : false
 		}

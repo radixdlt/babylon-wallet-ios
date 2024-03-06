@@ -7,7 +7,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		let periods: [DateRangeItem]
 
-		var activeFilters: IdentifiedArrayOf<TransactionFilters.State.Filter> = []
+		var activeFilters: IdentifiedArrayOf<TransactionHistoryFilters.State.Filter> = []
 
 		var selectedPeriod: DateRangeItem.ID
 
@@ -38,7 +38,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case onAppear
 		case selectedPeriod(DateRangeItem.ID)
 		case filtersTapped
-		case removeFilterTapped(TransactionFilters.State.Filter.ID)
+		case removeFilterTapped(TransactionFilter)
 		case closeTapped
 	}
 
@@ -49,17 +49,17 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public struct Destination: DestinationReducer {
 		@CasePathable
 		public enum State: Sendable, Hashable {
-			case filters(TransactionFilters.State)
+			case filters(TransactionHistoryFilters.State)
 		}
 
 		@CasePathable
 		public enum Action: Sendable, Equatable {
-			case filters(TransactionFilters.Action)
+			case filters(TransactionHistoryFilters.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
 			Scope(state: \.filters, action: \.filters) {
-				TransactionFilters()
+				TransactionHistoryFilters()
 			}
 		}
 	}
@@ -93,7 +93,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		case let .removeFilterTapped(id):
 			state.activeFilters.remove(id: id)
-			return .none
+			return loadSelectedPeriod(state: &state)
 
 		case .closeTapped:
 			return .run { _ in await dismiss() }
@@ -118,6 +118,10 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		}
 	}
 
+	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		loadSelectedPeriod(state: &state)
+	}
+
 	// Helper methods
 
 	func loadSelectedPeriod(state: inout State) -> Effect<Action> {
@@ -125,8 +129,10 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			return .none
 		}
 
+		let filters = state.activeFilters.map(\.id)
+
 		return .run { [account = state.account.address] send in
-			let transactions = try await transactionHistoryClient.getTransactionHistory(account, range, String?.none)
+			let transactions = try await transactionHistoryClient.getTransactionHistory(account, range, filters, true, String?.none)
 			await send(.internal(.updateTransactions(transactions.items)))
 		}
 	}
