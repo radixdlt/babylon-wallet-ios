@@ -3,7 +3,7 @@ import ComposableArchitecture
 // MARK: - TransactionHistory
 public struct TransactionHistory: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		let account: Profile.Network.Account
+		let account: OnLedgerEntity.Account
 
 		let periods: [DateRangeItem]
 
@@ -17,7 +17,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destination.State?
 
-		init(account: Profile.Network.Account, sections: [TransactionSection] = []) {
+		init(account: OnLedgerEntity.Account, sections: [TransactionSection] = []) {
 			self.account = account
 			self.periods = try! .init(months: 7)
 			self.selectedPeriod = periods[0].id
