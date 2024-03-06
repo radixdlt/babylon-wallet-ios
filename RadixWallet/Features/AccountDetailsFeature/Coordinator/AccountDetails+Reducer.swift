@@ -124,7 +124,14 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .historyButtonTapped:
-			state.destination = .history(.init(account: state.account))
+			print("••• Have resource addresses?: \((state.assets.allResourceAddresses?.count).map(String.init) ?? "nil")")
+
+			guard let assets = state.assets.allResourceAddresses else {
+				loggerGlobal.error("The button should not be enabled until the portfolio has been loaded")
+				return .none
+			}
+
+			state.destination = .history(.init(account: state.account, assets: assets))
 			return .none
 
 		case .exportMnemonicButtonTapped:
