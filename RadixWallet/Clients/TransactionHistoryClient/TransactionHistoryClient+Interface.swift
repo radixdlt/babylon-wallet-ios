@@ -7,7 +7,7 @@ public struct TransactionHistoryClient: Sendable, DependencyKey {
 
 // MARK: TransactionHistoryClient.GetTransactionHistory
 extension TransactionHistoryClient {
-	public typealias GetTransactionHistory = @Sendable (AccountAddress, Range<Date>, _ cursor: String?) async throws -> TransactionHistoryResponse
+	public typealias GetTransactionHistory = @Sendable (AccountAddress, Range<Date>, [TransactionFilter], _ ascending: Bool, _ cursor: String?) async throws -> TransactionHistoryResponse
 }
 
 // MARK: - TransactionHistoryResponse
