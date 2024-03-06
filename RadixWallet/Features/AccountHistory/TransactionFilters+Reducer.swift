@@ -14,6 +14,10 @@ public struct TransactionHistoryFilters: Sendable, FeatureReducer {
 			var all: IdentifiedArrayOf<Filter> {
 				transferTypes + fungibles + nonFungibles + transactionTypes
 			}
+
+			var showAssetsSection: Bool {
+				!(fungibles.isEmpty && nonFungibles.isEmpty)
+			}
 		}
 
 		public struct Filter: Hashable, Sendable, Identifiable {
@@ -38,8 +42,7 @@ public struct TransactionHistoryFilters: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Equatable, Sendable {
-		case addTapped(TransactionFilter)
-		case removeTapped(TransactionFilter)
+		case filterTapped(TransactionFilter)
 	}
 
 	public enum DelegateAction: Equatable, Sendable {
@@ -48,12 +51,12 @@ public struct TransactionHistoryFilters: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case let .addTapped(filter):
-			state.setActive(true, filter: filter)
-			return activeFiltersChanged(state: state)
-
-		case let .removeTapped(filter):
-			state.setActive(false, filter: filter)
+		case let .filterTapped(id):
+			guard let filter = state.filters.all[id: id] else {
+				assertionFailure("Filter \(id) does not exist")
+				return .none
+			}
+			state.setActive(!filter.isActive, filter: id)
 			return activeFiltersChanged(state: state)
 		}
 	}
@@ -118,8 +121,8 @@ extension TransactionHistoryFilters.State.Filter {
 	}
 
 	init?(_ asset: OnLedgerEntity.Resource, isActive: Bool) {
-		guard let symbol = asset.metadata.symbol else { return nil }
-		self.init(id: .asset(asset.resourceAddress), icon: nil, label: symbol, isActive: isActive)
+		let label = asset.metadata.title ?? asset.resourceAddress.formatted()
+		self.init(id: .asset(asset.resourceAddress), icon: nil, label: label, isActive: isActive)
 	}
 
 	init(_ transactionType: TransactionFilter.TransactionType, isActive: Bool) {
