@@ -70,16 +70,17 @@ extension TransactionHistory {
 						}
 					}
 					.clipShape(Rectangle())
-				}
-				.toolbar {
-					ToolbarItem(placement: .topBarLeading) {
-						CloseButton {
-							store.send(.view(.closeTapped))
+					.toolbar {
+						ToolbarItem(placement: .topBarLeading) {
+							CloseButton {
+								store.send(.view(.closeTapped))
+							}
 						}
-					}
-					ToolbarItem(placement: .topBarTrailing) {
-						Button(asset: AssetResource.transactionHistoryFilterList) {
-							store.send(.view(.filtersTapped))
+						ToolbarItem(placement: .topBarTrailing) {
+							Button(asset: AssetResource.transactionHistoryFilterList) {
+								store.send(.view(.filtersTapped))
+							}
+							.disabled(viewStore.allResources == nil)
 						}
 					}
 				}
