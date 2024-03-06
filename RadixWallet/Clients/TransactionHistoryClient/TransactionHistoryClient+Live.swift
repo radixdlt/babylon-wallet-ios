@@ -1,37 +1,6 @@
 import EngineToolkit
 
-extension SpecificAddress {
-	public func networkID() throws -> NetworkID {
-		try .init(intoEngine().networkId())
-	}
-}
-
 extension TransactionHistoryClient {
-	private static func eventsFilter(_ filters: [TransactionFilter], account: AccountAddress) -> [GatewayAPI.StreamTransactionsRequestEventFilterItem]? {
-		filters
-			.compactMap(\.transferType)
-			.map { transferType in
-				switch transferType {
-				case .deposit: .init(event: .deposit, emitterAddress: account.address)
-				case .withdrawal: .init(event: .withdrawal, emitterAddress: account.address)
-				}
-			}
-			.nilIfEmpty
-	}
-
-	private static func manifestClassFilter(_ filters: [TransactionFilter]) -> GatewayAPI.StreamTransactionsRequestAllOfManifestClassFilter? {
-		filters
-			.compactMap(\.transactionType)
-			.first
-			.map { .init(_class: $0, matchOnlyMostSpecific: false) }
-	}
-
-	private static func manifestResourcesFilter(_ filters: [TransactionFilter]) -> [String]? {
-		filters
-			.compactMap(\.asset?.address)
-			.nilIfEmpty
-	}
-
 	public static let liveValue = TransactionHistoryClient.live()
 
 	public static func live() -> Self {
@@ -39,51 +8,34 @@ extension TransactionHistoryClient {
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
 		@Sendable
-		func getTransactionHistory(
-			account: AccountAddress,
-			period: Range<Date>,
-			filters: [TransactionFilter],
-			ascending: Bool,
-			cursor: String?
-		) async throws -> TransactionHistoryResponse {
-			let networkID = try account.networkID()
+		func getTransactionHistory(_ request: TransactionHistoryRequest) async throws -> TransactionHistoryResponse {
+			let networkID = try request.account.networkID()
 
-			var account = account
+			var account = request.account
 			if networkID == .mainnet {
 				// FIXME: GK REMOVE THIS
 				account = try AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l")
 			}
 
-			let request = GatewayAPI.StreamTransactionsRequest(
-				atLedgerState: .init(timestamp: period.upperBound),
-				fromLedgerState: .init(timestamp: period.lowerBound),
-				cursor: cursor,
-				limitPerPage: 100,
-//				kindFilter: T##GatewayAPI.StreamTransactionsRequest.KindFilter,
-//				manifestAccountsWithdrawnFromFilter: <#T##[String]?#>,
-//				manifestAccountsDepositedIntoFilter: <#T##[String]?#>,
-				manifestResourcesFilter: manifestResourcesFilter(filters),
-				affectedGlobalEntitiesFilter: [account.address],
-				eventsFilter: eventsFilter(filters, account: account),
-//				accountsWithManifestOwnerMethodCalls: <#T##[String]?#>,
-//				accountsWithoutManifestOwnerMethodCalls: <#T##[String]?#>,
-				manifestClassFilter: manifestClassFilter(filters),
-				order: ascending ? .asc : .desc,
-				optIns: .init(balanceChanges: true)
-				// optIns: GatewayAPI.TransactionDetailsOptIns(affectedGlobalEntities: true, manifestInstructions: true, balanceChanges: true)
-			)
-
-			let response = try await gatewayAPIClient.streamTransactions(request)
+			let response = try await gatewayAPIClient.streamTransactions(request.gatewayRequest)
 
 			// Pre-loading the details for all the resources involved
 
 			// an LSU: resource_rdx1nfuz9wd3laurnsveh32wuurh0c2t8ceg8hgvdkzl22ex9gqk9cqd2p
 
-			print("• RESPONSE: \(period.lowerBound.formatted(date: .abbreviated, time: .omitted)) -> \(period.upperBound.formatted(date: .abbreviated, time: .omitted)) \(response.items.count) •••••••••••••••••••••••")
+			print("• RESPONSE: \(request.period.lowerBound.formatted(date: .abbreviated, time: .omitted)) -> \(request.period.upperBound.formatted(date: .abbreviated, time: .omitted)) \(response.items.count) •••••••••••••••••••••••")
 
-			let resourceAddresses = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
+			let resourceAddresses_ = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
+			let resourceAddresses = request.allResources
+
+			print("•• RESPONSE RES: \(resourceAddresses.count) \(resourceAddresses_.count)")
+
 			let resourceDetails = try await onLedgerEntitiesClient.getResources(resourceAddresses)
 			let keyedResources = IdentifiedArray(uniqueElements: resourceDetails)
+
+			for red in keyedResources {
+				print("    •• res: \(red.metadata.title ?? "-"): \(resourceAddresses_.contains(red.id))")
+			}
 
 			// Thrown if a resource or nonFungibleToken that we loaded is not present, should never happen
 			struct ProgrammerError: Error {}
@@ -224,7 +176,7 @@ extension TransactionHistoryClient {
 				items.append(transactionItem)
 			}
 
-			return .init(cursor: response.nextCursor, items: items)
+			return .init(cursor: response.nextCursor, allResources: keyedResources, items: items)
 
 //			return try await .init(
 //				cursor: response.nextCursor,
@@ -290,5 +242,59 @@ extension TransactionHistoryClient {
 		return try localIDStrings
 			.map(nonFungibleLocalIdFromStr)
 			.map { try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress, nonFungibleLocalId: $0) }
+	}
+}
+
+extension TransactionHistoryRequest {
+	var gatewayRequest: GatewayAPI.StreamTransactionsRequest {
+		.init(
+			atLedgerState: .init(timestamp: period.upperBound),
+			fromLedgerState: .init(timestamp: period.lowerBound),
+			cursor: cursor,
+			limitPerPage: 100,
+//				kindFilter: T##GatewayAPI.StreamTransactionsRequest.KindFilter,
+//				manifestAccountsWithdrawnFromFilter: <#T##[String]?#>,
+//				manifestAccountsDepositedIntoFilter: <#T##[String]?#>,
+			manifestResourcesFilter: manifestResourcesFilter(filters),
+			affectedGlobalEntitiesFilter: [account.address],
+			eventsFilter: eventsFilter(filters, account: account),
+//				accountsWithManifestOwnerMethodCalls: <#T##[String]?#>,
+//				accountsWithoutManifestOwnerMethodCalls: <#T##[String]?#>,
+			manifestClassFilter: manifestClassFilter(filters),
+			order: ascending ? .asc : .desc,
+			optIns: .init(balanceChanges: true)
+			// optIns: GatewayAPI.TransactionDetailsOptIns(affectedGlobalEntities: true, manifestInstructions: true, balanceChanges: true)
+		)
+	}
+
+	private func eventsFilter(_ filters: [TransactionFilter], account: AccountAddress) -> [GatewayAPI.StreamTransactionsRequestEventFilterItem]? {
+		filters
+			.compactMap(\.transferType)
+			.map { transferType in
+				switch transferType {
+				case .deposit: .init(event: .deposit, emitterAddress: account.address)
+				case .withdrawal: .init(event: .withdrawal, emitterAddress: account.address)
+				}
+			}
+			.nilIfEmpty
+	}
+
+	private func manifestClassFilter(_ filters: [TransactionFilter]) -> GatewayAPI.StreamTransactionsRequestAllOfManifestClassFilter? {
+		filters
+			.compactMap(\.transactionType)
+			.first
+			.map { .init(_class: $0, matchOnlyMostSpecific: false) }
+	}
+
+	private func manifestResourcesFilter(_ filters: [TransactionFilter]) -> [String]? {
+		filters
+			.compactMap(\.asset?.address)
+			.nilIfEmpty
+	}
+}
+
+extension SpecificAddress {
+	public func networkID() throws -> NetworkID {
+		try .init(intoEngine().networkId())
 	}
 }

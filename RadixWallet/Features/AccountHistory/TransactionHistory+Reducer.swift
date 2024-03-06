@@ -3,25 +3,28 @@ import ComposableArchitecture
 // MARK: - TransactionHistory
 public struct TransactionHistory: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		let account: OnLedgerEntity.Account
+		let account: Profile.Network.Account
 
 		let periods: [DateRangeItem]
+
+		var allResourceAddresses: Set<ResourceAddress>
+		var allResources: IdentifiedArrayOf<OnLedgerEntity.Resource>? = nil
 
 		var activeFilters: IdentifiedArrayOf<TransactionHistoryFilters.State.Filter> = []
 
 		var selectedPeriod: DateRangeItem.ID
 
-		var sections: IdentifiedArrayOf<TransactionSection>
+		var sections: IdentifiedArrayOf<TransactionSection> = []
 		var loadedPeriods: Set<Date> = []
 
 		@PresentationState
 		public var destination: Destination.State?
 
-		init(account: OnLedgerEntity.Account, sections: [TransactionSection] = []) {
+		init(account: Profile.Network.Account, assets: Set<ResourceAddress>) {
 			self.account = account
 			self.periods = try! .init(months: 7)
+			self.allResourceAddresses = assets
 			self.selectedPeriod = periods[0].id
-			self.sections = sections.asIdentifiable()
 		}
 
 		public struct TransactionSection: Sendable, Hashable, Identifiable {
@@ -43,7 +46,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Hashable {
-		case updateTransactions([TransactionHistoryItem])
+		case updateHistory(TransactionHistoryResponse)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -67,6 +70,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.transactionHistoryClient) var transactionHistoryClient
+	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 	public init() {}
 
@@ -88,7 +92,11 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			return loadSelectedPeriod(state: &state)
 
 		case .filtersTapped:
-			state.destination = .filters(.init(assets: [], activeFilters: state.activeFilters.map(\.id)))
+			guard let allResources = state.allResources else {
+				loggerGlobal.error("The filters button should not be enabled until the resources have been loaded")
+				return .none
+			}
+			state.destination = .filters(.init(assets: allResources, activeFilters: state.activeFilters.map(\.id)))
 			return .none
 
 		case let .removeFilterTapped(id):
@@ -102,8 +110,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .updateTransactions(transactions):
-			state.updateTransactions(transactions)
+		case let .updateHistory(updateHistory):
+			state.updateHistory(updateHistory)
 			return .none
 		}
 	}
@@ -131,9 +139,17 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		let filters = state.activeFilters.map(\.id)
 
-		return .run { [account = state.account.address] send in
-			let transactions = try await transactionHistoryClient.getTransactionHistory(account, range, filters, true, String?.none)
-			await send(.internal(.updateTransactions(transactions.items)))
+		return .run { [account = state.account.address, allResources = state.allResourceAddresses] send in
+			let request = TransactionHistoryRequest(
+				account: account,
+				period: range,
+				filters: filters,
+				allResources: allResources,
+				ascending: true,
+				cursor: nil
+			)
+			let response = try await transactionHistoryClient.getTransactionHistory(request)
+			await send(.internal(.updateHistory(response)))
 		}
 	}
 }
@@ -148,7 +164,7 @@ private extension Range<Date> {
 
 extension TransactionHistory.State {
 	///  Presupposes that transactions are loaded in chunks of full months
-	mutating func updateTransactions(_ transactions: [TransactionHistoryItem]) {
+	mutating func updateHistory(_ response: TransactionHistoryResponse) {
 //		let newSections = transactions.inSections
 //		var sections = self.sections
 //		sections.append(contentsOf: newSections)
@@ -157,9 +173,12 @@ extension TransactionHistory.State {
 //		loadedPeriods.append(contentsOf: newSections.map(\.month))
 
 		sections.removeAll()
-		sections.append(contentsOf: transactions.inSections)
+		sections.append(contentsOf: response.items.inSections)
 		sections.sort(by: \.day)
 		loadedPeriods.append(contentsOf: sections.map(\.month))
+
+		print("••• UPDATED history, set res: \(response.allResources.count)")
+		allResources = response.allResources
 	}
 
 	mutating func clearSections() {
