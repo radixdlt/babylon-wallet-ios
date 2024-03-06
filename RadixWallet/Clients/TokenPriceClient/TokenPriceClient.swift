@@ -82,7 +82,7 @@ extension DependencyValues {
 extension TokenPriceClient.TokenPrices {
 	init(_ tokenPricesResponse: TokensPriceResponse) {
 		self = tokenPricesResponse.tokens.reduce(into: [:]) { partialResult, next in
-			let roundedToRETPrecision = next.price.roundDoubleToDecimalPlaces(Int(RETDecimal.maxDivisibility))
+			let roundedToRETPrecision = next.price.roundDoubleToDecimalPlaces(Int(RETDecimal.maxDivisibility - 10))
 			partialResult[next.resourceAddress] = RETDecimal(floatLiteral: roundedToRETPrecision)
 		}
 	}

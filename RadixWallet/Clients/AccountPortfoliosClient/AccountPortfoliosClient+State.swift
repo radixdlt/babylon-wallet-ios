@@ -181,6 +181,8 @@ private extension OnLedgerEntity.OwnedFungibleResources {
 		nonXrdResources.mutateAll { resource in
 			resource.amount.fiatWorth = change(resource.resourceAddress, resource.amount)
 		}
+
+		nonXrdResources.sort(by: <)
 	}
 }
 

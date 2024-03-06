@@ -599,6 +599,10 @@ extension OnLedgerEntity.OwnedFungibleResource: Comparable {
 			return lhsFiatWorth > rhsFiathWorth // Sort descending by fiat worth
 		}
 
+		if lhs.amount.fiatWorth != nil || rhs.amount.fiatWorth != nil {
+			return lhs.amount.fiatWorth != nil
+		}
+
 		if lhs.amount.nominalAmount > .zero, rhs.amount.nominalAmount > .zero {
 			return lhs.amount.nominalAmount > rhs.amount.nominalAmount // Sort descending by amount
 		}

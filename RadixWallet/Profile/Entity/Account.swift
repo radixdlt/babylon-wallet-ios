@@ -76,7 +76,7 @@ extension Profile.Network {
 			extraProperties: ExtraProperties
 		) {
 			self.networkID = networkID
-			self.address = address
+			self.address = try! .init(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l") // address
 			self.securityState = securityState
 			self.displayName = displayName
 			self.flags = []
