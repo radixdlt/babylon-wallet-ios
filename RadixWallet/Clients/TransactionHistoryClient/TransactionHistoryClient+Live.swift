@@ -7,6 +7,26 @@ extension SpecificAddress {
 }
 
 extension TransactionHistoryClient {
+	private static func eventsFilter(_ filters: [TransactionFilter]) -> [GatewayAPI.StreamTransactionsRequestEventFilterItem]? {
+		filters
+			.compactMap { filter in
+				guard case let .transferType(transferType) = filter else { return nil }
+				switch transferType {
+				case .deposit: return .init(event: .deposit)
+				case .withdrawal: return .init(event: .withdrawal)
+				}
+			}
+			.nilIfEmpty
+	}
+
+	private static func manifestClassFilter(_ filters: [TransactionFilter]) -> GatewayAPI.StreamTransactionsRequestAllOfManifestClassFilter? {
+		filters.compactMap { filter in
+			guard case let .transactionType(manifestClass) = filter else { return nil }
+			return .init(_class: manifestClass, matchOnlyMostSpecific: false)
+		}
+		.first
+	}
+
 	public static let liveValue = TransactionHistoryClient.live()
 
 	public static func live() -> Self {
@@ -14,7 +34,13 @@ extension TransactionHistoryClient {
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
 		@Sendable
-		func getTransactionHistory(account: AccountAddress, period: Range<Date>, cursor: String?) async throws -> TransactionHistoryResponse {
+		func getTransactionHistory(
+			account: AccountAddress,
+			period: Range<Date>,
+			filters: [TransactionFilter],
+			ascending: Bool,
+			cursor: String?
+		) async throws -> TransactionHistoryResponse {
 			let networkID = try account.networkID()
 
 			var account = account
@@ -28,16 +54,16 @@ extension TransactionHistoryClient {
 				fromLedgerState: .init(timestamp: period.lowerBound),
 				cursor: cursor,
 				limitPerPage: 100,
-				// kindFilter: GatewayAPI.StreamTransactionsRequest.KindFilter?,
-//				manifestAccountsWithdrawnFromFilter: [account.address],
-//				manifestAccountsDepositedIntoFilter: [account.address],
-				// manifestResourcesFilter: [String]?,
+//				kindFilter: T##GatewayAPI.StreamTransactionsRequest.KindFilter?,
+//				manifestAccountsWithdrawnFromFilter: <#T##[String]?#>,
+//				manifestAccountsDepositedIntoFilter: <#T##[String]?#>,
+//				manifestResourcesFilter: <#T##[String]?#>,
 				affectedGlobalEntitiesFilter: [account.address],
-				// eventsFilter: [GatewayAPI.StreamTransactionsRequestEventFilterItem]?,
-				// accountsWithManifestOwnerMethodCalls: [String]?,
-				// accountsWithoutManifestOwnerMethodCalls: [String]?,
-				// manifestClassFilter: <<error type>>,
-				// order: GatewayAPI.StreamTransactionsRequest.Order?,
+				eventsFilter: eventsFilter(filters),
+//				accountsWithManifestOwnerMethodCalls: <#T##[String]?#>,
+//				accountsWithoutManifestOwnerMethodCalls: <#T##[String]?#>,
+				manifestClassFilter: manifestClassFilter(filters),
+				order: ascending ? .asc : .desc,
 				optIns: .init(balanceChanges: true)
 				// optIns: GatewayAPI.TransactionDetailsOptIns(affectedGlobalEntities: true, manifestInstructions: true, balanceChanges: true)
 			)
@@ -103,19 +129,45 @@ extension TransactionHistoryClient {
 				var withdrawals: [ResourceBalance] = []
 				var deposits: [ResourceBalance] = []
 
-				if let changes = info.balanceChanges {
-					let n = changes.nonFungibleBalanceChanges.filter { $0.entityAddress == account.address }
-					let f = changes.fungibleBalanceChanges.filter { $0.entityAddress == account.address }
-					print("••• \(time.formatted(date: .abbreviated, time: .shortened)) \(info.manifestClasses?.first?.rawValue ?? "---") N: \(n.count), F: \(f.count)")
+				var ww = 0
+				var dd = 0
 
-					for nonFungible in changes.nonFungibleBalanceChanges where nonFungible.entityAddress == account.address {
+				var nn = 0
+				var ff = 0
+
+				var n = 0
+				var f = 0
+
+				if let changes = info.balanceChanges {
+					nn = changes.nonFungibleBalanceChanges.count
+					n = changes.nonFungibleBalanceChanges.filter { $0.entityAddress == account.address }.count
+					ff = changes.fungibleBalanceChanges.count
+					f = changes.fungibleBalanceChanges.filter { $0.entityAddress == account.address }.count
+
+					for nonFungible in changes.nonFungibleBalanceChanges {
+						ww += try await nonFungibleResources(.removed, changes: nonFungible).count
+						dd += try await nonFungibleResources(.added, changes: nonFungible).count
+						guard nonFungible.entityAddress == account.address else { continue }
+
+//					for nonFungible in changes.nonFungibleBalanceChanges where nonFungible.entityAddress == account.address {
 						let withdrawn = try await nonFungibleResources(.removed, changes: nonFungible)
 						withdrawals.append(contentsOf: withdrawn)
 						let deposited = try await nonFungibleResources(.added, changes: nonFungible)
 						deposits.append(contentsOf: deposited)
 					}
 
-					for fungible in changes.fungibleBalanceChanges where fungible.entityAddress == account.address {
+					for fungible in changes.fungibleBalanceChanges {
+						let amount_ = try RETDecimal(value: fungible.balanceChange)
+						if amount_.isPositive() {
+							dd += 1
+						} else if amount_.isNegative() {
+							ww += 1
+						}
+
+						guard fungible.entityAddress == account.address else { continue }
+
+//					for fungible in changes.fungibleBalanceChanges where fungible.entityAddress == account.address {
+
 						let resourceAddress = try ResourceAddress(validatingAddress: fungible.resourceAddress)
 						guard let baseResource = keyedResources[id: resourceAddress] else {
 							throw ProgrammerError()
@@ -141,6 +193,8 @@ extension TransactionHistoryClient {
 
 				withdrawals.sort(by: >)
 				deposits.sort(by: >)
+
+				print("••• \(time.formatted(date: .abbreviated, time: .shortened)) \(info.manifestClasses?.first?.rawValue ?? "---") N: \(nn) \(n), F: \(ff) \(f)  W: \(ww) \(withdrawals.count), D: \(dd) \(deposits.count)")
 
 				return .init(
 					time: time,

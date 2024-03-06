@@ -1,3 +1,4 @@
+import Foundation
 
 extension Button where Label == Image {
 	public init(asset: ImageAsset, action: @escaping () -> Void) {
