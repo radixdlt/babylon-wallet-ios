@@ -79,6 +79,7 @@ struct ValidatorStakeView: View {
 			ResourceBalanceView.StakeClaimNFT(
 				viewState: viewState,
 				background: .app.white,
+				compact: false,
 				onTap: onTap,
 				onClaimAllTapped: onClaimAllTapped
 			)
