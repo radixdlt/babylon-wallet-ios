@@ -148,9 +148,9 @@ public struct ResourceBalanceView: View {
 			case let .nonFungible(viewState):
 				NonFungible(viewState: viewState, compact: compact)
 			case let .liquidStakeUnit(viewState):
-				LiquidStakeUnit(viewState: viewState, isSelected: isSelected, compact: compact)
+				LiquidStakeUnit(viewState: viewState, compact: compact, isSelected: isSelected)
 			case let .poolUnit(viewState):
-				PoolUnit(viewState: viewState, isSelected: isSelected, compact: compact)
+				PoolUnit(viewState: viewState, compact: compact, isSelected: isSelected)
 			case let .stakeClaimNFT(viewState):
 				StakeClaimNFT(viewState: viewState, background: .white, compact: compact, onTap: { _ in })
 			}
@@ -181,81 +181,21 @@ public struct ResourceBalanceView: View {
 }
 
 extension ResourceBalanceView {
-	private struct FungibleView: View {
-		public let thumbnail: Thumbnail.FungibleContent
-		public let caption: String?
-		public let fallback: String?
-		public let amount: ResourceBalance.Amount?
-		public let compact: Bool
-
-		public var body: some View {
-			HStack(spacing: .zero) {
-				Thumbnail(fungible: thumbnail, size: size)
-					.padding(.trailing, .small1)
-
-				if let caption {
-					Text(caption)
-						.lineLimit(1)
-						.textStyle(titleTextStyle)
-						.foregroundColor(.app.gray1)
-				}
-
-				if useSpacer {
-					Spacer(minLength: .small2)
-				}
-
-				AmountView(amount: amount, fallback: fallback, compact: compact)
-			}
-		}
-
-		private var size: HitTargetSize {
-			compact ? .smallest : .small
-		}
-
-		private var titleTextStyle: TextStyle {
-			compact ? .body1HighImportance : .body2HighImportance
-		}
-
-		private var useSpacer: Bool {
-			amount != nil || fallback != nil
-		}
-	}
-
 	public struct Fungible: View {
 		@Environment(\.missingFungibleAmountFallback) var fallback
 		public let viewState: ResourceBalance.ViewState.Fungible
 		public let compact: Bool
 
 		public var body: some View {
-			HStack(spacing: .zero) {
-				Thumbnail(fungible: viewState.icon, size: size)
-					.padding(.trailing, .small1)
-
-				if let title = viewState.title {
-					Text(title)
-						.lineLimit(1)
-						.textStyle(titleTextStyle)
-						.foregroundColor(.app.gray1)
-				}
-
-				if useSpacer {
-					Spacer(minLength: .small2)
-				}
-
-				AmountView(amount: viewState.amount, fallback: fallback, compact: compact)
-			}
-		}
-
-		private var size: HitTargetSize {
-			compact ? .smallest : .small
-		}
-
-		private var titleTextStyle: TextStyle {
-			compact ? .body1HighImportance : .body2HighImportance
-		}
-
-		private var useSpacer: Bool {
-			viewState.amount != nil || fallback != nil
+			FungibleView(
+				thumbnail: viewState.icon,
+				caption1: viewState.title,
+				caption2: nil,
+				fallback: fallback,
+				amount: viewState.amount,
+				compact: compact,
+				isSelected: nil
+			)
 		}
 	}
 
@@ -264,34 +204,12 @@ extension ResourceBalanceView {
 		public let compact: Bool
 
 		public var body: some View {
-			HStack(spacing: .zero) {
-				Thumbnail(.nft, url: viewState.resourceImage, size: size)
-					.padding(.trailing, .small1)
-
-				VStack(alignment: .leading, spacing: 0) {
-					Text(line1)
-						.textStyle(compact ? .body2HighImportance : .body1HighImportance)
-						.foregroundColor(.app.gray1)
-					Text(line2)
-						.textStyle(.body2Regular)
-						.foregroundColor(.app.gray2)
-				}
-				.lineLimit(1)
-
-				Spacer(minLength: 0)
-			}
-		}
-
-		private var size: HitTargetSize {
-			compact ? .smallest : .smallish
-		}
-
-		private var line1: String {
-			viewState.resourceName ?? viewState.id.resourceAddress().formatted()
-		}
-
-		private var line2: String {
-			viewState.nonFungibleName ?? viewState.id.localId().formatted()
+			NonFungibleView(
+				thumbnail: .nft(viewState.resourceImage),
+				caption1: viewState.resourceName ?? viewState.id.resourceAddress().formatted(),
+				caption2: viewState.nonFungibleName ?? viewState.id.localId().formatted(),
+				compact: compact
+			)
 		}
 	}
 
@@ -303,35 +221,15 @@ extension ResourceBalanceView {
 
 		public var body: some View {
 			VStack(alignment: .leading, spacing: .medium3) {
-				HStack(spacing: .zero) {
-					Thumbnail(.lsu, url: viewState.icon, size: .slightlySmaller)
-						.padding(.trailing, .small1)
-
-					VStack(alignment: .leading, spacing: .zero) {
-						if let title = viewState.title {
-							Text(title)
-								.textStyle(.body1Header)
-						}
-
-						if let validatorName = viewState.validatorName {
-							Text(validatorName)
-								.foregroundStyle(.app.gray2)
-								.textStyle(.body2Regular)
-						}
-					}
-					.lineLimit(1)
-					.minimumScaleFactor(0.8)
-					.padding(.trailing, .small2)
-
-					Spacer(minLength: 0)
-
-					AmountView(amount: viewState.amount, compact: false)
-						.padding(.leading, isSelected != nil ? .small2 : 0)
-
-					if let isSelected {
-						CheckmarkView(appearance: .dark, isChecked: isSelected)
-					}
-				}
+				FungibleView(
+					thumbnail: .lsu(viewState.icon),
+					caption1: viewState.title,
+					caption2: viewState.validatorName,
+					fallback: nil,
+					amount: viewState.amount,
+					compact: compact,
+					isSelected: isSelected
+				)
 
 				if !hideDetails {
 					VStack(alignment: .leading, spacing: .small3) {
@@ -341,6 +239,7 @@ extension ResourceBalanceView {
 
 						ResourceBalanceView(.fungible(.xrd(balance: viewState.worth)), appearance: .compact(border: true))
 					}
+					.padding(.top, .small2)
 				}
 			}
 		}
@@ -354,44 +253,23 @@ extension ResourceBalanceView {
 
 		public var body: some View {
 			VStack(alignment: .leading, spacing: .zero) {
-				HStack(spacing: .zero) {
-					Thumbnail(.poolUnit, url: viewState.poolIcon, size: .slightlySmaller)
-						.padding(.trailing, .small1)
-
-					VStack(alignment: .leading, spacing: 0) {
-						Text(viewState.poolName ?? L10n.TransactionReview.poolUnits)
-							.textStyle(.body1Header)
-							.foregroundColor(.app.gray1)
-
-						loadable(viewState.dAppName, loadingViewHeight: .small1) { dAppName in
-							if let dAppName {
-								Text(dAppName)
-									.textStyle(.body2Regular)
-									.foregroundColor(.app.gray2)
-							}
-						}
-					}
-
-					Spacer(minLength: 0)
-
-					ResourceBalanceView.AmountView(amount: viewState.amount, compact: false)
-						.padding(.leading, isSelected != nil ? .small2 : 0)
-
-					if let isSelected {
-						CheckmarkView(appearance: .dark, isChecked: isSelected)
-					}
-
-					//					AssetIcon(.asset(AssetResource.info), size: .smallest)
-					//						.tint(.app.gray3)
-				}
-				.padding(.bottom, .small2)
-
-				Text(L10n.TransactionReview.worth.uppercased())
-					.textStyle(.body2HighImportance)
-					.foregroundColor(.app.gray2)
-					.padding(.bottom, .small3)
+				FungibleView(
+					thumbnail: .poolUnit(viewState.poolIcon),
+					caption1: viewState.poolName ?? L10n.TransactionReview.poolUnits,
+					caption2: viewState.dAppName.wrappedValue?.flatMap { $0 },
+					fallback: nil,
+					amount: viewState.amount,
+					compact: compact,
+					isSelected: isSelected
+				)
 
 				if !hideDetails {
+					Text(L10n.TransactionReview.worth.uppercased())
+						.textStyle(.body2HighImportance)
+						.foregroundColor(.app.gray2)
+						.padding(.top, .small2)
+						.padding(.bottom, .small3)
+
 					loadable(viewState.resources) { fungibles in
 						ResourceBalancesView(fungibles: fungibles)
 							.environment(\.missingFungibleAmountFallback, L10n.Account.PoolUnits.noTotalSupply)
@@ -405,43 +283,18 @@ extension ResourceBalanceView {
 		@Environment(\.resourceBalanceHideDetails) var hideDetails
 		public let viewState: ResourceBalance.ViewState.StakeClaimNFT
 		public let background: Color
+		public let compact: Bool
 		public let onTap: (OnLedgerEntitiesClient.StakeClaim) -> Void
-		public let onClaimAllTapped: (() -> Void)?
-
-		public init(
-			viewState: ResourceBalance.StakeClaimNFT,
-			background: Color,
-			onTap: @escaping (OnLedgerEntitiesClient.StakeClaim) -> Void,
-			onClaimAllTapped: (() -> Void)? = nil
-		) {
-			self.viewState = viewState
-			self.background = background
-			self.onTap = onTap
-			self.onClaimAllTapped = onClaimAllTapped
-		}
+		public var onClaimAllTapped: (() -> Void)? = nil
 
 		public var body: some View {
-			VStack(alignment: .leading, spacing: .medium3) {
-				HStack(spacing: .zero) {
-					Thumbnail(.nft, url: viewState.resourceMetadata.iconURL, size: .slightlySmaller)
-						.padding(.trailing, .small1)
-
-					VStack(alignment: .leading, spacing: .zero) {
-						if let title = viewState.resourceMetadata.title {
-							Text(title)
-								.textStyle(.body1Header)
-								.foregroundStyle(.app.gray1)
-						}
-
-						if let validatorName = viewState.validatorName {
-							Text(validatorName)
-								.textStyle(.body2Regular)
-								.foregroundStyle(.app.gray2)
-						}
-					}
-
-					Spacer()
-				}
+			VStack(alignment: .leading, spacing: .zero) {
+				NonFungibleView(
+					thumbnail: .stakeClaimNFT(viewState.resourceMetadata.iconURL),
+					caption1: viewState.resourceMetadata.title ?? "",
+					caption2: viewState.validatorName ?? "",
+					compact: compact
+				)
 
 				if !hideDetails {
 					Tokens(
@@ -450,6 +303,7 @@ extension ResourceBalanceView {
 						onTap: onTap,
 						onClaimAllTapped: onClaimAllTapped
 					)
+					.padding(.top, .small2)
 				}
 			}
 			.background(background)
@@ -541,6 +395,108 @@ extension ResourceBalanceView {
 	}
 
 	// Helper Views
+
+	private struct FungibleView: View {
+		public let thumbnail: Thumbnail.FungibleContent
+		public let caption1: String?
+		public let caption2: String?
+		public let fallback: String?
+		public let amount: ResourceBalance.Amount?
+		public let compact: Bool
+		public let isSelected: Bool?
+
+		public var body: some View {
+			HStack(spacing: .zero) {
+				CaptionedThumbnailView(
+					type: thumbnail.type,
+					url: thumbnail.url,
+					caption1: caption1,
+					caption2: caption2,
+					compact: compact
+				)
+
+				if useSpacer {
+					Spacer(minLength: .small2)
+				}
+
+				AmountView(amount: amount, fallback: fallback, compact: compact)
+					.padding(.leading, isSelected != nil ? .small2 : 0)
+
+				if let isSelected {
+					CheckmarkView(appearance: .dark, isChecked: isSelected)
+				}
+			}
+		}
+
+		private var size: HitTargetSize {
+			compact ? .smallest : .small
+		}
+
+		private var titleTextStyle: TextStyle {
+			compact ? .body2HighImportance : .body1HighImportance
+		}
+
+		private var useSpacer: Bool {
+			amount != nil || fallback != nil
+		}
+	}
+
+	private struct NonFungibleView: View {
+		let thumbnail: Thumbnail.NonFungibleContent
+		let caption1: String?
+		let caption2: String?
+		let compact: Bool
+
+		var body: some View {
+			HStack(spacing: .zero) {
+				CaptionedThumbnailView(
+					type: thumbnail.type,
+					url: thumbnail.url,
+					caption1: caption1,
+					caption2: caption2,
+					compact: compact
+				)
+
+				Spacer(minLength: 0)
+			}
+		}
+	}
+
+	private struct CaptionedThumbnailView: View {
+		let type: Thumbnail.ContentType
+		let url: URL?
+		let caption1: String?
+		let caption2: String?
+		let compact: Bool
+
+		var body: some View {
+			Thumbnail(type, url: url, size: size)
+				.padding(.trailing, .small1)
+
+			VStack(alignment: .leading, spacing: 0) {
+				if let caption1 {
+					Text(caption1)
+						.textStyle(titleTextStyle)
+						.foregroundColor(.app.gray1)
+						.lineLimit(1)
+				}
+				if let caption2 {
+					Text(caption2)
+						.textStyle(.body2Regular)
+						.foregroundColor(.app.gray2)
+						.lineLimit(2)
+				}
+			}
+		}
+
+		private var size: HitTargetSize {
+			compact ? .smallest : .smallish
+		}
+
+		private var titleTextStyle: TextStyle {
+			compact ? .body2HighImportance : .body1HighImportance
+		}
+	}
 
 	struct AmountView: View {
 		let amount: ResourceBalance.Amount?
