@@ -6781,7 +6781,6 @@
 			path = AccountPreferencesTests;
 			sourceTree = "<group>";
 		};
-<<<<<<< HEAD
 		83823EA52B722D9000827211 /* HTTPClient */ = {
 			isa = PBXGroup;
 			children = (
