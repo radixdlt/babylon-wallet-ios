@@ -70,16 +70,18 @@ extension AccountPortfoliosClient: DependencyKey {
 				let currentAccounts = state.portfoliosSubject.value.wrappedValue.map { $0.values.map(\.account) } ?? []
 				let allResources: [ResourceAddress] = {
 					if gateway == .mainnet {
+						/// Only Mainnet resources have prices
 						return (currentAccounts + accounts)
 							.flatMap {
 								$0.allFungibleResourceAddresses +
 									$0.poolUnitResources.poolUnits.flatMap(\.poolResources) +
-									[mainnetXRDAddress]
+									[.mainnetXRDAddress]
 							}
 					} else {
 						#if DEBUG
+						/// Helpful for testing on stokenet
 						return [
-							mainnetXRDAddress,
+							.mainnetXRDAddress,
 							try! .init(validatingAddress:
 								"resource_rdx1t4tjx4g3qzd98nayqxm7qdpj0a0u8ns6a0jrchq49dyfevgh6u0gj3"
 							),
@@ -94,18 +96,21 @@ extension AccountPortfoliosClient: DependencyKey {
 							),
 						]
 						#else
+						/// No
 						return []
 						#endif
 					}
 				}()
 
-				let prices = try? await tokenPriceClient.getTokenPrices(.init(
-					tokens: Array(allResources),
-					currency: preferences.fiatCurrencyPriceTarget
-				))
+				if !allResources.isEmpty {
+					let prices = try? await tokenPriceClient.getTokenPrices(.init(
+						tokens: Array(allResources),
+						currency: preferences.fiatCurrencyPriceTarget
+					))
 
-				if let prices {
-					await state.setTokenPrices(prices)
+					if let prices {
+						await state.setTokenPrices(prices)
+					}
 				}
 
 				let portfolios = accounts.map { AccountPortfolio(account: $0) }
@@ -132,33 +137,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			portfolioForAccount: { address in
 				await state.portfolioForAccount(address)
 			},
-			portfolios: { state.portfoliosSubject.value.wrappedValue.map { Array($0.values) } ?? [] },
-			totalFiatWorth: {
-				state.portfoliosSubject
-					.eraseToAnyAsyncSequence()
-					.map {
-						let isCurrencyAmountVisible = await state.isCurrencyAmountVisible
-						let selectedCurrency = await state.selectedCurrency
-
-						return $0.values.flatMap { values in
-							let zero = FiatWorth(
-								isVisible: isCurrencyAmountVisible,
-								worth: .zero,
-								currency: selectedCurrency
-							)
-
-							let result: Loadable<FiatWorth> = values
-								.map(\.totalFiatWorth)
-								.reduce(.success(zero)) {
-									$0.reduce($1, join: +)
-								}
-
-							return result
-						}
-					}
-					.removeDuplicates()
-					.eraseToAnyAsyncSequence()
-			}
+			portfolios: { state.portfoliosSubject.value.wrappedValue.map { Array($0.values) } ?? [] }
 		)
 	}()
 }

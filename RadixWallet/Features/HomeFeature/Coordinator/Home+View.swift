@@ -6,8 +6,7 @@ extension Home.State {
 		.init(
 			hasNotification: shouldWriteDownPersonasSeedPhrase,
 			showRadixBanner: showRadixBanner,
-			totalFiatWorth: totalFiatWorth,
-			isShowingFiatWorth: showFiatWorth
+			totalFiatWorth: totalFiatWorth
 		)
 	}
 }
@@ -17,8 +16,7 @@ extension Home {
 	public struct ViewState: Equatable {
 		let hasNotification: Bool
 		let showRadixBanner: Bool
-		let totalFiatWorth: Loadable<FiatWorth>
-		let isShowingFiatWorth: Bool
+		let totalFiatWorth: Loadable<FiatWorth>?
 	}
 
 	@MainActor
@@ -35,19 +33,21 @@ extension Home {
 					VStack(spacing: .medium1) {
 						HeaderView()
 
-						VStack(spacing: .small2) {
-							Text("TOTAL VALUE")
-								.foregroundStyle(.app.gray2)
-								.textStyle(.body1Header)
-							TotalCurrencyWorthView(
-								state: .init(totalCurrencyWorth: viewStore.totalFiatWorth),
-								backgroundColor: .app.gray4
-							) {
-								viewStore.send(.view(.showFiatWorthToggled))
+						if let fiatWorth = viewStore.totalFiatWorth {
+							VStack(spacing: .small2) {
+								Text("TOTAL VALUE")
+									.foregroundStyle(.app.gray2)
+									.textStyle(.body1Header)
+								TotalCurrencyWorthView(
+									state: .init(totalCurrencyWorth: fiatWorth),
+									backgroundColor: .app.gray4
+								) {
+									viewStore.send(.view(.showFiatWorthToggled))
+								}
+								.foregroundColor(.app.gray1)
 							}
-							.foregroundColor(viewStore.isShowingFiatWorth ? .app.gray1 : .app.gray3)
+							.padding(.horizontal, .medium1)
 						}
-						.padding(.horizontal, .medium1)
 
 						VStack(spacing: .medium3) {
 							ForEachStore(

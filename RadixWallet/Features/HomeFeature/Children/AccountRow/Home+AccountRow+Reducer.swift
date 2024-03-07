@@ -9,6 +9,7 @@ extension Home {
 			public var accountWithInfo: AccountWithInfo
 
 			public var portfolio: Loadable<AccountPortfoliosClient.AccountPortfolio>
+			public var showFiatWorth: Bool = true
 			public var totalFiatWorth: Loadable<FiatWorth>
 
 			public init(

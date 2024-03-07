@@ -10,7 +10,7 @@ extension AccountDetails.State {
 			mnemonicHandlingCallToAction: mnemonicHandlingCallToAction,
 			isLedgerAccount: account.isLedgerAccount,
 			showToolbar: destination == nil,
-			totalFiatWorth: assets.totalFiatWorth,
+			totalFiatWorth: showFiatWorth ? assets.totalFiatWorth : nil,
 			account: account
 		)
 	}
@@ -25,7 +25,7 @@ extension AccountDetails {
 		let mnemonicHandlingCallToAction: MnemonicHandling?
 		let isLedgerAccount: Bool
 		let showToolbar: Bool
-		let totalFiatWorth: Loadable<FiatWorth>
+		let totalFiatWorth: Loadable<FiatWorth>?
 		let account: Profile.Network.Account
 	}
 
@@ -45,14 +45,16 @@ extension AccountDetails {
 						.textStyle(.body2HighImportance)
 						.padding(.bottom, .small1)
 
-					TotalCurrencyWorthView(
-						state: .init(totalCurrencyWorth: viewStore.totalFiatWorth),
-						backgroundColor: .clear
-					) {
-						viewStore.send(.showFiatWorthToggled)
+					if let totalFiatWorth = viewStore.totalFiatWorth {
+						TotalCurrencyWorthView(
+							state: .init(totalCurrencyWorth: totalFiatWorth),
+							backgroundColor: .clear
+						) {
+							viewStore.send(.showFiatWorthToggled)
+						}
+						.foregroundColor(.app.white)
+						.padding([.bottom, .horizontal], .medium1)
 					}
-					.foregroundColor(.app.white)
-					.padding([.bottom, .horizontal], .medium1)
 
 					prompts(
 						mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction
@@ -191,7 +193,7 @@ struct AccountDetails_Preview: PreviewProvider {
 		NavigationStack {
 			AccountDetails.View(
 				store: .init(
-					initialState: .init(accountWithInfo: .init(account: .previewValue0)),
+					initialState: .init(accountWithInfo: .init(account: .previewValue0), showFiatWorth: true),
 					reducer: AccountDetails.init
 				)
 			)

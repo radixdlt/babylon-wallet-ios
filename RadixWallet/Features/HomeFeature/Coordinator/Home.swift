@@ -11,8 +11,15 @@ public struct Home: Sendable, FeatureReducer {
 		public var shouldWriteDownPersonasSeedPhrase: Bool = false
 
 		public var showRadixBanner: Bool = false
-		var showFiatWorth: Bool = true
-		var totalFiatWorth: Loadable<FiatWorth> = .loading
+		public var showFiatWorth: Bool = true
+
+		public var totalFiatWorth: Loadable<FiatWorth>? {
+			guard showFiatWorth else {
+				return nil
+			}
+
+			return accountRows.map(\.totalFiatWorth).reduce(+)
+		}
 
 		// MARK: - Destination
 		@PresentationState
@@ -38,7 +45,7 @@ public struct Home: Sendable, FeatureReducer {
 		case exportMnemonic(account: Profile.Network.Account)
 		case importMnemonic
 		case loadedShouldWriteDownPersonasSeedPhrase(Bool)
-		case totalFiatWorthLoaded(Loadable<FiatWorth>)
+		case currentGatewayChanged(to: Radix.Gateway)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -91,6 +98,7 @@ public struct Home: Sendable, FeatureReducer {
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.iOSSecurityClient) var iOSSecurityClient
+	@Dependency(\.gatewaysClient) var gatewaysClient
 
 	public init() {}
 
@@ -133,7 +141,7 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			.merge(with: checkAccountsAccessToMnemonic(state: state))
 			.merge(with: loadShouldWriteDownPersonasSeedPhrase())
-			.merge(with: loadTotalFiatWorth())
+			.merge(with: loadGateways())
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(
@@ -163,7 +171,7 @@ public struct Home: Sendable, FeatureReducer {
 			return .send(.delegate(.displaySettings))
 
 		case .showFiatWorthToggled:
-			return .run { [isCurrencyAmountVisible = state.showFiatWorth] _ in
+			return .run { _ in
 				try await appPreferencesClient.toggleIsCurrencyAmountVisible()
 			}
 		}
@@ -185,10 +193,6 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			.merge(with: checkAccountsAccessToMnemonic(state: state))
 
-		case let .totalFiatWorthLoaded(totalFiatWorth):
-			state.totalFiatWorth.refresh(from: totalFiatWorth)
-			return .none
-
 		case let .accountsLoadedResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
@@ -202,6 +206,17 @@ public struct Home: Sendable, FeatureReducer {
 
 		case .importMnemonic:
 			return importMnemonics(state: &state)
+
+		case let .currentGatewayChanged(gateway):
+			// #if DEBUG
+			//            state.showFiatWorth = true
+			//            #else
+			state.showFiatWorth = gateway == .stokenet
+			state.accountRows.mutateAll { rowState in
+				rowState.showFiatWorth = state.showFiatWorth
+			}
+			//            #endif
+			return .none
 		}
 	}
 
@@ -221,7 +236,7 @@ public struct Home: Sendable, FeatureReducer {
 			let account = accountRow.account
 			switch delegateAction {
 			case .openDetails:
-				state.destination = .accountDetails(.init(accountWithInfo: accountRow.accountWithInfo))
+				state.destination = .accountDetails(.init(accountWithInfo: accountRow.accountWithInfo, showFiatWorth: state.showFiatWorth))
 				return .none
 			case .exportMnemonic:
 				return exportMnemonic(controlling: account, state: &state)
@@ -307,14 +322,11 @@ public struct Home: Sendable, FeatureReducer {
 		}
 	}
 
-	public func loadTotalFiatWorth() -> Effect<Action> {
+	public func loadGateways() -> Effect<Action> {
 		.run { send in
-			for try await totalFiatWorth in await accountPortfoliosClient.totalFiatWorth() {
+			for try await gateway in await gatewaysClient.currentGatewayValues() {
 				guard !Task.isCancelled else { return }
-
-				await send(.internal(.totalFiatWorthLoaded(
-					totalFiatWorth
-				)))
+				await send(.internal(.currentGatewayChanged(to: gateway)))
 			}
 		}
 	}

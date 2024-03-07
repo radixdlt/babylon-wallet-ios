@@ -6,15 +6,13 @@ extension AccountPortfoliosClient: TestDependencyKey {
 		fetchAccountPortfolios: unimplemented("\(AccountPortfoliosClient.self).fetchAccountPortfolios"),
 		fetchAccountPortfolio: unimplemented("\(AccountPortfoliosClient.self).fetchAccountPortfolio"),
 		portfolioForAccount: unimplemented("\(AccountPortfoliosClient.self).portfolioForAccount"),
-		portfolios: unimplemented("\(AccountPortfoliosClient.self).portfolios"),
-		totalFiatWorth: unimplemented("\(AccountPortfoliosClient.self).totalFiatWorth")
+		portfolios: unimplemented("\(AccountPortfoliosClient.self).portfolios")
 	)
 
 	public static let noop = AccountPortfoliosClient(
 		fetchAccountPortfolios: { _, _ in throw NoopError() },
 		fetchAccountPortfolio: { _, _ in throw NoopError() },
 		portfolioForAccount: { _ in fatalError() },
-		portfolios: { fatalError() },
-		totalFiatWorth: { fatalError() }
+		portfolios: { fatalError() }
 	)
 }

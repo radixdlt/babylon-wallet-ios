@@ -6,14 +6,17 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, AccountWithInfoHolder {
 		public var accountWithInfo: AccountWithInfo
 		var assets: AssetsView.State
+		var showFiatWorth: Bool
 
 		@PresentationState
 		var destination: Destination.State?
 
 		public init(
-			accountWithInfo: AccountWithInfo
+			accountWithInfo: AccountWithInfo,
+			showFiatWorth: Bool
 		) {
 			self.accountWithInfo = accountWithInfo
+			self.showFiatWorth = showFiatWorth
 			self.assets = AssetsView.State(
 				account: accountWithInfo.account,
 				mode: .normal

@@ -5,6 +5,7 @@ extension Home.AccountRow {
 	public struct ViewState: Equatable {
 		let name: String
 		let address: AccountAddress
+		let showFiatWorth: Bool
 		let fiatWorth: Loadable<FiatWorth>
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let isLoadingResources: Bool
@@ -44,6 +45,7 @@ extension Home.AccountRow {
 			self.name = state.account.displayName.rawValue
 			self.address = state.account.address
 			self.appearanceID = state.account.appearanceID
+			self.showFiatWorth = state.showFiatWorth
 			self.fiatWorth = state.totalFiatWorth
 			self.isLoadingResources = state.portfolio.isLoading
 
@@ -91,22 +93,24 @@ extension Home.AccountRow {
 								.truncationMode(.tail)
 								.layoutPriority(0)
 
-							Spacer()
-							loadable(
-								viewStore.fiatWorth,
-								loadingViewHeight: .medium1,
-								backgroundColor: .clear
-							) { fiatWorth in
-								if fiatWorth.worth.isUnknown || fiatWorth.worth > .zero {
-									Text(fiatWorth.currencyFormatted())
-										.lineLimit(1)
-										.textStyle(.secondaryHeader)
-										.foregroundStyle(.app.white)
+							if viewStore.showFiatWorth {
+								Spacer()
+								loadable(
+									viewStore.fiatWorth,
+									loadingViewHeight: .medium1,
+									backgroundColor: .clear
+								) { fiatWorth in
+									if fiatWorth.worth.isUnknown || fiatWorth.worth > .zero {
+										Text(fiatWorth.currencyFormatted())
+											.lineLimit(1)
+											.textStyle(.secondaryHeader)
+											.foregroundStyle(.app.white)
+									}
 								}
+								.padding(.leading, .small1)
+								.frame(maxWidth: viewStore.fiatWorth.didLoad ? nil : .huge1)
+								.layoutPriority(1)
 							}
-							.padding(.leading, .small1)
-							.frame(maxWidth: viewStore.fiatWorth.didLoad ? nil : .huge1)
-							.layoutPriority(1)
 						}
 
 						HStack {

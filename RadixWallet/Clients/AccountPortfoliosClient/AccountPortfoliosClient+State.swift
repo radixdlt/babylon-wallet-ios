@@ -19,14 +19,17 @@ extension AccountPortfoliosClient {
 
 		var selectedCurrency: FiatCurrency = .usd
 		var isCurrencyAmountVisible: Bool = true
+
+		// Useful for DEBUG mode, when we want to display proper resources fiat worth on mainnet
+		// but use random prices on testnets; as one resources from mainnet have prices.
 		var gateway: Radix.Gateway = .mainnet
 	}
 }
 
 // MARK: - Portfolio Setters/Getters
 extension AccountPortfoliosClient.State {
-	func setRadixGateway(_ gw: Radix.Gateway) {
-		self.gateway = gw
+	func setRadixGateway(_ gateway: Radix.Gateway) {
+		self.gateway = gateway
 	}
 
 	func handlePortfolioUpdate(_ portfolio: AccountPortfoliosClient.AccountPortfolio) {
@@ -52,7 +55,7 @@ extension AccountPortfoliosClient.State {
 	}
 
 	private func setOrUpdateAccountPortfolios(_ portfolios: [AccountPortfoliosClient.AccountPortfolio]) {
-		var newValue = portfoliosSubject.value.wrappedValue ?? [:]
+		var newValue: [AccountAddress: AccountPortfoliosClient.AccountPortfolio] = [:]
 		for portfolio in portfolios {
 			newValue[portfolio.account.address] = portfolio
 		}
@@ -126,7 +129,7 @@ extension AccountPortfoliosClient.State {
 			let price = {
 				#if DEBUG
 				if gateway != .mainnet {
-					if resourceAddress == mainnetXRDAddress {
+					if resourceAddress == .mainnetXRDAddress {
 						return self.tokenPrices[resourceAddress]
 					} else {
 						return self.tokenPrices.values.randomElement()
@@ -175,9 +178,6 @@ extension AccountPortfoliosClient.State {
 	}
 }
 
-// Mainnet XRD address; Price is available only on mainnet
-let mainnetXRDAddress = ResourceAddress(address: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd", decodedKind: .globalFungibleResourceManager)
-
 // MARK: Fiat Worth changes
 private extension AccountPortfoliosClient.AccountPortfolio {
 	mutating func updateFiatWorth<T>(value: T, to keyPath: WritableKeyPath<FiatWorth, T>) {
@@ -198,7 +198,7 @@ private extension AccountPortfoliosClient.AccountPortfolio {
 private extension OnLedgerEntity.OwnedFungibleResources {
 	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
 		xrdResource.mutate { resource in
-			resource.amount.fiatWorth = change(mainnetXRDAddress, resource.amount)
+			resource.amount.fiatWorth = change(.mainnetXRDAddress, resource.amount)
 		}
 
 		nonXrdResources.mutateAll { resource in
@@ -213,7 +213,7 @@ private extension MutableCollection where Element == OnLedgerEntitiesClient.Owne
 	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
 		mutateAll { detail in
 			detail.xrdResource?.redemptionValue.mutate { amount in
-				amount.fiatWorth = change(mainnetXRDAddress, amount)
+				amount.fiatWorth = change(.mainnetXRDAddress, amount)
 			}
 
 			detail.nonXrdResources.mutateAll { resource in
@@ -230,11 +230,11 @@ private extension MutableCollection where Element == OnLedgerEntitiesClient.Owne
 	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
 		mutateAll { detail in
 			detail.stakeUnitResource.mutate {
-				$0.amount.fiatWorth = change(mainnetXRDAddress, $0.amount)
+				$0.amount.fiatWorth = change(.mainnetXRDAddress, $0.amount)
 			}
 			detail.stakeClaimTokens.mutate {
 				$0.stakeClaims.mutateAll { token in
-					token.claimAmount.fiatWorth = change(mainnetXRDAddress, token.claimAmount)
+					token.claimAmount.fiatWorth = change(.mainnetXRDAddress, token.claimAmount)
 				}
 			}
 		}
