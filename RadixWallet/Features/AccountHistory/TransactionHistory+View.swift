@@ -72,7 +72,7 @@ extension TransactionHistory {
 
 								if !viewStore.filters.isEmpty {
 									ActiveFiltersView(filters: viewStore.filters) { id in
-										store.send(.view(.filterTapped(id)))
+										store.send(.view(.filterCrossTapped(id)), animation: .default)
 									}
 								}
 							}
@@ -139,13 +139,13 @@ extension TransactionHistory {
 
 	struct ActiveFiltersView: SwiftUI.View {
 		let filters: IdentifiedArrayOf<TransactionHistoryFilters.State.Filter>
-		let action: (TransactionFilter) -> Void
+		let crossAction: (TransactionFilter) -> Void
 
 		var body: some SwiftUI.View {
 			ScrollView(.horizontal) {
 				HStack {
 					ForEach(filters) { filter in
-						TransactionFilterView(filter: filter, action: action)
+						TransactionFilterView(filter: filter, action: { _ in }, crossAction: crossAction)
 					}
 
 					Spacer(minLength: 0)

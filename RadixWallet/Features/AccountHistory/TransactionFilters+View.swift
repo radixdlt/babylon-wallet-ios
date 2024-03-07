@@ -173,6 +173,7 @@ extension TransactionHistoryFilters {
 struct TransactionFilterView: SwiftUI.View {
 	let filter: TransactionHistoryFilters.State.Filter
 	let action: (TransactionFilter) -> Void
+	var crossAction: ((TransactionFilter) -> Void)? = nil
 
 	var body: some SwiftUI.View {
 		Button {
@@ -192,13 +193,30 @@ struct TransactionFilterView: SwiftUI.View {
 			.padding(.horizontal, .medium3)
 		}
 		.contentShape(Capsule())
+		.disabled(showCross)
+		.padding(.trailing, showCross ? .medium1 : 0)
 		.background {
 			ZStack {
 				Capsule().fill(filter.isActive ? .app.gray1 : .app.white)
 				Capsule().stroke(filter.isActive ? .clear : .app.gray3)
 			}
 		}
+		.overlay(alignment: .trailing) {
+			if showCross, let crossAction {
+				Button(asset: AssetResource.close) {
+					crossAction(filter.id)
+				}
+				.tint(.app.gray3)
+				.padding(.vertical, -.small3)
+				.padding(.trailing, .small2)
+				.transition(.scale.combined(with: .opacity))
+			}
+		}
 		.animation(.default.speed(2), value: filter.isActive)
+	}
+
+	private var showCross: Bool {
+		crossAction != nil && filter.isActive
 	}
 
 	private var textColor: Color {
@@ -207,7 +225,7 @@ struct TransactionFilterView: SwiftUI.View {
 
 	struct Dummy: SwiftUI.View {
 		var body: some SwiftUI.View {
-			Text("DUMMY")
+			Text("ABC")
 				.textStyle(.body1HighImportance)
 				.padding(.vertical, .small2)
 		}
