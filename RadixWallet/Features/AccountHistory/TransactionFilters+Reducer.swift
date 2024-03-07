@@ -43,11 +43,16 @@ public struct TransactionHistoryFilters: Sendable, FeatureReducer {
 
 	public enum ViewAction: Equatable, Sendable {
 		case filterTapped(TransactionFilter)
+		case clearTapped
+		case showResultsTapped
+		case closeTapped
 	}
 
 	public enum DelegateAction: Equatable, Sendable {
 		case updateActiveFilters(IdentifiedArrayOf<State.Filter>)
 	}
+
+	@Dependency(\.dismiss) var dismiss
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -58,6 +63,17 @@ public struct TransactionHistoryFilters: Sendable, FeatureReducer {
 			}
 			state.setActive(!filter.isActive, filter: id)
 			return activeFiltersChanged(state: state)
+
+		case .clearTapped:
+			for id in state.filters.all.ids {
+				state.setActive(false, filter: id)
+			}
+			return .none
+
+		case .showResultsTapped, .closeTapped:
+			return .run { _ in
+				await dismiss()
+			}
 		}
 	}
 

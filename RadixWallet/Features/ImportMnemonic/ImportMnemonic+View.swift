@@ -166,7 +166,7 @@ extension ImportMnemonic {
 							Button(viewStore.modeButtonTitle) {
 								viewStore.send(.toggleModeButtonTapped)
 							}
-							.buttonStyle(.blue)
+							.buttonStyle(.blueText)
 							.frame(height: .large1)
 							.padding(.bottom, .medium1)
 						}

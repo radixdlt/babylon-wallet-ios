@@ -14,32 +14,68 @@ extension TransactionHistoryFilters {
 		}
 
 		public var body: some SwiftUI.View {
-			ScrollView {
-				WithViewStore(store, observe: \.filters, send: { .view($0) }) { viewStore in
-					VStack {
-						SubSection(filters: viewStore.transferTypes, flexible: false, store: store)
+			NavigationStack {
+				ScrollView {
+					WithViewStore(store, observe: \.filters, send: { .view($0) }) { viewStore in
+						VStack(spacing: .medium3) {
+							SubSection(filters: viewStore.transferTypes, store: store)
 
-						if viewStore.showAssetsSection {
-							Section("Type of asset") {
-								SubSection("Tokens", filters: viewStore.fungibles, store: store)
+							Divider()
 
-								SubSection("NFTs", filters: viewStore.nonFungibles, store: store)
+							if viewStore.showAssetsSection {
+								Section("Type of asset") { // FIXME: Strings
+									SubSection("Tokens", filters: viewStore.fungibles, flexible: tokenLabels, store: store)
+
+									Divider()
+
+									SubSection("NFTs", filters: viewStore.nonFungibles, flexible: nftLabels, store: store)
+								}
+
+								Divider()
 							}
-						}
 
-						Section("Type of transaction") {
-							SubSection(filters: viewStore.transactionTypes, store: store)
-						}
+							Section("Type of transaction") {
+								SubSection(filters: viewStore.transactionTypes, store: store)
+							}
 
-						Spacer(minLength: 0)
+							Divider()
+
+							Spacer(minLength: 0)
+						}
+						.padding(.horizontal, .medium1)
 					}
-					.padding(.horizontal, .medium1)
+				}
+				.footer {
+					Button("Show results") {
+						store.send(.view(.showResultsTapped))
+					}
+					.buttonStyle(.primaryRectangular(shouldExpand: true))
+				}
+				.toolbar {
+					ToolbarItem(placement: .topBarLeading) {
+						CloseButton {
+							store.send(.view(.closeTapped))
+						}
+					}
+					ToolbarItem(placement: .topBarTrailing) {
+						Button("Clear all") { // FIXME: Strings
+							store.send(.view(.clearTapped))
+						}
+					}
 				}
 			}
 		}
 
+		private var tokenLabels: SubSection.FlexibleLabels {
+			.init(showAll: "Show all tokens", showLess: "Show fewer tokens")
+		}
+
+		private var nftLabels: SubSection.FlexibleLabels {
+			.init(showAll: "Show all NFTs", showLess: "Show fewer NFTs")
+		}
+
 		struct Section<Content: SwiftUI.View>: SwiftUI.View {
-			@SwiftUI.State private var expanded: Bool = true
+			@SwiftUI.State private var expanded: Bool = false
 			let name: String
 			let content: Content
 
@@ -66,10 +102,11 @@ extension TransactionHistoryFilters {
 							Image(expanded ? .chevronUp : .chevronDown)
 						}
 					}
-					.background(.app.gray5)
+					.background(.app.white)
 
 					if expanded {
 						content
+							.padding(.top, .medium3)
 					}
 				}
 				.clipped()
@@ -77,12 +114,18 @@ extension TransactionHistoryFilters {
 		}
 
 		struct SubSection: SwiftUI.View {
+			struct FlexibleLabels: Equatable {
+				let showAll: String
+				let showLess: String
+			}
+
+			@SwiftUI.State private var showsAll: Bool = false
 			let heading: String?
 			let filters: IdentifiedArrayOf<State.Filter>
-			let flexible: Bool
+			let flexible: FlexibleLabels?
 			let store: StoreOf<TransactionHistoryFilters>
 
-			init(_ heading: String? = nil, filters: IdentifiedArrayOf<State.Filter>, flexible: Bool = true, store: StoreOf<TransactionHistoryFilters>) {
+			init(_ heading: String? = nil, filters: IdentifiedArrayOf<State.Filter>, flexible: FlexibleLabels? = nil, store: StoreOf<TransactionHistoryFilters>) {
 				self.heading = heading
 				self.filters = filters
 				self.flexible = flexible
@@ -91,11 +134,13 @@ extension TransactionHistoryFilters {
 
 			var body: some SwiftUI.View {
 				if !filters.isEmpty {
-					VStack {
+					VStack(spacing: .zero) {
 						if let heading {
 							Text(heading)
 								.textStyle(.body1HighImportance)
 								.foregroundStyle(.app.gray2)
+								.flushedLeft
+								.padding(.bottom, .medium3)
 						}
 
 						HStack(spacing: .zero) {
@@ -108,6 +153,14 @@ extension TransactionHistoryFilters {
 							}
 
 							Spacer(minLength: 0)
+						}
+
+						if let flexible {
+							Button(showsAll ? "- \(flexible.showLess)" : "+ \(flexible.showAll)") {
+								showsAll.toggle()
+							}
+							.buttonStyle(.blueText)
+							.padding(.top, .medium3)
 						}
 					}
 				}
@@ -154,7 +207,7 @@ struct TransactionFilterView: SwiftUI.View {
 
 	struct Dummy: SwiftUI.View {
 		var body: some SwiftUI.View {
-			Text("ABC")
+			Text("DUMMY")
 				.textStyle(.body1HighImportance)
 				.padding(.vertical, .small2)
 		}
