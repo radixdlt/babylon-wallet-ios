@@ -485,6 +485,7 @@ extension ResourceBalanceView {
 						.textStyle(.body2Regular)
 						.foregroundColor(.app.gray2)
 						.lineLimit(2)
+						.lineSpacing(-.small2)
 				}
 			}
 		}
