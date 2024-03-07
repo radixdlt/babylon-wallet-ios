@@ -19,6 +19,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		var sections: IdentifiedArrayOf<TransactionSection> = []
 		var loadedPeriods: Set<Date> = []
 
+		var isLoading: Bool = false
+
 		@PresentationState
 		public var destination: Destination.State?
 
@@ -114,6 +116,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .updateHistory(updateHistory):
 			state.updateHistory(updateHistory)
+			state.isLoading = false
 			return .none
 		}
 	}
@@ -136,6 +139,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	// Helper methods
 
 	func loadSelectedPeriod(state: inout State) -> Effect<Action> {
+		state.isLoading = true
 		guard let range = state.periods.first(where: { $0.id == state.selectedPeriod })?.range.clamped else {
 			return .none
 		}

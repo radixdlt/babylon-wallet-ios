@@ -1,6 +1,12 @@
 import ComposableArchitecture
 import SwiftUI
 
+extension TransactionHistory.State {
+	var showEmptyState: Bool {
+		sections.isEmpty && !isLoading
+	}
+}
+
 // MARK: - TransactionHistory.View
 extension TransactionHistory {
 	@MainActor
@@ -43,6 +49,13 @@ extension TransactionHistory {
 						}
 						.scrollIndicators(.never)
 						.coordinateSpace(name: View.coordSpace)
+					}
+					.background {
+						if viewStore.showEmptyState {
+							Text("You have no transactions") // FIXME: Strings
+								.textStyle(.sectionHeader)
+								.foregroundStyle(.app.gray2)
+						}
 					}
 					.background(.app.gray5)
 					.overlayPreferenceValue(PositionsPreferenceKey.self, alignment: .top) { positions in
