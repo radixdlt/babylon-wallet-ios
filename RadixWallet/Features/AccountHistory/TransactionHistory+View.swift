@@ -185,6 +185,12 @@ private extension View {
 	}
 }
 
+extension TransactionHistoryItem {
+	var isEmpty: Bool {
+		manifestClass != .accountDepositSettingsUpdate && deposits.isEmpty && withdrawals.isEmpty
+	}
+}
+
 // MARK: - TransactionHistory.TransactionView
 extension TransactionHistory {
 	struct TransactionView: SwiftUI.View {
@@ -203,18 +209,24 @@ extension TransactionHistory {
 					}
 
 					VStack(spacing: .small1) {
-						if !transaction.withdrawals.isEmpty {
-							let resources = transaction.withdrawals.map(\.viewState)
-							TransfersActionView(type: .withdrawal, resources: resources)
-						}
+						if transaction.failed {
+							FailedTransactionView()
+						} else if transaction.isEmpty {
+							EmptyTransactionView()
+						} else {
+							if !transaction.withdrawals.isEmpty {
+								let resources = transaction.withdrawals.map(\.viewState)
+								TransfersActionView(type: .withdrawal, resources: resources)
+							}
 
-						if !transaction.deposits.isEmpty {
-							let resources = transaction.deposits.map(\.viewState)
-							TransfersActionView(type: .deposit, resources: resources)
-						}
+							if !transaction.deposits.isEmpty {
+								let resources = transaction.deposits.map(\.viewState)
+								TransfersActionView(type: .deposit, resources: resources)
+							}
 
-						if transaction.depositSettingsUpdated {
-							DepositSettingsActionView()
+							if transaction.depositSettingsUpdated {
+								DepositSettingsActionView()
+							}
 						}
 					}
 					.overlay(alignment: .topTrailing) {
@@ -319,6 +331,45 @@ extension TransactionHistory {
 			}
 		}
 
+		struct FailedTransactionView: SwiftUI.View {
+			var body: some SwiftUI.View {
+				VStack {
+					EventHeader.Dummy()
+
+					HStack(spacing: .small2) {
+						Image(.warningError)
+							.resizable()
+							.frame(.smallest)
+							.tint(.app.notification)
+
+						Text("Failed Transaction") // FIXME: Strings
+							.textStyle(.body2HighImportance)
+							.foregroundColor(.app.notification)
+
+						Spacer(minLength: 0)
+					}
+					.padding(.horizontal, .small1)
+					.padding(.vertical, .medium3)
+					.roundedCorners(strokeColor: .app.gray3)
+				}
+			}
+		}
+
+		struct EmptyTransactionView: SwiftUI.View {
+			var body: some SwiftUI.View {
+				VStack {
+					EventHeader.Dummy()
+
+					Text("No deposits or withdrawals from this account in this transaction.") // FIXME: Strings
+						.textStyle(.body2HighImportance)
+						.foregroundColor(.app.gray1)
+						.flushedLeft
+						.padding(.small1)
+						.roundedCorners(strokeColor: .app.gray3)
+				}
+			}
+		}
+
 		struct EventHeader: SwiftUI.View {
 			let event: Event
 
@@ -364,6 +415,14 @@ extension TransactionHistory {
 					.app.green1
 				case .withdrawal, .depositSettings:
 					.app.gray1
+				}
+			}
+
+			struct Dummy: SwiftUI.View {
+				var body: some SwiftUI.View {
+					Text("DUMMY")
+						.textStyle(.body2Header)
+						.foregroundColor(.clear)
 				}
 			}
 		}

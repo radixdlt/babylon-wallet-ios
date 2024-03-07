@@ -9,28 +9,20 @@ extension TransactionHistoryClient {
 
 		@Sendable
 		func getTransactionHistory(_ request: TransactionHistoryRequest) async throws -> TransactionHistoryResponse {
-			let networkID = try request.account.networkID()
-
-			var account = request.account
-			if networkID == .mainnet {
-				// FIXME: GK REMOVE THIS
-				account = try AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l")
-			}
-
 			let response = try await gatewayAPIClient.streamTransactions(request.gatewayRequest)
+			let account = request.account
+			let networkID = try account.networkID()
 
 			// Pre-loading the details for all the resources involved
 
-			// an LSU: resource_rdx1nfuz9wd3laurnsveh32wuurh0c2t8ceg8hgvdkzl22ex9gqk9cqd2p
-
 			print("• RESPONSE: \(request.period.lowerBound.formatted(date: .abbreviated, time: .omitted)) -> \(request.period.upperBound.formatted(date: .abbreviated, time: .omitted)) \(response.items.count) •••••••••••••••••••••••")
 
-			let resourceAddresses_ = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
 			let resourceAddresses = request.allResources
+			let resourceAddresses_ = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
 
 			print("•• RESPONSE RES: \(resourceAddresses.count) \(resourceAddresses_.count)")
 
-			let resourceDetails = try await onLedgerEntitiesClient.getResources(resourceAddresses)
+			let resourceDetails = try await onLedgerEntitiesClient.getResources(resourceAddresses_)
 			let keyedResources = IdentifiedArray(uniqueElements: resourceDetails)
 
 			for red in keyedResources {
@@ -82,8 +74,14 @@ extension TransactionHistoryClient {
 					struct CorruptTimestamp: Error { let roundTimestamd: String }
 					throw CorruptTimestamp(roundTimestamd: info.roundTimestamp)
 				}
-				let message = info.message?.plaintext?.content.string
+
 				let manifestClass = info.manifestClasses?.first
+
+				guard info.receipt?.status == .committedSuccess else {
+					return .failed(at: time, manifestClass: manifestClass)
+				}
+
+				let message = info.message?.plaintext?.content.string
 
 				var withdrawals: [ResourceBalance] = []
 				var deposits: [ResourceBalance] = []
@@ -156,6 +154,7 @@ extension TransactionHistoryClient {
 
 				withdrawals.sort(by: >)
 				deposits.sort(by: >)
+				let depositSettingsUpdated = info.manifestClasses?.contains(.accountDepositSettingsUpdate) == true
 
 				print("••• \(time.formatted(date: .abbreviated, time: .shortened)) \(info.manifestClasses?.first?.rawValue ?? "---") N: \(nn) \(n), F: \(ff) \(f)  W: \(ww) \(withdrawals.count), D: \(dd) \(deposits.count)")
 
@@ -165,7 +164,8 @@ extension TransactionHistoryClient {
 					manifestClass: manifestClass,
 					withdrawals: withdrawals,
 					deposits: deposits,
-					depositSettingsUpdated: info.manifestClasses?.contains(.accountDepositSettingsUpdate) == true
+					depositSettingsUpdated: depositSettingsUpdated,
+					failed: false
 				)
 			}
 
