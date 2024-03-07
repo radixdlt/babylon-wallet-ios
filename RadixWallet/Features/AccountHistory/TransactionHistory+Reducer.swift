@@ -88,7 +88,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onAppear:
-			print("••••• onAppear")
 			return loadSelectedPeriod(state: &state)
 		case let .selectedPeriod(period):
 			state.selectedPeriod = period
@@ -143,9 +142,11 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		print("••••• loadSelectedPeriod")
 
+		let mockAccount = state.account.networkID == .mainnet ? try! AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l") : nil
+
 		return .run { [account = state.account.address, allResources = state.allResourceAddresses, filters = state.activeFilters] send in
 			let request = TransactionHistoryRequest(
-				account: account,
+				account: mockAccount ?? account,
 				period: range,
 				filters: filters,
 				allResources: allResources,

@@ -12,7 +12,7 @@ extension TransactionHistoryClient {
 
 // MARK: - TransactionHistoryRequest
 public struct TransactionHistoryRequest: Sendable, Hashable {
-	public let account: AccountAddress
+	public var account: AccountAddress
 	public let period: Range<Date>
 	public let filters: [TransactionFilter]
 	public let allResources: Set<ResourceAddress>
@@ -35,6 +35,19 @@ public struct TransactionHistoryItem: Sendable, Hashable {
 	let withdrawals: [ResourceBalance]
 	let deposits: [ResourceBalance]
 	let depositSettingsUpdated: Bool
+	let failed: Bool
+
+	static func failed(at time: Date, manifestClass: GatewayAPI.ManifestClass?) -> Self {
+		.init(
+			time: time,
+			message: nil,
+			manifestClass: manifestClass,
+			withdrawals: [],
+			deposits: [],
+			depositSettingsUpdated: false,
+			failed: true
+		)
+	}
 }
 
 // MARK: - TransactionFilter
