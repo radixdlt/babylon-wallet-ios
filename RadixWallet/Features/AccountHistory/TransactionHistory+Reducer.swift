@@ -45,7 +45,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case onAppear
 		case selectedPeriod(DateRangeItem.ID)
 		case filtersTapped
-		case filterTapped(TransactionFilter)
+		case filterCrossTapped(TransactionFilter)
 		case closeTapped
 	}
 
@@ -103,8 +103,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			state.destination = .filters(.init(assets: allResources, activeFilters: state.activeFilters))
 			return .none
 
-		case let .filterTapped(id):
-			state.filters[id: id]?.isActive.toggle()
+		case let .filterCrossTapped(id):
+			state.filters.remove(id: id)
 			return loadSelectedPeriod(state: &state)
 
 		case .closeTapped:
