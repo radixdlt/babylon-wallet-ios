@@ -88,6 +88,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onAppear:
+			print("••••• onAppear")
 			return loadSelectedPeriod(state: &state)
 		case let .selectedPeriod(period):
 			state.selectedPeriod = period
@@ -129,7 +130,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		loadSelectedPeriod(state: &state)
+		print("••••• reduceDismissedDestination"); return
+			loadSelectedPeriod(state: &state)
 	}
 
 	// Helper methods
@@ -138,6 +140,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		guard let range = state.periods.first(where: { $0.id == state.selectedPeriod })?.range.clamped else {
 			return .none
 		}
+
+		print("••••• loadSelectedPeriod")
 
 		return .run { [account = state.account.address, allResources = state.allResourceAddresses, filters = state.activeFilters] send in
 			let request = TransactionHistoryRequest(
@@ -149,6 +153,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 				cursor: nil
 			)
 			let response = try await transactionHistoryClient.getTransactionHistory(request)
+			print("••••• got response")
 			await send(.internal(.updateHistory(response)))
 		}
 	}

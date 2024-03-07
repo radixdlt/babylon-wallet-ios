@@ -80,7 +80,6 @@ extension TransactionHistory {
 							Button(asset: AssetResource.transactionHistoryFilterList) {
 								store.send(.view(.filtersTapped))
 							}
-							.disabled(viewStore.allResources == nil)
 						}
 					}
 				}
