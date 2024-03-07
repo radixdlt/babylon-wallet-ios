@@ -800,7 +800,7 @@
 		48CFC5A32ADC10DA00E77A5C /* TrailingIconLabelStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC0F52ADC10D900E77A5C /* TrailingIconLabelStyle.swift */; };
 		48CFC5A42ADC10DA00E77A5C /* PrimaryTextButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC0F62ADC10D900E77A5C /* PrimaryTextButtonStyle.swift */; };
 		48CFC5A52ADC10DA00E77A5C /* TappableRowStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC0F72ADC10D900E77A5C /* TappableRowStyle.swift */; };
-		48CFC5A62ADC10DA00E77A5C /* BlueButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC0F82ADC10D900E77A5C /* BlueButtonStyle.swift */; };
+		48CFC5A62ADC10DA00E77A5C /* BlueTextButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC0F82ADC10D900E77A5C /* BlueTextButtonStyle.swift */; };
 		48CFC5A72ADC10DA00E77A5C /* InfoButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC0F92ADC10D900E77A5C /* InfoButtonStyle.swift */; };
 		48CFC5A82ADC10DA00E77A5C /* URLButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC0FA2ADC10D900E77A5C /* URLButtonStyle.swift */; };
 		48CFC5A92ADC10DA00E77A5C /* SecondaryRectangularButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC0FB2ADC10D900E77A5C /* SecondaryRectangularButtonStyle.swift */; };
@@ -2112,7 +2112,7 @@
 		48CFC0F52ADC10D900E77A5C /* TrailingIconLabelStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrailingIconLabelStyle.swift; sourceTree = "<group>"; };
 		48CFC0F62ADC10D900E77A5C /* PrimaryTextButtonStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrimaryTextButtonStyle.swift; sourceTree = "<group>"; };
 		48CFC0F72ADC10D900E77A5C /* TappableRowStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TappableRowStyle.swift; sourceTree = "<group>"; };
-		48CFC0F82ADC10D900E77A5C /* BlueButtonStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlueButtonStyle.swift; sourceTree = "<group>"; };
+		48CFC0F82ADC10D900E77A5C /* BlueTextButtonStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlueTextButtonStyle.swift; sourceTree = "<group>"; };
 		48CFC0F92ADC10D900E77A5C /* InfoButtonStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InfoButtonStyle.swift; sourceTree = "<group>"; };
 		48CFC0FA2ADC10D900E77A5C /* URLButtonStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLButtonStyle.swift; sourceTree = "<group>"; };
 		48CFC0FB2ADC10D900E77A5C /* SecondaryRectangularButtonStyle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecondaryRectangularButtonStyle.swift; sourceTree = "<group>"; };
@@ -5787,7 +5787,7 @@
 				48CFC0F52ADC10D900E77A5C /* TrailingIconLabelStyle.swift */,
 				48CFC0F62ADC10D900E77A5C /* PrimaryTextButtonStyle.swift */,
 				48CFC0F72ADC10D900E77A5C /* TappableRowStyle.swift */,
-				48CFC0F82ADC10D900E77A5C /* BlueButtonStyle.swift */,
+				48CFC0F82ADC10D900E77A5C /* BlueTextButtonStyle.swift */,
 				48CFC0F92ADC10D900E77A5C /* InfoButtonStyle.swift */,
 				48CFC0FA2ADC10D900E77A5C /* URLButtonStyle.swift */,
 				48CFC0FB2ADC10D900E77A5C /* SecondaryRectangularButtonStyle.swift */,
@@ -8796,7 +8796,7 @@
 				48CFC59A2ADC10DA00E77A5C /* HitTargetSize.swift in Sources */,
 				48CFC68A2ADC10DB00E77A5C /* AppPreferences+Display.swift in Sources */,
 				48CFC2C12ADC10D900E77A5C /* AssetTransfer+Reducer.swift in Sources */,
-				48CFC5A62ADC10DA00E77A5C /* BlueButtonStyle.swift in Sources */,
+				48CFC5A62ADC10DA00E77A5C /* BlueTextButtonStyle.swift in Sources */,
 				48CFC6332ADC10DB00E77A5C /* UnsecuredEntityControl.swift in Sources */,
 				48CFC4D32ADC10DA00E77A5C /* StreamTransactionsRequest.swift in Sources */,
 				48CFC64D2ADC10DB00E77A5C /* PersonaData+PostalAddress.swift in Sources */,

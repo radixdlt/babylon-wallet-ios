@@ -108,7 +108,7 @@ extension AccountDetails {
 			Button(L10n.Account.transfer, asset: AssetResource.transfer) {
 				store.send(.view(.transferButtonTapped))
 			}
-			.headerButtonStyle
+			.buttonStyle(.header)
 		}
 
 		func historyButton(enabled: Bool) -> some SwiftUI.View {
@@ -120,21 +120,30 @@ extension AccountDetails {
 				}
 				.opacity(enabled ? 1 : 0.5)
 			}
-			.headerButtonStyle
+			.buttonStyle(.header)
 			.disabled(!enabled)
 		}
 	}
 }
 
-private extension Button {
-	var headerButtonStyle: some View {
-		textStyle(.body1Header)
+// MARK: - HeaderButtonStyle
+
+extension ButtonStyle where Self == HeaderButtonStyle {
+	public static var header: HeaderButtonStyle { .init() }
+}
+
+// MARK: - HeaderButtonStyle
+public struct HeaderButtonStyle: ButtonStyle {
+	public func makeBody(configuration: ButtonStyle.Configuration) -> some View {
+		configuration.label
+			.textStyle(.body1Header)
 			.foregroundColor(.app.white)
 			.padding(.horizontal, .large2)
 			.frame(height: .standardButtonHeight)
 			.background(.app.whiteTransparent3)
 			.cornerRadius(.standardButtonHeight / 2)
 			.padding(.bottom, .medium1)
+			.opacity(configuration.isPressed ? 0.4 : 1)
 	}
 }
 

@@ -78,26 +78,3 @@ public enum TransactionFilter: Hashable, Sendable {
 		return transactionType
 	}
 }
-
-// extension TransactionHistoryClient {
-//	@Sendable
-//	func getTransactionHistory(
-//		account: AccountAddress,
-//		allResourceAddresses: Set<ResourceAddress>,
-//		period: Range<Date>,
-//		filters: [TransactionFilter],
-//		ascending: Bool,
-//		cursor: String?
-//	) async throws -> TransactionHistoryResponse {
-//		getTransactionHistory(
-//			.init(
-//				account: <#T##AccountAddress#>,
-//				period: <#T##Range<Date>#>,
-//				filters: <#T##[TransactionFilter]#>,
-//				allResources: <#T##Set<ResourceAddress>#>,
-//				ascending: <#T##Bool#>,
-//				cursor: <#T##String?#>
-//			)
-//		)
-//	}
-// }
