@@ -3,12 +3,12 @@ public struct FlowLayout: Layout {
 	public let alignment: VerticalAlignment
 	public let spacing: CGSize
 
-	public init(alignment: VerticalAlignment = .center, spacing: CGFloat = 10) {
+	public init(alignment: VerticalAlignment = .center, spacing: CGFloat = 10, rowLimit: Int? = nil) {
 		self.alignment = alignment
 		self.spacing = .init(width: spacing, height: spacing)
 	}
 
-	public init(alignment: VerticalAlignment = .center, spacing: CGSize) {
+	public init(alignment: VerticalAlignment = .center, spacing: CGSize, rowLimit: Int? = nil) {
 		self.alignment = alignment
 		self.spacing = spacing
 	}
