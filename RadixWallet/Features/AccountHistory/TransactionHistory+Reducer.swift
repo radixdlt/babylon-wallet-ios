@@ -144,8 +144,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			return .none
 		}
 
-		print("••••• loadSelectedPeriod")
-
 		let mockAccount = state.account.networkID == .mainnet ? try! AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l") : nil
 
 		return .run { [account = state.account.address, allResources = state.allResourceAddresses, filters = state.activeFilters] send in
@@ -158,7 +156,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 				cursor: nil
 			)
 			let response = try await transactionHistoryClient.getTransactionHistory(request)
-			print("••••• got response")
 			await send(.internal(.updateHistory(response)))
 		}
 	}
