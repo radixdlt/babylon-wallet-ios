@@ -12,15 +12,13 @@ extension TransactionHistoryClient {
 			let response = try await gatewayAPIClient.streamTransactions(request.gatewayRequest)
 			let account = request.account
 			let networkID = try account.networkID()
-
-			// Pre-loading the details for all the resources involved
+			let resourceAddresses = request.allResources
 
 			print("• RESPONSE: \(request.period.lowerBound.formatted(date: .abbreviated, time: .omitted)) -> \(request.period.upperBound.formatted(date: .abbreviated, time: .omitted)) \(response.items.count) •••••••••••••••••••••••")
-
-			let resourceAddresses = request.allResources
 			let resourceAddresses_ = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
-
 			print("•• RESPONSE RES: \(resourceAddresses.count) \(resourceAddresses_.count)")
+
+			// Pre-loading the details for all the resources involved
 
 			let resourceDetails = try await onLedgerEntitiesClient.getResources(resourceAddresses_)
 			let keyedResources = IdentifiedArray(uniqueElements: resourceDetails)
@@ -152,8 +150,14 @@ extension TransactionHistoryClient {
 					}
 				}
 
-				withdrawals.sort(by: >)
-				deposits.sort(by: >)
+				if request.ascending {
+					withdrawals.sort()
+					deposits.sort()
+				} else {
+					withdrawals.sort(by: >)
+					deposits.sort(by: >)
+				}
+
 				let depositSettingsUpdated = info.manifestClasses?.contains(.accountDepositSettingsUpdate) == true
 
 				print("••• \(time.formatted(date: .abbreviated, time: .shortened)) \(info.manifestClasses?.first?.rawValue ?? "---") N: \(nn) \(n), F: \(ff) \(f)  W: \(ww) \(withdrawals.count), D: \(dd) \(deposits.count)")
