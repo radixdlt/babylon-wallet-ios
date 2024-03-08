@@ -84,49 +84,15 @@ extension TransactionHistoryClient {
 				var withdrawals: [ResourceBalance] = []
 				var deposits: [ResourceBalance] = []
 
-				var ww = 0
-				var dd = 0
-
-				var nn = 0
-				var ff = 0
-
-				var n = 0
-				var f = 0
-
 				if let changes = info.balanceChanges {
-					nn = changes.nonFungibleBalanceChanges.count
-					n = changes.nonFungibleBalanceChanges.filter { $0.entityAddress == account.address }.count
-					ff = changes.fungibleBalanceChanges.count
-					f = changes.fungibleBalanceChanges.filter { $0.entityAddress == account.address }.count
-
-					for nonFungible in changes.nonFungibleBalanceChanges {
-						ww += try await nonFungibleResources(.removed, changes: nonFungible).count
-						dd += try await nonFungibleResources(.added, changes: nonFungible).count
-						guard nonFungible.entityAddress == account.address else { continue }
-
-//					for nonFungible in changes.nonFungibleBalanceChanges where nonFungible.entityAddress == account.address {
+					for nonFungible in changes.nonFungibleBalanceChanges where nonFungible.entityAddress == account.address {
 						let withdrawn = try await nonFungibleResources(.removed, changes: nonFungible)
 						withdrawals.append(contentsOf: withdrawn)
 						let deposited = try await nonFungibleResources(.added, changes: nonFungible)
 						deposits.append(contentsOf: deposited)
-
-						for w in withdrawn {
-							print(" ••  \(w.resource.metadata.title) \(w.resource.id.address)")
-						}
 					}
 
-					for fungible in changes.fungibleBalanceChanges {
-						let amount_ = try RETDecimal(value: fungible.balanceChange)
-						if amount_.isPositive() {
-							dd += 1
-						} else if amount_.isNegative() {
-							ww += 1
-						}
-
-						guard fungible.entityAddress == account.address else { continue }
-
-//					for fungible in changes.fungibleBalanceChanges where fungible.entityAddress == account.address {
-
+					for fungible in changes.fungibleBalanceChanges where fungible.entityAddress == account.address {
 						let resourceAddress = try ResourceAddress(validatingAddress: fungible.resourceAddress)
 						guard let baseResource = keyedResources[id: resourceAddress] else {
 							throw ProgrammerError()
@@ -150,17 +116,10 @@ extension TransactionHistoryClient {
 					}
 				}
 
-				if request.ascending {
-					withdrawals.sort()
-					deposits.sort()
-				} else {
-					withdrawals.sort(by: >)
-					deposits.sort(by: >)
-				}
+				withdrawals.sort()
+				deposits.sort()
 
 				let depositSettingsUpdated = info.manifestClasses?.contains(.accountDepositSettingsUpdate) == true
-
-				print("••• \(time.formatted(date: .abbreviated, time: .shortened)) \(info.manifestClasses?.first?.rawValue ?? "---") N: \(nn) \(n), F: \(ff) \(f)  W: \(ww) \(withdrawals.count), D: \(dd) \(deposits.count)")
 
 				return .init(
 					time: time,
@@ -180,7 +139,14 @@ extension TransactionHistoryClient {
 				items.append(transactionItem)
 			}
 
-			return .init(cursor: response.nextCursor, allResources: keyedResources, items: items)
+			let items_ = try await response.items.parallelMap(transaction(for:))
+
+			// We filter out complex resources, i.e. Stake Claim NFTs, Pool Units and LSUs
+			let simpleResources = keyedResources.filter {
+				$0.metadata.validator == nil && $0.metadata.poolUnit == nil
+			}
+
+			return .init(cursor: response.nextCursor, allResources: simpleResources, items: items)
 
 //			return try await .init(
 //				cursor: response.nextCursor,
@@ -188,34 +154,6 @@ extension TransactionHistoryClient {
 //			)
 		}
 
-		/*
-		 public private(set) var stateVersion: Int64
-		 public private(set) var epoch: Int64
-		 public private(set) var round: Int64
-		 public private(set) var roundTimestamp: String
-		 public private(set) var transactionStatus: TransactionStatus
-		 /** Bech32m-encoded hash. */
-		 public private(set) var payloadHash: String?
-		 /** Bech32m-encoded hash. */
-		 public private(set) var intentHash: String?
-		 /** String-encoded decimal representing the amount of a related fungible resource. */
-		 public private(set) var feePaid: String?
-		 public private(set) var affectedGlobalEntities: [String]?
-		 public private(set) var confirmedAt: Date?
-		 public private(set) var errorMessage: String?
-		 /** Hex-encoded binary blob. */
-		 public private(set) var rawHex: String?
-		 public private(set) var receipt: TransactionReceipt?
-		 /** A text-representation of a transaction manifest. This field will be present only for user transactions
-		  and when explicitly opted-in using `manifest_instructions` flag.  */
-		 public private(set) var manifestInstructions: String?
-		 /** A collection of zero or more manifest classes ordered from the most specific class to the least specific one.
-		  This field will be present only for user transactions.  */
-		 public private(set) var manifestClasses: [ManifestClass]?
-		 public private(set) var message: CoreAPI.TransactionMessage?
-		 public private(set) var balanceChanges: TransactionBalanceChanges?
-
-		 */
 		return TransactionHistoryClient(
 			getTransactionHistory: getTransactionHistory
 		)
