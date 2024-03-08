@@ -478,16 +478,15 @@ extension ResourceBalanceView {
 					Text(caption1)
 						.textStyle(titleTextStyle)
 						.foregroundColor(.app.gray1)
-						.lineLimit(1)
 				}
 				if let caption2 {
 					Text(caption2)
 						.textStyle(.body2Regular)
 						.foregroundColor(.app.gray2)
-						.lineLimit(2)
-						.lineSpacing(-.small2)
 				}
 			}
+			.lineLimit(1)
+			.truncationMode(.tail)
 		}
 
 		private var size: HitTargetSize {
