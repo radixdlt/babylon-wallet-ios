@@ -540,3 +540,40 @@ extension TransactionHistory.State.TransactionSection {
 		day.formatted(date: .abbreviated, time: .omitted)
 	}
 }
+
+extension View {
+	public func measureSize(_ id: AnyHashable) -> some View {
+		background {
+			GeometryReader { proxy in
+				Color.clear
+					.preference(key: PositionsPreferenceKey.self, value: [id: proxy.frame(in: .local)])
+			}
+		}
+	}
+
+	public func readSize(_ id: AnyHashable, content: @escaping (CGSize) -> some View) -> some View {
+		overlayPreferenceValue(PositionsPreferenceKey.self, alignment: .top) { positions in
+			if let size = positions[id]?.size {
+				content(size)
+			} else {
+				EmptyView()
+			}
+		}
+	}
+
+	public func onReadSize(_ id: AnyHashable, content: @escaping (CGSize) -> Void) -> some View {
+		onPreferenceChange(PositionsPreferenceKey.self) { positions in
+			if let size = positions[id]?.size {
+				content(size)
+			}
+		}
+	}
+
+	public func onReadSizes(_ id1: AnyHashable, _ id2: AnyHashable, content: @escaping (CGSize, CGSize) -> Void) -> some View {
+		onPreferenceChange(PositionsPreferenceKey.self) { positions in
+			if let size1 = positions[id1]?.size, let size2 = positions[id2]?.size {
+				content(size1, size2)
+			}
+		}
+	}
+}
