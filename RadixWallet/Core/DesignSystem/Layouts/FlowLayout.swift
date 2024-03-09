@@ -3,12 +3,12 @@ public struct FlowLayout: Layout {
 	public let alignment: VerticalAlignment
 	public let spacing: CGSize
 
-	public init(alignment: VerticalAlignment = .center, spacing: CGFloat = 10, rowLimit: Int? = nil) {
+	public init(alignment: VerticalAlignment = .center, spacing: CGFloat = 10) {
 		self.alignment = alignment
 		self.spacing = .init(width: spacing, height: spacing)
 	}
 
-	public init(alignment: VerticalAlignment = .center, spacing: CGSize, rowLimit: Int? = nil) {
+	public init(alignment: VerticalAlignment = .center, spacing: CGSize) {
 		self.alignment = alignment
 		self.spacing = spacing
 	}
@@ -38,6 +38,7 @@ public struct FlowLayout: Layout {
 			containerWidth: bounds.width,
 			alignment: alignment
 		).offsets
+
 		for (offset, subview) in zip(offsets, subviews) {
 			subview.place(at: CGPoint(x: offset.x + bounds.minX, y: offset.y + bounds.minY), proposal: .unspecified)
 		}
