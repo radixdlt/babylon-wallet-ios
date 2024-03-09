@@ -152,7 +152,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 				period: range,
 				filters: filters,
 				allResources: allResources,
-				ascending: true,
+				ascending: false,
 				cursor: nil
 			)
 			let response = try await transactionHistoryClient.getTransactionHistory(request)

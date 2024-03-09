@@ -139,8 +139,6 @@ extension TransactionHistoryClient {
 				items.append(transactionItem)
 			}
 
-			let items_ = try await response.items.parallelMap(transaction(for:))
-
 			// We filter out complex resources, i.e. Stake Claim NFTs, Pool Units and LSUs
 			let simpleResources = keyedResources.filter {
 				$0.metadata.validator == nil && $0.metadata.poolUnit == nil
@@ -184,6 +182,51 @@ extension TransactionHistoryClient {
 		return try localIDStrings
 			.map(nonFungibleLocalIdFromStr)
 			.map { try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress, nonFungibleLocalId: $0) }
+	}
+}
+
+// MARK: - TransactionInfo
+struct TransactionInfo: Sendable {
+	static let timestampFormatter: ISO8601DateFormatter = {
+		let dateformatter = ISO8601DateFormatter()
+		dateformatter.formatOptions.insert(.withFractionalSeconds)
+		return dateformatter
+	}()
+
+	let time: Date
+	let message: String?
+	let manifestClass: GatewayAPI.ManifestClass?
+//	let fungibleBalanceChanges: String
+//	let nonFungibleBalanceChanges: String
+	let depositSettingsUpdated: Bool
+	let failed: Bool
+}
+
+extension TransactionInfo {
+	init(info: GatewayAPI.CommittedTransactionInfo) throws {
+		guard let time = TransactionInfo.timestampFormatter.date(from: info.roundTimestamp) else {
+			struct CorruptTimestamp: Error { let roundTimestamd: String }
+			throw CorruptTimestamp(roundTimestamd: info.roundTimestamp)
+		}
+
+		let message = info.message?.plaintext?.content.string
+		let manifestClass = info.manifestClasses?.first
+		guard info.receipt?.status == .committedSuccess else {
+			self.init(time: time, message: message, manifestClass: manifestClass, depositSettingsUpdated: false, failed: true)
+			return
+		}
+
+		let changes = info.balanceChanges
+
+		let depositSettingsUpdated = info.manifestClasses?.contains(.accountDepositSettingsUpdate) == true
+
+		self.init(
+			time: time,
+			message: message,
+			manifestClass: manifestClass,
+			depositSettingsUpdated: depositSettingsUpdated,
+			failed: false
+		)
 	}
 }
 

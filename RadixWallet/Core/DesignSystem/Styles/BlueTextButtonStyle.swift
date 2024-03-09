@@ -12,6 +12,6 @@ public struct BlueTextButtonStyle: ButtonStyle {
 		configuration.label
 			.textStyle(.body1StandaloneLink)
 			.foregroundColor(.app.blue2)
-			.opacity(configuration.isPressed ? 0.2 : 1)
+			.opacity(configuration.isPressed ? 0.5 : 1)
 	}
 }

@@ -18,17 +18,21 @@ extension TransactionHistoryFilters {
 				ScrollView {
 					WithViewStore(store, observe: \.filters, send: { .view($0) }) { viewStore in
 						VStack(spacing: .medium3) {
-							SubSection(filters: viewStore.transferTypes, store: store)
+							HStack(spacing: .small1) {
+								FiltersView(filters: viewStore.transferTypes, store: store)
+
+								Spacer(minLength: 0)
+							}
 
 							Divider()
 
 							if viewStore.showAssetsSection {
 								Section("Type of asset") { // FIXME: Strings
-									SubSection("Tokens", filters: viewStore.fungibles, flexible: tokenLabels, store: store)
+									SubSection("Tokens", filters: viewStore.fungibles, labels: tokenLabels, store: store)
 
 									Divider()
 
-									SubSection("NFTs", filters: viewStore.nonFungibles, flexible: nftLabels, store: store)
+									SubSection("NFTs", filters: viewStore.nonFungibles, labels: nftLabels, store: store)
 								}
 
 								Divider()
@@ -67,11 +71,11 @@ extension TransactionHistoryFilters {
 		}
 
 		private var tokenLabels: SubSection.FlexibleLabels {
-			.init(showAll: "Show all tokens", showLess: "Show fewer tokens")
+			.init(showAll: "Show all tokens", showLess: "Show fewer tokens") // FIXME: Strings
 		}
 
 		private var nftLabels: SubSection.FlexibleLabels {
-			.init(showAll: "Show all NFTs", showLess: "Show fewer NFTs")
+			.init(showAll: "Show all NFTs", showLess: "Show fewer NFTs") // FIXME: Strings
 		}
 
 		struct Section<Content: SwiftUI.View>: SwiftUI.View {
@@ -86,19 +90,19 @@ extension TransactionHistoryFilters {
 
 			var body: some SwiftUI.View {
 				VStack(spacing: 0) {
-					HStack(spacing: .zero) {
-						Text(name)
-							.textStyle(.body1Header)
-							.foregroundStyle(.app.gray1)
-							.padding(.vertical, .small2)
+					Button {
+						withAnimation(.default) {
+							expanded.toggle()
+						}
+					} label: {
+						HStack(spacing: .zero) {
+							Text(name)
+								.textStyle(.body1Header)
+								.foregroundStyle(.app.gray1)
+								.padding(.vertical, .small2)
 
-						Spacer()
+							Spacer()
 
-						Button {
-							withAnimation(.default) {
-								expanded.toggle()
-							}
-						} label: {
 							Image(expanded ? .chevronUp : .chevronDown)
 						}
 					}
@@ -119,16 +123,30 @@ extension TransactionHistoryFilters {
 				let showLess: String
 			}
 
-			@SwiftUI.State private var showsAll: Bool = false
+			@SwiftUI.State private var rowHeight: CGFloat = .infinity
+			@SwiftUI.State private var totalHeight: CGFloat = .infinity
+			@SwiftUI.State private var isCollapsed: Bool = true
+
 			let heading: String?
 			let filters: IdentifiedArrayOf<State.Filter>
-			let flexible: FlexibleLabels?
+			let labels: FlexibleLabels?
 			let store: StoreOf<TransactionHistoryFilters>
 
-			init(_ heading: String? = nil, filters: IdentifiedArrayOf<State.Filter>, flexible: FlexibleLabels? = nil, store: StoreOf<TransactionHistoryFilters>) {
+			private var showCollapseButton: Bool {
+				labels != nil && totalHeight > collapsedHeight
+			}
+
+			private var collapsedHeight: CGFloat {
+				CGFloat(collapsedRowLimit) * rowHeight + CGFloat(collapsedRowLimit - 1) * spacing
+			}
+
+			private let collapsedRowLimit: Int = 2
+			private let spacing: CGFloat = .small1
+
+			init(_ heading: String? = nil, filters: IdentifiedArrayOf<State.Filter>, labels: FlexibleLabels? = nil, store: StoreOf<TransactionHistoryFilters>) {
 				self.heading = heading
 				self.filters = filters
-				self.flexible = flexible
+				self.labels = labels
 				self.store = store
 			}
 
@@ -144,24 +162,57 @@ extension TransactionHistoryFilters {
 						}
 
 						HStack(spacing: .zero) {
-							FlowLayout(spacing: .small1) {
-								ForEach(filters) { filter in
-									TransactionFilterView(filter: filter) { id in
-										store.send(.view(.filterTapped(id)))
-									}
-								}
+							FlowLayout(spacing: spacing) {
+								FiltersView(filters: filters, store: store)
+							}
+							.measureSize(flowLayoutID)
+							.overlay {
+								TransactionFilterView.Dummy()
+									.measureSize(flowDummyID)
 							}
 
 							Spacer(minLength: 0)
 						}
+						.frame(maxHeight: isCollapsed ? collapsedHeight : .infinity, alignment: .top)
+						.clipped()
+						.onReadSizes(flowDummyID, flowLayoutID) { dummySize, flowSize in
+							rowHeight = dummySize.height
+							totalHeight = flowSize.height
+						}
 
-						if let flexible {
-							Button(showsAll ? "- \(flexible.showLess)" : "+ \(flexible.showAll)") {
-								showsAll.toggle()
+						if showCollapseButton, let labels {
+							Button {
+								withAnimation {
+									isCollapsed.toggle()
+								}
+							} label: {
+								ZStack {
+									Text("+ \(labels.showAll)")
+										.opacity(isCollapsed ? 1 : 0)
+									Text("- \(labels.showLess)")
+										.opacity(isCollapsed ? 0 : 1)
+								}
 							}
 							.buttonStyle(.blueText)
 							.padding(.top, .medium3)
 						}
+					}
+					.animation(.default, value: isCollapsed)
+				}
+			}
+
+			private let flowLayoutID = "FlowLayout"
+			private let flowDummyID = "FlowDummy"
+		}
+
+		private struct FiltersView: SwiftUI.View {
+			let filters: IdentifiedArrayOf<State.Filter>
+			let store: StoreOf<TransactionHistoryFilters>
+
+			var body: some SwiftUI.View {
+				ForEach(filters) { filter in
+					TransactionFilterView(filter: filter) { id in
+						store.send(.view(.filterTapped(id)))
 					}
 				}
 			}
@@ -227,6 +278,7 @@ struct TransactionFilterView: SwiftUI.View {
 		var body: some SwiftUI.View {
 			Text("ABC")
 				.textStyle(.body1HighImportance)
+				.foregroundStyle(.clear)
 				.padding(.vertical, .small2)
 		}
 	}
