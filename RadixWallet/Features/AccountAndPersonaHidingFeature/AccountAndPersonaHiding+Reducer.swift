@@ -13,13 +13,6 @@ public struct AccountAndPersonaHiding: Sendable, FeatureReducer {
 	public enum ViewAction: Hashable, Sendable {
 		case task
 		case unhideAllTapped
-
-		case confirmUnhideAllAlert(PresentationAction<ConfirmUnhideAllAlert>)
-
-		public enum ConfirmUnhideAllAlert: Hashable, Sendable {
-			case confirmTapped
-			case cancelTapped
-		}
 	}
 
 	public enum InternalAction: Hashable, Sendable {
@@ -80,26 +73,6 @@ public struct AccountAndPersonaHiding: Sendable, FeatureReducer {
 				]
 			))
 			return .none
-
-		case let .confirmUnhideAllAlert(action):
-			defer {
-				state.destination = nil
-			}
-
-			switch action {
-			case .presented(.confirmTapped):
-				return .run { send in
-					try await entitiesVisibilityClient.unhideAllEntities()
-					overlayWindowClient.scheduleHUD(.updatedAccount)
-					await send(.internal(.didUnhideAllEntities))
-				} catch: { error, _ in
-					errorQueue.schedule(error)
-				}
-			case .presented(.cancelTapped):
-				return .none
-			case .dismiss:
-				return .none
-			}
 		}
 	}
 
@@ -111,6 +84,28 @@ public struct AccountAndPersonaHiding: Sendable, FeatureReducer {
 		case .didUnhideAllEntities:
 			state.hiddenEntityCounts = .init(hiddenAccountsCount: 0, hiddenPersonasCount: 0)
 			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .confirmUnhideAllAlert(confirmUnhideAllAlert):
+			defer {
+				state.destination = nil
+			}
+
+			switch confirmUnhideAllAlert {
+			case .confirmTapped:
+				return .run { send in
+					try await entitiesVisibilityClient.unhideAllEntities()
+					overlayWindowClient.scheduleHUD(.updatedAccount)
+					await send(.internal(.didUnhideAllEntities))
+				} catch: { error, _ in
+					errorQueue.schedule(error)
+				}
+			case .cancelTapped:
+				return .none
+			}
 		}
 	}
 }
