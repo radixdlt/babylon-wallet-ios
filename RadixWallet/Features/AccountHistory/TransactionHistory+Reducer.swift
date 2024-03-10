@@ -10,9 +10,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		var allResourceAddresses: Set<ResourceAddress>
 		var allResources: IdentifiedArrayOf<OnLedgerEntity.Resource>? = nil
 
-		var filters: IdentifiedArrayOf<TransactionHistoryFilters.State.Filter> = []
-
-		var activeFilters: [TransactionFilter] { filters.filter(\.isActive).map(\.id) }
+		var activeFilters: IdentifiedArrayOf<TransactionHistoryFilters.State.Filter> = []
 
 		var selectedPeriod: DateRangeItem.ID
 
@@ -28,7 +26,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			self.account = account
 			self.periods = try! .init(months: 7)
 			self.allResourceAddresses = assets
-			self.selectedPeriod = periods[0].id
+			self.selectedPeriod = periods.last!.id
 		}
 
 		public struct TransactionSection: Sendable, Hashable, Identifiable {
@@ -100,11 +98,11 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 				loggerGlobal.error("The filters button should not be enabled until the resources have been loaded")
 				return .none
 			}
-			state.destination = .filters(.init(assets: allResources, activeFilters: state.activeFilters))
+			state.destination = .filters(.init(assets: allResources, activeFilters: state.activeFilters.map(\.id)))
 			return .none
 
 		case let .filterCrossTapped(id):
-			state.filters.remove(id: id)
+			state.activeFilters.remove(id: id)
 			return loadSelectedPeriod(state: &state)
 
 		case .closeTapped:
@@ -124,7 +122,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .filters(.delegate(.updateActiveFilters(filters))):
-			state.filters = filters
+			state.activeFilters = filters
 			return .none
 		default:
 			return .none
@@ -146,7 +144,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		let mockAccount = state.account.networkID == .mainnet ? try! AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l") : nil
 
-		return .run { [account = state.account.address, allResources = state.allResourceAddresses, filters = state.activeFilters] send in
+		return .run { [account = state.account.address, allResources = state.allResourceAddresses, filters = state.activeFilters.map(\.id)] send in
 			let request = TransactionHistoryRequest(
 				account: mockAccount ?? account,
 				period: range,
