@@ -27,9 +27,9 @@ extension TransactionHistoryFilters {
 							Divider()
 
 							if viewStore.showAssetsSection {
-								Section(L10n.AccountHistory.Filters.assetTypeLabel) {
+								Section(L10n.TransactionHistory.Filters.assetTypeLabel) {
 									SubSection(
-										L10n.AccountHistory.Filters.tokensLabel,
+										L10n.TransactionHistory.Filters.tokensLabel,
 										filters: viewStore.fungibles,
 										labels: tokenLabels,
 										store: store
@@ -38,7 +38,7 @@ extension TransactionHistoryFilters {
 									Divider()
 
 									SubSection(
-										L10n.AccountHistory.Filters.assetTypeNFTsLabel,
+										L10n.TransactionHistory.Filters.assetTypeNFTsLabel,
 										filters: viewStore.nonFungibles,
 										labels: nftLabels,
 										store: store
@@ -48,7 +48,7 @@ extension TransactionHistoryFilters {
 								Divider()
 							}
 
-							Section(L10n.AccountHistory.Filters.transactionTypeLabel) {
+							Section(L10n.TransactionHistory.Filters.transactionTypeLabel) {
 								SubSection(filters: viewStore.transactionTypes, store: store)
 							}
 
@@ -60,7 +60,7 @@ extension TransactionHistoryFilters {
 					}
 				}
 				.footer {
-					Button(L10n.AccountHistory.Filters.showResultsButton) {
+					Button(L10n.TransactionHistory.Filters.showResultsButton) {
 						store.send(.view(.showResultsTapped))
 					}
 					.buttonStyle(.primaryRectangular(shouldExpand: true))
@@ -72,21 +72,24 @@ extension TransactionHistoryFilters {
 						}
 					}
 					ToolbarItem(placement: .topBarTrailing) {
-						Button(L10n.AccountHistory.Filters.clearAll) {
+						Button(L10n.TransactionHistory.Filters.clearAll) {
 							store.send(.view(.clearTapped))
 						}
 					}
 				}
-				.navigationTitle(L10n.AccountHistory.Filters.title)
+				.navigationTitle(L10n.TransactionHistory.Filters.title)
 			}
 		}
 
 		private var tokenLabels: SubSection.CollapseLabels {
-			.init(showAll: L10n.AccountHistory.Filters.tokenShowAll, showLess: L10n.AccountHistory.Filters.tokenShowLess)
+			.init(showAll: L10n.TransactionHistory.Filters.tokenShowAll, showLess: L10n.TransactionHistory.Filters.tokenShowLess)
 		}
 
 		private var nftLabels: SubSection.CollapseLabels {
-			.init(showAll: L10n.AccountHistory.Filters.nftShowAll, showLess: L10n.AccountHistory.Filters.nftShowLess)
+			.init(
+				showAll: L10n.TransactionHistory.Filters.nftShowAll,
+				showLess: L10n.TransactionHistory.Filters.nftShowLess
+			)
 		}
 
 		struct Section<Content: SwiftUI.View>: SwiftUI.View {

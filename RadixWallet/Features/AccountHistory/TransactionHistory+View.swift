@@ -52,7 +52,7 @@ extension TransactionHistory {
 					}
 					.background {
 						if viewStore.showEmptyState {
-							Text(L10n.AccountHistory.empty)
+							Text(L10n.TransactionHistory.noTransactions)
 								.textStyle(.sectionHeader)
 								.foregroundStyle(.app.gray2)
 						}
@@ -96,7 +96,7 @@ extension TransactionHistory {
 						}
 					}
 				}
-				.navigationTitle(L10n.AccountHistory.title)
+				.navigationTitle(L10n.TransactionHistory.title)
 				.navigationBarTitleDisplayMode(.inline)
 			}
 			.onAppear {
@@ -324,7 +324,7 @@ extension TransactionHistory {
 				VStack {
 					EventHeader(event: .settings)
 
-					Text(L10n.AccountHistory.Settings.info)
+					Text(L10n.TransactionHistory.updatedDepositSettings)
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray1)
 						.flushedLeft
@@ -345,7 +345,7 @@ extension TransactionHistory {
 							.frame(.smallest)
 							.tint(.app.notification)
 
-						Text(L10n.AccountHistory.Settings.info)
+						Text(L10n.TransactionHistory.failedTransaction)
 							.textStyle(.body2HighImportance)
 							.foregroundColor(.app.notification)
 
@@ -363,7 +363,7 @@ extension TransactionHistory {
 				VStack {
 					EventHeader.Dummy()
 
-					Text(L10n.AccountHistory.noBalanceChanges)
+					Text(L10n.TransactionHistory.noBalanceChanges)
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray1)
 						.flushedLeft
@@ -403,11 +403,11 @@ extension TransactionHistory {
 			private var label: String {
 				switch event {
 				case .deposited:
-					L10n.AccountHistory.depositedSection
+					L10n.TransactionHistory.depositedSection
 				case .withdrawn:
-					L10n.AccountHistory.withdrawnSection
+					L10n.TransactionHistory.withdrawnSection
 				case .settings:
-					L10n.AccountHistory.settingsSection
+					L10n.TransactionHistory.settingsSection
 				}
 			}
 
@@ -569,20 +569,20 @@ extension TransactionHistory {
 	static func label(for transactionType: TransactionFilter.TransactionType?) -> String {
 		switch transactionType {
 		case let .some(transactionType): label(for: transactionType)
-		case .none: L10n.AccountHistory.transactionClassOther
+		case .none: L10n.TransactionHistory.ManifestClass.other
 		}
 	}
 
 	static func label(for transactionType: TransactionFilter.TransactionType) -> String {
 		switch transactionType {
-		case .general: L10n.AccountHistory.transactionClassGeneral
-		case .transfer: L10n.AccountHistory.transactionClassTransfer
-		case .poolContribution: L10n.AccountHistory.transactionClassContribute
-		case .poolRedemption: L10n.AccountHistory.transactionClassRedeem
-		case .validatorStake: L10n.AccountHistory.transactionClassStaking
-		case .validatorUnstake: L10n.AccountHistory.transactionClassUnstaking
-		case .validatorClaim: L10n.AccountHistory.transactionClassClaim
-		case .accountDepositSettingsUpdate: L10n.AccountHistory.transactionClassAccountSettings
+		case .general: L10n.TransactionHistory.ManifestClass.general
+		case .transfer: L10n.TransactionHistory.ManifestClass.transfer
+		case .poolContribution: L10n.TransactionHistory.ManifestClass.contribute
+		case .poolRedemption: L10n.TransactionHistory.ManifestClass.redeem
+		case .validatorStake: L10n.TransactionHistory.ManifestClass.staking
+		case .validatorUnstake: L10n.TransactionHistory.ManifestClass.unstaking
+		case .validatorClaim: L10n.TransactionHistory.ManifestClass.claim
+		case .accountDepositSettingsUpdate: L10n.TransactionHistory.ManifestClass.accountSettings
 		}
 	}
 }
