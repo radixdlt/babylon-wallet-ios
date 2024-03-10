@@ -70,8 +70,8 @@ extension TransactionHistory {
 							VStack(spacing: .small2) {
 								HScrollBar(items: viewStore.periods, selection: selection)
 
-								if !viewStore.filters.isEmpty {
-									ActiveFiltersView(filters: viewStore.filters) { id in
+								if let filters = viewStore.activeFilters.nilIfEmpty {
+									ActiveFiltersView(filters: filters) { id in
 										store.send(.view(.filterCrossTapped(id)), animation: .default)
 									}
 								}
