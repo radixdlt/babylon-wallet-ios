@@ -127,6 +127,8 @@ public enum AssetResource {
   public static let tagIcon = ImageAsset(name: "tag-icon")
   public static let transactionHistoryDeposit = ImageAsset(name: "transactionHistory_deposit")
   public static let transactionHistoryFilterList = ImageAsset(name: "transactionHistory_filter-list")
+  public static let transactionHistoryFilterDeposit = ImageAsset(name: "transactionHistory_filter_deposit")
+  public static let transactionHistoryFilterWithdrawal = ImageAsset(name: "transactionHistory_filter_withdrawal")
   public static let transactionHistorySettings = ImageAsset(name: "transactionHistory_settings")
   public static let transactionHistoryWithdrawal = ImageAsset(name: "transactionHistory_withdrawal")
   public static let transactionReviewMessage = ImageAsset(name: "transactionReview-message")

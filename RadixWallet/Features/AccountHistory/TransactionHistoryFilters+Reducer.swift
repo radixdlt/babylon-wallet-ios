@@ -120,9 +120,9 @@ extension TransactionHistoryFilters.State.Filter {
 	private static func icon(for transferType: TransactionFilter.TransferType) -> ImageResource {
 		switch transferType {
 		case .withdrawal:
-			.transactionHistoryWithdrawal
+			.transactionHistoryFilterWithdrawal
 		case .deposit:
-			.transactionHistoryDeposit
+			.transactionHistoryFilterDeposit
 		}
 	}
 

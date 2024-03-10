@@ -233,7 +233,6 @@ struct TransactionFilterView: SwiftUI.View {
 			HStack(spacing: .small3) {
 				if let icon = filter.icon {
 					Image(icon)
-						.tint(textColor)
 				}
 
 				Text(filter.label)
