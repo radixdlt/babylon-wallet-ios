@@ -52,7 +52,7 @@ extension TransactionHistory {
 					}
 					.background {
 						if viewStore.showEmptyState {
-							Text("You have no transactions") // FIXME: Strings
+							Text(L10n.AccountHistory.empty)
 								.textStyle(.sectionHeader)
 								.foregroundStyle(.app.gray2)
 						}
@@ -96,7 +96,7 @@ extension TransactionHistory {
 						}
 					}
 				}
-				.navigationTitle("History") // FIXME: Strings
+				.navigationTitle(L10n.AccountHistory.title)
 				.navigationBarTitleDisplayMode(.inline)
 			}
 			.onAppear {
@@ -287,17 +287,7 @@ extension TransactionHistory {
 			}
 
 			private var manifestClassLabel: String {
-				switch manifestClass {
-				case .general: "General" // FIXME: Strings
-				case .transfer: "Transfer"
-				case .poolContribution: "Contribution"
-				case .poolRedemption: "Redemption"
-				case .validatorStake: "Stake"
-				case .validatorUnstake: "Unstake"
-				case .validatorClaim: "Claim"
-				case .accountDepositSettingsUpdate: "Deposit Settings"
-				case .none: "Other"
-				}
+				TransactionHistory.label(for: manifestClass)
 			}
 
 			private var timeLabel: String {
@@ -318,9 +308,9 @@ extension TransactionHistory {
 				VStack {
 					switch type {
 					case .withdrawal:
-						EventHeader(event: .withdrawal)
+						EventHeader(event: .withdrawn)
 					case .deposit:
-						EventHeader(event: .deposit)
+						EventHeader(event: .deposited)
 					}
 
 					ResourceBalancesView(resources)
@@ -332,9 +322,9 @@ extension TransactionHistory {
 		struct DepositSettingsActionView: SwiftUI.View {
 			var body: some SwiftUI.View {
 				VStack {
-					EventHeader(event: .depositSettings)
+					EventHeader(event: .settings)
 
-					Text("Updated Account Deposit Settings") // FIXME: Strings
+					Text(L10n.AccountHistory.Settings.info)
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray1)
 						.flushedLeft
@@ -355,7 +345,7 @@ extension TransactionHistory {
 							.frame(.smallest)
 							.tint(.app.notification)
 
-						Text("Failed Transaction") // FIXME: Strings
+						Text(L10n.AccountHistory.Settings.info)
 							.textStyle(.body2HighImportance)
 							.foregroundColor(.app.notification)
 
@@ -373,7 +363,7 @@ extension TransactionHistory {
 				VStack {
 					EventHeader.Dummy()
 
-					Text("No deposits or withdrawals from this account in this transaction.") // FIXME: Strings
+					Text(L10n.AccountHistory.noBalanceChanges)
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray1)
 						.flushedLeft
@@ -401,32 +391,31 @@ extension TransactionHistory {
 
 			private var image: ImageResource {
 				switch event {
-				case .deposit:
+				case .deposited:
 					.transactionHistoryDeposit
-				case .withdrawal:
+				case .withdrawn:
 					.transactionHistoryWithdrawal
-				case .depositSettings:
+				case .settings:
 					.transactionHistorySettings
 				}
 			}
 
 			private var label: String {
-				// FIXME: strings
 				switch event {
-				case .deposit:
-					"Deposited"
-				case .withdrawal:
-					"Withdrawn"
-				case .depositSettings:
-					"Settings"
+				case .deposited:
+					L10n.AccountHistory.depositedSection
+				case .withdrawn:
+					L10n.AccountHistory.withdrawnSection
+				case .settings:
+					L10n.AccountHistory.settingsSection
 				}
 			}
 
 			private var textColor: Color {
 				switch event {
-				case .deposit:
+				case .deposited:
 					.app.green1
-				case .withdrawal, .depositSettings:
+				case .withdrawn, .settings:
 					.app.gray1
 				}
 			}
@@ -442,9 +431,9 @@ extension TransactionHistory {
 	}
 
 	public enum Event {
-		case deposit
-		case withdrawal
-		case depositSettings
+		case deposited
+		case withdrawn
+		case settings
 	}
 }
 
@@ -533,8 +522,6 @@ private enum PositionsPreferenceKey: PreferenceKey {
 	}
 }
 
-// "ViewState"
-
 extension TransactionHistory.State.TransactionSection {
 	var title: String {
 		day.formatted(date: .abbreviated, time: .omitted)
@@ -574,6 +561,28 @@ extension View {
 			if let size1 = positions[id1]?.size, let size2 = positions[id2]?.size {
 				content(size1, size2)
 			}
+		}
+	}
+}
+
+extension TransactionHistory {
+	static func label(for transactionType: TransactionFilter.TransactionType?) -> String {
+		switch transactionType {
+		case let .some(transactionType): label(for: transactionType)
+		case .none: L10n.AccountHistory.transactionClassOther
+		}
+	}
+
+	static func label(for transactionType: TransactionFilter.TransactionType) -> String {
+		switch transactionType {
+		case .general: L10n.AccountHistory.transactionClassGeneral
+		case .transfer: L10n.AccountHistory.transactionClassTransfer
+		case .poolContribution: L10n.AccountHistory.transactionClassContribute
+		case .poolRedemption: L10n.AccountHistory.transactionClassRedeem
+		case .validatorStake: L10n.AccountHistory.transactionClassStaking
+		case .validatorUnstake: L10n.AccountHistory.transactionClassUnstaking
+		case .validatorClaim: L10n.AccountHistory.transactionClassClaim
+		case .accountDepositSettingsUpdate: L10n.AccountHistory.transactionClassAccountSettings
 		}
 	}
 }
