@@ -128,9 +128,9 @@ extension TransactionHistoryFilters.State.Filter {
 	private static func label(for transferType: TransactionFilter.TransferType) -> String {
 		switch transferType {
 		case .withdrawal:
-			L10n.AccountHistory.Filters.withdrawalsType
+			L10n.TransactionHistory.Filters.withdrawalsType
 		case .deposit:
-			L10n.AccountHistory.Filters.depositsType
+			L10n.TransactionHistory.Filters.depositsType
 		}
 	}
 
