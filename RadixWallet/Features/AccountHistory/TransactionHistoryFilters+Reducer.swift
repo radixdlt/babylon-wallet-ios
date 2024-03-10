@@ -36,7 +36,6 @@ public struct TransactionHistoryFilters: Sendable, FeatureReducer {
 			let fungibles = assets.filter { $0.fungibility == .fungible }.compactMap { Filter($0, isActive: activeFilters.contains(.asset($0.id))) }
 			let nonFungibles = assets.filter { $0.fungibility == .nonFungible }.compactMap { Filter($0, isActive: activeFilters.contains(.asset($0.id))) }
 			let transactionTypes = TransactionFilter.TransactionType.allCases.map { Filter($0, isActive: activeFilters.contains(.transactionType($0))) }
-
 			self.filters = .init(transferTypes: transferTypes, fungibles: fungibles, nonFungibles: nonFungibles, transactionTypes: transactionTypes)
 		}
 	}
@@ -126,13 +125,12 @@ extension TransactionHistoryFilters.State.Filter {
 		}
 	}
 
-	// FIXME: Strings
 	private static func label(for transferType: TransactionFilter.TransferType) -> String {
 		switch transferType {
 		case .withdrawal:
-			"Withdrawals"
+			L10n.AccountHistory.Filters.withdrawalsType
 		case .deposit:
-			"Deposits"
+			L10n.AccountHistory.Filters.depositsType
 		}
 	}
 
@@ -145,23 +143,9 @@ extension TransactionHistoryFilters.State.Filter {
 		self.init(
 			id: .transactionType(transactionType),
 			icon: nil,
-			label: Self.label(for: transactionType),
+			label: TransactionHistory.label(for: transactionType),
 			isActive: isActive
 		)
-	}
-
-	// FIXME: Strings
-	private static func label(for transactionType: TransactionFilter.TransactionType) -> String {
-		switch transactionType {
-		case .general: "General"
-		case .transfer: "Transfers"
-		case .poolContribution: "Contribute"
-		case .poolRedemption: "Redeem"
-		case .validatorStake: "Stake"
-		case .validatorUnstake: "Unstake"
-		case .validatorClaim: "Claim"
-		case .accountDepositSettingsUpdate: "Third-party Deposit Settings"
-		}
 	}
 }
 

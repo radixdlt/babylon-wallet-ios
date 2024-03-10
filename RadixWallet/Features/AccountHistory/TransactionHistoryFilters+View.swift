@@ -27,18 +27,28 @@ extension TransactionHistoryFilters {
 							Divider()
 
 							if viewStore.showAssetsSection {
-								Section("Type of asset") { // FIXME: Strings
-									SubSection("Tokens", filters: viewStore.fungibles, labels: tokenLabels, store: store)
+								Section(L10n.AccountHistory.Filters.assetTypeLabel) {
+									SubSection(
+										L10n.AccountHistory.Filters.tokensLabel,
+										filters: viewStore.fungibles,
+										labels: tokenLabels,
+										store: store
+									)
 
 									Divider()
 
-									SubSection("NFTs", filters: viewStore.nonFungibles, labels: nftLabels, store: store)
+									SubSection(
+										L10n.AccountHistory.Filters.assetTypeNFTsLabel,
+										filters: viewStore.nonFungibles,
+										labels: nftLabels,
+										store: store
+									)
 								}
 
 								Divider()
 							}
 
-							Section("Type of transaction") {
+							Section(L10n.AccountHistory.Filters.transactionTypeLabel) {
 								SubSection(filters: viewStore.transactionTypes, store: store)
 							}
 
@@ -50,7 +60,7 @@ extension TransactionHistoryFilters {
 					}
 				}
 				.footer {
-					Button("Show results") {
+					Button(L10n.AccountHistory.Filters.showResultsButton) {
 						store.send(.view(.showResultsTapped))
 					}
 					.buttonStyle(.primaryRectangular(shouldExpand: true))
@@ -62,20 +72,21 @@ extension TransactionHistoryFilters {
 						}
 					}
 					ToolbarItem(placement: .topBarTrailing) {
-						Button("Clear all") { // FIXME: Strings
+						Button(L10n.AccountHistory.Filters.clearAll) {
 							store.send(.view(.clearTapped))
 						}
 					}
 				}
+				.navigationTitle(L10n.AccountHistory.Filters.title)
 			}
 		}
 
-		private var tokenLabels: SubSection.FlexibleLabels {
-			.init(showAll: "Show all tokens", showLess: "Show fewer tokens") // FIXME: Strings
+		private var tokenLabels: SubSection.CollapseLabels {
+			.init(showAll: L10n.AccountHistory.Filters.tokenShowAll, showLess: L10n.AccountHistory.Filters.tokenShowLess)
 		}
 
-		private var nftLabels: SubSection.FlexibleLabels {
-			.init(showAll: "Show all NFTs", showLess: "Show fewer NFTs") // FIXME: Strings
+		private var nftLabels: SubSection.CollapseLabels {
+			.init(showAll: L10n.AccountHistory.Filters.nftShowAll, showLess: L10n.AccountHistory.Filters.nftShowLess)
 		}
 
 		struct Section<Content: SwiftUI.View>: SwiftUI.View {
@@ -118,7 +129,7 @@ extension TransactionHistoryFilters {
 		}
 
 		struct SubSection: SwiftUI.View {
-			struct FlexibleLabels: Equatable {
+			struct CollapseLabels: Equatable {
 				let showAll: String
 				let showLess: String
 			}
@@ -129,12 +140,8 @@ extension TransactionHistoryFilters {
 
 			let heading: String?
 			let filters: IdentifiedArrayOf<State.Filter>
-			let labels: FlexibleLabels?
+			let labels: CollapseLabels?
 			let store: StoreOf<TransactionHistoryFilters>
-
-			private var showCollapseButton: Bool {
-				labels != nil && totalHeight > collapsedHeight
-			}
 
 			private var collapsedHeight: CGFloat {
 				CGFloat(collapsedRowLimit) * rowHeight + CGFloat(collapsedRowLimit - 1) * spacing
@@ -143,7 +150,7 @@ extension TransactionHistoryFilters {
 			private let collapsedRowLimit: Int = 2
 			private let spacing: CGFloat = .small1
 
-			init(_ heading: String? = nil, filters: IdentifiedArrayOf<State.Filter>, labels: FlexibleLabels? = nil, store: StoreOf<TransactionHistoryFilters>) {
+			init(_ heading: String? = nil, filters: IdentifiedArrayOf<State.Filter>, labels: CollapseLabels? = nil, store: StoreOf<TransactionHistoryFilters>) {
 				self.heading = heading
 				self.filters = filters
 				self.labels = labels
@@ -152,6 +159,7 @@ extension TransactionHistoryFilters {
 
 			var body: some SwiftUI.View {
 				if !filters.isEmpty {
+					let isCollapsible = labels != nil
 					VStack(spacing: .zero) {
 						if let heading {
 							Text(heading)
@@ -173,14 +181,16 @@ extension TransactionHistoryFilters {
 
 							Spacer(minLength: 0)
 						}
-						.frame(maxHeight: isCollapsed ? collapsedHeight : .infinity, alignment: .top)
+						.frame(maxHeight: isCollapsible && isCollapsed ? collapsedHeight : .infinity, alignment: .top)
 						.clipped()
 						.onReadSizes(flowDummyID, flowLayoutID) { dummySize, flowSize in
-							rowHeight = dummySize.height
-							totalHeight = flowSize.height
+							if isCollapsible {
+								rowHeight = dummySize.height
+								totalHeight = flowSize.height
+							}
 						}
 
-						if showCollapseButton, let labels {
+						if totalHeight > collapsedHeight, let labels {
 							Button {
 								withAnimation {
 									isCollapsed.toggle()
@@ -275,7 +285,7 @@ struct TransactionFilterView: SwiftUI.View {
 
 	struct Dummy: SwiftUI.View {
 		var body: some SwiftUI.View {
-			Text("ABC")
+			Text("DUMMY")
 				.textStyle(.body1HighImportance)
 				.foregroundStyle(.clear)
 				.padding(.vertical, .small2)
