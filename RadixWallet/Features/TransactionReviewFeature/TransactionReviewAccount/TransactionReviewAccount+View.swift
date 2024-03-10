@@ -103,7 +103,7 @@ struct TransactionReviewResourceView: View {
 				onTap(nil)
 			}
 		case let .stakeClaimNFT(details):
-			ResourceBalanceView.StakeClaimNFT(viewState: details, background: .app.gray5) { stakeClaim in
+			ResourceBalanceView.StakeClaimNFT(viewState: details, background: .app.gray5, compact: false) { stakeClaim in
 				onTap(stakeClaim.token)
 			}
 		}
@@ -149,7 +149,7 @@ extension ResourceBalance.Fungible {
 	init(resourceWithRedemptionValue resource: OnLedgerEntitiesClient.OwnedResourcePoolDetails.ResourceWithRedemptionValue, isXRD: Bool) {
 		self.init(
 			isXRD: isXRD,
-			amount: resource.redemptionValue ?? .zero,
+			amount: resource.redemptionValue ?? { fatalError() }(), // FIXME: GK - handle nil amount
 			guarantee: nil
 		)
 	}

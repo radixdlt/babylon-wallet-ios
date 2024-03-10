@@ -15,7 +15,7 @@ struct ValidatorStakeView: View {
 		var stakeClaimResource: ResourceBalance.StakeClaimNFT?
 
 		public struct LiquidStakeUnit: Sendable, Hashable {
-			let lsu: ResourceBalance.ViewState.LSU
+			let lsu: ResourceBalance.ViewState.LiquidStakeUnit
 			var isSelected: Bool?
 		}
 	}
@@ -62,7 +62,7 @@ struct ValidatorStakeView: View {
 				.frame(height: .small3)
 				.overlay(.app.gray5)
 
-			ResourceBalanceButton(.lsu(viewState.lsu), appearance: .assetList, isSelected: viewState.isSelected, onTap: action)
+			ResourceBalanceButton(.liquidStakeUnit(viewState.lsu), appearance: .assetList, isSelected: viewState.isSelected, onTap: action)
 		}
 	}
 
@@ -79,6 +79,7 @@ struct ValidatorStakeView: View {
 			ResourceBalanceView.StakeClaimNFT(
 				viewState: viewState,
 				background: .app.white,
+				compact: false,
 				onTap: onTap,
 				onClaimAllTapped: onClaimAllTapped
 			)

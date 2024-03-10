@@ -1,6 +1,12 @@
 import ComposableArchitecture
 import SwiftUI
 
+extension TransactionHistory.State {
+	var showEmptyState: Bool {
+		sections.isEmpty && !isLoading
+	}
+}
+
 // MARK: - TransactionHistory.View
 extension TransactionHistory {
 	@MainActor
@@ -19,8 +25,15 @@ extension TransactionHistory {
 					let selection = viewStore.binding(get: \.selectedPeriod, send: ViewAction.selectedPeriod)
 
 					VStack(spacing: .zero) {
-						HScrollBarDummy()
-							.padding(.vertical, .small3)
+						VStack(spacing: .small2) {
+							HScrollBarDummy()
+
+							if !viewStore.activeFilters.isEmpty {
+								ActiveFiltersView.Dummy()
+							}
+						}
+						.padding(.top, .small2)
+						.padding(.bottom, .small1)
 
 						ScrollView {
 							LazyVStack(spacing: .small1, pinnedViews: [.sectionHeaders]) {
@@ -32,9 +45,17 @@ extension TransactionHistory {
 									SectionView(section: section)
 								}
 							}
+							.padding(.bottom, .medium3)
 						}
 						.scrollIndicators(.never)
 						.coordinateSpace(name: View.coordSpace)
+					}
+					.background {
+						if viewStore.showEmptyState {
+							Text(L10n.TransactionHistory.noTransactions)
+								.textStyle(.sectionHeader)
+								.foregroundStyle(.app.gray2)
+						}
 					}
 					.background(.app.gray5)
 					.overlayPreferenceValue(PositionsPreferenceKey.self, alignment: .top) { positions in
@@ -46,30 +67,43 @@ extension TransactionHistory {
 							}
 
 							let scrollBarOffset = max(rect?.maxY ?? 0, 0)
-							HScrollBar(items: viewStore.periods, selection: selection)
-								.padding(.vertical, .small3)
-								.background(.app.white)
-								.offset(y: scrollBarOffset)
+							VStack(spacing: .small2) {
+								HScrollBar(items: viewStore.periods, selection: selection)
+
+								if let filters = viewStore.activeFilters.nilIfEmpty {
+									ActiveFiltersView(filters: filters) { id in
+										store.send(.view(.filterCrossTapped(id)), animation: .default)
+									}
+								}
+							}
+							.padding(.top, .small2)
+							.padding(.bottom, .small1)
+							.background(.app.white)
+							.offset(y: scrollBarOffset)
 						}
 					}
 					.clipShape(Rectangle())
-				}
-				.toolbar {
-					ToolbarItem(placement: .topBarLeading) {
-						CloseButton {
-							store.send(.view(.closeTapped))
+					.toolbar {
+						ToolbarItem(placement: .topBarLeading) {
+							CloseButton {
+								store.send(.view(.closeTapped))
+							}
+						}
+						ToolbarItem(placement: .topBarTrailing) {
+							Button(asset: AssetResource.transactionHistoryFilterList) {
+								store.send(.view(.filtersTapped))
+							}
 						}
 					}
-					ToolbarItem(placement: .topBarTrailing) {
-						Button(asset: AssetResource.transactionHistoryFilterList) {}
-					}
 				}
-				.navigationTitle("History") // FIXME: Strings
+				.navigationTitle(L10n.TransactionHistory.title)
 				.navigationBarTitleDisplayMode(.inline)
 			}
 			.onAppear {
 				store.send(.view(.onAppear))
 			}
+			.destinations(with: store)
+			.ignoresSafeArea(edges: .bottom)
 		}
 
 		private static let coordSpace = "TransactionHistory"
@@ -103,6 +137,33 @@ extension TransactionHistory {
 		}
 	}
 
+	struct ActiveFiltersView: SwiftUI.View {
+		let filters: IdentifiedArrayOf<TransactionHistoryFilters.State.Filter>
+		let crossAction: (TransactionFilter) -> Void
+
+		var body: some SwiftUI.View {
+			ScrollView(.horizontal) {
+				HStack {
+					ForEach(filters) { filter in
+						TransactionFilterView(filter: filter, action: { _ in }, crossAction: crossAction)
+					}
+
+					Spacer(minLength: 0)
+				}
+				.padding(.horizontal, .medium3)
+			}
+		}
+
+		struct Dummy: SwiftUI.View {
+			var body: some SwiftUI.View {
+				Text("DUMMY")
+					.textStyle(.body1HighImportance)
+					.foregroundStyle(.clear)
+					.padding(.vertical, .small2)
+			}
+		}
+	}
+
 	struct SectionHeaderView: SwiftUI.View {
 		let title: String
 
@@ -111,11 +172,35 @@ extension TransactionHistory {
 				.textStyle(.body2Header)
 				.foregroundStyle(.app.gray2)
 				.padding(.horizontal, .medium3)
-				.padding(.top, .small1)
-				.padding(.bottom, .small2)
+				.padding(.vertical, .small2)
 				.frame(maxWidth: .infinity, alignment: .leading)
 				.background(.app.gray5)
 		}
+	}
+}
+
+private extension StoreOf<TransactionHistory> {
+	var destination: PresentationStoreOf<TransactionHistory.Destination> {
+		func scopeState(state: State) -> PresentationState<TransactionHistory.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<TransactionHistory>) -> some View {
+		let destinationStore = store.destination
+		return sheet(store: destinationStore.scope(state: \.filters, action: \.filters)) {
+			TransactionHistoryFilters.View(store: $0)
+		}
+	}
+}
+
+extension TransactionHistoryItem {
+	var isEmpty: Bool {
+		manifestClass != .accountDepositSettingsUpdate && deposits.isEmpty && withdrawals.isEmpty
 	}
 }
 
@@ -137,21 +222,31 @@ extension TransactionHistory {
 					}
 
 					VStack(spacing: .small1) {
-						if !transaction.withdrawals.isEmpty {
-							TransfersActionView(type: .withdrawal, resources: transaction.withdrawals)
-								.padding(.horizontal, .medium3)
-						}
+						if transaction.failed {
+							FailedTransactionView()
+						} else if transaction.isEmpty {
+							EmptyTransactionView()
+						} else {
+							if !transaction.withdrawals.isEmpty {
+								let resources = transaction.withdrawals.map(\.viewState)
+								TransfersActionView(type: .withdrawal, resources: resources)
+							}
 
-						if !transaction.deposits.isEmpty {
-							TransfersActionView(type: .deposit, resources: transaction.deposits)
-								.padding(.horizontal, .medium3)
+							if !transaction.deposits.isEmpty {
+								let resources = transaction.deposits.map(\.viewState)
+								TransfersActionView(type: .deposit, resources: resources)
+							}
+
+							if transaction.depositSettingsUpdated {
+								DepositSettingsActionView()
+							}
 						}
 					}
 					.overlay(alignment: .topTrailing) {
 						TimeStampView(manifestClass: transaction.manifestClass, time: transaction.time)
-							.padding(.trailing, .medium3)
 					}
 					.padding(.top, .small1)
+					.padding(.horizontal, .medium3)
 				}
 				.padding(.bottom, .medium3)
 			}
@@ -192,17 +287,7 @@ extension TransactionHistory {
 			}
 
 			private var manifestClassLabel: String {
-				switch manifestClass {
-				case .general: "General" // FIXME: Strings
-				case .transfer: "Transfer"
-				case .poolContribution: "Contribution"
-				case .poolRedemption: "Redemption"
-				case .validatorStake: "Stake"
-				case .validatorUnstake: "Unstake"
-				case .validatorClaim: "Claim"
-				case .accountDepositSettingsUpdate: "Deposit Settings"
-				case .none: "Other"
-				}
+				TransactionHistory.label(for: manifestClass)
 			}
 
 			private var timeLabel: String {
@@ -221,48 +306,134 @@ extension TransactionHistory {
 
 			var body: some SwiftUI.View {
 				VStack {
-					HStack(spacing: .zero) {
-						Image(asset: asset)
-							.padding(.trailing, .small3)
-
-						Text(label)
-							.textStyle(.body2Header)
-							.foregroundColor(textColor)
-
-						Spacer()
+					switch type {
+					case .withdrawal:
+						EventHeader(event: .withdrawn)
+					case .deposit:
+						EventHeader(event: .deposited)
 					}
 
 					ResourceBalancesView(resources)
+						.environment(\.resourceBalanceHideDetails, true)
+				}
+			}
+		}
+
+		struct DepositSettingsActionView: SwiftUI.View {
+			var body: some SwiftUI.View {
+				VStack {
+					EventHeader(event: .settings)
+
+					Text(L10n.TransactionHistory.updatedDepositSettings)
+						.textStyle(.body2HighImportance)
+						.foregroundColor(.app.gray1)
+						.flushedLeft
+						.padding(.small1)
+						.roundedCorners(strokeColor: .app.gray3)
+				}
+			}
+		}
+
+		struct FailedTransactionView: SwiftUI.View {
+			var body: some SwiftUI.View {
+				VStack {
+					EventHeader.Dummy()
+
+					HStack(spacing: .small2) {
+						Image(.warningError)
+							.resizable()
+							.frame(.smallest)
+							.tint(.app.notification)
+
+						Text(L10n.TransactionHistory.failedTransaction)
+							.textStyle(.body2HighImportance)
+							.foregroundColor(.app.notification)
+
+						Spacer(minLength: 0)
+					}
+					.padding(.horizontal, .small1)
+					.padding(.vertical, .medium3)
+					.roundedCorners(strokeColor: .app.gray3)
+				}
+			}
+		}
+
+		struct EmptyTransactionView: SwiftUI.View {
+			var body: some SwiftUI.View {
+				VStack {
+					EventHeader.Dummy()
+
+					Text(L10n.TransactionHistory.noBalanceChanges)
+						.textStyle(.body2HighImportance)
+						.foregroundColor(.app.gray1)
+						.flushedLeft
+						.padding(.small1)
+						.roundedCorners(strokeColor: .app.gray3)
+				}
+			}
+		}
+
+		struct EventHeader: SwiftUI.View {
+			let event: Event
+
+			var body: some SwiftUI.View {
+				HStack(spacing: .zero) {
+					Image(image)
+						.padding(.trailing, .small3)
+
+					Text(label)
+						.textStyle(.body2Header)
+						.foregroundColor(textColor)
+
+					Spacer()
 				}
 			}
 
-			private var asset: ImageAsset {
-				switch type {
-				case .deposit:
-					AssetResource.transactionHistoryDeposit
-				case .withdrawal:
-					AssetResource.transactionHistoryWithdrawal
+			private var image: ImageResource {
+				switch event {
+				case .deposited:
+					.transactionHistoryDeposit
+				case .withdrawn:
+					.transactionHistoryWithdrawal
+				case .settings:
+					.transactionHistorySettings
 				}
 			}
 
 			private var label: String {
-				switch type {
-				case .deposit:
-					"Deposited"
-				case .withdrawal:
-					"Withdrawn"
+				switch event {
+				case .deposited:
+					L10n.TransactionHistory.depositedSection
+				case .withdrawn:
+					L10n.TransactionHistory.withdrawnSection
+				case .settings:
+					L10n.TransactionHistory.settingsSection
 				}
 			}
 
 			private var textColor: Color {
-				switch type {
-				case .deposit:
+				switch event {
+				case .deposited:
 					.app.green1
-				case .withdrawal:
+				case .withdrawn, .settings:
 					.app.gray1
 				}
 			}
+
+			struct Dummy: SwiftUI.View {
+				var body: some SwiftUI.View {
+					Text("DUMMY")
+						.textStyle(.body2Header)
+						.foregroundColor(.clear)
+				}
+			}
 		}
+	}
+
+	public enum Event {
+		case deposited
+		case withdrawn
+		case settings
 	}
 }
 
@@ -313,7 +484,6 @@ public struct HScrollBar<Item: ScrollBarItem>: View {
 						.animation(.default, value: rect)
 				}
 			}
-			.padding(.vertical, .small1)
 			.padding(.horizontal, .medium3)
 		}
 		.scrollIndicators(.never)
@@ -327,7 +497,7 @@ public struct HScrollBarDummy: View {
 	public var body: some View {
 		Text("DUMMY")
 			.foregroundStyle(.clear)
-			.padding(.vertical, 2 * .small2)
+			.padding(.vertical, .small2)
 			.frame(maxWidth: .infinity)
 	}
 }
@@ -352,10 +522,67 @@ private enum PositionsPreferenceKey: PreferenceKey {
 	}
 }
 
-// "ViewState"
-
 extension TransactionHistory.State.TransactionSection {
 	var title: String {
 		day.formatted(date: .abbreviated, time: .omitted)
+	}
+}
+
+extension View {
+	public func measureSize(_ id: AnyHashable) -> some View {
+		background {
+			GeometryReader { proxy in
+				Color.clear
+					.preference(key: PositionsPreferenceKey.self, value: [id: proxy.frame(in: .local)])
+			}
+		}
+	}
+
+	public func readSize(_ id: AnyHashable, content: @escaping (CGSize) -> some View) -> some View {
+		overlayPreferenceValue(PositionsPreferenceKey.self, alignment: .top) { positions in
+			if let size = positions[id]?.size {
+				content(size)
+			} else {
+				EmptyView()
+			}
+		}
+	}
+
+	public func onReadSize(_ id: AnyHashable, content: @escaping (CGSize) -> Void) -> some View {
+		onPreferenceChange(PositionsPreferenceKey.self) { positions in
+			if let size = positions[id]?.size {
+				content(size)
+			}
+		}
+	}
+
+	public func onReadSizes(_ id1: AnyHashable, _ id2: AnyHashable, content: @escaping (CGSize, CGSize) -> Void) -> some View {
+		onPreferenceChange(PositionsPreferenceKey.self) { positions in
+			if let size1 = positions[id1]?.size, let size2 = positions[id2]?.size {
+				content(size1, size2)
+			}
+		}
+	}
+}
+
+extension TransactionHistory {
+	static func label(for transactionType: TransactionFilter.TransactionType?) -> String {
+		switch transactionType {
+		case let .some(transactionType): label(for: transactionType)
+		case .none: L10n.TransactionHistory.ManifestClass.other
+		}
+	}
+
+	static func label(for transactionType: TransactionFilter.TransactionType) -> String {
+		switch transactionType {
+		case .general: L10n.TransactionHistory.ManifestClass.general
+		case .transfer: L10n.TransactionHistory.ManifestClass.transfer
+		case .poolContribution: L10n.TransactionHistory.ManifestClass.contribute
+		case .poolRedemption: L10n.TransactionHistory.ManifestClass.redeem
+		case .validatorStake: L10n.TransactionHistory.ManifestClass.staking
+		case .validatorUnstake: L10n.TransactionHistory.ManifestClass.unstaking
+		case .validatorClaim: L10n.TransactionHistory.ManifestClass.claim
+		case .accountDepositSettingsUpdate: L10n.TransactionHistory.ManifestClass.accountSettings
+		}
 	}
 }
