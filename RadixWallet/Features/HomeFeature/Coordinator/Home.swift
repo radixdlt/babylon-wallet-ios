@@ -46,6 +46,7 @@ public struct Home: Sendable, FeatureReducer {
 		case importMnemonic
 		case loadedShouldWriteDownPersonasSeedPhrase(Bool)
 		case currentGatewayChanged(to: Radix.Gateway)
+		case shouldShowNPSSurvey(Bool)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -63,7 +64,7 @@ public struct Home: Sendable, FeatureReducer {
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
 			case exportMnemonic(ExportMnemonic.State)
 			case acknowledgeJailbreakAlert(AlertState<Action.AcknowledgeJailbreakAlert>)
-			case userFeedback(UserFeedback.State)
+			case npsSurvey(NPSSurvey.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -72,7 +73,7 @@ public struct Home: Sendable, FeatureReducer {
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
 			case exportMnemonic(ExportMnemonic.Action)
 			case acknowledgeJailbreakAlert(AcknowledgeJailbreakAlert)
-			case userFeedback(UserFeedback.Action)
+			case npsSurvey(NPSSurvey.Action)
 
 			public enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
 		}
@@ -90,8 +91,8 @@ public struct Home: Sendable, FeatureReducer {
 			Scope(state: /State.exportMnemonic, action: /Action.exportMnemonic) {
 				ExportMnemonic()
 			}
-			Scope(state: /State.userFeedback, action: /Action.userFeedback) {
-				UserFeedback()
+			Scope(state: /State.npsSurvey, action: /Action.npsSurvey) {
+				NPSSurvey()
 			}
 		}
 	}
@@ -104,6 +105,8 @@ public struct Home: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.iOSSecurityClient) var iOSSecurityClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
+	@Dependency(\.npsSurveyClient) var npsSurveyClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init() {}
 
@@ -147,14 +150,14 @@ public struct Home: Sendable, FeatureReducer {
 			.merge(with: checkAccountsAccessToMnemonic(state: state))
 			.merge(with: loadShouldWriteDownPersonasSeedPhrase())
 			.merge(with: loadGateways())
+			.merge(with: loadNPSSurveyStatus())
 
 		case .createAccountButtonTapped:
-			state.destination = .userFeedback(.init())
-//			state.destination = .createAccount(
-//				.init(config: .init(
-//					purpose: .newAccountFromHome
-//				))
-//			)
+			state.destination = .createAccount(
+				.init(config: .init(
+					purpose: .newAccountFromHome
+				))
+			)
 			return .none
 		case .pullToRefreshStarted:
 			let accountAddresses = state.accounts.map(\.address)
@@ -223,6 +226,12 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			//            #endif
 			return .none
+
+		case let .shouldShowNPSSurvey(shouldShow):
+			if shouldShow {
+				state.destination = .npsSurvey(.init())
+			}
+			return .none
 		}
 	}
 
@@ -249,7 +258,6 @@ public struct Home: Sendable, FeatureReducer {
 			case .importMnemonics:
 				return importMnemonics(state: &state)
 			}
-
 		default:
 			return .none
 		}
@@ -290,9 +298,20 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			return .none
 
+		case let .npsSurvey(.delegate(.feedbackFilled(userFeedback))):
+			state.destination = nil
+			return uploadUserFeedback(userFeedback)
+
 		default:
 			return .none
 		}
+	}
+
+	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		if case .npsSurvey = state.destination {
+			return uploadUserFeedback(nil)
+		}
+		return .none
 	}
 
 	private func dismissAccountDetails(then internalAction: InternalAction, _ state: inout State) -> Effect<Action> {
@@ -334,6 +353,23 @@ public struct Home: Sendable, FeatureReducer {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.currentGatewayChanged(to: gateway)))
 			}
+		}
+	}
+
+	private func loadNPSSurveyStatus() -> Effect<Action> {
+		.run { send in
+			for try await shouldAsk in await npsSurveyClient.shouldAskForUserFeedback() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.shouldShowNPSSurvey(shouldAsk)))
+			}
+		}
+	}
+
+	private func uploadUserFeedback(_ feedback: NPSSurveyClient.UserFeedback?) -> Effect<Action> {
+		overlayWindowClient.scheduleHUD(.thankYou)
+
+		return .run { _ in
+			await npsSurveyClient.uploadUserFeedback(feedback)
 		}
 	}
 }

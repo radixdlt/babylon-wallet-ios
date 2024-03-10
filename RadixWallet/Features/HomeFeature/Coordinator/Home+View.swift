@@ -95,6 +95,9 @@ extension Home {
 			.onFirstAppear {
 				store.send(.view(.onFirstAppear))
 			}
+			.onAppear {
+				debugPrint("Home did Appear")
+			}
 		}
 
 		private struct HeaderView: SwiftUI.View {
@@ -200,9 +203,9 @@ private extension View {
 	private func userFeedback(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /Home.Destination.State.userFeedback,
-			action: Home.Destination.Action.userFeedback,
-			content: { UserFeedback.View(store: $0) }
+			state: /Home.Destination.State.npsSurvey,
+			action: Home.Destination.Action.npsSurvey,
+			content: { NPSSurvey.View(store: $0) }
 		)
 	}
 }
