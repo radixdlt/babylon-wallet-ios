@@ -341,16 +341,16 @@ extension TransactionHistory {
 
 					HStack(spacing: .small2) {
 						Image(.warningError)
+							.renderingMode(.template)
 							.resizable()
 							.frame(.smallest)
-							.tint(.app.notification)
 
 						Text(L10n.TransactionHistory.failedTransaction)
 							.textStyle(.body2HighImportance)
-							.foregroundColor(.app.notification)
 
 						Spacer(minLength: 0)
 					}
+					.foregroundColor(.app.red1)
 					.padding(.horizontal, .small1)
 					.padding(.vertical, .medium3)
 					.roundedCorners(strokeColor: .app.gray3)
