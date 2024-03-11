@@ -7,6 +7,11 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		let availableMonths: [DateRangeItem]
 
+		// The metadata used by the filters
+		let filterMetadata: [ResourceAddress: OnLedgerEntity.Metadata]
+
+		let allResourceAddresses: Set<ResourceAddress>
+
 		var resources: IdentifiedArrayOf<OnLedgerEntity.Resource> = []
 
 		var activeFilters: IdentifiedArrayOf<TransactionHistoryFilters.State.Filter> = []
@@ -21,7 +26,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		struct Loading: Hashable, Sendable {
 			let range: Range<Date>
 			let filters: [TransactionFilter]
-			var didLoadResources: Bool = false
 			var loadedRange: Range<Date>
 			var cursor: String?
 			var isLoading: Bool
@@ -35,18 +39,15 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		public var destination: Destination.State?
 
 		init(account: Profile.Network.Account) throws {
-			var account = account
-			if account.networkID == .mainnet {
-				account = .init(
-					networkID: account.networkID,
-					address: try! AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l"),
-					securityState: account.securityState,
-					appearanceID: account.appearanceID,
-					displayName: account.displayName
-				)
+			@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+
+			guard let portfolio = accountPortfoliosClient.portfolios().first(where: { $0.address == account.address }) else {
+				struct MissingPortfolioError: Error { let account: AccountAddress }
+				throw MissingPortfolioError(account: account.accountAddress)
 			}
 
 			self.account = account
+			self.filterMetadata = portfolio.filterMetadata
 			self.availableMonths = try .from(babylonDate)
 			self.currentMonth = availableMonths[availableMonths.endIndex - 1].id
 			self.loading = .start(babylonDate)
@@ -74,7 +75,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Hashable {
-		case loadedResources(IdentifiedArrayOf<OnLedgerEntity.Resource>)
 		case loadedHistory(TransactionHistoryResponse)
 	}
 
@@ -116,18 +116,14 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onAppear:
-			return loadResources(state: state)
+			return loadHistory(state: &state)
 
 		case let .selectedMonth(month):
 			state.currentMonth = month
 			return loadHistory(state: &state)
 
 		case .filtersTapped:
-			guard state.loading.didLoadResources else {
-				loggerGlobal.error("The filters button should not be enabled until the resources have been loaded")
-				return .none
-			}
-			state.destination = .filters(.init(assets: state.resources, filters: state.activeFilters.map(\.id)))
+			state.destination = .filters(.init(metadata: state.filterMetadata, filters: state.activeFilters.map(\.id)))
 			return .none
 
 		case let .filterCrossTapped(id):
@@ -141,8 +137,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadedResources(resources):
-			loadedResources(resources, state: &state)
 		case let .loadedHistory(history):
 			loadedHistory(history, state: &state)
 		}
@@ -164,30 +158,11 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	// Helper methods
 
-	func loadResources(state: State) -> Effect<Action> {
-		.run { [account = state.account.address] send in
-			let resources = try await accountPortfoliosClient.fetchAccountPortfolio(account, false).allResources
-			await send(.internal(.loadedResources(resources)))
-		}
-	}
-
-	func loadedResources(_ resources: IdentifiedArrayOf<OnLedgerEntity.Resource>, state: inout State) -> Effect<Action> {
-		state.resources = resources
-		state.loading.didLoadResources = true
-		return loadHistory(state: &state)
-	}
-
 	func loadHistory(state: inout State) -> Effect<Action> {
 		state.loading.isLoading = true
 		guard let range = state.availableMonths.first(where: { $0.id == state.currentMonth })?.range.clamped else {
 			return .none
 		}
-
-		guard state.loading.didLoadResources else {
-			return loadResources(state: state)
-		}
-
-//		let mockAccount = state.account.networkID == .mainnet ? try! AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l") : nil
 
 		let request = TransactionHistoryRequest(
 			account: state.account.accountAddress,
@@ -206,7 +181,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	func loadedHistory(_ response: TransactionHistoryResponse, state: inout State) -> Effect<Action> {
 		state.loading.isLoading = false
-//		state.resources = response.allResources
+		state.resources.append(contentsOf: response.allResources)
 
 //		let newSections = transactions.inSections
 //		var sections = self.sections
@@ -223,42 +198,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		print("••• UPDATED history, set res: \(response.allResources.count)")
 
 		return .none
-	}
-}
-
-extension OnLedgerEntity.Account {
-	var allResources: IdentifiedArrayOf<OnLedgerEntity.Resource> {
-		var result: IdentifiedArrayOf<OnLedgerEntity.Resource> = []
-
-		if let xrd = fungibleResources.xrdResource {
-			result.append(xrd.resource)
-		}
-		result.append(contentsOf: fungibleResources.nonXrdResources.map(\.resource))
-		result.append(contentsOf: nonFungibleResources.map(\.resource))
-		result.append(contentsOf: poolUnitResources.poolUnits.map(\.resource.resource))
-
-		for stake in poolUnitResources.radixNetworkStakes {
-			if let stakeClaim = stake.stakeClaimResource {
-				result.append(stakeClaim.resource)
-			}
-			if let stakeUnit = stake.stakeUnitResource {
-				result.append(stakeUnit.resource)
-			}
-		}
-
-		return result
-	}
-}
-
-private extension OnLedgerEntity.OwnedFungibleResource {
-	var resource: OnLedgerEntity.Resource {
-		.init(resourceAddress: resourceAddress, atLedgerState: atLedgerState, metadata: metadata)
-	}
-}
-
-private extension OnLedgerEntity.OwnedNonFungibleResource {
-	var resource: OnLedgerEntity.Resource {
-		.init(resourceAddress: resourceAddress, atLedgerState: atLedgerState, metadata: metadata)
 	}
 }
 
