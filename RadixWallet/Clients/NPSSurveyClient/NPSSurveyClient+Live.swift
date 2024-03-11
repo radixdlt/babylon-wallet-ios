@@ -41,11 +41,17 @@ extension NPSSurveyClient {
 		@Dependency(\.userDefaults) var userDefaults
 		@Dependency(\.date) var date
 
-		if transactionCounter == Self.feedbackTransactionCounterThreshold {
+		if transactionCounter > Self.feedbackTransactionCounterThreshold {
 			return true
 		} else if transactionCounter > Self.feedbackTransactionCounterThreshold {
 			guard let lastSubmittedDate = userDefaults.getDateOfLastSubmittedNPSSurvey() else {
-				return false
+				// No submit date saved?
+				// Can happen if user did close the app while the original NPS survey was shown.
+				// And since the next NPS survey check will happen only after user did perform
+				// yet another transaction, the execution will reach this guard branch.
+				// Therefore, it is considered that user did not yet submit an NPS survey, so ask the user
+				// to complete the it.
+				return true
 			}
 
 			let calendar = Calendar.current
