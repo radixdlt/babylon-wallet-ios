@@ -150,7 +150,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .resourceLoaded(resource, newAsset):
-			state.loadedResources.append(.init(iconURL: resource?.metadata.iconURL, name: resource?.metadata.name, address: newAsset))
+			state.loadedResources.append(.init(iconURL: resource?.metadata.iconURL, name: resource?.metadata.title, address: newAsset))
 
 			switch newAsset {
 			case let .assetException(resource):
@@ -173,7 +173,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 				let resourceDetails = resources.first { $0.resourceAddress == address.resourceAddress }
 				return .init(
 					iconURL: resourceDetails?.metadata.iconURL,
-					name: resourceDetails?.metadata.name,
+					name: resourceDetails?.metadata.title,
 					address: address
 				)
 			}

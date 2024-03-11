@@ -20,6 +20,7 @@ public struct StateNonFungibleLocationRequest: Codable, Hashable {
     public private(set) var atLedgerState: LedgerStateSelector?
     /** Bech32m-encoded human readable version of the address. */
     public private(set) var resourceAddress: String
+    /** limited to max 100 items. */
     public private(set) var nonFungibleIds: [String]
 
     public init(atLedgerState: LedgerStateSelector? = nil, resourceAddress: String, nonFungibleIds: [String]) {

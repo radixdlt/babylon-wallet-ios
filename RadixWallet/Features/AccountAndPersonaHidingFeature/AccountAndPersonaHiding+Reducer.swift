@@ -1,5 +1,5 @@
 // MARK: - AccountAndPersonaHiding
-@Reducer
+
 public struct AccountAndPersonaHiding: Sendable, FeatureReducer {
 	// MARK: - State
 
@@ -27,12 +27,13 @@ public struct AccountAndPersonaHiding: Sendable, FeatureReducer {
 		case didUnhideAllEntities
 	}
 
-	@Reducer
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case confirmUnhideAllAlert(AlertState<Action.ConfirmUnhideAllAlert>)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case confirmUnhideAllAlert(ConfirmUnhideAllAlert)
 

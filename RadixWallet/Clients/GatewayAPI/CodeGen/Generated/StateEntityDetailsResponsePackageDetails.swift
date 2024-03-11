@@ -15,9 +15,11 @@ public typealias StateEntityDetailsResponsePackageDetails = GatewayAPI.StateEnti
 
 extension GatewayAPI {
 
+/** vm_type, code_hash_hex and code_hex are always going to be empty, use &#x60;codes&#x60; property which will return collection (it&#39;s possible after protocol update that package might have multiple codes) */
 public struct StateEntityDetailsResponsePackageDetails: Codable, Hashable {
 
     public private(set) var type: StateEntityDetailsResponseItemDetailsType
+    public private(set) var codes: StateEntityDetailsResponsePackageDetailsCodeCollection
     public private(set) var vmType: PackageVmType
     /** Hex-encoded binary blob. */
     public private(set) var codeHashHex: String
@@ -28,8 +30,9 @@ public struct StateEntityDetailsResponsePackageDetails: Codable, Hashable {
     public private(set) var blueprints: StateEntityDetailsResponsePackageDetailsBlueprintCollection?
     public private(set) var schemas: StateEntityDetailsResponsePackageDetailsSchemaCollection?
 
-    public init(type: StateEntityDetailsResponseItemDetailsType, vmType: PackageVmType, codeHashHex: String, codeHex: String, royaltyVaultBalance: String? = nil, blueprints: StateEntityDetailsResponsePackageDetailsBlueprintCollection? = nil, schemas: StateEntityDetailsResponsePackageDetailsSchemaCollection? = nil) {
+    public init(type: StateEntityDetailsResponseItemDetailsType, codes: StateEntityDetailsResponsePackageDetailsCodeCollection, vmType: PackageVmType, codeHashHex: String, codeHex: String, royaltyVaultBalance: String? = nil, blueprints: StateEntityDetailsResponsePackageDetailsBlueprintCollection? = nil, schemas: StateEntityDetailsResponsePackageDetailsSchemaCollection? = nil) {
         self.type = type
+        self.codes = codes
         self.vmType = vmType
         self.codeHashHex = codeHashHex
         self.codeHex = codeHex
@@ -40,6 +43,7 @@ public struct StateEntityDetailsResponsePackageDetails: Codable, Hashable {
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case type
+        case codes
         case vmType = "vm_type"
         case codeHashHex = "code_hash_hex"
         case codeHex = "code_hex"
@@ -53,6 +57,7 @@ public struct StateEntityDetailsResponsePackageDetails: Codable, Hashable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(type, forKey: .type)
+        try container.encode(codes, forKey: .codes)
         try container.encode(vmType, forKey: .vmType)
         try container.encode(codeHashHex, forKey: .codeHashHex)
         try container.encode(codeHex, forKey: .codeHex)

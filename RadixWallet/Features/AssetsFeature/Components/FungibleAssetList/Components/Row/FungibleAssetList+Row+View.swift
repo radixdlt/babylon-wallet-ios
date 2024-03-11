@@ -5,7 +5,7 @@ extension FungibleAssetList.Section.Row.State {
 	var viewState: FungibleAssetList.Section.Row.ViewState {
 		.init(
 			thumbnail: isXRD ? .xrd : .other(token.metadata.iconURL),
-			symbol: token.metadata.symbol ?? token.metadata.name ?? "",
+			title: token.metadata.title,
 			tokenAmount: token.amount.formatted(),
 			isSelected: isSelected
 		)
@@ -16,7 +16,7 @@ extension FungibleAssetList.Section.Row.State {
 extension FungibleAssetList.Section.Row {
 	public struct ViewState: Equatable {
 		let thumbnail: Thumbnail.TokenContent
-		let symbol: String
+		let title: String?
 		let tokenAmount: String
 		let isSelected: Bool?
 	}
@@ -35,9 +35,11 @@ extension FungibleAssetList.Section.Row {
 					HStack(spacing: .small1) {
 						Thumbnail(token: viewStore.thumbnail, size: .small)
 
-						Text(viewStore.symbol)
-							.foregroundColor(.app.gray1)
-							.textStyle(.body2HighImportance)
+						if let title = viewStore.title {
+							Text(title)
+								.foregroundColor(.app.gray1)
+								.textStyle(.body2HighImportance)
+						}
 					}
 
 					Spacer()

@@ -335,9 +335,6 @@ public struct DappDetails: Sendable, FeatureReducer {
 		let associatedDapps = loadedDApps.filter { dApp in
 			do {
 				try dApp.metadata.validate(dAppDefinitionAddress: dApp.address)
-				guard dApp.metadata.name != nil else {
-					throw OnLedgerEntity.Metadata.MetadataError.missingName
-				}
 				return true
 			} catch {
 				loggerGlobal.warning("Invalida dApp \(error)")

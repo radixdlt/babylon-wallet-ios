@@ -923,7 +923,7 @@ extension TransactionReview {
 					resource: resource,
 					stakeClaims: stakeClaimTokens.asIdentifiable()
 				),
-				validatorName: stakeClaimValidator.metadata.name ?? L10n.TransactionReview.unknown
+				validatorName: stakeClaimValidator.metadata.name
 			))
 		)]
 	}

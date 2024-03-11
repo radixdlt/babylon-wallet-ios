@@ -35,14 +35,15 @@ extension FungibleResourceAsset.View {
 			VStack(alignment: .trailing) {
 				HStack {
 					Thumbnail(token: viewStore.thumbnail, size: .smallest)
-					if let name = viewStore.resource.metadata.name {
-						Text(name)
+
+					if let title = viewStore.resource.metadata.title {
+						Text(title)
 							.textStyle(.body2HighImportance)
 							.foregroundColor(.app.gray1)
 					}
 
 					TextField(
-						"0.00",
+						RETDecimal.zero.formatted(),
 						text: viewStore.binding(
 							get: \.transferAmountStr,
 							send: { .amountChanged($0) }

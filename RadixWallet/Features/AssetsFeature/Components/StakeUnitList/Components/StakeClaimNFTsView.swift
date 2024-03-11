@@ -49,8 +49,8 @@ public struct StakeClaimResourceView: View {
 					.padding(.trailing, .small1)
 
 				VStack(alignment: .leading, spacing: .zero) {
-					if let name = viewState.resourceMetadata.name {
-						Text(name)
+					if let title = viewState.resourceMetadata.title {
+						Text(title)
 							.textStyle(.body1Header)
 							.foregroundStyle(.app.gray1)
 					}

@@ -200,7 +200,7 @@ extension DappDetails.View {
 
 		var body: some View {
 			WithViewStore(store, observe: \.fungibles, send: { .view($0) }) { viewStore in
-				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.tokens, elements: viewStore.state, title: \.title) { resource in
+				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.tokens, elements: viewStore.state, title: \.metadata.title) { resource in
 					Thumbnail(token: .other(resource.metadata.iconURL), size: .small)
 				} action: { id in
 					viewStore.send(.fungibleTapped(id))
@@ -215,7 +215,7 @@ extension DappDetails.View {
 
 		var body: some View {
 			WithViewStore(store, observe: \.nonFungibles, send: { .view($0) }) { viewStore in
-				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.nfts, elements: viewStore.state, title: \.title) { resource in
+				ListWithHeading(heading: L10n.AuthorizedDapps.DAppDetails.nfts, elements: viewStore.state, title: \.metadata.title) { resource in
 					Thumbnail(.nft, url: resource.metadata.iconURL, size: .small)
 				} action: { id in
 					viewStore.send(.nonFungibleTapped(id))
@@ -243,7 +243,7 @@ extension DappDetails.View {
 						Card {
 							action(element.id)
 						} contents: {
-							PlainListRow(title: title(element) ?? L10n.TransactionReview.unknown, accessory: nil) {
+							PlainListRow(title: title(element) ?? "", accessory: nil) {
 								icon(element)
 							}
 						}

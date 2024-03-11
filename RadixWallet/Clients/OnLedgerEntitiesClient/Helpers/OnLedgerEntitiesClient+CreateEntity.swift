@@ -541,9 +541,9 @@ extension OnLedgerEntitiesClient {
 	}
 }
 
-extension OnLedgerEntity.Resource {
+extension OnLedgerEntity.Metadata {
 	var title: String? {
-		metadata.symbol ?? metadata.name
+		symbol ?? name
 	}
 }
 

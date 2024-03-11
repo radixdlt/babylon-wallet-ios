@@ -42,8 +42,7 @@ extension Settings {
 
 // MARK: - SettingsRowModel
 struct SettingsRowModel<Feature: FeatureReducer>: Identifiable {
-	var id: String { rowViewState.rowCoreViewState.title }
-
+	let id: String
 	let rowViewState: PlainListRow<AssetIcon>.ViewState
 	let action: Feature.ViewAction
 
@@ -54,6 +53,7 @@ struct SettingsRowModel<Feature: FeatureReducer>: Identifiable {
 		icon: AssetIcon.Content,
 		action: Feature.ViewAction
 	) {
+		self.id = title
 		self.rowViewState = .init(icon, rowCoreViewState: .init(title: title, subtitle: subtitle, hint: hint))
 		self.action = action
 	}

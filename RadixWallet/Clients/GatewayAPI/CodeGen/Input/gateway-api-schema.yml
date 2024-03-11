@@ -1,12 +1,12 @@
 openapi: 3.0.0
 info:
-  version: v1.2.0
+  version: v1.4.0
   title: Radix Gateway API - Babylon
   license:
     name: The Radix License, Version 1.0
     url: https://www.radixfoundation.org/licenses/license-v1
   x-logo:
-    url: https://docs-babylon.radixdlt.com/main/_images/radix-logo-banner.png
+    url: https://cdn.document360.io/50e78792-5410-4ac9-aa43-4612b4d33953/Images/Documentation/radix-logo-banner.png
     href: https://docs.radixdlt.com
   description: |
     This API is exposed by the Babylon Radix Gateway to enable clients to efficiently query current and historic
@@ -51,6 +51,7 @@ x-tagGroups:
       - SubAPIs
       - Concepts
       - Architecture
+      - Examples
   - name: Endpoints
     tags:
       - Status
@@ -69,37 +70,6 @@ tags:
       - **Stream** (`/transaction/*`) - For reading committed transactions.
       - **State** (`/state/*`) - For reading the current or past ledger state of the network.
       - **Statistics** (`/statistics/*`) - For calculating particular statistics against the current or past ledger state of the network.
-  - name: Architecture
-    x-traitTag: true
-    description: |
-
-      ## Request-Response Format
-
-      The API is designed in a JSON-RPC-like style, using HTTP as a transport layer, which means that:
-      - Requests always use HTTP POST method.
-      - There is no HTTP cache involved.
-      - Client-originated errors result in HTTP 4xx error responses.
-      - Server-originated errors result in HTTP 5xx error responses:
-          - The error object contains an HTTP-like `code`
-          - The error object also contains a structured/typed properties, with a `type` discriminator, allowing for structured error interpretation in client software.
-
-      ## Pagination Model
-
-      Collections can grow in size therefore every dynamic-length collection is a subject to pagination where a generic data struct is used to represent a chunk (page) of
-      underlying data. Gateway API uses cursor-based pagination model where the sole existence of the cursor indicates that next chunk (page) of the underlying collection is
-      available.
-
-      ```
-      collection {
-        int64? total_count,
-        string? next_cursor,
-        T[] items
-      }
-      ```
-
-      - `total_count` *(optional)* if present specifies the overall size of the underlying collection,
-      - `next_cursor` *(optional)* if present indicates that the next chunk (page) exists and can be fetched using collection-specific endpoint and cursor value,
-      - `items` a chunk (page) of unerlying collection items.
   - name: Concepts
     x-displayName: Concepts
     x-traitTag: true # Don't display endpoints under this tag
@@ -147,6 +117,924 @@ tags:
 
       For each global entity, the Gateway aggregates its owned resources by looking at the contents of Vaults in the
       subtree of entities under that global entity.
+  - name: Architecture
+    x-traitTag: true
+    description: |
+      ## Request-Response Format
+
+      The API is designed in a JSON-RPC-like style, using HTTP as a transport layer, which means that:
+      - Requests always use the HTTP POST method.
+      - There is no HTTP cache involved.
+      - Client-originated errors result in HTTP 4xx error responses.
+      - Server-originated errors result in HTTP 5xx error responses:
+          - The error object contains an HTTP-like `code`
+          - The error object also contains a structured/typed properties, with a `type` discriminator, allowing for structured error interpretation in client software.
+
+      ## Pagination Model
+
+      Many collections have dynamic length, so these are exposed through a pagination model.
+      The Gateway API uses cursor-based pagination model where the existence of the cursor indicates that next chunk (page) of the underlying collection is
+      available, and can be used in a subsequent request to query for it.
+
+      ```
+      collection {
+        int64? total_count,
+        string? next_cursor,
+        T[] items
+      }
+      ```
+
+      - `total_count` *(optional)* if present indicates the overall size of the underlying collection,
+      - `next_cursor` *(optional)* if present indicates that the next chunk (page) exists and can be fetched using collection-specific endpoint and cursor value,
+      - `items` a chunk (page) of underlying collection items.
+
+      ## State consistency and versioning
+
+      Each response from a state endpoint returns data from a single "snapshot" of the ledger. By default, the latest available ledger version is used.
+      All state responses include a `ledger_state` property in their root object, which captures which ledger version was used by the gateway to generate the response.
+
+      Because the state of entities constantly changes, the `ledger_state` object makes it clear which state was used to generate the response.
+      The `ledger_state` object includes the `state_version` (ie the unique ID of that state version, which can also be used to uniquely identify the last transaction which brought the
+      ledger to that state version), the `timestamp` (which may be shared by neighbouring transactions, but does not decrease) and the epoch and round in that epoch
+      when the transaction was committed (again, the pair `(epoch, round)` may be shared by neighbouring transactions).
+
+      ## Browsing historical data
+
+      All endpoints with an `at_ledger_state` parameter allow you to request a particular snapshot is used for generating the response. In this way, you can browse historical state at a given point in time.
+
+      You can specify one of:
+      - `state_version`
+      - `timestamp` - which will query against the nearest state version before that timestamp
+      - `epoch` - which will query against the result of the first transaction in that epoch
+      - A pair of `epoch` and `round` - which will query against the result of the first transaction in that epoch and round
+
+      For example, the following request will return the current state (at the current tip of the ledger) for the entity with address: `resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd` (ie XRD).
+
+      ```
+      /state/entity/details
+
+      {
+        "addresses": [
+          "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"
+        ]
+      }
+      ```
+
+      Whereas the following request will return the state of XRD as it was at state version 1000, near the start of the Babylon ledger:
+      ```
+      /state/entity/details
+
+      {
+        "addresses": [
+          "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"
+        ],
+        "at_ledger_state": {
+          "state_version": 1000
+        }
+      }
+      ```
+
+      ## Using endpoints with opt-in features
+
+      To reduce bandwith and wasted work, some properties in certain endpoints are optional.
+
+      Most opt-ins default to `false` if not provided, and you can ask for the supplementary data by explicitly setting the corresponding opt-in property to `true`.
+
+      Some opt-ins for backwards-compatibility default to `true`. In these cases, explicitly providing a value of `false` will opt out of the data and save bandwidth.
+
+      Endpoints that currently support opt-ins include the following. Check out the request schemas under the endpoints themselves for more detail on how to request opt-ins:
+
+      ```
+      /transaction/committed-details
+      /stream/transactions
+      /state/entity/details
+      /state/entity/page/fungibles/
+      /state/entity/page/non-fungibles/
+      /state/entity/page/non-fungible-vaults/
+      ```
+
+      For example, the following request will return a simple, short response with opt-ins disabled:
+
+      ```
+      /transaction/committed-details
+
+      {
+        "intent_hash": "txid_rdx1t44y7lrqtrmn0pq4gxgsmn035lh5glws273h0lsff37jnzj2ylls3aeumn"
+      }
+      ```
+      ```
+      // Response
+      {
+        "ledger_state": {
+          "network": "mainnet",
+          "state_version": 5151578,
+          "proposer_round_timestamp": "2023-10-11T07:21:03.167Z",
+          "epoch": 36452,
+          "round": 1060
+        },
+        "transaction": {
+          "transaction_status": "CommittedSuccess",
+          "state_version": 5150877,
+          "epoch": 36452,
+          "round": 362,
+          "round_timestamp": "2023-10-11T07:18:30.417Z",
+          "payload_hash": "notarizedtransaction_rdx1hjlstgpadgpyeulp5yahrcz56ymkmsukmrjv42nwzvygfl9nyfhsxccm42",
+          "intent_hash": "txid_rdx1t44y7lrqtrmn0pq4gxgsmn035lh5glws273h0lsff37jnzj2ylls3aeumn",
+          "fee_paid": "0.25417642453",
+          "confirmed_at": "2023-10-11T07:18:30.417Z",
+          "receipt": {
+            "status": "CommittedSuccess",
+            "output": [
+              {
+                "hex": "5c2100",
+                "programmatic_json": null
+              },
+              {
+                "hex": "5c90f8ef824eb480c16bbceebcc36d0e263b9ebf287cdcab710332344104f11c",
+                "programmatic_json": null
+              },
+              {
+                "hex": "5c2100",
+                "programmatic_json": null
+              },
+              {
+                "hex": "5c2100",
+                "programmatic_json": null
+              }
+            ]
+          }
+        }
+      }
+      ```
+
+      Or, if we're interested in the raw transaction payload, we can enable it in the response by requesting the `"raw_hex"` opt-in,
+      which will result in the `raw_hex` property being returned:
+
+      ```
+      /transaction/committed-details
+      {
+        "intent_hash": "txid_rdx1t44y7lrqtrmn0pq4gxgsmn035lh5glws273h0lsff37jnzj2ylls3aeumn",
+        "opt_ins": {
+          "raw_hex": true
+        }
+      }
+      ```
+      ```
+      // Response
+      {
+        "ledger_state": {
+          "network": "mainnet",
+          "state_version": 5152002,
+          "proposer_round_timestamp": "2023-10-11T07:22:45.886Z",
+          "epoch": 36453,
+          "round": 152
+        },
+        "transaction": {
+          "transaction_status": "CommittedSuccess",
+          "state_version": 5150877,
+          "epoch": 36452,
+          "round": 362,
+          "round_timestamp": "2023-10-11T07:18:30.417Z",
+          "payload_hash": "notarizedtransaction_rdx1hjlstgpadgpyeulp5yahrcz56ymkmsukmrjv42nwzvygfl9nyfhsxccm42",
+          "intent_hash": "txid_rdx1t44y7lrqtrmn0pq4gxgsmn035lh5glws273h0lsff37jnzj2ylls3aeumn",
+          "fee_paid": "0.25417642453",
+          "confirmed_at": "2023-10-11T07:18:30.417Z",
+          "raw_hex": "4d22030221022104210707010a648e0000000000000a6e8e000000000000090b86dca62201012007208df9fdf4b8325fffdf300b0c68492ebc0fbe9f17c7fc811c68e6cb16a6eaf5f9010008000020220441038000d1f20f6eaff22df7090ddc21cf738ba70cd700c6e6854ea349ebec4530e80c086c6f636b5f666565210185e08f4fb23e2e21050000000000000000000000000000000041038000d1f20f6eaff22df7090ddc21cf738ba70cd700c6e6854ea349ebec4530e80c087769746864726177210280005da66318c6318c61f5a61b4c6318c6318cf794aa8d295f14e6318c6318c68500003468c609860bac140000000000000000000000000000000280005da66318c6318c61f5a61b4c6318c6318cf794aa8d295f14e6318c6318c68500003468c609860bac14000000000000000000000000000041038000d1f742847eb59027497d466b7404f6b6e3c3f0458c5a7da3eb54858c49ed0c147472795f6465706f7369745f6f725f61626f72742102810000000022000020200022000020220100012101200741017c16c54cf8ba3e3d3487172424b40502404812a7a9ceeda5aa544baa1c2d0f0c1e6cfbb3dd6af5b6aa047231d918e5288e1139d397064326ac4f63283da6686f2201012101200740e82f9e9a002a64cb3dbb2154e7912ef25720c92e0b86a7b0d090ff4c9d9992ef435b5c6d08e577f50423f8a9b831b3fbb9faecf16399a386b8412d2a53f3450f",
+          "receipt": {
+            "status": "CommittedSuccess",
+            "output": [
+              {
+                "hex": "5c2100",
+                "programmatic_json": null
+              },
+              {
+                "hex": "5c90f8ef824eb480c16bbceebcc36d0e263b9ebf287cdcab710332344104f11c",
+                "programmatic_json": null
+              },
+              {
+                "hex": "5c2100",
+                "programmatic_json": null
+              },
+              {
+                "hex": "5c2100",
+                "programmatic_json": null
+              }
+            ]
+          }
+        }
+      }
+      ```
+
+  - name: Examples
+    x-displayName: Examples
+    x-traitTag: true
+    description: |
+      ## Querying for entity data, including fungible and non-fungible resources.
+
+      The Gateway API has different entry points which can be used to fetch entity data.
+
+      The `/state/entity/details` is the main endpoint - it takes a list of entity addresses, and returns various details for those entities, which differs per entity type. A detailed specification of the response model for each entity is given in the response schema for the endpoint later in this doc. The endpoint also also supports a number of opt-ins detailed below. Many of these opt-ins return a "first page" of related data for each entity. Further pages can be requested from the `/page/` endpoints.
+
+      The entity details endpoint is supplemented by various paged endpoints, which return collections:
+
+      * `/state/entity/page/metadata` &rarr; returns entity metadata, and can be used as entry point for further pagination with the cursor returned from `/state/entity/details`
+
+      * `/state/entity/page/fungibles/` &rarr; can be used as an entry point to fetch fungible resources under a given global entity or for further pagination with the cursor returned from `/state/entity/details`
+
+      * `/state/entity/page/fungible-vaults/` &rarr; can be used as an entry point to fetch fungible vaults of a given resource under a given global entity or for further pagination with a cursor returned from `/state/entity/details`
+
+      * `/state/entity/page/non-fungibles/` &rarr; can be used as an entry point to fetch non-fungible resources under a given global entity or for further pagination with a cursor returned from `/state/entity/details`
+
+      * `/state/entity/page/non-fungible-vaults/` &rarr; can be used as an entry point to fetch non-fungible vaults of a given resource under a given global entity or for further pagination with a cursor returned from `/state/entity/details`
+
+      * `/state/entity/page/non-fungible-vault/ids` &rarr; can be used as  an entry point to fetch non fungible-ids in a given vault or for further pagination from a cursor returned from `/state/entity/details`
+
+      ### Metadata
+
+      `/state/entity/details` endpoint returns only the first page of metadata. If the queried entity contains more than one page of metadata items, a `next_cursor` will be returned, which can be used as `cursor` in the `/state/entity/page/metadata` endpoint to fetch further pages.
+
+      You can also explicitly specify a list of metadata keys which you wish to be included on any returned objects. You can do that by filling the `explicit_metadata` opt-in with the metadata keys you wish to load.
+
+      For example, the following request will return the regular `metadata` property in the response, but will also contain an `explicit_metadata` section containing `name` and `description` for each returned entity (if they are defined for that entity).
+      ```
+      /state/entity/details
+
+      {
+        "addresses": [
+          "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"
+        ],
+        "opt_ins": {
+          "explicit_metadata": [
+            "name",
+            "description"
+          ]
+        }
+      }
+      ```
+      ```
+      // Response
+      // ...
+      "explicit_metadata": {
+        "total_count": 2,
+        "items": [
+          {
+            "key": "name",
+            "value": {
+              "raw_hex": "5c2200010c055261646978",
+              "programmatic_json": {
+                "kind": "Enum",
+                "variant_id": "0",
+                "fields": [
+                  {
+                    "kind": "String",
+                    "value": "Radix"
+                  }
+                ]
+              },
+              "typed": {
+                "value": "Radix",
+                "type": "String"
+              }
+            },
+            "is_locked": true,
+            "last_updated_at_state_version": 2
+          },
+          {
+            "key": "description",
+            "value": {
+              "raw_hex": "5c2200010c9e01546865205261646978205075626c6963204e6574776f726b2773206e617469766520746f6b656e2c207573656420746f2070617920746865206e6574776f726b2773207265717569726564207472616e73616374696f6e206665657320616e6420746f2073656375726520746865206e6574776f726b207468726f756768207374616b696e6720746f206974732076616c696461746f72206e6f6465732e",
+              "programmatic_json": {
+                "kind": "Enum",
+                "variant_id": "0",
+                "fields": [
+                  {
+                    "kind": "String",
+                    "value": "The Radix Public Network's native token, used to pay the network's required transaction fees and to secure the network through staking to its validator nodes."
+                  }
+                ]
+              },
+              "typed": {
+                "value": "The Radix Public Network's native token, used to pay the network's required transaction fees and to secure the network through staking to its validator nodes.",
+                "type": "String"
+              }
+            },
+            "is_locked": true,
+            "last_updated_at_state_version": 2
+          }
+        ]
+      },
+      // ...
+      ```
+
+      ### Resource aggregation
+
+      Both fungible and non-fungible resources can be aggregated globally or per vault.
+      This is controlled by the `aggregation_level` request field.
+
+      * `Global` - If the entity contains multiple vaults of the same resource, or nested components which contains vaults of the same resource, the total balance across all these vaults will be returned. This mode is useful for TVL style calculations.
+
+      * `Vault` - Each vault is returned separately. This mode is useful for non-fungibles, because you get the vault ids which you can use to paginated ids from a vault.
+
+      ### Fungible resources opt-in
+
+      This opt-in returns only the first page of fungible resources under the entity. If the queried entity contains more resources, a `next_cursor` will be returned, which can be used with the `/state/entity/page/fungibles/` endpoint for requesting further pages.
+
+      If you requested vault aggregation, only the first page of vaults are returned for each resource. If a `next_cursor` is returned, further vaults for that resource can be fetched using that cursor with the `/state/entity/page/fungible-vaults/` endpoint.
+
+      ### Non-fungible resources opt-in
+
+      This opt-in returns only the first page of non-fungible resources under the entity. If the queried entity contains more resources, a `next_cursor` will be returned, which can be used with the `/state/entity/page/non-fungibles/` endpoint for requesting further pages.
+
+      If you requested vault aggregation, only the first page of vaults are returned for each resource . If a `next_cursor` is returned, further vaults for that resource can be fetched using that cursor with the `/state/entity/page/non-fungible-vaults/` endpoint.
+
+      If the `non_fungible_include_nfids` opt-in is set to true AND vault aggregation was requested, the response will also contain the first page of non-fungible ids in each returned vault. If the vault contains more than one page of ids, a `next_cursor` is returned, which can be used with the `/state/entity/page/non-fungible-vault/ids` endpoint to load further non-fungible ids in the vault.
+
+      ## Using the /stream/transactions endpoint
+
+      The transaction stream endpoint can be used to read a filtered stream of transaction results.
+
+      ### State version
+
+      You can narrow the range of transactions by specifying ledger state boundaries with the `at_ledger_state` and `from_ledger_state` filters.
+
+      `at_ledger_state` lets you specify at which state version you want to query. It's same for almost all endpoints where you can basically travel in time on ledger. Let's say it's currently state version 347 062 but for any reason you'd like to check how ledger looked like at state version `100`  If not specified it'll always query against current tip of the ledger.
+
+      For example, the following request will return the transaction stream as it was for state version `100` (by default all user transactions before state version `100`, from latest to oldest)
+      ```
+      /stream/transactions
+      {
+        "at_ledger_state": {"state_version": 100 }
+      }
+      ```
+
+      By contrast, `from_ledger_state` lets you specify a lower boundary of state versions. This can be used to "page forward" through the transaction stream (although by default only user transactions will be returned, and they will be in descending order):
+
+      ```
+      /stream/transactions
+
+      {
+        "from_ledger_state": {"state_version": 50 },
+      }
+      ```
+
+      You can combine these two, for example the following request will return all user transactions with state version `s` between `100` and `300` inclusive (in desceding order).
+      ```
+      /stream/transactions
+
+      {
+        "from_ledger_state": {"state_version": 100 },
+        "at_ledger_state": {"state_version": 300 }
+      }
+
+      ```
+
+      ### Supported filters
+
+      The transaction stream endpoint allows additional filters. A transaction has to satisfy all filters in order to be returned.
+
+      The currently supported filters are:
+
+      * `kind_filter` - one of `User`, `EpochChange`, `All`. You can use that filter to query for certain kinds of transactions. Defaults to `User`.
+
+      * `manifest_accounts_withdrawn_from_filter` - allows specifying an array of account addresses. If specified, the response will contain only transactions with a manifest containing withdrawals from the given accounts.
+
+      * `manifest_accounts_deposited_into_filter` - similar to withdrawn, but will return only transactions with a manifest containing deposits to the given accounts.
+
+      * `manifest_resources_filter` - allows specifying array of resource addresses. If specified, the response will contain only transactions containing the given resources in the manifest (regardless of their usage).
+
+      * `accounts_with_manifest_owner_method_calls` - allows specifying an array of account addresses. If specified, the response will contain only transactions that, for all specified accounts, contain manifest method calls to that account which require the owner role. See the [account docs](https://docs.radixdlt.com/docs/account) for more information.
+
+      * `accounts_without_manifest_owner_method_calls` - allows specifying an array of account addresses. If specified, the response will contain only transactions that, for all specified accounts, do NOT contain manifest method calls to that account which require owner role. See the [account docs](https://docs.radixdlt.com/docs/account) for more information.
+
+      * `manifest_class_filter` - allows filtering to transactions which match the given manifest classification. If specified, the response will contain only transactions which have a class that matches the filter. If `match_only_most_specific` set to true, only transactions where the queried class is most specific will be returned. See the [docs on manifest classification](https://docs.radixdlt.com/docs/conforming-transaction-manifest-types) for more information.
+
+      * `affected_global_entities_filter` - allows specifying an array of global addresses. If specified, the response will contain transactions that affected all of the given global entities. A global entity is marked as "affected" by a transaction if any of its state (or its descendents' state) was modified as a result of the transaction.
+
+      * `events_filter` - filters the transaction stream to transactions which emitted at least one event matching each filter (each filter can be satisfied by a different event). Currently *only* deposit and withdrawal events emitted by an internal vault entity are tracked. For the purpose of filtering, the emitter address is replaced by the global ancestor of the emitter, for example, the top-level account / component which contains the vault which emitted the event.
+
+      Each filter is a complex object where you can specify:
+      - `event` (required) - the event tag. Currently only the following tags are supported:
+        * `{"event": "Withdrawal"}` - Filters to "Withdraw" events from fungible and non-fungible vaults
+        * `{"event": "Deposit"}` - Filters to "Deposit" events from fungible and non-fungible vaults
+      - `emitter_address` (optional) - The "global emitter". Adding a global address here filters to matching events which have an emitter entity which is a descendent of the given global address, e.g. using `{"emitter_address" : "account_rdx16y76fepuvxqpv6gp6qswqymwhj5ng6sduugj4z6yysccvdg95g0dtr" }` filters to events emitted by vaults inside that account.
+      - `resource_address` (optional) - Adding a resource address here filters to matching events which concern the given resource, e.g. `{"resource_address" : "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"}` matches only events which involve XRD.
+
+      As an example, the following query selects all transactions where the first account withdrew XRD and the second account deposited XRD:
+
+      ```
+      {
+        "events_filter": [
+          {
+            "event": "Withdrawal",
+            "emitter_address": "account_rdx16y76fepuvxqpv6gp6qswqymwhj5ng6sduugj4z6yysccvdg95g0dtr",
+            "resource_address": "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"
+          },
+          {
+            "event": "Deposit",
+            "emitter_address": "account_rdx12x5vk07qcez6xj0zt8ve0x2g20mrssk0vrest3vf0qljd76r6zfvsx",
+            "resource_address": "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"
+          }
+        ]
+      }
+      ```
+
+      ### Pagination
+
+      If the `limit_per_page` request parameter is lower than the number of transactions to be returned, a `next_cursor` will be returned. It can be used in subsequent requests as the `cursor` parameter to fetch further pages.
+
+      For example, the following request will return a cursor:
+      ```
+      /stream/transactions
+
+      {
+        "kind_filter": "All",
+        "from_ledger_state": { "state_version": 100 },
+        "at_ledger_state": { "state_version": 300 },
+        "limit_per_page": 1
+      }
+      ```
+      ```
+      // Returns
+      {
+        // ...
+        "next_cursor": "eyJ2IjoyOTl9",
+        // ...
+      }
+      ```
+
+      Which can be used in the next query to fetch further pages:
+      ```
+      /stream/transactions
+
+      {
+        "kind_filter": "All",
+        "from_ledger_state": { "state_version": 100 },
+        "at_ledger_state": { "state_version": 300 },
+        "limit_per_page": 1,
+        "cursor": "eyJ2IjoyOTl9"
+      }
+      ```
+
+      ### Ordering
+
+      By default, transactions are returned in **descending** order (highest state version / most recent first).
+
+      You can change this to **ascending** order by setting the `order` parameter to `Asc`
+
+      ```
+      /stream/transactions
+
+      {
+        // ...
+        "order": "Asc"
+        // ...
+      }
+      ```
+
+      Keep in mind that if order is ascending you'll start fetching transactions from the oldest first and with each page you'll fetch newer transactions.
+
+      ### Reading events to find out what happened in a given dApp
+
+      Currently the gateway supports filtering by `withdrawal` and `deposit` events only.
+      We wish to support other filters in future.
+
+      For the time being, if your dApp component always updates state along with emitting events, you can use the `affected` filter to filter to all transactions which affected your component, and extract relevant events from those transactions.
+
+      For example, to find all transactions which affected `component_rdx1cq4ugccz6pg89w83ujanqlycw566kd9c9vxxuc9r45p7vues2649t4`,
+      (and therefore all events which it emitted), you can use the following request:
+      ```
+      /stream/transactions
+
+      {
+        "kind_filter": "All",
+        "affected_global_entities_filter": ["component_rdx1cq4ugccz6pg89w83ujanqlycw566kd9c9vxxuc9r45p7vues2649t4"],
+        "opt_ins": { "receipt_events": true }
+      }
+      ```
+
+      This will return the first page of all transactions, including their emitted events (which was enabled by using the `receipt_events` opt-in).
+      These emitted events can be filtered by the client to just events which were emitted by the given component (`component_rdx1cq4ugccz6pg89w83ujanqlycw566kd9c9vxxuc9r45p7vues2649t4` in this case).
+
+      ```
+      // Response
+      {
+        "transaction_status": "CommittedSuccess",
+        "state_version": 14614370,
+        "epoch": 44797,
+        "round": 655,
+        "round_timestamp": "2023-11-09T13:29:32.27Z",
+        "payload_hash": "notarizedtransaction_rdx1dmjjaww667cq388hpx4jv895yj42l7ezynqycdr97ht9s4mkhzssejpcxz",
+        "intent_hash": "txid_rdx1l0y5gw45aup7r8ex863s2ahhfwz9vdfv8jktqhcypegcf3vlk6zqhnmj9a",
+        "fee_paid": "0.57054833978",
+        "confirmed_at": "2023-11-09T13:29:32.27Z",
+        "receipt": {
+          "status": "CommittedSuccess",
+          "events": [
+            {
+              "name": "LockFeeEvent",
+              "emitter": {
+                "type": "Method",
+                "entity": {
+                  "is_global": false,
+                  "entity_type": "InternalFungibleVault",
+                  "entity_address": "internal_vault_rdx1tzst8p8vvagnyyev8eu209h6fhmdvk334vhx0vhk4em02p89hlaluu"
+                },
+                "object_module_id": "Main"
+              },
+              "data": {
+                "fields": [
+                  {
+                    "value": "0.713902721272999997",
+                    "kind": "Decimal",
+                    "field_name": "amount"
+                  }
+                ],
+                "kind": "Tuple",
+                "type_name": "LockFeeEvent"
+              }
+            },
+            {
+              "name": "WithdrawEvent",
+              "emitter": {
+                "type": "Method",
+                "entity": {
+                  "is_global": false,
+                  "entity_type": "InternalFungibleVault",
+                  "entity_address": "internal_vault_rdx1tpl4g48ul8tz8agtll35m7f936f2vuj4f8up9wlcgu6lj566vmashl"
+                },
+                "object_module_id": "Main"
+              },
+              "data": {
+                "fields": [
+                  {
+                    "value": "20",
+                    "kind": "Decimal",
+                    "field_name": "amount"
+                  }
+                ],
+                "kind": "Tuple",
+                "type_name": "WithdrawEvent"
+              }
+            },
+            // ...
+          ]
+        }
+      },
+      // ...
+      ```
+
+      ## How role assignment works
+
+      Blueprints define a list of different roles which control access to their features.
+      Global components of a given blueprint provide assignments of access rules to those roles.
+
+      You can get the roles and role assignments for a blueprint from the `/state/entity/details` endpoint.
+
+      For example, let's take a look at the XRD resource:
+      ```
+      /state/entity/details
+
+      {
+        "addresses": [
+          "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"
+        ],
+      }
+      ```
+
+      The response will contain two main parts. The definition of the owner role, and a list of all role assignments for that component:
+
+      ```
+      "role_assignments": {
+        "owner": {
+          // ...
+        },
+        "entries": [
+          // ...
+        ]
+      }
+      ```
+
+      Each role assignment conceptually includes:
+
+      * An assigned `rule` which defines what are the requirements to access that role.
+      * Its `updater` which defines which role is allowed to update the assignment.
+
+      ### The Owner role
+
+      The owner role assignment includes the `rule` which specifies the requirements you have to meet to act
+      as the owner of the entity. In the below example you need to have access to a proof of a certain non-fungible id.
+
+      The `updater` of an owner role assingment is either `None` or specifies the owner can update itself.
+
+
+      ```
+        "owner": {
+          "rule": {
+            "type": "Protected",
+            "access_rule": {
+              "type": "ProofRule",
+              "proof_rule": {
+                "type": "Require",
+                "requirement": {
+                  "type": "NonFungible",
+                  "non_fungible": {
+                    "local_id": {
+                      "id_type": "Integer",
+                      "sbor_hex": "5cc0010000000000000000",
+                      "simple_rep": "#0#"
+                    },
+                    "resource_address": "resource_rdx1nfxxxxxxxxxxsystxnxxxxxxxxx002683325037xxxxxxxxxsystxn"
+                  }
+                }
+              }
+            }
+          },
+          "updater": "None"
+        },
+      ```
+
+      ### Role assignment entries
+
+      Each role assignment contains three fields:
+      * `role_key` - a composite key consisting of the entity module which defines the role and the name of the role inside the module.
+      * `assignment` - the assigned rule. It could be either `Explicit` as in the below example and contain an inline rule, or `Owner` which means the owner role is used.
+      * `updater_roles` - a fixed list of `role_key`s which act as updaters for the role, defined on the blueprint. Access to any of these updater roles permits someone to update the assignment for this role.
+
+      An example assignment entry is the following. This response indicates that the given resource can be burned by an actor who
+      has access to a proof of a specific global caller badge:
+      ```
+      "role_key": {
+        "module": "Main",
+        "name": "burner"
+      },
+      "assignment": {
+        "resolution": "Explicit",
+        "explicit_rule": {
+          "type": "Protected",
+          "access_rule": {
+            "type": "ProofRule",
+            "proof_rule": {
+              "type": "Require",
+              "requirement": {
+                "type": "NonFungible",
+                "non_fungible": {
+                  "local_id": {
+                    "id_type": "Bytes",
+                    "sbor_hex": "5cc0022068c44e9d432e71c51e2a2ac285897b372328d8b31374ff29131bc6b25b6bd070",
+                    "simple_rep": "[68c44e9d432e71c51e2a2ac285897b372328d8b31374ff29131bc6b25b6bd070]"
+                  },
+                  "resource_address": "resource_rdx1nfxxxxxxxxxxglcllrxxxxxxxxx002350006550xxxxxxxxxglcllr"
+                }
+              }
+            }
+          }
+        }
+      },
+      "updater_roles": [
+        {
+          "module": "Main",
+          "name": "burner_updater"
+        }
+      ]
+      ```
+
+      ## How to query the content of a key-value store inside a component
+
+      ### An example component
+
+      Imagine a component which can store resources into named vaults.
+      To support arbitrary names, it might store these vaults in a `KeyValueStore<String, Vault>` as follows.
+      We will use this blueprint for demonstrating some requests.
+
+      ```
+      use scrypto::prelude::*;
+
+      #[blueprint]
+      mod multi_vault {
+          use scrypto::prelude::Vault;
+
+          struct MultiVault {
+              token_vaults: KeyValueStore<String, Vault>
+          }
+
+          impl MultiVault {
+              pub fn instantiate_multivault() -> Global<MultiVault> {
+                  Self {
+                      token_vaults: KeyValueStore::new()
+                  }
+                  .instantiate()
+                  .prepare_to_globalize(OwnerRole::None)
+                  .globalize()
+              }
+
+              pub fn deposit_to_vault(&mut self, vault_id: String, deposit: Bucket) {
+                  let tmp_token_vaults = self.token_vaults.get_mut(&vault_id);
+                  match tmp_token_vaults {
+                      Some(mut vault) => vault.put(deposit),
+                      None => {
+                          drop(tmp_token_vaults);
+                          self.token_vaults.insert(vault_id, Vault::with_bucket(deposit))
+                      }
+                  }
+              }
+          }
+      }
+
+      ```
+
+      ### Querying for `KeyValueStore` address
+
+      Let's say that after creating a component with the above blueprint, we created 3 vaults "1", "2", "3" and transfered some amount of resource to each of them.
+
+      If you'd like to look at the content of the `KeyValueStore`, you need to first get its address. You can do that by calling `/state/entity/details` with the instantiated component address:
+
+      ```
+      /state/entity/details
+
+      {
+        "addresses": [
+          "component_tdx_2_1crmcapqnz2sex9u6tppnagps64lgpfmkupmyrwazeg5qe3x2z3trcr"
+        ]
+      }
+      ```
+
+      In the response you'll receive the state of that component which will contain the address of that `KeyValueStore`:
+
+      ```
+            // ...
+            "details": {
+              // ...
+              "state": {
+                "kind": "Tuple",
+                "type_name": "MultiVault",
+                "fields": [
+                  {
+                    "kind": "Own",
+                    "type_name": "KeyValueStore",
+                    "field_name": "token_vaults",
+                    "value": "internal_keyvaluestore_tdx_2_1kzjd929eqlzd9n02uuj8jd48705vcrpvhv4mgxnaltrgystnca3qxk"
+                  }
+                ]
+              }
+            }
+      ```
+
+      ### Iterating over all `KeyValueStore` keys
+
+      You can use `/state/key-value-store/keys` endpoint to iterate over all keys in certain `KeyValueStore`.
+      If the queried `KeyValueStore` contains more than one page of keys, a `next_cursor` will be returned, which can be used as `cursor` in the request to fetch further pages.
+
+      i.e:
+      ```
+      /state/key-value-store/keys
+
+      {
+        "key_value_store_address": "internal_keyvaluestore_tdx_2_1kzjd929eqlzd9n02uuj8jd48705vcrpvhv4mgxnaltrgystnca3qxk"
+      }
+      ```
+
+      Will respond with list of all keys (in both `hex` and `programmatic_json` form) and state version when they were last updated.
+
+      ```
+      {
+        ...
+        "total_count": 8,
+        "items": [
+          {
+            "key": {
+              "raw_hex": "5c0c0131",
+              "programmatic_json": {
+                "value": "1",
+                "kind": "String"
+              }
+            },
+            "last_updated_at_state_version": 4939670
+          },
+          ...
+        ],
+        "key_value_store_address": "internal_keyvaluestore_tdx_2_1kzjd929eqlzd9n02uuj8jd48705vcrpvhv4mgxnaltrgystnca3qxk"
+      }
+      ```
+
+      ### Querying for the content under specific keys
+
+      You can either rely on keys returned from `/state/key-value-store/keys` endpoint or construct keys in json form on your own. It's possible if you created that `KeyValueStore` and you know what is the form of keys.
+
+      #### Querying using hex keys
+
+      Simply grab `raw_hex` key returned from `/state/key-value-store/keys` endpoint and call `/state/key-value-store/data` with it as parameter.
+
+      i.e:
+      ```
+      /state/key-value-store/data
+
+      {
+        "key_value_store_address": "internal_keyvaluestore_tdx_2_1kzjd929eqlzd9n02uuj8jd48705vcrpvhv4mgxnaltrgystnca3qxk",
+        "keys": [
+          {
+            "key_hex": "5c0c0131"
+          }
+        ]
+      }
+      ```
+
+      Will respond with data held under that key:
+
+      ```
+      {
+        ...
+        "key_value_store_address": "internal_keyvaluestore_tdx_2_1kzjd929eqlzd9n02uuj8jd48705vcrpvhv4mgxnaltrgystnca3qxk",
+        "entries": [
+          {
+            "key": {
+              "raw_hex": "5c0c0131",
+              "programmatic_json": {
+                "value": "1",
+                "kind": "String"
+              }
+            },
+            "value": {
+              "raw_hex": "5c90588c6d59227f64bd7fc68e38bf7c7013cf179a78d5562ce9378b1378e2fa",
+              "programmatic_json": {
+                "value": "internal_vault_tdx_2_1tzxx6kfz0ajt6l7x3cut7lrsz0830xnc64tze6fh3vfh3ch6587c5d",
+                "kind": "Own",
+                "type_name": "Vault"
+              }
+            },
+            "last_updated_at_state_version": 4939415,
+            "is_locked": false
+          }
+        ]
+      }
+      ```
+
+      In our case, we may want to look up information about the vault (for example, the vault's resource address and balance).
+      This can be done with the `/state/entity/details` endpoint.
+
+      #### Constructing json keys
+
+      The json keys are specified as programmatic SBOR JSON (which is a recursive data format, with each layer being a discriminated union with the `kind` discriminator). Search for [SBOR on our docs site](https://docs.radixdlt.com) for more information on SBOR and the programmatic SBOR JSON format.
+
+      In this case, our `KeyValueStore` keys are strings, so each key is identified as programmatic SBOR JSON with two properties:
+
+      ```
+      "key_json": {
+          "kind": "String",
+          "value": "{Id}"
+      }
+      ```
+
+      And we can use that json in `/state/key-value-store/data` simply replacing {Id} with our vault name, for example, "1":
+
+      ```
+      /state/key-value-store/data
+
+      {
+      "key_value_store_address": "internal_keyvaluestore_tdx_2_1kzjd929eqlzd9n02uuj8jd48705vcrpvhv4mgxnaltrgystnca3qxk",
+        "keys": [
+          {
+            "key_json": {
+                "kind": "String",
+                "value": "1"
+            }
+          }
+        ]
+      }
+      ```
+
+      The API will respond with content which is held under the given key:
+
+      ```
+      // Response
+      {
+        // ...
+        "key_value_store_address": "internal_keyvaluestore_tdx_2_1kzjd929eqlzd9n02uuj8jd48705vcrpvhv4mgxnaltrgystnca3qxk",
+        "entries": [
+          {
+            "key": {
+              "raw_hex": "5c0c0131",
+              "programmatic_json": {
+                "value": "1",
+                "kind": "String"
+              }
+            },
+            "value": {
+              "raw_hex": "5c90588c6d59227f64bd7fc68e38bf7c7013cf179a78d5562ce9378b1378e2fa",
+              "programmatic_json": {
+                "value": "internal_vault_tdx_2_1tzxx6kfz0ajt6l7x3cut7lrsz0830xnc64tze6fh3vfh3ch6587c5d",
+                "kind": "Own",
+                "type_name": "Vault"
+              }
+            },
+            // ...
+          }
+        ]
+      }
+      ```
+
+      In our case, we may want to look up information about the vault (for example, the vault's resource address and balance).
+      This can be done with the `/state/entity/details` endpoint.
+
   - name: Status
     x-displayName: Status Endpoints
     description: Query information about the Gateway API status.
@@ -312,6 +1200,7 @@ paths:
       summary: Get Transactions Stream
       description: |
         Returns transactions which have been committed to the ledger.
+        [Check detailed documentation for brief explanation](#section/Using-the-streamtransactions-endpoint)
       tags:
         - Stream
       requestBody:
@@ -382,7 +1271,7 @@ paths:
   /state/entity/page/fungibles/:
     post:
       operationId: EntityFungiblesPage
-      summary: Get Entity Fungible Resource Totals Page aggregated globally
+      summary: Get page of Global Entity Fungible Resource Balances
       description: |
         Returns the total amount of each fungible resource owned by a given global entity.
         Result can be aggregated globally or per vault.
@@ -408,7 +1297,7 @@ paths:
   /state/entity/page/fungible-vaults/:
     post:
       operationId: EntityFungibleResourceVaultPage
-      summary: Get vault page of Entity Fungible resource aggregated per vault
+      summary: Get page of Global Entity Fungible Resource Vaults
       description: |
         Returns vaults for fungible resource owned by a given global entity.
         The returned response is in a paginated format, ordered by the resource's first appearance on the ledger.
@@ -433,7 +1322,7 @@ paths:
   /state/entity/page/non-fungibles/:
     post:
       operationId: EntityNonFungiblesPage
-      summary: Get Entity Non-Fungible Resource Totals Page aggregated globally
+      summary: Get page of Global Entity Non-Fungible Resource Balances
       description: |
         Returns the total amount of each non-fungible resource owned by a given global entity.
         Result can be aggregated globally or per vault.
@@ -459,7 +1348,7 @@ paths:
   /state/entity/page/non-fungible-vaults/:
     post:
       operationId: EntityNonFungibleResourceVaultPage
-      summary: Get vault page of Entity Non Fungible aggregated per vault
+      summary: Get page of Global Entity Non-Fungible Resource Vaults
       description: |
         Returns vaults for non fungible resource owned by a given global entity.
         The returned response is in a paginated format, ordered by the resource's first appearance on the ledger.
@@ -484,7 +1373,7 @@ paths:
   /state/entity/page/non-fungible-vault/ids:
     post:
       operationId: EntityNonFungibleIdsPage
-      summary: Get Entity Non-Fungible IDs
+      summary: Get page of Non-Fungibles in Vault
       description: |
         Returns all non-fungible IDs of a given non-fungible resource owned by a given entity.
         The returned response is in a paginated format, ordered by the resource's first appearence on the ledger.
@@ -509,7 +1398,7 @@ paths:
   /state/non-fungible/ids:
     post:
       operationId: NonFungibleIds
-      summary: Get Non-Fungible Collection
+      summary: Get page of Non-Fungible Ids in Resource Collection
       description: |
         Returns the non-fungible IDs of a given non-fungible resource.
         Returned response is in a paginated format, ordered by their first appearance on the ledger.
@@ -577,12 +1466,37 @@ paths:
         "4XX":
           $ref: "#/components/responses/ErrorResponse"
 
+  /state/key-value-store/keys:
+    post:
+      operationId: KeyValueStoreKeys
+      summary: Get KeyValueStore Keys
+      description: |
+        Allows to iterate over key value store keys.
+      tags:
+        - State
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StateKeyValueStoreKeysRequest"
+      responses:
+        "200":
+          description: KeyValueStore keys collection
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StateKeyValueStoreKeysResponse"
+        "4XX":
+          $ref: "#/components/responses/ErrorResponse"
+
   /state/key-value-store/data:
     post:
       operationId: KeyValueStoreData
       summary: Get KeyValueStore Data
       description: |
         Returns data (value) associated with a given key of a given key-value store.
+        [Check detailed documentation for explanation](#section/How-to-query-the-content-of-a-key-value-store-inside-a-component)
       tags:
         - State
       requestBody:
@@ -859,6 +1773,28 @@ components:
     #
     # Common Response Types
     #
+
+    ManifestClass:
+      description: |
+        High-level manifest class type:
+          * `General`: A general manifest that involves any amount of arbitrary components and packages where nothing more concrete can be said about the manifest and its nature.
+          * `Transfer`: A manifest of a 1-to-1 transfer to a one-to-many transfer of resources.
+          * `PoolContribution`: A manifest that contributed some amount of resources to a liquidity pool that can be a one-resource pool, two-resource pool, or a multi-resource pool.
+          * `PoolRedemption`: A manifest that redeemed resources from a liquidity pool. Similar to contributions, this can be any of the three pool blueprints available in the pool package.
+          * `ValidatorStake`: A manifest where XRD is staked to one or more validators.
+          * `ValidatorUnstake`: A manifest where XRD is unstaked from one or more validators.
+          * `ValidatorClaim`: A manifest where XRD is claimed from one or more validators.
+          * `AccountDepositSettingsUpdate`: A manifest that updated the deposit settings of the account.
+      type: string
+      enum:
+        - General
+        - Transfer
+        - PoolContribution
+        - PoolRedemption
+        - ValidatorStake
+        - ValidatorUnstake
+        - ValidatorClaim
+        - AccountDepositSettingsUpdate
 
     ObjectModuleId:
       type: string
@@ -1276,6 +2212,20 @@ components:
           $ref: "#/components/schemas/HexString"
         receipt:
           $ref: "#/components/schemas/TransactionReceipt"
+        manifest_instructions:
+          description: |
+            A text-representation of a transaction manifest.
+            This field will be present only for user transactions and when explicitly opted-in using `manifest_instructions` flag.
+          type: string
+          nullable: true
+        manifest_classes:
+          description: |
+            A collection of zero or more manifest classes ordered from the most specific class to the least specific one.
+            This field will be present only for user transactions.
+          type: array
+          nullable: true
+          items:
+            $ref: "#/components/schemas/ManifestClass"
         message:
           type: object
           description: |
@@ -1457,6 +2407,8 @@ components:
         - pending_xrd_withdraw_vault
         - locked_owner_stake_unit_vault
         - pending_owner_stake_unit_unlock_vault
+        - state
+        - effective_fee_factor
       properties:
         address:
           $ref: "#/components/schemas/Address"
@@ -1478,6 +2430,32 @@ components:
           $ref: "#/components/schemas/ValidatorCollectionItemActiveInEpoch"
         metadata:
           $ref: "#/components/schemas/EntityMetadataCollection"
+        effective_fee_factor:
+          type: object
+          required:
+            - current
+          properties:
+            current:
+              type: object
+              required:
+                - fee_factor
+              properties:
+                fee_factor:
+                  $ref: "#/components/schemas/BigDecimal"
+            pending:
+              type: object
+              nullable: true
+              required:
+                - fee_factor
+                - effective_at_epoch
+              properties:
+                fee_factor:
+                  $ref: "#/components/schemas/BigDecimal"
+                effective_at_epoch:
+                  type: integer
+                  format: int64
+                  minimum: 0
+                  maximum: 10000000000
     ValidatorCollectionItemActiveInEpoch:
       type: object
       required:
@@ -1530,12 +2508,14 @@ components:
             - metadata_module_package
             - royalty_module_package
             - access_rules_package
+            - role_assignment_module_package
             - genesis_helper_package
             - faucet_package
             - consensus_manager
             - genesis_helper
             - faucet
             - pool_package
+            - transaction_tracker
           properties:
             xrd:
               $ref: "#/components/schemas/Address"
@@ -1576,6 +2556,10 @@ components:
             royalty_module_package:
               $ref: "#/components/schemas/Address"
             access_rules_package:
+              description: "Obsolete! Use `role_assignment_module_package` instead."
+              deprecated: true
+              $ref: "#/components/schemas/Address"
+            role_assignment_module_package:
               $ref: "#/components/schemas/Address"
             genesis_helper_package:
               $ref: "#/components/schemas/Address"
@@ -1588,6 +2572,8 @@ components:
             faucet:
               $ref: "#/components/schemas/Address"
             pool_package:
+              $ref: "#/components/schemas/Address"
+            transaction_tracker:
               $ref: "#/components/schemas/Address"
 
     GatewayStatusResponse:
@@ -1788,6 +2774,13 @@ components:
               type: integer
               format: int64
               nullable: true
+            permanently_rejects_at_epoch:
+              description: The epoch number at which the transaction is guaranteed to get permanently rejected by the Network due to exceeded epoch range defined when submitting transaction.
+              nullable: true
+              type: integer
+              format: int64
+              minimum: 0
+              maximum: 10000000000
             error_message:
               description: |
                 The most relevant error message received, due to a rejection or commit as failure.
@@ -1899,6 +2892,10 @@ components:
           default: true
         affected_global_entities:
           description: if set to `true`, all affected global entities by given transaction are returned.
+          type: boolean
+          default: false
+        manifest_instructions:
+          description: if set to `true`, manifest instructions for user transactions are returned.
           type: boolean
           default: false
         balance_changes:
@@ -2052,6 +3049,24 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/StreamTransactionsRequestEventFilterItem"
+            accounts_with_manifest_owner_method_calls:
+              type: array
+              items:
+                $ref: "#/components/schemas/Address"
+            accounts_without_manifest_owner_method_calls:
+              type: array
+              items:
+                $ref: "#/components/schemas/Address"
+            manifest_class_filter:
+              type: object
+              required:
+                - class
+              properties:
+                class:
+                  $ref: "#/components/schemas/ManifestClass"
+                match_only_most_specific:
+                  type: boolean
+                  default: false
             order:
               description: Configures the order of returned result set. Defaults to `desc`.
               type: string
@@ -2105,6 +3120,7 @@ components:
               $ref: "#/components/schemas/StateEntityDetailsOptIns"
             addresses:
               type: array
+              description: limited to max 100 items.
               items:
                 $ref: "#/components/schemas/Address"
             aggregation_level:
@@ -2123,6 +3139,7 @@ components:
             - description
     StateEntityDetailsOptIns:
       type: object
+      description: Check detailed [OptIns](#section/Using-endpoints-with-opt-in-features) documentation for more details
       properties:
         ancestor_identities:
           description: if set to `true`, ancestor addresses - `parent_address`, `owner_address` and `global_address` for entities are returned.
@@ -2278,20 +3295,31 @@ components:
               $ref: "#/components/schemas/Address"
             balance:
               $ref: "#/components/schemas/NonFungibleResourcesCollectionItemVaultAggregatedVaultItem"
+
     StateEntityDetailsResponsePackageDetails:
+      description: "vm_type, code_hash_hex and code_hex are always going to be empty, use `codes` property which will return collection (it's possible after protocol update that package might have multiple codes)"
       allOf:
         - $ref: "#/components/schemas/StateEntityDetailsResponseItemDetails"
         - type: object
           required:
+            - codes
             - vm_type
             - code_hash_hex
             - code_hex
           properties:
+            codes:
+              $ref: "#/components/schemas/StateEntityDetailsResponsePackageDetailsCodeCollection"
             vm_type:
+              description: "Obsolete! Use `codes` collection instead."
+              deprecated: true
               $ref: "#/components/schemas/PackageVmType"
             code_hash_hex:
+              description: "Obsolete! Use `codes` collection instead."
+              deprecated: true
               $ref: "#/components/schemas/HexString"
             code_hex:
+              description: "Obsolete! Use `codes` collection instead."
+              deprecated: true
               $ref: "#/components/schemas/HexString"
             royalty_vault_balance:
               $ref: "#/components/schemas/BigDecimal"
@@ -2299,6 +3327,30 @@ components:
               $ref: "#/components/schemas/StateEntityDetailsResponsePackageDetailsBlueprintCollection"
             schemas:
               $ref: "#/components/schemas/StateEntityDetailsResponsePackageDetailsSchemaCollection"
+    StateEntityDetailsResponsePackageDetailsCodeCollection:
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/PackageCodeCollectionItem"
+    PackageCodeCollectionItem:
+      type: object
+      required:
+        - vm_type
+        - code_hash_hex
+        - code_hex
+      properties:
+        vm_type:
+          $ref: "#/components/schemas/PackageVmType"
+        code_hash_hex:
+          $ref: "#/components/schemas/HexString"
+        code_hex:
+          $ref: "#/components/schemas/HexString"
     StateEntityDetailsResponsePackageDetailsBlueprintCollection:
       allOf:
         - $ref: "#/components/schemas/ResultSetCursorMixin"
@@ -2431,6 +3483,7 @@ components:
         address: "<component-entity-address>"
     StateEntityFungiblesPageRequestOptIns:
       type: object
+      description: Check detailed [OptIns](#section/Using-endpoints-with-opt-in-features) documentation for more details
       properties:
         explicit_metadata:
           description: allows specifying explicitly metadata properties which should be returned in response, limited to max 20 items.
@@ -2495,6 +3548,7 @@ components:
         address: "<component-entity-address>"
     StateEntityNonFungiblesPageRequestOptIns:
       type: object
+      description: Check detailed [OptIns](#section/Using-endpoints-with-opt-in-features) documentation for more details
       properties:
         non_fungible_include_nfids:
           description: if set to `true`, first page of non fungible ids are returned for each non fungible resource, with cursor which can be later used at `/state/entity/page/non-fungible-vault/ids` endpoint.
@@ -2536,6 +3590,7 @@ components:
         resource_address: "<resource_address>"
     StateEntityNonFungibleResourceVaultsPageOptIns:
       type: object
+      description: Check detailed [OptIns](#section/Using-endpoints-with-opt-in-features) documentation for more details
       properties:
         non_fungible_include_nfids:
           description: if set to `true`, first page of non fungible ids are returned for each non fungible resource, with cursor which can be later used at `/state/entity/page/non-fungible-vault/ids` endpoint.
@@ -2630,6 +3685,7 @@ components:
               $ref: "#/components/schemas/Address"
             non_fungible_ids:
               type: array
+              description: limited to max 100 items.
               items:
                 $ref: "#/components/schemas/NonFungibleId"
       example:
@@ -2678,6 +3734,7 @@ components:
               $ref: "#/components/schemas/Address"
             non_fungible_ids:
               type: array
+              description: limited to max 100 items.
               items:
                 $ref: "#/components/schemas/NonFungibleId"
       example:
@@ -2716,6 +3773,54 @@ components:
         last_updated_at_state_version:
           $ref: "#/components/schemas/LastUpdatedAtStateVersion"
 
+    StateKeyValueStoreKeysRequest:
+      allOf:
+        - $ref: "#/components/schemas/AtLedgerStateMixin"
+        - $ref: "#/components/schemas/CursorLimitMixin"
+        - type: object
+          required:
+            - key_value_store_address
+          properties:
+            key_value_store_address:
+              $ref: "#/components/schemas/Address"
+      example:
+        key_value_store_address: "<key-value-store-address>"
+
+    StateKeyValueStoreKeysResponse:
+      allOf:
+        - $ref: "#/components/schemas/LedgerStateMixin"
+        - $ref: "#/components/schemas/StateKeyValueStoreKeysCollection"
+        - type: object
+          required:
+            - key_value_store_address
+          properties:
+            key_value_store_address:
+              $ref: "#/components/schemas/Address"
+
+    StateKeyValueStoreKeysCollection:
+      description: Key value store items collection.
+      allOf:
+        - $ref: "#/components/schemas/ResultSetCursorMixin"
+        - type: object
+          required:
+            - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/StateKeyValueStoreKeysResponseItem"
+
+    StateKeyValueStoreKeysResponseItem:
+      type: object
+      required:
+        - key
+        - last_updated_at_state_version
+      properties:
+        key:
+          $ref: "#/components/schemas/ScryptoSborValue"
+        last_updated_at_state_version:
+          $ref: "#/components/schemas/LastUpdatedAtStateVersion"
+
     StateKeyValueStoreDataRequest:
       allOf:
         - $ref: "#/components/schemas/AtLedgerStateMixin"
@@ -2728,6 +3833,7 @@ components:
               $ref: "#/components/schemas/Address"
             keys:
               type: array
+              description: limited to max 100 items.
               items:
                 $ref: "#/components/schemas/StateKeyValueStoreDataRequestKeyItem"
       example:
