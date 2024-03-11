@@ -12,26 +12,20 @@ extension TransactionHistoryClient {
 			let response = try await gatewayAPIClient.streamTransactions(request.gatewayRequest)
 			let account = request.account
 			let networkID = try account.networkID()
-			let resourceAddresses = request.allResources.ids
+			let resourcesForPeriod = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
+			let resourcesNeededOverall = request.allResourcesAddresses.union(resourcesForPeriod)
+			let existingResources = request.resources.ids
+			let resourcesToLoad = resourcesNeededOverall.subtracting(existingResources)
+			let loadedResources = try await onLedgerEntitiesClient.getResources(resourcesToLoad)
+			var keyedResources = request.resources
+			keyedResources.append(contentsOf: loadedResources)
 
 			print("• RESPONSE: \(request.period.lowerBound.formatted(date: .abbreviated, time: .omitted)) -> \(request.period.upperBound.formatted(date: .abbreviated, time: .omitted)) \(response.items.count) •••••••••••••••••••••••")
 
-			let resourceAddressesInPeriod = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
-
-			let unloaded = resourceAddressesInPeriod.subtracting(resourceAddresses)
-
-			print("•• RESPONSE RES: loaded: \(resourceAddresses.count),  needed: \(resourceAddressesInPeriod.count), not loaded: \(unloaded.count)")
-
-			// Pre-loading the details for all the resources involved
-
-			var resourceDetails = request.allResources
-			let additionalResourceDetails = try await onLedgerEntitiesClient.getResources(unloaded)
-			resourceDetails.append(contentsOf: additionalResourceDetails)
-
-			let keyedResources = IdentifiedArray(uniqueElements: resourceDetails)
+			print("•• GET RES: period: \(resourcesForPeriod.count), overall: \(resourcesNeededOverall.count), needed: \(resourcesToLoad.count) -> total: \(keyedResources.count) loaded now: \(loadedResources.count)")
 
 			for red in keyedResources {
-				print("    •• res: \(red.metadata.title ?? "-"): \(request.allResources.ids.contains(red.id))")
+				print("    •• res: \(red.metadata.title ?? "-"): already loaded: \(request.resources.ids.contains(red.id))")
 			}
 
 			// Thrown if a resource or nonFungibleToken that we loaded is not present, should never happen
@@ -146,12 +140,7 @@ extension TransactionHistoryClient {
 				items.append(transactionItem)
 			}
 
-			// We filter out complex resources, i.e. Stake Claim NFTs, Pool Units and LSUs
-			let simpleResources = keyedResources.filter {
-				$0.metadata.validator == nil && $0.metadata.poolUnit == nil
-			}
-
-			return .init(cursor: response.nextCursor, allResources: simpleResources, items: items)
+			return .init(cursor: nil, resources: keyedResources, items: items)
 
 //			return try await .init(
 //				cursor: response.nextCursor,

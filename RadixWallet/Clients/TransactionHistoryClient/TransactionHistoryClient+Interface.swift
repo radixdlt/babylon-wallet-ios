@@ -12,10 +12,11 @@ extension TransactionHistoryClient {
 
 // MARK: - TransactionHistoryRequest
 public struct TransactionHistoryRequest: Sendable, Hashable {
-	public var account: AccountAddress
+	public let account: AccountAddress
 	public let period: Range<Date>
 	public let filters: [TransactionFilter]
-	public let allResources: IdentifiedArrayOf<OnLedgerEntity.Resource>
+	public let allResourcesAddresses: Set<ResourceAddress>
+	public let resources: IdentifiedArrayOf<OnLedgerEntity.Resource>
 	public let ascending: Bool
 	public let cursor: String?
 }
@@ -23,7 +24,7 @@ public struct TransactionHistoryRequest: Sendable, Hashable {
 // MARK: - TransactionHistoryResponse
 public struct TransactionHistoryResponse: Sendable, Hashable {
 	public let cursor: String?
-	public let allResources: IdentifiedArrayOf<OnLedgerEntity.Resource>
+	public let resources: IdentifiedArrayOf<OnLedgerEntity.Resource>
 	public let items: [TransactionHistoryItem]
 }
 
