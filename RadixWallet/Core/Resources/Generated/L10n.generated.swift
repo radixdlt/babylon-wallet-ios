@@ -62,6 +62,80 @@ public enum L10n {
       public static let worth = L10n.tr("Localizable", "account_staking_worth", fallback: "WORTH")
     }
   }
+  public enum AccountHistory {
+    /// Deposited
+    public static let depositedSection = L10n.tr("Localizable", "accountHistory_depositedSection", fallback: "Deposited")
+    /// You have no Transactions.
+    public static let empty = L10n.tr("Localizable", "accountHistory_empty", fallback: "You have no Transactions.")
+    /// Failed Transaction
+    public static let failedTransaction = L10n.tr("Localizable", "accountHistory_failedTransaction", fallback: "Failed Transaction")
+    /// No deposits or withdrawals from this account in this transaction.
+    public static let noBalanceChanges = L10n.tr("Localizable", "accountHistory_noBalanceChanges", fallback: "No deposits or withdrawals from this account in this transaction.")
+    /// Pool Units
+    public static let poolUnits = L10n.tr("Localizable", "accountHistory_poolUnits", fallback: "Pool Units")
+    /// Settings
+    public static let settingsSection = L10n.tr("Localizable", "accountHistory_settingsSection", fallback: "Settings")
+    /// History
+    public static let title = L10n.tr("Localizable", "accountHistory_title", fallback: "History")
+    /// Deposit Settings
+    public static let transactionClassAccountSettings = L10n.tr("Localizable", "accountHistory_transactionClassAccountSettings", fallback: "Deposit Settings")
+    /// Claim Stake
+    public static let transactionClassClaim = L10n.tr("Localizable", "accountHistory_transactionClassClaim", fallback: "Claim Stake")
+    /// Contribute
+    public static let transactionClassContribute = L10n.tr("Localizable", "accountHistory_transactionClassContribute", fallback: "Contribute")
+    /// General
+    public static let transactionClassGeneral = L10n.tr("Localizable", "accountHistory_transactionClassGeneral", fallback: "General")
+    /// Other
+    public static let transactionClassOther = L10n.tr("Localizable", "accountHistory_transactionClassOther", fallback: "Other")
+    /// Redeem
+    public static let transactionClassRedeem = L10n.tr("Localizable", "accountHistory_transactionClassRedeem", fallback: "Redeem")
+    /// Stake
+    public static let transactionClassStaking = L10n.tr("Localizable", "accountHistory_transactionClassStaking", fallback: "Stake")
+    /// Transfer
+    public static let transactionClassTransfer = L10n.tr("Localizable", "accountHistory_transactionClassTransfer", fallback: "Transfer")
+    /// Request Unstake
+    public static let transactionClassUnstaking = L10n.tr("Localizable", "accountHistory_transactionClassUnstaking", fallback: "Request Unstake")
+    /// Unknown
+    public static let unknown = L10n.tr("Localizable", "accountHistory_unknown", fallback: "Unknown")
+    /// This transaction cannot be summarized. Only the raw transaction manifest may be viewed.
+    public static let unknownTransactionInfo = L10n.tr("Localizable", "accountHistory_unknownTransactionInfo", fallback: "This transaction cannot be summarized. Only the raw transaction manifest may be viewed.")
+    /// Withdrawn
+    public static let withdrawnSection = L10n.tr("Localizable", "accountHistory_withdrawnSection", fallback: "Withdrawn")
+    /// Worth
+    public static let worth = L10n.tr("Localizable", "accountHistory_worth", fallback: "Worth")
+    public enum Filters {
+      /// Type of Asset
+      public static let assetTypeLabel = L10n.tr("Localizable", "accountHistory_filters_assetTypeLabel", fallback: "Type of Asset")
+      /// NFTs
+      public static let assetTypeNFTsLabel = L10n.tr("Localizable", "accountHistory_filters_assetTypeNFTsLabel", fallback: "NFTs")
+      /// Clear All
+      public static let clearAll = L10n.tr("Localizable", "accountHistory_filters_clearAll", fallback: "Clear All")
+      /// Deposits
+      public static let depositsType = L10n.tr("Localizable", "accountHistory_filters_depositsType", fallback: "Deposits")
+      /// Show All NFTs
+      public static let nftShowAll = L10n.tr("Localizable", "accountHistory_filters_nftShowAll", fallback: "Show All NFTs")
+      /// Show Less NFTs
+      public static let nftShowLess = L10n.tr("Localizable", "accountHistory_filters_nftShowLess", fallback: "Show Less NFTs")
+      /// Show Results
+      public static let showResultsButton = L10n.tr("Localizable", "accountHistory_filters_showResultsButton", fallback: "Show Results")
+      /// Filter
+      public static let title = L10n.tr("Localizable", "accountHistory_filters_title", fallback: "Filter")
+      /// Show All Tokens
+      public static let tokenShowAll = L10n.tr("Localizable", "accountHistory_filters_tokenShowAll", fallback: "Show All Tokens")
+      /// Show Less Tokens
+      public static let tokenShowLess = L10n.tr("Localizable", "accountHistory_filters_tokenShowLess", fallback: "Show Less Tokens")
+      /// Tokens
+      public static let tokensLabel = L10n.tr("Localizable", "accountHistory_filters_tokensLabel", fallback: "Tokens")
+      /// Type of Transaction
+      public static let transactionTypeLabel = L10n.tr("Localizable", "accountHistory_filters_transactionTypeLabel", fallback: "Type of Transaction")
+      /// Withdrawals
+      public static let withdrawalsType = L10n.tr("Localizable", "accountHistory_filters_withdrawalsType", fallback: "Withdrawals")
+    }
+    public enum Settings {
+      /// Updated Account Deposit Settings
+      public static let info = L10n.tr("Localizable", "accountHistory_settings_info", fallback: "Updated Account Deposit Settings")
+    }
+  }
   public enum AccountRecoveryScan {
     /// Deriving Accounts
     public static let derivingAccounts = L10n.tr("Localizable", "accountRecoveryScan_derivingAccounts", fallback: "Deriving Accounts")
@@ -1724,8 +1798,8 @@ public enum L10n {
     /// Wrong mnemmonic
     public static let wrongMnemonicHUD = L10n.tr("Localizable", "importMnemonic_wrongMnemonicHUD", fallback: "Wrong mnemmonic")
     public enum BackedUpAlert {
-      /// Yes, I have backed it up
-      public static let confirmAction = L10n.tr("Localizable", "importMnemonic_backedUpAlert_confirmAction", fallback: "Yes, I have backed it up")
+      /// Yes, I have written it down
+      public static let confirmAction = L10n.tr("Localizable", "importMnemonic_backedUpAlert_confirmAction", fallback: "Yes, I have written it down")
       /// Are you sure you have securely written down this seed phrase? You will need it to recover access if you lose your phone.
       public static let message = L10n.tr("Localizable", "importMnemonic_backedUpAlert_message", fallback: "Are you sure you have securely written down this seed phrase? You will need it to recover access if you lose your phone.")
       /// No, not yet
@@ -2382,6 +2456,74 @@ public enum L10n {
       public static let messageIOS = L10n.tr("Localizable", "splash_rootDetection_messageIOS", fallback: "It appears that your device might be jailbroken. To ensure the security of your Accounts and assets, using the Radix Wallet on jailbroken devices is not recommended. Please confirm if you wish to continue anyway at your own risk.")
       /// Possible jailbreak detected
       public static let titleIOS = L10n.tr("Localizable", "splash_rootDetection_titleIOS", fallback: "Possible jailbreak detected")
+    }
+  }
+  public enum TransactionHistory {
+    /// This transaction cannot be summarized. Only the raw transaction manifest may be viewed.
+    public static let complexTransaction = L10n.tr("Localizable", "transactionHistory_complexTransaction", fallback: "This transaction cannot be summarized. Only the raw transaction manifest may be viewed.")
+    /// Deposited
+    public static let depositedSection = L10n.tr("Localizable", "transactionHistory_depositedSection", fallback: "Deposited")
+    /// Failed Transaction
+    public static let failedTransaction = L10n.tr("Localizable", "transactionHistory_failedTransaction", fallback: "Failed Transaction")
+    /// No deposits or withdrawals from this account in this transaction.
+    public static let noBalanceChanges = L10n.tr("Localizable", "transactionHistory_noBalanceChanges", fallback: "No deposits or withdrawals from this account in this transaction.")
+    /// You have no Transactions.
+    public static let noTransactions = L10n.tr("Localizable", "transactionHistory_noTransactions", fallback: "You have no Transactions.")
+    /// Settings
+    public static let settingsSection = L10n.tr("Localizable", "transactionHistory_settingsSection", fallback: "Settings")
+    /// History
+    public static let title = L10n.tr("Localizable", "transactionHistory_title", fallback: "History")
+    /// Updated Account Deposit Settings
+    public static let updatedDepositSettings = L10n.tr("Localizable", "transactionHistory_updatedDepositSettings", fallback: "Updated Account Deposit Settings")
+    /// Withdrawn
+    public static let withdrawnSection = L10n.tr("Localizable", "transactionHistory_withdrawnSection", fallback: "Withdrawn")
+    public enum Filters {
+      /// Type of Asset
+      public static let assetTypeLabel = L10n.tr("Localizable", "transactionHistory_filters_assetTypeLabel", fallback: "Type of Asset")
+      /// NFTs
+      public static let assetTypeNFTsLabel = L10n.tr("Localizable", "transactionHistory_filters_assetTypeNFTsLabel", fallback: "NFTs")
+      /// Clear All
+      public static let clearAll = L10n.tr("Localizable", "transactionHistory_filters_clearAll", fallback: "Clear All")
+      /// Deposits
+      public static let depositsType = L10n.tr("Localizable", "transactionHistory_filters_depositsType", fallback: "Deposits")
+      /// Show All NFTs
+      public static let nftShowAll = L10n.tr("Localizable", "transactionHistory_filters_nftShowAll", fallback: "Show All NFTs")
+      /// Show Less NFTs
+      public static let nftShowLess = L10n.tr("Localizable", "transactionHistory_filters_nftShowLess", fallback: "Show Less NFTs")
+      /// Show Results
+      public static let showResultsButton = L10n.tr("Localizable", "transactionHistory_filters_showResultsButton", fallback: "Show Results")
+      /// Filter
+      public static let title = L10n.tr("Localizable", "transactionHistory_filters_title", fallback: "Filter")
+      /// Show All Tokens
+      public static let tokenShowAll = L10n.tr("Localizable", "transactionHistory_filters_tokenShowAll", fallback: "Show All Tokens")
+      /// Show Less Tokens
+      public static let tokenShowLess = L10n.tr("Localizable", "transactionHistory_filters_tokenShowLess", fallback: "Show Less Tokens")
+      /// Tokens
+      public static let tokensLabel = L10n.tr("Localizable", "transactionHistory_filters_tokensLabel", fallback: "Tokens")
+      /// Type of Transaction
+      public static let transactionTypeLabel = L10n.tr("Localizable", "transactionHistory_filters_transactionTypeLabel", fallback: "Type of Transaction")
+      /// Withdrawals
+      public static let withdrawalsType = L10n.tr("Localizable", "transactionHistory_filters_withdrawalsType", fallback: "Withdrawals")
+    }
+    public enum ManifestClass {
+      /// Deposit Settings
+      public static let accountSettings = L10n.tr("Localizable", "transactionHistory_manifestClass_AccountSettings", fallback: "Deposit Settings")
+      /// Claim Stake
+      public static let claim = L10n.tr("Localizable", "transactionHistory_manifestClass_Claim", fallback: "Claim Stake")
+      /// Contribute
+      public static let contribute = L10n.tr("Localizable", "transactionHistory_manifestClass_Contribute", fallback: "Contribute")
+      /// General
+      public static let general = L10n.tr("Localizable", "transactionHistory_manifestClass_General", fallback: "General")
+      /// Other
+      public static let other = L10n.tr("Localizable", "transactionHistory_manifestClass_Other", fallback: "Other")
+      /// Redeem
+      public static let redeem = L10n.tr("Localizable", "transactionHistory_manifestClass_Redeem", fallback: "Redeem")
+      /// Stake
+      public static let staking = L10n.tr("Localizable", "transactionHistory_manifestClass_Staking", fallback: "Stake")
+      /// Transfer
+      public static let transfer = L10n.tr("Localizable", "transactionHistory_manifestClass_Transfer", fallback: "Transfer")
+      /// Request Unstake
+      public static let unstaking = L10n.tr("Localizable", "transactionHistory_manifestClass_Unstaking", fallback: "Request Unstake")
     }
   }
   public enum TransactionReview {

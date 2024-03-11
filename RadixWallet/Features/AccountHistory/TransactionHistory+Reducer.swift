@@ -7,16 +7,26 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		let periods: [DateRangeItem]
 
+		var allResourceAddresses: Set<ResourceAddress>
+		var allResources: IdentifiedArrayOf<OnLedgerEntity.Resource>? = nil
+
+		var activeFilters: IdentifiedArrayOf<TransactionHistoryFilters.State.Filter> = []
+
 		var selectedPeriod: DateRangeItem.ID
 
-		var sections: IdentifiedArrayOf<TransactionSection>
+		var sections: IdentifiedArrayOf<TransactionSection> = []
 		var loadedPeriods: Set<Date> = []
 
-		init(account: Profile.Network.Account, sections: [TransactionSection] = []) {
+		var isLoading: Bool = false
+
+		@PresentationState
+		public var destination: Destination.State?
+
+		init(account: Profile.Network.Account, assets: Set<ResourceAddress>) {
 			self.account = account
 			self.periods = try! .init(months: 7)
-			self.selectedPeriod = periods[0].id
-			self.sections = sections.asIdentifiable()
+			self.allResourceAddresses = assets
+			self.selectedPeriod = periods.last!.id
 		}
 
 		public struct TransactionSection: Sendable, Hashable, Identifiable {
@@ -31,16 +41,49 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Hashable {
 		case onAppear
-		case closeTapped
 		case selectedPeriod(DateRangeItem.ID)
+		case filtersTapped
+		case filterCrossTapped(TransactionFilter)
+		case closeTapped
 	}
 
 	public enum InternalAction: Sendable, Hashable {
-		case updateTransactions([TransactionHistoryItem])
+		case updateHistory(TransactionHistoryResponse)
+	}
+
+	public struct Destination: DestinationReducer {
+		@CasePathable
+		public enum State: Sendable, Hashable {
+			case filters(TransactionHistoryFilters.State)
+		}
+
+		@CasePathable
+		public enum Action: Sendable, Equatable {
+			case filters(TransactionHistoryFilters.Action)
+		}
+
+		public var body: some ReducerOf<Self> {
+			Scope(state: \.filters, action: \.filters) {
+				TransactionHistoryFilters()
+			}
+		}
 	}
 
 	@Dependency(\.dismiss) var dismiss
+	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.transactionHistoryClient) var transactionHistoryClient
+	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+
+	public init() {}
+
+	public var body: some ReducerOf<Self> {
+		Reduce(core)
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
+			}
+	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -50,6 +93,18 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			state.selectedPeriod = period
 			return loadSelectedPeriod(state: &state)
 
+		case .filtersTapped:
+			guard let allResources = state.allResources else {
+				loggerGlobal.error("The filters button should not be enabled until the resources have been loaded")
+				return .none
+			}
+			state.destination = .filters(.init(assets: allResources, activeFilters: state.activeFilters.map(\.id)))
+			return .none
+
+		case let .filterCrossTapped(id):
+			state.activeFilters.remove(id: id)
+			return loadSelectedPeriod(state: &state)
+
 		case .closeTapped:
 			return .run { _ in await dismiss() }
 		}
@@ -57,22 +112,49 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .updateTransactions(transactions):
-			state.updateTransactions(transactions)
+		case let .updateHistory(updateHistory):
+			state.updateHistory(updateHistory)
+			state.isLoading = false
 			return .none
 		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .filters(.delegate(.updateActiveFilters(filters))):
+			state.activeFilters = filters
+			return .none
+		default:
+			return .none
+		}
+	}
+
+	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		print("••••• reduceDismissedDestination"); return
+			loadSelectedPeriod(state: &state)
 	}
 
 	// Helper methods
 
 	func loadSelectedPeriod(state: inout State) -> Effect<Action> {
+		state.isLoading = true
 		guard let range = state.periods.first(where: { $0.id == state.selectedPeriod })?.range.clamped else {
 			return .none
 		}
 
-		return .run { [account = state.account.address] send in
-			let transactions = try await transactionHistoryClient.getTransactionHistory(account, range, nil)
-			await send(.internal(.updateTransactions(transactions.items)))
+		let mockAccount = state.account.networkID == .mainnet ? try! AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l") : nil
+
+		return .run { [account = state.account.address, allResources = state.allResourceAddresses, filters = state.activeFilters.map(\.id)] send in
+			let request = TransactionHistoryRequest(
+				account: mockAccount ?? account,
+				period: range,
+				filters: filters,
+				allResources: allResources,
+				ascending: false,
+				cursor: nil
+			)
+			let response = try await transactionHistoryClient.getTransactionHistory(request)
+			await send(.internal(.updateHistory(response)))
 		}
 	}
 }
@@ -87,7 +169,7 @@ private extension Range<Date> {
 
 extension TransactionHistory.State {
 	///  Presupposes that transactions are loaded in chunks of full months
-	mutating func updateTransactions(_ transactions: [TransactionHistoryItem]) {
+	mutating func updateHistory(_ response: TransactionHistoryResponse) {
 //		let newSections = transactions.inSections
 //		var sections = self.sections
 //		sections.append(contentsOf: newSections)
@@ -96,9 +178,12 @@ extension TransactionHistory.State {
 //		loadedPeriods.append(contentsOf: newSections.map(\.month))
 
 		sections.removeAll()
-		sections.append(contentsOf: transactions.inSections)
+		sections.append(contentsOf: response.items.inSections)
 		sections.sort(by: \.day)
 		loadedPeriods.append(contentsOf: sections.map(\.month))
+
+		print("••• UPDATED history, set res: \(response.allResources.count)")
+		allResources = response.allResources
 	}
 
 	mutating func clearSections() {

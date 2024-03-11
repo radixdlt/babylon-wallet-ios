@@ -44,7 +44,7 @@ public struct ResourceBalanceButton: View {
 			switch viewState {
 			case .fungible, .nonFungible:
 				.medium2
-			case .lsu, .poolUnit, .stakeClaimNFT:
+			case .liquidStakeUnit, .poolUnit, .stakeClaimNFT:
 				.medium3
 			}
 		case .transactionReview:
@@ -58,7 +58,7 @@ public struct ResourceBalanceButton: View {
 			switch viewState {
 			case .fungible, .nonFungible:
 				.large3
-			case .lsu, .poolUnit, .stakeClaimNFT:
+			case .liquidStakeUnit, .poolUnit, .stakeClaimNFT:
 				.medium3
 			}
 		case .transactionReview:

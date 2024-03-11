@@ -47,6 +47,7 @@ public struct FlowLayout: Layout {
 			containerWidth: bounds.width,
 			alignment: alignment
 		).offsets
+
 		for (offset, subview) in zip(offsets, subviews) {
 			subview.place(at: CGPoint(x: offset.x + bounds.minX, y: offset.y + bounds.minY), proposal: .unspecified)
 		}

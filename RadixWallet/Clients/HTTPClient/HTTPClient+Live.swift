@@ -1,13 +1,3 @@
-// MARK: - HTTPClient
-public struct HTTPClient: Sendable, DependencyKey {
-	public let executeRequest: ExecuteRequest
-}
-
-// MARK: HTTPClient.ExecuteRequest
-extension HTTPClient {
-	public typealias ExecuteRequest = @Sendable (URLRequest) async throws -> Data
-}
-
 extension HTTPClient {
 	public static let liveValue: HTTPClient = {
 		let session = URLSession.shared
@@ -31,11 +21,4 @@ extension HTTPClient {
 			}
 		)
 	}()
-}
-
-extension DependencyValues {
-	public var httpClient: HTTPClient {
-		get { self[HTTPClient.self] }
-		set { self[HTTPClient.self] = newValue }
-	}
 }

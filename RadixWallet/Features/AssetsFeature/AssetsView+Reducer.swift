@@ -32,6 +32,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		public var nonFungibleTokenList: NonFungibleAssetList.State?
 		public var stakeUnitList: StakeUnitList.State?
 		public var poolUnitsList: PoolUnitsList.State?
+		public var allResourceAddresses: Set<ResourceAddress>?
 
 		public let account: Profile.Network.Account
 		public var accountPortfolio: Loadable<AccountPortfoliosClient.AccountPortfolio> = .idle
@@ -88,14 +89,6 @@ public struct AssetsView: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		public struct ResourcesState: Sendable, Equatable {
-			public let portfolio: AccountPortfoliosClient.AccountPortfolio
-			public let fungibleTokenList: FungibleAssetList.State?
-			public let nonFungibleTokenList: NonFungibleAssetList.State?
-			public let stakeUnitList: StakeUnitList.State?
-			public let poolUnitsList: PoolUnitsList.State?
-		}
-
 		case portfolioUpdated(AccountPortfoliosClient.AccountPortfolio)
 	}
 
@@ -133,7 +126,6 @@ public struct AssetsView: Sendable, FeatureReducer {
 			return .run { [state] send in
 				for try await portfolio in await accountPortfoliosClient.portfolioForAccount(state.account.address).debounce(for: .seconds(0.1)) {
 					guard !Task.isCancelled else { return }
-
 					await send(.internal(.portfolioUpdated(portfolio)))
 				}
 			} catch: { error, _ in
@@ -256,6 +248,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		state.nonFungibleTokenList = !nfts.isEmpty ? .init(rows: .init(uniqueElements: nfts)) : nil
 		state.stakeUnitList = stakeUnitList
 		state.poolUnitsList = poolUnitList
+		state.allResourceAddresses = portfolio.account.allResourceAddresses
 	}
 }
 

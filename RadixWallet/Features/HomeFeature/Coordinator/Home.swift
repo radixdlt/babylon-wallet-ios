@@ -217,14 +217,14 @@ public struct Home: Sendable, FeatureReducer {
 			return importMnemonics(state: &state)
 
 		case let .currentGatewayChanged(gateway):
-			// #if DEBUG
-			//            state.showFiatWorth = true
-			//            #else
-			state.showFiatWorth = gateway == .stokenet
+			#if DEBUG
+			state.showFiatWorth = true
+			#else
+			state.showFiatWorth = gateway == .mainnet
 			state.accountRows.mutateAll { rowState in
 				rowState.showFiatWorth = state.showFiatWorth
 			}
-			//            #endif
+			#endif
 			return .none
 
 		case let .shouldShowNPSSurvey(shouldShow):
