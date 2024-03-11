@@ -15,7 +15,7 @@ public struct TransactionHistoryRequest: Sendable, Hashable {
 	public var account: AccountAddress
 	public let period: Range<Date>
 	public let filters: [TransactionFilter]
-	public let allResources: Set<ResourceAddress>
+	public let allResources: IdentifiedArrayOf<OnLedgerEntity.Resource>
 	public let ascending: Bool
 	public let cursor: String?
 }

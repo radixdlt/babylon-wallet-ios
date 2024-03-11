@@ -12,19 +12,26 @@ extension TransactionHistoryClient {
 			let response = try await gatewayAPIClient.streamTransactions(request.gatewayRequest)
 			let account = request.account
 			let networkID = try account.networkID()
-			let resourceAddresses = request.allResources
+			let resourceAddresses = request.allResources.ids
 
 			print("• RESPONSE: \(request.period.lowerBound.formatted(date: .abbreviated, time: .omitted)) -> \(request.period.upperBound.formatted(date: .abbreviated, time: .omitted)) \(response.items.count) •••••••••••••••••••••••")
-			let resourceAddresses_ = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
-			print("•• RESPONSE RES: \(resourceAddresses.count) \(resourceAddresses_.count)")
+
+			let resourceAddressesInPeriod = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
+
+			let unloaded = resourceAddressesInPeriod.subtracting(resourceAddresses)
+
+			print("•• RESPONSE RES: loaded: \(resourceAddresses.count),  needed: \(resourceAddressesInPeriod.count), not loaded: \(unloaded.count)")
 
 			// Pre-loading the details for all the resources involved
 
-			let resourceDetails = try await onLedgerEntitiesClient.getResources(resourceAddresses_)
+			var resourceDetails = request.allResources
+			let additionalResourceDetails = try await onLedgerEntitiesClient.getResources(unloaded)
+			resourceDetails.append(contentsOf: additionalResourceDetails)
+
 			let keyedResources = IdentifiedArray(uniqueElements: resourceDetails)
 
 			for red in keyedResources {
-				print("    •• res: \(red.metadata.title ?? "-"): \(resourceAddresses_.contains(red.id))")
+				print("    •• res: \(red.metadata.title ?? "-"): \(request.allResources.ids.contains(red.id))")
 			}
 
 			// Thrown if a resource or nonFungibleToken that we loaded is not present, should never happen
