@@ -3,14 +3,11 @@ import ComposableArchitecture
 // MARK: - TransactionHistory
 public struct TransactionHistory: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		let account: Profile.Network.Account
-
 		let availableMonths: [DateRangeItem]
 
-		// The metadata used by the filters
-		let filterMetadata: [ResourceAddress: OnLedgerEntity.Metadata]
+		let account: Profile.Network.Account
 
-		let allResourceAddresses: Set<ResourceAddress>
+		let portfolio: OnLedgerEntity.Account
 
 		var resources: IdentifiedArrayOf<OnLedgerEntity.Resource> = []
 
@@ -46,9 +43,9 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 				throw MissingPortfolioError(account: account.accountAddress)
 			}
 
-			self.account = account
-			self.filterMetadata = portfolio.filterMetadata
 			self.availableMonths = try .from(babylonDate)
+			self.account = account
+			self.portfolio = portfolio
 			self.currentMonth = availableMonths[availableMonths.endIndex - 1].id
 			self.loading = .start(babylonDate)
 		}
@@ -123,7 +120,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			return loadHistory(state: &state)
 
 		case .filtersTapped:
-			state.destination = .filters(.init(metadata: state.filterMetadata, filters: state.activeFilters.map(\.id)))
+			state.destination = .filters(.init(portfolio: state.portfolio, filters: state.activeFilters.map(\.id)))
 			return .none
 
 		case let .filterCrossTapped(id):
@@ -168,7 +165,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			account: state.account.accountAddress,
 			period: range,
 			filters: state.activeFilters.map(\.id),
-			allResources: state.resources,
+			allResourcesAddresses: state.portfolio.allResourceAddresses,
+			resources: state.resources,
 			ascending: false,
 			cursor: nil
 		)
@@ -181,21 +179,18 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	func loadedHistory(_ response: TransactionHistoryResponse, state: inout State) -> Effect<Action> {
 		state.loading.isLoading = false
-		state.resources.append(contentsOf: response.allResources)
-
-//		let newSections = transactions.inSections
-//		var sections = self.sections
-//		sections.append(contentsOf: newSections)
-//		sections.sort(by: \.day)
-//		self.sections = sections
-//		loadedPeriods.append(contentsOf: newSections.map(\.month))
-
+		state.resources.append(contentsOf: response.resources)
 		state.sections.removeAll()
 		state.sections.append(contentsOf: response.items.inSections)
-		state.sections.sort(by: \.day)
-//		loadedPeriods.append(contentsOf: sections.map(\.month))
+		state.sections.sort(by: \.day, >)
 
-		print("••• UPDATED history, set res: \(response.allResources.count)")
+		//		let newSections = transactions.inSections
+		//		var sections = self.sections
+		//		sections.append(contentsOf: newSections)
+		//		sections.sort(by: \.day)
+		//		self.sections = sections
+		//		loadedPeriods.append(contentsOf: newSections.map(\.month))
+		//		loadedPeriods.append(contentsOf: sections.map(\.month))
 
 		return .none
 	}
