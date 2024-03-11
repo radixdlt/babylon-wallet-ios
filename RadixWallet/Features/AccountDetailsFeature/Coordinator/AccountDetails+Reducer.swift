@@ -130,8 +130,11 @@ public struct AccountDetails: Sendable, FeatureReducer {
 				loggerGlobal.error("The button should not be enabled until the portfolio has been loaded")
 				return .none
 			}
-
-			state.destination = .history(.init(account: state.account, assets: assets))
+			do {
+				state.destination = try .history(.init(account: state.account, assets: assets))
+			} catch {
+				errorQueue.schedule(error)
+			}
 			return .none
 
 		case .exportMnemonicButtonTapped:

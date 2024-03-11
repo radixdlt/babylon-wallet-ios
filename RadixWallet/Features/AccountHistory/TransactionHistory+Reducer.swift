@@ -5,28 +5,41 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		let account: Profile.Network.Account
 
-		let periods: [DateRangeItem]
+		let availableMonths: [DateRangeItem]
 
 		var allResourceAddresses: Set<ResourceAddress>
 		var allResources: IdentifiedArrayOf<OnLedgerEntity.Resource>? = nil
 
 		var activeFilters: IdentifiedArrayOf<TransactionHistoryFilters.State.Filter> = []
 
-		var selectedPeriod: DateRangeItem.ID
-
 		var sections: IdentifiedArrayOf<TransactionSection> = []
-		var loadedPeriods: Set<Date> = []
 
-		var isLoading: Bool = false
+		// The currently selected month
+		var currentMonth: DateRangeItem.ID
+
+		var loading: Loading
+
+		struct Loading: Hashable, Sendable {
+			let range: Range<Date>
+			let filters: [TransactionFilter]
+			var loadedRange: Range<Date>
+			var cursor: String?
+			var isLoading: Bool
+
+			static func start(_ fromDate: Date) -> Self {
+				.init(range: fromDate ..< Date.now, filters: [], loadedRange: Date.now ..< Date.now, isLoading: true)
+			}
+		}
 
 		@PresentationState
 		public var destination: Destination.State?
 
-		init(account: Profile.Network.Account, assets: Set<ResourceAddress>) {
+		init(account: Profile.Network.Account, assets: Set<ResourceAddress>) throws {
 			self.account = account
-			self.periods = try! .init(months: 7)
+			self.availableMonths = try .from(babylonDate)
 			self.allResourceAddresses = assets
-			self.selectedPeriod = periods.last!.id
+			self.currentMonth = availableMonths[availableMonths.endIndex - 1].id
+			self.loading = .start(babylonDate)
 		}
 
 		public struct TransactionSection: Sendable, Hashable, Identifiable {
@@ -37,18 +50,20 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			let month: Date
 			var transactions: [TransactionHistoryItem]
 		}
+
+		private let babylonDate = Date(timeIntervalSince1970: 1_695_893_400)
 	}
 
 	public enum ViewAction: Sendable, Hashable {
 		case onAppear
-		case selectedPeriod(DateRangeItem.ID)
+		case selectedMonth(DateRangeItem.ID)
 		case filtersTapped
 		case filterCrossTapped(TransactionFilter)
 		case closeTapped
 	}
 
 	public enum InternalAction: Sendable, Hashable {
-		case updateHistory(TransactionHistoryResponse)
+		case loaded(TransactionHistoryResponse)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -89,8 +104,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		switch viewAction {
 		case .onAppear:
 			return loadSelectedPeriod(state: &state)
-		case let .selectedPeriod(period):
-			state.selectedPeriod = period
+		case let .selectedMonth(month):
+			state.currentMonth = month
 			return loadSelectedPeriod(state: &state)
 
 		case .filtersTapped:
@@ -98,7 +113,10 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 				loggerGlobal.error("The filters button should not be enabled until the resources have been loaded")
 				return .none
 			}
-			state.destination = .filters(.init(assets: allResources, activeFilters: state.activeFilters.map(\.id)))
+			if let period = state.availableMonths.randomElement() {
+				state.currentMonth = period.id
+			}
+//			state.destination = .filters(.init(assets: allResources, activeFilters: state.activeFilters.map(\.id)))
 			return .none
 
 		case let .filterCrossTapped(id):
@@ -112,9 +130,9 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .updateHistory(updateHistory):
+		case let .loaded(updateHistory):
 			state.updateHistory(updateHistory)
-			state.isLoading = false
+			state.loading.isLoading = false
 			return .none
 		}
 	}
@@ -136,9 +154,9 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	// Helper methods
 
-	func loadSelectedPeriod(state: inout State) -> Effect<Action> {
-		state.isLoading = true
-		guard let range = state.periods.first(where: { $0.id == state.selectedPeriod })?.range.clamped else {
+	func loadSelectedPeriod(state: inout State, goto: Bool = false) -> Effect<Action> {
+		state.loading.isLoading = true
+		guard let range = state.availableMonths.first(where: { $0.id == state.currentMonth })?.range.clamped else {
 			return .none
 		}
 
@@ -154,7 +172,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 				cursor: nil
 			)
 			let response = try await transactionHistoryClient.getTransactionHistory(request)
-			await send(.internal(.updateHistory(response)))
+			await send(.internal(.loaded(response)))
 		}
 	}
 }
@@ -180,7 +198,7 @@ extension TransactionHistory.State {
 		sections.removeAll()
 		sections.append(contentsOf: response.items.inSections)
 		sections.sort(by: \.day)
-		loadedPeriods.append(contentsOf: sections.map(\.month))
+//		loadedPeriods.append(contentsOf: sections.map(\.month))
 
 		print("••• UPDATED history, set res: \(response.allResources.count)")
 		allResources = response.allResources
@@ -188,7 +206,7 @@ extension TransactionHistory.State {
 
 	mutating func clearSections() {
 		sections.removeAll(keepingCapacity: true)
-		loadedPeriods.removeAll(keepingCapacity: true)
+//		loadedPeriods.removeAll(keepingCapacity: true)
 	}
 }
 
@@ -223,14 +241,18 @@ extension TransactionHistory.State.TransactionSection {
 struct FailedToCalculateDate: Error {}
 
 extension [DateRangeItem] {
-	init(months: Int, upTo now: Date = .now) throws {
+	static func from(_ fromDate: Date) throws -> Self {
+		let now: Date = .now
 		let calendar: Calendar = .current
-		let monthStart = calendar.startOfMonth(for: now)
-		let dates = ((1 - months) ... 1).compactMap { calendar.date(byAdding: .month, value: $0, to: monthStart) }
 
-		guard dates.count == months + 1 else {
-			throw FailedToCalculateDate()
-		}
+		var monthStarts = [calendar.startOfMonth(for: fromDate)]
+		repeat {
+			let lastMonthStart = monthStarts[monthStarts.endIndex - 1]
+			guard let nextMonthStart = calendar.date(byAdding: .month, value: 1, to: lastMonthStart) else {
+				throw FailedToCalculateDate() // This should not be possible
+			}
+			monthStarts.append(nextMonthStart)
+		} while monthStarts[monthStarts.endIndex - 1] < now
 
 		func caption(date: Date) -> String {
 			if calendar.areSameYear(date, now) {
@@ -240,7 +262,7 @@ extension [DateRangeItem] {
 			}
 		}
 
-		self = zip(dates, dates.dropFirst()).map { start, end in
+		return zip(monthStarts, monthStarts.dropFirst()).map { start, end in
 			.init(
 				caption: caption(date: start),
 				startDate: start,
