@@ -80,7 +80,6 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
-	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
@@ -124,17 +123,12 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .historyButtonTapped:
-			print("••• Have resource addresses?: \((state.assets.allResourceAddresses?.count).map(String.init) ?? "nil")")
-
-			guard let assets = state.assets.allResourceAddresses else {
-				loggerGlobal.error("The button should not be enabled until the portfolio has been loaded")
-				return .none
-			}
 			do {
-				state.destination = try .history(.init(account: state.account, assets: assets))
+				state.destination = try .history(.init(account: state.account))
 			} catch {
 				errorQueue.schedule(error)
 			}
+
 			return .none
 
 		case .exportMnemonicButtonTapped:
@@ -147,7 +141,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .assets(.internal(.resourcesStateUpdated)):
+		case .assets(.internal(.resourcesUpdated)):
 			checkAccountAccessToMnemonic(state: &state)
 			return .none
 

@@ -7,8 +7,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		let availableMonths: [DateRangeItem]
 
-		var allResourceAddresses: Set<ResourceAddress>
-		var allResources: IdentifiedArrayOf<OnLedgerEntity.Resource>? = nil
+		var resources: IdentifiedArrayOf<OnLedgerEntity.Resource> = []
 
 		var activeFilters: IdentifiedArrayOf<TransactionHistoryFilters.State.Filter> = []
 
@@ -22,6 +21,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		struct Loading: Hashable, Sendable {
 			let range: Range<Date>
 			let filters: [TransactionFilter]
+			var didLoadResources: Bool = false
 			var loadedRange: Range<Date>
 			var cursor: String?
 			var isLoading: Bool
@@ -34,10 +34,20 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destination.State?
 
-		init(account: Profile.Network.Account, assets: Set<ResourceAddress>) throws {
+		init(account: Profile.Network.Account) throws {
+			var account = account
+			if account.networkID == .mainnet {
+				account = .init(
+					networkID: account.networkID,
+					address: try! AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l"),
+					securityState: account.securityState,
+					appearanceID: account.appearanceID,
+					displayName: account.displayName
+				)
+			}
+
 			self.account = account
 			self.availableMonths = try .from(babylonDate)
-			self.allResourceAddresses = assets
 			self.currentMonth = availableMonths[availableMonths.endIndex - 1].id
 			self.loading = .start(babylonDate)
 		}
@@ -51,6 +61,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			var transactions: [TransactionHistoryItem]
 		}
 
+		// September 28th, 2023, at 9.30 PM UTC
 		private let babylonDate = Date(timeIntervalSince1970: 1_695_893_400)
 	}
 
@@ -63,7 +74,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Hashable {
-		case loaded(TransactionHistoryResponse)
+		case loadedResources(IdentifiedArrayOf<OnLedgerEntity.Resource>)
+		case loadedHistory(TransactionHistoryResponse)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -84,6 +96,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.transactionHistoryClient) var transactionHistoryClient
@@ -103,25 +116,23 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onAppear:
-			return loadSelectedPeriod(state: &state)
+			return loadResources(state: state)
+
 		case let .selectedMonth(month):
 			state.currentMonth = month
-			return loadSelectedPeriod(state: &state)
+			return loadHistory(state: &state)
 
 		case .filtersTapped:
-			guard let allResources = state.allResources else {
+			guard state.loading.didLoadResources else {
 				loggerGlobal.error("The filters button should not be enabled until the resources have been loaded")
 				return .none
 			}
-			if let period = state.availableMonths.randomElement() {
-				state.currentMonth = period.id
-			}
-//			state.destination = .filters(.init(assets: allResources, activeFilters: state.activeFilters.map(\.id)))
+			state.destination = .filters(.init(assets: state.resources, filters: state.activeFilters.map(\.id)))
 			return .none
 
 		case let .filterCrossTapped(id):
 			state.activeFilters.remove(id: id)
-			return loadSelectedPeriod(state: &state)
+			return loadHistory(state: &state)
 
 		case .closeTapped:
 			return .run { _ in await dismiss() }
@@ -130,10 +141,10 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loaded(updateHistory):
-			state.updateHistory(updateHistory)
-			state.loading.isLoading = false
-			return .none
+		case let .loadedResources(resources):
+			loadedResources(resources, state: &state)
+		case let .loadedHistory(history):
+			loadedHistory(history, state: &state)
 		}
 	}
 
@@ -148,46 +159,55 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		print("••••• reduceDismissedDestination"); return
-			loadSelectedPeriod(state: &state)
+		loadHistory(state: &state)
 	}
 
 	// Helper methods
 
-	func loadSelectedPeriod(state: inout State, goto: Bool = false) -> Effect<Action> {
+	func loadResources(state: State) -> Effect<Action> {
+		.run { [account = state.account.address] send in
+			let resources = try await accountPortfoliosClient.fetchAccountPortfolio(account, false).allResources
+			await send(.internal(.loadedResources(resources)))
+		}
+	}
+
+	func loadedResources(_ resources: IdentifiedArrayOf<OnLedgerEntity.Resource>, state: inout State) -> Effect<Action> {
+		state.resources = resources
+		state.loading.didLoadResources = true
+		return loadHistory(state: &state)
+	}
+
+	func loadHistory(state: inout State) -> Effect<Action> {
 		state.loading.isLoading = true
 		guard let range = state.availableMonths.first(where: { $0.id == state.currentMonth })?.range.clamped else {
 			return .none
 		}
 
-		let mockAccount = state.account.networkID == .mainnet ? try! AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l") : nil
+		guard state.loading.didLoadResources else {
+			return loadResources(state: state)
+		}
 
-		return .run { [account = state.account.address, allResources = state.allResourceAddresses, filters = state.activeFilters.map(\.id)] send in
-			let request = TransactionHistoryRequest(
-				account: mockAccount ?? account,
-				period: range,
-				filters: filters,
-				allResources: allResources,
-				ascending: false,
-				cursor: nil
-			)
+//		let mockAccount = state.account.networkID == .mainnet ? try! AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l") : nil
+
+		let request = TransactionHistoryRequest(
+			account: state.account.accountAddress,
+			period: range,
+			filters: state.activeFilters.map(\.id),
+			allResources: state.resources,
+			ascending: false,
+			cursor: nil
+		)
+
+		return .run { send in
 			let response = try await transactionHistoryClient.getTransactionHistory(request)
-			await send(.internal(.loaded(response)))
+			await send(.internal(.loadedHistory(response)))
 		}
 	}
-}
 
-private extension Range<Date> {
-	var clamped: Range? {
-		let now: Date = .now
-		guard lowerBound < now else { return nil }
-		return lowerBound ..< Swift.min(upperBound, now.addingTimeInterval(0)) // FIXME: Figure out end date
-	}
-}
+	func loadedHistory(_ response: TransactionHistoryResponse, state: inout State) -> Effect<Action> {
+		state.loading.isLoading = false
+//		state.resources = response.allResources
 
-extension TransactionHistory.State {
-	///  Presupposes that transactions are loaded in chunks of full months
-	mutating func updateHistory(_ response: TransactionHistoryResponse) {
 //		let newSections = transactions.inSections
 //		var sections = self.sections
 //		sections.append(contentsOf: newSections)
@@ -195,18 +215,58 @@ extension TransactionHistory.State {
 //		self.sections = sections
 //		loadedPeriods.append(contentsOf: newSections.map(\.month))
 
-		sections.removeAll()
-		sections.append(contentsOf: response.items.inSections)
-		sections.sort(by: \.day)
+		state.sections.removeAll()
+		state.sections.append(contentsOf: response.items.inSections)
+		state.sections.sort(by: \.day)
 //		loadedPeriods.append(contentsOf: sections.map(\.month))
 
 		print("••• UPDATED history, set res: \(response.allResources.count)")
-		allResources = response.allResources
-	}
 
-	mutating func clearSections() {
-		sections.removeAll(keepingCapacity: true)
-//		loadedPeriods.removeAll(keepingCapacity: true)
+		return .none
+	}
+}
+
+extension OnLedgerEntity.Account {
+	var allResources: IdentifiedArrayOf<OnLedgerEntity.Resource> {
+		var result: IdentifiedArrayOf<OnLedgerEntity.Resource> = []
+
+		if let xrd = fungibleResources.xrdResource {
+			result.append(xrd.resource)
+		}
+		result.append(contentsOf: fungibleResources.nonXrdResources.map(\.resource))
+		result.append(contentsOf: nonFungibleResources.map(\.resource))
+		result.append(contentsOf: poolUnitResources.poolUnits.map(\.resource.resource))
+
+		for stake in poolUnitResources.radixNetworkStakes {
+			if let stakeClaim = stake.stakeClaimResource {
+				result.append(stakeClaim.resource)
+			}
+			if let stakeUnit = stake.stakeUnitResource {
+				result.append(stakeUnit.resource)
+			}
+		}
+
+		return result
+	}
+}
+
+private extension OnLedgerEntity.OwnedFungibleResource {
+	var resource: OnLedgerEntity.Resource {
+		.init(resourceAddress: resourceAddress, atLedgerState: atLedgerState, metadata: metadata)
+	}
+}
+
+private extension OnLedgerEntity.OwnedNonFungibleResource {
+	var resource: OnLedgerEntity.Resource {
+		.init(resourceAddress: resourceAddress, atLedgerState: atLedgerState, metadata: metadata)
+	}
+}
+
+private extension Range<Date> {
+	var clamped: Range? {
+		let now: Date = .now
+		guard lowerBound < now else { return nil }
+		return lowerBound ..< Swift.min(upperBound, now)
 	}
 }
 

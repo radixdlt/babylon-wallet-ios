@@ -31,11 +31,11 @@ public struct TransactionHistoryFilters: Sendable, FeatureReducer {
 			}
 		}
 
-		public init(assets: some Collection<OnLedgerEntity.Resource>, activeFilters: [Filter.ID]) {
-			let transferTypes = TransactionFilter.TransferType.allCases.map { Filter($0, isActive: activeFilters.contains(.transferType($0))) }
-			let fungibles = assets.filter { $0.fungibility == .fungible }.compactMap { Filter($0, isActive: activeFilters.contains(.asset($0.id))) }
-			let nonFungibles = assets.filter { $0.fungibility == .nonFungible }.compactMap { Filter($0, isActive: activeFilters.contains(.asset($0.id))) }
-			let transactionTypes = TransactionFilter.TransactionType.allCases.map { Filter($0, isActive: activeFilters.contains(.transactionType($0))) }
+		public init(assets: some Collection<OnLedgerEntity.Resource>, filters: [Filter.ID]) {
+			let transferTypes = TransactionFilter.TransferType.allCases.map { Filter($0, isActive: filters.contains(.transferType($0))) }
+			let fungibles = assets.filter { $0.fungibility == .fungible }.compactMap { Filter($0, isActive: filters.contains(.asset($0.id))) }
+			let nonFungibles = assets.filter { $0.fungibility == .nonFungible }.compactMap { Filter($0, isActive: filters.contains(.asset($0.id))) }
+			let transactionTypes = TransactionFilter.TransactionType.allCases.map { Filter($0, isActive: filters.contains(.transactionType($0))) }
 			self.filters = .init(transferTypes: transferTypes, fungibles: fungibles, nonFungibles: nonFungibles, transactionTypes: transactionTypes)
 		}
 	}
