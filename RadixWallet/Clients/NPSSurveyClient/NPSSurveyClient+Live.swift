@@ -13,7 +13,10 @@ extension NPSSurveyClient: DependencyKey {
 		let shouldAskForFeedbackSubject: AsyncCurrentValueSubject<Bool> = .init(false)
 
 		return .init(
-			uploadUserFeedback: uploadUserFeedback,
+			uploadUserFeedback: { feedback in
+				await uploadUserFeedback(feedback)
+				shouldAskForFeedbackSubject.send(false)
+			},
 			incrementTransactionCompleteCounter: {
 				let currentCounter = userDefaults.getTransactionsCompletedCounter() ?? 0
 				let updatedCounter = currentCounter + 1
@@ -115,7 +118,11 @@ private extension URLQueryItem {
 		.init(name: "id", value: id.uuidString)
 	}
 
+	#if DEBUG
 	static let formUUID: Self = .init(name: "form_uuid", value: "281622a0-dc6b-11ee-8fd1-23c96056fbd2")
+	#else
+	static let formUUID: Self = .init(name: "form_uuid", value: "3432b6e0-dfad-11ee-a53c-95167f067d9c")
+	#endif
 
 	static func npsScore(_ score: Int) -> Self {
 		.init(name: "nps", value: "\(score)")
