@@ -5,7 +5,7 @@ extension AccountPortfoliosClient: DependencyKey {
 
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 		@Dependency(\.cacheClient) var cacheClient
-		@Dependency(\.tokenPriceClient) var tokenPriceClient
+		@Dependency(\.tokenPricesClient) var tokenPricesClient
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 
@@ -96,14 +96,14 @@ extension AccountPortfoliosClient: DependencyKey {
 							),
 						]
 						#else
-						/// No
+						/// No price for resources on testnets
 						return []
 						#endif
 					}
 				}()
 
 				if !allResources.isEmpty {
-					let prices = try? await tokenPriceClient.getTokenPrices(.init(
+					let prices = try? await tokenPricesClient.getTokenPrices(.init(
 						tokens: Array(allResources),
 						currency: preferences.fiatCurrencyPriceTarget
 					))

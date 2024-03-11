@@ -359,10 +359,8 @@ extension OnLedgerEntitiesClient {
 		)
 
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
-		@Dependency(\.tokenPriceClient) var tokenPriceClient
 		@Dependency(\.appPreferencesClient) var appPreferencesClient
 		let currentEpoch = try await gatewayAPIClient.getEpoch()
-		// let xrdPrice = await appPreferencesClient.getPreferences().display.isCurrencyAmountVisible ? 0.043 : nil // try? await tokenPriceClient.getTokenPrices()
 
 		let allStakeClaimTokens = try await ownedStakes.compactMap { validator -> (ValidatorAddress, OnLedgerEntity.OwnedNonFungibleResource)? in
 			guard let stakeClaimResource = validator.stakeClaimResource else {
