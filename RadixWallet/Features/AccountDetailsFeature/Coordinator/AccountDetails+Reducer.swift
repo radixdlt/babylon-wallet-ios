@@ -123,6 +123,16 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .historyButtonTapped:
+
+			//		let mockAccount = state.account.networkID == .mainnet ? try! AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l") : nil
+
+//			func loadResources(state: State) -> Effect<Action> {
+//				.run { [account = state.account.address] send in
+//					let resources = try await accountPortfoliosClient.fetchAccountPortfolio(account, false).allResources
+//					await send(.internal(.loadedResources(resources)))
+//				}
+//			}
+
 			do {
 				state.destination = try .history(.init(account: state.account))
 			} catch {

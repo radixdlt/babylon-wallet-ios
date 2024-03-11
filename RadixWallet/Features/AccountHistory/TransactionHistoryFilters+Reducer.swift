@@ -31,11 +31,29 @@ public struct TransactionHistoryFilters: Sendable, FeatureReducer {
 			}
 		}
 
-		public init(assets: some Collection<OnLedgerEntity.Resource>, filters: [Filter.ID]) {
+		public init(account: AccountAddress, filters: [Filter.ID]) throws {
+			func isFungible(_ resource: ResourceAddress) -> Bool {
+				resource.decodedKind == .globalFungibleResourceManager
+			}
+
+			@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+			guard let portfolio = accountPortfoliosClient.portfolios().first(where: { $0.address == account }) else {
+				struct MissingPortfolioError: Error { let account: AccountAddress }
+				throw MissingPortfolioError(account: account)
+			}
+
 			let transferTypes = TransactionFilter.TransferType.allCases.map { Filter($0, isActive: filters.contains(.transferType($0))) }
-			let fungibles = assets.filter { $0.fungibility == .fungible }.compactMap { Filter($0, isActive: filters.contains(.asset($0.id))) }
-			let nonFungibles = assets.filter { $0.fungibility == .nonFungible }.compactMap { Filter($0, isActive: filters.contains(.asset($0.id))) }
+			let fungibles = portfolio.fungibleMetadata.map { Filter($0.key, metadata: $0.value, isActive: filters.contains(.asset($0.key))) }
+			let nonFungibles = portfolio.nonFungibleMetadata.map { Filter($0.key, metadata: $0.value, isActive: filters.contains(.asset($0.key))) }
 			let transactionTypes = TransactionFilter.TransactionType.allCases.map { Filter($0, isActive: filters.contains(.transactionType($0))) }
+
+//			let transferTypes = TransactionFilter.TransferType.allCases.map { Filter($0, isActive: filters.contains(.transferType($0))) }
+//			let fungibles = metadata.filter { isFungible($0.key) }
+//				.map { Filter($0.key, metadata: $0.value, isActive: filters.contains(.asset($0.key))) }
+//			let nonFungibles = metadata.filter { !isFungible($0.key) }
+//				.map { Filter($0.key, metadata: $0.value, isActive: filters.contains(.asset($0.key))) }
+//			let transactionTypes = TransactionFilter.TransactionType.allCases.map { Filter($0, isActive: filters.contains(.transactionType($0))) }
+
 			self.filters = .init(transferTypes: transferTypes, fungibles: fungibles, nonFungibles: nonFungibles, transactionTypes: transactionTypes)
 		}
 	}
@@ -134,9 +152,9 @@ extension TransactionHistoryFilters.State.Filter {
 		}
 	}
 
-	init?(_ asset: OnLedgerEntity.Resource, isActive: Bool) {
-		let label = asset.metadata.title ?? asset.resourceAddress.formatted()
-		self.init(id: .asset(asset.resourceAddress), icon: nil, label: label, isActive: isActive)
+	init(_ resourceAddress: ResourceAddress, metadata: OnLedgerEntity.Metadata, isActive: Bool) {
+		let label = metadata.title ?? resourceAddress.formatted()
+		self.init(id: .asset(resourceAddress), icon: nil, label: label, isActive: isActive)
 	}
 
 	init(_ transactionType: TransactionFilter.TransactionType, isActive: Bool) {
@@ -155,5 +173,30 @@ extension IdentifiedArrayOf<TransactionHistoryFilters.State.Filter> {
 		for existingID in ids {
 			self[id: existingID]?.isActive = existingID == id ? active : false
 		}
+	}
+}
+
+private extension OnLedgerEntity.Account {
+	var fungibleMetadata: [ResourceAddress: OnLedgerEntity.Metadata] {
+		var result: [ResourceAddress: OnLedgerEntity.Metadata] = [:]
+
+		if let xrd = fungibleResources.xrdResource {
+			result[xrd.resourceAddress] = xrd.metadata
+		}
+		for fungible in fungibleResources.nonXrdResources {
+			result[fungible.resourceAddress] = fungible.metadata
+		}
+
+		return result
+	}
+
+	var nonFungibleMetadata: [ResourceAddress: OnLedgerEntity.Metadata] {
+		var result: [ResourceAddress: OnLedgerEntity.Metadata] = [:]
+
+		for nonFungible in nonFungibleResources {
+			result[nonFungible.resourceAddress] = nonFungible.metadata
+		}
+
+		return result
 	}
 }
