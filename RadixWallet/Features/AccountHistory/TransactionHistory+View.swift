@@ -3,7 +3,7 @@ import SwiftUI
 
 extension TransactionHistory.State {
 	var showEmptyState: Bool {
-		sections.isEmpty && !isLoading
+		sections.isEmpty && !loading.isLoading
 	}
 }
 
@@ -22,7 +22,7 @@ extension TransactionHistory {
 				WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 					let accountHeader = AccountHeaderView(account: viewStore.account)
 
-					let selection = viewStore.binding(get: \.selectedPeriod, send: ViewAction.selectedPeriod)
+					let selection = viewStore.binding(get: \.currentMonth, send: ViewAction.selectedMonth)
 
 					VStack(spacing: .zero) {
 						VStack(spacing: .small2) {
@@ -68,7 +68,7 @@ extension TransactionHistory {
 
 							let scrollBarOffset = max(rect?.maxY ?? 0, 0)
 							VStack(spacing: .small2) {
-								HScrollBar(items: viewStore.periods, selection: selection)
+								HScrollBar(items: viewStore.availableMonths, selection: selection)
 
 								if let filters = viewStore.activeFilters.nilIfEmpty {
 									ActiveFiltersView(filters: filters) { id in
@@ -457,36 +457,41 @@ public struct HScrollBar<Item: ScrollBarItem>: View {
 	@Binding var selection: Item.ID
 
 	public var body: some View {
-		ScrollView(.horizontal) {
-			HStack(spacing: .zero) {
-				ForEach(items) { item in
-					let isSelected = item.id == selection
-					Button {
-						selection = item.id
-					} label: {
-						Text(item.caption.localizedUppercase)
-							.foregroundStyle(isSelected ? .app.gray1 : .app.gray2)
+		ScrollViewReader { proxy in
+			ScrollView(.horizontal) {
+				HStack(spacing: .zero) {
+					ForEach(items) { item in
+						let isSelected = item.id == selection
+						Button {
+							selection = item.id
+						} label: {
+							Text(item.caption.localizedUppercase)
+								.foregroundStyle(isSelected ? .app.gray1 : .app.gray2)
+						}
+						.padding(.horizontal, .medium3)
+						.padding(.vertical, .small2)
+						.measurePosition(item.id, coordSpace: HScrollBar.coordSpace)
+						.padding(.horizontal, .small3)
+						.animation(.default, value: isSelected)
 					}
-					.padding(.horizontal, .medium3)
-					.padding(.vertical, .small2)
-					.measurePosition(item.id, coordSpace: HScrollBar.coordSpace)
-					.padding(.horizontal, .small3)
-					.animation(.default, value: isSelected)
 				}
-			}
-			.coordinateSpace(name: HScrollBar.coordSpace)
-			.backgroundPreferenceValue(PositionsPreferenceKey.self) { positions in
-				if let rect = positions[selection] {
-					Capsule()
-						.fill(.app.gray4)
-						.frame(width: rect.width, height: rect.height)
-						.position(x: rect.midX, y: rect.midY)
-						.animation(.default, value: rect)
+				.coordinateSpace(name: HScrollBar.coordSpace)
+				.backgroundPreferenceValue(PositionsPreferenceKey.self) { positions in
+					if let rect = positions[selection] {
+						Capsule()
+							.fill(.app.gray4)
+							.frame(width: rect.width, height: rect.height)
+							.position(x: rect.midX, y: rect.midY)
+							.animation(.default, value: rect)
+					}
 				}
+				.padding(.horizontal, .medium3)
 			}
-			.padding(.horizontal, .medium3)
+			.scrollIndicators(.never)
+			.onChange(of: selection) { value in
+				proxy.scrollTo(value)
+			}
 		}
-		.scrollIndicators(.never)
 	}
 
 	private static var coordSpace: String { "HScrollBar.HStack" }
