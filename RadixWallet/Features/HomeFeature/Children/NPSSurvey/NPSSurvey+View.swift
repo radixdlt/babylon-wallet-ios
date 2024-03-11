@@ -1,5 +1,4 @@
 // MARK: - NPSSurvey.View
-
 extension NPSSurvey {
 	public struct View: SwiftUI.View {
 		public let store: StoreOf<NPSSurvey>

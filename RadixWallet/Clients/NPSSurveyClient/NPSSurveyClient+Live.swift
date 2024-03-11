@@ -88,7 +88,7 @@ extension NPSSurveyClient {
 		@Dependency(\.date) var date
 
 		/// We consider the feedback sent on user interaction.
-		/// No need to actual have a successful upload of the feedback.
+		/// No need to actually have a successful upload of the feedback.
 		userDefaults.setDateOfLastSubmittedNPSSurvey(date.now)
 
 		let userId = {
