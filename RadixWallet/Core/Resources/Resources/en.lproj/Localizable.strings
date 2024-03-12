@@ -1026,3 +1026,10 @@ If you have any “Legacy” Accounts (created on the Olympia network) to import
 "transactionHistory_filters_withdrawalsType" = "Withdrawals";
 "transactionHistory_filters_assetTypeNFTsLabel" = "NFTs";
 "transactionHistory_filters_transactionTypeLabel" = "Type of Transaction";
+"survey_title" = "How\'s it Going?";
+"survey_subtitle" = "How likely are you to recommend Radix and the Radix Wallet to your friends or colleagues?";
+"survey_lowestScoreLabel" = "0 - Not likely";
+"survey_highestScoreLabel" = "10 - Very likely";
+"survey_reason_heading" = "What’s the main reason for your score?";
+"survey_reason_fieldHint" = "Let us know...";
+"survey_submitButton" = "Submit Feedback - Thanks!";
