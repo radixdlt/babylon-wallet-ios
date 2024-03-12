@@ -52,10 +52,15 @@ extension TransactionHistory {
 											}
 									}
 
-									Divider()
-										.onAppear {
-											store.send(.view(.reachedEnd))
-										}
+//									Rectangle()
+//										.fill(.pink)
+//										.onAppear {
+//											store.send(.view(.reachedEnd))
+//										}
+
+//									if viewStore.loading.isLoading {
+//										ProgressView()
+//									}
 								}
 								.padding(.bottom, .medium3)
 							}
