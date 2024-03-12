@@ -48,19 +48,21 @@ extension TransactionHistory {
 												store.send(.view(.sectionAppeared(section.id)))
 											}
 											.onDisappear {
-												store.send(.view(.sectionDisappeared(section.id)))
+//												store.send(.view(.sectionDisappeared(section.id)))
 											}
 									}
 
-//									Rectangle()
-//										.fill(.pink)
-//										.onAppear {
-//											store.send(.view(.reachedEnd))
+									Rectangle()
+										.fill(viewStore.loading.isLoading ? .pink.opacity(0.1) : .green.opacity(0.1))
+										.frame(height: .medium3)
+//										.overlay {
+//											if viewStore.loading.isLoading {
+//												ProgressView()
+//											}
 //										}
-
-//									if viewStore.loading.isLoading {
-//										ProgressView()
-//									}
+										.onAppear {
+											store.send(.view(.reachedBottom))
+										}
 								}
 								.padding(.bottom, .medium3)
 							}
@@ -507,6 +509,7 @@ public struct HScrollBar<Item: ScrollBarItem>: View {
 			}
 			.scrollIndicators(.never)
 			.onChange(of: selection) { value in
+				print("••• SCROLLBAR selection changed to \(value)")
 				proxy.scrollTo(value)
 			}
 		}
