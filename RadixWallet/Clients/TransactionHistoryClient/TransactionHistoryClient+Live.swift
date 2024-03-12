@@ -7,6 +7,26 @@ extension TransactionHistoryClient {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
+		/*
+		 1. load from now and backwards
+
+		 a:
+		 2. scroll backwards - load more using cursor
+
+		 b:
+		 2. scroll forwards - change to forward request
+
+		 c:
+		 2. change filter - reload everything from where you are
+
+		 new period, adjacent - after
+		 new period, inside
+		 new period, outside
+
+		 older transactions in the same period
+		 newer transactions after the ones we have loaded
+		 */
+
 		@Sendable
 		func getTransactionHistory(_ request: TransactionHistoryRequest) async throws -> TransactionHistoryResponse {
 			let response = try await gatewayAPIClient.streamTransactions(request.gatewayRequest)
@@ -20,13 +40,13 @@ extension TransactionHistoryClient {
 			var keyedResources = request.resources
 			keyedResources.append(contentsOf: loadedResources)
 
-			print("• RESPONSE: \(request.period.lowerBound.formatted(date: .abbreviated, time: .omitted)) -> \(request.period.upperBound.formatted(date: .abbreviated, time: .omitted)) \(response.items.count) •••••••••••••••••••••••")
+//			print("• RESPONSE: for \(request.parameters.period.debugString()), got \(response.items.count) items •••••••••••••••••••••••")
 
-			print("•• GET RES: period: \(resourcesForPeriod.count), overall: \(resourcesNeededOverall.count), needed: \(resourcesToLoad.count) -> total: \(keyedResources.count) loaded now: \(loadedResources.count)")
-
-			for red in keyedResources {
-				print("    •• res: \(red.metadata.title ?? "-"): already loaded: \(request.resources.ids.contains(red.id))")
-			}
+//			print("•• GET RES: period: \(resourcesForPeriod.count), overall: \(resourcesNeededOverall.count), needed: \(resourcesToLoad.count) -> total: \(keyedResources.count) loaded now: \(loadedResources.count)")
+//
+//			for red in keyedResources where loadedResources.map(\.id).contains(red.id) {
+//				print("    •• loaded res: \(red.metadata.title ?? "-")")
+//			}
 
 			// Thrown if a resource or nonFungibleToken that we loaded is not present, should never happen
 			struct ProgrammerError: Error {}
@@ -140,7 +160,13 @@ extension TransactionHistoryClient {
 				items.append(transactionItem)
 			}
 
-			return .init(cursor: nil, resources: keyedResources, items: items)
+			return .init(
+				parameters: request.parameters,
+				nextCursor: response.nextCursor,
+				totalCount: response.totalCount,
+				resources: keyedResources,
+				items: items
+			)
 
 //			return try await .init(
 //				cursor: response.nextCursor,
@@ -181,47 +207,16 @@ extension TransactionHistoryClient {
 	}
 }
 
-// MARK: - TransactionInfo
-struct TransactionInfo: Sendable {
-	static let timestampFormatter: ISO8601DateFormatter = {
-		let dateformatter = ISO8601DateFormatter()
-		dateformatter.formatOptions.insert(.withFractionalSeconds)
-		return dateformatter
-	}()
-
-	let time: Date
-	let message: String?
-	let manifestClass: GatewayAPI.ManifestClass?
-//	let fungibleBalanceChanges: String
-//	let nonFungibleBalanceChanges: String
-	let depositSettingsUpdated: Bool
-	let failed: Bool
-}
-
-extension TransactionInfo {
-	init(info: GatewayAPI.CommittedTransactionInfo) throws {
-		guard let time = TransactionInfo.timestampFormatter.date(from: info.roundTimestamp) else {
-			struct CorruptTimestamp: Error { let roundTimestamd: String }
-			throw CorruptTimestamp(roundTimestamd: info.roundTimestamp)
-		}
-
-		let message = info.message?.plaintext?.content.string
-		let manifestClass = info.manifestClasses?.first
-		guard info.receipt?.status == .committedSuccess else {
-			self.init(time: time, message: message, manifestClass: manifestClass, depositSettingsUpdated: false, failed: true)
-			return
-		}
-
-		let changes = info.balanceChanges
-
-		let depositSettingsUpdated = info.manifestClasses?.contains(.accountDepositSettingsUpdate) == true
-
-		self.init(
+extension TransactionHistoryItem {
+	static func failed(at time: Date, manifestClass: GatewayAPI.ManifestClass?) -> Self {
+		.init(
 			time: time,
-			message: message,
+			message: nil,
 			manifestClass: manifestClass,
-			depositSettingsUpdated: depositSettingsUpdated,
-			failed: false
+			withdrawals: [],
+			deposits: [],
+			depositSettingsUpdated: false,
+			failed: true
 		)
 	}
 }
@@ -229,20 +224,20 @@ extension TransactionInfo {
 extension TransactionHistoryRequest {
 	var gatewayRequest: GatewayAPI.StreamTransactionsRequest {
 		.init(
-			atLedgerState: .init(timestamp: period.upperBound),
-			fromLedgerState: .init(timestamp: period.lowerBound),
+			atLedgerState: .init(timestamp: parameters.period.upperBound),
+			fromLedgerState: .init(timestamp: parameters.period.lowerBound),
 			cursor: cursor,
-			limitPerPage: 100,
+			limitPerPage: 5,
 //				kindFilter: T##GatewayAPI.StreamTransactionsRequest.KindFilter,
 //				manifestAccountsWithdrawnFromFilter: <#T##[String]?#>,
 //				manifestAccountsDepositedIntoFilter: <#T##[String]?#>,
-			manifestResourcesFilter: manifestResourcesFilter(filters),
+			manifestResourcesFilter: manifestResourcesFilter(parameters.filters),
 			affectedGlobalEntitiesFilter: [account.address],
-			eventsFilter: eventsFilter(filters, account: account),
+			eventsFilter: eventsFilter(parameters.filters, account: account),
 //				accountsWithManifestOwnerMethodCalls: <#T##[String]?#>,
 //				accountsWithoutManifestOwnerMethodCalls: <#T##[String]?#>,
-			manifestClassFilter: manifestClassFilter(filters),
-			order: ascending ? .asc : .desc,
+			manifestClassFilter: manifestClassFilter(parameters.filters),
+			order: parameters.backwards ? .desc : .asc,
 			optIns: .init(balanceChanges: true)
 			// optIns: GatewayAPI.TransactionDetailsOptIns(affectedGlobalEntities: true, manifestInstructions: true, balanceChanges: true)
 		)

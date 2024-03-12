@@ -35,20 +35,33 @@ extension TransactionHistory {
 						.padding(.top, .small2)
 						.padding(.bottom, .small1)
 
-						ScrollView {
-							LazyVStack(spacing: .small1, pinnedViews: [.sectionHeaders]) {
-								accountHeader
-									.measurePosition(View.accountDummy, coordSpace: View.coordSpace)
-									.opacity(0)
+						ScrollViewReader { _ in
+							ScrollView {
+								LazyVStack(spacing: .small1, pinnedViews: [.sectionHeaders]) {
+									accountHeader
+										.measurePosition(View.accountDummy, coordSpace: View.coordSpace)
+										.opacity(0)
 
-								ForEach(viewStore.sections) { section in
-									SectionView(section: section)
+									ForEach(viewStore.sections) { section in
+										SectionView(section: section)
+											.onAppear {
+												store.send(.view(.sectionAppeared(section.id)))
+											}
+											.onDisappear {
+												store.send(.view(.sectionDisappeared(section.id)))
+											}
+									}
+
+									Divider()
+										.onAppear {
+											store.send(.view(.reachedEnd))
+										}
 								}
+								.padding(.bottom, .medium3)
 							}
-							.padding(.bottom, .medium3)
+							.scrollIndicators(.never)
+							.coordinateSpace(name: View.coordSpace)
 						}
-						.scrollIndicators(.never)
-						.coordinateSpace(name: View.coordSpace)
 					}
 					.background {
 						if viewStore.showEmptyState {
