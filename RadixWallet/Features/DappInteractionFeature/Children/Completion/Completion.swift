@@ -20,14 +20,14 @@ struct Completion: Sendable, FeatureReducer {
 		case dismissTapped
 	}
 
-	@Dependency(\.dismiss) var dismiss
+	enum DelegateAction: Sendable, Equatable {
+		case dismiss
+	}
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .dismissTapped:
-			.run { _ in
-				await dismiss()
-			}
+			.send(.delegate(.dismiss))
 		}
 	}
 }
