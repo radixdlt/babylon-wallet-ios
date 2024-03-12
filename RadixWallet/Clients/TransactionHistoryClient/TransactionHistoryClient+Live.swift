@@ -40,14 +40,6 @@ extension TransactionHistoryClient {
 			var keyedResources = request.resources
 			keyedResources.append(contentsOf: loadedResources)
 
-//			print("• RESPONSE: for \(request.parameters.period.debugString()), got \(response.items.count) items •••••••••••••••••••••••")
-
-//			print("•• GET RES: period: \(resourcesForPeriod.count), overall: \(resourcesNeededOverall.count), needed: \(resourcesToLoad.count) -> total: \(keyedResources.count) loaded now: \(loadedResources.count)")
-//
-//			for red in keyedResources where loadedResources.map(\.id).contains(red.id) {
-//				print("    •• loaded res: \(red.metadata.title ?? "-")")
-//			}
-
 			// Thrown if a resource or nonFungibleToken that we loaded is not present, should never happen
 			struct ProgrammerError: Error {}
 
@@ -85,11 +77,22 @@ extension TransactionHistoryClient {
 				}
 			}
 
-			let dateformatter = ISO8601DateFormatter()
-			dateformatter.formatOptions.insert(.withFractionalSeconds)
+			let dateformatter1 = ISO8601DateFormatter()
+			dateformatter1.formatOptions.insert(.withFractionalSeconds)
+			let dateformatter2 = ISO8601DateFormatter()
 
 			func transaction(for info: GatewayAPI.CommittedTransactionInfo) async throws -> TransactionHistoryItem {
-				guard let time = dateformatter.date(from: info.roundTimestamp) else {
+				let alt1 = dateformatter1.date(from: info.roundTimestamp) != nil ? "1 OK" : "1 x"
+				let alt2 = dateformatter2.date(from: info.roundTimestamp) != nil ? "2 OK" : "2 x"
+				let alt3 = info.confirmedAt != nil ? "3 OK" : "3 x"
+				print(" timestamp: \(info.roundTimestamp) :: \(alt1) - \(alt2) -  \(alt3)")
+
+				let time = dateformatter1.date(from: info.roundTimestamp)
+					?? dateformatter2.date(from: info.roundTimestamp)
+					?? info.confirmedAt
+
+				guard let time else {
+					print(" CORRUPT timestamp: \(info.roundTimestamp)")
 					struct CorruptTimestamp: Error { let roundTimestamd: String }
 					throw CorruptTimestamp(roundTimestamd: info.roundTimestamp)
 				}
