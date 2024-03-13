@@ -106,7 +106,7 @@ private extension ResourceBalance.ViewState.PoolUnit {
 			poolName: resource.fungibleResourceName,
 			amount: .init(details.details.poolUnitResource.amount, guaranteed: details.guarantee?.amount),
 			dAppName: .success(details.details.dAppName),
-			resources: .success(.init(resources: details.details)) // FIXME: GK test this
+			resources: .success(.init(resources: details.details))
 		)
 	}
 }
