@@ -42,24 +42,34 @@ extension TransactionHistory {
 										.measurePosition(View.accountDummy, coordSpace: View.coordSpace)
 										.opacity(0)
 
+									if viewStore.loading.isLoading /* , !viewStore.loading.parameters.backwards */ {
+										Rectangle()
+											.fill(.pink)
+											.frame(height: .medium3)
+											.overlay {
+												ProgressView()
+											}
+									}
+
 									ForEach(viewStore.sections) { section in
 										SectionView(section: section)
 											.onAppear {
 												store.send(.view(.sectionAppeared(section.id)))
 											}
 											.onDisappear {
-//												store.send(.view(.sectionDisappeared(section.id)))
+												guard !viewStore.didDismiss else { return }
+												store.send(.view(.sectionDisappeared(section.id)))
 											}
 									}
 
 									Rectangle()
-										.fill(viewStore.loading.isLoading ? .pink.opacity(0.1) : .green.opacity(0.1))
+										.fill(.clear)
 										.frame(height: .medium3)
-//										.overlay {
-//											if viewStore.loading.isLoading {
-//												ProgressView()
-//											}
-//										}
+										.overlay {
+											if viewStore.loading.isLoading, viewStore.loading.parameters.backwards {
+												ProgressView()
+											}
+										}
 										.onAppear {
 											store.send(.view(.reachedBottom))
 										}
@@ -100,6 +110,11 @@ extension TransactionHistory {
 							.padding(.bottom, .small1)
 							.background(.app.white)
 							.offset(y: scrollBarOffset)
+						}
+					}
+					.onReadPosition(View.accountDummy) { rect in
+						if rect.minY > 30, !viewStore.loading.isLoading {
+							store.send(.view(.pulledDown))
 						}
 					}
 					.clipShape(Rectangle())
@@ -563,28 +578,18 @@ extension View {
 		}
 	}
 
-	public func readSize(_ id: AnyHashable, content: @escaping (CGSize) -> some View) -> some View {
-		overlayPreferenceValue(PositionsPreferenceKey.self, alignment: .top) { positions in
-			if let size = positions[id]?.size {
-				content(size)
-			} else {
-				EmptyView()
-			}
-		}
-	}
-
-	public func onReadSize(_ id: AnyHashable, content: @escaping (CGSize) -> Void) -> some View {
+	public func onReadPosition(_ id: AnyHashable, action: @escaping (CGRect) -> Void) -> some View {
 		onPreferenceChange(PositionsPreferenceKey.self) { positions in
-			if let size = positions[id]?.size {
-				content(size)
+			if let position = positions[id] {
+				action(position)
 			}
 		}
 	}
 
-	public func onReadSizes(_ id1: AnyHashable, _ id2: AnyHashable, content: @escaping (CGSize, CGSize) -> Void) -> some View {
+	public func onReadSizes(_ id1: AnyHashable, _ id2: AnyHashable, action: @escaping (CGSize, CGSize) -> Void) -> some View {
 		onPreferenceChange(PositionsPreferenceKey.self) { positions in
 			if let size1 = positions[id1]?.size, let size2 = positions[id2]?.size {
-				content(size1, size2)
+				action(size1, size2)
 			}
 		}
 	}
