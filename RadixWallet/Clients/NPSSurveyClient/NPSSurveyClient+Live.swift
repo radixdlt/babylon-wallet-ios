@@ -41,7 +41,7 @@ extension NPSSurveyClient {
 		@Dependency(\.userDefaults) var userDefaults
 		@Dependency(\.date) var date
 
-		if transactionCounter > Self.feedbackTransactionCounterThreshold {
+		if transactionCounter == Self.feedbackTransactionCounterThreshold {
 			return true
 		} else if transactionCounter > Self.feedbackTransactionCounterThreshold {
 			guard let lastSubmittedDate = userDefaults.getDateOfLastSubmittedNPSSurvey() else {
@@ -74,7 +74,7 @@ extension NPSSurveyClient {
 	static let rootURL = "https://wallet-net-promoter-score.radixdlt.com/v1/responses"
 	#endif
 
-	private enum QueryItem: String {
+	enum QueryItem: String {
 		case id
 		case formUuid = "form_uuid"
 		case nps
@@ -131,11 +131,11 @@ private extension URLQueryItem {
 	#endif
 
 	static func npsScore(_ score: Int) -> Self {
-		.init(name: "nps", value: "\(score)")
+		.init(name: NPSSurveyClient.QueryItem.nps.rawValue, value: "\(score)")
 	}
 
 	static func npsFeedbackReason(_ reason: String) -> Self {
-		.init(name: "what_do_you_value_most_about_our_service", value: reason)
+		.init(name: NPSSurveyClient.QueryItem.feedbackReason.rawValue, value: reason)
 	}
 }
 
