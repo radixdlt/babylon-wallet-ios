@@ -468,6 +468,10 @@ extension OnLedgerEntity.Account.PoolUnitResources {
 			return nil
 		}
 
+		let poolUnits = poolUnits.filter {
+			$0.resource.amount > .zero
+		}.as
+
 		return .init(radixNetworkStakes: stakes.asIdentifiable(), poolUnits: poolUnits)
 	}
 }
