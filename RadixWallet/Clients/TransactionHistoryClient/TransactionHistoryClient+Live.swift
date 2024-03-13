@@ -12,20 +12,13 @@ extension TransactionHistoryClient {
 			let response = try await gatewayAPIClient.streamTransactions(request.gatewayRequest)
 			let account = request.account
 			let networkID = try account.networkID()
-			let resourceAddresses = request.allResources
-
-			print("• RESPONSE: \(request.period.lowerBound.formatted(date: .abbreviated, time: .omitted)) -> \(request.period.upperBound.formatted(date: .abbreviated, time: .omitted)) \(response.items.count) •••••••••••••••••••••••")
-			let resourceAddresses_ = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
-			print("•• RESPONSE RES: \(resourceAddresses.count) \(resourceAddresses_.count)")
-
-			// Pre-loading the details for all the resources involved
-
-			let resourceDetails = try await onLedgerEntitiesClient.getResources(resourceAddresses_)
-			let keyedResources = IdentifiedArray(uniqueElements: resourceDetails)
-
-			for red in keyedResources {
-				print("    •• res: \(red.metadata.title ?? "-"): \(resourceAddresses_.contains(red.id))")
-			}
+			let resourcesForPeriod = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
+			let resourcesNeededOverall = request.allResourcesAddresses.union(resourcesForPeriod)
+			let existingResources = request.resources.ids
+			let resourcesToLoad = resourcesNeededOverall.subtracting(existingResources)
+			let loadedResources = try await onLedgerEntitiesClient.getResources(resourcesToLoad)
+			var keyedResources = request.resources
+			keyedResources.append(contentsOf: loadedResources)
 
 			// Thrown if a resource or nonFungibleToken that we loaded is not present, should never happen
 			struct ProgrammerError: Error {}
@@ -64,11 +57,16 @@ extension TransactionHistoryClient {
 				}
 			}
 
-			let dateformatter = ISO8601DateFormatter()
-			dateformatter.formatOptions.insert(.withFractionalSeconds)
+			let dateformatter1 = ISO8601DateFormatter()
+			dateformatter1.formatOptions.insert(.withFractionalSeconds)
+			let dateformatter2 = ISO8601DateFormatter()
 
 			func transaction(for info: GatewayAPI.CommittedTransactionInfo) async throws -> TransactionHistoryItem {
-				guard let time = dateformatter.date(from: info.roundTimestamp) else {
+				let time = dateformatter1.date(from: info.roundTimestamp)
+					?? dateformatter2.date(from: info.roundTimestamp)
+					?? info.confirmedAt
+
+				guard let time else {
 					struct CorruptTimestamp: Error { let roundTimestamd: String }
 					throw CorruptTimestamp(roundTimestamd: info.roundTimestamp)
 				}
@@ -139,17 +137,17 @@ extension TransactionHistoryClient {
 				items.append(transactionItem)
 			}
 
-			// We filter out complex resources, i.e. Stake Claim NFTs, Pool Units and LSUs
-			let simpleResources = keyedResources.filter {
-				$0.metadata.validator == nil && $0.metadata.poolUnit == nil
+			if !request.parameters.backwards {
+				items.reverse()
 			}
 
-			return .init(cursor: response.nextCursor, allResources: simpleResources, items: items)
-
-//			return try await .init(
-//				cursor: response.nextCursor,
-//				items: response.items.parallelMap(transaction(for:))
-//			)
+			return .init(
+				parameters: request.parameters,
+				nextCursor: response.nextCursor,
+				totalCount: response.totalCount,
+				resources: keyedResources,
+				items: items
+			)
 		}
 
 		return TransactionHistoryClient(
@@ -185,47 +183,16 @@ extension TransactionHistoryClient {
 	}
 }
 
-// MARK: - TransactionInfo
-struct TransactionInfo: Sendable {
-	static let timestampFormatter: ISO8601DateFormatter = {
-		let dateformatter = ISO8601DateFormatter()
-		dateformatter.formatOptions.insert(.withFractionalSeconds)
-		return dateformatter
-	}()
-
-	let time: Date
-	let message: String?
-	let manifestClass: GatewayAPI.ManifestClass?
-//	let fungibleBalanceChanges: String
-//	let nonFungibleBalanceChanges: String
-	let depositSettingsUpdated: Bool
-	let failed: Bool
-}
-
-extension TransactionInfo {
-	init(info: GatewayAPI.CommittedTransactionInfo) throws {
-		guard let time = TransactionInfo.timestampFormatter.date(from: info.roundTimestamp) else {
-			struct CorruptTimestamp: Error { let roundTimestamd: String }
-			throw CorruptTimestamp(roundTimestamd: info.roundTimestamp)
-		}
-
-		let message = info.message?.plaintext?.content.string
-		let manifestClass = info.manifestClasses?.first
-		guard info.receipt?.status == .committedSuccess else {
-			self.init(time: time, message: message, manifestClass: manifestClass, depositSettingsUpdated: false, failed: true)
-			return
-		}
-
-		let changes = info.balanceChanges
-
-		let depositSettingsUpdated = info.manifestClasses?.contains(.accountDepositSettingsUpdate) == true
-
-		self.init(
+extension TransactionHistoryItem {
+	static func failed(at time: Date, manifestClass: GatewayAPI.ManifestClass?) -> Self {
+		.init(
 			time: time,
-			message: message,
+			message: nil,
 			manifestClass: manifestClass,
-			depositSettingsUpdated: depositSettingsUpdated,
-			failed: false
+			withdrawals: [],
+			deposits: [],
+			depositSettingsUpdated: false,
+			failed: true
 		)
 	}
 }
@@ -233,22 +200,16 @@ extension TransactionInfo {
 extension TransactionHistoryRequest {
 	var gatewayRequest: GatewayAPI.StreamTransactionsRequest {
 		.init(
-			atLedgerState: .init(timestamp: period.upperBound),
-			fromLedgerState: .init(timestamp: period.lowerBound),
+			atLedgerState: .init(timestamp: parameters.period.upperBound),
+			fromLedgerState: .init(timestamp: parameters.period.lowerBound),
 			cursor: cursor,
-			limitPerPage: 100,
-//				kindFilter: T##GatewayAPI.StreamTransactionsRequest.KindFilter,
-//				manifestAccountsWithdrawnFromFilter: <#T##[String]?#>,
-//				manifestAccountsDepositedIntoFilter: <#T##[String]?#>,
-			manifestResourcesFilter: manifestResourcesFilter(filters),
+			limitPerPage: 20,
+			manifestResourcesFilter: manifestResourcesFilter(parameters.filters),
 			affectedGlobalEntitiesFilter: [account.address],
-			eventsFilter: eventsFilter(filters, account: account),
-//				accountsWithManifestOwnerMethodCalls: <#T##[String]?#>,
-//				accountsWithoutManifestOwnerMethodCalls: <#T##[String]?#>,
-			manifestClassFilter: manifestClassFilter(filters),
-			order: ascending ? .asc : .desc,
+			eventsFilter: eventsFilter(parameters.filters, account: account),
+			manifestClassFilter: manifestClassFilter(parameters.filters),
+			order: parameters.backwards ? .desc : .asc,
 			optIns: .init(balanceChanges: true)
-			// optIns: GatewayAPI.TransactionDetailsOptIns(affectedGlobalEntities: true, manifestInstructions: true, balanceChanges: true)
 		)
 	}
 

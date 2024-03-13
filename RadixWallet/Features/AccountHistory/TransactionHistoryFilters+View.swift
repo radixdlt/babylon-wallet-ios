@@ -78,6 +78,7 @@ extension TransactionHistoryFilters {
 					}
 				}
 				.navigationTitle(L10n.TransactionHistory.Filters.title)
+				.navigationBarTitleDisplayMode(.inline)
 			}
 		}
 

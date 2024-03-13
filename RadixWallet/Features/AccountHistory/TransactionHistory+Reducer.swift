@@ -1,36 +1,63 @@
 import ComposableArchitecture
 
+private extension Date {
+	// September 28th, 2023, at 9.30 PM UTC
+	static let babylonLaunch = Date(timeIntervalSince1970: 1_695_893_400)
+}
+
 // MARK: - TransactionHistory
 public struct TransactionHistory: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		let availableMonths: [DateRangeItem]
+
 		let account: Profile.Network.Account
 
-		let periods: [DateRangeItem]
+		let portfolio: OnLedgerEntity.Account
 
-		var allResourceAddresses: Set<ResourceAddress>
-		var allResources: IdentifiedArrayOf<OnLedgerEntity.Resource>? = nil
+		var resources: IdentifiedArrayOf<OnLedgerEntity.Resource> = []
 
 		var activeFilters: IdentifiedArrayOf<TransactionHistoryFilters.State.Filter> = []
 
-		var selectedPeriod: DateRangeItem.ID
-
 		var sections: IdentifiedArrayOf<TransactionSection> = []
-		var loadedPeriods: Set<Date> = []
 
-		var isLoading: Bool = false
+		/// Used to accurately control the current month
+		var visibleSections: OrderedSet<TransactionSection.ID> = []
+
+		/// The currently selected month
+		var currentMonth: DateRangeItem.ID
+
+		/// Values related to loading. Note that `parameters` are set **when receiving the response**
+		var loading: Loading = .init(parameters: .init(period: Date.now ..< Date.now))
+
+		/// Workaround, TCA sends the sectionDisappeared after we dismiss, causing a run-time warning
+		var didDismiss: Bool = false
+
+		struct Loading: Hashable, Sendable {
+			let parameters: TransactionHistoryParameters
+			var isLoading: Bool = false
+			var nextCursor: String? = nil
+			var didLoadFully: Bool = false
+		}
 
 		@PresentationState
 		public var destination: Destination.State?
 
-		init(account: Profile.Network.Account, assets: Set<ResourceAddress>) {
+		init(account: Profile.Network.Account) throws {
+			@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+
+			guard let portfolio = accountPortfoliosClient.portfolios().first(where: { $0.address == account.address }) else {
+				struct MissingPortfolioError: Error { let account: AccountAddress }
+				throw MissingPortfolioError(account: account.accountAddress)
+			}
+
+			self.availableMonths = try .from(.babylonLaunch)
 			self.account = account
-			self.periods = try! .init(months: 7)
-			self.allResourceAddresses = assets
-			self.selectedPeriod = periods.last!.id
+			self.portfolio = portfolio
+			self.currentMonth = .distantFuture
 		}
 
 		public struct TransactionSection: Sendable, Hashable, Identifiable {
-			public var id: Date { day }
+			public var id: Tagged<Self, Date> { .init(day) }
 			/// The day, in the form of a `Date` with all time components set to 0
 			let day: Date
 			/// The month, in the form of a `Date` with all time components set to 0 and the day set to 1
@@ -41,14 +68,19 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Hashable {
 		case onAppear
-		case selectedPeriod(DateRangeItem.ID)
+		case selectedMonth(DateRangeItem.ID)
 		case filtersTapped
 		case filterCrossTapped(TransactionFilter)
 		case closeTapped
+
+		case sectionAppeared(State.TransactionSection.ID)
+		case sectionDisappeared(State.TransactionSection.ID)
+
+		case pulledDown
 	}
 
 	public enum InternalAction: Sendable, Hashable {
-		case updateHistory(TransactionHistoryResponse)
+		case loadedHistory(TransactionHistoryResponse)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -69,10 +101,12 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		}
 	}
 
+	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.transactionHistoryClient) var transactionHistoryClient
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+	@Dependency(\.openURL) var openURL
 
 	public init() {}
 
@@ -88,33 +122,61 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onAppear:
-			return loadSelectedPeriod(state: &state)
-		case let .selectedPeriod(period):
-			state.selectedPeriod = period
-			return loadSelectedPeriod(state: &state)
+			return loadHistory(period: .babylonLaunch ..< .now, state: &state)
+
+		case let .selectedMonth(month):
+			let calendar: Calendar = .current
+			guard let endOfMonth = calendar.date(byAdding: .month, value: 1, to: month) else { return .none }
+			let period: Range<Date> = .babylonLaunch ..< min(endOfMonth, .now)
+			state.currentMonth = month
+			return loadHistory(period: period, state: &state)
 
 		case .filtersTapped:
-			guard let allResources = state.allResources else {
-				loggerGlobal.error("The filters button should not be enabled until the resources have been loaded")
-				return .none
-			}
-			state.destination = .filters(.init(assets: allResources, activeFilters: state.activeFilters.map(\.id)))
+			state.destination = .filters(.init(portfolio: state.portfolio, filters: state.activeFilters.map(\.id)))
 			return .none
 
 		case let .filterCrossTapped(id):
 			state.activeFilters.remove(id: id)
-			return loadSelectedPeriod(state: &state)
+			return loadHistory(filters: state.activeFilters.map(\.id), state: &state)
 
 		case .closeTapped:
+			state.didDismiss = true
 			return .run { _ in await dismiss() }
+
+		case let .sectionAppeared(id):
+			state.visibleSections.remove(id)
+			state.visibleSections.append(id)
+			state.visibleSectionsChanged()
+
+			if state.sections.suffix(2).map(\.id).contains(id) {
+				return loadMoreHistory(state: &state)
+			}
+
+			return .none
+
+		case let .sectionDisappeared(id):
+			state.visibleSections.remove(id)
+			state.visibleSectionsChanged()
+
+			return .none
+
+		case .pulledDown:
+			guard !state.loading.isLoading else { return .none }
+			if state.loading.parameters.backwards {
+				// If we are at the end of the period, we can't load more
+				guard state.currentMonth != state.availableMonths.last?.id else { return .none }
+				guard let loadedRange = state.loadedRange else { return .none }
+				return loadHistory(period: loadedRange.upperBound ..< .now, backwards: false, state: &state)
+			} else {
+				return loadMoreHistory(state: &state)
+			}
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .updateHistory(updateHistory):
-			state.updateHistory(updateHistory)
-			state.isLoading = false
+		case let .loadedHistory(history):
+			loadedHistory(history, state: &state)
 			return .none
 		}
 	}
@@ -130,92 +192,169 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		print("••••• reduceDismissedDestination"); return
-			loadSelectedPeriod(state: &state)
+		loadHistory(filters: state.activeFilters.map(\.id), state: &state)
 	}
 
 	// Helper methods
 
-	func loadSelectedPeriod(state: inout State) -> Effect<Action> {
-		state.isLoading = true
-		guard let range = state.periods.first(where: { $0.id == state.selectedPeriod })?.range.clamped else {
-			return .none
+	/// Load history for the given period, using existing filters
+	func loadHistory(period: Range<Date>, backwards: Bool = true, state: inout State) -> Effect<Action> {
+		let parameters = TransactionHistoryParameters(
+			period: period,
+			backwards: backwards,
+			filters: state.loading.parameters.filters
+		)
+		return loadHistory(parameters: parameters, state: &state)
+	}
+
+	/// Load history for the current period using the provided filters
+	func loadHistory(filters: [TransactionFilter], state: inout State) -> Effect<Action> {
+		let parameters = TransactionHistoryParameters(
+			period: state.loading.parameters.period,
+			backwards: true,
+			filters: filters
+		)
+		return loadHistory(parameters: parameters, state: &state)
+	}
+
+	/// Load more history for the same period, using the existing filters
+	func loadMoreHistory(state: inout State) -> Effect<Action> {
+		loadHistory(parameters: state.loading.parameters, state: &state)
+	}
+
+	/// Load history using the provided parameters, should not be used directly
+	func loadHistory(parameters: TransactionHistoryParameters, state: inout State) -> Effect<Action> {
+		if state.loading.isLoading { return .none }
+
+		if state.loading.didLoadFully, state.loading.parameters.covers(parameters) { return .none }
+
+		if parameters != state.loading.parameters {
+			state.loading.nextCursor = nil
+			state.sections = []
 		}
 
-		let mockAccount = state.account.networkID == .mainnet ? try! AccountAddress(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l") : nil
+		state.loading.isLoading = true
 
-		return .run { [account = state.account.address, allResources = state.allResourceAddresses, filters = state.activeFilters.map(\.id)] send in
-			let request = TransactionHistoryRequest(
-				account: mockAccount ?? account,
-				period: range,
-				filters: filters,
-				allResources: allResources,
-				ascending: false,
-				cursor: nil
-			)
+		let request = TransactionHistoryRequest(
+			account: state.account.accountAddress,
+			parameters: parameters,
+			cursor: state.loading.nextCursor,
+			allResourcesAddresses: state.portfolio.allResourceAddresses,
+			resources: state.resources
+		)
+
+		return .run { send in
 			let response = try await transactionHistoryClient.getTransactionHistory(request)
-			await send(.internal(.updateHistory(response)))
+			await send(.internal(.loadedHistory(response)))
+		} catch: { error, _ in
+			errorQueue.schedule(error)
 		}
+	}
+
+	func loadedHistory(_ response: TransactionHistoryResponse, state: inout State) {
+		state.resources.append(contentsOf: response.resources)
+
+		if response.parameters == state.loading.parameters {
+			// We loaded more from the same range
+			state.loading.nextCursor = response.nextCursor
+			if response.nextCursor == nil {
+				state.loading.didLoadFully = true
+			}
+
+			state.sections.addItems(response.items, backwards: response.parameters.backwards)
+		} else {
+			state.loading = .init(parameters: response.parameters, nextCursor: response.nextCursor)
+			state.sections.replaceItems(response.items)
+		}
+
+		state.loading.isLoading = false
 	}
 }
 
-private extension Range<Date> {
-	var clamped: Range? {
-		let now: Date = .now
-		guard lowerBound < now else { return nil }
-		return lowerBound ..< Swift.min(upperBound, now.addingTimeInterval(0)) // FIXME: Figure out end date
+// MARK: - TransactionHistory.State.TransactionSection + CustomStringConvertible
+extension TransactionHistory.State.TransactionSection: CustomStringConvertible {
+	public var description: String {
+		"Section(\(id.rawValue.formatted(date: .numeric, time: .omitted))): \(transactions.count) transactions"
 	}
 }
 
 extension TransactionHistory.State {
-	///  Presupposes that transactions are loaded in chunks of full months
-	mutating func updateHistory(_ response: TransactionHistoryResponse) {
-//		let newSections = transactions.inSections
-//		var sections = self.sections
-//		sections.append(contentsOf: newSections)
-//		sections.sort(by: \.day)
-//		self.sections = sections
-//		loadedPeriods.append(contentsOf: newSections.map(\.month))
-
-		sections.removeAll()
-		sections.append(contentsOf: response.items.inSections)
-		sections.sort(by: \.day)
-		loadedPeriods.append(contentsOf: sections.map(\.month))
-
-		print("••• UPDATED history, set res: \(response.allResources.count)")
-		allResources = response.allResources
+	var loadedRange: Range<Date>? {
+		guard let first = sections.first?.transactions.first?.time, let last = sections.last?.transactions.last?.time else {
+			return nil
+		}
+		return last ..< first
 	}
 
-	mutating func clearSections() {
-		sections.removeAll(keepingCapacity: true)
-		loadedPeriods.removeAll(keepingCapacity: true)
+	mutating func visibleSectionsChanged() {
+		if let latest = visibleSections.last, let section = sections[id: latest] {
+			currentMonth = section.month
+		}
 	}
 }
 
-extension [TransactionHistoryItem] {
+extension Range {
+	func contains(_ otherRange: Range) -> Bool {
+		otherRange.lowerBound >= lowerBound && otherRange.upperBound <= upperBound
+	}
+}
+
+extension Range<Date> {
+	var debugString: String {
+		"\(lowerBound.formatted(date: .abbreviated, time: .omitted)) -- \(upperBound.formatted(date: .abbreviated, time: .omitted))"
+	}
+}
+
+extension IdentifiedArrayOf<TransactionHistory.State.TransactionSection> {
+	mutating func addItems(_ items: some Collection<TransactionHistoryItem>, backwards: Bool) {
+		let newSections = items.inSections
+
+		if backwards {
+			for newSection in newSections {
+				if last?.id == newSection.id {
+					self[id: newSection.id]?.transactions.append(contentsOf: newSection.transactions)
+				} else {
+					append(newSection)
+				}
+			}
+		} else {
+			for newSection in newSections.reversed() {
+				if first?.id == newSection.id {
+					self[id: newSection.id]?.transactions.insert(contentsOf: newSection.transactions, at: 0)
+				} else {
+					insert(newSection, at: 0)
+				}
+			}
+		}
+	}
+
+	mutating func replaceItems(_ items: some Collection<TransactionHistoryItem>) {
+		self = items.inSections.asIdentifiable()
+	}
+}
+
+extension Collection<TransactionHistoryItem> {
 	var inSections: [TransactionHistory.State.TransactionSection] {
 		let calendar: Calendar = .current
 
-		let sortedBackwards = sorted(by: \.time, >)
 		var result: [TransactionHistory.State.TransactionSection] = []
 
-		for transaction in sortedBackwards {
+		for transaction in self {
 			let day = calendar.startOfDay(for: transaction.time)
-			let month = calendar.startOfMonth(for: transaction.time)
-
-			if result.last?.day == day {
-				result[result.endIndex - 1].append(transaction)
+			if let lastSection = result.last, lastSection.day == day {
+				result[result.endIndex - 1].transactions.append(transaction)
 			} else {
-				result.append(.init(day: day, month: month, transactions: [transaction]))
+				result.append(
+					.init(
+						day: day,
+						month: calendar.startOfMonth(for: day),
+						transactions: [transaction]
+					)
+				)
 			}
 		}
-		return result
-	}
-}
 
-extension TransactionHistory.State.TransactionSection {
-	mutating func append(_ transaction: TransactionHistoryItem) {
-		transactions.append(transaction)
+		return result
 	}
 }
 
@@ -223,14 +362,18 @@ extension TransactionHistory.State.TransactionSection {
 struct FailedToCalculateDate: Error {}
 
 extension [DateRangeItem] {
-	init(months: Int, upTo now: Date = .now) throws {
+	static func from(_ fromDate: Date) throws -> Self {
+		let now: Date = .now
 		let calendar: Calendar = .current
-		let monthStart = calendar.startOfMonth(for: now)
-		let dates = ((1 - months) ... 1).compactMap { calendar.date(byAdding: .month, value: $0, to: monthStart) }
 
-		guard dates.count == months + 1 else {
-			throw FailedToCalculateDate()
-		}
+		var monthStarts = [calendar.startOfMonth(for: fromDate)]
+		repeat {
+			let lastMonthStart = monthStarts[monthStarts.endIndex - 1]
+			guard let nextMonthStart = calendar.date(byAdding: .month, value: 1, to: lastMonthStart) else {
+				throw FailedToCalculateDate() // This should not be possible
+			}
+			monthStarts.append(nextMonthStart)
+		} while monthStarts[monthStarts.endIndex - 1] < now
 
 		func caption(date: Date) -> String {
 			if calendar.areSameYear(date, now) {
@@ -240,7 +383,7 @@ extension [DateRangeItem] {
 			}
 		}
 
-		self = zip(dates, dates.dropFirst()).map { start, end in
+		return zip(monthStarts, monthStarts.dropFirst()).map { start, end in
 			.init(
 				caption: caption(date: start),
 				startDate: start,

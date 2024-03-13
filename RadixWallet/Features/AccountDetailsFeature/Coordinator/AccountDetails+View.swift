@@ -11,8 +11,7 @@ extension AccountDetails.State {
 			isLedgerAccount: account.isLedgerAccount,
 			showToolbar: destination == nil,
 			totalFiatWorth: showFiatWorth ? assets.totalFiatWorth : nil,
-			account: account,
-			historyButtonEnabled: assets.allResourceAddresses != nil
+			account: account
 		)
 	}
 }
@@ -28,7 +27,6 @@ extension AccountDetails {
 		let showToolbar: Bool
 		let totalFiatWorth: Loadable<FiatWorth>?
 		let account: Profile.Network.Account
-		let historyButtonEnabled: Bool
 	}
 
 	@MainActor
@@ -134,7 +132,6 @@ extension AccountDetails {
 				.opacity(enabled ? 1 : 0.5)
 			}
 			.buttonStyle(.header)
-			.disabled(!enabled)
 		}
 	}
 }

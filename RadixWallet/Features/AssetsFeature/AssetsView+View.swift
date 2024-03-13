@@ -32,7 +32,7 @@ extension AssetsView {
 						case .fungible:
 							IfLetStore(
 								store.scope(
-									state: \.fungibleTokenList,
+									state: \.resources.fungibleTokenList,
 									action: \.child.fungibleTokenList
 								),
 								then: { FungibleAssetList.View(store: $0) },
@@ -41,7 +41,7 @@ extension AssetsView {
 						case .nonFungible:
 							IfLetStore(
 								store.scope(
-									state: \.nonFungibleTokenList,
+									state: \.resources.nonFungibleTokenList,
 									action: \.child.nonFungibleTokenList
 								),
 								then: { NonFungibleAssetList.View(store: $0) },
@@ -50,7 +50,7 @@ extension AssetsView {
 						case .stakeUnits:
 							IfLetStore(
 								store.scope(
-									state: \.stakeUnitList,
+									state: \.resources.stakeUnitList,
 									action: \.child.stakeUnitList
 								),
 								then: { StakeUnitList.View(store: $0) },
@@ -59,7 +59,7 @@ extension AssetsView {
 						case .poolUnits:
 							IfLetStore(
 								store.scope(
-									state: \.poolUnitsList,
+									state: \.resources.poolUnitsList,
 									action: \.child.poolUnitsList
 								),
 								then: { PoolUnitsList.View(store: $0) },

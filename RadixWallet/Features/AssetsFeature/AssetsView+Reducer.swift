@@ -25,14 +25,17 @@ public struct AssetsView: Sendable, FeatureReducer {
 			}
 		}
 
+		public struct Resources: Hashable, Sendable {
+			public var fungibleTokenList: FungibleAssetList.State?
+			public var nonFungibleTokenList: NonFungibleAssetList.State?
+			public var stakeUnitList: StakeUnitList.State?
+			public var poolUnitsList: PoolUnitsList.State?
+		}
+
 		public var activeAssetKind: AssetKind
 		public var assetKinds: NonEmpty<[AssetKind]>
 
-		public var fungibleTokenList: FungibleAssetList.State?
-		public var nonFungibleTokenList: NonFungibleAssetList.State?
-		public var stakeUnitList: StakeUnitList.State?
-		public var poolUnitsList: PoolUnitsList.State?
-		public var allResourceAddresses: Set<ResourceAddress>?
+		public var resources: Resources = .init()
 
 		public let account: Profile.Network.Account
 		public var accountPortfolio: Loadable<AccountPortfoliosClient.AccountPortfolio> = .idle
@@ -44,10 +47,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		public init(account: Profile.Network.Account, mode: Mode = .normal) {
 			self.init(
 				account: account,
-				fungibleTokenList: nil,
-				nonFungibleTokenList: nil,
-				stakeUnitList: nil,
-				poolUnitsList: nil,
+				resources: .init(),
 				mode: mode
 			)
 		}
@@ -55,19 +55,13 @@ public struct AssetsView: Sendable, FeatureReducer {
 		init(
 			account: Profile.Network.Account,
 			assetKinds: NonEmpty<[AssetKind]> = .init(rawValue: AssetKind.allCases)!,
-			fungibleTokenList: FungibleAssetList.State?,
-			nonFungibleTokenList: NonFungibleAssetList.State?,
-			stakeUnitList: StakeUnitList.State?,
-			poolUnitsList: PoolUnitsList.State?,
+			resources: Resources,
 			mode: Mode
 		) {
 			self.account = account
 			self.assetKinds = assetKinds
 			self.activeAssetKind = assetKinds.first
-			self.fungibleTokenList = fungibleTokenList
-			self.nonFungibleTokenList = nonFungibleTokenList
-			self.stakeUnitList = stakeUnitList
-			self.poolUnitsList = poolUnitsList
+			self.resources = resources
 			self.mode = mode
 		}
 	}
@@ -104,16 +98,16 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.fungibleTokenList, action: /Action.child .. ChildAction.fungibleTokenList) {
+			.ifLet(\.resources.fungibleTokenList, action: \.child.fungibleTokenList) {
 				FungibleAssetList()
 			}
-			.ifLet(\.nonFungibleTokenList, action: /Action.child .. ChildAction.nonFungibleTokenList) {
+			.ifLet(\.resources.nonFungibleTokenList, action: \.child.nonFungibleTokenList) {
 				NonFungibleAssetList()
 			}
-			.ifLet(\.stakeUnitList, action: /Action.child .. ChildAction.stakeUnitList) {
+			.ifLet(\.resources.stakeUnitList, action: \.child.stakeUnitList) {
 				StakeUnitList()
 			}
-			.ifLet(\.poolUnitsList, action: /Action.child .. ChildAction.poolUnitsList) {
+			.ifLet(\.resources.poolUnitsList, action: \.child.poolUnitsList) {
 				PoolUnitsList()
 			}
 	}
@@ -275,24 +269,24 @@ extension AssetsView.State {
 	public var selectedAssets: Mode.SelectedAssets? {
 		guard case .selection = mode else { return nil }
 
-		let selectedLiquidStakeUnits = stakeUnitList?.selectedLiquidStakeUnits ?? []
+		let selectedLiquidStakeUnits = resources.stakeUnitList?.selectedLiquidStakeUnits ?? []
 
-		let selectedPoolUnitTokens = poolUnitsList?.poolUnits
+		let selectedPoolUnitTokens = resources.poolUnitsList?.poolUnits
 			.map(SelectedResourceProvider.init)
 			.compactMap(\.selectedResource) ?? []
 
-		let selectedXRDResource = fungibleTokenList?.sections[id: .xrd]?
+		let selectedXRDResource = resources.fungibleTokenList?.sections[id: .xrd]?
 			.rows
 			.first
 			.map(SelectedResourceProvider.init)
 			.flatMap(\.selectedResource)
 
-		let selectedNonXrdResources = fungibleTokenList?.sections[id: .nonXrd]?.rows
+		let selectedNonXrdResources = resources.fungibleTokenList?.sections[id: .nonXrd]?.rows
 			.map(SelectedResourceProvider.init)
 			.compactMap(\.selectedResource) ?? []
 
-		let selectedNonFungibleResources = nonFungibleTokenList?.rows.compactMap(NonFungibleTokensPerResourceProvider.init) ?? []
-		let selectedStakeClaims = stakeUnitList?.selectedStakeClaimTokens?.map { resource, tokens in
+		let selectedNonFungibleResources = resources.nonFungibleTokenList?.rows.compactMap(NonFungibleTokensPerResourceProvider.init) ?? []
+		let selectedStakeClaims = resources.stakeUnitList?.selectedStakeClaimTokens?.map { resource, tokens in
 			NonFungibleTokensPerResourceProvider(selectedAssets: .init(tokens), resource: resource)
 		} ?? []
 
