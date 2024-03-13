@@ -274,12 +274,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 			}
 
-		case .modal(.dismiss):
-			if case .dappInteractionCompletion = state.currentModal {
-				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
-			}
-
-			return .none
+		case .modal(.presented(.dappInteractionCompletion(.delegate(.dismiss)))):
+			state.currentModal = nil
+			return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
 
 		default:
 			return .none

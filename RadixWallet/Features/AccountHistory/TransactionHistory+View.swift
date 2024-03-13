@@ -3,7 +3,7 @@ import SwiftUI
 
 extension TransactionHistory.State {
 	var showEmptyState: Bool {
-		sections.isEmpty && !isLoading
+		sections.isEmpty && !loading.isLoading
 	}
 }
 
@@ -22,7 +22,7 @@ extension TransactionHistory {
 				WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 					let accountHeader = AccountHeaderView(account: viewStore.account)
 
-					let selection = viewStore.binding(get: \.selectedPeriod, send: ViewAction.selectedPeriod)
+					let selection = viewStore.binding(get: \.currentMonth, send: ViewAction.selectedMonth)
 
 					VStack(spacing: .zero) {
 						VStack(spacing: .small2) {
@@ -41,9 +41,30 @@ extension TransactionHistory {
 									.measurePosition(View.accountDummy, coordSpace: View.coordSpace)
 									.opacity(0)
 
+								if viewStore.loading.isLoading, !viewStore.loading.parameters.backwards {
+									ProgressView()
+										.padding(.small1)
+								}
+
 								ForEach(viewStore.sections) { section in
 									SectionView(section: section)
+										.onAppear {
+											store.send(.view(.sectionAppeared(section.id)))
+										}
+										.onDisappear {
+											guard !viewStore.didDismiss else { return }
+											store.send(.view(.sectionDisappeared(section.id)))
+										}
 								}
+
+								Rectangle()
+									.fill(.clear)
+									.frame(height: .medium3)
+									.overlay {
+										if viewStore.loading.isLoading, viewStore.loading.parameters.backwards {
+											ProgressView()
+										}
+									}
 							}
 							.padding(.bottom, .medium3)
 						}
@@ -68,7 +89,7 @@ extension TransactionHistory {
 
 							let scrollBarOffset = max(rect?.maxY ?? 0, 0)
 							VStack(spacing: .small2) {
-								HScrollBar(items: viewStore.periods, selection: selection)
+								HScrollBar(items: viewStore.availableMonths, selection: selection)
 
 								if let filters = viewStore.activeFilters.nilIfEmpty {
 									ActiveFiltersView(filters: filters) { id in
@@ -80,6 +101,11 @@ extension TransactionHistory {
 							.padding(.bottom, .small1)
 							.background(.app.white)
 							.offset(y: scrollBarOffset)
+						}
+					}
+					.onReadPosition(View.accountDummy) { rect in
+						if rect.minY > 50 {
+							store.send(.view(.pulledDown))
 						}
 					}
 					.clipShape(Rectangle())
@@ -341,16 +367,16 @@ extension TransactionHistory {
 
 					HStack(spacing: .small2) {
 						Image(.warningError)
+							.renderingMode(.template)
 							.resizable()
 							.frame(.smallest)
-							.tint(.app.notification)
 
 						Text(L10n.TransactionHistory.failedTransaction)
 							.textStyle(.body2HighImportance)
-							.foregroundColor(.app.notification)
 
 						Spacer(minLength: 0)
 					}
+					.foregroundColor(.app.red1)
 					.padding(.horizontal, .small1)
 					.padding(.vertical, .medium3)
 					.roundedCorners(strokeColor: .app.gray3)
@@ -457,36 +483,43 @@ public struct HScrollBar<Item: ScrollBarItem>: View {
 	@Binding var selection: Item.ID
 
 	public var body: some View {
-		ScrollView(.horizontal) {
-			HStack(spacing: .zero) {
-				ForEach(items) { item in
-					let isSelected = item.id == selection
-					Button {
-						selection = item.id
-					} label: {
-						Text(item.caption.localizedUppercase)
-							.foregroundStyle(isSelected ? .app.gray1 : .app.gray2)
+		ScrollViewReader { proxy in
+			ScrollView(.horizontal) {
+				HStack(spacing: .zero) {
+					ForEach(items) { item in
+						let isSelected = item.id == selection
+						Button {
+							selection = item.id
+						} label: {
+							Text(item.caption.localizedUppercase)
+								.foregroundStyle(isSelected ? .app.gray1 : .app.gray2)
+						}
+						.padding(.horizontal, .medium3)
+						.padding(.vertical, .small2)
+						.measurePosition(item.id, coordSpace: HScrollBar.coordSpace)
+						.padding(.horizontal, .small3)
+						.animation(.default, value: isSelected)
 					}
-					.padding(.horizontal, .medium3)
-					.padding(.vertical, .small2)
-					.measurePosition(item.id, coordSpace: HScrollBar.coordSpace)
-					.padding(.horizontal, .small3)
-					.animation(.default, value: isSelected)
+				}
+				.coordinateSpace(name: HScrollBar.coordSpace)
+				.backgroundPreferenceValue(PositionsPreferenceKey.self) { positions in
+					if let rect = positions[selection] {
+						Capsule()
+							.fill(.app.gray4)
+							.frame(width: rect.width, height: rect.height)
+							.position(x: rect.midX, y: rect.midY)
+							.animation(.default, value: rect)
+					}
+				}
+				.padding(.horizontal, .medium3)
+			}
+			.scrollIndicators(.never)
+			.onChange(of: selection) { value in
+				withAnimation {
+					proxy.scrollTo(value, anchor: .center)
 				}
 			}
-			.coordinateSpace(name: HScrollBar.coordSpace)
-			.backgroundPreferenceValue(PositionsPreferenceKey.self) { positions in
-				if let rect = positions[selection] {
-					Capsule()
-						.fill(.app.gray4)
-						.frame(width: rect.width, height: rect.height)
-						.position(x: rect.midX, y: rect.midY)
-						.animation(.default, value: rect)
-				}
-			}
-			.padding(.horizontal, .medium3)
 		}
-		.scrollIndicators(.never)
 	}
 
 	private static var coordSpace: String { "HScrollBar.HStack" }
@@ -538,28 +571,18 @@ extension View {
 		}
 	}
 
-	public func readSize(_ id: AnyHashable, content: @escaping (CGSize) -> some View) -> some View {
-		overlayPreferenceValue(PositionsPreferenceKey.self, alignment: .top) { positions in
-			if let size = positions[id]?.size {
-				content(size)
-			} else {
-				EmptyView()
-			}
-		}
-	}
-
-	public func onReadSize(_ id: AnyHashable, content: @escaping (CGSize) -> Void) -> some View {
+	public func onReadPosition(_ id: AnyHashable, action: @escaping (CGRect) -> Void) -> some View {
 		onPreferenceChange(PositionsPreferenceKey.self) { positions in
-			if let size = positions[id]?.size {
-				content(size)
+			if let position = positions[id] {
+				action(position)
 			}
 		}
 	}
 
-	public func onReadSizes(_ id1: AnyHashable, _ id2: AnyHashable, content: @escaping (CGSize, CGSize) -> Void) -> some View {
+	public func onReadSizes(_ id1: AnyHashable, _ id2: AnyHashable, action: @escaping (CGSize, CGSize) -> Void) -> some View {
 		onPreferenceChange(PositionsPreferenceKey.self) { positions in
 			if let size1 = positions[id1]?.size, let size2 = positions[id2]?.size {
-				content(size1, size2)
+				action(size1, size2)
 			}
 		}
 	}

@@ -102,10 +102,11 @@ extension TransactionClient {
 					return nil
 				}
 
-				return FeePayerCandidate(
-					account: account,
-					xrdBalance: portfolio.fungibleResources.xrdResource?.amount.nominalAmount ?? .zero
-				)
+				guard let xrdBalance = portfolio.fungibleResources.xrdResource?.amount else {
+					return nil
+				}
+
+				return FeePayerCandidate(account: account, xrdBalance: xrdBalance)
 			}
 
 			guard let allCandidates = NonEmpty(rawValue: IdentifiedArray(uncheckedUniqueElements: allFeePayerCandidates)) else {

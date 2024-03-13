@@ -12,19 +12,39 @@ extension TransactionHistoryClient {
 
 // MARK: - TransactionHistoryRequest
 public struct TransactionHistoryRequest: Sendable, Hashable {
-	public var account: AccountAddress
-	public let period: Range<Date>
-	public let filters: [TransactionFilter]
-	public let allResources: Set<ResourceAddress>
-	public let ascending: Bool
+	public let account: AccountAddress
+	public let parameters: TransactionHistoryParameters
 	public let cursor: String?
+
+	public let allResourcesAddresses: Set<ResourceAddress>
+	public let resources: IdentifiedArrayOf<OnLedgerEntity.Resource>
 }
 
 // MARK: - TransactionHistoryResponse
 public struct TransactionHistoryResponse: Sendable, Hashable {
-	public let cursor: String?
-	public let allResources: IdentifiedArrayOf<OnLedgerEntity.Resource>
+	public let parameters: TransactionHistoryParameters
+	public let nextCursor: String?
+	public let totalCount: Int64?
+	public let resources: IdentifiedArrayOf<OnLedgerEntity.Resource>
 	public let items: [TransactionHistoryItem]
+}
+
+// MARK: - TransactionHistoryParameters
+public struct TransactionHistoryParameters: Sendable, Hashable {
+	public let period: Range<Date>
+	public let backwards: Bool
+	public let filters: [TransactionFilter]
+
+	public init(period: Range<Date>, backwards: Bool = true, filters: [TransactionFilter] = []) {
+		self.period = period
+		self.backwards = backwards
+		self.filters = filters
+	}
+
+	/// The other parameter set already encompasses these transactions
+	public func covers(_ parameters: Self) -> Bool {
+		filters == parameters.filters && period.contains(parameters.period)
+	}
 }
 
 // MARK: - TransactionHistoryItem
@@ -36,18 +56,6 @@ public struct TransactionHistoryItem: Sendable, Hashable {
 	let deposits: [ResourceBalance]
 	let depositSettingsUpdated: Bool
 	let failed: Bool
-
-	static func failed(at time: Date, manifestClass: GatewayAPI.ManifestClass?) -> Self {
-		.init(
-			time: time,
-			message: nil,
-			manifestClass: manifestClass,
-			withdrawals: [],
-			deposits: [],
-			depositSettingsUpdated: false,
-			failed: true
-		)
-	}
 }
 
 // MARK: - TransactionFilter
