@@ -470,7 +470,7 @@ extension OnLedgerEntity.Account.PoolUnitResources {
 
 		let poolUnits = poolUnits.filter {
 			$0.resource.amount > .zero
-		}.as
+		}
 
 		return .init(radixNetworkStakes: stakes.asIdentifiable(), poolUnits: poolUnits)
 	}
