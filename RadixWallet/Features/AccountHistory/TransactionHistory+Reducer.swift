@@ -36,7 +36,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			let parameters: TransactionHistoryParameters
 			var isLoading: Bool = false
 			var nextCursor: String? = nil
-			var didLoadEverything: Bool = false
+			var didLoadFully: Bool = false
 		}
 
 		@PresentationState
@@ -162,6 +162,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			return .none
 
 		case .pulledDown:
+			guard !state.loading.isLoading else { return .none }
 			print("•• Pulled down")
 			if state.loading.parameters.backwards {
 				print("•• Start loading forwards")
@@ -169,6 +170,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 				return loadHistory(period: loadedRange.upperBound ..< .now, backwards: false, state: &state)
 			} else {
 				print("•• Load more forwards")
+				return loadMoreHistory(state: &state)
 			}
 			return .none
 		}
@@ -225,16 +227,21 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	/// Load history using the provided parameters, should not be used directly
 	func loadHistory(parameters: TransactionHistoryParameters, state: inout State) -> Effect<Action> {
+		print("•• LOAD: \(parameters.period.debugString) \(parameters.backwards ? "backwards" : "forwards"), \(state.loading.isLoading ? "isLoading" : "")")
+
 		if state.loading.isLoading { return .none }
 
-		if state.loading.didLoadEverything, state.loading.parameters.covers(parameters) { return .none }
+		if state.loading.didLoadFully, state.loading.parameters.covers(parameters) { return .none }
 
 		if parameters != state.loading.parameters {
+			print("•• new parameters, reload")
+			state.loading.nextCursor = nil
 			state.sections = []
+		} else {
+			print("•• same parameters, load more")
 		}
 
 		state.loading.isLoading = true
-		print("•• started loading")
 
 		let request = TransactionHistoryRequest(
 			account: state.account.accountAddress,
@@ -253,23 +260,35 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	func debugPrint(_ response: TransactionHistoryResponse, state: State) {
-		func debugString(_ range: Range<Date>, style: Date.FormatStyle.DateStyle = .abbreviated) -> String {
-			"\(range.lowerBound.formatted(date: style, time: .omitted)) -- \(range.upperBound.formatted(date: style, time: .omitted))"
-		}
-
 		let times = response.items.map(\.time)
 		let newlyLoadedRange: String = if let lowest = times.min(), let highest = times.max() {
-			debugString(lowest ..< highest)
+			(lowest ..< highest).debugString
 		} else {
 			"(empty)"
 		}
 
 		let n = response.items.count
 		let total = state.sections.reduce(0) { $0 + $1.transactions.count }
-		let string = state.loadedRange != nil ? "more" : "initially"
-		let period = debugString(response.parameters.period)
+		let period = (response.parameters.period).debugString
 
-		print("••• Loaded #\(n) (\(total)) \(string) in \(newlyLoadedRange) from \(period)")
+		print("••• Loaded #\(n) (\(total)) in \(newlyLoadedRange) from \(period)")
+
+		var allSorted = true
+		let isSorted = state.sections.map { $0 } == state.sections.sorted(by: \.day, >)
+		allSorted = isSorted && allSorted
+		for section in state.sections {
+			let isSorted = section.transactions == section.transactions.sorted(by: \.time, >)
+			allSorted = isSorted && allSorted
+//			print("  ••• \(isSorted) \(section.day.formatted(date: .abbreviated, time: .omitted))")
+//			for item in section.transactions {
+//				print("    ••• \(item.time.formatted(date: .abbreviated, time: .shortened))")
+//			}
+		}
+		if !allSorted {
+			print("••••••••••••••• NOT SORTED •••••••••")
+		} else {
+			print("••••••••••••••• ALL IS SORTED •••••••••")
+		}
 	}
 
 	func loadedHistory(_ response: TransactionHistoryResponse, state: inout State) {
@@ -279,17 +298,16 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			// We loaded more from the same range
 			state.loading.nextCursor = response.nextCursor
 			if response.nextCursor == nil {
-				state.loading.didLoadEverything = true
+				state.loading.didLoadFully = true
 			}
 
-			state.sections.addItems(response.items)
+			state.sections.addItems(response.items, backwards: response.parameters.backwards)
 		} else {
 			state.loading = .init(parameters: response.parameters, nextCursor: response.nextCursor)
 			state.sections.replaceItems(response.items)
 		}
 
 		state.loading.isLoading = false
-		print("•• stopped loading")
 		debugPrint(response, state: state)
 	}
 }
@@ -323,6 +341,10 @@ extension Range {
 }
 
 extension Range<Date> {
+	var debugString: String {
+		"\(lowerBound.formatted(date: .abbreviated, time: .omitted)) -- \(upperBound.formatted(date: .abbreviated, time: .omitted))"
+	}
+
 	var clamped: Range? {
 		let now: Date = .now
 		guard lowerBound < now else { return nil }
@@ -331,36 +353,55 @@ extension Range<Date> {
 }
 
 extension IdentifiedArrayOf<TransactionHistory.State.TransactionSection> {
-	mutating func addItems(_ items: some Collection<TransactionHistoryItem>) {
-		let newSections = items.inUnsortedSections.sorted(by: \.day, >)
+	mutating func addItems(_ items: some Collection<TransactionHistoryItem>, backwards: Bool) {
+		let newSections = items.inSections
 
-		for newSection in newSections {
-			if last?.id == newSection.id {
-				self[id: newSection.id]?.transactions.append(contentsOf: newSection.transactions)
-			} else {
-				append(newSection)
+		if backwards {
+			for newSection in newSections {
+				if last?.id == newSection.id {
+					self[id: newSection.id]?.transactions.append(contentsOf: newSection.transactions)
+				} else {
+					append(newSection)
+				}
+			}
+		} else {
+			for newSection in newSections.reversed() {
+				if first?.id == newSection.id {
+					self[id: newSection.id]?.transactions.insert(contentsOf: newSection.transactions, at: 0)
+				} else {
+					insert(newSection, at: 0)
+				}
 			}
 		}
 	}
 
 	mutating func replaceItems(_ items: some Collection<TransactionHistoryItem>) {
-		self = items.inUnsortedSections.sorted(by: \.day, >).asIdentifiable()
+		self = items.inSections.asIdentifiable()
 	}
 }
 
 extension Collection<TransactionHistoryItem> {
-	var inUnsortedSections: [TransactionHistory.State.TransactionSection] {
+	var inSections: [TransactionHistory.State.TransactionSection] {
 		let calendar: Calendar = .current
-		return Dictionary(grouping: self) { transaction in
-			calendar.startOfDay(for: transaction.time)
+
+		var result: [TransactionHistory.State.TransactionSection] = []
+
+		for transaction in self {
+			let day = calendar.startOfDay(for: transaction.time)
+			if let lastSection = result.last, lastSection.day == day {
+				result[result.endIndex - 1].transactions.append(transaction)
+			} else {
+				result.append(
+					.init(
+						day: day,
+						month: calendar.startOfMonth(for: day),
+						transactions: [transaction]
+					)
+				)
+			}
 		}
-		.map { day, transactions in
-			.init(
-				day: day,
-				month: calendar.startOfMonth(for: day),
-				transactions: transactions
-			)
-		}
+
+		return result
 	}
 }
 
