@@ -53,7 +53,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			self.availableMonths = try .from(.babylonLaunch)
 			self.account = account
 			self.portfolio = portfolio
-			self.currentMonth = availableMonths[availableMonths.endIndex - 1].id
+			self.currentMonth = .distantFuture
 		}
 
 		public struct TransactionSection: Sendable, Hashable, Identifiable {
@@ -128,6 +128,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			let calendar: Calendar = .current
 			guard let endOfMonth = calendar.date(byAdding: .month, value: 1, to: month) else { return .none }
 			let period: Range<Date> = .babylonLaunch ..< min(endOfMonth, .now)
+			state.currentMonth = month
 			return loadHistory(period: period, state: &state)
 
 		case .filtersTapped:
@@ -162,6 +163,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case .pulledDown:
 			guard !state.loading.isLoading else { return .none }
 			if state.loading.parameters.backwards {
+				// If we are at the end of the period, we can't load more
+				guard state.currentMonth != state.availableMonths.last?.id else { return .none }
 				guard let loadedRange = state.loadedRange else { return .none }
 				return loadHistory(period: loadedRange.upperBound ..< .now, backwards: false, state: &state)
 			} else {
