@@ -106,6 +106,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.transactionHistoryClient) var transactionHistoryClient
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
+	@Dependency(\.openURL) var openURL
 
 	public init() {}
 
@@ -121,16 +122,13 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onAppear:
-//			return loadHistory(period: .babylonLaunch ..< .now, state: &state)
-			return loadHistory(
-				period: .init(timeIntervalSinceNow: -80 * 24 * 3600) ..< .init(timeIntervalSinceNow: -40 * 24 * 3600),
-				state: &state
-			)
+			return loadHistory(period: .babylonLaunch ..< .now, state: &state)
 
 		case let .selectedMonth(month):
 			let calendar: Calendar = .current
 			guard let endOfMonth = calendar.date(byAdding: .month, value: 1, to: month) else { return .none }
-			return loadHistory(period: .babylonLaunch ..< endOfMonth, state: &state)
+			let period: Range<Date> = .babylonLaunch ..< min(endOfMonth, .now)
+			return loadHistory(period: period, state: &state)
 
 		case .filtersTapped:
 			state.destination = .filters(.init(portfolio: state.portfolio, filters: state.activeFilters.map(\.id)))
@@ -301,12 +299,6 @@ extension Range {
 extension Range<Date> {
 	var debugString: String {
 		"\(lowerBound.formatted(date: .abbreviated, time: .omitted)) -- \(upperBound.formatted(date: .abbreviated, time: .omitted))"
-	}
-
-	var clamped: Range? {
-		let now: Date = .now
-		guard lowerBound < now else { return nil }
-		return lowerBound ..< Swift.min(upperBound, now)
 	}
 }
 
