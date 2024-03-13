@@ -106,7 +106,7 @@ extension TransactionClient {
 					return nil
 				}
 
-				return FeePayerCandidate(account: account, xrdBalance: xrdBalance)
+				return FeePayerCandidate(account: account, xrdBalance: xrdBalance.nominalAmount)
 			}
 
 			guard let allCandidates = NonEmpty(rawValue: IdentifiedArray(uncheckedUniqueElements: allFeePayerCandidates)) else {

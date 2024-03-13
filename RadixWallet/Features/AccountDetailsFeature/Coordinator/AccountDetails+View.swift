@@ -62,7 +62,7 @@ extension AccountDetails {
 					.padding(.medium1)
 
 					HStack {
-						historyButton(enabled: viewStore.historyButtonEnabled)
+						historyButton()
 						transferButton()
 					}
 
@@ -122,14 +122,13 @@ extension AccountDetails {
 			.buttonStyle(.header)
 		}
 
-		func historyButton(enabled: Bool) -> some SwiftUI.View {
+		func historyButton() -> some SwiftUI.View {
 			Button {
 				store.send(.view(.historyButtonTapped))
 			} label: {
 				HStack(alignment: .center) {
 					Label(L10n.Common.history, asset: AssetResource.iconHistory)
 				}
-				.opacity(enabled ? 1 : 0.5)
 			}
 			.buttonStyle(.header)
 		}

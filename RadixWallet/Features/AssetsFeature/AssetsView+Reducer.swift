@@ -238,11 +238,12 @@ public struct AssetsView: Sendable, FeatureReducer {
 		)
 
 		state.totalFiatWorth.refresh(from: portfolio.totalFiatWorth)
-		state.fungibleTokenList = fungibleTokenList
-		state.nonFungibleTokenList = !nfts.isEmpty ? .init(rows: .init(uniqueElements: nfts)) : nil
-		state.stakeUnitList = stakeUnitList
-		state.poolUnitsList = poolUnitList
-		state.allResourceAddresses = portfolio.account.allResourceAddresses
+		state.resources = .init(
+			fungibleTokenList: fungibleTokenList,
+			nonFungibleTokenList: !nfts.isEmpty ? .init(rows: .init(uniqueElements: nfts)) : nil,
+			stakeUnitList: stakeUnitList,
+			poolUnitsList: poolUnitList
+		)
 	}
 }
 
