@@ -20,10 +20,17 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		var sections: IdentifiedArrayOf<TransactionSection> = []
 
-		// The currently selected month
+		/// Used to accurately control the current month
+		var visibleSections: OrderedSet<TransactionSection.ID> = []
+
+		/// The currently selected month
 		var currentMonth: DateRangeItem.ID
 
+		/// Values related to loading. Note that `parameters` are set **when receiving the response**
 		var loading: Loading = .init(parameters: .init(period: Date.now ..< Date.now))
+
+		/// Workaround, TCA sends the sectionDisappeared after we dismiss, causing a run-time warning
+		var didDismiss: Bool = false
 
 		struct Loading: Hashable, Sendable {
 			let parameters: TransactionHistoryParameters
@@ -69,7 +76,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case sectionAppeared(State.TransactionSection.ID)
 		case sectionDisappeared(State.TransactionSection.ID)
 
-		case reachedTop
+		case pulledDown
 		case reachedBottom
 	}
 
@@ -115,54 +122,55 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onAppear:
-//			return loadHistory(parameters: .init(period: .babylonLaunch ..< .now), state: &state)
+//			return loadHistory(period: .babylonLaunch ..< .now, state: &state)
 			return loadHistory(
-				parameters: .init(
-					period: .init(timeIntervalSinceNow: -80 * 24 * 3600) ..< .init(timeIntervalSinceNow: -40 * 24 * 3600)
-				),
+				period: .init(timeIntervalSinceNow: -80 * 24 * 3600) ..< .init(timeIntervalSinceNow: -40 * 24 * 3600),
 				state: &state
 			)
 
 		case let .selectedMonth(month):
-			state.currentMonth = month
-//			return loadHistory(state: &state)
-			return .none
+			let calendar: Calendar = .current
+			guard let endOfMonth = calendar.date(byAdding: .month, value: 1, to: month) else { return .none }
+			return loadHistory(period: .babylonLaunch ..< endOfMonth, state: &state)
 
 		case .filtersTapped:
-			state.sections.remove(at: 0)
-
 			state.destination = .filters(.init(portfolio: state.portfolio, filters: state.activeFilters.map(\.id)))
 			return .none
 
 		case let .filterCrossTapped(id):
 			state.activeFilters.remove(id: id)
-
-			// RELOAD HISTORY with new parameters
 			return loadHistory(filters: state.activeFilters.map(\.id), state: &state)
 
 		case .closeTapped:
+			state.didDismiss = true
 			return .run { _ in await dismiss() }
 
 		case let .sectionAppeared(id):
-			if let section = state.sections[id: id] {
-				print("•• set month to \(section.month.formatted(date: .abbreviated, time: .omitted))")
-				state.currentMonth = section.month
-			}
+			state.visibleSections.remove(id)
+			state.visibleSections.append(id)
+			state.visibleSectionsChanged()
 
 			if state.sections.suffix(2).map(\.id).contains(id) {
-				print("•• reached almost end")
 				return loadMoreHistory(state: &state)
 			}
 
-//			print("•••• + \(state.visibleSections.map { $0.rawValue.formatted(date: .abbreviated, time: .omitted) })")
 			return .none
 
 		case let .sectionDisappeared(id):
-//			state.visibleSections.remove(id)
-//			print("•••• - \(state.visibleSections.map { $0.rawValue.formatted(date: .abbreviated, time: .omitted) })")
+			state.visibleSections.remove(id)
+			state.visibleSectionsChanged()
+
 			return .none
 
-		case .reachedTop:
+		case .pulledDown:
+			print("•• Pulled down")
+			if state.loading.parameters.backwards {
+				print("•• Start loading forwards")
+				guard let loadedRange = state.loadedRange else { return .none }
+				return loadHistory(period: loadedRange.upperBound ..< .now, backwards: false, state: &state)
+			} else {
+				print("•• Load more forwards")
+			}
 			return .none
 
 		case .reachedBottom:
@@ -174,6 +182,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .loadedHistory(history):
 			loadedHistory(history, state: &state)
+			return .none
 		}
 	}
 
@@ -188,12 +197,22 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		// RELOAD USING PARAMETERS
 		loadHistory(filters: state.activeFilters.map(\.id), state: &state)
 	}
 
 	// Helper methods
 
+	/// Load history for the given period, using existing filters
+	func loadHistory(period: Range<Date>, backwards: Bool = true, state: inout State) -> Effect<Action> {
+		let parameters = TransactionHistoryParameters(
+			period: period,
+			backwards: backwards,
+			filters: state.loading.parameters.filters
+		)
+		return loadHistory(parameters: parameters, state: &state)
+	}
+
+	/// Load history for the current period using the provided filters
 	func loadHistory(filters: [TransactionFilter], state: inout State) -> Effect<Action> {
 		let parameters = TransactionHistoryParameters(
 			period: state.loading.parameters.period,
@@ -203,26 +222,23 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		return loadHistory(parameters: parameters, state: &state)
 	}
 
+	/// Load more history for the same period, using the existing filters
 	func loadMoreHistory(state: inout State) -> Effect<Action> {
 		loadHistory(parameters: state.loading.parameters, state: &state)
 	}
 
+	/// Load history using the provided parameters, should not be used directly
 	func loadHistory(parameters: TransactionHistoryParameters, state: inout State) -> Effect<Action> {
-		if state.loading.isLoading {
-			return .none
-		}
+		if state.loading.isLoading { return .none }
 
-		if state.loading.didLoadEverything, state.loading.parameters.covers(parameters) {
-			return .none
-		}
+		if state.loading.didLoadEverything, state.loading.parameters.covers(parameters) { return .none }
 
 		if parameters != state.loading.parameters {
 			state.sections = []
-		} else {
-			// Loading more
 		}
 
 		state.loading.isLoading = true
+		print("•• started loading")
 
 		let request = TransactionHistoryRequest(
 			account: state.account.accountAddress,
@@ -232,8 +248,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			resources: state.resources
 		)
 
-		// 2023-12-27T20:21:15Z
-
 		return .run { send in
 			let response = try await transactionHistoryClient.getTransactionHistory(request)
 			await send(.internal(.loadedHistory(response)))
@@ -242,10 +256,28 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		}
 	}
 
-	func loadedHistory(_ response: TransactionHistoryResponse, state: inout State) -> Effect<Action> {
-		state.resources.append(contentsOf: response.resources)
+	func debugPrint(_ response: TransactionHistoryResponse, state: State) {
+		func debugString(_ range: Range<Date>, style: Date.FormatStyle.DateStyle = .abbreviated) -> String {
+			"\(range.lowerBound.formatted(date: style, time: .omitted)) -- \(range.upperBound.formatted(date: style, time: .omitted))"
+		}
 
-		state.loading.isLoading = false
+		let times = response.items.map(\.time)
+		let newlyLoadedRange: String = if let lowest = times.min(), let highest = times.max() {
+			debugString(lowest ..< highest)
+		} else {
+			"(empty)"
+		}
+
+		let n = response.items.count
+		let total = state.sections.reduce(0) { $0 + $1.transactions.count }
+		let string = state.loadedRange != nil ? "more" : "initially"
+		let period = debugString(response.parameters.period)
+
+		print("••• Loaded #\(n) (\(total)) \(string) in \(newlyLoadedRange) from \(period)")
+	}
+
+	func loadedHistory(_ response: TransactionHistoryResponse, state: inout State) {
+		state.resources.append(contentsOf: response.resources)
 
 		if response.parameters == state.loading.parameters {
 			// We loaded more from the same range
@@ -255,14 +287,14 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			}
 
 			state.sections.addItems(response.items)
-
-			state.loading.isLoading = false
 		} else {
 			state.loading = .init(parameters: response.parameters, nextCursor: response.nextCursor)
 			state.sections.replaceItems(response.items)
 		}
 
-		return .none
+		state.loading.isLoading = false
+		print("•• stopped loading")
+		debugPrint(response, state: state)
 	}
 }
 
@@ -280,6 +312,12 @@ extension TransactionHistory.State {
 		}
 		return last ..< first
 	}
+
+	mutating func visibleSectionsChanged() {
+		if let latest = visibleSections.last, let section = sections[id: latest] {
+			currentMonth = section.month
+		}
+	}
 }
 
 extension Range {
@@ -289,10 +327,6 @@ extension Range {
 }
 
 extension Range<Date> {
-	func debugString(style: Date.FormatStyle.DateStyle = .abbreviated) -> String {
-		"\(lowerBound.formatted(date: style, time: .omitted)) -- \(upperBound.formatted(date: style, time: .omitted))"
-	}
-
 	var clamped: Range? {
 		let now: Date = .now
 		guard lowerBound < now else { return nil }
