@@ -9,9 +9,6 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 		@PresentationState
 		var destination: Destination.State?
 
-		@PresentationState
-		var destination: Destination.State?
-
 		public struct PoolUnitState: Sendable, Hashable, Identifiable {
 			public var id: ResourcePoolAddress { poolUnit.resourcePoolAddress }
 			public let poolUnit: OnLedgerEntity.Account.PoolUnit
