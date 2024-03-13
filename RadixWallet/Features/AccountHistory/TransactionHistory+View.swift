@@ -70,9 +70,6 @@ extension TransactionHistory {
 												ProgressView()
 											}
 										}
-										.onAppear {
-											store.send(.view(.reachedBottom))
-										}
 								}
 								.padding(.bottom, .medium3)
 							}
