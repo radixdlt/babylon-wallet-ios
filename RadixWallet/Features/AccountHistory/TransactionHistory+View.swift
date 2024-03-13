@@ -43,6 +43,7 @@ extension TransactionHistory {
 
 								if viewStore.loading.isLoading, !viewStore.loading.parameters.backwards {
 									ProgressView()
+										.padding(.small1)
 								}
 
 								ForEach(viewStore.sections) { section in
@@ -103,7 +104,7 @@ extension TransactionHistory {
 						}
 					}
 					.onReadPosition(View.accountDummy) { rect in
-						if rect.minY > 30 {
+						if rect.minY > 50 {
 							store.send(.view(.pulledDown))
 						}
 					}

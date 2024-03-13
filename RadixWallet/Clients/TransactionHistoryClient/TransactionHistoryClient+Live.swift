@@ -136,6 +136,7 @@ extension TransactionHistoryClient {
 				let transactionItem = try await transaction(for: item)
 				items.append(transactionItem)
 			}
+
 			if !request.parameters.backwards {
 				items.reverse()
 			}
@@ -147,11 +148,6 @@ extension TransactionHistoryClient {
 				resources: keyedResources,
 				items: items
 			)
-
-//			return try await .init(
-//				cursor: response.nextCursor,
-//				items: response.items.parallelMap(transaction(for:))
-//			)
 		}
 
 		return TransactionHistoryClient(
@@ -207,7 +203,7 @@ extension TransactionHistoryRequest {
 			atLedgerState: .init(timestamp: parameters.period.upperBound),
 			fromLedgerState: .init(timestamp: parameters.period.lowerBound),
 			cursor: cursor,
-			limitPerPage: 10,
+			limitPerPage: 20,
 			manifestResourcesFilter: manifestResourcesFilter(parameters.filters),
 			affectedGlobalEntitiesFilter: [account.address],
 			eventsFilter: eventsFilter(parameters.filters, account: account),
