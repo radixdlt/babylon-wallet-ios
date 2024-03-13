@@ -76,16 +76,7 @@ extension Profile.Network {
 			extraProperties: ExtraProperties
 		) {
 			self.networkID = networkID
-			// FIXME: GK remove!
-			#if DEBUG
-			if networkID == .mainnet {
-				self.address = try! .init(validatingAddress: "account_rdx128z7rwu87lckvjd43rnw0jh3uczefahtmfuu5y9syqrwsjpxz8hz3l")
-			} else {
-				self.address = address
-			}
-			#else
 			self.address = address
-			#endif
 			self.securityState = securityState
 			self.displayName = displayName
 			self.flags = []
