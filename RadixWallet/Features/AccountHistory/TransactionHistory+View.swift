@@ -515,7 +515,9 @@ public struct HScrollBar<Item: ScrollBarItem>: View {
 			}
 			.scrollIndicators(.never)
 			.onChange(of: selection) { value in
-				proxy.scrollTo(value)
+				withAnimation {
+					proxy.scrollTo(value, anchor: .center)
+				}
 			}
 		}
 	}
