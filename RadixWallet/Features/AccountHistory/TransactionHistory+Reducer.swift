@@ -163,16 +163,12 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		case .pulledDown:
 			guard !state.loading.isLoading else { return .none }
-			print("•• Pulled down")
 			if state.loading.parameters.backwards {
-				print("•• Start loading forwards")
 				guard let loadedRange = state.loadedRange else { return .none }
 				return loadHistory(period: loadedRange.upperBound ..< .now, backwards: false, state: &state)
 			} else {
-				print("•• Load more forwards")
 				return loadMoreHistory(state: &state)
 			}
-			return .none
 		}
 	}
 
@@ -227,18 +223,13 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	/// Load history using the provided parameters, should not be used directly
 	func loadHistory(parameters: TransactionHistoryParameters, state: inout State) -> Effect<Action> {
-		print("•• LOAD: \(parameters.period.debugString) \(parameters.backwards ? "backwards" : "forwards"), \(state.loading.isLoading ? "isLoading" : "")")
-
 		if state.loading.isLoading { return .none }
 
 		if state.loading.didLoadFully, state.loading.parameters.covers(parameters) { return .none }
 
 		if parameters != state.loading.parameters {
-			print("•• new parameters, reload")
 			state.loading.nextCursor = nil
 			state.sections = []
-		} else {
-			print("•• same parameters, load more")
 		}
 
 		state.loading.isLoading = true
@@ -259,38 +250,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		}
 	}
 
-	func debugPrint(_ response: TransactionHistoryResponse, state: State) {
-		let times = response.items.map(\.time)
-		let newlyLoadedRange: String = if let lowest = times.min(), let highest = times.max() {
-			(lowest ..< highest).debugString
-		} else {
-			"(empty)"
-		}
-
-		let n = response.items.count
-		let total = state.sections.reduce(0) { $0 + $1.transactions.count }
-		let period = (response.parameters.period).debugString
-
-		print("••• Loaded #\(n) (\(total)) in \(newlyLoadedRange) from \(period)")
-
-		var allSorted = true
-		let isSorted = state.sections.map { $0 } == state.sections.sorted(by: \.day, >)
-		allSorted = isSorted && allSorted
-		for section in state.sections {
-			let isSorted = section.transactions == section.transactions.sorted(by: \.time, >)
-			allSorted = isSorted && allSorted
-//			print("  ••• \(isSorted) \(section.day.formatted(date: .abbreviated, time: .omitted))")
-//			for item in section.transactions {
-//				print("    ••• \(item.time.formatted(date: .abbreviated, time: .shortened))")
-//			}
-		}
-		if !allSorted {
-			print("••••••••••••••• NOT SORTED •••••••••")
-		} else {
-			print("••••••••••••••• ALL IS SORTED •••••••••")
-		}
-	}
-
 	func loadedHistory(_ response: TransactionHistoryResponse, state: inout State) {
 		state.resources.append(contentsOf: response.resources)
 
@@ -308,7 +267,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		}
 
 		state.loading.isLoading = false
-		debugPrint(response, state: state)
 	}
 }
 
