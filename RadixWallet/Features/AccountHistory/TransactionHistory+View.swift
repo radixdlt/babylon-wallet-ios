@@ -35,47 +35,40 @@ extension TransactionHistory {
 						.padding(.top, .small2)
 						.padding(.bottom, .small1)
 
-						ScrollViewReader { _ in
-							ScrollView {
-								LazyVStack(spacing: .small1, pinnedViews: [.sectionHeaders]) {
-									accountHeader
-										.measurePosition(View.accountDummy, coordSpace: View.coordSpace)
-										.opacity(0)
+						ScrollView {
+							LazyVStack(spacing: .small1, pinnedViews: [.sectionHeaders]) {
+								accountHeader
+									.measurePosition(View.accountDummy, coordSpace: View.coordSpace)
+									.opacity(0)
 
-									if viewStore.loading.isLoading /* , !viewStore.loading.parameters.backwards */ {
-										Rectangle()
-											.fill(.pink)
-											.frame(height: .medium3)
-											.overlay {
-												ProgressView()
-											}
-									}
+								if viewStore.loading.isLoading, !viewStore.loading.parameters.backwards {
+									ProgressView()
+								}
 
-									ForEach(viewStore.sections) { section in
-										SectionView(section: section)
-											.onAppear {
-												store.send(.view(.sectionAppeared(section.id)))
-											}
-											.onDisappear {
-												guard !viewStore.didDismiss else { return }
-												store.send(.view(.sectionDisappeared(section.id)))
-											}
-									}
-
-									Rectangle()
-										.fill(.clear)
-										.frame(height: .medium3)
-										.overlay {
-											if viewStore.loading.isLoading, viewStore.loading.parameters.backwards {
-												ProgressView()
-											}
+								ForEach(viewStore.sections) { section in
+									SectionView(section: section)
+										.onAppear {
+											store.send(.view(.sectionAppeared(section.id)))
+										}
+										.onDisappear {
+											guard !viewStore.didDismiss else { return }
+											store.send(.view(.sectionDisappeared(section.id)))
 										}
 								}
-								.padding(.bottom, .medium3)
+
+								Rectangle()
+									.fill(.clear)
+									.frame(height: .medium3)
+									.overlay {
+										if viewStore.loading.isLoading, viewStore.loading.parameters.backwards {
+											ProgressView()
+										}
+									}
 							}
-							.scrollIndicators(.never)
-							.coordinateSpace(name: View.coordSpace)
+							.padding(.bottom, .medium3)
 						}
+						.scrollIndicators(.never)
+						.coordinateSpace(name: View.coordSpace)
 					}
 					.background {
 						if viewStore.showEmptyState {
@@ -110,7 +103,7 @@ extension TransactionHistory {
 						}
 					}
 					.onReadPosition(View.accountDummy) { rect in
-						if rect.minY > 30, !viewStore.loading.isLoading {
+						if rect.minY > 30 {
 							store.send(.view(.pulledDown))
 						}
 					}
