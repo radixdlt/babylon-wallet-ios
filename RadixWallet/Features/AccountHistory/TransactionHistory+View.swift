@@ -509,7 +509,6 @@ public struct HScrollBar<Item: ScrollBarItem>: View {
 			}
 			.scrollIndicators(.never)
 			.onChange(of: selection) { value in
-				print("••• SCROLLBAR selection changed to \(value)")
 				proxy.scrollTo(value)
 			}
 		}
