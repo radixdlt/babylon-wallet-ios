@@ -163,11 +163,9 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			return .none
 
 		case .reachedTop:
-			print("•• Reached TOP")
 			return .none
 
 		case .reachedBottom:
-			print("•• Reached BOTTOM")
 			return loadMoreHistory(state: &state)
 		}
 	}
@@ -211,29 +209,20 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	func loadHistory(parameters: TransactionHistoryParameters, state: inout State) -> Effect<Action> {
 		if state.loading.isLoading {
-			print("•• ALREADY LOADING")
 			return .none
 		}
 
 		if state.loading.didLoadEverything, state.loading.parameters.covers(parameters) {
-			print("•• ALREADY FULLY LOADED")
 			return .none
 		}
 
 		if parameters != state.loading.parameters {
 			state.sections = []
-			print("•• Reload from scratch")
 		} else {
-			if state.loadedRange == nil, state.loading.nextCursor == nil {
-				print("•• Load first")
-			} else {
-				print("•• Load more of the same")
-			}
+			// Loading more
 		}
 
 		state.loading.isLoading = true
-
-		print("•• Load \(parameters.period.debugString()), \(parameters.filters.count) filters")
 
 		let request = TransactionHistoryRequest(
 			account: state.account.accountAddress,
@@ -253,45 +242,22 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		}
 	}
 
-	func debugPrint(_ response: TransactionHistoryResponse, loadedRange: Range<Date>?) {
-		let times = response.items.map(\.time)
-		let newlyLoadedRange: String = if let lowest = times.min(), let highest = times.max() {
-			(lowest ..< highest).debugString() + " (#\(response.items.count))"
-		} else {
-			"(nothing)"
-		}
-		if let loadedRange {
-			print("••• Loaded \(newlyLoadedRange) from \(response.parameters.period.debugString())")
-		} else {
-			print("••• Loaded \(newlyLoadedRange) from \(response.parameters.period.debugString()) first")
-		}
-	}
-
 	func loadedHistory(_ response: TransactionHistoryResponse, state: inout State) -> Effect<Action> {
 		state.resources.append(contentsOf: response.resources)
 
 		state.loading.isLoading = false
 
 		if response.parameters == state.loading.parameters {
-			debugPrint(response, loadedRange: state.loadedRange) // FIXME: GK remove
-
 			// We loaded more from the same range
 			state.loading.nextCursor = response.nextCursor
 			if response.nextCursor == nil {
-				print(" •• Seems that we loaded everything now")
 				state.loading.didLoadEverything = true
-			}
-
-			guard response.parameters.backwards else {
-				print(" •• forward loading not supported yet")
-				return .none
 			}
 
 			state.sections.addItems(response.items)
 
 			state.loading.isLoading = false
 		} else {
-			print("••• Loaded: \(response.parameters.period.debugString()) :#\(response.items.count)")
 			state.loading = .init(parameters: response.parameters, nextCursor: response.nextCursor)
 			state.sections.replaceItems(response.items)
 		}
@@ -338,14 +304,10 @@ extension IdentifiedArrayOf<TransactionHistory.State.TransactionSection> {
 	mutating func addItems(_ items: some Collection<TransactionHistoryItem>) {
 		let newSections = items.inUnsortedSections.sorted(by: \.day, >)
 
-		print(" ••• got # \(items.count)")
-
 		for newSection in newSections {
 			if last?.id == newSection.id {
-				print("   ••• appending # \(newSection.transactions.count) to existing section \(self[id: newSection.id]!.day.formatted(date: .abbreviated, time: .omitted))")
 				self[id: newSection.id]?.transactions.append(contentsOf: newSection.transactions)
 			} else {
-				print("   ••• appending entire section \(newSection)")
 				append(newSection)
 			}
 		}
@@ -353,7 +315,6 @@ extension IdentifiedArrayOf<TransactionHistory.State.TransactionSection> {
 
 	mutating func replaceItems(_ items: some Collection<TransactionHistoryItem>) {
 		self = items.inUnsortedSections.sorted(by: \.day, >).asIdentifiable()
-		print("   ••• replacing sections \(self.map(\.transactions.count))")
 	}
 }
 

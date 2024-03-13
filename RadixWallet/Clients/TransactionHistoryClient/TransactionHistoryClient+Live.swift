@@ -7,26 +7,6 @@ extension TransactionHistoryClient {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
-		/*
-		 1. load from now and backwards
-
-		 a:
-		 2. scroll backwards - load more using cursor
-
-		 b:
-		 2. scroll forwards - change to forward request
-
-		 c:
-		 2. change filter - reload everything from where you are
-
-		 new period, adjacent - after
-		 new period, inside
-		 new period, outside
-
-		 older transactions in the same period
-		 newer transactions after the ones we have loaded
-		 */
-
 		@Sendable
 		func getTransactionHistory(_ request: TransactionHistoryRequest) async throws -> TransactionHistoryResponse {
 			let response = try await gatewayAPIClient.streamTransactions(request.gatewayRequest)
@@ -82,17 +62,11 @@ extension TransactionHistoryClient {
 			let dateformatter2 = ISO8601DateFormatter()
 
 			func transaction(for info: GatewayAPI.CommittedTransactionInfo) async throws -> TransactionHistoryItem {
-				let alt1 = dateformatter1.date(from: info.roundTimestamp) != nil ? "1 OK" : "1 x"
-				let alt2 = dateformatter2.date(from: info.roundTimestamp) != nil ? "2 OK" : "2 x"
-				let alt3 = info.confirmedAt != nil ? "3 OK" : "3 x"
-				print(" timestamp: \(info.roundTimestamp) :: \(alt1) - \(alt2) -  \(alt3)")
-
 				let time = dateformatter1.date(from: info.roundTimestamp)
 					?? dateformatter2.date(from: info.roundTimestamp)
 					?? info.confirmedAt
 
 				guard let time else {
-					print(" CORRUPT timestamp: \(info.roundTimestamp)")
 					struct CorruptTimestamp: Error { let roundTimestamd: String }
 					throw CorruptTimestamp(roundTimestamd: info.roundTimestamp)
 				}
@@ -231,18 +205,12 @@ extension TransactionHistoryRequest {
 			fromLedgerState: .init(timestamp: parameters.period.lowerBound),
 			cursor: cursor,
 			limitPerPage: 5,
-//				kindFilter: T##GatewayAPI.StreamTransactionsRequest.KindFilter,
-//				manifestAccountsWithdrawnFromFilter: <#T##[String]?#>,
-//				manifestAccountsDepositedIntoFilter: <#T##[String]?#>,
 			manifestResourcesFilter: manifestResourcesFilter(parameters.filters),
 			affectedGlobalEntitiesFilter: [account.address],
 			eventsFilter: eventsFilter(parameters.filters, account: account),
-//				accountsWithManifestOwnerMethodCalls: <#T##[String]?#>,
-//				accountsWithoutManifestOwnerMethodCalls: <#T##[String]?#>,
 			manifestClassFilter: manifestClassFilter(parameters.filters),
 			order: parameters.backwards ? .desc : .asc,
 			optIns: .init(balanceChanges: true)
-			// optIns: GatewayAPI.TransactionDetailsOptIns(affectedGlobalEntities: true, manifestInstructions: true, balanceChanges: true)
 		)
 	}
 
