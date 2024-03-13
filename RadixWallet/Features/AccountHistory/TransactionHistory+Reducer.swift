@@ -77,7 +77,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case sectionDisappeared(State.TransactionSection.ID)
 
 		case pulledDown
-		case reachedBottom
 	}
 
 	public enum InternalAction: Sendable, Hashable {
@@ -172,9 +171,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 				print("•• Load more forwards")
 			}
 			return .none
-
-		case .reachedBottom:
-			return loadMoreHistory(state: &state)
 		}
 	}
 
