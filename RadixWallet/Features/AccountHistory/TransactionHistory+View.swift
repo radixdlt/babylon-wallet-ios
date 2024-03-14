@@ -47,14 +47,16 @@ extension TransactionHistory {
 								}
 
 								ForEach(viewStore.sections) { section in
-									SectionView(section: section)
-										.onAppear {
-											store.send(.view(.sectionAppeared(section.id)))
-										}
-										.onDisappear {
-											guard !viewStore.didDismiss else { return }
-											store.send(.view(.sectionDisappeared(section.id)))
-										}
+									SectionView(section: section) { txid in
+										store.send(.view(.transactionTapped(txid)))
+									}
+									.onAppear {
+										store.send(.view(.sectionAppeared(section.id)))
+									}
+									.onDisappear {
+										guard !viewStore.didDismiss else { return }
+										store.send(.view(.sectionDisappeared(section.id)))
+									}
 								}
 
 								Rectangle()
@@ -138,11 +140,15 @@ extension TransactionHistory {
 
 	struct SectionView: SwiftUI.View {
 		let section: TransactionHistory.State.TransactionSection
+		let onTap: (TXID) -> Void
 
 		var body: some SwiftUI.View {
 			Section {
 				ForEach(section.transactions, id: \.self) { transaction in
 					TransactionView(transaction: transaction)
+						.onTapGesture {
+							onTap(transaction.id)
+						}
 						.padding(.horizontal, .medium3)
 				}
 			} header: {
