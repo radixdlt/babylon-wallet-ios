@@ -17,12 +17,14 @@ public struct FlowLayout: Layout {
 		let containerWidth = proposal.replacingUnspecifiedDimensions().width
 		let dimensions = subviews.map { $0.dimensions(in: .unspecified) }
 
-		return layout(
+		let laidOutSize = layout(
 			dimensions: dimensions,
 			spacing: spacing,
 			containerWidth: containerWidth,
 			alignment: alignment
 		).size
+
+		return .init(width: min(laidOutSize.width, containerWidth), height: laidOutSize.height)
 	}
 
 	public func placeSubviews(
@@ -40,7 +42,7 @@ public struct FlowLayout: Layout {
 		).offsets
 
 		for (offset, subview) in zip(offsets, subviews) {
-			subview.place(at: CGPoint(x: offset.x + bounds.minX, y: offset.y + bounds.minY), proposal: .unspecified)
+			subview.place(at: CGPoint(x: offset.x + bounds.minX, y: offset.y + bounds.minY), proposal: .init(width: proposal.width, height: nil))
 		}
 	}
 
