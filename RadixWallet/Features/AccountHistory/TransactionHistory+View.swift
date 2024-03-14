@@ -25,51 +25,27 @@ extension TransactionHistory {
 					let selection = viewStore.binding(get: \.currentMonth, send: ViewAction.selectedMonth)
 
 					VStack(spacing: .zero) {
-						VStack(spacing: .small2) {
-							HScrollBarDummy()
+						accountHeader
 
-							if !viewStore.activeFilters.isEmpty {
-								ActiveFiltersView.Dummy()
+						VStack(spacing: .small2) {
+							HScrollBar(items: viewStore.availableMonths, selection: selection)
+
+							if let filters = viewStore.activeFilters.nilIfEmpty {
+								ActiveFiltersView(filters: filters) { id in
+									store.send(.view(.filterCrossTapped(id)), animation: .default)
+								}
 							}
 						}
 						.padding(.top, .small2)
 						.padding(.bottom, .small1)
+						.background(.app.white)
 
-						ScrollView {
-							LazyVStack(spacing: .small1, pinnedViews: [.sectionHeaders]) {
-								accountHeader
-									.measurePosition(View.accountDummy, coordSpace: View.coordSpace)
-									.opacity(0)
-
-								if viewStore.loading.isLoading, !viewStore.loading.parameters.backwards {
-									ProgressView()
-										.padding(.small1)
-								}
-
-								ForEach(viewStore.sections) { section in
-									SectionView(section: section)
-										.onAppear {
-											store.send(.view(.sectionAppeared(section.id)))
-										}
-										.onDisappear {
-											guard !viewStore.didDismiss else { return }
-											store.send(.view(.sectionDisappeared(section.id)))
-										}
-								}
-
-								Rectangle()
-									.fill(.clear)
-									.frame(height: .medium3)
-									.overlay {
-										if viewStore.loading.isLoading, viewStore.loading.parameters.backwards {
-											ProgressView()
-										}
-									}
+						UITableViewWrapper(
+							sections: viewStore.sections.elements,
+							onSectionDidAppear: { id in
+								store.send(.view(.sectionAppeared(id)))
 							}
-							.padding(.bottom, .medium3)
-						}
-						.scrollIndicators(.never)
-						.coordinateSpace(name: View.coordSpace)
+						)
 					}
 					.background {
 						if viewStore.showEmptyState {
@@ -79,30 +55,6 @@ extension TransactionHistory {
 						}
 					}
 					.background(.app.gray5)
-					.overlayPreferenceValue(PositionsPreferenceKey.self, alignment: .top) { positions in
-						let rect = positions[View.accountDummy]
-						ZStack(alignment: .top) {
-							if let rect {
-								accountHeader
-									.offset(y: rect.minY)
-							}
-
-							let scrollBarOffset = max(rect?.maxY ?? 0, 0)
-							VStack(spacing: .small2) {
-								HScrollBar(items: viewStore.availableMonths, selection: selection)
-
-								if let filters = viewStore.activeFilters.nilIfEmpty {
-									ActiveFiltersView(filters: filters) { id in
-										store.send(.view(.filterCrossTapped(id)), animation: .default)
-									}
-								}
-							}
-							.padding(.top, .small2)
-							.padding(.bottom, .small1)
-							.background(.app.white)
-							.offset(y: scrollBarOffset)
-						}
-					}
 					.onReadPosition(View.accountDummy) { rect in
 						if rect.minY > 50 {
 							store.send(.view(.pulledDown))
@@ -606,6 +558,91 @@ extension TransactionHistory {
 		case .validatorUnstake: L10n.TransactionHistory.ManifestClass.unstaking
 		case .validatorClaim: L10n.TransactionHistory.ManifestClass.claim
 		case .accountDepositSettingsUpdate: L10n.TransactionHistory.ManifestClass.accountSettings
+		}
+	}
+}
+
+// MARK: - UITableViewWrapper
+/// Very specific to TXHistory, but could definetely be made more generic
+private struct UITableViewWrapper: UIViewRepresentable {
+	let sections: [TransactionHistory.State.TransactionSection]
+	var onSectionDidAppear: ((TransactionHistory.State.TransactionSection.ID) -> Void)?
+	var onSectionDidDisappear: ((TransactionHistory.State.TransactionSection.ID) -> Void)?
+
+	func makeUIView(context: Context) -> UITableView {
+		let tableView = UITableView(frame: .zero, style: .plain)
+		tableView.backgroundColor = .clear
+
+		// Register cell class
+		tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+
+		// Set delegate and data source
+		tableView.delegate = context.coordinator
+		tableView.dataSource = context.coordinator
+
+		tableView.separatorStyle = .none
+
+		return tableView
+	}
+
+	func updateUIView(_ uiView: UITableView, context: Context) {
+		context.coordinator.sections = sections
+		uiView.reloadData()
+	}
+
+	func makeCoordinator() -> Coordinator {
+		Coordinator(sections, onSectionDidAppear: onSectionDidAppear)
+	}
+
+	class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
+		var sections: [TransactionHistory.State.TransactionSection]
+		let onSectionDidAppear: ((TransactionHistory.State.TransactionSection.ID) -> Void)?
+		var onSectionDidDisappear: ((TransactionHistory.State.TransactionSection.ID) -> Void)?
+
+		init(_ sections: [TransactionHistory.State.TransactionSection], onSectionDidAppear: ((TransactionHistory.State.TransactionSection.ID) -> Void)?) {
+			self.sections = sections
+			self.onSectionDidAppear = onSectionDidAppear
+		}
+
+		func numberOfSections(in tableView: UITableView) -> Int {
+			sections.count
+		}
+
+		func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+			sections[section].transactions.count
+		}
+
+		func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+			let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+			let item = sections[indexPath.section].transactions[indexPath.row]
+
+			cell.backgroundColor = .clear
+			cell.contentConfiguration = UIHostingConfiguration {
+				TransactionHistory.TransactionView(transaction: item)
+			}
+			return cell
+		}
+
+		func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+			let section = sections[section]
+			let headerView = TransactionHistory.SectionHeaderView(title: section.title)
+
+			let hostingController = UIHostingController(rootView: headerView)
+			// Set the hosting controller's view background color to clear to avoid unwanted background colors
+			hostingController.view.backgroundColor = .clear
+			// Remove extra padding inside the hosting controller
+			hostingController.view.sizeToFit()
+
+			return hostingController.view
+		}
+
+		func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+			UITableView.automaticDimension
+		}
+
+		func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+			let section = sections[section]
+			onSectionDidAppear?(section.id)
 		}
 	}
 }
