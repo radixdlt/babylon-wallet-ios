@@ -36,7 +36,7 @@ extension TransactionHistory {
 						.padding(.bottom, .small1)
 
 						ScrollView {
-							LazyVStack(spacing: .small1, pinnedViews: [.sectionHeaders]) {
+							VStack(spacing: .small1) {
 								accountHeader
 									.measurePosition(View.accountDummy, coordSpace: View.coordSpace)
 									.opacity(0)
