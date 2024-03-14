@@ -138,8 +138,8 @@ extension TransactionHistoryFilters {
 				let showLess: String
 			}
 
-			@SwiftUI.State private var rowHeight: CGFloat = .infinity
-			@SwiftUI.State private var totalHeight: CGFloat = .infinity
+			@SwiftUI.State private var rowHeight: CGFloat = .zero
+			@SwiftUI.State private var totalHeight: CGFloat = .zero
 			@SwiftUI.State private var isCollapsed: Bool = true
 
 			let heading: String?
@@ -151,7 +151,7 @@ extension TransactionHistoryFilters {
 				CGFloat(collapsedRowLimit) * rowHeight + CGFloat(collapsedRowLimit - 1) * spacing
 			}
 
-			private let collapsedRowLimit: Int = 2
+			private let collapsedRowLimit: Int = 3
 			private let spacing: CGFloat = .small1
 
 			init(_ heading: String? = nil, filters: IdentifiedArrayOf<State.Filter>, labels: CollapseLabels? = nil, store: StoreOf<TransactionHistoryFilters>) {
@@ -164,7 +164,7 @@ extension TransactionHistoryFilters {
 			var body: some SwiftUI.View {
 				if !filters.isEmpty {
 					let isCollapsible = labels != nil
-					VStack(spacing: .zero) {
+					VStack(alignment: .leading, spacing: .zero) {
 						if let heading {
 							Text(heading)
 								.textStyle(.body1HighImportance)
@@ -173,18 +173,15 @@ extension TransactionHistoryFilters {
 								.padding(.bottom, .medium3)
 						}
 
-						HStack(spacing: .zero) {
-							FlowLayout(spacing: spacing) {
-								FiltersView(filters: filters, store: store)
-							}
-							.measureSize(flowLayoutID)
-							.overlay {
-								TransactionFilterView.Dummy()
-									.measureSize(flowDummyID)
-							}
-
-							Spacer(minLength: 0)
+						FlowLayout(spacing: spacing) {
+							FiltersView(filters: filters, store: store)
 						}
+						.measureSize(flowLayoutID)
+						.overlay {
+							TransactionFilterView.Dummy()
+								.measureSize(flowDummyID)
+						}
+
 						.frame(maxHeight: isCollapsible && isCollapsed ? collapsedHeight : .infinity, alignment: .top)
 						.clipped()
 						.onReadSizes(flowDummyID, flowLayoutID) { dummySize, flowSize in
@@ -208,6 +205,7 @@ extension TransactionHistoryFilters {
 								}
 							}
 							.buttonStyle(.blueText)
+							.frame(maxWidth: .infinity)
 							.padding(.top, .medium3)
 						}
 					}
@@ -250,6 +248,8 @@ struct TransactionFilterView: SwiftUI.View {
 				}
 
 				Text(filter.label)
+					.lineLimit(1)
+					.truncationMode(.tail)
 					.textStyle(.body1HighImportance)
 					.foregroundStyle(textColor)
 			}
