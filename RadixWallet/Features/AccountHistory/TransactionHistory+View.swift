@@ -565,6 +565,7 @@ extension TransactionHistory {
 // MARK: - UITableViewWrapper
 /// Very specific to TXHistory, but could definetely be made more generic
 private struct UITableViewWrapper: UIViewRepresentable {
+	static let cellIdentifier = "TransactionCell"
 	let sections: [TransactionHistory.State.TransactionSection]
 	var onSectionDidAppear: ((TransactionHistory.State.TransactionSection.ID) -> Void)?
 	var onSectionDidDisappear: ((TransactionHistory.State.TransactionSection.ID) -> Void)?
@@ -572,15 +573,12 @@ private struct UITableViewWrapper: UIViewRepresentable {
 	func makeUIView(context: Context) -> UITableView {
 		let tableView = UITableView(frame: .zero, style: .plain)
 		tableView.backgroundColor = .clear
+		tableView.separatorStyle = .none
 
-		// Register cell class
-		tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+		tableView.register(UITableViewCell.self, forCellReuseIdentifier: Self.cellIdentifier)
 
-		// Set delegate and data source
 		tableView.delegate = context.coordinator
 		tableView.dataSource = context.coordinator
-
-		tableView.separatorStyle = .none
 
 		return tableView
 	}
@@ -599,7 +597,10 @@ private struct UITableViewWrapper: UIViewRepresentable {
 		let onSectionDidAppear: ((TransactionHistory.State.TransactionSection.ID) -> Void)?
 		var onSectionDidDisappear: ((TransactionHistory.State.TransactionSection.ID) -> Void)?
 
-		init(_ sections: [TransactionHistory.State.TransactionSection], onSectionDidAppear: ((TransactionHistory.State.TransactionSection.ID) -> Void)?) {
+		init(
+			_ sections: [TransactionHistory.State.TransactionSection],
+			onSectionDidAppear: ((TransactionHistory.State.TransactionSection.ID) -> Void)?
+		) {
 			self.sections = sections
 			self.onSectionDidAppear = onSectionDidAppear
 		}
@@ -613,7 +614,7 @@ private struct UITableViewWrapper: UIViewRepresentable {
 		}
 
 		func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-			let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+			let cell = tableView.dequeueReusableCell(withIdentifier: UITableViewWrapper.cellIdentifier, for: indexPath)
 			let item = sections[indexPath.section].transactions[indexPath.row]
 
 			cell.backgroundColor = .clear
@@ -625,12 +626,10 @@ private struct UITableViewWrapper: UIViewRepresentable {
 
 		func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
 			let section = sections[section]
-			let headerView = TransactionHistory.SectionHeaderView(title: section.title)
 
+			let headerView = TransactionHistory.SectionHeaderView(title: section.title)
 			let hostingController = UIHostingController(rootView: headerView)
-			// Set the hosting controller's view background color to clear to avoid unwanted background colors
 			hostingController.view.backgroundColor = .clear
-			// Remove extra padding inside the hosting controller
 			hostingController.view.sizeToFit()
 
 			return hostingController.view
