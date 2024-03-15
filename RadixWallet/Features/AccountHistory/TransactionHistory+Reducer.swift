@@ -20,9 +20,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		var sections: IdentifiedArrayOf<TransactionSection> = []
 
-		/// Used to accurately control the current month
-		var visibleSections: OrderedSet<TransactionSection.ID> = []
-
 		/// The currently selected month
 		var currentMonth: DateRangeItem.ID
 
@@ -72,16 +69,19 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case transactionTapped(TXID)
 		case filtersTapped
 		case filterCrossTapped(TransactionFilter)
-		case closeTapped
-
-		case sectionAppeared(State.TransactionSection.ID)
-		case sectionDisappeared(State.TransactionSection.ID)
+		case transactionWillAppear(TXID, ScrollDirection)
 
 		case pulledDown
+		case closeTapped
 	}
 
 	public enum InternalAction: Sendable, Hashable {
 		case loadedHistory(TransactionHistoryResponse)
+	}
+
+	public enum ScrollDirection: Sendable {
+		case up
+		case down
 	}
 
 	public struct Destination: DestinationReducer {
@@ -151,20 +151,14 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			state.didDismiss = true
 			return .run { _ in await dismiss() }
 
-		case let .sectionAppeared(id):
-			state.visibleSections.remove(id)
-			state.visibleSections.append(id)
-			state.visibleSectionsChanged()
+		case let .transactionWillAppear(txid, direction):
+//			return loadMoreHistory(state: &state)
 
-			if state.sections.suffix(2).map(\.id).contains(id) {
-				return loadMoreHistory(state: &state)
+			if state.sections.last?.transactions.suffix(3).map(\.id).contains(txid) == true {
+				print("• Reached end")
 			}
 
-			return .none
-
-		case let .sectionDisappeared(id):
-			state.visibleSections.remove(id)
-			state.visibleSectionsChanged()
+			currentMonth = section.month
 
 			return .none
 
@@ -292,12 +286,6 @@ extension TransactionHistory.State {
 			return nil
 		}
 		return last ..< first
-	}
-
-	mutating func visibleSectionsChanged() {
-		if let latest = visibleSections.last, let section = sections[id: latest] {
-			currentMonth = section.month
-		}
 	}
 }
 
