@@ -25,7 +25,7 @@ struct ValidatorHeaderView: View {
 				}
 
 				if let stakedAmount = viewState.stakedAmount {
-					Text("Current Stake: \(stakedAmount.formatted()) XRD")
+					Text(L10n.Account.Staking.currentStake("\(stakedAmount.formatted()) XRD"))
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray2)
 				}
