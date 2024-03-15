@@ -40,6 +40,10 @@ public enum L10n {
     public enum Staking {
       /// Claim
       public static let claim = L10n.tr("Localizable", "account_staking_claim", fallback: "Claim")
+      /// Current Stake: %@
+      public static func currentStake(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "account_staking_currentStake", String(describing: p1), fallback: "Current Stake: %@")
+      }
       /// Liquid Stake Units
       public static let liquidStakeUnits = L10n.tr("Localizable", "account_staking_liquidStakeUnits", fallback: "Liquid Stake Units")
       /// Radix Network XRD Stake Summary

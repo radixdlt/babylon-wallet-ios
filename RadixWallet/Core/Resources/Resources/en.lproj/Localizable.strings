@@ -28,6 +28,7 @@
 "account_staking_readyToClaim" = "Ready to Claim";
 "account_staking_readyToBeClaimed" = "Ready to be claimed";
 "account_staking_staked" = "Staked";
+"account_staking_currentStake" = "Current Stake: %@";
 "account_staking_liquidStakeUnits" = "Liquid Stake Units";
 "account_staking_stakeClaimNFTs" = "Stake Claim NFTs";
 "account_staking_worth" = "WORTH";
