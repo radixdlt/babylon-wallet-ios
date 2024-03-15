@@ -165,8 +165,8 @@ public enum TXFailureStatus: LocalizedError, Sendable, Hashable {
 extension TXFailureStatus {
 	public enum Reason: Sendable, Hashable, Equatable {
 		public enum ApplicationError: Equatable, Sendable, Hashable {
-			public enum WorktopError: String, Sendable, Hashable, Equatable {
-				case assertionFailed = "AssertionFailed"
+			public enum WorktopError: Sendable, Hashable, Equatable {
+				case assertionFailed
 			}
 
 			case worktopError(WorktopError)
