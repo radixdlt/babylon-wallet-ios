@@ -8,7 +8,8 @@ final class AccountDetailsFeatureTests: TestCase {
 		// given
 		let store = TestStore(
 			initialState: AccountDetails.State(
-				accountWithInfo: .previewValue0
+				accountWithInfo: .previewValue0,
+				showFiatWorth: false
 			),
 			reducer: AccountDetails.init
 		)
@@ -23,7 +24,8 @@ final class AccountDetailsFeatureTests: TestCase {
 	func test_accountHidden_thenCoordinateDismissal() async {
 		let store = TestStore(
 			initialState: AccountDetails.State(
-				accountWithInfo: .previewValue0
+				accountWithInfo: .previewValue0,
+				showFiatWorth: false
 			),
 			reducer: AccountDetails.init
 		)
