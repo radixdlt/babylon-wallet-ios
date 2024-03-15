@@ -29,8 +29,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		/// Workaround, TCA sends the sectionDisappeared after we dismiss, causing a run-time warning
 		var didDismiss: Bool = false
 
-		var transactionToScrollTo: TXID? = nil
-
 		struct Loading: Hashable, Sendable {
 			let parameters: TransactionHistoryParameters
 			var isLoading: Bool = false
