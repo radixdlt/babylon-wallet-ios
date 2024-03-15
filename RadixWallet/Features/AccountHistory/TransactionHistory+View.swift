@@ -40,7 +40,7 @@ extension TransactionHistory {
 						.padding(.bottom, .small1)
 						.background(.app.white)
 
-						TransactionsTableView(sections: viewStore.sections.elements, transaction: viewStore.transactionToScrollTo) { action in
+						TransactionsTableView(sections: viewStore.sections) { action in
 							store.send(.view(.transactionsTableAction(action)))
 						}
 					}
@@ -563,7 +563,7 @@ extension TransactionHistory {
 	public struct TransactionsTableView: UIViewRepresentable {
 		public enum Action: Hashable, Sendable {
 			case transactionTapped(TXID)
-			case scrolledPastTop
+			case pulledDown
 			case nearingTop
 			case nearingBottom
 			case monthChanged(Date)
@@ -571,8 +571,7 @@ extension TransactionHistory {
 
 		private static let cellIdentifier = "TransactionCell"
 
-		let sections: [TransactionSection]
-		let transaction: TXID?
+		let sections: IdentifiedArrayOf<TransactionSection>
 		let action: (Action) -> Void
 
 		public func makeUIView(context: Context) -> UITableView {
@@ -588,28 +587,40 @@ extension TransactionHistory {
 		}
 
 		public func updateUIView(_ uiView: UITableView, context: Context) {
-			context.coordinator.sections = sections
-			uiView.reloadData()
-			print("•• Update view")
+			guard sections != context.coordinator.sections else { return }
+			let oldTransactions = context.coordinator.sections.allTransactions
+			let newTransactions = sections.allTransactions
 
-			if let transaction, transaction != context.coordinator.scrolledToTransaction {
-				for (index, section) in sections.enumerated() {
-					if let row = section.transactions.ids.firstIndex(of: transaction) {
-						uiView.scrollToRow(at: .init(row: row, section: index), at: .top, animated: true)
-						print("••• will scroll")
-					}
-				}
+			if !oldTransactions.isEmpty, newTransactions.hasSuffix(oldTransactions) {
+				print(" •• updateUIView: inserted \(newTransactions.count - oldTransactions.count) above")
+				let oldContentHeight = uiView.contentSize.height
+				let oldContentOffset = uiView.contentOffset.y
+				context.coordinator.sections = sections
+				uiView.reloadData()
+				let newContentHeight = uiView.contentSize.height
+
+				let new = oldContentOffset + newContentHeight - oldContentHeight
+				let inserted = newContentHeight - oldContentHeight
+				print(" •• updateUIView: (height : offset): \(oldContentHeight) : \(oldContentOffset) -> \(newContentHeight) : \(new) [\(inserted)]")
+
+				uiView.contentOffset.y = oldContentOffset + newContentHeight - oldContentHeight
+			} else if !oldTransactions.isEmpty, newTransactions.hasPrefix(oldTransactions) {
+				print(" •• updateUIView: inserted \(newTransactions.count - oldTransactions.count) below")
+				context.coordinator.sections = sections
+				uiView.reloadData()
+			} else {
+				print(" •• updateUIView: everything changed")
+				context.coordinator.sections = sections
+				uiView.reloadData()
 			}
-
-			context.coordinator.scrolledToTransaction = transaction
 		}
 
 		public func makeCoordinator() -> Coordinator {
-			Coordinator(sections, action: action)
+			Coordinator(sections: sections, action: action)
 		}
 
 		public class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
-			var sections: [TransactionHistory.TransactionSection]
+			var sections: IdentifiedArrayOf<TransactionSection>
 			let action: (Action) -> Void
 
 			private var isScrolledPastTop: Bool = false
@@ -620,10 +631,8 @@ extension TransactionHistory {
 
 			private var scrolling: (direction: ScrollDirection, count: Int) = (.down, 0)
 
-			var scrolledToTransaction: TXID? = nil
-
 			public init(
-				_ sections: [TransactionHistory.TransactionSection],
+				sections: IdentifiedArrayOf<TransactionSection>,
 				action: @escaping (Action) -> Void
 			) {
 				self.sections = sections
@@ -681,11 +690,13 @@ extension TransactionHistory {
 				}
 				previousCell = indexPath
 
+				// We only want to pre-emptively load if they have been scrolling for a while in the same direction
 				if scrolling.count > 8 {
-					if scrolling.direction == .down, bottomTransactions.contains(txID) {
+					let transactions = sections.allTransactions
+					if scrolling.direction == .down, transactions.suffix(15).contains(txID) {
 						action(.nearingBottom)
 						scrolling.count = 0
-					} else if scrollDirection == .up, topTransactions.contains(txID) {
+					} else if scrollDirection == .up, transactions.prefix(7).contains(txID) {
 						action(.nearingTop)
 						scrolling.count = 0
 					}
@@ -696,7 +707,6 @@ extension TransactionHistory {
 				nil
 			}
 
-//
 			// UIScrollViewDelegate
 
 			public func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -705,7 +715,7 @@ extension TransactionHistory {
 				}
 
 				if scrollView.contentOffset.y < -30, !isScrolledPastTop {
-					action(.scrolledPastTop)
+					action(.pulledDown)
 					isScrolledPastTop = true
 				} else if isScrolledPastTop, scrollView.contentOffset.y >= 0 {
 					isScrolledPastTop = false
@@ -721,14 +731,71 @@ extension TransactionHistory {
 				action(.monthChanged(newMonth))
 				month = newMonth
 			}
+		}
+	}
+}
 
-			private var topTransactions: some Collection<TXID> {
-				sections.prefix(7).flatMap(\.transactions.ids).prefix(7)
-			}
+extension Collection where Element: Equatable {
+	func hasPrefix(_ elements: some Collection<Element>) -> Bool {
+		prefix(elements.count).elementsEqual(elements)
+	}
 
-			private var bottomTransactions: [TXID] {
-				sections.suffix(15).flatMap(\.transactions.ids).suffix(15)
+	func hasSuffix(_ elements: some Collection<Element>) -> Bool {
+		suffix(elements.count).elementsEqual(elements)
+	}
+
+	func prefix(sharedWith other: some Collection<Element>) -> [Element] {
+		zip(self, other).prefix(while: ==).map(\.0)
+	}
+
+	func suffix(sharedWith other: some Collection<Element>) -> some Collection<Element> {
+		zip(self, other).map(Pair.init).suffix(while: \.equal).map(\.left)
+	}
+}
+
+extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
+	var allTransactions: [TXID] {
+		flatMap(\.transactions.ids)
+	}
+
+	var firstTransaction: TXID? {
+		first?.transactions.first?.id
+	}
+
+	func index(of transaction: TXID) -> IndexPath? {
+		for (index, section) in enumerated() {
+			if let row = section.transactions.ids.firstIndex(of: transaction) {
+				return .init(row: row, section: index)
 			}
 		}
+
+		return nil
+	}
+}
+
+// MARK: - Pair
+public struct Pair<L, R> {
+	public let left: L
+	public let right: R
+
+	public init(_ left: L, _ right: R) {
+		self.left = left
+		self.right = right
+	}
+}
+
+// MARK: Sendable
+extension Pair: Sendable where L: Sendable, R: Sendable {}
+
+// MARK: Equatable
+extension Pair: Equatable where L: Equatable, R: Equatable {}
+
+// MARK: Hashable
+extension Pair: Hashable where L: Hashable, R: Hashable {}
+
+extension Pair where L == R, L: Equatable, R: Equatable {
+	/// The two components are equal
+	public var equal: Bool {
+		left == right
 	}
 }
