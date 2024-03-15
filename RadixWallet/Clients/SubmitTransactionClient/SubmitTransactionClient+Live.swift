@@ -40,9 +40,9 @@ extension SubmitTransactionClient: DependencyKey {
 				case .committedSuccess:
 					return
 				case .committedFailure:
-					throw TXFailureStatus.failed
+					throw TXFailureStatus.failed(reason: .init(transactionStatusResponse.errorMessage))
 				case .permanentlyRejected:
-					throw TXFailureStatus.permanentlyRejected
+					throw TXFailureStatus.permanentlyRejected(reason: .init(transactionStatusResponse.errorMessage))
 				case .temporarilyRejected:
 					throw TXFailureStatus.temporarilyRejected(currentEpoch: .init(UInt64(transactionStatusResponse.ledgerState.epoch)))
 				}
@@ -148,15 +148,89 @@ public enum SubmitTXFailure: Sendable, LocalizedError, Equatable {
 
 // MARK: - TXFailureStatus
 public enum TXFailureStatus: LocalizedError, Sendable, Hashable {
-	case permanentlyRejected
+	case permanentlyRejected(reason: Reason)
 	case temporarilyRejected(currentEpoch: Epoch)
-	case failed
+	case failed(reason: Reason)
 
 	public var errorDescription: String? {
 		switch self {
 		case .permanentlyRejected: "Permanently Rejected"
 		case .temporarilyRejected: "Temporarily Rejected"
 		case .failed: "Failed"
+		}
+	}
+}
+
+// MARK: TXFailureStatus.Reason
+extension TXFailureStatus {
+	public enum Reason: Sendable, Hashable, Equatable {
+		public enum ApplicationError: Equatable, Sendable, Hashable {
+			public enum WorktopError: String, Sendable, Hashable, Equatable {
+				case assertionFailed = "AssertionFailed"
+			}
+
+			case worktopError(WorktopError)
+		}
+
+		case applicationError(ApplicationError)
+		case unknown
+	}
+}
+
+/// Rudimentary parser combinator algo
+extension TXFailureStatus.Reason {
+	public init(_ rawError: String?) {
+		guard let rawError else {
+			self = .unknown
+			return
+		}
+
+		let components = rawError.components(separatedBy: CharacterSet(charactersIn: "()"))
+			.flatMap { $0.split(separator: " ") }
+			.map(String.init)
+
+		switch components.first {
+		case "ApplicationError":
+			guard let wrappedCase = ApplicationError(components.dropFirst()) else {
+				self = .unknown
+				return
+			}
+			self = .applicationError(wrappedCase)
+		default:
+			self = .unknown
+		}
+	}
+}
+
+extension TXFailureStatus.Reason.ApplicationError {
+	init?(_ rawErrorComponents: ArraySlice<String>) {
+		guard let firstComponent = rawErrorComponents.first else {
+			return nil
+		}
+
+		switch firstComponent {
+		case "WorktopError":
+			guard let wrappedCase = WorktopError(rawErrorComponents.dropFirst()) else {
+				return nil
+			}
+			self = .worktopError(wrappedCase)
+		default:
+			return nil
+		}
+	}
+}
+
+extension TXFailureStatus.Reason.ApplicationError.WorktopError {
+	init?(_ rawErrorComponents: ArraySlice<String>) {
+		guard let firstComponent = rawErrorComponents.first else {
+			return nil
+		}
+
+		switch firstComponent {
+		case "AssertionFailed":
+			self = .assertionFailed
+		default:
+			return nil
 		}
 	}
 }
