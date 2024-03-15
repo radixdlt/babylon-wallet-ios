@@ -40,7 +40,7 @@ extension TransactionHistory {
 						.padding(.bottom, .small1)
 						.background(.app.white)
 
-						TransactionsTableView(sections: viewStore.sections.elements) { action in
+						TransactionsTableView(sections: viewStore.sections.elements, transaction: viewStore.transactionToScrollTo) { action in
 							store.send(.view(.transactionsTableAction(action)))
 						}
 					}
@@ -562,6 +562,7 @@ extension TransactionHistory {
 extension TransactionHistory {
 	public struct TransactionsTableView: UIViewRepresentable {
 		public enum Action: Hashable, Sendable {
+			case transactionTapped(TXID)
 			case scrolledPastTop
 			case nearingTop
 			case nearingBottom
@@ -571,15 +572,14 @@ extension TransactionHistory {
 		private static let cellIdentifier = "TransactionCell"
 
 		let sections: [TransactionSection]
+		let transaction: TXID?
 		let action: (Action) -> Void
 
 		public func makeUIView(context: Context) -> UITableView {
 			let tableView = UITableView(frame: .zero, style: .plain)
 			tableView.backgroundColor = .clear
 			tableView.separatorStyle = .none
-
 			tableView.register(UITableViewCell.self, forCellReuseIdentifier: Self.cellIdentifier)
-
 			tableView.delegate = context.coordinator
 			tableView.dataSource = context.coordinator
 			tableView.sectionHeaderTopPadding = 0
@@ -590,6 +590,18 @@ extension TransactionHistory {
 		public func updateUIView(_ uiView: UITableView, context: Context) {
 			context.coordinator.sections = sections
 			uiView.reloadData()
+			print("•• Update view")
+
+			if let transaction, transaction != context.coordinator.scrolledToTransaction {
+				for (index, section) in sections.enumerated() {
+					if let row = section.transactions.ids.firstIndex(of: transaction) {
+						uiView.scrollToRow(at: .init(row: row, section: index), at: .top, animated: true)
+						print("••• will scroll")
+					}
+				}
+			}
+
+			context.coordinator.scrolledToTransaction = transaction
 		}
 
 		public func makeCoordinator() -> Coordinator {
@@ -608,6 +620,8 @@ extension TransactionHistory {
 
 			private var scrolling: (direction: ScrollDirection, count: Int) = (.down, 0)
 
+			var scrolledToTransaction: TXID? = nil
+
 			public init(
 				_ sections: [TransactionHistory.TransactionSection],
 				action: @escaping (Action) -> Void
@@ -620,21 +634,6 @@ extension TransactionHistory {
 				sections.count
 			}
 
-			public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-				sections[section].transactions.count
-			}
-
-			public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-				let cell = tableView.dequeueReusableCell(withIdentifier: TransactionsTableView.cellIdentifier, for: indexPath)
-				let item = sections[indexPath.section].transactions[indexPath.row]
-
-				cell.backgroundColor = .clear
-				cell.contentConfiguration = UIHostingConfiguration {
-					TransactionHistory.TransactionView(transaction: item)
-				}
-				return cell
-			}
-
 			public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
 				let section = sections[section]
 
@@ -644,6 +643,27 @@ extension TransactionHistory {
 				hostingController.view.sizeToFit()
 
 				return hostingController.view
+			}
+
+			public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+				sections[section].transactions.count
+			}
+
+			public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+				let cell = tableView.dequeueReusableCell(withIdentifier: TransactionsTableView.cellIdentifier, for: indexPath)
+				let item = sections[indexPath.section].transactions[indexPath.row]
+
+				cell.backgroundColor = .clear
+				cell.contentConfiguration = UIHostingConfiguration { [weak self] in
+					Button {
+						self?.action(.transactionTapped(item.id))
+					} label: {
+						TransactionHistory.TransactionView(transaction: item)
+					}
+				}
+				cell.selectionStyle = .none
+
+				return cell
 			}
 
 			public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -672,6 +692,11 @@ extension TransactionHistory {
 				}
 			}
 
+			public func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+				nil
+			}
+
+//
 			// UIScrollViewDelegate
 
 			public func scrollViewDidScroll(_ scrollView: UIScrollView) {

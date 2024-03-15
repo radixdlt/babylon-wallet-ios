@@ -29,6 +29,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		/// Workaround, TCA sends the sectionDisappeared after we dismiss, causing a run-time warning
 		var didDismiss: Bool = false
 
+		var transactionToScrollTo: TXID? = nil
+
 		struct Loading: Hashable, Sendable {
 			let parameters: TransactionHistoryParameters
 			var isLoading: Bool = false
@@ -66,7 +68,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Hashable {
 		case onAppear
 		case selectedMonth(DateRangeItem.ID)
-		case transactionTapped(TXID)
 		case filtersTapped
 		case filterCrossTapped(TransactionFilter)
 		case transactionsTableAction(TransactionsTableView.Action)
@@ -125,13 +126,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case .onAppear:
 			return loadHistory(period: .babylonLaunch ..< .now, state: &state)
 
-		case let .transactionTapped(txid):
-			let path = "transaction/\(txid.asStr())/summary"
-			let url = Radix.Dashboard.dashboard(forNetworkID: state.account.networkID).url.appending(path: path)
-			return .run { _ in
-				await openURL(url)
-			}
-
 		case let .selectedMonth(month):
 			let calendar: Calendar = .current
 			guard let endOfMonth = calendar.date(byAdding: .month, value: 1, to: month) else { return .none }
@@ -140,7 +134,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			return loadHistory(period: period, state: &state)
 
 		case .filtersTapped:
-			state.destination = .filters(.init(portfolio: state.portfolio, filters: state.activeFilters.map(\.id)))
+//			state.destination = .filters(.init(portfolio: state.portfolio, filters: state.activeFilters.map(\.id)))
 			return .none
 
 		case let .filterCrossTapped(id):
@@ -164,6 +158,13 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 			case let .monthChanged(month):
 				state.currentMonth = month
+
+			case let .transactionTapped(txid):
+				let path = "transaction/\(txid.asStr())/summary"
+				let url = Radix.Dashboard.dashboard(forNetworkID: state.account.networkID).url.appending(path: path)
+				return .run { _ in
+					await openURL(url)
+				}
 			}
 
 			return .none
