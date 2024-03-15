@@ -40,7 +40,7 @@ extension TransactionHistory {
 						.padding(.bottom, .small1)
 						.background(.app.white)
 
-						TransactionsTableView(sections: viewStore.sections.elements) { action in
+						TransactionsTableView(sections: viewStore.sections.elements, transaction: viewStore.transactionToScrollTo) { action in
 							store.send(.view(.transactionsTableAction(action)))
 						}
 					}
@@ -572,15 +572,14 @@ extension TransactionHistory {
 		private static let cellIdentifier = "TransactionCell"
 
 		let sections: [TransactionSection]
+		let transaction: TXID?
 		let action: (Action) -> Void
 
 		public func makeUIView(context: Context) -> UITableView {
 			let tableView = UITableView(frame: .zero, style: .plain)
 			tableView.backgroundColor = .clear
 			tableView.separatorStyle = .none
-
 			tableView.register(UITableViewCell.self, forCellReuseIdentifier: Self.cellIdentifier)
-
 			tableView.delegate = context.coordinator
 			tableView.dataSource = context.coordinator
 			tableView.sectionHeaderTopPadding = 0
@@ -591,6 +590,17 @@ extension TransactionHistory {
 		public func updateUIView(_ uiView: UITableView, context: Context) {
 			context.coordinator.sections = sections
 			uiView.reloadData()
+
+			if let transaction, transaction != context.coordinator.scrolledToTransaction {
+				for (index, section) in sections.enumerated() {
+					if let row = section.transactions.ids.firstIndex(of: transaction) {
+						uiView.scrollToRow(at: .init(row: row, section: index), at: .top, animated: true)
+						print("••• will scroll")
+					}
+				}
+			}
+
+			context.coordinator.scrolledToTransaction = transaction
 		}
 
 		public func makeCoordinator() -> Coordinator {
@@ -608,6 +618,8 @@ extension TransactionHistory {
 			private var month: Date = .distantPast
 
 			private var scrolling: (direction: ScrollDirection, count: Int) = (.down, 0)
+
+			var scrolledToTransaction: TXID? = nil
 
 			public init(
 				_ sections: [TransactionHistory.TransactionSection],
