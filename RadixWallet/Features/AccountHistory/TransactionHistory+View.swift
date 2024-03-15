@@ -40,8 +40,8 @@ extension TransactionHistory {
 						.padding(.bottom, .small1)
 						.background(.app.white)
 
-						TransactionsTableView(sections: viewStore.sections.elements) { txid, direction in
-							store.send(.view(.transactionWillAppear(txid, direction)))
+						TransactionsTableView(sections: viewStore.sections.elements) { action in
+							store.send(.view(.transactionsTableAction(action)))
 						}
 					}
 					.background {
@@ -81,7 +81,7 @@ extension TransactionHistory {
 	}
 
 	struct SectionView: SwiftUI.View {
-		let section: TransactionHistory.State.TransactionSection
+		let section: TransactionHistory.TransactionSection
 		let onTap: (TXID) -> Void
 
 		var body: some SwiftUI.View {
@@ -503,7 +503,7 @@ private enum PositionsPreferenceKey: PreferenceKey {
 	}
 }
 
-extension TransactionHistory.State.TransactionSection {
+extension TransactionHistory.TransactionSection {
 	var title: String {
 		day.formatted(date: .abbreviated, time: .omitted)
 	}
@@ -561,16 +561,17 @@ extension TransactionHistory {
 // MARK: - TransactionHistory.TransactionsTableView
 extension TransactionHistory {
 	public struct TransactionsTableView: UIViewRepresentable {
-		public struct Update: Hashable, Sendable {
-			let transactionToAppear: TXID
-			let scrollDirection: ScrollDirection
-			let visibleCells: [TXID]
+		public enum Action: Hashable, Sendable {
+			case scrolledPastTop
+			case nearingTop
+			case nearingBottom
+			case monthChanged(Date)
 		}
 
 		private static let cellIdentifier = "TransactionCell"
 
-		let sections: [TransactionHistory.State.TransactionSection]
-		let action: (TXID, ScrollDirection, _ visible: [TXID]) -> Void
+		let sections: [TransactionSection]
+		let action: (Action) -> Void
 
 		public func makeUIView(context: Context) -> UITableView {
 			let tableView = UITableView(frame: .zero, style: .plain)
@@ -592,26 +593,28 @@ extension TransactionHistory {
 		}
 
 		public func makeCoordinator() -> Coordinator {
-			Coordinator(sections) { _, _ in
-//				onTransactionWillAppear(txid, direction, )
-			}
+			Coordinator(sections, action: action)
 		}
 
 		public class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
-			var sections: [TransactionHistory.State.TransactionSection]
-			let onTransactionWillAppear: (TXID, ScrollDirection) -> Void
+			var sections: [TransactionHistory.TransactionSection]
+			let action: (Action) -> Void
+
+			private var isScrolledPastTop: Bool = false
+
+			private var previousCell: IndexPath = .init(row: 0, section: 0)
+
+			private var month: Date = .distantPast
+
+			private var scrolling: (direction: ScrollDirection, count: Int) = (.down, 0)
 
 			public init(
-				_ sections: [TransactionHistory.State.TransactionSection],
-				onTransactionWillAppear: @escaping (TXID, ScrollDirection) -> Void
+				_ sections: [TransactionHistory.TransactionSection],
+				action: @escaping (Action) -> Void
 			) {
 				self.sections = sections
-				self.onTransactionWillAppear = onTransactionWillAppear
+				self.action = action
 			}
-
-			// UIScrollViewDelegate
-
-			public func scrollViewDidScroll(_ scrollView: UIScrollView) {}
 
 			public func numberOfSections(in tableView: UITableView) -> Int {
 				sections.count
@@ -648,14 +651,59 @@ extension TransactionHistory {
 			}
 
 			public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-				print("• willDisplay cell \(indexPath.section):\(indexPath.row) \(sections[indexPath.section].transactions[indexPath.row].time.formatted(date: .abbreviated, time: .shortened)) \(indexPath > previousCell ? "down" : "up")")
-				let direction: ScrollDirection = indexPath > previousCell ? .down : .up
-				let txid = sections[indexPath.section].transactions[indexPath.row].id
+				let section = sections[indexPath.section]
+				let txID = section.transactions[indexPath.row].id
+				let scrollDirection: ScrollDirection = indexPath > previousCell ? .down : .up
+				if scrollDirection == scrolling.direction {
+					scrolling.count += 1
+				} else {
+					scrolling = (scrollDirection, 0)
+				}
 				previousCell = indexPath
-				onTransactionWillAppear(txid, direction)
+
+				if scrolling.count > 8 {
+					if scrolling.direction == .down, bottomTransactions.contains(txID) {
+						action(.nearingBottom)
+						scrolling.count = 0
+					} else if scrollDirection == .up, topTransactions.contains(txID) {
+						action(.nearingTop)
+						scrolling.count = 0
+					}
+				}
 			}
 
-			var previousCell: IndexPath = .init(row: 0, section: 0)
+			// UIScrollViewDelegate
+
+			public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+				if let tableView = scrollView as? UITableView {
+					updateMonth(tableView: tableView)
+				}
+
+				if scrollView.contentOffset.y < -30, !isScrolledPastTop {
+					action(.scrolledPastTop)
+					isScrolledPastTop = true
+				} else if isScrolledPastTop, scrollView.contentOffset.y >= 0 {
+					isScrolledPastTop = false
+				}
+			}
+
+			// Helpers
+
+			private func updateMonth(tableView: UITableView) {
+				guard let topMost = tableView.indexPathsForVisibleRows?.first else { return }
+				let newMonth = sections[topMost.section].month
+				guard newMonth != month else { return }
+				action(.monthChanged(newMonth))
+				month = newMonth
+			}
+
+			private var topTransactions: some Collection<TXID> {
+				sections.prefix(7).flatMap(\.transactions.ids).prefix(7)
+			}
+
+			private var bottomTransactions: [TXID] {
+				sections.suffix(15).flatMap(\.transactions.ids).suffix(15)
+			}
 		}
 	}
 }

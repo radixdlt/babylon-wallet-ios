@@ -32,12 +32,12 @@ public struct TransactionHistoryResponse: Sendable, Hashable {
 // MARK: - TransactionHistoryParameters
 public struct TransactionHistoryParameters: Sendable, Hashable {
 	public let period: Range<Date>
-	public let backwards: Bool
+	public let downwards: Bool
 	public let filters: [TransactionFilter]
 
-	public init(period: Range<Date>, backwards: Bool = true, filters: [TransactionFilter] = []) {
+	public init(period: Range<Date>, downwards: Bool = true, filters: [TransactionFilter] = []) {
 		self.period = period
-		self.backwards = backwards
+		self.downwards = downwards
 		self.filters = filters
 	}
 
