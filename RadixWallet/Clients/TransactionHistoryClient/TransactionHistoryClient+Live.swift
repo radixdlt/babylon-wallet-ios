@@ -7,6 +7,9 @@ extension TransactionHistoryClient {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
+		struct CorruptTimestamp: Error { let roundTimestamd: String }
+		struct MissingIntentHash: Error {}
+
 		@Sendable
 		func getTransactionHistory(_ request: TransactionHistoryRequest) async throws -> TransactionHistoryResponse {
 			let response = try await gatewayAPIClient.streamTransactions(request.gatewayRequest)
@@ -57,24 +60,27 @@ extension TransactionHistoryClient {
 				}
 			}
 
-			let dateformatter1 = ISO8601DateFormatter()
-			dateformatter1.formatOptions.insert(.withFractionalSeconds)
-			let dateformatter2 = ISO8601DateFormatter()
+			let dateFormatter = TimestampFormatter()
 
 			func transaction(for info: GatewayAPI.CommittedTransactionInfo) async throws -> TransactionHistoryItem {
-				let time = dateformatter1.date(from: info.roundTimestamp)
-					?? dateformatter2.date(from: info.roundTimestamp)
-					?? info.confirmedAt
-
-				guard let time else {
-					struct CorruptTimestamp: Error { let roundTimestamd: String }
+				guard let time = dateFormatter.date(from: info.roundTimestamp) ?? info.confirmedAt else {
 					throw CorruptTimestamp(roundTimestamd: info.roundTimestamp)
 				}
+				guard let hash = info.intentHash else {
+					throw MissingIntentHash()
+				}
+
+				let txid = try TXID.fromStr(string: hash, networkId: networkID.rawValue)
 
 				let manifestClass = info.manifestClasses?.first
 
 				guard info.receipt?.status == .committedSuccess else {
-					return .failed(at: time, manifestClass: manifestClass)
+					return .init(
+						id: txid,
+						time: time,
+						manifestClass: manifestClass,
+						failed: true
+					)
 				}
 
 				let message = info.message?.plaintext?.content.string
@@ -120,6 +126,7 @@ extension TransactionHistoryClient {
 				let depositSettingsUpdated = info.manifestClasses?.contains(.accountDepositSettingsUpdate) == true
 
 				return .init(
+					id: txid,
 					time: time,
 					message: message,
 					manifestClass: manifestClass,
@@ -137,7 +144,7 @@ extension TransactionHistoryClient {
 				items.append(transactionItem)
 			}
 
-			if !request.parameters.backwards {
+			if !request.parameters.downwards {
 				items.reverse()
 			}
 
@@ -181,19 +188,18 @@ extension TransactionHistoryClient {
 			.map(nonFungibleLocalIdFromStr)
 			.map { try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress, nonFungibleLocalId: $0) }
 	}
-}
 
-extension TransactionHistoryItem {
-	static func failed(at time: Date, manifestClass: GatewayAPI.ManifestClass?) -> Self {
-		.init(
-			time: time,
-			message: nil,
-			manifestClass: manifestClass,
-			withdrawals: [],
-			deposits: [],
-			depositSettingsUpdated: false,
-			failed: true
-		)
+	struct TimestampFormatter {
+		let formatter = ISO8601DateFormatter()
+		let fractionalFormatter = ISO8601DateFormatter()
+
+		init() {
+			self.fractionalFormatter.formatOptions.insert(.withFractionalSeconds)
+		}
+
+		func date(from string: String) -> Date? {
+			formatter.date(from: string) ?? fractionalFormatter.date(from: string)
+		}
 	}
 }
 
@@ -203,12 +209,12 @@ extension TransactionHistoryRequest {
 			atLedgerState: .init(timestamp: parameters.period.upperBound),
 			fromLedgerState: .init(timestamp: parameters.period.lowerBound),
 			cursor: cursor,
-			limitPerPage: 20,
+			limitPerPage: 25,
 			manifestResourcesFilter: manifestResourcesFilter(parameters.filters),
 			affectedGlobalEntitiesFilter: [account.address],
 			eventsFilter: eventsFilter(parameters.filters, account: account),
 			manifestClassFilter: manifestClassFilter(parameters.filters),
-			order: parameters.backwards ? .desc : .asc,
+			order: parameters.downwards ? .desc : .asc,
 			optIns: .init(balanceChanges: true)
 		)
 	}

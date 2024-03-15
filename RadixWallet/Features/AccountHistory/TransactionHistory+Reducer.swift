@@ -20,9 +20,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		var sections: IdentifiedArrayOf<TransactionSection> = []
 
-		/// Used to accurately control the current month
-		var visibleSections: OrderedSet<TransactionSection.ID> = []
-
 		/// The currently selected month
 		var currentMonth: DateRangeItem.ID
 
@@ -31,6 +28,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		/// Workaround, TCA sends the sectionDisappeared after we dismiss, causing a run-time warning
 		var didDismiss: Bool = false
+
+		var transactionToScrollTo: TXID? = nil
 
 		struct Loading: Hashable, Sendable {
 			let parameters: TransactionHistoryParameters
@@ -55,15 +54,15 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			self.portfolio = portfolio.account
 			self.currentMonth = .distantFuture
 		}
+	}
 
-		public struct TransactionSection: Sendable, Hashable, Identifiable {
-			public var id: Tagged<Self, Date> { .init(day) }
-			/// The day, in the form of a `Date` with all time components set to 0
-			let day: Date
-			/// The month, in the form of a `Date` with all time components set to 0 and the day set to 1
-			let month: Date
-			var transactions: [TransactionHistoryItem]
-		}
+	public struct TransactionSection: Sendable, Hashable, Identifiable {
+		public var id: Tagged<Self, Date> { .init(day) }
+		/// The day, in the form of a `Date` with all time components set to 0
+		let day: Date
+		/// The month, in the form of a `Date` with all time components set to 0 and the day set to 1
+		let month: Date
+		var transactions: IdentifiedArrayOf<TransactionHistoryItem>
 	}
 
 	public enum ViewAction: Sendable, Hashable {
@@ -71,16 +70,19 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case selectedMonth(DateRangeItem.ID)
 		case filtersTapped
 		case filterCrossTapped(TransactionFilter)
-		case closeTapped
-
-		case sectionAppeared(State.TransactionSection.ID)
-		case sectionDisappeared(State.TransactionSection.ID)
+		case transactionsTableAction(TransactionsTableView.Action)
 
 		case pulledDown
+		case closeTapped
 	}
 
 	public enum InternalAction: Sendable, Hashable {
 		case loadedHistory(TransactionHistoryResponse)
+	}
+
+	public enum ScrollDirection: Sendable {
+		case up
+		case down
 	}
 
 	public struct Destination: DestinationReducer {
@@ -132,7 +134,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			return loadHistory(period: period, state: &state)
 
 		case .filtersTapped:
-			state.destination = .filters(.init(portfolio: state.portfolio, filters: state.activeFilters.map(\.id)))
+//			state.destination = .filters(.init(portfolio: state.portfolio, filters: state.activeFilters.map(\.id)))
 			return .none
 
 		case let .filterCrossTapped(id):
@@ -143,30 +145,37 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			state.didDismiss = true
 			return .run { _ in await dismiss() }
 
-		case let .sectionAppeared(id):
-			state.visibleSections.remove(id)
-			state.visibleSections.append(id)
-			state.visibleSectionsChanged()
+		case let .transactionsTableAction(action):
+			switch action {
+			case .scrolledPastTop:
+				print("• ACTION scrolledPastTop")
 
-			if state.sections.suffix(2).map(\.id).contains(id) {
+			case .nearingTop:
+				print("• ACTION nearingTop")
+
+			case .nearingBottom:
 				return loadMoreHistory(state: &state)
+
+			case let .monthChanged(month):
+				state.currentMonth = month
+
+			case let .transactionTapped(txid):
+				let path = "transaction/\(txid.asStr())/summary"
+				let url = Radix.Dashboard.dashboard(forNetworkID: state.account.networkID).url.appending(path: path)
+				return .run { _ in
+					await openURL(url)
+				}
 			}
-
-			return .none
-
-		case let .sectionDisappeared(id):
-			state.visibleSections.remove(id)
-			state.visibleSectionsChanged()
 
 			return .none
 
 		case .pulledDown:
 			guard !state.loading.isLoading else { return .none }
-			if state.loading.parameters.backwards {
+			if state.loading.parameters.downwards {
 				// If we are at the end of the period, we can't load more
 				guard state.currentMonth != state.availableMonths.last?.id else { return .none }
 				guard let loadedRange = state.loadedRange else { return .none }
-				return loadHistory(period: loadedRange.upperBound ..< .now, backwards: false, state: &state)
+				return loadHistory(period: loadedRange.upperBound ..< .now, downwards: false, state: &state)
 			} else {
 				return loadMoreHistory(state: &state)
 			}
@@ -198,10 +207,10 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	// Helper methods
 
 	/// Load history for the given period, using existing filters
-	func loadHistory(period: Range<Date>, backwards: Bool = true, state: inout State) -> Effect<Action> {
+	func loadHistory(period: Range<Date>, downwards: Bool = true, state: inout State) -> Effect<Action> {
 		let parameters = TransactionHistoryParameters(
 			period: period,
-			backwards: backwards,
+			downwards: downwards,
 			filters: state.loading.parameters.filters
 		)
 		return loadHistory(parameters: parameters, state: &state)
@@ -211,7 +220,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	func loadHistory(filters: [TransactionFilter], state: inout State) -> Effect<Action> {
 		let parameters = TransactionHistoryParameters(
 			period: state.loading.parameters.period,
-			backwards: true,
+			downwards: true,
 			filters: filters
 		)
 		return loadHistory(parameters: parameters, state: &state)
@@ -261,7 +270,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 				state.loading.didLoadFully = true
 			}
 
-			state.sections.addItems(response.items, backwards: response.parameters.backwards)
+			state.sections.addItems(response.items, downwards: response.parameters.downwards)
 		} else {
 			state.loading = .init(parameters: response.parameters, nextCursor: response.nextCursor)
 			state.sections.replaceItems(response.items)
@@ -271,8 +280,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 }
 
-// MARK: - TransactionHistory.State.TransactionSection + CustomStringConvertible
-extension TransactionHistory.State.TransactionSection: CustomStringConvertible {
+// MARK: - TransactionHistory.TransactionSection + CustomStringConvertible
+extension TransactionHistory.TransactionSection: CustomStringConvertible {
 	public var description: String {
 		"Section(\(id.rawValue.formatted(date: .numeric, time: .omitted))): \(transactions.count) transactions"
 	}
@@ -284,12 +293,6 @@ extension TransactionHistory.State {
 			return nil
 		}
 		return last ..< first
-	}
-
-	mutating func visibleSectionsChanged() {
-		if let latest = visibleSections.last, let section = sections[id: latest] {
-			currentMonth = section.month
-		}
 	}
 }
 
@@ -305,11 +308,11 @@ extension Range<Date> {
 	}
 }
 
-extension IdentifiedArrayOf<TransactionHistory.State.TransactionSection> {
-	mutating func addItems(_ items: some Collection<TransactionHistoryItem>, backwards: Bool) {
+extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
+	mutating func addItems(_ items: some Collection<TransactionHistoryItem>, downwards: Bool) {
 		let newSections = items.inSections
 
-		if backwards {
+		if downwards {
 			for newSection in newSections {
 				if last?.id == newSection.id {
 					self[id: newSection.id]?.transactions.append(contentsOf: newSection.transactions)
@@ -334,10 +337,10 @@ extension IdentifiedArrayOf<TransactionHistory.State.TransactionSection> {
 }
 
 extension Collection<TransactionHistoryItem> {
-	var inSections: [TransactionHistory.State.TransactionSection] {
+	var inSections: [TransactionHistory.TransactionSection] {
 		let calendar: Calendar = .current
 
-		var result: [TransactionHistory.State.TransactionSection] = []
+		var result: [TransactionHistory.TransactionSection] = []
 
 		for transaction in self {
 			let day = calendar.startOfDay(for: transaction.time)
