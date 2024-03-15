@@ -35,9 +35,11 @@ extension Home {
 
 						if let fiatWorth = viewStore.totalFiatWorth {
 							VStack(spacing: .small2) {
-								Text("TOTAL VALUE")
+								Text(L10n.HomePage.totalValue)
 									.foregroundStyle(.app.gray2)
 									.textStyle(.body1Header)
+									.textCase(.uppercase)
+
 								TotalCurrencyWorthView(
 									state: .init(totalCurrencyWorth: fiatWorth),
 									backgroundColor: .app.gray4
