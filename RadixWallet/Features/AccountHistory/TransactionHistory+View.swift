@@ -40,7 +40,7 @@ extension TransactionHistory {
 						.padding(.bottom, .small1)
 						.background(.app.white)
 
-						TransactionsTableView(sections: viewStore.sections.elements, transaction: viewStore.transactionToScrollTo) { action in
+						TransactionsTableView(sections: viewStore.sections) { action in
 							store.send(.view(.transactionsTableAction(action)))
 						}
 					}
@@ -563,7 +563,7 @@ extension TransactionHistory {
 	public struct TransactionsTableView: UIViewRepresentable {
 		public enum Action: Hashable, Sendable {
 			case transactionTapped(TXID)
-			case scrolledPastTop
+			case pulledDown
 			case nearingTop
 			case nearingBottom
 			case monthChanged(Date)
@@ -571,8 +571,7 @@ extension TransactionHistory {
 
 		private static let cellIdentifier = "TransactionCell"
 
-		let sections: [TransactionSection]
-		let transaction: TXID?
+		let sections: IdentifiedArrayOf<TransactionSection>
 		let action: (Action) -> Void
 
 		public func makeUIView(context: Context) -> UITableView {
@@ -590,25 +589,14 @@ extension TransactionHistory {
 		public func updateUIView(_ uiView: UITableView, context: Context) {
 			context.coordinator.sections = sections
 			uiView.reloadData()
-
-			if let transaction, transaction != context.coordinator.scrolledToTransaction {
-				for (index, section) in sections.enumerated() {
-					if let row = section.transactions.ids.firstIndex(of: transaction) {
-						uiView.scrollToRow(at: .init(row: row, section: index), at: .top, animated: true)
-						print("••• will scroll")
-					}
-				}
-			}
-
-			context.coordinator.scrolledToTransaction = transaction
 		}
 
 		public func makeCoordinator() -> Coordinator {
-			Coordinator(sections, action: action)
+			Coordinator(sections: sections, action: action)
 		}
 
 		public class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
-			var sections: [TransactionHistory.TransactionSection]
+			var sections: IdentifiedArrayOf<TransactionSection>
 			let action: (Action) -> Void
 
 			private var isScrolledPastTop: Bool = false
@@ -622,7 +610,7 @@ extension TransactionHistory {
 			var scrolledToTransaction: TXID? = nil
 
 			public init(
-				_ sections: [TransactionHistory.TransactionSection],
+				sections: IdentifiedArrayOf<TransactionSection>,
 				action: @escaping (Action) -> Void
 			) {
 				self.sections = sections
@@ -703,7 +691,7 @@ extension TransactionHistory {
 				}
 
 				if scrollView.contentOffset.y < -30, !isScrolledPastTop {
-					action(.scrolledPastTop)
+					action(.pulledDown)
 					isScrolledPastTop = true
 				} else if isScrolledPastTop, scrollView.contentOffset.y >= 0 {
 					isScrolledPastTop = false

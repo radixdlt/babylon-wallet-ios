@@ -71,8 +71,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case filtersTapped
 		case filterCrossTapped(TransactionFilter)
 		case transactionsTableAction(TransactionsTableView.Action)
-
-		case pulledDown
 		case closeTapped
 	}
 
@@ -147,8 +145,21 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		case let .transactionsTableAction(action):
 			switch action {
-			case .scrolledPastTop:
+			case .pulledDown:
 				print("• ACTION scrolledPastTop")
+
+				guard !state.loading.isLoading else { return .none }
+				if state.loading.parameters.downwards {
+					print("• switching to upwards")
+
+					// If we are at the end of the period, we can't load more
+					guard state.currentMonth != state.availableMonths.last?.id else { return .none }
+					guard let loadedRange = state.loadedRange else { return .none }
+					return loadHistory(period: loadedRange.upperBound ..< .now, downwards: false, state: &state)
+				} else {
+					print("• keep going upwards")
+					return loadMoreHistory(state: &state)
+				}
 
 			case .nearingTop:
 				print("• ACTION nearingTop")
@@ -168,17 +179,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			}
 
 			return .none
-
-		case .pulledDown:
-			guard !state.loading.isLoading else { return .none }
-			if state.loading.parameters.downwards {
-				// If we are at the end of the period, we can't load more
-				guard state.currentMonth != state.availableMonths.last?.id else { return .none }
-				guard let loadedRange = state.loadedRange else { return .none }
-				return loadHistory(period: loadedRange.upperBound ..< .now, downwards: false, state: &state)
-			} else {
-				return loadMoreHistory(state: &state)
-			}
 		}
 	}
 
