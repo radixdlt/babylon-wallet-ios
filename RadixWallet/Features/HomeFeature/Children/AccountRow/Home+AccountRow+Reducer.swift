@@ -8,13 +8,16 @@ extension Home {
 			public var id: AccountAddress { account.address }
 			public var accountWithInfo: AccountWithInfo
 
-			public var portfolio: Loadable<OnLedgerEntity.Account>
+			public var portfolio: Loadable<AccountPortfoliosClient.AccountPortfolio>
+			public var showFiatWorth: Bool = true
+			public var totalFiatWorth: Loadable<FiatWorth>
 
 			public init(
 				account: Profile.Network.Account
 			) {
 				self.accountWithInfo = .init(account: account)
 				self.portfolio = .loading
+				self.totalFiatWorth = .loading
 			}
 		}
 
@@ -26,7 +29,7 @@ extension Home {
 		}
 
 		public enum InternalAction: Sendable, Equatable {
-			case accountPortfolioUpdate(OnLedgerEntity.Account)
+			case accountPortfolioUpdate(AccountPortfoliosClient.AccountPortfolio)
 			case checkAccountAccessToMnemonic
 		}
 
@@ -55,7 +58,7 @@ extension Home {
 						guard !Task.isCancelled else {
 							return
 						}
-						await send(.internal(.accountPortfolioUpdate(accountPortfolio.nonEmptyVaults)))
+						await send(.internal(.accountPortfolioUpdate(accountPortfolio)))
 					}
 				}
 			case .exportMnemonicButtonTapped:
@@ -72,11 +75,12 @@ extension Home {
 		public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 			switch internalAction {
 			case let .accountPortfolioUpdate(portfolio):
-				state.isDappDefinitionAccount = portfolio.metadata.accountType == .dappDefinition
+				state.isDappDefinitionAccount = portfolio.account.metadata.accountType == .dappDefinition
 
-				assert(portfolio.address == state.account.address)
+				assert(portfolio.account.address == state.account.address)
 
 				state.portfolio = .success(portfolio)
+				state.totalFiatWorth.refresh(from: portfolio.totalFiatWorth)
 				return .send(.internal(.checkAccountAccessToMnemonic))
 
 			case .checkAccountAccessToMnemonic:
@@ -86,7 +90,7 @@ extension Home {
 		}
 
 		private func checkAccountAccessToMnemonic(state: inout State) {
-			state.checkAccountAccessToMnemonic(portfolio: state.portfolio.wrappedValue)
+			state.checkAccountAccessToMnemonic(portfolio: state.portfolio.account.wrappedValue)
 		}
 	}
 }

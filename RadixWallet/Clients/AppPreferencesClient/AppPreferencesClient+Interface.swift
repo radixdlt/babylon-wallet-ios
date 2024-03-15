@@ -1,5 +1,6 @@
 // MARK: - AppPreferencesClient
 public struct AppPreferencesClient: Sendable {
+	public var appPreferenceUpdates: AppPreferenceUpdates
 	public var getPreferences: GetPreferences
 	public var updatePreferences: UpdatePreferences
 
@@ -14,6 +15,7 @@ public struct AppPreferencesClient: Sendable {
 	public var getDetailsOfSecurityStructure: GetDetailsOfSecurityStructure
 
 	public init(
+		appPreferenceUpdates: @escaping AppPreferenceUpdates,
 		getPreferences: @escaping GetPreferences,
 		updatePreferences: @escaping UpdatePreferences,
 		extractProfileSnapshot: @escaping ExtractProfileSnapshot,
@@ -21,6 +23,7 @@ public struct AppPreferencesClient: Sendable {
 		setIsCloudProfileSyncEnabled: @escaping SetIsCloudProfileSyncEnabled,
 		getDetailsOfSecurityStructure: @escaping GetDetailsOfSecurityStructure
 	) {
+		self.appPreferenceUpdates = appPreferenceUpdates
 		self.getPreferences = getPreferences
 		self.updatePreferences = updatePreferences
 		self.extractProfileSnapshot = extractProfileSnapshot
@@ -32,6 +35,7 @@ public struct AppPreferencesClient: Sendable {
 
 // MARK: - Typealias
 extension AppPreferencesClient {
+	public typealias AppPreferenceUpdates = @Sendable () async -> AnyAsyncSequence<AppPreferences>
 	public typealias SetIsCloudProfileSyncEnabled = @Sendable (Bool) async throws -> Void
 	public typealias GetPreferences = @Sendable () async -> AppPreferences
 	public typealias UpdatePreferences = @Sendable (AppPreferences) async throws -> Void
@@ -64,6 +68,12 @@ extension AppPreferencesClient {
 
 	public func isDeveloperModeEnabled() async -> Bool {
 		await extractProfileSnapshot().appPreferences.security.isDeveloperModeEnabled
+	}
+
+	public func toggleIsCurrencyAmountVisible() async throws {
+		try await updatingDisplay { display in
+			display.isCurrencyAmountVisible.toggle()
+		}
 	}
 }
 

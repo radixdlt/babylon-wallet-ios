@@ -260,6 +260,17 @@ extension RETDecimal {
 	}
 }
 
+extension RETDecimal {
+	func asDouble() throws -> Double {
+		guard let double = Double(self.asStr()) else {
+			assertionFailure("Invalid decimal? how is it possible?")
+			struct InvalidDecimalValue: Error {}
+			throw InvalidDecimalValue()
+		}
+		return double
+	}
+}
+
 // MARK: - RETDecimal.Multiplier
 extension RETDecimal {
 	public enum Multiplier: UInt, CaseIterable {

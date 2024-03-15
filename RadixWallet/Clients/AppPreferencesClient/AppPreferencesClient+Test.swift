@@ -3,6 +3,7 @@ extension AppPreferencesClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 
 	public static let testValue = Self(
+		appPreferenceUpdates: unimplemented("\(Self.self).appPreferenceUpdates"),
 		getPreferences: unimplemented("\(Self.self).getPreferences"),
 		updatePreferences: unimplemented("\(Self.self).updatePreferences"),
 		extractProfileSnapshot: unimplemented("\(Self.self).extractProfileSnapshot"),
@@ -14,6 +15,7 @@ extension AppPreferencesClient: TestDependencyKey {
 
 extension AppPreferencesClient {
 	public static let noop = Self(
+		appPreferenceUpdates: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getPreferences: { .default },
 		updatePreferences: { _ in },
 		extractProfileSnapshot: { fatalError() },

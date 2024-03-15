@@ -6,14 +6,17 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, AccountWithInfoHolder {
 		public var accountWithInfo: AccountWithInfo
 		var assets: AssetsView.State
+		var showFiatWorth: Bool
 
 		@PresentationState
 		var destination: Destination.State?
 
 		public init(
-			accountWithInfo: AccountWithInfo
+			accountWithInfo: AccountWithInfo,
+			showFiatWorth: Bool
 		) {
 			self.accountWithInfo = accountWithInfo
+			self.showFiatWorth = showFiatWorth
 			self.assets = AssetsView.State(
 				account: accountWithInfo.account,
 				mode: .normal
@@ -30,6 +33,8 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 		case exportMnemonicButtonTapped
 		case importMnemonicButtonTapped
+
+		case showFiatWorthToggled
 	}
 
 	@CasePathable
@@ -84,6 +89,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.openURL) var openURL
+	@Dependency(\.appPreferencesClient) var appPreferencesClient
 
 	public init() {}
 
@@ -136,12 +142,17 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 		case .importMnemonicButtonTapped:
 			return .send(.delegate(.importMnemonics))
+
+		case .showFiatWorthToggled:
+			return .run { _ in
+				try await appPreferencesClient.toggleIsCurrencyAmountVisible()
+			}
 		}
 	}
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .assets(.internal(.resourcesUpdated)):
+		case .assets(.internal(.portfolioUpdated)):
 			checkAccountAccessToMnemonic(state: &state)
 			return .none
 

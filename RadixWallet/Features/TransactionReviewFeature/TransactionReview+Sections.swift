@@ -626,7 +626,7 @@ extension TransactionReview {
 
 				let details: ResourceBalance.Fungible = .init(
 					isXRD: false,
-					amount: source.amount,
+					amount: .init(nominalAmount: source.amount),
 					guarantee: nil
 				)
 

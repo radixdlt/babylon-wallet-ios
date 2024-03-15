@@ -25,8 +25,7 @@ struct ValidatorHeaderView: View {
 				}
 
 				if let stakedAmount = viewState.stakedAmount {
-					// This localization does not look right, should be only one string.
-					Text(L10n.Account.Staking.staked + " \(stakedAmount.formatted()) XRD")
+					Text(L10n.Account.Staking.currentStake("\(stakedAmount.formatted()) XRD"))
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray2)
 				}

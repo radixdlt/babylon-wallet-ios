@@ -37,7 +37,7 @@ extension TransactionClient {
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.personasClient) var personasClient
-		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		@Sendable
@@ -93,20 +93,21 @@ extension TransactionClient {
 		func getAllFeePayerCandidates(refreshingBalances: Bool) async throws -> NonEmpty<IdentifiedArrayOf<FeePayerCandidate>> {
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
-			let addresses = allAccounts.map(\.address)
-			let allFeePayerCandidates = try await accountPortfoliosClient.fetchAccountPortfolios(addresses, refreshingBalances)
-				.compactMap { portfolio -> FeePayerCandidate? in
-					guard let account = allAccounts.first(where: { account in account.address == portfolio.address }) else {
-						assertionFailure("Failed to find account or no balance, this should never happen.")
-						return nil
-					}
 
-					guard let xrdBalance = portfolio.fungibleResources.xrdResource?.amount else {
-						return nil
-					}
-
-					return FeePayerCandidate(account: account, xrdBalance: xrdBalance)
+			let allFeePayerCandidates = try await onLedgerEntitiesClient.getAccounts(allAccounts.map(\.address), cachingStrategy: .forceUpdate).compactMap { portfolio -> FeePayerCandidate? in
+				guard
+					let account = allAccounts.first(where: { account in account.address == portfolio.address })
+				else {
+					assertionFailure("Failed to find account or no balance, this should never happen.")
+					return nil
 				}
+
+				guard let xrdBalance = portfolio.fungibleResources.xrdResource?.amount else {
+					return nil
+				}
+
+				return FeePayerCandidate(account: account, xrdBalance: xrdBalance.nominalAmount)
+			}
 
 			guard let allCandidates = NonEmpty(rawValue: IdentifiedArray(uncheckedUniqueElements: allFeePayerCandidates)) else {
 				throw NoFeePayerCandidate()

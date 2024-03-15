@@ -16,7 +16,7 @@ extension ResourceBalance: Comparable {
 		case let (.fungible(lhsValue), .fungible(rhsValue)):
 			if lhs.resource.resourceAddress == rhs.resource.resourceAddress {
 				// If it's the same resource, sort by the amount
-				order(lhs: lhsValue.amount, rhs: rhsValue.amount)
+				order(lhs: lhsValue.amount.nominalAmount, rhs: rhsValue.amount.nominalAmount)
 			} else {
 				// Else sort alphabetically by title, or failing that, address
 				order(lhs: lhs.resource.metadata.name, rhs: rhs.resource.metadata.name) {
@@ -51,7 +51,7 @@ extension ResourceBalance: Comparable {
 		case let (.poolUnit(lhsValue), .poolUnit(rhsValue)):
 			if lhs.resource == rhs.resource {
 				// If it's the same resource, sort by the amount
-				order(lhs: lhsValue.details.poolUnitResource.amount, rhs: rhsValue.details.poolUnitResource.amount)
+				order(lhs: lhsValue.details.poolUnitResource.amount.nominalAmount, rhs: rhsValue.details.poolUnitResource.amount.nominalAmount)
 			} else {
 				// Else sort alphabetically by pool name, or failing that, address
 				order(lhs: lhs.resource.fungibleResourceName, rhs: rhs.resource.fungibleResourceName) {

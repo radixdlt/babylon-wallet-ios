@@ -42,14 +42,14 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		init(account: Profile.Network.Account) throws {
 			@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 
-			guard let portfolio = accountPortfoliosClient.portfolios().first(where: { $0.address == account.address }) else {
+			guard let portfolio = accountPortfoliosClient.portfolios().first(where: { $0.account.address == account.address }) else {
 				struct MissingPortfolioError: Error { let account: AccountAddress }
 				throw MissingPortfolioError(account: account.accountAddress)
 			}
 
 			self.availableMonths = try .from(.babylonLaunch)
 			self.account = account
-			self.portfolio = portfolio
+			self.portfolio = portfolio.account
 			self.currentMonth = .distantFuture
 		}
 	}
