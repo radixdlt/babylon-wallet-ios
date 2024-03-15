@@ -177,7 +177,6 @@ extension TXFailureStatus {
 	}
 }
 
-/// Rudimentary parser combinator algo
 extension TXFailureStatus.Reason {
 	public init(_ rawError: String?) {
 		guard let rawError else {
@@ -185,52 +184,10 @@ extension TXFailureStatus.Reason {
 			return
 		}
 
-		let components = rawError.components(separatedBy: CharacterSet(charactersIn: "()"))
-			.flatMap { $0.split(separator: " ") }
-			.map(String.init)
-
-		switch components.first {
-		case "ApplicationError":
-			guard let wrappedCase = ApplicationError(components.dropFirst()) else {
-				self = .unknown
-				return
-			}
-			self = .applicationError(wrappedCase)
-		default:
+		if rawError.contains("AssertionFailed") {
+			self = .applicationError(.worktopError(.assertionFailed))
+		} else {
 			self = .unknown
-		}
-	}
-}
-
-extension TXFailureStatus.Reason.ApplicationError {
-	init?(_ rawErrorComponents: ArraySlice<String>) {
-		guard let firstComponent = rawErrorComponents.first else {
-			return nil
-		}
-
-		switch firstComponent {
-		case "WorktopError":
-			guard let wrappedCase = WorktopError(rawErrorComponents.dropFirst()) else {
-				return nil
-			}
-			self = .worktopError(wrappedCase)
-		default:
-			return nil
-		}
-	}
-}
-
-extension TXFailureStatus.Reason.ApplicationError.WorktopError {
-	init?(_ rawErrorComponents: ArraySlice<String>) {
-		guard let firstComponent = rawErrorComponents.first else {
-			return nil
-		}
-
-		switch firstComponent {
-		case "AssertionFailed":
-			self = .assertionFailed
-		default:
-			return nil
 		}
 	}
 }
