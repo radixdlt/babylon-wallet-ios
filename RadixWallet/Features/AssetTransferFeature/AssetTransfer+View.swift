@@ -38,13 +38,12 @@ extension AssetTransfer.View {
 					headerView(viewStore)
 						.padding(.top, .medium3)
 
-					IfLetStore(
-						store.scope(state: \.message, action: { .child(.message($0)) }),
-						then: { AssetTransferMessage.View(store: $0) }
-					)
+					IfLetStore(store.scope(state: \.message, action: \.child.message)) {
+						AssetTransferMessage.View(store: $0)
+					}
 
 					TransferAccountList.View(
-						store: store.scope(state: \.accounts, action: { .child(.accounts($0)) })
+						store: store.scope(state: \.accounts, action: \.child.accounts)
 					)
 
 					FixedSpacer(height: .large1)
@@ -98,7 +97,7 @@ extension AssetTransfer {
 		}
 
 		public var body: some SwiftUI.View {
-			let bannerStore = store.scope(state: \.showIsUsingTestnetBanner, action: actionless)
+			let bannerStore = store.scope(state: \.showIsUsingTestnetBanner, action: \.never)
 			WithNavigationBar {
 				store.send(.view(.closeButtonTapped))
 			} content: {

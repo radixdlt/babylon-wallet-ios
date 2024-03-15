@@ -4,8 +4,11 @@ import SwiftUI
 // MARK: - PoolUnitsList
 public struct PoolUnitsList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		var poolUnits: IdentifiedArrayOf<PoolUnit.State> = []
 		let account: OnLedgerEntity.Account
+		var poolUnits: IdentifiedArrayOf<PoolUnitState>
+
+		@PresentationState
+		var destination: Destination.State?
 
 		var didLoadResource: Bool {
 			if case .success = poolUnits.first?.resourceDetails {
@@ -13,19 +16,41 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 			}
 			return false
 		}
-	}
 
-	public enum ChildAction: Sendable, Equatable {
-		case poolUnit(id: PoolUnit.State.ID, action: PoolUnit.Action)
+		public struct PoolUnitState: Sendable, Hashable, Identifiable {
+			public var id: ResourcePoolAddress { poolUnit.resourcePoolAddress }
+			public let poolUnit: OnLedgerEntity.Account.PoolUnit
+			public var resourceDetails: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails> = .idle
+			public var isSelected: Bool? = nil
+		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
 		case refresh
+		case poolUnitWasTapped(ResourcePoolAddress)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadedResources(TaskResult<[OnLedgerEntitiesClient.OwnedResourcePoolDetails]>)
+	}
+
+	public struct Destination: DestinationReducer {
+		@CasePathable
+		public enum State: Sendable, Hashable {
+			case details(PoolUnitDetails.State)
+		}
+
+		@CasePathable
+		public enum Action: Sendable, Equatable {
+			case details(PoolUnitDetails.Action)
+		}
+
+		public var body: some ReducerOf<Self> {
+			Scope(state: /State.details, action: /Action.details) {
+				PoolUnitDetails()
+			}
+		}
 	}
 
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
@@ -34,10 +59,12 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.forEach(\.poolUnits, action: /Action.child .. ChildAction.poolUnit) {
-				PoolUnit()
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
 			}
 	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -48,18 +75,29 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 			return getOwnedPoolUnitsDetails(state, cachingStrategy: .useCache)
 
 		case .refresh:
-			for unit in state.poolUnits {
-				state.poolUnits[id: unit.poolUnit.resourcePoolAddress]?.resourceDetails = .loading
+			for poolUnit in state.poolUnits {
+				state.poolUnits[id: poolUnit.id]?.resourceDetails = .loading
 			}
 			return getOwnedPoolUnitsDetails(state, cachingStrategy: .forceUpdate)
+		case let .poolUnitWasTapped(id):
+			if let isSelected = state.poolUnits[id: id]?.isSelected {
+				state.poolUnits[id: id]?.isSelected = !isSelected
+			} else {
+				guard let poolUnit = state.poolUnits[id: id], case let .success(details) = poolUnit.resourceDetails else {
+					return .none
+				}
+				state.destination = .details(.init(resourcesDetails: details))
+			}
+
+			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedResources(.success(poolDetails)):
-			for poolDetails in poolDetails {
-				state.poolUnits[id: poolDetails.address]?.resourceDetails = .success(poolDetails)
+			for details in poolDetails {
+				state.poolUnits[id: details.address]?.resourceDetails = .success(details)
 			}
 			return .none
 		case .loadedResources:

@@ -20,7 +20,7 @@ extension ResourceAsset.View {
 	public var body: some View {
 		VStack(spacing: .small3) {
 			HStack {
-				SwitchStore(store.scope(state: \.kind, action: { .child($0) })) { state in
+				SwitchStore(store.scope(state: \.kind, action: \.child)) { state in
 					switch state {
 					case .fungibleAsset:
 						CaseLet(

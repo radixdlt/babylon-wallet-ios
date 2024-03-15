@@ -25,13 +25,17 @@ public struct AssetsView: Sendable, FeatureReducer {
 			}
 		}
 
+		public struct Resources: Hashable, Sendable {
+			public var fungibleTokenList: FungibleAssetList.State?
+			public var nonFungibleTokenList: NonFungibleAssetList.State?
+			public var stakeUnitList: StakeUnitList.State?
+			public var poolUnitsList: PoolUnitsList.State?
+		}
+
 		public var activeAssetKind: AssetKind
 		public var assetKinds: NonEmpty<[AssetKind]>
 
-		public var fungibleTokenList: FungibleAssetList.State?
-		public var nonFungibleTokenList: NonFungibleAssetList.State?
-		public var stakeUnitList: StakeUnitList.State?
-		public var poolUnitsList: PoolUnitsList.State?
+		public var resources: Resources = .init()
 
 		public let account: Profile.Network.Account
 		public var isLoadingResources: Bool = false
@@ -41,10 +45,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		public init(account: Profile.Network.Account, mode: Mode = .normal) {
 			self.init(
 				account: account,
-				fungibleTokenList: nil,
-				nonFungibleTokenList: nil,
-				stakeUnitList: nil,
-				poolUnitsList: nil,
+				resources: .init(),
 				mode: mode
 			)
 		}
@@ -52,19 +53,13 @@ public struct AssetsView: Sendable, FeatureReducer {
 		init(
 			account: Profile.Network.Account,
 			assetKinds: NonEmpty<[AssetKind]> = .init(rawValue: AssetKind.allCases)!,
-			fungibleTokenList: FungibleAssetList.State?,
-			nonFungibleTokenList: NonFungibleAssetList.State?,
-			stakeUnitList: StakeUnitList.State?,
-			poolUnitsList: PoolUnitsList.State?,
+			resources: Resources,
 			mode: Mode
 		) {
 			self.account = account
 			self.assetKinds = assetKinds
 			self.activeAssetKind = assetKinds.first
-			self.fungibleTokenList = fungibleTokenList
-			self.nonFungibleTokenList = nonFungibleTokenList
-			self.stakeUnitList = stakeUnitList
-			self.poolUnitsList = poolUnitsList
+			self.resources = resources
 			self.mode = mode
 		}
 	}
@@ -77,6 +72,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		case closeButtonTapped
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case fungibleTokenList(FungibleAssetList.Action)
 		case nonFungibleTokenList(NonFungibleAssetList.Action)
@@ -85,14 +81,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		public struct ResourcesState: Sendable, Equatable {
-			public let fungibleTokenList: FungibleAssetList.State?
-			public let nonFungibleTokenList: NonFungibleAssetList.State?
-			public let stakeUnitList: StakeUnitList.State?
-			public let poolUnitsList: PoolUnitsList.State?
-		}
-
-		case resourcesStateUpdated(ResourcesState)
+		case resourcesUpdated(State.Resources)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -107,16 +96,16 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
-			.ifLet(\.fungibleTokenList, action: /Action.child .. ChildAction.fungibleTokenList) {
+			.ifLet(\.resources.fungibleTokenList, action: \.child.fungibleTokenList) {
 				FungibleAssetList()
 			}
-			.ifLet(\.nonFungibleTokenList, action: /Action.child .. ChildAction.nonFungibleTokenList) {
+			.ifLet(\.resources.nonFungibleTokenList, action: \.child.nonFungibleTokenList) {
 				NonFungibleAssetList()
 			}
-			.ifLet(\.stakeUnitList, action: /Action.child .. ChildAction.stakeUnitList) {
+			.ifLet(\.resources.stakeUnitList, action: \.child.stakeUnitList) {
 				StakeUnitList()
 			}
-			.ifLet(\.poolUnitsList, action: /Action.child .. ChildAction.poolUnitsList) {
+			.ifLet(\.resources.poolUnitsList, action: \.child.poolUnitsList) {
 				PoolUnitsList()
 			}
 	}
@@ -129,10 +118,8 @@ public struct AssetsView: Sendable, FeatureReducer {
 				for try await portfolio in await accountPortfoliosClient.portfolioForAccount(address).debounce(for: .seconds(0.1)) {
 					guard !Task.isCancelled else { return }
 
-					await send(.internal(.resourcesStateUpdated(createResourcesState(
-						from: portfolio.nonEmptyVaults,
-						mode: mode
-					)
+					await send(.internal(.resourcesUpdated(
+						createResourcesState(from: portfolio.nonEmptyVaults, mode: mode)
 					)))
 				}
 			} catch: { error, _ in
@@ -157,19 +144,15 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .resourcesStateUpdated(resourcesState):
+		case let .resourcesUpdated(resources):
 			state.isLoadingResources = false
-			state.fungibleTokenList = resourcesState.fungibleTokenList
-			state.nonFungibleTokenList = resourcesState.nonFungibleTokenList
-			state.stakeUnitList = resourcesState.stakeUnitList
-			state.poolUnitsList = resourcesState.poolUnitsList
-
+			state.resources = resources
 			state.isRefreshing = false
 
-			let shouldRefreshPoolUnitList = resourcesState.poolUnitsList != nil
+			let shouldRefreshPoolUnitList = resources.poolUnitsList != nil
 				&& (state.activeAssetKind == .poolUnits || state.isRefreshing)
 
-			let shouldRefreshStakeUnitList = resourcesState.stakeUnitList != nil
+			let shouldRefreshStakeUnitList = resources.stakeUnitList != nil
 				&& (state.activeAssetKind == .stakeUnits || state.isRefreshing)
 
 			return .run { send in
@@ -186,7 +169,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 	private func createResourcesState(
 		from portfolio: OnLedgerEntity.Account,
 		mode: State.Mode
-	) async -> InternalAction.ResourcesState {
+	) async -> State.Resources {
 		let xrd = portfolio.fungibleResources.xrdResource.map { token in
 			FungibleAssetList.Section.Row.State(
 				xrdToken: token,
@@ -212,23 +195,21 @@ public struct AssetsView: Sendable, FeatureReducer {
 		}
 
 		let poolUnitList: PoolUnitsList.State? = {
-			if !portfolio.poolUnitResources.poolUnits.isEmpty {
-				return .init(
-					poolUnits: .init(
-						uncheckedUniqueElements: portfolio.poolUnitResources.poolUnits
-							.map {
-								PoolUnit.State(
-									poolUnit: $0,
-									isSelected: mode
-										.nonXrdRowSelected($0.resource.resourceAddress)
-								)
-							}
-					),
-					account: portfolio
+			guard !portfolio.poolUnitResources.poolUnits.isEmpty else {
+				return nil
+			}
+
+			let poolUnits = portfolio.poolUnitResources.poolUnits.map {
+				PoolUnitsList.State.PoolUnitState(
+					poolUnit: $0,
+					isSelected: mode.nonXrdRowSelected($0.resource.resourceAddress)
 				)
 			}
 
-			return nil
+			return .init(
+				account: portfolio,
+				poolUnits: .init(uncheckedUniqueElements: poolUnits)
+			)
 		}()
 
 		let fungibleTokenList: FungibleAssetList.State? = {
@@ -284,24 +265,24 @@ extension AssetsView.State {
 	public var selectedAssets: Mode.SelectedAssets? {
 		guard case .selection = mode else { return nil }
 
-		let selectedLiquidStakeUnits = stakeUnitList?.selectedLiquidStakeUnits ?? []
+		let selectedLiquidStakeUnits = resources.stakeUnitList?.selectedLiquidStakeUnits ?? []
 
-		let selectedPoolUnitTokens = poolUnitsList?.poolUnits
+		let selectedPoolUnitTokens = resources.poolUnitsList?.poolUnits
 			.map(SelectedResourceProvider.init)
 			.compactMap(\.selectedResource) ?? []
 
-		let selectedXRDResource = fungibleTokenList?.sections[id: .xrd]?
+		let selectedXRDResource = resources.fungibleTokenList?.sections[id: .xrd]?
 			.rows
 			.first
 			.map(SelectedResourceProvider.init)
 			.flatMap(\.selectedResource)
 
-		let selectedNonXrdResources = fungibleTokenList?.sections[id: .nonXrd]?.rows
+		let selectedNonXrdResources = resources.fungibleTokenList?.sections[id: .nonXrd]?.rows
 			.map(SelectedResourceProvider.init)
 			.compactMap(\.selectedResource) ?? []
 
-		let selectedNonFungibleResources = nonFungibleTokenList?.rows.compactMap(NonFungibleTokensPerResourceProvider.init) ?? []
-		let selectedStakeClaims = stakeUnitList?.selectedStakeClaimTokens?.map { resource, tokens in
+		let selectedNonFungibleResources = resources.nonFungibleTokenList?.rows.compactMap(NonFungibleTokensPerResourceProvider.init) ?? []
+		let selectedStakeClaims = resources.stakeUnitList?.selectedStakeClaimTokens?.map { resource, tokens in
 			NonFungibleTokensPerResourceProvider(selectedAssets: .init(tokens), resource: resource)
 		} ?? []
 
@@ -441,7 +422,7 @@ extension SelectedResourceProvider<OnLedgerEntity.OwnedFungibleResource> {
 		)
 	}
 
-	init(with poolUnit: PoolUnit.State) {
+	init(with poolUnit: PoolUnitsList.State.PoolUnitState) {
 		self.init(
 			isSelected: poolUnit.isSelected,
 			resource: poolUnit.poolUnit.resource

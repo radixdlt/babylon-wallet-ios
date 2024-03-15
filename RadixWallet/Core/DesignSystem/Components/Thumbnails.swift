@@ -7,22 +7,12 @@ public struct Thumbnail: View {
 	private let url: URL?
 	private let size: HitTargetSize
 
-	public enum FungibleContent: Sendable, Hashable {
-		case token(TokenContent)
-		case poolUnit(URL?)
-		case lsu(URL?)
-	}
-
-	public enum TokenContent: Sendable, Hashable {
-		case xrd
-		case other(URL?)
-	}
-
 	public enum ContentType: Sendable, Hashable {
 		case token(Token)
 		case poolUnit
 		case lsu
 		case nft
+		case stakeClaimNFT
 		case persona
 		case dapp
 		case pool
@@ -31,26 +21,6 @@ public struct Thumbnail: View {
 		public enum Token: Sendable, Hashable {
 			case xrd
 			case other
-		}
-	}
-
-	public init(fungible: FungibleContent, size: HitTargetSize = .small) {
-		switch fungible {
-		case let .token(token):
-			self.init(token: token, size: size)
-		case let .poolUnit(url):
-			self.init(.poolUnit, url: url, size: size)
-		case let .lsu(url):
-			self.init(.lsu, url: url, size: size)
-		}
-	}
-
-	public init(token: TokenContent, size: HitTargetSize = .small) {
-		switch token {
-		case .xrd:
-			self.init(.token(.xrd), url: nil, size: size)
-		case let .other(url):
-			self.init(.token(.other), url: url, size: size)
 		}
 	}
 
@@ -74,6 +44,9 @@ public struct Thumbnail: View {
 			circularImage(placeholder: AssetResource.poolUnits, placeholderBackground: true)
 
 		case .nft:
+			roundedRectImage(placeholder: AssetResource.nft, placeholderBackground: true)
+
+		case .stakeClaimNFT:
 			roundedRectImage(placeholder: AssetResource.nft, placeholderBackground: true)
 
 		case .persona:
@@ -115,6 +88,80 @@ public struct Thumbnail: View {
 				}
 			}
 		}
+	}
+}
+
+extension Thumbnail {
+	public enum FungibleContent: Sendable, Hashable {
+		case token(TokenContent)
+		case poolUnit(URL?)
+		case lsu(URL?)
+
+		var url: URL? {
+			switch self {
+			case let .token(token): token.url
+			case let .poolUnit(url): url
+			case let .lsu(url): url
+			}
+		}
+
+		var type: ContentType {
+			switch self {
+			case let .token(token): token.type
+			case .poolUnit: .poolUnit
+			case .lsu: .lsu
+			}
+		}
+	}
+
+	public enum TokenContent: Sendable, Hashable {
+		case xrd
+		case other(URL?)
+
+		var url: URL? {
+			switch self {
+			case .xrd: nil
+			case let .other(url): url
+			}
+		}
+
+		var type: ContentType {
+			switch self {
+			case .xrd: .token(.xrd)
+			case .other: .token(.other)
+			}
+		}
+	}
+
+	public enum NonFungibleContent: Sendable, Hashable {
+		case nft(URL?)
+		case stakeClaimNFT(URL?)
+
+		var url: URL? {
+			switch self {
+			case let .nft(url): url
+			case let .stakeClaimNFT(url): url
+			}
+		}
+
+		var type: ContentType {
+			switch self {
+			case .nft: .nft
+			case .stakeClaimNFT: .stakeClaimNFT
+			}
+		}
+	}
+
+	public init(fungible: FungibleContent, size: HitTargetSize = .small) {
+		self.init(fungible.type, url: fungible.url, size: size)
+	}
+
+	public init(token: TokenContent, size: HitTargetSize = .small) {
+		self.init(token.type, url: token.url, size: size)
+	}
+
+	public init(nonFungible: NonFungibleContent, size: HitTargetSize = .small) {
+		self.init(nonFungible.type, url: nonFungible.url, size: size)
 	}
 }
 

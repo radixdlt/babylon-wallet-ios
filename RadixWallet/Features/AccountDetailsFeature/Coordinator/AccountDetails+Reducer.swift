@@ -53,27 +53,33 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case preferences(AccountPreferences.State)
+			case history(TransactionHistory.State)
 			case transfer(AssetTransfer.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case preferences(AccountPreferences.Action)
+			case history(TransactionHistory.Action)
 			case transfer(AssetTransfer.Action)
 		}
 
 		public var body: some Reducer<State, Action> {
-			Scope(state: /State.preferences, action: /Action.preferences) {
+			Scope(state: \.preferences, action: \.preferences) {
 				AccountPreferences()
 			}
-			Scope(state: /State.transfer, action: /Action.transfer) {
+			Scope(state: \.history, action: \.history) {
+				TransactionHistory()
+			}
+			Scope(state: \.transfer, action: \.transfer) {
 				AssetTransfer()
 			}
 		}
 	}
 
-	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
@@ -117,13 +123,13 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			return .none
 
 		case .historyButtonTapped:
-			let url = Radix.Dashboard
-				.dashboard(forNetworkID: state.account.networkID)
-				.recentTransactionsURL(state.account.address)
-
-			return .run { _ in
-				await openURL(url)
+			do {
+				state.destination = try .history(.init(account: state.account))
+			} catch {
+				errorQueue.schedule(error)
 			}
+
+			return .none
 
 		case .exportMnemonicButtonTapped:
 			return .send(.delegate(.exportMnemonic(controlling: state.account)))
@@ -135,7 +141,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case .assets(.internal(.resourcesStateUpdated)):
+		case .assets(.internal(.resourcesUpdated)):
 			checkAccountAccessToMnemonic(state: &state)
 			return .none
 
@@ -168,7 +174,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	}
 
 	private func checkAccountAccessToMnemonic(state: inout State) {
-		let xrdResource = state.assets.fungibleTokenList?.sections[id: .xrd]?.rows.first?.token
+		let xrdResource = state.assets.resources.fungibleTokenList?.sections[id: .xrd]?.rows.first?.token
 		state.checkAccountAccessToMnemonic(xrdResource: xrdResource)
 	}
 }

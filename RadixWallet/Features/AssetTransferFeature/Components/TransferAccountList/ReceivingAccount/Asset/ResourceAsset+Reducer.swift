@@ -5,6 +5,7 @@ import SwiftUI
 // Higher order reducer composing all types of assets that can be transferred
 public struct ResourceAsset: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
+		@CasePathable
 		public enum Kind: Sendable, Hashable {
 			case fungibleAsset(FungibleResourceAsset.State)
 			case nonFungibleAsset(NonFungibleResourceAsset.State)
@@ -24,6 +25,7 @@ public struct ResourceAsset: Sendable, FeatureReducer {
 		public var additionalSignatureRequired: Bool = false
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case fungibleAsset(FungibleResourceAsset.Action)
 		case nonFungibleAsset(NonFungibleResourceAsset.Action)
@@ -39,14 +41,13 @@ public struct ResourceAsset: Sendable, FeatureReducer {
 	}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.kind, action: /Action.child) {
-			EmptyReducer()
-				.ifCaseLet(/State.Kind.fungibleAsset, action: /ChildAction.fungibleAsset) {
-					FungibleResourceAsset()
-				}
-				.ifCaseLet(/State.Kind.nonFungibleAsset, action: /ChildAction.nonFungibleAsset) {
-					NonFungibleResourceAsset()
-				}
+		Scope(state: \.kind, action: \.child) {
+			Scope(state: \.fungibleAsset, action: \.fungibleAsset) {
+				FungibleResourceAsset()
+			}
+			Scope(state: \.nonFungibleAsset, action: \.nonFungibleAsset) {
+				NonFungibleResourceAsset()
+			}
 		}
 
 		Reduce(core)
