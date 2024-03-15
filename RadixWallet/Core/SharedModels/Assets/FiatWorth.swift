@@ -15,7 +15,7 @@ public struct FiatWorth: Sendable, Hashable {
 }
 
 extension FiatWorth {
-	public static func + (lhs: FiatWorth, rhs: FiatWorth) -> FiatWorth {
+	public static func + (lhs: Self, rhs: Self) -> Self {
 		.init(
 			isVisible: lhs.isVisible,
 			worth: lhs.worth + rhs.worth,
@@ -94,7 +94,7 @@ extension FiatWorth {
 		let value = worth.value ?? .zero // Zero for the unknown case, just to do to the base formatting
 
 		if value < 1 {
-			formatter.maximumFractionDigits = 10
+			formatter.maximumFractionDigits = 8
 		}
 
 		let formattedValue = {
