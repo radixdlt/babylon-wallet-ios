@@ -148,7 +148,7 @@ extension TransactionHistoryClient {
 				items.append(transactionItem)
 			}
 
-			if !request.parameters.downwards {
+			if request.parameters.direction == .up {
 				items.reverse()
 			}
 
@@ -213,12 +213,12 @@ extension TransactionHistoryRequest {
 			atLedgerState: .init(timestamp: parameters.period.upperBound),
 			fromLedgerState: .init(timestamp: parameters.period.lowerBound),
 			cursor: cursor,
-			limitPerPage: 25,
+			limitPerPage: 5,
 			manifestResourcesFilter: manifestResourcesFilter(parameters.filters),
 			affectedGlobalEntitiesFilter: [account.address],
 			eventsFilter: eventsFilter(parameters.filters, account: account),
 			manifestClassFilter: manifestClassFilter(parameters.filters),
-			order: parameters.downwards ? .desc : .asc,
+			order: parameters.direction == .down ? .desc : .asc,
 			optIns: .init(balanceChanges: true)
 		)
 	}
