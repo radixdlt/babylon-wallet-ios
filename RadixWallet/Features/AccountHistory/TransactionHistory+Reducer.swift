@@ -120,6 +120,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onAppear:
+			print("• onAppear: LOAD")
 			return loadHistory(period: .babylonLaunch ..< .now, state: &state)
 
 		case let .selectedMonth(month):
@@ -127,9 +128,26 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			guard let endOfMonth = calendar.date(byAdding: .month, value: 1, to: month) else { return .none }
 			let period: Range<Date> = .babylonLaunch ..< min(endOfMonth, .now)
 			state.currentMonth = month
+			print("• selectedMonth: LOAD period")
 			return loadHistory(period: period, state: &state)
 
 		case .filtersTapped:
+
+			// FIXME: GK REMOVE
+			guard !state.loading.isLoading else { return .none }
+			if state.loading.parameters.downwards {
+				print("• switching to upwards")
+
+				// If we are at the end of the period, we can't load more
+				guard state.currentMonth != state.availableMonths.last?.id else { print("•• can't load later tx"); return .none }
+				guard let loadedRange = state.loadedRange else { return .none }
+				print("• filtersTapped: LOAD period upwards")
+				return loadHistory(period: loadedRange.upperBound ..< .now, downwards: false, state: &state)
+			} else {
+				print("• filtersTapped: LOAD more upwards")
+				return loadMoreHistory(state: &state)
+			}
+
 			state.destination = .filters(.init(portfolio: state.portfolio, filters: state.activeFilters.map(\.id)))
 			return .none
 
@@ -145,24 +163,25 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			switch action {
 			case .pulledDown:
 				print("• ACTION scrolledPastTop")
-
-				guard !state.loading.isLoading else { return .none }
-				if state.loading.parameters.downwards {
-					print("• switching to upwards")
-
-					// If we are at the end of the period, we can't load more
-					guard state.currentMonth != state.availableMonths.last?.id else { return .none }
-					guard let loadedRange = state.loadedRange else { return .none }
-					return loadHistory(period: loadedRange.upperBound ..< .now, downwards: false, state: &state)
-				} else {
-					print("• keep going upwards")
-					return loadMoreHistory(state: &state)
-				}
+				return .none
+//				guard !state.loading.isLoading else { return .none }
+//				if state.loading.parameters.downwards {
+//					print("• switching to upwards")
+//
+//					// If we are at the end of the period, we can't load more
+//					guard state.currentMonth != state.availableMonths.last?.id else { print("•• can't load later tx"); return .none }
+//					guard let loadedRange = state.loadedRange else { return .none }
+//					return loadHistory(period: loadedRange.upperBound ..< .now, downwards: false, state: &state)
+//				} else {
+//					print("• keep going upwards: LOAD")
+//					return loadMoreHistory(state: &state)
+//				}
 
 			case .nearingTop:
 				print("• ACTION nearingTop")
 
 			case .nearingBottom:
+				print("• ACTION nearingBottom: LOAD more")
 				return loadMoreHistory(state: &state)
 
 			case let .monthChanged(month):
@@ -234,6 +253,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		if state.loading.isLoading { return .none }
 
 		if state.loading.didLoadFully, state.loading.parameters.covers(parameters) { return .none }
+
+		print("•• LOAD HISTORY: \(parameters != state.loading.parameters ? "new parameters" : "same params")")
 
 		if parameters != state.loading.parameters {
 			state.loading.nextCursor = nil

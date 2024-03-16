@@ -587,9 +587,16 @@ extension TransactionHistory {
 		}
 
 		public func updateUIView(_ uiView: UITableView, context: Context) {
-			guard sections != context.coordinator.sections else { return }
+			let oldSections = context.coordinator.sections
+			let sectionsIDs = sections.ids == oldSections.ids
+			let txIDs = sections.allTransactions == oldSections.allTransactions
+			print(" •• updateUIView: #\(oldSections.count).\(oldSections.allTransactions.count) -> #\(sections.count).\(sections.allTransactions.count). same sections: \(sections == oldSections), sectionIDs: \(sectionsIDs), txIDs: \(txIDs)")
+
+			guard !sections.isEmpty, sections != context.coordinator.sections else { return }
 			let oldTransactions = context.coordinator.sections.allTransactions
 			let newTransactions = sections.allTransactions
+
+			print(" •• updateUIView: old non-empty \(!oldTransactions.isEmpty), suf: \(newTransactions.hasSuffix(oldTransactions)), pref: \(newTransactions.hasPrefix(oldTransactions))")
 
 			if !oldTransactions.isEmpty, newTransactions.hasSuffix(oldTransactions) {
 				print(" •• updateUIView: inserted \(newTransactions.count - oldTransactions.count) above")
@@ -597,13 +604,15 @@ extension TransactionHistory {
 				let oldContentOffset = uiView.contentOffset.y
 				context.coordinator.sections = sections
 				uiView.reloadData()
-				let newContentHeight = uiView.contentSize.height
 
-				let new = oldContentOffset + newContentHeight - oldContentHeight
-				let inserted = newContentHeight - oldContentHeight
-				print(" •• updateUIView: (height : offset): \(oldContentHeight) : \(oldContentOffset) -> \(newContentHeight) : \(new) [\(inserted)]")
-
-				uiView.contentOffset.y = oldContentOffset + newContentHeight - oldContentHeight
+				Task {
+					let newContentHeight = uiView.contentSize.height
+					let new = oldContentOffset + newContentHeight - oldContentHeight
+					let inserted = newContentHeight - oldContentHeight
+					print(" •• updateUIView: H: \(oldContentHeight.rounded()), O: \(oldContentOffset.rounded()) -> H: \(newContentHeight.rounded()), O: \(new.rounded()) [\(inserted.rounded())]")
+					uiView.contentOffset.y = oldContentOffset + newContentHeight - oldContentHeight
+					print(" •• updateUIView: offset is now \(uiView.contentOffset.y)")
+				}
 			} else if !oldTransactions.isEmpty, newTransactions.hasPrefix(oldTransactions) {
 				print(" •• updateUIView: inserted \(newTransactions.count - oldTransactions.count) below")
 				context.coordinator.sections = sections
@@ -710,6 +719,8 @@ extension TransactionHistory {
 			// UIScrollViewDelegate
 
 			public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+				print(" • scrollViewDidScroll \(scrollView.contentOffset.y.rounded())")
+
 				if let tableView = scrollView as? UITableView {
 					updateMonth(tableView: tableView)
 				}
