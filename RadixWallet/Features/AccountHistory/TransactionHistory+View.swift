@@ -560,6 +560,8 @@ extension TransactionHistory {
 
 // MARK: - TransactionHistory.TransactionsTableView
 extension TransactionHistory {
+	public typealias Identifier = (section: TransactionHistory.TransactionSection.ID, transaction: TXID)
+
 	public struct TransactionsTableView: UIViewRepresentable {
 		public enum Action: Hashable, Sendable {
 			case transactionTapped(TXID)
@@ -569,10 +571,10 @@ extension TransactionHistory {
 			case monthChanged(Date)
 		}
 
-		private static let cellIdentifier = "TransactionCell"
-
 		let sections: IdentifiedArrayOf<TransactionSection>
 		let action: (Action) -> Void
+
+		private static let cellIdentifier = "TransactionCell"
 
 		public func makeUIView(context: Context) -> UITableView {
 			let tableView = UITableView(frame: .zero, style: .plain)
@@ -598,29 +600,29 @@ extension TransactionHistory {
 
 			print(" •• updateUIView: old non-empty \(!oldTransactions.isEmpty), suf: \(newTransactions.hasSuffix(oldTransactions)), pref: \(newTransactions.hasPrefix(oldTransactions))")
 
-			if !oldTransactions.isEmpty, newTransactions.hasSuffix(oldTransactions) {
-				print(" •• updateUIView: inserted \(newTransactions.count - oldTransactions.count) above")
-				let oldContentHeight = uiView.contentSize.height
-				let oldContentOffset = uiView.contentOffset.y
-				context.coordinator.sections = sections
-				uiView.reloadData()
+			let inserted = newTransactions.count - oldTransactions.count
 
-				Task {
-					let newContentHeight = uiView.contentSize.height
-					let new = oldContentOffset + newContentHeight - oldContentHeight
-					let inserted = newContentHeight - oldContentHeight
-					print(" •• updateUIView: H: \(oldContentHeight.rounded()), O: \(oldContentOffset.rounded()) -> H: \(newContentHeight.rounded()), O: \(new.rounded()) [\(inserted.rounded())]")
-					uiView.contentOffset.y = oldContentOffset + newContentHeight - oldContentHeight
-					print(" •• updateUIView: offset is now \(uiView.contentOffset.y)")
-				}
-			} else if !oldTransactions.isEmpty, newTransactions.hasPrefix(oldTransactions) {
-				print(" •• updateUIView: inserted \(newTransactions.count - oldTransactions.count) below")
-				context.coordinator.sections = sections
-				uiView.reloadData()
+			let scrollingTarget: Identifier?
+			if !oldTransactions.isEmpty, newTransactions.hasSuffix(oldTransactions) {
+				print(" •• updateUIView: inserted \(inserted) above")
+				scrollingTarget = uiView.indexPathsForVisibleRows?.first.map(sections.identifier(for:))
 			} else {
-				print(" •• updateUIView: everything changed")
-				context.coordinator.sections = sections
-				uiView.reloadData()
+				scrollingTarget = nil
+				if !oldTransactions.isEmpty, newTransactions.hasPrefix(oldTransactions) {
+					print(" •• updateUIView: inserted \(newTransactions.count - oldTransactions.count) below")
+				} else {
+					print(" •• updateUIView: everything changed")
+				}
+			}
+
+			context.coordinator.sections = sections
+			uiView.reloadData()
+
+			if let scrollingTarget, let indexPath = sections.indexPath(for: scrollingTarget) {
+				Task {
+					print(" •• scrolling to \(indexPath)")
+					uiView.scrollToRow(at: indexPath, at: .top, animated: false)
+				}
 			}
 		}
 
@@ -754,14 +756,6 @@ extension Collection where Element: Equatable {
 	func hasSuffix(_ elements: some Collection<Element>) -> Bool {
 		suffix(elements.count).elementsEqual(elements)
 	}
-
-	func prefix(sharedWith other: some Collection<Element>) -> [Element] {
-		zip(self, other).prefix(while: ==).map(\.0)
-	}
-
-	func suffix(sharedWith other: some Collection<Element>) -> some Collection<Element> {
-		zip(self, other).map(Pair.init).suffix(while: \.equal).map(\.left)
-	}
 }
 
 extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
@@ -769,11 +763,32 @@ extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
 		flatMap(\.transactions.ids)
 	}
 
-	var firstTransaction: TXID? {
-		first?.transactions.first?.id
+	func identifier(for indexPath: IndexPath) -> TransactionHistory.Identifier {
+		let section = self[indexPath.section]
+		let transaction = section.transactions[indexPath.row]
+		return (section.id, transaction.id)
 	}
 
-	func index(of transaction: TXID) -> IndexPath? {
+	func sectionID(for indexPath: IndexPath) -> TransactionHistory.TransactionSection.ID {
+		self[indexPath.section].id
+	}
+
+	func transactionID(for indexPath: IndexPath) -> TXID {
+		self[indexPath.section].transactions[indexPath.row].id
+	}
+
+	func indexPath(for identifier: TransactionHistory.Identifier) -> IndexPath? {
+		guard let section = ids.firstIndex(of: identifier.section) else { return nil }
+		return self[section].transactions.ids
+			.firstIndex(of: identifier.transaction)
+			.map { .init(row: $0, section: section) }
+	}
+
+	func transaction(for indexPath: IndexPath) -> TXID {
+		self[indexPath.section].transactions[indexPath.row].id
+	}
+
+	func indexPath(for transaction: TXID) -> IndexPath? {
 		for (index, section) in enumerated() {
 			if let row = section.transactions.ids.firstIndex(of: transaction) {
 				return .init(row: row, section: index)
@@ -781,32 +796,5 @@ extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
 		}
 
 		return nil
-	}
-}
-
-// MARK: - Pair
-public struct Pair<L, R> {
-	public let left: L
-	public let right: R
-
-	public init(_ left: L, _ right: R) {
-		self.left = left
-		self.right = right
-	}
-}
-
-// MARK: Sendable
-extension Pair: Sendable where L: Sendable, R: Sendable {}
-
-// MARK: Equatable
-extension Pair: Equatable where L: Equatable, R: Equatable {}
-
-// MARK: Hashable
-extension Pair: Hashable where L: Hashable, R: Hashable {}
-
-extension Pair where L == R, L: Equatable, R: Equatable {
-	/// The two components are equal
-	public var equal: Bool {
-		left == right
 	}
 }
