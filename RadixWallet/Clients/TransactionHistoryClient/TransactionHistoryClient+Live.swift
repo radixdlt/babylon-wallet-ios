@@ -42,7 +42,9 @@ extension TransactionHistoryClient {
 				let address = try ResourceAddress(validatingAddress: changes.resourceAddress)
 
 				// The resource should have been fetched
-				guard let resource = keyedResources[id: address] else { throw ProgrammerError() }
+				guard let resource = keyedResources[id: address] else {
+					throw ProgrammerError()
+				}
 
 				if let validator = await onLedgerEntitiesClient.isStakeClaimNFT(resource) {
 					return try [onLedgerEntitiesClient.stakeClaim(resource, stakeClaimValidator: validator, unstakeData: [], tokens: [])]
@@ -51,7 +53,9 @@ extension TransactionHistoryClient {
 					return try nonFungibleIDs
 						.map { id in
 							// All tokens should have been fetched earlier
-							guard let token = keyedNonFungibleTokens[id: id] else { throw ProgrammerError() }
+							guard let token = keyedNonFungibleTokens[id: id] else {
+								throw ProgrammerError()
+							}
 							return token
 						}
 						.map { token in
