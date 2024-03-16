@@ -40,7 +40,7 @@ extension TransactionHistory {
 						.padding(.bottom, .small1)
 						.background(.app.white)
 
-						TransactionsTableView(sections: viewStore.sections) { action in
+						TransactionsTableView(direction: viewStore.loading.parameters.direction, sections: viewStore.sections) { action in
 							store.send(.view(.transactionsTableAction(action)))
 						}
 					}
@@ -338,6 +338,7 @@ extension TransactionHistory {
 					EventHeader.Dummy()
 
 					Text(L10n.TransactionHistory.noBalanceChanges)
+						.multilineTextAlignment(.leading)
 						.textStyle(.body2HighImportance)
 						.foregroundColor(.app.gray1)
 						.flushedLeft
@@ -560,8 +561,6 @@ extension TransactionHistory {
 
 // MARK: - TransactionHistory.TransactionsTableView
 extension TransactionHistory {
-	public typealias Identifier = (section: TransactionHistory.TransactionSection.ID, transaction: TXID)
-
 	public struct TransactionsTableView: UIViewRepresentable {
 		public enum Action: Hashable, Sendable {
 			case transactionTapped(TXID)
@@ -571,6 +570,7 @@ extension TransactionHistory {
 			case monthChanged(Date)
 		}
 
+		let direction: TransactionHistory.Direction
 		let sections: IdentifiedArrayOf<TransactionSection>
 		let action: (Action) -> Void
 
@@ -602,12 +602,12 @@ extension TransactionHistory {
 
 			let inserted = newTransactions.count - oldTransactions.count
 
-			let scrollingTarget: Identifier?
+			let scrollTarget: TXID?
 			if !oldTransactions.isEmpty, newTransactions.hasSuffix(oldTransactions) {
-				print(" •• updateUIView: inserted \(inserted) above")
-				scrollingTarget = uiView.indexPathsForVisibleRows?.first.map(sections.identifier(for:))
+				scrollTarget = uiView.indexPathsForVisibleRows?.first.map(context.coordinator.sections.transaction(for:))
+				print(" •• updateUIView: inserted \(inserted) above, set scrolltarget: \(scrollTarget == nil)")
 			} else {
-				scrollingTarget = nil
+				scrollTarget = nil
 				if !oldTransactions.isEmpty, newTransactions.hasPrefix(oldTransactions) {
 					print(" •• updateUIView: inserted \(newTransactions.count - oldTransactions.count) below")
 				} else {
@@ -618,11 +618,9 @@ extension TransactionHistory {
 			context.coordinator.sections = sections
 			uiView.reloadData()
 
-			if let scrollingTarget, let indexPath = sections.indexPath(for: scrollingTarget) {
-				Task {
-					print(" •• scrolling to \(indexPath)")
-					uiView.scrollToRow(at: indexPath, at: .top, animated: false)
-				}
+			if let indexPath = scrollTarget.flatMap(context.coordinator.sections.indexPath(for:)) {
+				print(" •• scrolling to \(indexPath)")
+				uiView.scrollToRow(at: indexPath, at: .top, animated: false)
 			}
 		}
 
@@ -640,7 +638,7 @@ extension TransactionHistory {
 
 			private var month: Date = .distantPast
 
-			private var scrolling: (direction: ScrollDirection, count: Int) = (.down, 0)
+			private var scrolling: (direction: Direction, count: Int) = (.down, 0)
 
 			public init(
 				sections: IdentifiedArrayOf<TransactionSection>,
@@ -693,7 +691,7 @@ extension TransactionHistory {
 			public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
 				let section = sections[indexPath.section]
 				let txID = section.transactions[indexPath.row].id
-				let scrollDirection: ScrollDirection = indexPath > previousCell ? .down : .up
+				let scrollDirection: Direction = indexPath > previousCell ? .down : .up
 				if scrollDirection == scrolling.direction {
 					scrolling.count += 1
 				} else {
@@ -721,18 +719,18 @@ extension TransactionHistory {
 			// UIScrollViewDelegate
 
 			public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-				print(" • scrollViewDidScroll \(scrollView.contentOffset.y.rounded())")
-
-				if let tableView = scrollView as? UITableView {
-					updateMonth(tableView: tableView)
-				}
-
-				if scrollView.contentOffset.y < -30, !isScrolledPastTop {
-					action(.pulledDown)
-					isScrolledPastTop = true
-				} else if isScrolledPastTop, scrollView.contentOffset.y >= 0 {
-					isScrolledPastTop = false
-				}
+//				print(" • scrollViewDidScroll \(scrollView.contentOffset.y.rounded())")
+//
+//				if let tableView = scrollView as? UITableView {
+//					updateMonth(tableView: tableView)
+//				}
+//
+//				if scrollView.contentOffset.y < -30, !isScrolledPastTop {
+//					action(.pulledDown)
+//					isScrolledPastTop = true
+//				} else if isScrolledPastTop, scrollView.contentOffset.y >= 0 {
+//					isScrolledPastTop = false
+//				}
 			}
 
 			// Helpers
@@ -756,32 +754,21 @@ extension Collection where Element: Equatable {
 	func hasSuffix(_ elements: some Collection<Element>) -> Bool {
 		suffix(elements.count).elementsEqual(elements)
 	}
+
+	// IF the start of this collection overlaps the end of the other, returns the length of this overlap
+	func prefixOverlappingSuffix(of elements: some Collection<Element>) -> Int {
+		guard let first, let index = elements.reversed().firstIndex(of: first) else { print("   • no overlap"); return 0 }
+		if elements.hasSuffix(prefix(index + 1)) {
+			return index + 1
+		} else {
+			return 0
+		}
+	}
 }
 
 extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
 	var allTransactions: [TXID] {
 		flatMap(\.transactions.ids)
-	}
-
-	func identifier(for indexPath: IndexPath) -> TransactionHistory.Identifier {
-		let section = self[indexPath.section]
-		let transaction = section.transactions[indexPath.row]
-		return (section.id, transaction.id)
-	}
-
-	func sectionID(for indexPath: IndexPath) -> TransactionHistory.TransactionSection.ID {
-		self[indexPath.section].id
-	}
-
-	func transactionID(for indexPath: IndexPath) -> TXID {
-		self[indexPath.section].transactions[indexPath.row].id
-	}
-
-	func indexPath(for identifier: TransactionHistory.Identifier) -> IndexPath? {
-		guard let section = ids.firstIndex(of: identifier.section) else { return nil }
-		return self[section].transactions.ids
-			.firstIndex(of: identifier.transaction)
-			.map { .init(row: $0, section: section) }
 	}
 
 	func transaction(for indexPath: IndexPath) -> TXID {

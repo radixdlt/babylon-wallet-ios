@@ -7,6 +7,11 @@ private extension Date {
 
 // MARK: - TransactionHistory
 public struct TransactionHistory: Sendable, FeatureReducer {
+	public enum Direction: Sendable {
+		case up
+		case down
+	}
+
 	public struct State: Sendable, Hashable {
 		let availableMonths: [DateRangeItem]
 
@@ -76,11 +81,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case loadedHistory(TransactionHistoryResponse)
 	}
 
-	public enum ScrollDirection: Sendable {
-		case up
-		case down
-	}
-
 	public struct Destination: DestinationReducer {
 		@CasePathable
 		public enum State: Sendable, Hashable {
@@ -120,7 +120,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onAppear:
-			print("• onAppear: LOAD")
 			return loadHistory(period: .babylonLaunch ..< .now, state: &state)
 
 		case let .selectedMonth(month):
@@ -135,21 +134,20 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 			// FIXME: GK REMOVE
 			guard !state.loading.isLoading else { return .none }
-			if state.loading.parameters.downwards {
-				print("• switching to upwards")
-
+			switch state.loading.parameters.direction {
+			case .down:
 				// If we are at the end of the period, we can't load more
 				guard state.currentMonth != state.availableMonths.last?.id else { print("•• can't load later tx"); return .none }
 				guard let loadedRange = state.loadedRange else { return .none }
 				print("• filtersTapped: LOAD period upwards")
-				return loadHistory(period: loadedRange.upperBound ..< .now, downwards: false, state: &state)
-			} else {
+				return loadHistory(period: loadedRange.upperBound ..< .now, direction: .up, state: &state)
+			case .up:
 				print("• filtersTapped: LOAD more upwards")
 				return loadMoreHistory(state: &state)
 			}
 
-			state.destination = .filters(.init(portfolio: state.portfolio, filters: state.activeFilters.map(\.id)))
-			return .none
+//			state.destination = .filters(.init(portfolio: state.portfolio, filters: state.activeFilters.map(\.id)))
+//			return .none
 
 		case let .filterCrossTapped(id):
 			state.activeFilters.remove(id: id)
@@ -224,22 +222,17 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	// Helper methods
 
 	/// Load history for the given period, using existing filters
-	func loadHistory(period: Range<Date>, downwards: Bool = true, state: inout State) -> Effect<Action> {
-		let parameters = TransactionHistoryParameters(
-			period: period,
-			downwards: downwards,
-			filters: state.loading.parameters.filters
-		)
+	func loadHistory(period: Range<Date>, direction: Direction = .down, state: inout State) -> Effect<Action> {
+		var parameters = state.loading.parameters
+		parameters.period = period
+		parameters.direction = direction
 		return loadHistory(parameters: parameters, state: &state)
 	}
 
 	/// Load history for the current period using the provided filters
 	func loadHistory(filters: [TransactionFilter], state: inout State) -> Effect<Action> {
-		let parameters = TransactionHistoryParameters(
-			period: state.loading.parameters.period,
-			downwards: true,
-			filters: filters
-		)
+		var parameters = state.loading.parameters
+		parameters.filters = filters
 		return loadHistory(parameters: parameters, state: &state)
 	}
 
@@ -258,7 +251,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		if parameters != state.loading.parameters {
 			state.loading.nextCursor = nil
-			state.sections = []
 		}
 
 		state.loading.isLoading = true
@@ -282,15 +274,37 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	func loadedHistory(_ response: TransactionHistoryResponse, state: inout State) {
 		state.resources.append(contentsOf: response.resources)
 
+		func shouldPrependWithOverlap() -> Int? {
+			let wasDown = state.loading.parameters.direction == .down
+			let isUp = response.parameters.direction == .up
+
+			let overlap = state.sections.allTransactions.prefixOverlappingSuffix(of: response.items.map(\.id))
+
+			print("•• shouldPrependWithOverlap: isNonEmpty: \(!state.sections.isEmpty), wasDown: \(wasDown), isUp: \(isUp), overlap: \(overlap)")
+
+			guard !state.sections.isEmpty else { return nil }
+			guard state.loading.parameters.direction == .down, response.parameters.direction == .up else { return nil }
+//			let overlap = state.sections.allTransactions.prefixOverlappingSuffix(of: response.items.map(\.id))
+			guard overlap > 0 else { return nil }
+			return overlap
+		}
+
 		if response.parameters == state.loading.parameters {
+			print("•• LOADED same params")
 			// We loaded more from the same range
 			state.loading.nextCursor = response.nextCursor
 			if response.nextCursor == nil {
 				state.loading.didLoadFully = true
 			}
 
-			state.sections.addItems(response.items, downwards: response.parameters.downwards)
+			state.sections.addItems(response.items, direction: response.parameters.direction)
+		} else if let overlap = shouldPrependWithOverlap() {
+			print("•• LOADED overlap: \(overlap)")
+			// Switched from down to up, prepend new data to existing, but with some overlap
+			state.loading = .init(parameters: response.parameters, nextCursor: response.nextCursor)
+			state.sections.insertItemsAtStart(response.items, withOverlap: overlap)
 		} else {
+			print("•• LOADED new params")
 			state.loading = .init(parameters: response.parameters, nextCursor: response.nextCursor)
 			state.sections.replaceItems(response.items)
 		}
@@ -328,10 +342,15 @@ extension Range<Date> {
 }
 
 extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
-	mutating func addItems(_ items: some Collection<TransactionHistoryItem>, downwards: Bool) {
+	mutating func insertItemsAtStart(_ items: some Collection<TransactionHistoryItem>, withOverlap overlap: Int) {
+		addItems(items.dropLast(overlap), direction: .up)
+	}
+
+	mutating func addItems(_ items: some Collection<TransactionHistoryItem>, direction: TransactionHistory.Direction) {
 		let newSections = items.inSections
 
-		if downwards {
+		switch direction {
+		case .down:
 			for newSection in newSections {
 				if last?.id == newSection.id {
 					self[id: newSection.id]?.transactions.append(contentsOf: newSection.transactions)
@@ -339,7 +358,9 @@ extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
 					append(newSection)
 				}
 			}
-		} else {
+			print("•• inserted \(items) after -> \(allTransactions.count)")
+
+		case .up:
 			for newSection in newSections.reversed() {
 				if first?.id == newSection.id {
 					self[id: newSection.id]?.transactions.insert(contentsOf: newSection.transactions, at: 0)
@@ -347,6 +368,8 @@ extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
 					insert(newSection, at: 0)
 				}
 			}
+
+			print("•• inserted \(items.count) before -> \(allTransactions.count)")
 		}
 	}
 
