@@ -567,6 +567,7 @@ extension TransactionHistory {
 			case pulledDown
 			case nearingTop
 			case nearingBottom
+			case reachedBottom
 			case monthChanged(Date)
 		}
 
@@ -709,6 +710,8 @@ extension TransactionHistory {
 						action(.nearingTop)
 						scrolling.count = 0
 					}
+				} else if scrollDirection == .down, txID == sections.allTransactions.last {
+					action(.reachedBottom)
 				}
 			}
 
@@ -719,18 +722,16 @@ extension TransactionHistory {
 			// UIScrollViewDelegate
 
 			public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//				print(" • scrollViewDidScroll \(scrollView.contentOffset.y.rounded())")
-//
-//				if let tableView = scrollView as? UITableView {
-//					updateMonth(tableView: tableView)
-//				}
-//
-//				if scrollView.contentOffset.y < -30, !isScrolledPastTop {
-//					action(.pulledDown)
-//					isScrolledPastTop = true
-//				} else if isScrolledPastTop, scrollView.contentOffset.y >= 0 {
-//					isScrolledPastTop = false
-//				}
+				if let tableView = scrollView as? UITableView {
+					updateMonth(tableView: tableView)
+				}
+
+				if scrollView.contentOffset.y < -130, !isScrolledPastTop {
+					action(.pulledDown)
+					isScrolledPastTop = true
+				} else if isScrolledPastTop, scrollView.contentOffset.y >= 0 {
+					isScrolledPastTop = false
+				}
 			}
 
 			// Helpers

@@ -161,25 +161,36 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			switch action {
 			case .pulledDown:
 				print("• ACTION scrolledPastTop")
-				return .none
 //				guard !state.loading.isLoading else { return .none }
-//				if state.loading.parameters.downwards {
-//					print("• switching to upwards")
-//
+//				switch state.loading.parameters.direction {
+//				case .down:
 //					// If we are at the end of the period, we can't load more
 //					guard state.currentMonth != state.availableMonths.last?.id else { print("•• can't load later tx"); return .none }
 //					guard let loadedRange = state.loadedRange else { return .none }
-//					return loadHistory(period: loadedRange.upperBound ..< .now, downwards: false, state: &state)
-//				} else {
-//					print("• keep going upwards: LOAD")
+//					print("• filtersTapped: LOAD period upwards")
+//					return loadHistory(period: loadedRange.upperBound ..< .now, direction: .up, state: &state)
+//				case .up:
+//					print("• filtersTapped: LOAD more upwards")
 //					return loadMoreHistory(state: &state)
 //				}
 
 			case .nearingTop:
 				print("• ACTION nearingTop")
+				guard !state.loading.isLoading else { return .none }
+				switch state.loading.parameters.direction {
+				case .down:
+					// If we are at the end of the period, we can't load more
+					guard state.currentMonth != state.availableMonths.last?.id else { print("•• can't load later tx"); return .none }
+					guard let loadedRange = state.loadedRange else { return .none }
+					print("• filtersTapped: LOAD period upwards")
+					return loadHistory(period: loadedRange.upperBound ..< .now, direction: .up, state: &state)
+				case .up:
+					print("• filtersTapped: LOAD more upwards")
+					return loadMoreHistory(state: &state)
+				}
 
-			case .nearingBottom:
-				print("• ACTION nearingBottom: LOAD more")
+			case .nearingBottom, .reachedBottom:
+				print("• ACTION nearingBottom/reachedBottom: LOAD more")
 				return loadMoreHistory(state: &state)
 
 			case let .monthChanged(month):
@@ -245,7 +256,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	func loadHistory(parameters: TransactionHistoryParameters, state: inout State) -> Effect<Action> {
 		if state.loading.isLoading { return .none }
 
-		if state.loading.didLoadFully, state.loading.parameters.covers(parameters) { return .none }
+		if state.loading.didLoadFully, state.loading.parameters.covers(parameters) { print("•• ALREADY LOADED"); return .none }
 
 		print("•• LOAD HISTORY: \(parameters != state.loading.parameters ? "new parameters" : "same params")")
 
@@ -275,22 +286,15 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		state.resources.append(contentsOf: response.resources)
 
 		func shouldPrependWithOverlap() -> Int? {
-			let wasDown = state.loading.parameters.direction == .down
-			let isUp = response.parameters.direction == .up
-
-			let overlap = state.sections.allTransactions.prefixOverlappingSuffix(of: response.items.map(\.id))
-
-			print("•• shouldPrependWithOverlap: isNonEmpty: \(!state.sections.isEmpty), wasDown: \(wasDown), isUp: \(isUp), overlap: \(overlap)")
-
 			guard !state.sections.isEmpty else { return nil }
 			guard state.loading.parameters.direction == .down, response.parameters.direction == .up else { return nil }
-//			let overlap = state.sections.allTransactions.prefixOverlappingSuffix(of: response.items.map(\.id))
+			let overlap = state.sections.allTransactions.prefixOverlappingSuffix(of: response.items.map(\.id))
 			guard overlap > 0 else { return nil }
 			return overlap
 		}
 
 		if response.parameters == state.loading.parameters {
-			print("•• LOADED same params")
+			print("•• LOADED \(response.items.count) same params")
 			// We loaded more from the same range
 			state.loading.nextCursor = response.nextCursor
 			if response.nextCursor == nil {
@@ -299,12 +303,12 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 			state.sections.addItems(response.items, direction: response.parameters.direction)
 		} else if let overlap = shouldPrependWithOverlap() {
-			print("•• LOADED overlap: \(overlap)")
+			print("•• LOADED \(response.items.count) overlap: \(overlap)")
 			// Switched from down to up, prepend new data to existing, but with some overlap
 			state.loading = .init(parameters: response.parameters, nextCursor: response.nextCursor)
 			state.sections.insertItemsAtStart(response.items, withOverlap: overlap)
 		} else {
-			print("•• LOADED new params")
+			print("•• LOADED \(response.items.count) new params")
 			state.loading = .init(parameters: response.parameters, nextCursor: response.nextCursor)
 			state.sections.replaceItems(response.items)
 		}
@@ -358,7 +362,7 @@ extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
 					append(newSection)
 				}
 			}
-			print("•• inserted \(items) after -> \(allTransactions.count)")
+			print("•• inserted \(items.count) after -> \(allTransactions.count)")
 
 		case .up:
 			for newSection in newSections.reversed() {
