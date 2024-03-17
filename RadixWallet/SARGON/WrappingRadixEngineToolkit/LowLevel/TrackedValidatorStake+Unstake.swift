@@ -36,7 +36,7 @@ extension TrackedPoolInteractionStuff {
 		}
 	}
 
-	public var poolAddress: ComponentAddress { sargon() }
+	public var poolAddress: PoolAddress { sargon() }
 	public var poolUnitsResourceAddress: ResourceAddress { sargon() }
 	public var poolUnitsAmount: RETDecimal {
 		get {

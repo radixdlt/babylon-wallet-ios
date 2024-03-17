@@ -5,6 +5,7 @@ import SwiftUI
 struct DetailsContainerWithHeaderViewState: Equatable {
 	let title: Loadable<String?>
 	let amount: String?
+	let currencyWorth: AttributedString?
 	let symbol: Loadable<String?>
 }
 
@@ -12,7 +13,8 @@ extension DetailsContainerWithHeaderViewState {
 	init(_ resourceWithAmount: OnLedgerEntitiesClient.ResourceWithVaultAmount) {
 		self.init(
 			title: .success(resourceWithAmount.resource.metadata.name),
-			amount: resourceWithAmount.amount.formatted(),
+			amount: resourceWithAmount.amount.nominalAmount.formatted(),
+			currencyWorth: nil,
 			symbol: .success(resourceWithAmount.resource.metadata.symbol)
 		)
 	}
@@ -53,7 +55,7 @@ struct DetailsContainerWithHeaderView<ThumbnailView: View, DetailsView: View>: V
 	private func header(
 		with viewState: DetailsContainerWithHeaderViewState
 	) -> some View {
-		VStack(spacing: .medium3) {
+		VStack(spacing: .zero) {
 			thumbnailView
 
 			if let amount = viewState.amount {
@@ -66,6 +68,13 @@ struct DetailsContainerWithHeaderView<ThumbnailView: View, DetailsView: View>: V
 				} else {
 					amountView
 				}
+			}
+
+			if let currencyWorth = viewState.currencyWorth {
+				Text(currencyWorth)
+					.textStyle(.body2HighImportance)
+					.foregroundStyle(.app.gray2)
+					.padding(.top, .small2)
 			}
 		}
 		.padding(.vertical, .small2)

@@ -12,4 +12,8 @@ public struct TransactionHash: DummySargon {
 	public func bytes() -> Data {
 		sargon()
 	}
+
+	public func formatted(_ format: AddressFormat = .default) -> String {
+		bytes().hex()
+	}
 }

@@ -40,9 +40,9 @@ extension SubmitTransactionClient: DependencyKey {
 				case .committedSuccess:
 					return
 				case .committedFailure:
-					throw TXFailureStatus.failed
+					throw TXFailureStatus.failed(reason: .init(transactionStatusResponse.errorMessage))
 				case .permanentlyRejected:
-					throw TXFailureStatus.permanentlyRejected
+					throw TXFailureStatus.permanentlyRejected(reason: .init(transactionStatusResponse.errorMessage))
 				case .temporarilyRejected:
 					throw TXFailureStatus.temporarilyRejected(currentEpoch: .init(UInt64(transactionStatusResponse.ledgerState.epoch)))
 				}
@@ -119,15 +119,46 @@ public enum SubmitTXFailure: Sendable, LocalizedError, Equatable {
 
 // MARK: - TXFailureStatus
 public enum TXFailureStatus: LocalizedError, Sendable, Hashable {
-	case permanentlyRejected
+	case permanentlyRejected(reason: Reason)
 	case temporarilyRejected(currentEpoch: Epoch)
-	case failed
+	case failed(reason: Reason)
 
 	public var errorDescription: String? {
 		switch self {
 		case .permanentlyRejected: "Permanently Rejected"
 		case .temporarilyRejected: "Temporarily Rejected"
 		case .failed: "Failed"
+		}
+	}
+}
+
+// MARK: TXFailureStatus.Reason
+extension TXFailureStatus {
+	public enum Reason: Sendable, Hashable, Equatable {
+		public enum ApplicationError: Equatable, Sendable, Hashable {
+			public enum WorktopError: Sendable, Hashable, Equatable {
+				case assertionFailed
+			}
+
+			case worktopError(WorktopError)
+		}
+
+		case applicationError(ApplicationError)
+		case unknown
+	}
+}
+
+extension TXFailureStatus.Reason {
+	public init(_ rawError: String?) {
+		guard let rawError else {
+			self = .unknown
+			return
+		}
+
+		if rawError.contains("AssertionFailed") {
+			self = .applicationError(.worktopError(.assertionFailed))
+		} else {
+			self = .unknown
 		}
 	}
 }

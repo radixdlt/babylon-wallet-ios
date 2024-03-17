@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - TrackedPoolInteraction
 public protocol TrackedPoolInteraction {
-	var poolAddress: ComponentAddress { get }
+	var poolAddress: PoolAddress { get }
 	var poolUnitsResourceAddress: ResourceAddress { get }
 	var poolUnitsAmount: RETDecimal { get set }
 	var resourcesInInteraction: [String: RETDecimal] { get set }

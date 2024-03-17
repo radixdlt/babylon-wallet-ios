@@ -26,6 +26,7 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 		case closeTapped
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case guarantee(id: TransactionReviewGuarantee.State.ID, action: TransactionReviewGuarantee.Action)
 		case info(PresentationAction<SlideUpPanel.Action>)
@@ -73,7 +74,7 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 // MARK: - TransactionReviewGuarantee
 public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 	public struct State: Identifiable, Sendable, Hashable {
-		public let id: TransactionReview.Transfer.ID
+		public let id: ResourceBalance.ID
 		public let account: TransactionReview.Account
 		public let resource: OnLedgerEntity.Resource
 		public let thumbnail: Thumbnail.FungibleContent
@@ -82,15 +83,9 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 
 		public var percentageStepper: MinimumPercentageStepper.State
 
-		public enum Fungible: Sendable, Hashable {
-			case token(isXRD: Bool)
-			case poolUnit
-			case lsu
-		}
-
 		init?(
 			account: TransactionReview.Account,
-			transfer: TransactionReview.Transfer
+			transfer: ResourceBalance
 		) {
 			self.id = transfer.id
 			self.account = account
@@ -120,6 +115,7 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 		}
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case percentageStepper(MinimumPercentageStepper.Action)
 	}

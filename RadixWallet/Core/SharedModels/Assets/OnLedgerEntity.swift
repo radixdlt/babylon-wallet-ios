@@ -100,7 +100,7 @@ extension OnLedgerEntity {
 		public let dappDefinitions: [AccountAddress]?
 		public let dappDefinition: AccountAddress?
 		public let validator: ValidatorAddress?
-		public let poolUnit: ResourcePoolAddress?
+		public let poolUnit: PoolAddress?
 		public let poolUnitResource: ResourceAddress?
 		public let claimedEntities: [String]?
 		public let claimedWebsites: [URL]?
@@ -147,7 +147,7 @@ extension OnLedgerEntity {
 			dappDefinitions: [AccountAddress]? = nil,
 			dappDefinition: AccountAddress? = nil,
 			validator: ValidatorAddress? = nil,
-			poolUnit: ResourcePoolAddress? = nil,
+			poolUnit: PoolAddress? = nil,
 			poolUnitResource: ResourceAddress? = nil,
 			claimedEntities: [String]? = nil,
 			claimedWebsites: [URL]? = nil,
@@ -240,6 +240,7 @@ extension OnLedgerEntity {
 extension OnLedgerEntity {
 	public struct NonFungibleToken: Sendable, Hashable, Identifiable, Codable {
 		public typealias NFTData = GatewayAPI.ProgrammaticScryptoSborValueTuple
+		public typealias ID = NonFungibleGlobalId
 		public let id: NonFungibleGlobalId
 		public let data: NFTData?
 
@@ -277,13 +278,13 @@ extension OnLedgerEntity {
 
 extension OnLedgerEntity {
 	public struct ResourcePool: Sendable, Hashable, Codable {
-		public let address: ResourcePoolAddress
+		public let address: PoolAddress
 		public let poolUnitResourceAddress: ResourceAddress
 		public let resources: OwnedFungibleResources
 		public let metadata: Metadata
 
 		public init(
-			address: ResourcePoolAddress,
+			address: PoolAddress,
 			poolUnitResourceAddress: ResourceAddress,
 			resources: OwnedFungibleResources,
 			metadata: Metadata
@@ -320,8 +321,8 @@ extension OnLedgerEntity {
 
 extension OnLedgerEntity {
 	public struct OwnedFungibleResources: Sendable, Hashable, Codable {
-		public let xrdResource: OwnedFungibleResource?
-		public let nonXrdResources: [OwnedFungibleResource]
+		public var xrdResource: OwnedFungibleResource?
+		public var nonXrdResources: [OwnedFungibleResource]
 
 		public init(xrdResource: OwnedFungibleResource? = nil, nonXrdResources: [OwnedFungibleResource] = []) {
 			self.xrdResource = xrdResource
@@ -336,13 +337,13 @@ extension OnLedgerEntity {
 
 		public let resourceAddress: ResourceAddress
 		public let atLedgerState: AtLedgerState
-		public let amount: RETDecimal
+		public var amount: ResourceAmount
 		public let metadata: Metadata
 
 		public init(
 			resourceAddress: ResourceAddress,
 			atLedgerState: AtLedgerState,
-			amount: RETDecimal,
+			amount: ResourceAmount,
 			metadata: Metadata
 		) {
 			self.resourceAddress = resourceAddress
@@ -434,6 +435,7 @@ extension OnLedgerEntity {
 		public var fungibleResources: OwnedFungibleResources
 		public var nonFungibleResources: [OwnedNonFungibleResource]
 		public var poolUnitResources: PoolUnitResources
+
 		public struct Details: Sendable, Hashable, Codable {
 			public let depositRule: Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule
 			public init(depositRule: Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule) {
@@ -478,7 +480,7 @@ extension OnLedgerEntity {
 
 extension OnLedgerEntity.Account {
 	public struct PoolUnitResources: Sendable, Hashable, Codable {
-		public let radixNetworkStakes: IdentifiedArrayOf<RadixNetworkStake>
+		public var radixNetworkStakes: IdentifiedArrayOf<RadixNetworkStake>
 		public let poolUnits: [PoolUnit]
 	}
 
@@ -488,7 +490,7 @@ extension OnLedgerEntity.Account {
 		}
 
 		public let validatorAddress: ValidatorAddress
-		public let stakeUnitResource: OnLedgerEntity.OwnedFungibleResource?
+		public var stakeUnitResource: OnLedgerEntity.OwnedFungibleResource?
 		public let stakeClaimResource: OnLedgerEntity.OwnedNonFungibleResource?
 
 		public init(
@@ -504,14 +506,17 @@ extension OnLedgerEntity.Account {
 
 	public struct PoolUnit: Sendable, Hashable, Codable {
 		public let resource: OnLedgerEntity.OwnedFungibleResource
-		public let resourcePoolAddress: ResourcePoolAddress
+		public let resourcePoolAddress: PoolAddress
+		public let poolResources: [ResourceAddress]
 
 		public init(
 			resource: OnLedgerEntity.OwnedFungibleResource,
-			resourcePoolAddress: ResourcePoolAddress
+			resourcePoolAddress: PoolAddress,
+			poolResources: [ResourceAddress] = []
 		) {
 			self.resource = resource
 			self.resourcePoolAddress = resourcePoolAddress
+			self.poolResources = poolResources
 		}
 	}
 }
@@ -601,7 +606,7 @@ extension OnLedgerEntity.Resource {
 			loggerGlobal.error("Total supply is 0 for \(poolUnitResource.resource.resourceAddress.address)")
 			return nil
 		}
-		let redemptionValue = poolUnitResource.amount * (amount / poolUnitTotalSupply)
+		let redemptionValue = poolUnitResource.amount.nominalAmount * (amount / poolUnitTotalSupply)
 		let decimalPlaces = divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
 		let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
 

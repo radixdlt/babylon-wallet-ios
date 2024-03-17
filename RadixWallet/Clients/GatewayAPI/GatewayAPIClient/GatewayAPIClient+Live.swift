@@ -29,17 +29,16 @@ extension GatewayAPIClient {
 	public typealias Value = GatewayAPIClient
 
 	public static let liveValue = GatewayAPIClient.live(
-		urlSession: .shared,
 		jsonEncoder: .init(),
 		jsonDecoder: .default
 	)
 
 	public static func live(
-		urlSession: URLSession,
 		jsonEncoder: JSONEncoder,
 		jsonDecoder: JSONDecoder
 	) -> Self {
 		@Dependency(\.gatewaysClient) var gatewaysClient
+		@Dependency(\.httpClient) var httpClient
 
 		let getCurrentBaseURL: @Sendable () async -> URL = {
 			await gatewaysClient.getGatewayAPIEndpointBaseURL()
@@ -71,18 +70,7 @@ extension GatewayAPIClient {
 				urlRequest.timeoutInterval = timeoutInterval
 			}
 
-			let (data, urlResponse) = try await urlSession.data(for: urlRequest)
-
-			guard let httpURLResponse = urlResponse as? HTTPURLResponse else {
-				throw ExpectedHTTPURLResponse()
-			}
-
-			guard httpURLResponse.statusCode == BadHTTPResponseCode.expected else {
-				#if DEBUG
-				loggerGlobal.error("Request with URL: \(urlRequest.url!.absoluteString) failed with status code: \(httpURLResponse.statusCode), data: \(data.prettyPrintedJSONString ?? "<NOT_JSON>")")
-				#endif
-				throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
-			}
+			let data = try await httpClient.executeRequest(urlRequest)
 
 			do {
 				return try jsonDecoder.decode(Response.self, from: data)
@@ -131,14 +119,12 @@ extension GatewayAPIClient {
 		@Sendable
 		func post<Response>(
 			request: some Encodable,
+			dateEncodingStrategy: JSONEncoder.DateEncodingStrategy = .deferredToDate,
 			urlFromBase: @escaping @Sendable (URL) -> URL
-		) async throws -> Response
-			where
-			Response: Decodable
-		{
+		) async throws -> Response where Response: Decodable {
 			jsonEncoder.outputFormatting = [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes]
+			jsonEncoder.dateEncodingStrategy = dateEncodingStrategy
 			let httpBody = try jsonEncoder.encode(request)
-
 			return try await makeRequest(httpBodyData: httpBody, urlFromBase: urlFromBase)
 		}
 
@@ -237,6 +223,12 @@ extension GatewayAPIClient {
 				try await post(
 					request: transactionPreviewRequest
 				) { $0.appendingPathComponent("transaction/preview") }
+			},
+			streamTransactions: { streamTransactionsRequest in
+				try await post(
+					request: streamTransactionsRequest,
+					dateEncodingStrategy: .iso8601
+				) { $0.appendingPathComponent("stream/transactions") }
 			}
 		)
 	}

@@ -8,10 +8,11 @@ extension AppPreferences {
 		CustomStringConvertible,
 		CustomDumpReflectable
 	{
+		public static let defaultDepositGuaranteePreset = RETDecimal(floatLiteral: 0.99)
 		public var defaultDepositGuarantee: RETDecimal
 
 		public init(
-			defaultDepositGuarantee: RETDecimal = 1
+			defaultDepositGuarantee: RETDecimal = Self.defaultDepositGuaranteePreset
 		) {
 			self.defaultDepositGuarantee = defaultDepositGuarantee
 		}

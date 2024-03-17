@@ -22,6 +22,17 @@ extension Collection {
 	}
 }
 
+extension MutableCollection where Self: RandomAccessCollection {
+	public mutating func sort<Value: Comparable>(
+		by keyPath: KeyPath<Element, Value>,
+		_ comparator: (Value, Value) -> Bool = (<)
+	) {
+		sort {
+			comparator($0[keyPath: keyPath], $1[keyPath: keyPath])
+		}
+	}
+}
+
 extension OrderedSet where Element: Hashable {
 	/// Add or remove the given element
 	public mutating func toggle(_ element: Element) {
@@ -64,5 +75,11 @@ extension MutableCollection where Self: RangeReplaceableCollection {
 				formIndex(after: &index)
 			}
 		}
+	}
+}
+
+extension Sequence {
+	func grouped<V: Hashable>(by value: (Element) throws -> V) rethrows -> [V: [Element]] {
+		try Dictionary(grouping: self, by: value)
 	}
 }

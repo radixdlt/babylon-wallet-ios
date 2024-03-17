@@ -86,6 +86,7 @@ extension CacheClient {
 		case dAppRequestMetadata(_ definitionAddress: String)
 		case rolaDappVerificationMetadata(_ definitionAddress: String)
 		case rolaWellKnownFileVerification(_ url: String)
+		case tokenPrices(_ currency: FiatCurrency)
 
 		var filesystemFilePath: String {
 			switch self {
@@ -115,6 +116,8 @@ extension CacheClient {
 				return "\(filesystemFolderPath)/RolaDappVerificationMetadata-\(definitionAddress)"
 			case let .rolaWellKnownFileVerification(url):
 				return "\(filesystemFolderPath)/RolaWellKnownFileVerification-\(url)"
+			case let .tokenPrices(currency):
+				return "\(filesystemFolderPath)/prices-\(currency.rawValue)"
 			}
 		}
 
@@ -146,6 +149,8 @@ extension CacheClient {
 				return "RolaDappVerificationMetadata"
 			case .rolaWellKnownFileVerification:
 				return "RolaWellKnownFileVerification"
+			case .tokenPrices:
+				return "TokenPrices"
 			}
 		}
 
@@ -159,6 +164,8 @@ extension CacheClient {
 				60 * 60 * 24 // On day cache
 			case .dAppRequestMetadata, .rolaDappVerificationMetadata, .rolaWellKnownFileVerification:
 				60
+			case .tokenPrices:
+				60 * 5 // 5 minutes
 			}
 		}
 	}

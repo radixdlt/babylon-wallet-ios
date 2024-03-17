@@ -18,7 +18,7 @@ public struct NonFungibleResourceAsset: Sendable, FeatureReducer {
 }
 
 extension NonFungibleResourceAsset {
-	public typealias ViewState = TransferNFTView.ViewState
+	public typealias ViewState = ResourceBalance.ViewState // FIXME: GK use .nonFungbile
 
 	@MainActor
 	public struct View: SwiftUI.View {
@@ -31,19 +31,20 @@ extension NonFungibleResourceAsset {
 
 extension NonFungibleResourceAsset.State {
 	var viewState: NonFungibleResourceAsset.ViewState {
-		.init(
-			tokenID: nftToken.id.localId().toUserFacingString(),
-			tokenName: nftToken.data?.name,
-			thumbnail: resourceImage
-		)
+		.nonFungible(.init(
+			id: nftToken.id,
+			resourceImage: resourceImage,
+			resourceName: resourceName,
+			nonFungibleName: nftToken.data?.name
+		))
 	}
 }
 
 extension NonFungibleResourceAsset.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState) { viewStore in
-			TransferNFTView(viewState: viewStore.state, background: .app.white)
-				.frame(height: .largeButtonHeight)
+			ResourceBalanceView(viewStore.state, appearance: .compact)
+				.padding(.medium3)
 		}
 	}
 }

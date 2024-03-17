@@ -18,6 +18,10 @@ extension FungibleResourceAsset {
 }
 
 extension FungibleResourceAsset.ViewState {
+	var resourceBalance: ResourceBalance.ViewState {
+		.fungible(.init(resource: resource, isXRD: isXRD).withoutAmount)
+	}
+
 	var thumbnail: Thumbnail.TokenContent {
 		isXRD ? .xrd : .other(resource.metadata.iconURL)
 	}
@@ -33,30 +37,24 @@ extension FungibleResourceAsset.View {
 	public var body: some View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 			VStack(alignment: .trailing) {
-				HStack {
-					Thumbnail(token: viewStore.thumbnail, size: .smallest)
-
-					if let title = viewStore.resource.metadata.title {
-						Text(title)
-							.textStyle(.body2HighImportance)
-							.foregroundColor(.app.gray1)
-					}
-
-					TextField(
-						RETDecimal.zero.formatted(),
-						text: viewStore.binding(
-							get: \.transferAmountStr,
-							send: { .amountChanged($0) }
+				ResourceBalanceView(viewStore.resourceBalance, appearance: .compact)
+					.withAuxiliary(spacing: .small2) {
+						TextField(
+							RETDecimal.zero.formatted(),
+							text: viewStore.binding(
+								get: \.transferAmountStr,
+								send: { .amountChanged($0) }
+							)
 						)
-					)
-					.keyboardType(.decimalPad)
-					.lineLimit(1)
-					.multilineTextAlignment(.trailing)
-					.foregroundColor(.app.gray1)
-					.textStyle(.sectionHeader)
-					.focused($focused)
-					.bind(viewStore.focusedBinding, to: $focused)
-				}
+						.keyboardType(.decimalPad)
+						.multilineTextAlignment(.trailing)
+						.lineLimit(1)
+						.minimumScaleFactor(0.7)
+						.foregroundColor(.app.gray1)
+						.textStyle(.sectionHeader)
+						.focused($focused)
+						.bind(viewStore.focusedBinding, to: $focused)
+					}
 
 				if viewStore.totalExceedsBalance {
 					// TODO: Add better style

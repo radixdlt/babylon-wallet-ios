@@ -30,7 +30,7 @@ public func + (lhs: PredictedDecimal, rhs: PredictedDecimal) -> PredictedDecimal
 
 // MARK: - FungibleResourceIndicator
 public enum FungibleResourceIndicator: DummySargon {
-	case guaranteed(amount: PredictedDecimal)
+	case guaranteed(amount: RETDecimal)
 	case predicted(PredictedDecimal)
 	public var amount: RETDecimal {
 		sargon()

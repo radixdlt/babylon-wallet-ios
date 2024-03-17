@@ -31,7 +31,7 @@ public typealias IdentityAddress = SpecificAddress<IdentityEntityType>
 public typealias AccessControllerAddress = SpecificAddress<AccessControllerEntityType>
 public typealias VaultAddress = SpecificAddress<VaultEntityType>
 public typealias ValidatorAddress = SpecificAddress<ValidatorEntityType>
-public typealias ResourcePoolAddress = SpecificAddress<ResourcePoolEntityType>
+public typealias PoolAddress = SpecificAddress<ResourcePoolEntityType>
 
 // MARK: - EntityType + CaseIterable
 extension EntityType: CaseIterable {

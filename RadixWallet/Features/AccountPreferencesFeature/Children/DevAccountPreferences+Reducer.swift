@@ -300,7 +300,7 @@ extension DevAccountPreferences {
 	private func updateAccountPortfolio(_ state: State) -> Effect<Action> {
 		.run { [address = state.address] send in
 			await send(.internal(.refreshAccountCompleted(
-				TaskResult { try await accountPortfoliosClient.fetchAccountPortfolio(address, true) }
+				TaskResult { try await accountPortfoliosClient.fetchAccountPortfolio(address, true).account }
 			)))
 		}
 	}

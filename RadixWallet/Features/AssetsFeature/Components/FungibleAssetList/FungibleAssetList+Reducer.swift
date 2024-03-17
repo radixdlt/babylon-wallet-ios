@@ -16,6 +16,7 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 		}
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case section(FungibleAssetList.Section.State.ID, FungibleAssetList.Section.Action)
 	}

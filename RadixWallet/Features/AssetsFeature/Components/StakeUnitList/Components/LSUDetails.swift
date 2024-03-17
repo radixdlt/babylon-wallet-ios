@@ -6,7 +6,7 @@ public struct LSUDetails: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		let validator: OnLedgerEntity.Validator
 		let stakeUnitResource: OnLedgerEntitiesClient.ResourceWithVaultAmount
-		let xrdRedemptionValue: RETDecimal
+		let xrdRedemptionValue: ResourceAmount
 	}
 
 	@Dependency(\.dismiss) var dismiss
