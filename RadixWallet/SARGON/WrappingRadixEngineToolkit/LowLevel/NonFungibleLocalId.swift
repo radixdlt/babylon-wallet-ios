@@ -6,6 +6,10 @@ public enum NonFungibleLocalId: DummySargon {
 		sargon()
 	}
 
+	init(string: String) throws {
+		sargon()
+	}
+
 	public static func integer(value: Int) -> Self {
 		sargon()
 	}

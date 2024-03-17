@@ -184,12 +184,11 @@ extension TransactionHistoryClient {
 		_ type: ChangeType,
 		from changes: GatewayAPI.TransactionNonFungibleBalanceChanges
 	) throws -> [NonFungibleGlobalId] {
-//		let localIDStrings = type == .added ? changes.added : changes.removed
-//		let resourceAddress = try EngineToolkit.Address(address: changes.resourceAddress)
-//		return try localIDStrings
-//			.map(nonFungibleLocalIdFromStr)
-//			.map { try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress, nonFungibleLocalId: $0) }
-		sargon()
+		let localIDStrings = type == .added ? changes.added : changes.removed
+		let resourceAddress = try ResourceAddress(validatingAddress: changes.resourceAddress)
+		return try localIDStrings
+			.map(NonFungibleLocalId.init(string:))
+			.map { NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress, nonFungibleLocalId: $0) }
 	}
 
 	struct TimestampFormatter {
