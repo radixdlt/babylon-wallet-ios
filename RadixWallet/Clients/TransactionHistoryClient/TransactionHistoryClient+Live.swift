@@ -153,9 +153,7 @@ extension TransactionHistoryClient {
 			}
 
 			return .init(
-				parameters: request.parameters,
 				nextCursor: response.nextCursor,
-				totalCount: response.totalCount,
 				resources: keyedResources,
 				items: items
 			)

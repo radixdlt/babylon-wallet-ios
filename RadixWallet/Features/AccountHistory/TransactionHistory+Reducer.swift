@@ -12,6 +12,13 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case down
 	}
 
+	public enum ScrollTarget: Hashable, Sendable {
+		// Put the given transaction to the top
+		case transaction(TXID)
+		// Put the first transaction after the given date at the bottom
+		case date(Date)
+	}
+
 	public struct State: Sendable, Hashable {
 		let availableMonths: [DateRangeItem]
 
@@ -29,16 +36,38 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		var currentMonth: DateRangeItem.ID
 
 		/// Values related to loading. Note that `parameters` are set **when receiving the response**
-		var loading: Loading = .init(parameters: .init(period: Date.now ..< Date.now))
+		var loading: Loading = .init(from: .babylonLaunch)
 
 		/// Workaround, TCA sends the sectionDisappeared after we dismiss, causing a run-time warning
 		var didDismiss: Bool = false
 
 		struct Loading: Hashable, Sendable {
-			let parameters: TransactionHistoryParameters
-			var isLoading: Bool = false
-			var nextCursor: String? = nil
-			var didLoadFully: Bool = false
+			let fullPeriod: Range<Date>
+			let pivotDate: Date
+
+			var isLoading: Bool
+			var upCursor: Cursor
+			var downCursor: Cursor
+			var direction: Direction
+
+			init(
+				from: Date,
+				pivotDate: Date? = nil,
+				filters: [TransactionFilter] = []
+			) {
+				self.fullPeriod = from ..< .now
+				self.pivotDate = pivotDate ?? .now
+				self.isLoading = false
+				self.upCursor = .firstRequest
+				self.downCursor = .firstRequest
+				self.direction = .down
+			}
+
+			public enum Cursor: Hashable, Sendable {
+				case firstRequest
+				case next(String)
+				case loadedAll
+			}
 		}
 
 		@PresentationState
@@ -78,7 +107,11 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Hashable {
-		case loadedHistory(TransactionHistoryResponse)
+		case loadedHistory(
+			TransactionHistoryResponse,
+			parameters: TransactionHistoryRequest.Parameters,
+			scrollTarget: ScrollTarget?
+		)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -120,38 +153,36 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onAppear:
-			return loadHistory(period: .babylonLaunch ..< .now, state: &state)
+			return load(.down, state: &state)
 
 		case let .selectedMonth(month):
-			let calendar: Calendar = .current
-			guard let endOfMonth = calendar.date(byAdding: .month, value: 1, to: month) else { return .none }
-			let period: Range<Date> = .babylonLaunch ..< min(endOfMonth, .now)
 			state.currentMonth = month
 			print("• selectedMonth: LOAD period")
-			return loadHistory(period: period, state: &state)
+			return load(month, state: &state)
 
 		case .filtersTapped:
 
-			// FIXME: GK REMOVE
-			guard !state.loading.isLoading else { return .none }
-			switch state.loading.parameters.direction {
-			case .down:
-				// If we are at the end of the period, we can't load more
-				guard state.currentMonth != state.availableMonths.last?.id else { print("•• can't load later tx"); return .none }
-				guard let loadedRange = state.loadedRange else { return .none }
-				print("• filtersTapped: LOAD period upwards")
-				return loadHistory(period: loadedRange.upperBound ..< .now, direction: .up, state: &state)
-			case .up:
-				print("• filtersTapped: LOAD more upwards")
-				return loadMoreHistory(state: &state)
-			}
+//			// FIXME: GK REMOVE - emulate scroll to top
+//			guard !state.loading.isLoading else { return .none }
+//			switch state.loading.currentDirection {
+//			case .down:
+//				// If we are at the end of the period, we can't load more
+//				guard state.currentMonth != state.availableMonths.last?.id else { print("•• can't load later tx"); return .none }
+//				guard let loadedRange = state.loadedRange else { return .none }
+//				print("• filtersTapped: LOAD period upwards")
+//				return loadHistory(period: loadedRange.upperBound ..< .now, direction: .up, state: &state)
+//			case .up:
+//				print("• filtersTapped: LOAD more upwards")
+//				return loadMoreHistory(state: &state)
+//			}
 
 //			state.destination = .filters(.init(portfolio: state.portfolio, filters: state.activeFilters.map(\.id)))
-//			return .none
+			return .none
 
 		case let .filterCrossTapped(id):
 			state.activeFilters.remove(id: id)
-			return loadHistory(filters: state.activeFilters.map(\.id), state: &state)
+
+//			return loadHistory(filters: state.activeFilters.map(\.id), state: &state)
 
 		case .closeTapped:
 			state.didDismiss = true
@@ -176,18 +207,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 			case .nearingTop:
 				print("• ACTION nearingTop")
-				guard !state.loading.isLoading else { return .none }
-				switch state.loading.parameters.direction {
-				case .down:
-					// If we are at the end of the period, we can't load more
-					guard state.currentMonth != state.availableMonths.last?.id else { print("•• can't load later tx"); return .none }
-					guard let loadedRange = state.loadedRange else { return .none }
-					print("• filtersTapped: LOAD period upwards")
-					return loadHistory(period: loadedRange.upperBound ..< .now, direction: .up, state: &state)
-				case .up:
-					print("• filtersTapped: LOAD more upwards")
-					return loadMoreHistory(state: &state)
-				}
 
 			case .nearingBottom, .reachedBottom:
 				print("• ACTION nearingBottom/reachedBottom: LOAD more")
@@ -210,8 +229,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadedHistory(history):
-			loadedHistory(history, state: &state)
+		case let .loadedHistory(response, parameters, scrollTarget):
+			loadedHistory(response, parameters: parameters, scrollTarget: scrollTarget, state: &state)
 			return .none
 		}
 	}
@@ -227,73 +246,99 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		loadHistory(filters: state.activeFilters.map(\.id), state: &state)
+		load(with: state.activeFilters.map(\.id), state: &state)
 	}
 
 	// Helper methods
 
-	/// Load history for the given period, using existing filters
-	func loadHistory(period: Range<Date>, direction: Direction = .down, state: inout State) -> Effect<Action> {
-		var parameters = state.loading.parameters
-		parameters.period = period
-		parameters.direction = direction
-		return loadHistory(parameters: parameters, state: &state)
+	func load(with filters: [TransactionFilter], state: inout State) -> Effect<Action> {
+		.none
 	}
 
-	/// Load history for the current period using the provided filters
-	func loadHistory(filters: [TransactionFilter], state: inout State) -> Effect<Action> {
-		var parameters = state.loading.parameters
-		parameters.filters = filters
-		return loadHistory(parameters: parameters, state: &state)
-	}
-
-	/// Load more history for the same period, using the existing filters
-	func loadMoreHistory(state: inout State) -> Effect<Action> {
-		loadHistory(parameters: state.loading.parameters, state: &state)
-	}
-
-	/// Load history using the provided parameters, should not be used directly
-	func loadHistory(parameters: TransactionHistoryParameters, state: inout State) -> Effect<Action> {
-		if state.loading.isLoading { return .none }
-
-		if state.loading.didLoadFully, state.loading.parameters.covers(parameters) { print("•• ALREADY LOADED"); return .none }
-
-		print("•• LOAD HISTORY: \(parameters != state.loading.parameters ? "new parameters" : "same params")")
-
-		if parameters != state.loading.parameters {
-			state.loading.nextCursor = nil
-		}
-
-		state.loading.isLoading = true
+	// Load history for the provided month, keeping the same period and filters
+	func load(_ month: Date, state: inout State) -> Effect<Action> {
+		let calendar: Calendar = .current
+		guard let endOfMonth = calendar.date(byAdding: .month, value: 1, to: month) else { return .none }
+		state.sections = []
+		state.loading = .init(from: .babylonLaunch, pivotDate: min(endOfMonth, .now))
 
 		let request = TransactionHistoryRequest(
 			account: state.account.accountAddress,
-			parameters: parameters,
-			cursor: state.loading.nextCursor,
+			parameters: .init(period: period, direction: direction, filters: state.loading.filters),
+			cursor: cursor,
+			allResourcesAddresses: state.portfolio.allResourceAddresses,
+			resources: state.resources
+		)
+
+		return loadHistory(request: request, scrollTo: scrollTarget, state: &state)
+	}
+
+//	// Load (more) history in the given direction, keeping the same period and filters
+//	func load(_ direction: Direction, state: inout State) -> Effect<Action> {
+//		let period: Range<Date> = state.loading.fullPeriod.split(before: direction == .up, point: state.loading.pivotDate)
+//		let cursor: String?
+//		let scrollTarget: ScrollTarget?
+//
+//		switch direction {
+//		case .up:
+//			guard state.loading.upCursor != .loadedAll else { print("• LOADED LATEST ALREADY"); return .none }
+//			period = state.loading.fullPeriod.lowerBound ..< state.loading.pivotDate
+//			cursor = state.loading.upCursor.string
+//			scrollTarget = (state.sections.first?.transactions.first?.id).map(ScrollTarget.transaction)
+//		case .down:
+//			guard state.loading.downCursor != .loadedAll else { print("• LOADED OLDEST ALREADY"); return .none }
+//			period = state.loading.pivotDate ..< state.loading.fullPeriod.upperBound
+//			cursor = state.loading.downCursor.string
+//			scrollTarget = nil
+//		}
+//
+//		let request = TransactionHistoryRequest(
+//			account: state.account.accountAddress,
+//			parameters: .init(period: period, direction: direction, filters: state.loading.filters),
+//			cursor: cursor,
+//			allResourcesAddresses: state.portfolio.allResourceAddresses,
+//			resources: state.resources
+//		)
+//
+//		return loadHistory(request: request, scrollTo: scrollTarget, state: &state)
+//	}
+//
+
+	/// Load (more) history using the parameters in `loading`, **should not be used directly**
+	func loadHistory(direction: Direction, cursor: String?, scrollTo: ScrollTarget? = nil, state: inout State) -> Effect<Action> {
+		guard !state.loading.isLoading, state.loading.cursor != .loadedAll else { return .none }
+		state.loading.isLoading = true
+
+		let scrollTarget: ScrollTarget? = switch direction {
+		case .up: (state.sections.first?.transactions.first?.id).map(ScrollTarget.transaction)
+		case .down: nil
+		}
+
+		let request = TransactionHistoryRequest(
+			account: state.account.accountAddress,
+			parameters: state.requestParameters,
+			cursor: state.loading.cursor.string,
 			allResourcesAddresses: state.portfolio.allResourceAddresses,
 			resources: state.resources
 		)
 
 		return .run { send in
 			let response = try await transactionHistoryClient.getTransactionHistory(request)
-			await send(.internal(.loadedHistory(response)))
+			await send(.internal(.loadedHistory(response, parameters: request.parameters, scrollTarget: scrollTarget)))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}
 	}
 
-	func loadedHistory(_ response: TransactionHistoryResponse, state: inout State) {
+	func loadedHistory(
+		_ response: TransactionHistoryResponse,
+		parameters: TransactionHistoryRequest.Parameters,
+		scrollTarget: ScrollTarget?,
+		state: inout State
+	) {
 		state.resources.append(contentsOf: response.resources)
 
-		func shouldPrependWithOverlap() -> Int? {
-			guard !state.sections.isEmpty else { return nil }
-			guard state.loading.parameters.direction == .down, response.parameters.direction == .up else { return nil }
-			let overlap = state.sections.allTransactions.prefixOverlappingSuffix(of: response.items.map(\.id))
-			guard overlap > 0 else { return nil }
-			return overlap
-		}
-
-		if response.parameters == state.loading.parameters {
+		if response.requestParameters == state.loading.parameters {
 			print("•• LOADED \(response.items.count) same params")
 			// We loaded more from the same range
 			state.loading.nextCursor = response.nextCursor
@@ -302,7 +347,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			}
 
 			state.sections.addItems(response.items, direction: response.parameters.direction)
-		} else if let overlap = shouldPrependWithOverlap() {
+		} else if let overlap = state.sections.allTransactions.prefixOverlappingSuffix(of: response.items.map(\.id)) {
 			print("•• LOADED \(response.items.count) overlap: \(overlap)")
 			// Switched from down to up, prepend new data to existing, but with some overlap
 			state.loading = .init(parameters: response.parameters, nextCursor: response.nextCursor)
@@ -314,6 +359,45 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		}
 
 		state.loading.isLoading = false
+	}
+}
+
+extension TransactionHistory.State.Loading {
+	func requestParameters(for direction: TransactionHistory.Direction) -> TransactionHistoryRequest.Parameters {
+		let period = loading.fullPeriod.split(before: direction == .down, point: loading.pivotDate)
+
+		return .init(
+			period: loading.period,
+			filters: activeFilters.map(\.id),
+			direction: loading.direction
+		)
+	}
+
+	var period: Range<Date> {
+		fullPeriod.split(before: direction == .down, point: pivotDate)
+	}
+
+	var cursor: Cursor {
+		switch direction {
+		case .up: upCursor
+		case .down: downCursor
+		}
+	}
+
+	mutating func setNextCursor(_ cursor: Cursor, direction: TransactionHistory.Direction) {
+		switch direction {
+		case .up:
+			upCursor = cursor
+		case .down:
+			downCursor = cursor
+		}
+	}
+}
+
+extension TransactionHistory.State.Loading.Cursor {
+	var string: String? {
+		guard case let .next(value) = self else { return nil }
+		return value
 	}
 }
 
@@ -336,6 +420,12 @@ extension TransactionHistory.State {
 extension Range {
 	func contains(_ otherRange: Range) -> Bool {
 		otherRange.lowerBound >= lowerBound && otherRange.upperBound <= upperBound
+	}
+
+	/// Returns the part of the range that is before (or after, respectivel) the provided point
+	func split(before: Bool, point: Bound) -> Range {
+		let clamped = Swift.min(Swift.max(point, lowerBound), upperBound)
+		return before ? lowerBound ..< clamped : clamped ..< upperBound
 	}
 }
 

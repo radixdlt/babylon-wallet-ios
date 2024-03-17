@@ -756,14 +756,11 @@ extension Collection where Element: Equatable {
 		suffix(elements.count).elementsEqual(elements)
 	}
 
-	// IF the start of this collection overlaps the end of the other, returns the length of this overlap
-	func prefixOverlappingSuffix(of elements: some Collection<Element>) -> Int {
-		guard let first, let index = elements.reversed().firstIndex(of: first) else { print("   • no overlap"); return 0 }
-		if elements.hasSuffix(prefix(index + 1)) {
-			return index + 1
-		} else {
-			return 0
-		}
+	/// When the start of this collection overlaps the end of the other, returns the length of this overlap, otherwise `nil`
+	func prefixOverlappingSuffix(of elements: some Collection<Element>) -> Int? {
+		guard let first, let index = elements.reversed().firstIndex(of: first) else { return nil }
+		guard elements.hasSuffix(prefix(index + 1)) else { return nil }
+		return index + 1
 	}
 }
 

@@ -13,38 +13,30 @@ extension TransactionHistoryClient {
 // MARK: - TransactionHistoryRequest
 public struct TransactionHistoryRequest: Sendable, Hashable {
 	public let account: AccountAddress
-	public let parameters: TransactionHistoryParameters
+	public let parameters: Parameters
 	public let cursor: String?
 
 	public let allResourcesAddresses: Set<ResourceAddress>
 	public let resources: IdentifiedArrayOf<OnLedgerEntity.Resource>
+
+	// MARK: - Parameters
+	public struct Parameters: Sendable, Hashable {
+		public var period: Range<Date>
+		public var filters: [TransactionFilter]
+		public var direction: TransactionHistory.Direction
+
+		/// The other parameter set already encompasses these transactions
+		public func covers(_ parameters: Self) -> Bool {
+			filters == parameters.filters && period.contains(parameters.period)
+		}
+	}
 }
 
 // MARK: - TransactionHistoryResponse
 public struct TransactionHistoryResponse: Sendable, Hashable {
-	public let parameters: TransactionHistoryParameters
 	public let nextCursor: String?
-	public let totalCount: Int64?
 	public let resources: IdentifiedArrayOf<OnLedgerEntity.Resource>
 	public let items: [TransactionHistoryItem]
-}
-
-// MARK: - TransactionHistoryParameters
-public struct TransactionHistoryParameters: Sendable, Hashable {
-	public var period: Range<Date>
-	public var direction: TransactionHistory.Direction
-	public var filters: [TransactionFilter]
-
-	public init(period: Range<Date>, direction: TransactionHistory.Direction = .down, filters: [TransactionFilter] = []) {
-		self.period = period
-		self.direction = direction
-		self.filters = filters
-	}
-
-	/// The other parameter set already encompasses these transactions
-	public func covers(_ parameters: Self) -> Bool {
-		filters == parameters.filters && period.contains(parameters.period)
-	}
 }
 
 // MARK: - TransactionHistoryItem
