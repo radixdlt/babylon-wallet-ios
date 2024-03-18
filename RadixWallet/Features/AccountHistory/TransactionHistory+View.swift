@@ -47,6 +47,12 @@ extension TransactionHistory {
 							store.send(.view(.transactionsTableAction(action)))
 						}
 						.opacity(viewStore.sections == [] ? 0 : 1)
+						.background(alignment: .top) {
+							if viewStore.loading.isLoading {
+								ProgressView()
+									.padding(.small3)
+							}
+						}
 					}
 					.background {
 						if viewStore.showEmptyState {
