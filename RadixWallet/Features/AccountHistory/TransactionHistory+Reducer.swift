@@ -42,6 +42,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		/// Workaround, TCA sends the sectionDisappeared after we dismiss, causing a run-time warning
 		var didDismiss: Bool = false
 
+		var showAccount: Bool = true
+
 		struct Loading: Hashable, Sendable {
 			let fullPeriod: Range<Date>
 			let pivotDate: Date
