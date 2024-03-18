@@ -75,7 +75,6 @@ extension Home {
 		public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 			switch internalAction {
 			case let .accountPortfolioUpdate(portfolio):
-				print("Portfolio update called \(portfolio.account.address)")
 				state.isDappDefinitionAccount = portfolio.account.metadata.accountType == .dappDefinition
 
 				assert(portfolio.account.address == state.account.address)

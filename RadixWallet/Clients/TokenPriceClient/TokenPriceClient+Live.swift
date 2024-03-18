@@ -4,7 +4,11 @@ extension TokenPricesClient {
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		@Dependency(\.jsonEncoder) var jsonEncoder
 		@Dependency(\.cacheClient) var cacheClient
+		#if DEBUG
 		let rootURL = URL(string: "https://dev-token-price.extratools.works")!
+		#else
+		let rootURL = URL(string: "https://token-price-service.radixdlt.com")!
+		#endif
 
 		@Sendable
 		func getTokenPrices(_ fetchRequest: FetchPricesRequest) async throws -> TokenPrices {
@@ -39,19 +43,17 @@ extension TokenPricesClient {
 
 extension TokenPricesClient.TokenPrices {
 	fileprivate init(_ tokenPricesResponse: TokensPriceResponse) {
-		self = tokenPricesResponse.tokens.reduce(into: [:]) { partialResult, next in
-			let roundedToRETPrecision = next.price.roundDoubleToDecimalPlaces(Int(RETDecimal.maxDivisibility - 10))
-			partialResult[next.resourceAddress] = RETDecimal(floatLiteral: roundedToRETPrecision)
-		}
-	}
-}
+		let formatter = NumberFormatter()
+		formatter.numberStyle = .decimal
+		formatter.maximumFractionDigits = Int(RETDecimal.maxDivisibility)
+		formatter.roundingMode = .down
 
-extension Double {
-	func roundDoubleToDecimalPlaces(_ decimalPlaces: Int) -> Double {
-		var decimalValue = Decimal(self)
-		var result = Decimal()
-		NSDecimalRound(&result, &decimalValue, decimalPlaces, .plain)
-		return (result as NSDecimalNumber).doubleValue
+		self = tokenPricesResponse.tokens.reduce(into: [:]) { partialResult, next in
+			let trimmed = formatter.string(for: next.price) ?? ""
+			if let value = try? RETDecimal(value: trimmed) {
+				partialResult[next.resourceAddress] = value
+			}
+		}
 	}
 }
 

@@ -28,6 +28,7 @@
 "account_staking_readyToClaim" = "Ready to Claim";
 "account_staking_readyToBeClaimed" = "Ready to be claimed";
 "account_staking_staked" = "Staked";
+"account_staking_currentStake" = "Current Stake: %@";
 "account_staking_liquidStakeUnits" = "Liquid Stake Units";
 "account_staking_stakeClaimNFTs" = "Stake Claim NFTs";
 "account_staking_worth" = "WORTH";
@@ -453,6 +454,7 @@
 "transactionStatus_dismissDialog_message" = "Stop waiting for transaction result? The transaction will not be canceled.";
 "transactionStatus_dismissalDisabledDialog_title" = "Dismiss";
 "transactionStatus_dismissalDisabledDialog_text" = "This transaction requires to be completed";
+"transactionStatus_assertionFailure_text" = "Transaction failed because a guarantee on transaction results was not met. Consider reducing your preferred guarantee %";
 "addressAction_copyAddress" = "Copy Address";
 "addressAction_copiedToClipboard" = "Copied to Clipboard";
 "addressAction_copyNftId" = "Copy NFT ID";

@@ -45,7 +45,7 @@ final class AccountAndPersonaHidingTests: TestCase {
 			))
 		}
 
-		await store.send(.view(.confirmUnhideAllAlert(.presented(.confirmTapped)))) {
+		await store.send(.destination(.presented(.confirmUnhideAllAlert(.confirmTapped)))) {
 			$0.destination = nil
 		}
 
@@ -97,7 +97,7 @@ final class AccountAndPersonaHidingTests: TestCase {
 			))
 		}
 
-		await store.send(.view(.confirmUnhideAllAlert(.presented(.confirmTapped)))) {
+		await store.send(.destination(.presented(.confirmUnhideAllAlert(.confirmTapped)))) {
 			$0.destination = nil
 		}
 

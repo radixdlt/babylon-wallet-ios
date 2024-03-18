@@ -32,12 +32,12 @@ public struct TransactionHistoryResponse: Sendable, Hashable {
 // MARK: - TransactionHistoryParameters
 public struct TransactionHistoryParameters: Sendable, Hashable {
 	public let period: Range<Date>
-	public let backwards: Bool
+	public let downwards: Bool
 	public let filters: [TransactionFilter]
 
-	public init(period: Range<Date>, backwards: Bool = true, filters: [TransactionFilter] = []) {
+	public init(period: Range<Date>, downwards: Bool = true, filters: [TransactionFilter] = []) {
 		self.period = period
-		self.backwards = backwards
+		self.downwards = downwards
 		self.filters = filters
 	}
 
@@ -48,14 +48,35 @@ public struct TransactionHistoryParameters: Sendable, Hashable {
 }
 
 // MARK: - TransactionHistoryItem
-public struct TransactionHistoryItem: Sendable, Hashable {
-	let time: Date
-	let message: String?
-	let manifestClass: GatewayAPI.ManifestClass?
-	let withdrawals: [ResourceBalance]
-	let deposits: [ResourceBalance]
-	let depositSettingsUpdated: Bool
-	let failed: Bool
+public struct TransactionHistoryItem: Sendable, Hashable, Identifiable {
+	public let id: TXID
+	public let time: Date
+	public let message: String?
+	public let manifestClass: GatewayAPI.ManifestClass?
+	public let withdrawals: [ResourceBalance]
+	public let deposits: [ResourceBalance]
+	public let depositSettingsUpdated: Bool
+	public let failed: Bool
+
+	init(
+		id: TXID,
+		time: Date,
+		message: String? = nil,
+		manifestClass: GatewayAPI.ManifestClass? = nil,
+		withdrawals: [ResourceBalance] = [],
+		deposits: [ResourceBalance] = [],
+		depositSettingsUpdated: Bool = false,
+		failed: Bool = false
+	) {
+		self.id = id
+		self.time = time
+		self.message = message
+		self.manifestClass = manifestClass
+		self.withdrawals = withdrawals
+		self.deposits = deposits
+		self.depositSettingsUpdated = depositSettingsUpdated
+		self.failed = failed
+	}
 }
 
 // MARK: - TransactionFilter

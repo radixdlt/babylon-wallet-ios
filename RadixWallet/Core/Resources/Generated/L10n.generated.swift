@@ -40,6 +40,10 @@ public enum L10n {
     public enum Staking {
       /// Claim
       public static let claim = L10n.tr("Localizable", "account_staking_claim", fallback: "Claim")
+      /// Current Stake: %@
+      public static func currentStake(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "account_staking_currentStake", String(describing: p1), fallback: "Current Stake: %@")
+      }
       /// Liquid Stake Units
       public static let liquidStakeUnits = L10n.tr("Localizable", "account_staking_liquidStakeUnits", fallback: "Liquid Stake Units")
       /// Radix Network XRD Stake Summary
@@ -2647,6 +2651,10 @@ public enum L10n {
     public static let title = L10n.tr("Localizable", "transactionSigning_title", fallback: "Approve Transaction")
   }
   public enum TransactionStatus {
+    public enum AssertionFailure {
+      /// Transaction failed because a guarantee on transaction results was not met. Consider reducing your preferred guarantee %
+      public static let text = L10n.tr("Localizable", "transactionStatus_assertionFailure_text", fallback: "Transaction failed because a guarantee on transaction results was not met. Consider reducing your preferred guarantee %")
+    }
     public enum Completing {
       /// Completing Transaction…
       public static let text = L10n.tr("Localizable", "transactionStatus_completing_text", fallback: "Completing Transaction…")

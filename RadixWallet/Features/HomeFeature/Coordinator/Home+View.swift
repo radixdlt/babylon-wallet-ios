@@ -35,9 +35,11 @@ extension Home {
 
 						if let fiatWorth = viewStore.totalFiatWorth {
 							VStack(spacing: .small2) {
-								Text("TOTAL VALUE")
+								Text(L10n.HomePage.totalValue)
 									.foregroundStyle(.app.gray2)
 									.textStyle(.body1Header)
+									.textCase(.uppercase)
+
 								TotalCurrencyWorthView(
 									state: .init(totalCurrencyWorth: fiatWorth),
 									backgroundColor: .app.gray4
@@ -95,9 +97,6 @@ extension Home {
 			.onFirstAppear {
 				store.send(.view(.onFirstAppear))
 			}
-			.onAppear {
-				debugPrint("Home did Appear")
-			}
 		}
 
 		private struct HeaderView: SwiftUI.View {
@@ -153,7 +152,6 @@ private extension View {
 			.exportMnemonic(with: destinationStore)
 			.importMnemonics(with: destinationStore)
 			.acknowledgeJailbreakAlert(with: destinationStore)
-			.userFeedback(with: destinationStore)
 	}
 
 	private func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
@@ -197,15 +195,6 @@ private extension View {
 			store: destinationStore,
 			state: /Home.Destination.State.acknowledgeJailbreakAlert,
 			action: Home.Destination.Action.acknowledgeJailbreakAlert
-		)
-	}
-
-	private func userFeedback(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /Home.Destination.State.npsSurvey,
-			action: Home.Destination.Action.npsSurvey,
-			content: { NPSSurvey.View(store: $0) }
 		)
 	}
 }

@@ -25,51 +25,24 @@ extension TransactionHistory {
 					let selection = viewStore.binding(get: \.currentMonth, send: ViewAction.selectedMonth)
 
 					VStack(spacing: .zero) {
-						VStack(spacing: .small2) {
-							HScrollBarDummy()
+						accountHeader
 
-							if !viewStore.activeFilters.isEmpty {
-								ActiveFiltersView.Dummy()
+						VStack(spacing: .small2) {
+							HScrollBar(items: viewStore.availableMonths, selection: selection)
+
+							if let filters = viewStore.activeFilters.nilIfEmpty {
+								ActiveFiltersView(filters: filters) { id in
+									store.send(.view(.filterCrossTapped(id)), animation: .default)
+								}
 							}
 						}
 						.padding(.top, .small2)
 						.padding(.bottom, .small1)
+						.background(.app.white)
 
-						ScrollView {
-							LazyVStack(spacing: .small1, pinnedViews: [.sectionHeaders]) {
-								accountHeader
-									.measurePosition(View.accountDummy, coordSpace: View.coordSpace)
-									.opacity(0)
-
-								if viewStore.loading.isLoading, !viewStore.loading.parameters.backwards {
-									ProgressView()
-										.padding(.small1)
-								}
-
-								ForEach(viewStore.sections) { section in
-									SectionView(section: section)
-										.onAppear {
-											store.send(.view(.sectionAppeared(section.id)))
-										}
-										.onDisappear {
-											guard !viewStore.didDismiss else { return }
-											store.send(.view(.sectionDisappeared(section.id)))
-										}
-								}
-
-								Rectangle()
-									.fill(.clear)
-									.frame(height: .medium3)
-									.overlay {
-										if viewStore.loading.isLoading, viewStore.loading.parameters.backwards {
-											ProgressView()
-										}
-									}
-							}
-							.padding(.bottom, .medium3)
+						TransactionsTableView(sections: viewStore.sections) { action in
+							store.send(.view(.transactionsTableAction(action)))
 						}
-						.scrollIndicators(.never)
-						.coordinateSpace(name: View.coordSpace)
 					}
 					.background {
 						if viewStore.showEmptyState {
@@ -79,35 +52,6 @@ extension TransactionHistory {
 						}
 					}
 					.background(.app.gray5)
-					.overlayPreferenceValue(PositionsPreferenceKey.self, alignment: .top) { positions in
-						let rect = positions[View.accountDummy]
-						ZStack(alignment: .top) {
-							if let rect {
-								accountHeader
-									.offset(y: rect.minY)
-							}
-
-							let scrollBarOffset = max(rect?.maxY ?? 0, 0)
-							VStack(spacing: .small2) {
-								HScrollBar(items: viewStore.availableMonths, selection: selection)
-
-								if let filters = viewStore.activeFilters.nilIfEmpty {
-									ActiveFiltersView(filters: filters) { id in
-										store.send(.view(.filterCrossTapped(id)), animation: .default)
-									}
-								}
-							}
-							.padding(.top, .small2)
-							.padding(.bottom, .small1)
-							.background(.app.white)
-							.offset(y: scrollBarOffset)
-						}
-					}
-					.onReadPosition(View.accountDummy) { rect in
-						if rect.minY > 50 {
-							store.send(.view(.pulledDown))
-						}
-					}
 					.clipShape(Rectangle())
 					.toolbar {
 						ToolbarItem(placement: .topBarLeading) {
@@ -137,12 +81,16 @@ extension TransactionHistory {
 	}
 
 	struct SectionView: SwiftUI.View {
-		let section: TransactionHistory.State.TransactionSection
+		let section: TransactionHistory.TransactionSection
+		let onTap: (TXID) -> Void
 
 		var body: some SwiftUI.View {
 			Section {
 				ForEach(section.transactions, id: \.self) { transaction in
 					TransactionView(transaction: transaction)
+						.onTapGesture {
+							onTap(transaction.id)
+						}
 						.padding(.horizontal, .medium3)
 				}
 			} header: {
@@ -555,7 +503,7 @@ private enum PositionsPreferenceKey: PreferenceKey {
 	}
 }
 
-extension TransactionHistory.State.TransactionSection {
+extension TransactionHistory.TransactionSection {
 	var title: String {
 		day.formatted(date: .abbreviated, time: .omitted)
 	}
@@ -607,5 +555,247 @@ extension TransactionHistory {
 		case .validatorClaim: L10n.TransactionHistory.ManifestClass.claim
 		case .accountDepositSettingsUpdate: L10n.TransactionHistory.ManifestClass.accountSettings
 		}
+	}
+}
+
+// MARK: - TransactionHistory.TransactionsTableView
+extension TransactionHistory {
+	public struct TransactionsTableView: UIViewRepresentable {
+		public enum Action: Hashable, Sendable {
+			case transactionTapped(TXID)
+			case pulledDown
+			case nearingTop
+			case nearingBottom
+			case monthChanged(Date)
+		}
+
+		private static let cellIdentifier = "TransactionCell"
+
+		let sections: IdentifiedArrayOf<TransactionSection>
+		let action: (Action) -> Void
+
+		public func makeUIView(context: Context) -> UITableView {
+			let tableView = UITableView(frame: .zero, style: .plain)
+			tableView.backgroundColor = .clear
+			tableView.separatorStyle = .none
+			tableView.register(UITableViewCell.self, forCellReuseIdentifier: Self.cellIdentifier)
+			tableView.delegate = context.coordinator
+			tableView.dataSource = context.coordinator
+			tableView.sectionHeaderTopPadding = 0
+
+			return tableView
+		}
+
+		public func updateUIView(_ uiView: UITableView, context: Context) {
+			guard sections != context.coordinator.sections else { return }
+			let oldTransactions = context.coordinator.sections.allTransactions
+			let newTransactions = sections.allTransactions
+
+			if !oldTransactions.isEmpty, newTransactions.hasSuffix(oldTransactions) {
+				print(" •• updateUIView: inserted \(newTransactions.count - oldTransactions.count) above")
+				let oldContentHeight = uiView.contentSize.height
+				let oldContentOffset = uiView.contentOffset.y
+				context.coordinator.sections = sections
+				uiView.reloadData()
+				let newContentHeight = uiView.contentSize.height
+
+				let new = oldContentOffset + newContentHeight - oldContentHeight
+				let inserted = newContentHeight - oldContentHeight
+				print(" •• updateUIView: (height : offset): \(oldContentHeight) : \(oldContentOffset) -> \(newContentHeight) : \(new) [\(inserted)]")
+
+				uiView.contentOffset.y = oldContentOffset + newContentHeight - oldContentHeight
+			} else if !oldTransactions.isEmpty, newTransactions.hasPrefix(oldTransactions) {
+				print(" •• updateUIView: inserted \(newTransactions.count - oldTransactions.count) below")
+				context.coordinator.sections = sections
+				uiView.reloadData()
+			} else {
+				print(" •• updateUIView: everything changed")
+				context.coordinator.sections = sections
+				uiView.reloadData()
+			}
+		}
+
+		public func makeCoordinator() -> Coordinator {
+			Coordinator(sections: sections, action: action)
+		}
+
+		public class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
+			var sections: IdentifiedArrayOf<TransactionSection>
+			let action: (Action) -> Void
+
+			private var isScrolledPastTop: Bool = false
+
+			private var previousCell: IndexPath = .init(row: 0, section: 0)
+
+			private var month: Date = .distantPast
+
+			private var scrolling: (direction: ScrollDirection, count: Int) = (.down, 0)
+
+			public init(
+				sections: IdentifiedArrayOf<TransactionSection>,
+				action: @escaping (Action) -> Void
+			) {
+				self.sections = sections
+				self.action = action
+			}
+
+			public func numberOfSections(in tableView: UITableView) -> Int {
+				sections.count
+			}
+
+			public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+				let section = sections[section]
+
+				let headerView = TransactionHistory.SectionHeaderView(title: section.title)
+				let hostingController = UIHostingController(rootView: headerView)
+				hostingController.view.backgroundColor = .clear
+				hostingController.view.sizeToFit()
+
+				return hostingController.view
+			}
+
+			public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+				sections[section].transactions.count
+			}
+
+			public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+				let cell = tableView.dequeueReusableCell(withIdentifier: TransactionsTableView.cellIdentifier, for: indexPath)
+				let item = sections[indexPath.section].transactions[indexPath.row]
+
+				cell.backgroundColor = .clear
+				cell.contentConfiguration = UIHostingConfiguration { [weak self] in
+					Button {
+						self?.action(.transactionTapped(item.id))
+					} label: {
+						TransactionHistory.TransactionView(transaction: item)
+					}
+				}
+				cell.selectionStyle = .none
+
+				return cell
+			}
+
+			public func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+				UITableView.automaticDimension
+			}
+
+			public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+				let section = sections[indexPath.section]
+				let txID = section.transactions[indexPath.row].id
+				let scrollDirection: ScrollDirection = indexPath > previousCell ? .down : .up
+				if scrollDirection == scrolling.direction {
+					scrolling.count += 1
+				} else {
+					scrolling = (scrollDirection, 0)
+				}
+				previousCell = indexPath
+
+				// We only want to pre-emptively load if they have been scrolling for a while in the same direction
+				if scrolling.count > 8 {
+					let transactions = sections.allTransactions
+					if scrolling.direction == .down, transactions.suffix(15).contains(txID) {
+						action(.nearingBottom)
+						scrolling.count = 0
+					} else if scrollDirection == .up, transactions.prefix(7).contains(txID) {
+						action(.nearingTop)
+						scrolling.count = 0
+					}
+				}
+			}
+
+			public func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+				nil
+			}
+
+			// UIScrollViewDelegate
+
+			public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+				if let tableView = scrollView as? UITableView {
+					updateMonth(tableView: tableView)
+				}
+
+				if scrollView.contentOffset.y < -30, !isScrolledPastTop {
+					action(.pulledDown)
+					isScrolledPastTop = true
+				} else if isScrolledPastTop, scrollView.contentOffset.y >= 0 {
+					isScrolledPastTop = false
+				}
+			}
+
+			// Helpers
+
+			private func updateMonth(tableView: UITableView) {
+				guard let topMost = tableView.indexPathsForVisibleRows?.first else { return }
+				let newMonth = sections[topMost.section].month
+				guard newMonth != month else { return }
+				action(.monthChanged(newMonth))
+				month = newMonth
+			}
+		}
+	}
+}
+
+extension Collection where Element: Equatable {
+	func hasPrefix(_ elements: some Collection<Element>) -> Bool {
+		prefix(elements.count).elementsEqual(elements)
+	}
+
+	func hasSuffix(_ elements: some Collection<Element>) -> Bool {
+		suffix(elements.count).elementsEqual(elements)
+	}
+
+	func prefix(sharedWith other: some Collection<Element>) -> [Element] {
+		zip(self, other).prefix(while: ==).map(\.0)
+	}
+
+	func suffix(sharedWith other: some Collection<Element>) -> some Collection<Element> {
+		zip(self, other).map(Pair.init).suffix(while: \.equal).map(\.left)
+	}
+}
+
+extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
+	var allTransactions: [TXID] {
+		flatMap(\.transactions.ids)
+	}
+
+	var firstTransaction: TXID? {
+		first?.transactions.first?.id
+	}
+
+	func index(of transaction: TXID) -> IndexPath? {
+		for (index, section) in enumerated() {
+			if let row = section.transactions.ids.firstIndex(of: transaction) {
+				return .init(row: row, section: index)
+			}
+		}
+
+		return nil
+	}
+}
+
+// MARK: - Pair
+public struct Pair<L, R> {
+	public let left: L
+	public let right: R
+
+	public init(_ left: L, _ right: R) {
+		self.left = left
+		self.right = right
+	}
+}
+
+// MARK: Sendable
+extension Pair: Sendable where L: Sendable, R: Sendable {}
+
+// MARK: Equatable
+extension Pair: Equatable where L: Equatable, R: Equatable {}
+
+// MARK: Hashable
+extension Pair: Hashable where L: Hashable, R: Hashable {}
+
+extension Pair where L == R, L: Equatable, R: Equatable {
+	/// The two components are equal
+	public var equal: Bool {
+		left == right
 	}
 }
