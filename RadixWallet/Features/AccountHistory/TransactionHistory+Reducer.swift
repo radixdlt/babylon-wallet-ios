@@ -1,60 +1,5 @@
 import ComposableArchitecture
 
-// MARK: - TestSection
-struct TestSection: Identifiable, CustomStringConvertible {
-	let id: Int
-	var transactions: IdentifiedArrayOf<TestTransaction>
-
-	var description: String {
-		"[\(id): \(transactions.map(\.description).joined(separator: ","))]"
-	}
-}
-
-// MARK: - TestTransaction
-struct TestTransaction: Identifiable, CustomStringConvertible, ExpressibleByIntegerLiteral {
-	let id: Int
-
-	var description: String {
-		String(id)
-	}
-
-	init(integerLiteral value: Int) {
-		self.id = value
-	}
-}
-
-func testPrepending() {
-	testPrepending(x: [.init(id: 0, transactions: [1, 2, 3])], before: [.init(id: 1, transactions: [4, 5, 6]), .init(id: 2, transactions: [7, 8, 9])])
-	testPrepending(x: [.init(id: 1, transactions: [1, 2, 3])], before: [.init(id: 1, transactions: [4, 5, 6]), .init(id: 2, transactions: [7, 8, 9])])
-	testPrepending(x: [.init(id: 1, transactions: [1, 2, 3])], before: [.init(id: 1, transactions: [3, 4, 5, 6]), .init(id: 2, transactions: [7, 8, 9])])
-	testPrepending(x: [.init(id: 1, transactions: [1, 2, 3])], before: [.init(id: 1, transactions: [2, 3, 4, 5, 6]), .init(id: 2, transactions: [7, 8, 9])])
-}
-
-func testPrepending(x: [TestSection], before: IdentifiedArrayOf<TestSection>) {
-	var after = before
-	after.prependSections(x)
-	after.debugPrint()
-}
-
-extension IdentifiedArrayOf<TestSection> {
-	mutating func prependSections(_ sections: some Collection<Element>) {
-		for newSection in sections.reversed() {
-			if first?.id == newSection.id {
-				self[id: newSection.id]?.transactions.insert(contentsOf: newSection.transactions, at: 0)
-			} else {
-				insert(newSection, at: 0)
-			}
-		}
-	}
-
-	func debugPrint() {
-		print("••••• \(count)")
-		for section in self {
-			print("    •• SECTION \(section.id): \(section.transactions.elements)")
-		}
-	}
-}
-
 private extension Date {
 	// September 28th, 2023, at 9.30 PM UTC
 	static let babylonLaunch = Date(timeIntervalSince1970: 1_695_893_400)
@@ -87,7 +32,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		var sections: IdentifiedArrayOf<TransactionSection> = []
 
-		var scrollTarget: ScrollTarget? = nil
+		var scrollTarget: TransactionsTableView.ScrollTarget? = nil
 
 		/// The currently selected month
 		var currentMonth: DateRangeItem.ID
@@ -104,11 +49,11 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			let filters: [TransactionFilter]
 
 			var isLoading: Bool = false
-			var upCursor: Cursor = .firstRequest
-			var downCursor: Cursor = .firstRequest
+			var upCursor: Cursor = .initialRequest
+			var downCursor: Cursor = .initialRequest
 
 			public enum Cursor: Hashable, Sendable {
-				case firstRequest
+				case initialRequest
 				case next(String)
 				case loadedAll
 			}
@@ -198,9 +143,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onAppear:
-
-			testPrepending()
-
 			return loadTransactions(state: &state)
 
 		case let .selectedMonth(month):
@@ -279,7 +221,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	/// Load history for the provided month, keeping the same period and filters
 	func loadTransactionsForMonth(_ month: Date, state: inout State) -> Effect<Action> {
-		guard month != state.currentMonth else { print("• SAME MONTH"); return .none }
 		guard let endOfMonth = Calendar.current.date(byAdding: .month, value: 1, to: month) else { return .none }
 		state.sections = []
 		state.loading = state.loading.withNewPivotDate(min(endOfMonth, .now))
@@ -344,20 +285,23 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		state.resources.append(contentsOf: response.resources)
 		state.loading[cursor: parameters.direction] = response.nextCursor.map { .next($0) } ?? .loadedAll
 
-		let newSections = response.items.inSections
+		let wasEmpty = state.sections.isEmpty
 
 		if replace {
-			state.sections = newSections.asIdentifiable()
-		} else {
-			switch parameters.direction {
-			case .up:
-				state.sections.prependSections(newSections)
-			case .down:
-				state.sections.appendSections(newSections)
-			}
+			state.sections = []
 		}
 
-		state.scrollTarget = scrollTarget
+		state.sections.addTransactions(response.items)
+
+		if let scrollTarget {
+			switch scrollTarget {
+			case let .transaction(txID):
+				print("•• Try to scroll to \(txID)")
+				state.scrollTarget = .init(transaction: txID, topPosition: true)
+			case let .date(date):
+				print("•• Can't scroll to date yet")
+			}
+		}
 		state.loading.isLoading = false
 	}
 }
@@ -448,51 +392,24 @@ extension RandomAccessCollection<TransactionHistory.TransactionSection> {
 }
 
 extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
-	mutating func prependSections(_ sections: some Collection<Element>) {
-		for newSection in sections.reversed() {
-			if first?.id == newSection.id {
-				self[id: newSection.id]?.transactions.insert(contentsOf: newSection.transactions, at: 0)
-			} else {
-				insert(newSection, at: 0)
-			}
-		}
-		print("•• inserted \(sections.flatMap(\.transactions.ids).count) before -> \(allTransactions.count)")
-	}
-
-	mutating func appendSections(_ sections: some Collection<Element>) {
-		for newSection in sections {
-			if last?.id == newSection.id {
-				self[id: newSection.id]?.transactions.append(contentsOf: newSection.transactions)
-			} else {
-				append(newSection)
-			}
-		}
-		print("•• appended \(sections.flatMap(\.transactions.ids).count) after -> \(allTransactions.count)")
-	}
-}
-
-extension Collection<TransactionHistoryItem> {
-	var inSections: [TransactionHistory.TransactionSection] {
+	mutating func addTransactions(_ transactions: some Collection<TransactionHistoryItem>) {
 		let calendar: Calendar = .current
-
-		var result: [TransactionHistory.TransactionSection] = []
-
-		for transaction in self {
-			let day = calendar.startOfDay(for: transaction.time)
-			if let lastSection = result.last, lastSection.day == day {
-				result[result.endIndex - 1].transactions.append(transaction)
-			} else {
-				result.append(
-					.init(
-						day: day,
-						month: calendar.startOfMonth(for: day),
-						transactions: [transaction]
-					)
-				)
-			}
+		let grouped = Dictionary(grouping: transactions) { transaction in
+			calendar.startOfDay(for: transaction.time)
 		}
 
-		return result
+		for (day, transactions) in grouped {
+			let sectionID = TransactionHistory.TransactionSection.ID(day)
+			if self[id: sectionID] == nil {
+				let month = calendar.startOfMonth(for: day)
+				self[id: sectionID] = .init(day: day, month: month, transactions: transactions.asIdentifiable())
+			} else {
+				self[id: sectionID]?.transactions.append(contentsOf: transactions)
+			}
+			self[id: sectionID]?.transactions.sort(by: \.time, >)
+		}
+
+		sort(by: \.day, >)
 	}
 }
 
