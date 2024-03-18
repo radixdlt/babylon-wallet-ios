@@ -40,7 +40,11 @@ extension TransactionHistory {
 						.padding(.bottom, .small1)
 						.background(.app.white)
 
-						TransactionsTableView(direction: viewStore.loading.parameters.direction, sections: viewStore.sections) { action in
+						TransactionsTableView(
+							direction: .down,
+							sections: viewStore.sections,
+							scrollTarget: viewStore.scrollTarget
+						) { action in
 							store.send(.view(.transactionsTableAction(action)))
 						}
 					}
@@ -573,6 +577,7 @@ extension TransactionHistory {
 
 		let direction: TransactionHistory.Direction
 		let sections: IdentifiedArrayOf<TransactionSection>
+		let scrollTarget: ScrollTarget?
 		let action: (Action) -> Void
 
 		private static let cellIdentifier = "TransactionCell"

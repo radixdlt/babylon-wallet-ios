@@ -1,5 +1,60 @@
 import ComposableArchitecture
 
+// MARK: - TestSection
+struct TestSection: Identifiable, CustomStringConvertible {
+	let id: Int
+	var transactions: IdentifiedArrayOf<TestTransaction>
+
+	var description: String {
+		"[\(id): \(transactions.map(\.description).joined(separator: ","))]"
+	}
+}
+
+// MARK: - TestTransaction
+struct TestTransaction: Identifiable, CustomStringConvertible, ExpressibleByIntegerLiteral {
+	let id: Int
+
+	var description: String {
+		String(id)
+	}
+
+	init(integerLiteral value: Int) {
+		self.id = value
+	}
+}
+
+func testPrepending() {
+	testPrepending(x: [.init(id: 0, transactions: [1, 2, 3])], before: [.init(id: 1, transactions: [4, 5, 6]), .init(id: 2, transactions: [7, 8, 9])])
+	testPrepending(x: [.init(id: 1, transactions: [1, 2, 3])], before: [.init(id: 1, transactions: [4, 5, 6]), .init(id: 2, transactions: [7, 8, 9])])
+	testPrepending(x: [.init(id: 1, transactions: [1, 2, 3])], before: [.init(id: 1, transactions: [3, 4, 5, 6]), .init(id: 2, transactions: [7, 8, 9])])
+	testPrepending(x: [.init(id: 1, transactions: [1, 2, 3])], before: [.init(id: 1, transactions: [2, 3, 4, 5, 6]), .init(id: 2, transactions: [7, 8, 9])])
+}
+
+func testPrepending(x: [TestSection], before: IdentifiedArrayOf<TestSection>) {
+	var after = before
+	after.prependSections(x)
+	after.debugPrint()
+}
+
+extension IdentifiedArrayOf<TestSection> {
+	mutating func prependSections(_ sections: some Collection<Element>) {
+		for newSection in sections.reversed() {
+			if first?.id == newSection.id {
+				self[id: newSection.id]?.transactions.insert(contentsOf: newSection.transactions, at: 0)
+			} else {
+				insert(newSection, at: 0)
+			}
+		}
+	}
+
+	func debugPrint() {
+		print("••••• \(count)")
+		for section in self {
+			print("    •• SECTION \(section.id): \(section.transactions.elements)")
+		}
+	}
+}
+
 private extension Date {
 	// September 28th, 2023, at 9.30 PM UTC
 	static let babylonLaunch = Date(timeIntervalSince1970: 1_695_893_400)
@@ -32,11 +87,13 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		var sections: IdentifiedArrayOf<TransactionSection> = []
 
+		var scrollTarget: ScrollTarget? = nil
+
 		/// The currently selected month
 		var currentMonth: DateRangeItem.ID
 
 		/// Values related to loading. Note that `parameters` are set **when receiving the response**
-		var loading: Loading = .init(from: .babylonLaunch)
+		var loading: Loading = .init(fullPeriod: .babylonLaunch ..< .now, pivotDate: .now, filters: [])
 
 		/// Workaround, TCA sends the sectionDisappeared after we dismiss, causing a run-time warning
 		var didDismiss: Bool = false
@@ -44,24 +101,11 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		struct Loading: Hashable, Sendable {
 			let fullPeriod: Range<Date>
 			let pivotDate: Date
+			let filters: [TransactionFilter]
 
-			var isLoading: Bool
-			var upCursor: Cursor
-			var downCursor: Cursor
-			var direction: Direction
-
-			init(
-				from: Date,
-				pivotDate: Date? = nil,
-				filters: [TransactionFilter] = []
-			) {
-				self.fullPeriod = from ..< .now
-				self.pivotDate = pivotDate ?? .now
-				self.isLoading = false
-				self.upCursor = .firstRequest
-				self.downCursor = .firstRequest
-				self.direction = .down
-			}
+			var isLoading: Bool = false
+			var upCursor: Cursor = .firstRequest
+			var downCursor: Cursor = .firstRequest
 
 			public enum Cursor: Hashable, Sendable {
 				case firstRequest
@@ -109,6 +153,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Hashable {
 		case loadedHistory(
 			TransactionHistoryResponse,
+			replace: Bool,
 			parameters: TransactionHistoryRequest.Parameters,
 			scrollTarget: ScrollTarget?
 		)
@@ -153,36 +198,26 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onAppear:
-			return load(.down, state: &state)
+
+			testPrepending()
+
+			return loadTransactions(state: &state)
 
 		case let .selectedMonth(month):
 			state.currentMonth = month
 			print("• selectedMonth: LOAD period")
-			return load(month, state: &state)
+			return loadTransactionsForMonth(month, state: &state)
 
 		case .filtersTapped:
+			// FIXME: GK REMOVE - emulate scroll to top
+			return loadNewerTransactions(state: &state)
 
-//			// FIXME: GK REMOVE - emulate scroll to top
-//			guard !state.loading.isLoading else { return .none }
-//			switch state.loading.currentDirection {
-//			case .down:
-//				// If we are at the end of the period, we can't load more
-//				guard state.currentMonth != state.availableMonths.last?.id else { print("•• can't load later tx"); return .none }
-//				guard let loadedRange = state.loadedRange else { return .none }
-//				print("• filtersTapped: LOAD period upwards")
-//				return loadHistory(period: loadedRange.upperBound ..< .now, direction: .up, state: &state)
-//			case .up:
-//				print("• filtersTapped: LOAD more upwards")
-//				return loadMoreHistory(state: &state)
-//			}
-
-//			state.destination = .filters(.init(portfolio: state.portfolio, filters: state.activeFilters.map(\.id)))
-			return .none
+			//			state.destination = .filters(.init(portfolio: state.portfolio, filters: state.activeFilters.map(\.id)))
+			//			return .none
 
 		case let .filterCrossTapped(id):
 			state.activeFilters.remove(id: id)
-
-//			return loadHistory(filters: state.activeFilters.map(\.id), state: &state)
+			return loadTransactionsWithFilters(state.activeFilters.map(\.id), state: &state)
 
 		case .closeTapped:
 			state.didDismiss = true
@@ -192,28 +227,21 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			switch action {
 			case .pulledDown:
 				print("• ACTION scrolledPastTop")
-//				guard !state.loading.isLoading else { return .none }
-//				switch state.loading.parameters.direction {
-//				case .down:
-//					// If we are at the end of the period, we can't load more
-//					guard state.currentMonth != state.availableMonths.last?.id else { print("•• can't load later tx"); return .none }
-//					guard let loadedRange = state.loadedRange else { return .none }
-//					print("• filtersTapped: LOAD period upwards")
-//					return loadHistory(period: loadedRange.upperBound ..< .now, direction: .up, state: &state)
-//				case .up:
-//					print("• filtersTapped: LOAD more upwards")
-//					return loadMoreHistory(state: &state)
-//				}
+				//				return loadNewerTransactions(state: &state)
+				return .none
 
 			case .nearingTop:
 				print("• ACTION nearingTop")
+				return .none
 
 			case .nearingBottom, .reachedBottom:
 				print("• ACTION nearingBottom/reachedBottom: LOAD more")
-				return loadMoreHistory(state: &state)
+				return loadTransactions(state: &state)
 
 			case let .monthChanged(month):
+				print("• ACTION monthChanged \(month.formatted(date: .abbreviated, time: .omitted))")
 				state.currentMonth = month
+				return .none
 
 			case let .transactionTapped(txid):
 				let path = "transaction/\(txid.asStr())/summary"
@@ -222,15 +250,13 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 					await openURL(url)
 				}
 			}
-
-			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadedHistory(response, parameters, scrollTarget):
-			loadedHistory(response, parameters: parameters, scrollTarget: scrollTarget, state: &state)
+		case let .loadedHistory(response, replace, parameters, scrollTarget):
+			loadedHistory(response, replace: replace, parameters: parameters, scrollTarget: scrollTarget, state: &state)
 			return .none
 		}
 	}
@@ -246,85 +272,59 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		load(with: state.activeFilters.map(\.id), state: &state)
+		loadTransactionsWithFilters(state.activeFilters.map(\.id), state: &state)
 	}
 
 	// Helper methods
 
-	func load(with filters: [TransactionFilter], state: inout State) -> Effect<Action> {
-		.none
-	}
-
-	// Load history for the provided month, keeping the same period and filters
-	func load(_ month: Date, state: inout State) -> Effect<Action> {
-		let calendar: Calendar = .current
-		guard let endOfMonth = calendar.date(byAdding: .month, value: 1, to: month) else { return .none }
+	/// Load history for the provided month, keeping the same period and filters
+	func loadTransactionsForMonth(_ month: Date, state: inout State) -> Effect<Action> {
+		guard month != state.currentMonth else { print("• SAME MONTH"); return .none }
+		guard let endOfMonth = Calendar.current.date(byAdding: .month, value: 1, to: month) else { return .none }
 		state.sections = []
-		state.loading = .init(from: .babylonLaunch, pivotDate: min(endOfMonth, .now))
+		state.loading = state.loading.withNewPivotDate(min(endOfMonth, .now))
 
-		let request = TransactionHistoryRequest(
-			account: state.account.accountAddress,
-			parameters: .init(period: period, direction: direction, filters: state.loading.filters),
-			cursor: cursor,
-			allResourcesAddresses: state.portfolio.allResourceAddresses,
-			resources: state.resources
-		)
-
-		return loadHistory(request: request, scrollTo: scrollTarget, state: &state)
+		return loadHistory(.down, replaceExisting: true, scrollTarget: .date(month), state: &state)
 	}
 
-//	// Load (more) history in the given direction, keeping the same period and filters
-//	func load(_ direction: Direction, state: inout State) -> Effect<Action> {
-//		let period: Range<Date> = state.loading.fullPeriod.split(before: direction == .up, point: state.loading.pivotDate)
-//		let cursor: String?
-//		let scrollTarget: ScrollTarget?
-//
-//		switch direction {
-//		case .up:
-//			guard state.loading.upCursor != .loadedAll else { print("• LOADED LATEST ALREADY"); return .none }
-//			period = state.loading.fullPeriod.lowerBound ..< state.loading.pivotDate
-//			cursor = state.loading.upCursor.string
-//			scrollTarget = (state.sections.first?.transactions.first?.id).map(ScrollTarget.transaction)
-//		case .down:
-//			guard state.loading.downCursor != .loadedAll else { print("• LOADED OLDEST ALREADY"); return .none }
-//			period = state.loading.pivotDate ..< state.loading.fullPeriod.upperBound
-//			cursor = state.loading.downCursor.string
-//			scrollTarget = nil
-//		}
-//
-//		let request = TransactionHistoryRequest(
-//			account: state.account.accountAddress,
-//			parameters: .init(period: period, direction: direction, filters: state.loading.filters),
-//			cursor: cursor,
-//			allResourcesAddresses: state.portfolio.allResourceAddresses,
-//			resources: state.resources
-//		)
-//
-//		return loadHistory(request: request, scrollTo: scrollTarget, state: &state)
-//	}
-//
+	/// Load history for the previously selected period, using the provided filters
+	func loadTransactionsWithFilters(_ filters: [TransactionFilter], state: inout State) -> Effect<Action> {
+		let currentMonth = state.currentMonth
+		guard filters != state.loading.filters else { return .none }
+		state.sections = []
+		state.loading = state.loading.withNewFilters(filters)
 
-	/// Load (more) history using the parameters in `loading`, **should not be used directly**
-	func loadHistory(direction: Direction, cursor: String?, scrollTo: ScrollTarget? = nil, state: inout State) -> Effect<Action> {
-		guard !state.loading.isLoading, state.loading.cursor != .loadedAll else { return .none }
+		return loadHistory(.down, replaceExisting: true, scrollTarget: .date(currentMonth), state: &state)
+	}
+
+	/// Loads (more) transactions
+	func loadTransactions(state: inout State) -> Effect<Action> {
+		loadHistory(.down, state: &state)
+	}
+
+	func loadNewerTransactions(state: inout State) -> Effect<Action> {
+		loadHistory(.up, scrollTarget: (state.sections.first?.transactions.first?.id).map(ScrollTarget.transaction), state: &state)
+	}
+
+	/// Makes the TransactionHitosryRequest. **NB: don't call this directly**, instead use the specialised functions like `loadHistoryForMonth`
+	func loadHistory(_ direction: Direction, replaceExisting: Bool = false, scrollTarget: ScrollTarget? = nil, state: inout State) -> Effect<Action> {
+		let parameters = state.loading.requestParameters(for: direction)
+
+		let cursor = state.loading[cursor: direction]
+		guard !state.loading.isLoading, cursor != .loadedAll else { return .none }
 		state.loading.isLoading = true
 
-		let scrollTarget: ScrollTarget? = switch direction {
-		case .up: (state.sections.first?.transactions.first?.id).map(ScrollTarget.transaction)
-		case .down: nil
-		}
-
 		let request = TransactionHistoryRequest(
 			account: state.account.accountAddress,
-			parameters: state.requestParameters,
-			cursor: state.loading.cursor.string,
+			parameters: parameters,
+			cursor: cursor.string,
 			allResourcesAddresses: state.portfolio.allResourceAddresses,
 			resources: state.resources
 		)
 
 		return .run { send in
 			let response = try await transactionHistoryClient.getTransactionHistory(request)
-			await send(.internal(.loadedHistory(response, parameters: request.parameters, scrollTarget: scrollTarget)))
+			await send(.internal(.loadedHistory(response, replace: replaceExisting, parameters: request.parameters, scrollTarget: scrollTarget)))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}
@@ -332,64 +332,67 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	func loadedHistory(
 		_ response: TransactionHistoryResponse,
+		replace: Bool,
 		parameters: TransactionHistoryRequest.Parameters,
 		scrollTarget: ScrollTarget?,
 		state: inout State
 	) {
+		guard parameters == state.loading.requestParameters(for: parameters.direction) else {
+			loggerGlobal.info("Received obsolete Transaction History response, should not be possible")
+			return
+		}
 		state.resources.append(contentsOf: response.resources)
+		state.loading[cursor: parameters.direction] = response.nextCursor.map { .next($0) } ?? .loadedAll
 
-		if response.requestParameters == state.loading.parameters {
-			print("•• LOADED \(response.items.count) same params")
-			// We loaded more from the same range
-			state.loading.nextCursor = response.nextCursor
-			if response.nextCursor == nil {
-				state.loading.didLoadFully = true
-			}
+		let newSections = response.items.inSections
 
-			state.sections.addItems(response.items, direction: response.parameters.direction)
-		} else if let overlap = state.sections.allTransactions.prefixOverlappingSuffix(of: response.items.map(\.id)) {
-			print("•• LOADED \(response.items.count) overlap: \(overlap)")
-			// Switched from down to up, prepend new data to existing, but with some overlap
-			state.loading = .init(parameters: response.parameters, nextCursor: response.nextCursor)
-			state.sections.insertItemsAtStart(response.items, withOverlap: overlap)
+		if replace {
+			state.sections = newSections.asIdentifiable()
 		} else {
-			print("•• LOADED \(response.items.count) new params")
-			state.loading = .init(parameters: response.parameters, nextCursor: response.nextCursor)
-			state.sections.replaceItems(response.items)
+			switch parameters.direction {
+			case .up:
+				state.sections.prependSections(newSections)
+			case .down:
+				state.sections.appendSections(newSections)
+			}
 		}
 
+		state.scrollTarget = scrollTarget
 		state.loading.isLoading = false
 	}
 }
 
 extension TransactionHistory.State.Loading {
-	func requestParameters(for direction: TransactionHistory.Direction) -> TransactionHistoryRequest.Parameters {
-		let period = loading.fullPeriod.split(before: direction == .down, point: loading.pivotDate)
+	func withNewPivotDate(_ newPivotDate: Date) -> Self {
+		.init(fullPeriod: fullPeriod.lowerBound ..< .now, pivotDate: newPivotDate, filters: filters)
+	}
 
-		return .init(
-			period: loading.period,
-			filters: activeFilters.map(\.id),
-			direction: loading.direction
+	func withNewFilters(_ newFilters: [TransactionFilter]) -> Self {
+		.init(fullPeriod: fullPeriod.lowerBound ..< .now, pivotDate: pivotDate, filters: newFilters)
+	}
+
+	func requestParameters(for direction: TransactionHistory.Direction) -> TransactionHistoryRequest.Parameters {
+		.init(
+			period: fullPeriod.split(before: direction == .down, point: pivotDate),
+			filters: filters,
+			direction: direction
 		)
 	}
 
-	var period: Range<Date> {
-		fullPeriod.split(before: direction == .down, point: pivotDate)
-	}
-
-	var cursor: Cursor {
-		switch direction {
-		case .up: upCursor
-		case .down: downCursor
+	subscript(cursor direction: TransactionHistory.Direction) -> Cursor {
+		get {
+			switch direction {
+			case .up: upCursor
+			case .down: downCursor
+			}
 		}
-	}
-
-	mutating func setNextCursor(_ cursor: Cursor, direction: TransactionHistory.Direction) {
-		switch direction {
-		case .up:
-			upCursor = cursor
-		case .down:
-			downCursor = cursor
+		set {
+			switch direction {
+			case .up:
+				upCursor = newValue
+			case .down:
+				downCursor = newValue
+			}
 		}
 	}
 }
@@ -405,15 +408,6 @@ extension TransactionHistory.State.Loading.Cursor {
 extension TransactionHistory.TransactionSection: CustomStringConvertible {
 	public var description: String {
 		"Section(\(id.rawValue.formatted(date: .numeric, time: .omitted))): \(transactions.count) transactions"
-	}
-}
-
-extension TransactionHistory.State {
-	var loadedRange: Range<Date>? {
-		guard let first = sections.first?.transactions.first?.time, let last = sections.last?.transactions.last?.time else {
-			return nil
-		}
-		return last ..< first
 	}
 }
 
@@ -435,40 +429,45 @@ extension Range<Date> {
 	}
 }
 
-extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
-	mutating func insertItemsAtStart(_ items: some Collection<TransactionHistoryItem>, withOverlap overlap: Int) {
-		addItems(items.dropLast(overlap), direction: .up)
-	}
-
-	mutating func addItems(_ items: some Collection<TransactionHistoryItem>, direction: TransactionHistory.Direction) {
-		let newSections = items.inSections
-
-		switch direction {
-		case .down:
-			for newSection in newSections {
-				if last?.id == newSection.id {
-					self[id: newSection.id]?.transactions.append(contentsOf: newSection.transactions)
-				} else {
-					append(newSection)
-				}
-			}
-			print("•• inserted \(items.count) after -> \(allTransactions.count)")
-
-		case .up:
-			for newSection in newSections.reversed() {
-				if first?.id == newSection.id {
-					self[id: newSection.id]?.transactions.insert(contentsOf: newSection.transactions, at: 0)
-				} else {
-					insert(newSection, at: 0)
-				}
-			}
-
-			print("•• inserted \(items.count) before -> \(allTransactions.count)")
+extension RandomAccessCollection<TransactionHistoryItem> {
+	var dateRange: Range<Date>? {
+		guard let first = first?.time, let last = last?.time else {
+			return nil
 		}
+		return last ..< first
+	}
+}
+
+extension RandomAccessCollection<TransactionHistory.TransactionSection> {
+	var dateRange: Range<Date>? {
+		guard let first = first?.transactions.first?.time, let last = last?.transactions.last?.time else {
+			return nil
+		}
+		return last ..< first
+	}
+}
+
+extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
+	mutating func prependSections(_ sections: some Collection<Element>) {
+		for newSection in sections.reversed() {
+			if first?.id == newSection.id {
+				self[id: newSection.id]?.transactions.insert(contentsOf: newSection.transactions, at: 0)
+			} else {
+				insert(newSection, at: 0)
+			}
+		}
+		print("•• inserted \(sections.flatMap(\.transactions.ids).count) before -> \(allTransactions.count)")
 	}
 
-	mutating func replaceItems(_ items: some Collection<TransactionHistoryItem>) {
-		self = items.inSections.asIdentifiable()
+	mutating func appendSections(_ sections: some Collection<Element>) {
+		for newSection in sections {
+			if last?.id == newSection.id {
+				self[id: newSection.id]?.transactions.append(contentsOf: newSection.transactions)
+			} else {
+				append(newSection)
+			}
+		}
+		print("•• appended \(sections.flatMap(\.transactions.ids).count) after -> \(allTransactions.count)")
 	}
 }
 
