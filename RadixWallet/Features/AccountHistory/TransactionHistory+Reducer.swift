@@ -90,7 +90,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case selectedMonth(DateRangeItem.ID)
 		case filtersTapped
 		case filterCrossTapped(TransactionFilter)
-		case transactionsTableAction(TransactionsTableView.Action)
+		case transactionsTableAction(TableView.Action)
 		case closeTapped
 	}
 
