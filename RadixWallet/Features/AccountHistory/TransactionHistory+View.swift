@@ -46,6 +46,7 @@ extension TransactionHistory {
 						) { action in
 							store.send(.view(.transactionsTableAction(action)))
 						}
+						.opacity(viewStore.sections == [] ? 0 : 1)
 					}
 					.background {
 						if viewStore.showEmptyState {
@@ -574,13 +575,8 @@ extension TransactionHistory {
 			case monthChanged(Date)
 		}
 
-		public struct ScrollTarget: Hashable, Sendable {
-			let transaction: TXID
-			let topPosition: Bool
-		}
-
 		let sections: IdentifiedArrayOf<TransactionSection>
-		let scrollTarget: ScrollTarget?
+		let scrollTarget: TXID?
 		let action: (Action) -> Void
 
 		private static let cellIdentifier = "TransactionCell"
@@ -605,8 +601,8 @@ extension TransactionHistory {
 			context.coordinator.sections = sections
 			uiView.reloadData()
 
-			if let scrollTarget, let indexPath = context.coordinator.sections.indexPath(for: scrollTarget.transaction) {
-				uiView.scrollToRow(at: indexPath, at: scrollTarget.topPosition ? .top : .bottom, animated: false)
+			if let scrollTarget, let indexPath = context.coordinator.sections.indexPath(for: scrollTarget) {
+				uiView.scrollToRow(at: indexPath, at: .top, animated: false)
 			}
 		}
 
@@ -711,7 +707,7 @@ extension TransactionHistory {
 					updateMonth(tableView: tableView)
 				}
 
-				if scrollView.contentOffset.y < -130, !isScrolledPastTop {
+				if scrollView.contentOffset.y < -20, !isScrolledPastTop {
 					action(.pulledDown)
 					isScrolledPastTop = true
 				} else if isScrolledPastTop, scrollView.contentOffset.y >= 0 {
