@@ -105,6 +105,12 @@ extension UserDefaults.Dependency.Key {
 
 		case .mnemonicsUserClaimsToHaveBackedUp:
 			return userDefaults.getFactorSourceIDOfBackedUpMnemonics().map(String.init(describing:))
+		case .transactionsCompletedCounter:
+			return userDefaults.getTransactionsCompletedCounter().map(String.init(describing:)).asArray(\.self)
+		case .dateOfLastSubmittedNPSSurvey:
+			return userDefaults.getDateOfLastSubmittedNPSSurvey().map(String.init(describing:)).asArray(\.self)
+		case .npsSurveyUserID:
+			return userDefaults.getNPSSurveyUserId().map(String.init(describing:)).asArray(\.self)
 		}
 	}
 }

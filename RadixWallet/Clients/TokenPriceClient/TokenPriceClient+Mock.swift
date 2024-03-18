@@ -8,7 +8,7 @@ extension TokenPricesClient: TestDependencyKey {
 
 	private static func noop() -> Self {
 		.init(
-			getTokenPrices: { _ in [:] }
+			getTokenPrices: { _, _ in [:] }
 		)
 	}
 }

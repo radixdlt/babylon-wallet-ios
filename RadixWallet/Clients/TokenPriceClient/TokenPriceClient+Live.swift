@@ -28,9 +28,10 @@ extension TokenPricesClient {
 		}
 
 		return .init(
-			getTokenPrices: { request in
+			getTokenPrices: { request, refresh in
 				try await cacheClient.withCaching(
 					cacheEntry: .tokenPrices(request.currency),
+					forceRefresh: refresh,
 					invalidateCached: {
 						Array($0.keys) != request.tokens ? .cachedIsInvalid : .cachedIsValid
 					},

@@ -1098,9 +1098,13 @@
 		830EA9E92AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */; };
 		832880692AE664C30014FBF3 /* EntityFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832880682AE664C30014FBF3 /* EntityFlag.swift */; };
 		8328806C2AE6725F0014FBF3 /* AccountPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */; };
+		83377A032B9DDAF000D8AA36 /* NPSSurvey+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83377A022B9DDAF000D8AA36 /* NPSSurvey+View.swift */; };
+		83377A052B9DDB5C00D8AA36 /* NPSSurveyClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83377A042B9DDB5C00D8AA36 /* NPSSurveyClient+Live.swift */; };
 		8338B9E52AFAB20700D1D8EA /* TransactionFee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */; };
+		834B651F2B972E5100B7E1E8 /* NPSSurvey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 834B651E2B972E5100B7E1E8 /* NPSSurvey.swift */; };
 		835F196D2B3581C300E0B71D /* UnknownDappComponents+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835F196C2B3581C300E0B71D /* UnknownDappComponents+View.swift */; };
 		836878612B4551910029C808 /* UnknownDappComponents+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 836878602B4551910029C808 /* UnknownDappComponents+Reducer.swift */; };
+		8370FC5C2B99C780007AD882 /* NPSSurveyClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8370FC5B2B99C780007AD882 /* NPSSurveyClient+Interface.swift */; };
 		83823EA72B722DB000827211 /* HTTPClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83823EA62B722DB000827211 /* HTTPClient+Interface.swift */; };
 		83823EAA2B72365000827211 /* TokenPriceClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83823EA92B72365000827211 /* TokenPriceClient+Interface.swift */; };
 		83856D622B0279080026452A /* VerifyMnemonic+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83856D602B0279080026452A /* VerifyMnemonic+View.swift */; };
@@ -2388,9 +2392,13 @@
 		830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Test.swift"; sourceTree = "<group>"; };
 		832880682AE664C30014FBF3 /* EntityFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityFlag.swift; sourceTree = "<group>"; };
 		8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPreferencesTests.swift; sourceTree = "<group>"; };
+		83377A022B9DDAF000D8AA36 /* NPSSurvey+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NPSSurvey+View.swift"; sourceTree = "<group>"; };
+		83377A042B9DDB5C00D8AA36 /* NPSSurveyClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NPSSurveyClient+Live.swift"; sourceTree = "<group>"; };
 		8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionFee.swift; sourceTree = "<group>"; };
+		834B651E2B972E5100B7E1E8 /* NPSSurvey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NPSSurvey.swift; sourceTree = "<group>"; };
 		835F196C2B3581C300E0B71D /* UnknownDappComponents+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UnknownDappComponents+View.swift"; sourceTree = "<group>"; };
 		836878602B4551910029C808 /* UnknownDappComponents+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UnknownDappComponents+Reducer.swift"; sourceTree = "<group>"; };
+		8370FC5B2B99C780007AD882 /* NPSSurveyClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NPSSurveyClient+Interface.swift"; sourceTree = "<group>"; };
 		83823EA62B722DB000827211 /* HTTPClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Interface.swift"; sourceTree = "<group>"; };
 		83823EA92B72365000827211 /* TokenPriceClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Interface.swift"; sourceTree = "<group>"; };
 		83856D602B0279080026452A /* VerifyMnemonic+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "VerifyMnemonic+View.swift"; sourceTree = "<group>"; };
@@ -3389,6 +3397,7 @@
 		48CFBD122ADC10D800E77A5C /* Children */ = {
 			isa = PBXGroup;
 			children = (
+				834B651D2B972E3A00B7E1E8 /* NPSSurvey */,
 				48CFBCB92ADC10D800E77A5C /* AccountRow */,
 				E6A2D9E62AFA7132001857EC /* Mnemonics+Utils.swift */,
 			);
@@ -5063,6 +5072,7 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
+				8370FC5A2B99C732007AD882 /* NPSSurveyClient */,
 				83823EA82B72362600827211 /* TokenPriceClient */,
 				83823EA52B722D9000827211 /* HTTPClient */,
 				A462B5752B820D1200C26D20 /* TransactionHistoryClient */,
@@ -6793,6 +6803,24 @@
 			path = AccountPreferencesTests;
 			sourceTree = "<group>";
 		};
+		834B651D2B972E3A00B7E1E8 /* NPSSurvey */ = {
+			isa = PBXGroup;
+			children = (
+				834B651E2B972E5100B7E1E8 /* NPSSurvey.swift */,
+				83377A022B9DDAF000D8AA36 /* NPSSurvey+View.swift */,
+			);
+			path = NPSSurvey;
+			sourceTree = "<group>";
+		};
+		8370FC5A2B99C732007AD882 /* NPSSurveyClient */ = {
+			isa = PBXGroup;
+			children = (
+				8370FC5B2B99C780007AD882 /* NPSSurveyClient+Interface.swift */,
+				83377A042B9DDB5C00D8AA36 /* NPSSurveyClient+Live.swift */,
+			);
+			path = NPSSurveyClient;
+			sourceTree = "<group>";
+		};
 		83823EA52B722D9000827211 /* HTTPClient */ = {
 			isa = PBXGroup;
 			children = (
@@ -8179,6 +8207,7 @@
 				48CFC6202ADC10DA00E77A5C /* OnLedgerEntity.swift in Sources */,
 				48CFC4A82ADC10DA00E77A5C /* ModelErrorResponse.swift in Sources */,
 				48CFC2EE2ADC10D900E77A5C /* SelectFactorView.swift in Sources */,
+				8370FC5C2B99C780007AD882 /* NPSSurveyClient+Interface.swift in Sources */,
 				83EE47972AF0EE3C00155F03 /* ProgrammaticScryptoSborValueArray.swift in Sources */,
 				48CFC66E2ADC10DB00E77A5C /* FactorInstance.swift in Sources */,
 				48CFC5412ADC10DA00E77A5C /* NetworkConfigurationResponse.swift in Sources */,
@@ -8266,6 +8295,7 @@
 				48CFC3282ADC10D900E77A5C /* ScanQRCoordinator+View.swift in Sources */,
 				48CFC4122ADC10DA00E77A5C /* ErrorQueue+Interface.swift in Sources */,
 				A4B017F72B4C099D00B42B8E /* TransactionReview+DepositSettingView.swift in Sources */,
+				834B651F2B972E5100B7E1E8 /* NPSSurvey.swift in Sources */,
 				48CFC26A2ADC10D900E77A5C /* Signing+View.swift in Sources */,
 				48CFC60D2ADC10DA00E77A5C /* WalletInteractionSuccessResponseItems.swift in Sources */,
 				48CFC3262ADC10D900E77A5C /* LocalNetworkPermission+Reducer.swift in Sources */,
@@ -8484,6 +8514,7 @@
 				48CFC26E2ADC10D900E77A5C /* SignWithFactorSourcesOfKindDevice.swift in Sources */,
 				48CFC5DC2ADC10DA00E77A5C /* Modifier.swift in Sources */,
 				48CFC4CF2ADC10DA00E77A5C /* EntityMetadataItemValue.swift in Sources */,
+				83377A032B9DDAF000D8AA36 /* NPSSurvey+View.swift in Sources */,
 				48CFC67C2ADC10DB00E77A5C /* SecurityStructureMetadata.swift in Sources */,
 				48CFC3112ADC10D900E77A5C /* AccountsToImport+View.swift in Sources */,
 				48CFC5A12ADC10DA00E77A5C /* Stroke.swift in Sources */,
@@ -8784,6 +8815,7 @@
 				48CFC4AE2ADC10DA00E77A5C /* TransactionCommittedDetailsRequest.swift in Sources */,
 				83D0B5692AE01EDE0048DCBE /* RadixEngineToolkitError+Description.swift in Sources */,
 				48CFC3012ADC10D900E77A5C /* DebugSettingsCoordinator+Reducer.swift in Sources */,
+				83377A052B9DDB5C00D8AA36 /* NPSSurveyClient+Live.swift in Sources */,
 				A462B5B22B8407D300C26D20 /* CoreAPI_BinaryPlaintextMessageContent.swift in Sources */,
 				48CFC4F42ADC10DA00E77A5C /* StateNonFungibleLocationResponse.swift in Sources */,
 				48CFC35F2ADC10D900E77A5C /* ChooseQuestions.swift in Sources */,
@@ -9750,8 +9782,8 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.7.3;
+				kind = exactVersion;
+				version = 1.8.0;
 			};
 		};
 		A47571FD2B29B0860059A95D /* XCRemoteSwiftPackageReference "IOSSecuritySuite" */ = {

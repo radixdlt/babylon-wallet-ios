@@ -2,14 +2,23 @@
 public struct FlowLayout: Layout {
 	public let alignment: VerticalAlignment
 	public let spacing: CGSize
+	public let multilineAlignment: HorizontalAlignment
 
-	public init(alignment: VerticalAlignment = .center, spacing: CGFloat = 10) {
-		self.alignment = alignment
-		self.spacing = .init(width: spacing, height: spacing)
+	public init(
+		alignment: VerticalAlignment = .center,
+		multilineAlignment: HorizontalAlignment = .leading,
+		spacing: CGFloat = 10
+	) {
+		self.init(alignment: alignment, multilineAlignment: multilineAlignment, spacing: .init(width: spacing, height: spacing))
 	}
 
-	public init(alignment: VerticalAlignment = .center, spacing: CGSize) {
+	public init(
+		alignment: VerticalAlignment = .center,
+		multilineAlignment: HorizontalAlignment = .leading,
+		spacing: CGSize
+	) {
 		self.alignment = alignment
+		self.multilineAlignment = multilineAlignment
 		self.spacing = spacing
 	}
 
@@ -59,9 +68,23 @@ public struct FlowLayout: Layout {
 		func flushLine() {
 			currentPosition.x = 0
 			let union = currentLine.union
+			let remainingWidth = abs(containerWidth - union.width)
 			result.append(contentsOf: currentLine.map { rect in
 				var copy = rect
 				copy.origin.y += currentPosition.y - union.minY
+
+				switch multilineAlignment {
+				case .center:
+					copy.origin.x += remainingWidth / 2
+				case .trailing:
+					copy.origin.x += remainingWidth
+				case .leading:
+					// default alignment, no adjustment needed.
+					break
+				default:
+					break
+				}
+
 				return copy
 			})
 
