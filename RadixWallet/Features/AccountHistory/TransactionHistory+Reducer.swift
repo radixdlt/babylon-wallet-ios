@@ -145,15 +145,11 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		case let .selectedMonth(month):
 			state.currentMonth = month
-			print("• selectedMonth: LOAD period")
 			return loadTransactionsForMonth(month, state: &state)
 
 		case .filtersTapped:
-			// FIXME: GK REMOVE - emulate scroll to top
-			return loadNewerTransactions(state: &state)
-
-			//			state.destination = .filters(.init(portfolio: state.portfolio, filters: state.activeFilters.map(\.id)))
-			//			return .none
+			state.destination = .filters(.init(portfolio: state.portfolio, filters: state.activeFilters.map(\.id)))
+			return .none
 
 		case let .filterCrossTapped(id):
 			state.activeFilters.remove(id: id)
@@ -166,20 +162,15 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case let .transactionsTableAction(action):
 			switch action {
 			case .pulledDown:
-				print("• ACTION scrolledPastTop")
-				//				return loadNewerTransactions(state: &state)
-				return .none
+				return loadNewerTransactions(state: &state)
 
 			case .nearingTop:
-				print("• ACTION nearingTop")
 				return .none
 
 			case .nearingBottom, .reachedBottom:
-				print("• ACTION nearingBottom/reachedBottom: LOAD more")
 				return loadTransactions(state: &state)
 
 			case let .monthChanged(month):
-				print("• ACTION monthChanged \(month.formatted(date: .abbreviated, time: .omitted))")
 				state.currentMonth = month
 				return .none
 
@@ -281,20 +272,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		state.resources.append(contentsOf: response.resources)
 		state.loading[cursor: parameters.direction] = response.nextCursor.map { .next($0) } ?? .loadedAll
 		state.sections.addTransactions(response.items)
-
-		if let first = response.items.first, let last = response.items.last {
-			print("•• LOADED \(first.time.formatted(date: .abbreviated, time: .omitted)) -- \(last.time.formatted(date: .abbreviated, time: .omitted))")
-			var new: IdentifiedArrayOf<TransactionSection> = []
-			new.addTransactions(response.items)
-			for section in new {
-				print("•• \(section.day.formatted(date: .abbreviated, time: .omitted)): #\(section.transactions.count)")
-			}
-		}
-
-		print("•• NOW we have")
-		for section in state.sections {
-			print("•• \(section.day.formatted(date: .abbreviated, time: .omitted)): #\(section.transactions.count)")
-		}
 
 		if let scrollTarget {
 			switch scrollTarget {
