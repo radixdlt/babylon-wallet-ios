@@ -1,4 +1,19 @@
 // MARK: - NPSSurvey.View
+extension NPSSurvey.State {
+	var submitButtonControlState: ControlState {
+		if feedbackScore == nil {
+			return .disabled
+		}
+
+		if isUploadingFeedback {
+			return .loading(.local)
+		}
+
+		return .enabled
+	}
+}
+
+// MARK: - NPSSurvey.View
 extension NPSSurvey {
 	public struct View: SwiftUI.View {
 		public let store: StoreOf<NPSSurvey>
@@ -30,9 +45,9 @@ extension NPSSurvey {
 							store.feedbackScore,
 							forAction: { store.send(.view(.submitFeedbackTapped(score: $0))) }
 						) { action in
-							Button("Submit Feedback - Thanks!", action: action)
+							Button(L10n.Survey.submitButton, action: action)
 								.buttonStyle(.primaryRectangular)
-								.controlState(store.isUploadingFeedback ? .loading(.local) : .enabled)
+								.controlState(store.submitButtonControlState)
 						}
 					}
 					.presentationDragIndicator(.visible)
@@ -45,12 +60,12 @@ extension NPSSurvey {
 extension NPSSurvey.View {
 	@ViewBuilder
 	private func headerView() -> some SwiftUI.View {
-		Text("How’s it Going?")
+		Text(L10n.Survey.title)
 			.textStyle(.sheetTitle)
 			.foregroundStyle(.app.gray1)
 			.padding(.bottom, .medium3)
 
-		Text("How likely are you to recommend Radix and the Radix Wallet to your friends or colleagues?")
+		Text(L10n.Survey.subtitle)
 			.multilineTextAlignment(.center)
 			.textStyle(.body1Regular)
 			.foregroundStyle(.app.gray1)
@@ -75,9 +90,9 @@ extension NPSSurvey.View {
 		.padding(.bottom, .medium1)
 
 		HStack {
-			Text("0 - Not likely")
+			Text(L10n.Survey.lowestScoreLabel)
 			Spacer()
-			Text("10 - Very likely")
+			Text(L10n.Survey.highestScoreLabel)
 		}
 		.textStyle(.body2Regular)
 		.foregroundStyle(.app.gray2)
@@ -86,18 +101,18 @@ extension NPSSurvey.View {
 
 	@ViewBuilder
 	private func scoreReasonView() -> some SwiftUI.View {
-		Text("What’s the main reason for your score?")
+		Text(L10n.Survey.Reason.heading)
 			.textStyle(.body1Regular)
 			.foregroundStyle(.app.gray1)
 			.padding(.bottom, .small2)
 
-		Text("Optional")
+		Text(L10n.Common.optional)
 			.textStyle(.body1Regular)
 			.foregroundStyle(.app.gray2)
 			.padding(.bottom, .medium3)
 
 		AppTextField(
-			placeholder: "Let us know...",
+			placeholder: L10n.Survey.Reason.fieldHint,
 			text: .init(
 				get: { store.feedbackReason },
 				set: { store.send(.view(.feedbackReasonTextChanged($0))) }

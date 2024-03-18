@@ -103,10 +103,13 @@ extension AccountPortfoliosClient: DependencyKey {
 				}()
 
 				if !allResources.isEmpty {
-					let prices = try? await tokenPricesClient.getTokenPrices(.init(
-						tokens: Array(allResources),
-						currency: preferences.fiatCurrencyPriceTarget
-					))
+					let prices = try? await tokenPricesClient.getTokenPrices(
+						.init(
+							tokens: Array(allResources),
+							currency: preferences.fiatCurrencyPriceTarget
+						),
+						forceRefresh
+					)
 
 					if let prices {
 						await state.setTokenPrices(prices)

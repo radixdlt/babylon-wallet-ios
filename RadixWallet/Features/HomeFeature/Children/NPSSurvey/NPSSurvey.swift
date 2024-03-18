@@ -5,19 +5,19 @@ import SwiftUI
 public struct NPSSurvey: FeatureReducer {
 	@ObservableState
 	public struct State: Hashable, Sendable {
-		public var feedbackScore: Int?
+		public var feedbackScore: Int? = nil
 		public var feedbackReason: String = ""
 		public var isUploadingFeedback: Bool = false
 	}
 
-	public enum ViewAction: Equatable {
+	public enum ViewAction: Equatable, Sendable {
 		case feedbackScoreTapped(Int)
 		case feedbackReasonTextChanged(String)
 		case submitFeedbackTapped(score: Int)
 		case closeButtonTapped
 	}
 
-	public enum DelegateAction: Equatable {
+	public enum DelegateAction: Equatable, Sendable {
 		case feedbackFilled(NPSSurveyClient.UserFeedback)
 	}
 
