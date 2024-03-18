@@ -41,7 +41,6 @@ extension TransactionHistory {
 						.background(.app.white)
 
 						TransactionsTableView(
-							direction: .down,
 							sections: viewStore.sections,
 							scrollTarget: viewStore.scrollTarget
 						) { action in
@@ -575,7 +574,11 @@ extension TransactionHistory {
 			case monthChanged(Date)
 		}
 
-		let direction: TransactionHistory.Direction
+		public struct ScrollTarget: Hashable, Sendable {
+			let transaction: TXID
+			let topPosition: Bool
+		}
+
 		let sections: IdentifiedArrayOf<TransactionSection>
 		let scrollTarget: ScrollTarget?
 		let action: (Action) -> Void
@@ -601,32 +604,12 @@ extension TransactionHistory {
 			print(" •• updateUIView: #\(oldSections.count).\(oldSections.allTransactions.count) -> #\(sections.count).\(sections.allTransactions.count). same sections: \(sections == oldSections), sectionIDs: \(sectionsIDs), txIDs: \(txIDs)")
 
 			guard !sections.isEmpty, sections != context.coordinator.sections else { return }
-			let oldTransactions = context.coordinator.sections.allTransactions
-			let newTransactions = sections.allTransactions
-
-			print(" •• updateUIView: old non-empty \(!oldTransactions.isEmpty), suf: \(newTransactions.hasSuffix(oldTransactions)), pref: \(newTransactions.hasPrefix(oldTransactions))")
-
-			let inserted = newTransactions.count - oldTransactions.count
-
-			let scrollTarget: TXID?
-			if !oldTransactions.isEmpty, newTransactions.hasSuffix(oldTransactions) {
-				scrollTarget = uiView.indexPathsForVisibleRows?.first.map(context.coordinator.sections.transaction(for:))
-				print(" •• updateUIView: inserted \(inserted) above, set scrolltarget: \(scrollTarget == nil)")
-			} else {
-				scrollTarget = nil
-				if !oldTransactions.isEmpty, newTransactions.hasPrefix(oldTransactions) {
-					print(" •• updateUIView: inserted \(newTransactions.count - oldTransactions.count) below")
-				} else {
-					print(" •• updateUIView: everything changed")
-				}
-			}
-
 			context.coordinator.sections = sections
 			uiView.reloadData()
 
-			if let indexPath = scrollTarget.flatMap(context.coordinator.sections.indexPath(for:)) {
-				print(" •• scrolling to \(indexPath)")
-				uiView.scrollToRow(at: indexPath, at: .top, animated: false)
+			if let scrollTarget, let indexPath = context.coordinator.sections.indexPath(for: scrollTarget.transaction) {
+				print(" •• schould scroll to \(indexPath)")
+//				uiView.scrollToRow(at: indexPath, at: scrollTarget.topPosition ? .top : .bottom, animated: false)
 			}
 		}
 
