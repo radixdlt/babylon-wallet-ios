@@ -171,7 +171,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 			case let .monthChanged(month):
 				state.currentMonth = month
-				print("••• monthChanged \(month.formatted(date: .abbreviated, time: .omitted))")
 				return .none
 
 			case let .transactionTapped(txid):
@@ -239,7 +238,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		let parameters = state.loading.requestParameters(for: direction)
 		let cursor = state.loading[cursor: direction]
 
-		guard !state.loading.isLoading, cursor != .loadedAll else { return .none }
+		guard !state.loading.isLoading, cursor != .loadedAll, !parameters.period.isEmpty else { return .none }
 		state.loading.isLoading = true
 
 		let request = TransactionHistoryRequest(

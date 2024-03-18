@@ -31,9 +31,6 @@ extension TransactionHistory {
 		}
 
 		public func updateUIView(_ uiView: UITableView, context: Context) {
-			let oldSections = context.coordinator.sections
-			let sectionsIDs = sections.ids == oldSections.ids
-			let txIDs = sections.allTransactions == oldSections.allTransactions
 			guard !sections.isEmpty, sections != context.coordinator.sections else { return }
 			context.coordinator.sections = sections
 			uiView.reloadData()
@@ -76,7 +73,6 @@ extension TransactionHistory {
 
 				let headerView = TransactionHistory.SectionHeaderView(title: section.title)
 				let hostingController = UIHostingController(rootView: headerView)
-				hostingController.view.backgroundColor = .clear
 				hostingController.view.sizeToFit()
 
 				return hostingController.view
@@ -90,7 +86,7 @@ extension TransactionHistory {
 				let cell = tableView.dequeueReusableCell(withIdentifier: TableView.cellIdentifier, for: indexPath)
 				let item = sections[indexPath.section].transactions[indexPath.row]
 
-				cell.backgroundColor = .clear
+				cell.backgroundColor = .init(.app.gray5)
 				cell.contentConfiguration = UIHostingConfiguration { [weak self] in
 					Button {
 						self?.action(.transactionTapped(item.id))
