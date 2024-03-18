@@ -96,12 +96,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Hashable {
-		case loadedHistory(
-			TransactionHistoryResponse,
-			replace: Bool,
-			parameters: TransactionHistoryRequest.Parameters,
-			scrollTarget: ScrollTarget?
-		)
+		case loadedHistory(TransactionHistoryResponse, parameters: TransactionHistoryRequest.Parameters, scrollTarget: ScrollTarget?)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -143,6 +138,9 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onAppear:
+			if let latestMonth = state.availableMonths.last?.id {
+				state.currentMonth = latestMonth
+			}
 			return loadTransactions(state: &state)
 
 		case let .selectedMonth(month):
@@ -197,8 +195,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadedHistory(response, replace, parameters, scrollTarget):
-			loadedHistory(response, replace: replace, parameters: parameters, scrollTarget: scrollTarget, state: &state)
+		case let .loadedHistory(response, parameters, scrollTarget):
+			loadedHistory(response, parameters: parameters, scrollTarget: scrollTarget, state: &state)
 			return .none
 		}
 	}
@@ -221,11 +219,10 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	/// Load history for the provided month, keeping the same period and filters
 	func loadTransactionsForMonth(_ month: Date, state: inout State) -> Effect<Action> {
-		guard let endOfMonth = Calendar.current.date(byAdding: .month, value: 1, to: month) else { return .none }
 		state.sections = []
-		state.loading = state.loading.withNewPivotDate(min(endOfMonth, .now))
+		state.loading = state.loading.withNewPivotDate(min(month, .now))
 
-		return loadHistory(.down, replaceExisting: true, scrollTarget: .date(month), state: &state)
+		return loadHistory(.up, scrollTarget: .date(month), state: &state)
 	}
 
 	/// Load history for the previously selected period, using the provided filters
@@ -235,7 +232,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		state.sections = []
 		state.loading = state.loading.withNewFilters(filters)
 
-		return loadHistory(.down, replaceExisting: true, scrollTarget: .date(currentMonth), state: &state)
+		return loadHistory(.down, scrollTarget: .date(currentMonth), state: &state)
 	}
 
 	/// Loads (more) transactions
@@ -248,10 +245,10 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	/// Makes the TransactionHitosryRequest. **NB: don't call this directly**, instead use the specialised functions like `loadHistoryForMonth`
-	func loadHistory(_ direction: Direction, replaceExisting: Bool = false, scrollTarget: ScrollTarget? = nil, state: inout State) -> Effect<Action> {
+	func loadHistory(_ direction: Direction, scrollTarget: ScrollTarget? = nil, state: inout State) -> Effect<Action> {
 		let parameters = state.loading.requestParameters(for: direction)
-
 		let cursor = state.loading[cursor: direction]
+
 		guard !state.loading.isLoading, cursor != .loadedAll else { return .none }
 		state.loading.isLoading = true
 
@@ -265,7 +262,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		return .run { send in
 			let response = try await transactionHistoryClient.getTransactionHistory(request)
-			await send(.internal(.loadedHistory(response, replace: replaceExisting, parameters: request.parameters, scrollTarget: scrollTarget)))
+			await send(.internal(.loadedHistory(response, parameters: request.parameters, scrollTarget: scrollTarget)))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}
@@ -273,7 +270,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	func loadedHistory(
 		_ response: TransactionHistoryResponse,
-		replace: Bool,
 		parameters: TransactionHistoryRequest.Parameters,
 		scrollTarget: ScrollTarget?,
 		state: inout State
@@ -284,23 +280,33 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		}
 		state.resources.append(contentsOf: response.resources)
 		state.loading[cursor: parameters.direction] = response.nextCursor.map { .next($0) } ?? .loadedAll
+		state.sections.addTransactions(response.items)
 
-		let wasEmpty = state.sections.isEmpty
-
-		if replace {
-			state.sections = []
+		if let first = response.items.first, let last = response.items.last {
+			print("•• LOADED \(first.time.formatted(date: .abbreviated, time: .omitted)) -- \(last.time.formatted(date: .abbreviated, time: .omitted))")
+			var new: IdentifiedArrayOf<TransactionSection> = []
+			new.addTransactions(response.items)
+			for section in new {
+				print("•• \(section.day.formatted(date: .abbreviated, time: .omitted)): #\(section.transactions.count)")
+			}
 		}
 
-		state.sections.addTransactions(response.items)
+		print("•• NOW we have")
+		for section in state.sections {
+			print("•• \(section.day.formatted(date: .abbreviated, time: .omitted)): #\(section.transactions.count)")
+		}
 
 		if let scrollTarget {
 			switch scrollTarget {
 			case let .transaction(txID):
-				print("•• Try to scroll to \(txID)")
 				state.scrollTarget = .init(transaction: txID, topPosition: true)
 			case let .date(date):
-				print("•• Can't scroll to date yet")
+				if let firstInMonth = state.sections.reversed().first(where: { $0.day >= date })?.transactions.last {
+					state.scrollTarget = .init(transaction: firstInMonth.id, topPosition: false)
+				}
 			}
+		} else {
+			state.scrollTarget = nil
 		}
 		state.loading.isLoading = false
 	}
@@ -373,17 +379,8 @@ extension Range<Date> {
 	}
 }
 
-extension RandomAccessCollection<TransactionHistoryItem> {
-	var dateRange: Range<Date>? {
-		guard let first = first?.time, let last = last?.time else {
-			return nil
-		}
-		return last ..< first
-	}
-}
-
 extension RandomAccessCollection<TransactionHistory.TransactionSection> {
-	var dateRange: Range<Date>? {
+	var dateSpan: Range<Date>? {
 		guard let first = first?.transactions.first?.time, let last = last?.transactions.last?.time else {
 			return nil
 		}

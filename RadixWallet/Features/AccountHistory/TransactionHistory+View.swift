@@ -601,15 +601,12 @@ extension TransactionHistory {
 			let oldSections = context.coordinator.sections
 			let sectionsIDs = sections.ids == oldSections.ids
 			let txIDs = sections.allTransactions == oldSections.allTransactions
-			print(" •• updateUIView: #\(oldSections.count).\(oldSections.allTransactions.count) -> #\(sections.count).\(sections.allTransactions.count). same sections: \(sections == oldSections), sectionIDs: \(sectionsIDs), txIDs: \(txIDs)")
-
 			guard !sections.isEmpty, sections != context.coordinator.sections else { return }
 			context.coordinator.sections = sections
 			uiView.reloadData()
 
 			if let scrollTarget, let indexPath = context.coordinator.sections.indexPath(for: scrollTarget.transaction) {
-				print(" •• schould scroll to \(indexPath)")
-//				uiView.scrollToRow(at: indexPath, at: scrollTarget.topPosition ? .top : .bottom, animated: false)
+				uiView.scrollToRow(at: indexPath, at: scrollTarget.topPosition ? .top : .bottom, animated: false)
 			}
 		}
 
@@ -724,7 +721,7 @@ extension TransactionHistory {
 
 			// Helpers
 
-			private func updateMonth(tableView: UITableView) {
+			func updateMonth(tableView: UITableView) {
 				guard let topMost = tableView.indexPathsForVisibleRows?.first else { return }
 				let newMonth = sections[topMost.section].month
 				guard newMonth != month else { return }
