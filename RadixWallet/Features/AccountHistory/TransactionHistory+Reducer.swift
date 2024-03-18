@@ -13,10 +13,9 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	public enum ScrollTarget: Hashable, Sendable {
-		// Put the given transaction to the top
 		case transaction(TXID)
-		// Put the first transaction after the given date at the bottom
-		case date(Date)
+		// The latest transaction before the given date
+		case beforeDate(Date)
 	}
 
 	public struct State: Sendable, Hashable {
@@ -32,7 +31,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		var sections: IdentifiedArrayOf<TransactionSection> = []
 
-		var scrollTarget: TransactionsTableView.ScrollTarget? = nil
+		var scrollTarget: TXID? = nil
 
 		/// The currently selected month
 		var currentMonth: DateRangeItem.ID
@@ -172,6 +171,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 			case let .monthChanged(month):
 				state.currentMonth = month
+				print("••• monthChanged \(month.formatted(date: .abbreviated, time: .omitted))")
 				return .none
 
 			case let .transactionTapped(txid):
@@ -208,22 +208,21 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	// Helper methods
 
-	/// Load history for the provided month, keeping the same period and filters
-	func loadTransactionsForMonth(_ month: Date, state: inout State) -> Effect<Action> {
-		state.sections = []
-		state.loading = state.loading.withNewPivotDate(min(month, .now))
-
-		return loadHistory(.up, scrollTarget: .date(month), state: &state)
-	}
-
 	/// Load history for the previously selected period, using the provided filters
 	func loadTransactionsWithFilters(_ filters: [TransactionFilter], state: inout State) -> Effect<Action> {
 		let currentMonth = state.currentMonth
 		guard filters != state.loading.filters else { return .none }
-		state.sections = []
 		state.loading = state.loading.withNewFilters(filters)
+		return loadTransactionsForMonth(state.currentMonth, state: &state)
+	}
 
-		return loadHistory(.down, scrollTarget: .date(currentMonth), state: &state)
+	/// Load history for the provided month, keeping the same period and filters
+	func loadTransactionsForMonth(_ month: Date, state: inout State) -> Effect<Action> {
+		guard let endOfMonth = Calendar.current.date(byAdding: .month, value: 1, to: month) else { return .none }
+		let pivotDate = min(endOfMonth, .now)
+		state.sections = []
+		state.loading = state.loading.withNewPivotDate(pivotDate)
+		return loadHistory(.down, scrollTarget: .beforeDate(pivotDate), state: &state)
 	}
 
 	/// Loads (more) transactions
@@ -276,10 +275,10 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		if let scrollTarget {
 			switch scrollTarget {
 			case let .transaction(txID):
-				state.scrollTarget = .init(transaction: txID, topPosition: true)
-			case let .date(date):
-				if let firstInMonth = state.sections.reversed().first(where: { $0.day >= date })?.transactions.last {
-					state.scrollTarget = .init(transaction: firstInMonth.id, topPosition: false)
+				state.scrollTarget = txID
+			case let .beforeDate(date):
+				if let lastInMonth = state.sections.first(where: { $0.day < date })?.transactions.first {
+					state.scrollTarget = lastInMonth.id
 				}
 			}
 		} else {
