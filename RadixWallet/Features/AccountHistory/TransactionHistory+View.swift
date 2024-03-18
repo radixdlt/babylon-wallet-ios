@@ -20,15 +20,18 @@ extension TransactionHistory {
 		public var body: some SwiftUI.View {
 			NavigationStack {
 				WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-					let accountHeader = AccountHeaderView(account: viewStore.account)
-
 					let selection = viewStore.binding(get: \.currentMonth, send: ViewAction.selectedMonth)
 
 					VStack(spacing: .zero) {
-						accountHeader
+						VStack(spacing: .zero) {
+							if viewStore.showAccount {
+								AccountHeaderView(account: viewStore.account)
+									.transition(.opacity.combined(with: .scale(scale: 0.8)))
+							}
 
-						VStack(spacing: .small2) {
 							HScrollBar(items: viewStore.availableMonths, selection: selection)
+								.background(.app.white)
+								.padding(.vertical, .small2)
 
 							if let filters = viewStore.activeFilters.nilIfEmpty {
 								ActiveFiltersView(filters: filters) { id in
@@ -36,7 +39,6 @@ extension TransactionHistory {
 								}
 							}
 						}
-						.padding(.top, .small2)
 						.padding(.bottom, .small1)
 						.background(.app.white)
 
@@ -46,6 +48,7 @@ extension TransactionHistory {
 						) { action in
 							store.send(.view(.transactionsTableAction(action)))
 						}
+						.ignoresSafeArea(edges: .bottom)
 						.opacity(viewStore.sections == [] ? 0 : 1)
 						.background(alignment: .top) {
 							if viewStore.loading.isLoading {
@@ -54,6 +57,7 @@ extension TransactionHistory {
 							}
 						}
 					}
+					.animation(.default, value: viewStore.showAccount)
 					.background {
 						if viewStore.showEmptyState {
 							Text(L10n.TransactionHistory.noTransactions)
@@ -62,7 +66,6 @@ extension TransactionHistory {
 						}
 					}
 					.background(.app.gray5)
-					.clipShape(Rectangle())
 					.toolbar {
 						ToolbarItem(placement: .topBarLeading) {
 							CloseButton {
@@ -83,7 +86,6 @@ extension TransactionHistory {
 				store.send(.view(.onAppear))
 			}
 			.destinations(with: store)
-			.ignoresSafeArea(edges: .bottom)
 		}
 
 		private static let coordSpace = "TransactionHistory"
