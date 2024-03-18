@@ -1213,7 +1213,7 @@
 		E61F825C2B9F530100A686F2 /* StakeClaim.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61F82332B9F530000A686F2 /* StakeClaim.swift */; };
 		E61F825D2B9F530100A686F2 /* NEW_SARGON_TYPES.md in Resources */ = {isa = PBXBuildFile; fileRef = E61F82342B9F530000A686F2 /* NEW_SARGON_TYPES.md */; };
 		E61F825E2B9F530100A686F2 /* Nonce.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61F82352B9F530000A686F2 /* Nonce.swift */; };
-		E61F825F2B9F530100A686F2 /* AssetTransferRepresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61F82362B9F530000A686F2 /* AssetTransferRepresentation.swift */; };
+		E61F825F2B9F530100A686F2 /* PerAssetTransfers.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61F82362B9F530000A686F2 /* PerAssetTransfers.swift */; };
 		E61F82602B9F530100A686F2 /* AddressOfAccountOrPersona.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61F82372B9F530000A686F2 /* AddressOfAccountOrPersona.swift */; };
 		E61F82612B9F530100A686F2 /* TXVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61F82382B9F530000A686F2 /* TXVersion.swift */; };
 		E61F82622B9F530100A686F2 /* Epoch.swift in Sources */ = {isa = PBXBuildFile; fileRef = E61F82392B9F530000A686F2 /* Epoch.swift */; };
@@ -2521,7 +2521,7 @@
 		E61F82332B9F530000A686F2 /* StakeClaim.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StakeClaim.swift; sourceTree = "<group>"; };
 		E61F82342B9F530000A686F2 /* NEW_SARGON_TYPES.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = NEW_SARGON_TYPES.md; sourceTree = "<group>"; };
 		E61F82352B9F530000A686F2 /* Nonce.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Nonce.swift; sourceTree = "<group>"; };
-		E61F82362B9F530000A686F2 /* AssetTransferRepresentation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AssetTransferRepresentation.swift; sourceTree = "<group>"; };
+		E61F82362B9F530000A686F2 /* PerAssetTransfers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PerAssetTransfers.swift; sourceTree = "<group>"; };
 		E61F82372B9F530000A686F2 /* AddressOfAccountOrPersona.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressOfAccountOrPersona.swift; sourceTree = "<group>"; };
 		E61F82382B9F530000A686F2 /* TXVersion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TXVersion.swift; sourceTree = "<group>"; };
 		E61F82392B9F530000A686F2 /* Epoch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Epoch.swift; sourceTree = "<group>"; };
@@ -7012,7 +7012,7 @@
 				E61F82332B9F530000A686F2 /* StakeClaim.swift */,
 				E61F82342B9F530000A686F2 /* NEW_SARGON_TYPES.md */,
 				E61F82352B9F530000A686F2 /* Nonce.swift */,
-				E61F82362B9F530000A686F2 /* AssetTransferRepresentation.swift */,
+				E61F82362B9F530000A686F2 /* PerAssetTransfers.swift */,
 				E61F82372B9F530000A686F2 /* AddressOfAccountOrPersona.swift */,
 				E61F82382B9F530000A686F2 /* TXVersion.swift */,
 				E61F82392B9F530000A686F2 /* Epoch.swift */,
@@ -8010,7 +8010,7 @@
 				48CFC4032ADC10D900E77A5C /* KeychainClient+Mocked.swift in Sources */,
 				48CFC2B12ADC10D900E77A5C /* DerivePublicKeys+View.swift in Sources */,
 				48CFC3032ADC10D900E77A5C /* DebugManageFactorSources.swift in Sources */,
-				E61F825F2B9F530100A686F2 /* AssetTransferRepresentation.swift in Sources */,
+				E61F825F2B9F530100A686F2 /* PerAssetTransfers.swift in Sources */,
 				48CFC3212ADC10D900E77A5C /* NewConnection+Reducer.swift in Sources */,
 				48CFC5C92ADC10DA00E77A5C /* StackedViewsLayout.swift in Sources */,
 				48CFC45C2ADC10DA00E77A5C /* P2PLinksClient+Interface.swift in Sources */,

@@ -4,27 +4,6 @@ import SwiftUI
 // MARK: - TransferAccountList
 public struct TransferAccountList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var transferRepresentation: AssetsTransfersTransactionPrototype {
-			AssetsTransfersTransactionPrototype(
-				fromAccount: fromAccount.accountAddress,
-				transfers: receivingAccounts.filter { $0.recipient != nil }.map { receivingAccount in
-					AssetsTransfersToRecipient(
-						recipient: receivingAccount.recipient!,
-						fungibles: receivingAccount.assets
-							.compactMap(\.kind.fungible)
-							.filter { $0.transferAmount != nil }
-							.map { fungible in
-								FungiblePositiveAmount(
-									resourceAddress: fungible.resource.resourceAddress,
-									amount: fungible.transferAmount!
-								)
-							},
-						nonFungibles: receivingAccount.assets.compactMap { $0.kind.nonFungible?.nftGlobalID }
-					)
-				}.asIdentifiable()
-			)
-		}
-
 		public let fromAccount: Profile.Network.Account
 		public var receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State> {
 			didSet {

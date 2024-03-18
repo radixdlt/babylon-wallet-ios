@@ -68,11 +68,9 @@ extension Sargon {
 		sargon()
 	}
 
-	/// REQUIRES NETWORK CALL (and probable cache)
 	public static func manifestAssetsTransfers(
-		transfers: AssetsTransfersTransactionPrototype,
-		message: Message?
-	) async throws -> TransactionManifest {
+		transfers: PerAssetTransfers
+	) -> TransactionManifest {
 		sargon()
 	}
 }
