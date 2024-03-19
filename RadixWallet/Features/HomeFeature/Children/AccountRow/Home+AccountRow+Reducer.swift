@@ -47,17 +47,9 @@ extension Home {
 		public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 			switch viewAction {
 			case .task:
-				let accountAddress = state.account.address
 				self.checkAccountAccessToMnemonic(state: &state)
 
-				return .run { send in
-					for try await fiatWorth in await accountPortfoliosClient.portfolioForAccount(accountAddress).map(\.totalFiatWorth).removeDuplicates() {
-						guard !Task.isCancelled else {
-							return
-						}
-						await send(.internal(.fiatWorthUpdated(fiatWorth)))
-					}
-				}
+				return .none
 
 			case .exportMnemonicButtonTapped:
 				return .send(.delegate(.exportMnemonic))

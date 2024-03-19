@@ -391,6 +391,28 @@ public struct Home: Sendable, FeatureReducer {
 			}
 		}
 	}
+
+	private func loadFiatValues() -> Effect<Action> {
+		.run { _ in
+			let observable = accountPortfoliosClient.portfolioUpdates()
+				.compactMap { portfoliosLoadable in
+					portfoliosLoadable.wrappedValue?.reduce(into: [AccountAddress: Loadable<FiatWorth>]()) { partialResult, portfolio in
+						partialResult[portfolio.account.address] = portfolio.totalFiatWorth
+					}
+				}
+				.filter {
+					Array($0.values).reduce(+)
+				}
+
+			//            for try await accountResources in accountPortfoliosClient.portfolioUpdates()
+			//                .map {
+			//                $0.map { $0.map { ($0.account.address, $0.totalFiatWorth)
+			//            } } }.removeDuplicates() {
+			//                guard !Task.isCancelled else { return }
+			//                await send(.internal(.accountsResourcesLoaded(accountResources)))
+			//            }
+		}
+	}
 }
 
 extension Home.State {
