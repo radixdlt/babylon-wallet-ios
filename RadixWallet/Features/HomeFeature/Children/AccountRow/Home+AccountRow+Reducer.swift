@@ -58,12 +58,14 @@ extension Home {
 
 				self.checkAccountAccessToMnemonic(state: &state)
 
-				return .run { send in
+				return .run { [portfolio = state.portfolio] send in
 					for try await accountPortfolio in await accountPortfoliosClient.portfolioForAccount(accountAddress) {
 						guard !Task.isCancelled else {
 							return
 						}
+						// if portfolio != .success(accountPortfolio) {
 						await send(.internal(.accountPortfolioUpdate(accountPortfolio)))
+						//  }
 					}
 				}
 			case .exportMnemonicButtonTapped:

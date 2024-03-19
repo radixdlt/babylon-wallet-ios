@@ -250,6 +250,8 @@ public struct AssetsView: Sendable, FeatureReducer {
 extension AccountPortfoliosClient.AccountPortfolio {
 	mutating func refresh(from portfolio: AccountPortfoliosClient.AccountPortfolio) {
 		self.account = portfolio.account
+		self.isCurrencyAmountVisible = portfolio.isCurrencyAmountVisible
+		self.fiatCurrency = portfolio.fiatCurrency
 		self.stakeUnitDetails.refresh(from: portfolio.stakeUnitDetails)
 		self.poolUnitDetails.refresh(from: portfolio.poolUnitDetails)
 	}
