@@ -45,7 +45,7 @@ extension AccountPortfoliosClient.State {
 	}
 
 	func portfolioForAccount(_ address: AccountAddress) -> AnyAsyncSequence<AccountPortfoliosClient.AccountPortfolio> {
-		portfoliosSubject.compactMap { $0[address].unwrap()?.wrappedValue }.eraseToAnyAsyncSequence()
+		portfoliosSubject.compactMap { $0[address].unwrap()?.wrappedValue }.removeDuplicates().eraseToAnyAsyncSequence()
 	}
 
 	private func setOrUpdateAccountPortfolio(_ portfolio: AccountPortfoliosClient.AccountPortfolio) {

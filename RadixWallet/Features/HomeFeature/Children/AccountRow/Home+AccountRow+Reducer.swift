@@ -8,7 +8,12 @@ extension Home {
 			public var id: AccountAddress { account.address }
 			public var accountWithInfo: AccountWithInfo
 
-			public var portfolio: Loadable<AccountPortfoliosClient.AccountPortfolio>
+			public var portfolio: Loadable<AccountPortfoliosClient.AccountPortfolio> {
+				didSet {
+					totalFiatWorth.refresh(from: portfolio.totalFiatWorth.flatten())
+				}
+			}
+
 			public var showFiatWorth: Bool = true
 			public var totalFiatWorth: Loadable<FiatWorth>
 
@@ -75,16 +80,15 @@ extension Home {
 		public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 			switch internalAction {
 			case let .accountPortfolioUpdate(portfolio):
-				state.isDappDefinitionAccount = portfolio.account.metadata.accountType == .dappDefinition
-
 				assert(portfolio.account.address == state.account.address)
-				var newValue = state.portfolio
-				newValue.refresh(from: .success(portfolio))
-				if state.portfolio != newValue {
-					state.portfolio = newValue
+
+				guard state.portfolio != .success(portfolio) else {
+					return .none
 				}
-				// state.portfolio.refresh(from: .success(portfolio))
-				// state.totalFiatWorth.refresh(from: portfolio.totalFiatWorth)
+
+				state.isDappDefinitionAccount = portfolio.account.metadata.accountType == .dappDefinition
+				state.portfolio.refresh(from: .success(portfolio))
+
 				return .send(.internal(.checkAccountAccessToMnemonic))
 
 			case .checkAccountAccessToMnemonic:
