@@ -13,7 +13,7 @@ extension TransactionHistory {
 		}
 
 		let sections: IdentifiedArrayOf<TransactionSection>
-		let scrollTarget: TXID?
+		let scrollTarget: Triggering<TXID?>
 		let action: (Action) -> Void
 
 		private static let cellIdentifier = "TransactionCell"
@@ -31,11 +31,12 @@ extension TransactionHistory {
 		}
 
 		public func updateUIView(_ uiView: UITableView, context: Context) {
-			guard !sections.isEmpty, sections != context.coordinator.sections else { return }
-			context.coordinator.sections = sections
-			uiView.reloadData()
+			if !sections.isEmpty, sections != context.coordinator.sections {
+				context.coordinator.sections = sections
+				uiView.reloadData()
+			}
 
-			if let scrollTarget, let indexPath = context.coordinator.sections.indexPath(for: scrollTarget) {
+			if let scrollTarget = scrollTarget.value, let indexPath = context.coordinator.sections.indexPath(for: scrollTarget) {
 				uiView.scrollToRow(at: indexPath, at: .top, animated: false)
 			}
 		}

@@ -5,6 +5,13 @@ private extension Date {
 	static let babylonLaunch = Date(timeIntervalSince1970: 1_695_893_400)
 }
 
+// MARK: - Triggering
+// Triggers a View update, even if the value wasn't changed
+struct Triggering<T: Hashable & Sendable>: Hashable, Sendable {
+	let created: Date = .now
+	let value: T
+}
+
 // MARK: - TransactionHistory
 public struct TransactionHistory: Sendable, FeatureReducer {
 	public enum Direction: Sendable {
@@ -31,7 +38,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		var sections: IdentifiedArrayOf<TransactionSection> = []
 
-		var scrollTarget: TXID? = nil
+		var scrollTarget: Triggering<TXID?> = .init(value: nil)
 
 		/// The currently selected month
 		var currentMonth: DateRangeItem.ID
@@ -165,11 +172,9 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case let .transactionsTableAction(action):
 			switch action {
 			case .reachedTop:
-				return .none
 				return loadNewerTransactions(state: &state)
 
 			case .pulledDown:
-				return .none
 				return loadNewerTransactions(state: &state)
 
 			case .nearingBottom:
@@ -198,19 +203,12 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case let .loadedHistory(response, parameters, scrollTarget):
 			loadedHistory(response, parameters: parameters, scrollTarget: scrollTarget, state: &state)
 
-			print("•• Loaded: \(state.sections.dateSpan?.debugString ?? "-"), up: \(state.loading.requestParameters(for: .up).period.debugString), o: \(state.sections.dateSpan?.overlaps(state.loading.requestParameters(for: .up).period) == true)")
-
-			if let span = state.sections.dateSpan {
-				print("•• overlap: \(span.clamped(to: state.loading.requestParameters(for: .up).period).debugString)")
+			// IF we stil haven't loaded anything later than the pivot date, we will do so now
+			let upwardsPeriod = state.loading.requestParameters(for: .up).period
+			if !upwardsPeriod.isEmpty, let lastLoaded = state.sections.dateSpan?.upperBound, !upwardsPeriod.contains(lastLoaded) {
+				return loadNewerTransactions(state: &state)
 			}
 
-			if let latest = state.sections.dateSpan?.upperBound {
-				print("•• latest is after pivot: \(latest > state.loading.pivotDate)")
-			}
-
-			if parameters.direction == .down, let latest = state.sections.dateSpan?.upperBound, latest <= state.loading.pivotDate {
-				print("•• should also load newer")
-			}
 			return .none
 		}
 	}
@@ -241,10 +239,16 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	/// Load history for the provided month, keeping the same period and filters
 	func loadTransactionsForMonth(_ month: Date, state: inout State) -> Effect<Action> {
 		guard let endOfMonth = Calendar.current.date(byAdding: .month, value: 1, to: month) else { return .none }
-		let pivotDate = min(endOfMonth, .now)
+		let clampedEndOfMonth = min(endOfMonth, .now)
+
+		if state.sections.dateSpan?.contains(month ..< clampedEndOfMonth) == true {
+			state.setScrollTarget(.beforeDate(clampedEndOfMonth))
+			return .none
+		}
+
 		state.sections = []
-		state.loading = state.loading.withNewPivotDate(pivotDate)
-		return loadHistory(.down, scrollTarget: .beforeDate(pivotDate), state: &state)
+		state.loading = state.loading.withNewPivotDate(clampedEndOfMonth)
+		return loadHistory(.down, scrollTarget: .beforeDate(clampedEndOfMonth), state: &state)
 	}
 
 	/// Loads (more) transactions
@@ -258,12 +262,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	/// Makes the TransactionHitosryRequest. **NB: don't call this directly**, instead use the specialised functions like `loadHistoryForMonth`
 	func loadHistory(_ direction: Direction, scrollTarget: ScrollTarget? = nil, state: inout State) -> Effect<Action> {
-		let direction = direction
 		let parameters = state.loading.requestParameters(for: direction)
 		let cursor = state.loading[cursor: direction]
-
-		print("•• LOAD HISTORY \(direction) \(parameters.period.debugString), isLoading: \(state.loading.isLoading)")
-
 		guard !state.loading.isLoading, cursor != .loadedAll, !parameters.period.isEmpty else { return .none }
 
 		state.loading.isLoading = true
@@ -300,18 +300,23 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		state.loading[cursor: parameters.direction] = response.nextCursor.map { .next($0) } ?? .loadedAll
 		state.sections.addTransactions(response.items)
 		state.loading.isLoading = false
+		state.setScrollTarget(scrollTarget)
+	}
+}
 
+extension TransactionHistory.State {
+	mutating func setScrollTarget(_ scrollTarget: TransactionHistory.ScrollTarget?) {
 		if let scrollTarget {
 			switch scrollTarget {
 			case let .transaction(txID):
-				state.scrollTarget = txID
+				self.scrollTarget = .init(value: txID)
 			case let .beforeDate(date):
-				if let lastInMonth = state.sections.first(where: { $0.day < date })?.transactions.first {
-					state.scrollTarget = lastInMonth.id
+				if let lastInMonth = sections.first(where: { $0.day < date })?.transactions.first {
+					self.scrollTarget = .init(value: lastInMonth.id)
 				}
 			}
 		} else {
-			state.scrollTarget = nil
+			self.scrollTarget = .init(value: nil)
 		}
 	}
 }
