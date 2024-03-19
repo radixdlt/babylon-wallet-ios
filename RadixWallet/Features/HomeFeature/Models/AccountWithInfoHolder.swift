@@ -47,12 +47,13 @@ extension DeviceFactorSourceControlled {
 			return
 		}
 
-		guard let xrdResource else {
-			mnemonicHandlingCallToAction = nil
-			return
-		}
+//		guard let xrdResource else {
+//			mnemonicHandlingCallToAction = nil
+//			return
+//		}
 
-		let hasValue = xrdResource.amount.nominalAmount > 0
+		// Disabled for now, to be revised with MFA
+		let hasValue = true // xrdResource.amount.nominalAmount > 0
 		let hasAlreadyBackedUpMnemonic = userDefaults.getFactorSourceIDOfBackedUpMnemonics().contains(factorSourceID)
 		let exportMnemonicNeeded = !hasAlreadyBackedUpMnemonic && hasValue
 

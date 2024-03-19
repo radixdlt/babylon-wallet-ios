@@ -6,7 +6,7 @@ extension Home.State {
 		.init(
 			hasNotification: shouldWriteDownPersonasSeedPhrase,
 			showRadixBanner: showRadixBanner,
-			totalFiatWorth: totalFiatWorth
+			totalFiatWorth: showFiatWorth ? totalFiatWorth : nil
 		)
 	}
 }

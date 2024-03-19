@@ -223,7 +223,7 @@ extension Loadable {
 		}
 	}
 
-	public func firstd(where predicate: (Value.Element) -> Bool) -> Loadable<Value.Element?> where Value: Sequence {
+	public func first(where predicate: (Value.Element) -> Bool) -> Loadable<Value.Element?> where Value: Sequence {
 		switch self {
 		case .idle:
 			return .idle
@@ -292,6 +292,10 @@ extension Loadable {
         concat(other).map(join)
     }
 
+    public func reduce<Element>(_ join: (Element) -> Void) -> Void where Value == Array<Element> {
+
+    }
+
     public mutating func mutateValue(_ mutate: (inout Value) -> Void) {
         switch self {
         case .idle, .loading, .failure:
@@ -307,16 +311,29 @@ extension Loadable {
     public mutating func refresh(
         from other: Loadable<Value>,
         valueChangeMap: (_ old: Value, _ new: Value) -> Value = { _, new in new }
-    ) {
+    ) where Value: Equatable {
         switch (self, other) {
-        // If `other` is success, update the content regardless of the current state
-        case let (.success(oldValue), .success(newValue)):
-            self = .success(valueChangeMap(oldValue, newValue))
-        case let (_, .success(otherValue)):
+        // Update to success if no current value
+        case let (.idle, .success(otherValue)),
+            let (.loading, .success(otherValue)),
+            let (.failure, .success(otherValue)):
+
             self = .success(otherValue)
+
+        // Update to new value only if it changed
+        case let (.success(oldValue), .success(newValue)):
+            if oldValue != newValue {
+                self = .success(valueChangeMap(oldValue, newValue))
+            }
+
         // If current state is success, don't update if `other` is loading or failed
         case (.success, _):
             break
+
+        case (.loading, .loading),
+            (.idle, .idle):
+            break
+
         // If current state is other than .success
         case let (_, other):
             self = other
