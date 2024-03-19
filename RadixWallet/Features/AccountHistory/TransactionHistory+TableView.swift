@@ -127,7 +127,7 @@ extension TransactionHistory {
 
 				// Detect if we are getting close to the bottom
 
-				let isClose = isCloseToBottom(tableView: tableView)
+				let isClose = isCloseToBottom(tableView: tableView) && scrollView.isDragging
 				if isClose, !isNearingBottom {
 					action(.nearingBottom)
 					isNearingBottom = true

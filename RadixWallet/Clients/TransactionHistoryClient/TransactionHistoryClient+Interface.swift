@@ -21,14 +21,9 @@ public struct TransactionHistoryRequest: Sendable, Hashable {
 
 	// MARK: - Parameters
 	public struct Parameters: Sendable, Hashable {
-		public var period: Range<Date>
-		public var filters: [TransactionFilter]
-		public var direction: TransactionHistory.Direction
-
-		/// The other parameter set already encompasses these transactions
-		public func covers(_ parameters: Self) -> Bool {
-			filters == parameters.filters && period.contains(parameters.period)
-		}
+		public let period: Range<Date>
+		public let filters: [TransactionFilter]
+		public let direction: TransactionHistory.Direction
 	}
 }
 

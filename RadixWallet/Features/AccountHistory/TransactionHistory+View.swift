@@ -85,7 +85,6 @@ extension TransactionHistory {
 		}
 
 		private static let coordSpace = "TransactionHistory"
-		private static let accountDummy = "SmallAccountCardDummy"
 	}
 
 	struct AccountHeaderView: SwiftUI.View {
@@ -114,15 +113,6 @@ extension TransactionHistory {
 					Spacer(minLength: 0)
 				}
 				.padding(.horizontal, .medium3)
-			}
-		}
-
-		struct Dummy: SwiftUI.View {
-			var body: some SwiftUI.View {
-				Text("DUMMY")
-					.textStyle(.body1HighImportance)
-					.foregroundStyle(.clear)
-					.padding(.vertical, .small2)
 			}
 		}
 	}
