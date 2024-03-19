@@ -42,8 +42,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		/// Workaround, TCA sends the sectionDisappeared after we dismiss, causing a run-time warning
 		var didDismiss: Bool = false
 
-		var showAccount: Bool = true
-
 		struct Loading: Hashable, Sendable {
 			let fullPeriod: Range<Date>
 			let pivotDate: Date
@@ -97,7 +95,12 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Hashable {
-		case loadedHistory(TransactionHistoryResponse, parameters: TransactionHistoryRequest.Parameters, scrollTarget: ScrollTarget?)
+		case loadedHistory(
+			TransactionHistoryResponse,
+			parameters: TransactionHistoryRequest.Parameters,
+			scrollTarget: ScrollTarget?,
+			alsoLoadNewer: Bool
+		)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -162,16 +165,22 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		case let .transactionsTableAction(action):
 			switch action {
-			case .pulledDown:
+			case .reachedTop:
+				return .none
 				return loadNewerTransactions(state: &state)
 
-			case .nearingTop:
+			case .pulledDown:
 				return .none
+				return loadNewerTransactions(state: &state)
 
-			case .nearingBottom, .reachedBottom:
+			case .nearingBottom:
+				return loadTransactions(state: &state)
+
+			case .reachedBottom:
 				return loadTransactions(state: &state)
 
 			case let .monthChanged(month):
+				print("•• Month changed \(month.formatted(date: .abbreviated, time: .omitted))")
 				state.currentMonth = month
 				return .none
 
@@ -187,7 +196,12 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadedHistory(response, parameters, scrollTarget):
+		case let .loadedHistory(response, parameters, scrollTarget, loadNewer):
+			if loadNewer {
+				loadedHistory(response, parameters: parameters, scrollTarget: nil, state: &state)
+				return loadHistory(.up, scrollTarget: scrollTarget, state: &state)
+			}
+
 			loadedHistory(response, parameters: parameters, scrollTarget: scrollTarget, state: &state)
 			return .none
 		}
@@ -211,7 +225,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	/// Load history for the previously selected period, using the provided filters
 	func loadTransactionsWithFilters(_ filters: [TransactionFilter], state: inout State) -> Effect<Action> {
-		let currentMonth = state.currentMonth
 		guard filters != state.loading.filters else { return .none }
 		state.loading = state.loading.withNewFilters(filters)
 		return loadTransactionsForMonth(state.currentMonth, state: &state)
@@ -223,7 +236,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		let pivotDate = min(endOfMonth, .now)
 		state.sections = []
 		state.loading = state.loading.withNewPivotDate(pivotDate)
-		return loadHistory(.down, scrollTarget: .beforeDate(pivotDate), state: &state)
+		return loadHistory(.firstUpThenDown, scrollTarget: .beforeDate(pivotDate), state: &state)
 	}
 
 	/// Loads (more) transactions
@@ -236,9 +249,13 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	/// Makes the TransactionHitosryRequest. **NB: don't call this directly**, instead use the specialised functions like `loadHistoryForMonth`
-	func loadHistory(_ direction: Direction, scrollTarget: ScrollTarget? = nil, state: inout State) -> Effect<Action> {
+	func loadHistory(_ direction: Direction?, scrollTarget: ScrollTarget? = nil, state: inout State) -> Effect<Action> {
+		let loadBothDirections = direction == .firstUpThenDown
+		let direction = direction ?? .down
 		let parameters = state.loading.requestParameters(for: direction)
 		let cursor = state.loading[cursor: direction]
+
+		print("•• LOAD HISTORY \(direction) \(parameters.period.debugString), isLoading: \(state.loading.isLoading)")
 
 		guard !state.loading.isLoading, cursor != .loadedAll, !parameters.period.isEmpty else { return .none }
 		state.loading.isLoading = true
@@ -253,7 +270,9 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		return .run { send in
 			let response = try await transactionHistoryClient.getTransactionHistory(request)
-			await send(.internal(.loadedHistory(response, parameters: request.parameters, scrollTarget: scrollTarget)))
+			await send(.internal(
+				.loadedHistory(response, parameters: request.parameters, scrollTarget: scrollTarget, alsoLoadNewer: loadBothDirections)
+			))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
 		}
@@ -265,6 +284,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		scrollTarget: ScrollTarget?,
 		state: inout State
 	) {
+		state.loading.isLoading = false
+
 		guard parameters == state.loading.requestParameters(for: parameters.direction) else {
 			loggerGlobal.info("Received obsolete Transaction History response, should not be possible")
 			return
@@ -285,8 +306,11 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		} else {
 			state.scrollTarget = nil
 		}
-		state.loading.isLoading = false
 	}
+}
+
+extension TransactionHistory.Direction? {
+	static let firstUpThenDown: Self = nil
 }
 
 extension TransactionHistory.State.Loading {
