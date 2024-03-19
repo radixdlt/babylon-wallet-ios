@@ -24,10 +24,7 @@ extension TransactionHistory {
 
 					VStack(spacing: .zero) {
 						VStack(spacing: .zero) {
-							if viewStore.showAccount {
-								AccountHeaderView(account: viewStore.account)
-									.transition(.opacity.combined(with: .scale(scale: 0.8)))
-							}
+							AccountHeaderView(account: viewStore.account)
 
 							HScrollBar(items: viewStore.availableMonths, selection: selection)
 								.background(.app.white)
@@ -37,9 +34,9 @@ extension TransactionHistory {
 								ActiveFiltersView(filters: filters) { id in
 									store.send(.view(.filterCrossTapped(id)), animation: .default)
 								}
+								.padding(.bottom, .small1)
 							}
 						}
-						.padding(.bottom, .small1)
 						.background(.app.white)
 
 						TableView(
@@ -57,7 +54,6 @@ extension TransactionHistory {
 							}
 						}
 					}
-					.animation(.default, value: viewStore.showAccount)
 					.background {
 						if viewStore.showEmptyState {
 							Text(L10n.TransactionHistory.noTransactions)
@@ -90,25 +86,6 @@ extension TransactionHistory {
 
 		private static let coordSpace = "TransactionHistory"
 		private static let accountDummy = "SmallAccountCardDummy"
-	}
-
-	struct SectionView: SwiftUI.View {
-		let section: TransactionHistory.TransactionSection
-		let onTap: (TXID) -> Void
-
-		var body: some SwiftUI.View {
-			Section {
-				ForEach(section.transactions, id: \.self) { transaction in
-					TransactionView(transaction: transaction)
-						.onTapGesture {
-							onTap(transaction.id)
-						}
-						.padding(.horizontal, .medium3)
-				}
-			} header: {
-				SectionHeaderView(title: section.title)
-			}
-		}
 	}
 
 	struct AccountHeaderView: SwiftUI.View {
