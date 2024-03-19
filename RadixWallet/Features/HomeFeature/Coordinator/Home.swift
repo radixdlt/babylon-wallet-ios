@@ -13,13 +13,7 @@ public struct Home: Sendable, FeatureReducer {
 		public var showRadixBanner: Bool = false
 		public var showFiatWorth: Bool = true
 
-		public var totalFiatWorth: Loadable<FiatWorth>? {
-			guard showFiatWorth else {
-				return nil
-			}
-
-			return accountRows.map(\.totalFiatWorth).reduce(+)
-		}
+		public var totalFiatWorth: Loadable<FiatWorth> = .idle
 
 		// MARK: - Destination
 		@PresentationState
@@ -48,6 +42,7 @@ public struct Home: Sendable, FeatureReducer {
 		case currentGatewayChanged(to: Radix.Gateway)
 		case shouldShowNPSSurvey(Bool)
 		case accountsResourcesLoaded(Loadable<[OnLedgerEntity.Account]>)
+		case accountsFiatWorthLoaded([AccountAddress: Loadable<FiatWorth>])
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -153,6 +148,7 @@ public struct Home: Sendable, FeatureReducer {
 			.merge(with: loadGateways())
 			.merge(with: loadNPSSurveyStatus())
 			.merge(with: loadAccountResources())
+			.merge(with: loadFiatValues())
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(
@@ -240,6 +236,14 @@ public struct Home: Sendable, FeatureReducer {
 			if shouldShow {
 				state.destination = .npsSurvey(.init())
 			}
+			return .none
+		case let .accountsFiatWorthLoaded(fiatWorths):
+			state.accountRows.mutateAll {
+				if let fiatWorth = fiatWorths[$0.id] {
+					$0.totalFiatWorth.refresh(from: fiatWorth)
+				}
+			}
+			state.totalFiatWorth = state.accountRows.map(\.totalFiatWorth).reduce(+) ?? .loading
 			return .none
 		}
 	}
@@ -393,24 +397,25 @@ public struct Home: Sendable, FeatureReducer {
 	}
 
 	private func loadFiatValues() -> Effect<Action> {
-		.run { _ in
-			let observable = accountPortfoliosClient.portfolioUpdates()
+		.run { send in
+			let accountsTotalFiatWorth = accountPortfoliosClient.portfolioUpdates()
 				.compactMap { portfoliosLoadable in
 					portfoliosLoadable.wrappedValue?.reduce(into: [AccountAddress: Loadable<FiatWorth>]()) { partialResult, portfolio in
 						partialResult[portfolio.account.address] = portfolio.totalFiatWorth
 					}
 				}
 				.filter {
-					Array($0.values).reduce(+)
+					// All items should load
+					if let aggregated = Array($0.values).reduce(+), aggregated.didLoad {
+						return true
+					}
+					return false
 				}
 
-			//            for try await accountResources in accountPortfoliosClient.portfolioUpdates()
-			//                .map {
-			//                $0.map { $0.map { ($0.account.address, $0.totalFiatWorth)
-			//            } } }.removeDuplicates() {
-			//                guard !Task.isCancelled else { return }
-			//                await send(.internal(.accountsResourcesLoaded(accountResources)))
-			//            }
+			for try await accountsTotalFiatWorth in accountsTotalFiatWorth.removeDuplicates() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.accountsFiatWorthLoaded(accountsTotalFiatWorth)))
+			}
 		}
 	}
 }

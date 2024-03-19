@@ -386,7 +386,7 @@ extension ResourceBalanceView {
 							}
 							.disabled(onTap == nil)
 							.buttonStyle(.borderless)
-							.roundedCorners(strokeColor: .red) // .app.gray3
+							.roundedCorners(strokeColor: .app.gray3)
 						}
 					}
 				}

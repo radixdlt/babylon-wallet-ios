@@ -66,6 +66,9 @@ extension AccountPortfoliosClient: DependencyKey {
 
 				let accounts = try await onLedgerEntitiesClient.getAccounts(accountAddresses).map(\.nonEmptyVaults)
 
+				let portfolios = accounts.map { AccountPortfolio(account: $0) }
+				await state.handlePortfoliosUpdate(portfolios)
+
 				/// Put together all resources from already fetched and new accounts
 				let currentAccounts = state.portfoliosSubject.value.wrappedValue.map { $0.values.map(\.account) } ?? []
 				let allResources: [ResourceAddress] = {
@@ -115,9 +118,6 @@ extension AccountPortfoliosClient: DependencyKey {
 						await state.setTokenPrices(prices)
 					}
 				}
-
-				let portfolios = accounts.map { AccountPortfolio(account: $0) }
-				await state.handlePortfoliosUpdate(portfolios)
 
 				// Load additional details
 				_ = await accounts.parallelMap(fetchPoolAndStakeUnitsDetails)

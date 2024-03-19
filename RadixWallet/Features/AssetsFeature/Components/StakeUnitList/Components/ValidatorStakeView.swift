@@ -83,6 +83,7 @@ struct ValidatorStakeView: View {
 				onTap: onTap,
 				onClaimAllTapped: onClaimAllTapped
 			)
+			.padding(.small1)
 		}
 	}
 }
