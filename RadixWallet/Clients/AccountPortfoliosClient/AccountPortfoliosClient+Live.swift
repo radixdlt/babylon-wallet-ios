@@ -137,6 +137,11 @@ extension AccountPortfoliosClient: DependencyKey {
 
 				return portfolio
 			},
+			portfolioUpdates: {
+				state.portfoliosSubject
+					.map { $0.map { Array($0.values) } }
+					.eraseToAnyAsyncSequence()
+			},
 			portfolioForAccount: { address in
 				await state.portfolioForAccount(address)
 			},

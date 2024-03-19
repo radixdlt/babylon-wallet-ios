@@ -10,6 +10,8 @@ public struct AccountPortfoliosClient: Sendable {
 	/// Will return the portfolio after fetch, as well will notify any subscribes through `portfolioForAccount`
 	public var fetchAccountPortfolio: FetchAccountPortfolio
 
+	public var portfolioUpdates: PortfolioUpdates
+
 	/// Subscribe to portfolio changes for a given account address
 	public var portfolioForAccount: PortfolioForAccount
 
@@ -21,6 +23,8 @@ extension AccountPortfoliosClient {
 	public typealias FetchAccountPortfolio = @Sendable (_ address: AccountAddress, _ forceResfresh: Bool) async throws -> AccountPortfolio
 	public typealias FetchAccountPortfolios = @Sendable (_ addresses: [AccountAddress], _ forceResfresh: Bool) async throws -> [AccountPortfolio]
 	public typealias PortfolioForAccount = @Sendable (_ address: AccountAddress) async -> AnyAsyncSequence<AccountPortfolio>
+
+	public typealias PortfolioUpdates = @Sendable () -> AnyAsyncSequence<Loadable<[AccountPortfolio]>>
 	public typealias Portfolios = @Sendable () -> [AccountPortfolio]
 }
 

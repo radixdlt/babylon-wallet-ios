@@ -47,6 +47,7 @@ public struct Home: Sendable, FeatureReducer {
 		case loadedShouldWriteDownPersonasSeedPhrase(Bool)
 		case currentGatewayChanged(to: Radix.Gateway)
 		case shouldShowNPSSurvey(Bool)
+		case accountsResourcesLoaded(Loadable<[OnLedgerEntity.Account]>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -151,6 +152,7 @@ public struct Home: Sendable, FeatureReducer {
 			.merge(with: loadShouldWriteDownPersonasSeedPhrase())
 			.merge(with: loadGateways())
 			.merge(with: loadNPSSurveyStatus())
+			.merge(with: loadAccountResources())
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(
@@ -204,6 +206,14 @@ public struct Home: Sendable, FeatureReducer {
 
 		case let .accountsLoadedResult(.failure(error)):
 			errorQueue.schedule(error)
+			return .none
+
+		case let .accountsResourcesLoaded(accountsResources):
+			state.accountRows.mutateAll { row in
+				if let accountResources = accountsResources.first(where: { $0.address == row.id }).unwrap() {
+					row.accountWithResources.refresh(from: accountResources)
+				}
+			}
 			return .none
 
 		case let .loadedShouldWriteDownPersonasSeedPhrase(shouldBackup):
@@ -370,6 +380,15 @@ public struct Home: Sendable, FeatureReducer {
 
 		return .run { _ in
 			await npsSurveyClient.uploadUserFeedback(feedback)
+		}
+	}
+
+	private func loadAccountResources() -> Effect<Action> {
+		.run { send in
+			for try await accountResources in accountPortfoliosClient.portfolioUpdates().map { $0.map { $0.map(\.account) } }.removeDuplicates() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.accountsResourcesLoaded(accountResources)))
+			}
 		}
 	}
 }

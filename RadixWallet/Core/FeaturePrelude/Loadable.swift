@@ -223,7 +223,7 @@ extension Loadable {
 		}
 	}
 
-	public func firstd(where predicate: (Value.Element) -> Bool) -> Loadable<Value.Element?> where Value: Sequence {
+	public func first(where predicate: (Value.Element) -> Bool) -> Loadable<Value.Element?> where Value: Sequence {
 		switch self {
 		case .idle:
 			return .idle
