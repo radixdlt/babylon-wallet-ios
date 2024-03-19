@@ -307,18 +307,29 @@ extension Loadable {
     public mutating func refresh(
         from other: Loadable<Value>,
         valueChangeMap: (_ old: Value, _ new: Value) -> Value = { _, new in new }
-    ) {
+    ) where Value: Equatable {
         switch (self, other) {
-        // If `other` is success, update the content regardless of the current state
-        case let (.success(oldValue), .success(newValue)):
-            self = .success(valueChangeMap(oldValue, newValue))
-        case let (_, .success(otherValue)):
+        // Update to success if no current value
+        case let (.idle, .success(otherValue)),
+            let (.loading, .success(otherValue)),
+            let (.failure, .success(otherValue)):
+            print("Refresh from nonSuccessValue")
             self = .success(otherValue)
+
+        // Update to new value only if it changed
+        case let (.success(oldValue), .success(newValue)):
+            print("Refresh from success value with success")
+            if oldValue != newValue {
+                self = .success(valueChangeMap(oldValue, newValue))
+            }
+
         // If current state is success, don't update if `other` is loading or failed
         case (.success, _):
+            print("Refresh from success value with other value")
             break
         // If current state is other than .success
         case let (_, other):
+            print("Refresh from any value with other value")
             self = other
         }
     }

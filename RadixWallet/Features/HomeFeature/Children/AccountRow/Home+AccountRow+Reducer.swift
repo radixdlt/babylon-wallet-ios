@@ -78,9 +78,13 @@ extension Home {
 				state.isDappDefinitionAccount = portfolio.account.metadata.accountType == .dappDefinition
 
 				assert(portfolio.account.address == state.account.address)
-
-				state.portfolio = .success(portfolio)
-				state.totalFiatWorth.refresh(from: portfolio.totalFiatWorth)
+				var newValue = state.portfolio
+				newValue.refresh(from: .success(portfolio))
+				if state.portfolio != newValue {
+					state.portfolio = newValue
+				}
+				// state.portfolio.refresh(from: .success(portfolio))
+				// state.totalFiatWorth.refresh(from: portfolio.totalFiatWorth)
 				return .send(.internal(.checkAccountAccessToMnemonic))
 
 			case .checkAccountAccessToMnemonic:
