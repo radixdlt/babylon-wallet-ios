@@ -98,8 +98,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case loadedHistory(
 			TransactionHistoryResponse,
 			parameters: TransactionHistoryRequest.Parameters,
-			scrollTarget: ScrollTarget?,
-			alsoLoadNewer: Bool
+			scrollTarget: ScrollTarget?
 		)
 	}
 
@@ -196,13 +195,22 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadedHistory(response, parameters, scrollTarget, loadNewer):
-			if loadNewer {
-				loadedHistory(response, parameters: parameters, scrollTarget: nil, state: &state)
-				return loadHistory(.up, scrollTarget: scrollTarget, state: &state)
+		case let .loadedHistory(response, parameters, scrollTarget):
+			loadedHistory(response, parameters: parameters, scrollTarget: scrollTarget, state: &state)
+
+			print("•• Loaded: \(state.sections.dateSpan?.debugString ?? "-"), up: \(state.loading.requestParameters(for: .up).period.debugString), o: \(state.sections.dateSpan?.overlaps(state.loading.requestParameters(for: .up).period) == true)")
+
+			if let span = state.sections.dateSpan {
+				print("•• overlap: \(span.clamped(to: state.loading.requestParameters(for: .up).period).debugString)")
 			}
 
-			loadedHistory(response, parameters: parameters, scrollTarget: scrollTarget, state: &state)
+			if let latest = state.sections.dateSpan?.upperBound {
+				print("•• latest is after pivot: \(latest > state.loading.pivotDate)")
+			}
+
+			if parameters.direction == .down, let latest = state.sections.dateSpan?.upperBound, latest <= state.loading.pivotDate {
+				print("•• should also load newer")
+			}
 			return .none
 		}
 	}
@@ -236,7 +244,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		let pivotDate = min(endOfMonth, .now)
 		state.sections = []
 		state.loading = state.loading.withNewPivotDate(pivotDate)
-		return loadHistory(.firstUpThenDown, scrollTarget: .beforeDate(pivotDate), state: &state)
+		return loadHistory(.down, scrollTarget: .beforeDate(pivotDate), state: &state)
 	}
 
 	/// Loads (more) transactions
@@ -249,15 +257,15 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	/// Makes the TransactionHitosryRequest. **NB: don't call this directly**, instead use the specialised functions like `loadHistoryForMonth`
-	func loadHistory(_ direction: Direction?, scrollTarget: ScrollTarget? = nil, state: inout State) -> Effect<Action> {
-		let loadBothDirections = direction == .firstUpThenDown
-		let direction = direction ?? .down
+	func loadHistory(_ direction: Direction, scrollTarget: ScrollTarget? = nil, state: inout State) -> Effect<Action> {
+		let direction = direction
 		let parameters = state.loading.requestParameters(for: direction)
 		let cursor = state.loading[cursor: direction]
 
 		print("•• LOAD HISTORY \(direction) \(parameters.period.debugString), isLoading: \(state.loading.isLoading)")
 
 		guard !state.loading.isLoading, cursor != .loadedAll, !parameters.period.isEmpty else { return .none }
+
 		state.loading.isLoading = true
 
 		let request = TransactionHistoryRequest(
@@ -271,7 +279,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		return .run { send in
 			let response = try await transactionHistoryClient.getTransactionHistory(request)
 			await send(.internal(
-				.loadedHistory(response, parameters: request.parameters, scrollTarget: scrollTarget, alsoLoadNewer: loadBothDirections)
+				.loadedHistory(response, parameters: request.parameters, scrollTarget: scrollTarget)
 			))
 		} catch: { error, _ in
 			errorQueue.schedule(error)
@@ -284,8 +292,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		scrollTarget: ScrollTarget?,
 		state: inout State
 	) {
-		state.loading.isLoading = false
-
 		guard parameters == state.loading.requestParameters(for: parameters.direction) else {
 			loggerGlobal.info("Received obsolete Transaction History response, should not be possible")
 			return
@@ -293,6 +299,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		state.resources.append(contentsOf: response.resources)
 		state.loading[cursor: parameters.direction] = response.nextCursor.map { .next($0) } ?? .loadedAll
 		state.sections.addTransactions(response.items)
+		state.loading.isLoading = false
 
 		if let scrollTarget {
 			switch scrollTarget {
@@ -307,10 +314,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			state.scrollTarget = nil
 		}
 	}
-}
-
-extension TransactionHistory.Direction? {
-	static let firstUpThenDown: Self = nil
 }
 
 extension TransactionHistory.State.Loading {
