@@ -195,7 +195,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 				return nil
 			}
 
-			return .init(sections: sections)
+			return .init(sections: sections, destination: state.resources.fungibleTokenList?.destination)
 		}()
 
 		state.accountPortfolio.refresh(from: .success(portfolio))
@@ -210,7 +210,8 @@ public struct AssetsView: Sendable, FeatureReducer {
 					},
 					isSelected: mode.nonXrdRowSelected(poolUnit.resource.resourceAddress)
 				)
-			}.asIdentifiable()
+			}.asIdentifiable(),
+			destination: state.resources.poolUnitsList?.destination
 		)
 
 		let stakes = portfolio.account.poolUnitResources.radixNetworkStakes
@@ -234,13 +235,14 @@ public struct AssetsView: Sendable, FeatureReducer {
 						dict[resource] = selectedtokens
 					}
 				} : nil,
-			stakeUnitDetails: state.accountPortfolio.stakeUnitDetails.flatten()
+			stakeUnitDetails: state.accountPortfolio.stakeUnitDetails.flatten(),
+			destination: state.resources.stakeUnitList?.destination
 		)
 
 		state.totalFiatWorth.refresh(from: portfolio.totalFiatWorth)
 		state.resources = .init(
 			fungibleTokenList: fungibleTokenList,
-			nonFungibleTokenList: !nfts.isEmpty ? .init(rows: .init(uniqueElements: nfts)) : nil,
+			nonFungibleTokenList: !nfts.isEmpty ? .init(rows: nfts.asIdentifiable(), destination: state.resources.nonFungibleTokenList?.destination) : nil,
 			stakeUnitList: stakeUnitList,
 			poolUnitsList: poolUnitList
 		)

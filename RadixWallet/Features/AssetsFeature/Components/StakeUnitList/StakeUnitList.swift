@@ -23,11 +23,13 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 			account: OnLedgerEntity.Account,
 			selectedLiquidStakeUnits: IdentifiedArrayOf<OnLedgerEntity.OwnedFungibleResource>?,
 			selectedStakeClaimTokens: SelectedStakeClaimTokens?,
-			stakeUnitDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>>
+			stakeUnitDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>>,
+			destination: Destination.State? = nil
 		) {
 			self.account = account
 			self.selectedLiquidStakeUnits = selectedLiquidStakeUnits
 			self.selectedStakeClaimTokens = selectedStakeClaimTokens
+			self.destination = destination
 
 			switch stakeUnitDetails {
 			case .idle, .loading:
