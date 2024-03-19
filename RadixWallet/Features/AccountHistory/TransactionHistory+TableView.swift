@@ -5,8 +5,8 @@ extension TransactionHistory {
 	public struct TableView: UIViewRepresentable {
 		public enum Action: Hashable, Sendable {
 			case transactionTapped(TXID)
+			case reachedTop
 			case pulledDown
-			case nearingTop
 			case nearingBottom
 			case reachedBottom
 			case monthChanged(Date)
@@ -48,13 +48,10 @@ extension TransactionHistory {
 			var sections: IdentifiedArrayOf<TransactionSection>
 			let action: (Action) -> Void
 
-			private var isScrolledPastTop: Bool = false
-
-			private var previousCell: IndexPath = .init(row: 0, section: 0)
+			private var isPulledDown: Bool = false
+			private var isNearingBottom: Bool = false
 
 			private var month: Date = .distantPast
-
-			private var scrolling: (direction: Direction, count: Int) = (.down, 0)
 
 			public init(
 				sections: IdentifiedArrayOf<TransactionSection>,
@@ -103,32 +100,6 @@ extension TransactionHistory {
 				UITableView.automaticDimension
 			}
 
-			public func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-				let section = sections[indexPath.section]
-				let txID = section.transactions[indexPath.row].id
-				let scrollDirection: Direction = indexPath > previousCell ? .down : .up
-				if scrollDirection == scrolling.direction {
-					scrolling.count += 1
-				} else {
-					scrolling = (scrollDirection, 0)
-				}
-				previousCell = indexPath
-
-				// We only want to pre-emptively load if they have been scrolling for a while in the same direction
-				if scrolling.count > 8 {
-					let transactions = sections.allTransactions
-					if scrolling.direction == .down, transactions.suffix(15).contains(txID) {
-						action(.nearingBottom)
-						scrolling.count = 0
-					} else if scrollDirection == .up, transactions.prefix(7).contains(txID) {
-						action(.nearingTop)
-						scrolling.count = 0
-					}
-				} else if scrollDirection == .down, txID == sections.allTransactions.last {
-					action(.reachedBottom)
-				}
-			}
-
 			public func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
 				nil
 			}
@@ -136,21 +107,61 @@ extension TransactionHistory {
 			// UIScrollViewDelegate
 
 			public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-				if let tableView = scrollView as? UITableView {
-					updateMonth(tableView: tableView)
+				guard let tableView = scrollView as? UITableView else {
+					assertionFailure("This should be a UITableView")
+					return
 				}
 
-				if scrollView.contentOffset.y < -20, !isScrolledPastTop {
+				updateMonth(tableView: tableView)
+
+				let offset = scrollView.contentOffset.y
+
+				// Detect pull to refresh
+
+				if offset < -20, !isPulledDown {
 					action(.pulledDown)
-					isScrolledPastTop = true
-				} else if isScrolledPastTop, scrollView.contentOffset.y >= 0 {
-					isScrolledPastTop = false
+					isPulledDown = true
+				} else if offset >= 0, isPulledDown {
+					isPulledDown = false
+				}
+
+				// Detect if we are getting close to the bottom
+
+				let isClose = isCloseToBottom(tableView: tableView)
+				if isClose, !isNearingBottom {
+					action(.nearingBottom)
+					isNearingBottom = true
+				} else if !isClose, isNearingBottom {
+					isNearingBottom = false
+				}
+			}
+
+			public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+				guard let tableView = scrollView as? UITableView else {
+					assertionFailure("This should be a UITableView")
+					return
+				}
+
+				if isAtTop(tableView: tableView) {
+					action(.reachedTop)
+				} else if isCloseToBottom(tableView: tableView) {
+					action(.reachedBottom)
 				}
 			}
 
 			// Helpers
 
-			func updateMonth(tableView: UITableView) {
+			private func isAtTop(tableView: UITableView) -> Bool {
+				guard let visibleRows = tableView.indexPathsForVisibleRows else { return false }
+				return visibleRows.contains(.firstRow)
+			}
+
+			private func isCloseToBottom(tableView: UITableView) -> Bool {
+				guard let lastVisible = tableView.indexPathsForVisibleRows?.last else { return false }
+				return sections.allTransactions.suffix(5).contains(sections.transaction(for: lastVisible))
+			}
+
+			private func updateMonth(tableView: UITableView) {
 				guard let topMost = tableView.indexPathsForVisibleRows?.first else { return }
 				let newMonth = sections[topMost.section].month
 				guard newMonth != month else { return }
@@ -162,6 +173,10 @@ extension TransactionHistory {
 			}
 		}
 	}
+}
+
+extension IndexPath {
+	static let firstRow: IndexPath = .init(row: 0, section: 0)
 }
 
 extension Collection where Element: Equatable {
