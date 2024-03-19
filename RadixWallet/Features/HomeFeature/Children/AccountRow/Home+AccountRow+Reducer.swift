@@ -8,12 +8,7 @@ extension Home {
 			public var id: AccountAddress { account.address }
 			public var accountWithInfo: AccountWithInfo
 
-			public var portfolio: Loadable<AccountPortfoliosClient.AccountPortfolio> {
-				didSet {
-					totalFiatWorth.refresh(from: portfolio.totalFiatWorth.flatten())
-				}
-			}
-
+			public var accountWithResources: Loadable<OnLedgerEntity.Account>
 			public var showFiatWorth: Bool = true
 			public var totalFiatWorth: Loadable<FiatWorth>
 
@@ -21,7 +16,7 @@ extension Home {
 				account: Profile.Network.Account
 			) {
 				self.accountWithInfo = .init(account: account)
-				self.portfolio = .loading
+				self.accountWithResources = .loading
 				self.totalFiatWorth = .loading
 			}
 		}
@@ -34,7 +29,8 @@ extension Home {
 		}
 
 		public enum InternalAction: Sendable, Equatable {
-			case accountPortfolioUpdate(AccountPortfoliosClient.AccountPortfolio)
+			case accountUpdated(OnLedgerEntity.Account)
+			case fiatWorthUpdated(Loadable<FiatWorth>)
 			case checkAccountAccessToMnemonic
 		}
 
@@ -52,22 +48,28 @@ extension Home {
 			switch viewAction {
 			case .task:
 				let accountAddress = state.account.address
-				if state.portfolio.wrappedValue == nil {
-					state.portfolio = .loading
-				}
-
 				self.checkAccountAccessToMnemonic(state: &state)
 
-				return .run { [portfolio = state.portfolio] send in
-					for try await accountPortfolio in await accountPortfoliosClient.portfolioForAccount(accountAddress) {
+				return .run { send in
+					for try await accountPortfolio in await accountPortfoliosClient.portfolioForAccount(accountAddress).map(\.account).removeDuplicates() {
 						guard !Task.isCancelled else {
 							return
 						}
 						// if portfolio != .success(accountPortfolio) {
-						await send(.internal(.accountPortfolioUpdate(accountPortfolio)))
+						await send(.internal(.accountUpdated(accountPortfolio)))
 						//  }
 					}
 				}
+				.merge(with: .run { send in
+					for try await fiatWorth in await accountPortfoliosClient.portfolioForAccount(accountAddress).map(\.totalFiatWorth).removeDuplicates() {
+						guard !Task.isCancelled else {
+							return
+						}
+						// if portfolio != .success(accountPortfolio) {
+						await send(.internal(.fiatWorthUpdated(fiatWorth)))
+						//  }
+					}
+				})
 			case .exportMnemonicButtonTapped:
 				return .send(.delegate(.exportMnemonic))
 
@@ -81,26 +83,26 @@ extension Home {
 
 		public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 			switch internalAction {
-			case let .accountPortfolioUpdate(portfolio):
-				assert(portfolio.account.address == state.account.address)
+			case let .accountUpdated(account):
+				assert(account.address == state.account.address)
 
-				guard state.portfolio != .success(portfolio) else {
-					return .none
-				}
-
-				state.isDappDefinitionAccount = portfolio.account.metadata.accountType == .dappDefinition
-				state.portfolio.refresh(from: .success(portfolio))
+				state.isDappDefinitionAccount = account.metadata.accountType == .dappDefinition
+				state.accountWithResources.refresh(from: .success(account))
 
 				return .send(.internal(.checkAccountAccessToMnemonic))
 
 			case .checkAccountAccessToMnemonic:
 				checkAccountAccessToMnemonic(state: &state)
 				return .none
+
+			case let .fiatWorthUpdated(fiatWorth):
+				state.totalFiatWorth.refresh(from: fiatWorth)
+				return .none
 			}
 		}
 
 		private func checkAccountAccessToMnemonic(state: inout State) {
-			state.checkAccountAccessToMnemonic(portfolio: state.portfolio.account.wrappedValue)
+			state.checkAccountAccessToMnemonic(portfolio: state.accountWithResources.wrappedValue)
 		}
 	}
 }
