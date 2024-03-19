@@ -38,6 +38,7 @@ extension TransactionHistory {
 
 			if let scrollTarget = scrollTarget.value, let indexPath = context.coordinator.sections.indexPath(for: scrollTarget) {
 				uiView.scrollToRow(at: indexPath, at: .top, animated: false)
+				context.coordinator.didSelectMonth = true
 			}
 		}
 
@@ -46,6 +47,8 @@ extension TransactionHistory {
 		}
 
 		public class Coordinator: NSObject, UITableViewDataSource, UITableViewDelegate {
+			var didSelectMonth: Bool = false
+
 			var sections: IdentifiedArrayOf<TransactionSection>
 			let action: (Action) -> Void
 
@@ -137,6 +140,10 @@ extension TransactionHistory {
 				}
 			}
 
+			public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+				didSelectMonth = false
+			}
+
 			public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
 				guard let tableView = scrollView as? UITableView else {
 					assertionFailure("This should be a UITableView")
@@ -159,11 +166,12 @@ extension TransactionHistory {
 
 			private func isCloseToBottom(tableView: UITableView) -> Bool {
 				guard let lastVisible = tableView.indexPathsForVisibleRows?.last else { return false }
-				return sections.allTransactions.suffix(5).contains(sections.transaction(for: lastVisible))
+				return sections.allTransactions.suffix(5).contains(sections.transaction(for: lastVisible).id)
 			}
 
 			private func updateMonth(tableView: UITableView) {
-				guard let topMost = tableView.indexPathsForVisibleRows?.first else { return }
+				// If the user hasn't scrolled since selecting a month, we won't update the month
+				guard !didSelectMonth, let topMost = tableView.indexPathsForVisibleRows?.first else { return }
 				let newMonth = sections[topMost.section].month
 				guard newMonth != month else { return }
 				month = newMonth
@@ -202,8 +210,8 @@ extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
 		flatMap(\.transactions.ids)
 	}
 
-	func transaction(for indexPath: IndexPath) -> TXID {
-		self[indexPath.section].transactions[indexPath.row].id
+	func transaction(for indexPath: IndexPath) -> TransactionHistoryItem {
+		self[indexPath.section].transactions[indexPath.row]
 	}
 
 	func indexPath(for transaction: TXID) -> IndexPath? {

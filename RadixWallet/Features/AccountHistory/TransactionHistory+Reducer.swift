@@ -184,7 +184,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 				return loadTransactions(state: &state)
 
 			case let .monthChanged(month):
-				print("•• Month changed \(month.formatted(date: .abbreviated, time: .omitted))")
 				state.currentMonth = month
 				return .none
 
@@ -239,7 +238,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	/// Load history for the provided month, keeping the same period and filters
 	func loadTransactionsForMonth(_ month: Date, state: inout State) -> Effect<Action> {
 		guard let endOfMonth = Calendar.current.date(byAdding: .month, value: 1, to: month) else { return .none }
-		let clampedEndOfMonth = min(endOfMonth, .now)
+		let clampedEndOfMonth = min(endOfMonth, state.loading.fullPeriod.upperBound)
 
 		if state.sections.dateSpan?.contains(month ..< clampedEndOfMonth) == true {
 			state.setScrollTarget(.beforeDate(clampedEndOfMonth))
@@ -323,11 +322,11 @@ extension TransactionHistory.State {
 
 extension TransactionHistory.State.Loading {
 	func withNewPivotDate(_ newPivotDate: Date) -> Self {
-		.init(fullPeriod: fullPeriod.lowerBound ..< .now, pivotDate: newPivotDate, filters: filters)
+		.init(fullPeriod: fullPeriod, pivotDate: newPivotDate, filters: filters)
 	}
 
 	func withNewFilters(_ newFilters: [TransactionFilter]) -> Self {
-		.init(fullPeriod: fullPeriod.lowerBound ..< .now, pivotDate: pivotDate, filters: newFilters)
+		.init(fullPeriod: fullPeriod, pivotDate: pivotDate, filters: newFilters)
 	}
 
 	func requestParameters(for direction: TransactionHistory.Direction) -> TransactionHistoryRequest.Parameters {
