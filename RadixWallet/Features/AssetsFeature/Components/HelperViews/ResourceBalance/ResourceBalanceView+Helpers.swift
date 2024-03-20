@@ -17,7 +17,8 @@ extension ResourceBalance.ViewState.PoolUnit {
 extension ResourceBalance.ViewState.Fungible {
 	public static func xrd(balance: ResourceAmount) -> Self {
 		.init(
-			address: try! .init(validatingAddress: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"), // FIXME: REMOVE
+			address: try! .init(validatingAddress: "resource_tdx_2_1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxtfd2jc"), // FIXME: REMOVE
+//			address: try! .init(validatingAddress: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd"), // FIXME: REMOVE
 			icon: .token(.xrd),
 			title: Constants.xrdTokenName,
 			amount: .init(balance)
