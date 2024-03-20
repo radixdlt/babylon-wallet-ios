@@ -184,25 +184,256 @@ extension TransactionHistory {
 	}
 }
 
-extension IndexPath {
-	static let firstRow: IndexPath = .init(row: 0, section: 0)
+// MARK: - TransactionHistory.TransactionView
+extension TransactionHistory {
+	struct SectionHeaderView: SwiftUI.View {
+		let title: String
+
+		var body: some SwiftUI.View {
+			Text(title)
+				.textStyle(.body2Header)
+				.foregroundStyle(.app.gray2)
+				.padding(.horizontal, .medium3)
+				.padding(.vertical, .small2)
+				.frame(maxWidth: .infinity, alignment: .leading)
+				.background(.app.gray5)
+		}
+	}
+
+	struct TransactionView: SwiftUI.View {
+		let transaction: TransactionHistoryItem
+
+		init(transaction: TransactionHistoryItem) {
+			self.transaction = transaction
+		}
+
+		var body: some SwiftUI.View {
+			Card(.app.white) {
+				VStack(spacing: 0) {
+					if let message = transaction.message {
+						MessageView(message: message)
+							.padding(.bottom, -.small3)
+					}
+
+					VStack(spacing: .small1) {
+						if transaction.failed {
+							FailedTransactionView()
+						} else if transaction.isEmpty {
+							EmptyTransactionView()
+						} else {
+							if !transaction.withdrawals.isEmpty {
+								let resources = transaction.withdrawals.map(\.viewState)
+								TransfersActionView(type: .withdrawal, resources: resources)
+							}
+
+							if !transaction.deposits.isEmpty {
+								let resources = transaction.deposits.map(\.viewState)
+								TransfersActionView(type: .deposit, resources: resources)
+							}
+
+							if transaction.depositSettingsUpdated {
+								DepositSettingsActionView()
+							}
+						}
+					}
+					.overlay(alignment: .topTrailing) {
+						TimeStampView(manifestClass: transaction.manifestClass, time: transaction.time)
+					}
+					.padding(.top, .small1)
+					.padding(.horizontal, .medium3)
+				}
+				.padding(.bottom, .medium3)
+			}
+		}
+
+		var time: Date {
+			transaction.time
+		}
+
+		var manifestClass: GatewayAPI.ManifestClass? {
+			transaction.manifestClass
+		}
+
+		struct MessageView: SwiftUI.View {
+			let message: String
+
+			var body: some SwiftUI.View {
+				let inset: CGFloat = 2
+				Text(message)
+					.textStyle(.body2Regular)
+					.foregroundColor(.app.gray1)
+					.padding(.medium3)
+					.frame(maxWidth: .infinity, alignment: .leading)
+					.inFlatBottomSpeechbubble(inset: inset)
+					.padding(.top, inset)
+					.padding(.horizontal, inset)
+			}
+		}
+
+		struct TimeStampView: SwiftUI.View {
+			let manifestClass: GatewayAPI.ManifestClass?
+			let time: Date
+
+			var body: some SwiftUI.View {
+				Text("\(manifestClassLabel) • \(timeLabel)")
+					.textStyle(.body2HighImportance)
+					.foregroundColor(.app.gray2)
+			}
+
+			private var manifestClassLabel: String {
+				TransactionHistory.label(for: manifestClass)
+			}
+
+			private var timeLabel: String {
+				time.formatted(date: .omitted, time: .shortened)
+			}
+		}
+
+		struct TransfersActionView: SwiftUI.View {
+			let type: TransferType
+			let resources: [ResourceBalance.ViewState]
+
+			enum TransferType {
+				case withdrawal
+				case deposit
+			}
+
+			var body: some SwiftUI.View {
+				VStack {
+					switch type {
+					case .withdrawal:
+						EventHeader(event: .withdrawn)
+					case .deposit:
+						EventHeader(event: .deposited)
+					}
+
+					ResourceBalancesView(resources)
+						.environment(\.resourceBalanceHideDetails, true)
+				}
+			}
+		}
+
+		struct DepositSettingsActionView: SwiftUI.View {
+			var body: some SwiftUI.View {
+				VStack {
+					EventHeader(event: .settings)
+
+					Text(L10n.TransactionHistory.updatedDepositSettings)
+						.textStyle(.body2HighImportance)
+						.foregroundColor(.app.gray1)
+						.flushedLeft
+						.padding(.small1)
+						.roundedCorners(strokeColor: .app.gray3)
+				}
+			}
+		}
+
+		struct FailedTransactionView: SwiftUI.View {
+			var body: some SwiftUI.View {
+				VStack {
+					EventHeader.Dummy()
+
+					HStack(spacing: .small2) {
+						Image(.warningError)
+							.renderingMode(.template)
+							.resizable()
+							.frame(.smallest)
+
+						Text(L10n.TransactionHistory.failedTransaction)
+							.textStyle(.body2HighImportance)
+
+						Spacer(minLength: 0)
+					}
+					.foregroundColor(.app.red1)
+					.padding(.horizontal, .small1)
+					.padding(.vertical, .medium3)
+					.roundedCorners(strokeColor: .app.gray3)
+				}
+			}
+		}
+
+		struct EmptyTransactionView: SwiftUI.View {
+			var body: some SwiftUI.View {
+				VStack {
+					EventHeader.Dummy()
+
+					Text(L10n.TransactionHistory.noBalanceChanges)
+						.multilineTextAlignment(.leading)
+						.textStyle(.body2HighImportance)
+						.foregroundColor(.app.gray1)
+						.flushedLeft
+						.padding(.small1)
+						.roundedCorners(strokeColor: .app.gray3)
+				}
+			}
+		}
+
+		struct EventHeader: SwiftUI.View {
+			let event: Event
+
+			var body: some SwiftUI.View {
+				HStack(spacing: .zero) {
+					Image(image)
+						.padding(.trailing, .small3)
+
+					Text(label)
+						.textStyle(.body2Header)
+						.foregroundColor(textColor)
+
+					Spacer()
+				}
+			}
+
+			private var image: ImageResource {
+				switch event {
+				case .deposited:
+					.transactionHistoryDeposit
+				case .withdrawn:
+					.transactionHistoryWithdrawal
+				case .settings:
+					.transactionHistorySettings
+				}
+			}
+
+			private var label: String {
+				switch event {
+				case .deposited:
+					L10n.TransactionHistory.depositedSection
+				case .withdrawn:
+					L10n.TransactionHistory.withdrawnSection
+				case .settings:
+					L10n.TransactionHistory.settingsSection
+				}
+			}
+
+			private var textColor: Color {
+				switch event {
+				case .deposited:
+					.app.green1
+				case .withdrawn, .settings:
+					.app.gray1
+				}
+			}
+
+			struct Dummy: SwiftUI.View {
+				var body: some SwiftUI.View {
+					Text("DUMMY")
+						.textStyle(.body2Header)
+						.foregroundColor(.clear)
+				}
+			}
+		}
+	}
+
+	public enum Event {
+		case deposited
+		case withdrawn
+		case settings
+	}
 }
 
-extension Collection where Element: Equatable {
-	func hasPrefix(_ elements: some Collection<Element>) -> Bool {
-		prefix(elements.count).elementsEqual(elements)
-	}
-
-	func hasSuffix(_ elements: some Collection<Element>) -> Bool {
-		suffix(elements.count).elementsEqual(elements)
-	}
-
-	/// When the start of this collection overlaps the end of the other, returns the length of this overlap, otherwise `nil`
-	func prefixOverlappingSuffix(of elements: some Collection<Element>) -> Int? {
-		guard let first, let index = elements.reversed().firstIndex(of: first) else { return nil }
-		guard elements.hasSuffix(prefix(index + 1)) else { return nil }
-		return index + 1
-	}
+extension IndexPath {
+	static let firstRow: IndexPath = .init(row: 0, section: 0)
 }
 
 extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
