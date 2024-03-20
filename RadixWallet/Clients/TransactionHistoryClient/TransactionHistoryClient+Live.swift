@@ -75,22 +75,20 @@ extension TransactionHistoryClient {
 					throw ProgrammerError()
 				}
 
-				let validator = await onLedgerEntitiesClient.isStakeClaimNFT(resource)
-
 				func getToken(id: NonFungibleGlobalId) throws -> ResourceBalance {
 					// All tokens should have been fetched earlier
 					guard let token = keyedNonFungibleTokens[id: id] else { throw ProgrammerError() }
 					return ResourceBalance(resource: resource, details: .nonFungible(token))
 				}
 
-				return try extractNonFungibleIDs(type, from: changes)
-					.map { id in
-						if let validator {
-							try onLedgerEntitiesClient.stakeClaim(resource, stakeClaimValidator: validator, unstakeData: [], tokens: [])
-						} else {
-							try getToken(id: id)
-						}
-					}
+				let ids = try extractNonFungibleIDs(type, from: changes)
+
+				if let validator = await onLedgerEntitiesClient.isStakeClaimNFT(resource) {
+					guard !ids.isEmpty else { return [] }
+					return try [onLedgerEntitiesClient.stakeClaim(resource, stakeClaimValidator: validator, unstakeData: [], tokens: [])]
+				} else {
+					return try ids.map(getToken(id:))
+				}
 			}
 
 			func transaction(for info: GatewayAPI.CommittedTransactionInfo) async throws -> TransactionHistoryItem {
