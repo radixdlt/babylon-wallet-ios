@@ -905,12 +905,12 @@ extension TransactionReview.State {
 		deposits?.accounts.flatMap { $0.transfers.compactMap(\.fungibleGuarantee) } ?? []
 	}
 
-	public mutating func applyGuarantee(_ updated: TransactionClient.Guarantee, transferID: ResourceBalance.ID) {
+	public mutating func applyGuarantee(_ updated: TransactionClient.Guarantee, transferID: IDResourceBalance.ID) {
 		guard let accountID = accountID(for: transferID) else { return }
 		deposits?.accounts[id: accountID]?.transfers[id: transferID]?.fungibleGuarantee = updated
 	}
 
-	private func accountID(for transferID: ResourceBalance.ID) -> AccountAddress? {
+	private func accountID(for transferID: IDResourceBalance.ID) -> AccountAddress? {
 		for account in deposits?.accounts ?? [] {
 			for transfer in account.transfers {
 				if transfer.id == transferID {
