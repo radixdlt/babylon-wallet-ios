@@ -66,7 +66,7 @@ extension OnLedgerEntitiesClient {
 		let isXRD = resourceAddress.isXRD(on: networkID)
 		let details: ResourceBalance.Fungible = .init(isXRD: isXRD, amount: .init(nominalAmount: amount), guarantee: guarantee)
 
-		return .init(resource: resource, details: .fungible(details))
+		return .init(resource: resource, details: .fungible(details), id: resource.resourceAddress)
 	}
 
 	private func poolUnit(
@@ -115,7 +115,8 @@ extension OnLedgerEntitiesClient {
 						nonXrdResources: nonXrdResources
 					),
 					guarantee: guarantee
-				))
+				)),
+				id: resource.resourceAddress
 			)
 		} else {
 			guard let details = try await getPoolUnitDetails(resource, forAmount: amount) else {
@@ -127,7 +128,8 @@ extension OnLedgerEntitiesClient {
 				details: .poolUnit(.init(
 					details: details,
 					guarantee: guarantee
-				))
+				)),
+				id: resource.resourceAddress
 			)
 		}
 	}
@@ -170,7 +172,7 @@ extension OnLedgerEntitiesClient {
 			guarantee: guarantee
 		)
 
-		return .init(resource: resource, details: .liquidStakeUnit(details))
+		return .init(resource: resource, details: .liquidStakeUnit(details), id: resource.resourceAddress)
 	}
 
 	// MARK: Non-fungibles
@@ -220,7 +222,7 @@ extension OnLedgerEntitiesClient {
 				)]
 			} else {
 				result = tokens.map { token in
-					.init(resource: resource, details: .nonFungible(token))
+					.init(resource: resource, details: .nonFungible(token), id: token.id)
 				}
 
 				guard result.count == ids.count else {
@@ -238,7 +240,7 @@ extension OnLedgerEntitiesClient {
 					try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: localId)
 				}
 				.map { id in
-					ResourceBalance(resource: resource, details: .nonFungible(.init(id: id, data: nil)))
+					ResourceBalance(resource: resource, details: .nonFungible(.init(id: id, data: nil)), id: id)
 				}
 
 			guard result.count == ids.count else {
@@ -296,7 +298,8 @@ extension OnLedgerEntitiesClient {
 					stakeClaims: stakeClaimTokens.asIdentifiable()
 				),
 				validatorName: stakeClaimValidator.metadata.name
-			))
+			)),
+			id: resource.id
 		)
 	}
 }
