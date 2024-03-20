@@ -319,8 +319,9 @@ extension TransactionHistory.State {
 			case let .transaction(txID):
 				self.scrollTarget = .init(value: txID)
 			case let .beforeDate(date):
-				if let lastInMonth = sections.first(where: { $0.day < date })?.transactions.first {
-					self.scrollTarget = .init(value: lastInMonth.id)
+				if let lastSection = sections.first(where: { $0.day < date }), let lastTransaction = lastSection.transactions.first {
+					self.currentMonth = lastSection.month
+					self.scrollTarget = .init(value: lastTransaction.id)
 				}
 			}
 		} else {
