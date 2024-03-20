@@ -1,10 +1,5 @@
 import ComposableArchitecture
 
-private extension Date {
-	// September 28th, 2023, at 9.30 PM UTC
-	static let babylonLaunch = Date(timeIntervalSince1970: 1_695_893_400)
-}
-
 // MARK: - Triggering
 // Triggers a View update, even if the value wasn't changed
 struct Triggering<T: Hashable & Sendable>: Hashable, Sendable {
@@ -26,7 +21,9 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	public struct State: Sendable, Hashable {
-		let availableMonths: [DateRangeItem]
+		var fullPeriod: Range<Date> = .now ..< .now
+
+		var availableMonths: [DateRangeItem] = []
 
 		let account: Profile.Network.Account
 
@@ -44,13 +41,12 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		var currentMonth: DateRangeItem.ID
 
 		/// Values related to loading. Note that `parameters` are set **when receiving the response**
-		var loading: Loading = .init(fullPeriod: .babylonLaunch ..< .now, pivotDate: .now, filters: [])
+		var loading: Loading = .init(pivotDate: .now, filters: [])
 
 		/// Workaround, TCA sends the sectionDisappeared after we dismiss, causing a run-time warning
 		var didDismiss: Bool = false
 
 		struct Loading: Hashable, Sendable {
-			let fullPeriod: Range<Date>
 			let pivotDate: Date
 			let filters: [TransactionFilter]
 
@@ -76,7 +72,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 				throw MissingPortfolioError(account: account.accountAddress)
 			}
 
-			self.availableMonths = try .from(.babylonLaunch)
 			self.account = account
 			self.portfolio = portfolio.account
 			self.currentMonth = .distantFuture
@@ -102,6 +97,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Hashable {
+		case loadedFirstTransactionDate(Date?)
 		case loadedHistory(
 			TransactionHistoryResponse,
 			parameters: TransactionHistoryRequest.Parameters,
@@ -148,10 +144,10 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onAppear:
-			if let latestMonth = state.availableMonths.last?.id {
-				state.currentMonth = latestMonth
+			return .run { [accountAddress = state.account.accountAddress] send in
+				let date = try await transactionHistoryClient.getFirstTransactionDate(accountAddress)
+				await send(.internal(.loadedFirstTransactionDate(date)))
 			}
-			return loadTransactions(state: &state)
 
 		case let .selectedMonth(month):
 			state.currentMonth = month
@@ -199,11 +195,22 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
+		case let .loadedFirstTransactionDate(date):
+			let lastDate: Date = .init(timeIntervalSinceNow: -10)
+			let firstDate = date ?? lastDate
+			state.fullPeriod = firstDate ..< lastDate
+			state.availableMonths = (try? .init(period: state.fullPeriod)) ?? []
+
+			if let latestMonth = state.availableMonths.last?.id {
+				state.currentMonth = latestMonth
+			}
+			return loadTransactions(state: &state)
+
 		case let .loadedHistory(response, parameters, scrollTarget):
 			loadedHistory(response, parameters: parameters, scrollTarget: scrollTarget, state: &state)
 
 			// IF we stil haven't loaded anything later than the pivot date, we will do so now
-			let upwardsPeriod = state.loading.requestParameters(for: .up).period
+			let upwardsPeriod = state.requestParameters(for: .up).period
 			if !upwardsPeriod.isEmpty, let lastLoaded = state.sections.dateSpan?.upperBound, !upwardsPeriod.contains(lastLoaded) {
 				return loadNewerTransactions(state: &state)
 			}
@@ -238,7 +245,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	/// Load history for the provided month, keeping the same period and filters
 	func loadTransactionsForMonth(_ month: Date, state: inout State) -> Effect<Action> {
 		guard let endOfMonth = Calendar.current.date(byAdding: .month, value: 1, to: month) else { return .none }
-		let clampedEndOfMonth = min(endOfMonth, state.loading.fullPeriod.upperBound)
+		let clampedEndOfMonth = min(endOfMonth, state.fullPeriod.upperBound)
 
 		if state.sections.dateSpan?.contains(month ..< clampedEndOfMonth) == true {
 			state.setScrollTarget(.beforeDate(clampedEndOfMonth))
@@ -261,7 +268,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	/// Makes the TransactionHitosryRequest. **NB: don't call this directly**, instead use the specialised functions like `loadHistoryForMonth`
 	func loadHistory(_ direction: Direction, scrollTarget: ScrollTarget? = nil, state: inout State) -> Effect<Action> {
-		let parameters = state.loading.requestParameters(for: direction)
+		let parameters = state.requestParameters(for: direction)
 		let cursor = state.loading[cursor: direction]
 		guard !state.loading.isLoading, cursor != .loadedAll, !parameters.period.isEmpty else { return .none }
 
@@ -291,7 +298,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		scrollTarget: ScrollTarget?,
 		state: inout State
 	) {
-		guard parameters == state.loading.requestParameters(for: parameters.direction) else {
+		guard parameters == state.requestParameters(for: parameters.direction) else {
 			loggerGlobal.info("Received obsolete Transaction History response, should not be possible")
 			return
 		}
@@ -320,21 +327,23 @@ extension TransactionHistory.State {
 	}
 }
 
+extension TransactionHistory.State {
+	func requestParameters(for direction: TransactionHistory.Direction) -> TransactionHistoryRequest.Parameters {
+		.init(
+			period: fullPeriod.split(before: direction == .down, point: loading.pivotDate),
+			filters: loading.filters,
+			direction: direction
+		)
+	}
+}
+
 extension TransactionHistory.State.Loading {
 	func withNewPivotDate(_ newPivotDate: Date) -> Self {
-		.init(fullPeriod: fullPeriod, pivotDate: newPivotDate, filters: filters)
+		.init(pivotDate: newPivotDate, filters: filters)
 	}
 
 	func withNewFilters(_ newFilters: [TransactionFilter]) -> Self {
-		.init(fullPeriod: fullPeriod, pivotDate: pivotDate, filters: newFilters)
-	}
-
-	func requestParameters(for direction: TransactionHistory.Direction) -> TransactionHistoryRequest.Parameters {
-		.init(
-			period: fullPeriod.split(before: direction == .down, point: pivotDate),
-			filters: filters,
-			direction: direction
-		)
+		.init(pivotDate: pivotDate, filters: newFilters)
 	}
 
 	subscript(cursor direction: TransactionHistory.Direction) -> Cursor {
@@ -422,28 +431,32 @@ extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
 struct FailedToCalculateDate: Error {}
 
 extension [DateRangeItem] {
-	static func from(_ fromDate: Date) throws -> Self {
-		let now: Date = .now
+	init(period: Range<Date>) throws {
+		guard !period.isEmpty else {
+			self = []
+			return
+		}
+
 		let calendar: Calendar = .current
 
-		var monthStarts = [calendar.startOfMonth(for: fromDate)]
+		var monthStarts = [calendar.startOfMonth(for: period.lowerBound)]
 		repeat {
 			let lastMonthStart = monthStarts[monthStarts.endIndex - 1]
 			guard let nextMonthStart = calendar.date(byAdding: .month, value: 1, to: lastMonthStart) else {
 				throw FailedToCalculateDate() // This should not be possible
 			}
 			monthStarts.append(nextMonthStart)
-		} while monthStarts[monthStarts.endIndex - 1] < now
+		} while monthStarts[monthStarts.endIndex - 1] < period.upperBound
 
 		func caption(date: Date) -> String {
-			if calendar.areSameYear(date, now) {
+			if calendar.areSameYear(date, .now) {
 				Self.sameYearFormatter.string(from: date)
 			} else {
 				Self.otherYearFormatter.string(from: date)
 			}
 		}
 
-		return zip(monthStarts, monthStarts.dropFirst()).map { start, end in
+		self = zip(monthStarts, monthStarts.dropFirst()).map { start, end in
 			.init(
 				caption: caption(date: start),
 				startDate: start,
