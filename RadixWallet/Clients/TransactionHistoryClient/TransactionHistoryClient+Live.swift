@@ -264,7 +264,7 @@ extension TransactionHistoryRequest {
 		filters
 			.compactMap(\.transactionType)
 			.first
-			.map { .init(_class: $0, matchOnlyMostSpecific: false) }
+			.map { .init(_class: $0, matchOnlyMostSpecific: true) }
 	}
 
 	private func manifestResourcesFilter(_ filters: [TransactionFilter]) -> [String]? {
