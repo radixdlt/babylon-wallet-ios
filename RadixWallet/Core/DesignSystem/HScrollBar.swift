@@ -12,7 +12,7 @@ public struct HScrollBar<Item: ScrollBarItem>: View {
 
 	public var body: some View {
 		ScrollViewReader { proxy in
-			ScrollView(.horizontal) {
+			ScrollView(.horizontal, showsIndicators: false) {
 				HStack(spacing: .zero) {
 					ForEach(items) { item in
 						let isSelected = item.id == selection

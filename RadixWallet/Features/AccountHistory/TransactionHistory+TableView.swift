@@ -260,6 +260,7 @@ extension TransactionHistory {
 			var body: some SwiftUI.View {
 				let inset: CGFloat = 2
 				Text(message)
+					.multilineTextAlignment(.leading)
 					.textStyle(.body2Regular)
 					.foregroundColor(.app.gray1)
 					.padding(.medium3)
