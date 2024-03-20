@@ -3,16 +3,11 @@ extension ResourceAddress {
 		address == knownAddresses(networkId: networkID.rawValue).resourceAddresses.xrd.addressString()
 	}
 
-	public static func xrd(on networkID: NetworkID) throws -> Self {
-		try EngineToolkit.Address.xrd(networkID.rawValue).asSpecific()
+	public static func xrd(on networkID: NetworkID) -> Self {
+		try! EngineToolkit.Address.xrd(networkID.rawValue).asSpecific()
 	}
 
-	static var mainnetXRDAddress: ResourceAddress {
-		(try? xrd(on: .mainnet)) ?? ResourceAddress(
-			address: "resource_rdx1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxradxrd",
-			decodedKind: .globalFungibleResourceManager
-		)
-	}
+	static let mainnetXRDAddress: ResourceAddress = .xrd(on: .mainnet)
 }
 
 extension EngineToolkit.Address {
