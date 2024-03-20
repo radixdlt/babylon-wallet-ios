@@ -74,7 +74,7 @@ public struct TransactionReviewGuarantees: Sendable, FeatureReducer {
 // MARK: - TransactionReviewGuarantee
 public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 	public struct State: Identifiable, Sendable, Hashable {
-		public let id: IDResourceBalance.ID
+		public let id: TransactionReview.Transfer.ID
 		public let account: TransactionReview.Account
 		public let resource: OnLedgerEntity.Resource
 		public let thumbnail: Thumbnail.FungibleContent
@@ -85,7 +85,7 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 
 		init?(
 			account: TransactionReview.Account,
-			transfer: IDResourceBalance
+			transfer: TransactionReview.Transfer
 		) {
 			self.id = transfer.id
 			self.account = account

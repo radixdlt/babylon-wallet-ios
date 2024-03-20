@@ -384,7 +384,7 @@ extension TransactionReview {
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
-		var withdrawals: [Account: IdentifiedArrayOf<IDResourceBalance>] = [:]
+		var withdrawals: [Account: IdentifiedArrayOf<Transfer>] = [:]
 
 		for (accountAddress, resources) in accountWithdraws {
 			let account = try userAccounts.account(for: .init(validatingAddress: accountAddress))
@@ -427,7 +427,7 @@ extension TransactionReview {
 	) async throws -> TransactionReviewAccounts.State? {
 		let defaultDepositGuarantee = await appPreferencesClient.getPreferences().transaction.defaultDepositGuarantee
 
-		var deposits: [Account: IdentifiedArrayOf<IDResourceBalance>] = [:]
+		var deposits: [Account: IdentifiedArrayOf<Transfer>] = [:]
 
 		for (accountAddress, accountDeposits) in accountDeposits {
 			let account = try userAccounts.account(for: .init(validatingAddress: accountAddress))
