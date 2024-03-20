@@ -211,9 +211,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case let .loadedHistory(response, parameters, scrollTarget):
 			loadedHistory(response, parameters: parameters, scrollTarget: scrollTarget, state: &state)
 
-			// IF we stil haven't loaded anything later than the pivot date, we will do so now
-			let upwardsPeriod = state.requestParameters(for: .up).period
-			if !upwardsPeriod.isEmpty, let lastLoaded = state.sections.dateSpan?.upperBound, !upwardsPeriod.contains(lastLoaded) {
+			// If we stil haven't loaded anything later than the pivot date, we will do so now
+			if state.shouldAlsoLoadUpwards {
 				return loadNewerTransactions(state: &state)
 			}
 
@@ -321,6 +320,13 @@ extension StoreOf<TransactionHistory> {
 extension TransactionHistory.State {
 	var isNonMainNetAccount: Bool {
 		account.networkID != .mainnet
+	}
+
+	var shouldAlsoLoadUpwards: Bool {
+		let upwardsPeriod = requestParameters(for: .up).period
+		guard !upwardsPeriod.isEmpty else { return false }
+		guard let lastLoaded = sections.dateSpan?.upperBound else { return true }
+		return !upwardsPeriod.contains(lastLoaded)
 	}
 
 	mutating func setScrollTarget(_ scrollTarget: TransactionHistory.ScrollTarget?) {
