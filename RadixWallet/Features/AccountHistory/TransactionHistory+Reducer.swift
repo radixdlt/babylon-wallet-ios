@@ -312,7 +312,17 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 }
 
+extension StoreOf<TransactionHistory> {
+	var bannerStore: Store<Bool, Never> {
+		scope(state: \.isNonMainNetAccount, action: \.never)
+	}
+}
+
 extension TransactionHistory.State {
+	var isNonMainNetAccount: Bool {
+		account.networkID != .mainnet
+	}
+
 	mutating func setScrollTarget(_ scrollTarget: TransactionHistory.ScrollTarget?) {
 		if let scrollTarget {
 			switch scrollTarget {
@@ -328,9 +338,7 @@ extension TransactionHistory.State {
 			self.scrollTarget = .init(value: nil)
 		}
 	}
-}
 
-extension TransactionHistory.State {
 	func requestParameters(for direction: TransactionHistory.Direction) -> TransactionHistoryRequest.Parameters {
 		.init(
 			period: fullPeriod.split(before: direction == .down, point: loading.pivotDate),
