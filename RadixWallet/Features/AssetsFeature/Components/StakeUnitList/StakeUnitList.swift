@@ -16,45 +16,107 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		var selectedLiquidStakeUnits: IdentifiedArrayOf<OnLedgerEntity.OwnedFungibleResource>?
 		var selectedStakeClaimTokens: SelectedStakeClaimTokens?
 
-		// Loading state
-		var isLoading: Bool
-		var shouldRefresh: Bool
-
 		@PresentationState
 		var destination: Destination.State?
 
 		init(
 			account: OnLedgerEntity.Account,
 			selectedLiquidStakeUnits: IdentifiedArrayOf<OnLedgerEntity.OwnedFungibleResource>?,
-			selectedStakeClaimTokens: SelectedStakeClaimTokens?
+			selectedStakeClaimTokens: SelectedStakeClaimTokens?,
+			stakeUnitDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>>,
+			destination: Destination.State? = nil
 		) {
 			self.account = account
 			self.selectedLiquidStakeUnits = selectedLiquidStakeUnits
 			self.selectedStakeClaimTokens = selectedStakeClaimTokens
-			self.stakeSummary = .init(
-				staked: .loading,
-				unstaking: .loading,
-				readyToClaim: .loading,
-				canClaimStakes: selectedStakeClaimTokens == nil
-			)
-			self.stakedValidators = []
+			self.destination = destination
 
-			self.isLoading = false
-			self.shouldRefresh = false
+			switch stakeUnitDetails {
+			case .idle, .loading:
+				self.stakeSummary = .init(
+					staked: .loading,
+					unstaking: .loading,
+					readyToClaim: .loading,
+					canClaimStakes: selectedStakeClaimTokens == nil
+				)
+				self.stakedValidators = []
+			case let .success(details):
+				let allSelectedTokens = selectedStakeClaimTokens?.values.flatMap { $0 }.map(\.id).asIdentifiable()
+
+				let stakeClaims = details.compactMap(\.stakeClaimTokens).flatMap(\.stakeClaims)
+				let stakedAmount = details.map {
+					ResourceAmount(
+						nominalAmount: $0.xrdRedemptionValue,
+						fiatWorth: $0.stakeUnitResource?.amount.fiatWorth
+					)
+				}.reduce(.zero, +)
+
+				let unstakingAmount = stakeClaims.filter(not(\.isReadyToBeClaimed)).map(\.claimAmount)
+					.reduce(.zero, +)
+				let readyToClaimAmount = stakeClaims.filter(\.isReadyToBeClaimed).map(\.claimAmount)
+					.reduce(.zero, +)
+
+				let validatorStakes = details.map { stake in
+					ValidatorStakeView.ViewState(
+						stakeDetails: stake,
+						validatorNameViewState: .init(
+							imageURL: stake.validator.metadata.iconURL,
+							name: stake.validator.metadata.name ?? L10n.Account.PoolUnits.unknownValidatorName,
+							stakedAmount: stake.xrdRedemptionValue
+						),
+						liquidStakeUnit: stake.stakeUnitResource.map { stakeUnitResource in
+							.init(
+								lsu: .init(
+									address: stakeUnitResource.resource.resourceAddress,
+									icon: stakeUnitResource.resource.metadata.iconURL,
+									title: stakeUnitResource.resource.metadata.title,
+									amount: nil,
+									worth: .init(
+										nominalAmount: stake.xrdRedemptionValue,
+										fiatWorth: stake.stakeUnitResource?.amount.fiatWorth
+									),
+									validatorName: nil
+								),
+								isSelected: selectedLiquidStakeUnits?.contains { $0.id == stakeUnitResource.resource.resourceAddress }
+							)
+						},
+						stakeClaimResource: stake.stakeClaimTokens.map { stakeClaimTokens in
+							ResourceBalance.StakeClaimNFT(
+								canClaimTokens: allSelectedTokens == nil, // cannot claim in selection mode
+								stakeClaimTokens: stakeClaimTokens,
+								selectedStakeClaims: allSelectedTokens
+							)
+						}
+					)
+				}.sorted(by: \.id.address).asIdentifiable()
+
+				self.stakeSummary = .init(
+					staked: .success(stakedAmount),
+					unstaking: .success(unstakingAmount),
+					readyToClaim: .success(readyToClaimAmount),
+					canClaimStakes: selectedStakeClaimTokens == nil
+				)
+
+				self.stakedValidators = validatorStakes
+			case let .failure(error):
+				self.stakeSummary = .init(
+					staked: .loading,
+					unstaking: .loading,
+					readyToClaim: .loading,
+					canClaimStakes: selectedStakeClaimTokens == nil
+				)
+
+				self.stakedValidators = []
+			}
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case refresh
 		case didTapLiquidStakeUnit(forValidator: ValidatorAddress)
 		case didTapStakeClaimNFT(OnLedgerEntitiesClient.StakeClaim)
 		case didTapClaimAll(forValidator: ValidatorAddress)
 		case didTapClaimAllStakes
-	}
-
-	public enum InternalAction: Sendable, Equatable {
-		case detailsLoaded(TaskResult<[OnLedgerEntitiesClient.OwnedStakeDetails]>)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -101,15 +163,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			guard !state.isLoading else {
-				return .none
-			}
-
-			return loadStakingDetails(&state)
-
-		case .refresh:
-			state.shouldRefresh = true
-			return loadStakingDetails(&state)
+			return .none
 
 		case let .didTapLiquidStakeUnit(validatorAddress):
 			if state.selectedLiquidStakeUnits != nil {
@@ -132,7 +186,10 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 					.init(
 						validator: stakeDetails.validator,
 						stakeUnitResource: stakeUnitResource,
-						xrdRedemptionValue: stakeDetails.xrdRedemptionValue
+						xrdRedemptionValue: .init(
+							nominalAmount: stakeDetails.xrdRedemptionValue,
+							fiatWorth: stakeUnitResource.amount.fiatWorth
+						)
 					)
 				)
 			}
@@ -188,7 +245,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 						validatorAddress: validatorAddress,
 						resourceAddress: stakeClaimTokens.resource.resourceAddress,
 						ids: stakeClaims.map { $0.id.localId() },
-						amount: stakeClaims.map(\.claimAmount).reduce(0, +)
+						amount: stakeClaims.map(\.claimAmount.nominalAmount).reduce(0, +)
 					),
 				]
 			)
@@ -207,25 +264,10 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 						validatorAddress: stake.validator.address,
 						resourceAddress: stakeClaimTokens.resource.resourceAddress,
 						ids: stakeClaims.map { $0.id.localId() },
-						amount: stakeClaims.map(\.claimAmount).reduce(0, +)
+						amount: stakeClaims.map(\.claimAmount.nominalAmount).reduce(0, +)
 					)
 				}
 			)
-		}
-	}
-
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
-		case let .detailsLoaded(.success(details)):
-			state.isLoading = false
-			state.shouldRefresh = false
-			updateAfterLoading(&state, details: details.asIdentifiable())
-			return .none
-		case let .detailsLoaded(.failure(error)):
-			state.isLoading = false
-			state.shouldRefresh = false
-			errorQueue.schedule(error)
-			return .none
 		}
 	}
 
@@ -240,26 +282,12 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 						validatorAddress: stakeClaim.validatorAddress,
 						resourceAddress: resourceAddress,
 						ids: .init(stakeClaim.id.localId()),
-						amount: stakeClaim.claimAmount
+						amount: stakeClaim.claimAmount.nominalAmount
 					),
 				]
 			)
 		case .stakeClaimDetails, .details:
 			return .none
-		}
-	}
-
-	private func loadStakingDetails(_ state: inout State) -> Effect<Action> {
-		state.isLoading = true
-
-		return .run { [state = state] send in
-			let result = await TaskResult {
-				try await onLedgerEntitiesClient.getOwnedStakesDetails(
-					account: state.account,
-					cachingStrategy: state.shouldRefresh ? .forceUpdate : .useCache
-				)
-			}
-			await send(.internal(.detailsLoaded(result)))
 		}
 	}
 
@@ -277,64 +305,6 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 	}
 }
 
-extension StakeUnitList {
-	private func updateAfterLoading(
-		_ state: inout State,
-		details: IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>
-	) {
-		let allSelectedTokens = state.selectedStakeClaimTokens?.values.flatMap { $0 }.map(\.id).asIdentifiable()
-
-		let stakeClaims = details.compactMap(\.stakeClaimTokens).flatMap(\.stakeClaims)
-		let stakedAmount = details.map(\.xrdRedemptionValue).reduce(.zero(), +)
-		let unstakingAmount = stakeClaims.filter(not(\.isReadyToBeClaimed)).map(\.claimAmount).reduce(.zero(), +)
-		let readyToClaimAmount = stakeClaims.filter(\.isReadyToBeClaimed).map(\.claimAmount).reduce(.zero(), +)
-
-		let validatorStakes = details
-			.map { stake in
-				ValidatorStakeView.ViewState(
-					stakeDetails: stake,
-					validatorNameViewState: .init(
-						imageURL: stake.validator.metadata.iconURL,
-						name: stake.validator.metadata.name,
-						stakedAmount: stake.xrdRedemptionValue
-					),
-					liquidStakeUnit: stake.stakeUnitResource.map {
-						stakeUnitResource in
-						.init(
-							lsu: .init(
-								address: stakeUnitResource.resource.resourceAddress,
-								icon: stakeUnitResource.resource.metadata.iconURL,
-								title: stakeUnitResource.resource.metadata.title,
-								amount: nil,
-								worth: stake.xrdRedemptionValue,
-								validatorName: nil
-							),
-							isSelected: state.selectedLiquidStakeUnits?.contains { $0.id == stakeUnitResource.resource.resourceAddress }
-						)
-					},
-					stakeClaimResource: stake.stakeClaimTokens.map { stakeClaimTokens in
-						ResourceBalance.StakeClaimNFT(
-							canClaimTokens: allSelectedTokens == nil, // cannot claim in selection mode
-							stakeClaimTokens: stakeClaimTokens,
-							selectedStakeClaims: allSelectedTokens
-						)
-					}
-				)
-			}
-			.sorted(by: \.id.address)
-			.asIdentifiable()
-
-		state.stakeSummary = .init(
-			staked: .success(stakedAmount),
-			unstaking: .success(unstakingAmount),
-			readyToClaim: .success(readyToClaimAmount),
-			canClaimStakes: state.selectedStakeClaimTokens == nil
-		)
-
-		state.stakedValidators = validatorStakes
-	}
-}
-
 // MARK: - OnLedgerEntitiesClient.OwnedStakeDetails + Identifiable
 extension OnLedgerEntitiesClient.OwnedStakeDetails: Identifiable {
 	public var id: ValidatorAddress {
@@ -344,6 +314,6 @@ extension OnLedgerEntitiesClient.OwnedStakeDetails: Identifiable {
 
 extension OnLedgerEntitiesClient.OwnedStakeDetails {
 	var xrdRedemptionValue: RETDecimal {
-		((stakeUnitResource?.amount ?? 0) * validator.xrdVaultBalance) / (stakeUnitResource?.resource.totalSupply ?? 1)
+		((stakeUnitResource?.amount.nominalAmount ?? 0) * validator.xrdVaultBalance) / (stakeUnitResource?.resource.totalSupply ?? 1)
 	}
 }

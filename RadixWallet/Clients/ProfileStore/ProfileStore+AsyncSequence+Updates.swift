@@ -47,6 +47,13 @@ extension ProfileStore {
 		}
 	}
 
+	/// A multicasting replaying AsyncSequence of distinct AppPreferences.
+	public func appPreferencesValues() -> AnyAsyncSequence<AppPreferences> {
+		_lens {
+			$0.appPreferences
+		}
+	}
+
 	@_disfavoredOverload
 	private func lens<Property>(
 		_ keyPath: KeyPath<Profile, Property?>

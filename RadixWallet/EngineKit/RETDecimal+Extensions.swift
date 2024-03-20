@@ -246,7 +246,23 @@ extension RETDecimal {
 		let integerCount = UInt(Swift.max(digits.count - RETDecimal.scale, 1))
 		if integerCount > totalPlaces {
 			let scale = RETDecimal(exponent: integerCount - totalPlaces)
-			return (self / scale).rounded(decimalPlaces: 0) * scale
+			let base = self / scale
+			let decimalPlaces: UInt = 0
+			let base_rounded = base.rounded(decimalPlaces: decimalPlaces)
+
+			do {
+				return try base_rounded.mul(other: scale)
+			} catch {
+				// we overflowed which will happen if we are using RETDecimal.max()
+				// instead of using `base.rounded(decimalPlaces: 0)` which uses
+				// rounding mode `toNearestMidpointAwayFromZero` we will use
+				// `toZero` to avoid overflow.
+				let safeBase = try! base.round(
+					decimalPlaces: Int32(decimalPlaces),
+					roundingMode: .toZero
+				)
+				return safeBase * scale
+			}
 		} else {
 			// The remaining digits are decimals and we keep up to totalPlaces of them
 			let decimalsToKeep = totalPlaces - integerCount
@@ -257,6 +273,17 @@ extension RETDecimal {
 	private func multiplier() -> Multiplier? {
 		guard let abs = try? abs() else { return nil }
 		return Multiplier.allCases.last(where: { $0.value <= abs })
+	}
+}
+
+extension RETDecimal {
+	func asDouble() throws -> Double {
+		guard let double = Double(self.asStr()) else {
+			assertionFailure("Invalid decimal? how is it possible?")
+			struct InvalidDecimalValue: Error {}
+			throw InvalidDecimalValue()
+		}
+		return double
 	}
 }
 

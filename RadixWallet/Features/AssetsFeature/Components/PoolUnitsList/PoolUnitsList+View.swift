@@ -23,9 +23,6 @@ extension PoolUnitsList {
 				}
 			}
 			.destinations(with: store)
-			.task { @MainActor in
-				await store.send(.view(.task)).finish()
-			}
 		}
 	}
 }

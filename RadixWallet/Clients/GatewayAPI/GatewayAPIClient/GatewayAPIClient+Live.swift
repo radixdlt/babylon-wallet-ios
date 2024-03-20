@@ -29,17 +29,16 @@ extension GatewayAPIClient {
 	public typealias Value = GatewayAPIClient
 
 	public static let liveValue = GatewayAPIClient.live(
-		urlSession: .shared,
 		jsonEncoder: .init(),
 		jsonDecoder: .default
 	)
 
 	public static func live(
-		urlSession: URLSession,
 		jsonEncoder: JSONEncoder,
 		jsonDecoder: JSONDecoder
 	) -> Self {
 		@Dependency(\.gatewaysClient) var gatewaysClient
+		@Dependency(\.httpClient) var httpClient
 
 		let getCurrentBaseURL: @Sendable () async -> URL = {
 			await gatewaysClient.getGatewayAPIEndpointBaseURL()
@@ -71,18 +70,7 @@ extension GatewayAPIClient {
 				urlRequest.timeoutInterval = timeoutInterval
 			}
 
-			let (data, urlResponse) = try await urlSession.data(for: urlRequest)
-
-			guard let httpURLResponse = urlResponse as? HTTPURLResponse else {
-				throw ExpectedHTTPURLResponse()
-			}
-
-			guard httpURLResponse.statusCode == BadHTTPResponseCode.expected else {
-				#if DEBUG
-				loggerGlobal.error("Request with URL: \(urlRequest.url!.absoluteString) failed with status code: \(httpURLResponse.statusCode), data: \(data.prettyPrintedJSONString ?? "<NOT_JSON>")")
-				#endif
-				throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
-			}
+			let data = try await httpClient.executeRequest(urlRequest)
 
 			do {
 				return try jsonDecoder.decode(Response.self, from: data)

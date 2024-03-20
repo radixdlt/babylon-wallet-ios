@@ -29,7 +29,7 @@ extension ResourceBalance {
 			public let icon: URL?
 			public let title: String?
 			public let amount: ResourceBalance.Amount?
-			public let worth: RETDecimal
+			public let worth: ResourceAmount
 			public var validatorName: String? = nil
 		}
 
@@ -386,7 +386,7 @@ extension ResourceBalanceView {
 							}
 							.disabled(onTap == nil)
 							.buttonStyle(.borderless)
-							.roundedCorners(strokeColor: .red) // .app.gray3
+							.roundedCorners(strokeColor: .app.gray3)
 						}
 					}
 				}
@@ -522,9 +522,17 @@ extension ResourceBalanceView {
 		@ViewBuilder
 		private func core(amount: ResourceBalance.Amount, compact: Bool) -> some View {
 			if compact {
-				Text(amount.amount.formatted())
-					.textStyle(amountTextStyle)
-					.foregroundColor(.app.gray1)
+				VStack(alignment: .trailing, spacing: 0) {
+					Text(amount.amount.nominalAmount.formatted())
+						.textStyle(amountTextStyle)
+						.foregroundColor(.app.gray1)
+					if let fiatWorth = amount.amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
+						Text(fiatWorth)
+							.textStyle(.body2HighImportance)
+							.foregroundStyle(.app.gray2)
+							.padding(.top, .small3)
+					}
+				}
 			} else {
 				VStack(alignment: .trailing, spacing: 0) {
 					if amount.guaranteed != nil {
@@ -532,12 +540,19 @@ extension ResourceBalanceView {
 							.textStyle(.body2HighImportance)
 							.foregroundColor(.app.gray1)
 					}
-					Text(amount.amount.formatted())
+					Text(amount.amount.nominalAmount.formatted())
 						.lineLimit(1)
 						.minimumScaleFactor(0.8)
 						.truncationMode(.tail)
 						.textStyle(.secondaryHeader)
 						.foregroundColor(.app.gray1)
+
+					if let fiatWorth = amount.amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
+						Text(fiatWorth)
+							.textStyle(.body2HighImportance)
+							.foregroundStyle(.app.gray2)
+							.padding(.top, .small3)
+					}
 
 					if let guaranteedAmount = amount.guaranteed {
 						Text(L10n.TransactionReview.guaranteed)
