@@ -76,6 +76,12 @@ extension TransactionHistoryClient {
 				}
 
 				if let validator = await onLedgerEntitiesClient.isStakeClaimNFT(resource) {
+					guard type == .added && !changes.added.isEmpty, changes.removed.isEmpty
+						|| type == .removed && !changes.removed.isEmpty, changes.added.isEmpty
+					else {
+						return []
+					}
+
 					return try [onLedgerEntitiesClient.stakeClaim(resource, stakeClaimValidator: validator, unstakeData: [], tokens: [])]
 				} else {
 					let nonFungibleIDs = try extractNonFungibleIDs(type, from: changes)
