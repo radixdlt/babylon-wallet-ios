@@ -16,11 +16,12 @@ extension TransactionHistoryClient {
 		func getFirstTransactionDate(_ account: AccountAddress) async throws -> Date? {
 			@Dependency(\.cacheClient) var cacheClient
 
+			if let date = try? cacheClient.load(Date.self, .dateOfFirstTransaction) as? Date {
+				return date
+			}
+
 			let response = try await gatewayAPIClient.streamTransactions(
 				.init(
-					atLedgerState: .init(timestamp: .now),
-					fromLedgerState: .init(timestamp: .distantPast),
-					cursor: nil,
 					limitPerPage: 1,
 					affectedGlobalEntitiesFilter: [account.address],
 					order: .asc
