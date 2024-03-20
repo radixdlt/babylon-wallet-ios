@@ -239,6 +239,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	/// Load history for the previously selected period, using the provided filters
 	func loadTransactionsWithFilters(_ filters: [TransactionFilter], state: inout State) -> Effect<Action> {
 		guard filters != state.loading.filters else { return .none }
+		state.sections = []
 		state.loading = state.loading.withNewFilters(filters)
 		return loadTransactionsForMonth(state.currentMonth, state: &state)
 	}
