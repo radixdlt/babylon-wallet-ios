@@ -82,6 +82,7 @@ extension TransactionHistory {
 				store.send(.view(.onAppear))
 			}
 			.destinations(with: store)
+			.showDeveloperDisclaimerBanner(store.bannerStore)
 		}
 
 		private static let coordSpace = "TransactionHistory"
