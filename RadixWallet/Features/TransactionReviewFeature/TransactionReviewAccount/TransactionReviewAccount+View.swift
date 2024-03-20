@@ -55,7 +55,7 @@ extension TransactionReviewAccount.State {
 extension TransactionReviewAccount {
 	public struct ViewState: Equatable {
 		let account: TransactionReview.Account
-		let transfers: [IDResourceBalance] // FIXME: GK use viewstate?
+		let transfers: [TransactionReview.Transfer] // FIXME: GK use viewstate?
 		let showApprovedMark: Bool
 	}
 
