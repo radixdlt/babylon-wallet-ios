@@ -264,7 +264,12 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	func loadNewerTransactions(state: inout State) -> Effect<Action> {
-		loadHistory(.up, scrollTarget: (state.sections.first?.transactions.first?.id).map(ScrollTarget.transaction), state: &state)
+		let scrollTarget: ScrollTarget = if let lastTransaction = state.sections.first?.transactions.first?.id {
+			.transaction(lastTransaction)
+		} else {
+			.beforeDate(state.currentMonth)
+		}
+		return loadHistory(.up, scrollTarget: scrollTarget, state: &state)
 	}
 
 	/// Makes the TransactionHitosryRequest. **NB: don't call this directly**, instead use the specialised functions like `loadHistoryForMonth`
@@ -335,7 +340,10 @@ extension TransactionHistory.State {
 			case let .transaction(txID):
 				self.scrollTarget = .init(value: txID)
 			case let .beforeDate(date):
-				if let lastSection = sections.first(where: { $0.day < date }), let lastTransaction = lastSection.transactions.first {
+				if let lastSectionInMonth = sections.first(where: { $0.day < date }), let lastTransaction = lastSectionInMonth.transactions.first {
+					self.currentMonth = lastSectionInMonth.month
+					self.scrollTarget = .init(value: lastTransaction.id)
+				} else if let lastSection = sections.first, let lastTransaction = lastSection.transactions.first {
 					self.currentMonth = lastSection.month
 					self.scrollTarget = .init(value: lastTransaction.id)
 				}
