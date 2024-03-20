@@ -2,11 +2,13 @@ import Foundation
 
 // MARK: - TransactionHistoryClient
 public struct TransactionHistoryClient: Sendable, DependencyKey {
+	public var getFirstTransactionDate: GetFirstTransactionDate
 	public var getTransactionHistory: GetTransactionHistory
 }
 
 // MARK: TransactionHistoryClient.GetTransactionHistory
 extension TransactionHistoryClient {
+	public typealias GetFirstTransactionDate = @Sendable (AccountAddress) async throws -> Date?
 	public typealias GetTransactionHistory = @Sendable (TransactionHistoryRequest) async throws -> TransactionHistoryResponse
 }
 

@@ -10,6 +10,34 @@ extension TransactionHistoryClient {
 		struct CorruptTimestamp: Error { let roundTimestamd: String }
 		struct MissingIntentHash: Error {}
 
+		let dateFormatter = TimestampFormatter()
+
+		@Sendable
+		func getFirstTransactionDate(_ account: AccountAddress) async throws -> Date? {
+			@Dependency(\.cacheClient) var cacheClient
+
+			let response = try await gatewayAPIClient.streamTransactions(
+				.init(
+					atLedgerState: .init(timestamp: .now),
+					fromLedgerState: .init(timestamp: .distantPast),
+					cursor: nil,
+					limitPerPage: 1,
+					affectedGlobalEntitiesFilter: [account.address],
+					order: .asc
+				)
+			)
+
+			guard let info = response.items.first else { return nil }
+
+			guard let date = dateFormatter.date(from: info.roundTimestamp) ?? info.confirmedAt else {
+				throw CorruptTimestamp(roundTimestamd: info.roundTimestamp)
+			}
+
+			cacheClient.save(date, .dateOfFirstTransaction)
+
+			return date
+		}
+
 		@Sendable
 		func getTransactionHistory(_ request: TransactionHistoryRequest) async throws -> TransactionHistoryResponse {
 			let response = try await gatewayAPIClient.streamTransactions(request.gatewayRequest)
@@ -63,8 +91,6 @@ extension TransactionHistoryClient {
 						}
 				}
 			}
-
-			let dateFormatter = TimestampFormatter()
 
 			func transaction(for info: GatewayAPI.CommittedTransactionInfo) async throws -> TransactionHistoryItem {
 				guard let time = dateFormatter.date(from: info.roundTimestamp) ?? info.confirmedAt else {
@@ -160,6 +186,7 @@ extension TransactionHistoryClient {
 		}
 
 		return TransactionHistoryClient(
+			getFirstTransactionDate: getFirstTransactionDate,
 			getTransactionHistory: getTransactionHistory
 		)
 	}
