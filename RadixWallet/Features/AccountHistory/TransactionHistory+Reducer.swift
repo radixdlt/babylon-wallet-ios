@@ -147,6 +147,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 			return .run { [accountAddress = state.account.accountAddress] send in
 				let date = try await transactionHistoryClient.getFirstTransactionDate(accountAddress)
 				await send(.internal(.loadedFirstTransactionDate(date)))
+			} catch: { error, _ in
+				errorQueue.schedule(error)
 			}
 
 		case let .selectedMonth(month):
@@ -467,15 +469,14 @@ extension [DateRangeItem] {
 
 	private static let sameYearFormatter: DateFormatter = {
 		let formatter = DateFormatter()
-		formatter.timeStyle = .none
-		formatter.dateFormat = "MMM"
+		formatter.dateFormat = .localizedStringWithFormat("MMM")
+
 		return formatter
 	}()
 
 	private static let otherYearFormatter: DateFormatter = {
 		let formatter = DateFormatter()
-		formatter.timeStyle = .none
-		formatter.dateFormat = "MMM YY"
+		formatter.dateFormat = .localizedStringWithFormat("MMM YY")
 		return formatter
 	}()
 }

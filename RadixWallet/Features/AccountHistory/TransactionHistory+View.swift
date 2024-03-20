@@ -154,8 +154,25 @@ public struct DateRangeItem: ScrollBarItem, Sendable, Hashable {
 
 extension TransactionHistory.TransactionSection {
 	var title: String {
-		day.formatted(date: .abbreviated, time: .omitted)
+		if Calendar.current.areSameYear(day, .now) {
+			Self.sameYearFormatter.string(from: day)
+		} else {
+			Self.otherYearFormatter.string(from: day)
+		}
 	}
+
+	private static let sameYearFormatter: DateFormatter = {
+		let formatter = DateFormatter()
+		formatter.dateFormat = .localizedStringWithFormat("MMMM d")
+
+		return formatter
+	}()
+
+	private static let otherYearFormatter: DateFormatter = {
+		let formatter = DateFormatter()
+		formatter.dateFormat = .localizedStringWithFormat("MMMM d, yyyy")
+		return formatter
+	}()
 }
 
 extension TransactionHistory {
