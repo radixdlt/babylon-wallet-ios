@@ -43,7 +43,6 @@ extension TransactionHistoryClient {
 		func getTransactionHistory(_ request: TransactionHistoryRequest) async throws -> TransactionHistoryResponse {
 			let response = try await gatewayAPIClient.streamTransactions(request.gatewayRequest)
 			let account = request.account
-			let networkID = try account.networkID()
 			let resourcesForPeriod = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
 			let resourcesNeededOverall = request.allResourcesAddresses.union(resourcesForPeriod)
 			let existingResources = request.resources.ids
@@ -99,7 +98,7 @@ extension TransactionHistoryClient {
 					throw MissingIntentHash()
 				}
 
-				let txid = try TXID.fromStr(string: hash, networkId: networkID.rawValue)
+				let txid = try TXID.fromStr(string: hash, networkId: account.networkID.rawValue)
 
 				let manifestClass = info.manifestClasses?.first
 
@@ -138,7 +137,7 @@ extension TransactionHistoryClient {
 						let resource = try await onLedgerEntitiesClient.fungibleResourceBalance(
 							baseResource,
 							resourceQuantifier: .guaranteed(amount: amount.abs()),
-							networkID: networkID
+							networkID: account.networkID
 						)
 
 						if amount.isNegative() {
@@ -274,7 +273,7 @@ extension TransactionHistoryRequest {
 }
 
 extension SpecificAddress {
-	public func networkID() throws -> NetworkID {
-		try .init(intoEngine().networkId())
+	public var networkID: NetworkID {
+		(try? .init(intoEngine().networkId())) ?? .mainnet
 	}
 }
