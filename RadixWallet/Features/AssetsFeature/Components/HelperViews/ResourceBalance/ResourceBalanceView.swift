@@ -219,6 +219,10 @@ extension ResourceBalanceView {
 		public let compact: Bool
 		public let isSelected: Bool?
 
+		private var fungible: ResourceBalance.ViewState.Fungible {
+			.xrd(balance: viewState.worth, network: viewState.address.networkID)
+		}
+
 		public var body: some View {
 			VStack(alignment: .leading, spacing: .medium3) {
 				FungibleView(
@@ -237,7 +241,7 @@ extension ResourceBalanceView {
 							.textStyle(.body2HighImportance)
 							.foregroundColor(.app.gray2)
 
-						ResourceBalanceView(.fungible(.xrd(balance: viewState.worth)), appearance: .compact(border: true))
+						ResourceBalanceView(.fungible(fungible), appearance: .compact(border: true))
 					}
 					.padding(.top, .small2)
 				}
@@ -380,9 +384,13 @@ extension ResourceBalanceView {
 								onTap?(claim)
 							} label: {
 								let isSelected = viewState.selectedStakeClaims?.contains(claim.id)
-								ResourceBalanceView(.fungible(.xrd(balance: claim.claimAmount)), appearance: .compact, isSelected: isSelected)
-									.padding(.small1)
-									.background(background)
+								ResourceBalanceView(
+									.fungible(.xrd(balance: claim.claimAmount, network: claim.validatorAddress.networkID)),
+									appearance: .compact,
+									isSelected: isSelected
+								)
+								.padding(.small1)
+								.background(background)
 							}
 							.disabled(onTap == nil)
 							.buttonStyle(.borderless)
