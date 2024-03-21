@@ -75,6 +75,7 @@ extension TransactionHistoryFilters {
 						Button(L10n.TransactionHistory.Filters.clearAll) {
 							store.send(.view(.clearTapped))
 						}
+						.buttonStyle(.blueText)
 					}
 				}
 				.navigationTitle(L10n.TransactionHistory.Filters.title)
