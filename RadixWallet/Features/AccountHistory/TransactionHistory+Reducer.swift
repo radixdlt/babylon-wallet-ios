@@ -485,9 +485,9 @@ extension IdentifiedArrayOf<DateRangeItem> {
 
 		func caption(date: Date) -> String {
 			if calendar.areSameYear(date, .now) {
-				Self.sameYearFormatter.string(from: date)
+				date.formatted(.dateTime.month(.abbreviated))
 			} else {
-				Self.otherYearFormatter.string(from: date)
+				date.formatted(.dateTime.month(.abbreviated).year(.twoDigits))
 			}
 		}
 
@@ -501,19 +501,6 @@ extension IdentifiedArrayOf<DateRangeItem> {
 			}
 			.asIdentifiable()
 	}
-
-	private static let sameYearFormatter: DateFormatter = {
-		let formatter = DateFormatter()
-		formatter.dateFormat = .localizedStringWithFormat("MMM")
-
-		return formatter
-	}()
-
-	private static let otherYearFormatter: DateFormatter = {
-		let formatter = DateFormatter()
-		formatter.dateFormat = .localizedStringWithFormat("MMM YY")
-		return formatter
-	}()
 }
 
 extension Calendar {
