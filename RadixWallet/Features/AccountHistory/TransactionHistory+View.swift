@@ -155,10 +155,23 @@ public struct DateRangeItem: ScrollBarItem, Sendable, Hashable, Identifiable {
 
 extension TransactionHistory.TransactionSection {
 	var title: String {
-		if Calendar.current.areSameYear(day, .now) {
-			Self.sameYearFormatter.string(from: day)
+		Self.string(from: day)
+	}
+
+	private static func string(from date: Date) -> String {
+		let calendar: Calendar = .current
+
+		if calendar.areSameYear(date, .now) {
+			let dateString = sameYearFormatter.string(from: date)
+			if calendar.isDateInToday(date) {
+				return "\(L10n.TransactionHistory.DatePrefix.today), \(dateString)"
+			} else if calendar.isDateInYesterday(date) {
+				return "\(L10n.TransactionHistory.DatePrefix.yesterday), \(dateString)"
+			} else {
+				return dateString
+			}
 		} else {
-			Self.otherYearFormatter.string(from: day)
+			return otherYearFormatter.string(from: date)
 		}
 	}
 
