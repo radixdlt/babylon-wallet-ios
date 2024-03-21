@@ -53,7 +53,7 @@ extension AccountDetails {
 							viewStore.send(.showFiatWorthToggled)
 						}
 						.foregroundColor(.app.white)
-						.padding([.bottom, .horizontal], .medium1)
+						.padding(.horizontal, .medium1)
 					}
 
 					prompts(
@@ -65,6 +65,7 @@ extension AccountDetails {
 						historyButton()
 						transferButton()
 					}
+					.padding(.top, .small1)
 
 					AssetsView.View(store: store.scope(state: \.assets, action: \.child.assets))
 						.roundedCorners(.top, radius: .medium1)
