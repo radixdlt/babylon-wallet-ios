@@ -144,6 +144,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onAppear:
+			state.loading.isLoading = true
 			return .run { [accountAddress = state.account.accountAddress] send in
 				let date = try await transactionHistoryClient.getFirstTransactionDate(accountAddress)
 				await send(.internal(.loadedFirstTransactionDate(date)))
@@ -198,6 +199,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedFirstTransactionDate(date):
+			state.loading.isLoading = false
 			let lastDate: Date = .init(timeIntervalSinceNow: -10)
 			let firstDate = date ?? lastDate
 			state.fullPeriod = firstDate ..< lastDate
