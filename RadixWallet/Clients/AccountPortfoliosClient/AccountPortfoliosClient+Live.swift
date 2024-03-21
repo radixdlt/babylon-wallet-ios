@@ -27,10 +27,10 @@ extension AccountPortfoliosClient: DependencyKey {
 
 		/// Fetches the pool and stake units details for a given account; Will update the portfolio accordingly
 		@Sendable
-		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.Account) async {
+		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.Account, cachingStrategy: OnLedgerEntitiesClient.CachingStrategy) async {
 			async let poolDetailsFetch = Task {
 				do {
-					let poolUnitDetails = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account)
+					let poolUnitDetails = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account, cachingStrategy: cachingStrategy)
 					await state.set(poolDetails: .success(poolUnitDetails), forAccount: account.address)
 				} catch {
 					await state.set(poolDetails: .failure(error), forAccount: account.address)
@@ -38,7 +38,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			}.result
 			async let stakeUnitDetails = Task {
 				do {
-					let stakeUnitDetails = try await onLedgerEntitiesClient.getOwnedStakesDetails(account: account)
+					let stakeUnitDetails = try await onLedgerEntitiesClient.getOwnedStakesDetails(account: account, cachingStrategy: cachingStrategy)
 					await state.set(stakeUnitDetails: .success(stakeUnitDetails.asIdentifiable()), forAccount: account.address)
 				} catch {
 					await state.set(stakeUnitDetails: .failure(error), forAccount: account.address)
@@ -46,6 +46,23 @@ extension AccountPortfoliosClient: DependencyKey {
 			}.result
 
 			_ = await (poolDetailsFetch, stakeUnitDetails)
+		}
+
+		@Sendable
+		func applyTokenPrices(_ resources: [ResourceAddress], forceRefresh: Bool) async {
+			if !resources.isEmpty {
+				let prices = try? await tokenPricesClient.getTokenPrices(
+					.init(
+						tokens: Array(resources.uniqued()),
+						currency: state.selectedCurrency
+					),
+					forceRefresh
+				)
+
+				if let prices {
+					await state.setTokenPrices(prices)
+				}
+			}
 		}
 
 		return AccountPortfoliosClient(
@@ -74,12 +91,7 @@ extension AccountPortfoliosClient: DependencyKey {
 				let allResources: [ResourceAddress] = {
 					if gateway == .mainnet {
 						/// Only Mainnet resources have prices
-						return (currentAccounts + accounts)
-							.flatMap {
-								$0.allFungibleResourceAddresses +
-									$0.poolUnitResources.poolUnits.flatMap(\.poolResources) +
-									[.mainnetXRDAddress]
-							}
+						return (currentAccounts + accounts).flatMap(\.resourcesWithPrices) + [.mainnetXRDAddress]
 					} else {
 						#if DEBUG
 						/// Helpful for testing on stokenet
@@ -105,22 +117,12 @@ extension AccountPortfoliosClient: DependencyKey {
 					}
 				}()
 
-				if !allResources.isEmpty {
-					let prices = try? await tokenPricesClient.getTokenPrices(
-						.init(
-							tokens: Array(allResources),
-							currency: preferences.fiatCurrencyPriceTarget
-						),
-						forceRefresh
-					)
-
-					if let prices {
-						await state.setTokenPrices(prices)
-					}
-				}
+				await applyTokenPrices(Array(allResources), forceRefresh: forceRefresh)
 
 				// Load additional details
-				_ = await accounts.parallelMap(fetchPoolAndStakeUnitsDetails)
+				_ = await accounts.parallelMap {
+					await fetchPoolAndStakeUnitsDetails($0, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
+				}
 
 				return Array(state.portfoliosSubject.value.wrappedValue!.values)
 			},
@@ -132,8 +134,14 @@ extension AccountPortfoliosClient: DependencyKey {
 				let account = try await onLedgerEntitiesClient.getAccount(accountAddress)
 				let portfolio = AccountPortfolio(account: account)
 
+				let currentResources = await state.tokenPrices.keys
+				await applyTokenPrices(
+					currentResources + account.resourcesWithPrices,
+					forceRefresh: forceRefresh
+				)
+
 				await state.handlePortfolioUpdate(portfolio)
-				await fetchPoolAndStakeUnitsDetails(account)
+				await fetchPoolAndStakeUnitsDetails(account, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
 
 				return portfolio
 			},
@@ -148,4 +156,11 @@ extension AccountPortfoliosClient: DependencyKey {
 			portfolios: { state.portfoliosSubject.value.wrappedValue.map { Array($0.values) } ?? [] }
 		)
 	}()
+}
+
+extension OnLedgerEntity.Account {
+	/// The resources which can have prices
+	fileprivate var resourcesWithPrices: [ResourceAddress] {
+		allFungibleResourceAddresses + poolUnitResources.poolUnits.flatMap(\.poolResources)
+	}
 }
