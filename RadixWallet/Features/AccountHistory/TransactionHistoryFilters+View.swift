@@ -73,7 +73,7 @@ extension TransactionHistoryFilters {
 					}
 					ToolbarItem(placement: .topBarTrailing) {
 						Button(L10n.TransactionHistory.Filters.clearAll) {
-							store.send(.view(.clearTapped))
+							store.send(.view(.clearAllTapped))
 						}
 						.buttonStyle(.blueText)
 					}
