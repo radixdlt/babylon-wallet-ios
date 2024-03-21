@@ -51,6 +51,8 @@ public struct ExpandableTextView: View {
 			.applyingTruncationMask(size: moreTextSize, enabled: !isExpanded && isTruncated)
 			.background(
 				Text(L10n.Common.showMore) // Used to determine the size of the "Show More" text
+					.textStyle(.body2Regular)
+					.bold()
 					.hidden()
 					.onSizeChanged { moreTextSize = $0 }
 			)
@@ -60,9 +62,10 @@ public struct ExpandableTextView: View {
 						withAnimation { isExpanded.toggle() }
 					} label: {
 						Text(isExpanded ? L10n.Common.showLess : L10n.Common.showMore)
+							.textStyle(.body2Regular)
+							.bold()
+							.foregroundColor(.app.blue2)
 					}
-					.textStyle(textStyle)
-					.foregroundColor(.app.blue2)
 				}
 			}
 	}
