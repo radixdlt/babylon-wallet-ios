@@ -43,7 +43,7 @@ public struct TransactionHistoryFilters: Sendable, FeatureReducer {
 
 	public enum ViewAction: Equatable, Sendable {
 		case filterTapped(TransactionFilter)
-		case clearTapped
+		case clearAllTapped
 		case showResultsTapped
 		case closeTapped
 	}
@@ -64,11 +64,11 @@ public struct TransactionHistoryFilters: Sendable, FeatureReducer {
 			state.setActive(!filter.isActive, filter: id)
 			return activeFiltersChanged(state: state)
 
-		case .clearTapped:
+		case .clearAllTapped:
 			for id in state.filters.all.ids {
 				state.setActive(false, filter: id)
 			}
-			return .none
+			return activeFiltersChanged(state: state)
 
 		case .showResultsTapped, .closeTapped:
 			return .run { _ in
