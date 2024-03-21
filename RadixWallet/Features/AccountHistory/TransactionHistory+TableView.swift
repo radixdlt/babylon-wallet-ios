@@ -184,6 +184,16 @@ extension TransactionHistory {
 	}
 }
 
+extension TransactionHistoryItem {
+	var isEmpty: Bool {
+		manifestClass != .accountDepositSettingsUpdate && deposits.isEmpty && withdrawals.isEmpty
+	}
+
+	var isComplex: Bool {
+		manifestClass == nil || manifestClass == .general
+	}
+}
+
 // MARK: - TransactionHistory.TransactionView
 extension TransactionHistory {
 	struct SectionHeaderView: SwiftUI.View {
@@ -241,8 +251,12 @@ extension TransactionHistory {
 					}
 					.padding(.top, .small1)
 					.padding(.horizontal, .medium3)
+					.padding(.bottom, .medium3)
+
+					if transaction.isComplex {
+						ComplexTransactionView()
+					}
 				}
-				.padding(.bottom, .medium3)
 			}
 		}
 
@@ -369,6 +383,23 @@ extension TransactionHistory {
 			}
 		}
 
+		struct ComplexTransactionView: SwiftUI.View {
+			var body: some SwiftUI.View {
+				let inset: CGFloat = 2
+				Text(L10n.TransactionHistory.complexTransaction)
+					.multilineTextAlignment(.leading)
+					.textStyle(.body2Regular)
+					.foregroundColor(.app.gray2)
+					.padding(.vertical, .small2)
+					.padding(.horizontal, .medium3)
+					.frame(maxWidth: .infinity, alignment: .leading)
+					.background(.app.gray5)
+					.roundedCorners(.bottom, radius: .medium3 - inset)
+					.padding(.horizontal, inset)
+					.padding(.bottom, inset)
+			}
+		}
+
 		struct EventHeader: SwiftUI.View {
 			let event: Event
 
@@ -454,5 +485,63 @@ extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
 		}
 
 		return nil
+	}
+}
+
+extension TransactionHistory.TransactionSection {
+	var title: String {
+		Self.string(from: day)
+	}
+
+	private static func string(from date: Date) -> String {
+		let calendar: Calendar = .current
+
+		if calendar.areSameYear(date, .now) {
+			let dateString = sameYearFormatter.string(from: date)
+			if calendar.isDateInToday(date) {
+				return "\(L10n.TransactionHistory.DatePrefix.today), \(dateString)"
+			} else if calendar.isDateInYesterday(date) {
+				return "\(L10n.TransactionHistory.DatePrefix.yesterday), \(dateString)"
+			} else {
+				return dateString
+			}
+		} else {
+			return otherYearFormatter.string(from: date)
+		}
+	}
+
+	private static let sameYearFormatter: DateFormatter = {
+		let formatter = DateFormatter()
+		formatter.dateFormat = .localizedStringWithFormat("MMMM d")
+
+		return formatter
+	}()
+
+	private static let otherYearFormatter: DateFormatter = {
+		let formatter = DateFormatter()
+		formatter.dateFormat = .localizedStringWithFormat("MMMM d, yyyy")
+		return formatter
+	}()
+}
+
+extension TransactionHistory {
+	static func label(for transactionType: TransactionFilter.TransactionType?) -> String {
+		switch transactionType {
+		case let .some(transactionType): label(for: transactionType)
+		case .none: L10n.TransactionHistory.ManifestClass.other
+		}
+	}
+
+	static func label(for transactionType: TransactionFilter.TransactionType) -> String {
+		switch transactionType {
+		case .general: L10n.TransactionHistory.ManifestClass.general
+		case .transfer: L10n.TransactionHistory.ManifestClass.transfer
+		case .poolContribution: L10n.TransactionHistory.ManifestClass.contribute
+		case .poolRedemption: L10n.TransactionHistory.ManifestClass.redeem
+		case .validatorStake: L10n.TransactionHistory.ManifestClass.staking
+		case .validatorUnstake: L10n.TransactionHistory.ManifestClass.unstaking
+		case .validatorClaim: L10n.TransactionHistory.ManifestClass.claim
+		case .accountDepositSettingsUpdate: L10n.TransactionHistory.ManifestClass.accountSettings
+		}
 	}
 }
