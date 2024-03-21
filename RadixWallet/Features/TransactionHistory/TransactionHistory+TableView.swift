@@ -516,7 +516,7 @@ extension TransactionHistory.TransactionSection {
 		let calendar: Calendar = .current
 
 		if calendar.areSameYear(date, .now) {
-			let dateString = date.formatted(.dateTime.day().month())
+			let dateString = date.formatted(.dateTime.day().month(.wide))
 			if calendar.isDateInToday(date) {
 				return "\(L10n.TransactionHistory.DatePrefix.today), \(dateString)"
 			} else if calendar.isDateInYesterday(date) {
