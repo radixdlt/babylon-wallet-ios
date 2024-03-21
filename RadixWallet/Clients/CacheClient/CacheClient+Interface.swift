@@ -87,7 +87,7 @@ extension CacheClient {
 		case rolaDappVerificationMetadata(_ definitionAddress: String)
 		case rolaWellKnownFileVerification(_ url: String)
 		case tokenPrices(_ currency: FiatCurrency)
-		case dateOfFirstTransaction
+		case dateOfFirstTransaction(_ accountAddress: AccountAddress)
 
 		var filesystemFilePath: String {
 			switch self {
@@ -119,8 +119,8 @@ extension CacheClient {
 				return "\(filesystemFolderPath)/RolaWellKnownFileVerification-\(url)"
 			case let .tokenPrices(currency):
 				return "\(filesystemFolderPath)/prices-\(currency.rawValue)"
-			case .dateOfFirstTransaction:
-				return filesystemFolderPath
+			case let .dateOfFirstTransaction(address):
+				return "\(filesystemFolderPath)/account-\(address.address)"
 			}
 		}
 
@@ -155,7 +155,7 @@ extension CacheClient {
 			case .tokenPrices:
 				return "TokenPrices"
 			case .dateOfFirstTransaction:
-				return "dateOfFirstTransaction"
+				return "DateOfFirstTransaction"
 			}
 		}
 

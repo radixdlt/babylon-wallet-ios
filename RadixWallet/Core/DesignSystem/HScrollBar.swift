@@ -7,7 +7,7 @@ public protocol ScrollBarItem: Identifiable {
 
 // MARK: - HScrollBar
 public struct HScrollBar<Item: ScrollBarItem>: View {
-	let items: [Item]
+	let items: IdentifiedArrayOf<Item>
 	@Binding var selection: Item.ID
 
 	public var body: some View {
