@@ -2785,7 +2785,7 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				A41557512B7645D40040AD4E /* AccountHistory */,
+				A41557512B7645D40040AD4E /* TransactionHistory */,
 				48AE39D82B0CBE3900813CF3 /* AccountRecoveryScan */,
 				830EA9D42AE94014004C8051 /* AccountAndPersonaHidingFeature */,
 				48CFBC612ADC10D800E77A5C /* SecurityStructureConfigurationList */,
@@ -6897,7 +6897,7 @@
 			path = ManualAccountRecoveryScan;
 			sourceTree = "<group>";
 		};
-		A41557512B7645D40040AD4E /* AccountHistory */ = {
+		A41557512B7645D40040AD4E /* TransactionHistory */ = {
 			isa = PBXGroup;
 			children = (
 				A41557522B7645E70040AD4E /* TransactionHistory+Reducer.swift */,
@@ -6906,7 +6906,7 @@
 				A462B5C02B95210000C26D20 /* TransactionHistoryFilters+Reducer.swift */,
 				A462B5C22B95212600C26D20 /* TransactionHistoryFilters+View.swift */,
 			);
-			path = AccountHistory;
+			path = TransactionHistory;
 			sourceTree = "<group>";
 		};
 		A462B5752B820D1200C26D20 /* TransactionHistoryClient */ = {
