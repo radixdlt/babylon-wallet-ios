@@ -145,7 +145,7 @@ extension TransactionHistoryItem {
 }
 
 // MARK: - DateRangeItem
-public struct DateRangeItem: ScrollBarItem, Sendable, Hashable {
+public struct DateRangeItem: ScrollBarItem, Sendable, Hashable, Identifiable {
 	public var id: Date { startDate }
 	public let caption: String
 	let startDate: Date
