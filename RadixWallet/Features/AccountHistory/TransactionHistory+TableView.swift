@@ -220,7 +220,7 @@ extension TransactionHistory {
 		var body: some SwiftUI.View {
 			Card(.app.white) {
 				VStack(spacing: 0) {
-					if let message = transaction.message {
+					if let message = transaction.message, !message.isEmpty {
 						MessageView(message: message)
 							.padding(.bottom, -.small3)
 					}
