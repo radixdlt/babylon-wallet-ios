@@ -269,19 +269,38 @@ extension TransactionHistory {
 		}
 
 		struct MessageView: SwiftUI.View {
+			@SwiftUI.State private var expanded: Bool = true
 			let message: String
 
 			var body: some SwiftUI.View {
 				let inset: CGFloat = 2
+				ZStack {
+					if expanded {
+						more()
+					} else {
+						less()
+					}
+				}
+				.inFlatBottomSpeechbubble(inset: inset)
+				.padding(.top, inset)
+				.padding(.horizontal, inset)
+				.onTapGesture {
+					expanded.toggle()
+				}
+			}
+
+			func less() -> some SwiftUI.View {
+				more()
+					.lineLimit(2, reservesSpace: true)
+			}
+
+			func more() -> some SwiftUI.View {
 				Text(message)
 					.multilineTextAlignment(.leading)
 					.textStyle(.body2Regular)
 					.foregroundColor(.app.gray1)
 					.padding(.medium3)
 					.frame(maxWidth: .infinity, alignment: .leading)
-					.inFlatBottomSpeechbubble(inset: inset)
-					.padding(.top, inset)
-					.padding(.horizontal, inset)
 			}
 		}
 
