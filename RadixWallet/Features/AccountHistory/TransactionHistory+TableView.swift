@@ -190,7 +190,7 @@ extension TransactionHistoryItem {
 	}
 
 	var isComplex: Bool {
-		manifestClass == nil || manifestClass == .general
+		manifestClass == nil
 	}
 }
 
@@ -253,9 +253,9 @@ extension TransactionHistory {
 					.padding(.horizontal, .medium3)
 					.padding(.bottom, .medium3)
 
-					if transaction.isComplex {
-						ComplexTransactionView()
-					}
+//					if transaction.isComplex {
+//						ComplexTransactionView()
+//					}
 				}
 			}
 		}
