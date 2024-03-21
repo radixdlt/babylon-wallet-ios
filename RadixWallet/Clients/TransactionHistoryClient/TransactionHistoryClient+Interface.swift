@@ -75,8 +75,8 @@ public enum TransactionFilter: Hashable, Sendable {
 	case transactionType(TransactionType)
 
 	public enum TransferType: CaseIterable, Sendable {
-		case withdrawal
 		case deposit
+		case withdrawal
 	}
 
 	public typealias TransactionType = GatewayAPI.ManifestClass
