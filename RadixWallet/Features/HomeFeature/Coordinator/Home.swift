@@ -11,6 +11,9 @@ public struct Home: Sendable, FeatureReducer {
 		public var shouldWriteDownPersonasSeedPhrase: Bool = false
 
 		public var showRadixBanner: Bool = false
+		public var showFiatWorth: Bool = true
+
+		public var totalFiatWorth: Loadable<FiatWorth> = .idle
 
 		// MARK: - Destination
 		@PresentationState
@@ -27,6 +30,7 @@ public struct Home: Sendable, FeatureReducer {
 		case settingsButtonTapped
 		case radixBannerButtonTapped
 		case radixBannerDismissButtonTapped
+		case showFiatWorthToggled
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -35,6 +39,10 @@ public struct Home: Sendable, FeatureReducer {
 		case exportMnemonic(account: Profile.Network.Account)
 		case importMnemonic
 		case loadedShouldWriteDownPersonasSeedPhrase(Bool)
+		case currentGatewayChanged(to: Radix.Gateway)
+		case shouldShowNPSSurvey(Bool)
+		case accountsResourcesLoaded(Loadable<[OnLedgerEntity.Account]>)
+		case accountsFiatWorthLoaded([AccountAddress: Loadable<FiatWorth>])
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -52,6 +60,7 @@ public struct Home: Sendable, FeatureReducer {
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
 			case exportMnemonic(ExportMnemonic.State)
 			case acknowledgeJailbreakAlert(AlertState<Action.AcknowledgeJailbreakAlert>)
+			case npsSurvey(NPSSurvey.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -60,6 +69,7 @@ public struct Home: Sendable, FeatureReducer {
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
 			case exportMnemonic(ExportMnemonic.Action)
 			case acknowledgeJailbreakAlert(AcknowledgeJailbreakAlert)
+			case npsSurvey(NPSSurvey.Action)
 
 			public enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
 		}
@@ -77,6 +87,9 @@ public struct Home: Sendable, FeatureReducer {
 			Scope(state: /State.exportMnemonic, action: /Action.exportMnemonic) {
 				ExportMnemonic()
 			}
+			Scope(state: /State.npsSurvey, action: /Action.npsSurvey) {
+				NPSSurvey()
+			}
 		}
 	}
 
@@ -85,7 +98,11 @@ public struct Home: Sendable, FeatureReducer {
 	@Dependency(\.userDefaults) var userDefaults
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.iOSSecurityClient) var iOSSecurityClient
+	@Dependency(\.gatewaysClient) var gatewaysClient
+	@Dependency(\.npsSurveyClient) var npsSurveyClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init() {}
 
@@ -128,6 +145,10 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			.merge(with: checkAccountsAccessToMnemonic(state: state))
 			.merge(with: loadShouldWriteDownPersonasSeedPhrase())
+			.merge(with: loadGateways())
+			.merge(with: loadNPSSurveyStatus())
+			.merge(with: loadAccountResources())
+			.merge(with: loadFiatValues())
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(
@@ -155,6 +176,11 @@ public struct Home: Sendable, FeatureReducer {
 
 		case .settingsButtonTapped:
 			return .send(.delegate(.displaySettings))
+
+		case .showFiatWorthToggled:
+			return .run { _ in
+				try await appPreferencesClient.toggleIsCurrencyAmountVisible()
+			}
 		}
 	}
 
@@ -178,6 +204,14 @@ public struct Home: Sendable, FeatureReducer {
 			errorQueue.schedule(error)
 			return .none
 
+		case let .accountsResourcesLoaded(accountsResources):
+			state.accountRows.mutateAll { row in
+				if let accountResources = accountsResources.first(where: { $0.address == row.id }).unwrap() {
+					row.accountWithResources.refresh(from: accountResources)
+				}
+			}
+			return .none
+
 		case let .loadedShouldWriteDownPersonasSeedPhrase(shouldBackup):
 			state.shouldWriteDownPersonasSeedPhrase = shouldBackup
 			return .none
@@ -187,6 +221,30 @@ public struct Home: Sendable, FeatureReducer {
 
 		case .importMnemonic:
 			return importMnemonics(state: &state)
+
+		case let .currentGatewayChanged(gateway):
+			#if DEBUG
+			state.showFiatWorth = true
+			#else
+			state.showFiatWorth = gateway == .mainnet
+			state.accountRows.mutateAll { rowState in
+				rowState.showFiatWorth = state.showFiatWorth
+			}
+			#endif
+			return .none
+		case let .shouldShowNPSSurvey(shouldShow):
+			if shouldShow {
+				state.destination = .npsSurvey(.init())
+			}
+			return .none
+		case let .accountsFiatWorthLoaded(fiatWorths):
+			state.accountRows.mutateAll {
+				if let fiatWorth = fiatWorths[$0.id] {
+					$0.totalFiatWorth.refresh(from: fiatWorth)
+				}
+			}
+			state.totalFiatWorth = state.accountRows.map(\.totalFiatWorth).reduce(+) ?? .loading
+			return .none
 		}
 	}
 
@@ -206,7 +264,7 @@ public struct Home: Sendable, FeatureReducer {
 			let account = accountRow.account
 			switch delegateAction {
 			case .openDetails:
-				state.destination = .accountDetails(.init(accountWithInfo: accountRow.accountWithInfo))
+				state.destination = .accountDetails(.init(accountWithInfo: accountRow.accountWithInfo, showFiatWorth: state.showFiatWorth))
 				return .none
 			case .exportMnemonic:
 				return exportMnemonic(controlling: account, state: &state)
@@ -254,9 +312,20 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			return .none
 
+		case let .npsSurvey(.delegate(.feedbackFilled(userFeedback))):
+			state.destination = nil
+			return uploadUserFeedback(userFeedback)
+
 		default:
 			return .none
 		}
+	}
+
+	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		if case .npsSurvey = state.destination {
+			return uploadUserFeedback(nil)
+		}
+		return .none
 	}
 
 	private func dismissAccountDetails(then internalAction: InternalAction, _ state: inout State) -> Effect<Action> {
@@ -288,6 +357,64 @@ public struct Home: Sendable, FeatureReducer {
 			for try await shouldBackup in await personasClient.shouldWriteDownSeedPhraseForSomePersonaSequence() {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.loadedShouldWriteDownPersonasSeedPhrase(shouldBackup)))
+			}
+		}
+	}
+
+	public func loadGateways() -> Effect<Action> {
+		.run { send in
+			for try await gateway in await gatewaysClient.currentGatewayValues() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.currentGatewayChanged(to: gateway)))
+			}
+		}
+	}
+
+	private func loadNPSSurveyStatus() -> Effect<Action> {
+		.run { send in
+			for try await shouldAsk in await npsSurveyClient.shouldAskForUserFeedback() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.shouldShowNPSSurvey(shouldAsk)))
+			}
+		}
+	}
+
+	private func uploadUserFeedback(_ feedback: NPSSurveyClient.UserFeedback?) -> Effect<Action> {
+		overlayWindowClient.scheduleHUD(.thankYou)
+
+		return .run { _ in
+			await npsSurveyClient.uploadUserFeedback(feedback)
+		}
+	}
+
+	private func loadAccountResources() -> Effect<Action> {
+		.run { send in
+			for try await accountResources in accountPortfoliosClient.portfolioUpdates().map { $0.map { $0.map(\.account) } }.removeDuplicates() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.accountsResourcesLoaded(accountResources)))
+			}
+		}
+	}
+
+	private func loadFiatValues() -> Effect<Action> {
+		.run { send in
+			let accountsTotalFiatWorth = accountPortfoliosClient.portfolioUpdates()
+				.compactMap { portfoliosLoadable in
+					portfoliosLoadable.wrappedValue?.reduce(into: [AccountAddress: Loadable<FiatWorth>]()) { partialResult, portfolio in
+						partialResult[portfolio.account.address] = portfolio.totalFiatWorth
+					}
+				}
+				.filter {
+					// All items should load
+					if let aggregated = Array($0.values).reduce(+), aggregated.didLoad {
+						return true
+					}
+					return false
+				}
+
+			for try await accountsTotalFiatWorth in accountsTotalFiatWorth.removeDuplicates() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.accountsFiatWorthLoaded(accountsTotalFiatWorth)))
 			}
 		}
 	}

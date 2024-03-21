@@ -8,11 +8,15 @@ public enum LedgerIdentifiable: Sendable {
 	}
 
 	public var address: String {
+		formatted(.raw)
+	}
+
+	public func formatted(_ format: AddressFormat = .default) -> String {
 		switch self {
 		case let .address(address):
-			address.address
+			address.formatted(format)
 		case let .identifier(identifier):
-			identifier.address
+			identifier.formatted(format)
 		}
 	}
 
@@ -32,11 +36,15 @@ extension LedgerIdentifiable {
 		case nonFungibleGlobalID(NonFungibleGlobalId)
 
 		public var address: String {
+			formatted(.raw)
+		}
+
+		public func formatted(_ format: AddressFormat = .default) -> String {
 			switch self {
 			case let .transaction(txId):
-				txId.asStr()
+				txId.formatted(format)
 			case let .nonFungibleGlobalID(nonFungibleGlobalId):
-				nonFungibleGlobalId.asStr()
+				nonFungibleGlobalId.formatted(format)
 			}
 		}
 
@@ -61,21 +69,25 @@ extension LedgerIdentifiable {
 		case nonFungibleGlobalID(NonFungibleGlobalId)
 
 		public var address: String {
+			formatted(.raw)
+		}
+
+		public func formatted(_ format: AddressFormat) -> String {
 			switch self {
 			case let .account(accountAddress, _):
-				accountAddress.address
+				accountAddress.formatted(format)
 			case let .package(packageAddress):
-				packageAddress.address
+				packageAddress.formatted(format)
 			case let .resource(resourceAddress):
-				resourceAddress.address
+				resourceAddress.formatted(format)
 			case let .resourcePool(resourcePoolAddress):
-				resourcePoolAddress.address
+				resourcePoolAddress.formatted(format)
 			case let .component(componentAddress):
-				componentAddress.address
+				componentAddress.formatted(format)
 			case let .validator(validatorAddress):
-				validatorAddress.address
-			case let .nonFungibleGlobalID(id):
-				id.asStr()
+				validatorAddress.formatted(format)
+			case let .nonFungibleGlobalID(nonFungible):
+				nonFungible.formatted(format)
 			}
 		}
 

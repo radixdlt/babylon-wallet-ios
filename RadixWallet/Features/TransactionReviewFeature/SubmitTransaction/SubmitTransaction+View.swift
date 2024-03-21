@@ -14,6 +14,9 @@ extension SubmitTransaction.State {
 extension SubmitTransaction.State.TXStatus {
 	var display: String {
 		switch self {
+		case .failed(.applicationError(.worktopError(.assertionFailed))),
+		     .permanentlyRejected(.applicationError(.worktopError(.assertionFailed))):
+			L10n.TransactionStatus.AssertionFailure.text
 		case .failed:
 			L10n.TransactionStatus.Failed.text
 		case .permanentlyRejected:

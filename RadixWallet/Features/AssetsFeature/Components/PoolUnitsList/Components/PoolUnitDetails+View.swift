@@ -27,7 +27,8 @@ extension PoolUnitDetails {
 	public struct ViewState: Equatable {
 		let containerWithHeader: DetailsContainerWithHeaderViewState
 		let thumbnailURL: URL?
-		let resources: [PoolUnitResourceView.ViewState]
+		let resources: [ResourceBalance.ViewState.Fungible]
+
 		let resourceDetails: AssetResourceDetailsSection.ViewState
 	}
 
@@ -53,7 +54,7 @@ extension PoolUnitDetails {
 							.textStyle(.secondaryHeader)
 							.foregroundColor(.app.gray1)
 
-						PoolUnitResourcesView(resources: viewStore.resources)
+						ResourceBalancesView(fungibles: viewStore.resources)
 							.padding(.horizontal, .large2)
 
 						AssetResourceDetailsSection(viewState: viewStore.resourceDetails)

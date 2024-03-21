@@ -27,8 +27,9 @@ public struct ValidatorCollectionItem: Codable, Hashable {
     public private(set) var state: AnyCodable?
     public private(set) var activeInEpoch: ValidatorCollectionItemActiveInEpoch?
     public private(set) var metadata: EntityMetadataCollection
+    public private(set) var effectiveFeeFactor: ValidatorCollectionItemEffectiveFeeFactor
 
-    public init(address: String, stakeVault: ValidatorVaultItem, pendingXrdWithdrawVault: ValidatorVaultItem, lockedOwnerStakeUnitVault: ValidatorVaultItem, pendingOwnerStakeUnitUnlockVault: ValidatorVaultItem, state: AnyCodable? = nil, activeInEpoch: ValidatorCollectionItemActiveInEpoch? = nil, metadata: EntityMetadataCollection) {
+    public init(address: String, stakeVault: ValidatorVaultItem, pendingXrdWithdrawVault: ValidatorVaultItem, lockedOwnerStakeUnitVault: ValidatorVaultItem, pendingOwnerStakeUnitUnlockVault: ValidatorVaultItem, state: AnyCodable?, activeInEpoch: ValidatorCollectionItemActiveInEpoch? = nil, metadata: EntityMetadataCollection, effectiveFeeFactor: ValidatorCollectionItemEffectiveFeeFactor) {
         self.address = address
         self.stakeVault = stakeVault
         self.pendingXrdWithdrawVault = pendingXrdWithdrawVault
@@ -37,6 +38,7 @@ public struct ValidatorCollectionItem: Codable, Hashable {
         self.state = state
         self.activeInEpoch = activeInEpoch
         self.metadata = metadata
+        self.effectiveFeeFactor = effectiveFeeFactor
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -48,6 +50,7 @@ public struct ValidatorCollectionItem: Codable, Hashable {
         case state
         case activeInEpoch = "active_in_epoch"
         case metadata
+        case effectiveFeeFactor = "effective_fee_factor"
     }
 
     // Encodable protocol methods
@@ -59,9 +62,10 @@ public struct ValidatorCollectionItem: Codable, Hashable {
         try container.encode(pendingXrdWithdrawVault, forKey: .pendingXrdWithdrawVault)
         try container.encode(lockedOwnerStakeUnitVault, forKey: .lockedOwnerStakeUnitVault)
         try container.encode(pendingOwnerStakeUnitUnlockVault, forKey: .pendingOwnerStakeUnitUnlockVault)
-        try container.encodeIfPresent(state, forKey: .state)
+        try container.encode(state, forKey: .state)
         try container.encodeIfPresent(activeInEpoch, forKey: .activeInEpoch)
         try container.encode(metadata, forKey: .metadata)
+        try container.encode(effectiveFeeFactor, forKey: .effectiveFeeFactor)
     }
 }
 

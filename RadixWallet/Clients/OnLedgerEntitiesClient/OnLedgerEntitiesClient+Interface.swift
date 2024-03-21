@@ -229,7 +229,7 @@ extension OnLedgerEntitiesClient {
 
 	@Sendable
 	public func getResources(
-		_ addresses: [ResourceAddress],
+		_ addresses: some Collection<ResourceAddress>,
 		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys,
 		cachingStrategy: CachingStrategy = .useCache,
 		atLedgerState: AtLedgerState? = nil
@@ -443,7 +443,7 @@ extension OnLedgerEntitiesClient {
 
 	public func isStakeClaimNFT(_ resource: OnLedgerEntity.Resource) async -> OnLedgerEntity.Validator? {
 		guard let validatorAddress = resource.metadata.validator else {
-			return nil // no declared pool unit
+			return nil // no declared validator
 		}
 
 		let validator = try? await getEntity(
@@ -500,7 +500,10 @@ extension OnLedgerEntitiesClient {
 			return nil
 		}
 
-		let poolUnitResource = ResourceWithVaultAmount(resource: poolUnitResource, amount: amount)
+		let poolUnitResource = ResourceWithVaultAmount(
+			resource: poolUnitResource,
+			amount: .init(nominalAmount: amount)
+		)
 
 		return await populatePoolDetails(pool, allResources, poolUnitResource)
 	}
@@ -546,7 +549,10 @@ extension OnLedgerEntitiesClient {
 				return nil
 			}
 
-			let poolUnitResource = ResourceWithVaultAmount(resource: poolUnitResourcee, amount: ownedPoolUnit.resource.amount)
+			let poolUnitResource = ResourceWithVaultAmount(
+				resource: poolUnitResourcee,
+				amount: ownedPoolUnit.resource.amount
+			)
 
 			return await populatePoolDetails(pool, allResources, poolUnitResource)
 		}
@@ -567,7 +573,7 @@ extension OnLedgerEntitiesClient {
 
 			nonXrdResourceDetails.append(.init(
 				resource: resourceDetails,
-				redemptionValue: resourceDetails.poolRedemptionValue(for: resource.amount, poolUnitResource: poolUnitResource)
+				redemptionValue: resourceDetails.poolRedemptionValue(for: resource.amount.nominalAmount, poolUnitResource: poolUnitResource).map { .init(nominalAmount: $0) }
 			))
 		}
 
@@ -579,7 +585,7 @@ extension OnLedgerEntitiesClient {
 			}
 			xrdResourceDetails = .init(
 				resource: details,
-				redemptionValue: details.poolRedemptionValue(for: xrdResource.amount, poolUnitResource: poolUnitResource)
+				redemptionValue: details.poolRedemptionValue(for: xrdResource.amount.nominalAmount, poolUnitResource: poolUnitResource).map { .init(nominalAmount: $0) }
 			)
 		} else {
 			xrdResourceDetails = nil

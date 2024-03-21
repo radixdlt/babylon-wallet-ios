@@ -35,10 +35,12 @@ public struct TransactionDetailsOptIns: Codable, Hashable {
     public private(set) var receiptOutput: Bool? = true
     /** if set to `true`, all affected global entities by given transaction are returned. */
     public private(set) var affectedGlobalEntities: Bool? = false
+    /** if set to `true`, manifest instructions for user transactions are returned. */
+    public private(set) var manifestInstructions: Bool? = false
     /** if set to `true`, returns the fungible and non-fungible balance changes.  **Warning!** This opt-in might be missing for recently committed transactions, in that case a `null` value will be returned. Retry the request until non-null value is returned.  */
     public private(set) var balanceChanges: Bool? = false
 
-    public init(rawHex: Bool? = false, receiptStateChanges: Bool? = false, receiptFeeSummary: Bool? = false, receiptFeeSource: Bool? = false, receiptFeeDestination: Bool? = false, receiptCostingParameters: Bool? = false, receiptEvents: Bool? = false, receiptOutput: Bool? = true, affectedGlobalEntities: Bool? = false, balanceChanges: Bool? = false) {
+    public init(rawHex: Bool? = false, receiptStateChanges: Bool? = false, receiptFeeSummary: Bool? = false, receiptFeeSource: Bool? = false, receiptFeeDestination: Bool? = false, receiptCostingParameters: Bool? = false, receiptEvents: Bool? = false, receiptOutput: Bool? = true, affectedGlobalEntities: Bool? = false, manifestInstructions: Bool? = false, balanceChanges: Bool? = false) {
         self.rawHex = rawHex
         self.receiptStateChanges = receiptStateChanges
         self.receiptFeeSummary = receiptFeeSummary
@@ -48,6 +50,7 @@ public struct TransactionDetailsOptIns: Codable, Hashable {
         self.receiptEvents = receiptEvents
         self.receiptOutput = receiptOutput
         self.affectedGlobalEntities = affectedGlobalEntities
+        self.manifestInstructions = manifestInstructions
         self.balanceChanges = balanceChanges
     }
 
@@ -61,6 +64,7 @@ public struct TransactionDetailsOptIns: Codable, Hashable {
         case receiptEvents = "receipt_events"
         case receiptOutput = "receipt_output"
         case affectedGlobalEntities = "affected_global_entities"
+        case manifestInstructions = "manifest_instructions"
         case balanceChanges = "balance_changes"
     }
 
@@ -77,6 +81,7 @@ public struct TransactionDetailsOptIns: Codable, Hashable {
         try container.encodeIfPresent(receiptEvents, forKey: .receiptEvents)
         try container.encodeIfPresent(receiptOutput, forKey: .receiptOutput)
         try container.encodeIfPresent(affectedGlobalEntities, forKey: .affectedGlobalEntities)
+        try container.encodeIfPresent(manifestInstructions, forKey: .manifestInstructions)
         try container.encodeIfPresent(balanceChanges, forKey: .balanceChanges)
     }
 }

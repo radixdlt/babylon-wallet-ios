@@ -17,7 +17,7 @@ extension GatewayAPI {
 
 public struct TransactionReceipt: Codable, Hashable {
 
-    public private(set) var status: TransactionReceiptStatus?
+    public private(set) var status: TransactionStatus?
     /** This type is defined in the Core API as `FeeSummary`. See the Core API documentation for more details.  */
     public private(set) var feeSummary: AnyCodable?
     public private(set) var costingParameters: AnyCodable?
@@ -32,12 +32,11 @@ public struct TransactionReceipt: Codable, Hashable {
     /** The manifest line-by-line engine return data (only present if `status` is `CommittedSuccess`). This type is defined in the Core API as `SborData`. See the Core API documentation for more details.  */
     public private(set) var output: AnyCodable?
     /** Events emitted by a transaction. */
-    /// Has incorrect format in schema, disabled for now as it is not used anyway
-    public private(set) var events: [AnyCodable]?
+    public private(set) var events: [EventsItem]?
     /** Error message (only present if status is `Failed` or `Rejected`) */
     public private(set) var errorMessage: String?
 
-    public init(status: TransactionReceiptStatus? = nil, feeSummary: AnyCodable? = nil, costingParameters: AnyCodable? = nil, feeDestination: AnyCodable? = nil, feeSource: AnyCodable? = nil, stateUpdates: AnyCodable? = nil, nextEpoch: AnyCodable? = nil, output: AnyCodable? = nil, events: [AnyCodable]? = nil, errorMessage: String? = nil) {
+    public init(status: TransactionStatus? = nil, feeSummary: AnyCodable? = nil, costingParameters: AnyCodable? = nil, feeDestination: AnyCodable? = nil, feeSource: AnyCodable? = nil, stateUpdates: AnyCodable? = nil, nextEpoch: AnyCodable? = nil, output: AnyCodable? = nil, events: [EventsItem]? = nil, errorMessage: String? = nil) {
         self.status = status
         self.feeSummary = feeSummary
         self.costingParameters = costingParameters

@@ -41,4 +41,5 @@ extension OverlayWindowClient.Item.HUD {
 	public static let updatedAccount = Self(text: L10n.AccountSettings.updatedAccountHUDMessage)
 	public static let copied = Self(text: L10n.AddressAction.copiedToClipboard)
 	public static let seedPhraseImported = Self(text: L10n.ImportMnemonic.seedPhraseImported)
+	public static let thankYou = Self(text: "Thank you!")
 }

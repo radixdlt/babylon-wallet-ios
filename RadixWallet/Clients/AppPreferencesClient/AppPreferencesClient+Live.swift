@@ -5,6 +5,9 @@ extension AppPreferencesClient: DependencyKey {
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		Self(
+			appPreferenceUpdates: {
+				await profileStore.appPreferencesValues()
+			},
 			getPreferences: { await profileStore.profile.appPreferences },
 			updatePreferences: { newPreferences in
 				try await profileStore.updating {

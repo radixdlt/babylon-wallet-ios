@@ -5,6 +5,8 @@ extension Home.AccountRow {
 	public struct ViewState: Equatable {
 		let name: String
 		let address: AccountAddress
+		let showFiatWorth: Bool
+		let fiatWorth: Loadable<FiatWorth>
 		let appearanceID: Profile.Network.Account.AppearanceID
 		let isLoadingResources: Bool
 
@@ -43,7 +45,9 @@ extension Home.AccountRow {
 			self.name = state.account.displayName.rawValue
 			self.address = state.account.address
 			self.appearanceID = state.account.appearanceID
-			self.isLoadingResources = state.portfolio.isLoading
+			self.showFiatWorth = state.showFiatWorth
+			self.fiatWorth = state.totalFiatWorth
+			self.isLoadingResources = state.accountWithResources.isLoading
 
 			self.tag = .init(state: state)
 			self.isLedgerAccount = state.isLedgerAccount
@@ -51,7 +55,7 @@ extension Home.AccountRow {
 			self.mnemonicHandlingCallToAction = state.mnemonicHandlingCallToAction
 
 			// Resources
-			guard let portfolio = state.portfolio.wrappedValue else {
+			guard let accountWithResources = state.accountWithResources.wrappedValue else {
 				self.fungibleResourceIcons = []
 				self.nonFungibleResourcesCount = 0
 				self.stakedValidatorsCount = 0
@@ -60,13 +64,13 @@ extension Home.AccountRow {
 				return
 			}
 
-			let fungibleResources = portfolio.fungibleResources
+			let fungibleResources = accountWithResources.fungibleResources
 			let xrdIcon: [Thumbnail.TokenContent] = fungibleResources.xrdResource != nil ? [.xrd] : []
 			let otherIcons: [Thumbnail.TokenContent] = fungibleResources.nonXrdResources.map { .other($0.metadata.iconURL) }
 			self.fungibleResourceIcons = xrdIcon + otherIcons
-			self.nonFungibleResourcesCount = portfolio.nonFungibleResources.count
-			self.stakedValidatorsCount = portfolio.poolUnitResources.radixNetworkStakes.count
-			self.poolUnitsCount = portfolio.poolUnitResources.poolUnits.count
+			self.nonFungibleResourcesCount = accountWithResources.nonFungibleResources.count
+			self.stakedValidatorsCount = accountWithResources.poolUnitResources.radixNetworkStakes.count
+			self.poolUnitsCount = accountWithResources.poolUnitResources.poolUnits.count
 		}
 	}
 
@@ -81,11 +85,33 @@ extension Home.AccountRow {
 			WithViewStore(store, observe: ViewState.init, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading, spacing: .medium3) {
 					VStack(alignment: .leading, spacing: .zero) {
-						Text(viewStore.name)
-							.lineLimit(1)
-							.textStyle(.body1Header)
-							.foregroundColor(.app.white)
-							.frame(maxWidth: .infinity, alignment: .leading)
+						HStack(spacing: .zero) {
+							Text(viewStore.name)
+								.lineLimit(1)
+								.textStyle(.body1Header)
+								.foregroundColor(.app.white)
+								.truncationMode(.tail)
+								.layoutPriority(0)
+
+							if viewStore.showFiatWorth {
+								Spacer()
+								loadable(
+									viewStore.fiatWorth,
+									loadingViewHeight: .medium1,
+									backgroundColor: .clear
+								) { fiatWorth in
+									if fiatWorth.worth.isUnknown || fiatWorth.worth > .zero {
+										Text(fiatWorth.currencyFormatted())
+											.lineLimit(1)
+											.textStyle(.secondaryHeader)
+											.foregroundStyle(.app.white)
+									}
+								}
+								.padding(.leading, .small1)
+								.frame(maxWidth: viewStore.fiatWorth.didLoad ? nil : .huge1)
+								.layoutPriority(1)
+							}
+						}
 
 						HStack {
 							AddressView(.address(.account(viewStore.address, isLedgerHWAccount: viewStore.isLedgerAccount)))

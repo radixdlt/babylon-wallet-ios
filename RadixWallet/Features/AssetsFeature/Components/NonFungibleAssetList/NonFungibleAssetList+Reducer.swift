@@ -7,10 +7,6 @@ public struct NonFungibleAssetList: Sendable, FeatureReducer {
 
 		@PresentationState
 		public var destination: Destination.State?
-
-		public init(rows: IdentifiedArrayOf<NonFungibleAssetList.Row.State>) {
-			self.rows = rows
-		}
 	}
 
 	public enum ChildAction: Sendable, Equatable {

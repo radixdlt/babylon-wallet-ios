@@ -28,12 +28,16 @@ public struct MyEntitiesInvolvedInTransaction: Sendable, Hashable {
 }
 
 extension TransactionClient {
+	public struct NoFeePayerCandidate: LocalizedError {
+		public var errorDescription: String? { "No account containing XRD found" }
+	}
+
 	public static var liveValue: Self {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		@Dependency(\.accountsClient) var accountsClient
 		@Dependency(\.personasClient) var personasClient
-		@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
 		@Sendable
@@ -89,7 +93,8 @@ extension TransactionClient {
 		func getAllFeePayerCandidates(refreshingBalances: Bool) async throws -> NonEmpty<IdentifiedArrayOf<FeePayerCandidate>> {
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
-			let allFeePayerCandidates = try await accountPortfoliosClient.fetchAccountPortfolios(allAccounts.map(\.address), refreshingBalances).compactMap { portfolio -> FeePayerCandidate? in
+
+			let allFeePayerCandidates = try await onLedgerEntitiesClient.getAccounts(allAccounts.map(\.address), cachingStrategy: .forceUpdate).compactMap { portfolio -> FeePayerCandidate? in
 				guard
 					let account = allAccounts.first(where: { account in account.address == portfolio.address })
 				else {
@@ -97,19 +102,17 @@ extension TransactionClient {
 					return nil
 				}
 
-				return FeePayerCandidate(
-					account: account,
-					xrdBalance: portfolio.fungibleResources.xrdResource?.amount ?? .zero
-				)
+				guard let xrdBalance = portfolio.fungibleResources.xrdResource?.amount else {
+					return nil
+				}
+
+				return FeePayerCandidate(account: account, xrdBalance: xrdBalance.nominalAmount)
 			}
 
-			guard
-				let allCandidates = NonEmpty<IdentifiedArrayOf<FeePayerCandidate>>(rawValue: .init(uncheckedUniqueElements: allFeePayerCandidates))
-			else {
-				struct NoFeePayerCandidates: Error {}
-				// Should not ever happen, user should have at least one account
-				throw NoFeePayerCandidates()
+			guard let allCandidates = NonEmpty(rawValue: IdentifiedArray(uncheckedUniqueElements: allFeePayerCandidates)) else {
+				throw NoFeePayerCandidate()
 			}
+
 			return allCandidates
 		}
 

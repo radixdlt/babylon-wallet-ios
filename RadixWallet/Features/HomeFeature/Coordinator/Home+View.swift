@@ -3,7 +3,11 @@ import SwiftUI
 
 extension Home.State {
 	var viewState: Home.ViewState {
-		.init(hasNotification: shouldWriteDownPersonasSeedPhrase, showRadixBanner: showRadixBanner)
+		.init(
+			hasNotification: shouldWriteDownPersonasSeedPhrase,
+			showRadixBanner: showRadixBanner,
+			totalFiatWorth: showFiatWorth ? totalFiatWorth : nil
+		)
 	}
 }
 
@@ -12,6 +16,7 @@ extension Home {
 	public struct ViewState: Equatable {
 		let hasNotification: Bool
 		let showRadixBanner: Bool
+		let totalFiatWorth: Loadable<FiatWorth>?
 	}
 
 	@MainActor
@@ -27,6 +32,24 @@ extension Home {
 				ScrollView {
 					VStack(spacing: .medium1) {
 						HeaderView()
+
+						if let fiatWorth = viewStore.totalFiatWorth {
+							VStack(spacing: .small2) {
+								Text(L10n.HomePage.totalValue)
+									.foregroundStyle(.app.gray2)
+									.textStyle(.body1Header)
+									.textCase(.uppercase)
+
+								TotalCurrencyWorthView(
+									state: .init(totalCurrencyWorth: fiatWorth),
+									backgroundColor: .app.gray4
+								) {
+									viewStore.send(.view(.showFiatWorthToggled))
+								}
+								.foregroundColor(.app.gray1)
+							}
+							.padding(.horizontal, .medium1)
+						}
 
 						VStack(spacing: .medium3) {
 							ForEachStore(
@@ -129,6 +152,7 @@ private extension View {
 			.exportMnemonic(with: destinationStore)
 			.importMnemonics(with: destinationStore)
 			.acknowledgeJailbreakAlert(with: destinationStore)
+			.userFeedback(with: destinationStore)
 	}
 
 	private func accountDetails(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
@@ -172,6 +196,15 @@ private extension View {
 			store: destinationStore,
 			state: /Home.Destination.State.acknowledgeJailbreakAlert,
 			action: Home.Destination.Action.acknowledgeJailbreakAlert
+		)
+	}
+
+	private func userFeedback(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /Home.Destination.State.npsSurvey,
+			action: Home.Destination.Action.npsSurvey,
+			content: { NPSSurvey.View(store: $0) }
 		)
 	}
 }

@@ -16,8 +16,8 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 			case submitted
 			case committedSuccessfully
 			case temporarilyRejected(remainingProcessingTime: Int)
-			case permanentlyRejected
-			case failed
+			case permanentlyRejected(TXFailureStatus.Reason)
+			case failed(TXFailureStatus.Reason)
 		}
 
 		public let notarizedTX: NotarizeTransactionResponse
@@ -64,6 +64,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 	@Dependency(\.submitTXClient) var submitTXClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+	@Dependency(\.npsSurveyClient) var npsSurveyClient
 
 	public init() {}
 
@@ -131,16 +132,16 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 				} catch let error as TXFailureStatus {
 					// Error is always TXFailureStatus, just that it is erased to generic Error
 					switch error {
-					case .permanentlyRejected:
-						await send(.internal(.statusUpdate(.permanentlyRejected)))
+					case let .permanentlyRejected(reason):
+						await send(.internal(.statusUpdate(.permanentlyRejected(reason))))
 					case let .temporarilyRejected(epoch):
 						await send(.internal(.statusUpdate(
 							.temporarilyRejected(
 								remainingProcessingTime: Int(endEpoch - epoch.rawValue) * epochDurationInMinutes
 							)
 						)))
-					case .failed:
-						await send(.internal(.statusUpdate(.failed)))
+					case let .failed(reason):
+						await send(.internal(.statusUpdate(.failed(reason))))
 					}
 				}
 			}
@@ -160,6 +161,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 	private func transactionCommittedSuccesfully(_ state: State) -> Effect<Action> {
 		// TODO: Could probably be moved in other place. TransactionClient? AccountPortfolio?
 		accountPortfoliosClient.updateAfterCommittedTransaction(state.notarizedTX.intent)
+		npsSurveyClient.incrementTransactionCompleteCounter()
 		return .send(.delegate(.committedSuccessfully(state.notarizedTX.txID)))
 	}
 }

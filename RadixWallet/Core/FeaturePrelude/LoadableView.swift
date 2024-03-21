@@ -21,23 +21,24 @@ extension View {
 	public func loadable<T>(
 		_ loadable: Loadable<T>,
 		loadingViewHeight: CGFloat = .large1,
+		backgroundColor: Color = .app.gray4,
 		@ViewBuilder successContent: (T) -> some View
 	) -> some View {
 		self.loadable(
 			loadable,
 			loadingView: {
-				shimmeringLoadingView(height: loadingViewHeight)
+				shimmeringLoadingView(height: loadingViewHeight, backgroundColor: backgroundColor)
 			},
 			successContent: successContent
 		)
 	}
 
 	@ViewBuilder
-	func shimmeringLoadingView(height: CGFloat = .large1) -> some View {
+	func shimmeringLoadingView(height: CGFloat = .large1, backgroundColor: Color = .app.gray4) -> some View {
 		Spacer()
-			.frame(height: height)
-			.background(.app.gray4)
+			.background(backgroundColor)
 			.shimmer(active: true, config: .accountResourcesLoading)
+			.frame(height: height)
 			.cornerRadius(.small1)
 	}
 }

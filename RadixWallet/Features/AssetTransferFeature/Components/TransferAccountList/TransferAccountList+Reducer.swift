@@ -211,7 +211,7 @@ extension TransferAccountList {
 					resourceImage: resource.resourceImage,
 					resourceName: resource.resourceName,
 					resourceAddress: resource.resourceAddress,
-					nftToken: $0
+					token: $0
 				)))
 			}
 		}
@@ -268,7 +268,7 @@ extension TransferAccountList {
 					resourceName: asset.resourceName,
 					tokens: []
 				)
-				resource.tokens.append(asset.nftToken)
+				resource.tokens.append(asset.token)
 				partialResult.updateOrAppend(resource)
 			}
 
@@ -276,7 +276,7 @@ extension TransferAccountList {
 			.filter { $0.id != id }
 			.flatMap(\.assets)
 			.nonFungibleAssets
-			.map(\.nftToken.id)
+			.map(\.token.id)
 
 		state.destination = .init(
 			id: id,
