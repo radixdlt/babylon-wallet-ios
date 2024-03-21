@@ -23,7 +23,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var fullPeriod: Range<Date> = .now ..< .now
 
-		var availableMonths: [DateRangeItem] = []
+		var availableMonths: IdentifiedArrayOf<DateRangeItem> = []
 
 		let account: Profile.Network.Account
 
@@ -306,7 +306,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		state: inout State
 	) {
 		guard parameters == state.requestParameters(for: parameters.direction) else {
-			loggerGlobal.info("Received obsolete Transaction History response, should not be possible")
+			loggerGlobal.error("Received obsolete Transaction History response, should not be possible")
 			return
 		}
 		state.resources.append(contentsOf: response.resources)
@@ -456,7 +456,7 @@ extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
 // MARK: - FailedToCalculateDate
 struct FailedToCalculateDate: Error {}
 
-extension [DateRangeItem] {
+extension IdentifiedArrayOf<DateRangeItem> {
 	init(period: Range<Date>) throws {
 		guard !period.isEmpty else {
 			self = []
@@ -482,13 +482,15 @@ extension [DateRangeItem] {
 			}
 		}
 
-		self = zip(monthStarts, monthStarts.dropFirst()).map { start, end in
-			.init(
-				caption: caption(date: start),
-				startDate: start,
-				endDate: end
-			)
-		}
+		self = zip(monthStarts, monthStarts.dropFirst())
+			.map { start, end in
+				.init(
+					caption: caption(date: start),
+					startDate: start,
+					endDate: end
+				)
+			}
+			.asIdentifiable()
 	}
 
 	private static let sameYearFormatter: DateFormatter = {
