@@ -182,7 +182,6 @@ extension TransactionHistoryFilters {
 							TransactionFilterView.Dummy()
 								.measureSize(flowDummyID)
 						}
-
 						.frame(maxHeight: isCollapsible && isCollapsed ? collapsedHeight : .infinity, alignment: .top)
 						.clipped()
 						.onReadSizes(flowDummyID, flowLayoutID) { dummySize, flowSize in
