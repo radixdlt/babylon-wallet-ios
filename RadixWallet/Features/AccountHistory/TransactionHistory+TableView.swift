@@ -497,7 +497,7 @@ extension TransactionHistory.TransactionSection {
 		let calendar: Calendar = .current
 
 		if calendar.areSameYear(date, .now) {
-			let dateString = sameYearFormatter.string(from: date)
+			let dateString = date.formatted(.dateTime.day().month())
 			if calendar.isDateInToday(date) {
 				return "\(L10n.TransactionHistory.DatePrefix.today), \(dateString)"
 			} else if calendar.isDateInYesterday(date) {
@@ -506,22 +506,9 @@ extension TransactionHistory.TransactionSection {
 				return dateString
 			}
 		} else {
-			return otherYearFormatter.string(from: date)
+			return date.formatted(.dateTime.day().month(.wide).year())
 		}
 	}
-
-	private static let sameYearFormatter: DateFormatter = {
-		let formatter = DateFormatter()
-		formatter.dateFormat = .localizedStringWithFormat("MMMM d")
-
-		return formatter
-	}()
-
-	private static let otherYearFormatter: DateFormatter = {
-		let formatter = DateFormatter()
-		formatter.dateFormat = .localizedStringWithFormat("MMMM d, yyyy")
-		return formatter
-	}()
 }
 
 extension TransactionHistory {
