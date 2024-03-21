@@ -16,7 +16,7 @@ extension TransactionHistoryClient {
 		func getFirstTransactionDate(_ account: AccountAddress) async throws -> Date? {
 			@Dependency(\.cacheClient) var cacheClient
 
-			if let date = try? cacheClient.load(Date.self, .dateOfFirstTransaction) as? Date {
+			if let date = try? cacheClient.load(Date.self, .dateOfFirstTransaction(account)) as? Date {
 				return date
 			}
 
@@ -34,7 +34,7 @@ extension TransactionHistoryClient {
 				throw CorruptTimestamp(roundTimestamd: info.roundTimestamp)
 			}
 
-			cacheClient.save(date, .dateOfFirstTransaction)
+			cacheClient.save(date, .dateOfFirstTransaction(account))
 
 			return date
 		}
