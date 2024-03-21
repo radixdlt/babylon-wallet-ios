@@ -1,4 +1,9 @@
 extension ResourceAddress {
+	/// Is this resource XRD on its own network
+	public var isXRD: Bool {
+		isXRD(on: networkID)
+	}
+
 	public func isXRD(on networkID: NetworkID) -> Bool {
 		address == knownAddresses(networkId: networkID.rawValue).resourceAddresses.xrd.addressString()
 	}
