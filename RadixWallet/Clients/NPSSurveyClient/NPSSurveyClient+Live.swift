@@ -19,9 +19,10 @@ extension NPSSurveyClient: DependencyKey {
 			},
 			incrementTransactionCompleteCounter: {
 				let currentCounter = userDefaults.getTransactionsCompletedCounter() ?? 0
+				let lastDate = userDefaults.getDateOfLastSubmittedNPSSurvey()
 				let updatedCounter = currentCounter + 1
 				userDefaults.setTransactionsCompletedCounter(updatedCounter)
-				if Self.shouldAskUserForFeedback(updatedCounter) {
+				if Self.shouldAskUserForFeedback(updatedCounter, dateOfLastSubmittedNPSSurvey: lastDate) {
 					shouldAskForFeedbackSubject.send(true)
 				}
 			},
@@ -37,14 +38,13 @@ extension NPSSurveyClient {
 	private static let nextFeedbackIntervalThresholdInMonths = 3
 
 	@Sendable
-	static func shouldAskUserForFeedback(_ transactionCounter: Int) -> Bool {
-		@Dependency(\.userDefaults) var userDefaults
+	static func shouldAskUserForFeedback(_ transactionCounter: Int, dateOfLastSubmittedNPSSurvey: Date?) -> Bool {
 		@Dependency(\.date) var date
 
 		if transactionCounter == Self.feedbackTransactionCounterThreshold {
 			return true
 		} else if transactionCounter > Self.feedbackTransactionCounterThreshold {
-			guard let lastSubmittedDate = userDefaults.getDateOfLastSubmittedNPSSurvey() else {
+			guard let lastSubmittedDate = dateOfLastSubmittedNPSSurvey else {
 				// No submit date saved?
 				// Can happen if user did close the app while the original NPS survey was shown.
 				// And since the next NPS survey check will happen only after user did perform
