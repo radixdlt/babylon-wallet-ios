@@ -245,8 +245,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	// Helper methods
 
 	func loadTransactionsFirstTime(state: inout State) -> Effect<Action> {
-		print("• loadTransactionsFirstTime: .latestTransaction"); return
-			loadHistory(.down, scrollTarget: .latestTransaction, state: &state)
+		loadHistory(.down, scrollTarget: .latestTransaction, state: &state)
 	}
 
 	/// Load history for the previously selected period, using the provided filters
@@ -293,8 +292,6 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		guard !state.loading.isLoading, cursor != .loadedAll, !parameters.period.isEmpty else { return .none }
 
 		state.loading.isLoading = true
-
-		print("• loadHistory: \(direction), scroll: \(scrollTarget)")
 
 		let request = TransactionHistoryRequest(
 			account: state.account.accountAddress,
