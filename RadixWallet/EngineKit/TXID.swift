@@ -4,7 +4,7 @@ public typealias TXID = TransactionHash
 
 extension TXID {
 	public func formatted(_ format: AddressFormat = .default) -> String {
-		bytes().hex()
+		asStr()
 	}
 
 	public var hex: String {
