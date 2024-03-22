@@ -23,20 +23,22 @@ extension TransactionHistory {
 					let selection = viewStore.binding(get: \.currentMonth, send: ViewAction.selectedMonth)
 
 					VStack(spacing: .zero) {
-						VStack(spacing: .zero) {
-							AccountHeaderView(account: viewStore.account)
-
-							HScrollBar(items: viewStore.availableMonths, selection: selection)
-								.background(.app.white)
-								.padding(.vertical, .small2)
+						VStack(spacing: .small2) {
+							SmallAccountCard(account: viewStore.account)
+								.roundedCorners(radius: .small1)
+								.padding(.horizontal, .medium3)
 
 							if let filters = viewStore.activeFilters.nilIfEmpty {
 								ActiveFiltersView(filters: filters) { id in
 									store.send(.view(.filterCrossTapped(id)), animation: .default)
 								}
-								.padding(.bottom, .small1)
 							}
+
+							HScrollBar(items: viewStore.availableMonths, selection: selection)
+								.background(.app.white)
 						}
+						.padding(.top, .small3)
+						.padding(.bottom, .small1)
 						.background(.app.white)
 
 						TableView(
@@ -86,18 +88,6 @@ extension TransactionHistory {
 		}
 
 		private static let coordSpace = "TransactionHistory"
-	}
-
-	struct AccountHeaderView: SwiftUI.View {
-		let account: Profile.Network.Account
-
-		var body: some SwiftUI.View {
-			SmallAccountCard(account: account)
-				.roundedCorners(radius: .small1)
-				.padding(.horizontal, .medium3)
-				.padding(.top, .medium3)
-				.background(.app.white)
-		}
 	}
 
 	struct ActiveFiltersView: SwiftUI.View {
