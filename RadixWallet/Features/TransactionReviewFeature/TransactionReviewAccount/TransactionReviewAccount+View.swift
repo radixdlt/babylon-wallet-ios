@@ -55,7 +55,7 @@ extension TransactionReviewAccount.State {
 extension TransactionReviewAccount {
 	public struct ViewState: Equatable {
 		let account: TransactionReview.Account
-		let transfers: [ResourceBalance] // FIXME: GK use viewstate?
+		let transfers: [TransactionReview.Transfer] // FIXME: GK use viewstate?
 		let showApprovedMark: Bool
 	}
 
@@ -74,8 +74,8 @@ extension TransactionReviewAccount {
 
 					VStack(spacing: .zero) {
 						ForEach(viewStore.transfers) { transfer in
-							TransactionReviewResourceView(transfer: transfer) { token in
-								viewStore.send(.transferTapped(transfer, token))
+							TransactionReviewResourceView(transfer: transfer.value) { token in
+								viewStore.send(.transferTapped(transfer.value, token))
 							}
 
 							if transfer.id != viewStore.transfers.last?.id {
@@ -103,7 +103,7 @@ struct TransactionReviewResourceView: View {
 				onTap(nil)
 			}
 		case let .stakeClaimNFT(details):
-			ResourceBalanceView.StakeClaimNFT(viewState: details, background: .app.gray5, compact: false) { stakeClaim in
+			ResourceBalanceView.StakeClaimNFT(viewState: details, appearance: .transactionReview, compact: false) { stakeClaim in
 				onTap(stakeClaim.token)
 			}
 		}
