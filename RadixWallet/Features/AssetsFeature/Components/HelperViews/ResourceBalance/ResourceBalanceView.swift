@@ -152,7 +152,7 @@ public struct ResourceBalanceView: View {
 			case let .poolUnit(viewState):
 				PoolUnit(viewState: viewState, compact: compact, isSelected: isSelected)
 			case let .stakeClaimNFT(viewState):
-				StakeClaimNFT(viewState: viewState, background: .white, compact: compact, onTap: { _ in })
+				StakeClaimNFT(viewState: viewState, appearance: .standalone, compact: compact, onTap: { _ in })
 			}
 
 			if !delegateSelection, let isSelected {
@@ -286,10 +286,15 @@ extension ResourceBalanceView {
 	public struct StakeClaimNFT: View {
 		@Environment(\.resourceBalanceHideDetails) var hideDetails
 		public let viewState: ResourceBalance.ViewState.StakeClaimNFT
-		public let background: Color
+		public let appearance: Appearance
 		public let compact: Bool
 		public let onTap: (OnLedgerEntitiesClient.StakeClaim) -> Void
 		public var onClaimAllTapped: (() -> Void)? = nil
+
+		public enum Appearance {
+			case standalone
+			case transactionReview
+		}
 
 		public var body: some View {
 			VStack(alignment: .leading, spacing: .zero) {
@@ -310,7 +315,22 @@ extension ResourceBalanceView {
 					.padding(.top, .small2)
 				}
 			}
+			.padding(padding)
 			.background(background)
+		}
+
+		private var padding: CGFloat {
+			switch appearance {
+			case .standalone: .zero
+			case .transactionReview: .medium3
+			}
+		}
+
+		private var background: Color {
+			switch appearance {
+			case .standalone: .white
+			case .transactionReview: .app.gray5
+			}
 		}
 
 		public struct Tokens: View {
