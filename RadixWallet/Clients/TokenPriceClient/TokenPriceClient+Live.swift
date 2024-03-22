@@ -28,9 +28,10 @@ extension TokenPricesClient {
 		}
 
 		return .init(
-			getTokenPrices: { request in
+			getTokenPrices: { request, refresh in
 				try await cacheClient.withCaching(
 					cacheEntry: .tokenPrices(request.currency),
+					forceRefresh: refresh,
 					invalidateCached: {
 						Array($0.keys) != request.tokens ? .cachedIsInvalid : .cachedIsValid
 					},
@@ -47,6 +48,7 @@ extension TokenPricesClient.TokenPrices {
 		formatter.numberStyle = .decimal
 		formatter.maximumFractionDigits = Int(RETDecimal.maxDivisibility)
 		formatter.roundingMode = .down
+		formatter.decimalSeparator = "." // Enfore dot notation for RETDecimal
 
 		self = tokenPricesResponse.tokens.reduce(into: [:]) { partialResult, next in
 			let trimmed = formatter.string(for: next.price) ?? ""

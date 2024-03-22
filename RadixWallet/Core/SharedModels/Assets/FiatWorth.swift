@@ -93,10 +93,6 @@ extension FiatWorth {
 
 		let value = worth.value ?? .zero // Zero for the unknown case, just to do to the base formatting
 
-		if value < 1 {
-			formatter.maximumFractionDigits = 8
-		}
-
 		let formattedValue = {
 			guard let double = try? value.asDouble(), let value = formatter.string(for: double) else {
 				// Good enough fallback

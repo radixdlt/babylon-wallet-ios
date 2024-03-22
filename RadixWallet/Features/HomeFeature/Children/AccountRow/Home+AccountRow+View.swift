@@ -47,7 +47,7 @@ extension Home.AccountRow {
 			self.appearanceID = state.account.appearanceID
 			self.showFiatWorth = state.showFiatWorth
 			self.fiatWorth = state.totalFiatWorth
-			self.isLoadingResources = state.portfolio.isLoading
+			self.isLoadingResources = state.accountWithResources.isLoading
 
 			self.tag = .init(state: state)
 			self.isLedgerAccount = state.isLedgerAccount
@@ -55,7 +55,7 @@ extension Home.AccountRow {
 			self.mnemonicHandlingCallToAction = state.mnemonicHandlingCallToAction
 
 			// Resources
-			guard let portfolio = state.portfolio.wrappedValue else {
+			guard let accountWithResources = state.accountWithResources.wrappedValue else {
 				self.fungibleResourceIcons = []
 				self.nonFungibleResourcesCount = 0
 				self.stakedValidatorsCount = 0
@@ -64,13 +64,13 @@ extension Home.AccountRow {
 				return
 			}
 
-			let fungibleResources = portfolio.account.fungibleResources
+			let fungibleResources = accountWithResources.fungibleResources
 			let xrdIcon: [Thumbnail.TokenContent] = fungibleResources.xrdResource != nil ? [.xrd] : []
 			let otherIcons: [Thumbnail.TokenContent] = fungibleResources.nonXrdResources.map { .other($0.metadata.iconURL) }
 			self.fungibleResourceIcons = xrdIcon + otherIcons
-			self.nonFungibleResourcesCount = portfolio.account.nonFungibleResources.count
-			self.stakedValidatorsCount = portfolio.account.poolUnitResources.radixNetworkStakes.count
-			self.poolUnitsCount = portfolio.account.poolUnitResources.poolUnits.count
+			self.nonFungibleResourcesCount = accountWithResources.nonFungibleResources.count
+			self.stakedValidatorsCount = accountWithResources.poolUnitResources.radixNetworkStakes.count
+			self.poolUnitsCount = accountWithResources.poolUnitResources.poolUnits.count
 		}
 	}
 

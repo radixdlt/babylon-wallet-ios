@@ -78,7 +78,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 
 				Task {
 					_ = try await dappInteractionClient.addWalletInteraction(
-						.transaction(.init(send: .init(transactionManifest: manifest))),
+						.transaction(.init(send: .init(transactionManifest: manifest, message: message))),
 						.accountTransfer
 					)
 				}

@@ -4,16 +4,10 @@ import SwiftUI
 // MARK: - FungibleAssetList
 public struct FungibleAssetList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var sections: IdentifiedArrayOf<FungibleAssetList.Section.State>
+		public var sections: IdentifiedArrayOf<FungibleAssetList.Section.State> = []
 
 		@PresentationState
 		public var destination: Destination.State?
-
-		public init(
-			sections: IdentifiedArrayOf<FungibleAssetList.Section.State> = []
-		) {
-			self.sections = sections
-		}
 	}
 
 	@CasePathable

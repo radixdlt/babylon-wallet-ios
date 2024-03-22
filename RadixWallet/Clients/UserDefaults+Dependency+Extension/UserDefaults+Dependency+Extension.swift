@@ -6,6 +6,9 @@ public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case hideMigrateOlympiaButton
 	case showRadixBanner
 	case epochForWhenLastUsedByAccountAddress
+	case transactionsCompletedCounter
+	case dateOfLastSubmittedNPSSurvey
+	case npsSurveyUserID
 
 	/// DO NOT CHANGE THIS KEY
 	case activeProfileID
@@ -105,5 +108,33 @@ extension UserDefaults.Dependency {
 
 	public func removeActiveProfileID() {
 		remove(.activeProfileID)
+	}
+
+	public func getTransactionsCompletedCounter() -> Int? {
+		integer(forKey: Key.transactionsCompletedCounter.rawValue)
+	}
+
+	public func setTransactionsCompletedCounter(_ count: Int) {
+		set(count, forKey: Key.transactionsCompletedCounter.rawValue)
+	}
+
+	public func transactionsCompletedCounterValues() -> AsyncStream<Int?> {
+		integerValues(forKey: Key.transactionsCompletedCounter.rawValue)
+	}
+
+	public func getDateOfLastSubmittedNPSSurvey() -> Date? {
+		date(forKey: Key.dateOfLastSubmittedNPSSurvey.rawValue)
+	}
+
+	public func setDateOfLastSubmittedNPSSurvey(_ date: Date) {
+		set(date, forKey: Key.dateOfLastSubmittedNPSSurvey.rawValue)
+	}
+
+	public func getNPSSurveyUserId() -> UUID? {
+		string(forKey: Key.npsSurveyUserID.rawValue).flatMap(UUID.init(uuidString:))
+	}
+
+	public func setNPSSurveyUserId(_ id: UUID) {
+		set(id.uuidString, forKey: Key.npsSurveyUserID.rawValue)
 	}
 }

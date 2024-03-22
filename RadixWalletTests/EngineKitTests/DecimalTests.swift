@@ -274,15 +274,17 @@ final class DecimalTests: TestCase {
 	}
 
 	func test_format_decimal() throws {
-		func doTest(_ decimalString: String, expected: String, line: UInt = #line) throws {
+		func doTest(_ decimal: RETDecimal, expected: String, line: UInt = #line) throws {
 			let locale = Locale(identifier: "en_US_POSIX")
-			let decimal = try RETDecimal(value: decimalString)
 			let actual = decimal.formatted(locale: locale, totalPlaces: 8, useGroupingSeparator: false)
 			XCTAssertEqual(actual, expected, line: line)
 		}
+		func doTest(_ decimalString: String, expected: String, line: UInt = #line) throws {
+			try doTest(RETDecimal(value: decimalString), expected: expected, line: line)
+		}
 
+		try doTest(RETDecimal.max(), expected: "3.138e39")
 		try doTest("0.009999999999999", expected: "0.01")
-
 		try doTest("12341234", expected: "12.341234 M")
 		try doTest("1234123.4", expected: "1.2341234 M")
 		try doTest("123456.34", expected: "123456.34")

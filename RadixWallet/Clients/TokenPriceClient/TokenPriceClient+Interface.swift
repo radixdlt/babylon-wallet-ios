@@ -10,5 +10,5 @@ extension TokenPricesClient {
 		public let currency: FiatCurrency
 	}
 
-	public typealias GetTokenPrices = @Sendable (FetchPricesRequest) async throws -> TokenPrices
+	public typealias GetTokenPrices = @Sendable (FetchPricesRequest, _ refresh: Bool) async throws -> TokenPrices
 }
