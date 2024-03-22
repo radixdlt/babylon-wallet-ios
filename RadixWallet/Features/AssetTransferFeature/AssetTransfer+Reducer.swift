@@ -73,7 +73,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		case .sendTransferTapped:
 			state.message?.focused = false
 
-			return .run { [accounts = state.accounts] send in
+			return .run { [accounts = state.accounts, message = state.message?.message] send in
 				let manifest = try await createManifest(accounts)
 
 				Task {
