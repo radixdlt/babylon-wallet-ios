@@ -5,6 +5,14 @@ import ComposableArchitecture
 struct Triggering<T: Hashable & Sendable>: Hashable, Sendable {
 	let created: Date = .now
 	let value: T
+
+	private init(value: T) {
+		self.value = value
+	}
+
+	static func updated(_ value: T) -> Self {
+		.init(value: value)
+	}
 }
 
 // MARK: - TransactionHistory
@@ -36,7 +44,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		var sections: IdentifiedArrayOf<TransactionSection> = []
 
-		var scrollTarget: Triggering<TXID?> = .init(value: nil)
+		var scrollTarget: Triggering<TXID?> = .updated(nil)
 
 		/// The currently selected month
 		var currentMonth: DateRangeItem.ID
@@ -237,7 +245,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	// Helper methods
 
 	func loadTransactionsFirstTime(state: inout State) -> Effect<Action> {
-		loadHistory(.down, scrollTarget: .latestTransaction, state: &state)
+		print("• loadTransactionsFirstTime: .latestTransaction"); return
+			loadHistory(.down, scrollTarget: .latestTransaction, state: &state)
 	}
 
 	/// Load history for the previously selected period, using the provided filters
@@ -284,6 +293,8 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		guard !state.loading.isLoading, cursor != .loadedAll, !parameters.period.isEmpty else { return .none }
 
 		state.loading.isLoading = true
+
+		print("• loadHistory: \(direction), scroll: \(scrollTarget)")
 
 		let request = TransactionHistoryRequest(
 			account: state.account.accountAddress,
@@ -340,21 +351,24 @@ extension TransactionHistory.State {
 	}
 
 	mutating func setScrollTarget(_ scrollTarget: TransactionHistory.ScrollTarget?) {
-		guard let scrollTarget else { return }
+		guard let scrollTarget else {
+			self.scrollTarget = .updated(nil)
+			return
+		}
 
 		func scrollToLatest() {
 			guard let lastSection = sections.first, let lastTransaction = lastSection.transactions.first else { return }
 			self.currentMonth = lastSection.month
-			self.scrollTarget = .init(value: lastTransaction.id)
+			self.scrollTarget = .updated(lastTransaction.id)
 		}
 
 		switch scrollTarget {
 		case let .transaction(txID):
-			self.scrollTarget = .init(value: txID)
+			self.scrollTarget = .updated(txID)
 		case let .beforeDate(date):
 			if let lastSectionInMonth = sections.first(where: { $0.day < date }), let lastTransaction = lastSectionInMonth.transactions.first {
 				self.currentMonth = lastSectionInMonth.month
-				self.scrollTarget = .init(value: lastTransaction.id)
+				self.scrollTarget = .updated(lastTransaction.id)
 			} else {
 				scrollToLatest()
 			}
