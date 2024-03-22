@@ -26,29 +26,25 @@ extension TransactionManifest {
 	}
 
 	public static func createFungibleToken(
-		addressOfOwner: AccountAddress,
-		networkID: NetworkID
+		addressOfOwner: AccountAddress
 	) throws -> TransactionManifest {
 		sargon()
 	}
 
 	public static func createMultipleFungibleTokens(
-		addressOfOwner: AccountAddress,
-		networkID: NetworkID
+		addressOfOwner: AccountAddress
 	) throws -> TransactionManifest {
 		sargon()
 	}
 
 	public static func createMultipleNonFungibleTokens(
-		addressOfOwner: AccountAddress,
-		networkID: NetworkID
+		addressOfOwner: AccountAddress
 	) throws -> TransactionManifest {
 		sargon()
 	}
 
 	public static func createNonFungibleToken(
-		addressOfOwner: AccountAddress,
-		networkID: NetworkID
+		addressOfOwner: AccountAddress
 	) throws -> TransactionManifest {
 		sargon()
 	}

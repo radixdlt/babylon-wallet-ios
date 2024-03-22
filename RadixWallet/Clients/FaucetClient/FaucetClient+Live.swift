@@ -104,17 +104,14 @@ extension FaucetClient: DependencyKey {
 
 		#if DEBUG
 		let createFungibleToken: CreateFungibleToken = { request in
-			let networkID = await gatewaysClient.getCurrentNetworkID()
 			// TODO: Re-enable. With new manifest builder that is not easy to handle.
 			let manifest = if request.numberOfTokens == 1 {
 				try TransactionManifest.createFungibleToken(
-					addressOfOwner: request.recipientAccountAddress,
-					networkID: networkID
+					addressOfOwner: request.recipientAccountAddress
 				)
 			} else {
 				try TransactionManifest.createMultipleFungibleTokens(
-					addressOfOwner: request.recipientAccountAddress,
-					networkID: networkID
+					addressOfOwner: request.recipientAccountAddress
 				)
 			}
 
