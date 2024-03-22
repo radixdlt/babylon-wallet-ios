@@ -4,14 +4,14 @@ import Foundation
 public enum Sargon {}
 
 // MARK: Declare Manifests
-extension Sargon {
-	public static func manifestThirdPartyDepositUpdate(
+extension TransactionManifest {
+	public static func thirdPartyDepositUpdate(
 		to new: ThirdPartyDeposits
 	) throws -> (manifest: TransactionManifest, updatedAccount: Profile.Network.Account) {
 		sargon()
 	}
 
-	public static func manifestForFaucet(
+	public static func faucet(
 		includeLockFeeInstruction: Bool,
 		networkID: NetworkID,
 		addressOfReceivingAccount: AccountAddress
@@ -19,7 +19,7 @@ extension Sargon {
 		sargon()
 	}
 
-	public static func manifestSetOwnerKeys(
+	public static func setOwnerKeys(
 		addressOfAccountOrPersona: AddressOfAccountOrPersona,
 		ownerKeyHashes: [RETPublicKeyHash],
 		networkId: NetworkID
@@ -27,66 +27,62 @@ extension Sargon {
 		sargon()
 	}
 
-	public static func manifestForCreateFungibleToken(
+	public static func createFungibleToken(
 		addressOfOwner: AccountAddress,
 		networkID: NetworkID
 	) throws -> TransactionManifest {
 		sargon()
 	}
 
-	public static func manifestForCreateMultipleFungibleTokens(
+	public static func createMultipleFungibleTokens(
 		addressOfOwner: AccountAddress,
 		networkID: NetworkID
 	) throws -> TransactionManifest {
 		sargon()
 	}
 
-	public static func manifestForCreateMultipleNonFungibleTokens(
+	public static func createMultipleNonFungibleTokens(
 		addressOfOwner: AccountAddress,
 		networkID: NetworkID
 	) throws -> TransactionManifest {
 		sargon()
 	}
 
-	public static func manifestForCreateNonFungibleToken(
+	public static func createNonFungibleToken(
 		addressOfOwner: AccountAddress,
 		networkID: NetworkID
 	) throws -> TransactionManifest {
 		sargon()
 	}
 
-	public static func manifestMarkingAccountAsDappDefinitionType(
+	public static func markingAccountAsDappDefinitionType(
 		accountAddress: AccountAddress
 	) throws -> TransactionManifest {
 		sargon()
 	}
 
-	public static func manifestStakesClaim(
+	public static func stakesClaim(
 		accountAddress: AccountAddress,
 		stakeClaims: [StakeClaim]
 	) throws -> TransactionManifest {
 		sargon()
 	}
 
-	public static func manifestAssetsTransfers(
+	public static func assetsTransfers(
 		transfers: PerAssetTransfers
 	) -> TransactionManifest {
 		sargon()
 	}
-}
 
-extension Sargon {
-	public static func updatingManifestLockFee(
-		_ manifest: TransactionManifest,
-		addressOfFeePayer: AccountAddress,
-		fee: RETDecimal = .temporaryStandardFee
+	public func modify(
+		lockFee fee: RETDecimal = .temporaryStandardFee,
+		addressOfFeePayer: AccountAddress
 	) throws -> TransactionManifest {
 		sargon()
 	}
 
-	public static func updatingManifestAddGuarantees(
-		_ manifest: TransactionManifest,
-		guarantees: [TransactionGuarantee]
+	public func modify(
+		addGuarantees guarantees: [TransactionGuarantee]
 	) throws -> TransactionManifest {
 		sargon()
 	}

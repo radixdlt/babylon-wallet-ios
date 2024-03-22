@@ -301,10 +301,8 @@ extension TransferAccountList {
 			return .run { send in
 				for asset in assets {
 					let resourceAddress = asset.resourceAddress
-					let signatureNeeded = try await Sargon.needsSignatureForDepositting(
-						intoAccount: userOwnedAccount,
-						resource: resourceAddress
-					)
+					let signatureNeeded = await needsSignatureForDepositting(into: userOwnedAccount, resource: resourceAddress)
+
 					await send(.internal(.updateSignatureStatus(
 						accountID: receivingAccount.id,
 						assetID: asset.id,

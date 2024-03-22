@@ -225,7 +225,7 @@ extension AssetTransfer {
 			nonFungibleResources: nonFungibles
 		)
 
-		return Sargon.manifestAssetsTransfers(transfers: perAssetTransfers)
+		return TransactionManifest.assetsTransfers(transfers: perAssetTransfers)
 	}
 }
 

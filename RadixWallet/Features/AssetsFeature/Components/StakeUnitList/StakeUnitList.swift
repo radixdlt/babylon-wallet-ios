@@ -296,7 +296,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		stakeClaims: [StakeClaim]
 	) -> Effect<Action> {
 		.run { _ in
-			let manifest = try Sargon.manifestStakesClaim(
+			let manifest = try TransactionManifest.stakesClaim(
 				accountAddress: acccountAddress,
 				stakeClaims: stakeClaims
 			)

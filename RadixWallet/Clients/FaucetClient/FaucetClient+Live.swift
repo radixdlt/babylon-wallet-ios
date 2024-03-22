@@ -81,7 +81,7 @@ extension FaucetClient: DependencyKey {
 
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 
-			let manifest = try Sargon.manifestForFaucet(
+			let manifest = try TransactionManifest.faucet(
 				includeLockFeeInstruction: true,
 				networkID: networkID,
 				addressOfReceivingAccount: accountAddress
@@ -107,12 +107,12 @@ extension FaucetClient: DependencyKey {
 			let networkID = await gatewaysClient.getCurrentNetworkID()
 			// TODO: Re-enable. With new manifest builder that is not easy to handle.
 			let manifest = if request.numberOfTokens == 1 {
-				try Sargon.manifestForCreateFungibleToken(
+				try TransactionManifest.createFungibleToken(
 					addressOfOwner: request.recipientAccountAddress,
 					networkID: networkID
 				)
 			} else {
-				try Sargon.manifestForCreateMultipleFungibleTokens(
+				try TransactionManifest.createMultipleFungibleTokens(
 					addressOfOwner: request.recipientAccountAddress,
 					networkID: networkID
 				)

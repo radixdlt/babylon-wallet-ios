@@ -697,10 +697,9 @@ extension TransactionReview {
 		var manifest = reviewedTransaction.transactionManifest
 		if case let .success(feePayerAccount) = reviewedTransaction.feePayer.unwrap()?.account {
 			do {
-				manifest = try Sargon.updatingManifestLockFee(
-					reviewedTransaction.transactionManifest,
-					addressOfFeePayer: feePayerAccount.address,
-					fee: reviewedTransaction.transactionFee.totalFee.lockFee
+				manifest = try reviewedTransaction.transactionManifest.modify(
+					lockFee: reviewedTransaction.transactionFee.totalFee.lockFee,
+					addressOfFeePayer: feePayerAccount.address
 				)
 			} catch {
 				loggerGlobal.error("Failed to add lock fee, error: \(error)")
@@ -708,10 +707,7 @@ extension TransactionReview {
 			}
 		}
 		do {
-			return try Sargon.updatingManifestAddGuarantees(
-				manifest,
-				guarantees: state.allGuarantees
-			)
+			return try manifest.modify(addGuarantees: state.allGuarantees)
 		} catch {
 			loggerGlobal.error("Failed to add guarantee, error: \(error)")
 			throw FailedToAddGuarantee(underlyingError: error)

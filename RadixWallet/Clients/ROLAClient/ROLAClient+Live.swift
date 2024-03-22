@@ -35,7 +35,7 @@ extension ROLAClient {
 
 			loggerGlobal.notice("Setting ownerKeyHashes to: \(ownerKeyHashes)")
 
-			return try Sargon.manifestSetOwnerKeys(
+			return try TransactionManifest.setOwnerKeys(
 				addressOfAccountOrPersona: entityAddress,
 				ownerKeyHashes: ownerKeyHashes,
 				networkId: request.entity.networkID

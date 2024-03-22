@@ -159,7 +159,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 			}
 		case .turnIntoDappDefinitionAccountTypeButtonTapped:
 			return .run { [accountAddress = state.address] send in
-				let manifest = try Sargon.manifestMarkingAccountAsDappDefinitionType(accountAddress: accountAddress)
+				let manifest = try TransactionManifest.markingAccountAsDappDefinitionType(accountAddress: accountAddress)
 				await send(.internal(.reviewTransaction(manifest)))
 			} catch: { error, _ in
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
@@ -168,7 +168,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		case .createFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
 				let accountAddress = try await accountsClient.getAccountByAddress(accountAddress)
-				let manifest = try Sargon.manifestForCreateFungibleToken(addressOfOwner: accountAddress.address, networkID: accountAddress.networkID)
+				let manifest = try TransactionManifest.createFungibleToken(addressOfOwner: accountAddress.address, networkID: accountAddress.networkID)
 				await send(.internal(.reviewTransaction(manifest)))
 			} catch: { error, _ in
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
@@ -177,7 +177,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		case .createNonFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
 				let accountAddress = try await accountsClient.getAccountByAddress(accountAddress)
-				let manifest = try Sargon.manifestForCreateNonFungibleToken(
+				let manifest = try TransactionManifest.createNonFungibleToken(
 					addressOfOwner: accountAddress.address,
 					networkID: accountAddress.networkID
 				)
@@ -188,7 +188,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		case .createMultipleFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
 				let accountAddress = try await accountsClient.getAccountByAddress(accountAddress)
-				let manifest = try Sargon.manifestForCreateMultipleFungibleTokens(addressOfOwner: accountAddress.address, networkID: accountAddress.networkID)
+				let manifest = try TransactionManifest.createMultipleFungibleTokens(addressOfOwner: accountAddress.address, networkID: accountAddress.networkID)
 				await send(.internal(.reviewTransaction(manifest)))
 			} catch: { error, _ in
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
@@ -196,7 +196,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		case .createMultipleNonFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
 				let accountAddress = try await accountsClient.getAccountByAddress(accountAddress)
-				let manifest = try Sargon.manifestForCreateMultipleNonFungibleTokens(
+				let manifest = try TransactionManifest.createMultipleNonFungibleTokens(
 					addressOfOwner: accountAddress.address,
 					networkID: accountAddress.networkID
 				)

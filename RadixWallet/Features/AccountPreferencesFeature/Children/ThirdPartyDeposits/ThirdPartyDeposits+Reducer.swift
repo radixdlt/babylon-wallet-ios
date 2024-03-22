@@ -168,6 +168,6 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 	private func prepareForSubmission(
 		newConfig new: ThirdPartyDeposits
 	) throws -> (manifest: TransactionManifest, updatedAccount: Profile.Network.Account) {
-		try Sargon.manifestThirdPartyDepositUpdate(to: new)
+		try TransactionManifest.thirdPartyDepositUpdate(to: new)
 	}
 }
