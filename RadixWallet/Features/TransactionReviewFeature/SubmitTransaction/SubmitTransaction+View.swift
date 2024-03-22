@@ -29,6 +29,19 @@ extension SubmitTransaction.State.TXStatus {
 			""
 		}
 	}
+
+	var errorTitle: String {
+		switch self {
+		case .notYetSubmitted, .submitting, .submitted, .committedSuccessfully:
+			"" // Not applicable
+		case .temporarilyRejected:
+			L10n.TransactionStatus.Error.title
+		case .permanentlyRejected:
+			L10n.TransactionStatus.Rejected.title
+		case .failed:
+			L10n.TransactionStatus.Failed.title
+		}
+	}
 }
 
 // MARK: - SubmitTransaction.View
@@ -57,7 +70,7 @@ extension SubmitTransaction {
 					VStack(spacing: .medium2) {
 						if viewStore.status.failed {
 							Image(asset: AssetResource.warningError)
-							Text(L10n.TransactionStatus.Failure.title)
+							Text(viewStore.status.errorTitle)
 								.foregroundColor(.app.gray1)
 								.textStyle(.sheetTitle)
 								.multilineTextAlignment(.center)
