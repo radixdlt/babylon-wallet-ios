@@ -13,7 +13,6 @@ extension TransactionManifest {
 
 	public static func faucet(
 		includeLockFeeInstruction: Bool,
-		networkID: NetworkID,
 		addressOfReceivingAccount: AccountAddress
 	) throws -> TransactionManifest {
 		sargon()
@@ -21,8 +20,7 @@ extension TransactionManifest {
 
 	public static func setOwnerKeys(
 		addressOfAccountOrPersona: AddressOfAccountOrPersona,
-		ownerKeyHashes: [RETPublicKeyHash],
-		networkId: NetworkID
+		ownerKeyHashes: [RETPublicKeyHash]
 	) -> TransactionManifest {
 		sargon()
 	}

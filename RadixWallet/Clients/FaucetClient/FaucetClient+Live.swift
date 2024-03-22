@@ -80,10 +80,10 @@ extension FaucetClient: DependencyKey {
 			}
 
 			let networkID = await gatewaysClient.getCurrentNetworkID()
-
+			let networkIDOfAddress = try accountAddress.networkID()
+			assert(networkIDOfAddress == networkID)
 			let manifest = try TransactionManifest.faucet(
 				includeLockFeeInstruction: true,
-				networkID: networkID,
 				addressOfReceivingAccount: accountAddress
 			)
 

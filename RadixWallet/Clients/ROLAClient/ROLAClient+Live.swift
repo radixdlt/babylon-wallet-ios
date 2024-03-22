@@ -10,12 +10,16 @@ extension ROLAClient {
 			let entity = request.entity
 			let newPublicKey = request.newPublicKey
 
-			let entityAddress = switch entity {
-			case let .account(account):
-				AddressOfAccountOrPersona.account(account.address)
-			case let .persona(persona):
-				AddressOfAccountOrPersona.persona(persona.address)
-			}
+			let entityAddress: AddressOfAccountOrPersona = {
+				switch entity {
+				case let .account(account):
+					assert(account.networkID == request.entity.networkID)
+					return AddressOfAccountOrPersona.account(account.address)
+				case let .persona(persona):
+					assert(persona.networkID == request.entity.networkID)
+					return AddressOfAccountOrPersona.persona(persona.address)
+				}
+			}()
 
 			let metadata = try await onLedgerEntitiesClient.getEntity(entityAddress.address, metadataKeys: [.ownerKeys]).genericComponent?.metadata
 			var ownerKeyHashes = try metadata?.ownerKeyHashes() ?? []
@@ -34,11 +38,9 @@ extension ROLAClient {
 			}
 
 			loggerGlobal.notice("Setting ownerKeyHashes to: \(ownerKeyHashes)")
-
 			return try TransactionManifest.setOwnerKeys(
 				addressOfAccountOrPersona: entityAddress,
-				ownerKeyHashes: ownerKeyHashes,
-				networkId: request.entity.networkID
+				ownerKeyHashes: ownerKeyHashes
 			)
 		}
 
