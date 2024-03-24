@@ -2652,8 +2652,8 @@ public enum L10n {
   }
   public enum TransactionStatus {
     public enum AssertionFailure {
-      /// Transaction failed because a guarantee on transaction results was not met. Consider reducing your preferred guarantee %
-      public static let text = L10n.tr("Localizable", "transactionStatus_assertionFailure_text", fallback: "Transaction failed because a guarantee on transaction results was not met. Consider reducing your preferred guarantee %")
+      /// A guarantee on transaction results was not met. Consider reducing your preferred guarantee %
+      public static let text = L10n.tr("Localizable", "transactionStatus_assertionFailure_text", fallback: "A guarantee on transaction results was not met. Consider reducing your preferred guarantee %")
     }
     public enum Completing {
       /// Completing Transaction…
