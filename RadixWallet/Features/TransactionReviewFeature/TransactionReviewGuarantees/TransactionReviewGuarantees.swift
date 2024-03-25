@@ -78,7 +78,7 @@ public struct TransactionReviewGuarantee: Sendable, FeatureReducer {
 		public let account: TransactionReview.Account
 		public let resource: OnLedgerEntity.Resource
 		public let thumbnail: Thumbnail.FungibleContent
-		public let amount: RETDecimal
+		public let amount: Decimal192
 		public var guarantee: TransactionGuarantee
 
 		public var percentageStepper: MinimumPercentageStepper.State
@@ -150,7 +150,7 @@ extension TransactionReviewGuarantee.State {
 		guard let value = percentageStepper.value else { return }
 
 		let newMinimumDecimal = value * 0.01
-		let divisibility: UInt = resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
+		let divisibility: UInt = resource.divisibility.map(UInt.init) ?? Decimal192.maxDivisibility
 		guarantee.amount = (newMinimumDecimal * amount).rounded(decimalPlaces: divisibility)
 	}
 }

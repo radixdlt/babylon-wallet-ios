@@ -194,9 +194,9 @@ public struct FeePayerCandidate: Sendable, Hashable, Identifiable {
 	public var id: ID { account.id }
 
 	public let account: Profile.Network.Account
-	public let xrdBalance: RETDecimal
+	public let xrdBalance: Decimal192
 
-	public init(account: Profile.Network.Account, xrdBalance: RETDecimal) {
+	public init(account: Profile.Network.Account, xrdBalance: Decimal192) {
 		self.account = account
 		self.xrdBalance = xrdBalance
 	}
@@ -273,7 +273,7 @@ public struct FeePayerSelectionResult: Equatable, Sendable {
 }
 
 extension ExecutionSummary {
-	func guranteesCost() throws -> RETDecimal {
+	func guranteesCost() throws -> Decimal192 {
 		switch detailedManifestClass {
 		case .general, .transfer:
 			accountDeposits.flatMap(\.value).reduce(.zero) { result, resource in

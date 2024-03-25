@@ -18,7 +18,7 @@ extension TrackedPoolInteractionStuff {
 		sargon()
 	}
 
-	public var liquidStakeUnitAmount: RETDecimal {
+	public var liquidStakeUnitAmount: Decimal192 {
 		get {
 			sargon()
 		}
@@ -27,7 +27,7 @@ extension TrackedPoolInteractionStuff {
 		}
 	}
 
-	public var xrdAmount: RETDecimal {
+	public var xrdAmount: Decimal192 {
 		get {
 			sargon()
 		}
@@ -38,7 +38,7 @@ extension TrackedPoolInteractionStuff {
 
 	public var poolAddress: PoolAddress { sargon() }
 	public var poolUnitsResourceAddress: ResourceAddress { sargon() }
-	public var poolUnitsAmount: RETDecimal {
+	public var poolUnitsAmount: Decimal192 {
 		get {
 			sargon()
 		}
@@ -47,7 +47,7 @@ extension TrackedPoolInteractionStuff {
 		}
 	}
 
-	public var resourcesInInteraction: [String: RETDecimal] {
+	public var resourcesInInteraction: [String: Decimal192] {
 		get {
 			sargon()
 		}
@@ -56,7 +56,7 @@ extension TrackedPoolInteractionStuff {
 		}
 	}
 
-	public var contributedResources: [String: RETDecimal] {
+	public var contributedResources: [String: Decimal192] {
 		get {
 			sargon()
 		}
@@ -65,7 +65,7 @@ extension TrackedPoolInteractionStuff {
 		}
 	}
 
-	public var redeemedResources: [String: RETDecimal] {
+	public var redeemedResources: [String: Decimal192] {
 		get {
 			sargon()
 		}

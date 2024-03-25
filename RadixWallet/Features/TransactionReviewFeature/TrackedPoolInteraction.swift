@@ -4,14 +4,14 @@ import Foundation
 public protocol TrackedPoolInteraction {
 	var poolAddress: PoolAddress { get }
 	var poolUnitsResourceAddress: ResourceAddress { get }
-	var poolUnitsAmount: RETDecimal { get set }
-	var resourcesInInteraction: [String: RETDecimal] { get set }
+	var poolUnitsAmount: Decimal192 { get set }
+	var resourcesInInteraction: [String: Decimal192] { get set }
 	mutating func add(_ other: Self)
 }
 
 // MARK: - TrackedPoolContribution + TrackedPoolInteraction
 extension TrackedPoolContribution: TrackedPoolInteraction {
-	public var resourcesInInteraction: [String: RETDecimal] {
+	public var resourcesInInteraction: [String: Decimal192] {
 		get { contributedResources }
 		set { contributedResources = newValue }
 	}
@@ -19,7 +19,7 @@ extension TrackedPoolContribution: TrackedPoolInteraction {
 
 // MARK: - TrackedPoolRedemption + TrackedPoolInteraction
 extension TrackedPoolRedemption: TrackedPoolInteraction {
-	public var resourcesInInteraction: [String: RETDecimal] {
+	public var resourcesInInteraction: [String: Decimal192] {
 		get { redeemedResources }
 		set { redeemedResources = newValue }
 	}

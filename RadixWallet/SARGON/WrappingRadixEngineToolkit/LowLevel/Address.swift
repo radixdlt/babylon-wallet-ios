@@ -21,7 +21,7 @@ public typealias ResourceAddress = SpecificAddress<ResourceEntityType>
 
 extension ResourceAddress {
 	public func isXRD(on networkID: NetworkID) -> Bool {
-		Sargon.xrdAddressOfNetwork(networkId: networkID) == self
+		Self.xrd(on: networkID) == self
 	}
 }
 

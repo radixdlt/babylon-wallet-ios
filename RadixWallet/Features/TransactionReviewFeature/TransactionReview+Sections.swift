@@ -592,7 +592,7 @@ extension TransactionReview {
 		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
 		type: TransferType,
-		defaultDepositGuarantee: RETDecimal = 1
+		defaultDepositGuarantee: Decimal192 = 1
 	) async throws -> [ResourceBalance] {
 		let resourceAddress: ResourceAddress = resourceQuantifier.resourceAddress
 

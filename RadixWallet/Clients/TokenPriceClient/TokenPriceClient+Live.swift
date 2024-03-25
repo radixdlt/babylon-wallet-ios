@@ -46,13 +46,13 @@ extension TokenPricesClient.TokenPrices {
 	fileprivate init(_ tokenPricesResponse: TokensPriceResponse) {
 		let formatter = NumberFormatter()
 		formatter.numberStyle = .decimal
-		formatter.maximumFractionDigits = Int(RETDecimal.maxDivisibility)
+		formatter.maximumFractionDigits = Int(Decimal192.maxDivisibility)
 		formatter.roundingMode = .down
-		formatter.decimalSeparator = "." // Enfore dot notation for RETDecimal
+		formatter.decimalSeparator = "." // Enfore dot notation for Decimal192
 
 		self = tokenPricesResponse.tokens.reduce(into: [:]) { partialResult, next in
 			let trimmed = formatter.string(for: next.price) ?? ""
-			if let value = try? RETDecimal(value: trimmed) {
+			if let value = try? Decimal192(value: trimmed) {
 				partialResult[next.resourceAddress] = value
 			}
 		}

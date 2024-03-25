@@ -227,7 +227,7 @@ extension NonFungibleTokenDetails.ViewState.TokenDetails {
 			case complex
 			case url(URL)
 			case address(LedgerIdentifiable.Address)
-			case decimal(RETDecimal)
+			case decimal(Decimal192)
 			case `enum`(variant: String)
 			case id(NonFungibleLocalId)
 			case instant(Date)
@@ -282,7 +282,7 @@ private extension String {
 
 	var asDecimalDataField: ArbitraryDataFieldKind? {
 		nilIfEmpty.map {
-			if let decimal = try? RETDecimal(value: $0) {
+			if let decimal = try? Decimal192(value: $0) {
 				.decimal(decimal)
 			} else {
 				.primitive(self)

@@ -40,7 +40,7 @@ extension FungibleResourceAsset.View {
 				ResourceBalanceView(viewStore.resourceBalance, appearance: .compact)
 					.withAuxiliary(spacing: .small2) {
 						TextField(
-							RETDecimal.zero.formatted(),
+							Decimal192.zero.formatted(),
 							text: viewStore.binding(
 								get: \.transferAmountStr,
 								send: { .amountChanged($0) }

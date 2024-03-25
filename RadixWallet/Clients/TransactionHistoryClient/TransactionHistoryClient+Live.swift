@@ -101,7 +101,7 @@ extension TransactionHistoryClient {
 							throw ProgrammerError()
 						}
 
-						let amount = try RETDecimal(value: fungible.balanceChange)
+						let amount = try Decimal192(value: fungible.balanceChange)
 						guard !amount.isZero() else { continue }
 
 						// NB: The sign of the amount in the balance is made positive, negative balances are treated as withdrawals

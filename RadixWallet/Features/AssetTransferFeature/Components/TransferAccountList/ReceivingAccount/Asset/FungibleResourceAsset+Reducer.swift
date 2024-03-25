@@ -5,13 +5,13 @@ import SwiftUI
 public struct FungibleResourceAsset: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public typealias ID = String
-		static let defaultFee: RETDecimal = 1
+		static let defaultFee: Decimal192 = 1
 
 		public var id: ID {
 			resource.resourceAddress.address
 		}
 
-		public var balance: RETDecimal {
+		public var balance: Decimal192 {
 			resource.amount.nominalAmount
 		}
 
@@ -29,17 +29,17 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 		public var alert: AlertState<ViewAction.Alert>?
 
 		public var transferAmountStr: String = ""
-		public var transferAmount: RETDecimal? = nil
+		public var transferAmount: Decimal192? = nil
 
 		// Total transfer sum for the transferred resource
-		public var totalTransferSum: RETDecimal
+		public var totalTransferSum: Decimal192
 
 		public var focused: Bool = false
 
 		init(
 			resource: OnLedgerEntity.OwnedFungibleResource,
 			isXRD: Bool,
-			totalTransferSum: RETDecimal = .zero
+			totalTransferSum: Decimal192 = .zero
 		) {
 			self.resource = resource
 			self.isXRD = isXRD
@@ -60,13 +60,13 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 			case needsToPayFeeFromOtherAccount(NeedsToPayFeeFromOtherAccount)
 
 			public enum ChooseXRDAmountAlert: Hashable, Sendable {
-				case deductFee(RETDecimal)
-				case sendAll(RETDecimal)
+				case deductFee(Decimal192)
+				case sendAll(Decimal192)
 				case cancel
 			}
 
 			public enum NeedsToPayFeeFromOtherAccount: Hashable, Sendable {
-				case confirm(RETDecimal)
+				case confirm(Decimal192)
 				case cancel
 			}
 		}
@@ -82,7 +82,7 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 		case let .amountChanged(transferAmountStr):
 			state.transferAmountStr = transferAmountStr
 
-			if let value = try? RETDecimal(formattedString: transferAmountStr), !value.isNegative() {
+			if let value = try? Decimal192(formattedString: transferAmountStr), !value.isNegative() {
 				state.transferAmount = value
 			} else {
 				state.transferAmount = nil
@@ -139,7 +139,7 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 }
 
 extension AlertState where Action == FungibleResourceAsset.ViewAction.Alert {
-	fileprivate static func chooseXRDAmount(feeDeductedAmount: RETDecimal, maxAmount: RETDecimal) -> Self {
+	fileprivate static func chooseXRDAmount(feeDeductedAmount: Decimal192, maxAmount: Decimal192) -> Self {
 		AlertState(
 			title: TextState(L10n.AssetTransfer.MaxAmountDialog.title),
 			message: TextState(L10n.AssetTransfer.MaxAmountDialog.body),
@@ -161,7 +161,7 @@ extension AlertState where Action == FungibleResourceAsset.ViewAction.Alert {
 		)
 	}
 
-	fileprivate static func willNeedToPayFeeFromOtherAccount(_ amount: RETDecimal) -> Self {
+	fileprivate static func willNeedToPayFeeFromOtherAccount(_ amount: Decimal192) -> Self {
 		AlertState(
 			title: TextState(L10n.AssetTransfer.MaxAmountDialog.title),
 			message: TextState("Sending the full amount of XRD in this account will require you to pay the transaction fee from a different account"),

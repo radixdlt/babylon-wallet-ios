@@ -1,7 +1,7 @@
 // MARK: - FiatWorth
 public struct FiatWorth: Sendable, Hashable {
 	enum Worth: Sendable, Hashable {
-		case known(RETDecimal)
+		case known(Decimal192)
 		case unknown
 	}
 
@@ -38,7 +38,7 @@ extension FiatWorth.Worth {
 extension FiatWorth.Worth {
 	static let zero: Self = .known(.zero)
 
-	var value: RETDecimal? {
+	var value: Decimal192? {
 		if case let .known(value) = self {
 			return value
 		}

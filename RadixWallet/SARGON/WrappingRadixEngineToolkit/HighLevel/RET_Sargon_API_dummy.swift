@@ -69,7 +69,7 @@ extension TransactionManifest {
 	}
 
 	public func modify(
-		lockFee fee: RETDecimal = .temporaryStandardFee,
+		lockFee fee: Decimal192 = .temporaryStandardFee,
 		addressOfFeePayer: AccountAddress
 	) -> Self {
 		sargon()
@@ -78,6 +78,13 @@ extension TransactionManifest {
 	public func modify(
 		addGuarantees guarantees: [TransactionGuarantee]
 	) -> Self {
+		sargon()
+	}
+}
+
+extension ResourceAddress {
+	/// Returns the XRD resource on network identified by `networkID`.
+	public static func xrd(on networkID: NetworkID) -> Self {
 		sargon()
 	}
 }
@@ -96,18 +103,6 @@ extension Sargon {
 	}
 
 	public static func hash(data: Data) -> Data {
-		sargon()
-	}
-
-	public static func xrdAddressOfNetwork(networkId: NetworkID) -> ResourceAddress {
-		sargon()
-	}
-
-	public static func nonFungibleLocalIdAsStr(value: NonFungibleLocalId) -> String {
-		sargon()
-	}
-
-	public static func nonFungibleLocalIdFromStr(string: String) throws -> NonFungibleLocalId {
 		sargon()
 	}
 

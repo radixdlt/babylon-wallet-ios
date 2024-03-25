@@ -1,13 +1,13 @@
-// MARK: - RETDecimal
-public struct RETDecimal: DummySargon {
+// MARK: - Decimal192
+public struct Decimal192: DummySargon {
 	public init(value: String) throws {
 		sargon()
 	}
 }
 
-extension RETDecimal {
+extension Decimal192 {
 	// Used for development purposes
-	public static let temporaryStandardFee: RETDecimal = 25
+	public static let temporaryStandardFee: Decimal192 = 25
 
 	public static let maxDivisibility: UInt = 18
 
@@ -23,7 +23,7 @@ extension RETDecimal {
 		sargon()
 	}
 
-	public static var zero: RETDecimal {
+	public static var zero: Decimal192 {
 		sargon()
 	}
 
@@ -38,63 +38,63 @@ extension RETDecimal {
 }
 
 // MARK: Arithmetic operators
-extension RETDecimal {
-	public func sub(other: RETDecimal) throws -> RETDecimal {
+extension Decimal192 {
+	public func sub(other: Decimal192) throws -> Decimal192 {
 		sargon()
 	}
 
-	public func add(other: RETDecimal) throws -> RETDecimal {
+	public func add(other: Decimal192) throws -> Decimal192 {
 		sargon()
 	}
 
-	public func mul(other: RETDecimal) throws -> RETDecimal {
+	public func mul(other: Decimal192) throws -> Decimal192 {
 		sargon()
 	}
 
-	public func div(other: RETDecimal) throws -> RETDecimal {
+	public func div(other: Decimal192) throws -> Decimal192 {
 		sargon()
 	}
 
-	public func lessThan(other: RETDecimal) -> Bool {
+	public func lessThan(other: Decimal192) -> Bool {
 		sargon()
 	}
 
-	public func lessThanOrEqual(other: RETDecimal) -> Bool {
+	public func lessThanOrEqual(other: Decimal192) -> Bool {
 		sargon()
 	}
 
-	public func greaterThan(other: RETDecimal) -> Bool {
+	public func greaterThan(other: Decimal192) -> Bool {
 		sargon()
 	}
 
-	public func greaterThanOrEqual(other: RETDecimal) -> Bool {
+	public func greaterThanOrEqual(other: Decimal192) -> Bool {
 		sargon()
 	}
 }
 
 // MARK: Clamping
 
-extension RETDecimal {
-	public var clamped: RETDecimal {
+extension Decimal192 {
+	public var clamped: Decimal192 {
 		isNegative() ? .zero : self
 	}
 }
 
 // MARK: Truncation and rounding
 
-extension RETDecimal {
+extension Decimal192 {
 	/// Rounds to `decimalPlaces` decimals, in the direction of 0
-	public func floor(decimalPlaces: UInt) -> RETDecimal {
+	public func floor(decimalPlaces: UInt) -> Decimal192 {
 		sargon()
 	}
 
 	/// Rounds to `decimalPlaces` decimals, in the direction away from zero
-	public func ceil(decimalPlaces: UInt) -> RETDecimal {
+	public func ceil(decimalPlaces: UInt) -> Decimal192 {
 		sargon()
 	}
 
 	/// Rounds to `decimalPlaces` decimals
-	public func rounded(decimalPlaces: UInt = 0) -> RETDecimal {
+	public func rounded(decimalPlaces: UInt = 0) -> Decimal192 {
 		sargon()
 	}
 }
@@ -106,7 +106,7 @@ extension UInt {
 	public static let maxPlacesEngineeringNotation: UInt = 4
 }
 
-extension RETDecimal {
+extension Decimal192 {
 	/// Parse a local respecting string
 	public init(
 		formattedString: String,

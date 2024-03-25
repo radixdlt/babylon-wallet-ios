@@ -6,7 +6,7 @@ extension TXID {
 	}
 }
 
-extension RETDecimal {
+extension Decimal192 {
 	public func asDouble() -> Double {
 		sargon()
 	}

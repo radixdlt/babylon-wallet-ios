@@ -5,5 +5,5 @@ public struct StakeClaim: Sendable {
 	public let resourceAddress: ResourceAddress
 	public let ids: NonEmpty<[NonFungibleLocalId]>
 	/// The summed claim amount across ids
-	public let amount: RETDecimal
+	public let amount: Decimal192
 }

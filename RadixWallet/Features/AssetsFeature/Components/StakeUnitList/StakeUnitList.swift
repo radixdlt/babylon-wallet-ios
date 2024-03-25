@@ -316,7 +316,7 @@ extension OnLedgerEntitiesClient.OwnedStakeDetails: Identifiable {
 }
 
 extension OnLedgerEntitiesClient.OwnedStakeDetails {
-	var xrdRedemptionValue: RETDecimal {
+	var xrdRedemptionValue: Decimal192 {
 		((stakeUnitResource?.amount.nominalAmount ?? 0) * validator.xrdVaultBalance) / (stakeUnitResource?.resource.totalSupply ?? 1)
 	}
 }

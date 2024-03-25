@@ -34,7 +34,7 @@ public struct ResourceBalance: Sendable, Hashable, Identifiable {
 
 	public struct LiquidStakeUnit: Sendable, Hashable {
 		public let resource: OnLedgerEntity.Resource
-		public let amount: RETDecimal
+		public let amount: Decimal192
 		public let worth: ResourceAmount
 		public let validator: OnLedgerEntity.Validator
 		public var guarantee: TransactionGuarantee?
@@ -94,14 +94,14 @@ public struct ResourceBalance: Sendable, Hashable, Identifiable {
 
 	public struct Amount: Sendable, Hashable {
 		public let amount: ResourceAmount
-		public let guaranteed: RETDecimal?
+		public let guaranteed: Decimal192?
 
-		init(_ amount: ResourceAmount, guaranteed: RETDecimal? = nil) {
+		init(_ amount: ResourceAmount, guaranteed: Decimal192? = nil) {
 			self.amount = amount
 			self.guaranteed = guaranteed
 		}
 
-		init(_ amount: RETDecimal, guaranteed: RETDecimal? = nil) {
+		init(_ amount: Decimal192, guaranteed: Decimal192? = nil) {
 			self.init(.init(nominalAmount: amount), guaranteed: guaranteed)
 		}
 	}

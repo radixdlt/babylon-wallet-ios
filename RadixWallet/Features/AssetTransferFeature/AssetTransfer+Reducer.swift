@@ -128,7 +128,7 @@ extension AssetTransfer.State {
 extension AssetTransfer {
 	private struct InvolvedFungibleResource: Identifiable {
 		struct PerAccountAmount: Identifiable {
-			var amount: RETDecimal
+			var amount: Decimal192
 			let recipient: AssetsTransfersRecipient
 			typealias ID = AccountAddress
 			var id: ID {
@@ -141,7 +141,7 @@ extension AssetTransfer {
 		}
 
 		let address: ResourceAddress
-		let totalTransferAmount: RETDecimal
+		let totalTransferAmount: Decimal192
 		let divisibility: Int?
 		var accounts: IdentifiedArrayOf<PerAccountAmount>
 	}

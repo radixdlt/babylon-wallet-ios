@@ -864,7 +864,7 @@ extension ResourceBalance {
 	}
 
 	/// The transferred amount, for a fungible resource
-	public var fungibleTransferAmount: RETDecimal? {
+	public var fungibleTransferAmount: Decimal192? {
 		switch details {
 		case let .fungible(fungible):
 			fungible.amount.nominalAmount
@@ -989,9 +989,9 @@ extension ReviewedTransaction {
 				return selected.validateBalance(forFee: transactionFee)
 			}
 
-			let xrdAddress = Sargon.xrdAddressOfNetwork(networkId: networkID)
+			let xrdAddress = ResourceAddress.xrd(on: networkID)
 
-			let xrdTotalTransfer: RETDecimal = feePayerWithdraws.reduce(.zero) { partialResult, resource in
+			let xrdTotalTransfer: Decimal192 = feePayerWithdraws.reduce(.zero) { partialResult, resource in
 				if case let .fungible(resourceAddress, indicator) = resource, resourceAddress == xrdAddress {
 					return (try? partialResult.add(other: indicator.amount)) ?? partialResult
 				}

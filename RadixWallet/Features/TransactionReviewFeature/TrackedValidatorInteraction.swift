@@ -4,7 +4,7 @@ import Foundation
 public protocol TrackedValidatorInteraction {
 	var validatorAddress: ValidatorAddress { get }
 	var liquidStakeUnitAddress: ResourceAddress { get }
-	var liquidStakeUnitAmount: RETDecimal { get set }
+	var liquidStakeUnitAmount: Decimal192 { get set }
 	mutating func add(_ other: Self)
 }
 

@@ -14,5 +14,5 @@ public struct UnstakeDataEntry: DummySargon {
 // MARK: - UnstakeData
 public struct UnstakeData: DummySargon {
 	public var claimEpoch: Epoch
-	public var claimAmount: RETDecimal
+	public var claimAmount: Decimal192
 }

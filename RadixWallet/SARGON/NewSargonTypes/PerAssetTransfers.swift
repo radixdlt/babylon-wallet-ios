@@ -21,7 +21,7 @@ public struct PerAssetFungibleResource: Sendable, Hashable {
 // MARK: - PerAssetFungibleTransfer
 public struct PerAssetFungibleTransfer: Sendable, Hashable {
 	public let useTryDepositOrAbort: Bool
-	public let amount: RETDecimal
+	public let amount: Decimal192
 	public let recipient: AssetsTransfersRecipient
 }
 

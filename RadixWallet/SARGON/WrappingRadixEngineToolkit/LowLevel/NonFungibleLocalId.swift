@@ -15,11 +15,11 @@ public enum NonFungibleLocalId: DummySargon {
 	}
 
 	public static func from(stringFormat: String) throws -> Self {
-		try Sargon.nonFungibleLocalIdFromStr(string: stringFormat)
+		sargon()
 	}
 
 	public func toString() throws -> String {
-		Sargon.nonFungibleLocalIdAsStr(value: self)
+		sargon()
 	}
 
 	public func toUserFacingString() -> String {

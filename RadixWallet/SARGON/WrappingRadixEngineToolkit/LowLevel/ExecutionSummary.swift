@@ -55,16 +55,16 @@ public struct ExecutionSummary: DummySargon {
 
 // MARK: - FeeSummary
 public enum FeeSummary: DummySargon {
-	public var executionCost: RETDecimal { sargon() }
-	public var finalizationCost: RETDecimal { sargon() }
-	public var storageExpansionCost: RETDecimal { sargon() }
-	public var royaltyCost: RETDecimal { sargon() }
+	public var executionCost: Decimal192 { sargon() }
+	public var finalizationCost: Decimal192 { sargon() }
+	public var storageExpansionCost: Decimal192 { sargon() }
+	public var royaltyCost: Decimal192 { sargon() }
 }
 
 // MARK: - FeeLocks
 public enum FeeLocks: DummySargon {
-	public var lock: RETDecimal { sargon() }
-	public var contingentLock: RETDecimal { sargon() }
+	public var lock: Decimal192 { sargon() }
+	public var contingentLock: Decimal192 { sargon() }
 }
 
 // MARK: - ReservedInstruction

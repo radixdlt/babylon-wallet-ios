@@ -23,7 +23,7 @@ extension OnLedgerEntitiesClient {
 		entities: TransactionReview.ResourcesInfo = [:],
 		resourceAssociatedDapps: TransactionReview.ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
-		defaultDepositGuarantee: RETDecimal = 1
+		defaultDepositGuarantee: Decimal192 = 1
 	) async throws -> ResourceBalance {
 		let amount = resourceQuantifier.amount
 		let resourceAddress = resource.resourceAddress
@@ -71,7 +71,7 @@ extension OnLedgerEntitiesClient {
 
 	private func poolUnit(
 		_ resource: OnLedgerEntity.Resource,
-		amount: RETDecimal,
+		amount: Decimal192,
 		poolContributions: [some TrackedPoolInteraction] = [],
 		entities: TransactionReview.ResourcesInfo = [:],
 		resourceAssociatedDapps: TransactionReview.ResourceAssociatedDapps? = nil,
@@ -134,12 +134,12 @@ extension OnLedgerEntitiesClient {
 
 	private func liquidStakeUnit(
 		_ resource: OnLedgerEntity.Resource,
-		amount: RETDecimal,
+		amount: Decimal192,
 		validator: OnLedgerEntity.Validator,
 		validatorStakes: [TrackedValidatorStake] = [],
 		guarantee: TransactionGuarantee?
 	) async throws -> ResourceBalance {
-		let worth: RETDecimal
+		let worth: Decimal192
 		if validatorStakes.isEmpty {
 			guard let totalSupply = resource.totalSupply, totalSupply.isPositive() else {
 				throw MissingPositiveTotalSupply()
