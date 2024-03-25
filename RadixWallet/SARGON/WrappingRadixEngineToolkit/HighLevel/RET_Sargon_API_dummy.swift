@@ -109,13 +109,6 @@ extension Sargon {
 	public static func debugPrintCompiledNotarizedIntent(data: Data) -> String {
 		sargon()
 	}
-
-	public static func deriveVirtualIdentityAddressFromPublicKey(
-		publicKey: SLIP10.PublicKey,
-		networkId: NetworkID
-	) throws -> IdentityAddress {
-		sargon()
-	}
 }
 
 extension LegacyOlympiaAccountAddress {
@@ -129,6 +122,15 @@ extension AccountAddress {
 		sargon()
 	}
 
+	public init(
+		publicKey: SLIP10.PublicKey,
+		networkId: NetworkID
+	) {
+		sargon()
+	}
+}
+
+extension IdentityAddress {
 	public init(
 		publicKey: SLIP10.PublicKey,
 		networkId: NetworkID

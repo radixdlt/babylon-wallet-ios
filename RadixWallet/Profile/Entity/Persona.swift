@@ -132,7 +132,7 @@ extension Profile.Network.Persona {
 			throw WrongEntityInDerivationPath()
 		}
 
-		return try Sargon.deriveVirtualIdentityAddressFromPublicKey(
+		return EntityAddress(
 			publicKey: factorInstance.publicKey,
 			networkId: networkID
 		)
