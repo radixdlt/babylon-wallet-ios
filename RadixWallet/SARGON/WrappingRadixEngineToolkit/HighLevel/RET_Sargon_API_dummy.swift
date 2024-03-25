@@ -98,11 +98,13 @@ extension Sargon {
 		SargonBuildInformation()
 	}
 
-	public static func hash(data: Data) -> Data {
+	public static func debugPrintCompiledNotarizedIntent(data: Data) -> String {
 		sargon()
 	}
+}
 
-	public static func debugPrintCompiledNotarizedIntent(data: Data) -> String {
+extension Data {
+	func hash() -> Data {
 		sargon()
 	}
 }

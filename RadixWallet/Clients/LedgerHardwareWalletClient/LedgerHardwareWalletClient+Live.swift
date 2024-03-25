@@ -160,7 +160,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					origin: request.origin,
 					dAppDefinitionAddress: request.dAppDefinitionAddress
 				))
-				let hash = try Sargon.hash(data: rolaPayload.payloadToHashAndSign)
+				let hash = rolaPayload.payloadToHashAndSign.hash()
 				return try await sign(
 					signers: request.signers,
 					expectedHashedMessage: hash.data

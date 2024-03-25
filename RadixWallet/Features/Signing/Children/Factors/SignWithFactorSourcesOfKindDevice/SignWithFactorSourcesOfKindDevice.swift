@@ -48,7 +48,7 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 		state: State
 	) async throws -> Set<SignatureOfEntity> {
 		let dataToSign: Data = switch state.signingPurposeWithPayload {
-		case let .signAuth(auth): try Sargon.hash(data: auth.payloadToHashAndSign)
+		case let .signAuth(auth): auth.payloadToHashAndSign.hash()
 		case let .signTransaction(_, intent, _):
 			try intent.intentHash().bytes().data
 		}
