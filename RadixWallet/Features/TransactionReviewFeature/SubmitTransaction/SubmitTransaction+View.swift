@@ -29,6 +29,19 @@ extension SubmitTransaction.State.TXStatus {
 			""
 		}
 	}
+
+	var errorTitle: String {
+		switch self {
+		case .notYetSubmitted, .submitting, .submitted, .committedSuccessfully:
+			"" // Not applicable
+		case .temporarilyRejected:
+			L10n.TransactionStatus.Error.title
+		case .permanentlyRejected:
+			L10n.TransactionStatus.Rejected.title
+		case .failed:
+			L10n.TransactionStatus.Failed.title
+		}
+	}
 }
 
 // MARK: - SubmitTransaction.View
@@ -57,7 +70,7 @@ extension SubmitTransaction {
 					VStack(spacing: .medium2) {
 						if viewStore.status.failed {
 							Image(asset: AssetResource.warningError)
-							Text(L10n.TransactionStatus.Failure.title)
+							Text(viewStore.status.errorTitle)
 								.foregroundColor(.app.gray1)
 								.textStyle(.sheetTitle)
 								.multilineTextAlignment(.center)
@@ -84,10 +97,11 @@ extension SubmitTransaction {
 
 						HStack {
 							Text(L10n.TransactionReview.SubmitTransaction.txID)
+								.foregroundColor(.app.gray1)
 							AddressView(.identifier(.transaction(viewStore.txID)))
+								.foregroundColor(.app.blue1)
 						}
-						.foregroundColor(.app.gray1)
-						.textStyle(.body1Regular)
+						.textStyle(.body1Header)
 					}
 					.padding(.horizontal, .medium2)
 					.padding(.bottom, .medium3)
@@ -96,7 +110,7 @@ extension SubmitTransaction {
 					viewStore.send(.appeared)
 				}
 				.alert(store: store.scope(state: \.$dismissTransactionAlert, action: { .view(.dismissTransactionAlert($0)) }))
-				.interactiveDismissDisabled(true)
+				.interactiveDismissDisabled(viewStore.dismissalDisabled)
 				.presentationDragIndicator(.visible)
 				.presentationDetents([.fraction(0.66)])
 				.presentationBackground(.blur)

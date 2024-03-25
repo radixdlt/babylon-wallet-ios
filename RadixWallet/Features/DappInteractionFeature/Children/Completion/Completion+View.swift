@@ -53,10 +53,11 @@ extension Completion {
 						if let txID = viewStore.txID {
 							HStack {
 								Text(L10n.TransactionReview.SubmitTransaction.txID)
+									.foregroundColor(.app.gray1)
 								AddressView(.identifier(.transaction(txID)))
+									.foregroundColor(.app.blue1)
 							}
-							.foregroundColor(.app.gray1)
-							.textStyle(.body1Regular)
+							.textStyle(.body1Header)
 						}
 					}
 					.padding(.horizontal, .medium2)
