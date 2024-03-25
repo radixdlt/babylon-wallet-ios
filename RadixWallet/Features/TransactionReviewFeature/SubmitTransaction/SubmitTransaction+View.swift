@@ -97,10 +97,11 @@ extension SubmitTransaction {
 
 						HStack {
 							Text(L10n.TransactionReview.SubmitTransaction.txID)
+								.foregroundColor(.app.gray1)
 							AddressView(.identifier(.transaction(viewStore.txID)))
+								.foregroundColor(.app.blue1)
 						}
-						.foregroundColor(.app.gray1)
-						.textStyle(.body1Regular)
+						.textStyle(.body1Header)
 					}
 					.padding(.horizontal, .medium2)
 					.padding(.bottom, .medium3)
@@ -109,7 +110,7 @@ extension SubmitTransaction {
 					viewStore.send(.appeared)
 				}
 				.alert(store: store.scope(state: \.$dismissTransactionAlert, action: { .view(.dismissTransactionAlert($0)) }))
-				.interactiveDismissDisabled(true)
+				.interactiveDismissDisabled(viewStore.dismissalDisabled)
 				.presentationDragIndicator(.visible)
 				.presentationDetents([.fraction(0.66)])
 				.presentationBackground(.blur)
