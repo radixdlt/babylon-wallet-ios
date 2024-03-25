@@ -5,12 +5,19 @@ import SwiftUI
 public struct AccountPreferences: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var account: Profile.Network.Account
+		public var faucetButtonState: ControlState
+		public var address: AccountAddress { account.address }
+		public var isOnMainnet: Bool { account.networkID == .mainnet }
 
 		@PresentationState
 		var destination: Destination.State? = nil
 
-		public init(account: Profile.Network.Account) {
+		public init(
+			account: Profile.Network.Account,
+			faucetButtonState: ControlState = .enabled
+		) {
 			self.account = account
+			self.faucetButtonState = faucetButtonState
 		}
 	}
 
@@ -21,10 +28,15 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case qrCodeButtonTapped
 		case rowTapped(AccountPreferences.Section.SectionRow)
 		case hideAccountTapped
+		case faucetButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case accountUpdated(Profile.Network.Account)
+		case isAllowedToUseFaucet(TaskResult<Bool>)
+		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState = .enabled)
+		case refreshAccountCompleted(TaskResult<OnLedgerEntity.Account>)
+		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -75,6 +87,9 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.entitiesVisibilityClient) var entitiesVisibilityClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	@Dependency(\.faucetClient) var faucetClient
+	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
+	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
@@ -97,6 +112,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 					await send(.internal(.accountUpdated(accountUpdate)))
 				}
 			}
+			.merge(with: loadIsAllowedToUseFaucet(&state))
 
 		case .qrCodeButtonTapped:
 			state.destination = .showQR(.init(accountAddress: state.account.address))
@@ -115,6 +131,11 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 				]
 			))
 			return .none
+
+		case .faucetButtonTapped:
+			return call(buttonState: \.faucetButtonState, into: &state) {
+				try await faucetClient.getFreeXRD(.init(recipientAccountAddress: $0))
+			}
 		}
 	}
 
@@ -123,6 +144,32 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		case let .accountUpdated(updated):
 			state.account = updated
 			return .none
+
+		case let .isAllowedToUseFaucet(.success(value)):
+			state.faucetButtonState = value ? .enabled : .disabled
+			return .none
+
+		case let .isAllowedToUseFaucet(.failure(error)):
+			state.faucetButtonState = .disabled
+			errorQueue.schedule(error)
+			return .none
+
+		case let .hideLoader(controlStateKeyPath):
+			state[keyPath: controlStateKeyPath] = .enabled
+			return .none
+
+		case .refreshAccountCompleted:
+			state.faucetButtonState = .disabled
+			return .none
+
+		case let .callDone(controlStateKeyPath, changeTo):
+			if controlStateKeyPath == \State.faucetButtonState {
+				// NB: This call to update might be superfluous, since after any transaction we fetch all accounts
+				return updateAccountPortfolio(state).concatenate(with: loadIsAllowedToUseFaucet(&state))
+			} else {
+				state[keyPath: controlStateKeyPath] = changeTo
+				return .none
+			}
 		}
 	}
 
@@ -163,6 +210,43 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 				break
 			}
 			return .none
+		}
+	}
+
+	private func call(
+		buttonState: WritableKeyPath<State, ControlState>,
+		into state: inout State,
+		onSuccess: ControlState = .enabled,
+		call: @escaping @Sendable (AccountAddress) async throws -> Void
+	) -> Effect<Action> {
+		state[keyPath: buttonState] = .loading(.local)
+		return .run { [address = state.address] send in
+			try await call(address)
+			await send(.internal(.callDone(updateControlState: buttonState, changeTo: onSuccess)))
+		} catch: { error, send in
+			await send(.internal(.hideLoader(updateControlState: buttonState)))
+			if !Task.isCancelled {
+				errorQueue.schedule(error)
+			}
+		}
+	}
+    
+    private func updateAccountPortfolio(_ state: State) -> Effect<Action> {
+        .run { [address = state.address] send in
+            await send(.internal(.refreshAccountCompleted(
+                TaskResult { try await accountPortfoliosClient.fetchAccountPortfolio(address, true).account }
+            )))
+        }
+    }
+
+	private func loadIsAllowedToUseFaucet(_ state: inout State) -> Effect<Action> {
+		state.faucetButtonState = .loading(.local)
+		return .run { [address = state.address] send in
+			await send(.internal(.isAllowedToUseFaucet(
+				TaskResult {
+					await faucetClient.isAllowedToUseFaucet(address)
+				}
+			)))
 		}
 	}
 }
