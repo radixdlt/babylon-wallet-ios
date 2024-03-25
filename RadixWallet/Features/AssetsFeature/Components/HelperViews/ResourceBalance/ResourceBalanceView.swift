@@ -255,7 +255,7 @@ extension ResourceBalanceView {
 			VStack(alignment: .leading, spacing: .zero) {
 				FungibleView(
 					thumbnail: .poolUnit(viewState.poolIcon),
-					caption1: viewState.poolName ?? L10n.TransactionReview.poolUnits,
+					caption1: viewState.poolName ?? "",
 					caption2: viewState.dAppName.wrappedValue?.flatMap { $0 },
 					fallback: nil,
 					amount: viewState.amount,
