@@ -110,23 +110,29 @@ extension Sargon {
 		sargon()
 	}
 
-	public static func deriveOlympiaMainnetAccountAddressFromPublicKey(
-		publicKey: K1.PublicKey
-	) throws -> LegacyOlympiaAccountAddress {
-		sargon()
-	}
-
-	public static func deriveVirtualAccountAddressFromPublicKey(
-		publicKey: SLIP10.PublicKey,
-		networkId: NetworkID
-	) throws -> AccountAddress {
-		sargon()
-	}
-
 	public static func deriveVirtualIdentityAddressFromPublicKey(
 		publicKey: SLIP10.PublicKey,
 		networkId: NetworkID
 	) throws -> IdentityAddress {
+		sargon()
+	}
+}
+
+extension LegacyOlympiaAccountAddress {
+	public init(publicKey: K1.PublicKey) {
+		sargon()
+	}
+}
+
+extension AccountAddress {
+	public func wasMigratedFromLegacyOlympia(address legacy: LegacyOlympiaAccountAddress) -> Bool {
+		sargon()
+	}
+
+	public init(
+		publicKey: SLIP10.PublicKey,
+		networkId: NetworkID
+	) {
 		sargon()
 	}
 }

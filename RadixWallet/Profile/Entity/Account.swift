@@ -120,8 +120,8 @@ extension Profile.Network.Account {
 	public static func deriveVirtualAddress(
 		networkID: NetworkID,
 		factorInstance: HierarchicalDeterministicFactorInstance
-	) throws -> EntityAddress {
-		try Sargon.deriveVirtualAccountAddressFromPublicKey(
+	) -> EntityAddress {
+		EntityAddress(
 			publicKey: factorInstance.publicKey,
 			networkId: networkID
 		)

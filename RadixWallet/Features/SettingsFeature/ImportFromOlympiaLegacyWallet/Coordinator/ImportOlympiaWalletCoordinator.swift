@@ -581,8 +581,8 @@ extension ImportOlympiaWalletCoordinator {
 		networkID: NetworkID,
 		existingAccounts: Int
 	) throws -> NonEmpty<[MigratableAccount]> {
-		let result = try scannedAccounts.enumerated().map { index, account in
-			let babylonAddress: AccountAddress = try Sargon.deriveVirtualAccountAddressFromPublicKey(
+		let result = scannedAccounts.enumerated().map { index, account in
+			let babylonAddress = AccountAddress(
 				publicKey: .ecdsaSecp256k1(account.publicKey),
 				networkId: networkID
 			)

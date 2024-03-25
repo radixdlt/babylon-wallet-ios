@@ -7,7 +7,7 @@ extension AccountAddress {
 	public static func random(
 		networkID: NetworkID = Radix.Gateway.default.network.id
 	) -> Self {
-		try! Sargon.deriveVirtualAccountAddressFromPublicKey(
+		Self(
 			publicKey: SLIP10.PublicKey.eddsaEd25519(Curve25519.PrivateKey().publicKey),
 			networkId: networkID
 		)
