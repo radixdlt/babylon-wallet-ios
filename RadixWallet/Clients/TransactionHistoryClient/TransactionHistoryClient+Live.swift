@@ -9,11 +9,39 @@ extension TransactionHistoryClient {
 		struct CorruptTimestamp: Error { let roundTimestamd: String }
 		struct MissingIntentHash: Error {}
 
+		let dateFormatter = TimestampFormatter()
+
+		@Sendable
+		func getFirstTransactionDate(_ account: AccountAddress) async throws -> Date? {
+			@Dependency(\.cacheClient) var cacheClient
+
+			if let date = try? cacheClient.load(Date.self, .dateOfFirstTransaction(account)) as? Date {
+				return date
+			}
+
+			let response = try await gatewayAPIClient.streamTransactions(
+				.init(
+					limitPerPage: 1,
+					affectedGlobalEntitiesFilter: [account.address],
+					order: .asc
+				)
+			)
+
+			guard let info = response.items.first else { return nil }
+
+			guard let date = dateFormatter.date(from: info.roundTimestamp) ?? info.confirmedAt else {
+				throw CorruptTimestamp(roundTimestamd: info.roundTimestamp)
+			}
+
+			cacheClient.save(date, .dateOfFirstTransaction(account))
+
+			return date
+		}
+
 		@Sendable
 		func getTransactionHistory(_ request: TransactionHistoryRequest) async throws -> TransactionHistoryResponse {
 			let response = try await gatewayAPIClient.streamTransactions(request.gatewayRequest)
 			let account = request.account
-			let networkID = try account.networkID()
 			let resourcesForPeriod = try Set(response.items.flatMap { try $0.balanceChanges.map(extractResourceAddresses) ?? [] })
 			let resourcesNeededOverall = request.allResourcesAddresses.union(resourcesForPeriod)
 			let existingResources = request.resources.ids
@@ -41,25 +69,26 @@ extension TransactionHistoryClient {
 				let address = try ResourceAddress(validatingAddress: changes.resourceAddress)
 
 				// The resource should have been fetched
-				guard let resource = keyedResources[id: address] else { throw ProgrammerError() }
-
-				if let validator = await onLedgerEntitiesClient.isStakeClaimNFT(resource) {
-					return try [onLedgerEntitiesClient.stakeClaim(resource, stakeClaimValidator: validator, unstakeData: [], tokens: [])]
-				} else {
-					let nonFungibleIDs = try extractNonFungibleIDs(type, from: changes)
-					return try nonFungibleIDs
-						.map { id in
-							// All tokens should have been fetched earlier
-							guard let token = keyedNonFungibleTokens[id: id] else { throw ProgrammerError() }
-							return token
-						}
-						.map { token in
-							ResourceBalance(resource: resource, details: .nonFungible(token))
-						}
+				guard let resource = keyedResources[id: address] else {
+					throw ProgrammerError()
 				}
-			}
 
-			let dateFormatter = TimestampFormatter()
+				// Will be non-nil if this is a stake claim NFT (or multiple)
+				let stakeClaimNFT = try await onLedgerEntitiesClient.isStakeClaimNFT(resource)
+					.map { validator in
+						try onLedgerEntitiesClient.stakeClaim(resource, stakeClaimValidator: validator, unstakeData: [], tokens: [])
+					}
+
+				return try extractNonFungibleIDs(type, from: changes)
+					.map { id in
+						if let stakeClaimNFT {
+							return stakeClaimNFT
+						} else {
+							guard let token = keyedNonFungibleTokens[id: id] else { throw ProgrammerError() }
+							return ResourceBalance(resource: resource, details: .nonFungible(token))
+						}
+					}
+			}
 
 			func transaction(for info: GatewayAPI.CommittedTransactionInfo) async throws -> TransactionHistoryItem {
 				guard let time = dateFormatter.date(from: info.roundTimestamp) ?? info.confirmedAt else {
@@ -69,7 +98,7 @@ extension TransactionHistoryClient {
 					throw MissingIntentHash()
 				}
 
-				let txid = try TXID.fromStr(string: hash, networkId: networkID)
+				let txid = try TXID.fromStr(string: hash, networkId: account.networkID)
 
 				let manifestClass = info.manifestClasses?.first
 
@@ -108,7 +137,7 @@ extension TransactionHistoryClient {
 						let resource = try await onLedgerEntitiesClient.fungibleResourceBalance(
 							baseResource,
 							resourceQuantifier: .guaranteed(amount: amount.abs()),
-							networkID: networkID
+							networkID: account.networkID
 						)
 
 						if amount.isNegative() {
@@ -143,20 +172,19 @@ extension TransactionHistoryClient {
 				items.append(transactionItem)
 			}
 
-			if !request.parameters.downwards {
+			if request.parameters.direction == .up {
 				items.reverse()
 			}
 
 			return .init(
-				parameters: request.parameters,
 				nextCursor: response.nextCursor,
-				totalCount: response.totalCount,
 				resources: keyedResources,
 				items: items
 			)
 		}
 
 		return TransactionHistoryClient(
+			getFirstTransactionDate: getFirstTransactionDate,
 			getTransactionHistory: getTransactionHistory
 		)
 	}
@@ -211,12 +239,12 @@ extension TransactionHistoryRequest {
 			atLedgerState: .init(timestamp: parameters.period.upperBound),
 			fromLedgerState: .init(timestamp: parameters.period.lowerBound),
 			cursor: cursor,
-			limitPerPage: 25,
+			limitPerPage: 20,
 			manifestResourcesFilter: manifestResourcesFilter(parameters.filters),
 			affectedGlobalEntitiesFilter: [account.address],
 			eventsFilter: eventsFilter(parameters.filters, account: account),
 			manifestClassFilter: manifestClassFilter(parameters.filters),
-			order: parameters.downwards ? .desc : .asc,
+			order: parameters.direction == .down ? .desc : .asc,
 			optIns: .init(balanceChanges: true)
 		)
 	}
@@ -237,7 +265,7 @@ extension TransactionHistoryRequest {
 		filters
 			.compactMap(\.transactionType)
 			.first
-			.map { .init(_class: $0, matchOnlyMostSpecific: false) }
+			.map { .init(_class: $0, matchOnlyMostSpecific: true) }
 	}
 
 	private func manifestResourcesFilter(_ filters: [TransactionFilter]) -> [String]? {
@@ -248,8 +276,8 @@ extension TransactionHistoryRequest {
 }
 
 extension SpecificAddress {
-	public func networkID() throws -> NetworkID {
-//		try .init(intoEngine().networkId())
+	public var networkID: NetworkID {
+//		(try? .init(intoEngine().networkId())) ?? .mainnet
 		sargon()
 	}
 }

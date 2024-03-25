@@ -15,20 +15,21 @@ public struct TruncationTextMask: ViewModifier {
 						Rectangle()
 						HStack(spacing: 0) {
 							Rectangle()
+
 							HStack(spacing: 0) {
 								LinearGradient(
 									gradient: Gradient(stops: [
 										Gradient.Stop(color: .black, location: 0),
-										Gradient.Stop(color: .clear, location: 0.9),
+										Gradient.Stop(color: .clear, location: 1),
 									]),
 									startPoint: layoutDirection == .rightToLeft ? .trailing : .leading,
 									endPoint: layoutDirection == .rightToLeft ? .leading : .trailing
 								)
-								.frame(width: size.width, height: size.height)
+								.frame(width: .medium1, height: size.height)
 
 								Rectangle()
 									.foregroundColor(.clear)
-									.frame(width: size.width)
+									.frame(width: size.width, height: size.height)
 							}
 						}
 						.frame(height: size.height)

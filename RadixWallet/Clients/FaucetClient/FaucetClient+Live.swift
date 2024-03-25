@@ -72,6 +72,7 @@ extension FaucetClient: DependencyKey {
 		let getFreeXRD: GetFreeXRD = { faucetRequest in
 
 			let accountAddress = faucetRequest.recipientAccountAddress
+
 			guard let epochsAndMaybeCurrent = await isAllowedToUseFaucetIfSoGetEpochs(
 				accountAddress: accountAddress
 			) else {
@@ -80,7 +81,7 @@ extension FaucetClient: DependencyKey {
 			}
 
 			let networkID = await gatewaysClient.getCurrentNetworkID()
-			let networkIDOfAddress = try accountAddress.networkID()
+			let networkIDOfAddress = try accountAddress.networkID
 			assert(networkIDOfAddress == networkID)
 			let manifest = try TransactionManifest.faucet(
 				includeLockFeeInstruction: true,

@@ -385,7 +385,7 @@ extension TransactionReview {
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
-		var withdrawals: [Account: [ResourceBalance]] = [:]
+		var withdrawals: [Account: IdentifiedArrayOf<Transfer>] = [:]
 
 		for (accountAddress, resources) in accountWithdraws {
 			let account = try userAccounts.account(for: .init(validatingAddress: accountAddress))
@@ -400,6 +400,7 @@ extension TransactionReview {
 					type: .exact
 				)
 			}
+			.map(\.asIdentified)
 
 			withdrawals[account, default: []].append(contentsOf: transfers)
 		}
@@ -407,8 +408,9 @@ extension TransactionReview {
 		guard !withdrawals.isEmpty else { return nil }
 
 		let withdrawalAccounts = withdrawals.map {
-			TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value))
-		}.asIdentifiable()
+			TransactionReviewAccount.State(account: $0.key, transfers: $0.value)
+		}
+		.asIdentifiable()
 
 		return .init(accounts: withdrawalAccounts, enableCustomizeGuarantees: false)
 	}
@@ -426,7 +428,7 @@ extension TransactionReview {
 	) async throws -> TransactionReviewAccounts.State? {
 		let defaultDepositGuarantee = await appPreferencesClient.getPreferences().transaction.defaultDepositGuarantee
 
-		var deposits: [Account: [ResourceBalance]] = [:]
+		var deposits: [Account: IdentifiedArrayOf<Transfer>] = [:]
 
 		for (accountAddress, accountDeposits) in accountDeposits {
 			let account = try userAccounts.account(for: .init(validatingAddress: accountAddress))
@@ -444,13 +446,14 @@ extension TransactionReview {
 					defaultDepositGuarantee: defaultDepositGuarantee
 				)
 			}
+			.map(\.asIdentified)
 
 			deposits[account, default: []].append(contentsOf: transfers)
 		}
 
 		let depositAccounts = deposits
 			.filter { !$0.value.isEmpty }
-			.map { TransactionReviewAccount.State(account: $0.key, transfers: .init(uniqueElements: $0.value)) }
+			.map { TransactionReviewAccount.State(account: $0.key, transfers: $0.value) }
 			.asIdentifiable()
 
 		guard !depositAccounts.isEmpty else { return nil }

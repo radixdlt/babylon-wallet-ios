@@ -87,6 +87,10 @@ extension ResourceAddress {
 	public static func xrd(on networkID: NetworkID) -> Self {
 		sargon()
 	}
+
+	public var isXRD: Bool {
+		sargon()
+	}
 }
 
 extension Sargon {

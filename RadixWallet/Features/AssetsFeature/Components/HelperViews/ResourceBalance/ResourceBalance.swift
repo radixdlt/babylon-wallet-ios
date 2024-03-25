@@ -1,19 +1,17 @@
-// MARK: - ResourceBalance
-public struct ResourceBalance: Sendable, Hashable, Identifiable {
-	public var id: AnyHashable { _id?.wrapped ?? .init(self) }
-	private let _id: SendableAnyHashable?
+public typealias IDResourceBalance = Identified<Tagged<ResourceBalance, UUID>, ResourceBalance>
 
+extension ResourceBalance {
+	public var asIdentified: IDResourceBalance {
+		.init(self, id: .init())
+	}
+}
+
+// MARK: - ResourceBalance
+public struct ResourceBalance: Sendable, Hashable {
 	public let resource: OnLedgerEntity.Resource
 	public var details: Details
 
-	public init(resource: OnLedgerEntity.Resource, details: Details, id: some Hashable & Sendable) {
-		self._id = .init(wrapped: id)
-		self.resource = resource
-		self.details = details
-	}
-
 	public init(resource: OnLedgerEntity.Resource, details: Details) {
-		self._id = nil
 		self.resource = resource
 		self.details = details
 	}

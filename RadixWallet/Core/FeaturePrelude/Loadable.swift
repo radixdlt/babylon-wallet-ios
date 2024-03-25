@@ -292,10 +292,6 @@ extension Loadable {
         concat(other).map(join)
     }
 
-    public func reduce<Element>(_ join: (Element) -> Void) -> Void where Value == Array<Element> {
-
-    }
-
     public mutating func mutateValue(_ mutate: (inout Value) -> Void) {
         switch self {
         case .idle, .loading, .failure:

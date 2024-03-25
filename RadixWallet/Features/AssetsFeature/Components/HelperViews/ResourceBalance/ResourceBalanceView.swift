@@ -152,7 +152,7 @@ public struct ResourceBalanceView: View {
 			case let .poolUnit(viewState):
 				PoolUnit(viewState: viewState, compact: compact, isSelected: isSelected)
 			case let .stakeClaimNFT(viewState):
-				StakeClaimNFT(viewState: viewState, background: .white, compact: compact, onTap: { _ in })
+				StakeClaimNFT(viewState: viewState, appearance: .standalone, compact: compact, onTap: { _ in })
 			}
 
 			if !delegateSelection, let isSelected {
@@ -219,6 +219,10 @@ extension ResourceBalanceView {
 		public let compact: Bool
 		public let isSelected: Bool?
 
+		private var fungible: ResourceBalance.ViewState.Fungible {
+			.xrd(balance: viewState.worth, network: viewState.address.networkID)
+		}
+
 		public var body: some View {
 			VStack(alignment: .leading, spacing: .medium3) {
 				FungibleView(
@@ -237,7 +241,7 @@ extension ResourceBalanceView {
 							.textStyle(.body2HighImportance)
 							.foregroundColor(.app.gray2)
 
-						ResourceBalanceView(.fungible(.xrd(balance: viewState.worth)), appearance: .compact(border: true))
+						ResourceBalanceView(.fungible(fungible), appearance: .compact(border: true))
 					}
 					.padding(.top, .small2)
 				}
@@ -255,7 +259,7 @@ extension ResourceBalanceView {
 			VStack(alignment: .leading, spacing: .zero) {
 				FungibleView(
 					thumbnail: .poolUnit(viewState.poolIcon),
-					caption1: viewState.poolName ?? L10n.TransactionReview.poolUnits,
+					caption1: viewState.poolName,
 					caption2: viewState.dAppName.wrappedValue?.flatMap { $0 },
 					fallback: nil,
 					amount: viewState.amount,
@@ -282,10 +286,15 @@ extension ResourceBalanceView {
 	public struct StakeClaimNFT: View {
 		@Environment(\.resourceBalanceHideDetails) var hideDetails
 		public let viewState: ResourceBalance.ViewState.StakeClaimNFT
-		public let background: Color
+		public let appearance: Appearance
 		public let compact: Bool
 		public let onTap: (OnLedgerEntitiesClient.StakeClaim) -> Void
 		public var onClaimAllTapped: (() -> Void)? = nil
+
+		public enum Appearance {
+			case standalone
+			case transactionReview
+		}
 
 		public var body: some View {
 			VStack(alignment: .leading, spacing: .zero) {
@@ -306,7 +315,22 @@ extension ResourceBalanceView {
 					.padding(.top, .small2)
 				}
 			}
+			.padding(padding)
 			.background(background)
+		}
+
+		private var padding: CGFloat {
+			switch appearance {
+			case .standalone: .zero
+			case .transactionReview: .medium3
+			}
+		}
+
+		private var background: Color {
+			switch appearance {
+			case .standalone: .white
+			case .transactionReview: .app.gray5
+			}
 		}
 
 		public struct Tokens: View {
@@ -380,9 +404,13 @@ extension ResourceBalanceView {
 								onTap?(claim)
 							} label: {
 								let isSelected = viewState.selectedStakeClaims?.contains(claim.id)
-								ResourceBalanceView(.fungible(.xrd(balance: claim.claimAmount)), appearance: .compact, isSelected: isSelected)
-									.padding(.small1)
-									.background(background)
+								ResourceBalanceView(
+									.fungible(.xrd(balance: claim.claimAmount, network: claim.validatorAddress.networkID)),
+									appearance: .compact,
+									isSelected: isSelected
+								)
+								.padding(.small1)
+								.background(background)
 							}
 							.disabled(onTap == nil)
 							.buttonStyle(.borderless)
@@ -437,7 +465,7 @@ extension ResourceBalanceView {
 		}
 
 		private var useSpacer: Bool {
-			amount != nil || fallback != nil
+			amount != nil || fallback != nil || caption1 == nil
 		}
 	}
 
