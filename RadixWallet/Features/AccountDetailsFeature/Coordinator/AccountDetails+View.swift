@@ -62,7 +62,7 @@ extension AccountDetails {
 					}
 					.padding(.top, .large2)
 					.padding([.horizontal, .bottom], .medium1)
-					
+
 					prompts(
 						mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction
 					)
