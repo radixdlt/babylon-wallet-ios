@@ -3,6 +3,8 @@ import SwiftUI
 
 // MARK: - TransactionReview
 public struct TransactionReview: Sendable, FeatureReducer {
+	public typealias Transfer = IDResourceBalance
+
 	public struct State: Sendable, Hashable {
 		public var displayMode: DisplayMode = .review
 
@@ -905,12 +907,12 @@ extension TransactionReview.State {
 		deposits?.accounts.flatMap { $0.transfers.compactMap(\.fungibleGuarantee) } ?? []
 	}
 
-	public mutating func applyGuarantee(_ updated: TransactionClient.Guarantee, transferID: ResourceBalance.ID) {
+	public mutating func applyGuarantee(_ updated: TransactionClient.Guarantee, transferID: TransactionReview.Transfer.ID) {
 		guard let accountID = accountID(for: transferID) else { return }
 		deposits?.accounts[id: accountID]?.transfers[id: transferID]?.fungibleGuarantee = updated
 	}
 
-	private func accountID(for transferID: ResourceBalance.ID) -> AccountAddress? {
+	private func accountID(for transferID: TransactionReview.Transfer.ID) -> AccountAddress? {
 		for account in deposits?.accounts ?? [] {
 			for transfer in account.transfers {
 				if transfer.id == transferID {

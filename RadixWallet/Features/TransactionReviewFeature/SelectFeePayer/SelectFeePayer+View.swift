@@ -105,11 +105,11 @@ extension SelectFeePayer {
 enum SelectAccountToPayForFeeRow {
 	struct ViewState: Equatable {
 		let account: Profile.Network.Account
-		let xrdBalance: RETDecimal
+		let fungible: ResourceBalance.ViewState.Fungible
 
 		init(candidate: FeePayerCandidate) {
-			account = candidate.account
-			xrdBalance = candidate.xrdBalance
+			self.account = candidate.account
+			self.fungible = .xrd(balance: .init(nominalAmount: candidate.xrdBalance), network: account.networkID)
 		}
 	}
 
@@ -126,7 +126,7 @@ enum SelectAccountToPayForFeeRow {
 						SmallAccountCard(account: viewState.account)
 
 						HStack {
-							ResourceBalanceView(.fungible(.xrd(balance: .init(nominalAmount: viewState.xrdBalance))), appearance: .compact)
+							ResourceBalanceView(.fungible(viewState.fungible), appearance: .compact)
 
 							RadioButton(appearance: .dark, state: isSelected ? .selected : .unselected)
 						}

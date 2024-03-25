@@ -1202,6 +1202,9 @@
 		A48FD15F2B55E671009295E9 /* TrackedPoolInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48FD15E2B55E671009295E9 /* TrackedPoolInteraction.swift */; };
 		A48FD1612B55F8F0009295E9 /* TransactionReview+Sections.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48FD1602B55F8F0009295E9 /* TransactionReview+Sections.swift */; };
 		A4B017F72B4C099D00B42B8E /* TransactionReview+DepositSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4B017F42B4BF59000B42B8E /* TransactionReview+DepositSettingView.swift */; };
+		A4CFB55D2BA8CA3200778BDD /* TransactionHistory+TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4CFB55C2BA8CA3200778BDD /* TransactionHistory+TableView.swift */; };
+		A4CFB55F2BAA821E00778BDD /* HScrollBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4CFB55E2BAA821E00778BDD /* HScrollBar.swift */; };
+		A4CFB5612BAA826E00778BDD /* Measure+Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4CFB5602BAA826E00778BDD /* Measure+Position.swift */; };
 		A4EB37C82B6272F3003FE31D /* TrackedValidatorInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4EB37C72B6272F3003FE31D /* TrackedValidatorInteraction.swift */; };
 		E62449D52AFBA61100272C67 /* Home+AccountRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */; };
 		E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */; };
@@ -1311,7 +1314,6 @@
 		E6DBA3862ADEBFB300A38425 /* DappModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA3132ADEBFB300A38425 /* DappModelsTests.swift */; };
 		E6DBA3872ADEBFB300A38425 /* LedgerModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA3152ADEBFB300A38425 /* LedgerModelTests.swift */; };
 		E6DBA3882ADEBFB300A38425 /* Validation+ExtraTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA3172ADEBFB300A38425 /* Validation+ExtraTests.swift */; };
-		E6DBA3892ADEBFB300A38425 /* String+ExtraTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA3182ADEBFB300A38425 /* String+ExtraTests.swift */; };
 		E6DBA38B2ADEC0CB00A38425 /* SLIP10TestVectorsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA38A2ADEC0CB00A38425 /* SLIP10TestVectorsHelper.swift */; };
 		E6FA984A2B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98482B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift */; };
 		E6FA984B2B04B9AC00748F20 /* ConfirmSkippingBDFS.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */; };
@@ -2494,6 +2496,9 @@
 		A48FD15E2B55E671009295E9 /* TrackedPoolInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackedPoolInteraction.swift; sourceTree = "<group>"; };
 		A48FD1602B55F8F0009295E9 /* TransactionReview+Sections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionReview+Sections.swift"; sourceTree = "<group>"; };
 		A4B017F42B4BF59000B42B8E /* TransactionReview+DepositSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionReview+DepositSettingView.swift"; sourceTree = "<group>"; };
+		A4CFB55C2BA8CA3200778BDD /* TransactionHistory+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistory+TableView.swift"; sourceTree = "<group>"; };
+		A4CFB55E2BAA821E00778BDD /* HScrollBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HScrollBar.swift; sourceTree = "<group>"; };
+		A4CFB5602BAA826E00778BDD /* Measure+Position.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Measure+Position.swift"; sourceTree = "<group>"; };
 		A4EB37C72B6272F3003FE31D /* TrackedValidatorInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackedValidatorInteraction.swift; sourceTree = "<group>"; };
 		E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+Reducer.swift"; sourceTree = "<group>"; };
 		E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+View.swift"; sourceTree = "<group>"; };
@@ -2602,7 +2607,6 @@
 		E6DBA3132ADEBFB300A38425 /* DappModelsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DappModelsTests.swift; sourceTree = "<group>"; };
 		E6DBA3152ADEBFB300A38425 /* LedgerModelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LedgerModelTests.swift; sourceTree = "<group>"; };
 		E6DBA3172ADEBFB300A38425 /* Validation+ExtraTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Validation+ExtraTests.swift"; sourceTree = "<group>"; };
-		E6DBA3182ADEBFB300A38425 /* String+ExtraTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+ExtraTests.swift"; sourceTree = "<group>"; };
 		E6DBA38A2ADEC0CB00A38425 /* SLIP10TestVectorsHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SLIP10TestVectorsHelper.swift; sourceTree = "<group>"; };
 		E6FA98482B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfirmSkippingBDFS+View.swift"; sourceTree = "<group>"; };
 		E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmSkippingBDFS.swift; sourceTree = "<group>"; };
@@ -2781,7 +2785,7 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
-				A41557512B7645D40040AD4E /* AccountHistory */,
+				A41557512B7645D40040AD4E /* TransactionHistory */,
 				48AE39D82B0CBE3900813CF3 /* AccountRecoveryScan */,
 				830EA9D42AE94014004C8051 /* AccountAndPersonaHidingFeature */,
 				48CFBC612ADC10D800E77A5C /* SecurityStructureConfigurationList */,
@@ -5796,6 +5800,8 @@
 				839B6C532B21D28400402651 /* ExpandableTextView.swift */,
 				83D663AF2B271D0100D1AB9E /* TruncationMask.swift */,
 				83EA887D2B7E68EE00FF8424 /* TotalCurrencyWorthView.swift */,
+				A4CFB55E2BAA821E00778BDD /* HScrollBar.swift */,
+				A4CFB5602BAA826E00778BDD /* Measure+Position.swift */,
 			);
 			path = DesignSystem;
 			sourceTree = "<group>";
@@ -6891,15 +6897,16 @@
 			path = ManualAccountRecoveryScan;
 			sourceTree = "<group>";
 		};
-		A41557512B7645D40040AD4E /* AccountHistory */ = {
+		A41557512B7645D40040AD4E /* TransactionHistory */ = {
 			isa = PBXGroup;
 			children = (
 				A41557522B7645E70040AD4E /* TransactionHistory+Reducer.swift */,
 				A41557542B7645F70040AD4E /* TransactionHistory+View.swift */,
+				A4CFB55C2BA8CA3200778BDD /* TransactionHistory+TableView.swift */,
 				A462B5C02B95210000C26D20 /* TransactionHistoryFilters+Reducer.swift */,
 				A462B5C22B95212600C26D20 /* TransactionHistoryFilters+View.swift */,
 			);
-			path = AccountHistory;
+			path = TransactionHistory;
 			sourceTree = "<group>";
 		};
 		A462B5752B820D1200C26D20 /* TransactionHistoryClient */ = {
@@ -7602,7 +7609,6 @@
 			isa = PBXGroup;
 			children = (
 				E6DBA3172ADEBFB300A38425 /* Validation+ExtraTests.swift */,
-				E6DBA3182ADEBFB300A38425 /* String+ExtraTests.swift */,
 			);
 			path = FeaturePreludeTests;
 			sourceTree = "<group>";
@@ -7844,7 +7850,6 @@
 				E6DBA3822ADEBFB300A38425 /* FactorSourcesClientLiveTests.swift in Sources */,
 				E6DBA3852ADEBFB300A38425 /* FaucetClientTests.swift in Sources */,
 				E6DBA3252ADEBFB300A38425 /* DecimalTests.swift in Sources */,
-				E6DBA3892ADEBFB300A38425 /* String+ExtraTests.swift in Sources */,
 				E6DBA3222ADEBFB300A38425 /* RadixConnectJSONValues.swift in Sources */,
 				E6DBA31E2ADEBFB300A38425 /* DataChannelMocks.swift in Sources */,
 				E6DBA36C2ADEBFB300A38425 /* SnapshotHeaderTests.swift in Sources */,
@@ -8384,6 +8389,7 @@
 				48CFC5052ADC10DA00E77A5C /* TransactionPreviewResponseLogsInner.swift in Sources */,
 				48CFC2FF2ADC10D900E77A5C /* AccountSecurity+View.swift in Sources */,
 				48CFC56B2ADC10DA00E77A5C /* MetadataU8ArrayValue.swift in Sources */,
+				A4CFB55F2BAA821E00778BDD /* HScrollBar.swift in Sources */,
 				48CFC2F92ADC10D900E77A5C /* InfoOfNewPersona+Reducer.swift in Sources */,
 				48CFC44D2ADC10DA00E77A5C /* MnemonicClient+Live.swift in Sources */,
 				48CFC57E2ADC10DA00E77A5C /* ValidatorState.swift in Sources */,
@@ -8427,6 +8433,7 @@
 				48CFC42C2ADC10DA00E77A5C /* Unit.swift in Sources */,
 				48CFC6622ADC10DB00E77A5C /* FactorSource.swift in Sources */,
 				48CFC2602ADC10D900E77A5C /* EditPersonaEntry+View.swift in Sources */,
+				A4CFB5612BAA826E00778BDD /* Measure+Position.swift in Sources */,
 				48AE39E22B0CBE8200813CF3 /* AccountRecoveryScanInProgress.swift in Sources */,
 				48CFC2E92ADC10D900E77A5C /* SimpleCreateSecurityStructureFlow+View.swift in Sources */,
 				48CFC5162ADC10DA00E77A5C /* EntityNotFoundError.swift in Sources */,
@@ -8855,6 +8862,7 @@
 				48CFC3D42ADC10D900E77A5C /* BIP39+WordCount.swift in Sources */,
 				48CFC47B2ADC10DA00E77A5C /* LocalAuthenticationClient+Test.swift in Sources */,
 				48CFC2CB2ADC10D900E77A5C /* ResourceAsset+View.swift in Sources */,
+				A4CFB55D2BA8CA3200778BDD /* TransactionHistory+TableView.swift in Sources */,
 				48CFC5FB2ADC10DA00E77A5C /* ImageAsset+Extension.swift in Sources */,
 				48CFC4C22ADC10DA00E77A5C /* StateEntityDetailsResponseNonFungibleVaultDetails.swift in Sources */,
 				48CFC3852ADC10D900E77A5C /* EmptyAssetListView.swift in Sources */,

@@ -2,49 +2,38 @@ import Foundation
 
 // MARK: - TransactionHistoryClient
 public struct TransactionHistoryClient: Sendable, DependencyKey {
+	public var getFirstTransactionDate: GetFirstTransactionDate
 	public var getTransactionHistory: GetTransactionHistory
 }
 
 // MARK: TransactionHistoryClient.GetTransactionHistory
 extension TransactionHistoryClient {
+	public typealias GetFirstTransactionDate = @Sendable (AccountAddress) async throws -> Date?
 	public typealias GetTransactionHistory = @Sendable (TransactionHistoryRequest) async throws -> TransactionHistoryResponse
 }
 
 // MARK: - TransactionHistoryRequest
 public struct TransactionHistoryRequest: Sendable, Hashable {
 	public let account: AccountAddress
-	public let parameters: TransactionHistoryParameters
+	public let parameters: Parameters
 	public let cursor: String?
 
 	public let allResourcesAddresses: Set<ResourceAddress>
 	public let resources: IdentifiedArrayOf<OnLedgerEntity.Resource>
+
+	// MARK: - Parameters
+	public struct Parameters: Sendable, Hashable {
+		public let period: Range<Date>
+		public let filters: [TransactionFilter]
+		public let direction: TransactionHistory.Direction
+	}
 }
 
 // MARK: - TransactionHistoryResponse
 public struct TransactionHistoryResponse: Sendable, Hashable {
-	public let parameters: TransactionHistoryParameters
 	public let nextCursor: String?
-	public let totalCount: Int64?
 	public let resources: IdentifiedArrayOf<OnLedgerEntity.Resource>
 	public let items: [TransactionHistoryItem]
-}
-
-// MARK: - TransactionHistoryParameters
-public struct TransactionHistoryParameters: Sendable, Hashable {
-	public let period: Range<Date>
-	public let downwards: Bool
-	public let filters: [TransactionFilter]
-
-	public init(period: Range<Date>, downwards: Bool = true, filters: [TransactionFilter] = []) {
-		self.period = period
-		self.downwards = downwards
-		self.filters = filters
-	}
-
-	/// The other parameter set already encompasses these transactions
-	public func covers(_ parameters: Self) -> Bool {
-		filters == parameters.filters && period.contains(parameters.period)
-	}
 }
 
 // MARK: - TransactionHistoryItem
@@ -86,8 +75,8 @@ public enum TransactionFilter: Hashable, Sendable {
 	case transactionType(TransactionType)
 
 	public enum TransferType: CaseIterable, Sendable {
-		case withdrawal
 		case deposit
+		case withdrawal
 	}
 
 	public typealias TransactionType = GatewayAPI.ManifestClass

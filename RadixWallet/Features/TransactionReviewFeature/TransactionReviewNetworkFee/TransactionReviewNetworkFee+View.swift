@@ -1,6 +1,13 @@
 import ComposableArchitecture
 import SwiftUI
 
+extension TransactionReviewNetworkFee.State {
+	var displayedTotalFee: String {
+		"\(reviewedTransaction.transactionFee.totalFee.displayedTotalFee) XRD"
+	}
+}
+
+// MARK: - TransactionReviewNetworkFee.View
 extension TransactionReviewNetworkFee {
 	@MainActor
 	public struct View: SwiftUI.View {
@@ -25,7 +32,7 @@ extension TransactionReviewNetworkFee {
 
 						Spacer(minLength: 0)
 
-						Text(viewStore.reviewedTransaction.transactionFee.totalFee.displayedTotalFee)
+						Text(viewStore.displayedTotalFee)
 							.textStyle(.body1HighImportance)
 							.foregroundColor(.app.gray1)
 					}

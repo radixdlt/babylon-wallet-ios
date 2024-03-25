@@ -18,9 +18,15 @@ extension ResourceBalance: Comparable {
 				// If it's the same resource, sort by the amount
 				order(lhs: lhsValue.amount.nominalAmount, rhs: rhsValue.amount.nominalAmount)
 			} else {
-				// Else sort alphabetically by title, or failing that, address
-				order(lhs: lhs.resource.metadata.name, rhs: rhs.resource.metadata.name) {
-					lhs.resource.resourceAddress.address < rhs.resource.resourceAddress.address
+				if lhs.resource.resourceAddress.isXRD {
+					true
+				} else if rhs.resource.resourceAddress.isXRD {
+					false
+				} else {
+					// Else sort alphabetically by title, or failing that, address
+					order(lhs: lhs.resource.metadata.name, rhs: rhs.resource.metadata.name) {
+						lhs.resource.resourceAddress.address < rhs.resource.resourceAddress.address
+					}
 				}
 			}
 		case let (.nonFungible(lhsValue), .nonFungible(rhsValue)):
@@ -71,9 +77,9 @@ extension ResourceBalance: Comparable {
 			1
 		case .liquidStakeUnit:
 			2
-		case .poolUnit:
-			3
 		case .stakeClaimNFT:
+			3
+		case .poolUnit:
 			4
 		}
 	}

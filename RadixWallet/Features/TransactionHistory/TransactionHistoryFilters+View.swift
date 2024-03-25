@@ -73,8 +73,9 @@ extension TransactionHistoryFilters {
 					}
 					ToolbarItem(placement: .topBarTrailing) {
 						Button(L10n.TransactionHistory.Filters.clearAll) {
-							store.send(.view(.clearTapped))
+							store.send(.view(.clearAllTapped))
 						}
+						.buttonStyle(.blueText)
 					}
 				}
 				.navigationTitle(L10n.TransactionHistory.Filters.title)
@@ -181,7 +182,6 @@ extension TransactionHistoryFilters {
 							TransactionFilterView.Dummy()
 								.measureSize(flowDummyID)
 						}
-
 						.frame(maxHeight: isCollapsible && isCollapsed ? collapsedHeight : .infinity, alignment: .top)
 						.clipped()
 						.onReadSizes(flowDummyID, flowLayoutID) { dummySize, flowSize in
