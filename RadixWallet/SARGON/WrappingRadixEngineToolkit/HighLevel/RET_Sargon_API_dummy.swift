@@ -7,77 +7,77 @@ public enum Sargon {}
 extension TransactionManifest {
 	public static func thirdPartyDepositUpdate(
 		to new: ThirdPartyDeposits
-	) throws -> (manifest: TransactionManifest, updatedAccount: Profile.Network.Account) {
+	) -> Self {
 		sargon()
 	}
 
 	public static func faucet(
 		includeLockFeeInstruction: Bool,
 		addressOfReceivingAccount: AccountAddress
-	) throws -> TransactionManifest {
+	) -> Self {
 		sargon()
 	}
 
 	public static func setOwnerKeys(
 		addressOfAccountOrPersona: AddressOfAccountOrPersona,
 		ownerKeyHashes: [RETPublicKeyHash]
-	) -> TransactionManifest {
+	) -> Self {
 		sargon()
 	}
 
 	public static func createFungibleToken(
 		addressOfOwner: AccountAddress
-	) throws -> TransactionManifest {
+	) -> Self {
 		sargon()
 	}
 
 	public static func createMultipleFungibleTokens(
 		addressOfOwner: AccountAddress
-	) throws -> TransactionManifest {
+	) -> Self {
 		sargon()
 	}
 
 	public static func createMultipleNonFungibleTokens(
 		addressOfOwner: AccountAddress
-	) throws -> TransactionManifest {
+	) -> Self {
 		sargon()
 	}
 
 	public static func createNonFungibleToken(
 		addressOfOwner: AccountAddress
-	) throws -> TransactionManifest {
+	) -> Self {
 		sargon()
 	}
 
 	public static func markingAccountAsDappDefinitionType(
 		accountAddress: AccountAddress
-	) throws -> TransactionManifest {
+	) -> Self {
 		sargon()
 	}
 
 	public static func stakesClaim(
 		accountAddress: AccountAddress,
 		stakeClaims: [StakeClaim]
-	) throws -> TransactionManifest {
+	) -> Self {
 		sargon()
 	}
 
 	public static func assetsTransfers(
 		transfers: PerAssetTransfers
-	) -> TransactionManifest {
+	) -> Self {
 		sargon()
 	}
 
 	public func modify(
 		lockFee fee: RETDecimal = .temporaryStandardFee,
 		addressOfFeePayer: AccountAddress
-	) throws -> TransactionManifest {
+	) -> Self {
 		sargon()
 	}
 
 	public func modify(
 		addGuarantees guarantees: [TransactionGuarantee]
-	) throws -> TransactionManifest {
+	) -> Self {
 		sargon()
 	}
 }

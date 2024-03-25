@@ -168,6 +168,8 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 	private func prepareForSubmission(
 		newConfig new: ThirdPartyDeposits
 	) throws -> (manifest: TransactionManifest, updatedAccount: Profile.Network.Account) {
-		try TransactionManifest.thirdPartyDepositUpdate(to: new)
+		let manifest = TransactionManifest.thirdPartyDepositUpdate(to: new)
+		//        return (manifest, updatedAccount)
+		fatalError()
 	}
 }
