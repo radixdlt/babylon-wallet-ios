@@ -90,14 +90,6 @@ extension ResourceAddress {
 }
 
 extension Sargon {
-	/// REQUIRES NETWORK CALL (and probable cache)	///
-	public static func needsSignatureForDepositting(
-		intoAccount: Profile.Network.Account,
-		resource: ResourceAddress
-	) async throws -> Bool {
-		sargon()
-	}
-
 	public static func buildInformation() -> SargonBuildInformation {
 		SargonBuildInformation()
 	}
