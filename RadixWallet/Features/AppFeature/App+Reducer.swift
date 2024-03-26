@@ -16,7 +16,7 @@ public struct App: Sendable, FeatureReducer {
 			root: Root = .splash(.init())
 		) {
 			self.root = root
-			let sargonBuildInfo = Sargon.buildInformation()
+			let sargonBuildInfo = SargonBuildInformation.get()
 			let config = BuildConfiguration.current?.description ?? "Unknown Build Config"
 			loggerGlobal.info("App started (\(config), Sargon=\(sargonBuildInfo))")
 		}

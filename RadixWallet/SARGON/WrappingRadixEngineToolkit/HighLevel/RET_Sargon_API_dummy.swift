@@ -93,14 +93,14 @@ extension ResourceAddress {
 	}
 }
 
-extension Sargon {
-	public static func buildInformation() -> SargonBuildInformation {
-		SargonBuildInformation()
-	}
-
-	public static func debugPrintCompiledNotarizedIntent(data: Data) -> String {
+extension SargonBuildInformation {
+	public static func get() -> Self {
 		sargon()
 	}
+}
+
+public func debugPrintCompiledNotarizedIntent(data: Data) -> String {
+	sargon()
 }
 
 extension Data {

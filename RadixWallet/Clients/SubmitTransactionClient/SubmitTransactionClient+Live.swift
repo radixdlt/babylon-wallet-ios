@@ -53,7 +53,7 @@ extension SubmitTransactionClient: DependencyKey {
 			let txID = request.txID
 
 			#if DEBUG
-			Sargon.debugPrintCompiledNotarizedIntent(data: request.compiledNotarizedTXIntent)
+			debugPrintCompiledNotarizedIntent(data: request.compiledNotarizedTXIntent)
 			#endif
 
 			let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
