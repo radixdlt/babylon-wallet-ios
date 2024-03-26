@@ -80,15 +80,14 @@ extension ImportMnemonicWord {
 							set: { viewStore.send(.wordChanged(input: $0.lowercased().trimmingWhitespacesAndNewlines())) }
 						),
 						hint: viewStore.hint,
-						// FIXME: Bring back autofocus
-//						focus: .on(
-//							.textField,
-//							binding: viewStore.binding(
-//								get: \.focusedField,
-//								send: { .textFieldFocused($0) }
-//							),
-//							to: $focusedField
-//						),
+						focus: .on(
+							.textField,
+							binding: viewStore.binding(
+								get: \.focusedField,
+								send: { .textFieldFocused($0) }
+							),
+							to: $focusedField
+						),
 						showClearButton: viewStore.showClearButton,
 						innerAccessory: {
 							if viewStore.displayValidAccessory {
