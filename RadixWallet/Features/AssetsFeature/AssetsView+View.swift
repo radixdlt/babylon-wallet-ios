@@ -68,6 +68,7 @@ extension AssetsView {
 						}
 					}
 				}
+				.environment(\.resourceBalanceHideFiatValue, !viewStore.account.address.isOnMainnet)
 				.buttonStyle(.plain)
 				.scrollContentBackground(.hidden)
 				.listStyle(.insetGrouped)

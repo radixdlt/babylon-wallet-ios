@@ -15,6 +15,12 @@ extension ResourceAddress {
 	static let mainnetXRDAddress: ResourceAddress = .xrd(on: .mainnet)
 }
 
+extension SpecificAddress {
+	var isOnMainnet: Bool {
+		networkID == NetworkID.mainnet
+	}
+}
+
 extension EngineToolkit.Address {
 	static func xrd(_ networkId: UInt8) -> EngineToolkit.Address {
 		knownAddresses(networkId: networkId).resourceAddresses.xrd
