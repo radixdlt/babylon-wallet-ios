@@ -112,7 +112,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 					await send(.internal(.accountUpdated(accountUpdate)))
 				}
 			}
-			.merge(with: loadIsAllowedToUseFaucet(&state))
+            .merge(with: state.isOnMainnet ? .none : loadIsAllowedToUseFaucet(&state))
 
 		case .qrCodeButtonTapped:
 			state.destination = .showQR(.init(accountAddress: state.account.address))
@@ -212,24 +212,26 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			return .none
 		}
 	}
+}
 
-	private func call(
-		buttonState: WritableKeyPath<State, ControlState>,
-		into state: inout State,
-		onSuccess: ControlState = .enabled,
-		call: @escaping @Sendable (AccountAddress) async throws -> Void
-	) -> Effect<Action> {
-		state[keyPath: buttonState] = .loading(.local)
-		return .run { [address = state.address] send in
-			try await call(address)
-			await send(.internal(.callDone(updateControlState: buttonState, changeTo: onSuccess)))
-		} catch: { error, send in
-			await send(.internal(.hideLoader(updateControlState: buttonState)))
-			if !Task.isCancelled {
-				errorQueue.schedule(error)
-			}
-		}
-	}
+extension AccountPreferences {
+    private func call(
+        buttonState: WritableKeyPath<State, ControlState>,
+        into state: inout State,
+        onSuccess: ControlState = .enabled,
+        call: @escaping @Sendable (AccountAddress) async throws -> Void
+    ) -> Effect<Action> {
+        state[keyPath: buttonState] = .loading(.local)
+        return .run { [address = state.address] send in
+            try await call(address)
+            await send(.internal(.callDone(updateControlState: buttonState, changeTo: onSuccess)))
+        } catch: { error, send in
+            await send(.internal(.hideLoader(updateControlState: buttonState)))
+            if !Task.isCancelled {
+                errorQueue.schedule(error)
+            }
+        }
+    }
     
     private func updateAccountPortfolio(_ state: State) -> Effect<Action> {
         .run { [address = state.address] send in
@@ -239,16 +241,16 @@ public struct AccountPreferences: Sendable, FeatureReducer {
         }
     }
 
-	private func loadIsAllowedToUseFaucet(_ state: inout State) -> Effect<Action> {
-		state.faucetButtonState = .loading(.local)
-		return .run { [address = state.address] send in
-			await send(.internal(.isAllowedToUseFaucet(
-				TaskResult {
-					await faucetClient.isAllowedToUseFaucet(address)
-				}
-			)))
-		}
-	}
+    private func loadIsAllowedToUseFaucet(_ state: inout State) -> Effect<Action> {
+        state.faucetButtonState = .loading(.local)
+        return .run { [address = state.address] send in
+            await send(.internal(.isAllowedToUseFaucet(
+                TaskResult {
+                    await faucetClient.isAllowedToUseFaucet(address)
+                }
+            )))
+        }
+    }
 }
 
 extension OverlayWindowClient.Item.HUD {
