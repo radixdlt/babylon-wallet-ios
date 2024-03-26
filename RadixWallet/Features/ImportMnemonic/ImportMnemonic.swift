@@ -552,7 +552,8 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .focusNext(id):
 			state.idOfWordWithTextFieldFocus = id
-			state.words[id: id]?.focus()
+			// FIXME: Temporary workaround. Have a proper fix for the keyboard being broken with autoadvance
+			// state.words[id: id]?.focus()
 			return .none
 
 		case let .saveFactorSourceResult(.failure(error)):
