@@ -52,58 +52,58 @@ jobs:
         run: |
           timeout 300 snyk code test --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --severity-threshold=high || [ "$?" = "124" ]
 
-#  snyk_sbom:
-#    if: >
-#      ( github.event.action == 'opened' && github.event.pull_request.draft == false ) ||
-#      ( github.event.pull_request.draft == false && github.event.action == 'synchronize' ) ||
-#      ( github.event.action == 'ready_for_review' ) ||
-#      ( github.event_name == 'push' && github.ref == 'refs/heads/main' )
-#    permissions:
-#      id-token: write
-#      contents: read
-#    name: "Snyk SBOM"
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: RDXWorks-actions/checkout@main
-#      - uses: RDXWorks-actions/setup-node@main
-#        with:
-#          node-version: '14'
-#      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-#        with:
-#          role_name: ${{ secrets.GH_COMMON_SECRETS_READ_ACCESS }}
-#          app_name: 'babylon-wallet-ios'
-#          step_name: 'snyk_sbom'
-#          secret_prefix: 'SNYK'
-#          secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
-#          parse_json: true
-#      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-#        with:
-#          role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
-#          app_name: 'babylon-wallet-ios'
-#          step_name: 'snyk_sbom'
-#          secret_prefix: 'WALLET'
-#          secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET }}
-#          parse_json: true
-#      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
-#        with:
-#          role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
-#          app_name: 'babylon-wallet-ios'
-#          step_name: 'unit_test'
-#          secret_prefix: 'SWIFT_ENGINE_TOOLKIT_SSH_KEY'
-#          secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
-#          parse_json: true
-#      - uses: RDXWorks-actions/ssh-agent@master
-#        with:
-#          ssh-private-key: |
-#            ${{ env.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
-#      - name: Install snyk
-#        run: |
-#          npm install snyk -g
-#          snyk -v
-#          snyk auth ${{ env.SNYK_TOKEN }}
-#      - name: Generate SBOM # check SBOM can be generated but nothing is done with it
-#        run: |
-#          snyk sbom --debug --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
+  snyk_sbom:
+    if: >
+      ( github.event.action == 'opened' && github.event.pull_request.draft == false ) ||
+      ( github.event.pull_request.draft == false && github.event.action == 'synchronize' ) ||
+      ( github.event.action == 'ready_for_review' ) ||
+      ( github.event_name == 'push' && github.ref == 'refs/heads/main' )
+    permissions:
+      id-token: write
+      contents: read
+    name: "Snyk SBOM"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: RDXWorks-actions/checkout@main
+      - uses: RDXWorks-actions/setup-node@main
+        with:
+          node-version: '14'
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.GH_COMMON_SECRETS_READ_ACCESS }}
+          app_name: 'babylon-wallet-ios'
+          step_name: 'snyk_sbom'
+          secret_prefix: 'SNYK'
+          secret_name: ${{ secrets.AWS_SECRET_NAME_SNYK }}
+          parse_json: true
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
+          app_name: 'babylon-wallet-ios'
+          step_name: 'snyk_sbom'
+          secret_prefix: 'WALLET'
+          secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET }}
+          parse_json: true
+      - uses: radixdlt/public-iac-resuable-artifacts/fetch-secrets@main
+        with:
+          role_name: ${{ secrets.GH_WALLET_SECRET_ACCESS }}
+          app_name: 'babylon-wallet-ios'
+          step_name: 'unit_test'
+          secret_prefix: 'SWIFT_ENGINE_TOOLKIT_SSH_KEY'
+          secret_name: ${{ secrets.AWS_SECRET_NAME_WALLET_SWIFT_SSH }}
+          parse_json: true
+      - uses: RDXWorks-actions/ssh-agent@master
+        with:
+          ssh-private-key: |
+            ${{ env.SWIFT_ENGINE_TOOLKIT_SSH_KEY }}
+      - name: Install snyk
+        run: |
+          npm install snyk -g
+          snyk -v
+          snyk auth ${{ env.SNYK_TOKEN }}
+      - name: Generate SBOM # check SBOM can be generated but nothing is done with it
+        run: |
+          snyk sbom --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --format=cyclonedx1.4+json > sbom.json
 
   linting:
     name: "Linting"
@@ -210,7 +210,7 @@ jobs:
     needs:
       - unit_test
       - snyk_scan
-      #- snyk_sbom
+      - snyk_sbom
     steps:
       - uses: RDXWorks-actions/checkout@main
       - uses: RDXWorks-actions/setup-node@main
