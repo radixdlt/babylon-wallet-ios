@@ -44,9 +44,9 @@ public struct AddAsset: FeatureReducer, Sendable {
 				return .invalid
 			}
 
-			guard address.resourceAddress.networkId() == networkID.rawValue else {
+			guard address.resourceAddress.networkID == networkID else {
 				// On wrong network
-				return .wrongNetwork(address, incorrectNetwork: address.resourceAddress.networkId().rawValue)
+				return .wrongNetwork(address, incorrectNetwork: address.resourceAddress.networkID.rawValue)
 			}
 
 			guard !alreadyAddedResources.contains(where: { $0.resourceAddress == address.resourceAddress }) else {

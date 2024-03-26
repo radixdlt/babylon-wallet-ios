@@ -60,13 +60,13 @@ extension TransactionClient {
 				try await .init(validating: addresses.asyncMap(identityFromComponentAddress))
 			}
 
-			let summary = manifest.summary(networkId: networkID)
+			let summary = manifest.summary
 
 			return try await MyEntitiesInvolvedInTransaction(
-				identitiesRequiringAuth: mapIdentity(summary.identitiesRequiringAuth),
-				accountsRequiringAuth: mapAccount(summary.accountsRequiringAuth),
-				accountsWithdrawnFrom: mapAccount(summary.accountsWithdrawnFrom),
-				accountsDepositedInto: mapAccount(summary.accountsDepositedInto)
+				identitiesRequiringAuth: mapIdentity(summary.addressesOfPersonasRequiringAuth),
+				accountsRequiringAuth: mapAccount(summary.addressesOfAccountsRequiringAuth),
+				accountsWithdrawnFrom: mapAccount(summary.addressesOfAccountsWithdrawnFrom),
+				accountsDepositedInto: mapAccount(summary.addressesOfAccountsDepositedInto)
 			)
 		}
 
@@ -124,24 +124,24 @@ extension TransactionClient {
 				startEpochInclusive: epoch,
 				endEpochExclusive: epoch + request.makeTransactionHeaderInput.epochWindow,
 				nonce: request.nonce,
-				notaryPublicKey: SLIP10.PublicKey.eddsaEd25519(request.transactionSigners.notaryPublicKey),
+				notaryPublicKey: SLIP10.PublicKey.eddsaEd25519(request.transactionSigners.notaryPublicKey).intoSargon(),
 				notaryIsSignatory: request.transactionSigners.notaryIsSignatory,
 				tipPercentage: request.makeTransactionHeaderInput.tipPercentage
 			)
 
-			return .init(header: header, manifest: request.manifest, message: request.message)
+			return .init(header: header, manifest: request.manifest, message: request.message ?? Message.none)
 		}
 
 		let notarizeTransaction: NotarizeTransaction = { request in
 			let signedTransactionIntent = SignedIntent(
 				intent: request.transactionIntent,
-				intentSignatures: Array(request.intentSignatures)
+				intentSignatures: IntentSignatures(signatures: Array(request.intentSignatures.map { IntentSignature(signatureWithPublicKey: $0.intoSargon()) }))
 			)
 
-			let signedIntentHash = try signedTransactionIntent.signedIntentHash()
+			let signedIntentHash = try signedTransactionIntent.hash()
 
 			let notarySignature = try request.notary.sign(
-				hashOfMessage: signedIntentHash.bytes().data
+				hashOfMessage: signedIntentHash.hash
 			)
 
 			let uncompiledNotarized = try NotarizedTransaction(
@@ -187,7 +187,6 @@ extension TransactionClient {
 
 			/// Analyze the manifest
 			let analyzedManifestToReview = try manifestToSign.executionSummary(
-				networkId: networkID,
 				encodedReceipt: receiptBytes
 			)
 
@@ -253,7 +252,7 @@ extension TransactionClient {
 
 			return try .init(
 				rawManifest: transactionManifest,
-				header: intent.header(),
+				header: intent.header,
 				transactionSigners: transactionSigners
 			)
 		}

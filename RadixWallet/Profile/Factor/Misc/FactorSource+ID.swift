@@ -8,7 +8,7 @@ extension FactorSource {
 		let hash = publicKey.compressedRepresentation.hash()
 		return try .init(
 			kind: factorSourceKind,
-			body: .init(data: hash)
+			body: .init(data: hash.data)
 		)
 	}
 

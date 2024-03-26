@@ -208,7 +208,7 @@ extension AssetTransfer {
 				)
 				return PerAssetNonFungibleTransfer(
 					useTryDepositOrAbort: useTryDepositOrAbort,
-					nonFungibleLocalIds: transfer.tokens.map { $0.id.localId() },
+					nonFungibleLocalIds: transfer.tokens.map(\.id.nonFungibleLocalId),
 					recipient: transfer.recipient
 				)
 			}
@@ -235,9 +235,11 @@ func useTryAbortOrDeposit(
 ) async throws -> Bool {
 	let recipientAddress = receivingAccount.address
 
-	if case let .myOwnAccount(userAccount) = receivingAccount {
+	if case let .myOwnAccount(sargonUserAccount) = receivingAccount {
 		@Dependency(\.secureStorageClient) var secureStorageClient
+		@Dependency(\.accountsClient) var accountsClient
 
+		let userAccount = try await accountsClient.fromSargon(sargonUserAccount)
 		let needsSignatureForDepositing = await needsSignatureForDepositting(into: userAccount, resource: resource)
 		let isSoftwareAccount = !receivingAccount.isLedgerAccount
 		let userHasAccessToMnemonic = userAccount.deviceFactorSourceID.map { deviceFactorSourceID in

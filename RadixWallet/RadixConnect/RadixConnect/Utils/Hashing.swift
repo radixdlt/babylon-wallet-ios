@@ -1,7 +1,7 @@
 import WebRTC
 
 extension ConnectionPassword {
-	func hash() throws -> Data {
-		try self.data.data.hash()
+	func hash() -> Data {
+		self.data.data.hash().data
 	}
 }

@@ -38,10 +38,10 @@ extension GatewayAPI.TransactionPreviewRequest {
 		let notaryIsSignatory = transactionSigners.notaryIsSignatory
 
 		try self.init(
-			manifest: rawManifest.instructionsString(),
-			blobsHex: rawManifest.blobs().map(\.hex),
-			startEpochInclusive: .init(header.startEpochInclusive.rawValue),
-			endEpochExclusive: .init(header.endEpochExclusive.rawValue),
+			manifest: rawManifest.instructionsString,
+			blobsHex: rawManifest.blobs.blobs.map(\.hex),
+			startEpochInclusive: .init(header.startEpochInclusive),
+			endEpochExclusive: .init(header.endEpochExclusive),
 			notaryPublicKey: GatewayAPI.PublicKey(from: header.notaryPublicKey),
 			notaryIsSignatory: notaryIsSignatory,
 			tipPercentage: .init(header.tipPercentage),
@@ -78,12 +78,12 @@ extension TransactionSigners {
 }
 
 extension GatewayAPI.PublicKey {
-	init(from slip10: SLIP10.PublicKey) {
-		switch slip10 {
-		case let .eddsaEd25519(pubKey):
-			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: pubKey.rawRepresentation.hex))
-		case let .ecdsaSecp256k1(pubKey):
-			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: pubKey.compressedRepresentation.hex))
+	init(from sargon: Sargon.PublicKey) {
+		switch sargon {
+		case let .ed25519(pubKey):
+			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: pubKey.hex))
+		case let .secp256k1(pubKey):
+			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: pubKey.hex))
 		}
 	}
 }

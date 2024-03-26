@@ -71,7 +71,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			await state.setRadixGateway(gateway)
 			if forceRefresh {
 				for accountAddress in accountAddresses {
-					cacheClient.removeFolder(.onLedgerEntity(.account(accountAddress.asGeneral)))
+					cacheClient.removeFolder(.onLedgerEntity(.account(accountAddress)))
 				}
 			}
 
@@ -130,7 +130,7 @@ extension AccountPortfoliosClient: DependencyKey {
 		@Sendable
 		func fetchAccountPortfolio(_ accountAddress: AccountAddress, _ forceRefresh: Bool) async throws -> AccountPortfolio {
 			if forceRefresh {
-				cacheClient.removeFolder(.onLedgerEntity(.account(accountAddress.asGeneral)))
+				cacheClient.removeFolder(.onLedgerEntity(.account(accountAddress)))
 			}
 
 			let account = try await onLedgerEntitiesClient.getAccount(accountAddress)

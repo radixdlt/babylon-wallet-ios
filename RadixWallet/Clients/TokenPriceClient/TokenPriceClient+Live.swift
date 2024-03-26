@@ -52,7 +52,7 @@ extension TokenPricesClient.TokenPrices {
 
 		self = tokenPricesResponse.tokens.reduce(into: [:]) { partialResult, next in
 			let trimmed = formatter.string(for: next.price) ?? ""
-			if let value = try? Decimal192(value: trimmed) {
+			if let value = try? Decimal192(trimmed) {
 				partialResult[next.resourceAddress] = value
 			}
 		}

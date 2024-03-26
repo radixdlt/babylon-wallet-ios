@@ -1,1 +1,0 @@
-This directory contains types which have not yet been created in Sargon but which given the new Wrapped RET high level API in Sargon requires these new types - types we have previously created in Swift.

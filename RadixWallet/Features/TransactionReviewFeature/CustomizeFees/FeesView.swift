@@ -146,7 +146,7 @@ extension TransactionFee.NormalFeeCustomization {
 
 private extension Decimal192 {
 	func formatted(showsZero: Bool) -> String {
-		if !showsZero, isZero() {
+		if !showsZero, isZero {
 			return L10n.CustomizeNetworkFees.noneDue
 		}
 		return L10n.TransactionReview.xrdAmount(formatted())

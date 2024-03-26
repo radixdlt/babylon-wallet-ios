@@ -24,6 +24,13 @@ extension OnLedgerEntity.Resource {
 	}
 }
 
+// MARK: - MetadataValue
+public enum MetadataValue {
+	public var string: String? { nil }
+	public var url: URL? { nil }
+	public var stringArray: [String]? { nil }
+}
+
 extension [String: MetadataValue?] {
 	var name: String? {
 		self["name"]??.string

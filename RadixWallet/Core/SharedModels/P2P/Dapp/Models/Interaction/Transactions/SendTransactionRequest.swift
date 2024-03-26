@@ -1,25 +1,25 @@
 // MARK: - UnvalidatedTransactionManifest
 public struct UnvalidatedTransactionManifest: Sendable, Hashable {
 	public let transactionManifestString: String
-	public let blobsBytes: [Data]
+	public let blobs: Blobs
 
 	public init(transactionManifestString: String, blobsBytes: [Data]) {
 		self.transactionManifestString = transactionManifestString
-		self.blobsBytes = blobsBytes
+		self.blobs = Blobs(blobsBytes.map(Blob.init(data:)))
 	}
 
-	public init(manifest: TransactionManifest) throws {
-		try self.init(
-			transactionManifestString: manifest.instructionsString(),
-			blobsBytes: manifest.blobs()
-		)
+	public init(manifest: TransactionManifest) {
+		self.transactionManifestString = manifest.instructionsString
+		self.blobs = manifest.blobs
 	}
 
-	public func transactionManifest(onNetwork networkID: NetworkID) throws -> TransactionManifest {
+	public func transactionManifest(
+		onNetwork networkID: NetworkID
+	) throws -> TransactionManifest {
 		try .init(
 			instructionsString: transactionManifestString,
 			networkID: networkID,
-			blobs: blobsBytes
+			blobs: blobs
 		)
 	}
 }
@@ -45,13 +45,10 @@ extension P2P.Dapp.Request {
 			version: TXVersion = .default,
 			transactionManifest: TransactionManifest,
 			message: String? = nil
-		) throws {
-			try self.init(
+		) {
+			self.init(
 				version: version,
-				unvalidatedManifest: .init(
-					transactionManifestString: transactionManifest.instructionsString(),
-					blobsBytes: transactionManifest.blobs()
-				),
+				unvalidatedManifest: .init(manifest: transactionManifest),
 				message: message
 			)
 		}

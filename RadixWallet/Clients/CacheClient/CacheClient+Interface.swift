@@ -72,11 +72,11 @@ extension CacheClient {
 extension CacheClient {
 	public enum Entry: Equatable {
 		public enum OnLedgerEntity: Hashable {
-			case account(Address)
-			case resource(Address)
-			case resourcePool(Address)
-			case validator(Address)
-			case genericComponent(Address)
+			case account(AccountAddress)
+			case resource(ResourceAddress)
+			case resourcePool(PoolAddress)
+			case validator(ValidatorAddress)
+//			case genericComponent(Address)
 			case nonFungibleData(NonFungibleGlobalId)
 			case nonFungibleIdPage(accountAddress: Address, resourceAddress: Address, pageCursor: String?)
 		}
@@ -101,10 +101,10 @@ extension CacheClient {
 					return "\(filesystemFolderPath)/\(resourcePoolAddress.address)"
 				case let .validator(validatorAddress):
 					return "\(filesystemFolderPath)/\(validatorAddress.address)"
-				case let .genericComponent(componentAddress):
-					return "\(filesystemFolderPath)/\(componentAddress.address)"
+//				case let .genericComponent(componentAddress):
+//					return "\(filesystemFolderPath)/\(componentAddress.address)"
 				case let .nonFungibleData(nonFungibleGlobalId):
-					return "\(filesystemFolderPath)/\(nonFungibleGlobalId.asStr())"
+					return "\(filesystemFolderPath)/\(nonFungibleGlobalId.description)"
 				case let .nonFungibleIdPage(_, resourceAddress, pageCursor):
 					let file = "nonFungibleIds-" + resourceAddress.address + (pageCursor.map { "-\($0)" } ?? "")
 					return "\(filesystemFolderPath)/\(file)"
@@ -137,8 +137,8 @@ extension CacheClient {
 					return "\(folderRoot)/resourcePools"
 				case .validator:
 					return "\(folderRoot)/validators"
-				case .genericComponent:
-					return "\(folderRoot)/genericComponents"
+//				case .genericComponent:
+//					return "\(folderRoot)/genericComponents"
 				case .nonFungibleData:
 					return "\(folderRoot)/nonFungiblesData"
 				case let .nonFungibleIdPage(accountAddress, _, _):
