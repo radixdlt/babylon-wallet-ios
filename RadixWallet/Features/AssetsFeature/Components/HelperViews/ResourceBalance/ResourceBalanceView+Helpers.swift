@@ -73,3 +73,15 @@ extension EnvironmentValues {
 private struct ResourceBalanceHideDetailsKey: EnvironmentKey {
 	static let defaultValue: Bool = false
 }
+
+extension EnvironmentValues {
+	var resourceBalanceHideFiatValue: Bool {
+		get { self[ResourceBalanceHideFiatValue.self] }
+		set { self[ResourceBalanceHideFiatValue.self] = newValue }
+	}
+}
+
+// MARK: - ResourceBalanceHideFiatValue
+private struct ResourceBalanceHideFiatValue: EnvironmentKey {
+	static let defaultValue: Bool = false
+}

@@ -22,6 +22,7 @@ extension DetailsContainerWithHeaderViewState {
 
 // MARK: - DetailsContainerWithHeaderView
 struct DetailsContainerWithHeaderView<ThumbnailView: View, DetailsView: View>: View {
+	@Environment(\.resourceBalanceHideFiatValue) var resourceBalanceHideFiatValue
 	let viewState: DetailsContainerWithHeaderViewState
 	let closeButtonAction: () -> Void
 
@@ -70,7 +71,7 @@ struct DetailsContainerWithHeaderView<ThumbnailView: View, DetailsView: View>: V
 				}
 			}
 
-			if let currencyWorth = viewState.currencyWorth {
+			if !resourceBalanceHideFiatValue, let currencyWorth = viewState.currencyWorth {
 				Text(currencyWorth)
 					.textStyle(.body2HighImportance)
 					.foregroundStyle(.app.gray2)
