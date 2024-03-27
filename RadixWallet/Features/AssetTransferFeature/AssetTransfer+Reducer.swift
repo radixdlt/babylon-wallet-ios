@@ -75,6 +75,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 
 			return .run { [accounts = state.accounts, message = state.message?.message] send in
 				let manifest = try await createManifest(accounts)
+
 				Task {
 					_ = try await dappInteractionClient.addWalletInteraction(
 						.transaction(.init(send: .init(transactionManifest: manifest, message: message))),
@@ -109,7 +110,7 @@ extension AssetTransfer.State {
 		}
 
 		return accounts.receivingAccounts.allSatisfy {
-			guard $0.account != nil else {
+			guard $0.recipient != nil else {
 				return false
 			}
 			let fungibleAssets = $0.assets.fungibleAssets
@@ -127,8 +128,8 @@ extension AssetTransfer.State {
 extension AssetTransfer {
 	private struct InvolvedFungibleResource: Identifiable {
 		struct PerAccountAmount: Identifiable {
-			var amount: RETDecimal
-			let recipient: ReceivingAccount.State.Account
+			var amount: Decimal192
+			let recipient: AssetsTransfersRecipient
 			typealias ID = AccountAddress
 			var id: ID {
 				recipient.address
@@ -140,7 +141,7 @@ extension AssetTransfer {
 		}
 
 		let address: ResourceAddress
-		let totalTransferAmount: RETDecimal
+		let totalTransferAmount: Decimal192
 		let divisibility: Int?
 		var accounts: IdentifiedArrayOf<PerAccountAmount>
 	}
@@ -148,7 +149,7 @@ extension AssetTransfer {
 	private struct InvolvedNonFungibleResource: Identifiable {
 		struct PerAccountTokens: Identifiable {
 			var tokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>
-			let recipient: ReceivingAccount.State.Account
+			let recipient: AssetsTransfersRecipient
 			typealias ID = AccountAddress
 			var id: ID {
 				recipient.address
@@ -166,77 +167,79 @@ extension AssetTransfer {
 			accounts.flatMap(\.tokens)
 		}
 	}
+}
 
+extension AssetTransfer {
 	private func createManifest(_ accounts: TransferAccountList.State) async throws -> TransactionManifest {
-		let networkID = await gatewaysClient.getCurrentNetworkID()
+		let _involvedFungibleResources = try await extractInvolvedFungibleResources(accounts.receivingAccounts)
 
-		let involvedFungibleResources = try await extractInvolvedFungibleResources(accounts.receivingAccounts)
-		let involvedNonFungibles = extractInvolvedNonFungibleResource(accounts.receivingAccounts)
+		let fungibles: [PerAssetTransfersOfFungibleResource] = try await _involvedFungibleResources.asyncMap { perAsset in
+			let resourceAddress = perAsset.address
 
-		return try await ManifestBuilder.make {
-			for resource in involvedFungibleResources {
-				let divisibility = resource.divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
-				try ManifestBuilder.withdrawAmount(
-					accounts.fromAccount.address.intoEngine(),
-					resource.address.intoEngine(),
-					resource.totalTransferAmount.rounded(decimalPlaces: divisibility)
+			let transfers: [PerAssetFungibleTransfer] = try await perAsset.accounts.asyncMap { transfer in
+				let useTryDepositOrAbort = try await useTryAbortOrDeposit(
+					resource: resourceAddress,
+					into: transfer.recipient
 				)
-
-				for account in resource.accounts {
-					let bucket = ManifestBuilderBucket.unique
-					try ManifestBuilder.takeFromWorktop(
-						resource.address.intoEngine(),
-						account.amount.rounded(decimalPlaces: divisibility),
-						bucket
-					)
-
-					try await instructionForDepositing(
-						bucket: bucket,
-						resource: resource.address,
-						into: account.recipient
-					)
-				}
+				return PerAssetFungibleTransfer(
+					useTryDepositOrAbort: useTryDepositOrAbort,
+					amount: transfer.amount,
+					recipient: transfer.recipient
+				)
 			}
 
-			for resource in involvedNonFungibles {
-				try ManifestBuilder.withdrawTokens(
-					accounts.fromAccount.address.intoEngine(),
-					resource.address.intoEngine(),
-					resource.allTokens.map { $0.id.localId() }
-				)
-
-				for account in resource.accounts {
-					let bucket = ManifestBuilderBucket.unique
-					let localIds = account.tokens.map { $0.id.localId() }
-
-					try ManifestBuilder.takeNonFungiblesFromWorktop(
-						resource.address.intoEngine(),
-						localIds,
-						bucket
-					)
-
-					try await instructionForDepositing(
-						bucket: bucket,
-						resource: resource.address,
-						into: account.recipient
-					)
-				}
-			}
+			return PerAssetTransfersOfFungibleResource(
+				resource: PerAssetFungibleResource(
+					resourceAddress: resourceAddress,
+					divisibility: perAsset.divisibility.map(UInt8.init)
+				),
+				transfers: transfers
+			)
 		}
-		.build(networkId: networkID.rawValue)
+
+		let _involvedNonFungibles = extractInvolvedNonFungibleResource(accounts.receivingAccounts)
+
+		let nonFungibles: [PerAssetTransfersOfNonFungibleResource] = try await _involvedNonFungibles.asyncMap { perAsset in
+			let resourceAddress = perAsset.address
+			let transfers: [PerAssetNonFungibleTransfer] = try await perAsset.accounts.asyncMap { transfer in
+				let useTryDepositOrAbort = try await useTryAbortOrDeposit(
+					resource: resourceAddress,
+					into: transfer.recipient
+				)
+				return PerAssetNonFungibleTransfer(
+					useTryDepositOrAbort: useTryDepositOrAbort,
+					nonFungibleLocalIds: transfer.tokens.map(\.id.nonFungibleLocalId),
+					recipient: transfer.recipient
+				)
+			}
+
+			return PerAssetTransfersOfNonFungibleResource(
+				resource: resourceAddress,
+				transfers: transfers
+			)
+		}
+
+		let perAssetTransfers = PerAssetTransfers(
+			fromAccount: accounts.fromAccount.accountAddress,
+			fungibleResources: fungibles,
+			nonFungibleResources: nonFungibles
+		)
+
+		return TransactionManifest.assetsTransfers(transfers: perAssetTransfers)
 	}
 }
 
-func instructionForDepositing(
-	bucket: ManifestBuilderBucket,
+func useTryAbortOrDeposit(
 	resource: ResourceAddress,
-	into receivingAccount: ReceivingAccount.State.Account
-) async throws -> ManifestBuilder.InstructionsChain.Instruction {
+	into receivingAccount: AssetsTransfersRecipient
+) async throws -> Bool {
 	let recipientAddress = receivingAccount.address
 
-	if case let .left(userAccount) = receivingAccount {
+	if case let .myOwnAccount(sargonUserAccount) = receivingAccount {
 		@Dependency(\.secureStorageClient) var secureStorageClient
+		@Dependency(\.accountsClient) var accountsClient
 
+		let userAccount = try await accountsClient.fromSargon(sargonUserAccount)
 		let needsSignatureForDepositing = await needsSignatureForDepositting(into: userAccount, resource: resource)
 		let isSoftwareAccount = !receivingAccount.isLedgerAccount
 		let userHasAccessToMnemonic = userAccount.deviceFactorSourceID.map { deviceFactorSourceID in
@@ -244,18 +247,11 @@ func instructionForDepositing(
 		} ?? false
 
 		if needsSignatureForDepositing, isSoftwareAccount && userHasAccessToMnemonic || !isSoftwareAccount {
-			return try ManifestBuilder.accountDeposit(
-				recipientAddress.intoEngine(),
-				bucket
-			)
+			return false
 		}
 	}
 
-	return try ManifestBuilder.accountTryDepositOrAbort(
-		recipientAddress.intoEngine(),
-		bucket,
-		nil
-	)
+	return true
 }
 
 /// Determines if depositting the resource into an account requires the addition of a signature
@@ -316,7 +312,7 @@ extension AssetTransfer {
 		var resources: IdentifiedArrayOf<InvolvedFungibleResource> = []
 
 		for receivingAccount in receivingAccounts {
-			guard let account = receivingAccount.account else {
+			guard let account = receivingAccount.recipient else {
 				continue
 			}
 			let assets = receivingAccount.assets.fungibleAssets
@@ -351,7 +347,7 @@ extension AssetTransfer {
 		var resources: IdentifiedArrayOf<InvolvedNonFungibleResource> = []
 
 		for receivingAccount in receivingAccounts {
-			guard let account = receivingAccount.account else {
+			guard let account = receivingAccount.recipient else {
 				continue
 			}
 
@@ -361,10 +357,10 @@ extension AssetTransfer {
 			for nonFungibleAsset in assets {
 				if resources[id: nonFungibleAsset.resourceAddress] != nil {
 					if resources[id: nonFungibleAsset.resourceAddress]?.accounts[id: accountAddress] != nil {
-						resources[id: nonFungibleAsset.resourceAddress]?.accounts[id: accountAddress]?.tokens.append(nonFungibleAsset.token)
+						resources[id: nonFungibleAsset.resourceAddress]?.accounts[id: accountAddress]?.tokens.append(nonFungibleAsset.nftToken)
 					} else {
 						resources[id: nonFungibleAsset.resourceAddress]?.accounts.append(.init(
-							tokens: [nonFungibleAsset.token],
+							tokens: [nonFungibleAsset.nftToken],
 							recipient: account
 						))
 					}
@@ -372,7 +368,7 @@ extension AssetTransfer {
 					resources.append(.init(
 						address: nonFungibleAsset.resourceAddress,
 						accounts: [.init(
-							tokens: [nonFungibleAsset.token],
+							tokens: [nonFungibleAsset.nftToken],
 							recipient: account
 						)]
 					))

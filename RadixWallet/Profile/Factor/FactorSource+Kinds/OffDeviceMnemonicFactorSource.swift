@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - OffDeviceMnemonicFactorSource
 public struct OffDeviceMnemonicFactorSource: FactorSourceProtocol {
 	public typealias ID = FactorSourceID.FromHash

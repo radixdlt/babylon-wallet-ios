@@ -13,7 +13,7 @@ extension AccountPortfoliosClient {
 
 	/// Internal state that holds all loaded portfolios.
 	actor State {
-		typealias TokenPrices = [ResourceAddress: RETDecimal]
+		typealias TokenPrices = [ResourceAddress: Decimal192]
 		let portfoliosSubject: AsyncCurrentValueSubject<Loadable<[AccountAddress: AccountPortfolio]>> = .init(.loading)
 		var tokenPrices: TokenPrices = [:]
 

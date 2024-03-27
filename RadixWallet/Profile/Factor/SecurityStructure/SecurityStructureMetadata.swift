@@ -1,4 +1,4 @@
-import EngineToolkit
+
 
 // MARK: - SecurityStructureMetadata
 public struct SecurityStructureMetadata: Sendable, Hashable, Codable, Identifiable {

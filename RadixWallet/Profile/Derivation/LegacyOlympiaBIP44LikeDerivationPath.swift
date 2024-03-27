@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - LegacyOlympiaBIP44LikeDerivationPath
 /// A derivation path that looks like a BIP44 path, but does not follow the BIP44 standard
 /// since the last component must be hardened, [contrary to the BIP44 standard][bip44]. The

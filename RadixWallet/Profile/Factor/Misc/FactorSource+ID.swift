@@ -1,14 +1,14 @@
-import EngineToolkit
+
 
 extension FactorSource {
 	public static func id(
 		publicKey: SLIP10.PublicKey,
 		factorSourceKind: FactorSourceKind
 	) throws -> FactorSourceID.FromHash {
-		let hash = try blake2b(data: publicKey.compressedRepresentation)
+		let hash = publicKey.compressedRepresentation.hash()
 		return try .init(
 			kind: factorSourceKind,
-			body: .init(data: hash)
+			body: .init(data: hash.data)
 		)
 	}
 

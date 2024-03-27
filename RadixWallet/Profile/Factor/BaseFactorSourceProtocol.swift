@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - FactorOfTierProtocol
 public protocol FactorOfTierProtocol {
 	var factorSourceKind: FactorSourceKind { get }

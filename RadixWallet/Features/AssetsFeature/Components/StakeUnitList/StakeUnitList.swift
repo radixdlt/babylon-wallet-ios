@@ -291,9 +291,12 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		}
 	}
 
-	private func sendStakeClaimTransaction(_ acccountAddress: AccountAddress, stakeClaims: [ManifestBuilder.StakeClaim]) -> Effect<Action> {
+	private func sendStakeClaimTransaction(
+		_ acccountAddress: AccountAddress,
+		stakeClaims: [StakeClaim]
+	) -> Effect<Action> {
 		.run { _ in
-			let manifest = try ManifestBuilder.stakeClaimsManifest(
+			let manifest = try TransactionManifest.stakesClaim(
 				accountAddress: acccountAddress,
 				stakeClaims: stakeClaims
 			)
@@ -313,7 +316,7 @@ extension OnLedgerEntitiesClient.OwnedStakeDetails: Identifiable {
 }
 
 extension OnLedgerEntitiesClient.OwnedStakeDetails {
-	var xrdRedemptionValue: RETDecimal {
+	var xrdRedemptionValue: Decimal192 {
 		((stakeUnitResource?.amount.nominalAmount ?? 0) * validator.xrdVaultBalance) / (stakeUnitResource?.resource.totalSupply ?? 1)
 	}
 }

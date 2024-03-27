@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - PersonaData.PostalAddress.CountryOrRegion
 extension PersonaData.PostalAddress {
 	public enum CountryOrRegion: String, Sendable, Hashable, Codable, CaseIterable, Identifiable {

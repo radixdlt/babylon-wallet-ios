@@ -159,8 +159,11 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 			}
 		case .turnIntoDappDefinitionAccountTypeButtonTapped:
 			return .run { [accountAddress = state.address] send in
-				let accountAddress = try await accountsClient.getAccountByAddress(accountAddress)
-				let manifest = try TransactionManifest.manifestMarkingAccountAsDappDefinitionType(accountAddress: accountAddress)
+
+				let manifest = try TransactionManifest.markingAccountAsDappDefinitionType(
+					accountAddress: accountAddress
+				)
+
 				await send(.internal(.reviewTransaction(manifest)))
 			} catch: { error, _ in
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
@@ -169,7 +172,11 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		case .createFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
 				let accountAddress = try await accountsClient.getAccountByAddress(accountAddress)
-				let manifest = try ManifestBuilder.manifestForCreateFungibleToken(account: accountAddress.address, networkID: accountAddress.networkID)
+
+				let manifest = try TransactionManifest.createFungibleToken(
+					addressOfOwner: accountAddress.address
+				)
+
 				await send(.internal(.reviewTransaction(manifest)))
 			} catch: { error, _ in
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
@@ -178,7 +185,11 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		case .createNonFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
 				let accountAddress = try await accountsClient.getAccountByAddress(accountAddress)
-				let manifest = try ManifestBuilder.manifestForCreateNonFungibleToken(account: accountAddress.address, networkID: accountAddress.networkID)
+
+				let manifest = try TransactionManifest.createNonFungibleToken(
+					addressOfOwner: accountAddress.address
+				)
+
 				await send(.internal(.reviewTransaction(manifest)))
 			} catch: { error, _ in
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
@@ -186,7 +197,11 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		case .createMultipleFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
 				let accountAddress = try await accountsClient.getAccountByAddress(accountAddress)
-				let manifest = try ManifestBuilder.manifestForCreateMultipleFungibleTokens(account: accountAddress.address, networkID: accountAddress.networkID)
+
+				let manifest = try TransactionManifest.createMultipleFungibleTokens(
+					addressOfOwner: accountAddress.address
+				)
+
 				await send(.internal(.reviewTransaction(manifest)))
 			} catch: { error, _ in
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
@@ -194,7 +209,11 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		case .createMultipleNonFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
 				let accountAddress = try await accountsClient.getAccountByAddress(accountAddress)
-				let manifest = try ManifestBuilder.manifestForCreateMultipleNonFungibleTokens(account: accountAddress.address, networkID: accountAddress.networkID)
+
+				let manifest = try TransactionManifest.createMultipleNonFungibleTokens(
+					addressOfOwner: accountAddress.address
+				)
+
 				await send(.internal(.reviewTransaction(manifest)))
 			} catch: { error, _ in
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
@@ -341,15 +360,3 @@ extension DevAccountPreferences {
 	}
 	#endif
 }
-
-#if DEBUG
-extension TransactionManifest {
-	fileprivate static func manifestMarkingAccountAsDappDefinitionType(
-		accountAddress: Profile.Network.Account
-	) throws -> TransactionManifest {
-		try ManifestBuilder()
-			.setAccountType(from: accountAddress.address.asGeneral, type: "dapp definition")
-			.build(networkId: accountAddress.networkID.rawValue)
-	}
-}
-#endif

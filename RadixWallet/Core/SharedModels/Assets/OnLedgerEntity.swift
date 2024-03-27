@@ -100,7 +100,7 @@ extension OnLedgerEntity {
 		public let dappDefinitions: [AccountAddress]?
 		public let dappDefinition: AccountAddress?
 		public let validator: ValidatorAddress?
-		public let poolUnit: ResourcePoolAddress?
+		public let poolUnit: PoolAddress?
 		public let poolUnitResource: ResourceAddress?
 		public let claimedEntities: [String]?
 		public let claimedWebsites: [URL]?
@@ -147,7 +147,7 @@ extension OnLedgerEntity {
 			dappDefinitions: [AccountAddress]? = nil,
 			dappDefinition: AccountAddress? = nil,
 			validator: ValidatorAddress? = nil,
-			poolUnit: ResourcePoolAddress? = nil,
+			poolUnit: PoolAddress? = nil,
 			poolUnitResource: ResourceAddress? = nil,
 			claimedEntities: [String]? = nil,
 			claimedWebsites: [URL]? = nil,
@@ -184,7 +184,7 @@ extension OnLedgerEntity {
 		public let atLedgerState: AtLedgerState
 		public let divisibility: Int?
 		public let behaviors: [AssetBehavior]
-		public let totalSupply: RETDecimal?
+		public let totalSupply: Decimal192?
 		public let metadata: Metadata
 
 		public var fungibility: Fungibility {
@@ -205,7 +205,7 @@ extension OnLedgerEntity {
 			atLedgerState: AtLedgerState,
 			divisibility: Int? = nil,
 			behaviors: [AssetBehavior] = [],
-			totalSupply: RETDecimal? = nil,
+			totalSupply: Decimal192? = nil,
 			metadata: Metadata
 		) {
 			self.resourceAddress = resourceAddress
@@ -240,6 +240,7 @@ extension OnLedgerEntity {
 extension OnLedgerEntity {
 	public struct NonFungibleToken: Sendable, Hashable, Identifiable, Codable {
 		public typealias NFTData = GatewayAPI.ProgrammaticScryptoSborValueTuple
+		public typealias ID = NonFungibleGlobalId
 		public let id: NonFungibleGlobalId
 		public let data: NFTData?
 
@@ -277,13 +278,13 @@ extension OnLedgerEntity {
 
 extension OnLedgerEntity {
 	public struct ResourcePool: Sendable, Hashable, Codable {
-		public let address: ResourcePoolAddress
+		public let address: PoolAddress
 		public let poolUnitResourceAddress: ResourceAddress
 		public let resources: OwnedFungibleResources
 		public let metadata: Metadata
 
 		public init(
-			address: ResourcePoolAddress,
+			address: PoolAddress,
 			poolUnitResourceAddress: ResourceAddress,
 			resources: OwnedFungibleResources,
 			metadata: Metadata
@@ -298,14 +299,14 @@ extension OnLedgerEntity {
 	public struct Validator: Sendable, Hashable, Codable {
 		public let address: ValidatorAddress
 		public let stakeUnitResourceAddress: ResourceAddress
-		public let xrdVaultBalance: RETDecimal
+		public let xrdVaultBalance: Decimal192
 		public let stakeClaimFungibleResourceAddress: ResourceAddress
 		public let metadata: Metadata
 
 		public init(
 			address: ValidatorAddress,
 			stakeUnitResourceAddress: ResourceAddress,
-			xrdVaultBalance: RETDecimal,
+			xrdVaultBalance: Decimal192,
 			stakeClaimFungibleResourceAddress: ResourceAddress,
 			metadata: Metadata
 		) {
@@ -505,12 +506,12 @@ extension OnLedgerEntity.Account {
 
 	public struct PoolUnit: Sendable, Hashable, Codable {
 		public let resource: OnLedgerEntity.OwnedFungibleResource
-		public let resourcePoolAddress: ResourcePoolAddress
+		public let resourcePoolAddress: PoolAddress
 		public let poolResources: [ResourceAddress]
 
 		public init(
 			resource: OnLedgerEntity.OwnedFungibleResource,
-			resourcePoolAddress: ResourcePoolAddress,
+			resourcePoolAddress: PoolAddress,
 			poolResources: [ResourceAddress] = []
 		) {
 			self.resource = resource
@@ -545,11 +546,11 @@ extension OnLedgerEntity.NonFungibleToken.NFTData {
 		return nil
 	}
 
-	public func getDecimalValue(forField field: StandardField) -> RETDecimal? {
+	public func getDecimalValue(forField field: StandardField) -> Decimal192? {
 		self.fields
 			.compactMap(/GatewayAPI.ProgrammaticScryptoSborValue.decimal)
 			.first { $0.fieldName == field.rawValue }
-			.flatMap { try? RETDecimal(value: $0.value) }
+			.flatMap { try? Decimal192(value: $0.value) }
 	}
 
 	public var name: String? {
@@ -564,7 +565,7 @@ extension OnLedgerEntity.NonFungibleToken.NFTData {
 		getString(forField: .keyImageURL).flatMap(URL.init(string:))
 	}
 
-	public var claimAmount: RETDecimal? {
+	public var claimAmount: Decimal192? {
 		getDecimalValue(forField: .claimAmount)
 	}
 
@@ -594,9 +595,9 @@ extension OnLedgerEntity.Account {
 
 extension OnLedgerEntity.Resource {
 	func poolRedemptionValue(
-		for amount: RETDecimal,
+		for amount: Decimal192,
 		poolUnitResource: OnLedgerEntitiesClient.ResourceWithVaultAmount
-	) -> RETDecimal? {
+	) -> Decimal192? {
 		guard let poolUnitTotalSupply = poolUnitResource.resource.totalSupply else {
 			loggerGlobal.error("Missing total supply for \(poolUnitResource.resource.resourceAddress.address)")
 			return nil
@@ -606,7 +607,7 @@ extension OnLedgerEntity.Resource {
 			return nil
 		}
 		let redemptionValue = poolUnitResource.amount.nominalAmount * (amount / poolUnitTotalSupply)
-		let decimalPlaces = divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
+		let decimalPlaces = divisibility.map(UInt.init) ?? Decimal192.maxDivisibility
 		let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
 
 		return roundedRedemptionValue

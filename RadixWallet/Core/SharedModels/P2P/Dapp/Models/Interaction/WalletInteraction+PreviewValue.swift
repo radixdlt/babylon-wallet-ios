@@ -2,7 +2,11 @@
 #if DEBUG
 
 extension TransactionManifest {
-	public static let previewValue = try! TransactionManifest(instructions: .fromString(string: complexManifestString, networkId: NetworkID.mainnet.rawValue), blobs: [])
+	public static let previewValue = try! TransactionManifest(
+		instructionsString: complexManifestString,
+		networkID: NetworkID.mainnet,
+		blobs: []
+	)
 }
 
 private let complexManifestString = """

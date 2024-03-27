@@ -97,7 +97,7 @@ extension OnLedgerEntitiesClient {
 				atLedgerState: ledgerState,
 				divisibility: fungibleDetails.divisibility,
 				behaviors: item.details?.fungible?.roleAssignments.extractBehaviors() ?? [],
-				totalSupply: try? RETDecimal(value: fungibleDetails.totalSupply),
+				totalSupply: try? Decimal192(value: fungibleDetails.totalSupply),
 				metadata: .init(item.explicitMetadata)
 			)
 		case let .nonFungibleResource(nonFungibleDetails):
@@ -106,7 +106,7 @@ extension OnLedgerEntitiesClient {
 				atLedgerState: ledgerState,
 				divisibility: nil,
 				behaviors: item.details?.nonFungible?.roleAssignments.extractBehaviors() ?? [],
-				totalSupply: try? RETDecimal(value: nonFungibleDetails.totalSupply),
+				totalSupply: try? Decimal192(value: nonFungibleDetails.totalSupply),
 				metadata: .init(item.explicitMetadata)
 			)
 		default:
@@ -139,7 +139,7 @@ extension OnLedgerEntitiesClient {
 	) async throws -> OnLedgerEntity.Validator? {
 		@Dependency(\.gatewaysClient) var gatewaysClient
 		let networkId = await gatewaysClient.getCurrentNetworkID()
-		let xrdAddress = knownAddresses(networkId: networkId.rawValue).resourceAddresses.xrd.addressString()
+		let xrdAddress = ResourceAddress.xrd(on: networkId)
 
 		guard let state: GatewayAPI.ValidatorState = try? item.details?.component?.decodeState() else {
 			assertionFailure("Invalid validator state")
@@ -150,7 +150,7 @@ extension OnLedgerEntitiesClient {
 		guard let xrdResource = item
 			.fungibleResources?
 			.items
-			.first(where: { $0.resourceAddress == xrdAddress })
+			.first(where: { $0.resourceAddress == xrdAddress.address })
 		else {
 			assertionFailure("A validator didn't contain an xrd resource")
 			return nil
@@ -302,7 +302,7 @@ extension OnLedgerEntitiesClient {
 				return nil
 			}
 
-			let amount = try RETDecimal(value: vault.amount)
+			let amount = try Decimal192(value: vault.amount)
 			return try .init(
 				resourceAddress: .init(validatingAddress: vaultAggregated.resourceAddress),
 				atLedgerState: ledgerState,
@@ -514,7 +514,7 @@ extension OnLedgerEntitiesClient {
 	}
 
 	public struct OwnedResourcePoolDetails: Hashable, Sendable {
-		public let address: ResourcePoolAddress
+		public let address: PoolAddress
 		public let dAppName: String?
 		public let poolUnitResource: ResourceWithVaultAmount
 		public var xrdResource: ResourceWithRedemptionValue?

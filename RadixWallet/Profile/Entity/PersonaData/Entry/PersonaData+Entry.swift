@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - PersonaData.Entry
 extension PersonaData {
 	public enum Entry: Sendable, Hashable, Codable, BasePersonaDataEntryProtocol, CustomStringConvertible {

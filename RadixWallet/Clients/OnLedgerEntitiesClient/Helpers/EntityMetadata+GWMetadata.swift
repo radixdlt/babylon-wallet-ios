@@ -221,11 +221,11 @@ extension GatewayAPI.EntityMetadataCollection {
 		)
 	}
 
-	public var pool: ResourcePoolAddress? {
+	public var pool: PoolAddress? {
 		extract(
 			key: .pool,
 			from: \.asGlobalAddress,
-			transform: ResourcePoolAddress.init(validatingAddress:)
+			transform: PoolAddress.init(validatingAddress:)
 		)
 	}
 

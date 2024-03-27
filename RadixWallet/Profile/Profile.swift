@@ -1,6 +1,5 @@
-import EngineToolkit
-
 // MARK: - Profile
+
 public struct Profile:
 	Sendable,
 	Hashable,

@@ -139,7 +139,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				let compiledTransactionIntent = try request.transactionIntent.compile()
 				return try await sign(
 					signers: request.signers,
-					expectedHashedMessage: hashedMsg.bytes().data
+					expectedHashedMessage: hashedMsg.bytes()
 				) {
 					try await makeRequest(
 						.signTransaction(.init(
@@ -160,7 +160,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					origin: request.origin,
 					dAppDefinitionAddress: request.dAppDefinitionAddress
 				))
-				let hash = try blake2b(data: rolaPayload.payloadToHashAndSign)
+				let hash = rolaPayload.payloadToHashAndSign.hash()
 				return try await sign(
 					signers: request.signers,
 					expectedHashedMessage: hash.data

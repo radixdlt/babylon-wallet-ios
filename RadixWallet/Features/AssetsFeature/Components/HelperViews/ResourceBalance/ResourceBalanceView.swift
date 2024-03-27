@@ -34,7 +34,7 @@ extension ResourceBalance {
 		}
 
 		public struct PoolUnit: Sendable, Hashable {
-			public let resourcePoolAddress: ResourcePoolAddress
+			public let resourcePoolAddress: PoolAddress
 			public let poolUnitAddress: ResourceAddress
 			public let poolIcon: URL?
 			public let poolName: String?
@@ -206,7 +206,7 @@ extension ResourceBalanceView {
 		public var body: some View {
 			NonFungibleView(
 				thumbnail: .nft(viewState.resourceImage),
-				caption1: viewState.resourceName ?? viewState.id.resourceAddress().formatted(),
+				caption1: viewState.resourceName ?? viewState.id.resourceAddress.formatted(),
 				caption2: viewState.nonFungibleName ?? viewState.id.localId().formatted(),
 				compact: compact
 			)

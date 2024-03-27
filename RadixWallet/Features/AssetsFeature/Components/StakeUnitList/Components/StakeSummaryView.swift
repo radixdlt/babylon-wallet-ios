@@ -7,7 +7,7 @@ public struct StakeSummaryView: View {
 		public let canClaimStakes: Bool
 
 		public var readyToClaimControlState: ControlState {
-			if !canClaimStakes || readyToClaim.isLoading || readyToClaim.wrappedValue?.nominalAmount == .zero() {
+			if !canClaimStakes || readyToClaim.isLoading || readyToClaim.wrappedValue?.nominalAmount == .zero {
 				.disabled
 			} else {
 				.enabled

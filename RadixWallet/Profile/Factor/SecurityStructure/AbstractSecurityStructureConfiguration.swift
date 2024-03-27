@@ -1,6 +1,5 @@
-import EngineToolkit
-
 // MARK: - AbstractSecurityStructureConfiguration
+
 public struct AbstractSecurityStructureConfiguration<AbstractFactor>:
 	Sendable, Hashable, Codable, Identifiable
 	where AbstractFactor: FactorOfTierProtocol & Sendable & Hashable & Codable

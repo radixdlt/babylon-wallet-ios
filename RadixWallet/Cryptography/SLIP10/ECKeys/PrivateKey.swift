@@ -26,7 +26,7 @@ extension SLIP10 {
 
 extension SLIP10.PrivateKey {
 	/// For secp256k1 we produce a recoverable ECDSA signature.
-	public func sign(hashOfMessage: some DataProtocol) throws -> SignatureWithPublicKey {
+	public func sign(hashOfMessage: Data) throws -> SignatureWithPublicKey {
 		// We now sign the hash of the message for both secp256k1 and Curve25519.
 		switch self {
 		case let .curve25519(key):

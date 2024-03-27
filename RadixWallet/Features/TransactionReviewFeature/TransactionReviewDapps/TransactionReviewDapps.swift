@@ -1,13 +1,12 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
-public typealias TransactionReviewPools = TransactionReviewDapps<ResourcePoolEntityType>
-public typealias TransactionReviewDappsUsed = TransactionReviewDapps<ComponentEntityType>
+public typealias TransactionReviewPools = TransactionReviewDapps<PoolAddress>
+public typealias TransactionReviewDappsUsed = TransactionReviewDapps<ComponentAddress>
 
 // MARK: - TransactionReviewDapps
-public struct TransactionReviewDapps<Kind: SpecificEntityType>: Sendable, FeatureReducer {
-	public typealias AddressType = SpecificAddress<Kind>
-
+public struct TransactionReviewDapps<AddressType: AddressProtocol>: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var knownDapps: IdentifiedArrayOf<TransactionReview.DappEntity>
 		public var unknownDapps: IdentifiedArrayOf<AddressType>

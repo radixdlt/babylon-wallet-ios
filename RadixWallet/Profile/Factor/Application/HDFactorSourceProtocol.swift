@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - HDFactorSourceProtocol
 // Empty marker protocol only
 public protocol HDFactorSourceProtocol: BaseFactorSourceProtocol {

@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - PersonaData.PostalAddress.Field
 extension PersonaData.PostalAddress {
 	public enum Field: Sendable, Hashable, Codable, Identifiable, CustomStringConvertible {

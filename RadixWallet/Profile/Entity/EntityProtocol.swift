@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - EntityBaseProtocol
 public protocol EntityBaseProtocol {
 	typealias Flags = OrderedSet<EntityFlag>

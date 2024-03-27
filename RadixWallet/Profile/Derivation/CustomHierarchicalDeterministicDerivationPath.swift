@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - CustomHierarchicalDeterministicDerivationPath
 /// A **custom** derivation path used to derive keys for whatever purpose. [CAP-26][cap26] states
 /// that custom derivation paths must be supported.

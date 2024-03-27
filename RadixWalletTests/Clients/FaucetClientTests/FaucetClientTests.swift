@@ -163,5 +163,9 @@ extension TransactionHeader {
 }
 
 extension TransactionIntent {
-	static let previewValue = try! TransactionIntent(header: .previewValue, manifest: TransactionManifest(instructions: .fromInstructions(instructions: [], networkId: NetworkID.kisharnet.rawValue), blobs: []), message: .none)
+	static let previewValue = try! TransactionIntent(header: .previewValue, manifest: TransactionManifest(
+		instructionsString: "",
+		networkId: NetworkID.kisharnet.rawValue,
+		blobs: []
+	), message: .none)
 }

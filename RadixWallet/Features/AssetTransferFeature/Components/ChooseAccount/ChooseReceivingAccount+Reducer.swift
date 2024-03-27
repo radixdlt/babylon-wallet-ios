@@ -28,15 +28,14 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 				return .invalid
 			}
 			guard
-				let addressOnSomeNetwork = try? AccountAddress(validatingAddress: manualAccountAddress),
-				let engineAddress = try? addressOnSomeNetwork.intoEngine()
+				let addressOnSomeNetwork = try? AccountAddress(validatingAddress: manualAccountAddress)
 			else {
 				return .invalid
 			}
-			let networkOfAddress = engineAddress.networkId()
+			let networkOfAddress = addressOnSomeNetwork.networkId()
 			guard networkOfAddress == networkID.rawValue else {
 				loggerGlobal.warning("Manually inputted address is valid, but is on the WRONG network, inputted: \(networkOfAddress), but current network is: \(networkID.rawValue)")
-				return .wrongNetwork(addressOnSomeNetwork, incorrectNetwork: networkOfAddress)
+				return .wrongNetwork(addressOnSomeNetwork, incorrectNetwork: networkOfAddress.rawValue)
 			}
 			return .valid(addressOnSomeNetwork)
 		}
@@ -64,7 +63,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		case closeButtonTapped
 		case manualAccountAddressChanged(String)
 		case focusChanged(Bool)
-		case chooseButtonTapped(ReceivingAccount.State.Account)
+		case chooseButtonTapped(AssetsTransfersRecipient)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -73,7 +72,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case handleResult(ReceivingAccount.State.Account)
+		case handleResult(AssetsTransfersRecipient)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -127,8 +126,8 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		case let .chooseButtonTapped(result):
 			// While we allow to easily selected the owned account, user is still able to paste the address of an owned account.
 			// This be sure to check if the manually introduced address matches any of the user owned accounts.
-			if case let .right(address) = result, let ownedAccount = state.chooseAccounts.availableAccounts.first(where: { $0.address == address }) {
-				return .send(.delegate(.handleResult(.left(ownedAccount))))
+			if case let .foreignAccount(address) = result, let ownedAccount = state.chooseAccounts.availableAccounts.first(where: { $0.address == address }) {
+				return .send(.delegate(.handleResult(.myOwnAccount(ownedAccount))))
 			}
 			return .send(.delegate(.handleResult(result)))
 		}

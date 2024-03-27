@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - PersonaDataEntryProtocol
 public protocol PersonaDataEntryProtocol: BasePersonaDataEntryProtocol {
 	static var casePath: CasePath<PersonaData.Entry, Self> { get }

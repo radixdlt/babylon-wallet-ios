@@ -1,20 +1,20 @@
 // MARK: - ResourceAmount
 public struct ResourceAmount: Sendable, Hashable, Codable {
-	let nominalAmount: RETDecimal
+	let nominalAmount: Decimal192
 	var fiatWorth: FiatWorth?
 
 	enum CodingKeys: CodingKey {
 		case nominalAmount
 	}
 
-	init(nominalAmount: RETDecimal, fiatWorth: FiatWorth? = nil) {
+	init(nominalAmount: Decimal192, fiatWorth: FiatWorth? = nil) {
 		self.nominalAmount = nominalAmount
 		self.fiatWorth = fiatWorth
 	}
 
 	public init(from decoder: Decoder) throws {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
-		self.nominalAmount = try container.decode(RETDecimal.self, forKey: .nominalAmount)
+		self.nominalAmount = try container.decode(Decimal192.self, forKey: .nominalAmount)
 		self.fiatWorth = nil
 	}
 

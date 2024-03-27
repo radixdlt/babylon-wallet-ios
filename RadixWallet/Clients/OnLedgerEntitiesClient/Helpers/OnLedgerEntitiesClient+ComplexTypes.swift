@@ -23,12 +23,12 @@ extension OnLedgerEntitiesClient {
 		entities: TransactionReview.ResourcesInfo = [:],
 		resourceAssociatedDapps: TransactionReview.ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
-		defaultDepositGuarantee: RETDecimal = 1
+		defaultDepositGuarantee: Decimal192 = 1
 	) async throws -> ResourceBalance {
 		let amount = resourceQuantifier.amount
 		let resourceAddress = resource.resourceAddress
 
-		let guarantee: TransactionClient.Guarantee? = {
+		let guarantee: TransactionGuarantee? = {
 			guard case let .predicted(predictedAmount) = resourceQuantifier else { return nil }
 			let guaranteedAmount = defaultDepositGuarantee * predictedAmount.value
 			return .init(
@@ -71,16 +71,16 @@ extension OnLedgerEntitiesClient {
 
 	private func poolUnit(
 		_ resource: OnLedgerEntity.Resource,
-		amount: RETDecimal,
+		amount: Decimal192,
 		poolContributions: [some TrackedPoolInteraction] = [],
 		entities: TransactionReview.ResourcesInfo = [:],
 		resourceAssociatedDapps: TransactionReview.ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
-		guarantee: TransactionClient.Guarantee?
+		guarantee: TransactionGuarantee?
 	) async throws -> ResourceBalance {
 		let resourceAddress = resource.resourceAddress
 
-		if let poolContribution = try poolContributions.first(where: { try $0.poolUnitsResourceAddress.asSpecific() == resourceAddress }) {
+		if let poolContribution = try poolContributions.first(where: { try $0.poolUnitsResourceAddress == resourceAddress }) {
 			// If this transfer does not contain all the pool units, scale the resource amounts pro rata
 			let adjustmentFactor = amount != poolContribution.poolUnitsAmount ? (amount / poolContribution.poolUnitsAmount) : 1
 			var xrdResource: OwnedResourcePoolDetails.ResourceWithRedemptionValue?
@@ -108,7 +108,7 @@ extension OnLedgerEntitiesClient {
 				resource: resource,
 				details: .poolUnit(.init(
 					details: .init(
-						address: poolContribution.poolAddress.asSpecific(),
+						address: poolContribution.poolAddress,
 						dAppName: resourceAssociatedDapps?[resourceAddress]?.name,
 						poolUnitResource: .init(resource: resource, amount: .init(nominalAmount: amount)),
 						xrdResource: xrdResource,
@@ -134,12 +134,12 @@ extension OnLedgerEntitiesClient {
 
 	private func liquidStakeUnit(
 		_ resource: OnLedgerEntity.Resource,
-		amount: RETDecimal,
+		amount: Decimal192,
 		validator: OnLedgerEntity.Validator,
 		validatorStakes: [TrackedValidatorStake] = [],
-		guarantee: TransactionClient.Guarantee?
+		guarantee: TransactionGuarantee?
 	) async throws -> ResourceBalance {
-		let worth: RETDecimal
+		let worth: Decimal192
 		if validatorStakes.isEmpty {
 			guard let totalSupply = resource.totalSupply, totalSupply.isPositive() else {
 				throw MissingPositiveTotalSupply()
@@ -147,8 +147,8 @@ extension OnLedgerEntitiesClient {
 
 			worth = amount * validator.xrdVaultBalance / totalSupply
 		} else {
-			if let stake = try validatorStakes.first(where: { try $0.validatorAddress.asSpecific() == validator.address }) {
-				guard try stake.liquidStakeUnitAddress.asSpecific() == validator.stakeUnitResourceAddress else {
+			if let stake = try validatorStakes.first(where: { try $0.validatorAddress == validator.address }) {
+				guard try stake.liquidStakeUnitAddress == validator.stakeUnitResourceAddress else {
 					throw StakeUnitAddressMismatch()
 				}
 				// Distribute the worth in proportion to the amounts, if needed
@@ -189,13 +189,13 @@ extension OnLedgerEntitiesClient {
 		case let .left(resource):
 			let existingTokenIds = ids.filter { id in
 				!newlyCreatedNonFungibles.contains { newId in
-					newId.resourceAddress().asStr() == resourceAddress.address && newId.localId() == id
+					newId.resourceAddress.asStr() == resourceAddress.address && newId.localId() == id
 				}
 			}
 
 			let newTokens = try ids.filter { id in
 				newlyCreatedNonFungibles.contains { newId in
-					newId.resourceAddress().asStr() == resourceAddress.address && newId.localId() == id
+					newId.resourceAddress.asStr() == resourceAddress.address && newId.localId() == id
 				}
 			}.map {
 				try OnLedgerEntity.NonFungibleToken(resourceAddress: resourceAddress, nftID: $0, nftData: nil)
@@ -205,7 +205,7 @@ extension OnLedgerEntitiesClient {
 				resource: resourceAddress,
 				nonFungibleIds: existingTokenIds.map {
 					try NonFungibleGlobalId.fromParts(
-						resourceAddress: resourceAddress.intoEngine(),
+						resourceAddress: resourceAddress,
 						nonFungibleLocalId: $0
 					)
 				}
@@ -235,7 +235,7 @@ extension OnLedgerEntitiesClient {
 			// Newly minted tokens
 			result = try ids
 				.map { localId in
-					try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: localId)
+					try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress, nonFungibleLocalId: localId)
 				}
 				.map { id in
 					ResourceBalance(resource: resource, details: .nonFungible(.init(id: id, data: nil)))
@@ -261,7 +261,7 @@ extension OnLedgerEntitiesClient {
 					throw InvalidStakeClaimToken()
 				}
 
-				guard let claimAmount = data.claimAmount, try token.id.resourceAddress().asSpecific() == resource.resourceAddress else {
+				guard let claimAmount = data.claimAmount, try token.id.resourceAddress == resource.resourceAddress else {
 					throw InvalidStakeClaimToken()
 				}
 

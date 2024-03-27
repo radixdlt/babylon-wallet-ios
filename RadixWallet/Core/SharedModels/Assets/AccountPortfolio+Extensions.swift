@@ -3,7 +3,7 @@ extension OnLedgerEntity.NonFungibleToken {
 	public init(resourceAddress: ResourceAddress, nftID: NonFungibleLocalId, nftData: NFTData?) throws {
 		try self.init(
 			id: .fromParts(
-				resourceAddress: resourceAddress.intoEngine(),
+				resourceAddress: resourceAddress,
 				nonFungibleLocalId: nftID
 			),
 			data: nftData
@@ -22,6 +22,13 @@ extension OnLedgerEntity.Resource {
 			metadata: metadata
 		)
 	}
+}
+
+// MARK: - MetadataValue
+public enum MetadataValue {
+	public var string: String? { nil }
+	public var url: URL? { nil }
+	public var stringArray: [String]? { nil }
 }
 
 extension [String: MetadataValue?] {

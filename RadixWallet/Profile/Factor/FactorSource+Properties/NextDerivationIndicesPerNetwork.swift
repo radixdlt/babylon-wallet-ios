@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - Profile.Network.NextDerivationIndices
 extension Profile.Network {
 	public struct NextDerivationIndices: Sendable, Hashable, Codable, Identifiable {

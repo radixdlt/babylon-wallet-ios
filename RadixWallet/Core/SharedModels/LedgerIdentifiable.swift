@@ -62,7 +62,7 @@ extension LedgerIdentifiable {
 		case account(AccountAddress, isLedgerHWAccount: Bool = false)
 		case package(PackageAddress)
 		case resource(ResourceAddress)
-		case resourcePool(ResourcePoolAddress)
+		case resourcePool(PoolAddress)
 		case component(ComponentAddress)
 		case validator(ValidatorAddress)
 		// Will be displayd with full ResourceAddress+NFTLocalID

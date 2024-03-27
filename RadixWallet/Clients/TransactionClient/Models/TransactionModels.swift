@@ -38,14 +38,14 @@ extension GatewayAPI.TransactionPreviewRequest {
 		let notaryIsSignatory = transactionSigners.notaryIsSignatory
 
 		try self.init(
-			manifest: rawManifest.instructions().asStr(),
-			blobsHex: rawManifest.blobs().map(\.hex),
+			manifest: rawManifest.instructionsString,
+			blobsHex: rawManifest.blobs.blobs.map(\.hex),
 			startEpochInclusive: .init(header.startEpochInclusive),
 			endEpochExclusive: .init(header.endEpochExclusive),
 			notaryPublicKey: GatewayAPI.PublicKey(from: header.notaryPublicKey),
 			notaryIsSignatory: notaryIsSignatory,
 			tipPercentage: .init(header.tipPercentage),
-			nonce: .init(header.nonce),
+			nonce: .init(header.nonce.rawValue),
 			signerPublicKeys: transactionSigners.signerPublicKeys.map(GatewayAPI.PublicKey.init(from:)),
 			flags: flags
 		)
@@ -78,34 +78,23 @@ extension TransactionSigners {
 }
 
 extension GatewayAPI.PublicKey {
-	init(from engine: EngineToolkit.PublicKey) {
-		switch engine {
-		case let .secp256k1(bytes):
-			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: bytes.hex()))
-		case let .ed25519(bytes):
-			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: bytes.hex()))
-		}
-	}
-}
-
-extension GatewayAPI.PublicKey {
-	init(from slip10: SLIP10.PublicKey) {
-		switch slip10 {
-		case let .eddsaEd25519(pubKey):
-			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: pubKey.rawRepresentation.hex))
-		case let .ecdsaSecp256k1(pubKey):
-			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: pubKey.compressedRepresentation.hex))
+	init(from sargon: Sargon.PublicKey) {
+		switch sargon {
+		case let .ed25519(pubKey):
+			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: pubKey.hex))
+		case let .secp256k1(pubKey):
+			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: pubKey.hex))
 		}
 	}
 }
 
 // MARK: - NotarizeTransactionRequest
 public struct NotarizeTransactionRequest: Sendable, Hashable {
-	public let intentSignatures: Set<EngineToolkit.SignatureWithPublicKey>
+	public let intentSignatures: Set<SignatureWithPublicKey>
 	public let transactionIntent: TransactionIntent
 	public let notary: SLIP10.PrivateKey
 	public init(
-		intentSignatures: Set<EngineToolkit.SignatureWithPublicKey>,
+		intentSignatures: Set<SignatureWithPublicKey>,
 		transactionIntent: TransactionIntent,
 		notary: SLIP10.PrivateKey
 	) {
@@ -132,14 +121,14 @@ public struct BuildTransactionIntentRequest: Sendable {
 	public let networkID: NetworkID
 	public let nonce: Nonce
 	public let manifest: TransactionManifest
-	public let message: Message
+	public let message: Message?
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
 	public let transactionSigners: TransactionSigners
 
 	public init(
 		networkID: NetworkID,
 		manifest: TransactionManifest,
-		message: Message,
+		message: Message?,
 		nonce: Nonce = .secureRandom(),
 		makeTransactionHeaderInput: MakeTransactionHeaderInput,
 		transactionSigners: TransactionSigners
@@ -159,39 +148,21 @@ public struct GetTransactionSignersRequest: Sendable, Hashable {
 	public let manifest: TransactionManifest
 	public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
 
-	public init(networkID: NetworkID, manifest: TransactionManifest, ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey) {
+	public init(
+		networkID: NetworkID,
+		manifest: TransactionManifest,
+		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
+	) {
 		self.networkID = networkID
 		self.manifest = manifest
 		self.ephemeralNotaryPublicKey = ephemeralNotaryPublicKey
 	}
 }
 
-// MARK: - TransactionClient.Guarantee
-extension TransactionClient {
-	public struct Guarantee: Sendable, Hashable {
-		public var amount: RETDecimal
-		public var instructionIndex: UInt64
-		public var resourceAddress: ResourceAddress
-		public var resourceDivisibility: Int?
-
-		public init(
-			amount: RETDecimal,
-			instructionIndex: UInt64,
-			resourceAddress: ResourceAddress,
-			resourceDivisibility: Int?
-		) {
-			self.amount = amount
-			self.instructionIndex = instructionIndex
-			self.resourceAddress = resourceAddress
-			self.resourceDivisibility = resourceDivisibility
-		}
-	}
-}
-
 // MARK: - ManifestReviewRequest
 public struct ManifestReviewRequest: Sendable {
 	public let unvalidatedManifest: UnvalidatedTransactionManifest
-	public let message: Message
+	public let message: Message?
 	public let nonce: Nonce
 	public let makeTransactionHeaderInput: MakeTransactionHeaderInput
 	public let ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey
@@ -200,7 +171,7 @@ public struct ManifestReviewRequest: Sendable {
 
 	public init(
 		unvalidatedManifest: UnvalidatedTransactionManifest,
-		message: Message,
+		message: Message?,
 		nonce: Nonce,
 		makeTransactionHeaderInput: MakeTransactionHeaderInput = .default,
 		ephemeralNotaryPublicKey: Curve25519.Signing.PublicKey,
@@ -223,9 +194,9 @@ public struct FeePayerCandidate: Sendable, Hashable, Identifiable {
 	public var id: ID { account.id }
 
 	public let account: Profile.Network.Account
-	public let xrdBalance: RETDecimal
+	public let xrdBalance: Decimal192
 
-	public init(account: Profile.Network.Account, xrdBalance: RETDecimal) {
+	public init(account: Profile.Network.Account, xrdBalance: Decimal192) {
 		self.account = account
 		self.xrdBalance = xrdBalance
 	}
@@ -302,7 +273,7 @@ public struct FeePayerSelectionResult: Equatable, Sendable {
 }
 
 extension ExecutionSummary {
-	func guranteesCost() throws -> RETDecimal {
+	func guranteesCost() throws -> Decimal192 {
 		switch detailedManifestClass {
 		case .general, .transfer:
 			accountDeposits.flatMap(\.value).reduce(.zero) { result, resource in

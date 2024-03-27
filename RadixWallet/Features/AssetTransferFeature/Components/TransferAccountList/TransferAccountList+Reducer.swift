@@ -136,8 +136,8 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		guard let id = state.destination?.id else { return .none }
 
 		switch presentedAction {
-		case let .chooseAccount(.delegate(.handleResult(account))):
-			state.receivingAccounts[id: id]?.account = account
+		case let .chooseAccount(.delegate(.handleResult(recipient))):
+			state.receivingAccounts[id: id]?.recipient = recipient
 			state.destination = nil
 			return .none
 
@@ -211,7 +211,7 @@ extension TransferAccountList {
 					resourceImage: resource.resourceImage,
 					resourceName: resource.resourceName,
 					resourceAddress: resource.resourceAddress,
-					token: $0
+					nftToken: $0
 				)))
 			}
 		}
@@ -231,7 +231,7 @@ extension TransferAccountList {
 	}
 
 	private func navigateToChooseAccounts(_ state: inout State, id: ReceivingAccount.State.ID) -> Effect<Action> {
-		let filteredAccounts = state.receivingAccounts.compactMap(\.account?.left?.address) + [state.fromAccount.address]
+		let filteredAccounts = state.receivingAccounts.compactMap(\.recipient?.id) + [state.fromAccount.address]
 		let chooseAccount: ChooseReceivingAccount.State = .init(
 			networkID: state.fromAccount.networkID,
 			chooseAccounts: .init(
@@ -268,7 +268,7 @@ extension TransferAccountList {
 					resourceName: asset.resourceName,
 					tokens: []
 				)
-				resource.tokens.append(asset.token)
+				resource.tokens.append(asset.nftToken)
 				partialResult.updateOrAppend(resource)
 			}
 
@@ -276,7 +276,7 @@ extension TransferAccountList {
 			.filter { $0.id != id }
 			.flatMap(\.assets)
 			.nonFungibleAssets
-			.map(\.token.id)
+			.map(\.nftToken.id)
 
 		state.destination = .init(
 			id: id,
@@ -297,11 +297,12 @@ extension TransferAccountList {
 		_ receivingAccount: ReceivingAccount.State,
 		forAssets assets: IdentifiedArrayOf<ResourceAsset.State>
 	) -> Effect<Action> {
-		if case let .left(userOwnedAccount) = receivingAccount.account {
+		if case let .myOwnAccount(userOwnedAccount) = receivingAccount.recipient {
 			return .run { send in
 				for asset in assets {
 					let resourceAddress = asset.resourceAddress
 					let signatureNeeded = await needsSignatureForDepositting(into: userOwnedAccount, resource: resourceAddress)
+
 					await send(.internal(.updateSignatureStatus(
 						accountID: receivingAccount.id,
 						assetID: asset.id,

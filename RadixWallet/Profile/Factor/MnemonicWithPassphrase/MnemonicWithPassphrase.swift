@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - MnemonicWithPassphrase
 public struct MnemonicWithPassphrase: Sendable, Hashable, Codable {
 	public let mnemonic: Mnemonic

@@ -47,7 +47,7 @@ public struct TransactionFee: Hashable, Sendable {
 		)
 	}
 
-	public mutating func update(with feeSummaryField: WritableKeyPath<FeeSummary, RETDecimal>, amount: RETDecimal) {
+	public mutating func update(with feeSummaryField: WritableKeyPath<FeeSummary, Decimal192>, amount: Decimal192) {
 		var feeSummary = feeSummary
 		feeSummary[keyPath: feeSummaryField] = amount
 		let mode: Mode = switch self.mode {
@@ -105,24 +105,24 @@ extension TransactionFee {
 extension TransactionFee {
 	public enum PredefinedFeeConstants {
 		/// 15% margin is added here to make up for the ambiguity of the transaction preview estimate)
-		public static let networkFeeMultiplier: RETDecimal = 0.15
+		public static let networkFeeMultiplier: Decimal192 = 0.15
 
 		/// Network fees -> https://radixdlt.atlassian.net/wiki/spaces/S/pages/3134783512/Manifest+Mutation+Cost+Addition+Estimates
 		// swiftformat:disable all
-        public static let lockFeeInstructionCost =              try! RETDecimal(value: "0.08581566997")
-        public static let fungibleGuaranteeInstructionCost =    try! RETDecimal(value: "0.00908532837")
-        public static let nonFungibleGuranteeInstructionCost =  try! RETDecimal(value: "0.00954602837")
-        public static let signatureCost =                       try! RETDecimal(value: "0.01109974758")
-        public static let notarizingCost =                      try! RETDecimal(value: "0.0081393944")
-        public static let notarizingCostWhenNotaryIsSignatory = try! RETDecimal(value: "0.0084273944")
+        public static let lockFeeInstructionCost =              try! Decimal192(value: "0.08581566997")
+        public static let fungibleGuaranteeInstructionCost =    try! Decimal192(value: "0.00908532837")
+        public static let nonFungibleGuranteeInstructionCost =  try! Decimal192(value: "0.00954602837")
+        public static let signatureCost =                       try! Decimal192(value: "0.01109974758")
+        public static let notarizingCost =                      try! Decimal192(value: "0.0081393944")
+        public static let notarizingCostWhenNotaryIsSignatory = try! Decimal192(value: "0.0084273944")
         //    swiftformat:enable all
 
-		public static func notarizingCost(_ notaryIsSignatory: Bool) -> RETDecimal {
+		public static func notarizingCost(_ notaryIsSignatory: Bool) -> Decimal192 {
 			notaryIsSignatory ? notarizingCostWhenNotaryIsSignatory : notarizingCost
 		}
 
-		public static func signaturesCost(_ signaturesCount: Int) -> RETDecimal {
-			RETDecimal(integer: signaturesCount) * PredefinedFeeConstants.signatureCost
+		public static func signaturesCost(_ signaturesCount: Int) -> Decimal192 {
+			Decimal192(integer: signaturesCount) * PredefinedFeeConstants.signatureCost
 		}
 	}
 
@@ -132,18 +132,18 @@ extension TransactionFee {
 	}
 
 	public struct FeeSummary: Hashable, Sendable {
-		public let executionCost: RETDecimal
-		public let finalizationCost: RETDecimal
-		public let storageExpansionCost: RETDecimal
-		public let royaltyCost: RETDecimal
+		public let executionCost: Decimal192
+		public let finalizationCost: Decimal192
+		public let storageExpansionCost: Decimal192
+		public let royaltyCost: Decimal192
 
-		public let guaranteesCost: RETDecimal
+		public let guaranteesCost: Decimal192
 
-		public var lockFeeCost: RETDecimal
-		public var signaturesCost: RETDecimal
-		public var notarizingCost: RETDecimal
+		public var lockFeeCost: Decimal192
+		public var signaturesCost: Decimal192
+		public var notarizingCost: Decimal192
 
-		public var totalExecutionCost: RETDecimal {
+		public var totalExecutionCost: Decimal192 {
 			executionCost
 				+ guaranteesCost
 				+ signaturesCost
@@ -151,7 +151,7 @@ extension TransactionFee {
 				+ notarizingCost
 		}
 
-		public var total: RETDecimal {
+		public var total: Decimal192 {
 			totalExecutionCost
 				+ finalizationCost
 				+ storageExpansionCost
@@ -159,14 +159,14 @@ extension TransactionFee {
 		}
 
 		public init(
-			executionCost: RETDecimal,
-			finalizationCost: RETDecimal,
-			storageExpansionCost: RETDecimal,
-			royaltyCost: RETDecimal,
-			guaranteesCost: RETDecimal,
-			signaturesCost: RETDecimal,
-			lockFeeCost: RETDecimal,
-			notarizingCost: RETDecimal
+			executionCost: Decimal192,
+			finalizationCost: Decimal192,
+			storageExpansionCost: Decimal192,
+			royaltyCost: Decimal192,
+			guaranteesCost: Decimal192,
+			signaturesCost: Decimal192,
+			lockFeeCost: Decimal192,
+			notarizingCost: Decimal192
 		) {
 			self.executionCost = executionCost
 			self.finalizationCost = finalizationCost
@@ -180,10 +180,10 @@ extension TransactionFee {
 	}
 
 	public struct FeeLocks: Hashable, Sendable {
-		public let nonContingentLock: RETDecimal
-		public let contingentLock: RETDecimal
+		public let nonContingentLock: Decimal192
+		public let contingentLock: Decimal192
 
-		public init(nonContingentLock: RETDecimal, contingentLock: RETDecimal) {
+		public init(nonContingentLock: Decimal192, contingentLock: Decimal192) {
 			self.nonContingentLock = nonContingentLock
 			self.contingentLock = contingentLock
 		}
@@ -191,15 +191,15 @@ extension TransactionFee {
 
 	public struct AdvancedFeeCustomization: Hashable, Sendable {
 		public let feeSummary: FeeSummary
-		public var paddingFee: RETDecimal
+		public var paddingFee: Decimal192
 		public var tipPercentage: UInt16
-		public let paidByDapps: RETDecimal
+		public let paidByDapps: Decimal192
 
-		public var tipAmount: RETDecimal {
-			(RETDecimal(integer: Int(tipPercentage)) / 100) * (feeSummary.totalExecutionCost + feeSummary.finalizationCost)
+		public var tipAmount: Decimal192 {
+			(Decimal192(integer: Int(tipPercentage)) / 100) * (feeSummary.totalExecutionCost + feeSummary.finalizationCost)
 		}
 
-		public var total: RETDecimal {
+		public var total: Decimal192 {
 			(feeSummary.total + paddingFee + tipAmount + paidByDapps).clamped
 		}
 
@@ -214,11 +214,11 @@ extension TransactionFee {
 	}
 
 	public struct NormalFeeCustomization: Hashable, Sendable {
-		public let networkFee: RETDecimal
-		public let royaltyFee: RETDecimal
-		public let total: RETDecimal
+		public let networkFee: Decimal192
+		public let royaltyFee: Decimal192
+		public let total: Decimal192
 
-		public init(networkFee: RETDecimal, royaltyFee: RETDecimal) {
+		public init(networkFee: Decimal192, royaltyFee: Decimal192) {
 			self.networkFee = networkFee
 			self.royaltyFee = royaltyFee
 			self.total = networkFee + royaltyFee
@@ -240,15 +240,15 @@ extension TransactionFee {
 	}
 
 	public struct TotalFee: Hashable, Sendable {
-		public let min: RETDecimal
-		public let max: RETDecimal
+		public let min: Decimal192
+		public let max: Decimal192
 
-		public init(min: RETDecimal, max: RETDecimal) {
+		public init(min: Decimal192, max: Decimal192) {
 			self.min = min
 			self.max = max
 		}
 
-		public var lockFee: RETDecimal {
+		public var lockFee: Decimal192 {
 			// We always lock the max amount
 			max
 		}

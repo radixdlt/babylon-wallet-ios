@@ -123,7 +123,7 @@ struct IncorrectSignatureCountExpectedExactlyOne: Swift.Error {}
 extension DeviceFactorSourceClient {
 	public func signUsingDeviceFactorSource(
 		signerEntity: EntityPotentiallyVirtual,
-		hashedDataToSign: some DataProtocol,
+		hashedDataToSign: Data,
 		purpose: SigningPurpose
 	) async throws -> SignatureOfEntity {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
