@@ -125,7 +125,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 
 		case let .submitTXResult(.success(txID)):
 			state.status = .submitted
-			return .run { [endEpoch = state.notarizedTX.intent.header().endEpochExclusive] send in
+			return .run { [endEpoch = state.notarizedTX.intent.header.endEpochExclusive] send in
 				do {
 					try await submitTXClient.hasTXBeenCommittedSuccessfully(txID)
 					await send(.internal(.statusUpdate(.committedSuccessfully)))
@@ -137,7 +137,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 					case let .temporarilyRejected(epoch):
 						await send(.internal(.statusUpdate(
 							.temporarilyRejected(
-								remainingProcessingTime: Int((endEpoch - epoch).rawValue) * epochDurationInMinutes
+								remainingProcessingTime: Int(endEpoch - epoch) * epochDurationInMinutes
 							)
 						)))
 					case let .failed(reason):

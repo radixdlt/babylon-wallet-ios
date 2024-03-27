@@ -282,7 +282,7 @@ private extension String {
 
 	var asDecimalDataField: ArbitraryDataFieldKind? {
 		nilIfEmpty.map {
-			if let decimal = try? Decimal192(value: $0) {
+			if let decimal = try? Decimal192($0) {
 				.decimal(decimal)
 			} else {
 				.primitive(self)
@@ -292,7 +292,7 @@ private extension String {
 
 	var asNonFungibleIDDataField: ArbitraryDataFieldKind? {
 		nilIfEmpty.map {
-			if let id = try? NonFungibleLocalId.from(stringFormat: $0) {
+			if let id = try? NonFungibleLocalID(localId: $0) {
 				.id(id)
 			} else {
 				.primitive(self)

@@ -138,23 +138,23 @@ extension TransactionClient {
 				intentSignatures: IntentSignatures(signatures: Array(request.intentSignatures.map { IntentSignature(signatureWithPublicKey: $0.intoSargon()) }))
 			)
 
-			let signedIntentHash = try signedTransactionIntent.hash()
+			let signedIntentHash = signedTransactionIntent.hash()
 
 			let notarySignature = try request.notary.sign(
-				hashOfMessage: signedIntentHash.hash
+				hashOfMessage: signedIntentHash.hash.data
 			)
 
-			let uncompiledNotarized = try NotarizedTransaction(
+			let uncompiledNotarized = NotarizedTransaction(
 				signedIntent: signedTransactionIntent,
-				notarySignature: notarySignature.signature
+				notarySignature: NotarySignature(signature: notarySignature.intoSargon())
 			)
 
-			let compiledNotarizedTXIntent = try uncompiledNotarized.compile()
+			let compiledNotarizedTXIntent = uncompiledNotarized.compile()
 
-			let txID = try request.transactionIntent.intentHash()
+			let txID = request.transactionIntent.hash()
 
 			return .init(
-				notarized: compiledNotarizedTXIntent,
+				notarized: compiledNotarizedTXIntent.data,
 				intent: request.transactionIntent,
 				txID: txID
 			)

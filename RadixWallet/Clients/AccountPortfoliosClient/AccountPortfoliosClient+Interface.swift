@@ -71,7 +71,7 @@ extension AccountPortfoliosClient {
 
 			if let poolAddressesToRefresh {
 				for item in poolAddressesToRefresh {
-					cacheClient.removeFile(.onLedgerEntity(.resource(.pool(item))))
+					cacheClient.removeFile(.onLedgerEntity(.resourcePool(item)))
 				}
 			}
 

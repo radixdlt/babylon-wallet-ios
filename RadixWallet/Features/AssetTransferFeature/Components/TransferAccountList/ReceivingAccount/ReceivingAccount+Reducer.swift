@@ -76,7 +76,7 @@ extension AssetsTransfersRecipient {
 	var name: String {
 		switch self {
 		case let .myOwnAccount(account):
-			account.displayName.rawValue
+			account.displayName.value
 		case .foreignAccount:
 			L10n.Common.account
 		}
