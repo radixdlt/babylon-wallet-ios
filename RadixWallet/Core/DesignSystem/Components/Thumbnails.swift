@@ -253,7 +253,7 @@ public struct LoadableImage<Placeholder: View>: View {
 	private var loadingView: some View {
 		switch placeholderBehaviour.loading {
 		case .shimmer:
-			Color.app.gray4
+			Color.gray
 				.shimmer(active: true, config: .accountResourcesLoading)
 
 		case let .color(color):
