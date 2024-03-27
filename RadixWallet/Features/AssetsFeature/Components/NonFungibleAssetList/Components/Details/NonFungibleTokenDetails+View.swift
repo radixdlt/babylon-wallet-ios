@@ -160,7 +160,7 @@ extension NonFungibleTokenDetails {
 
 			case let .address(address):
 				KeyValueView(key: field.name) {
-					AddressView(.address(address))
+					AddressView(.address(address), imageColor: .app.gray2)
 				}
 
 			case let .decimal(value):

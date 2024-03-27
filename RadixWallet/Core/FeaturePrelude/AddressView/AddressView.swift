@@ -2,6 +2,7 @@
 public struct AddressView: View {
 	let identifiable: LedgerIdentifiable
 	let isTappable: Bool
+	let imageColor: Color?
 	private let showFull: Bool
 	private let action: Action
 
@@ -16,11 +17,13 @@ public struct AddressView: View {
 	public init(
 		_ identifiable: LedgerIdentifiable,
 		showFull: Bool = false,
-		isTappable: Bool = true
+		isTappable: Bool = true,
+		imageColor: Color? = nil
 	) {
 		self.identifiable = identifiable
 		self.showFull = showFull
 		self.isTappable = isTappable
+		self.imageColor = imageColor
 
 		switch identifiable {
 		case .address, .identifier(.nonFungibleGlobalID):
@@ -89,7 +92,12 @@ extension AddressView {
 			HStack(spacing: .small3) {
 				Text(identifiable.formatted(.default))
 					.lineLimit(1)
-				image
+				if let imageColor {
+					image
+						.foregroundStyle(imageColor)
+				} else {
+					image
+				}
 			}
 		}
 	}

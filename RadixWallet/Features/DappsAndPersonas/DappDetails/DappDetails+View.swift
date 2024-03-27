@@ -173,9 +173,12 @@ extension DappDetails.View {
 
 						Spacer(minLength: 0)
 
-						AddressView(.address(.account(viewStore.address)))
-							.foregroundColor(.app.gray1)
-							.textStyle(.body1HighImportance)
+						AddressView(
+							.address(.account(viewStore.address)),
+							imageColor: .app.gray2
+						)
+						.foregroundColor(.app.gray1)
+						.textStyle(.body1HighImportance)
 					}
 
 					if let domain = viewStore.domain {
