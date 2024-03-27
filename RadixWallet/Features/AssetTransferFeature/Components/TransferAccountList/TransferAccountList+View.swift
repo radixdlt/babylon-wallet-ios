@@ -51,13 +51,15 @@ extension TransferAccountList.View {
 					)
 				}
 
-				Button(L10n.AssetTransfer.AccountList.addAccountButton, asset: AssetResource.addAccount) {
+				Button {
 					viewStore.send(.addAccountTapped)
+				} label: {
+					Label(L10n.AssetTransfer.AccountList.addAccountButton, asset: AssetResource.addAccount)
+						.font(.app.button)
+						.foregroundColor(.app.blue2)
+						.padding([.vertical, .leading], .medium1)
 				}
-				.textStyle(.button)
-				.foregroundColor(.app.blue2)
 				.flushedRight
-				.padding(.top, .medium1)
 			}
 			.destinations(with: store)
 		}

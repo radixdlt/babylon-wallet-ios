@@ -52,10 +52,15 @@ extension ReceivingAccount.View {
 				}
 			} else {
 				HStack {
-					Button(L10n.AssetTransfer.ReceivingAccount.chooseAccountButton) {
+					Button {
 						viewStore.send(.chooseAccountTapped)
+					} label: {
+						Label(L10n.AssetTransfer.ReceivingAccount.chooseAccountButton, asset: AssetResource.chooseAccount)
+							.font(.app.body1Header)
+							.foregroundColor(.app.blue2)
+							.flushedLeft
+							.padding(.vertical, .medium3)
 					}
-					.textStyle(.body1Header)
 					Spacer()
 					if viewStore.canBeRemoved {
 						removeAccountButton(viewStore)
@@ -77,12 +82,15 @@ extension ReceivingAccount.View {
 				}
 			)
 
-			Button(L10n.AssetTransfer.ReceivingAccount.addAssetsButton) {
+			Button {
 				viewStore.send(.addAssetTapped)
+			} label: {
+				Text(L10n.AssetTransfer.ReceivingAccount.addAssetsButton)
+					.frame(height: .standardButtonHeight)
+					.frame(maxWidth: .infinity)
+					.foregroundColor(.app.blue2)
+					.font(.app.body1StandaloneLink)
 			}
-			.frame(height: .standardButtonHeight)
-			.foregroundColor(.app.gray2)
-			.textStyle(.body1StandaloneLink)
 		}
 		.frame(maxWidth: .infinity)
 		.padding([.top, .horizontal], .medium3)
