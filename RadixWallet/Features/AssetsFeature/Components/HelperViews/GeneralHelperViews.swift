@@ -6,19 +6,19 @@ struct KeyValueView<Content: View>: View {
 	let key: String
 	let content: Content
 
-	init(resourceAddress: ResourceAddress, imageColor: Color?) where Content == AddressView {
+	init(resourceAddress: ResourceAddress, imageColor: Color? = .app.gray2) where Content == AddressView {
 		self.init(key: L10n.AssetDetails.resourceAddress) {
 			AddressView(.address(.resource(resourceAddress)), imageColor: imageColor)
 		}
 	}
 
-	init(validatorAddress: ValidatorAddress, imageColor: Color?) where Content == AddressView {
+	init(validatorAddress: ValidatorAddress, imageColor: Color? = .app.gray2) where Content == AddressView {
 		self.init(key: L10n.AssetDetails.validator) {
 			AddressView(.address(.validator(validatorAddress)), imageColor: imageColor)
 		}
 	}
 
-	init(nonFungibleGlobalID: NonFungibleGlobalId, imageColor: Color?) where Content == AddressView {
+	init(nonFungibleGlobalID: NonFungibleGlobalId, imageColor: Color? = .app.gray2) where Content == AddressView {
 		self.init(key: L10n.AssetDetails.NFTDetails.id) {
 			AddressView(.identifier(.nonFungibleGlobalID(nonFungibleGlobalID)), imageColor: imageColor)
 		}

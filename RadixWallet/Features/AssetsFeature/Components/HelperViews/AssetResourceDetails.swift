@@ -33,16 +33,10 @@ struct AssetResourceDetailsSection: View {
 			.padding(.horizontal, .large2)
 
 			VStack(alignment: .leading, spacing: .medium3) {
-				KeyValueView(
-					resourceAddress: viewState.resourceAddress,
-					imageColor: .app.gray2
-				)
+				KeyValueView(resourceAddress: viewState.resourceAddress)
 
 				if let validatorAddress = viewState.validatorAddress {
-					KeyValueView(
-						validatorAddress: validatorAddress,
-						imageColor: .app.gray2
-					)
+					KeyValueView(validatorAddress: validatorAddress)
 				}
 
 				if let resourceName = viewState.resourceName {
