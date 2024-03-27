@@ -21,14 +21,12 @@ extension AccountPreferences.State {
 
 				#if DEBUG
 				addDevAccountPreferencesSection(to: &sections)
-				#else
-				if account.networkID != .mainnet {
-					addDevAccountPreferencesSection(to: &sections)
-				}
 				#endif
 
 				return sections
-			}()
+			}(),
+			faucetButtonState: faucetButtonState,
+			isOnMainnet: isOnMainnet
 		)
 	}
 
@@ -49,6 +47,8 @@ extension AccountPreferences {
 		typealias Section = PreferenceSection<AccountPreferences.Section, AccountPreferences.Section.SectionRow>.ViewState
 		let account: Profile.Network.Account
 		var sections: [Section]
+		var faucetButtonState: ControlState
+		var isOnMainnet: Bool
 	}
 
 	@MainActor
@@ -78,7 +78,7 @@ extension AccountPreferences {
 				PreferencesList(
 					viewState: .init(sections: viewStore.sections),
 					onRowSelected: { _, rowId in viewStore.send(.rowTapped(rowId)) },
-					footer: { hideAccountButton() }
+					footer: { footer(with: viewStore) }
 				)
 				.task {
 					viewStore.send(.task)
@@ -97,8 +97,34 @@ extension AccountPreferences {
 }
 
 extension AccountPreferences.View {
+	@ViewBuilder
+	private func footer(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
+		VStack {
+			if !viewStore.isOnMainnet {
+				faucetButton(with: viewStore)
+			}
+
+			hideAccountButton()
+		}
+	}
+
+	@ViewBuilder
+	private func faucetButton(with viewStore: ViewStoreOf<AccountPreferences>) -> some View {
+		Button(L10n.AccountSettings.getXrdTestTokens) {
+			viewStore.send(.faucetButtonTapped)
+		}
+		.buttonStyle(.secondaryRectangular(shouldExpand: true))
+		.controlState(viewStore.faucetButtonState)
+
+		if viewStore.faucetButtonState.isLoading {
+			Text(L10n.AccountSettings.loadingPrompt)
+				.font(.app.body2Regular)
+				.foregroundColor(.app.gray1)
+		}
+	}
+
 	@MainActor
-	func hideAccountButton() -> some View {
+	private func hideAccountButton() -> some View {
 		Button(L10n.AccountSettings.HideAccount.button) {
 			store.send(.view(.hideAccountTapped))
 		}

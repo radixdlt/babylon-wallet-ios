@@ -7,8 +7,6 @@ extension DevAccountPreferences.State {
 	var viewState: DevAccountPreferences.ViewState {
 		#if DEBUG
 		return .init(
-			isOnMainnet: isOnMainnet,
-			faucetButtonState: faucetButtonState,
 			canTurnIntoDappDefinitionAccounType: canTurnIntoDappDefinitionAccountType,
 			canCreateAuthSigningKey: canCreateAuthSigningKey,
 			createFungibleTokenButtonState: createFungibleTokenButtonState,
@@ -17,7 +15,7 @@ extension DevAccountPreferences.State {
 			createMultipleNonFungibleTokenButtonState: createMultipleNonFungibleTokenButtonState
 		)
 		#else
-		return .init(isOnMainnet: isOnMainnet, faucetButtonState: faucetButtonState)
+		return .init()
 		#endif // DEBUG
 	}
 }
@@ -25,9 +23,6 @@ extension DevAccountPreferences.State {
 // MARK: - AccountPreferences.View
 extension DevAccountPreferences {
 	public struct ViewState: Equatable {
-		public let isOnMainnet: Bool
-		public var faucetButtonState: ControlState
-
 		#if DEBUG
 		public var canTurnIntoDappDefinitionAccounType: Bool
 		public var canCreateAuthSigningKey: Bool
@@ -39,8 +34,6 @@ extension DevAccountPreferences {
 
 		#if DEBUG
 		public init(
-			isOnMainnet: Bool,
-			faucetButtonState: ControlState,
 			canTurnIntoDappDefinitionAccounType: Bool,
 			canCreateAuthSigningKey: Bool,
 			createFungibleTokenButtonState: ControlState,
@@ -48,8 +41,6 @@ extension DevAccountPreferences {
 			createMultipleFungibleTokenButtonState: ControlState,
 			createMultipleNonFungibleTokenButtonState: ControlState
 		) {
-			self.isOnMainnet = isOnMainnet
-			self.faucetButtonState = faucetButtonState
 			self.canTurnIntoDappDefinitionAccounType = canTurnIntoDappDefinitionAccounType
 			self.canCreateAuthSigningKey = canCreateAuthSigningKey
 			self.createFungibleTokenButtonState = createFungibleTokenButtonState
@@ -58,10 +49,7 @@ extension DevAccountPreferences {
 			self.createMultipleNonFungibleTokenButtonState = createMultipleNonFungibleTokenButtonState
 		}
 		#else
-		public init(isOnMainnet: Bool, faucetButtonState: ControlState) {
-			self.isOnMainnet = isOnMainnet
-			self.faucetButtonState = faucetButtonState
-		}
+		public init() {}
 		#endif // DEBUG
 	}
 
@@ -77,9 +65,6 @@ extension DevAccountPreferences {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				NavigationStack {
 					VStack {
-						if !viewStore.isOnMainnet {
-							faucetButton(with: viewStore)
-						}
 						#if DEBUG
 						turnIntoDappDefinitionAccountTypeButton(with: viewStore)
 						createFungibleTokenButton(with: viewStore)
@@ -108,23 +93,6 @@ extension DevAccountPreferences {
 						.toolbarBackground(.visible, for: .navigationBar)
 				}
 			}
-		}
-	}
-}
-
-extension DevAccountPreferences.View {
-	@ViewBuilder
-	private func faucetButton(with viewStore: ViewStoreOf<DevAccountPreferences>) -> some View {
-		Button(L10n.AccountSettings.getXrdTestTokens) {
-			viewStore.send(.faucetButtonTapped)
-		}
-		.buttonStyle(.secondaryRectangular(shouldExpand: true))
-		.controlState(viewStore.faucetButtonState)
-
-		if viewStore.faucetButtonState.isLoading {
-			Text(L10n.AccountSettings.loadingPrompt)
-				.font(.app.body2Regular)
-				.foregroundColor(.app.gray1)
 		}
 	}
 }
