@@ -133,8 +133,8 @@ extension Profile.Network.Persona {
 		}
 
 		return EntityAddress(
-			publicKey: factorInstance.publicKey,
-			networkId: networkID
+			publicKey: factorInstance.publicKey.intoSargon(),
+			networkID: networkID
 		)
 	}
 }

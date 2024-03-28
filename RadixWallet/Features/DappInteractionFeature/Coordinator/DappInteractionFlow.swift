@@ -1041,8 +1041,9 @@ extension DappInteractionFlow.Path.State {
 				nonce: .secureRandom(),
 				signTransactionPurpose: .manifestFromDapp,
 				message: item.message.map {
-					Message.plainText(value: $0)
-				} ?? .none,
+//					Message.plainText(value: $0)
+					Message.plainText(plaintext: .init(mimeType: "application/text", message: .stringMessage(string: $0)))
+				} ?? Message.none,
 				waitsForTransactionToBeComitted: interaction.id.isWalletAccountDepositSettingsInteraction,
 				isWalletTransaction: interaction.id.isWalletInteraction,
 				proposingDappMetadata: dappMetadata.onLedger

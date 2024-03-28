@@ -122,8 +122,8 @@ extension Profile.Network.Account {
 		factorInstance: HierarchicalDeterministicFactorInstance
 	) -> EntityAddress {
 		EntityAddress(
-			publicKey: factorInstance.publicKey,
-			networkId: networkID
+			publicKey: factorInstance.publicKey.intoSargon(),
+			networkID: networkID
 		)
 	}
 

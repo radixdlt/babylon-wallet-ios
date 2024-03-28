@@ -435,7 +435,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				reviewedTransaction: reviewedTransaction,
 				manifestSummary: reviewedTransaction
 					.transactionManifest
-					.summary(networkId: reviewedTransaction.networkID),
+					.summary,
 				signingPurpose: .signTransaction(state.signTransactionPurpose)
 			))
 			return .none
@@ -460,7 +460,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				transactionFee: preview.transactionFee,
 				transactionSigners: preview.transactionSigners,
 				signingFactors: preview.signingFactors,
-				accountWithdraws: preview.analyzedManifestToReview.accountWithdraws,
+				accountWithdraws: preview.analyzedManifestToReview.withdrawals,
 				isNonConforming: preview.analyzedManifestToReview.detailedManifestClass == nil
 			)
 
@@ -974,7 +974,7 @@ public struct ReviewedTransaction: Hashable, Sendable {
 	var transactionSigners: TransactionSigners
 	var signingFactors: SigningFactors
 
-	let accountWithdraws: [String: [ResourceIndicator]]
+	let accountWithdraws: [AccountAddress: [ResourceIndicator]]
 	let isNonConforming: Bool
 }
 
@@ -989,7 +989,7 @@ extension ReviewedTransaction {
 	var feePayingValidation: Loadable<FeeValidationOutcome> {
 		feePayer.map { selected in
 			guard let feePayer = selected,
-			      let feePayerWithdraws = accountWithdraws[feePayer.account.address.address]
+			      let feePayerWithdraws = accountWithdraws[feePayer.account.address]
 			else {
 				return selected.validateBalance(forFee: transactionFee)
 			}
@@ -998,7 +998,7 @@ extension ReviewedTransaction {
 
 			let xrdTotalTransfer: Decimal192 = feePayerWithdraws.reduce(.zero) { partialResult, resource in
 				if case let .fungible(resourceAddress, indicator) = resource, resourceAddress == xrdAddress {
-					return (try? partialResult.add(rhs: indicator.amount)) ?? partialResult
+					return partialResult + indicator.amount
 				}
 				return partialResult
 			}

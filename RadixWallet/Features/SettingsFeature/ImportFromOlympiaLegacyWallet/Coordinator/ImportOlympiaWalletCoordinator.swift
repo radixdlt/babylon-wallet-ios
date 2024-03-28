@@ -583,8 +583,8 @@ extension ImportOlympiaWalletCoordinator {
 	) throws -> NonEmpty<[MigratableAccount]> {
 		let result = scannedAccounts.enumerated().map { index, account in
 			let babylonAddress = AccountAddress(
-				publicKey: .ecdsaSecp256k1(account.publicKey),
-				networkId: networkID
+				publicKey: SLIP10.PublicKey.ecdsaSecp256k1(account.publicKey).intoSargon(),
+				networkID: networkID
 			)
 
 			return MigratableAccount(

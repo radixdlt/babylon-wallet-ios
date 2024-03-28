@@ -27,7 +27,7 @@ extension Settings {
 
 		init(state: Settings.State) {
 			#if DEBUG
-			let retCommitHash: String = SargonBuildInformation.get().dependencies.radixEngineToolkit
+			let retCommitHash: String = SargonBuildInformation.get().dependencies.radixEngineToolkit.description
 			self.debugAppInfo = "RET #\(retCommitHash), SS \(RadixConnectConstants.defaultSignalingServer.absoluteString)"
 			#endif
 

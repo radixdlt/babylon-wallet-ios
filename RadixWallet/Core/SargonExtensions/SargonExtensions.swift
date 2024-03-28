@@ -1,32 +1,4 @@
-// MARK: - AssetsTransfersRecipient + Identifiable
-extension AssetsTransfersRecipient: Identifiable {
-	public typealias ID = AccountAddress
-	public var id: ID {
-		accountAddress
-	}
-}
-
-extension NonFungibleLocalID {
-	public func toUserFacingString() -> String {
-		fatalError("sargon migration")
-	}
-
-	public func formatted(_ format: AddressFormat = .default) -> String {
-		fatalError("sargon migration")
-	}
-}
-
-extension NonFungibleGlobalID {
-	public func formatted(_ format: AddressFormat = .default) -> String {
-		fatalError("sargon migration")
-	}
-}
-
-extension ResourceAddress {
-	public func formatted(_ format: AddressFormat = .default) -> String {
-		fatalError("sargon migration")
-	}
-}
+import SargonUniFFI
 
 extension Profile.Network.Account.AppearanceID {
 	init(sargon: Sargon.AppearanceID) {
@@ -46,5 +18,47 @@ extension PlaintextMessage {
 extension Profile.Network.Account {
 	public func intoSargon() -> Sargon.Account {
 		fatalError()
+	}
+}
+
+extension OnLedgerEntitiesClient.StakeClaim {
+	public func intoSargon() -> StakeClaim {
+		fatalError()
+	}
+}
+
+extension ResourceIndicator {
+	public var resourceAddress: ResourceAddress {
+		switch self {
+		case let .fungible(resourceAddress, _): resourceAddress
+		case let .nonFungible(resourceAddress, _): resourceAddress
+		}
+	}
+}
+
+extension FungibleResourceIndicator {
+	public var amount: Decimal192 {
+		switch self {
+		case let .guaranteed(decimal: amount): amount
+		case let .predicted(predictedDecimal): predictedDecimal.value
+		}
+	}
+}
+
+extension ResourceAddress {
+	public func isXRD(on networkID: NetworkID) -> Bool {
+		self == self.mapTo(networkID: networkID)
+	}
+}
+
+// MARK: - DependencyInformation + CustomStringConvertible
+extension DependencyInformation: CustomStringConvertible {
+	public var description: String {
+		switch self {
+		case let .branch(value): value
+		case let .tag(value): value
+		case let .version(value): value
+		case let .rev(value): value
+		}
 	}
 }

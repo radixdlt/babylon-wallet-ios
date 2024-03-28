@@ -173,7 +173,7 @@ extension GatewayAPIClient {
 				) {
 					$0.appendingPathComponent("transaction/construction")
 				}
-				return Epoch(rawValue: .init(response.ledgerState.epoch))
+				return Epoch(response.ledgerState.epoch)
 			},
 			getEntityDetails: getEntityDetails,
 			getEntityMetadata: { address, explicitMetadata in

@@ -154,7 +154,7 @@ extension TransactionClient {
 			let txID = request.transactionIntent.hash()
 
 			return .init(
-				notarized: compiledNotarizedTXIntent.data,
+				notarized: compiledNotarizedTXIntent,
 				intent: request.transactionIntent,
 				txID: txID
 			)

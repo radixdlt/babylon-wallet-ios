@@ -48,9 +48,9 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 		state: State
 	) async throws -> Set<SignatureOfEntity> {
 		let dataToSign: Data = switch state.signingPurposeWithPayload {
-		case let .signAuth(auth): auth.payloadToHashAndSign.hash()
+		case let .signAuth(auth): auth.payloadToHashAndSign.hash().data
 		case let .signTransaction(_, intent, _):
-			try intent.intentHash().bytes().data
+			intent.hash().hash.data
 		}
 
 		return try await deviceFactorSourceClient.signUsingDeviceFactorSource(

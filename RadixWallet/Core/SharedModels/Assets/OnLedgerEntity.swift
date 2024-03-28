@@ -182,7 +182,7 @@ extension OnLedgerEntity {
 		public var id: ResourceAddress { resourceAddress }
 		public let resourceAddress: ResourceAddress
 		public let atLedgerState: AtLedgerState
-		public let divisibility: Int?
+		public let divisibility: UInt8?
 		public let behaviors: [AssetBehavior]
 		public let totalSupply: Decimal192?
 		public let metadata: Metadata
@@ -203,7 +203,7 @@ extension OnLedgerEntity {
 		public init(
 			resourceAddress: ResourceAddress,
 			atLedgerState: AtLedgerState,
-			divisibility: Int? = nil,
+			divisibility: UInt8? = nil,
 			behaviors: [AssetBehavior] = [],
 			totalSupply: Decimal192? = nil,
 			metadata: Metadata
@@ -607,7 +607,7 @@ extension OnLedgerEntity.Resource {
 			return nil
 		}
 		let redemptionValue = poolUnitResource.amount.nominalAmount * (amount / poolUnitTotalSupply)
-		let decimalPlaces = divisibility.map(UInt8.init) ?? Decimal192.maxDivisibility
+		let decimalPlaces = divisibility ?? Decimal192.maxDivisibility
 		let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
 
 		return roundedRedemptionValue

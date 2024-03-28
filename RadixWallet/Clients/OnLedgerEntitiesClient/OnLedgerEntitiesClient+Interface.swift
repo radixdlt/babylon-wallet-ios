@@ -153,7 +153,7 @@ extension OnLedgerEntitiesClient {
 		atLedgerState: AtLedgerState? = nil
 	) async throws -> [OnLedgerEntity.Account] {
 		try await getEntities(
-			addresses: addresses.map(\.embed()),
+			addresses: addresses.map { $0.embed() },
 			metadataKeys: metadataKeys,
 			cachingStrategy: cachingStrategy,
 			atLedgerState: atLedgerState
@@ -204,7 +204,7 @@ extension OnLedgerEntitiesClient {
 		atLedgerState: AtLedgerState? = nil
 	) async throws -> [OnLedgerEntity.AssociatedDapp] {
 		try await getEntities(
-			addresses: addresses.map(\.embed()),
+			addresses: addresses.map { $0.embed() },
 			metadataKeys: .dappMetadataKeys,
 			cachingStrategy: cachingStrategy,
 			atLedgerState: atLedgerState

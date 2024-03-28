@@ -28,7 +28,7 @@ extension GatewayAPIClient: TestDependencyKey {
 	) -> Self {
 		.init(
 			getNetworkName: { _ in .init("Nebunet") },
-			getEpoch: { .init(rawValue: 123) },
+			getEpoch: { 123 },
 			getEntityDetails: unimplemented("\(self).getEntityDetails"),
 			getEntityMetadata: unimplemented("\(self).getEntityMetadata"),
 			getEntityFungiblesPage: unimplemented("\(self).getEntityFungiblesPage"),

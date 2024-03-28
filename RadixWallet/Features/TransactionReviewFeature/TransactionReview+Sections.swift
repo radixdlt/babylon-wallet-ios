@@ -25,327 +25,333 @@ extension TransactionReview {
 	}
 
 	func sections(for summary: ExecutionSummary, networkID: NetworkID) async throws -> Sections? {
-		let userAccounts = try await extractUserAccounts(summary.encounteredEntities)
+		fatalError()
+		/*
+		 let userAccounts = try await extractUserAccounts(summary.encounteredEntities)
 
-		let allWithdrawAddresses = summary.accountWithdraws.values.flatMap { $0 }.map(\.resourceAddress)
-		let allDepositAddresses = summary.accountDeposits.values.flatMap { $0 }.map(\.resourceAddress)
-		// Prepoluate with all resource addresses from withdraw and deposit.
-		let allAddresses: IdentifiedArrayOf<ResourceAddress> = try (allWithdrawAddresses + allDepositAddresses)
-			.asIdentifiable()
+		 let allWithdrawAddresses = summary.accountWithdraws.values.flatMap { $0 }.map(\.resourceAddress)
+		 let allDepositAddresses = summary.accountDeposits.values.flatMap { $0 }.map(\.resourceAddress)
+		 // Prepoluate with all resource addresses from withdraw and deposit.
+		 let allAddresses: IdentifiedArrayOf<ResourceAddress> = try (allWithdrawAddresses + allDepositAddresses)
+		 	.asIdentifiable()
 
-		func resourcesInfo(_ resourceAddresses: [ResourceAddress]) async throws -> ResourcesInfo {
-			var newlyCreatedMetadata = Dictionary(uniqueKeysWithValues: resourceAddresses.compactMap { resourceAddress in
-				summary.metadataOfNewlyCreatedEntities[resourceAddress.address].map { (resourceAddress, ResourceInfo.right(.init($0))) }
-			})
+		 func resourcesInfo(_ resourceAddresses: [ResourceAddress]) async throws -> ResourcesInfo {
+		 	var newlyCreatedMetadata = Dictionary(uniqueKeysWithValues: resourceAddresses.compactMap { resourceAddress in
+		 		summary.metadataOfNewlyCreatedEntities[resourceAddress.address].map { (resourceAddress, ResourceInfo.right(.init($0))) }
+		 	})
 
-			let existingResources = resourceAddresses.filter {
-				newlyCreatedMetadata[$0] == nil
-			}
+		 	let existingResources = resourceAddresses.filter {
+		 		newlyCreatedMetadata[$0] == nil
+		 	}
 
-			let existingResourceDetails = try await onLedgerEntitiesClient.getResources(existingResources)
-				.reduce(into: ResourcesInfo()) { partialResult, next in
-					partialResult[next.resourceAddress] = .left(next)
-				}
+		 	let existingResourceDetails = try await onLedgerEntitiesClient.getResources(existingResources)
+		 		.reduce(into: ResourcesInfo()) { partialResult, next in
+		 			partialResult[next.resourceAddress] = .left(next)
+		 		}
 
-			newlyCreatedMetadata.append(contentsOf: existingResourceDetails)
+		 	newlyCreatedMetadata.append(contentsOf: existingResourceDetails)
 
-			return newlyCreatedMetadata
-		}
+		 	return newlyCreatedMetadata
+		 }
 
-		switch summary.detailedManifestClass {
-		case nil:
-			return nil
-		case .general, .transfer:
-			if summary.detailedManifestClass == .general {
-				guard !summary.accountDeposits.isEmpty || !summary.accountWithdraws.isEmpty else { return nil }
-			}
+		 switch summary.detailedManifestClass {
+		 case nil:
+		 	return nil
+		 case .general, .transfer:
+		 	if summary.detailedManifestClass == .general {
+		 		guard !summary.accountDeposits.isEmpty || !summary.accountWithdraws.isEmpty else { return nil }
+		 	}
 
-			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
-			let withdrawals = try await extractWithdrawals(
-				accountWithdraws: summary.accountWithdraws,
-				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
-				entities: resourcesInfo,
-				userAccounts: userAccounts,
-				networkID: networkID
-			)
+		 	let resourcesInfo = try await resourcesInfo(allAddresses.elements)
+		 	let withdrawals = try await extractWithdrawals(
+		 		accountWithdraws: summary.accountWithdraws,
+		 		newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+		 		entities: resourcesInfo,
+		 		userAccounts: userAccounts,
+		 		networkID: networkID
+		 	)
 
-			let dAppAddresses = summary.encounteredEntities.filter { $0.entityType() == .globalGenericComponent }
-			let dAppsUsed: TransactionReviewDappsUsed.State? = try await extractDapps(dAppAddresses, unknownTitle: L10n.TransactionReview.unknownComponents)
+		 	let dAppAddresses = summary.encounteredEntities.filter { $0.entityType() == .globalGenericComponent }
+		 	let dAppsUsed: TransactionReviewDappsUsed.State? = try await extractDapps(dAppAddresses, unknownTitle: L10n.TransactionReview.unknownComponents)
 
-			let deposits = try await extractDeposits(
-				accountDeposits: summary.accountDeposits,
-				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
-				entities: resourcesInfo,
-				userAccounts: userAccounts,
-				networkID: networkID
-			)
+		 	let deposits = try await extractDeposits(
+		 		accountDeposits: summary.accountDeposits,
+		 		newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+		 		entities: resourcesInfo,
+		 		userAccounts: userAccounts,
+		 		networkID: networkID
+		 	)
 
-			let proofs: TransactionReviewProofs.State? = try await exctractProofs(summary.presentedProofs)
+		 	let proofs: TransactionReviewProofs.State? = try await exctractProofs(summary.presentedProofs)
 
-			return Sections(
-				withdrawals: withdrawals,
-				dAppsUsed: dAppsUsed,
-				deposits: deposits,
-				proofs: proofs
-			)
+		 	return Sections(
+		 		withdrawals: withdrawals,
+		 		dAppsUsed: dAppsUsed,
+		 		deposits: deposits,
+		 		proofs: proofs
+		 	)
 
-		case let .poolContribution(poolAddresses, poolContributions):
-			// All resources that are part of the pool
-			let resourceAddresses = try poolContributions.flatMap(\.contributedResources.keys).map {
-				try ResourceAddress(validatingAddress: $0)
-			}
+		 case let .poolContribution(poolAddresses, poolContributions):
+		 	// All resources that are part of the pool
+		 	let resourceAddresses = try poolContributions.flatMap(\.contributedResources.keys).map {
+		 		try ResourceAddress(validatingAddress: $0)
+		 	}
 
-			let allAddresses = allAddresses + resourceAddresses.asIdentifiable()
-			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
+		 	let allAddresses = allAddresses + resourceAddresses.asIdentifiable()
+		 	let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 
-			let dApps = await extractDappEntities(poolAddresses.map(\.embed()))
+		 	let dApps = await extractDappEntities(poolAddresses.map(\.embed()))
 
-			let perPoolUnitDapps = perPoolUnitDapps(dApps, poolInteractions: poolContributions)
+		 	let perPoolUnitDapps = perPoolUnitDapps(dApps, poolInteractions: poolContributions)
 
-			// Extract Contributing to Pools section
-			let pools: TransactionReviewPools.State? = try await extractDapps(dApps, unknownTitle: L10n.TransactionReview.unknownPools)
+		 	// Extract Contributing to Pools section
+		 	let pools: TransactionReviewPools.State? = try await extractDapps(dApps, unknownTitle: L10n.TransactionReview.unknownPools)
 
-			// Extract Withdrawals section
-			let withdrawals = try await extractWithdrawals(
-				accountWithdraws: summary.accountWithdraws,
-				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
-				entities: resourcesInfo,
-				resourceAssociatedDapps: perPoolUnitDapps,
-				userAccounts: userAccounts,
-				networkID: networkID
-			)
+		 	// Extract Withdrawals section
+		 	let withdrawals = try await extractWithdrawals(
+		 		accountWithdraws: summary.accountWithdraws,
+		 		newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+		 		entities: resourcesInfo,
+		 		resourceAssociatedDapps: perPoolUnitDapps,
+		 		userAccounts: userAccounts,
+		 		networkID: networkID
+		 	)
 
-			// Extract Deposits section, passing in poolcontributions so that pool units can be updated
-			let deposits = try await extractDeposits(
-				accountDeposits: summary.accountDeposits,
-				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
-				poolContributions: poolContributions.aggregated,
-				entities: resourcesInfo,
-				resourceAssociatedDapps: perPoolUnitDapps,
-				userAccounts: userAccounts,
-				networkID: networkID
-			)
+		 	// Extract Deposits section, passing in poolcontributions so that pool units can be updated
+		 	let deposits = try await extractDeposits(
+		 		accountDeposits: summary.accountDeposits,
+		 		newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+		 		poolContributions: poolContributions.aggregated,
+		 		entities: resourcesInfo,
+		 		resourceAssociatedDapps: perPoolUnitDapps,
+		 		userAccounts: userAccounts,
+		 		networkID: networkID
+		 	)
 
-			return Sections(
-				withdrawals: withdrawals,
-				deposits: deposits,
-				contributingToPools: pools
-			)
+		 	return Sections(
+		 		withdrawals: withdrawals,
+		 		deposits: deposits,
+		 		contributingToPools: pools
+		 	)
 
-		case let .poolRedemption(poolAddresses, poolRedemptions):
-			// All resources that are part of the pool
-			let resourceAddresses = try poolRedemptions.flatMap(\.redeemedResources.keys).map {
-				try ResourceAddress(validatingAddress: $0)
-			}
+		 case let .poolRedemption(poolAddresses, poolRedemptions):
+		 	// All resources that are part of the pool
+		 	let resourceAddresses = try poolRedemptions.flatMap(\.redeemedResources.keys).map {
+		 		try ResourceAddress(validatingAddress: $0)
+		 	}
 
-			let allAddresses = allAddresses + resourceAddresses.asIdentifiable()
-			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
+		 	let allAddresses = allAddresses + resourceAddresses.asIdentifiable()
+		 	let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 
-			let dApps = await extractDappEntities(poolAddresses.map(\.embed()))
+		 	let dApps = await extractDappEntities(poolAddresses.map(\.embed()))
 
-			let perPoolUnitDapps = perPoolUnitDapps(dApps, poolInteractions: poolRedemptions)
+		 	let perPoolUnitDapps = perPoolUnitDapps(dApps, poolInteractions: poolRedemptions)
 
-			// Extract Contributing to Pools section
-			let pools: TransactionReviewPools.State? = try await extractDapps(dApps, unknownTitle: L10n.TransactionReview.unknownPools)
+		 	// Extract Contributing to Pools section
+		 	let pools: TransactionReviewPools.State? = try await extractDapps(dApps, unknownTitle: L10n.TransactionReview.unknownPools)
 
-			// Extract Withdrawals section, passing in poolRedemptions so that withdrawn pool units can be updated
-			let withdrawals = try await extractWithdrawals(
-				accountWithdraws: summary.accountWithdraws,
-				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
-				poolRedemptions: poolRedemptions.aggregated,
-				entities: resourcesInfo,
-				resourceAssociatedDapps: perPoolUnitDapps,
-				userAccounts: userAccounts,
-				networkID: networkID
-			)
+		 	// Extract Withdrawals section, passing in poolRedemptions so that withdrawn pool units can be updated
+		 	let withdrawals = try await extractWithdrawals(
+		 		accountWithdraws: summary.accountWithdraws,
+		 		newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+		 		poolRedemptions: poolRedemptions.aggregated,
+		 		entities: resourcesInfo,
+		 		resourceAssociatedDapps: perPoolUnitDapps,
+		 		userAccounts: userAccounts,
+		 		networkID: networkID
+		 	)
 
-			// Extract Deposits section
-			let deposits = try await extractDeposits(
-				accountDeposits: summary.accountDeposits,
-				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
-				entities: resourcesInfo,
-				resourceAssociatedDapps: perPoolUnitDapps,
-				userAccounts: userAccounts,
-				networkID: networkID
-			)
+		 	// Extract Deposits section
+		 	let deposits = try await extractDeposits(
+		 		accountDeposits: summary.accountDeposits,
+		 		newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+		 		entities: resourcesInfo,
+		 		resourceAssociatedDapps: perPoolUnitDapps,
+		 		userAccounts: userAccounts,
+		 		networkID: networkID
+		 	)
 
-			return Sections(
-				withdrawals: withdrawals,
-				deposits: deposits,
-				redeemingFromPools: pools
-			)
+		 	return Sections(
+		 		withdrawals: withdrawals,
+		 		deposits: deposits,
+		 		redeemingFromPools: pools
+		 	)
 
-		case let .validatorStake(validatorAddresses: validatorAddresses, validatorStakes: validatorStakes):
-			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
+		 case let .validatorStake(validatorAddresses: validatorAddresses, validatorStakes: validatorStakes):
+		 	let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 
-			let withdrawals = try await extractWithdrawals(
-				accountWithdraws: summary.accountWithdraws,
-				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
-				entities: resourcesInfo,
-				userAccounts: userAccounts,
-				networkID: networkID
-			)
+		 	let withdrawals = try await extractWithdrawals(
+		 		accountWithdraws: summary.accountWithdraws,
+		 		newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+		 		entities: resourcesInfo,
+		 		userAccounts: userAccounts,
+		 		networkID: networkID
+		 	)
 
-			// Extract validators
-			let stakingToValidators = try await extractValidators(for: validatorAddresses)
+		 	// Extract validators
+		 	let stakingToValidators = try await extractValidators(for: validatorAddresses)
 
-			// Extract Deposits section
-			let deposits = try await extractDeposits(
-				accountDeposits: summary.accountDeposits,
-				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
-				validatorStakes: validatorStakes.aggregated,
-				entities: resourcesInfo,
-				userAccounts: userAccounts,
-				networkID: networkID
-			)
+		 	// Extract Deposits section
+		 	let deposits = try await extractDeposits(
+		 		accountDeposits: summary.accountDeposits,
+		 		newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+		 		validatorStakes: validatorStakes.aggregated,
+		 		entities: resourcesInfo,
+		 		userAccounts: userAccounts,
+		 		networkID: networkID
+		 	)
 
-			return Sections(
-				withdrawals: withdrawals,
-				deposits: deposits,
-				stakingToValidators: stakingToValidators
-			)
+		 	return Sections(
+		 		withdrawals: withdrawals,
+		 		deposits: deposits,
+		 		stakingToValidators: stakingToValidators
+		 	)
 
-		case let .validatorUnstake(validatorAddresses, validatorUnstakes, claimsNonFungibleData):
-			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
+		 case let .validatorUnstake(validatorAddresses, validatorUnstakes, claimsNonFungibleData):
+		 	let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 
-			let withdrawals = try await extractWithdrawals(
-				accountWithdraws: summary.accountWithdraws,
-				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
-				entities: resourcesInfo,
-				userAccounts: userAccounts,
-				networkID: networkID
-			)
+		 	let withdrawals = try await extractWithdrawals(
+		 		accountWithdraws: summary.accountWithdraws,
+		 		newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+		 		entities: resourcesInfo,
+		 		userAccounts: userAccounts,
+		 		networkID: networkID
+		 	)
 
-			// Extract validators
-			let unstakingFromValidators = try await extractValidators(for: validatorAddresses)
+		 	// Extract validators
+		 	let unstakingFromValidators = try await extractValidators(for: validatorAddresses)
 
-			// Extract Deposits section
-			let deposits = try await extractDeposits(
-				accountDeposits: summary.accountDeposits,
-				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
-				unstakeData: claimsNonFungibleData,
-				entities: resourcesInfo,
-				userAccounts: userAccounts,
-				networkID: networkID
-			)
+		 	// Extract Deposits section
+		 	let deposits = try await extractDeposits(
+		 		accountDeposits: summary.accountDeposits,
+		 		newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+		 		unstakeData: claimsNonFungibleData,
+		 		entities: resourcesInfo,
+		 		userAccounts: userAccounts,
+		 		networkID: networkID
+		 	)
 
-			return Sections(
-				withdrawals: withdrawals,
-				deposits: deposits,
-				unstakingFromValidators: unstakingFromValidators
-			)
+		 	return Sections(
+		 		withdrawals: withdrawals,
+		 		deposits: deposits,
+		 		unstakingFromValidators: unstakingFromValidators
+		 	)
 
-		case let .validatorClaim(validatorAddresses, _):
-			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
-			let withdrawals = try? await extractWithdrawals(
-				accountWithdraws: summary.accountWithdraws.aggregated,
-				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
-				entities: resourcesInfo,
-				userAccounts: userAccounts,
-				networkID: networkID
-			)
+		 case let .validatorClaim(validatorAddresses, _):
+		 	let resourcesInfo = try await resourcesInfo(allAddresses.elements)
+		 	let withdrawals = try? await extractWithdrawals(
+		 		accountWithdraws: summary.accountWithdraws.aggregated,
+		 		newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+		 		entities: resourcesInfo,
+		 		userAccounts: userAccounts,
+		 		networkID: networkID
+		 	)
 
-			let claimingFromValidators = try await extractValidators(
-				for: validatorAddresses
-			)
+		 	let claimingFromValidators = try await extractValidators(
+		 		for: validatorAddresses
+		 	)
 
-			let deposits = try? await extractDeposits(
-				accountDeposits: summary.accountDeposits.aggregated,
-				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
-				entities: resourcesInfo,
-				userAccounts: userAccounts,
-				networkID: networkID
-			)
+		 	let deposits = try? await extractDeposits(
+		 		accountDeposits: summary.accountDeposits.aggregated,
+		 		newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
+		 		entities: resourcesInfo,
+		 		userAccounts: userAccounts,
+		 		networkID: networkID
+		 	)
 
-			return Sections(
-				withdrawals: withdrawals,
-				deposits: deposits,
-				claimingFromValidators: claimingFromValidators
-			)
+		 	return Sections(
+		 		withdrawals: withdrawals,
+		 		deposits: deposits,
+		 		claimingFromValidators: claimingFromValidators
+		 	)
 
-		case let .accountDepositSettingsUpdate(
-			resourcePreferencesUpdates,
-			depositModeUpdates,
-			authorizedDepositorsAdded,
-			authorizedDepositorsRemoved
-		):
+		 case let .accountDepositSettingsUpdate(
+		 	resourcePreferencesUpdates,
+		 	depositModeUpdates,
+		 	authorizedDepositorsAdded,
+		 	authorizedDepositorsRemoved
+		 ):
 
-			let resourcePreferenceChanges = try resourcePreferencesUpdates.mapKeyValues(
-				AccountAddress.init(validatingAddress:),
-				fValue: { try $0.mapKeys(ResourceAddress.init(validatingAddress:)) }
-			)
-			let defaultDepositRuleChanges = try depositModeUpdates.mapKeys(AccountAddress.init(validatingAddress:))
-			let authorizedDepositorsAdded = try authorizedDepositorsAdded.mapKeys(AccountAddress.init(validatingAddress:))
-			let authorizedDepositorsRemoved = try authorizedDepositorsRemoved.mapKeys(AccountAddress.init(validatingAddress:))
+		 	let resourcePreferenceChanges = try resourcePreferencesUpdates.mapKeyValues(
+		 		AccountAddress.init(validatingAddress:),
+		 		fValue: { try $0.mapKeys(ResourceAddress.init(validatingAddress:)) }
+		 	)
+		 	let defaultDepositRuleChanges = try depositModeUpdates.mapKeys(AccountAddress.init(validatingAddress:))
+		 	let authorizedDepositorsAdded = try authorizedDepositorsAdded.mapKeys(AccountAddress.init(validatingAddress:))
+		 	let authorizedDepositorsRemoved = try authorizedDepositorsRemoved.mapKeys(AccountAddress.init(validatingAddress:))
 
-			let allAccountAddress = Set(authorizedDepositorsAdded.keys)
-				.union(authorizedDepositorsRemoved.keys)
-				.union(defaultDepositRuleChanges.keys)
-				.union(resourcePreferenceChanges.keys)
+		 	let allAccountAddress = Set(authorizedDepositorsAdded.keys)
+		 		.union(authorizedDepositorsRemoved.keys)
+		 		.union(defaultDepositRuleChanges.keys)
+		 		.union(resourcePreferenceChanges.keys)
 
-			let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork() // TODO: Use general one
+		 	let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork() // TODO: Use general one
 
-			let validAccounts = allAccountAddress.compactMap { address in
-				userAccounts.first { $0.address == address }
-			}
+		 	let validAccounts = allAccountAddress.compactMap { address in
+		 		userAccounts.first { $0.address == address }
+		 	}
 
-			let accountDepositSetting = extractAccountDepositSetting(
-				for: validAccounts,
-				defaultDepositRuleChanges: defaultDepositRuleChanges
-			)
-			let accountDepositExceptions = try await extractAccountDepositExceptions(
-				for: validAccounts,
-				resourcePreferenceChanges: resourcePreferenceChanges,
-				authorizedDepositorsAdded: authorizedDepositorsAdded,
-				authorizedDepositorsRemoved: authorizedDepositorsRemoved
-			)
+		 	let accountDepositSetting = extractAccountDepositSetting(
+		 		for: validAccounts,
+		 		defaultDepositRuleChanges: defaultDepositRuleChanges
+		 	)
+		 	let accountDepositExceptions = try await extractAccountDepositExceptions(
+		 		for: validAccounts,
+		 		resourcePreferenceChanges: resourcePreferenceChanges,
+		 		authorizedDepositorsAdded: authorizedDepositorsAdded,
+		 		authorizedDepositorsRemoved: authorizedDepositorsRemoved
+		 	)
 
-			return Sections(
-				accountDepositSetting: accountDepositSetting,
-				accountDepositExceptions: accountDepositExceptions
-			)
-		}
+		 	return Sections(
+		 		accountDepositSetting: accountDepositSetting,
+		 		accountDepositExceptions: accountDepositExceptions
+		 	)
+		 }
+		 */
 	}
 
 	private func extractUserAccounts(_ allAddress: [Address]) async throws -> [Account] {
-		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
-
-		return allAddress
-			.compactMap {
-				let accountAddress: AccountAddress? = try? $0.asSpecific()
-				return accountAddress
-			}
-			.map { (address: AccountAddress) in
-				let userAccount = userAccounts.first { userAccount in
-					userAccount.address.address == address.address
-				}
-				if let userAccount {
-					return .user(userAccount)
-				} else {
-					return .external(address, approved: false)
-				}
-			}
+		fatalError()
+//		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
+//
+//		return allAddress
+//			.compactMap {
+//				let accountAddress: AccountAddress? = try? $0.asSpecific()
+//				return accountAddress
+//			}
+//			.map { (address: AccountAddress) in
+//				let userAccount = userAccounts.first { userAccount in
+//					userAccount.address.address == address.address
+//				}
+//				if let userAccount {
+//					return .user(userAccount)
+//				} else {
+//					return .external(address, approved: false)
+//				}
+//			}
 	}
 
-	private func extractDapps<Kind: SpecificEntityType>(
+	private func extractDapps<Kind: AddressProtocol>(
 		_ addresses: [Address],
 		unknownTitle: (Int) -> String
 	) async throws -> TransactionReviewDapps<Kind>.State? {
-		let dApps = await extractDappEntities(addresses)
-		return try await extractDapps(dApps, unknownTitle: unknownTitle)
+//		let dApps = await extractDappEntities(addresses)
+//		return try await extractDapps(dApps, unknownTitle: unknownTitle)
+		fatalError()
 	}
 
-	private func extractDapps<Kind: SpecificEntityType>(
+	private func extractDapps<Kind: AddressProtocol>(
 		_ dAppEntities: [(address: Address, entity: DappEntity?)],
 		unknownTitle: (Int) -> String
 	) async throws -> TransactionReviewDapps<Kind>.State? {
-		let knownDapps = dAppEntities.compactMap(\.entity).asIdentifiable()
-		let unknownDapps = try dAppEntities.filter { $0.entity == nil }
-			.map { try $0.address.asSpecific() as SpecificAddress<Kind> }.asIdentifiable()
-
-		guard knownDapps.count + unknownDapps.count > 0 else { return nil }
-
-		return .init(knownDapps: knownDapps, unknownDapps: unknownDapps, unknownTitle: unknownTitle)
+//		let knownDapps = dAppEntities.compactMap(\.entity).asIdentifiable()
+//		let unknownDapps = try dAppEntities.filter { $0.entity == nil }
+//			.map { try $0.address.asSpecific() as SpecificAddress<Kind> }.asIdentifiable()
+//
+//		guard knownDapps.count + unknownDapps.count > 0 else { return nil }
+//
+//		return .init(knownDapps: knownDapps, unknownDapps: unknownDapps, unknownTitle: unknownTitle)
+		fatalError()
 	}
 
 	private func extractDappEntities(_ addresses: [Address]) async -> [(address: Address, entity: DappEntity?)] {
@@ -385,34 +391,35 @@ extension TransactionReview {
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
-		var withdrawals: [Account: IdentifiedArrayOf<Transfer>] = [:]
-
-		for (accountAddress, resources) in accountWithdraws {
-			let account = try userAccounts.account(for: .init(validatingAddress: accountAddress))
-			let transfers = try await resources.asyncFlatMap {
-				try await transferInfo(
-					resourceQuantifier: $0,
-					newlyCreatedNonFungibles: newlyCreatedNonFungibles,
-					poolInteractions: poolRedemptions,
-					entities: entities,
-					resourceAssociatedDapps: resourceAssociatedDapps,
-					networkID: networkID,
-					type: .exact
-				)
-			}
-			.map(\.asIdentified)
-
-			withdrawals[account, default: []].append(contentsOf: transfers)
-		}
-
-		guard !withdrawals.isEmpty else { return nil }
-
-		let withdrawalAccounts = withdrawals.map {
-			TransactionReviewAccount.State(account: $0.key, transfers: $0.value)
-		}
-		.asIdentifiable()
-
-		return .init(accounts: withdrawalAccounts, enableCustomizeGuarantees: false)
+		fatalError()
+//		var withdrawals: [Account: IdentifiedArrayOf<Transfer>] = [:]
+//
+//		for (accountAddress, resources) in accountWithdraws {
+//			let account = try userAccounts.account(for: .init(validatingAddress: accountAddress))
+//			let transfers = try await resources.asyncFlatMap {
+//				try await transferInfo(
+//					resourceQuantifier: $0,
+//					newlyCreatedNonFungibles: newlyCreatedNonFungibles,
+//					poolInteractions: poolRedemptions,
+//					entities: entities,
+//					resourceAssociatedDapps: resourceAssociatedDapps,
+//					networkID: networkID,
+//					type: .exact
+//				)
+//			}
+//			.map(\.asIdentified)
+//
+//			withdrawals[account, default: []].append(contentsOf: transfers)
+//		}
+//
+//		guard !withdrawals.isEmpty else { return nil }
+//
+//		let withdrawalAccounts = withdrawals.map {
+//			TransactionReviewAccount.State(account: $0.key, transfers: $0.value)
+//		}
+//		.asIdentifiable()
+//
+//		return .init(accounts: withdrawalAccounts, enableCustomizeGuarantees: false)
 	}
 
 	private func extractDeposits(
@@ -420,81 +427,86 @@ extension TransactionReview {
 		newlyCreatedNonFungibles: [NonFungibleGlobalId] = [],
 		poolContributions: [TrackedPoolContribution] = [],
 		validatorStakes: [TrackedValidatorStake] = [],
-		unstakeData: [UnstakeDataEntry] = [],
+		unstakeData: [UnstakeData] = [],
 		entities: ResourcesInfo = [:],
 		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		userAccounts: [Account],
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
-		let defaultDepositGuarantee = await appPreferencesClient.getPreferences().transaction.defaultDepositGuarantee
+		fatalError()
+		/*
+		 let defaultDepositGuarantee = await appPreferencesClient.getPreferences().transaction.defaultDepositGuarantee
 
-		var deposits: [Account: IdentifiedArrayOf<Transfer>] = [:]
+		 var deposits: [Account: IdentifiedArrayOf<Transfer>] = [:]
 
-		for (accountAddress, accountDeposits) in accountDeposits {
-			let account = try userAccounts.account(for: .init(validatingAddress: accountAddress))
-			let transfers = try await accountDeposits.asyncFlatMap {
-				try await transferInfo(
-					resourceQuantifier: $0,
-					newlyCreatedNonFungibles: newlyCreatedNonFungibles,
-					poolInteractions: poolContributions,
-					validatorStakes: validatorStakes,
-					unstakeData: unstakeData,
-					entities: entities,
-					resourceAssociatedDapps: resourceAssociatedDapps,
-					networkID: networkID,
-					type: $0.transferType,
-					defaultDepositGuarantee: defaultDepositGuarantee
-				)
-			}
-			.map(\.asIdentified)
+		 for (accountAddress, accountDeposits) in accountDeposits {
+		 	let account = try userAccounts.account(for: .init(validatingAddress: accountAddress))
+		 	let transfers = try await accountDeposits.asyncFlatMap {
+		 		try await transferInfo(
+		 			resourceQuantifier: $0,
+		 			newlyCreatedNonFungibles: newlyCreatedNonFungibles,
+		 			poolInteractions: poolContributions,
+		 			validatorStakes: validatorStakes,
+		 			unstakeData: unstakeData,
+		 			entities: entities,
+		 			resourceAssociatedDapps: resourceAssociatedDapps,
+		 			networkID: networkID,
+		 			type: $0.transferType,
+		 			defaultDepositGuarantee: defaultDepositGuarantee
+		 		)
+		 	}
+		 	.map(\.asIdentified)
 
-			deposits[account, default: []].append(contentsOf: transfers)
-		}
+		 	deposits[account, default: []].append(contentsOf: transfers)
+		 }
 
-		let depositAccounts = deposits
-			.filter { !$0.value.isEmpty }
-			.map { TransactionReviewAccount.State(account: $0.key, transfers: $0.value) }
-			.asIdentifiable()
+		 let depositAccounts = deposits
+		 	.filter { !$0.value.isEmpty }
+		 	.map { TransactionReviewAccount.State(account: $0.key, transfers: $0.value) }
+		 	.asIdentifiable()
 
-		guard !depositAccounts.isEmpty else { return nil }
+		 guard !depositAccounts.isEmpty else { return nil }
 
-		let requiresGuarantees = !depositAccounts.customizableGuarantees.isEmpty
-		return .init(accounts: depositAccounts, enableCustomizeGuarantees: requiresGuarantees)
+		 let requiresGuarantees = !depositAccounts.customizableGuarantees.isEmpty
+		 return .init(accounts: depositAccounts, enableCustomizeGuarantees: requiresGuarantees)
+		 */
 	}
 
 	func extractValidators(for addresses: [ValidatorAddress]) async throws -> ValidatorsState? {
-		guard !addresses.isEmpty else { return nil }
-
-		let validators = try await onLedgerEntitiesClient.getEntities(addresses: addresses.map(\.embed()), metadataKeys: .resourceMetadataKeys)
-			.compactMap { entity -> ValidatorState? in
-				guard let validator = entity.validator else { return nil }
-				return .init(
-					address: validator.address,
-					name: validator.metadata.name,
-					thumbnail: validator.metadata.iconURL
-				)
-			}
-
-		guard validators.count == addresses.count else {
-			struct FailedToExtractValidatorInformation: Error {}
-			throw FailedToExtractValidatorInformation()
-		}
-
-		return .init(validators: validators)
+		fatalError()
+//		guard !addresses.isEmpty else { return nil }
+//
+//		let validators = try await onLedgerEntitiesClient.getEntities(addresses: addresses.map(\.embed()), metadataKeys: .resourceMetadataKeys)
+//			.compactMap { entity -> ValidatorState? in
+//				guard let validator = entity.validator else { return nil }
+//				return .init(
+//					address: validator.address,
+//					name: validator.metadata.name,
+//					thumbnail: validator.metadata.iconURL
+//				)
+//			}
+//
+//		guard validators.count == addresses.count else {
+//			struct FailedToExtractValidatorInformation: Error {}
+//			throw FailedToExtractValidatorInformation()
+//		}
+//
+//		return .init(validators: validators)
 	}
 
 	func extractAccountDepositSetting(
 		for validAccounts: [Profile.Network.Account],
 		defaultDepositRuleChanges: [AccountAddress: AccountDefaultDepositRule]
 	) -> DepositSettingState? {
-		let depositSettingChanges: [TransactionReview.DepositSettingChange] = validAccounts.compactMap { account in
-			guard let depositRuleChange = defaultDepositRuleChanges[account.address] else { return nil }
-			return .init(account: account, ruleChange: depositRuleChange)
-		}
-
-		guard !depositSettingChanges.isEmpty else { return nil }
-
-		return .init(changes: IdentifiedArray(uncheckedUniqueElements: depositSettingChanges))
+		fatalError()
+//		let depositSettingChanges: [TransactionReview.DepositSettingChange] = validAccounts.compactMap { account in
+//			guard let depositRuleChange = defaultDepositRuleChanges[account.address] else { return nil }
+//			return .init(account: account, ruleChange: depositRuleChange)
+//		}
+//
+//		guard !depositSettingChanges.isEmpty else { return nil }
+//
+//		return .init(changes: IdentifiedArray(uncheckedUniqueElements: depositSettingChanges))
 	}
 
 	func extractAccountDepositExceptions(
@@ -503,53 +515,56 @@ extension TransactionReview {
 		authorizedDepositorsAdded: [AccountAddress: [ResourceOrNonFungible]],
 		authorizedDepositorsRemoved: [AccountAddress: [ResourceOrNonFungible]]
 	) async throws -> DepositExceptionsState? {
-		let exceptionChanges: [DepositExceptionsChange] = try await validAccounts.asyncCompactMap { account in
-			let resourcePreferenceChanges = try await resourcePreferenceChanges[account.address]?
-				.asyncMap { resourcePreference in
-					try await DepositExceptionsChange.ResourcePreferenceChange(
-						resource: onLedgerEntitiesClient.getResource(resourcePreference.key),
-						change: resourcePreference.value
-					)
-				} ?? []
+		fatalError()
+		/*
+		 let exceptionChanges: [DepositExceptionsChange] = try await validAccounts.asyncCompactMap { account in
+		 	let resourcePreferenceChanges = try await resourcePreferenceChanges[account.address]?
+		 		.asyncMap { resourcePreference in
+		 			try await DepositExceptionsChange.ResourcePreferenceChange(
+		 				resource: onLedgerEntitiesClient.getResource(resourcePreference.key),
+		 				change: resourcePreference.value
+		 			)
+		 		} ?? []
 
-			let authorizedDepositorChanges = try await {
-				var changes: [DepositExceptionsChange.AllowedDepositorChange] = []
-				if let authorizedDepositorsAdded = authorizedDepositorsAdded[account.address] {
-					let added = try await authorizedDepositorsAdded.asyncMap { resourceOrNonFungible in
-						let resourceAddress = try resourceOrNonFungible.resourceAddress()
-						return try await DepositExceptionsChange.AllowedDepositorChange(
-							resource: onLedgerEntitiesClient.getResource(resourceAddress),
-							change: .added
-						)
-					}
-					changes.append(contentsOf: added)
-				}
-				if let authorizedDepositorsRemoved = authorizedDepositorsRemoved[account.address] {
-					let removed = try await authorizedDepositorsRemoved.asyncMap { resourceOrNonFungible in
-						let resourceAddress = try resourceOrNonFungible.resourceAddress()
-						return try await DepositExceptionsChange.AllowedDepositorChange(
-							resource: onLedgerEntitiesClient.getResource(resourceAddress),
-							change: .removed
-						)
-					}
-					changes.append(contentsOf: removed)
-				}
+		 	let authorizedDepositorChanges = try await {
+		 		var changes: [DepositExceptionsChange.AllowedDepositorChange] = []
+		 		if let authorizedDepositorsAdded = authorizedDepositorsAdded[account.address] {
+		 			let added = try await authorizedDepositorsAdded.asyncMap { resourceOrNonFungible in
+		 				let resourceAddress = try resourceOrNonFungible.resourceAddress()
+		 				return try await DepositExceptionsChange.AllowedDepositorChange(
+		 					resource: onLedgerEntitiesClient.getResource(resourceAddress),
+		 					change: .added
+		 				)
+		 			}
+		 			changes.append(contentsOf: added)
+		 		}
+		 		if let authorizedDepositorsRemoved = authorizedDepositorsRemoved[account.address] {
+		 			let removed = try await authorizedDepositorsRemoved.asyncMap { resourceOrNonFungible in
+		 				let resourceAddress = try resourceOrNonFungible.resourceAddress()
+		 				return try await DepositExceptionsChange.AllowedDepositorChange(
+		 					resource: onLedgerEntitiesClient.getResource(resourceAddress),
+		 					change: .removed
+		 				)
+		 			}
+		 			changes.append(contentsOf: removed)
+		 		}
 
-				return changes
-			}()
+		 		return changes
+		 	}()
 
-			guard !resourcePreferenceChanges.isEmpty || !authorizedDepositorChanges.isEmpty else { return nil }
+		 	guard !resourcePreferenceChanges.isEmpty || !authorizedDepositorChanges.isEmpty else { return nil }
 
-			return DepositExceptionsChange(
-				account: account,
-				resourcePreferenceChanges: IdentifiedArray(uncheckedUniqueElements: resourcePreferenceChanges),
-				allowedDepositorChanges: IdentifiedArray(uncheckedUniqueElements: authorizedDepositorChanges)
-			)
-		}
+		 	return DepositExceptionsChange(
+		 		account: account,
+		 		resourcePreferenceChanges: IdentifiedArray(uncheckedUniqueElements: resourcePreferenceChanges),
+		 		allowedDepositorChanges: IdentifiedArray(uncheckedUniqueElements: authorizedDepositorChanges)
+		 	)
+		 }
 
-		guard !exceptionChanges.isEmpty else { return nil }
+		 guard !exceptionChanges.isEmpty else { return nil }
 
-		return DepositExceptionsState(changes: IdentifiedArray(uncheckedUniqueElements: exceptionChanges))
+		 return DepositExceptionsState(changes: IdentifiedArray(uncheckedUniqueElements: exceptionChanges))
+		 */
 	}
 
 	private func perPoolUnitDapps(
@@ -557,7 +572,7 @@ extension TransactionReview {
 		poolInteractions: [some TrackedPoolInteraction]
 	) -> ResourceAssociatedDapps {
 		Dictionary(uniqueKeysWithValues: dappEntities.compactMap { data -> (ResourceAddress, OnLedgerEntity.Metadata)? in
-			let poolUnitResource: ResourceAddress? = try? poolInteractions
+			let poolUnitResource: ResourceAddress? = poolInteractions
 				.first(where: { $0.poolAddress.embed() == data.address })?
 				.poolUnitsResourceAddress
 
@@ -590,7 +605,7 @@ extension TransactionReview {
 		newlyCreatedNonFungibles: [NonFungibleGlobalId] = [],
 		poolInteractions: [some TrackedPoolInteraction] = [],
 		validatorStakes: [TrackedValidatorStake] = [],
-		unstakeData: [UnstakeDataEntry] = [],
+		unstakeData: [UnstakeData] = [],
 		entities: ResourcesInfo = [:],
 		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
@@ -721,7 +736,7 @@ extension FungibleResourceIndicator {
 	public func adding(_ other: Self) -> Self {
 		switch (self, other) {
 		case let (.guaranteed(amount), .guaranteed(otherAmount)):
-			return .guaranteed(amount: amount + otherAmount)
+			return .guaranteed(decimal: amount + otherAmount)
 		default:
 			assertionFailure("Cannot sum up the predicted amounts")
 			return self

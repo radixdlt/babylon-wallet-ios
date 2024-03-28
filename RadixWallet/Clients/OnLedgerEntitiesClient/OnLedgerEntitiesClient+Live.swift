@@ -167,7 +167,7 @@ extension OnLedgerEntitiesClient {
 				try await gatewayAPIClient.getNonFungibleData(.init(
 					atLedgerState: request.atLedgerState?.selector,
 					resourceAddress: request.resource.address,
-					nonFungibleIds: Array(ids.map { try $0.nonFungibleLocalId.toString() })
+					nonFungibleIds: Array(ids.map { $0.nonFungibleLocalId.toString() })
 				))
 			}
 
@@ -176,8 +176,8 @@ extension OnLedgerEntitiesClient {
 				try item.nonFungibleIds.map { id in
 					try OnLedgerEntity.nonFungibleToken(.init(
 						id: .fromParts(
-							resourceAddress: .init(address: request.resource.address),
-							nonFungibleLocalId: .from(stringFormat: id.nonFungibleId)
+							resourceAddress: request.resource,
+							nonFungibleLocalId: .init(localId: id.nonFungibleId)
 						),
 						data: id.data?.programmaticJson.tuple
 					))

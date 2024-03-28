@@ -129,8 +129,8 @@ extension ChooseReceivingAccount.View {
 			or: viewStore.validateAccountAddress,
 			forAction: { result in
 				let recipient: AssetsTransfersRecipient = switch result {
-				case let .left(account): .myOwnAccount(value: account)
-				case let .right(address): .foreignAccount(address)
+				case let .left(account): .myOwnAccount(value: account.intoSargon())
+				case let .right(address): .foreignAccount(value: address)
 				}
 				viewStore.send(.chooseButtonTapped(recipient))
 			},

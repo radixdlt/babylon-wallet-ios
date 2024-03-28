@@ -114,7 +114,10 @@ extension EntityDerivationPathProtocol {
 	public static var purpose: DerivationPurpose { .publicKeyForAddressOfEntity(type: Entity.self) }
 
 	public var networkID: NetworkID {
-		guard let networkID = NetworkID(rawValue: UInt8(exactly: self[.networkIndex])) else {
+		guard
+			let rawValue = UInt8(exactly: self[.networkIndex]),
+			let networkID = NetworkID(rawValue: rawValue)
+		else {
 			fatalError("Expected to always have a valid networkID")
 		}
 		return networkID

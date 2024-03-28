@@ -7,4 +7,8 @@ extension Decimal192 {
 		}
 		return double
 	}
+
+	public var isPositive: Bool {
+		fatalError()
+	}
 }

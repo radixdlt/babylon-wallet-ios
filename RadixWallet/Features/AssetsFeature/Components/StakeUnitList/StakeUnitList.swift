@@ -255,16 +255,20 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		case .didTapClaimAllStakes:
 			return sendStakeClaimTransaction(
 				state.account.address,
-				stakeClaims: state.stakedValidators.map(\.stakeDetails).compactMap { stake in
+				stakeClaims: state.stakedValidators.map(\.stakeDetails).compactMap { stake -> StakeClaim? in
 					guard let stakeClaimTokens = stake.stakeClaimTokens,
 					      let stakeClaims = stakeClaimTokens.stakeClaims.filter(\.isReadyToBeClaimed).nonEmpty
 					else {
 						return nil
 					}
 
+					guard let nonFungibleResourceAddress = try? NonFungibleResourceAddress(validatingAddress: stakeClaimTokens.resource.resourceAddress.address) else {
+						return nil
+					}
+
 					return .init(
 						validatorAddress: stake.validator.address,
-						resourceAddress: stakeClaimTokens.resource.resourceAddress,
+						resourceAddress: nonFungibleResourceAddress,
 						ids: stakeClaims.map(\.id.nonFungibleLocalId),
 						amount: stakeClaims.map(\.claimAmount.nominalAmount).reduce(0, +)
 					)
@@ -276,16 +280,23 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
 		case let .stakeClaimDetails(.delegate(.tappedClaimStake(resourceAddress, stakeClaim))):
+
+			guard let nonFungibleResourceAddress = try? NonFungibleResourceAddress(validatingAddress: resourceAddress.address) else {
+				return .none
+			}
+
 			state.destination = nil
+
 			return sendStakeClaimTransaction(
 				state.account.address,
 				stakeClaims: [
-					.init(
-						validatorAddress: stakeClaim.validatorAddress,
-						resourceAddress: resourceAddress,
-						ids: .init(stakeClaim.id.nonFungibleLocalId),
-						amount: stakeClaim.claimAmount.nominalAmount
-					),
+					//					.init(
+//						validatorAddress: stakeClaim.validatorAddress,
+//						resourceAddress: nonFungibleResourceAddress,
+//						ids: .init(stakeClaim.id.nonFungibleLocalId),
+//						amount: stakeClaim.claimAmount.nominalAmount
+//					),
+					stakeClaim.intoSargon(),
 				]
 			)
 		case .stakeClaimDetails, .details:
@@ -298,11 +309,11 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		stakeClaims: [StakeClaim]
 	) -> Effect<Action> {
 		.run { _ in
-			let manifest = try TransactionManifest.stakesClaim(
+			let manifest = TransactionManifest.stakesClaim(
 				accountAddress: acccountAddress,
 				stakeClaims: stakeClaims
 			)
-			_ = try await dappInteractionClient.addWalletInteraction(
+			_ = await dappInteractionClient.addWalletInteraction(
 				.transaction(.init(send: .init(transactionManifest: manifest))),
 				.accountTransfer
 			)

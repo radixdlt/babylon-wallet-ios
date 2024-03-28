@@ -120,7 +120,11 @@ public struct NotarizeTransactionResponse: Sendable, Hashable {
 	public let notarized: CompiledNotarizedIntent
 	public let intent: TransactionIntent
 	public let txID: TXID
-	public init(notarized: Data, intent: TransactionIntent, txID: TXID) {
+	public init(
+		notarized: CompiledNotarizedIntent,
+		intent: TransactionIntent,
+		txID: TXID
+	) {
 		self.notarized = notarized
 		self.intent = intent
 		self.txID = txID

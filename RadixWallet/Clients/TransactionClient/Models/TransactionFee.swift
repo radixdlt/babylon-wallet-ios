@@ -122,7 +122,7 @@ extension TransactionFee {
 		}
 
 		public static func signaturesCost(_ signaturesCount: Int) -> Decimal192 {
-			Decimal192(integer: signaturesCount) * PredefinedFeeConstants.signatureCost
+			Decimal192(Int64(signaturesCount)) * PredefinedFeeConstants.signatureCost
 		}
 	}
 
@@ -196,7 +196,12 @@ extension TransactionFee {
 		public let paidByDapps: Decimal192
 
 		public var tipAmount: Decimal192 {
-			(Decimal192(integer: Int(tipPercentage)) / 100) * (feeSummary.totalExecutionCost + feeSummary.finalizationCost)
+			let lhsNominator = Decimal192(UInt64(tipPercentage))
+			let lhsDenominator = Decimal192(100)
+			let lhs: Decimal192 = lhsNominator / lhsDenominator
+			let rhs: Decimal192 = feeSummary.totalExecutionCost + feeSummary.finalizationCost
+
+			return lhs * rhs
 		}
 
 		public var total: Decimal192 {

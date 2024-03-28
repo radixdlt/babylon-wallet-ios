@@ -142,7 +142,7 @@ extension AssetTransfer {
 
 		let address: ResourceAddress
 		let totalTransferAmount: Decimal192
-		let divisibility: Int?
+		let divisibility: UInt8?
 		var accounts: IdentifiedArrayOf<PerAccountAmount>
 	}
 
@@ -191,7 +191,7 @@ extension AssetTransfer {
 			return PerAssetTransfersOfFungibleResource(
 				resource: PerAssetFungibleResource(
 					resourceAddress: resourceAddress,
-					divisibility: perAsset.divisibility.map(UInt8.init)
+					divisibility: perAsset.divisibility
 				),
 				transfers: transfers
 			)

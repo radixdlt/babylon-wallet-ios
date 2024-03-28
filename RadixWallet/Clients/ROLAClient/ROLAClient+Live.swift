@@ -14,10 +14,10 @@ extension ROLAClient {
 				switch entity {
 				case let .account(account):
 					assert(account.networkID == request.entity.networkID)
-					return AddressOfAccountOrPersona.account(address: account.address)
+					return AddressOfAccountOrPersona.account(account.address)
 				case let .persona(persona):
 					assert(persona.networkID == request.entity.networkID)
-					return AddressOfAccountOrPersona.persona(address: persona.address)
+					return AddressOfAccountOrPersona.identity(persona.address)
 				}
 			}()
 
@@ -26,11 +26,11 @@ extension ROLAClient {
 
 			let transactionSigningKeyHash: PublicKeyHash = switch entity.securityState {
 			case let .unsecured(control):
-				try .init(hashing: control.transactionSigning.publicKey.intoSargon())
+				.init(hashing: control.transactionSigning.publicKey.intoSargon())
 			}
 
 			loggerGlobal.debug("ownerKeyHashes: \(ownerKeyHashes)")
-			try ownerKeyHashes.append(.init(hashing: newPublicKey.intoSargon()))
+			ownerKeyHashes.append(.init(hashing: newPublicKey.intoSargon()))
 
 			if !ownerKeyHashes.contains(transactionSigningKeyHash) {
 				loggerGlobal.debug("Did not contain transactionSigningKey hash, re-adding it: \(transactionSigningKeyHash)")
@@ -38,7 +38,7 @@ extension ROLAClient {
 			}
 
 			loggerGlobal.notice("Setting ownerKeyHashes to: \(ownerKeyHashes)")
-			return try TransactionManifest.setOwnerKeys(
+			return TransactionManifest.setOwnerKeys(
 				addressOfAccountOrPersona: entityAddress,
 				ownerKeyHashes: ownerKeyHashes
 			)

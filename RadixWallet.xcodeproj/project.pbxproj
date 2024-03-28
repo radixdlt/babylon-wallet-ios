@@ -843,7 +843,6 @@
 		48CFC5E62ADC10DA00E77A5C /* SwiftUINavigation+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC13D2ADC10D900E77A5C /* SwiftUINavigation+Extra.swift */; };
 		48CFC5E72ADC10DA00E77A5C /* TaskResult+Unit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC13E2ADC10D900E77A5C /* TaskResult+Unit.swift */; };
 		48CFC5E82ADC10DA00E77A5C /* FeatureReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC13F2ADC10D900E77A5C /* FeatureReducer.swift */; };
-		48CFC5EA2ADC10DA00E77A5C /* AddressFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1422ADC10D900E77A5C /* AddressFormat.swift */; };
 		48CFC5EB2ADC10DA00E77A5C /* AddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1432ADC10D900E77A5C /* AddressView.swift */; };
 		48CFC5EC2ADC10DA00E77A5C /* Loadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1442ADC10D900E77A5C /* Loadable.swift */; };
 		48CFC5ED2ADC10DA00E77A5C /* SlideUpPanel+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1462ADC10D900E77A5C /* SlideUpPanel+Reducer.swift */; };
@@ -2153,7 +2152,6 @@
 		48CFC13D2ADC10D900E77A5C /* SwiftUINavigation+Extra.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SwiftUINavigation+Extra.swift"; sourceTree = "<group>"; };
 		48CFC13E2ADC10D900E77A5C /* TaskResult+Unit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "TaskResult+Unit.swift"; sourceTree = "<group>"; };
 		48CFC13F2ADC10D900E77A5C /* FeatureReducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeatureReducer.swift; sourceTree = "<group>"; };
-		48CFC1422ADC10D900E77A5C /* AddressFormat.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressFormat.swift; sourceTree = "<group>"; };
 		48CFC1432ADC10D900E77A5C /* AddressView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressView.swift; sourceTree = "<group>"; };
 		48CFC1442ADC10D900E77A5C /* Loadable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Loadable.swift; sourceTree = "<group>"; };
 		48CFC1462ADC10D900E77A5C /* SlideUpPanel+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SlideUpPanel+Reducer.swift"; sourceTree = "<group>"; };
@@ -5847,7 +5845,6 @@
 		48CFC1412ADC10D900E77A5C /* AddressView */ = {
 			isa = PBXGroup;
 			children = (
-				48CFC1422ADC10D900E77A5C /* AddressFormat.swift */,
 				48CFC1432ADC10D900E77A5C /* AddressView.swift */,
 			);
 			path = AddressView;
@@ -7992,7 +7989,6 @@
 				48CFC27D2ADC10D900E77A5C /* Overlay+Reducer.swift in Sources */,
 				48CFC2A42ADC10D900E77A5C /* PersonaList+Reducer.swift in Sources */,
 				48CFC4B22ADC10DA00E77A5C /* TransactionStatusResponse.swift in Sources */,
-				48CFC5EA2ADC10DA00E77A5C /* AddressFormat.swift in Sources */,
 				48CFC5AA2ADC10DA00E77A5C /* PrimaryRectangularButtonStyle.swift in Sources */,
 				48CFC29F2ADC10D900E77A5C /* PersonasCoordinator+View.swift in Sources */,
 				48CFC43E2ADC10DA00E77A5C /* FactorSourcesClient+Interface.swift in Sources */,
@@ -9703,7 +9699,7 @@
 			repositoryURL = "https://github.com/radixdlt/sargon";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.5.1;
+				minimumVersion = 0.5.3;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
