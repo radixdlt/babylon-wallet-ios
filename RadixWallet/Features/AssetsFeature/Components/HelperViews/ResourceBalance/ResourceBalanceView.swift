@@ -451,6 +451,9 @@ extension ResourceBalanceView {
 					.padding(.leading, isSelected != nil ? .small2 : 0)
 
 				if let isSelected {
+					if !useSpacer, caption1 == nil {
+						Spacer(minLength: .small2)
+					}
 					CheckmarkView(appearance: .dark, isChecked: isSelected)
 				}
 			}
@@ -465,7 +468,7 @@ extension ResourceBalanceView {
 		}
 
 		private var useSpacer: Bool {
-			amount != nil || fallback != nil || caption1 == nil
+			amount != nil || fallback != nil
 		}
 	}
 
@@ -527,6 +530,7 @@ extension ResourceBalanceView {
 	}
 
 	struct AmountView: View {
+		@Environment(\.resourceBalanceHideFiatValue) var resourceBalanceHideFiatValue
 		let amount: ResourceBalance.Amount?
 		let fallback: String?
 		let compact: Bool
@@ -554,7 +558,7 @@ extension ResourceBalanceView {
 					Text(amount.amount.nominalAmount.formatted())
 						.textStyle(amountTextStyle)
 						.foregroundColor(.app.gray1)
-					if let fiatWorth = amount.amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
+					if !resourceBalanceHideFiatValue, let fiatWorth = amount.amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
 						Text(fiatWorth)
 							.textStyle(.body2HighImportance)
 							.foregroundStyle(.app.gray2)
@@ -575,7 +579,7 @@ extension ResourceBalanceView {
 						.textStyle(.secondaryHeader)
 						.foregroundColor(.app.gray1)
 
-					if let fiatWorth = amount.amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
+					if !resourceBalanceHideFiatValue, let fiatWorth = amount.amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
 						Text(fiatWorth)
 							.textStyle(.body2HighImportance)
 							.foregroundStyle(.app.gray2)

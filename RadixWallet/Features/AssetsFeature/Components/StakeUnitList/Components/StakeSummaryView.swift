@@ -15,6 +15,7 @@ public struct StakeSummaryView: View {
 		}
 	}
 
+	@Environment(\.resourceBalanceHideFiatValue) var resourceBalanceHideFiatValue
 	public let viewState: ViewState
 	public let onReadyToClaimTapped: () -> Void
 
@@ -77,7 +78,7 @@ extension StakeSummaryView {
 					Text("\(amount.nominalAmount.formatted()) XRD")
 						.textStyle(.body2HighImportance)
 						.foregroundColor(amountTextColor)
-					if let fiatWorth = amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
+					if !resourceBalanceHideFiatValue, let fiatWorth = amount.fiatWorth?.currencyFormatted(applyCustomFont: false) {
 						Text(fiatWorth)
 							.textStyle(.body2HighImportance)
 							.foregroundStyle(.app.gray2)
