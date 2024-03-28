@@ -17,6 +17,6 @@ extension Decimal192 {
 	}
 
 	public var isPositive: Bool {
-		fatalError()
+		self > .zero
 	}
 }

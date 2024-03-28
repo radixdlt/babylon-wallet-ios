@@ -216,8 +216,13 @@ extension EntitySecurityState {
 }
 
 extension OnLedgerEntitiesClient.StakeClaim {
-	public func intoSargon() -> StakeClaim {
-		fatalError()
+	public func intoSargon() -> Sargon.StakeClaim {
+		Sargon.StakeClaim(
+			validatorAddress: self.validatorAddress,
+			resourceAddress: self.token.id.resourceAddress.asNonFungibleResourceAddress!,
+			ids: [self.id.nonFungibleLocalId],
+			amount: self.claimAmount.nominalAmount
+		)
 	}
 }
 

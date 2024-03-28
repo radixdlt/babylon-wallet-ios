@@ -17,7 +17,7 @@ extension SLIP10.Signature {
 
 extension K1.PublicKey {
 	public func intoSargon() -> Sargon.Secp256k1PublicKey {
-		fatalError("Sargon migration")
+		try! Sargon.Secp256k1PublicKey(bytes: self.compressedRepresentation)
 	}
 }
 
