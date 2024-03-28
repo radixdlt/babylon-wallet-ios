@@ -8,7 +8,12 @@ extension Decimal192: Codable {
 	public init(from decoder: Decoder) throws {
 		let container = try decoder.singleValueContainer()
 		let string = try container.decode(String.self)
-		try self.init(string)
+		do {
+			try self.init(string)
+		} catch {
+			loggerGlobal.critical("Failed to JSON decode Decimal192 from string: \(string), error: \(error)")
+			throw error
+		}
 	}
 }
 
