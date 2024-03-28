@@ -58,12 +58,6 @@ extension ResourceAddress {
 	public static let mainnetXRDAddress = Self.xrd(on: .mainnet)
 }
 
-extension TransactionManifest {
-	public var involvedPoolAddresses: [PoolAddress] {
-		fatalError("Sargon migration")
-	}
-}
-
 // MARK: - NonFungibleGlobalId + Codable
 extension NonFungibleGlobalId: Codable {
 	public func encode(to encoder: Encoder) throws {
