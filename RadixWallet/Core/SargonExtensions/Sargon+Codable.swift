@@ -2,16 +2,16 @@
 extension Decimal192: Codable {
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.singleValueContainer()
-		try container.encode(self.description)
+		try container.encode(self.formatted())
 	}
 
 	public init(from decoder: Decoder) throws {
 		let container = try decoder.singleValueContainer()
-		let string = try container.decode(String.self)
+		let formattedString = try container.decode(String.self)
 		do {
-			try self.init(string)
+			try self.init(formattedString: formattedString)
 		} catch {
-			loggerGlobal.critical("Failed to JSON decode Decimal192 from string: \(string), error: \(error)")
+			loggerGlobal.critical("Failed to JSON decode Decimal192 from string: \(formattedString), error: \(error)")
 			throw error
 		}
 	}
