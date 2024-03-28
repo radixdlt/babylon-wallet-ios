@@ -1,3 +1,5 @@
+import SargonUniFFI
+
 // MARK: - SubmitTransactionClient + DependencyKey
 extension SubmitTransactionClient: DependencyKey {
 	public typealias Value = SubmitTransactionClient
@@ -10,7 +12,7 @@ extension SubmitTransactionClient: DependencyKey {
 
 			@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatusResponse {
 				let txStatusRequest = GatewayAPI.TransactionStatusRequest(
-					intentHash: txID.description
+					intentHash: txID.bech32EncodedTxId
 				)
 				let txStatusResponse = try await gatewayAPIClient.transactionStatus(txStatusRequest)
 				return txStatusResponse
@@ -53,9 +55,7 @@ extension SubmitTransactionClient: DependencyKey {
 			let txID = request.txID
 
 			#if DEBUG
-			debugPrintCompiledNotarizedIntent(
-				compiled: request.compiledNotarizedTXIntent
-			)
+			debugPrintCompiledNotarizedIntent(compiled: request.compiledNotarizedTXIntent)
 			#endif
 
 			let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(

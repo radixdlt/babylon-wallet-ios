@@ -289,7 +289,7 @@ extension ExecutionSummary {
 		case .general, .transfer:
 			deposits.flatMap(\.value).reduce(.zero) { result, resource in
 				switch resource {
-				case .fungible(_, .predicted):
+				case let .fungible(resourceAddress, indicator: .predicted(predictedDecimal)):
 					result + TransactionFee.PredefinedFeeConstants.fungibleGuaranteeInstructionCost
 				default:
 					result
