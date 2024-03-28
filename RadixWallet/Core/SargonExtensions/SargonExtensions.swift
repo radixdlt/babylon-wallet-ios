@@ -18,6 +18,17 @@ extension EntityFlag {
 	}
 }
 
+extension NonFungibleResourceIndicator {
+	public var ids: [NonFungibleLocalId] {
+		switch self {
+		case let .byIds(ids):
+			ids
+		case let .byAll(_, ids), let .byAmount(_, ids):
+			ids.value
+		}
+	}
+}
+
 extension Address {
 	public func into<A: AddressProtocol>(type: A.Type = A.self) throws -> A {
 		try A(validatingAddress: self.address)

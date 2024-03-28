@@ -78,61 +78,56 @@ extension OnLedgerEntitiesClient {
 		networkID: NetworkID,
 		guarantee: TransactionGuarantee?
 	) async throws -> ResourceBalance {
-		/*
-		 let resourceAddress = resource.resourceAddress
+		let resourceAddress = resource.resourceAddress
 
-		 if let poolContribution = try poolContributions.first(where: { try $0.poolUnitsResourceAddress == resourceAddress }) {
-		 	// If this transfer does not contain all the pool units, scale the resource amounts pro rata
-		 	let adjustmentFactor = amount != poolContribution.poolUnitsAmount ? (amount / poolContribution.poolUnitsAmount) : 1
-		 	var xrdResource: OwnedResourcePoolDetails.ResourceWithRedemptionValue?
-		 	var nonXrdResources: [OwnedResourcePoolDetails.ResourceWithRedemptionValue] = []
-		 	for (resourceAddress, resourceAmount) in poolContribution.resourcesInInteraction {
-		 		let address = try ResourceAddress(validatingAddress: resourceAddress)
+		if let poolContribution = poolContributions.first(where: { $0.poolUnitsResourceAddress == resourceAddress }) {
+			// If this transfer does not contain all the pool units, scale the resource amounts pro rata
+			let adjustmentFactor = amount != poolContribution.poolUnitsAmount ? (amount / poolContribution.poolUnitsAmount) : 1
+			var xrdResource: OwnedResourcePoolDetails.ResourceWithRedemptionValue?
+			var nonXrdResources: [OwnedResourcePoolDetails.ResourceWithRedemptionValue] = []
+			for (address, resourceAmount) in poolContribution.resourcesInInteraction {
+				guard let entity = entities[address] else {
+					throw ResourceEntityNotFound(address: resourceAddress.address)
+				}
 
-		 		guard let entity = entities[address] else {
-		 			throw ResourceEntityNotFound(address: resourceAddress)
-		 		}
+				let resource = OwnedResourcePoolDetails.ResourceWithRedemptionValue(
+					resource: .init(resourceAddress: address, metadata: entity.metadata),
+					redemptionValue: .init(nominalAmount: resourceAmount * adjustmentFactor)
+				)
 
-		 		let resource = OwnedResourcePoolDetails.ResourceWithRedemptionValue(
-		 			resource: .init(resourceAddress: address, metadata: entity.metadata),
-		 			redemptionValue: .init(nominalAmount: resourceAmount * adjustmentFactor)
-		 		)
+				if address.isXRD(on: networkID) {
+					xrdResource = resource
+				} else {
+					nonXrdResources.append(resource)
+				}
+			}
 
-		 		if address.isXRD(on: networkID) {
-		 			xrdResource = resource
-		 		} else {
-		 			nonXrdResources.append(resource)
-		 		}
-		 	}
+			return .init(
+				resource: resource,
+				details: .poolUnit(.init(
+					details: .init(
+						address: poolContribution.poolAddress,
+						dAppName: resourceAssociatedDapps?[resourceAddress]?.name,
+						poolUnitResource: .init(resource: resource, amount: .init(nominalAmount: amount)),
+						xrdResource: xrdResource,
+						nonXrdResources: nonXrdResources
+					),
+					guarantee: guarantee
+				))
+			)
+		} else {
+			guard let details = try await getPoolUnitDetails(resource, forAmount: amount) else {
+				throw FailedToGetPoolUnitDetails()
+			}
 
-		 	return try .init(
-		 		resource: resource,
-		 		details: .poolUnit(.init(
-		 			details: .init(
-		 				address: poolContribution.poolAddress,
-		 				dAppName: resourceAssociatedDapps?[resourceAddress]?.name,
-		 				poolUnitResource: .init(resource: resource, amount: .init(nominalAmount: amount)),
-		 				xrdResource: xrdResource,
-		 				nonXrdResources: nonXrdResources
-		 			),
-		 			guarantee: guarantee
-		 		))
-		 	)
-		 } else {
-		 	guard let details = try await getPoolUnitDetails(resource, forAmount: amount) else {
-		 		throw FailedToGetPoolUnitDetails()
-		 	}
-
-		 	return .init(
-		 		resource: resource,
-		 		details: .poolUnit(.init(
-		 			details: details,
-		 			guarantee: guarantee
-		 		))
-		 	)
-		 }
-		 */
-		fatalError()
+			return .init(
+				resource: resource,
+				details: .poolUnit(.init(
+					details: details,
+					guarantee: guarantee
+				))
+			)
+		}
 	}
 
 	private func liquidStakeUnit(
@@ -142,41 +137,38 @@ extension OnLedgerEntitiesClient {
 		validatorStakes: [TrackedValidatorStake] = [],
 		guarantee: TransactionGuarantee?
 	) async throws -> ResourceBalance {
-		/*
-		 let worth: Decimal192
-		 if validatorStakes.isEmpty {
-		 	guard let totalSupply = resource.totalSupply, totalSupply.isPositive else {
-		 		throw MissingPositiveTotalSupply()
-		 	}
+		let worth: Decimal192
+		if validatorStakes.isEmpty {
+			guard let totalSupply = resource.totalSupply, totalSupply.isPositive else {
+				throw MissingPositiveTotalSupply()
+			}
 
-		 	worth = amount * validator.xrdVaultBalance / totalSupply
-		 } else {
-		 	if let stake = try validatorStakes.first(where: { try $0.validatorAddress == validator.address }) {
-		 		guard try stake.liquidStakeUnitAddress == validator.stakeUnitResourceAddress else {
-		 			throw StakeUnitAddressMismatch()
-		 		}
-		 		// Distribute the worth in proportion to the amounts, if needed
-		 		if stake.liquidStakeUnitAmount == amount {
-		 			worth = stake.xrdAmount
-		 		} else {
-		 			worth = (amount / stake.liquidStakeUnitAmount) * stake.xrdAmount
-		 		}
-		 	} else {
-		 		throw MissingTrackedValidatorStake()
-		 	}
-		 }
+			worth = amount * validator.xrdVaultBalance / totalSupply
+		} else {
+			if let stake = try validatorStakes.first(where: { $0.validatorAddress == validator.address }) {
+				guard try stake.liquidStakeUnitAddress == validator.stakeUnitResourceAddress else {
+					throw StakeUnitAddressMismatch()
+				}
+				// Distribute the worth in proportion to the amounts, if needed
+				if stake.liquidStakeUnitAmount == amount {
+					worth = stake.xrdAmount
+				} else {
+					worth = (amount / stake.liquidStakeUnitAmount) * stake.xrdAmount
+				}
+			} else {
+				throw MissingTrackedValidatorStake()
+			}
+		}
 
-		 let details = ResourceBalance.LiquidStakeUnit(
-		 	resource: resource,
-		 	amount: amount,
-		 	worth: .init(nominalAmount: worth),
-		 	validator: validator,
-		 	guarantee: guarantee
-		 )
+		let details = ResourceBalance.LiquidStakeUnit(
+			resource: resource,
+			amount: amount,
+			worth: .init(nominalAmount: worth),
+			validator: validator,
+			guarantee: guarantee
+		)
 
-		 return .init(resource: resource, details: .liquidStakeUnit(details))
-		 */
-		fatalError()
+		return .init(resource: resource, details: .liquidStakeUnit(details))
 	}
 
 	// MARK: Non-fungibles
@@ -188,74 +180,74 @@ extension OnLedgerEntitiesClient {
 		unstakeData: [UnstakeData] = [],
 		newlyCreatedNonFungibles: [NonFungibleGlobalId] = []
 	) async throws -> [ResourceBalance] {
-		/*
-		 let ids = resourceQuantifier.ids
-		 let result: [ResourceBalance]
+		let ids = resourceQuantifier.ids
+		let result: [ResourceBalance]
 
-		 switch resourceInfo {
-		 case let .left(resource):
-		 	let existingTokenIds = ids.filter { id in
-		 		!newlyCreatedNonFungibles.contains { newId in
-		 			newId.resourceAddress.asStr() == resourceAddress.address && newId.nonFungibleLocalId == id
-		 		}
-		 	}
+		switch resourceInfo {
+		case let .left(resource):
+			let existingTokenIds = ids.filter { id in
+				!newlyCreatedNonFungibles.contains { newId in
+					newId.resourceAddress == resourceAddress && newId.nonFungibleLocalId == id
+				}
+			}
 
-		 	let newTokens = try ids.filter { id in
-		 		newlyCreatedNonFungibles.contains { newId in
-		 			newId.resourceAddress.asStr() == resourceAddress.address && newId.nonFungibleLocalId == id
-		 		}
-		 	}.map {
-		 		try OnLedgerEntity.NonFungibleToken(resourceAddress: resourceAddress, nftID: $0, nftData: nil)
-		 	}
+			let newTokens = try ids.filter { id in
+				newlyCreatedNonFungibles.contains { newId in
+					newId.resourceAddress == resourceAddress && newId.nonFungibleLocalId == id
+				}
+			}.map {
+				try OnLedgerEntity.NonFungibleToken(resourceAddress: resourceAddress, nftID: $0, nftData: nil)
+			}
 
-		 	let tokens = try await getNonFungibleTokenData(.init(
-		 		resource: resourceAddress,
-		 		nonFungibleIds: existingTokenIds.map {
-		 			try NonFungibleGlobalId.fromParts(
-		 				resourceAddress: resourceAddress,
-		 				nonFungibleLocalId: $0
-		 			)
-		 		}
-		 	)) + newTokens
+			let tokens = try await getNonFungibleTokenData(.init(
+				resource: resourceAddress,
+				nonFungibleIds: existingTokenIds.map {
+					NonFungibleGlobalId.fromParts(
+						resourceAddress: resourceAddress,
+						nonFungibleLocalId: $0
+					)
+				}
+			)) + newTokens
 
-		 	if let stakeClaimValidator = await isStakeClaimNFT(resource) {
-		 		result = try [stakeClaim(
-		 			resource,
-		 			stakeClaimValidator: stakeClaimValidator,
-		 			unstakeData: unstakeData,
-		 			tokens: tokens
-		 		)]
-		 	} else {
-		 		result = tokens.map { token in
-		 			.init(resource: resource, details: .nonFungible(token))
-		 		}
+			if let stakeClaimValidator = await isStakeClaimNFT(resource) {
+				result = try [stakeClaim(
+					resource,
+					stakeClaimValidator: stakeClaimValidator,
+					unstakeData: unstakeData,
+					tokens: tokens
+				)]
+			} else {
+				result = tokens.map { token in
+					ResourceBalance(resource: resource, details: .nonFungible(token))
+				}
 
-		 		guard result.count == ids.count else {
-		 			throw FailedToGetDataForAllNFTs()
-		 		}
-		 	}
+				guard result.count == ids.count else {
+					throw FailedToGetDataForAllNFTs()
+				}
+			}
 
-		 case let .right(newEntityMetadata):
-		 	// A newly created non-fungible resource
-		 	let resource = OnLedgerEntity.Resource(resourceAddress: resourceAddress, metadata: newEntityMetadata)
+		case let .right(newEntityMetadata):
+			// A newly created non-fungible resource
+			let resource = OnLedgerEntity.Resource(resourceAddress: resourceAddress, metadata: newEntityMetadata)
 
-		 	// Newly minted tokens
-		 	result = try ids
-		 		.map { localId in
-		 			try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress, nonFungibleLocalId: localId)
-		 		}
-		 		.map { id in
-		 			ResourceBalance(resource: resource, details: .nonFungible(.init(id: id, data: nil)))
-		 		}
+			// Newly minted tokens
+			result = ids
+				.map { localId in
+					NonFungibleGlobalId.fromParts(
+						resourceAddress: resourceAddress,
+						nonFungibleLocalId: localId
+					)
+				}
+				.map { id in
+					ResourceBalance(resource: resource, details: .nonFungible(.init(id: id, data: nil)))
+				}
 
-		 	guard result.count == ids.count else {
-		 		throw FailedToGetDataForAllNFTs()
-		 	}
-		 }
+			guard result.count == ids.count else {
+				throw FailedToGetDataForAllNFTs()
+			}
+		}
 
-		 return result
-		 */
-		fatalError()
+		return result
 	}
 
 	public func stakeClaim(
