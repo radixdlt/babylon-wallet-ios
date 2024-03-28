@@ -30,6 +30,37 @@ extension K1.PublicKey {
 
 extension SignatureWithPublicKey {
 	public func intoSargon() -> Sargon.SignatureWithPublicKey {
-		fatalError("Sargon migration")
+		switch self {
+		case let .ecdsaSecp256k1(signature, publicKey):
+			Sargon.SignatureWithPublicKey.secp256k1(
+				publicKey: publicKey.intoSargon(),
+				signature: signature.intoSargon()
+			)
+		case let .eddsaEd25519(signature, publicKey):
+			Sargon.SignatureWithPublicKey.ed25519(
+				publicKey: publicKey.intoSargon(),
+				signature: Sargon.Ed25519Signature(
+					wallet: signature
+				)
+			)
+		}
+	}
+}
+
+extension K1.ECDSAWithKeyRecovery.Signature {
+	func intoSargon() -> Sargon.Secp256k1Signature {
+		try! Sargon.Secp256k1Signature(bytes: self.data)
+	}
+}
+
+extension Curve25519.Signing.PublicKey {
+	func intoSargon() -> Sargon.Ed25519PublicKey {
+		try! Sargon.Ed25519PublicKey(bytes: self.compressedRepresentation)
+	}
+}
+
+extension Sargon.Ed25519Signature {
+	init(wallet: EdDSASignature) {
+		try! self.init(bytes: wallet)
 	}
 }

@@ -25,51 +25,48 @@ extension OnLedgerEntitiesClient {
 		networkID: NetworkID,
 		defaultDepositGuarantee: Decimal192 = 1
 	) async throws -> ResourceBalance {
-		/*
-		 let amount = resourceQuantifier.amount
-		 let resourceAddress = resource.resourceAddress
+		let amount = resourceQuantifier.amount
+		let resourceAddress = resource.resourceAddress
 
-		 let guarantee: TransactionGuarantee? = { () -> TransactionGuarantee? in
-		 	guard case let .predicted(predictedAmount) = resourceQuantifier else { return nil }
-		 	let guaranteedAmount = defaultDepositGuarantee * predictedAmount.value
-		 	return .init(
-		 		amount: guaranteedAmount,
-		 		instructionIndex: predictedAmount.instructionIndex,
-		 		resourceAddress: resourceAddress,
-		 		resourceDivisibility: resource.divisibility
-		 	)
-		 }()
+		let guarantee: TransactionGuarantee? = { () -> TransactionGuarantee? in
+			guard case let .predicted(predictedAmount) = resourceQuantifier else { return nil }
+			let guaranteedAmount = defaultDepositGuarantee * predictedAmount.value
+			return .init(
+				amount: guaranteedAmount,
+				instructionIndex: predictedAmount.instructionIndex,
+				resourceAddress: resourceAddress,
+				resourceDivisibility: resource.divisibility
+			)
+		}()
 
-		 // Check if the fungible resource is a pool unit resource
-		 if await isPoolUnitResource(resource) {
-		 	return try await poolUnit(
-		 		resource,
-		 		amount: amount,
-		 		poolContributions: poolContributions,
-		 		entities: entities,
-		 		resourceAssociatedDapps: resourceAssociatedDapps,
-		 		networkID: networkID,
-		 		guarantee: guarantee
-		 	)
-		 }
+		// Check if the fungible resource is a pool unit resource
+		if await isPoolUnitResource(resource) {
+			return try await poolUnit(
+				resource,
+				amount: amount,
+				poolContributions: poolContributions,
+				entities: entities,
+				resourceAssociatedDapps: resourceAssociatedDapps,
+				networkID: networkID,
+				guarantee: guarantee
+			)
+		}
 
-		 // Check if the fungible resource is an LSU
-		 if let validator = await isLiquidStakeUnit(resource) {
-		 	return try await liquidStakeUnit(
-		 		resource,
-		 		amount: amount,
-		 		validator: validator,
-		 		validatorStakes: validatorStakes,
-		 		guarantee: guarantee
-		 	)
-		 }
-		 // Normal fungible resource
-		 let isXRD = resourceAddress.isXRD(on: networkID)
-		 let details: ResourceBalance.Fungible = .init(isXRD: isXRD, amount: .init(nominalAmount: amount), guarantee: guarantee)
+		// Check if the fungible resource is an LSU
+		if let validator = await isLiquidStakeUnit(resource) {
+			return try await liquidStakeUnit(
+				resource,
+				amount: amount,
+				validator: validator,
+				validatorStakes: validatorStakes,
+				guarantee: guarantee
+			)
+		}
+		// Normal fungible resource
+		let isXRD = resourceAddress.isXRD(on: networkID)
+		let details: ResourceBalance.Fungible = .init(isXRD: isXRD, amount: .init(nominalAmount: amount), guarantee: guarantee)
 
-		 return .init(resource: resource, details: .fungible(details))
-		 */
-		fatalError()
+		return .init(resource: resource, details: .fungible(details))
 	}
 
 	private func poolUnit(

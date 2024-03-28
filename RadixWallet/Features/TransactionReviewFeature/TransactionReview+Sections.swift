@@ -317,23 +317,21 @@ extension TransactionReview {
 		componentAddresses: [ComponentAddress],
 		unknownTitle: (Int) -> String
 	) async throws -> TransactionReviewDapps<ComponentAddress>.State? {
-//		let dApps = await extractDappEntities(addresses)
-//		return try await extractDapps(dApps, unknownTitle: unknownTitle)
-		fatalError()
+		let dApps = await extractDappEntities(componentAddresses.map { $0.embed() })
+		return try await extractDapps(dApps, unknownTitle: unknownTitle)
 	}
 
 	private func extractDapps<A: AddressProtocol>(
 		_ dAppEntities: [(address: Address, entity: DappEntity?)],
 		unknownTitle: (Int) -> String
 	) async throws -> TransactionReviewDapps<A>.State? {
-//		let knownDapps = dAppEntities.compactMap(\.entity).asIdentifiable()
-//		let unknownDapps = try dAppEntities.filter { $0.entity == nil }
-//			.map { try $0.address.asSpecific() as SpecificAddress<Kind> }.asIdentifiable()
-//
-//		guard knownDapps.count + unknownDapps.count > 0 else { return nil }
-//
-//		return .init(knownDapps: knownDapps, unknownDapps: unknownDapps, unknownTitle: unknownTitle)
-		fatalError()
+		let knownDapps = dAppEntities.compactMap(\.entity).asIdentifiable()
+		let unknownDapps = try dAppEntities.filter { $0.entity == nil }
+			.map { try $0.address.into(type: A.self) }.asIdentifiable()
+
+		guard knownDapps.count + unknownDapps.count > 0 else { return nil }
+
+		return .init(knownDapps: knownDapps, unknownDapps: unknownDapps, unknownTitle: unknownTitle)
 	}
 
 	private func extractDappEntities(_ addresses: [Address]) async -> [(address: Address, entity: DappEntity?)] {
@@ -372,36 +370,35 @@ extension TransactionReview {
 		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
-		fatalError()
-		//        var withdrawals: [Account: IdentifiedArrayOf<Transfer>] = [:]
-		//    userAccounts: [Account],
-//
-//		for (accountAddress, resources) in accountWithdraws {
-//			let account = try userAccounts.account(for: .init(validatingAddress: accountAddress))
-//			let transfers = try await resources.asyncFlatMap {
-//				try await transferInfo(
-//					resourceQuantifier: $0,
-//					newlyCreatedNonFungibles: newlyCreatedNonFungibles,
-//					poolInteractions: poolRedemptions,
-//					entities: entities,
-//					resourceAssociatedDapps: resourceAssociatedDapps,
-//					networkID: networkID,
-//					type: .exact
-//				)
-//			}
-//			.map(\.asIdentified)
-//
-//			withdrawals[account, default: []].append(contentsOf: transfers)
-//		}
-//
-//		guard !withdrawals.isEmpty else { return nil }
-//
-//		let withdrawalAccounts = withdrawals.map {
-//			TransactionReviewAccount.State(account: $0.key, transfers: $0.value)
-//		}
-//		.asIdentifiable()
-//
-//		return .init(accounts: withdrawalAccounts, enableCustomizeGuarantees: false)
+		var withdrawals: [Account: IdentifiedArrayOf<Transfer>] = [:]
+		let userAccounts: [Account] = try await extractUserAccounts(Array(accountWithdraws.keys))
+
+		for (accountAddress, resources) in accountWithdraws {
+			let account = try userAccounts.account(for: accountAddress)
+			let transfers = try await resources.asyncFlatMap {
+				try await transferInfo(
+					resourceQuantifier: $0,
+					newlyCreatedNonFungibles: newlyCreatedNonFungibles,
+					poolInteractions: poolRedemptions,
+					entities: entities,
+					resourceAssociatedDapps: resourceAssociatedDapps,
+					networkID: networkID,
+					type: .exact
+				)
+			}
+			.map(\.asIdentified)
+
+			withdrawals[account, default: []].append(contentsOf: transfers)
+		}
+
+		guard !withdrawals.isEmpty else { return nil }
+
+		let withdrawalAccounts = withdrawals.map {
+			TransactionReviewAccount.State(account: $0.key, transfers: $0.value)
+		}
+		.asIdentifiable()
+
+		return .init(accounts: withdrawalAccounts, enableCustomizeGuarantees: false)
 	}
 
 	private func extractDeposits(
@@ -414,44 +411,41 @@ extension TransactionReview {
 		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
-		fatalError()
-		/*
-		 userAccounts: [Account],
-		 let defaultDepositGuarantee = await appPreferencesClient.getPreferences().transaction.defaultDepositGuarantee
+		let userAccounts: [Account] = try await extractUserAccounts(Array(accountDeposits.keys))
+		let defaultDepositGuarantee = await appPreferencesClient.getPreferences().transaction.defaultDepositGuarantee
 
-		 var deposits: [Account: IdentifiedArrayOf<Transfer>] = [:]
+		var deposits: [Account: IdentifiedArrayOf<Transfer>] = [:]
 
-		 for (accountAddress, accountDeposits) in accountDeposits {
-		 	let account = try userAccounts.account(for: .init(validatingAddress: accountAddress))
-		 	let transfers = try await accountDeposits.asyncFlatMap {
-		 		try await transferInfo(
-		 			resourceQuantifier: $0,
-		 			newlyCreatedNonFungibles: newlyCreatedNonFungibles,
-		 			poolInteractions: poolContributions,
-		 			validatorStakes: validatorStakes,
-		 			unstakeData: unstakeData,
-		 			entities: entities,
-		 			resourceAssociatedDapps: resourceAssociatedDapps,
-		 			networkID: networkID,
-		 			type: $0.transferType,
-		 			defaultDepositGuarantee: defaultDepositGuarantee
-		 		)
-		 	}
-		 	.map(\.asIdentified)
+		for (accountAddress, accountDeposits) in accountDeposits {
+			let account = try userAccounts.account(for: accountAddress)
+			let transfers = try await accountDeposits.asyncFlatMap {
+				try await transferInfo(
+					resourceQuantifier: $0,
+					newlyCreatedNonFungibles: newlyCreatedNonFungibles,
+					poolInteractions: poolContributions,
+					validatorStakes: validatorStakes,
+					unstakeData: unstakeData,
+					entities: entities,
+					resourceAssociatedDapps: resourceAssociatedDapps,
+					networkID: networkID,
+					type: $0.transferType,
+					defaultDepositGuarantee: defaultDepositGuarantee
+				)
+			}
+			.map(\.asIdentified)
 
-		 	deposits[account, default: []].append(contentsOf: transfers)
-		 }
+			deposits[account, default: []].append(contentsOf: transfers)
+		}
 
-		 let depositAccounts = deposits
-		 	.filter { !$0.value.isEmpty }
-		 	.map { TransactionReviewAccount.State(account: $0.key, transfers: $0.value) }
-		 	.asIdentifiable()
+		let depositAccounts = deposits
+			.filter { !$0.value.isEmpty }
+			.map { TransactionReviewAccount.State(account: $0.key, transfers: $0.value) }
+			.asIdentifiable()
 
-		 guard !depositAccounts.isEmpty else { return nil }
+		guard !depositAccounts.isEmpty else { return nil }
 
-		 let requiresGuarantees = !depositAccounts.customizableGuarantees.isEmpty
-		 return .init(accounts: depositAccounts, enableCustomizeGuarantees: requiresGuarantees)
-		 */
+		let requiresGuarantees = !depositAccounts.customizableGuarantees.isEmpty
+		return .init(accounts: depositAccounts, enableCustomizeGuarantees: requiresGuarantees)
 	}
 
 	func extractValidators(for addresses: [ValidatorAddress]) async throws -> ValidatorsState? {

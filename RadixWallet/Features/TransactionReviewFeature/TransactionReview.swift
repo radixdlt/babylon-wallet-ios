@@ -910,9 +910,9 @@ extension TransactionReview.State {
 extension [TransactionReview.Account] {
 	struct MissingUserAccountError: Error {}
 
-	func account(for componentAddress: ComponentAddress) throws -> TransactionReview.Account {
-		guard let account = first(where: { $0.address.address == componentAddress.address }) else {
-			loggerGlobal.error("Can't find component address that was specified for transfer")
+	func account(for accountAddress: AccountAddress) throws -> TransactionReview.Account {
+		guard let account = first(where: { $0.address == accountAddress }) else {
+			loggerGlobal.error("Can't find address that was specified for transfer")
 			throw MissingUserAccountError()
 		}
 

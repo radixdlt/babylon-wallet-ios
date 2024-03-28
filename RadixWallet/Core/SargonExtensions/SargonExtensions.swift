@@ -18,6 +18,12 @@ extension EntityFlag {
 	}
 }
 
+extension Address {
+	public func into<A: AddressProtocol>(type: A.Type = A.self) throws -> A {
+		try A(validatingAddress: self.address)
+	}
+}
+
 extension OrderedSet<EntityFlag> {
 	func intoSargon() -> [Sargon.EntityFlag] {
 		map { $0.intoSargon() }
