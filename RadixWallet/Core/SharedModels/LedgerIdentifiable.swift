@@ -114,22 +114,21 @@ extension LedgerIdentifiable {
 
 extension LedgerIdentifiable.Address {
 	public init?(address: Address) {
-//		switch address.decodedKind {
-//		case _ where AccountEntityType.addressSpace.contains(address.decodedKind):
-//			self = .account(.init(address: address.address, decodedKind: address.decodedKind), isLedgerHWAccount: false)
-//		case _ where ResourceEntityType.addressSpace.contains(address.decodedKind):
-//			self = .resource(.init(address: address.address, decodedKind: address.decodedKind))
-//		case _ where ResourcePoolEntityType.addressSpace.contains(address.decodedKind):
-//			self = .resourcePool(.init(address: address.address, decodedKind: address.decodedKind))
-//		case _ where PackageEntityType.addressSpace.contains(address.decodedKind):
-//			self = .package(.init(address: address.address, decodedKind: address.decodedKind))
-//		case _ where ValidatorEntityType.addressSpace.contains(address.decodedKind):
-//			self = .validator(.init(address: address.address, decodedKind: address.decodedKind))
-//		case _ where ComponentEntityType.addressSpace.contains(address.decodedKind):
-//			self = .component(.init(address: address.address, decodedKind: address.decodedKind))
-//		default:
-//			return nil
-//		}
-		fatalError("sargon migration")
+		switch address {
+		case let .account(accountAddress):
+			self = .account(accountAddress, isLedgerHWAccount: false)
+		case let .resource(resourceAddress):
+			self = .resource(resourceAddress)
+		case let .pool(poolAddress):
+			self = .resourcePool(poolAddress)
+		case let .package(packageAddress):
+			self = .package(packageAddress)
+		case let .validator(validatorAddress):
+			self = .validator(validatorAddress)
+		case let .component(componentAddress):
+			self = .component(componentAddress)
+		default:
+			return nil
+		}
 	}
 }
