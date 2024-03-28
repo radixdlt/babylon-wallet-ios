@@ -84,7 +84,18 @@ extension OnLedgerEntity.Metadata.ValueAtStateVersion: Equatable where Value: Eq
 // MARK: - OnLedgerEntity.Metadata.ValueAtStateVersion + Hashable
 extension OnLedgerEntity.Metadata.ValueAtStateVersion: Hashable where Value: Hashable {}
 
-// MARK: OnLedgerEntity.Resource
+extension OnLedgerEntity.Metadata {
+	init(newlyCreated: Sargon.NewlyCreatedResource) {
+		self.init(
+			name: newlyCreated.name,
+			symbol: newlyCreated.symbol,
+			description: newlyCreated.description,
+			iconURL: newlyCreated.iconUrl.map { URL(string: $0) } ?? nil,
+			tags: newlyCreated.tags.compactMap(NonEmptyString.init(rawValue:)).map(AssetTag.custom)
+		)
+	}
+}
+
 extension OnLedgerEntity {
 	public struct Metadata: Sendable, Hashable, Codable {
 		public enum PublicKeyHash: Sendable, Hashable, Codable {

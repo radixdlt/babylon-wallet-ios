@@ -23,32 +23,3 @@ extension OnLedgerEntity.Resource {
 		)
 	}
 }
-
-// MARK: - MetadataValue
-public enum MetadataValue {
-	public var string: String? { nil }
-	public var url: URL? { nil }
-	public var stringArray: [String]? { nil }
-}
-
-extension [String: MetadataValue?] {
-	var name: String? {
-		self["name"]??.string
-	}
-
-	var symbol: String? {
-		self["symbol"]??.string
-	}
-
-	var iconURL: URL? {
-		self["icon_url"]??.url
-	}
-
-	var description: String? {
-		self["description"]??.string
-	}
-
-	var tags: [AssetTag] {
-		self["tags"]??.stringArray?.compactMap { NonEmptyString(rawValue: $0) }.map(AssetTag.custom) ?? []
-	}
-}

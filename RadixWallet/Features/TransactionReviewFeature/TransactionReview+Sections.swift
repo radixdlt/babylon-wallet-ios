@@ -25,34 +25,39 @@ extension TransactionReview {
 	}
 
 	func sections(for summary: ExecutionSummary, networkID: NetworkID) async throws -> Sections? {
-		fatalError()
+//		 let userAccounts = try await extractUserAccounts(summary.encounteredEntities)
+
+		let allWithdrawAddresses = summary.withdrawals.values.flatMap { $0 }.map(\.resourceAddress)
+		let allDepositAddresses = summary.deposits.values.flatMap { $0 }.map(\.resourceAddress)
+		// Prepoluate with all resource addresses from withdraw and deposit.
+		let allAddresses: IdentifiedArrayOf<ResourceAddress> = (allWithdrawAddresses + allDepositAddresses).asIdentifiable()
+
+		func resourcesInfo(_ resourceAddresses: [ResourceAddress]) async throws -> ResourcesInfo {
+			var newlyCreatedMetadata = Dictionary(
+				uniqueKeysWithValues: resourceAddresses.compactMap { resourceAddress in
+					summary.newEntities.metadata[resourceAddress].map {
+						(
+							resourceAddress,
+							ResourceInfo.right(OnLedgerEntity.Metadata(newlyCreated: $0))
+						)
+					}
+				}
+			)
+
+			let existingResources = resourceAddresses.filter {
+				newlyCreatedMetadata[$0] == nil
+			}
+
+			let existingResourceDetails = try await onLedgerEntitiesClient.getResources(existingResources)
+				.reduce(into: ResourcesInfo()) { partialResult, next in
+					partialResult[next.resourceAddress] = .left(next)
+				}
+
+			newlyCreatedMetadata.append(contentsOf: existingResourceDetails)
+
+			return newlyCreatedMetadata
+		}
 		/*
-		 let userAccounts = try await extractUserAccounts(summary.encounteredEntities)
-
-		 let allWithdrawAddresses = summary.accountWithdraws.values.flatMap { $0 }.map(\.resourceAddress)
-		 let allDepositAddresses = summary.accountDeposits.values.flatMap { $0 }.map(\.resourceAddress)
-		 // Prepoluate with all resource addresses from withdraw and deposit.
-		 let allAddresses: IdentifiedArrayOf<ResourceAddress> = try (allWithdrawAddresses + allDepositAddresses)
-		 	.asIdentifiable()
-
-		 func resourcesInfo(_ resourceAddresses: [ResourceAddress]) async throws -> ResourcesInfo {
-		 	var newlyCreatedMetadata = Dictionary(uniqueKeysWithValues: resourceAddresses.compactMap { resourceAddress in
-		 		summary.metadataOfNewlyCreatedEntities[resourceAddress.address].map { (resourceAddress, ResourceInfo.right(.init($0))) }
-		 	})
-
-		 	let existingResources = resourceAddresses.filter {
-		 		newlyCreatedMetadata[$0] == nil
-		 	}
-
-		 	let existingResourceDetails = try await onLedgerEntitiesClient.getResources(existingResources)
-		 		.reduce(into: ResourcesInfo()) { partialResult, next in
-		 			partialResult[next.resourceAddress] = .left(next)
-		 		}
-
-		 	newlyCreatedMetadata.append(contentsOf: existingResourceDetails)
-
-		 	return newlyCreatedMetadata
-		 }
 
 		 switch summary.detailedManifestClass {
 		 case nil:
@@ -308,6 +313,7 @@ extension TransactionReview {
 		 	)
 		 }
 		 */
+		fatalError()
 	}
 
 	private func extractUserAccounts(_ allAddress: [Address]) async throws -> [Account] {
