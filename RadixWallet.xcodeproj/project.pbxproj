@@ -479,7 +479,6 @@
 		48CFC4362ADC10DA00E77A5C /* JSONEncoder+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF492ADC10D900E77A5C /* JSONEncoder+Live.swift */; };
 		48CFC4372ADC10DA00E77A5C /* JSONDecoder+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF4A2ADC10D900E77A5C /* JSONDecoder+Live.swift */; };
 		48CFC4392ADC10DA00E77A5C /* Sorted.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF4D2ADC10D900E77A5C /* Sorted.swift */; };
-		48CFC43A2ADC10DA00E77A5C /* Data+Random.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF4E2ADC10D900E77A5C /* Data+Random.swift */; };
 		48CFC43B2ADC10DA00E77A5C /* QRAddressPrefix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF4F2ADC10D900E77A5C /* QRAddressPrefix.swift */; };
 		48CFC43C2ADC10DA00E77A5C /* Validation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF512ADC10D900E77A5C /* Validation.swift */; };
 		48CFC43D2ADC10DA00E77A5C /* FactorSourcesClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF542ADC10D900E77A5C /* FactorSourcesClient+Test.swift */; };
@@ -1788,7 +1787,6 @@
 		48CFBF492ADC10D900E77A5C /* JSONEncoder+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "JSONEncoder+Live.swift"; sourceTree = "<group>"; };
 		48CFBF4A2ADC10D900E77A5C /* JSONDecoder+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "JSONDecoder+Live.swift"; sourceTree = "<group>"; };
 		48CFBF4D2ADC10D900E77A5C /* Sorted.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sorted.swift; sourceTree = "<group>"; };
-		48CFBF4E2ADC10D900E77A5C /* Data+Random.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Data+Random.swift"; sourceTree = "<group>"; };
 		48CFBF4F2ADC10D900E77A5C /* QRAddressPrefix.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRAddressPrefix.swift; sourceTree = "<group>"; };
 		48CFBF512ADC10D900E77A5C /* Validation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Validation.swift; sourceTree = "<group>"; };
 		48CFBF542ADC10D900E77A5C /* FactorSourcesClient+Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "FactorSourcesClient+Test.swift"; sourceTree = "<group>"; };
@@ -4855,7 +4853,6 @@
 				48CFBF272ADC10D900E77A5C /* Extensions */,
 				48CFBF482ADC10D900E77A5C /* JSON */,
 				48CFBF4C2ADC10D900E77A5C /* Sorted */,
-				48CFBF4E2ADC10D900E77A5C /* Data+Random.swift */,
 				48CFBF4F2ADC10D900E77A5C /* QRAddressPrefix.swift */,
 				48CFBF502ADC10D900E77A5C /* Validation */,
 				830EA9E42AEB9088004C8051 /* DefaultValueDecodable.swift */,
@@ -8270,7 +8267,6 @@
 				48CFC3822ADC10D900E77A5C /* AssetBehaviorsView.swift in Sources */,
 				48CFC5652ADC10DA00E77A5C /* MetadataNonFungibleGlobalIdValue.swift in Sources */,
 				48CFC63C2ADC10DB00E77A5C /* DerivationPathScheme.swift in Sources */,
-				48CFC43A2ADC10DA00E77A5C /* Data+Random.swift in Sources */,
 				48CFC4B02ADC10DA00E77A5C /* MetadataStringValue.swift in Sources */,
 				48CFC5362ADC10DA00E77A5C /* StateEntityDetailsResponse.swift in Sources */,
 				48CFC5372ADC10DA00E77A5C /* StateEntityNonFungibleResourceVaultsPageOptIns.swift in Sources */,
