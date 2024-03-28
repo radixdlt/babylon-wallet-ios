@@ -10,12 +10,6 @@ extension TXID {
 	}
 }
 
-extension SignedIntent {
-	public func hash() -> SignedIntentHash {
-		fatalError("Sargon migration")
-	}
-}
-
 extension SLIP10.PublicKey {
 	public func intoSargon() -> Sargon.PublicKey {
 		try! Sargon.PublicKey(bytes: self.compressedData)
@@ -24,7 +18,7 @@ extension SLIP10.PublicKey {
 
 extension SLIP10.Signature {
 	public func intoSargon() -> Sargon.Signature {
-		fatalError("Sargon migration")
+		try! Sargon.Signature(bytes: self.serialize())
 	}
 }
 
