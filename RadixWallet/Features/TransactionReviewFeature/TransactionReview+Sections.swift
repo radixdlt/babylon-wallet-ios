@@ -25,8 +25,6 @@ extension TransactionReview {
 	}
 
 	func sections(for summary: ExecutionSummary, networkID: NetworkID) async throws -> Sections? {
-//		 let userAccounts = try await extractUserAccounts(summary.encounteredEntities)
-
 		let allWithdrawAddresses = summary.withdrawals.values.flatMap { $0 }.map(\.resourceAddress)
 		let allDepositAddresses = summary.deposits.values.flatMap { $0 }.map(\.resourceAddress)
 		// Prepoluate with all resource addresses from withdraw and deposit.
@@ -137,9 +135,6 @@ extension TransactionReview {
 
 		case let .poolRedemption(poolAddresses, poolRedemptions):
 			// All resources that are part of the pool
-//		 	let resourceAddresses = try poolRedemptions.flatMap(\.redeemedResources.keys).map {
-//		 		try ResourceAddress(validatingAddress: $0)
-//		 	}
 			let resourceAddresses = poolRedemptions.flatMap {
 				Array($0.redeemedResources.keys)
 			}
@@ -449,40 +444,42 @@ extension TransactionReview {
 	}
 
 	func extractValidators(for addresses: [ValidatorAddress]) async throws -> ValidatorsState? {
-		fatalError()
-//		guard !addresses.isEmpty else { return nil }
-//
-//		let validators = try await onLedgerEntitiesClient.getEntities(addresses: addresses.map(\.embed()), metadataKeys: .resourceMetadataKeys)
-//			.compactMap { entity -> ValidatorState? in
-//				guard let validator = entity.validator else { return nil }
-//				return .init(
-//					address: validator.address,
-//					name: validator.metadata.name,
-//					thumbnail: validator.metadata.iconURL
-//				)
-//			}
-//
-//		guard validators.count == addresses.count else {
-//			struct FailedToExtractValidatorInformation: Error {}
-//			throw FailedToExtractValidatorInformation()
-//		}
-//
-//		return .init(validators: validators)
+		guard !addresses.isEmpty else { return nil }
+
+		let validators = try await onLedgerEntitiesClient.getEntities(
+			addresses: addresses.map { $0.embed() },
+			metadataKeys: .resourceMetadataKeys
+		)
+
+		.compactMap { entity -> ValidatorState? in
+			guard let validator = entity.validator else { return nil }
+			return .init(
+				address: validator.address,
+				name: validator.metadata.name,
+				thumbnail: validator.metadata.iconURL
+			)
+		}
+
+		guard validators.count == addresses.count else {
+			struct FailedToExtractValidatorInformation: Error {}
+			throw FailedToExtractValidatorInformation()
+		}
+
+		return .init(validators: validators)
 	}
 
 	func extractAccountDepositSetting(
 		for validAccounts: [Profile.Network.Account],
 		defaultDepositRuleChanges: [AccountAddress: AccountDefaultDepositRule]
 	) -> DepositSettingState? {
-		fatalError()
-//		let depositSettingChanges: [TransactionReview.DepositSettingChange] = validAccounts.compactMap { account in
-//			guard let depositRuleChange = defaultDepositRuleChanges[account.address] else { return nil }
-//			return .init(account: account, ruleChange: depositRuleChange)
-//		}
-//
-//		guard !depositSettingChanges.isEmpty else { return nil }
-//
-//		return .init(changes: IdentifiedArray(uncheckedUniqueElements: depositSettingChanges))
+		let depositSettingChanges: [TransactionReview.DepositSettingChange] = validAccounts.compactMap { account in
+			guard let depositRuleChange = defaultDepositRuleChanges[account.address] else { return nil }
+			return .init(account: account, ruleChange: depositRuleChange)
+		}
+
+		guard !depositSettingChanges.isEmpty else { return nil }
+
+		return .init(changes: IdentifiedArray(uncheckedUniqueElements: depositSettingChanges))
 	}
 
 	func extractAccountDepositExceptions(
@@ -491,56 +488,53 @@ extension TransactionReview {
 		authorizedDepositorsAdded: [AccountAddress: [ResourceOrNonFungible]],
 		authorizedDepositorsRemoved: [AccountAddress: [ResourceOrNonFungible]]
 	) async throws -> DepositExceptionsState? {
-		fatalError()
-		/*
-		 let exceptionChanges: [DepositExceptionsChange] = try await validAccounts.asyncCompactMap { account in
-		 	let resourcePreferenceChanges = try await resourcePreferenceChanges[account.address]?
-		 		.asyncMap { resourcePreference in
-		 			try await DepositExceptionsChange.ResourcePreferenceChange(
-		 				resource: onLedgerEntitiesClient.getResource(resourcePreference.key),
-		 				change: resourcePreference.value
-		 			)
-		 		} ?? []
+		let exceptionChanges: [DepositExceptionsChange] = try await validAccounts.asyncCompactMap { account in
+			let resourcePreferenceChanges = try await resourcePreferenceChanges[account.address]?
+				.asyncMap { resourcePreference in
+					try await DepositExceptionsChange.ResourcePreferenceChange(
+						resource: onLedgerEntitiesClient.getResource(resourcePreference.key),
+						change: resourcePreference.value
+					)
+				} ?? []
 
-		 	let authorizedDepositorChanges = try await {
-		 		var changes: [DepositExceptionsChange.AllowedDepositorChange] = []
-		 		if let authorizedDepositorsAdded = authorizedDepositorsAdded[account.address] {
-		 			let added = try await authorizedDepositorsAdded.asyncMap { resourceOrNonFungible in
-		 				let resourceAddress = try resourceOrNonFungible.resourceAddress()
-		 				return try await DepositExceptionsChange.AllowedDepositorChange(
-		 					resource: onLedgerEntitiesClient.getResource(resourceAddress),
-		 					change: .added
-		 				)
-		 			}
-		 			changes.append(contentsOf: added)
-		 		}
-		 		if let authorizedDepositorsRemoved = authorizedDepositorsRemoved[account.address] {
-		 			let removed = try await authorizedDepositorsRemoved.asyncMap { resourceOrNonFungible in
-		 				let resourceAddress = try resourceOrNonFungible.resourceAddress()
-		 				return try await DepositExceptionsChange.AllowedDepositorChange(
-		 					resource: onLedgerEntitiesClient.getResource(resourceAddress),
-		 					change: .removed
-		 				)
-		 			}
-		 			changes.append(contentsOf: removed)
-		 		}
+			let authorizedDepositorChanges = try await {
+				var changes: [DepositExceptionsChange.AllowedDepositorChange] = []
+				if let authorizedDepositorsAdded = authorizedDepositorsAdded[account.address] {
+					let added = try await authorizedDepositorsAdded.asyncMap { resourceOrNonFungible in
+						let resourceAddress = try resourceOrNonFungible.resourceAddress()
+						return try await DepositExceptionsChange.AllowedDepositorChange(
+							resource: onLedgerEntitiesClient.getResource(resourceAddress),
+							change: .added
+						)
+					}
+					changes.append(contentsOf: added)
+				}
+				if let authorizedDepositorsRemoved = authorizedDepositorsRemoved[account.address] {
+					let removed = try await authorizedDepositorsRemoved.asyncMap { resourceOrNonFungible in
+						let resourceAddress = try resourceOrNonFungible.resourceAddress()
+						return try await DepositExceptionsChange.AllowedDepositorChange(
+							resource: onLedgerEntitiesClient.getResource(resourceAddress),
+							change: .removed
+						)
+					}
+					changes.append(contentsOf: removed)
+				}
 
-		 		return changes
-		 	}()
+				return changes
+			}()
 
-		 	guard !resourcePreferenceChanges.isEmpty || !authorizedDepositorChanges.isEmpty else { return nil }
+			guard !resourcePreferenceChanges.isEmpty || !authorizedDepositorChanges.isEmpty else { return nil }
 
-		 	return DepositExceptionsChange(
-		 		account: account,
-		 		resourcePreferenceChanges: IdentifiedArray(uncheckedUniqueElements: resourcePreferenceChanges),
-		 		allowedDepositorChanges: IdentifiedArray(uncheckedUniqueElements: authorizedDepositorChanges)
-		 	)
-		 }
+			return DepositExceptionsChange(
+				account: account,
+				resourcePreferenceChanges: IdentifiedArray(uncheckedUniqueElements: resourcePreferenceChanges),
+				allowedDepositorChanges: IdentifiedArray(uncheckedUniqueElements: authorizedDepositorChanges)
+			)
+		}
 
-		 guard !exceptionChanges.isEmpty else { return nil }
+		guard !exceptionChanges.isEmpty else { return nil }
 
-		 return DepositExceptionsState(changes: IdentifiedArray(uncheckedUniqueElements: exceptionChanges))
-		 */
+		return DepositExceptionsState(changes: IdentifiedArray(uncheckedUniqueElements: exceptionChanges))
 	}
 
 	private func perPoolUnitDapps(
