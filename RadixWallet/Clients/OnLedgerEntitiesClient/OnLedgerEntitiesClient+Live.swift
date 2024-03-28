@@ -273,27 +273,26 @@ extension OnLedgerEntitiesClient {
 
 extension OnLedgerEntity {
 	var cachingIdentifier: CacheClient.Entry.OnLedgerEntity {
-//		switch self {
-//		case let .resource(resource):
-//			.resource(resource.resourceAddress.embed())
-//		case let .nonFungibleToken(nonFungibleToken):
-//			.nonFungibleData(nonFungibleToken.id)
-//		case let .accountNonFungibleIds(idsPage):
-//			.nonFungibleIdPage(
-//				accountAddress: idsPage.accountAddress.embed(),
-//				resourceAddress: idsPage.resourceAddress.embed(),
-//				pageCursor: idsPage.pageCursor
-//			)
-//		case let .account(account):
-//			.account(account.address.embed())
-//		case let .resourcePool(resourcePool):
-//			.resourcePool(resourcePool.address.embed())
-//		case let .validator(validator):
-//			.validator(validator.address.embed())
-//		case let .genericComponent(component):
-//			.genericComponent(component.address.embed())
-//		}
-		fatalError("sargon migration")
+		switch self {
+		case let .resource(resource):
+			.init(address: resource.resourceAddress)
+		case let .nonFungibleToken(nonFungibleToken):
+			.nonFungibleData(nonFungibleToken.id)
+		case let .accountNonFungibleIds(idsPage):
+			.nonFungibleIdPage(
+				accountAddress: idsPage.accountAddress,
+				resourceAddress: idsPage.resourceAddress,
+				pageCursor: idsPage.pageCursor
+			)
+		case let .account(account):
+			.init(address: account.address)
+		case let .resourcePool(resourcePool):
+			.init(address: resourcePool.address)
+		case let .validator(validator):
+			.init(address: validator.address)
+		case let .genericComponent(component):
+			.init(address: component.address)
+		}
 	}
 }
 
