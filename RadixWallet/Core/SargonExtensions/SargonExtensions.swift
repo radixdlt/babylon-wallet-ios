@@ -15,6 +15,14 @@ extension PlaintextMessage {
 	}
 }
 
+public func == (lhs: Address, rhs: some AddressProtocol) -> Bool {
+	lhs == rhs.embed()
+}
+
+public func == (lhs: some AddressProtocol, rhs: Address) -> Bool {
+	rhs == lhs
+}
+
 extension Profile.Network.Account {
 	public func intoSargon() -> Sargon.Account {
 		fatalError()

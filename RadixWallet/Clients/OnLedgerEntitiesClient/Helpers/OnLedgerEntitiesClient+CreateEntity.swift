@@ -203,46 +203,45 @@ extension OnLedgerEntitiesClient {
 		let stakeUnitCandidates = rawFungibleResources.filter {
 			$0.metadata.validator != nil
 		}
+
+		let stakeClaimNFTCandidates = rawNonFungibleResources.filter {
+			$0.metadata.validator != nil
+		}
+
+		let poolUnitCandidates = rawFungibleResources.filter {
+			$0.metadata.poolUnit != nil
+		}
+
+		func matchPoolUnitCandidate(
+			for poolUnitResourceAddress: ResourceAddress,
+			itemAddress: Address,
+			candidates: [OnLedgerEntity.OwnedFungibleResource],
+			metadataAddressMatch: KeyPath<OnLedgerEntity.Metadata, String?>
+		) -> OnLedgerEntity.OwnedFungibleResource? {
+			guard let candidate = candidates.first(where: {
+				$0.metadata[keyPath: metadataAddressMatch] == itemAddress.address
+			}) else {
+				return nil
+			}
+
+			guard candidate.resourceAddress.address == poolUnitResourceAddress.address else {
+				assertionFailure("Bad candidate, not declared by the pool unit")
+				return nil
+			}
+
+			return candidate
+		}
+
+		let stakeAndPoolAddresses = Set(
+			stakeUnitCandidates.compactMap(\.metadata.validator).map { $0.embed() }
+				+ stakeClaimNFTCandidates.compactMap(\.metadata.validator).map { $0.embed() }
+				+ poolUnitCandidates.compactMap(\.metadata.poolUnit).map { $0.embed() }
+		)
+
+		guard !stakeAndPoolAddresses.isEmpty else {
+			return .init(radixNetworkStakes: [], poolUnits: [])
+		}
 		/*
-
-		 let stakeClaimNFTCandidates = rawNonFungibleResources.filter {
-		 	$0.metadata.validator != nil
-		 }
-
-		 let poolUnitCandidates = rawFungibleResources.filter {
-		 	$0.metadata.poolUnit != nil
-		 }
-
-		 func matchPoolUnitCandidate(
-		 	for poolUnitResourceAddress: ResourceAddress,
-		 	itemAddress: Address,
-		 	candidates: [OnLedgerEntity.OwnedFungibleResource],
-		 	metadataAddressMatch: KeyPath<OnLedgerEntity.Metadata, String?>
-		 ) -> OnLedgerEntity.OwnedFungibleResource? {
-		 	guard let candidate = candidates.first(where: {
-		 		$0.metadata[keyPath: metadataAddressMatch] == itemAddress.address
-		 	}) else {
-		 		return nil
-		 	}
-
-		 	guard candidate.resourceAddress.address == poolUnitResourceAddress.address else {
-		 		assertionFailure("Bad candidate, not declared by the pool unit")
-		 		return nil
-		 	}
-
-		 	return candidate
-		 }
-
-		 let stakeAndPoolAddresses = Set(
-		 	stakeUnitCandidates.compactMap(\.metadata.validator?.embed())
-		 		+ stakeClaimNFTCandidates.compactMap(\.metadata.validator?.embed())
-		 		+ poolUnitCandidates.compactMap(\.metadata.poolUnit?.embed())
-		 )
-
-		 guard !stakeAndPoolAddresses.isEmpty else {
-		 	return .init(radixNetworkStakes: [], poolUnits: [])
-		 }
-
 		 let entities = try await getEntities(
 		 	for: Array(stakeAndPoolAddresses),
 		 	.resourceMetadataKeys,
