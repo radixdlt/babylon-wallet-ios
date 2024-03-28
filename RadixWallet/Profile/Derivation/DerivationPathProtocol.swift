@@ -120,6 +120,10 @@ extension DerivationPath {
 		try IdentityHierarchicalDeterministicDerivationPath(derivationPath: path)
 	}
 
+	var isGetID: Bool {
+		self == Self.getID
+	}
+
 	public func asAccountPath() throws -> AccountDerivationPath {
 		try AccountDerivationPath(derivationPath: path)
 	}
