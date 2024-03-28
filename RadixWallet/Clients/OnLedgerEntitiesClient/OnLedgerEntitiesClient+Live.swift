@@ -61,8 +61,8 @@ extension OnLedgerEntitiesClient {
 		@Dependency(\.cacheClient) var cacheClient
 
 		let cachingIdentifier = CacheClient.Entry.onLedgerEntity(.nonFungibleIdPage(
-			accountAddress: request.accountAddress.asGeneral,
-			resourceAddress: request.resource.resourceAddress.asGeneral,
+			accountAddress: request.accountAddress,
+			resourceAddress: request.resource.resourceAddress,
 			pageCursor: request.pageCursor
 		))
 		let cached = try? cacheClient.load(
@@ -89,7 +89,7 @@ extension OnLedgerEntitiesClient {
 		let items = try freshPage.items.map {
 			try NonFungibleGlobalId.fromParts(
 				resourceAddress: request.resource.resourceAddress,
-				nonFungibleLocalId: .from(stringFormat: $0)
+				nonFungibleLocalId: .init(localId: $0)
 			)
 		}
 
@@ -167,7 +167,7 @@ extension OnLedgerEntitiesClient {
 				try await gatewayAPIClient.getNonFungibleData(.init(
 					atLedgerState: request.atLedgerState?.selector,
 					resourceAddress: request.resource.address,
-					nonFungibleIds: Array(ids.map { try $0.localId().toString() })
+					nonFungibleIds: Array(ids.map { try $0.nonFungibleLocalId.toString() })
 				))
 			}
 
@@ -273,66 +273,69 @@ extension OnLedgerEntitiesClient {
 
 extension OnLedgerEntity {
 	var cachingIdentifier: CacheClient.Entry.OnLedgerEntity {
-		switch self {
-		case let .resource(resource):
-			.resource(resource.resourceAddress.asGeneral)
-		case let .nonFungibleToken(nonFungibleToken):
-			.nonFungibleData(nonFungibleToken.id)
-		case let .accountNonFungibleIds(idsPage):
-			.nonFungibleIdPage(
-				accountAddress: idsPage.accountAddress.asGeneral,
-				resourceAddress: idsPage.resourceAddress.asGeneral,
-				pageCursor: idsPage.pageCursor
-			)
-		case let .account(account):
-			.account(account.address.asGeneral)
-		case let .resourcePool(resourcePool):
-			.resourcePool(resourcePool.address.asGeneral)
-		case let .validator(validator):
-			.validator(validator.address.asGeneral)
-		case let .genericComponent(component):
-			.genericComponent(component.address.asGeneral)
-		}
+//		switch self {
+//		case let .resource(resource):
+//			.resource(resource.resourceAddress.embed())
+//		case let .nonFungibleToken(nonFungibleToken):
+//			.nonFungibleData(nonFungibleToken.id)
+//		case let .accountNonFungibleIds(idsPage):
+//			.nonFungibleIdPage(
+//				accountAddress: idsPage.accountAddress.embed(),
+//				resourceAddress: idsPage.resourceAddress.embed(),
+//				pageCursor: idsPage.pageCursor
+//			)
+//		case let .account(account):
+//			.account(account.address.embed())
+//		case let .resourcePool(resourcePool):
+//			.resourcePool(resourcePool.address.embed())
+//		case let .validator(validator):
+//			.validator(validator.address.embed())
+//		case let .genericComponent(component):
+//			.genericComponent(component.address.embed())
+//		}
+		fatalError("sargon migration")
 	}
 }
 
 extension CacheClient.Entry.OnLedgerEntity {
 	var address: Address {
-		switch self {
-		case let .resource(resource):
-			resource.asGeneral
-		case let .account(account):
-			account.asGeneral
-		case let .resourcePool(resourcePool):
-			resourcePool.asGeneral
-		case let .validator(validator):
-			validator.asGeneral
-		case let .genericComponent(genericComponent):
-			genericComponent.asGeneral
-		case let .nonFungibleData(nonFungibleId):
-			nonFungibleId.resourceAddress.asGeneral
-		case let .nonFungibleIdPage(_, resourceAddress, _):
-			resourceAddress.asGeneral
-		}
+//		switch self {
+//		case let .resource(resource):
+//			resource.embed()
+//		case let .account(account):
+//			account.embed()
+//		case let .resourcePool(resourcePool):
+//			resourcePool.embed()
+//		case let .validator(validator):
+//			validator.embed()
+//		case let .genericComponent(genericComponent):
+//			genericComponent.embed()
+//		case let .nonFungibleData(nonFungibleId):
+//			nonFungibleId.resourceAddress.embed()
+//		case let .nonFungibleIdPage(_, resourceAddress, _):
+//			resourceAddress.embed()
+//		}
+		fatalError("sargon migration")
 	}
 }
 
 extension Address {
 	var cachingIdentifier: CacheClient.Entry.OnLedgerEntity {
-		switch self.decodedKind {
-		case _ where AccountEntityType.addressSpace.contains(self.decodedKind):
-			.account(self)
-		case _ where ResourceEntityType.addressSpace.contains(self.decodedKind):
-			.resource(self)
-		case _ where ResourcePoolEntityType.addressSpace.contains(self.decodedKind):
-			.resourcePool(self)
-		case _ where ValidatorEntityType.addressSpace.contains(self.decodedKind):
-			.validator(self)
-		case _ where ComponentEntityType.addressSpace.contains(self.decodedKind):
-			.genericComponent(self)
-		default:
-			.genericComponent(self)
-		}
+//		switch self.decodedKind {
+//		case _ where AccountEntityType.addressSpace.contains(self.decodedKind):
+//			.account(self)
+//		case _ where ResourceEntityType.addressSpace.contains(self.decodedKind):
+//			.resource(self)
+//		case _ where ResourcePoolEntityType.addressSpace.contains(self.decodedKind):
+//			.resourcePool(self)
+//		case _ where ValidatorEntityType.addressSpace.contains(self.decodedKind):
+//			.validator(self)
+//		case _ where ComponentEntityType.addressSpace.contains(self.decodedKind):
+//			.genericComponent(self)
+//		default:
+//			.genericComponent(self)
+//		}
+		fatalError("sargon migration")
 	}
 }
 

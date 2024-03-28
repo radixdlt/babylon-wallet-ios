@@ -188,7 +188,7 @@ extension OnLedgerEntity {
 		public let metadata: Metadata
 
 		public var fungibility: Fungibility {
-			if case .globalFungibleResourceManager = resourceAddress.decodedKind {
+			if resourceAddress.isFungible {
 				.fungible
 			} else {
 				.nonFungible
@@ -550,7 +550,7 @@ extension OnLedgerEntity.NonFungibleToken.NFTData {
 		self.fields
 			.compactMap(/GatewayAPI.ProgrammaticScryptoSborValue.decimal)
 			.first { $0.fieldName == field.rawValue }
-			.flatMap { try? Decimal192(value: $0.value) }
+			.flatMap { try? Decimal192($0.value) }
 	}
 
 	public var name: String? {
@@ -607,7 +607,7 @@ extension OnLedgerEntity.Resource {
 			return nil
 		}
 		let redemptionValue = poolUnitResource.amount.nominalAmount * (amount / poolUnitTotalSupply)
-		let decimalPlaces = divisibility.map(UInt.init) ?? Decimal192.maxDivisibility
+		let decimalPlaces = divisibility.map(UInt8.init) ?? Decimal192.maxDivisibility
 		let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
 
 		return roundedRedemptionValue

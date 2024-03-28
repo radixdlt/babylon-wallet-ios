@@ -999,7 +999,6 @@
 		48CFC68F2ADC10DB00E77A5C /* OlympiaAccountToMigrate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC2312ADC10D900E77A5C /* OlympiaAccountToMigrate.swift */; };
 		48CFC6902ADC10DB00E77A5C /* MigratedHardwareAccounts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC2322ADC10D900E77A5C /* MigratedHardwareAccounts.swift */; };
 		48CFC6912ADC10DB00E77A5C /* MigratedAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC2332ADC10D900E77A5C /* MigratedAccount.swift */; };
-		48CFC6922ADC10DB00E77A5C /* LegacyOlympiaAccountAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC2342ADC10D900E77A5C /* LegacyOlympiaAccountAddress.swift */; };
 		48CFC6932ADC10DB00E77A5C /* ImportLegacyWalletErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC2352ADC10D900E77A5C /* ImportLegacyWalletErrors.swift */; };
 		48CFC6942ADC10DB00E77A5C /* MigratedSoftwareAccounts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC2362ADC10D900E77A5C /* MigratedSoftwareAccounts.swift */; };
 		48CFC6952ADC10DB00E77A5C /* Olympia.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC2382ADC10D900E77A5C /* Olympia.swift */; };
@@ -2314,7 +2313,6 @@
 		48CFC2312ADC10D900E77A5C /* OlympiaAccountToMigrate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OlympiaAccountToMigrate.swift; sourceTree = "<group>"; };
 		48CFC2322ADC10D900E77A5C /* MigratedHardwareAccounts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MigratedHardwareAccounts.swift; sourceTree = "<group>"; };
 		48CFC2332ADC10D900E77A5C /* MigratedAccount.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MigratedAccount.swift; sourceTree = "<group>"; };
-		48CFC2342ADC10D900E77A5C /* LegacyOlympiaAccountAddress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LegacyOlympiaAccountAddress.swift; sourceTree = "<group>"; };
 		48CFC2352ADC10D900E77A5C /* ImportLegacyWalletErrors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImportLegacyWalletErrors.swift; sourceTree = "<group>"; };
 		48CFC2362ADC10D900E77A5C /* MigratedSoftwareAccounts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MigratedSoftwareAccounts.swift; sourceTree = "<group>"; };
 		48CFC2382ADC10D900E77A5C /* Olympia.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Olympia.swift; sourceTree = "<group>"; };
@@ -6575,7 +6573,6 @@
 				48CFC2312ADC10D900E77A5C /* OlympiaAccountToMigrate.swift */,
 				48CFC2322ADC10D900E77A5C /* MigratedHardwareAccounts.swift */,
 				48CFC2332ADC10D900E77A5C /* MigratedAccount.swift */,
-				48CFC2342ADC10D900E77A5C /* LegacyOlympiaAccountAddress.swift */,
 				48CFC2352ADC10D900E77A5C /* ImportLegacyWalletErrors.swift */,
 				48CFC2362ADC10D900E77A5C /* MigratedSoftwareAccounts.swift */,
 				48CFC2372ADC10D900E77A5C /* CAP33 */,
@@ -8716,7 +8713,6 @@
 				48CFC3552ADC10D900E77A5C /* ImportOlympiaLedgerAccountsAndFactorSources+View.swift in Sources */,
 				48CFC4E12ADC10DA00E77A5C /* StateEntityDetailsResponseFungibleVaultDetails.swift in Sources */,
 				48CFC5B22ADC10DA00E77A5C /* Footer.swift in Sources */,
-				48CFC6922ADC10DB00E77A5C /* LegacyOlympiaAccountAddress.swift in Sources */,
 				48CFC6302ADC10DB00E77A5C /* ProfileSnapshot+Header.swift in Sources */,
 				48CFC4152ADC10DA00E77A5C /* PasteboardClient+Interface.swift in Sources */,
 				48CFC2902ADC10D900E77A5C /* TransactionReviewAccount.swift in Sources */,

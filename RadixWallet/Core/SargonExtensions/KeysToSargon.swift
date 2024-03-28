@@ -21,6 +21,18 @@ extension SLIP10.PublicKey {
 	}
 }
 
+extension SLIP10.Signature {
+	public func intoSargon() -> Sargon.Signature {
+		fatalError("Sargon migration")
+	}
+}
+
+extension K1.PublicKey {
+	public func intoSargon() -> Sargon.Secp256k1PublicKey {
+		fatalError("Sargon migration")
+	}
+}
+
 extension SignatureWithPublicKey {
 	public func intoSargon() -> Sargon.SignatureWithPublicKey {
 		fatalError("Sargon migration")

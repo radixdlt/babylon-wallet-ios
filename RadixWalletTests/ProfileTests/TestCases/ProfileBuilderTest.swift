@@ -5,7 +5,7 @@ import XCTest
 final class ProfileBuilderTest: TestCase {
 	// MOVE ME to some appropriate file.
 	func test_tx_guarantee_default_preset_is_99() throws {
-		let expectedPreset = try Decimal192(value: "0.99")
+		let expectedPreset = try Decimal192("0.99")
 		XCTAssertEqual(AppPreferences.Transaction.defaultDepositGuaranteePreset, expectedPreset)
 		XCTAssertEqual(AppPreferences.Transaction().defaultDepositGuarantee, expectedPreset)
 		XCTAssertEqual(AppPreferences().transaction.defaultDepositGuarantee, expectedPreset)

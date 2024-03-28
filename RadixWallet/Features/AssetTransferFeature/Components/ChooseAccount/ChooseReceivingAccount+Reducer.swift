@@ -32,8 +32,8 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 			else {
 				return .invalid
 			}
-			let networkOfAddress = addressOnSomeNetwork.networkId()
-			guard networkOfAddress == networkID.rawValue else {
+			let networkOfAddress = addressOnSomeNetwork.networkID
+			guard networkOfAddress == networkID else {
 				loggerGlobal.warning("Manually inputted address is valid, but is on the WRONG network, inputted: \(networkOfAddress), but current network is: \(networkID.rawValue)")
 				return .wrongNetwork(addressOnSomeNetwork, incorrectNetwork: networkOfAddress.rawValue)
 			}
@@ -127,7 +127,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 			// While we allow to easily selected the owned account, user is still able to paste the address of an owned account.
 			// This be sure to check if the manually introduced address matches any of the user owned accounts.
 			if case let .foreignAccount(address) = result, let ownedAccount = state.chooseAccounts.availableAccounts.first(where: { $0.address == address }) {
-				return .send(.delegate(.handleResult(.myOwnAccount(ownedAccount))))
+				return .send(.delegate(.handleResult(.myOwnAccount(value: ownedAccount.intoSargon()))))
 			}
 			return .send(.delegate(.handleResult(result)))
 		}

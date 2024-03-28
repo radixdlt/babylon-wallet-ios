@@ -237,14 +237,16 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 			else {
 				return .none
 			}
-
+			guard let nonFungibleResourceAddress = try? NonFungibleResourceAddress(validatingAddress: stakeClaimTokens.resource.resourceAddress.address) else {
+				return .none
+			}
 			return sendStakeClaimTransaction(
 				state.account.address,
 				stakeClaims: [
 					.init(
 						validatorAddress: validatorAddress,
-						resourceAddress: stakeClaimTokens.resource.resourceAddress,
-						ids: stakeClaims.map { $0.id.localId() },
+						resourceAddress: nonFungibleResourceAddress,
+						ids: stakeClaims.map(\.id.nonFungibleLocalId),
 						amount: stakeClaims.map(\.claimAmount.nominalAmount).reduce(0, +)
 					),
 				]
@@ -263,7 +265,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 					return .init(
 						validatorAddress: stake.validator.address,
 						resourceAddress: stakeClaimTokens.resource.resourceAddress,
-						ids: stakeClaims.map { $0.id.localId() },
+						ids: stakeClaims.map(\.id.nonFungibleLocalId),
 						amount: stakeClaims.map(\.claimAmount.nominalAmount).reduce(0, +)
 					)
 				}
@@ -281,7 +283,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 					.init(
 						validatorAddress: stakeClaim.validatorAddress,
 						resourceAddress: resourceAddress,
-						ids: .init(stakeClaim.id.localId()),
+						ids: .init(stakeClaim.id.nonFungibleLocalId),
 						amount: stakeClaim.claimAmount.nominalAmount
 					),
 				]

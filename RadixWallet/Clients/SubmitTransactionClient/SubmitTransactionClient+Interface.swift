@@ -17,8 +17,8 @@ extension SubmitTransactionClient {
 // MARK: - SubmitTXRequest
 public struct SubmitTXRequest: Sendable, Hashable {
 	public let txID: TXID
-	public let compiledNotarizedTXIntent: Data
-	public init(txID: TXID, compiledNotarizedTXIntent: Data) {
+	public let compiledNotarizedTXIntent: CompiledNotarizedIntent
+	public init(txID: TXID, compiledNotarizedTXIntent: CompiledNotarizedIntent) {
 		self.txID = txID
 		self.compiledNotarizedTXIntent = compiledNotarizedTXIntent
 	}

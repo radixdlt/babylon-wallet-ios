@@ -37,7 +37,7 @@ extension GatewayAPI.TransactionPreviewRequest {
 		}
 		let notaryIsSignatory = transactionSigners.notaryIsSignatory
 
-		try self.init(
+		self.init(
 			manifest: rawManifest.instructionsString,
 			blobsHex: rawManifest.blobs.blobs.map(\.hex),
 			startEpochInclusive: .init(header.startEpochInclusive),
@@ -45,7 +45,7 @@ extension GatewayAPI.TransactionPreviewRequest {
 			notaryPublicKey: GatewayAPI.PublicKey(from: header.notaryPublicKey),
 			notaryIsSignatory: notaryIsSignatory,
 			tipPercentage: .init(header.tipPercentage),
-			nonce: .init(header.nonce.rawValue),
+			nonce: Int64(header.nonce.value),
 			signerPublicKeys: transactionSigners.signerPublicKeys.map(GatewayAPI.PublicKey.init(from:)),
 			flags: flags
 		)
@@ -73,6 +73,17 @@ extension TransactionSigners {
 		switch intentSigning {
 		case .notaryIsSignatory: .init()
 		case let .intentSigners(signers): OrderedSet(signers)
+		}
+	}
+}
+
+extension GatewayAPI.PublicKey {
+	init(from slip10: SLIP10.PublicKey) {
+		switch slip10 {
+		case let .eddsaEd25519(pubKey):
+			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: pubKey.rawRepresentation.hex))
+		case let .ecdsaSecp256k1(pubKey):
+			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: pubKey.compressedRepresentation.hex))
 		}
 	}
 }
@@ -106,7 +117,7 @@ public struct NotarizeTransactionRequest: Sendable, Hashable {
 
 // MARK: - NotarizeTransactionResponse
 public struct NotarizeTransactionResponse: Sendable, Hashable {
-	public let notarized: Data
+	public let notarized: CompiledNotarizedIntent
 	public let intent: TransactionIntent
 	public let txID: TXID
 	public init(notarized: Data, intent: TransactionIntent, txID: TXID) {
@@ -276,7 +287,7 @@ extension ExecutionSummary {
 	func guranteesCost() throws -> Decimal192 {
 		switch detailedManifestClass {
 		case .general, .transfer:
-			accountDeposits.flatMap(\.value).reduce(.zero) { result, resource in
+			deposits.flatMap(\.value).reduce(.zero) { result, resource in
 				switch resource {
 				case .fungible(_, .predicted):
 					result + TransactionFee.PredefinedFeeConstants.fungibleGuaranteeInstructionCost

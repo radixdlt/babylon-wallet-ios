@@ -10,7 +10,7 @@ extension SubmitTransactionClient: DependencyKey {
 
 			@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatusResponse {
 				let txStatusRequest = GatewayAPI.TransactionStatusRequest(
-					intentHash: txID.asStr()
+					intentHash: txID.description
 				)
 				let txStatusResponse = try await gatewayAPIClient.transactionStatus(txStatusRequest)
 				return txStatusResponse
@@ -53,11 +53,13 @@ extension SubmitTransactionClient: DependencyKey {
 			let txID = request.txID
 
 			#if DEBUG
-			debugPrintCompiledNotarizedIntent(data: request.compiledNotarizedTXIntent)
+			debugPrintCompiledNotarizedIntent(
+				compiled: request.compiledNotarizedTXIntent
+			)
 			#endif
 
 			let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
-				notarizedTransactionHex: request.compiledNotarizedTXIntent.hex()
+				notarizedTransactionHex: request.compiledNotarizedTXIntent.data.hex
 			)
 
 			let response = try await gatewayAPIClient.submitTransaction(submitTransactionRequest)

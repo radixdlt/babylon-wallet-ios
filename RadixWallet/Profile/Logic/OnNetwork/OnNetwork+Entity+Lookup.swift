@@ -1,5 +1,4 @@
 // MARK: - NoEntityFoundMatchingCriteria
-
 struct NoEntityFoundMatchingCriteria: Swift.Error {}
 
 // MARK: - IncorrectEntityType
@@ -23,7 +22,7 @@ extension Profile.Network {
 	}
 
 	public func entity(
-		address: AddressProtocol
+		address: any AddressProtocol
 	) throws -> any EntityProtocol {
 		if let account = getAccounts().first(where: { $0.address.address == address.address }) {
 			return account

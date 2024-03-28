@@ -37,11 +37,17 @@ extension ResourceAddress: Codable {}
 // MARK: - PoolAddress + Codable
 extension PoolAddress: Codable {}
 
+// MARK: - VaultAddress + Codable
+extension VaultAddress: Codable {}
+
 // MARK: - ValidatorAddress + Codable
 extension ValidatorAddress: Codable {}
 
 // MARK: - PackageAddress + Codable
 extension PackageAddress: Codable {}
+
+// MARK: - ComponentAddress + Codable
+extension ComponentAddress: Codable {}
 
 extension ResourceAddress {
 	public static let mainnetXRDAddress = Self.xrd(on: .mainnet)
@@ -50,6 +56,20 @@ extension ResourceAddress {
 extension TransactionManifest {
 	public var involvedPoolAddresses: [PoolAddress] {
 		fatalError("Sargon migration")
+	}
+}
+
+// MARK: - NonFungibleGlobalId + Codable
+extension NonFungibleGlobalId: Codable {
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.singleValueContainer()
+		try container.encode(self.description)
+	}
+
+	public init(from decoder: Decoder) throws {
+		let container = try decoder.singleValueContainer()
+		let string = try container.decode(String.self)
+		try self.init(string: string)
 	}
 }
 
@@ -63,8 +83,7 @@ extension NonFungibleLocalId: Codable {
 	public init(from decoder: Decoder) throws {
 		let container = try decoder.singleValueContainer()
 		let string = try container.decode(String.self)
-		//        try self.init(localId: string)
-		fatalError("Sargon migration: use `self.init(localId: string)`")
+		try self.init(localId: string)
 	}
 }
 

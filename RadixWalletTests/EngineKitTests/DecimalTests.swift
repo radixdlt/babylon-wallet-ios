@@ -15,18 +15,18 @@ final class DecimalTests: TestCase {
 
 	func testBreakDecimalInt128WithDecimals() throws {
 		// 2^128 -1 + 0.987654321
-		let first = try Decimal192(value: "340282366920938463463374607431768211455.987654321")
+		let first = try Decimal192("340282366920938463463374607431768211455.987654321")
 		// 2^128 -2 + 0.123456789
-		let second = try Decimal192(value: "340282366920938463463374607431768211454.123456789")
-		let expected = try Decimal192(value: "1.864197532")
+		let second = try Decimal192("340282366920938463463374607431768211454.123456789")
+		let expected = try Decimal192("1.864197532")
 		XCTAssertEqual(first - second, expected)
 	}
 
 	func testAddition() throws {
 		func doTest(lhs lhsDecimalString: String, rhs rhsDecimalString: String, expected expectedString: String) throws {
-			let lhs = try Decimal192(value: lhsDecimalString)
-			let rhs = try Decimal192(value: rhsDecimalString)
-			let expected = try Decimal192(value: expectedString)
+			let lhs = try Decimal192(lhsDecimalString)
+			let rhs = try Decimal192(rhsDecimalString)
+			let expected = try Decimal192(expectedString)
 			XCTAssertEqual(lhs + rhs, expected)
 		}
 
@@ -58,9 +58,9 @@ final class DecimalTests: TestCase {
 
 	func testSubtraction() throws {
 		func doTest(lhs lhsDecimalString: String, rhs rhsDecimalString: String, expected expectedString: String) throws {
-			let lhs = try Decimal192(value: lhsDecimalString)
-			let rhs = try Decimal192(value: rhsDecimalString)
-			let expected = try Decimal192(value: expectedString)
+			let lhs = try Decimal192(lhsDecimalString)
+			let rhs = try Decimal192(rhsDecimalString)
+			let expected = try Decimal192(expectedString)
 			XCTAssertEqual(lhs - rhs, expected)
 		}
 
@@ -88,9 +88,9 @@ final class DecimalTests: TestCase {
 
 	func testMultiplication() throws {
 		func doTest(lhs lhsDecimalString: String, rhs rhsDecimalString: String, expected expectedString: String) throws {
-			let lhs = try Decimal192(value: lhsDecimalString)
-			let rhs = try Decimal192(value: rhsDecimalString)
-			let expected = try Decimal192(value: expectedString)
+			let lhs = try Decimal192(lhsDecimalString)
+			let rhs = try Decimal192(rhsDecimalString)
+			let expected = try Decimal192(expectedString)
 			XCTAssertEqual(lhs * rhs, expected)
 		}
 
@@ -104,9 +104,9 @@ final class DecimalTests: TestCase {
 
 	func testDivision() throws {
 		func doTest(lhs lhsDecimalString: String, rhs rhsDecimalString: String, expected expectedString: String) throws {
-			let lhs = try Decimal192(value: lhsDecimalString)
-			let rhs = try Decimal192(value: rhsDecimalString)
-			let expected = try Decimal192(value: expectedString)
+			let lhs = try Decimal192(lhsDecimalString)
+			let rhs = try Decimal192(rhsDecimalString)
+			let expected = try Decimal192(expectedString)
 			XCTAssertEqual(lhs / rhs, expected)
 		}
 
@@ -135,8 +135,8 @@ final class DecimalTests: TestCase {
 
 	func testEqual() throws {
 		func doTest(_ value0String: String, _ value1String: String) throws {
-			let value0 = try Decimal192(value: value0String)
-			let value1 = try Decimal192(value: value1String)
+			let value0 = try Decimal192(value0String)
+			let value1 = try Decimal192(value1String)
 			XCTAssertEqual(value0, value1)
 		}
 
@@ -149,8 +149,8 @@ final class DecimalTests: TestCase {
 
 	func testNotEqual() throws {
 		func doTest(_ value0String: String, _ value1String: String) throws {
-			let value0 = try Decimal192(value: value0String)
-			let value1 = try Decimal192(value: value1String)
+			let value0 = try Decimal192(value0String)
+			let value1 = try Decimal192(value1String)
 			XCTAssertNotEqual(value0, value1)
 		}
 
@@ -162,8 +162,8 @@ final class DecimalTests: TestCase {
 
 	func test_round_decimal() throws {
 		func doTest(_ decimalString: String, divisibility: UInt, expected expectedString: String, line: UInt = #line) throws {
-			let expected = try Decimal192(value: expectedString)
-			let decimal = try Decimal192(value: decimalString)
+			let expected = try Decimal192(expectedString)
+			let decimal = try Decimal192(decimalString)
 			let actual = decimal.rounded(decimalPlaces: divisibility)
 			XCTAssertEqual(actual, expected, line: line)
 		}
@@ -211,8 +211,8 @@ final class DecimalTests: TestCase {
 
 	func test_truncate_decimal() throws {
 		func doTest(_ decimalString: String, divisibility: UInt, expected expectedString: String, line: UInt = #line) throws {
-			let expected = try Decimal192(value: expectedString)
-			let decimal = try Decimal192(value: decimalString)
+			let expected = try Decimal192(expectedString)
+			let decimal = try Decimal192(decimalString)
 			let actual = decimal.floor(decimalPlaces: divisibility)
 			XCTAssertEqual(actual, expected, line: line)
 		}
@@ -280,7 +280,7 @@ final class DecimalTests: TestCase {
 			XCTAssertEqual(actual, expected, line: line)
 		}
 		func doTest(_ decimalString: String, expected: String, line: UInt = #line) throws {
-			try doTest(Decimal192(value: decimalString), expected: expected, line: line)
+			try doTest(Decimal192(decimalString), expected: expected, line: line)
 		}
 
 		try doTest(Decimal192.max(), expected: "3.138e39")
@@ -499,7 +499,7 @@ final class DecimalTests: TestCase {
 	func test_format_grouping_separator() throws {
 		func doTest(_ decimalString: String, expected: String, line: UInt = #line) throws {
 			let locale = Locale(identifier: "en_US_POSIX")
-			let decimal = try Decimal192(value: decimalString)
+			let decimal = try Decimal192(decimalString)
 			let actual = decimal.formatted(locale: locale, totalPlaces: 8, useGroupingSeparator: true)
 			XCTAssertEqual(actual, expected, line: line)
 		}
@@ -575,7 +575,7 @@ final class DecimalTests: TestCase {
 		try doTest(nil)
 
 		for decimalString in decimalStrings {
-			try doTest(Decimal192(value: decimalString))
+			try doTest(Decimal192(decimalString))
 		}
 	}
 

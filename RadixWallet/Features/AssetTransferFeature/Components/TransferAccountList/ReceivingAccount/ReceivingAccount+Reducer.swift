@@ -85,7 +85,7 @@ extension AssetsTransfersRecipient {
 	var identifer: LedgerIdentifiable {
 		switch self {
 		case let .myOwnAccount(account):
-			.address(of: account)
+			.address(.account(account.address))
 		case let .foreignAccount(address):
 			.address(.account(address))
 		}
@@ -94,7 +94,7 @@ extension AssetsTransfersRecipient {
 	var gradient: Gradient {
 		switch self {
 		case let .myOwnAccount(account):
-			.init(account.appearanceID)
+			.init(Profile.Network.Account.AppearanceID(sargon: account.appearanceID))
 		case .foreignAccount:
 			.init(colors: [.app.gray2])
 		}
@@ -113,11 +113,12 @@ extension AssetsTransfersRecipient {
 	}
 
 	var isLedgerAccount: Bool {
-		guard case let .myOwnAccount(account) = self else {
-			return false
-		}
-
-		return account.isLedgerAccount
+//		guard case let .myOwnAccount(account) = self else {
+//			return false
+//		}
+//
+//		return account.isLedgerAccount
+		fatalError("sargon migration")
 	}
 }
 

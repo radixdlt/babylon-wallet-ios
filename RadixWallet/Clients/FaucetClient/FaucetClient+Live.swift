@@ -23,7 +23,7 @@ extension FaucetClient: DependencyKey {
 			// will never be negative thx to `if current < last` check above.
 			let delta = current - last
 
-			guard delta.rawValue >= minimumNumberOfEpochsPassedForFaucetToBeReused else {
+			guard delta >= minimumNumberOfEpochsPassedForFaucetToBeReused else {
 				return nil /* NOT allowed to use */
 			}
 			return (epochs, current) /* is allowed to use */

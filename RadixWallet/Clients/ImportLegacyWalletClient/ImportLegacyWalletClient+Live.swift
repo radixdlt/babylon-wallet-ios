@@ -160,7 +160,7 @@ func convert(
 	parsedOlympiaAccount raw: Olympia.Parsed.Account
 ) throws -> OlympiaAccountToMigrate {
 	let address = LegacyOlympiaAccountAddress(
-		publicKey: raw.publicKey
+		publicKey: raw.publicKey.intoSargon()
 	)
 
 	let derivationPath = try LegacyOlympiaBIP44LikeDerivationPath(

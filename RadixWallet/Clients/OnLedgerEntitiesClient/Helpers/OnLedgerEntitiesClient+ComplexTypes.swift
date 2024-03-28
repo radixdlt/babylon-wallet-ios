@@ -189,13 +189,13 @@ extension OnLedgerEntitiesClient {
 		case let .left(resource):
 			let existingTokenIds = ids.filter { id in
 				!newlyCreatedNonFungibles.contains { newId in
-					newId.resourceAddress.asStr() == resourceAddress.address && newId.localId() == id
+					newId.resourceAddress.asStr() == resourceAddress.address && newId.nonFungibleLocalId == id
 				}
 			}
 
 			let newTokens = try ids.filter { id in
 				newlyCreatedNonFungibles.contains { newId in
-					newId.resourceAddress.asStr() == resourceAddress.address && newId.localId() == id
+					newId.resourceAddress.asStr() == resourceAddress.address && newId.nonFungibleLocalId == id
 				}
 			}.map {
 				try OnLedgerEntity.NonFungibleToken(resourceAddress: resourceAddress, nftID: $0, nftData: nil)
@@ -252,7 +252,7 @@ extension OnLedgerEntitiesClient {
 	public func stakeClaim(
 		_ resource: OnLedgerEntity.Resource,
 		stakeClaimValidator: OnLedgerEntity.Validator,
-		unstakeData: [UnstakeDataEntry],
+		unstakeData: [UnstakeData],
 		tokens: [OnLedgerEntity.NonFungibleToken]
 	) throws -> ResourceBalance {
 		let stakeClaimTokens: [OnLedgerEntitiesClient.StakeClaim] = if unstakeData.isEmpty {

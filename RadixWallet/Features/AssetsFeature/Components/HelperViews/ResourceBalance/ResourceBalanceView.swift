@@ -207,7 +207,7 @@ extension ResourceBalanceView {
 			NonFungibleView(
 				thumbnail: .nft(viewState.resourceImage),
 				caption1: viewState.resourceName ?? viewState.id.resourceAddress.formatted(),
-				caption2: viewState.nonFungibleName ?? viewState.id.localId().formatted(),
+				caption2: viewState.nonFungibleName ?? viewState.id.nonFungibleLocalId.formatted(),
 				compact: compact
 			)
 		}

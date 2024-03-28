@@ -31,9 +31,9 @@ extension ResourceBalance: Comparable {
 			}
 		case let (.nonFungible(lhsValue), .nonFungible(rhsValue)):
 			if lhsValue.id.resourceAddress == rhsValue.id.resourceAddress {
-				lhsValue.id.localId().toUserFacingString() < rhsValue.id.localId().toUserFacingString()
+				lhsValue.id.nonFungibleLocalId.toUserFacingString() < rhsValue.id.nonFungibleLocalId.toUserFacingString()
 			} else {
-				lhsValue.id.resourceAddress.asStr() < rhsValue.id.resourceAddress.asStr()
+				lhsValue.id.resourceAddress.description < rhsValue.id.resourceAddress.description
 			}
 		case let (.liquidStakeUnit(lhsValue), .liquidStakeUnit(rhsValue)):
 			if lhsValue.validator.address == rhsValue.validator.address {
@@ -128,5 +128,5 @@ private func order<W: Comparable>(lhs: W?, rhs: W?, tieBreak: () -> Bool) -> Boo
 }
 
 private func order(lhs: Decimal192?, rhs: Decimal192?) -> Bool {
-	lhs ?? .min() < rhs ?? .min()
+	lhs ?? .min < rhs ?? .min
 }

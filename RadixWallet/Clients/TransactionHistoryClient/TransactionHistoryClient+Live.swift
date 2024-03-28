@@ -98,7 +98,7 @@ extension TransactionHistoryClient {
 					throw MissingIntentHash()
 				}
 
-				let txid = try TXID.fromStr(string: hash, networkId: account.networkID)
+				let txid = try TXID(string: hash)
 
 				let manifestClass = info.manifestClasses?.first
 
@@ -130,13 +130,13 @@ extension TransactionHistoryClient {
 							throw ProgrammerError()
 						}
 
-						let amount = try Decimal192(value: fungible.balanceChange)
-						guard !amount.isZero() else { continue }
+						let amount = try Decimal192(fungible.balanceChange)
+						guard !amount.isZero else { continue }
 
 						// NB: The sign of the amount in the balance is made positive, negative balances are treated as withdrawals
 						let resource = try await onLedgerEntitiesClient.fungibleResourceBalance(
 							baseResource,
-							resourceQuantifier: .guaranteed(amount: amount.abs()),
+							resourceQuantifier: .guaranteed(decimal: amount.abs()),
 							networkID: account.networkID
 						)
 
@@ -272,12 +272,5 @@ extension TransactionHistoryRequest {
 		filters
 			.compactMap(\.asset?.address)
 			.nilIfEmpty
-	}
-}
-
-extension SpecificAddress {
-	public var networkID: NetworkID {
-//		(try? .init(intoEngine().networkId())) ?? .mainnet
-		sargon()
 	}
 }

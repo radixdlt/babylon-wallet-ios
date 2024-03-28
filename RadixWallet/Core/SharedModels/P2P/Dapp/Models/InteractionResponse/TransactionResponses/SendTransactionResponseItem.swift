@@ -19,7 +19,7 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 			var container = encoder.container(keyedBy: CodingKeys.self)
 			try container.encode(
 				// Bech32m encoded transaction ID
-				transactionIntentHash.asStr(),
+				transactionIntentHash.bech32EncodedTxId,
 				forKey: .transactionIntentHash
 			)
 		}

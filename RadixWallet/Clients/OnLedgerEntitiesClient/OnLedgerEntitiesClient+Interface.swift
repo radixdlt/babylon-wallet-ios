@@ -153,7 +153,7 @@ extension OnLedgerEntitiesClient {
 		atLedgerState: AtLedgerState? = nil
 	) async throws -> [OnLedgerEntity.Account] {
 		try await getEntities(
-			addresses: addresses.map(\.asGeneral),
+			addresses: addresses.map(\.embed()),
 			metadataKeys: metadataKeys,
 			cachingStrategy: cachingStrategy,
 			atLedgerState: atLedgerState
@@ -187,7 +187,7 @@ extension OnLedgerEntitiesClient {
 		atLedgerState: AtLedgerState? = nil
 	) async throws -> OnLedgerEntity.Account {
 		guard let account = try await getEntity(
-			address.asGeneral,
+			address.embed(),
 			metadataKeys: metadataKeys,
 			cachingStrategy: cachingStrategy,
 			atLedgerState: atLedgerState
@@ -204,7 +204,7 @@ extension OnLedgerEntitiesClient {
 		atLedgerState: AtLedgerState? = nil
 	) async throws -> [OnLedgerEntity.AssociatedDapp] {
 		try await getEntities(
-			addresses: addresses.map(\.asGeneral),
+			addresses: addresses.map(\.embed()),
 			metadataKeys: .dappMetadataKeys,
 			cachingStrategy: cachingStrategy,
 			atLedgerState: atLedgerState
@@ -235,7 +235,7 @@ extension OnLedgerEntitiesClient {
 		atLedgerState: AtLedgerState? = nil
 	) async throws -> [OnLedgerEntity.Resource] {
 		try await getEntities(
-			addresses: addresses.map(\.asGeneral),
+			addresses: addresses.map { $0.embed() },
 			metadataKeys: metadataKeys,
 			cachingStrategy: cachingStrategy,
 			atLedgerState: atLedgerState
@@ -393,7 +393,7 @@ extension OnLedgerEntitiesClient {
 extension OnLedgerEntitiesClient {
 	/// Returns the validator of a correctly linked LSU, and `nil` for any other resource
 	public func isLiquidStakeUnit(_ resource: OnLedgerEntity.Resource) async -> OnLedgerEntity.Validator? {
-		guard let validatorAddress = resource.metadata.validator?.asGeneral else {
+		guard let validatorAddress = resource.metadata.validator?.embed() else {
 			return nil
 		}
 
@@ -418,7 +418,7 @@ extension OnLedgerEntitiesClient {
 	}
 
 	public func isPoolUnitResource(_ resource: OnLedgerEntity.Resource) async -> Bool {
-		guard let poolAddress = resource.metadata.poolUnit?.asGeneral else {
+		guard let poolAddress = resource.metadata.poolUnit?.embed() else {
 			return false // no declared pool unit
 		}
 
@@ -447,7 +447,7 @@ extension OnLedgerEntitiesClient {
 		}
 
 		let validator = try? await getEntity(
-			validatorAddress.asGeneral,
+			validatorAddress.embed(),
 			metadataKeys: .poolUnitMetadataKeys,
 			cachingStrategy: .useCache,
 			atLedgerState: resource.atLedgerState
@@ -467,7 +467,7 @@ extension OnLedgerEntitiesClient {
 
 extension OnLedgerEntitiesClient {
 	public func getPoolUnitDetails(_ poolUnitResource: OnLedgerEntity.Resource, forAmount amount: Decimal192) async throws -> OwnedResourcePoolDetails? {
-		guard let poolAddress = poolUnitResource.metadata.poolUnit?.asGeneral else {
+		guard let poolAddress = poolUnitResource.metadata.poolUnit?.embed() else {
 			return nil
 		}
 
@@ -518,7 +518,7 @@ extension OnLedgerEntitiesClient {
 	) async throws -> [OwnedResourcePoolDetails] {
 		let ownedPoolUnits = account.poolUnitResources.poolUnits
 		let pools = try await getEntities(
-			ownedPoolUnits.map(\.resourcePoolAddress.asGeneral),
+			ownedPoolUnits.map(\.resourcePoolAddress).map { $0.embed() },
 			[.dappDefinition],
 			account.atLedgerState,
 			cachingStrategy
@@ -592,7 +592,7 @@ extension OnLedgerEntitiesClient {
 		}
 
 		let dAppName: String? = if let dAppDefinition = pool.metadata.dappDefinition {
-			try? await getDappMetadata(dAppDefinition, validatingDappEntity: pool.address.asGeneral).name
+			try? await getDappMetadata(dAppDefinition, validatingDappEntity: pool.address.embed()).name
 		} else {
 			nil
 		}

@@ -8,8 +8,8 @@ extension AccountAddress {
 		networkID: NetworkID = Radix.Gateway.default.network.id
 	) -> Self {
 		Self(
-			publicKey: SLIP10.PublicKey.eddsaEd25519(Curve25519.PrivateKey().publicKey),
-			networkId: networkID
+			publicKey: SLIP10.PublicKey.eddsaEd25519(Curve25519.PrivateKey().publicKey).intoSargon(),
+			networkID: networkID
 		)
 	}
 }

@@ -9,17 +9,10 @@ extension LegacyOlympiaAccountAddress {
 	public func formatted(_ format: AddressFormat = .default) -> String {
 		switch format {
 		case .default:
-			address.rawValue.truncatedMiddle(keepFirst: 3, last: 9)
+			address.truncatedMiddle(keepFirst: 3, last: 9)
 		case .full, .raw:
-			address.rawValue
+			address
 		}
-	}
-}
-
-extension SpecificAddress {
-	/// The default format is truncated in the middle
-	public func formatted(_ format: AddressFormat = .default) -> String {
-		address.formattedAsAddressString(format)
 	}
 }
 

@@ -103,7 +103,7 @@ extension ThirdPartyDeposits.DepositorAddress {
 			return
 		}
 
-		if let asNFTId = try? NonFungibleGlobalId(nonFungibleGlobalId: raw) {
+		if let asNFTId = try? NonFungibleGlobalId(string: raw) {
 			self = .nonFungibleGlobalID(asNFTId)
 			return
 		}

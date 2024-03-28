@@ -98,7 +98,7 @@ extension TransactionReview {
 			let allAddresses = allAddresses + resourceAddresses.asIdentifiable()
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 
-			let dApps = await extractDappEntities(poolAddresses.map(\.asGeneral))
+			let dApps = await extractDappEntities(poolAddresses.map(\.embed()))
 
 			let perPoolUnitDapps = perPoolUnitDapps(dApps, poolInteractions: poolContributions)
 
@@ -141,7 +141,7 @@ extension TransactionReview {
 			let allAddresses = allAddresses + resourceAddresses.asIdentifiable()
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 
-			let dApps = await extractDappEntities(poolAddresses.map(\.asGeneral))
+			let dApps = await extractDappEntities(poolAddresses.map(\.embed()))
 
 			let perPoolUnitDapps = perPoolUnitDapps(dApps, poolInteractions: poolRedemptions)
 
@@ -350,7 +350,7 @@ extension TransactionReview {
 
 	private func extractDappEntities(_ addresses: [Address]) async -> [(address: Address, entity: DappEntity?)] {
 		await addresses.asyncMap {
-			await (address: $0, entity: try? extractDappEntity($0.asGeneral))
+			await (address: $0, entity: try? extractDappEntity($0.embed()))
 		}
 	}
 
@@ -465,7 +465,7 @@ extension TransactionReview {
 	func extractValidators(for addresses: [ValidatorAddress]) async throws -> ValidatorsState? {
 		guard !addresses.isEmpty else { return nil }
 
-		let validators = try await onLedgerEntitiesClient.getEntities(addresses: addresses.map(\.asGeneral), metadataKeys: .resourceMetadataKeys)
+		let validators = try await onLedgerEntitiesClient.getEntities(addresses: addresses.map(\.embed()), metadataKeys: .resourceMetadataKeys)
 			.compactMap { entity -> ValidatorState? in
 				guard let validator = entity.validator else { return nil }
 				return .init(
@@ -558,7 +558,7 @@ extension TransactionReview {
 	) -> ResourceAssociatedDapps {
 		Dictionary(uniqueKeysWithValues: dappEntities.compactMap { data -> (ResourceAddress, OnLedgerEntity.Metadata)? in
 			let poolUnitResource: ResourceAddress? = try? poolInteractions
-				.first(where: { $0.poolAddress.asGeneral == data.address })?
+				.first(where: { $0.poolAddress.embed() == data.address })?
 				.poolUnitsResourceAddress
 
 			guard let poolUnitResource,

@@ -196,7 +196,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 				return .none
 
 			case let .transactionTapped(txid):
-				let path = "transaction/\(txid.asStr())/summary"
+				let path = "transaction/\(txid.bech32EncodedTxId)/summary"
 				let url = Radix.Dashboard.dashboard(forNetworkID: state.account.networkID).url.appending(path: path)
 				return .run { _ in
 					await openURL(url)

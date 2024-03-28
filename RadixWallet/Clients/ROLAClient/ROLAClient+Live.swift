@@ -14,23 +14,23 @@ extension ROLAClient {
 				switch entity {
 				case let .account(account):
 					assert(account.networkID == request.entity.networkID)
-					return AddressOfAccountOrPersona.account(account.address)
+					return AddressOfAccountOrPersona.account(address: account.address)
 				case let .persona(persona):
 					assert(persona.networkID == request.entity.networkID)
-					return AddressOfAccountOrPersona.persona(persona.address)
+					return AddressOfAccountOrPersona.persona(address: persona.address)
 				}
 			}()
 
-			let metadata = try await onLedgerEntitiesClient.getEntity(entityAddress.address, metadataKeys: [.ownerKeys]).genericComponent?.metadata
+			let metadata = try await onLedgerEntitiesClient.getEntity(entityAddress.embed(), metadataKeys: [.ownerKeys]).genericComponent?.metadata
 			var ownerKeyHashes = try metadata?.ownerKeyHashes() ?? []
 
-			let transactionSigningKeyHash: RETPublicKeyHash = switch entity.securityState {
+			let transactionSigningKeyHash: PublicKeyHash = switch entity.securityState {
 			case let .unsecured(control):
-				try .init(hashing: control.transactionSigning.publicKey)
+				try .init(hashing: control.transactionSigning.publicKey.intoSargon())
 			}
 
 			loggerGlobal.debug("ownerKeyHashes: \(ownerKeyHashes)")
-			try ownerKeyHashes.append(.init(hashing: newPublicKey))
+			try ownerKeyHashes.append(.init(hashing: newPublicKey.intoSargon()))
 
 			if !ownerKeyHashes.contains(transactionSigningKeyHash) {
 				loggerGlobal.debug("Did not contain transactionSigningKey hash, re-adding it: \(transactionSigningKeyHash)")
@@ -148,14 +148,14 @@ extension ROLAClient {
 }
 
 extension OnLedgerEntity.Metadata {
-	public func ownerKeyHashes() throws -> [RETPublicKeyHash]? {
+	public func ownerKeyHashes() throws -> [Sargon.PublicKeyHash]? {
 		try ownerKeys?.value.map { hash in
 			switch hash {
 			case let .ecdsaSecp256k1(value):
-				let bytes = try Data(hex: value)
+				let bytes = try Exactly29Bytes(hex: value)
 				return .secp256k1(value: bytes)
 			case let .eddsaEd25519(value):
-				let bytes = try Data(hex: value)
+				let bytes = try Exactly29Bytes(hex: value)
 				return .ed25519(value: bytes)
 			}
 		}

@@ -998,7 +998,7 @@ extension ReviewedTransaction {
 
 			let xrdTotalTransfer: Decimal192 = feePayerWithdraws.reduce(.zero) { partialResult, resource in
 				if case let .fungible(resourceAddress, indicator) = resource, resourceAddress == xrdAddress {
-					return (try? partialResult.add(other: indicator.amount)) ?? partialResult
+					return (try? partialResult.add(rhs: indicator.amount)) ?? partialResult
 				}
 				return partialResult
 			}

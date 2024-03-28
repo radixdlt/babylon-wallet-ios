@@ -23,7 +23,7 @@ extension TransactionReview.State {
 			message: {
 				// TODO: handle the rest of types
 				if case let .plainText(value) = message {
-					return value
+					return value.messageString
 				}
 				return nil
 			}(),

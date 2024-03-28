@@ -78,7 +78,11 @@ extension CacheClient {
 			case validator(ValidatorAddress)
 //			case genericComponent(Address)
 			case nonFungibleData(NonFungibleGlobalId)
-			case nonFungibleIdPage(accountAddress: Address, resourceAddress: Address, pageCursor: String?)
+			case nonFungibleIdPage(
+				accountAddress: AccountAddress,
+				resourceAddress: ResourceAddress,
+				pageCursor: String?
+			)
 		}
 
 		case onLedgerEntity(OnLedgerEntity)
