@@ -241,73 +241,71 @@ extension OnLedgerEntitiesClient {
 		guard !stakeAndPoolAddresses.isEmpty else {
 			return .init(radixNetworkStakes: [], poolUnits: [])
 		}
-		/*
-		 let entities = try await getEntities(
-		 	for: Array(stakeAndPoolAddresses),
-		 	.resourceMetadataKeys,
-		 	ledgerState: ledgerState,
-		 	cachingStrategy: cachingStrategy
-		 )
-		 let validators = entities.compactMap(\.validator)
-		 let resourcesPools = entities.compactMap(\.resourcePool)
 
-		 let stakeUnits = validators.compactMap { validator -> OnLedgerEntity.Account.RadixNetworkStake? in
-		 	let stakeUnit = matchPoolUnitCandidate(
-		 		for: validator.stakeUnitResourceAddress,
-		 		itemAddress: validator.address.embed(),
-		 		candidates: stakeUnitCandidates,
-		 		metadataAddressMatch: \.validator?.address
-		 	)
+		let entities = try await getEntities(
+			for: Array(stakeAndPoolAddresses),
+			.resourceMetadataKeys,
+			ledgerState: ledgerState,
+			cachingStrategy: cachingStrategy
+		)
+		let validators = entities.compactMap(\.validator)
+		let resourcesPools = entities.compactMap(\.resourcePool)
 
-		 	let stakeClaimNFT: OnLedgerEntity.OwnedNonFungibleResource? = {
-		 		let stakeClaimNFTCandidate = stakeClaimNFTCandidates.first {
-		 			$0.metadata.validator == validator.address
-		 		}
+		let stakeUnits = validators.compactMap { validator -> OnLedgerEntity.Account.RadixNetworkStake? in
+			let stakeUnit = matchPoolUnitCandidate(
+				for: validator.stakeUnitResourceAddress,
+				itemAddress: validator.address.embed(),
+				candidates: stakeUnitCandidates,
+				metadataAddressMatch: \.validator?.address
+			)
 
-		 		guard let stakeClaimNFTCandidate else {
-		 			return nil
-		 		}
+			let stakeClaimNFT: OnLedgerEntity.OwnedNonFungibleResource? = {
+				let stakeClaimNFTCandidate = stakeClaimNFTCandidates.first {
+					$0.metadata.validator == validator.address
+				}
 
-		 		// Then validate that the validator is also referencing the candidate
-		 		guard validator.stakeClaimFungibleResourceAddress == stakeClaimNFTCandidate.resourceAddress else {
-		 			assertionFailure("Bad stake claim nft candidate, not declared by the validator")
-		 			return nil
-		 		}
+				guard let stakeClaimNFTCandidate else {
+					return nil
+				}
 
-		 		return stakeClaimNFTCandidate
-		 	}()
+				// Then validate that the validator is also referencing the candidate
+				guard validator.stakeClaimFungibleResourceAddress == stakeClaimNFTCandidate.resourceAddress else {
+					assertionFailure("Bad stake claim nft candidate, not declared by the validator")
+					return nil
+				}
 
-		 	if stakeUnit != nil || stakeClaimNFT != nil {
-		 		return .init(
-		 			validatorAddress: validator.address,
-		 			stakeUnitResource: stakeUnit,
-		 			stakeClaimResource: stakeClaimNFT
-		 		)
-		 	}
+				return stakeClaimNFTCandidate
+			}()
 
-		 	return nil
-		 }
+			if stakeUnit != nil || stakeClaimNFT != nil {
+				return .init(
+					validatorAddress: validator.address,
+					stakeUnitResource: stakeUnit,
+					stakeClaimResource: stakeClaimNFT
+				)
+			}
 
-		 let poolUnits = resourcesPools.compactMap { pool -> OnLedgerEntity.Account.PoolUnit? in
-		 	let poolUnitResource = matchPoolUnitCandidate(
-		 		for: pool.poolUnitResourceAddress,
-		 		itemAddress: pool.address.embed(),
-		 		candidates: poolUnitCandidates,
-		 		metadataAddressMatch: \.poolUnit?.address
-		 	)
+			return nil
+		}
 
-		 	guard let poolUnitResource else {
-		 		assertionFailure("Pool Unit not matched by any candidate")
-		 		return nil
-		 	}
+		let poolUnits = resourcesPools.compactMap { pool -> OnLedgerEntity.Account.PoolUnit? in
+			let poolUnitResource = matchPoolUnitCandidate(
+				for: pool.poolUnitResourceAddress,
+				itemAddress: pool.address.embed(),
+				candidates: poolUnitCandidates,
+				metadataAddressMatch: \.poolUnit?.address
+			)
 
-		 	return OnLedgerEntity.Account.PoolUnit(resource: poolUnitResource, resourcePoolAddress: pool.address)
-		 }
+			guard let poolUnitResource else {
+				assertionFailure("Pool Unit not matched by any candidate")
+				return nil
+			}
 
-		 let poolUnitResources = OnLedgerEntity.Account.PoolUnitResources(radixNetworkStakes: stakeUnits.asIdentifiable(), poolUnits: poolUnits.sorted())
-		 return poolUnitResources
-		 */
-		fatalError()
+			return OnLedgerEntity.Account.PoolUnit(resource: poolUnitResource, resourcePoolAddress: pool.address)
+		}
+
+		let poolUnitResources = OnLedgerEntity.Account.PoolUnitResources(radixNetworkStakes: stakeUnits.asIdentifiable(), poolUnits: poolUnits.sorted())
+		return poolUnitResources
 	}
 
 	static func extractOwnedFungibleResources(
