@@ -76,7 +76,12 @@ extension TransactionHistoryClient {
 				// Will be non-nil if this is a stake claim NFT (or multiple)
 				let stakeClaimNFT = try await onLedgerEntitiesClient.isStakeClaimNFT(resource)
 					.map { validator in
-						try onLedgerEntitiesClient.stakeClaim(resource, stakeClaimValidator: validator, unstakeData: [], tokens: [])
+						try onLedgerEntitiesClient.stakeClaim(
+							resource,
+							stakeClaimValidator: validator,
+							unstakeData: [:],
+							tokens: []
+						)
 					}
 
 				return try extractNonFungibleIDs(type, from: changes)

@@ -224,7 +224,7 @@ extension TransactionReview {
 			let deposits = try await extractDeposits(
 				accountDeposits: summary.deposits,
 				newlyCreatedNonFungibles: summary.newlyCreatedNonFungibles,
-				unstakeData: Array(claimsNonFungibleData.values),
+				unstakeData: claimsNonFungibleData,
 				entities: resourcesInfo,
 				networkID: networkID
 			)
@@ -406,7 +406,7 @@ extension TransactionReview {
 		newlyCreatedNonFungibles: [NonFungibleGlobalId] = [],
 		poolContributions: [TrackedPoolContribution] = [],
 		validatorStakes: [TrackedValidatorStake] = [],
-		unstakeData: [UnstakeData] = [],
+		unstakeData: [NonFungibleGlobalId: UnstakeData] = [:],
 		entities: ResourcesInfo = [:],
 		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		networkID: NetworkID
@@ -581,7 +581,7 @@ extension TransactionReview {
 		newlyCreatedNonFungibles: [NonFungibleGlobalId] = [],
 		poolInteractions: [some TrackedPoolInteraction] = [],
 		validatorStakes: [TrackedValidatorStake] = [],
-		unstakeData: [UnstakeData] = [],
+		unstakeData: [NonFungibleGlobalId: UnstakeData] = [:],
 		entities: ResourcesInfo = [:],
 		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,

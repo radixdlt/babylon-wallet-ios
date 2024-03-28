@@ -1,4 +1,6 @@
 import Foundation
+import Sargon
+import SargonUniFFI
 
 extension OnLedgerEntitiesClient {
 	struct ResourceEntityNotFound: Swift.Error {
@@ -177,7 +179,7 @@ extension OnLedgerEntitiesClient {
 		_ resourceInfo: TransactionReview.ResourceInfo,
 		resourceAddress: ResourceAddress,
 		resourceQuantifier: NonFungibleResourceIndicator,
-		unstakeData: [UnstakeData] = [],
+		unstakeData: [NonFungibleGlobalId: UnstakeData] = [:],
 		newlyCreatedNonFungibles: [NonFungibleGlobalId] = []
 	) async throws -> [ResourceBalance] {
 		let ids = resourceQuantifier.ids
@@ -253,55 +255,52 @@ extension OnLedgerEntitiesClient {
 	public func stakeClaim(
 		_ resource: OnLedgerEntity.Resource,
 		stakeClaimValidator: OnLedgerEntity.Validator,
-		unstakeData: [UnstakeData],
+		unstakeData: [NonFungibleGlobalId: UnstakeData],
 		tokens: [OnLedgerEntity.NonFungibleToken]
 	) throws -> ResourceBalance {
-		/*
-		 let stakeClaimTokens: [OnLedgerEntitiesClient.StakeClaim] = if unstakeData.isEmpty {
-		 	try tokens.map { token in
-		 		guard let data = token.data else {
-		 			throw InvalidStakeClaimToken()
-		 		}
+		let stakeClaimTokens: [OnLedgerEntitiesClient.StakeClaim] = if unstakeData.isEmpty {
+			try tokens.map { token in
+				guard let data = token.data else {
+					throw InvalidStakeClaimToken()
+				}
 
-		 		guard let claimAmount = data.claimAmount, try token.id.resourceAddress == resource.resourceAddress else {
-		 			throw InvalidStakeClaimToken()
-		 		}
+				guard let claimAmount = data.claimAmount, token.id.resourceAddress == resource.resourceAddress else {
+					throw InvalidStakeClaimToken()
+				}
 
-		 		return OnLedgerEntitiesClient.StakeClaim(
-		 			validatorAddress: stakeClaimValidator.address,
-		 			token: token,
-		 			claimAmount: .init(nominalAmount: claimAmount),
-		 			reamainingEpochsUntilClaim: data.claimEpoch.map { Int($0) - Int(resource.atLedgerState.epoch) }
-		 		)
-		 	}
-		 } else {
-		 	try tokens.map { token in
-		 		guard let data = unstakeData.first(where: { $0.nonFungibleGlobalId == token.id })?.data else {
-		 			throw MissingStakeClaimTokenData()
-		 		}
+				return OnLedgerEntitiesClient.StakeClaim(
+					validatorAddress: stakeClaimValidator.address,
+					token: token,
+					claimAmount: .init(nominalAmount: claimAmount),
+					reamainingEpochsUntilClaim: data.claimEpoch.map { Int($0) - Int(resource.atLedgerState.epoch) }
+				)
+			}
+		} else {
+			try tokens.map { token in
+				guard let data = unstakeData.first(where: { $0.key == token.id })?.value else {
+					throw MissingStakeClaimTokenData()
+				}
 
-		 		return OnLedgerEntitiesClient.StakeClaim(
-		 			validatorAddress: stakeClaimValidator.address,
-		 			token: token,
-		 			claimAmount: .init(nominalAmount: data.claimAmount),
-		 			reamainingEpochsUntilClaim: nil
-		 		)
-		 	}
-		 }
+				return OnLedgerEntitiesClient.StakeClaim(
+					validatorAddress: stakeClaimValidator.address,
+					token: token,
+					claimAmount: .init(nominalAmount: data.claimAmount),
+					reamainingEpochsUntilClaim: nil
+				)
+			}
+		}
 
-		 return .init(
-		 	resource: resource,
-		 	details: .stakeClaimNFT(.init(
-		 		canClaimTokens: false,
-		 		stakeClaimTokens: .init(
-		 			resource: resource,
-		 			stakeClaims: stakeClaimTokens.asIdentifiable()
-		 		),
-		 		validatorName: stakeClaimValidator.metadata.name
-		 	))
-		 )
-		 */
-		fatalError()
+		return .init(
+			resource: resource,
+			details: .stakeClaimNFT(.init(
+				canClaimTokens: false,
+				stakeClaimTokens: .init(
+					resource: resource,
+					stakeClaims: stakeClaimTokens.asIdentifiable()
+				),
+				validatorName: stakeClaimValidator.metadata.name
+			))
+		)
 	}
 }
 
