@@ -111,15 +111,6 @@ extension AssetsTransfersRecipient {
 
 		return true
 	}
-
-	var isLedgerAccount: Bool {
-//		guard case let .myOwnAccount(account) = self else {
-//			return false
-//		}
-//
-//		return account.isLedgerAccount
-		fatalError("sargon migration")
-	}
 }
 
 extension ResourceAsset.State {
