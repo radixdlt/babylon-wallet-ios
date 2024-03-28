@@ -299,43 +299,17 @@ extension OnLedgerEntity {
 
 extension CacheClient.Entry.OnLedgerEntity {
 	var address: Address {
-//		switch self {
-//		case let .resource(resource):
-//			resource.embed()
-//		case let .account(account):
-//			account.embed()
-//		case let .resourcePool(resourcePool):
-//			resourcePool.embed()
-//		case let .validator(validator):
-//			validator.embed()
-//		case let .genericComponent(genericComponent):
-//			genericComponent.embed()
-//		case let .nonFungibleData(nonFungibleId):
-//			nonFungibleId.resourceAddress.embed()
-//		case let .nonFungibleIdPage(_, resourceAddress, _):
-//			resourceAddress.embed()
-//		}
-		fatalError("sargon migration")
+		switch self {
+		case let .address(address): address
+		case let .nonFungibleData(globalID): globalID.resourceAddress.embed()
+		case let .nonFungibleIdPage(_, resourceAddress, _): resourceAddress.embed()
+		}
 	}
 }
 
 extension Address {
 	var cachingIdentifier: CacheClient.Entry.OnLedgerEntity {
-//		switch self.decodedKind {
-//		case _ where AccountEntityType.addressSpace.contains(self.decodedKind):
-//			.account(self)
-//		case _ where ResourceEntityType.addressSpace.contains(self.decodedKind):
-//			.resource(self)
-//		case _ where ResourcePoolEntityType.addressSpace.contains(self.decodedKind):
-//			.resourcePool(self)
-//		case _ where ValidatorEntityType.addressSpace.contains(self.decodedKind):
-//			.validator(self)
-//		case _ where ComponentEntityType.addressSpace.contains(self.decodedKind):
-//			.genericComponent(self)
-//		default:
-//			.genericComponent(self)
-//		}
-		fatalError("sargon migration")
+		.address(self)
 	}
 }
 

@@ -5,50 +5,62 @@ extension OnLedgerEntitiesClient {
 		from item: GatewayAPI.StateEntityDetailsResponseItem,
 		ledgerState: AtLedgerState
 	) async throws -> OnLedgerEntity? {
-//		let address = try Address(validatingAddress: item.address)
-//		let addressKind = address.decodedKind
-//		switch addressKind {
-//		case _ where AccountEntityType.addressSpace.contains(addressKind):
-//			return try await .account(createAccount(
-//				item,
-//				ledgerState: ledgerState
-//			))
-//		case _ where ResourceEntityType.addressSpace.contains(addressKind):
-//			return try createResource(item, ledgerState: ledgerState).map(OnLedgerEntity.resource)
-//		case _ where ResourcePoolEntityType.addressSpace.contains(addressKind):
-//			guard let resourcePool = try await createResourcePool(
-//				item,
-//				ledgerState: ledgerState
-//			) else {
-//				return nil
-//			}
-//
-//			return .resourcePool(resourcePool)
-//		case _ where ValidatorEntityType.addressSpace.contains(addressKind):
-//			guard let validator = try await createValidator(
-//				item,
-//				ledgerState: ledgerState
-//			) else {
-//				return nil
-//			}
-//			return .validator(validator)
-//		default:
-//			return try .genericComponent(createGenericComponent(item, ledgerState: ledgerState))
-//		}
-		fatalError("sargon migration")
+		let address = try Address(validatingAddress: item.address)
+
+		switch address {
+		case let .account(accountAddress):
+			return try await .account(
+				createAccount(
+					accountAddress: accountAddress,
+					item,
+					ledgerState: ledgerState
+				)
+			)
+
+		case let .resource(resourceAddress):
+			return createResource(
+				resourceAddress: resourceAddress,
+				item,
+				ledgerState: ledgerState
+			).map(OnLedgerEntity.resource)
+
+		case let .pool(poolAddress):
+			guard let resourcePool = try await createResourcePool(
+				poolAddress: poolAddress,
+				item,
+				ledgerState: ledgerState
+			) else {
+				return nil
+			}
+
+			return .resourcePool(resourcePool)
+
+		case let .validator(validatorAddress):
+			guard let validator = try await createValidator(
+				validatorAddress: validatorAddress,
+				item,
+				ledgerState: ledgerState
+			) else {
+				return nil
+			}
+			return .validator(validator)
+
+		default:
+			return try .genericComponent(createGenericComponent(item, ledgerState: ledgerState))
+		}
 	}
 
 	@Sendable
 	static func createAccount(
+		accountAddress: AccountAddress,
 		_ item: GatewayAPI.StateEntityDetailsResponseItem,
 		ledgerState: AtLedgerState
 	) async throws -> OnLedgerEntity.Account {
-		let accountAddress = try AccountAddress(validatingAddress: item.address)
 		let fungibleResources = try extractOwnedFungibleResources(item, ledgerState: ledgerState)
 		let nonFungibleResources = try extractOwnedNonFungibleResources(item, ledgerState: ledgerState)
 
 		let poolUnitResources = try await createPoolUnitResources(
-			accountAddress.address,
+			accountAddress: accountAddress,
 			rawFungibleResources: fungibleResources,
 			rawNonFungibleResources: nonFungibleResources,
 			ledgerState: ledgerState
@@ -88,13 +100,14 @@ extension OnLedgerEntitiesClient {
 
 	@Sendable
 	static func createResource(
+		resourceAddress: ResourceAddress,
 		_ item: GatewayAPI.StateEntityDetailsResponseItem,
 		ledgerState: AtLedgerState
-	) throws -> OnLedgerEntity.Resource? {
+	) -> OnLedgerEntity.Resource? {
 		switch item.details {
 		case let .fungibleResource(fungibleDetails):
-			try .init(
-				resourceAddress: .init(validatingAddress: item.address),
+			.init(
+				resourceAddress: resourceAddress,
 				atLedgerState: ledgerState,
 				divisibility: UInt8(fungibleDetails.divisibility),
 				behaviors: item.details?.fungible?.roleAssignments.extractBehaviors() ?? [],
@@ -102,8 +115,8 @@ extension OnLedgerEntitiesClient {
 				metadata: .init(item.explicitMetadata)
 			)
 		case let .nonFungibleResource(nonFungibleDetails):
-			try .init(
-				resourceAddress: .init(validatingAddress: item.address),
+			.init(
+				resourceAddress: resourceAddress,
 				atLedgerState: ledgerState,
 				divisibility: nil,
 				behaviors: item.details?.nonFungible?.roleAssignments.extractBehaviors() ?? [],
@@ -117,6 +130,7 @@ extension OnLedgerEntitiesClient {
 
 	@Sendable
 	static func createResourcePool(
+		poolAddress: PoolAddress,
 		_ item: GatewayAPI.StateEntityDetailsResponseItem,
 		ledgerState: AtLedgerState
 	) async throws -> OnLedgerEntity.ResourcePool? {
@@ -126,7 +140,7 @@ extension OnLedgerEntitiesClient {
 		}
 
 		return try await .init(
-			address: .init(validatingAddress: item.address),
+			address: poolAddress,
 			poolUnitResourceAddress: .init(validatingAddress: state.poolUnitResourceAddress),
 			resources: extractOwnedFungibleResources(item, ledgerState: ledgerState).sorted(),
 			metadata: .init(item.explicitMetadata)
@@ -135,6 +149,7 @@ extension OnLedgerEntitiesClient {
 
 	@Sendable
 	static func createValidator(
+		validatorAddress: ValidatorAddress,
 		_ item: GatewayAPI.StateEntityDetailsResponseItem,
 		ledgerState: AtLedgerState
 	) async throws -> OnLedgerEntity.Validator? {
@@ -169,7 +184,7 @@ extension OnLedgerEntitiesClient {
 		}
 
 		return try .init(
-			address: .init(validatingAddress: item.address),
+			address: validatorAddress,
 			stakeUnitResourceAddress: .init(validatingAddress: state.stakeUnitResourceAddress),
 			xrdVaultBalance: Decimal192(xrdStakeVaultBalance),
 			stakeClaimFungibleResourceAddress: .init(validatingAddress: state.unstakeClaimTokenResourceAddress),
@@ -179,17 +194,16 @@ extension OnLedgerEntitiesClient {
 
 	@Sendable
 	static func createPoolUnitResources(
-		_ accountAddress: String,
+		accountAddress: AccountAddress,
 		rawFungibleResources: [OnLedgerEntity.OwnedFungibleResource],
 		rawNonFungibleResources: [OnLedgerEntity.OwnedNonFungibleResource],
 		ledgerState: AtLedgerState,
 		cachingStrategy: CachingStrategy = .useCache
 	) async throws -> OnLedgerEntity.Account.PoolUnitResources {
-		fatalError()
+		let stakeUnitCandidates = rawFungibleResources.filter {
+			$0.metadata.validator != nil
+		}
 		/*
-		 let stakeUnitCandidates = rawFungibleResources.filter {
-		 	$0.metadata.validator != nil
-		 }
 
 		 let stakeClaimNFTCandidates = rawNonFungibleResources.filter {
 		 	$0.metadata.validator != nil
@@ -294,6 +308,7 @@ extension OnLedgerEntitiesClient {
 		 let poolUnitResources = OnLedgerEntity.Account.PoolUnitResources(radixNetworkStakes: stakeUnits.asIdentifiable(), poolUnits: poolUnits.sorted())
 		 return poolUnitResources
 		 */
+		fatalError()
 	}
 
 	static func extractOwnedFungibleResources(
