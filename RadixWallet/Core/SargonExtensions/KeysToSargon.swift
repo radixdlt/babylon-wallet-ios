@@ -1,5 +1,6 @@
 import Foundation
-
+import Sargon
+import SargonUniFFI
 public typealias TXID = IntentHash
 
 extension TXID {
@@ -17,7 +18,7 @@ extension SignedIntent {
 
 extension SLIP10.PublicKey {
 	public func intoSargon() -> Sargon.PublicKey {
-		fatalError("Sargon migration")
+		try! Sargon.PublicKey(bytes: self.compressedData)
 	}
 }
 

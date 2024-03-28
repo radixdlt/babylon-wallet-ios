@@ -76,7 +76,7 @@ extension CacheClient {
 			case resource(ResourceAddress)
 			case resourcePool(PoolAddress)
 			case validator(ValidatorAddress)
-//			case genericComponent(Address)
+			case componentAddress(ComponentAddress)
 			case nonFungibleData(NonFungibleGlobalId)
 			case nonFungibleIdPage(
 				accountAddress: AccountAddress,
@@ -105,8 +105,8 @@ extension CacheClient {
 					return "\(filesystemFolderPath)/\(resourcePoolAddress.address)"
 				case let .validator(validatorAddress):
 					return "\(filesystemFolderPath)/\(validatorAddress.address)"
-//				case let .genericComponent(componentAddress):
-//					return "\(filesystemFolderPath)/\(componentAddress.address)"
+				case let .componentAddress(componentAddress):
+					return "\(filesystemFolderPath)/\(componentAddress.address)"
 				case let .nonFungibleData(nonFungibleGlobalId):
 					return "\(filesystemFolderPath)/\(nonFungibleGlobalId.description)"
 				case let .nonFungibleIdPage(_, resourceAddress, pageCursor):
@@ -141,8 +141,8 @@ extension CacheClient {
 					return "\(folderRoot)/resourcePools"
 				case .validator:
 					return "\(folderRoot)/validators"
-//				case .genericComponent:
-//					return "\(folderRoot)/genericComponents"
+				case .componentAddress:
+					return "\(folderRoot)/componentAddress"
 				case .nonFungibleData:
 					return "\(folderRoot)/nonFungiblesData"
 				case let .nonFungibleIdPage(accountAddress, _, _):
