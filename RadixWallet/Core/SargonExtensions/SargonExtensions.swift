@@ -246,7 +246,7 @@ extension FungibleResourceIndicator {
 
 extension ResourceAddress {
 	public func isXRD(on networkID: NetworkID) -> Bool {
-		self == self.mapTo(networkID: networkID)
+		self == Self.xrd(on: networkID)
 	}
 }
 

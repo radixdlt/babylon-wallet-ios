@@ -111,7 +111,7 @@ extension OnLedgerEntitiesClient {
 }
 
 extension OnLedgerEntitiesClient {
-	public struct CachingStrategy: Sendable, Hashable {
+	public struct CachingStrategy: Sendable, Hashable, CustomDebugStringConvertible {
 		public enum Read: Sendable, Hashable {
 			case fromCache
 			case fromLedger
@@ -124,6 +124,18 @@ extension OnLedgerEntitiesClient {
 
 		public let read: Read
 		public let write: Write
+
+		public var debugDescription: String {
+			if self == Self.forceUpdate {
+				"forceUpdate"
+			} else if self == Self.useCache {
+				"useCache"
+			} else if self == Self.readFromLedgerSkipWrite {
+				"readFromLedgerSkipWrite"
+			} else {
+				"read: \(read), write: \(write)"
+			}
+		}
 
 		public static let forceUpdate = Self(read: .fromLedger, write: .toCache)
 		public static let useCache = Self(read: .fromCache, write: .toCache)

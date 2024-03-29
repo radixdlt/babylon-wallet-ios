@@ -596,6 +596,7 @@ extension [OnLedgerEntity.OwnedFungibleResource] {
 		for resource in self {
 			if resource.resourceAddress.isXRD(on: networkId) {
 				xrdResource = resource
+				precondition(resource.resourceAddress.isXRD)
 			} else {
 				nonXrdResources.append(resource)
 			}

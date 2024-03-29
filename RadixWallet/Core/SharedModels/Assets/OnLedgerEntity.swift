@@ -364,7 +364,14 @@ extension OnLedgerEntity {
 		public var xrdResource: OwnedFungibleResource?
 		public var nonXrdResources: [OwnedFungibleResource]
 
-		public init(xrdResource: OwnedFungibleResource? = nil, nonXrdResources: [OwnedFungibleResource] = []) {
+		public init(
+			xrdResource: OwnedFungibleResource? = nil,
+			nonXrdResources: [OwnedFungibleResource] = []
+		) {
+			if let xrdResource {
+				precondition(xrdResource.resourceAddress.isXRD, "non XRD address used as XRD!")
+			}
+			precondition(nonXrdResources.allSatisfy { !$0.resourceAddress.isXRD }, "XRD found in non XRD!")
 			self.xrdResource = xrdResource
 			self.nonXrdResources = nonXrdResources
 		}
