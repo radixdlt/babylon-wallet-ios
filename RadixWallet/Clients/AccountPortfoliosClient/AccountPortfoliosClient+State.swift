@@ -10,18 +10,7 @@ extension AccountPortfoliosClient {
 		var isCurrencyAmountVisible: Bool = true
 		var fiatCurrency: FiatCurrency = .usd
 		public var debugDescription: String {
-			let fun = account.fungibleResources.debugDescription
-			let nonFun = account.nonFungibleResources.map(\.debugDescription).joined(separator: "\n")
-			let stakes = account.poolUnitResources.radixNetworkStakes.map(\.debugDescription).joined(separator: "\n")
-			let pools = account.poolUnitResources.poolUnits.map(\.debugDescription).joined(separator: "\n")
-
-			return [
-				account.address.formatted(),
-				fun.nilIfEmpty,
-				nonFun.nilIfEmpty,
-				stakes.nilIfEmpty,
-				pools.nilIfEmpty,
-			].compactMap { $0 }.joined(separator: "\n")
+			account.debugDescription
 		}
 	}
 

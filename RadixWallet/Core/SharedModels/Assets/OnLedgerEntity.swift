@@ -1,5 +1,24 @@
 // MARK: - OnLedgerEntity
-public enum OnLedgerEntity: Sendable, Hashable, Codable {
+public enum OnLedgerEntity: Sendable, Hashable, Codable, CustomDebugStringConvertible {
+	public var debugDescription: String {
+		switch self {
+		case let .account(account):
+			"account: \(account)"
+		case let .accountNonFungibleIds(page):
+			"accountNonFungibleIds: \(page)"
+		case let .resource(resource):
+			"resource: \(resource)"
+		case let .resourcePool(pool):
+			"pool: \(pool)"
+		case let .validator(validator):
+			"validator: \(validator)"
+		case let .genericComponent(generic):
+			"genericComponent: \(generic)"
+		case let .nonFungibleToken(nft):
+			"nonFungibleToken: \(nft)"
+		}
+	}
+
 	case resource(Resource)
 	case account(Account)
 	case resourcePool(ResourcePool)
@@ -189,7 +208,7 @@ extension OnLedgerEntity {
 		case dappDefinition = "dapp definition"
 	}
 
-	public struct Resource: Sendable, Hashable, Codable, Identifiable {
+	public struct Resource: Sendable, Hashable, Codable, Identifiable, CustomDebugStringConvertible {
 		public var id: ResourceAddress { resourceAddress }
 		public let resourceAddress: ResourceAddress
 		public let atLedgerState: AtLedgerState
@@ -197,6 +216,16 @@ extension OnLedgerEntity {
 		public let behaviors: [AssetBehavior]
 		public let totalSupply: Decimal192?
 		public let metadata: Metadata
+
+		public var debugDescription: String {
+			"""
+			\(resourceAddress.formatted())
+			symbol: \(metadata.symbol ?? "???")
+			name: \(metadata.name ?? "???")
+			icon: \(metadata.iconURL?.absoluteString ?? "???")
+			description: \(metadata.description ?? "???")
+			"""
+		}
 
 		public var fungibility: Fungibility {
 			if resourceAddress.isFungible {
@@ -461,7 +490,7 @@ extension OnLedgerEntity.Account.Details {
 
 // MARK: - OnLedgerEntity.Account
 extension OnLedgerEntity {
-	public struct Account: Sendable, Hashable, Codable {
+	public struct Account: Sendable, Hashable, Codable, CustomDebugStringConvertible {
 		public let address: AccountAddress
 		public let atLedgerState: AtLedgerState
 		public let metadata: Metadata
@@ -474,6 +503,21 @@ extension OnLedgerEntity {
 			public init(depositRule: Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule) {
 				self.depositRule = depositRule
 			}
+		}
+
+		public var debugDescription: String {
+			let fun = fungibleResources.debugDescription
+			let nonFun = nonFungibleResources.map(\.debugDescription).joined(separator: "\n")
+			let stakes = poolUnitResources.radixNetworkStakes.map(\.debugDescription).joined(separator: "\n")
+			let pools = poolUnitResources.poolUnits.map(\.debugDescription).joined(separator: "\n")
+
+			return [
+				address.formatted(),
+				fun.nilIfEmpty,
+				nonFun.nilIfEmpty,
+				stakes.nilIfEmpty,
+				pools.nilIfEmpty,
+			].compactMap { $0 }.joined(separator: "\n")
 		}
 
 		public var details: Details?
