@@ -6,7 +6,7 @@ private let baseLabel = "com.radixpublishing"
 
 private func makeLogger(
 	label: String,
-	level: Logger.Level = .debug
+	level: Logger.Level = .error
 ) -> Logger {
 	Logger(label: label) { _ in
 		// FIXME: Instead of this, we should differentiate by build flavour. Waiting on SPM to support proper build flavours.
@@ -53,6 +53,7 @@ func logAssertionFailure(_ errorMessage: String, severity: Logger.FailureSeverit
 }
 
 public let loggerGlobal = makeLogger(label: baseLabel)
+public let cyon = makeLogger(label: "cyon", level: .trace)
 
 extension Logger {
 	public static let logFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appending(path: "appLogs.txt")

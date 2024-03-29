@@ -2,13 +2,27 @@ import Foundation
 
 // MARK: - Definition
 extension AccountPortfoliosClient {
-	public struct AccountPortfolio: Sendable, Hashable {
+	public struct AccountPortfolio: Sendable, Hashable, CustomDebugStringConvertible {
 		public var account: OnLedgerEntity.Account
 		public var poolUnitDetails: Loadable<[OnLedgerEntitiesClient.OwnedResourcePoolDetails]> = .idle
 		public var stakeUnitDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>> = .idle
 
 		var isCurrencyAmountVisible: Bool = true
 		var fiatCurrency: FiatCurrency = .usd
+		public var debugDescription: String {
+			let fun = account.fungibleResources.debugDescription
+			let nonFun = account.nonFungibleResources.map(\.debugDescription).joined(separator: "\n")
+			let stakes = account.poolUnitResources.radixNetworkStakes.map(\.debugDescription).joined(separator: "\n")
+			let pools = account.poolUnitResources.poolUnits.map(\.debugDescription).joined(separator: "\n")
+
+			return [
+				account.address.formatted(),
+				fun.nilIfEmpty,
+				nonFun.nilIfEmpty,
+				stakes.nilIfEmpty,
+				pools.nilIfEmpty,
+			].compactMap { $0 }.joined(separator: "\n")
+		}
 	}
 
 	/// Internal state that holds all loaded portfolios.
@@ -55,8 +69,10 @@ extension AccountPortfoliosClient.State {
 	}
 
 	private func setOrUpdateAccountPortfolios(_ portfolios: [AccountPortfoliosClient.AccountPortfolio]) {
+		cyon.info("setOrUpdateAccountPortfolios START | #portfolios: \(portfolios.count)")
 		var newValue: [AccountAddress: AccountPortfoliosClient.AccountPortfolio] = [:]
 		for portfolio in portfolios {
+			cyon.info("setOrUpdateAccountPortfolios | \(portfolio)")
 			newValue[portfolio.account.address] = portfolio
 		}
 		portfoliosSubject.value = .success(newValue)

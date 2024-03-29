@@ -331,7 +331,7 @@ extension OnLedgerEntity {
 }
 
 extension OnLedgerEntity {
-	public struct OwnedFungibleResources: Sendable, Hashable, Codable {
+	public struct OwnedFungibleResources: Sendable, Hashable, Codable, CustomDebugStringConvertible {
 		public var xrdResource: OwnedFungibleResource?
 		public var nonXrdResources: [OwnedFungibleResource]
 
@@ -339,9 +339,18 @@ extension OnLedgerEntity {
 			self.xrdResource = xrdResource
 			self.nonXrdResources = nonXrdResources
 		}
+
+		public var debugDescription: String {
+			let xrd = xrdResource?.debugDescription ?? ""
+			let nonXRD = nonXrdResources.map(\.debugDescription).joined(separator: "\n")
+			return [
+				xrd.nilIfEmpty,
+				nonXRD.nilIfEmpty,
+			].compactMap { $0 }.joined(separator: "\n")
+		}
 	}
 
-	public struct OwnedFungibleResource: Sendable, Hashable, Identifiable, Codable {
+	public struct OwnedFungibleResource: Sendable, Hashable, Identifiable, Codable, CustomDebugStringConvertible {
 		public var id: ResourceAddress {
 			resourceAddress
 		}
@@ -350,6 +359,12 @@ extension OnLedgerEntity {
 		public let atLedgerState: AtLedgerState
 		public var amount: ResourceAmount
 		public let metadata: Metadata
+
+		public var debugDescription: String {
+			let symbol: String = metadata.symbol ?? "???"
+
+			return "\(symbol) - \(resourceAddress.formatted()) | # \(amount.nominalAmount.formatted())"
+		}
 
 		public init(
 			resourceAddress: ResourceAddress,
@@ -364,9 +379,16 @@ extension OnLedgerEntity {
 		}
 	}
 
-	public struct OwnedNonFungibleResource: Sendable, Hashable, Identifiable, Codable {
+	public struct OwnedNonFungibleResource: Sendable, Hashable, Identifiable, Codable, CustomDebugStringConvertible {
 		public var id: ResourceAddress {
 			resourceAddress
+		}
+
+		public var debugDescription: String {
+			"""
+			\(resourceAddress.formatted())
+			localID count: #\(nonFungibleIdsCount)
+			"""
 		}
 
 		public let resourceAddress: ResourceAddress
@@ -495,9 +517,17 @@ extension OnLedgerEntity.Account {
 		public let poolUnits: [PoolUnit]
 	}
 
-	public struct RadixNetworkStake: Sendable, Hashable, Codable, Identifiable {
+	public struct RadixNetworkStake: Sendable, Hashable, Codable, Identifiable, CustomDebugStringConvertible {
 		public var id: ValidatorAddress {
 			validatorAddress
+		}
+
+		public var debugDescription: String {
+			"""
+			\(validatorAddress.formatted())
+			staked: \(stakeUnitResource?.amount.nominalAmount.formatted() ?? "NONE")
+			claimable?: \(stakeClaimResource != nil)
+			"""
 		}
 
 		public let validatorAddress: ValidatorAddress
@@ -515,10 +545,22 @@ extension OnLedgerEntity.Account {
 		}
 	}
 
-	public struct PoolUnit: Sendable, Hashable, Codable {
+	public struct PoolUnit: Sendable, Hashable, Codable, CustomDebugStringConvertible {
 		public let resource: OnLedgerEntity.OwnedFungibleResource
 		public let resourcePoolAddress: PoolAddress
 		public let poolResources: [ResourceAddress]
+
+		public var descriptionOfPoolKind: String {
+			String(describing: resourcePoolAddress.poolKind)
+		}
+
+		public var debugDescription: String {
+			"""
+			\(resourcePoolAddress.formatted())
+			kind: \(descriptionOfPoolKind)
+			amount: \(resource.amount.nominalAmount.formatted())
+			"""
+		}
 
 		public init(
 			resource: OnLedgerEntity.OwnedFungibleResource,

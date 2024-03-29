@@ -66,7 +66,12 @@ extension AccountPortfoliosClient: DependencyKey {
 		}
 
 		@Sendable
-		func fetchAccountPortfolios(_ accountAddresses: [AccountAddress], _ forceRefresh: Bool) async throws -> [AccountPortfolio] {
+		func fetchAccountPortfolios(
+			_ accountAddresses: [AccountAddress],
+			_ forceRefreshIgnored: Bool
+		) async throws -> [AccountPortfolio] {
+			let forceRefresh = true
+			cyon.debug("fetchAccountPortfolioPLURALIS START | forceRefresh \(forceRefresh) ")
 			let gateway = await gatewaysClient.getCurrentGateway()
 			await state.setRadixGateway(gateway)
 			if forceRefresh {
@@ -128,7 +133,12 @@ extension AccountPortfoliosClient: DependencyKey {
 		}
 
 		@Sendable
-		func fetchAccountPortfolio(_ accountAddress: AccountAddress, _ forceRefresh: Bool) async throws -> AccountPortfolio {
+		func fetchAccountPortfolio(
+			_ accountAddress: AccountAddress,
+			_ forceRefreshIgnored: Bool
+		) async throws -> AccountPortfolio {
+			let forceRefresh = true
+			cyon.debug("fetchAccountPortfolio START | forceRefresh \(forceRefresh) ")
 			if forceRefresh {
 				cacheClient.removeFolder(.init(address: accountAddress))
 			}
