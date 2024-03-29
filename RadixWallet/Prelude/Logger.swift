@@ -53,7 +53,6 @@ func logAssertionFailure(_ errorMessage: String, severity: Logger.FailureSeverit
 }
 
 public let loggerGlobal = makeLogger(label: baseLabel)
-public let cyon = makeLogger(label: "cyon", level: .trace)
 
 extension Logger {
 	public static let logFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appending(path: "appLogs.txt")

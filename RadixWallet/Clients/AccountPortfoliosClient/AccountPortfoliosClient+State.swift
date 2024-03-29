@@ -58,10 +58,8 @@ extension AccountPortfoliosClient.State {
 	}
 
 	private func setOrUpdateAccountPortfolios(_ portfolios: [AccountPortfoliosClient.AccountPortfolio]) {
-		cyon.info("setOrUpdateAccountPortfolios START | #portfolios: \(portfolios.count)")
 		var newValue: [AccountAddress: AccountPortfoliosClient.AccountPortfolio] = [:]
 		for portfolio in portfolios {
-			cyon.info("setOrUpdateAccountPortfolios | \(portfolio)")
 			newValue[portfolio.account.address] = portfolio
 		}
 		portfoliosSubject.value = .success(newValue)

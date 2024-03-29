@@ -193,8 +193,6 @@ extension OnLedgerEntitiesClient {
 	) async throws -> [OnLedgerEntity] {
 		@Dependency(\.cacheClient) var cacheClient
 
-		cyon.debug("fetchEntitiesWithCaching | START")
-
 		func cacheIfSpecified(_ freshEntities: [OnLedgerEntity]) {
 			guard cachingStrategy.write == .toCache else { return }
 			for freshEntity in freshEntities {
