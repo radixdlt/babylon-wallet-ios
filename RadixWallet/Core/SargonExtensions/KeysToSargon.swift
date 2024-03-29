@@ -42,7 +42,7 @@ extension SignatureWithPublicKey {
 
 extension K1.ECDSAWithKeyRecovery.Signature {
 	func intoSargon() -> Sargon.Secp256k1Signature {
-		try! Sargon.Secp256k1Signature(bytes: self.data)
+		try! Sargon.Secp256k1Signature(bytes: self.radixSerialize())
 	}
 }
 
