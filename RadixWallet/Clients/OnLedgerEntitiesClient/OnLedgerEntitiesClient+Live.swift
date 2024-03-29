@@ -89,7 +89,7 @@ extension OnLedgerEntitiesClient {
 		let items = try freshPage.items.map {
 			try NonFungibleGlobalId.fromParts(
 				resourceAddress: request.resource.resourceAddress,
-				nonFungibleLocalId: .init(localId: $0)
+				nonFungibleLocalId: .init($0)
 			)
 		}
 
@@ -167,7 +167,7 @@ extension OnLedgerEntitiesClient {
 				try await gatewayAPIClient.getNonFungibleData(.init(
 					atLedgerState: request.atLedgerState?.selector,
 					resourceAddress: request.resource.address,
-					nonFungibleIds: Array(ids.map { $0.nonFungibleLocalId.toString() })
+					nonFungibleIds: Array(ids.map { $0.nonFungibleLocalId.toRawString() })
 				))
 			}
 
@@ -177,7 +177,7 @@ extension OnLedgerEntitiesClient {
 					try OnLedgerEntity.nonFungibleToken(.init(
 						id: .fromParts(
 							resourceAddress: request.resource,
-							nonFungibleLocalId: .init(localId: id.nonFungibleId)
+							nonFungibleLocalId: .init(id.nonFungibleId)
 						),
 						data: id.data?.programmaticJson.tuple
 					))

@@ -121,7 +121,7 @@ extension GatewayAPI.EntityMetadataItemValue {
 			return nil
 		}
 		do {
-			return try NonFungibleLocalId(localId: raw)
+			return try NonFungibleLocalId(raw)
 		} catch {
 			loggerGlobal.error("Failed to convert NonFungibleLocalId from string: \(raw), error: \(error) => FILTERED OUT.")
 			return nil

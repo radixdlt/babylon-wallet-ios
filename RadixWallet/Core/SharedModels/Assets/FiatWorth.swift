@@ -94,7 +94,8 @@ extension FiatWorth {
 		let value = worth.value ?? .zero // Zero for the unknown case, just to do to the base formatting
 
 		let formattedValue = {
-			guard let double = try? value.asDouble(), let value = formatter.string(for: double) else {
+			let double = value.asDouble
+			guard let value = formatter.string(for: double) else {
 				// Good enough fallback
 				return "\(currency.currencyCode)\(value.formattedPlain())"
 			}

@@ -297,7 +297,7 @@ extension FactorInstance.ID.BadgeAddress {
 
 		if var virtualContainer = try? container.nestedUnkeyedContainer(forKey: .virtual) {
 			let globalIDString = try virtualContainer.decode(String.self)
-			self = try .virtual(.init(string: globalIDString))
+			self = try .virtual(NonFungibleGlobalID(globalIDString))
 		} else if var resourceAddressContainer = try? container.nestedUnkeyedContainer(forKey: .resourceAddress) {
 			self = try .resourceAddress(.init(validatingAddress: resourceAddressContainer.decode(String.self)))
 		} else {

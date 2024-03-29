@@ -145,7 +145,7 @@ extension TransactionHistoryClient {
 							networkID: account.networkID
 						)
 
-						if amount.isNegative() {
+						if amount.isNegative {
 							withdrawals.append(resource)
 						} else {
 							deposits.append(resource)
@@ -220,7 +220,7 @@ extension TransactionHistoryClient {
 		let localIDStrings = type == .added ? changes.added : changes.removed
 		let resourceAddress = try ResourceAddress(validatingAddress: changes.resourceAddress)
 		return try localIDStrings
-			.map(NonFungibleLocalId.init(string:))
+			.map(NonFungibleLocalId.init)
 			.map { NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress, nonFungibleLocalId: $0) }
 	}
 

@@ -170,12 +170,7 @@ extension NonFungibleTokenDetails {
 				KeyValueView(key: field.name, value: variant)
 
 			case let .id(id):
-				if let idString = try? id.toString() {
-					KeyValueView(key: field.name, value: idString)
-				} else {
-					EmptyView()
-				}
-
+				KeyValueView(key: field.name, value: id.toRawString()) // use `id.formatted()` instead?
 			case let .instant(date):
 				KeyValueView(key: field.name, value: date.formatted())
 			}
@@ -292,7 +287,7 @@ private extension String {
 
 	var asNonFungibleIDDataField: ArbitraryDataFieldKind? {
 		nilIfEmpty.map {
-			if let id = try? NonFungibleLocalID(localId: $0) {
+			if let id = try? NonFungibleLocalID($0) {
 				.id(id)
 			} else {
 				.primitive(self)

@@ -82,7 +82,7 @@ public struct FungibleResourceAsset: Sendable, FeatureReducer {
 		case let .amountChanged(transferAmountStr):
 			state.transferAmountStr = transferAmountStr
 
-			if let value = try? Decimal192(formattedString: transferAmountStr), !value.isNegative() {
+			if let value = try? Decimal192(formattedString: transferAmountStr), !value.isNegative {
 				state.transferAmount = value
 			} else {
 				state.transferAmount = nil

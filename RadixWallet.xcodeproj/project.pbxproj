@@ -1187,7 +1187,6 @@
 		E63257612BB2D40F00952051 /* TXVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = E63257602BB2D40F00952051 /* TXVersion.swift */; };
 		E63257632BB2F0D400952051 /* KeysToSargon.swift in Sources */ = {isa = PBXBuildFile; fileRef = E63257622BB2F0D400952051 /* KeysToSargon.swift */; };
 		E63257652BB314F600952051 /* ExecutionSummary+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E63257642BB314F600952051 /* ExecutionSummary+Extensions.swift */; };
-		E63257672BB3268800952051 /* Decimal192+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E63257662BB3268800952051 /* Decimal192+Extensions.swift */; };
 		E634CA2F2AFD25B100C43DB7 /* DebugKeychainContents+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E634CA2D2AFD25B100C43DB7 /* DebugKeychainContents+View.swift */; };
 		E634CA302AFD25B100C43DB7 /* DebugKeychainContents.swift in Sources */ = {isa = PBXBuildFile; fileRef = E634CA2E2AFD25B100C43DB7 /* DebugKeychainContents.swift */; };
 		E6390FB32AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6390FB22AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift */; };
@@ -2461,7 +2460,6 @@
 		E63257602BB2D40F00952051 /* TXVersion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TXVersion.swift; sourceTree = "<group>"; };
 		E63257622BB2F0D400952051 /* KeysToSargon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeysToSargon.swift; sourceTree = "<group>"; };
 		E63257642BB314F600952051 /* ExecutionSummary+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ExecutionSummary+Extensions.swift"; sourceTree = "<group>"; };
-		E63257662BB3268800952051 /* Decimal192+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Decimal192+Extensions.swift"; sourceTree = "<group>"; };
 		E634CA2D2AFD25B100C43DB7 /* DebugKeychainContents+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DebugKeychainContents+View.swift"; sourceTree = "<group>"; };
 		E634CA2E2AFD25B100C43DB7 /* DebugKeychainContents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugKeychainContents.swift; sourceTree = "<group>"; };
 		E6390FB22AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift"; sourceTree = "<group>"; };
@@ -6875,7 +6873,6 @@
 				E63257602BB2D40F00952051 /* TXVersion.swift */,
 				E63257622BB2F0D400952051 /* KeysToSargon.swift */,
 				E63257642BB314F600952051 /* ExecutionSummary+Extensions.swift */,
-				E63257662BB3268800952051 /* Decimal192+Extensions.swift */,
 				488829792BB41D0700DFF8E1 /* SargonExtensions.swift */,
 			);
 			path = SargonExtensions;
@@ -8049,7 +8046,6 @@
 				48CFC4772ADC10DA00E77A5C /* GatewaysClient+Interface.swift in Sources */,
 				48CFC59D2ADC10DA00E77A5C /* UIKeyboardType+Extra.swift in Sources */,
 				48CFC5292ADC10DA00E77A5C /* TransactionSubmitResponse.swift in Sources */,
-				E63257672BB3268800952051 /* Decimal192+Extensions.swift in Sources */,
 				48CFC5E12ADC10DA00E77A5C /* Validation+Extra.swift in Sources */,
 				83EE47A12AF0EECD00155F03 /* TransactionFungibleFeeBalanceChanges.swift in Sources */,
 				48CFC48F2ADC10DA00E77A5C /* GatewayAPIClient+Interface.swift in Sources */,
@@ -9695,7 +9691,7 @@
 			repositoryURL = "https://github.com/radixdlt/sargon";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 0.5.3;
+				minimumVersion = 0.5.5;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

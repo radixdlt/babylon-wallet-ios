@@ -175,7 +175,7 @@ extension Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositorA
 		case .resourceAddress:
 			self = try .resourceAddress(.init(validatingAddress: value))
 		case .nonFungibleGlobalID:
-			self = try .nonFungibleGlobalID(NonFungibleGlobalId(string: value))
+			self = try .nonFungibleGlobalID(NonFungibleGlobalId(value))
 		}
 	}
 

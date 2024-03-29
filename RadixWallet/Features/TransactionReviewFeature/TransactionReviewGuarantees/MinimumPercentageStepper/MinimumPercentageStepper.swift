@@ -51,7 +51,7 @@ public struct MinimumPercentageStepper: FeatureReducer {
 			state.string = string
 			if string.isEmpty {
 				state.value = 0
-			} else if let value = try? Decimal192(formattedString: string), !value.isNegative() {
+			} else if let value = try? Decimal192(formattedString: string), !value.isNegative {
 				state.value = value
 			} else {
 				state.value = nil

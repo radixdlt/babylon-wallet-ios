@@ -29,12 +29,6 @@ extension NonFungibleResourceIndicator {
 	}
 }
 
-extension Address {
-	public func into<A: AddressProtocol>(type: A.Type = A.self) throws -> A {
-		try A(validatingAddress: self.address)
-	}
-}
-
 extension OrderedSet<EntityFlag> {
 	func intoSargon() -> [Sargon.EntityFlag] {
 		map { $0.intoSargon() }
@@ -247,17 +241,5 @@ extension FungibleResourceIndicator {
 extension ResourceAddress {
 	public func isXRD(on networkID: NetworkID) -> Bool {
 		self == Self.xrd(on: networkID)
-	}
-}
-
-// MARK: - DependencyInformation + CustomStringConvertible
-extension DependencyInformation: CustomStringConvertible {
-	public var description: String {
-		switch self {
-		case let .branch(value): value
-		case let .tag(value): value
-		case let .version(value): value
-		case let .rev(value): value
-		}
 	}
 }
