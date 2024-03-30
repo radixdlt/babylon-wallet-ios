@@ -103,7 +103,7 @@ extension TransactionHistoryClient {
 					throw MissingIntentHash()
 				}
 
-				let txid = try TXID(string: hash)
+				let txid = try IntentHash(string: hash)
 
 				let manifestClass = info.manifestClasses?.first
 
@@ -221,7 +221,7 @@ extension TransactionHistoryClient {
 		let resourceAddress = try ResourceAddress(validatingAddress: changes.resourceAddress)
 		return try localIDStrings
 			.map(NonFungibleLocalId.init)
-			.map { NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress, nonFungibleLocalId: $0) }
+			.map { NonFungibleGlobalId(resourceAddress: resourceAddress, nonFungibleLocalId: $0) }
 	}
 
 	struct TimestampFormatter {

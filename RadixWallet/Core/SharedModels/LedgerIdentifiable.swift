@@ -32,7 +32,7 @@ public enum LedgerIdentifiable: Sendable {
 
 extension LedgerIdentifiable {
 	public enum Identifier: Sendable {
-		case transaction(TXID)
+		case transaction(IntentHash)
 		case nonFungibleGlobalID(NonFungibleGlobalId)
 
 		public var address: String {

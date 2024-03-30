@@ -75,3 +75,11 @@ extension P2P.Dapp.Request {
 		}
 	}
 }
+
+// MARK: - TXVersionTag
+public enum TXVersionTag: Sendable {}
+public typealias TXVersion = Tagged<TXVersionTag, UInt8>
+
+extension TXVersion {
+	public static let `default`: Self = 1
+}

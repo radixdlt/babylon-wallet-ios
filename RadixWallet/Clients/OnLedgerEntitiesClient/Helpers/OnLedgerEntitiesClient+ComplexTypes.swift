@@ -204,7 +204,7 @@ extension OnLedgerEntitiesClient {
 			let tokens = try await getNonFungibleTokenData(.init(
 				resource: resourceAddress,
 				nonFungibleIds: existingTokenIds.map {
-					NonFungibleGlobalId.fromParts(
+					NonFungibleGlobalID(
 						resourceAddress: resourceAddress,
 						nonFungibleLocalId: $0
 					)
@@ -235,7 +235,7 @@ extension OnLedgerEntitiesClient {
 			// Newly minted tokens
 			result = ids
 				.map { localId in
-					NonFungibleGlobalId.fromParts(
+					NonFungibleGlobalID(
 						resourceAddress: resourceAddress,
 						nonFungibleLocalId: localId
 					)

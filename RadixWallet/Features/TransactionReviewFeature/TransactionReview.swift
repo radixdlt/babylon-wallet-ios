@@ -136,8 +136,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case failed(TransactionFailure)
-		case signedTXAndSubmittedToGateway(TXID)
-		case transactionCompleted(TXID)
+		case signedTXAndSubmittedToGateway(IntentHash)
+		case transactionCompleted(IntentHash)
 		case dismiss
 	}
 

@@ -39,7 +39,7 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case submitTXResult(TaskResult<TXID>)
+		case submitTXResult(TaskResult<IntentHash>)
 		case statusUpdate(State.TXStatus)
 	}
 
@@ -56,8 +56,8 @@ public struct SubmitTransaction: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case failedToSubmit
-		case submittedButNotCompleted(TXID)
-		case committedSuccessfully(TXID)
+		case submittedButNotCompleted(IntentHash)
+		case committedSuccessfully(IntentHash)
 		case manuallyDismiss
 	}
 

@@ -87,7 +87,7 @@ extension OnLedgerEntitiesClient {
 		)
 
 		let items = try freshPage.items.map {
-			try NonFungibleGlobalId.fromParts(
+			try NonFungibleGlobalId(
 				resourceAddress: request.resource.resourceAddress,
 				nonFungibleLocalId: .init($0)
 			)
@@ -175,7 +175,7 @@ extension OnLedgerEntitiesClient {
 			.flatMap { item in
 				try item.nonFungibleIds.map { id in
 					try OnLedgerEntity.nonFungibleToken(.init(
-						id: .fromParts(
+						id: NonFungibleGlobalID(
 							resourceAddress: request.resource,
 							nonFungibleLocalId: .init(id.nonFungibleId)
 						),

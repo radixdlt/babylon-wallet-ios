@@ -94,12 +94,12 @@ extension AccountPortfoliosClient: DependencyKey {
 			let allResources: [ResourceAddress] = {
 				if gateway == .mainnet {
 					/// Only Mainnet resources have prices
-					return (currentAccounts + accounts).flatMap(\.resourcesWithPrices) + [.mainnetXRDAddress]
+					return (currentAccounts + accounts).flatMap(\.resourcesWithPrices) + [.mainnetXRD]
 				} else {
 					#if DEBUG
 					/// Helpful for testing on stokenet
 					return [
-						.mainnetXRDAddress,
+						.mainnetXRD,
 						try! .init(validatingAddress:
 							"resource_rdx1t4tjx4g3qzd98nayqxm7qdpj0a0u8ns6a0jrchq49dyfevgh6u0gj3"
 						),

@@ -118,7 +118,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case dismissWithFailure(P2P.Dapp.Response.WalletInteractionFailureResponse)
-		case dismissWithSuccess(DappMetadata, TXID)
+		case dismissWithSuccess(DappMetadata, IntentHash)
 		case submit(P2P.Dapp.Response.WalletInteractionSuccessResponse, DappMetadata)
 		case dismiss
 	}
@@ -401,7 +401,7 @@ extension DappInteractionFlow {
 
 		func handleSignAndSubmitTX(
 			_ item: State.AnyInteractionItem,
-			_ txID: TXID
+			_ txID: IntentHash
 		) -> Effect<Action> {
 			state.responseItems[item] = .remote(.send(.init(txID: txID)))
 			return continueEffect(for: &state)
@@ -1041,8 +1041,7 @@ extension DappInteractionFlow.Path.State {
 				nonce: .secureRandom(),
 				signTransactionPurpose: .manifestFromDapp,
 				message: item.message.map {
-//					Message.plainText(value: $0)
-					Message.plainText(plaintext: .init(mimeType: "application/text", message: .stringMessage(string: $0)))
+					Message.plaintext(string: $0)
 				} ?? Message.none,
 				waitsForTransactionToBeComitted: interaction.id.isWalletAccountDepositSettingsInteraction,
 				isWalletTransaction: interaction.id.isWalletInteraction,

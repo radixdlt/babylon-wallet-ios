@@ -39,14 +39,32 @@ public struct FactorInstance: Sendable, Hashable, Codable, Identifiable, FactorO
 				let payload = k1PubKey.compressedRepresentation.prefix(26)
 				return try! .init(
 					factorSourceKind: factorSourceID.kind,
-					badgeAddress: .virtual(.fromParts(resourceAddress: .init(validatingAddress: "resource_sim1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxakj8n3"), nonFungibleLocalId: .integer(value: 1)))
+					badgeAddress: .virtual(
+						NonFungibleGlobalID(
+							resourceAddress: .init(
+								validatingAddress: "resource_sim1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxakj8n3"
+							),
+							nonFungibleLocalId: .integer(
+								value: 1
+							)
+						)
+					)
 				)
 			case let .eddsaEd25519(curve25519PubKey):
 				// FIXME: THIS IS COMPLETELY WRONG, placeholder only
 				let payload = curve25519PubKey.compressedRepresentation.prefix(26)
 				return try! .init(
 					factorSourceKind: factorSourceID.kind,
-					badgeAddress: .virtual(.fromParts(resourceAddress: .init(validatingAddress: "resource_sim1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxakj8n3"), nonFungibleLocalId: .integer(value: 1)))
+					badgeAddress: .virtual(
+						NonFungibleGlobalID(
+							resourceAddress: .init(
+								validatingAddress: "resource_sim1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxakj8n3"
+							),
+							nonFungibleLocalId: .integer(
+								value: 1
+							)
+						)
+					)
 				)
 			}
 		}

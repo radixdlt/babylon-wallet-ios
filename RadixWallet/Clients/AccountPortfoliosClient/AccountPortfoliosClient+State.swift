@@ -132,7 +132,7 @@ extension AccountPortfoliosClient.State {
 			let price = {
 				#if DEBUG
 				if gateway != .mainnet {
-					if resourceAddress == .mainnetXRDAddress {
+					if resourceAddress == .mainnetXRD {
 						return self.tokenPrices[resourceAddress]
 					} else {
 						return self.tokenPrices.values.randomElement()
@@ -201,7 +201,7 @@ private extension AccountPortfoliosClient.AccountPortfolio {
 private extension OnLedgerEntity.OwnedFungibleResources {
 	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
 		xrdResource.mutate { resource in
-			resource.amount.fiatWorth = change(.mainnetXRDAddress, resource.amount)
+			resource.amount.fiatWorth = change(.mainnetXRD, resource.amount)
 		}
 
 		nonXrdResources.mutateAll { resource in
@@ -216,7 +216,7 @@ private extension MutableCollection where Element == OnLedgerEntitiesClient.Owne
 	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
 		mutateAll { detail in
 			detail.xrdResource?.redemptionValue.mutate { amount in
-				amount.fiatWorth = change(.mainnetXRDAddress, amount)
+				amount.fiatWorth = change(.mainnetXRD, amount)
 			}
 
 			detail.nonXrdResources.mutateAll { resource in
@@ -233,11 +233,11 @@ private extension MutableCollection where Element == OnLedgerEntitiesClient.Owne
 	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
 		mutateAll { detail in
 			detail.stakeUnitResource.mutate {
-				$0.amount.fiatWorth = change(.mainnetXRDAddress, $0.amount)
+				$0.amount.fiatWorth = change(.mainnetXRD, $0.amount)
 			}
 			detail.stakeClaimTokens.mutate {
 				$0.stakeClaims.mutateAll { token in
-					token.claimAmount.fiatWorth = change(.mainnetXRDAddress, token.claimAmount)
+					token.claimAmount.fiatWorth = change(.mainnetXRD, token.claimAmount)
 				}
 			}
 		}

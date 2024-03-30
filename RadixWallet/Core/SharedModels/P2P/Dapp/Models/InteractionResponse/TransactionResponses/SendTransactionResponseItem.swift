@@ -6,13 +6,13 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 	/// [cap]: https://radixdlt.atlassian.net/wiki/spaces/AT/pages/2712895489/CAP-21+Message+format+between+dApp+and+wallet#Wallet-SDK-%E2%86%94%EF%B8%8F-Wallet-messages
 	///
 	public struct SendTransactionResponseItem: Sendable, Hashable, Encodable {
-		public let transactionIntentHash: TXID
+		public let transactionIntentHash: IntentHash
 
 		enum CodingKeys: CodingKey {
 			case transactionIntentHash
 		}
 
-		public init(txID: TXID) {
+		public init(txID: IntentHash) {
 			transactionIntentHash = txID
 		}
 
