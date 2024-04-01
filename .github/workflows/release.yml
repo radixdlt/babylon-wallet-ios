@@ -25,7 +25,7 @@ jobs:
           snyk auth ${{ secrets.SNYK_TOKEN }}
       - name: Generate SBOM
         run: |
-          snyk sbom --all-projects --org=${{ secrets.SNYK_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
+          snyk sbom --all-projects --org=${{ secrets.SNYK_ORG_ID }} --format=cyclonedx1.4+json > sbom.json
       - name: Upload SBOM
         uses: RDXWorks-actions/upload-release-assets@c94805dc72e4b20745f543da0f62eaee7722df7a
         with:

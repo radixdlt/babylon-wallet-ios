@@ -103,7 +103,7 @@ jobs:
           snyk auth ${{ env.SNYK_TOKEN }}
       - name: Generate SBOM # check SBOM can be generated but nothing is done with it
         run: |
-          snyk sbom --debug --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --format=cyclonedx1.4+json --json-file-output sbom.json
+          snyk sbom --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --format=cyclonedx1.4+json > sbom.json
 
   linting:
     name: "Linting"

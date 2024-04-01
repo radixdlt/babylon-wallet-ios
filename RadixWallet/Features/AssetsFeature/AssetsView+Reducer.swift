@@ -202,11 +202,11 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 		let poolUnits = portfolio.account.poolUnitResources.poolUnits
 		let poolUnitList: PoolUnitsList.State? = poolUnits.isEmpty ? nil : .init(
-			poolUnits: portfolio.account.poolUnitResources.poolUnits.map { poolUnit in
+			poolUnits: poolUnits.map { poolUnit in
 				PoolUnitsList.State.PoolUnitState(
 					poolUnit: poolUnit,
-					resourceDetails: state.accountPortfolio.poolUnitDetails.flatten().map {
-						$0.first { poolUnit.resourcePoolAddress == $0.address }!
+					resourceDetails: state.accountPortfolio.poolUnitDetails.flatten().flatMap {
+						$0.first { poolUnit.resourcePoolAddress == $0.address }.map(Loadable.success) ?? .loading
 					},
 					isSelected: mode.nonXrdRowSelected(poolUnit.resource.resourceAddress)
 				)
@@ -474,5 +474,11 @@ extension NonFungibleTokensPerResourceProvider {
 			selectedAssets: row.selectedAssets,
 			resource: row.resource
 		)
+	}
+}
+
+extension SpecificAddress {
+	var isOnMainnet: Bool {
+		networkID == NetworkID.mainnet
 	}
 }
