@@ -51,7 +51,7 @@ extension ManualAccountRecoveryCoordinator.View {
 		}
 		.background(.app.white)
 		.toolbar {
-			ToolbarItem(placement: .automatic) {
+			ToolbarItem(placement: .cancellationAction) {
 				CloseButton {
 					store.send(.view(.closeButtonTapped))
 				}

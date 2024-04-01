@@ -16,7 +16,7 @@ extension SelectBackup {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				coreView(store, with: viewStore)
 					.toolbar {
-						ToolbarItem(placement: .automatic) {
+						ToolbarItem(placement: .cancellationAction) {
 							CloseButton {
 								store.send(.view(.closeButtonTapped))
 							}

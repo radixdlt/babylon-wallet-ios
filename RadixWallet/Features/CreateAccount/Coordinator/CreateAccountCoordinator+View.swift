@@ -32,7 +32,7 @@ extension CreateAccountCoordinator {
 						destinations(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
 							.toolbar {
 								if viewStore.shouldDisplayNavBar {
-									ToolbarItem(placement: .primaryAction) {
+									ToolbarItem(placement: .cancellationAction) {
 										CloseButton {
 											store.send(.view(.closeButtonTapped))
 										}
