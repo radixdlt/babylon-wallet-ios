@@ -56,7 +56,6 @@ extension AssetTransferMessage.View {
 					.padding(.medium3)
 					.roundedCorners(.top, strokeColor: .borderColor)
 
-					// here
 					AppTextEditor(
 						placeholder: L10n.AssetTransfer.transactionMessagePlaceholder,
 						text: viewStore.binding(
