@@ -146,7 +146,7 @@ private extension View {
 		return sheet(store: destinationStore.scope(state: \.reviewTransaction, action: \.reviewTransaction)) {
 			// FIXME: Should use DappInteractionClient instead to schedule a transaction
 			TransactionReview.View(store: $0)
-				.withNavigationBar(.topBarLeading) {
+				.withNavigationBar {
 					store.send(.view(.closeTransactionButtonTapped))
 				}
 		}
