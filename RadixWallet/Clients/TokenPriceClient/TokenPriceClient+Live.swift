@@ -45,10 +45,12 @@ extension TokenPricesClient {
 extension TokenPricesClient.TokenPrices {
 	fileprivate init(_ tokenPricesResponse: TokensPriceResponse) {
 		let formatter = NumberFormatter()
+		formatter.locale = Locale(identifier: "en_US_POSIX") // Just ignore the users locale
 		formatter.numberStyle = .decimal
 		formatter.maximumFractionDigits = Int(RETDecimal.maxDivisibility)
 		formatter.roundingMode = .down
-		formatter.decimalSeparator = "." // Enfore dot notation for RETDecimal
+		formatter.decimalSeparator = "." // Enforce dot notation for RETDecimal
+		formatter.usesGroupingSeparator = false // No grouping separator for RETDecimal
 
 		self = tokenPricesResponse.tokens.reduce(into: [:]) { partialResult, next in
 			let trimmed = formatter.string(for: next.price) ?? ""
