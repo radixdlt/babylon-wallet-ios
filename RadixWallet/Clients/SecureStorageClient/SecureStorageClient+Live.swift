@@ -242,6 +242,28 @@ extension SecureStorageClient: DependencyKey {
 			)
 		}
 
+		let saveMobile2MobileSessionSecret: SaveMobile2MobileSessionSecret = { id, secret in
+			let mostSecureAccesibilityAndAuthenticationPolicy = try queryMostSecureAccesibilityAndAuthenticationPolicy()
+
+			try keychainClient.setDataWithAuth(
+				secret.data.data,
+				forKey: .init(.init(rawValue: id.id)!),
+				attributes: .init(
+					iCloudSyncEnabled: false,
+					accessibility: mostSecureAccesibilityAndAuthenticationPolicy.accessibility,
+					authenticationPolicy: mostSecureAccesibilityAndAuthenticationPolicy.authenticationPolicy,
+					label: importantKeychainIdentifier("Radix Wallet Mobile2Mobile session secret")!,
+					comment: .init("Created for \(id.dAppOrigin) \(id.sessionId)")
+				)
+			)
+		}
+
+		let loadMobile2MobileSessionSecret: LoadMobile2MobileSessionSecret = { id in
+			try keychainClient.getDataWithoutAuth(forKey: .init(.init(rawValue: id.id)!)).map {
+				try HexCodable32Bytes(data: $0)
+			}
+		}
+
 		#if DEBUG
 		let getAllMnemonics: GetAllMnemonics = {
 			let unfilteredKeys = keychainClient.getAllKeysMatchingAttributes(
@@ -388,7 +410,9 @@ extension SecureStorageClient: DependencyKey {
 			saveDeviceInfo: saveDeviceInfo,
 			deprecatedLoadDeviceID: deprecatedLoadDeviceID,
 			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID,
-			getAllMnemonics: getAllMnemonics
+			getAllMnemonics: getAllMnemonics,
+			saveMobile2MobileSessionSecret: saveMobile2MobileSessionSecret,
+			loadMobile2MobileSessionSecret: loadMobile2MobileSessionSecret
 		)
 		#else
 		return Self(
@@ -408,7 +432,9 @@ extension SecureStorageClient: DependencyKey {
 			loadDeviceInfo: loadDeviceInfo,
 			saveDeviceInfo: saveDeviceInfo,
 			deprecatedLoadDeviceID: deprecatedLoadDeviceID,
-			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID
+			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID,
+			saveMobile2MobileSessionSecret: saveMobile2MobileSessionSecret,
+			loadMobile2MobileSessionSecret: loadMobile2MobileSessionSecret
 		)
 		#endif
 	}()

@@ -26,6 +26,9 @@ public struct SecureStorageClient: Sendable {
 	/// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
 	public var deleteDeprecatedDeviceID: DeleteDeprecatedDeviceID
 
+	public var saveMobile2MobileSessionSecret: SaveMobile2MobileSessionSecret
+	public var loadMobile2MobileSessionSecret: LoadMobile2MobileSessionSecret
+
 	#if DEBUG
 	public var getAllMnemonics: GetAllMnemonics
 	#endif
@@ -49,7 +52,9 @@ public struct SecureStorageClient: Sendable {
 		saveDeviceInfo: @escaping SaveDeviceInfo,
 		deprecatedLoadDeviceID: @escaping DeprecatedLoadDeviceID,
 		deleteDeprecatedDeviceID: @escaping DeleteDeprecatedDeviceID,
-		getAllMnemonics: @escaping GetAllMnemonics
+		getAllMnemonics: @escaping GetAllMnemonics,
+		saveMobile2MobileSessionSecret: @escaping SaveMobile2MobileSessionSecret,
+		loadMobile2MobileSessionSecret: @escaping LoadMobile2MobileSessionSecret
 	) {
 		self.saveProfileSnapshot = saveProfileSnapshot
 		self.loadProfileSnapshotData = loadProfileSnapshotData
@@ -69,6 +74,8 @@ public struct SecureStorageClient: Sendable {
 		self.deprecatedLoadDeviceID = deprecatedLoadDeviceID
 		self.deleteDeprecatedDeviceID = deleteDeprecatedDeviceID
 		self.getAllMnemonics = getAllMnemonics
+		self.saveMobile2MobileSessionSecret = saveMobile2MobileSessionSecret
+		self.loadMobile2MobileSessionSecret = loadMobile2MobileSessionSecret
 	}
 	#else
 
@@ -89,7 +96,9 @@ public struct SecureStorageClient: Sendable {
 		loadDeviceInfo: @escaping LoadDeviceInfo,
 		saveDeviceInfo: @escaping SaveDeviceInfo,
 		deprecatedLoadDeviceID: @escaping DeprecatedLoadDeviceID,
-		deleteDeprecatedDeviceID: @escaping DeleteDeprecatedDeviceID
+		deleteDeprecatedDeviceID: @escaping DeleteDeprecatedDeviceID,
+		saveMobile2MobileSessionSecret: @escaping SaveMobile2MobileSessionSecret,
+		loadMobile2MobileSessionSecret: @escaping LoadMobile2MobileSessionSecret
 	) {
 		self.saveProfileSnapshot = saveProfileSnapshot
 		self.loadProfileSnapshotData = loadProfileSnapshotData
@@ -108,6 +117,8 @@ public struct SecureStorageClient: Sendable {
 		self.saveDeviceInfo = saveDeviceInfo
 		self.deprecatedLoadDeviceID = deprecatedLoadDeviceID
 		self.deleteDeprecatedDeviceID = deleteDeprecatedDeviceID
+		self.saveMobile2MobileSessionSecret = saveMobile2MobileSessionSecret
+		self.loadMobile2MobileSessionSecret = loadMobile2MobileSessionSecret
 	}
 	#endif // DEBUG
 }
@@ -142,6 +153,9 @@ extension SecureStorageClient {
 
 	public typealias LoadDeviceInfo = @Sendable () throws -> DeviceInfo?
 	public typealias SaveDeviceInfo = @Sendable (DeviceInfo) throws -> Void
+
+	public typealias SaveMobile2MobileSessionSecret = @Sendable (Mobile2MobileClient.SessionConnectionID, HexCodable32Bytes) throws -> Void
+	public typealias LoadMobile2MobileSessionSecret = @Sendable (Mobile2MobileClient.SessionConnectionID) throws -> HexCodable32Bytes?
 
 	/// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
 	public typealias DeprecatedLoadDeviceID = @Sendable () throws -> DeviceID?

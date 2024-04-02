@@ -2,26 +2,35 @@ import CryptoKit
 import Foundation
 
 // MARK: - Mobile2MobileClient
-struct Mobile2MobileClient: DependencyKey {
-	var handleRequest: HandleRequest
+public struct Mobile2MobileClient: DependencyKey {
+	public var handleRequest: HandleRequest
 }
 
 extension Mobile2MobileClient {
-	struct WalletConnectRequest: Sendable {
-		let dAppOrigin: URL
-		let publicKey: Curve25519.KeyAgreement.PublicKey
-		let sessionId: String
+	public struct WalletConnectRequest: Sendable {
+		public let dAppOrigin: URL
+		public let publicKey: Curve25519.KeyAgreement.PublicKey
+		public let sessionId: String
 	}
 
-	typealias HandleRequest = (WalletConnectRequest) async throws -> Void
+	public typealias HandleRequest = (WalletConnectRequest) async throws -> Void
 }
 
 extension Mobile2MobileClient {
-	enum Error: Swift.Error {
+	public struct SessionConnectionID: Codable {
+		public var id: String {
+			dAppOrigin + sessionId
+		}
+
+		public let dAppOrigin: String
+		public let sessionId: String
+	}
+
+	public enum Error: Swift.Error {
 		case missingDappReturnURL
 	}
 
-	static var liveValue: Mobile2MobileClient {
+	public static var liveValue: Mobile2MobileClient {
 		@Dependency(\.httpClient) var httpClient
 		@Dependency(\.openURL) var openURL
 		@Dependency(\.overlayWindowClient) var overlayWindowClient
@@ -39,6 +48,9 @@ extension Mobile2MobileClient {
 				let dappReturnURL = try await getDappReturnURL(request.dAppOrigin)
 
 				loggerGlobal.critical("Creating the Wallet Private/Public key pair")
+
+				// Generate Private/Public key pair.
+				// Store the private key in Keychain
 
 				let walletPrivateKey = Curve25519.KeyAgreement.PrivateKey()
 				let walletPublicKey = walletPrivateKey.publicKey
@@ -67,7 +79,6 @@ extension Mobile2MobileClient {
 				let returnURL = dappReturnURL.appending(queryItems: [
 					.init(name: "publicKey", value: walletPublicKey.rawRepresentation.hex),
 					.init(name: "sessionId", value: request.sessionId),
-					// .init(name: "secret", value: sharedSecret.hex),
 				])
 
 				await openURL(returnURL)
@@ -76,7 +87,7 @@ extension Mobile2MobileClient {
 }
 
 extension DependencyValues {
-	var mobile2MobileClient: Mobile2MobileClient {
+	public var mobile2MobileClient: Mobile2MobileClient {
 		get { self[Mobile2MobileClient.self] }
 		set { self[Mobile2MobileClient.self] = newValue }
 	}

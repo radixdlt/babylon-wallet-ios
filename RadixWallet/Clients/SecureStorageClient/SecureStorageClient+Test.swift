@@ -27,7 +27,9 @@ extension SecureStorageClient: TestDependencyKey {
 		saveDeviceInfo: { _ in },
 		deprecatedLoadDeviceID: { nil },
 		deleteDeprecatedDeviceID: {},
-		getAllMnemonics: { [] }
+		getAllMnemonics: { [] },
+		saveMobile2MobileSessionSecret: { _, _ in },
+		loadMobile2MobileSessionSecret: { _ in nil }
 	)
 	#else
 	public static let noop = Self(
@@ -47,7 +49,9 @@ extension SecureStorageClient: TestDependencyKey {
 		loadDeviceInfo: { nil },
 		saveDeviceInfo: { _ in },
 		deprecatedLoadDeviceID: { nil },
-		deleteDeprecatedDeviceID: {}
+		deleteDeprecatedDeviceID: {},
+		saveMobile2MobileSessionSecret: { _, _ in },
+		loadMobile2MobileSessionSecret: { _ in nil }
 	)
 	#endif // DEBUG
 
@@ -72,7 +76,9 @@ extension SecureStorageClient: TestDependencyKey {
 		saveDeviceInfo: unimplemented("\(Self.self).saveDeviceInfo"),
 		deprecatedLoadDeviceID: unimplemented("\(Self.self).deprecatedLoadDeviceID"),
 		deleteDeprecatedDeviceID: unimplemented("\(Self.self).deleteDeprecatedDeviceID"),
-		getAllMnemonics: unimplemented("\(Self.self).getAllMnemonics")
+		getAllMnemonics: unimplemented("\(Self.self).getAllMnemonics"),
+		saveMobile2MobileSessionSecret: unimplemented("\(Self.self).saveMobile2MobileSessionSecret"),
+		loadMobile2MobileSessionSecret: unimplemented("\(Self.self).loadMobile2MobileSessionSecret")
 	)
 	#else
 	public static let testValue = Self(
@@ -92,7 +98,9 @@ extension SecureStorageClient: TestDependencyKey {
 		loadDeviceInfo: unimplemented("\(Self.self).loadDeviceInfo"),
 		saveDeviceInfo: unimplemented("\(Self.self).saveDeviceInfo"),
 		deprecatedLoadDeviceID: unimplemented("\(Self.self).deprecatedLoadDeviceID"),
-		deleteDeprecatedDeviceID: unimplemented("\(Self.self).deleteDeprecatedDeviceID")
+		deleteDeprecatedDeviceID: unimplemented("\(Self.self).deleteDeprecatedDeviceID"),
+		saveMobile2MobileSessionSecret: unimplemented("\(Self.self).saveMobile2MobileSessionSecret"),
+		loadMobile2MobileSessionSecret: unimplemented("\(Self.self).loadMobile2MobileSessionSecret")
 	)
 	#endif
 }
