@@ -34,9 +34,14 @@ public struct App: Sendable, FeatureReducer {
 		case splash(Splash.Action)
 	}
 
+	public enum ViewAction: Sendable, Equatable {
+		case urlOpened(URL)
+	}
+
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.deepLinkHandlerClient) var deepLinkHandlerClient
 
 	public init() {}
 
@@ -54,6 +59,14 @@ public struct App: Sendable, FeatureReducer {
 				}
 		}
 		Reduce(core)
+	}
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+		switch viewAction {
+		case let .urlOpened(url):
+			deepLinkHandlerClient.handleDeepLink(url)
+			return .none
+		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {

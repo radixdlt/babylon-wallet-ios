@@ -43,25 +43,25 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 		debugPrint(userActivity.webpageURL)
 	}
 
-	public func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
-		debugPrint(URLContexts)
-	}
+//	public func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+//		debugPrint(URLContexts)
+//	}
+//
+//	public func scene(_ scene: UIScene, didUpdate userActivity: NSUserActivity) {
+//		debugPrint(userActivity)
+//	}
+//
+//	public func scene(_ scene: UIScene, restoreInteractionStateWith stateRestorationActivity: NSUserActivity) {
+//		debugPrint(stateRestorationActivity)
+//	}
 
-	public func scene(_ scene: UIScene, didUpdate userActivity: NSUserActivity) {
-		debugPrint(userActivity)
-	}
-
-	public func scene(_ scene: UIScene, restoreInteractionStateWith stateRestorationActivity: NSUserActivity) {
-		debugPrint(stateRestorationActivity)
-	}
-
-	public func scene(_ scene: UIScene, willContinueUserActivityWithType userActivityType: String) {
-		debugPrint(userActivityType)
-	}
-
-	public func sceneWillEnterForeground(_ scene: UIScene) {
-		debugPrint("Hola")
-	}
+//	public func scene(_ scene: UIScene, willContinueUserActivityWithType userActivityType: String) {
+//		debugPrint(userActivityType)
+//	}
+//
+//	public func sceneWillEnterForeground(_ scene: UIScene) {
+//		debugPrint("Hola")
+//	}
 
 	func overlayWindow(in scene: UIWindowScene) {
 		let overlayView = OverlayReducer.View(

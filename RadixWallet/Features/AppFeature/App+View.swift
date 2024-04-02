@@ -38,6 +38,9 @@ extension App {
 			}
 			.tint(.app.gray1)
 			.presentsLoadingViewOverlay()
+			.onOpenURL { url in
+				store.send(.view(.urlOpened(url)))
+			}
 		}
 	}
 }
