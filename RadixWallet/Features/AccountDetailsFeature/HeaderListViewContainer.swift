@@ -1,5 +1,5 @@
 import SwiftUI
-import SwiftUIIntrospect
+@_spi(Advanced) import SwiftUIIntrospect
 
 /**
  A component that creates a collapsible header with a list.
@@ -48,7 +48,7 @@ public struct HeaderListViewContainer<Header: View, List: View>: UIViewRepresent
 		var initialTopInset: CGFloat = 0
 		let headerController = UIHostingController(
 			rootView: self.headerView
-				.introspect(.view, on: .iOS(.v16, .v17)) { view in
+				.introspect(.view, on: .iOS(.v16...)) { view in
 					initialTopInset = view.frame.height
 					topConstraint.constant = view.frame.height
 				}
@@ -58,7 +58,7 @@ public struct HeaderListViewContainer<Header: View, List: View>: UIViewRepresent
 
 		let listController = UIHostingController(
 			rootView: self.listView
-				.introspect(.list, on: .iOS(.v16, .v17)) { tableView in
+				.introspect(.list, on: .iOS(.v16...)) { tableView in
 					observation = tableView.observe(\.contentOffset) { tableView, _ in
 						DispatchQueue.main.async {
 							let offset = tableView.contentOffset.y
@@ -83,7 +83,7 @@ public struct HeaderListViewContainer<Header: View, List: View>: UIViewRepresent
 
 							/// Make transition more prominent
 							if headerAlpha < 1 {
-								headerAlpha -= 0.3
+								headerAlpha -= 0.2
 							}
 
 							headerView.alpha = max(0, min(headerAlpha, 1))
