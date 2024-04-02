@@ -39,11 +39,11 @@ extension DeepLinkHandlerClient {
 				throw Error.missingPublicKey
 			}
 
-			guard let rawSessionId = queryItems.first(where: { $0.name == "sessionId" })?.value, let sessionID = UUID(uuidString: rawSessionId) else {
+			guard let sessionId = queryItems.first(where: { $0.name == "sessionId" })?.value else {
 				throw Error.missingSessionId
 			}
 
-			return .init(dAppOrigin: oringURL, publicKey: publicKey, sessionId: sessionID)
+			return .init(dAppOrigin: oringURL, publicKey: publicKey, sessionId: sessionId)
 		}
 
 		return DeepLinkHandlerClient(handleDeepLink: { url in

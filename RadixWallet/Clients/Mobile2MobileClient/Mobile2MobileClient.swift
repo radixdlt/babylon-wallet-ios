@@ -10,7 +10,7 @@ extension Mobile2MobileClient {
 	struct WalletConnectRequest: Sendable {
 		let dAppOrigin: URL
 		let publicKey: Curve25519.KeyAgreement.PublicKey
-		let sessionId: UUID
+		let sessionId: String
 	}
 
 	typealias HandleRequest = (WalletConnectRequest) async throws -> Void
@@ -26,17 +26,17 @@ extension Mobile2MobileClient {
 		@Dependency(\.openURL) var openURL
 		@Dependency(\.overlayWindowClient) var overlayWindowClient
 
-		func getDappReturnURL(_ dAppOrigin: URL, sessionId: UUID) async throws -> String {
+		func getDappReturnURL(_ dAppOrigin: URL) async throws -> URL {
 			let wellKnown = try await httpClient.fetchDappWellKnownFile(dAppOrigin)
 			guard let returnURL = wellKnown.callbackPath else {
 				throw Error.missingDappReturnURL
 			}
-			return dAppOrigin.absoluteString + "/" + returnURL // dAppOrigin.appending(component: returnURL)
+			return .init(string: dAppOrigin.absoluteString + returnURL)! // dAppOrigin.appending(component: returnURL)
 		}
 
 		return .init(
 			handleRequest: { request in
-				let dappReturnURL = try await getDappReturnURL(request.dAppOrigin, sessionId: request.sessionId)
+				let dappReturnURL = try await getDappReturnURL(request.dAppOrigin)
 
 				loggerGlobal.critical("Creating the Wallet Private/Public key pair")
 
@@ -64,14 +64,13 @@ extension Mobile2MobileClient {
 						.init(sharedSecret.hex)
 					}))
 
-				let returnURL = dappReturnURL + "?publicKey=\(walletPublicKey.rawRepresentation.hex)&sessionId=\(request.sessionId.uuidString)&secret=\(sharedSecret.hex)"
-				//                let returnURL = dappReturnURL.appending(queryItems: [
-				//                    .init(name: "publicKey", value: walletPublicKey.rawRepresentation.hex),
-				//                    .init(name: "sessionId", value: request.sessionId.uuidString),
-				//                    .init(name: "secret", value: sharedSecret.hex)
-				//                ])
+				let returnURL = dappReturnURL.appending(queryItems: [
+					.init(name: "publicKey", value: walletPublicKey.rawRepresentation.hex),
+					.init(name: "sessionId", value: request.sessionId),
+					.init(name: "secret", value: sharedSecret.hex),
+				])
 
-				await openURL(.init(string: returnURL)!)
+				await openURL(returnURL)
 			})
 	}
 }
