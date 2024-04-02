@@ -1107,7 +1107,6 @@
 		835F196D2B3581C300E0B71D /* UnknownDappComponents+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835F196C2B3581C300E0B71D /* UnknownDappComponents+View.swift */; };
 		836878612B4551910029C808 /* UnknownDappComponents+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 836878602B4551910029C808 /* UnknownDappComponents+Reducer.swift */; };
 		8370FC5C2B99C780007AD882 /* NPSSurveyClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8370FC5B2B99C780007AD882 /* NPSSurveyClient+Interface.swift */; };
-		8381C8AA2BBC2F4100A470B4 /* DeepLinkingClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8381C8A92BBC2F4100A470B4 /* DeepLinkingClientTests.swift */; };
 		83823EA72B722DB000827211 /* HTTPClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83823EA62B722DB000827211 /* HTTPClient+Interface.swift */; };
 		83823EAA2B72365000827211 /* TokenPriceClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83823EA92B72365000827211 /* TokenPriceClient+Interface.swift */; };
 		83856D622B0279080026452A /* VerifyMnemonic+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83856D602B0279080026452A /* VerifyMnemonic+View.swift */; };
@@ -2409,7 +2408,6 @@
 		835F196C2B3581C300E0B71D /* UnknownDappComponents+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UnknownDappComponents+View.swift"; sourceTree = "<group>"; };
 		836878602B4551910029C808 /* UnknownDappComponents+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UnknownDappComponents+Reducer.swift"; sourceTree = "<group>"; };
 		8370FC5B2B99C780007AD882 /* NPSSurveyClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NPSSurveyClient+Interface.swift"; sourceTree = "<group>"; };
-		8381C8A92BBC2F4100A470B4 /* DeepLinkingClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkingClientTests.swift; sourceTree = "<group>"; };
 		83823EA62B722DB000827211 /* HTTPClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Interface.swift"; sourceTree = "<group>"; };
 		83823EA92B72365000827211 /* TokenPriceClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Interface.swift"; sourceTree = "<group>"; };
 		83856D602B0279080026452A /* VerifyMnemonic+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "VerifyMnemonic+View.swift"; sourceTree = "<group>"; };
@@ -6858,14 +6856,6 @@
 			path = NPSSurveyClient;
 			sourceTree = "<group>";
 		};
-		8381C8A82BBC2F2E00A470B4 /* DeepLinkingClientTests */ = {
-			isa = PBXGroup;
-			children = (
-				8381C8A92BBC2F4100A470B4 /* DeepLinkingClientTests.swift */,
-			);
-			path = DeepLinkingClientTests;
-			sourceTree = "<group>";
-		};
 		83823EA52B722D9000827211 /* HTTPClient */ = {
 			isa = PBXGroup;
 			children = (
@@ -7495,7 +7485,6 @@
 		E6DBA2E02ADEBFB300A38425 /* Clients */ = {
 			isa = PBXGroup;
 			children = (
-				8381C8A82BBC2F2E00A470B4 /* DeepLinkingClientTests */,
 				48FF43132AE4364000C568B9 /* KeychainClientTests */,
 				E6DBA2E32ADEBFB300A38425 /* OnLedgerEntitiesClientTests */,
 				E6DBA2EA2ADEBFB300A38425 /* ROLAClientTests */,
@@ -7919,7 +7908,6 @@
 				E6DBA3802ADEBFB300A38425 /* ProfileStoreTests.swift in Sources */,
 				E6DBA3282ADEBFB300A38425 /* Misc+Extensions.swift in Sources */,
 				E6DBA3432ADEBFB300A38425 /* UserDefaultsClientTests.swift in Sources */,
-				8381C8AA2BBC2F4100A470B4 /* DeepLinkingClientTests.swift in Sources */,
 				E6DBA33C2ADEBFB300A38425 /* SplashFeatureTests.swift in Sources */,
 				E6DBA3342ADEBFB300A38425 /* GatewaySettingsFeatureTests.swift in Sources */,
 				E6DBA3602ADEBFB300A38425 /* ChecksummedTestVectors.swift in Sources */,

@@ -67,7 +67,7 @@ extension Mobile2MobileClient {
 				let returnURL = dappReturnURL.appending(queryItems: [
 					.init(name: "publicKey", value: walletPublicKey.rawRepresentation.hex),
 					.init(name: "sessionId", value: request.sessionId),
-					.init(name: "secret", value: sharedSecret.hex),
+					// .init(name: "secret", value: sharedSecret.hex),
 				])
 
 				await openURL(returnURL)
