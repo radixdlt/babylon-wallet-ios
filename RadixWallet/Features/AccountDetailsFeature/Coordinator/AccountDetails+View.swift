@@ -39,38 +39,11 @@ extension AccountDetails {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(spacing: .zero) {
-					AddressView(.address(.account(viewStore.accountAddress, isLedgerHWAccount: viewStore.isLedgerAccount)))
-						.foregroundColor(.app.whiteTransparent)
-						.textStyle(.body2HighImportance)
-						.padding(.bottom, .small1)
-
-					if let totalFiatWorth = viewStore.totalFiatWorth {
-						TotalCurrencyWorthView(
-							state: .init(totalCurrencyWorth: totalFiatWorth),
-							backgroundColor: .clear
-						) {
-							viewStore.send(.showFiatWorthToggled)
-						}
-						.foregroundColor(.app.white)
-						.padding(.horizontal, .medium1)
-					}
-
-					prompts(
-						mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction
-					)
-					.padding(.medium1)
-
-					HStack {
-						historyButton()
-						transferButton()
-					}
-					.padding(.top, .small1)
-
-					AssetsView.View(store: store.scope(state: \.assets, action: \.child.assets))
-						.roundedCorners(.top, radius: .medium1)
-						.ignoresSafeArea(edges: .bottom)
-				}
+				HeaderListViewContainer(
+					headerView: { header(with: viewStore) },
+					listView: { assetsView() }
+				)
+				.ignoresSafeArea(edges: .bottom)
 				.background(viewStore.appearanceID.gradient)
 				.navigationBarBackButtonHidden()
 				.task {
@@ -101,6 +74,36 @@ extension AccountDetails {
 		}
 
 		@ViewBuilder
+		func header(with viewStore: ViewStore<AccountDetails.ViewState, AccountDetails.ViewAction>) -> some SwiftUI.View {
+			AddressView(.address(.account(viewStore.accountAddress, isLedgerHWAccount: viewStore.isLedgerAccount)))
+				.foregroundColor(.app.whiteTransparent)
+				.textStyle(.body2HighImportance)
+				.padding(.bottom, .small1)
+
+			if let totalFiatWorth = viewStore.totalFiatWorth {
+				TotalCurrencyWorthView(
+					state: .init(totalCurrencyWorth: totalFiatWorth),
+					backgroundColor: .clear
+				) {
+					viewStore.send(.showFiatWorthToggled)
+				}
+				.foregroundColor(.app.white)
+				.padding(.horizontal, .medium1)
+			}
+
+			prompts(
+				mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction
+			)
+			.padding(.medium1)
+
+			HStack {
+				historyButton()
+				transferButton()
+			}
+			.padding(.top, .small1)
+		}
+
+		@ViewBuilder
 		func prompts(mnemonicHandlingCallToAction: MnemonicHandling?) -> some SwiftUI.View {
 			if let mnemonicHandlingCallToAction {
 				switch mnemonicHandlingCallToAction {
@@ -114,6 +117,12 @@ extension AccountDetails {
 					}
 				}
 			}
+		}
+
+		func assetsView() -> some SwiftUI.View {
+			AssetsView.View(store: store.scope(state: \.assets, action: \.child.assets))
+				.roundedCorners(.top, radius: .medium1)
+				.ignoresSafeArea(edges: .bottom)
 		}
 
 		func transferButton() -> some SwiftUI.View {
