@@ -4,11 +4,8 @@ extension TokenPricesClient {
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		@Dependency(\.jsonEncoder) var jsonEncoder
 		@Dependency(\.cacheClient) var cacheClient
-		#if DEBUG
-		let rootURL = URL(string: "https://dev-token-price.extratools.works")!
-		#else
+
 		let rootURL = URL(string: "https://token-price-service.radixdlt.com")!
-		#endif
 
 		@Sendable
 		func getTokenPrices(_ fetchRequest: FetchPricesRequest) async throws -> TokenPrices {
@@ -43,12 +40,14 @@ extension TokenPricesClient {
 }
 
 extension TokenPricesClient.TokenPrices {
-	fileprivate init(_ tokenPricesResponse: TokensPriceResponse) {
+	public init(_ tokenPricesResponse: TokensPriceResponse) {
 		let formatter = NumberFormatter()
+		formatter.locale = Locale(identifier: "en_US_POSIX") // Just ignore the users locale
 		formatter.numberStyle = .decimal
 		formatter.maximumFractionDigits = Int(Decimal192.maxDivisibility)
 		formatter.roundingMode = .down
-		formatter.decimalSeparator = "." // Enfore dot notation for Decimal192
+		formatter.decimalSeparator = "." // Enforce dot notation for RETDecimal
+		formatter.usesGroupingSeparator = false // No grouping separator for RETDecimal
 
 		self = tokenPricesResponse.tokens.reduce(into: [:]) { partialResult, next in
 			let trimmed = formatter.string(for: next.price) ?? ""
@@ -60,19 +59,28 @@ extension TokenPricesClient.TokenPrices {
 }
 
 // MARK: - TokensPriceResponse
-private struct TokensPriceResponse: Decodable {
+public struct TokensPriceResponse: Decodable {
 	public let tokens: [TokenPrice]
+
+	public init(tokens: [TokenPrice]) {
+		self.tokens = tokens
+	}
 }
 
 // MARK: TokensPriceResponse.TokenPrice
 extension TokensPriceResponse {
-	struct TokenPrice: Decodable {
+	public struct TokenPrice: Decodable {
 		enum CodingKeys: String, CodingKey {
 			case resourceAddress = "resource_address"
 			case price = "usd_price"
 		}
 
-		let resourceAddress: ResourceAddress
-		let price: Double
+		public let resourceAddress: ResourceAddress
+		public let price: Double
+
+		public init(resourceAddress: ResourceAddress, price: Double) {
+			self.resourceAddress = resourceAddress
+			self.price = price
+		}
 	}
 }

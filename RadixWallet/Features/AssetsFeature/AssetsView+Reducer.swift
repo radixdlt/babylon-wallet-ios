@@ -144,9 +144,10 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .portfolioUpdated(portfolio):
+		case var .portfolioUpdated(portfolio):
 			state.isLoadingResources = false
 			state.isRefreshing = false
+			portfolio.account = portfolio.account.nonEmptyVaults
 			updateFromPortfolio(state: &state, from: portfolio)
 			return .none
 		}

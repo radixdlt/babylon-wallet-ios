@@ -84,7 +84,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			await state.setSelectedCurrency(preferences.fiatCurrencyPriceTarget)
 			await state.setIsCurrencyAmountVisble(preferences.isCurrencyAmountVisible)
 
-			let accounts = try await onLedgerEntitiesClient.getAccounts(accountAddresses).map(\.nonEmptyVaults)
+			let accounts = try await onLedgerEntitiesClient.getAccounts(accountAddresses)
 
 			let portfolios = accounts.map { AccountPortfolio(account: $0) }
 			await state.handlePortfoliosUpdate(portfolios)
@@ -123,7 +123,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			await applyTokenPrices(Array(allResources), forceRefresh: forceRefresh)
 
 			// Load additional details
-			_ = await accounts.parallelMap {
+			_ = await accounts.map(\.nonEmptyVaults).parallelMap {
 				await fetchPoolAndStakeUnitsDetails($0, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
 			}
 
@@ -149,7 +149,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			)
 
 			await state.handlePortfolioUpdate(portfolio)
-			await fetchPoolAndStakeUnitsDetails(account, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
+			await fetchPoolAndStakeUnitsDetails(account.nonEmptyVaults, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
 
 			return portfolio
 		}
