@@ -3591,7 +3591,6 @@
 			children = (
 				48CFBD4D2ADC10D800E77A5C /* Coordinator */,
 				48CFBD502ADC10D800E77A5C /* ShieldCallToActionButton.swift */,
-				E7B7A0FC2BBBFB6100EEE900 /* HeaderListViewContainer.swift */,
 			);
 			path = AccountDetailsFeature;
 			sourceTree = "<group>";
@@ -5805,6 +5804,7 @@
 				83EA887D2B7E68EE00FF8424 /* TotalCurrencyWorthView.swift */,
 				A4CFB55E2BAA821E00778BDD /* HScrollBar.swift */,
 				A4CFB5602BAA826E00778BDD /* Measure+Position.swift */,
+				E7B7A0FC2BBBFB6100EEE900 /* HeaderListViewContainer.swift */,
 			);
 			path = DesignSystem;
 			sourceTree = "<group>";
