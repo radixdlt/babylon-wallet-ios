@@ -40,7 +40,7 @@ extension TokenPricesClient {
 }
 
 extension TokenPricesClient.TokenPrices {
-	fileprivate init(_ tokenPricesResponse: TokensPriceResponse) {
+	public init(_ tokenPricesResponse: TokensPriceResponse) {
 		let formatter = NumberFormatter()
 		formatter.locale = Locale(identifier: "en_US_POSIX") // Just ignore the users locale
 		formatter.numberStyle = .decimal
@@ -59,19 +59,28 @@ extension TokenPricesClient.TokenPrices {
 }
 
 // MARK: - TokensPriceResponse
-private struct TokensPriceResponse: Decodable {
+public struct TokensPriceResponse: Decodable {
 	public let tokens: [TokenPrice]
+
+	public init(tokens: [TokenPrice]) {
+		self.tokens = tokens
+	}
 }
 
 // MARK: TokensPriceResponse.TokenPrice
 extension TokensPriceResponse {
-	struct TokenPrice: Decodable {
+	public struct TokenPrice: Decodable {
 		enum CodingKeys: String, CodingKey {
 			case resourceAddress = "resource_address"
 			case price = "usd_price"
 		}
 
-		let resourceAddress: ResourceAddress
-		let price: Double
+		public let resourceAddress: ResourceAddress
+		public let price: Double
+
+		public init(resourceAddress: ResourceAddress, price: Double) {
+			self.resourceAddress = resourceAddress
+			self.price = price
+		}
 	}
 }
