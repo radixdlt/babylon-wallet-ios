@@ -1,5 +1,4 @@
 // MARK: - ImportedOlympiaWalletFailPayloadsEmpty
-
 struct ImportedOlympiaWalletFailPayloadsEmpty: Swift.Error {}
 
 // MARK: - ImportedOlympiaWalletFailInvalidWordCount

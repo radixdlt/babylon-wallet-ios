@@ -1,5 +1,4 @@
 // MARK: - Profile.Networks
-
 extension Profile {
 	/// An ordered dictionary mapping from a `Network` to an `Profile.Network`, which is a
 	/// collection of accounts, personas and connected dapps.

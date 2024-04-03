@@ -1,5 +1,4 @@
 // MARK: - AuthorizedDappDoesNotExists
-
 public struct AuthorizedDappDoesNotExists: Swift.Error {
 	public init() {}
 }

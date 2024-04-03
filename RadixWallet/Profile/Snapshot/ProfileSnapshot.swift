@@ -1,5 +1,4 @@
 // MARK: - ProfileSnapshot
-
 public struct ProfileSnapshot:
 	Sendable,
 	Hashable,

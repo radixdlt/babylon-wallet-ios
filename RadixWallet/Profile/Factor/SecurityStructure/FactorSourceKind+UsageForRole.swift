@@ -1,5 +1,4 @@
 // MARK: - SupportedUsageForRole
-
 public enum SupportedUsageForRole: Sendable, Hashable {
 	/// Either alone or combined with other
 	case aloneOrWhenCombinedWithOther

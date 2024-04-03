@@ -1,5 +1,4 @@
 // MARK: - ExpectedAccountGotPersona
-
 struct ExpectedAccountGotPersona: Swift.Error {}
 
 // MARK: - ExpectedPersonaGotAccount

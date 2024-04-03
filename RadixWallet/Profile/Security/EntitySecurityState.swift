@@ -1,5 +1,4 @@
 // MARK: - EntitySecurityState
-
 /// Security state of an entity (Account/Persona).
 public enum EntitySecurityState:
 	Sendable,

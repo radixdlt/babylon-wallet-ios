@@ -1,5 +1,4 @@
 // MARK: - Profile.Network.Account.AppearanceID
-
 extension Profile.Network.Account {
 	/// An identifier for a certain User Interface rendered appearance for a account (or accounts
 	/// if user has many accounts, since we recycle them).

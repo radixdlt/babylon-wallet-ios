@@ -1,5 +1,4 @@
 // MARK: - Profile.Network
-
 extension Profile {
 	// MARK: - Profile.Network
 	/// **For a given network**: a list of accounts, personas and connected dApps.

@@ -1,5 +1,4 @@
 // MARK: - UnsecuredEntityControl
-
 /// Basic security control of an unsecured entity. When said entity
 /// is "securified" it will no longer be controlled by this `UnsecuredEntityControl`
 /// but rather by an `AccessControl`. It is a name space holding the
