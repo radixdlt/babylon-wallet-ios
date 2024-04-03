@@ -55,7 +55,7 @@ extension Home.AccountRow {
 			self.mnemonicHandlingCallToAction = state.mnemonicHandlingCallToAction
 
 			// Resources
-			guard let accountWithResources = state.accountWithResources.wrappedValue else {
+			guard let accountWithResources = state.accountWithResources.wrappedValue?.nonEmptyVaults else {
 				self.fungibleResourceIcons = []
 				self.nonFungibleResourcesCount = 0
 				self.stakedValidatorsCount = 0

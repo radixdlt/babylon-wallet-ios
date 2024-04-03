@@ -74,3 +74,16 @@ extension NonFungibleLocalId {
 		}
 	}
 }
+
+extension TXID {
+	public func formatted(_ format: AddressFormat = .default) -> String {
+		let str = asStr()
+
+		switch format {
+		case .default:
+			return str.truncatedMiddle(keepFirst: 4, last: 6)
+		case .full, .raw:
+			return str
+		}
+	}
+}
