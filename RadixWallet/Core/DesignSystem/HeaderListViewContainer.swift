@@ -103,9 +103,9 @@ public struct HeaderListViewContainer<Header: View, List: View>: UIViewRepresent
 		var listController: UIHostingController<AnyView>
 
 		init(
-            headerController: UIHostingController<AnyView>,
-            listController: UIHostingController<AnyView>
-        ) {
+			headerController: UIHostingController<AnyView>,
+			listController: UIHostingController<AnyView>
+		) {
 			self.headerController = headerController
 			self.listController = listController
 		}
