@@ -103,7 +103,7 @@ extension TransactionHistoryClient {
 					throw MissingIntentHash()
 				}
 
-				let txid = try IntentHash(string: hash)
+				let txid = try IntentHash(hash)
 
 				let manifestClass = info.manifestClasses?.first
 
