@@ -133,7 +133,7 @@ extension AccountPortfoliosClient: DependencyKey {
 				cacheClient.removeFolder(.onLedgerEntity(.account(accountAddress.asGeneral)))
 			}
 
-			let account = try await onLedgerEntitiesClient.getAccount(accountAddress)
+			let account = try await onLedgerEntitiesClient.getAccount(accountAddress).nonEmptyVaults
 			let portfolio = AccountPortfolio(account: account)
 
 			let currentResources = await state.tokenPrices.keys
