@@ -56,16 +56,17 @@ extension AccountDetails {
 						.padding(.horizontal, .medium1)
 					}
 
-					prompts(
-						mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction
-					)
-					.padding(.medium1)
-
-					HStack {
+					HStack(spacing: .medium3) {
 						historyButton()
 						transferButton()
 					}
-					.padding(.top, .small1)
+					.padding(.top, .large2)
+					.padding([.horizontal, .bottom], .medium1)
+
+					prompts(
+						mnemonicHandlingCallToAction: viewStore.mnemonicHandlingCallToAction
+					)
+					.padding([.horizontal, .bottom], .medium1)
 
 					AssetsView.View(store: store.scope(state: \.assets, action: \.child.assets))
 						.roundedCorners(.top, radius: .medium1)
@@ -147,12 +148,11 @@ public struct HeaderButtonStyle: ButtonStyle {
 	public func makeBody(configuration: ButtonStyle.Configuration) -> some View {
 		configuration.label
 			.textStyle(.body1Header)
+			.frame(maxWidth: .infinity)
 			.foregroundColor(.app.white)
-			.padding(.horizontal, .large2)
 			.frame(height: .standardButtonHeight)
 			.background(.app.whiteTransparent3)
 			.cornerRadius(.standardButtonHeight / 2)
-			.padding(.bottom, .medium1)
 			.opacity(configuration.isPressed ? 0.4 : 1)
 	}
 }
