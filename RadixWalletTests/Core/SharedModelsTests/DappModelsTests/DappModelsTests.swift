@@ -113,7 +113,7 @@ final class ToDappResponseTests: TestCase {
 					))
 				),
 				metadata: .init(
-					version: 1, networkId: 34,
+					version: 1, networkId: NetworkID.hammunet,
 					origin: "radixdlt.dashboard.com",
 					dAppDefinitionAddress: "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"
 				)
@@ -146,18 +146,15 @@ final class ToDappResponseTests: TestCase {
 				items: .transaction(.init(
 					send: .init(
 						version: 1,
-						transactionManifest: .init(
-							instructions: .fromInstructions(
-								instructions: [],
-								networkId: Radix.Gateway.default.network.id.rawValue
-							),
-							blobs: []
+						transactionManifest: TransactionManifest(
+							instructionsString: "",
+							networkID: Radix.Gateway.default.network.id
 						),
 						message: "MSG"
 					)
 				)),
 				metadata: .init(
-					version: 1, networkId: 34,
+					version: 1, networkId: NetworkID.hammunet,
 					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
 					dAppDefinitionAddress: "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"
 				)
@@ -191,7 +188,7 @@ final class ToDappResponseTests: TestCase {
 				))),
 				metadata: .init(
 					version: 1,
-					networkId: 34,
+					networkId: NetworkID.hammunet,
 					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
 					dAppDefinitionAddress: "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"
 				)
@@ -226,7 +223,7 @@ final class ToDappResponseTests: TestCase {
 				))),
 				metadata: .init(
 					version: 1,
-					networkId: 34,
+					networkId: NetworkID.hammunet,
 					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
 					dAppDefinitionAddress: "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"
 				)
@@ -261,7 +258,7 @@ final class ToDappResponseTests: TestCase {
 				))),
 				metadata: .init(
 					version: 1,
-					networkId: 34,
+					networkId: NetworkID.hammunet,
 					origin: "https://dashboard-pr-126.rdx-works-main.extratools.works",
 					dAppDefinitionAddress: "account_tdx_21_12yth59wfyl8e4axupym0c96g9heuf5j06lv2lgc2cuapzlmj6alzzn"
 				)
@@ -383,12 +380,5 @@ final class ToDappResponseTests: TestCase {
 extension HexCodable32Bytes: ExpressibleByStringLiteral {
 	public init(stringLiteral: String) {
 		try! self.init(hex: stringLiteral)
-	}
-}
-
-// MARK: - IdentityAddress + ExpressibleByExtendedGraphemeClusterLiteral, ExpressibleByUnicodeScalarLiteral, ExpressibleByStringLiteral
-extension IdentityAddress: ExpressibleByExtendedGraphemeClusterLiteral & ExpressibleByUnicodeScalarLiteral & ExpressibleByStringLiteral {
-	public init(stringLiteral: String) {
-		try! self.init(validatingAddress: stringLiteral)
 	}
 }

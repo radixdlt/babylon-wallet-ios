@@ -1213,8 +1213,6 @@
 		E6DBA3212ADEBFB300A38425 /* WebSocketClientMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2652ADEBFB200A38425 /* WebSocketClientMock.swift */; };
 		E6DBA3222ADEBFB300A38425 /* RadixConnectJSONValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2662ADEBFB200A38425 /* RadixConnectJSONValues.swift */; };
 		E6DBA3232ADEBFB300A38425 /* RadixConnectModelsTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2682ADEBFB200A38425 /* RadixConnectModelsTest.swift */; };
-		E6DBA3242ADEBFB300A38425 /* TransactionManifestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA26A2ADEBFB200A38425 /* TransactionManifestTests.swift */; };
-		E6DBA3252ADEBFB300A38425 /* DecimalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA26B2ADEBFB200A38425 /* DecimalTests.swift */; };
 		E6DBA3262ADEBFB300A38425 /* TestFixture.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA26D2ADEBFB200A38425 /* TestFixture.swift */; };
 		E6DBA3272ADEBFB300A38425 /* MockURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA26E2ADEBFB200A38425 /* MockURLProtocol.swift */; };
 		E6DBA3282ADEBFB300A38425 /* Misc+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA26F2ADEBFB200A38425 /* Misc+Extensions.swift */; };
@@ -2483,8 +2481,6 @@
 		E6DBA2652ADEBFB200A38425 /* WebSocketClientMock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebSocketClientMock.swift; sourceTree = "<group>"; };
 		E6DBA2662ADEBFB200A38425 /* RadixConnectJSONValues.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadixConnectJSONValues.swift; sourceTree = "<group>"; };
 		E6DBA2682ADEBFB200A38425 /* RadixConnectModelsTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadixConnectModelsTest.swift; sourceTree = "<group>"; };
-		E6DBA26A2ADEBFB200A38425 /* TransactionManifestTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TransactionManifestTests.swift; sourceTree = "<group>"; };
-		E6DBA26B2ADEBFB200A38425 /* DecimalTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DecimalTests.swift; sourceTree = "<group>"; };
 		E6DBA26D2ADEBFB200A38425 /* TestFixture.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestFixture.swift; sourceTree = "<group>"; };
 		E6DBA26E2ADEBFB200A38425 /* MockURLProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockURLProtocol.swift; sourceTree = "<group>"; };
 		E6DBA26F2ADEBFB200A38425 /* Misc+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Misc+Extensions.swift"; sourceTree = "<group>"; };
@@ -2632,7 +2628,6 @@
 				E6DBA2E02ADEBFB300A38425 /* Clients */,
 				E6DBA3102ADEBFB300A38425 /* Core */,
 				E6DBA2A82ADEBFB300A38425 /* CryptographyTests */,
-				E6DBA2692ADEBFB200A38425 /* EngineKitTests */,
 				E6DBA2732ADEBFB200A38425 /* Features */,
 				E6DBA2992ADEBFB300A38425 /* PreludeTests */,
 				E6DBA2CD2ADEBFB300A38425 /* ProfileTests */,
@@ -6989,15 +6984,6 @@
 			path = RadixConnectModelsTests;
 			sourceTree = "<group>";
 		};
-		E6DBA2692ADEBFB200A38425 /* EngineKitTests */ = {
-			isa = PBXGroup;
-			children = (
-				E6DBA26A2ADEBFB200A38425 /* TransactionManifestTests.swift */,
-				E6DBA26B2ADEBFB200A38425 /* DecimalTests.swift */,
-			);
-			path = EngineKitTests;
-			sourceTree = "<group>";
-		};
 		E6DBA26C2ADEBFB200A38425 /* TestExtensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -7764,7 +7750,6 @@
 				E6DBA3232ADEBFB300A38425 /* RadixConnectModelsTest.swift in Sources */,
 				E6DBA3822ADEBFB300A38425 /* FactorSourcesClientLiveTests.swift in Sources */,
 				E6DBA3852ADEBFB300A38425 /* FaucetClientTests.swift in Sources */,
-				E6DBA3252ADEBFB300A38425 /* DecimalTests.swift in Sources */,
 				E6DBA3222ADEBFB300A38425 /* RadixConnectJSONValues.swift in Sources */,
 				E6DBA31E2ADEBFB300A38425 /* DataChannelMocks.swift in Sources */,
 				E6DBA36C2ADEBFB300A38425 /* SnapshotHeaderTests.swift in Sources */,
@@ -7807,7 +7792,6 @@
 				E6DBA37E2ADEBFB300A38425 /* CacheClientTests.swift in Sources */,
 				E6DBA33B2ADEBFB300A38425 /* MainFeatureTests.swift in Sources */,
 				48581B2F2B0206E600F885C0 /* TestUtils.swift in Sources */,
-				E6DBA3242ADEBFB300A38425 /* TransactionManifestTests.swift in Sources */,
 				E6DBA35B2ADEBFB300A38425 /* PasswordBasedKeyDerivationTests.swift in Sources */,
 				E6DBA3272ADEBFB300A38425 /* MockURLProtocol.swift in Sources */,
 				E6DBA33D2ADEBFB300A38425 /* NewConnectionFeatureTests.swift in Sources */,

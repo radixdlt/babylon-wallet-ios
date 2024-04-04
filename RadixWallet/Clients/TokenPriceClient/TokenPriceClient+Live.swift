@@ -46,8 +46,8 @@ extension TokenPricesClient.TokenPrices {
 		formatter.numberStyle = .decimal
 		formatter.maximumFractionDigits = Int(Decimal192.maxDivisibility)
 		formatter.roundingMode = .down
-		formatter.decimalSeparator = "." // Enforce dot notation for RETDecimal
-		formatter.usesGroupingSeparator = false // No grouping separator for RETDecimal
+		formatter.decimalSeparator = "." // Enforce dot notation for Decimal192
+		formatter.usesGroupingSeparator = false // No grouping separator for Decimal192
 
 		self = tokenPricesResponse.tokens.reduce(into: [:]) { partialResult, next in
 			let trimmed = formatter.string(for: next.price) ?? ""
