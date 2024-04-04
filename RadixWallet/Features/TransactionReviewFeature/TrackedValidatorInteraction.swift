@@ -25,14 +25,6 @@ extension Collection where Element: TrackedValidatorInteraction {
 }
 
 // MARK: - TrackedValidatorStake + TrackedValidatorInteraction
-//// MARK: - TrackedValidatorUnstake + TrackedValidatorInteraction
-// extension TrackedValidatorUnstake: TrackedValidatorInteraction {
-//	public mutating func add(_ other: Self) {
-//		guard isCompatible(with: other) else { return }
-//		liquidStakeUnitAmount += other.liquidStakeUnitAmount
-//	}
-// }
-
 extension TrackedValidatorStake: TrackedValidatorInteraction {
 	public mutating func add(_ other: Self) {
 		guard isCompatible(with: other) else { return }

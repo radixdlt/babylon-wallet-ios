@@ -47,7 +47,7 @@ extension FaucetClient: DependencyKey {
 				.init(
 					networkID: networkID,
 					manifest: manifest,
-					message: .none,
+					message: Message.none,
 					makeTransactionHeaderInput: .default,
 					transactionSigners: .init(notaryPublicKey: ephemeralNotary.publicKey, intentSigning: .notaryIsSignatory)
 				)
@@ -102,39 +102,39 @@ extension FaucetClient: DependencyKey {
 
 			// Done
 		}
-
-		#if DEBUG
-		let createFungibleToken: CreateFungibleToken = { request in
-			// TODO: Re-enable. With new manifest builder that is not easy to handle.
-			let manifest = if request.numberOfTokens == 1 {
-				try TransactionManifest.createFungibleToken(
-					addressOfOwner: request.recipientAccountAddress
-				)
-			} else {
-				try TransactionManifest.createMultipleFungibleTokens(
-					addressOfOwner: request.recipientAccountAddress
-				)
-			}
-
-			try await signSubmitTX(manifest: manifest)
-		}
-
-		let createNonFungibleToken: CreateNonFungibleToken = { _ in
-			fatalError()
-			// TODO: Re-enable. With new manifest builder that is not easy to handle.
-		}
-
-		return Self(
-			getFreeXRD: getFreeXRD,
-			isAllowedToUseFaucet: isAllowedToUseFaucet,
-			createFungibleToken: createFungibleToken,
-			createNonFungibleToken: createNonFungibleToken
-		)
-		#else
+//
+//		#if DEBUG
+//		let createFungibleToken: CreateFungibleToken = { request in
+//			// TODO: Re-enable. With new manifest builder that is not easy to handle.
+//			let manifest = if request.numberOfTokens == 1 {
+//				try TransactionManifest.createFungibleToken(
+//					addressOfOwner: request.recipientAccountAddress
+//				)
+//			} else {
+//				try TransactionManifest.createMultipleFungibleTokens(
+//					addressOfOwner: request.recipientAccountAddress
+//				)
+//			}
+//
+//			try await signSubmitTX(manifest: manifest)
+//		}
+//
+//		let createNonFungibleToken: CreateNonFungibleToken = { _ in
+//			fatalError()
+//			// TODO: Re-enable. With new manifest builder that is not easy to handle.
+//		}
+//
+//		return Self(
+//			getFreeXRD: getFreeXRD,
+//			isAllowedToUseFaucet: isAllowedToUseFaucet,
+//			createFungibleToken: createFungibleToken,
+//			createNonFungibleToken: createNonFungibleToken
+//		)
+//		#else
 		return Self(
 			getFreeXRD: getFreeXRD,
 			isAllowedToUseFaucet: isAllowedToUseFaucet
 		)
-		#endif // DEBUG
+//		#endif // DEBUG
 	}()
 }

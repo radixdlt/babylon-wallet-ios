@@ -101,7 +101,7 @@ extension AssetsTransfersRecipient {
 	}
 
 	var address: AccountAddress {
-		id
+		accountAddress
 	}
 
 	var isUserAccount: Bool {

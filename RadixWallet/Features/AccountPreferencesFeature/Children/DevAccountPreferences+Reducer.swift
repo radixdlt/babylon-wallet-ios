@@ -150,12 +150,9 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 
 		case .createFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
-				let accountAddress = try await accountsClient.getAccountByAddress(accountAddress)
-
 				let manifest = try TransactionManifest.createFungibleToken(
-					addressOfOwner: accountAddress.address
+					addressOfOwner: accountAddress
 				)
-
 				await send(.internal(.reviewTransaction(manifest)))
 			} catch: { error, _ in
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")

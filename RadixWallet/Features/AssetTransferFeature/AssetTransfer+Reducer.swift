@@ -177,7 +177,7 @@ extension AssetTransfer {
 			let resourceAddress = perAsset.address
 
 			let transfers: [PerAssetFungibleTransfer] = try await perAsset.accounts.asyncMap { transfer in
-				let useTryDepositOrAbort = try await useTryAbortOrDeposit(
+				let useTryDepositOrAbort = try await useTryDepositOrAbort(
 					resource: resourceAddress,
 					into: transfer.recipient
 				)
@@ -202,7 +202,7 @@ extension AssetTransfer {
 		let nonFungibles: [PerAssetTransfersOfNonFungibleResource] = try await _involvedNonFungibles.asyncMap { perAsset in
 			let resourceAddress = perAsset.address
 			let transfers: [PerAssetNonFungibleTransfer] = try await perAsset.accounts.asyncMap { transfer in
-				let useTryDepositOrAbort = try await useTryAbortOrDeposit(
+				let useTryDepositOrAbort = try await useTryDepositOrAbort(
 					resource: resourceAddress,
 					into: transfer.recipient
 				)
@@ -229,12 +229,10 @@ extension AssetTransfer {
 	}
 }
 
-func useTryAbortOrDeposit(
+func useTryDepositOrAbort(
 	resource: ResourceAddress,
 	into receivingAccount: AssetsTransfersRecipient
 ) async throws -> Bool {
-	let recipientAddress = receivingAccount.address
-
 	if case let .myOwnAccount(sargonUserAccount) = receivingAccount {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.accountsClient) var accountsClient
