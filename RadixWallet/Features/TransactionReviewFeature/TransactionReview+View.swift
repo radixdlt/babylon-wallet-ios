@@ -20,7 +20,7 @@ extension View {
 extension TransactionReview.State {
 	var viewState: TransactionReview.ViewState {
 		.init(
-			message: message?.plaintext,
+			message: message.plaintext,
 			isExpandedDappUsed: dAppsUsed?.isExpanded == true,
 			isExpandedContributingToPools: contributingToPools?.isExpanded == true,
 			isExpandedRedeemingFromPools: redeemingFromPools?.isExpanded == true,
