@@ -28,7 +28,7 @@ extension NewPersonaInfo {
 			self.subtitleText = L10n.CreatePersona.NameNewPersona.subtitle
 			self.entityName = state.inputtedName
 
-			let defaultHint: Hint = .info(L10n.CreateEntity.NameNewEntity.explanation)
+			let defaultHint: Hint = .info(L10n.CreatePersona.Explanation.thisWillBeShared)
 			if let sanitizedName = state.sanitizedName {
 				if sanitizedName.count > Profile.Network.Account.nameMaxLength {
 					self.sanitizedNameRequirement = nil
