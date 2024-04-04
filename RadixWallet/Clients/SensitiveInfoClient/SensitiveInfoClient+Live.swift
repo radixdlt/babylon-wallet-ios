@@ -12,7 +12,7 @@ extension SensitiveInfoClient: DependencyKey {
 					return nil
 				}
 				if value.starts(with: "placeholder") {
-					assertionFailure("Please set up your sensitive info tokens in 'SensitiveInfo.plist'")
+					loggerGlobal.warning("Please set up your sensitive info tokens in 'SensitiveInfo.plist'")
 				}
 				return value
 			}
