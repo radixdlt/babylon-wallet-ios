@@ -11,4 +11,11 @@ public final class AppDelegate: NSObject, UIApplicationDelegate {
 		sceneConfig.delegateClass = SceneDelegate.self
 		return sceneConfig
 	}
+
+	public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+		@Dependency(\.appsFlyerClient) var appsFlyerClient
+		appsFlyerClient.start()
+
+		return true
+	}
 }
