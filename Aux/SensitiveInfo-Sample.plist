@@ -4,7 +4,7 @@
 <dict>
 	<key>APPS_FLYER_APP_ID</key>
 	<string>placeholder</string>
-    <key>APPS_FLYER_DEV_KEY</key>
-    <string>placeholder</string>
+	<key>APPS_FLYER_DEV_KEY</key>
+	<string>placeholder</string>
 </dict>
 </plist>
