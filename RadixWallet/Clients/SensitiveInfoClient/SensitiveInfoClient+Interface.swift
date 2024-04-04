@@ -5,7 +5,7 @@ struct SensitiveInfoClient: Sendable {
 
 // MARK: SensitiveInfoClient.Read
 extension SensitiveInfoClient {
-	typealias Read = @Sendable (_ key: Key) -> String
+	typealias Read = @Sendable (_ key: Key) -> String?
 }
 
 extension DependencyValues {
