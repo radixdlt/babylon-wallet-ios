@@ -42,7 +42,7 @@ extension LedgerIdentifiable {
 		public func formatted(_ format: AddressFormat = .default) -> String {
 			switch self {
 			case let .transaction(txId):
-				txId.bech32EncodedTxId
+				txId.formatted(format)
 			case let .nonFungibleGlobalID(nonFungibleGlobalId):
 				nonFungibleGlobalId.formatted(format)
 			}
