@@ -28,7 +28,7 @@ extension SecureStorageClient: TestDependencyKey {
 		deprecatedLoadDeviceID: { nil },
 		deleteDeprecatedDeviceID: {},
 		getAllMnemonics: { [] },
-		saveMobile2MobileSessionSecret: { _, _ in },
+		saveMobile2MobileSessionSecret: { _ in },
 		loadMobile2MobileSessionSecret: { _ in nil }
 	)
 	#else
@@ -50,7 +50,7 @@ extension SecureStorageClient: TestDependencyKey {
 		saveDeviceInfo: { _ in },
 		deprecatedLoadDeviceID: { nil },
 		deleteDeprecatedDeviceID: {},
-		saveMobile2MobileSessionSecret: { _, _ in },
+		saveMobile2MobileSessionSecret: { _ in },
 		loadMobile2MobileSessionSecret: { _ in nil }
 	)
 	#endif // DEBUG

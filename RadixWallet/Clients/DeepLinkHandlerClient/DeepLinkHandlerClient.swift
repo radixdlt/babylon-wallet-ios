@@ -33,8 +33,7 @@ extension DeepLinkHandlerClient {
 				throw Error.missingRequestOrigin
 			}
 
-			guard let rawPublicKey = queryItems.first(where: { $0.name == "publicKey" })?.value,
-			      let publicKey = try? Curve25519.KeyAgreement.PublicKey(rawRepresentation: HexCodable32Bytes(hex: rawPublicKey).data.data)
+			guard let publicKey = queryItems.first(where: { $0.name == "publicKey" })?.value
 			else {
 				throw Error.missingPublicKey
 			}
@@ -43,7 +42,7 @@ extension DeepLinkHandlerClient {
 				throw Error.missingSessionId
 			}
 
-			return .init(dAppOrigin: oringURL, publicKey: publicKey, sessionId: sessionId)
+			return .init(dAppOrigin: oringURL, publicKeyHex: publicKey, sessionId: sessionId)
 		}
 
 		return DeepLinkHandlerClient(handleDeepLink: { url in
