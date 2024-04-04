@@ -64,5 +64,5 @@ After the above setup, you are good to go with building and running the app on i
 
 [rbenv]: https://github.com/rbenv/rbenv
 [bundler]: https://bundler.io
-[general_secrets]: https://rdx.works
+[general_secrets]: https://start.1password.com/open/i?a=JWO4INKPOFHCDMZ2CYQMY4DRY4&v=btoakzspnaugf5miuybcfh5fey&i=hb34e2be37ep5cym3vo7fuvsu4&h=rdxworks.1password.com
 [fastlane_secrets]: https://start.1password.com/open/i?a=JWO4INKPOFHCDMZ2CYQMY4DRY4&v=btoakzspnaugf5miuybcfh5fey&i=xpfwvtmc65hbja4xwujp2e6vfq&h=rdxworks.1password.com
