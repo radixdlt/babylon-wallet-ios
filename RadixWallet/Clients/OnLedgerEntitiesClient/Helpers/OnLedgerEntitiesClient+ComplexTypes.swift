@@ -1,6 +1,5 @@
 import Foundation
 import Sargon
-import SargonUniFFI
 
 extension OnLedgerEntitiesClient {
 	struct ResourceEntityNotFound: Swift.Error {

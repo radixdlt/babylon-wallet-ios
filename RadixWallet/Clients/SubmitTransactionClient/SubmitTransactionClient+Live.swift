@@ -1,4 +1,4 @@
-import SargonUniFFI
+import Sargon
 
 // MARK: - SubmitTransactionClient + DependencyKey
 extension SubmitTransactionClient: DependencyKey {
@@ -7,12 +7,12 @@ extension SubmitTransactionClient: DependencyKey {
 	public static let liveValue: Self = {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
-		let hasTXBeenCommittedSuccessfully: HasTXBeenCommittedSuccessfully = { txID in
+		let hasTXBeenCommittedSuccessfully: HasTXBeenCommittedSuccessfully = { intentHash in
 			@Dependency(\.continuousClock) var clock
 
 			@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatusResponse {
 				let txStatusRequest = GatewayAPI.TransactionStatusRequest(
-					intentHash: txID.bech32EncodedTxId
+					intentHash: intentHash.toRawString()
 				)
 				let txStatusResponse = try await gatewayAPIClient.transactionStatus(txStatusRequest)
 				return txStatusResponse

@@ -1,12 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension AddressProtocol {
-	public var isOnMainnet: Bool {
-		self.networkID == .mainnet
-	}
-}
-
 // MARK: - AssetsView.View
 extension AssetsView {
 	public typealias ViewState = State

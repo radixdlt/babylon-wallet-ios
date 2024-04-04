@@ -663,7 +663,7 @@ extension TransactionReview {
 			return .none
 		}
 		guard let networkID = state.networkID else {
-			"Bad implementation, expected `networkID`"
+			assertionFailure("Bad implementation, expected `networkID`")
 			return .none
 		}
 
@@ -682,8 +682,7 @@ extension TransactionReview {
 	func showRawTransaction(_ state: inout State) -> Effect<Action> {
 		do {
 			let manifest = try transactionManifestWithWalletInstructionsAdded(state)
-			let rawTransaction = try manifest.instructionsString
-			state.displayMode = .raw(rawTransaction)
+			state.displayMode = .raw(manifest.instructionsString)
 		} catch {
 			errorQueue.schedule(error)
 		}
@@ -698,22 +697,13 @@ extension TransactionReview {
 
 		var manifest = reviewedTransaction.transactionManifest
 		if case let .success(feePayerAccount) = reviewedTransaction.feePayer.unwrap()?.account {
-			do {
-				manifest = try reviewedTransaction.transactionManifest.modify(
-					lockFee: reviewedTransaction.transactionFee.totalFee.lockFee,
-					addressOfFeePayer: feePayerAccount.address
-				)
-			} catch {
-				loggerGlobal.error("Failed to add lock fee, error: \(error)")
-				throw FailedToAddLockFee(underlyingError: error)
-			}
+			manifest = reviewedTransaction.transactionManifest.modify(
+				lockFee: reviewedTransaction.transactionFee.totalFee.lockFee,
+				addressOfFeePayer: feePayerAccount.address
+			)
 		}
-		do {
-			return try manifest.modify(addGuarantees: state.allGuarantees)
-		} catch {
-			loggerGlobal.error("Failed to add guarantee, error: \(error)")
-			throw FailedToAddGuarantee(underlyingError: error)
-		}
+
+		return manifest.modify(addGuarantees: state.allGuarantees)
 	}
 
 	func determineFeePayer(_ state: State, reviewedTransaction: ReviewedTransaction) -> Effect<Action> {

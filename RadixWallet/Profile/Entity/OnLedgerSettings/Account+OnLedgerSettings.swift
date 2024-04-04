@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - Profile.Network.Account.OnLedgerSettings
 extension Profile.Network.Account {
 	public struct OnLedgerSettings: Hashable, Sendable, Codable {
@@ -189,7 +191,7 @@ extension Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositorA
 
 		case let .nonFungibleGlobalID(id):
 			try container.encode(Discriminator.nonFungibleGlobalID, forKey: .discriminator)
-			try container.encode(id.description, forKey: .value)
+			try container.encode(id.toRawString(), forKey: .value)
 		}
 	}
 }
