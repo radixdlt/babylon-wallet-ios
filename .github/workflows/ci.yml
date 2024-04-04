@@ -177,7 +177,7 @@ jobs:
           xcode-version: "15.3.0"
 
       - name: "Set up ruby"
-        uses: RDXWorks-actions/setup-ruby@master
+        uses: RDXWorks-actions/setup-ruby@master-upgrade-to-v1-171-0
         with:
           ruby-version: 3.1.2
           bundler-cache: true
