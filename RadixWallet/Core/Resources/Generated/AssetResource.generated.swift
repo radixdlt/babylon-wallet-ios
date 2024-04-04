@@ -29,6 +29,7 @@ public enum AssetResource {
   public static let iconPlusCircle = ImageAsset(name: "icon-plus-circle")
   public static let addAccount = ImageAsset(name: "addAccount")
   public static let addMessage = ImageAsset(name: "addMessage")
+  public static let chooseAccount = ImageAsset(name: "chooseAccount")
   public static let transfer = ImageAsset(name: "transfer")
   public static let fungibleTokens = ImageAsset(name: "fungible-tokens")
   public static let nonfungbileTokens = ImageAsset(name: "nonfungbile-tokens")
