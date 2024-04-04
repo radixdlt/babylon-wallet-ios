@@ -72,7 +72,7 @@ extension TransactionReview {
 				networkID: networkID
 			)
 
-			let dAppAddresses = summary.encounteredComponentAddresses
+			let dAppAddresses = summary.encounteredComponentAddresses.filter(\.isGlobal)
 			let dAppsUsed: TransactionReviewDappsUsed.State? = try await extractDapps(
 				componentAddresses: dAppAddresses,
 				unknownTitle: L10n.TransactionReview.unknownComponents
