@@ -6,8 +6,14 @@ extension AppsFlyerClient: DependencyKey {
 
 		return .init(
 			start: {
-				AppsFlyerLib.shared().appsFlyerDevKey = sensitiveInfoClient.read(.appsFlyerDevKey)
-				AppsFlyerLib.shared().appleAppID = sensitiveInfoClient.read(.appsFlyerAppId)
+				guard
+					let devKey = sensitiveInfoClient.read(.appsFlyerDevKey),
+					let appId = sensitiveInfoClient.read(.appsFlyerAppId)
+				else {
+					return
+				}
+				AppsFlyerLib.shared().appsFlyerDevKey = devKey
+				AppsFlyerLib.shared().appleAppID = appId
 
 				#if DEBUG
 				AppsFlyerLib.shared().isDebug = true
