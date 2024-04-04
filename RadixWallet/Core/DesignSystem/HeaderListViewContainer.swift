@@ -52,22 +52,53 @@ public struct HeaderListViewContainer<Header: View, List: View>: UIViewRepresent
 				.introspect(.list, on: .iOS(.v16...)) { tableView in
 					observation = tableView.observe(\.contentOffset) { tableView, _ in
 						DispatchQueue.main.async {
-							guard let topConstraint = context.coordinator.topConstraint else { return }
+							guard
+								!context.coordinator.isAnimating,
+								let topConstraint = context.coordinator.topConstraint
+							else { return }
 
 							let initialTopInset = context.coordinator.initialTopInset
-							let headerHight = context.coordinator.headerController.view.bounds.height
+							let headerHeight = context.coordinator.headerController.view.bounds.height
 							let offset = tableView.contentOffset.y
 
 							/// Threshold to avoid setting constraints too frequently
 							let offsetThreshold: CGFloat = 0.5
 
 							if abs(offset) > offsetThreshold {
-								topConstraint.constant = min(max(0, topConstraint.constant - offset), headerHight)
+								topConstraint.constant = min(max(0, topConstraint.constant - offset), headerHeight)
+							} else {
+								/// Threshold to control scroll sensitivity
+								let velocityThreshold: Double = 900
+								let velocity = tableView.panGestureRecognizer.velocity(in: tableView.superview).y
+
+								let shouldScrollUp = velocity < -velocityThreshold && topConstraint.constant > 0
+								let shouldScrollDown = velocity > velocityThreshold && topConstraint.constant < initialTopInset
+
+								/// Update the list view's top constraint animated
+								if shouldScrollUp || shouldScrollDown {
+									let newTopConstraintConstant = shouldScrollUp ? 0 : initialTopInset
+									topConstraint.constant = newTopConstraintConstant
+
+									/// Extend the list view's height to prevent it from shrinking mid-animation
+									if shouldScrollDown {
+										context.coordinator.bottomConstraint?.constant = context.coordinator.listController.view.bounds.height
+									}
+
+									context.coordinator.isAnimating = true
+									tableView.isScrollEnabled = false
+									UIView.animate(withDuration: 0.3, animations: {
+										context.coordinator.headerController.view.superview?.layoutIfNeeded()
+									}, completion: { _ in
+										context.coordinator.isAnimating = false
+										tableView.isScrollEnabled = true
+										context.coordinator.bottomConstraint?.constant = 0
+									})
+								}
 							}
 
 							/// Reset `contentOffset` in order to avoid scroll when `listView` is not fully expanded
 							let shouldResetOffset = topConstraint.constant > 0
-								&& topConstraint.constant < headerHight
+								&& topConstraint.constant < headerHeight
 								&& abs(offset) > offsetThreshold
 							if shouldResetOffset {
 								tableView.contentOffset.y = 0
@@ -98,7 +129,9 @@ public struct HeaderListViewContainer<Header: View, List: View>: UIViewRepresent
 
 	public class Coordinator: NSObject {
 		var topConstraint: NSLayoutConstraint?
+		var bottomConstraint: NSLayoutConstraint?
 		var initialTopInset: CGFloat = 0
+		var isAnimating = false
 		var headerController: UIHostingController<AnyView>
 		var listController: UIHostingController<AnyView>
 
@@ -134,10 +167,11 @@ public struct HeaderListViewContainer<Header: View, List: View>: UIViewRepresent
 		listView.translatesAutoresizingMaskIntoConstraints = false
 		context.coordinator.topConstraint = listView.topAnchor.constraint(equalTo: view.topAnchor, constant: headerView.bounds.height)
 		context.coordinator.topConstraint?.isActive = true
+		context.coordinator.bottomConstraint = listView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+		context.coordinator.bottomConstraint?.isActive = true
 		NSLayoutConstraint.activate([
 			listView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
 			listView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-			listView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
 		])
 	}
 }
