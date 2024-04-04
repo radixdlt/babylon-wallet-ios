@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - DevAccountPreferences
@@ -139,7 +140,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		case .turnIntoDappDefinitionAccountTypeButtonTapped:
 			return .run { [accountAddress = state.address] send in
 
-				let manifest = try TransactionManifest.markingAccountAsDappDefinitionType(
+				let manifest = TransactionManifest.markingAccountAsDappDefinitionType(
 					accountAddress: accountAddress
 				)
 
@@ -150,9 +151,11 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 
 		case .createFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
-				let manifest = try TransactionManifest.createFungibleToken(
+
+				let manifest = TransactionManifest.createFungibleToken(
 					addressOfOwner: accountAddress
 				)
+
 				await send(.internal(.reviewTransaction(manifest)))
 			} catch: { error, _ in
 				loggerGlobal.warning("Failed to create manifest which turns account into dapp definition account type, error: \(error)")
@@ -160,10 +163,10 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 
 		case .createNonFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
-				let accountAddress = try await accountsClient.getAccountByAddress(accountAddress)
 
-				let manifest = try TransactionManifest.createNonFungibleToken(
-					addressOfOwner: accountAddress.address
+				let manifest = TransactionManifest.createNonFungibleToken(
+					addressOfOwner: accountAddress,
+					nftsPerCollection: 10
 				)
 
 				await send(.internal(.reviewTransaction(manifest)))
@@ -172,10 +175,10 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 			}
 		case .createMultipleFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
-				let accountAddress = try await accountsClient.getAccountByAddress(accountAddress)
 
-				let manifest = try TransactionManifest.createMultipleFungibleTokens(
-					addressOfOwner: accountAddress.address
+				let manifest = TransactionManifest.createMultipleFungibleTokens(
+					addressOfOwner: accountAddress,
+					count: 10
 				)
 
 				await send(.internal(.reviewTransaction(manifest)))
@@ -184,10 +187,11 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 			}
 		case .createMultipleNonFungibleTokenButtonTapped:
 			return .run { [accountAddress = state.address] send in
-				let accountAddress = try await accountsClient.getAccountByAddress(accountAddress)
 
-				let manifest = try TransactionManifest.createMultipleNonFungibleTokens(
-					addressOfOwner: accountAddress.address
+				let manifest = TransactionManifest.createMultipleNonFungibleTokens(
+					addressOfOwner: accountAddress,
+					collectionCount: 5,
+					nftsPerCollection: 10
 				)
 
 				await send(.internal(.reviewTransaction(manifest)))
@@ -242,9 +246,9 @@ extension DevAccountPreferences {
 	#if DEBUG
 	private func loadCanCreateAuthSigningKey(_ state: State) -> Effect<Action> {
 		.run { [address = state.address] send in
-			let accountAddress = try await accountsClient.getAccountByAddress(address)
+			let account = try await accountsClient.getAccountByAddress(address)
 
-			await send(.internal(.canCreateAuthSigningKey(!accountAddress.hasAuthenticationSigningKey)))
+			await send(.internal(.canCreateAuthSigningKey(!account.hasAuthenticationSigningKey)))
 		}
 	}
 
