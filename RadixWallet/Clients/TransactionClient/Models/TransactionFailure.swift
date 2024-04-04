@@ -151,7 +151,7 @@ extension TransactionFailure {
 			case .failedToCompileTXIntent:
 				"Failed to compile transaction intent"
 			case .failedToGenerateTXId:
-				"Failed to generate IntentHash"
+				"Failed to generate TXID"
 			case .failedToCompileSignedTXIntent:
 				"Failed to compile signed transaction intent"
 			case .failedToSignIntentWithAccountSigners:
