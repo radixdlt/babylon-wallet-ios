@@ -44,10 +44,7 @@ extension IntroductionToPersonas {
 
 		@ViewBuilder
 		private func introToPersona(with viewStore: ViewStoreOf<IntroductionToPersonas>) -> some SwiftUI.View {
-			// PLACEHOLDER until we get the correct icon.
-			Color.app.gray4
-				.frame(width: 200, height: 200)
-				.cornerRadius(.small2)
+			Image(asset: AssetResource.persona)
 
 			Text(viewStore.titleText)
 				.foregroundColor(.app.gray1)
