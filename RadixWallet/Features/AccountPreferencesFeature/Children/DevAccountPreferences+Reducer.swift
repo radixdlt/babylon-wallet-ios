@@ -6,10 +6,8 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 	// MARK: - State
 
 	public struct State: Sendable, Hashable {
-		public var isOnMainnet: Bool
 		public let account: Profile.Network.Account
 		public var address: AccountAddress { account.address }
-		public var faucetButtonState: ControlState
 
 		@PresentationState
 		var destination: Destination.State? = nil
@@ -23,14 +21,8 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		public var createMultipleNonFungibleTokenButtonState: ControlState
 		#endif
 
-		public init(
-			isOnMainnet: Bool = true, // safest to default to true and change to false, we REALLY do not wanna display the faucet button for mainnet
-			account: Profile.Network.Account,
-			faucetButtonState: ControlState = .enabled
-		) {
-			self.isOnMainnet = isOnMainnet
+		public init(account: Profile.Network.Account) {
 			self.account = account
-			self.faucetButtonState = faucetButtonState
 
 			#if DEBUG
 			self.canCreateAuthSigningKey = false
@@ -49,7 +41,6 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		case appeared
 		case closeButtonTapped
 		case closeTransactionButtonTapped
-		case faucetButtonTapped
 
 		#if DEBUG
 		case turnIntoDappDefinitionAccountTypeButtonTapped
@@ -62,11 +53,6 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case currentNetwork(Radix.Network)
-		case isAllowedToUseFaucet(TaskResult<Bool>)
-		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState = .enabled)
-		case refreshAccountCompleted(TaskResult<OnLedgerEntity.Account>)
-		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
 		#if DEBUG
 		case reviewTransaction(TransactionManifest)
 		case canCreateAuthSigningKey(Bool)
@@ -108,10 +94,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.accountsClient) var accountsClient
-	@Dependency(\.faucetClient) var faucetClient
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
-	@Dependency(\.gatewaysClient) var gatewaysClient
 
 	#if DEBUG
 	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
@@ -131,11 +114,11 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return loadCurrentNetwork()
-				.concatenate(with: loadIsAllowedToUseFaucet(&state))
 			#if DEBUG
-				.concatenate(with: loadCanCreateAuthSigningKey(state))
+			return loadCanCreateAuthSigningKey(state)
 				.concatenate(with: loadCanTurnIntoDappDefAccountType(state))
+			#else
+			return .none
 			#endif
 
 		case .closeButtonTapped:
@@ -147,10 +130,6 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case .faucetButtonTapped:
-			return call(buttonState: \.faucetButtonState, into: &state) {
-				try await faucetClient.getFreeXRD(.init(recipientAccountAddress: $0))
-			}
 		#if DEBUG
 		case .deleteAccountButtonTapped:
 			return .run { [account = state.account] send in
@@ -223,38 +202,8 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
-		case let .currentNetwork(currentNetwork):
-			state.isOnMainnet = currentNetwork == .mainnet
-			return .none
-
-		case let .isAllowedToUseFaucet(.success(value)):
-			state.faucetButtonState = value ? .enabled : .disabled
-			return .none
-
-		case let .isAllowedToUseFaucet(.failure(error)):
-			state.faucetButtonState = .disabled
-			errorQueue.schedule(error)
-			return .none
-
-		case .refreshAccountCompleted:
-			state.faucetButtonState = .disabled
-			return .none
-
-		case let .hideLoader(controlStateKeyPath):
-			state[keyPath: controlStateKeyPath] = .enabled
-			return .none
-
-		case let .callDone(controlStateKeyPath, changeTo):
-			if controlStateKeyPath == \State.faucetButtonState {
-				// NB: This call to update might be superfluous, since after any transaction we fetch all accounts
-				return updateAccountPortfolio(state).concatenate(with: loadIsAllowedToUseFaucet(&state))
-			} else {
-				state[keyPath: controlStateKeyPath] = changeTo
-				return .none
-			}
-
 		#if DEBUG
+		switch internalAction {
 		case let .reviewTransaction(manifest):
 			state.destination = .reviewTransaction(.init(
 				unvalidatedManifest: try! .init(manifest: manifest),
@@ -272,8 +221,8 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		case let .canTurnIntoDappDefAccountType(canTurnIntoDappDefAccountType):
 			state.canTurnIntoDappDefinitionAccountType = canTurnIntoDappDefAccountType
 			return .none
-		#endif
 		}
+		#endif
 	}
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
@@ -290,53 +239,9 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		}
 		#endif
 	}
-
-	private func call(
-		buttonState: WritableKeyPath<State, ControlState>,
-		into state: inout State,
-		onSuccess: ControlState = .enabled,
-		call: @escaping @Sendable (AccountAddress) async throws -> Void
-	) -> Effect<Action> {
-		state[keyPath: buttonState] = .loading(.local)
-		return .run { [address = state.address] send in
-			try await call(address)
-			await send(.internal(.callDone(updateControlState: buttonState, changeTo: onSuccess)))
-		} catch: { error, send in
-			await send(.internal(.hideLoader(updateControlState: buttonState)))
-			if !Task.isCancelled {
-				errorQueue.schedule(error)
-			}
-		}
-	}
 }
 
 extension DevAccountPreferences {
-	private func updateAccountPortfolio(_ state: State) -> Effect<Action> {
-		.run { [address = state.address] send in
-			await send(.internal(.refreshAccountCompleted(
-				TaskResult { try await accountPortfoliosClient.fetchAccountPortfolio(address, true).account }
-			)))
-		}
-	}
-
-	private func loadCurrentNetwork() -> Effect<Action> {
-		.run { send in
-			let currentGateway = await gatewaysClient.getCurrentGateway()
-			await send(.internal(.currentNetwork(currentGateway.network)))
-		}
-	}
-
-	private func loadIsAllowedToUseFaucet(_ state: inout State) -> Effect<Action> {
-		state.faucetButtonState = .loading(.local)
-		return .run { [address = state.address] send in
-			await send(.internal(.isAllowedToUseFaucet(
-				TaskResult {
-					await faucetClient.isAllowedToUseFaucet(address)
-				}
-			)))
-		}
-	}
-
 	#if DEBUG
 	private func loadCanCreateAuthSigningKey(_ state: State) -> Effect<Action> {
 		.run { [address = state.address] send in
