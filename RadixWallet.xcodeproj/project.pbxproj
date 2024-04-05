@@ -1084,6 +1084,12 @@
 		48FFFB082ADC6FD300B2B213 /* SwiftUINavigationCore in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB072ADC6FD300B2B213 /* SwiftUINavigationCore */; };
 		48FFFB0A2ADC721800B2B213 /* Atomics in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB092ADC721800B2B213 /* Atomics */; };
 		48FFFB0D2ADC744700B2B213 /* TextBuilder in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFB0C2ADC744700B2B213 /* TextBuilder */; };
+		5B1C4FD52BBB0B0C00B9436F /* AppsFlyerLib-Strict in Frameworks */ = {isa = PBXBuildFile; productRef = 5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */; };
+		5B1C4FD82BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1C4FD72BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift */; };
+		5B1C4FDA2BBB0DCF00B9436F /* AppsFlyerClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1C4FD92BBB0DCF00B9436F /* AppsFlyerClient+Live.swift */; };
+		5B9846BD2BBD5C8800E814F3 /* SensitiveInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */; };
+		5B9846C02BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */; };
+		5B9846C22BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9846C12BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift */; };
 		5BBC43A92BBAC6B0005747B1 /* AppTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */; };
 		830818482B9F1621002D8351 /* HTTPClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830818472B9F1621002D8351 /* HTTPClient+Live.swift */; };
 		8308184A2B9F162B002D8351 /* HTTPClient+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830818492B9F162B002D8351 /* HTTPClient+Mock.swift */; };
@@ -2382,6 +2388,11 @@
 		48F9CFE62B03A0A000657755 /* ProfileBuilderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileBuilderTest.swift; sourceTree = "<group>"; };
 		48FF43142AE43C7C00C568B9 /* TimeLimit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeLimit.swift; sourceTree = "<group>"; };
 		48FFFAF12ADC23AC00B2B213 /* Exports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exports.swift; sourceTree = "<group>"; };
+		5B1C4FD72BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppsFlyerClient+Interface.swift"; sourceTree = "<group>"; };
+		5B1C4FD92BBB0DCF00B9436F /* AppsFlyerClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppsFlyerClient+Live.swift"; sourceTree = "<group>"; };
+		5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SensitiveInfo.plist; sourceTree = "<group>"; };
+		5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SensitiveInfoClient+Interface.swift"; sourceTree = "<group>"; };
+		5B9846C12BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SensitiveInfoClient+Live.swift"; sourceTree = "<group>"; };
 		5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTextEditor.swift; sourceTree = "<group>"; };
 		830818472B9F1621002D8351 /* HTTPClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Live.swift"; sourceTree = "<group>"; };
 		830818492B9F162B002D8351 /* HTTPClient+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Mock.swift"; sourceTree = "<group>"; };
@@ -2649,6 +2660,7 @@
 				48FFFAFB2ADC241A00B2B213 /* HashTreeCollections in Frameworks */,
 				48FFFAC52ADC211700B2B213 /* JSONTesting in Frameworks */,
 				48FFFB062ADC6FD300B2B213 /* SwiftUINavigation in Frameworks */,
+				5B1C4FD52BBB0B0C00B9436F /* AppsFlyerLib-Strict in Frameworks */,
 				48FFFB032ADC6F8100B2B213 /* Builders in Frameworks */,
 				48FFFAB72ADC207B00B2B213 /* NavigationTransitions in Frameworks */,
 				48FFFA992ADC1EEC00B2B213 /* AsyncExtensions in Frameworks */,
@@ -5080,6 +5092,8 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
+				5B9846BE2BBD5EF600E814F3 /* SensitiveInfoClient */,
+				5B1C4FD62BBB0C0100B9436F /* AppsFlyerClient */,
 				8370FC5A2B99C732007AD882 /* NPSSurveyClient */,
 				83823EA82B72362600827211 /* TokenPriceClient */,
 				83823EA52B722D9000827211 /* HTTPClient */,
@@ -6690,6 +6704,7 @@
 				48CFC6972ADC110800E77A5C /* InfoPlist.strings */,
 				48CFC6992ADC110800E77A5C /* Config */,
 				48CFC6AD2ADC110800E77A5C /* Radix-Wallet--iOS--Info.plist */,
+				5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */,
 			);
 			path = Aux;
 			sourceTree = "<group>";
@@ -6769,6 +6784,24 @@
 				E6DBA2DF2ADEBFB300A38425 /* KeychainHolderTests.swift */,
 			);
 			path = KeychainClientTests;
+			sourceTree = "<group>";
+		};
+		5B1C4FD62BBB0C0100B9436F /* AppsFlyerClient */ = {
+			isa = PBXGroup;
+			children = (
+				5B1C4FD72BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift */,
+				5B1C4FD92BBB0DCF00B9436F /* AppsFlyerClient+Live.swift */,
+			);
+			path = AppsFlyerClient;
+			sourceTree = "<group>";
+		};
+		5B9846BE2BBD5EF600E814F3 /* SensitiveInfoClient */ = {
+			isa = PBXGroup;
+			children = (
+				5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */,
+				5B9846C12BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift */,
+			);
+			path = SensitiveInfoClient;
 			sourceTree = "<group>";
 		};
 		830EA9D42AE94014004C8051 /* AccountAndPersonaHidingFeature */ = {
@@ -7661,6 +7694,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 48CFBC5D2ADC106400E77A5C /* Build configuration list for PBXNativeTarget "RadixWallet" */;
 			buildPhases = (
+				5B9846C32BBD643700E814F3 /* Create SensitiveInfo Sample */,
 				48CFBC4B2ADC106300E77A5C /* Sources */,
 				48CFBC4C2ADC106300E77A5C /* Frameworks */,
 				48CFBC4D2ADC106300E77A5C /* Resources */,
@@ -7712,6 +7746,7 @@
 				E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */,
 				A47571FE2B29B0860059A95D /* IOSSecuritySuite */,
 				A415574F2B757C5E0040AD4E /* ComposableArchitecture */,
+				5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -7781,6 +7816,7 @@
 				48FFFB0B2ADC744700B2B213 /* XCRemoteSwiftPackageReference "TextBuilder" */,
 				A47571FD2B29B0860059A95D /* XCRemoteSwiftPackageReference "IOSSecuritySuite" */,
 				A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+				5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -7833,6 +7869,7 @@
 				48CFC6B82ADC110800E77A5C /* Project-Debug-Opt.xcconfig in Resources */,
 				48CFC6BD2ADC110800E77A5C /* Project-Beta.xcconfig in Resources */,
 				48CFC6B02ADC110800E77A5C /* iOS-dev.xcconfig in Resources */,
+				5B9846BD2BBD5C8800E814F3 /* SensitiveInfo.plist in Resources */,
 				48CFC6AE2ADC110800E77A5C /* InfoPlist.strings in Resources */,
 				48CFC5F72ADC10DA00E77A5C /* IBMPlexSans-Medium.ttf in Resources */,
 				48CFC6B32ADC110800E77A5C /* iOS-shared.xcconfig in Resources */,
@@ -7852,6 +7889,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		5B9846C32BBD643700E814F3 /* Create SensitiveInfo Sample */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Create SensitiveInfo Sample";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/SensitiveInfo.plist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# The SensitiveInfo.plist contains the secret tokens that we don't want publicly available.\n# As this file is ignored from SourceControl, this script will create a placeholder version\n# of it if it isn't already present.\nCONFIG_FILE_BASE_NAME=\"SensitiveInfo\"\n \nCONFIG_FILE_NAME=${CONFIG_FILE_BASE_NAME}.plist\nSAMPLE_CONFIG_FILE_NAME=${CONFIG_FILE_BASE_NAME}-Sample.plist\n \nCONFIG_FILE_PATH=$SRCROOT/Aux/$CONFIG_FILE_NAME\nSAMPLE_CONFIG_FILE_PATH=$SRCROOT/Aux/$SAMPLE_CONFIG_FILE_NAME\n \nif [ -f \"$CONFIG_FILE_PATH\" ]; then\n  echo \"$CONFIG_FILE_PATH exists.\"\nelse\n  echo \"$CONFIG_FILE_PATH does not exist, copying sample\"\n  cp -v \"${SAMPLE_CONFIG_FILE_PATH}\" \"${CONFIG_FILE_PATH}\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		481B43AC2ADC7F1A007945C1 /* Sources */ = {
@@ -8400,9 +8459,11 @@
 				48CFC66D2ADC10DB00E77A5C /* SecurityQuestionsFactorSource.swift in Sources */,
 				48CFC6022ADC10DA00E77A5C /* P2P+LedgerHardwareWallet.swift in Sources */,
 				48CFC46A2ADC10DA00E77A5C /* ImportLegacyWalletClient+Live.swift in Sources */,
+				5B1C4FD82BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift in Sources */,
 				830EA9D62AE94033004C8051 /* AccountAndPersonaHiding+Reducer.swift in Sources */,
 				48CFC5052ADC10DA00E77A5C /* TransactionPreviewResponseLogsInner.swift in Sources */,
 				48CFC2FF2ADC10D900E77A5C /* AccountSecurity+View.swift in Sources */,
+				5B1C4FDA2BBB0DCF00B9436F /* AppsFlyerClient+Live.swift in Sources */,
 				48CFC56B2ADC10DA00E77A5C /* MetadataU8ArrayValue.swift in Sources */,
 				A4CFB55F2BAA821E00778BDD /* HScrollBar.swift in Sources */,
 				48CFC2F92ADC10D900E77A5C /* InfoOfNewPersona+Reducer.swift in Sources */,
@@ -8760,6 +8821,7 @@
 				48CFC3EE2ADC10D900E77A5C /* DataChannelAssembledMessage.swift in Sources */,
 				48CFC2972ADC10D900E77A5C /* AdvancedFeesCustomization.swift in Sources */,
 				48CFC4CB2ADC10DA00E77A5C /* Extensions.swift in Sources */,
+				5B9846C22BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift in Sources */,
 				48CFC4302ADC10DA00E77A5C /* Collection+Extra.swift in Sources */,
 				83EE47832AF0EE3C00155F03 /* ProgrammaticScryptoSborValuePreciseDecimal.swift in Sources */,
 				48CFC2D62ADC10D900E77A5C /* ChooseAccountsRow.swift in Sources */,
@@ -8910,6 +8972,7 @@
 				48CFC6332ADC10DB00E77A5C /* UnsecuredEntityControl.swift in Sources */,
 				48CFC4D32ADC10DA00E77A5C /* StreamTransactionsRequest.swift in Sources */,
 				48CFC64D2ADC10DB00E77A5C /* PersonaData+PostalAddress.swift in Sources */,
+				5B9846C02BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift in Sources */,
 				48CFC5EE2ADC10DA00E77A5C /* SlideUpPanel+View.swift in Sources */,
 				48CFC3492ADC10D900E77A5C /* PersonaDataPermissionBox.swift in Sources */,
 				5BBC43A92BBAC6B0005747B1 /* AppTextEditor.swift in Sources */,
@@ -9802,6 +9865,14 @@
 				minimumVersion = 3.0.1;
 			};
 		};
+		5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AppsFlyerSDK/AppsFlyerFramework-Strict";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.13.2;
+			};
+		};
 		A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
@@ -10010,6 +10081,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFB0B2ADC744700B2B213 /* XCRemoteSwiftPackageReference "TextBuilder" */;
 			productName = TextBuilder;
+		};
+		5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */;
+			productName = "AppsFlyerLib-Strict";
 		};
 		A415574F2B757C5E0040AD4E /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;
