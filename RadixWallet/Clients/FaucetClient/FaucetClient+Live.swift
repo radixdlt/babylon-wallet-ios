@@ -102,39 +102,10 @@ extension FaucetClient: DependencyKey {
 
 			// Done
 		}
-//
-//		#if DEBUG
-//		let createFungibleToken: CreateFungibleToken = { request in
-//			// TODO: Re-enable. With new manifest builder that is not easy to handle.
-//			let manifest = if request.numberOfTokens == 1 {
-//				try TransactionManifest.createFungibleToken(
-//					addressOfOwner: request.recipientAccountAddress
-//				)
-//			} else {
-//				try TransactionManifest.createMultipleFungibleTokens(
-//					addressOfOwner: request.recipientAccountAddress
-//				)
-//			}
-//
-//			try await signSubmitTX(manifest: manifest)
-//		}
-//
-//		let createNonFungibleToken: CreateNonFungibleToken = { _ in
-//			fatalError()
-//			// TODO: Re-enable. With new manifest builder that is not easy to handle.
-//		}
-//
-//		return Self(
-//			getFreeXRD: getFreeXRD,
-//			isAllowedToUseFaucet: isAllowedToUseFaucet,
-//			createFungibleToken: createFungibleToken,
-//			createNonFungibleToken: createNonFungibleToken
-//		)
-//		#else
+
 		return Self(
 			getFreeXRD: getFreeXRD,
 			isAllowedToUseFaucet: isAllowedToUseFaucet
 		)
-//		#endif // DEBUG
 	}()
 }
