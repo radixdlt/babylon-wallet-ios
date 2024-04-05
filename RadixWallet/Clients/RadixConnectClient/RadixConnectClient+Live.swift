@@ -6,7 +6,7 @@ extension RadixConnectClient {
 	public static let liveValue: Self = {
 		@Dependency(\.p2pLinksClient) var p2pLinksClient
 
-		let raMS = RaMS()
+		let m2m = Mobile2Mobile()
 		let rtcClients = RTCClients()
 		let localNetworkAuthorization = LocalNetworkAuthorization()
 
@@ -80,15 +80,15 @@ extension RadixConnectClient {
 			receiveMessages: {
 				await AsyncAlgorithms.merge(
 					rtcClients.incomingMessages(),
-					raMS.incomingMessages()
+					m2m.incomingMessages()
 				)
 				.share()
 				.eraseToAnyAsyncSequence()
 			},
 			sendResponse: { response, route in
 				switch route {
-				case let .deepLink(password):
-					try await raMS.sendResponse(response, password: password)
+				case let .deepLink(sessionId):
+					try await m2m.sendResponse(response, sessionId: sessionId)
 				case let .rtc(route):
 					try await rtcClients.sendResponse(response, to: route)
 				case .wallet:
@@ -99,8 +99,8 @@ extension RadixConnectClient {
 			sendRequest: { request, strategy in
 				try await rtcClients.sendRequest(request, strategy: strategy)
 			},
-			handleDappDeepLink: { password in
-				let request = try await raMS.recieveRequest(onConnectioId: password)
+			handleDappDeepLink: { request in
+				try await m2m.handleRequest(request)
 			}
 		)
 	}()

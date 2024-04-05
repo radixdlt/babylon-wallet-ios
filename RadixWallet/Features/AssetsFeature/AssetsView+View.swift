@@ -19,7 +19,7 @@ extension AssetsView {
 					assetTypeSelectorView(viewStore)
 						.listRowSeparator(.hidden)
 						.listRowBackground(Color.clear)
-						.listRowInsets(.init())
+					// .listRowInsets(.init())
 
 					if viewStore.isLoadingResources {
 						ProgressView()

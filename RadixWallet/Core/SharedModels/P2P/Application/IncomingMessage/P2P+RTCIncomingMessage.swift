@@ -3,7 +3,7 @@ extension P2P {
 	public enum Route: Sendable, Hashable {
 		case wallet
 		case rtc(RTCRoute)
-		case deepLink(ConnectionPassword)
+		case deepLink(String)
 	}
 
 	/// Recipient of sender of an RTC message

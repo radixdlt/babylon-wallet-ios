@@ -38,7 +38,7 @@ public actor RaMS {
 			from: decryptedPayload
 		)
 
-		incomingMessagesSubject.send(.init(result: .success(.request(request)), route: .deepLink(password)))
+		// incomingMessagesSubject.send(.init(result: .success(.request(request)), route: .deepLink(password)))
 	}
 
 	func sendResponse(_ response: P2P.RTCOutgoingMessage.Response, password: ConnectionPassword) async throws {

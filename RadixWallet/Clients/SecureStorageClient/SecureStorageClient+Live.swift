@@ -261,7 +261,7 @@ extension SecureStorageClient: DependencyKey {
 
 		let loadMobile2MobileSessionSecret: LoadMobile2MobileSessionSecret = { id in
 			try keychainClient.getDataWithoutAuth(forKey: .init(.init(rawValue: id)!)).map {
-				try jsonDecoder().decode(Mobile2MobileClient.SessionConnection.self, from: $0)
+				try jsonDecoder().decode(Mobile2Mobile.SessionConnection.self, from: $0)
 			}
 		}
 

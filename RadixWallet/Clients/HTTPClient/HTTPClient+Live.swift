@@ -10,12 +10,12 @@ extension HTTPClient {
 					throw ExpectedHTTPURLResponse()
 				}
 
-				guard httpURLResponse.statusCode == BadHTTPResponseCode.expected else {
-					#if DEBUG
-					loggerGlobal.error("Request with URL: \(request.url!.absoluteString) failed with status code: \(httpURLResponse.statusCode), data: \(data.prettyPrintedJSONString ?? "<NOT_JSON>")")
-					#endif
-					throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
-				}
+//				guard httpURLResponse.statusCode == BadHTTPResponseCode.expected else {
+//					#if DEBUG
+//					loggerGlobal.error("Request with URL: \(request.url!.absoluteString) failed with status code: \(httpURLResponse.statusCode), data: \(data.prettyPrintedJSONString ?? "<NOT_JSON>")")
+//					#endif
+//					throw BadHTTPResponseCode(got: httpURLResponse.statusCode)
+//				}
 
 				return data
 			}

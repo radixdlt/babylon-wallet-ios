@@ -26,17 +26,6 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 				loggerGlobal.error("did open from unviersal link \(universalLink), referral: \(userActivity.referrerURL), info: \(userActivity.userInfo)")
 			}
 		}
-
-		loggerGlobal.error("has urlContext: \(connectionOptions.urlContexts)")
-		if let connectURL = connectionOptions.urlContexts.first?.url {
-			let connectionPassword = URLComponents(url: connectURL, resolvingAgainstBaseURL: true)?.queryItems?.first?.value
-			if let connectionPassword {
-				let cp = try! ConnectionPassword(.init(hex: connectionPassword))
-				Task {
-					try await radixConnectionClient.handleDappDeepLink(cp)
-				}
-			}
-		}
 	}
 
 	public func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {

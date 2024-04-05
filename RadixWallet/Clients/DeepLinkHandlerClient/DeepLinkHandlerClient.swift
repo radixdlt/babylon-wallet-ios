@@ -20,10 +20,10 @@ extension DeepLinkHandlerClient {
 	}
 
 	public static var liveValue: DeepLinkHandlerClient {
-		@Dependency(\.mobile2MobileClient) var mobile2MobileClient
+		@Dependency(\.radixConnectClient) var radixConnectClient
 		@Dependency(\.errorQueue) var errorQueue
 
-		func extractWalletConnectRequest(_ url: URL) throws -> Mobile2MobileClient.Request {
+		func extractWalletConnectRequest(_ url: URL) throws -> Mobile2Mobile.Request {
 			guard let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: true)?.queryItems else {
 				throw Error.emptyQuery
 			}
@@ -56,7 +56,7 @@ extension DeepLinkHandlerClient {
 				do {
 					let request = try extractWalletConnectRequest(url)
 					Task {
-						try await mobile2MobileClient.handleRequest(request)
+						try await radixConnectClient.handleDappDeepLink(request)
 					}
 				} catch {
 					errorQueue.schedule(error)
