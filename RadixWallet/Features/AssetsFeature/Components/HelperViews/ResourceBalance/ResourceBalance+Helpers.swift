@@ -88,15 +88,8 @@ extension ResourceBalance: Comparable {
 // MARK: - ResourceBalance.Amount + Comparable
 extension ResourceBalance.Amount: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
-		// If Decimal192 were comparable:
-//		order(lhs: lhs.amount, rhs: rhs.amount) {
-//			order(lhs: lhs.guaranteed, rhs: rhs.guaranteed, minValue: 0)
-//		}
-
-		if lhs.amount == rhs.amount {
-			lhs.guaranteed ?? 0 < rhs.guaranteed ?? 0
-		} else {
-			lhs.amount < rhs.amount
+		order(lhs: lhs.amount, rhs: rhs.amount) {
+			order(lhs: lhs.guaranteed, rhs: rhs.guaranteed)
 		}
 	}
 
