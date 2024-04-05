@@ -262,35 +262,14 @@ extension OnLedgerEntity {
 		public let atLedgerState: AtLedgerState
 		public let behaviors: [AssetBehavior]
 		public let metadata: Metadata
-
-		public init(
-			address: ComponentAddress,
-			atLedgerState: AtLedgerState,
-			behaviors: [AssetBehavior],
-			metadata: Metadata
-		) {
-			self.address = address
-			self.atLedgerState = atLedgerState
-			self.behaviors = behaviors
-			self.metadata = metadata
-		}
 	}
 }
 
 extension OnLedgerEntity {
 	public struct NonFungibleToken: Sendable, Hashable, Identifiable, Codable {
 		public typealias NFTData = GatewayAPI.ProgrammaticScryptoSborValueTuple
-		public typealias ID = NonFungibleGlobalId
 		public let id: NonFungibleGlobalId
 		public let data: NFTData?
-
-		public init(
-			id: NonFungibleGlobalId,
-			data: NFTData?
-		) {
-			self.id = id
-			self.data = data
-		}
 	}
 
 	public struct AccountNonFungibleIdsPage: Sendable, Hashable, Codable {
@@ -299,20 +278,6 @@ extension OnLedgerEntity {
 		public let ids: [NonFungibleGlobalId]
 		public let pageCursor: String?
 		public let nextPageCursor: String?
-
-		public init(
-			accountAddress: AccountAddress,
-			resourceAddress: ResourceAddress,
-			ids: [NonFungibleGlobalId],
-			pageCursor: String?,
-			nextPageCursor: String?
-		) {
-			self.accountAddress = accountAddress
-			self.resourceAddress = resourceAddress
-			self.ids = ids
-			self.pageCursor = pageCursor
-			self.nextPageCursor = nextPageCursor
-		}
 	}
 }
 
@@ -322,18 +287,6 @@ extension OnLedgerEntity {
 		public let poolUnitResourceAddress: ResourceAddress
 		public let resources: OwnedFungibleResources
 		public let metadata: Metadata
-
-		public init(
-			address: PoolAddress,
-			poolUnitResourceAddress: ResourceAddress,
-			resources: OwnedFungibleResources,
-			metadata: Metadata
-		) {
-			self.address = address
-			self.poolUnitResourceAddress = poolUnitResourceAddress
-			self.resources = resources
-			self.metadata = metadata
-		}
 	}
 
 	public struct Validator: Sendable, Hashable, Codable {
@@ -342,20 +295,6 @@ extension OnLedgerEntity {
 		public let xrdVaultBalance: Decimal192
 		public let stakeClaimFungibleResourceAddress: ResourceAddress
 		public let metadata: Metadata
-
-		public init(
-			address: ValidatorAddress,
-			stakeUnitResourceAddress: ResourceAddress,
-			xrdVaultBalance: Decimal192,
-			stakeClaimFungibleResourceAddress: ResourceAddress,
-			metadata: Metadata
-		) {
-			self.address = address
-			self.stakeUnitResourceAddress = stakeUnitResourceAddress
-			self.xrdVaultBalance = xrdVaultBalance
-			self.stakeClaimFungibleResourceAddress = stakeClaimFungibleResourceAddress
-			self.metadata = metadata
-		}
 	}
 }
 

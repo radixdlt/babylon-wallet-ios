@@ -100,10 +100,6 @@ extension AssetsTransfersRecipient {
 		}
 	}
 
-	var address: AccountAddress {
-		accountAddress
-	}
-
 	var isUserAccount: Bool {
 		guard case .myOwnAccount = self else {
 			return false

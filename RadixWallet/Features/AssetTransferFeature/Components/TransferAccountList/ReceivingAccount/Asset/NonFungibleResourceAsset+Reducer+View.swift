@@ -6,14 +6,14 @@ import SwiftUI
 public struct NonFungibleResourceAsset: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public typealias ID = String
-		public var id: ID { nftToken.id.toRawString() }
+		public var id: ID { token.id.toRawString() }
 
 		public let resourceImage: URL?
 		public let resourceName: String?
 		public let resourceAddress: ResourceAddress
-		public let nftToken: OnLedgerEntity.NonFungibleToken
+		public let token: OnLedgerEntity.NonFungibleToken
 		public var nftGlobalID: NonFungibleGlobalId {
-			nftToken.id
+			token.id
 		}
 	}
 }
@@ -33,10 +33,10 @@ extension NonFungibleResourceAsset {
 extension NonFungibleResourceAsset.State {
 	var viewState: NonFungibleResourceAsset.ViewState {
 		.nonFungible(.init(
-			id: nftToken.id,
+			id: token.id,
 			resourceImage: resourceImage,
 			resourceName: resourceName,
-			nonFungibleName: nftToken.data?.name
+			nonFungibleName: token.data?.name
 		))
 	}
 }

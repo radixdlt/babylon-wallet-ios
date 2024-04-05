@@ -132,7 +132,7 @@ extension AssetTransfer {
 			let recipient: AssetsTransfersRecipient
 			typealias ID = AccountAddress
 			var id: ID {
-				recipient.address
+				recipient.accountAddress
 			}
 		}
 
@@ -152,7 +152,7 @@ extension AssetTransfer {
 			let recipient: AssetsTransfersRecipient
 			typealias ID = AccountAddress
 			var id: ID {
-				recipient.address
+				recipient.accountAddress
 			}
 		}
 
@@ -171,9 +171,9 @@ extension AssetTransfer {
 
 extension AssetTransfer {
 	private func createManifest(_ accounts: TransferAccountList.State) async throws -> TransactionManifest {
-		let _involvedFungibleResources = try await extractInvolvedFungibleResources(accounts.receivingAccounts)
+		let involvedFungibleResources = try await extractInvolvedFungibleResources(accounts.receivingAccounts)
 
-		let fungibles: [PerAssetTransfersOfFungibleResource] = try await _involvedFungibleResources.asyncMap { perAsset in
+		let fungibles: [PerAssetTransfersOfFungibleResource] = try await involvedFungibleResources.asyncMap { perAsset in
 			let resourceAddress = perAsset.address
 
 			let transfers: [PerAssetFungibleTransfer] = try await perAsset.accounts.asyncMap { transfer in
@@ -197,9 +197,9 @@ extension AssetTransfer {
 			)
 		}
 
-		let _involvedNonFungibles = extractInvolvedNonFungibleResource(accounts.receivingAccounts)
+		let involvedNonFungibles = extractInvolvedNonFungibleResource(accounts.receivingAccounts)
 
-		let nonFungibles: [PerAssetTransfersOfNonFungibleResource] = try await _involvedNonFungibles.asyncMap { perAsset in
+		let nonFungibles: [PerAssetTransfersOfNonFungibleResource] = try await involvedNonFungibles.asyncMap { perAsset in
 			let resourceAddress = perAsset.address
 			let transfers: [PerAssetNonFungibleTransfer] = try await perAsset.accounts.asyncMap { transfer in
 				let useTryDepositOrAbort = try await useTryDepositOrAbort(
@@ -349,16 +349,16 @@ extension AssetTransfer {
 				continue
 			}
 
-			let accountAddress = account.address
+			let accountAddress = account.accountAddress
 			let assets = receivingAccount.assets.nonFungibleAssets
 
 			for nonFungibleAsset in assets {
 				if resources[id: nonFungibleAsset.resourceAddress] != nil {
 					if resources[id: nonFungibleAsset.resourceAddress]?.accounts[id: accountAddress] != nil {
-						resources[id: nonFungibleAsset.resourceAddress]?.accounts[id: accountAddress]?.tokens.append(nonFungibleAsset.nftToken)
+						resources[id: nonFungibleAsset.resourceAddress]?.accounts[id: accountAddress]?.tokens.append(nonFungibleAsset.token)
 					} else {
 						resources[id: nonFungibleAsset.resourceAddress]?.accounts.append(.init(
-							tokens: [nonFungibleAsset.nftToken],
+							tokens: [nonFungibleAsset.token],
 							recipient: account
 						))
 					}
@@ -366,7 +366,7 @@ extension AssetTransfer {
 					resources.append(.init(
 						address: nonFungibleAsset.resourceAddress,
 						accounts: [.init(
-							tokens: [nonFungibleAsset.nftToken],
+							tokens: [nonFungibleAsset.token],
 							recipient: account
 						)]
 					))

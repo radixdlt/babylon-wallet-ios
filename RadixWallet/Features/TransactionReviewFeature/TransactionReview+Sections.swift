@@ -1,4 +1,5 @@
 import Foundation
+import Sargon
 
 extension TransactionReview {
 	// Either the resource from ledger or metadata extracted from the TX manifest
@@ -101,7 +102,7 @@ extension TransactionReview {
 			let allAddresses = allAddresses + resourceAddresses.asIdentifiable()
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 
-			let dApps = await extractDappEntities(poolAddresses.map { $0.embed() })
+			let dApps = await extractDappEntities(poolAddresses.map(\.asGeneral))
 
 			let perPoolUnitDapps = perPoolUnitDapps(dApps, poolInteractions: poolContributions)
 
@@ -142,7 +143,7 @@ extension TransactionReview {
 			let allAddresses = allAddresses + resourceAddresses.asIdentifiable()
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 
-			let dApps = await extractDappEntities(poolAddresses.map { $0.embed() })
+			let dApps = await extractDappEntities(poolAddresses.map(\.asGeneral))
 
 			let perPoolUnitDapps = perPoolUnitDapps(dApps, poolInteractions: poolRedemptions)
 
@@ -312,7 +313,7 @@ extension TransactionReview {
 		componentAddresses: [ComponentAddress],
 		unknownTitle: (Int) -> String
 	) async throws -> TransactionReviewDapps<ComponentAddress>.State? {
-		let dApps = await extractDappEntities(componentAddresses.map { $0.embed() })
+		let dApps = await extractDappEntities(componentAddresses.map(\.asGeneral))
 		return try await extractDapps(dApps, unknownTitle: unknownTitle)
 	}
 
@@ -322,7 +323,7 @@ extension TransactionReview {
 	) async throws -> TransactionReviewDapps<A>.State? {
 		let knownDapps = dAppEntities.compactMap(\.entity).asIdentifiable()
 		let unknownDapps = try dAppEntities.filter { $0.entity == nil }
-			.map { try $0.address.into(type: A.self) }.asIdentifiable()
+			.map { try $0.address.asSpecific(type: A.self) }.asIdentifiable()
 
 		guard knownDapps.count + unknownDapps.count > 0 else { return nil }
 
@@ -331,7 +332,7 @@ extension TransactionReview {
 
 	private func extractDappEntities(_ addresses: [Address]) async -> [(address: Address, entity: DappEntity?)] {
 		await addresses.asyncMap {
-			await (address: $0, entity: try? extractDappEntity($0.embed()))
+			await (address: $0, entity: try? extractDappEntity($0.asGeneral))
 		}
 	}
 
@@ -447,7 +448,7 @@ extension TransactionReview {
 		guard !addresses.isEmpty else { return nil }
 
 		let validators = try await onLedgerEntitiesClient.getEntities(
-			addresses: addresses.map { $0.embed() },
+			addresses: addresses.map(\.asGeneral),
 			metadataKeys: .resourceMetadataKeys
 		)
 
@@ -543,7 +544,7 @@ extension TransactionReview {
 	) -> ResourceAssociatedDapps {
 		Dictionary(uniqueKeysWithValues: dappEntities.compactMap { data -> (ResourceAddress, OnLedgerEntity.Metadata)? in
 			let poolUnitResource: ResourceAddress? = poolInteractions
-				.first(where: { $0.poolAddress.embed() == data.address })?
+				.first(where: { $0.poolAddress.asGeneral == data.address })?
 				.poolUnitsResourceAddress
 
 			guard let poolUnitResource,

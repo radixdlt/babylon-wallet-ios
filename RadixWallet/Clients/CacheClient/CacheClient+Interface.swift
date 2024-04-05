@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - CacheClient
 public struct CacheClient: Sendable {
 	public var save: Save
@@ -115,7 +117,7 @@ extension CacheClient {
 			case address(Address)
 
 			public init(address: some AddressProtocol) {
-				self = .address(address.embed())
+				self = .address(address.asGeneral)
 			}
 
 			case nonFungibleData(NonFungibleGlobalId)

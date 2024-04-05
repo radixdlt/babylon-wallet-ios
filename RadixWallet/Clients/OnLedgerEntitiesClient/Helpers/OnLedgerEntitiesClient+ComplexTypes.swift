@@ -276,7 +276,7 @@ extension OnLedgerEntitiesClient {
 			}
 		} else {
 			try tokens.map { token in
-				guard let data = unstakeData.first(where: { $0.key == token.id })?.value else {
+				guard let data = unstakeData[token.id] else {
 					throw MissingStakeClaimTokenData()
 				}
 

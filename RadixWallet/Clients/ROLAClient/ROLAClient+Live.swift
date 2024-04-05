@@ -1,4 +1,4 @@
-
+import Sargon
 
 extension ROLAClient {
 	public static let liveValue: Self = {
@@ -21,7 +21,7 @@ extension ROLAClient {
 				}
 			}()
 
-			let metadata = try await onLedgerEntitiesClient.getEntity(entityAddress.embed(), metadataKeys: [.ownerKeys]).genericComponent?.metadata
+			let metadata = try await onLedgerEntitiesClient.getEntity(entityAddress.asGeneral, metadataKeys: [.ownerKeys]).genericComponent?.metadata
 			var ownerKeyHashes = try metadata?.ownerKeyHashes() ?? []
 
 			let transactionSigningKeyHash: PublicKeyHash = switch entity.securityState {

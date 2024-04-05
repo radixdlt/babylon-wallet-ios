@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - OnLedgerEntitiesClient + DependencyKey
 extension OnLedgerEntitiesClient: DependencyKey {
 	public static let maximumNFTIDChunkSize = 29
@@ -300,8 +302,8 @@ extension CacheClient.Entry.OnLedgerEntity {
 	var address: Address {
 		switch self {
 		case let .address(address): address
-		case let .nonFungibleData(globalID): globalID.resourceAddress.embed()
-		case let .nonFungibleIdPage(_, resourceAddress, _): resourceAddress.embed()
+		case let .nonFungibleData(globalID): globalID.resourceAddress.asGeneral
+		case let .nonFungibleIdPage(_, resourceAddress, _): resourceAddress.asGeneral
 		}
 	}
 }
