@@ -31,6 +31,22 @@ Builds and archives the app
 
 Runs test
 
+### ios create_sensitive_info
+
+```sh
+[bundle exec] fastlane ios create_sensitive_info
+```
+
+Creates SensitiveInfo.plist if it doesn't exist
+
+### ios populate_sensitive_info
+
+```sh
+[bundle exec] fastlane ios populate_sensitive_info
+```
+
+Populates SensitiveInfo.plist with environment values
+
 ### ios deploy
 
 ```sh

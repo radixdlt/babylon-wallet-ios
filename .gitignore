@@ -13,7 +13,8 @@ DerivedData/
 .netrc
 fastlane/report.xml
 fastlane/test_output/
-fastlane/.env.secret
+.env.secret
 .bundle
 vendor
 .design
+Aux/SensitiveInfo.plist

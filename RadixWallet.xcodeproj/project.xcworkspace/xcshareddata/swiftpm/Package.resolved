@@ -1,5 +1,5 @@
 {
-  "originHash" : "afe728646c91bd6674f4d8d6eb1692b8a79001f355d20f9465ca2f3750ced870",
+  "originHash" : "3313f884630244f405efa4cdbbcb2486d097b16289931114ea3c6826384f24b9",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "862808b2070cd908cb04f9aafe7de83d35f81b05",
         "version" : "0.6.7"
+      }
+    },
+    {
+      "identity" : "appsflyerframework-strict",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/AppsFlyerSDK/AppsFlyerFramework-Strict",
+      "state" : {
+        "revision" : "a22ea3af34d4631123bd54f55f95f7b7a9cd905f",
+        "version" : "6.13.2"
       }
     },
     {
@@ -110,15 +119,6 @@
       }
     },
     {
-      "identity" : "sargon",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/radixdlt/sargon",
-      "state" : {
-        "revision" : "241f87352299b9748e816d57468e690d7de5b341",
-        "version" : "0.6.8"
-      }
-    },
-    {
       "identity" : "screenshotpreventing-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Sajjon/ScreenshotPreventing-iOS",
@@ -186,8 +186,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-collections.git",
       "state" : {
-        "revision" : "94cf62b3ba8d4bed62680a282d4c25f9c63c2efb",
-        "version" : "1.1.0"
+        "branch" : "main",
+        "revision" : "b2c7faa198164f3d928b1ceec9ce373e22febb96"
       }
     },
     {
@@ -242,6 +242,15 @@
       "state" : {
         "branch" : "main",
         "revision" : "db33f4084304e2ef47c8b4d2949f0eb286f95b90"
+      }
+    },
+    {
+      "identity" : "swift-engine-toolkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/radixdlt/swift-engine-toolkit",
+      "state" : {
+        "branch" : "1.0.12_update",
+        "revision" : "4cf2edc92a430d4f59547d405e4c2c4bc5c912fe"
       }
     },
     {
