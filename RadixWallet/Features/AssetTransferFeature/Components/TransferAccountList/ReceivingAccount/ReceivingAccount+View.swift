@@ -85,7 +85,7 @@ extension ReceivingAccount.View {
 			Button {
 				viewStore.send(.addAssetTapped)
 			} label: {
-				Text(L10n.AssetTransfer.ReceivingAccount.addAssetsButton)
+				Text("+ " + L10n.AssetTransfer.ReceivingAccount.addAssetsButton)
 					.frame(height: .standardButtonHeight)
 					.frame(maxWidth: .infinity)
 					.foregroundColor(.app.blue2)
