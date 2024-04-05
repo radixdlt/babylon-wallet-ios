@@ -95,7 +95,7 @@ extension AccountDetails {
 				historyButton()
 				transferButton()
 			}
-			.padding(.top, .large2)
+			.padding(.top, .small1)
 			.padding([.horizontal, .bottom], .medium1)
 
 			prompts(
