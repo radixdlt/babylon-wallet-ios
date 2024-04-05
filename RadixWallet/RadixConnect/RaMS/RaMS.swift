@@ -5,7 +5,7 @@ public actor RaMS {
 	typealias EncryptionKey = Tagged<RaMS, HexCodable32Bytes>
 	private static let encryptionScheme = EncryptionScheme.version1
 	let session = URLSession.shared
-	let serviceURL = URL(string: "https://ddjdmrlme9v4i.cloudfront.net")!
+	let serviceURL = URL(string: "https://radix-connect-relay-dev.rdx-works-main.extratools.works/api/v1")!
 
 	private let incomingMessagesSubject: AsyncPassthroughSubject<P2P.RTCIncomingMessage> = .init()
 

@@ -21,10 +21,24 @@ extension DeepLinkHandlerClient {
 
 	public static var liveValue: DeepLinkHandlerClient {
 		@Dependency(\.mobile2MobileClient) var mobile2MobileClient
+		@Dependency(\.errorQueue) var errorQueue
 
-		func extractWalletConnectRequest(_ url: URL) throws -> Mobile2MobileClient.WalletConnectRequest {
+		func extractWalletConnectRequest(_ url: URL) throws -> Mobile2MobileClient.Request {
 			guard let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: true)?.queryItems else {
 				throw Error.emptyQuery
+			}
+
+			guard let sessionId = queryItems.first(where: { $0.name == "sessionId" })?.value else {
+				throw Error.missingSessionId
+			}
+
+			if let interactionId = queryItems.first(where: { $0.name == "interactionId" })?.value {
+				return .request(.init(sessionId: sessionId, interactionId: interactionId))
+			}
+
+			guard let publicKey = queryItems.first(where: { $0.name == "publicKey" })?.value
+			else {
+				throw Error.missingPublicKey
 			}
 
 			guard let origin = queryItems.first(where: { $0.name == "origin" })?.value,
@@ -33,26 +47,23 @@ extension DeepLinkHandlerClient {
 				throw Error.missingRequestOrigin
 			}
 
-			guard let publicKey = queryItems.first(where: { $0.name == "publicKey" })?.value
-			else {
-				throw Error.missingPublicKey
-			}
-
-			guard let sessionId = queryItems.first(where: { $0.name == "sessionId" })?.value else {
-				throw Error.missingSessionId
-			}
-
-			return .init(dAppOrigin: oringURL, publicKeyHex: publicKey, sessionId: sessionId)
+			return .linking(.init(dAppOrigin: oringURL, publicKeyHex: publicKey, sessionId: sessionId))
 		}
 
 		return DeepLinkHandlerClient(handleDeepLink: { url in
+			loggerGlobal.error("DeepLink received \(url)")
 			if url.host() == m2mDeepLinkHost {
-				let request = try! extractWalletConnectRequest(url)
-				Task {
-					try await mobile2MobileClient.handleRequest(request)
+				do {
+					let request = try extractWalletConnectRequest(url)
+					Task {
+						try await mobile2MobileClient.handleRequest(request)
+					}
+				} catch {
+					errorQueue.schedule(error)
 				}
 			} else {
-				assertionFailure("Unknown deep link url - \(url)")
+				struct UnknownDeepLinkURL: Swift.Error {}
+				errorQueue.schedule(UnknownDeepLinkURL())
 			}
 		})
 	}
