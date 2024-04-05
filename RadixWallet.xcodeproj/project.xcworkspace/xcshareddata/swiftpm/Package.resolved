@@ -1,5 +1,5 @@
 {
-  "originHash" : "3313f884630244f405efa4cdbbcb2486d097b16289931114ea3c6826384f24b9",
+  "originHash" : "5781e493b3b5935431690908af86b207cf3426348bd3a1d90bc542f5896251ea",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -119,6 +119,15 @@
       }
     },
     {
+      "identity" : "sargon",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/radixdlt/sargon",
+      "state" : {
+        "revision" : "241f87352299b9748e816d57468e690d7de5b341",
+        "version" : "0.6.8"
+      }
+    },
+    {
       "identity" : "screenshotpreventing-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Sajjon/ScreenshotPreventing-iOS",
@@ -186,8 +195,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-collections.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "b2c7faa198164f3d928b1ceec9ce373e22febb96"
+        "revision" : "94cf62b3ba8d4bed62680a282d4c25f9c63c2efb",
+        "version" : "1.1.0"
       }
     },
     {
@@ -242,15 +251,6 @@
       "state" : {
         "branch" : "main",
         "revision" : "db33f4084304e2ef47c8b4d2949f0eb286f95b90"
-      }
-    },
-    {
-      "identity" : "swift-engine-toolkit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/radixdlt/swift-engine-toolkit",
-      "state" : {
-        "branch" : "1.0.12_update",
-        "revision" : "4cf2edc92a430d4f59547d405e4c2c4bc5c912fe"
       }
     },
     {
