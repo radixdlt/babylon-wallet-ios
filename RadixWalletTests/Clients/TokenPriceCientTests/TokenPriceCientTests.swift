@@ -35,21 +35,19 @@ final class TokenPriceCientTests: XCTestCase {
 		validateDecimalPriceConversion(0.000099, expected: try! Decimal192("0.000099"))
 	}
 
-	// NOTE: All of the below values would be rounded to 14 decimal places
-	//       As it seems that Swift number formatter for Double cannot express more decimals.
 	func test_closeToDecimal192Divisibility() {
 		// 17 decimal places
-		validateDecimalPriceConversion(1.12345678901234567, expected: try! Decimal192("1.12345678901235"))
+		validateDecimalPriceConversion(1.12345678901234567, expected: try! Decimal192("1.1234567890123457"))
 	}
 
 	func test_maxDecimal192Divisibility() {
 		// 18 decimal places
-		validateDecimalPriceConversion(1.123456789012345678, expected: try! Decimal192("1.12345678901235"))
+		validateDecimalPriceConversion(1.123456789012345678, expected: try! Decimal192("1.1234567890123457"))
 	}
 
 	func test_overMaxDecimal192Divisibility() {
 		// 22 decimal places
-		validateDecimalPriceConversion(1.1234567890123456789012, expected: try! Decimal192("1.12345678901235"))
+		validateDecimalPriceConversion(1.1234567890123456789012, expected: try! Decimal192("1.1234567890123457"))
 	}
 
 	private func validateDecimalPriceConversion(
