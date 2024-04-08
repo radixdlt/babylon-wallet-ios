@@ -51,7 +51,6 @@ extension DeepLinkHandlerClient {
 		}
 
 		return DeepLinkHandlerClient(handleDeepLink: { url in
-			loggerGlobal.error("DeepLink received \(url)")
 			if url.host() == m2mDeepLinkHost {
 				do {
 					let request = try extractWalletConnectRequest(url)

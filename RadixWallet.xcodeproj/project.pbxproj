@@ -1106,7 +1106,6 @@
 		832880692AE664C30014FBF3 /* EntityFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832880682AE664C30014FBF3 /* EntityFlag.swift */; };
 		8328806C2AE6725F0014FBF3 /* AccountPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */; };
 		8329ACE42BBAB9E7005FD9DC /* DeepLinkHandlerClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8329ACE32BBAB9E7005FD9DC /* DeepLinkHandlerClient.swift */; };
-		8329ACE72BBAFEDE005FD9DC /* Mobile2MobileClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8329ACE62BBAFEDE005FD9DC /* Mobile2MobileClient.swift */; };
 		83377A032B9DDAF000D8AA36 /* NPSSurvey+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83377A022B9DDAF000D8AA36 /* NPSSurvey+View.swift */; };
 		83377A052B9DDB5C00D8AA36 /* NPSSurveyClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83377A042B9DDB5C00D8AA36 /* NPSSurveyClient+Live.swift */; };
 		8338B9E52AFAB20700D1D8EA /* TransactionFee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */; };
@@ -2415,7 +2414,6 @@
 		832880682AE664C30014FBF3 /* EntityFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityFlag.swift; sourceTree = "<group>"; };
 		8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPreferencesTests.swift; sourceTree = "<group>"; };
 		8329ACE32BBAB9E7005FD9DC /* DeepLinkHandlerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkHandlerClient.swift; sourceTree = "<group>"; };
-		8329ACE62BBAFEDE005FD9DC /* Mobile2MobileClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mobile2MobileClient.swift; sourceTree = "<group>"; };
 		83377A022B9DDAF000D8AA36 /* NPSSurvey+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NPSSurvey+View.swift"; sourceTree = "<group>"; };
 		83377A042B9DDB5C00D8AA36 /* NPSSurveyClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NPSSurveyClient+Live.swift"; sourceTree = "<group>"; };
 		8338B9E42AFAB20700D1D8EA /* TransactionFee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionFee.swift; sourceTree = "<group>"; };
@@ -5107,7 +5105,6 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
-				8329ACE52BBAFEA1005FD9DC /* Mobile2MobileClient */,
 				8329ACE22BBAB9CD005FD9DC /* DeepLinkHandlerClient */,
 				5B9846BE2BBD5EF600E814F3 /* SensitiveInfoClient */,
 				5B1C4FD62BBB0C0100B9436F /* AppsFlyerClient */,
@@ -6871,14 +6868,6 @@
 				8329ACE32BBAB9E7005FD9DC /* DeepLinkHandlerClient.swift */,
 			);
 			path = DeepLinkHandlerClient;
-			sourceTree = "<group>";
-		};
-		8329ACE52BBAFEA1005FD9DC /* Mobile2MobileClient */ = {
-			isa = PBXGroup;
-			children = (
-				8329ACE62BBAFEDE005FD9DC /* Mobile2MobileClient.swift */,
-			);
-			path = Mobile2MobileClient;
 			sourceTree = "<group>";
 		};
 		834B651D2B972E3A00B7E1E8 /* NPSSurvey */ = {
@@ -8954,7 +8943,6 @@
 				48CFC6642ADC10DB00E77A5C /* FactorSourceID.swift in Sources */,
 				48CFC3242ADC10D900E77A5C /* ConnectUsingSecrets+View.swift in Sources */,
 				48CFC2412ADC10D900E77A5C /* DevAccountPreferences+Reducer.swift in Sources */,
-				8329ACE72BBAFEDE005FD9DC /* Mobile2MobileClient.swift in Sources */,
 				48CFC5062ADC10DA00E77A5C /* EntityMetadataItem.swift in Sources */,
 				48CFC3232ADC10D900E77A5C /* ConnectUsingSecrets+Reducer.swift in Sources */,
 				48CFC5FF2ADC10DA00E77A5C /* Persona+PreviewValues.swift in Sources */,
