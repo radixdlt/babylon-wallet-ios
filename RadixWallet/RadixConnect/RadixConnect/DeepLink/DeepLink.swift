@@ -103,11 +103,11 @@ extension Mobile2Mobile {
 				response.id.rawValue
 			}
 
-			//            let returnURL = URL(string: sessionSecrets.dAppOrigin.absoluteString + "#connect")?.appending(queryItems: [
-			//                .init(name: "sessionId", value: sessionId),
-			//                .init(name: "interactionId", value: intId)
-			//            ])
-			//            await openURL(returnURL!)
+			let returnURL = URL(string: sessionSecrets.dAppOrigin.absoluteString + "#connect")?.appending(queryItems: [
+				.init(name: "sessionId", value: sessionId),
+				.init(name: "interactionId", value: intId),
+			])
+			await openURL(returnURL!)
 		} catch {
 			errorQueue.schedule(error)
 		}
