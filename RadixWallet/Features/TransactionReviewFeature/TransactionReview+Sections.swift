@@ -31,6 +31,7 @@ extension TransactionReview {
 		let allDepositAddresses = summary.accountDeposits.values.flatMap { $0 }.map(\.resourceAddress)
 		// Prepoluate with all resource addresses from withdraw and deposit.
 		let allAddresses: IdentifiedArrayOf<ResourceAddress> = try (allWithdrawAddresses + allDepositAddresses)
+			.uniqued()
 			.map { try $0.asSpecific() }
 			.asIdentified()
 
