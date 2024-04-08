@@ -41,7 +41,7 @@ platform :ios do
 
     desc "Populates SensitiveInfo.plist with environment values"
     lane :populate_sensitive_info do |options|
-        appIdKey = "APPS_FLYER_APP_ID_%s" % options[:flavour]
+        appIdKey = "APPS_FLYER_APP_ID_%s" % options[:flavour].downcase
         Dotenv.load "../.env.secret"
         update_plist( 
                 plist_path: "Aux/SensitiveInfo.plist",
