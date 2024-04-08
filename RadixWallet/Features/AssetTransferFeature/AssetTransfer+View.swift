@@ -46,7 +46,7 @@ extension AssetTransfer.View {
 						store: store.scope(state: \.accounts, action: \.child.accounts)
 					)
 
-					FixedSpacer(height: .large1)
+					FixedSpacer(height: .small2)
 
 					Button(L10n.AssetTransfer.sendTransferButton) {
 						viewStore.send(.sendTransferTapped)

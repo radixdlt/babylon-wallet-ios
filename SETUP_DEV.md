@@ -38,10 +38,16 @@ gem install bundler -v 2.3.25
 bundle install
 ```
 
+### Setup secrets
+
+There are two types of secrets required by the project: `General` & `Fastlane`. In order to download them, you will need access to RDX Works 1Password team.  
+Once you have it, you will be to download each secrets file and place it in the folder detailed in the next steps. After downloading each file, be sure to remove the leading underscore from the file name.
+
+- Download [general secrets][general_secrets] and put the downloaded file in root folder.
+- Download [fastlane secrets][fastlane_secrets] and put the downloaded file in [fastlane](fastlane) folder.
+
 ### Setup `fastlane`
 
-- Download [fastlane secrets][secret] (requires RDX Works 1Password access).
-- Put the downloaded file in [fastlane](fastlane) folder. Be sure to remove the leading underscore from the file name.
 - Run the below command to bring the necessary certificates for development:
 
 ```sh
@@ -58,4 +64,5 @@ After the above setup, you are good to go with building and running the app on i
 
 [rbenv]: https://github.com/rbenv/rbenv
 [bundler]: https://bundler.io
-[secret]: https://start.1password.com/open/i?a=JWO4INKPOFHCDMZ2CYQMY4DRY4&v=srjnzoh2conosxfpkekxlakwzq&i=c75l3mugtfopfd5ebrcn22hssu&h=rdxworks.1password.com
+[general_secrets]: https://start.1password.com/open/i?a=JWO4INKPOFHCDMZ2CYQMY4DRY4&v=btoakzspnaugf5miuybcfh5fey&i=hb34e2be37ep5cym3vo7fuvsu4&h=rdxworks.1password.com
+[fastlane_secrets]: https://start.1password.com/open/i?a=JWO4INKPOFHCDMZ2CYQMY4DRY4&v=btoakzspnaugf5miuybcfh5fey&i=xpfwvtmc65hbja4xwujp2e6vfq&h=rdxworks.1password.com
