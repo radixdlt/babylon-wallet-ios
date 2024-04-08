@@ -295,7 +295,7 @@ extension OnLedgerEntitiesClient {
 				canClaimTokens: false,
 				stakeClaimTokens: .init(
 					resource: resource,
-					stakeClaims: stakeClaimTokens.asIdentifiable()
+					stakeClaims: stakeClaimTokens.asIdentified()
 				),
 				validatorName: stakeClaimValidator.metadata.name
 			))

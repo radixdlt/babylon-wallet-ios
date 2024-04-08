@@ -462,7 +462,7 @@ extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
 			let sectionID = TransactionHistory.TransactionSection.ID(day)
 			if self[id: sectionID] == nil {
 				let month = calendar.startOfMonth(for: day)
-				self[id: sectionID] = .init(day: day, month: month, transactions: transactions.asIdentifiable())
+				self[id: sectionID] = .init(day: day, month: month, transactions: transactions.asIdentified())
 			} else {
 				self[id: sectionID]?.transactions.append(contentsOf: transactions)
 			}
@@ -510,7 +510,7 @@ extension IdentifiedArrayOf<DateRangeItem> {
 					endDate: end
 				)
 			}
-			.asIdentifiable()
+			.asIdentified()
 	}
 }
 

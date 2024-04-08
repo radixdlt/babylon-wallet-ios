@@ -266,7 +266,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 				setAccountsResponse(
 					to: ongoingAccountsWithoutProofOfOwnership.requestItem,
 					accessKind: .ongoing,
-					chosenAccounts: .withoutProofOfOwnership(.init(uniqueElements: ongoingAccountsWithoutProofOfOwnership.accounts)),
+					chosenAccounts: .withoutProofOfOwnership(ongoingAccountsWithoutProofOfOwnership.accounts.asIdentified()),
 					into: &state
 				)
 			}

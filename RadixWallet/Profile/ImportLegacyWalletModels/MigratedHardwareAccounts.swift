@@ -5,7 +5,7 @@ public struct MigratedHardwareAccounts: Sendable, Hashable {
 
 	public let accounts: NonEmpty<OrderedSet<MigratedAccount>>
 	public var babylonAccounts: Profile.Network.Accounts {
-		accounts.elements.map(\.babylon).asIdentifiable()
+		accounts.elements.map(\.babylon).asIdentified()
 	}
 
 	public init(

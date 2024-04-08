@@ -39,7 +39,7 @@ extension AccountPortfoliosClient: DependencyKey {
 			async let stakeUnitDetails = Task {
 				do {
 					let stakeUnitDetails = try await onLedgerEntitiesClient.getOwnedStakesDetails(account: account, cachingStrategy: cachingStrategy)
-					await state.set(stakeUnitDetails: .success(stakeUnitDetails.asIdentifiable()), forAccount: account.address)
+					await state.set(stakeUnitDetails: .success(stakeUnitDetails.asIdentified()), forAccount: account.address)
 				} catch {
 					await state.set(stakeUnitDetails: .failure(error), forAccount: account.address)
 				}

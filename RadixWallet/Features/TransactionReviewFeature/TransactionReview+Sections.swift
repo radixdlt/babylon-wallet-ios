@@ -28,8 +28,9 @@ extension TransactionReview {
 	func sections(for summary: ExecutionSummary, networkID: NetworkID) async throws -> Sections? {
 		let allWithdrawAddresses = summary.withdrawals.values.flatMap { $0 }.map(\.resourceAddress)
 		let allDepositAddresses = summary.deposits.values.flatMap { $0 }.map(\.resourceAddress)
-		// Prepoluate with all resource addresses from withdraw and deposit.
-		let allAddresses: IdentifiedArrayOf<ResourceAddress> = (allWithdrawAddresses + allDepositAddresses).asIdentifiable()
+
+		// Pre-populate with all resource addresses from withdraw and deposit.
+		let allAddresses: IdentifiedArrayOf<ResourceAddress> = Array((allWithdrawAddresses + allDepositAddresses).uniqued()).asIdentified()
 
 		func resourcesInfo(_ resourceAddresses: [ResourceAddress]) async throws -> ResourcesInfo {
 			var newlyCreatedMetadata = Dictionary(
@@ -99,7 +100,7 @@ extension TransactionReview {
 			// All resources that are part of the pool
 			let resourceAddresses = poolContributions.flatMap { Array($0.contributedResources.keys) }
 
-			let allAddresses = allAddresses + resourceAddresses.asIdentifiable()
+			let allAddresses = allAddresses + resourceAddresses.asIdentified()
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 
 			let dApps = await extractDappEntities(poolAddresses.map(\.asGeneral))
@@ -140,7 +141,7 @@ extension TransactionReview {
 				Array($0.redeemedResources.keys)
 			}
 
-			let allAddresses = allAddresses + resourceAddresses.asIdentifiable()
+			let allAddresses = allAddresses + resourceAddresses.asIdentified()
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 
 			let dApps = await extractDappEntities(poolAddresses.map(\.asGeneral))
@@ -321,9 +322,9 @@ extension TransactionReview {
 		_ dAppEntities: [(address: Address, entity: DappEntity?)],
 		unknownTitle: (Int) -> String
 	) async throws -> TransactionReviewDapps<A>.State? {
-		let knownDapps = dAppEntities.compactMap(\.entity).asIdentifiable()
+		let knownDapps = dAppEntities.compactMap(\.entity).asIdentified()
 		let unknownDapps = try dAppEntities.filter { $0.entity == nil }
-			.map { try $0.address.asSpecific(type: A.self) }.asIdentifiable()
+			.map { try $0.address.asSpecific(type: A.self) }.asIdentified()
 
 		guard knownDapps.count + unknownDapps.count > 0 else { return nil }
 
@@ -345,10 +346,12 @@ extension TransactionReview {
 
 	private func exctractProofs(_ accountProofs: [ResourceAddress]) async throws -> TransactionReviewProofs.State? {
 		let proofs = try await accountProofs
+			.uniqued()
 			.asyncMap(extractProofInfo)
+
 		guard !proofs.isEmpty else { return nil }
 
-		return TransactionReviewProofs.State(proofs: .init(uniqueElements: proofs))
+		return TransactionReviewProofs.State(proofs: proofs.asIdentified())
 	}
 
 	private func extractProofInfo(_ address: ResourceAddress) async throws -> ProofEntity {
@@ -392,7 +395,7 @@ extension TransactionReview {
 		let withdrawalAccounts = withdrawals.map {
 			TransactionReviewAccount.State(account: $0.key, transfers: $0.value)
 		}
-		.asIdentifiable()
+		.asIdentified()
 
 		return .init(accounts: withdrawalAccounts, enableCustomizeGuarantees: false)
 	}
@@ -436,7 +439,7 @@ extension TransactionReview {
 		let depositAccounts = deposits
 			.filter { !$0.value.isEmpty }
 			.map { TransactionReviewAccount.State(account: $0.key, transfers: $0.value) }
-			.asIdentifiable()
+			.asIdentified()
 
 		guard !depositAccounts.isEmpty else { return nil }
 
