@@ -91,6 +91,7 @@ jobs:
           git config user.name $GIT_USER
           git config user.email $GIT_USER
           echo "${{ env.WALLET_FASTLANE_SECRETS_BASE64 }}" | base64 --decode > fastlane/.env.secret
+          echo "${{ env.WALLET_GENERAL_SECRETS_BASE64 }}" | base64 --decode > .env.secret
           brew install xcbeautify
         env:
           GIT_USER: ${{ env.WALLET_RADIX_BOT_USERNAME }}

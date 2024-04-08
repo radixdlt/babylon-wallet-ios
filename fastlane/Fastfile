@@ -10,6 +10,7 @@ end
 
 platform :ios do
     before_all do
+        create_sensitive_info
         Dotenv.load ".env.ios"
         dir_to_del = ENV["SCAN_OUTPUT_DIRECTORY"]
         puts "deleting '#{dir_to_del}'"
@@ -29,9 +30,33 @@ platform :ios do
         run_tests
     end
 
+    desc "Creates SensitiveInfo.plist if it doesn't exist"
+    lane :create_sensitive_info do
+        if File.exists?("../Aux/SensitiveInfo.plist")
+            puts "SensitiveInfo.plist already available"
+        elsif
+            sh("cp -v '../Aux/SensitiveInfo-Sample.plist' '../Aux/SensitiveInfo.plist'")
+        end
+    end
+
+    desc "Populates SensitiveInfo.plist with environment values"
+    lane :populate_sensitive_info do |options|
+        appIdKey = "APPS_FLYER_APP_ID_%s" % options[:flavour].downcase
+        Dotenv.load "../.env.secret"
+        update_plist( 
+                plist_path: "Aux/SensitiveInfo.plist",
+                block: proc do |plist|
+                    plist[:APPS_FLYER_APP_ID] = ENV[appIdKey]
+                    plist[:APPS_FLYER_DEV_KEY] = ENV['APPS_FLYER_DEV_KEY']
+                end
+            )
+    end
+
     desc "Deploy the app for a given flavour: alpha, beta, release"
     desc "Usage `bundle exec fastlane ios deploy --env ios.<specific env>`"
     lane :deploy do |options|
+        flavour = ENV['FLAVOUR']
+        populate_sensitive_info(flavour: flavour)
         install_distribution_certificates
 
         api_key = app_store_connect_api_key
@@ -53,7 +78,6 @@ platform :ios do
             api_key: api_key
         )
 
-        flavour = ENV['FLAVOUR']
         tag = "%s#%s-%s" % [app_version, build_number, flavour]
         add_git_tag(tag: tag)
         push_to_git_remote

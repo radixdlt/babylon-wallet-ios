@@ -12,11 +12,10 @@ public final class AppDelegate: NSObject, UIApplicationDelegate {
 		return sceneConfig
 	}
 
-	public func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-		true
-	}
+	public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+		@Dependency(\.appsFlyerClient) var appsFlyerClient
+		appsFlyerClient.start()
 
-	public func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
-		true
+		return true
 	}
 }
