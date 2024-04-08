@@ -27,7 +27,7 @@ public struct VerifyMnemonic: Sendable, FeatureReducer {
 			self.wordsToConfirm = .init(randomWords)!
 			self.enteredWords = wordsToConfirm.rawValue.map {
 				OffsetIdentified(offset: $0.offset, element: "")
-			}.asIdentifiable()
+			}.asIdentified()
 
 			self.focusedField = wordsToConfirm.first?.offset
 		}

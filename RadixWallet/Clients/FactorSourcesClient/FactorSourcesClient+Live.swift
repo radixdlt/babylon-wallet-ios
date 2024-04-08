@@ -373,7 +373,7 @@ func signingFactors(
 				signingFactors[factorSource.kind] = existingArray // write back to Dictionary
 			} else {
 				// trivial case,
-				signingFactors[factorSource.kind] = [sigingFactor].asIdentifiable()
+				signingFactors[factorSource.kind] = [sigingFactor].asIdentified()
 			}
 		}
 	}

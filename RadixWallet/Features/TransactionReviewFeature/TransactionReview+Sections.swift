@@ -32,7 +32,7 @@ extension TransactionReview {
 		// Prepoluate with all resource addresses from withdraw and deposit.
 		let allAddresses: IdentifiedArrayOf<ResourceAddress> = try (allWithdrawAddresses + allDepositAddresses)
 			.map { try $0.asSpecific() }
-			.asIdentifiable()
+			.asIdentified()
 
 		func resourcesInfo(_ resourceAddresses: [ResourceAddress]) async throws -> ResourcesInfo {
 			var newlyCreatedMetadata = Dictionary(uniqueKeysWithValues: resourceAddresses.compactMap { resourceAddress in
@@ -96,7 +96,7 @@ extension TransactionReview {
 				try ResourceAddress(validatingAddress: $0)
 			}
 
-			let allAddresses = allAddresses + resourceAddresses.asIdentifiable()
+			let allAddresses = allAddresses + resourceAddresses.asIdentified()
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 
 			let dApps = await extractDappEntities(poolAddresses)
@@ -139,7 +139,7 @@ extension TransactionReview {
 				try ResourceAddress(validatingAddress: $0)
 			}
 
-			let allAddresses = allAddresses + resourceAddresses.asIdentifiable()
+			let allAddresses = allAddresses + resourceAddresses.asIdentified()
 			let resourcesInfo = try await resourcesInfo(allAddresses.elements)
 
 			let dApps = await extractDappEntities(poolAddresses)
@@ -337,9 +337,9 @@ extension TransactionReview {
 		_ dAppEntities: [(address: EngineToolkit.Address, entity: DappEntity?)],
 		unknownTitle: (Int) -> String
 	) async throws -> TransactionReviewDapps<Kind>.State? {
-		let knownDapps = dAppEntities.compactMap(\.entity).asIdentifiable()
+		let knownDapps = dAppEntities.compactMap(\.entity).asIdentified()
 		let unknownDapps = try dAppEntities.filter { $0.entity == nil }
-			.map { try $0.address.asSpecific() as SpecificAddress<Kind> }.asIdentifiable()
+			.map { try $0.address.asSpecific() as SpecificAddress<Kind> }.asIdentified()
 
 		guard knownDapps.count + unknownDapps.count > 0 else { return nil }
 
@@ -366,7 +366,7 @@ extension TransactionReview {
 
 		guard !proofs.isEmpty else { return nil }
 
-		return TransactionReviewProofs.State(proofs: proofs.asIdentifiable())
+		return TransactionReviewProofs.State(proofs: proofs.asIdentified())
 	}
 
 	private func extractProofInfo(_ address: ResourceAddress) async throws -> ProofEntity {
@@ -410,7 +410,7 @@ extension TransactionReview {
 		let withdrawalAccounts = withdrawals.map {
 			TransactionReviewAccount.State(account: $0.key, transfers: $0.value)
 		}
-		.asIdentifiable()
+		.asIdentified()
 
 		return .init(accounts: withdrawalAccounts, enableCustomizeGuarantees: false)
 	}
@@ -454,7 +454,7 @@ extension TransactionReview {
 		let depositAccounts = deposits
 			.filter { !$0.value.isEmpty }
 			.map { TransactionReviewAccount.State(account: $0.key, transfers: $0.value) }
-			.asIdentifiable()
+			.asIdentified()
 
 		guard !depositAccounts.isEmpty else { return nil }
 

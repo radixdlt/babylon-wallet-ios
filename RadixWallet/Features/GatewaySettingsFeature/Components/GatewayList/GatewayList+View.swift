@@ -55,7 +55,7 @@ extension GatewayList.State {
 	static let previewValue = Self(
 		gateways: [
 			.previewValue1, .previewValue2, .previewValue3,
-		].asIdentifiable()
+		].asIdentified()
 	)
 }
 #endif

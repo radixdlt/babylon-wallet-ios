@@ -493,7 +493,7 @@ extension OnLedgerEntitiesClient {
 			allResourceAddresses,
 			cachingStrategy: .useCache,
 			atLedgerState: poolUnitResource.atLedgerState
-		).asIdentifiable()
+		).asIdentified()
 
 		guard let allResources else {
 			loggerGlobal.error("Failed to load the details for the resources in the pool")
@@ -537,7 +537,7 @@ extension OnLedgerEntitiesClient {
 			allResourceAddresses,
 			cachingStrategy: cachingStrategy,
 			atLedgerState: account.atLedgerState
-		).asIdentifiable()
+		).asIdentified()
 
 		return await ownedPoolUnits.asyncCompactMap { ownedPoolUnit -> OwnedResourcePoolDetails? in
 			guard let pool = pools.first(where: { $0.address == ownedPoolUnit.resourcePoolAddress }) else {

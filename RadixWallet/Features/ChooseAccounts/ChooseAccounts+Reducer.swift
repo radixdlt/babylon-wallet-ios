@@ -91,7 +91,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 			// Uniqueness is guaranteed as per `Profile.Network.Accounts`
 			state.availableAccounts = accounts.filter {
 				!state.filteredAccounts.contains($0.address)
-			}.asIdentifiable()
+			}.asIdentified()
 			return .none
 
 		case let .loadAccountsResult(.failure(error)):

@@ -57,22 +57,22 @@ extension EntitiesControlledByFactorSource {
 
 	/// Non hidden
 	public var babylonAccounts: IdentifiedArrayOf<Profile.Network.Account> {
-		accounts.filter(not(\.isOlympiaAccount)).asIdentifiable()
+		accounts.filter(not(\.isOlympiaAccount)).asIdentified()
 	}
 
 	/// hidden
 	public var babylonAccountsHidden: IdentifiedArrayOf<Profile.Network.Account> {
-		hiddenAccounts.filter(not(\.isOlympiaAccount)).asIdentifiable()
+		hiddenAccounts.filter(not(\.isOlympiaAccount)).asIdentified()
 	}
 
 	/// Non hidden
 	public var olympiaAccounts: IdentifiedArrayOf<Profile.Network.Account> {
-		accounts.filter(\.isOlympiaAccount).asIdentifiable()
+		accounts.filter(\.isOlympiaAccount).asIdentified()
 	}
 
 	/// hidden
 	public var olympiaAccountsHidden: IdentifiedArrayOf<Profile.Network.Account> {
-		hiddenAccounts.filter(\.isOlympiaAccount).asIdentifiable()
+		hiddenAccounts.filter(\.isOlympiaAccount).asIdentified()
 	}
 
 	public var accounts: [Profile.Network.Account] { entities.compactMap { try? $0.asAccount() } }

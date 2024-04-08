@@ -288,7 +288,7 @@ extension OnLedgerEntitiesClient {
 			return OnLedgerEntity.Account.PoolUnit(resource: poolUnitResource, resourcePoolAddress: pool.address)
 		}
 
-		let poolUnitResources = OnLedgerEntity.Account.PoolUnitResources(radixNetworkStakes: stakeUnits.asIdentifiable(), poolUnits: poolUnits.sorted())
+		let poolUnitResources = OnLedgerEntity.Account.PoolUnitResources(radixNetworkStakes: stakeUnits.asIdentified(), poolUnits: poolUnits.sorted())
 		return poolUnitResources
 	}
 
@@ -424,7 +424,7 @@ extension OnLedgerEntitiesClient {
 								claimAmount: .init(nominalAmount: claimAmount),
 								reamainingEpochsUntilClaim: Int(claimEpoch) - Int(currentEpoch.rawValue)
 							)
-						}.asIdentifiable()
+						}.asIdentified()
 					)
 				}
 
@@ -472,7 +472,7 @@ extension OnLedgerEntity.Account.PoolUnitResources {
 			$0.resource.amount > .zero
 		}
 
-		return .init(radixNetworkStakes: stakes.asIdentifiable(), poolUnits: poolUnits)
+		return .init(radixNetworkStakes: stakes.asIdentified(), poolUnits: poolUnits)
 	}
 }
 

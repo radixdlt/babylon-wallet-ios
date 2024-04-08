@@ -1,11 +1,11 @@
 
 extension Array where Element: Identifiable {
 	/// Returns an `IdentifiedArray` of the `Element`, omitting clashing elements
-	public func asIdentifiable() -> IdentifiedArrayOf<Element> {
+	public func asIdentified() -> IdentifiedArrayOf<Element> {
 		var array: IdentifiedArrayOf<Element> = []
 		for element in self {
-			let (alreadyExists, _) = array.append(element)
-			if alreadyExists {
+			let (inserted, _) = array.append(element)
+			if !inserted {
 				#if DEBUG
 				assertionFailure("The source array does not contain unique elements, id clash for \(element.id)")
 				#endif

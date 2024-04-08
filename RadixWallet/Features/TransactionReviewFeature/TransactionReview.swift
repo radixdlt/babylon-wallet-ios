@@ -423,7 +423,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 		case .deposits(.delegate(.showCustomizeGuarantees)):
 			guard let guarantees = state.deposits?.accounts.customizableGuarantees, !guarantees.isEmpty else { return .none }
-			state.destination = .customizeGuarantees(.init(guarantees: guarantees.asIdentifiable()))
+			state.destination = .customizeGuarantees(.init(guarantees: guarantees.asIdentified()))
 
 			return .none
 

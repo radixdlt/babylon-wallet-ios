@@ -199,10 +199,10 @@ extension Profile.Network.Account {
 
 extension Profile.Network.Accounts {
 	public var nonHidden: IdentifiedArrayOf<Profile.Network.Account> {
-		filter(not(\.isHidden)).asIdentifiable()
+		filter(not(\.isHidden)).asIdentified()
 	}
 
 	public var hidden: IdentifiedArrayOf<Profile.Network.Account> {
-		filter(\.isHidden).asIdentifiable()
+		filter(\.isHidden).asIdentified()
 	}
 }

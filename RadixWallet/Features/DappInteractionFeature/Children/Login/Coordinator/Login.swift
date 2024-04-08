@@ -130,7 +130,7 @@ struct Login: Sendable, FeatureReducer {
 					lastLogin: persona == lastLoggedInPersona ? authorizedPersonaSimple?.lastLogin : nil
 				)
 			}
-			.asIdentifiable()
+			.asIdentified()
 
 			if
 				let lastLoggedInPersona,

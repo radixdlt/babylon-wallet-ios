@@ -28,7 +28,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		public init(fromAccount: Profile.Network.Account) {
 			self.init(
 				fromAccount: fromAccount,
-				receivingAccounts: [.empty(canBeRemovedWhenEmpty: false)].asIdentifiable()
+				receivingAccounts: [.empty(canBeRemovedWhenEmpty: false)].asIdentified()
 			)
 		}
 	}

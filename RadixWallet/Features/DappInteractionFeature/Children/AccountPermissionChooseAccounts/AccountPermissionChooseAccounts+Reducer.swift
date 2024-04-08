@@ -181,7 +181,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 
 				let chosenAccounts: AccountPermissionChooseAccountsResult = .withProofOfOwnership(
 					challenge: signedAuthChallenge.challenge,
-					walletAccountsWithProof.asIdentifiable()
+					walletAccountsWithProof.asIdentified()
 				)
 				return .send(.delegate(.continue(accessKind: state.accessKind, chosenAccounts: chosenAccounts)))
 

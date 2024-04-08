@@ -16,7 +16,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 
 	func test_whenViewAppeared_thenCurrentGatewayAndGatewayListIsLoaded() async throws {
 		// given
-		let otherGateways: IdentifiedArrayOf<Radix.Gateway> = [.stokenet, .rcnet].asIdentifiable()
+		let otherGateways: IdentifiedArrayOf<Radix.Gateway> = [.stokenet, .rcnet].asIdentified()
 		let currentGateway: Radix.Gateway = .mainnet
 		let gateways = try! Gateways(
 			current: currentGateway,
@@ -79,9 +79,9 @@ final class GatewaySettingsFeatureTests: TestCase {
 	func test_whenNonCurrentGatewayRemovalIsConfirmed_removeGateway() async throws {
 		// given
 		let gatewayToBeDeleted = GatewayRow.State(gateway: .rcnet, isSelected: false, canBeDeleted: true)
-		let otherGateways: IdentifiedArrayOf<Radix.Gateway> = [.stokenet, .rcnet].asIdentifiable()
+		let otherGateways: IdentifiedArrayOf<Radix.Gateway> = [.stokenet, .rcnet].asIdentified()
 		let currentGateway: Radix.Gateway = .mainnet
-		let otherAfterDeletion: IdentifiedArrayOf<Radix.Gateway> = [.stokenet].asIdentifiable()
+		let otherAfterDeletion: IdentifiedArrayOf<Radix.Gateway> = [.stokenet].asIdentified()
 		let gateways = try! Gateways(
 			current: currentGateway,
 			other: otherGateways
