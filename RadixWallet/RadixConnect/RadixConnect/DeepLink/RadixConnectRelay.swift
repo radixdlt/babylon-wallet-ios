@@ -20,20 +20,20 @@ extension RadixConnectRelay {
 		let sessionId: RadixConnectRelay.SessionId
 		let data: HexCodable?
 
-		static func sendRequest(sessionId: SessionId, data: HexCodable) -> Self {
+		static func sendRequest(sessionId: RadixConnectRelay.SessionId, data: HexCodable) -> Self {
 			.init(method: .sendRequest, sessionId: sessionId, data: data)
 		}
 
-		static func getRequests(sessionId: String) -> Self {
-			.init(method: getRequests, sessionId: sessionId)
+		static func getRequests(sessionId: RadixConnectRelay.SessionId) -> Self {
+			.init(method: .getRequests, sessionId: sessionId, data: nil)
 		}
 
-		static func sendResponse(sessionId: String, data: String) -> Self {
-			.init(method: sendResponse, sessionId: sessionId, data: data)
+		static func sendResponse(sessionId: RadixConnectRelay.SessionId, data: HexCodable) -> Self {
+			.init(method: .sendResponse, sessionId: sessionId, data: data)
 		}
 
-		static func getResponses(sessionId: String) -> Self {
-			.init(method: getRessponses, sessionId: sessionId)
+		static func getResponses(sessionId: RadixConnectRelay.SessionId) -> Self {
+			.init(method: .getRessponses, sessionId: sessionId, data: nil)
 		}
 	}
 }
