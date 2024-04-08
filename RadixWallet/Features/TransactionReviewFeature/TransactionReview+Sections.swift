@@ -362,6 +362,7 @@ extension TransactionReview {
 	private func exctractProofs(_ accountProofs: [EngineToolkit.Address]) async throws -> TransactionReviewProofs.State? {
 		let proofs = try await accountProofs
 			.map { try ResourceAddress(validatingAddress: $0.addressString()) }
+			.uniqued()
 			.asyncMap(extractProofInfo)
 
 		guard !proofs.isEmpty else { return nil }
