@@ -297,7 +297,7 @@ extension TransferAccountList {
 		_ receivingAccount: ReceivingAccount.State,
 		forAssets assets: IdentifiedArrayOf<ResourceAsset.State>
 	) -> Effect<Action> {
-		if case let .myOwnAccount(sargonUserOwnedAccount) = receivingAccount.recipient {
+		if case let .profileAccount(value: sargonUserOwnedAccount) = receivingAccount.recipient {
 			return .run { send in
 				@Dependency(\.accountsClient) var accountsClient
 				let userOwnedAccount = try await accountsClient.fromSargon(sargonUserOwnedAccount)

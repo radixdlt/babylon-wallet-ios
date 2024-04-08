@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ReceivingAccount
@@ -7,12 +8,12 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 		public typealias ID = UUID
 		public let id = ID()
 
-		public var recipient: AssetsTransfersRecipient?
+		public var recipient: AccountOrAddressOf?
 		public var assets: IdentifiedArrayOf<ResourceAsset.State>
 		public var canBeRemoved: Bool
 
 		public init(
-			recipient: AssetsTransfersRecipient?,
+			recipient: AccountOrAddressOf?,
 			assets: IdentifiedArrayOf<ResourceAsset.State>,
 			canBeRemovedWhenEmpty: Bool
 		) {
@@ -72,36 +73,36 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 	}
 }
 
-extension AssetsTransfersRecipient {
+extension AccountOrAddressOf {
 	var name: String {
 		switch self {
-		case let .myOwnAccount(account):
+		case let .profileAccount(account):
 			account.displayName.value
-		case .foreignAccount:
+		case .addressOfExternalAccount:
 			L10n.Common.account
 		}
 	}
 
 	var identifer: LedgerIdentifiable {
 		switch self {
-		case let .myOwnAccount(account):
+		case let .profileAccount(value: account):
 			.address(.account(account.address))
-		case let .foreignAccount(address):
+		case let .addressOfExternalAccount(address):
 			.address(.account(address))
 		}
 	}
 
 	var gradient: Gradient {
 		switch self {
-		case let .myOwnAccount(account):
+		case let .profileAccount(value: account):
 			.init(Profile.Network.Account.AppearanceID(sargon: account.appearanceID))
-		case .foreignAccount:
+		case .addressOfExternalAccount:
 			.init(colors: [.app.gray2])
 		}
 	}
 
 	var isUserAccount: Bool {
-		guard case .myOwnAccount = self else {
+		guard case .profileAccount = self else {
 			return false
 		}
 

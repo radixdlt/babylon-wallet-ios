@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ChooseReceivingAccount
@@ -63,7 +64,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		case closeButtonTapped
 		case manualAccountAddressChanged(String)
 		case focusChanged(Bool)
-		case chooseButtonTapped(AssetsTransfersRecipient)
+		case chooseButtonTapped(AccountOrAddressOf)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -72,7 +73,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case handleResult(AssetsTransfersRecipient)
+		case handleResult(AccountOrAddressOf)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -126,8 +127,8 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		case let .chooseButtonTapped(result):
 			// While we allow to easily selected the owned account, user is still able to paste the address of an owned account.
 			// This be sure to check if the manually introduced address matches any of the user owned accounts.
-			if case let .foreignAccount(address) = result, let ownedAccount = state.chooseAccounts.availableAccounts.first(where: { $0.address == address }) {
-				return .send(.delegate(.handleResult(.myOwnAccount(value: ownedAccount.intoSargon()))))
+			if case let .addressOfExternalAccount(address) = result, let ownedAccount = state.chooseAccounts.availableAccounts.first(where: { $0.address == address }) {
+				return .send(.delegate(.handleResult(.profileAccount(value: ownedAccount.intoSargon()))))
 			}
 			return .send(.delegate(.handleResult(result)))
 		}
