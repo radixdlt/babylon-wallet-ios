@@ -286,7 +286,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			let dApps = try await authorizedDappsClient.getDappsAuthorizedByPersona(oldPersona.id)
 				.map(State.DappInfo.init)
 
-			return await .general(persona, dApps: addingDappMetadata(to: .init(uniqueElements: dApps)))
+			return await .general(persona, dApps: addingDappMetadata(to: dApps.asIdentified()))
 		}
 	}
 

@@ -155,11 +155,11 @@ extension Profile.Network.Persona {
 
 extension Profile.Network.Personas {
 	public var nonHidden: IdentifiedArrayOf<Profile.Network.Persona> {
-		filter(not(\.isHidden)).asIdentifiable()
+		filter(not(\.isHidden)).asIdentified()
 	}
 
 	public var hiden: IdentifiedArrayOf<Profile.Network.Persona> {
-		filter(\.isHidden).asIdentifiable()
+		filter(\.isHidden).asIdentified()
 	}
 }
 

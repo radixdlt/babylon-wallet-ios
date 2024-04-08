@@ -38,7 +38,7 @@ public struct DebugKeychainContents: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadedMnemonics(mnemonics):
-			state.keyedMnemonics = mnemonics.asIdentifiable()
+			state.keyedMnemonics = mnemonics.asIdentified()
 			return .none
 		}
 	}

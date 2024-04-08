@@ -37,7 +37,7 @@ public struct SelectInactiveAccountsToAdd: Sendable, FeatureReducer {
 			return .send(.delegate(.goBack))
 		case let .selectedAccountsChanged(rows):
 			if let rows {
-				state.selectedInactive = rows.map(\.account).asIdentifiable()
+				state.selectedInactive = rows.map(\.account).asIdentified()
 			} else {
 				state.selectedInactive = []
 			}

@@ -171,7 +171,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 					isSelected: mode.nonXrdRowSelected(token.resourceAddress)
 				)
 			}
-			.asIdentifiable()
+			.asIdentified()
 
 		let nfts = portfolio.account.nonFungibleResources.map { resource in
 			NonFungibleAssetList.Row.State(
@@ -211,7 +211,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 					},
 					isSelected: mode.nonXrdRowSelected(poolUnit.resource.resourceAddress)
 				)
-			}.asIdentifiable(),
+			}.asIdentified(),
 			destination: state.resources.poolUnitsList?.destination
 		)
 
@@ -225,14 +225,14 @@ public struct AssetsView: Sendable, FeatureReducer {
 					.fungibleResources
 					.nonXrdResources
 					.filter(stakeUnitResources.contains)
-					.asIdentifiable()
+					.asIdentified()
 			},
 			selectedStakeClaimTokens:
 			mode.isSelection ?
 				stakes
 				.compactMap(\.stakeClaimResource)
 				.reduce(into: StakeUnitList.SelectedStakeClaimTokens()) { dict, resource in
-					if let selectedtokens = mode.nftRowSelectedAssets(resource.resourceAddress)?.elements.asIdentifiable() {
+					if let selectedtokens = mode.nftRowSelectedAssets(resource.resourceAddress)?.elements.asIdentified() {
 						dict[resource] = selectedtokens
 					}
 				} : nil,
@@ -243,7 +243,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		state.totalFiatWorth.refresh(from: portfolio.totalFiatWorth)
 		state.resources = .init(
 			fungibleTokenList: fungibleTokenList,
-			nonFungibleTokenList: !nfts.isEmpty ? .init(rows: nfts.asIdentifiable(), destination: state.resources.nonFungibleTokenList?.destination) : nil,
+			nonFungibleTokenList: !nfts.isEmpty ? .init(rows: nfts.asIdentified(), destination: state.resources.nonFungibleTokenList?.destination) : nil,
 			stakeUnitList: stakeUnitList,
 			poolUnitsList: poolUnitList
 		)

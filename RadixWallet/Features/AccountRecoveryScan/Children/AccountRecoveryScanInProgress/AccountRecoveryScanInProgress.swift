@@ -225,7 +225,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 								onLedgerSettings: .unknown
 							)
 						)
-					}.asIdentifiable()
+					}.asIdentified()
 
 					await send(.internal(.startScan(accounts: accounts)))
 				} catch: { error, send in

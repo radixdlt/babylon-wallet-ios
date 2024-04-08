@@ -20,7 +20,7 @@ extension VerifyMnemonic.State {
 		}
 
 		return .init(
-			words: wordViewStates.asIdentifiable(),
+			words: wordViewStates.asIdentified(),
 			focusedField: focusedField,
 			verificationFailed: invalidMnemonic
 		)

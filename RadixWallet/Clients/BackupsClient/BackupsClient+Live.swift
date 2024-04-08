@@ -54,7 +54,7 @@ extension BackupsClient: DependencyKey {
 						return nil
 					}
 
-					return .init(rawValue: filteredHeaders.asIdentifiable())
+					return .init(rawValue: filteredHeaders.asIdentified())
 				} catch {
 					assertionFailure("Corrupt Profile headers")
 					loggerGlobal.critical("Corrupt Profile header: \(error.legibleLocalizedDescription)")
