@@ -93,7 +93,12 @@ extension TransactionReview {
 
 	@MainActor
 	public struct View: SwiftUI.View {
+		@SwiftUI.State private var showNavigationTitle: Bool = false
+
 		private let store: StoreOf<TransactionReview>
+
+		private let coordSpace: String = "TransactionReviewCoordSpace"
+		private let navTitleID: String = "TransactionReview.title"
 
 		public init(store: StoreOf<TransactionReview>) {
 			self.store = store
@@ -122,6 +127,8 @@ extension TransactionReview {
 							}
 						}
 					}
+					.navigationTitle(showNavigationTitle ? L10n.TransactionReview.title : "")
+					.navigationBarTitleDisplayMode(.inline)
 					.destinations(with: store)
 					.onAppear {
 						viewStore.send(.appeared)
@@ -220,6 +227,10 @@ extension TransactionReview {
 				.background(.app.gray5.gradient.shadow(.inner(color: shadowColor, radius: 15)))
 				.animation(.easeInOut, value: viewStore.canToggleViewMode ? viewStore.rawTransaction : nil)
 			}
+			.coordinateSpace(name: coordSpace)
+			.onPreferenceChange(PositionsPreferenceKey.self) { positions in
+				showNavigationTitle = (positions[navTitleID]?.maxY ?? 0) <= 0
+			}
 		}
 
 		private let shadowColor: Color = .app.gray2.opacity(0.4)
@@ -232,6 +243,7 @@ extension TransactionReview {
 						.lineLimit(2)
 						.multilineTextAlignment(.leading)
 						.foregroundColor(.app.gray1)
+						.measurePosition(navTitleID, coordSpace: coordSpace)
 
 					Spacer(minLength: 0)
 
