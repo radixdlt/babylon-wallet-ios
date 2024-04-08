@@ -23,7 +23,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 			dApp: Profile.Network.AuthorizedDappDetailed
 		) {
 			self.init(
-				personas: .init(uniqueElements: dApp.detailedAuthorizedPersonas.map(Persona.State.init)),
+				personas: dApp.detailedAuthorizedPersonas.map(Persona.State.init).asIdentifiable(),
 				strategy: .dApp(dApp.dAppDefinitionAddress)
 			)
 		}
@@ -74,7 +74,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 					guard result.count == ids.count else {
 						throw UpdatePersonaError.personasMissingFromClient(ids.subtracting(result.map(\.id)))
 					}
-					await send(.internal(.personasLoaded(.init(uniqueElements: result))))
+					await send(.internal(.personasLoaded(result.asIdentifiable())))
 				}
 			} catch: { error, _ in
 				loggerGlobal.error("Failed to update personas from client, error: \(error)")

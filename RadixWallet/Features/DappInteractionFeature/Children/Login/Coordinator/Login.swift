@@ -124,14 +124,14 @@ struct Login: Sendable, FeatureReducer {
 			} else {
 				nil
 			}
-			state.personas = .init(uniqueElements:
-				personas.map { persona in
-					PersonaRow.State(
-						persona: persona,
-						lastLogin: persona == lastLoggedInPersona ? authorizedPersonaSimple?.lastLogin : nil
-					)
-				}
-			)
+			state.personas = personas.map { persona in
+				PersonaRow.State(
+					persona: persona,
+					lastLogin: persona == lastLoggedInPersona ? authorizedPersonaSimple?.lastLogin : nil
+				)
+			}
+			.asIdentifiable()
+
 			if
 				let lastLoggedInPersona,
 				let extractedLastLoggedInPersona = state.personas.remove(id: lastLoggedInPersona.id)

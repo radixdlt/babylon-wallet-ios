@@ -16,21 +16,21 @@ final class GatewaySettingsFeatureTests: TestCase {
 
 	func test_whenViewAppeared_thenCurrentGatewayAndGatewayListIsLoaded() async throws {
 		// given
-		let otherGateways: [Radix.Gateway] = [.stokenet, .rcnet]
+		let otherGateways: [Radix.Gateway] = [.stokenet, .rcnet].asIdentifiable()
 		let currentGateway: Radix.Gateway = .mainnet
 		let gateways = try! Gateways(
 			current: currentGateway,
-			other: .init(uniqueElements: otherGateways)
+			other: otherGateways
 		)
 		let store = TestStore(
 			initialState: GatewaySettings.State(),
 			reducer: GatewaySettings.init
 		) {
 			$0.gatewaysClient.getAllGateways = {
-				.init(rawValue: .init(uniqueElements: otherGateways))!
+				.init(rawValue: otherGateways)!
 			}
 			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([
-				try! .init(current: currentGateway, other: .init(uniqueElements: otherGateways)),
+				try! .init(current: currentGateway, other: otherGateways),
 			]
 			).eraseToAnyAsyncSequence() }
 		}
@@ -79,16 +79,16 @@ final class GatewaySettingsFeatureTests: TestCase {
 	func test_whenNonCurrentGatewayRemovalIsConfirmed_removeGateway() async throws {
 		// given
 		let gatewayToBeDeleted = GatewayRow.State(gateway: .rcnet, isSelected: false, canBeDeleted: true)
-		let otherGateways: [Radix.Gateway] = [.stokenet, .rcnet]
+		let otherGateways: [Radix.Gateway] = [.stokenet, .rcnet].asIdentifiable()
 		let currentGateway: Radix.Gateway = .mainnet
-		let otherAfterDeletion: [Radix.Gateway] = [.stokenet]
+		let otherAfterDeletion: [Radix.Gateway] = [.stokenet].asIdentifiable()
 		let gateways = try! Gateways(
 			current: currentGateway,
-			other: .init(uniqueElements: otherGateways)
+			other: otherGateways
 		)
 		let gatewaysAfterDeletion = try! Gateways(
 			current: currentGateway,
-			other: .init(uniqueElements: otherAfterDeletion)
+			other: otherAfterDeletion
 		)
 
 		var initialState = GatewaySettings.State()

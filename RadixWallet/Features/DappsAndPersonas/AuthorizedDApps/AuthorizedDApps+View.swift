@@ -75,7 +75,7 @@ extension AuthorizedDapps.State {
 			)
 		}
 
-		return .init(dApps: .init(uniqueElements: dAppViewStates))
+		return .init(dApps: dAppViewStates.asIdentifiable())
 	}
 }
 

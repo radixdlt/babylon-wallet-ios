@@ -363,9 +363,10 @@ extension TransactionReview {
 		let proofs = try await accountProofs
 			.map { try ResourceAddress(validatingAddress: $0.addressString()) }
 			.asyncMap(extractProofInfo)
+
 		guard !proofs.isEmpty else { return nil }
 
-		return TransactionReviewProofs.State(proofs: .init(uniqueElements: proofs))
+		return TransactionReviewProofs.State(proofs: proofs.asIdentifiable())
 	}
 
 	private func extractProofInfo(_ address: ResourceAddress) async throws -> ProofEntity {
