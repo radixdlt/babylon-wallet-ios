@@ -1113,6 +1113,7 @@
 		836878612B4551910029C808 /* UnknownDappComponents+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 836878602B4551910029C808 /* UnknownDappComponents+Reducer.swift */; };
 		8370FC5C2B99C780007AD882 /* NPSSurveyClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8370FC5B2B99C780007AD882 /* NPSSurveyClient+Interface.swift */; };
 		8381C8B02BBD2CD400A470B4 /* TokenPriceCientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8381C8AF2BBD2CD400A470B4 /* TokenPriceCientTests.swift */; };
+		8381C8B72BC3DB4100A470B4 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 8381C8B62BC3D80100A470B4 /* PrivacyInfo.xcprivacy */; };
 		83823EA72B722DB000827211 /* HTTPClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83823EA62B722DB000827211 /* HTTPClient+Interface.swift */; };
 		83823EAA2B72365000827211 /* TokenPriceClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83823EA92B72365000827211 /* TokenPriceClient+Interface.swift */; };
 		83856D622B0279080026452A /* VerifyMnemonic+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83856D602B0279080026452A /* VerifyMnemonic+View.swift */; };
@@ -2416,6 +2417,7 @@
 		836878602B4551910029C808 /* UnknownDappComponents+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UnknownDappComponents+Reducer.swift"; sourceTree = "<group>"; };
 		8370FC5B2B99C780007AD882 /* NPSSurveyClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NPSSurveyClient+Interface.swift"; sourceTree = "<group>"; };
 		8381C8AF2BBD2CD400A470B4 /* TokenPriceCientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenPriceCientTests.swift; sourceTree = "<group>"; };
+		8381C8B62BC3D80100A470B4 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		83823EA62B722DB000827211 /* HTTPClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Interface.swift"; sourceTree = "<group>"; };
 		83823EA92B72365000827211 /* TokenPriceClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Interface.swift"; sourceTree = "<group>"; };
 		83856D602B0279080026452A /* VerifyMnemonic+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "VerifyMnemonic+View.swift"; sourceTree = "<group>"; };
@@ -6705,6 +6707,7 @@
 				48CFC6992ADC110800E77A5C /* Config */,
 				48CFC6AD2ADC110800E77A5C /* Radix-Wallet--iOS--Info.plist */,
 				5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */,
+				8381C8B62BC3D80100A470B4 /* PrivacyInfo.xcprivacy */,
 			);
 			path = Aux;
 			sourceTree = "<group>";
@@ -7880,6 +7883,7 @@
 				48CFC6BF2ADC110800E77A5C /* Project-Release-Opt.xcconfig in Resources */,
 				48CFC6B12ADC110800E77A5C /* iOS-release.xcconfig in Resources */,
 				48ABCF402AE54A1F00D6E87F /* iOS-dev-test.xcconfig in Resources */,
+				8381C8B72BC3DB4100A470B4 /* PrivacyInfo.xcprivacy in Resources */,
 				48CFC6B42ADC110800E77A5C /* iOS-beta.xcconfig in Resources */,
 				48CFC6B22ADC110800E77A5C /* iOS-alpha.xcconfig in Resources */,
 				48CFC6B92ADC110800E77A5C /* Project-Release.xcconfig in Resources */,
