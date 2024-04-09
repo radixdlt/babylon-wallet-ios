@@ -1038,3 +1038,14 @@ If you have any “Legacy” Accounts (created on the Olympia network) to import
 "survey_reason_heading" = "What’s the main reason for your score?";
 "survey_reason_fieldHint" = "Let us know...";
 "survey_submitButton" = "Submit Feedback - Thanks!";
+"factorSourceAccess_title_signature" = "Signature Request";
+"factorSourceAccess_title_createAccount" = "Creating Account";
+"factorSourceAccess_title_deriveAccounts" = "Deriving Accounts";
+"factorSourceAccess_title_proveOwnership" = "Proving Ownership";
+"factorSourceAccess_title_encryptMessage" = "Encrypting Message";
+"factorSourceAccess_title_createKey" = "Creating Key";
+"factorSourceAccess_message_device_signature" = "Authenticate to your phone to sign.";
+"factorSourceAccess_message_device_general" = "Authenticate to your phone to complete using your phone's signing key.";
+"factorSourceAccess_message_ledger_signature" = "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.\n**Complete signing on the device.**";
+"factorSourceAccess_message_ledger_deriveAccounts" = "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.\n**Derivation may take up to a minute.**";
+"factorSourceAccess_message_ledger_general" = "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.";

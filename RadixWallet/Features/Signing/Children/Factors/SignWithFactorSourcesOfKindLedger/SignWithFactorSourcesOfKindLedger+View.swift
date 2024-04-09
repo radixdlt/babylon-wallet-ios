@@ -1,23 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension SignWithFactorSourcesOfKindLedger.State {
-	var viewState: SignWithFactorSourcesOfKindLedger.ViewState {
-		.init(currentSigningFactor: currentSigningFactor)
-	}
-}
-
 // MARK: - SignWithFactorSourcesOfKindLedger.View
-
 extension SignWithFactorSourcesOfKindLedger {
-	public struct ViewState: Equatable {
-		let currentSigningFactor: SigningFactor?
-
-		var ledger: LedgerHardwareWalletFactorSource? {
-			currentSigningFactor.flatMap { $0.factorSource.extract() }
-		}
-	}
-
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: StoreOf<SignWithFactorSourcesOfKindLedger>

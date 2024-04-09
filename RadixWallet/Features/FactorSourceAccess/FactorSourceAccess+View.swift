@@ -1,29 +1,10 @@
-extension FactorSourceAccess.State {
-	var viewState: FactorSourceAccess.ViewState {
-		.init(
-			title: "Signature Request",
-			message: "Authenticate to your phone to sign.",
-			device: device,
-			retryEnabled: retryEnabled
-		)
-	}
-
-	private var device: String? {
-		nil
-	}
-
-	private var retryEnabled: Bool {
-		false
-	}
-}
-
 // MARK: - FactorSourceAccess.View
 
 public extension FactorSourceAccess {
 	struct ViewState: Equatable {
 		let title: String
 		let message: String
-		let device: String?
+		let externalDevice: String?
 		let retryEnabled: Bool
 	}
 
@@ -49,13 +30,13 @@ public extension FactorSourceAccess {
 						.textStyle(.body1Regular)
 						.foregroundColor(.app.gray1)
 
-					device(viewStore.device)
+					externalDevice(viewStore.externalDevice)
 
 					if viewStore.retryEnabled {
 						Button {
 							viewStore.send(.retryButtonTapped)
 						} label: {
-							Text("Retry")
+							Text(L10n.Common.retry)
 								.textStyle(.body1Header)
 								.foregroundColor(.app.blue2)
 								.frame(height: .standardButtonHeight)
@@ -70,13 +51,14 @@ public extension FactorSourceAccess {
 			}
 			.presentationDetents([.fraction(0.66)])
 			.presentationDragIndicator(.visible)
+			.interactiveDismissDisabled()
 			.onFirstTask { @MainActor in
 				await store.send(.view(.onFirstTask)).finish()
 			}
 		}
 
 		@ViewBuilder
-		private func device(_ value: String?) -> some SwiftUI.View {
+		private func externalDevice(_ value: String?) -> some SwiftUI.View {
 			if let value {
 				HStack(spacing: .medium3) {
 					Image(asset: AssetResource.signingKey)
@@ -94,5 +76,70 @@ public extension FactorSourceAccess {
 				.cornerRadius(.large1)
 			}
 		}
+	}
+}
+
+// MARK: - ViewState
+extension FactorSourceAccess.State {
+	var viewState: FactorSourceAccess.ViewState {
+		.init(
+			title: title,
+			message: message,
+			externalDevice: externalDevice,
+			retryEnabled: retryEnabled
+		)
+	}
+
+	private var title: String {
+		typealias S = L10n.FactorSourceAccess.Title
+		switch purpose {
+		case .signature:
+			return S.signature
+		case .createAccount:
+			return S.createAccount
+		case .deriveAccounts:
+			return S.deriveAccounts
+		case .proveOwnership:
+			return S.proveOwnership
+		case .encryptMessage:
+			return S.encryptMessage
+		case .createKey:
+			return S.createKey
+		}
+	}
+
+	private var message: String {
+		typealias S = L10n.FactorSourceAccess.Message
+		switch kind {
+		case .device:
+			switch purpose {
+			case .signature:
+				return S.Device.signature
+			case .createAccount, .deriveAccounts, .proveOwnership, .encryptMessage, .createKey:
+				return S.Device.general
+			}
+		case .ledger:
+			switch purpose {
+			case .signature:
+				return S.Ledger.signature
+			case .deriveAccounts:
+				return S.Ledger.deriveAccounts
+			case .createAccount, .proveOwnership, .encryptMessage, .createKey:
+				return S.Ledger.general
+			}
+		}
+	}
+
+	private var externalDevice: String? {
+		switch kind {
+		case .device:
+			nil
+		case let .ledger(value):
+			value?.hint.name
+		}
+	}
+
+	private var retryEnabled: Bool {
+		false
 	}
 }

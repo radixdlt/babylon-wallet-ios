@@ -214,19 +214,23 @@ public struct Signing: Sendable, FeatureReducer {
 		}
 		switch nextKind {
 		case .device:
-			return .signWithDeviceFactors(.init(signingFactors: nextFactors, signingPurposeWithPayload: signingPurposeWithPayload, factorSourceAccess: deviceFactorSourceAccess))
+			return .signWithDeviceFactors(.init(
+				signingFactors: nextFactors,
+				signingPurposeWithPayload: signingPurposeWithPayload,
+				factorSourceAccess: .init(kind: .device, purpose: .signature)
+			))
 		case .ledgerHQHardwareWallet:
-			return .signWithLedgerFactors(.init(signingFactors: nextFactors, signingPurposeWithPayload: signingPurposeWithPayload, factorSourceAccess: ledgerFactorSourceAccess))
+			var ledger: LedgerHardwareWalletFactorSource?
+			if let factors = factorsLeftToSignWith[.ledgerHQHardwareWallet], case let .ledger(value) = factors.first.factorSource {
+				ledger = value
+			}
+			return .signWithLedgerFactors(.init(
+				signingFactors: nextFactors,
+				signingPurposeWithPayload: signingPurposeWithPayload,
+				factorSourceAccess: .init(kind: .ledger(ledger), purpose: .signature)
+			))
 		case .offDeviceMnemonic, .securityQuestions, .trustedContact:
 			fatalError("Implement me")
 		}
-	}
-
-	private static var deviceFactorSourceAccess: FactorSourceAccess.State {
-		.init()
-	}
-
-	private static var ledgerFactorSourceAccess: FactorSourceAccess.State {
-		.init()
 	}
 }

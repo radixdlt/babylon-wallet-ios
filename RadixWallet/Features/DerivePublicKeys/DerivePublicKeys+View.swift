@@ -22,7 +22,7 @@ extension DerivePublicKeys {
 				L10n.DerivePublicKeys.titleCreateAccount
 
 			case .createNewEntity(.identity):
-				L10n.DerivePublicKeys.titleCreatePersona
+				L10n.DerivePublicKeys.titleCreatePersona // TODO: MATI - Missing case
 
 			case .accountRecoveryScan:
 				L10n.DerivePublicKeys.titleAccountRecoveryScan
