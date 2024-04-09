@@ -242,7 +242,7 @@ extension SecureStorageClient: DependencyKey {
 			)
 		}
 
-		let saveMobile2MobileSessionSecret: SaveMobile2MobileSessionSecret = { session in
+		let saveRadixConnectRelaySession: SaveRadixConnectRelaySession = { session in
 			let mostSecureAccesibilityAndAuthenticationPolicy = try queryMostSecureAccesibilityAndAuthenticationPolicy()
 
 			let data = try jsonEncoder().encode(session)
@@ -259,7 +259,7 @@ extension SecureStorageClient: DependencyKey {
 			)
 		}
 
-		let loadMobile2MobileSessionSecret: LoadMobile2MobileSessionSecret = { id in
+		let loadRadixConnectRelaySession: loadRadixConnectRelaySession = { id in
 			try keychainClient.getDataWithoutAuth(forKey: .init(.init(rawValue: id.rawValue)!)).map {
 				try jsonDecoder().decode(RadixConnectRelay.Session.self, from: $0)
 			}
@@ -412,8 +412,8 @@ extension SecureStorageClient: DependencyKey {
 			deprecatedLoadDeviceID: deprecatedLoadDeviceID,
 			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID,
 			getAllMnemonics: getAllMnemonics,
-			saveMobile2MobileSessionSecret: saveMobile2MobileSessionSecret,
-			loadMobile2MobileSessionSecret: loadMobile2MobileSessionSecret
+			saveRadixConnectRelaySession: saveRadixConnectRelaySession,
+			loadRadixConnectRelaySession: loadRadixConnectRelaySession
 		)
 		#else
 		return Self(
@@ -434,8 +434,8 @@ extension SecureStorageClient: DependencyKey {
 			saveDeviceInfo: saveDeviceInfo,
 			deprecatedLoadDeviceID: deprecatedLoadDeviceID,
 			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID,
-			saveMobile2MobileSessionSecret: saveMobile2MobileSessionSecret,
-			loadMobile2MobileSessionSecret: loadMobile2MobileSessionSecret
+			saveRadixConnectRelaySession: saveRadixConnectRelaySession,
+			loadRadixConnectRelaySession: loadRadixConnectRelaySession
 		)
 		#endif
 	}()

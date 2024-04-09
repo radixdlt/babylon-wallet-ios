@@ -26,8 +26,8 @@ public struct SecureStorageClient: Sendable {
 	/// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
 	public var deleteDeprecatedDeviceID: DeleteDeprecatedDeviceID
 
-	public var saveMobile2MobileSessionSecret: SaveMobile2MobileSessionSecret
-	public var loadMobile2MobileSessionSecret: LoadMobile2MobileSessionSecret
+	public var saveRadixConnectRelaySession: SaveRadixConnectRelaySession
+	public var loadRadixConnectRelaySession: LoadRadixConnectRelaySession
 
 	#if DEBUG
 	public var getAllMnemonics: GetAllMnemonics
@@ -53,8 +53,8 @@ public struct SecureStorageClient: Sendable {
 		deprecatedLoadDeviceID: @escaping DeprecatedLoadDeviceID,
 		deleteDeprecatedDeviceID: @escaping DeleteDeprecatedDeviceID,
 		getAllMnemonics: @escaping GetAllMnemonics,
-		saveMobile2MobileSessionSecret: @escaping SaveMobile2MobileSessionSecret,
-		loadMobile2MobileSessionSecret: @escaping LoadMobile2MobileSessionSecret
+		saveRadixConnectRelaySession: @escaping SaveRadixConnectRelaySession,
+		loadRadixConnectRelaySession: @escaping LoadRadixConnectRelaySession
 	) {
 		self.saveProfileSnapshot = saveProfileSnapshot
 		self.loadProfileSnapshotData = loadProfileSnapshotData
@@ -74,8 +74,8 @@ public struct SecureStorageClient: Sendable {
 		self.deprecatedLoadDeviceID = deprecatedLoadDeviceID
 		self.deleteDeprecatedDeviceID = deleteDeprecatedDeviceID
 		self.getAllMnemonics = getAllMnemonics
-		self.saveMobile2MobileSessionSecret = saveMobile2MobileSessionSecret
-		self.loadMobile2MobileSessionSecret = loadMobile2MobileSessionSecret
+		self.saveRadixConnectRelaySession = saveRadixConnectRelaySession
+		self.loadRadixConnectRelaySession = loadRadixConnectRelaySession
 	}
 	#else
 
@@ -97,8 +97,8 @@ public struct SecureStorageClient: Sendable {
 		saveDeviceInfo: @escaping SaveDeviceInfo,
 		deprecatedLoadDeviceID: @escaping DeprecatedLoadDeviceID,
 		deleteDeprecatedDeviceID: @escaping DeleteDeprecatedDeviceID,
-		saveMobile2MobileSessionSecret: @escaping SaveMobile2MobileSessionSecret,
-		loadMobile2MobileSessionSecret: @escaping LoadMobile2MobileSessionSecret
+		saveRadixConnectRelaySession: @escaping SaveRadixConnectRelaySession,
+		loadRadixConnectRelaySession: @escaping loadRadixConnectRelaySession
 	) {
 		self.saveProfileSnapshot = saveProfileSnapshot
 		self.loadProfileSnapshotData = loadProfileSnapshotData
@@ -117,8 +117,8 @@ public struct SecureStorageClient: Sendable {
 		self.saveDeviceInfo = saveDeviceInfo
 		self.deprecatedLoadDeviceID = deprecatedLoadDeviceID
 		self.deleteDeprecatedDeviceID = deleteDeprecatedDeviceID
-		self.saveMobile2MobileSessionSecret = saveMobile2MobileSessionSecret
-		self.loadMobile2MobileSessionSecret = loadMobile2MobileSessionSecret
+		self.saveRadixConnectRelaySession = saveRadixConnectRelaySession
+		self.loadRadixConnectRelaySession = loadRadixConnectRelaySession
 	}
 	#endif // DEBUG
 }
@@ -154,8 +154,8 @@ extension SecureStorageClient {
 	public typealias LoadDeviceInfo = @Sendable () throws -> DeviceInfo?
 	public typealias SaveDeviceInfo = @Sendable (DeviceInfo) throws -> Void
 
-	public typealias SaveMobile2MobileSessionSecret = @Sendable (RadixConnectRelay.Session) throws -> Void
-	public typealias LoadMobile2MobileSessionSecret = @Sendable (RadixConnectRelay.Session.ID) throws -> RadixConnectRelay.Session?
+	public typealias SaveRadixConnectRelaySession = @Sendable (RadixConnectRelay.Session) throws -> Void
+	public typealias LoadRadixConnectRelaySession = @Sendable (RadixConnectRelay.Session.ID) throws -> RadixConnectRelay.Session?
 
 	/// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
 	public typealias DeprecatedLoadDeviceID = @Sendable () throws -> DeviceID?
