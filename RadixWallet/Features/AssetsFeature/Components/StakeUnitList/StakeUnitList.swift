@@ -41,7 +41,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 				)
 				self.stakedValidators = []
 			case let .success(details):
-				let allSelectedTokens = selectedStakeClaimTokens?.values.flatMap { $0 }.map(\.id).asIdentifiable()
+				let allSelectedTokens = selectedStakeClaimTokens?.values.flatMap { $0 }.map(\.id).asIdentified()
 
 				let stakeClaims = details.compactMap(\.stakeClaimTokens).flatMap(\.stakeClaims)
 				let stakedAmount = details.map {
@@ -88,7 +88,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 							)
 						}
 					)
-				}.sorted(by: \.id.address).asIdentifiable()
+				}.sorted(by: \.id.address).asIdentified()
 
 				self.stakeSummary = .init(
 					staked: .success(stakedAmount),

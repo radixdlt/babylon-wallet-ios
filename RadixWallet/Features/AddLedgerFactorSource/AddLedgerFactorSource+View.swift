@@ -41,7 +41,7 @@ extension AddLedgerFactorSource {
 						.padding(.bottom, .large2)
 					}
 					.toolbar {
-						ToolbarItem(placement: .primaryAction) {
+						ToolbarItem(placement: .cancellationAction) {
 							CloseButton {
 								viewStore.send(.closeButtonTapped)
 							}

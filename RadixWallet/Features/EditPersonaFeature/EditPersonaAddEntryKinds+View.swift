@@ -48,7 +48,7 @@ extension EditPersonaAddEntryKinds {
 					.navigationBarTitleDisplayMode(.inline)
 					.navigationBarInlineTitleFont(.app.secondaryHeader)
 					.toolbar {
-						ToolbarItem(placement: .primaryAction) {
+						ToolbarItem(placement: .cancellationAction) {
 							CloseButton(action: { viewStore.send(.closeButtonTapped) })
 						}
 					}

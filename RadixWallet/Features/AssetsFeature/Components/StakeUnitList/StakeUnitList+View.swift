@@ -5,7 +5,7 @@ extension StakeUnitList.State {
 	}
 
 	var remainingStakedValidators: IdentifiedArrayOf<ValidatorStakeView.ViewState> {
-		Array(stakedValidators.dropFirst()).asIdentifiable()
+		Array(stakedValidators.dropFirst()).asIdentified()
 	}
 }
 
