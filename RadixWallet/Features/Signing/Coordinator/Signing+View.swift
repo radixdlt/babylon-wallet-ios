@@ -15,18 +15,11 @@ extension Signing {
 		public var body: some SwiftUI.View {
 			SwitchStore(store.scope(state: \.step, action: Action.child)) { state in
 				switch state {
-				case .signWithDeviceFactors:
+				case .signWithFactorSource:
 					CaseLet(
-						/Signing.State.Step.signWithDeviceFactors,
-						action: Signing.ChildAction.signWithDeviceFactors,
-						then: { SignWithFactorSourcesOfKindDevice.View(store: $0) }
-					)
-
-				case .signWithLedgerFactors:
-					CaseLet(
-						/Signing.State.Step.signWithLedgerFactors,
-						action: Signing.ChildAction.signWithLedgerFactors,
-						then: { SignWithFactorSourcesOfKindLedger.View(store: $0) }
+						/Signing.State.Step.signWithFactorSource,
+						action: Signing.ChildAction.signWithFactorSource,
+						then: { SignWithFactorSource.View(store: $0) }
 					)
 				}
 			}

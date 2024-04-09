@@ -36,8 +36,7 @@ public enum SigningResponse: Sendable, Hashable {
 public struct Signing: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Step: Sendable, Hashable {
-			case signWithDeviceFactors(SignWithFactorSourcesOfKindDevice.State)
-			case signWithLedgerFactors(SignWithFactorSourcesOfKindLedger.State)
+			case signWithFactorSource(SignWithFactorSource.State)
 		}
 
 		public var signatures: OrderedSet<SignatureOfEntity> = []
@@ -73,8 +72,7 @@ public struct Signing: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case signWithDeviceFactors(SignWithFactorSourcesOfKindDevice.Action)
-		case signWithLedgerFactors(SignWithFactorSourcesOfKindLedger.Action)
+		case signWithFactorSource(SignWithFactorSource.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -92,16 +90,10 @@ public struct Signing: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Scope(state: \.step, action: /.self) {
 			Scope(
-				state: /State.Step.signWithDeviceFactors,
-				action: /Action.child .. ChildAction.signWithDeviceFactors
+				state: /State.Step.signWithFactorSource,
+				action: /Action.child .. ChildAction.signWithFactorSource
 			) {
-				SignWithFactorSourcesOfKindDevice()
-			}
-			Scope(
-				state: /State.Step.signWithLedgerFactors,
-				action: /Action.child .. ChildAction.signWithLedgerFactors
-			) {
-				SignWithFactorSourcesOfKindLedger()
+				SignWithFactorSource()
 			}
 		}
 
@@ -158,13 +150,10 @@ public struct Signing: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case
-			let .signWithDeviceFactors(.delegate(.done(factors, signatures))),
-			let .signWithLedgerFactors(.delegate(.done(factors, signatures))):
+		case let .signWithFactorSource(.delegate(.done(factors, signatures))):
 			return handleSignatures(signingFactors: factors, signatures: signatures, &state)
 
-		case let .signWithDeviceFactors(.delegate(.failedToSign(factor))),
-		     let .signWithLedgerFactors(.delegate(.failedToSign(factor))):
+		case let .signWithFactorSource(.delegate(.failedToSign(factor))):
 			loggerGlobal.error("Failed to sign with \(factor.factorSource.kind)")
 			return .send(.delegate(.failedToSign))
 		default:
@@ -214,20 +203,16 @@ public struct Signing: Sendable, FeatureReducer {
 		}
 		switch nextKind {
 		case .device:
-			return .signWithDeviceFactors(.init(
+			return .signWithFactorSource(.init(
+				kind: .device,
 				signingFactors: nextFactors,
-				signingPurposeWithPayload: signingPurposeWithPayload,
-				factorSourceAccess: .init(kind: .device, purpose: .signature)
+				signingPurposeWithPayload: signingPurposeWithPayload
 			))
 		case .ledgerHQHardwareWallet:
-			var ledger: LedgerHardwareWalletFactorSource?
-			if let factors = factorsLeftToSignWith[.ledgerHQHardwareWallet], case let .ledger(value) = factors.first.factorSource {
-				ledger = value
-			}
-			return .signWithLedgerFactors(.init(
+			return .signWithFactorSource(.init(
+				kind: .ledger,
 				signingFactors: nextFactors,
-				signingPurposeWithPayload: signingPurposeWithPayload,
-				factorSourceAccess: .init(kind: .ledger(ledger), purpose: .signature)
+				signingPurposeWithPayload: signingPurposeWithPayload
 			))
 		case .offDeviceMnemonic, .securityQuestions, .trustedContact:
 			fatalError("Implement me")
