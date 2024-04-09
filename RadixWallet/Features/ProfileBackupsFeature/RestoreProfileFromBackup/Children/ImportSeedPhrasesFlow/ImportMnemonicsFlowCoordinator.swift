@@ -190,7 +190,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 					let treatAsImplicitMain = !toImport.hasAnyBDFSExplicitlyMarkedMain
 					mnemonicsLeftToImport[id: firstBabylonDeviceFactorSource.id]?.isMainBDFS = treatAsImplicitMain
 				} else {
-					assertionFailure("DISCREPANCY, no babylon device factor source, invalid profile.")
+					loggerGlobal.notice("no mnemonics to import - probably you uninstalled the app with mnemonics still intact in Keychain")
 				}
 			}
 

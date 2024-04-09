@@ -1301,6 +1301,7 @@
 		E6FA984A2B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98482B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift */; };
 		E6FA984B2B04B9AC00748F20 /* ConfirmSkippingBDFS.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */; };
 		E6FA984E2B04E3D500748F20 /* NoContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA984D2B04E3D500748F20 /* NoContentView.swift */; };
+		E7B7A0FD2BBBFB6100EEE900 /* HeaderListViewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B7A0FC2BBBFB6100EEE900 /* HeaderListViewContainer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -2576,6 +2577,7 @@
 		E6FA98482B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfirmSkippingBDFS+View.swift"; sourceTree = "<group>"; };
 		E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmSkippingBDFS.swift; sourceTree = "<group>"; };
 		E6FA984D2B04E3D500748F20 /* NoContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoContentView.swift; sourceTree = "<group>"; };
+		E7B7A0FC2BBBFB6100EEE900 /* HeaderListViewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderListViewContainer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -5715,6 +5717,7 @@
 				83EA887D2B7E68EE00FF8424 /* TotalCurrencyWorthView.swift */,
 				A4CFB55E2BAA821E00778BDD /* HScrollBar.swift */,
 				A4CFB5602BAA826E00778BDD /* Measure+Position.swift */,
+				E7B7A0FC2BBBFB6100EEE900 /* HeaderListViewContainer.swift */,
 			);
 			path = DesignSystem;
 			sourceTree = "<group>";
@@ -8681,6 +8684,7 @@
 				48CFC3CD2ADC10D900E77A5C /* WordList+Italian.swift in Sources */,
 				48CFC5242ADC10DA00E77A5C /* MetadataI32Value.swift in Sources */,
 				48CFC2522ADC10D900E77A5C /* AddNewGateway+Reducer.swift in Sources */,
+				E7B7A0FD2BBBFB6100EEE900 /* HeaderListViewContainer.swift in Sources */,
 				48CFC3FA2ADC10D900E77A5C /* SignalingClient.swift in Sources */,
 				48CFC6632ADC10DB00E77A5C /* FactorSourceProtocol.swift in Sources */,
 				48CFC3A82ADC10D900E77A5C /* Signature.swift in Sources */,

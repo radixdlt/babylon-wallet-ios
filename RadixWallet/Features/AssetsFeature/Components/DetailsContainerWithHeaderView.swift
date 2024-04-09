@@ -108,7 +108,7 @@ struct DetailsContainer<Contents: View>: View {
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarInlineTitleFont(.app.secondaryHeader)
 			.toolbar {
-				ToolbarItem(placement: .primaryAction) {
+				ToolbarItem(placement: .cancellationAction) {
 					CloseButton(action: closeButtonAction)
 				}
 			}
