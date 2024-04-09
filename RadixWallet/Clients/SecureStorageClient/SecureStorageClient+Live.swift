@@ -249,19 +249,19 @@ extension SecureStorageClient: DependencyKey {
 
 			try keychainClient.setDataWithoutAuth(
 				data,
-				forKey: .init(.init(rawValue: session.id)!),
+				forKey: .init(.init(rawValue: session.id.rawValue)!),
 				attributes: .init(
 					iCloudSyncEnabled: false,
 					accessibility: mostSecureAccesibilityAndAuthenticationPolicy.accessibility,
 					label: importantKeychainIdentifier("Radix Wallet Mobile2Mobile session secret")!,
-					comment: .init("Created for \(session.dAppOrigin) \(session.sessionId)")
+					comment: .init("Created for \(session.origin) \(session.id)")
 				)
 			)
 		}
 
 		let loadMobile2MobileSessionSecret: LoadMobile2MobileSessionSecret = { id in
-			try keychainClient.getDataWithoutAuth(forKey: .init(.init(rawValue: id)!)).map {
-				try jsonDecoder().decode(Mobile2Mobile.SessionConnection.self, from: $0)
+			try keychainClient.getDataWithoutAuth(forKey: .init(.init(rawValue: id.rawValue)!)).map {
+				try jsonDecoder().decode(RadixConnectRelay.Session.self, from: $0)
 			}
 		}
 

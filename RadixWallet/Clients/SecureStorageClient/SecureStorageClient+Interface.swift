@@ -154,8 +154,8 @@ extension SecureStorageClient {
 	public typealias LoadDeviceInfo = @Sendable () throws -> DeviceInfo?
 	public typealias SaveDeviceInfo = @Sendable (DeviceInfo) throws -> Void
 
-	public typealias SaveMobile2MobileSessionSecret = @Sendable (Mobile2Mobile.SessionConnection) throws -> Void
-	public typealias LoadMobile2MobileSessionSecret = @Sendable (Mobile2Mobile.SessionConnection.ID) throws -> Mobile2Mobile.SessionConnection?
+	public typealias SaveMobile2MobileSessionSecret = @Sendable (RadixConnectRelay.Session) throws -> Void
+	public typealias LoadMobile2MobileSessionSecret = @Sendable (RadixConnectRelay.Session.ID) throws -> RadixConnectRelay.Session?
 
 	/// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
 	public typealias DeprecatedLoadDeviceID = @Sendable () throws -> DeviceID?

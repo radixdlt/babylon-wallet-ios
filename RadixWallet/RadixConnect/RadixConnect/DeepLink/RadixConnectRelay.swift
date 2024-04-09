@@ -2,46 +2,80 @@ import Foundation
 
 // MARK: - RadixConnectRelay
 // A component that interact with the RadixConnectRelay
-struct RadixConnectRelay: DependencyKey {
-	var getRequests: GetRequests
+public struct RadixConnectRelay: DependencyKey {
+	public var getRequests: GetRequests
+	public var sendResponse: SendResponse
 }
 
 extension RadixConnectRelay {
-	typealias SessionId = Tagged<Self, String>
-	typealias GetRequests = (SessionId) async throws -> [P2P.RTCMessageFromPeer.Request]
-	typealias SendResponse = (P2P.RTCOutgoingMessage.Response, SessionId) async throws -> Void
+	public typealias GetRequests = (Session.ID) async throws -> [P2P.RTCMessageFromPeer.Request]
+	public typealias SendResponse = (P2P.RTCOutgoingMessage.Response, Session.ID) async throws -> Void
+
+	public struct Session: Codable, Sendable {
+		public enum Origin: Codable, Sendable {
+			case webDapp(URL)
+		}
+
+		public typealias ID = Tagged<Self, String>
+
+		public let id: ID
+		public let origin: Origin
+		public let encryptionKey: HexCodable32Bytes
+	}
 }
 
 extension RadixConnectRelay {
-	static var liveValue: RadixConnectRelay {
+	public static var liveValue: RadixConnectRelay {
 		@Dependency(\.httpClient) var httpClient
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
 		let serviceURL = URL(string: "https://radix-connect-relay-dev.rdx-works-main.extratools.works/api/v1")!
 		let encryptionScheme = EncryptionScheme.version1
 
-		return .init(getRequests: { sessionId in
-			let body = Request.getRequests(sessionId: sessionId)
-			var urlRequest = URLRequest(url: serviceURL)
-			urlRequest.httpBody = try JSONEncoder().encode(body)
-			urlRequest.httpMethod = "POST"
+		return .init(
+			getRequests: { sessionId in
+				let body = Request.getRequests(sessionId: sessionId)
+				var urlRequest = URLRequest(url: serviceURL)
+				urlRequest.httpBody = try JSONEncoder().encode(body)
+				urlRequest.httpMethod = "POST"
 
-			let response = try await httpClient.executeRequest(urlRequest)
-			let content = try JSONDecoder().decode([HexCodable].self, from: response)
+				let response = try await httpClient.executeRequest(urlRequest)
+				let content = try JSONDecoder().decode([HexCodable].self, from: response)
 
-			let sessionSecrets = try secureStorageClient.loadMobile2MobileSessionSecret(sessionId.rawValue)!
-			let walletPrivateKey = try Curve25519.KeyAgreement.PrivateKey(rawRepresentation: sessionSecrets.walletPrivateKey.data.data)
-			let dAppPublicKey = try Curve25519.KeyAgreement.PublicKey(rawRepresentation: sessionSecrets.dAppPublicKey.data.data)
-			let sharedSecret = try walletPrivateKey.sharedSecretFromKeyAgreement(with: dAppPublicKey)
-			return try content.map {
-				try encryptionScheme.decrypt(data: $0.data, decryptionKey: .init(data: sharedSecret.data))
-			}.map {
-				try JSONDecoder().decode(
-					P2P.RTCMessageFromPeer.Request.self,
-					from: $0
+				let sessionSecrets = try secureStorageClient.loadMobile2MobileSessionSecret(sessionId)!
+				return try content.map {
+					try encryptionScheme.decrypt(data: $0.data, decryptionKey: .init(data: sessionSecrets.encryptionKey.data.data))
+				}.map {
+					try JSONDecoder().decode(
+						P2P.RTCMessageFromPeer.Request.self,
+						from: $0
+					)
+				}
+			},
+			sendResponse: { response, sessionId in
+				let sessionSecrets = try secureStorageClient.loadMobile2MobileSessionSecret(sessionId)!
+				var urlRequest = URLRequest(url: serviceURL)
+				urlRequest.httpMethod = "POST"
+				urlRequest.allHTTPHeaderFields = [
+					"accept": "application/json",
+					"Content-Type": "application/json",
+				]
+
+				let encodedResponse = try JSONEncoder().encode(response)
+
+				let encryptedResponse = try encryptionScheme.encrypt(
+					data: encodedResponse,
+					encryptionKey: .init(data: sessionSecrets.encryptionKey.data.data)
 				)
+
+				let payload = HexCodable(data: encryptedResponse)
+				let sendResponse = Request.sendResponse(sessionId: sessionId, data: payload)
+
+				urlRequest.httpBody = try JSONEncoder().encode(sendResponse)
+
+				try await httpClient.executeRequest(urlRequest)
 			}
-		})
+		)
 	}
 }
 
@@ -56,23 +90,30 @@ extension RadixConnectRelay {
 		}
 
 		let method: Method
-		let sessionId: RadixConnectRelay.SessionId
+		let sessionId: RadixConnectRelay.Session.ID
 		let data: HexCodable?
 
-		static func sendRequest(sessionId: RadixConnectRelay.SessionId, data: HexCodable) -> Self {
+		static func sendRequest(sessionId: RadixConnectRelay.Session.ID, data: HexCodable) -> Self {
 			.init(method: .sendRequest, sessionId: sessionId, data: data)
 		}
 
-		static func getRequests(sessionId: RadixConnectRelay.SessionId) -> Self {
+		static func getRequests(sessionId: RadixConnectRelay.Session.ID) -> Self {
 			.init(method: .getRequests, sessionId: sessionId, data: nil)
 		}
 
-		static func sendResponse(sessionId: RadixConnectRelay.SessionId, data: HexCodable) -> Self {
+		static func sendResponse(sessionId: RadixConnectRelay.Session.ID, data: HexCodable) -> Self {
 			.init(method: .sendResponse, sessionId: sessionId, data: data)
 		}
 
-		static func getResponses(sessionId: RadixConnectRelay.SessionId) -> Self {
+		static func getResponses(sessionId: RadixConnectRelay.Session.ID) -> Self {
 			.init(method: .getRessponses, sessionId: sessionId, data: nil)
 		}
+	}
+}
+
+extension DependencyValues {
+	public var radixConnectRelay: RadixConnectRelay {
+		get { self[RadixConnectRelay.self] }
+		set { self[RadixConnectRelay.self] = newValue }
 	}
 }
