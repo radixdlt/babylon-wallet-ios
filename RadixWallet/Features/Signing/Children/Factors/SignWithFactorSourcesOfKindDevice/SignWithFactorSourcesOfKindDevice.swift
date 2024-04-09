@@ -5,10 +5,6 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 	public typealias Factor = DeviceFactorSource
 	public typealias State = SignWithFactorSourcesOfKindState<Factor>
 
-	public enum ViewAction: SignWithFactorSourcesOfKindViewActionProtocol {
-		case onFirstTask
-	}
-
 	public enum InternalAction: SignWithFactorSourcesOfKindInternalActionProtocol {
 		case signingWithFactor(SigningFactor)
 	}
@@ -23,7 +19,7 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	public enum ChildAction: SignWithFactorSourcesOfKindChildActionProtocol {
 		case factorSourceAccess(FactorSourceAccess.Action)
 	}
 
@@ -43,13 +39,6 @@ public struct SignWithFactorSourcesOfKindDevice: SignWithFactorSourcesOfKindRedu
 			signWithSigningFactors(of: state)
 		default:
 			.none
-		}
-	}
-
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
-		switch viewAction {
-		case .onFirstTask:
-			signWithSigningFactors(of: state)
 		}
 	}
 

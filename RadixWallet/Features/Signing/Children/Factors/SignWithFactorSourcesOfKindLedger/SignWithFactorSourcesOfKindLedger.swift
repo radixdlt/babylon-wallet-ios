@@ -6,11 +6,6 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 	public typealias Factor = LedgerHardwareWalletFactorSource
 	public typealias State = SignWithFactorSourcesOfKindState<Factor>
 
-	public enum ViewAction: SignWithFactorSourcesOfKindViewActionProtocol {
-		case onFirstTask
-		case retryButtonTapped
-	}
-
 	public enum InternalAction: SignWithFactorSourcesOfKindInternalActionProtocol {
 		case signingWithFactor(SigningFactor)
 	}
@@ -20,18 +15,29 @@ public struct SignWithFactorSourcesOfKindLedger: SignWithFactorSourcesOfKindRedu
 		case failedToSign(SigningFactor)
 	}
 
+	@CasePathable
+	public enum ChildAction: SignWithFactorSourcesOfKindChildActionProtocol {
+		case factorSourceAccess(FactorSourceAccess.Action)
+	}
+
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
-		switch viewAction {
-		case .onFirstTask:
-			signWithSigningFactors(of: state)
+	public var body: some ReducerOf<Self> {
+		Scope(state: \.factorSourceAccess, action: /Action.child .. ChildAction.factorSourceAccess) {
+			FactorSourceAccess()
+		}
+		Reduce(core)
+	}
 
-		case .retryButtonTapped:
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		case .factorSourceAccess(.delegate(.perform)):
 			signWithSigningFactors(of: state)
+		default:
+			.none
 		}
 	}
 

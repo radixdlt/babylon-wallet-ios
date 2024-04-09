@@ -16,9 +16,9 @@ protocol SignWithFactorSourcesOfKindInternalActionProtocol: Sendable, Equatable 
 	static func signingWithFactor(_ signingFactor: SigningFactor) -> Self
 }
 
-// MARK: - SignWithFactorSourcesOfKindViewActionProtocol
-protocol SignWithFactorSourcesOfKindViewActionProtocol: Sendable, Equatable {
-	static var onFirstTask: Self { get }
+// MARK: - SignWithFactorSourcesOfKindChildActionProtocol
+protocol SignWithFactorSourcesOfKindChildActionProtocol: Sendable, Equatable {
+	static func factorSourceAccess(_: FactorSourceAccess.Action) -> Self
 }
 
 // MARK: - SignWithFactorSourcesOfKindState
@@ -53,7 +53,7 @@ protocol SignWithFactorSourcesOfKindReducer:
 	DelegateAction: SignWithFactorSourcesOfKindDelegateActionProtocol,
 	State == SignWithFactorSourcesOfKindState<Factor>,
 	InternalAction: SignWithFactorSourcesOfKindInternalActionProtocol,
-	ViewAction: SignWithFactorSourcesOfKindViewActionProtocol
+	ChildAction: SignWithFactorSourcesOfKindChildActionProtocol
 {
 	associatedtype Factor: FactorSourceProtocol
 
