@@ -22,11 +22,13 @@ extension SignWithFactorSourcesOfKindDevice {
 		}
 
 		public var body: some SwiftUI.View {
-			Color.app.background
-				.onFirstTask { @MainActor in
-					await store.send(.view(.onFirstTask)).finish()
-				}
-				.navigationTitle(L10n.Signing.SignatureRequest.title)
+			FactorSourceAccess.View(store: store.factorSourceAccess)
 		}
+	}
+}
+
+private extension StoreOf<SignWithFactorSourcesOfKindDevice> {
+	var factorSourceAccess: StoreOf<FactorSourceAccess> {
+		scope(state: \.factorSourceAccess, action: \.child.factorSourceAccess)
 	}
 }

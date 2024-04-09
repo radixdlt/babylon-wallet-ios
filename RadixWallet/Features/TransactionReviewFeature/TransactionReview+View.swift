@@ -493,7 +493,7 @@ private extension View {
 			store: destinationStore,
 			state: /TransactionReview.Destination.State.signing,
 			action: TransactionReview.Destination.Action.signing,
-			content: { Signing.SheetView(store: $0) }
+			content: { Signing.View(store: $0) }
 		)
 	}
 

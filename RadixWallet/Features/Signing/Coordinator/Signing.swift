@@ -214,11 +214,19 @@ public struct Signing: Sendable, FeatureReducer {
 		}
 		switch nextKind {
 		case .device:
-			return .signWithDeviceFactors(.init(signingFactors: nextFactors, signingPurposeWithPayload: signingPurposeWithPayload))
+			return .signWithDeviceFactors(.init(signingFactors: nextFactors, signingPurposeWithPayload: signingPurposeWithPayload, factorSourceAccess: deviceFactorSourceAccess))
 		case .ledgerHQHardwareWallet:
-			return .signWithLedgerFactors(.init(signingFactors: nextFactors, signingPurposeWithPayload: signingPurposeWithPayload))
+			return .signWithLedgerFactors(.init(signingFactors: nextFactors, signingPurposeWithPayload: signingPurposeWithPayload, factorSourceAccess: ledgerFactorSourceAccess))
 		case .offDeviceMnemonic, .securityQuestions, .trustedContact:
 			fatalError("Implement me")
 		}
+	}
+
+	private static var deviceFactorSourceAccess: FactorSourceAccess.State {
+		.init()
+	}
+
+	private static var ledgerFactorSourceAccess: FactorSourceAccess.State {
+		.init()
 	}
 }

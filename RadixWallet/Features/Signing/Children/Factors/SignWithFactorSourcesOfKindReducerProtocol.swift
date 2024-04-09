@@ -29,16 +29,19 @@ public struct SignWithFactorSourcesOfKindState<Factor: FactorSourceProtocol>:
 	public let signingFactors: NonEmpty<Set<SigningFactor>>
 	public let signingPurposeWithPayload: SigningPurposeWithPayload
 	public var currentSigningFactor: SigningFactor?
+	public var factorSourceAccess: FactorSourceAccess.State
 
 	public init(
 		signingFactors: NonEmpty<Set<SigningFactor>>,
 		signingPurposeWithPayload: SigningPurposeWithPayload,
-		currentSigningFactor: SigningFactor? = nil
+		currentSigningFactor: SigningFactor? = nil,
+		factorSourceAccess: FactorSourceAccess.State
 	) {
 		assert(signingFactors.allSatisfy { $0.factorSource.kind == Factor.kind })
 		self.signingFactors = signingFactors
 		self.signingPurposeWithPayload = signingPurposeWithPayload
 		self.currentSigningFactor = currentSigningFactor
+		self.factorSourceAccess = factorSourceAccess
 	}
 }
 

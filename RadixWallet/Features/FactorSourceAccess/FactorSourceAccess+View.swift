@@ -2,18 +2,18 @@ extension FactorSourceAccess.State {
 	var viewState: FactorSourceAccess.ViewState {
 		.init(
 			title: "Signature Request",
-			message: "Authenticate to your phone to sign",
+			message: "Authenticate to your phone to sign.",
 			device: device,
 			retryEnabled: retryEnabled
 		)
 	}
 
 	private var device: String? {
-		"My Arculus Card"
+		nil
 	}
 
 	private var retryEnabled: Bool {
-		true
+		false
 	}
 }
 
@@ -52,7 +52,9 @@ public extension FactorSourceAccess {
 					device(viewStore.device)
 
 					if viewStore.retryEnabled {
-						Button {} label: {
+						Button {
+							viewStore.send(.retryButtonTapped)
+						} label: {
 							Text("Retry")
 								.textStyle(.body1Header)
 								.foregroundColor(.app.blue2)
@@ -68,6 +70,9 @@ public extension FactorSourceAccess {
 			}
 			.presentationDetents([.fraction(0.66)])
 			.presentationDragIndicator(.visible)
+			.onFirstTask { @MainActor in
+				await store.send(.view(.onFirstTask)).finish()
+			}
 		}
 
 		@ViewBuilder

@@ -32,22 +32,4 @@ extension Signing {
 			}
 		}
 	}
-
-	/// A wrapper for Signing.View to be used in a sheet context
-	@MainActor
-	public struct SheetView: SwiftUI.View {
-		private let store: StoreOf<Signing>
-
-		public init(store: StoreOf<Signing>) {
-			self.store = store
-		}
-
-		public var body: some SwiftUI.View {
-			WithNavigationBar {
-				store.send(.view(.closeButtonTapped))
-			} content: {
-				View(store: store)
-			}
-		}
-	}
 }
