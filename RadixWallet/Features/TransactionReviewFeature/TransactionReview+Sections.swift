@@ -356,8 +356,7 @@ extension TransactionReview {
 	private func extractDappEntity(_ entity: Address) async throws -> DappEntity {
 		let dAppDefinitionAddress = try await onLedgerEntitiesClient.getDappDefinitionAddress(entity)
 		let metadata = try await onLedgerEntitiesClient.getDappMetadata(dAppDefinitionAddress, validatingDappEntity: entity)
-		let isAuthorized = await authorizedDappsClient.isDappAuthorized(dAppDefinitionAddress)
-		return DappEntity(id: dAppDefinitionAddress, metadata: metadata, isAuthorized: isAuthorized)
+		return DappEntity(id: dAppDefinitionAddress, metadata: metadata)
 	}
 
 	private func exctractProofs(_ accountProofs: [EngineToolkit.Address]) async throws -> TransactionReviewProofs.State? {
