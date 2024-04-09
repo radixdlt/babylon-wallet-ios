@@ -35,13 +35,8 @@ public enum SigningResponse: Sendable, Hashable {
 // MARK: - Signing
 public struct Signing: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public enum Step: Sendable, Hashable {
-			case signWithFactorSource(SignWithFactorSource.State)
-		}
-
 		public var signatures: OrderedSet<SignatureOfEntity> = []
-
-		public var step: Step
+		public var signWithFactorSource: SignWithFactorSource.State
 
 		public var factorsLeftToSignWith: SigningFactors
 		public let expectedSignatureCount: Int
@@ -55,7 +50,7 @@ public struct Signing: Sendable, FeatureReducer {
 			self.signingPurposeWithPayload = signingPurposeWithPayload
 			self.factorsLeftToSignWith = factorsLeftToSignWith
 			self.expectedSignatureCount = factorsLeftToSignWith.expectedSignatureCount
-			self.step = Signing.nextStep(
+			self.signWithFactorSource = Signing.nextFactorSource(
 				factorsLeftToSignWith: factorsLeftToSignWith,
 				signingPurposeWithPayload: signingPurposeWithPayload
 			)!
@@ -71,6 +66,7 @@ public struct Signing: Sendable, FeatureReducer {
 		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
 		case signWithFactorSource(SignWithFactorSource.Action)
 	}
@@ -88,15 +84,9 @@ public struct Signing: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.step, action: /.self) {
-			Scope(
-				state: /State.Step.signWithFactorSource,
-				action: /Action.child .. ChildAction.signWithFactorSource
-			) {
-				SignWithFactorSource()
-			}
+		Scope(state: \.signWithFactorSource, action: /Action.child .. ChildAction.signWithFactorSource) {
+			SignWithFactorSource()
 		}
-
 		Reduce(self.core)
 	}
 
@@ -180,21 +170,21 @@ public struct Signing: Sendable, FeatureReducer {
 	}
 
 	private func proceedWithNextFactorSource(_ state: inout State) -> Effect<Action> {
-		guard let nextStep = Self.nextStep(
+		guard let nextFactorSource = Self.nextFactorSource(
 			factorsLeftToSignWith: state.factorsLeftToSignWith,
 			signingPurposeWithPayload: state.signingPurposeWithPayload
 		) else {
 			assert(state.signatures.count == state.expectedSignatureCount, "Expected to have \(state.expectedSignatureCount) signatures, but got: \(state.signatures.count)")
 			return .send(.internal(.finishedSigningWithAllFactors))
 		}
-		state.step = nextStep
+		state.signWithFactorSource = nextFactorSource
 		return .none
 	}
 
-	private static func nextStep(
+	private static func nextFactorSource(
 		factorsLeftToSignWith: SigningFactors,
 		signingPurposeWithPayload: SigningPurposeWithPayload
-	) -> State.Step? {
+	) -> SignWithFactorSource.State? {
 		guard
 			let nextKind = factorsLeftToSignWith.keys.first,
 			let nextFactors = factorsLeftToSignWith[nextKind]
@@ -203,17 +193,17 @@ public struct Signing: Sendable, FeatureReducer {
 		}
 		switch nextKind {
 		case .device:
-			return .signWithFactorSource(.init(
+			return .init(
 				kind: .device,
 				signingFactors: nextFactors,
 				signingPurposeWithPayload: signingPurposeWithPayload
-			))
+			)
 		case .ledgerHQHardwareWallet:
-			return .signWithFactorSource(.init(
+			return .init(
 				kind: .ledger,
 				signingFactors: nextFactors,
 				signingPurposeWithPayload: signingPurposeWithPayload
-			))
+			)
 		case .offDeviceMnemonic, .securityQuestions, .trustedContact:
 			fatalError("Implement me")
 		}

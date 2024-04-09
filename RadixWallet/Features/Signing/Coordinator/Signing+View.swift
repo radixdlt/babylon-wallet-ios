@@ -13,16 +13,7 @@ extension Signing {
 		}
 
 		public var body: some SwiftUI.View {
-			SwitchStore(store.scope(state: \.step, action: Action.child)) { state in
-				switch state {
-				case .signWithFactorSource:
-					CaseLet(
-						/Signing.State.Step.signWithFactorSource,
-						action: Signing.ChildAction.signWithFactorSource,
-						then: { SignWithFactorSource.View(store: $0) }
-					)
-				}
-			}
+			SignWithFactorSource.View(store: store.scope(state: \.signWithFactorSource, action: \.child.signWithFactorSource))
 		}
 	}
 }
