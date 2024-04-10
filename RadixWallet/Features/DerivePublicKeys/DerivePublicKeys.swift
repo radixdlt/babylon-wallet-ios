@@ -27,8 +27,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 				case .createNewEntity(.account):
 					.createAccount
 				case .createNewEntity(.identity):
-					// TODO: MATI - Add support
-					.createAccount
+					.createPersona
 				case .accountRecoveryScan:
 					.deriveAccounts
 				case .importLegacyAccounts:

@@ -1040,6 +1040,7 @@ If you have any “Legacy” Accounts (created on the Olympia network) to import
 "survey_submitButton" = "Submit Feedback - Thanks!";
 "factorSourceAccess_title_signature" = "Signature Request";
 "factorSourceAccess_title_createAccount" = "Creating Account";
+"factorSourceAccess_title_createPersona" = "Creating Persona";
 "factorSourceAccess_title_deriveAccounts" = "Deriving Accounts";
 "factorSourceAccess_title_proveOwnership" = "Proving Ownership";
 "factorSourceAccess_title_encryptMessage" = "Encrypting Message";

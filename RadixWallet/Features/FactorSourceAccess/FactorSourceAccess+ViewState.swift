@@ -17,6 +17,8 @@ extension FactorSourceAccess.State {
 			return S.signature
 		case .createAccount:
 			return S.createAccount
+		case .createPersona:
+			return S.createPersona
 		case .deriveAccounts:
 			return S.deriveAccounts
 		case .proveOwnership:
@@ -35,7 +37,7 @@ extension FactorSourceAccess.State {
 			switch purpose {
 			case .signature:
 				return S.Device.signature
-			case .createAccount, .deriveAccounts, .proveOwnership, .encryptMessage, .createKey:
+			case .createAccount, .createPersona, .deriveAccounts, .proveOwnership, .encryptMessage, .createKey:
 				return S.Device.general
 			}
 		case .ledger:
@@ -44,7 +46,7 @@ extension FactorSourceAccess.State {
 				return S.Ledger.signature
 			case .deriveAccounts:
 				return S.Ledger.deriveAccounts
-			case .createAccount, .proveOwnership, .encryptMessage, .createKey:
+			case .createAccount, .createPersona, .proveOwnership, .encryptMessage, .createKey:
 				return S.Ledger.general
 			}
 		}

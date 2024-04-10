@@ -46,6 +46,9 @@ extension FactorSourceAccess.State {
 		/// Adding a new account.
 		case createAccount
 
+		/// Adding a new persona.
+		case createPersona
+
 		/// Recovery of existing accounts.
 		case deriveAccounts
 

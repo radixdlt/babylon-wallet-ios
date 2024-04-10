@@ -1536,6 +1536,8 @@ public enum L10n {
       public static let createAccount = L10n.tr("Localizable", "factorSourceAccess_title_createAccount", fallback: "Creating Account")
       /// Creating Key
       public static let createKey = L10n.tr("Localizable", "factorSourceAccess_title_createKey", fallback: "Creating Key")
+      /// Creating Persona
+      public static let createPersona = L10n.tr("Localizable", "factorSourceAccess_title_createPersona", fallback: "Creating Persona")
       /// Deriving Accounts
       public static let deriveAccounts = L10n.tr("Localizable", "factorSourceAccess_title_deriveAccounts", fallback: "Deriving Accounts")
       /// Encrypting Message
