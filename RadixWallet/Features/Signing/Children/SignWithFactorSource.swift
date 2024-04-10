@@ -2,6 +2,7 @@ import ComposableArchitecture
 
 // MARK: - SignWithFactorSource
 public struct SignWithFactorSource: Sendable, FeatureReducer {
+	@ObservableState
 	public struct State: Sendable, Hashable {
 		public let kind: Kind
 		public let signingFactors: NonEmpty<Set<SigningFactor>>
