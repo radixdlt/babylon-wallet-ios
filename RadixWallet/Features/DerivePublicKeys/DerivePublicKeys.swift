@@ -89,7 +89,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 					case let .ledger(ledger):
 						.ledger(ledger)
 					default:
-						fatalError("Impelement")
+						fatalError("Implement")
 					}
 				case .specificPrivateHDFactorSource:
 					// TODO: MATI: Confirm this should use device
