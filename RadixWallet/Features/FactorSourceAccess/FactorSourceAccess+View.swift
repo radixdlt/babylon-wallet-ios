@@ -26,7 +26,7 @@ public extension FactorSourceAccess {
 						.textStyle(.sheetTitle)
 						.foregroundColor(.app.gray1)
 
-					Text(viewStore.message)
+					Text(LocalizedStringKey(viewStore.message))
 						.textStyle(.body1Regular)
 						.foregroundColor(.app.gray1)
 
