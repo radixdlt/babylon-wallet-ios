@@ -40,7 +40,7 @@ public struct SignWithFactorSource: Sendable, FeatureReducer {
 	}
 
 	@CasePathable
-	public enum ChildAction: Sendable, Equatable {
+	public enum ChildAction: Sendable, Hashable {
 		case factorSourceAccess(FactorSourceAccess.Action)
 	}
 

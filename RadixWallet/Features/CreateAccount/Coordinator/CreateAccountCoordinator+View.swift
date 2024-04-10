@@ -46,6 +46,7 @@ extension CreateAccountCoordinator {
 					destinations(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
 				}
 				.navigationTransition(.slide, interactivity: .disabled)
+				.destinations(with: store)
 			}
 		}
 
@@ -80,5 +81,27 @@ extension CreateAccountCoordinator {
 			.navigationBarBackButtonHidden(!shouldDisplayNavBar)
 			.navigationBarHidden(!shouldDisplayNavBar)
 		}
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<CreateAccountCoordinator>) -> some View {
+		let destinationStore = store.destination
+		return sheet(
+			store: destinationStore,
+			state: /CreateAccountCoordinator.Destination.State.derivePublicKeys,
+			action: CreateAccountCoordinator.Destination.Action.derivePublicKeys,
+			content: { DerivePublicKeys.View(store: $0) }
+		)
+	}
+}
+
+extension StoreOf<CreateAccountCoordinator> {
+	var destination: PresentationStoreOf<CreateAccountCoordinator.Destination> {
+		func scopeState(state: State) -> PresentationState<CreateAccountCoordinator.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }

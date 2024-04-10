@@ -236,6 +236,10 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 					loggerGlobal.error("Failed to process Olympia hardware accounts: \(error)")
 					errorQueue.schedule(error)
 				}
+
+			case .derivePublicKeys(.cancel):
+				state.destination = nil
+				return .none
 			}
 
 		default:
