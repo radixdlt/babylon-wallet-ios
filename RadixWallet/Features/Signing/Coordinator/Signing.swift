@@ -57,10 +57,6 @@ public struct Signing: Sendable, FeatureReducer {
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-		case closeButtonTapped
-	}
-
 	public enum InternalAction: Sendable, Equatable {
 		case finishedSigningWithAllFactors
 		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
@@ -88,13 +84,6 @@ public struct Signing: Sendable, FeatureReducer {
 			SignWithFactorSource()
 		}
 		Reduce(self.core)
-	}
-
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
-		switch viewAction {
-		case .closeButtonTapped:
-			.send(.delegate(.cancelSigning))
-		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
@@ -146,6 +135,9 @@ public struct Signing: Sendable, FeatureReducer {
 		case let .signWithFactorSource(.delegate(.failedToSign(factor))):
 			loggerGlobal.error("Failed to sign with \(factor.factorSource.kind)")
 			return .send(.delegate(.failedToSign))
+
+		case .signWithFactorSource(.delegate(.cancel)):
+			return .send(.delegate(.cancelSigning))
 		default:
 			return .none
 		}

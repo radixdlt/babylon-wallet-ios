@@ -35,6 +35,7 @@ public struct SignWithFactorSource: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case done(signingFactors: NonEmpty<Set<SigningFactor>>, signatures: Set<SignatureOfEntity>)
 		case failedToSign(SigningFactor)
+		case cancel
 	}
 
 	@CasePathable
@@ -58,6 +59,8 @@ public struct SignWithFactorSource: Sendable, FeatureReducer {
 		switch childAction {
 		case .factorSourceAccess(.delegate(.perform)):
 			signWithSigningFactors(of: state)
+		case .factorSourceAccess(.delegate(.cancel)):
+			.send(.delegate(.cancel))
 		default:
 			.none
 		}

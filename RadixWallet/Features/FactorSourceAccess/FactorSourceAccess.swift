@@ -18,6 +18,7 @@ public struct FactorSourceAccess: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case perform
+		case cancel
 	}
 
 	public init() {}
@@ -27,7 +28,7 @@ public struct FactorSourceAccess: Sendable, FeatureReducer {
 		case .onFirstTask, .retryButtonTapped:
 			.send(.delegate(.perform))
 		case .closeButtonTapped:
-			.none
+			.send(.delegate(.cancel))
 		}
 	}
 }
