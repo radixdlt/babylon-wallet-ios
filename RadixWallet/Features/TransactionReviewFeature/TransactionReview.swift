@@ -215,7 +215,6 @@ public struct TransactionReview: Sendable, FeatureReducer {
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.pasteboardClient) var pasteboardClient
 
 	public init() {}
@@ -828,7 +827,6 @@ extension TransactionReview {
 	public struct DappEntity: Sendable, Identifiable, Hashable {
 		public let id: DappDefinitionAddress
 		public let metadata: OnLedgerEntity.Metadata
-		public let isAuthorized: Bool
 	}
 
 	public enum Account: Sendable, Hashable {
