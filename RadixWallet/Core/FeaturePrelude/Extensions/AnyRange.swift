@@ -35,38 +35,3 @@ extension AnyRange {
 		lowerBound != nil && lowerBound == upperBound
 	}
 }
-
-extension AnyRange {
-	public func contains(_ otherRange: AnyRange) -> Bool {
-		switch (otherRange.lowerBound, otherRange.upperBound) {
-		case let (lowerBound?, upperBound?):
-			contains(lowerBound) && contains(upperBound)
-		case (let lowerBound?, nil):
-			contains(lowerBound) && upperBound == nil
-		case (nil, let upperBound?):
-			lowerBound == nil && contains(upperBound)
-		case (nil, nil):
-			lowerBound == nil && upperBound == nil
-		}
-	}
-
-	public var polymorphic: PolyMorhpic {
-		switch (lowerBound, upperBound) {
-		case let (lowerBound?, upperBound?):
-			.range(lowerBound ..< upperBound)
-		case (let lowerBound?, nil):
-			.partialRangeFrom(lowerBound...)
-		case (nil, let upperBound?):
-			.partialRangeUpTo(..<upperBound)
-		case (nil, nil):
-			.unboundedRange
-		}
-	}
-
-	public enum PolyMorhpic: Sendable {
-		case range(Range<Bound>)
-		case partialRangeFrom(PartialRangeFrom<Bound>)
-		case partialRangeUpTo(PartialRangeUpTo<Bound>)
-		case unboundedRange
-	}
-}
