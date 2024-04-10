@@ -93,7 +93,15 @@ extension TransactionReview {
 
 	@MainActor
 	public struct View: SwiftUI.View {
+		@SwiftUI.State private var showNavigationTitle: Bool = false
+
 		private let store: StoreOf<TransactionReview>
+
+		private let coordSpace: String = "TransactionReviewCoordSpace"
+		private let navTitleID: String = "TransactionReview.title"
+		private let showTitleHysteresis: CGFloat = .small3
+
+		private let shadowColor: Color = .app.gray2.opacity(0.4)
 
 		public init(store: StoreOf<TransactionReview>) {
 			self.store = store
@@ -121,6 +129,22 @@ extension TransactionReview {
 								.brightness(viewStore.rawTransaction == nil ? 0 : -0.15)
 							}
 						}
+
+						ToolbarItem(placement: .principal) {
+							if showNavigationTitle {
+								VStack(spacing: 0) {
+									Text(L10n.TransactionReview.title)
+										.textStyle(.body2Header)
+										.foregroundColor(.app.gray1)
+
+									if let name = viewStore.proposingDappMetadata?.name {
+										Text(L10n.TransactionReview.proposingDappSubtitle(name.rawValue))
+											.textStyle(.body2Regular)
+											.foregroundColor(.app.gray2)
+									}
+								}
+							}
+						}
 					}
 					.destinations(with: store)
 					.onAppear {
@@ -134,6 +158,7 @@ extension TransactionReview {
 			ScrollView(showsIndicators: false) {
 				VStack(spacing: 0) {
 					header(viewStore.proposingDappMetadata)
+						.measurePosition(navTitleID, coordSpace: coordSpace)
 						.padding(.horizontal, .medium3)
 						.padding(.bottom, .medium3)
 						.background {
@@ -220,9 +245,19 @@ extension TransactionReview {
 				.background(.app.gray5.gradient.shadow(.inner(color: shadowColor, radius: 15)))
 				.animation(.easeInOut, value: viewStore.canToggleViewMode ? viewStore.rawTransaction : nil)
 			}
+			.coordinateSpace(name: coordSpace)
+			.onPreferenceChange(PositionsPreferenceKey.self) { positions in
+				guard let offset = positions[navTitleID]?.maxY else {
+					showNavigationTitle = true
+					return
+				}
+				if showNavigationTitle, offset > showTitleHysteresis {
+					showNavigationTitle = false
+				} else if !showNavigationTitle, offset < 0 {
+					showNavigationTitle = true
+				}
+			}
 		}
-
-		private let shadowColor: Color = .app.gray2.opacity(0.4)
 
 		private func header(_ proposingDappMetadata: DappMetadata.Ledger?) -> some SwiftUI.View {
 			VStack(alignment: .leading, spacing: .small3) {
