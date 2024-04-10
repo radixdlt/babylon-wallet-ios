@@ -44,14 +44,16 @@ public extension FactorSourceAccess {
 						}
 					}
 				}
+				.multilineTextAlignment(.center)
 				.padding(.horizontal, .large2)
 			}
 			.withNavigationBar {
 				store.send(.view(.closeButtonTapped))
 			}
-			.presentationDetents([.fraction(0.66)])
+			.presentationDetents([.fraction(0.66), .large])
 			.presentationDragIndicator(.visible)
 			.interactiveDismissDisabled()
+			.presentationBackground(.blur)
 			.onFirstTask { @MainActor in
 				await store.send(.view(.onFirstTask)).finish()
 			}
