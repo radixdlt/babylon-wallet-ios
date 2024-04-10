@@ -234,8 +234,6 @@
 		48CFC3182ADC10D900E77A5C /* CreateAccountCoordinator+Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDBE2ADC10D800E77A5C /* CreateAccountCoordinator+Models.swift */; };
 		48CFC3192ADC10D900E77A5C /* CreateAccountCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDBF2ADC10D800E77A5C /* CreateAccountCoordinator+View.swift */; };
 		48CFC31A2ADC10D900E77A5C /* CreateAccountCoordinator+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDC02ADC10D800E77A5C /* CreateAccountCoordinator+Reducer.swift */; };
-		48CFC31B2ADC10D900E77A5C /* CreationOfAccount+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDC32ADC10D800E77A5C /* CreationOfAccount+View.swift */; };
-		48CFC31C2ADC10D900E77A5C /* CreationOfAccount+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDC42ADC10D800E77A5C /* CreationOfAccount+Reducer.swift */; };
 		48CFC31D2ADC10D900E77A5C /* NewAccountCompletion+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDC62ADC10D800E77A5C /* NewAccountCompletion+Reducer.swift */; };
 		48CFC31E2ADC10D900E77A5C /* NewAccountCompletion+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDC72ADC10D800E77A5C /* NewAccountCompletion+View.swift */; };
 		48CFC31F2ADC10D900E77A5C /* NameAccount+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDC92ADC10D800E77A5C /* NameAccount+Reducer.swift */; };
@@ -1570,8 +1568,6 @@
 		48CFBDBE2ADC10D800E77A5C /* CreateAccountCoordinator+Models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CreateAccountCoordinator+Models.swift"; sourceTree = "<group>"; };
 		48CFBDBF2ADC10D800E77A5C /* CreateAccountCoordinator+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CreateAccountCoordinator+View.swift"; sourceTree = "<group>"; };
 		48CFBDC02ADC10D800E77A5C /* CreateAccountCoordinator+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CreateAccountCoordinator+Reducer.swift"; sourceTree = "<group>"; };
-		48CFBDC32ADC10D800E77A5C /* CreationOfAccount+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CreationOfAccount+View.swift"; sourceTree = "<group>"; };
-		48CFBDC42ADC10D800E77A5C /* CreationOfAccount+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CreationOfAccount+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBDC62ADC10D800E77A5C /* NewAccountCompletion+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NewAccountCompletion+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBDC72ADC10D800E77A5C /* NewAccountCompletion+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NewAccountCompletion+View.swift"; sourceTree = "<group>"; };
 		48CFBDC92ADC10D800E77A5C /* NameAccount+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NameAccount+Reducer.swift"; sourceTree = "<group>"; };
@@ -3990,20 +3986,10 @@
 		48CFBDC12ADC10D800E77A5C /* Children */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBDC22ADC10D800E77A5C /* CreationOfAccount */,
-				48CFBDC52ADC10D800E77A5C /* NewAccountCompletion */,
 				48CFBDC82ADC10D800E77A5C /* NameAccount */,
+				48CFBDC52ADC10D800E77A5C /* NewAccountCompletion */,
 			);
 			path = Children;
-			sourceTree = "<group>";
-		};
-		48CFBDC22ADC10D800E77A5C /* CreationOfAccount */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBDC32ADC10D800E77A5C /* CreationOfAccount+View.swift */,
-				48CFBDC42ADC10D800E77A5C /* CreationOfAccount+Reducer.swift */,
-			);
-			path = CreationOfAccount;
 			sourceTree = "<group>";
 		};
 		48CFBDC52ADC10D800E77A5C /* NewAccountCompletion */ = {
@@ -8202,7 +8188,6 @@
 				48CFC5E12ADC10DA00E77A5C /* Validation+Extra.swift in Sources */,
 				83EE47A12AF0EECD00155F03 /* TransactionFungibleFeeBalanceChanges.swift in Sources */,
 				48CFC48F2ADC10DA00E77A5C /* GatewayAPIClient+Interface.swift in Sources */,
-				48CFC31C2ADC10D900E77A5C /* CreationOfAccount+Reducer.swift in Sources */,
 				48CFC6822ADC10DB00E77A5C /* AbstractSecurityStructureConfiguration.swift in Sources */,
 				48CFC4712ADC10DA00E77A5C /* AuthorizedDappsClient+Live.swift in Sources */,
 				48CFC4B52ADC10DA00E77A5C /* StateNonFungibleIdsResponse.swift in Sources */,
@@ -8861,7 +8846,6 @@
 				48CFC2502ADC10D900E77A5C /* GatewayRow+View.swift in Sources */,
 				48CFC3542ADC10D900E77A5C /* DappInteractor.swift in Sources */,
 				48CFC2ED2ADC10D900E77A5C /* FactorForRoleView.swift in Sources */,
-				48CFC31B2ADC10D900E77A5C /* CreationOfAccount+View.swift in Sources */,
 				E657773C2B0BAB35002DB237 /* RecoverWalletControlWithBDFSOnly+View.swift in Sources */,
 				48CFC3552ADC10D900E77A5C /* ImportOlympiaLedgerAccountsAndFactorSources+View.swift in Sources */,
 				48CFC4E12ADC10DA00E77A5C /* StateEntityDetailsResponseFungibleVaultDetails.swift in Sources */,

@@ -63,11 +63,11 @@ extension CreateAccountCoordinator {
 							action: CreateAccountCoordinator.Path.Action.step1_nameAccount,
 							then: { NameAccount.View(store: $0) }
 						)
-					case .step2_creationOfAccount:
+					case .step2_selectLedger:
 						CaseLet(
-							/CreateAccountCoordinator.Path.State.step2_creationOfAccount,
-							action: CreateAccountCoordinator.Path.Action.step2_creationOfAccount,
-							then: { CreationOfAccount.View(store: $0) }
+							/CreateAccountCoordinator.Path.State.step2_selectLedger,
+							action: CreateAccountCoordinator.Path.Action.step2_selectLedger,
+							then: { LedgerHardwareDevices.View(store: $0) }
 						)
 					case .step3_completion:
 						CaseLet(
