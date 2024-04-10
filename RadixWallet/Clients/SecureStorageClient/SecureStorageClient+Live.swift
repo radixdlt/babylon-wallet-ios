@@ -259,7 +259,7 @@ extension SecureStorageClient: DependencyKey {
 			)
 		}
 
-		let loadRadixConnectRelaySession: loadRadixConnectRelaySession = { id in
+		let loadRadixConnectRelaySession: LoadRadixConnectRelaySession = { id in
 			try keychainClient.getDataWithoutAuth(forKey: .init(.init(rawValue: id.rawValue)!)).map {
 				try jsonDecoder().decode(RadixConnectRelay.Session.self, from: $0)
 			}

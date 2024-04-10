@@ -8,8 +8,8 @@ public struct RadixConnectRelay: DependencyKey {
 }
 
 extension RadixConnectRelay {
-	public typealias GetRequests = (Session.ID) async throws -> [P2P.RTCMessageFromPeer.Request]
-	public typealias SendResponse = (P2P.RTCOutgoingMessage.Response, Session.ID) async throws -> Void
+	public typealias GetRequests = (Session) async throws -> [P2P.RTCMessageFromPeer.Request]
+	public typealias SendResponse = (P2P.RTCOutgoingMessage.Response, Session) async throws -> Void
 
 	public struct Session: Codable, Sendable {
 		public enum Origin: Codable, Sendable {
@@ -33,8 +33,8 @@ extension RadixConnectRelay {
 		let encryptionScheme = EncryptionScheme.version1
 
 		return .init(
-			getRequests: { sessionId in
-				let body = Request.getRequests(sessionId: sessionId)
+			getRequests: { session in
+				let body = Request.getRequests(sessionId: session.id)
 				var urlRequest = URLRequest(url: serviceURL)
 				urlRequest.httpBody = try JSONEncoder().encode(body)
 				urlRequest.httpMethod = "POST"
@@ -42,9 +42,8 @@ extension RadixConnectRelay {
 				let response = try await httpClient.executeRequest(urlRequest)
 				let content = try JSONDecoder().decode([HexCodable].self, from: response)
 
-				let sessionSecrets = try secureStorageClient.loadMobile2MobileSessionSecret(sessionId)!
 				return try content.map {
-					try encryptionScheme.decrypt(data: $0.data, decryptionKey: .init(data: sessionSecrets.encryptionKey.data.data))
+					try encryptionScheme.decrypt(data: $0.data, decryptionKey: .init(data: session.encryptionKey.data.data))
 				}.map {
 					try JSONDecoder().decode(
 						P2P.RTCMessageFromPeer.Request.self,
@@ -52,8 +51,16 @@ extension RadixConnectRelay {
 					)
 				}
 			},
-			sendResponse: { response, sessionId in
-				let sessionSecrets = try secureStorageClient.loadMobile2MobileSessionSecret(sessionId)!
+			sendResponse: { response, session in
+				let encodedResponse = try JSONEncoder().encode(response)
+				let encryptedResponse = try encryptionScheme.encrypt(
+					data: encodedResponse,
+					encryptionKey: .init(data: session.encryptionKey.data.data)
+				)
+
+				let payload = HexCodable(data: encryptedResponse)
+				let sendResponse = Request.sendResponse(sessionId: session.id, data: payload)
+
 				var urlRequest = URLRequest(url: serviceURL)
 				urlRequest.httpMethod = "POST"
 				urlRequest.allHTTPHeaderFields = [
@@ -61,19 +68,9 @@ extension RadixConnectRelay {
 					"Content-Type": "application/json",
 				]
 
-				let encodedResponse = try JSONEncoder().encode(response)
-
-				let encryptedResponse = try encryptionScheme.encrypt(
-					data: encodedResponse,
-					encryptionKey: .init(data: sessionSecrets.encryptionKey.data.data)
-				)
-
-				let payload = HexCodable(data: encryptedResponse)
-				let sendResponse = Request.sendResponse(sessionId: sessionId, data: payload)
-
 				urlRequest.httpBody = try JSONEncoder().encode(sendResponse)
 
-				try await httpClient.executeRequest(urlRequest)
+				_ = try await httpClient.executeRequest(urlRequest)
 			}
 		)
 	}

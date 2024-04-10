@@ -28,8 +28,8 @@ extension SecureStorageClient: TestDependencyKey {
 		deprecatedLoadDeviceID: { nil },
 		deleteDeprecatedDeviceID: {},
 		getAllMnemonics: { [] },
-		saveMobile2MobileSessionSecret: { _ in },
-		loadMobile2MobileSessionSecret: { _ in nil }
+		saveRadixConnectRelaySession: { _ in },
+		loadRadixConnectRelaySession: { _ in nil }
 	)
 	#else
 	public static let noop = Self(
@@ -50,8 +50,8 @@ extension SecureStorageClient: TestDependencyKey {
 		saveDeviceInfo: { _ in },
 		deprecatedLoadDeviceID: { nil },
 		deleteDeprecatedDeviceID: {},
-		saveMobile2MobileSessionSecret: { _ in },
-		loadMobile2MobileSessionSecret: { _ in nil }
+		saveRadixConnectRelaySession: { _ in },
+		loadRadixConnectRelaySession: { _ in nil }
 	)
 	#endif // DEBUG
 
@@ -77,8 +77,8 @@ extension SecureStorageClient: TestDependencyKey {
 		deprecatedLoadDeviceID: unimplemented("\(Self.self).deprecatedLoadDeviceID"),
 		deleteDeprecatedDeviceID: unimplemented("\(Self.self).deleteDeprecatedDeviceID"),
 		getAllMnemonics: unimplemented("\(Self.self).getAllMnemonics"),
-		saveMobile2MobileSessionSecret: unimplemented("\(Self.self).saveMobile2MobileSessionSecret"),
-		loadMobile2MobileSessionSecret: unimplemented("\(Self.self).loadMobile2MobileSessionSecret")
+		saveRadixConnectRelaySession: unimplemented("\(Self.self).saveRadixConnectRelaySession"),
+		loadRadixConnectRelaySession: unimplemented("\(Self.self).loadRadixConnectRelaySession")
 	)
 	#else
 	public static let testValue = Self(
@@ -99,8 +99,8 @@ extension SecureStorageClient: TestDependencyKey {
 		saveDeviceInfo: unimplemented("\(Self.self).saveDeviceInfo"),
 		deprecatedLoadDeviceID: unimplemented("\(Self.self).deprecatedLoadDeviceID"),
 		deleteDeprecatedDeviceID: unimplemented("\(Self.self).deleteDeprecatedDeviceID"),
-		saveMobile2MobileSessionSecret: unimplemented("\(Self.self).saveMobile2MobileSessionSecret"),
-		loadMobile2MobileSessionSecret: unimplemented("\(Self.self).loadMobile2MobileSessionSecret")
+		saveRadixConnectRelaySession: unimplemented("\(Self.self).saveRadixConnectRelaySession"),
+		loadRadixConnectRelaySession: unimplemented("\(Self.self).loadRadixConnectRelaySession")
 	)
 	#endif
 }

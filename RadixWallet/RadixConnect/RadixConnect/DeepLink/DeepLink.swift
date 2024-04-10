@@ -52,7 +52,7 @@ extension Mobile2Mobile {
 			let sharedSecret = try walletPrivateKey.sharedSecretFromKeyAgreement(with: dAppPublicKey)
 			let encryptionKey = SymmetricKey(data: sharedSecret.data)
 
-			try secureStorageClient.saveMobile2MobileSessionSecret(
+			try secureStorageClient.saveRadixConnectRelaySession(
 				.init(
 					id: request.sessionId,
 					origin: request.origin,
@@ -69,15 +69,21 @@ extension Mobile2Mobile {
 		}
 	}
 
-	func sendResponse(_ response: P2P.RTCOutgoingMessage.Response, sessionId: RadixConnectRelay.Session.ID) async throws {
-		try await radixConnectRelay.sendResponse(response, sessionId)
+	func sendResponse(
+		_ response: P2P.RTCOutgoingMessage.Response,
+		sessionId: RadixConnectRelay.Session.ID
+	) async throws {
+		guard let session = try secureStorageClient.loadRadixConnectRelaySession(sessionId) else {
+			return
+		}
+
+		try await radixConnectRelay.sendResponse(response, session)
 		let intId = switch response {
 		case let .dapp(response):
 			response.id.rawValue
 		}
 
-		let sessionSecrets = try secureStorageClient.loadMobile2MobileSessionSecret(sessionId)!
-		switch sessionSecrets.origin {
+		switch session.origin {
 		case let .webDapp(dAppOrigin):
 			let returnURL = URL(string: dAppOrigin.absoluteString + "#connect")?.appending(queryItems: [
 				.init(name: "sessionId", value: sessionId.rawValue),
@@ -88,8 +94,12 @@ extension Mobile2Mobile {
 	}
 
 	func handleDeepLinkRequest(_ request: Request.DappRequest) async throws {
+		guard let session = try secureStorageClient.loadRadixConnectRelaySession(request.sessionId) else {
+			return
+		}
+
 		let receivedRequest = try await radixConnectRelay
-			.getRequests(request.sessionId)
+			.getRequests(session)
 			.first {
 				switch $0 {
 				case let .dapp(dApp):
