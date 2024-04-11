@@ -46,6 +46,7 @@ extension CreatePersonaCoordinator {
 					destination(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
 				}
 				.navigationTransition(.slide, interactivity: .disabled)
+				.destinations(with: store)
 			}
 		}
 
@@ -70,17 +71,10 @@ extension CreatePersonaCoordinator {
 							then: { NewPersonaInfo.View(store: $0) }
 						)
 
-					case .step2_creationOfPersona:
+					case .step2_completion:
 						CaseLet(
-							/CreatePersonaCoordinator.Path.State.step2_creationOfPersona,
-							action: CreatePersonaCoordinator.Path.Action.step2_creationOfPersona,
-							then: { CreationOfPersona.View(store: $0) }
-						)
-
-					case .step3_completion:
-						CaseLet(
-							/CreatePersonaCoordinator.Path.State.step3_completion,
-							action: CreatePersonaCoordinator.Path.Action.step3_completion,
+							/CreatePersonaCoordinator.Path.State.step2_completion,
+							action: CreatePersonaCoordinator.Path.Action.step2_completion,
 							then: { NewPersonaCompletion.View(store: $0) }
 						)
 					}
@@ -89,5 +83,27 @@ extension CreatePersonaCoordinator {
 			.navigationBarBackButtonHidden(!shouldDisplayNavBar)
 			.navigationBarHidden(!shouldDisplayNavBar)
 		}
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<CreatePersonaCoordinator>) -> some View {
+		let destinationStore = store.destination
+		return sheet(
+			store: destinationStore,
+			state: /CreatePersonaCoordinator.Destination.State.derivePublicKeys,
+			action: CreatePersonaCoordinator.Destination.Action.derivePublicKeys,
+			content: { DerivePublicKeys.View(store: $0) }
+		)
+	}
+}
+
+extension StoreOf<CreatePersonaCoordinator> {
+	var destination: PresentationStoreOf<CreatePersonaCoordinator.Destination> {
+		func scopeState(state: State) -> PresentationState<CreatePersonaCoordinator.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }

@@ -199,8 +199,6 @@
 		48CFC2F32ADC10D900E77A5C /* CreatePersonaCoordinator+Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD7F2ADC10D800E77A5C /* CreatePersonaCoordinator+Models.swift */; };
 		48CFC2F42ADC10D900E77A5C /* IntroductionToPersonas+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD822ADC10D800E77A5C /* IntroductionToPersonas+View.swift */; };
 		48CFC2F52ADC10D900E77A5C /* IntroductionToPersonas.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD832ADC10D800E77A5C /* IntroductionToPersonas.swift */; };
-		48CFC2F62ADC10D900E77A5C /* CreationOfPersona+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD852ADC10D800E77A5C /* CreationOfPersona+Reducer.swift */; };
-		48CFC2F72ADC10D900E77A5C /* CreationOfPersona+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD862ADC10D800E77A5C /* CreationOfPersona+View.swift */; };
 		48CFC2F82ADC10D900E77A5C /* InfoOfNewPersona+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD882ADC10D800E77A5C /* InfoOfNewPersona+View.swift */; };
 		48CFC2F92ADC10D900E77A5C /* InfoOfNewPersona+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD892ADC10D800E77A5C /* InfoOfNewPersona+Reducer.swift */; };
 		48CFC2FA2ADC10D900E77A5C /* NewPersonaCompletion+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD8B2ADC10D800E77A5C /* NewPersonaCompletion+View.swift */; };
@@ -1533,8 +1531,6 @@
 		48CFBD7F2ADC10D800E77A5C /* CreatePersonaCoordinator+Models.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CreatePersonaCoordinator+Models.swift"; sourceTree = "<group>"; };
 		48CFBD822ADC10D800E77A5C /* IntroductionToPersonas+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "IntroductionToPersonas+View.swift"; sourceTree = "<group>"; };
 		48CFBD832ADC10D800E77A5C /* IntroductionToPersonas.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroductionToPersonas.swift; sourceTree = "<group>"; };
-		48CFBD852ADC10D800E77A5C /* CreationOfPersona+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CreationOfPersona+Reducer.swift"; sourceTree = "<group>"; };
-		48CFBD862ADC10D800E77A5C /* CreationOfPersona+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CreationOfPersona+View.swift"; sourceTree = "<group>"; };
 		48CFBD882ADC10D800E77A5C /* InfoOfNewPersona+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "InfoOfNewPersona+View.swift"; sourceTree = "<group>"; };
 		48CFBD892ADC10D800E77A5C /* InfoOfNewPersona+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "InfoOfNewPersona+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBD8B2ADC10D800E77A5C /* NewPersonaCompletion+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NewPersonaCompletion+View.swift"; sourceTree = "<group>"; };
@@ -3750,7 +3746,6 @@
 			isa = PBXGroup;
 			children = (
 				48CFBD812ADC10D800E77A5C /* Introduction */,
-				48CFBD842ADC10D800E77A5C /* CreationOfPersona */,
 				48CFBD872ADC10D800E77A5C /* InfoOfNewPersona */,
 				48CFBD8A2ADC10D800E77A5C /* NewPersonaCompletion */,
 			);
@@ -3764,15 +3759,6 @@
 				48CFBD832ADC10D800E77A5C /* IntroductionToPersonas.swift */,
 			);
 			path = Introduction;
-			sourceTree = "<group>";
-		};
-		48CFBD842ADC10D800E77A5C /* CreationOfPersona */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBD852ADC10D800E77A5C /* CreationOfPersona+Reducer.swift */,
-				48CFBD862ADC10D800E77A5C /* CreationOfPersona+View.swift */,
-			);
-			path = CreationOfPersona;
 			sourceTree = "<group>";
 		};
 		48CFBD872ADC10D800E77A5C /* InfoOfNewPersona */ = {
@@ -8455,7 +8441,6 @@
 				E6390FB32AE6C3E200B4DEE2 /* ProfileStore+OverlayWindowClient+Alert+OwnershipConflict.swift in Sources */,
 				83EE47A22AF0EECD00155F03 /* TransactionFungibleBalanceChanges.swift in Sources */,
 				48CFC3162ADC10D900E77A5C /* ScanMultipleOlympiaQRCodes.swift in Sources */,
-				48CFC2F72ADC10D900E77A5C /* CreationOfPersona+View.swift in Sources */,
 				48CFC2CC2ADC10D900E77A5C /* FungibleResourceAsset+Reducer.swift in Sources */,
 				48CFC29A2ADC10D900E77A5C /* TransactionReviewDapps+View.swift in Sources */,
 				48CFC36B2ADC10D900E77A5C /* FungibleTokenDetails+Reducer.swift in Sources */,
@@ -8546,7 +8531,6 @@
 				48CFC27C2ADC10D900E77A5C /* HUD+Reducer.swift in Sources */,
 				48CFC5FC2ADC10DA00E77A5C /* Asset.swift in Sources */,
 				48CFC6572ADC10DB00E77A5C /* OnNetwork+Entity+Lookup.swift in Sources */,
-				48CFC2F62ADC10D900E77A5C /* CreationOfPersona+Reducer.swift in Sources */,
 				830EA9E72AEBA793004C8051 /* EntitiesVisibilityClient+Live.swift in Sources */,
 				48CFC4012ADC10D900E77A5C /* KeychainClient+Live.swift in Sources */,
 				48CFC4E92ADC10DA00E77A5C /* TransactionPreviewRequestFlags.swift in Sources */,

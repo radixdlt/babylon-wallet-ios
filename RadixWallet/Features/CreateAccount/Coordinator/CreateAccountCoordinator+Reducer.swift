@@ -200,11 +200,6 @@ extension CreateAccountCoordinator {
 				))
 			return .none
 
-		case let .createAccountResult(.failure(error)):
-			errorQueue.schedule(error)
-			state.destination = nil
-			return .none
-
 		case let .createAccountResult(.success(account)):
 			return .run { send in
 				try await accountsClient.saveVirtualAccount(account)
@@ -213,6 +208,11 @@ extension CreateAccountCoordinator {
 				loggerGlobal.error("Failed to save newly created virtual account into profile: \(error)")
 				await send(.internal(.handleFailure))
 			}
+
+		case let .createAccountResult(.failure(error)):
+			errorQueue.schedule(error)
+			state.destination = nil
+			return .none
 
 		case let .handleAccountCreated(account):
 			state.destination = nil
