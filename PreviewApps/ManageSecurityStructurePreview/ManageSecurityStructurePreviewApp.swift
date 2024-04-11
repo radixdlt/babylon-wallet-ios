@@ -51,7 +51,7 @@ extension FactorSourcesClient {
 						mnemonic: Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong", language: .english)
 					)
 				)
-				return NonEmpty<IdentifiedArrayOf<FactorSource>>.init(rawValue: [device.embed()])!
+				return NonEmpty<IdentifiedArrayOf<FactorSource>>(rawValue: [device.embed()])!
 			}
 		}
 }
