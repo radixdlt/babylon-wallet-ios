@@ -14,12 +14,12 @@ extension NewConnection {
 		public var body: some SwiftUI.View {
 			NavigationStack {
 				ZStack {
-					SwitchStore(store) { state in
+					SwitchStore(store.scope(state: \.root, action: \.child)) { state in
 						switch state {
 						case .localNetworkPermission:
 							CaseLet(
-								/NewConnection.State.localNetworkPermission,
-								action: { NewConnection.Action.child(.localNetworkPermission($0)) },
+								/NewConnection.State.Root.localNetworkPermission,
+								action: NewConnection.ChildAction.localNetworkPermission,
 								then: {
 									LocalNetworkPermission.View(store: $0)
 										.withTitle(L10n.LinkedConnectors.NewConnection.title)
@@ -27,18 +27,18 @@ extension NewConnection {
 							)
 						case .scanQR:
 							CaseLet(
-								/NewConnection.State.scanQR,
-								action: { NewConnection.Action.child(.scanQR($0)) },
+								/NewConnection.State.Root.scanQR,
+								action: NewConnection.ChildAction.scanQR,
 								then: {
 									ScanQRCoordinator.View(store: $0)
 										.withTitle(L10n.LinkedConnectors.NewConnection.title)
 								}
 							)
-						case .connectUsingSecrets:
+						case .nameConnection:
 							CaseLet(
-								/NewConnection.State.connectUsingSecrets,
-								action: { NewConnection.Action.child(.connectUsingSecrets($0)) },
-								then: { ConnectUsingSecrets.View(store: $0) }
+								/NewConnection.State.Root.nameConnection,
+								action: NewConnection.ChildAction.nameConnection,
+								then: { NewConnectionName.View(store: $0) }
 							)
 						}
 					}

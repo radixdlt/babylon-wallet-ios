@@ -1,3 +1,4 @@
+import CryptoKit
 import WebRTC
 
 // MARK: - PeerConnectionFactory
@@ -40,7 +41,7 @@ struct PeerConnectionNegotiator {
 		self.signalingClient = signalingClient
 		self.factory = factory
 
-		let (negotiationResultsStream, negotiationResultsContinuation) = AsyncStream<NegotiationResult>.streamWithContinuation()
+		let (negotiationResultsStream, negotiationResultsContinuation) = AsyncStream<NegotiationResult>.makeStream()
 		self.negotiationResults = negotiationResultsStream.eraseToAnyAsyncSequence().share().eraseToAnyAsyncSequence()
 		self.negotiationResultsContinuation = negotiationResultsContinuation
 		self.negotiationTask = Self.listenForNegotiationTriggers(
@@ -188,6 +189,15 @@ extension PeerConnectionNegotiator {
 
 		_ = try await onConnectionEstablished.collect()
 		_ = try await onDataChannelReady.collect()
+
+		let response = P2P.ConnectorExtension.Request.LinkClientInteractionResponse(
+			discriminator: .linkClient,
+			publicKey: try! HexCodable32Bytes(data: Curve25519.PrivateKey().publicKey.compressedRepresentation)
+		)
+		@Dependency(\.jsonEncoder) var jsonEncoder
+		try await peerConnectionClient.sendData(jsonEncoder().encode(response))
+		log("Sent LinkClientInteractionResponse")
+
 		log("Connection established")
 		iceExchangeTask.cancel()
 

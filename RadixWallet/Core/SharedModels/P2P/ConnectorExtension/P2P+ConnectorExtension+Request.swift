@@ -141,4 +141,14 @@ extension P2P.ConnectorExtension.Request {
 			}
 		}
 	}
+
+	public struct LinkClientInteractionResponse: Sendable, Hashable, Encodable {
+		public enum Discriminator: String, Sendable, Hashable, Encodable {
+			case linkClient
+		}
+
+		public let discriminator: Discriminator
+		public let publicKey: HexCodable32Bytes
+		//        public let signature: HexCodable
+	}
 }

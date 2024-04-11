@@ -10,8 +10,8 @@ public struct P2PLink:
 	Codable,
 	Identifiable
 {
-	public var id: ConnectionPassword {
-		connectionPassword
+	public var id: ConnectionPublicKey {
+		publicKey
 	}
 
 	/// The most important property of this struct, the `ConnectionPassword`,
@@ -19,15 +19,23 @@ public struct P2PLink:
 	/// for the `ID`.
 	public let connectionPassword: ConnectionPassword
 
+	public let publicKey: ConnectionPublicKey
+
+	public let purpose: ConnectionPurpose
+
 	/// Client name, e.g. "Chrome on Macbook" or "My work Android" or "My wifes iPhone SE".
 	public let displayName: String
 
 	/// The canonical initializer requiring a `ConnectionPassword` and `Display` name.
 	public init(
 		connectionPassword: ConnectionPassword,
+		publicKey: ConnectionPublicKey,
+		purpose: ConnectionPurpose,
 		displayName: String
 	) {
 		self.connectionPassword = connectionPassword
+		self.publicKey = publicKey
+		self.purpose = purpose
 		self.displayName = displayName
 	}
 }
@@ -35,6 +43,6 @@ public struct P2PLink:
 // MARK: Equatable
 extension P2PLink: Equatable {
 	public static func == (lhs: Self, rhs: Self) -> Bool {
-		lhs.connectionPassword == rhs.connectionPassword
+		lhs.id == rhs.id
 	}
 }

@@ -247,8 +247,8 @@
 		48CFC3202ADC10D900E77A5C /* NameAccount+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDCA2ADC10D800E77A5C /* NameAccount+View.swift */; };
 		48CFC3212ADC10D900E77A5C /* NewConnection+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDCD2ADC10D800E77A5C /* NewConnection+Reducer.swift */; };
 		48CFC3222ADC10D900E77A5C /* NewConnection+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDCE2ADC10D800E77A5C /* NewConnection+View.swift */; };
-		48CFC3232ADC10D900E77A5C /* ConnectUsingSecrets+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDD12ADC10D800E77A5C /* ConnectUsingSecrets+Reducer.swift */; };
-		48CFC3242ADC10D900E77A5C /* ConnectUsingSecrets+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDD22ADC10D800E77A5C /* ConnectUsingSecrets+View.swift */; };
+		48CFC3232ADC10D900E77A5C /* NewConnectionName+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDD12ADC10D800E77A5C /* NewConnectionName+Reducer.swift */; };
+		48CFC3242ADC10D900E77A5C /* NewConnectionName+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDD22ADC10D800E77A5C /* NewConnectionName+View.swift */; };
 		48CFC3252ADC10D900E77A5C /* LocalNetworkPermission+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDD42ADC10D800E77A5C /* LocalNetworkPermission+View.swift */; };
 		48CFC3262ADC10D900E77A5C /* LocalNetworkPermission+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDD52ADC10D800E77A5C /* LocalNetworkPermission+Reducer.swift */; };
 		48CFC3272ADC10D900E77A5C /* ScanQRCoordinator+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDD82ADC10D800E77A5C /* ScanQRCoordinator+Reducer.swift */; };
@@ -1575,8 +1575,8 @@
 		48CFBDCA2ADC10D800E77A5C /* NameAccount+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NameAccount+View.swift"; sourceTree = "<group>"; };
 		48CFBDCD2ADC10D800E77A5C /* NewConnection+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NewConnection+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBDCE2ADC10D800E77A5C /* NewConnection+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NewConnection+View.swift"; sourceTree = "<group>"; };
-		48CFBDD12ADC10D800E77A5C /* ConnectUsingSecrets+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ConnectUsingSecrets+Reducer.swift"; sourceTree = "<group>"; };
-		48CFBDD22ADC10D800E77A5C /* ConnectUsingSecrets+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ConnectUsingSecrets+View.swift"; sourceTree = "<group>"; };
+		48CFBDD12ADC10D800E77A5C /* NewConnectionName+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NewConnectionName+Reducer.swift"; sourceTree = "<group>"; };
+		48CFBDD22ADC10D800E77A5C /* NewConnectionName+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NewConnectionName+View.swift"; sourceTree = "<group>"; };
 		48CFBDD42ADC10D800E77A5C /* LocalNetworkPermission+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LocalNetworkPermission+View.swift"; sourceTree = "<group>"; };
 		48CFBDD52ADC10D800E77A5C /* LocalNetworkPermission+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LocalNetworkPermission+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBDD82ADC10D800E77A5C /* ScanQRCoordinator+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ScanQRCoordinator+Reducer.swift"; sourceTree = "<group>"; };
@@ -4055,19 +4055,19 @@
 		48CFBDCF2ADC10D800E77A5C /* Children */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBDD02ADC10D800E77A5C /* ConnectUsingSecrets */,
+				48CFBDD02ADC10D800E77A5C /* NewConnectionName */,
 				48CFBDD32ADC10D800E77A5C /* LocalNetworkAuthorization */,
 			);
 			path = Children;
 			sourceTree = "<group>";
 		};
-		48CFBDD02ADC10D800E77A5C /* ConnectUsingSecrets */ = {
+		48CFBDD02ADC10D800E77A5C /* NewConnectionName */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBDD12ADC10D800E77A5C /* ConnectUsingSecrets+Reducer.swift */,
-				48CFBDD22ADC10D800E77A5C /* ConnectUsingSecrets+View.swift */,
+				48CFBDD12ADC10D800E77A5C /* NewConnectionName+Reducer.swift */,
+				48CFBDD22ADC10D800E77A5C /* NewConnectionName+View.swift */,
 			);
-			path = ConnectUsingSecrets;
+			path = NewConnectionName;
 			sourceTree = "<group>";
 		};
 		48CFBDD32ADC10D800E77A5C /* LocalNetworkAuthorization */ = {
@@ -8840,10 +8840,10 @@
 				48CFC35F2ADC10D900E77A5C /* ChooseQuestions.swift in Sources */,
 				48CFC3952ADC10D900E77A5C /* Models+Sendable.swift in Sources */,
 				48CFC6642ADC10DB00E77A5C /* FactorSourceID.swift in Sources */,
-				48CFC3242ADC10D900E77A5C /* ConnectUsingSecrets+View.swift in Sources */,
+				48CFC3242ADC10D900E77A5C /* NewConnectionName+View.swift in Sources */,
 				48CFC2412ADC10D900E77A5C /* DevAccountPreferences+Reducer.swift in Sources */,
 				48CFC5062ADC10DA00E77A5C /* EntityMetadataItem.swift in Sources */,
-				48CFC3232ADC10D900E77A5C /* ConnectUsingSecrets+Reducer.swift in Sources */,
+				48CFC3232ADC10D900E77A5C /* NewConnectionName+Reducer.swift in Sources */,
 				48CFC5FF2ADC10DA00E77A5C /* Persona+PreviewValues.swift in Sources */,
 				83EE47812AF0EE3C00155F03 /* ProgrammaticScryptoSborValueBool.swift in Sources */,
 				83EE47992AF0EE3C00155F03 /* ProgrammaticScryptoSborValueEnum.swift in Sources */,
