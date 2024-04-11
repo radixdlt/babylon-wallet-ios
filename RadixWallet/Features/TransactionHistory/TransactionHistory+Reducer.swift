@@ -207,12 +207,10 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadedFirstTransactionDate(date):
+		case let .loadedFirstTransactionDate(firstDate):
 			state.loading.isLoading = false
-			let lastDate: Date = .now
-			// Make sure firstDate is firmly in the past, even when there have been no transactions (i.e. date is nil)
-			let firstDate = date ?? lastDate.addingTimeInterval(-24 * 3600)
-			state.fullPeriod = firstDate ..< lastDate
+			guard let firstDate else { return .none }
+			state.fullPeriod = firstDate ..< .now
 			state.availableMonths = (try? .init(period: state.fullPeriod)) ?? []
 
 			return loadTransactionsFirstTime(state: &state)
