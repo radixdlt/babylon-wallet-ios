@@ -386,16 +386,17 @@ extension TransactionHistory.State {
 	}
 
 	private func period(for direction: TransactionHistory.Direction) -> AnyRange<Date>? {
+		guard !fullPeriod.isEmpty else { return nil }
 		// Note that pivotDate == nil means that we are loading right up to the present
 		switch direction {
 		case .down:
-			.init(lowerBound: fullPeriod.lowerBound, upperBound: loading.pivotDate)
+			return .init(lowerBound: fullPeriod.lowerBound, upperBound: loading.pivotDate)
 		case .up:
 			if let pivotDate = loading.pivotDate {
-				.init(lowerBound: pivotDate)
+				return .init(lowerBound: pivotDate)
 			} else {
 				// The up direction does not make sense
-				nil
+				return nil
 			}
 		}
 	}
