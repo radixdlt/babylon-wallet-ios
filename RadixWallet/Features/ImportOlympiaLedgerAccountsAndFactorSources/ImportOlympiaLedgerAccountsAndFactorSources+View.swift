@@ -133,38 +133,7 @@ private extension View {
 			store: destinationStore,
 			state: /ImportOlympiaLedgerAccountsAndFactorSources.Destination.State.nameLedgerAndDerivePublicKeys,
 			action: ImportOlympiaLedgerAccountsAndFactorSources.Destination.Action.nameLedgerAndDerivePublicKeys,
-			content: { NameLedgerAndDerivePublicKeys.View(store: $0) }
+			content: { ImportOlympiaNameLedgerAndDerivePublicKeys.View(store: $0) }
 		)
-	}
-}
-
-// MARK: - NameLedgerAndDerivePublicKeys.View
-extension NameLedgerAndDerivePublicKeys {
-	@MainActor
-	public struct View: SwiftUI.View {
-		private let store: StoreOf<NameLedgerAndDerivePublicKeys>
-
-		public init(store: StoreOf<NameLedgerAndDerivePublicKeys>) {
-			self.store = store
-		}
-
-		public var body: some SwiftUI.View {
-			WithNavigationBar {
-				store.send(.view(.closeButtonTapped))
-			} content: {
-				IfLetStore(store.scope(state: \.nameLedger, action: { .child(.nameLedger($0)) })) { childStore in
-					NameLedgerFactorSource.View(store: childStore)
-				} else: {
-					Rectangle()
-						.fill(.clear)
-				}
-				.navigationDestination(
-					store: store.scope(state: \.$derivePublicKeys, action: { .child(.derivePublicKeys($0)) })
-				) {
-					DerivePublicKeys.View(store: $0)
-						.navigationBarBackButtonHidden()
-				}
-			}
-		}
 	}
 }
