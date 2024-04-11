@@ -109,6 +109,7 @@ private extension View {
 		return addNewP2PLinkSheet(with: destinationStore)
 			.noP2PLinkAlert(with: destinationStore)
 			.nameLedgerSheet(with: destinationStore)
+			.derivePublicKeysSheet(with: destinationStore)
 	}
 
 	private func noP2PLinkAlert(with destinationStore: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destination>) -> some View {
@@ -131,9 +132,18 @@ private extension View {
 	private func nameLedgerSheet(with destinationStore: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /ImportOlympiaLedgerAccountsAndFactorSources.Destination.State.nameLedgerAndDerivePublicKeys,
-			action: ImportOlympiaLedgerAccountsAndFactorSources.Destination.Action.nameLedgerAndDerivePublicKeys,
-			content: { ImportOlympiaNameLedgerAndDerivePublicKeys.View(store: $0) }
+			state: /ImportOlympiaLedgerAccountsAndFactorSources.Destination.State.nameLedger,
+			action: ImportOlympiaLedgerAccountsAndFactorSources.Destination.Action.nameLedger,
+			content: { ImportOlympiaNameLedger.View(store: $0) }
+		)
+	}
+
+	private func derivePublicKeysSheet(with destinationStore: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /ImportOlympiaLedgerAccountsAndFactorSources.Destination.State.derivePublicKeys,
+			action: ImportOlympiaLedgerAccountsAndFactorSources.Destination.Action.derivePublicKeys,
+			content: { DerivePublicKeys.View(store: $0) }
 		)
 	}
 }
