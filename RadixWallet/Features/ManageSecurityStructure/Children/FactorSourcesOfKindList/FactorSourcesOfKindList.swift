@@ -222,7 +222,7 @@ public struct FactorSourcesOfKindList<FactorSourceOfKind: Sendable & Hashable>: 
 					}
 					return specificType.extract(from: $0) as! FactorSourceOfKind
 				}
-				return IdentifiedArrayOf<FactorSourceOfKind>.init(uncheckedUniqueElements: filteredType)
+				return IdentifiedArrayOf<FactorSourceOfKind>(uncheckedUniqueElements: filteredType)
 			}
 			await send(.internal(.loadedFactorSources(result)))
 		}

@@ -234,8 +234,8 @@ extension TransactionHistoryClient {
 extension TransactionHistoryRequest {
 	var gatewayRequest: GatewayAPI.StreamTransactionsRequest {
 		.init(
-			atLedgerState: .init(timestamp: parameters.period.upperBound),
-			fromLedgerState: .init(timestamp: parameters.period.lowerBound),
+			atLedgerState: parameters.period.upperBound.map { .init(timestamp: $0) },
+			fromLedgerState: parameters.period.lowerBound.map { .init(timestamp: $0) },
 			cursor: cursor,
 			limitPerPage: 20,
 			manifestResourcesFilter: manifestResourcesFilter(parameters.filters),

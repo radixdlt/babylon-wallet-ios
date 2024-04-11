@@ -23,7 +23,7 @@ public struct TransactionHistoryRequest: Sendable, Hashable {
 
 	// MARK: - Parameters
 	public struct Parameters: Sendable, Hashable {
-		public let period: Range<Date>
+		public let period: AnyRange<Date>
 		public let filters: [TransactionFilter]
 		public let direction: TransactionHistory.Direction
 	}
