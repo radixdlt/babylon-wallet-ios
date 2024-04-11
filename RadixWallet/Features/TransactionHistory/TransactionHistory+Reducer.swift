@@ -210,6 +210,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		case let .loadedFirstTransactionDate(date):
 			state.loading.isLoading = false
 			let lastDate: Date = .now
+			// Make sure firstDate is firmly in the past, even when there have been no transactions (i.e. date is nil)
 			let firstDate = date ?? lastDate.addingTimeInterval(-24 * 3600)
 			state.fullPeriod = firstDate ..< lastDate
 			state.availableMonths = (try? .init(period: state.fullPeriod)) ?? []
