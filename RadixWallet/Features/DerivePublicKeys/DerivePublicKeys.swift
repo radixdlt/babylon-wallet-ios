@@ -92,7 +92,6 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 						fatalError("Implement")
 					}
 				case .specificPrivateHDFactorSource:
-					// TODO: MATI: Confirm this should use device
 					.device
 				}
 			}
