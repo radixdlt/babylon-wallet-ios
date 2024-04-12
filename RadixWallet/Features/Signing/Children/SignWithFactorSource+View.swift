@@ -9,14 +9,11 @@ public extension SignWithFactorSource {
 		}
 
 		public var body: some SwiftUI.View {
-			// We need to create two different views so that each of them triggers the corresponding `.onFirstTask()` that
-			// starts the factor source access. Otherwise, when having multiple signatures chained, it would only trigger the first one.
-			switch store.kind {
-			case .device:
-				FactorSourceAccess.View(store: store.factorSourceAccess)
-			case .ledger:
-				FactorSourceAccess.View(store: store.factorSourceAccess)
-			}
+			/// We set the `.id` to the `kind` so that, when multiple factor sources are required, each of them has its own view created.
+			/// Otherwise, only the first of them would have the `.onFirstTask()` triggered, and the logic for the remaining ones
+			/// wouldn't be performed.
+			FactorSourceAccess.View(store: store.factorSourceAccess)
+				.id(store.kind)
 		}
 	}
 }
