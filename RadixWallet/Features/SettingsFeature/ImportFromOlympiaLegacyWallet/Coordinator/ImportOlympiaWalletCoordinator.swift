@@ -22,7 +22,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		public let accountName: String?
 		public let olympiaAddress: LegacyOlympiaAccountAddress
 		public let babylonAddress: AccountAddress
-		public let appearanceID: Profile.Network.Account.AppearanceID
+		public let appearanceID: AppearanceID
 		public let olympiaAccountType: Olympia.AccountType
 	}
 

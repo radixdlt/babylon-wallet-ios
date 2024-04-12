@@ -7,12 +7,12 @@ extension Profile.Network {
 		public var id: ID { address }
 		public let address: AccountAddress
 		public let label: NonEmpty<String>
-		public let appearanceID: Profile.Network.Account.AppearanceID
+		public let appearanceID: AppearanceID
 
 		public init(
 			address: AccountAddress,
 			label: NonEmpty<String>,
-			appearanceID: Profile.Network.Account.AppearanceID
+			appearanceID: AppearanceID
 		) {
 			self.address = address
 			self.label = label

@@ -9,7 +9,7 @@ public enum DerivationPurpose:
 	CustomDumpStringConvertible
 {
 	/// Purpose of deriving is a public key used for an address of `kind`
-	case publicKeyForAddress(kind: AddressKind)
+	case publicKeyForAddress(kind: EntityKind)
 
 	/// Purpose is a stable ID, e.g. used to identify a Ledger Nano device.
 	case hashOfPublicKeyAsID

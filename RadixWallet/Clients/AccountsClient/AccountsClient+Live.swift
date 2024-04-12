@@ -29,7 +29,7 @@ extension AccountsClient: DependencyKey {
 			let currentNetworkID = await getCurrentNetworkID()
 			let networkID = maybeNetworkID ?? currentNetworkID
 			let numberOfAccounts = await (try? profileStore.profile.network(id: networkID).numberOfAccountsIncludingHidden) ?? 0
-			return Profile.Network.Account.AppearanceID.fromNumberOfAccounts(numberOfAccounts + offset)
+			return AppearanceID.fromNumberOfAccounts(numberOfAccounts + offset)
 		}
 
 		let hasAccountOnNetwork: HasAccountOnNetwork = { networkID in

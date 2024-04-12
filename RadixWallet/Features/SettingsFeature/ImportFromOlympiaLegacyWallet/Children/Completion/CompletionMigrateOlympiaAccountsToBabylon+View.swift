@@ -51,7 +51,7 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 			let name: String?
 			let address: AccountAddress
 			let previouslyMigrated: Bool
-			let appearanceID: Profile.Network.Account.AppearanceID
+			let appearanceID: AppearanceID
 		}
 	}
 
@@ -138,7 +138,7 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 }
 
 extension View {
-	public func accountsBackground(count: Int, after lastAppearanceID: Profile.Network.Account.AppearanceID? = nil) -> some View {
+	public func accountsBackground(count: Int, after lastAppearanceID: AppearanceID? = nil) -> some View {
 		background(alignment: .bottom) {
 			AccountCardsBackground(count: count, after: lastAppearanceID)
 		}
@@ -149,14 +149,14 @@ extension View {
 struct AccountCardsBackground: View {
 	@State private var active = false
 	let count: Int
-	let indexedIDs: [(index: Int, id: Profile.Network.Account.AppearanceID)]
+	let indexedIDs: [(index: Int, id: AppearanceID)]
 
-	init(count: Int, after lastAppearanceID: Profile.Network.Account.AppearanceID?) {
+	init(count: Int, after lastAppearanceID: AppearanceID?) {
 		self.count = count
 
-		let last = lastAppearanceID.flatMap(Profile.Network.Account.AppearanceID.allCases.firstIndex) ?? 0
+		let last = lastAppearanceID.flatMap(AppearanceID.allCases.firstIndex) ?? 0
 		self.indexedIDs = (0 ..< count).map { offset in
-			(index: offset, id: Profile.Network.Account.AppearanceID.fromNumberOfAccounts(last + 1 + offset))
+			(index: offset, id: AppearanceID.fromNumberOfAccounts(last + 1 + offset))
 		}
 	}
 
@@ -175,7 +175,7 @@ struct AccountCardsBackground: View {
 		}
 	}
 
-	private func dummyAccountCard(appearanceID: Profile.Network.Account.AppearanceID) -> some View {
+	private func dummyAccountCard(appearanceID: AppearanceID) -> some View {
 		RoundedRectangle(cornerRadius: .small1, style: .continuous)
 			.fill(appearanceID.gradient)
 			.frame(height: 2 * .large1)

@@ -179,7 +179,7 @@ extension EntityFlag {
 	}
 }
 
-extension Profile.Network.Account.AppearanceID {
+extension AppearanceID {
 	func intoSargon() -> Sargon.AppearanceID {
 		Sargon.AppearanceID(value: self.rawValue)
 	}
@@ -244,12 +244,5 @@ extension Sargon.DisplayName {
 extension Sargon.Ed25519Signature {
 	init(wallet: EdDSASignature) {
 		try! self.init(bytes: wallet)
-	}
-}
-
-// MARK: Into Wallet
-extension Profile.Network.Account.AppearanceID {
-	init(sargon: Sargon.AppearanceID) {
-		self.init(rawValue: sargon.value)!
 	}
 }

@@ -20,7 +20,7 @@ extension AccountDetails.State {
 extension AccountDetails {
 	public struct ViewState: Equatable {
 		let accountAddress: AccountAddress
-		let appearanceID: Profile.Network.Account.AppearanceID
+		let appearanceID: AppearanceID
 		let displayName: String
 		let mnemonicHandlingCallToAction: MnemonicHandling?
 		let isLedgerAccount: Bool

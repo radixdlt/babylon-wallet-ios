@@ -10,12 +10,12 @@ extension P2P.Dapp.Response {
 	public struct WalletAccount: Sendable, Hashable, Encodable {
 		public let address: AccountAddress
 		public let label: NonEmptyString
-		public let appearanceId: Profile.Network.Account.AppearanceID
+		public let appearanceId: AppearanceID
 
 		public init(
 			accountAddress: AccountAddress,
 			label: NonEmptyString,
-			appearanceId: Profile.Network.Account.AppearanceID
+			appearanceId: AppearanceID
 		) {
 			self.address = accountAddress
 			self.label = label

@@ -44,7 +44,7 @@ public extension AnswerSecurityQuestionFreeform {
 				) { viewStore in
 					ScrollView {
 						VStack {
-							LinearGradient(._1)
+							LinearGradient(.sample)
 								.rotationEffect(.degrees(45))
 								.mask {
 									Image(systemName: "questionmark.app")

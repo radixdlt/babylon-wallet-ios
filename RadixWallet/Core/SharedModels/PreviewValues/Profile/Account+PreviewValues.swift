@@ -16,7 +16,7 @@ extension Profile.Network.Account {
 				derivationPath: .accountPath(.init(derivationPath: "m/44H/1022H/10H/525H/1460H/0H"))
 			)
 		)),
-		appearanceID: ._0,
+		appearanceID: .sample,
 		displayName: "Main"
 	)
 
@@ -35,7 +35,7 @@ extension Profile.Network.Account {
 				derivationPath: .accountPath(.init(derivationPath: "m/44H/1022H/10H/525H/1460H/1H"))
 			)
 		)),
-		appearanceID: ._1,
+		appearanceID: .sampleOther,
 		displayName: "Secondary"
 	)
 }

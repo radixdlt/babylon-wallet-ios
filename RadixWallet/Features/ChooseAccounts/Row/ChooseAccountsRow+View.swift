@@ -16,7 +16,7 @@ extension ChooseAccountsRow {
 			account.displayName.rawValue
 		}
 
-		var appearanceID: Profile.Network.Account.AppearanceID {
+		var appearanceID: AppearanceID {
 			account.appearanceID
 		}
 

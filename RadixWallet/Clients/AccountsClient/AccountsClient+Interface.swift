@@ -99,7 +99,7 @@ extension AccountsClient {
 
 	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 
-	public typealias NextAppearanceID = @Sendable (NetworkID?, _ offset: Int?) async -> Profile.Network.Account.AppearanceID
+	public typealias NextAppearanceID = @Sendable (NetworkID?, _ offset: Int?) async -> AppearanceID
 
 	public typealias GetAccountsOnCurrentNetwork = @Sendable () async throws -> Accounts
 	public typealias GetHiddenAccountsOnCurrentNetwork = @Sendable () async throws -> Accounts

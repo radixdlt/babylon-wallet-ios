@@ -93,7 +93,7 @@ extension Profile.Network.Persona {
 	public static var entityKind: EntityKind { .identity }
 
 	/// Noop
-	public mutating func updateAppearanceIDIfAble(_: Profile.Network.Account.AppearanceID) {}
+	public mutating func updateAppearanceIDIfAble(_: AppearanceID) {}
 
 	public typealias EntityAddress = IdentityAddress
 }
