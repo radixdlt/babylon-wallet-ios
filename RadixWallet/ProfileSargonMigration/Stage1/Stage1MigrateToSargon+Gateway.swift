@@ -33,42 +33,42 @@ extension Gateway {
 
 extension Gateway {
 	public static var mainnet: Self {
-		sargonProfileStage1()
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	public static var stokenet: Self {
-		sargonProfileStage1()
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	public static var rcnet: Self {
-		sargonProfileStage1()
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	public static var nebunet: Self {
-		sargonProfileStage1()
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	public static var kisharnet: Self {
-		sargonProfileStage1()
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	public static var ansharnet: Self {
-		sargonProfileStage1()
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	public static var hammunet: Self {
-		sargonProfileStage1()
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	public static var enkinet: Self {
-		sargonProfileStage1()
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	public static var mardunet: Self {
-		sargonProfileStage1()
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	public static var simulator: Self {
-		sargonProfileStage1()
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }

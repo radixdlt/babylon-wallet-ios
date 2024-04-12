@@ -121,16 +121,17 @@ public struct ManageSecurityStructureCoordinator: Sendable, FeatureReducer {
 
 		case let .path(.element(_, action: .nameStructure(.delegate(.updateOrCreateSecurityStructure(structure))))):
 
-			return .run { [isUpdatingExisting = state.mode != .new] send in
-				let taskResult = await TaskResult {
-					let configReference = structure.asReference()
-					try await appPreferencesClient.updating { preferences in
-						let didUpdateExisting = preferences.security.structureConfigurationReferences.updateOrAppend(configReference) != nil
-						assert(didUpdateExisting == isUpdatingExisting)
-					}
-					return structure
-				}
-				await send(.delegate(.done(taskResult)))
+			return .run { [isUpdatingExisting = state.mode != .new] _ in
+				sargonProfileStage3()
+//				let taskResult = await TaskResult {
+//					let configReference = structure.asReference()
+//					try await appPreferencesClient.updating { preferences in
+//						let didUpdateExisting = preferences.security.structureConfigurationReferences.updateOrAppend(configReference) != nil
+//						assert(didUpdateExisting == isUpdatingExisting)
+//					}
+//					return structure
+//				}
+//				await send(.delegate(.done(taskResult)))
 			}
 
 		default: return .none

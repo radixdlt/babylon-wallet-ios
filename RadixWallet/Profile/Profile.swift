@@ -30,7 +30,7 @@ public struct Profile:
 	public init(
 		header: ProfileSnapshot.Header,
 		factorSources: FactorSources,
-		appPreferences: AppPreferences = .init(),
+		appPreferences: AppPreferences = .default,
 		networks: Networks = .init()
 	) {
 		self.header = header
@@ -42,7 +42,7 @@ public struct Profile:
 	public init(
 		header: ProfileSnapshot.Header,
 		deviceFactorSource: DeviceFactorSource,
-		appPreferences: AppPreferences = .init(),
+		appPreferences: AppPreferences = .default,
 		networks: Networks = .init()
 	) {
 		self.init(
@@ -52,12 +52,6 @@ public struct Profile:
 			networks: networks
 		)
 	}
-}
-
-// MARK: Codable
-@available(*, unavailable)
-extension Profile: Codable {
-	/* Makes it impossible to make Profile Codable. */
 }
 
 extension Profile {

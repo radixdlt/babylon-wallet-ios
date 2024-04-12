@@ -2,7 +2,6 @@
 public struct ProfileSnapshot:
 	Sendable,
 	Hashable,
-	Codable, // Snapshot IS Codable, but `Profile` is not.
 	CustomStringConvertible,
 	CustomDumpReflectable
 {

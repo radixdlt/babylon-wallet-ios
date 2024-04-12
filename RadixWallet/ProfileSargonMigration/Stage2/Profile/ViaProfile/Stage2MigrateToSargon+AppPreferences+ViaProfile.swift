@@ -12,7 +12,7 @@ extension Profile {
 
 	public mutating func removeGateway(_ gateway: Gateway) throws {
 //		appPreferences.gateways.remove(gateway)
-		sargonProfileStage1()
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	/// Requires the presence of an `Profile.Network` in `networks` for
@@ -23,6 +23,16 @@ extension Profile {
 //		_ = try network(id: newNetworkID)
 //		try appPreferences.gateways.changeCurrent(to: newGateway)
 
-		sargonProfileStage1()
+		sargonProfileFinishMigrateAtEndOfStage1()
+	}
+
+	public mutating func updateDisplayAppPreferences(_ display: AppDisplay) {
+		self.appPreferences.updateDisplay(display)
+	}
+
+	/// Appends a new `P2PLink` to the Profile's `AppPreferences`, returns `nil` if it was not inserted (because already present).
+	@discardableResult
+	public mutating func appendP2PLink(_ p2pLinks: P2PLink) -> P2PLink? {
+		self.appPreferences.appendP2PLink(p2pLinks)
 	}
 }

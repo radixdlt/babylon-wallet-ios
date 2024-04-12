@@ -33,7 +33,7 @@ extension NetworkSwitchingClient {
 
 			// FIXME: mainnet: also compare `NetworkID` from lookup with NetworkID from `getNetworkInformation` call
 			// once it returns networkID!
-			let network = try Radix.Network.lookupBy(name: name)
+			let network = try NetworkDefinition.lookupBy(name: name)
 
 			let gateway = Gateway(
 				network: network,

@@ -10,17 +10,18 @@ extension Gateways {
 	/// * Removes `newCurrent` from `other` (if present)
 	/// * Sets `current = newCurrent`
 	private mutating func changeCurrent(to newCurrent: Gateway) throws {
-		guard newCurrent != current else {
-			assert(other[id: current.id] == nil, "Discrepancy, `other` should not contain `current`.")
-			return
-		}
-		let oldCurrent = self.current
-		let (wasInserted, _) = other.append(oldCurrent)
-		guard wasInserted else {
-			throw DiscrepancyOtherShouldNotContainCurrent()
-		}
-		other.remove(id: newCurrent.id)
-		current = newCurrent
+//		guard newCurrent != current else {
+//			assert(other[id: current.id] == nil, "Discrepancy, `other` should not contain `current`.")
+//			return
+//		}
+//		let oldCurrent = self.current
+//		let (wasInserted, _) = other.append(oldCurrent)
+//		guard wasInserted else {
+//			throw DiscrepancyOtherShouldNotContainCurrent()
+//		}
+//		other.remove(id: newCurrent.id)
+//		current = newCurrent
+		sargonProfileStage2()
 	}
 
 	public mutating func changeCurrentToMainnetIfNeeded() {
@@ -34,6 +35,25 @@ extension Gateways {
 	}
 
 	private mutating func remove(_ gateway: Gateway) {
-		other.remove(gateway)
+//		other.remove(gateway)
+		sargonProfileStage2()
+	}
+
+	public var customDumpMirror: Mirror {
+		.init(
+			self,
+			children: [
+				"current": current,
+				"other": other,
+			],
+			displayStyle: .struct
+		)
+	}
+
+	public var description: String {
+		"""
+		current: \(current),
+		other: \(other)
+		"""
 	}
 }

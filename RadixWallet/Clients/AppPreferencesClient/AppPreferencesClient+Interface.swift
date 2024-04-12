@@ -61,7 +61,7 @@ extension AppPreferencesClient {
 	}
 
 	public func updatingDisplay<T>(
-		_ mutateDisplay: @Sendable (inout AppPreferences.AppDisplay) throws -> T
+		_ mutateDisplay: @Sendable (inout AppDisplay) throws -> T
 	) async throws -> T {
 		try await updating { preferences in
 			try mutateDisplay(&preferences.display)

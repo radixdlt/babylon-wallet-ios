@@ -285,11 +285,6 @@ extension AppPreferencesView {
 				indentation: inOneLevel
 			)
 
-			P2PLinksView(
-				p2pLinks: appPreferences.p2pLinks,
-				indentation: inOneLevel
-			)
-
 			AppSecurityView(
 				security: appPreferences.security,
 				indentation: inOneLevel
@@ -335,7 +330,7 @@ extension GatewayView {
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
-			Labeled("Network Name", value: gateway.network.name.rawValue)
+			Labeled("Network Name", value: gateway.network.logicalName)
 			Labeled("Network ID", value: gateway.network.id.description)
 			if isCurrent {
 				Text("Is current gateway ✅")
@@ -348,7 +343,7 @@ extension GatewayView {
 
 // MARK: - DisplayView
 public struct DisplayView: IndentedView {
-	public let display: AppPreferences.AppDisplay
+	public let display: AppDisplay
 	public let indentation: Indentation
 }
 
@@ -368,7 +363,7 @@ extension DisplayView {
 
 // MARK: - AppSecurityView
 public struct AppSecurityView: IndentedView {
-	public let security: AppPreferences.Security
+	public let security: Security
 	public let indentation: Indentation
 }
 
@@ -382,35 +377,6 @@ extension AppSecurityView {
 			#endif // os(macOS)
 			Labeled("isCloudProfileSyncEnabled", value: String(describing: security.isCloudProfileSyncEnabled))
 			Labeled("isDeveloperModeEnabled", value: String(describing: security.isDeveloperModeEnabled))
-		}
-		.padding(.leading, leadingPadding)
-	}
-}
-
-// MARK: - P2PLinksView
-public struct P2PLinksView: IndentedView {
-	public let p2pLinks: P2PLinks
-	public let indentation: Indentation
-}
-
-extension P2PLinksView {
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Text("P2PLinks")
-				.fontWeight(.heavy)
-			#if os(macOS)
-				.font(.title)
-			#endif // os(macOS)
-			if p2pLinks.isEmpty {
-				Text("<None yet>").font(.callout)
-			} else {
-				ForEach(p2pLinks) { p2pLinks in
-					P2PLinkView(
-						p2pLinks: p2pLinks,
-						indentation: inOneLevel
-					)
-				}
-			}
 		}
 		.padding(.leading, leadingPadding)
 	}
@@ -538,27 +504,6 @@ public struct DappAuthorizedPersonaView: IndentedView {
 			} else {
 				Text("Never requested")
 			}
-		}
-		.padding(.leading, leadingPadding)
-	}
-}
-
-// MARK: - P2PLinkView
-public struct P2PLinkView: IndentedView {
-	public let p2pLinks: P2PLink
-	public let indentation: Indentation
-}
-
-extension P2PLinkView {
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Text("P2P Client")
-				.fontWeight(.heavy)
-			#if os(macOS)
-				.font(.title)
-			#endif // os(macOS)
-			Labeled("ID", value: String(p2pLinks.id.data.hex().mask(showLast: 6)))
-			Labeled("Client Name", value: p2pLinks.displayName)
 		}
 		.padding(.leading, leadingPadding)
 	}

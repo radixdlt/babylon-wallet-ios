@@ -47,12 +47,13 @@ public struct SecurityStructureConfigurationList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			.run { send in
-				let configs = await appPreferencesClient.getPreferences().security.structureConfigurationReferences
-				await send(.internal(.configsLoaded(.init(
-					uncheckedUniqueElements: configs.map(SecurityStructureConfigurationRow.State.init))
-				)))
-			}
+			sargonProfileStage3()
+//			.run { send in
+//				let configs = await appPreferencesClient.getPreferences().security.structureConfigurationReferences
+//				await send(.internal(.configsLoaded(.init(
+//					uncheckedUniqueElements: configs.map(SecurityStructureConfigurationRow.State.init))
+//				)))
+//			}
 		case .createNewStructure:
 			.send(.delegate(.createNewStructure))
 		}

@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - Radix.Dashboard
 extension Radix {
 	public struct Dashboard: Sendable, Hashable, Codable, Identifiable, CustomStringConvertible {
@@ -13,7 +15,7 @@ extension Radix {
 }
 
 extension Radix.Dashboard {
-	public static func dashboard(forNetwork network: Radix.Network) -> Self {
+	public static func dashboard(forNetwork network: NetworkDefinition) -> Self {
 		dashboard(forNetworkID: network.id)
 	}
 

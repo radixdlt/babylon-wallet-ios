@@ -3,6 +3,6 @@ import Sargon
 
 extension Gateway {
 	public var isWellknown: Bool {
-		sargonProfileStage1()
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }

@@ -3,7 +3,7 @@ import Sargon
 
 extension Gateways {
 	public static var preset: Self {
-		sargonProfileStage1()
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }
 
