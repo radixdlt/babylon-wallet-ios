@@ -1320,24 +1320,6 @@ public enum L10n {
       public static let subtitleWrongNetworkID = L10n.tr("Localizable", "dAppRequest_validationOutcome_subtitleWrongNetworkID", fallback: "Network mismatch")
     }
   }
-  public enum DerivePublicKeys {
-    /// Authenticate to your phone to sign.
-    public static let subtitleDevice = L10n.tr("Localizable", "derivePublicKeys_subtitleDevice", fallback: "Authenticate to your phone to sign.")
-    /// Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension. Complete signing on the device.
-    public static let subtitleLedger = L10n.tr("Localizable", "derivePublicKeys_subtitleLedger", fallback: "Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension. Complete signing on the device.")
-    /// Deriving Accounts
-    public static let titleAccountRecoveryScan = L10n.tr("Localizable", "derivePublicKeys_titleAccountRecoveryScan", fallback: "Deriving Accounts")
-    /// Creating Account
-    public static let titleCreateAccount = L10n.tr("Localizable", "derivePublicKeys_titleCreateAccount", fallback: "Creating Account")
-    /// Creating Key
-    public static let titleCreateAuthSignKeyForAccount = L10n.tr("Localizable", "derivePublicKeys_titleCreateAuthSignKeyForAccount", fallback: "Creating Key")
-    /// Creating Key
-    public static let titleCreateAuthSignKeyForPersona = L10n.tr("Localizable", "derivePublicKeys_titleCreateAuthSignKeyForPersona", fallback: "Creating Key")
-    /// Creating Persona
-    public static let titleCreatePersona = L10n.tr("Localizable", "derivePublicKeys_titleCreatePersona", fallback: "Creating Persona")
-    /// Deriving Accounts
-    public static let titleImportLegacyAccount = L10n.tr("Localizable", "derivePublicKeys_titleImportLegacyAccount", fallback: "Deriving Accounts")
-  }
   public enum DisplayMnemonics {
     /// Write Down this Seed Phrase
     public static let backUpWarning = L10n.tr("Localizable", "displayMnemonics_backUpWarning", fallback: "Write Down this Seed Phrase")
@@ -2344,38 +2326,6 @@ public enum L10n {
       public static let subtitle = L10n.tr("Localizable", "settings_linkToConnectorHeader_subtitle", fallback: "Scan the QR code in the Radix Wallet Connector extension")
       /// Link your Wallet to a Desktop Browser
       public static let title = L10n.tr("Localizable", "settings_linkToConnectorHeader_title", fallback: "Link your Wallet to a Desktop Browser")
-    }
-  }
-  public enum Signing {
-    public enum SignatureRequest {
-      /// Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension, and the Radix Babylon app is launched on the device.
-      public static let body = L10n.tr("Localizable", "signing_signatureRequest_body", fallback: "Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension, and the Radix Babylon app is launched on the device.")
-      /// Review and sign the transaction on the Ledger device to continue.
-      public static let instructions = L10n.tr("Localizable", "signing_signatureRequest_instructions", fallback: "Review and sign the transaction on the Ledger device to continue.")
-      /// Signature Request
-      public static let title = L10n.tr("Localizable", "signing_signatureRequest_title", fallback: "Signature Request")
-    }
-    public enum SignatureSuccessful {
-      /// Signature successful
-      public static let body = L10n.tr("Localizable", "signing_signatureSuccessful_body", fallback: "Signature successful")
-      /// Signed
-      public static let title = L10n.tr("Localizable", "signing_signatureSuccessful_title", fallback: "Signed")
-    }
-    public enum UseLedgerLabel {
-      /// Added on
-      public static let addedOn = L10n.tr("Localizable", "signing_useLedgerLabel_addedOn", fallback: "Added on")
-      /// Last used
-      public static let lastUsed = L10n.tr("Localizable", "signing_useLedgerLabel_lastUsed", fallback: "Last used")
-      /// Ledger
-      public static let ledger = L10n.tr("Localizable", "signing_useLedgerLabel_Ledger", fallback: "Ledger")
-    }
-    public enum WithDeviceFactorSource {
-      /// Factor Source ID: %@
-      public static func idLabel(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "signing_withDeviceFactorSource_idLabel", String(describing: p1), fallback: "Factor Source ID: %@")
-      }
-      /// Sign transaction with phone
-      public static let signTransaction = L10n.tr("Localizable", "signing_withDeviceFactorSource_signTransaction", fallback: "Sign transaction with phone")
     }
   }
   public enum Splash {
