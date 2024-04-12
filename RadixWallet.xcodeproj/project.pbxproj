@@ -982,8 +982,6 @@
 		48CFC6842ADC10DB00E77A5C /* SecurityStructureConfigurationDetailed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC21E2ADC10D900E77A5C /* SecurityStructureConfigurationDetailed.swift */; };
 		48CFC6852ADC10DB00E77A5C /* FactorSourceFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC21F2ADC10D900E77A5C /* FactorSourceFlag.swift */; };
 		48CFC6862ADC10DB00E77A5C /* AppPreferences+Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC2222ADC10D900E77A5C /* AppPreferences+Transaction.swift */; };
-		48CFC6872ADC10DB00E77A5C /* AppPreferences+Security.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC2242ADC10D900E77A5C /* AppPreferences+Security.swift */; };
-		48CFC6892ADC10DB00E77A5C /* Gateways.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC2272ADC10D900E77A5C /* Gateways.swift */; };
 		48CFC68C2ADC10DB00E77A5C /* Radix+Dashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC22C2ADC10D900E77A5C /* Radix+Dashboard.swift */; };
 		48CFC68E2ADC10DB00E77A5C /* AddressKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC22F2ADC10D900E77A5C /* AddressKind.swift */; };
 		48CFC68F2ADC10DB00E77A5C /* OlympiaAccountToMigrate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC2312ADC10D900E77A5C /* OlympiaAccountToMigrate.swift */; };
@@ -2306,8 +2304,6 @@
 		48CFC21E2ADC10D900E77A5C /* SecurityStructureConfigurationDetailed.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecurityStructureConfigurationDetailed.swift; sourceTree = "<group>"; };
 		48CFC21F2ADC10D900E77A5C /* FactorSourceFlag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FactorSourceFlag.swift; sourceTree = "<group>"; };
 		48CFC2222ADC10D900E77A5C /* AppPreferences+Transaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AppPreferences+Transaction.swift"; sourceTree = "<group>"; };
-		48CFC2242ADC10D900E77A5C /* AppPreferences+Security.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AppPreferences+Security.swift"; sourceTree = "<group>"; };
-		48CFC2272ADC10D900E77A5C /* Gateways.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Gateways.swift; sourceTree = "<group>"; };
 		48CFC22C2ADC10D900E77A5C /* Radix+Dashboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Radix+Dashboard.swift"; sourceTree = "<group>"; };
 		48CFC22F2ADC10D900E77A5C /* AddressKind.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressKind.swift; sourceTree = "<group>"; };
 		48CFC2312ADC10D900E77A5C /* OlympiaAccountToMigrate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OlympiaAccountToMigrate.swift; sourceTree = "<group>"; };
@@ -6484,8 +6480,6 @@
 			isa = PBXGroup;
 			children = (
 				48CFC2212ADC10D900E77A5C /* Transaction */,
-				48CFC2232ADC10D900E77A5C /* AppSecurity */,
-				48CFC2262ADC10D900E77A5C /* Gateways */,
 			);
 			path = AppPreferences;
 			sourceTree = "<group>";
@@ -6496,22 +6490,6 @@
 				48CFC2222ADC10D900E77A5C /* AppPreferences+Transaction.swift */,
 			);
 			path = Transaction;
-			sourceTree = "<group>";
-		};
-		48CFC2232ADC10D900E77A5C /* AppSecurity */ = {
-			isa = PBXGroup;
-			children = (
-				48CFC2242ADC10D900E77A5C /* AppPreferences+Security.swift */,
-			);
-			path = AppSecurity;
-			sourceTree = "<group>";
-		};
-		48CFC2262ADC10D900E77A5C /* Gateways */ = {
-			isa = PBXGroup;
-			children = (
-				48CFC2272ADC10D900E77A5C /* Gateways.swift */,
-			);
-			path = Gateways;
 			sourceTree = "<group>";
 		};
 		48CFC22D2ADC10D900E77A5C /* Address */ = {
@@ -8631,7 +8609,6 @@
 				48CFC3EB2ADC10D900E77A5C /* RTCClients.swift in Sources */,
 				48CFC4592ADC10DA00E77A5C /* LedgerHardwareWalletClient+Interface.swift in Sources */,
 				48CFC5A82ADC10DA00E77A5C /* URLButtonStyle.swift in Sources */,
-				48CFC6892ADC10DB00E77A5C /* Gateways.swift in Sources */,
 				48CFC4602ADC10DA00E77A5C /* TransactionModels.swift in Sources */,
 				48CFC4942ADC10DA00E77A5C /* RoleAssignmentResolution.swift in Sources */,
 				83EA887E2B7E68EE00FF8424 /* TotalCurrencyWorthView.swift in Sources */,
@@ -9021,7 +8998,6 @@
 				48CFC3C92ADC10D900E77A5C /* WordList+Japanese.swift in Sources */,
 				48CFC3532ADC10D900E77A5C /* DappInteractor+ViewModifier.swift in Sources */,
 				48CFC6562ADC10DB00E77A5C /* EntityProtocol.swift in Sources */,
-				48CFC6872ADC10DB00E77A5C /* AppPreferences+Security.swift in Sources */,
 				48CFC40C2ADC10DA00E77A5C /* UserDefaults+Dependency+Extension.swift in Sources */,
 				48CFC2442ADC10D900E77A5C /* ThirdPartyDeposits+Reducer.swift in Sources */,
 				48CFC3F62ADC10D900E77A5C /* ClientMessage.swift in Sources */,
