@@ -68,15 +68,15 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 
 	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
-			case derivePublicKeys(DerivePublicKeys.State)
+			case derivePublicKey(DerivePublicKeys.State)
 		}
 
 		public enum Action: Sendable, Hashable {
-			case derivePublicKeys(DerivePublicKeys.Action)
+			case derivePublicKey(DerivePublicKeys.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.derivePublicKeys, action: /Action.derivePublicKeys) {
+			Scope(state: /State.derivePublicKey, action: /Action.derivePublicKey) {
 				DerivePublicKeys()
 			}
 		}
@@ -92,8 +92,8 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case derivePublicKeysFromDevice
-		case derivePublicKeysFromLedger(LedgerHardwareWalletFactorSource)
+		case derivePublicKeyFromDevice
+		case derivePublicKeyFromLedger(LedgerHardwareWalletFactorSource)
 		case createAccountResult(TaskResult<Profile.Network.Account>)
 		case handleAccountCreated(Profile.Network.Account)
 		case handleFailure
@@ -151,11 +151,11 @@ extension CreateAccountCoordinator {
 				state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
 				return .none
 			} else {
-				return .send(.internal(.derivePublicKeysFromDevice))
+				return .send(.internal(.derivePublicKeyFromDevice))
 			}
 
 		case let .path(.element(_, action: .selectLedger(.delegate(.choseLedger(ledger))))):
-			return .send(.internal(.derivePublicKeysFromLedger(ledger)))
+			return .send(.internal(.derivePublicKeyFromLedger(ledger)))
 
 		case .path(.element(_, action: .completion(.delegate(.completed)))):
 			return .run { send in
@@ -172,8 +172,8 @@ extension CreateAccountCoordinator {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case .derivePublicKeysFromDevice:
-			state.destination = .derivePublicKeys(
+		case .derivePublicKeyFromDevice:
+			state.destination = .derivePublicKey(
 				.init(
 					derivationPathOption: .next(
 						for: .account,
@@ -186,8 +186,8 @@ extension CreateAccountCoordinator {
 				))
 			return .none
 
-		case let .derivePublicKeysFromLedger(ledger):
-			state.destination = .derivePublicKeys(
+		case let .derivePublicKeyFromLedger(ledger):
+			state.destination = .derivePublicKey(
 				.init(
 					derivationPathOption: .next(
 						for: .account,
@@ -230,7 +230,7 @@ extension CreateAccountCoordinator {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .derivePublicKeys(.delegate(.derivedPublicKeys(hdKeys, factorSourceID, networkID))):
+		case let .derivePublicKey(.delegate(.derivedPublicKeys(hdKeys, factorSourceID, networkID))):
 			guard let hdKey = hdKeys.first else {
 				loggerGlobal.error("Failed to create account expected one single key, got: \(hdKeys.count)")
 				return .send(.internal(.handleFailure))
@@ -269,10 +269,10 @@ extension CreateAccountCoordinator {
 				})))
 			}
 
-		case .derivePublicKeys(.delegate(.failedToDerivePublicKey)):
+		case .derivePublicKey(.delegate(.failedToDerivePublicKey)):
 			return .send(.internal(.handleFailure))
 
-		case .derivePublicKeys(.delegate(.cancel)):
+		case .derivePublicKey(.delegate(.cancel)):
 			state.destination = nil
 			return .none
 
