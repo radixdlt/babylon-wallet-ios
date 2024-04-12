@@ -134,7 +134,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		case let .autodismissAlert(alert):
 			state.destination = .alert(alert)
 			return setIsUserInteractionEnabled(&state, isEnabled: true).concatenate(with: .run { send in
-				try await Task.sleep(for: .seconds(2))
+				try await Task.sleep(for: .seconds(.random(in: 1 ..< 4)))
 				await send(.internal(.autoDimissed))
 			})
 		}
