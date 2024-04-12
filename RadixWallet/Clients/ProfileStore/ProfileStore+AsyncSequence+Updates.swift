@@ -27,7 +27,7 @@ extension ProfileStore {
 	}
 
 	/// A multicasting replaying AsyncSequence of distinct Gateways
-	public func currentGatewayValues() -> AnyAsyncSequence<Radix.Gateway> {
+	public func currentGatewayValues() -> AnyAsyncSequence<Gateway> {
 		_lens {
 			$0.appPreferences.gateways.current
 		}

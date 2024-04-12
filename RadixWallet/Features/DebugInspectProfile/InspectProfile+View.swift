@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ProfileView
@@ -321,7 +322,7 @@ extension GatewaysView {
 
 // MARK: - GatewayView
 public struct GatewayView: IndentedView {
-	public let gateway: Radix.Gateway
+	public let gateway: Gateway
 	public let isCurrent: Bool
 	public let indentation: Indentation
 }
@@ -347,7 +348,7 @@ extension GatewayView {
 
 // MARK: - DisplayView
 public struct DisplayView: IndentedView {
-	public let display: AppPreferences.Display
+	public let display: AppPreferences.AppDisplay
 	public let indentation: Indentation
 }
 

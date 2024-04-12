@@ -37,12 +37,6 @@ public struct ProfileSnapshot:
 	}
 }
 
-extension Profile {
-	public mutating func changeCurrentToMainnetIfNeeded() {
-		appPreferences.changeCurrentToMainnetIfNeeded()
-	}
-}
-
 // MARK: Take Snapshot
 extension Profile {
 	public func snapshot() -> ProfileSnapshot {

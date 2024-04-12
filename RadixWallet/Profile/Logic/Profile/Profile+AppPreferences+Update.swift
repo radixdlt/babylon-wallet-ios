@@ -1,13 +1,13 @@
-
+import Sargon
 
 extension AppPreferences {
-	public mutating func updateDisplay(_ display: Display) {
+	public mutating func updateDisplay(_ display: AppDisplay) {
 		self.display = display
 	}
 }
 
 extension Profile {
-	public mutating func updateDisplayAppPreferences(_ display: AppPreferences.Display) {
+	public mutating func updateDisplayAppPreferences(_ display: AppDisplay) {
 		self.appPreferences.updateDisplay(display)
 	}
 }

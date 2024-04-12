@@ -5,9 +5,9 @@ import SwiftUI
 public struct GatewaySettings: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var gatewayList: GatewayList.State
-		var currentGateway: Radix.Gateway?
-		var validatedNewGatewayToSwitchTo: Radix.Gateway?
-		var gatewayForRemoval: Radix.Gateway?
+		var currentGateway: Gateway?
+		var validatedNewGatewayToSwitchTo: Gateway?
+		var gatewayForRemoval: Gateway?
 
 		@PresentationState
 		var destination: Destination.State?
@@ -28,8 +28,8 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case gatewaysLoadedResult(TaskResult<Gateways>)
 		case hasAccountsResult(TaskResult<Bool>)
-		case createAccountOnNetworkBeforeSwitchingToIt(Radix.Gateway)
-		case switchToGatewayResult(TaskResult<Radix.Gateway>)
+		case createAccountOnNetworkBeforeSwitchingToIt(Gateway)
+		case switchToGatewayResult(TaskResult<Gateway>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -296,7 +296,7 @@ private extension GatewaySettings {
 		return .none
 	}
 
-	func switchToGateway(_ state: inout State, gateway: Radix.Gateway) -> Effect<Action> {
+	func switchToGateway(_ state: inout State, gateway: Gateway) -> Effect<Action> {
 		guard
 			let current = state.currentGateway,
 			current.id != gateway.id

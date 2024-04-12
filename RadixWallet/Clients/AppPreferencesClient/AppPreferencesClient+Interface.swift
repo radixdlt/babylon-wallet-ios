@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - AppPreferencesClient
 public struct AppPreferencesClient: Sendable {
 	public var appPreferenceUpdates: AppPreferenceUpdates
@@ -59,7 +61,7 @@ extension AppPreferencesClient {
 	}
 
 	public func updatingDisplay<T>(
-		_ mutateDisplay: @Sendable (inout AppPreferences.Display) throws -> T
+		_ mutateDisplay: @Sendable (inout AppPreferences.AppDisplay) throws -> T
 	) async throws -> T {
 		try await updating { preferences in
 			try mutateDisplay(&preferences.display)

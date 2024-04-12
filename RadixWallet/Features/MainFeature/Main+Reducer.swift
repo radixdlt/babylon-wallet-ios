@@ -30,7 +30,7 @@ public struct Main: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case currentGatewayChanged(to: Radix.Gateway)
+		case currentGatewayChanged(to: Gateway)
 	}
 
 	public struct Destination: DestinationReducer {

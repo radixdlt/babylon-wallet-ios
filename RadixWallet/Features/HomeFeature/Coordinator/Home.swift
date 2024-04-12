@@ -39,7 +39,7 @@ public struct Home: Sendable, FeatureReducer {
 		case exportMnemonic(account: Profile.Network.Account)
 		case importMnemonic
 		case loadedShouldWriteDownPersonasSeedPhrase(Bool)
-		case currentGatewayChanged(to: Radix.Gateway)
+		case currentGatewayChanged(to: Gateway)
 		case shouldShowNPSSurvey(Bool)
 		case accountsResourcesLoaded(Loadable<[OnLedgerEntity.Account]>)
 		case accountsFiatWorthLoaded([AccountAddress: Loadable<FiatWorth>])

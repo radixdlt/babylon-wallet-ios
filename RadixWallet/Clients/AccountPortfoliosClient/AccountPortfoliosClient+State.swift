@@ -25,13 +25,13 @@ extension AccountPortfoliosClient {
 
 		// Useful for DEBUG mode, when we want to display proper resources fiat worth on mainnet
 		// but use random prices on testnets; as one resources from mainnet have prices.
-		var gateway: Radix.Gateway = .mainnet
+		var gateway: Gateway = .mainnet
 	}
 }
 
 // MARK: - Portfolio Setters/Getters
 extension AccountPortfoliosClient.State {
-	func setRadixGateway(_ gateway: Radix.Gateway) {
+	func setRadixGateway(_ gateway: Gateway) {
 		self.gateway = gateway
 	}
 
@@ -127,7 +127,7 @@ extension AccountPortfoliosClient.State {
 
 // MARK: - Stake and Pool details handling
 extension AccountPortfoliosClient.State {
-	func calculateWorth(_ gateway: Radix.Gateway) -> (ResourceAddress, ResourceAmount) -> FiatWorth? {
+	func calculateWorth(_ gateway: Gateway) -> (ResourceAddress, ResourceAmount) -> FiatWorth? {
 		{ resourceAddress, amount in
 			let price = {
 				#if DEBUG

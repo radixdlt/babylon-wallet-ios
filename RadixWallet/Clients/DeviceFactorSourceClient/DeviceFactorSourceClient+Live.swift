@@ -22,7 +22,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 
 				// FIXME: Uh this aint pretty... but we are short on time.
 				if let overridingSnapshot = maybeSnapshot {
-					let networkID = Radix.Gateway.default.network.id
+					let networkID = Gateway.default.network.id
 					let profile = Profile(snapshot: overridingSnapshot)
 					let network = try profile.network(id: networkID)
 					accountNonHidden = network.getAccounts().elements
