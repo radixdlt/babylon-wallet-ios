@@ -6,7 +6,8 @@ extension FactorSourceAccess.State {
 			title: title,
 			message: message,
 			externalDevice: externalDevice,
-			retryEnabled: retryEnabled
+			retryEnabled: retryEnabled,
+			height: height
 		)
 	}
 
@@ -67,6 +68,20 @@ extension FactorSourceAccess.State {
 			false
 		case .ledger:
 			true
+		}
+	}
+
+	private var height: CGFloat {
+		switch kind {
+		case .device:
+			0.55
+		case .ledger:
+			switch purpose {
+			case .signature, .deriveAccounts:
+				0.74
+			case .createAccount, .createPersona, .proveOwnership, .encryptMessage, .createKey:
+				0.70
+			}
 		}
 	}
 }

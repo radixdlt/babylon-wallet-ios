@@ -6,6 +6,7 @@ public extension FactorSourceAccess {
 		let message: String
 		let externalDevice: String?
 		let retryEnabled: Bool
+		let height: CGFloat
 	}
 
 	@MainActor
@@ -18,45 +19,50 @@ public extension FactorSourceAccess {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-				VStack(spacing: .medium3) {
-					Image(asset: AssetResource.signingKey)
-						.foregroundColor(.app.gray3)
+				content(viewStore)
+					.withNavigationBar {
+						viewStore.send(.closeButtonTapped)
+					}
+					.presentationDetents([.fraction(viewStore.height), .large])
+					.presentationDragIndicator(.visible)
+					.interactiveDismissDisabled()
+					.presentationBackground(.blur)
+					.onFirstTask { @MainActor in
+						await store.send(.view(.onFirstTask)).finish()
+					}
+			}
+		}
 
-					Text(viewStore.title)
-						.textStyle(.sheetTitle)
-						.foregroundColor(.app.gray1)
+		@ViewBuilder
+		private func content(_ viewStore: ViewStoreOf<FactorSourceAccess>) -> some SwiftUI.View {
+			VStack(spacing: .medium3) {
+				Image(asset: AssetResource.signingKey)
+					.foregroundColor(.app.gray3)
 
-					Text(LocalizedStringKey(viewStore.message))
-						.textStyle(.body1Regular)
-						.foregroundColor(.app.gray1)
+				Text(viewStore.title)
+					.textStyle(.sheetTitle)
+					.foregroundColor(.app.gray1)
 
-					externalDevice(viewStore.externalDevice)
+				Text(LocalizedStringKey(viewStore.message))
+					.textStyle(.body1Regular)
+					.foregroundColor(.app.gray1)
 
-					if viewStore.retryEnabled {
-						Button {
-							viewStore.send(.retryButtonTapped)
-						} label: {
-							Text(L10n.Common.retry)
-								.textStyle(.body1Header)
-								.foregroundColor(.app.blue2)
-								.frame(height: .standardButtonHeight)
-								.frame(maxWidth: .infinity)
-						}
+				externalDevice(viewStore.externalDevice)
+
+				if viewStore.retryEnabled {
+					Button {
+						viewStore.send(.retryButtonTapped)
+					} label: {
+						Text(L10n.Common.retry)
+							.textStyle(.body1Header)
+							.foregroundColor(.app.blue2)
+							.frame(height: .standardButtonHeight)
+							.frame(maxWidth: .infinity)
 					}
 				}
-				.multilineTextAlignment(.center)
-				.padding(.horizontal, .large2)
 			}
-			.withNavigationBar {
-				store.send(.view(.closeButtonTapped))
-			}
-			.presentationDetents([.fraction(0.66), .large])
-			.presentationDragIndicator(.visible)
-			.interactiveDismissDisabled()
-			.presentationBackground(.blur)
-			.onFirstTask { @MainActor in
-				await store.send(.view(.onFirstTask)).finish()
-			}
+			.multilineTextAlignment(.center)
+			.padding(.horizontal, .large2)
 		}
 
 		@ViewBuilder
