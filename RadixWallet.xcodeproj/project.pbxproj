@@ -981,7 +981,6 @@
 		48CFC6832ADC10DB00E77A5C /* AbstractSecurityStructure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC21D2ADC10D900E77A5C /* AbstractSecurityStructure.swift */; };
 		48CFC6842ADC10DB00E77A5C /* SecurityStructureConfigurationDetailed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC21E2ADC10D900E77A5C /* SecurityStructureConfigurationDetailed.swift */; };
 		48CFC6852ADC10DB00E77A5C /* FactorSourceFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC21F2ADC10D900E77A5C /* FactorSourceFlag.swift */; };
-		48CFC6862ADC10DB00E77A5C /* AppPreferences+Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC2222ADC10D900E77A5C /* AppPreferences+Transaction.swift */; };
 		48CFC68C2ADC10DB00E77A5C /* Radix+Dashboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC22C2ADC10D900E77A5C /* Radix+Dashboard.swift */; };
 		48CFC68E2ADC10DB00E77A5C /* AddressKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC22F2ADC10D900E77A5C /* AddressKind.swift */; };
 		48CFC68F2ADC10DB00E77A5C /* OlympiaAccountToMigrate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC2312ADC10D900E77A5C /* OlympiaAccountToMigrate.swift */; };
@@ -2303,7 +2302,6 @@
 		48CFC21D2ADC10D900E77A5C /* AbstractSecurityStructure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AbstractSecurityStructure.swift; sourceTree = "<group>"; };
 		48CFC21E2ADC10D900E77A5C /* SecurityStructureConfigurationDetailed.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SecurityStructureConfigurationDetailed.swift; sourceTree = "<group>"; };
 		48CFC21F2ADC10D900E77A5C /* FactorSourceFlag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FactorSourceFlag.swift; sourceTree = "<group>"; };
-		48CFC2222ADC10D900E77A5C /* AppPreferences+Transaction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AppPreferences+Transaction.swift"; sourceTree = "<group>"; };
 		48CFC22C2ADC10D900E77A5C /* Radix+Dashboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Radix+Dashboard.swift"; sourceTree = "<group>"; };
 		48CFC22F2ADC10D900E77A5C /* AddressKind.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddressKind.swift; sourceTree = "<group>"; };
 		48CFC2312ADC10D900E77A5C /* OlympiaAccountToMigrate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OlympiaAccountToMigrate.swift; sourceTree = "<group>"; };
@@ -6131,7 +6129,6 @@
 				48CFC1EC2ADC10D900E77A5C /* Profile.swift */,
 				48CFC1ED2ADC10D900E77A5C /* AuthorizedDapp */,
 				48CFC1EF2ADC10D900E77A5C /* Factor */,
-				48CFC2202ADC10D900E77A5C /* AppPreferences */,
 				48CFC22D2ADC10D900E77A5C /* Address */,
 				48CFC2302ADC10D900E77A5C /* ImportLegacyWalletModels */,
 			);
@@ -6474,22 +6471,6 @@
 				48CFC21E2ADC10D900E77A5C /* SecurityStructureConfigurationDetailed.swift */,
 			);
 			path = SecurityStructure;
-			sourceTree = "<group>";
-		};
-		48CFC2202ADC10D900E77A5C /* AppPreferences */ = {
-			isa = PBXGroup;
-			children = (
-				48CFC2212ADC10D900E77A5C /* Transaction */,
-			);
-			path = AppPreferences;
-			sourceTree = "<group>";
-		};
-		48CFC2212ADC10D900E77A5C /* Transaction */ = {
-			isa = PBXGroup;
-			children = (
-				48CFC2222ADC10D900E77A5C /* AppPreferences+Transaction.swift */,
-			);
-			path = Transaction;
 			sourceTree = "<group>";
 		};
 		48CFC22D2ADC10D900E77A5C /* Address */ = {
@@ -7969,7 +7950,6 @@
 				48CFC6422ADC10DB00E77A5C /* PersonaData+IdentifiedEntry.swift in Sources */,
 				48CFC2A62ADC10D900E77A5C /* PersonaDetails.swift in Sources */,
 				48CFC4A42ADC10DA00E77A5C /* ValidatorUptimeCollectionItem.swift in Sources */,
-				48CFC6862ADC10DB00E77A5C /* AppPreferences+Transaction.swift in Sources */,
 				83EE47822AF0EE3C00155F03 /* ProgrammaticScryptoSborValueU16.swift in Sources */,
 				83D663B02B271D0100D1AB9E /* TruncationMask.swift in Sources */,
 				48CFC6102ADC10DA00E77A5C /* WalletInteraction.swift in Sources */,
