@@ -57,22 +57,22 @@ extension CreateAccountCoordinator {
 			ZStack {
 				SwitchStore(store) { state in
 					switch state {
-					case .step1_nameAccount:
+					case .nameAccount:
 						CaseLet(
-							/CreateAccountCoordinator.Path.State.step1_nameAccount,
-							action: CreateAccountCoordinator.Path.Action.step1_nameAccount,
+							/CreateAccountCoordinator.Path.State.nameAccount,
+							action: CreateAccountCoordinator.Path.Action.nameAccount,
 							then: { NameAccount.View(store: $0) }
 						)
-					case .step2_selectLedger:
+					case .selectLedger:
 						CaseLet(
-							/CreateAccountCoordinator.Path.State.step2_selectLedger,
-							action: CreateAccountCoordinator.Path.Action.step2_selectLedger,
+							/CreateAccountCoordinator.Path.State.selectLedger,
+							action: CreateAccountCoordinator.Path.Action.selectLedger,
 							then: { LedgerHardwareDevices.View(store: $0) }
 						)
-					case .step3_completion:
+					case .completion:
 						CaseLet(
-							/CreateAccountCoordinator.Path.State.step3_completion,
-							action: CreateAccountCoordinator.Path.Action.step3_completion,
+							/CreateAccountCoordinator.Path.State.completion,
+							action: CreateAccountCoordinator.Path.Action.completion,
 							then: { NewAccountCompletion.View(store: $0) }
 						)
 					}

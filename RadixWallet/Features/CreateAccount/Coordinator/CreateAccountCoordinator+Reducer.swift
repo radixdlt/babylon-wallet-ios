@@ -21,7 +21,7 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 			if let root {
 				self.root = root
 			} else {
-				self.root = .step1_nameAccount(.init(config: config))
+				self.root = .nameAccount(.init(config: config))
 			}
 		}
 
@@ -30,9 +30,9 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 				return false
 			}
 			switch path.last {
-			case .step1_nameAccount, .step2_selectLedger:
+			case .nameAccount, .selectLedger:
 				return true
-			case .step3_completion:
+			case .completion:
 				return false
 			case .none:
 				return true
@@ -42,25 +42,25 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 
 	public struct Path: Sendable, Reducer {
 		public enum State: Sendable, Hashable {
-			case step1_nameAccount(NameAccount.State)
-			case step2_selectLedger(LedgerHardwareDevices.State)
-			case step3_completion(NewAccountCompletion.State)
+			case nameAccount(NameAccount.State)
+			case selectLedger(LedgerHardwareDevices.State)
+			case completion(NewAccountCompletion.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case step1_nameAccount(NameAccount.Action)
-			case step2_selectLedger(LedgerHardwareDevices.Action)
-			case step3_completion(NewAccountCompletion.Action)
+			case nameAccount(NameAccount.Action)
+			case selectLedger(LedgerHardwareDevices.Action)
+			case completion(NewAccountCompletion.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.step1_nameAccount, action: /Action.step1_nameAccount) {
+			Scope(state: /State.nameAccount, action: /Action.nameAccount) {
 				NameAccount()
 			}
-			Scope(state: /State.step2_selectLedger, action: /Action.step2_selectLedger) {
+			Scope(state: /State.selectLedger, action: /Action.selectLedger) {
 				LedgerHardwareDevices()
 			}
-			Scope(state: /State.step3_completion, action: /Action.step3_completion) {
+			Scope(state: /State.completion, action: /Action.completion) {
 				NewAccountCompletion()
 			}
 		}
@@ -145,19 +145,19 @@ extension CreateAccountCoordinator {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .root(.step1_nameAccount(.delegate(.proceed(accountName, useLedgerAsFactorSource)))):
+		case let .root(.nameAccount(.delegate(.proceed(accountName, useLedgerAsFactorSource)))):
 			state.name = accountName
 			if useLedgerAsFactorSource {
-				state.path.append(.step2_selectLedger(.init(context: .createHardwareAccount)))
+				state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
 				return .none
 			} else {
 				return .send(.internal(.derivePublicKeysFromDevice))
 			}
 
-		case let .path(.element(_, action: .step2_selectLedger(.delegate(.choseLedger(ledger))))):
+		case let .path(.element(_, action: .selectLedger(.delegate(.choseLedger(ledger))))):
 			return .send(.internal(.derivePublicKeysFromLedger(ledger)))
 
-		case .path(.element(_, action: .step3_completion(.delegate(.completed)))):
+		case .path(.element(_, action: .completion(.delegate(.completed)))):
 			return .run { send in
 				await send(.delegate(.completed))
 				if isPresented {
@@ -216,7 +216,7 @@ extension CreateAccountCoordinator {
 
 		case let .handleAccountCreated(account):
 			state.destination = nil
-			state.path.append(.step3_completion(.init(
+			state.path.append(.completion(.init(
 				account: account,
 				config: state.config
 			)))
