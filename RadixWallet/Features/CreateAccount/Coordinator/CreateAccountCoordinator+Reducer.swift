@@ -272,6 +272,10 @@ extension CreateAccountCoordinator {
 		case .derivePublicKeys(.delegate(.failedToDerivePublicKey)):
 			return .send(.internal(.handleFailure))
 
+		case .derivePublicKeys(.delegate(.cancel)):
+			state.destination = nil
+			return .none
+
 		default:
 			return .none
 		}
