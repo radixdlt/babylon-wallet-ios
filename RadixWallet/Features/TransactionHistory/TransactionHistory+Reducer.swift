@@ -50,13 +50,13 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		var currentMonth: DateRangeItem.ID
 
 		/// Values related to loading. Note that `parameters` are set **when receiving the response**
-		var loading: Loading = .init(pivotDate: .now, filters: [])
+		var loading: Loading = .init(pivotDate: nil, filters: [])
 
 		/// Workaround, TCA sends the sectionDisappeared after we dismiss, causing a run-time warning
 		var didDismiss: Bool = false
 
 		struct Loading: Hashable, Sendable {
-			let pivotDate: Date
+			let pivotDate: Date? // nil means "now"
 			let filters: [TransactionFilter]
 
 			var isLoading: Bool = false
@@ -207,11 +207,10 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadedFirstTransactionDate(date):
+		case let .loadedFirstTransactionDate(firstDate):
 			state.loading.isLoading = false
-			let lastDate: Date = .init(timeIntervalSinceNow: -10)
-			let firstDate = date ?? lastDate
-			state.fullPeriod = firstDate ..< lastDate
+			guard let firstDate else { return .none }
+			state.fullPeriod = firstDate ..< .now
 			state.availableMonths = (try? .init(period: state.fullPeriod)) ?? []
 
 			return loadTransactionsFirstTime(state: &state)
@@ -259,16 +258,20 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	/// Load history for the provided month, keeping the same period and filters
 	func loadTransactionsForMonth(_ month: Date, state: inout State) -> Effect<Action> {
 		guard let endOfMonth = Calendar.current.date(byAdding: .month, value: 1, to: month) else { return .none }
-		let clampedEndOfMonth = min(endOfMonth, state.fullPeriod.upperBound)
-
-		if state.sections.dateSpan?.contains(month ..< clampedEndOfMonth) == true {
-			state.setScrollTarget(.beforeDate(clampedEndOfMonth))
-			return .none
+		if endOfMonth > state.fullPeriod.upperBound {
+			state.sections = []
+			state.loading = state.loading.withNewPivotDate(nil)
+			return loadHistory(.down, scrollTarget: .latestTransaction, state: &state)
+		} else {
+			if state.sections.dateSpan?.contains(month ..< endOfMonth) == true {
+				// We have already loaded all transactions for the chosen month
+				state.setScrollTarget(.beforeDate(endOfMonth))
+				return .none
+			}
+			state.sections = []
+			state.loading = state.loading.withNewPivotDate(endOfMonth)
+			return loadHistory(.down, scrollTarget: .beforeDate(endOfMonth), state: &state)
 		}
-
-		state.sections = []
-		state.loading = state.loading.withNewPivotDate(clampedEndOfMonth)
-		return loadHistory(.down, scrollTarget: .beforeDate(clampedEndOfMonth), state: &state)
 	}
 
 	/// Loads (more) transactions
@@ -287,9 +290,9 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 	/// Makes the TransactionHitosryRequest. **NB: don't call this directly**, instead use the specialised functions like `loadHistoryForMonth`
 	func loadHistory(_ direction: Direction, scrollTarget: ScrollTarget? = nil, state: inout State) -> Effect<Action> {
-		let parameters = state.requestParameters(for: direction)
+		guard let parameters = state.requestParameters(for: direction) else { return .none }
 		let cursor = state.loading[cursor: direction]
-		guard !state.loading.isLoading, cursor != .loadedAll, !parameters.period.isEmpty else { return .none }
+		guard !state.loading.isLoading, cursor != .loadedAll else { return .none }
 
 		state.loading.isLoading = true
 
@@ -341,8 +344,7 @@ extension TransactionHistory.State {
 	}
 
 	var shouldAlsoLoadUpwards: Bool {
-		let upwardsPeriod = requestParameters(for: .up).period
-		guard !upwardsPeriod.isEmpty else { return false }
+		guard let upwardsPeriod = requestParameters(for: .up)?.period else { return false }
 		guard let lastLoaded = sections.dateSpan?.upperBound else { return true }
 		return !upwardsPeriod.contains(lastLoaded)
 	}
@@ -374,17 +376,34 @@ extension TransactionHistory.State {
 		}
 	}
 
-	func requestParameters(for direction: TransactionHistory.Direction) -> TransactionHistoryRequest.Parameters {
-		.init(
-			period: fullPeriod.split(before: direction == .down, point: loading.pivotDate),
+	func requestParameters(for direction: TransactionHistory.Direction) -> TransactionHistoryRequest.Parameters? {
+		guard let period = period(for: direction), !period.isEmpty else { return nil }
+		return .init(
+			period: period,
 			filters: loading.filters,
 			direction: direction
 		)
 	}
+
+	private func period(for direction: TransactionHistory.Direction) -> AnyRange<Date>? {
+		guard !fullPeriod.isEmpty else { return nil }
+		// Note that pivotDate == nil means that we are loading right up to the present
+		switch direction {
+		case .down:
+			return .init(lowerBound: fullPeriod.lowerBound, upperBound: loading.pivotDate)
+		case .up:
+			if let pivotDate = loading.pivotDate {
+				return .init(lowerBound: pivotDate)
+			} else {
+				// The up direction does not make sense
+				return nil
+			}
+		}
+	}
 }
 
 extension TransactionHistory.State.Loading {
-	func withNewPivotDate(_ newPivotDate: Date) -> Self {
+	func withNewPivotDate(_ newPivotDate: Date?) -> Self {
 		.init(pivotDate: newPivotDate, filters: filters)
 	}
 
@@ -427,18 +446,6 @@ extension TransactionHistory.TransactionSection: CustomStringConvertible {
 extension Range {
 	func contains(_ otherRange: Range) -> Bool {
 		otherRange.lowerBound >= lowerBound && otherRange.upperBound <= upperBound
-	}
-
-	/// Returns the part of the range that is before (or after, respectivel) the provided point
-	func split(before: Bool, point: Bound) -> Range {
-		let clamped = Swift.min(Swift.max(point, lowerBound), upperBound)
-		return before ? lowerBound ..< clamped : clamped ..< upperBound
-	}
-}
-
-extension Range<Date> {
-	var debugString: String {
-		"\(lowerBound.formatted(date: .abbreviated, time: .omitted)) -- \(upperBound.formatted(date: .abbreviated, time: .omitted))"
 	}
 }
 

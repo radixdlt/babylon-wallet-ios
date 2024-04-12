@@ -160,7 +160,7 @@ extension OnLedgerEntity {
 			public func mapArray<T>(_ transform: (Value) throws -> [T]?) rethrows -> [ValueAtStateVersion<T>]? {
 				guard let elements = try transform(value) else { return nil }
 				return elements.map { (element: T) in
-					ValueAtStateVersion<T>.init(value: element, lastUpdatedAtStateVersion: lastUpdatedAtStateVersion)
+					ValueAtStateVersion<T>(value: element, lastUpdatedAtStateVersion: lastUpdatedAtStateVersion)
 				}
 			}
 		}

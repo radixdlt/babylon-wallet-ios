@@ -16,8 +16,7 @@ extension TransactionReview.DappEntity {
 		.known(
 			name: metadata.name,
 			thumbnail: metadata.iconURL,
-			id: id,
-			unauthorizedHint: isAuthorized ? nil : L10n.Common.unauthorized
+			id: id
 		)
 	}
 }
@@ -59,7 +58,7 @@ extension TransactionReviewDapps {
 extension TransactionReview {
 	struct DappView: SwiftUI.View {
 		enum ViewState: Hashable {
-			case known(name: String?, thumbnail: URL?, id: TransactionReview.DappEntity.ID, unauthorizedHint: String?)
+			case known(name: String?, thumbnail: URL?, id: TransactionReview.DappEntity.ID)
 			case unknown(String)
 		}
 
@@ -73,11 +72,11 @@ extension TransactionReview {
 
 		var body: some SwiftUI.View {
 			switch viewState {
-			case let .known(name, url, id, unauthorizedHint):
+			case let .known(name, url, id):
 				Card {
 					action(.knownDappTapped(id))
 				} contents: {
-					PlainListRow(title: name, subtitle: unauthorizedHint, accessory: nil) {
+					PlainListRow(title: name, accessory: nil) {
 						Thumbnail(.dapp, url: url)
 					}
 				}
