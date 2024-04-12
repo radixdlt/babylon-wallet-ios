@@ -92,8 +92,8 @@ private extension View {
 		let destinationStore = store.destination
 		return sheet(
 			store: destinationStore,
-			state: /CreatePersonaCoordinator.Destination.State.derivePublicKeys,
-			action: CreatePersonaCoordinator.Destination.Action.derivePublicKeys,
+			state: /CreatePersonaCoordinator.Destination.State.derivePublicKey,
+			action: CreatePersonaCoordinator.Destination.Action.derivePublicKey,
 			content: { DerivePublicKeys.View(store: $0) }
 		)
 	}

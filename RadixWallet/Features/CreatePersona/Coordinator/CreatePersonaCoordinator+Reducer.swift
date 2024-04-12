@@ -70,15 +70,15 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 
 	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
-			case derivePublicKeys(DerivePublicKeys.State)
+			case derivePublicKey(DerivePublicKeys.State)
 		}
 
 		public enum Action: Sendable, Hashable {
-			case derivePublicKeys(DerivePublicKeys.Action)
+			case derivePublicKey(DerivePublicKeys.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.derivePublicKeys, action: /Action.derivePublicKeys) {
+			Scope(state: /State.derivePublicKey, action: /Action.derivePublicKey) {
 				DerivePublicKeys()
 			}
 		}
@@ -99,7 +99,7 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case derivePublicKeys
+		case derivePublicKey
 		case createPersonaResult(TaskResult<Profile.Network.Persona>)
 		case handleFailure
 	}
@@ -150,7 +150,7 @@ extension CreatePersonaCoordinator {
 			state.name = name
 			state.fields = fields
 
-			return .send(.internal(.derivePublicKeys))
+			return .send(.internal(.derivePublicKey))
 
 		case .path(.element(_, action: .step2_completion(.delegate(.completed)))):
 			return .run { send in
@@ -165,8 +165,8 @@ extension CreatePersonaCoordinator {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case .derivePublicKeys:
-			state.destination = .derivePublicKeys(
+		case .derivePublicKey:
+			state.destination = .derivePublicKey(
 				.init(
 					derivationPathOption: .next(
 						networkOption: .useCurrent,
@@ -201,7 +201,7 @@ extension CreatePersonaCoordinator {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .derivePublicKeys(.delegate(.derivedPublicKeys(hdKeys, factorSourceID, networkID))):
+		case let .derivePublicKey(.delegate(.derivedPublicKeys(hdKeys, factorSourceID, networkID))):
 			guard let hdKey = hdKeys.first else {
 				loggerGlobal.error("Failed to create persona expected one single key, got: \(hdKeys.count)")
 				return .send(.internal(.handleFailure))
@@ -232,7 +232,7 @@ extension CreatePersonaCoordinator {
 				await send(.internal(.handleFailure))
 			}
 
-		case .derivePublicKeys(.delegate(.failedToDerivePublicKey)):
+		case .derivePublicKey(.delegate(.failedToDerivePublicKey)):
 			return .send(.internal(.handleFailure))
 
 		default:
