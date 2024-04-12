@@ -1,9 +1,10 @@
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
 
 final class TokenPriceCientTests: XCTestCase {
 	func test_zeroPrice() {
-		validateDecimalPriceConversion(0, expected: .zero())
+		validateDecimalPriceConversion(0, expected: Decimal192.zero)
 	}
 
 	func test_noDecimalPlaces_1() {
@@ -19,11 +20,11 @@ final class TokenPriceCientTests: XCTestCase {
 	}
 
 	func test_withDecimalPlaces_1() {
-		validateDecimalPriceConversion(1.99, expected: try! .init(value: "1.99"))
+		validateDecimalPriceConversion(1.99, expected: try! Decimal192("1.99"))
 	}
 
 	func test_withDecimalPlaces_2() {
-		validateDecimalPriceConversion(1.000099, expected: try! .init(value: "1.000099"))
+		validateDecimalPriceConversion(1.000099, expected: try! Decimal192("1.000099"))
 	}
 
 	func test_belowOne_1() {
@@ -31,35 +32,33 @@ final class TokenPriceCientTests: XCTestCase {
 	}
 
 	func test_belowOne_2() {
-		validateDecimalPriceConversion(0.000099, expected: try! .init(value: "0.000099"))
+		validateDecimalPriceConversion(0.000099, expected: try! Decimal192("0.000099"))
 	}
 
-	// NOTE: All of the below values would be rounded to 14 decimal places
-	//       As it seems that Swift number formatter for Double cannot express more decimals.
-	func test_closeToRETDecimalDivisibility() {
+	func test_closeToDecimal192Divisibility() {
 		// 17 decimal places
-		validateDecimalPriceConversion(1.12345678901234567, expected: try! .init(value: "1.12345678901235"))
+		validateDecimalPriceConversion(1.12345678901234567, expected: try! Decimal192("1.1234567890123457"))
 	}
 
-	func test_maxRETDecimalDivisibility() {
+	func test_maxDecimal192Divisibility() {
 		// 18 decimal places
-		validateDecimalPriceConversion(1.123456789012345678, expected: try! .init(value: "1.12345678901235"))
+		validateDecimalPriceConversion(1.123456789012345678, expected: try! Decimal192("1.1234567890123457"))
 	}
 
-	func test_overMaxRETDecimalDivisibility() {
+	func test_overMaxDecimal192Divisibility() {
 		// 22 decimal places
-		validateDecimalPriceConversion(1.1234567890123456789012, expected: try! .init(value: "1.12345678901235"))
+		validateDecimalPriceConversion(1.1234567890123456789012, expected: try! Decimal192("1.1234567890123457"))
 	}
 
 	private func validateDecimalPriceConversion(
 		_ price: Double,
-		expected: RETDecimal,
+		expected: Decimal192,
 		file: StaticString = #filePath,
 		line: UInt = #line
 	) {
 		let tokenPrice = tokenWithPrice(price)
 		guard let decimalPrice = TokenPricesClient.TokenPrices(tokenPrice).first?.value else {
-			XCTFail("Could'nt convert \(tokenPrice) to RETDecimal", file: file, line: line)
+			XCTFail("Could'nt convert \(tokenPrice) to Decimal192", file: file, line: line)
 			return
 		}
 		XCTAssertEqual(

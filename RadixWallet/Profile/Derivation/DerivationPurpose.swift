@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - DerivationPurpose
 /// The purpose for deriving a key pair, e.g. to derive and `Address`, or
 /// to create a cryptography based ID (e.g. Ledger Nano Device ID)

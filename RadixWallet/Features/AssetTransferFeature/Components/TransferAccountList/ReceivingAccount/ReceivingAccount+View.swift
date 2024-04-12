@@ -40,7 +40,7 @@ extension ReceivingAccount.View {
 
 	private func account(_ viewStore: ViewStoreOf<ReceivingAccount>) -> some View {
 		Group {
-			if let account = viewStore.account {
+			if let account = viewStore.recipient {
 				SmallAccountCard(
 					account.name,
 					identifiable: account.identifer,
@@ -85,7 +85,7 @@ extension ReceivingAccount.View {
 			Button {
 				viewStore.send(.addAssetTapped)
 			} label: {
-				Text(L10n.AssetTransfer.ReceivingAccount.addAssetsButton)
+				Text("+ " + L10n.AssetTransfer.ReceivingAccount.addAssetsButton)
 					.frame(height: .standardButtonHeight)
 					.frame(maxWidth: .infinity)
 					.foregroundColor(.app.blue2)

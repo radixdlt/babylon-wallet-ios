@@ -136,8 +136,8 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		guard let id = state.destination?.id else { return .none }
 
 		switch presentedAction {
-		case let .chooseAccount(.delegate(.handleResult(account))):
-			state.receivingAccounts[id: id]?.account = account
+		case let .chooseAccount(.delegate(.handleResult(recipient))):
+			state.receivingAccounts[id: id]?.recipient = recipient
 			state.destination = nil
 			return .none
 
@@ -231,7 +231,7 @@ extension TransferAccountList {
 	}
 
 	private func navigateToChooseAccounts(_ state: inout State, id: ReceivingAccount.State.ID) -> Effect<Action> {
-		let filteredAccounts = state.receivingAccounts.compactMap(\.account?.left?.address) + [state.fromAccount.address]
+		let filteredAccounts = state.receivingAccounts.compactMap(\.recipient?.accountAddress) + [state.fromAccount.address]
 		let chooseAccount: ChooseReceivingAccount.State = .init(
 			networkID: state.fromAccount.networkID,
 			chooseAccounts: .init(
@@ -297,11 +297,17 @@ extension TransferAccountList {
 		_ receivingAccount: ReceivingAccount.State,
 		forAssets assets: IdentifiedArrayOf<ResourceAsset.State>
 	) -> Effect<Action> {
-		if case let .left(userOwnedAccount) = receivingAccount.account {
+		if case let .profileAccount(value: sargonUserOwnedAccount) = receivingAccount.recipient {
 			return .run { send in
+				@Dependency(\.accountsClient) var accountsClient
+				let userOwnedAccount = try await accountsClient.fromSargon(sargonUserOwnedAccount)
 				for asset in assets {
 					let resourceAddress = asset.resourceAddress
-					let signatureNeeded = await needsSignatureForDepositting(into: userOwnedAccount, resource: resourceAddress)
+					let signatureNeeded = await needsSignatureForDepositting(
+						into: userOwnedAccount,
+						resource: resourceAddress
+					)
+
 					await send(.internal(.updateSignatureStatus(
 						accountID: receivingAccount.id,
 						assetID: asset.id,

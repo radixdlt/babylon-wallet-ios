@@ -1,4 +1,4 @@
-import EngineToolkit
+import Sargon
 
 // MARK: - Profile.Network.Account.OnLedgerSettings
 extension Profile.Network.Account {
@@ -177,7 +177,7 @@ extension Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositorA
 		case .resourceAddress:
 			self = try .resourceAddress(.init(validatingAddress: value))
 		case .nonFungibleGlobalID:
-			self = try .nonFungibleGlobalID(.init(nonFungibleGlobalId: value))
+			self = try .nonFungibleGlobalID(NonFungibleGlobalId(value))
 		}
 	}
 
@@ -191,7 +191,7 @@ extension Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositorA
 
 		case let .nonFungibleGlobalID(id):
 			try container.encode(Discriminator.nonFungibleGlobalID, forKey: .discriminator)
-			try container.encode(id.asStr(), forKey: .value)
+			try container.encode(id.toRawString(), forKey: .value)
 		}
 	}
 }

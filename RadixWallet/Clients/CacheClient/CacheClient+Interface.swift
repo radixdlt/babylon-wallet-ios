@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - CacheClient
 public struct CacheClient: Sendable {
 	public var save: Save
@@ -69,16 +71,85 @@ extension CacheClient {
 	}
 }
 
+extension Address {
+	fileprivate func filesystemFolderPath(rootName folderRoot: String) -> String {
+		switch self {
+		case let .account(accountAddress):
+			"\(folderRoot)/accounts/\(accountAddress.address)"
+		case .resource:
+			"\(folderRoot)/resources"
+		case .pool:
+			"\(folderRoot)/resourcePools"
+		case .validator:
+			"\(folderRoot)/validators"
+		case .component:
+			"\(folderRoot)/componentAddress"
+		default:
+			"\(folderRoot)/generic"
+		}
+	}
+
+	fileprivate func filesystemFilePath(folderPath filesystemFolderPath: String) -> String {
+		switch self {
+		case .account:
+			"\(filesystemFolderPath)/details"
+		case let .resource(resourceAddress):
+			"\(filesystemFolderPath)/\(resourceAddress.address)"
+		case let .pool(poolAddress):
+			"\(filesystemFolderPath)/\(poolAddress.address)"
+		case let .validator(validatorAddress):
+			"\(filesystemFolderPath)/\(validatorAddress.address)"
+		case let .component(componentAddress):
+			"\(filesystemFolderPath)/\(componentAddress.address)"
+		default:
+			"\(filesystemFolderPath)/\(self.address)"
+		}
+	}
+}
+
 extension CacheClient {
 	public enum Entry: Equatable {
+		public init(address: some AddressProtocol) {
+			self = .onLedgerEntity(.init(address: address))
+		}
+
 		public enum OnLedgerEntity: Hashable {
-			case account(Address)
-			case resource(Address)
-			case resourcePool(Address)
-			case validator(Address)
-			case genericComponent(Address)
+			case address(Address)
+
+			public init(address: some AddressProtocol) {
+				self = .address(address.asGeneral)
+			}
+
 			case nonFungibleData(NonFungibleGlobalId)
-			case nonFungibleIdPage(accountAddress: Address, resourceAddress: Address, pageCursor: String?)
+			case nonFungibleIdPage(
+				accountAddress: AccountAddress,
+				resourceAddress: ResourceAddress,
+				pageCursor: String?
+			)
+
+			var filesystemFilePath: String {
+				switch self {
+				case let .address(address):
+					return address.filesystemFilePath(folderPath: filesystemFolderPath)
+				case let .nonFungibleData(nonFungibleGlobalId):
+					return "\(filesystemFolderPath)/\(nonFungibleGlobalId.description)"
+				case let .nonFungibleIdPage(_, resourceAddress, pageCursor):
+					let file = "nonFungibleIds-" + resourceAddress.address + (pageCursor.map { "-\($0)" } ?? "")
+					return "\(filesystemFolderPath)/\(file)"
+				}
+			}
+
+			var filesystemFolderPath: String {
+				let folderRoot = "OnLedgerEntity"
+				switch self {
+				case let .address(address):
+					return address.filesystemFolderPath(rootName: folderRoot)
+				case .nonFungibleData:
+					return "\(folderRoot)/nonFungiblesData"
+				case let .nonFungibleIdPage(accountAddress, _, _):
+					return "\(folderRoot)/accounts/\(accountAddress.address)"
+				}
+			}
 		}
 
 		case onLedgerEntity(OnLedgerEntity)
@@ -92,70 +163,38 @@ extension CacheClient {
 		var filesystemFilePath: String {
 			switch self {
 			case let .onLedgerEntity(entity):
-				switch entity {
-				case .account:
-					return "\(filesystemFolderPath)/details"
-				case let .resource(resourceAddress):
-					return "\(filesystemFolderPath)/\(resourceAddress.address)"
-				case let .resourcePool(resourcePoolAddress):
-					return "\(filesystemFolderPath)/\(resourcePoolAddress.address)"
-				case let .validator(validatorAddress):
-					return "\(filesystemFolderPath)/\(validatorAddress.address)"
-				case let .genericComponent(componentAddress):
-					return "\(filesystemFolderPath)/\(componentAddress.address)"
-				case let .nonFungibleData(nonFungibleGlobalId):
-					return "\(filesystemFolderPath)/\(nonFungibleGlobalId.asStr())"
-				case let .nonFungibleIdPage(_, resourceAddress, pageCursor):
-					let file = "nonFungibleIds-" + resourceAddress.address + (pageCursor.map { "-\($0)" } ?? "")
-					return "\(filesystemFolderPath)/\(file)"
-				}
+				entity.filesystemFilePath
 			case let .networkName(url):
-				return "\(filesystemFolderPath)/networkName-\(url)"
+				"\(filesystemFolderPath)/networkName-\(url)"
 			case let .dAppRequestMetadata(definitionAddress):
-				return "\(filesystemFolderPath)/DappRequestMetadata-\(definitionAddress)"
+				"\(filesystemFolderPath)/DappRequestMetadata-\(definitionAddress)"
 			case let .rolaDappVerificationMetadata(definitionAddress):
-				return "\(filesystemFolderPath)/RolaDappVerificationMetadata-\(definitionAddress)"
+				"\(filesystemFolderPath)/RolaDappVerificationMetadata-\(definitionAddress)"
 			case let .rolaWellKnownFileVerification(url):
-				return "\(filesystemFolderPath)/RolaWellKnownFileVerification-\(url)"
+				"\(filesystemFolderPath)/RolaWellKnownFileVerification-\(url)"
 			case let .tokenPrices(currency):
-				return "\(filesystemFolderPath)/prices-\(currency.rawValue)"
+				"\(filesystemFolderPath)/prices-\(currency.rawValue)"
 			case let .dateOfFirstTransaction(address):
-				return "\(filesystemFolderPath)/account-\(address.address)"
+				"\(filesystemFolderPath)/account-\(address.address)"
 			}
 		}
 
 		var filesystemFolderPath: String {
 			switch self {
 			case let .onLedgerEntity(entity):
-				let folderRoot = "OnLedgerEntity"
-				switch entity {
-				case let .account(accountAddress):
-					return "\(folderRoot)/accounts/\(accountAddress.address)"
-				case .resource:
-					return "\(folderRoot)/resources"
-				case .resourcePool:
-					return "\(folderRoot)/resourcePools"
-				case .validator:
-					return "\(folderRoot)/validators"
-				case .genericComponent:
-					return "\(folderRoot)/genericComponents"
-				case .nonFungibleData:
-					return "\(folderRoot)/nonFungiblesData"
-				case let .nonFungibleIdPage(accountAddress, _, _):
-					return "\(folderRoot)/accounts/\(accountAddress.address)"
-				}
+				entity.filesystemFolderPath
 			case .networkName:
-				return "NetworkName"
+				"NetworkName"
 			case .dAppRequestMetadata:
-				return "DappRequestMetadata"
+				"DappRequestMetadata"
 			case .rolaDappVerificationMetadata:
-				return "RolaDappVerificationMetadata"
+				"RolaDappVerificationMetadata"
 			case .rolaWellKnownFileVerification:
-				return "RolaWellKnownFileVerification"
+				"RolaWellKnownFileVerification"
 			case .tokenPrices:
-				return "TokenPrices"
+				"TokenPrices"
 			case .dateOfFirstTransaction:
-				return "DateOfFirstTransaction"
+				"DateOfFirstTransaction"
 			}
 		}
 

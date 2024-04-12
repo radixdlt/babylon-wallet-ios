@@ -16,8 +16,12 @@ extension DataChannelClient {
 			self.messageHash = messageHash
 		}
 
-		public init(message: Data, id: Message.ID) throws {
-			try self.init(message: message, id: id, messageHash: message.hash())
+		public init(message: Data, id: Message.ID) {
+			self.init(
+				message: message,
+				id: id,
+				messageHash: message.hash().data
+			)
 		}
 	}
 }
@@ -66,7 +70,7 @@ extension DataChannelClient.AssembledMessage {
 			throw error()
 		}
 
-		let hash = try message.hash()
+		let hash = message.hash().data
 		guard hash == expectedHash else {
 			let hashHex = hash.hex()
 			let expectedHashHex = expectedHash.hex()

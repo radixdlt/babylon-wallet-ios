@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - ImportedOlympiaWalletFailPayloadsEmpty
 struct ImportedOlympiaWalletFailPayloadsEmpty: Swift.Error {}
 

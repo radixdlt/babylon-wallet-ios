@@ -6,7 +6,7 @@ struct ValidatorHeaderView: View {
 	struct ViewState: Hashable {
 		let imageURL: URL?
 		let name: String?
-		let stakedAmount: RETDecimal?
+		let stakedAmount: Decimal192?
 	}
 
 	let viewState: ViewState

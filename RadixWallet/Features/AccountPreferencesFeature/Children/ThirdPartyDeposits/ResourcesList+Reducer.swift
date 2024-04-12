@@ -273,7 +273,7 @@ extension ThirdPartyDeposits.DepositorAddress {
 		case let .resourceAddress(address):
 			address
 		case let .nonFungibleGlobalID(nonFungibleGlobalID):
-			try! nonFungibleGlobalID.resourceAddress().asSpecific()
+			nonFungibleGlobalID.resourceAddress
 		}
 	}
 }

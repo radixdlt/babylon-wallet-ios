@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - FactorSource
 public enum FactorSource: BaseFactorSourceProtocol, Sendable, Hashable, Codable, Identifiable {
 	public typealias ID = FactorSourceID

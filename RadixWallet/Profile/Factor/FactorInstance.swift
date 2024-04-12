@@ -1,10 +1,8 @@
-import EngineToolkit
-
 // MARK: - FactorInstance
 /// An factor instance created from a FactorSource.
 public struct FactorInstance: Sendable, Hashable, Codable, Identifiable, FactorOfTierProtocol {
 	// FIXME: COMPLETELY incorrectly implemented, MUST be sent in probably, because Profile cannot
-	// use EngineToolkit which we must, to do Blake hash.
+	// use RET which we must, to do Blake hash.
 	/// A string uniquely identifying this Factor Source, on format:
 	/// `FactorSourceKind(1) || "#" || BadgeAddress(String)` e.g.
 	/// `de#resource_sim1qgqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqs64j5z6:[9f58abcbc2ebd2da349acb10773ffbc37b6af91fa8df2486c9ea]"`
@@ -30,7 +28,7 @@ public struct FactorInstance: Sendable, Hashable, Codable, Identifiable, FactorO
 	public let factorSourceID: FactorSourceID
 
 	// FIXME: CHANGE TO STORED PROPERTY, COMPLETELY incorrectly implemented, MUST be sent in probably, because Profile cannot
-	// use EngineToolkit which we must, to do Blake hash.
+	// use RET which we must, to do Blake hash.
 	/// FactorInstanceID is a referenced by security structure
 	public var id: ID {
 		switch badge {
@@ -41,14 +39,32 @@ public struct FactorInstance: Sendable, Hashable, Codable, Identifiable, FactorO
 				let payload = k1PubKey.compressedRepresentation.prefix(26)
 				return try! .init(
 					factorSourceKind: factorSourceID.kind,
-					badgeAddress: .virtual(.fromParts(resourceAddress: .init(address: "resource_sim1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxakj8n3"), nonFungibleLocalId: .integer(value: 1)))
+					badgeAddress: .virtual(
+						NonFungibleGlobalID(
+							resourceAddress: .init(
+								validatingAddress: "resource_sim1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxakj8n3"
+							),
+							nonFungibleLocalId: .integer(
+								value: 1
+							)
+						)
+					)
 				)
 			case let .eddsaEd25519(curve25519PubKey):
 				// FIXME: THIS IS COMPLETELY WRONG, placeholder only
 				let payload = curve25519PubKey.compressedRepresentation.prefix(26)
 				return try! .init(
 					factorSourceKind: factorSourceID.kind,
-					badgeAddress: .virtual(.fromParts(resourceAddress: .init(address: "resource_sim1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxakj8n3"), nonFungibleLocalId: .integer(value: 1)))
+					badgeAddress: .virtual(
+						NonFungibleGlobalID(
+							resourceAddress: .init(
+								validatingAddress: "resource_sim1tknxxxxxxxxxradxrdxxxxxxxxx009923554798xxxxxxxxxakj8n3"
+							),
+							nonFungibleLocalId: .integer(
+								value: 1
+							)
+						)
+					)
 				)
 			}
 		}
@@ -298,7 +314,8 @@ extension FactorInstance.ID.BadgeAddress {
 		let container = try decoder.container(keyedBy: CodingKeys.self)
 
 		if var virtualContainer = try? container.nestedUnkeyedContainer(forKey: .virtual) {
-			self = try .virtual(.init(nonFungibleGlobalId: virtualContainer.decode(String.self)))
+			let globalIDString = try virtualContainer.decode(String.self)
+			self = try .virtual(NonFungibleGlobalID(globalIDString))
 		} else if var resourceAddressContainer = try? container.nestedUnkeyedContainer(forKey: .resourceAddress) {
 			self = try .resourceAddress(.init(validatingAddress: resourceAddressContainer.decode(String.self)))
 		} else {
@@ -312,7 +329,7 @@ extension FactorInstance.ID.BadgeAddress {
 		switch self {
 		case let .virtual(id):
 			var nestedContainer = container.nestedUnkeyedContainer(forKey: .virtual)
-			try nestedContainer.encode(id.asStr())
+			try nestedContainer.encode(id.description)
 		case let .resourceAddress(address):
 			var nestedContainer = container.nestedUnkeyedContainer(forKey: .resourceAddress)
 			try nestedContainer.encode(address.address)

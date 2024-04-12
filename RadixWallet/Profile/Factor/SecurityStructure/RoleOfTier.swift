@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - RoleProtocol
 public protocol RoleProtocol: Sendable, Hashable {
 	static var role: SecurityStructureRole { get }

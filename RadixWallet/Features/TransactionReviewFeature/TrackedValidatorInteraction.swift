@@ -2,9 +2,9 @@ import Foundation
 
 // MARK: - TrackedValidatorInteraction
 public protocol TrackedValidatorInteraction {
-	var validatorAddress: EngineToolkit.Address { get }
-	var liquidStakeUnitAddress: EngineToolkit.Address { get }
-	var liquidStakeUnitAmount: RETDecimal { get set }
+	var validatorAddress: ValidatorAddress { get }
+	var liquidStakeUnitAddress: ResourceAddress { get }
+	var liquidStakeUnitAmount: Decimal192 { get set }
 	mutating func add(_ other: Self)
 }
 
@@ -21,14 +21,6 @@ extension Collection where Element: TrackedValidatorInteraction {
 			}
 		}
 		return result
-	}
-}
-
-// MARK: - TrackedValidatorUnstake + TrackedValidatorInteraction
-extension TrackedValidatorUnstake: TrackedValidatorInteraction {
-	public mutating func add(_ other: Self) {
-		guard isCompatible(with: other) else { return }
-		liquidStakeUnitAmount += other.liquidStakeUnitAmount
 	}
 }
 

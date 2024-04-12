@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - TrustedContactFactorSource
 public struct TrustedContactFactorSource: FactorSourceProtocol {
 	public typealias ID = FactorSourceID.FromAddress

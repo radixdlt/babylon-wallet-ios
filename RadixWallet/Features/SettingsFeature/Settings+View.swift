@@ -27,8 +27,16 @@ extension Settings {
 
 		init(state: Settings.State) {
 			#if DEBUG
-			let retCommitHash: String = buildInformation().version
-			self.debugAppInfo = "RET #\(retCommitHash), SS \(RadixConnectConstants.defaultSignalingServer.absoluteString)"
+			let buildInfo = SargonBuildInformation.get()
+			let dependencies = buildInfo.dependencies
+			let sargon = buildInfo.sargonVersion.description
+			let ret = String(dependencies.radixEngineToolkit.description.prefix(7))
+			self.debugAppInfo =
+				"""
+				Sargon: \(sargon)
+				RET: #\(ret)
+				SS: \(RadixConnectConstants.defaultSignalingServer.absoluteString)
+				"""
 			#endif
 
 			self.shouldShowAddP2PLinkButton = state.userHasNoP2PLinks ?? false
@@ -139,6 +147,7 @@ extension Settings.View {
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2Regular)
 						.padding(.bottom, .medium1)
+						.multilineTextAlignment(.leading)
 					#endif
 				}
 			}

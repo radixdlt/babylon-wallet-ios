@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - Radix
 /// Just a namespace for Radix entities, e.g. `Radix.Network`
 public enum Radix {}

@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - PersonaData.Name
 extension PersonaData {
 	public struct Name: Sendable, Hashable, Codable, PersonaDataEntryProtocol, CustomStringConvertible {
