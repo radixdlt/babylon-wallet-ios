@@ -30,10 +30,10 @@ extension ResourceBalance: Comparable {
 				}
 			}
 		case let (.nonFungible(lhsValue), .nonFungible(rhsValue)):
-			if lhsValue.id.resourceAddress() == rhsValue.id.resourceAddress() {
-				lhsValue.id.localId().toUserFacingString() < rhsValue.id.localId().toUserFacingString()
+			if lhsValue.id.resourceAddress == rhsValue.id.resourceAddress {
+				lhsValue.id.nonFungibleLocalId.toUserFacingString() < rhsValue.id.nonFungibleLocalId.toUserFacingString()
 			} else {
-				lhsValue.id.resourceAddress().asStr() < rhsValue.id.resourceAddress().asStr()
+				lhsValue.id.resourceAddress.description < rhsValue.id.resourceAddress.description
 			}
 		case let (.liquidStakeUnit(lhsValue), .liquidStakeUnit(rhsValue)):
 			if lhsValue.validator.address == rhsValue.validator.address {
@@ -88,15 +88,8 @@ extension ResourceBalance: Comparable {
 // MARK: - ResourceBalance.Amount + Comparable
 extension ResourceBalance.Amount: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
-		// If RETDecimal were comparable:
-//		order(lhs: lhs.amount, rhs: rhs.amount) {
-//			order(lhs: lhs.guaranteed, rhs: rhs.guaranteed, minValue: 0)
-//		}
-
-		if lhs.amount == rhs.amount {
-			lhs.guaranteed ?? 0 < rhs.guaranteed ?? 0
-		} else {
-			lhs.amount < rhs.amount
+		order(lhs: lhs.amount, rhs: rhs.amount) {
+			order(lhs: lhs.guaranteed, rhs: rhs.guaranteed)
 		}
 	}
 
@@ -127,6 +120,6 @@ private func order<W: Comparable>(lhs: W?, rhs: W?, tieBreak: () -> Bool) -> Boo
 	}
 }
 
-private func order(lhs: RETDecimal?, rhs: RETDecimal?) -> Bool {
-	lhs ?? .min() < rhs ?? .min()
+private func order(lhs: Decimal192?, rhs: Decimal192?) -> Bool {
+	lhs ?? .min < rhs ?? .min
 }

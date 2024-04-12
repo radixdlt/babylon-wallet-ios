@@ -47,7 +47,7 @@ extension SubmitTransaction.State.TXStatus {
 // MARK: - SubmitTransaction.View
 extension SubmitTransaction {
 	public struct ViewState: Equatable {
-		let txID: TXID
+		let txID: IntentHash
 		let status: State.TXStatus
 		let dismissalDisabled: Bool
 	}

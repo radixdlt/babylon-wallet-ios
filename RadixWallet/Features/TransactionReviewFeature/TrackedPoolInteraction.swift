@@ -2,16 +2,16 @@ import Foundation
 
 // MARK: - TrackedPoolInteraction
 public protocol TrackedPoolInteraction {
-	var poolAddress: EngineToolkit.Address { get }
-	var poolUnitsResourceAddress: EngineToolkit.Address { get }
-	var poolUnitsAmount: RETDecimal { get set }
-	var resourcesInInteraction: [String: RETDecimal] { get set }
+	var poolAddress: PoolAddress { get }
+	var poolUnitsResourceAddress: ResourceAddress { get }
+	var poolUnitsAmount: Decimal192 { get set }
+	var resourcesInInteraction: [ResourceAddress: Decimal192] { get set }
 	mutating func add(_ other: Self)
 }
 
 // MARK: - TrackedPoolContribution + TrackedPoolInteraction
 extension TrackedPoolContribution: TrackedPoolInteraction {
-	public var resourcesInInteraction: [String: RETDecimal] {
+	public var resourcesInInteraction: [ResourceAddress: Decimal192] {
 		get { contributedResources }
 		set { contributedResources = newValue }
 	}
@@ -19,7 +19,7 @@ extension TrackedPoolContribution: TrackedPoolInteraction {
 
 // MARK: - TrackedPoolRedemption + TrackedPoolInteraction
 extension TrackedPoolRedemption: TrackedPoolInteraction {
-	public var resourcesInInteraction: [String: RETDecimal] {
+	public var resourcesInInteraction: [ResourceAddress: Decimal192] {
 		get { redeemedResources }
 		set { redeemedResources = newValue }
 	}

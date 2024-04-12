@@ -44,38 +44,34 @@ extension AccountPortfoliosClient {
 			@Dependency(\.cacheClient) var cacheClient
 
 			let changedAccounts: [Profile.Network.Account.EntityAddress]?
-			let resourceAddressesToRefresh: [Address]?
+			let poolAddressesToRefresh: [PoolAddress]?
 			do {
-				let manifest = intent.manifest()
+				let manifest = intent.manifest
 
 				let involvedAccounts = try await transactionClient.myInvolvedEntities(manifest)
 				changedAccounts = involvedAccounts.accountsDepositedInto
 					.union(involvedAccounts.accountsWithdrawnFrom)
 					.map(\.address)
 
-				let involvedAddresses = manifest.extractAddresses()
+				let involvedPoolAddresses = manifest.involvedPoolAddresses
 				/// Refresh the resources if an operation on resource pool is involved,
 				/// reason being that contributing or withdrawing from a resource pool modifies the totalSupply
-				if involvedAddresses.contains(where: \.key.isResourcePool) {
+				if !involvedPoolAddresses.isEmpty {
 					/// A little bit too aggressive, as any other resource will also be refreshed.
 					/// But at this stage we cannot determine(without making additional calls) the pool unit related fungible resource
-					resourceAddressesToRefresh = involvedAddresses
-						.filter { $0.key == .globalFungibleResourceManager || $0.key.isResourcePool }
-						.values
-						.flatMap(identity)
-						.compactMap { try? $0.asSpecific() }
+					poolAddressesToRefresh = involvedPoolAddresses
 				} else {
-					resourceAddressesToRefresh = nil
+					poolAddressesToRefresh = nil
 				}
 			} catch {
 				loggerGlobal.warning("Could get transactionClient.myInvolvedEntities: \(error.localizedDescription)")
 				changedAccounts = nil
-				resourceAddressesToRefresh = nil
+				poolAddressesToRefresh = nil
 			}
 
-			if let resourceAddressesToRefresh {
-				for item in resourceAddressesToRefresh {
-					cacheClient.removeFile(.onLedgerEntity(.resource(item.asGeneral)))
+			if let poolAddressesToRefresh {
+				for item in poolAddressesToRefresh {
+					cacheClient.removeFile(.onLedgerEntity(.address(.pool(item))))
 				}
 			}
 

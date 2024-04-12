@@ -125,7 +125,7 @@ extension ResourcesList.View {
 	@ViewBuilder
 	func resourceRowView(_ viewState: ResourceViewState, _ viewStore: ViewStoreOf<ResourcesList>) -> some SwiftUI.View {
 		HStack {
-			if case .globalNonFungibleResourceManager = viewState.address.resourceAddress.decodedKind {
+			if viewState.address.resourceAddress.isNonFungible {
 				Thumbnail(.nft, url: viewState.iconURL)
 			} else {
 				Thumbnail(token: .other(viewState.iconURL))

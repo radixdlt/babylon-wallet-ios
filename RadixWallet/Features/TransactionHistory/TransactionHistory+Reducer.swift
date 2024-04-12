@@ -23,7 +23,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	}
 
 	public enum ScrollTarget: Hashable, Sendable {
-		case transaction(TXID)
+		case transaction(IntentHash)
 		// The latest transaction before the given date
 		case beforeDate(Date)
 		case latestTransaction
@@ -44,7 +44,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		var sections: IdentifiedArrayOf<TransactionSection> = []
 
-		var scrollTarget: Triggering<TXID?> = .updated(nil)
+		var scrollTarget: Triggering<IntentHash?> = .updated(nil)
 
 		/// The currently selected month
 		var currentMonth: DateRangeItem.ID
@@ -196,7 +196,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 				return .none
 
 			case let .transactionTapped(txid):
-				let path = "transaction/\(txid.asStr())/summary"
+				let path = "transaction/\(txid.bech32EncodedTxId)/summary"
 				let url = Radix.Dashboard.dashboard(forNetworkID: state.account.networkID).url.appending(path: path)
 				return .run { _ in
 					await openURL(url)

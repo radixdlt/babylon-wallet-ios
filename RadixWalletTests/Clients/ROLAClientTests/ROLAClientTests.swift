@@ -18,7 +18,7 @@ final class ROLAClientTests: TestCase {
 		dAppDefinitionAddress: DappDefinitionAddress
 	) -> P2P.Dapp.Request.Metadata {
 		try! .init(
-			version: 1, networkId: 0,
+			version: 1, networkId: NetworkID.mainnet,
 			origin: .init(string: origin),
 			dAppDefinitionAddress: dAppDefinitionAddress
 		)
@@ -74,7 +74,7 @@ final class ROLAClientTests: TestCase {
 					origin: .init(string: vector.origin)
 				)
 				XCTAssertEqual(payload.hex, vector.payloadToHash)
-				let blakeHashOfPayload = try blake2b(data: payload)
+				let blakeHashOfPayload = payload.hash()
 				XCTAssertEqual(blakeHashOfPayload.hex, vector.blakeHashOfPayload)
 			}
 		}
@@ -95,13 +95,13 @@ final class ROLAClientTests: TestCase {
 			try accounts.flatMap { dAppDefinitionAddress -> [TestVector] in
 				try (UInt8.zero ..< 10).map { seed -> TestVector in
 					/// deterministic derivation of a challenge, this is not `blakeHashOfPayload`
-					let challenge = try blake2b(data: Data((origin.urlString.rawValue + dAppDefinitionAddress.address).utf8) + [seed])
+					let challenge = (Data((origin.urlString.rawValue + dAppDefinitionAddress.address).utf8) + [seed]).hash()
 					let payload = try ROLAClient.payloadToHash(
-						challenge: .init(rawValue: .init(data: challenge)),
+						challenge: .init(rawValue: .init(data: challenge.data)),
 						dAppDefinitionAddress: dAppDefinitionAddress,
 						origin: origin
 					)
-					let blakeHashOfPayload = try blake2b(data: payload)
+					let blakeHashOfPayload = payload.hash()
 					return TestVector(
 						origin: origin.urlString.rawValue,
 						challenge: challenge.hex,
@@ -132,7 +132,7 @@ final class ROLAClientTests: TestCase {
 				dAppDefinitionAddress: .init(validatingAddress: "account_rdx168fghy4kapzfnwpmq7t7753425lwklk65r82ys7pz2xzleehk2ap0k"),
 				origin: .init(string: "https://radix-dapp-toolkit-dev.rdx-works-main.extratools.works")
 			)
-			return try blake2b(data: payload)
+			return payload.hash().data
 		}()
 
 		let signature = try key.privateKey!.signature(for: hash)

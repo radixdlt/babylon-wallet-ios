@@ -4,11 +4,11 @@ import SwiftUI
 // MARK: - Completion
 struct Completion: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
-		let txID: TXID?
+		let txID: IntentHash?
 		let dappMetadata: DappMetadata
 
 		init(
-			txID: TXID?,
+			txID: IntentHash?,
 			dappMetadata: DappMetadata
 		) {
 			self.txID = txID

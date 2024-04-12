@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - UnsecuredEntityControl
 /// Basic security control of an unsecured entity. When said entity
 /// is "securified" it will no longer be controlled by this `UnsecuredEntityControl`

@@ -4,7 +4,7 @@ public struct TokenPricesClient: Sendable, DependencyKey {
 }
 
 extension TokenPricesClient {
-	public typealias TokenPrices = [ResourceAddress: RETDecimal]
+	public typealias TokenPrices = [ResourceAddress: Decimal192]
 	public struct FetchPricesRequest: Encodable {
 		public let tokens: [ResourceAddress]
 		public let currency: FiatCurrency

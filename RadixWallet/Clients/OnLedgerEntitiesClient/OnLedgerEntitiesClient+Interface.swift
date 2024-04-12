@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - OnLedgerEntitiesClient
 /// A client that manages loading Entities from the Ledger.
 public struct OnLedgerEntitiesClient: Sendable {
@@ -111,7 +113,7 @@ extension OnLedgerEntitiesClient {
 }
 
 extension OnLedgerEntitiesClient {
-	public struct CachingStrategy: Sendable, Hashable {
+	public struct CachingStrategy: Sendable, Hashable, CustomDebugStringConvertible {
 		public enum Read: Sendable, Hashable {
 			case fromCache
 			case fromLedger
@@ -124,6 +126,18 @@ extension OnLedgerEntitiesClient {
 
 		public let read: Read
 		public let write: Write
+
+		public var debugDescription: String {
+			if self == Self.forceUpdate {
+				"forceUpdate"
+			} else if self == Self.useCache {
+				"useCache"
+			} else if self == Self.readFromLedgerSkipWrite {
+				"readFromLedgerSkipWrite"
+			} else {
+				"read: \(read), write: \(write)"
+			}
+		}
 
 		public static let forceUpdate = Self(read: .fromLedger, write: .toCache)
 		public static let useCache = Self(read: .fromCache, write: .toCache)
@@ -466,7 +480,7 @@ extension OnLedgerEntitiesClient {
 }
 
 extension OnLedgerEntitiesClient {
-	public func getPoolUnitDetails(_ poolUnitResource: OnLedgerEntity.Resource, forAmount amount: RETDecimal) async throws -> OwnedResourcePoolDetails? {
+	public func getPoolUnitDetails(_ poolUnitResource: OnLedgerEntity.Resource, forAmount amount: Decimal192) async throws -> OwnedResourcePoolDetails? {
 		guard let poolAddress = poolUnitResource.metadata.poolUnit?.asGeneral else {
 			return nil
 		}
@@ -518,7 +532,7 @@ extension OnLedgerEntitiesClient {
 	) async throws -> [OwnedResourcePoolDetails] {
 		let ownedPoolUnits = account.poolUnitResources.poolUnits
 		let pools = try await getEntities(
-			ownedPoolUnits.map(\.resourcePoolAddress.asGeneral),
+			ownedPoolUnits.map(\.resourcePoolAddress).map(\.asGeneral),
 			[.dappDefinition],
 			account.atLedgerState,
 			cachingStrategy

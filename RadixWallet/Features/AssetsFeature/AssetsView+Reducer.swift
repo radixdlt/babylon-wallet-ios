@@ -477,9 +477,3 @@ extension NonFungibleTokensPerResourceProvider {
 		)
 	}
 }
-
-extension SpecificAddress {
-	var isOnMainnet: Bool {
-		networkID == NetworkID.mainnet
-	}
-}

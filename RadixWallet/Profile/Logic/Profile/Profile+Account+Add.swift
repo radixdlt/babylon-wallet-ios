@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - PersonaNotConnected
 struct PersonaNotConnected: Swift.Error {}
 

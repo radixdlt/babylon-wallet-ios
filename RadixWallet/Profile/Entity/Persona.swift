@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - Profile.Network.Persona
 extension Profile.Network {
 	/// A network unique account with a unique public address and a set of cryptographic
@@ -134,12 +132,10 @@ extension Profile.Network.Persona {
 			throw WrongEntityInDerivationPath()
 		}
 
-		let engineAddress = try deriveVirtualIdentityAddressFromPublicKey(
-			publicKey: factorInstance.publicKey.intoEngine(),
-			networkId: networkID.rawValue
+		return EntityAddress(
+			publicKey: factorInstance.publicKey.intoSargon(),
+			networkID: networkID
 		)
-
-		return .init(address: engineAddress.addressString(), decodedKind: engineAddress.entityType())
 	}
 }
 

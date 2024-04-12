@@ -53,20 +53,20 @@ extension TransactionClient {
 			func identityFromComponentAddress(_ identityAddress: IdentityAddress) async throws -> Profile.Network.Persona {
 				try await personasClient.getPersona(id: identityAddress)
 			}
-			func mapAccount(_ addresses: [EngineToolkit.Address]) throws -> OrderedSet<Profile.Network.Account> {
-				try .init(validating: addresses.asSpecific().compactMap(accountFromComponentAddress))
+			func mapAccount(_ addresses: [AccountAddress]) throws -> OrderedSet<Profile.Network.Account> {
+				try .init(validating: addresses.compactMap(accountFromComponentAddress))
 			}
-			func mapIdentity(_ addresses: [EngineToolkit.Address]) async throws -> OrderedSet<Profile.Network.Persona> {
-				try await .init(validating: addresses.asSpecific().asyncMap(identityFromComponentAddress))
+			func mapIdentity(_ addresses: [IdentityAddress]) async throws -> OrderedSet<Profile.Network.Persona> {
+				try await .init(validating: addresses.asyncMap(identityFromComponentAddress))
 			}
 
-			let summary = manifest.summary(networkId: networkID.rawValue)
+			let summary = manifest.summary
 
 			return try await MyEntitiesInvolvedInTransaction(
-				identitiesRequiringAuth: mapIdentity(summary.identitiesRequiringAuth),
-				accountsRequiringAuth: mapAccount(summary.accountsRequiringAuth),
-				accountsWithdrawnFrom: mapAccount(summary.accountsWithdrawnFrom),
-				accountsDepositedInto: mapAccount(summary.accountsDepositedInto)
+				identitiesRequiringAuth: mapIdentity(summary.addressesOfPersonasRequiringAuth),
+				accountsRequiringAuth: mapAccount(summary.addressesOfAccountsRequiringAuth),
+				accountsWithdrawnFrom: mapAccount(summary.addressesOfAccountsWithdrawnFrom),
+				accountsDepositedInto: mapAccount(summary.addressesOfAccountsDepositedInto)
 			)
 		}
 
@@ -120,38 +120,38 @@ extension TransactionClient {
 			let epoch = try await gatewayAPIClient.getEpoch()
 
 			let header = TransactionHeader(
-				networkId: request.networkID.rawValue,
-				startEpochInclusive: epoch.rawValue,
-				endEpochExclusive: (epoch + request.makeTransactionHeaderInput.epochWindow).rawValue,
-				nonce: request.nonce.rawValue,
-				notaryPublicKey: SLIP10.PublicKey.eddsaEd25519(request.transactionSigners.notaryPublicKey).intoEngine(),
+				networkId: request.networkID,
+				startEpochInclusive: epoch,
+				endEpochExclusive: epoch + request.makeTransactionHeaderInput.epochWindow,
+				nonce: request.nonce,
+				notaryPublicKey: SLIP10.PublicKey.eddsaEd25519(request.transactionSigners.notaryPublicKey).intoSargon(),
 				notaryIsSignatory: request.transactionSigners.notaryIsSignatory,
 				tipPercentage: request.makeTransactionHeaderInput.tipPercentage
 			)
 
-			return .init(header: header, manifest: request.manifest, message: request.message)
+			return .init(header: header, manifest: request.manifest, message: request.message ?? Message.none)
 		}
 
 		let notarizeTransaction: NotarizeTransaction = { request in
 			let signedTransactionIntent = SignedIntent(
 				intent: request.transactionIntent,
-				intentSignatures: Array(request.intentSignatures)
+				intentSignatures: IntentSignatures(signatures: Array(request.intentSignatures.map { IntentSignature(signatureWithPublicKey: $0.intoSargon()) }))
 			)
 
-			let signedIntentHash = try signedTransactionIntent.signedIntentHash()
+			let signedIntentHash = signedTransactionIntent.hash()
 
 			let notarySignature = try request.notary.sign(
-				hashOfMessage: signedIntentHash.bytes().data
+				hashOfMessage: signedIntentHash.hash.data
 			)
 
-			let uncompiledNotarized = try NotarizedTransaction(
+			let uncompiledNotarized = NotarizedTransaction(
 				signedIntent: signedTransactionIntent,
-				notarySignature: notarySignature.intoEngine().signature
+				notarySignature: NotarySignature(signature: notarySignature.signature.intoSargon())
 			)
 
-			let compiledNotarizedTXIntent = try uncompiledNotarized.compile()
+			let compiledNotarizedTXIntent = uncompiledNotarized.compile()
 
-			let txID = try request.transactionIntent.intentHash()
+			let txID = request.transactionIntent.hash()
 
 			return .init(
 				notarized: compiledNotarizedTXIntent,
@@ -186,7 +186,9 @@ extension TransactionClient {
 			let receiptBytes = try Data(hex: transactionPreviewResponse.encodedReceipt)
 
 			/// Analyze the manifest
-			let analyzedManifestToReview = try manifestToSign.executionSummary(networkId: networkID.rawValue, encodedReceipt: receiptBytes)
+			let analyzedManifestToReview = try manifestToSign.executionSummary(
+				encodedReceipt: receiptBytes
+			)
 
 			/// Transactions created outside of the Wallet are not allowed to use reserved instructions
 			if !request.isWalletTransaction, !analyzedManifestToReview.reservedInstructions.isEmpty {
@@ -250,7 +252,7 @@ extension TransactionClient {
 
 			return try .init(
 				rawManifest: transactionManifest,
-				header: intent.header(),
+				header: intent.header,
 				transactionSigners: transactionSigners
 			)
 		}
