@@ -79,7 +79,7 @@ extension RadixConnectRelay {
 // MARK: RadixConnectRelay.Request
 extension RadixConnectRelay {
 	struct Request: Codable, Sendable {
-		enum Method: Codable, Sendable {
+		enum Method: String, Codable, Sendable {
 			case sendRequest
 			case getRequests
 			case sendResponse

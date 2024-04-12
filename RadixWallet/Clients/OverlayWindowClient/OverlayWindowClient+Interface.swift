@@ -20,6 +20,8 @@ public struct OverlayWindowClient: Sendable {
 	public var setIsUserIteractionEnabled: SetIsUserIteractionEnabled
 	public var isUserInteractionEnabled: IsUserInteractionEnabled
 
+	public var scheduleAlertAutoDimiss: ScheduleAlertAutoDimiss
+
 	public init(
 		scheduledItems: @escaping ScheduledItems,
 		scheduleAlertIgnoreAction: @escaping ScheduleAlertIgnoreAction,
@@ -27,7 +29,8 @@ public struct OverlayWindowClient: Sendable {
 		scheduleHUD: @escaping ScheduleHUD,
 		sendAlertAction: @escaping SendAlertAction,
 		setIsUserIteractionEnabled: @escaping SetIsUserIteractionEnabled,
-		isUserInteractionEnabled: @escaping IsUserInteractionEnabled
+		isUserInteractionEnabled: @escaping IsUserInteractionEnabled,
+		scheduleAlertAutoDimiss: @escaping ScheduleAlertAutoDimiss
 	) {
 		self.scheduledItems = scheduledItems
 		self.scheduleAlertIgnoreAction = scheduleAlertIgnoreAction
@@ -36,6 +39,7 @@ public struct OverlayWindowClient: Sendable {
 		self.sendAlertAction = sendAlertAction
 		self.setIsUserIteractionEnabled = setIsUserIteractionEnabled
 		self.isUserInteractionEnabled = isUserInteractionEnabled
+		self.scheduleAlertAutoDimiss = scheduleAlertAutoDimiss
 	}
 }
 
@@ -48,6 +52,7 @@ extension OverlayWindowClient {
 
 	public typealias SetIsUserIteractionEnabled = @Sendable (Bool) -> Void
 	public typealias IsUserInteractionEnabled = @Sendable () -> AnyAsyncSequence<Bool>
+	public typealias ScheduleAlertAutoDimiss = @Sendable (Item.AlertState) async -> Void
 }
 
 // MARK: OverlayWindowClient.Item
@@ -97,6 +102,7 @@ extension OverlayWindowClient {
 
 		case hud(HUD)
 		case alert(AlertState)
+		case autodismissAlert(AlertState)
 	}
 }
 

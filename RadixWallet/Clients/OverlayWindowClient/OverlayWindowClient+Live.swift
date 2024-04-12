@@ -32,7 +32,11 @@ extension OverlayWindowClient: DependencyKey {
 			scheduleHUD: { items.send(.hud($0)) },
 			sendAlertAction: { action, id in alertActions.send((action, id)) },
 			setIsUserIteractionEnabled: { isUserInteractionEnabled.send($0) },
-			isUserInteractionEnabled: { isUserInteractionEnabled.eraseToAnyAsyncSequence() }
+			isUserInteractionEnabled: { isUserInteractionEnabled.eraseToAnyAsyncSequence() },
+			scheduleAlertAutoDimiss: { alert in
+				items.send(.autodismissAlert(alert))
+				await alertActions.first { $0.id == alert.id }?.action
+			}
 		)
 	}()
 }

@@ -32,10 +32,11 @@ public actor Mobile2Mobile {
 extension Mobile2Mobile {
 	func getDappReturnURL(_ dAppOrigin: URL) async throws -> URL {
 		let wellKnown = try await httpClient.fetchDappWellKnownFile(dAppOrigin)
-//		guard let returnURL = wellKnown.callbackPath else {
-//			throw Error.missingDappReturnURL
-//		}
-		return .init(string: dAppOrigin.absoluteString + wellKnown.callbackPath!)! // dAppOrigin.appending(component: returnURL)
+		guard let returnURL = wellKnown.callbackPath else {
+			fatalError()
+			// throw Error.missingDappReturnURL
+		}
+		return .init(string: dAppOrigin.absoluteString + returnURL)! // dAppOrigin.appending(component: returnURL)
 	}
 
 	func linkDapp(_ request: Request.DappLinking) async throws {
@@ -64,6 +65,10 @@ extension Mobile2Mobile {
 				.init(name: "publicKey", value: walletPublicKey.rawRepresentation.hex),
 				.init(name: "sessionId", value: request.sessionId.rawValue),
 			])
+
+			await overlayWindowClient.scheduleAlertAutoDimiss(.init(title: {
+				.init("Verifying dApp link")
+			}))
 
 			await openURL(returnURL)
 		}
