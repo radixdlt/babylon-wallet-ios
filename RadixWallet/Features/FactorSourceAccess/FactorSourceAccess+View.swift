@@ -5,7 +5,7 @@ public extension FactorSourceAccess {
 		let title: String
 		let message: String
 		let externalDevice: String?
-		let retryEnabled: Bool
+		let isRetryEnabled: Bool
 		let height: CGFloat
 	}
 
@@ -49,7 +49,7 @@ public extension FactorSourceAccess {
 
 				externalDevice(viewStore.externalDevice)
 
-				if viewStore.retryEnabled {
+				if viewStore.isRetryEnabled {
 					Button {
 						viewStore.send(.retryButtonTapped)
 					} label: {

@@ -6,7 +6,7 @@ extension FactorSourceAccess.State {
 			title: title,
 			message: message,
 			externalDevice: externalDevice,
-			retryEnabled: retryEnabled,
+			isRetryEnabled: isRetryEnabled,
 			height: height
 		)
 	}
@@ -62,7 +62,7 @@ extension FactorSourceAccess.State {
 		}
 	}
 
-	private var retryEnabled: Bool {
+	private var isRetryEnabled: Bool {
 		switch kind {
 		case .device:
 			false
