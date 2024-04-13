@@ -12,7 +12,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 		@Dependency(\.userDefaults) var userDefaults
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 
-		let entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource = { factorSource, maybeSnapshot in
+		let entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource = { factorSource, _ in
 
 			let (allNonHiddenEntities, allHiddenEntities) = try await { () -> (allNonHiddenEntities: [EntityPotentiallyVirtual], allHiddenEntities: [EntityPotentiallyVirtual]) in
 				let accountNonHidden: [Profile.Network.Account]
@@ -21,30 +21,32 @@ extension DeviceFactorSourceClient: DependencyKey {
 				let personasHidden: [Profile.Network.Persona]
 
 				// FIXME: Uh this aint pretty... but we are short on time.
-				if let overridingSnapshot = maybeSnapshot {
-					let networkID = Gateway.default.network.id
-					let profile = Profile(snapshot: overridingSnapshot)
-					let network = try profile.network(id: networkID)
-					accountNonHidden = network.getAccounts().elements
-					personasNonHidden = network.getPersonas().elements
+//				if let overridingSnapshot = maybeSnapshot {
+//					let networkID = Gateway.default.network.id
+//					let profile = Profile(snapshot: overridingSnapshot)
+//					let network = try profile.network(id: networkID)
+//					accountNonHidden = network.getAccounts().elements
+//					personasNonHidden = network.getPersonas().elements
+//
+//					accountHidden = network.getHiddenAccounts().elements
+//					personasHidden = network.getHiddenPersonas().elements
+//				} else {
+//					accountNonHidden = try await accountsClient.getAccountsOnCurrentNetwork().elements
+//					personasNonHidden = try await personasClient.getPersonas().elements
+//
+//					accountHidden = try await accountsClient.getHiddenAccountsOnCurrentNetwork().elements
+//					personasHidden = try await personasClient.getHiddenPersonasOnCurrentNetwork().elements
+//				}
 
-					accountHidden = network.getHiddenAccounts().elements
-					personasHidden = network.getHiddenPersonas().elements
-				} else {
-					accountNonHidden = try await accountsClient.getAccountsOnCurrentNetwork().elements
-					personasNonHidden = try await personasClient.getPersonas().elements
+//				var allNonHiddenEntities = accountNonHidden.map(EntityPotentiallyVirtual.account)
+//				allNonHiddenEntities.append(contentsOf: personasNonHidden.map(EntityPotentiallyVirtual.persona))
+//
+//				var allHidden = accountHidden.map(EntityPotentiallyVirtual.account)
+//				allHidden.append(contentsOf: personasHidden.map(EntityPotentiallyVirtual.persona))
+//
+//				return (allNonHiddenEntities, allHidden)
 
-					accountHidden = try await accountsClient.getHiddenAccountsOnCurrentNetwork().elements
-					personasHidden = try await personasClient.getHiddenPersonasOnCurrentNetwork().elements
-				}
-
-				var allNonHiddenEntities = accountNonHidden.map(EntityPotentiallyVirtual.account)
-				allNonHiddenEntities.append(contentsOf: personasNonHidden.map(EntityPotentiallyVirtual.persona))
-
-				var allHidden = accountHidden.map(EntityPotentiallyVirtual.account)
-				allHidden.append(contentsOf: personasHidden.map(EntityPotentiallyVirtual.persona))
-
-				return (allNonHiddenEntities, allHidden)
+				sargonProfileFinishMigrateAtEndOfStage1()
 			}()
 
 			let nonHiddenEntitiesForSource = allNonHiddenEntities.filter { entity in

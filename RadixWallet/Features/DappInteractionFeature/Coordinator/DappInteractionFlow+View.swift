@@ -137,20 +137,21 @@ extension AuthorizedDappsClient {
 	static func previewValueOnePersona() -> Self {
 		update(noop) {
 			$0.getAuthorizedDapps = {
-				var dapp = Profile.Network.AuthorizedDapp(
-					networkID: .nebunet,
-					dAppDefinitionAddress: try! .init(validatingAddress: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh"),
-					displayName: .init(rawValue: "something")!
+				var dapp = AuthorizedDapp(
+					networkId: .nebunet,
+					dappDefinitionAddress: .sample,
+					displayName: "something",
+					referencesToAuthorizedPersonas: []
 				)
 				dapp.referencesToAuthorizedPersonas = [
 					.init(
-						identityAddress: Profile.Network.Persona.previewValue1.address,
+						identityAddress: .sample,
 						lastLogin: .now,
 						sharedAccounts: try! .init(
-							ids: [try! AccountAddress(validatingAddress: "account_tdx_b_1qlujhx6yh6tuctgw6nl68fr2dwg3y5k7h7mc6l04zsfsg7yeqh")],
-							forRequest: .exactly(1)
+							request: .exactly(1),
+							ids: [.sample]
 						),
-						sharedPersonaData: .init()
+						sharedPersonaData: .default
 					),
 				]
 				return [dapp]

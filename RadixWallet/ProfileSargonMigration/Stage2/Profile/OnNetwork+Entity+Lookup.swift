@@ -24,12 +24,13 @@ extension Profile.Network {
 	public func entity(
 		address: any AddressProtocol
 	) throws -> any EntityProtocol {
-		if let account = getAccounts().first(where: { $0.address.address == address.address }) {
-			return account
-		} else if let persona = getPersonas().first(where: { $0.address.address == address.address }) {
-			return persona
-		} else {
-			throw NoEntityFoundMatchingCriteria()
-		}
+//		if let account = getAccounts().first(where: { $0.address.address == address.address }) {
+//			return account
+//		} else if let persona = getPersonas().first(where: { $0.address.address == address.address }) {
+//			return persona
+//		} else {
+//			throw NoEntityFoundMatchingCriteria()
+//		}
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }

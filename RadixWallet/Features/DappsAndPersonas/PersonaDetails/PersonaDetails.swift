@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - PersonaDetails
@@ -34,14 +35,14 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 
 		public struct DappInfo: Sendable, Hashable, Identifiable {
-			public let id: Profile.Network.AuthorizedDapp.ID
+			public let id: AuthorizedDapp.ID
 			public var thumbnail: URL?
 			public let displayName: String
 
-			public init(dApp: Profile.Network.AuthorizedDapp) {
+			public init(dApp: AuthorizedDapp) {
 				self.id = dApp.id
 				self.thumbnail = nil
-				self.displayName = dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName
+				self.displayName = dApp.displayName ?? L10n.DAppRequest.Metadata.unknownName
 			}
 		}
 
@@ -61,7 +62,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case dAppTapped(Profile.Network.AuthorizedDapp.ID)
+		case dAppTapped(AuthorizedDapp.ID)
 		case editPersonaTapped
 		case editAccountSharingTapped
 		case deauthorizePersonaTapped
@@ -322,7 +323,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	}
 
 	enum ReloadError: Error {
-		case personaNotPresentInDapp(Profile.Network.Persona.ID, Profile.Network.AuthorizedDapp.ID)
+		case personaNotPresentInDapp(Profile.Network.Persona.ID, AuthorizedDapp.ID)
 	}
 }
 

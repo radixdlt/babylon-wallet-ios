@@ -16,7 +16,7 @@ extension AuthorizedDapps {
 		let dApps: IdentifiedArrayOf<Dapp>
 
 		struct Dapp: Equatable, Identifiable {
-			let id: Profile.Network.AuthorizedDapp.ID
+			let id: AuthorizedDapp.ID
 			let name: String
 			let thumbnail: URL?
 		}
@@ -70,7 +70,7 @@ extension AuthorizedDapps.State {
 		let dAppViewStates = dApps.map {
 			AuthorizedDapps.ViewState.Dapp(
 				id: $0.id,
-				name: $0.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
+				name: $0.displayName ?? L10n.DAppRequest.Metadata.unknownName,
 				thumbnail: thumbnails[$0.id]
 			)
 		}

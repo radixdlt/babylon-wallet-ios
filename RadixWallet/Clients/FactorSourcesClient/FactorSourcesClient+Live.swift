@@ -141,26 +141,27 @@ extension FactorSourcesClient: DependencyKey {
 				return try OrderedSet(validating: indicesOfEntitiesControlledByAccount)
 			}
 
-			let indices: OrderedSet<HD.Path.Component.Child.Value> = if let network {
-				switch request.entityKind {
-				case .account:
-					try nextDerivationIndexForFactorSource(
-						entitiesControlledByFactorSource: network.accountsIncludingHidden()
-					)
-				case .identity:
-					try nextDerivationIndexForFactorSource(
-						entitiesControlledByFactorSource: network.personasIncludingHidden()
-					)
-				}
-			} else {
-				[]
-			}
-
-			return IndicesUsedByFactorSource(
-				indices: indices,
-				factorSource: factorSource,
-				currentNetworkID: networkID
-			)
+//			let indices: OrderedSet<HD.Path.Component.Child.Value> = if let network {
+//				switch request.entityKind {
+//				case .account:
+//					try nextDerivationIndexForFactorSource(
+//						entitiesControlledByFactorSource: network.accountsIncludingHidden()
+//					)
+//				case .identity:
+//					try nextDerivationIndexForFactorSource(
+//						entitiesControlledByFactorSource: network.personasIncludingHidden()
+//					)
+//				}
+//			} else {
+//				[]
+//			}
+//
+//			return IndicesUsedByFactorSource(
+//				indices: indices,
+//				factorSource: factorSource,
+//				currentNetworkID: networkID
+//			)
+			sargonProfileFinishMigrateAtEndOfStage1()
 		}
 
 		return Self(

@@ -32,3 +32,14 @@ extension AppearanceID: Codable {
 		sargonProfileREMOVEAtEndOfStage1TEMP()
 	}
 }
+
+// MARK: - AuthorizedDapp + Codable
+extension AuthorizedDapp: Codable {
+	public func encode(to encoder: Encoder) throws {
+		sargonProfileREMOVEAtEndOfStage1TEMP()
+	}
+
+	public init(from decoder: Decoder) throws {
+		sargonProfileREMOVEAtEndOfStage1TEMP()
+	}
+}

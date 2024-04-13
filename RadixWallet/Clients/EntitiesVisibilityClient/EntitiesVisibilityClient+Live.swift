@@ -7,28 +7,32 @@ extension EntitiesVisibilityClient: DependencyKey {
 		profileStore: ProfileStore = .shared
 	) -> Self {
 		.init(
-			hideAccounts: { idsOfAccounts in
-				try await profileStore.updatingOnCurrentNetwork { network in
-					network.hideAccounts(ids: idsOfAccounts)
-				}
+			hideAccounts: { _ in
+//				try await profileStore.updatingOnCurrentNetwork { network in
+//					network.hideAccounts(ids: idsOfAccounts)
+//				}
+				sargonProfileFinishMigrateAtEndOfStage1()
 			},
-			hidePersonas: { idsOfPersonas in
-				try await profileStore.updatingOnCurrentNetwork { network in
-					network.hidePersonas(ids: idsOfPersonas)
-				}
+			hidePersonas: { _ in
+//				try await profileStore.updatingOnCurrentNetwork { network in
+//					network.hidePersonas(ids: idsOfPersonas)
+//				}
+				sargonProfileFinishMigrateAtEndOfStage1()
 			},
 			unhideAllEntities: {
-				try await profileStore.updatingOnCurrentNetwork { network in
-					network.unhideAllEntities()
-				}
+//				try await profileStore.updatingOnCurrentNetwork { network in
+//					network.unhideAllEntities()
+//				}
+				sargonProfileFinishMigrateAtEndOfStage1()
 			},
 			getHiddenEntityCounts: {
-				let network = try await profileStore.network()
-
-				return .init(
-					hiddenAccountsCount: network.getHiddenAccounts().count,
-					hiddenPersonasCount: network.getHiddenPersonas().count
-				)
+//				let network = try await profileStore.network()
+//
+//				return .init(
+//					hiddenAccountsCount: network.getHiddenAccounts().count,
+//					hiddenPersonasCount: network.getHiddenPersonas().count
+//				)
+				sargonProfileFinishMigrateAtEndOfStage1()
 			}
 		)
 	}

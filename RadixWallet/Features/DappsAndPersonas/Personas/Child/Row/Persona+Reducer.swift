@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - Persona
-public struct Persona: Sendable, FeatureReducer {
+public struct PersonaReducer: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public let id: Profile.Network.Persona.ID
 		public let thumbnail: URL?

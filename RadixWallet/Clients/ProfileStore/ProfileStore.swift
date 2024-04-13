@@ -408,8 +408,9 @@ extension ProfileStore {
 
 		profile.header.lastModified = date.now
 		profile.header.contentHint.numberOfNetworks = networks.count
-		profile.header.contentHint.numberOfAccountsOnAllNetworksInTotal = networks.values.map { $0.getAccounts().count }.reduce(0, +)
-		profile.header.contentHint.numberOfPersonasOnAllNetworksInTotal = networks.values.map { $0.getPersonas().count }.reduce(0, +)
+//		profile.header.contentHint.numberOfAccountsOnAllNetworksInTotal = networks.values.map { $0.getAccounts().count }.reduce(0, +)
+//		profile.header.contentHint.numberOfPersonasOnAllNetworksInTotal = networks.values.map { $0.getPersonas().count }.reduce(0, +)
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	/// Updates the in-memory copy of profile in ProfileStores and saves it, by

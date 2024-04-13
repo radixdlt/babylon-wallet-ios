@@ -386,7 +386,7 @@ extension AppSecurityView {
 public struct AuthorizedDappsView: IndentedView {
 	public let authorizedDapps: Profile.Network.AuthorizedDapps
 	public let indentation: Indentation
-	public let getDetailedAuthorizedDapp: (Profile.Network.AuthorizedDapp) -> Profile.Network.AuthorizedDappDetailed?
+	public let getDetailedAuthorizedDapp: (AuthorizedDapp) -> Profile.Network.AuthorizedDappDetailed?
 }
 
 extension AuthorizedDappsView {
@@ -415,7 +415,7 @@ extension AuthorizedDappsView {
 
 // MARK: - AuthorizedDappView
 public struct AuthorizedDappView: IndentedView {
-	public let authorizedDapp: Profile.Network.AuthorizedDapp
+	public let authorizedDapp: AuthorizedDapp
 	public let indentation: Indentation
 	public let authorizedPersonas: IdentifiedArrayOf<Profile.Network.AuthorizedPersonaDetailed>?
 }
@@ -546,42 +546,42 @@ extension ProfileNetworkView {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Text("Network")
 				.fontWeight(.heavy)
-			#if os(macOS)
-				.font(.title)
-			#endif // os(macOS)
-
-			Labeled("ID", value: String(describing: network.networkID))
-
-			AccountsView(
-				areHidden: false,
-				entities: network.getAccounts().elements,
-				indentation: inOneLevel
-			)
-
-			AccountsView(
-				areHidden: true,
-				entities: network.getHiddenAccounts().elements,
-				indentation: inOneLevel
-			)
-
-			PersonasView(
-				areHidden: false,
-				entities: network.getPersonas().elements,
-				indentation: inOneLevel
-			)
-
-			PersonasView(
-				areHidden: true,
-				entities: network.getHiddenPersonas().elements,
-				indentation: inOneLevel
-			)
-
-			AuthorizedDappsView(
-				authorizedDapps: network.authorizedDapps,
-				indentation: inOneLevel
-			) {
-				try? network.detailsForAuthorizedDapp($0)
-			}
+//			#if os(macOS)
+//				.font(.title)
+//			#endif // os(macOS)
+//
+//			Labeled("ID", value: String(describing: network.networkID))
+//
+//			AccountsView(
+//				areHidden: false,
+//				entities: network.getAccounts().elements,
+//				indentation: inOneLevel
+//			)
+//
+//			AccountsView(
+//				areHidden: true,
+//				entities: network.getHiddenAccounts().elements,
+//				indentation: inOneLevel
+//			)
+//
+//			PersonasView(
+//				areHidden: false,
+//				entities: network.getPersonas().elements,
+//				indentation: inOneLevel
+//			)
+//
+//			PersonasView(
+//				areHidden: true,
+//				entities: network.getHiddenPersonas().elements,
+//				indentation: inOneLevel
+//			)
+//
+//			AuthorizedDappsView(
+//				authorizedDapps: network.authorizedDapps,
+//				indentation: inOneLevel
+//			) {
+//				try? network.detailsForAuthorizedDapp($0)
+//			}
 		}
 		.padding(.leading, leadingPadding)
 	}

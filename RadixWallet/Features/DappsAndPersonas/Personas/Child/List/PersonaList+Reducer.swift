@@ -8,11 +8,11 @@ public struct PersonaList: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 
 	public struct State: Sendable, Hashable {
-		public var personas: IdentifiedArrayOf<Persona.State>
+		public var personas: IdentifiedArrayOf<PersonaReducer.State>
 		public let strategy: ReloadingStrategy
 
 		public init(
-			personas: IdentifiedArrayOf<Persona.State> = [],
+			personas: IdentifiedArrayOf<PersonaReducer.State> = [],
 			strategy: ReloadingStrategy = .all
 		) {
 			self.personas = personas
@@ -23,7 +23,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 			dApp: Profile.Network.AuthorizedDappDetailed
 		) {
 			self.init(
-				personas: dApp.detailedAuthorizedPersonas.map(Persona.State.init).asIdentified(),
+				personas: dApp.detailedAuthorizedPersonas.map(PersonaReducer.State.init).asIdentified(),
 				strategy: .dApp(dApp.dAppDefinitionAddress)
 			)
 		}
@@ -31,7 +31,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 		public enum ReloadingStrategy: Sendable, Hashable {
 			case all
 			case ids(OrderedSet<Profile.Network.Persona.ID>)
-			case dApp(Profile.Network.AuthorizedDapp.ID)
+			case dApp(AuthorizedDapp.ID)
 		}
 	}
 
@@ -41,7 +41,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case persona(id: Profile.Network.Persona.ID, action: Persona.Action)
+		case persona(id: Persona.ID, action: PersonaReducer.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -51,7 +51,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case personasLoaded(IdentifiedArrayOf<Persona.State>)
+		case personasLoaded(IdentifiedArrayOf<PersonaReducer.State>)
 	}
 
 	public init() {}
@@ -59,7 +59,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(\.personas, action: /Action.child .. ChildAction.persona) {
-				Persona()
+				PersonaReducer()
 			}
 	}
 
@@ -70,7 +70,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 				for try await personas in await personasClient.personas() {
 					guard !Task.isCancelled else { return }
 					let ids = try await personaIDs(strategy) ?? personas.ids
-					let result = ids.compactMap { personas[id: $0] }.map(Persona.State.init)
+					let result = ids.compactMap { personas[id: $0] }.map(PersonaReducer.State.init)
 					guard result.count == ids.count else {
 						throw UpdatePersonaError.personasMissingFromClient(ids.subtracting(result.map(\.id)))
 					}
