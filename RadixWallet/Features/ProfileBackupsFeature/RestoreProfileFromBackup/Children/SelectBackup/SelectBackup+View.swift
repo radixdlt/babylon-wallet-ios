@@ -109,42 +109,48 @@ extension SelectBackup.View {
 	}
 
 	@MainActor
-	private func cloudBackupDataCard(_ item: SelectionItem<Sargon.Profile.Header>, viewStore: ViewStoreOf<SelectBackup>) -> some View {
-		let header = item.value
-		let isVersionCompatible = header.isVersionCompatible()
-		let creatingDevice = header.creatingDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.creatingDevice.description
-		return Card(action: item.action) {
-			HStack {
-				VStack(alignment: .leading, spacing: 0) {
-					Group {
-						// Contains bold text segments.
-						Text(LocalizedStringKey(L10n.RecoverProfileBackup.backupFrom(creatingDevice)))
-						Text(L10n.IOSProfileBackup.lastModifedDateLabel(formatDate(header.lastModified)))
+	private func cloudBackupDataCard(
+		_ item: SelectionItem<Sargon.Profile.Header>,
+		viewStore: ViewStoreOf<SelectBackup>
+	) -> some View {
+		/*
+		 let header = item.value
+		 let isVersionCompatible = header.isVersionCompatible()
+		 let creatingDevice = header.creatingDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.creatingDevice.description
+		 return Card(action: item.action) {
+		 	HStack {
+		 		VStack(alignment: .leading, spacing: 0) {
+		 			Group {
+		 				// Contains bold text segments.
+		 				Text(LocalizedStringKey(L10n.RecoverProfileBackup.backupFrom(creatingDevice)))
+		 				Text(L10n.IOSProfileBackup.lastModifedDateLabel(formatDate(header.lastModified)))
 
-						Text(L10n.IOSProfileBackup.totalAccountsNumberLabel(header.contentHint.numberOfAccountsOnAllNetworksInTotal))
-						Text(L10n.IOSProfileBackup.totalPersonasNumberLabel(header.contentHint.numberOfPersonasOnAllNetworksInTotal))
-					}
-					.foregroundColor(.app.gray2)
-					.textStyle(.body2Regular)
+		 				Text(L10n.IOSProfileBackup.totalAccountsNumberLabel(header.contentHint.numberOfAccountsOnAllNetworksInTotal))
+		 				Text(L10n.IOSProfileBackup.totalPersonasNumberLabel(header.contentHint.numberOfPersonasOnAllNetworksInTotal))
+		 			}
+		 			.foregroundColor(.app.gray2)
+		 			.textStyle(.body2Regular)
 
-					if !isVersionCompatible {
-						Text(L10n.IOSProfileBackup.incompatibleWalletDataLabel)
-							.foregroundColor(.red)
-							.textStyle(.body2HighImportance)
-					}
-				}
-				if isVersionCompatible {
-					Spacer()
-					RadioButton(
-						appearance: .dark,
-						state: item.isSelected ? .selected : .unselected
-					)
-				}
-			}
-			.padding(.medium3)
-			.frame(maxWidth: .infinity, alignment: .leading)
-		}
-		.disabled(!isVersionCompatible)
+		 			if !isVersionCompatible {
+		 				Text(L10n.IOSProfileBackup.incompatibleWalletDataLabel)
+		 					.foregroundColor(.red)
+		 					.textStyle(.body2HighImportance)
+		 			}
+		 		}
+		 		if isVersionCompatible {
+		 			Spacer()
+		 			RadioButton(
+		 				appearance: .dark,
+		 				state: item.isSelected ? .selected : .unselected
+		 			)
+		 		}
+		 	}
+		 	.padding(.medium3)
+		 	.frame(maxWidth: .infinity, alignment: .leading)
+		 }
+		 .disabled(!isVersionCompatible)
+		  */
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	@MainActor

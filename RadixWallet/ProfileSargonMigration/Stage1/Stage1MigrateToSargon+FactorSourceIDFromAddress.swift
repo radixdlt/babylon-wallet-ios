@@ -1,21 +1,19 @@
 import Foundation
 import Sargon
 
-public typealias SLIP10Curve = Slip10Curve
-
-extension SLIP10Curve {
-	public init?(rawValue: String) {
-		sargonProfileFinishMigrateAtEndOfStage1()
-	}
-}
-
-// MARK: Codable
-extension SLIP10Curve: Codable {
+// MARK: - FactorSourceIdFromAddress + Codable
+extension FactorSourceIdFromAddress: Codable {
 	public init(from decoder: Decoder) throws {
 		sargonProfileREMOVEAtEndOfStage1TEMP()
 	}
 
 	public func encode(to encoder: Encoder) throws {
 		sargonProfileREMOVEAtEndOfStage1TEMP()
+	}
+}
+
+extension FactorSourceIdFromAddress {
+	public func embed() -> FactorSourceID {
+		.address(value: self)
 	}
 }

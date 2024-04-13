@@ -1,17 +1,41 @@
 import Foundation
 import Sargon
 
-// MARK: - CollectionCompat
-public protocol CollectionCompat: Collection {
-	var list: [Element] { get }
-}
-
 // MARK: - FactorSources + CollectionCompat
 extension FactorSources: CollectionCompat {
 	public typealias Element = FactorSource
-	public var list: [Element] {
+	public var elements: [Element] {
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
+}
+
+// MARK: - Accounts + CollectionCompat
+extension Accounts: CollectionCompat {
+	public typealias Element = Account
+	public var elements: [Element] {
+		sargonProfileFinishMigrateAtEndOfStage1()
+	}
+}
+
+// MARK: - Personas + CollectionCompat
+extension Personas: CollectionCompat {
+	public typealias Element = Persona
+	public var elements: [Element] {
+		sargonProfileFinishMigrateAtEndOfStage1()
+	}
+}
+
+// MARK: - AuthorizedDapps + CollectionCompat
+extension AuthorizedDapps: CollectionCompat {
+	public typealias Element = AuthorizedDapp
+	public var elements: [Element] {
+		sargonProfileFinishMigrateAtEndOfStage1()
+	}
+}
+
+// MARK: - CollectionCompat
+public protocol CollectionCompat: Collection {
+	var elements: [Element] { get }
 }
 
 extension CollectionCompat {
@@ -22,30 +46,30 @@ extension CollectionCompat {
 	public typealias Indices = Array<Element>.Indices
 
 	public var startIndex: Index {
-		list.startIndex
+		elements.startIndex
 	}
 
 	public var indices: Indices {
-		list.indices
+		elements.indices
 	}
 
 	public var endIndex: Index {
-		list.endIndex
+		elements.endIndex
 	}
 
 	public func formIndex(after index: inout Index) {
-		list.formIndex(after: &index)
+		elements.formIndex(after: &index)
 	}
 
 	public func formIndex(before index: inout Index) {
-		list.formIndex(before: &index)
+		elements.formIndex(before: &index)
 	}
 
 	public subscript(bounds: Range<Index>) -> SubSequence {
-		list[bounds]
+		elements[bounds]
 	}
 
 	public subscript(position: Index) -> Element {
-		list[position]
+		elements[position]
 	}
 }

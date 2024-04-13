@@ -11,4 +11,13 @@ extension Sargon.HierarchicalDeterministicFactorInstance {
 	public var derivationPath: Sargon.DerivationPath {
 		self.publicKey.derivationPath
 	}
+
+	public var factorInstance: FactorInstance {
+		FactorInstance(
+			factorSourceId: factorSourceID.embed(),
+			badge: .virtual(
+				value: .hierarchicalDeterministic(value: self.publicKey)
+			)
+		)
+	}
 }

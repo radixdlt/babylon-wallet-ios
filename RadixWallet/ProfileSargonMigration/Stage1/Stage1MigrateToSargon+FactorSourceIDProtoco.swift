@@ -31,3 +31,13 @@ extension FactorSourceIDProtocol {
 		"\(kind):\(String(describing: body))"
 	}
 }
+
+// MARK: - FactorSourceIDFromHash + FactorSourceIDProtocol
+extension FactorSourceIDFromHash: FactorSourceIDProtocol {
+	public static let casePath: CasePath<FactorSourceID, Self> = /FactorSourceID.hash
+}
+
+// MARK: - FactorSourceIdFromAddress + FactorSourceIDProtocol
+extension FactorSourceIdFromAddress: FactorSourceIDProtocol {
+	public static let casePath: CasePath<FactorSourceID, Self> = /FactorSourceID.address
+}

@@ -23,6 +23,8 @@ extension Sargon.Account: Comparable {
 }
 
 extension Sargon.Account {
+	public static let nameMaxLength = 30
+
 	public var derivationIndex: HDPathValue {
 		switch securityState {
 		case let .unsecured(uec): uec.transactionSigning.derivationPath.index

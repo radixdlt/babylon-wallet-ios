@@ -129,7 +129,7 @@ extension ChooseReceivingAccount.View {
 			or: viewStore.validateAccountAddress,
 			forAction: { result in
 				let recipient: AccountOrAddressOf = switch result {
-				case let .left(account): .profileAccount(value: account.intoSargon())
+				case let .left(account): .profileAccount(value: account)
 				case let .right(address): .addressOfExternalAccount(value: address)
 				}
 				viewStore.send(.chooseButtonTapped(recipient))

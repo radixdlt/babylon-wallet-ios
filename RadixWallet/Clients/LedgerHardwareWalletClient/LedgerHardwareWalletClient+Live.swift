@@ -1,4 +1,5 @@
 import ComposableArchitecture // actually CasePaths... but CI fails if we do `import CasePaths` 🤷‍♂️
+import Sargon
 
 // MARK: - LedgerHardwareWalletClient + DependencyKey
 extension LedgerHardwareWalletClient: DependencyKey {
@@ -86,10 +87,10 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				for requiredSigningFactor in requiredSigner.factorInstancesRequiredToSign {
 					guard
 						let signature = signaturesValidated.first(where: {
-							$0.signature.publicKey == requiredSigningFactor.publicKey
+							$0.signature.publicKey == requiredSigningFactor.publicKey.publicKey
 						})
 					else {
-						loggerGlobal.error("Missing signature from required signer with publicKey: \(requiredSigningFactor.publicKey.compressedRepresentation.hex)")
+						loggerGlobal.error("Missing signature from required signer with publicKey: \(requiredSigningFactor.publicKey.publicKey.hex)")
 						throw MissingSignatureFromRequiredSigner()
 					}
 					assert(requiredSigningFactor.derivationPath == signature.derivationPath)
@@ -233,34 +234,24 @@ extension HierarchicalDeterministicPublicKey {
 			loggerGlobal.error("Bad curve")
 			throw BadCurve()
 		}
-		let publicKey: Sargon.PublicKey = switch curve {
-		case .secp256k1:
-			try .ecdsaSecp256k1(.init(compressedRepresentation: keyData))
-		case .curve25519:
-			try .eddsaEd25519(.init(compressedRepresentation: keyData))
-		}
+//		let publicKey: Sargon.PublicKey = switch curve {
+//		case .secp256k1:
+//			try .ecdsaSecp256k1(.init(compressedRepresentation: keyData))
+//		case .curve25519:
+//			try .eddsaEd25519(.init(compressedRepresentation: keyData))
+//		}
+		let publicKey = try Sargon.PublicKey(bytes: keyData)
+		assert(publicKey.curve == curve)
 
 		let derivationPath: DerivationPath
-		do {
-			derivationPath = try .init(
-				scheme: .cap26,
-				path: AccountBabylonDerivationPath(
-					derivationPath: path
-				)
-				.derivationPath
-			)
-		} catch {
-			derivationPath = try .init(
-				scheme: .bip44Olympia,
-				path: Bip44LikePath(
-					derivationPath: path
-				)
-				.derivationPath
-			)
+		if let cap26Path = try? Cap26Path(string: path) {
+			derivationPath = .cap26(value: cap26Path)
+		} else {
+			let bip44Path = try BIP44LikePath(string: path)
+			derivationPath = .bip44Like(value: bip44Path)
 		}
 
 		assert(derivationPath.curveForScheme == curve)
-
 		self.init(publicKey: publicKey, derivationPath: derivationPath)
 	}
 }
@@ -272,29 +263,30 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 	}
 
 	func validate(hashed: Data) throws -> Validated {
-		let hdPubKey = try self.derivedPublicKey.hdPubKey()
-		let signatureWithPublicKey: SignatureWithPublicKey = switch hdPubKey.publicKey {
-		case let .ecdsaSecp256k1(pubKey):
-			try .ecdsaSecp256k1(
-				signature: .init(radixFormat: self.signature.data),
-				publicKey: pubKey
-			)
-		case let .eddsaEd25519(pubKey):
-			.eddsaEd25519(
-				signature: self.signature.data,
-				publicKey: pubKey
-			)
-		}
-
-		guard signatureWithPublicKey.isValidSignature(for: hashed) else {
-			loggerGlobal.error("Signature invalid for hashed msg: \(hashed.hex), signatureWithPublicKey: \(signatureWithPublicKey)")
-			throw InvalidSignature()
-		}
-
-		return Validated(
-			signature: signatureWithPublicKey,
-			derivationPath: hdPubKey.derivationPath
-		)
+//		let hdPubKey = try self.derivedPublicKey.hdPubKey()
+//		let signatureWithPublicKey: SignatureWithPublicKey = switch hdPubKey.publicKey {
+//		case let .secp256k1(pubKey):
+//			try .secp256k1(
+//				signature: .init(radixFormat: self.signature.data),
+//				publicKey: pubKey
+//			)
+//		case let .ed25519(pubKey):
+//			.ed25519(
+//				signature: self.signature.data,
+//				publicKey: pubKey
+//			)
+//		}
+//
+//		guard signatureWithPublicKey.isValidSignature(for: hashed) else {
+//			loggerGlobal.error("Signature invalid for hashed msg: \(hashed.hex), signatureWithPublicKey: \(signatureWithPublicKey)")
+//			throw InvalidSignature()
+//		}
+//
+//		return Validated(
+//			signature: signatureWithPublicKey,
+//			derivationPath: hdPubKey.derivationPath
+//		)
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }
 

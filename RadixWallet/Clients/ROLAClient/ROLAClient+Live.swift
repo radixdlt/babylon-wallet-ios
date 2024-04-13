@@ -26,11 +26,11 @@ extension ROLAClient {
 
 			let transactionSigningKeyHash: PublicKeyHash = switch entity.securityState {
 			case let .unsecured(control):
-				.init(hashing: control.transactionSigning.publicKey.intoSargon())
+				.init(hashing: control.transactionSigning.publicKey.publicKey)
 			}
 
 			loggerGlobal.debug("ownerKeyHashes: \(ownerKeyHashes)")
-			ownerKeyHashes.append(.init(hashing: newPublicKey.intoSargon()))
+			ownerKeyHashes.append(.init(hashing: newPublicKey))
 
 			if !ownerKeyHashes.contains(transactionSigningKeyHash) {
 				loggerGlobal.debug("Did not contain transactionSigningKey hash, re-adding it: \(transactionSigningKeyHash)")

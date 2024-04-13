@@ -30,6 +30,18 @@ extension Curve25519.Signing.PublicKey: Hashable {
 	}
 }
 
+// MARK: - Curve25519.Signing.PrivateKey + Sendable
+extension Curve25519.Signing.PrivateKey: @unchecked Sendable {}
+
+// MARK: - Curve25519.Signing.PrivateKey + Hashable
+extension Curve25519.Signing.PrivateKey: Hashable {
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(self.publicKey)
+	}
+}
+
+// MARK: - Curve25519.Signing.PrivateKey + Equatable
+extension Curve25519.Signing.PrivateKey: Equatable {}
 extension Curve25519.Signing.PrivateKey {
 	public static func == (lhs: Self, rhs: Self) -> Bool {
 		lhs.publicKey == rhs.publicKey

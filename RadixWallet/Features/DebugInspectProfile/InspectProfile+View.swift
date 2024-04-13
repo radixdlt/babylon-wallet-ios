@@ -386,7 +386,7 @@ public protocol IndentedView: SwiftUI.View {
 
  // MARK: - AuthorizedDappsView
  public struct AuthorizedDappsView: IndentedView {
- 	public let authorizedDapps: Sargon.ProfileNetwork.AuthorizedDapps
+ 	public let authorizedDapps: AuthorizedDapps
  	public let indentation: Indentation
  	public let getDetailedAuthorizedDapp: (AuthorizedDapp) -> Sargon.ProfileNetwork.AuthorizedDappDetailed?
  }

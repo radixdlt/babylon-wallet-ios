@@ -1,6 +1,8 @@
 import Foundation
 import Sargon
 
+public typealias DeviceID = UUID
+
 // MARK: - Sargon.Header + Identifiable
 extension Sargon.Header: Identifiable {
 	public typealias ID = ProfileID

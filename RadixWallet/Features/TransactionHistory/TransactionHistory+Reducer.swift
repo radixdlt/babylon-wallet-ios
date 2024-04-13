@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 
 // MARK: - Triggering
 // Triggers a View update, even if the value wasn't changed
@@ -78,7 +79,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 			guard let portfolio = accountPortfoliosClient.portfolios().first(where: { $0.account.address == account.address }) else {
 				struct MissingPortfolioError: Error { let account: AccountAddress }
-				throw MissingPortfolioError(account: account.accountAddress)
+				throw MissingPortfolioError(account: account.address)
 			}
 
 			self.account = account
@@ -154,7 +155,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		switch viewAction {
 		case .onAppear:
 			state.loading.isLoading = true
-			return .run { [accountAddress = state.account.accountAddress] send in
+			return .run { [accountAddress = state.account.address] send in
 				let date = try await transactionHistoryClient.getFirstTransactionDate(accountAddress)
 				await send(.internal(.loadedFirstTransactionDate(date)))
 			} catch: { error, _ in
@@ -297,7 +298,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		state.loading.isLoading = true
 
 		let request = TransactionHistoryRequest(
-			account: state.account.accountAddress,
+			account: state.account.address,
 			parameters: parameters,
 			cursor: cursor.string,
 			allResourcesAddresses: state.portfolio.allResourceAddresses,

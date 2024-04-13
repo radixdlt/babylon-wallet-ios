@@ -28,17 +28,18 @@ extension Profile {
 	public mutating func addAuthorizedDapp(
 		_ unvalidatedAuthorizedDapp: AuthorizedDapp
 	) throws -> AuthorizedDapp {
-		let authorizedDapp = try validateAuthorizedPersonas(of: unvalidatedAuthorizedDapp)
-		let networkID = authorizedDapp.networkID
-		var network = try network(id: networkID)
-		guard !network.authorizedDapps.contains(where: { $0.dAppDefinitionAddress == authorizedDapp.dAppDefinitionAddress }) else {
-			throw AuthorizedDappAlreadyExists()
-		}
-		guard network.authorizedDapps.updateOrAppend(authorizedDapp) == nil else {
-			fatalError("Incorrect implementation, should have been a new AuthorizedDapp")
-		}
-		try updateOnNetwork(network)
-		return authorizedDapp
+//		let authorizedDapp = try validateAuthorizedPersonas(of: unvalidatedAuthorizedDapp)
+//		let networkID = authorizedDapp.networkID
+//		var network = try network(id: networkID)
+//		guard !network.authorizedDapps.contains(where: { $0.dAppDefinitionAddress == authorizedDapp.dAppDefinitionAddress }) else {
+//			throw AuthorizedDappAlreadyExists()
+//		}
+//		guard network.authorizedDapps.updateOrAppend(authorizedDapp) == nil else {
+//			fatalError("Incorrect implementation, should have been a new AuthorizedDapp")
+//		}
+//		try updateOnNetwork(network)
+//		return authorizedDapp
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	/// Forgets  a `AuthorizedDapp`
@@ -46,12 +47,13 @@ extension Profile {
 		_ authorizedDappID: AuthorizedDapp.ID,
 		on networkID: NetworkID
 	) throws {
-		var network = try network(id: networkID)
-		guard network.authorizedDapps.remove(id: authorizedDappID) != nil else {
-			throw DappWasNotConnected()
-		}
-
-		try updateOnNetwork(network)
+//		var network = try network(id: networkID)
+//		guard network.authorizedDapps.remove(id: authorizedDappID) != nil else {
+//			throw DappWasNotConnected()
+//		}
+//
+//		try updateOnNetwork(network)
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	@discardableResult
@@ -121,35 +123,38 @@ extension Profile {
 	public mutating func updateAuthorizedDapp(
 		_ unvalidatedAuthorizedDapp: AuthorizedDapp
 	) throws {
-		let authorizedDapp = try validateAuthorizedPersonas(of: unvalidatedAuthorizedDapp)
-		let networkID = authorizedDapp.networkID
-		var network = try network(id: networkID)
-		guard network.authorizedDapps.contains(where: { $0.dAppDefinitionAddress == authorizedDapp.dAppDefinitionAddress }) else {
-			throw AuthorizedDappDoesNotExists()
-		}
-		guard network.authorizedDapps.updateOrAppend(authorizedDapp) != nil else {
-			fatalError("Incorrect implementation, should have been an existing AuthorizedDapp")
-		}
-		try updateOnNetwork(network)
+//		let authorizedDapp = try validateAuthorizedPersonas(of: unvalidatedAuthorizedDapp)
+//		let networkID = authorizedDapp.networkID
+//		var network = try network(id: networkID)
+//		guard network.authorizedDapps.contains(where: { $0.dAppDefinitionAddress == authorizedDapp.dAppDefinitionAddress }) else {
+//			throw AuthorizedDappDoesNotExists()
+//		}
+//		guard network.authorizedDapps.updateOrAppend(authorizedDapp) != nil else {
+//			fatalError("Incorrect implementation, should have been an existing AuthorizedDapp")
+//		}
+//		try updateOnNetwork(network)
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	/// Updates or adds a `AuthorizedDapp` in the profile
 	public mutating func updateOrAddAuthorizedDapp(
 		_ unvalidatedAuthorizedDapp: AuthorizedDapp
 	) throws {
-		let dapp = try validateAuthorizedPersonas(of: unvalidatedAuthorizedDapp)
-		let networkID = dapp.networkID
-		let network = try network(id: networkID)
-		if network.authorizedDapps.contains(dapp: dapp) {
-			try updateAuthorizedDapp(dapp)
-		} else {
-			try addAuthorizedDapp(dapp)
-		}
+//		let dapp = try validateAuthorizedPersonas(of: unvalidatedAuthorizedDapp)
+//		let networkID = dapp.networkID
+//		let network = try network(id: networkID)
+//		if network.authorizedDapps.contains(dapp: dapp) {
+//			try updateAuthorizedDapp(dapp)
+//		} else {
+//			try addAuthorizedDapp(dapp)
+//		}
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }
 
-extension Sargon.ProfileNetwork.AuthorizedDapps {
+extension AuthorizedDapps {
 	public func contains(dapp authorizedDapp: AuthorizedDapp) -> Bool {
-		self[id: authorizedDapp.id] != nil
+//		self[id: authorizedDapp.id] != nil
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }

@@ -99,26 +99,28 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		@Sendable func loadProfileHeaderList() throws -> Sargon.Profile.HeaderList? {
-			try keychainClient
-				.getDataWithoutAuth(forKey: profileHeaderListKeychainKey)
-				.map {
-					try jsonDecoder().decode([Sargon.Profile.Header].self, from: $0)
-				}
-				.flatMap(Sargon.Profile.HeaderList.init)
+//			try keychainClient
+//				.getDataWithoutAuth(forKey: profileHeaderListKeychainKey)
+//				.map {
+//					try jsonDecoder().decode([Sargon.Profile.Header].self, from: $0)
+//				}
+//				.flatMap(Sargon.Profile.HeaderList.init)
+			sargonProfileFinishMigrateAtEndOfStage1()
 		}
 
 		@Sendable func saveProfileHeaderList(_ headers: Sargon.Profile.HeaderList) throws {
-			let data = try jsonEncoder().encode(headers)
-			try keychainClient.setDataWithoutAuth(
-				data,
-				forKey: profileHeaderListKeychainKey,
-				attributes: .init(
-					iCloudSyncEnabled: true, // Always synced, since header list might be used by multiple devices
-					accessibility: .whenUnlocked,
-					label: importantKeychainIdentifier("Radix Wallet Metadata"),
-					comment: "Contains the metadata about Radix Wallet Data."
-				)
-			)
+//			let data = try jsonEncoder().encode(headers)
+//			try keychainClient.setDataWithoutAuth(
+//				data,
+//				forKey: profileHeaderListKeychainKey,
+//				attributes: .init(
+//					iCloudSyncEnabled: true, // Always synced, since header list might be used by multiple devices
+//					accessibility: .whenUnlocked,
+//					label: importantKeychainIdentifier("Radix Wallet Metadata"),
+//					comment: "Contains the metadata about Radix Wallet Data."
+//				)
+//			)
+			sargonProfileFinishMigrateAtEndOfStage1()
 		}
 
 		@Sendable func deleteProfileHeader(_ id: Sargon.Profile.Header.ID) throws {
@@ -160,18 +162,19 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		@Sendable func loadDeviceInfo() throws -> DeviceInfo? {
-			let loaded = try keychainClient
-				.getDataWithoutAuth(forKey: deviceInfoKey)
-				.map {
-					try jsonDecoder().decode(DeviceInfo.self, from: $0)
-				}
-
-			if let loaded {
-				loggerGlobal.trace("Loaded deviceInfo: \(loaded)")
-			} else {
-				loggerGlobal.info("No deviceInfo loaded, was nil.")
-			}
-			return loaded
+//			let loaded = try keychainClient
+//				.getDataWithoutAuth(forKey: deviceInfoKey)
+//				.map {
+//					try jsonDecoder().decode(DeviceInfo.self, from: $0)
+//				}
+//
+//			if let loaded {
+//				loggerGlobal.trace("Loaded deviceInfo: \(loaded)")
+//			} else {
+//				loggerGlobal.info("No deviceInfo loaded, was nil.")
+//			}
+//			return loaded
+			sargonProfileFinishMigrateAtEndOfStage1()
 		}
 
 		let deviceInfoAttributes = KeychainClient.AttributesWithoutAuth(
@@ -182,30 +185,32 @@ extension SecureStorageClient: DependencyKey {
 		)
 
 		@Sendable func saveDeviceInfo(_ deviceInfo: DeviceInfo) throws {
-			let data = try jsonEncoder().encode(deviceInfo)
-			try keychainClient.setDataWithoutAuth(
-				data,
-				forKey: deviceInfoKey,
-				attributes: deviceInfoAttributes
-			)
-			loggerGlobal.notice("Saved deviceInfo: \(deviceInfo)")
+//			let data = try jsonEncoder().encode(deviceInfo)
+//			try keychainClient.setDataWithoutAuth(
+//				data,
+//				forKey: deviceInfoKey,
+//				attributes: deviceInfoAttributes
+//			)
+//			loggerGlobal.notice("Saved deviceInfo: \(deviceInfo)")
+			sargonProfileFinishMigrateAtEndOfStage1()
 		}
 
 		@Sendable func loadMnemonicFor(
 			key: KeychainClient.Key,
 			notifyIfMissing: Bool
 		) throws -> MnemonicWithPassphrase? {
-			let authenticationPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: L10n.Biometrics.Prompt.title).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to continue."
-			guard let data = try keychainClient.getDataWithAuth(
-				forKey: key,
-				authenticationPrompt: authenticationPrompt
-			) else {
-				if notifyIfMissing {
-					overlayWindowClient.scheduleAlertIgnoreAction(.missingMnemonicAlert)
-				}
-				return nil
-			}
-			return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)
+//			let authenticationPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: L10n.Biometrics.Prompt.title).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to continue."
+//			guard let data = try keychainClient.getDataWithAuth(
+//				forKey: key,
+//				authenticationPrompt: authenticationPrompt
+//			) else {
+//				if notifyIfMissing {
+//					overlayWindowClient.scheduleAlertIgnoreAction(.missingMnemonicAlert)
+//				}
+//				return nil
+//			}
+//			return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)
+			sargonProfileFinishMigrateAtEndOfStage1()
 		}
 
 		let loadProfileSnapshot: LoadProfileSnapshot = { id in
@@ -222,24 +227,25 @@ extension SecureStorageClient: DependencyKey {
 			return try loadMnemonicFor(key: key, notifyIfMissing: request.notifyIfMissing)
 		}
 
-		let saveMnemonicForFactorSource: SaveMnemonicForFactorSource = { privateFactorSource in
-			let factorSource = privateFactorSource.factorSource
-			let mnemonicWithPassphrase = privateFactorSource.mnemonicWithPassphrase
-			let data = try jsonEncoder().encode(mnemonicWithPassphrase)
-			let mostSecureAccesibilityAndAuthenticationPolicy = try queryMostSecureAccesibilityAndAuthenticationPolicy()
-			let key = key(factorSourceID: factorSource.id)
-
-			try keychainClient.setDataWithAuth(
-				data,
-				forKey: key,
-				attributes: .init(
-					iCloudSyncEnabled: false,
-					accessibility: mostSecureAccesibilityAndAuthenticationPolicy.accessibility,
-					authenticationPolicy: mostSecureAccesibilityAndAuthenticationPolicy.authenticationPolicy,
-					label: importantKeychainIdentifier("Radix Wallet Factor Secret")!,
-					comment: .init("Created on \(factorSource.hint.name) \(factorSource.supportsOlympia ? " (Olympia)" : "")")
-				)
-			)
+		let saveMnemonicForFactorSource: SaveMnemonicForFactorSource = { _ in
+//			let factorSource = privateFactorSource.factorSource
+//			let mnemonicWithPassphrase = privateFactorSource.mnemonicWithPassphrase
+//			let data = try jsonEncoder().encode(mnemonicWithPassphrase)
+//			let mostSecureAccesibilityAndAuthenticationPolicy = try queryMostSecureAccesibilityAndAuthenticationPolicy()
+//			let key = key(factorSourceID: factorSource.id)
+//
+//			try keychainClient.setDataWithAuth(
+//				data,
+//				forKey: key,
+//				attributes: .init(
+//					iCloudSyncEnabled: false,
+//					accessibility: mostSecureAccesibilityAndAuthenticationPolicy.accessibility,
+//					authenticationPolicy: mostSecureAccesibilityAndAuthenticationPolicy.authenticationPolicy,
+//					label: importantKeychainIdentifier("Radix Wallet Factor Secret")!,
+//					comment: .init("Created on \(factorSource.hint.name) \(factorSource.supportsOlympia ? " (Olympia)" : "")")
+//				)
+//			)
+			sargonProfileFinishMigrateAtEndOfStage1()
 		}
 
 		#if DEBUG
@@ -278,13 +284,14 @@ extension SecureStorageClient: DependencyKey {
 			)
 		}
 
-		let loadProfile: LoadProfile = { id in
-			guard
-				let existingSnapshot = try loadProfileSnapshot(id)
-			else {
-				return nil
-			}
-			return Profile(snapshot: existingSnapshot)
+		let loadProfile: LoadProfile = { _ in
+//			guard
+//				let existingSnapshot = try loadProfileSnapshot(id)
+//			else {
+//				return nil
+//			}
+//			return Profile(snapshot: existingSnapshot)
+			sargonProfileFinishMigrateAtEndOfStage1()
 		}
 
 		let containsMnemonicIdentifiedByFactorSourceID: ContainsMnemonicIdentifiedByFactorSourceID = { factorSourceID in
@@ -428,7 +435,8 @@ extension Sargon.Profile.Header.ID {
 }
 
 private func key(factorSourceID: FactorSourceIDFromHash) -> KeychainClient.Key {
-	.init(rawValue: .init(rawValue: factorSourceID.keychainKey)!)
+//	.init(rawValue: .init(rawValue: factorSourceID.keychainKey)!)
+	sargonProfileFinishMigrateAtEndOfStage1()
 }
 
 extension OverlayWindowClient.Item.AlertState {
@@ -440,16 +448,17 @@ extension OverlayWindowClient.Item.AlertState {
 
 extension FactorSourceIDFromHash {
 	init?(keychainKey: KeychainClient.Key) {
-		let key = keychainKey.rawValue.rawValue
-		guard
-			case let parts = key.split(separator: Self.keychainKeySeparator),
-			parts.count == 2,
-			let kind = FactorSourceKind(rawValue: String(parts[0])),
-			let hex32 = try? HexCodable(hex: String(parts[1])),
-			let id = try? Self(kind: kind, hash: hex32.data)
-		else {
-			return nil
-		}
-		self = id
+//		let key = keychainKey.rawValue.rawValue
+//		guard
+//			case let parts = key.split(separator: Self.keychainKeySeparator),
+//			parts.count == 2,
+//			let kind = FactorSourceKind(rawValue: String(parts[0])),
+//			let hex32 = try? HexCodable(hex: String(parts[1])),
+//			let id = try? Self(kind: kind, hash: hex32.data)
+//		else {
+//			return nil
+//		}
+//		self = id
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }

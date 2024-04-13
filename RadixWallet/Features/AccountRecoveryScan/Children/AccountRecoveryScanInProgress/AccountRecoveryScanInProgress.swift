@@ -207,33 +207,34 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 				assert(factorSourceID == id.embed())
 				assert(networkID == state.networkID)
 				loggerGlobal.debug("Creating accounts with networkID: \(networkID)")
-				return .run { send in
-					let accounts = try await publicHDKeys.enumerated().asyncMap { localOffset, publicHDKey in
-						let offset = localOffset + globalOffset
-						let appearanceID = await accountsClient.nextAppearanceID(networkID, offset)
-						return try Sargon.Account(
-							networkID: networkID,
-							factorInstance: HierarchicalDeterministicFactorInstance(
-								factorSourceID: id,
-								publicHDKey: publicHDKey
-							),
-							displayName: .init(rawValue: L10n.AccountRecoveryScan.InProgress.nameOfRecoveredAccount) ?? "Unnamed",
-							extraProperties: .init(
-								appearanceID: appearanceID,
-								// We will be replacing the `depositRule` with one fetched from GW
-								// in `scan` step later on.
-								onLedgerSettings: .unknown
-							)
-						)
-					}.asIdentified()
-
-					await send(.internal(.startScan(accounts: accounts)))
-				} catch: { error, send in
-					let errorMsg = "Failed to create account, error: \(error)"
-					loggerGlobal.critical(.init(stringLiteral: errorMsg))
-					assertionFailure(errorMsg)
-					await send(.delegate(.failed))
-				}
+				sargonProfileFinishMigrateAtEndOfStage1()
+//				return .run { send in
+//					let accounts = try await publicHDKeys.enumerated().asyncMap { localOffset, publicHDKey in
+//						let offset = localOffset + globalOffset
+//						let appearanceID = await accountsClient.nextAppearanceID(networkID, offset)
+//						return try Sargon.Account(
+//							networkID: networkID,
+//							factorInstance: HierarchicalDeterministicFactorInstance(
+//								factorSourceID: id,
+//								publicHDKey: publicHDKey
+//							),
+//							displayName: .init(rawValue: L10n.AccountRecoveryScan.InProgress.nameOfRecoveredAccount) ?? "Unnamed",
+//							extraProperties: .init(
+//								appearanceID: appearanceID,
+//								// We will be replacing the `depositRule` with one fetched from GW
+//								// in `scan` step later on.
+//								onLedgerSettings: .unknown
+//							)
+//						)
+//					}.asIdentified()
+//
+//					await send(.internal(.startScan(accounts: accounts)))
+//				} catch: { error, send in
+//					let errorMsg = "Failed to create account, error: \(error)"
+//					loggerGlobal.critical(.init(stringLiteral: errorMsg))
+//					assertionFailure(errorMsg)
+//					await send(.delegate(.failed))
+//				}
 
 			case .failedToDerivePublicKey:
 				return .send(.delegate(.failed))
@@ -253,33 +254,34 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 extension AccountRecoveryScanInProgress {
 	private func nextDerivationPaths(state: inout State) throws -> OrderedSet<DerivationPath> {
-		let networkID = state.networkID
-
-		let derivationIndices = generateIntegers(
-			start: state.maxIndex ?? 0,
-			count: batchSize,
-			excluding: state.indicesOfAlreadyUsedEntities
-		)
-		assert(derivationIndices.count == batchSize)
-		state.maxIndex = derivationIndices.max()! + 1
-
-		let paths = try derivationIndices.map { index in
-			if state.forOlympiaAccounts {
-				try Bip44LikePath(
-					index: index
-				)
-				.wrapAsDerivationPath()
-			} else {
-				try AccountBabylonDerivationPath(
-					networkID: networkID,
-					index: index,
-					keyKind: .virtualEntity
-				)
-				.wrapAsDerivationPath()
-			}
-		}
-
-		return try OrderedSet(validating: paths)
+//		let networkID = state.networkID
+//
+//		let derivationIndices = generateIntegers(
+//			start: state.maxIndex ?? 0,
+//			count: batchSize,
+//			excluding: state.indicesOfAlreadyUsedEntities
+//		)
+//		assert(derivationIndices.count == batchSize)
+//		state.maxIndex = derivationIndices.max()! + 1
+//
+//		let paths = try derivationIndices.map { index in
+//			if state.forOlympiaAccounts {
+//				try Bip44LikePath(
+//					index: index
+//				)
+//				.wrapAsDerivationPath()
+//			} else {
+//				try AccountBabylonDerivationPath(
+//					networkID: networkID,
+//					index: index,
+//					keyKind: .virtualEntity
+//				)
+//				.wrapAsDerivationPath()
+//			}
+//		}
+//
+//		return try OrderedSet(validating: paths)
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	private func derivePublicKeys(
@@ -355,13 +357,14 @@ extension AccountRecoveryScanInProgress {
 
 extension DerivationPath {
 	var index: HDPathValue {
-		do {
-			guard let index = try hdFullPath().children.last?.nonHardenedValue else {
-				fatalError("Expected to ALWAYS be able to read the last path component of an HD paths' index, but was nil.")
-			}
-			return index
-		} catch {
-			fatalError("Expected to ALWAYS be able to read the last path component of an HD paths' index, got error: \(error)")
-		}
+//		do {
+//			guard let index = try hdFullPath().children.last?.nonHardenedValue else {
+//				fatalError("Expected to ALWAYS be able to read the last path component of an HD paths' index, but was nil.")
+//			}
+//			return index
+//		} catch {
+//			fatalError("Expected to ALWAYS be able to read the last path component of an HD paths' index, got error: \(error)")
+//		}
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }

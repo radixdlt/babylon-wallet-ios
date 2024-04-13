@@ -143,7 +143,8 @@ extension ProfileStore {
 	/// and saves the snapshot of the profile into Keychain.
 	/// - Parameter profile: Imported Profile to use and save.
 	public func importProfileSnapshot(_ snapshot: Sargon.Profile) throws {
-		try importProfile(Profile(snapshot: snapshot))
+//		try importProfile(Profile(snapshot: snapshot))
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	/// Change current profile to new importedProfile and saves it, by
@@ -205,48 +206,51 @@ extension ProfileStore {
 	public func finishOnboarding(
 		with accountsRecoveredFromScanningUsingMnemonic: AccountsRecoveredFromScanningUsingMnemonic
 	) async throws {
-		@Dependency(\.uuid) var uuid
-		loggerGlobal.notice("Finish onboarding with accounts recovered from scanning using menmonic")
-		let (creatingDevice, model, name) = await updateDeviceInfo()
-		var bdfs = accountsRecoveredFromScanningUsingMnemonic.deviceFactorSource
-		bdfs.hint.name = name
-		bdfs.hint.model = .init(model)
+		/*
+		 @Dependency(\.uuid) var uuid
+		 loggerGlobal.notice("Finish onboarding with accounts recovered from scanning using menmonic")
+		 let (creatingDevice, model, name) = await updateDeviceInfo()
+		 var bdfs = accountsRecoveredFromScanningUsingMnemonic.deviceFactorSource
+		 bdfs.hint.name = name
+		 bdfs.hint.model = .init(model)
 
-		let accounts = accountsRecoveredFromScanningUsingMnemonic.accounts
+		 let accounts = accountsRecoveredFromScanningUsingMnemonic.accounts
 
-		// It is important that we always create the mainnet `Sargon.ProfileNetwork` and
-		// add it, even if `accounts` is empty, since during App launch we check
-		// `profile.networks.isEmpty` to determine if we should onboard the user or not,
-		// thus, this ensures that we do not onboard a user who has created Profile
-		// via Account Recovery Scan with 0 accounts if said user force quits app before
-		// she creates her first account.
-		let network = Sargon.ProfileNetwork(
-			networkID: .mainnet,
-			accounts: accounts,
-			personas: [],
-			authorizedDapps: []
-		)
+		 // It is important that we always create the mainnet `Sargon.ProfileNetwork` and
+		 // add it, even if `accounts` is empty, since during App launch we check
+		 // `profile.networks.isEmpty` to determine if we should onboard the user or not,
+		 // thus, this ensures that we do not onboard a user who has created Profile
+		 // via Account Recovery Scan with 0 accounts if said user force quits app before
+		 // she creates her first account.
+		 let network = Sargon.ProfileNetwork(
+		 	networkID: .mainnet,
+		 	accounts: accounts,
+		 	personas: [],
+		 	authorizedDapps: []
+		 )
 
-		let profile = Profile(
-			header: Sargon.Profile.Header(
-				creatingDevice: creatingDevice,
-				lastUsedOnDevice: creatingDevice,
-				id: uuid(),
-				lastModified: bdfs.addedOn,
-				contentHint: Sargon.Profile.Header.ContentHint(
-					numberOfAccountsOnAllNetworksInTotal: accounts.count,
-					numberOfPersonasOnAllNetworksInTotal: 0,
-					numberOfNetworks: 1
-				)
-			),
-			deviceFactorSource: bdfs,
-			networks: Profile.Networks(
-				network: network
-			)
-		)
+		 let profile = Profile(
+		 	header: Sargon.Profile.Header(
+		 		creatingDevice: creatingDevice,
+		 		lastUsedOnDevice: creatingDevice,
+		 		id: uuid(),
+		 		lastModified: bdfs.addedOn,
+		 		contentHint: Sargon.Profile.Header.ContentHint(
+		 			numberOfAccountsOnAllNetworksInTotal: accounts.count,
+		 			numberOfPersonasOnAllNetworksInTotal: 0,
+		 			numberOfNetworks: 1
+		 		)
+		 	),
+		 	deviceFactorSource: bdfs,
+		 	networks: Profile.Networks(
+		 		network: network
+		 	)
+		 )
 
-		// We can "piggyback" on importProfile! Same logic applies!
-		try importProfile(profile)
+		 // We can "piggyback" on importProfile! Same logic applies!
+		 try importProfile(profile)
+		  */
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	public func unlockedApp() async -> Profile {
@@ -403,11 +407,11 @@ extension ProfileStore {
 	/// Updates the header of a Profile, lastModified date, contentHint etc.
 	/// - Parameter profile: Profile with a header to update
 	private func _updateHeader(of profile: inout Profile) throws {
-		@Dependency(\.date) var date
-		let networks = profile.networks
-
-		profile.header.lastModified = date.now
-		profile.header.contentHint.numberOfNetworks = networks.count
+//		@Dependency(\.date) var date
+//		let networks = profile.networks
+//
+//		profile.header.lastModified = date.now
+//		profile.header.contentHint.numberOfNetworks = networks.count
 //		profile.header.contentHint.numberOfAccountsOnAllNetworksInTotal = networks.values.map { $0.getAccounts().count }.reduce(0, +)
 //		profile.header.contentHint.numberOfPersonasOnAllNetworksInTotal = networks.values.map { $0.getPersonas().count }.reduce(0, +)
 		sargonProfileFinishMigrateAtEndOfStage1()
@@ -495,62 +499,65 @@ extension ProfileStore {
 	private static func _loadSavedElseNewProfile(
 		metaDeviceInfo: MetaDeviceInfo
 	) -> NewProfileTuple {
-		@Dependency(\.secureStorageClient) var secureStorageClient
-		let deviceInfo = metaDeviceInfo.deviceInfo
+		/*
+		 @Dependency(\.secureStorageClient) var secureStorageClient
+		 let deviceInfo = metaDeviceInfo.deviceInfo
 
-		func newProfile() throws -> NewProfileTuple {
-			try (
-				deviceInfo: metaDeviceInfo.deviceInfo,
-				profile: _tryGenerateAndSaveNewProfile(deviceInfo: deviceInfo),
-				conflictingOwners: nil
-			)
-		}
+		 func newProfile() throws -> NewProfileTuple {
+		 	try (
+		 		deviceInfo: metaDeviceInfo.deviceInfo,
+		 		profile: _tryGenerateAndSaveNewProfile(deviceInfo: deviceInfo),
+		 		conflictingOwners: nil
+		 	)
+		 }
 
-		do {
-			if var existing = try _tryLoadSavedProfile() {
-				if
-					case let bdfs = existing.factorSources.babylonDevice,
-					!secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(bdfs.id),
-					existing.networks.isEmpty
-				{
-					// Unlikely corner case, but possible. The Profile does not contain any accounts and
-					// the BDFS mnemonic is missing => treat this scenario as if there is no Profile ->
-					// let user start fresh. It is possible for users to end up in this corner case scenario
-					// if the do this:
-					// 1. Start wallet without any Profile => a new Profile and BDFS is saved into keychain (and BDFS mnemonic)
-					// 2. Before they create the first account, they delete the passcode from their device and re-enabling it, this
-					// 		will delete the mnemonic from keychain, but not the Profile.
-					// 3. Start wallet again, and they are met with onboarding screen to create their first acocunt into the empty
-					// 		Profile created in step 1. HOWEVER, they user is now stuck in a bad state. The account creation will
-					// 		try to use a missing mnemonic which silently fails and user gets back to the screen where they are asked
-					//		to name the account.
-					//
-					//	The solution is simple, this Profile has no value! It has no accounts! So we just toss it and generate a new
-					//	(Profile, BDFS) pair, with the mnemonic of this new BDFS intact in keychain.
-					Self.deleteEphemeralProfile(id: existing.header.id)
-					return try newProfile()
-				}
+		 do {
+		 	if var existing = try _tryLoadSavedProfile() {
+		 		if
+		 			case let bdfs = existing.factorSources.babylonDevice,
+		 			!secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(bdfs.id),
+		 			existing.networks.isEmpty
+		 		{
+		 			// Unlikely corner case, but possible. The Profile does not contain any accounts and
+		 			// the BDFS mnemonic is missing => treat this scenario as if there is no Profile ->
+		 			// let user start fresh. It is possible for users to end up in this corner case scenario
+		 			// if the do this:
+		 			// 1. Start wallet without any Profile => a new Profile and BDFS is saved into keychain (and BDFS mnemonic)
+		 			// 2. Before they create the first account, they delete the passcode from their device and re-enabling it, this
+		 			// 		will delete the mnemonic from keychain, but not the Profile.
+		 			// 3. Start wallet again, and they are met with onboarding screen to create their first acocunt into the empty
+		 			// 		Profile created in step 1. HOWEVER, they user is now stuck in a bad state. The account creation will
+		 			// 		try to use a missing mnemonic which silently fails and user gets back to the screen where they are asked
+		 			//		to name the account.
+		 			//
+		 			//	The solution is simple, this Profile has no value! It has no accounts! So we just toss it and generate a new
+		 			//	(Profile, BDFS) pair, with the mnemonic of this new BDFS intact in keychain.
+		 			Self.deleteEphemeralProfile(id: existing.header.id)
+		 			return try newProfile()
+		 		}
 
-				// Read: https://radixdlt.atlassian.net/l/cp/fmoH9KcN
-				let matchingIDs = existing.header.lastUsedOnDevice.id == deviceInfo.id
-				if metaDeviceInfo.fromDeprecatedDeviceID, matchingIDs {
-					// Same ID => migrate
-					existing.header.lastUsedOnDevice = deviceInfo
-				}
-				return (
-					deviceInfo: deviceInfo,
-					profile: existing,
-					conflictingOwners: matchingIDs ? nil : .init(
-						ownerOfCurrentProfile: existing.header.lastUsedOnDevice,
-						thisDevice: deviceInfo
-					)
-				)
-			} else {
-				return try newProfile()
-			}
-		} catch {
-			fatalError("Unable to use app. error: \(error)")
-		}
+		 		// Read: https://radixdlt.atlassian.net/l/cp/fmoH9KcN
+		 		let matchingIDs = existing.header.lastUsedOnDevice.id == deviceInfo.id
+		 		if metaDeviceInfo.fromDeprecatedDeviceID, matchingIDs {
+		 			// Same ID => migrate
+		 			existing.header.lastUsedOnDevice = deviceInfo
+		 		}
+		 		return (
+		 			deviceInfo: deviceInfo,
+		 			profile: existing,
+		 			conflictingOwners: matchingIDs ? nil : .init(
+		 				ownerOfCurrentProfile: existing.header.lastUsedOnDevice,
+		 				thisDevice: deviceInfo
+		 			)
+		 		)
+		 	} else {
+		 		return try newProfile()
+		 	}
+		 } catch {
+		 	fatalError("Unable to use app. error: \(error)")
+		 }
+		  */
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	private static func _tryLoadSavedProfile() throws -> Profile? {
@@ -591,38 +598,44 @@ extension ProfileStore {
 
 		let profileID = uuid()
 		let header = Sargon.Profile.Header(
+			snapshotVersion: .v100,
+			id: profileID,
 			creatingDevice: creatingDevice,
 			lastUsedOnDevice: creatingDevice,
-			id: profileID,
 			lastModified: date.now,
-			contentHint: .init()
+			contentHint: .init(
+				numberOfAccountsOnAllNetworksInTotal: 0,
+				numberOfPersonasOnAllNetworksInTotal: 0,
+				numberOfNetworks: 0
+			)
 		)
 
 		let mnemonic = try MnemonicWithPassphrase(
 			mnemonic: mnemonicClient.generate(
 				BIP39WordCount.twentyFour,
 				BIP39Language.english
-			)
+			), passphrase: ""
 		)
 
-		let bdfs = try DeviceFactorSource.babylon(
-			mnemonicWithPassphrase: mnemonic,
-			isMain: true,
-			model: "iPhone",
-			name: "iPhone"
-		)
-
-		let bdfsMnemonic = try PrivateHierarchicalDeterministicFactorSource(
-			mnemonicWithPassphrase: mnemonic,
-			factorSource: bdfs
-		)
-
-		let profile = Profile(
-			header: header,
-			deviceFactorSource: bdfs
-		)
-
-		return (profile, bdfsMnemonic)
+//		let bdfs = try DeviceFactorSource.babylon(
+//			mnemonicWithPassphrase: mnemonic,
+//			isMain: true,
+//			model: "iPhone",
+//			name: "iPhone"
+//		)
+//
+//		let bdfsMnemonic = try PrivateHierarchicalDeterministicFactorSource(
+//			mnemonicWithPassphrase: mnemonic,
+//			factorSource: bdfs
+//		)
+//
+//		let profile = Profile(
+//			header: header,
+//			deviceFactorSource: bdfs
+//		)
+//
+//		return (profile, bdfsMnemonic)
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	/// Returns `MetaDeviceInfo` which contains `fromDeprecatedDeviceID` , and if
@@ -633,38 +646,39 @@ extension ProfileStore {
 		@Dependency(\.uuid) var uuid
 		@Dependency(\.date) var date
 
-		func createNew(deviceID: DeviceID? = nil) -> DeviceInfo {
-			.init(
-				description: "iPhone",
-				id: deviceID ?? uuid(),
-				date: date.now
-			)
-		}
-
-		if let existing = try? secureStorageClient.loadDeviceInfo() {
-			return MetaDeviceInfo(deviceInfo: existing, fromDeprecatedDeviceID: false)
-		}
-		let new: DeviceInfo
-		let fromDeprecatedDeviceID: Bool
-
-		do {
-			if let legacyDeviceID = try? secureStorageClient.deprecatedLoadDeviceID() {
-				new = createNew(deviceID: legacyDeviceID)
-				fromDeprecatedDeviceID = true
-			} else {
-				new = createNew()
-				fromDeprecatedDeviceID = false
-			}
-			try secureStorageClient.saveDeviceInfo(new)
-			if fromDeprecatedDeviceID {
-				// Delete only if `saveDeviceInfo` was successful.
-				secureStorageClient.deleteDeprecatedDeviceID()
-			}
-			return MetaDeviceInfo(deviceInfo: new, fromDeprecatedDeviceID: fromDeprecatedDeviceID)
-		} catch {
-			loggerGlobal.error("Failed to save new device info: \(error)")
-			return MetaDeviceInfo(deviceInfo: new, fromDeprecatedDeviceID: fromDeprecatedDeviceID)
-		}
+//		func createNew(deviceID: DeviceID? = nil) -> DeviceInfo {
+//			.init(
+//				description: "iPhone",
+//				id: deviceID ?? uuid(),
+//				date: date.now
+//			)
+//		}
+//
+//		if let existing = try? secureStorageClient.loadDeviceInfo() {
+//			return MetaDeviceInfo(deviceInfo: existing, fromDeprecatedDeviceID: false)
+//		}
+//		let new: DeviceInfo
+//		let fromDeprecatedDeviceID: Bool
+//
+//		do {
+//			if let legacyDeviceID = try? secureStorageClient.deprecatedLoadDeviceID() {
+//				new = createNew(deviceID: legacyDeviceID)
+//				fromDeprecatedDeviceID = true
+//			} else {
+//				new = createNew()
+//				fromDeprecatedDeviceID = false
+//			}
+//			try secureStorageClient.saveDeviceInfo(new)
+//			if fromDeprecatedDeviceID {
+//				// Delete only if `saveDeviceInfo` was successful.
+//				secureStorageClient.deleteDeprecatedDeviceID()
+//			}
+//			return MetaDeviceInfo(deviceInfo: new, fromDeprecatedDeviceID: fromDeprecatedDeviceID)
+//		} catch {
+//			loggerGlobal.error("Failed to save new device info: \(error)")
+//			return MetaDeviceInfo(deviceInfo: new, fromDeprecatedDeviceID: fromDeprecatedDeviceID)
+//		}
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	private static func _updateHeaderList(with header: Sargon.Profile.Header) throws {
@@ -691,7 +705,8 @@ extension ProfileStore {
 	}
 
 	private static func _persist(profile: Profile) throws {
-		try _persist(profileSnapshot: profile.snapshot())
+//		try _persist(profileSnapshot: profile.snapshot())
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	private static func _persist(profileSnapshot: Sargon.Profile) throws {

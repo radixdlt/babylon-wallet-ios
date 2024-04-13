@@ -1,5 +1,6 @@
 
 import DependenciesAdditions
+import Sargon
 
 // MARK: - UserDefaultsKey
 public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
@@ -98,11 +99,11 @@ extension UserDefaults.Dependency {
 		set(value, forKey: Key.showRadixBanner.rawValue)
 	}
 
-	public func getActiveProfileID() -> Sargon.Profile.Header.ID? {
+	public func getActiveProfileID() -> ProfileID? {
 		string(forKey: Key.activeProfileID.rawValue).flatMap(UUID.init(uuidString:))
 	}
 
-	public func setActiveProfileID(_ id: Sargon.Profile.Header.UsedDeviceInfo.ID) {
+	public func setActiveProfileID(_ id: ProfileID) {
 		set(id.uuidString, forKey: Key.activeProfileID.rawValue)
 	}
 

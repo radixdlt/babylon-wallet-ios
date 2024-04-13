@@ -123,7 +123,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				let ledgerInfo = try await ledgerHardwareWalletClient.getDeviceInfo()
 
 				if let ledger = try await factorSourcesClient.getFactorSource(
-					id: .init(kind: .ledgerHqHardwareWallet, hash: ledgerInfo.id.data.data),
+					id: FactorSourceID.hash(value: FactorSourceIdFromHash(kind: FactorSourceKind.ledgerHqHardwareWallet, body: Exactly32Bytes(bytes: ledgerInfo.id.data.data))),
 					as: LedgerHardwareWalletFactorSource.self
 				) {
 					await send(.internal(.useExistingLedger(ledger)))
@@ -321,7 +321,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 		}
 
 		if olympiaAccountsToMigrate.isEmpty, !olympiaAccountsToValidate.isEmpty, !derivedKeys.isEmpty {
-			loggerGlobal.critical("Invalid keys from export format?\nderivedKeys: \(derivedKeys.map { $0.compressedRepresentation.hex() })\nolympiaAccountsToValidate:\(olympiaAccountsToValidate.map(\.publicKey.compressedRepresentation.hex))")
+			loggerGlobal.critical("Invalid keys from export format?\nderivedKeys: \(derivedKeys.map(\.hex))\nolympiaAccountsToValidate:\(olympiaAccountsToValidate.map(\.publicKey.hex))")
 		}
 
 		guard

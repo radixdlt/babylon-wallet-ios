@@ -221,7 +221,7 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 		)
 	}
 
-	static func thirdPartyDeposits(_ rule: ThirdPartyDeposits.DepositRule) -> Self {
+	static func thirdPartyDeposits(_ rule: DepositRule) -> Self {
 		.init(
 			id: .onLedger(.thirdPartyDeposits),
 			title: L10n.AccountSettings.thirdPartyDeposits,
@@ -240,7 +240,7 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 	}
 }
 
-extension ThirdPartyDeposits.DepositRule {
+extension DepositRule {
 	var text: String {
 		switch self {
 		case .acceptAll:

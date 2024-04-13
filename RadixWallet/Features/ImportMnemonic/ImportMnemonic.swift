@@ -461,7 +461,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		#if DEBUG
 		case .debugCopyMnemonic:
-			if let mnemonic = state.mnemonic?.phrase.rawValue {
+			if let mnemonic = state.mnemonic?.phrase {
 				pasteboardClient.copyString(mnemonic)
 			}
 			return .none
@@ -585,17 +585,18 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			}
 			precondition(persistStrategy.factorSourceKindOfMnemonic == .offDevice)
 
-			return .run { send in
-				await send(.internal(.saveFactorSourceResult(
-					TaskResult {
-						let factorSource = try await factorSourcesClient.addOffDeviceFactorSource(
-							mnemonicWithPassphrase: mnemonicWithPassphrase,
-							label: label
-						)
-						return .init(factorSource: factorSource, savedIntoProfile: true)
-					}
-				)))
-			}
+//			return .run { send in
+//				await send(.internal(.saveFactorSourceResult(
+//					TaskResult {
+//						let factorSource = try await factorSourcesClient.addOffDeviceFactorSource(
+//							mnemonicWithPassphrase: mnemonicWithPassphrase,
+//							label: label
+//						)
+//						return .init(factorSource: factorSource, savedIntoProfile: true)
+//					}
+//				)))
+//			}
+			sargonProfileFinishMigrateAtEndOfStage1()
 
 		case .backupConfirmation(.userHasBackedUp):
 			guard let mnemonic = state.mnemonic else {

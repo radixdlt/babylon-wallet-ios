@@ -176,9 +176,9 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		updatedAccount.onLedgerSettings.thirdPartyDeposits = localConfig
 		return (
 			manifest: TransactionManifest.thirdPartyDepositUpdate(
-				accountAddress: state.account.accountAddress,
-				from: inProfileConfig.intoSargon(),
-				to: localConfig.intoSargon()
+				accountAddress: state.account.address,
+				from: inProfileConfig,
+				to: localConfig
 			),
 			account: updatedAccount
 		)

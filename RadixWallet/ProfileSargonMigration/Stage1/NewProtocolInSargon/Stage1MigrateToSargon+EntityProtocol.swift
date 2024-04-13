@@ -155,3 +155,91 @@ extension EntityProtocol {
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }
+
+// MARK: - Account + EntityProtocol
+extension Account: EntityProtocol {
+	public struct ExtraProperties: Sendable {
+		public var appearanceID: AppearanceID
+		public let onLedgerSettings: OnLedgerSettings
+
+		public init(
+			appearanceID: AppearanceID,
+			onLedgerSettings: OnLedgerSettings = .default
+		) {
+			self.appearanceID = appearanceID
+			self.onLedgerSettings = onLedgerSettings
+		}
+	}
+
+	public init(
+		networkID: NetworkID,
+		address: AccountAddress,
+		securityState: EntitySecurityState,
+		displayName: NonEmptyString,
+		extraProperties: ExtraProperties
+	) {
+		self.init(
+			networkId: networkID,
+			address: address,
+			displayName: DisplayName(nonEmpty: displayName),
+			securityState: securityState,
+			appearanceId: extraProperties.appearanceID,
+			flags: [],
+			onLedgerSettings: extraProperties.onLedgerSettings
+		)
+	}
+
+	public static var entityKind: EntityKind {
+		.account
+	}
+
+	public static func deriveVirtualAddress(
+		networkID: NetworkID,
+		factorInstance: HierarchicalDeterministicFactorInstance
+	) throws -> AccountAddress {
+		AccountAddress(publicKey: factorInstance.publicKey.publicKey, networkID: networkID)
+	}
+
+	public typealias EntityAddress = AccountAddress
+}
+
+// MARK: - Persona + EntityProtocol
+extension Persona: EntityProtocol {
+	public typealias EntityAddress = IdentityAddress
+
+	/// Ephemeral, only used as arg passed to init.
+	public struct ExtraProperties: Sendable, Hashable {
+		public var personaData: PersonaData
+		public init(personaData: PersonaData) {
+			self.personaData = personaData
+		}
+	}
+
+	public init(
+		networkID: NetworkID,
+		address: IdentityAddress,
+		securityState: EntitySecurityState,
+		displayName: NonEmptyString,
+		extraProperties: ExtraProperties
+	) {
+		self.init(
+			networkId: networkID,
+			address: address,
+			displayName: DisplayName(nonEmpty: displayName),
+			securityState: securityState,
+			flags: [],
+			personaData: extraProperties.personaData
+		)
+	}
+
+	public static var entityKind: EntityKind {
+		.account
+	}
+
+	public static func deriveVirtualAddress(
+		networkID: NetworkID,
+		factorInstance: HierarchicalDeterministicFactorInstance
+	) throws -> IdentityAddress {
+		IdentityAddress(publicKey: factorInstance.publicKey.publicKey, networkID: networkID)
+	}
+}

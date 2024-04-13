@@ -28,7 +28,7 @@ public struct AuthorizedDappsClient: Sendable {
 }
 
 extension AuthorizedDappsClient {
-	public typealias GetAuthorizedDapps = @Sendable () async throws -> Sargon.ProfileNetwork.AuthorizedDapps
+	public typealias GetAuthorizedDapps = @Sendable () async throws -> AuthorizedDapps
 	public typealias DetailsForAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Sargon.ProfileNetwork.AuthorizedDappDetailed
 	public typealias AddAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Void
 	public typealias UpdateOrAddAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Void

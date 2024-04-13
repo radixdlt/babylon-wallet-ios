@@ -349,7 +349,7 @@ extension OnLedgerEntitiesClient {
 	) async throws -> OnLedgerSyncOfAccounts {
 		let activeAddresses: [CustomizedOnLedgerThirdPartDepositForAccount]
 		do {
-			activeAddresses = try await getOnLedgerCustomizedThirdPartyDepositRule(addresses: accounts.map(\.accountAddress))
+			activeAddresses = try await getOnLedgerCustomizedThirdPartyDepositRule(addresses: accounts.map(\.address))
 		} catch is GatewayAPIClient.EmptyEntityDetailsResponse {
 			return OnLedgerSyncOfAccounts(inactive: accounts, active: [])
 		} catch {

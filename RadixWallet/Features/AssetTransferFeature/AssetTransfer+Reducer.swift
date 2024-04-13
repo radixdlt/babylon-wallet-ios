@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - AssetTransfer
@@ -220,7 +221,7 @@ extension AssetTransfer {
 		}
 
 		let perAssetTransfers = PerAssetTransfers(
-			fromAccount: accounts.fromAccount.accountAddress,
+			fromAccount: accounts.fromAccount.address,
 			fungibleResources: fungibles,
 			nonFungibleResources: nonFungibles
 		)

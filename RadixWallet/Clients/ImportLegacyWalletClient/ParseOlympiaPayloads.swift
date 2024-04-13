@@ -1,5 +1,6 @@
 import Foundation
 import RegexBuilder
+import Sargon
 import SwiftUI
 
 extension Olympia {
@@ -200,7 +201,7 @@ extension CAP33 {
 
 		let publicKey: Secp256k1PublicKey
 		do {
-			publicKey = try Secp256k1PublicKey(compressedRepresentation: publicKeyData)
+			publicKey = try Secp256k1PublicKey(bytes: publicKeyData)
 		} catch {
 			throw ParseFailure.accountPublicKeyInvalidSecp256k1PublicKey
 		}
