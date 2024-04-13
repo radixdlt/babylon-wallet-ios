@@ -1,7 +1,7 @@
 
 
 extension Profile {
-	mutating func updateOnNetwork(_ network: Profile.Network) throws {
+	mutating func updateOnNetwork(_ network: Sargon.ProfileNetwork) throws {
 		try networks.update(network)
 	}
 }
@@ -13,11 +13,11 @@ extension Profile {
 	}
 
 	/// The current network with a non empty set of accounts.
-	public var network: Profile.Network? {
+	public var network: Sargon.ProfileNetwork? {
 		try? network(id: networkID)
 	}
 
-	public func network(id needle: NetworkID) throws -> Profile.Network {
+	public func network(id needle: NetworkID) throws -> Sargon.ProfileNetwork {
 		try networks.network(id: needle)
 	}
 

@@ -9,7 +9,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 		/// by calling `accountsClient.saveVirtualAccounts`
 		@Sendable func migrate(
 			accounts: NonEmpty<Set<OlympiaAccountToMigrate>>,
-			factorSouceID: FactorSourceID.FromHash
+			factorSouceID: FactorSourceIDFromHash
 		) async throws -> (accounts: NonEmpty<OrderedSet<MigratedAccount>>, networkID: NetworkID) {
 			// we only allow import of olympia accounts into mainnet
 			let networkID = NetworkID.mainnet
@@ -25,7 +25,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 			var accountsSet = OrderedSet<MigratedAccount>()
 			for olympiaAccount in sortedOlympia {
 				defer { accountOffset += 1 }
-				let publicKey = SLIP10.PublicKey.ecdsaSecp256k1(olympiaAccount.publicKey)
+				let publicKey = Sargon.PublicKey.ecdsaSecp256k1(olympiaAccount.publicKey)
 				let factorInstance = HierarchicalDeterministicFactorInstance(
 					id: factorSouceID,
 					publicKey: publicKey,
@@ -35,7 +35,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 				let displayName = olympiaAccount.displayName ?? defaultAccountName
 
 				let appearanceID = await accountsClient.nextAppearanceID(networkID, accountOffset)
-				let babylon = try Profile.Network.Account(
+				let babylon = try Sargon.Account(
 					networkID: networkID,
 					factorInstance: factorInstance,
 					displayName: displayName,
@@ -163,7 +163,7 @@ func convert(
 		publicKey: raw.publicKey.intoSargon()
 	)
 
-	let derivationPath = try LegacyOlympiaBIP44LikeDerivationPath(
+	let derivationPath = try Bip44LikePath(
 		index: raw.addressIndex
 	)
 

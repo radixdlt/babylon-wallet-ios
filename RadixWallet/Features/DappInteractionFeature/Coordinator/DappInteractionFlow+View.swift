@@ -135,42 +135,44 @@ extension AccountsClient {
 
 extension AuthorizedDappsClient {
 	static func previewValueOnePersona() -> Self {
-		update(noop) {
-			$0.getAuthorizedDapps = {
-				var dapp = AuthorizedDapp(
-					networkId: .nebunet,
-					dappDefinitionAddress: .sample,
-					displayName: "something",
-					referencesToAuthorizedPersonas: []
-				)
-				dapp.referencesToAuthorizedPersonas = [
-					.init(
-						identityAddress: .sample,
-						lastLogin: .now,
-						sharedAccounts: try! .init(
-							request: .exactly(1),
-							ids: [.sample]
-						),
-						sharedPersonaData: .default
-					),
-				]
-				return [dapp]
-			}
-		}
+//		update(noop) {
+//			$0.getAuthorizedDapps = {
+//				var dapp = AuthorizedDapp(
+//					networkId: .nebunet,
+//					dappDefinitionAddress: .sample,
+//					displayName: "something",
+//					referencesToAuthorizedPersonas: []
+//				)
+//				dapp.referencesToAuthorizedPersonas = [
+//					.init(
+//						identityAddress: .sample,
+//						lastLogin: .now,
+//						sharedAccounts: try! .init(
+//							request: .exactly(1),
+//							ids: [.sample]
+//						),
+//						sharedPersonaData: .default
+//					),
+//				]
+//				return [dapp]
+//			}
+//		}
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }
 
 extension PersonasClient {
 	static func previewValueTwoPersonas(existing: Bool) -> Self {
-		update(noop) {
-			$0.getPersonas = {
-				if existing {
-					[.previewValue0, .previewValue1]
-				} else {
-					[.previewValue0]
-				}
-			}
-		}
+//		update(noop) {
+//			$0.getPersonas = {
+//				if existing {
+//					[.previewValue0, .previewValue1]
+//				} else {
+//					[.previewValue0]
+//				}
+//			}
+//		}
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }
 #endif

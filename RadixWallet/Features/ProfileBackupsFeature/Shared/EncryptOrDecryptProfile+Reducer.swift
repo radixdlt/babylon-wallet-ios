@@ -15,7 +15,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 			)
 
 			case encryptSpecific(
-				profileSnapshot: ProfileSnapshot,
+				profileSnapshot: Sargon.Profile,
 				kdfScheme: PasswordBasedKeyDerivationScheme = .default,
 				encryptionScheme: EncryptionScheme = .default
 			)
@@ -66,7 +66,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 		case focusTextField(State.Field?)
 
 		case loadProfileSnapshotToEncryptResult(
-			TaskResult<ProfileSnapshot>,
+			TaskResult<Sargon.Profile>,
 			kdfScheme: PasswordBasedKeyDerivationScheme,
 			encryptionScheme: EncryptionScheme
 		)
@@ -74,8 +74,8 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case successfullyDecrypted(encrypted: EncryptedProfileSnapshot, decrypted: ProfileSnapshot)
-		case successfullyEncrypted(plaintext: ProfileSnapshot, encrypted: EncryptedProfileSnapshot)
+		case successfullyDecrypted(encrypted: EncryptedProfileSnapshot, decrypted: Sargon.Profile)
+		case successfullyEncrypted(plaintext: Sargon.Profile, encrypted: EncryptedProfileSnapshot)
 	}
 
 	// MARK: - Destination

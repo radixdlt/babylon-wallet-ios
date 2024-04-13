@@ -8,7 +8,7 @@ extension AccountAddress {
 		networkID: NetworkID = Gateway.default.network.id
 	) -> Self {
 		Self(
-			publicKey: SLIP10.PublicKey.eddsaEd25519(Curve25519.PrivateKey().publicKey).intoSargon(),
+			publicKey: Sargon.PublicKey.ed25519(Curve25519.PrivateKey().publicKey).intoSargon(),
 			networkID: networkID
 		)
 	}

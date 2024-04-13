@@ -56,7 +56,7 @@ extension ProfileNetwork {
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
-	public mutating func hideAccounts(ids idsOfAccountsToHide: Set<Profile.Network.Account.ID>) {
+	public mutating func hideAccounts(ids idsOfAccountsToHide: Set<Sargon.Account.ID>) {
 //		var identifiedArrayOf = self.accounts
 //		for id in idsOfAccountsToHide {
 //			identifiedArrayOf[id: id]?.hide()

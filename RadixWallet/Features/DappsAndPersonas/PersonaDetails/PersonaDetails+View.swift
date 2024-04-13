@@ -173,7 +173,7 @@ extension PersonaDetails.State {
 
 	struct AccountSection: Equatable {
 		let dAppName: String
-		let sharingAccounts: OrderedSet<Profile.Network.AccountForDisplay>
+		let sharingAccounts: OrderedSet<Sargon.ProfileNetwork.AccountForDisplay>
 	}
 }
 
@@ -298,14 +298,9 @@ extension PersonaDetails.View {
 		struct ViewState: Equatable {
 			let dAppInfo: DappInfo?
 			let personaName: String
-			let companyName: String?
 			let fullName: String?
-			let dateOfBirth: Date?
 			let emailAddresses: [String]?
 			let phoneNumbers: [String]?
-			let urls: [String]?
-			let postalAddresses: [PersonaData.PostalAddress]?
-			let creditCards: [PersonaData.CreditCard]?
 
 			struct DappInfo: Equatable {
 				let name: String
@@ -319,21 +314,10 @@ extension PersonaDetails.View {
 			) {
 				self.dAppInfo = dAppInfo
 				self.personaName = personaName
-				self.fullName = personaData?.name?.value.formatted
-				self.emailAddresses = personaData?.emailAddresses.map(\.value.email)
-				self.phoneNumbers = personaData?.phoneNumbers.map(\.value.number)
-
-				self.dateOfBirth = personaData?.dateOfBirth?.value.date
-				self.companyName = personaData?.companyName?.value.name
-				self.urls = personaData?.urls.map(\.value.url)
-				self.postalAddresses = personaData?.postalAddresses.map(\.value)
-				self.creditCards = personaData?.creditCards.map(\.value)
-
-				// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
-				// we do not forget to handle it here.
-				switch PersonaData.Entry.Kind.fullName {
-				case .fullName, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
-				}
+//				self.fullName = personaData?.name?.value.formatted
+//				self.emailAddresses = personaData?.emailAddresses.map(\.value.email)
+//				self.phoneNumbers = personaData?.phoneNumbers.map(\.value.number)
+				sargonProfileFinishMigrateAtEndOfStage1()
 			}
 		}
 

@@ -28,7 +28,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 			case createProfile(PrivateHDFactorSource)
 
 			case addAccounts(
-				factorSourceID: FactorSourceID.FromHash,
+				factorSourceID: FactorSourceIDFromHash,
 				olympia: Bool
 			)
 		}
@@ -142,10 +142,10 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 
 	private func completed(
 		purpose: State.Purpose,
-		active: IdentifiedArrayOf<Profile.Network.Account>,
-		inactive: IdentifiedArrayOf<Profile.Network.Account>
+		active: IdentifiedArrayOf<Sargon.Account>,
+		inactive: IdentifiedArrayOf<Sargon.Account>
 	) -> Effect<Action> {
-		let sortedAccounts: IdentifiedArrayOf<Profile.Network.Account> = { () -> IdentifiedArrayOf<Profile.Network.Account> in
+		let sortedAccounts: IdentifiedArrayOf<Sargon.Account> = { () -> IdentifiedArrayOf<Sargon.Account> in
 			var accounts = active
 			accounts.append(contentsOf: inactive)
 			accounts.sort() // by index

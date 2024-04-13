@@ -77,7 +77,7 @@ public struct IndicesOfEntitiesControlledByFactorSourceRequest: Sendable, Hashab
 
 // MARK: - IndicesUsedByFactorSource
 public struct IndicesUsedByFactorSource: Sendable, Hashable {
-	let indices: OrderedSet<HD.Path.Component.Child.Value>
+	let indices: OrderedSet<HDPathValue>
 	let factorSource: FactorSource
 	let currentNetworkID: NetworkID
 }
@@ -85,14 +85,14 @@ public struct IndicesUsedByFactorSource: Sendable, Hashable {
 // MARK: FactorSourcesClient.GetFactorSources
 extension FactorSourcesClient {
 	public typealias IndicesOfEntitiesControlledByFactorSource = @Sendable (IndicesOfEntitiesControlledByFactorSourceRequest) async throws -> IndicesUsedByFactorSource
-	public typealias NextEntityIndexForFactorSource = @Sendable (NextEntityIndexForFactorSourceRequest) async throws -> HD.Path.Component.Child.Value
+	public typealias NextEntityIndexForFactorSource = @Sendable (NextEntityIndexForFactorSourceRequest) async throws -> HDPathValue
 	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 	public typealias GetMainDeviceFactorSource = @Sendable () async throws -> DeviceFactorSource
 	public typealias CreateNewMainDeviceFactorSource = @Sendable () async throws -> PrivateHDFactorSource
 	public typealias GetFactorSources = @Sendable () async throws -> FactorSources
 	public typealias FactorSourcesAsyncSequence = @Sendable () async -> AnyAsyncSequence<FactorSources>
-	public typealias AddPrivateHDFactorSource = @Sendable (AddPrivateHDFactorSourceRequest) async throws -> FactorSourceID.FromHash
-	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (BIP39.WordCount, NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceID.FromHash?
+	public typealias AddPrivateHDFactorSource = @Sendable (AddPrivateHDFactorSourceRequest) async throws -> FactorSourceIDFromHash
+	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (BIP39.WordCount, NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceIDFromHash?
 	public typealias SaveFactorSource = @Sendable (FactorSource) async throws -> Void
 	public typealias UpdateFactorSource = @Sendable (FactorSource) async throws -> Void
 	public typealias GetSigningFactors = @Sendable (GetSigningFactorsRequest) async throws -> SigningFactors
@@ -128,9 +128,9 @@ extension SigningFactors {
 // MARK: - GetSigningFactorsRequest
 public struct GetSigningFactorsRequest: Sendable, Hashable {
 	public let networkID: NetworkID
-	public let signers: NonEmpty<Set<EntityPotentiallyVirtual>>
+	public let signers: NonEmpty<Set<AccountOrPersona>>
 	public let signingPurpose: SigningPurpose
-	public init(networkID: NetworkID, signers: NonEmpty<Set<EntityPotentiallyVirtual>>, signingPurpose: SigningPurpose) {
+	public init(networkID: NetworkID, signers: NonEmpty<Set<AccountOrPersona>>, signingPurpose: SigningPurpose) {
 		self.networkID = networkID
 		self.signers = signers
 		self.signingPurpose = signingPurpose
@@ -326,7 +326,7 @@ extension MnemonicWithPassphrase {
 
 	@discardableResult
 	public func validatePublicKeys(
-		of accounts: some Collection<Profile.Network.Account>
+		of accounts: some Collection<Sargon.Account>
 	) throws -> Bool {
 		try validatePublicKeys(
 			of: accounts.flatMap { account in
@@ -342,12 +342,12 @@ extension MnemonicWithPassphrase {
 
 	@discardableResult
 	public func validatePublicKeys(
-		of accounts: [(path: HD.Path.Full, expectedPublicKey: SLIP10.PublicKey)]
+		of accounts: [(path: HD.Path.Full, expectedPublicKey: Sargon.PublicKey)]
 	) throws -> Bool {
 		let hdRoot = try self.hdRoot()
 
 		for (path, publicKey) in accounts {
-			let derivedPublicKey: SLIP10.PublicKey = switch publicKey.curve {
+			let derivedPublicKey: Sargon.PublicKey = switch publicKey.curve {
 			case .secp256k1:
 				try .ecdsaSecp256k1(hdRoot.derivePrivateKey(
 					path: path,

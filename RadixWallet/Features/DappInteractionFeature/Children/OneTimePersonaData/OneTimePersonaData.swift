@@ -34,7 +34,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case personasLoaded(IdentifiedArrayOf<Profile.Network.Persona>)
+		case personasLoaded(IdentifiedArrayOf<Persona>)
 		case personaPrimacyDetermined(PersonaPrimacy)
 	}
 
@@ -43,7 +43,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case personaUpdated(Profile.Network.Persona)
+		case personaUpdated(Persona)
 		case continueButtonTapped(P2P.Dapp.Request.Response)
 	}
 

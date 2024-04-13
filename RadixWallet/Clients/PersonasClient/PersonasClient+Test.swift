@@ -21,8 +21,8 @@ extension PersonasClient: TestDependencyKey {
 	)
 	public static let noop = Self(
 		personas: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
-		getPersonas: { .init() },
-		getPersonasOnNetwork: { _ in .init() },
+		getPersonas: { sargonProfileFinishMigrateAtEndOfStage1() },
+		getPersonasOnNetwork: { _ in sargonProfileFinishMigrateAtEndOfStage1() },
 		getHiddenPersonasOnCurrentNetwork: { throw NoopError() },
 		updatePersona: { _ in throw NoopError() },
 		saveVirtualPersona: { _ in },

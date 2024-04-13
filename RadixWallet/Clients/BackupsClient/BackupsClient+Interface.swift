@@ -25,28 +25,29 @@ public struct BackupsClient: Sendable {
 }
 
 extension BackupsClient {
-	public typealias SnapshotOfProfileForExport = @Sendable () async throws -> ProfileSnapshot
-	public typealias LoadProfileBackups = @Sendable () async -> ProfileSnapshot.HeaderList?
+	public typealias SnapshotOfProfileForExport = @Sendable () async throws -> Sargon.Profile
+	public typealias LoadProfileBackups = @Sendable () async -> Sargon.Profile.HeaderList?
 
-	public typealias ImportProfileSnapshot = @Sendable (ProfileSnapshot, Set<FactorSourceID.FromHash>) async throws -> Void
-	public typealias ImportCloudProfile = @Sendable (ProfileSnapshot.Header, Set<FactorSourceID.FromHash>) async throws -> Void
-	public typealias LookupProfileSnapshotByHeader = @Sendable (ProfileSnapshot.Header) async throws -> ProfileSnapshot?
+	public typealias ImportProfileSnapshot = @Sendable (Sargon.Profile, Set<FactorSourceIDFromHash>) async throws -> Void
+	public typealias ImportCloudProfile = @Sendable (Sargon.Profile.Header, Set<FactorSourceIDFromHash>) async throws -> Void
+	public typealias LookupProfileSnapshotByHeader = @Sendable (Sargon.Profile.Header) async throws -> Sargon.Profile?
 
 	public typealias LoadDeviceID = @Sendable () async -> UUID?
 }
 
 extension BackupsClient {
 	public func importSnapshot(
-		_ snapshot: ProfileSnapshot,
+		_ snapshot: Sargon.Profile,
 		fromCloud: Bool
 	) async throws {
-		let factorSourceIDs: Set<FactorSourceID.FromHash> = .init(
-			snapshot.factorSources.compactMap { $0.extract(DeviceFactorSource.self) }.map(\.id)
-		)
-		if fromCloud {
-			try await importCloudProfile(snapshot.header, factorSourceIDs)
-		} else {
-			try await importProfileSnapshot(snapshot, factorSourceIDs)
-		}
+//		let factorSourceIDs: Set<FactorSourceIDFromHash> = .init(
+//			snapshot.factorSources.compactMap { $0.extract(DeviceFactorSource.self) }.map(\.id)
+//		)
+//		if fromCloud {
+//			try await importCloudProfile(snapshot.header, factorSourceIDs)
+//		} else {
+//			try await importProfileSnapshot(snapshot, factorSourceIDs)
+//		}
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }

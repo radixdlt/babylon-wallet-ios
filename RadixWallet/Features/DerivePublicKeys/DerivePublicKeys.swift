@@ -418,7 +418,7 @@ extension DerivePublicKeys {
 		of entityKind: EntityKind,
 		derivationPathScheme: DerivationPathScheme,
 		networkID maybeNetworkID: NetworkID?
-	) async throws -> (index: HD.Path.Component.Child.Value, networkID: NetworkID) {
+	) async throws -> (index: HDPathValue, networkID: NetworkID) {
 		let currentNetwork = await accountsClient.getCurrentNetworkID()
 		let networkID = maybeNetworkID ?? currentNetwork
 		let request = NextEntityIndexForFactorSourceRequest(

@@ -31,7 +31,7 @@ public extension AccountRecoveryScanInProgress {
 		let status: AccountRecoveryScanInProgress.State.Status
 		let kind: FactorSourceKind
 		let olympia: Bool
-		let active: IdentifiedArrayOf<Profile.Network.Account>
+		let active: IdentifiedArrayOf<Sargon.Account>
 		let hasFoundAnyAccounts: Bool
 		let maxIndex: Int
 
@@ -188,7 +188,7 @@ public extension AccountRecoveryScanInProgress {
 // MARK: - SimpleAccountCard
 /// A `SmallAccountCard` without `name`, and with the address centered
 private struct SimpleAccountCard: View {
-	let account: Profile.Network.Account
+	let account: Sargon.Account
 
 	var body: some View {
 		SmallAccountCard(

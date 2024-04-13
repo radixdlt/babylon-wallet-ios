@@ -35,8 +35,8 @@ public struct Home: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		public typealias HasAccessToMnemonic = Bool
-		case accountsLoadedResult(TaskResult<IdentifiedArrayOf<Profile.Network.Account>>)
-		case exportMnemonic(account: Profile.Network.Account)
+		case accountsLoadedResult(TaskResult<IdentifiedArrayOf<Sargon.Account>>)
+		case exportMnemonic(account: Sargon.Account)
 		case importMnemonic
 		case loadedShouldWriteDownPersonasSeedPhrase(Bool)
 		case currentGatewayChanged(to: Gateway)
@@ -338,7 +338,7 @@ public struct Home: Sendable, FeatureReducer {
 		return .none
 	}
 
-	private func exportMnemonic(controlling account: Profile.Network.Account, state: inout State) -> Effect<Action> {
+	private func exportMnemonic(controlling account: Sargon.Account, state: inout State) -> Effect<Action> {
 		exportMnemonic(
 			controlling: account,
 			onSuccess: {
@@ -421,7 +421,7 @@ public struct Home: Sendable, FeatureReducer {
 }
 
 extension Home.State {
-	public var accounts: IdentifiedArrayOf<Profile.Network.Account> {
+	public var accounts: IdentifiedArrayOf<Sargon.Account> {
 		accountRows.map(\.account).asIdentified()
 	}
 

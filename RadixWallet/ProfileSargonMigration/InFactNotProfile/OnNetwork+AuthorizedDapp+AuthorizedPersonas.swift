@@ -1,7 +1,7 @@
 
 
 // MARK: ~~~=== LOGIC ===~~~
-extension Profile.Network {
+extension Sargon.ProfileNetwork {
 	public struct AccountForDisplay: Sendable, Hashable, Identifiable {
 		public typealias ID = AccountAddress
 		public var id: ID { address }
@@ -26,7 +26,7 @@ extension Profile.Network {
 		/// Address that globally abnd uniquely identifies this Persona.
 		public let identityAddress: IdentityAddress
 
-		/// The display name of the Persona, as stored in `Profile.Network.Persona`
+		/// The display name of the Persona, as stored in `Persona`
 		public let displayName: NonEmptyString
 
 		/// Information of accounts the user has given the Dapp access to,
@@ -41,10 +41,10 @@ extension Profile.Network {
 	}
 
 	public struct AuthorizedDappDetailed: Sendable, Hashable {
-		public let networkID: Radix.Network.ID
+		public let networkID: Sargon.NetworkID
 		public let dAppDefinitionAddress: AccountAddress
 		public let displayName: NonEmptyString?
-		public let detailedAuthorizedPersonas: IdentifiedArrayOf<Profile.Network.AuthorizedPersonaDetailed>
+		public let detailedAuthorizedPersonas: IdentifiedArrayOf<Sargon.ProfileNetwork.AuthorizedPersonaDetailed>
 	}
 
 	public func detailsForAuthorizedDapp(_ dapp: AuthorizedDapp) throws -> AuthorizedDappDetailed {
@@ -52,15 +52,15 @@ extension Profile.Network {
 		 guard
 		 	dapp.networkID == self.networkID
 		 else {
-		 	/// this is a sign that ProfileSnapshot is in a bad state somehow...
+		 	/// this is a sign that Sargon.Profile is in a bad state somehow...
 		 	throw NetworkDiscrepancyError()
 		 }
-		 let detailedAuthorizedPersonas = try IdentifiedArrayOf<Profile.Network.AuthorizedPersonaDetailed>(uniqueElements: dapp.referencesToAuthorizedPersonas.map { simple in
+		 let detailedAuthorizedPersonas = try IdentifiedArrayOf<Sargon.ProfileNetwork.AuthorizedPersonaDetailed>(uniqueElements: dapp.referencesToAuthorizedPersonas.map { simple in
 
 		 	guard
 		 		let persona = self.getPersonas().first(where: { $0.address == simple.identityAddress })
 		 	else {
-		 		/// this is a sign that ProfileSnapshot is in a bad state somehow...
+		 		/// this is a sign that Sargon.Profile is in a bad state somehow...
 		 		throw DiscrepancyAuthorizedDappReferencedPersonaWhichDoesNotExist()
 		 	}
 

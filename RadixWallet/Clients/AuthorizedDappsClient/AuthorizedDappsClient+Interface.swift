@@ -28,19 +28,19 @@ public struct AuthorizedDappsClient: Sendable {
 }
 
 extension AuthorizedDappsClient {
-	public typealias GetAuthorizedDapps = @Sendable () async throws -> Profile.Network.AuthorizedDapps
-	public typealias DetailsForAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Profile.Network.AuthorizedDappDetailed
+	public typealias GetAuthorizedDapps = @Sendable () async throws -> Sargon.ProfileNetwork.AuthorizedDapps
+	public typealias DetailsForAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Sargon.ProfileNetwork.AuthorizedDappDetailed
 	public typealias AddAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Void
 	public typealias UpdateOrAddAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Void
 	public typealias ForgetAuthorizedDapp = @Sendable (AuthorizedDapp.ID, NetworkID?) async throws -> Void
 	public typealias UpdateAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Void
-	public typealias DeauthorizePersonaFromDapp = @Sendable (Profile.Network.Persona.ID, AuthorizedDapp.ID, NetworkID) async throws -> Void
+	public typealias DeauthorizePersonaFromDapp = @Sendable (Persona.ID, AuthorizedDapp.ID, NetworkID) async throws -> Void
 }
 
 extension AuthorizedDappsClient {
 	public func getDetailedDapp(
 		_ id: AuthorizedDapp.ID
-	) async throws -> Profile.Network.AuthorizedDappDetailed {
+	) async throws -> Sargon.ProfileNetwork.AuthorizedDappDetailed {
 		let dApps = try await getAuthorizedDapps()
 		guard let dApp = dApps[id: id] else {
 			throw AuthorizedDappDoesNotExists()
@@ -49,15 +49,15 @@ extension AuthorizedDappsClient {
 	}
 
 	public func getDappsAuthorizedByPersona(
-		_ id: Profile.Network.Persona.ID
+		_ id: Persona.ID
 	) async throws -> IdentifiedArrayOf<AuthorizedDapp> {
 		//	try await getAuthorizedDapps().filter { $0.referencesToAuthorizedPersonas.ids.contains(id) }
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	public func removeBrokenReferencesToSharedPersonaData(
-		personaCurrent: Profile.Network.Persona,
-		personaUpdated: Profile.Network.Persona
+		personaCurrent: Persona,
+		personaUpdated: Persona
 	) async throws {
 		sargonProfileFinishMigrateAtEndOfStage1()
 		/*

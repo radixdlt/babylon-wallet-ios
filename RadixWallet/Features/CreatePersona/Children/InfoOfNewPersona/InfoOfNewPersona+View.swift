@@ -30,7 +30,7 @@ extension NewPersonaInfo {
 
 			let defaultHint: Hint = .info(L10n.CreatePersona.Explanation.thisWillBeShared)
 			if let sanitizedName = state.sanitizedName {
-				if sanitizedName.count > Profile.Network.Account.nameMaxLength {
+				if sanitizedName.count > Sargon.Account.nameMaxLength {
 					self.sanitizedNameRequirement = nil
 					self.hint = .error(L10n.Error.PersonaLabel.tooLong)
 				} else {
@@ -130,7 +130,7 @@ import ComposableArchitecture //
 
 // struct InfoOfNewPersona_Previews: PreviewProvider {
 //	static var previews: some View {
-//		NameNewEntity<Profile.Network.Account>.View(
+//		NameNewEntity<Sargon.Account>.View(
 //			store: .init(
 //				initialState: .init(isFirst: true),
 //				reducer: NameNewEntity.init

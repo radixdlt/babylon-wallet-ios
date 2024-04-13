@@ -15,7 +15,7 @@ extension Profile {
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
-	/// Requires the presence of an `Profile.Network` in `networks` for
+	/// Requires the presence of an `Sargon.ProfileNetwork` in `networks` for
 	/// `newGateway.network.id`, otherwise an error is thrown.
 	public mutating func changeGateway(to newGateway: Gateway) throws {
 //		let newNetworkID = newGateway.network.id

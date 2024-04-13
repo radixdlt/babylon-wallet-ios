@@ -13,34 +13,34 @@ extension EntitiesVisibilityClient {
 		public let hiddenPersonasCount: Int
 	}
 
-	public typealias HideAccounts = @Sendable (Set<Profile.Network.Account.ID>) async throws -> Void
-	public typealias HidePersonas = @Sendable (Set<Profile.Network.Persona.ID>) async throws -> Void
+	public typealias HideAccounts = @Sendable (Set<Sargon.Account.ID>) async throws -> Void
+	public typealias HidePersonas = @Sendable (Set<Persona.ID>) async throws -> Void
 	public typealias UnhideAllEntities = @Sendable () async throws -> Void
 	public typealias GetHiddenEntityCounts = @Sendable () async throws -> HiddenEntityCounts
 }
 
 extension EntitiesVisibilityClient {
-	public func hideAccounts(ids: some Collection<Profile.Network.Account.ID>) async throws {
+	public func hideAccounts(ids: some Collection<Sargon.Account.ID>) async throws {
 		try await hideAccounts(Set(ids))
 	}
 
-	public func hidePersonas(ids: some Collection<Profile.Network.Persona.ID>) async throws {
+	public func hidePersonas(ids: some Collection<Persona.ID>) async throws {
 		try await hidePersonas(Set(ids))
 	}
 
-	public func hide(accounts: some Collection<Profile.Network.Account>) async throws {
+	public func hide(accounts: some Collection<Sargon.Account>) async throws {
 		try await hideAccounts(ids: accounts.map(\.id))
 	}
 
-	public func hide(personas: some Collection<Profile.Network.Persona>) async throws {
+	public func hide(personas: some Collection<Persona>) async throws {
 		try await hidePersonas(ids: personas.map(\.id))
 	}
 
-	public func hide(account: Profile.Network.Account) async throws {
+	public func hide(account: Sargon.Account) async throws {
 		try await hide(accounts: [account])
 	}
 
-	public func hide(persona: Profile.Network.Persona) async throws {
+	public func hide(persona: Persona) async throws {
 		try await hide(personas: [persona])
 	}
 }

@@ -4,12 +4,12 @@ import SwiftUI
 // MARK: - Persona
 public struct PersonaReducer: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
-		public let id: Profile.Network.Persona.ID
+		public let id: Persona.ID
 		public let thumbnail: URL?
 		public let displayName: String
 		public var shouldWriteDownMnemonic: Bool
 
-		public init(persona: Profile.Network.AuthorizedPersonaDetailed) {
+		public init(persona: Sargon.ProfileNetwork.AuthorizedPersonaDetailed) {
 			self.init(
 				id: persona.id,
 				thumbnail: nil,
@@ -17,7 +17,7 @@ public struct PersonaReducer: Sendable, FeatureReducer {
 			)
 		}
 
-		public init(persona: Profile.Network.Persona) {
+		public init(persona: Persona) {
 			self.init(
 				id: persona.id,
 				thumbnail: nil,
@@ -27,7 +27,7 @@ public struct PersonaReducer: Sendable, FeatureReducer {
 		}
 
 		public init(
-			id: Profile.Network.Persona.ID,
+			id: Persona.ID,
 			thumbnail: URL?,
 			displayName: String,
 			shouldWriteDownMnemonic: Bool = false

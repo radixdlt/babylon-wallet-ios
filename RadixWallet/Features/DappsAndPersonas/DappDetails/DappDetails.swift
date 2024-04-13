@@ -32,7 +32,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public let dAppDefinitionAddress: DappDefinitionAddress
 
 		// This will only be non-nil if the dApp is in fact authorized
-		public var authorizedDapp: Profile.Network.AuthorizedDappDetailed?
+		public var authorizedDapp: Sargon.ProfileNetwork.AuthorizedDappDetailed?
 
 		public var personaList: PersonaList.State
 
@@ -50,7 +50,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 		// Authorized dApp
 		public init(
-			dApp: Profile.Network.AuthorizedDappDetailed,
+			dApp: Sargon.ProfileNetwork.AuthorizedDappDetailed,
 			context: Context.SettingsContext,
 			metadata: OnLedgerEntity.Metadata? = nil,
 			resources: Resources? = nil,
@@ -110,7 +110,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case metadataLoaded(Loadable<OnLedgerEntity.Metadata>)
 		case resourcesLoaded(Loadable<State.Resources>)
 		case associatedDappsLoaded(Loadable<[OnLedgerEntity.AssociatedDapp]>)
-		case dAppUpdated(Profile.Network.AuthorizedDappDetailed)
+		case dAppUpdated(Sargon.ProfileNetwork.AuthorizedDappDetailed)
 	}
 
 	public enum ChildAction: Sendable, Equatable {

@@ -71,7 +71,7 @@ extension AccountsClient: DependencyKey {
 		let newVirtualAccount: NewVirtualAccount = { _ in
 //			let networkID = request.networkID
 //			let appearanceID = await nextAppearanceID(networkID, nil)
-//			return try Profile.Network.Account(
+//			return try Sargon.Account(
 //				networkID: networkID,
 //				factorInstance: request.factorInstance,
 //				displayName: request.name,

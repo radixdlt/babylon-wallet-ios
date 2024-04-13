@@ -7,7 +7,7 @@ struct TryingToUpdateAnAccountWhichIsNotAlreadySaved: Swift.Error {}
 extension Profile {
 	/// Updates an `Account` in the profile
 	public mutating func updateAccount(
-		_ account: Profile.Network.Account
+		_ account: Sargon.Account
 	) throws {
 //		var network = try network(id: account.networkID)
 //		try network.updateAccount(account)
@@ -16,7 +16,7 @@ extension Profile {
 	}
 
 	#if DEBUG
-	public mutating func deleteAccount(_ account: Profile.Network.Account) throws {
+	public mutating func deleteAccount(_ account: Sargon.Account) throws {
 //		var network = try network(id: account.networkID)
 //		network.deleteAccount(address: account.address)
 //		try updateOnNetwork(network)
@@ -27,7 +27,7 @@ extension Profile {
 	/// Saves an `Account` into the profile, if this is the first mainnet account,
 	/// we will switch to mainnet
 	public mutating func addAccount(
-		_ account: Profile.Network.Account
+		_ account: Sargon.Account
 	) throws {
 //		let networkID = account.networkID
 //		// can be nil if this is a new network
@@ -37,7 +37,7 @@ extension Profile {
 //			try network.addAccount(account)
 //			try updateOnNetwork(network)
 //		} else {
-//			let network = Profile.Network(
+//			let network = Sargon.ProfileNetwork(
 //				networkID: networkID,
 //				accounts: [account].asIdentified(),
 //				personas: [],

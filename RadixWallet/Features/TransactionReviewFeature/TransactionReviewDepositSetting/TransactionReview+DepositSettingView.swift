@@ -10,7 +10,7 @@ extension TransactionReview {
 
 	public struct DepositSettingChange: Sendable, Identifiable, Hashable {
 		public var id: AccountAddress.ID { account.accountAddress.id }
-		public let account: Profile.Network.Account
+		public let account: Sargon.Account
 		public let ruleChange: AccountDefaultDepositRule
 	}
 }

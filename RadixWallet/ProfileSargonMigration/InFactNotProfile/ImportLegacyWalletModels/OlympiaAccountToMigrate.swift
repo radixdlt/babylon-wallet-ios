@@ -1,15 +1,15 @@
-
+import Sargon
 
 // MARK: - OlympiaAccountToMigrate
 public struct OlympiaAccountToMigrate: Sendable, Hashable, CustomDebugStringConvertible, Identifiable {
-	public typealias ID = K1.PublicKey
+	public typealias ID = Secp256k1PublicKey
 
 	public var id: ID { publicKey }
 
 	public let accountType: Olympia.AccountType
 
-	public let publicKey: K1.PublicKey
-	public let path: LegacyOlympiaBIP44LikeDerivationPath
+	public let publicKey: Secp256k1PublicKey
+	public let path: Bip44LikePath
 
 	/// Legacy Olympia address
 	public let address: LegacyOlympiaAccountAddress
@@ -17,12 +17,12 @@ public struct OlympiaAccountToMigrate: Sendable, Hashable, CustomDebugStringConv
 	public let displayName: NonEmptyString?
 
 	/// the non hardened value of the path
-	public let addressIndex: HD.Path.Component.Child.Value
+	public let addressIndex: HDPathValue
 
 	public init(
 		accountType: Olympia.AccountType,
-		publicKey: K1.PublicKey,
-		path: LegacyOlympiaBIP44LikeDerivationPath,
+		publicKey: Secp256k1PublicKey,
+		path: Bip44LikePath,
 		address: LegacyOlympiaAccountAddress,
 		displayName: NonEmptyString?
 	) {

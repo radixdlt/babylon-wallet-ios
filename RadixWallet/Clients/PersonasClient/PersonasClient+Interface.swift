@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - PersonasClient
 public struct PersonasClient: Sendable {
 	public var personas: Personas
@@ -32,28 +34,29 @@ public struct PersonasClient: Sendable {
 }
 
 extension PersonasClient {
-	public typealias Personas = @Sendable () async -> AnyAsyncSequence<Profile.Network.Personas>
-	public typealias GetPersonas = @Sendable () async throws -> Profile.Network.Personas
-	public typealias GetPersonasOnNetwork = @Sendable (NetworkID) async -> Profile.Network.Personas
-	public typealias getHiddenPersonasOnCurrentNetwork = @Sendable () async throws -> Profile.Network.Personas
+	public typealias Personas = @Sendable () async -> AnyAsyncSequence<Sargon.Personas>
+	public typealias GetPersonas = @Sendable () async throws -> Sargon.Personas
+	public typealias GetPersonasOnNetwork = @Sendable (NetworkID) async -> Sargon.Personas
+	public typealias getHiddenPersonasOnCurrentNetwork = @Sendable () async throws -> Sargon.Personas
 	public typealias HasSomePersonaOnAnyNetworks = @Sendable () async -> Bool
 	public typealias HasSomePersonaOnCurrentNetwork = @Sendable () async -> Bool
-	public typealias UpdatePersona = @Sendable (Profile.Network.Persona) async throws -> Void
-	public typealias SaveVirtualPersona = @Sendable (Profile.Network.Persona) async throws -> Void
+	public typealias UpdatePersona = @Sendable (Persona) async throws -> Void
+	public typealias SaveVirtualPersona = @Sendable (Persona) async throws -> Void
 }
 
 extension PersonasClient {
-	public func getPersona(id: Profile.Network.Persona.ID) async throws -> Profile.Network.Persona {
-		let personas = try await getPersonas()
-		guard let persona = personas[id: id] else {
-			throw PersonaNotFoundError(id: id)
-		}
-
-		return persona
+	public func getPersona(id: Persona.ID) async throws -> Persona {
+//		let personas = try await getPersonas()
+//		guard let persona = personas[id: id] else {
+//			throw PersonaNotFoundError(id: id)
+//		}
+//
+//		return persona
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	public struct PersonaNotFoundError: Error {
-		let id: Profile.Network.Persona.ID
+		let id: Persona.ID
 	}
 
 	public func determinePersonaPrimacy() async -> PersonaPrimacy {
@@ -69,14 +72,16 @@ extension PersonasClient {
 	}
 
 	public func shouldWriteDownSeedPhraseForSomePersona() async throws -> Bool {
-		try await getPersonas().contains(where: \.shouldWriteDownMnemonic)
+//		try await getPersonas().contains(where: \.shouldWriteDownMnemonic)
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	public func shouldWriteDownSeedPhraseForSomePersonaSequence() async -> AnyAsyncSequence<Bool> {
-		await personas().map { personas in
-			personas.contains(where: \.shouldWriteDownMnemonic)
-		}
-		.share()
-		.eraseToAnyAsyncSequence()
+//		await personas().map { personas in
+//			personas.contains(where: \.shouldWriteDownMnemonic)
+//		}
+//		.share()
+//		.eraseToAnyAsyncSequence()
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }

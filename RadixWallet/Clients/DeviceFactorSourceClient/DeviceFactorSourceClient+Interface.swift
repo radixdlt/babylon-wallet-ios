@@ -28,8 +28,8 @@ public struct DeviceFactorSourceClient: Sendable {
 
 // MARK: DeviceFactorSourceClient.onDeviceHDPublicKey
 extension DeviceFactorSourceClient {
-	public typealias GetEntitiesControlledByFactorSource = @Sendable (DeviceFactorSource, ProfileSnapshot?) async throws -> EntitiesControlledByFactorSource
-	public typealias GetControlledEntities = @Sendable (ProfileSnapshot?) async throws -> IdentifiedArrayOf<EntitiesControlledByFactorSource>
+	public typealias GetEntitiesControlledByFactorSource = @Sendable (DeviceFactorSource, Sargon.Profile?) async throws -> EntitiesControlledByFactorSource
+	public typealias GetControlledEntities = @Sendable (Sargon.Profile?) async throws -> IdentifiedArrayOf<EntitiesControlledByFactorSource>
 
 	public typealias PublicKeysFromOnDeviceHD = @Sendable (PublicKeysFromOnDeviceHDRequest) async throws -> [HierarchicalDeterministicPublicKey]
 	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey
@@ -122,7 +122,7 @@ struct FailedToFindDeviceFactorSourceForSigning: Swift.Error {}
 struct IncorrectSignatureCountExpectedExactlyOne: Swift.Error {}
 extension DeviceFactorSourceClient {
 	public func signUsingDeviceFactorSource(
-		signerEntity: EntityPotentiallyVirtual,
+		signerEntity: AccountOrPersona,
 		hashedDataToSign: Data,
 		purpose: SigningPurpose
 	) async throws -> SignatureOfEntity {
@@ -160,7 +160,7 @@ extension DeviceFactorSourceClient {
 
 	public func signUsingDeviceFactorSource(
 		deviceFactorSource: DeviceFactorSource,
-		signerEntities: Set<EntityPotentiallyVirtual>,
+		signerEntities: Set<AccountOrPersona>,
 		hashedDataToSign: some DataProtocol,
 		purpose: SigningPurpose
 	) async throws -> Set<SignatureOfEntity> {

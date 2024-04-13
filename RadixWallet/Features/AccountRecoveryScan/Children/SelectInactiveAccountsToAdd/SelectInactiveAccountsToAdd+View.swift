@@ -9,7 +9,7 @@ public extension SelectInactiveAccountsToAdd {
 
 		init(state: SelectInactiveAccountsToAdd.State) {
 			let selectionRequirement = SelectionRequirement.atLeast(0)
-			func rowState(_ account: Profile.Network.Account) -> ChooseAccountsRow.State {
+			func rowState(_ account: Sargon.Account) -> ChooseAccountsRow.State {
 				.init(account: account, mode: .checkmark)
 			}
 			self.availableAccounts = state.inactive.map(rowState)

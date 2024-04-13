@@ -472,7 +472,7 @@ extension TransactionReview {
 	}
 
 	func extractAccountDepositSetting(
-		for validAccounts: [Profile.Network.Account],
+		for validAccounts: [Sargon.Account],
 		defaultDepositRuleChanges: [AccountAddress: AccountDefaultDepositRule]
 	) -> DepositSettingState? {
 		let depositSettingChanges: [TransactionReview.DepositSettingChange] = validAccounts.compactMap { account in
@@ -486,7 +486,7 @@ extension TransactionReview {
 	}
 
 	func extractAccountDepositExceptions(
-		for validAccounts: [Profile.Network.Account],
+		for validAccounts: [Sargon.Account],
 		resourcePreferenceChanges: [AccountAddress: [ResourceAddress: ResourcePreferenceUpdate]],
 		authorizedDepositorsAdded: [AccountAddress: [ResourceOrNonFungible]],
 		authorizedDepositorsRemoved: [AccountAddress: [ResourceOrNonFungible]]

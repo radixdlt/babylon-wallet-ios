@@ -13,22 +13,22 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		public var status: Status
 		public var networkID: NetworkID = .mainnet
 		public var batchNumber: Int = 0
-		public var maxIndex: HD.Path.Component.Child.Value? = nil
+		public var maxIndex: HDPathValue? = nil
 
-		public var indicesOfAlreadyUsedEntities: OrderedSet<HD.Path.Component.Child.Value> = []
+		public var indicesOfAlreadyUsedEntities: OrderedSet<HDPathValue> = []
 		public let forOlympiaAccounts: Bool
-		public var active: IdentifiedArrayOf<Profile.Network.Account> = []
-		public var inactive: IdentifiedArrayOf<Profile.Network.Account> = []
+		public var active: IdentifiedArrayOf<Sargon.Account> = []
+		public var inactive: IdentifiedArrayOf<Sargon.Account> = []
 
 		@PresentationState
 		public var destination: Destination.State? = nil
 
 		public enum Mode: Sendable, Hashable {
 			case privateHD(PrivateHDFactorSource)
-			case factorSourceWithID(id: FactorSourceID.FromHash, Loadable<FactorSource> = .idle)
+			case factorSourceWithID(id: FactorSourceIDFromHash, Loadable<FactorSource> = .idle)
 		}
 
-		public var factorSourceIDFromHash: FactorSourceID.FromHash {
+		public var factorSourceIDFromHash: FactorSourceIDFromHash {
 			switch mode {
 			case let .privateHD(privateHD):
 				privateHD.factorSource.id
@@ -50,10 +50,10 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadIndicesUsedByFactorSourceResult(TaskResult<IndicesUsedByFactorSource>)
-		case startScan(accounts: IdentifiedArrayOf<Profile.Network.Account>)
+		case startScan(accounts: IdentifiedArrayOf<Sargon.Account>)
 		case foundAccounts(
-			active: IdentifiedArrayOf<Profile.Network.Account>,
-			inactive: IdentifiedArrayOf<Profile.Network.Account>
+			active: IdentifiedArrayOf<Sargon.Account>,
+			inactive: IdentifiedArrayOf<Sargon.Account>
 		)
 		case initiate
 	}
@@ -67,8 +67,8 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case foundAccounts(
-			active: IdentifiedArrayOf<Profile.Network.Account>,
-			inactive: IdentifiedArrayOf<Profile.Network.Account>
+			active: IdentifiedArrayOf<Sargon.Account>,
+			inactive: IdentifiedArrayOf<Sargon.Account>
 		)
 		case failed
 		case close
@@ -211,7 +211,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 					let accounts = try await publicHDKeys.enumerated().asyncMap { localOffset, publicHDKey in
 						let offset = localOffset + globalOffset
 						let appearanceID = await accountsClient.nextAppearanceID(networkID, offset)
-						return try Profile.Network.Account(
+						return try Sargon.Account(
 							networkID: networkID,
 							factorInstance: HierarchicalDeterministicFactorInstance(
 								factorSourceID: id,
@@ -265,7 +265,7 @@ extension AccountRecoveryScanInProgress {
 
 		let paths = try derivationIndices.map { index in
 			if state.forOlympiaAccounts {
-				try LegacyOlympiaBIP44LikeDerivationPath(
+				try Bip44LikePath(
 					index: index
 				)
 				.wrapAsDerivationPath()
@@ -324,7 +324,7 @@ extension AccountRecoveryScanInProgress {
 	}
 
 	private func scanOnLedger(
-		accounts: IdentifiedArrayOf<Profile.Network.Account>,
+		accounts: IdentifiedArrayOf<Sargon.Account>,
 		state: inout State
 	) -> Effect<Action> {
 		assert(accounts.count == batchSize)
@@ -354,7 +354,7 @@ extension AccountRecoveryScanInProgress {
 }
 
 extension DerivationPath {
-	var index: HD.Path.Component.Child.Value {
+	var index: HDPathValue {
 		do {
 			guard let index = try hdFullPath().children.last?.nonHardenedValue else {
 				fatalError("Expected to ALWAYS be able to read the last path component of an HD paths' index, but was nil.")
@@ -362,21 +362,6 @@ extension DerivationPath {
 			return index
 		} catch {
 			fatalError("Expected to ALWAYS be able to read the last path component of an HD paths' index, got error: \(error)")
-		}
-	}
-}
-
-// MARK: - Profile.Network.Account + Comparable
-extension Profile.Network.Account: Comparable {
-	public static func < (lhs: Self, rhs: Self) -> Bool {
-		lhs.derivationIndex < rhs.derivationIndex
-	}
-}
-
-extension Profile.Network.Account {
-	var derivationIndex: HD.Path.Component.Child.Value {
-		switch securityState {
-		case let .unsecured(uec): uec.transactionSigning.derivationPath.index
 		}
 	}
 }

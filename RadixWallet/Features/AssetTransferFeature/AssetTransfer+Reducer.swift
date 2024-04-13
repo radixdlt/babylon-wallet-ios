@@ -9,7 +9,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		public let isMainnetAccount: Bool
 
 		public init(
-			from account: Profile.Network.Account
+			from account: Sargon.Account
 		) {
 			self.isMainnetAccount = account.networkID == .mainnet
 			self.accounts = .init(fromAccount: account)
@@ -254,7 +254,7 @@ func useTryDepositOrAbort(
 
 /// Determines if depositting the resource into an account requires the addition of a signature
 func needsSignatureForDepositting(
-	into receivingAccount: Profile.Network.Account,
+	into receivingAccount: Sargon.Account,
 	resource resourceAddress: ResourceAddress
 ) async -> Bool {
 	let depositSettings = receivingAccount.onLedgerSettings.thirdPartyDeposits

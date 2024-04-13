@@ -1,6 +1,6 @@
 import Foundation
 
-extension ProfileSnapshot: Codable {
+extension Sargon.Profile: Codable {
 	public func encode(to encoder: any Encoder) throws {
 		sargonProfileREMOVEAtEndOfStage1TEMP()
 	}

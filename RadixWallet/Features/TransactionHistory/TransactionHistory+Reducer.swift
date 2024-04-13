@@ -34,7 +34,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		var availableMonths: IdentifiedArrayOf<DateRangeItem> = []
 
-		let account: Profile.Network.Account
+		let account: Sargon.Account
 
 		let portfolio: OnLedgerEntity.Account
 
@@ -73,7 +73,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destination.State?
 
-		init(account: Profile.Network.Account) throws {
+		init(account: Sargon.Account) throws {
 			@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 
 			guard let portfolio = accountPortfoliosClient.portfolios().first(where: { $0.account.address == account.address }) else {
@@ -197,7 +197,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 			case let .transactionTapped(txid):
 				let path = "transaction/\(txid.bech32EncodedTxId)/summary"
-				let url = Radix.Dashboard.dashboard(forNetworkID: state.account.networkID).url.appending(path: path)
+				let url = RadixDashboard.dashboard(forNetworkID: state.account.networkID).url.appending(path: path)
 				return .run { _ in
 					await openURL(url)
 				}

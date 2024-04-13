@@ -136,7 +136,7 @@ extension LedgerHardwareWalletClient {
 	}
 
 	@discardableResult
-	public func verifyAddress(of account: Profile.Network.Account) async throws -> VerifyAddressOutcome {
+	public func verifyAddress(of account: Sargon.Account) async throws -> VerifyAddressOutcome {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		switch account.securityState {
 		case let .unsecured(unsecuredEntityControl):

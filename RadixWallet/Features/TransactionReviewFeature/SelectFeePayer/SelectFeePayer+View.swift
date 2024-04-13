@@ -104,7 +104,7 @@ extension SelectFeePayer {
 // MARK: - SelectAccountToPayForFeeRow
 enum SelectAccountToPayForFeeRow {
 	struct ViewState: Equatable {
-		let account: Profile.Network.Account
+		let account: Sargon.Account
 		let fungible: ResourceBalance.ViewState.Fungible
 
 		init(candidate: FeePayerCandidate) {

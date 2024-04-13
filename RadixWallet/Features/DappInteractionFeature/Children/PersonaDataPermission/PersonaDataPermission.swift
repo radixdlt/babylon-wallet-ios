@@ -5,7 +5,7 @@ import SwiftUI
 struct PersonaDataPermission: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable {
 		let dappMetadata: DappMetadata
-		let personaID: Profile.Network.Persona.ID
+		let personaID: Persona.ID
 		var persona: PersonaDataPermissionBox.State?
 		let requested: P2P.Dapp.Request.PersonaDataRequestItem
 
@@ -14,7 +14,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 
 		init(
 			dappMetadata: DappMetadata,
-			personaID: Profile.Network.Persona.ID,
+			personaID: Persona.ID,
 			requested: P2P.Dapp.Request.PersonaDataRequestItem
 		) {
 			self.dappMetadata = dappMetadata
@@ -29,7 +29,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case personasLoaded(IdentifiedArrayOf<Profile.Network.Persona>)
+		case personasLoaded(IdentifiedArrayOf<Persona>)
 	}
 
 	enum ChildAction: Sendable, Equatable {
@@ -37,7 +37,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 	}
 
 	enum DelegateAction: Sendable, Equatable {
-		case personaUpdated(Profile.Network.Persona)
+		case personaUpdated(Persona)
 		case continueButtonTapped(P2P.Dapp.Request.Response)
 	}
 

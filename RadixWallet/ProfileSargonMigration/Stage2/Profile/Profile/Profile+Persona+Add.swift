@@ -3,7 +3,7 @@
 // MARK: Add Persona
 extension Profile {
 	public mutating func addPersona(
-		_ persona: Profile.Network.Persona
+		_ persona: Persona
 	) throws {
 //		let networkID = persona.networkID
 //		var network = try network(id: networkID)

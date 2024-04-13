@@ -14,11 +14,11 @@ extension DeviceFactorSourceClient: DependencyKey {
 
 		let entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource = { factorSource, _ in
 
-			let (allNonHiddenEntities, allHiddenEntities) = try await { () -> (allNonHiddenEntities: [EntityPotentiallyVirtual], allHiddenEntities: [EntityPotentiallyVirtual]) in
-				let accountNonHidden: [Profile.Network.Account]
-				let accountHidden: [Profile.Network.Account]
-				let personasNonHidden: [Profile.Network.Persona]
-				let personasHidden: [Profile.Network.Persona]
+			let (allNonHiddenEntities, allHiddenEntities) = try await { () -> (allNonHiddenEntities: [AccountOrPersona], allHiddenEntities: [AccountOrPersona]) in
+				let accountNonHidden: [Sargon.Account]
+				let accountHidden: [Sargon.Account]
+				let personasNonHidden: [Persona]
+				let personasHidden: [Persona]
 
 				// FIXME: Uh this aint pretty... but we are short on time.
 //				if let overridingSnapshot = maybeSnapshot {
@@ -38,11 +38,11 @@ extension DeviceFactorSourceClient: DependencyKey {
 //					personasHidden = try await personasClient.getHiddenPersonasOnCurrentNetwork().elements
 //				}
 
-//				var allNonHiddenEntities = accountNonHidden.map(EntityPotentiallyVirtual.account)
-//				allNonHiddenEntities.append(contentsOf: personasNonHidden.map(EntityPotentiallyVirtual.persona))
+//				var allNonHiddenEntities = accountNonHidden.map(AccountOrPersona.account)
+//				allNonHiddenEntities.append(contentsOf: personasNonHidden.map(AccountOrPersona.persona))
 //
-//				var allHidden = accountHidden.map(EntityPotentiallyVirtual.account)
-//				allHidden.append(contentsOf: personasHidden.map(EntityPotentiallyVirtual.persona))
+//				var allHidden = accountHidden.map(AccountOrPersona.account)
+//				allHidden.append(contentsOf: personasHidden.map(AccountOrPersona.persona))
 //
 //				return (allNonHiddenEntities, allHidden)
 

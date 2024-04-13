@@ -320,16 +320,16 @@ extension OnLedgerEntitiesClient {
 // MARK: - OnLedgerSyncOfAccounts
 public struct OnLedgerSyncOfAccounts: Sendable, Hashable {
 	/// Inactive virtual accounts, unknown to the Ledger OnNetwork.
-	public let inactive: IdentifiedArrayOf<Profile.Network.Account>
+	public let inactive: IdentifiedArrayOf<Sargon.Account>
 	/// Accounts known to the Ledger OnNetwork, with state updated according to that OnNetwork.
-	public let active: IdentifiedArrayOf<Profile.Network.Account>
+	public let active: IdentifiedArrayOf<Sargon.Account>
 }
 
 extension OnLedgerEntitiesClient {
 	/// returns the updated account, else `nil` if account was not changed,
 	public func syncThirdPartyDepositWithOnLedgerSettings(
-		account: Profile.Network.Account
-	) async throws -> Profile.Network.Account? {
+		account: Sargon.Account
+	) async throws -> Sargon.Account? {
 		guard let ruleOfAccount = try await getOnLedgerCustomizedThirdPartyDepositRule(addresses: [account.address]).first else {
 			return nil
 		}
@@ -345,7 +345,7 @@ extension OnLedgerEntitiesClient {
 	}
 
 	public func syncThirdPartyDepositWithOnLedgerSettings(
-		addressesOf accounts: IdentifiedArrayOf<Profile.Network.Account>
+		addressesOf accounts: IdentifiedArrayOf<Sargon.Account>
 	) async throws -> OnLedgerSyncOfAccounts {
 		let activeAddresses: [CustomizedOnLedgerThirdPartDepositForAccount]
 		do {
@@ -355,8 +355,8 @@ extension OnLedgerEntitiesClient {
 		} catch {
 			throw error
 		}
-		var inactive: IdentifiedArrayOf<Profile.Network.Account> = []
-		var active: IdentifiedArrayOf<Profile.Network.Account> = []
+		var inactive: IdentifiedArrayOf<Sargon.Account> = []
+		var active: IdentifiedArrayOf<Sargon.Account> = []
 		for account in accounts { // iterate with `accounts` to retain insertion order.
 			if let onLedgerActiveAccount = activeAddresses.first(where: { $0.address == account.address }) {
 				var activeAccount = account
@@ -371,7 +371,7 @@ extension OnLedgerEntitiesClient {
 
 	public struct CustomizedOnLedgerThirdPartDepositForAccount: Sendable, Hashable {
 		public let address: AccountAddress
-		public let rule: Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule
+		public let rule: Sargon.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule
 	}
 
 	public func getOnLedgerCustomizedThirdPartyDepositRule(

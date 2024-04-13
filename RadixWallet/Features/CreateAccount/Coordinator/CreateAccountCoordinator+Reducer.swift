@@ -94,8 +94,8 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case derivePublicKeysFromDevice
 		case derivePublicKeysFromLedger(LedgerHardwareWalletFactorSource)
-		case createAccountResult(TaskResult<Profile.Network.Account>)
-		case handleAccountCreated(Profile.Network.Account)
+		case createAccountResult(TaskResult<Sargon.Account>)
+		case handleAccountCreated(Sargon.Account)
 		case handleFailure
 	}
 

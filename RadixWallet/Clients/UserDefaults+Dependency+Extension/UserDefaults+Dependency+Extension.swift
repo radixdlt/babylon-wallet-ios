@@ -98,11 +98,11 @@ extension UserDefaults.Dependency {
 		set(value, forKey: Key.showRadixBanner.rawValue)
 	}
 
-	public func getActiveProfileID() -> ProfileSnapshot.Header.ID? {
+	public func getActiveProfileID() -> Sargon.Profile.Header.ID? {
 		string(forKey: Key.activeProfileID.rawValue).flatMap(UUID.init(uuidString:))
 	}
 
-	public func setActiveProfileID(_ id: ProfileSnapshot.Header.UsedDeviceInfo.ID) {
+	public func setActiveProfileID(_ id: Sargon.Profile.Header.UsedDeviceInfo.ID) {
 		set(id.uuidString, forKey: Key.activeProfileID.rawValue)
 	}
 

@@ -5,8 +5,8 @@ import SwiftUI
 public struct ProfileBackupSettings: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var preferences: AppPreferences?
-		public var backupProfileHeaders: ProfileSnapshot.HeaderList?
-		public var selectedProfileHeader: ProfileSnapshot.Header?
+		public var backupProfileHeaders: Sargon.Profile.HeaderList?
+		public var selectedProfileHeader: Sargon.Profile.Header?
 
 		public var thisDeviceID: UUID?
 
@@ -21,8 +21,8 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 		public var profileFile: ExportableProfileFile?
 
 		public init(
-			backupProfileHeaders: ProfileSnapshot.HeaderList? = nil,
-			selectedProfileHeader: ProfileSnapshot.Header? = nil,
+			backupProfileHeaders: Sargon.Profile.HeaderList? = nil,
+			selectedProfileHeader: Sargon.Profile.Header? = nil,
 			thisDeviceID: UUID? = nil
 		) {
 			self.backupProfileHeaders = backupProfileHeaders
@@ -116,7 +116,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedProfileSnapshotToExportAsPlaintext(ProfileSnapshot)
+		case loadedProfileSnapshotToExportAsPlaintext(Sargon.Profile)
 		case loadPreferences(AppPreferences)
 	}
 

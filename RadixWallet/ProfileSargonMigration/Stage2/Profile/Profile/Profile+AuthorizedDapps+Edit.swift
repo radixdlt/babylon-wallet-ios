@@ -14,7 +14,7 @@ struct AuthorizedDappAlreadyExists: Swift.Error {}
 extension Profile {
 	/// Updates a `Persona` in the profile
 	public mutating func updatePersona(
-		_ persona: Profile.Network.Persona
+		_ persona: Persona
 	) throws {
 //		let networkID = persona.networkID
 //		var network = try network(id: networkID)
@@ -95,7 +95,7 @@ extension Profile {
 
 	/// Removes a Persona from a dApp in the Profile
 	public mutating func deauthorizePersonaFromDapp(
-		_ personaID: Profile.Network.Persona.ID,
+		_ personaID: Persona.ID,
 		dAppID: AuthorizedDapp.ID,
 		networkID: NetworkID
 	) throws {
@@ -148,7 +148,7 @@ extension Profile {
 	}
 }
 
-extension Profile.Network.AuthorizedDapps {
+extension Sargon.ProfileNetwork.AuthorizedDapps {
 	public func contains(dapp authorizedDapp: AuthorizedDapp) -> Bool {
 		self[id: authorizedDapp.id] != nil
 	}

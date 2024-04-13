@@ -26,7 +26,7 @@ extension AccountDetails {
 		let isLedgerAccount: Bool
 		let showToolbar: Bool
 		let totalFiatWorth: Loadable<FiatWorth>?
-		let account: Profile.Network.Account
+		let account: Sargon.Account
 	}
 
 	@MainActor

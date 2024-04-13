@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - TransactionSigners
 public struct TransactionSigners: Sendable, Hashable {
 	public let notaryPublicKey: Curve25519.Signing.PublicKey
@@ -5,7 +7,7 @@ public struct TransactionSigners: Sendable, Hashable {
 
 	public enum IntentSigning: Sendable, Hashable {
 		case notaryIsSignatory
-		case intentSigners(NonEmpty<OrderedSet<EntityPotentiallyVirtual>>)
+		case intentSigners(NonEmpty<OrderedSet<AccountOrPersona>>)
 	}
 
 	public init(
@@ -60,7 +62,7 @@ extension TransactionSigners {
 		}
 	}
 
-	public var signerPublicKeys: Set<SLIP10.PublicKey> {
+	public var signerPublicKeys: Set<Sargon.PublicKey> {
 		switch intentSigning {
 		case let .intentSigners(signers):
 			Set(signers.flatMap { $0.virtualHierarchicalDeterministicFactorInstances.map(\.publicKey) })
@@ -69,21 +71,10 @@ extension TransactionSigners {
 		}
 	}
 
-	public func intentSignerEntitiesOrEmpty() -> OrderedSet<EntityPotentiallyVirtual> {
+	public func intentSignerEntitiesOrEmpty() -> OrderedSet<AccountOrPersona> {
 		switch intentSigning {
 		case .notaryIsSignatory: .init()
 		case let .intentSigners(signers): OrderedSet(signers)
-		}
-	}
-}
-
-extension GatewayAPI.PublicKey {
-	init(from slip10: SLIP10.PublicKey) {
-		switch slip10 {
-		case let .eddsaEd25519(pubKey):
-			self = .eddsaEd25519(.init(keyType: .eddsaEd25519, keyHex: pubKey.rawRepresentation.hex))
-		case let .ecdsaSecp256k1(pubKey):
-			self = .ecdsaSecp256k1(.init(keyType: .ecdsaSecp256k1, keyHex: pubKey.compressedRepresentation.hex))
 		}
 	}
 }
@@ -103,11 +94,11 @@ extension GatewayAPI.PublicKey {
 public struct NotarizeTransactionRequest: Sendable, Hashable {
 	public let intentSignatures: Set<SignatureWithPublicKey>
 	public let transactionIntent: TransactionIntent
-	public let notary: SLIP10.PrivateKey
+	public let notary: Curve25519.Signing.PrivateKey
 	public init(
 		intentSignatures: Set<SignatureWithPublicKey>,
 		transactionIntent: TransactionIntent,
-		notary: SLIP10.PrivateKey
+		notary: Curve25519.Signing.PrivateKey
 	) {
 		self.intentSignatures = intentSignatures
 		self.transactionIntent = transactionIntent
@@ -205,13 +196,13 @@ public struct ManifestReviewRequest: Sendable {
 
 // MARK: - FeePayerCandidate
 public struct FeePayerCandidate: Sendable, Hashable, Identifiable {
-	public typealias ID = Profile.Network.Account.ID
+	public typealias ID = Sargon.Account.ID
 	public var id: ID { account.id }
 
-	public let account: Profile.Network.Account
+	public let account: Sargon.Account
 	public let xrdBalance: Decimal192
 
-	public init(account: Profile.Network.Account, xrdBalance: Decimal192) {
+	public init(account: Sargon.Account, xrdBalance: Decimal192) {
 		self.account = account
 		self.xrdBalance = xrdBalance
 	}

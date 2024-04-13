@@ -19,14 +19,14 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		public var mode: Mode
 
 		public enum Mode: Sendable, Hashable {
-			case general(Profile.Network.Persona, dApps: IdentifiedArrayOf<DappInfo>)
+			case general(Persona, dApps: IdentifiedArrayOf<DappInfo>)
 
 			case dApp(
-				Profile.Network.AuthorizedDappDetailed,
-				persona: Profile.Network.AuthorizedPersonaDetailed
+				Sargon.ProfileNetwork.AuthorizedDappDetailed,
+				persona: Sargon.ProfileNetwork.AuthorizedPersonaDetailed
 			)
 
-			var id: Profile.Network.Persona.ID {
+			var id: Persona.ID {
 				switch self {
 				case let .general(persona, _): persona.id
 				case let .dApp(_, persona: persona): persona.id
@@ -71,17 +71,17 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case personaDeauthorized
-		case personaChanged(Profile.Network.Persona.ID)
+		case personaChanged(Persona.ID)
 		case personaHidden
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case editablePersonaFetched(Profile.Network.Persona)
+		case editablePersonaFetched(Persona)
 		case reloaded(State.Mode)
 		case dAppsUpdated(IdentifiedArrayOf<State.DappInfo>)
 		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState)
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
-		case dAppLoaded(Profile.Network.AuthorizedDappDetailed)
+		case dAppLoaded(Sargon.ProfileNetwork.AuthorizedDappDetailed)
 	}
 
 	// MARK: - Destination
@@ -323,7 +323,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	}
 
 	enum ReloadError: Error {
-		case personaNotPresentInDapp(Profile.Network.Persona.ID, AuthorizedDapp.ID)
+		case personaNotPresentInDapp(Persona.ID, AuthorizedDapp.ID)
 	}
 }
 

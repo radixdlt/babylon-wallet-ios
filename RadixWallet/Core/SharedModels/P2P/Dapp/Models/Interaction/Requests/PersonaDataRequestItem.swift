@@ -12,12 +12,6 @@ extension P2P.Dapp.Request {
 			numberOfRequestedEmailAddresses: RequestedQuantity? = nil,
 			numberOfRequestedPhoneNumbers: RequestedQuantity? = nil
 		) {
-			// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
-			// we do not forget to handle it here.
-			switch PersonaData.Entry.Kind.fullName {
-			case .fullName, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
-			}
-
 			self.isRequestingName = isRequestingName
 			self.numberOfRequestedEmailAddresses = numberOfRequestedEmailAddresses
 			self.numberOfRequestedPhoneNumbers = numberOfRequestedPhoneNumbers
@@ -60,12 +54,13 @@ extension P2P.Dapp.Request {
 		public var existingRequestedEntries: [PersonaData.Entry.Kind: [PersonaData.Entry]] = [:]
 
 		public var response: P2P.Dapp.Request.Response? {
-			guard missingEntries.isEmpty else { return nil }
-			return try? .init(
-				name: existingRequestedEntries.extract(.fullName),
-				emailAddresses: existingRequestedEntries.extract(.emailAddress),
-				phoneNumbers: existingRequestedEntries.extract(.phoneNumber)
-			)
+//			guard missingEntries.isEmpty else { return nil }
+//			return try? .init(
+//				name: existingRequestedEntries.extract(.fullName),
+//				emailAddresses: existingRequestedEntries.extract(.emailAddress),
+//				phoneNumbers: existingRequestedEntries.extract(.phoneNumber)
+//			)
+			sargonProfileFinishMigrateAtEndOfStage1()
 		}
 	}
 }

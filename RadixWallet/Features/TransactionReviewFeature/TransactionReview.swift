@@ -493,7 +493,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 
 			if reviewedTransaction.transactionSigners.notaryIsSignatory {
-				let notaryKey: SLIP10.PrivateKey = .curve25519(state.ephemeralNotaryPrivateKey)
+				let notaryKey: Curve25519.Signing.PrivateKey = .curve25519(state.ephemeralNotaryPrivateKey)
 
 				/// Silently sign the transaction with notary keys.
 				return .run { send in
@@ -798,7 +798,7 @@ extension TransactionReview {
 	}
 
 	public enum Account: Sendable, Hashable {
-		case user(Profile.Network.Account)
+		case user(Sargon.Account)
 		case external(AccountAddress, approved: Bool)
 
 		var address: AccountAddress {
@@ -1045,7 +1045,7 @@ func printSigners(_ reviewedTransaction: ReviewedTransaction) {
 
 #if DEBUG
 extension TransactionSigners {
-	func intentSignerEntitiesNonEmptyOrNil() -> NonEmpty<OrderedSet<EntityPotentiallyVirtual>>? {
+	func intentSignerEntitiesNonEmptyOrNil() -> NonEmpty<OrderedSet<AccountOrPersona>>? {
 		switch intentSigning {
 		case let .intentSigners(signers) where !signers.isEmpty:
 			NonEmpty(rawValue: OrderedSet(signers))

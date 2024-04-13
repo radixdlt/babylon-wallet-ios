@@ -398,7 +398,7 @@ extension GatewayAPI {
 	}
 }
 
-extension Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule {
+extension Sargon.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule {
 	public init(gateway: GatewayAPI.DepositRule) {
 		switch gateway {
 		case .accept: self = .acceptAll
@@ -445,8 +445,8 @@ extension OnLedgerEntity {
 		public var poolUnitResources: PoolUnitResources
 
 		public struct Details: Sendable, Hashable, Codable {
-			public let depositRule: Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule
-			public init(depositRule: Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule) {
+			public let depositRule: Sargon.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule
+			public init(depositRule: Sargon.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule) {
 				self.depositRule = depositRule
 			}
 		}

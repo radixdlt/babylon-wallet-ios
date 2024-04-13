@@ -76,10 +76,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			// to much logic and responsibility into this reducer here... for when a mnemonic is displayed
 			// either from settings or from AccountDetails after user have pressed "Back up this mnemonic"
 			// prompt, we need to able to mark a mnemonic as "backed up by user", we do so by use of
-			// `FactorSourceID.FromHash` - which require a FactorSourceKind....
-			public let factorSourceID: FactorSourceID.FromHash
+			// `FactorSourceIDFromHash` - which require a FactorSourceKind....
+			public let factorSourceID: FactorSourceIDFromHash
 
-			public init(context: Context, factorSourceID: FactorSourceID.FromHash) {
+			public init(context: Context, factorSourceID: FactorSourceIDFromHash) {
 				self.context = context
 				self.factorSourceID = factorSourceID
 			}

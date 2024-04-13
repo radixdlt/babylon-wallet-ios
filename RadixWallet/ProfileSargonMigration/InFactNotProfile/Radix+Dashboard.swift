@@ -1,20 +1,18 @@
 import Sargon
 
-// MARK: - Radix.Dashboard
-extension Radix {
-	public struct Dashboard: Sendable, Hashable, Codable, Identifiable, CustomStringConvertible {
-		public typealias ID = URL
+// MARK: - RadixDashboard
+public struct RadixDashboard: Sendable, Hashable, Codable, Identifiable, CustomStringConvertible {
+	public typealias ID = URL
 
-		public let url: URL
-		public var id: ID { url }
+	public let url: URL
+	public var id: ID { url }
 
-		public init(url: URL) {
-			self.url = url
-		}
+	public init(url: URL) {
+		self.url = url
 	}
 }
 
-extension Radix.Dashboard {
+extension RadixDashboard {
 	public static func dashboard(forNetwork network: NetworkDefinition) -> Self {
 		dashboard(forNetworkID: network.id)
 	}
@@ -46,7 +44,7 @@ extension Radix.Dashboard {
 	}
 }
 
-extension Radix.Dashboard {
+extension RadixDashboard {
 	public static var mainnet: Self {
 		.init(
 			url: URL(string: "https://dashboard.radixdlt.com/")!
@@ -108,7 +106,7 @@ extension Radix.Dashboard {
 	}
 }
 
-extension Radix.Dashboard {
+extension RadixDashboard {
 	public var description: String {
 		"""
 		url: \(url)
@@ -116,7 +114,7 @@ extension Radix.Dashboard {
 	}
 }
 
-extension Radix.Dashboard {
+extension RadixDashboard {
 	enum Path: String {
 		case account
 		case recentTransactions = "recent-transactions"
@@ -131,7 +129,7 @@ extension Radix.Dashboard {
 }
 
 extension URL {
-	fileprivate func appending(path: Radix.Dashboard.Path) -> Self {
+	fileprivate func appending(path: RadixDashboard.Path) -> Self {
 		appending(path: path.rawValue)
 	}
 }

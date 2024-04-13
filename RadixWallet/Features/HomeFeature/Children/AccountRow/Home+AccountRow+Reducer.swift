@@ -13,7 +13,7 @@ extension Home {
 			public var totalFiatWorth: Loadable<FiatWorth>
 
 			public init(
-				account: Profile.Network.Account
+				account: Sargon.Account
 			) {
 				self.accountWithInfo = .init(account: account)
 				self.accountWithResources = .loading

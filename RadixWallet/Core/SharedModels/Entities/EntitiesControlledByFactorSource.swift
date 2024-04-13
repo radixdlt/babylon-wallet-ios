@@ -1,18 +1,18 @@
-public typealias NonEmptyAccounts = NonEmpty<IdentifiedArrayOf<Profile.Network.Account>>
+public typealias NonEmptyAccounts = NonEmpty<IdentifiedArrayOf<Sargon.Account>>
 
 // MARK: - EntitiesControlledByFactorSource
 public struct EntitiesControlledByFactorSource: Sendable, Hashable, Identifiable {
 	public typealias ID = FactorSourceID
 	public var id: ID { deviceFactorSource.id.embed() }
-	public let entities: [EntityPotentiallyVirtual]
-	public let hiddenEntities: [EntityPotentiallyVirtual]
+	public let entities: [AccountOrPersona]
+	public let hiddenEntities: [AccountOrPersona]
 	public var isMnemonicPresentInKeychain: Bool
 	public var isMnemonicMarkedAsBackedUp: Bool
 	public let deviceFactorSource: DeviceFactorSource
 
 	public init(
-		entities: [EntityPotentiallyVirtual],
-		hiddenEntities: [EntityPotentiallyVirtual],
+		entities: [AccountOrPersona],
+		hiddenEntities: [AccountOrPersona],
 		deviceFactorSource: DeviceFactorSource,
 		isMnemonicPresentInKeychain: Bool,
 		isMnemonicMarkedAsBackedUp: Bool
@@ -33,8 +33,8 @@ extension EntitiesControlledByFactorSource {
 		}
 
 		public let id: ID
-		public let accounts: IdentifiedArrayOf<Profile.Network.Account>
-		public let hiddenAccounts: IdentifiedArrayOf<Profile.Network.Account>
+		public let accounts: IdentifiedArrayOf<Sargon.Account>
+		public let hiddenAccounts: IdentifiedArrayOf<Sargon.Account>
 	}
 
 	public var olympia: AccountsControlledByKeysOnSameCurve? {
@@ -56,29 +56,29 @@ extension EntitiesControlledByFactorSource {
 	}
 
 	/// Non hidden
-	public var babylonAccounts: IdentifiedArrayOf<Profile.Network.Account> {
+	public var babylonAccounts: IdentifiedArrayOf<Sargon.Account> {
 		accounts.filter(not(\.isOlympiaAccount)).asIdentified()
 	}
 
 	/// hidden
-	public var babylonAccountsHidden: IdentifiedArrayOf<Profile.Network.Account> {
+	public var babylonAccountsHidden: IdentifiedArrayOf<Sargon.Account> {
 		hiddenAccounts.filter(not(\.isOlympiaAccount)).asIdentified()
 	}
 
 	/// Non hidden
-	public var olympiaAccounts: IdentifiedArrayOf<Profile.Network.Account> {
+	public var olympiaAccounts: IdentifiedArrayOf<Sargon.Account> {
 		accounts.filter(\.isOlympiaAccount).asIdentified()
 	}
 
 	/// hidden
-	public var olympiaAccountsHidden: IdentifiedArrayOf<Profile.Network.Account> {
+	public var olympiaAccountsHidden: IdentifiedArrayOf<Sargon.Account> {
 		hiddenAccounts.filter(\.isOlympiaAccount).asIdentified()
 	}
 
-	public var accounts: [Profile.Network.Account] { entities.compactMap { try? $0.asAccount() } }
-	public var hiddenAccounts: [Profile.Network.Account] { hiddenEntities.compactMap { try? $0.asAccount() } }
-	public var personas: [Profile.Network.Persona] { entities.compactMap { try? $0.asPersona() } }
-	public var hiddenPersonas: [Profile.Network.Persona] { hiddenEntities.compactMap { try? $0.asPersona() } }
+	public var accounts: [Sargon.Account] { entities.compactMap { try? $0.asAccount() } }
+	public var hiddenAccounts: [Sargon.Account] { hiddenEntities.compactMap { try? $0.asAccount() } }
+	public var personas: [Persona] { entities.compactMap { try? $0.asPersona() } }
+	public var hiddenPersonas: [Persona] { hiddenEntities.compactMap { try? $0.asPersona() } }
 }
 
 extension EntitiesControlledByFactorSource {
@@ -96,7 +96,7 @@ extension EntitiesControlledByFactorSource {
 		deviceFactorSource.isExplicitMain
 	}
 
-	public var factorSourceID: FactorSourceID.FromHash {
+	public var factorSourceID: FactorSourceIDFromHash {
 		deviceFactorSource.id
 	}
 

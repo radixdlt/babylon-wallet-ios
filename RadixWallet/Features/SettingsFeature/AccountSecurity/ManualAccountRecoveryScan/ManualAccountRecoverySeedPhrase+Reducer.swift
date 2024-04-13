@@ -51,7 +51,7 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case recover(FactorSourceID.FromHash, olympia: Bool)
+		case recover(FactorSourceIDFromHash, olympia: Bool)
 	}
 
 	// MARK: - Reducer

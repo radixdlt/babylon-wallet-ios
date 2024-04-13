@@ -91,23 +91,23 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		@Sendable func saveProfile(
-			snapshot profileSnapshot: ProfileSnapshot,
+			snapshot profileSnapshot: Sargon.Profile,
 			iCloudSyncEnabled: Bool
 		) throws {
 			let data = try jsonEncoder().encode(profileSnapshot)
 			try saveProfile(snapshotData: data, key: profileSnapshot.header.id.keychainKey, iCloudSyncEnabled: iCloudSyncEnabled)
 		}
 
-		@Sendable func loadProfileHeaderList() throws -> ProfileSnapshot.HeaderList? {
+		@Sendable func loadProfileHeaderList() throws -> Sargon.Profile.HeaderList? {
 			try keychainClient
 				.getDataWithoutAuth(forKey: profileHeaderListKeychainKey)
 				.map {
-					try jsonDecoder().decode([ProfileSnapshot.Header].self, from: $0)
+					try jsonDecoder().decode([Sargon.Profile.Header].self, from: $0)
 				}
-				.flatMap(ProfileSnapshot.HeaderList.init)
+				.flatMap(Sargon.Profile.HeaderList.init)
 		}
 
-		@Sendable func saveProfileHeaderList(_ headers: ProfileSnapshot.HeaderList) throws {
+		@Sendable func saveProfileHeaderList(_ headers: Sargon.Profile.HeaderList) throws {
 			let data = try jsonEncoder().encode(headers)
 			try keychainClient.setDataWithoutAuth(
 				data,
@@ -121,7 +121,7 @@ extension SecureStorageClient: DependencyKey {
 			)
 		}
 
-		@Sendable func deleteProfileHeader(_ id: ProfileSnapshot.Header.ID) throws {
+		@Sendable func deleteProfileHeader(_ id: Sargon.Profile.Header.ID) throws {
 			if let profileHeaders = try loadProfileHeaderList() {
 				let remainingHeaders = profileHeaders.filter { $0.id != id }
 				if remainingHeaders.isEmpty {
@@ -138,7 +138,7 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		@Sendable func deleteProfile(
-			_ id: ProfileSnapshot.Header.ID
+			_ id: Sargon.Profile.Header.ID
 		) throws {
 			try keychainClient.removeData(forKey: id.keychainKey)
 			try deleteProfileHeader(id)
@@ -214,7 +214,7 @@ extension SecureStorageClient: DependencyKey {
 			else {
 				return nil
 			}
-			return try jsonDecoder().decode(ProfileSnapshot.self, from: existingSnapshotData)
+			return try jsonDecoder().decode(Sargon.Profile.self, from: existingSnapshotData)
 		}
 
 		let loadMnemonicByFactorSourceID: LoadMnemonicByFactorSourceID = { request in
@@ -253,7 +253,7 @@ extension SecureStorageClient: DependencyKey {
 
 			return keys.compactMap {
 				guard
-					let factorSourceID = FactorSourceID.FromHash(keychainKey: $0),
+					let factorSourceID = FactorSourceIDFromHash(keychainKey: $0),
 					let mnemonicWithPassphrase = try? loadMnemonicByFactorSourceID(
 						.init(factorSourceID: factorSourceID, notifyIfMissing: false)
 					)
@@ -303,7 +303,7 @@ extension SecureStorageClient: DependencyKey {
 
 			guard
 				let profileSnapshot = try? jsonDecoder().decode(
-					ProfileSnapshot.self,
+					Sargon.Profile.self,
 					from: profileSnapshotData
 				)
 			else {
@@ -419,7 +419,7 @@ let profileHeaderListKeychainKey: KeychainClient.Key = "profileHeaderList"
 private let deviceIdentifierKey: KeychainClient.Key = "deviceIdentifier"
 private let deviceInfoKey: KeychainClient.Key = "deviceInfo"
 
-extension ProfileSnapshot.Header.ID {
+extension Sargon.Profile.Header.ID {
 	private static let profileSnapshotKeychainKeyPrefix = "profileSnapshot"
 
 	var keychainKey: KeychainClient.Key {
@@ -427,7 +427,7 @@ extension ProfileSnapshot.Header.ID {
 	}
 }
 
-private func key(factorSourceID: FactorSourceID.FromHash) -> KeychainClient.Key {
+private func key(factorSourceID: FactorSourceIDFromHash) -> KeychainClient.Key {
 	.init(rawValue: .init(rawValue: factorSourceID.keychainKey)!)
 }
 
@@ -438,7 +438,7 @@ extension OverlayWindowClient.Item.AlertState {
 	)
 }
 
-extension FactorSourceID.FromHash {
+extension FactorSourceIDFromHash {
 	init?(keychainKey: KeychainClient.Key) {
 		let key = keychainKey.rawValue.rawValue
 		guard

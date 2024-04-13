@@ -80,7 +80,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public enum DelegateAction: Sendable, Equatable {
 		case failed(Failure)
-		case completed(IdentifiedArrayOf<Profile.Network.Account>)
+		case completed(IdentifiedArrayOf<Sargon.Account>)
 
 		public enum Failure: Sendable, Equatable {
 			case failedToSaveNewLedger
@@ -219,7 +219,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 		case let .derivePublicKeys(.delegate(.derivedPublicKeys(publicKeys, factorSourceID, _))):
 			state.destination = nil
-			guard let ledgerID = factorSourceID.extract(FactorSourceID.FromHash.self) else {
+			guard let ledgerID = factorSourceID.extract(FactorSourceIDFromHash.self) else {
 				loggerGlobal.error("Failed to find ledger with factor sourceID in local state: \(factorSourceID)")
 				return .none
 			}
@@ -306,7 +306,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 			)
 		}
 
-		let derivedKeys: [K1.PublicKey] = derivedPublicKeys.compactMap {
+		let derivedKeys: [Secp256k1PublicKey] = derivedPublicKeys.compactMap {
 			guard case let .ecdsaSecp256k1(k1Key) = $0.publicKey else {
 				return nil
 			}

@@ -5,7 +5,7 @@ public protocol AccountWithInfoHolder {
 }
 
 extension AccountWithInfoHolder {
-	public var account: Profile.Network.Account {
+	public var account: Sargon.Account {
 		get { accountWithInfo.account }
 		set { accountWithInfo.account = newValue }
 	}

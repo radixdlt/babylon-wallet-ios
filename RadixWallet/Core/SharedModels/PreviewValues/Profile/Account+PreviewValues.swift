@@ -1,6 +1,6 @@
 #if DEBUG
 
-extension Profile.Network.Account {
+extension Sargon.Account {
 	public static let previewValue0: Self = try! Self(
 		networkID: .nebunet,
 		address: .init(
@@ -40,8 +40,8 @@ extension Profile.Network.Account {
 	)
 }
 
-extension Profile.Network.Accounts {
-	public static let previewValue = [Profile.Network.Account.previewValue0, Profile.Network.Account.previewValue1].asIdentified()
+extension Sargon.Accounts {
+	public static let previewValue = [Sargon.Account.previewValue0, Sargon.Account.previewValue1].asIdentified()
 }
 
 #endif // DEBUG

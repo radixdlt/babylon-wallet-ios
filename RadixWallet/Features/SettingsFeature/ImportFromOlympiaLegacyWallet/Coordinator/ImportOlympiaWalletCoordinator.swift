@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - ImportOlympiaWalletCoordinator
 public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	public typealias AccountsToMigrate = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
-	public typealias MigratedAccounts = IdentifiedArrayOf<Profile.Network.Account>
+	public typealias MigratedAccounts = IdentifiedArrayOf<Sargon.Account>
 
 	// MARK: State
 
@@ -18,7 +18,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	}
 
 	public struct MigratableAccount: Sendable, Hashable, Identifiable {
-		public let id: K1.PublicKey
+		public let id: Secp256k1PublicKey
 		public let accountName: String?
 		public let olympiaAddress: LegacyOlympiaAccountAddress
 		public let babylonAddress: AccountAddress
@@ -97,7 +97,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			existingAccounts: Int
 		)
 		case checkedIfOlympiaFactorSourceAlreadyExists(
-			FactorSourceID.FromHash?,
+			FactorSourceIDFromHash?,
 			softwareAccounts: AccountsToMigrate
 		)
 		case migratedSoftwareAccountsToBabylon(
@@ -353,7 +353,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	private func checkedIfOlympiaFactorSourceAlreadyExists(
 		in state: inout State,
-		idOfExistingFactorSource: FactorSourceID.FromHash?,
+		idOfExistingFactorSource: FactorSourceIDFromHash?,
 		softwareAccounts: AccountsToMigrate
 	) -> Effect<Action> {
 		guard case let .foundAlreadyImported(progress) = state.progress else { return progressError(state.progress) }
@@ -423,7 +423,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	private func migrateSoftwareAccountsToBabylon(
 		_ olympiaAccounts: AccountsToMigrate,
-		factorSourceID: FactorSourceID.FromHash,
+		factorSourceID: FactorSourceIDFromHash,
 		factorSource: PrivateHDFactorSource?
 	) -> Effect<Action> {
 		.run { send in
@@ -583,7 +583,7 @@ extension ImportOlympiaWalletCoordinator {
 	) throws -> NonEmpty<[MigratableAccount]> {
 		let result = scannedAccounts.enumerated().map { index, account in
 			let babylonAddress = AccountAddress(
-				publicKey: SLIP10.PublicKey.ecdsaSecp256k1(account.publicKey).intoSargon(),
+				publicKey: Sargon.PublicKey.ecdsaSecp256k1(account.publicKey).intoSargon(),
 				networkID: networkID
 			)
 

@@ -24,7 +24,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			self.isMainBDFS = isMainBDFS
 			self.entitiesControlledByFactorSource = ents
 
-			let accounts: IdentifiedArrayOf<Profile.Network.Account> = switch (ents.babylonAccounts.isEmpty, ents.olympiaAccounts.isEmpty) {
+			let accounts: IdentifiedArrayOf<Sargon.Account> = switch (ents.babylonAccounts.isEmpty, ents.olympiaAccounts.isEmpty) {
 			case (false, _):
 				// We prefer Babylon, always.
 				ents.babylonAccounts
@@ -61,10 +61,10 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case persistedMnemonicInKeychain(FactorSourceID.FromHash)
-		case skippedMnemonic(FactorSourceID.FromHash)
-		case createdNewMainBDFS(oldSkipped: FactorSourceID.FromHash, DeviceFactorSource)
-		case failedToSaveInKeychain(FactorSourceID.FromHash)
+		case persistedMnemonicInKeychain(FactorSourceIDFromHash)
+		case skippedMnemonic(FactorSourceIDFromHash)
+		case createdNewMainBDFS(oldSkipped: FactorSourceIDFromHash, DeviceFactorSource)
+		case failedToSaveInKeychain(FactorSourceIDFromHash)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -142,7 +142,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			switch delegateAction {
 			case let .notPersisted(mnemonicWithPassphrase):
 				// FIXME: should always work... but please tidy up!
-				let factorSourceID = try! FactorSourceID.FromHash(
+				let factorSourceID = try! FactorSourceIDFromHash(
 					kind: .device,
 					mnemonicWithPassphrase: mnemonicWithPassphrase
 				)
@@ -208,7 +208,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 
 	private func validate(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		accounts: [Profile.Network.Account],
+		accounts: [Sargon.Account],
 		factorSource: DeviceFactorSource
 	) -> Effect<Action> {
 		func fail(error: Swift.Error?) -> Effect<Action> {

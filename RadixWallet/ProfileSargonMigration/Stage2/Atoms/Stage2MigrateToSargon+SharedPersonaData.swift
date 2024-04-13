@@ -60,7 +60,7 @@ extension SharedPersonaData {
 extension SharedPersonaData {
 	init(
 		requested: P2P.Dapp.Request.PersonaDataRequestItem,
-		persona: Profile.Network.Persona,
+		persona: Persona,
 		provided: P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem
 	) throws {
 		/*

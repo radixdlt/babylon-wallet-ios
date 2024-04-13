@@ -12,7 +12,7 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
-		public var dApps: Profile.Network.AuthorizedDapps = []
+		public var dApps: Sargon.ProfileNetwork.AuthorizedDapps = []
 		public var thumbnails: [AuthorizedDapp.ID: URL] = [:]
 
 		@PresentationState
@@ -31,7 +31,7 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedDapps(TaskResult<Profile.Network.AuthorizedDapps>)
+		case loadedDapps(TaskResult<Sargon.ProfileNetwork.AuthorizedDapps>)
 		case loadedThumbnail(URL, dApp: AuthorizedDapp.ID)
 		case presentDappDetails(DappDetails.State)
 		case failedToGetDetailsOfDapp(id: AuthorizedDapp.ID)

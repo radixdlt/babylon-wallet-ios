@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - ChooseAccountsRow.View
 extension ChooseAccountsRow {
 	struct ViewState: Equatable {
-		let account: Profile.Network.Account
+		let account: Sargon.Account
 		let mode: ChooseAccountsRow.State.Mode
 
 		init(state: ChooseAccountsRow.State) {

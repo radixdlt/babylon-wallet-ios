@@ -233,7 +233,7 @@ extension HierarchicalDeterministicPublicKey {
 			loggerGlobal.error("Bad curve")
 			throw BadCurve()
 		}
-		let publicKey: SLIP10.PublicKey = switch curve {
+		let publicKey: Sargon.PublicKey = switch curve {
 		case .secp256k1:
 			try .ecdsaSecp256k1(.init(compressedRepresentation: keyData))
 		case .curve25519:
@@ -252,7 +252,7 @@ extension HierarchicalDeterministicPublicKey {
 		} catch {
 			derivationPath = try .init(
 				scheme: .bip44Olympia,
-				path: LegacyOlympiaBIP44LikeDerivationPath(
+				path: Bip44LikePath(
 					derivationPath: path
 				)
 				.derivationPath

@@ -13,7 +13,7 @@ extension Login {
 		let continueButtonRequirements: ContinueButtonRequirements?
 
 		struct ContinueButtonRequirements: Equatable {
-			let persona: Profile.Network.Persona
+			let persona: Persona
 		}
 
 		init(state: Login.State) {

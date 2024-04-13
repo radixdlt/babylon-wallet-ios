@@ -43,7 +43,7 @@ extension AccountPortfoliosClient {
 			@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 			@Dependency(\.cacheClient) var cacheClient
 
-			let changedAccounts: [Profile.Network.Account.EntityAddress]?
+			let changedAccounts: [Sargon.Account.EntityAddress]?
 			let poolAddressesToRefresh: [PoolAddress]?
 			do {
 				let manifest = intent.manifest

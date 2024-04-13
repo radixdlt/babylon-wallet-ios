@@ -5,7 +5,7 @@ public struct MigratedSoftwareAccounts: Sendable, Hashable {
 	public let networkID: NetworkID
 
 	public let accounts: NonEmpty<OrderedSet<MigratedAccount>>
-	public var babylonAccounts: Profile.Network.Accounts {
+	public var babylonAccounts: Sargon.Accounts {
 		accounts.rawValue.elements.map(\.babylon).asIdentified()
 	}
 

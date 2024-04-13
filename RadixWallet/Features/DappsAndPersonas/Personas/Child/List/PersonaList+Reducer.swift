@@ -20,7 +20,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 		}
 
 		public init(
-			dApp: Profile.Network.AuthorizedDappDetailed
+			dApp: Sargon.ProfileNetwork.AuthorizedDappDetailed
 		) {
 			self.init(
 				personas: dApp.detailedAuthorizedPersonas.map(PersonaReducer.State.init).asIdentified(),
@@ -30,7 +30,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 
 		public enum ReloadingStrategy: Sendable, Hashable {
 			case all
-			case ids(OrderedSet<Profile.Network.Persona.ID>)
+			case ids(OrderedSet<Persona.ID>)
 			case dApp(AuthorizedDapp.ID)
 		}
 	}
@@ -46,8 +46,8 @@ public struct PersonaList: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case createNewPersona
-		case openDetails(Profile.Network.Persona)
-		case exportMnemonic(Profile.Network.Persona)
+		case openDetails(Persona)
+		case exportMnemonic(Persona)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -66,20 +66,21 @@ public struct PersonaList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			.run { [strategy = state.strategy] send in
-				for try await personas in await personasClient.personas() {
-					guard !Task.isCancelled else { return }
-					let ids = try await personaIDs(strategy) ?? personas.ids
-					let result = ids.compactMap { personas[id: $0] }.map(PersonaReducer.State.init)
-					guard result.count == ids.count else {
-						throw UpdatePersonaError.personasMissingFromClient(ids.subtracting(result.map(\.id)))
-					}
-					await send(.internal(.personasLoaded(result.asIdentified())))
-				}
-			} catch: { error, _ in
-				loggerGlobal.error("Failed to update personas from client, error: \(error)")
-				errorQueue.schedule(error)
-			}
+//			.run { [strategy = state.strategy] send in
+//				for try await personas in await personasClient.personas() {
+//					guard !Task.isCancelled else { return }
+//					let ids = try await personaIDs(strategy) ?? personas.ids
+//					let result = ids.compactMap { personas[id: $0] }.map(PersonaReducer.State.init)
+//					guard result.count == ids.count else {
+//						throw UpdatePersonaError.personasMissingFromClient(ids.subtracting(result.map(\.id)))
+//					}
+//					await send(.internal(.personasLoaded(result.asIdentified())))
+//				}
+//			} catch: { error, _ in
+//				loggerGlobal.error("Failed to update personas from client, error: \(error)")
+//				errorQueue.schedule(error)
+//			}
+			sargonProfileFinishMigrateAtEndOfStage1()
 
 		case .createNewPersonaButtonTapped:
 			.send(.delegate(.createNewPersona))
@@ -87,11 +88,11 @@ public struct PersonaList: Sendable, FeatureReducer {
 	}
 
 	enum UpdatePersonaError: Error {
-		case personasMissingFromClient(OrderedSet<Profile.Network.Persona.ID>)
+		case personasMissingFromClient(OrderedSet<Persona.ID>)
 	}
 
 	/// Returns the ids of personas to include under the given strategy. nil means that all ids should be included
-	private func personaIDs(_ strategy: State.ReloadingStrategy) async throws -> OrderedSet<Profile.Network.Persona.ID>? {
+	private func personaIDs(_ strategy: State.ReloadingStrategy) async throws -> OrderedSet<Persona.ID>? {
 		switch strategy {
 		case .all:
 			return nil

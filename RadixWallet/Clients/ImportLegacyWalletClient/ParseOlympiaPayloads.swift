@@ -10,17 +10,17 @@ extension Olympia {
 
 		public struct Account: Sendable, Hashable {
 			public let accountType: Olympia.AccountType
-			public let publicKey: K1.PublicKey
+			public let publicKey: Secp256k1PublicKey
 			public let displayName: NonEmptyString?
 			/// the non hardened value of the path
-			public let addressIndex: HD.Path.Component.Child.Value
+			public let addressIndex: HDPathValue
 		}
 	}
 }
 
 extension Olympia.Export {
 	public static let accountNameForbiddenCharReplacement = "_"
-	public static let accountNameMaxLength = Profile.Network.Account.nameMaxLength
+	public static let accountNameMaxLength = Sargon.Account.nameMaxLength
 
 	public enum Separator: Sendable, Hashable, CaseIterable {
 		static let inter = "~"
@@ -198,14 +198,14 @@ extension CAP33 {
 			throw ParseFailure.accountPublicKeyInvalidByteCount
 		}
 
-		let publicKey: K1.PublicKey
+		let publicKey: Secp256k1PublicKey
 		do {
-			publicKey = try K1.PublicKey(compressedRepresentation: publicKeyData)
+			publicKey = try Secp256k1PublicKey(compressedRepresentation: publicKeyData)
 		} catch {
 			throw ParseFailure.accountPublicKeyInvalidSecp256k1PublicKey
 		}
 
-		guard let bip44LikeAddressIndex = HD.Path.Component.Child.Value(components[2]) else {
+		guard let bip44LikeAddressIndex = HDPathValue(components[2]) else {
 			throw ParseFailure.accountAddressIndex
 		}
 

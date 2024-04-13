@@ -48,29 +48,30 @@ extension Indentation {
 
 extension ProfileView {
 	public var body: some View {
-		ScrollView {
-			VStack(alignment: .leading, spacing: indentation.spacing) {
-				HeaderView(
-					header: profile.header,
-					indentation: inOneLevel
-				)
-
-				PerNetworkView(
-					networks: profile.networks,
-					indentation: inOneLevel
-				)
-
-				AppPreferencesView(
-					appPreferences: profile.appPreferences,
-					indentation: inOneLevel
-				)
-
-				FactorSourcesView(
-					factorSources: profile.factorSources,
-					indentation: inOneLevel
-				)
-			}
-		}
+//		ScrollView {
+//			VStack(alignment: .leading, spacing: indentation.spacing) {
+//				HeaderView(
+//					header: profile.header,
+//					indentation: inOneLevel
+//				)
+//
+//				PerNetworkView(
+//					networks: profile.networks,
+//					indentation: inOneLevel
+//				)
+//
+//				AppPreferencesView(
+//					appPreferences: profile.appPreferences,
+//					indentation: inOneLevel
+//				)
+//
+//				FactorSourcesView(
+//					factorSources: profile.factorSources,
+//					indentation: inOneLevel
+//				)
+//			}
+//		}
+		Text("Migrate me")
 	}
 }
 
@@ -79,674 +80,679 @@ public protocol IndentedView: SwiftUI.View {
 	var indentation: Indentation { get }
 }
 
-extension IndentedView {
-	public var inOneLevel: Indentation {
-		indentation.inOneLevel
-	}
+/*
+ extension IndentedView {
+ 	public var inOneLevel: Indentation {
+ 		indentation.inOneLevel
+ 	}
 
-	public var leadingPadding: CGFloat {
-		indentation.leadingPadding
-	}
-}
+ 	public var leadingPadding: CGFloat {
+ 		indentation.leadingPadding
+ 	}
+ }
 
-// MARK: - HeaderView
-public struct HeaderView: IndentedView {
-	public let header: ProfileSnapshot.Header
-	public let indentation: Indentation
+ // MARK: - HeaderView
+ public struct HeaderView: IndentedView {
+ 	public let header: Sargon.Profile.Header
+ 	public let indentation: Indentation
 
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Labeled("ID", value: header.id)
-			Labeled("Snapshot version", value: header.snapshotVersion)
-			CreatingDeviceView(device: header.creatingDevice, indentation: inOneLevel)
-			HeaderHintView(hint: header.contentHint, indentation: inOneLevel)
-		}
-	}
-}
+ 	public var body: some View {
+ 		VStack(alignment: .leading, spacing: indentation.spacing) {
+ 			Labeled("ID", value: header.id)
+ 			Labeled("Snapshot version", value: header.snapshotVersion)
+ 			CreatingDeviceView(device: header.creatingDevice, indentation: inOneLevel)
+ 			HeaderHintView(hint: header.contentHint, indentation: inOneLevel)
+ 		}
+ 	}
+ }
 
-// MARK: - CreatingDeviceView
-public struct CreatingDeviceView: IndentedView {
-	public let device: ProfileSnapshot.Header.UsedDeviceInfo
-	public let indentation: Indentation
+ // MARK: - CreatingDeviceView
+ public struct CreatingDeviceView: IndentedView {
+ 	public let device: Sargon.Profile.Header.UsedDeviceInfo
+ 	public let indentation: Indentation
 
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Labeled("Device ID", value: device.id)
-			Labeled("Creation date", value: device.date.ISO8601Format())
-			Labeled("Device", value: device.description)
-		}
-	}
-}
+ 	public var body: some View {
+ 		VStack(alignment: .leading, spacing: indentation.spacing) {
+ 			Labeled("Device ID", value: device.id)
+ 			Labeled("Creation date", value: device.date.ISO8601Format())
+ 			Labeled("Device", value: device.description)
+ 		}
+ 	}
+ }
 
-// MARK: - HeaderHintView
-public struct HeaderHintView: IndentedView {
-	public let hint: ProfileSnapshot.Header.ContentHint
-	public let indentation: Indentation
+ // MARK: - HeaderHintView
+ public struct HeaderHintView: IndentedView {
+ 	public let hint: Sargon.Profile.Header.ContentHint
+ 	public let indentation: Indentation
 
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Labeled("#Networks", value: hint.numberOfNetworks)
-			Labeled("#Accounts", value: hint.numberOfAccountsOnAllNetworksInTotal)
-			Labeled("#Personas", value: hint.numberOfPersonasOnAllNetworksInTotal)
-		}
-	}
-}
+ 	public var body: some View {
+ 		VStack(alignment: .leading, spacing: indentation.spacing) {
+ 			Labeled("#Networks", value: hint.numberOfNetworks)
+ 			Labeled("#Accounts", value: hint.numberOfAccountsOnAllNetworksInTotal)
+ 			Labeled("#Personas", value: hint.numberOfPersonasOnAllNetworksInTotal)
+ 		}
+ 	}
+ }
 
-// MARK: - FactorSourcesView
-public struct FactorSourcesView: IndentedView {
-	public let factorSources: FactorSources
-	public let indentation: Indentation
-}
+ // MARK: - FactorSourcesView
+ public struct FactorSourcesView: IndentedView {
+ 	public let factorSources: FactorSources
+ 	public let indentation: Indentation
+ }
 
-extension FactorSourcesView {
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Text("Factor Sources")
-				.fontWeight(.heavy)
-				.textCase(.uppercase)
-			#if os(macOS)
-				.font(.title)
-			#endif // os(macOS)
+ extension FactorSourcesView {
+ 	public var body: some View {
+ 		VStack(alignment: .leading, spacing: indentation.spacing) {
+ 			Text("Factor Sources")
+ 				.fontWeight(.heavy)
+ 				.textCase(.uppercase)
+ 			#if os(macOS)
+ 				.font(.title)
+ 			#endif // os(macOS)
 
-			ForEach(factorSources) { factorSource in
-				DebugInspectFactorSourceView(
-					factorSource: factorSource,
-					indentation: inOneLevel
-				)
-			}
-		}
-		.padding(.leading, leadingPadding)
-	}
-}
+ 			ForEach(factorSources) { factorSource in
+ 				DebugInspectFactorSourceView(
+ 					factorSource: factorSource,
+ 					indentation: inOneLevel
+ 				)
+ 			}
+ 		}
+ 		.padding(.leading, leadingPadding)
+ 	}
+ }
 
-// MARK: - DebugInspectFactorSourceView
-public struct DebugInspectFactorSourceView: IndentedView {
-	public let factorSource: FactorSource
-	public let indentation: Indentation
-}
+ // MARK: - DebugInspectFactorSourceView
+ public struct DebugInspectFactorSourceView: IndentedView {
+ 	public let factorSource: FactorSource
+ 	public let indentation: Indentation
+ }
 
-extension DebugInspectFactorSourceView {
-	public var body: some View {
-		VStack(alignment: .leading, spacing: 2) {
-			Text("Factor Source")
-				.fontWeight(.heavy)
-			#if os(macOS)
-				.font(.title)
-			#endif // os(macOS)
+ extension DebugInspectFactorSourceView {
+ 	public var body: some View {
+ 		VStack(alignment: .leading, spacing: 2) {
+ 			Text("Factor Source")
+ 				.fontWeight(.heavy)
+ 			#if os(macOS)
+ 				.font(.title)
+ 			#endif // os(macOS)
 
-			Labeled("ID", value: factorSource.id)
+ 			Labeled("ID", value: factorSource.id)
 
-			switch factorSource {
-			case let .device(deviceFactorSource):
-				DeviceFactorSouceView(deviceFactorSource: deviceFactorSource)
-			case let .ledger(ledgerFactorSource):
-				LedgerFactorSourceView(ledgerFactorSource: ledgerFactorSource)
-			case let .offDeviceMnemonic(offDeviceMnemonicFactorSource):
-				OffDeviceMnemonicFactorSourceView(offDeviceMnemonicFactorSource: offDeviceMnemonicFactorSource)
-			case let .securityQuestions(questionsFactorSource):
-				// FIXME: impl me
-				Text("\(String(describing: questionsFactorSource))")
-			case let .trustedContact(trustedContact):
-				// FIXME: impl me
-				Text("\(String(describing: trustedContact))")
-			}
-			FactorSourceCommonView(common: factorSource.common)
-		}
-		.background {
-			Color.randomDark(seed: factorSource.id.description.data(using: .utf8)!)
-		}
-		.foregroundColor(.white)
-		.padding(.leading, leadingPadding)
-		.overlay {
-			if factorSource.isExplicitMain {
-				RoundedRectangle(cornerRadius: 4)
-					.stroke(.green, lineWidth: 10)
-			}
-		}
-	}
-}
+ 			switch factorSource {
+ 			case let .device(deviceFactorSource):
+ 				DeviceFactorSouceView(deviceFactorSource: deviceFactorSource)
+ 			case let .ledger(ledgerFactorSource):
+ 				LedgerFactorSourceView(ledgerFactorSource: ledgerFactorSource)
+ 			case let .offDeviceMnemonic(offDeviceMnemonicFactorSource):
+ 				OffDeviceMnemonicFactorSourceView(offDeviceMnemonicFactorSource: offDeviceMnemonicFactorSource)
+ 			case let .securityQuestions(questionsFactorSource):
+ 				// FIXME: impl me
+ 				Text("\(String(describing: questionsFactorSource))")
+ 			case let .trustedContact(trustedContact):
+ 				// FIXME: impl me
+ 				Text("\(String(describing: trustedContact))")
+ 			}
+ 			FactorSourceCommonView(common: factorSource.common)
+ 		}
+ 		.background {
+ 			Color.randomDark(seed: factorSource.id.description.data(using: .utf8)!)
+ 		}
+ 		.foregroundColor(.white)
+ 		.padding(.leading, leadingPadding)
+ 		.overlay {
+ 			if factorSource.isExplicitMain {
+ 				RoundedRectangle(cornerRadius: 4)
+ 					.stroke(.green, lineWidth: 10)
+ 			}
+ 		}
+ 	}
+ }
 
-// MARK: - FactorSourceCommonView
-extension FactorSource {
-	var isExplicitMain: Bool {
-		switch self {
-		case let .device(deviceFactorSource):
-			deviceFactorSource.isExplicitMain
-		default: false
-		}
-	}
-}
+ // MARK: - FactorSourceCommonView
+ extension FactorSource {
+ 	var isExplicitMain: Bool {
+ 		switch self {
+ 		case let .device(deviceFactorSource):
+ 			deviceFactorSource.isExplicitMain
+ 		default: false
+ 		}
+ 	}
+ }
 
-// MARK: - FactorSourceCommonView
-public struct FactorSourceCommonView: View {
-	public let common: FactorSource.Common
-	public var body: some View {
-		Labeled("Added On", value: common.addedOn.ISO8601Format())
-		Labeled("LastUsed On", value: common.lastUsedOn.ISO8601Format())
-		Labeled("Supported Curves", value: common.cryptoParameters.supportedCurves.map { String(describing: $0) }.joined(separator: ", "))
-		Labeled("Supported Derivation", value: common.cryptoParameters.supportedDerivationPathSchemes.map { String(describing: $0) }.joined(separator: ", "))
-	}
-}
+ // MARK: - FactorSourceCommonView
+ public struct FactorSourceCommonView: View {
+ 	public let common: FactorSource.Common
+ 	public var body: some View {
+ 		Labeled("Added On", value: common.addedOn.ISO8601Format())
+ 		Labeled("LastUsed On", value: common.lastUsedOn.ISO8601Format())
+ 		Labeled("Supported Curves", value: common.cryptoParameters.supportedCurves.map { String(describing: $0) }.joined(separator: ", "))
+ 		Labeled("Supported Derivation", value: common.cryptoParameters.supportedDerivationPathSchemes.map { String(describing: $0) }.joined(separator: ", "))
+ 	}
+ }
 
-// MARK: - DeviceFactorSouceView
-public struct DeviceFactorSouceView: View {
-	public let deviceFactorSource: DeviceFactorSource
-	var isMain: Bool { deviceFactorSource.flags.contains(.main) }
-	public var body: some View {
-		Labeled("Is Main?", value: isMain)
-			.fontWeight(.heavy)
-		Labeled("Name", value: deviceFactorSource.hint.name)
-		Labeled("Model", value: deviceFactorSource.hint.model.rawValue)
-	}
-}
+ // MARK: - DeviceFactorSouceView
+ public struct DeviceFactorSouceView: View {
+ 	public let deviceFactorSource: DeviceFactorSource
+ 	var isMain: Bool { deviceFactorSource.flags.contains(.main) }
+ 	public var body: some View {
+ 		Labeled("Is Main?", value: isMain)
+ 			.fontWeight(.heavy)
+ 		Labeled("Name", value: deviceFactorSource.hint.name)
+ 		Labeled("Model", value: deviceFactorSource.hint.model.rawValue)
+ 	}
+ }
 
-// MARK: - LedgerFactorSourceView
-public struct LedgerFactorSourceView: View {
-	public let ledgerFactorSource: LedgerHardwareWalletFactorSource
-	public var body: some View {
-		Labeled("Name", value: ledgerFactorSource.hint.name)
-		Labeled("Model", value: ledgerFactorSource.hint.model.rawValue)
-	}
-}
+ // MARK: - LedgerFactorSourceView
+ public struct LedgerFactorSourceView: View {
+ 	public let ledgerFactorSource: LedgerHardwareWalletFactorSource
+ 	public var body: some View {
+ 		Labeled("Name", value: ledgerFactorSource.hint.name)
+ 		Labeled("Model", value: ledgerFactorSource.hint.model.rawValue)
+ 	}
+ }
 
-// MARK: - OffDeviceMnemonicFactorSourceView
-public struct OffDeviceMnemonicFactorSourceView: View {
-	public let offDeviceMnemonicFactorSource: OffDeviceMnemonicFactorSource
-	public var body: some View {
-		Labeled("Word count", value: offDeviceMnemonicFactorSource.bip39Parameters.wordCount)
-		Labeled("Language", value: offDeviceMnemonicFactorSource.bip39Parameters.language)
-		Labeled("Passphrase?", value: offDeviceMnemonicFactorSource.bip39Parameters.bip39PassphraseSpecified)
-		Labeled("Label", value: offDeviceMnemonicFactorSource.hint.label)
-	}
-}
+ // MARK: - OffDeviceMnemonicFactorSourceView
+ public struct OffDeviceMnemonicFactorSourceView: View {
+ 	public let offDeviceMnemonicFactorSource: OffDeviceMnemonicFactorSource
+ 	public var body: some View {
+ 		Labeled("Word count", value: offDeviceMnemonicFactorSource.bip39Parameters.wordCount)
+ 		Labeled("Language", value: offDeviceMnemonicFactorSource.bip39Parameters.language)
+ 		Labeled("Passphrase?", value: offDeviceMnemonicFactorSource.bip39Parameters.bip39PassphraseSpecified)
+ 		Labeled("Label", value: offDeviceMnemonicFactorSource.hint.label)
+ 	}
+ }
 
-// MARK: - AppPreferencesView
-public struct AppPreferencesView: IndentedView {
-	public let appPreferences: AppPreferences
-	public let indentation: Indentation
-}
+ // MARK: - AppPreferencesView
+ public struct AppPreferencesView: IndentedView {
+ 	public let appPreferences: AppPreferences
+ 	public let indentation: Indentation
+ }
 
-extension AppPreferencesView {
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Text("App Preferences")
-				.fontWeight(.heavy)
-				.textCase(.uppercase)
-			#if os(macOS)
-				.font(.title)
-			#endif // os(macOS)
-			DisplayView(
-				display: appPreferences.display,
-				indentation: inOneLevel
-			)
+ extension AppPreferencesView {
+ 	public var body: some View {
+ 		VStack(alignment: .leading, spacing: indentation.spacing) {
+ 			Text("App Preferences")
+ 				.fontWeight(.heavy)
+ 				.textCase(.uppercase)
+ 			#if os(macOS)
+ 				.font(.title)
+ 			#endif // os(macOS)
+ 			DisplayView(
+ 				display: appPreferences.display,
+ 				indentation: inOneLevel
+ 			)
 
-			GatewaysView(
-				gateways: appPreferences.gateways,
-				indentation: inOneLevel
-			)
+ 			GatewaysView(
+ 				gateways: appPreferences.gateways,
+ 				indentation: inOneLevel
+ 			)
 
-			AppSecurityView(
-				security: appPreferences.security,
-				indentation: inOneLevel
-			)
-		}
-		.padding(.leading, leadingPadding)
-	}
-}
+ 			AppSecurityView(
+ 				security: appPreferences.security,
+ 				indentation: inOneLevel
+ 			)
+ 		}
+ 		.padding(.leading, leadingPadding)
+ 	}
+ }
 
-// MARK: - GatewaysView
-public struct GatewaysView: IndentedView {
-	public let gateways: Gateways
-	public let indentation: Indentation
-}
+ // MARK: - GatewaysView
+ public struct GatewaysView: IndentedView {
+ 	public let gateways: Gateways
+ 	public let indentation: Indentation
+ }
 
-extension GatewaysView {
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			ForEach(gateways.all) { gateway in
-				GatewayView(
-					gateway: gateway,
-					isCurrent: self.gateways.current == gateway,
-					indentation: inOneLevel
-				)
-			}
-		}
-		.padding(.leading, leadingPadding)
-	}
-}
+ extension GatewaysView {
+ 	public var body: some View {
+ 		VStack(alignment: .leading, spacing: indentation.spacing) {
+ 			ForEach(gateways.all) { gateway in
+ 				GatewayView(
+ 					gateway: gateway,
+ 					isCurrent: self.gateways.current == gateway,
+ 					indentation: inOneLevel
+ 				)
+ 			}
+ 		}
+ 		.padding(.leading, leadingPadding)
+ 	}
+ }
 
-// MARK: - GatewayView
-public struct GatewayView: IndentedView {
-	public let gateway: Gateway
-	public let isCurrent: Bool
-	public let indentation: Indentation
-}
+ // MARK: - GatewayView
+ public struct GatewayView: IndentedView {
+ 	public let gateway: Gateway
+ 	public let isCurrent: Bool
+ 	public let indentation: Indentation
+ }
 
-extension GatewayView {
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Text("Network & Gateway")
-				.fontWeight(.heavy)
-			#if os(macOS)
-				.font(.title)
-			#endif // os(macOS)
-			Labeled("Network Name", value: gateway.network.logicalName)
-			Labeled("Network ID", value: gateway.network.id.description)
-			if isCurrent {
-				Text("Is current gateway ✅")
-			}
-			Labeled("Gateway API Base URL", value: gateway.url.absoluteString)
-		}
-		.padding(.leading, leadingPadding)
-	}
-}
+ extension GatewayView {
+ 	public var body: some View {
+ 		VStack(alignment: .leading, spacing: indentation.spacing) {
+ 			Text("Network & Gateway")
+ 				.fontWeight(.heavy)
+ 			#if os(macOS)
+ 				.font(.title)
+ 			#endif // os(macOS)
+ 			Labeled("Network Name", value: gateway.network.logicalName)
+ 			Labeled("Network ID", value: gateway.network.id.description)
+ 			if isCurrent {
+ 				Text("Is current gateway ✅")
+ 			}
+ 			Labeled("Gateway API Base URL", value: gateway.url.absoluteString)
+ 		}
+ 		.padding(.leading, leadingPadding)
+ 	}
+ }
 
-// MARK: - DisplayView
-public struct DisplayView: IndentedView {
-	public let display: AppDisplay
-	public let indentation: Indentation
-}
+ // MARK: - DisplayView
+ public struct DisplayView: IndentedView {
+ 	public let display: AppDisplay
+ 	public let indentation: Indentation
+ }
 
-extension DisplayView {
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Text("Display")
-				.fontWeight(.heavy)
-			#if os(macOS)
-				.font(.title)
-			#endif // os(macOS)
-			Labeled("Currency", value: display.fiatCurrencyPriceTarget.rawValue)
-		}
-		.padding(.leading, leadingPadding)
-	}
-}
+ extension DisplayView {
+ 	public var body: some View {
+ 		VStack(alignment: .leading, spacing: indentation.spacing) {
+ 			Text("Display")
+ 				.fontWeight(.heavy)
+ 			#if os(macOS)
+ 				.font(.title)
+ 			#endif // os(macOS)
+ 			Labeled("Currency", value: display.fiatCurrencyPriceTarget.rawValue)
+ 		}
+ 		.padding(.leading, leadingPadding)
+ 	}
+ }
 
-// MARK: - AppSecurityView
-public struct AppSecurityView: IndentedView {
-	public let security: Security
-	public let indentation: Indentation
-}
+ // MARK: - AppSecurityView
+ public struct AppSecurityView: IndentedView {
+ 	public let security: Security
+ 	public let indentation: Indentation
+ }
 
-extension AppSecurityView {
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Text("App Security")
-				.fontWeight(.heavy)
-			#if os(macOS)
-				.font(.title)
-			#endif // os(macOS)
-			Labeled("isCloudProfileSyncEnabled", value: String(describing: security.isCloudProfileSyncEnabled))
-			Labeled("isDeveloperModeEnabled", value: String(describing: security.isDeveloperModeEnabled))
-		}
-		.padding(.leading, leadingPadding)
-	}
-}
+ extension AppSecurityView {
+ 	public var body: some View {
+ 		VStack(alignment: .leading, spacing: indentation.spacing) {
+ 			Text("App Security")
+ 				.fontWeight(.heavy)
+ 			#if os(macOS)
+ 				.font(.title)
+ 			#endif // os(macOS)
+ 			Labeled("isCloudProfileSyncEnabled", value: String(describing: security.isCloudProfileSyncEnabled))
+ 			Labeled("isDeveloperModeEnabled", value: String(describing: security.isDeveloperModeEnabled))
+ 		}
+ 		.padding(.leading, leadingPadding)
+ 	}
+ }
 
-// MARK: - AuthorizedDappsView
-public struct AuthorizedDappsView: IndentedView {
-	public let authorizedDapps: Profile.Network.AuthorizedDapps
-	public let indentation: Indentation
-	public let getDetailedAuthorizedDapp: (AuthorizedDapp) -> Profile.Network.AuthorizedDappDetailed?
-}
+ // MARK: - AuthorizedDappsView
+ public struct AuthorizedDappsView: IndentedView {
+ 	public let authorizedDapps: Sargon.ProfileNetwork.AuthorizedDapps
+ 	public let indentation: Indentation
+ 	public let getDetailedAuthorizedDapp: (AuthorizedDapp) -> Sargon.ProfileNetwork.AuthorizedDappDetailed?
+ }
 
-extension AuthorizedDappsView {
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Text("Authorized Dapps")
-				.fontWeight(.heavy)
-			#if os(macOS)
-				.font(.title)
-			#endif // os(macOS)
-			if authorizedDapps.isEmpty {
-				Text("<None yet>").font(.callout)
-			} else {
-				ForEach(authorizedDapps) { authorizedDapp in
-					AuthorizedDappView(
-						authorizedDapp: authorizedDapp,
-						indentation: inOneLevel,
-						authorizedPersonas: getDetailedAuthorizedDapp(authorizedDapp)?.detailedAuthorizedPersonas
-					)
-				}
-			}
-		}
-		.padding(.leading, leadingPadding)
-	}
-}
+ extension AuthorizedDappsView {
+ 	public var body: some View {
+ 		VStack(alignment: .leading, spacing: indentation.spacing) {
+ 			Text("Authorized Dapps")
+ 				.fontWeight(.heavy)
+ 			#if os(macOS)
+ 				.font(.title)
+ 			#endif // os(macOS)
+ 			if authorizedDapps.isEmpty {
+ 				Text("<None yet>").font(.callout)
+ 			} else {
+ 				ForEach(authorizedDapps) { authorizedDapp in
+ 					AuthorizedDappView(
+ 						authorizedDapp: authorizedDapp,
+ 						indentation: inOneLevel,
+ 						authorizedPersonas: getDetailedAuthorizedDapp(authorizedDapp)?.detailedAuthorizedPersonas
+ 					)
+ 				}
+ 			}
+ 		}
+ 		.padding(.leading, leadingPadding)
+ 	}
+ }
 
-// MARK: - AuthorizedDappView
-public struct AuthorizedDappView: IndentedView {
-	public let authorizedDapp: AuthorizedDapp
-	public let indentation: Indentation
-	public let authorizedPersonas: IdentifiedArrayOf<Profile.Network.AuthorizedPersonaDetailed>?
-}
+ // MARK: - AuthorizedDappView
+ public struct AuthorizedDappView: IndentedView {
+ 	public let authorizedDapp: AuthorizedDapp
+ 	public let indentation: Indentation
+ 	public let authorizedPersonas: IdentifiedArrayOf<Sargon.ProfileNetwork.AuthorizedPersonaDetailed>?
+ }
 
-extension AuthorizedDappView {
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Labeled("Name", value: String(describing: authorizedDapp.displayName))
-			Labeled("Dapp def address", value: String(describing: authorizedDapp.dAppDefinitionAddress))
+ extension AuthorizedDappView {
+ 	public var body: some View {
+ 		VStack(alignment: .leading, spacing: indentation.spacing) {
+ 			Labeled("Name", value: String(describing: authorizedDapp.displayName))
+ 			Labeled("Dapp def address", value: String(describing: authorizedDapp.dAppDefinitionAddress))
 
-			if let authorizedPersonas {
-				ForEach(authorizedPersonas) {
-					DappAuthorizedPersonaView(
-						detailedAuthorizedPersona: $0,
-						indentation: inOneLevel
-					)
-				}
-			} else {
-				Text("No authorized personas")
-			}
-		}
-		.padding(.leading, leadingPadding)
-	}
-}
+ 			if let authorizedPersonas {
+ 				ForEach(authorizedPersonas) {
+ 					DappAuthorizedPersonaView(
+ 						detailedAuthorizedPersona: $0,
+ 						indentation: inOneLevel
+ 					)
+ 				}
+ 			} else {
+ 				Text("No authorized personas")
+ 			}
+ 		}
+ 		.padding(.leading, leadingPadding)
+ 	}
+ }
 
-// MARK: - DappAuthorizedPersonaView
-public struct DappAuthorizedPersonaView: IndentedView {
-	public let detailedAuthorizedPersona: Profile.Network.AuthorizedPersonaDetailed
-	public let indentation: Indentation
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Labeled("Address", value: detailedAuthorizedPersona.identityAddress.address)
-			Labeled("Name", value: detailedAuthorizedPersona.displayName.rawValue)
+ // MARK: - DappAuthorizedPersonaView
+ public struct DappAuthorizedPersonaView: IndentedView {
+ 	public let detailedAuthorizedPersona: Sargon.ProfileNetwork.AuthorizedPersonaDetailed
+ 	public let indentation: Indentation
+ 	public var body: some View {
+ //		VStack(alignment: .leading, spacing: indentation.spacing) {
+ //			Labeled("Address", value: detailedAuthorizedPersona.identityAddress.address)
+ //			Labeled("Name", value: detailedAuthorizedPersona.displayName.rawValue)
+ //
+ //			Text("Shared Fields")
+ //			Group {
+ //				let sharedPersonaData = detailedAuthorizedPersona.sharedPersonaData
+ //
+ //				if let name = sharedPersonaData.name {
+ //					Text("Name")
+ //					Labeled(L10n.AuthorizedDapps.PersonaDetails.givenName, value: name.value.givenNames)
+ //					Labeled(L10n.AuthorizedDapps.PersonaDetails.nickname, value: name.value.nickname)
+ //					Labeled(L10n.AuthorizedDapps.PersonaDetails.nameFamily, value: name.value.familyName)
+ //					Labeled("id", value: name.id)
+ //				}
+ //
+ //				if let dateOfBirth = sharedPersonaData.dateOfBirth {
+ //					Text("Date of birth")
+ //					Labeled("id", value: dateOfBirth.id)
+ //					Labeled("value", value: dateOfBirth.value.date.ISO8601Format())
+ //				}
+ //
+ //				Text("Emails")
+ //				ForEach(sharedPersonaData.emailAddresses) { email in
+ //					Labeled("Value", value: email.value.email)
+ //					Labeled("id", value: email.id)
+ //				}
+ //
+ //				Text("Phonenumbers")
+ //				ForEach(sharedPersonaData.phoneNumbers) { phone in
+ //					Labeled("Value", value: phone.value.number)
+ //					Labeled("id", value: phone.id)
+ //				}
+ //				Group {
+ //					Text("Postal addresses")
+ //					ForEach(sharedPersonaData.postalAddresses) { postalAddress in
+ //						Labeled("id", value: postalAddress.id)
+ //						ForEach(postalAddress.value.fields) { field in
+ //							Labeled("Value", value: String(describing: field))
+ //						}
+ //					}
+ //				}
+ //			}
+ //
+ //			Text("Shared Accounts")
+ //			if let simpleAccounts = detailedAuthorizedPersona.simpleAccounts {
+ //				if !simpleAccounts.isEmpty {
+ //					ForEach(simpleAccounts) { simpleAccount in
+ //						Labeled("displayName", value: simpleAccount.label.rawValue)
+ //						Labeled("address", value: simpleAccount.address.address)
+ //						Labeled("appearanceID", value: simpleAccount.appearanceID.description)
+ //					}
+ //				} else {
+ //					Text("None yet")
+ //				}
+ //			} else {
+ //				Text("Never requested")
+ //			}
+ //		}
+ //		.padding(.leading, leadingPadding)
+ 		Text("Migrate me")
+ 	}
+ }
 
-			Text("Shared Fields")
-			Group {
-				let sharedPersonaData = detailedAuthorizedPersona.sharedPersonaData
+ // MARK: - PerNetworkView
+ public struct PerNetworkView: IndentedView {
+ 	public let networks: Profile.Networks
+ 	public let indentation: Indentation
+ }
 
-				if let name = sharedPersonaData.name {
-					Text("Name")
-					Labeled(L10n.AuthorizedDapps.PersonaDetails.givenName, value: name.value.givenNames)
-					Labeled(L10n.AuthorizedDapps.PersonaDetails.nickname, value: name.value.nickname)
-					Labeled(L10n.AuthorizedDapps.PersonaDetails.nameFamily, value: name.value.familyName)
-					Labeled("id", value: name.id)
-				}
+ extension PerNetworkView {
+ 	public var body: some View {
+ 		VStack(alignment: .leading, spacing: indentation.spacing) {
+ 			Text("Per Network")
+ 				.fontWeight(.heavy)
+ 				.textCase(.uppercase)
+ 			#if os(macOS)
+ 				.font(.title)
+ 			#endif // os(macOS)
+ 			ForEach(networks.keys, id: \.self) { networkID in
+ 				ProfileNetworkView(
+ 					network: try! networks.network(id: networkID),
+ 					indentation: inOneLevel
+ 				)
+ 			}
+ 		}
+ 		.padding(.leading, leadingPadding)
+ 	}
+ }
 
-				if let dateOfBirth = sharedPersonaData.dateOfBirth {
-					Text("Date of birth")
-					Labeled("id", value: dateOfBirth.id)
-					Labeled("value", value: dateOfBirth.value.date.ISO8601Format())
-				}
+ // MARK: - ProfileNetworkView
+ public struct ProfileNetworkView: IndentedView {
+ 	public let network: Sargon.ProfileNetwork
+ 	public let indentation: Indentation
+ }
 
-				Text("Emails")
-				ForEach(sharedPersonaData.emailAddresses) { email in
-					Labeled("Value", value: email.value.email)
-					Labeled("id", value: email.id)
-				}
+ extension ProfileNetworkView {
+ 	public var body: some View {
+ 		VStack(alignment: .leading, spacing: indentation.spacing) {
+ 			Text("Network")
+ 				.fontWeight(.heavy)
+ //			#if os(macOS)
+ //				.font(.title)
+ //			#endif // os(macOS)
+ //
+ //			Labeled("ID", value: String(describing: network.networkID))
+ //
+ //			AccountsView(
+ //				areHidden: false,
+ //				entities: network.getAccounts().elements,
+ //				indentation: inOneLevel
+ //			)
+ //
+ //			AccountsView(
+ //				areHidden: true,
+ //				entities: network.getHiddenAccounts().elements,
+ //				indentation: inOneLevel
+ //			)
+ //
+ //			PersonasView(
+ //				areHidden: false,
+ //				entities: network.getPersonas().elements,
+ //				indentation: inOneLevel
+ //			)
+ //
+ //			PersonasView(
+ //				areHidden: true,
+ //				entities: network.getHiddenPersonas().elements,
+ //				indentation: inOneLevel
+ //			)
+ //
+ //			AuthorizedDappsView(
+ //				authorizedDapps: network.authorizedDapps,
+ //				indentation: inOneLevel
+ //			) {
+ //				try? network.detailsForAuthorizedDapp($0)
+ //			}
+ 		}
+ 		.padding(.leading, leadingPadding)
+ 	}
+ }
 
-				Text("Phonenumbers")
-				ForEach(sharedPersonaData.phoneNumbers) { phone in
-					Labeled("Value", value: phone.value.number)
-					Labeled("id", value: phone.id)
-				}
-				Group {
-					Text("Postal addresses")
-					ForEach(sharedPersonaData.postalAddresses) { postalAddress in
-						Labeled("id", value: postalAddress.id)
-						ForEach(postalAddress.value.fields) { field in
-							Labeled("Value", value: String(describing: field))
-						}
-					}
-				}
-			}
+ public typealias AccountsView = EntitiesView<Sargon.Account>
+ public typealias PersonasView = EntitiesView<Persona>
 
-			Text("Shared Accounts")
-			if let simpleAccounts = detailedAuthorizedPersona.simpleAccounts {
-				if !simpleAccounts.isEmpty {
-					ForEach(simpleAccounts) { simpleAccount in
-						Labeled("displayName", value: simpleAccount.label.rawValue)
-						Labeled("address", value: simpleAccount.address.address)
-						Labeled("appearanceID", value: simpleAccount.appearanceID.description)
-					}
-				} else {
-					Text("None yet")
-				}
-			} else {
-				Text("Never requested")
-			}
-		}
-		.padding(.leading, leadingPadding)
-	}
-}
+ // MARK: - EntitiesView
+ public struct EntitiesView<Entity: EntityProtocol>: IndentedView {
+ 	public let areHidden: Bool
+ 	public let entities: [Entity]
+ 	public let indentation: Indentation
+ }
 
-// MARK: - PerNetworkView
-public struct PerNetworkView: IndentedView {
-	public let networks: Profile.Networks
-	public let indentation: Indentation
-}
+ extension EntitiesView {
+ 	public var body: some View {
+ 		VStack(alignment: .leading, spacing: indentation.spacing) {
+ 			if areHidden {
+ 				Text("HIDDEN")
+ 					.fontWeight(.heavy)
+ 			}
+ 			Text(Entity.entityKind == .identity ? "Personas" : "Accounts")
+ 				.fontWeight(.heavy)
+ 			#if os(macOS)
+ 				.font(.title)
+ 			#endif // os(macOS)
+ 			if entities.isEmpty {
+ 				Text("<None yet>")
+ 			} else {
+ 				ForEach(entities, id: \.address) { entity in
+ 					EntityView(
+ 						isHidden: areHidden,
+ 						entity: entity,
+ 						indentation: inOneLevel
+ 					)
+ 				}
+ 			}
+ 		}
+ 		.padding(.leading, leadingPadding)
+ 	}
+ }
 
-extension PerNetworkView {
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Text("Per Network")
-				.fontWeight(.heavy)
-				.textCase(.uppercase)
-			#if os(macOS)
-				.font(.title)
-			#endif // os(macOS)
-			ForEach(networks.keys, id: \.self) { networkID in
-				ProfileNetworkView(
-					network: try! networks.network(id: networkID),
-					indentation: inOneLevel
-				)
-			}
-		}
-		.padding(.leading, leadingPadding)
-	}
-}
+ // MARK: - EntityView
+ public struct EntityView<Entity: EntityProtocol>: IndentedView {
+ 	public let isHidden: Bool
+ 	public let entity: Entity
+ 	public let indentation: Indentation
+ }
 
-// MARK: - ProfileNetworkView
-public struct ProfileNetworkView: IndentedView {
-	public let network: Profile.Network
-	public let indentation: Indentation
-}
+ extension EntityView {
+ 	public var body: some View {
+ //		VStack(alignment: .leading, spacing: indentation.spacing) {
+ //			Labeled("DisplayName", value: entity.displayName.rawValue)
+ //			Labeled("Address", value: entity.address.address)
+ //
+ //			switch entity.securityState {
+ //			case let .unsecured(unsecuredControl):
+ //				UnsecuredEntityControlView(
+ //					unsecuredControl: unsecuredControl,
+ //					indentation: inOneLevel
+ //				)
+ //			}
+ //
+ //			Group {
+ //				if let persona = self.entity as? Persona {
+ //					Text("Persona fields")
+ //					ForEach(persona.personaData.entries, id: \.self) { entry in
+ //						Labeled("id:\(entry.id)", value: String(describing: entry.value))
+ //					}
+ //				}
+ //			}
+ //			.padding(.leading, indentation.inOneLevel.leadingPadding)
+ //
+ //			if let account = self.entity as? Sargon.Account {
+ //				Labeled("Account Appearance ID", value: account.appearanceID.description)
+ //			}
+ //		}
+ //		.foregroundColor(isHidden ? .white : (entity.kind == .account ? .white : .black))
+ //		.padding(.leading, leadingPadding)
+ //		.background {
+ //			if isHidden {
+ //				Color.gray
+ //			} else {
+ //				if let account = entity as? Sargon.Account {
+ //					account.appearanceID.gradient
+ //						.brightness(-0.2)
+ //				}
+ //			}
+ //		}
+ 		Text("Migrate me")
+ 	}
+ }
 
-extension ProfileNetworkView {
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Text("Network")
-				.fontWeight(.heavy)
-//			#if os(macOS)
-//				.font(.title)
-//			#endif // os(macOS)
-//
-//			Labeled("ID", value: String(describing: network.networkID))
-//
-//			AccountsView(
-//				areHidden: false,
-//				entities: network.getAccounts().elements,
-//				indentation: inOneLevel
-//			)
-//
-//			AccountsView(
-//				areHidden: true,
-//				entities: network.getHiddenAccounts().elements,
-//				indentation: inOneLevel
-//			)
-//
-//			PersonasView(
-//				areHidden: false,
-//				entities: network.getPersonas().elements,
-//				indentation: inOneLevel
-//			)
-//
-//			PersonasView(
-//				areHidden: true,
-//				entities: network.getHiddenPersonas().elements,
-//				indentation: inOneLevel
-//			)
-//
-//			AuthorizedDappsView(
-//				authorizedDapps: network.authorizedDapps,
-//				indentation: inOneLevel
-//			) {
-//				try? network.detailsForAuthorizedDapp($0)
-//			}
-		}
-		.padding(.leading, leadingPadding)
-	}
-}
+ // MARK: - UnsecuredEntityControlView
+ public struct UnsecuredEntityControlView: IndentedView {
+ 	public let unsecuredControl: UnsecuredEntityControl
+ 	public let indentation: Indentation
+ }
 
-public typealias AccountsView = EntitiesView<Profile.Network.Account>
-public typealias PersonasView = EntitiesView<Profile.Network.Persona>
+ extension UnsecuredEntityControlView {
+ 	public var body: some View {
+ 		VStack(alignment: .leading, spacing: indentation.spacing) {
+ 			HierarchicalDeterministicFactorInstanceView(
+ 				description: "Transaction Signing",
+ 				factorInstance: unsecuredControl.transactionSigning,
+ 				indentation: inOneLevel
+ 			)
+ 			if let authenticationSigning = unsecuredControl.authenticationSigning {
+ 				HierarchicalDeterministicFactorInstanceView(
+ 					description: "Auth Signing",
+ 					factorInstance: authenticationSigning,
+ 					indentation: inOneLevel
+ 				)
+ 			}
+ 		}
+ 	}
+ }
 
-// MARK: - EntitiesView
-public struct EntitiesView<Entity: EntityProtocol>: IndentedView {
-	public let areHidden: Bool
-	public let entities: [Entity]
-	public let indentation: Indentation
-}
+ // MARK: - HierarchicalDeterministicFactorInstanceView
+ public struct HierarchicalDeterministicFactorInstanceView: IndentedView {
+ 	public let description: String
+ 	public let factorInstance: HierarchicalDeterministicFactorInstance
+ 	public let indentation: Indentation
+ }
 
-extension EntitiesView {
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			if areHidden {
-				Text("HIDDEN")
-					.fontWeight(.heavy)
-			}
-			Text(Entity.entityKind == .identity ? "Personas" : "Accounts")
-				.fontWeight(.heavy)
-			#if os(macOS)
-				.font(.title)
-			#endif // os(macOS)
-			if entities.isEmpty {
-				Text("<None yet>")
-			} else {
-				ForEach(entities, id: \.address) { entity in
-					EntityView(
-						isHidden: areHidden,
-						entity: entity,
-						indentation: inOneLevel
-					)
-				}
-			}
-		}
-		.padding(.leading, leadingPadding)
-	}
-}
+ extension HierarchicalDeterministicFactorInstanceView {
+ 	public var body: some View {
+ 		VStack(alignment: .leading, spacing: indentation.spacing) {
+ 			Text("\(description) factor instance")
+ 				.fontWeight(.heavy)
+ 			#if os(macOS)
+ 				.font(.title)
+ 			#endif // os(macOS)
 
-// MARK: - EntityView
-public struct EntityView<Entity: EntityProtocol>: IndentedView {
-	public let isHidden: Bool
-	public let entity: Entity
-	public let indentation: Indentation
-}
+ 			Labeled("Derivation Path", value: factorInstance.derivationPath.description)
+ 			Labeled("Derivation Scheme", value: factorInstance.derivationPath.scheme.rawValue)
+ 			Labeled("Public Key", value: factorInstance.publicKey.compressedRepresentation.hex)
+ 			Labeled("Curve", value: factorInstance.publicKey.curve.rawValue)
+ 			Labeled("Factor Source ID", value: String(factorInstance.factorSourceID.description.mask(showLast: 6)))
+ 		}
+ 		.padding(.leading, leadingPadding)
+ 	}
+ }
 
-extension EntityView {
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Labeled("DisplayName", value: entity.displayName.rawValue)
-			Labeled("Address", value: entity.address.address)
+ // MARK: - Labeled
+ public struct Labeled: SwiftUI.View {
+ 	let label: String
+ 	let value: String
+ 	public init(_ label: String, value: String) {
+ 		self.label = label
+ 		self.value = value
+ 	}
 
-			switch entity.securityState {
-			case let .unsecured(unsecuredControl):
-				UnsecuredEntityControlView(
-					unsecuredControl: unsecuredControl,
-					indentation: inOneLevel
-				)
-			}
+ 	public init(_ label: String, value: some CustomStringConvertible) {
+ 		self.init(label, value: String(describing: value))
+ 	}
 
-			Group {
-				if let persona = self.entity as? Profile.Network.Persona {
-					Text("Persona fields")
-					ForEach(persona.personaData.entries, id: \.self) { entry in
-						Labeled("id:\(entry.id)", value: String(describing: entry.value))
-					}
-				}
-			}
-			.padding(.leading, indentation.inOneLevel.leadingPadding)
+ 	public var body: some View {
+ 		HStack(alignment: .top) {
+ 			Text(label)
+ 				.fontWeight(.light)
+ 				.textSelection(.enabled)
+ 			Text(value)
+ 				.fontWeight(.bold)
+ 				.textSelection(.enabled)
+ 		}
+ 	}
+ }
 
-			if let account = self.entity as? Profile.Network.Account {
-				Labeled("Account Appearance ID", value: account.appearanceID.description)
-			}
-		}
-		.foregroundColor(isHidden ? .white : (entity.kind == .account ? .white : .black))
-		.padding(.leading, leadingPadding)
-		.background {
-			if isHidden {
-				Color.gray
-			} else {
-				if let account = entity as? Profile.Network.Account {
-					account.appearanceID.gradient
-						.brightness(-0.2)
-				}
-			}
-		}
-	}
-}
-
-// MARK: - UnsecuredEntityControlView
-public struct UnsecuredEntityControlView: IndentedView {
-	public let unsecuredControl: UnsecuredEntityControl
-	public let indentation: Indentation
-}
-
-extension UnsecuredEntityControlView {
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			HierarchicalDeterministicFactorInstanceView(
-				description: "Transaction Signing",
-				factorInstance: unsecuredControl.transactionSigning,
-				indentation: inOneLevel
-			)
-			if let authenticationSigning = unsecuredControl.authenticationSigning {
-				HierarchicalDeterministicFactorInstanceView(
-					description: "Auth Signing",
-					factorInstance: authenticationSigning,
-					indentation: inOneLevel
-				)
-			}
-		}
-	}
-}
-
-// MARK: - HierarchicalDeterministicFactorInstanceView
-public struct HierarchicalDeterministicFactorInstanceView: IndentedView {
-	public let description: String
-	public let factorInstance: HierarchicalDeterministicFactorInstance
-	public let indentation: Indentation
-}
-
-extension HierarchicalDeterministicFactorInstanceView {
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Text("\(description) factor instance")
-				.fontWeight(.heavy)
-			#if os(macOS)
-				.font(.title)
-			#endif // os(macOS)
-
-			Labeled("Derivation Path", value: factorInstance.derivationPath.description)
-			Labeled("Derivation Scheme", value: factorInstance.derivationPath.scheme.rawValue)
-			Labeled("Public Key", value: factorInstance.publicKey.compressedRepresentation.hex)
-			Labeled("Curve", value: factorInstance.publicKey.curve.rawValue)
-			Labeled("Factor Source ID", value: String(factorInstance.factorSourceID.description.mask(showLast: 6)))
-		}
-		.padding(.leading, leadingPadding)
-	}
-}
-
-// MARK: - Labeled
-public struct Labeled: SwiftUI.View {
-	let label: String
-	let value: String
-	public init(_ label: String, value: String) {
-		self.label = label
-		self.value = value
-	}
-
-	public init(_ label: String, value: some CustomStringConvertible) {
-		self.init(label, value: String(describing: value))
-	}
-
-	public var body: some View {
-		HStack(alignment: .top) {
-			Text(label)
-				.fontWeight(.light)
-				.textSelection(.enabled)
-			Text(value)
-				.fontWeight(.bold)
-				.textSelection(.enabled)
-		}
-	}
-}
+ */

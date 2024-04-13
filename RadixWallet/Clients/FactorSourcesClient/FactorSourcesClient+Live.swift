@@ -121,9 +121,9 @@ extension FactorSourcesClient: DependencyKey {
 
 			func nextDerivationIndexForFactorSource(
 				entitiesControlledByFactorSource: some Collection<some EntityProtocol>
-			) throws -> OrderedSet<HD.Path.Component.Child.Value> {
+			) throws -> OrderedSet<HDPathValue> {
 				let indicesOfEntitiesControlledByAccount = entitiesControlledByFactorSource
-					.compactMap { entity -> HD.Path.Component.Child.Value? in
+					.compactMap { entity -> HDPathValue? in
 						switch entity.securityState {
 						case let .unsecured(unsecuredControl):
 							let factorInstance = unsecuredControl.transactionSigning
@@ -141,7 +141,7 @@ extension FactorSourcesClient: DependencyKey {
 				return try OrderedSet(validating: indicesOfEntitiesControlledByAccount)
 			}
 
-//			let indices: OrderedSet<HD.Path.Component.Child.Value> = if let network {
+//			let indices: OrderedSet<HDPathValue> = if let network {
 //				switch request.entityKind {
 //				case .account:
 //					try nextDerivationIndexForFactorSource(
@@ -246,7 +246,7 @@ extension FactorSourcesClient: DependencyKey {
 				return nextIndex
 			},
 			addPrivateHDFactorSource: addPrivateHDFactorSource,
-			checkIfHasOlympiaFactorSourceForAccounts: { wordCount, softwareAccounts -> FactorSourceID.FromHash? in
+			checkIfHasOlympiaFactorSourceForAccounts: { wordCount, softwareAccounts -> FactorSourceIDFromHash? in
 
 				guard softwareAccounts.allSatisfy({ $0.accountType == .software }) else {
 					assertionFailure("Unexpectedly received hardware account, unable to verify.")
@@ -337,7 +337,7 @@ extension FactorSourcesClient: DependencyKey {
 }
 
 func signingFactors(
-	for entities: some Collection<EntityPotentiallyVirtual>,
+	for entities: some Collection<AccountOrPersona>,
 	from allFactorSources: IdentifiedArrayOf<FactorSource>,
 	signingPurpose: SigningPurpose
 ) throws -> SigningFactors {

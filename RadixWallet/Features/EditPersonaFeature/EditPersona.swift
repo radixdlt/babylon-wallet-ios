@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - EditPersona.Output
@@ -33,7 +34,7 @@ extension EditPersona {
 							value: .init(email: emailAddress)
 						),
 					]
-				)) ?? .init()
+				)) ?? .init(collection: [])
 			}
 
 			if let phoneState = phoneNumber, let phoneNumber = phoneState.input {
@@ -44,7 +45,7 @@ extension EditPersona {
 							value: .init(number: phoneNumber)
 						),
 					]
-				)) ?? .init()
+				)) ?? .init(collection: [])
 			}
 
 			return personaData
@@ -65,7 +66,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 		}
 
 		let mode: Mode
-		let persona: Profile.Network.Persona
+		let persona: Persona
 		var entries: EditPersonaEntries.State
 		var labelField: EditPersonaStaticField.State
 
@@ -78,7 +79,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 
 		public init(
 			mode: Mode,
-			persona: Profile.Network.Persona
+			persona: Persona
 		) {
 			self.mode = mode
 			self.persona = persona
@@ -86,7 +87,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 			self.labelField = EditPersonaStaticField.State(
 				behaviour: .personaLabel,
 				entryID: persona.personaData.name?.id,
-				initial: persona.displayName.rawValue
+				initial: persona.displayName.value
 			)
 		}
 	}
@@ -108,7 +109,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case personaSaved(Profile.Network.Persona)
+		case personaSaved(Persona)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -230,7 +231,7 @@ public struct EditPersona: Sendable, FeatureReducer {
 	}
 }
 
-extension PersonaData.Name {
+extension PersonaDataEntryName {
 	static let `default` = Self(
 		variant: .western,
 		familyName: "",
@@ -242,7 +243,7 @@ extension PersonaData.Name {
 extension EditPersona.State {
 	func hasChanges() -> Bool {
 		guard let output = viewState.output else { return false }
-		return output.personaLabel != persona.displayName
+		return output.personaLabel.rawValue != persona.displayName.rawValue
 			// FIXME: Figure out some better way for diffing. Currently if we'd simply do `output.personaData != persona.personaData` we'd get `false` as `id`s would not match.
 			|| output.personaData.name?.value != persona.personaData.name?.value
 			|| output.personaData.emailAddresses.first?.value != persona.personaData.emailAddresses.first?.value
@@ -261,11 +262,11 @@ extension EditPersona.State.Mode {
 	}
 }
 
-extension Profile.Network.Persona {
+extension Persona {
 	fileprivate func updated(with output: EditPersona.Output) -> Self {
 		var updatedPersona = self
 
-		updatedPersona.displayName = output.personaLabel
+		updatedPersona.displayName = Sargon.DisplayName(value: output.personaLabel.rawValue)
 		updatedPersona.personaData = output.personaData
 
 		return updatedPersona
@@ -294,7 +295,7 @@ extension EditPersonaEntry<EditPersonaDynamicField>.State {
 		isRequestedByDapp: Bool = false
 	) throws -> Self {
 		switch kind {
-		case .fullName, .dateOfBirth, .companyName, .url, .postalAddress, .creditCard:
+		case .fullName:
 			throw NotApplicableError()
 
 		case .emailAddress:
@@ -341,7 +342,7 @@ extension EditPersonaEntry<EditPersonaDynamicField>.State {
 extension EditPersonaEntry<EditPersonaName>.State {
 	static func entry(
 		entryID: PersonaDataEntryID?,
-		name: PersonaData.Name,
+		name: PersonaDataEntryName,
 		isRequestedByDapp: Bool = false
 	) -> Self {
 		.init(
@@ -360,13 +361,8 @@ extension PersonaData.Entry {
 	var kind: Kind {
 		switch self {
 		case .name: .fullName
-		case .dateOfBirth: .dateOfBirth
-		case .companyName: .companyName
 		case .emailAddress: .emailAddress
 		case .phoneNumber: .phoneNumber
-		case .url: .url
-		case .postalAddress: .postalAddress
-		case .creditCard: .creditCard
 		}
 	}
 }

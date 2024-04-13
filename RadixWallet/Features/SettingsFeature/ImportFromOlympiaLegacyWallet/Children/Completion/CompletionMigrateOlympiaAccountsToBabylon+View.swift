@@ -28,7 +28,7 @@ extension ImportOlympiaWalletCoordinator.MigratableAccount {
 	}
 }
 
-extension Profile.Network.Account {
+extension Sargon.Account {
 	var viewStateAccount: CompletionMigrateOlympiaAccountsToBabylon.ViewState.Account {
 		.init(
 			name: displayName.rawValue,
