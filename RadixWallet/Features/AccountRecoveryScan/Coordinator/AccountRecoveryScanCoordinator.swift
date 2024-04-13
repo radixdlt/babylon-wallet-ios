@@ -25,7 +25,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 
 		/// Create new Profile or add accounts
 		public enum Purpose: Sendable, Hashable {
-			case createProfile(PrivateHDFactorSource)
+			case createProfile(PrivateHierarchicalDeterministicFactorSource)
 
 			case addAccounts(
 				factorSourceID: FactorSourceIDFromHash,

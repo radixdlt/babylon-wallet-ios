@@ -125,7 +125,7 @@ extension SecureStorageClient {
 	public typealias LoadProfileSnapshot = @Sendable (Sargon.Profile.Header.ID) throws -> Sargon.Profile?
 	public typealias LoadProfile = @Sendable (Sargon.Profile.Header.ID) throws -> Profile?
 
-	public typealias SaveMnemonicForFactorSource = @Sendable (PrivateHDFactorSource) throws -> Void
+	public typealias SaveMnemonicForFactorSource = @Sendable (PrivateHierarchicalDeterministicFactorSource) throws -> Void
 	public typealias LoadMnemonicByFactorSourceID = @Sendable (LoadMnemonicByFactorSourceIDRequest) throws -> MnemonicWithPassphrase?
 	public typealias ContainsMnemonicIdentifiedByFactorSourceID = @Sendable (FactorSourceIDFromHash) -> Bool
 

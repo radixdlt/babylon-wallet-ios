@@ -38,23 +38,23 @@ extension DebugSettingsCoordinator.View {
 	@MainActor
 	private var rows: [SettingsRowModel<DebugSettingsCoordinator>] {
 		[
-			.init(
-				title: "Multi-Factor Setup",
-				icon: .systemImage("lock.square.stack.fill"),
-				action: .securityStructureConfigsButtonTapped
-			),
+			//			.init(
+//				title: "Multi-Factor Setup",
+//				icon: .systemImage("lock.square.stack.fill"),
+//				action: .securityStructureConfigsButtonTapped
+//			),
 			// ONLY DEBUG EVER
 			.init(
 				title: "Factor sources",
 				icon: .systemImage("person.badge.key"),
 				action: .factorSourcesButtonTapped
 			),
-			// ONLY DEBUG EVER
-			.init(
-				title: "Inspect profile",
-				icon: .systemImage("wallet.pass"),
-				action: .debugInspectProfileButtonTapped
-			),
+//			// ONLY DEBUG EVER
+//			.init(
+//				title: "Inspect profile",
+//				icon: .systemImage("wallet.pass"),
+//				action: .debugInspectProfileButtonTapped
+//			),
 			// ONLY DEBUG EVER
 			.init(
 				title: "UserDefaults content",
@@ -92,14 +92,14 @@ private extension StoreOf<DebugSettingsCoordinator> {
 private extension View {
 	func destinations(with store: StoreOf<DebugSettingsCoordinator>) -> some View {
 		let destinationStore = store.destination
-		return factorSources(with: destinationStore)
-			.debugUserDefaultsContents(with: destinationStore)
+		return debugUserDefaultsContents(with: destinationStore)
 		#if DEBUG
 			.debugKeychainTest(with: destinationStore)
 			.debugKeychainContents(with: destinationStore)
 		#endif
-			.debugInspectProfile(with: destinationStore)
-			.securityStructureConfigs(with: destinationStore)
+		//		.factorSources(with: destinationStore)
+//			.debugInspectProfile(with: destinationStore)
+//			.securityStructureConfigs(with: destinationStore)
 	}
 
 	private func debugUserDefaultsContents(
@@ -137,36 +137,36 @@ private extension View {
 	}
 	#endif // DEBUG
 
-	private func factorSources(
-		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
-	) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /DebugSettingsCoordinator.Destination.State.debugManageFactorSources,
-			action: DebugSettingsCoordinator.Destination.Action.debugManageFactorSources,
-			destination: { DebugManageFactorSources.View(store: $0) }
-		)
-	}
+//	private func factorSources(
+//		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
+//	) -> some View {
+//		navigationDestination(
+//			store: destinationStore,
+//			state: /DebugSettingsCoordinator.Destination.State.debugManageFactorSources,
+//			action: DebugSettingsCoordinator.Destination.Action.debugManageFactorSources,
+//			destination: { DebugManageFactorSources.View(store: $0) }
+//		)
+//	}
 
-	private func debugInspectProfile(
-		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
-	) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /DebugSettingsCoordinator.Destination.State.debugInspectProfile,
-			action: DebugSettingsCoordinator.Destination.Action.debugInspectProfile,
-			destination: { DebugInspectProfile.View(store: $0) }
-		)
-	}
+//	private func debugInspectProfile(
+//		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
+//	) -> some View {
+//		navigationDestination(
+//			store: destinationStore,
+//			state: /DebugSettingsCoordinator.Destination.State.debugInspectProfile,
+//			action: DebugSettingsCoordinator.Destination.Action.debugInspectProfile,
+//			destination: { DebugInspectProfile.View(store: $0) }
+//		)
+//	}
 
-	private func securityStructureConfigs(
-		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
-	) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /DebugSettingsCoordinator.Destination.State.securityStructureConfigs,
-			action: DebugSettingsCoordinator.Destination.Action.securityStructureConfigs,
-			destination: { SecurityStructureConfigurationListCoordinator.View(store: $0) }
-		)
-	}
+//	private func securityStructureConfigs(
+//		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
+//	) -> some View {
+//		navigationDestination(
+//			store: destinationStore,
+//			state: /DebugSettingsCoordinator.Destination.State.securityStructureConfigs,
+//			action: DebugSettingsCoordinator.Destination.Action.securityStructureConfigs,
+//			destination: { SecurityStructureConfigurationListCoordinator.View(store: $0) }
+//		)
+//	}
 }

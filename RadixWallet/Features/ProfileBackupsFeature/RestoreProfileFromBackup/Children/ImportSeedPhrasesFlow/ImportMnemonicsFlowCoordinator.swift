@@ -102,7 +102,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	}
 
 	public struct SkippedOrImported: Sendable, Hashable {
-		public let factorSourceID: FactorSource.ID.FromHash
+		public let factorSourceID: FactorSourceIdFromHash
 	}
 
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient

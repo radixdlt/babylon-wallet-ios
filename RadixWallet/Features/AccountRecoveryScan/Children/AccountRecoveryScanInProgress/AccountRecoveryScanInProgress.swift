@@ -24,7 +24,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 		public var destination: Destination.State? = nil
 
 		public enum Mode: Sendable, Hashable {
-			case privateHD(PrivateHDFactorSource)
+			case privateHD(PrivateHierarchicalDeterministicFactorSource)
 			case factorSourceWithID(id: FactorSourceIDFromHash, Loadable<FactorSource> = .idle)
 		}
 

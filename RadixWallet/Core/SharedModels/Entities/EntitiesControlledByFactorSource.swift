@@ -28,7 +28,7 @@ public struct EntitiesControlledByFactorSource: Sendable, Hashable, Identifiable
 extension EntitiesControlledByFactorSource {
 	public struct AccountsControlledByKeysOnSameCurve: Equatable, Sendable {
 		public struct ID: Sendable, Hashable {
-			public let factorSourceID: FactorSource.ID.FromHash
+			public let factorSourceID: FactorSourceIdFromHash
 			public let isOlympia: Bool
 		}
 
@@ -100,7 +100,7 @@ extension EntitiesControlledByFactorSource {
 		deviceFactorSource.id
 	}
 
-	public var mnemonicWordCount: BIP39.WordCount {
+	public var mnemonicWordCount: BIP39WordCount {
 		deviceFactorSource.hint.mnemonicWordCount
 	}
 }

@@ -188,7 +188,7 @@ public struct Signing: Sendable, FeatureReducer {
 				signingFactors: nextFactors,
 				signingPurposeWithPayload: signingPurposeWithPayload
 			)
-		case .ledgerHQHardwareWallet:
+		case .ledgerHqHardwareWallet:
 			return .init(
 				kind: .ledger,
 				signingFactors: nextFactors,

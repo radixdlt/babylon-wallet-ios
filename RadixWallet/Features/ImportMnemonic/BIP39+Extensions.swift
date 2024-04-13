@@ -1,8 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - BIP39.WordCount + Comparable
-extension BIP39.WordCount: Comparable {
+// MARK: - BIP39WordCount + Comparable
+extension BIP39WordCount: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
 		lhs.rawValue < rhs.rawValue
 	}

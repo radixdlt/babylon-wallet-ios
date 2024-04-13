@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - AccountPortfoliosClient
 public struct AccountPortfoliosClient: Sendable {
 	/// Fetches the account portfolios for the given addresses.
@@ -43,7 +45,7 @@ extension AccountPortfoliosClient {
 			@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 			@Dependency(\.cacheClient) var cacheClient
 
-			let changedAccounts: [Sargon.Account.EntityAddress]?
+			let changedAccounts: [AccountAddress]?
 			let poolAddressesToRefresh: [PoolAddress]?
 			do {
 				let manifest = intent.manifest

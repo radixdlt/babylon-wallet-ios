@@ -75,16 +75,17 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			.run { send in
-				for try await personas in await personasClient.personas() {
-					guard !Task.isCancelled else {
-						return
-					}
-					await send(.internal(.personasLoaded(personas)))
-				}
-			} catch: { error, _ in
-				errorQueue.schedule(error)
-			}
+//			.run { send in
+//				for try await personas in await personasClient.personas() {
+//					guard !Task.isCancelled else {
+//						return
+//					}
+//					await send(.internal(.personasLoaded(personas)))
+//				}
+//			} catch: { error, _ in
+//				errorQueue.schedule(error)
+//			}
+			sargonProfileFinishMigrateAtEndOfStage1()
 
 		case let .continueButtonTapped(response):
 			.send(.delegate(.continueButtonTapped(response)))

@@ -155,8 +155,8 @@ extension LedgerHardwareWalletClient {
 
 			let (derivedKey, address) = try await deriveAndDisplayAddress(keyParams, ledger)
 
-			if derivedKey != signTXFactorInstance.hierarchicalDeterministicPublicKey {
-				let errMsg = "Re-derived public key on Ledger does not matched the transactionSigning factor instance of the account. \(derivedKey) != \(signTXFactorInstance.hierarchicalDeterministicPublicKey)"
+			if derivedKey != signTXFactorInstance.publicKey {
+				let errMsg = "Re-derived public key on Ledger does not matched the transactionSigning factor instance of the account. \(derivedKey) != \(signTXFactorInstance.publicKey)"
 				loggerGlobal.error(.init(stringLiteral: errMsg))
 				return .mismatch(.publicKeyMismatch)
 			}
@@ -172,7 +172,7 @@ extension LedgerHardwareWalletClient {
 	}
 }
 
-extension SLIP10.Curve {
+extension SLIP10Curve {
 	public func toLedger() -> P2P.LedgerHardwareWallet.KeyParameters.Curve {
 		switch self {
 		case .curve25519: .curve25519

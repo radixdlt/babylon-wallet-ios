@@ -38,8 +38,8 @@ public struct OlympiaAccountToMigrate: Sendable, Hashable, CustomDebugStringConv
 		"""
 		accountType: \(accountType)
 		name: \(displayName ?? "Unknown")
-		path: \(path.derivationPath)
-		publicKey: \(publicKey.compressedRepresentation.hex)
+		path: \(path)
+		publicKey: \(publicKey.hex)
 		"""
 	}
 }

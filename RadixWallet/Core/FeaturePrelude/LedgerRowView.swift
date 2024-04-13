@@ -1,3 +1,4 @@
+import Sargon
 
 // MARK: - LedgerRowView
 @MainActor
@@ -9,8 +10,8 @@ public struct LedgerRowView: View {
 
 		public init(factorSource: LedgerHardwareWalletFactorSource) {
 			self.description = factorSource.hint.name
-			self.addedOn = factorSource.addedOn
-			self.lastUsedOn = factorSource.lastUsedOn
+			self.addedOn = factorSource.common.addedOn
+			self.lastUsedOn = factorSource.common.lastUsedOn
 		}
 	}
 

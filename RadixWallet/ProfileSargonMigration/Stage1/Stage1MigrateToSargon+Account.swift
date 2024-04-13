@@ -23,9 +23,20 @@ extension Sargon.Account: Comparable {
 }
 
 extension Sargon.Account {
-	var derivationIndex: HDPathValue {
+	public var derivationIndex: HDPathValue {
 		switch securityState {
 		case let .unsecured(uec): uec.transactionSigning.derivationPath.index
+		}
+	}
+
+	public var isOlympiaAccount: Bool {
+		address.isLegacy
+	}
+
+	public var isLedgerAccount: Bool {
+		switch self.securityState {
+		case let .unsecured(control):
+			control.transactionSigning.factorSourceID.kind == .ledgerHqHardwareWallet
 		}
 	}
 }

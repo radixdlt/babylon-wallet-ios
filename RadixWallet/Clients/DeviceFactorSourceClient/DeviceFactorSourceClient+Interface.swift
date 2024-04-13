@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - DeviceFactorSourceClient
 public struct DeviceFactorSourceClient: Sendable {
 	public var publicKeysFromOnDeviceHD: PublicKeysFromOnDeviceHD
@@ -24,6 +26,16 @@ public struct DeviceFactorSourceClient: Sendable {
 		self.entitiesControlledByFactorSource = entitiesControlledByFactorSource
 		self.controlledEntities = controlledEntities
 	}
+}
+
+// MARK: - SignatureFromOnDeviceHDRequest
+public struct SignatureFromOnDeviceHDRequest: Sendable, Hashable {
+	public let bip39Seed: BIP39Seed
+	public let derivationPath: DerivationPath
+	public let curve: SLIP10Curve
+
+	/// The data to sign
+	public let hashedData: Data
 }
 
 // MARK: DeviceFactorSourceClient.onDeviceHDPublicKey
@@ -61,7 +73,7 @@ public struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
 	}
 
 	public enum Source: Sendable, Hashable {
-		case privateHDFactorSource(PrivateHDFactorSource)
+		case privateHDFactorSource(PrivateHierarchicalDeterministicFactorSource)
 		case loadMnemonicFor(DeviceFactorSource, purpose: SecureStorageClient.LoadMnemonicPurpose)
 
 		public var deviceFactorSource: DeviceFactorSource {
@@ -83,35 +95,14 @@ public struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
 		derivationPaths: [DerivationPath],
 		source: Source
 	) throws {
-		for derivationPath in derivationPaths {
-			guard source.deviceFactorSource.cryptoParameters.supportedCurves.contains(derivationPath.curveForScheme) else {
-				throw DiscrepancyUnsupportedCurve()
-			}
-		}
+//		for derivationPath in derivationPaths {
+//			guard source.deviceFactorSource.cryptoParameters.supportedCurves.contains(derivationPath.curveForScheme) else {
+//				throw DiscrepancyUnsupportedCurve()
+//			}
+//		}
+		sargonProfileFinishMigrateAtEndOfStage1()
 		self.derivationPaths = derivationPaths
 		self.source = source
-	}
-}
-
-// MARK: - SignatureFromOnDeviceHDRequest
-public struct SignatureFromOnDeviceHDRequest: Sendable, Hashable {
-	public let hdRoot: HD.Root
-	public let derivationPath: DerivationPath
-	public let curve: SLIP10.Curve
-
-	/// The data to sign
-	public let hashedData: Data
-
-	public init(
-		hdRoot: HD.Root,
-		derivationPath: DerivationPath,
-		curve: SLIP10.Curve,
-		hashedData: Data
-	) {
-		self.hdRoot = hdRoot
-		self.derivationPath = derivationPath
-		self.curve = curve
-		self.hashedData = hashedData
 	}
 }
 
@@ -176,7 +167,7 @@ extension DeviceFactorSourceClient {
 		else {
 			throw FailedToFindDeviceFactorSourceForSigning()
 		}
-		let hdRoot = try loadedMnemonicWithPassphrase.hdRoot()
+		let bip39Seed = loadedMnemonicWithPassphrase.toSeed()
 
 		var signatures = Set<SignatureOfEntity>()
 
@@ -202,8 +193,8 @@ extension DeviceFactorSourceClient {
 
 				loggerGlobal.debug("🔏 Signing data with device, with entity=\(entity.displayName), curve=\(curve), factor source hint.name=\(deviceFactorSource.hint.name), hint.model=\(deviceFactorSource.hint.model)")
 
-				let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(.init(
-					hdRoot: hdRoot,
+				let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(SignatureFromOnDeviceHDRequest(
+					bip39Seed: bip39Seed,
 					derivationPath: derivationPath,
 					curve: curve,
 					hashedData: Data(hashedDataToSign)

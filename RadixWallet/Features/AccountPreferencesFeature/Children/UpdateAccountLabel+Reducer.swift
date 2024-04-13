@@ -11,7 +11,7 @@ public struct UpdateAccountLabel: FeatureReducer, Sendable {
 		init(account: Sargon.Account) {
 			self.account = account
 			self.accountLabel = account.displayName.rawValue
-			self.sanitizedName = account.displayName
+			self.sanitizedName = NonEmptyString(rawValue: account.displayName.value)
 		}
 	}
 
@@ -36,7 +36,7 @@ public struct UpdateAccountLabel: FeatureReducer, Sendable {
 			return .none
 
 		case let .updateTapped(newLabel):
-			state.account.displayName = newLabel
+			state.account.displayName = DisplayName(nonEmpty: newLabel)
 
 			return .run { [account = state.account] send in
 				do {

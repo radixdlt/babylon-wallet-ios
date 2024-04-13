@@ -61,7 +61,7 @@ public extension AccountRecoveryScanInProgress {
 				} else {
 					L10n.AccountRecoveryScan.InProgress.factorSourceBabylonSeedPhrase
 				}
-			case .ledgerHQHardwareWallet:
+			case .ledgerHqHardwareWallet:
 				L10n.AccountRecoveryScan.InProgress.factorSourceLedgerHardwareDevice
 			default:
 				L10n.AccountRecoveryScan.InProgress.factorSourceFallback

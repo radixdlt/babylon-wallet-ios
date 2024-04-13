@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - FactorSourcesClient
 public struct FactorSourcesClient: Sendable {
 	public var indicesOfEntitiesControlledByFactorSource: IndicesOfEntitiesControlledByFactorSource
@@ -88,11 +90,11 @@ extension FactorSourcesClient {
 	public typealias NextEntityIndexForFactorSource = @Sendable (NextEntityIndexForFactorSourceRequest) async throws -> HDPathValue
 	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 	public typealias GetMainDeviceFactorSource = @Sendable () async throws -> DeviceFactorSource
-	public typealias CreateNewMainDeviceFactorSource = @Sendable () async throws -> PrivateHDFactorSource
+	public typealias CreateNewMainDeviceFactorSource = @Sendable () async throws -> PrivateHierarchicalDeterministicFactorSource
 	public typealias GetFactorSources = @Sendable () async throws -> FactorSources
 	public typealias FactorSourcesAsyncSequence = @Sendable () async -> AnyAsyncSequence<FactorSources>
 	public typealias AddPrivateHDFactorSource = @Sendable (AddPrivateHDFactorSourceRequest) async throws -> FactorSourceIDFromHash
-	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (BIP39.WordCount, NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceIDFromHash?
+	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (BIP39WordCount, NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceIDFromHash?
 	public typealias SaveFactorSource = @Sendable (FactorSource) async throws -> Void
 	public typealias UpdateFactorSource = @Sendable (FactorSource) async throws -> Void
 	public typealias GetSigningFactors = @Sendable (GetSigningFactorsRequest) async throws -> SigningFactors
@@ -102,12 +104,12 @@ extension FactorSourcesClient {
 
 // MARK: - AddPrivateHDFactorSourceRequest
 public struct AddPrivateHDFactorSourceRequest: Sendable, Hashable {
-	public let privateHDFactorSource: PrivateHDFactorSource
+	public let privateHDFactorSource: PrivateHierarchicalDeterministicFactorSource
 	public let onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy
 	/// E.g. import babylon factor sources should only be saved keychain, not profile (already there).
 	public let saveIntoProfile: Bool
 	public init(
-		privateHDFactorSource: PrivateHDFactorSource,
+		privateHDFactorSource: PrivateHierarchicalDeterministicFactorSource,
 		onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy,
 		saveIntoProfile: Bool
 	) {
@@ -138,7 +140,7 @@ public struct GetSigningFactorsRequest: Sendable, Hashable {
 }
 
 extension FactorSourcesClient {
-	public func createNewMainBDFS() async throws -> PrivateHDFactorSource {
+	public func createNewMainBDFS() async throws -> PrivateHierarchicalDeterministicFactorSource {
 		try await createNewMainDeviceFactorSource()
 	}
 
@@ -250,23 +252,23 @@ extension FactorSourcesClient {
 		try await saveFactorSource(newMainBDFS.embed())
 	}
 
-	public func addOffDeviceFactorSource(
-		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		label: OffDeviceMnemonicFactorSource.Hint.Label
-	) async throws -> FactorSource {
-		let factorSource = try OffDeviceMnemonicFactorSource.from(
-			mnemonicWithPassphrase: mnemonicWithPassphrase,
-			label: label
-		)
-
-		try await saveFactorSource(factorSource.embed())
-
-		return factorSource.embed()
-	}
+//	public func addOffDeviceFactorSource(
+//		mnemonicWithPassphrase: MnemonicWithPassphrase,
+//		label: OffDeviceMnemonicFactorSource.Hint.Label
+//	) async throws -> FactorSource {
+//		let factorSource = try OffDeviceMnemonicFactorSource.from(
+//			mnemonicWithPassphrase: mnemonicWithPassphrase,
+//			label: label
+//		)
+//
+//		try await saveFactorSource(factorSource.embed())
+//
+//		return factorSource.embed()
+//	}
 
 	@discardableResult
 	public func addOnDeviceFactorSource(
-		privateHDFactorSource: PrivateHDFactorSource,
+		privateHDFactorSource: PrivateHierarchicalDeterministicFactorSource,
 		onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy,
 		saveIntoProfile: Bool
 	) async throws -> FactorSourceID {

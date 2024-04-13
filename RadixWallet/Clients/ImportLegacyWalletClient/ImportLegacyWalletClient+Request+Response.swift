@@ -1,6 +1,6 @@
 // MARK: - ScannedParsedOlympiaWalletToMigrate
 public struct ScannedParsedOlympiaWalletToMigrate: Sendable, Hashable {
-	public let mnemonicWordCount: BIP39.WordCount
+	public let mnemonicWordCount: BIP39WordCount
 	public let accounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 }
 
@@ -8,12 +8,12 @@ public struct ScannedParsedOlympiaWalletToMigrate: Sendable, Hashable {
 public struct MigrateOlympiaSoftwareAccountsToBabylonRequest: Sendable, Hashable {
 	public let olympiaAccounts: Set<OlympiaAccountToMigrate>
 	public let olympiaFactorSouceID: FactorSourceIDFromHash
-	public let olympiaFactorSource: PrivateHDFactorSource?
+	public let olympiaFactorSource: PrivateHierarchicalDeterministicFactorSource?
 
 	public init(
 		olympiaAccounts: Set<OlympiaAccountToMigrate>,
 		olympiaFactorSouceID: FactorSourceIDFromHash,
-		olympiaFactorSource: PrivateHDFactorSource?
+		olympiaFactorSource: PrivateHierarchicalDeterministicFactorSource?
 	) {
 		self.olympiaAccounts = olympiaAccounts
 		self.olympiaFactorSource = olympiaFactorSource

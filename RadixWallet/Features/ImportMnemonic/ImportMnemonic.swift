@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ImportMnemonic
@@ -11,21 +12,21 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		public var idOfWordWithTextFieldFocus: ImportMnemonicWord.State.ID?
 
-		public var language: BIP39.Language
-		public var wordCount: BIP39.WordCount {
-			guard let wordCount = BIP39.WordCount(wordCount: words.count) else {
+		public var language: BIP39Language
+		public var wordCount: BIP39WordCount {
+			guard let wordCount = BIP39WordCount(wordCount: words.count) else {
 				assertionFailure("Should never happen")
 				return .twentyFour
 			}
 			return wordCount
 		}
 
-		public mutating func changeWordCount(to newWordCount: BIP39.WordCount) {
+		public mutating func changeWordCount(to newWordCount: BIP39WordCount) {
 			let wordCount = words.count
-			let delta = newWordCount.rawValue - wordCount
+			let delta = Int(newWordCount.rawValue) - wordCount
 			if delta > 0 {
 				// is increasing word count
-				words.append(contentsOf: (wordCount ..< newWordCount.rawValue).map {
+				words.append(contentsOf: (wordCount ..< Int(newWordCount.rawValue)).map {
 					.init(
 						id: $0,
 						placeholder: ImportMnemonic.placeholder(
@@ -53,7 +54,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			)
 		}
 
-		public var completedWords: [BIP39.Word] {
+		public var completedWords: [BIP39Word] {
 			words.compactMap(\.completeWord)
 		}
 
@@ -173,12 +174,12 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			warningOnContinue: OnContinueWarning? = nil,
 			isWordCountFixed: Bool = false,
 			persistStrategy: PersistStrategy?,
-			language: BIP39.Language = .english,
-			wordCount: BIP39.WordCount = .twelve,
+			language: BIP39Language = .english,
+			wordCount: BIP39WordCount = .twelve,
 			bip39Passphrase: String = "",
 			offDeviceMnemonicInfoPrompt: OffDeviceMnemonicInfo.State? = nil
 		) {
-			precondition(wordCount.rawValue.isMultiple(of: ImportMnemonic.wordsPerRow))
+			precondition(wordCount.rawValue.isMultiple(of: UInt8(ImportMnemonic.wordsPerRow)))
 
 			self.mode = .write(
 				.init(
@@ -231,7 +232,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 						ImportMnemonicWord.State(
 							id: $0.offset,
 							value: .complete(
-								text: $0.element.word.rawValue,
+								text: $0.element.word,
 								word: $0.element,
 								completion: .auto(match: .exact)
 							),
@@ -262,7 +263,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		case toggleModeButtonTapped
 		case passphraseChanged(String)
-		case changedWordCountTo(BIP39.WordCount)
+		case changedWordCountTo(BIP39WordCount)
 		case doneViewing
 		case closeButtonTapped
 		case backButtonTapped
@@ -298,7 +299,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case persistedNewFactorSourceInProfile(FactorSource)
 		case persistedMnemonicInKeychainOnly(FactorSource)
 		case notPersisted(MnemonicWithPassphrase)
-		case doneViewing(idOfBackedUpFactorSource: FactorSource.ID.FromHash?) // `nil` means it was already marked as backed up
+		case doneViewing(idOfBackedUpFactorSource: FactorSourceIdFromHash?) // `nil` means it was already marked as backed up
 	}
 
 	public struct Destination: DestinationReducer {
@@ -371,7 +372,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			let lookupResult = lookup(input: displayText, state)
 			switch lookupResult {
 			case let .known(.ambigous(candidates, input)):
-				if let exactMatch = candidates.first(where: { $0.word == input }) {
+				if let exactMatch = candidates.first(where: { $0.word == input.rawValue }) {
 					state.words[id: id]?.value = .complete(
 						text: displayText,
 						word: exactMatch,
@@ -635,7 +636,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 }
 
 extension ImportMnemonic {
-	private func lookup(input: String, _ state: State) -> BIP39.WordList.LookupResult {
+	private func lookup(input: String, _ state: State) -> BIP39LookupResult {
 		mnemonicClient.lookup(.init(
 			language: state.language,
 			input: input,
@@ -644,7 +645,7 @@ extension ImportMnemonic {
 	}
 
 	private func completeWith(
-		word: BIP39.Word,
+		word: BIP39Word,
 		completion: ImportMnemonicWord.State.WordValue.Completion,
 		id: ImportMnemonicWord.State.ID,
 		input: String,
@@ -658,7 +659,7 @@ extension ImportMnemonic {
 		id: ImportMnemonicWord.State.ID,
 		input: String,
 		_ state: inout State,
-		lookupResult: BIP39.WordList.LookupResult
+		lookupResult: BIP39LookupResult
 	) -> Effect<Action> {
 		switch lookupResult {
 		case let .known(.ambigous(candidates, nonEmptyInput)):
@@ -697,31 +698,31 @@ extension ImportMnemonic {
 extension ImportMnemonic {
 	static func placeholder(
 		index: Int,
-		wordCount: BIP39.WordCount,
-		language: BIP39.Language
+		wordCount: BIP39WordCount,
+		language: BIP39Language
 	) -> String {
 		precondition(index <= 23, "Invalid BIP39 word index, got index: \(index), exected less than 24.")
-		let word: BIP39.Word = {
-			let wordList = BIP39.wordList(for: language)
+		let word: BIP39Word = {
+			let wordList = language.wordlist() // BIP39.wordList(for: language)
 			switch language {
 			case .english:
 				let bip39Alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", /* X is missing */ "y", "z"]
 				return wordList
-					.words
 					// we use `last` simply because we did not like the words "abandon baby"
 					// which we get by using `first`, too sad a combination.
 					.last(
-						where: { $0.word.rawValue.hasPrefix(bip39Alphabet[index]) }
+						where: { $0.word.hasPrefix(bip39Alphabet[index]) }
 					)!
 
 			default:
 				let scale = UInt16(89) // 2048 / 23
-				let indexScaled = BIP39.Word.Index(valueBoundBy16Bits: scale * UInt16(index))!
-				return wordList.indexToWord[indexScaled]!
+//				let indexScaled = BIP39Word.Index(valueBoundBy16Bits: scale * UInt16(index))!
+				let indexScaled = U11(inner: scale * UInt16(index))
+				return wordList.first(where: { $0.index == indexScaled })!
 			}
 
 		}()
-		return word.word.rawValue
+		return word.word
 	}
 }
 

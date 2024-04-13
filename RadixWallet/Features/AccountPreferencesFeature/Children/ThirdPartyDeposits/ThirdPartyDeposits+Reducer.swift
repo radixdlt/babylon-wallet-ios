@@ -1,14 +1,13 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
-
-public typealias ThirdPartyDeposits = Sargon.Account.OnLedgerSettings.ThirdPartyDeposits
 
 // MARK: - ManageThirdPartyDeposits
 public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 	public struct State: Hashable, Sendable {
 		var account: Sargon.Account
 
-		var depositRule: ThirdPartyDeposits.DepositRule {
+		var depositRule: DepositRule {
 			thirdPartyDeposits.depositRule
 		}
 

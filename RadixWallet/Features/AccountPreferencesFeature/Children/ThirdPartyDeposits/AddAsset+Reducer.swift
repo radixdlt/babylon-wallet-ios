@@ -33,27 +33,31 @@ public struct AddAsset: FeatureReducer, Sendable {
 
 			let address: ResourceViewState.Address?
 
-			switch mode {
-			case let .allowDenyAssets(exceptionRule):
-				address = try? .assetException(.init(address: .init(validatingAddress: resourceAddress), exceptionRule: exceptionRule))
-			case .allowDepositors:
-				address = ThirdPartyDeposits.DepositorAddress(raw: resourceAddress).map { .allowedDepositor($0) }
-			}
+			sargonProfileFinishMigrateAtEndOfStage1()
 
-			guard let address else {
-				return .invalid
-			}
-
-			guard address.resourceAddress.networkID == networkID else {
-				// On wrong network
-				return .wrongNetwork(address, incorrectNetwork: address.resourceAddress.networkID.rawValue)
-			}
-
-			guard !alreadyAddedResources.contains(where: { $0.resourceAddress == address.resourceAddress }) else {
-				return .alreadyAdded
-			}
-
-			return .valid(address)
+//			switch mode {
+//			case let .allowDenyAssets(exceptionRule):
+//				address = try? .assetException(.init(address: .init(validatingAddress: resourceAddress), exceptionRule: exceptionRule))
+//			case .allowDepositors:
+//				if let resourceAddress = try? ResourceAddress(validatingAddress: resourceAddress) {
+//					address = ResourceOrNonFungible.resource(value: resourceAddress).map { .allowedDepositor($0) }
+//				}
+//			}
+//
+//			guard let address else {
+//				return .invalid
+//			}
+//
+//			guard address.resourceAddress.networkID == networkID else {
+//				// On wrong network
+//				return .wrongNetwork(address, incorrectNetwork: address.resourceAddress.networkID.rawValue)
+//			}
+//
+//			guard !alreadyAddedResources.contains(where: { $0.resourceAddress == address.resourceAddress }) else {
+//				return .alreadyAdded
+//			}
+//
+//			return .valid(address)
 		}
 	}
 
@@ -96,18 +100,19 @@ public struct AddAsset: FeatureReducer, Sendable {
 	}
 }
 
-extension ThirdPartyDeposits.DepositorAddress {
+extension ResourceOrNonFungible {
 	init?(raw: String) {
-		if let asResourceAddress = try? ResourceAddress(validatingAddress: raw) {
-			self = .resourceAddress(asResourceAddress)
-			return
-		}
-
-		if let asNFTId = try? NonFungibleGlobalId(raw) {
-			self = .nonFungibleGlobalID(asNFTId)
-			return
-		}
-
-		return nil
+//		if let asResourceAddress = try? ResourceAddress(validatingAddress: raw) {
+//			self = .resourceAddress(asResourceAddress)
+//			return
+//		}
+//
+//		if let asNFTId = try? NonFungibleGlobalId(raw) {
+//			self = .nonFungibleGlobalID(asNFTId)
+//			return
+//		}
+//
+//		return nil
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }

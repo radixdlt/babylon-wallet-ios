@@ -25,25 +25,33 @@ extension ImportLegacyWalletClient: DependencyKey {
 			var accountsSet = OrderedSet<MigratedAccount>()
 			for olympiaAccount in sortedOlympia {
 				defer { accountOffset += 1 }
-				let publicKey = Sargon.PublicKey.ecdsaSecp256k1(olympiaAccount.publicKey)
+				let publicKey = Sargon.PublicKey.secp256k1(olympiaAccount.publicKey)
+
 				let factorInstance = HierarchicalDeterministicFactorInstance(
-					id: factorSouceID,
-					publicKey: publicKey,
-					derivationPath: olympiaAccount.path.wrapAsDerivationPath()
+					factorSourceId: factorSouceID,
+					publicKey: .init(
+						publicKey: publicKey,
+						derivationPath: .bip44Like(
+							value: olympiaAccount.path
+						)
+					)
 				)
 
 				let displayName = olympiaAccount.displayName ?? defaultAccountName
 
 				let appearanceID = await accountsClient.nextAppearanceID(networkID, accountOffset)
-				let babylon = try Sargon.Account(
-					networkID: networkID,
-					factorInstance: factorInstance,
-					displayName: displayName,
-					extraProperties: .init(appearanceID: appearanceID)
-				)
+//
+//				let babylon = try Sargon.Account(
+//					networkID: networkID,
+//					factorInstance: factorInstance,
+//					displayName: displayName,
+//					extraProperties: .init(appearanceID: appearanceID)
+//				)
+//
+//				let migrated = MigratedAccount(olympia: olympiaAccount, babylon: babylon)
+//				accountsSet.append(migrated)
 
-				let migrated = MigratedAccount(olympia: olympiaAccount, babylon: babylon)
-				accountsSet.append(migrated)
+				sargonProfileFinishMigrateAtEndOfStage1()
 			}
 
 			guard let accounts = NonEmpty<OrderedSet<MigratedAccount>>(rawValue: accountsSet) else {
@@ -160,10 +168,10 @@ func convert(
 	parsedOlympiaAccount raw: Olympia.Parsed.Account
 ) throws -> OlympiaAccountToMigrate {
 	let address = LegacyOlympiaAccountAddress(
-		publicKey: raw.publicKey.intoSargon()
+		publicKey: raw.publicKey
 	)
 
-	let derivationPath = try Bip44LikePath(
+	let derivationPath = try BIP44LikePath(
 		index: raw.addressIndex
 	)
 

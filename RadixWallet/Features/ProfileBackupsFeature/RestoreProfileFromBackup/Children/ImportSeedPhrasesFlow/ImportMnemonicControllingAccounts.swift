@@ -51,7 +51,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case validated(PrivateHDFactorSource)
+		case validated(PrivateHierarchicalDeterministicFactorSource)
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -221,7 +221,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 				return fail(error: nil)
 			}
 
-			let privateHDFactorSource = try PrivateHDFactorSource(
+			let privateHDFactorSource = try PrivateHierarchicalDeterministicFactorSource(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
 				factorSource: factorSource
 			)

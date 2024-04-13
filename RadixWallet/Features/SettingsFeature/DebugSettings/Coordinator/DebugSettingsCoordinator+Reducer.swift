@@ -19,11 +19,11 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case factorSourcesButtonTapped
-		case debugInspectProfileButtonTapped
+//		case debugInspectProfileButtonTapped
 		case debugUserDefaultsContentsButtonTapped
 		case debugTestKeychainButtonTapped
 		case debugKeychainContentsButtonTapped
-		case securityStructureConfigsButtonTapped
+//		case securityStructureConfigsButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -33,33 +33,33 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case debugUserDefaultsContents(DebugUserDefaultsContents.State)
-			case debugInspectProfile(DebugInspectProfile.State)
-			case debugManageFactorSources(DebugManageFactorSources.State)
+//			case debugInspectProfile(DebugInspectProfile.State)
+//			case debugManageFactorSources(DebugManageFactorSources.State)
 			#if DEBUG
 			case debugKeychainTest(DebugKeychainTest.State)
 			case debugKeychainContents(DebugKeychainContents.State)
 			#endif // DEBUG
-			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.State)
+//			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case debugUserDefaultsContents(DebugUserDefaultsContents.Action)
-			case debugInspectProfile(DebugInspectProfile.Action)
+//			case debugInspectProfile(DebugInspectProfile.Action)
 			#if DEBUG
 			case debugKeychainTest(DebugKeychainTest.Action)
 			case debugKeychainContents(DebugKeychainContents.Action)
 			#endif // DEBUG
-			case debugManageFactorSources(DebugManageFactorSources.Action)
-			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.Action)
+//			case debugManageFactorSources(DebugManageFactorSources.Action)
+//			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
 			Scope(state: /State.debugUserDefaultsContents, action: /Action.debugUserDefaultsContents) {
 				DebugUserDefaultsContents()
 			}
-			Scope(state: /State.debugInspectProfile, action: /Action.debugInspectProfile) {
-				DebugInspectProfile()
-			}
+//			Scope(state: /State.debugInspectProfile, action: /Action.debugInspectProfile) {
+//				DebugInspectProfile()
+//			}
 			#if DEBUG
 			Scope(state: /State.debugKeychainTest, action: /Action.debugKeychainTest) {
 				DebugKeychainTest()
@@ -68,12 +68,12 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 				DebugKeychainContents()
 			}
 			#endif // DEBUG
-			Scope(state: /State.debugManageFactorSources, action: /Action.debugManageFactorSources) {
-				DebugManageFactorSources()
-			}
-			Scope(state: /State.securityStructureConfigs, action: /Action.securityStructureConfigs) {
-				SecurityStructureConfigurationListCoordinator()
-			}
+//			Scope(state: /State.debugManageFactorSources, action: /Action.debugManageFactorSources) {
+//				DebugManageFactorSources()
+//			}
+//			Scope(state: /State.securityStructureConfigs, action: /Action.securityStructureConfigs) {
+//				SecurityStructureConfigurationListCoordinator()
+//			}
 		}
 	}
 
@@ -95,15 +95,16 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .factorSourcesButtonTapped:
-			state.destination = .debugManageFactorSources(.init())
+//			state.destination = .debugManageFactorSources(.init())
+			sargonProfileFinishMigrateAtEndOfStage1()
 			return .none
 
-		case .debugInspectProfileButtonTapped:
-			return .run { send in
-				let snapshot = await appPreferencesClient.extractProfileSnapshot()
-				guard let profile = try? Profile(snapshot: snapshot) else { return }
-				await send(.internal(.profileToDebugLoaded(profile)))
-			}
+//		case .debugInspectProfileButtonTapped:
+//			return .run { send in
+//				let snapshot = await appPreferencesClient.extractProfileSnapshot()
+//				guard let profile = try? Profile(snapshot: snapshot) else { return }
+//				await send(.internal(.profileToDebugLoaded(profile)))
+//			}
 
 		case .debugTestKeychainButtonTapped:
 			#if DEBUG
@@ -117,9 +118,9 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			#endif // DEBUG
 			return .none
 
-		case .securityStructureConfigsButtonTapped:
-			state.destination = .securityStructureConfigs(.init())
-			return .none
+//		case .securityStructureConfigsButtonTapped:
+//			state.destination = .securityStructureConfigs(.init())
+//			return .none
 
 		case .debugUserDefaultsContentsButtonTapped:
 			state.destination = .debugUserDefaultsContents(.init())
@@ -127,11 +128,11 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
-		case let .profileToDebugLoaded(profile):
-			state.destination = .debugInspectProfile(.init(profile: profile))
-			return .none
-		}
-	}
+//	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+//		switch internalAction {
+//		case let .profileToDebugLoaded(profile):
+//			state.destination = .debugInspectProfile(.init(profile: profile))
+//			return .none
+//		}
+//	}
 }

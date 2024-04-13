@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ImportOlympiaLedgerAccountsAndFactorSources
@@ -122,7 +123,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				let ledgerInfo = try await ledgerHardwareWalletClient.getDeviceInfo()
 
 				if let ledger = try await factorSourcesClient.getFactorSource(
-					id: .init(kind: .ledgerHQHardwareWallet, hash: ledgerInfo.id.data.data),
+					id: .init(kind: .ledgerHqHardwareWallet, hash: ledgerInfo.id.data.data),
 					as: LedgerHardwareWalletFactorSource.self
 				) {
 					await send(.internal(.useExistingLedger(ledger)))
@@ -307,7 +308,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 		}
 
 		let derivedKeys: [Secp256k1PublicKey] = derivedPublicKeys.compactMap {
-			guard case let .ecdsaSecp256k1(k1Key) = $0.publicKey else {
+			guard case let .secp256k1(k1Key) = $0.publicKey else {
 				return nil
 			}
 			return k1Key
@@ -343,7 +344,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 	}
 }
 
-extension LedgerHardwareWalletFactorSource.DeviceModel {
+extension LedgerHardwareWalletModel {
 	init(model: P2P.LedgerHardwareWallet.Model) {
 		switch model {
 		case .nanoS: self = .nanoS

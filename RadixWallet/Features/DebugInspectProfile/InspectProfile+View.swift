@@ -221,7 +221,7 @@ public protocol IndentedView: SwiftUI.View {
 
  // MARK: - FactorSourceCommonView
  public struct FactorSourceCommonView: View {
- 	public let common: FactorSource.Common
+ 	public let common: FactorSourceCommon
  	public var body: some View {
  		Labeled("Added On", value: common.addedOn.ISO8601Format())
  		Labeled("LastUsed On", value: common.lastUsedOn.ISO8601Format())

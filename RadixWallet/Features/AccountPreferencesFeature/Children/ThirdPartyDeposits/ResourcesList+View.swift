@@ -89,7 +89,7 @@ extension ResourcesList.View {
 						send: { .exceptionListChanged($0) }
 					)
 				) {
-					ForEach(ThirdPartyDeposits.DepositAddressExceptionRule.allCases, id: \.self) {
+					ForEach(DepositAddressExceptionRule.allCases, id: \.self) {
 						Text($0.text)
 					}
 				}
@@ -165,13 +165,17 @@ private extension StoreOf<ResourcesList> {
 
 @MainActor
 private extension View {
-	func destinations(with store: StoreOf<ResourcesList>) -> some View {
+	func destinations(
+		with store: StoreOf<ResourcesList>
+	) -> some View {
 		let destinationStore = store.destination
 		return addAsset(with: destinationStore)
 			.confirmDeletionAlert(with: destinationStore)
 	}
 
-	private func addAsset(with destinationStore: PresentationStoreOf<ResourcesList.Destination>) -> some View {
+	private func addAsset(
+		with destinationStore: PresentationStoreOf<ResourcesList.Destination>
+	) -> some View {
 		sheet(
 			store: destinationStore,
 			state: /ResourcesList.Destination.State.addAsset,
@@ -180,7 +184,9 @@ private extension View {
 		)
 	}
 
-	private func confirmDeletionAlert(with destinationStore: PresentationStoreOf<ResourcesList.Destination>) -> some View {
+	private func confirmDeletionAlert(
+		with destinationStore: PresentationStoreOf<ResourcesList.Destination>
+	) -> some View {
 		alert(
 			store: destinationStore,
 			state: /ResourcesList.Destination.State.confirmAssetDeletion,
@@ -189,7 +195,7 @@ private extension View {
 	}
 }
 
-extension ThirdPartyDeposits.DepositAddressExceptionRule {
+extension DepositAddressExceptionRule {
 	var text: String {
 		switch self {
 		case .allow:

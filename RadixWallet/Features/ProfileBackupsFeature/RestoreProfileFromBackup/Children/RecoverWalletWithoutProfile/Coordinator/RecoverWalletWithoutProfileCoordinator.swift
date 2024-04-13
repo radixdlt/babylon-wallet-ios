@@ -6,7 +6,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		public var path: StackState<Path.State> = .init()
 
 		/// Not saved into keychain yet
-		public var factorSourceOfImportedMnemonic: PrivateHDFactorSource?
+		public var factorSourceOfImportedMnemonic: PrivateHierarchicalDeterministicFactorSource?
 
 		@PresentationState
 		var destination: Destination.State? = nil
@@ -139,7 +139,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 						isOlympiaCompatible: false // FIXME: is this what we want?
 					)
 
-					let privateHD = try PrivateHDFactorSource(
+					let privateHD = try PrivateHierarchicalDeterministicFactorSource(
 						mnemonicWithPassphrase: mnemonicWithPassphrase,
 						factorSource: mainBDFS
 					)

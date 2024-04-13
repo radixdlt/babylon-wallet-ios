@@ -15,19 +15,19 @@ public struct MnemonicClient: Sendable {
 }
 
 extension MnemonicClient {
-	public typealias Generate = @Sendable (BIP39.WordCount, BIP39.Language) throws -> Mnemonic
-	public typealias Import = @Sendable (String, BIP39.Language?) throws -> Mnemonic
-	public typealias LookupWord = @Sendable (LookupRequest) -> BIP39.WordList.LookupResult
+	public typealias Generate = @Sendable (BIP39WordCount, BIP39Language) throws -> Mnemonic
+	public typealias Import = @Sendable (String, BIP39Language?) throws -> Mnemonic
+	public typealias LookupWord = @Sendable (LookupRequest) -> BIP39LookupResult
 }
 
 // MARK: - LookupRequest
 public struct LookupRequest: Sendable, Hashable {
-	public let language: BIP39.Language
+	public let language: BIP39Language
 	public let input: String
 	public let minLenghForCandidatesLookup: Int
 
 	public init(
-		language: BIP39.Language,
+		language: BIP39Language,
 		input: String,
 		minLenghForCandidatesLookup: Int
 	) {

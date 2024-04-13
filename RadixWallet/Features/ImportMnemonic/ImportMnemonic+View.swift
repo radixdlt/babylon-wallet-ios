@@ -55,8 +55,8 @@ extension ImportMnemonic {
 		let header: State.Header?
 		let warning: String?
 		let rowCount: Int
-		let wordCount: BIP39.WordCount
-		let completedWords: [BIP39.Word]
+		let wordCount: BIP39WordCount
+		let completedWords: [BIP39Word]
 		let mnemonic: Mnemonic?
 		let bip39Passphrase: String
 
@@ -137,7 +137,7 @@ extension ImportMnemonic {
 									get: \.wordCount,
 									send: { .changedWordCountTo($0) }
 								)) {
-									ForEach(BIP39.WordCount.allCases, id: \.self) { wordCount in
+									ForEach(BIP39WordCount.allCases, id: \.self) { wordCount in
 										Text("\(wordCount.rawValue)")
 											.textStyle(.body1Regular)
 									}

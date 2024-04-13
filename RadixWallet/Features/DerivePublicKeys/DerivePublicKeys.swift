@@ -24,9 +24,9 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 
 			var factorSourceAccessPurpose: FactorSourceAccess.State.Purpose {
 				switch self {
-				case .createNewEntity(.account):
+				case .createNewEntity(.accounts): // CYON Migration FIX typo in Sargon
 					.createAccount
-				case .createNewEntity(.identity):
+				case .createNewEntity(.persona):
 					.createPersona
 				case .accountRecoveryScan:
 					.deriveAccounts
@@ -41,7 +41,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		public let derivationsPathOption: DerivationPathOption
 		public enum DerivationPathOption: Sendable, Hashable {
 			case knownPaths([DerivationPath], networkID: NetworkID) // derivation paths must not be a Set, since import from Olympia can contain duplicate derivation paths, for different Ledger devices.
-			case next(networkOption: NetworkOption, entityKind: EntityKind, curve: SLIP10.Curve, scheme: DerivationPathScheme)
+			case next(networkOption: NetworkOption, entityKind: EntityKind, curve: SLIP10Curve, scheme: DerivationPathScheme)
 
 			public enum NetworkOption: Sendable, Hashable {
 				case specific(NetworkID)
@@ -59,7 +59,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			public static func next(
 				for entityKind: EntityKind,
 				networkID: NetworkID?,
-				curve: SLIP10.Curve,
+				curve: SLIP10Curve,
 				scheme: DerivationPathScheme
 			) -> Self {
 				.next(
@@ -76,7 +76,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		public enum FactorSourceOption: Sendable, Hashable {
 			case device
 			case specific(FactorSource)
-			case specificPrivateHDFactorSource(PrivateHDFactorSource)
+			case specificPrivateHDFactorSource(PrivateHierarchicalDeterministicFactorSource)
 
 			var factorSourceAccessKind: FactorSourceAccess.State.Kind {
 				switch self {
@@ -406,11 +406,12 @@ extension DerivePublicKeys {
 			derivationPathScheme: derivationPathScheme,
 			networkID: maybeNetworkID
 		)
-		return try DerivationPath.forEntity(
-			kind: entityKind,
-			networkID: networkID,
-			index: index
-		)
+//		return try DerivationPath.forEntity(
+//			kind: entityKind,
+//			networkID: networkID,
+//			index: index
+//		)
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	private func nextIndex(
@@ -432,7 +433,7 @@ extension DerivePublicKeys {
 	}
 }
 
-extension SLIP10.Curve {
+extension SLIP10Curve {
 	var p2pCurve: P2P.LedgerHardwareWallet.KeyParameters.Curve {
 		switch self {
 		case .curve25519:

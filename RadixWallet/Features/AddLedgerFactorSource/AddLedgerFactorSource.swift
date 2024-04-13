@@ -134,7 +134,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		return .run { send in
 
 			if let ledger = try await factorSourcesClient.getFactorSource(
-				id: .init(kind: .ledgerHQHardwareWallet, hash: ledgerDeviceInfo.id.data.data),
+				id: .init(kind: .ledgerHqHardwareWallet, hash: ledgerDeviceInfo.id.data.data),
 				as: LedgerHardwareWalletFactorSource.self
 			) {
 				await send(.internal(.alreadyExists(ledger)))

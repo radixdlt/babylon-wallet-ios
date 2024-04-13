@@ -54,26 +54,27 @@ public struct DebugKeychainContents: Sendable, FeatureReducer {
 	}
 
 	private func loadKeyValues() -> Effect<Action> {
-		.run { send in
-			let keyedMnemonics = secureStorageClient.getAllMnemonics()
-
-			let values = try await keyedMnemonics.asyncMap {
-				do {
-					if
-						let deviceFactorSource = try await factorSourcesClient.getFactorSource(id: $0.factorSourceID.embed(), as: DeviceFactorSource.self),
-						let entitiesControlledByFactorSource = try? await deviceFactorSourceClient.entitiesControlledByFactorSource(deviceFactorSource, nil)
-					{
-						return KeyedMnemonicWithMetadata(keyedMnemonic: $0, entitiesControlledByFactorSource: entitiesControlledByFactorSource)
-					} else {
-						return KeyedMnemonicWithMetadata(keyedMnemonic: $0)
-					}
-				} catch {
-					return KeyedMnemonicWithMetadata(keyedMnemonic: $0)
-				}
-			}
-
-			await send(.internal(.loadedMnemonics(values)))
-		}
+//		.run { send in
+//			let keyedMnemonics = secureStorageClient.getAllMnemonics()
+//
+//			let values = try await keyedMnemonics.asyncMap {
+//				do {
+//					if
+//						let deviceFactorSource = try await factorSourcesClient.getFactorSource(id: $0.factorSourceID.embed(), as: DeviceFactorSource.self),
+//						let entitiesControlledByFactorSource = try? await deviceFactorSourceClient.entitiesControlledByFactorSource(deviceFactorSource, nil)
+//					{
+//						return KeyedMnemonicWithMetadata(keyedMnemonic: $0, entitiesControlledByFactorSource: entitiesControlledByFactorSource)
+//					} else {
+//						return KeyedMnemonicWithMetadata(keyedMnemonic: $0)
+//					}
+//				} catch {
+//					return KeyedMnemonicWithMetadata(keyedMnemonic: $0)
+//				}
+//			}
+//
+//			await send(.internal(.loadedMnemonics(values)))
+//		}
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }
 

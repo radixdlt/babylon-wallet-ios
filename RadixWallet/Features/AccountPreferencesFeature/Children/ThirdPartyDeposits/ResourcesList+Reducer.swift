@@ -1,9 +1,10 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ResourcesListMode
 public enum ResourcesListMode: Hashable, Sendable {
-	public typealias ExceptionRule = ThirdPartyDeposits.DepositAddressExceptionRule
+	public typealias ExceptionRule = DepositAddressExceptionRule
 	case allowDenyAssets(ExceptionRule)
 	case allowDepositors
 }
@@ -11,8 +12,8 @@ public enum ResourcesListMode: Hashable, Sendable {
 // MARK: - ResourceViewState
 public struct ResourceViewState: Hashable, Sendable, Identifiable {
 	public enum Address: Hashable, Sendable {
-		case assetException(ThirdPartyDeposits.AssetException)
-		case allowedDepositor(ThirdPartyDeposits.DepositorAddress)
+		case assetException(AssetException)
+		case allowedDepositor(ResourceOrNonFungible)
 	}
 
 	public var id: Address { address }
@@ -30,25 +31,27 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		let canModify: Bool
 
 		var allDepositorAddresses: OrderedSet<ResourceViewState.Address> {
-			switch mode {
-			case .allowDenyAssets:
-				OrderedSet(thirdPartyDeposits.assetsExceptionSet().map { .assetException($0) })
-			case .allowDepositors:
-				OrderedSet(thirdPartyDeposits.depositorsAllowSet().map { .allowedDepositor($0) })
-			}
+//			switch mode {
+//			case .allowDenyAssets:
+//				OrderedSet(thirdPartyDeposits.assetsExceptionSet().map { .assetException($0) })
+//			case .allowDepositors:
+//				OrderedSet(thirdPartyDeposits.depositorsAllowSet().map { .allowedDepositor($0) })
+//			}
+			sargonProfileFinishMigrateAtEndOfStage1()
 		}
 
 		var resourcesForDisplay: [ResourceViewState] {
-			switch mode {
-			case let .allowDenyAssets(exception):
-				let addresses: [ResourceViewState.Address] = thirdPartyDeposits.assetsExceptionSet()
-					.filter { $0.exceptionRule == exception }
-					.map { .assetException($0) }
-
-				return loadedResources.filter { addresses.contains($0.address) }
-			case .allowDepositors:
-				return loadedResources
-			}
+//			switch mode {
+//			case let .allowDenyAssets(exception):
+//				let addresses: [ResourceViewState.Address] = thirdPartyDeposits.assetsExceptionSet()
+//					.filter { $0.exceptionRule == exception }
+//					.map { .assetException($0) }
+//
+//				return loadedResources.filter { addresses.contains($0.address) }
+//			case .allowDepositors:
+//				return loadedResources
+//			}
+			sargonProfileFinishMigrateAtEndOfStage1()
 		}
 
 		var mode: ResourcesListMode
@@ -66,7 +69,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		case task
 		case addAssetTapped
 		case assetRemove(ResourceViewState.Address)
-		case exceptionListChanged(ThirdPartyDeposits.DepositAddressExceptionRule)
+		case exceptionListChanged(DepositAddressExceptionRule)
 	}
 
 	public enum DelegateAction: Equatable, Sendable {
@@ -150,16 +153,17 @@ public struct ResourcesList: FeatureReducer, Sendable {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .resourceLoaded(resource, newAsset):
-			state.loadedResources.append(.init(iconURL: resource?.metadata.iconURL, name: resource?.metadata.title, address: newAsset))
-
-			switch newAsset {
-			case let .assetException(resource):
-				state.thirdPartyDeposits.appendToAssetsExceptionList(resource)
-			case let .allowedDepositor(depositorAddress):
-				state.thirdPartyDeposits.appendToDepositorsAllowList(depositorAddress)
-			}
-
-			return .send(.delegate(.updated(state.thirdPartyDeposits)))
+//			state.loadedResources.append(.init(iconURL: resource?.metadata.iconURL, name: resource?.metadata.title, address: newAsset))
+//
+//			switch newAsset {
+//			case let .assetException(resource):
+//				state.thirdPartyDeposits.appendToAssetsExceptionList(resource)
+//			case let .allowedDepositor(depositorAddress):
+//				state.thirdPartyDeposits.appendToDepositorsAllowList(depositorAddress)
+//			}
+//
+//			return .send(.delegate(.updated(state.thirdPartyDeposits)))
+			sargonProfileFinishMigrateAtEndOfStage1()
 
 		case let .resourcesLoaded(resources):
 			guard let resources else {
@@ -193,19 +197,20 @@ public struct ResourcesList: FeatureReducer, Sendable {
 			}
 
 		case let .confirmAssetDeletion(.confirmTapped(resource)):
-			state.loadedResources.removeAll(where: { $0.address == resource })
-			switch resource {
-			case let .assetException(resource):
-				state.thirdPartyDeposits.updateAssetsExceptionList {
-					$0?.removeAll(where: { $0.address == resource.address })
-				}
-			case let .allowedDepositor(depositorAddress):
-				state.thirdPartyDeposits.updateDepositorsAllowList {
-					$0?.remove(depositorAddress)
-				}
-			}
-
-			return .send(.delegate(.updated(state.thirdPartyDeposits)))
+//			state.loadedResources.removeAll(where: { $0.address == resource })
+//			switch resource {
+//			case let .assetException(resource):
+//				state.thirdPartyDeposits.updateAssetsExceptionList {
+//					$0?.removeAll(where: { $0.address == resource.address })
+//				}
+//			case let .allowedDepositor(depositorAddress):
+//				state.thirdPartyDeposits.updateDepositorsAllowList {
+//					$0?.remove(depositorAddress)
+//				}
+//			}
+//
+//			return .send(.delegate(.updated(state.thirdPartyDeposits)))
+			sargonProfileFinishMigrateAtEndOfStage1()
 
 		default:
 			return .none
@@ -267,7 +272,7 @@ extension ResourcesListMode {
 	}
 }
 
-extension ThirdPartyDeposits.DepositorAddress {
+extension ResourceOrNonFungible {
 	var resourceAddress: ResourceAddress {
 		switch self {
 		case let .resourceAddress(address):
@@ -278,8 +283,8 @@ extension ThirdPartyDeposits.DepositorAddress {
 	}
 }
 
-extension ThirdPartyDeposits.AssetException {
-	func updateExceptionRule(_ rule: ThirdPartyDeposits.DepositAddressExceptionRule) -> Self {
+extension AssetException {
+	func updateExceptionRule(_ rule: DepositAddressExceptionRule) -> Self {
 		.init(address: address, exceptionRule: rule)
 	}
 }

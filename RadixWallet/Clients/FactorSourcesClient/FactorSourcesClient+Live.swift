@@ -179,8 +179,8 @@ extension FactorSourcesClient: DependencyKey {
 
 				let mnemonicWithPassphrase = try MnemonicWithPassphrase(
 					mnemonic: mnemonicClient.generate(
-						BIP39.WordCount.twentyFour,
-						BIP39.Language.english
+						BIP39WordCount.twentyFour,
+						BIP39Language.english
 					)
 				)
 
@@ -206,7 +206,7 @@ extension FactorSourcesClient: DependencyKey {
 					)
 				)
 
-				return try PrivateHDFactorSource(
+				return try PrivateHierarchicalDeterministicFactorSource(
 					mnemonicWithPassphrase: mnemonicWithPassphrase,
 					factorSource: newBDFS
 				)
@@ -402,7 +402,7 @@ extension FactorSourceKind: Comparable {
 
 	fileprivate var signingOrder: Int {
 		switch self {
-		case .ledgerHQHardwareWallet: 0
+		case .ledgerHqHardwareWallet: 0
 		case .offDeviceMnemonic: 1
 		case .securityQuestions: 2
 		case .trustedContact: 3

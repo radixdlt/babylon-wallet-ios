@@ -19,6 +19,11 @@ extension String {
 	static let filenameProfileEncrypted: Self = "\(filenameProfileBase).\(profileFileEncryptedPart).json"
 }
 
+extension UTType {
+	// FIXME: should we declare our own file format? For now we use require `.json` file extension.
+	public static let profile: Self = .json
+}
+
 extension ExportableProfileFile {
 	public static let readableContentTypes: [UTType] = [.profile]
 

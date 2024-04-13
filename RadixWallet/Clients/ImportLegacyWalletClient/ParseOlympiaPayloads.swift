@@ -5,7 +5,7 @@ import SwiftUI
 extension Olympia {
 	public enum Export {}
 	public struct Parsed: Sendable, Hashable {
-		public let mnemonicWordCount: BIP39.WordCount
+		public let mnemonicWordCount: BIP39WordCount
 		public let accounts: NonEmpty<OrderedSet<Olympia.Parsed.Account>>
 
 		public struct Account: Sendable, Hashable {
@@ -69,13 +69,13 @@ public enum CAP33 {
 		payloads payloadStrings: NonEmpty<OrderedSet<NonEmptyString>>
 	) throws -> Olympia.Parsed {
 		var accounts: OrderedSet<Olympia.Parsed.Account> = []
-		var mnemonicWordCount: BIP39.WordCount? = nil
+		var mnemonicWordCount: BIP39WordCount? = nil
 		var rest: NonEmptyString? = nil
 
 		for payloadString in payloadStrings.rawValue.elements {
 			let payload = try _deserialize(payload: payloadString, rest: rest)
 			if mnemonicWordCount == nil {
-				mnemonicWordCount = BIP39.WordCount(wordCount: payload.header.mnemonicWordCount)!
+				mnemonicWordCount = BIP39WordCount(wordCount: payload.header.mnemonicWordCount)!
 			}
 			accounts.append(contentsOf: payload.contents.accounts)
 			rest = payload.contents.rest

@@ -16,13 +16,13 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 
 			case complete(
 				text: String, // might be empty if user pressed candidates button when empty
-				word: BIP39.Word,
+				word: BIP39Word,
 				completion: Completion
 			)
 
 			public enum Completion: Sendable, Hashable {
 				/// We automatically completed the word, since it was unambigiously identified as a BIP39 word.
-				case auto(match: BIP39.WordList.LookupResult.Known.UnambiguousMatch)
+				case auto(match: BIP39LookupResult.Known.UnambiguousMatch)
 
 				/// User explicitly chose the word from a list of candidates.
 				case user
@@ -45,7 +45,7 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 			var text: String {
 				switch self {
 				case let .complete(_, word, _):
-					word.word.rawValue
+					word.word
 				case let .incomplete(text, _):
 					text
 				}
@@ -63,7 +63,7 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 
 		public struct AutocompletionCandidates: Sendable, Hashable {
 			public let input: NonEmptyString
-			public let candidates: NonEmpty<OrderedSet<BIP39.Word>>
+			public let candidates: NonEmpty<OrderedSet<BIP39Word>>
 		}
 
 		public typealias ID = Int
@@ -91,7 +91,7 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 			value.isComplete
 		}
 
-		public var completeWord: BIP39.Word? {
+		public var completeWord: BIP39Word? {
 			guard case let .complete(_, word, _) = value else {
 				return nil
 			}
@@ -109,14 +109,14 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Hashable {
 		case wordChanged(input: String)
-		case userSelectedCandidate(BIP39.Word)
+		case userSelectedCandidate(BIP39Word)
 		case textFieldFocused(State.Field?)
 	}
 
 	public enum DelegateAction: Sendable, Hashable {
 		case lookupWord(input: String)
 		case lostFocus(displayText: String)
-		case userSelectedCandidate(BIP39.Word, fromPartial: String)
+		case userSelectedCandidate(BIP39Word, fromPartial: String)
 	}
 
 	public init() {}

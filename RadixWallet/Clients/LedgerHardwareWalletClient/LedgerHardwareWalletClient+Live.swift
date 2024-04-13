@@ -228,7 +228,7 @@ public struct FailedToFindFactorInstanceMatchingDerivationPathInSignature: Swift
 
 extension HierarchicalDeterministicPublicKey {
 	init(curve curveString: String, key keyData: Data, path: String) throws {
-		guard let curve = SLIP10.Curve(rawValue: curveString) else {
+		guard let curve = SLIP10Curve(rawValue: curveString) else {
 			struct BadCurve: Swift.Error {}
 			loggerGlobal.error("Bad curve")
 			throw BadCurve()

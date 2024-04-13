@@ -57,7 +57,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		}
 
 		struct ScannedQR: Sendable, Hashable {
-			let expectedMnemonicWordCount: BIP39.WordCount
+			let expectedMnemonicWordCount: BIP39WordCount
 			let scannedAccounts: AccountsToMigrate
 		}
 
@@ -342,7 +342,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	}
 
 	private func checkIfOlympiaFactorSourceAlreadyExists(
-		wordCount: BIP39.WordCount,
+		wordCount: BIP39WordCount,
 		_ softwareAccounts: AccountsToMigrate
 	) -> Effect<Action> {
 		.run { send in
@@ -403,7 +403,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				of: progress.softwareAccountsToMigrate
 			)
 
-			let privateHDFactorSource = try PrivateHDFactorSource(
+			let privateHDFactorSource = try PrivateHierarchicalDeterministicFactorSource(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
 				factorSource: DeviceFactorSource.olympia(
 					mnemonicWithPassphrase: mnemonicWithPassphrase
@@ -424,7 +424,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	private func migrateSoftwareAccountsToBabylon(
 		_ olympiaAccounts: AccountsToMigrate,
 		factorSourceID: FactorSourceIDFromHash,
-		factorSource: PrivateHDFactorSource?
+		factorSource: PrivateHierarchicalDeterministicFactorSource?
 	) -> Effect<Action> {
 		.run { send in
 			// Migrates and saved all accounts to Profile

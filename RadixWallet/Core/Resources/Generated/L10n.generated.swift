@@ -1535,7 +1535,7 @@ public enum L10n {
       /// Phone
       public static let device = L10n.tr("Localizable", "factorSources_kind_device", fallback: "Phone")
       /// Ledger
-      public static let ledgerHQHardwareWallet = L10n.tr("Localizable", "factorSources_kind_ledgerHQHardwareWallet", fallback: "Ledger")
+      public static let ledgerHqHardwareWallet = L10n.tr("Localizable", "factorSources_kind_ledgerHQHardwareWallet", fallback: "Ledger")
       /// Seed phrase
       public static let offDeviceMnemonic = L10n.tr("Localizable", "factorSources_kind_offDeviceMnemonic", fallback: "Seed phrase")
       /// Security Questions

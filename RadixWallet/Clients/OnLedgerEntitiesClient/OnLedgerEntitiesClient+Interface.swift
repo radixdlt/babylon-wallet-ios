@@ -371,7 +371,7 @@ extension OnLedgerEntitiesClient {
 
 	public struct CustomizedOnLedgerThirdPartDepositForAccount: Sendable, Hashable {
 		public let address: AccountAddress
-		public let rule: Sargon.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule
+		public let rule: DepositRule
 	}
 
 	public func getOnLedgerCustomizedThirdPartyDepositRule(
