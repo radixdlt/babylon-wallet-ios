@@ -240,7 +240,7 @@ func useTryDepositOrAbort(
 
 		let userAccount = try await accountsClient.fromSargon(sargonUserAccount)
 		let needsSignatureForDepositing = await needsSignatureForDepositting(into: userAccount, resource: resource)
-		let isSoftwareAccount = !userAccount.isLedgerAccount
+		let isSoftwareAccount = !userAccount.isLedgerControlled
 		let userHasAccessToMnemonic = userAccount.deviceFactorSourceID.map { deviceFactorSourceID in
 			secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(deviceFactorSourceID)
 		} ?? false

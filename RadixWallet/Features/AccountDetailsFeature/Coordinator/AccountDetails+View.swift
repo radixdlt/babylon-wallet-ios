@@ -8,7 +8,7 @@ extension AccountDetails.State {
 			appearanceID: account.appearanceID,
 			displayName: account.displayName.rawValue,
 			mnemonicHandlingCallToAction: mnemonicHandlingCallToAction,
-			isLedgerAccount: account.isLedgerAccount,
+			isLedgerAccount: account.isLedgerControlled,
 			showToolbar: destination == nil,
 			totalFiatWorth: showFiatWorth ? assets.totalFiatWorth : nil,
 			account: account

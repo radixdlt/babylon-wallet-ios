@@ -35,7 +35,7 @@ extension Sargon.Account {
 		address.isLegacy
 	}
 
-	public var isLedgerAccount: Bool {
+	public var isLedgerControlled: Bool {
 		switch self.securityState {
 		case let .unsecured(control):
 			control.transactionSigning.factorSourceID.kind == .ledgerHqHardwareWallet
