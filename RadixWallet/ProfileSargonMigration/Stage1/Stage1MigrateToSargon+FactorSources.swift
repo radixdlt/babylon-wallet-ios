@@ -1,8 +1,8 @@
 import Foundation
 import Sargon
 
-// MARK: - FactorSources + NeverEmptyCollectionCompat, Collection
-extension FactorSources: NeverEmptyCollectionCompat & Collection {
+// MARK: - FactorSources + NeverEmptyCollectionCompat
+extension FactorSources: NeverEmptyCollectionCompat {
 	public typealias Element = FactorSource
 	public var elements: [Element] {
 		sargonProfileFinishMigrateAtEndOfStage1()
@@ -13,8 +13,8 @@ extension FactorSources: NeverEmptyCollectionCompat & Collection {
 	}
 }
 
-// MARK: - Accounts + CanBeEmptyCollectionCompat, Collection
-extension Accounts: CanBeEmptyCollectionCompat & Collection {
+// MARK: - Accounts + CanBeEmptyCollectionCompat
+extension Accounts: CanBeEmptyCollectionCompat {
 	public typealias Element = Account
 	public var elements: [Element] {
 		sargonProfileFinishMigrateAtEndOfStage1()
@@ -25,8 +25,8 @@ extension Accounts: CanBeEmptyCollectionCompat & Collection {
 	}
 }
 
-// MARK: - Personas + CanBeEmptyCollectionCompat, Collection
-extension Personas: CanBeEmptyCollectionCompat & Collection {
+// MARK: - Personas + CanBeEmptyCollectionCompat
+extension Personas: CanBeEmptyCollectionCompat {
 	public typealias Element = Persona
 	public var elements: [Element] {
 		sargonProfileFinishMigrateAtEndOfStage1()
@@ -37,8 +37,8 @@ extension Personas: CanBeEmptyCollectionCompat & Collection {
 	}
 }
 
-// MARK: - AuthorizedDapps + CanBeEmptyCollectionCompat, Collection
-extension AuthorizedDapps: CanBeEmptyCollectionCompat & Collection {
+// MARK: - AuthorizedDapps + CanBeEmptyCollectionCompat
+extension AuthorizedDapps: CanBeEmptyCollectionCompat {
 	public typealias Element = AuthorizedDapp
 	public var elements: [Element] {
 		sargonProfileFinishMigrateAtEndOfStage1()
@@ -55,12 +55,12 @@ public protocol BaseCollectionCompat: Sequence where Element: Identifiable {
 }
 
 // MARK: - NeverEmptyCollectionCompat
-public protocol NeverEmptyCollectionCompat: BaseCollectionCompat {
+public protocol NeverEmptyCollectionCompat: BaseCollectionCompat & RandomAccessCollection {
 	init(elements: [Element]) throws
 }
 
 // MARK: - CanBeEmptyCollectionCompat
-public protocol CanBeEmptyCollectionCompat: BaseCollectionCompat & ExpressibleByArrayLiteral {
+public protocol CanBeEmptyCollectionCompat: BaseCollectionCompat & RandomAccessCollection & ExpressibleByArrayLiteral {
 	init(elements: [Element])
 	init(identified: IdentifiedArrayOf<Element>)
 }
