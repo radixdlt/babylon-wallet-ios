@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - Home
@@ -35,7 +36,7 @@ public struct Home: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		public typealias HasAccessToMnemonic = Bool
-		case accountsLoadedResult(TaskResult<IdentifiedArrayOf<Sargon.Account>>)
+		case accountsLoadedResult(TaskResult<Sargon.Accounts>)
 		case exportMnemonic(account: Sargon.Account)
 		case importMnemonic
 		case loadedShouldWriteDownPersonasSeedPhrase(Bool)

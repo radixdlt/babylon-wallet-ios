@@ -6,7 +6,8 @@ public struct MigratedSoftwareAccounts: Sendable, Hashable {
 
 	public let accounts: NonEmpty<OrderedSet<MigratedAccount>>
 	public var babylonAccounts: Sargon.Accounts {
-		accounts.rawValue.elements.map(\.babylon).asIdentified()
+//		Sargon.Accounts(accounts.rawValue.elements.map(\.babylon))
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	public let factorSourceToSave: DeviceFactorSource?

@@ -252,8 +252,6 @@
 		48CFC2FF2ADC10D900E77A5C /* AccountSecurity+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD932ADC10D800E77A5C /* AccountSecurity+View.swift */; };
 		48CFC3002ADC10D900E77A5C /* DebugSettingsCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD962ADC10D800E77A5C /* DebugSettingsCoordinator+View.swift */; };
 		48CFC3012ADC10D900E77A5C /* DebugSettingsCoordinator+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD972ADC10D800E77A5C /* DebugSettingsCoordinator+Reducer.swift */; };
-		48CFC3022ADC10D900E77A5C /* DebugManageFactorSources+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD9A2ADC10D800E77A5C /* DebugManageFactorSources+View.swift */; };
-		48CFC3032ADC10D900E77A5C /* DebugManageFactorSources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD9B2ADC10D800E77A5C /* DebugManageFactorSources.swift */; };
 		48CFC3042ADC10D900E77A5C /* DebugKeychainTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD9D2ADC10D800E77A5C /* DebugKeychainTest.swift */; };
 		48CFC3052ADC10D900E77A5C /* DebugKeychainTest+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBD9E2ADC10D800E77A5C /* DebugKeychainTest+View.swift */; };
 		48CFC3062ADC10D900E77A5C /* DebugUserDefaultsContents+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDA02ADC10D800E77A5C /* DebugUserDefaultsContents+View.swift */; };
@@ -896,6 +894,8 @@
 		48CFC6BD2ADC110800E77A5C /* Project-Beta.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 48CFC6AA2ADC110800E77A5C /* Project-Beta.xcconfig */; };
 		48CFC6BE2ADC110800E77A5C /* Project-PreAlpha.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 48CFC6AB2ADC110800E77A5C /* Project-PreAlpha.xcconfig */; };
 		48CFC6BF2ADC110800E77A5C /* Project-Release-Opt.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 48CFC6AC2ADC110800E77A5C /* Project-Release-Opt.xcconfig */; };
+		48DD0FF52BCBCB7C00C54C43 /* Stage1MigrateToSargon+ResourceOrNonFungible.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DD0FF42BCBCB7C00C54C43 /* Stage1MigrateToSargon+ResourceOrNonFungible.swift */; };
+		48DD0FF72BCBCBB900C54C43 /* Stage1MigrateToSargon+AssetException.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48DD0FF62BCBCBB900C54C43 /* Stage1MigrateToSargon+AssetException.swift */; };
 		48F9CFE52B03A09400657755 /* ProfileBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F9CFE32B0375A500657755 /* ProfileBuilder.swift */; };
 		48F9CFE72B03A0A000657755 /* ProfileBuilderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F9CFE62B03A0A000657755 /* ProfileBuilderTest.swift */; };
 		48FF43152AE43C7C00C568B9 /* TimeLimit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48FF43142AE43C7C00C568B9 /* TimeLimit.swift */; };
@@ -1457,8 +1457,6 @@
 		48CFBD932ADC10D800E77A5C /* AccountSecurity+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AccountSecurity+View.swift"; sourceTree = "<group>"; };
 		48CFBD962ADC10D800E77A5C /* DebugSettingsCoordinator+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DebugSettingsCoordinator+View.swift"; sourceTree = "<group>"; };
 		48CFBD972ADC10D800E77A5C /* DebugSettingsCoordinator+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DebugSettingsCoordinator+Reducer.swift"; sourceTree = "<group>"; };
-		48CFBD9A2ADC10D800E77A5C /* DebugManageFactorSources+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DebugManageFactorSources+View.swift"; sourceTree = "<group>"; };
-		48CFBD9B2ADC10D800E77A5C /* DebugManageFactorSources.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DebugManageFactorSources.swift; sourceTree = "<group>"; };
 		48CFBD9D2ADC10D800E77A5C /* DebugKeychainTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DebugKeychainTest.swift; sourceTree = "<group>"; };
 		48CFBD9E2ADC10D800E77A5C /* DebugKeychainTest+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DebugKeychainTest+View.swift"; sourceTree = "<group>"; };
 		48CFBDA02ADC10D800E77A5C /* DebugUserDefaultsContents+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DebugUserDefaultsContents+View.swift"; sourceTree = "<group>"; };
@@ -2106,6 +2104,8 @@
 		48CFC6AB2ADC110800E77A5C /* Project-PreAlpha.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Project-PreAlpha.xcconfig"; sourceTree = "<group>"; };
 		48CFC6AC2ADC110800E77A5C /* Project-Release-Opt.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Project-Release-Opt.xcconfig"; sourceTree = "<group>"; };
 		48CFC6AD2ADC110800E77A5C /* Radix-Wallet--iOS--Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Radix-Wallet--iOS--Info.plist"; sourceTree = "<group>"; };
+		48DD0FF42BCBCB7C00C54C43 /* Stage1MigrateToSargon+ResourceOrNonFungible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+ResourceOrNonFungible.swift"; sourceTree = "<group>"; };
+		48DD0FF62BCBCBB900C54C43 /* Stage1MigrateToSargon+AssetException.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+AssetException.swift"; sourceTree = "<group>"; };
 		48F9CFE32B0375A500657755 /* ProfileBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileBuilder.swift; sourceTree = "<group>"; };
 		48F9CFE62B03A0A000657755 /* ProfileBuilderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileBuilderTest.swift; sourceTree = "<group>"; };
 		48FF43142AE43C7C00C568B9 /* TimeLimit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeLimit.swift; sourceTree = "<group>"; };
@@ -3454,20 +3454,10 @@
 			isa = PBXGroup;
 			children = (
 				E634CA2C2AFD259000C43DB7 /* DebugKeychainContents */,
-				48CFBD992ADC10D800E77A5C /* DebugManageFactorSourcesFeature */,
 				48CFBD9C2ADC10D800E77A5C /* DebugKeychainTest */,
 				48CFBD9F2ADC10D800E77A5C /* DebugUserDefaultsContents */,
 			);
 			path = Children;
-			sourceTree = "<group>";
-		};
-		48CFBD992ADC10D800E77A5C /* DebugManageFactorSourcesFeature */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBD9A2ADC10D800E77A5C /* DebugManageFactorSources+View.swift */,
-				48CFBD9B2ADC10D800E77A5C /* DebugManageFactorSources.swift */,
-			);
-			path = DebugManageFactorSourcesFeature;
 			sourceTree = "<group>";
 		};
 		48CFBD9C2ADC10D800E77A5C /* DebugKeychainTest */ = {
@@ -5947,6 +5937,8 @@
 				484161622BCADBFF00D2B644 /* Stage1MigrateToSargon+DeviceFactorSource.swift */,
 				4855B1AF2BCA5E3100DD0A47 /* Stage1MigrateToSargon+DisplayName.swift */,
 				4855B1B82BCA64B800DD0A47 /* Stage1MigrateToSargon+EntityKind.swift */,
+				48DD0FF42BCBCB7C00C54C43 /* Stage1MigrateToSargon+ResourceOrNonFungible.swift */,
+				48DD0FF62BCBCBB900C54C43 /* Stage1MigrateToSargon+AssetException.swift */,
 				4841613A2BCACB7200D2B644 /* Stage1MigrateToSargon+FactorSource.swift */,
 				484161662BCADE2100D2B644 /* Stage1MigrateToSargon+FactorInstance.swift */,
 				4855B1C82BCAC84C00DD0A47 /* Stage1MigrateToSargon+FactorSourceID.swift */,
@@ -7005,7 +6997,6 @@
 				48CFC36F2ADC10D900E77A5C /* FungibleAssetList+View.swift in Sources */,
 				48CFC4032ADC10D900E77A5C /* KeychainClient+Mocked.swift in Sources */,
 				48CFC2B12ADC10D900E77A5C /* DerivePublicKeys+View.swift in Sources */,
-				48CFC3032ADC10D900E77A5C /* DebugManageFactorSources.swift in Sources */,
 				48CFC3212ADC10D900E77A5C /* NewConnection+Reducer.swift in Sources */,
 				48CFC5C92ADC10DA00E77A5C /* StackedViewsLayout.swift in Sources */,
 				48CFC45C2ADC10DA00E77A5C /* P2PLinksClient+Interface.swift in Sources */,
@@ -7078,7 +7069,6 @@
 				48CFC57F2ADC10DA00E77A5C /* GatewayAPI.swift in Sources */,
 				4855B1C12BCAC48700DD0A47 /* Stage1MigrateToSargon+AccountOrPersona.swift in Sources */,
 				488A42F42BCAFD4200F285BC /* AccountsRecoveredFromScanning.swift in Sources */,
-				48CFC3022ADC10D900E77A5C /* DebugManageFactorSources+View.swift in Sources */,
 				48CFC4702ADC10DA00E77A5C /* URLFormatterClient+Live.swift in Sources */,
 				484161412BCACDC700D2B644 /* Stage1MigrateToSargon+DepositAddressExceptionRule.swift in Sources */,
 				48CFC25B2ADC10D900E77A5C /* OnboardingStartup+Reducer.swift in Sources */,
@@ -7172,6 +7162,7 @@
 				48CFC4B52ADC10DA00E77A5C /* StateNonFungibleIdsResponse.swift in Sources */,
 				48CFC4642ADC10DA00E77A5C /* OverlayWindowClient+Interface.swift in Sources */,
 				48CFC53E2ADC10DA00E77A5C /* TransactionSubmitRequest.swift in Sources */,
+				48DD0FF52BCBCB7C00C54C43 /* Stage1MigrateToSargon+ResourceOrNonFungible.swift in Sources */,
 				48CFC58C2ADC10DA00E77A5C /* OnboardingClient+Live.swift in Sources */,
 				484161552BCAD84300D2B644 /* Stage1MigrateToSargon+HDFactorSourceProtocol.swift in Sources */,
 				48CFC4872ADC10DA00E77A5C /* OnLedgerEntitiesClient+Test.swift in Sources */,
@@ -7316,6 +7307,7 @@
 				4855B1B92BCA64B800DD0A47 /* Stage1MigrateToSargon+EntityKind.swift in Sources */,
 				48CFC54A2ADC10DA00E77A5C /* LedgerStateSelector.swift in Sources */,
 				48CFC4852ADC10DA00E77A5C /* OnLedgerEntitiesClient+Live.swift in Sources */,
+				48DD0FF72BCBCBB900C54C43 /* Stage1MigrateToSargon+AssetException.swift in Sources */,
 				48CFC2832ADC10D900E77A5C /* SelectFeePayer+View.swift in Sources */,
 				48CFC3282ADC10D900E77A5C /* ScanQRCoordinator+View.swift in Sources */,
 				48CFC4122ADC10DA00E77A5C /* ErrorQueue+Interface.swift in Sources */,

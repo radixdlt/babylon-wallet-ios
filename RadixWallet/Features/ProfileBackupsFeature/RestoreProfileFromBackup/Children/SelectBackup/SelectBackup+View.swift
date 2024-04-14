@@ -150,7 +150,7 @@ extension SelectBackup.View {
 		 }
 		 .disabled(!isVersionCompatible)
 		  */
-		sargonProfileFinishMigrateAtEndOfStage1()
+		Text("MIGRATE ME ")
 	}
 
 	@MainActor

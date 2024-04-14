@@ -480,7 +480,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return .send(.view(.debugMnemonicChanged("wine over village stage barrel strategy cushion decline echo fiber salad carry empower fun awful cereal galaxy laundry practice appear bean flat mansion license", continue: continueAutomatically)))
 
 		case let .debugUseTestingMnemonicZooVote(continueAutomatically):
-			return .send(.view(.debugMnemonicChanged(Mnemonic.testValueZooVote.phrase.rawValue, continue: continueAutomatically)))
+			return .send(.view(.debugMnemonicChanged(Mnemonic.sample24ZooVote.phrase, continue: continueAutomatically)))
 		#endif
 		}
 	}

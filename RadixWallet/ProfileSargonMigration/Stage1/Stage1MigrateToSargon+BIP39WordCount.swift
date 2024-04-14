@@ -9,6 +9,22 @@ extension BIP39WordCount {
 	}
 }
 
+// MARK: Identifiable
+extension BIP39WordCount: Identifiable {
+	public typealias ID = RawValue
+	public var id: ID {
+		rawValue
+	}
+}
+
+// MARK: CaseIterable
+extension BIP39WordCount: CaseIterable {
+	public typealias AllCases = [Self]
+	public static var allCases: [Self] {
+		sargonProfileFinishMigrateAtEndOfStage1()
+	}
+}
+
 // MARK: Comparable
 extension BIP39WordCount: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {

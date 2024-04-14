@@ -493,7 +493,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 
 			if reviewedTransaction.transactionSigners.notaryIsSignatory {
-				let notaryKey: Curve25519.Signing.PrivateKey = .curve25519(state.ephemeralNotaryPrivateKey)
+				let notaryKey = state.ephemeralNotaryPrivateKey
 
 				/// Silently sign the transaction with notary keys.
 				return .run { send in
@@ -770,17 +770,6 @@ extension TransactionReview {
 		state.canApproveTX = true
 		state.resetSlider()
 		return .none
-	}
-}
-
-extension ResourceOrNonFungible {
-	func resourceAddress() throws -> ResourceAddress {
-		switch self {
-		case let .resource(address):
-			address
-		case let .nonFungible(globalID):
-			globalID.resourceAddress
-		}
 	}
 }
 

@@ -270,77 +270,83 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 		ledgerID: LedgerHardwareWalletFactorSource.ID,
 		olympiaAccountsToValidate: Set<OlympiaAccountToMigrate>
 	) async throws -> (ValidatedAccounts, MigratedHardwareAccounts) {
-		let validation = try await validate(derivedPublicKeys: derivedPublicKeys, olympiaAccountsToValidate: olympiaAccountsToValidate)
+		/*
+		 let validation = try await validate(derivedPublicKeys: derivedPublicKeys, olympiaAccountsToValidate: olympiaAccountsToValidate)
 
-		guard let validatedAccounts = NonEmpty<Set>(validation.validated) else {
-			struct NoAccountsOnLedgerError: LocalizedError {
-				var errorDescription: String? {
-					L10n.ImportOlympiaAccounts.noNewAccounts
-				}
-			}
+		 guard let validatedAccounts = NonEmpty<Set>(validation.validated) else {
+		 	struct NoAccountsOnLedgerError: LocalizedError {
+		 		var errorDescription: String? {
+		 			L10n.ImportOlympiaAccounts.noNewAccounts
+		 		}
+		 	}
 
-			throw NoAccountsOnLedgerError()
-		}
+		 	throw NoAccountsOnLedgerError()
+		 }
 
-		// Migrates and saved all accounts to Profile
-		let migrated = try await importLegacyWalletClient.migrateOlympiaHardwareAccountsToBabylon(
-			.init(olympiaAccounts: validatedAccounts, ledgerFactorSourceID: ledgerID)
-		)
+		 // Migrates and saved all accounts to Profile
+		 let migrated = try await importLegacyWalletClient.migrateOlympiaHardwareAccountsToBabylon(
+		 	.init(olympiaAccounts: validatedAccounts, ledgerFactorSourceID: ledgerID)
+		 )
 
-		// Save all accounts
-		try await accountsClient.saveVirtualAccounts(migrated.babylonAccounts.elements)
+		 // Save all accounts
+		 try await accountsClient.saveVirtualAccounts(migrated.babylonAccounts.elements)
 
-		loggerGlobal.notice("Converted #\(migrated.accounts.count) accounts to babylon! ✅")
+		 loggerGlobal.notice("Converted #\(migrated.accounts.count) accounts to babylon! ✅")
 
-		return (validatedAccounts, migrated)
+		 return (validatedAccounts, migrated)
+		  */
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	private func validate(
 		derivedPublicKeys: [HierarchicalDeterministicPublicKey],
 		olympiaAccountsToValidate: Set<OlympiaAccountToMigrate>
 	) async throws -> OlympiaAccountsValidation {
-		guard !derivedPublicKeys.isEmpty else {
-			loggerGlobal.warning("Response contained no public keys at all.")
-			return OlympiaAccountsValidation(
-				validated: [],
-				unvalidated: olympiaAccountsToValidate
-			)
-		}
+		/*
+		 guard !derivedPublicKeys.isEmpty else {
+		 	loggerGlobal.warning("Response contained no public keys at all.")
+		 	return OlympiaAccountsValidation(
+		 		validated: [],
+		 		unvalidated: olympiaAccountsToValidate
+		 	)
+		 }
 
-		let derivedKeys: [Secp256k1PublicKey] = derivedPublicKeys.compactMap {
-			guard case let .secp256k1(k1Key) = $0.publicKey else {
-				return nil
-			}
-			return k1Key
-		}
+		 let derivedKeys: [Secp256k1PublicKey] = derivedPublicKeys.compactMap {
+		 	guard case let .secp256k1(k1Key) = $0.publicKey else {
+		 		return nil
+		 	}
+		 	return k1Key
+		 }
 
-		var olympiaAccountsToValidate = olympiaAccountsToValidate
+		 var olympiaAccountsToValidate = olympiaAccountsToValidate
 
-		let olympiaAccountsToMigrate = olympiaAccountsToValidate.filter {
-			derivedKeys.contains($0.publicKey)
-		}
+		 let olympiaAccountsToMigrate = olympiaAccountsToValidate.filter {
+		 	derivedKeys.contains($0.publicKey)
+		 }
 
-		if olympiaAccountsToMigrate.isEmpty, !olympiaAccountsToValidate.isEmpty, !derivedKeys.isEmpty {
-			loggerGlobal.critical("Invalid keys from export format?\nderivedKeys: \(derivedKeys.map(\.hex))\nolympiaAccountsToValidate:\(olympiaAccountsToValidate.map(\.publicKey.hex))")
-		}
+		 if olympiaAccountsToMigrate.isEmpty, !olympiaAccountsToValidate.isEmpty, !derivedKeys.isEmpty {
+		 	loggerGlobal.critical("Invalid keys from export format?\nderivedKeys: \(derivedKeys.map(\.hex))\nolympiaAccountsToValidate:\(olympiaAccountsToValidate.map(\.publicKey.hex))")
+		 }
 
-		guard
-			let verifiedToBeMigrated = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>(
-				rawValue: OrderedSet(uncheckedUniqueElements: olympiaAccountsToMigrate.sorted(by: \.addressIndex))
-			)
-		else {
-			loggerGlobal.warning("No accounts to migrated.")
-			return OlympiaAccountsValidation(validated: [], unvalidated: olympiaAccountsToValidate)
-		}
+		 guard
+		 	let verifiedToBeMigrated = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>(
+		 		rawValue: OrderedSet(uncheckedUniqueElements: olympiaAccountsToMigrate.sorted(by: \.addressIndex))
+		 	)
+		 else {
+		 	loggerGlobal.warning("No accounts to migrated.")
+		 	return OlympiaAccountsValidation(validated: [], unvalidated: olympiaAccountsToValidate)
+		 }
 
-		for verifiedAccountToMigrate in olympiaAccountsToMigrate {
-			olympiaAccountsToValidate.remove(verifiedAccountToMigrate)
-		}
+		 for verifiedAccountToMigrate in olympiaAccountsToMigrate {
+		 	olympiaAccountsToValidate.remove(verifiedAccountToMigrate)
+		 }
 
-		return OlympiaAccountsValidation(
-			validated: olympiaAccountsToMigrate,
-			unvalidated: olympiaAccountsToValidate
-		)
+		 return OlympiaAccountsValidation(
+		 	validated: olympiaAccountsToMigrate,
+		 	unvalidated: olympiaAccountsToValidate
+		 )
+		  */
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }
 

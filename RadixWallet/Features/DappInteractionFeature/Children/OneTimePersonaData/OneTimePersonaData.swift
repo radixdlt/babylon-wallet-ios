@@ -86,16 +86,17 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			return .run { send in
-				for try await personas in await personasClient.personas() {
-					guard !Task.isCancelled else {
-						return
-					}
-					await send(.internal(.personasLoaded(personas)))
-				}
-			} catch: { error, _ in
-				errorQueue.schedule(error)
-			}
+//			return .run { send in
+//				for try await personas in await personasClient.personas() {
+//					guard !Task.isCancelled else {
+//						return
+//					}
+//					await send(.internal(.personasLoaded(personas)))
+//				}
+//			} catch: { error, _ in
+//				errorQueue.schedule(error)
+//			}
+			sargonProfileFinishMigrateAtEndOfStage1()
 
 		case .appeared:
 			return .run { send in

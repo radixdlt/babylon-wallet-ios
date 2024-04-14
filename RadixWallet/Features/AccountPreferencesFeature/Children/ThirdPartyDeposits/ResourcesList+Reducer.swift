@@ -271,20 +271,3 @@ extension ResourcesListMode {
 		}
 	}
 }
-
-extension ResourceOrNonFungible {
-	var resourceAddress: ResourceAddress {
-		switch self {
-		case let .resourceAddress(address):
-			address
-		case let .nonFungibleGlobalID(nonFungibleGlobalID):
-			nonFungibleGlobalID.resourceAddress
-		}
-	}
-}
-
-extension AssetException {
-	func updateExceptionRule(_ rule: DepositAddressExceptionRule) -> Self {
-		.init(address: address, exceptionRule: rule)
-	}
-}

@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - AuthorizedDapps
@@ -12,7 +13,7 @@ public struct AuthorizedDappsReducer: Sendable, FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
-		public var dApps: AuthorizedDapps = []
+		public var dApps = AuthorizedDapps(Array<AuthorizedDapp>.init())
 		public var thumbnails: [AuthorizedDapp.ID: URL] = [:]
 
 		@PresentationState

@@ -56,6 +56,10 @@ public protocol CollectionCompat: RandomAccessCollection & ExpressibleByArrayLit
 }
 
 extension CollectionCompat {
+	public func asIdentified() -> IdentifiedArrayOf<Element> {
+		sargonProfileFinishMigrateAtEndOfStage1()
+	}
+
 	public typealias ArrayLiteralElement = Element
 	public init(arrayLiteral elements: ArrayLiteralElement...) {
 		self.init(elements)

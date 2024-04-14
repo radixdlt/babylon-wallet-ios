@@ -249,7 +249,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			state.responseItems[.remote(.auth(.usePersona(item)))] = .remote(.auth(.usePersona(.init(
 				persona: .init(
 					identityAddress: persona.address,
-					label: NonEmptyString(rawValue: persona.displayName.rawValue)!
+					label: persona.displayName.rawValue
 				)
 			))))
 
