@@ -646,39 +646,38 @@ extension ProfileStore {
 		@Dependency(\.uuid) var uuid
 		@Dependency(\.date) var date
 
-//		func createNew(deviceID: DeviceID? = nil) -> DeviceInfo {
-//			.init(
-//				description: "iPhone",
-//				id: deviceID ?? uuid(),
-//				date: date.now
-//			)
-//		}
-//
-//		if let existing = try? secureStorageClient.loadDeviceInfo() {
-//			return MetaDeviceInfo(deviceInfo: existing, fromDeprecatedDeviceID: false)
-//		}
-//		let new: DeviceInfo
-//		let fromDeprecatedDeviceID: Bool
-//
-//		do {
-//			if let legacyDeviceID = try? secureStorageClient.deprecatedLoadDeviceID() {
-//				new = createNew(deviceID: legacyDeviceID)
-//				fromDeprecatedDeviceID = true
-//			} else {
-//				new = createNew()
-//				fromDeprecatedDeviceID = false
-//			}
-//			try secureStorageClient.saveDeviceInfo(new)
-//			if fromDeprecatedDeviceID {
-//				// Delete only if `saveDeviceInfo` was successful.
-//				secureStorageClient.deleteDeprecatedDeviceID()
-//			}
-//			return MetaDeviceInfo(deviceInfo: new, fromDeprecatedDeviceID: fromDeprecatedDeviceID)
-//		} catch {
-//			loggerGlobal.error("Failed to save new device info: \(error)")
-//			return MetaDeviceInfo(deviceInfo: new, fromDeprecatedDeviceID: fromDeprecatedDeviceID)
-//		}
-		sargonProfileFinishMigrateAtEndOfStage1()
+		func createNew(deviceID: DeviceID? = nil) -> DeviceInfo {
+			.init(
+				id: deviceID ?? uuid(),
+				date: date.now,
+				description: "iPhone"
+			)
+		}
+
+		if let existing = try? secureStorageClient.loadDeviceInfo() {
+			return MetaDeviceInfo(deviceInfo: existing, fromDeprecatedDeviceID: false)
+		}
+		let new: DeviceInfo
+		let fromDeprecatedDeviceID: Bool
+
+		do {
+			if let legacyDeviceID = try? secureStorageClient.deprecatedLoadDeviceID() {
+				new = createNew(deviceID: legacyDeviceID)
+				fromDeprecatedDeviceID = true
+			} else {
+				new = createNew()
+				fromDeprecatedDeviceID = false
+			}
+			try secureStorageClient.saveDeviceInfo(new)
+			if fromDeprecatedDeviceID {
+				// Delete only if `saveDeviceInfo` was successful.
+				secureStorageClient.deleteDeprecatedDeviceID()
+			}
+			return MetaDeviceInfo(deviceInfo: new, fromDeprecatedDeviceID: fromDeprecatedDeviceID)
+		} catch {
+			loggerGlobal.error("Failed to save new device info: \(error)")
+			return MetaDeviceInfo(deviceInfo: new, fromDeprecatedDeviceID: fromDeprecatedDeviceID)
+		}
 	}
 
 	private static func _updateHeaderList(with header: Sargon.Profile.Header) throws {

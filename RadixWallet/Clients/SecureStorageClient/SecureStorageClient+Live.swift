@@ -162,19 +162,18 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		@Sendable func loadDeviceInfo() throws -> DeviceInfo? {
-//			let loaded = try keychainClient
-//				.getDataWithoutAuth(forKey: deviceInfoKey)
-//				.map {
-//					try jsonDecoder().decode(DeviceInfo.self, from: $0)
-//				}
-//
-//			if let loaded {
-//				loggerGlobal.trace("Loaded deviceInfo: \(loaded)")
-//			} else {
-//				loggerGlobal.info("No deviceInfo loaded, was nil.")
-//			}
-//			return loaded
-			sargonProfileFinishMigrateAtEndOfStage1()
+			let loaded = try keychainClient
+				.getDataWithoutAuth(forKey: deviceInfoKey)
+				.map {
+					try jsonDecoder().decode(DeviceInfo.self, from: $0)
+				}
+
+			if let loaded {
+				loggerGlobal.trace("Loaded deviceInfo: \(loaded)")
+			} else {
+				loggerGlobal.info("No deviceInfo loaded, was nil.")
+			}
+			return loaded
 		}
 
 		let deviceInfoAttributes = KeychainClient.AttributesWithoutAuth(
