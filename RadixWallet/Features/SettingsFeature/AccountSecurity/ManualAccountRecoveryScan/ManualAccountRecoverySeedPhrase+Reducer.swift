@@ -87,16 +87,17 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 				onMnemonicExistsStrategy: .appendWithCryptoParamaters
 			)
 
-			state.destination = .importMnemonic(.init(
-				header: .init(title: title),
-				warning: L10n.EnterSeedPhrase.warning,
-				warningOnContinue: nil,
-				isWordCountFixed: !state.isOlympia,
-				persistStrategy: persistStrategy,
-				wordCount: state.isOlympia ? .twelve : .twentyFour,
-				bip39Passphrase: "",
-				offDeviceMnemonicInfoPrompt: nil
-			))
+			state.destination = .importMnemonic(
+				ImportMnemonic.State(
+					header: .init(title: title),
+					warning: L10n.EnterSeedPhrase.warning,
+					warningOnContinue: nil,
+					isWordCountFixed: !state.isOlympia,
+					persistStrategy: persistStrategy,
+					wordCount: state.isOlympia ? BIP39WordCount.twelve : BIP39WordCount.twentyFour,
+					bip39Passphrase: ""
+				)
+			)
 			return .none
 
 		case .closeEnterMnemonicButtonTapped:

@@ -176,8 +176,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			persistStrategy: PersistStrategy?,
 			language: BIP39Language = .english,
 			wordCount: BIP39WordCount = .twelve,
-			bip39Passphrase: String = "",
-			offDeviceMnemonicInfoPrompt: OffDeviceMnemonicInfo.State? = nil
+			bip39Passphrase: String = ""
 		) {
 			precondition(wordCount.rawValue.isMultiple(of: UInt8(ImportMnemonic.wordsPerRow)))
 
@@ -194,9 +193,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 			self.isWordCountFixed = isWordCountFixed
 			self.words = []
-			if let offDeviceMnemonicInfoPrompt {
-				self.destination = .offDeviceMnemonicInfoPrompt(offDeviceMnemonicInfoPrompt)
-			}
 			self.header = header
 			self.warning = warning
 			self.warningOnContinue = warningOnContinue
@@ -304,14 +300,12 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
-			case offDeviceMnemonicInfoPrompt(OffDeviceMnemonicInfo.State)
 			case backupConfirmation(AlertState<Action.BackupConfirmation>)
 			case onContinueWarning(AlertState<Action.OnContinueWarning>)
 			case verifyMnemonic(VerifyMnemonic.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case offDeviceMnemonicInfoPrompt(OffDeviceMnemonicInfo.Action)
 			case backupConfirmation(BackupConfirmation)
 			case verifyMnemonic(VerifyMnemonic.Action)
 			case onContinueWarning(OnContinueWarning)
@@ -327,9 +321,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 
 		public var body: some Reducer<State, Action> {
-			Scope(state: /State.offDeviceMnemonicInfoPrompt, action: /Action.offDeviceMnemonicInfoPrompt) {
-				OffDeviceMnemonicInfo()
-			}
 			Scope(state: /State.verifyMnemonic, action: /Action.verifyMnemonic) {
 				VerifyMnemonic()
 			}
@@ -511,9 +502,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case .intoKeychainAndProfile:
 			switch persistStrategy.factorSourceKindOfMnemonic {
 			case .offDevice:
-				state.destination = .offDeviceMnemonicInfoPrompt(.init(
-					mnemonicWithPassphrase: mnemonicWithPassphrase
-				))
+				assertionFailure("OffDeviceMnemonoic is not supported anymore. Will be moved into Sargon later.")
 				return .none
 
 			case let .onDevice(onDeviceKind):
@@ -577,27 +566,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .offDeviceMnemonicInfoPrompt(.delegate(.done(label, mnemonicWithPassphrase))):
-			state.destination = nil
-
-			guard let persistStrategy = state.mode.write?.persistStrategy else {
-				preconditionFailure("expected persistStrategy")
-			}
-			precondition(persistStrategy.factorSourceKindOfMnemonic == .offDevice)
-
-//			return .run { send in
-//				await send(.internal(.saveFactorSourceResult(
-//					TaskResult {
-//						let factorSource = try await factorSourcesClient.addOffDeviceFactorSource(
-//							mnemonicWithPassphrase: mnemonicWithPassphrase,
-//							label: label
-//						)
-//						return .init(factorSource: factorSource, savedIntoProfile: true)
-//					}
-//				)))
-//			}
-			sargonProfileFinishMigrateAtEndOfStage1()
-
 		case .backupConfirmation(.userHasBackedUp):
 			guard let mnemonic = state.mnemonic else {
 				return .none

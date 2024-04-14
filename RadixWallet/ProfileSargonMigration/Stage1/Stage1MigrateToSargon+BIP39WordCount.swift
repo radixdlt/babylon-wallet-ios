@@ -8,3 +8,26 @@ extension BIP39WordCount {
 		self.init(rawValue: UInt8(wordCount))
 	}
 }
+
+// MARK: Comparable
+extension BIP39WordCount: Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		lhs.rawValue < rhs.rawValue
+	}
+
+	mutating func increaseBy3() {
+		guard self != .twentyFour else {
+			assertionFailure("Invalid, cannot increase to than 24 words")
+			return
+		}
+		self = .init(rawValue: rawValue + 3)!
+	}
+
+	mutating func decreaseBy3() {
+		guard self != .twelve else {
+			assertionFailure("Invalid, cannot decrease to less than 12 words")
+			return
+		}
+		self = .init(rawValue: rawValue - 3)!
+	}
+}

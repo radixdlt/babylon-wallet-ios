@@ -112,7 +112,7 @@ extension SelectBackup.View {
 	private func cloudBackupDataCard(
 		_ item: SelectionItem<Sargon.Profile.Header>,
 		viewStore: ViewStoreOf<SelectBackup>
-	) -> some View {
+	) -> some SwiftUI.View {
 		/*
 		 let header = item.value
 		 let isVersionCompatible = header.isVersionCompatible()

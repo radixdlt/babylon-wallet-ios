@@ -7,12 +7,20 @@ extension FactorSources: CollectionCompat {
 	public var elements: [Element] {
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
+
+	public init(_ elements: [Element]) {
+		sargonProfileFinishMigrateAtEndOfStage1()
+	}
 }
 
 // MARK: - Accounts + CollectionCompat
 extension Accounts: CollectionCompat {
 	public typealias Element = Account
 	public var elements: [Element] {
+		sargonProfileFinishMigrateAtEndOfStage1()
+	}
+
+	public init(_ elements: [Element]) {
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }
@@ -23,6 +31,10 @@ extension Personas: CollectionCompat {
 	public var elements: [Element] {
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
+
+	public init(_ elements: [Element]) {
+		sargonProfileFinishMigrateAtEndOfStage1()
+	}
 }
 
 // MARK: - AuthorizedDapps + CollectionCompat
@@ -31,14 +43,24 @@ extension AuthorizedDapps: CollectionCompat {
 	public var elements: [Element] {
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
+
+	public init(_ elements: [Element]) {
+		sargonProfileFinishMigrateAtEndOfStage1()
+	}
 }
 
 // MARK: - CollectionCompat
-public protocol CollectionCompat: Collection {
+public protocol CollectionCompat: RandomAccessCollection & ExpressibleByArrayLiteral {
 	var elements: [Element] { get }
+	init(_ elements: [Element])
 }
 
 extension CollectionCompat {
+	public typealias ArrayLiteralElement = Element
+	public init(arrayLiteral elements: ArrayLiteralElement...) {
+		self.init(elements)
+	}
+
 	public typealias Index = Array<Element>.Index
 
 	public typealias SubSequence = Array<Element>.SubSequence

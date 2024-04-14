@@ -186,16 +186,17 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .editablePersonaFetched(persona):
-			switch state.mode {
-			case .general:
-				state.destination = .editPersona(.init(mode: .edit, persona: persona))
-			case let .dApp(_, detailedPersona):
-				// TODO: This should be tested
-				let required = Set(detailedPersona.sharedPersonaData.entries.map(\.value.discriminator))
-				state.destination = .editPersona(.init(mode: .dapp(requiredEntries: required), persona: persona))
-			}
-
-			return .none
+//			switch state.mode {
+//			case .general:
+//				state.destination = .editPersona(.init(mode: .edit, persona: persona))
+//			case let .dApp(_, detailedPersona):
+//				// TODO: This should be tested
+//				let required = Set(detailedPersona.sharedPersonaData.entries.map(\.value.discriminator))
+//				state.destination = .editPersona(.init(mode: .dapp(requiredEntries: required), persona: persona))
+//			}
+//
+//			return .none
+			sargonProfileFinishMigrateAtEndOfStage1()
 
 		case let .dAppsUpdated(updatedDapps):
 			guard case .general(let persona, var dApps) = state.mode else { return .none }

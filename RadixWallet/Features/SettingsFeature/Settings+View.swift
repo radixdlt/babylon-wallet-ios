@@ -240,7 +240,7 @@ private extension View {
 			store: destinationStore,
 			state: /Settings.Destination.State.authorizedDapps,
 			action: Settings.Destination.Action.authorizedDapps,
-			destination: { AuthorizedDapps.View(store: $0) }
+			destination: { AuthorizedDappsReducer.View(store: $0) }
 		)
 	}
 

@@ -227,35 +227,6 @@ public struct MissingSignatureFromRequiredSigner: Swift.Error {}
 // MARK: - FailedToFindFactorInstanceMatchingDerivationPathInSignature
 public struct FailedToFindFactorInstanceMatchingDerivationPathInSignature: Swift.Error {}
 
-extension HierarchicalDeterministicPublicKey {
-	init(curve curveString: String, key keyData: Data, path: String) throws {
-		guard let curve = SLIP10Curve(rawValue: curveString) else {
-			struct BadCurve: Swift.Error {}
-			loggerGlobal.error("Bad curve")
-			throw BadCurve()
-		}
-//		let publicKey: Sargon.PublicKey = switch curve {
-//		case .secp256k1:
-//			try .ecdsaSecp256k1(.init(compressedRepresentation: keyData))
-//		case .curve25519:
-//			try .eddsaEd25519(.init(compressedRepresentation: keyData))
-//		}
-		let publicKey = try Sargon.PublicKey(bytes: keyData)
-		assert(publicKey.curve == curve)
-
-		let derivationPath: DerivationPath
-		if let cap26Path = try? Cap26Path(string: path) {
-			derivationPath = .cap26(value: cap26Path)
-		} else {
-			let bip44Path = try BIP44LikePath(string: path)
-			derivationPath = .bip44Like(value: bip44Path)
-		}
-
-		assert(derivationPath.curveForScheme == curve)
-		self.init(publicKey: publicKey, derivationPath: derivationPath)
-	}
-}
-
 extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner {
 	struct Validated: Sendable, Hashable {
 		public let signature: SignatureWithPublicKey
