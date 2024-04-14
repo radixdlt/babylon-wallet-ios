@@ -26,7 +26,7 @@ public struct AccountWithInfo: Sendable, Hashable {
 	}
 
 	public var id: AccountAddress { account.address }
-	public var isLegacyAccount: Bool { account.isOlympiaAccount }
+	public var isLegacyAccount: Bool { account.isLegacy }
 	public var isLedgerAccount: Bool { account.isLedgerAccount }
 
 	public var mnemonicHandlingCallToAction: MnemonicHandling? {

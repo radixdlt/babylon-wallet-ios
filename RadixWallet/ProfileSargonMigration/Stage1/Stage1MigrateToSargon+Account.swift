@@ -31,7 +31,7 @@ extension Sargon.Account {
 		}
 	}
 
-	public var isOlympiaAccount: Bool {
+	public var isLegacy: Bool {
 		address.isLegacy
 	}
 

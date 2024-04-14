@@ -57,22 +57,22 @@ extension EntitiesControlledByFactorSource {
 
 	/// Non hidden
 	public var babylonAccounts: IdentifiedArrayOf<Sargon.Account> {
-		accounts.filter(not(\.isOlympiaAccount)).asIdentified()
+		accounts.filter(not(\.isLegacy)).asIdentified()
 	}
 
 	/// hidden
 	public var babylonAccountsHidden: IdentifiedArrayOf<Sargon.Account> {
-		hiddenAccounts.filter(not(\.isOlympiaAccount)).asIdentified()
+		hiddenAccounts.filter(not(\.isLegacy)).asIdentified()
 	}
 
 	/// Non hidden
 	public var olympiaAccounts: IdentifiedArrayOf<Sargon.Account> {
-		accounts.filter(\.isOlympiaAccount).asIdentified()
+		accounts.filter(\.isLegacy).asIdentified()
 	}
 
 	/// hidden
 	public var olympiaAccountsHidden: IdentifiedArrayOf<Sargon.Account> {
-		hiddenAccounts.filter(\.isOlympiaAccount).asIdentified()
+		hiddenAccounts.filter(\.isLegacy).asIdentified()
 	}
 
 	public var accounts: [Sargon.Account] { entities.compactMap { try? $0.asAccount() } }

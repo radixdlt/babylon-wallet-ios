@@ -72,7 +72,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 
 				do {
 					let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
-					if accounts.contains(where: \.isOlympiaAccount) {
+					if accounts.contains(where: \.isLegacy) {
 						userDefaults.setHideMigrateOlympiaButton(true)
 						return false
 					}
