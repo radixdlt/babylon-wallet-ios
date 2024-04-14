@@ -1,8 +1,8 @@
 import Foundation
 import Sargon
 
-// MARK: - FactorSources + NeverEmptyCollectionCompat
-extension FactorSources: NeverEmptyCollectionCompat {
+// MARK: - FactorSources + NeverEmptyCollectionCompat, Collection
+extension FactorSources: NeverEmptyCollectionCompat & Collection {
 	public typealias Element = FactorSource
 	public var elements: [Element] {
 		sargonProfileFinishMigrateAtEndOfStage1()
@@ -13,8 +13,8 @@ extension FactorSources: NeverEmptyCollectionCompat {
 	}
 }
 
-// MARK: - Accounts + CanBeEmptyCollectionCompat
-extension Accounts: CanBeEmptyCollectionCompat {
+// MARK: - Accounts + CanBeEmptyCollectionCompat, Collection
+extension Accounts: CanBeEmptyCollectionCompat & Collection {
 	public typealias Element = Account
 	public var elements: [Element] {
 		sargonProfileFinishMigrateAtEndOfStage1()
@@ -25,8 +25,8 @@ extension Accounts: CanBeEmptyCollectionCompat {
 	}
 }
 
-// MARK: - Personas + CanBeEmptyCollectionCompat
-extension Personas: CanBeEmptyCollectionCompat {
+// MARK: - Personas + CanBeEmptyCollectionCompat, Collection
+extension Personas: CanBeEmptyCollectionCompat & Collection {
 	public typealias Element = Persona
 	public var elements: [Element] {
 		sargonProfileFinishMigrateAtEndOfStage1()
@@ -37,8 +37,8 @@ extension Personas: CanBeEmptyCollectionCompat {
 	}
 }
 
-// MARK: - AuthorizedDapps + CanBeEmptyCollectionCompat
-extension AuthorizedDapps: CanBeEmptyCollectionCompat {
+// MARK: - AuthorizedDapps + CanBeEmptyCollectionCompat, Collection
+extension AuthorizedDapps: CanBeEmptyCollectionCompat & Collection {
 	public typealias Element = AuthorizedDapp
 	public var elements: [Element] {
 		sargonProfileFinishMigrateAtEndOfStage1()
@@ -90,6 +90,10 @@ extension BaseCollectionCompat {
 
 	public typealias Indices = Array<Element>.Indices
 	public typealias Iterator = Array<Element>.Iterator
+
+	public func index(after index: Index) -> Index {
+		elements.index(after: index)
+	}
 
 	public var startIndex: Index {
 		elements.startIndex
