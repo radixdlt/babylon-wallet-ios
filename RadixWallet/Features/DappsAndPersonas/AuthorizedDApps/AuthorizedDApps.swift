@@ -13,7 +13,7 @@ public struct AuthorizedDappsReducer: Sendable, FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
-		public var dApps = AuthorizedDapps(Array<AuthorizedDapp>.init())
+		public var dApps: IdentifiedArrayOf<AuthorizedDapp> = []
 		public var thumbnails: [AuthorizedDapp.ID: URL] = [:]
 
 		@PresentationState
@@ -32,7 +32,7 @@ public struct AuthorizedDappsReducer: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedDapps(TaskResult<AuthorizedDapps>)
+		case loadedDapps(TaskResult<IdentifiedArrayOf<AuthorizedDapp>>)
 		case loadedThumbnail(URL, dApp: AuthorizedDapp.ID)
 		case presentDappDetails(DappDetails.State)
 		case failedToGetDetailsOfDapp(id: AuthorizedDapp.ID)

@@ -504,7 +504,7 @@ extension TransactionReview {
 				var changes: [DepositExceptionsChange.AllowedDepositorChange] = []
 				if let authorizedDepositorsAdded = authorizedDepositorsAdded[account.address] {
 					let added = try await authorizedDepositorsAdded.asyncMap { resourceOrNonFungible in
-						let resourceAddress = try resourceOrNonFungible.resourceAddress()
+						let resourceAddress = resourceOrNonFungible.resourceAddress
 						return try await DepositExceptionsChange.AllowedDepositorChange(
 							resource: onLedgerEntitiesClient.getResource(resourceAddress),
 							change: .added
@@ -514,7 +514,7 @@ extension TransactionReview {
 				}
 				if let authorizedDepositorsRemoved = authorizedDepositorsRemoved[account.address] {
 					let removed = try await authorizedDepositorsRemoved.asyncMap { resourceOrNonFungible in
-						let resourceAddress = try resourceOrNonFungible.resourceAddress()
+						let resourceAddress = resourceOrNonFungible.resourceAddress
 						return try await DepositExceptionsChange.AllowedDepositorChange(
 							resource: onLedgerEntitiesClient.getResource(resourceAddress),
 							change: .removed

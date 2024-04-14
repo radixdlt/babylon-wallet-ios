@@ -36,7 +36,7 @@ public struct Home: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		public typealias HasAccessToMnemonic = Bool
-		case accountsLoadedResult(TaskResult<Sargon.Accounts>)
+		case accountsLoadedResult(TaskResult<IdentifiedArrayOf<Account>>)
 		case exportMnemonic(account: Sargon.Account)
 		case importMnemonic
 		case loadedShouldWriteDownPersonasSeedPhrase(Bool)
@@ -186,67 +186,70 @@ public struct Home: Sendable, FeatureReducer {
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
-		case let .accountsLoadedResult(.success(accounts)):
-			guard accounts.elements != state.accounts.elements else {
-				return .none
-			}
+		/*
+		 switch internalAction {
+		 case let .accountsLoadedResult(.success(accounts)):
+		 	guard accounts.elements != state.accounts.elements else {
+		 		return .none
+		 	}
 
-			state.accountRows = accounts.map { Home.AccountRow.State(account: $0) }.asIdentified()
+		 	state.accountRows = accounts.map { Home.AccountRow.State(account: $0) }.asIdentified()
 
-			return .run { [addresses = state.accountAddresses] _ in
-				_ = try await accountPortfoliosClient.fetchAccountPortfolios(addresses, false)
-			} catch: { error, _ in
-				errorQueue.schedule(error)
-			}
-			.merge(with: checkAccountsAccessToMnemonic(state: state))
+		 	return .run { [addresses = state.accountAddresses] _ in
+		 		_ = try await accountPortfoliosClient.fetchAccountPortfolios(addresses, false)
+		 	} catch: { error, _ in
+		 		errorQueue.schedule(error)
+		 	}
+		 	.merge(with: checkAccountsAccessToMnemonic(state: state))
 
-		case let .accountsLoadedResult(.failure(error)):
-			errorQueue.schedule(error)
-			return .none
+		 case let .accountsLoadedResult(.failure(error)):
+		 	errorQueue.schedule(error)
+		 	return .none
 
-		case let .accountsResourcesLoaded(accountsResources):
-			state.accountRows.mutateAll { row in
-				if let accountResources = accountsResources.first(where: { $0.address == row.id }).unwrap() {
-					row.accountWithResources.refresh(from: accountResources)
-				}
-			}
-			return .none
+		 case let .accountsResourcesLoaded(accountsResources):
+		 	state.accountRows.mutateAll { row in
+		 		if let accountResources = accountsResources.first(where: { $0.address == row.id }).unwrap() {
+		 			row.accountWithResources.refresh(from: accountResources)
+		 		}
+		 	}
+		 	return .none
 
-		case let .loadedShouldWriteDownPersonasSeedPhrase(shouldBackup):
-			state.shouldWriteDownPersonasSeedPhrase = shouldBackup
-			return .none
+		 case let .loadedShouldWriteDownPersonasSeedPhrase(shouldBackup):
+		 	state.shouldWriteDownPersonasSeedPhrase = shouldBackup
+		 	return .none
 
-		case let .exportMnemonic(account):
-			return exportMnemonic(controlling: account, state: &state)
+		 case let .exportMnemonic(account):
+		 	return exportMnemonic(controlling: account, state: &state)
 
-		case .importMnemonic:
-			return importMnemonics(state: &state)
+		 case .importMnemonic:
+		 	return importMnemonics(state: &state)
 
-		case let .currentGatewayChanged(gateway):
-			#if DEBUG
-			state.showFiatWorth = true
-			#else
-			state.showFiatWorth = gateway == .mainnet
-			state.accountRows.mutateAll { rowState in
-				rowState.showFiatWorth = state.showFiatWorth
-			}
-			#endif
-			return .none
-		case let .shouldShowNPSSurvey(shouldShow):
-			if shouldShow {
-				state.destination = .npsSurvey(.init())
-			}
-			return .none
-		case let .accountsFiatWorthLoaded(fiatWorths):
-			state.accountRows.mutateAll {
-				if let fiatWorth = fiatWorths[$0.id] {
-					$0.totalFiatWorth.refresh(from: fiatWorth)
-				}
-			}
-			state.totalFiatWorth = state.accountRows.map(\.totalFiatWorth).reduce(+) ?? .loading
-			return .none
-		}
+		 case let .currentGatewayChanged(gateway):
+		 	#if DEBUG
+		 	state.showFiatWorth = true
+		 	#else
+		 	state.showFiatWorth = gateway == .mainnet
+		 	state.accountRows.mutateAll { rowState in
+		 		rowState.showFiatWorth = state.showFiatWorth
+		 	}
+		 	#endif
+		 	return .none
+		 case let .shouldShowNPSSurvey(shouldShow):
+		 	if shouldShow {
+		 		state.destination = .npsSurvey(.init())
+		 	}
+		 	return .none
+		 case let .accountsFiatWorthLoaded(fiatWorths):
+		 	state.accountRows.mutateAll {
+		 		if let fiatWorth = fiatWorths[$0.id] {
+		 			$0.totalFiatWorth.refresh(from: fiatWorth)
+		 		}
+		 	}
+		 	state.totalFiatWorth = state.accountRows.map(\.totalFiatWorth).reduce(+) ?? .loading
+		 	return .none
+		 }
+		  */
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	private func checkAccountsAccessToMnemonic(state: State) -> Effect<Action> {

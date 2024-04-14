@@ -77,20 +77,21 @@ public struct VerifyMnemonic: Sendable, FeatureReducer {
 			return .none
 
 		case .confirmSeedPhraseButtonTapped:
-			let mnemonicMatches = zip(
-				state.enteredWords.elements,
-				state.wordsToConfirm.rawValue.elements
-			).reduce(true) { partialResult, words in
-				partialResult && words.0.element == words.1.element.word.rawValue
-			}
-
-			if mnemonicMatches {
-				overlayWindowClient.scheduleHUD(.succeeded)
-				return .send(.delegate(.mnemonicVerified))
-			} else {
-				state.invalidMnemonic = true
-				return .none
-			}
+//			let mnemonicMatches = zip(
+//				state.enteredWords.elements,
+//				state.wordsToConfirm.rawValue.elements
+//			).reduce(true) { partialResult, words in
+//				partialResult && words.0.element == words.1.element.word.rawValue
+//			}
+//
+//			if mnemonicMatches {
+//				overlayWindowClient.scheduleHUD(.succeeded)
+//				return .send(.delegate(.mnemonicVerified))
+//			} else {
+//				state.invalidMnemonic = true
+//				return .none
+//			}
+			sargonProfileFinishMigrateAtEndOfStage1()
 
 		#if DEBUG
 		case .debugCheat:

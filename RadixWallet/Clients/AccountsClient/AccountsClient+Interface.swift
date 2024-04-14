@@ -1,3 +1,6 @@
+import IdentifiedCollections
+import Sargon
+
 // MARK: - AccountsClient
 public struct AccountsClient: Sendable {
 	public var getCurrentNetworkID: GetCurrentNetworkID
@@ -101,11 +104,11 @@ extension AccountsClient {
 
 	public typealias NextAppearanceID = @Sendable (NetworkID?, _ offset: Int?) async -> AppearanceID
 
-	public typealias GetAccountsOnCurrentNetwork = @Sendable () async throws -> Accounts
-	public typealias GetHiddenAccountsOnCurrentNetwork = @Sendable () async throws -> Accounts
-	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> Accounts
+	public typealias GetAccountsOnCurrentNetwork = @Sendable () async throws -> IdentifiedArrayOf<Account>
+	public typealias GetHiddenAccountsOnCurrentNetwork = @Sendable () async throws -> IdentifiedArrayOf<Account>
+	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> IdentifiedArrayOf<Account>
 
-	public typealias AccountsOnCurrentNetwork = @Sendable () async -> AnyAsyncSequence<Accounts>
+	public typealias AccountsOnCurrentNetwork = @Sendable () async -> AnyAsyncSequence<IdentifiedArrayOf<Account>>
 	public typealias AccountUpdates = @Sendable (AccountAddress) async -> AnyAsyncSequence<Sargon.Account>
 
 	public typealias NewVirtualAccount = @Sendable (NewAccountRequest) async throws -> Sargon.Account

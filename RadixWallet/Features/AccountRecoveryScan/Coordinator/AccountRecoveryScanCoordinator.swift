@@ -156,7 +156,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		switch purpose {
 		case let .createProfile(privateHD):
 			let recoveredAccountAndBDFS = AccountsRecoveredFromScanningUsingMnemonic(
-				accounts: sortedAccounts,
+				accounts: Accounts(identified: sortedAccounts),
 				deviceFactorSource: privateHD.factorSource
 			)
 			return .run { send in

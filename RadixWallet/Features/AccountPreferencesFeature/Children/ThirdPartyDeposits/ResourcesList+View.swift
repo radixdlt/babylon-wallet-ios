@@ -228,15 +228,16 @@ extension ResourcesListMode {
 
 extension ResourceViewState.Address {
 	var ledgerIdentifiable: LedgerIdentifiable {
-		switch self {
-		case let .assetException(exception):
-			.address(.resource(exception.address))
-
-		case let .allowedDepositor(.resourceAddress(resourceAddress)):
-			.address(.resource(resourceAddress))
-
-		case let .allowedDepositor(.nonFungibleGlobalID(nonFungibleGlobalID)):
-			.address(.nonFungibleGlobalID(nonFungibleGlobalID))
-		}
+//		switch self {
+//		case let .assetException(exception):
+//			.address(.resource(exception.address))
+//
+//		case let .allowedDepositor(.resourceAddress(resourceAddress)):
+//			.address(.resource(resourceAddress))
+//
+//		case let .allowedDepositor(.nonFungibleGlobalID(nonFungibleGlobalID)):
+//			.address(.nonFungibleGlobalID(nonFungibleGlobalID))
+//		}
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }

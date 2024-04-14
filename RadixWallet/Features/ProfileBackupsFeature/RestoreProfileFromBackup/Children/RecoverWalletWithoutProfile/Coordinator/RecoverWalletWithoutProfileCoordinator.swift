@@ -132,28 +132,29 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		case let .path(.element(_, action: .importMnemonic(.delegate(delegateAction)))):
 			switch delegateAction {
 			case let .notPersisted(mnemonicWithPassphrase):
-				do {
-					let mainBDFS = try DeviceFactorSource.babylon(
-						mnemonicWithPassphrase: mnemonicWithPassphrase,
-						isMain: true,
-						isOlympiaCompatible: false // FIXME: is this what we want?
-					)
-
-					let privateHD = try PrivateHierarchicalDeterministicFactorSource(
-						mnemonicWithPassphrase: mnemonicWithPassphrase,
-						factorSource: mainBDFS
-					)
-
-					state.factorSourceOfImportedMnemonic = privateHD
-					state.destination = .accountRecoveryScanCoordinator(.init(purpose: .createProfile(privateHD)))
-
-					return .none
-				} catch {
-					let errorMsg = "Failed to create Private HD FactorSource from MnemonicWithPassphrase, error: \(error)"
-					loggerGlobal.error(.init(stringLiteral: errorMsg))
-					assertionFailure(errorMsg)
-					return .send(.delegate(.dismiss))
-				}
+//				do {
+//					let mainBDFS = try DeviceFactorSource.babylon(
+//						mnemonicWithPassphrase: mnemonicWithPassphrase,
+//						isMain: true,
+//						isOlympiaCompatible: false // FIXME: is this what we want?
+//					)
+//
+//					let privateHD = try PrivateHierarchicalDeterministicFactorSource(
+//						mnemonicWithPassphrase: mnemonicWithPassphrase,
+//						factorSource: mainBDFS
+//					)
+//
+//					state.factorSourceOfImportedMnemonic = privateHD
+//					state.destination = .accountRecoveryScanCoordinator(.init(purpose: .createProfile(privateHD)))
+//
+//					return .none
+//				} catch {
+//					let errorMsg = "Failed to create Private HD FactorSource from MnemonicWithPassphrase, error: \(error)"
+//					loggerGlobal.error(.init(stringLiteral: errorMsg))
+//					assertionFailure(errorMsg)
+//					return .send(.delegate(.dismiss))
+//				}
+				sargonProfileFinishMigrateAtEndOfStage1()
 
 			default:
 				let errorMsg = "Discrepancy! Expected to have saved mnemonic into keychain but other action happened: \(delegateAction)"

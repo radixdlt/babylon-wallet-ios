@@ -1,3 +1,4 @@
+import IdentifiedCollections
 import Sargon
 
 // MARK: - PersonasClient
@@ -34,10 +35,10 @@ public struct PersonasClient: Sendable {
 }
 
 extension PersonasClient {
-	public typealias Personas = @Sendable () async -> AnyAsyncSequence<Sargon.Personas>
-	public typealias GetPersonas = @Sendable () async throws -> Sargon.Personas
-	public typealias GetPersonasOnNetwork = @Sendable (NetworkID) async -> Sargon.Personas
-	public typealias getHiddenPersonasOnCurrentNetwork = @Sendable () async throws -> Sargon.Personas
+	public typealias Personas = @Sendable () async -> AnyAsyncSequence<IdentifiedArrayOf<Persona>>
+	public typealias GetPersonas = @Sendable () async throws -> IdentifiedArrayOf<Persona>
+	public typealias GetPersonasOnNetwork = @Sendable (NetworkID) async -> IdentifiedArrayOf<Persona>
+	public typealias getHiddenPersonasOnCurrentNetwork = @Sendable () async throws -> IdentifiedArrayOf<Persona>
 	public typealias HasSomePersonaOnAnyNetworks = @Sendable () async -> Bool
 	public typealias HasSomePersonaOnCurrentNetwork = @Sendable () async -> Bool
 	public typealias UpdatePersona = @Sendable (Persona) async throws -> Void

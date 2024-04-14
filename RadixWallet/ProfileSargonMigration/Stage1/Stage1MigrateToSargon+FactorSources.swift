@@ -1,68 +1,87 @@
 import Foundation
 import Sargon
 
-// MARK: - FactorSources + CollectionCompat
-extension FactorSources: CollectionCompat {
+// MARK: - FactorSources + NeverEmptyCollectionCompat
+extension FactorSources: NeverEmptyCollectionCompat {
 	public typealias Element = FactorSource
 	public var elements: [Element] {
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
-	public init(_ elements: [Element]) {
+	public init(elements: [Element]) throws {
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }
 
-// MARK: - Accounts + CollectionCompat
-extension Accounts: CollectionCompat {
+// MARK: - Accounts + CanBeEmptyCollectionCompat
+extension Accounts: CanBeEmptyCollectionCompat {
 	public typealias Element = Account
 	public var elements: [Element] {
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
-	public init(_ elements: [Element]) {
+	public init(elements: [Element]) {
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }
 
-// MARK: - Personas + CollectionCompat
-extension Personas: CollectionCompat {
+// MARK: - Personas + CanBeEmptyCollectionCompat
+extension Personas: CanBeEmptyCollectionCompat {
 	public typealias Element = Persona
 	public var elements: [Element] {
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
-	public init(_ elements: [Element]) {
+	public init(elements: [Element]) {
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }
 
-// MARK: - AuthorizedDapps + CollectionCompat
-extension AuthorizedDapps: CollectionCompat {
+// MARK: - AuthorizedDapps + CanBeEmptyCollectionCompat
+extension AuthorizedDapps: CanBeEmptyCollectionCompat {
 	public typealias Element = AuthorizedDapp
 	public var elements: [Element] {
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
-	public init(_ elements: [Element]) {
+	public init(elements: [Element]) {
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }
 
-// MARK: - CollectionCompat
-public protocol CollectionCompat: RandomAccessCollection & ExpressibleByArrayLiteral {
+// MARK: - BaseCollectionCompat
+public protocol BaseCollectionCompat: Sequence where Element: Identifiable {
 	var elements: [Element] { get }
-	init(_ elements: [Element])
 }
 
-extension CollectionCompat {
+// MARK: - NeverEmptyCollectionCompat
+public protocol NeverEmptyCollectionCompat: BaseCollectionCompat {
+	init(elements: [Element]) throws
+}
+
+// MARK: - CanBeEmptyCollectionCompat
+public protocol CanBeEmptyCollectionCompat: BaseCollectionCompat & ExpressibleByArrayLiteral {
+	init(elements: [Element])
+	init(identified: IdentifiedArrayOf<Element>)
+}
+
+extension CanBeEmptyCollectionCompat {
+	public init(arrayLiteral elements: Element...) {
+		self.init(elements: elements)
+	}
+
+	public init(identified: IdentifiedArrayOf<Element>) {
+		self.init(elements: identified.elements)
+	}
+}
+
+extension BaseCollectionCompat {
 	public func asIdentified() -> IdentifiedArrayOf<Element> {
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
-	public typealias ArrayLiteralElement = Element
-	public init(arrayLiteral elements: ArrayLiteralElement...) {
-		self.init(elements)
+	public func makeIterator() -> Iterator {
+		elements.makeIterator()
 	}
 
 	public typealias Index = Array<Element>.Index
@@ -70,6 +89,7 @@ extension CollectionCompat {
 	public typealias SubSequence = Array<Element>.SubSequence
 
 	public typealias Indices = Array<Element>.Indices
+	public typealias Iterator = Array<Element>.Iterator
 
 	public var startIndex: Index {
 		elements.startIndex
