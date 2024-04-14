@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - PersonaNotConnected
 struct PersonaNotConnected: Swift.Error {}
 
@@ -29,20 +31,21 @@ extension Profile {
 	public mutating func addAccount(
 		_ account: Sargon.Account
 	) throws {
-//		let networkID = account.networkID
-//		// can be nil if this is a new network
-//		let maybeNetwork = try? network(id: networkID)
-//
-//		if var network = maybeNetwork {
-//			try network.addAccount(account)
-//			try updateOnNetwork(network)
-//		} else {
-//			let network = Sargon.ProfileNetwork(
-//				networkID: networkID,
-//				accounts: [account].asIdentified(),
-//				personas: [],
-//				authorizedDapps: []
-//			)
+		let networkID = account.networkID
+		// can be nil if this is a new network
+		let maybeNetwork = try? network(id: networkID)
+
+		if var network = maybeNetwork {
+			try network.addAccount(account)
+			try updateOnNetwork(network)
+		} else {
+			let network = ProfileNetwork(
+				id: networkID,
+				accounts: Accounts(element: account),
+				personas: [],
+				authorizedDapps: []
+			)
+
 //			try networks.add(network)
 //
 //			if network.networkID == .mainnet {
@@ -54,8 +57,9 @@ extension Profile {
 //					assertionFailure(errorMsg) // for production, we will not crash
 //				}
 //			}
-//		}
-		sargonProfileFinishMigrateAtEndOfStage1()
+
+			sargonProfileFinishMigrateAtEndOfStage1()
+		}
 	}
 }
 

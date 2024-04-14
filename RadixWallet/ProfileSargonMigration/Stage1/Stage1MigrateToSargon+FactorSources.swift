@@ -11,6 +11,10 @@ extension FactorSources: NeverEmptyCollectionCompat {
 	public init(elements: [Element]) throws {
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
+
+	public init(element: Element) {
+		sargonProfileFinishMigrateAtEndOfStage1()
+	}
 }
 
 // MARK: - Accounts + CanBeEmptyCollectionCompat
@@ -52,6 +56,7 @@ extension AuthorizedDapps: CanBeEmptyCollectionCompat {
 // MARK: - BaseCollectionCompat
 public protocol BaseCollectionCompat: Sequence where Element: Identifiable {
 	var elements: [Element] { get }
+	init(element: Element)
 }
 
 // MARK: - NeverEmptyCollectionCompat
@@ -72,6 +77,10 @@ extension CanBeEmptyCollectionCompat {
 
 	public init(identified: IdentifiedArrayOf<Element>) {
 		self.init(elements: identified.elements)
+	}
+
+	public init(element: Element) {
+		self.init(elements: [element])
 	}
 }
 

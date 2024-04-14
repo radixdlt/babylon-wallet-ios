@@ -6,13 +6,12 @@ extension AccountsClient: DependencyKey {
 	public static func live(
 		profileStore: ProfileStore = .shared
 	) -> Self {
-		let saveVirtualAccounts: SaveVirtualAccounts = { _ in
-//			try await profileStore.updating {
-//				for account in accounts {
-//					try $0.addAccount(account)
-//				}
-//			}
-			sargonProfileFinishMigrateAtEndOfStage1()
+		let saveVirtualAccounts: SaveVirtualAccounts = { accounts in
+			try await profileStore.updating {
+				for account in accounts {
+					try $0.addAccount(account)
+				}
+			}
 		}
 
 		let getCurrentNetworkID: GetCurrentNetworkID = {
