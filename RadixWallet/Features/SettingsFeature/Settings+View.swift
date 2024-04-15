@@ -17,13 +17,8 @@ extension Settings {
 		let debugAppInfo: String
 		#endif
 		let shouldShowAddP2PLinkButton: Bool
-		let shouldShowMigrateOlympiaButton: Bool
 		let shouldWriteDownPersonasSeedPhrase: Bool
 		let appVersion: String
-
-		var showsSomeBanner: Bool {
-			shouldShowAddP2PLinkButton || shouldShowMigrateOlympiaButton
-		}
 
 		init(state: Settings.State) {
 			#if DEBUG
@@ -40,10 +35,9 @@ extension Settings {
 			#endif
 
 			self.shouldShowAddP2PLinkButton = state.userHasNoP2PLinks ?? false
-			self.shouldShowMigrateOlympiaButton = state.shouldShowMigrateOlympiaButton
 			self.shouldWriteDownPersonasSeedPhrase = state.shouldWriteDownPersonasSeedPhrase
 			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
-			self.appVersion = L10n.Settings.appVersion(bundleInfo.shortVersion, bundleInfo.version)
+			self.appVersion = L10n.WalletSettings.appVersion(bundleInfo.shortVersion)
 		}
 	}
 }
@@ -76,23 +70,10 @@ extension Settings.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: .zero) {
-					if viewStore.showsSomeBanner {
-						VStack(spacing: .medium3) {
-							if viewStore.shouldShowAddP2PLinkButton {
-								ConnectExtensionView {
-									viewStore.send(.addP2PLinkButtonTapped)
-								}
-							}
-							if viewStore.shouldShowMigrateOlympiaButton {
-								MigrateOlympiaAccountsView {
-									viewStore.send(.importOlympiaButtonTapped)
-								} dismiss: {
-									viewStore.send(.dismissImportOlympiaHeaderButtonTapped)
-								}
-								.transition(headerTransition)
-							}
+					if viewStore.shouldShowAddP2PLinkButton {
+						ConnectExtensionView {
+							viewStore.send(.addP2PLinkButtonTapped)
 						}
-						.padding(.medium3)
 					}
 
 					ForEach(rows(viewStore: viewStore)) { kind in
@@ -109,25 +90,22 @@ extension Settings.View {
 						}
 					}
 				}
-				.padding(.bottom, .large3)
 
-				VStack(spacing: .zero) {
+				VStack(spacing: .medium1) {
 					Text(viewStore.appVersion)
 						.foregroundColor(.app.gray2)
-						.textStyle(.body2Regular)
-						.padding(.bottom, .medium1)
+						.textStyle(.body1Regular)
 
 					#if DEBUG
 					Text(viewStore.debugAppInfo)
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2Regular)
-						.padding(.bottom, .medium1)
 						.multilineTextAlignment(.leading)
 					#endif
 				}
+				.frame(minHeight: .huge1)
 			}
 			.background(Color.app.gray4)
-			.animation(.default, value: viewStore.shouldShowMigrateOlympiaButton)
 			.onAppear {
 				store.send(.view(.appeared))
 			}
@@ -155,27 +133,44 @@ extension Settings.View {
 	private func normalRows(viewStore: ViewStoreOf<Settings>) -> [RowKind] {
 		[
 			.model(.init(
-				title: L10n.Settings.authorizedDapps,
-				icon: .asset(AssetResource.authorizedDapps),
+				title: L10n.WalletSettings.SecurityCenter.title,
+				subtitle: L10n.WalletSettings.SecurityCenter.subtitle,
+				icon: .asset(AssetResource.security),
 				action: .authorizedDappsButtonTapped
 			)),
 			.separator,
 			.model(.init(
-				title: L10n.Settings.personas,
+				title: L10n.WalletSettings.Personas.title,
+				subtitle: L10n.WalletSettings.Personas.subtitle,
 				hint: viewStore.shouldWriteDownPersonasSeedPhrase ? .init(kind: .warning, text: .init(L10n.Settings.personasSeedPhrasePrompt)) : nil,
 				icon: .asset(AssetResource.personas),
 				action: .personasButtonTapped
 			)),
 			.model(.init(
-				title: L10n.Settings.accountSecurityAndSettings,
-				icon: .asset(AssetResource.accountSecurity),
+				title: L10n.WalletSettings.Dapps.title,
+				subtitle: L10n.WalletSettings.Dapps.subtitle,
+				icon: .asset(AssetResource.authorizedDapps),
+				action: .accountSecurityButtonTapped
+			)),
+			.model(.init(
+				title: L10n.WalletSettings.Connectors.title,
+				subtitle: L10n.WalletSettings.Connectors.subtitle,
+				icon: .asset(AssetResource.desktopConnections),
 				action: .accountSecurityButtonTapped
 			)),
 			.separator,
 			.model(.init(
-				title: L10n.Settings.appSettings,
-				icon: .asset(AssetResource.appSettings),
-				action: .appSettingsButtonTapped
+				title: L10n.WalletSettings.Preferences.title,
+				subtitle: L10n.WalletSettings.Preferences.subtitle,
+				icon: .asset(AssetResource.depositGuarantees),
+				action: .accountSecurityButtonTapped
+			)),
+			.separator,
+			.model(.init(
+				title: L10n.WalletSettings.Troubleshooting.title,
+				subtitle: L10n.WalletSettings.Troubleshooting.subtitle,
+				icon: .asset(AssetResource.troubleshooting),
+				action: .accountSecurityButtonTapped
 			)),
 		]
 	}
@@ -283,67 +278,29 @@ extension Settings.View {
 		var body: some View {
 			VStack(spacing: .medium2) {
 				Image(asset: AssetResource.connectorBrowsersIcon)
-					.padding(.horizontal, .medium1)
 
-				Text(L10n.Settings.LinkToConnectorHeader.title)
-					.textStyle(.body1Header)
-					.foregroundColor(.app.gray1)
-					.padding(.horizontal, .medium2)
+				VStack(spacing: .medium3) {
+					Text(L10n.WalletSettings.LinkToConnectorHeader.title)
+						.textStyle(.body1Header)
+						.foregroundColor(.app.gray1)
 
-				Text(L10n.Settings.LinkToConnectorHeader.subtitle)
-					.foregroundColor(.app.gray2)
-					.textStyle(.body2Regular)
-					.multilineTextAlignment(.center)
-					.padding(.horizontal, .medium2)
+					Text(L10n.WalletSettings.LinkToConnectorHeader.subtitle)
+						.foregroundColor(.app.gray2)
+						.textStyle(.body2Regular)
+						.multilineTextAlignment(.center)
+						.padding(.horizontal, .large3)
+				}
 
-				Button(L10n.Settings.LinkToConnectorHeader.linkToConnector, action: action)
+				Button(L10n.WalletSettings.LinkToConnectorHeader.linkToConnector, action: action)
 					.buttonStyle(.secondaryRectangular(
+						backgroundColor: .app.gray3,
 						shouldExpand: true,
 						image: .init(asset: AssetResource.qrCodeScanner)
 					))
-					.padding(.horizontal, .medium1)
 			}
-			.padding(.vertical, .medium1)
-			.background(Color.app.gray5)
-			.cornerRadius(.medium3)
-		}
-	}
-
-	// MARK: - MigrateOlympiaAccountsView
-	struct MigrateOlympiaAccountsView: View {
-		let action: () -> Void
-		let dismiss: () -> Void
-
-		var body: some View {
-			VStack(spacing: .medium2) {
-				Text(L10n.Settings.ImportFromLegacyWalletHeader.title)
-					.textStyle(.body1Header)
-					.foregroundColor(.app.gray1)
-					.padding(.horizontal, .medium2)
-
-				Text(L10n.Settings.ImportFromLegacyWalletHeader.subtitle)
-					.foregroundColor(.app.gray2)
-					.textStyle(.body2Regular)
-					.multilineTextAlignment(.center)
-					.padding(.horizontal, .medium1)
-
-				Button(
-					L10n.Settings.ImportFromLegacyWalletHeader.importLegacyAccounts,
-					action: action
-				)
-				.buttonStyle(.secondaryRectangular(
-					shouldExpand: true,
-					image: .init(asset: AssetResource.qrCodeScanner) // FIXME: Pick asset
-				))
-				.padding(.horizontal, .medium1)
-			}
-			.padding(.vertical, .medium1)
-			.background(Color.app.gray5)
-			.cornerRadius(.medium3)
-			.overlay(alignment: .topTrailing) {
-				CloseButton(action: dismiss)
-					.padding(.small3)
-			}
+			.padding(.vertical, .large3)
+			.padding(.horizontal, .large2)
+			.background(Color.clear)
 		}
 	}
 }

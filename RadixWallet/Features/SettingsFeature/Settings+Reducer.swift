@@ -19,7 +19,6 @@ public struct Settings: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destination.State?
 
-		public var shouldShowMigrateOlympiaButton: Bool = false
 		public var userHasNoP2PLinks: Bool? = nil
 		public var shouldWriteDownPersonasSeedPhrase: Bool = false
 
@@ -31,8 +30,6 @@ public struct Settings: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case addP2PLinkButtonTapped
-		case importOlympiaButtonTapped
-		case dismissImportOlympiaHeaderButtonTapped
 
 		case authorizedDappsButtonTapped
 		case personasButtonTapped
@@ -43,7 +40,6 @@ public struct Settings: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadedP2PLinks(P2PLinks)
-		case loadedShouldShowImportWalletShortcutInSettings(Bool)
 		case loadedShouldWriteDownPersonasSeedPhrase(Bool)
 	}
 
@@ -116,19 +112,11 @@ public struct Settings: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return loadP2PLinks()
-				.merge(with: loadShouldShowImportWalletShortcutInSettings())
 				.merge(with: loadShouldWriteDownPersonasSeedPhrase())
 
 		case .addP2PLinkButtonTapped:
 			state.destination = .manageP2PLinks(.init(destination: .newConnection(.init())))
 			return .none
-
-		case .importOlympiaButtonTapped:
-			state.destination = .accountSecurity(.importOlympia)
-			return .none
-
-		case .dismissImportOlympiaHeaderButtonTapped:
-			return hideImportOlympiaHeader(in: &state)
 
 		case .authorizedDappsButtonTapped:
 			state.destination = .authorizedDapps(.init())
@@ -154,10 +142,6 @@ public struct Settings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadedShouldShowImportWalletShortcutInSettings(shouldShow):
-			state.shouldShowMigrateOlympiaButton = shouldShow
-			return .none
-
 		case let .loadedP2PLinks(clients):
 			state.userHasNoP2PLinks = clients.isEmpty
 			return .none
@@ -187,12 +171,6 @@ public struct Settings: Sendable, FeatureReducer {
 			.none
 		}
 	}
-
-	private func hideImportOlympiaHeader(in state: inout State) -> Effect<Action> {
-		state.shouldShowMigrateOlympiaButton = false
-		userDefaults.setHideMigrateOlympiaButton(true)
-		return .none
-	}
 }
 
 // MARK: Private
@@ -202,14 +180,6 @@ extension Settings {
 			await send(.internal(.loadedP2PLinks(
 				p2pLinksClient.getP2PLinks()
 			)))
-		}
-	}
-
-	private func loadShouldShowImportWalletShortcutInSettings() -> Effect<Action> {
-		.run { send in
-			@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
-			let shouldShow = await importLegacyWalletClient.shouldShowImportWalletShortcutInSettings()
-			await send(.internal(.loadedShouldShowImportWalletShortcutInSettings(shouldShow)))
 		}
 	}
 
