@@ -153,7 +153,7 @@
 "accountSettings_specificAssetsDeposits_allowDepositorsNoResources" = "Add a specific badge by its resource address to allow all deposits from its holder.";
 "accountSettings_specificAssetsDeposits_allowDepositors" = "The holder of the following badges may always deposit accounts to this account.";
 "accountSettings_specificAssetsDeposits_resourceListPicker" = "Select exception list";
-"accountSettings_specificAssetsDeposits_modificationDisabledForRecoveredAccount" = "⚠️ Sorry, this Account\'s third-party exceptions and depositor lists are in an unknown state and cannot be viewed or edited because it was imported using only a seed phrase or Ledger. A forthcoming wallet update will enable viewing and editing of these lists.";
+"accountSettings_specificAssetsDeposits_modificationDisabledForRecoveredAccount" = "Sorry, this Account\'s third-party exceptions and depositor lists are in an unknown state and cannot be viewed or edited because it was imported using only a seed phrase or Ledger. A forthcoming wallet update will enable viewing and editing of these lists.";
 "accountSettings_showAssets_text" = "Asset creators can add tags to them. You can choose which tags you want to see in this Account.";
 "accountSettings_showAssets_selectShown" = "Select the ones you’d like shown on all your assets.";
 "accountSettings_showAssets_recommended" = "Recommended";
@@ -1020,15 +1020,17 @@ If you have any “Legacy” Accounts (created on the Olympia network) to import
 "survey_reason_heading" = "What’s the main reason for your score?";
 "survey_reason_fieldHint" = "Let us know...";
 "survey_submitButton" = "Submit Feedback - Thanks!";
-"factorSourceAccess_title_signature" = "Signature Request";
-"factorSourceAccess_title_createAccount" = "Creating Account";
-"factorSourceAccess_title_createPersona" = "Creating Persona";
-"factorSourceAccess_title_deriveAccounts" = "Deriving Accounts";
-"factorSourceAccess_title_proveOwnership" = "Proving Ownership";
-"factorSourceAccess_title_encryptMessage" = "Encrypting Message";
-"factorSourceAccess_title_createKey" = "Creating Key";
-"factorSourceAccess_message_device_signature" = "Authenticate to your phone to sign.";
-"factorSourceAccess_message_device_general" = "Authenticate to your phone to complete using your phone's signing key.";
-"factorSourceAccess_message_ledger_signature" = "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.\n**Complete signing on the device.**";
-"factorSourceAccess_message_ledger_deriveAccounts" = "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.\n**Derivation may take up to a minute.**";
-"factorSourceAccess_message_ledger_general" = "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.";
+"factorSourceActions_signature_title" = "Signature Request";
+"factorSourceActions_createAccount_title" = "Creating Account";
+"factorSourceActions_createPersona_title" = "Creating Persona";
+"factorSourceActions_deriveAccounts_title" = "Deriving Accounts";
+"factorSourceActions_proveOwnership_title" = "Proving Ownership";
+"factorSourceActions_encryptMessage_title" = "Encrypting Message";
+"factorSourceActions_createKey_title" = "Creating Key";
+"factorSourceActions_device_messageSignature" = "Authenticate to your phone to sign.";
+"factorSourceActions_device_message" = "Authenticate to your phone to complete using your phone\'s signing key.";
+"factorSourceActions_ledger_messageSignature" = "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
+**Complete signing on the device.**";
+"factorSourceActions_ledger_messageDeriveAccounts" = "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
+**Derivation may take up to a minute.**";
+"factorSourceActions_ledger_message" = "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.";
