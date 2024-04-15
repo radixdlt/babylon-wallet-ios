@@ -2708,6 +2708,58 @@ public enum L10n {
       public static let text = L10n.tr("Localizable", "transactionStatus_transactionID_text", fallback: "Transaction ID: ")
     }
   }
+  public enum WalletSettings {
+    /// App version: %@
+    public static func appVersion(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "walletSettings_appVersion", String(describing: p1), fallback: "App version: %@")
+    }
+    /// Wallet Settings
+    public static let title = L10n.tr("Localizable", "walletSettings_title", fallback: "Wallet Settings")
+    public enum Connectors {
+      /// Connect to desktop through the Radix Connector browser extension
+      public static let subtitle = L10n.tr("Localizable", "walletSettings_connectors_subtitle", fallback: "Connect to desktop through the Radix Connector browser extension")
+      /// Linked Connectors
+      public static let title = L10n.tr("Localizable", "walletSettings_connectors_title", fallback: "Linked Connectors")
+    }
+    public enum Dapps {
+      /// Manage the Radix dApps you're connected to
+      public static let subtitle = L10n.tr("Localizable", "walletSettings_dapps_subtitle", fallback: "Manage the Radix dApps you're connected to")
+      /// Approved dApps
+      public static let title = L10n.tr("Localizable", "walletSettings_dapps_title", fallback: "Approved dApps")
+    }
+    public enum LinkToConnectorHeader {
+      /// Link to Connector
+      public static let linkToConnector = L10n.tr("Localizable", "walletSettings_linkToConnectorHeader_linkToConnector", fallback: "Link to Connector")
+      /// Scan the QR code in the Radix Wallet Connector extension
+      public static let subtitle = L10n.tr("Localizable", "walletSettings_linkToConnectorHeader_subtitle", fallback: "Scan the QR code in the Radix Wallet Connector extension")
+      /// Link your Wallet to a Desktop Browser
+      public static let title = L10n.tr("Localizable", "walletSettings_linkToConnectorHeader_title", fallback: "Link your Wallet to a Desktop Browser")
+    }
+    public enum Personas {
+      /// Manage Radix dApp login details
+      public static let subtitle = L10n.tr("Localizable", "walletSettings_personas_subtitle", fallback: "Manage Radix dApp login details")
+      /// Personas
+      public static let title = L10n.tr("Localizable", "walletSettings_personas_title", fallback: "Personas")
+    }
+    public enum Preferences {
+      /// Deposits, hidden Accounts and Personas, and avdanced preferences
+      public static let subtitle = L10n.tr("Localizable", "walletSettings_preferences_subtitle", fallback: "Deposits, hidden Accounts and Personas, and avdanced preferences")
+      /// Preferences
+      public static let title = L10n.tr("Localizable", "walletSettings_preferences_title", fallback: "Preferences")
+    }
+    public enum SecurityCenter {
+      /// Manage your wallet security settings
+      public static let subtitle = L10n.tr("Localizable", "walletSettings_securityCenter_subtitle", fallback: "Manage your wallet security settings")
+      /// Security Center
+      public static let title = L10n.tr("Localizable", "walletSettings_securityCenter_title", fallback: "Security Center")
+    }
+    public enum Troubleshooting {
+      /// Add your existing Accounts and contact support
+      public static let subtitle = L10n.tr("Localizable", "walletSettings_troubleshooting_subtitle", fallback: "Add your existing Accounts and contact support")
+      /// Troubleshooting
+      public static let title = L10n.tr("Localizable", "walletSettings_troubleshooting_title", fallback: "Troubleshooting")
+    }
+  }
 }
 // swiftlint:enable explicit_type_interface function_parameter_count identifier_name line_length
 // swiftlint:enable nesting type_body_length type_name vertical_whitespace_opening_braces

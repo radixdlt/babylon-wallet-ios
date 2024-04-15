@@ -1038,3 +1038,21 @@ If you have any “Legacy” Accounts (created on the Olympia network) to import
 "survey_reason_heading" = "What’s the main reason for your score?";
 "survey_reason_fieldHint" = "Let us know...";
 "survey_submitButton" = "Submit Feedback - Thanks!";
+
+"walletSettings_title" = "Wallet Settings";
+"walletSettings_securityCenter_title" = "Security Center";
+"walletSettings_securityCenter_subtitle" = "Manage your wallet security settings";
+"walletSettings_personas_title" = "Personas";
+"walletSettings_personas_subtitle" = "Manage Radix dApp login details";
+"walletSettings_dapps_title" = "Approved dApps";
+"walletSettings_dapps_subtitle" = "Manage the Radix dApps you're connected to";
+"walletSettings_connectors_title" = "Linked Connectors";
+"walletSettings_connectors_subtitle" = "Connect to desktop through the Radix Connector browser extension";
+"walletSettings_preferences_title" = "Preferences";
+"walletSettings_preferences_subtitle" = "Deposits, hidden Accounts and Personas, and avdanced preferences";
+"walletSettings_troubleshooting_title" = "Troubleshooting";
+"walletSettings_troubleshooting_subtitle" = "Add your existing Accounts and contact support";
+"walletSettings_appVersion" = "App version: %@";
+"walletSettings_linkToConnectorHeader_title" = "Link your Wallet to a Desktop Browser";
+"walletSettings_linkToConnectorHeader_subtitle" = "Scan the QR code in the Radix Wallet Connector extension";
+"walletSettings_linkToConnectorHeader_linkToConnector" = "Link to Connector";
