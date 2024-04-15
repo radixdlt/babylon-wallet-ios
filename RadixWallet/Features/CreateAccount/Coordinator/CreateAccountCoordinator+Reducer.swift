@@ -149,11 +149,11 @@ extension CreateAccountCoordinator {
 				state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
 				return .none
 			} else {
-				return derivePublicKey(state: &state, ledger: nil)
+				return derivePublicKey(state: &state, factorSourceOption: .device)
 			}
 
 		case let .path(.element(_, action: .selectLedger(.delegate(.choseLedger(ledger))))):
-			return derivePublicKey(state: &state, ledger: ledger)
+			return derivePublicKey(state: &state, factorSourceOption: .specific(ledger.embed()))
 
 		case .path(.element(_, action: .completion(.delegate(.completed)))):
 			return .run { send in
@@ -252,12 +252,7 @@ extension CreateAccountCoordinator {
 		}
 	}
 
-	private func derivePublicKey(state: inout State, ledger: LedgerHardwareWalletFactorSource?) -> Effect<Action> {
-		let factorSourceOption: DerivePublicKeys.State.FactorSourceOption = if let ledger {
-			.specific(ledger.embed())
-		} else {
-			.device
-		}
+	private func derivePublicKey(state: inout State, factorSourceOption: DerivePublicKeys.State.FactorSourceOption) -> Effect<Action> {
 		state.destination = .derivePublicKey(
 			.init(
 				derivationPathOption: .next(
