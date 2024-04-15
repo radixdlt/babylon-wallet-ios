@@ -93,7 +93,7 @@ extension NewConnectionName {
 import ComposableArchitecture
 import SwiftUI
 
-struct ConnectUsingPassword_Preview: PreviewProvider {
+struct NewConnectionName_Preview: PreviewProvider {
 	static var previews: some View {
 		NewConnectionName.View(
 			store: .init(

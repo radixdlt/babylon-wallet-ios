@@ -34,6 +34,12 @@ extension NewConnection {
 										.withTitle(L10n.LinkedConnectors.NewConnection.title)
 								}
 							)
+						case .connectionApproval:
+							CaseLet(
+								/NewConnection.State.Root.connectionApproval,
+								action: NewConnection.ChildAction.connectionApproval,
+								then: { NewConnectionApproval.View(store: $0) }
+							)
 						case .nameConnection:
 							CaseLet(
 								/NewConnection.State.Root.nameConnection,
@@ -50,6 +56,7 @@ extension NewConnection {
 						}
 					}
 				}
+				.destination(with: store)
 			}
 			.tint(.app.gray1)
 			.foregroundColor(.app.gray1)
@@ -71,22 +78,19 @@ extension View {
 	}
 }
 
-#if DEBUG
-import ComposableArchitecture
-import SwiftUI
-
-struct NewConnection_Preview: PreviewProvider {
-	static var previews: some View {
-		NewConnection.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: NewConnection.init
-			)
-		)
+@MainActor
+private extension View {
+	func destination(with store: StoreOf<NewConnection>) -> some View {
+		let destination = store.destination
+		return alert(store: destination.scope(state: \.errorAlert, action: \.errorAlert))
 	}
 }
 
-extension NewConnection.State {
-	public static let previewValue: Self = .init()
+extension StoreOf<NewConnection> {
+	var destination: PresentationStoreOf<NewConnection.Destination> {
+		func scopeState(state: State) -> PresentationState<NewConnection.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
 }
-#endif

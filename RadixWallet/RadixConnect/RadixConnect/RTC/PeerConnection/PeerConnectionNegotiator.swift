@@ -190,9 +190,10 @@ extension PeerConnectionNegotiator {
 		_ = try await onConnectionEstablished.collect()
 		_ = try await onDataChannelReady.collect()
 
+        // TODO: - fix
 		let response = P2P.ConnectorExtension.Request.LinkClientInteractionResponse(
 			discriminator: .linkClient,
-			publicKey: try! HexCodable32Bytes(data: Curve25519.PrivateKey().publicKey.compressedRepresentation)
+			publicKey: try! HexCodable32Bytes(hex: "2c62b69a34f51fdcef3ee912c8e1ce12b734ad069e8e254b6ed0f4e9a75a781c") // HexCodable32Bytes(data: Curve25519.PrivateKey().publicKey.compressedRepresentation)
 		)
 		@Dependency(\.jsonEncoder) var jsonEncoder
 		try await peerConnectionClient.sendData(jsonEncoder().encode(response))

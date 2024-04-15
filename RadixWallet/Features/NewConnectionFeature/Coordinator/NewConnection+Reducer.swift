@@ -8,13 +8,18 @@ public struct NewConnection: Sendable, FeatureReducer {
 			case localNetworkPermission(LocalNetworkPermission.State)
 			case scanQR(ScanQRCoordinator.State)
 			case nameConnection(NewConnectionName.State)
+			case connectionApproval(NewConnectionApproval.State)
 		}
+
+		public typealias ConnectionName = String
 
 		public var root: Root
 
-		public var linkConnectionQRData: LinkConnectionQRData?
+		@PresentationState
+		public var destination: Destination.State?
 
-		public var connectionName: String?
+		public var linkConnectionQRData: LinkConnectionQRData?
+		public var connectionName: ConnectionName?
 
 		public init() {
 			self.root = .localNetworkPermission(.init())
@@ -29,6 +34,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 		case localNetworkPermission(LocalNetworkPermission.Action)
 		case scanQR(ScanQRCoordinator.Action)
 		case nameConnection(NewConnectionName.Action)
+		case connectionApproval(NewConnectionApproval.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -40,14 +46,35 @@ public struct NewConnection: Sendable, FeatureReducer {
 		case linkConnectionDataFromStringResult(TaskResult<LinkConnectionQRData>)
 		case establishConnection(String)
 		case establishConnectionResult(TaskResult<LinkConnectionQRData>)
+		case approveConnection(NewConnectionApproval.State.Purpose)
+		case showErrorAlert(AlertState<Destination.Action.ErrorAlert>)
+	}
 
-		case connectionName
+	public struct Destination: DestinationReducer {
+		@CasePathable
+		public enum State: Sendable, Hashable {
+			case errorAlert(AlertState<Action.ErrorAlert>)
+		}
+
+		@CasePathable
+		public enum Action: Sendable, Equatable {
+			case errorAlert(ErrorAlert)
+
+			public enum ErrorAlert: Hashable, Sendable {
+				case dismissTapped
+			}
+		}
+
+		public var body: some ReducerOf<Self> {
+			EmptyReducer()
+		}
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.p2pLinksClient) var p2pLinksClient
 	@Dependency(\.jsonDecoder) var jsonDecoder
 	@Dependency(\.radixConnectClient) var radixConnectClient
+	@Dependency(\.dismiss) var dismiss
 
 	public init() {}
 
@@ -59,6 +86,9 @@ public struct NewConnection: Sendable, FeatureReducer {
 				}
 				.ifCaseLet(/State.Root.scanQR, action: /ChildAction.scanQR) {
 					ScanQRCoordinator()
+				}
+				.ifCaseLet(/State.Root.connectionApproval, action: /ChildAction.connectionApproval) {
+					NewConnectionApproval()
 				}
 				.ifCaseLet(/State.Root.nameConnection, action: /ChildAction.nameConnection) {
 					NewConnectionName()
@@ -81,27 +111,24 @@ public struct NewConnection: Sendable, FeatureReducer {
 			state.linkConnectionQRData = data
 
 			return .run { send in
-				switch data.purpose {
-				case .general:
-					let p2pLinks = await p2pLinksClient.getP2PLinks()
+				let p2pLinks = await p2pLinksClient.getP2PLinks()
 
-					if let p2pLink = p2pLinks.first(where: { $0.publicKey == data.publicKey }) {
-						if p2pLink.purpose == data.purpose {
-							// [NewConnectionApproval] This appears to be a Radix Connector you previously linked to. Link will be updated.
-							await send(.internal(.establishConnection(p2pLink.displayName)))
-						} else {
-							// Inform users that changing purposes is not supported
-							// - Changing a Connector’s type is not supported.
-						}
+				if let p2pLink = p2pLinks.first(where: { $0.publicKey == data.publicKey }) {
+					if p2pLink.purpose == data.purpose {
+						await send(.internal(.approveConnection(.approveExisitingConnection(p2pLink.displayName))))
 					} else {
-						// [NewConnectionApproval] Is this the official Radix Connect browser extension, or a Connector you trust to relay requests from many dApps?”
-						await send(.internal(.connectionName))
+						await send(.internal(.showErrorAlert(.changingPurposeNotSupported)))
 					}
-				case .dAppSpecific:
-					// Inform users that dApp specific linkage is not supported
-					break
+				} else {
+					switch data.purpose {
+					case .general:
+						await send(.internal(.approveConnection(.approveNewConnection)))
+					case .unknown:
+						await send(.internal(.showErrorAlert(.unknownPurpose)))
+					}
 				}
 			}
+
 		case let .linkConnectionDataFromStringResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
@@ -110,14 +137,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 			guard let linkConnectionQRData = state.linkConnectionQRData else { return .none }
 
 			state.connectionName = connectionName
-
-			switch state.root {
-			case var .nameConnection(nameState):
-				nameState.isConnecting = true
-				state.root = .nameConnection(nameState)
-			default:
-				break
-			}
+			updateConnectingState(for: &state, isConnecting: true)
 
 			return .run { send in
 				await send(.internal(.establishConnectionResult(
@@ -137,31 +157,20 @@ public struct NewConnection: Sendable, FeatureReducer {
 				purpose: linkConnectionQRData.purpose,
 				displayName: connectionName
 			)
-			return .run { send in
-				let p2pLinks = await p2pLinksClient.getP2PLinks()
 
-				if let oldP2PLink = p2pLinks.first(where: { $0.publicKey == linkConnectionQRData.publicKey }) {
-					try await radixConnectClient.deleteP2PLinkByPassword(oldP2PLink.connectionPassword)
-				}
-
-				await send(.delegate(.newConnection(p2pLink)))
-			}
+			return .send(.delegate(.newConnection(p2pLink)))
 
 		case let .establishConnectionResult(.failure(error)):
 			errorQueue.schedule(error)
-
-			switch state.root {
-			case var .nameConnection(nameState):
-				nameState.isConnecting = false
-				state.root = .nameConnection(nameState)
-			default:
-				break
-			}
-
+			updateConnectingState(for: &state, isConnecting: false)
 			return .none
 
-		case .connectionName:
-			state.root = .nameConnection(.init())
+		case let .approveConnection(purpose):
+			state.root = .connectionApproval(.init(purpose: purpose))
+			return .none
+
+		case let .showErrorAlert(error):
+			state.destination = .errorAlert(error)
 			return .none
 		}
 	}
@@ -185,11 +194,70 @@ public struct NewConnection: Sendable, FeatureReducer {
 				await send(.internal(.linkConnectionDataFromStringResult(result)))
 			}
 
+		case let .connectionApproval(.delegate(.approved(purpose))):
+			switch purpose {
+			case .approveNewConnection:
+				state.root = .nameConnection(.init())
+				return .none
+			case let .approveExisitingConnection(connectionName):
+				return .send(.internal(.establishConnection(connectionName)))
+			}
+
 		case let .nameConnection(.delegate(.nameSet(connectionName))):
 			return .send(.internal(.establishConnection(connectionName)))
 
 		default:
 			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .errorAlert(.dismissTapped):
+			.run { _ in
+				await dismiss()
+			}
+		}
+	}
+
+	private func updateConnectingState(for state: inout State, isConnecting: Bool) {
+		switch state.root {
+		case var .connectionApproval(approvalState):
+			approvalState.isConnecting = isConnecting
+			state.root = .connectionApproval(approvalState)
+
+		case var .nameConnection(nameState):
+			nameState.isConnecting = isConnecting
+			state.root = .nameConnection(nameState)
+
+		default:
+			break
+		}
+	}
+}
+
+extension AlertState<NewConnection.Destination.Action.ErrorAlert> {
+	public static var unknownPurpose: AlertState {
+		AlertState {
+			TextState("Link Failed")
+		} actions: {
+			ButtonState(role: .cancel, action: .dismissTapped) {
+				TextState("Dismiss")
+			}
+		} message: {
+			TextState("This type of Connector link is not supported.")
+		}
+	}
+
+	public static var changingPurposeNotSupported: AlertState {
+		AlertState {
+			TextState("Link Failed")
+		} actions: {
+			ButtonState(role: .cancel, action: .dismissTapped) {
+				TextState("Dismiss")
+			}
+		} message: {
+			TextState("Changing a Connector’s type is not supported.")
 		}
 	}
 }

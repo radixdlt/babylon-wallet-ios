@@ -1933,6 +1933,20 @@ public enum L10n {
     public static let subtitle = L10n.tr("Localizable", "linkedConnectors_subtitle", fallback: "Connect your Radix Wallet to desktop web browsers by linking to the Radix Connector browser extension. Here are your linked Connectors.")
     /// Linked Connectors
     public static let title = L10n.tr("Localizable", "linkedConnectors_title", fallback: "Linked Connectors")
+    public enum ApproveExistingConnector {
+      /// This appears to be a Radix Connector you previously linked to. Link will be updated.
+      public static let message = L10n.tr("Localizable", "linkedConnectors_approveExistingConnector_message", fallback: "This appears to be a Radix Connector you previously linked to. Link will be updated.")
+      /// Update Link
+      public static let title = L10n.tr("Localizable", "linkedConnectors_approveExistingConnector_title", fallback: "Update Link")
+    }
+    public enum ApproveNewConnector {
+      /// This Connector will be trusted to verify the dApp origin of requests to this wallet.
+      /// 
+      /// Only continue if you are linking to the **official Radix Connector browser extension** - or a Connector you control and trust.
+      public static let message = L10n.tr("Localizable", "linkedConnectors_approveNewConnector_message", fallback: "This Connector will be trusted to verify the dApp origin of requests to this wallet.\n\nOnly continue if you are linking to the **official Radix Connector browser extension** - or a Connector you control and trust.")
+      /// Link Connector
+      public static let title = L10n.tr("Localizable", "linkedConnectors_approveNewConnector_title", fallback: "Link Connector")
+    }
     public enum CameraPermissionDeniedAlert {
       /// Camera access is required to link to a Connector.
       public static let message = L10n.tr("Localizable", "linkedConnectors_cameraPermissionDeniedAlert_message", fallback: "Camera access is required to link to a Connector.")

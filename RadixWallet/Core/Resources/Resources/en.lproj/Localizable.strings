@@ -1037,3 +1037,11 @@ If you have any “Legacy” Accounts (created on the Olympia network) to import
 "survey_reason_heading" = "What’s the main reason for your score?";
 "survey_reason_fieldHint" = "Let us know...";
 "survey_submitButton" = "Submit Feedback - Thanks!";
+
+
+"linkedConnectors_approveNewConnector_title" = "Link Connector";
+"linkedConnectors_approveExistingConnector_title" = "Update Link";
+"linkedConnectors_approveNewConnector_message" = "This Connector will be trusted to verify the dApp origin of requests to this wallet.
+
+Only continue if you are linking to the **official Radix Connector browser extension** - or a Connector you control and trust.";
+"linkedConnectors_approveExistingConnector_message" = "This appears to be a Radix Connector you previously linked to. Link will be updated.";

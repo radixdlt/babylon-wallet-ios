@@ -110,6 +110,7 @@ public enum AssetResource {
   public static let delete = ImageAsset(name: "delete")
   public static let depositGuarantees = ImageAsset(name: "depositGuarantees")
   public static let desktopConnections = ImageAsset(name: "desktop-connections")
+  public static let desktopLinkConnector = ImageAsset(name: "desktop-link-connector")
   public static let developerMode = ImageAsset(name: "developerMode")
   public static let entityHiding = ImageAsset(name: "entityHiding")
   public static let gateway = ImageAsset(name: "gateway")

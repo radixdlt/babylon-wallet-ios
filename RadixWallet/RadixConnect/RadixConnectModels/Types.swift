@@ -31,7 +31,7 @@ extension ConnectionPublicKey {
 
 // MARK: - LinkConnectionQRData
 public struct LinkConnectionQRData: Sendable, Hashable, Decodable {
-	public let purpose: ConnectionPurpose
+	public var purpose: ConnectionPurpose
 
 	public let password: ConnectionPassword
 
@@ -52,7 +52,7 @@ extension LinkConnectionQRData {
 #endif
 
 // MARK: - ConnectionPurpose
-public enum ConnectionPurpose: String, Sendable, Codable {
+public enum ConnectionPurpose: String, Sendable, Codable, UnknownCaseDecodable {
 	case general
-	case dAppSpecific // TODO: value??
+	case unknown
 }
