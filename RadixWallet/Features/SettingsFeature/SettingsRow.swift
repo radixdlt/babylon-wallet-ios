@@ -30,3 +30,40 @@ struct SettingsRow<Feature: FeatureReducer>: View {
 			.withSeparator
 	}
 }
+
+// MARK: - SettingsRowKind
+enum SettingsRowKind<Feature: FeatureReducer>: Identifiable {
+	case model(SettingsRowModel<Feature>)
+	case separator(String)
+
+	static var separator: Self {
+		.separator(UUID().uuidString)
+	}
+
+	var id: String {
+		switch self {
+		case let .model(model):
+			model.id
+		case let .separator(id):
+			id
+		}
+	}
+
+	@ViewBuilder
+	func build(viewStore: ViewStore<Feature.ViewState, Feature.ViewAction>) -> some View {
+		switch self {
+		case let .model(model):
+			PlainListRow(viewState: model.rowViewState)
+				.tappable {
+					viewStore.send(model.action)
+				}
+				.withSeparator
+
+		case .separator:
+			Rectangle()
+				.fill(Color.clear)
+				.frame(maxWidth: .infinity)
+				.frame(height: .large3)
+		}
+	}
+}

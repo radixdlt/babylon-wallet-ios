@@ -77,17 +77,7 @@ extension Settings.View {
 					}
 
 					ForEach(rows(viewStore: viewStore)) { kind in
-						switch kind {
-						case let .model(model):
-							SettingsRow(row: model) {
-								viewStore.send(model.action)
-							}
-						case .separator:
-							Rectangle()
-								.fill(Color.clear)
-								.frame(maxWidth: .infinity)
-								.frame(height: .large3)
-						}
+						kind.build(viewStore: viewStore)
 					}
 				}
 
@@ -117,7 +107,7 @@ extension Settings.View {
 	}
 
 	@MainActor
-	private func rows(viewStore: ViewStoreOf<Settings>) -> [RowKind] {
+	private func rows(viewStore: ViewStoreOf<Settings>) -> [SettingsRowKind<Settings>] {
 		var visibleRows = normalRows(viewStore: viewStore)
 		#if DEBUG
 		visibleRows.append(.separator)
@@ -131,7 +121,7 @@ extension Settings.View {
 	}
 
 	@MainActor
-	private func normalRows(viewStore: ViewStoreOf<Settings>) -> [RowKind] {
+	private func normalRows(viewStore: ViewStoreOf<Settings>) -> [SettingsRowKind<Settings>] {
 		[
 			.model(.init(
 				title: L10n.WalletSettings.SecurityCenter.title,
@@ -237,21 +227,8 @@ private extension View {
 	#endif
 }
 
+// MARK: - Settings.View.ConnectExtensionView
 extension Settings.View {
-	enum RowKind: Identifiable {
-		case model(SettingsRowModel<Settings>)
-		case separator
-
-		var id: String {
-			switch self {
-			case let .model(model):
-				model.id
-			case .separator:
-				UUID().uuidString
-			}
-		}
-	}
-
 	// MARK: - ConnectExtensionView
 	struct ConnectExtensionView: View {
 		let action: () -> Void
