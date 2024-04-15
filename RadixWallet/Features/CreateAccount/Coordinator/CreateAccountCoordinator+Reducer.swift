@@ -93,8 +93,7 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case createAccountResult(TaskResult<Profile.Network.Account>)
-		case handleAccountCreated(Profile.Network.Account)
-		case handleFailure
+		case handleAccountCreated(TaskResult<Profile.Network.Account>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -172,28 +171,25 @@ extension CreateAccountCoordinator {
 		switch internalAction {
 		case let .createAccountResult(.success(account)):
 			return .run { send in
-				try await accountsClient.saveVirtualAccount(account)
-				await send(.internal(.handleAccountCreated(account)))
-			} catch: { error, send in
-				loggerGlobal.error("Failed to save newly created virtual account into profile: \(error)")
-				await send(.internal(.handleFailure))
+				await send(.internal(.handleAccountCreated(TaskResult {
+					try await accountsClient.saveVirtualAccount(account)
+					return account
+				})))
 			}
 
-		case let .createAccountResult(.failure(error)):
+		case
+			let .createAccountResult(.failure(error)),
+			let .handleAccountCreated(.failure(error)):
 			errorQueue.schedule(error)
 			state.destination = nil
 			return .none
 
-		case let .handleAccountCreated(account):
+		case let .handleAccountCreated(.success(account)):
 			state.destination = nil
 			state.path.append(.completion(.init(
 				account: account,
 				config: state.config
 			)))
-			return .none
-
-		case .handleFailure:
-			state.destination = nil
 			return .none
 		}
 	}
@@ -241,7 +237,8 @@ extension CreateAccountCoordinator {
 			}
 
 		case .derivePublicKey(.delegate(.failedToDerivePublicKey)):
-			return .send(.internal(.handleFailure))
+			state.destination = nil
+			return .none
 
 		case .derivePublicKey(.delegate(.cancel)):
 			state.destination = nil
