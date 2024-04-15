@@ -639,6 +639,7 @@ Or you can clear this wallet from this phone and start fresh.";
 "misc_remoteThumbnails_vectorImageFailure" = "Can\'t displays image of vector type";
 "misc_remoteThumbnails_loadingFailure" = "Can\'t load image";
 "assetTransfer_transactionMessage" = "Message";
+"assetTransfer_transactionMessagePlaceholder" = "Add a message";
 "assetTransfer_qrScanInstructions" = "Scan a QR code of a Radix Account address from another wallet or an exchange.";
 "assetTransfer_sendTransferButton" = "Continue";
 "assetTransfer_accountList_externalAccountName" = "Account";
