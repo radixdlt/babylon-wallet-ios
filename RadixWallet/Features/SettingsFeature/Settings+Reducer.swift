@@ -29,12 +29,13 @@ public struct Settings: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case addP2PLinkButtonTapped
-
-		case authorizedDappsButtonTapped
+		case addConnectorButtonTapped
+		case securityButtonTapped
 		case personasButtonTapped
-		case accountSecurityButtonTapped
-		case appSettingsButtonTapped
+		case dappsButtonTapped
+		case connectorsButtonTapped
+		case preferencesButtonTapped
+		case troubleshootingButtonTapped
 		case debugButtonTapped
 	}
 
@@ -78,12 +79,6 @@ public struct Settings: Sendable, FeatureReducer {
 			Scope(state: /State.personas, action: /Action.personas) {
 				PersonasCoordinator()
 			}
-			Scope(state: /State.accountSecurity, action: /Action.accountSecurity) {
-				AccountSecurity()
-			}
-			Scope(state: /State.appSettings, action: /Action.appSettings) {
-				AppSettings()
-			}
 			#if DEBUG
 			Scope(state: /State.debugSettings, action: /Action.debugSettings) {
 				DebugSettingsCoordinator()
@@ -114,25 +109,41 @@ public struct Settings: Sendable, FeatureReducer {
 			return loadP2PLinks()
 				.merge(with: loadShouldWriteDownPersonasSeedPhrase())
 
-		case .addP2PLinkButtonTapped:
+		case .addConnectorButtonTapped:
 			state.destination = .manageP2PLinks(.init(destination: .newConnection(.init())))
 			return .none
 
-		case .authorizedDappsButtonTapped:
-			state.destination = .authorizedDapps(.init())
+		case .securityButtonTapped:
+			//            state.destination =
 			return .none
 
 		case .personasButtonTapped:
 			state.destination = .personas(.init())
 			return .none
 
-		case .accountSecurityButtonTapped:
-			state.destination = .accountSecurity(.init())
+		case .dappsButtonTapped:
+			state.destination = .authorizedDapps(.init())
 			return .none
 
-		case .appSettingsButtonTapped:
-			state.destination = .appSettings(.init())
+		case .connectorsButtonTapped:
+			state.destination = .manageP2PLinks(.init())
 			return .none
+
+		case .preferencesButtonTapped:
+			//            state.destination
+			return .none
+
+		case .troubleshootingButtonTapped:
+			//            state.destination =
+			return .none
+
+//		case .accountSecurityButtonTapped:
+//			state.destination = .accountSecurity(.init())
+//			return .none
+//
+//		case .appSettingsButtonTapped:
+//			state.destination = .appSettings(.init())
+//			return .none
 
 		case .debugButtonTapped:
 			state.destination = .debugSettings(.init())

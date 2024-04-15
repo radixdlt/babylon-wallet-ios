@@ -72,7 +72,7 @@ extension Settings.View {
 				VStack(spacing: .zero) {
 					if viewStore.shouldShowAddP2PLinkButton {
 						ConnectExtensionView {
-							viewStore.send(.addP2PLinkButtonTapped)
+							viewStore.send(.addConnectorButtonTapped)
 						}
 					}
 
@@ -120,6 +120,7 @@ extension Settings.View {
 	private func rows(viewStore: ViewStoreOf<Settings>) -> [RowKind] {
 		var visibleRows = normalRows(viewStore: viewStore)
 		#if DEBUG
+		visibleRows.append(.separator)
 		visibleRows.append(.model(.init(
 			title: "Debug Settings",
 			icon: .asset(AssetResource.appSettings), // FIXME: Find
@@ -136,7 +137,7 @@ extension Settings.View {
 				title: L10n.WalletSettings.SecurityCenter.title,
 				subtitle: L10n.WalletSettings.SecurityCenter.subtitle,
 				icon: .asset(AssetResource.security),
-				action: .authorizedDappsButtonTapped
+				action: .securityButtonTapped
 			)),
 			.separator,
 			.model(.init(
@@ -150,27 +151,27 @@ extension Settings.View {
 				title: L10n.WalletSettings.Dapps.title,
 				subtitle: L10n.WalletSettings.Dapps.subtitle,
 				icon: .asset(AssetResource.authorizedDapps),
-				action: .accountSecurityButtonTapped
+				action: .dappsButtonTapped
 			)),
 			.model(.init(
 				title: L10n.WalletSettings.Connectors.title,
 				subtitle: L10n.WalletSettings.Connectors.subtitle,
 				icon: .asset(AssetResource.desktopConnections),
-				action: .accountSecurityButtonTapped
+				action: .connectorsButtonTapped
 			)),
 			.separator,
 			.model(.init(
 				title: L10n.WalletSettings.Preferences.title,
 				subtitle: L10n.WalletSettings.Preferences.subtitle,
 				icon: .asset(AssetResource.depositGuarantees),
-				action: .accountSecurityButtonTapped
+				action: .preferencesButtonTapped
 			)),
 			.separator,
 			.model(.init(
 				title: L10n.WalletSettings.Troubleshooting.title,
 				subtitle: L10n.WalletSettings.Troubleshooting.subtitle,
 				icon: .asset(AssetResource.troubleshooting),
-				action: .accountSecurityButtonTapped
+				action: .troubleshootingButtonTapped
 			)),
 		]
 	}
@@ -192,8 +193,6 @@ private extension View {
 		return manageP2PLinks(with: destinationStore)
 			.authorizedDapps(with: destinationStore)
 			.personas(with: destinationStore)
-			.accountSecurity(with: destinationStore)
-			.appSettings(with: destinationStore)
 		#if DEBUG
 			.debugSettings(with: destinationStore)
 		#endif
@@ -223,24 +222,6 @@ private extension View {
 			state: /Settings.Destination.State.personas,
 			action: Settings.Destination.Action.personas,
 			destination: { PersonasCoordinator.View(store: $0) }
-		)
-	}
-
-	private func accountSecurity(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /Settings.Destination.State.accountSecurity,
-			action: Settings.Destination.Action.accountSecurity,
-			destination: { AccountSecurity.View(store: $0) }
-		)
-	}
-
-	private func appSettings(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /Settings.Destination.State.appSettings,
-			action: Settings.Destination.Action.appSettings,
-			destination: { AppSettings.View(store: $0) }
 		)
 	}
 
