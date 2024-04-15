@@ -48,39 +48,6 @@ extension Settings {
 	}
 }
 
-// MARK: - SettingsRowModel
-struct SettingsRowModel<Feature: FeatureReducer>: Identifiable {
-	let id: String
-	let rowViewState: PlainListRow<AssetIcon>.ViewState
-	let action: Feature.ViewAction
-
-	public init(
-		title: String,
-		subtitle: String? = nil,
-		hint: Hint.ViewState? = nil,
-		icon: AssetIcon.Content,
-		action: Feature.ViewAction
-	) {
-		self.id = title
-		self.rowViewState = .init(icon, rowCoreViewState: .init(kind: .settings, title: title, subtitle: subtitle, hint: hint))
-		self.action = action
-	}
-}
-
-// MARK: - SettingsRow
-struct SettingsRow<Feature: FeatureReducer>: View {
-	let row: SettingsRowModel<Feature>
-	let action: () -> Void
-
-	var body: some View {
-		VStack(spacing: .small3) {
-			PlainListRow(viewState: row.rowViewState)
-				.tappable(action)
-				.withSeparator
-		}
-	}
-}
-
 extension Settings.View {
 	public var body: some View {
 		settingsView()
@@ -128,9 +95,17 @@ extension Settings.View {
 						.padding(.medium3)
 					}
 
-					ForEach(rows(viewStore: viewStore)) { row in
-						SettingsRow(row: row) {
-							viewStore.send(row.action)
+					ForEach(rows(viewStore: viewStore)) { kind in
+						switch kind {
+						case let .model(model):
+							SettingsRow(row: model) {
+								viewStore.send(model.action)
+							}
+						case .separator:
+							Rectangle()
+								.fill(Color.clear)
+								.frame(maxWidth: .infinity)
+								.frame(height: .large3)
 						}
 					}
 				}
@@ -151,6 +126,7 @@ extension Settings.View {
 					#endif
 				}
 			}
+			.background(Color.app.gray4)
 			.animation(.default, value: viewStore.shouldShowMigrateOlympiaButton)
 			.onAppear {
 				store.send(.view(.appeared))
@@ -163,42 +139,44 @@ extension Settings.View {
 	}
 
 	@MainActor
-	private func rows(viewStore: ViewStoreOf<Settings>) -> [SettingsRowModel<Settings>] {
+	private func rows(viewStore: ViewStoreOf<Settings>) -> [RowKind] {
 		var visibleRows = normalRows(viewStore: viewStore)
 		#if DEBUG
-		visibleRows.append(.init(
+		visibleRows.append(.model(.init(
 			title: "Debug Settings",
 			icon: .asset(AssetResource.appSettings), // FIXME: Find
 			action: .debugButtonTapped
-		))
+		)))
 		#endif
 		return visibleRows
 	}
 
 	@MainActor
-	private func normalRows(viewStore: ViewStoreOf<Settings>) -> [SettingsRowModel<Settings>] {
+	private func normalRows(viewStore: ViewStoreOf<Settings>) -> [RowKind] {
 		[
-			.init(
+			.model(.init(
 				title: L10n.Settings.authorizedDapps,
 				icon: .asset(AssetResource.authorizedDapps),
 				action: .authorizedDappsButtonTapped
-			),
-			.init(
+			)),
+			.separator,
+			.model(.init(
 				title: L10n.Settings.personas,
 				hint: viewStore.shouldWriteDownPersonasSeedPhrase ? .init(kind: .warning, text: .init(L10n.Settings.personasSeedPhrasePrompt)) : nil,
 				icon: .asset(AssetResource.personas),
 				action: .personasButtonTapped
-			),
-			.init(
+			)),
+			.model(.init(
 				title: L10n.Settings.accountSecurityAndSettings,
 				icon: .asset(AssetResource.accountSecurity),
 				action: .accountSecurityButtonTapped
-			),
-			.init(
+			)),
+			.separator,
+			.model(.init(
 				title: L10n.Settings.appSettings,
 				icon: .asset(AssetResource.appSettings),
 				action: .appSettingsButtonTapped
-			),
+			)),
 		]
 	}
 }
@@ -283,86 +261,89 @@ private extension View {
 	#endif
 }
 
-#if DEBUG
-struct SettingsView_Previews: PreviewProvider {
-	static var previews: some View {
-		Settings.View(
-			store: .init(
-				initialState: .init(),
-				reducer: Settings.init
-			)
-		)
+extension Settings.View {
+	enum RowKind: Identifiable {
+		case model(SettingsRowModel<Settings>)
+		case separator
+
+		var id: String {
+			switch self {
+			case let .model(model):
+				model.id
+			case .separator:
+				UUID().uuidString
+			}
+		}
 	}
-}
-#endif
 
-// MARK: - ConnectExtensionView
-struct ConnectExtensionView: View {
-	let action: () -> Void
+	// MARK: - ConnectExtensionView
+	struct ConnectExtensionView: View {
+		let action: () -> Void
 
-	var body: some View {
-		VStack(spacing: .medium2) {
-			Image(asset: AssetResource.connectorBrowsersIcon)
-				.padding(.horizontal, .medium1)
+		var body: some View {
+			VStack(spacing: .medium2) {
+				Image(asset: AssetResource.connectorBrowsersIcon)
+					.padding(.horizontal, .medium1)
 
-			Text(L10n.Settings.LinkToConnectorHeader.title)
-				.textStyle(.body1Header)
-				.foregroundColor(.app.gray1)
-				.padding(.horizontal, .medium2)
+				Text(L10n.Settings.LinkToConnectorHeader.title)
+					.textStyle(.body1Header)
+					.foregroundColor(.app.gray1)
+					.padding(.horizontal, .medium2)
 
-			Text(L10n.Settings.LinkToConnectorHeader.subtitle)
-				.foregroundColor(.app.gray2)
-				.textStyle(.body2Regular)
-				.multilineTextAlignment(.center)
-				.padding(.horizontal, .medium2)
+				Text(L10n.Settings.LinkToConnectorHeader.subtitle)
+					.foregroundColor(.app.gray2)
+					.textStyle(.body2Regular)
+					.multilineTextAlignment(.center)
+					.padding(.horizontal, .medium2)
 
-			Button(L10n.Settings.LinkToConnectorHeader.linkToConnector, action: action)
+				Button(L10n.Settings.LinkToConnectorHeader.linkToConnector, action: action)
+					.buttonStyle(.secondaryRectangular(
+						shouldExpand: true,
+						image: .init(asset: AssetResource.qrCodeScanner)
+					))
+					.padding(.horizontal, .medium1)
+			}
+			.padding(.vertical, .medium1)
+			.background(Color.app.gray5)
+			.cornerRadius(.medium3)
+		}
+	}
+
+	// MARK: - MigrateOlympiaAccountsView
+	struct MigrateOlympiaAccountsView: View {
+		let action: () -> Void
+		let dismiss: () -> Void
+
+		var body: some View {
+			VStack(spacing: .medium2) {
+				Text(L10n.Settings.ImportFromLegacyWalletHeader.title)
+					.textStyle(.body1Header)
+					.foregroundColor(.app.gray1)
+					.padding(.horizontal, .medium2)
+
+				Text(L10n.Settings.ImportFromLegacyWalletHeader.subtitle)
+					.foregroundColor(.app.gray2)
+					.textStyle(.body2Regular)
+					.multilineTextAlignment(.center)
+					.padding(.horizontal, .medium1)
+
+				Button(
+					L10n.Settings.ImportFromLegacyWalletHeader.importLegacyAccounts,
+					action: action
+				)
 				.buttonStyle(.secondaryRectangular(
 					shouldExpand: true,
-					image: .init(asset: AssetResource.qrCodeScanner)
+					image: .init(asset: AssetResource.qrCodeScanner) // FIXME: Pick asset
 				))
 				.padding(.horizontal, .medium1)
-		}
-		.padding(.vertical, .medium1)
-		.background(Color.app.gray5)
-		.cornerRadius(.medium3)
-	}
-}
-
-// MARK: - MigrateOlympiaAccountsView
-struct MigrateOlympiaAccountsView: View {
-	let action: () -> Void
-	let dismiss: () -> Void
-
-	var body: some View {
-		VStack(spacing: .medium2) {
-			Text(L10n.Settings.ImportFromLegacyWalletHeader.title)
-				.textStyle(.body1Header)
-				.foregroundColor(.app.gray1)
-				.padding(.horizontal, .medium2)
-
-			Text(L10n.Settings.ImportFromLegacyWalletHeader.subtitle)
-				.foregroundColor(.app.gray2)
-				.textStyle(.body2Regular)
-				.multilineTextAlignment(.center)
-				.padding(.horizontal, .medium1)
-
-			Button(
-				L10n.Settings.ImportFromLegacyWalletHeader.importLegacyAccounts,
-				action: action
-			)
-			.buttonStyle(.secondaryRectangular(
-				shouldExpand: true,
-				image: .init(asset: AssetResource.qrCodeScanner) // FIXME: Pick asset
-			))
-			.padding(.horizontal, .medium1)
-		}
-		.padding(.vertical, .medium1)
-		.background(Color.app.gray5)
-		.cornerRadius(.medium3)
-		.overlay(alignment: .topTrailing) {
-			CloseButton(action: dismiss)
-				.padding(.small3)
+			}
+			.padding(.vertical, .medium1)
+			.background(Color.app.gray5)
+			.cornerRadius(.medium3)
+			.overlay(alignment: .topTrailing) {
+				CloseButton(action: dismiss)
+					.padding(.small3)
+			}
 		}
 	}
 }
