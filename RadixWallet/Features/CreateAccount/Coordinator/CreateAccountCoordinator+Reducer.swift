@@ -92,8 +92,6 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case derivePublicKeyFromDevice
-		case derivePublicKeyFromLedger(LedgerHardwareWalletFactorSource)
 		case createAccountResult(TaskResult<Profile.Network.Account>)
 		case handleAccountCreated(Profile.Network.Account)
 		case handleFailure
@@ -151,11 +149,11 @@ extension CreateAccountCoordinator {
 				state.path.append(.selectLedger(.init(context: .createHardwareAccount)))
 				return .none
 			} else {
-				return .send(.internal(.derivePublicKeyFromDevice))
+				return derivePublicKey(state: &state, ledger: nil)
 			}
 
 		case let .path(.element(_, action: .selectLedger(.delegate(.choseLedger(ledger))))):
-			return .send(.internal(.derivePublicKeyFromLedger(ledger)))
+			return derivePublicKey(state: &state, ledger: ledger)
 
 		case .path(.element(_, action: .completion(.delegate(.completed)))):
 			return .run { send in
@@ -172,34 +170,6 @@ extension CreateAccountCoordinator {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case .derivePublicKeyFromDevice:
-			state.destination = .derivePublicKey(
-				.init(
-					derivationPathOption: .next(
-						for: .account,
-						networkID: state.config.specificNetworkID,
-						curve: .curve25519,
-						scheme: .cap26
-					),
-					factorSourceOption: .device,
-					purpose: .createNewEntity(kind: .account)
-				))
-			return .none
-
-		case let .derivePublicKeyFromLedger(ledger):
-			state.destination = .derivePublicKey(
-				.init(
-					derivationPathOption: .next(
-						for: .account,
-						networkID: state.config.specificNetworkID,
-						curve: .curve25519,
-						scheme: .cap26
-					),
-					factorSourceOption: .specific(ledger.embed()),
-					purpose: .createNewEntity(kind: .account)
-				))
-			return .none
-
 		case let .createAccountResult(.success(account)):
 			return .run { send in
 				try await accountsClient.saveVirtualAccount(account)
@@ -233,7 +203,8 @@ extension CreateAccountCoordinator {
 		case let .derivePublicKey(.delegate(.derivedPublicKeys(hdKeys, factorSourceID, networkID))):
 			guard let hdKey = hdKeys.first else {
 				loggerGlobal.error("Failed to create account expected one single key, got: \(hdKeys.count)")
-				return .send(.internal(.handleFailure))
+				state.destination = nil
+				return .none
 			}
 			guard let name = state.name else {
 				fatalError("Derived public keys without account name set")
@@ -279,6 +250,26 @@ extension CreateAccountCoordinator {
 		default:
 			return .none
 		}
+	}
+
+	private func derivePublicKey(state: inout State, ledger: LedgerHardwareWalletFactorSource?) -> Effect<Action> {
+		let factorSourceOption: DerivePublicKeys.State.FactorSourceOption = if let ledger {
+			.specific(ledger.embed())
+		} else {
+			.device
+		}
+		state.destination = .derivePublicKey(
+			.init(
+				derivationPathOption: .next(
+					for: .account,
+					networkID: state.config.specificNetworkID,
+					curve: .curve25519,
+					scheme: .cap26
+				),
+				factorSourceOption: factorSourceOption,
+				purpose: .createNewEntity(kind: .account)
+			))
+		return .none
 	}
 }
 
