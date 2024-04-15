@@ -12,43 +12,43 @@ extension FactorSourceAccess.State {
 	}
 
 	private var title: String {
-		typealias S = L10n.FactorSourceAccess.Title
+		typealias S = L10n.FactorSourceActions
 		switch purpose {
 		case .signature:
-			return S.signature
+			return S.Signature.title
 		case .createAccount:
-			return S.createAccount
+			return S.CreateAccount.title
 		case .createPersona:
-			return S.createPersona
+			return S.CreatePersona.title
 		case .deriveAccounts:
-			return S.deriveAccounts
+			return S.DeriveAccounts.title
 		case .proveOwnership:
-			return S.proveOwnership
+			return S.ProveOwnership.title
 		case .encryptMessage:
-			return S.encryptMessage
+			return S.EncryptMessage.title
 		case .createKey:
-			return S.createKey
+			return S.CreateKey.title
 		}
 	}
 
 	private var message: String {
-		typealias S = L10n.FactorSourceAccess.Message
+		typealias S = L10n.FactorSourceActions
 		switch kind {
 		case .device:
 			switch purpose {
 			case .signature:
-				return S.Device.signature
+				return S.Device.messageSignature
 			case .createAccount, .createPersona, .deriveAccounts, .proveOwnership, .encryptMessage, .createKey:
-				return S.Device.general
+				return S.Device.message
 			}
 		case .ledger:
 			switch purpose {
 			case .signature:
-				return S.Ledger.signature
+				return S.Ledger.messageSignature
 			case .deriveAccounts:
-				return S.Ledger.deriveAccounts
+				return S.Ledger.messageDeriveAccounts
 			case .createAccount, .createPersona, .proveOwnership, .encryptMessage, .createKey:
-				return S.Ledger.general
+				return S.Ledger.message
 			}
 		}
 	}

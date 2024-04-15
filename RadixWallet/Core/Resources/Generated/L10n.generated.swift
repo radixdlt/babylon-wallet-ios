@@ -1494,40 +1494,50 @@ public enum L10n {
       public static let unknown = L10n.tr("Localizable", "error_transactionFailure_unknown", fallback: "Unknown error")
     }
   }
-  public enum FactorSourceAccess {
-    public enum Message {
-      public enum Device {
-        /// Authenticate to your phone to complete using your phone's signing key.
-        public static let general = L10n.tr("Localizable", "factorSourceAccess_message_device_general", fallback: "Authenticate to your phone to complete using your phone's signing key.")
-        /// Authenticate to your phone to sign.
-        public static let signature = L10n.tr("Localizable", "factorSourceAccess_message_device_signature", fallback: "Authenticate to your phone to sign.")
-      }
-      public enum Ledger {
-        /// Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
-        /// **Derivation may take up to a minute.**
-        public static let deriveAccounts = L10n.tr("Localizable", "factorSourceAccess_message_ledger_deriveAccounts", fallback: "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.\n**Derivation may take up to a minute.**")
-        /// Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
-        public static let general = L10n.tr("Localizable", "factorSourceAccess_message_ledger_general", fallback: "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.")
-        /// Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
-        /// **Complete signing on the device.**
-        public static let signature = L10n.tr("Localizable", "factorSourceAccess_message_ledger_signature", fallback: "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.\n**Complete signing on the device.**")
-      }
-    }
-    public enum Title {
+  public enum FactorSourceActions {
+    public enum CreateAccount {
       /// Creating Account
-      public static let createAccount = L10n.tr("Localizable", "factorSourceAccess_title_createAccount", fallback: "Creating Account")
+      public static let title = L10n.tr("Localizable", "factorSourceActions_createAccount_title", fallback: "Creating Account")
+    }
+    public enum CreateKey {
       /// Creating Key
-      public static let createKey = L10n.tr("Localizable", "factorSourceAccess_title_createKey", fallback: "Creating Key")
+      public static let title = L10n.tr("Localizable", "factorSourceActions_createKey_title", fallback: "Creating Key")
+    }
+    public enum CreatePersona {
       /// Creating Persona
-      public static let createPersona = L10n.tr("Localizable", "factorSourceAccess_title_createPersona", fallback: "Creating Persona")
+      public static let title = L10n.tr("Localizable", "factorSourceActions_createPersona_title", fallback: "Creating Persona")
+    }
+    public enum DeriveAccounts {
       /// Deriving Accounts
-      public static let deriveAccounts = L10n.tr("Localizable", "factorSourceAccess_title_deriveAccounts", fallback: "Deriving Accounts")
+      public static let title = L10n.tr("Localizable", "factorSourceActions_deriveAccounts_title", fallback: "Deriving Accounts")
+    }
+    public enum Device {
+      /// Authenticate to your phone to complete using your phone's signing key.
+      public static let message = L10n.tr("Localizable", "factorSourceActions_device_message", fallback: "Authenticate to your phone to complete using your phone's signing key.")
+      /// Authenticate to your phone to sign.
+      public static let messageSignature = L10n.tr("Localizable", "factorSourceActions_device_messageSignature", fallback: "Authenticate to your phone to sign.")
+    }
+    public enum EncryptMessage {
       /// Encrypting Message
-      public static let encryptMessage = L10n.tr("Localizable", "factorSourceAccess_title_encryptMessage", fallback: "Encrypting Message")
+      public static let title = L10n.tr("Localizable", "factorSourceActions_encryptMessage_title", fallback: "Encrypting Message")
+    }
+    public enum Ledger {
+      /// Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
+      public static let message = L10n.tr("Localizable", "factorSourceActions_ledger_message", fallback: "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.")
+      /// Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
+      /// **Derivation may take up to a minute.**
+      public static let messageDeriveAccounts = L10n.tr("Localizable", "factorSourceActions_ledger_messageDeriveAccounts", fallback: "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.\n**Derivation may take up to a minute.**")
+      /// Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
+      /// **Complete signing on the device.**
+      public static let messageSignature = L10n.tr("Localizable", "factorSourceActions_ledger_messageSignature", fallback: "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.\n**Complete signing on the device.**")
+    }
+    public enum ProveOwnership {
       /// Proving Ownership
-      public static let proveOwnership = L10n.tr("Localizable", "factorSourceAccess_title_proveOwnership", fallback: "Proving Ownership")
+      public static let title = L10n.tr("Localizable", "factorSourceActions_proveOwnership_title", fallback: "Proving Ownership")
+    }
+    public enum Signature {
       /// Signature Request
-      public static let signature = L10n.tr("Localizable", "factorSourceAccess_title_signature", fallback: "Signature Request")
+      public static let title = L10n.tr("Localizable", "factorSourceActions_signature_title", fallback: "Signature Request")
     }
   }
   public enum FactorSources {
