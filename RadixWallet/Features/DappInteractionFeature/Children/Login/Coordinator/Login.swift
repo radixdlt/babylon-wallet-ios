@@ -103,7 +103,7 @@ struct Login: Sendable, FeatureReducer {
 
 				let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
 					signerEntity: .persona(persona),
-					hashedDataToSign: blake2b(data: authToSignResponse.payloadToHashAndSign),
+					hashedDataToSign: authToSignResponse.payloadToHashAndSign.hash().data,
 					purpose: .signAuth
 				)
 				let signedAuthChallenge = SignedAuthChallenge(challenge: challenge, entitySignatures: Set([signature]))
@@ -124,14 +124,14 @@ struct Login: Sendable, FeatureReducer {
 			} else {
 				nil
 			}
-			state.personas = .init(uniqueElements:
-				personas.map { persona in
-					PersonaRow.State(
-						persona: persona,
-						lastLogin: persona == lastLoggedInPersona ? authorizedPersonaSimple?.lastLogin : nil
-					)
-				}
-			)
+			state.personas = personas.map { persona in
+				PersonaRow.State(
+					persona: persona,
+					lastLogin: persona == lastLoggedInPersona ? authorizedPersonaSimple?.lastLogin : nil
+				)
+			}
+			.asIdentified()
+
 			if
 				let lastLoggedInPersona,
 				let extractedLastLoggedInPersona = state.personas.remove(id: lastLoggedInPersona.id)

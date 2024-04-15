@@ -50,7 +50,7 @@ extension NewConnection {
 					}
 				}
 				.toolbar {
-					ToolbarItem(placement: .primaryAction) {
+					ToolbarItem(placement: .cancellationAction) {
 						CloseButton {
 							store.send(.view(.closeButtonTapped))
 						}

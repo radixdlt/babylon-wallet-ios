@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - PersonaData
 public struct PersonaData: Sendable, Hashable, Codable, CustomStringConvertible {
 	public typealias IdentifiedName = IdentifiedEntry<Name>

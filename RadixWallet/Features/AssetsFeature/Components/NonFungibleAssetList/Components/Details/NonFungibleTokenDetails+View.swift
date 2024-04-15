@@ -170,12 +170,7 @@ extension NonFungibleTokenDetails {
 				KeyValueView(key: field.name, value: variant)
 
 			case let .id(id):
-				if let idString = try? id.toString() {
-					KeyValueView(key: field.name, value: idString)
-				} else {
-					EmptyView()
-				}
-
+				KeyValueView(key: field.name, value: id.toRawString()) // use `id.formatted()` instead?
 			case let .instant(date):
 				KeyValueView(key: field.name, value: date.formatted())
 			}
@@ -227,7 +222,7 @@ extension NonFungibleTokenDetails.ViewState.TokenDetails {
 			case complex
 			case url(URL)
 			case address(LedgerIdentifiable.Address)
-			case decimal(RETDecimal)
+			case decimal(Decimal192)
 			case `enum`(variant: String)
 			case id(NonFungibleLocalId)
 			case instant(Date)
@@ -282,7 +277,7 @@ private extension String {
 
 	var asDecimalDataField: ArbitraryDataFieldKind? {
 		nilIfEmpty.map {
-			if let decimal = try? RETDecimal(value: $0) {
+			if let decimal = try? Decimal192($0) {
 				.decimal(decimal)
 			} else {
 				.primitive(self)
@@ -292,7 +287,7 @@ private extension String {
 
 	var asNonFungibleIDDataField: ArbitraryDataFieldKind? {
 		nilIfEmpty.map {
-			if let id = try? NonFungibleLocalId.from(stringFormat: $0) {
+			if let id = try? NonFungibleLocalID($0) {
 				.id(id)
 			} else {
 				.primitive(self)

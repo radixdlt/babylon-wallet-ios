@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - PersonaData.PostalAddress
 extension PersonaData {
 	public struct PostalAddress: Sendable, Hashable, Codable, PersonaDataEntryProtocol, CustomStringConvertible {

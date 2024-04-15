@@ -115,7 +115,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 				)))
 			}
 
-			guard let signers = NonEmpty<Set<EntityPotentiallyVirtual>>.init(rawValue: Set(selectedAccounts.map { EntityPotentiallyVirtual.account($0) })) else {
+			guard let signers = NonEmpty<Set<EntityPotentiallyVirtual>>(rawValue: Set(selectedAccounts.map { EntityPotentiallyVirtual.account($0) })) else {
 				return .send(.delegate(.continue(
 					accessKind: state.accessKind,
 					chosenAccounts: .withoutProofOfOwnership(selectedAccounts)
@@ -181,7 +181,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 
 				let chosenAccounts: AccountPermissionChooseAccountsResult = .withProofOfOwnership(
 					challenge: signedAuthChallenge.challenge,
-					IdentifiedArrayOf<P2P.Dapp.Response.Accounts.WithProof>.init(uniqueElements: walletAccountsWithProof)
+					walletAccountsWithProof.asIdentified()
 				)
 				return .send(.delegate(.continue(accessKind: state.accessKind, chosenAccounts: chosenAccounts)))
 

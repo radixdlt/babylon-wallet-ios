@@ -226,7 +226,7 @@ public struct SigningFactor: Sendable, Hashable, Identifiable {
 	) {
 		self.init(
 			factorSource: factorSource,
-			signers: .init(rawValue: .init(uniqueElements: [signer]))! // ok to force unwrap since we know we have one element.
+			signers: .init(rawValue: [signer].asIdentified())! // ok to force unwrap since we know we have one element.
 		)
 	}
 }

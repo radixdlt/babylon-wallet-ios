@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - BaseFactorSourceIDProtocol
 public protocol BaseFactorSourceIDProtocol {
 	var kind: FactorSourceKind { get }

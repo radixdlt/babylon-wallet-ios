@@ -18,7 +18,7 @@ extension DappMetadata {
 extension Completion {
 	struct ViewState: Equatable {
 		/// `nil` is a valid value for Persona Data requests
-		let txID: TXID?
+		let txID: IntentHash?
 		let title: String
 		let subtitle: String
 

@@ -1,11 +1,11 @@
-import EngineToolkit
+
 @testable import Radix_Wallet_Dev
 import XCTest
 
 @MainActor
 final class AssetTransferDepositRuleTests: TestCase {
 	static let recipientAccount = Profile.Network.Account.testValueIdx0
-	static let resourceAddress = try! ResourceAddress(validatingAddress: "resource_rdx1tkk83magp3gjyxrpskfsqwkg4g949rmcjee4tu2xmw93ltw2cz94sq")
+	static let resourceAddress = ResourceAddress.mainnetXRD
 
 	static let onLedgerAccountWithResource = OnLedgerEntity.Account(
 		address: recipientAccount.address,
@@ -15,7 +15,7 @@ final class AssetTransferDepositRuleTests: TestCase {
 			xrdResource: .init(
 				resourceAddress: resourceAddress,
 				atLedgerState: .init(version: 0, epoch: 0),
-				amount: .init(nominalAmount: .one()),
+				amount: .init(nominalAmount: Decimal192(1)),
 				metadata: .init(nil)
 			)
 		),

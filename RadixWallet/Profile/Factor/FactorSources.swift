@@ -1,4 +1,4 @@
-import EngineToolkit
+
 
 public typealias FactorSources = NonEmpty<IdentifiedArrayOf<FactorSource>>
 
@@ -40,7 +40,7 @@ extension FactorSources {
 
 	public func babylonDeviceFactorSources() -> NonEmpty<IdentifiedArrayOf<DeviceFactorSource>> {
 		let array = compactMap { $0.extract(DeviceFactorSource.self) }.filter(\.isBDFS)
-		let identifiedArray = array.asIdentifiable()
+		let identifiedArray = array.asIdentified()
 
 		guard
 			let nonEmpty = NonEmpty<IdentifiedArrayOf<DeviceFactorSource>>(rawValue: identifiedArray)

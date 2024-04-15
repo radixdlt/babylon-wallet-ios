@@ -191,7 +191,7 @@ public struct Home: Sendable, FeatureReducer {
 				return .none
 			}
 
-			state.accountRows = accounts.map { Home.AccountRow.State(account: $0) }.asIdentifiable()
+			state.accountRows = accounts.map { Home.AccountRow.State(account: $0) }.asIdentified()
 
 			return .run { [addresses = state.accountAddresses] _ in
 				_ = try await accountPortfoliosClient.fetchAccountPortfolios(addresses, false)
@@ -422,7 +422,7 @@ public struct Home: Sendable, FeatureReducer {
 
 extension Home.State {
 	public var accounts: IdentifiedArrayOf<Profile.Network.Account> {
-		accountRows.map(\.account).asIdentifiable()
+		accountRows.map(\.account).asIdentified()
 	}
 
 	public var accountAddresses: [AccountAddress] {

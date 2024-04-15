@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - FactorSource.Common
 extension FactorSource {
 	public struct Common: Sendable, Hashable, Codable {

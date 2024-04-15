@@ -23,7 +23,7 @@ public struct TransactionHistoryRequest: Sendable, Hashable {
 
 	// MARK: - Parameters
 	public struct Parameters: Sendable, Hashable {
-		public let period: Range<Date>
+		public let period: AnyRange<Date>
 		public let filters: [TransactionFilter]
 		public let direction: TransactionHistory.Direction
 	}
@@ -38,7 +38,7 @@ public struct TransactionHistoryResponse: Sendable, Hashable {
 
 // MARK: - TransactionHistoryItem
 public struct TransactionHistoryItem: Sendable, Hashable, Identifiable {
-	public let id: TXID
+	public let id: IntentHash
 	public let time: Date
 	public let message: String?
 	public let manifestClass: GatewayAPI.ManifestClass?
@@ -48,7 +48,7 @@ public struct TransactionHistoryItem: Sendable, Hashable, Identifiable {
 	public let failed: Bool
 
 	init(
-		id: TXID,
+		id: IntentHash,
 		time: Date,
 		message: String? = nil,
 		manifestClass: GatewayAPI.ManifestClass? = nil,

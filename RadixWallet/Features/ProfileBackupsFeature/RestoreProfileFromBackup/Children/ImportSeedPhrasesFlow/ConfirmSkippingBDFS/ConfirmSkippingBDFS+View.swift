@@ -33,7 +33,7 @@ extension ConfirmSkippingBDFS {
 					.padding(.bottom, .medium2)
 				}
 				.toolbar {
-					ToolbarItem(placement: .primaryAction) {
+					ToolbarItem(placement: .cancellationAction) {
 						CloseButton {
 							store.send(.view(.closeButtonTapped))
 						}

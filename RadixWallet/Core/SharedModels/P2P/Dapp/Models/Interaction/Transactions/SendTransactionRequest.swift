@@ -1,24 +1,25 @@
 // MARK: - UnvalidatedTransactionManifest
 public struct UnvalidatedTransactionManifest: Sendable, Hashable {
 	public let transactionManifestString: String
-	public let blobsBytes: [Data]
+	public let blobs: Blobs
 
 	public init(transactionManifestString: String, blobsBytes: [Data]) {
 		self.transactionManifestString = transactionManifestString
-		self.blobsBytes = blobsBytes
+		self.blobs = Blobs(blobsBytes.map(Blob.init(data:)))
 	}
 
-	public init(manifest: TransactionManifest) throws {
-		try self.init(
-			transactionManifestString: manifest.instructions().asStr(),
-			blobsBytes: manifest.blobs()
-		)
+	public init(manifest: TransactionManifest) {
+		self.transactionManifestString = manifest.instructionsString
+		self.blobs = manifest.blobs
 	}
 
-	public func transactionManifest(onNetwork networkID: NetworkID) throws -> TransactionManifest {
+	public func transactionManifest(
+		onNetwork networkID: NetworkID
+	) throws -> TransactionManifest {
 		try .init(
-			instructions: .fromString(string: transactionManifestString, networkId: networkID.rawValue),
-			blobs: blobsBytes
+			instructionsString: transactionManifestString,
+			networkID: networkID,
+			blobs: blobs
 		)
 	}
 }
@@ -44,13 +45,10 @@ extension P2P.Dapp.Request {
 			version: TXVersion = .default,
 			transactionManifest: TransactionManifest,
 			message: String? = nil
-		) throws {
-			try self.init(
+		) {
+			self.init(
 				version: version,
-				unvalidatedManifest: .init(
-					transactionManifestString: transactionManifest.instructions().asStr(),
-					blobsBytes: transactionManifest.blobs()
-				),
+				unvalidatedManifest: .init(manifest: transactionManifest),
 				message: message
 			)
 		}
@@ -76,4 +74,12 @@ extension P2P.Dapp.Request {
 			)
 		}
 	}
+}
+
+// MARK: - TXVersionTag
+public enum TXVersionTag: Sendable {}
+public typealias TXVersion = Tagged<TXVersionTag, UInt8>
+
+extension TXVersion {
+	public static let `default`: Self = 1
 }

@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ChooseReceivingAccount
@@ -28,15 +29,14 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 				return .invalid
 			}
 			guard
-				let addressOnSomeNetwork = try? AccountAddress(validatingAddress: manualAccountAddress),
-				let engineAddress = try? addressOnSomeNetwork.intoEngine()
+				let addressOnSomeNetwork = try? AccountAddress(validatingAddress: manualAccountAddress)
 			else {
 				return .invalid
 			}
-			let networkOfAddress = engineAddress.networkId()
-			guard networkOfAddress == networkID.rawValue else {
+			let networkOfAddress = addressOnSomeNetwork.networkID
+			guard networkOfAddress == networkID else {
 				loggerGlobal.warning("Manually inputted address is valid, but is on the WRONG network, inputted: \(networkOfAddress), but current network is: \(networkID.rawValue)")
-				return .wrongNetwork(addressOnSomeNetwork, incorrectNetwork: networkOfAddress)
+				return .wrongNetwork(addressOnSomeNetwork, incorrectNetwork: networkOfAddress.rawValue)
 			}
 			return .valid(addressOnSomeNetwork)
 		}
@@ -64,7 +64,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		case closeButtonTapped
 		case manualAccountAddressChanged(String)
 		case focusChanged(Bool)
-		case chooseButtonTapped(ReceivingAccount.State.Account)
+		case chooseButtonTapped(AccountOrAddressOf)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -73,7 +73,7 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case handleResult(ReceivingAccount.State.Account)
+		case handleResult(AccountOrAddressOf)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -127,8 +127,8 @@ public struct ChooseReceivingAccount: Sendable, FeatureReducer {
 		case let .chooseButtonTapped(result):
 			// While we allow to easily selected the owned account, user is still able to paste the address of an owned account.
 			// This be sure to check if the manually introduced address matches any of the user owned accounts.
-			if case let .right(address) = result, let ownedAccount = state.chooseAccounts.availableAccounts.first(where: { $0.address == address }) {
-				return .send(.delegate(.handleResult(.left(ownedAccount))))
+			if case let .addressOfExternalAccount(address) = result, let ownedAccount = state.chooseAccounts.availableAccounts.first(where: { $0.address == address }) {
+				return .send(.delegate(.handleResult(.profileAccount(value: ownedAccount.intoSargon()))))
 			}
 			return .send(.delegate(.handleResult(result)))
 		}

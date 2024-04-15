@@ -28,7 +28,7 @@ jobs:
       contents: read
     name: "Test Flight Deploy"
     if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' && !(contains(github.event.head_commit.message, '[skip cd]') || contains(github.event.head_commit.message, '[cd skip]')) }}
-    runs-on: macos-13-xlarge
+    runs-on: macos-14-xlarge
 
     steps:
       - uses: RDXWorks-actions/checkout@main
@@ -71,14 +71,14 @@ jobs:
         with:
           token: ${{ env.WALLET_RADIX_BOT_PAT }}
 
-      - uses: RDXWorks-actions/setup-ruby@master
+      - uses: RDXWorks-actions/setup-ruby@master-upgrade-to-v1-171-0
         with:
           ruby-version: 3.1.2
           bundler-cache: true
 
       - uses: RDXWorks-actions/setup-xcode@master
         with:
-          xcode-version: "15.0.1"
+          xcode-version: "15.3.0"
 
       - uses: RDXWorks-actions/ssh-agent@master
         with:
@@ -91,6 +91,7 @@ jobs:
           git config user.name $GIT_USER
           git config user.email $GIT_USER
           echo "${{ env.WALLET_FASTLANE_SECRETS_BASE64 }}" | base64 --decode > fastlane/.env.secret
+          echo "${{ env.WALLET_GENERAL_SECRETS_BASE64 }}" | base64 --decode > .env.secret
           brew install xcbeautify
         env:
           GIT_USER: ${{ env.WALLET_RADIX_BOT_USERNAME }}

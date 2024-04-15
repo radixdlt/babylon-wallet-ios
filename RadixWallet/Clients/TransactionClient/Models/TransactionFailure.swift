@@ -55,19 +55,19 @@ extension TransactionFailure {
 //			case .failedToSubmitTX:
 //				return (errorKind: .failedToSubmitTransaction, message: nil)
 //			case let .invalidTXWasDuplicate(txID):
-//				return (errorKind: .submittedTransactionWasDuplicate, message: "TXID: \(txID)")
+//				return (errorKind: .submittedTransactionWasDuplicate, message: "IntentHash: \(txID)")
 //			}
 //
 //		case let .failedToPoll(error):
 //			switch error {
 //			case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .rejected):
-//				return (errorKind: .submittedTransactionHasRejectedTransactionStatus, message: "TXID: \(txID)")
+//				return (errorKind: .submittedTransactionHasRejectedTransactionStatus, message: "IntentHash: \(txID)")
 //			case let .invalidTXWasSubmittedButNotSuccessful(txID, status: .failed):
-//				return (errorKind: .submittedTransactionHasFailedTransactionStatus, message: "TXID: \(txID)")
+//				return (errorKind: .submittedTransactionHasFailedTransactionStatus, message: "IntentHash: \(txID)")
 //			case let .failedToPollTX(txID, _):
-//				return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
+//				return (errorKind: .failedToPollSubmittedTransaction, message: "IntentHash: \(txID)")
 //			case let .failedToGetTransactionStatus(txID, _):
-//				return (errorKind: .failedToPollSubmittedTransaction, message: "TXID: \(txID)")
+//				return (errorKind: .failedToPollSubmittedTransaction, message: "IntentHash: \(txID)")
 //			}
 		}
 	}

@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - DerivationScheme
 /// A derivation scheme used to derive keys using some derivation path.
 public enum DerivationScheme:
@@ -120,6 +118,10 @@ extension DerivationPath {
 
 	public func asIdentityPath() throws -> IdentityHierarchicalDeterministicDerivationPath {
 		try IdentityHierarchicalDeterministicDerivationPath(derivationPath: path)
+	}
+
+	var isGetID: Bool {
+		self == Self.getID
 	}
 
 	public func asAccountPath() throws -> AccountDerivationPath {

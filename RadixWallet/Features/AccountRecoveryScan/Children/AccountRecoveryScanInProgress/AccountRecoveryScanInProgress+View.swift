@@ -89,7 +89,7 @@ public extension AccountRecoveryScanInProgress {
 					}
 					.toolbar {
 						if viewStore.showToolbar {
-							ToolbarItem(placement: .automatic) {
+							ToolbarItem(placement: .cancellationAction) {
 								CloseButton {
 									store.send(.view(.closeButtonTapped))
 								}

@@ -1,4 +1,5 @@
 import Foundation
+import Sargon
 
 extension OnLedgerEntitiesClient {
 	struct ResourceEntityNotFound: Swift.Error {
@@ -23,12 +24,12 @@ extension OnLedgerEntitiesClient {
 		entities: TransactionReview.ResourcesInfo = [:],
 		resourceAssociatedDapps: TransactionReview.ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
-		defaultDepositGuarantee: RETDecimal = 1
+		defaultDepositGuarantee: Decimal192 = 1
 	) async throws -> ResourceBalance {
 		let amount = resourceQuantifier.amount
 		let resourceAddress = resource.resourceAddress
 
-		let guarantee: TransactionClient.Guarantee? = {
+		let guarantee: TransactionGuarantee? = { () -> TransactionGuarantee? in
 			guard case let .predicted(predictedAmount) = resourceQuantifier else { return nil }
 			let guaranteedAmount = defaultDepositGuarantee * predictedAmount.value
 			return .init(
@@ -71,25 +72,23 @@ extension OnLedgerEntitiesClient {
 
 	private func poolUnit(
 		_ resource: OnLedgerEntity.Resource,
-		amount: RETDecimal,
+		amount: Decimal192,
 		poolContributions: [some TrackedPoolInteraction] = [],
 		entities: TransactionReview.ResourcesInfo = [:],
 		resourceAssociatedDapps: TransactionReview.ResourceAssociatedDapps? = nil,
 		networkID: NetworkID,
-		guarantee: TransactionClient.Guarantee?
+		guarantee: TransactionGuarantee?
 	) async throws -> ResourceBalance {
 		let resourceAddress = resource.resourceAddress
 
-		if let poolContribution = try poolContributions.first(where: { try $0.poolUnitsResourceAddress.asSpecific() == resourceAddress }) {
+		if let poolContribution = poolContributions.first(where: { $0.poolUnitsResourceAddress == resourceAddress }) {
 			// If this transfer does not contain all the pool units, scale the resource amounts pro rata
 			let adjustmentFactor = amount != poolContribution.poolUnitsAmount ? (amount / poolContribution.poolUnitsAmount) : 1
 			var xrdResource: OwnedResourcePoolDetails.ResourceWithRedemptionValue?
 			var nonXrdResources: [OwnedResourcePoolDetails.ResourceWithRedemptionValue] = []
-			for (resourceAddress, resourceAmount) in poolContribution.resourcesInInteraction {
-				let address = try ResourceAddress(validatingAddress: resourceAddress)
-
+			for (address, resourceAmount) in poolContribution.resourcesInInteraction {
 				guard let entity = entities[address] else {
-					throw ResourceEntityNotFound(address: resourceAddress)
+					throw ResourceEntityNotFound(address: resourceAddress.address)
 				}
 
 				let resource = OwnedResourcePoolDetails.ResourceWithRedemptionValue(
@@ -104,11 +103,11 @@ extension OnLedgerEntitiesClient {
 				}
 			}
 
-			return try .init(
+			return .init(
 				resource: resource,
 				details: .poolUnit(.init(
 					details: .init(
-						address: poolContribution.poolAddress.asSpecific(),
+						address: poolContribution.poolAddress,
 						dAppName: resourceAssociatedDapps?[resourceAddress]?.name,
 						poolUnitResource: .init(resource: resource, amount: .init(nominalAmount: amount)),
 						xrdResource: xrdResource,
@@ -134,21 +133,21 @@ extension OnLedgerEntitiesClient {
 
 	private func liquidStakeUnit(
 		_ resource: OnLedgerEntity.Resource,
-		amount: RETDecimal,
+		amount: Decimal192,
 		validator: OnLedgerEntity.Validator,
 		validatorStakes: [TrackedValidatorStake] = [],
-		guarantee: TransactionClient.Guarantee?
+		guarantee: TransactionGuarantee?
 	) async throws -> ResourceBalance {
-		let worth: RETDecimal
+		let worth: Decimal192
 		if validatorStakes.isEmpty {
-			guard let totalSupply = resource.totalSupply, totalSupply.isPositive() else {
+			guard let totalSupply = resource.totalSupply, totalSupply.isPositive else {
 				throw MissingPositiveTotalSupply()
 			}
 
 			worth = amount * validator.xrdVaultBalance / totalSupply
 		} else {
-			if let stake = try validatorStakes.first(where: { try $0.validatorAddress.asSpecific() == validator.address }) {
-				guard try stake.liquidStakeUnitAddress.asSpecific() == validator.stakeUnitResourceAddress else {
+			if let stake = try validatorStakes.first(where: { $0.validatorAddress == validator.address }) {
+				guard try stake.liquidStakeUnitAddress == validator.stakeUnitResourceAddress else {
 					throw StakeUnitAddressMismatch()
 				}
 				// Distribute the worth in proportion to the amounts, if needed
@@ -179,7 +178,7 @@ extension OnLedgerEntitiesClient {
 		_ resourceInfo: TransactionReview.ResourceInfo,
 		resourceAddress: ResourceAddress,
 		resourceQuantifier: NonFungibleResourceIndicator,
-		unstakeData: [UnstakeDataEntry] = [],
+		unstakeData: [NonFungibleGlobalId: UnstakeData] = [:],
 		newlyCreatedNonFungibles: [NonFungibleGlobalId] = []
 	) async throws -> [ResourceBalance] {
 		let ids = resourceQuantifier.ids
@@ -189,13 +188,13 @@ extension OnLedgerEntitiesClient {
 		case let .left(resource):
 			let existingTokenIds = ids.filter { id in
 				!newlyCreatedNonFungibles.contains { newId in
-					newId.resourceAddress().asStr() == resourceAddress.address && newId.localId() == id
+					newId.resourceAddress == resourceAddress && newId.nonFungibleLocalId == id
 				}
 			}
 
 			let newTokens = try ids.filter { id in
 				newlyCreatedNonFungibles.contains { newId in
-					newId.resourceAddress().asStr() == resourceAddress.address && newId.localId() == id
+					newId.resourceAddress == resourceAddress && newId.nonFungibleLocalId == id
 				}
 			}.map {
 				try OnLedgerEntity.NonFungibleToken(resourceAddress: resourceAddress, nftID: $0, nftData: nil)
@@ -204,8 +203,8 @@ extension OnLedgerEntitiesClient {
 			let tokens = try await getNonFungibleTokenData(.init(
 				resource: resourceAddress,
 				nonFungibleIds: existingTokenIds.map {
-					try NonFungibleGlobalId.fromParts(
-						resourceAddress: resourceAddress.intoEngine(),
+					NonFungibleGlobalID(
+						resourceAddress: resourceAddress,
 						nonFungibleLocalId: $0
 					)
 				}
@@ -220,7 +219,7 @@ extension OnLedgerEntitiesClient {
 				)]
 			} else {
 				result = tokens.map { token in
-					.init(resource: resource, details: .nonFungible(token))
+					ResourceBalance(resource: resource, details: .nonFungible(token))
 				}
 
 				guard result.count == ids.count else {
@@ -233,9 +232,12 @@ extension OnLedgerEntitiesClient {
 			let resource = OnLedgerEntity.Resource(resourceAddress: resourceAddress, metadata: newEntityMetadata)
 
 			// Newly minted tokens
-			result = try ids
+			result = ids
 				.map { localId in
-					try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress.intoEngine(), nonFungibleLocalId: localId)
+					NonFungibleGlobalID(
+						resourceAddress: resourceAddress,
+						nonFungibleLocalId: localId
+					)
 				}
 				.map { id in
 					ResourceBalance(resource: resource, details: .nonFungible(.init(id: id, data: nil)))
@@ -252,7 +254,7 @@ extension OnLedgerEntitiesClient {
 	public func stakeClaim(
 		_ resource: OnLedgerEntity.Resource,
 		stakeClaimValidator: OnLedgerEntity.Validator,
-		unstakeData: [UnstakeDataEntry],
+		unstakeData: [NonFungibleGlobalId: UnstakeData],
 		tokens: [OnLedgerEntity.NonFungibleToken]
 	) throws -> ResourceBalance {
 		let stakeClaimTokens: [OnLedgerEntitiesClient.StakeClaim] = if unstakeData.isEmpty {
@@ -261,7 +263,7 @@ extension OnLedgerEntitiesClient {
 					throw InvalidStakeClaimToken()
 				}
 
-				guard let claimAmount = data.claimAmount, try token.id.resourceAddress().asSpecific() == resource.resourceAddress else {
+				guard let claimAmount = data.claimAmount, token.id.resourceAddress == resource.resourceAddress else {
 					throw InvalidStakeClaimToken()
 				}
 
@@ -274,7 +276,7 @@ extension OnLedgerEntitiesClient {
 			}
 		} else {
 			try tokens.map { token in
-				guard let data = unstakeData.first(where: { $0.nonFungibleGlobalId == token.id })?.data else {
+				guard let data = unstakeData[token.id] else {
 					throw MissingStakeClaimTokenData()
 				}
 
@@ -293,7 +295,7 @@ extension OnLedgerEntitiesClient {
 				canClaimTokens: false,
 				stakeClaimTokens: .init(
 					resource: resource,
-					stakeClaims: stakeClaimTokens.asIdentifiable()
+					stakeClaims: stakeClaimTokens.asIdentified()
 				),
 				validatorName: stakeClaimValidator.metadata.name
 			))

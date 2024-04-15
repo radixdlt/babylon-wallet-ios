@@ -100,7 +100,7 @@ extension NonFungibleAssetList.Row.View {
 
 				HStack {
 					NFTIDView(
-						id: asset.id.localId().toUserFacingString(),
+						id: asset.id.nonFungibleLocalId.toUserFacingString(),
 						name: asset.data?.name,
 						thumbnail: asset.data?.keyImageURL
 					)
