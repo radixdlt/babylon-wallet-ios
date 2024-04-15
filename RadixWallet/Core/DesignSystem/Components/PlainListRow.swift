@@ -76,15 +76,18 @@ public struct PlainListRow<Icon: View>: View {
 // MARK: - PlainListRowCore
 public struct PlainListRowCore: View {
 	public struct ViewState {
+		public let kind: Kind
 		public let title: String?
 		public let subtitle: String?
 		public let hint: Hint.ViewState?
 
 		init(
+			kind: Kind = .general,
 			title: String?,
 			subtitle: String? = nil,
 			hint: Hint.ViewState? = nil
 		) {
+			self.kind = kind
 			self.title = title
 			self.subtitle = subtitle
 			self.hint = hint
@@ -109,7 +112,7 @@ public struct PlainListRowCore: View {
 				Text(title)
 					.lineSpacing(-6)
 					.lineLimit(1)
-					.textStyle(.secondaryHeader)
+					.textStyle(viewState.kind.titleTextStyle)
 					.foregroundColor(.app.gray1)
 			}
 
@@ -118,13 +121,58 @@ public struct PlainListRowCore: View {
 					.lineSpacing(-4)
 					.lineLimit(2)
 					.minimumScaleFactor(0.8)
-					.textStyle(.body2Regular)
-					.foregroundColor(.app.gray2)
+					.textStyle(viewState.kind.subtitleTextStyle)
+					.foregroundColor(viewState.kind.subtitleForegroundColor)
 			}
 
 			if let hint = viewState.hint {
 				Hint(viewState: hint)
 					.padding(.top, .small3)
+			}
+		}
+		.padding(.vertical, viewState.kind.verticalPadding)
+	}
+}
+
+// MARK: - PlainListRowCore.ViewState.Kind
+extension PlainListRowCore.ViewState {
+	public enum Kind {
+		case general
+		case settings
+
+		var titleTextStyle: TextStyle {
+			switch self {
+			case .general:
+				.secondaryHeader
+			case .settings:
+				.body1Header
+			}
+		}
+
+		var subtitleTextStyle: TextStyle {
+			switch self {
+			case .general:
+				.body2Regular
+			case .settings:
+				.body1Regular
+			}
+		}
+
+		var subtitleForegroundColor: Color {
+			switch self {
+			case .general:
+				.app.gray2
+			case .settings:
+				.app.gray1
+			}
+		}
+
+		var verticalPadding: CGFloat {
+			switch self {
+			case .general:
+				.zero
+			case .settings:
+				.medium1
 			}
 		}
 	}

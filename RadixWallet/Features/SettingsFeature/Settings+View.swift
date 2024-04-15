@@ -62,7 +62,7 @@ struct SettingsRowModel<Feature: FeatureReducer>: Identifiable {
 		action: Feature.ViewAction
 	) {
 		self.id = title
-		self.rowViewState = .init(icon, rowCoreViewState: .init(title: title, subtitle: subtitle, hint: hint))
+		self.rowViewState = .init(icon, rowCoreViewState: .init(kind: .settings, title: title, subtitle: subtitle, hint: hint))
 		self.action = action
 	}
 }
