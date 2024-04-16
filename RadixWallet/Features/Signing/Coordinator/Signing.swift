@@ -35,14 +35,8 @@ public enum SigningResponse: Sendable, Hashable {
 // MARK: - Signing
 public struct Signing: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public enum Step: Sendable, Hashable {
-			case signWithDeviceFactors(SignWithFactorSourcesOfKindDevice.State)
-			case signWithLedgerFactors(SignWithFactorSourcesOfKindLedger.State)
-		}
-
 		public var signatures: OrderedSet<SignatureOfEntity> = []
-
-		public var step: Step
+		public var signWithFactorSource: SignWithFactorSource.State
 
 		public var factorsLeftToSignWith: SigningFactors
 		public let expectedSignatureCount: Int
@@ -56,15 +50,11 @@ public struct Signing: Sendable, FeatureReducer {
 			self.signingPurposeWithPayload = signingPurposeWithPayload
 			self.factorsLeftToSignWith = factorsLeftToSignWith
 			self.expectedSignatureCount = factorsLeftToSignWith.expectedSignatureCount
-			self.step = Signing.nextStep(
+			self.signWithFactorSource = Signing.nextFactorSource(
 				factorsLeftToSignWith: factorsLeftToSignWith,
 				signingPurposeWithPayload: signingPurposeWithPayload
 			)!
 		}
-	}
-
-	public enum ViewAction: Sendable, Equatable {
-		case closeButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -72,9 +62,9 @@ public struct Signing: Sendable, FeatureReducer {
 		case notarizeResult(TaskResult<NotarizeTransactionResponse>)
 	}
 
+	@CasePathable
 	public enum ChildAction: Sendable, Equatable {
-		case signWithDeviceFactors(SignWithFactorSourcesOfKindDevice.Action)
-		case signWithLedgerFactors(SignWithFactorSourcesOfKindLedger.Action)
+		case signWithFactorSource(SignWithFactorSource.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -90,29 +80,10 @@ public struct Signing: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.step, action: /.self) {
-			Scope(
-				state: /State.Step.signWithDeviceFactors,
-				action: /Action.child .. ChildAction.signWithDeviceFactors
-			) {
-				SignWithFactorSourcesOfKindDevice()
-			}
-			Scope(
-				state: /State.Step.signWithLedgerFactors,
-				action: /Action.child .. ChildAction.signWithLedgerFactors
-			) {
-				SignWithFactorSourcesOfKindLedger()
-			}
+		Scope(state: \.signWithFactorSource, action: /Action.child .. ChildAction.signWithFactorSource) {
+			SignWithFactorSource()
 		}
-
 		Reduce(self.core)
-	}
-
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
-		switch viewAction {
-		case .closeButtonTapped:
-			.send(.delegate(.cancelSigning))
-		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
@@ -156,15 +127,15 @@ public struct Signing: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case
-			let .signWithDeviceFactors(.delegate(.done(factors, signatures))),
-			let .signWithLedgerFactors(.delegate(.done(factors, signatures))):
+		case let .signWithFactorSource(.delegate(.done(factors, signatures))):
 			return handleSignatures(signingFactors: factors, signatures: signatures, &state)
 
-		case let .signWithDeviceFactors(.delegate(.failedToSign(factor))),
-		     let .signWithLedgerFactors(.delegate(.failedToSign(factor))):
+		case let .signWithFactorSource(.delegate(.failedToSign(factor))):
 			loggerGlobal.error("Failed to sign with \(factor.factorSource.kind)")
 			return .send(.delegate(.failedToSign))
+
+		case .signWithFactorSource(.delegate(.cancel)):
+			return .send(.delegate(.cancelSigning))
 		default:
 			return .none
 		}
@@ -189,21 +160,21 @@ public struct Signing: Sendable, FeatureReducer {
 	}
 
 	private func proceedWithNextFactorSource(_ state: inout State) -> Effect<Action> {
-		guard let nextStep = Self.nextStep(
+		guard let nextFactorSource = Self.nextFactorSource(
 			factorsLeftToSignWith: state.factorsLeftToSignWith,
 			signingPurposeWithPayload: state.signingPurposeWithPayload
 		) else {
 			assert(state.signatures.count == state.expectedSignatureCount, "Expected to have \(state.expectedSignatureCount) signatures, but got: \(state.signatures.count)")
 			return .send(.internal(.finishedSigningWithAllFactors))
 		}
-		state.step = nextStep
+		state.signWithFactorSource = nextFactorSource
 		return .none
 	}
 
-	private static func nextStep(
+	private static func nextFactorSource(
 		factorsLeftToSignWith: SigningFactors,
 		signingPurposeWithPayload: SigningPurposeWithPayload
-	) -> State.Step? {
+	) -> SignWithFactorSource.State? {
 		guard
 			let nextKind = factorsLeftToSignWith.keys.first,
 			let nextFactors = factorsLeftToSignWith[nextKind]
@@ -212,9 +183,17 @@ public struct Signing: Sendable, FeatureReducer {
 		}
 		switch nextKind {
 		case .device:
-			return .signWithDeviceFactors(.init(signingFactors: nextFactors, signingPurposeWithPayload: signingPurposeWithPayload))
+			return .init(
+				kind: .device,
+				signingFactors: nextFactors,
+				signingPurposeWithPayload: signingPurposeWithPayload
+			)
 		case .ledgerHQHardwareWallet:
-			return .signWithLedgerFactors(.init(signingFactors: nextFactors, signingPurposeWithPayload: signingPurposeWithPayload))
+			return .init(
+				kind: .ledger,
+				signingFactors: nextFactors,
+				signingPurposeWithPayload: signingPurposeWithPayload
+			)
 		case .offDeviceMnemonic, .securityQuestions, .trustedContact:
 			fatalError("Implement me")
 		}
