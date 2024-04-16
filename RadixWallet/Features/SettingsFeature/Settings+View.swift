@@ -45,12 +45,7 @@ extension Settings {
 extension Settings.View {
 	public var body: some View {
 		settingsView()
-			.navigationTitle(L10n.WalletSettings.title)
-			.navigationBarTitleColor(.app.gray1)
-			.navigationBarTitleDisplayMode(.inline)
-			.navigationBarInlineTitleFont(.app.secondaryHeader)
-			.toolbarBackground(.app.background, for: .navigationBar)
-			.toolbarBackground(.visible, for: .navigationBar)
+			.setUpNavigationBar(title: L10n.WalletSettings.title)
 			.tint(.app.gray1)
 			.foregroundColor(.app.gray1)
 			.destinations(with: store)

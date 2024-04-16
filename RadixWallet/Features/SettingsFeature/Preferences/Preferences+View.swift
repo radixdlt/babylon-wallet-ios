@@ -44,12 +44,7 @@ public extension Preferences {
 
 		public var body: some SwiftUI.View {
 			content
-				.navigationTitle(S.title)
-				.navigationBarTitleColor(.app.gray1)
-				.navigationBarTitleDisplayMode(.inline)
-				.navigationBarInlineTitleFont(.app.secondaryHeader)
-				.toolbarBackground(.app.background, for: .navigationBar)
-				.toolbarBackground(.visible, for: .navigationBar)
+				.setUpNavigationBar(title: S.title)
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 				.presentsLoadingViewOverlay()
