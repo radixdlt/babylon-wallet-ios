@@ -1838,8 +1838,8 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "importOlympiaAccounts_scanQR_title", fallback: "Import Legacy Olympia Accounts")
     }
     public enum VerifySeedPhrase {
-      /// Do not throw away this seed phrase! You will still need it if you need to recover access to your Olympia accounts in the future.
-      public static let keepSeedPhrasePrompt = L10n.tr("Localizable", "importOlympiaAccounts_verifySeedPhrase_keepSeedPhrasePrompt", fallback: "Do not throw away this seed phrase! You will still need it if you need to recover access to your Olympia accounts in the future.")
+      /// Do not throw away this seed phrase! You will still need it if you need s access to your Olympia accounts in the future.
+      public static let keepSeedPhrasePrompt = L10n.tr("Localizable", "importOlympiaAccounts_verifySeedPhrase_keepSeedPhrasePrompt", fallback: "Do not throw away this seed phrase! You will still need it if you need s access to your Olympia accounts in the future.")
       /// I Understand
       public static let keepSeedPhrasePromptConfirmation = L10n.tr("Localizable", "importOlympiaAccounts_verifySeedPhrase_keepSeedPhrasePromptConfirmation", fallback: "I Understand")
       /// Warning
@@ -2732,6 +2732,38 @@ public enum L10n {
     public enum TransactionID {
       /// Transaction ID: 
       public static let text = L10n.tr("Localizable", "transactionStatus_transactionID_text", fallback: "Transaction ID: ")
+    }
+  }
+  public enum Troubleshooting {
+    /// Account Recovery
+    public static let accountRecovery = L10n.tr("Localizable", "troubleshooting_accountRecovery", fallback: "Account Recovery")
+    /// Support and Community
+    public static let supportAndCommunity = L10n.tr("Localizable", "troubleshooting_supportAndCommunity", fallback: "Support and Community")
+    /// Troubleshooting
+    public static let title = L10n.tr("Localizable", "troubleshooting_title", fallback: "Troubleshooting")
+    public enum AccountScan {
+      /// Recover Accounts with a seed phrase or Ledger device
+      public static let subtitle = L10n.tr("Localizable", "troubleshooting_accountScan_subtitle", fallback: "Recover Accounts with a seed phrase or Ledger device")
+      /// Account Recovery Scan
+      public static let title = L10n.tr("Localizable", "troubleshooting_accountScan_title", fallback: "Account Recovery Scan")
+    }
+    public enum ContactSupport {
+      /// Connect directly with the Radix support team
+      public static let subtitle = L10n.tr("Localizable", "troubleshooting_contactSupport_subtitle", fallback: "Connect directly with the Radix support team")
+      /// Contact Support
+      public static let title = L10n.tr("Localizable", "troubleshooting_contactSupport_title", fallback: "Contact Support")
+    }
+    public enum Discord {
+      /// Connect to the official Radix Discord channel to join the community and ask for help.
+      public static let subtitle = L10n.tr("Localizable", "troubleshooting_discord_subtitle", fallback: "Connect to the official Radix Discord channel to join the community and ask for help.")
+      /// Discord
+      public static let title = L10n.tr("Localizable", "troubleshooting_discord_title", fallback: "Discord")
+    }
+    public enum LegacyImport {
+      /// Import Accounts from an Olympia wallet
+      public static let subtitle = L10n.tr("Localizable", "troubleshooting_legacyImport_subtitle", fallback: "Import Accounts from an Olympia wallet")
+      /// Import from a Legacy Wallet
+      public static let title = L10n.tr("Localizable", "troubleshooting_legacyImport_title", fallback: "Import from a Legacy Wallet")
     }
   }
   public enum WalletSettings {

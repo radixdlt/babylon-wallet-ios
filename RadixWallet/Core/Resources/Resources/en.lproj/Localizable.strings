@@ -552,7 +552,7 @@
 "importOlympiaAccounts_verifySeedPhrase_subtitle" = "To complete importing your accounts, please view your seed phrase in the Radix Desktop Wallet and enter the words here.";
 "importOlympiaAccounts_verifySeedPhrase_warning" = "This will give this Radix Wallet control of your accounts. Never give your seed phrase to anyone for any reason.";
 "importOlympiaAccounts_verifySeedPhrase_keepSeedPhraseTitle" = "Warning";
-"importOlympiaAccounts_verifySeedPhrase_keepSeedPhrasePrompt" = "Do not throw away this seed phrase! You will still need it if you need to recover access to your Olympia accounts in the future.";
+"importOlympiaAccounts_verifySeedPhrase_keepSeedPhrasePrompt" = "Do not throw away this seed phrase! You will still need it if you need s access to your Olympia accounts in the future.";
 "importOlympiaAccounts_verifySeedPhrase_keepSeedPhrasePromptConfirmation" = "I Understand";
 "importOlympiaAccounts_completion_title" = "Congratulations";
 "importOlympiaAccounts_completion_subtitleMultiple" = "You\'ve now imported these Accounts:";
@@ -1065,3 +1065,14 @@ If you have any “Legacy” Accounts (created on the Olympia network) to import
 "preferences_gateways" = "Network Gateways";
 "preferences_developerMode_title" = "Developer Mode";
 "preferences_developerMode_subtitle" = "Warning: disables website validity checks";
+"troubleshooting_title" = "Troubleshooting";
+"troubleshooting_accountRecovery" = "Account Recovery";
+"troubleshooting_accountScan_title" = "Account Recovery Scan";
+"troubleshooting_accountScan_subtitle" = "Recover Accounts with a seed phrase or Ledger device";
+"troubleshooting_legacyImport_title" = "Import from a Legacy Wallet";
+"troubleshooting_legacyImport_subtitle" = "Import Accounts from an Olympia wallet";
+"troubleshooting_supportAndCommunity" = "Support and Community";
+"troubleshooting_contactSupport_title" = "Contact Support";
+"troubleshooting_contactSupport_subtitle" = "Connect directly with the Radix support team";
+"troubleshooting_discord_title" = "Discord";
+"troubleshooting_discord_subtitle" = "Connect to the official Radix Discord channel to join the community and ask for help.";
