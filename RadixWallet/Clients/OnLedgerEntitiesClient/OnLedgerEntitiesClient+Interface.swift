@@ -548,7 +548,7 @@ extension OnLedgerEntitiesClient {
 		}
 
 		let allResources = try await getResources(
-			allResourceAddresses,
+			Array(allResourceAddresses.uniqued()),
 			cachingStrategy: cachingStrategy,
 			atLedgerState: account.atLedgerState
 		).asIdentified()

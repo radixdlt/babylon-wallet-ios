@@ -292,8 +292,8 @@ public enum L10n {
       public static let emptyAllowAll = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_emptyAllowAll", fallback: "Add a specific asset by its resource address to allow all third-party deposits")
       /// Add a specific asset by its resource address to deny all third-party deposits
       public static let emptyDenyAll = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_emptyDenyAll", fallback: "Add a specific asset by its resource address to deny all third-party deposits")
-      /// ⚠️ Sorry, this Account's third-party exceptions and depositor lists are in an unknown state and cannot be viewed or edited because it was imported using only a seed phrase or Ledger. A forthcoming wallet update will enable viewing and editing of these lists.
-      public static let modificationDisabledForRecoveredAccount = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_modificationDisabledForRecoveredAccount", fallback: "⚠️ Sorry, this Account's third-party exceptions and depositor lists are in an unknown state and cannot be viewed or edited because it was imported using only a seed phrase or Ledger. A forthcoming wallet update will enable viewing and editing of these lists.")
+      /// Sorry, this Account's third-party exceptions and depositor lists are in an unknown state and cannot be viewed or edited because it was imported using only a seed phrase or Ledger. A forthcoming wallet update will enable viewing and editing of these lists.
+      public static let modificationDisabledForRecoveredAccount = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_modificationDisabledForRecoveredAccount", fallback: "Sorry, this Account's third-party exceptions and depositor lists are in an unknown state and cannot be viewed or edited because it was imported using only a seed phrase or Ledger. A forthcoming wallet update will enable viewing and editing of these lists.")
       /// Remove Asset
       public static let removeAsset = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_removeAsset", fallback: "Remove Asset")
       /// The asset will be removed from the allow list
@@ -1510,6 +1510,52 @@ public enum L10n {
       public static let submit = L10n.tr("Localizable", "error_transactionFailure_submit", fallback: "Failed to submit transaction")
       /// Unknown error
       public static let unknown = L10n.tr("Localizable", "error_transactionFailure_unknown", fallback: "Unknown error")
+    }
+  }
+  public enum FactorSourceActions {
+    public enum CreateAccount {
+      /// Creating Account
+      public static let title = L10n.tr("Localizable", "factorSourceActions_createAccount_title", fallback: "Creating Account")
+    }
+    public enum CreateKey {
+      /// Creating Key
+      public static let title = L10n.tr("Localizable", "factorSourceActions_createKey_title", fallback: "Creating Key")
+    }
+    public enum CreatePersona {
+      /// Creating Persona
+      public static let title = L10n.tr("Localizable", "factorSourceActions_createPersona_title", fallback: "Creating Persona")
+    }
+    public enum DeriveAccounts {
+      /// Deriving Accounts
+      public static let title = L10n.tr("Localizable", "factorSourceActions_deriveAccounts_title", fallback: "Deriving Accounts")
+    }
+    public enum Device {
+      /// Authenticate to your phone to complete using your phone's signing key.
+      public static let message = L10n.tr("Localizable", "factorSourceActions_device_message", fallback: "Authenticate to your phone to complete using your phone's signing key.")
+      /// Authenticate to your phone to sign.
+      public static let messageSignature = L10n.tr("Localizable", "factorSourceActions_device_messageSignature", fallback: "Authenticate to your phone to sign.")
+    }
+    public enum EncryptMessage {
+      /// Encrypting Message
+      public static let title = L10n.tr("Localizable", "factorSourceActions_encryptMessage_title", fallback: "Encrypting Message")
+    }
+    public enum Ledger {
+      /// Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
+      public static let message = L10n.tr("Localizable", "factorSourceActions_ledger_message", fallback: "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.")
+      /// Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
+      /// **Derivation may take up to a minute.**
+      public static let messageDeriveAccounts = L10n.tr("Localizable", "factorSourceActions_ledger_messageDeriveAccounts", fallback: "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.\n**Derivation may take up to a minute.**")
+      /// Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
+      /// **Complete signing on the device.**
+      public static let messageSignature = L10n.tr("Localizable", "factorSourceActions_ledger_messageSignature", fallback: "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.\n**Complete signing on the device.**")
+    }
+    public enum ProveOwnership {
+      /// Proving Ownership
+      public static let title = L10n.tr("Localizable", "factorSourceActions_proveOwnership_title", fallback: "Proving Ownership")
+    }
+    public enum Signature {
+      /// Signature Request
+      public static let title = L10n.tr("Localizable", "factorSourceActions_signature_title", fallback: "Signature Request")
     }
   }
   public enum FactorSources {

@@ -47,10 +47,12 @@ public struct NameAccount: Sendable, FeatureReducer {
 			return .none
 
 		case let .confirmNameButtonTapped(sanitizedName):
-			return .send(.delegate(.proceed(
-				accountName: sanitizedName,
-				useLedgerAsFactorSource: state.useLedgerAsFactorSource
-			)))
+			return
+				.resignFirstResponder
+					.concatenate(with: .send(.delegate(.proceed(
+						accountName: sanitizedName,
+						useLedgerAsFactorSource: state.useLedgerAsFactorSource
+					))))
 
 		case let .textFieldChanged(inputtedName):
 			state.inputtedName = inputtedName
