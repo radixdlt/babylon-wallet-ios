@@ -109,7 +109,7 @@ extension Settings.View {
 	}
 
 	@MainActor
-	private func rows(viewStore: ViewStoreOf<Settings>) -> [SettingsRowKind<Settings>] {
+	private func rows(viewStore: ViewStoreOf<Settings>) -> [AbstractSettingsRow<Settings>] {
 		var visibleRows = normalRows(viewStore: viewStore)
 		#if DEBUG
 		visibleRows.append(.separator)
@@ -123,7 +123,7 @@ extension Settings.View {
 	}
 
 	@MainActor
-	private func normalRows(viewStore: ViewStoreOf<Settings>) -> [SettingsRowKind<Settings>] {
+	private func normalRows(viewStore: ViewStoreOf<Settings>) -> [AbstractSettingsRow<Settings>] {
 		[
 			.model(.init(
 				title: L10n.WalletSettings.SecurityCenter.title,

@@ -8,4 +8,8 @@ extension View {
 					.foregroundColor(.app.gray3)
 			}
 	}
+
+	func eraseToAnyView() -> AnyView {
+		AnyView(self)
+	}
 }

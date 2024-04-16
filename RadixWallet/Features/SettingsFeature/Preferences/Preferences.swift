@@ -3,6 +3,7 @@
 public struct Preferences: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var appPreferences: AppPreferences?
+		var exportLogsUrl: URL?
 
 		@PresentationState
 		public var destination: Destination.State?
@@ -13,6 +14,11 @@ public struct Preferences: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case depositGuaranteesButtonTapped
+		case hiddenEntitiesButtonTapped
+		case gatewaysButtonTapped
+		case developerModeToogled(Bool)
+		case exportLogsButtonTapped
+		case exportLogsDismissed
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -22,15 +28,25 @@ public struct Preferences: Sendable, FeatureReducer {
 	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case depositGuarantees(DefaultDepositGuarantees.State)
+			case hiddenEntities(AccountAndPersonaHiding.State)
+			case gateways(GatewaySettings.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case depositGuarantees(DefaultDepositGuarantees.Action)
+			case hiddenEntities(AccountAndPersonaHiding.Action)
+			case gateways(GatewaySettings.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
 			Scope(state: /State.depositGuarantees, action: /Action.depositGuarantees) {
 				DefaultDepositGuarantees()
+			}
+			Scope(state: /State.hiddenEntities, action: /Action.hiddenEntities) {
+				AccountAndPersonaHiding()
+			}
+			Scope(state: /State.gateways, action: /Action.gateways) {
+				GatewaySettings()
 			}
 		}
 	}
@@ -59,6 +75,29 @@ public struct Preferences: Sendable, FeatureReducer {
 		case .depositGuaranteesButtonTapped:
 			let depositGuarantee = state.appPreferences?.transaction.defaultDepositGuarantee ?? 1
 			state.destination = .depositGuarantees(.init(depositGuarantee: depositGuarantee))
+			return .none
+
+		case .hiddenEntitiesButtonTapped:
+			state.destination = .hiddenEntities(.init())
+			return .none
+
+		case .gatewaysButtonTapped:
+			state.destination = .gateways(.init())
+			return .none
+
+		case let .developerModeToogled(isEnabled):
+			state.appPreferences?.security.isDeveloperModeEnabled = isEnabled
+			guard let preferences = state.appPreferences else { return .none }
+			return .run { _ in
+				try await appPreferencesClient.updatePreferences(preferences)
+			}
+
+		case .exportLogsButtonTapped:
+			state.exportLogsUrl = Logger.logFilePath
+			return .none
+
+		case .exportLogsDismissed:
+			state.exportLogsUrl = nil
 			return .none
 		}
 	}

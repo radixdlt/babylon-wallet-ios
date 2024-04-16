@@ -31,9 +31,10 @@ struct SettingsRow<Feature: FeatureReducer>: View {
 	}
 }
 
-// MARK: - SettingsRowKind
-enum SettingsRowKind<Feature: FeatureReducer>: Identifiable {
+// MARK: - AbstractSettingsRow
+enum AbstractSettingsRow<Feature: FeatureReducer>: Identifiable {
 	case model(SettingsRowModel<Feature>)
+	case custom(AnyView, String)
 	case separator(String)
 	case header(title: String, id: String)
 
@@ -45,10 +46,16 @@ enum SettingsRowKind<Feature: FeatureReducer>: Identifiable {
 		.header(title: title, id: UUID().uuidString)
 	}
 
+	static func custom(_ view: AnyView) -> Self {
+		.custom(view, UUID().uuidString)
+	}
+
 	var id: String {
 		switch self {
 		case let .model(model):
 			model.id
+		case let .custom(_, id):
+			id
 		case let .separator(id):
 			id
 		case let .header(_, id):
@@ -65,6 +72,9 @@ enum SettingsRowKind<Feature: FeatureReducer>: Identifiable {
 					viewStore.send(model.action)
 				}
 				.withSeparator
+
+		case let .custom(content, _):
+			content
 
 		case .separator:
 			Rectangle()
