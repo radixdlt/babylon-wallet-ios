@@ -1,12 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension Settings.Destination.State {
-	static func displayMnemonics() -> Self {
-		.accountSecurity(AccountSecurity.State(destination: .mnemonics(.init())))
-	}
-}
-
 // MARK: - Settings
 public struct Settings: Sendable, FeatureReducer {
 	public typealias Store = StoreOf<Self>
@@ -54,8 +48,6 @@ public struct Settings: Sendable, FeatureReducer {
 
 			case authorizedDapps(AuthorizedDapps.State)
 			case personas(PersonasCoordinator.State)
-			case accountSecurity(AccountSecurity.State)
-			case appSettings(AppSettings.State)
 			case debugSettings(DebugSettingsCoordinator.State)
 		}
 
@@ -64,8 +56,6 @@ public struct Settings: Sendable, FeatureReducer {
 
 			case authorizedDapps(AuthorizedDapps.Action)
 			case personas(PersonasCoordinator.Action)
-			case accountSecurity(AccountSecurity.Action)
-			case appSettings(AppSettings.Action)
 			case debugSettings(DebugSettingsCoordinator.Action)
 		}
 
@@ -114,7 +104,7 @@ public struct Settings: Sendable, FeatureReducer {
 			return .none
 
 		case .securityButtonTapped:
-			//            state.destination =
+			// TODO: Implement
 			return .none
 
 		case .personasButtonTapped:
@@ -130,20 +120,12 @@ public struct Settings: Sendable, FeatureReducer {
 			return .none
 
 		case .preferencesButtonTapped:
-			//            state.destination
+			// TODO: Implement
 			return .none
 
 		case .troubleshootingButtonTapped:
-			//            state.destination =
+			// TODO: Implement
 			return .none
-
-//		case .accountSecurityButtonTapped:
-//			state.destination = .accountSecurity(.init())
-//			return .none
-//
-//		case .appSettingsButtonTapped:
-//			state.destination = .appSettings(.init())
-//			return .none
 
 		case .debugButtonTapped:
 			state.destination = .debugSettings(.init())
@@ -160,17 +142,6 @@ public struct Settings: Sendable, FeatureReducer {
 		case let .loadedShouldWriteDownPersonasSeedPhrase(shouldBackup):
 			state.shouldWriteDownPersonasSeedPhrase = shouldBackup
 			return .none
-		}
-	}
-
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		switch presentedAction {
-		case let .accountSecurity(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))):
-			.send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent)))
-		case .accountSecurity(.delegate(.gotoAccountList)):
-			.run { _ in await dismiss() }
-		default:
-			.none
 		}
 	}
 
