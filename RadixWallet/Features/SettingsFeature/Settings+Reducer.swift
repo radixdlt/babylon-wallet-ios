@@ -45,17 +45,17 @@ public struct Settings: Sendable, FeatureReducer {
 	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case manageP2PLinks(P2PLinksFeature.State)
-
 			case authorizedDapps(AuthorizedDapps.State)
 			case personas(PersonasCoordinator.State)
+			case preferences(Preferences.State)
 			case debugSettings(DebugSettingsCoordinator.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case manageP2PLinks(P2PLinksFeature.Action)
-
 			case authorizedDapps(AuthorizedDapps.Action)
 			case personas(PersonasCoordinator.Action)
+			case preferences(Preferences.Action)
 			case debugSettings(DebugSettingsCoordinator.Action)
 		}
 
@@ -68,6 +68,9 @@ public struct Settings: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.personas, action: /Action.personas) {
 				PersonasCoordinator()
+			}
+			Scope(state: /State.preferences, action: /Action.preferences) {
+				Preferences()
 			}
 			#if DEBUG
 			Scope(state: /State.debugSettings, action: /Action.debugSettings) {
@@ -120,7 +123,7 @@ public struct Settings: Sendable, FeatureReducer {
 			return .none
 
 		case .preferencesButtonTapped:
-			// TODO: Implement
+			state.destination = .preferences(.init())
 			return .none
 
 		case .troubleshootingButtonTapped:

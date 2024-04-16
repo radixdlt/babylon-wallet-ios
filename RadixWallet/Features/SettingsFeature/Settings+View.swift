@@ -45,10 +45,12 @@ extension Settings {
 extension Settings.View {
 	public var body: some View {
 		settingsView()
-			.navigationTitle(L10n.Settings.title)
+			.navigationTitle(L10n.WalletSettings.title)
 			.navigationBarTitleColor(.app.gray1)
 			.navigationBarTitleDisplayMode(.inline)
 			.navigationBarInlineTitleFont(.app.secondaryHeader)
+			.toolbarBackground(.app.background, for: .navigationBar)
+			.toolbarBackground(.visible, for: .navigationBar)
 			.tint(.app.gray1)
 			.foregroundColor(.app.gray1)
 			.destinations(with: store)
@@ -183,6 +185,7 @@ private extension View {
 		return manageP2PLinks(with: destinationStore)
 			.authorizedDapps(with: destinationStore)
 			.personas(with: destinationStore)
+			.preferences(with: destinationStore)
 		#if DEBUG
 			.debugSettings(with: destinationStore)
 		#endif
@@ -212,6 +215,15 @@ private extension View {
 			state: /Settings.Destination.State.personas,
 			action: Settings.Destination.Action.personas,
 			destination: { PersonasCoordinator.View(store: $0) }
+		)
+	}
+
+	private func preferences(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /Settings.Destination.State.preferences,
+			action: Settings.Destination.Action.preferences,
+			destination: { Preferences.View(store: $0) }
 		)
 	}
 
