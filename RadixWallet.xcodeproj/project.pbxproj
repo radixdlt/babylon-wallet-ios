@@ -3799,7 +3799,6 @@
 			isa = PBXGroup;
 			children = (
 				A41266ED2B15577200EA38E9 /* ManualAccountRecoveryScan */,
-				48CFBD8F2ADC10D800E77A5C /* DefaultDepositGuarantees */,
 				48CFBD922ADC10D800E77A5C /* AccountSecurity+Reducer.swift */,
 				48CFBD932ADC10D800E77A5C /* AccountSecurity+View.swift */,
 			);
@@ -6707,6 +6706,7 @@
 			children = (
 				5B758D552BCE7AEC00348722 /* Preferences+View.swift */,
 				5B758D562BCE7AEC00348722 /* Preferences.swift */,
+				48CFBD8F2ADC10D800E77A5C /* DefaultDepositGuarantees */,
 			);
 			path = Preferences;
 			sourceTree = "<group>";
