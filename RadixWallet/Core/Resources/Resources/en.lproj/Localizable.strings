@@ -1056,3 +1056,12 @@ If you have any “Legacy” Accounts (created on the Olympia network) to import
 "walletSettings_linkToConnectorHeader_title" = "Link your Wallet to a Desktop Browser";
 "walletSettings_linkToConnectorHeader_subtitle" = "Scan the QR code in the Radix Wallet Connector extension";
 "walletSettings_linkToConnectorHeader_linkToConnector" = "Link to Connector";
+"preferences_title" = "Preferences";
+"preferences_depositGuarantees_title" = "Default Deposit Guarantees";
+"preferences_depositGuarantees_subtitle" = "Set your guaranteed minimum for estimated deposits";
+"preferences_hiddenEntities_title" = "Hidden Accounts and Personas";
+"preferences_hiddenEntities_subtitle" = "Manage hidden Accounts and Personas";
+"preferences_advancedPreferences" = "Advanced Preferences";
+"preferences_gateways" = "Network Gateways";
+"preferences_developerMode_title" = "Developer Mode";
+"preferences_developerMode_subtitle" = "Warning: disables website validity checks";

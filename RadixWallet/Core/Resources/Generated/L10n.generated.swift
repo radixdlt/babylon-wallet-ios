@@ -2028,6 +2028,32 @@ public enum L10n {
     /// Write down main seed phrase
     public static let writeSeedPhrase = L10n.tr("Localizable", "personas_writeSeedPhrase", fallback: "Write down main seed phrase")
   }
+  public enum Preferences {
+    /// Advanced Preferences
+    public static let advancedPreferences = L10n.tr("Localizable", "preferences_advancedPreferences", fallback: "Advanced Preferences")
+    /// Network Gateways
+    public static let gateways = L10n.tr("Localizable", "preferences_gateways", fallback: "Network Gateways")
+    /// Preferences
+    public static let title = L10n.tr("Localizable", "preferences_title", fallback: "Preferences")
+    public enum DepositGuarantees {
+      /// Set your guaranteed minimum for estimated deposits
+      public static let subtitle = L10n.tr("Localizable", "preferences_depositGuarantees_subtitle", fallback: "Set your guaranteed minimum for estimated deposits")
+      /// Default Deposit Guarantees
+      public static let title = L10n.tr("Localizable", "preferences_depositGuarantees_title", fallback: "Default Deposit Guarantees")
+    }
+    public enum DeveloperMode {
+      /// Warning: disables website validity checks
+      public static let subtitle = L10n.tr("Localizable", "preferences_developerMode_subtitle", fallback: "Warning: disables website validity checks")
+      /// Developer Mode
+      public static let title = L10n.tr("Localizable", "preferences_developerMode_title", fallback: "Developer Mode")
+    }
+    public enum HiddenEntities {
+      /// Manage hidden Accounts and Personas
+      public static let subtitle = L10n.tr("Localizable", "preferences_hiddenEntities_subtitle", fallback: "Manage hidden Accounts and Personas")
+      /// Hidden Accounts and Personas
+      public static let title = L10n.tr("Localizable", "preferences_hiddenEntities_title", fallback: "Hidden Accounts and Personas")
+    }
+  }
   public enum ProfileBackup {
     /// Backing up your wallet ensures that you can restore access to your Accounts, Personas, and wallet settings on a new phone by re-entering your seed phrase(s).
     /// 
