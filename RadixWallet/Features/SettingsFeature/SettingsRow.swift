@@ -35,9 +35,14 @@ struct SettingsRow<Feature: FeatureReducer>: View {
 enum SettingsRowKind<Feature: FeatureReducer>: Identifiable {
 	case model(SettingsRowModel<Feature>)
 	case separator(String)
+	case header(title: String, id: String)
 
 	static var separator: Self {
 		.separator(UUID().uuidString)
+	}
+
+	static func header(_ title: String) -> Self {
+		.header(title: title, id: UUID().uuidString)
 	}
 
 	var id: String {
@@ -45,6 +50,8 @@ enum SettingsRowKind<Feature: FeatureReducer>: Identifiable {
 		case let .model(model):
 			model.id
 		case let .separator(id):
+			id
+		case let .header(_, id):
 			id
 		}
 	}
@@ -64,6 +71,15 @@ enum SettingsRowKind<Feature: FeatureReducer>: Identifiable {
 				.fill(Color.clear)
 				.frame(maxWidth: .infinity)
 				.frame(height: .large3)
+
+		case let .header(title, _):
+			HStack(spacing: .zero) {
+				Text(title)
+					.textStyle(.body1Link)
+					.foregroundColor(.app.gray2)
+				Spacer()
+			}
+			.padding(.medium3)
 		}
 	}
 }
