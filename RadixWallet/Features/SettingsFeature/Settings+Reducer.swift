@@ -48,6 +48,7 @@ public struct Settings: Sendable, FeatureReducer {
 			case authorizedDapps(AuthorizedDapps.State)
 			case personas(PersonasCoordinator.State)
 			case preferences(Preferences.State)
+			case troubleshooting(Troubleshooting.State)
 			case debugSettings(DebugSettingsCoordinator.State)
 		}
 
@@ -56,6 +57,7 @@ public struct Settings: Sendable, FeatureReducer {
 			case authorizedDapps(AuthorizedDapps.Action)
 			case personas(PersonasCoordinator.Action)
 			case preferences(Preferences.Action)
+			case troubleshooting(Troubleshooting.Action)
 			case debugSettings(DebugSettingsCoordinator.Action)
 		}
 
@@ -71,6 +73,9 @@ public struct Settings: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.preferences, action: /Action.preferences) {
 				Preferences()
+			}
+			Scope(state: /State.troubleshooting, action: /Action.troubleshooting) {
+				Troubleshooting()
 			}
 			#if DEBUG
 			Scope(state: /State.debugSettings, action: /Action.debugSettings) {
@@ -127,7 +132,7 @@ public struct Settings: Sendable, FeatureReducer {
 			return .none
 
 		case .troubleshootingButtonTapped:
-			// TODO: Implement
+			state.destination = .troubleshooting(.init())
 			return .none
 
 		case .debugButtonTapped:
@@ -145,6 +150,15 @@ public struct Settings: Sendable, FeatureReducer {
 		case let .loadedShouldWriteDownPersonasSeedPhrase(shouldBackup):
 			state.shouldWriteDownPersonasSeedPhrase = shouldBackup
 			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .troubleshooting(.delegate(.goToAccountList)):
+			.run { _ in await dismiss() }
+		default:
+			.none
 		}
 	}
 

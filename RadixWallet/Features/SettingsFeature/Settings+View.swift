@@ -181,6 +181,7 @@ private extension View {
 			.authorizedDapps(with: destinationStore)
 			.personas(with: destinationStore)
 			.preferences(with: destinationStore)
+			.troubleshooting(with: destinationStore)
 		#if DEBUG
 			.debugSettings(with: destinationStore)
 		#endif
@@ -219,6 +220,15 @@ private extension View {
 			state: /Settings.Destination.State.preferences,
 			action: Settings.Destination.Action.preferences,
 			destination: { Preferences.View(store: $0) }
+		)
+	}
+
+	private func troubleshooting(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /Settings.Destination.State.troubleshooting,
+			action: Settings.Destination.Action.troubleshooting,
+			destination: { Troubleshooting.View(store: $0) }
 		)
 	}
 

@@ -11,10 +11,11 @@ struct SettingsRowModel<Feature: FeatureReducer>: Identifiable {
 		subtitle: String? = nil,
 		hint: Hint.ViewState? = nil,
 		icon: AssetIcon.Content,
+		accessory: ImageAsset? = AssetResource.chevronRight,
 		action: Feature.ViewAction
 	) {
 		self.id = title
-		self.rowViewState = .init(icon, rowCoreViewState: .init(kind: .settings, title: title, subtitle: subtitle, hint: hint))
+		self.rowViewState = .init(icon, rowCoreViewState: .init(kind: .settings, title: title, subtitle: subtitle, hint: hint), accessory: accessory)
 		self.action = action
 	}
 }
@@ -64,7 +65,7 @@ enum AbstractSettingsRow<Feature: FeatureReducer>: Identifiable {
 	}
 
 	@ViewBuilder
-	func build(viewStore: ViewStore<Feature.ViewState, Feature.ViewAction>) -> some View {
+	func build(viewStore: ViewStoreOf<Feature>) -> some View {
 		switch self {
 		case let .model(model):
 			PlainListRow(viewState: model.rowViewState)

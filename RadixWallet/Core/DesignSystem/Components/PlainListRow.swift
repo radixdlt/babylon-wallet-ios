@@ -119,7 +119,7 @@ public struct PlainListRowCore: View {
 			if let subtitle = viewState.subtitle {
 				Text(subtitle)
 					.lineSpacing(-4)
-					.lineLimit(2)
+					.lineLimit(viewState.kind.subtitleLineLimit)
 					.minimumScaleFactor(0.8)
 					.textStyle(viewState.kind.subtitleTextStyle)
 					.foregroundColor(viewState.kind.subtitleForegroundColor)
@@ -164,6 +164,15 @@ extension PlainListRowCore.ViewState {
 				.app.gray2
 			case .settings:
 				.app.gray1
+			}
+		}
+
+		var subtitleLineLimit: Int {
+			switch self {
+			case .general:
+				2
+			case .settings:
+				3
 			}
 		}
 
