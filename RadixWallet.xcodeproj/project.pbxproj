@@ -1015,6 +1015,8 @@
 		A41557552B7645F70040AD4E /* TransactionHistory+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41557542B7645F70040AD4E /* TransactionHistory+View.swift */; };
 		A41557572B7D4BF10040AD4E /* ResourceBalanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41557562B7D4BF10040AD4E /* ResourceBalanceView.swift */; };
 		A43F1E232BC72884001DD3FA /* AnyRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43F1E222BC72884001DD3FA /* AnyRange.swift */; };
+		A43F1E262BC96F18001DD3FA /* SecurityCenter+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43F1E252BC96F18001DD3FA /* SecurityCenter+Reducer.swift */; };
+		A43F1E282BC96F27001DD3FA /* SecurityCenter+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43F1E272BC96F27001DD3FA /* SecurityCenter+View.swift */; };
 		A462B5792B8210A400C26D20 /* TransactionHistoryClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5782B820D2300C26D20 /* TransactionHistoryClient+Interface.swift */; };
 		A462B57A2B8210A600C26D20 /* TransactionHistoryClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5762B820D2200C26D20 /* TransactionHistoryClient+Live.swift */; };
 		A462B57B2B8210A900C26D20 /* TransactionHistoryClient+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = A462B5772B820D2300C26D20 /* TransactionHistoryClient+Mock.swift */; };
@@ -1050,6 +1052,7 @@
 		A47572042B29B4EE0059A95D /* IOSSecurityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */; };
 		A47572052B29B4F20059A95D /* IOSSecurityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */; };
 		A47572062B29B4F50059A95D /* IOSSecurityClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572012B29B3CA0059A95D /* IOSSecurityClient+Live.swift */; };
+		A47809082BDBDB4C006B68C0 /* RadixDateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47809072BDBDB4C006B68C0 /* RadixDateFormatter.swift */; };
 		A48FD15F2B55E671009295E9 /* TrackedPoolInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48FD15E2B55E671009295E9 /* TrackedPoolInteraction.swift */; };
 		A48FD1612B55F8F0009295E9 /* TransactionReview+Sections.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48FD1602B55F8F0009295E9 /* TransactionReview+Sections.swift */; };
 		A4B017F72B4C099D00B42B8E /* TransactionReview+DepositSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4B017F42B4BF59000B42B8E /* TransactionReview+DepositSettingView.swift */; };
@@ -1057,6 +1060,8 @@
 		A4CFB55F2BAA821E00778BDD /* HScrollBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4CFB55E2BAA821E00778BDD /* HScrollBar.swift */; };
 		A4CFB5612BAA826E00778BDD /* Measure+Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4CFB5602BAA826E00778BDD /* Measure+Position.swift */; };
 		A4EB37C82B6272F3003FE31D /* TrackedValidatorInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4EB37C72B6272F3003FE31D /* TrackedValidatorInteraction.swift */; };
+		A4EBB5D62BD0777C00D05FDE /* ConfigurationBackup+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4EBB5D52BD0777C00D05FDE /* ConfigurationBackup+Reducer.swift */; };
+		A4EBB5D82BD0777F00D05FDE /* ConfigurationBackup+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4EBB5D72BD0777F00D05FDE /* ConfigurationBackup+View.swift */; };
 		A4ECE2722BEEAFFC00468BF6 /* SecurityCenterClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECE26E2BEEAFFC00468BF6 /* SecurityCenterClient+Interface.swift */; };
 		A4ECE2732BEEAFFC00468BF6 /* SecurityCenterClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECE26F2BEEAFFC00468BF6 /* SecurityCenterClient+Live.swift */; };
 		A4ECE2742BEEAFFC00468BF6 /* SecurityCenterClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECE2702BEEAFFC00468BF6 /* SecurityCenterClient+Test.swift */; };
@@ -2116,6 +2121,8 @@
 		A41557542B7645F70040AD4E /* TransactionHistory+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistory+View.swift"; sourceTree = "<group>"; };
 		A41557562B7D4BF10040AD4E /* ResourceBalanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceBalanceView.swift; sourceTree = "<group>"; };
 		A43F1E222BC72884001DD3FA /* AnyRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyRange.swift; sourceTree = "<group>"; };
+		A43F1E252BC96F18001DD3FA /* SecurityCenter+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityCenter+Reducer.swift"; sourceTree = "<group>"; };
+		A43F1E272BC96F27001DD3FA /* SecurityCenter+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityCenter+View.swift"; sourceTree = "<group>"; };
 		A462B5762B820D2200C26D20 /* TransactionHistoryClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistoryClient+Live.swift"; sourceTree = "<group>"; };
 		A462B5772B820D2300C26D20 /* TransactionHistoryClient+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistoryClient+Mock.swift"; sourceTree = "<group>"; };
 		A462B5782B820D2300C26D20 /* TransactionHistoryClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistoryClient+Interface.swift"; sourceTree = "<group>"; };
@@ -2147,16 +2154,21 @@
 		A462B5BE2B9382BC00C26D20 /* OnLedgerEntitiesClient+ComplexTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OnLedgerEntitiesClient+ComplexTypes.swift"; sourceTree = "<group>"; };
 		A462B5C02B95210000C26D20 /* TransactionHistoryFilters+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistoryFilters+Reducer.swift"; sourceTree = "<group>"; };
 		A462B5C22B95212600C26D20 /* TransactionHistoryFilters+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistoryFilters+View.swift"; sourceTree = "<group>"; };
+		A473079A2BD9B0FA0077B5E2 /* RadixWalletDebug-Dev.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "RadixWalletDebug-Dev.entitlements"; sourceTree = "<group>"; };
 		A47572012B29B3CA0059A95D /* IOSSecurityClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Live.swift"; sourceTree = "<group>"; };
 		A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Test.swift"; sourceTree = "<group>"; };
 		A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Interface.swift"; sourceTree = "<group>"; };
+		A47809072BDBDB4C006B68C0 /* RadixDateFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadixDateFormatter.swift; sourceTree = "<group>"; };
 		A48FD15E2B55E671009295E9 /* TrackedPoolInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackedPoolInteraction.swift; sourceTree = "<group>"; };
 		A48FD1602B55F8F0009295E9 /* TransactionReview+Sections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionReview+Sections.swift"; sourceTree = "<group>"; };
+		A4A1379A2BE4630200D84B50 /* RadixWalletDebug-PreAlpha.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "RadixWalletDebug-PreAlpha.entitlements"; sourceTree = "<group>"; };
 		A4B017F42B4BF59000B42B8E /* TransactionReview+DepositSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionReview+DepositSettingView.swift"; sourceTree = "<group>"; };
 		A4CFB55C2BA8CA3200778BDD /* TransactionHistory+TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistory+TableView.swift"; sourceTree = "<group>"; };
 		A4CFB55E2BAA821E00778BDD /* HScrollBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HScrollBar.swift; sourceTree = "<group>"; };
 		A4CFB5602BAA826E00778BDD /* Measure+Position.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Measure+Position.swift"; sourceTree = "<group>"; };
 		A4EB37C72B6272F3003FE31D /* TrackedValidatorInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackedValidatorInteraction.swift; sourceTree = "<group>"; };
+		A4EBB5D52BD0777C00D05FDE /* ConfigurationBackup+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfigurationBackup+Reducer.swift"; sourceTree = "<group>"; };
+		A4EBB5D72BD0777F00D05FDE /* ConfigurationBackup+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfigurationBackup+View.swift"; sourceTree = "<group>"; };
 		A4ECE26E2BEEAFFC00468BF6 /* SecurityCenterClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SecurityCenterClient+Interface.swift"; sourceTree = "<group>"; };
 		A4ECE26F2BEEAFFC00468BF6 /* SecurityCenterClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SecurityCenterClient+Live.swift"; sourceTree = "<group>"; };
 		A4ECE2702BEEAFFC00468BF6 /* SecurityCenterClient+Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SecurityCenterClient+Test.swift"; sourceTree = "<group>"; };
@@ -2421,6 +2433,8 @@
 		48CFBC512ADC106300E77A5C /* RadixWallet */ = {
 			isa = PBXGroup;
 			children = (
+				A4A1379A2BE4630200D84B50 /* RadixWalletDebug-PreAlpha.entitlements */,
+				A473079A2BD9B0FA0077B5E2 /* RadixWalletDebug-Dev.entitlements */,
 				E65D6CE42BC980FE001D8A39 /* MIGRATE_TO_SARGON */,
 				48649AD42ADC7CAC006307CF /* AppIcon.xcassets */,
 				48CFBF522ADC10D900E77A5C /* Clients */,
@@ -2439,6 +2453,7 @@
 		48CFBC602ADC10D800E77A5C /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				A43F1E242BC96EF2001DD3FA /* SecurityCenterFeature */,
 				48D5F3972BD8DE0A000DE964 /* DebugInspectProfile */,
 				5B45E2F32BC45706007C4C84 /* FactorSourceAccess */,
 				A41557512B7645D40040AD4E /* TransactionHistory */,
@@ -5044,6 +5059,7 @@
 				48CFC1452ADC10D900E77A5C /* SlideUpPanel */,
 				48CFC1482ADC10D900E77A5C /* SmallAccountCard.swift */,
 				48CFC1492ADC10D900E77A5C /* UserDefaultsClient+AccountRecovery.swift */,
+				A47809072BDBDB4C006B68C0 /* RadixDateFormatter.swift */,
 			);
 			path = FeaturePrelude;
 			sourceTree = "<group>";
@@ -5763,6 +5779,17 @@
 				A462B5C22B95212600C26D20 /* TransactionHistoryFilters+View.swift */,
 			);
 			path = TransactionHistory;
+			sourceTree = "<group>";
+		};
+		A43F1E242BC96EF2001DD3FA /* SecurityCenterFeature */ = {
+			isa = PBXGroup;
+			children = (
+				A43F1E252BC96F18001DD3FA /* SecurityCenter+Reducer.swift */,
+				A43F1E272BC96F27001DD3FA /* SecurityCenter+View.swift */,
+				A4EBB5D52BD0777C00D05FDE /* ConfigurationBackup+Reducer.swift */,
+				A4EBB5D72BD0777F00D05FDE /* ConfigurationBackup+View.swift */,
+			);
+			path = SecurityCenterFeature;
 			sourceTree = "<group>";
 		};
 		A462B5752B820D1200C26D20 /* TransactionHistoryClient */ = {
@@ -6828,6 +6855,7 @@
 				48CFC5532ADC10DA00E77A5C /* GatewayStatusResponse.swift in Sources */,
 				48CFC4272ADC10DA00E77A5C /* JSON+ISO8601.swift in Sources */,
 				48CFC2482ADC10D900E77A5C /* ThirdPartyDeposits+View.swift in Sources */,
+				A4EBB5D62BD0777C00D05FDE /* ConfigurationBackup+Reducer.swift in Sources */,
 				A41557532B7645E70040AD4E /* TransactionHistory+Reducer.swift in Sources */,
 				E6A2D9E72AFA7132001857EC /* Mnemonics+Utils.swift in Sources */,
 				48CFC28A2ADC10D900E77A5C /* TransactionReviewGuarantees.swift in Sources */,
@@ -7271,6 +7299,7 @@
 				A462B5B92B90C57400C26D20 /* ResourceBalanceButton.swift in Sources */,
 				48CFC4BE2ADC10DA00E77A5C /* StateEntityDetailsResponsePackageDetailsSchemaCollection.swift in Sources */,
 				48CFC4EC2ADC10DA00E77A5C /* NonFungibleResourcesCollectionItemVaultAggregatedVault.swift in Sources */,
+				A47809082BDBDB4C006B68C0 /* RadixDateFormatter.swift in Sources */,
 				48CFC28F2ADC10D900E77A5C /* TransactionReviewAccount+View.swift in Sources */,
 				48CFC33D2ADC10D900E77A5C /* DappInteractionCoordinator.swift in Sources */,
 				48CFC4502ADC10DA00E77A5C /* PersonasClient+Live.swift in Sources */,
@@ -7419,6 +7448,7 @@
 				48CFC5D02ADC10DA00E77A5C /* LabelledDate.swift in Sources */,
 				830EA9E92AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift in Sources */,
 				48CFC4DD2ADC10DA00E77A5C /* PublicKeyEddsaEd25519.swift in Sources */,
+				A43F1E282BC96F27001DD3FA /* SecurityCenter+View.swift in Sources */,
 				48CFC52D2ADC10DA00E77A5C /* InvalidRequestError.swift in Sources */,
 				A462B5B42B8F25BC00C26D20 /* ResourceBalance.swift in Sources */,
 				48CFC6052ADC10DA00E77A5C /* WalletAccount.swift in Sources */,
@@ -7502,6 +7532,7 @@
 				48CFC3642ADC10D900E77A5C /* NonFungibleAssetList+View.swift in Sources */,
 				48CFC4102ADC10DA00E77A5C /* Functions.swift in Sources */,
 				83EE47892AF0EE3C00155F03 /* ProgrammaticScryptoSborValueI16.swift in Sources */,
+				A43F1E262BC96F18001DD3FA /* SecurityCenter+Reducer.swift in Sources */,
 				48CFC5212ADC10DA00E77A5C /* StateValidatorsListResponse.swift in Sources */,
 				48CFC43D2ADC10DA00E77A5C /* FactorSourcesClient+Test.swift in Sources */,
 				4884F3352BD83D9200A19B83 /* Stage1MigrateToSargon+ThirdPartyDeposits.swift in Sources */,
@@ -7595,6 +7626,7 @@
 				48CFC2BA2ADC10D900E77A5C /* SelectBackup+View.swift in Sources */,
 				48CFC4432ADC10DA00E77A5C /* RadixConnectClient+Live.swift in Sources */,
 				48CFC2BC2ADC10D900E77A5C /* ImportMnemonicsFlowCoordinator+View.swift in Sources */,
+				A4EBB5D82BD0777F00D05FDE /* ConfigurationBackup+View.swift in Sources */,
 				48CFC4842ADC10DA00E77A5C /* QRGeneratorClient+Test.swift in Sources */,
 				48CFC5492ADC10DA00E77A5C /* StreamTransactionsRequestEventFilterItem.swift in Sources */,
 				48AE39E72B0CBEA800813CF3 /* SelectInactiveAccountsToAdd+View.swift in Sources */,
@@ -7868,6 +7900,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 48CFC69C2ADC110800E77A5C /* iOS-dev.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "RadixWallet/RadixWalletDebug-Dev.entitlements";
 				CURRENT_PROJECT_VERSION = 1;
 				SWIFT_VERSION = 5.0;
 			};
@@ -8023,7 +8056,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 48CFC6A22ADC110800E77A5C /* iOS-preAlpha.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "RadixWallet/RadixWalletDebug-PreAlpha.entitlements";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CURRENT_PROJECT_VERSION = 1;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MDH99V28LM;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore com.radixpublishing.radixwallet.ios.pre-alpha";
 				SWIFT_VERSION = 5.0;
 			};
 			name = "Debug-PreAlpha";

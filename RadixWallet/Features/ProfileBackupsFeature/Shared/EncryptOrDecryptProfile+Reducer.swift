@@ -41,7 +41,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 
 		public var mode: Mode
 		var focusedField: Field?
-		var inputtedEncryptionPassword: String = ""
+		var enteredEncryptionPassword: String = ""
 		var confirmedEncryptionPassword: String = ""
 
 		public init(mode: Mode) {
@@ -126,13 +126,13 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 			}
 
 		case .confirmedEncryptionPassword:
-			precondition(!state.inputtedEncryptionPassword.isEmpty)
+			precondition(!state.enteredEncryptionPassword.isEmpty)
 
 			if !state.mode.isDecrypt {
-				precondition(state.inputtedEncryptionPassword == state.confirmedEncryptionPassword)
+				precondition(state.enteredEncryptionPassword == state.confirmedEncryptionPassword)
 			}
 
-			let password = state.inputtedEncryptionPassword
+			let password = state.enteredEncryptionPassword
 
 			switch state.mode {
 			case .loadThenEncrypt:
@@ -163,12 +163,14 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 				await send(.internal(.focusTextField(focus)))
 			}
 
-		case let .passwordChanged(inputtedEncryptionPassword):
-			state.inputtedEncryptionPassword = inputtedEncryptionPassword
+		case let .passwordChanged(password):
+			print("•• passwordChanged \(password)")
+			state.enteredEncryptionPassword = password
 			return .none
 
-		case let .passwordConfirmationChanged(confirmingPassword):
-			state.confirmedEncryptionPassword = confirmingPassword
+		case let .passwordConfirmationChanged(password):
+			print("•• passwordConfirmationChanged \(password)")
+			state.confirmedEncryptionPassword = password
 			return .none
 		}
 	}

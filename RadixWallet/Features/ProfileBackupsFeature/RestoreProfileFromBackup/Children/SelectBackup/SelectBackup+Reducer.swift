@@ -4,8 +4,20 @@ import SwiftUI
 // MARK: - SelectBackup
 public struct SelectBackup: Sendable, FeatureReducer {
 	public struct State: Hashable, Sendable {
-		public var backupProfileHeaders: Profile.HeaderList?
-		public var selectedProfileHeader: Profile.Header?
+		public enum Status: Hashable, Sendable {
+			case start
+			case migrating
+			case loading
+			case loaded
+			case failed
+		}
+
+		public var status: Status = .start { didSet { print("•• STATUS: \(status)") } }
+
+		public var backedUpProfiles: [Profile]? = nil
+
+		public var selectedProfile: Profile? = nil
+
 		public var isDisplayingFileImporter: Bool
 		public var thisDeviceID: UUID?
 
@@ -15,34 +27,32 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		public var profileFile: ExportableProfileFile?
 
 		public init(
-			backupProfileHeaders: Profile.HeaderList? = nil,
-			selectedProfileHeader: Profile.Header? = nil,
 			isDisplayingFileImporter: Bool = false,
 			thisDeviceID: UUID? = nil
 		) {
-			self.backupProfileHeaders = backupProfileHeaders
-			self.selectedProfileHeader = selectedProfileHeader
 			self.isDisplayingFileImporter = isDisplayingFileImporter
 			self.thisDeviceID = thisDeviceID
 		}
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.State)
 			case recoverWalletWithoutProfileCoordinator(RecoverWalletWithoutProfileCoordinator.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.Action)
 			case recoverWalletWithoutProfileCoordinator(RecoverWalletWithoutProfileCoordinator.Action)
 		}
 
 		public var body: some Reducer<State, Action> {
-			Scope(state: /State.inputEncryptionPassword, action: /Action.inputEncryptionPassword) {
+			Scope(state: \.inputEncryptionPassword, action: \.inputEncryptionPassword) {
 				EncryptOrDecryptProfile()
 			}
-			Scope(state: /State.recoverWalletWithoutProfileCoordinator, action: /Action.recoverWalletWithoutProfileCoordinator) {
+			Scope(state: \.recoverWalletWithoutProfileCoordinator, action: \.recoverWalletWithoutProfileCoordinator) {
 				RecoverWalletWithoutProfileCoordinator()
 			}
 		}
@@ -50,23 +60,23 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case selectedProfileHeader(Profile.Header?)
+		case selectedProfile(Profile?)
 		case importFromFileInstead
 		case dismissFileImporter
 		case otherRestoreOptionsTapped
 		case profileImportResult(Result<URL, NSError>)
-		case tappedUseCloudBackup(Profile.Header)
+		case tappedUseCloudBackup(Profile)
 		case closeButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadBackupProfileHeadersResult(Profile.HeaderList?)
+		case setStatus(State.Status)
+		case loadCloudBackupProfiles([Profile]?)
 		case loadThisDeviceIDResult(UUID?)
-		case snapshotWithHeaderNotFoundInCloud(Profile.Header)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case selectedProfileSnapshot(Profile, isInCloud: Bool)
+		case selectedProfile(Profile, isInCloud: Bool)
 		case backToStartOfOnboarding
 		case profileCreatedFromImportedBDFS
 	}
@@ -75,9 +85,11 @@ public struct SelectBackup: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.dataReader) var dataReader
 	@Dependency(\.jsonDecoder) var jsonDecoder
-	@Dependency(\.backupsClient) var backupsClient
+	@Dependency(\.cloudBackupClient) var cloudBackupClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	@Dependency(\.secureStorageClient) var secureStorageClient
+	@Dependency(\.userDefaults) var userDefaults
 
 	public init() {}
 
@@ -93,15 +105,8 @@ public struct SelectBackup: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			return .run { send in
-				await send(.internal(.loadThisDeviceIDResult(
-					backupsClient.loadDeviceID()
-				)))
-
-				await send(.internal(.loadBackupProfileHeadersResult(
-					backupsClient.loadProfileBackups()
-				)))
-			}
+			return migrateEffect()
+				.concatenate(with: loadEffect())
 
 		case .importFromFileInstead:
 			state.isDisplayingFileImporter = true
@@ -111,21 +116,12 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			state.destination = .recoverWalletWithoutProfileCoordinator(.init())
 			return .none
 
-		case let .selectedProfileHeader(header):
-			state.selectedProfileHeader = header
+		case let .selectedProfile(profile):
+			state.selectedProfile = profile
 			return .none
 
-		case let .tappedUseCloudBackup(profileHeader):
-			return .run { send in
-				guard let snapshot = try await backupsClient.lookupProfileSnapshotByHeader(profileHeader) else {
-					await send(.internal(.snapshotWithHeaderNotFoundInCloud(profileHeader)))
-					return
-				}
-				await send(.delegate(.selectedProfileSnapshot(snapshot, isInCloud: true)))
-			} catch: { error, send in
-				loggerGlobal.error("Failed to load profile snapshot with header, error: \(error), header: \(profileHeader)")
-				await send(.internal(.snapshotWithHeaderNotFoundInCloud(profileHeader)))
-			}
+		case let .tappedUseCloudBackup(profile):
+			return .send(.delegate(.selectedProfile(profile, isInCloud: true)))
 
 		case .dismissFileImporter:
 			state.isDisplayingFileImporter = false
@@ -148,8 +144,8 @@ public struct SelectBackup: Sendable, FeatureReducer {
 					state.destination = .inputEncryptionPassword(.init(mode: .decrypt(encrypted)))
 					return .none
 
-				case let .plaintext(snapshot):
-					return .send(.delegate(.selectedProfileSnapshot(snapshot, isInCloud: false)))
+				case let .plaintext(profile):
+					return .send(.delegate(.selectedProfile(profile, isInCloud: false)))
 				}
 			} catch {
 				errorQueue.schedule(error)
@@ -166,16 +162,16 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadBackupProfileHeadersResult(profileHeaders):
-			state.backupProfileHeaders = profileHeaders
+		case let .setStatus(status):
+			state.status = status
+			return .none
+
+		case let .loadCloudBackupProfiles(profiles):
+			state.backedUpProfiles = profiles
 			return .none
 
 		case let .loadThisDeviceIDResult(identifier):
 			state.thisDeviceID = identifier
-			return .none
-
-		case let .snapshotWithHeaderNotFoundInCloud(headerOfNonFoundProfile):
-			errorQueue.schedule(ProfileNotFoundInCloud(header: headerOfNonFoundProfile))
 			return .none
 		}
 	}
@@ -203,10 +199,10 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case let .inputEncryptionPassword(.delegate(.successfullyDecrypted(_, decrypted))):
 			state.destination = nil
 			overlayWindowClient.scheduleHUD(.decryptedProfile)
-			return .send(.delegate(.selectedProfileSnapshot(decrypted, isInCloud: false)))
+			return .send(.delegate(.selectedProfile(decrypted, isInCloud: false)))
 
 		case .inputEncryptionPassword(.delegate(.successfullyEncrypted)):
-			preconditionFailure("What? Encrypted? Expected to only have DECRYPTED. Incorrect implementation somewhere...")
+			preconditionFailure("Incorrect implementation, expected decryption")
 
 		default:
 			return .none
@@ -217,12 +213,48 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		state.destination = nil
 		return .none
 	}
-}
 
-// MARK: - ProfileNotFoundInCloud
-struct ProfileNotFoundInCloud: LocalizedError {
-	let header: Profile.Header
-	var errorDescription: String? {
-		L10n.IOSProfileBackup.profileNotFoundInCloud
+	public func migrateEffect() -> Effect<Action> {
+		.run { send in
+			if !userDefaults.getDidMigrateKeychainProfiles {
+				print("•• will migrate profiles")
+				await send(.internal(.setStatus(.migrating)))
+				do {
+					let profilesInKeychain = try secureStorageClient.loadProfileHeaderList()?.count ?? 0
+					if profilesInKeychain > 0 {
+						_ = try await cloudBackupClient.migrateProfilesFromKeychain()
+						userDefaults.setDidMigrateKeychainProfiles(true)
+						print("•• finished migrating profiles")
+					}
+				} catch {
+					print("•• migration failed")
+				}
+			} else {
+				print("•• already migrated profiles")
+			}
+		}
+	}
+
+	public func loadEffect() -> Effect<Action> {
+		.run { send in
+			do {
+				await send(.internal(.loadThisDeviceIDResult(
+					cloudBackupClient.loadDeviceID()
+				)))
+
+				await send(.internal(.setStatus(.loading)))
+				print("•• loading backed up profiles")
+
+				try await send(.internal(.loadCloudBackupProfiles(
+					cloudBackupClient.loadAllProfiles()
+				)))
+
+				await send(.internal(.setStatus(.loaded)))
+			} catch {
+				print("•• loading failed: \(error)")
+
+				await send(.internal(.setStatus(.failed)))
+			}
+		}
 	}
 }
