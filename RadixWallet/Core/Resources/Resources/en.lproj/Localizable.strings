@@ -1052,3 +1052,14 @@ If you have any “Legacy” Accounts (created on the Olympia network) to import
 "factorSourceActions_ledger_messageDeriveAccounts" = "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
 **Derivation may take up to a minute.**";
 "factorSourceActions_ledger_message" = "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.";
+
+"linkedConnectors_approveNewConnector_title" = "Link Connector";
+"linkedConnectors_approveExistingConnector_title" = "Update Link";
+"linkedConnectors_approveNewConnector_message" = "This Connector will be trusted to verify the dApp origin of requests to this wallet.
+
+Only continue if you are linking to the **official Radix Connector browser extension** - or a Connector you control and trust.";
+"linkedConnectors_approveExistingConnector_message" = "This appears to be a Radix Connector you previously linked to. Link will be updated.";
+"linkedConnectors_linkFailedErrorTitle" = "Link Failed";
+"linkedConnectors_unknownPurposeErrorMessage" = "This type of Connector link is not supported.";
+"linkedConnectors_changingPurposeNotSupportedErrorMessage" = "Changing a Connector’s type is not supported.";
+"common_dismiss" = "Dismiss";
