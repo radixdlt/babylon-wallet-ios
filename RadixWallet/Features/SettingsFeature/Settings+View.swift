@@ -276,7 +276,7 @@ extension Settings.View {
 						.padding(.horizontal, .large3)
 				}
 
-				Button(L10n.WalletSettings.LinkToConnectorHeader.linkToConnector, action: action)
+				Button(L10n.WalletSettings.LinkToConnectorHeader.button, action: action)
 					.buttonStyle(.secondaryRectangular(
 						backgroundColor: .app.gray3,
 						shouldExpand: true,
