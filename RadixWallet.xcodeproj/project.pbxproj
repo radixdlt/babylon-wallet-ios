@@ -217,8 +217,6 @@
 		48CFC3082ADC10D900E77A5C /* DisplayMnemonics+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDA42ADC10D800E77A5C /* DisplayMnemonics+View.swift */; };
 		48CFC3092ADC10D900E77A5C /* DisplayMnemonics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDA52ADC10D800E77A5C /* DisplayMnemonics.swift */; };
 		48CFC30C2ADC10D900E77A5C /* Settings+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDA92ADC10D800E77A5C /* Settings+View.swift */; };
-		48CFC30D2ADC10D900E77A5C /* AppSettings+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDAB2ADC10D800E77A5C /* AppSettings+Reducer.swift */; };
-		48CFC30E2ADC10D900E77A5C /* AppSettings+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDAC2ADC10D800E77A5C /* AppSettings+View.swift */; };
 		48CFC30F2ADC10D900E77A5C /* ImportOlympiaWalletCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDAF2ADC10D800E77A5C /* ImportOlympiaWalletCoordinator.swift */; };
 		48CFC3102ADC10D900E77A5C /* ImportOlympiaWalletCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDB02ADC10D800E77A5C /* ImportOlympiaWalletCoordinator+View.swift */; };
 		48CFC3112ADC10D900E77A5C /* AccountsToImport+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDB32ADC10D800E77A5C /* AccountsToImport+View.swift */; };
@@ -1531,8 +1529,6 @@
 		48CFBDA42ADC10D800E77A5C /* DisplayMnemonics+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DisplayMnemonics+View.swift"; sourceTree = "<group>"; };
 		48CFBDA52ADC10D800E77A5C /* DisplayMnemonics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DisplayMnemonics.swift; sourceTree = "<group>"; };
 		48CFBDA92ADC10D800E77A5C /* Settings+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Settings+View.swift"; sourceTree = "<group>"; };
-		48CFBDAB2ADC10D800E77A5C /* AppSettings+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AppSettings+Reducer.swift"; sourceTree = "<group>"; };
-		48CFBDAC2ADC10D800E77A5C /* AppSettings+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AppSettings+View.swift"; sourceTree = "<group>"; };
 		48CFBDAF2ADC10D800E77A5C /* ImportOlympiaWalletCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImportOlympiaWalletCoordinator.swift; sourceTree = "<group>"; };
 		48CFBDB02ADC10D800E77A5C /* ImportOlympiaWalletCoordinator+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ImportOlympiaWalletCoordinator+View.swift"; sourceTree = "<group>"; };
 		48CFBDB32ADC10D800E77A5C /* AccountsToImport+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AccountsToImport+View.swift"; sourceTree = "<group>"; };
@@ -3747,7 +3743,6 @@
 				48CFBDBB2ADC10D800E77A5C /* Settings+Reducer.swift */,
 				48CFBDA92ADC10D800E77A5C /* Settings+View.swift */,
 				5B758D522BCD721D00348722 /* SettingsRow.swift */,
-				48CFBDAA2ADC10D800E77A5C /* AppSettings */,
 				5B758D542BCE7AD100348722 /* Preferences */,
 				5B758D592BCEC39B00348722 /* Troubleshooting */,
 				48CFBD942ADC10D800E77A5C /* DebugSettings */,
@@ -3836,15 +3831,6 @@
 				48CFBDA52ADC10D800E77A5C /* DisplayMnemonics.swift */,
 			);
 			path = Coordinator;
-			sourceTree = "<group>";
-		};
-		48CFBDAA2ADC10D800E77A5C /* AppSettings */ = {
-			isa = PBXGroup;
-			children = (
-				48CFBDAB2ADC10D800E77A5C /* AppSettings+Reducer.swift */,
-				48CFBDAC2ADC10D800E77A5C /* AppSettings+View.swift */,
-			);
-			path = AppSettings;
 			sourceTree = "<group>";
 		};
 		48CFBDAD2ADC10D800E77A5C /* ImportFromOlympiaLegacyWallet */ = {
@@ -8327,7 +8313,6 @@
 				48CFC3F22ADC10D900E77A5C /* PeerConnectionNegotiator.swift in Sources */,
 				48CFC5E22ADC10DA00E77A5C /* Store+Extra.swift in Sources */,
 				48CFC4132ADC10DA00E77A5C /* ErrorQueue+Test.swift in Sources */,
-				48CFC30D2ADC10D900E77A5C /* AppSettings+Reducer.swift in Sources */,
 				48CFC2D02ADC10D900E77A5C /* TransferAccountList+View.swift in Sources */,
 				48CFC23F2ADC10D900E77A5C /* PreferenceList.swift in Sources */,
 				48CFC2A52ADC10D900E77A5C /* PersonaDetails+View.swift in Sources */,
@@ -8585,7 +8570,6 @@
 				83EE47572AF0DE8F00155F03 /* TransactionIntentStatus.swift in Sources */,
 				48CFC2BD2ADC10D900E77A5C /* ImportMnemonicControllingAccounts+View.swift in Sources */,
 				48CFC50E2ADC10DA00E77A5C /* InternalServerError.swift in Sources */,
-				48CFC30E2ADC10D900E77A5C /* AppSettings+View.swift in Sources */,
 				48CFC3222ADC10D900E77A5C /* NewConnection+View.swift in Sources */,
 				48CFC4462ADC10DA00E77A5C /* OnboardingClient+Interface.swift in Sources */,
 				5B758D5C2BCEC3B200348722 /* Troubleshooting+View.swift in Sources */,
