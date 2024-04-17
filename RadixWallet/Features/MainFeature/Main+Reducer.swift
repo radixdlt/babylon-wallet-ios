@@ -52,6 +52,7 @@ public struct Main: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.personasClient) var personasClient
+	@Dependency(\.cloudBackupClient) var cloudBackupClient
 
 	public init() {}
 

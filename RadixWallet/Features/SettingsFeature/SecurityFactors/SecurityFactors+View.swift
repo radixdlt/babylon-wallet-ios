@@ -42,7 +42,7 @@ private extension SecurityFactors.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: .zero) {
-					ForEach(rows(viewStore: viewStore)) { kind in
+					ForEachStatic(rows(viewStore: viewStore)) { kind in
 						SettingsRow(kind: kind, store: store)
 					}
 				}
