@@ -1,17 +1,6 @@
 import Foundation
 import Sargon
 
-extension Sargon.Account {
-	public typealias ID = AccountAddress
-	public var id: ID {
-		address
-	}
-
-	public var networkID: NetworkID {
-		networkId
-	}
-}
-
 // MARK: - Sargon.Account + EntityBaseProtocol
 extension Sargon.Account: EntityBaseProtocol {}
 
