@@ -9,13 +9,14 @@ struct SettingsRowModel<Feature: FeatureReducer>: Identifiable {
 	public init(
 		title: String,
 		subtitle: String? = nil,
+		detail: String? = nil,
 		hint: Hint.ViewState? = nil,
 		icon: AssetIcon.Content,
 		accessory: ImageAsset? = AssetResource.chevronRight,
 		action: Feature.ViewAction
 	) {
 		self.id = title
-		self.rowViewState = .init(icon, rowCoreViewState: .init(kind: .settings, title: title, subtitle: subtitle, hint: hint), accessory: accessory)
+		self.rowViewState = .init(icon, rowCoreViewState: .init(kind: .settings, title: title, subtitle: subtitle, detail: detail, hint: hint), accessory: accessory)
 		self.action = action
 	}
 }
@@ -35,32 +36,20 @@ struct SettingsRow<Feature: FeatureReducer>: View {
 // MARK: - AbstractSettingsRow
 enum AbstractSettingsRow<Feature: FeatureReducer>: Identifiable {
 	case model(SettingsRowModel<Feature>)
-	case custom(AnyView, String)
-	case separator(String)
-	case header(title: String, id: String)
-
-	static var separator: Self {
-		.separator(UUID().uuidString)
-	}
-
-	static func header(_ title: String) -> Self {
-		.header(title: title, id: UUID().uuidString)
-	}
-
-	static func custom(_ view: AnyView) -> Self {
-		.custom(view, UUID().uuidString)
-	}
+	case custom(AnyView)
+	case separator
+	case header(String)
 
 	var id: String {
 		switch self {
 		case let .model(model):
 			model.id
-		case let .custom(_, id):
-			id
-		case let .separator(id):
-			id
-		case let .header(_, id):
-			id
+		case .custom:
+			"custom"
+		case .separator:
+			"separator"
+		case let .header(value):
+			value
 		}
 	}
 
@@ -74,7 +63,7 @@ enum AbstractSettingsRow<Feature: FeatureReducer>: Identifiable {
 				}
 				.withSeparator
 
-		case let .custom(content, _):
+		case let .custom(content):
 			content
 
 		case .separator:
@@ -83,7 +72,7 @@ enum AbstractSettingsRow<Feature: FeatureReducer>: Identifiable {
 				.frame(maxWidth: .infinity)
 				.frame(height: .large3)
 
-		case let .header(title, _):
+		case let .header(title):
 			HStack(spacing: .zero) {
 				Text(title)
 					.textStyle(.body1Link)

@@ -1053,6 +1053,9 @@
 		5B45E2FE2BC59780007C4C84 /* SignWithFactorSource+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E2FC2BC59780007C4C84 /* SignWithFactorSource+View.swift */; };
 		5B45E2FF2BC59780007C4C84 /* SignWithFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E2FD2BC59780007C4C84 /* SignWithFactorSource.swift */; };
 		5B45E3012BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E3002BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift */; };
+		5B6499B72BCFD0E8000F2176 /* SecurityFactors+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */; };
+		5B6499B82BCFD0E8000F2176 /* SecurityFactors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B62BCFD0E8000F2176 /* SecurityFactors.swift */; };
+		5B6499BA2BCFDB1E000F2176 /* ShareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6499B92BCFDB1E000F2176 /* ShareView.swift */; };
 		5B758D4F2BCD5BF700348722 /* Effect+Extra.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D4E2BCD5BF700348722 /* Effect+Extra.swift */; };
 		5B758D532BCD721D00348722 /* SettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D522BCD721D00348722 /* SettingsRow.swift */; };
 		5B758D572BCE7AEC00348722 /* Preferences+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D552BCE7AEC00348722 /* Preferences+View.swift */; };
@@ -2334,6 +2337,9 @@
 		5B45E2FC2BC59780007C4C84 /* SignWithFactorSource+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SignWithFactorSource+View.swift"; sourceTree = "<group>"; };
 		5B45E2FD2BC59780007C4C84 /* SignWithFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignWithFactorSource.swift; sourceTree = "<group>"; };
 		5B45E3002BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceAccess+ViewState.swift"; sourceTree = "<group>"; };
+		5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityFactors+View.swift"; sourceTree = "<group>"; };
+		5B6499B62BCFD0E8000F2176 /* SecurityFactors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityFactors.swift; sourceTree = "<group>"; };
+		5B6499B92BCFDB1E000F2176 /* ShareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareView.swift; sourceTree = "<group>"; };
 		5B758D4E2BCD5BF700348722 /* Effect+Extra.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Effect+Extra.swift"; sourceTree = "<group>"; };
 		5B758D522BCD721D00348722 /* SettingsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsRow.swift; sourceTree = "<group>"; };
 		5B758D552BCE7AEC00348722 /* Preferences+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Preferences+View.swift"; sourceTree = "<group>"; };
@@ -3743,6 +3749,7 @@
 				48CFBDBB2ADC10D800E77A5C /* Settings+Reducer.swift */,
 				48CFBDA92ADC10D800E77A5C /* Settings+View.swift */,
 				5B758D522BCD721D00348722 /* SettingsRow.swift */,
+				5B6499B42BCFD0C7000F2176 /* SecurityFactors */,
 				5B758D542BCE7AD100348722 /* Preferences */,
 				5B758D592BCEC39B00348722 /* Troubleshooting */,
 				48CFBD942ADC10D800E77A5C /* DebugSettings */,
@@ -5724,6 +5731,7 @@
 				48CFC1192ADC10D900E77A5C /* ApprovalSlider.swift */,
 				48CFC11A2ADC10D900E77A5C /* FixedSpacer.swift */,
 				5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */,
+				5B6499B92BCFDB1E000F2176 /* ShareView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -6639,6 +6647,15 @@
 				5B45E3002BC5A491007C4C84 /* FactorSourceAccess+ViewState.swift */,
 			);
 			path = FactorSourceAccess;
+			sourceTree = "<group>";
+		};
+		5B6499B42BCFD0C7000F2176 /* SecurityFactors */ = {
+			isa = PBXGroup;
+			children = (
+				5B6499B52BCFD0E8000F2176 /* SecurityFactors+View.swift */,
+				5B6499B62BCFD0E8000F2176 /* SecurityFactors.swift */,
+			);
+			path = SecurityFactors;
 			sourceTree = "<group>";
 		};
 		5B758D542BCE7AD100348722 /* Preferences */ = {
@@ -8419,6 +8436,8 @@
 				83AAAC6D2B483D1B00222B64 /* StakeSummaryView.swift in Sources */,
 				48CFC3422ADC10D900E77A5C /* AccountPermissionChooseAccounts+Reducer.swift in Sources */,
 				48CFC37F2ADC10D900E77A5C /* PoolUnitsList+View.swift in Sources */,
+				5B6499B72BCFD0E8000F2176 /* SecurityFactors+View.swift in Sources */,
+				5B6499B82BCFD0E8000F2176 /* SecurityFactors.swift in Sources */,
 				48CFC5742ADC10DA00E77A5C /* GatewayAPI+Utils.swift in Sources */,
 				48CFC2432ADC10D900E77A5C /* UpdateAccountLabel+View.swift in Sources */,
 				48CFC3182ADC10D900E77A5C /* CreateAccountCoordinator+Models.swift in Sources */,
@@ -8820,6 +8839,7 @@
 				48CFC2C12ADC10D900E77A5C /* AssetTransfer+Reducer.swift in Sources */,
 				48CFC5A62ADC10DA00E77A5C /* BlueTextButtonStyle.swift in Sources */,
 				48CFC6332ADC10DB00E77A5C /* UnsecuredEntityControl.swift in Sources */,
+				5B6499BA2BCFDB1E000F2176 /* ShareView.swift in Sources */,
 				48CFC4D32ADC10DA00E77A5C /* StreamTransactionsRequest.swift in Sources */,
 				48CFC64D2ADC10DB00E77A5C /* PersonaData+PostalAddress.swift in Sources */,
 				48AF19CE2BB71C1600796130 /* IntoSargon+Bridge.swift in Sources */,

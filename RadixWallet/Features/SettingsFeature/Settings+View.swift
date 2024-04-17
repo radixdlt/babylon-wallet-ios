@@ -178,6 +178,7 @@ private extension View {
 	func destinations(with store: StoreOf<Settings>) -> some View {
 		let destinationStore = store.destination
 		return manageP2PLinks(with: destinationStore)
+			.securityFactors(with: destinationStore)
 			.authorizedDapps(with: destinationStore)
 			.personas(with: destinationStore)
 			.preferences(with: destinationStore)
@@ -193,6 +194,15 @@ private extension View {
 			state: /Settings.Destination.State.manageP2PLinks,
 			action: Settings.Destination.Action.manageP2PLinks,
 			destination: { P2PLinksFeature.View(store: $0) }
+		)
+	}
+
+	private func securityFactors(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /Settings.Destination.State.securityFactors,
+			action: Settings.Destination.Action.securityFactors,
+			destination: { SecurityFactors.View(store: $0) }
 		)
 	}
 

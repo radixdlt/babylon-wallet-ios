@@ -79,17 +79,20 @@ public struct PlainListRowCore: View {
 		public let kind: Kind
 		public let title: String?
 		public let subtitle: String?
+		public let detail: String?
 		public let hint: Hint.ViewState?
 
 		init(
 			kind: Kind = .general,
 			title: String?,
 			subtitle: String? = nil,
+			detail: String? = nil,
 			hint: Hint.ViewState? = nil
 		) {
 			self.kind = kind
 			self.title = title
 			self.subtitle = subtitle
+			self.detail = detail
 			self.hint = hint
 		}
 	}
@@ -112,17 +115,25 @@ public struct PlainListRowCore: View {
 				Text(title)
 					.lineSpacing(-6)
 					.lineLimit(1)
-					.textStyle(viewState.kind.titleTextStyle)
+					.textStyle(viewState.titleTextStyle)
 					.foregroundColor(.app.gray1)
 			}
 
 			if let subtitle = viewState.subtitle {
 				Text(subtitle)
 					.lineSpacing(-4)
-					.lineLimit(viewState.kind.subtitleLineLimit)
+					.lineLimit(viewState.subtitleLineLimit)
 					.minimumScaleFactor(0.8)
-					.textStyle(viewState.kind.subtitleTextStyle)
-					.foregroundColor(viewState.kind.subtitleForegroundColor)
+					.textStyle(viewState.subtitleTextStyle)
+					.foregroundColor(viewState.subtitleForegroundColor)
+			}
+
+			if let detail = viewState.detail {
+				Text(detail)
+					.textStyle(.body2Regular)
+					.lineLimit(1)
+					.minimumScaleFactor(0.8)
+					.foregroundColor(.app.gray2)
 			}
 
 			if let hint = viewState.hint {
@@ -130,7 +141,54 @@ public struct PlainListRowCore: View {
 					.padding(.top, .small3)
 			}
 		}
-		.padding(.vertical, viewState.kind.verticalPadding)
+		.padding(.vertical, viewState.verticalPadding)
+	}
+}
+
+private extension PlainListRowCore.ViewState {
+	var titleTextStyle: TextStyle {
+		switch kind {
+		case .general:
+			.secondaryHeader
+		case .settings:
+			.body1Header
+		}
+	}
+
+	var subtitleTextStyle: TextStyle {
+		switch kind {
+		case .general:
+			.body2Regular
+		case .settings:
+			detail == nil ? .body1Regular : .body2Regular
+		}
+	}
+
+	var subtitleForegroundColor: Color {
+		switch kind {
+		case .general:
+			.app.gray2
+		case .settings:
+			.app.gray1
+		}
+	}
+
+	var subtitleLineLimit: Int {
+		switch kind {
+		case .general:
+			2
+		case .settings:
+			3
+		}
+	}
+
+	var verticalPadding: CGFloat {
+		switch kind {
+		case .general:
+			.zero
+		case .settings:
+			.medium1
+		}
 	}
 }
 
@@ -139,51 +197,6 @@ extension PlainListRowCore.ViewState {
 	public enum Kind {
 		case general
 		case settings
-
-		var titleTextStyle: TextStyle {
-			switch self {
-			case .general:
-				.secondaryHeader
-			case .settings:
-				.body1Header
-			}
-		}
-
-		var subtitleTextStyle: TextStyle {
-			switch self {
-			case .general:
-				.body2Regular
-			case .settings:
-				.body1Regular
-			}
-		}
-
-		var subtitleForegroundColor: Color {
-			switch self {
-			case .general:
-				.app.gray2
-			case .settings:
-				.app.gray1
-			}
-		}
-
-		var subtitleLineLimit: Int {
-			switch self {
-			case .general:
-				2
-			case .settings:
-				3
-			}
-		}
-
-		var verticalPadding: CGFloat {
-			switch self {
-			case .general:
-				.zero
-			case .settings:
-				.medium1
-			}
-		}
 	}
 }
 

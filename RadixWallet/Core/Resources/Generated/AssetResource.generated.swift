@@ -118,6 +118,7 @@ public enum AssetResource {
   public static let qrCodeScanner = ImageAsset(name: "qr-code-scanner")
   public static let recovery = ImageAsset(name: "recovery")
   public static let security = ImageAsset(name: "security")
+  public static let seedPhrases = ImageAsset(name: "seedPhrases")
   public static let tempLinkConnector = ImageAsset(name: "temp-link-connector")
   public static let troubleshooting = ImageAsset(name: "troubleshooting")
   public static let splash = ImageAsset(name: "Splash")
