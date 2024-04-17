@@ -143,16 +143,12 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 			state.destination = nil
 			return .run { send in
 				let result = await TaskResult {
-					try await radixConnectClient.storeP2PLink(connectedClient)
+					try await radixConnectClient.updateOrAddP2PLink(connectedClient)
 				}
 				.map { connectedClient }
 
 				await send(.internal(.saveNewConnectionResult(result)))
 			}
-
-		case .newConnection(.delegate(.dismiss)):
-			state.destination = nil
-			return .none
 
 		case let .removeConnection(.removeTapped(p2pLink)):
 			return .run { send in

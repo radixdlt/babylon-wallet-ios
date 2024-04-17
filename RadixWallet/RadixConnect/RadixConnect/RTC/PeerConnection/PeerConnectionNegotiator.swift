@@ -1,4 +1,3 @@
-import CryptoKit
 import WebRTC
 
 // MARK: - PeerConnectionFactory
@@ -34,6 +33,7 @@ struct PeerConnectionNegotiator {
 	private let factory: PeerConnectionFactory
 
 	init(
+		p2pLink: P2PLink,
 		signalingClient: SignalingClient,
 		factory: PeerConnectionFactory,
 		isOfferer: Bool = false
@@ -45,6 +45,7 @@ struct PeerConnectionNegotiator {
 		self.negotiationResults = negotiationResultsStream.eraseToAnyAsyncSequence().share().eraseToAnyAsyncSequence()
 		self.negotiationResultsContinuation = negotiationResultsContinuation
 		self.negotiationTask = Self.listenForNegotiationTriggers(
+			p2pLink: p2pLink,
 			signalingClient: signalingClient,
 			factory: factory,
 			isOfferer: isOfferer,
@@ -61,6 +62,7 @@ extension PeerConnectionNegotiator {
 	}
 
 	private static func listenForNegotiationTriggers(
+		p2pLink: P2PLink,
 		signalingClient: SignalingClient,
 		factory: PeerConnectionFactory,
 		isOfferer: Bool,
@@ -70,6 +72,7 @@ extension PeerConnectionNegotiator {
 			do {
 				let peerConnection = try await negotiatePeerConnection(
 					trigger,
+					p2pLink: p2pLink,
 					signalingServerClient: signalingClient,
 					factory: factory
 				)
@@ -112,6 +115,7 @@ extension PeerConnectionNegotiator {
 
 	private static func negotiatePeerConnection(
 		_ trigger: NegotiationTrigger,
+		p2pLink: P2PLink,
 		signalingServerClient: SignalingClient,
 		factory: PeerConnectionFactory
 	) async throws -> PeerConnectionClient {
@@ -190,14 +194,22 @@ extension PeerConnectionNegotiator {
 		_ = try await onConnectionEstablished.collect()
 		_ = try await onDataChannelReady.collect()
 
-        // TODO: - fix
-		let response = P2P.ConnectorExtension.Request.LinkClientInteractionResponse(
-			discriminator: .linkClient,
-			publicKey: try! HexCodable32Bytes(hex: "2c62b69a34f51fdcef3ee912c8e1ce12b734ad069e8e254b6ed0f4e9a75a781c") // HexCodable32Bytes(data: Curve25519.PrivateKey().publicKey.compressedRepresentation)
-		)
+		@Dependency(\.p2pLinksClient) var p2pLinkClient
 		@Dependency(\.jsonEncoder) var jsonEncoder
-		try await peerConnectionClient.sendData(jsonEncoder().encode(response))
+
+		let (privateKey, isNewPrivateKey) = try await p2pLinkClient.getP2PLinkPrivateKey(p2pLink.publicKey)
+		let hashedMessageToSign = p2pLink.connectionPassword.messageToHash.hash().data
+		let linkClientInteractionResponse = try P2P.ConnectorExtension.Request.LinkClientInteractionResponse(
+			discriminator: .linkClient,
+			publicKey: HexCodable32Bytes(data: privateKey.publicKey.compressedRepresentation),
+			signature: HexCodable(data: privateKey.signature(for: hashedMessageToSign))
+		)
+		try await peerConnectionClient.sendData(jsonEncoder().encode(linkClientInteractionResponse))
 		log("Sent LinkClientInteractionResponse")
+
+		if isNewPrivateKey {
+			try await p2pLinkClient.storeP2PLinkPrivateKey(p2pLink.publicKey, privateKey)
+		}
 
 		log("Connection established")
 		iceExchangeTask.cancel()

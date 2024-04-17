@@ -28,7 +28,7 @@ extension RadixConnectClient {
 		let connectToP2PLinks: ConnectToP2PLinks = { links in
 			for client in links {
 				try await rtcClients.connect(
-					client.connectionPassword
+					client
 				)
 			}
 		}
@@ -64,16 +64,18 @@ extension RadixConnectClient {
 					return connectedClient.idsOfConnectedPeerConnections
 				}
 			},
-			storeP2PLink: { client in
-				try await p2pLinksClient.addP2PLink(client)
+			updateOrAddP2PLink: { client in
+				if let oldLink = try await p2pLinksClient.updateOrAddP2PLink(client) {
+					await rtcClients.disconnectAndRemoveClient(oldLink.connectionPassword)
+				}
 			},
 			deleteP2PLinkByPassword: { password in
 				loggerGlobal.info("Deleting P2P Connection")
 				try await p2pLinksClient.deleteP2PLinkByPassword(password)
 				await rtcClients.disconnectAndRemoveClient(password)
 			},
-			addP2PWithPassword: { password in
-				try await rtcClients.connect(password, waitsForConnectionToBeEstablished: true)
+			connectP2PLink: { p2pLink in
+				try await rtcClients.connect(p2pLink, waitsForConnectionToBeEstablished: true)
 			},
 			receiveMessages: { await rtcClients.incomingMessages() },
 			sendResponse: { response, route in

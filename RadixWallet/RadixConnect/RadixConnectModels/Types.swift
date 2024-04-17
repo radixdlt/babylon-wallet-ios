@@ -13,43 +13,56 @@ extension PeerConnectionID: Sendable {}
 public enum ConnectionPasswordTag {}
 public typealias ConnectionPassword = Tagged<ConnectionPasswordTag, HexCodable32Bytes>
 
+extension ConnectionPassword {
+	var messageToHash: Data {
+		let prefix = Data("L".utf8)
+		let passwordData = self.data.data
+		var messageData = Data()
+		messageData.append(prefix)
+		messageData.append(passwordData)
+
+		return Data(messageData)
+	}
+}
+
 #if DEBUG
 extension ConnectionPassword {
 	public static let placeholder = try! Self(.init(.deadbeef32Bytes))
 }
 #endif // DEBUG
 
-// MARK: - ConnectionPublicKeyTag
-public enum ConnectionPublicKeyTag {}
-public typealias ConnectionPublicKey = Tagged<ConnectionPublicKeyTag, HexCodable32Bytes>
+// MARK: - CEPublicKeyTag
+public enum CEPublicKeyTag {}
+public typealias CEPublicKey = Tagged<CEPublicKeyTag, HexCodable32Bytes>
 
 #if DEBUG
-extension ConnectionPublicKey {
+extension CEPublicKey {
 	public static let placeholder = try! Self(.init(.deadbeef32Bytes))
 }
 #endif // DEBUG
 
+// MARK: - CESignatureTag
+public enum CESignatureTag {}
+public typealias CESignature = Tagged<CESignatureTag, HexCodable>
+
 // MARK: - LinkConnectionQRData
 public struct LinkConnectionQRData: Sendable, Hashable, Decodable {
-	public var purpose: ConnectionPurpose
-
+	public let purpose: ConnectionPurpose
 	public let password: ConnectionPassword
-
-	public let publicKey: ConnectionPublicKey
-
-	public let signature: HexCodable
+	public let publicKey: CEPublicKey
+	public let signature: CESignature
 }
 
-#if DEBUG
 extension LinkConnectionQRData {
-	public static let placeholder = Self(
-		purpose: .general,
-		password: .placeholder,
-		publicKey: .placeholder,
-		signature: HexCodable(data: Data())
-	)
+	public func hasValidSignature() throws -> Bool {
+		let signature = try SignatureWithPublicKey.eddsaEd25519(
+			signature: signature.data,
+			publicKey: .init(rawRepresentation: publicKey.data.data)
+		)
+
+		return signature.isValidSignature(for: password.messageToHash.hash().data)
+	}
 }
-#endif
 
 // MARK: - ConnectionPurpose
 public enum ConnectionPurpose: String, Sendable, Codable, UnknownCaseDecodable {

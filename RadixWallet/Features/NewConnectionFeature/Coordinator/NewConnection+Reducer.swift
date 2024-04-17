@@ -38,14 +38,13 @@ public struct NewConnection: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case dismiss
 		case newConnection(P2PLink)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case linkConnectionDataFromStringResult(TaskResult<LinkConnectionQRData>)
 		case establishConnection(String)
-		case establishConnectionResult(TaskResult<LinkConnectionQRData>)
+		case establishConnectionResult(TaskResult<P2PLink>)
 		case approveConnection(NewConnectionApproval.State.Purpose)
 		case showErrorAlert(AlertState<Destination.Action.ErrorAlert>)
 	}
@@ -101,26 +100,33 @@ public struct NewConnection: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .closeButtonTapped:
-			.send(.delegate(.dismiss))
+			.run { _ in
+				await dismiss()
+			}
 		}
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .linkConnectionDataFromStringResult(.success(data)):
-			state.linkConnectionQRData = data
+		case let .linkConnectionDataFromStringResult(.success(linkConnectionQRData)):
+			state.linkConnectionQRData = linkConnectionQRData
 
 			return .run { send in
+				guard try linkConnectionQRData.hasValidSignature() else {
+					await send(.internal(.showErrorAlert(.invalidQRCode)))
+					return
+				}
+
 				let p2pLinks = await p2pLinksClient.getP2PLinks()
 
-				if let p2pLink = p2pLinks.first(where: { $0.publicKey == data.publicKey }) {
-					if p2pLink.purpose == data.purpose {
+				if let p2pLink = p2pLinks.first(where: { $0.publicKey == linkConnectionQRData.publicKey }) {
+					if p2pLink.purpose == linkConnectionQRData.purpose {
 						await send(.internal(.approveConnection(.approveExisitingConnection(p2pLink.displayName))))
 					} else {
 						await send(.internal(.showErrorAlert(.changingPurposeNotSupported)))
 					}
 				} else {
-					switch data.purpose {
+					switch linkConnectionQRData.purpose {
 					case .general:
 						await send(.internal(.approveConnection(.approveNewConnection)))
 					case .unknown:
@@ -139,18 +145,6 @@ public struct NewConnection: Sendable, FeatureReducer {
 			state.connectionName = connectionName
 			updateConnectingState(for: &state, isConnecting: true)
 
-			return .run { send in
-				await send(.internal(.establishConnectionResult(
-					TaskResult {
-						try await radixConnectClient.addP2PWithPassword(linkConnectionQRData.password)
-						return linkConnectionQRData
-					}
-				)))
-			}
-
-		case let .establishConnectionResult(.success(linkConnectionQRData)):
-			guard let connectionName = state.connectionName else { return .none }
-
 			let p2pLink = P2PLink(
 				connectionPassword: linkConnectionQRData.password,
 				publicKey: linkConnectionQRData.publicKey,
@@ -158,6 +152,17 @@ public struct NewConnection: Sendable, FeatureReducer {
 				displayName: connectionName
 			)
 
+			return .run { send in
+				await send(.internal(.establishConnectionResult(
+					TaskResult {
+						try await radixConnectClient.connectP2PLink(p2pLink)
+						return p2pLink
+					}
+				)))
+			}
+
+		case let .establishConnectionResult(.success(p2pLink)):
+			updateConnectingState(for: &state, isConnecting: false)
 			return .send(.delegate(.newConnection(p2pLink)))
 
 		case let .establishConnectionResult(.failure(error)):
@@ -183,7 +188,9 @@ public struct NewConnection: Sendable, FeatureReducer {
 				state.root = .scanQR(.init(scanInstructions: string))
 				return .none
 			} else {
-				return .send(.delegate(.dismiss))
+				return .run { _ in
+					await dismiss()
+				}
 			}
 
 		case let .scanQR(.delegate(.scanned(qrString))):
@@ -237,27 +244,41 @@ public struct NewConnection: Sendable, FeatureReducer {
 }
 
 extension AlertState<NewConnection.Destination.Action.ErrorAlert> {
+    typealias S = L10n.LinkedConnectors
+    
 	public static var unknownPurpose: AlertState {
 		AlertState {
-			TextState("Link Failed")
+            TextState(S.linkFailedErrorTitle)
 		} actions: {
 			ButtonState(role: .cancel, action: .dismissTapped) {
-				TextState("Dismiss")
+                TextState(L10n.Common.dismiss)
 			}
 		} message: {
-			TextState("This type of Connector link is not supported.")
+            TextState(S.unknownPurposeErrorMessage)
 		}
 	}
 
 	public static var changingPurposeNotSupported: AlertState {
 		AlertState {
-			TextState("Link Failed")
+			TextState(S.linkFailedErrorTitle)
 		} actions: {
 			ButtonState(role: .cancel, action: .dismissTapped) {
-				TextState("Dismiss")
+				TextState(L10n.Common.dismiss)
 			}
 		} message: {
-			TextState("Changing a Connector’s type is not supported.")
+            TextState(S.changingPurposeNotSupportedErrorMessage)
+		}
+	}
+
+	public static var invalidQRCode: AlertState {
+		AlertState {
+            TextState(L10n.LinkedConnectors.incorrectQrTitle)
+		} actions: {
+			ButtonState(role: .cancel, action: .dismissTapped) {
+                TextState(L10n.Common.dismiss)
+			}
+		} message: {
+            TextState(L10n.LinkedConnectors.incorrectQrMessage)
 		}
 	}
 }

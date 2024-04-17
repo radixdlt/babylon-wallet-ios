@@ -877,6 +877,8 @@ public enum L10n {
     public static let copy = L10n.tr("Localizable", "common_copy", fallback: "Copy")
     /// Connected to a test network, not Radix main network.
     public static let developerDisclaimerText = L10n.tr("Localizable", "common_developerDisclaimerText", fallback: "Connected to a test network, not Radix main network.")
+    /// Dismiss
+    public static let dismiss = L10n.tr("Localizable", "common_dismiss", fallback: "Dismiss")
     /// Done
     public static let done = L10n.tr("Localizable", "common_done", fallback: "Done")
     /// An Error Occurred
@@ -1921,6 +1923,8 @@ public enum L10n {
     }
   }
   public enum LinkedConnectors {
+    /// Changing a Connector’s type is not supported.
+    public static let changingPurposeNotSupportedErrorMessage = L10n.tr("Localizable", "linkedConnectors_changingPurposeNotSupportedErrorMessage", fallback: "Changing a Connector’s type is not supported.")
     /// Please scan the QR code provided by your Radix Wallet Connector browser extension.
     public static let incorrectQrMessage = L10n.tr("Localizable", "linkedConnectors_incorrectQrMessage", fallback: "Please scan the QR code provided by your Radix Wallet Connector browser extension.")
     /// Incorrect QR code scanned.
@@ -1929,12 +1933,16 @@ public enum L10n {
     public static func lastConnected(_ p1: Any) -> String {
       return L10n.tr("Localizable", "linkedConnectors_lastConnected", String(describing: p1), fallback: "Last connected %@")
     }
+    /// Link Failed
+    public static let linkFailedErrorTitle = L10n.tr("Localizable", "linkedConnectors_linkFailedErrorTitle", fallback: "Link Failed")
     /// Link New Connector
     public static let linkNewConnector = L10n.tr("Localizable", "linkedConnectors_linkNewConnector", fallback: "Link New Connector")
     /// Connect your Radix Wallet to desktop web browsers by linking to the Radix Connector browser extension. Here are your linked Connectors.
     public static let subtitle = L10n.tr("Localizable", "linkedConnectors_subtitle", fallback: "Connect your Radix Wallet to desktop web browsers by linking to the Radix Connector browser extension. Here are your linked Connectors.")
     /// Linked Connectors
     public static let title = L10n.tr("Localizable", "linkedConnectors_title", fallback: "Linked Connectors")
+    /// This type of Connector link is not supported.
+    public static let unknownPurposeErrorMessage = L10n.tr("Localizable", "linkedConnectors_unknownPurposeErrorMessage", fallback: "This type of Connector link is not supported.")
     public enum ApproveExistingConnector {
       /// This appears to be a Radix Connector you previously linked to. Link will be updated.
       public static let message = L10n.tr("Localizable", "linkedConnectors_approveExistingConnector_message", fallback: "This appears to be a Radix Connector you previously linked to. Link will be updated.")

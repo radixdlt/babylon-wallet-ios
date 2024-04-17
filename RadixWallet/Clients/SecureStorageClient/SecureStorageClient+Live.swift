@@ -369,6 +369,66 @@ extension SecureStorageClient: DependencyKey {
 			try? keychainClient.removeData(forKey: deviceIdentifierKey)
 		}
 
+		@Sendable func loadP2PLinks() throws -> P2PLinks? {
+			let loaded = try keychainClient
+				.getDataWithoutAuth(forKey: p2pLinksKey)
+				.map {
+					try jsonDecoder().decode(P2PLinks.self, from: $0)
+				}
+
+			if let loaded {
+				loggerGlobal.trace("Loaded loadP2PLinks: \(loaded)")
+			} else {
+				loggerGlobal.info("No loadP2PLinks loaded, was nil.")
+			}
+			return loaded
+		}
+
+		let p2pLinksAttributes = KeychainClient.AttributesWithoutAuth(
+			iCloudSyncEnabled: false,
+			accessibility: .whenUnlocked,
+			label: importantKeychainIdentifier("Radix Wallet P2P Links"),
+			comment: "Contains linked connector extensions"
+		)
+
+		@Sendable func saveP2PLinks(_ p2pLinks: P2PLinks) throws {
+			let data = try jsonEncoder().encode(p2pLinks)
+			try keychainClient.setDataWithoutAuth(
+				data,
+				forKey: p2pLinksKey,
+				attributes: p2pLinksAttributes
+			)
+			loggerGlobal.notice("Saved p2pLinks: \(p2pLinks)")
+		}
+
+		@Sendable func loadP2PLinkPrivateKey(_ publicKey: CEPublicKey) throws -> Curve25519.PrivateKey? {
+			try keychainClient
+				.getDataWithoutAuth(forKey: key(publicKey: publicKey))
+				.map {
+					try Curve25519.PrivateKey(rawRepresentation: $0)
+				}
+		}
+
+		let p2pLinkPrivateKeyAttributes = KeychainClient.AttributesWithoutAuth(
+			iCloudSyncEnabled: false,
+			accessibility: .whenUnlocked,
+			label: importantKeychainIdentifier("Radix Wallet Private Key Per P2P link"),
+			comment: "Contains a wallet private key for a specific P2P link"
+		)
+
+		@Sendable func saveP2PLinkPrivateKey(_ publicKey: CEPublicKey, privateKey: Curve25519.PrivateKey) throws {
+			try keychainClient.setDataWithoutAuth(
+				privateKey.rawRepresentation,
+				forKey: key(publicKey: publicKey),
+				attributes: p2pLinkPrivateKeyAttributes
+			)
+			loggerGlobal.notice("Saved private key for CE public key: \(publicKey)")
+		}
+        
+        @Sendable func deleteP2PLinkPrivateKey(_ publicKey: CEPublicKey) throws {
+            try keychainClient.removeData(forKey: key(publicKey: publicKey))
+        }
+
 		#if DEBUG
 		return Self(
 			saveProfileSnapshot: saveProfileSnapshot,
@@ -388,6 +448,11 @@ extension SecureStorageClient: DependencyKey {
 			saveDeviceInfo: saveDeviceInfo,
 			deprecatedLoadDeviceID: deprecatedLoadDeviceID,
 			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID,
+			loadP2PLinks: loadP2PLinks,
+			saveP2PLinks: saveP2PLinks,
+			loadP2PLinkPrivateKey: loadP2PLinkPrivateKey,
+			saveP2PLinkPrivateKey: saveP2PLinkPrivateKey,
+            deleteP2PLinkPrivateKey: deleteP2PLinkPrivateKey,
 			getAllMnemonics: getAllMnemonics
 		)
 		#else
@@ -408,7 +473,12 @@ extension SecureStorageClient: DependencyKey {
 			loadDeviceInfo: loadDeviceInfo,
 			saveDeviceInfo: saveDeviceInfo,
 			deprecatedLoadDeviceID: deprecatedLoadDeviceID,
-			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID
+			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID,
+			loadP2PLinks: loadP2PLinks,
+			saveP2PLinks: saveP2PLinks,
+			loadP2PLinkPrivateKey: loadP2PLinkPrivateKey,
+            saveP2PLinkPrivateKey: saveP2PLinkPrivateKey, 
+            deleteP2PLinkPrivateKey: deleteP2PLinkPrivateKey
 		)
 		#endif
 	}()
@@ -418,6 +488,7 @@ let profileHeaderListKeychainKey: KeychainClient.Key = "profileHeaderList"
 @available(*, deprecated, renamed: "deviceInfoKey", message: "Migrate to use `deviceInfoKey` instead")
 private let deviceIdentifierKey: KeychainClient.Key = "deviceIdentifier"
 private let deviceInfoKey: KeychainClient.Key = "deviceInfo"
+private let p2pLinksKey: KeychainClient.Key = "p2pLinks"
 
 extension ProfileSnapshot.Header.ID {
 	private static let profileSnapshotKeychainKeyPrefix = "profileSnapshot"
@@ -429,6 +500,10 @@ extension ProfileSnapshot.Header.ID {
 
 private func key(factorSourceID: FactorSourceID.FromHash) -> KeychainClient.Key {
 	.init(rawValue: .init(rawValue: factorSourceID.keychainKey)!)
+}
+
+private func key(publicKey: CEPublicKey) -> KeychainClient.Key {
+	.init(rawValue: .init(rawValue: publicKey.data.hex())!)
 }
 
 extension OverlayWindowClient.Item.AlertState {

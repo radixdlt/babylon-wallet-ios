@@ -27,6 +27,11 @@ extension SecureStorageClient: TestDependencyKey {
 		saveDeviceInfo: { _ in },
 		deprecatedLoadDeviceID: { nil },
 		deleteDeprecatedDeviceID: {},
+		loadP2PLinks: { nil },
+		saveP2PLinks: { _ in },
+		loadP2PLinkPrivateKey: { _ in nil },
+		saveP2PLinkPrivateKey: { _, _ in },
+        deleteP2PLinkPrivateKey: { _ in },
 		getAllMnemonics: { [] }
 	)
 	#else
@@ -47,7 +52,12 @@ extension SecureStorageClient: TestDependencyKey {
 		loadDeviceInfo: { nil },
 		saveDeviceInfo: { _ in },
 		deprecatedLoadDeviceID: { nil },
-		deleteDeprecatedDeviceID: {}
+		deleteDeprecatedDeviceID: {},
+		loadP2PLinks: { nil },
+		saveP2PLinks: { _ in },
+		loadP2PLinkPrivateKey: { _ in nil },
+		saveP2PLinkPrivateKey: { _, _ in },
+        deleteP2PLinkPrivateKey: { _ in }
 	)
 	#endif // DEBUG
 
@@ -72,6 +82,11 @@ extension SecureStorageClient: TestDependencyKey {
 		saveDeviceInfo: unimplemented("\(Self.self).saveDeviceInfo"),
 		deprecatedLoadDeviceID: unimplemented("\(Self.self).deprecatedLoadDeviceID"),
 		deleteDeprecatedDeviceID: unimplemented("\(Self.self).deleteDeprecatedDeviceID"),
+		loadP2PLinks: unimplemented("\(Self.self).loadP2PLinks"),
+		saveP2PLinks: unimplemented("\(Self.self).saveP2PLinks"),
+		loadP2PLinkPrivateKey: unimplemented("\(Self.self).loadP2PLinkPrivateKey"),
+		saveP2PLinkPrivateKey: unimplemented("\(Self.self).saveP2PLinkPrivateKey"),
+        deleteP2PLinkPrivateKey: unimplemented("\(Self.self).deleteP2PLinkPrivateKey"),
 		getAllMnemonics: unimplemented("\(Self.self).getAllMnemonics")
 	)
 	#else
@@ -92,7 +107,12 @@ extension SecureStorageClient: TestDependencyKey {
 		loadDeviceInfo: unimplemented("\(Self.self).loadDeviceInfo"),
 		saveDeviceInfo: unimplemented("\(Self.self).saveDeviceInfo"),
 		deprecatedLoadDeviceID: unimplemented("\(Self.self).deprecatedLoadDeviceID"),
-		deleteDeprecatedDeviceID: unimplemented("\(Self.self).deleteDeprecatedDeviceID")
+		deleteDeprecatedDeviceID: unimplemented("\(Self.self).deleteDeprecatedDeviceID"),
+		loadP2PLinks: unimplemented("\(Self.self).loadP2PLinks"),
+		saveP2PLinks: unimplemented("\(Self.self).saveP2PLinks"),
+		loadP2PLinkPrivateKey: unimplemented("\(Self.self).loadP2PLinkPrivateKey"),
+		saveP2PLinkPrivateKey: unimplemented("\(Self.self).saveP2PLinkPrivateKey"),
+        deleteP2PLinkPrivateKey: unimplemented("\(Self.self).deleteP2PLinkPrivateKey")
 	)
 	#endif
 }

@@ -10,26 +10,26 @@ public struct P2PLink:
 	Codable,
 	Identifiable
 {
-	public var id: ConnectionPublicKey {
+	public var id: CEPublicKey {
 		publicKey
 	}
 
-	/// The most important property of this struct, the `ConnectionPassword`,
-	/// is used to be able to restablish the P2P connection and also acts as the seed
-	/// for the `ID`.
+	/// The `ConnectionPassword` is used to be able to restablish the P2P connection.
 	public let connectionPassword: ConnectionPassword
 
-	public let publicKey: ConnectionPublicKey
+    /// Acts as the seed for the `ID`.
+	public let publicKey: CEPublicKey
 
+    /// Link purpose
 	public let purpose: ConnectionPurpose
 
 	/// Client name, e.g. "Chrome on Macbook" or "My work Android" or "My wifes iPhone SE".
 	public let displayName: String
 
-	/// The canonical initializer requiring a `ConnectionPassword` and `Display` name.
+	/// The canonical initializer requiring a `ConnectionPassword`, `CEPublicKey`, `ConnectionPurpose` and `Display` name.
 	public init(
 		connectionPassword: ConnectionPassword,
-		publicKey: ConnectionPublicKey,
+		publicKey: CEPublicKey,
 		purpose: ConnectionPurpose,
 		displayName: String
 	) {
