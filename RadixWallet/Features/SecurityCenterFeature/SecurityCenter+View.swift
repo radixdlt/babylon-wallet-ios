@@ -44,10 +44,7 @@ extension SecurityCenter {
 		var body: some SwiftUI.View {
 			VStack(spacing: 0) {
 				HStack(spacing: 0) {
-					Image(.warningError)
-						.renderingMode(.template)
-						.resizable()
-						.frame(.smallest)
+					headingIcon
 						.padding(.horizontal, .small2)
 
 					Text(heading)
@@ -80,9 +77,18 @@ extension SecurityCenter {
 			.roundedCorners(radius: .small1)
 		}
 
-//		private var headingIcon: Image {
-//
-//		}
+		@ViewBuilder
+		private var headingIcon: some SwiftUI.View {
+			switch status {
+			case .good:
+				Image(.security)
+			case .bad:
+				Image(.warningError)
+					.renderingMode(.template)
+					.resizable()
+					.frame(.smallest)
+			}
+		}
 
 		private var heading: String {
 			switch status {
