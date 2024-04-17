@@ -44,6 +44,7 @@ extension SecurityCenter {
 			}
 			.navigationBarTitleDisplayMode(.large)
 			.navigationTitle(L10n.SecurityCenter.title)
+			.destinations(with: store)
 		}
 	}
 }
@@ -215,5 +216,31 @@ extension SecurityCenter {
 				}
 			}
 		}
+	}
+}
+
+private extension StoreOf<SecurityCenter> {
+	var destination: PresentationStoreOf<SecurityCenter.Destination> {
+		func scopeState(state: State) -> PresentationState<SecurityCenter.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<SecurityCenter>) -> some View {
+		let destinationStore = store.destination
+		return configurationBackup(with: destinationStore)
+	}
+
+	private func configurationBackup(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /SecurityCenter.Destination.State.configurationBackup,
+			action: SecurityCenter.Destination.Action.configurationBackup,
+			destination: { ConfigurationBackup.View(store: $0) }
+		)
 	}
 }
