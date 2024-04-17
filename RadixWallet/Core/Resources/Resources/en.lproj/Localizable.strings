@@ -1038,6 +1038,7 @@ If you have any “Legacy” Accounts (created on the Olympia network) to import
 "survey_reason_heading" = "What’s the main reason for your score?";
 "survey_reason_fieldHint" = "Let us know...";
 "survey_submitButton" = "Submit Feedback - Thanks!";
+<<<<<<< HEAD
 "factorSourceActions_signature_title" = "Signature Request";
 "factorSourceActions_createAccount_title" = "Creating Account";
 "factorSourceActions_createPersona_title" = "Creating Persona";
@@ -1080,3 +1081,4 @@ If you have any “Legacy” Accounts (created on the Olympia network) to import
 "preferences_gateways" = "Network Gateways";
 "preferences_developerMode_title" = "Developer Mode";
 "preferences_developerMode_subtitle" = "Warning: disables website validity checks";
+
