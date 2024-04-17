@@ -24,7 +24,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 
 			var factorSourceAccessPurpose: FactorSourceAccess.State.Purpose {
 				switch self {
-				case .createNewEntity(.accounts): // CYON Migration FIX typo in Sargon
+				case .createNewEntity(.account):
 					.createAccount
 				case .createNewEntity(.persona):
 					.createPersona
@@ -113,9 +113,8 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Hashable {
-		case delayedStart
+		case start
 		case loadedDeviceFactorSource(DeviceFactorSource)
-
 		case deriveWithDeviceFactor(DerivationPath, NetworkID, PublicKeysFromOnDeviceHDRequest.Source)
 		case deriveWithLedgerFactor(LedgerHardwareWalletFactorSource, DerivationPath, NetworkID)
 	}
@@ -152,7 +151,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case .delayedStart:
+		case .start:
 			switch state.factorSourceOption {
 			case .device:
 				return .run { send in
@@ -214,12 +213,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .factorSourceAccess(.delegate(.perform)):
-			.run { send in
-				/// For more information about that `sleep` please  check [this discussion in Slack](https://rdxworks.slack.com/archives/C03QFAWBRNX/p1687967412207119?thread_ts=1687964494.772899&cid=C03QFAWBRNX)
-				@Dependency(\.continuousClock) var clock
-				try? await clock.sleep(for: .milliseconds(700))
-				await send(.internal(.delayedStart))
-			}
+			.send(.internal(.start))
 		case .factorSourceAccess(.delegate(.cancel)):
 			.send(.delegate(.cancel))
 		default:

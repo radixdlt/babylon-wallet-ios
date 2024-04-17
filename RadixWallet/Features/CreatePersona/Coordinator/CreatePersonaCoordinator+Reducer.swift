@@ -70,15 +70,15 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 
 	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
-			case derivePublicKeys(DerivePublicKeys.State)
+			case derivePublicKey(DerivePublicKeys.State)
 		}
 
 		public enum Action: Sendable, Hashable {
-			case derivePublicKeys(DerivePublicKeys.Action)
+			case derivePublicKey(DerivePublicKeys.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.derivePublicKeys, action: /Action.derivePublicKeys) {
+			Scope(state: /State.derivePublicKey, action: /Action.derivePublicKey) {
 				DerivePublicKeys()
 			}
 		}
@@ -99,8 +99,8 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case derivePublicKeys
-		case createPersonaResult(TaskResult<Persona>)
+		case derivePublicKey
+		case createPersonaResult(TaskResult<Sargon.Persona>)
 		case handleFailure
 	}
 
@@ -150,13 +150,90 @@ extension CreatePersonaCoordinator {
 			state.name = name
 			state.fields = fields
 
-			return .send(.internal(.derivePublicKeys))
+			return .send(.internal(.derivePublicKey))
 
 		case .path(.element(_, action: .step2_completion(.delegate(.completed)))):
 			return .run { send in
 				await send(.delegate(.completed))
 				await dismiss()
 			}
+
+		default:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case .derivePublicKey:
+			state.destination = .derivePublicKey(
+				.init(
+					derivationPathOption: .next(
+						networkOption: .useCurrent,
+						entityKind: .identity,
+						curve: .curve25519,
+						scheme: .cap26
+					),
+					factorSourceOption: .device,
+					purpose: .createNewEntity(kind: .identity)
+				)
+			)
+			return .none
+
+		case let .createPersonaResult(.success(persona)):
+			state.destination = nil
+			state.path.append(.step2_completion(.init(
+				persona: persona,
+				config: state.config
+			)))
+			return .none
+
+		case let .createPersonaResult(.failure(error)):
+			errorQueue.schedule(error)
+			state.destination = nil
+			return .none
+
+		case .handleFailure:
+			state.destination = nil
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .derivePublicKey(.delegate(.derivedPublicKeys(hdKeys, factorSourceID, networkID))):
+			guard let hdKey = hdKeys.first else {
+				loggerGlobal.error("Failed to create persona expected one single key, got: \(hdKeys.count)")
+				return .send(.internal(.handleFailure))
+			}
+			guard let name = state.name, let personaData = state.fields else {
+				fatalError("Derived public keys without persona name or extra fields set")
+			}
+			return .run { send in
+				let persona = try Profile.Network.Persona(
+					networkID: networkID,
+					factorInstance: .init(
+						factorSourceID: factorSourceID,
+						publicKey: hdKey.publicKey,
+						derivationPath: hdKey.derivationPath
+					),
+					displayName: name,
+					extraProperties: .init(personaData: personaData)
+				)
+
+				await send(.internal(.createPersonaResult(
+					TaskResult {
+						try await personasClient.saveVirtualPersona(persona)
+						return persona
+					}
+				)))
+			} catch: { error, send in
+				loggerGlobal.error("Failed to create persona, error: \(error)")
+				await send(.internal(.handleFailure))
+			}
+
+		case .derivePublicKey(.delegate(.failedToDerivePublicKey)):
+			return .send(.internal(.handleFailure))
 
 		default:
 			return .none
