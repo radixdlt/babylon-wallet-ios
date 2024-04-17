@@ -2409,6 +2409,42 @@ public enum L10n {
       /// Encrypt Wallet Backup File
       public static let title = L10n.tr("Localizable", "securityCenter_encryptWalletBackup_title", fallback: "Encrypt Wallet Backup File")
     }
+    public enum GoodState {
+      /// Your wallet is recoverable
+      public static let heading = L10n.tr("Localizable", "securityCenter_goodState_heading", fallback: "Your wallet is recoverable")
+    }
+    public enum Problem3 {
+      /// %d Account(s) and %d Persona(s) are/is not recoverable
+      public static func heading(_ p1: Int, _ p2: Int) -> String {
+        return L10n.tr("Localizable", "securityCenter_problem3_heading", p1, p2, fallback: "%d Account(s) and %d Persona(s) are/is not recoverable")
+      }
+      /// View and write down your seed phrase so Accounts and Personas are recoverable
+      public static let text = L10n.tr("Localizable", "securityCenter_problem3_text", fallback: "View and write down your seed phrase so Accounts and Personas are recoverable")
+    }
+    public enum Problem5 {
+      /// Your wallet is not recoverable
+      public static let heading = L10n.tr("Localizable", "securityCenter_problem5_heading", fallback: "Your wallet is not recoverable")
+      /// Automated Configuration Backup has stopped working. Check internet and cloud settings.
+      public static let text = L10n.tr("Localizable", "securityCenter_problem5_text", fallback: "Automated Configuration Backup has stopped working. Check internet and cloud settings.")
+    }
+    public enum Problem6 {
+      /// Your wallet is not recoverable
+      public static let heading = L10n.tr("Localizable", "securityCenter_problem6_heading", fallback: "Your wallet is not recoverable")
+      /// Configuration Backup is not up to date. Create backup now.
+      public static let text = L10n.tr("Localizable", "securityCenter_problem6_text", fallback: "Configuration Backup is not up to date. Create backup now.")
+    }
+    public enum Problem7 {
+      /// Your wallet is not recoverable
+      public static let heading = L10n.tr("Localizable", "securityCenter_problem7_heading", fallback: "Your wallet is not recoverable")
+      /// Accounts and Personas not recoverable. Create Configuration Backup now.
+      public static let text = L10n.tr("Localizable", "securityCenter_problem7_text", fallback: "Accounts and Personas not recoverable. Create Configuration Backup now.")
+    }
+    public enum Problem9 {
+      /// Recovery required
+      public static let heading = L10n.tr("Localizable", "securityCenter_problem9_heading", fallback: "Recovery required")
+      /// Enter seed phrase to begin recovery.
+      public static let text = L10n.tr("Localizable", "securityCenter_problem9_text", fallback: "Enter seed phrase to begin recovery.")
+    }
     public enum SecurityFactorsItem {
       /// Active
       public static let activeStatus = L10n.tr("Localizable", "securityCenter_securityFactorsItem_activeStatus", fallback: "Active")
