@@ -2453,30 +2453,6 @@ public enum L10n {
       /// Security Factors
       public static let title = L10n.tr("Localizable", "securityCenter_securityFactorsItem_title", fallback: "Security Factors")
     }
-    public enum Status {
-      /// %d Account(s) and %d Persona(s) are/is not recoverable
-      public static func entitiesNotRecoverable(_ p1: Int, _ p2: Int) -> String {
-        return L10n.tr("Localizable", "securityCenter_status_entitiesNotRecoverable", p1, p2, fallback: "%d Account(s) and %d Persona(s) are/is not recoverable")
-      }
-      /// Your wallet is not recoverable
-      public static let notRecoverable = L10n.tr("Localizable", "securityCenter_status_notRecoverable", fallback: "Your wallet is not recoverable")
-      /// Your wallet is recoverable
-      public static let recoverable = L10n.tr("Localizable", "securityCenter_status_recoverable", fallback: "Your wallet is recoverable")
-      /// Recovery required
-      public static let recoveryRequired = L10n.tr("Localizable", "securityCenter_status_recoveryRequired", fallback: "Recovery required")
-    }
-    public enum SubStatus {
-      /// View and write down your seed phrase so Accounts and Personas are recoverable
-      public static let problem3 = L10n.tr("Localizable", "securityCenter_subStatus_problem3", fallback: "View and write down your seed phrase so Accounts and Personas are recoverable")
-      /// Automated Configuration Backup has stopped working. Check internet and cloud settings.
-      public static let problem5 = L10n.tr("Localizable", "securityCenter_subStatus_problem5", fallback: "Automated Configuration Backup has stopped working. Check internet and cloud settings.")
-      /// Configuration Backup is not up to date. Create backup now.
-      public static let problem6 = L10n.tr("Localizable", "securityCenter_subStatus_problem6", fallback: "Configuration Backup is not up to date. Create backup now.")
-      /// Accounts and Personas not recoverable. Create Configuration Backup now.
-      public static let problem7 = L10n.tr("Localizable", "securityCenter_subStatus_problem7", fallback: "Accounts and Personas not recoverable. Create Configuration Backup now.")
-      /// Enter seed phrase to begin recovery
-      public static let problem9 = L10n.tr("Localizable", "securityCenter_subStatus_problem9", fallback: "Enter seed phrase to begin recovery")
-    }
   }
   public enum SecurityFactors {
     /// View and manage your security factors
