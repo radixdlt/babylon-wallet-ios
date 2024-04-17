@@ -45,7 +45,7 @@ extension SecurityCenter {
 			VStack(spacing: 0) {
 				HStack(spacing: 0) {
 					headingIcon
-						.padding(.horizontal, .small2)
+						.padding(.trailing, .small2)
 
 					Text(heading)
 						.textStyle(.body1Header)
@@ -57,20 +57,28 @@ extension SecurityCenter {
 				.padding(.horizontal, .medium2)
 				.background(status == .good ? .app.green1 : .app.alert)
 
-				if case let .bad(_, problem, _) = status {
-					Button(action: onTap) {
-						HStack(spacing: 0) {
-							Text(string(for: problem))
-								.multilineTextAlignment(.leading)
-								.textStyle(.body2HighImportance)
+				if case let .bad(_, problems, _) = status {
+					ForEach(problems, id: \.self) { problem in
+						Button(action: onTap) {
+							HStack(spacing: 0) {
+								Text(string(for: problem))
+									.multilineTextAlignment(.leading)
+									.textStyle(.body2HighImportance)
 
-							Spacer(minLength: .small1)
+								Spacer(minLength: .small1)
 
-							Image(.chevronRight)
+								Image(.chevronRight)
+							}
+							.foregroundStyle(.app.alert)
+							.padding(.medium2)
+							.background(.app.lightAlert)
 						}
-						.foregroundStyle(.app.alert)
-						.padding(.medium2)
-						.background(.app.lightAlert)
+
+						if problem != problems.last {
+							Rectangle()
+								.fill(.app.alert.opacity(0.3))
+								.frame(height: 1)
+						}
 					}
 				}
 			}
@@ -139,8 +147,9 @@ extension SecurityCenter {
 							.foregroundStyle(.app.gray2)
 							.textStyle(.body2Regular)
 
-						HStack {
-							Image(actionRequired ? .warningError : .checkmarkBig)
+						HStack(spacing: .zero) {
+							icon
+								.padding(.trailing, .small3)
 
 							Text(status)
 								.foregroundStyle(actionRequired ? .app.alert : .app.green1)
@@ -156,10 +165,21 @@ extension SecurityCenter {
 			}
 		}
 
+		@ViewBuilder
+		private var icon: some SwiftUI.View {
+			if actionRequired {
+				Image(.warningError)
+					.resizable()
+					.frame(.smallest)
+			} else {
+				Image(.checkCircle)
+			}
+		}
+
 		private var image: ImageResource {
 			switch type {
-			case .securityFactors: .successCheckmark
-			case .configurationBackup: .successCheckmark
+			case .securityFactors: .securityFactors
+			case .configurationBackup: .configurationBackup
 			}
 		}
 
