@@ -2,7 +2,7 @@ private typealias S = L10n.SecurityFactors
 
 extension SecurityFactors.State {
 	var viewState: SecurityFactors.ViewState {
-		.init(seedPhrases: seedPhrases, ledgerWallets: ledgerWallets)
+		.init(seedPhrasesCount: seedPhrasesCount, ledgerWalletsCount: ledgerWalletsCount)
 	}
 }
 
@@ -10,8 +10,8 @@ extension SecurityFactors.State {
 
 public extension SecurityFactors {
 	struct ViewState: Equatable {
-		let seedPhrases: Int?
-		let ledgerWallets: Int?
+		let seedPhrasesCount: Int?
+		let ledgerWalletsCount: Int?
 	}
 
 	@MainActor
@@ -28,6 +28,7 @@ public extension SecurityFactors {
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 				.presentsLoadingViewOverlay()
+				.destinations(with: store)
 		}
 	}
 }
@@ -56,31 +57,74 @@ private extension SecurityFactors.View {
 			.model(.init(
 				title: S.SeedPhrases.title,
 				subtitle: S.SeedPhrases.subtitle,
-				detail: seedPhrases(viewStore: viewStore),
+				detail: seedPhrasesDetail(viewStore: viewStore),
 				icon: .asset(AssetResource.seedPhrases),
 				action: .seedPhrasesButtonTapped
 			)),
 			.model(.init(
 				title: S.LedgerWallet.title,
 				subtitle: S.LedgerWallet.subtitle,
-				detail: ledgerWallets(viewStore: viewStore),
+				detail: ledgerWalletsDetail(viewStore: viewStore),
 				icon: .asset(AssetResource.ledger),
 				action: .ledgerWalletsButtonTapped
 			)),
 		]
 	}
 
-	func seedPhrases(viewStore: ViewStoreOf<SecurityFactors>) -> String? {
-		guard let count = viewStore.seedPhrases else {
+	func seedPhrasesDetail(viewStore: ViewStoreOf<SecurityFactors>) -> String? {
+		guard let count = viewStore.seedPhrasesCount else {
 			return nil
 		}
 		return count == 1 ? S.SeedPhrases.counterSingular : S.SeedPhrases.counterPlural(count)
 	}
 
-	func ledgerWallets(viewStore: ViewStoreOf<SecurityFactors>) -> String? {
-		guard let count = viewStore.ledgerWallets else {
+	func ledgerWalletsDetail(viewStore: ViewStoreOf<SecurityFactors>) -> String? {
+		guard let count = viewStore.ledgerWalletsCount else {
 			return nil
 		}
 		return count == 1 ? S.LedgerWallet.counterSingular : S.LedgerWallet.counterPlural(count)
+	}
+}
+
+// MARK: - Extensions
+
+private extension StoreOf<SecurityFactors> {
+	var destination: PresentationStoreOf<SecurityFactors.Destination> {
+		func scopeState(state: State) -> PresentationState<SecurityFactors.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<SecurityFactors>) -> some View {
+		let destinationStore = store.destination
+		return seedPhrases(with: destinationStore)
+			.ledgerHardwareWallets(with: destinationStore)
+	}
+
+	private func seedPhrases(with destinationStore: PresentationStoreOf<SecurityFactors.Destination>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /SecurityFactors.Destination.State.seedPhrases,
+			action: SecurityFactors.Destination.Action.seedPhrases,
+			destination: { DisplayMnemonics.View(store: $0) }
+		)
+	}
+
+	private func ledgerHardwareWallets(with destinationStore: PresentationStoreOf<SecurityFactors.Destination>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /SecurityFactors.Destination.State.ledgerWallets,
+			action: SecurityFactors.Destination.Action.ledgerWallets,
+			destination: {
+				LedgerHardwareDevices.View(store: $0)
+					.background(.app.gray5)
+					.navigationTitle(L10n.AccountSecuritySettings.LedgerHardwareWallets.title)
+					.toolbarBackground(.visible, for: .navigationBar)
+			}
+		)
 	}
 }

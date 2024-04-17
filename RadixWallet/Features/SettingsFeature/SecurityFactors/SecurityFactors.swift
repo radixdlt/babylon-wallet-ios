@@ -2,8 +2,8 @@
 
 public struct SecurityFactors: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		var seedPhrases: Int?
-		var ledgerWallets: Int?
+		var seedPhrasesCount: Int?
+		var ledgerWalletsCount: Int?
 
 		@PresentationState
 		public var destination: Destination.State?
@@ -18,8 +18,8 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedSeedPhrases(Int)
-		case loadedLedgerWallets(Int)
+		case loadedSeedPhrasesCount(Int)
+		case loadedLedgerWalletsCount(Int)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -74,19 +74,19 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadedSeedPhrases(count):
-			state.seedPhrases = count
+		case let .loadedSeedPhrasesCount(count):
+			state.seedPhrasesCount = count
 			return .none
 
-		case let .loadedLedgerWallets(count):
-			state.ledgerWallets = count
+		case let .loadedLedgerWalletsCount(count):
+			state.ledgerWalletsCount = count
 			return .none
 		}
 	}
 
 	private func loadSeedPhrasesCount() -> Effect<Action> {
 		.run { send in
-			try await send(.internal(.loadedSeedPhrases(
+			try await send(.internal(.loadedSeedPhrasesCount(
 				factorSourcesClient.getFactorSources(type: DeviceFactorSource.self).count
 			)))
 		}
@@ -94,7 +94,7 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 
 	private func loadLedgerWalletsCount() -> Effect<Action> {
 		.run { send in
-			try await send(.internal(.loadedLedgerWallets(
+			try await send(.internal(.loadedLedgerWalletsCount(
 				factorSourcesClient.getFactorSources(type: LedgerHardwareWalletFactorSource.self).count
 			)))
 		}
