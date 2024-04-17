@@ -58,7 +58,7 @@ private extension View {
 			store: destinationStore,
 			state: /AccountPermissionChooseAccounts.Destination.State.signing,
 			action: AccountPermissionChooseAccounts.Destination.Action.signing,
-			content: { Signing.SheetView(store: $0) }
+			content: { Signing.View(store: $0) }
 		)
 	}
 }

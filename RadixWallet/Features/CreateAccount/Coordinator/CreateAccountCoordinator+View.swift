@@ -46,6 +46,7 @@ extension CreateAccountCoordinator {
 					destinations(for: $0, shouldDisplayNavBar: viewStore.shouldDisplayNavBar)
 				}
 				.navigationTransition(.slide, interactivity: .disabled)
+				.destinations(with: store)
 			}
 		}
 
@@ -56,22 +57,22 @@ extension CreateAccountCoordinator {
 			ZStack {
 				SwitchStore(store) { state in
 					switch state {
-					case .step1_nameAccount:
+					case .nameAccount:
 						CaseLet(
-							/CreateAccountCoordinator.Path.State.step1_nameAccount,
-							action: CreateAccountCoordinator.Path.Action.step1_nameAccount,
+							/CreateAccountCoordinator.Path.State.nameAccount,
+							action: CreateAccountCoordinator.Path.Action.nameAccount,
 							then: { NameAccount.View(store: $0) }
 						)
-					case .step2_creationOfAccount:
+					case .selectLedger:
 						CaseLet(
-							/CreateAccountCoordinator.Path.State.step2_creationOfAccount,
-							action: CreateAccountCoordinator.Path.Action.step2_creationOfAccount,
-							then: { CreationOfAccount.View(store: $0) }
+							/CreateAccountCoordinator.Path.State.selectLedger,
+							action: CreateAccountCoordinator.Path.Action.selectLedger,
+							then: { LedgerHardwareDevices.View(store: $0) }
 						)
-					case .step3_completion:
+					case .completion:
 						CaseLet(
-							/CreateAccountCoordinator.Path.State.step3_completion,
-							action: CreateAccountCoordinator.Path.Action.step3_completion,
+							/CreateAccountCoordinator.Path.State.completion,
+							action: CreateAccountCoordinator.Path.Action.completion,
 							then: { NewAccountCompletion.View(store: $0) }
 						)
 					}
@@ -80,5 +81,27 @@ extension CreateAccountCoordinator {
 			.navigationBarBackButtonHidden(!shouldDisplayNavBar)
 			.navigationBarHidden(!shouldDisplayNavBar)
 		}
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<CreateAccountCoordinator>) -> some View {
+		let destinationStore = store.destination
+		return sheet(
+			store: destinationStore,
+			state: /CreateAccountCoordinator.Destination.State.derivePublicKey,
+			action: CreateAccountCoordinator.Destination.Action.derivePublicKey,
+			content: { DerivePublicKeys.View(store: $0) }
+		)
+	}
+}
+
+extension StoreOf<CreateAccountCoordinator> {
+	var destination: PresentationStoreOf<CreateAccountCoordinator.Destination> {
+		func scopeState(state: State) -> PresentationState<CreateAccountCoordinator.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
 	}
 }
