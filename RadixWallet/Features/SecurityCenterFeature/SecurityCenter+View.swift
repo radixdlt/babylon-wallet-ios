@@ -19,23 +19,15 @@ extension SecurityCenter {
 						.textStyle(.body1Regular)
 						.padding(.bottom, .medium1)
 
-					StatusView(status: viewStore.status)
-						.padding(.bottom, .medium3)
-
-					CardView(
-						image: .successCheckmark,
-						title: L10n.SecurityCenter.SecurityFactorsItem.title,
-						subtitle: L10n.SecurityCenter.SecurityFactorsItem.subtitle,
-						viewState: viewStore.securityFactorsViewState
-					)
+					StatusView(status: viewStore.status) {
+						store.send(.view(.statusTapped))
+					}
 					.padding(.bottom, .medium3)
 
-					CardView(
-						image: .successCheckmark,
-						title: L10n.SecurityCenter.ConfigurationBackupItem.title,
-						subtitle: L10n.SecurityCenter.ConfigurationBackupItem.subtitle,
-						viewState: viewStore.configurationBackupViewState
-					)
+					ItemCardView(type: .securityFactors, actionRequired: viewStore.status.actionsRequired.contains(.securityFactors))
+						.padding(.bottom, .medium3)
+
+					ItemCardView(type: .configurationBackup, actionRequired: viewStore.status.actionsRequired.contains(.configurationBackup))
 				}
 			}
 			.padding(.horizontal, .medium2)
@@ -46,25 +38,62 @@ extension SecurityCenter {
 
 extension SecurityCenter {
 	struct StatusView: SwiftUI.View {
-		let status: SecurityCenterStatus
+		let status: Status
+		let onTap: () -> Void
 
 		var body: some SwiftUI.View {
 			VStack(spacing: 0) {
-				switch status {
-				case .good:
-					Text(L10n.SecurityCenter.Status.recoverable)
-						.background(.app.green1)
-				case let .bad(recoverabilityIssue, problem):
-					Text(string(for: recoverabilityIssue))
-						.background(.app.alert)
-					Text(string(for: problem))
-						.background(.yellow)
+				HStack(spacing: 0) {
+					Image(.warningError)
+						.renderingMode(.template)
+						.resizable()
+						.frame(.smallest)
+						.padding(.horizontal, .small2)
+
+					Text(heading)
+						.textStyle(.body1Header)
+
+					Spacer(minLength: .zero)
+				}
+				.foregroundStyle(.white)
+				.padding(.vertical, .small2)
+				.padding(.horizontal, .medium2)
+				.background(status == .good ? .app.green1 : .app.alert)
+
+				if case let .bad(_, problem, _) = status {
+					Button(action: onTap) {
+						HStack(spacing: 0) {
+							Text(string(for: problem))
+								.multilineTextAlignment(.leading)
+								.textStyle(.body2HighImportance)
+
+							Spacer(minLength: .small1)
+
+							Image(.chevronRight)
+						}
+						.foregroundStyle(.app.alert)
+						.padding(.medium2)
+						.background(.app.lightAlert)
+					}
 				}
 			}
 			.roundedCorners(radius: .small1)
 		}
 
-		func string(for issue: SecurityCenterStatus.RecoverabilityIssue) -> String {
+//		private var headingIcon: Image {
+//
+//		}
+
+		private var heading: String {
+			switch status {
+			case .good:
+				L10n.SecurityCenter.Status.recoverable
+			case let .bad(recoverabilityIssue, _, _):
+				string(for: recoverabilityIssue)
+			}
+		}
+
+		func string(for issue: Status.RecoverabilityIssue) -> String {
 			switch issue {
 			case .walletNotRecoverable: L10n.SecurityCenter.Status.notRecoverable
 			case let .entitiesNotRecoverable(accounts, personas): L10n.SecurityCenter.Status.entitiesNotRecoverable(accounts, personas)
@@ -72,7 +101,7 @@ extension SecurityCenter {
 			}
 		}
 
-		func string(for problem: SecurityCenterStatus.Problem) -> String {
+		func string(for problem: Status.Problem) -> String {
 			switch problem {
 			case .problem3: L10n.SecurityCenter.SubStatus.problem3
 			case .problem5: L10n.SecurityCenter.SubStatus.problem5
@@ -83,26 +112,19 @@ extension SecurityCenter {
 		}
 	}
 
-	struct CardView: SwiftUI.View {
-		struct ViewState {
-			let actionRequired: Bool
-			let status: String
-		}
-
-		let image: ImageResource
-		let title: String
-		let subtitle: String
-		let viewState: ViewState
+	struct ItemCardView: SwiftUI.View {
+		let type: Item
+		let actionRequired: Bool
 
 		var body: some SwiftUI.View {
 			Card {
 				HStack(spacing: .medium2) {
-					Rectangle()
-						.fill(.gray)
+					Image(image)
+						.resizable()
+						.frame(.medium)
 						.frame(width: 80, height: 80)
-						.overlay(Image(image))
 
-					VStack(spacing: .small3) {
+					VStack(alignment: .leading, spacing: .small3) {
 						Text(title)
 							.foregroundStyle(.app.gray1)
 							.textStyle(.body1Header)
@@ -112,66 +134,63 @@ extension SecurityCenter {
 							.textStyle(.body2Regular)
 
 						HStack {
-							Image(viewState.actionRequired ? .warningError : .checkmarkBig)
+							Image(actionRequired ? .warningError : .checkmarkBig)
 
-							Text(viewState.status)
-								.foregroundStyle(viewState.actionRequired ? .app.alert : .app.green1)
+							Text(status)
+								.foregroundStyle(actionRequired ? .app.alert : .app.green1)
 								.textStyle(.body2HighImportance)
 						}
 					}
+
+					Spacer(minLength: .zero)
 				}
 				.padding(.vertical, .medium2)
 				.padding(.leading, .medium2)
 				.padding(.trailing, .large3)
 			}
 		}
-	}
-}
 
-// MARK: - SecurityCenterStatus
-public enum SecurityCenterStatus: Equatable {
-	case good
-	case bad(RecoverabilityIssue, Problem)
+		private var image: ImageResource {
+			switch type {
+			case .securityFactors: .successCheckmark
+			case .configurationBackup: .successCheckmark
+			}
+		}
 
-	public enum RecoverabilityIssue: Equatable {
-		case walletNotRecoverable
-		case entitiesNotRecoverable(accounts: Int, personas: Int)
-		case recoveryRequired
-	}
+		private var title: String {
+			switch type {
+			case .securityFactors: L10n.SecurityCenter.SecurityFactorsItem.title
+			case .configurationBackup: L10n.SecurityCenter.ConfigurationBackup.title
+			}
+		}
 
-	public enum Problem: Equatable {
-		case problem3
-		case problem5
-		case problem6
-		case problem7
-		case problem9
-	}
-}
+		private var subtitle: String {
+			switch type {
+			case .securityFactors: L10n.SecurityCenter.SecurityFactorsItem.subtitle
+			case .configurationBackup: L10n.SecurityCenter.ConfigurationBackupItem.subtitle
+			}
+		}
 
-// MARK: - SecurityFactorsStatus
-public enum SecurityFactorsStatus: Equatable {
-	case active
-	case actionRequired
-}
-
-// MARK: - ConfigurationBackupStatus
-public enum ConfigurationBackupStatus: Equatable {
-	case backedUp
-	case actionRequired
-}
-
-extension SecurityCenter.State {
-	var securityFactorsViewState: SecurityCenter.CardView.ViewState {
-		switch securityFactorsStatus {
-		case .active: .init(actionRequired: false, status: L10n.SecurityCenter.SecurityFactorsItem.activeStatus)
-		case .actionRequired: .init(actionRequired: true, status: L10n.SecurityCenter.AnyItem.actionRequiredStatus)
+		private var status: String {
+			if actionRequired {
+				L10n.SecurityCenter.AnyItem.actionRequiredStatus
+			} else {
+				switch type {
+				case .securityFactors: L10n.SecurityCenter.SecurityFactorsItem.activeStatus
+				case .configurationBackup: L10n.SecurityCenter.ConfigurationBackupItem.backedUpStatus
+				}
+			}
 		}
 	}
+}
 
-	var configurationBackupViewState: SecurityCenter.CardView.ViewState {
-		switch configurationBackupStatus {
-		case .backedUp: .init(actionRequired: false, status: L10n.SecurityCenter.ConfigurationBackupItem.backedUpStatus)
-		case .actionRequired: .init(actionRequired: true, status: L10n.SecurityCenter.AnyItem.actionRequiredStatus)
+extension SecurityCenter.Status {
+	var actionsRequired: [SecurityCenter.Item] {
+		switch self {
+		case .good:
+			[]
+		case let .bad(_, _, actionsRequired):
+			actionsRequired
 		}
 	}
 }
