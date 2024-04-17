@@ -2,35 +2,37 @@ import ComposableArchitecture
 
 public struct SecurityCenter: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var status: Status = .good
+		public var problems: [Problem] = []
+		public var actionsRequired: [Item] = []
 	}
 
-	// MARK: - Status
-	public enum Status: Hashable, Sendable {
-		case good
-		case bad(RecoverabilityIssue, [Problem], actionsRequired: [Item])
+	public enum Problem: Hashable, Sendable, Identifiable {
+		case problem3(accounts: Int, personas: Int)
+		case problem5
+		case problem6
+		case problem7
+		case problem9
 
-		public enum RecoverabilityIssue: Hashable, Sendable {
-			case walletNotRecoverable
-			case entitiesNotRecoverable(accounts: Int, personas: Int)
-			case recoveryRequired
-		}
+		public var id: Int { number }
 
-		public enum Problem: Hashable, Sendable {
-			case problem3
-			case problem5
-			case problem6
-			case problem7
-			case problem9
+		public var number: Int {
+			switch self {
+			case .problem3: 3
+			case .problem5: 5
+			case .problem6: 6
+			case .problem7: 7
+			case .problem9: 9
+			}
 		}
 	}
 
-	public enum Item: Hashable, Sendable {
+	public enum Item: Hashable, Sendable, CaseIterable {
 		case securityFactors
 		case configurationBackup
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case statusTapped
+		case problemTapped(Problem.ID)
+		case itemTapped(Item)
 	}
 }
