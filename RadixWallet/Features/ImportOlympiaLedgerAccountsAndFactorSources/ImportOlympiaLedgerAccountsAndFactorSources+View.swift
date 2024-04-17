@@ -109,6 +109,7 @@ private extension View {
 		return addNewP2PLinkSheet(with: destinationStore)
 			.noP2PLinkAlert(with: destinationStore)
 			.nameLedgerSheet(with: destinationStore)
+			.derivePublicKeysSheet(with: destinationStore)
 	}
 
 	private func noP2PLinkAlert(with destinationStore: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destination>) -> some View {
@@ -131,40 +132,18 @@ private extension View {
 	private func nameLedgerSheet(with destinationStore: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destination>) -> some View {
 		sheet(
 			store: destinationStore,
-			state: /ImportOlympiaLedgerAccountsAndFactorSources.Destination.State.nameLedgerAndDerivePublicKeys,
-			action: ImportOlympiaLedgerAccountsAndFactorSources.Destination.Action.nameLedgerAndDerivePublicKeys,
-			content: { NameLedgerAndDerivePublicKeys.View(store: $0) }
+			state: /ImportOlympiaLedgerAccountsAndFactorSources.Destination.State.nameLedger,
+			action: ImportOlympiaLedgerAccountsAndFactorSources.Destination.Action.nameLedger,
+			content: { ImportOlympiaNameLedger.View(store: $0) }
 		)
 	}
-}
 
-// MARK: - NameLedgerAndDerivePublicKeys.View
-extension NameLedgerAndDerivePublicKeys {
-	@MainActor
-	public struct View: SwiftUI.View {
-		private let store: StoreOf<NameLedgerAndDerivePublicKeys>
-
-		public init(store: StoreOf<NameLedgerAndDerivePublicKeys>) {
-			self.store = store
-		}
-
-		public var body: some SwiftUI.View {
-			WithNavigationBar {
-				store.send(.view(.closeButtonTapped))
-			} content: {
-				IfLetStore(store.scope(state: \.nameLedger, action: { .child(.nameLedger($0)) })) { childStore in
-					NameLedgerFactorSource.View(store: childStore)
-				} else: {
-					Rectangle()
-						.fill(.clear)
-				}
-				.navigationDestination(
-					store: store.scope(state: \.$derivePublicKeys, action: { .child(.derivePublicKeys($0)) })
-				) {
-					DerivePublicKeys.View(store: $0)
-						.navigationBarBackButtonHidden()
-				}
-			}
-		}
+	private func derivePublicKeysSheet(with destinationStore: PresentationStoreOf<ImportOlympiaLedgerAccountsAndFactorSources.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /ImportOlympiaLedgerAccountsAndFactorSources.Destination.State.derivePublicKeys,
+			action: ImportOlympiaLedgerAccountsAndFactorSources.Destination.Action.derivePublicKeys,
+			content: { DerivePublicKeys.View(store: $0) }
+		)
 	}
 }

@@ -237,6 +237,9 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 			case .failedToDerivePublicKey:
 				return .send(.delegate(.failed))
+
+			case .cancel:
+				return .send(.delegate(.close))
 			}
 
 		default: return .none
