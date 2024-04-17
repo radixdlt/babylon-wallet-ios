@@ -206,35 +206,36 @@ extension CreateAccountCoordinator {
 				fatalError("Derived public keys without account name set")
 			}
 
-			return .run { send in
-				await send(.internal(.createAccountResult(TaskResult {
-					let account = try await accountsClient.newVirtualAccount(.init(
-						name: name,
-						factorInstance: .init(
-							factorSourceID: factorSourceID,
-							publicKey: hdKey.publicKey,
-							derivationPath: hdKey.derivationPath
-						),
-						networkID: networkID
-					))
-
-					do {
-						if let updated = try await doAsync(
-							withTimeout: .seconds(5),
-							work: { try await onLedgerEntitiesClient.syncThirdPartyDepositWithOnLedgerSettings(account: account) }
-						) {
-							loggerGlobal.notice("Used OnLedger ThirdParty Deposit Settings")
-							return updated
-						} else {
-							return account
-						}
-					} catch {
-						loggerGlobal.notice("Failed to get OnLedger state for newly created account: \(account). Will add it with default third party deposit settings...")
-						return account
-					}
-
-				})))
-			}
+//			return .run { send in
+//				await send(.internal(.createAccountResult(TaskResult {
+//					let account = try await accountsClient.newVirtualAccount(.init(
+//						name: name,
+//						factorInstance: .init(
+//							factorSourceID: factorSourceID,
+//							publicKey: hdKey.publicKey,
+//							derivationPath: hdKey.derivationPath
+//						),
+//						networkID: networkID
+//					))
+//
+//					do {
+//						if let updated = try await doAsync(
+//							withTimeout: .seconds(5),
+//							work: { try await onLedgerEntitiesClient.syncThirdPartyDepositWithOnLedgerSettings(account: account) }
+//						) {
+//							loggerGlobal.notice("Used OnLedger ThirdParty Deposit Settings")
+//							return updated
+//						} else {
+//							return account
+//						}
+//					} catch {
+//						loggerGlobal.notice("Failed to get OnLedger state for newly created account: \(account). Will add it with default third party deposit settings...")
+//						return account
+//					}
+//
+//				})))
+//			}
+			sargonProfileFinishMigrateAtEndOfStage1()
 
 		case .derivePublicKey(.delegate(.failedToDerivePublicKey)):
 			state.destination = nil

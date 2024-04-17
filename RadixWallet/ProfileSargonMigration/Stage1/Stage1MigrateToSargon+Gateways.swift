@@ -13,7 +13,8 @@ extension Gateways {
 	/// All gateways
 	public var all: Elements {
 		var elements = IdentifiedArrayOf<Gateway>(uniqueElements: [current])
-		elements.append(contentsOf: other)
-		return .init(rawValue: elements)!
+//		elements.append(contentsOf: other)
+//		return .init(rawValue: elements)!
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }

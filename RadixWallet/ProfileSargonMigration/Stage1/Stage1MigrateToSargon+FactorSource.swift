@@ -1,16 +1,7 @@
 import Foundation
 import Sargon
 
-// MARK: - FactorSource + Identifiable
-extension FactorSource: Identifiable {
-	public typealias ID = FactorSourceID
-	public var id: ID {
-		switch self {
-		case let .device(value): FactorSourceID.hash(value: value.id)
-		case let .ledger(value): FactorSourceID.hash(value: value.id)
-		}
-	}
-
+extension FactorSource {
 	public func extract<F>(_ type: F.Type = F.self) -> F? where F: FactorSourceProtocol {
 		F.extract(from: self)
 	}
@@ -23,14 +14,7 @@ extension FactorSource: Identifiable {
 	}
 
 	public var kind: FactorSourceKind {
-		property(\.kind)
-	}
-
-	private func property<Property>(_ keyPath: KeyPath<any BaseFactorSourceProtocol, Property>) -> Property {
-		switch self {
-		case let .device(factorSource): factorSource[keyPath: keyPath]
-		case let .ledger(factorSource): factorSource[keyPath: keyPath]
-		}
+		factorSourceKind
 	}
 }
 

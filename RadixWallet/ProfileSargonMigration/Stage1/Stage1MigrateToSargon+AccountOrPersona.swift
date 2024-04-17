@@ -100,7 +100,7 @@ extension AccountOrPersona {
 	}
 
 	/// Flags that are currently set on entity.
-	public var flags: [Sargon.EntityFlag] {
+	public var flags: Flags {
 		property(\.flags)
 	}
 }

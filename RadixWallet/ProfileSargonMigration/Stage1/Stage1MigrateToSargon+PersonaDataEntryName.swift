@@ -14,7 +14,7 @@ extension PersonaDataEntryName: Codable {
 
 // MARK: - PersonaDataEntryName.Variant
 extension PersonaDataEntryName {
-	public typealias Variant = Sargon.Variant
+	public typealias Variant = Sargon.PersonaDataNameVariant
 }
 
 // MARK: - PersonaDataEntryName.Variant + CaseIterable

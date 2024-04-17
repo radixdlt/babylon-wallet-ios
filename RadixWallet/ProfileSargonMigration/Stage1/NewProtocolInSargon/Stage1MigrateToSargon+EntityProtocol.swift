@@ -2,7 +2,7 @@ import Sargon
 
 // MARK: - EntityBaseProtocol
 public protocol EntityBaseProtocol {
-	typealias Flags = OrderedSet<Sargon.EntityFlag>
+	typealias Flags = EntityFlags
 
 	/// The ID of the network this entity exists on.
 	var networkID: Sargon.NetworkID { get }
@@ -14,7 +14,7 @@ public protocol EntityBaseProtocol {
 	var displayName: DisplayName { get }
 
 	/// Flags that are currently set on entity.
-	var flags: [Sargon.EntityFlag] { get }
+	var flags: Flags { get }
 }
 
 extension EntityBaseProtocol {
@@ -73,9 +73,6 @@ public protocol EntityProtocol: EntityBaseProtocol, Sendable, Equatable, Identif
 }
 
 extension EntityProtocol {
-	/// A stable and globally unique identifier for this account.
-	public var id: ID { address }
-
 	public var kind: EntityKind { Self.entityKind }
 
 	public init(

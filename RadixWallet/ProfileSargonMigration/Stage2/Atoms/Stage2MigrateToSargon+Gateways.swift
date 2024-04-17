@@ -31,7 +31,8 @@ extension Gateways {
 
 	/// Adds `newOther` to `other` (if indeed new).
 	private mutating func add(_ newOther: Gateway) {
-		other.append(newOther)
+//		other.append(newOther)
+		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
 	private mutating func remove(_ gateway: Gateway) {
