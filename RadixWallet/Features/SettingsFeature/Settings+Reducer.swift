@@ -14,7 +14,6 @@ public struct Settings: Sendable, FeatureReducer {
 		public var destination: Destination.State?
 
 		public var userHasNoP2PLinks: Bool? = nil
-		public var shouldWriteDownPersonasSeedPhrase: Bool = false
 
 		public init() {}
 	}
@@ -35,7 +34,6 @@ public struct Settings: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadedP2PLinks(P2PLinks)
-		case loadedShouldWriteDownPersonasSeedPhrase(Bool)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -110,7 +108,6 @@ public struct Settings: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return loadP2PLinks()
-				.merge(with: loadShouldWriteDownPersonasSeedPhrase())
 
 		case .addConnectorButtonTapped:
 			state.destination = .manageP2PLinks(.init(destination: .newConnection(.init())))
@@ -151,10 +148,6 @@ public struct Settings: Sendable, FeatureReducer {
 		case let .loadedP2PLinks(clients):
 			state.userHasNoP2PLinks = clients.isEmpty
 			return .none
-
-		case let .loadedShouldWriteDownPersonasSeedPhrase(shouldBackup):
-			state.shouldWriteDownPersonasSeedPhrase = shouldBackup
-			return .none
 		}
 	}
 
@@ -184,14 +177,6 @@ extension Settings {
 			await send(.internal(.loadedP2PLinks(
 				p2pLinksClient.getP2PLinks()
 			)))
-		}
-	}
-
-	private func loadShouldWriteDownPersonasSeedPhrase() -> Effect<Action> {
-		.run { send in
-			@Dependency(\.personasClient) var personasClient
-			let shouldBackup = try await personasClient.shouldWriteDownSeedPhraseForSomePersona()
-			await send(.internal(.loadedShouldWriteDownPersonasSeedPhrase(shouldBackup)))
 		}
 	}
 }

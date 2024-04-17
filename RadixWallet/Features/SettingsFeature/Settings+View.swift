@@ -17,7 +17,6 @@ extension Settings {
 		let debugAppInfo: String
 		#endif
 		let shouldShowAddP2PLinkButton: Bool
-		let shouldWriteDownPersonasSeedPhrase: Bool
 		let appVersion: String
 
 		init(state: Settings.State) {
@@ -35,7 +34,6 @@ extension Settings {
 			#endif
 
 			self.shouldShowAddP2PLinkButton = state.userHasNoP2PLinks ?? false
-			self.shouldWriteDownPersonasSeedPhrase = state.shouldWriteDownPersonasSeedPhrase
 			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
 			self.appVersion = L10n.WalletSettings.appVersion(bundleInfo.shortVersion)
 		}
@@ -130,7 +128,6 @@ extension Settings.View {
 			.model(.init(
 				title: L10n.WalletSettings.Personas.title,
 				subtitle: L10n.WalletSettings.Personas.subtitle,
-				hint: viewStore.shouldWriteDownPersonasSeedPhrase ? .init(kind: .warning, text: .init(L10n.Settings.personasSeedPhrasePrompt)) : nil,
 				icon: .asset(AssetResource.personas),
 				action: .personasButtonTapped
 			)),
