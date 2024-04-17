@@ -166,7 +166,7 @@ extension SecurityCenter {
 		private var title: String {
 			switch type {
 			case .securityFactors: L10n.SecurityCenter.SecurityFactorsItem.title
-			case .configurationBackup: L10n.SecurityCenter.ConfigurationBackup.title
+			case .configurationBackup: L10n.SecurityCenter.ConfigurationBackupItem.title
 			}
 		}
 
