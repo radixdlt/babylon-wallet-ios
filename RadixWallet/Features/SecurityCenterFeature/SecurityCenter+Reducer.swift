@@ -4,6 +4,9 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var problems: [Problem] = []
 		public var actionsRequired: [Item] = []
+
+		@PresentationState
+		public var destination: Destination.State? = nil
 	}
 
 	public enum Problem: Hashable, Sendable, Identifiable {
@@ -31,8 +34,42 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 		case configurationBackup
 	}
 
+	public struct Destination: DestinationReducer {
+		@CasePathable
+		public enum State: Sendable, Hashable {
+			case configurationBackup(ConfigurationBackup.State)
+		}
+
+		@CasePathable
+		public enum Action: Sendable, Equatable {
+			case configurationBackup(ConfigurationBackup.Action)
+		}
+
+		public var body: some ReducerOf<Self> {
+			Scope(state: \.configurationBackup, action: \.configurationBackup) {
+				ConfigurationBackup()
+			}
+		}
+	}
+
 	public enum ViewAction: Sendable, Equatable {
 		case problemTapped(Problem.ID)
 		case itemTapped(Item)
+	}
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+		switch viewAction {
+		case let .problemTapped(iD):
+			return .none
+
+		case let .itemTapped(item):
+			switch item {
+			case .securityFactors:
+				return .none
+			case .configurationBackup:
+				state.destination = .configurationBackup(.init())
+				return .none
+			}
+		}
 	}
 }

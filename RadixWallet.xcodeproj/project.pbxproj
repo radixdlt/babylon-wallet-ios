@@ -1061,6 +1061,8 @@
 		A4CFB55F2BAA821E00778BDD /* HScrollBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4CFB55E2BAA821E00778BDD /* HScrollBar.swift */; };
 		A4CFB5612BAA826E00778BDD /* Measure+Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4CFB5602BAA826E00778BDD /* Measure+Position.swift */; };
 		A4EB37C82B6272F3003FE31D /* TrackedValidatorInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4EB37C72B6272F3003FE31D /* TrackedValidatorInteraction.swift */; };
+		A4EBB5D62BD0777C00D05FDE /* ConfigurationBackup+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4EBB5D52BD0777C00D05FDE /* ConfigurationBackup+Reducer.swift */; };
+		A4EBB5D82BD0777F00D05FDE /* ConfigurationBackup+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4EBB5D72BD0777F00D05FDE /* ConfigurationBackup+View.swift */; };
 		E62449D52AFBA61100272C67 /* Home+AccountRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */; };
 		E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */; };
 		E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */; };
@@ -2154,6 +2156,8 @@
 		A4CFB55E2BAA821E00778BDD /* HScrollBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HScrollBar.swift; sourceTree = "<group>"; };
 		A4CFB5602BAA826E00778BDD /* Measure+Position.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Measure+Position.swift"; sourceTree = "<group>"; };
 		A4EB37C72B6272F3003FE31D /* TrackedValidatorInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackedValidatorInteraction.swift; sourceTree = "<group>"; };
+		A4EBB5D52BD0777C00D05FDE /* ConfigurationBackup+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfigurationBackup+Reducer.swift"; sourceTree = "<group>"; };
+		A4EBB5D72BD0777F00D05FDE /* ConfigurationBackup+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfigurationBackup+View.swift"; sourceTree = "<group>"; };
 		E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+Reducer.swift"; sourceTree = "<group>"; };
 		E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+View.swift"; sourceTree = "<group>"; };
 		E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportMnemonicTests.swift; sourceTree = "<group>"; };
@@ -5755,6 +5759,8 @@
 			children = (
 				A43F1E252BC96F18001DD3FA /* SecurityCenter+Reducer.swift */,
 				A43F1E272BC96F27001DD3FA /* SecurityCenter+View.swift */,
+				A4EBB5D52BD0777C00D05FDE /* ConfigurationBackup+Reducer.swift */,
+				A4EBB5D72BD0777F00D05FDE /* ConfigurationBackup+View.swift */,
 			);
 			path = SecurityCenterFeature;
 			sourceTree = "<group>";
@@ -6776,6 +6782,7 @@
 				48CFC5532ADC10DA00E77A5C /* GatewayStatusResponse.swift in Sources */,
 				48CFC4272ADC10DA00E77A5C /* JSON+ISO8601.swift in Sources */,
 				48CFC2482ADC10D900E77A5C /* ThirdPartyDeposits+View.swift in Sources */,
+				A4EBB5D62BD0777C00D05FDE /* ConfigurationBackup+Reducer.swift in Sources */,
 				A41557532B7645E70040AD4E /* TransactionHistory+Reducer.swift in Sources */,
 				E6A2D9E72AFA7132001857EC /* Mnemonics+Utils.swift in Sources */,
 				48CFC28A2ADC10D900E77A5C /* TransactionReviewGuarantees.swift in Sources */,
@@ -7543,6 +7550,8 @@
 				48CFC2BA2ADC10D900E77A5C /* SelectBackup+View.swift in Sources */,
 				48CFC4432ADC10DA00E77A5C /* RadixConnectClient+Live.swift in Sources */,
 				48CFC2BC2ADC10D900E77A5C /* ImportMnemonicsFlowCoordinator+View.swift in Sources */,
+				48CFC6312ADC10DB00E77A5C /* Profile+UTType.swift in Sources */,
+				A4EBB5D82BD0777F00D05FDE /* ConfigurationBackup+View.swift in Sources */,
 				48CFC4842ADC10DA00E77A5C /* QRGeneratorClient+Test.swift in Sources */,
 				48CFC5492ADC10DA00E77A5C /* StreamTransactionsRequestEventFilterItem.swift in Sources */,
 				48AE39E72B0CBEA800813CF3 /* SelectInactiveAccountsToAdd+View.swift in Sources */,
