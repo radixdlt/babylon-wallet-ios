@@ -1091,14 +1091,3 @@ If you have any “Legacy” Accounts (created on the Olympia network) to import
 "troubleshooting_contactSupport_subtitle" = "Connect directly with the Radix support team";
 "troubleshooting_discord_title" = "Discord";
 "troubleshooting_discord_subtitle" = "Connect to the official Radix Discord channel to join the community and ask for help.";
-"securityFactors_title" = "Security Factors";
-"securityFactors_subtitle" = "View and manage your security factors";
-"securityFactors_seedPhrases_title" = "Seed Phrases";
-"securityFactors_seedPhrases_subtitle" = "Your seedphrases connected to your account";
-"securityFactors_seedPhrases_counterSingular" = "1 Seed phrase";
-"securityFactors_seedPhrases_counterPlural" = "%d Seed phrases";
-"securityFactors_seedPhrases_enterSeedPhrase" = "Enter your seed phrase to recover Accounts";
-"securityFactors_ledgerWallet_title" = "Ledger Hardware Wallet";
-"securityFactors_ledgerWallet_subtitle" = "Hardware wallet designed for holding crypto";
-"securityFactors_ledgerWallet_counterSingular" = "1 set";
-"securityFactors_ledgerWallet_counterPlural" = "%d set";
