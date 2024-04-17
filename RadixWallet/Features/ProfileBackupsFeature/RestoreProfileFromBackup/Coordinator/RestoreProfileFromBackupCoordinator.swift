@@ -4,7 +4,7 @@ import SwiftUI
 
 // MARK: - ProfileSelection
 public struct ProfileSelection: Sendable, Hashable {
-	public let snapshot: Profile
+	public let profile: Profile
 	public let isInCloud: Bool
 }
 
@@ -64,6 +64,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.p2pLinksClient) var p2pLinksClient
+
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
@@ -87,15 +88,15 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .root(.selectBackup(.delegate(.selectedProfileSnapshot(profileSnapshot, isInCloud)))):
-			state.profileSelection = .init(snapshot: profileSnapshot, isInCloud: isInCloud)
+		case let .root(.selectBackup(.delegate(.selectedProfile(profile, isInCloud)))):
+			state.profileSelection = .init(profile: profile, isInCloud: isInCloud)
 			return .run { send in
 				try? await clock.sleep(for: .milliseconds(300))
 				let p2pLinks = await p2pLinksClient.getP2PLinks()
 				try await radixConnectClient.connectToP2PLinks(p2pLinks)
 				await send(.internal(.delayedAppendToPath(
-					.importMnemonicsFlow(.init(context: .fromOnboarding(profileSnapshot: profileSnapshot))
-					))))
+					.importMnemonicsFlow(.init(context: .fromOnboarding(profile: profile)))
+				)))
 			}
 
 		case .root(.selectBackup(.delegate(.backToStartOfOnboarding))):
@@ -111,7 +112,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			}
 			return .run { send in
 				loggerGlobal.notice("Importing snapshot...")
-				try await backupsClient.importSnapshot(profileSelection.snapshot, fromCloud: profileSelection.isInCloud)
+				try await backupsClient.importSnapshot(profileSelection.profile, fromCloud: profileSelection.isInCloud)
 
 				if let notYetSavedNewMainBDFS {
 					try await factorSourcesClient.saveNewMainBDFS(notYetSavedNewMainBDFS)

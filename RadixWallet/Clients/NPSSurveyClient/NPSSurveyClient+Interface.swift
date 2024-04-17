@@ -13,5 +13,5 @@ extension NPSSurveyClient {
 
 	public typealias UploadUserFeedback = (UserFeedback?) async -> Void
 	public typealias IncrementTransactionCompleteCounter = () -> Void
-	public typealias ShouldAskForUserFeedback = () async -> AnyAsyncSequence<Bool>
+	public typealias ShouldAskForUserFeedback = () -> AnyAsyncSequence<Bool>
 }
