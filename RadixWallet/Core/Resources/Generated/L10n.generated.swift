@@ -2312,6 +2312,38 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "revealSeedPhrase_warningDialog_title", fallback: "Use Caution")
     }
   }
+  public enum SecurityFactors {
+    /// View and manage your security factors
+    public static let subtitle = L10n.tr("Localizable", "securityFactors_subtitle", fallback: "View and manage your security factors")
+    /// Security Factors
+    public static let title = L10n.tr("Localizable", "securityFactors_title", fallback: "Security Factors")
+    public enum LedgerWallet {
+      /// %d set
+      public static func counterPlural(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "securityFactors_ledgerWallet_counterPlural", p1, fallback: "%d set")
+      }
+      /// 1 set
+      public static let counterSingular = L10n.tr("Localizable", "securityFactors_ledgerWallet_counterSingular", fallback: "1 set")
+      /// Hardware wallet designed for holding crypto
+      public static let subtitle = L10n.tr("Localizable", "securityFactors_ledgerWallet_subtitle", fallback: "Hardware wallet designed for holding crypto")
+      /// Ledger Hardware Wallet
+      public static let title = L10n.tr("Localizable", "securityFactors_ledgerWallet_title", fallback: "Ledger Hardware Wallet")
+    }
+    public enum SeedPhrases {
+      /// %d Seed phrases
+      public static func counterPlural(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "securityFactors_seedPhrases_counterPlural", p1, fallback: "%d Seed phrases")
+      }
+      /// 1 Seed phrase
+      public static let counterSingular = L10n.tr("Localizable", "securityFactors_seedPhrases_counterSingular", fallback: "1 Seed phrase")
+      /// Enter your seed phrase to recover Accounts
+      public static let enterSeedPhrase = L10n.tr("Localizable", "securityFactors_seedPhrases_enterSeedPhrase", fallback: "Enter your seed phrase to recover Accounts")
+      /// Your seedphrases connected to your account
+      public static let subtitle = L10n.tr("Localizable", "securityFactors_seedPhrases_subtitle", fallback: "Your seedphrases connected to your account")
+      /// Seed Phrases
+      public static let title = L10n.tr("Localizable", "securityFactors_seedPhrases_title", fallback: "Seed Phrases")
+    }
+  }
   public enum SeedPhrases {
     /// Please write down your Seed Phrase
     public static let backupWarning = L10n.tr("Localizable", "seedPhrases_backupWarning", fallback: "Please write down your Seed Phrase")
