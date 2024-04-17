@@ -13,125 +13,133 @@ extension SecurityCenter {
 
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-				VStack(spacing: .zero) {
-					Text(L10n.SecurityCenter.subtitle)
-						.foregroundStyle(.app.gray1)
-						.textStyle(.body1Regular)
-						.padding(.bottom, .medium1)
+				ScrollView {
+					VStack(spacing: .zero) {
+						Text(L10n.SecurityCenter.subtitle)
+							.foregroundStyle(.app.gray1)
+							.textStyle(.body1Regular)
+							.padding(.bottom, .medium1)
 
-					StatusView(status: viewStore.status) {
-						store.send(.view(.statusTapped))
+						VStack(spacing: .medium3) {
+							if viewStore.problems.isEmpty {
+								GoodStateView()
+							} else {
+								ForEach(viewStore.problems) { problem in
+									ProblemView(problem: problem) {
+										store.send(.view(.problemTapped(problem.id)))
+									}
+								}
+							}
+
+							ForEach(Item.allCases, id: \.self) { item in
+								ItemCardView(item: item, actionRequired: viewStore.actionsRequired.contains(item)) {
+									store.send(.view(.itemTapped(item)))
+								}
+							}
+						}
 					}
-					.padding(.bottom, .medium3)
-
-					ItemCardView(type: .securityFactors, actionRequired: viewStore.status.actionsRequired.contains(.securityFactors))
-						.padding(.bottom, .medium3)
-
-					ItemCardView(type: .configurationBackup, actionRequired: viewStore.status.actionsRequired.contains(.configurationBackup))
+					.padding(.top, .small2)
+					.padding(.horizontal, .medium2)
 				}
 			}
-			.padding(.horizontal, .medium2)
+			.navigationBarTitleDisplayMode(.large)
 			.navigationTitle(L10n.SecurityCenter.title)
 		}
 	}
 }
 
 extension SecurityCenter {
-	struct StatusView: SwiftUI.View {
-		let status: Status
-		let onTap: () -> Void
-
+	struct GoodStateView: SwiftUI.View {
 		var body: some SwiftUI.View {
-			VStack(spacing: 0) {
-				HStack(spacing: 0) {
-					headingIcon
-						.padding(.trailing, .small2)
+			HStack(spacing: 0) {
+				Image(.security)
+					.padding(.trailing, .small2)
 
-					Text(heading)
-						.textStyle(.body1Header)
+				Text(L10n.SecurityCenter.Status.recoverable)
+					.textStyle(.body1Header)
 
-					Spacer(minLength: .zero)
-				}
-				.foregroundStyle(.white)
-				.padding(.vertical, .small2)
-				.padding(.horizontal, .medium2)
-				.background(status == .good ? .app.green1 : .app.alert)
-
-				if case let .bad(_, problems, _) = status {
-					ForEach(problems, id: \.self) { problem in
-						Button(action: onTap) {
-							HStack(spacing: 0) {
-								Text(string(for: problem))
-									.multilineTextAlignment(.leading)
-									.textStyle(.body2HighImportance)
-
-								Spacer(minLength: .small1)
-
-								Image(.chevronRight)
-							}
-							.foregroundStyle(.app.alert)
-							.padding(.medium2)
-							.background(.app.lightAlert)
-						}
-
-						if problem != problems.last {
-							Rectangle()
-								.fill(.app.alert.opacity(0.3))
-								.frame(height: 1)
-						}
-					}
-				}
+				Spacer(minLength: .zero)
 			}
+			.foregroundStyle(.white)
+			.padding(.vertical, .small2)
+			.padding(.horizontal, .medium2)
+			.background(.app.green1)
 			.roundedCorners(radius: .small1)
 		}
+	}
 
-		@ViewBuilder
-		private var headingIcon: some SwiftUI.View {
-			switch status {
-			case .good:
-				Image(.security)
-			case .bad:
-				Image(.warningError)
-					.renderingMode(.template)
-					.resizable()
-					.frame(.smallest)
+	struct ProblemView: SwiftUI.View {
+		let problem: Problem
+		let action: () -> Void
+
+		var body: some SwiftUI.View {
+			Button(action: action) {
+				VStack(spacing: 0) {
+					HStack(spacing: 0) {
+						Image(.warningError)
+							.renderingMode(.template)
+							.resizable()
+							.frame(.smallest)
+							.padding(.trailing, .small2)
+
+						Text(heading(for: problem))
+							.multilineTextAlignment(.leading)
+							.lineSpacing(-.small2)
+							.textStyle(.body1Header)
+
+						Spacer(minLength: .zero)
+					}
+					.foregroundStyle(.white)
+					.padding(.vertical, .small2)
+					.padding(.horizontal, .medium2)
+					.background(.app.alert)
+
+					HStack(spacing: 0) {
+						Text(text(for: problem))
+							.multilineTextAlignment(.leading)
+							.textStyle(.body2HighImportance)
+
+						Spacer(minLength: .small1)
+
+						Image(.chevronRight)
+					}
+					.foregroundStyle(.app.alert)
+					.padding(.top, .small1)
+					.padding([.bottom, .horizontal], .medium2)
+					.background(.app.lightAlert)
+				}
+				.roundedCorners(radius: .small1)
 			}
 		}
 
-		private var heading: String {
-			switch status {
-			case .good:
-				L10n.SecurityCenter.Status.recoverable
-			case let .bad(recoverabilityIssue, _, _):
-				string(for: recoverabilityIssue)
-			}
-		}
-
-		func string(for issue: Status.RecoverabilityIssue) -> String {
-			switch issue {
-			case .walletNotRecoverable: L10n.SecurityCenter.Status.notRecoverable
-			case let .entitiesNotRecoverable(accounts, personas): L10n.SecurityCenter.Status.entitiesNotRecoverable(accounts, personas)
-			case .recoveryRequired: L10n.SecurityCenter.Status.recoveryRequired
-			}
-		}
-
-		func string(for problem: Status.Problem) -> String {
+		func heading(for problem: Problem) -> String {
 			switch problem {
-			case .problem3: L10n.SecurityCenter.SubStatus.problem3
-			case .problem5: L10n.SecurityCenter.SubStatus.problem5
-			case .problem6: L10n.SecurityCenter.SubStatus.problem6
-			case .problem7: L10n.SecurityCenter.SubStatus.problem7
-			case .problem9: L10n.SecurityCenter.SubStatus.problem9
+			case let .problem3(accounts, personas): L10n.SecurityCenter.Problem3.heading(accounts, personas)
+			case .problem5: L10n.SecurityCenter.Problem5.heading
+			case .problem6: L10n.SecurityCenter.Problem6.heading
+			case .problem7: L10n.SecurityCenter.Problem7.heading
+			case .problem9: L10n.SecurityCenter.Problem9.heading
+			}
+		}
+
+		func text(for problem: Problem) -> String {
+			switch problem {
+			case .problem3: L10n.SecurityCenter.Problem3.text
+			case .problem5: L10n.SecurityCenter.Problem5.text
+			case .problem6: L10n.SecurityCenter.Problem6.text
+			case .problem7: L10n.SecurityCenter.Problem7.text
+			case .problem9: L10n.SecurityCenter.Problem9.text
 			}
 		}
 	}
 
 	struct ItemCardView: SwiftUI.View {
-		let type: Item
+		let item: Item
 		let actionRequired: Bool
+		let action: () -> Void
 
 		var body: some SwiftUI.View {
-			Card {
+			Card(action: action) {
 				HStack(spacing: .medium2) {
 					Image(image)
 						.resizable()
@@ -177,21 +185,21 @@ extension SecurityCenter {
 		}
 
 		private var image: ImageResource {
-			switch type {
+			switch item {
 			case .securityFactors: .securityFactors
 			case .configurationBackup: .configurationBackup
 			}
 		}
 
 		private var title: String {
-			switch type {
+			switch item {
 			case .securityFactors: L10n.SecurityCenter.SecurityFactorsItem.title
 			case .configurationBackup: L10n.SecurityCenter.ConfigurationBackupItem.title
 			}
 		}
 
 		private var subtitle: String {
-			switch type {
+			switch item {
 			case .securityFactors: L10n.SecurityCenter.SecurityFactorsItem.subtitle
 			case .configurationBackup: L10n.SecurityCenter.ConfigurationBackupItem.subtitle
 			}
@@ -201,22 +209,11 @@ extension SecurityCenter {
 			if actionRequired {
 				L10n.SecurityCenter.AnyItem.actionRequiredStatus
 			} else {
-				switch type {
+				switch item {
 				case .securityFactors: L10n.SecurityCenter.SecurityFactorsItem.activeStatus
 				case .configurationBackup: L10n.SecurityCenter.ConfigurationBackupItem.backedUpStatus
 				}
 			}
-		}
-	}
-}
-
-extension SecurityCenter.Status {
-	var actionsRequired: [SecurityCenter.Item] {
-		switch self {
-		case .good:
-			[]
-		case let .bad(_, _, actionsRequired):
-			actionsRequired
 		}
 	}
 }
