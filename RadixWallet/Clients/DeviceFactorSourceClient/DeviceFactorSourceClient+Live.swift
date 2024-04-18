@@ -72,6 +72,14 @@ extension DeviceFactorSourceClient: DependencyKey {
 			)
 		}
 
+		let isSeedPhraseNeededToRecoverAccounts: @Sendable () async throws -> Bool = {
+			let deviceFactorSources = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)
+			let entities = try await deviceFactorSources.asyncMap {
+				try await entitiesControlledByFactorSource($0, nil)
+			}
+			return entities.contains(where: { !$0.isMnemonicPresentInKeychain })
+		}
+
 		return Self(
 			publicKeysFromOnDeviceHD: { request in
 				let factorSourceID = request.deviceFactorSource.id
@@ -143,7 +151,8 @@ extension DeviceFactorSourceClient: DependencyKey {
 				return try await IdentifiedArrayOf(uniqueElements: sources.asyncMap {
 					try await entitiesControlledByFactorSource($0, maybeOverridingSnapshot)
 				})
-			}
+			},
+			isSeedPhraseNeededToRecoverAccounts: isSeedPhraseNeededToRecoverAccounts
 		)
 	}()
 }

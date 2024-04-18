@@ -4,6 +4,7 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var seedPhrasesCount: Int?
 		var ledgerWalletsCount: Int?
+		var isSeedPhraseRequiredToRecoverAccounts = false
 
 		@PresentationState
 		public var destination: Destination.State?
@@ -20,6 +21,7 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case loadedSeedPhrasesCount(Int)
 		case loadedLedgerWalletsCount(Int)
+		case loadedIsSeedPhraseRequiredToRecoverAccounts(Bool)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -44,6 +46,7 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
+	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
 	public init() {}
 
@@ -61,6 +64,7 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 		case .onFirstTask:
 			return loadSeedPhrasesCount()
 				.merge(with: loadLedgerWalletsCount())
+				.merge(with: loadIsSeedPhraseRequiredToRecoverAccounts())
 
 		case .seedPhrasesButtonTapped:
 			state.destination = .seedPhrases(.init())
@@ -81,6 +85,10 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 		case let .loadedLedgerWalletsCount(count):
 			state.ledgerWalletsCount = count
 			return .none
+
+		case let .loadedIsSeedPhraseRequiredToRecoverAccounts(isRequired):
+			state.isSeedPhraseRequiredToRecoverAccounts = isRequired
+			return .none
 		}
 	}
 
@@ -96,6 +104,14 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 		.run { send in
 			try await send(.internal(.loadedLedgerWalletsCount(
 				factorSourcesClient.getFactorSources(type: LedgerHardwareWalletFactorSource.self).count
+			)))
+		}
+	}
+
+	private func loadIsSeedPhraseRequiredToRecoverAccounts() -> Effect<Action> {
+		.run { send in
+			try await send(.internal(.loadedIsSeedPhraseRequiredToRecoverAccounts(
+				deviceFactorSourceClient.isSeedPhraseNeededToRecoverAccounts()
 			)))
 		}
 	}

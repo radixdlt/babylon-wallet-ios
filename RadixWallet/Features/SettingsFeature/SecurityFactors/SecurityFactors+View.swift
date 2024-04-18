@@ -2,7 +2,11 @@ private typealias S = L10n.SecurityFactors
 
 extension SecurityFactors.State {
 	var viewState: SecurityFactors.ViewState {
-		.init(seedPhrasesCount: seedPhrasesCount, ledgerWalletsCount: ledgerWalletsCount)
+		.init(
+			seedPhrasesCount: seedPhrasesCount,
+			ledgerWalletsCount: ledgerWalletsCount,
+			isSeedPhraseRequiredToRecoverAccounts: isSeedPhraseRequiredToRecoverAccounts
+		)
 	}
 }
 
@@ -12,6 +16,7 @@ public extension SecurityFactors {
 	struct ViewState: Equatable {
 		let seedPhrasesCount: Int?
 		let ledgerWalletsCount: Int?
+		let isSeedPhraseRequiredToRecoverAccounts: Bool
 	}
 
 	@MainActor
@@ -57,28 +62,36 @@ private extension SecurityFactors.View {
 			.model(.init(
 				title: S.SeedPhrases.title,
 				subtitle: S.SeedPhrases.subtitle,
-				detail: seedPhrasesDetail(viewStore: viewStore),
+				detail: seedPhrasesDetail(viewStore),
+				hint: seedPhraseHint(viewStore),
 				icon: .asset(AssetResource.seedPhrases),
 				action: .seedPhrasesButtonTapped
 			)),
 			.model(.init(
 				title: S.LedgerWallet.title,
 				subtitle: S.LedgerWallet.subtitle,
-				detail: ledgerWalletsDetail(viewStore: viewStore),
+				detail: ledgerWalletsDetail(viewStore),
 				icon: .asset(AssetResource.ledger),
 				action: .ledgerWalletsButtonTapped
 			)),
 		]
 	}
 
-	func seedPhrasesDetail(viewStore: ViewStoreOf<SecurityFactors>) -> String? {
+	func seedPhrasesDetail(_ viewStore: ViewStoreOf<SecurityFactors>) -> String? {
 		guard let count = viewStore.seedPhrasesCount else {
 			return nil
 		}
 		return count == 1 ? S.SeedPhrases.counterSingular : S.SeedPhrases.counterPlural(count)
 	}
 
-	func ledgerWalletsDetail(viewStore: ViewStoreOf<SecurityFactors>) -> String? {
+	func seedPhraseHint(_ viewStore: ViewStoreOf<SecurityFactors>) -> Hint.ViewState? {
+		guard viewStore.isSeedPhraseRequiredToRecoverAccounts else {
+			return nil
+		}
+		return .init(kind: .warning, text: .init(S.SeedPhrases.enterSeedPhrase))
+	}
+
+	func ledgerWalletsDetail(_ viewStore: ViewStoreOf<SecurityFactors>) -> String? {
 		guard let count = viewStore.ledgerWalletsCount else {
 			return nil
 		}
