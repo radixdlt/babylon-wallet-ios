@@ -98,7 +98,6 @@ extension FactorSourcesClient: DependencyKey {
 				} else if sources.count > 1 {
 					let errorMessage = "BAD IMPL found more than 1 implicit main babylon device factor sources"
 					loggerGlobal.critical(.init(stringLiteral: errorMessage))
-					assertionFailure(errorMessage)
 					let dateSorted = sources.sorted(by: { $0.addedOn < $1.addedOn })
 					return dateSorted.first! // best we can do
 				} else {
