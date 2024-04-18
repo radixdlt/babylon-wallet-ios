@@ -125,29 +125,30 @@ public struct ImportMnemonicWord: Sendable, FeatureReducer {
 		switch viewAction {
 		case let .wordChanged(input):
 			guard !state.isReadonlyMode else { return .none }
-			switch state.value {
-			case let .complete(text, _, completion: .auto(match: .startsWith)):
-				guard input != text else {
-					// This is an unfortunate edge case we need to handle (perhaps can be solved in view layer?),
-					// if text was "com" and we type "f" the word gets autocompleted into "comfort", however,
-					// SwiftUI will **immediately** afterwards emit another "comf" event. Which we wanna prevent.
-					return .none
-				}
-			default: break
-			}
+			// FIXME: - No autocompletion, so this is disabled for now.
+//			switch state.value {
+//			case let .complete(text, _, completion: .auto(match: .startsWith)):
+//				guard input != text else {
+//					// This is an unfortunate edge case we need to handle (perhaps can be solved in view layer?),
+//					// if text was "com" and we type "f" the word gets autocompleted into "comfort", however,
+//					// SwiftUI will **immediately** afterwards emit another "comf" event. Which we wanna prevent.
+//					return .none
+//				}
+//			default: break
+//			}
 
-			guard input.count >= state.value.text.count else {
-				switch state.value {
-				case let .incomplete(text: _, hasFailedValidation) where hasFailedValidation:
-					// allow lookup if current word is invalid
-					return .send(.delegate(.lookupWord(input: input)))
-				default:
-					// We don't perform lookup when we decrease character count if the
-					// state is not currently "incomplete(_, hasFailedValidation: true)
-					state.value = .incomplete(text: input, hasFailedValidation: false)
-					return .none
-				}
-			}
+//			guard input.count >= state.value.text.count else {
+//				switch state.value {
+//				case let .incomplete(text: _, hasFailedValidation) where hasFailedValidation:
+//					// allow lookup if current word is invalid
+//					return .send(.delegate(.lookupWord(input: input)))
+//				default:
+//					// We don't perform lookup when we decrease character count if the
+//					// state is not currently "incomplete(_, hasFailedValidation: true)
+//					state.value = .incomplete(text: input, hasFailedValidation: false)
+//					return .none
+//				}
+//			}
 
 			return .send(.delegate(.lookupWord(input: input)))
 

@@ -660,14 +660,32 @@ extension ImportMnemonic {
 		_ state: inout State,
 		lookupResult: BIP39.WordList.LookupResult
 	) -> Effect<Action> {
+		// FIXME: - 1.5.4 hot fix
+		/// Words strip is broken in latest iOS versions, so we don't count on users selecting the word
+		/// dissambiguate between them. Rather the Wallet will validate the word eagerly if it is a valid one.
+		/// Behaviour:
+		/// - User enters the first two characters, having the word `en` - the word is incomplete.
+		/// - User enters another character, having the word`end` - the word is valid.
+		/// - User enters additional character, having the word `endl` - the word is incomplete.
+		/// - User enters additional characters, having the word `endless` - the word is considered valid.
+		/// - User removes some characters, having the word `endle` - the word is incomplete.
+		/// - User removes more characters, having the word `end` - the word is valid.
+		/// - User removes another character, having the word `en` - the word is incomplete.
 		switch lookupResult {
 		case let .known(.ambigous(candidates, nonEmptyInput)):
-			state.words[id: id]?.autocompletionCandidates = .init(input: nonEmptyInput, candidates: candidates)
-			state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: false)
-			return .none
+			guard let userInput = candidates.first(where: { $0.word == nonEmptyInput }) else {
+				state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: false)
+				return .none
+			}
 
-		case let .known(.unambiguous(word, match, _)):
-			return completeWith(word: word, completion: .auto(match: match), id: id, input: input, &state)
+			return completeWith(word: userInput, completion: .user, id: id, input: input, &state)
+
+		case let .known(.unambiguous(word, _, _)):
+			guard word.word.rawValue == input else {
+				state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: false)
+				return .none
+			}
+			return completeWith(word: word, completion: .user, id: id, input: input, &state)
 
 		case .unknown(.notInList):
 			state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: true)
