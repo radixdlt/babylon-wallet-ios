@@ -350,6 +350,7 @@ extension RTCClient {
 			throw PeerConnectionDidCloseError()
 		}
 		let data = try JSONEncoder().encode(response)
+		print(data.prettyPrintedJSONString)
 		try await anyConnection.sendData(data)
 	}
 
@@ -415,6 +416,7 @@ func decode(
 
 	return messageResult.flatMap { (message: DataChannelClient.AssembledMessage) in
 		let jsonData = message.messageContent
+		print(jsonData.prettyPrintedJSONString)
 		do {
 			let request = try jsonDecoder.decode(
 				P2P.RTCMessageFromPeer.Request.self,
