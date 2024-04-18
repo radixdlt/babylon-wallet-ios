@@ -1,12 +1,6 @@
 import Foundation
 import Sargon
 
-// MARK: - Gateway + Identifiable
-extension Gateway: Identifiable {
-	public typealias ID = URL
-	public var id: ID { url }
-}
-
 extension Gateway {
 	public var customDumpMirror: Mirror {
 		.init(
@@ -18,28 +12,9 @@ extension Gateway {
 			displayStyle: .struct
 		)
 	}
-
-	public var description: String {
-		"""
-		network: \(network),
-		url: \(url)
-		"""
-	}
 }
 
 extension Gateway {
-	public static let `default` = Gateway.mainnet
-}
-
-extension Gateway {
-	public static var mainnet: Self {
-		sargonProfileFinishMigrateAtEndOfStage1()
-	}
-
-	public static var stokenet: Self {
-		sargonProfileFinishMigrateAtEndOfStage1()
-	}
-
 	public static var rcnet: Self {
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
