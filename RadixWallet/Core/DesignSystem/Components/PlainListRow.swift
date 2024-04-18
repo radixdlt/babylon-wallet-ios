@@ -110,35 +110,37 @@ public struct PlainListRowCore: View {
 	}
 
 	public var body: some View {
-		VStack(alignment: .leading, spacing: .zero) {
-			if let title = viewState.title {
-				Text(title)
-					.lineSpacing(-6)
-					.lineLimit(1)
-					.textStyle(viewState.titleTextStyle)
-					.foregroundColor(.app.gray1)
-			}
+		VStack(alignment: .leading, spacing: .small3) {
+			VStack(alignment: .leading, spacing: .zero) {
+				if let title = viewState.title {
+					Text(title)
+						.lineSpacing(-6)
+						.lineLimit(1)
+						.textStyle(viewState.titleTextStyle)
+						.foregroundColor(.app.gray1)
+				}
 
-			if let subtitle = viewState.subtitle {
-				Text(subtitle)
-					.lineSpacing(-4)
-					.lineLimit(viewState.subtitleLineLimit)
-					.minimumScaleFactor(0.8)
-					.textStyle(viewState.subtitleTextStyle)
-					.foregroundColor(viewState.subtitleForegroundColor)
-			}
+				if let subtitle = viewState.subtitle {
+					Text(subtitle)
+						.lineSpacing(-4)
+						.lineLimit(viewState.subtitleLineLimit)
+						.minimumScaleFactor(0.8)
+						.textStyle(viewState.subtitleTextStyle)
+						.foregroundColor(viewState.subtitleForegroundColor)
+				}
 
-			if let detail = viewState.detail {
-				Text(detail)
-					.textStyle(.body2Regular)
-					.lineLimit(1)
-					.minimumScaleFactor(0.8)
-					.foregroundColor(.app.gray2)
+				if let detail = viewState.detail {
+					Text(detail)
+						.textStyle(.body2Regular)
+						.lineLimit(1)
+						.minimumScaleFactor(0.8)
+						.foregroundColor(.app.gray2)
+						.padding(.top, .small3)
+				}
 			}
 
 			if let hint = viewState.hint {
 				Hint(viewState: hint)
-					.padding(.top, .small3)
 			}
 		}
 		.padding(.vertical, viewState.verticalPadding)
