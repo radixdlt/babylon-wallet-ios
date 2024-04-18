@@ -53,23 +53,57 @@ public struct PlainListRow<Icon: View>: View {
 	}
 
 	public var body: some View {
+		VStack(alignment: .leading) {
+			top
+			hints
+		}
+		.padding(.vertical, viewState.rowCoreViewState.verticalPadding)
+		.padding(.horizontal, .medium3)
+		.frame(minHeight: .settingsRowHeight)
+		.contentShape(Rectangle())
+	}
+
+	private var top: some View {
 		HStack(spacing: .zero) {
-			if let icon = viewState.icon {
-				icon
-					.padding(.trailing, .medium3)
-			}
-
+			icon
 			PlainListRowCore(viewState: viewState.rowCoreViewState)
-
 			Spacer(minLength: 0)
+			accessory
+		}
+	}
 
-			if let accessory = viewState.accessory {
-				Image(asset: accessory)
+	@ViewBuilder
+	private var hints: some View {
+		if !viewState.rowCoreViewState.hints.isEmpty {
+			HStack(spacing: .zero) {
+				icon
+					.hidden() // to leave the same leading padding than on top view
+
+				VStack(alignment: .leading, spacing: .small1) {
+					ForEach(viewState.rowCoreViewState.hints) { hint in
+						Hint(viewState: hint)
+					}
+				}
+
+				accessory
+					.hidden() // to leave the same trailing padding than on top view
 			}
 		}
-		.frame(minHeight: .settingsRowHeight)
-		.padding(.horizontal, .medium3)
-		.contentShape(Rectangle())
+	}
+
+	@ViewBuilder
+	private var icon: some View {
+		if let icon = viewState.icon {
+			icon
+				.padding(.trailing, .medium3)
+		}
+	}
+
+	@ViewBuilder
+	private var accessory: some View {
+		if let accessory = viewState.accessory {
+			Image(asset: accessory)
+		}
 	}
 }
 
@@ -110,42 +144,33 @@ public struct PlainListRowCore: View {
 	}
 
 	public var body: some View {
-		VStack(alignment: .leading, spacing: .small3) {
-			VStack(alignment: .leading, spacing: .zero) {
-				if let title = viewState.title {
-					Text(title)
-						.lineSpacing(-6)
-						.lineLimit(1)
-						.textStyle(viewState.titleTextStyle)
-						.foregroundColor(.app.gray1)
-				}
-
-				if let subtitle = viewState.subtitle {
-					Text(subtitle)
-						.lineSpacing(-4)
-						.lineLimit(viewState.subtitleLineLimit)
-						.minimumScaleFactor(0.8)
-						.textStyle(viewState.subtitleTextStyle)
-						.foregroundColor(viewState.subtitleForegroundColor)
-				}
-
-				if let detail = viewState.detail {
-					Text(detail)
-						.textStyle(.body2Regular)
-						.lineLimit(1)
-						.minimumScaleFactor(0.8)
-						.foregroundColor(.app.gray2)
-						.padding(.top, .small3)
-				}
+		VStack(alignment: .leading, spacing: .zero) {
+			if let title = viewState.title {
+				Text(title)
+					.lineSpacing(-6)
+					.lineLimit(1)
+					.textStyle(viewState.titleTextStyle)
+					.foregroundColor(.app.gray1)
 			}
 
-			VStack(alignment: .leading, spacing: .small1) {
-				ForEach(viewState.hints) { hint in
-					Hint(viewState: hint)
-				}
+			if let subtitle = viewState.subtitle {
+				Text(subtitle)
+					.lineSpacing(-4)
+					.lineLimit(viewState.subtitleLineLimit)
+					.minimumScaleFactor(0.8)
+					.textStyle(viewState.subtitleTextStyle)
+					.foregroundColor(viewState.subtitleForegroundColor)
+			}
+
+			if let detail = viewState.detail {
+				Text(detail)
+					.textStyle(.body2Regular)
+					.lineLimit(1)
+					.minimumScaleFactor(0.8)
+					.foregroundColor(.app.gray2)
+					.padding(.top, .small3)
 			}
 		}
-		.padding(.vertical, viewState.verticalPadding)
 	}
 }
 
