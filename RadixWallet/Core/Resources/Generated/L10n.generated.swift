@@ -919,65 +919,67 @@ public enum L10n {
     public static let unauthorized = L10n.tr("Localizable", "common_unauthorized", fallback: "Unauthorized")
   }
   public enum ConfigurationBackup {
-    /// Accounts
-    public static let accountsItem = L10n.tr("Localizable", "configurationBackup_accountsItem", fallback: "Accounts")
-    /// Your list of Accounts and the Factors required to recover them
-    public static let accountsSubtitle = L10n.tr("Localizable", "configurationBackup_accountsSubtitle", fallback: "Your list of Accounts and the Factors required to recover them")
-    /// Configuration Backup status
-    public static let automatedBackupsToggle = L10n.tr("Localizable", "configurationBackup_automatedBackupsToggle", fallback: "Configuration Backup status")
-    /// Without an updated Configuration Backup, you cannot recover your Accounts and Personas.
-    public static let automatedBackupsWarning = L10n.tr("Localizable", "configurationBackup_automatedBackupsWarning", fallback: "Without an updated Configuration Backup, you cannot recover your Accounts and Personas.")
-    /// Automated Google Drive Backups
-    public static let backupsToggleGDrive = L10n.tr("Localizable", "configurationBackup_backupsToggleGDrive", fallback: "Automated Google Drive Backups")
-    /// Automated iCloud Backups
-    public static let backupsToggleICloud = L10n.tr("Localizable", "configurationBackup_backupsToggleICloud", fallback: "Automated iCloud Backups")
-    /// Last backup: %@ ago
-    public static func backupsUpdate(_ p1: Any) -> String {
-      return L10n.tr("Localizable", "configurationBackup_backupsUpdate", String(describing: p1), fallback: "Last backup: %@ ago")
-    }
-    /// Disconnect
-    public static let disconnectButton = L10n.tr("Localizable", "configurationBackup_disconnectButton", fallback: "Disconnect")
-    /// Logged in as:
-    public static let loggedInAsHeading = L10n.tr("Localizable", "configurationBackup_loggedInAsHeading", fallback: "Logged in as:")
-    /// Personas
-    public static let personasItem = L10n.tr("Localizable", "configurationBackup_personasItem", fallback: "Personas")
-    /// Your list of Personas and the Factors required to recover them. Also your Persona data.
-    public static let personasSubtitle = L10n.tr("Localizable", "configurationBackup_personasSubtitle", fallback: "Your list of Personas and the Factors required to recover them. Also your Persona data.")
     /// Automated Configuration Backup not working. Check internet connection and Google Drive settings.
     public static let problem5WarningAndroid = L10n.tr("Localizable", "configurationBackup_problem5WarningAndroid", fallback: "Automated Configuration Backup not working. Check internet connection and Google Drive settings.")
     /// Automated Configuration Backup not working. Check internet connection and iCloud settings.
     public static let problem5WarningIOS = L10n.tr("Localizable", "configurationBackup_problem5WarningIOS", fallback: "Automated Configuration Backup not working. Check internet connection and iCloud settings.")
     /// To secure your wallet, turn on automated backups or manually export backup file.
     public static let problem6Warning = L10n.tr("Localizable", "configurationBackup_problem6Warning", fallback: "To secure your wallet, turn on automated backups or manually export backup file.")
-    /// Delete
-    public static let problem7DeleteOldBackupIOS = L10n.tr("Localizable", "configurationBackup_problem7DeleteOldBackupIOS", fallback: "Delete")
-    /// Out-of-date backup still present on iCloud
-    public static let problem7OutOfDateBackupIOS = L10n.tr("Localizable", "configurationBackup_problem7OutOfDateBackupIOS", fallback: "Out-of-date backup still present on iCloud")
     /// Configuration Backup not up to date. Turn on automated backups or manually export backup file.
     public static let problem7Warning = L10n.tr("Localizable", "configurationBackup_problem7Warning", fallback: "Configuration Backup not up to date. Turn on automated backups or manually export backup file.")
-    /// Security Factors
-    public static let securityFactorsItem = L10n.tr("Localizable", "configurationBackup_securityFactorsItem", fallback: "Security Factors")
-    /// The list of Security Factors you need to recover your Accounts and Personas.
-    public static let securityFactorsSubtitle = L10n.tr("Localizable", "configurationBackup_securityFactorsSubtitle", fallback: "The list of Security Factors you need to recover your Accounts and Personas.")
-    /// You need an up-to-date Configuration Backup to recover your Accounts and Personas if you lose access to them.
-    /// 
-    /// Your Backup does not contain your keys or seed phrase.
-    public static let subtitle = L10n.tr("Localizable", "configurationBackup_subtitle", fallback: "You need an up-to-date Configuration Backup to recover your Accounts and Personas if you lose access to them.\n\nYour Backup does not contain your keys or seed phrase.")
     /// Configuration Backup
     public static let title = L10n.tr("Localizable", "configurationBackup_title", fallback: "Configuration Backup")
-    /// Wallet settings
-    public static let walletSettingsItem = L10n.tr("Localizable", "configurationBackup_walletSettingsItem", fallback: "Wallet settings")
-    /// Your general settings, such as trusted dApps, linked Connectors and wallet display settings.
-    public static let walletSettingsSubtitle = L10n.tr("Localizable", "configurationBackup_walletSettingsSubtitle", fallback: "Your general settings, such as trusted dApps, linked Connectors and wallet display settings.")
-    public enum ManualBackup {
+    public enum Automated {
+      /// Your list of Accounts and the Factors required to recover them
+      public static let accountsItemSubtitle = L10n.tr("Localizable", "configurationBackup_automated_accountsItemSubtitle", fallback: "Your list of Accounts and the Factors required to recover them")
+      /// Accounts
+      public static let accountsItemTitle = L10n.tr("Localizable", "configurationBackup_automated_accountsItemTitle", fallback: "Accounts")
+      /// Delete
+      public static let deleteOutdatedBackupIOS = L10n.tr("Localizable", "configurationBackup_automated_deleteOutdatedBackupIOS", fallback: "Delete")
+      /// Disconnect
+      public static let disconnectAndroid = L10n.tr("Localizable", "configurationBackup_automated_disconnectAndroid", fallback: "Disconnect")
+      /// You need an up-to-date Configuration Backup to recover your Accounts and Personas if you lose access to them.
+      /// 
+      /// Your Backup does not contain your keys or seed phrase.
+      public static let heading = L10n.tr("Localizable", "configurationBackup_automated_heading", fallback: "You need an up-to-date Configuration Backup to recover your Accounts and Personas if you lose access to them.\n\nYour Backup does not contain your keys or seed phrase.")
+      /// Last backup: %@ ago
+      public static func lastBackup(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "configurationBackup_automated_lastBackup", String(describing: p1), fallback: "Last backup: %@ ago")
+      }
+      /// Logged in as:
+      public static let loggedInAsAndroid = L10n.tr("Localizable", "configurationBackup_automated_loggedInAsAndroid", fallback: "Logged in as:")
+      /// Out-of-date backup still present on iCloud
+      public static let outdatedBackupIOS = L10n.tr("Localizable", "configurationBackup_automated_outdatedBackupIOS", fallback: "Out-of-date backup still present on iCloud")
+      /// Your list of Personas and the Factors required to recover them. Also your Persona data.
+      public static let personasItemSubtitle = L10n.tr("Localizable", "configurationBackup_automated_personasItemSubtitle", fallback: "Your list of Personas and the Factors required to recover them. Also your Persona data.")
+      /// Personas
+      public static let personasItemTitle = L10n.tr("Localizable", "configurationBackup_automated_personasItemTitle", fallback: "Personas")
+      /// The list of Security Factors you need to recover your Accounts and Personas.
+      public static let securityFactorsItemSubtitle = L10n.tr("Localizable", "configurationBackup_automated_securityFactorsItemSubtitle", fallback: "The list of Security Factors you need to recover your Accounts and Personas.")
+      /// Security Factors
+      public static let securityFactorsItemTitle = L10n.tr("Localizable", "configurationBackup_automated_securityFactorsItemTitle", fallback: "Security Factors")
+      /// Configuration Backup status
+      public static let text = L10n.tr("Localizable", "configurationBackup_automated_text", fallback: "Configuration Backup status")
+      /// Automated Google Drive Backups
+      public static let toggleAndroid = L10n.tr("Localizable", "configurationBackup_automated_toggleAndroid", fallback: "Automated Google Drive Backups")
+      /// Automated iCloud Backups
+      public static let toggleIOS = L10n.tr("Localizable", "configurationBackup_automated_toggleIOS", fallback: "Automated iCloud Backups")
+      /// Your general settings, such as trusted dApps, linked Connectors and wallet display settings.
+      public static let walletSettingsItemSubtitle = L10n.tr("Localizable", "configurationBackup_automated_walletSettingsItemSubtitle", fallback: "Your general settings, such as trusted dApps, linked Connectors and wallet display settings.")
+      /// Wallet settings
+      public static let walletSettingsItemTitle = L10n.tr("Localizable", "configurationBackup_automated_walletSettingsItemTitle", fallback: "Wallet settings")
+      /// Without an updated Configuration Backup, you cannot recover your Accounts and Personas.
+      public static let warning = L10n.tr("Localizable", "configurationBackup_automated_warning", fallback: "Without an updated Configuration Backup, you cannot recover your Accounts and Personas.")
+    }
+    public enum Manual {
       /// Export Backup File
-      public static let exportButton = L10n.tr("Localizable", "configurationBackup_manualBackup_exportButton", fallback: "Export Backup File")
+      public static let exportButton = L10n.tr("Localizable", "configurationBackup_manual_exportButton", fallback: "Export Backup File")
       /// Manual backup.
-      public static let heading = L10n.tr("Localizable", "configurationBackup_manualBackup_heading", fallback: "Manual backup.")
+      public static let heading = L10n.tr("Localizable", "configurationBackup_manual_heading", fallback: "Manual backup.")
       /// You can export your own Configuration Backup file and save it locally
-      public static let subtitle = L10n.tr("Localizable", "configurationBackup_manualBackup_subtitle", fallback: "You can export your own Configuration Backup file and save it locally")
+      public static let text = L10n.tr("Localizable", "configurationBackup_manual_text", fallback: "You can export your own Configuration Backup file and save it locally")
       /// You’ll need to export a new Backup file each time you make a change in your wallet.
-      public static let warning = L10n.tr("Localizable", "configurationBackup_manualBackup_warning", fallback: "You’ll need to export a new Backup file each time you make a change in your wallet.")
+      public static let warning = L10n.tr("Localizable", "configurationBackup_manual_warning", fallback: "You’ll need to export a new Backup file each time you make a change in your wallet.")
     }
   }
   public enum ConfirmMnemonicBackedUp {
