@@ -226,25 +226,24 @@ extension SecureStorageClient: DependencyKey {
 			return try loadMnemonicFor(key: key, notifyIfMissing: request.notifyIfMissing)
 		}
 
-		let saveMnemonicForFactorSource: SaveMnemonicForFactorSource = { _ in
-//			let factorSource = privateFactorSource.factorSource
-//			let mnemonicWithPassphrase = privateFactorSource.mnemonicWithPassphrase
-//			let data = try jsonEncoder().encode(mnemonicWithPassphrase)
-//			let mostSecureAccesibilityAndAuthenticationPolicy = try queryMostSecureAccesibilityAndAuthenticationPolicy()
-//			let key = key(factorSourceID: factorSource.id)
-//
-//			try keychainClient.setDataWithAuth(
-//				data,
-//				forKey: key,
-//				attributes: .init(
-//					iCloudSyncEnabled: false,
-//					accessibility: mostSecureAccesibilityAndAuthenticationPolicy.accessibility,
-//					authenticationPolicy: mostSecureAccesibilityAndAuthenticationPolicy.authenticationPolicy,
-//					label: importantKeychainIdentifier("Radix Wallet Factor Secret")!,
-//					comment: .init("Created on \(factorSource.hint.name) \(factorSource.supportsOlympia ? " (Olympia)" : "")")
-//				)
-//			)
-			sargonProfileFinishMigrateAtEndOfStage1()
+		let saveMnemonicForFactorSource: SaveMnemonicForFactorSource = { privateFactorSource in
+			let factorSource = privateFactorSource.factorSource
+			let mnemonicWithPassphrase = privateFactorSource.mnemonicWithPassphrase
+			let data = try jsonEncoder().encode(mnemonicWithPassphrase)
+			let mostSecureAccesibilityAndAuthenticationPolicy = try queryMostSecureAccesibilityAndAuthenticationPolicy()
+			let key = key(factorSourceID: factorSource.id)
+
+			try keychainClient.setDataWithAuth(
+				data,
+				forKey: key,
+				attributes: .init(
+					iCloudSyncEnabled: false,
+					accessibility: mostSecureAccesibilityAndAuthenticationPolicy.accessibility,
+					authenticationPolicy: mostSecureAccesibilityAndAuthenticationPolicy.authenticationPolicy,
+					label: importantKeychainIdentifier("Radix Wallet Factor Secret")!,
+					comment: .init("Created on \(factorSource.hint.name) \(factorSource.supportsOlympia ? " (Olympia)" : "")")
+				)
+			)
 		}
 
 		#if DEBUG
