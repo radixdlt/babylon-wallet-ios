@@ -1074,6 +1074,7 @@
 		A4CFB55F2BAA821E00778BDD /* HScrollBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4CFB55E2BAA821E00778BDD /* HScrollBar.swift */; };
 		A4CFB5612BAA826E00778BDD /* Measure+Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4CFB5602BAA826E00778BDD /* Measure+Position.swift */; };
 		A4EB37C82B6272F3003FE31D /* TrackedValidatorInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4EB37C72B6272F3003FE31D /* TrackedValidatorInteraction.swift */; };
+		E60CB51B2BD16AE5003C084C /* Stage1MigrateToSargon+Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = E60CB51A2BD16AE5003C084C /* Stage1MigrateToSargon+Header.swift */; };
 		E62449D52AFBA61100272C67 /* Home+AccountRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */; };
 		E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */; };
 		E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */; };
@@ -2244,6 +2245,7 @@
 		A4CFB55E2BAA821E00778BDD /* HScrollBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HScrollBar.swift; sourceTree = "<group>"; };
 		A4CFB5602BAA826E00778BDD /* Measure+Position.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Measure+Position.swift"; sourceTree = "<group>"; };
 		A4EB37C72B6272F3003FE31D /* TrackedValidatorInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackedValidatorInteraction.swift; sourceTree = "<group>"; };
+		E60CB51A2BD16AE5003C084C /* Stage1MigrateToSargon+Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+Header.swift"; sourceTree = "<group>"; };
 		E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+Reducer.swift"; sourceTree = "<group>"; };
 		E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+View.swift"; sourceTree = "<group>"; };
 		E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportMnemonicTests.swift; sourceTree = "<group>"; };
@@ -5935,6 +5937,7 @@
 				484161402BCACDC700D2B644 /* Stage1MigrateToSargon+DepositAddressExceptionRule.swift */,
 				484161502BCAD77900D2B644 /* Stage1MigrateToSargon+DepositeRule.swift */,
 				484161522BCAD7DF00D2B644 /* Stage1MigrateToSargon+DerivationPath.swift */,
+				E60CB51A2BD16AE5003C084C /* Stage1MigrateToSargon+Header.swift */,
 				484161622BCADBFF00D2B644 /* Stage1MigrateToSargon+DeviceFactorSource.swift */,
 				4855B1AF2BCA5E3100DD0A47 /* Stage1MigrateToSargon+DisplayName.swift */,
 				48DD0FF42BCBCB7C00C54C43 /* Stage1MigrateToSargon+ResourceOrNonFungible.swift */,
@@ -7391,6 +7394,7 @@
 				5B1C4FD82BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift in Sources */,
 				830EA9D62AE94033004C8051 /* AccountAndPersonaHiding+Reducer.swift in Sources */,
 				48CFC5052ADC10DA00E77A5C /* TransactionPreviewResponseLogsInner.swift in Sources */,
+				E60CB51B2BD16AE5003C084C /* Stage1MigrateToSargon+Header.swift in Sources */,
 				48CFC2FF2ADC10D900E77A5C /* AccountSecurity+View.swift in Sources */,
 				4855B1A62BCA5B1F00DD0A47 /* BasePersonaDataEntryProtocol.swift in Sources */,
 				5B1C4FDA2BBB0DCF00B9436F /* AppsFlyerClient+Live.swift in Sources */,

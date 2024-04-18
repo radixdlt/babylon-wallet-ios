@@ -109,18 +109,17 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		@Sendable func saveProfileHeaderList(_ headers: Sargon.Profile.HeaderList) throws {
-//			let data = try jsonEncoder().encode(headers)
-//			try keychainClient.setDataWithoutAuth(
-//				data,
-//				forKey: profileHeaderListKeychainKey,
-//				attributes: .init(
-//					iCloudSyncEnabled: true, // Always synced, since header list might be used by multiple devices
-//					accessibility: .whenUnlocked,
-//					label: importantKeychainIdentifier("Radix Wallet Metadata"),
-//					comment: "Contains the metadata about Radix Wallet Data."
-//				)
-//			)
-			sargonProfileFinishMigrateAtEndOfStage1()
+			let data = try jsonEncoder().encode(headers)
+			try keychainClient.setDataWithoutAuth(
+				data,
+				forKey: profileHeaderListKeychainKey,
+				attributes: .init(
+					iCloudSyncEnabled: true, // Always synced, since header list might be used by multiple devices
+					accessibility: .whenUnlocked,
+					label: importantKeychainIdentifier("Radix Wallet Metadata"),
+					comment: "Contains the metadata about Radix Wallet Data."
+				)
+			)
 		}
 
 		@Sendable func deleteProfileHeader(_ id: Sargon.Profile.Header.ID) throws {
@@ -184,32 +183,30 @@ extension SecureStorageClient: DependencyKey {
 		)
 
 		@Sendable func saveDeviceInfo(_ deviceInfo: DeviceInfo) throws {
-//			let data = try jsonEncoder().encode(deviceInfo)
-//			try keychainClient.setDataWithoutAuth(
-//				data,
-//				forKey: deviceInfoKey,
-//				attributes: deviceInfoAttributes
-//			)
-//			loggerGlobal.notice("Saved deviceInfo: \(deviceInfo)")
-			sargonProfileFinishMigrateAtEndOfStage1()
+			let data = try jsonEncoder().encode(deviceInfo)
+			try keychainClient.setDataWithoutAuth(
+				data,
+				forKey: deviceInfoKey,
+				attributes: deviceInfoAttributes
+			)
+			loggerGlobal.notice("Saved deviceInfo: \(deviceInfo)")
 		}
 
 		@Sendable func loadMnemonicFor(
 			key: KeychainClient.Key,
 			notifyIfMissing: Bool
 		) throws -> MnemonicWithPassphrase? {
-//			let authenticationPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: L10n.Biometrics.Prompt.title).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to continue."
-//			guard let data = try keychainClient.getDataWithAuth(
-//				forKey: key,
-//				authenticationPrompt: authenticationPrompt
-//			) else {
-//				if notifyIfMissing {
-//					overlayWindowClient.scheduleAlertIgnoreAction(.missingMnemonicAlert)
-//				}
-//				return nil
-//			}
-//			return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)
-			sargonProfileFinishMigrateAtEndOfStage1()
+			let authenticationPrompt: KeychainClient.AuthenticationPrompt = NonEmptyString(rawValue: L10n.Biometrics.Prompt.title).map { KeychainClient.AuthenticationPrompt($0) } ?? "Authenticate to continue."
+			guard let data = try keychainClient.getDataWithAuth(
+				forKey: key,
+				authenticationPrompt: authenticationPrompt
+			) else {
+				if notifyIfMissing {
+					overlayWindowClient.scheduleAlertIgnoreAction(.missingMnemonicAlert)
+				}
+				return nil
+			}
+			return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)
 		}
 
 		let loadProfileSnapshot: LoadProfileSnapshot = { id in
