@@ -33,7 +33,6 @@ extension RadixConnectRelay {
 	}
 
 	public struct HandshakeResponse: Sendable, Codable {
-		let sessionId: Session.ID
 		let publicKey: HexCodable32Bytes
 	}
 }
@@ -148,7 +147,12 @@ extension RadixConnectRelay {
 		}
 
 		static func sendHandshakeResponse(sessionId: RadixConnectRelay.Session.ID, publicKey: Session.PeerPublicKey) throws -> Self {
-			try .init(method: .sendHandshakeResponse, sessionId: sessionId, data: HexCodable(hex: publicKey.rawRepresentation.hex))
+			let encoded = try JSONEncoder().encode(HandshakeResponse(publicKey: HexCodable32Bytes(hex: publicKey.rawRepresentation.hex)))
+			return .init(
+				method: .sendHandshakeResponse,
+				sessionId: sessionId,
+				data: HexCodable(data: encoded)
+			)
 		}
 	}
 }
