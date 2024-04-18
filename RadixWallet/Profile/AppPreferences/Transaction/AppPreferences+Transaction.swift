@@ -8,7 +8,7 @@ extension AppPreferences {
 		CustomStringConvertible,
 		CustomDumpReflectable
 	{
-		public static let defaultDepositGuaranteePreset = Decimal192(floatLiteral: 0.99)
+		public static let defaultDepositGuaranteePreset = Decimal192(0.99)
 		public var defaultDepositGuarantee: Decimal192
 
 		public init(
