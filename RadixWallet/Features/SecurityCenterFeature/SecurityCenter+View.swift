@@ -56,7 +56,7 @@ extension SecurityCenter {
 				Image(.security)
 					.padding(.trailing, .small2)
 
-				Text(L10n.SecurityCenter.Status.recoverable)
+				Text(L10n.SecurityCenter.GoodState.heading)
 					.textStyle(.body1Header)
 
 				Spacer(minLength: .zero)
@@ -153,11 +153,13 @@ extension SecurityCenter {
 							.textStyle(.body1Header)
 
 						Text(subtitle)
+							.multilineTextAlignment(.leading)
+							.lineSpacing(-.small3)
 							.foregroundStyle(.app.gray2)
 							.textStyle(.body2Regular)
 
 						HStack(spacing: .zero) {
-							icon
+							StatusIcon(actionRequired: actionRequired)
 								.padding(.trailing, .small3)
 
 							Text(status)
@@ -171,17 +173,6 @@ extension SecurityCenter {
 				.padding(.vertical, .medium2)
 				.padding(.leading, .medium2)
 				.padding(.trailing, .large3)
-			}
-		}
-
-		@ViewBuilder
-		private var icon: some SwiftUI.View {
-			if actionRequired {
-				Image(.warningError)
-					.resizable()
-					.frame(.smallest)
-			} else {
-				Image(.checkCircle)
 			}
 		}
 
@@ -214,6 +205,20 @@ extension SecurityCenter {
 				case .securityFactors: L10n.SecurityCenter.SecurityFactorsItem.activeStatus
 				case .configurationBackup: L10n.SecurityCenter.ConfigurationBackupItem.backedUpStatus
 				}
+			}
+		}
+	}
+
+	struct StatusIcon: SwiftUI.View {
+		let actionRequired: Bool
+
+		var body: some SwiftUI.View {
+			if actionRequired {
+				Image(.warningError)
+					.resizable()
+					.frame(.smallest)
+			} else {
+				Image(.checkCircle)
 			}
 		}
 	}
