@@ -88,7 +88,7 @@ private extension SecurityFactors.View {
 		guard viewStore.isSeedPhraseRequiredToRecoverAccounts else {
 			return []
 		}
-		return [.init(kind: .warning, text: .init(S.SeedPhrases.enterSeedPhrase)), .init(kind: .warning, text: .init("Whatever"))]
+		return [.init(kind: .warning, text: .init(S.SeedPhrases.enterSeedPhrase))]
 	}
 
 	func ledgerWalletsDetail(_ viewStore: ViewStoreOf<SecurityFactors>) -> String? {

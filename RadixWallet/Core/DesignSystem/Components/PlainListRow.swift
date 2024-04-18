@@ -4,6 +4,7 @@ public struct PlainListRow<Icon: View>: View {
 		let accessory: ImageAsset?
 		let rowCoreViewState: PlainListRowCore.ViewState
 		let icon: Icon?
+		let hints: [Hint.ViewState]
 
 		public init(
 			rowCoreViewState: PlainListRowCore.ViewState,
@@ -13,16 +14,19 @@ public struct PlainListRow<Icon: View>: View {
 			self.accessory = accessory
 			self.rowCoreViewState = rowCoreViewState
 			self.icon = icon()
+			self.hints = []
 		}
 
 		public init(
 			_ content: AssetIcon.Content?,
 			rowCoreViewState: PlainListRowCore.ViewState,
-			accessory: ImageAsset? = AssetResource.chevronRight
+			accessory: ImageAsset? = AssetResource.chevronRight,
+			hints: [Hint.ViewState]
 		) where Icon == AssetIcon {
 			self.accessory = accessory
 			self.rowCoreViewState = rowCoreViewState
 			self.icon = content.map { AssetIcon($0) }
+			self.hints = hints
 		}
 	}
 
@@ -49,7 +53,7 @@ public struct PlainListRow<Icon: View>: View {
 		subtitle: String? = nil,
 		accessory: ImageAsset? = AssetResource.chevronRight
 	) where Icon == AssetIcon {
-		self.viewState = ViewState(content, rowCoreViewState: .init(title: title, subtitle: subtitle), accessory: accessory)
+		self.viewState = ViewState(content, rowCoreViewState: .init(title: title, subtitle: subtitle), accessory: accessory, hints: [])
 	}
 
 	public var body: some View {
@@ -74,13 +78,13 @@ public struct PlainListRow<Icon: View>: View {
 
 	@ViewBuilder
 	private var hints: some View {
-		if !viewState.rowCoreViewState.hints.isEmpty {
+		if !viewState.hints.isEmpty {
 			HStack(spacing: .zero) {
 				icon
 					.hidden() // to leave the same leading padding than on top view
 
 				VStack(alignment: .leading, spacing: .small1) {
-					ForEach(viewState.rowCoreViewState.hints) { hint in
+					ForEach(viewState.hints) { hint in
 						Hint(viewState: hint)
 					}
 				}
@@ -114,20 +118,17 @@ public struct PlainListRowCore: View {
 		public let title: String?
 		public let subtitle: String?
 		public let detail: String?
-		public let hints: [Hint.ViewState]
 
 		init(
 			kind: Kind = .general,
 			title: String?,
 			subtitle: String? = nil,
-			detail: String? = nil,
-			hints: [Hint.ViewState] = []
+			detail: String? = nil
 		) {
 			self.kind = kind
 			self.title = title
 			self.subtitle = subtitle
 			self.detail = detail
-			self.hints = hints
 		}
 	}
 
@@ -265,17 +266,5 @@ extension View {
 		Button(action: action) {
 			self
 		}
-	}
-}
-
-// MARK: - PlainListRow_Previews
-struct PlainListRow_Previews: PreviewProvider {
-	static var previews: some View {
-		PlainListRow(
-			viewState: .init(
-				.asset(AssetResource.appSettings),
-				rowCoreViewState: .init(title: "A title", subtitle: nil)
-			)
-		)
 	}
 }

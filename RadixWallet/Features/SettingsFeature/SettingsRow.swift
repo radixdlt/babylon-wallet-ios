@@ -62,7 +62,12 @@ extension SettingsRow {
 			action: Feature.ViewAction
 		) {
 			self.id = title
-			self.rowViewState = .init(icon, rowCoreViewState: .init(kind: .settings, title: title, subtitle: subtitle, detail: detail, hints: hints), accessory: accessory)
+			self.rowViewState = .init(
+				icon,
+				rowCoreViewState: .init(kind: .settings, title: title, subtitle: subtitle, detail: detail),
+				accessory: accessory,
+				hints: hints
+			)
 			self.action = action
 		}
 	}
