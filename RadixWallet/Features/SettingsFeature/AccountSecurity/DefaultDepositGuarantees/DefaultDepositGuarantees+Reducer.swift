@@ -16,7 +16,7 @@ public struct DefaultDepositGuarantees: Sendable, FeatureReducer {
 		var percentageStepper: MinimumPercentageStepper.State
 
 		public init(depositGuarantee: Decimal192) {
-			self.percentageStepper = .init(value: 100 * depositGuarantee)
+			self.percentageStepper = .init(value: Decimal192(100) * depositGuarantee)
 		}
 	}
 
