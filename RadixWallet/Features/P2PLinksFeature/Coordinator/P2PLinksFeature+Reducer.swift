@@ -64,7 +64,6 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 	// MARK: Reducer
 
 	@Dependency(\.radixConnectClient) var radixConnectClient
-	@Dependency(\.p2pLinksClient) var p2pLinksClient
 	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
