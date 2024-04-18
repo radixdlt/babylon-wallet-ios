@@ -272,13 +272,13 @@ extension AlertState<NewConnection.Destination.Action.ErrorAlert> {
 
 	public static var invalidQRCode: AlertState {
 		AlertState {
-            TextState(L10n.LinkedConnectors.incorrectQrTitle)
+            TextState(S.incorrectQrTitle)
 		} actions: {
 			ButtonState(role: .cancel, action: .dismissTapped) {
                 TextState(L10n.Common.dismiss)
 			}
 		} message: {
-            TextState(L10n.LinkedConnectors.incorrectQrMessage)
+            TextState(S.incorrectQrMessage)
 		}
 	}
 }
