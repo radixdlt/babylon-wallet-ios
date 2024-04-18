@@ -57,9 +57,18 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 		case itemTapped(Item)
 	}
 
+	public var body: some ReducerOf<Self> {
+		Reduce(core)
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
+			}
+	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
+
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case let .problemTapped(iD):
+		case let .problemTapped(id):
 			return .none
 
 		case let .itemTapped(item):
