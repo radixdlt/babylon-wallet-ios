@@ -99,13 +99,12 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		@Sendable func loadProfileHeaderList() throws -> Sargon.Profile.HeaderList? {
-//			try keychainClient
-//				.getDataWithoutAuth(forKey: profileHeaderListKeychainKey)
-//				.map {
-//					try jsonDecoder().decode([Sargon.Profile.Header].self, from: $0)
-//				}
-//				.flatMap(Sargon.Profile.HeaderList.init)
-			sargonProfileFinishMigrateAtEndOfStage1()
+			try keychainClient
+				.getDataWithoutAuth(forKey: profileHeaderListKeychainKey)
+				.map {
+					try jsonDecoder().decode([Sargon.Profile.Header].self, from: $0)
+				}
+				.flatMap(Sargon.Profile.HeaderList.init)
 		}
 
 		@Sendable func saveProfileHeaderList(_ headers: Sargon.Profile.HeaderList) throws {
