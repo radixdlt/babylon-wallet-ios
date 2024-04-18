@@ -1014,8 +1014,6 @@
 		A43F1E182BC6BBD1001DD3FA /* CloudBackupClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43F1E172BC6BBD1001DD3FA /* CloudBackupClient+Interface.swift */; };
 		A43F1E1A2BC6BC62001DD3FA /* CloudBackupClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43F1E192BC6BC62001DD3FA /* CloudBackupClient+Live.swift */; };
 		A43F1E1C2BC6BD10001DD3FA /* CloudBackupClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43F1E1B2BC6BD10001DD3FA /* CloudBackupClient+Test.swift */; };
-		A43F1E1F2BC6C11F001DD3FA /* CloudBackup+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43F1E1E2BC6C11F001DD3FA /* CloudBackup+Reducer.swift */; };
-		A43F1E212BC6C13A001DD3FA /* CloudBackup+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43F1E202BC6C13A001DD3FA /* CloudBackup+View.swift */; };
 		A43F1E232BC72884001DD3FA /* AnyRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43F1E222BC72884001DD3FA /* AnyRange.swift */; };
 		A43F1E262BC96F18001DD3FA /* SecurityCenter+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43F1E252BC96F18001DD3FA /* SecurityCenter+Reducer.swift */; };
 		A43F1E282BC96F27001DD3FA /* SecurityCenter+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = A43F1E272BC96F27001DD3FA /* SecurityCenter+View.swift */; };
@@ -2110,8 +2108,6 @@
 		A43F1E172BC6BBD1001DD3FA /* CloudBackupClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CloudBackupClient+Interface.swift"; sourceTree = "<group>"; };
 		A43F1E192BC6BC62001DD3FA /* CloudBackupClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CloudBackupClient+Live.swift"; sourceTree = "<group>"; };
 		A43F1E1B2BC6BD10001DD3FA /* CloudBackupClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CloudBackupClient+Test.swift"; sourceTree = "<group>"; };
-		A43F1E1E2BC6C11F001DD3FA /* CloudBackup+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CloudBackup+Reducer.swift"; sourceTree = "<group>"; };
-		A43F1E202BC6C13A001DD3FA /* CloudBackup+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CloudBackup+View.swift"; sourceTree = "<group>"; };
 		A43F1E222BC72884001DD3FA /* AnyRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyRange.swift; sourceTree = "<group>"; };
 		A43F1E252BC96F18001DD3FA /* SecurityCenter+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityCenter+Reducer.swift"; sourceTree = "<group>"; };
 		A43F1E272BC96F27001DD3FA /* SecurityCenter+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityCenter+View.swift"; sourceTree = "<group>"; };
@@ -5745,15 +5741,6 @@
 			path = CloudBackupClient;
 			sourceTree = "<group>";
 		};
-		A43F1E1D2BC6C104001DD3FA /* CloudBackupFeature */ = {
-			isa = PBXGroup;
-			children = (
-				A43F1E1E2BC6C11F001DD3FA /* CloudBackup+Reducer.swift */,
-				A43F1E202BC6C13A001DD3FA /* CloudBackup+View.swift */,
-			);
-			path = CloudBackupFeature;
-			sourceTree = "<group>";
-		};
 		A43F1E242BC96EF2001DD3FA /* SecurityCenterFeature */ = {
 			isa = PBXGroup;
 			children = (
@@ -6748,7 +6735,6 @@
 				48CFC4B22ADC10DA00E77A5C /* TransactionStatusResponse.swift in Sources */,
 				48CFC5AA2ADC10DA00E77A5C /* PrimaryRectangularButtonStyle.swift in Sources */,
 				48CFC29F2ADC10D900E77A5C /* PersonasCoordinator+View.swift in Sources */,
-				A43F1E212BC6C13A001DD3FA /* CloudBackup+View.swift in Sources */,
 				48CFC43E2ADC10DA00E77A5C /* FactorSourcesClient+Interface.swift in Sources */,
 				48CFC4062ADC10DA00E77A5C /* JSONValue.swift in Sources */,
 				48CFC5812ADC10DA00E77A5C /* URLFormatterClient+Test.swift in Sources */,
@@ -6877,7 +6863,6 @@
 				5B45E2FA2BC45770007C4C84 /* FactorSourceAccess+View.swift in Sources */,
 				5B45E2FB2BC45770007C4C84 /* FactorSourceAccess.swift in Sources */,
 				48CFC5252ADC10DA00E77A5C /* ValidatorUptimeCollection.swift in Sources */,
-				A43F1E1F2BC6C11F001DD3FA /* CloudBackup+Reducer.swift in Sources */,
 				48CFC2552ADC10D900E77A5C /* Splash.swift in Sources */,
 				48CFC6232ADC10DA00E77A5C /* AccountPortfolio+Extensions.swift in Sources */,
 				48CFC4962ADC10DA00E77A5C /* StateKeyValueStoreDataRequest.swift in Sources */,
