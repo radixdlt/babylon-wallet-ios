@@ -175,14 +175,6 @@ public struct PlainListRowCore: View {
 	}
 }
 
-// MARK: - Hint.ViewState + Identifiable
-// TODO: Change
-extension Hint.ViewState: Identifiable {
-	public var id: String {
-		UUID().uuidString
-	}
-}
-
 private extension PlainListRowCore.ViewState {
 	var titleTextStyle: TextStyle {
 		switch kind {
