@@ -15,11 +15,6 @@ public struct AppPreferences:
 	/// Display settings in the wallet app, such as appearences, currency etc.
 	public var display: Display
 
-	/// Collection of clients user have connected P2P with, typically these
-	/// are WebRTC connections with DApps, but might be Android or iPhone
-	/// clients as well.
-	public var p2pLinks: P2PLinks
-
 	/// The active network
 	public var gateways: Gateways
 
@@ -27,13 +22,11 @@ public struct AppPreferences:
 		transaction: Transaction = .default,
 		security: Security = .default,
 		display: Display = .default,
-		p2pLinks: P2PLinks = [],
 		gateways: Gateways = .preset
 	) {
 		self.transaction = transaction
 		self.security = security
 		self.display = display
-		self.p2pLinks = p2pLinks
 		self.gateways = gateways
 	}
 
@@ -54,7 +47,6 @@ extension AppPreferences {
 				"transaction": transaction,
 				"security": security,
 				"display": display,
-				"p2pLinks": p2pLinks,
 				"gateways": gateways,
 			],
 			displayStyle: .struct
@@ -66,7 +58,6 @@ extension AppPreferences {
 		transaction: \(transaction),
 		security: \(security),
 		display: \(display),
-		p2pLinks: \(p2pLinks),
 		gateways: \(gateways)
 		"""
 	}

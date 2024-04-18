@@ -284,11 +284,6 @@ extension AppPreferencesView {
 				indentation: inOneLevel
 			)
 
-			P2PLinksView(
-				p2pLinks: appPreferences.p2pLinks,
-				indentation: inOneLevel
-			)
-
 			AppSecurityView(
 				security: appPreferences.security,
 				indentation: inOneLevel
@@ -381,35 +376,6 @@ extension AppSecurityView {
 			#endif // os(macOS)
 			Labeled("isCloudProfileSyncEnabled", value: String(describing: security.isCloudProfileSyncEnabled))
 			Labeled("isDeveloperModeEnabled", value: String(describing: security.isDeveloperModeEnabled))
-		}
-		.padding(.leading, leadingPadding)
-	}
-}
-
-// MARK: - P2PLinksView
-public struct P2PLinksView: IndentedView {
-	public let p2pLinks: P2PLinks
-	public let indentation: Indentation
-}
-
-extension P2PLinksView {
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Text("P2PLinks")
-				.fontWeight(.heavy)
-			#if os(macOS)
-				.font(.title)
-			#endif // os(macOS)
-			if p2pLinks.isEmpty {
-				Text("<None yet>").font(.callout)
-			} else {
-				ForEach(p2pLinks) { p2pLinks in
-					P2PLinkView(
-						p2pLinks: p2pLinks,
-						indentation: inOneLevel
-					)
-				}
-			}
 		}
 		.padding(.leading, leadingPadding)
 	}
