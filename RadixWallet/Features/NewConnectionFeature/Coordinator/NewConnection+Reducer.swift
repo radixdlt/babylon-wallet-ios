@@ -244,17 +244,17 @@ public struct NewConnection: Sendable, FeatureReducer {
 }
 
 extension AlertState<NewConnection.Destination.Action.ErrorAlert> {
-    typealias S = L10n.LinkedConnectors
-    
+	typealias S = L10n.LinkedConnectors
+
 	public static var unknownPurpose: AlertState {
 		AlertState {
-            TextState(S.linkFailedErrorTitle)
+			TextState(S.linkFailedErrorTitle)
 		} actions: {
 			ButtonState(role: .cancel, action: .dismissTapped) {
-                TextState(L10n.Common.dismiss)
+				TextState(L10n.Common.dismiss)
 			}
 		} message: {
-            TextState(S.unknownPurposeErrorMessage)
+			TextState(S.unknownPurposeErrorMessage)
 		}
 	}
 
@@ -266,19 +266,19 @@ extension AlertState<NewConnection.Destination.Action.ErrorAlert> {
 				TextState(L10n.Common.dismiss)
 			}
 		} message: {
-            TextState(S.changingPurposeNotSupportedErrorMessage)
+			TextState(S.changingPurposeNotSupportedErrorMessage)
 		}
 	}
 
 	public static var invalidQRCode: AlertState {
 		AlertState {
-            TextState(S.incorrectQrTitle)
+			TextState(S.incorrectQrTitle)
 		} actions: {
 			ButtonState(role: .cancel, action: .dismissTapped) {
-                TextState(L10n.Common.dismiss)
+				TextState(L10n.Common.dismiss)
 			}
 		} message: {
-            TextState(S.incorrectQrMessage)
+			TextState(S.incorrectQrMessage)
 		}
 	}
 }

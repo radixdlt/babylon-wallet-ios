@@ -17,10 +17,10 @@ public struct P2PLink:
 	/// The `ConnectionPassword` is used to be able to restablish the P2P connection.
 	public let connectionPassword: ConnectionPassword
 
-    /// Acts as the seed for the `ID`.
+	/// Acts as the seed for the `ID`.
 	public let publicKey: CEPublicKey
 
-    /// Link purpose
+	/// Link purpose
 	public let purpose: ConnectionPurpose
 
 	/// Client name, e.g. "Chrome on Macbook" or "My work Android" or "My wifes iPhone SE".

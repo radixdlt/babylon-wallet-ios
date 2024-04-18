@@ -424,10 +424,10 @@ extension SecureStorageClient: DependencyKey {
 			)
 			loggerGlobal.notice("Saved private key for CE public key: \(publicKey)")
 		}
-        
-        @Sendable func deleteP2PLinkPrivateKey(_ publicKey: CEPublicKey) throws {
-            try keychainClient.removeData(forKey: key(publicKey: publicKey))
-        }
+
+		@Sendable func deleteP2PLinkPrivateKey(_ publicKey: CEPublicKey) throws {
+			try keychainClient.removeData(forKey: key(publicKey: publicKey))
+		}
 
 		#if DEBUG
 		return Self(
@@ -452,7 +452,7 @@ extension SecureStorageClient: DependencyKey {
 			saveP2PLinks: saveP2PLinks,
 			loadP2PLinkPrivateKey: loadP2PLinkPrivateKey,
 			saveP2PLinkPrivateKey: saveP2PLinkPrivateKey,
-            deleteP2PLinkPrivateKey: deleteP2PLinkPrivateKey,
+			deleteP2PLinkPrivateKey: deleteP2PLinkPrivateKey,
 			getAllMnemonics: getAllMnemonics
 		)
 		#else
@@ -477,8 +477,8 @@ extension SecureStorageClient: DependencyKey {
 			loadP2PLinks: loadP2PLinks,
 			saveP2PLinks: saveP2PLinks,
 			loadP2PLinkPrivateKey: loadP2PLinkPrivateKey,
-            saveP2PLinkPrivateKey: saveP2PLinkPrivateKey, 
-            deleteP2PLinkPrivateKey: deleteP2PLinkPrivateKey
+			saveP2PLinkPrivateKey: saveP2PLinkPrivateKey,
+			deleteP2PLinkPrivateKey: deleteP2PLinkPrivateKey
 		)
 		#endif
 	}()

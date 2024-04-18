@@ -31,7 +31,7 @@ extension SecureStorageClient: TestDependencyKey {
 		saveP2PLinks: { _ in },
 		loadP2PLinkPrivateKey: { _ in nil },
 		saveP2PLinkPrivateKey: { _, _ in },
-        deleteP2PLinkPrivateKey: { _ in },
+		deleteP2PLinkPrivateKey: { _ in },
 		getAllMnemonics: { [] }
 	)
 	#else
@@ -57,7 +57,7 @@ extension SecureStorageClient: TestDependencyKey {
 		saveP2PLinks: { _ in },
 		loadP2PLinkPrivateKey: { _ in nil },
 		saveP2PLinkPrivateKey: { _, _ in },
-        deleteP2PLinkPrivateKey: { _ in }
+		deleteP2PLinkPrivateKey: { _ in }
 	)
 	#endif // DEBUG
 
@@ -86,7 +86,7 @@ extension SecureStorageClient: TestDependencyKey {
 		saveP2PLinks: unimplemented("\(Self.self).saveP2PLinks"),
 		loadP2PLinkPrivateKey: unimplemented("\(Self.self).loadP2PLinkPrivateKey"),
 		saveP2PLinkPrivateKey: unimplemented("\(Self.self).saveP2PLinkPrivateKey"),
-        deleteP2PLinkPrivateKey: unimplemented("\(Self.self).deleteP2PLinkPrivateKey"),
+		deleteP2PLinkPrivateKey: unimplemented("\(Self.self).deleteP2PLinkPrivateKey"),
 		getAllMnemonics: unimplemented("\(Self.self).getAllMnemonics")
 	)
 	#else
@@ -112,7 +112,7 @@ extension SecureStorageClient: TestDependencyKey {
 		saveP2PLinks: unimplemented("\(Self.self).saveP2PLinks"),
 		loadP2PLinkPrivateKey: unimplemented("\(Self.self).loadP2PLinkPrivateKey"),
 		saveP2PLinkPrivateKey: unimplemented("\(Self.self).saveP2PLinkPrivateKey"),
-        deleteP2PLinkPrivateKey: unimplemented("\(Self.self).deleteP2PLinkPrivateKey")
+		deleteP2PLinkPrivateKey: unimplemented("\(Self.self).deleteP2PLinkPrivateKey")
 	)
 	#endif
 }

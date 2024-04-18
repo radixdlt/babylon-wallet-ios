@@ -42,7 +42,7 @@ public struct NewConnectionName: Sendable, FeatureReducer {
 			return .send(.view(.textFieldFocused(.connectionName)))
 
 		case let .textFieldFocused(focus):
-            return .send(.internal(.focusTextField(focus)))
+			return .send(.internal(.focusTextField(focus)))
 
 		case let .nameOfConnectionChanged(connectionName):
 			state.nameOfConnection = connectionName.trimmingNewlines()

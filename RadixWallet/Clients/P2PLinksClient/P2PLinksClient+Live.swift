@@ -1,5 +1,4 @@
 // MARK: - P2PLinksClient + DependencyKey
-
 extension P2PLinksClient: DependencyKey {
 	public typealias Value = P2PLinksClient
 
@@ -19,21 +18,21 @@ extension P2PLinksClient: DependencyKey {
 			},
 			deleteP2PLinkByPassword: { password in
 				try secureStorageClient.updatingP2PLinks {
-                    try $0.links
-                        .filter { $0.connectionPassword == password }
-                        .forEach {
-                            try secureStorageClient.deleteP2PLinkPrivateKey($0.publicKey)
-                        }
-                    $0.links.removeAll(where: { $0.connectionPassword == password })
-                }
+					try $0.links
+						.filter { $0.connectionPassword == password }
+						.forEach {
+							try secureStorageClient.deleteP2PLinkPrivateKey($0.publicKey)
+						}
+					$0.links.removeAll(where: { $0.connectionPassword == password })
+				}
 			},
 			deleteAllP2PLinks: {
-                try secureStorageClient.updatingP2PLinks {
-                    try $0.links.forEach {
-                        try secureStorageClient.deleteP2PLinkPrivateKey($0.publicKey)
-                    }
-                    $0.links.removeAll()
-                }
+				try secureStorageClient.updatingP2PLinks {
+					try $0.links.forEach {
+						try secureStorageClient.deleteP2PLinkPrivateKey($0.publicKey)
+					}
+					$0.links.removeAll()
+				}
 			},
 			getP2PLinkPrivateKey: { publicKey in
 				let privateKey = try secureStorageClient.loadP2PLinkPrivateKey(publicKey)
