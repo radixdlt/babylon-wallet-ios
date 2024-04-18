@@ -1,4 +1,4 @@
-import EngineToolkit
+
 @testable import Radix_Wallet_Dev
 import XCTest
 
@@ -40,7 +40,7 @@ final class EntitiesHidingTests: TestCase {
 
 	lazy var network = try! Profile.Network(
 		networkID: .mainnet,
-		accounts: [account0, account1].asIdentifiable(),
+		accounts: [account0, account1].asIdentified(),
 		personas: [persona0, persona1],
 		authorizedDapps: [dApp0, dApp1]
 	)

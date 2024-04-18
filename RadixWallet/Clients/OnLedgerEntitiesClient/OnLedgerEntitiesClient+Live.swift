@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - OnLedgerEntitiesClient + DependencyKey
 extension OnLedgerEntitiesClient: DependencyKey {
 	public static let maximumNFTIDChunkSize = 29
@@ -61,8 +63,8 @@ extension OnLedgerEntitiesClient {
 		@Dependency(\.cacheClient) var cacheClient
 
 		let cachingIdentifier = CacheClient.Entry.onLedgerEntity(.nonFungibleIdPage(
-			accountAddress: request.accountAddress.asGeneral,
-			resourceAddress: request.resource.resourceAddress.asGeneral,
+			accountAddress: request.accountAddress,
+			resourceAddress: request.resource.resourceAddress,
 			pageCursor: request.pageCursor
 		))
 		let cached = try? cacheClient.load(
@@ -87,9 +89,9 @@ extension OnLedgerEntitiesClient {
 		)
 
 		let items = try freshPage.items.map {
-			try NonFungibleGlobalId.fromParts(
-				resourceAddress: request.resource.resourceAddress.intoEngine(),
-				nonFungibleLocalId: .from(stringFormat: $0)
+			try NonFungibleGlobalId(
+				resourceAddress: request.resource.resourceAddress,
+				nonFungibleLocalId: .init($0)
 			)
 		}
 
@@ -167,7 +169,7 @@ extension OnLedgerEntitiesClient {
 				try await gatewayAPIClient.getNonFungibleData(.init(
 					atLedgerState: request.atLedgerState?.selector,
 					resourceAddress: request.resource.address,
-					nonFungibleIds: Array(ids.map { try $0.localId().toString() })
+					nonFungibleIds: Array(ids.map { $0.nonFungibleLocalId.toRawString() })
 				))
 			}
 
@@ -175,9 +177,9 @@ extension OnLedgerEntitiesClient {
 			.flatMap { item in
 				try item.nonFungibleIds.map { id in
 					try OnLedgerEntity.nonFungibleToken(.init(
-						id: .fromParts(
-							resourceAddress: .init(address: request.resource.address),
-							nonFungibleLocalId: .from(stringFormat: id.nonFungibleId)
+						id: NonFungibleGlobalID(
+							resourceAddress: request.resource,
+							nonFungibleLocalId: .init(id.nonFungibleId)
 						),
 						data: id.data?.programmaticJson.tuple
 					))
@@ -275,23 +277,23 @@ extension OnLedgerEntity {
 	var cachingIdentifier: CacheClient.Entry.OnLedgerEntity {
 		switch self {
 		case let .resource(resource):
-			.resource(resource.resourceAddress.asGeneral)
+			.init(address: resource.resourceAddress)
 		case let .nonFungibleToken(nonFungibleToken):
 			.nonFungibleData(nonFungibleToken.id)
 		case let .accountNonFungibleIds(idsPage):
 			.nonFungibleIdPage(
-				accountAddress: idsPage.accountAddress.asGeneral,
-				resourceAddress: idsPage.resourceAddress.asGeneral,
+				accountAddress: idsPage.accountAddress,
+				resourceAddress: idsPage.resourceAddress,
 				pageCursor: idsPage.pageCursor
 			)
 		case let .account(account):
-			.account(account.address.asGeneral)
+			.init(address: account.address)
 		case let .resourcePool(resourcePool):
-			.resourcePool(resourcePool.address.asGeneral)
+			.init(address: resourcePool.address)
 		case let .validator(validator):
-			.validator(validator.address.asGeneral)
+			.init(address: validator.address)
 		case let .genericComponent(component):
-			.genericComponent(component.address.asGeneral)
+			.init(address: component.address)
 		}
 	}
 }
@@ -299,40 +301,16 @@ extension OnLedgerEntity {
 extension CacheClient.Entry.OnLedgerEntity {
 	var address: Address {
 		switch self {
-		case let .resource(resource):
-			resource.asGeneral
-		case let .account(account):
-			account.asGeneral
-		case let .resourcePool(resourcePool):
-			resourcePool.asGeneral
-		case let .validator(validator):
-			validator.asGeneral
-		case let .genericComponent(genericComponent):
-			genericComponent.asGeneral
-		case let .nonFungibleData(nonFungibleId):
-			.init(address: nonFungibleId.resourceAddress().asStr(), decodedKind: .globalNonFungibleResourceManager)
-		case let .nonFungibleIdPage(_, resourceAddress, _):
-			resourceAddress.asGeneral
+		case let .address(address): address
+		case let .nonFungibleData(globalID): globalID.resourceAddress.asGeneral
+		case let .nonFungibleIdPage(_, resourceAddress, _): resourceAddress.asGeneral
 		}
 	}
 }
 
 extension Address {
 	var cachingIdentifier: CacheClient.Entry.OnLedgerEntity {
-		switch self.decodedKind {
-		case _ where AccountEntityType.addressSpace.contains(self.decodedKind):
-			.account(self)
-		case _ where ResourceEntityType.addressSpace.contains(self.decodedKind):
-			.resource(self)
-		case _ where ResourcePoolEntityType.addressSpace.contains(self.decodedKind):
-			.resourcePool(self)
-		case _ where ValidatorEntityType.addressSpace.contains(self.decodedKind):
-			.validator(self)
-		case _ where ComponentEntityType.addressSpace.contains(self.decodedKind):
-			.genericComponent(self)
-		default:
-			.genericComponent(self)
-		}
+		.address(self)
 	}
 }
 

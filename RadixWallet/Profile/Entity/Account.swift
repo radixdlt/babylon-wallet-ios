@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - EntityExtraProperties
 public enum EntityExtraProperties {
 	case forAccount(Profile.Network.Account.ExtraProperties)
@@ -122,10 +120,11 @@ extension Profile.Network.Account {
 	public static func deriveVirtualAddress(
 		networkID: NetworkID,
 		factorInstance: HierarchicalDeterministicFactorInstance
-	) throws -> EntityAddress {
-		_ = try factorInstance.derivationPath.asAccountPath()
-		let engineAddress = try deriveVirtualAccountAddressFromPublicKey(publicKey: factorInstance.publicKey.intoEngine(), networkId: networkID.rawValue)
-		return AccountAddress(address: engineAddress.addressString(), decodedKind: engineAddress.entityType())
+	) -> EntityAddress {
+		EntityAddress(
+			publicKey: factorInstance.publicKey.intoSargon(),
+			networkID: networkID
+		)
 	}
 
 	public var isOlympiaAccount: Bool {
@@ -199,10 +198,10 @@ extension Profile.Network.Account {
 
 extension Profile.Network.Accounts {
 	public var nonHidden: IdentifiedArrayOf<Profile.Network.Account> {
-		filter(not(\.isHidden)).asIdentifiable()
+		filter(not(\.isHidden)).asIdentified()
 	}
 
 	public var hidden: IdentifiedArrayOf<Profile.Network.Account> {
-		filter(\.isHidden).asIdentifiable()
+		filter(\.isHidden).asIdentified()
 	}
 }

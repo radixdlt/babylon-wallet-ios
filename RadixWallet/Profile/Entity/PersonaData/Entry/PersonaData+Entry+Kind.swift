@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - PersonaData.Entry.Kind
 extension PersonaData.Entry {
 	public enum Kind: String, Sendable, Hashable, Codable {

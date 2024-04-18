@@ -9,13 +9,13 @@ public struct DefaultDepositGuarantees: Sendable, FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
-		public var depositGuarantee: RETDecimal? {
-			percentageStepper.value.map { 0.01 * $0 }
+		public var depositGuarantee: Decimal192? {
+			percentageStepper.value.map { try! Decimal192(0.01) * $0 }
 		}
 
 		var percentageStepper: MinimumPercentageStepper.State
 
-		public init(depositGuarantee: RETDecimal) {
+		public init(depositGuarantee: Decimal192) {
 			self.percentageStepper = .init(value: 100 * depositGuarantee)
 		}
 	}

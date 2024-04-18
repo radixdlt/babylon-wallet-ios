@@ -129,7 +129,7 @@ extension BIP39.WordList {
 		}
 
 		let arrayOfCandidates = words.filter { $0.word.starts(with: string) }
-		let setOfCandidates = OrderedSet<BIP39.Word>.init(uncheckedUniqueElements: arrayOfCandidates)
+		let setOfCandidates = OrderedSet<BIP39.Word>(uncheckedUniqueElements: arrayOfCandidates)
 
 		guard
 			let candidates = NonEmpty<OrderedSet<BIP39.Word>>(rawValue: setOfCandidates)

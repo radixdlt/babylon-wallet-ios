@@ -39,7 +39,7 @@ struct DappInteractionCoordinator: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case submit(P2P.Dapp.Response, DappMetadata)
-		case dismiss(DappMetadata, TXID)
+		case dismiss(DappMetadata, IntentHash)
 		case dismissSilently
 	}
 

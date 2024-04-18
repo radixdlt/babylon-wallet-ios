@@ -22,18 +22,6 @@ extension OnLedgerEntity.Metadata {
 }
 
 extension OnLedgerEntity.Metadata {
-	public init(_ raw: [String: MetadataValue?]) {
-		self.init(
-			name: raw.name,
-			symbol: raw.symbol,
-			description: raw.description,
-			iconURL: raw.iconURL,
-			tags: raw.tags
-		)
-	}
-}
-
-extension OnLedgerEntity.Metadata {
 	public enum MetadataError: Error, CustomStringConvertible {
 		case missingName
 		case missingDappDefinition
@@ -133,7 +121,7 @@ extension GatewayAPI.EntityMetadataItemValue {
 			return nil
 		}
 		do {
-			return try NonFungibleLocalId.from(stringFormat: raw)
+			return try NonFungibleLocalId(raw)
 		} catch {
 			loggerGlobal.error("Failed to convert NonFungibleLocalId from string: \(raw), error: \(error) => FILTERED OUT.")
 			return nil
@@ -221,11 +209,11 @@ extension GatewayAPI.EntityMetadataCollection {
 		)
 	}
 
-	public var pool: ResourcePoolAddress? {
+	public var pool: PoolAddress? {
 		extract(
 			key: .pool,
 			from: \.asGlobalAddress,
-			transform: ResourcePoolAddress.init(validatingAddress:)
+			transform: PoolAddress.init(validatingAddress:)
 		)
 	}
 

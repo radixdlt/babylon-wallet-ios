@@ -94,7 +94,7 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 
 						return states
 					}
-					return deviceFactorSources.asIdentifiable()
+					return deviceFactorSources.asIdentified()
 				}
 
 				await send(

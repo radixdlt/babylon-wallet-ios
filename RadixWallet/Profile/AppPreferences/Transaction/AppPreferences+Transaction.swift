@@ -1,5 +1,3 @@
-import EngineToolkit
-
 // MARK: - AppPreferences.Transaction
 extension AppPreferences {
 	/// Display settings in the wallet app, such as appearences, currency etc.
@@ -10,11 +8,11 @@ extension AppPreferences {
 		CustomStringConvertible,
 		CustomDumpReflectable
 	{
-		public static let defaultDepositGuaranteePreset = RETDecimal(floatLiteral: 0.99)
-		public var defaultDepositGuarantee: RETDecimal
+		public static let defaultDepositGuaranteePreset = try! Decimal192(0.99)
+		public var defaultDepositGuarantee: Decimal192
 
 		public init(
-			defaultDepositGuarantee: RETDecimal = Self.defaultDepositGuaranteePreset
+			defaultDepositGuarantee: Decimal192 = Self.defaultDepositGuaranteePreset
 		) {
 			self.defaultDepositGuarantee = defaultDepositGuarantee
 		}

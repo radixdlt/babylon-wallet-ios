@@ -145,7 +145,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 						} else {
 							ent // user does not have access to this, needs importing.
 						}
-					}.asIdentifiable()
+					}.asIdentified()
 
 					return ToImport(
 						factorSourcesControllingEntities: factorSourcesControllingEntities,
@@ -167,13 +167,13 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 			return .none
 
 		case let .loadedToImport(.success(toImport)):
-			let ents = toImport.factorSourcesControllingEntities.sorted().asIdentifiable()
+			let ents = toImport.factorSourcesControllingEntities.sorted().asIdentified()
 			var mnemonicsLeftToImport = ents.map {
 				ImportMnemonicControllingAccounts.State(
 					entitiesControlledByFactorSource: $0,
 					isMainBDFS: false
 				)
-			}.asIdentifiable()
+			}.asIdentified()
 			let explicitMainBDFSFactorSources = ents.filter(\.isExplicitMain)
 
 			if let explicitMain = explicitMainBDFSFactorSources.first {
@@ -190,7 +190,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 					let treatAsImplicitMain = !toImport.hasAnyBDFSExplicitlyMarkedMain
 					mnemonicsLeftToImport[id: firstBabylonDeviceFactorSource.id]?.isMainBDFS = treatAsImplicitMain
 				} else {
-					assertionFailure("DISCREPANCY, no babylon device factor source, invalid profile.")
+					loggerGlobal.notice("no mnemonics to import - probably you uninstalled the app with mnemonics still intact in Keychain")
 				}
 			}
 

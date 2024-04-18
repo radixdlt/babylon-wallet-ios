@@ -1,5 +1,6 @@
 import JSONTesting
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
 
 // MARK: - FaucetClientTests
@@ -118,17 +119,17 @@ final class FaucetClientTests: TestCase {
 		let userDefaults = UserDefaults.Dependency.ephemeral()
 		await userDefaults.saveEpochForWhenLastUsedByAccountAddress(expectedEpochs)
 
-		let hash = try TransactionHash.fromStr(string: "txid_tdx_d_1pycj4pzxu9fc9x4qxflu63x7fmmal2raafd3wj9vea9nr5wy84dqsdq4cj", networkId: NetworkID.ansharnet.rawValue)
+		let hash = try IntentHash("txid_tdx_d_1pycj4pzxu9fc9x4qxflu63x7fmmal2raafd3wj9vea9nr5wy84dqsdq4cj")
 
 		try await withDependencies {
 			$0.gatewayAPIClient.getEpoch = { currentEpoch }
 			$0.submitTXClient.submitTransaction = { _ in hash }
 			$0.transactionClient.buildTransactionIntent = { _ in
-				.previewValue
+				TransactionIntent.sample
 			}
 			$0.userDefaults = userDefaults
 			$0.transactionClient.notarizeTransaction = { _ in
-				try NotarizeTransactionResponse(notarized: .init([]), intent: .init(header: .previewValue, manifest: .previewValue, message: .none), txID: hash)
+				try NotarizeTransactionResponse(notarized: CompiledNotarizedIntent.sample, intent: TransactionIntent.sample, txID: IntentHash.sample)
 			}
 			$0.submitTXClient.hasTXBeenCommittedSuccessfully = { _ in }
 			$0.gatewaysClient.getCurrentGateway = { .enkinet }
@@ -149,19 +150,3 @@ extension Curve25519.Signing.PublicKey {
 // extension Engine.EddsaEd25519PublicKey {
 //	static let previewValue = Self(bytes: Array(Curve25519.Signing.PublicKey.previewValue.rawRepresentation))
 // }
-
-extension TransactionHeader {
-	static let previewValue = Self(
-		networkId: NetworkID.enkinet.rawValue,
-		startEpochInclusive: 0,
-		endEpochExclusive: 1,
-		nonce: 0,
-		notaryPublicKey: .ed25519(value: Curve25519.Signing.PublicKey.previewValue.rawRepresentation),
-		notaryIsSignatory: true,
-		tipPercentage: 0
-	)
-}
-
-extension TransactionIntent {
-	static let previewValue = try! TransactionIntent(header: .previewValue, manifest: TransactionManifest(instructions: .fromInstructions(instructions: [], networkId: NetworkID.kisharnet.rawValue), blobs: []), message: .none)
-}

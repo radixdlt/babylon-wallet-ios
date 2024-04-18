@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - SubmitTransactionClient + DependencyKey
 extension SubmitTransactionClient: DependencyKey {
 	public typealias Value = SubmitTransactionClient
@@ -5,12 +7,12 @@ extension SubmitTransactionClient: DependencyKey {
 	public static let liveValue: Self = {
 		@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
-		let hasTXBeenCommittedSuccessfully: HasTXBeenCommittedSuccessfully = { txID in
+		let hasTXBeenCommittedSuccessfully: HasTXBeenCommittedSuccessfully = { intentHash in
 			@Dependency(\.continuousClock) var clock
 
 			@Sendable func pollTransactionStatus() async throws -> GatewayAPI.TransactionStatusResponse {
 				let txStatusRequest = GatewayAPI.TransactionStatusRequest(
-					intentHash: txID.asStr()
+					intentHash: intentHash.toRawString()
 				)
 				let txStatusResponse = try await gatewayAPIClient.transactionStatus(txStatusRequest)
 				return txStatusResponse
@@ -52,41 +54,12 @@ extension SubmitTransactionClient: DependencyKey {
 		let submitTransaction: SubmitTransaction = { request in
 			let txID = request.txID
 
-			func debugPrintTX(_ decompiledNotarized: NotarizedTransaction) {
-				let signedIntent = decompiledNotarized.signedIntent()
-				let notarySignature = decompiledNotarized.notarySignature()
-				let intent = signedIntent.intent()
-				let intentSignatures = signedIntent.intentSignatures()
-				// RET prints when convertManifest is called, when it is removed, this can be moved down
-				// inline inside `print`.
-				let txIntentString = intent.description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue })
-				loggerGlobal.debug("\n\n🔮 DEBUG TRANSACTION START 🔮")
-				loggerGlobal.debug("TXID: \(txID.asStr())")
-				let tooManyBytesToPrint = 6000 // competely arbitrarily chosen should not take long time to print is the point...
-				if txIntentString.count < tooManyBytesToPrint {
-					loggerGlobal.debug("TransactionIntent: \(txIntentString)")
-				} else {
-					loggerGlobal.debug("TransactionIntent <Manifest too big, header only> \(intent.header().description(lookupNetworkName: { try? Radix.Network.lookupBy(id: $0).name.rawValue }))")
-				}
-				loggerGlobal.debug("\n\nINTENT SIGNATURES: \(intentSignatures.map { "\npublicKey: \($0.publicKey?.bytes.hex ?? "")\nsig: \($0.signature.bytes.hex)" }.joined(separator: "\n"))")
-				loggerGlobal.debug("\nNOTARY SIGNATURE: \(notarySignature.bytes.hex)")
-				if request.compiledNotarizedTXIntent.count < tooManyBytesToPrint {
-					loggerGlobal.debug("\n\nCOMPILED NOTARIZED INTENT:\n\(request.compiledNotarizedTXIntent.hex)")
-				} else {
-					loggerGlobal.debug("\n\nCOMPILED NOTARIZED INTENT: <TOO BIG TO PRINT>")
-				}
-				loggerGlobal.debug("\n\n\n🔮 DEBUG TRANSACTION END 🔮\n\n")
-			}
-
-			do {
-				#if DEBUG
-				let decompiledNotarized = try NotarizedTransaction.decompile(compiledNotarizedTransaction: Data(request.compiledNotarizedTXIntent))
-				debugPrintTX(decompiledNotarized)
-				#endif
-			} catch {}
+			#if DEBUG
+			debugPrintCompiledNotarizedIntent(compiled: request.compiledNotarizedTXIntent)
+			#endif
 
 			let submitTransactionRequest = GatewayAPI.TransactionSubmitRequest(
-				notarizedTransactionHex: request.compiledNotarizedTXIntent.hex()
+				notarizedTransactionHex: request.compiledNotarizedTXIntent.data.hex
 			)
 
 			let response = try await gatewayAPIClient.submitTransaction(submitTransactionRequest)
@@ -134,7 +107,7 @@ extension GatewayAPI.TransactionStatus: @unchecked Sendable {}
 // MARK: - SubmitTXFailure
 public enum SubmitTXFailure: Sendable, LocalizedError, Equatable {
 	case failedToSubmitTX
-	case invalidTXWasDuplicate(txID: TXID)
+	case invalidTXWasDuplicate(txID: IntentHash)
 
 	public var errorDescription: String? {
 		switch self {

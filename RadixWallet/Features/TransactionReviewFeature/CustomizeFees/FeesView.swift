@@ -5,7 +5,7 @@ import SwiftUI
 struct FeesView: View {
 	struct ViewState: Equatable, Sendable {
 		let feeViewStates: IdentifiedArrayOf<FeeViewState>
-		let totalFee: RETDecimal
+		let totalFee: Decimal192
 		let isAdvancedMode: Bool
 	}
 
@@ -77,9 +77,9 @@ struct FeeViewState: Equatable, Sendable, Identifiable {
 	var id: String { name }
 
 	let name: String
-	let amount: RETDecimal
+	let amount: Decimal192
 	let isUserConfigurable: Bool
-	init(name: String, amount: RETDecimal, isUserConfigurable: Bool = false) {
+	init(name: String, amount: Decimal192, isUserConfigurable: Bool = false) {
 		self.name = name
 		self.amount = amount
 		self.isUserConfigurable = isUserConfigurable
@@ -144,9 +144,9 @@ extension TransactionFee.NormalFeeCustomization {
 	}
 }
 
-private extension RETDecimal {
+private extension Decimal192 {
 	func formatted(showsZero: Bool) -> String {
-		if !showsZero, isZero() {
+		if !showsZero, isZero {
 			return L10n.CustomizeNetworkFees.noneDue
 		}
 		return L10n.TransactionReview.xrdAmount(formatted())

@@ -225,7 +225,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 								onLedgerSettings: .unknown
 							)
 						)
-					}.asIdentifiable()
+					}.asIdentified()
 
 					await send(.internal(.startScan(accounts: accounts)))
 				} catch: { error, send in
@@ -237,6 +237,9 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 			case .failedToDerivePublicKey:
 				return .send(.delegate(.failed))
+
+			case .cancel:
+				return .send(.delegate(.close))
 			}
 
 		default: return .none

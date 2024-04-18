@@ -100,10 +100,10 @@ extension TransactionHistoryFilters.State {
 extension TransactionHistoryFilters.State.Filters {
 	typealias Filter = TransactionHistoryFilters.State.Filter
 	init(transferTypes: [Filter], fungibles: [Filter], nonFungibles: [Filter], transactionTypes: [Filter]) {
-		self.transferTypes = transferTypes.asIdentifiable()
-		self.fungibles = fungibles.asIdentifiable()
-		self.nonFungibles = nonFungibles.asIdentifiable()
-		self.transactionTypes = transactionTypes.asIdentifiable()
+		self.transferTypes = transferTypes.asIdentified()
+		self.fungibles = fungibles.asIdentified()
+		self.nonFungibles = nonFungibles.asIdentified()
+		self.transactionTypes = transactionTypes.asIdentified()
 	}
 }
 

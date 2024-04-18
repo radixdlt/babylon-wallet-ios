@@ -1,4 +1,4 @@
-import EngineToolkit
+import Sargon
 
 extension ROLAClient {
 	public static let liveValue: Self = {
@@ -10,22 +10,27 @@ extension ROLAClient {
 			let entity = request.entity
 			let newPublicKey = request.newPublicKey
 
-			let entityAddress: Address = switch entity {
-			case let .account(account):
-				account.address.asGeneral
-			case let .persona(persona):
-				persona.address.asGeneral
-			}
-			let metadata = try await onLedgerEntitiesClient.getEntity(entityAddress, metadataKeys: [.ownerKeys]).genericComponent?.metadata
+			let entityAddress: AddressOfAccountOrPersona = {
+				switch entity {
+				case let .account(account):
+					assert(account.networkID == request.entity.networkID)
+					return AddressOfAccountOrPersona.account(account.address)
+				case let .persona(persona):
+					assert(persona.networkID == request.entity.networkID)
+					return AddressOfAccountOrPersona.identity(persona.address)
+				}
+			}()
+
+			let metadata = try await onLedgerEntitiesClient.getEntity(entityAddress.asGeneral, metadataKeys: [.ownerKeys]).genericComponent?.metadata
 			var ownerKeyHashes = try metadata?.ownerKeyHashes() ?? []
 
 			let transactionSigningKeyHash: PublicKeyHash = switch entity.securityState {
 			case let .unsecured(control):
-				try .init(hashing: control.transactionSigning.publicKey)
+				.init(hashing: control.transactionSigning.publicKey.intoSargon())
 			}
 
 			loggerGlobal.debug("ownerKeyHashes: \(ownerKeyHashes)")
-			try ownerKeyHashes.append(.init(hashing: newPublicKey))
+			ownerKeyHashes.append(.init(hashing: newPublicKey.intoSargon()))
 
 			if !ownerKeyHashes.contains(transactionSigningKeyHash) {
 				loggerGlobal.debug("Did not contain transactionSigningKey hash, re-adding it: \(transactionSigningKeyHash)")
@@ -33,12 +38,10 @@ extension ROLAClient {
 			}
 
 			loggerGlobal.notice("Setting ownerKeyHashes to: \(ownerKeyHashes)")
-			return try ManifestBuilder()
-				.setOwnerKeys(
-					from: entityAddress,
-					ownerKeyHashes: ownerKeyHashes
-				)
-				.build(networkId: request.entity.networkID.rawValue)
+			return TransactionManifest.setOwnerKeys(
+				addressOfAccountOrPersona: entityAddress,
+				ownerKeyHashes: ownerKeyHashes
+			)
 		}
 
 		return Self(
@@ -144,41 +147,15 @@ extension ROLAClient {
 	}
 }
 
-extension EngineToolkit.PublicKeyHash {
-	public struct InvalidPublicKeyHashLength: Error {
-		public let got: Int
-		public let expected: Int
-	}
-
-	static let hashLength = 29
-
-	public init(hashing publicKey: SLIP10.PublicKey) throws {
-		let hashBytes = try blake2b(data: publicKey.compressedData).suffix(Self.hashLength)
-
-		guard
-			hashBytes.count == Self.hashLength
-		else {
-			throw InvalidPublicKeyHashLength(got: hashBytes.count, expected: Self.hashLength)
-		}
-
-		switch publicKey {
-		case .ecdsaSecp256k1:
-			self = .secp256k1(value: hashBytes)
-		case .eddsaEd25519:
-			self = .ed25519(value: hashBytes)
-		}
-	}
-}
-
 extension OnLedgerEntity.Metadata {
-	public func ownerKeyHashes() throws -> [EngineToolkit.PublicKeyHash]? {
+	public func ownerKeyHashes() throws -> [Sargon.PublicKeyHash]? {
 		try ownerKeys?.value.map { hash in
 			switch hash {
 			case let .ecdsaSecp256k1(value):
-				let bytes = try Data(hex: value)
+				let bytes = try Exactly29Bytes(hex: value)
 				return .secp256k1(value: bytes)
 			case let .eddsaEd25519(value):
-				let bytes = try Data(hex: value)
+				let bytes = try Exactly29Bytes(hex: value)
 				return .ed25519(value: bytes)
 			}
 		}

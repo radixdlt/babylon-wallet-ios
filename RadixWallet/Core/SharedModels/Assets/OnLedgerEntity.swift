@@ -1,5 +1,24 @@
 // MARK: - OnLedgerEntity
-public enum OnLedgerEntity: Sendable, Hashable, Codable {
+public enum OnLedgerEntity: Sendable, Hashable, Codable, CustomDebugStringConvertible {
+	public var debugDescription: String {
+		switch self {
+		case let .account(account):
+			"account: \(account)"
+		case let .accountNonFungibleIds(page):
+			"accountNonFungibleIds: \(page)"
+		case let .resource(resource):
+			"resource: \(resource)"
+		case let .resourcePool(pool):
+			"pool: \(pool)"
+		case let .validator(validator):
+			"validator: \(validator)"
+		case let .genericComponent(generic):
+			"genericComponent: \(generic)"
+		case let .nonFungibleToken(nft):
+			"nonFungibleToken: \(nft)"
+		}
+	}
+
 	case resource(Resource)
 	case account(Account)
 	case resourcePool(ResourcePool)
@@ -84,7 +103,18 @@ extension OnLedgerEntity.Metadata.ValueAtStateVersion: Equatable where Value: Eq
 // MARK: - OnLedgerEntity.Metadata.ValueAtStateVersion + Hashable
 extension OnLedgerEntity.Metadata.ValueAtStateVersion: Hashable where Value: Hashable {}
 
-// MARK: OnLedgerEntity.Resource
+extension OnLedgerEntity.Metadata {
+	init(newlyCreated: Sargon.NewlyCreatedResource) {
+		self.init(
+			name: newlyCreated.name,
+			symbol: newlyCreated.symbol,
+			description: newlyCreated.description,
+			iconURL: newlyCreated.iconUrl.map { URL(string: $0) } ?? nil,
+			tags: newlyCreated.tags.compactMap(NonEmptyString.init(rawValue:)).map(AssetTag.custom)
+		)
+	}
+}
+
 extension OnLedgerEntity {
 	public struct Metadata: Sendable, Hashable, Codable {
 		public enum PublicKeyHash: Sendable, Hashable, Codable {
@@ -100,7 +130,7 @@ extension OnLedgerEntity {
 		public let dappDefinitions: [AccountAddress]?
 		public let dappDefinition: AccountAddress?
 		public let validator: ValidatorAddress?
-		public let poolUnit: ResourcePoolAddress?
+		public let poolUnit: PoolAddress?
 		public let poolUnitResource: ResourceAddress?
 		public let claimedEntities: [String]?
 		public let claimedWebsites: [URL]?
@@ -130,7 +160,7 @@ extension OnLedgerEntity {
 			public func mapArray<T>(_ transform: (Value) throws -> [T]?) rethrows -> [ValueAtStateVersion<T>]? {
 				guard let elements = try transform(value) else { return nil }
 				return elements.map { (element: T) in
-					ValueAtStateVersion<T>.init(value: element, lastUpdatedAtStateVersion: lastUpdatedAtStateVersion)
+					ValueAtStateVersion<T>(value: element, lastUpdatedAtStateVersion: lastUpdatedAtStateVersion)
 				}
 			}
 		}
@@ -147,7 +177,7 @@ extension OnLedgerEntity {
 			dappDefinitions: [AccountAddress]? = nil,
 			dappDefinition: AccountAddress? = nil,
 			validator: ValidatorAddress? = nil,
-			poolUnit: ResourcePoolAddress? = nil,
+			poolUnit: PoolAddress? = nil,
 			poolUnitResource: ResourceAddress? = nil,
 			claimedEntities: [String]? = nil,
 			claimedWebsites: [URL]? = nil,
@@ -178,17 +208,27 @@ extension OnLedgerEntity {
 		case dappDefinition = "dapp definition"
 	}
 
-	public struct Resource: Sendable, Hashable, Codable, Identifiable {
+	public struct Resource: Sendable, Hashable, Codable, Identifiable, CustomDebugStringConvertible {
 		public var id: ResourceAddress { resourceAddress }
 		public let resourceAddress: ResourceAddress
 		public let atLedgerState: AtLedgerState
-		public let divisibility: Int?
+		public let divisibility: UInt8?
 		public let behaviors: [AssetBehavior]
-		public let totalSupply: RETDecimal?
+		public let totalSupply: Decimal192?
 		public let metadata: Metadata
 
+		public var debugDescription: String {
+			"""
+			\(resourceAddress.formatted())
+			symbol: \(metadata.symbol ?? "???")
+			name: \(metadata.name ?? "???")
+			icon: \(metadata.iconURL?.absoluteString ?? "???")
+			description: \(metadata.description ?? "???")
+			"""
+		}
+
 		public var fungibility: Fungibility {
-			if case .globalFungibleResourceManager = resourceAddress.decodedKind {
+			if resourceAddress.isFungible {
 				.fungible
 			} else {
 				.nonFungible
@@ -203,9 +243,9 @@ extension OnLedgerEntity {
 		public init(
 			resourceAddress: ResourceAddress,
 			atLedgerState: AtLedgerState,
-			divisibility: Int? = nil,
+			divisibility: UInt8? = nil,
 			behaviors: [AssetBehavior] = [],
-			totalSupply: RETDecimal? = nil,
+			totalSupply: Decimal192? = nil,
 			metadata: Metadata
 		) {
 			self.resourceAddress = resourceAddress
@@ -222,18 +262,6 @@ extension OnLedgerEntity {
 		public let atLedgerState: AtLedgerState
 		public let behaviors: [AssetBehavior]
 		public let metadata: Metadata
-
-		public init(
-			address: ComponentAddress,
-			atLedgerState: AtLedgerState,
-			behaviors: [AssetBehavior],
-			metadata: Metadata
-		) {
-			self.address = address
-			self.atLedgerState = atLedgerState
-			self.behaviors = behaviors
-			self.metadata = metadata
-		}
 	}
 }
 
@@ -242,14 +270,6 @@ extension OnLedgerEntity {
 		public typealias NFTData = GatewayAPI.ProgrammaticScryptoSborValueTuple
 		public let id: NonFungibleGlobalId
 		public let data: NFTData?
-
-		public init(
-			id: NonFungibleGlobalId,
-			data: NFTData?
-		) {
-			self.id = id
-			self.data = data
-		}
 	}
 
 	public struct AccountNonFungibleIdsPage: Sendable, Hashable, Codable {
@@ -258,78 +278,54 @@ extension OnLedgerEntity {
 		public let ids: [NonFungibleGlobalId]
 		public let pageCursor: String?
 		public let nextPageCursor: String?
-
-		public init(
-			accountAddress: AccountAddress,
-			resourceAddress: ResourceAddress,
-			ids: [NonFungibleGlobalId],
-			pageCursor: String?,
-			nextPageCursor: String?
-		) {
-			self.accountAddress = accountAddress
-			self.resourceAddress = resourceAddress
-			self.ids = ids
-			self.pageCursor = pageCursor
-			self.nextPageCursor = nextPageCursor
-		}
 	}
 }
 
 extension OnLedgerEntity {
 	public struct ResourcePool: Sendable, Hashable, Codable {
-		public let address: ResourcePoolAddress
+		public let address: PoolAddress
 		public let poolUnitResourceAddress: ResourceAddress
 		public let resources: OwnedFungibleResources
 		public let metadata: Metadata
-
-		public init(
-			address: ResourcePoolAddress,
-			poolUnitResourceAddress: ResourceAddress,
-			resources: OwnedFungibleResources,
-			metadata: Metadata
-		) {
-			self.address = address
-			self.poolUnitResourceAddress = poolUnitResourceAddress
-			self.resources = resources
-			self.metadata = metadata
-		}
 	}
 
 	public struct Validator: Sendable, Hashable, Codable {
 		public let address: ValidatorAddress
 		public let stakeUnitResourceAddress: ResourceAddress
-		public let xrdVaultBalance: RETDecimal
+		public let xrdVaultBalance: Decimal192
 		public let stakeClaimFungibleResourceAddress: ResourceAddress
 		public let metadata: Metadata
-
-		public init(
-			address: ValidatorAddress,
-			stakeUnitResourceAddress: ResourceAddress,
-			xrdVaultBalance: RETDecimal,
-			stakeClaimFungibleResourceAddress: ResourceAddress,
-			metadata: Metadata
-		) {
-			self.address = address
-			self.stakeUnitResourceAddress = stakeUnitResourceAddress
-			self.xrdVaultBalance = xrdVaultBalance
-			self.stakeClaimFungibleResourceAddress = stakeClaimFungibleResourceAddress
-			self.metadata = metadata
-		}
 	}
 }
 
 extension OnLedgerEntity {
-	public struct OwnedFungibleResources: Sendable, Hashable, Codable {
+	public struct OwnedFungibleResources: Sendable, Hashable, Codable, CustomDebugStringConvertible {
 		public var xrdResource: OwnedFungibleResource?
 		public var nonXrdResources: [OwnedFungibleResource]
 
-		public init(xrdResource: OwnedFungibleResource? = nil, nonXrdResources: [OwnedFungibleResource] = []) {
+		public init(
+			xrdResource: OwnedFungibleResource? = nil,
+			nonXrdResources: [OwnedFungibleResource] = []
+		) {
+			if let xrdResource {
+				precondition(xrdResource.resourceAddress.isXRD, "non XRD address used as XRD!")
+			}
+			precondition(nonXrdResources.allSatisfy { !$0.resourceAddress.isXRD }, "XRD found in non XRD!")
 			self.xrdResource = xrdResource
 			self.nonXrdResources = nonXrdResources
 		}
+
+		public var debugDescription: String {
+			let xrd = xrdResource?.debugDescription ?? ""
+			let nonXRD = nonXrdResources.map(\.debugDescription).joined(separator: "\n")
+			return [
+				xrd.nilIfEmpty,
+				nonXRD.nilIfEmpty,
+			].compactMap { $0 }.joined(separator: "\n")
+		}
 	}
 
-	public struct OwnedFungibleResource: Sendable, Hashable, Identifiable, Codable {
+	public struct OwnedFungibleResource: Sendable, Hashable, Identifiable, Codable, CustomDebugStringConvertible {
 		public var id: ResourceAddress {
 			resourceAddress
 		}
@@ -338,6 +334,12 @@ extension OnLedgerEntity {
 		public let atLedgerState: AtLedgerState
 		public var amount: ResourceAmount
 		public let metadata: Metadata
+
+		public var debugDescription: String {
+			let symbol: String = metadata.symbol ?? "???"
+
+			return "\(symbol) - \(resourceAddress.formatted()) | # \(amount.nominalAmount.formatted())"
+		}
 
 		public init(
 			resourceAddress: ResourceAddress,
@@ -352,9 +354,16 @@ extension OnLedgerEntity {
 		}
 	}
 
-	public struct OwnedNonFungibleResource: Sendable, Hashable, Identifiable, Codable {
+	public struct OwnedNonFungibleResource: Sendable, Hashable, Identifiable, Codable, CustomDebugStringConvertible {
 		public var id: ResourceAddress {
 			resourceAddress
+		}
+
+		public var debugDescription: String {
+			"""
+			\(resourceAddress.formatted())
+			localID count: #\(nonFungibleIdsCount)
+			"""
 		}
 
 		public let resourceAddress: ResourceAddress
@@ -427,7 +436,7 @@ extension OnLedgerEntity.Account.Details {
 
 // MARK: - OnLedgerEntity.Account
 extension OnLedgerEntity {
-	public struct Account: Sendable, Hashable, Codable {
+	public struct Account: Sendable, Hashable, Codable, CustomDebugStringConvertible {
 		public let address: AccountAddress
 		public let atLedgerState: AtLedgerState
 		public let metadata: Metadata
@@ -440,6 +449,21 @@ extension OnLedgerEntity {
 			public init(depositRule: Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule) {
 				self.depositRule = depositRule
 			}
+		}
+
+		public var debugDescription: String {
+			let fun = fungibleResources.debugDescription
+			let nonFun = nonFungibleResources.map(\.debugDescription).joined(separator: "\n")
+			let stakes = poolUnitResources.radixNetworkStakes.map(\.debugDescription).joined(separator: "\n")
+			let pools = poolUnitResources.poolUnits.map(\.debugDescription).joined(separator: "\n")
+
+			return [
+				address.formatted(),
+				fun.nilIfEmpty,
+				nonFun.nilIfEmpty,
+				stakes.nilIfEmpty,
+				pools.nilIfEmpty,
+			].compactMap { $0 }.joined(separator: "\n")
 		}
 
 		public var details: Details?
@@ -483,9 +507,17 @@ extension OnLedgerEntity.Account {
 		public let poolUnits: [PoolUnit]
 	}
 
-	public struct RadixNetworkStake: Sendable, Hashable, Codable, Identifiable {
+	public struct RadixNetworkStake: Sendable, Hashable, Codable, Identifiable, CustomDebugStringConvertible {
 		public var id: ValidatorAddress {
 			validatorAddress
+		}
+
+		public var debugDescription: String {
+			"""
+			\(validatorAddress.formatted())
+			staked: \(stakeUnitResource?.amount.nominalAmount.formatted() ?? "NONE")
+			claimable?: \(stakeClaimResource != nil)
+			"""
 		}
 
 		public let validatorAddress: ValidatorAddress
@@ -503,14 +535,26 @@ extension OnLedgerEntity.Account {
 		}
 	}
 
-	public struct PoolUnit: Sendable, Hashable, Codable {
+	public struct PoolUnit: Sendable, Hashable, Codable, CustomDebugStringConvertible {
 		public let resource: OnLedgerEntity.OwnedFungibleResource
-		public let resourcePoolAddress: ResourcePoolAddress
+		public let resourcePoolAddress: PoolAddress
 		public let poolResources: [ResourceAddress]
+
+		public var descriptionOfPoolKind: String {
+			String(describing: resourcePoolAddress.poolKind)
+		}
+
+		public var debugDescription: String {
+			"""
+			\(resourcePoolAddress.formatted())
+			kind: \(descriptionOfPoolKind)
+			amount: \(resource.amount.nominalAmount.formatted())
+			"""
+		}
 
 		public init(
 			resource: OnLedgerEntity.OwnedFungibleResource,
-			resourcePoolAddress: ResourcePoolAddress,
+			resourcePoolAddress: PoolAddress,
 			poolResources: [ResourceAddress] = []
 		) {
 			self.resource = resource
@@ -545,11 +589,11 @@ extension OnLedgerEntity.NonFungibleToken.NFTData {
 		return nil
 	}
 
-	public func getDecimalValue(forField field: StandardField) -> RETDecimal? {
+	public func getDecimalValue(forField field: StandardField) -> Decimal192? {
 		self.fields
 			.compactMap(/GatewayAPI.ProgrammaticScryptoSborValue.decimal)
 			.first { $0.fieldName == field.rawValue }
-			.flatMap { try? RETDecimal(value: $0.value) }
+			.flatMap { try? Decimal192($0.value) }
 	}
 
 	public var name: String? {
@@ -564,7 +608,7 @@ extension OnLedgerEntity.NonFungibleToken.NFTData {
 		getString(forField: .keyImageURL).flatMap(URL.init(string:))
 	}
 
-	public var claimAmount: RETDecimal? {
+	public var claimAmount: Decimal192? {
 		getDecimalValue(forField: .claimAmount)
 	}
 
@@ -594,9 +638,9 @@ extension OnLedgerEntity.Account {
 
 extension OnLedgerEntity.Resource {
 	func poolRedemptionValue(
-		for amount: RETDecimal,
+		for amount: Decimal192,
 		poolUnitResource: OnLedgerEntitiesClient.ResourceWithVaultAmount
-	) -> RETDecimal? {
+	) -> Decimal192? {
 		guard let poolUnitTotalSupply = poolUnitResource.resource.totalSupply else {
 			loggerGlobal.error("Missing total supply for \(poolUnitResource.resource.resourceAddress.address)")
 			return nil
@@ -606,7 +650,7 @@ extension OnLedgerEntity.Resource {
 			return nil
 		}
 		let redemptionValue = poolUnitResource.amount.nominalAmount * (amount / poolUnitTotalSupply)
-		let decimalPlaces = divisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
+		let decimalPlaces = divisibility ?? Decimal192.maxDivisibility
 		let roundedRedemptionValue = redemptionValue.rounded(decimalPlaces: decimalPlaces)
 
 		return roundedRedemptionValue

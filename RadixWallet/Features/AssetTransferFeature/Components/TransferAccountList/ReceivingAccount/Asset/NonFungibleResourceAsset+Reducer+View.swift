@@ -1,16 +1,20 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - NonFungibleResourceAsset
 public struct NonFungibleResourceAsset: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
 		public typealias ID = String
-		public var id: ID { token.id.asStr() }
+		public var id: ID { token.id.toRawString() }
 
 		public let resourceImage: URL?
 		public let resourceName: String?
 		public let resourceAddress: ResourceAddress
 		public let token: OnLedgerEntity.NonFungibleToken
+		public var nftGlobalID: NonFungibleGlobalId {
+			token.id
+		}
 	}
 }
 

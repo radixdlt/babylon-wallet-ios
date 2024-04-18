@@ -292,8 +292,8 @@ public enum L10n {
       public static let emptyAllowAll = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_emptyAllowAll", fallback: "Add a specific asset by its resource address to allow all third-party deposits")
       /// Add a specific asset by its resource address to deny all third-party deposits
       public static let emptyDenyAll = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_emptyDenyAll", fallback: "Add a specific asset by its resource address to deny all third-party deposits")
-      /// ⚠️ Sorry, this Account's third-party exceptions and depositor lists are in an unknown state and cannot be viewed or edited because it was imported using only a seed phrase or Ledger. A forthcoming wallet update will enable viewing and editing of these lists.
-      public static let modificationDisabledForRecoveredAccount = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_modificationDisabledForRecoveredAccount", fallback: "⚠️ Sorry, this Account's third-party exceptions and depositor lists are in an unknown state and cannot be viewed or edited because it was imported using only a seed phrase or Ledger. A forthcoming wallet update will enable viewing and editing of these lists.")
+      /// Sorry, this Account's third-party exceptions and depositor lists are in an unknown state and cannot be viewed or edited because it was imported using only a seed phrase or Ledger. A forthcoming wallet update will enable viewing and editing of these lists.
+      public static let modificationDisabledForRecoveredAccount = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_modificationDisabledForRecoveredAccount", fallback: "Sorry, this Account's third-party exceptions and depositor lists are in an unknown state and cannot be viewed or edited because it was imported using only a seed phrase or Ledger. A forthcoming wallet update will enable viewing and editing of these lists.")
       /// Remove Asset
       public static let removeAsset = L10n.tr("Localizable", "accountSettings_specificAssetsDeposits_removeAsset", fallback: "Remove Asset")
       /// The asset will be removed from the allow list
@@ -918,6 +918,68 @@ public enum L10n {
     /// Unauthorized
     public static let unauthorized = L10n.tr("Localizable", "common_unauthorized", fallback: "Unauthorized")
   }
+  public enum ConfigurationBackup {
+    /// Accounts
+    public static let accountsItem = L10n.tr("Localizable", "configurationBackup_accountsItem", fallback: "Accounts")
+    /// Your list of Accounts and the Factors required to recover them
+    public static let accountsSubtitle = L10n.tr("Localizable", "configurationBackup_accountsSubtitle", fallback: "Your list of Accounts and the Factors required to recover them")
+    /// Configuration Backup status
+    public static let automatedBackupsToggle = L10n.tr("Localizable", "configurationBackup_automatedBackupsToggle", fallback: "Configuration Backup status")
+    /// Without an updated Configuration Backup, you cannot recover your Accounts and Personas.
+    public static let automatedBackupsWarning = L10n.tr("Localizable", "configurationBackup_automatedBackupsWarning", fallback: "Without an updated Configuration Backup, you cannot recover your Accounts and Personas.")
+    /// Automated Google Drive Backups
+    public static let backupsToggleGDrive = L10n.tr("Localizable", "configurationBackup_backupsToggleGDrive", fallback: "Automated Google Drive Backups")
+    /// Automated iCloud Backups
+    public static let backupsToggleICloud = L10n.tr("Localizable", "configurationBackup_backupsToggleICloud", fallback: "Automated iCloud Backups")
+    /// Last backup: %@ ago
+    public static func backupsUpdate(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "configurationBackup_backupsUpdate", String(describing: p1), fallback: "Last backup: %@ ago")
+    }
+    /// Disconnect
+    public static let disconnectButton = L10n.tr("Localizable", "configurationBackup_disconnectButton", fallback: "Disconnect")
+    /// Logged in as:
+    public static let loggedInAsHeading = L10n.tr("Localizable", "configurationBackup_loggedInAsHeading", fallback: "Logged in as:")
+    /// Personas
+    public static let personasItem = L10n.tr("Localizable", "configurationBackup_personasItem", fallback: "Personas")
+    /// Your list of Personas and the Factors required to recover them. Also your Persona data.
+    public static let personasSubtitle = L10n.tr("Localizable", "configurationBackup_personasSubtitle", fallback: "Your list of Personas and the Factors required to recover them. Also your Persona data.")
+    /// Automated Configuration Backup not working. Check internet connection and Google Drive settings.
+    public static let problem5WarningAndroid = L10n.tr("Localizable", "configurationBackup_problem5WarningAndroid", fallback: "Automated Configuration Backup not working. Check internet connection and Google Drive settings.")
+    /// Automated Configuration Backup not working. Check internet connection and iCloud settings.
+    public static let problem5WarningIOS = L10n.tr("Localizable", "configurationBackup_problem5WarningIOS", fallback: "Automated Configuration Backup not working. Check internet connection and iCloud settings.")
+    /// To secure your wallet, turn on automated backups or manually export backup file.
+    public static let problem6Warning = L10n.tr("Localizable", "configurationBackup_problem6Warning", fallback: "To secure your wallet, turn on automated backups or manually export backup file.")
+    /// Delete
+    public static let problem7DeleteOldBackupIOS = L10n.tr("Localizable", "configurationBackup_problem7DeleteOldBackupIOS", fallback: "Delete")
+    /// Out-of-date backup still present on iCloud
+    public static let problem7OutOfDateBackupIOS = L10n.tr("Localizable", "configurationBackup_problem7OutOfDateBackupIOS", fallback: "Out-of-date backup still present on iCloud")
+    /// Configuration Backup not up to date. Turn on automated backups or manually export backup file.
+    public static let problem7Warning = L10n.tr("Localizable", "configurationBackup_problem7Warning", fallback: "Configuration Backup not up to date. Turn on automated backups or manually export backup file.")
+    /// Security Factors
+    public static let securityFactorsItem = L10n.tr("Localizable", "configurationBackup_securityFactorsItem", fallback: "Security Factors")
+    /// The list of Security Factors you need to recover your Accounts and Personas.
+    public static let securityFactorsSubtitle = L10n.tr("Localizable", "configurationBackup_securityFactorsSubtitle", fallback: "The list of Security Factors you need to recover your Accounts and Personas.")
+    /// You need an up-to-date Configuration Backup to recover your Accounts and Personas if you lose access to them.
+    /// 
+    /// Your Backup does not contain your keys or seed phrase.
+    public static let subtitle = L10n.tr("Localizable", "configurationBackup_subtitle", fallback: "You need an up-to-date Configuration Backup to recover your Accounts and Personas if you lose access to them.\n\nYour Backup does not contain your keys or seed phrase.")
+    /// Configuration Backup
+    public static let title = L10n.tr("Localizable", "configurationBackup_title", fallback: "Configuration Backup")
+    /// Wallet settings
+    public static let walletSettingsItem = L10n.tr("Localizable", "configurationBackup_walletSettingsItem", fallback: "Wallet settings")
+    /// Your general settings, such as trusted dApps, linked Connectors and wallet display settings.
+    public static let walletSettingsSubtitle = L10n.tr("Localizable", "configurationBackup_walletSettingsSubtitle", fallback: "Your general settings, such as trusted dApps, linked Connectors and wallet display settings.")
+    public enum ManualBackup {
+      /// Export Backup File
+      public static let exportButton = L10n.tr("Localizable", "configurationBackup_manualBackup_exportButton", fallback: "Export Backup File")
+      /// Manual backup.
+      public static let heading = L10n.tr("Localizable", "configurationBackup_manualBackup_heading", fallback: "Manual backup.")
+      /// You can export your own Configuration Backup file and save it locally
+      public static let subtitle = L10n.tr("Localizable", "configurationBackup_manualBackup_subtitle", fallback: "You can export your own Configuration Backup file and save it locally")
+      /// You’ll need to export a new Backup file each time you make a change in your wallet.
+      public static let warning = L10n.tr("Localizable", "configurationBackup_manualBackup_warning", fallback: "You’ll need to export a new Backup file each time you make a change in your wallet.")
+    }
+  }
   public enum ConfirmMnemonicBackedUp {
     /// Confirm you have written down the seed phrase by entering the missing words below.
     public static let subtitle = L10n.tr("Localizable", "confirmMnemonicBackedUp_subtitle", fallback: "Confirm you have written down the seed phrase by entering the missing words below.")
@@ -1512,6 +1574,52 @@ public enum L10n {
       public static let unknown = L10n.tr("Localizable", "error_transactionFailure_unknown", fallback: "Unknown error")
     }
   }
+  public enum FactorSourceActions {
+    public enum CreateAccount {
+      /// Creating Account
+      public static let title = L10n.tr("Localizable", "factorSourceActions_createAccount_title", fallback: "Creating Account")
+    }
+    public enum CreateKey {
+      /// Creating Key
+      public static let title = L10n.tr("Localizable", "factorSourceActions_createKey_title", fallback: "Creating Key")
+    }
+    public enum CreatePersona {
+      /// Creating Persona
+      public static let title = L10n.tr("Localizable", "factorSourceActions_createPersona_title", fallback: "Creating Persona")
+    }
+    public enum DeriveAccounts {
+      /// Deriving Accounts
+      public static let title = L10n.tr("Localizable", "factorSourceActions_deriveAccounts_title", fallback: "Deriving Accounts")
+    }
+    public enum Device {
+      /// Authenticate to your phone to complete using your phone's signing key.
+      public static let message = L10n.tr("Localizable", "factorSourceActions_device_message", fallback: "Authenticate to your phone to complete using your phone's signing key.")
+      /// Authenticate to your phone to sign.
+      public static let messageSignature = L10n.tr("Localizable", "factorSourceActions_device_messageSignature", fallback: "Authenticate to your phone to sign.")
+    }
+    public enum EncryptMessage {
+      /// Encrypting Message
+      public static let title = L10n.tr("Localizable", "factorSourceActions_encryptMessage_title", fallback: "Encrypting Message")
+    }
+    public enum Ledger {
+      /// Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
+      public static let message = L10n.tr("Localizable", "factorSourceActions_ledger_message", fallback: "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.")
+      /// Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
+      /// **Derivation may take up to a minute.**
+      public static let messageDeriveAccounts = L10n.tr("Localizable", "factorSourceActions_ledger_messageDeriveAccounts", fallback: "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.\n**Derivation may take up to a minute.**")
+      /// Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.
+      /// **Complete signing on the device.**
+      public static let messageSignature = L10n.tr("Localizable", "factorSourceActions_ledger_messageSignature", fallback: "Make sure the following **Ledger hardware wallet** is connected to a computer with a linked Radix Connector browser extension.\n**Complete signing on the device.**")
+    }
+    public enum ProveOwnership {
+      /// Proving Ownership
+      public static let title = L10n.tr("Localizable", "factorSourceActions_proveOwnership_title", fallback: "Proving Ownership")
+    }
+    public enum Signature {
+      /// Signature Request
+      public static let title = L10n.tr("Localizable", "factorSourceActions_signature_title", fallback: "Signature Request")
+    }
+  }
   public enum FactorSources {
     public enum Kind {
       /// Phone
@@ -1604,6 +1712,10 @@ public enum L10n {
       public static let subtitle = L10n.tr("Localizable", "homePage_radixBanner_subtitle", fallback: "Complete setting up your wallet and start staking, using dApps and more!")
       /// Start Using Radix
       public static let title = L10n.tr("Localizable", "homePage_radixBanner_title", fallback: "Start Using Radix")
+    }
+    public enum SecureFolder {
+      /// Your wallet has encountered a problem that should be resolved before you continue use. If you have a Samsung phone, this may be caused by putting the Radix Wallet in the "Secure Folder". Please contact support at hello@radixdlt.com for assistance.
+      public static let warning = L10n.tr("Localizable", "homePage_secureFolder_warning", fallback: "Your wallet has encountered a problem that should be resolved before you continue use. If you have a Samsung phone, this may be caused by putting the Radix Wallet in the \"Secure Folder\". Please contact support at hello@radixdlt.com for assistance.")
     }
     public enum VisitDashboard {
       /// Ready to get started using the Radix Network and your Wallet?
@@ -2028,6 +2140,32 @@ public enum L10n {
     /// Write down main seed phrase
     public static let writeSeedPhrase = L10n.tr("Localizable", "personas_writeSeedPhrase", fallback: "Write down main seed phrase")
   }
+  public enum Preferences {
+    /// Advanced Preferences
+    public static let advancedPreferences = L10n.tr("Localizable", "preferences_advancedPreferences", fallback: "Advanced Preferences")
+    /// Network Gateways
+    public static let gateways = L10n.tr("Localizable", "preferences_gateways", fallback: "Network Gateways")
+    /// Preferences
+    public static let title = L10n.tr("Localizable", "preferences_title", fallback: "Preferences")
+    public enum DepositGuarantees {
+      /// Set your guaranteed minimum for estimated deposits
+      public static let subtitle = L10n.tr("Localizable", "preferences_depositGuarantees_subtitle", fallback: "Set your guaranteed minimum for estimated deposits")
+      /// Default Deposit Guarantees
+      public static let title = L10n.tr("Localizable", "preferences_depositGuarantees_title", fallback: "Default Deposit Guarantees")
+    }
+    public enum DeveloperMode {
+      /// Warning: disables website validity checks
+      public static let subtitle = L10n.tr("Localizable", "preferences_developerMode_subtitle", fallback: "Warning: disables website validity checks")
+      /// Developer Mode
+      public static let title = L10n.tr("Localizable", "preferences_developerMode_title", fallback: "Developer Mode")
+    }
+    public enum HiddenEntities {
+      /// Manage hidden Accounts and Personas
+      public static let subtitle = L10n.tr("Localizable", "preferences_hiddenEntities_subtitle", fallback: "Manage hidden Accounts and Personas")
+      /// Hidden Accounts and Personas
+      public static let title = L10n.tr("Localizable", "preferences_hiddenEntities_title", fallback: "Hidden Accounts and Personas")
+    }
+  }
   public enum ProfileBackup {
     /// Backing up your wallet ensures that you can restore access to your Accounts, Personas, and wallet settings on a new phone by re-entering your seed phrase(s).
     /// 
@@ -2238,6 +2376,114 @@ public enum L10n {
       public static let subtitle = L10n.tr("Localizable", "revealSeedPhrase_warningDialog_subtitle", fallback: "Are you sure you have written down your seed phrase?")
       /// Use Caution
       public static let title = L10n.tr("Localizable", "revealSeedPhrase_warningDialog_title", fallback: "Use Caution")
+    }
+  }
+  public enum SecurityCenter {
+    /// Decentralized security settings that give you total control over your wallet’s protection.
+    public static let subtitle = L10n.tr("Localizable", "securityCenter_subtitle", fallback: "Decentralized security settings that give you total control over your wallet’s protection.")
+    /// Security Center
+    public static let title = L10n.tr("Localizable", "securityCenter_title", fallback: "Security Center")
+    public enum AnyItem {
+      /// Action required
+      public static let actionRequiredStatus = L10n.tr("Localizable", "securityCenter_anyItem_actionRequiredStatus", fallback: "Action required")
+    }
+    public enum ConfigurationBackupItem {
+      /// Backed up
+      public static let backedUpStatus = L10n.tr("Localizable", "securityCenter_configurationBackupItem_backedUpStatus", fallback: "Backed up")
+      /// A Backup of your Account, Persona and wallet settings
+      public static let subtitle = L10n.tr("Localizable", "securityCenter_configurationBackupItem_subtitle", fallback: "A Backup of your Account, Persona and wallet settings")
+      /// Configuration Backup
+      public static let title = L10n.tr("Localizable", "securityCenter_configurationBackupItem_title", fallback: "Configuration Backup")
+    }
+    public enum EncryptWalletBackup {
+      /// Confirm Password
+      public static let confirmPassword = L10n.tr("Localizable", "securityCenter_encryptWalletBackup_confirmPassword", fallback: "Confirm Password")
+      /// Continue
+      public static let `continue` = L10n.tr("Localizable", "securityCenter_encryptWalletBackup_continue", fallback: "Continue")
+      /// Enter Password
+      public static let enterPassword = L10n.tr("Localizable", "securityCenter_encryptWalletBackup_enterPassword", fallback: "Enter Password")
+      /// Passwords do not match
+      public static let passwordMismatchError = L10n.tr("Localizable", "securityCenter_encryptWalletBackup_passwordMismatchError", fallback: "Passwords do not match")
+      /// Enter a password to encrypt this wallet backup file. You will be required to enter this password when recovering your Wallet from this file.
+      public static let subtitle = L10n.tr("Localizable", "securityCenter_encryptWalletBackup_subtitle", fallback: "Enter a password to encrypt this wallet backup file. You will be required to enter this password when recovering your Wallet from this file.")
+      /// Encrypt Wallet Backup File
+      public static let title = L10n.tr("Localizable", "securityCenter_encryptWalletBackup_title", fallback: "Encrypt Wallet Backup File")
+    }
+    public enum GoodState {
+      /// Your wallet is recoverable
+      public static let heading = L10n.tr("Localizable", "securityCenter_goodState_heading", fallback: "Your wallet is recoverable")
+    }
+    public enum Problem3 {
+      /// %d Account(s) and %d Persona(s) are/is not recoverable
+      public static func heading(_ p1: Int, _ p2: Int) -> String {
+        return L10n.tr("Localizable", "securityCenter_problem3_heading", p1, p2, fallback: "%d Account(s) and %d Persona(s) are/is not recoverable")
+      }
+      /// View and write down your seed phrase so Accounts and Personas are recoverable
+      public static let text = L10n.tr("Localizable", "securityCenter_problem3_text", fallback: "View and write down your seed phrase so Accounts and Personas are recoverable")
+    }
+    public enum Problem5 {
+      /// Your wallet is not recoverable
+      public static let heading = L10n.tr("Localizable", "securityCenter_problem5_heading", fallback: "Your wallet is not recoverable")
+      /// Automated Configuration Backup has stopped working. Check internet and cloud settings.
+      public static let text = L10n.tr("Localizable", "securityCenter_problem5_text", fallback: "Automated Configuration Backup has stopped working. Check internet and cloud settings.")
+    }
+    public enum Problem6 {
+      /// Your wallet is not recoverable
+      public static let heading = L10n.tr("Localizable", "securityCenter_problem6_heading", fallback: "Your wallet is not recoverable")
+      /// Configuration Backup is not up to date. Create backup now.
+      public static let text = L10n.tr("Localizable", "securityCenter_problem6_text", fallback: "Configuration Backup is not up to date. Create backup now.")
+    }
+    public enum Problem7 {
+      /// Your wallet is not recoverable
+      public static let heading = L10n.tr("Localizable", "securityCenter_problem7_heading", fallback: "Your wallet is not recoverable")
+      /// Accounts and Personas not recoverable. Create Configuration Backup now.
+      public static let text = L10n.tr("Localizable", "securityCenter_problem7_text", fallback: "Accounts and Personas not recoverable. Create Configuration Backup now.")
+    }
+    public enum Problem9 {
+      /// Recovery required
+      public static let heading = L10n.tr("Localizable", "securityCenter_problem9_heading", fallback: "Recovery required")
+      /// Enter seed phrase to begin recovery.
+      public static let text = L10n.tr("Localizable", "securityCenter_problem9_text", fallback: "Enter seed phrase to begin recovery.")
+    }
+    public enum SecurityFactorsItem {
+      /// Active
+      public static let activeStatus = L10n.tr("Localizable", "securityCenter_securityFactorsItem_activeStatus", fallback: "Active")
+      /// The keys you use to control your Accounts and Personas
+      public static let subtitle = L10n.tr("Localizable", "securityCenter_securityFactorsItem_subtitle", fallback: "The keys you use to control your Accounts and Personas")
+      /// Security Factors
+      public static let title = L10n.tr("Localizable", "securityCenter_securityFactorsItem_title", fallback: "Security Factors")
+    }
+  }
+  public enum SecurityFactors {
+    /// View and manage your security factors
+    public static let subtitle = L10n.tr("Localizable", "securityFactors_subtitle", fallback: "View and manage your security factors")
+    /// Security Factors
+    public static let title = L10n.tr("Localizable", "securityFactors_title", fallback: "Security Factors")
+    public enum LedgerWallet {
+      /// %d set
+      public static func counterPlural(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "securityFactors_ledgerWallet_counterPlural", p1, fallback: "%d set")
+      }
+      /// 1 set
+      public static let counterSingular = L10n.tr("Localizable", "securityFactors_ledgerWallet_counterSingular", fallback: "1 set")
+      /// Hardware wallet designed for holding crypto
+      public static let subtitle = L10n.tr("Localizable", "securityFactors_ledgerWallet_subtitle", fallback: "Hardware wallet designed for holding crypto")
+      /// Ledger Hardware Wallet
+      public static let title = L10n.tr("Localizable", "securityFactors_ledgerWallet_title", fallback: "Ledger Hardware Wallet")
+    }
+    public enum SeedPhrases {
+      /// %d Seed phrases
+      public static func counterPlural(_ p1: Int) -> String {
+        return L10n.tr("Localizable", "securityFactors_seedPhrases_counterPlural", p1, fallback: "%d Seed phrases")
+      }
+      /// 1 Seed phrase
+      public static let counterSingular = L10n.tr("Localizable", "securityFactors_seedPhrases_counterSingular", fallback: "1 Seed phrase")
+      /// Enter your seed phrase to recover Accounts
+      public static let enterSeedPhrase = L10n.tr("Localizable", "securityFactors_seedPhrases_enterSeedPhrase", fallback: "Enter your seed phrase to recover Accounts")
+      /// Your seedphrases connected to your account
+      public static let subtitle = L10n.tr("Localizable", "securityFactors_seedPhrases_subtitle", fallback: "Your seedphrases connected to your account")
+      /// Seed Phrases
+      public static let title = L10n.tr("Localizable", "securityFactors_seedPhrases_title", fallback: "Seed Phrases")
     }
   }
   public enum SeedPhrases {
@@ -2706,6 +2952,92 @@ public enum L10n {
     public enum TransactionID {
       /// Transaction ID: 
       public static let text = L10n.tr("Localizable", "transactionStatus_transactionID_text", fallback: "Transaction ID: ")
+    }
+  }
+  public enum Troubleshooting {
+    /// Account Recovery
+    public static let accountRecovery = L10n.tr("Localizable", "troubleshooting_accountRecovery", fallback: "Account Recovery")
+    /// Support and Community
+    public static let supportAndCommunity = L10n.tr("Localizable", "troubleshooting_supportAndCommunity", fallback: "Support and Community")
+    /// Troubleshooting
+    public static let title = L10n.tr("Localizable", "troubleshooting_title", fallback: "Troubleshooting")
+    public enum AccountScan {
+      /// Recover Accounts with a seed phrase or Ledger device
+      public static let subtitle = L10n.tr("Localizable", "troubleshooting_accountScan_subtitle", fallback: "Recover Accounts with a seed phrase or Ledger device")
+      /// Account Recovery Scan
+      public static let title = L10n.tr("Localizable", "troubleshooting_accountScan_title", fallback: "Account Recovery Scan")
+    }
+    public enum ContactSupport {
+      /// Connect directly with the Radix support team
+      public static let subtitle = L10n.tr("Localizable", "troubleshooting_contactSupport_subtitle", fallback: "Connect directly with the Radix support team")
+      /// Contact Support
+      public static let title = L10n.tr("Localizable", "troubleshooting_contactSupport_title", fallback: "Contact Support")
+    }
+    public enum Discord {
+      /// Connect to the official Radix Discord channel to join the community and ask for help.
+      public static let subtitle = L10n.tr("Localizable", "troubleshooting_discord_subtitle", fallback: "Connect to the official Radix Discord channel to join the community and ask for help.")
+      /// Discord
+      public static let title = L10n.tr("Localizable", "troubleshooting_discord_title", fallback: "Discord")
+    }
+    public enum LegacyImport {
+      /// Import Accounts from an Olympia wallet
+      public static let subtitle = L10n.tr("Localizable", "troubleshooting_legacyImport_subtitle", fallback: "Import Accounts from an Olympia wallet")
+      /// Import from a Legacy Wallet
+      public static let title = L10n.tr("Localizable", "troubleshooting_legacyImport_title", fallback: "Import from a Legacy Wallet")
+    }
+  }
+  public enum WalletSettings {
+    /// App version: %@
+    public static func appVersion(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "walletSettings_appVersion", String(describing: p1), fallback: "App version: %@")
+    }
+    /// Wallet Settings
+    public static let title = L10n.tr("Localizable", "walletSettings_title", fallback: "Wallet Settings")
+    public enum Connectors {
+      /// Connect to desktop through the Radix Connector browser extension
+      public static let subtitle = L10n.tr("Localizable", "walletSettings_connectors_subtitle", fallback: "Connect to desktop through the Radix Connector browser extension")
+      /// Linked Connectors
+      public static let title = L10n.tr("Localizable", "walletSettings_connectors_title", fallback: "Linked Connectors")
+    }
+    public enum Dapps {
+      /// Manage the Radix dApps you're connected to
+      public static let subtitle = L10n.tr("Localizable", "walletSettings_dapps_subtitle", fallback: "Manage the Radix dApps you're connected to")
+      /// Approved dApps
+      public static let title = L10n.tr("Localizable", "walletSettings_dapps_title", fallback: "Approved dApps")
+    }
+    public enum LinkToConnectorHeader {
+      /// Link to Connector
+      public static let button = L10n.tr("Localizable", "walletSettings_linkToConnectorHeader_button", fallback: "Link to Connector")
+      /// Scan the QR code in the Radix Wallet Connector extension
+      public static let subtitle = L10n.tr("Localizable", "walletSettings_linkToConnectorHeader_subtitle", fallback: "Scan the QR code in the Radix Wallet Connector extension")
+      /// Link your Wallet to a desktop browser
+      public static let title = L10n.tr("Localizable", "walletSettings_linkToConnectorHeader_title", fallback: "Link your Wallet to a desktop browser")
+    }
+    public enum Personas {
+      /// Please write down the seed phrase for your Personas
+      public static let hint = L10n.tr("Localizable", "walletSettings_personas_hint", fallback: "Please write down the seed phrase for your Personas")
+      /// Manage Radix dApp login details
+      public static let subtitle = L10n.tr("Localizable", "walletSettings_personas_subtitle", fallback: "Manage Radix dApp login details")
+      /// Personas
+      public static let title = L10n.tr("Localizable", "walletSettings_personas_title", fallback: "Personas")
+    }
+    public enum Preferences {
+      /// Deposits, hidden Accounts and Personas, and avdanced preferences
+      public static let subtitle = L10n.tr("Localizable", "walletSettings_preferences_subtitle", fallback: "Deposits, hidden Accounts and Personas, and avdanced preferences")
+      /// Preferences
+      public static let title = L10n.tr("Localizable", "walletSettings_preferences_title", fallback: "Preferences")
+    }
+    public enum SecurityCenter {
+      /// Manage your wallet security settings
+      public static let subtitle = L10n.tr("Localizable", "walletSettings_securityCenter_subtitle", fallback: "Manage your wallet security settings")
+      /// Security Center
+      public static let title = L10n.tr("Localizable", "walletSettings_securityCenter_title", fallback: "Security Center")
+    }
+    public enum Troubleshooting {
+      /// Add your existing Accounts and contact support
+      public static let subtitle = L10n.tr("Localizable", "walletSettings_troubleshooting_subtitle", fallback: "Add your existing Accounts and contact support")
+      /// Troubleshooting
+      public static let title = L10n.tr("Localizable", "walletSettings_troubleshooting_title", fallback: "Troubleshooting")
     }
   }
 }
