@@ -44,15 +44,17 @@ public struct Hint: View, Equatable {
 
 	public var body: some View {
 		if let text = viewState.text {
-			Label {
-				text.lineSpacing(0).textStyle(.body2Regular)
-			} icon: {
+			HStack(spacing: .small3) {
 				if let iconAsset {
 					Image(asset: iconAsset)
-						.resizable()
 						.renderingMode(.template)
+						.resizable()
+						.scaledToFit()
 						.frame(.smallest)
 				}
+				text
+					.lineSpacing(0)
+					.textStyle(.body2HighImportance)
 			}
 			.foregroundColor(foregroundColor)
 		}
@@ -73,9 +75,7 @@ public struct Hint: View, Equatable {
 		switch viewState.kind {
 		case .info:
 			nil
-		case .error:
-			AssetResource.error
-		case .warning:
+		case .error, .warning:
 			AssetResource.warningError
 		}
 	}
