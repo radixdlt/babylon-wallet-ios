@@ -5,13 +5,13 @@ enum SettingsRow<Feature: FeatureReducer> {
 	/// A standard tappable row with the details specified on the `Model`
 	case model(Model)
 
-	/// A custom row with its own UI. Useful, for example, when we want a `ToggleView` between other rows.
+	/// A custom row with its own UI. Useful, for example, when we want a `ToggleView`.
 	case custom(AnyView, id: String)
 
 	/// A small row acting as a section header with the provided title.
 	case header(String)
 
-	/// Similar to the `.header`, but with no title/
+	/// Similar to the `.header`, but with no title.
 	case separator
 
 	@ViewBuilder
