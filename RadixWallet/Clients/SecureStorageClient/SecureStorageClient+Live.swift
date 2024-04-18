@@ -278,14 +278,8 @@ extension SecureStorageClient: DependencyKey {
 			)
 		}
 
-		let loadProfile: LoadProfile = { _ in
-//			guard
-//				let existingSnapshot = try loadProfileSnapshot(id)
-//			else {
-//				return nil
-//			}
-//			return Profile(snapshot: existingSnapshot)
-			sargonProfileFinishMigrateAtEndOfStage1()
+		let loadProfile: LoadProfile = { id in
+			try loadProfileSnapshot(id)
 		}
 
 		let containsMnemonicIdentifiedByFactorSourceID: ContainsMnemonicIdentifiedByFactorSourceID = { factorSourceID in
@@ -429,8 +423,7 @@ extension Sargon.Profile.Header.ID {
 }
 
 private func key(factorSourceID: FactorSourceIDFromHash) -> KeychainClient.Key {
-//	.init(rawValue: .init(rawValue: factorSourceID.keychainKey)!)
-	sargonProfileFinishMigrateAtEndOfStage1()
+	.init(rawValue: .init(rawValue: factorSourceID.keychainKey)!)
 }
 
 extension OverlayWindowClient.Item.AlertState {
@@ -442,17 +435,25 @@ extension OverlayWindowClient.Item.AlertState {
 
 extension FactorSourceIDFromHash {
 	init?(keychainKey: KeychainClient.Key) {
-//		let key = keychainKey.rawValue.rawValue
-//		guard
-//			case let parts = key.split(separator: Self.keychainKeySeparator),
-//			parts.count == 2,
-//			let kind = FactorSourceKind(rawValue: String(parts[0])),
-//			let hex32 = try? HexCodable(hex: String(parts[1])),
-//			let id = try? Self(kind: kind, hash: hex32.data)
-//		else {
-//			return nil
-//		}
-//		self = id
-		sargonProfileFinishMigrateAtEndOfStage1()
+		let key = keychainKey.rawValue.rawValue
+		guard
+			case let parts = key.split(separator: Self.keychainKeySeparator),
+			parts.count == 2,
+			case let kind = FactorSourceKind(rawValue: String(parts[0])),
+			case let hex32 = String(parts[1]),
+			let exactly32Bytes = try? Exactly32Bytes(hex: hex32)
+		else {
+			return nil
+		}
+		self.init(kind: kind, body: exactly32Bytes)
+	}
+}
+
+extension FactorSourceIdFromHash {
+	public static let keychainKeySeparator = ":"
+	/// NEVER EVER CHANGE THIS! If you do, users apps will be unable to load the Mnemonic
+	/// from keychain!
+	public var keychainKey: String {
+		"\(kind)\(Self.keychainKeySeparator)\(body.data.hex())"
 	}
 }
