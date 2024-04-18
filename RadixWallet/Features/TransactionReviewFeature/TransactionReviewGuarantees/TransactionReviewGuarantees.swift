@@ -149,7 +149,7 @@ extension TransactionReviewGuarantee.State {
 	mutating func updateAmount() {
 		guard let value = percentageStepper.value else { return }
 
-		let newMinimumDecimal = value * Decimal192(0.01)
+		let newMinimumDecimal = value * (try! Decimal192(0.01))
 		let divisibility: UInt8 = resource.divisibility ?? Decimal192.maxDivisibility
 		guarantee.amount = (newMinimumDecimal * amount).rounded(decimalPlaces: divisibility)
 	}
