@@ -63,7 +63,7 @@ private extension SecurityFactors.View {
 				title: S.SeedPhrases.title,
 				subtitle: S.SeedPhrases.subtitle,
 				detail: seedPhrasesDetail(viewStore),
-				hint: seedPhraseHint(viewStore),
+				hints: seedPhraseHints(viewStore),
 				icon: .asset(AssetResource.seedPhrases),
 				action: .seedPhrasesButtonTapped
 			)),
@@ -84,11 +84,11 @@ private extension SecurityFactors.View {
 		return count == 1 ? S.SeedPhrases.counterSingular : S.SeedPhrases.counterPlural(count)
 	}
 
-	func seedPhraseHint(_ viewStore: ViewStoreOf<SecurityFactors>) -> Hint.ViewState? {
+	func seedPhraseHints(_ viewStore: ViewStoreOf<SecurityFactors>) -> [Hint.ViewState] {
 		guard viewStore.isSeedPhraseRequiredToRecoverAccounts else {
-			return nil
+			return []
 		}
-		return .init(kind: .warning, text: .init(S.SeedPhrases.enterSeedPhrase))
+		return [.init(kind: .warning, text: .init(S.SeedPhrases.enterSeedPhrase)), .init(kind: .warning, text: .init("Whatever"))]
 	}
 
 	func ledgerWalletsDetail(_ viewStore: ViewStoreOf<SecurityFactors>) -> String? {

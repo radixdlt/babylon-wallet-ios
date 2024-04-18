@@ -80,20 +80,20 @@ public struct PlainListRowCore: View {
 		public let title: String?
 		public let subtitle: String?
 		public let detail: String?
-		public let hint: Hint.ViewState?
+		public let hints: [Hint.ViewState]
 
 		init(
 			kind: Kind = .general,
 			title: String?,
 			subtitle: String? = nil,
 			detail: String? = nil,
-			hint: Hint.ViewState? = nil
+			hints: [Hint.ViewState] = []
 		) {
 			self.kind = kind
 			self.title = title
 			self.subtitle = subtitle
 			self.detail = detail
-			self.hint = hint
+			self.hints = hints
 		}
 	}
 
@@ -139,11 +139,21 @@ public struct PlainListRowCore: View {
 				}
 			}
 
-			if let hint = viewState.hint {
-				Hint(viewState: hint)
+			VStack(alignment: .leading, spacing: .small1) {
+				ForEach(viewState.hints) { hint in
+					Hint(viewState: hint)
+				}
 			}
 		}
 		.padding(.vertical, viewState.verticalPadding)
+	}
+}
+
+// MARK: - Hint.ViewState + Identifiable
+// TODO: Change
+extension Hint.ViewState: Identifiable {
+	public var id: String {
+		UUID().uuidString
 	}
 }
 

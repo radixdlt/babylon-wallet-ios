@@ -10,13 +10,13 @@ struct SettingsRowModel<Feature: FeatureReducer>: Identifiable {
 		title: String,
 		subtitle: String? = nil,
 		detail: String? = nil,
-		hint: Hint.ViewState? = nil,
+		hints: [Hint.ViewState] = [],
 		icon: AssetIcon.Content,
 		accessory: ImageAsset? = AssetResource.chevronRight,
 		action: Feature.ViewAction
 	) {
 		self.id = title
-		self.rowViewState = .init(icon, rowCoreViewState: .init(kind: .settings, title: title, subtitle: subtitle, detail: detail, hint: hint), accessory: accessory)
+		self.rowViewState = .init(icon, rowCoreViewState: .init(kind: .settings, title: title, subtitle: subtitle, detail: detail, hints: hints), accessory: accessory)
 		self.action = action
 	}
 }
