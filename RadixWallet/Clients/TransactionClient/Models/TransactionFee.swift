@@ -105,7 +105,7 @@ extension TransactionFee {
 extension TransactionFee {
 	public enum PredefinedFeeConstants {
 		/// 15% margin is added here to make up for the ambiguity of the transaction preview estimate)
-		public static let networkFeeMultiplier: Decimal192 = 0.15
+		public static let networkFeeMultiplier = try! Decimal192(0.15)
 
 		/// Network fees -> https://radixdlt.atlassian.net/wiki/spaces/S/pages/3134783512/Manifest+Mutation+Cost+Addition+Estimates
 		// swiftformat:disable all
