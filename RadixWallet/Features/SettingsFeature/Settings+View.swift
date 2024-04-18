@@ -102,61 +102,61 @@ extension Settings.View {
 	}
 
 	@MainActor
-	private func rows(viewStore: ViewStoreOf<Settings>) -> [AbstractSettingsRow<Settings>] {
+	private func rows(viewStore: ViewStoreOf<Settings>) -> [SettingsRow<Settings>] {
 		var visibleRows = normalRows(viewStore: viewStore)
 		#if DEBUG
 		visibleRows.append(.separator)
-		visibleRows.append(.model(.init(
+		visibleRows.append(.model(
 			title: "Debug Settings",
 			icon: .asset(AssetResource.appSettings), // FIXME: Find
 			action: .debugButtonTapped
-		)))
+		))
 		#endif
 		return visibleRows
 	}
 
 	@MainActor
-	private func normalRows(viewStore: ViewStoreOf<Settings>) -> [AbstractSettingsRow<Settings>] {
+	private func normalRows(viewStore: ViewStoreOf<Settings>) -> [SettingsRow<Settings>] {
 		[
-			.model(.init(
+			.model(
 				title: L10n.WalletSettings.SecurityCenter.title,
 				subtitle: L10n.WalletSettings.SecurityCenter.subtitle,
 				icon: .asset(AssetResource.security),
 				action: .securityButtonTapped
-			)),
+			),
 			.separator,
-			.model(.init(
+			.model(
 				title: L10n.WalletSettings.Personas.title,
 				subtitle: L10n.WalletSettings.Personas.subtitle,
 				icon: .asset(AssetResource.personas),
 				action: .personasButtonTapped
-			)),
-			.model(.init(
+			),
+			.model(
 				title: L10n.WalletSettings.Dapps.title,
 				subtitle: L10n.WalletSettings.Dapps.subtitle,
 				icon: .asset(AssetResource.authorizedDapps),
 				action: .dappsButtonTapped
-			)),
-			.model(.init(
+			),
+			.model(
 				title: L10n.WalletSettings.Connectors.title,
 				subtitle: L10n.WalletSettings.Connectors.subtitle,
 				icon: .asset(AssetResource.desktopConnections),
 				action: .connectorsButtonTapped
-			)),
+			),
 			.separator,
-			.model(.init(
+			.model(
 				title: L10n.WalletSettings.Preferences.title,
 				subtitle: L10n.WalletSettings.Preferences.subtitle,
 				icon: .asset(AssetResource.depositGuarantees),
 				action: .preferencesButtonTapped
-			)),
+			),
 			.separator,
-			.model(.init(
+			.model(
 				title: L10n.WalletSettings.Troubleshooting.title,
 				subtitle: L10n.WalletSettings.Troubleshooting.subtitle,
 				icon: .asset(AssetResource.troubleshooting),
 				action: .troubleshootingButtonTapped
-			)),
+			),
 		]
 	}
 }

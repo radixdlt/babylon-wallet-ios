@@ -45,35 +45,35 @@ extension Troubleshooting.View {
 	}
 
 	@MainActor
-	private var rows: [AbstractSettingsRow<Troubleshooting>] {
+	private var rows: [SettingsRow<Troubleshooting>] {
 		[
 			.header(S.accountRecovery),
-			.model(.init(
+			.model(
 				title: S.AccountScan.title,
 				subtitle: S.AccountScan.subtitle,
 				icon: .asset(AssetResource.recovery),
 				action: .accountScanButtonTapped
-			)),
-			.model(.init(
+			),
+			.model(
 				title: S.LegacyImport.title,
 				subtitle: S.LegacyImport.subtitle,
 				icon: .asset(AssetResource.recovery),
 				action: .legacyImportButtonTapped
-			)),
+			),
 			.header(S.supportAndCommunity),
-			.model(.init(
+			.model(
 				title: S.ContactSupport.title,
 				subtitle: S.ContactSupport.subtitle,
 				icon: .systemImage("envelope"),
 				action: .contactSupportButtonTapped
-			)),
-			.model(.init(
+			),
+			.model(
 				title: S.Discord.title,
 				subtitle: S.Discord.subtitle,
 				icon: .asset(AssetResource.discord),
 				accessory: AssetResource.iconLinkOut,
 				action: .discordButtonTapped
-			)),
+			),
 		]
 	}
 }

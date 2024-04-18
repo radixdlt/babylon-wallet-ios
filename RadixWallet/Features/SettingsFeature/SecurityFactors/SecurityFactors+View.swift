@@ -56,24 +56,24 @@ private extension SecurityFactors.View {
 		}
 	}
 
-	func rows(viewStore: ViewStoreOf<SecurityFactors>) -> [AbstractSettingsRow<SecurityFactors>] {
+	func rows(viewStore: ViewStoreOf<SecurityFactors>) -> [SettingsRow<SecurityFactors>] {
 		[
 			.header(S.subtitle),
-			.model(.init(
+			.model(
 				title: S.SeedPhrases.title,
 				subtitle: S.SeedPhrases.subtitle,
 				detail: seedPhrasesDetail(viewStore),
 				hints: seedPhraseHints(viewStore),
 				icon: .asset(AssetResource.seedPhrases),
 				action: .seedPhrasesButtonTapped
-			)),
-			.model(.init(
+			),
+			.model(
 				title: S.LedgerWallet.title,
 				subtitle: S.LedgerWallet.subtitle,
 				detail: ledgerWalletsDetail(viewStore),
 				icon: .asset(AssetResource.ledger),
 				action: .ledgerWalletsButtonTapped
-			)),
+			),
 		]
 	}
 

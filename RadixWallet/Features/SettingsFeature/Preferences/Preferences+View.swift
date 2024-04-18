@@ -77,42 +77,42 @@ extension Preferences.View {
 	}
 
 	@MainActor
-	private func rows(viewStore: ViewStoreOf<Preferences>) -> [AbstractSettingsRow<Preferences>] {
+	private func rows(viewStore: ViewStoreOf<Preferences>) -> [SettingsRow<Preferences>] {
 		var visibleRows = normalRows(viewStore: viewStore)
 		#if DEBUG
-		visibleRows.append(.model(.init(
+		visibleRows.append(.model(
 			title: "Export logs",
 			subtitle: "Export and save debugging logs",
 			icon: .asset(AssetResource.appSettings),
 			action: .exportLogsButtonTapped
-		)))
+		))
 		#endif
 		return visibleRows
 	}
 
 	@MainActor
-	private func normalRows(viewStore: ViewStoreOf<Preferences>) -> [AbstractSettingsRow<Preferences>] {
+	private func normalRows(viewStore: ViewStoreOf<Preferences>) -> [SettingsRow<Preferences>] {
 		[
 			.separator,
-			.model(.init(
+			.model(
 				title: S.DepositGuarantees.title,
 				subtitle: S.DepositGuarantees.subtitle,
 				icon: .asset(AssetResource.depositGuarantees),
 				action: .depositGuaranteesButtonTapped
-			)),
-			.model(.init(
+			),
+			.model(
 				title: S.HiddenEntities.title,
 				subtitle: S.HiddenEntities.subtitle,
 				icon: .systemImage("eye.fill"),
 				action: .hiddenEntitiesButtonTapped
-			)),
+			),
 			.header(S.advancedPreferences),
-			.model(.init(
+			.model(
 				title: S.gateways,
 				icon: .asset(AssetResource.gateway),
 				action: .gatewaysButtonTapped
-			)),
-			.custom(developerMode(viewStore: viewStore)),
+			),
+			.custom(developerMode(viewStore: viewStore), id: "developerMode"),
 		]
 	}
 
