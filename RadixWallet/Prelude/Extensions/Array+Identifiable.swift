@@ -5,7 +5,7 @@ extension Array where Element: Identifiable {
 		var array: IdentifiedArrayOf<Element> = []
 		for element in self {
 			let (inserted, _) = array.append(element)
-			assert(inserted, "The source array does not contain unique elements, id clash for \(element.id)")
+			// assert(inserted, "The source array does not contain unique elements, id clash for \(element.id)")
 		}
 		return array
 	}

@@ -36,18 +36,13 @@ extension DeepLinkHandlerClient {
 				return .request(.init(sessionId: .init(sessionId), interactionId: interactionId))
 			}
 
-			guard let publicKey = queryItems.first(where: { $0.name == "publicKey" })?.value
-			else {
-				throw Error.missingPublicKey
-			}
-
 			guard let origin = queryItems.first(where: { $0.name == "origin" })?.value,
 			      let oringURL = URL(string: origin)
 			else {
 				throw Error.missingRequestOrigin
 			}
 
-			return .linking(.init(origin: .webDapp(oringURL), publicKeyHex: publicKey, sessionId: .init(sessionId)))
+			return .linking(.init(origin: .webDapp(oringURL), sessionId: .init(sessionId)))
 		}
 
 		return DeepLinkHandlerClient(handleDeepLink: { url in

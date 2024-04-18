@@ -5,13 +5,18 @@ import Foundation
 public struct RadixConnectRelay: DependencyKey {
 	public var getRequests: GetRequests
 	public var sendResponse: SendResponse
+	public var getHandshakeRequest: GetHandshakeRequest
+	public var sendHandshakeResponse: SendHandshakeResponse
 }
 
 extension RadixConnectRelay {
 	public typealias GetRequests = (Session) async throws -> [P2P.RTCMessageFromPeer.Request]
 	public typealias SendResponse = (P2P.RTCOutgoingMessage.Response, Session) async throws -> Void
+	public typealias GetHandshakeRequest = (Session.ID) async throws -> Session.PeerPublicKey
+	public typealias SendHandshakeResponse = (Session.ID, Session.PeerPublicKey) async throws -> Void
 
 	public struct Session: Codable, Sendable {
+		public typealias PeerPublicKey = Curve25519.KeyAgreement.PublicKey
 		public enum Origin: Codable, Sendable {
 			case webDapp(URL)
 		}
@@ -21,6 +26,15 @@ extension RadixConnectRelay {
 		public let id: ID
 		public let origin: Origin
 		public let encryptionKey: HexCodable32Bytes
+	}
+
+	public struct HandshakeRequest: Sendable, Decodable {
+		let publicKey: HexCodable32Bytes
+	}
+
+	public struct HandshakeResponse: Sendable, Codable {
+		let sessionId: Session.ID
+		let publicKey: HexCodable32Bytes
 	}
 }
 
@@ -71,6 +85,25 @@ extension RadixConnectRelay {
 				urlRequest.httpBody = try JSONEncoder().encode(sendResponse)
 
 				_ = try await httpClient.executeRequest(urlRequest)
+			},
+			getHandshakeRequest: { sessionId in
+				let body = Request.getHandshakeRequests(sessionId: sessionId)
+				var urlRequest = URLRequest(url: serviceURL)
+				urlRequest.httpBody = try JSONEncoder().encode(body)
+				urlRequest.httpMethod = "POST"
+
+				let response = try await httpClient.executeRequest(urlRequest)
+				let content = try JSONDecoder().decode(HandshakeRequest.self, from: response)
+
+				return try Session.PeerPublicKey(rawRepresentation: content.publicKey.data.data)
+			},
+			sendHandshakeResponse: { id, key in
+				let body = try Request.sendHandshakeResponse(sessionId: id, publicKey: key)
+				var urlRequest = URLRequest(url: serviceURL)
+				urlRequest.httpBody = try JSONEncoder().encode(body)
+				urlRequest.httpMethod = "POST"
+
+				_ = try await httpClient.executeRequest(urlRequest)
 			}
 		)
 	}
@@ -84,6 +117,10 @@ extension RadixConnectRelay {
 			case getRequests
 			case sendResponse
 			case getRessponses
+			case sendHandshakeRequest
+			case getHandshakeRequest
+			case sendHandshakeResponse
+			case getHandshakeResponse
 		}
 
 		let method: Method
@@ -104,6 +141,14 @@ extension RadixConnectRelay {
 
 		static func getResponses(sessionId: RadixConnectRelay.Session.ID) -> Self {
 			.init(method: .getRessponses, sessionId: sessionId, data: nil)
+		}
+
+		static func getHandshakeRequests(sessionId: RadixConnectRelay.Session.ID) -> Self {
+			.init(method: .getHandshakeRequest, sessionId: sessionId, data: nil)
+		}
+
+		static func sendHandshakeResponse(sessionId: RadixConnectRelay.Session.ID, publicKey: Session.PeerPublicKey) throws -> Self {
+			try .init(method: .sendHandshakeResponse, sessionId: sessionId, data: HexCodable(hex: publicKey.rawRepresentation.hex))
 		}
 	}
 }

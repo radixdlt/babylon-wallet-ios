@@ -42,7 +42,7 @@ extension Mobile2Mobile {
 	func linkDapp(_ request: Request.DappLinking) async throws {
 		switch request.origin {
 		case let .webDapp(dAppOrigin):
-			let dAppPublicKey = try Curve25519.KeyAgreement.PublicKey(rawRepresentation: HexCodable32Bytes(hex: request.publicKeyHex).data.data)
+			let dAppPublicKey = try await radixConnectRelay.getHandshakeRequest(request.sessionId)
 			let dappReturnURL = try await getDappReturnURL(dAppOrigin)
 
 			loggerGlobal.critical("Creating the Wallet Private/Public key pair")
@@ -61,8 +61,9 @@ extension Mobile2Mobile {
 				)
 			)
 
+			try await radixConnectRelay.sendHandshakeResponse(request.sessionId, walletPublicKey)
+
 			let returnURL = dappReturnURL.appending(queryItems: [
-				.init(name: "publicKey", value: walletPublicKey.rawRepresentation.hex),
 				.init(name: "sessionId", value: request.sessionId.rawValue),
 			])
 
@@ -127,7 +128,6 @@ extension Mobile2Mobile {
 
 		public struct DappLinking: Sendable {
 			public let origin: RadixConnectRelay.Session.Origin
-			public let publicKeyHex: String
 			public let sessionId: RadixConnectRelay.Session.ID
 		}
 
