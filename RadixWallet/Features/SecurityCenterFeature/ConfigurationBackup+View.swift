@@ -14,7 +14,7 @@ extension ConfigurationBackup {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				ScrollView {
-					VStack(spacing: .zero) {
+					VStack(alignment: .leading, spacing: .zero) {
 						Text(L10n.ConfigurationBackup.subtitle)
 							.foregroundStyle(.app.gray2)
 							.textStyle(.body1Header)
@@ -23,10 +23,20 @@ extension ConfigurationBackup {
 						let backupsEnabled = viewStore.binding(get: \.automatedBackupsEnabled) { .view(.toggleAutomatedBackups($0)) }
 						AutomatedBackupView(
 							backupsEnabled: backupsEnabled,
-							loggedInName: "hello@world.com",
+							loggedInName: viewStore.loggedInName,
 							actionsRequired: [.personas],
 							disconnectAction: { store.send(.view(.disconnectTapped)) }
 						)
+						.padding(.bottom, .medium1)
+
+						Text(L10n.ConfigurationBackup.ManualBackup.heading)
+							.foregroundStyle(.app.gray2)
+							.textStyle(.body1Header)
+							.padding(.bottom, .medium2)
+
+						ManualBackupView {
+							store.send(.view(.exportTapped))
+						}
 					}
 					.padding(.top, .small2)
 					.padding(.horizontal, .medium2)
@@ -104,25 +114,7 @@ extension ConfigurationBackup {
 					.padding(.horizontal, .medium1)
 					.padding(.bottom, .small1)
 
-					HStack(spacing: 0) {
-						Image(.warningError)
-							.resizable()
-							.renderingMode(.template)
-							.foregroundStyle(.app.gray1)
-							.frame(.smallest)
-							.padding(.trailing, .medium3)
-
-						Text(L10n.ConfigurationBackup.automatedBackupsWarning)
-							.multilineTextAlignment(.leading)
-							.lineSpacing(0)
-							.textStyle(.body1Regular)
-							.foregroundStyle(.app.gray1)
-
-						Spacer(minLength: 0)
-					}
-					.padding(.horizontal, .medium2)
-					.padding(.vertical, .medium3)
-					.background(.app.gray5)
+					BottomView(text: L10n.ConfigurationBackup.automatedBackupsWarning)
 				}
 			}
 		}
@@ -181,6 +173,56 @@ extension ConfigurationBackup {
 				case .walletSettings: L10n.ConfigurationBackup.walletSettingsSubtitle
 				}
 			}
+		}
+	}
+
+	struct ManualBackupView: SwiftUI.View {
+		let exportAction: () -> Void
+
+		var body: some SwiftUI.View {
+			Card {
+				VStack(alignment: .leading, spacing: .medium2) {
+					Text(L10n.ConfigurationBackup.ManualBackup.subtitle)
+						.lineSpacing(0)
+						.multilineTextAlignment(.leading)
+						.textStyle(.body1Regular)
+						.foregroundStyle(.app.gray1)
+						.padding(.top, .medium2)
+						.padding(.horizontal, .medium2)
+
+					Button(L10n.ConfigurationBackup.ManualBackup.exportButton, action: exportAction)
+						.buttonStyle(.primaryRectangular(shouldExpand: true))
+						.padding(.horizontal, .large2)
+
+					BottomView(text: L10n.ConfigurationBackup.ManualBackup.warning)
+				}
+			}
+		}
+	}
+
+	struct BottomView: SwiftUI.View {
+		let text: String
+
+		var body: some SwiftUI.View {
+			HStack(spacing: 0) {
+				Image(.warningError)
+					.resizable()
+					.renderingMode(.template)
+					.foregroundStyle(.app.gray1)
+					.frame(.smallest)
+					.padding(.trailing, .medium3)
+
+				Text(text)
+					.multilineTextAlignment(.leading)
+					.lineSpacing(0)
+					.textStyle(.body1Regular)
+					.foregroundStyle(.app.gray1)
+
+				Spacer(minLength: 0)
+			}
+			.padding(.horizontal, .medium2)
+			.padding(.vertical, .medium3)
+			.background(.app.gray5)
 		}
 	}
 }

@@ -3,6 +3,7 @@ import ComposableArchitecture
 public struct ConfigurationBackup: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var automatedBackupsEnabled: Bool = false
+		public var loggedInName: String? = nil
 		public var backedUpDate: Date = .init(timeIntervalSinceNow: -.random(in: 100 ..< 1000))
 	}
 
@@ -15,6 +16,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case toggleAutomatedBackups(Bool)
+		case exportTapped
 		case disconnectTapped
 	}
 
@@ -22,6 +24,9 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		switch viewAction {
 		case let .toggleAutomatedBackups(isEnabled):
 			state.automatedBackupsEnabled = isEnabled
+			return .none
+
+		case .exportTapped:
 			return .none
 
 		case .disconnectTapped:
