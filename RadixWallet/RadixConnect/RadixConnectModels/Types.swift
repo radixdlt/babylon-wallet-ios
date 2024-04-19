@@ -31,12 +31,12 @@ extension ConnectionPassword {
 }
 #endif // DEBUG
 
-// MARK: - CEPublicKeyTag
-public enum CEPublicKeyTag {}
-public typealias CEPublicKey = Tagged<CEPublicKeyTag, HexCodable32Bytes>
+// MARK: - Curve25519PublicKeyBytesTag
+public enum Curve25519PublicKeyBytesTag {}
+public typealias Curve25519PublicKeyBytes = Tagged<Curve25519PublicKeyBytesTag, HexCodable32Bytes>
 
 #if DEBUG
-extension CEPublicKey {
+extension Curve25519PublicKeyBytes {
 	public static let placeholder = try! Self(.init(.deadbeef32Bytes))
 }
 #endif // DEBUG
@@ -55,7 +55,10 @@ extension CESignature {
 public struct LinkConnectionQRData: Sendable, Hashable, Decodable {
 	public let purpose: ConnectionPurpose
 	public let password: ConnectionPassword
-	public let publicKey: CEPublicKey
+	public let publicKey: Curve25519PublicKeyBytes
+    
+    /// Represents a signature produced by CE by signing the hash of the `password` 
+    /// with the private key of the `publicKey`.
 	public let signature: CESignature
 }
 

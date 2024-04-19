@@ -401,7 +401,7 @@ extension SecureStorageClient: DependencyKey {
 			loggerGlobal.notice("Saved p2pLinks: \(p2pLinks)")
 		}
 
-		@Sendable func loadP2PLinkPrivateKey(_ publicKey: CEPublicKey) throws -> Curve25519.PrivateKey? {
+		@Sendable func loadP2PLinkPrivateKey(_ publicKey: Curve25519PublicKeyBytes) throws -> Curve25519.PrivateKey? {
 			try keychainClient
 				.getDataWithoutAuth(forKey: key(publicKey: publicKey))
 				.map {
@@ -416,7 +416,7 @@ extension SecureStorageClient: DependencyKey {
 			comment: "Contains a wallet private key for a specific P2P link"
 		)
 
-		@Sendable func saveP2PLinkPrivateKey(_ publicKey: CEPublicKey, privateKey: Curve25519.PrivateKey) throws {
+		@Sendable func saveP2PLinkPrivateKey(_ publicKey: Curve25519PublicKeyBytes, privateKey: Curve25519.PrivateKey) throws {
 			try keychainClient.setDataWithoutAuth(
 				privateKey.rawRepresentation,
 				forKey: key(publicKey: publicKey),
@@ -425,7 +425,7 @@ extension SecureStorageClient: DependencyKey {
 			loggerGlobal.notice("Saved private key for CE public key: \(publicKey)")
 		}
 
-		@Sendable func deleteP2PLinkPrivateKey(_ publicKey: CEPublicKey) throws {
+		@Sendable func deleteP2PLinkPrivateKey(_ publicKey: Curve25519PublicKeyBytes) throws {
 			try keychainClient.removeData(forKey: key(publicKey: publicKey))
 		}
 
@@ -502,7 +502,7 @@ private func key(factorSourceID: FactorSourceID.FromHash) -> KeychainClient.Key 
 	.init(rawValue: .init(rawValue: factorSourceID.keychainKey)!)
 }
 
-private func key(publicKey: CEPublicKey) -> KeychainClient.Key {
+private func key(publicKey: Curve25519PublicKeyBytes) -> KeychainClient.Key {
 	.init(rawValue: .init(rawValue: publicKey.data.hex())!)
 }
 

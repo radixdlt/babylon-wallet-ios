@@ -29,6 +29,6 @@ extension P2PLinksClient {
 	public typealias UpdateOrAddP2PLink = @Sendable (P2PLink) async throws -> P2PLink?
 	public typealias DeleteP2PLinkByPassword = @Sendable (ConnectionPassword) async throws -> Void
 	public typealias DeleteAllP2PLinks = @Sendable () async throws -> Void
-	public typealias GetP2PLinkPrivateKey = @Sendable (CEPublicKey) async throws -> (privateKey: Curve25519.PrivateKey, isNew: Bool)
-	public typealias StoreP2PLinkPrivateKey = @Sendable (CEPublicKey, Curve25519.PrivateKey) async throws -> Void
+	public typealias GetP2PLinkPrivateKey = @Sendable (Curve25519PublicKeyBytes) async throws -> (privateKey: Curve25519.PrivateKey, isNew: Bool)
+	public typealias StoreP2PLinkPrivateKey = @Sendable (Curve25519PublicKeyBytes, Curve25519.PrivateKey) async throws -> Void
 }

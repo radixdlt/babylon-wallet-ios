@@ -10,7 +10,7 @@ public struct P2PLink:
 	Codable,
 	Identifiable
 {
-	public var id: CEPublicKey {
+	public var id: Curve25519PublicKeyBytes {
 		publicKey
 	}
 
@@ -18,7 +18,7 @@ public struct P2PLink:
 	public let connectionPassword: ConnectionPassword
 
 	/// Acts as the seed for the `ID`.
-	public let publicKey: CEPublicKey
+	public let publicKey: Curve25519PublicKeyBytes
 
 	/// Link purpose
 	public let purpose: ConnectionPurpose
@@ -26,10 +26,10 @@ public struct P2PLink:
 	/// Client name, e.g. "Chrome on Macbook" or "My work Android" or "My wifes iPhone SE".
 	public let displayName: String
 
-	/// The canonical initializer requiring a `ConnectionPassword`, `CEPublicKey`, `ConnectionPurpose` and `Display` name.
+	/// The canonical initializer requiring a `ConnectionPassword`, `Curve25519PublicKeyBytes`, `ConnectionPurpose` and `Display` name.
 	public init(
 		connectionPassword: ConnectionPassword,
-		publicKey: CEPublicKey,
+		publicKey: Curve25519PublicKeyBytes,
 		purpose: ConnectionPurpose,
 		displayName: String
 	) {

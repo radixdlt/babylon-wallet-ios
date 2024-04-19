@@ -178,9 +178,9 @@ extension SecureStorageClient {
 	public typealias LoadP2PLinks = @Sendable () throws -> P2PLinks?
 	public typealias SaveP2PLinks = @Sendable (P2PLinks) throws -> Void
 
-	public typealias LoadP2PLinkPrivateKey = @Sendable (CEPublicKey) throws -> Curve25519.PrivateKey?
-	public typealias SaveP2PLinkPrivateKey = @Sendable (CEPublicKey, Curve25519.PrivateKey) throws -> Void
-	public typealias DeleteP2PLinkPrivateKey = @Sendable (CEPublicKey) throws -> Void
+	public typealias LoadP2PLinkPrivateKey = @Sendable (Curve25519PublicKeyBytes) throws -> Curve25519.PrivateKey?
+	public typealias SaveP2PLinkPrivateKey = @Sendable (Curve25519PublicKeyBytes, Curve25519.PrivateKey) throws -> Void
+	public typealias DeleteP2PLinkPrivateKey = @Sendable (Curve25519PublicKeyBytes) throws -> Void
 
 	public enum LoadMnemonicPurpose: Sendable, Hashable, CustomStringConvertible {
 		case signTransaction
