@@ -67,9 +67,9 @@ extension Mobile2Mobile {
 				.init(name: "sessionId", value: request.sessionId.rawValue),
 			])
 
-			await overlayWindowClient.scheduleAlertAutoDimiss(.init(title: {
-				.init("Verifying dApp link")
-			}))
+//			await overlayWindowClient.scheduleAlertAutoDimiss(.init(title: {
+//				.init("Verifying dApp link")
+//			}))
 
 			await openURL(returnURL)
 		}
