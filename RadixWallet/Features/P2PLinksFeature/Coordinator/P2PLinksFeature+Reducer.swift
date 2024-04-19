@@ -111,7 +111,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 			return .none
 
 		case let .saveNewConnectionResult(.success(newConnection)):
-			state.links.append(
+			state.links.updateOrAppend(
 				P2PLinkRow.State(link: newConnection)
 			)
 			return .none
