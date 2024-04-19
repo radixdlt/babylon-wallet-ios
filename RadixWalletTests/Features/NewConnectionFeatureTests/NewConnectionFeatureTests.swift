@@ -37,7 +37,7 @@ final class NewConnectionTests: TestCase {
 		}
 	}
 
-	func test__GIVEN_new_connection_approval_screen__WHEN__user_finishes_flow__THEN__connection_we_start_connect_using_secrets() async throws {
+	func test__GIVEN_new_connection_approval_screen__WHEN__user_finishes_flow__THEN__we_start_connect_using_secrets() async throws {
 		let connectionName = "Foobar"
 		let purpose = NewConnectionApproval.State.Purpose.approveNewConnection
 		let p2pLink = P2PLink(
