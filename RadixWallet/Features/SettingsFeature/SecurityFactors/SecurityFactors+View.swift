@@ -62,44 +62,46 @@ private extension SecurityFactors.View {
 			.model(
 				title: S.SeedPhrases.title,
 				subtitle: S.SeedPhrases.subtitle,
-				detail: seedPhrasesDetail(viewStore),
-				hints: seedPhraseHints(viewStore),
+				detail: viewStore.seedPhrasesDetail,
+				hints: viewStore.seedPhraseHints,
 				icon: .asset(AssetResource.seedPhrases),
 				action: .seedPhrasesButtonTapped
 			),
 			.model(
 				title: S.LedgerWallet.title,
 				subtitle: S.LedgerWallet.subtitle,
-				detail: ledgerWalletsDetail(viewStore),
+				detail: viewStore.ledgerWalletsDetail,
 				icon: .asset(AssetResource.ledger),
 				action: .ledgerWalletsButtonTapped
 			),
 		]
 	}
+}
 
-	func seedPhrasesDetail(_ viewStore: ViewStoreOf<SecurityFactors>) -> String? {
-		guard let count = viewStore.seedPhrasesCount else {
+// MARK: - Extensions
+
+private extension SecurityFactors.ViewState {
+	var seedPhrasesDetail: String? {
+		guard let seedPhrasesCount else {
 			return nil
 		}
-		return count == 1 ? S.SeedPhrases.counterSingular : S.SeedPhrases.counterPlural(count)
+		return seedPhrasesCount == 1 ? S.SeedPhrases.counterSingular : S.SeedPhrases.counterPlural(seedPhrasesCount)
 	}
 
-	func seedPhraseHints(_ viewStore: ViewStoreOf<SecurityFactors>) -> [Hint.ViewState] {
-		guard viewStore.isSeedPhraseRequiredToRecoverAccounts else {
+	var seedPhraseHints: [Hint.ViewState] {
+		guard isSeedPhraseRequiredToRecoverAccounts else {
 			return []
 		}
 		return [.init(kind: .warning, text: .init(S.SeedPhrases.enterSeedPhrase))]
 	}
 
-	func ledgerWalletsDetail(_ viewStore: ViewStoreOf<SecurityFactors>) -> String? {
-		guard let count = viewStore.ledgerWalletsCount else {
+	var ledgerWalletsDetail: String? {
+		guard let ledgerWalletsCount else {
 			return nil
 		}
-		return count == 1 ? S.LedgerWallet.counterSingular : S.LedgerWallet.counterPlural(count)
+		return ledgerWalletsCount == 1 ? S.LedgerWallet.counterSingular : S.LedgerWallet.counterPlural(ledgerWalletsCount)
 	}
 }
-
-// MARK: - Extensions
 
 private extension StoreOf<SecurityFactors> {
 	var destination: PresentationStoreOf<SecurityFactors.Destination> {
