@@ -166,8 +166,8 @@ extension ThirdPartyDeposits {
 }
 
 extension OrderedSet<EntityFlag> {
-	func intoSargon() -> [Sargon.EntityFlag] {
-		map { $0.intoSargon() }
+	func intoSargon() -> Sargon.EntityFlags {
+		Sargon.EntityFlags(map { $0.intoSargon() })
 	}
 }
 
