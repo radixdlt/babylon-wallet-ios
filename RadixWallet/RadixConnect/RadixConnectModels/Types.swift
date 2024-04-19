@@ -56,9 +56,9 @@ public struct LinkConnectionQRData: Sendable, Hashable, Decodable {
 	public let purpose: ConnectionPurpose
 	public let password: ConnectionPassword
 	public let publicKey: Curve25519PublicKeyBytes
-    
-    /// Represents a signature produced by CE by signing the hash of the `password` 
-    /// with the private key of the `publicKey`.
+
+	/// Represents a signature produced by CE by signing the hash of the `password`
+	/// with the private key of the `publicKey`.
 	public let signature: CESignature
 }
 
