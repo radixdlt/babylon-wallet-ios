@@ -31,13 +31,11 @@ extension BaseFactorSourceProtocol {
 	}
 
 	public var supportsOlympia: Bool {
-//		cryptoParameters.supportsOlympia
-		sargonProfileFinishMigrateAtEndOfStage1()
+		cryptoParameters.supportsOlympia
 	}
 
 	public var supportsBabylon: Bool {
-//		cryptoParameters.supportsBabylon
-		sargonProfileFinishMigrateAtEndOfStage1()
+		cryptoParameters.supportsBabylon
 	}
 }
 

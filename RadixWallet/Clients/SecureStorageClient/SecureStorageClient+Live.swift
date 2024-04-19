@@ -1,3 +1,6 @@
+import Sargon
+import SargonUniFFI
+
 // MARK: - KeychainAccess.Accessibility + Sendable
 extension KeychainAccess.Accessibility: @unchecked Sendable {}
 
@@ -91,11 +94,11 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		@Sendable func saveProfile(
-			snapshot profileSnapshot: Sargon.Profile,
+			snapshot profile: Sargon.Profile,
 			iCloudSyncEnabled: Bool
 		) throws {
-			let data = try jsonEncoder().encode(profileSnapshot)
-			try saveProfile(snapshotData: data, key: profileSnapshot.header.id.keychainKey, iCloudSyncEnabled: iCloudSyncEnabled)
+			let data = profile.profileSnapshot()
+			try saveProfile(snapshotData: data, key: profile.header.id.keychainKey, iCloudSyncEnabled: iCloudSyncEnabled)
 		}
 
 		@Sendable func loadProfileHeaderList() throws -> Sargon.Profile.HeaderList? {
@@ -214,7 +217,7 @@ extension SecureStorageClient: DependencyKey {
 			else {
 				return nil
 			}
-			return try jsonDecoder().decode(Sargon.Profile.self, from: existingSnapshotData)
+			return try Profile(json: existingSnapshotData)
 		}
 
 		let loadMnemonicByFactorSourceID: LoadMnemonicByFactorSourceID = { request in
@@ -268,13 +271,11 @@ extension SecureStorageClient: DependencyKey {
 		}
 		#endif
 
-		let saveProfileSnapshot: SaveProfileSnapshot = {
-			profileSnapshot in
-			let data = try jsonEncoder().encode(profileSnapshot)
+		let saveProfileSnapshot: SaveProfileSnapshot = { profile in
 			try saveProfile(
-				snapshotData: data,
-				key: profileSnapshot.header.id.keychainKey,
-				iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled
+				snapshotData: profile.profileSnapshot(),
+				key: profile.header.id.keychainKey,
+				iCloudSyncEnabled: profile.appPreferences.security.isCloudProfileSyncEnabled
 			)
 		}
 
@@ -297,10 +298,7 @@ extension SecureStorageClient: DependencyKey {
 			}
 
 			guard
-				let profileSnapshot = try? jsonDecoder().decode(
-					Sargon.Profile.self,
-					from: profileSnapshotData
-				)
+				let profileSnapshot = try? Profile(json: profileSnapshotData)
 			else {
 				return
 			}

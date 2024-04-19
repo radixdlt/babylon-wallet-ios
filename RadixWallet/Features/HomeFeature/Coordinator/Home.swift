@@ -393,7 +393,11 @@ public struct Home: Sendable, FeatureReducer {
 
 	private func loadAccountResources() -> Effect<Action> {
 		.run { send in
-			for try await accountResources in accountPortfoliosClient.portfolioUpdates().map { $0.map { $0.map(\.account) } }.removeDuplicates() {
+			for try await accountResources in accountPortfoliosClient
+				.portfolioUpdates()
+				.map({ updates in updates.map { update in update.map(\.account) } })
+				.removeDuplicates()
+			{
 				guard !Task.isCancelled else { return }
 				await send(.internal(.accountsResourcesLoaded(accountResources)))
 			}

@@ -98,43 +98,40 @@ extension DeviceFactorSourceClient: DependencyKey {
 				sargonProfileFinishMigrateAtEndOfStage1()
 			},
 			isAccountRecoveryNeeded: {
-				/*
-				 do {
-				 	let deviceFactorSource = try await factorSourcesClient.getFactorSources().babylonDeviceFactorSources().sorted(by: \.lastUsedOn).first
+				do {
+					let deviceFactorSource = try await factorSourcesClient.getFactorSources().babylonDeviceFactorSources().sorted(by: \.lastUsedOn).first
 
-				 	guard
-				 		let deviceFactorSource,
-				 		let mnemonicWithPassphrase = try secureStorageClient
-				 		.loadMnemonic(
-				 			factorSourceID: deviceFactorSource.id,
-				 			notifyIfMissing: false
-				 		)
-				 	else {
-				 		// Failed to find mnemonic for factor source
-				 		return true
-				 	}
+					guard
+						let deviceFactorSource,
+						let mnemonicWithPassphrase = try secureStorageClient
+						.loadMnemonic(
+							factorSourceID: deviceFactorSource.id,
+							notifyIfMissing: false
+						)
+					else {
+						// Failed to find mnemonic for factor source
+						return true
+					}
 
-				 	let accountsControlledByMainDeviceFactorSource = try await accountsClient.getAccountsOnCurrentNetwork().filter {
-				 		$0.virtualHierarchicalDeterministicFactorInstances.contains(where: { $0.factorSourceID == deviceFactorSource.id })
-				 	}
+					let accountsControlledByMainDeviceFactorSource = try await accountsClient.getAccountsOnCurrentNetwork().filter {
+						$0.virtualHierarchicalDeterministicFactorInstances.contains(where: { $0.factorSourceID == deviceFactorSource.id })
+					}
 
-				 	do {
-				 		let hasControlOfAllAccounts = try mnemonicWithPassphrase.validatePublicKeys(of: accountsControlledByMainDeviceFactorSource.elements)
-				 		return !hasControlOfAllAccounts // if we dont have controll of ALL accounts, then recovery is needed.
-				 	} catch {
-				 		// Account recover needed
-				 		return true
-				 	}
+					do {
+						let hasControlOfAllAccounts = try mnemonicWithPassphrase.validatePublicKeys(of: accountsControlledByMainDeviceFactorSource.elements)
+						return !hasControlOfAllAccounts // if we dont have controll of ALL accounts, then recovery is needed.
+					} catch {
+						// Account recover needed
+						return true
+					}
 
-				 } catch {
-				 	loggerGlobal.error("Failure during check if wallet needs account recovery: \(String(describing: error))")
-				 	if error is KeychainAccess.Status {
-				 		throw error
-				 	}
-				 	return true
-				 }
-				  */
-				sargonProfileFinishMigrateAtEndOfStage1()
+				} catch {
+					loggerGlobal.error("Failure during check if wallet needs account recovery: \(String(describing: error))")
+					if error is KeychainAccess.Status {
+						throw error
+					}
+					return true
+				}
 			},
 			entitiesControlledByFactorSource: entitiesControlledByFactorSource,
 			controlledEntities: { _ in

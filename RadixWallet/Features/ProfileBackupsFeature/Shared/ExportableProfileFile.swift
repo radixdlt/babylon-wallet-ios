@@ -38,7 +38,7 @@ extension ExportableProfileFile {
 	public init(data: Data) throws {
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		do {
-			self = try .plaintext(jsonDecoder().decode(Sargon.Profile.self, from: data))
+			self = try .plaintext(Sargon.Profile(json: data))
 		} catch let decodePlaintextError {
 			do {
 				self = try .encrypted(jsonDecoder().decode(EncryptedProfileSnapshot.self, from: data))
@@ -58,7 +58,7 @@ extension ExportableProfileFile {
 		encoder.outputFormatting = [.withoutEscapingSlashes]
 		switch self {
 		case let .plaintext(plaintext):
-			let jsonData = try encoder.encode(plaintext)
+			let jsonData = plaintext.profileSnapshot()
 			return FileWrapper(regularFileWithContents: jsonData)
 		case let .encrypted(encryptedSnapshot):
 			let jsonData = try encoder.encode(encryptedSnapshot)
