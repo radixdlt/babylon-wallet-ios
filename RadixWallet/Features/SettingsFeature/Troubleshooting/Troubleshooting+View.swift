@@ -1,15 +1,7 @@
 private typealias S = L10n.Troubleshooting
 
-extension Troubleshooting.State {
-	var viewState: Troubleshooting.ViewState {
-		.init()
-	}
-}
-
 // MARK: - Troubleshooting.View
 public extension Troubleshooting {
-	struct ViewState: Equatable {}
-
 	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<Troubleshooting>
@@ -32,16 +24,14 @@ public extension Troubleshooting {
 extension Troubleshooting.View {
 	@MainActor
 	private var content: some View {
-		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
-			ScrollView {
-				VStack(spacing: .zero) {
-					ForEach(rows) { kind in
-						SettingsRow(kind: kind, store: store)
-					}
+		ScrollView {
+			VStack(spacing: .zero) {
+				ForEach(rows) { kind in
+					SettingsRow(kind: kind, store: store)
 				}
 			}
-			.background(Color.app.gray4)
 		}
+		.background(Color.app.gray4)
 	}
 
 	@MainActor

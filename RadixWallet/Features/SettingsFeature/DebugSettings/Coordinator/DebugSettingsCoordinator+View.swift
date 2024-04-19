@@ -1,12 +1,6 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension DebugSettingsCoordinator.State {
-	var viewState: DebugSettingsCoordinator.ViewState {
-		.init()
-	}
-}
-
 // MARK: - DebugSettingsCoordinator.View
 extension DebugSettingsCoordinator {
 	public struct ViewState: Equatable {}
@@ -23,16 +17,14 @@ extension DebugSettingsCoordinator {
 
 extension DebugSettingsCoordinator.View {
 	public var body: some View {
-		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
-			ScrollView {
-				VStack(spacing: .zero) {
-					ForEach(rows) { kind in
-						SettingsRow(kind: kind, store: store)
-					}
+		ScrollView {
+			VStack(spacing: .zero) {
+				ForEach(rows) { kind in
+					SettingsRow(kind: kind, store: store)
 				}
 			}
-			.padding(.bottom, .large3)
 		}
+		.padding(.bottom, .large3)
 		.setUpNavigationBar(title: "Debug Settings")
 		.destinations(with: store)
 		.tint(.app.gray1)
