@@ -774,7 +774,7 @@ extension TransactionReview {
 
 					Spacer(minLength: 0)
 				}
-				.frame(minHeight: .settingsRowHeight)
+				.frame(minHeight: .plainListRowMinHeight)
 				.padding(.horizontal, .medium3)
 				.contentShape(Rectangle())
 			}

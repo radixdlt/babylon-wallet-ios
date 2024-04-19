@@ -63,7 +63,7 @@ struct PlainListRow<Icon: View>: View {
 		}
 		.padding(.vertical, viewState.rowCoreViewState.verticalPadding)
 		.padding(.horizontal, .medium3)
-		.frame(minHeight: .settingsRowHeight)
+		.frame(minHeight: .plainListRowMinHeight)
 		.contentShape(Rectangle())
 	}
 
