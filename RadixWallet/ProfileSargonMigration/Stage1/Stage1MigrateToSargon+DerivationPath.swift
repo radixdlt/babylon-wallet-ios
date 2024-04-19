@@ -10,7 +10,10 @@ extension DerivationPath {
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
-	public var path: String {
-		sargonProfileFinishMigrateAtEndOfStage1()
+	public var path: HDPath {
+		switch self {
+		case let .bip44Like(value): value.path
+		case let .cap26(value): value.path
+		}
 	}
 }

@@ -150,7 +150,7 @@ extension LedgerHardwareWalletClient {
 			}
 			let keyParams = P2P.LedgerHardwareWallet.KeyParameters(
 				curve: signTXFactorInstance.derivationPath.curveForScheme.toLedger(),
-				derivationPath: signTXFactorInstance.derivationPath.path
+				derivationPath: signTXFactorInstance.derivationPath.path.toString()
 			)
 
 			let (derivedKey, address) = try await deriveAndDisplayAddress(keyParams, ledger)

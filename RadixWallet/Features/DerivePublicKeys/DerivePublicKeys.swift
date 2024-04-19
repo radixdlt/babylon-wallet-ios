@@ -322,7 +322,7 @@ extension DerivePublicKeys {
 			derivationPaths.map {
 				P2P.LedgerHardwareWallet.KeyParameters(
 					curve: $0.curveForScheme.p2pCurve,
-					derivationPath: $0.path
+					derivationPath: $0.path.toString()
 				)
 			},
 			ledger

@@ -269,7 +269,7 @@ extension Signer {
 		factorInstancesRequiredToSign.compactMap {
 			P2P.LedgerHardwareWallet.KeyParameters(
 				curve: $0.publicKey.curve.toLedger(),
-				derivationPath: $0.derivationPath.path
+				derivationPath: $0.derivationPath.path.toString()
 			)
 		}
 	}

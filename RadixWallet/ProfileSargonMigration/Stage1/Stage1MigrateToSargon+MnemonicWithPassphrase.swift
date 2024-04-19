@@ -24,36 +24,30 @@ extension MnemonicWithPassphrase {
 	public func validatePublicKeys(
 		of softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 	) throws -> Bool {
-		/*
-		 try validatePublicKeys(
-		 of: softwareAccounts.map {
-		 (
-		 path: $0.path.fullPath,
-		 expectedPublicKey: .ecdsaSecp256k1($0.publicKey)
-		 )
-		 }
-		 )
-		  */
-		sargonProfileFinishMigrateAtEndOfStage1()
+		try validatePublicKeys(
+			of: softwareAccounts.map {
+				(
+					path: $0.path.path,
+					expectedPublicKey: $0.publicKey.asGeneral
+				)
+			}
+		)
 	}
 
 	@discardableResult
 	public func validatePublicKeys(
 		of accounts: some Collection<Sargon.Account>
 	) throws -> Bool {
-		/*
-		 try validatePublicKeys(
-		 of: accounts.flatMap { account in
-		 try account.virtualHierarchicalDeterministicFactorInstances.map {
-		 try (
-		 path: $0.derivationPath.hdFullPath(),
-		 expectedPublicKey: $0.publicKey
-		 )
-		 }
-		 }
-		 )
-		  */
-		sargonProfileFinishMigrateAtEndOfStage1()
+		try validatePublicKeys(
+			of: accounts.flatMap { account in
+				account.virtualHierarchicalDeterministicFactorInstances.map {
+					(
+						path: $0.derivationPath.path,
+						expectedPublicKey: $0.publicKey.publicKey
+					)
+				}
+			}
+		)
 	}
 
 	@discardableResult
