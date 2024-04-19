@@ -71,7 +71,7 @@ extension Settings.View {
 						}
 					}
 
-					ForEach(rows(viewStore: viewStore)) { kind in
+					ForEach(rows) { kind in
 						SettingsRow(kind: kind, store: store)
 					}
 				}
@@ -102,8 +102,8 @@ extension Settings.View {
 	}
 
 	@MainActor
-	private func rows(viewStore: ViewStoreOf<Settings>) -> [SettingsRow<Settings>.Kind] {
-		var visibleRows = normalRows(viewStore: viewStore)
+	private var rows: [SettingsRow<Settings>.Kind] {
+		var visibleRows = normalRows
 		#if DEBUG
 		visibleRows.append(.separator)
 		visibleRows.append(.model(
@@ -116,7 +116,7 @@ extension Settings.View {
 	}
 
 	@MainActor
-	private func normalRows(viewStore: ViewStoreOf<Settings>) -> [SettingsRow<Settings>.Kind] {
+	private var normalRows: [SettingsRow<Settings>.Kind] {
 		[
 			.model(
 				title: L10n.WalletSettings.SecurityCenter.title,
