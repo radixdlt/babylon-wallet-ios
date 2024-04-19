@@ -69,10 +69,10 @@ public struct PlainListRow<Icon: View>: View {
 
 	private var top: some View {
 		HStack(spacing: .zero) {
-			icon
+			iconView
 			PlainListRowCore(viewState: viewState.rowCoreViewState)
 			Spacer(minLength: 0)
-			accessory
+			accessoryView
 		}
 	}
 
@@ -80,7 +80,7 @@ public struct PlainListRow<Icon: View>: View {
 	private var hints: some View {
 		if !viewState.hints.isEmpty {
 			HStack(spacing: .zero) {
-				icon
+				iconView
 					.hidden() // to leave the same leading padding than on top view
 
 				VStack(alignment: .leading, spacing: .small1) {
@@ -89,14 +89,14 @@ public struct PlainListRow<Icon: View>: View {
 					}
 				}
 
-				accessory
+				accessoryView
 					.hidden() // to leave the same trailing padding than on top view
 			}
 		}
 	}
 
 	@ViewBuilder
-	private var icon: some View {
+	private var iconView: some View {
 		if let icon = viewState.icon {
 			icon
 				.padding(.trailing, .medium3)
@@ -104,7 +104,7 @@ public struct PlainListRow<Icon: View>: View {
 	}
 
 	@ViewBuilder
-	private var accessory: some View {
+	private var accessoryView: some View {
 		if let accessory = viewState.accessory {
 			Image(asset: accessory)
 		}
@@ -114,18 +114,18 @@ public struct PlainListRow<Icon: View>: View {
 // MARK: - PlainListRowCore
 public struct PlainListRowCore: View {
 	public struct ViewState {
-		public let kind: Kind
+		public let context: Context
 		public let title: String?
 		public let subtitle: String?
 		public let detail: String?
 
 		init(
-			kind: Kind = .general,
+			context: Context = .general,
 			title: String?,
 			subtitle: String? = nil,
 			detail: String? = nil
 		) {
-			self.kind = kind
+			self.context = context
 			self.title = title
 			self.subtitle = subtitle
 			self.detail = detail
@@ -177,7 +177,7 @@ public struct PlainListRowCore: View {
 
 private extension PlainListRowCore.ViewState {
 	var titleTextStyle: TextStyle {
-		switch kind {
+		switch context {
 		case .general:
 			.secondaryHeader
 		case .settings:
@@ -186,7 +186,7 @@ private extension PlainListRowCore.ViewState {
 	}
 
 	var subtitleTextStyle: TextStyle {
-		switch kind {
+		switch context {
 		case .general:
 			.body2Regular
 		case .settings:
@@ -195,7 +195,7 @@ private extension PlainListRowCore.ViewState {
 	}
 
 	var subtitleForegroundColor: Color {
-		switch kind {
+		switch context {
 		case .general:
 			.app.gray2
 		case .settings:
@@ -204,7 +204,7 @@ private extension PlainListRowCore.ViewState {
 	}
 
 	var subtitleLineLimit: Int {
-		switch kind {
+		switch context {
 		case .general:
 			2
 		case .settings:
@@ -213,7 +213,7 @@ private extension PlainListRowCore.ViewState {
 	}
 
 	var verticalPadding: CGFloat {
-		switch kind {
+		switch context {
 		case .general:
 			.zero
 		case .settings:
@@ -222,9 +222,9 @@ private extension PlainListRowCore.ViewState {
 	}
 }
 
-// MARK: - PlainListRowCore.ViewState.Kind
+// MARK: - PlainListRowCore.ViewState.Context
 extension PlainListRowCore.ViewState {
-	public enum Kind {
+	public enum Context {
 		case general
 		case settings
 	}
