@@ -1,14 +1,14 @@
 // MARK: - PlainListRow
-public struct PlainListRow<Icon: View>: View {
-	public struct ViewState {
-		let accessory: ImageAsset?
+struct PlainListRow<Icon: View>: View {
+	struct ViewState {
+		let accessory: ImageResource?
 		let rowCoreViewState: PlainListRowCore.ViewState
 		let icon: Icon?
 		let hints: [Hint.ViewState]
 
-		public init(
+		init(
 			rowCoreViewState: PlainListRowCore.ViewState,
-			accessory: ImageAsset? = AssetResource.chevronRight,
+			accessory: ImageResource? = .chevronRight,
 			@ViewBuilder icon: () -> Icon
 		) {
 			self.accessory = accessory
@@ -17,10 +17,10 @@ public struct PlainListRow<Icon: View>: View {
 			self.hints = []
 		}
 
-		public init(
+		init(
 			_ content: AssetIcon.Content?,
 			rowCoreViewState: PlainListRowCore.ViewState,
-			accessory: ImageAsset? = AssetResource.chevronRight,
+			accessory: ImageResource? = .chevronRight,
 			hints: [Hint.ViewState]
 		) where Icon == AssetIcon {
 			self.accessory = accessory
@@ -30,33 +30,33 @@ public struct PlainListRow<Icon: View>: View {
 		}
 	}
 
-	public let viewState: ViewState
+	let viewState: ViewState
 
-	public init(
+	init(
 		viewState: ViewState
 	) {
 		self.viewState = viewState
 	}
 
-	public init(
+	init(
 		title: String?,
 		subtitle: String? = nil,
-		accessory: ImageAsset? = AssetResource.chevronRight,
+		accessory: ImageResource? = .chevronRight,
 		@ViewBuilder icon: () -> Icon
 	) {
 		self.viewState = ViewState(rowCoreViewState: .init(title: title, subtitle: subtitle), accessory: accessory, icon: icon)
 	}
 
-	public init(
+	init(
 		_ content: AssetIcon.Content?,
 		title: String?,
 		subtitle: String? = nil,
-		accessory: ImageAsset? = AssetResource.chevronRight
+		accessory: ImageResource? = .chevronRight
 	) where Icon == AssetIcon {
 		self.viewState = ViewState(content, rowCoreViewState: .init(title: title, subtitle: subtitle), accessory: accessory, hints: [])
 	}
 
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading) {
 			top
 			hints
@@ -106,18 +106,18 @@ public struct PlainListRow<Icon: View>: View {
 	@ViewBuilder
 	private var accessoryView: some View {
 		if let accessory = viewState.accessory {
-			Image(asset: accessory)
+			Image(accessory)
 		}
 	}
 }
 
 // MARK: - PlainListRowCore
-public struct PlainListRowCore: View {
-	public struct ViewState {
-		public let context: Context
-		public let title: String?
-		public let subtitle: String?
-		public let detail: String?
+struct PlainListRowCore: View {
+	struct ViewState {
+		let context: Context
+		let title: String?
+		let subtitle: String?
+		let detail: String?
 
 		init(
 			context: Context = .general,
@@ -132,19 +132,19 @@ public struct PlainListRowCore: View {
 		}
 	}
 
-	public let viewState: ViewState
+	let viewState: ViewState
 
-	public init(
+	init(
 		viewState: ViewState
 	) {
 		self.viewState = viewState
 	}
 
-	public init(title: String?, subtitle: String?) {
+	init(title: String?, subtitle: String?) {
 		self.viewState = ViewState(title: title, subtitle: subtitle)
 	}
 
-	public var body: some View {
+	var body: some View {
 		VStack(alignment: .leading, spacing: .zero) {
 			if let title = viewState.title {
 				Text(title)
@@ -224,14 +224,14 @@ private extension PlainListRowCore.ViewState {
 
 // MARK: - PlainListRowCore.ViewState.Context
 extension PlainListRowCore.ViewState {
-	public enum Context {
+	enum Context {
 		case general
 		case settings
 	}
 }
 
 extension PlainListRow {
-	public func tappable(_ action: @escaping () -> Void) -> some View {
+	func tappable(_ action: @escaping () -> Void) -> some View {
 		Button(action: action) {
 			self
 		}
@@ -241,12 +241,12 @@ extension PlainListRow {
 
 extension View {
 	/// Adds a separator below the view, without padding. The separator has horizontal padding of default size.
-	public var withSeparator: some View {
+	var withSeparator: some View {
 		withSeparator()
 	}
 
 	/// Adds a separator below the view, without padding. The separator has horizontal padding of of the provided size.
-	public func withSeparator(horizontalPadding: CGFloat = .medium3) -> some View {
+	func withSeparator(horizontalPadding: CGFloat = .medium3) -> some View {
 		VStack(spacing: .zero) {
 			self
 			Separator()
@@ -254,7 +254,7 @@ extension View {
 		}
 	}
 
-	public func tappable(_ action: @escaping () -> Void) -> some View {
+	func tappable(_ action: @escaping () -> Void) -> some View {
 		Button(action: action) {
 			self
 		}

@@ -70,7 +70,7 @@ extension SettingsRow.Kind {
 			detail: String? = nil,
 			hints: [Hint.ViewState] = [],
 			icon: AssetIcon.Content,
-			accessory: ImageAsset? = AssetResource.chevronRight,
+			accessory: ImageResource? = .chevronRight,
 			action: Feature.ViewAction
 		) {
 			self.id = title
@@ -93,7 +93,7 @@ extension SettingsRow.Kind {
 		detail: String? = nil,
 		hints: [Hint.ViewState] = [],
 		icon: AssetIcon.Content,
-		accessory: ImageAsset? = AssetResource.chevronRight,
+		accessory: ImageResource? = .chevronRight,
 		action: Feature.ViewAction
 	) -> Self {
 		.model(

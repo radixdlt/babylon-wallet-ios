@@ -71,7 +71,7 @@ extension Troubleshooting.View {
 				title: S.Discord.title,
 				subtitle: S.Discord.subtitle,
 				icon: .asset(AssetResource.discord),
-				accessory: AssetResource.iconLinkOut,
+				accessory: .iconLinkOut,
 				action: .discordButtonTapped
 			),
 		]
