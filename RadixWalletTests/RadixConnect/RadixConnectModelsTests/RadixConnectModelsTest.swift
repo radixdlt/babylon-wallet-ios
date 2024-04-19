@@ -4,9 +4,11 @@ import XCTest
 
 final class RadixConnectModelsTest: TestCase {
 	func test_p2p_client_eq() throws {
-		let pw = try ConnectionPassword(.init(.deadbeef32Bytes))
-		let first = P2PLink(connectionPassword: pw, displayName: "first")
-		let second = P2PLink(connectionPassword: pw, displayName: "second")
+		let cePublicKey = try CEPublicKey(.init(.deadbeef32Bytes))
+		let firstPW = try ConnectionPassword(.init(.deadbeef32Bytes))
+		let secondPW = try ConnectionPassword(.init(.deadbeef32Bytes))
+		let first = P2PLink(connectionPassword: firstPW, publicKey: cePublicKey, purpose: .general, displayName: "first")
+		let second = P2PLink(connectionPassword: secondPW, publicKey: cePublicKey, purpose: .general, displayName: "second")
 		XCTAssertEqual(first, second)
 		var clients = P2PLinks(.init())
 		XCTAssertEqual(clients.append(first), first)

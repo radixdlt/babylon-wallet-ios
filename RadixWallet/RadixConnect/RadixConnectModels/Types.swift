@@ -45,6 +45,12 @@ extension CEPublicKey {
 public enum CESignatureTag {}
 public typealias CESignature = Tagged<CESignatureTag, HexCodable>
 
+#if DEBUG
+extension CESignature {
+	public static let placeholder = try! Self(.deadbeef32Bytes)
+}
+#endif // DEBUG
+
 // MARK: - LinkConnectionQRData
 public struct LinkConnectionQRData: Sendable, Hashable, Decodable {
 	public let purpose: ConnectionPurpose
@@ -63,6 +69,17 @@ extension LinkConnectionQRData {
 		return signature.isValidSignature(for: password.messageToHash.hash().data)
 	}
 }
+
+#if DEBUG
+extension LinkConnectionQRData {
+	public static let placeholder = try! Self(
+		purpose: .general,
+		password: .placeholder,
+		publicKey: .placeholder,
+		signature: .placeholder
+	)
+}
+#endif // DEBUG
 
 // MARK: - ConnectionPurpose
 public enum ConnectionPurpose: String, Sendable, Codable, UnknownCaseDecodable {

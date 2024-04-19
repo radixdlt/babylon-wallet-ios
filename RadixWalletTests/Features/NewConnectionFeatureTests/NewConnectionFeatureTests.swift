@@ -5,111 +5,124 @@ import XCTest
 @MainActor
 final class NewConnectionTests: TestCase {
 	let scanInstruction = "instruction"
-	func test__GIVEN__scanQR_screen__WHEN__secrets_are_scanned__THEN__we_start_connect_using_secrets() async throws {
+	func test__GIVEN__scanQR_screen__WHEN__secrets_with_invalid_signature_are_scanned__THEN__we_show_invalid_QR_error() async throws {
 		let store = TestStore(
 			// GIVEN
 			// initial state
-			initialState: NewConnection.State.scanQR(.init(scanInstructions: scanInstruction, step: .scanQR(.init(scanInstructions: scanInstruction)))),
+			initialState: NewConnection.State(
+				root: .scanQR(.init(scanInstructions: scanInstruction, step: .scanQR(.init(scanInstructions: scanInstruction))))
+			),
 			reducer: NewConnection.init
 		)
-		let password = ConnectionPassword.placeholder
+		let qrData = LinkConnectionQRData.placeholder
+		let qrString = """
+		{
+		"purpose": "\(qrData.purpose.rawValue)",
+		"password": "\(qrData.password.rawValue.data.hex())",
+		"publicKey": "\(qrData.publicKey.rawValue.data.hex())",
+		"signature": "\(qrData.signature.rawValue.data.hex())"
+		}
+		"""
 
-		let qrString = password.rawValue.data.hex()
-
-		// WHEN
-		// secrets are scanned
-		await store.send(.child(.scanQR(.child(.scanQR(.view(.scanned(.success(
-			qrString
-		))))))))
+		await store.send(.child(.scanQR(.child(.scanQR(.view(.scanned(.success(qrString))))))))
 
 		await store.receive(.child(.scanQR(.child(.scanQR(.delegate(.scanned(qrString)))))))
 		await store.receive(.child(.scanQR(.delegate(.scanned(qrString)))))
 
-		// THEN
-		// we start connect
-		await store.receive(.internal(.connectionPasswordFromStringResult(.success(password)))) {
-			$0 = .connectUsingSecrets(.init(connectionPassword: password))
+		await store.receive(.internal(.linkConnectionDataFromStringResult(.success(qrData)))) {
+			$0.linkConnectionQRData = qrData
+		}
+		await store.receive(.internal(.showErrorAlert(.invalidQRCode))) {
+			$0.destination = .errorAlert(.invalidQRCode)
 		}
 	}
 
-	func test__GIVEN__connecting__WHEN__connected__THEN_we_delegate_to_parent_reducer() async throws {
-		let store = TestStore(
-			// GIVEN initial state
-			initialState: NewConnection.State.connectUsingSecrets(
-				ConnectUsingSecrets.State(connectionPassword: .placeholder)
-			),
-			reducer: NewConnection.init
+	func test__GIVEN_new_connection_approval_screen__WHEN__user_finishes_flow__THEN__connection_we_start_connect_using_secrets() async throws {
+		let connectionName = "Foobar"
+		let purpose = NewConnectionApproval.State.Purpose.approveNewConnection
+		let p2pLink = P2PLink(
+			connectionPassword: .placeholder,
+			publicKey: .placeholder,
+			purpose: .general,
+			displayName: connectionName
 		)
-		let connectedClient = P2PLink(connectionPassword: .placeholder, displayName: "name")
-
-		await store.send(.child(.connectUsingSecrets(.delegate(.connected(connectedClient)))))
-		await store.receive(.delegate(.newConnection(connectedClient)))
-	}
-
-	func test__GIVEN__new_connected_client__WHEN__user_dismisses_flow__THEN__connection_is_not_saved() async throws {
-		let connection = P2PLink(connectionPassword: .placeholder, displayName: "Unnamed")
-
 		let store = TestStore(
 			// GIVEN initial state
-			initialState: NewConnection.State.connectUsingSecrets(
-				ConnectUsingSecrets.State(connectionPassword: connection.connectionPassword)
-			),
-			reducer: NewConnection.init
-		)
-
-		await store.send(.view(.closeButtonTapped))
-		await store.receive(.delegate(.dismiss))
-	}
-
-	func test__GIVEN_new_connected_client__WHEN__user_confirms_name__THEN__connection_is_saved_with_that_name_trimmed() async throws {
-		let password = ConnectionPassword.placeholder
-
-		let clock = TestClock()
-		let store = TestStore(
-			// GIVEN initial state
-			initialState: NewConnection.State.connectUsingSecrets(
-				ConnectUsingSecrets.State(connectionPassword: password)
+			initialState: NewConnection.State(
+				root: .connectionApproval(.init(purpose: purpose)),
+				linkConnectionQRData: .placeholder
 			),
 			reducer: NewConnection.init
 		) {
-			$0.continuousClock = clock
+			$0.radixConnectClient.connectP2PLink = { _ in }
 		}
-		let addP2PWithPassword = ActorIsolated<ConnectionPassword?>(nil)
-		store.dependencies.radixConnectClient.addP2PWithPassword = { password in
-			await addP2PWithPassword.setValue(password)
+
+		await store.send(.child(.connectionApproval(.view(.continueButtonTapped))))
+
+		await store.receive(.child(.connectionApproval(.delegate(.approved(purpose))))) {
+			$0.root = .nameConnection(.init())
 		}
-		let connectionName = "Foobar"
-		await store.send(.child(.connectUsingSecrets(.view(.nameOfConnectionChanged(connectionName + "\n"))))) {
-			$0 = .connectUsingSecrets(.init(
-				connectionPassword: password,
+
+		await store.send(.child(.nameConnection(.view(.nameOfConnectionChanged(connectionName + "\n"))))) {
+			$0.root = .nameConnection(.init(
 				nameOfConnection: connectionName
 			))
 		}
+		await store.send(.child(.nameConnection(.view(.confirmNameButtonTapped))))
 
-		await store.send(.child(.connectUsingSecrets(.view(.confirmNameButtonTapped)))) {
-			$0 = .connectUsingSecrets(.init(
-				connectionPassword: password,
+		await store.receive(.child(.nameConnection(.delegate(.nameSet(connectionName)))))
+		await store.receive(.internal(.establishConnection(connectionName))) {
+			$0.root = .nameConnection(.init(
 				isConnecting: true,
 				nameOfConnection: connectionName
 			))
+			$0.connectionName = connectionName
 		}
-
-		await clock.advance(by: .seconds(1))
-
-		let link = P2PLink(connectionPassword: password, displayName: connectionName)
-
-		await store.receive(.child(.connectUsingSecrets(.internal(.establishConnectionResult(.success(password)))))) {
-			$0 = .connectUsingSecrets(.init(
-				connectionPassword: password,
+		await store.receive(.internal(.establishConnectionResult(.success(p2pLink)))) {
+			$0.root = .nameConnection(.init(
 				isConnecting: false,
 				nameOfConnection: connectionName
 			))
 		}
-		await store.receive(.child(.connectUsingSecrets(.internal(.cancelOngoingEffects))))
-		await store.receive(.child(.connectUsingSecrets(.delegate(.connected(link)))))
-		await store.receive(.delegate(.newConnection(link)))
+		await store.receive(.delegate(.newConnection(p2pLink)))
+	}
 
-		let addedP2PWithPassword = await addP2PWithPassword.value
-		XCTAssertEqual(addedP2PWithPassword, password)
+	func test__GIVEN_existing_connection_approval_screen__WHEN__user_taps_continue__THEN__we_start_connect_using_secrets() async throws {
+		let connectionName = "Foobar"
+		let purpose = NewConnectionApproval.State.Purpose.approveExisitingConnection(connectionName)
+		let p2pLink = P2PLink(
+			connectionPassword: .placeholder,
+			publicKey: .placeholder,
+			purpose: .general,
+			displayName: connectionName
+		)
+		let store = TestStore(
+			// GIVEN initial state
+			initialState: NewConnection.State(
+				root: .connectionApproval(.init(purpose: purpose)),
+				linkConnectionQRData: .placeholder
+			),
+			reducer: NewConnection.init
+		) {
+			$0.radixConnectClient.connectP2PLink = { _ in }
+		}
+
+		await store.send(.child(.connectionApproval(.view(.continueButtonTapped))))
+
+		await store.receive(.child(.connectionApproval(.delegate(.approved(purpose)))))
+		await store.receive(.internal(.establishConnection(connectionName))) {
+			$0.root = .connectionApproval(.init(
+				purpose: purpose,
+				isConnecting: true
+			))
+			$0.connectionName = connectionName
+		}
+		await store.receive(.internal(.establishConnectionResult(.success(p2pLink)))) {
+			$0.root = .connectionApproval(.init(
+				purpose: purpose,
+				isConnecting: false
+			))
+		}
+		await store.receive(.delegate(.newConnection(p2pLink)))
 	}
 }

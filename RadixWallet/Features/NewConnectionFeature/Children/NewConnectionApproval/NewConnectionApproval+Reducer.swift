@@ -5,10 +5,14 @@ import SwiftUI
 public struct NewConnectionApproval: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let purpose: Purpose
-		public var isConnecting: Bool = false
+		public var isConnecting: Bool
 
-		public init(purpose: Purpose) {
+		public init(
+			purpose: Purpose,
+			isConnecting: Bool = false
+		) {
 			self.purpose = purpose
+			self.isConnecting = isConnecting
 		}
 	}
 

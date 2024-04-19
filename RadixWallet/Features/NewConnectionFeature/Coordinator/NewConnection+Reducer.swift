@@ -9,6 +9,10 @@ public struct NewConnection: Sendable, FeatureReducer {
 			case scanQR(ScanQRCoordinator.State)
 			case nameConnection(NewConnectionName.State)
 			case connectionApproval(NewConnectionApproval.State)
+
+			public init() {
+				self = .localNetworkPermission(.init())
+			}
 		}
 
 		public typealias ConnectionName = String
@@ -21,8 +25,14 @@ public struct NewConnection: Sendable, FeatureReducer {
 		public var linkConnectionQRData: LinkConnectionQRData?
 		public var connectionName: ConnectionName?
 
-		public init() {
-			self.root = .localNetworkPermission(.init())
+		public init(
+			root: Root = .init(),
+			linkConnectionQRData: LinkConnectionQRData? = nil,
+			connectionName: ConnectionName? = nil
+		) {
+			self.root = root
+			self.linkConnectionQRData = linkConnectionQRData
+			self.connectionName = connectionName
 		}
 	}
 
