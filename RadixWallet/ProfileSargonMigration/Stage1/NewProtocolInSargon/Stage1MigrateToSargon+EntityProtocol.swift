@@ -19,16 +19,15 @@ public protocol EntityBaseProtocol {
 
 extension EntityBaseProtocol {
 	public var virtualHierarchicalDeterministicFactorInstances: Set<Sargon.HierarchicalDeterministicFactorInstance> {
-//		var factorInstances = Set<HierarchicalDeterministicFactorInstance>()
-//		switch securityState {
-//		case let .unsecured(unsecuredEntityControl):
-//			factorInstances.insert(unsecuredEntityControl.transactionSigning)
-//			if let authSigning = unsecuredEntityControl.authenticationSigning {
-//				factorInstances.insert(authSigning)
-//			}
-//			return factorInstances
-//		}
-		sargonProfileFinishMigrateAtEndOfStage1()
+		var factorInstances = Set<HierarchicalDeterministicFactorInstance>()
+		switch securityState {
+		case let .unsecured(unsecuredEntityControl):
+			factorInstances.insert(unsecuredEntityControl.transactionSigning)
+			if let authSigning = unsecuredEntityControl.authenticationSigning {
+				factorInstances.insert(authSigning)
+			}
+			return factorInstances
+		}
 	}
 
 	public var hasAuthenticationSigningKey: Bool {

@@ -9,65 +9,30 @@ extension MnemonicWithPassphrase {
 
 // Move elsewhere?
 extension MnemonicWithPassphrase {
-	@discardableResult
 	public func validatePublicKeys(
 		of softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 	) throws -> Bool {
-		try validatePublicKeys(
-			of: softwareAccounts.map {
-				(
-					path: $0.path.path,
-					expectedPublicKey: $0.publicKey.asGeneral
-				)
+		guard validate(
+			publicKeys: softwareAccounts.map { account in
+				.init(publicKey: account.publicKey.asGeneral, derivationPath: account.path.asGeneral)
 			}
-		)
+		) else {
+			throw ValidateMnemonicAgainstEntities.publicKeyMismatch
+		}
+		return true
 	}
 
-	@discardableResult
 	public func validatePublicKeys(
 		of accounts: some Collection<Sargon.Account>
 	) throws -> Bool {
-		try validatePublicKeys(
-			of: accounts.flatMap { account in
-				account.virtualHierarchicalDeterministicFactorInstances.map {
-					(
-						path: $0.derivationPath.path,
-						expectedPublicKey: $0.publicKey.publicKey
-					)
-				}
+		guard validate(
+			publicKeys: accounts.flatMap { account in
+				account.virtualHierarchicalDeterministicFactorInstances.map(\.publicKey)
 			}
-		)
-	}
-
-	@discardableResult
-	public func validatePublicKeys(
-		of accounts: [(path: HDPath, expectedPublicKey: Sargon.PublicKey)]
-	) throws -> Bool {
-		/*
-		 //		let bip39Seed = self.toSeed()
-		 //
-		 //		for (path, publicKey) in accounts {
-		 //			let derivedPublicKey: Sargon.PublicKey = switch publicKey.curve {
-		 //			case .secp256k1:
-		 //				try .secp256k1(hdRoot.derivePrivateKey(
-		 //					path: path,
-		 //					curve: SECP256K1.self
-		 //				).publicKey)
-		 //			case .curve25519:
-		 //				try .eddsaEd25519(hdRoot.derivePrivateKey(
-		 //					path: path,
-		 //					curve: Curve25519.self
-		 //				).publicKey)
-		 //			}
-		 //
-		 //			guard derivedPublicKey == publicKey else {
-		 //				throw ValidateMnemonicAgainstEntities.publicKeyMismatch
-		 //			}
-		 //		}
-		 //		// PublicKeys matches
-		 //		return true
-		 */
-		sargonProfileFinishMigrateAtEndOfStage1()
+		) else {
+			throw ValidateMnemonicAgainstEntities.publicKeyMismatch
+		}
+		return true
 	}
 }
 
