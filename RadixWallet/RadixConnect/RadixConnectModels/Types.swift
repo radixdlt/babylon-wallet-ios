@@ -14,6 +14,8 @@ public enum ConnectionPasswordTag {}
 public typealias ConnectionPassword = Tagged<ConnectionPasswordTag, HexCodable32Bytes>
 
 extension ConnectionPassword {
+	/// Represents the message to be signed and sent to CE.
+	/// CE uses the same logic to compute its own message.
 	var messageToHash: Data {
 		let prefix = Data("L".utf8)
 		let passwordData = self.data.data
@@ -47,7 +49,7 @@ public typealias CESignature = Tagged<CESignatureTag, HexCodable>
 
 #if DEBUG
 extension CESignature {
-	public static let placeholder = try! Self(.deadbeef32Bytes)
+	public static let placeholder = Self(.deadbeef32Bytes)
 }
 #endif // DEBUG
 
@@ -59,6 +61,9 @@ public struct LinkConnectionQRData: Sendable, Hashable, Decodable {
 
 	/// Represents a signature produced by CE by signing the hash of the `password`
 	/// with the private key of the `publicKey`.
+	///
+	/// The same logic to compute the message to be signed is used by both, wallet and CE.
+	/// (see `ConnectionPassword.messageToHash`)
 	public let signature: CESignature
 }
 
@@ -75,7 +80,7 @@ extension LinkConnectionQRData {
 
 #if DEBUG
 extension LinkConnectionQRData {
-	public static let placeholder = try! Self(
+	public static let placeholder = Self(
 		purpose: .general,
 		password: .placeholder,
 		publicKey: .placeholder,

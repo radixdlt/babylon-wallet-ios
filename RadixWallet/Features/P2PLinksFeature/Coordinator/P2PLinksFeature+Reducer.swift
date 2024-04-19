@@ -34,7 +34,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case connection(id: P2PLink, action: P2PLinkRow.Action)
+		case connection(id: P2PLinkRow.State.ID, action: P2PLinkRow.Action)
 	}
 
 	// MARK: Destination
@@ -50,7 +50,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 			case removeConnection(RemoveConnection)
 
 			public enum RemoveConnection: Sendable, Hashable {
-				case removeTapped(P2PLink)
+				case removeTapped(P2PLinkRow.State.ID)
 			}
 		}
 
@@ -116,8 +116,8 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 			)
 			return .none
 
-		case let .deleteConnectionResult(.success(deletedID)):
-			state.links.remove(id: deletedID)
+		case let .deleteConnectionResult(.success(p2pLink)):
+			state.links.remove(id: p2pLink.id)
 			return .none
 
 		case let .deleteConnectionResult(.failure(error)):
@@ -149,7 +149,9 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 				await send(.internal(.saveNewConnectionResult(result)))
 			}
 
-		case let .removeConnection(.removeTapped(p2pLink)):
+		case let .removeConnection(.removeTapped(id)):
+			guard let p2pLink = state.links.first(where: { $0.id == id })?.link else { return .none }
+
 			return .run { send in
 				let result = await TaskResult {
 					try await radixConnectClient.deleteP2PLinkByPassword(p2pLink.connectionPassword)
@@ -165,7 +167,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 }
 
 extension AlertState<P2PLinksFeature.Destination.Action.RemoveConnection> {
-	static func confirmRemoval(id: P2PLink) -> AlertState {
+	static func confirmRemoval(id: P2PLinkRow.State.ID) -> AlertState {
 		AlertState {
 			TextState(L10n.LinkedConnectors.RemoveConnectionAlert.title)
 		} actions: {

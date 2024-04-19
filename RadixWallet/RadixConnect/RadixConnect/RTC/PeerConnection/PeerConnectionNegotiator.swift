@@ -194,6 +194,21 @@ extension PeerConnectionNegotiator {
 		_ = try await onConnectionEstablished.collect()
 		_ = try await onDataChannelReady.collect()
 
+		try await sendLinkClientInteractionResponse(peerConnectionClient: peerConnectionClient, p2pLink: p2pLink) {
+			log("Sent LinkClientInteractionResponse")
+		}
+
+		log("Connection established")
+		iceExchangeTask.cancel()
+
+		return peerConnectionClient
+	}
+
+	private static func sendLinkClientInteractionResponse(
+		peerConnectionClient: PeerConnectionClient,
+		p2pLink: P2PLink,
+		onSentSuccessfully: () -> Void
+	) async throws {
 		@Dependency(\.p2pLinksClient) var p2pLinkClient
 		@Dependency(\.jsonEncoder) var jsonEncoder
 
@@ -205,16 +220,11 @@ extension PeerConnectionNegotiator {
 			signature: HexCodable(data: privateKey.signature(for: hashedMessageToSign))
 		)
 		try await peerConnectionClient.sendData(jsonEncoder().encode(linkClientInteractionResponse))
-		log("Sent LinkClientInteractionResponse")
+		onSentSuccessfully()
 
 		if isNewPrivateKey {
 			try await p2pLinkClient.storeP2PLinkPrivateKey(p2pLink.publicKey, privateKey)
 		}
-
-		log("Connection established")
-		iceExchangeTask.cancel()
-
-		return peerConnectionClient
 	}
 
 	private static func tracePeerConnectionNegotiation(_ id: RemoteClientID) -> @Sendable (_ info: String) -> Void {
