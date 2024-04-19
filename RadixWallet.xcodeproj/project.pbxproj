@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -27,6 +27,8 @@
 		4813B0032BCA4FD60046BCAD /* Stage1MigrateToSargon+Persona.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813B0022BCA4FD60046BCAD /* Stage1MigrateToSargon+Persona.swift */; };
 		483A3DE42BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483A3DE32BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift */; };
 		483A3DE62BD2678900055932 /* Stage1MigrateToSargon+FactorSourceCryptoParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483A3DE52BD2678900055932 /* Stage1MigrateToSargon+FactorSourceCryptoParameters.swift */; };
+		483A3DE92BD31CB700055932 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 483A3DE82BD31CB700055932 /* Sargon */; };
+		483A3DEC2BD31F5A00055932 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 483A3DEB2BD31F5A00055932 /* Sargon */; };
 		484161392BCACA7500D2B644 /* Stage1MigrateToSargon+FactorSourceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484161382BCACA7500D2B644 /* Stage1MigrateToSargon+FactorSourceProtocol.swift */; };
 		4841613B2BCACB7200D2B644 /* Stage1MigrateToSargon+FactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4841613A2BCACB7200D2B644 /* Stage1MigrateToSargon+FactorSource.swift */; };
 		4841613D2BCACC8200D2B644 /* EncryptedProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4841613C2BCACC8200D2B644 /* EncryptedProfile.swift */; };
@@ -1076,7 +1078,6 @@
 		E62449D52AFBA61100272C67 /* Home+AccountRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */; };
 		E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */; };
 		E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */; };
-		E632575C2BB2D28F00952051 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = E632575B2BB2D28F00952051 /* Sargon */; };
 		E63257652BB314F600952051 /* ExecutionSummary+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = E63257642BB314F600952051 /* ExecutionSummary+Extensions.swift */; };
 		E634CA2F2AFD25B100C43DB7 /* DebugKeychainContents+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E634CA2D2AFD25B100C43DB7 /* DebugKeychainContents+View.swift */; };
 		E634CA302AFD25B100C43DB7 /* DebugKeychainContents.swift in Sources */ = {isa = PBXBuildFile; fileRef = E634CA2E2AFD25B100C43DB7 /* DebugKeychainContents.swift */; };
@@ -2381,7 +2382,6 @@
 				48FFFA9F2ADC1F2700B2B213 /* KeychainAccess in Frameworks */,
 				48FFFA9C2ADC1F1600B2B213 /* K1 in Frameworks */,
 				48FFFAF72ADC241A00B2B213 /* Collections in Frameworks */,
-				E632575C2BB2D28F00952051 /* Sargon in Frameworks */,
 				48FFFAF92ADC241A00B2B213 /* DequeModule in Frameworks */,
 				48FFFAAB2ADC1FE900B2B213 /* DependenciesAdditions in Frameworks */,
 				48FFFAA22ADC1F5D00B2B213 /* Algorithms in Frameworks */,
@@ -2405,6 +2405,7 @@
 				48FFFABC2ADC209100B2B213 /* NukeExtensions in Frameworks */,
 				A41557502B757C5E0040AD4E /* ComposableArchitecture in Frameworks */,
 				48FFFAFD2ADC241A00B2B213 /* HeapModule in Frameworks */,
+				483A3DE92BD31CB700055932 /* Sargon in Frameworks */,
 				48FFFAD52ADC21B900B2B213 /* LegibleError in Frameworks */,
 				48FFFB082ADC6FD300B2B213 /* SwiftUINavigationCore in Frameworks */,
 				48FFFAD82ADC21D200B2B213 /* NonEmpty in Frameworks */,
@@ -2418,6 +2419,7 @@
 				48FFFABA2ADC209100B2B213 /* Nuke in Frameworks */,
 				48FFFAE42ADC222100B2B213 /* Validated in Frameworks */,
 				48FFFAED2ADC226B00B2B213 /* CodeScanner in Frameworks */,
+				483A3DEC2BD31F5A00055932 /* Sargon in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6716,8 +6718,9 @@
 				E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */,
 				A47571FE2B29B0860059A95D /* IOSSecuritySuite */,
 				A415574F2B757C5E0040AD4E /* ComposableArchitecture */,
-				E632575B2BB2D28F00952051 /* Sargon */,
 				5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */,
+				483A3DE82BD31CB700055932 /* Sargon */,
+				483A3DEB2BD31F5A00055932 /* Sargon */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -6786,9 +6789,9 @@
 				48FFFB0B2ADC744700B2B213 /* XCRemoteSwiftPackageReference "TextBuilder" */,
 				A47571FD2B29B0860059A95D /* XCRemoteSwiftPackageReference "IOSSecuritySuite" */,
 				A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
-				E632575A2BB2D28F00952051 /* XCRemoteSwiftPackageReference "sargon" */,
 				5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */,
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
+				483A3DEA2BD31F5A00055932 /* XCLocalSwiftPackageReference "../sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -8457,6 +8460,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		483A3DEA2BD31F5A00055932 /* XCLocalSwiftPackageReference "../sargon" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../sargon;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		48FFFA972ADC1EEC00B2B213 /* XCRemoteSwiftPackageReference "AsyncExtensions" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -8730,17 +8740,17 @@
 				minimumVersion = 1.9.10;
 			};
 		};
-		E632575A2BB2D28F00952051 /* XCRemoteSwiftPackageReference "sargon" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/radixdlt/sargon";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.6.40;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		483A3DE82BD31CB700055932 /* Sargon */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Sargon;
+		};
+		483A3DEB2BD31F5A00055932 /* Sargon */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Sargon;
+		};
 		48FFFA982ADC1EEC00B2B213 /* AsyncExtensions */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFA972ADC1EEC00B2B213 /* XCRemoteSwiftPackageReference "AsyncExtensions" */;
@@ -8940,11 +8950,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A47571FD2B29B0860059A95D /* XCRemoteSwiftPackageReference "IOSSecuritySuite" */;
 			productName = IOSSecuritySuite;
-		};
-		E632575B2BB2D28F00952051 /* Sargon */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = E632575A2BB2D28F00952051 /* XCRemoteSwiftPackageReference "sargon" */;
-			productName = Sargon;
 		};
 		E63D123C2ADD1FC00001CBB1 /* SwiftUIIntrospect */ = {
 			isa = XCSwiftPackageProductDependency;

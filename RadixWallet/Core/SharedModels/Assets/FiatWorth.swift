@@ -145,12 +145,3 @@ extension FiatWorth {
 		return attributedString
 	}
 }
-
-extension FiatCurrency {
-	var currencyCode: String {
-		switch self {
-		case .usd:
-			"USD"
-		}
-	}
-}
