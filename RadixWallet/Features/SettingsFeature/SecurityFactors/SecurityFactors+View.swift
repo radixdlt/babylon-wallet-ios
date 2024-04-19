@@ -45,7 +45,7 @@ private extension SecurityFactors.View {
 			ScrollView {
 				VStack(spacing: .zero) {
 					ForEach(rows(viewStore: viewStore)) { kind in
-						kind.build(viewStore: viewStore)
+						SettingsRow(kind: kind, store: store)
 					}
 				}
 			}
@@ -56,7 +56,7 @@ private extension SecurityFactors.View {
 		}
 	}
 
-	func rows(viewStore: ViewStoreOf<SecurityFactors>) -> [SettingsRow<SecurityFactors>] {
+	func rows(viewStore: ViewStoreOf<SecurityFactors>) -> [SettingsRow<SecurityFactors>.Kind] {
 		[
 			.header(S.subtitle),
 			.model(

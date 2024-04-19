@@ -60,7 +60,7 @@ extension Preferences.View {
 			ScrollView {
 				VStack(spacing: .zero) {
 					ForEach(rows(viewStore: viewStore)) { kind in
-						kind.build(viewStore: viewStore)
+						SettingsRow(kind: kind, store: store)
 					}
 				}
 			}
@@ -77,7 +77,7 @@ extension Preferences.View {
 	}
 
 	@MainActor
-	private func rows(viewStore: ViewStoreOf<Preferences>) -> [SettingsRow<Preferences>] {
+	private func rows(viewStore: ViewStoreOf<Preferences>) -> [SettingsRow<Preferences>.Kind] {
 		var visibleRows = normalRows(viewStore: viewStore)
 		#if DEBUG
 		visibleRows.append(.model(
@@ -91,7 +91,7 @@ extension Preferences.View {
 	}
 
 	@MainActor
-	private func normalRows(viewStore: ViewStoreOf<Preferences>) -> [SettingsRow<Preferences>] {
+	private func normalRows(viewStore: ViewStoreOf<Preferences>) -> [SettingsRow<Preferences>.Kind] {
 		[
 			.separator,
 			.model(

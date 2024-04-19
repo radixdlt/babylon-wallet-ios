@@ -23,11 +23,11 @@ extension DebugSettingsCoordinator {
 
 extension DebugSettingsCoordinator.View {
 	public var body: some View {
-		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
 			ScrollView {
 				VStack(spacing: .zero) {
-					ForEach(rows) { row in
-						row.build(viewStore: viewStore)
+					ForEach(rows) { kind in
+						SettingsRow(kind: kind, store: store)
 					}
 				}
 			}
@@ -41,7 +41,7 @@ extension DebugSettingsCoordinator.View {
 	}
 
 	@MainActor
-	private var rows: [SettingsRow<DebugSettingsCoordinator>] {
+	private var rows: [SettingsRow<DebugSettingsCoordinator>.Kind] {
 		[
 			.model(
 				title: "Multi-Factor Setup",

@@ -32,11 +32,11 @@ public extension Troubleshooting {
 extension Troubleshooting.View {
 	@MainActor
 	private var content: some View {
-		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { _ in
 			ScrollView {
 				VStack(spacing: .zero) {
 					ForEach(rows) { kind in
-						kind.build(viewStore: viewStore)
+						SettingsRow(kind: kind, store: store)
 					}
 				}
 			}
@@ -45,7 +45,7 @@ extension Troubleshooting.View {
 	}
 
 	@MainActor
-	private var rows: [SettingsRow<Troubleshooting>] {
+	private var rows: [SettingsRow<Troubleshooting>.Kind] {
 		[
 			.header(S.accountRecovery),
 			.model(
