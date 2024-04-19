@@ -31,3 +31,27 @@ extension Sargon.Account {
 		}
 	}
 }
+
+extension Sargon.Account {
+	public var accountAddress: AccountAddress {
+		address
+	}
+
+	public mutating func hide() {
+		flags.append(.deletedByUser)
+	}
+
+	public mutating func unhide() {
+		flags.remove(element: .deletedByUser)
+	}
+}
+
+extension Sargon.Accounts {
+	public var nonHidden: IdentifiedArrayOf<Sargon.Account> {
+		filter(not(\.isHidden)).asIdentified()
+	}
+
+	public var hidden: IdentifiedArrayOf<Sargon.Account> {
+		filter(\.isHidden).asIdentified()
+	}
+}

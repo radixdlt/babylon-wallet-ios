@@ -20,8 +20,7 @@ extension Profile {
 	}
 
 	public func network(id needle: NetworkID) throws -> Sargon.ProfileNetwork {
-//		try networks.network(id: needle)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		try networks.network(id: needle)
 	}
 
 	public func containsNetwork(withID networkID: NetworkID) -> Bool {

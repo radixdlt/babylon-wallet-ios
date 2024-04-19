@@ -11,8 +11,7 @@ struct TryingToUpdateAPersonaWhichIsNotAlreadySaved: Swift.Error {}
 
 extension ProfileNetwork {
 	public func getAccounts() -> IdentifiedArrayOf<Account> {
-//		accounts.nonHidden
-		sargonProfileFinishMigrateAtEndOfStage1()
+		accounts.nonHidden
 	}
 
 	public func getHiddenAccounts() -> IdentifiedArrayOf<Account> {
@@ -150,6 +149,46 @@ extension ProfileNetwork {
 //		personas: \(personas),
 //		authorizedDapps: \(authorizedDapps),
 //		"""
+		sargonProfileFinishMigrateAtEndOfStage1()
+	}
+}
+
+extension ProfileNetworks {
+	var isEmpty: Bool {
+		count == 0
+	}
+
+	public func network(id needle: NetworkID) throws -> ProfileNetwork {
+		guard let network = self.get(id: needle) else {
+			throw Error.unknownNetworkWithID(needle)
+		}
+		return network
+	}
+
+	public enum Error:
+		Swift.Error,
+		Sendable,
+		Hashable
+	{
+		case unknownNetworkWithID(NetworkID)
+		case networkAlreadyExistsWithID(NetworkID)
+	}
+
+	public mutating func update(_ network: ProfileNetwork) throws {
+		//        guard dictionary.contains(where: { $0.key == network.networkID }) else {
+		//            throw Error.unknownNetworkWithID(network.networkID)
+		//        }
+		//        let updatedElement = dictionary.updateValue(network, forKey: network.networkID)
+		//        assert(updatedElement != nil)
+		sargonProfileFinishMigrateAtEndOfStage1()
+	}
+
+	public mutating func add(_ network: ProfileNetwork) throws {
+		//        guard !dictionary.contains(where: { $0.key == network.networkID }) else {
+		//            throw Error.networkAlreadyExistsWithID(network.networkID)
+		//        }
+		//        let updatedElement = dictionary.updateValue(network, forKey: network.networkID)
+		//        assert(updatedElement == nil)
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 }

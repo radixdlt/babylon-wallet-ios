@@ -15,18 +15,15 @@ extension AccountsClient: DependencyKey {
 		}
 
 		let getCurrentNetworkID: GetCurrentNetworkID = {
-//			await profileStore.profile.networkID
-			sargonProfileFinishMigrateAtEndOfStage1()
+			await profileStore.profile.networkID
 		}
 
-		let getAccountsOnNetwork: GetAccountsOnNetwork = { _ in
-//			try await profileStore.profile.network(id: $0).getAccounts()
-			sargonProfileFinishMigrateAtEndOfStage1()
+		let getAccountsOnNetwork: GetAccountsOnNetwork = {
+			try await profileStore.profile.network(id: $0).getAccounts()
 		}
 
 		let getAccountsOnCurrentNetwork: GetAccountsOnCurrentNetwork = {
-//			try await getAccountsOnNetwork(getCurrentNetworkID())
-			sargonProfileFinishMigrateAtEndOfStage1()
+			try await getAccountsOnNetwork(getCurrentNetworkID())
 		}
 
 		let nextAppearanceID: NextAppearanceID = { _, _ in
