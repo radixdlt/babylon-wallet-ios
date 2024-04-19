@@ -3,7 +3,7 @@ import Sargon
 
 extension AppearanceID {
 	public var rawValue: UInt8 {
-		sargonProfileFinishMigrateAtEndOfStage1()
+		value
 	}
 
 	public static func fromNumberOfAccounts(_ numberOfAccounts: Int) -> Self {

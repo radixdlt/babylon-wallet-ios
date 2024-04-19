@@ -15,8 +15,7 @@ extension Profile {
 
 	/// The current network with a non empty set of accounts.
 	public var network: Sargon.ProfileNetwork? {
-//		try? network(id: networkID)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		try? network(id: networkID)
 	}
 
 	public func network(id needle: NetworkID) throws -> Sargon.ProfileNetwork {

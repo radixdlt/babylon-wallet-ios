@@ -52,8 +52,7 @@ extension AccountsClient: DependencyKey {
 		}
 
 		let accountsOnCurrentNetwork: AccountsOnCurrentNetwork = {
-//			await profileStore.accountValues()
-			sargonProfileFinishMigrateAtEndOfStage1()
+			await profileStore.accountValues()
 		}
 
 		let accountUpdates: AccountUpdates = { _ in

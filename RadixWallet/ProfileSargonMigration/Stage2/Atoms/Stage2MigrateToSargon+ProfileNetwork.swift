@@ -71,8 +71,7 @@ extension ProfileNetwork {
 	}
 
 	public func getPersonas() -> IdentifiedArrayOf<Persona> {
-//		personas.nonHidden
-		sargonProfileFinishMigrateAtEndOfStage1()
+		personas.nonHidden
 	}
 
 	public func getHiddenPersonas() -> IdentifiedArrayOf<Persona> {

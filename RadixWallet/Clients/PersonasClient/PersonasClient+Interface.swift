@@ -73,16 +73,14 @@ extension PersonasClient {
 	}
 
 	public func shouldWriteDownSeedPhraseForSomePersona() async throws -> Bool {
-//		try await getPersonas().contains(where: \.shouldWriteDownMnemonic)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		try await getPersonas().contains(where: \.shouldWriteDownMnemonic)
 	}
 
 	public func shouldWriteDownSeedPhraseForSomePersonaSequence() async -> AnyAsyncSequence<Bool> {
-//		await personas().map { personas in
-//			personas.contains(where: \.shouldWriteDownMnemonic)
-//		}
-//		.share()
-//		.eraseToAnyAsyncSequence()
-		sargonProfileFinishMigrateAtEndOfStage1()
+		await personas().map { personas in
+			personas.contains(where: \.shouldWriteDownMnemonic)
+		}
+		.share()
+		.eraseToAnyAsyncSequence()
 	}
 }

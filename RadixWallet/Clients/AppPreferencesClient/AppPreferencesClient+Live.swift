@@ -6,12 +6,10 @@ extension AppPreferencesClient: DependencyKey {
 	) -> Self {
 		Self(
 			appPreferenceUpdates: {
-//				await profileStore.appPreferencesValues()
-				sargonProfileFinishMigrateAtEndOfStage1()
+				await profileStore.appPreferencesValues()
 			},
 			getPreferences: {
-//				await profileStore.profile.appPreferences
-				sargonProfileFinishMigrateAtEndOfStage1()
+				await profileStore.profile.appPreferences
 			},
 			updatePreferences: { _ in
 //				try await profileStore.updating {

@@ -15,8 +15,7 @@ extension PersonasClient: DependencyKey {
 
 		return Self(
 			personas: {
-//				await profileStore.personaValues()
-				sargonProfileFinishMigrateAtEndOfStage1()
+				await profileStore.personaValues()
 			},
 			getPersonas: {
 //				try await profileStore.network().getPersonas()

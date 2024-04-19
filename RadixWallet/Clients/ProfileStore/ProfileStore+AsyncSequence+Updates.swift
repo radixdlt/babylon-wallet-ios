@@ -14,18 +14,16 @@ extension ProfileStore {
 
 	/// A multicasting replaying AsyncSequence of distinct Accounts for the currently selected network.
 	public func accountValues() -> AnyAsyncSequence<IdentifiedArrayOf<Sargon.Account>> {
-//		_lens {
-//			$0.network?.getAccounts()
-//		}
-		sargonProfileFinishMigrateAtEndOfStage1()
+		_lens {
+			$0.network?.getAccounts()
+		}
 	}
 
 	/// A multicasting replaying AsyncSequence of distinct Personas for the currently selected network.
 	public func personaValues() -> AnyAsyncSequence<IdentifiedArrayOf<Persona>> {
-//		_lens {
-//			$0.network?.getPersonas()
-//		}
-		sargonProfileFinishMigrateAtEndOfStage1()
+		_lens {
+			$0.network?.getPersonas()
+		}
 	}
 
 	/// A multicasting replaying AsyncSequence of distinct Gateways

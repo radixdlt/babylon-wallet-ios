@@ -9,14 +9,13 @@ extension P2PLinksClient: DependencyKey {
 
 		return Self(
 			getP2PLinks: {
-//				await appPreferencesClient.getPreferences().p2pLinks
-				sargonProfileFinishMigrateAtEndOfStage1()
+				let sargonLinks = await appPreferencesClient.getPreferences().p2pLinks.elements
+				return try! P2PLinks(OrderedSet(sargonLinks.map { try P2PLink(connectionPassword: .init(rawValue: HexCodable32Bytes(data: $0.connectionPassword.value.data)), displayName: $0.displayName) }))
 			},
-			addP2PLink: { _ in
-//				try await appPreferencesClient.updating {
-//					_ = $0.appendP2PLink(newLink)
-//				}
-				sargonProfileFinishMigrateAtEndOfStage1()
+			addP2PLink: { newLink in
+				try await appPreferencesClient.updating {
+					_ = $0.appendP2PLink(newLink)
+				}
 			},
 			deleteP2PLinkByPassword: { _ in
 //				try await appPreferencesClient.updating {
@@ -25,9 +24,9 @@ extension P2PLinksClient: DependencyKey {
 				sargonProfileFinishMigrateAtEndOfStage1()
 			},
 			deleteAllP2PLinks: {
-//				try await appPreferencesClient.updating {
-//					$0.p2pLinks.links.removeAll()
-//				}
+				//                try await appPreferencesClient.updating {
+				//                    $0.p2pLinks.links.removeAll()
+				//                }
 				sargonProfileFinishMigrateAtEndOfStage1()
 			}
 		)
