@@ -143,8 +143,7 @@ extension ProfileStore {
 	/// and saves the snapshot of the profile into Keychain.
 	/// - Parameter profile: Imported Profile to use and save.
 	public func importProfileSnapshot(_ snapshot: Sargon.Profile) throws {
-//		try importProfile(Profile(snapshot: snapshot))
-		sargonProfileFinishMigrateAtEndOfStage1()
+		try importProfile(snapshot)
 	}
 
 	/// Change current profile to new importedProfile and saves it, by
@@ -206,51 +205,54 @@ extension ProfileStore {
 	public func finishOnboarding(
 		with accountsRecoveredFromScanningUsingMnemonic: AccountsRecoveredFromScanningUsingMnemonic
 	) async throws {
-		/*
-		 @Dependency(\.uuid) var uuid
-		 loggerGlobal.notice("Finish onboarding with accounts recovered from scanning using menmonic")
-		 let (creatingDevice, model, name) = await updateDeviceInfo()
-		 var bdfs = accountsRecoveredFromScanningUsingMnemonic.deviceFactorSource
-		 bdfs.hint.name = name
-		 bdfs.hint.model = .init(model)
+		@Dependency(\.uuid) var uuid
+		loggerGlobal.notice("Finish onboarding with accounts recovered from scanning using menmonic")
+		let (creatingDevice, model, name) = await updateDeviceInfo()
+		var bdfs = accountsRecoveredFromScanningUsingMnemonic.deviceFactorSource
+		bdfs.hint.name = name
+		bdfs.hint.model = .init(model)
 
-		 let accounts = accountsRecoveredFromScanningUsingMnemonic.accounts
+		let accounts = accountsRecoveredFromScanningUsingMnemonic.accounts
 
-		 // It is important that we always create the mainnet `Sargon.ProfileNetwork` and
-		 // add it, even if `accounts` is empty, since during App launch we check
-		 // `profile.networks.isEmpty` to determine if we should onboard the user or not,
-		 // thus, this ensures that we do not onboard a user who has created Profile
-		 // via Account Recovery Scan with 0 accounts if said user force quits app before
-		 // she creates her first account.
-		 let network = Sargon.ProfileNetwork(
-		 	networkID: .mainnet,
-		 	accounts: accounts,
-		 	personas: [],
-		 	authorizedDapps: []
-		 )
+		// It is important that we always create the mainnet `Sargon.ProfileNetwork` and
+		// add it, even if `accounts` is empty, since during App launch we check
+		// `profile.networks.isEmpty` to determine if we should onboard the user or not,
+		// thus, this ensures that we do not onboard a user who has created Profile
+		// via Account Recovery Scan with 0 accounts if said user force quits app before
+		// she creates her first account.
+		let network = Sargon.ProfileNetwork(
+			id: .mainnet,
+			accounts: accounts,
+			personas: [],
+			authorizedDapps: []
+		)
 
-		 let profile = Profile(
-		 	header: Sargon.Profile.Header(
-		 		creatingDevice: creatingDevice,
-		 		lastUsedOnDevice: creatingDevice,
-		 		id: uuid(),
-		 		lastModified: bdfs.addedOn,
-		 		contentHint: Sargon.Profile.Header.ContentHint(
-		 			numberOfAccountsOnAllNetworksInTotal: accounts.count,
-		 			numberOfPersonasOnAllNetworksInTotal: 0,
-		 			numberOfNetworks: 1
-		 		)
-		 	),
-		 	deviceFactorSource: bdfs,
-		 	networks: Profile.Networks(
-		 		network: network
-		 	)
-		 )
+		let profile = Profile(
+			header: Header(
+				snapshotVersion: .v100,
+				id: uuid(),
+				creatingDevice: creatingDevice,
+				lastUsedOnDevice: creatingDevice,
+				lastModified: bdfs.addedOn,
+				contentHint: .init(
+					numberOfAccountsOnAllNetworksInTotal: UInt16(
+						accounts.count
+					),
+					numberOfPersonasOnAllNetworksInTotal: 0,
+					numberOfNetworks: 1
+				)
+			),
+			factorSources: FactorSources(
+				element: bdfs.asGeneral
+			),
+			appPreferences: .default,
+			networks: ProfileNetworks(
+				element: network
+			)
+		)
 
-		 // We can "piggyback" on importProfile! Same logic applies!
-		 try importProfile(profile)
-		  */
-		sargonProfileFinishMigrateAtEndOfStage1()
+		// We can "piggyback" on importProfile! Same logic applies!
+		try importProfile(profile)
 	}
 
 	public func unlockedApp() async -> Profile {
