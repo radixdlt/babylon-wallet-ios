@@ -84,7 +84,7 @@ public struct PlainListRow<Icon: View>: View {
 					.hidden() // to leave the same leading padding than on top view
 
 				VStack(alignment: .leading, spacing: .small1) {
-					ForEach(viewState.hints) { hint in
+					ForEach(Array(viewState.hints.enumerated()), id: \.offset) { _, hint in
 						Hint(viewState: hint)
 					}
 				}

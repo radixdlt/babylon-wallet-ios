@@ -1,15 +1,13 @@
 
 // MARK: - Hint
 public struct Hint: View, Equatable {
-	public struct ViewState: Equatable, Identifiable {
+	public struct ViewState: Equatable {
 		public let kind: Kind
 		public let text: Text?
-		public let id: UUID
 
 		public init(kind: Kind, text: Text?) {
 			self.kind = kind
 			self.text = text
-			self.id = .init()
 		}
 	}
 
