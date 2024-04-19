@@ -93,7 +93,6 @@ extension Mobile2Mobile {
 		case let .webDapp(dAppOrigin):
 			let returnURL = URL(string: dAppOrigin.absoluteString + "#connect")?.appending(queryItems: [
 				.init(name: "sessionId", value: sessionId.rawValue),
-				.init(name: "interactionId", value: intId),
 			])
 			await openURL(returnURL!)
 		}
