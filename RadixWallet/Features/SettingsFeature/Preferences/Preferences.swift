@@ -111,14 +111,11 @@ public struct Preferences: Sendable, FeatureReducer {
 	}
 
 	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		if
-			case let .depositGuarantees(depositGuarantees) = state.destination,
-			let value = depositGuarantees.depositGuarantee
-		{
-			state.appPreferences?.transaction.defaultDepositGuarantee = value
-			return savePreferences(state: state)
+		guard case let .depositGuarantees(depositGuarantees) = state.destination, let value = depositGuarantees.depositGuarantee else {
+			return .none
 		}
-		return .none
+		state.appPreferences?.transaction.defaultDepositGuarantee = value
+		return savePreferences(state: state)
 	}
 
 	private func savePreferences(state: State) -> Effect<Action> {
