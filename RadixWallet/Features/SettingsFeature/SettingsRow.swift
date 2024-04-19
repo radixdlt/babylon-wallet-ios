@@ -14,9 +14,6 @@ struct SettingsRow<Feature: FeatureReducer>: View {
 				}
 				.withSeparator
 
-		case let .custom(content, _):
-			content
-
 		case let .header(title):
 			HStack(spacing: .zero) {
 				Text(title)
@@ -41,9 +38,6 @@ extension SettingsRow {
 		/// A standard tappable row with the details specified on the `Model`
 		case model(Model)
 
-		/// A custom row with its own UI. Useful, for example, when we want a `ToggleView`.
-		case custom(AnyView, id: String)
-
 		/// A small row acting as a section header with the provided title.
 		case header(String)
 
@@ -54,8 +48,6 @@ extension SettingsRow {
 			switch self {
 			case let .model(model):
 				model.id
-			case let .custom(_, id):
-				id
 			case .separator:
 				"separator"
 			case let .header(value):

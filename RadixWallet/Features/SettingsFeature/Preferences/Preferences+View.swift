@@ -59,39 +59,26 @@ extension Preferences.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: .zero) {
-					ForEach(rows(viewStore: viewStore)) { kind in
+					ForEach(rows) { kind in
 						SettingsRow(kind: kind, store: store)
 					}
+
+					developerMode(viewStore: viewStore)
+
+					#if DEBUG
+					exportLogs(viewStore: viewStore)
+					#endif
 				}
 			}
 			.background(Color.app.gray4)
 			.onAppear {
 				viewStore.send(.appeared)
 			}
-			#if DEBUG
-			.sheet(item: viewStore.binding(get: \.exportLogsUrl, send: { _ in .exportLogsDismissed })) { item in
-					ShareView(items: [item])
-				}
-			#endif
 		}
 	}
 
 	@MainActor
-	private func rows(viewStore: ViewStoreOf<Preferences>) -> [SettingsRow<Preferences>.Kind] {
-		var visibleRows = normalRows(viewStore: viewStore)
-		#if DEBUG
-		visibleRows.append(.model(
-			title: "Export logs",
-			subtitle: "Export and save debugging logs",
-			icon: .asset(AssetResource.appSettings),
-			action: .exportLogsButtonTapped
-		))
-		#endif
-		return visibleRows
-	}
-
-	@MainActor
-	private func normalRows(viewStore: ViewStoreOf<Preferences>) -> [SettingsRow<Preferences>.Kind] {
+	private var rows: [SettingsRow<Preferences>.Kind] {
 		[
 			.separator,
 			.model(
@@ -112,11 +99,10 @@ extension Preferences.View {
 				icon: .asset(AssetResource.gateway),
 				action: .gatewaysButtonTapped
 			),
-			.custom(developerMode(viewStore: viewStore), id: "developerMode"),
 		]
 	}
 
-	private func developerMode(viewStore: ViewStoreOf<Preferences>) -> AnyView {
+	private func developerMode(viewStore: ViewStoreOf<Preferences>) -> some View {
 		ToggleView(
 			icon: AssetResource.developerMode,
 			title: S.DeveloperMode.title,
@@ -131,8 +117,25 @@ extension Preferences.View {
 		.padding(.vertical, .medium1)
 		.background(Color.app.white)
 		.withSeparator
-		.eraseToAnyView()
 	}
+
+	#if DEBUG
+	@MainActor
+	private func exportLogs(viewStore: ViewStoreOf<Preferences>) -> some View {
+		SettingsRow(
+			kind: .model(
+				title: "Export logs",
+				subtitle: "Export and save debugging logs",
+				icon: .asset(AssetResource.appSettings),
+				action: .exportLogsButtonTapped
+			),
+			store: store
+		)
+		.sheet(item: viewStore.binding(get: \.exportLogsUrl, send: { _ in .exportLogsDismissed })) { item in
+			ShareView(items: [item])
+		}
+	}
+	#endif
 }
 
 private extension StoreOf<Preferences> {
