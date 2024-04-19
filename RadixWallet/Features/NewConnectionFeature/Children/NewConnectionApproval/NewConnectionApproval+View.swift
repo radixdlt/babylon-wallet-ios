@@ -50,7 +50,7 @@ extension NewConnectionApproval {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(spacing: 0) {
-					Image(asset: AssetResource.desktopLinkConnector)
+					Image(.desktopLinkConnector)
 						.padding(.bottom, .large1)
 
 					Text(viewStore.title)

@@ -254,41 +254,39 @@ public struct NewConnection: Sendable, FeatureReducer {
 }
 
 extension AlertState<NewConnection.Destination.Action.ErrorAlert> {
-	typealias S = L10n.LinkedConnectors
-
 	public static var unknownPurpose: AlertState {
 		AlertState {
-			TextState(S.linkFailedErrorTitle)
+			TextState(L10n.LinkedConnectors.linkFailedErrorTitle)
 		} actions: {
 			ButtonState(role: .cancel, action: .dismissTapped) {
 				TextState(L10n.Common.dismiss)
 			}
 		} message: {
-			TextState(S.unknownPurposeErrorMessage)
+			TextState(L10n.LinkedConnectors.unknownPurposeErrorMessage)
 		}
 	}
 
 	public static var changingPurposeNotSupported: AlertState {
 		AlertState {
-			TextState(S.linkFailedErrorTitle)
+			TextState(L10n.LinkedConnectors.linkFailedErrorTitle)
 		} actions: {
 			ButtonState(role: .cancel, action: .dismissTapped) {
 				TextState(L10n.Common.dismiss)
 			}
 		} message: {
-			TextState(S.changingPurposeNotSupportedErrorMessage)
+			TextState(L10n.LinkedConnectors.changingPurposeNotSupportedErrorMessage)
 		}
 	}
 
 	public static var invalidQRCode: AlertState {
 		AlertState {
-			TextState(S.incorrectQrTitle)
+			TextState(L10n.LinkedConnectors.incorrectQrTitle)
 		} actions: {
 			ButtonState(role: .cancel, action: .dismissTapped) {
 				TextState(L10n.Common.dismiss)
 			}
 		} message: {
-			TextState(S.incorrectQrMessage)
+			TextState(L10n.LinkedConnectors.incorrectQrMessage)
 		}
 	}
 }
