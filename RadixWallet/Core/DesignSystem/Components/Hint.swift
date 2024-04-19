@@ -52,8 +52,8 @@ public struct Hint: View, Equatable {
 	public var body: some View {
 		if let text = viewState.text {
 			HStack(spacing: .small3) {
-				if let iconAsset {
-					Image(asset: iconAsset)
+				if let iconResource {
+					Image(iconResource)
 						.renderingMode(.template)
 						.resizable()
 						.scaledToFit()
@@ -78,12 +78,12 @@ public struct Hint: View, Equatable {
 		}
 	}
 
-	private var iconAsset: ImageAsset? {
+	private var iconResource: ImageResource? {
 		switch viewState.kind {
 		case .info:
 			nil
 		case .error, .warning:
-			AssetResource.warningError
+			.warningError
 		}
 	}
 }
