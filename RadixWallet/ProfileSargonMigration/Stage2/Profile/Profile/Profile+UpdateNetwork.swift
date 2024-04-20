@@ -2,8 +2,7 @@ import Sargon
 
 extension Profile {
 	mutating func updateOnNetwork(_ network: Sargon.ProfileNetwork) throws {
-//		try networks.update(network)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		try networks.update(network)
 	}
 }
 

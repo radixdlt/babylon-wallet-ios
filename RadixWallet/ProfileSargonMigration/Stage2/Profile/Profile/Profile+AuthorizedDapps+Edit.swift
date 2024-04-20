@@ -16,11 +16,10 @@ extension Profile {
 	public mutating func updatePersona(
 		_ persona: Persona
 	) throws {
-//		let networkID = persona.networkID
-//		var network = try network(id: networkID)
-//		try network.updatePersona(persona)
-//		try updateOnNetwork(network)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		let networkID = persona.networkID
+		var network = try network(id: networkID)
+		try network.updatePersona(persona)
+		try updateOnNetwork(network)
 	}
 
 	/// Saves a `AuthorizedDapp` into the profile

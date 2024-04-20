@@ -94,10 +94,9 @@ extension ProfileNetwork {
 	}
 
 	public mutating func updatePersona(_ persona: Persona) throws {
-//		guard personas.updateOrAppend(persona) != nil else {
-//			throw TryingToUpdateAPersonaWhichIsNotAlreadySaved()
-//		}
-		sargonProfileFinishMigrateAtEndOfStage1()
+		guard personas.updateOrAppend(persona) != nil else {
+			throw TryingToUpdateAPersonaWhichIsNotAlreadySaved()
+		}
 	}
 
 	public mutating func hidePersonas(ids idsOfPersonaToHide: Set<Persona.ID>) {
@@ -169,11 +168,13 @@ extension ProfileNetworks {
 	}
 
 	public mutating func update(_ network: ProfileNetwork) throws {
-		//        guard dictionary.contains(where: { $0.key == network.networkID }) else {
-		//            throw Error.unknownNetworkWithID(network.networkID)
-		//        }
-		//        let updatedElement = dictionary.updateValue(network, forKey: network.networkID)
-		//        assert(updatedElement != nil)
+		guard get(id: network.id) != nil else {
+			throw Error.unknownNetworkWithID(network.id)
+		}
+		var network = network
+//		        let updatedElement = dictionary.updateValue(network, forKey: network.networkID)
+//		        assert(updatedElement != nil)
+//		uppdate(network)
 		sargonProfileFinishMigrateAtEndOfStage1()
 	}
 
