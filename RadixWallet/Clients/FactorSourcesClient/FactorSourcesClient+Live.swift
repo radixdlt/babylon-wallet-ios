@@ -88,31 +88,29 @@ extension FactorSourcesClient: DependencyKey {
 		}
 
 		let getMainDeviceFactorSource: GetMainDeviceFactorSource = {
-			/*
-			 let sources = try await getFactorSources()
-			 	.filter { $0.factorSourceKind == .device && !$0.supportsOlympia }
-			 	.map { try $0.extract(as: DeviceFactorSource.self) }
+			let sources = try await getFactorSources()
+				.filter { $0.factorSourceKind == .device }
+				.filter { !$0.supportsOlympia }
+				.map { try $0.extract(as: DeviceFactorSource.self) }
 
-			 if let explicitMain = sources.first(where: { $0.isExplicitMain }) {
-			 	return explicitMain
-			 } else {
-			 	if sources.count == 0 {
-			 		let errorMessage = "BAD IMPL found no babylon device factor source"
-			 		loggerGlobal.critical(.init(stringLiteral: errorMessage))
-			 		assertionFailure(errorMessage)
-			 		throw FactorSourceNotFound()
-			 	} else if sources.count > 1 {
-			 		let errorMessage = "BAD IMPL found more than 1 implicit main babylon device factor sources"
-			 		loggerGlobal.critical(.init(stringLiteral: errorMessage))
-			 		assertionFailure(errorMessage)
-			 		let dateSorted = sources.sorted(by: { $0.addedOn < $1.addedOn })
-			 		return dateSorted.first! // best we can do
-			 	} else {
-			 		return sources[0] // found implicit one
-			 	}
-			 }
-			  */
-			sargonProfileFinishMigrateAtEndOfStage1()
+			if let explicitMain = sources.first(where: { $0.isExplicitMain }) {
+				return explicitMain
+			} else {
+				if sources.count == 0 {
+					let errorMessage = "BAD IMPL found no babylon device factor source"
+					loggerGlobal.critical(.init(stringLiteral: errorMessage))
+					assertionFailure(errorMessage)
+					throw FactorSourceNotFound()
+				} else if sources.count > 1 {
+					let errorMessage = "BAD IMPL found more than 1 implicit main babylon device factor sources"
+					loggerGlobal.critical(.init(stringLiteral: errorMessage))
+					assertionFailure(errorMessage)
+					let dateSorted = sources.sorted(by: { $0.addedOn < $1.addedOn })
+					return dateSorted.first! // best we can do
+				} else {
+					return sources[0] // found implicit one
+				}
+			}
 		}
 
 		let getCurrentNetworkID: GetCurrentNetworkID = {
@@ -228,37 +226,34 @@ extension FactorSourcesClient: DependencyKey {
 			factorSourcesAsyncSequence: {
 				await profileStore.factorSourcesValues()
 			},
-			nextEntityIndexForFactorSource: { _ in
-				/*
-				 let mainBDFS = try await getMainDeviceFactorSource()
-				 let factorSourceID = request.factorSourceID ?? mainBDFS.factorSourceID.embed()
+			nextEntityIndexForFactorSource: { request in
+				let mainBDFS = try await getMainDeviceFactorSource()
+				let factorSourceID = request.factorSourceID ?? mainBDFS.factorSourceID
 
-				 /// We CANNOT just use `entitiesControlledByFactorSource.count` since it is possible that
-				 /// some users from Radix Babylon Wallet version 1.0.0 created accounts not sarting at
-				 /// index `0` (since we had global indexing, shared by all FactorSources...), lets say that
-				 /// only one account is controlled by a FactorSource `X`, having index `1`, then if we were
-				 /// to used `entitiesControlledByFactorSource.count` for "next index" then that would be...
-				 /// the value `1` AGAIN! Which does not work. Instead we need to read out the last path
-				 /// component (index!) of the derivation paths of `entitiesControlledByFactorSource` and
-				 /// find the MAX value and +1 on that. This also ensures that we are NOT "gap filling",
-				 /// meaning that we do not want to use index `0` even if it was not used, where `1` was used, so
-				 /// next index should be `2`, not `0` (which was free). The rationale is that it would just be
-				 /// confusing and messy (for us not the least). Best to always increase. But it is important
-				 /// to know  AccountRecoveryScan SHOULD find these "gap entities"!
-				 let indices = try await indicesOfEntitiesControlledByFactorSource(
-				 	.init(
-				 		entityKind: request.entityKind,
-				 		factorSourceID: factorSourceID,
-				 		derivationPathScheme: request.derivationPathScheme,
-				 		networkID: request.networkID
-				 	)
-				 ).indices
+				/// We CANNOT just use `entitiesControlledByFactorSource.count` since it is possible that
+				/// some users from Radix Babylon Wallet version 1.0.0 created accounts not sarting at
+				/// index `0` (since we had global indexing, shared by all FactorSources...), lets say that
+				/// only one account is controlled by a FactorSource `X`, having index `1`, then if we were
+				/// to used `entitiesControlledByFactorSource.count` for "next index" then that would be...
+				/// the value `1` AGAIN! Which does not work. Instead we need to read out the last path
+				/// component (index!) of the derivation paths of `entitiesControlledByFactorSource` and
+				/// find the MAX value and +1 on that. This also ensures that we are NOT "gap filling",
+				/// meaning that we do not want to use index `0` even if it was not used, where `1` was used, so
+				/// next index should be `2`, not `0` (which was free). The rationale is that it would just be
+				/// confusing and messy (for us not the least). Best to always increase. But it is important
+				/// to know  AccountRecoveryScan SHOULD find these "gap entities"!
+				let indices = try await indicesOfEntitiesControlledByFactorSource(
+					.init(
+						entityKind: request.entityKind,
+						factorSourceID: factorSourceID,
+						derivationPathScheme: request.derivationPathScheme,
+						networkID: request.networkID
+					)
+				).indices
 
-				 guard let max = indices.max() else { return 0 }
-				 let nextIndex = max + 1
-				 return nextIndex
-				  */
-				sargonProfileFinishMigrateAtEndOfStage1()
+				guard let max = indices.max() else { return 0 }
+				let nextIndex = max + 1
+				return nextIndex
 			},
 			addPrivateHDFactorSource: addPrivateHDFactorSource,
 			checkIfHasOlympiaFactorSourceForAccounts: { _, _ -> FactorSourceIDFromHash? in

@@ -103,3 +103,53 @@ extension LedgerHardwareWalletFactorSource: FactorSourceProtocol {
 
 	public static var casePath: CasePath<FactorSource, Self> = /FactorSource.ledger
 }
+
+// MARK: - FactorSource + BaseFactorSourceProtocol
+extension FactorSource: BaseFactorSourceProtocol {
+	public var common: FactorSourceCommon {
+		get { property(\.common) }
+		set {
+			update(\.common, to: newValue)
+		}
+	}
+
+	// Compiler crash if we try to use `private func property<Property>(_ keyPath: KeyPath<any FactorSourceProtocol, Property>) -> Property {
+	// and use `property(\.id).embed()
+	// :/
+	public var id: ID {
+		switch self {
+		case let .device(factorSource): factorSource.id.embed()
+		case let .ledger(factorSource): factorSource.id.embed()
+		}
+	}
+
+//	public var kind: FactorSourceKind {
+//		property(\.kind)
+//	}
+
+	public func embed() -> FactorSource {
+		self
+	}
+
+	public mutating func update<Property>(
+		_ writableKeyPath: WritableKeyPath<any FactorSourceProtocol, Property>,
+		to newValue: Property
+	) {
+		switch self {
+		case var .device(factorSource as (any FactorSourceProtocol)):
+			factorSource[keyPath: writableKeyPath] = newValue
+			self = factorSource.embed()
+
+		case var .ledger(factorSource as (any FactorSourceProtocol)):
+			factorSource[keyPath: writableKeyPath] = newValue
+			self = factorSource.embed()
+		}
+	}
+
+	private func property<Property>(_ keyPath: KeyPath<any BaseFactorSourceProtocol, Property>) -> Property {
+		switch self {
+		case let .device(factorSource): factorSource[keyPath: keyPath]
+		case let .ledger(factorSource): factorSource[keyPath: keyPath]
+		}
+	}
+}
