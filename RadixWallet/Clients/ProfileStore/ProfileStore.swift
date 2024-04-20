@@ -409,14 +409,13 @@ extension ProfileStore {
 	/// Updates the header of a Profile, lastModified date, contentHint etc.
 	/// - Parameter profile: Profile with a header to update
 	private func _updateHeader(of profile: inout Profile) throws {
-//		@Dependency(\.date) var date
-//		let networks = profile.networks
-//
-//		profile.header.lastModified = date.now
-//		profile.header.contentHint.numberOfNetworks = networks.count
-//		profile.header.contentHint.numberOfAccountsOnAllNetworksInTotal = networks.values.map { $0.getAccounts().count }.reduce(0, +)
-//		profile.header.contentHint.numberOfPersonasOnAllNetworksInTotal = networks.values.map { $0.getPersonas().count }.reduce(0, +)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		@Dependency(\.date) var date
+		let networks = profile.networks
+
+		profile.header.lastModified = date.now
+		profile.header.contentHint.numberOfNetworks = UInt16(networks.count)
+		profile.header.contentHint.numberOfAccountsOnAllNetworksInTotal = UInt16(networks.map { $0.getAccounts().count }.reduce(0, +))
+		profile.header.contentHint.numberOfPersonasOnAllNetworksInTotal = UInt16(networks.map { $0.getPersonas().count }.reduce(0, +))
 	}
 
 	/// Updates the in-memory copy of profile in ProfileStores and saves it, by

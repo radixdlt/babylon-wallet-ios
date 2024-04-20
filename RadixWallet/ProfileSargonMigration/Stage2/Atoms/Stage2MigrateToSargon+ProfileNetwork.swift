@@ -171,11 +171,8 @@ extension ProfileNetworks {
 		guard get(id: network.id) != nil else {
 			throw Error.unknownNetworkWithID(network.id)
 		}
-		var network = network
-//		        let updatedElement = dictionary.updateValue(network, forKey: network.networkID)
-//		        assert(updatedElement != nil)
-//		uppdate(network)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		let updatedElement = self.updateOrAppend(network)
+		assert(updatedElement != nil)
 	}
 
 	public mutating func add(_ network: ProfileNetwork) throws {
