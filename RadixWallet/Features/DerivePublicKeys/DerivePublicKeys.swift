@@ -400,12 +400,11 @@ extension DerivePublicKeys {
 			derivationPathScheme: derivationPathScheme,
 			networkID: maybeNetworkID
 		)
-//		return try DerivationPath.forEntity(
-//			kind: entityKind,
-//			networkID: networkID,
-//			index: index
-//		)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		return try DerivationPath.forEntity(
+			kind: entityKind,
+			networkID: networkID,
+			index: index
+		)
 	}
 
 	private func nextIndex(

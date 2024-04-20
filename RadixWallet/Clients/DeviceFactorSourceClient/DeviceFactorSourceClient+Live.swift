@@ -75,27 +75,13 @@ extension DeviceFactorSourceClient: DependencyKey {
 		}
 
 		return Self(
-			publicKeysFromOnDeviceHD: { _ in
-//				let factorSourceID = request.deviceFactorSource.id
-//				let mnemonicWithPassphrase = try request.getMnemonicWithPassphrase()
-//				let bip39Root = try mnemonicWithPassphrase.toSeed()
-//				let derivedKeys = try request.derivationPaths.map {
-//					let key = try bip39Root.derivePrivateKey(
-//						path: $0,
-//						curve: $0.curveForScheme
-//					)
-//					return HierarchicalDeterministicPublicKey(publicKey: key.publicKey(), derivationPath: $0)
-//				}
-//				return derivedKeys
-				sargonProfileFinishMigrateAtEndOfStage1()
+			publicKeysFromOnDeviceHD: { request in
+				let factorSourceID = request.deviceFactorSource.id
+				let mnemonicWithPassphrase = try request.getMnemonicWithPassphrase()
+				return mnemonicWithPassphrase.derivePublicKeys(paths: request.derivationPaths)
 			},
-			signatureFromOnDeviceHD: { _ in
-//				let privateKey = try request.hdRoot.derivePrivateKey(
-//					path: request.derivationPath,
-//					curve: request.curve
-//				)
-//				return try privateKey.sign(hashOfMessage: request.hashedData)
-				sargonProfileFinishMigrateAtEndOfStage1()
+			signatureFromOnDeviceHD: { request in
+				request.mnemonicWithPassphrase.sign(hash: request.hashedData, path: request.derivationPath)
 			},
 			isAccountRecoveryNeeded: {
 				do {

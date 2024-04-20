@@ -30,12 +30,12 @@ public struct DeviceFactorSourceClient: Sendable {
 
 // MARK: - SignatureFromOnDeviceHDRequest
 public struct SignatureFromOnDeviceHDRequest: Sendable, Hashable {
-	public let bip39Seed: BIP39Seed
+	public let mnemonicWithPassphrase: MnemonicWithPassphrase
 	public let derivationPath: DerivationPath
 	public let curve: SLIP10Curve
 
 	/// The data to sign
-	public let hashedData: Data
+	public let hashedData: Hash
 }
 
 // MARK: DeviceFactorSourceClient.onDeviceHDPublicKey
@@ -95,12 +95,11 @@ public struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
 		derivationPaths: [DerivationPath],
 		source: Source
 	) throws {
-//		for derivationPath in derivationPaths {
-//			guard source.deviceFactorSource.cryptoParameters.supportedCurves.contains(derivationPath.curveForScheme) else {
-//				throw DiscrepancyUnsupportedCurve()
-//			}
-//		}
-		sargonProfileFinishMigrateAtEndOfStage1()
+		for derivationPath in derivationPaths {
+			guard source.deviceFactorSource.cryptoParameters.supportedCurves.contains(derivationPath.curveForScheme) else {
+				throw DiscrepancyUnsupportedCurve()
+			}
+		}
 		self.derivationPaths = derivationPaths
 		self.source = source
 	}
@@ -114,7 +113,7 @@ struct IncorrectSignatureCountExpectedExactlyOne: Swift.Error {}
 extension DeviceFactorSourceClient {
 	public func signUsingDeviceFactorSource(
 		signerEntity: AccountOrPersona,
-		hashedDataToSign: Data,
+		hashedDataToSign: Hash,
 		purpose: SigningPurpose
 	) async throws -> SignatureOfEntity {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
@@ -152,7 +151,7 @@ extension DeviceFactorSourceClient {
 	public func signUsingDeviceFactorSource(
 		deviceFactorSource: DeviceFactorSource,
 		signerEntities: Set<AccountOrPersona>,
-		hashedDataToSign: some DataProtocol,
+		hashedDataToSign: Hash,
 		purpose: SigningPurpose
 	) async throws -> Set<SignatureOfEntity> {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
@@ -167,7 +166,6 @@ extension DeviceFactorSourceClient {
 		else {
 			throw FailedToFindDeviceFactorSourceForSigning()
 		}
-		let bip39Seed = loadedMnemonicWithPassphrase.toSeed()
 
 		var signatures = Set<SignatureOfEntity>()
 
@@ -194,10 +192,10 @@ extension DeviceFactorSourceClient {
 				loggerGlobal.debug("🔏 Signing data with device, with entity=\(entity.displayName), curve=\(curve), factor source hint.name=\(deviceFactorSource.hint.name), hint.model=\(deviceFactorSource.hint.model)")
 
 				let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(SignatureFromOnDeviceHDRequest(
-					bip39Seed: bip39Seed,
+					mnemonicWithPassphrase: loadedMnemonicWithPassphrase,
 					derivationPath: derivationPath,
 					curve: curve,
-					hashedData: Data(hashedDataToSign)
+					hashedData: hashedDataToSign
 				))
 
 				let entitySignature = SignatureOfEntity(

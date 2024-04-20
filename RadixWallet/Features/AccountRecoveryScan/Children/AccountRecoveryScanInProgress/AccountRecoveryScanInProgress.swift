@@ -354,17 +354,3 @@ extension AccountRecoveryScanInProgress {
 		}
 	}
 }
-
-extension DerivationPath {
-	var index: HDPathValue {
-//		do {
-//			guard let index = try hdFullPath().children.last?.nonHardenedValue else {
-//				fatalError("Expected to ALWAYS be able to read the last path component of an HD paths' index, but was nil.")
-//			}
-//			return index
-//		} catch {
-//			fatalError("Expected to ALWAYS be able to read the last path component of an HD paths' index, got error: \(error)")
-//		}
-		sargonProfileFinishMigrateAtEndOfStage1()
-	}
-}

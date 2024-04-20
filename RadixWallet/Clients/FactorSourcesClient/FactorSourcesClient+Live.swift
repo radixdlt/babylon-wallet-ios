@@ -117,59 +117,57 @@ extension FactorSourcesClient: DependencyKey {
 			await profileStore.profile.networkID
 		}
 
-		let indicesOfEntitiesControlledByFactorSource: IndicesOfEntitiesControlledByFactorSource = { _ in
-			/*
-			 let factorSourceID = request.factorSourceID
-			 guard let factorSource = try await getFactorSources().first(where: { $0.id == factorSourceID }) else { throw FailedToFindFactorSource() }
+		let indicesOfEntitiesControlledByFactorSource: IndicesOfEntitiesControlledByFactorSource = { request in
 
-			 let currentNetworkID = await getCurrentNetworkID()
-			 let networkID = request.networkID ?? currentNetworkID
-			 let network = try? await profileStore.profile.network(id: networkID)
+			let factorSourceID = request.factorSourceID
+			guard let factorSource = try await getFactorSources().first(where: { $0.id == factorSourceID }) else { throw FailedToFindFactorSource() }
 
-			 func nextDerivationIndexForFactorSource(
-			 	entitiesControlledByFactorSource: some Collection<some EntityProtocol>
-			 ) throws -> OrderedSet<HDPathValue> {
-			 	let indicesOfEntitiesControlledByAccount = entitiesControlledByFactorSource
-			 		.compactMap { entity -> HDPathValue? in
-			 			switch entity.securityState {
-			 			case let .unsecured(unsecuredControl):
-			 				let factorInstance = unsecuredControl.transactionSigning
-			 				guard factorInstance.factorSourceID.embed() == factorSourceID else {
-			 					return nil
-			 				}
-			 				guard factorInstance.derivationPath.scheme == request.derivationPathScheme else {
-			 					/// If DeviceFactorSource with mnemonic `M` is used to derive Account with CAP26 derivation path at index `0`, then we must
-			 					/// allow `M` to be able to derive account wit hBIP44-like derivation path at index `0` as well in the future.
-			 					return nil
-			 				}
-			 				return factorInstance.derivationPath.index
-			 			}
-			 		}
-			 	return try OrderedSet(validating: indicesOfEntitiesControlledByAccount)
-			 }
+			let currentNetworkID = await getCurrentNetworkID()
+			let networkID = request.networkID ?? currentNetworkID
+			let network = try? await profileStore.profile.network(id: networkID)
 
-			 let indices: OrderedSet<HDPathValue> = if let network {
-			 	switch request.entityKind {
-			 	case .account:
-			 		try nextDerivationIndexForFactorSource(
-			 			entitiesControlledByFactorSource: network.accountsIncludingHidden()
-			 		)
-			 	case .identity:
-			 		try nextDerivationIndexForFactorSource(
-			 			entitiesControlledByFactorSource: network.personasIncludingHidden()
-			 		)
-			 	}
-			 } else {
-			 	[]
-			 }
+			func nextDerivationIndexForFactorSource(
+				entitiesControlledByFactorSource: some Collection<some EntityProtocol>
+			) throws -> OrderedSet<HDPathValue> {
+				let indicesOfEntitiesControlledByAccount = entitiesControlledByFactorSource
+					.compactMap { entity -> HDPathValue? in
+						switch entity.securityState {
+						case let .unsecured(unsecuredControl):
+							let factorInstance = unsecuredControl.transactionSigning
+							guard factorInstance.factorSourceID.embed() == factorSourceID else {
+								return nil
+							}
+							guard factorInstance.derivationPath.scheme == request.derivationPathScheme else {
+								/// If DeviceFactorSource with mnemonic `M` is used to derive Account with CAP26 derivation path at index `0`, then we must
+								/// allow `M` to be able to derive account wit hBIP44-like derivation path at index `0` as well in the future.
+								return nil
+							}
+							return factorInstance.derivationPath.nonHardenedIndex
+						}
+					}
+				return try OrderedSet(validating: indicesOfEntitiesControlledByAccount)
+			}
 
-			 return IndicesUsedByFactorSource(
-			 	indices: indices,
-			 	factorSource: factorSource,
-			 	currentNetworkID: networkID
-			 )
-			 */
-			sargonProfileFinishMigrateAtEndOfStage1()
+			let indices: OrderedSet<HDPathValue> = if let network {
+				switch request.entityKind {
+				case .account:
+					try nextDerivationIndexForFactorSource(
+						entitiesControlledByFactorSource: network.accountsIncludingHidden()
+					)
+				case .persona:
+					try nextDerivationIndexForFactorSource(
+						entitiesControlledByFactorSource: network.personasIncludingHidden()
+					)
+				}
+			} else {
+				[]
+			}
+
+			return IndicesUsedByFactorSource(
+				indices: indices,
+				factorSource: factorSource,
+				currentNetworkID: networkID
+			)
 		}
 
 		return Self(

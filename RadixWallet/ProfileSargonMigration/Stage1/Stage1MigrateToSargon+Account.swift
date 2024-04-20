@@ -16,7 +16,7 @@ extension Sargon.Account {
 
 	public var derivationIndex: HDPathValue {
 		switch securityState {
-		case let .unsecured(uec): uec.transactionSigning.derivationPath.index
+		case let .unsecured(uec): uec.transactionSigning.derivationPath.nonHardenedIndex
 		}
 	}
 

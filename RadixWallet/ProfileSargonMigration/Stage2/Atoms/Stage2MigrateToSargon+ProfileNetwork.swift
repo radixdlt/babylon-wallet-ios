@@ -15,23 +15,19 @@ extension ProfileNetwork {
 	}
 
 	public func getHiddenAccounts() -> IdentifiedArrayOf<Account> {
-//		accounts.hidden
-		sargonProfileFinishMigrateAtEndOfStage1()
+		accounts.hidden
 	}
 
 	public func accountsIncludingHidden() -> IdentifiedArrayOf<Account> {
-//		accounts
-		sargonProfileFinishMigrateAtEndOfStage1()
+		accounts.asIdentified()
 	}
 
 	public func hasSomeAccount() -> Bool {
-//		!accounts.isEmpty
-		sargonProfileFinishMigrateAtEndOfStage1()
+		!accounts.isEmpty
 	}
 
 	var numberOfAccountsIncludingHidden: Int {
-//		accounts.count
-		sargonProfileFinishMigrateAtEndOfStage1()
+		accounts.count
 	}
 
 	#if DEBUG
