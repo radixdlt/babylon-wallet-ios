@@ -54,12 +54,11 @@ extension AccountsClient: DependencyKey {
 			await profileStore.accountValues()
 		}
 
-		let accountUpdates: AccountUpdates = { _ in
-//			await profileStore.accountValues().compactMap {
-//				$0.first { $0.address == address }
-//			}
-//			.eraseToAnyAsyncSequence()
-			sargonProfileFinishMigrateAtEndOfStage1()
+		let accountUpdates: AccountUpdates = { address in
+			await profileStore.accountValues().compactMap {
+				$0.first { $0.address == address }
+			}
+			.eraseToAnyAsyncSequence()
 		}
 
 		let newVirtualAccount: NewVirtualAccount = { request in
@@ -73,9 +72,8 @@ extension AccountsClient: DependencyKey {
 			)
 		}
 
-		let getAccountByAddress: GetAccountByAddress = { _ in
-//			try await profileStore.network().entity(address: address)
-			sargonProfileFinishMigrateAtEndOfStage1()
+		let getAccountByAddress: GetAccountByAddress = { address in
+			try await profileStore.network().entity(address: address)
 		}
 
 		let updateAccount: UpdateAccount = { _ in

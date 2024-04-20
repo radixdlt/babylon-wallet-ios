@@ -70,27 +70,23 @@ extension ProfileNetwork {
 	}
 
 	public func getHiddenPersonas() -> IdentifiedArrayOf<Persona> {
-//		personas.hiden
-		sargonProfileFinishMigrateAtEndOfStage1()
+		personas.hiden
 	}
 
 	public func personasIncludingHidden() -> IdentifiedArrayOf<Persona> {
-//		personas
-		sargonProfileFinishMigrateAtEndOfStage1()
+		personas.asIdentified()
 	}
 
 	public func hasSomePersona() -> Bool {
-//		!personas.isEmpty
-		sargonProfileFinishMigrateAtEndOfStage1()
+		!personas.isEmpty
 	}
 
 	public mutating func addPersona(_ persona: Persona) throws {
-//		guard personas[id: persona.id] == nil else {
-//			throw PersonaAlreadyExists()
-//		}
-//
-//		personas.append(persona)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		guard personas.get(id: persona.id) == nil else {
+			throw PersonaAlreadyExists()
+		}
+
+		personas.append(persona)
 	}
 
 	public mutating func updatePersona(_ persona: Persona) throws {
