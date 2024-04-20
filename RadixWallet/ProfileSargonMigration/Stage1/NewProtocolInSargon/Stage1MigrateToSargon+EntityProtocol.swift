@@ -78,17 +78,16 @@ extension EntityProtocol {
 		networkID: NetworkID,
 		address: EntityAddress,
 		factorInstance: Sargon.HierarchicalDeterministicFactorInstance,
-		displayName: DisplayName,
+		displayName: NonEmpty<String>,
 		extraProperties: ExtraProperties
 	) {
-//		self.init(
-//			networkID: networkID,
-//			address: address,
-//			securityState: .unsecured(.init(transactionSigning: factorInstance)),
-//			displayName: displayName,
-//			extraProperties: extraProperties
-//		)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		self.init(
+			networkID: networkID,
+			address: address,
+			securityState: .unsecured(value: .init(transactionSigning: factorInstance, authenticationSigning: nil)),
+			displayName: displayName,
+			extraProperties: extraProperties
+		)
 	}
 
 	public init(
@@ -97,15 +96,14 @@ extension EntityProtocol {
 		displayName: NonEmpty<String>,
 		extraProperties: ExtraProperties
 	) throws {
-//		let address = try Self.deriveVirtualAddress(networkID: networkID, factorInstance: factorInstance)
-//		self.init(
-//			networkID: networkID,
-//			address: address,
-//			factorInstance: factorInstance,
-//			displayName: displayName,
-//			extraProperties: extraProperties
-//		)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		let address = try Self.deriveVirtualAddress(networkID: networkID, factorInstance: factorInstance)
+		self.init(
+			networkID: networkID,
+			address: address,
+			factorInstance: factorInstance,
+			displayName: displayName,
+			extraProperties: extraProperties
+		)
 	}
 }
 

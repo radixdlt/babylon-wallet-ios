@@ -43,12 +43,11 @@ extension ProfileNetwork {
 	}
 
 	public mutating func addAccount(_ account: Account) throws {
-//		guard accounts[id: account.id] == nil else {
-//			throw AccountAlreadyExists()
-//		}
-//
-//		accounts.append(account)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		guard accounts.get(id: account.id) == nil else {
+			throw AccountAlreadyExists()
+		}
+
+		accounts.append(account)
 	}
 
 	public mutating func hideAccounts(ids idsOfAccountsToHide: Set<Sargon.Account.ID>) {

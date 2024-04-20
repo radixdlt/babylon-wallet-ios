@@ -83,7 +83,6 @@
 		488A42F42BCAFD4200F285BC /* AccountsRecoveredFromScanning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 488A42F32BCAFD4200F285BC /* AccountsRecoveredFromScanning.swift */; };
 		488A42F62BCAFED300F285BC /* Stage1MigrateToSargon+FactorSourceKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 488A42F52BCAFED300F285BC /* Stage1MigrateToSargon+FactorSourceKind.swift */; };
 		488A42F82BCB00B100F285BC /* Stage1MigrateToSargon+FactorSourceIDFromAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 488A42F72BCB00B100F285BC /* Stage1MigrateToSargon+FactorSourceIDFromAddress.swift */; };
-		488A42FA2BCB050E00F285BC /* Stage1MigrateToSargon+OnLedgerSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 488A42F92BCB050E00F285BC /* Stage1MigrateToSargon+OnLedgerSettings.swift */; };
 		489122782B186F61005F2EEE /* AlternativeRectangularButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 489122772B186F61005F2EEE /* AlternativeRectangularButtonStyle.swift */; };
 		48A86C432BCBC2810090E158 /* Stage1MigrateToSargon+CAP26.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A86C422BCBC2810090E158 /* Stage1MigrateToSargon+CAP26.swift */; };
 		48AB4E842AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AB4E832AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift */; };
@@ -1285,7 +1284,6 @@
 		488A42F32BCAFD4200F285BC /* AccountsRecoveredFromScanning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsRecoveredFromScanning.swift; sourceTree = "<group>"; };
 		488A42F52BCAFED300F285BC /* Stage1MigrateToSargon+FactorSourceKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+FactorSourceKind.swift"; sourceTree = "<group>"; };
 		488A42F72BCB00B100F285BC /* Stage1MigrateToSargon+FactorSourceIDFromAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+FactorSourceIDFromAddress.swift"; sourceTree = "<group>"; };
-		488A42F92BCB050E00F285BC /* Stage1MigrateToSargon+OnLedgerSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+OnLedgerSettings.swift"; sourceTree = "<group>"; };
 		489122772B186F61005F2EEE /* AlternativeRectangularButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlternativeRectangularButtonStyle.swift; sourceTree = "<group>"; };
 		48A86C422BCBC2810090E158 /* Stage1MigrateToSargon+CAP26.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+CAP26.swift"; sourceTree = "<group>"; };
 		48AB4E832AE19F5B001B238E /* ProfileStore+AsyncSequence+Updates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileStore+AsyncSequence+Updates.swift"; sourceTree = "<group>"; };
@@ -5953,7 +5951,6 @@
 				484161602BCADB4400D2B644 /* Stage1MigrateToSargon+Mnemonic.swift */,
 				4841614C2BCAD3D400D2B644 /* Stage1MigrateToSargon+MnemonicWithPassphrase.swift */,
 				4813AFE12BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift */,
-				488A42F92BCB050E00F285BC /* Stage1MigrateToSargon+OnLedgerSettings.swift */,
 				4813B0022BCA4FD60046BCAD /* Stage1MigrateToSargon+Persona.swift */,
 				4855B1AD2BCA5DB100DD0A47 /* Stage1MigrateToSargon+PersonaData.swift */,
 				4855B1B12BCA5E9800DD0A47 /* Stage1MigrateToSargon+PersonaDataCollections.swift */,
@@ -7466,7 +7463,6 @@
 				4855B1BD2BCA66E400DD0A47 /* Stage1MigrateToSargon+LedgerHardwareWalletFactorSource.swift in Sources */,
 				48CFC4E52ADC10DA00E77A5C /* ValidatorVaultItem.swift in Sources */,
 				48CFC3E42ADC10D900E77A5C /* RadixConnectConstants.swift in Sources */,
-				488A42FA2BCB050E00F285BC /* Stage1MigrateToSargon+OnLedgerSettings.swift in Sources */,
 				83EE477E2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueNonFungibleLocalId.swift in Sources */,
 				48CFC4242ADC10DA00E77A5C /* URL+Extra.swift in Sources */,
 				48CFC54C2ADC10DA00E77A5C /* ValidatorCollectionItem.swift in Sources */,

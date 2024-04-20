@@ -26,13 +26,12 @@ extension AccountsClient: DependencyKey {
 			try await getAccountsOnNetwork(getCurrentNetworkID())
 		}
 
-		let nextAppearanceID: NextAppearanceID = { _, _ in
-//			let offset = maybeOffset ?? 0
-//			let currentNetworkID = await getCurrentNetworkID()
-//			let networkID = maybeNetworkID ?? currentNetworkID
-//			let numberOfAccounts = await (try? profileStore.profile.network(id: networkID).numberOfAccountsIncludingHidden) ?? 0
-//			return AppearanceID.fromNumberOfAccounts(numberOfAccounts + offset)
-			sargonProfileFinishMigrateAtEndOfStage1()
+		let nextAppearanceID: NextAppearanceID = { maybeNetworkID, maybeOffset in
+			let offset = maybeOffset ?? 0
+			let currentNetworkID = await getCurrentNetworkID()
+			let networkID = maybeNetworkID ?? currentNetworkID
+			let numberOfAccounts = await (try? profileStore.profile.network(id: networkID).numberOfAccountsIncludingHidden) ?? 0
+			return AppearanceID.fromNumberOfAccounts(numberOfAccounts + offset)
 		}
 
 		let hasAccountOnNetwork: HasAccountOnNetwork = { _ in
@@ -63,16 +62,15 @@ extension AccountsClient: DependencyKey {
 			sargonProfileFinishMigrateAtEndOfStage1()
 		}
 
-		let newVirtualAccount: NewVirtualAccount = { _ in
-//			let networkID = request.networkID
-//			let appearanceID = await nextAppearanceID(networkID, nil)
-//			return try Sargon.Account(
-//				networkID: networkID,
-//				factorInstance: request.factorInstance,
-//				displayName: request.name,
-//				extraProperties: .init(appearanceID: appearanceID)
-//			)
-			sargonProfileFinishMigrateAtEndOfStage1()
+		let newVirtualAccount: NewVirtualAccount = { request in
+			let networkID = request.networkID
+			let appearanceID = await nextAppearanceID(networkID, nil)
+			return try Sargon.Account(
+				networkID: networkID,
+				factorInstance: request.factorInstance,
+				displayName: request.name,
+				extraProperties: .init(appearanceID: appearanceID)
+			)
 		}
 
 		let getAccountByAddress: GetAccountByAddress = { _ in
