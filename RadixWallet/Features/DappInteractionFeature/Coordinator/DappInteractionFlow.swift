@@ -195,42 +195,41 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-//			guard let usePersonaRequestItem = state.usePersonaRequestItem else {
-//				return .none
-//			}
-//
-//			return .run { [dappDefinitionAddress = state.dappMetadata.dAppDefinitionAddress] send in
-//				let identityAddress = usePersonaRequestItem.identityAddress
-//				guard
-//					let persona = try await personasClient.getPersonas()  //[id: identityAddress],
-//					let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps()[id: dappDefinitionAddress],
-//					let authorizedPersona = authorizedDapp.referencesToAuthorizedPersonas.first(where: { $0.identityAddress == identityAddress })
-//				else {
-//					await send(.internal(.presentPersonaNotFoundErrorAlert(reason: "")))
-//					return
-//				}
-//
-//				await send(.internal(.usePersona(usePersonaRequestItem, persona, authorizedDapp, authorizedPersona)))
-//
-//			} catch: { error, send in
-//				await send(.internal(.presentPersonaNotFoundErrorAlert(reason: error.legibleLocalizedDescription)))
-//			}
-			sargonProfileFinishMigrateAtEndOfStage1()
+			guard let usePersonaRequestItem = state.usePersonaRequestItem else {
+				return .none
+			}
+
+			return .run { [dappDefinitionAddress = state.dappMetadata.dAppDefinitionAddress] send in
+				let identityAddress = usePersonaRequestItem.identityAddress
+				guard
+					let persona = try await personasClient.getPersonas()[id: identityAddress],
+					let authorizedDapp = try await authorizedDappsClient.getAuthorizedDapps()[id: dappDefinitionAddress],
+					let authorizedPersona = authorizedDapp.referencesToAuthorizedPersonas.first(where: { $0.identityAddress == identityAddress })
+				else {
+					await send(.internal(.presentPersonaNotFoundErrorAlert(reason: "")))
+					return
+				}
+
+				await send(.internal(.usePersona(usePersonaRequestItem, persona, authorizedDapp, authorizedPersona)))
+
+			} catch: { error, send in
+				await send(.internal(.presentPersonaNotFoundErrorAlert(reason: error.legibleLocalizedDescription)))
+			}
 
 		case let .personaNotFoundErrorAlert(.presented(action)):
 			switch action {
 			case .cancelButtonTapped:
-				dismissEffect(for: state, errorKind: .invalidPersona, message: nil)
+				return dismissEffect(for: state, errorKind: .invalidPersona, message: nil)
 			}
 
 		case .personaNotFoundErrorAlert:
-			.none
+			return .none
 
 		case .closeButtonTapped:
-			dismissEffect(for: state, errorKind: .rejectedByUser, message: nil)
+			return dismissEffect(for: state, errorKind: .rejectedByUser, message: nil)
 
 		case .backButtonTapped:
-			goBackEffect(for: &state)
+			return goBackEffect(for: &state)
 		}
 	}
 

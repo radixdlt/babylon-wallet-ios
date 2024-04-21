@@ -63,13 +63,12 @@ extension TransactionSigners {
 	}
 
 	public var signerPublicKeys: Set<Sargon.PublicKey> {
-//		switch intentSigning {
-//		case let .intentSigners(signers):
-//			Set(signers.flatMap { $0.virtualHierarchicalDeterministicFactorInstances.map(\.publicKey) })
-//		case .notaryIsSignatory:
-//			[]
-//		}
-		sargonProfileFinishMigrateAtEndOfStage1()
+		switch intentSigning {
+		case let .intentSigners(signers):
+			Set(signers.flatMap { ent in ent.virtualHierarchicalDeterministicFactorInstances.map(\.publicKey.publicKey) })
+		case .notaryIsSignatory:
+			[]
+		}
 	}
 
 	public func intentSignerEntitiesOrEmpty() -> OrderedSet<AccountOrPersona> {

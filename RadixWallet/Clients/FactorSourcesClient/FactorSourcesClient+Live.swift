@@ -310,16 +310,13 @@ extension FactorSourcesClient: DependencyKey {
 			},
 			saveFactorSource: saveFactorSource,
 			updateFactorSource: updateFactorSource,
-			getSigningFactors: { _ in
-				/*
-				 assert(request.signers.allSatisfy { $0.networkID == request.networkID })
-				 return try await signingFactors(
-				 	for: request.signers,
-				 	from: getFactorSources().rawValue,
-				 	signingPurpose: request.signingPurpose
-				 )
-				  */
-				sargonProfileFinishMigrateAtEndOfStage1()
+			getSigningFactors: { request in
+				assert(request.signers.allSatisfy { $0.networkID == request.networkID })
+				return try await signingFactors(
+					for: request.signers,
+					from: getFactorSources().asIdentified(),
+					signingPurpose: request.signingPurpose
+				)
 			},
 			updateLastUsed: { _ in
 				/*
@@ -358,54 +355,51 @@ func signingFactors(
 	from allFactorSources: IdentifiedArrayOf<FactorSource>,
 	signingPurpose: SigningPurpose
 ) throws -> SigningFactors {
-	/*
-	 var signingFactors: [FactorSourceKind: IdentifiedArrayOf<SigningFactor>] = [:]
+	var signingFactors: [FactorSourceKind: IdentifiedArrayOf<SigningFactor>] = [:]
 
-	 for entity in entities {
-	 	switch entity.securityState {
-	 	case let .unsecured(unsecuredEntityControl):
+	for entity in entities {
+		switch entity.securityState {
+		case let .unsecured(unsecuredEntityControl):
 
-	 		let factorInstance = switch signingPurpose {
-	 		case .signAuth:
-	 			unsecuredEntityControl.authenticationSigning ?? unsecuredEntityControl.transactionSigning
-	 		case .signTransaction:
-	 			unsecuredEntityControl.transactionSigning
-	 		}
+			let factorInstance = switch signingPurpose {
+			case .signAuth:
+				unsecuredEntityControl.authenticationSigning ?? unsecuredEntityControl.transactionSigning
+			case .signTransaction:
+				unsecuredEntityControl.transactionSigning
+			}
 
-	 		let id = factorInstance.factorSourceID
-	 		guard let factorSource = allFactorSources[id: id.embed()] else {
-	 			assertionFailure("Bad! factor source not found")
-	 			throw FactorSourceNotFound()
-	 		}
-	 		let signer = try Signer(factorInstanceRequiredToSign: factorInstance, entity: entity)
-	 		let sigingFactor = SigningFactor(factorSource: factorSource, signer: signer)
+			let id = factorInstance.factorSourceID
+			guard let factorSource = allFactorSources[id: id.embed()] else {
+				assertionFailure("Bad! factor source not found")
+				throw FactorSourceNotFound()
+			}
+			let signer = try Signer(factorInstanceRequiredToSign: factorInstance, entity: entity)
+			let sigingFactor = SigningFactor(factorSource: factorSource, signer: signer)
 
-	 		if var existingArray: IdentifiedArrayOf<SigningFactor> = signingFactors[factorSource.kind] {
-	 			if var existingSigningFactor = existingArray[id: factorSource.id] {
-	 				var signers = existingSigningFactor.signers.rawValue
-	 				signers[id: signer.id] = signer // update copy of `signers`
-	 				existingSigningFactor.signers = .init(rawValue: signers)! // write back `signers`
-	 				existingArray[id: factorSource.id] = existingSigningFactor // write back to IdentifiedArray
-	 			} else {
-	 				existingArray[id: factorSource.id] = sigingFactor // write back to IdentifiedArray
-	 			}
-	 			signingFactors[factorSource.kind] = existingArray // write back to Dictionary
-	 		} else {
-	 			// trivial case,
-	 			signingFactors[factorSource.kind] = [sigingFactor].asIdentified()
-	 		}
-	 	}
-	 }
+			if var existingArray: IdentifiedArrayOf<SigningFactor> = signingFactors[factorSource.kind] {
+				if var existingSigningFactor = existingArray[id: factorSource.id] {
+					var signers = existingSigningFactor.signers.rawValue
+					signers[id: signer.id] = signer // update copy of `signers`
+					existingSigningFactor.signers = .init(rawValue: signers)! // write back `signers`
+					existingArray[id: factorSource.id] = existingSigningFactor // write back to IdentifiedArray
+				} else {
+					existingArray[id: factorSource.id] = sigingFactor // write back to IdentifiedArray
+				}
+				signingFactors[factorSource.kind] = existingArray // write back to Dictionary
+			} else {
+				// trivial case,
+				signingFactors[factorSource.kind] = [sigingFactor].asIdentified()
+			}
+		}
+	}
 
-	 return SigningFactors(
-	 	uniqueKeysWithValues: signingFactors.map { keyValuePair -> (key: FactorSourceKind, value: NonEmpty<Set<SigningFactor>>) in
-	 		assert(!keyValuePair.value.isEmpty, "Incorrect implementation, IdentifiedArrayOf<SigningFactor> should never be empty.")
-	 		let value: NonEmpty<Set<SigningFactor>> = .init(rawValue: Set(keyValuePair.value))!
-	 		return (key: keyValuePair.key, value: value)
-	 	}.sorted(by: \.key)
-	 )
-	  */
-	sargonProfileFinishMigrateAtEndOfStage1()
+	return SigningFactors(
+		uniqueKeysWithValues: signingFactors.map { keyValuePair -> (key: FactorSourceKind, value: NonEmpty<Set<SigningFactor>>) in
+			assert(!keyValuePair.value.isEmpty, "Incorrect implementation, IdentifiedArrayOf<SigningFactor> should never be empty.")
+			let value: NonEmpty<Set<SigningFactor>> = .init(rawValue: Set(keyValuePair.value))!
+			return (key: keyValuePair.key, value: value)
+		}.sorted(by: \.key)
+	)
 }
 
 // MARK: - FactorSourceNotFound

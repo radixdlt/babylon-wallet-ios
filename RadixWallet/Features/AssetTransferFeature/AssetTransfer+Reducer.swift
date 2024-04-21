@@ -258,44 +258,41 @@ func needsSignatureForDepositting(
 	into receivingAccount: Sargon.Account,
 	resource resourceAddress: ResourceAddress
 ) async -> Bool {
-	/*
-	 let depositSettings = receivingAccount.onLedgerSettings.thirdPartyDeposits
-	 let resourceException = depositSettings.assetsExceptionSet().first { $0.address == resourceAddress }?.exceptionRule
+	let depositSettings = receivingAccount.onLedgerSettings.thirdPartyDeposits
+	let resourceException = depositSettings.assetsExceptionList.first { $0.address == resourceAddress }?.exceptionRule
 
-	 switch (depositSettings.depositRule, resourceException) {
-	 // AcceptAll
-	 case (.acceptAll, .none):
-	 	return false
-	 case (.acceptAll, .allow):
-	 	return false
-	 case (.acceptAll, .deny):
-	 	return true
+	switch (depositSettings.depositRule, resourceException) {
+	// AcceptAll
+	case (.acceptAll, .none):
+		return false
+	case (.acceptAll, .allow):
+		return false
+	case (.acceptAll, .deny):
+		return true
 
-	 // Accept Known
-	 case (.acceptKnown, .allow):
-	 	return false
-	 case (.acceptKnown, .none):
-	 	// Check if the resource is known to the account
-	 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
-	 	let hasResource = await (try? onLedgerEntitiesClient
-	 		.getAccount(receivingAccount.address)
-	 		.hasResource(resourceAddress)
-	 	) ?? false
+	// Accept Known
+	case (.acceptKnown, .allow):
+		return false
+	case (.acceptKnown, .none):
+		// Check if the resource is known to the account
+		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+		let hasResource = await (try? onLedgerEntitiesClient
+			.getAccount(receivingAccount.address)
+			.hasResource(resourceAddress)
+		) ?? false
 
-	 	return !hasResource
-	 case (.acceptKnown, .deny):
-	 	return true
+		return !hasResource
+	case (.acceptKnown, .deny):
+		return true
 
-	 // DenyAll
-	 case (.denyAll, .none):
-	 	return true
-	 case (.denyAll, .allow):
-	 	return false
-	 case (.denyAll, .deny):
-	 	return true
-	 }
-	  */
-	sargonProfileFinishMigrateAtEndOfStage1()
+	// DenyAll
+	case (.denyAll, .none):
+		return true
+	case (.denyAll, .allow):
+		return false
+	case (.denyAll, .deny):
+		return true
+	}
 }
 
 extension AssetTransfer {

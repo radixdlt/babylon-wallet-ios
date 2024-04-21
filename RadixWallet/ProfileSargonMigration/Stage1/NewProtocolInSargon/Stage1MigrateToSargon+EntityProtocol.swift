@@ -137,16 +137,15 @@ extension EntityBaseProtocol {
 
 extension EntityProtocol {
 	public var deviceFactorSourceID: FactorSourceIDFromHash? {
-//		switch self.securityState {
-//		case let .unsecured(control):
-//			let factorSourceID = control.transactionSigning.factorSourceID
-//			guard factorSourceID.kind == .device else {
-//				return nil
-//			}
-//
-//			return factorSourceID
-//		}
-		sargonProfileFinishMigrateAtEndOfStage1()
+		switch self.securityState {
+		case let .unsecured(control):
+			let factorSourceID = control.transactionSigning.factorSourceID
+			guard factorSourceID.kind == .device else {
+				return nil
+			}
+
+			return factorSourceID
+		}
 	}
 }
 
