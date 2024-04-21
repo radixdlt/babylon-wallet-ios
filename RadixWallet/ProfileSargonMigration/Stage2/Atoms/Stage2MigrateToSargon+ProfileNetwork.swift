@@ -51,18 +51,17 @@ extension ProfileNetwork {
 	}
 
 	public mutating func hideAccounts(ids idsOfAccountsToHide: Set<Sargon.Account.ID>) {
-//		var identifiedArrayOf = self.accounts
-//		for id in idsOfAccountsToHide {
-//			identifiedArrayOf[id: id]?.hide()
-//
-//			authorizedDapps.mutateAll { dapp in
-//				dapp.referencesToAuthorizedPersonas.mutateAll { persona in
-//					persona.sharedAccounts?.ids.remove(id)
-//				}
-//			}
-//		}
-//		self.accounts = identifiedArrayOf
-		sargonProfileFinishMigrateAtEndOfStage1()
+		var identifiedArrayOf = self.accounts
+		for id in idsOfAccountsToHide {
+			identifiedArrayOf[id: id]?.hide()
+
+			authorizedDapps.mutateAll { dapp in
+				dapp.referencesToAuthorizedPersonas.mutateAll { persona in
+					persona.sharedAccounts?.ids.removeAll(where: { $0 == id })
+				}
+			}
+		}
+		self.accounts = identifiedArrayOf
 	}
 
 	public func getPersonas() -> IdentifiedArrayOf<Persona> {

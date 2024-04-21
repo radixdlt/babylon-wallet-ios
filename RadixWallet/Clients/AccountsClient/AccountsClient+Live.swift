@@ -34,20 +34,18 @@ extension AccountsClient: DependencyKey {
 			return AppearanceID.fromNumberOfAccounts(numberOfAccounts + offset)
 		}
 
-		let hasAccountOnNetwork: HasAccountOnNetwork = { _ in
-//			do {
-//				let network = try await profileStore.profile.network(id: networkID)
-//				// N.B. `accounts` is NonEmpty so `isEmpty` should always evaluate to `false`.
-//				return network.hasSomeAccount()
-//			} catch {
-//				return false
-//			}
-			sargonProfileFinishMigrateAtEndOfStage1()
+		let hasAccountOnNetwork: HasAccountOnNetwork = { networkID in
+			do {
+				let network = try await profileStore.profile.network(id: networkID)
+				// N.B. `accounts` is NonEmpty so `isEmpty` should always evaluate to `false`.
+				return network.hasSomeAccount()
+			} catch {
+				return false
+			}
 		}
 
 		let getHiddenAccountsOnCurrentNetwork: GetHiddenAccountsOnCurrentNetwork = {
-//			try await profileStore.profile.network(id: getCurrentNetworkID()).getHiddenAccounts()
-			sargonProfileFinishMigrateAtEndOfStage1()
+			try await profileStore.profile.network(id: getCurrentNetworkID()).getHiddenAccounts()
 		}
 
 		let accountsOnCurrentNetwork: AccountsOnCurrentNetwork = {
@@ -76,11 +74,10 @@ extension AccountsClient: DependencyKey {
 			try await profileStore.network().entity(address: address)
 		}
 
-		let updateAccount: UpdateAccount = { _ in
-//			try await profileStore.updating {
-//				try $0.updateAccount(updatedAccount)
-//			}
-			sargonProfileFinishMigrateAtEndOfStage1()
+		let updateAccount: UpdateAccount = { updatedAccount in
+			try await profileStore.updating {
+				try $0.updateAccount(updatedAccount)
+			}
 		}
 
 		#if DEBUG
