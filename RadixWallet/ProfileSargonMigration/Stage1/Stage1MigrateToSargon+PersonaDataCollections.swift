@@ -7,13 +7,6 @@ public protocol PersonaDataCollectionProtocol {
 	var first: Element? { get }
 }
 
-// MARK: - Sargon.PersonaDataEntryName + CustomStringConvertible
-extension Sargon.PersonaDataEntryName: CustomStringConvertible {
-	public var description: String {
-		sargonProfileFinishMigrateAtEndOfStage1()
-	}
-}
-
 // MARK: - Sargon.PersonaDataIdentifiedPhoneNumber + Identifiable
 extension Sargon.PersonaDataIdentifiedPhoneNumber: Identifiable {
 	public typealias ID = PersonaDataEntryID

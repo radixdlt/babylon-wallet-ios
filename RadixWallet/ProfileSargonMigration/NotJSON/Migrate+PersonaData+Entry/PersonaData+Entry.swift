@@ -1,23 +1,9 @@
 import Sargon
 import SargonUniFFI
 
-// MARK: - PersonaDataEntryName + BasePersonaDataEntryProtocol
-extension PersonaDataEntryName: BasePersonaDataEntryProtocol {
-	public func embed() -> PersonaData.Entry {
-		.name(self)
-	}
-}
-
-extension PersonaDataIdentifiedName {
+extension PersonaDataIdentifiedPhoneNumber {
 	public func embed() -> AnyIdentifiedPersonaEntry {
 		.init(id: self.id, value: self.value.embed())
-	}
-}
-
-// MARK: - PersonaDataEntryEmailAddress + BasePersonaDataEntryProtocol
-extension PersonaDataEntryEmailAddress: BasePersonaDataEntryProtocol {
-	public func embed() -> PersonaData.Entry {
-		.emailAddress(self)
 	}
 }
 
@@ -27,25 +13,9 @@ extension PersonaDataIdentifiedEmailAddress {
 	}
 }
 
-// MARK: - PersonaDataEntryPhoneNumber + BasePersonaDataEntryProtocol
-extension PersonaDataEntryPhoneNumber: BasePersonaDataEntryProtocol {
-	public func embed() -> PersonaData.Entry {
-		.phoneNumber(self)
-	}
-}
-
-extension PersonaDataIdentifiedPhoneNumber {
+extension PersonaDataIdentifiedName {
 	public func embed() -> AnyIdentifiedPersonaEntry {
 		.init(id: self.id, value: self.value.embed())
-	}
-}
-
-// MARK: - PersonaData.Entry
-extension PersonaData {
-	public enum Entry: Sendable, Hashable, Codable, BasePersonaDataEntryProtocol, CustomStringConvertible {
-		case name(PersonaDataEntryName)
-		case emailAddress(PersonaDataEntryEmailAddress)
-		case phoneNumber(PersonaDataEntryPhoneNumber)
 	}
 }
 
@@ -63,20 +33,6 @@ extension PersonaData.Entry {
 		case let .name(value): value.embed()
 		case let .emailAddress(value): value.embed()
 		case let .phoneNumber(value): value.embed()
-		}
-	}
-}
-
-// FIXME: This could also be a requirement in BasePersonaDataEntryProtocol
-extension PersonaData.Entry {
-	public var description: String {
-		switch self {
-		case let .name(name):
-			name.description
-		case let .emailAddress(emailAddress):
-			emailAddress.email.description
-		case let .phoneNumber(phoneNumber):
-			phoneNumber.number.description
 		}
 	}
 }
