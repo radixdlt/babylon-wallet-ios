@@ -1,11 +1,6 @@
 import Foundation
 import Sargon
 
-extension AuthorizedPersonaSimple: Identifiable {
-	public typealias ID = IdentityAddress
-	public var id: ID {
-		identityAddress
-	}
-
+extension AuthorizedPersonaSimple {
 	public typealias SharedAccounts = SharedToDappWithPersonaAccountAddresses
 }

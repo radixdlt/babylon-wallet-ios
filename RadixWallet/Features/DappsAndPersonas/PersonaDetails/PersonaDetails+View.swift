@@ -315,10 +315,9 @@ extension PersonaDetails.View {
 			) {
 				self.dAppInfo = dAppInfo
 				self.personaName = personaName
-//				self.fullName = personaData?.name?.value.formatted
-//				self.emailAddresses = personaData?.emailAddresses.map(\.value.email)
-//				self.phoneNumbers = personaData?.phoneNumbers.map(\.value.number)
-				sargonProfileFinishMigrateAtEndOfStage1()
+				self.fullName = personaData?.name?.value.formatted
+				self.emailAddresses = personaData?.emailAddresses.collection.map(\.value.email)
+				self.phoneNumbers = personaData?.phoneNumbers.collection.map(\.value.number)
 			}
 		}
 

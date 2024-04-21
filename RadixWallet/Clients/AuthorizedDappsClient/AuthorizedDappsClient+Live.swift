@@ -7,47 +7,40 @@ extension AuthorizedDappsClient: DependencyKey {
 	) -> Self {
 		Self(
 			getAuthorizedDapps: {
-//				guard let network = await profileStore.profile.network else {
-//					return .init()
-//				}
-//				return network.authorizedDapps
-				sargonProfileFinishMigrateAtEndOfStage1()
+				guard let network = await profileStore.profile.network else {
+					return .init()
+				}
+				return network.authorizedDapps.asIdentified()
 			},
-			addAuthorizedDapp: { _ in
-//				try await profileStore.updating {
-//					_ = try $0.addAuthorizedDapp(newDapp)
-//				}
-				sargonProfileFinishMigrateAtEndOfStage1()
+			addAuthorizedDapp: { newDapp in
+				try await profileStore.updating {
+					_ = try $0.addAuthorizedDapp(newDapp)
+				}
 			},
-			forgetAuthorizedDapp: { _, _ in
-//				let currentNetworkID = await profileStore.profile.networkID
-//				let networkID = maybeNetworkID ?? currentNetworkID
-//				return try await profileStore.updating {
-//					_ = try $0.forgetAuthorizedDapp(toForget, on: networkID)
-//				}
-				sargonProfileFinishMigrateAtEndOfStage1()
+			forgetAuthorizedDapp: { toForget, maybeNetworkID in
+				let currentNetworkID = await profileStore.profile.networkID
+				let networkID = maybeNetworkID ?? currentNetworkID
+				return try await profileStore.updating {
+					_ = try $0.forgetAuthorizedDapp(toForget, on: networkID)
+				}
 			},
-			updateAuthorizedDapp: { _ in
-//				try await profileStore.updating {
-//					try $0.updateAuthorizedDapp(toUpdate)
-//				}
-				sargonProfileFinishMigrateAtEndOfStage1()
+			updateAuthorizedDapp: { toUpdate in
+				try await profileStore.updating {
+					try $0.updateAuthorizedDapp(toUpdate)
+				}
 			},
-			updateOrAddAuthorizedDapp: { _ in
-//				try await profileStore.updating {
-//					try $0.updateOrAddAuthorizedDapp(dapp)
-//				}
-				sargonProfileFinishMigrateAtEndOfStage1()
+			updateOrAddAuthorizedDapp: { dapp in
+				try await profileStore.updating {
+					try $0.updateOrAddAuthorizedDapp(dapp)
+				}
 			},
-			deauthorizePersonaFromDapp: { _, _, _ in
-//				try await profileStore.updating {
-//					try $0.deauthorizePersonaFromDapp(personaID, dAppID: authorizedDappID, networkID: networkID)
-//				}
-				sargonProfileFinishMigrateAtEndOfStage1()
+			deauthorizePersonaFromDapp: { personaID, authorizedDappID, networkID in
+				try await profileStore.updating {
+					try $0.deauthorizePersonaFromDapp(personaID, dAppID: authorizedDappID, networkID: networkID)
+				}
 			},
-			detailsForAuthorizedDapp: { _ in
-//				try await profileStore.profile.detailsForAuthorizedDapp(simple)
-				sargonProfileFinishMigrateAtEndOfStage1()
+			detailsForAuthorizedDapp: { simple in
+				try await profileStore.profile.detailsForAuthorizedDapp(simple)
 			}
 		)
 	}

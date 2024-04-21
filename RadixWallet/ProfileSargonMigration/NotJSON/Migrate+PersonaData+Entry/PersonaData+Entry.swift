@@ -1,15 +1,51 @@
+import Sargon
+import SargonUniFFI
+
+// MARK: - PersonaDataEntryName + BasePersonaDataEntryProtocol
+extension PersonaDataEntryName: BasePersonaDataEntryProtocol {
+	public func embed() -> PersonaData.Entry {
+		.name(self)
+	}
+}
+
+extension PersonaDataIdentifiedName {
+	public func embed() -> AnyIdentifiedPersonaEntry {
+		.init(id: self.id, value: self.value.embed())
+	}
+}
+
+// MARK: - PersonaDataEntryEmailAddress + BasePersonaDataEntryProtocol
+extension PersonaDataEntryEmailAddress: BasePersonaDataEntryProtocol {
+	public func embed() -> PersonaData.Entry {
+		.emailAddress(self)
+	}
+}
+
+extension PersonaDataIdentifiedEmailAddress {
+	public func embed() -> AnyIdentifiedPersonaEntry {
+		.init(id: self.id, value: self.value.embed())
+	}
+}
+
+// MARK: - PersonaDataEntryPhoneNumber + BasePersonaDataEntryProtocol
+extension PersonaDataEntryPhoneNumber: BasePersonaDataEntryProtocol {
+	public func embed() -> PersonaData.Entry {
+		.phoneNumber(self)
+	}
+}
+
+extension PersonaDataIdentifiedPhoneNumber {
+	public func embed() -> AnyIdentifiedPersonaEntry {
+		.init(id: self.id, value: self.value.embed())
+	}
+}
+
 // MARK: - PersonaData.Entry
 extension PersonaData {
 	public enum Entry: Sendable, Hashable, Codable, BasePersonaDataEntryProtocol, CustomStringConvertible {
 		case name(PersonaDataEntryName)
-//		case dateOfBirth(DateOfBirth)
-//		case companyName(CompanyName)
-
 		case emailAddress(PersonaDataEntryEmailAddress)
 		case phoneNumber(PersonaDataEntryPhoneNumber)
-//		case url(AssociatedURL)
-//		case postalAddress(PostalAddress)
-//		case creditCard(CreditCard)
 	}
 }
 
@@ -17,55 +53,31 @@ extension PersonaData.Entry {
 	public var discriminator: PersonaData.Entry.Kind {
 		switch self {
 		case .name: .fullName
-//		case .dateOfBirth: .dateOfBirth
-//		case .companyName: .companyName
-
 		case .emailAddress: .emailAddress
 		case .phoneNumber: .phoneNumber
-//		case .url: .url
-//		case .postalAddress: .postalAddress
-//		case .creditCard: .creditCard
 		}
 	}
 
 	public func embed() -> PersonaData.Entry {
-//		switch self {
-//		case let .name(value): value.embed()
-//		case let .dateOfBirth(value): value.embed()
-//		case let .companyName(value): value.embed()
-//
-//		case let .emailAddress(value): value.embed()
-//		case let .phoneNumber(value): value.embed()
-//		case let .url(value): value.embed()
-//		case let .postalAddress(value): value.embed()
-//		case let .creditCard(value): value.embed()
-//		}
-		sargonProfileFinishMigrateAtEndOfStage1()
+		switch self {
+		case let .name(value): value.embed()
+		case let .emailAddress(value): value.embed()
+		case let .phoneNumber(value): value.embed()
+		}
 	}
 }
 
 // FIXME: This could also be a requirement in BasePersonaDataEntryProtocol
 extension PersonaData.Entry {
 	public var description: String {
-//		switch self {
-//		case let .name(name):
-//			name.description
-//		case let .dateOfBirth(dateOfBirth):
-//			dateOfBirth.description
-//		case let .companyName(companyName):
-//			companyName.description
-//		case let .emailAddress(emailAddress):
-//			emailAddress.description
-//		case let .phoneNumber(phoneNumber):
-//			phoneNumber.description
-//		case let .url(associatedURL):
-//			associatedURL.description
-//		case let .postalAddress(postalAddress):
-//			postalAddress.description
-//		case let .creditCard(creditCard):
-//			creditCard.description
-//		}
-		sargonProfileFinishMigrateAtEndOfStage1()
+		switch self {
+		case let .name(name):
+			name.description
+		case let .emailAddress(emailAddress):
+			emailAddress.email.description
+		case let .phoneNumber(phoneNumber):
+			phoneNumber.number.description
+		}
 	}
 }
 

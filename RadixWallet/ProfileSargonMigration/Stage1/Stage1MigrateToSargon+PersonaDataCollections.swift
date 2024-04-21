@@ -7,12 +7,6 @@ public protocol PersonaDataCollectionProtocol {
 	var first: Element? { get }
 }
 
-extension PersonaDataCollectionProtocol {
-	public var first: Element? {
-		sargonProfileFinishMigrateAtEndOfStage1()
-	}
-}
-
 // MARK: - Sargon.PersonaDataEntryName + CustomStringConvertible
 extension Sargon.PersonaDataEntryName: CustomStringConvertible {
 	public var description: String {
@@ -33,9 +27,15 @@ extension Sargon.PersonaDataIdentifiedEmailAddress: Identifiable {
 // MARK: - Sargon.CollectionOfPhoneNumbers + PersonaDataCollectionProtocol
 extension Sargon.CollectionOfPhoneNumbers: PersonaDataCollectionProtocol {
 	public typealias Element = Sargon.PersonaDataIdentifiedPhoneNumber
+	public var first: Element? {
+		self.collection.first
+	}
 }
 
 // MARK: - Sargon.CollectionOfEmailAddresses + PersonaDataCollectionProtocol
 extension Sargon.CollectionOfEmailAddresses: PersonaDataCollectionProtocol {
 	public typealias Element = Sargon.PersonaDataIdentifiedEmailAddress
+	public var first: Element? {
+		self.collection.first
+	}
 }

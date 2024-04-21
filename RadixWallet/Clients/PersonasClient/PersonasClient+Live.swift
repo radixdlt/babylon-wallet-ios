@@ -5,12 +5,11 @@ extension PersonasClient: DependencyKey {
 	public static func live(
 		profileStore: ProfileStore = .shared
 	) -> Self {
-		let getPersonasOnNetwork: GetPersonasOnNetwork = { _ in
-//			guard let network = try? await profileStore.profile.network(id: networkID) else {
-//				return .init()
-//			}
-//			return network.getPersonas()
-			sargonProfileFinishMigrateAtEndOfStage1()
+		let getPersonasOnNetwork: GetPersonasOnNetwork = { networkID in
+			guard let network = try? await profileStore.profile.network(id: networkID) else {
+				return .init()
+			}
+			return network.getPersonas()
 		}
 
 		return Self(
@@ -18,33 +17,27 @@ extension PersonasClient: DependencyKey {
 				await profileStore.personaValues()
 			},
 			getPersonas: {
-//				try await profileStore.network().getPersonas()
-				sargonProfileFinishMigrateAtEndOfStage1()
+				try await profileStore.network().getPersonas()
 			},
 			getPersonasOnNetwork: getPersonasOnNetwork,
 			getHiddenPersonasOnCurrentNetwork: {
-//				try await profileStore.network().getHiddenPersonas()
-				sargonProfileFinishMigrateAtEndOfStage1()
+				try await profileStore.network().getHiddenPersonas()
 			},
-			updatePersona: { _ in
-//				try await profileStore.updating {
-//					try $0.updatePersona(persona)
-//				}
-				sargonProfileFinishMigrateAtEndOfStage1()
+			updatePersona: { persona in
+				try await profileStore.updating {
+					try $0.updatePersona(persona)
+				}
 			},
-			saveVirtualPersona: { _ in
-//				try await profileStore.updating {
-//					try $0.addPersona(persona)
-//				}
-				sargonProfileFinishMigrateAtEndOfStage1()
+			saveVirtualPersona: { persona in
+				try await profileStore.updating {
+					try $0.addPersona(persona)
+				}
 			},
 			hasSomePersonaOnAnyNetwork: {
-//				await profileStore.profile.hasAnyPersonaOnAnyNetwork()
-				sargonProfileFinishMigrateAtEndOfStage1()
+				await profileStore.profile.hasAnyPersonaOnAnyNetwork()
 			},
 			hasSomePersonaOnCurrentNetwork: {
-//				await profileStore.profile.network?.hasSomePersona() ?? false
-				sargonProfileFinishMigrateAtEndOfStage1()
+				await profileStore.profile.network?.hasSomePersona() ?? false
 			}
 		)
 	}

@@ -209,6 +209,7 @@ extension CreateAccountCoordinator {
 			return .run { send in
 				await send(.internal(.createAccountResult(TaskResult {
 					let factorSourceIDFromHash = try factorSourceID.extract(as: FactorSourceIDFromHash.self)
+
 					let account = try await accountsClient.newVirtualAccount(.init(
 						name: name,
 						factorInstance: HierarchicalDeterministicFactorInstance(

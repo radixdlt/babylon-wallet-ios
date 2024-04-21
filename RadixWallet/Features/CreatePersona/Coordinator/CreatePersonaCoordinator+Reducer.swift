@@ -209,29 +209,28 @@ extension CreatePersonaCoordinator {
 			guard let name = state.name, let personaData = state.fields else {
 				fatalError("Derived public keys without persona name or extra fields set")
 			}
-//			return .run { send in
-//				let persona = try Profile.Network.Persona(
-//					networkID: networkID,
-//					factorInstance: .init(
-//						factorSourceID: factorSourceID,
-//						publicKey: hdKey.publicKey,
-//						derivationPath: hdKey.derivationPath
-//					),
-//					displayName: name,
-//					extraProperties: .init(personaData: personaData)
-//				)
-//
-//				await send(.internal(.createPersonaResult(
-//					TaskResult {
-//						try await personasClient.saveVirtualPersona(persona)
-//						return persona
-//					}
-//				)))
-//			} catch: { error, send in
-//				loggerGlobal.error("Failed to create persona, error: \(error)")
-//				await send(.internal(.handleFailure))
-//			}
-			sargonProfileFinishMigrateAtEndOfStage1()
+			return .run { send in
+				let factorSourceIDFromHash = try factorSourceID.extract(as: FactorSourceIDFromHash.self)
+				let persona = try Persona(
+					networkID: networkID,
+					factorInstance: HierarchicalDeterministicFactorInstance(
+						factorSourceId: factorSourceIDFromHash,
+						publicKey: hdKey
+					),
+					displayName: name,
+					extraProperties: .init(personaData: personaData)
+				)
+
+				await send(.internal(.createPersonaResult(
+					TaskResult {
+						try await personasClient.saveVirtualPersona(persona)
+						return persona
+					}
+				)))
+			} catch: { error, send in
+				loggerGlobal.error("Failed to create persona, error: \(error)")
+				await send(.internal(.handleFailure))
+			}
 
 		case .derivePublicKey(.delegate(.failedToDerivePublicKey)):
 			return .send(.internal(.handleFailure))

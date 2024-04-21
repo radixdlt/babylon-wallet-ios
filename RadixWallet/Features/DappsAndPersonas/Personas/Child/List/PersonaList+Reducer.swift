@@ -66,21 +66,20 @@ public struct PersonaList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-//			.run { [strategy = state.strategy] send in
-//				for try await personas in await personasClient.personas() {
-//					guard !Task.isCancelled else { return }
-//					let ids = try await personaIDs(strategy) ?? personas.ids
-//					let result = ids.compactMap { personas[id: $0] }.map(PersonaReducer.State.init)
-//					guard result.count == ids.count else {
-//						throw UpdatePersonaError.personasMissingFromClient(ids.subtracting(result.map(\.id)))
-//					}
-//					await send(.internal(.personasLoaded(result.asIdentified())))
-//				}
-//			} catch: { error, _ in
-//				loggerGlobal.error("Failed to update personas from client, error: \(error)")
-//				errorQueue.schedule(error)
-//			}
-			sargonProfileFinishMigrateAtEndOfStage1()
+			.run { [strategy = state.strategy] send in
+				for try await personas in await personasClient.personas() {
+					guard !Task.isCancelled else { return }
+					let ids = try await personaIDs(strategy) ?? personas.ids
+					let result = ids.compactMap { personas[id: $0] }.map(PersonaReducer.State.init)
+					guard result.count == ids.count else {
+						throw UpdatePersonaError.personasMissingFromClient(ids.subtracting(result.map(\.id)))
+					}
+					await send(.internal(.personasLoaded(result.asIdentified())))
+				}
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to update personas from client, error: \(error)")
+				errorQueue.schedule(error)
+			}
 
 		case .createNewPersonaButtonTapped:
 			.send(.delegate(.createNewPersona))

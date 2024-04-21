@@ -47,13 +47,12 @@ extension PersonasClient {
 
 extension PersonasClient {
 	public func getPersona(id: Persona.ID) async throws -> Persona {
-//		let personas = try await getPersonas()
-//		guard let persona = personas[id: id] else {
-//			throw PersonaNotFoundError(id: id)
-//		}
-//
-//		return persona
-		sargonProfileFinishMigrateAtEndOfStage1()
+		let personas = try await getPersonas()
+		guard let persona = personas[id: id] else {
+			throw PersonaNotFoundError(id: id)
+		}
+
+		return persona
 	}
 
 	public struct PersonaNotFoundError: Error {

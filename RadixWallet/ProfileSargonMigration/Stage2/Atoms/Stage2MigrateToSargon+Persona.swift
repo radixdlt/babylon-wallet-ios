@@ -3,13 +3,11 @@ import Sargon
 
 extension Persona {
 	public mutating func hide() {
-//		flags.append(.deletedByUser)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		flags.append(.deletedByUser)
 	}
 
 	public mutating func unhide() {
-//		flags.remove(.deletedByUser)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		flags.remove(.deletedByUser)
 	}
 }
 
