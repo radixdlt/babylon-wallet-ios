@@ -15,7 +15,7 @@ extension ConfigurationBackup {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				ScrollView {
 					VStack(alignment: .leading, spacing: .zero) {
-						Text(L10n.ConfigurationBackup.subtitle)
+						Text(L10n.ConfigurationBackup.Automated.heading)
 							.foregroundStyle(.app.gray2)
 							.textStyle(.body1Header)
 							.padding(.bottom, .medium2)
@@ -23,13 +23,14 @@ extension ConfigurationBackup {
 						let backupsEnabled = viewStore.binding(get: \.automatedBackupsEnabled) { .view(.toggleAutomatedBackups($0)) }
 						AutomatedBackupView(
 							backupsEnabled: backupsEnabled,
-							loggedInName: viewStore.loggedInName,
-							actionsRequired: [.personas],
-							disconnectAction: { store.send(.view(.disconnectTapped)) }
+							lastBackedUp: viewStore.lastBackup,
+							actionsRequired: viewStore.actionsRequired,
+							outdatedBackupPresent: viewStore.outdatedBackupPresent,
+							deleteOutdatedAction: { store.send(.view(.deleteOutdatedTapped)) }
 						)
 						.padding(.bottom, .medium1)
 
-						Text(L10n.ConfigurationBackup.ManualBackup.heading)
+						Text(L10n.ConfigurationBackup.Manual.heading)
 							.foregroundStyle(.app.gray2)
 							.textStyle(.body1Header)
 							.padding(.bottom, .medium2)
@@ -52,9 +53,10 @@ extension ConfigurationBackup {
 extension ConfigurationBackup {
 	struct AutomatedBackupView: SwiftUI.View {
 		@Binding var backupsEnabled: Bool
-		let loggedInName: String?
+		let lastBackedUp: Date?
 		let actionsRequired: [Item]
-		let disconnectAction: () -> Void
+		let outdatedBackupPresent: Bool
+		let deleteOutdatedAction: () -> Void
 
 		var body: some SwiftUI.View {
 			Card {
@@ -65,12 +67,12 @@ extension ConfigurationBackup {
 
 							Toggle(isOn: $backupsEnabled) {
 								VStack(alignment: .leading, spacing: .small3) {
-									Text(L10n.ConfigurationBackup.backupsToggleICloud)
+									Text(L10n.ConfigurationBackup.Automated.toggleIOS)
 										.multilineTextAlignment(.leading)
 										.textStyle(.body1Header)
 										.foregroundStyle(.app.gray1)
 
-									Text(L10n.ConfigurationBackup.backupsUpdate("3 min"))
+									Text(lastBackedUpString)
 										.textStyle(.body2Regular)
 										.foregroundStyle(.app.gray2)
 								}
@@ -80,7 +82,7 @@ extension ConfigurationBackup {
 
 						Divider()
 
-						Text(L10n.ConfigurationBackup.automatedBackupsToggle)
+						Text(L10n.ConfigurationBackup.Automated.text)
 							.textStyle(.body1Regular)
 							.foregroundStyle(.app.gray1)
 
@@ -89,34 +91,50 @@ extension ConfigurationBackup {
 								ItemView(item: item, actionRequired: actionsRequired.contains(item))
 							}
 						}
-
-						if let loggedInName {
-							Divider()
-
-							HStack(spacing: 0) {
-								VStack(alignment: .leading, spacing: .small2) {
-									Text(L10n.ConfigurationBackup.loggedInAsHeading)
-										.textStyle(.body2Regular)
-										.foregroundStyle(.app.gray2)
-
-									Text(loggedInName)
-										.textStyle(.body1Regular)
-										.foregroundStyle(.app.gray1)
-								}
-
-								Spacer(minLength: .small2)
-
-								Button(L10n.ConfigurationBackup.disconnectButton, action: disconnectAction)
-									.buttonStyle(.blueText)
-							}
-						}
 					}
 					.padding(.horizontal, .medium1)
 					.padding(.bottom, .small1)
 
-					BottomView(text: L10n.ConfigurationBackup.automatedBackupsWarning)
+					if outdatedBackupPresent {
+						Divider()
+
+						HStack(spacing: 0) {
+							Image(.folder)
+								.padding(.trailing, .medium3)
+
+							Text(L10n.ConfigurationBackup.Automated.outdatedBackupIOS)
+								.multilineTextAlignment(.leading)
+								.lineSpacing(0)
+								.textStyle(.body1Link)
+								.foregroundStyle(.app.red1)
+
+							Spacer(minLength: .small2)
+
+							Button(L10n.ConfigurationBackup.Automated.deleteOutdatedBackupIOS, action: deleteOutdatedAction)
+								.buttonStyle(.blueText)
+						}
+						.padding(.horizontal, .medium2)
+						.padding(.vertical, .medium3)
+					}
+
+					WarningView(text: L10n.ConfigurationBackup.Automated.warning)
 				}
 			}
+		}
+
+		private var lastBackedUpString: String {
+			if let lastBackedUp {
+				let time = lastBackedUp.timeIntervalSinceNow
+				return L10n.ConfigurationBackup.Automated.lastBackup("3 min")
+			} else {
+				return ""
+			}
+		}
+
+		private let formatter = {
+			let formatter = DateComponentsFormatter()
+			formatter.unitsStyle = .brief
+			return formatter
 		}
 
 		struct ItemView: SwiftUI.View {
@@ -135,7 +153,7 @@ extension ConfigurationBackup {
 							SecurityCenter.StatusIcon(actionRequired: actionRequired)
 								.padding(.trailing, .small3)
 
-							Text(heading)
+							Text(title)
 								.textStyle(.body2HighImportance)
 								.foregroundStyle(actionRequired ? .app.alert : .app.green1)
 
@@ -156,21 +174,21 @@ extension ConfigurationBackup {
 				.clipped()
 			}
 
-			var heading: String {
+			var title: String {
 				switch item {
-				case .accounts: L10n.ConfigurationBackup.accountsItem
-				case .personas: L10n.ConfigurationBackup.personasItem
-				case .securityFactors: L10n.ConfigurationBackup.securityFactorsItem
-				case .walletSettings: L10n.ConfigurationBackup.walletSettingsItem
+				case .accounts: L10n.ConfigurationBackup.Automated.accountsItemTitle
+				case .personas: L10n.ConfigurationBackup.Automated.personasItemTitle
+				case .securityFactors: L10n.ConfigurationBackup.Automated.securityFactorsItemTitle
+				case .walletSettings: L10n.ConfigurationBackup.Automated.walletSettingsItemTitle
 				}
 			}
 
 			var subtitle: String {
 				switch item {
-				case .accounts: L10n.ConfigurationBackup.accountsSubtitle
-				case .personas: L10n.ConfigurationBackup.personasSubtitle
-				case .securityFactors: L10n.ConfigurationBackup.securityFactorsSubtitle
-				case .walletSettings: L10n.ConfigurationBackup.walletSettingsSubtitle
+				case .accounts: L10n.ConfigurationBackup.Automated.accountsItemSubtitle
+				case .personas: L10n.ConfigurationBackup.Automated.personasItemSubtitle
+				case .securityFactors: L10n.ConfigurationBackup.Automated.securityFactorsItemSubtitle
+				case .walletSettings: L10n.ConfigurationBackup.Automated.walletSettingsItemSubtitle
 				}
 			}
 		}
@@ -182,7 +200,7 @@ extension ConfigurationBackup {
 		var body: some SwiftUI.View {
 			Card {
 				VStack(alignment: .leading, spacing: .medium2) {
-					Text(L10n.ConfigurationBackup.ManualBackup.subtitle)
+					Text(L10n.ConfigurationBackup.Manual.text)
 						.lineSpacing(0)
 						.multilineTextAlignment(.leading)
 						.textStyle(.body1Regular)
@@ -190,17 +208,17 @@ extension ConfigurationBackup {
 						.padding(.top, .medium2)
 						.padding(.horizontal, .medium2)
 
-					Button(L10n.ConfigurationBackup.ManualBackup.exportButton, action: exportAction)
+					Button(L10n.ConfigurationBackup.Manual.exportButton, action: exportAction)
 						.buttonStyle(.primaryRectangular(shouldExpand: true))
 						.padding(.horizontal, .large2)
 
-					BottomView(text: L10n.ConfigurationBackup.ManualBackup.warning)
+					WarningView(text: L10n.ConfigurationBackup.Manual.warning)
 				}
 			}
 		}
 	}
 
-	struct BottomView: SwiftUI.View {
+	struct WarningView: SwiftUI.View {
 		let text: String
 
 		var body: some SwiftUI.View {

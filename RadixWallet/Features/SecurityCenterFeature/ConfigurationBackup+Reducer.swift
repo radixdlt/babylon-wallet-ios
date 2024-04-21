@@ -3,8 +3,9 @@ import ComposableArchitecture
 public struct ConfigurationBackup: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var automatedBackupsEnabled: Bool = false
-		public var loggedInName: String? = nil
-		public var backedUpDate: Date = .init(timeIntervalSinceNow: -.random(in: 100 ..< 1000))
+		public var actionsRequired: [Item] = [.accounts]
+		public var outdatedBackupPresent: Bool = true
+		public var lastBackup: Date = .init(timeIntervalSinceNow: -.random(in: 100 ..< 1000))
 	}
 
 	public enum Item: Sendable, Hashable, CaseIterable {
@@ -17,7 +18,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case toggleAutomatedBackups(Bool)
 		case exportTapped
-		case disconnectTapped
+		case deleteOutdatedTapped
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
@@ -29,7 +30,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		case .exportTapped:
 			return .none
 
-		case .disconnectTapped:
+		case .deleteOutdatedTapped:
 			return .none
 		}
 	}
