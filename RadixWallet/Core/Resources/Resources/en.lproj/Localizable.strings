@@ -196,6 +196,15 @@
 "linkedConnectors_localNetworkPermissionDeniedAlert_message" = "Local network access is required to link to a Connector.";
 "linkedConnectors_incorrectQrTitle" = "Incorrect QR code scanned.";
 "linkedConnectors_incorrectQrMessage" = "Please scan the QR code provided by your Radix Wallet Connector browser extension.";
+"linkedConnectors_approveNewConnector_title" = "Link Connector";
+"linkedConnectors_approveExistingConnector_title" = "Update Link";
+"linkedConnectors_approveNewConnector_message" = "This Connector will be trusted to verify the dApp origin of requests to this wallet.
+
+Only continue if you are linking to the **official Radix Connector browser extension** - or a Connector you control and trust.";
+"linkedConnectors_approveExistingConnector_message" = "This appears to be a Radix Connector you previously linked to. Link will be updated.";
+"linkedConnectors_linkFailedErrorTitle" = "Link Failed";
+"linkedConnectors_unknownPurposeErrorMessage" = "This type of Connector link is not supported.";
+"linkedConnectors_changingPurposeNotSupportedErrorMessage" = "Changing a Connector’s type is not supported.";
 "gateways_title" = "Gateways";
 "gateways_subtitle" = "Choose the gateway your wallet will use to connect to the Radix Network or test networks. Only change this if you know what you’re doing.";
 "gateways_whatIsAGateway" = "What is a Gateway?";
@@ -510,6 +519,7 @@
 "common_unauthorized" = "Unauthorized";
 "common_rateLimitReached" = "Gateway access blocked due to exceeding rate limit. Please wait a few minutes to retry.";
 "common_badHttpResponseStatusCode" = "Bad HTTP response status code %d";
+"common_dismiss" = "Dismiss";
 "error_dappRequest_invalidPersonaId" = "Invalid Persona specified by dApp";
 "error_dappRequest_invalidRequest" = "Invalid request";
 "error_profileLoad_decodingError" = "Failed to import Radix Wallet backup: %@";
