@@ -437,7 +437,7 @@ extension FactorSourceIDFromHash {
 		guard
 			case let parts = key.split(separator: Self.keychainKeySeparator),
 			parts.count == 2,
-			case let kind = FactorSourceKind(rawValue: String(parts[0])),
+			let kind = FactorSourceKind(rawValue: String(parts[0])),
 			case let hex32 = String(parts[1]),
 			let exactly32Bytes = try? Exactly32Bytes(hex: hex32)
 		else {

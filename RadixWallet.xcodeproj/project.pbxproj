@@ -36,7 +36,6 @@
 		4841614B2BCAD38400D2B644 /* Stage1MigrateToSargon+BIP39Seed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4841614A2BCAD38400D2B644 /* Stage1MigrateToSargon+BIP39Seed.swift */; };
 		4841614D2BCAD3D400D2B644 /* Stage1MigrateToSargon+MnemonicWithPassphrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4841614C2BCAD3D400D2B644 /* Stage1MigrateToSargon+MnemonicWithPassphrase.swift */; };
 		4841614F2BCAD46A00D2B644 /* Stage1MigrateToSargon+PublicKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4841614E2BCAD46A00D2B644 /* Stage1MigrateToSargon+PublicKey.swift */; };
-		484161532BCAD7DF00D2B644 /* Stage1MigrateToSargon+DerivationPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484161522BCAD7DF00D2B644 /* Stage1MigrateToSargon+DerivationPath.swift */; };
 		484161552BCAD84300D2B644 /* Stage1MigrateToSargon+HDFactorSourceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484161542BCAD84300D2B644 /* Stage1MigrateToSargon+HDFactorSourceProtocol.swift */; };
 		484161572BCAD96E00D2B644 /* Stage1MigrateToSargon+BIP39Word.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484161562BCAD96E00D2B644 /* Stage1MigrateToSargon+BIP39Word.swift */; };
 		484161592BCADA0A00D2B644 /* Stage1MigrateToSargon+BIP39+Lookup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484161582BCADA0A00D2B644 /* Stage1MigrateToSargon+BIP39+Lookup.swift */; };
@@ -70,7 +69,6 @@
 		488A42F02BCAF9AF00F285BC /* Stage2MigrateToSargon+DeviceFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 488A42EF2BCAF9AF00F285BC /* Stage2MigrateToSargon+DeviceFactorSource.swift */; };
 		488A42F22BCAFB7000F285BC /* Stage1MigrateToSargon+LedgerHardwareWalletModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 488A42F12BCAFB7000F285BC /* Stage1MigrateToSargon+LedgerHardwareWalletModel.swift */; };
 		488A42F42BCAFD4200F285BC /* AccountsRecoveredFromScanning.swift in Sources */ = {isa = PBXBuildFile; fileRef = 488A42F32BCAFD4200F285BC /* AccountsRecoveredFromScanning.swift */; };
-		488A42F62BCAFED300F285BC /* Stage1MigrateToSargon+FactorSourceKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 488A42F52BCAFED300F285BC /* Stage1MigrateToSargon+FactorSourceKind.swift */; };
 		488A42F82BCB00B100F285BC /* Stage1MigrateToSargon+FactorSourceIDFromAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 488A42F72BCB00B100F285BC /* Stage1MigrateToSargon+FactorSourceIDFromAddress.swift */; };
 		489122782B186F61005F2EEE /* AlternativeRectangularButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 489122772B186F61005F2EEE /* AlternativeRectangularButtonStyle.swift */; };
 		48A86C432BCBC2810090E158 /* Stage1MigrateToSargon+CAP26.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A86C422BCBC2810090E158 /* Stage1MigrateToSargon+CAP26.swift */; };
@@ -1225,7 +1223,6 @@
 		4841614A2BCAD38400D2B644 /* Stage1MigrateToSargon+BIP39Seed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+BIP39Seed.swift"; sourceTree = "<group>"; };
 		4841614C2BCAD3D400D2B644 /* Stage1MigrateToSargon+MnemonicWithPassphrase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+MnemonicWithPassphrase.swift"; sourceTree = "<group>"; };
 		4841614E2BCAD46A00D2B644 /* Stage1MigrateToSargon+PublicKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+PublicKey.swift"; sourceTree = "<group>"; };
-		484161522BCAD7DF00D2B644 /* Stage1MigrateToSargon+DerivationPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+DerivationPath.swift"; sourceTree = "<group>"; };
 		484161542BCAD84300D2B644 /* Stage1MigrateToSargon+HDFactorSourceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+HDFactorSourceProtocol.swift"; sourceTree = "<group>"; };
 		484161562BCAD96E00D2B644 /* Stage1MigrateToSargon+BIP39Word.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+BIP39Word.swift"; sourceTree = "<group>"; };
 		484161582BCADA0A00D2B644 /* Stage1MigrateToSargon+BIP39+Lookup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+BIP39+Lookup.swift"; sourceTree = "<group>"; };
@@ -1259,7 +1256,6 @@
 		488A42EF2BCAF9AF00F285BC /* Stage2MigrateToSargon+DeviceFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage2MigrateToSargon+DeviceFactorSource.swift"; sourceTree = "<group>"; };
 		488A42F12BCAFB7000F285BC /* Stage1MigrateToSargon+LedgerHardwareWalletModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+LedgerHardwareWalletModel.swift"; sourceTree = "<group>"; };
 		488A42F32BCAFD4200F285BC /* AccountsRecoveredFromScanning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountsRecoveredFromScanning.swift; sourceTree = "<group>"; };
-		488A42F52BCAFED300F285BC /* Stage1MigrateToSargon+FactorSourceKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+FactorSourceKind.swift"; sourceTree = "<group>"; };
 		488A42F72BCB00B100F285BC /* Stage1MigrateToSargon+FactorSourceIDFromAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+FactorSourceIDFromAddress.swift"; sourceTree = "<group>"; };
 		489122772B186F61005F2EEE /* AlternativeRectangularButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlternativeRectangularButtonStyle.swift; sourceTree = "<group>"; };
 		48A86C422BCBC2810090E158 /* Stage1MigrateToSargon+CAP26.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+CAP26.swift"; sourceTree = "<group>"; };
@@ -5887,7 +5883,6 @@
 				48A86C422BCBC2810090E158 /* Stage1MigrateToSargon+CAP26.swift */,
 				4871C4C62BD04A4A0090D243 /* Stage1MigrateToSargon+Collection.swift */,
 				484161402BCACDC700D2B644 /* Stage1MigrateToSargon+DepositAddressExceptionRule.swift */,
-				484161522BCAD7DF00D2B644 /* Stage1MigrateToSargon+DerivationPath.swift */,
 				484161622BCADBFF00D2B644 /* Stage1MigrateToSargon+DeviceFactorSource.swift */,
 				4855B1AF2BCA5E3100DD0A47 /* Stage1MigrateToSargon+DisplayName.swift */,
 				483A3DE52BD2678900055932 /* Stage1MigrateToSargon+FactorSourceCryptoParameters.swift */,
@@ -5897,7 +5892,6 @@
 				488A42F72BCB00B100F285BC /* Stage1MigrateToSargon+FactorSourceIDFromAddress.swift */,
 				484161422BCACE6000D2B644 /* Stage1MigrateToSargon+FactorSourceIDFromHash.swift */,
 				4841616A2BCAF62D00D2B644 /* Stage1MigrateToSargon+FactorSourceIDProtoco.swift */,
-				488A42F52BCAFED300F285BC /* Stage1MigrateToSargon+FactorSourceKind.swift */,
 				4841615A2BCADA5800D2B644 /* Stage1MigrateToSargon+FactorSourceKindOfMnemonic.swift */,
 				484161382BCACA7500D2B644 /* Stage1MigrateToSargon+FactorSourceProtocol.swift */,
 				E65D6CE92BC981DA001D8A39 /* Stage1MigrateToSargon+FiatCurrency.swift */,
@@ -7117,7 +7111,6 @@
 				4841614B2BCAD38400D2B644 /* Stage1MigrateToSargon+BIP39Seed.swift in Sources */,
 				8397D82D2B46ACB50016365A /* StakeUnitList.swift in Sources */,
 				A462B5912B83675000C26D20 /* PackageCodeCollectionItem.swift in Sources */,
-				484161532BCAD7DF00D2B644 /* Stage1MigrateToSargon+DerivationPath.swift in Sources */,
 				48CFC44C2ADC10DA00E77A5C /* MnemonicClient+Test.swift in Sources */,
 				48CFC4192ADC10DA00E77A5C /* Tuple+Extra.swift in Sources */,
 				A47572052B29B4F20059A95D /* IOSSecurityClient+Test.swift in Sources */,
@@ -7827,7 +7820,6 @@
 				48CFC31D2ADC10D900E77A5C /* NewAccountCompletion+Reducer.swift in Sources */,
 				48CFC49D2ADC10DA00E77A5C /* TransactionNotFoundError.swift in Sources */,
 				48CFC3E82ADC10D900E77A5C /* Async.swift in Sources */,
-				488A42F62BCAFED300F285BC /* Stage1MigrateToSargon+FactorSourceKind.swift in Sources */,
 				48CFC51A2ADC10DA00E77A5C /* StateEntityNonFungibleIdsPageRequest.swift in Sources */,
 				48CFC4FD2ADC10DA00E77A5C /* StateNonFungibleIdsRequest.swift in Sources */,
 				48CFC5C12ADC10DA00E77A5C /* Selection.swift in Sources */,
