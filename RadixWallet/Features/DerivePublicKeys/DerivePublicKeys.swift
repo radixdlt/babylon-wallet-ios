@@ -321,8 +321,8 @@ extension DerivePublicKeys {
 		let hdKeys = try await ledgerHardwareWalletClient.derivePublicKeys(
 			derivationPaths.map {
 				P2P.LedgerHardwareWallet.KeyParameters(
-					curve: $0.curveForScheme.p2pCurve,
-					derivationPath: $0.path.toString()
+					curve: $0.curve.p2pCurve,
+					derivationPath: $0.toString()
 				)
 			},
 			ledger
@@ -363,7 +363,7 @@ extension DerivePublicKeys {
 						derivationPathScheme: derivationPathScheme,
 						networkID: networkID
 					)
-					assert(derivationPath.curveForScheme == curve)
+					assert(derivationPath.curve == curve)
 					try await send(deriveWithKnownDerivationPaths([derivationPath], networkID))
 				} catch: { error, send in
 					loggerGlobal.error("Failed to create derivation path, error: \(error)")

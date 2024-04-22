@@ -3,7 +3,7 @@ import Sargon
 
 extension HierarchicalDeterministicPublicKey {
 	public var curve: SLIP10Curve {
-		derivationPath.curveForScheme
+		derivationPath.curve
 	}
 
 	init(
@@ -19,7 +19,7 @@ extension HierarchicalDeterministicPublicKey {
 		let publicKey = try Sargon.PublicKey(bytes: keyData)
 		let derivationPath = try DerivationPath(string: path)
 		assert(publicKey.curve == curve)
-		assert(derivationPath.curveForScheme == curve)
+		assert(derivationPath.curve == curve)
 		self.init(publicKey: publicKey, derivationPath: derivationPath)
 	}
 }

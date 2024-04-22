@@ -96,7 +96,7 @@ public struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
 		source: Source
 	) throws {
 		for derivationPath in derivationPaths {
-			guard source.deviceFactorSource.cryptoParameters.supportedCurves.contains(derivationPath.curveForScheme) else {
+			guard source.deviceFactorSource.cryptoParameters.supportedCurves.contains(derivationPath.curve) else {
 				throw DiscrepancyUnsupportedCurve()
 			}
 		}

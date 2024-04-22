@@ -234,30 +234,33 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 	}
 
 	func validate(hashed: Data) throws -> Validated {
-//		let hdPubKey = try self.derivedPublicKey.hdPubKey()
-//		let signatureWithPublicKey: SignatureWithPublicKey = switch hdPubKey.publicKey {
-//		case let .secp256k1(pubKey):
-//			try .secp256k1(
-//				signature: .init(radixFormat: self.signature.data),
-//				publicKey: pubKey
-//			)
-//		case let .ed25519(pubKey):
-//			.ed25519(
-//				signature: self.signature.data,
-//				publicKey: pubKey
-//			)
-//		}
-//
-//		guard signatureWithPublicKey.isValidSignature(for: hashed) else {
-//			loggerGlobal.error("Signature invalid for hashed msg: \(hashed.hex), signatureWithPublicKey: \(signatureWithPublicKey)")
-//			throw InvalidSignature()
-//		}
-//
-//		return Validated(
-//			signature: signatureWithPublicKey,
-//			derivationPath: hdPubKey.derivationPath
-//		)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		let hdPubKey = try self.derivedPublicKey.hdPubKey()
+		let signatureWithPublicKey: SignatureWithPublicKey = switch hdPubKey.publicKey {
+		case let .secp256k1(pubKey):
+			try .secp256k1(
+				publicKey: pubKey,
+				signature: .init(bytes: self.signature.data)
+			)
+		case let .ed25519(pubKey):
+			try .ed25519(
+				publicKey: pubKey,
+				signature: .init(bytes: self.signature.data)
+			)
+		}
+
+		let bytes32 = try Exactly32Bytes(bytes: hashed)
+		let hash = Hash(bytes32: bytes32)
+		let isValidSignature = signatureWithPublicKey.isValid(hash)
+
+		guard isValidSignature else {
+			loggerGlobal.error("Signature invalid for hashed msg: \(hashed.hex), signatureWithPublicKey: \(signatureWithPublicKey)")
+			throw InvalidSignature()
+		}
+
+		return Validated(
+			signature: signatureWithPublicKey,
+			derivationPath: hdPubKey.derivationPath
+		)
 	}
 }
 
@@ -269,7 +272,7 @@ extension Signer {
 		factorInstancesRequiredToSign.compactMap {
 			P2P.LedgerHardwareWallet.KeyParameters(
 				curve: $0.publicKey.curve.toLedger(),
-				derivationPath: $0.derivationPath.path.toString()
+				derivationPath: $0.derivationPath.toString()
 			)
 		}
 	}
