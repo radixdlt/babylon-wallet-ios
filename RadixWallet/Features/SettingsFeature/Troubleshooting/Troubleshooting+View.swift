@@ -55,6 +55,7 @@ extension Troubleshooting.View {
 				title: S.ContactSupport.title,
 				subtitle: S.ContactSupport.subtitle,
 				icon: .systemImage("envelope"),
+				accessory: .iconLinkOut,
 				action: .contactSupportButtonTapped
 			),
 			.model(

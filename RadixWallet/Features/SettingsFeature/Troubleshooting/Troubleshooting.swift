@@ -64,8 +64,12 @@ public struct Troubleshooting: Sendable, FeatureReducer {
 			return .none
 
 		case .contactSupportButtonTapped:
-			// TODO: Implement
-			return .none
+			guard let url = URL(string: "mailto:hello@radixdlt.com") else {
+				return .none
+			}
+			return .run { _ in
+				await openURL(url)
+			}
 
 		case .discordButtonTapped:
 			guard let url = URL(string: "http://discord.gg/radixdlt") else {
