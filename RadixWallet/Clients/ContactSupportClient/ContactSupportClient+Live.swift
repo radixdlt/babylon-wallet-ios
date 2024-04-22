@@ -4,12 +4,22 @@ import UIKit
 extension ContactSupportClient: DependencyKey {
 	static var liveValue: ContactSupportClient {
 		@Dependency(\.openURL) var openURL
-		let state = State()
+		@Dependency(\.device) var device
+		@Dependency(\.bundleInfo) var bundleInfo
+
+		@Sendable
+		func buildBody() async -> String {
+			let version = bundleInfo.shortVersion
+			let model = await device.localizedModel
+			let systemVersion = await device.systemVersion
+
+			return "\n\nApp version: \(version)\nDevice: \(model)\nSystem version: \(systemVersion)"
+		}
 
 		return .init(
 			openEmail: {
 				let uiApplicaition = await UIApplication.shared
-				let body = await state.buildBody()
+				let body = await buildBody()
 
 				for app in EmailApp.allCases {
 					if let url = app.build(body: body), await uiApplicaition.canOpenURL(url) {
@@ -65,23 +75,6 @@ private extension ContactSupportClient {
 				]
 				return components.url
 			}
-		}
-	}
-}
-
-// MARK: - ContactSupportClient.State
-private extension ContactSupportClient {
-	actor State {
-		@Dependency(\.device) var device
-		@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
-
-		@Sendable
-		func buildBody() async -> String {
-			let version = bundleInfo.shortVersion
-			let model = await device.localizedModel
-			let systemVersion = await device.systemVersion
-
-			return "\n\nApp version: \(version)\nDevice: \(model)\nSystem version: \(systemVersion)"
 		}
 	}
 }
