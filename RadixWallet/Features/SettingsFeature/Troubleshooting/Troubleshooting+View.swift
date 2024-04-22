@@ -1,5 +1,3 @@
-private typealias S = L10n.Troubleshooting
-
 // MARK: - Troubleshooting.View
 public extension Troubleshooting {
 	@MainActor
@@ -12,7 +10,7 @@ public extension Troubleshooting {
 
 		public var body: some SwiftUI.View {
 			content
-				.setUpNavigationBar(title: S.title)
+				.setUpNavigationBar(title: L10n.Troubleshooting.title)
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 				.presentsLoadingViewOverlay()
@@ -37,30 +35,30 @@ extension Troubleshooting.View {
 	@MainActor
 	private var rows: [SettingsRow<Troubleshooting>.Kind] {
 		[
-			.header(S.accountRecovery),
+			.header(L10n.Troubleshooting.accountRecovery),
 			.model(
-				title: S.AccountScan.title,
-				subtitle: S.AccountScan.subtitle,
+				title: L10n.Troubleshooting.AccountScan.title,
+				subtitle: L10n.Troubleshooting.AccountScan.subtitle,
 				icon: .asset(AssetResource.recovery),
 				action: .accountScanButtonTapped
 			),
 			.model(
-				title: S.LegacyImport.title,
-				subtitle: S.LegacyImport.subtitle,
+				title: L10n.Troubleshooting.LegacyImport.title,
+				subtitle: L10n.Troubleshooting.LegacyImport.subtitle,
 				icon: .asset(AssetResource.recovery),
 				action: .legacyImportButtonTapped
 			),
-			.header(S.supportAndCommunity),
+			.header(L10n.Troubleshooting.supportAndCommunity),
 			.model(
-				title: S.ContactSupport.title,
-				subtitle: S.ContactSupport.subtitle,
+				title: L10n.Troubleshooting.ContactSupport.title,
+				subtitle: L10n.Troubleshooting.ContactSupport.subtitle,
 				icon: .systemImage("envelope"),
 				accessory: .iconLinkOut,
 				action: .contactSupportButtonTapped
 			),
 			.model(
-				title: S.Discord.title,
-				subtitle: S.Discord.subtitle,
+				title: L10n.Troubleshooting.Discord.title,
+				subtitle: L10n.Troubleshooting.Discord.subtitle,
 				icon: .asset(AssetResource.discord),
 				accessory: .iconLinkOut,
 				action: .discordButtonTapped

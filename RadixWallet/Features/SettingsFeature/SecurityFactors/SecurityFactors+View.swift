@@ -1,5 +1,3 @@
-private typealias S = L10n.SecurityFactors
-
 extension SecurityFactors.State {
 	var viewState: SecurityFactors.ViewState {
 		.init(
@@ -29,7 +27,7 @@ public extension SecurityFactors {
 
 		public var body: some SwiftUI.View {
 			content
-				.setUpNavigationBar(title: S.title)
+				.setUpNavigationBar(title: L10n.SecurityFactors.title)
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 				.presentsLoadingViewOverlay()
@@ -58,18 +56,18 @@ private extension SecurityFactors.View {
 
 	func rows(viewStore: ViewStoreOf<SecurityFactors>) -> [SettingsRow<SecurityFactors>.Kind] {
 		[
-			.header(S.subtitle),
+			.header(L10n.SecurityFactors.subtitle),
 			.model(
-				title: S.SeedPhrases.title,
-				subtitle: S.SeedPhrases.subtitle,
+				title: L10n.SecurityFactors.SeedPhrases.title,
+				subtitle: L10n.SecurityFactors.SeedPhrases.subtitle,
 				detail: viewStore.seedPhrasesDetail,
 				hints: viewStore.seedPhraseHints,
 				icon: .asset(AssetResource.seedPhrases),
 				action: .seedPhrasesButtonTapped
 			),
 			.model(
-				title: S.LedgerWallet.title,
-				subtitle: S.LedgerWallet.subtitle,
+				title: L10n.SecurityFactors.LedgerWallet.title,
+				subtitle: L10n.SecurityFactors.LedgerWallet.subtitle,
 				detail: viewStore.ledgerWalletsDetail,
 				icon: .asset(AssetResource.ledger),
 				action: .ledgerWalletsButtonTapped
@@ -85,21 +83,21 @@ private extension SecurityFactors.ViewState {
 		guard let seedPhrasesCount else {
 			return nil
 		}
-		return seedPhrasesCount == 1 ? S.SeedPhrases.counterSingular : S.SeedPhrases.counterPlural(seedPhrasesCount)
+		return seedPhrasesCount == 1 ? L10n.SecurityFactors.SeedPhrases.counterSingular : L10n.SecurityFactors.SeedPhrases.counterPlural(seedPhrasesCount)
 	}
 
 	var seedPhraseHints: [Hint.ViewState] {
 		guard isSeedPhraseRequiredToRecoverAccounts else {
 			return []
 		}
-		return [.init(kind: .warning, text: .init(S.SeedPhrases.enterSeedPhrase))]
+		return [.init(kind: .warning, text: .init(L10n.SecurityFactors.SeedPhrases.enterSeedPhrase))]
 	}
 
 	var ledgerWalletsDetail: String? {
 		guard let ledgerWalletsCount else {
 			return nil
 		}
-		return ledgerWalletsCount == 1 ? S.LedgerWallet.counterSingular : S.LedgerWallet.counterPlural(ledgerWalletsCount)
+		return ledgerWalletsCount == 1 ? L10n.SecurityFactors.LedgerWallet.counterSingular : L10n.SecurityFactors.LedgerWallet.counterPlural(ledgerWalletsCount)
 	}
 }
 

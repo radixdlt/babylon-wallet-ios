@@ -1,5 +1,3 @@
-private typealias S = L10n.Preferences
-
 extension Preferences.State {
 	var viewState: Preferences.ViewState {
 		let isDeveloperModeEnabled = appPreferences?.security.isDeveloperModeEnabled ?? false
@@ -44,7 +42,7 @@ public extension Preferences {
 
 		public var body: some SwiftUI.View {
 			content
-				.setUpNavigationBar(title: S.title)
+				.setUpNavigationBar(title: L10n.Preferences.title)
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 				.presentsLoadingViewOverlay()
@@ -82,20 +80,20 @@ extension Preferences.View {
 		[
 			.separator,
 			.model(
-				title: S.DepositGuarantees.title,
-				subtitle: S.DepositGuarantees.subtitle,
+				title: L10n.Preferences.DepositGuarantees.title,
+				subtitle: L10n.Preferences.DepositGuarantees.subtitle,
 				icon: .asset(AssetResource.depositGuarantees),
 				action: .depositGuaranteesButtonTapped
 			),
 			.model(
-				title: S.HiddenEntities.title,
-				subtitle: S.HiddenEntities.subtitle,
+				title: L10n.Preferences.HiddenEntities.title,
+				subtitle: L10n.Preferences.HiddenEntities.subtitle,
 				icon: .systemImage("eye.fill"),
 				action: .hiddenEntitiesButtonTapped
 			),
-			.header(S.advancedPreferences),
+			.header(L10n.Preferences.advancedPreferences),
 			.model(
-				title: S.gateways,
+				title: L10n.Preferences.gateways,
 				icon: .asset(AssetResource.gateway),
 				action: .gatewaysButtonTapped
 			),
@@ -105,8 +103,8 @@ extension Preferences.View {
 	private func developerMode(viewStore: ViewStoreOf<Preferences>) -> some View {
 		ToggleView(
 			icon: AssetResource.developerMode,
-			title: S.DeveloperMode.title,
-			subtitle: S.DeveloperMode.subtitle,
+			title: L10n.Preferences.DeveloperMode.title,
+			subtitle: L10n.Preferences.DeveloperMode.subtitle,
 			minHeight: .zero,
 			isOn: viewStore.binding(
 				get: \.isDeveloperModeEnabled,
