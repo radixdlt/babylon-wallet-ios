@@ -12,7 +12,7 @@ public struct AddressView: View {
 	@Dependency(\.qrGeneratorClient) var qrGeneratorClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 
-	@State private var qrCodeContent: AccountAddress? = nil
+	@State private var accountAddress: AccountAddress? = nil
 
 	public init(
 		_ identifiable: LedgerIdentifiable,
@@ -39,19 +39,26 @@ extension AddressView {
 	public var body: some View {
 		if isTappable {
 			tappableAddressView
-				.sheet(item: $qrCodeContent) { accountAddress in
-					AccountAddressQRCodePanel(address: accountAddress)
-				}
 		} else {
 			addressView
 		}
 	}
 
 	private var tappableAddressView: some View {
-		Button(action: tapAction) {
-			addressView
-				.contentShape(.contextMenuPreview, RoundedRectangle(cornerRadius: .medium1))
-				.contextMenu {
+		Group {
+			if case let .address(.account(accountAddress, _)) = identifiable {
+				addressView
+					.onTapGesture {
+						self.accountAddress = accountAddress
+					}
+					.onLongPressGesture(perform: longPressGesture)
+					.sheet(item: $accountAddress) { address in
+						AccountAddressView(address: address) {
+							self.accountAddress = nil
+						}
+					}
+			} else {
+				Menu {
 					Button(copyText, asset: AssetResource.copyBig) {
 						copyToPasteboard()
 					}
@@ -59,25 +66,11 @@ extension AddressView {
 					Button(L10n.AddressAction.viewOnDashboard, asset: AssetResource.iconLinkOut) {
 						viewOnRadixDashboard()
 					}
-
-					if case let .address(.account(accountAddress, isLedgerHWAccount)) = identifiable {
-						Button(
-							L10n.AddressAction.showAccountQR,
-							asset: AssetResource.qrCodeScanner
-						) {
-							showQR(for: accountAddress)
-						}
-
-						if isLedgerHWAccount {
-							Button(
-								L10n.AddressAction.verifyAddressLedger,
-								asset: AssetResource.ledger
-							) {
-								verifyAddressOnLedger(accountAddress)
-							}
-						}
-					}
+				} label: {
+					addressView
 				}
+				.onLongPressGesture(perform: longPressGesture)
+			}
 		}
 	}
 
@@ -126,7 +119,7 @@ extension AddressView {
 }
 
 extension AddressView {
-	private func tapAction() {
+	private func longPressGesture() {
 		action == .copy ? copyToPasteboard() : viewOnRadixDashboard()
 	}
 
@@ -144,10 +137,6 @@ extension AddressView {
 					.appending(path: path)
 			)
 		}
-	}
-
-	private func showQR(for accountAddress: AccountAddress) {
-		qrCodeContent = accountAddress
 	}
 
 	private var path: String? {
@@ -170,74 +159,3 @@ struct AddressView_Previews: PreviewProvider {
 	}
 }
 #endif
-
-// MARK: - AccountAddressQRCodePanel
-public struct AccountAddressQRCodePanel: View {
-	private let address: AccountAddress
-	private let closeAction: (() -> Void)?
-
-	public init(address: AccountAddress, closeAction: (() -> Void)? = nil) {
-		self.address = address
-		self.closeAction = closeAction
-	}
-
-	public var body: some View {
-		VStack(spacing: 0) {
-			if let closeAction {
-				CloseButtonBar(action: closeAction)
-			}
-			QRCodeView(QR.addressPrefix + address.address, size: Self.qrImageSize)
-				.padding([.horizontal, .bottom], .large3)
-				.padding(.top, topPadding)
-		}
-		.presentationDetents([.medium])
-		.presentationDragIndicator(.visible)
-	}
-
-	private var topPadding: CGFloat {
-		closeAction == nil ? .large3 : 0
-	}
-
-	private static let qrImageSize: CGFloat = 300
-}
-
-// MARK: - QRCodeView
-public struct QRCodeView: View {
-	@Dependency(\.qrGeneratorClient) var qrGeneratorClient
-
-	private let content: String
-	private let size: CGSize
-	@State private var qrImage: Result<CGImage, Error>? = nil
-
-	public init(_ content: String, size: CGFloat) {
-		self.content = content
-		self.size = .init(width: size, height: size)
-	}
-
-	public var body: some View {
-		ZStack {
-			switch qrImage {
-			case .none:
-				Color.clear
-			case let .success(value):
-				Image(value, scale: 1, label: Text(L10n.AddressAction.QrCodeView.qrCodeLabel))
-					.resizable()
-					.aspectRatio(1, contentMode: .fit)
-					.transition(.scale(scale: 0.95).combined(with: .opacity))
-			case .failure:
-				Text(L10n.AddressAction.QrCodeView.failureLabel)
-					.foregroundColor(.app.alert)
-					.textStyle(.body1HighImportance)
-			}
-		}
-		.animation(.easeInOut, value: qrImage != nil)
-		.task {
-			do {
-				let image = try await qrGeneratorClient.generate(.init(content: content, size: size))
-				self.qrImage = .success(image)
-			} catch {
-				self.qrImage = .failure(error)
-			}
-		}
-	}
-}

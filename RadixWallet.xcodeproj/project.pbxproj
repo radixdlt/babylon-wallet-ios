@@ -5814,7 +5814,7 @@
 			isa = PBXGroup;
 			children = (
 				48CFC1432ADC10D900E77A5C /* AddressView.swift */,
-				5B2A45052BD6A8B700AEC8AD /* AccountAddressView */,
+				5B2A45062BD6A8C800AEC8AD /* AccountAddressView.swift */,
 			);
 			path = AddressView;
 			sourceTree = "<group>";
@@ -6650,14 +6650,6 @@
 				5B1C4FD92BBB0DCF00B9436F /* AppsFlyerClient+Live.swift */,
 			);
 			path = AppsFlyerClient;
-			sourceTree = "<group>";
-		};
-		5B2A45052BD6A8B700AEC8AD /* AccountAddressView */ = {
-			isa = PBXGroup;
-			children = (
-				5B2A45062BD6A8C800AEC8AD /* AccountAddressView.swift */,
-			);
-			path = AccountAddressView;
 			sourceTree = "<group>";
 		};
 		5B45E2F32BC45706007C4C84 /* FactorSourceAccess */ = {

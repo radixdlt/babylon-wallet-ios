@@ -18,7 +18,7 @@ extension ShowQR {
 extension ShowQR.View {
 	public var body: some View {
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-			AccountAddressQRCodePanel(address: viewStore.accountAddress) {
+			AccountAddressView(address: viewStore.accountAddress) {
 				viewStore.send(.closeButtonTapped)
 			}
 		}
