@@ -507,22 +507,19 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		in state: inout State,
 		softwareAccounts: MigratedSoftwareAccounts
 	) -> Effect<Action> {
-		/*
-		 guard
-		 	case let .checkedIfOlympiaFactorSourceAlreadyExists(progress) = state.progress
-		 else {
-		 	loggerGlobal.critical("Expected state to have been 'checkedIfOlympiaFactorSourceAlreadyExists' but it was: \(state.progress.discriminator)")
-		 	return progressError(state.progress)
-		 }
+		guard
+			case let .checkedIfOlympiaFactorSourceAlreadyExists(progress) = state.progress
+		else {
+			loggerGlobal.critical("Expected state to have been 'checkedIfOlympiaFactorSourceAlreadyExists' but it was: \(state.progress.discriminator)")
+			return progressError(state.progress)
+		}
 
-		 state.progress = .migratedSoftwareAccounts(.init(
-		 	previous: progress.previous,
-		 	migratedSoftwareAccounts: softwareAccounts.babylonAccounts
-		 ))
+		state.progress = .migratedSoftwareAccounts(.init(
+			previous: progress.previous,
+			migratedSoftwareAccounts: softwareAccounts.babylonAccounts.asIdentified()
+		))
 
-		 return migrateHardwareAccounts(in: &state)
-		  */
-		sargonProfileFinishMigrateAtEndOfStage1()
+		return migrateHardwareAccounts(in: &state)
 	}
 
 	private func migrateHardwareAccounts(
