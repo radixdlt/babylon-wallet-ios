@@ -396,30 +396,26 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		in state: inout State,
 		mnemonicWithPassphrase: MnemonicWithPassphrase
 	) -> Effect<Action> {
-//		guard case let .checkedIfOlympiaFactorSourceAlreadyExists(progress) = state.progress else { return progressError(state.progress) }
-//
-//		do {
-//			try mnemonicWithPassphrase.validatePublicKeys(
-//				of: progress.softwareAccountsToMigrate
-//			)
-//
-//			let privateHDFactorSource = try PrivateHierarchicalDeterministicFactorSource(
-//				mnemonicWithPassphrase: mnemonicWithPassphrase,
-//				factorSource: DeviceFactorSource.olympia(
-//					mnemonicWithPassphrase: mnemonicWithPassphrase
-//				)
-//			)
-//
-//			return migrateSoftwareAccountsToBabylon(
-//				progress.softwareAccountsToMigrate,
-//				factorSourceID: privateHDFactorSource.factorSource.id,
-//				factorSource: privateHDFactorSource
-//			)
-//		} catch {
-//			errorQueue.schedule(error)
-//			return .none
-//		}
-		sargonProfileFinishMigrateAtEndOfStage1()
+		guard case let .checkedIfOlympiaFactorSourceAlreadyExists(progress) = state.progress else { return progressError(state.progress) }
+
+		do {
+			try mnemonicWithPassphrase.validatePublicKeys(
+				of: progress.softwareAccountsToMigrate
+			)
+
+			let privateHDFactorSource = PrivateHierarchicalDeterministicFactorSource.olympia(
+				mnemonicWithPassphrase: mnemonicWithPassphrase
+			)
+
+			return migrateSoftwareAccountsToBabylon(
+				progress.softwareAccountsToMigrate,
+				factorSourceID: privateHDFactorSource.factorSource.id,
+				factorSource: privateHDFactorSource
+			)
+		} catch {
+			errorQueue.schedule(error)
+			return .none
+		}
 	}
 
 	private func migrateSoftwareAccountsToBabylon(
