@@ -24,10 +24,10 @@ final class NewConnectionTests: TestCase {
 		}
 		"""
 
-		await store.send(.child(.scanQR(.child(.scanQR(.view(.scanned(.success(qrString))))))))
+		await store.send(.child(.root(.scanQR(.child(.scanQR(.view(.scanned(.success(qrString)))))))))
 
-		await store.receive(.child(.scanQR(.child(.scanQR(.delegate(.scanned(qrString)))))))
-		await store.receive(.child(.scanQR(.delegate(.scanned(qrString)))))
+		await store.receive(.child(.root(.scanQR(.child(.scanQR(.delegate(.scanned(qrString))))))))
+		await store.receive(.child(.root(.scanQR(.delegate(.scanned(qrString))))))
 
 		await store.receive(.internal(.linkConnectionDataFromStringResult(.success(qrData)))) {
 			$0.linkConnectionQRData = qrData
@@ -57,20 +57,20 @@ final class NewConnectionTests: TestCase {
 			$0.radixConnectClient.connectP2PLink = { _ in }
 		}
 
-		await store.send(.child(.connectionApproval(.view(.continueButtonTapped))))
+		await store.send(.child(.root(.connectionApproval(.view(.continueButtonTapped)))))
 
-		await store.receive(.child(.connectionApproval(.delegate(.approved(purpose))))) {
+		await store.receive(.child(.root(.connectionApproval(.delegate(.approved(purpose)))))) {
 			$0.root = .nameConnection(.init())
 		}
 
-		await store.send(.child(.nameConnection(.view(.nameOfConnectionChanged(connectionName + "\n"))))) {
+		await store.send(.child(.root(.nameConnection(.view(.nameOfConnectionChanged(connectionName + "\n")))))) {
 			$0.root = .nameConnection(.init(
 				nameOfConnection: connectionName
 			))
 		}
-		await store.send(.child(.nameConnection(.view(.confirmNameButtonTapped))))
+		await store.send(.child(.root(.nameConnection(.view(.confirmNameButtonTapped)))))
 
-		await store.receive(.child(.nameConnection(.delegate(.nameSet(connectionName)))))
+		await store.receive(.child(.root(.nameConnection(.delegate(.nameSet(connectionName))))))
 		await store.receive(.internal(.establishConnection(connectionName))) {
 			$0.root = .nameConnection(.init(
 				isConnecting: true,
@@ -107,9 +107,9 @@ final class NewConnectionTests: TestCase {
 			$0.radixConnectClient.connectP2PLink = { _ in }
 		}
 
-		await store.send(.child(.connectionApproval(.view(.continueButtonTapped))))
+		await store.send(.child(.root(.connectionApproval(.view(.continueButtonTapped)))))
 
-		await store.receive(.child(.connectionApproval(.delegate(.approved(purpose)))))
+		await store.receive(.child(.root(.connectionApproval(.delegate(.approved(purpose))))))
 		await store.receive(.internal(.establishConnection(connectionName))) {
 			$0.root = .connectionApproval(.init(
 				purpose: purpose,
