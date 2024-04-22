@@ -30,7 +30,6 @@
 		483A3DEC2BD31F5A00055932 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 483A3DEB2BD31F5A00055932 /* Sargon */; };
 		484161392BCACA7500D2B644 /* Stage1MigrateToSargon+FactorSourceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484161382BCACA7500D2B644 /* Stage1MigrateToSargon+FactorSourceProtocol.swift */; };
 		4841613B2BCACB7200D2B644 /* Stage1MigrateToSargon+FactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4841613A2BCACB7200D2B644 /* Stage1MigrateToSargon+FactorSource.swift */; };
-		4841613D2BCACC8200D2B644 /* EncryptedProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4841613C2BCACC8200D2B644 /* EncryptedProfile.swift */; };
 		4841613F2BCACD5300D2B644 /* Stage1MigrateToSargon+ThirdPartyDeposits.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4841613E2BCACD5300D2B644 /* Stage1MigrateToSargon+ThirdPartyDeposits.swift */; };
 		484161412BCACDC700D2B644 /* Stage1MigrateToSargon+DepositAddressExceptionRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484161402BCACDC700D2B644 /* Stage1MigrateToSargon+DepositAddressExceptionRule.swift */; };
 		484161432BCACE6000D2B644 /* Stage1MigrateToSargon+FactorSourceIDFromHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484161422BCACE6000D2B644 /* Stage1MigrateToSargon+FactorSourceIDFromHash.swift */; };
@@ -1157,7 +1156,6 @@
 		E6DBA3612ADEBFB300A38425 /* BIP39TestVectors.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2CB2ADEBFB300A38425 /* BIP39TestVectors.swift */; };
 		E6DBA3622ADEBFB300A38425 /* MnemonicChecksumTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2CC2ADEBFB300A38425 /* MnemonicChecksumTests.swift */; };
 		E6DBA3632ADEBFB300A38425 /* ProfileTestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2CF2ADEBFB300A38425 /* ProfileTestUtils.swift */; };
-		E6DBA3642ADEBFB300A38425 /* SnapshotTestVector.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2D02ADEBFB300A38425 /* SnapshotTestVector.swift */; };
 		E6DBA3652ADEBFB300A38425 /* only_plaintext_profile_snapshot_version_100.json in Resources */ = {isa = PBXBuildFile; fileRef = E6DBA2D32ADEBFB300A38425 /* only_plaintext_profile_snapshot_version_100.json */; };
 		E6DBA3662ADEBFB300A38425 /* factor_sources.json in Resources */ = {isa = PBXBuildFile; fileRef = E6DBA2D42ADEBFB300A38425 /* factor_sources.json */; };
 		E6DBA3672ADEBFB300A38425 /* multi_profile_snapshots_test_version_100.json in Resources */ = {isa = PBXBuildFile; fileRef = E6DBA2D52ADEBFB300A38425 /* multi_profile_snapshots_test_version_100.json */; };
@@ -1225,7 +1223,6 @@
 		483A3DE52BD2678900055932 /* Stage1MigrateToSargon+FactorSourceCryptoParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+FactorSourceCryptoParameters.swift"; sourceTree = "<group>"; };
 		484161382BCACA7500D2B644 /* Stage1MigrateToSargon+FactorSourceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+FactorSourceProtocol.swift"; sourceTree = "<group>"; };
 		4841613A2BCACB7200D2B644 /* Stage1MigrateToSargon+FactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+FactorSource.swift"; sourceTree = "<group>"; };
-		4841613C2BCACC8200D2B644 /* EncryptedProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncryptedProfile.swift; sourceTree = "<group>"; };
 		4841613E2BCACD5300D2B644 /* Stage1MigrateToSargon+ThirdPartyDeposits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+ThirdPartyDeposits.swift"; sourceTree = "<group>"; };
 		484161402BCACDC700D2B644 /* Stage1MigrateToSargon+DepositAddressExceptionRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+DepositAddressExceptionRule.swift"; sourceTree = "<group>"; };
 		484161422BCACE6000D2B644 /* Stage1MigrateToSargon+FactorSourceIDFromHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+FactorSourceIDFromHash.swift"; sourceTree = "<group>"; };
@@ -2317,7 +2314,6 @@
 		E6DBA2CB2ADEBFB300A38425 /* BIP39TestVectors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BIP39TestVectors.swift; sourceTree = "<group>"; };
 		E6DBA2CC2ADEBFB300A38425 /* MnemonicChecksumTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MnemonicChecksumTests.swift; sourceTree = "<group>"; };
 		E6DBA2CF2ADEBFB300A38425 /* ProfileTestUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileTestUtils.swift; sourceTree = "<group>"; };
-		E6DBA2D02ADEBFB300A38425 /* SnapshotTestVector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnapshotTestVector.swift; sourceTree = "<group>"; };
 		E6DBA2D32ADEBFB300A38425 /* only_plaintext_profile_snapshot_version_100.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = only_plaintext_profile_snapshot_version_100.json; sourceTree = "<group>"; };
 		E6DBA2D42ADEBFB300A38425 /* factor_sources.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = factor_sources.json; sourceTree = "<group>"; };
 		E6DBA2D52ADEBFB300A38425 /* multi_profile_snapshots_test_version_100.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = multi_profile_snapshots_test_version_100.json; sourceTree = "<group>"; };
@@ -5882,7 +5878,6 @@
 		E65D6CE82BC9819C001D8A39 /* Stage1 */ = {
 			isa = PBXGroup;
 			children = (
-				4841613C2BCACC8200D2B644 /* EncryptedProfile.swift */,
 				E63257642BB314F600952051 /* ExecutionSummary+Extensions.swift */,
 				48AF19CD2BB71C1600796130 /* IntoSargon+Bridge.swift */,
 				4855B1B52BCA613300DD0A47 /* NewProtocolInSargon */,
@@ -6372,7 +6367,6 @@
 			children = (
 				E6DBA2CF2ADEBFB300A38425 /* ProfileTestUtils.swift */,
 				48F9CFE32B0375A500657755 /* ProfileBuilder.swift */,
-				E6DBA2D02ADEBFB300A38425 /* SnapshotTestVector.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -6895,7 +6889,6 @@
 				E6DBA3342ADEBFB300A38425 /* GatewaySettingsFeatureTests.swift in Sources */,
 				E6DBA3602ADEBFB300A38425 /* ChecksummedTestVectors.swift in Sources */,
 				48F9CFE72B03A0A000657755 /* ProfileBuilderTest.swift in Sources */,
-				E6DBA3642ADEBFB300A38425 /* SnapshotTestVector.swift in Sources */,
 				830EA9E02AEB8219004C8051 /* AccountAndPersonaHidingTests.swift in Sources */,
 				E6DBA31A2ADEBFB300A38425 /* DataChannelClientTests.swift in Sources */,
 				E6DBA32B2ADEBFB300A38425 /* JSON+Sendable.swift in Sources */,
@@ -7082,7 +7075,6 @@
 				48CFC4BF2ADC10DA00E77A5C /* StateEntityFungiblesPageRequest.swift in Sources */,
 				48CFC49E2ADC10DA00E77A5C /* StateEntityDetailsOptIns.swift in Sources */,
 				48CFC4002ADC10D900E77A5C /* Constants.swift in Sources */,
-				4841613D2BCACC8200D2B644 /* EncryptedProfile.swift in Sources */,
 				48CFC4DE2ADC10DA00E77A5C /* FungibleResourcesCollectionItemVaultAggregatedVault.swift in Sources */,
 				5B45E2FE2BC59780007C4C84 /* SignWithFactorSource+View.swift in Sources */,
 				5B45E2FF2BC59780007C4C84 /* SignWithFactorSource.swift in Sources */,

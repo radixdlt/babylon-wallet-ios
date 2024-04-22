@@ -9,7 +9,7 @@ struct NoJSONDataFound: Error {}
 /// An exportable (and thus importable) Profile file, either encrypted or plaintext.
 public enum ExportableProfileFile: FileDocument, Sendable, Hashable {
 	case plaintext(Sargon.Profile)
-	case encrypted(EncryptedProfileSnapshot)
+	case encrypted(EncryptedProfileJSONData)
 }
 
 extension String {
@@ -40,14 +40,7 @@ extension ExportableProfileFile {
 		do {
 			self = try .plaintext(Sargon.Profile(json: data))
 		} catch let decodePlaintextError {
-			do {
-				self = try .encrypted(jsonDecoder().decode(EncryptedProfileSnapshot.self, from: data))
-			} catch {
-				loggerGlobal.error("Failed to decode imported profile file JSON as Sargon.Profile, underlying error: \(decodePlaintextError)")
-
-				loggerGlobal.error("Failed to decode imported profile file JSON as EncryptedProfileSnapshot, underlying error: \(error)")
-				throw error
-			}
+			self = .encrypted(data)
 		}
 	}
 

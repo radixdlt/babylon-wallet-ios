@@ -2,22 +2,18 @@ import ComposableArchitecture
 import SwiftUI
 
 public typealias EncryptionPassword = String
+public typealias EncryptedProfileJSONData = Data
 
 // MARK: - EncryptOrDecryptProfile
 public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public enum Mode: Sendable, Hashable {
-			case decrypt(EncryptedProfileSnapshot)
+			case decrypt(EncryptedProfileJSONData)
 
-			case loadThenEncrypt(
-				kdfScheme: PasswordBasedKeyDerivationScheme = .default,
-				encryptionScheme: EncryptionScheme = .default
-			)
+			case loadThenEncrypt
 
 			case encryptSpecific(
-				profileSnapshot: Sargon.Profile,
-				kdfScheme: PasswordBasedKeyDerivationScheme = .default,
-				encryptionScheme: EncryptionScheme = .default
+				profileSnapshot: Sargon.Profile
 			)
 
 			var isDecrypt: Bool {
@@ -66,16 +62,14 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 		case focusTextField(State.Field?)
 
 		case loadProfileSnapshotToEncryptResult(
-			TaskResult<Sargon.Profile>,
-			kdfScheme: PasswordBasedKeyDerivationScheme,
-			encryptionScheme: EncryptionScheme
+			TaskResult<Sargon.Profile>
 		)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case successfullyDecrypted(encrypted: EncryptedProfileSnapshot, decrypted: Sargon.Profile)
-		case successfullyEncrypted(plaintext: Sargon.Profile, encrypted: EncryptedProfileSnapshot)
+		case successfullyDecrypted(encrypted: EncryptedProfileJSONData, decrypted: Sargon.Profile)
+		case successfullyEncrypted(plaintext: Sargon.Profile, encrypted: EncryptedProfileJSONData)
 	}
 
 	// MARK: - Destination
@@ -117,13 +111,11 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 			return .run { [mode = state.mode] send in
 				await send(.internal(.focusTextField(.encryptionPassword)))
 				switch mode {
-				case let .loadThenEncrypt(kdfScheme, encryptionScheme):
+				case .loadThenEncrypt:
 					let result = await TaskResult { try await backupsClient.snapshotOfProfileForExport() }
 
 					await send(.internal(.loadProfileSnapshotToEncryptResult(
-						result,
-						kdfScheme: kdfScheme,
-						encryptionScheme: encryptionScheme
+						result
 					)))
 
 				case .encryptSpecific:
@@ -148,23 +140,13 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 				preconditionFailure("should have loaded already...")
 				return .send(.delegate(.dismiss))
 
-			case let .encryptSpecific(snapshot, kdfScheme, encryptionScheme):
-				do {
-					let encrypted = try snapshot.encrypt(
-						password: password,
-						kdfScheme: kdfScheme,
-						encryptionScheme: encryptionScheme
-					)
+			case let .encryptSpecific(snapshot):
+				let encrypted = snapshot.encrypt(password: password)
+				return .send(.delegate(.successfullyEncrypted(plaintext: snapshot, encrypted: encrypted)))
 
-					return .send(.delegate(.successfullyEncrypted(plaintext: snapshot, encrypted: encrypted)))
-				} catch {
-					loggerGlobal.error("Failed to encrypt profile snapshot, error: \(error)")
-					state.destination = .incorrectPasswordAlert(encrypt: true)
-					return .none
-				}
 			case let .decrypt(encrypted):
 				do {
-					let decrypted = try encrypted.decrypt(password: password)
+					let decrypted = try Profile(encrypted: encrypted, decryptionPassword: password)
 					return .send(.delegate(.successfullyDecrypted(encrypted: encrypted, decrypted: decrypted)))
 				} catch {
 					loggerGlobal.error("Failed to encrypt profile snapshot, error: \(error)")
@@ -197,15 +179,13 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 			state.focusedField = focus
 			return .none
 
-		case let .loadProfileSnapshotToEncryptResult(.success(snapshotToEncrypt), kdfScheme, encryptionScheme):
+		case let .loadProfileSnapshotToEncryptResult(.success(snapshotToEncrypt)):
 			state.mode = .encryptSpecific(
-				profileSnapshot: snapshotToEncrypt,
-				kdfScheme: kdfScheme,
-				encryptionScheme: encryptionScheme
+				profileSnapshot: snapshotToEncrypt
 			)
 			return .none
 
-		case let .loadProfileSnapshotToEncryptResult(.failure(error), _, _):
+		case let .loadProfileSnapshotToEncryptResult(.failure(error)):
 			let errorMsg = "Failed to load profile snapshot to encrypt, error: \(error)"
 			loggerGlobal.error(.init(stringLiteral: errorMsg))
 			errorQueue.schedule(error)

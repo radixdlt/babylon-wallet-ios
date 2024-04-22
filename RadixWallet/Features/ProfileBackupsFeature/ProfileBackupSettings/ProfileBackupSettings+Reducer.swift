@@ -253,7 +253,7 @@ public struct ProfileBackupSettings: Sendable, FeatureReducer {
 
 	private func exportProfile(encrypt: Bool, state: inout State) -> Effect<Action> {
 		if encrypt {
-			state.destination = .inputEncryptionPassword(.init(mode: .loadThenEncrypt()))
+			state.destination = .inputEncryptionPassword(.init(mode: .loadThenEncrypt))
 			return .none
 		} else {
 			return .run { send in
