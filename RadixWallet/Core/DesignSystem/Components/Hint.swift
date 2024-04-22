@@ -81,7 +81,7 @@ public struct Hint: View, Equatable {
 		case .info:
 			nil
 		case .error, .warning:
-			.warningError
+			.error
 		}
 	}
 }
