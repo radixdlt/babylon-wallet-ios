@@ -3,7 +3,7 @@ import Sargon
 
 extension Gateways {
 	public static var preset: Self {
-		sargonProfileFinishMigrateAtEndOfStage1()
+		Self.default
 	}
 }
 
@@ -13,8 +13,7 @@ extension Gateways {
 	/// All gateways
 	public var all: Elements {
 		var elements = IdentifiedArrayOf<Gateway>(uniqueElements: [current])
-//		elements.append(contentsOf: other)
-//		return .init(rawValue: elements)!
-		sargonProfileFinishMigrateAtEndOfStage1()
+		elements.append(contentsOf: other.elements)
+		return .init(rawValue: elements)!
 	}
 }
