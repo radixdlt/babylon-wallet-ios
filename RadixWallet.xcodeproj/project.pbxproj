@@ -1048,6 +1048,8 @@
 		5B1C4FD52BBB0B0C00B9436F /* AppsFlyerLib-Strict in Frameworks */ = {isa = PBXBuildFile; productRef = 5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */; };
 		5B1C4FD82BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1C4FD72BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift */; };
 		5B1C4FDA2BBB0DCF00B9436F /* AppsFlyerClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1C4FD92BBB0DCF00B9436F /* AppsFlyerClient+Live.swift */; };
+		5B2A45022BD6680400AEC8AD /* ContactSupportClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2A45012BD6680400AEC8AD /* ContactSupportClient.swift */; };
+		5B2A45042BD6689100AEC8AD /* ContactSupportClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2A45032BD6689100AEC8AD /* ContactSupportClient+Live.swift */; };
 		5B45E2FA2BC45770007C4C84 /* FactorSourceAccess+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E2F82BC45770007C4C84 /* FactorSourceAccess+View.swift */; };
 		5B45E2FB2BC45770007C4C84 /* FactorSourceAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E2F92BC45770007C4C84 /* FactorSourceAccess.swift */; };
 		5B45E2FE2BC59780007C4C84 /* SignWithFactorSource+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E2FC2BC59780007C4C84 /* SignWithFactorSource+View.swift */; };
@@ -2332,6 +2334,8 @@
 		48FFFAF12ADC23AC00B2B213 /* Exports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exports.swift; sourceTree = "<group>"; };
 		5B1C4FD72BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppsFlyerClient+Interface.swift"; sourceTree = "<group>"; };
 		5B1C4FD92BBB0DCF00B9436F /* AppsFlyerClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppsFlyerClient+Live.swift"; sourceTree = "<group>"; };
+		5B2A45012BD6680400AEC8AD /* ContactSupportClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactSupportClient.swift; sourceTree = "<group>"; };
+		5B2A45032BD6689100AEC8AD /* ContactSupportClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ContactSupportClient+Live.swift"; sourceTree = "<group>"; };
 		5B45E2F82BC45770007C4C84 /* FactorSourceAccess+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceAccess+View.swift"; sourceTree = "<group>"; };
 		5B45E2F92BC45770007C4C84 /* FactorSourceAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorSourceAccess.swift; sourceTree = "<group>"; };
 		5B45E2FC2BC59780007C4C84 /* SignWithFactorSource+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SignWithFactorSource+View.swift"; sourceTree = "<group>"; };
@@ -4933,6 +4937,7 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
+				5B2A45002BD667FB00AEC8AD /* ContactSupportClient */,
 				5B9846BE2BBD5EF600E814F3 /* SensitiveInfoClient */,
 				5B1C4FD62BBB0C0100B9436F /* AppsFlyerClient */,
 				8370FC5A2B99C732007AD882 /* NPSSurveyClient */,
@@ -6637,6 +6642,15 @@
 				5B1C4FD92BBB0DCF00B9436F /* AppsFlyerClient+Live.swift */,
 			);
 			path = AppsFlyerClient;
+			sourceTree = "<group>";
+		};
+		5B2A45002BD667FB00AEC8AD /* ContactSupportClient */ = {
+			isa = PBXGroup;
+			children = (
+				5B2A45012BD6680400AEC8AD /* ContactSupportClient.swift */,
+				5B2A45032BD6689100AEC8AD /* ContactSupportClient+Live.swift */,
+			);
+			path = ContactSupportClient;
 			sourceTree = "<group>";
 		};
 		5B45E2F32BC45706007C4C84 /* FactorSourceAccess */ = {
@@ -8763,6 +8777,7 @@
 				48CFC4A02ADC10DA00E77A5C /* TransactionCommittedDetailsResponse.swift in Sources */,
 				48CFC3302ADC10D900E77A5C /* ImportMnemonicWord.swift in Sources */,
 				48CFC6762ADC10DB00E77A5C /* NextDerivationIndicesPerNetwork.swift in Sources */,
+				5B2A45022BD6680400AEC8AD /* ContactSupportClient.swift in Sources */,
 				48CFC3372ADC10D900E77A5C /* PreviewResult+View.swift in Sources */,
 				48CFC5262ADC10DA00E77A5C /* NonFungibleIdsCollection.swift in Sources */,
 				48CFC6492ADC10DB00E77A5C /* PersonaData+DateOfBirth.swift in Sources */,
@@ -8815,6 +8830,7 @@
 				48CFC4C22ADC10DA00E77A5C /* StateEntityDetailsResponseNonFungibleVaultDetails.swift in Sources */,
 				48CFC3852ADC10D900E77A5C /* EmptyAssetListView.swift in Sources */,
 				A41266F72B160F3F00EA38E9 /* ManualAccountRecoveryCoordinator+Reducer.swift in Sources */,
+				5B2A45042BD6689100AEC8AD /* ContactSupportClient+Live.swift in Sources */,
 				48CFC4552ADC10DA00E77A5C /* CacheClient+Live.swift in Sources */,
 				48CFC3F32ADC10D900E77A5C /* PeerConnectionClient.swift in Sources */,
 				48CFC33E2ADC10D900E77A5C /* DappInteractionFlow+View.swift in Sources */,

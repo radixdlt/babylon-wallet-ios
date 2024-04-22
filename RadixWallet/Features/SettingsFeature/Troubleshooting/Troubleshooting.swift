@@ -41,6 +41,7 @@ public struct Troubleshooting: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.openURL) var openURL
+	@Dependency(\.contactSupportClient) var contactSupport
 
 	public init() {}
 
@@ -64,11 +65,8 @@ public struct Troubleshooting: Sendable, FeatureReducer {
 			return .none
 
 		case .contactSupportButtonTapped:
-			guard let url = URL(string: "mailto:hello@radixdlt.com") else {
-				return .none
-			}
 			return .run { _ in
-				await openURL(url)
+				await contactSupport.openEmail()
 			}
 
 		case .discordButtonTapped:
