@@ -1,5 +1,6 @@
 import SwiftUI
 
+@MainActor
 struct AccountAddressView: View {
 	let address: AccountAddress
 	let closeAction: () -> Void

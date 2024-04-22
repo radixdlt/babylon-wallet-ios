@@ -1,4 +1,5 @@
 // MARK: - AddressView
+@MainActor
 public struct AddressView: View {
 	let identifiable: LedgerIdentifiable
 	let isTappable: Bool

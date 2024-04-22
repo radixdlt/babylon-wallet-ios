@@ -2,6 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - KeyValueView
+@MainActor
 struct KeyValueView<Content: View>: View {
 	let key: String
 	let content: Content
