@@ -1052,6 +1052,7 @@
 		5B1C4FD52BBB0B0C00B9436F /* AppsFlyerLib-Strict in Frameworks */ = {isa = PBXBuildFile; productRef = 5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */; };
 		5B1C4FD82BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1C4FD72BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift */; };
 		5B1C4FDA2BBB0DCF00B9436F /* AppsFlyerClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B1C4FD92BBB0DCF00B9436F /* AppsFlyerClient+Live.swift */; };
+		5B2A45072BD6A8C800AEC8AD /* AccountAddressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2A45062BD6A8C800AEC8AD /* AccountAddressView.swift */; };
 		5B45E2FA2BC45770007C4C84 /* FactorSourceAccess+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E2F82BC45770007C4C84 /* FactorSourceAccess+View.swift */; };
 		5B45E2FB2BC45770007C4C84 /* FactorSourceAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E2F92BC45770007C4C84 /* FactorSourceAccess.swift */; };
 		5B45E2FE2BC59780007C4C84 /* SignWithFactorSource+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B45E2FC2BC59780007C4C84 /* SignWithFactorSource+View.swift */; };
@@ -2332,6 +2333,7 @@
 		48FFFAF12ADC23AC00B2B213 /* Exports.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Exports.swift; sourceTree = "<group>"; };
 		5B1C4FD72BBB0C1E00B9436F /* AppsFlyerClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppsFlyerClient+Interface.swift"; sourceTree = "<group>"; };
 		5B1C4FD92BBB0DCF00B9436F /* AppsFlyerClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppsFlyerClient+Live.swift"; sourceTree = "<group>"; };
+		5B2A45062BD6A8C800AEC8AD /* AccountAddressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountAddressView.swift; sourceTree = "<group>"; };
 		5B45E2F82BC45770007C4C84 /* FactorSourceAccess+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactorSourceAccess+View.swift"; sourceTree = "<group>"; };
 		5B45E2F92BC45770007C4C84 /* FactorSourceAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactorSourceAccess.swift; sourceTree = "<group>"; };
 		5B45E2FC2BC59780007C4C84 /* SignWithFactorSource+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SignWithFactorSource+View.swift"; sourceTree = "<group>"; };
@@ -5812,6 +5814,7 @@
 			isa = PBXGroup;
 			children = (
 				48CFC1432ADC10D900E77A5C /* AddressView.swift */,
+				5B2A45052BD6A8B700AEC8AD /* AccountAddressView */,
 			);
 			path = AddressView;
 			sourceTree = "<group>";
@@ -6647,6 +6650,14 @@
 				5B1C4FD92BBB0DCF00B9436F /* AppsFlyerClient+Live.swift */,
 			);
 			path = AppsFlyerClient;
+			sourceTree = "<group>";
+		};
+		5B2A45052BD6A8B700AEC8AD /* AccountAddressView */ = {
+			isa = PBXGroup;
+			children = (
+				5B2A45062BD6A8C800AEC8AD /* AccountAddressView.swift */,
+			);
+			path = AccountAddressView;
 			sourceTree = "<group>";
 		};
 		5B45E2F32BC45706007C4C84 /* FactorSourceAccess */ = {
@@ -7973,6 +7984,7 @@
 				48CFC4332ADC10DA00E77A5C /* Either+Extra.swift in Sources */,
 				48CFC2C72ADC10D900E77A5C /* MessageMode+View.swift in Sources */,
 				E6FA984A2B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift in Sources */,
+				5B2A45072BD6A8C800AEC8AD /* AccountAddressView.swift in Sources */,
 				48CFC57F2ADC10DA00E77A5C /* GatewayAPI.swift in Sources */,
 				48CFC3022ADC10D900E77A5C /* DebugManageFactorSources+View.swift in Sources */,
 				48CFC4702ADC10DA00E77A5C /* URLFormatterClient+Live.swift in Sources */,
