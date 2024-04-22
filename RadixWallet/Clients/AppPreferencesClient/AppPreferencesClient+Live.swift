@@ -11,34 +11,30 @@ extension AppPreferencesClient: DependencyKey {
 			getPreferences: {
 				await profileStore.profile.appPreferences
 			},
-			updatePreferences: { _ in
-//				try await profileStore.updating {
-//					$0.appPreferences = newPreferences
-//				}
-				sargonProfileFinishMigrateAtEndOfStage1()
+			updatePreferences: { newPreferences in
+				try await profileStore.updating {
+					$0.appPreferences = newPreferences
+				}
 			},
 			extractProfileSnapshot: {
-//				await profileStore.profile.snapshot()
-				sargonProfileFinishMigrateAtEndOfStage1()
+				await profileStore.profile
 			},
-			deleteProfileAndFactorSources: { _ in
-//				try await profileStore.deleteProfile(keepInICloudIfPresent: keepInICloudIfPresent)
-				sargonProfileFinishMigrateAtEndOfStage1()
+			deleteProfileAndFactorSources: { keepInICloudIfPresent in
+				try await profileStore.deleteProfile(keepInICloudIfPresent: keepInICloudIfPresent)
 			},
-			setIsCloudProfileSyncEnabled: { _ in
-//				@Dependency(\.secureStorageClient) var secureStorageClient
-//				let profile = await profileStore.profile
-//				let wasEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
-//				guard wasEnabled != isEnabled else { return }
-//
-//				try await profileStore.updating { profile in
-//					profile.appPreferences.security.isCloudProfileSyncEnabled = isEnabled
-//				}
-//				try secureStorageClient.updateIsCloudProfileSyncEnabled(
-//					profile.id,
-//					isEnabled ? .enable : .disable
-//				)
-				sargonProfileFinishMigrateAtEndOfStage1()
+			setIsCloudProfileSyncEnabled: { isEnabled in
+				@Dependency(\.secureStorageClient) var secureStorageClient
+				let profile = await profileStore.profile
+				let wasEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
+				guard wasEnabled != isEnabled else { return }
+
+				try await profileStore.updating { profile in
+					profile.appPreferences.security.isCloudProfileSyncEnabled = isEnabled
+				}
+				try secureStorageClient.updateIsCloudProfileSyncEnabled(
+					profile.id,
+					isEnabled ? .enable : .disable
+				)
 			}
 		)
 	}

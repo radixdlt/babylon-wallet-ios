@@ -11,7 +11,6 @@
 		480E50D52B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 480E50D32B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift */; };
 		4813AFDB2BC9A6C00046BCAD /* Stage1MigrateToSargon+AppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFDA2BC9A6C00046BCAD /* Stage1MigrateToSargon+AppPreferences.swift */; };
 		4813AFDD2BC9A7530046BCAD /* sargonProfileStage2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFDC2BC9A7530046BCAD /* sargonProfileStage2.swift */; };
-		4813AFE02BC9A80E0046BCAD /* TEMP_CODABLE_SO_CODE_COMPILES.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFDF2BC9A80E0046BCAD /* TEMP_CODABLE_SO_CODE_COMPILES.swift */; };
 		4813AFE22BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFE12BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift */; };
 		4813AFE52BC9AAAF0046BCAD /* stage3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFE42BC9AAAF0046BCAD /* stage3.swift */; };
 		4813AFEB2BC9AF4A0046BCAD /* RawRepresentable+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFEA2BC9AF4A0046BCAD /* RawRepresentable+Extensions.swift */; };
@@ -1207,7 +1206,6 @@
 		480E50D32B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecoverWalletWithoutProfileCoordinator+View.swift"; sourceTree = "<group>"; };
 		4813AFDA2BC9A6C00046BCAD /* Stage1MigrateToSargon+AppPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+AppPreferences.swift"; sourceTree = "<group>"; };
 		4813AFDC2BC9A7530046BCAD /* sargonProfileStage2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sargonProfileStage2.swift; sourceTree = "<group>"; };
-		4813AFDF2BC9A80E0046BCAD /* TEMP_CODABLE_SO_CODE_COMPILES.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TEMP_CODABLE_SO_CODE_COMPILES.swift; sourceTree = "<group>"; };
 		4813AFE12BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+NetworkDefinition.swift"; sourceTree = "<group>"; };
 		4813AFE42BC9AAAF0046BCAD /* stage3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = stage3.swift; sourceTree = "<group>"; };
 		4813AFEA2BC9AF4A0046BCAD /* RawRepresentable+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RawRepresentable+Extensions.swift"; sourceTree = "<group>"; };
@@ -2414,14 +2412,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		4813AFDE2BC9A7DD0046BCAD /* REMOVE_AT_END_OF_STAGE_1_GET_TO_COMPILE */ = {
-			isa = PBXGroup;
-			children = (
-				4813AFDF2BC9A80E0046BCAD /* TEMP_CODABLE_SO_CODE_COMPILES.swift */,
-			);
-			path = REMOVE_AT_END_OF_STAGE_1_GET_TO_COMPILE;
-			sourceTree = "<group>";
-		};
 		4813AFE32BC9AA960046BCAD /* Stage3 */ = {
 			isa = PBXGroup;
 			children = (
@@ -5896,7 +5886,6 @@
 				E63257642BB314F600952051 /* ExecutionSummary+Extensions.swift */,
 				48AF19CD2BB71C1600796130 /* IntoSargon+Bridge.swift */,
 				4855B1B52BCA613300DD0A47 /* NewProtocolInSargon */,
-				4813AFDE2BC9A7DD0046BCAD /* REMOVE_AT_END_OF_STAGE_1_GET_TO_COMPILE */,
 				4855B1C42BCAC72300DD0A47 /* SargonMigrateToSargon+HDPath.swift */,
 				E65D6CF32BC9836A001D8A39 /* sargonProfileStage1.swift */,
 				4855B1C22BCAC59C00DD0A47 /* Stage1MigrateToSargon+Account.swift */,
@@ -7072,7 +7061,6 @@
 				48CFC44E2ADC10DA00E77A5C /* AppPreferencesClient+Interface.swift in Sources */,
 				48CFC5432ADC10DA00E77A5C /* EntityMetadataCollection.swift in Sources */,
 				48CFC3442ADC10D900E77A5C /* AccountPermission.swift in Sources */,
-				4813AFE02BC9A80E0046BCAD /* TEMP_CODABLE_SO_CODE_COMPILES.swift in Sources */,
 				48CFC5E82ADC10DA00E77A5C /* FeatureReducer.swift in Sources */,
 				484161632BCADBFF00D2B644 /* Stage1MigrateToSargon+DeviceFactorSource.swift in Sources */,
 				48CFC6902ADC10DB00E77A5C /* MigratedHardwareAccounts.swift in Sources */,
