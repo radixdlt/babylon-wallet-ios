@@ -402,7 +402,7 @@ Only continue if you are linking to the **official Radix Connector browser exten
 "transactionReview_slideToSign" = "Slide to Sign";
 "transactionReview_xrdAmount" = "%@ XRD";
 "transactionReview_insufficientBalance" = "Insufficient Balance";
-"transactionReview_feePayerRequiredMessage" = "Fee Payer account required";
+"transactionReview_feePayerRequiredMessage" = "Fee payer account required";
 "transactionReview_withdrawalsHeading" = "Withdrawing From";
 "transactionReview_depositsHeading" = "Depositing To";
 "transactionReview_sendingToHeading" = "Sending to";
