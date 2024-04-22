@@ -4,9 +4,8 @@ public struct MigratedHardwareAccounts: Sendable, Hashable {
 	public let ledgerID: LedgerHardwareWalletFactorSource.ID
 
 	public let accounts: NonEmpty<OrderedSet<MigratedAccount>>
-	public var babylonAccounts: Sargon.Accounts {
-//		accounts.elements.map(\.babylon).asIdentified()
-		sargonProfileFinishMigrateAtEndOfStage1()
+	public var babylonAccounts: IdentifiedArrayOf<Sargon.Account> {
+		accounts.elements.map(\.babylon).asIdentified()
 	}
 
 	public init(
@@ -28,12 +27,11 @@ public struct MigratedHardwareAccounts: Sendable, Hashable {
 
 extension [MigratedHardwareAccounts] {
 	public func collectBabylonAccounts() -> IdentifiedArrayOf<Sargon.Account> {
-//		var result: IdentifiedArrayOf<Sargon.Account> = []
-//		for accounts in self {
-//			result.append(contentsOf: accounts.babylonAccounts)
-//		}
-//
-//		return result
-		sargonProfileFinishMigrateAtEndOfStage1()
+		var result: IdentifiedArrayOf<Sargon.Account> = []
+		for accounts in self {
+			result.append(contentsOf: accounts.babylonAccounts)
+		}
+
+		return result
 	}
 }

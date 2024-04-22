@@ -48,123 +48,96 @@ extension Sargon.ProfileNetwork {
 	}
 
 	public func detailsForAuthorizedDapp(_ dapp: AuthorizedDapp) throws -> AuthorizedDappDetailed {
-		/*
-		 guard
-		 	dapp.networkID == self.networkID
-		 else {
-		 	/// this is a sign that Sargon.Profile is in a bad state somehow...
-		 	throw NetworkDiscrepancyError()
-		 }
-		 let detailedAuthorizedPersonas = try IdentifiedArrayOf<Sargon.ProfileNetwork.AuthorizedPersonaDetailed>(uniqueElements: dapp.referencesToAuthorizedPersonas.map { simple in
+		guard
+			dapp.networkID == self.id
+		else {
+			/// this is a sign that Sargon.Profile is in a bad state somehow...
+			throw NetworkDiscrepancyError()
+		}
+		let detailedAuthorizedPersonas = try IdentifiedArrayOf<Sargon.ProfileNetwork.AuthorizedPersonaDetailed>(uniqueElements: dapp.referencesToAuthorizedPersonas.map {
+			simple in
 
-		 	guard
-		 		let persona = self.getPersonas().first(where: { $0.address == simple.identityAddress })
-		 	else {
-		 		/// this is a sign that Sargon.Profile is in a bad state somehow...
-		 		throw DiscrepancyAuthorizedDappReferencedPersonaWhichDoesNotExist()
-		 	}
+			guard
+				let persona = self.getPersonas().first(where: { $0.address == simple.identityAddress })
+			else {
+				/// this is a sign that Sargon.Profile is in a bad state somehow...
+				throw DiscrepancyAuthorizedDappReferencedPersonaWhichDoesNotExist()
+			}
+			let displayName = persona.displayName.asNonEmpty
+			return try AuthorizedPersonaDetailed(
+				identityAddress: persona.address,
+				displayName: displayName,
+				// Need to disable, since broken in swiftformat 0.52.7
+				// swiftformat:disable redundantClosure
+				simpleAccounts: {
+					if let sharedAccounts = simple.sharedAccounts {
+						try .init(sharedAccounts.ids.map { accountAddress in
+							guard
+								let account = self.getAccounts().first(where: { $0.address == accountAddress })
+							else {
+								throw AuthorizedDappReferencesAccountThatDoesNotExist()
+							}
+							return AccountForDisplay(
+								address: account.address,
+								label: account.displayName.asNonEmpty,
+								appearanceID: account.appearanceID
+							)
+						})
+					} else {
+						nil
+					}
+				}(),
+				// swiftformat:enable redundantClosure
+				sharedPersonaData: {
+					let full = persona.personaData
+					let fullIDs = Set(full.entries.map(\.id))
+					let shared = simple.sharedPersonaData
+					let sharedIDs = shared.entryIDs
 
-		 	return try AuthorizedPersonaDetailed(
-		 		identityAddress: persona.address,
-		 		displayName: persona.displayName,
-		 		// Need to disable, since broken in swiftformat 0.52.7
-		 		// swiftformat:disable redundantClosure
-		 		simpleAccounts: { if let sharedAccounts = simple.sharedAccounts {
-		 			try .init(sharedAccounts.ids.map { accountAddress in
-		 				guard
-		 					let account = self.getAccounts().first(where: { $0.address == accountAddress })
-		 				else {
-		 					throw AuthorizedDappReferencesAccountThatDoesNotExist()
-		 				}
-		 				return AccountForDisplay(
-		 					address: account.address,
-		 					label: account.displayName,
-		 					appearanceID: account.appearanceID
-		 				)
-		 			})
-		 		} else {
-		 			nil
-		 		}}(),
-		 		// swiftformat:enable redundantClosure
-		 		sharedPersonaData: {
-		 			let full = persona.personaData
-		 			let fullIDs = Set(full.entries.map(\.id))
-		 			let shared = simple.sharedPersonaData
-		 			let sharedIDs = shared.entryIDs
+					guard
+						fullIDs.isSuperset(of: sharedIDs)
+					else {
+						loggerGlobal.error("Profile discrepancy - most likely caused by incorrect implementation of DappInteractionFlow and updating of shared persona data. \n\nDetails [persona.personaData.ids] \(fullIDs) != \(sharedIDs) [simple.sharedPersonaData]\n\npersona.personaData: \(persona.personaData)\n\nsimple.sharedPersonaData:\(shared)")
+						throw AuthorizedDappReferencesFieldIDThatDoesNotExist()
+					}
 
-		 			guard
-		 				fullIDs.isSuperset(of: sharedIDs)
-		 			else {
-		 				loggerGlobal.error("Profile discrepancy - most likely caused by incorrect implementation of DappInteractionFlow and updating of shared persona data. \n\nDetails [persona.personaData.ids] \(fullIDs) != \(sharedIDs) [simple.sharedPersonaData]\n\npersona.personaData: \(persona.personaData)\n\nsimple.sharedPersonaData:\(shared)")
-		 				throw AuthorizedDappReferencesFieldIDThatDoesNotExist()
-		 			}
+					return PersonaData(
+						name: { () -> PersonaDataIdentifiedName? in
+							guard
+								let identifiedEntry = full.name
+							else {
+								return nil
+							}
+							guard
+								let idOfSharedName = shared.name,
+								idOfSharedName == identifiedEntry.id
+							else {
+								return nil
+							}
+							return PersonaDataIdentifiedName(id: idOfSharedName, value: identifiedEntry.value)
+						}(),
+						phoneNumbers: .init(collection: full.phoneNumbers.collection.filter(
+							{ (x: PersonaDataIdentifiedPhoneNumber) -> Bool in
+								shared.phoneNumbers?.ids.contains(where: { $0 == x.id }) ?? false
+							}
+						)),
+						emailAddresses: .init(collection: full.emailAddresses.collection.filter(
+							{ (x: PersonaDataIdentifiedEmailAddress) -> Bool in
+								shared.emailAddresses?.ids.contains(where: { $0 == x.id }) ?? false
+							}
+						))
+					)
+				}(),
+				hasAuthenticationSigningKey: persona.hasAuthenticationSigningKey
+			)
+		})
 
-		 			func pick<T>(
-		 				from fullKeyPath: KeyPath<PersonaData, PersonaData.IdentifiedEntry<T>?>,
-		 				using sharedKeyPath: KeyPath<AuthorizedPersonaSimple.SharedPersonaData,
-		 					PersonaDataEntryID?>
-		 			) -> PersonaData.IdentifiedEntry<T>? {
-		 				guard
-		 					let identifiedEntry = full[keyPath: fullKeyPath]
-		 				else {
-		 					return nil
-		 				}
-		 				guard
-		 					shared[keyPath: sharedKeyPath] == identifiedEntry.id
-		 				else {
-		 					return nil
-		 				}
-		 				return identifiedEntry
-		 			}
-
-		 			func filter<T>(
-		 				from fullKeyPath: KeyPath<PersonaData, PersonaData.CollectionOfIdentifiedEntries<T>>,
-		 				using sharedKeyPath: KeyPath<AuthorizedPersonaSimple.SharedPersonaData, AuthorizedPersonaSimple.SharedPersonaData.SharedCollection?>
-		 			) throws -> PersonaData.CollectionOfIdentifiedEntries<T> {
-		 				try .init(
-		 					collection: .init(uncheckedUniqueElements: full[keyPath: fullKeyPath].filter { value in
-		 						guard let sharedCollection = shared[keyPath: sharedKeyPath] else {
-		 							return false
-		 						}
-		 						guard sharedCollection.ids.contains(value.id) else {
-		 							return false
-		 						}
-		 						return true
-		 					})
-		 				)
-		 			}
-
-		 			let personaData = try PersonaData(
-		 				name: pick(from: \.name, using: \.name),
-		 				dateOfBirth: pick(from: \.dateOfBirth, using: \.dateOfBirth),
-		 				companyName: pick(from: \.companyName, using: \.companyName),
-		 				emailAddresses: filter(from: \.emailAddresses, using: \.emailAddresses),
-		 				phoneNumbers: filter(from: \.phoneNumbers, using: \.phoneNumbers),
-		 				urls: filter(from: \.urls, using: \.urls),
-		 				postalAddresses: filter(from: \.postalAddresses, using: \.postalAddresses),
-		 				creditCards: filter(from: \.creditCards, using: \.creditCards)
-		 			)
-
-		 			// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
-		 			// we do not forget to handle it here.
-		 			switch PersonaData.Entry.Kind.fullName {
-		 			case .fullName, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
-		 			}
-
-		 			return personaData
-		 		}(),
-		 		hasAuthenticationSigningKey: persona.hasAuthenticationSigningKey
-		 	)
-		 })
-
-		 return .init(
-		 	networkID: networkID,
-		 	dAppDefinitionAddress: dapp.dAppDefinitionAddress,
-		 	displayName: dapp.displayName,
-		 	detailedAuthorizedPersonas: detailedAuthorizedPersonas
-		 )
-		  */
-		sargonProfileFinishMigrateAtEndOfStage1()
+		return .init(
+			networkID: id,
+			dAppDefinitionAddress: dapp.dAppDefinitionAddress,
+			displayName: dapp.displayName.map { NonEmptyString(rawValue: $0) } ?? nil,
+			detailedAuthorizedPersonas: detailedAuthorizedPersonas
+		)
 	}
 
 	public struct NetworkDiscrepancyError: Swift.Error {}

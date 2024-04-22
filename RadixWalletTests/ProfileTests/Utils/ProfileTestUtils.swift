@@ -54,7 +54,7 @@ extension EmailAddress: ExpressibleByStringLiteral {
 	}
 }
 
-extension Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedPersonaData {
+extension Profile.Network.AuthorizedDapp.SharedPersonaData {
 	init(personaData: PersonaData) throws {
 		try self.init(
 			name: personaData.name?.id,

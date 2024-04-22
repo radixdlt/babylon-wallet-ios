@@ -6,7 +6,7 @@ extension SharedPersonaData {
 		sargonProfileFinishMigrateAtEndOfStage1()
 		/*
 		 func removeCollectionIfNeeded(
-		 	at keyPath: WritableKeyPath<Self, AuthorizedPersonaSimple.SharedPersonaData.SharedCollection?>
+		 	at keyPath: WritableKeyPath<Self, SharedPersonaData.SharedCollection?>
 		 ) {
 		 	guard
 		 		var collection = self[keyPath: keyPath],
@@ -132,7 +132,7 @@ extension SharedPersonaData {
 		 		)
 		 	}
 
-		 	return try AuthorizedPersonaSimple.SharedPersonaData.SharedCollection(
+		 	return try SharedPersonaData.SharedCollection(
 		 		ids: OrderedSet(validating: entriesSavedInPersona.map(\.id)),
 		 		forRequest: numberOfRequestedElements
 		 	)

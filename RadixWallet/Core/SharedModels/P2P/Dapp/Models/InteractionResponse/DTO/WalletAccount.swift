@@ -38,7 +38,7 @@ extension P2P.Dapp.Response.WalletAccount {
 	public init(account: Sargon.Account) {
 		self.init(
 			accountAddress: account.address,
-			label: account.displayName.asNonEmpty!,
+			label: account.displayName.asNonEmpty,
 			appearanceId: account.appearanceID
 		)
 	}

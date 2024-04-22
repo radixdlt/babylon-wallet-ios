@@ -8,8 +8,8 @@ extension DisplayName {
 }
 
 extension DisplayName {
-	public var asNonEmpty: NonEmptyString? {
-		NonEmptyString(rawValue: value)
+	public var asNonEmpty: NonEmptyString {
+		NonEmptyString(rawValue: value)!
 	}
 
 	public init(nonEmpty: NonEmptyString) {
