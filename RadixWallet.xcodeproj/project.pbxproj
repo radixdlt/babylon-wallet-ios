@@ -41,8 +41,6 @@
 		484161572BCAD96E00D2B644 /* Stage1MigrateToSargon+BIP39Word.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484161562BCAD96E00D2B644 /* Stage1MigrateToSargon+BIP39Word.swift */; };
 		484161592BCADA0A00D2B644 /* Stage1MigrateToSargon+BIP39+Lookup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484161582BCADA0A00D2B644 /* Stage1MigrateToSargon+BIP39+Lookup.swift */; };
 		4841615B2BCADA5800D2B644 /* Stage1MigrateToSargon+FactorSourceKindOfMnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4841615A2BCADA5800D2B644 /* Stage1MigrateToSargon+FactorSourceKindOfMnemonic.swift */; };
-		4841615D2BCADA8400D2B644 /* Stage1MigrateToSargon+BIP39Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4841615C2BCADA8400D2B644 /* Stage1MigrateToSargon+BIP39Language.swift */; };
-		4841615F2BCADAB400D2B644 /* Stage1MigrateToSargon+BIP39WordCount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4841615E2BCADAB400D2B644 /* Stage1MigrateToSargon+BIP39WordCount.swift */; };
 		484161612BCADB4400D2B644 /* Stage1MigrateToSargon+Mnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484161602BCADB4400D2B644 /* Stage1MigrateToSargon+Mnemonic.swift */; };
 		484161632BCADBFF00D2B644 /* Stage1MigrateToSargon+DeviceFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484161622BCADBFF00D2B644 /* Stage1MigrateToSargon+DeviceFactorSource.swift */; };
 		484161652BCADD9600D2B644 /* Stage1MigrateToSargon+BIP44LikePath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484161642BCADD9600D2B644 /* Stage1MigrateToSargon+BIP44LikePath.swift */; };
@@ -1232,8 +1230,6 @@
 		484161562BCAD96E00D2B644 /* Stage1MigrateToSargon+BIP39Word.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+BIP39Word.swift"; sourceTree = "<group>"; };
 		484161582BCADA0A00D2B644 /* Stage1MigrateToSargon+BIP39+Lookup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+BIP39+Lookup.swift"; sourceTree = "<group>"; };
 		4841615A2BCADA5800D2B644 /* Stage1MigrateToSargon+FactorSourceKindOfMnemonic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+FactorSourceKindOfMnemonic.swift"; sourceTree = "<group>"; };
-		4841615C2BCADA8400D2B644 /* Stage1MigrateToSargon+BIP39Language.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+BIP39Language.swift"; sourceTree = "<group>"; };
-		4841615E2BCADAB400D2B644 /* Stage1MigrateToSargon+BIP39WordCount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+BIP39WordCount.swift"; sourceTree = "<group>"; };
 		484161602BCADB4400D2B644 /* Stage1MigrateToSargon+Mnemonic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+Mnemonic.swift"; sourceTree = "<group>"; };
 		484161622BCADBFF00D2B644 /* Stage1MigrateToSargon+DeviceFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+DeviceFactorSource.swift"; sourceTree = "<group>"; };
 		484161642BCADD9600D2B644 /* Stage1MigrateToSargon+BIP44LikePath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+BIP44LikePath.swift"; sourceTree = "<group>"; };
@@ -5885,10 +5881,8 @@
 				483A3DE32BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift */,
 				4813AFFE2BC9B62F0046BCAD /* Stage1MigrateToSargon+AuthorizedPersonaSimple.swift */,
 				484161582BCADA0A00D2B644 /* Stage1MigrateToSargon+BIP39+Lookup.swift */,
-				4841615C2BCADA8400D2B644 /* Stage1MigrateToSargon+BIP39Language.swift */,
 				4841614A2BCAD38400D2B644 /* Stage1MigrateToSargon+BIP39Seed.swift */,
 				484161562BCAD96E00D2B644 /* Stage1MigrateToSargon+BIP39Word.swift */,
-				4841615E2BCADAB400D2B644 /* Stage1MigrateToSargon+BIP39WordCount.swift */,
 				484161642BCADD9600D2B644 /* Stage1MigrateToSargon+BIP44LikePath.swift */,
 				48A86C422BCBC2810090E158 /* Stage1MigrateToSargon+CAP26.swift */,
 				4871C4C62BD04A4A0090D243 /* Stage1MigrateToSargon+Collection.swift */,
@@ -7222,7 +7216,6 @@
 				48CFC3F02ADC10D900E77A5C /* RTCPrimitive.swift in Sources */,
 				48CFC2C02ADC10D900E77A5C /* AssetTransfer+View.swift in Sources */,
 				48CFC2F82ADC10D900E77A5C /* InfoOfNewPersona+View.swift in Sources */,
-				4841615D2BCADA8400D2B644 /* Stage1MigrateToSargon+BIP39Language.swift in Sources */,
 				48CFC3EC2ADC10D900E77A5C /* DataChannelMessage.swift in Sources */,
 				48CFC3FF2ADC10D900E77A5C /* RTCPeerConnectionAsyncDelegate.swift in Sources */,
 				48CFC5D72ADC10DA00E77A5C /* NavigationBarTitleColor.swift in Sources */,
@@ -7772,7 +7765,6 @@
 				48CFC5212ADC10DA00E77A5C /* StateValidatorsListResponse.swift in Sources */,
 				48CFC43D2ADC10DA00E77A5C /* FactorSourcesClient+Test.swift in Sources */,
 				A462B5A32B8384FB00C26D20 /* CoreAPI_PlaintextTransactionMessage.swift in Sources */,
-				4841615F2BCADAB400D2B644 /* Stage1MigrateToSargon+BIP39WordCount.swift in Sources */,
 				48CFC2A22ADC10D900E77A5C /* Persona+View.swift in Sources */,
 				48CFC5582ADC10DA00E77A5C /* NonFungibleIdType.swift in Sources */,
 				48CFC57D2ADC10DA00E77A5C /* StateEntityDetailsResponseItemDetails.swift in Sources */,
