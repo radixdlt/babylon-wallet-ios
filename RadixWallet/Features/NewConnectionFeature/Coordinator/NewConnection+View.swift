@@ -14,40 +14,7 @@ extension NewConnection {
 		public var body: some SwiftUI.View {
 			NavigationStack {
 				ZStack {
-					SwitchStore(store.scope(state: \.root, action: \.child)) { state in
-						switch state {
-						case .localNetworkPermission:
-							CaseLet(
-								/NewConnection.State.Root.localNetworkPermission,
-								action: NewConnection.ChildAction.localNetworkPermission,
-								then: {
-									LocalNetworkPermission.View(store: $0)
-										.withTitle(L10n.LinkedConnectors.NewConnection.title)
-								}
-							)
-						case .scanQR:
-							CaseLet(
-								/NewConnection.State.Root.scanQR,
-								action: NewConnection.ChildAction.scanQR,
-								then: {
-									ScanQRCoordinator.View(store: $0)
-										.withTitle(L10n.LinkedConnectors.NewConnection.title)
-								}
-							)
-						case .connectionApproval:
-							CaseLet(
-								/NewConnection.State.Root.connectionApproval,
-								action: NewConnection.ChildAction.connectionApproval,
-								then: { NewConnectionApproval.View(store: $0) }
-							)
-						case .nameConnection:
-							CaseLet(
-								/NewConnection.State.Root.nameConnection,
-								action: NewConnection.ChildAction.nameConnection,
-								then: { NewConnectionName.View(store: $0) }
-							)
-						}
-					}
+					root(for: store.scope(state: \.root, action: { .child(.root($0)) }))
 				}
 				.toolbar {
 					ToolbarItem(placement: .cancellationAction) {
@@ -60,6 +27,45 @@ extension NewConnection {
 			}
 			.tint(.app.gray1)
 			.foregroundColor(.app.gray1)
+		}
+
+		private func root(
+			for store: StoreOf<NewConnection.Root>
+		) -> some SwiftUI.View {
+			SwitchStore(store) { state in
+				switch state {
+				case .localNetworkPermission:
+					CaseLet(
+						/NewConnection.Root.State.localNetworkPermission,
+						action: NewConnection.Root.Action.localNetworkPermission,
+						then: {
+							LocalNetworkPermission.View(store: $0)
+								.withTitle(L10n.LinkedConnectors.NewConnection.title)
+						}
+					)
+				case .scanQR:
+					CaseLet(
+						/NewConnection.Root.State.scanQR,
+						action: NewConnection.Root.Action.scanQR,
+						then: {
+							ScanQRCoordinator.View(store: $0)
+								.withTitle(L10n.LinkedConnectors.NewConnection.title)
+						}
+					)
+				case .connectionApproval:
+					CaseLet(
+						/NewConnection.Root.State.connectionApproval,
+						action: NewConnection.Root.Action.connectionApproval,
+						then: { NewConnectionApproval.View(store: $0) }
+					)
+				case .nameConnection:
+					CaseLet(
+						/NewConnection.Root.State.nameConnection,
+						action: NewConnection.Root.Action.nameConnection,
+						then: { NewConnectionName.View(store: $0) }
+					)
+				}
+			}
 		}
 	}
 }

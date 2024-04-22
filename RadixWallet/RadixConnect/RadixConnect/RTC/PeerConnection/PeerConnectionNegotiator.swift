@@ -207,7 +207,7 @@ extension PeerConnectionNegotiator {
 	private static func sendLinkClientInteractionResponse(
 		peerConnectionClient: PeerConnectionClient,
 		p2pLink: P2PLink,
-		onSentSuccessfully: () -> Void
+		onSuccess: () -> Void
 	) async throws {
 		@Dependency(\.p2pLinksClient) var p2pLinkClient
 		@Dependency(\.jsonEncoder) var jsonEncoder
@@ -220,7 +220,7 @@ extension PeerConnectionNegotiator {
 			signature: HexCodable(data: privateKey.signature(for: hashedMessageToSign))
 		)
 		try await peerConnectionClient.sendData(jsonEncoder().encode(linkClientInteractionResponse))
-		onSentSuccessfully()
+		onSuccess()
 
 		if isNewPrivateKey {
 			try await p2pLinkClient.storeP2PLinkPrivateKey(p2pLink.publicKey, privateKey)

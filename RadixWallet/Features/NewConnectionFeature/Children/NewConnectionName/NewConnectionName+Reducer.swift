@@ -28,10 +28,6 @@ public struct NewConnectionName: Sendable, FeatureReducer {
 		case confirmNameButtonTapped
 	}
 
-	public enum InternalAction: Sendable, Equatable {
-		case focusTextField(NewConnectionName.State.Field?)
-	}
-
 	public enum DelegateAction: Sendable, Equatable {
 		case nameSet(String)
 	}
@@ -39,10 +35,10 @@ public struct NewConnectionName: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return .send(.view(.textFieldFocused(.connectionName)))
+			return focusTextField(.connectionName, state: &state)
 
 		case let .textFieldFocused(focus):
-			return .send(.internal(.focusTextField(focus)))
+			return focusTextField(focus, state: &state)
 
 		case let .nameOfConnectionChanged(connectionName):
 			state.nameOfConnection = connectionName.trimmingNewlines()
@@ -53,11 +49,8 @@ public struct NewConnectionName: Sendable, FeatureReducer {
 		}
 	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
-		case let .focusTextField(focus):
-			state.focusedField = focus
-			return .none
-		}
+	private func focusTextField(_ focus: NewConnectionName.State.Field?, state: inout State) -> Effect<Action> {
+		state.focusedField = focus
+		return .none
 	}
 }

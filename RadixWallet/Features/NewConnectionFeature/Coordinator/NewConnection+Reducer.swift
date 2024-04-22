@@ -4,20 +4,9 @@ import SwiftUI
 // MARK: - NewConnection
 public struct NewConnection: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public enum Root: Sendable, Hashable {
-			case localNetworkPermission(LocalNetworkPermission.State)
-			case scanQR(ScanQRCoordinator.State)
-			case nameConnection(NewConnectionName.State)
-			case connectionApproval(NewConnectionApproval.State)
-
-			public init() {
-				self = .localNetworkPermission(.init())
-			}
-		}
-
 		public typealias ConnectionName = String
 
-		public var root: Root
+		public var root: Root.State
 
 		@PresentationState
 		public var destination: Destination.State?
@@ -26,7 +15,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 		public var connectionName: ConnectionName?
 
 		public init(
-			root: Root = .init(),
+			root: Root.State = .init(),
 			linkConnectionQRData: LinkConnectionQRData? = nil,
 			connectionName: ConnectionName? = nil
 		) {
@@ -41,10 +30,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case localNetworkPermission(LocalNetworkPermission.Action)
-		case scanQR(ScanQRCoordinator.Action)
-		case nameConnection(NewConnectionName.Action)
-		case connectionApproval(NewConnectionApproval.Action)
+		case root(Root.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -57,6 +43,43 @@ public struct NewConnection: Sendable, FeatureReducer {
 		case establishConnectionResult(TaskResult<P2PLink>)
 		case approveConnection(NewConnectionApproval.State.Purpose)
 		case showErrorAlert(AlertState<Destination.Action.ErrorAlert>)
+	}
+
+	public struct Root: Sendable, Hashable, Reducer {
+		@CasePathable
+		public enum State: Sendable, Hashable {
+			case localNetworkPermission(LocalNetworkPermission.State)
+			case scanQR(ScanQRCoordinator.State)
+			case nameConnection(NewConnectionName.State)
+			case connectionApproval(NewConnectionApproval.State)
+
+			public init() {
+				self = .localNetworkPermission(.init())
+			}
+		}
+
+		@CasePathable
+		public enum Action: Sendable, Equatable {
+			case localNetworkPermission(LocalNetworkPermission.Action)
+			case scanQR(ScanQRCoordinator.Action)
+			case nameConnection(NewConnectionName.Action)
+			case connectionApproval(NewConnectionApproval.Action)
+		}
+
+		public var body: some ReducerOf<Self> {
+			Scope(state: /State.localNetworkPermission, action: /Action.localNetworkPermission) {
+				LocalNetworkPermission()
+			}
+			Scope(state: /State.scanQR, action: /Action.scanQR) {
+				ScanQRCoordinator()
+			}
+			Scope(state: /State.connectionApproval, action: /Action.connectionApproval) {
+				NewConnectionApproval()
+			}
+			Scope(state: /State.nameConnection, action: /Action.nameConnection) {
+				NewConnectionName()
+			}
+		}
 	}
 
 	public struct Destination: DestinationReducer {
@@ -88,22 +111,9 @@ public struct NewConnection: Sendable, FeatureReducer {
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
-		Scope(state: \.root, action: /Action.child) {
-			EmptyReducer()
-				.ifCaseLet(/State.Root.localNetworkPermission, action: /ChildAction.localNetworkPermission) {
-					LocalNetworkPermission()
-				}
-				.ifCaseLet(/State.Root.scanQR, action: /ChildAction.scanQR) {
-					ScanQRCoordinator()
-				}
-				.ifCaseLet(/State.Root.connectionApproval, action: /ChildAction.connectionApproval) {
-					NewConnectionApproval()
-				}
-				.ifCaseLet(/State.Root.nameConnection, action: /ChildAction.nameConnection) {
-					NewConnectionName()
-				}
+		Scope(state: \.root, action: /Action.child .. ChildAction.root) {
+			Root()
 		}
-
 		Reduce(core)
 	}
 
@@ -192,7 +202,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .localNetworkPermission(.delegate(.permissionResponse(allowed))):
+		case let .root(.localNetworkPermission(.delegate(.permissionResponse(allowed)))):
 			if allowed {
 				let string = L10n.LinkedConnectors.NewConnection.subtitle
 				state.root = .scanQR(.init(scanInstructions: string))
@@ -203,7 +213,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 				}
 			}
 
-		case let .scanQR(.delegate(.scanned(qrString))):
+		case let .root(.scanQR(.delegate(.scanned(qrString)))):
 			return .run { send in
 				let result = await TaskResult {
 					try jsonDecoder().decode(LinkConnectionQRData.self, from: Data(qrString.utf8))
@@ -211,7 +221,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 				await send(.internal(.linkConnectionDataFromStringResult(result)))
 			}
 
-		case let .connectionApproval(.delegate(.approved(purpose))):
+		case let .root(.connectionApproval(.delegate(.approved(purpose)))):
 			switch purpose {
 			case .approveNewConnection:
 				state.root = .nameConnection(.init())
@@ -220,7 +230,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 				return .send(.internal(.establishConnection(connectionName)))
 			}
 
-		case let .nameConnection(.delegate(.nameSet(connectionName))):
+		case let .root(.nameConnection(.delegate(.nameSet(connectionName)))):
 			return .send(.internal(.establishConnection(connectionName)))
 
 		default:
