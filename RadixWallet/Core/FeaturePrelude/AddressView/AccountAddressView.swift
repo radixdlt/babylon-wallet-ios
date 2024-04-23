@@ -47,9 +47,15 @@ struct AccountAddressView: View {
 			VStack(spacing: .small2) {
 				Text("Full address")
 					.foregroundColor(.app.gray1)
-
-				Text(address.address)
-					.multilineTextAlignment(.center)
+				Group {
+					if #available(iOS 17.0, *) {
+						gradientAddress
+					} else {
+						Text(address.address)
+							.foregroundColor(.app.gray1)
+					}
+				}
+				.multilineTextAlignment(.center)
 			}
 			actions
 		}
@@ -60,11 +66,27 @@ struct AccountAddressView: View {
 		.cornerRadius(.small1)
 	}
 
+	@available(iOS 17.0, *)
+	private var gradientAddress: some View {
+		// TODO: The logic to return the colorised part should be returned from Sargon.
+		var content = address.address
+		let start = content.prefix(5)
+		content = String(content.dropFirst(5))
+		let end = content.suffix(6)
+		content = String(content.dropLast(6))
+		return Text(start)
+			.foregroundColor(.app.gray1)
+			+ Text(content)
+			.foregroundStyle(LinearGradient.app.brand1)
+			+ Text(end)
+			.foregroundColor(.app.gray1)
+	}
+
 	private var actions: some View {
 		HStack(spacing: .large3) {
 			Button("Copy", image: .copy) {}
 
-			Button("Enlarge", image: .copy) {}
+			Button("Enlarge", image: .fullScreen) {}
 
 			Button("Share", systemImage: "square.and.arrow.up") {}
 		}
