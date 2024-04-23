@@ -7,23 +7,20 @@ extension Profile {
 	}
 
 	public mutating func addNewGateway(_ newGateway: Gateway) throws {
-//		appPreferences.gateways.add(newGateway)
+		appPreferences.gateways.add(newGateway)
 	}
 
 	public mutating func removeGateway(_ gateway: Gateway) throws {
-//		appPreferences.gateways.remove(gateway)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		appPreferences.gateways.remove(gateway)
 	}
 
 	/// Requires the presence of an `Sargon.ProfileNetwork` in `networks` for
 	/// `newGateway.network.id`, otherwise an error is thrown.
 	public mutating func changeGateway(to newGateway: Gateway) throws {
-//		let newNetworkID = newGateway.network.id
-//		// Ensure we have accounts on network, else do not change
-//		_ = try network(id: newNetworkID)
-//		try appPreferences.gateways.changeCurrent(to: newGateway)
-
-		sargonProfileFinishMigrateAtEndOfStage1()
+		let newNetworkID = newGateway.network.id
+		// Ensure we have accounts on network, else do not change
+		_ = try network(id: newNetworkID)
+		try appPreferences.gateways.changeCurrent(to: newGateway)
 	}
 
 	public mutating func updateDisplayAppPreferences(_ display: AppDisplay) {
