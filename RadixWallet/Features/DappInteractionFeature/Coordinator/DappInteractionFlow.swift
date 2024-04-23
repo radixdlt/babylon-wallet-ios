@@ -376,36 +376,33 @@ extension DappInteractionFlow {
 			_ state: inout State,
 			_ persona: Persona
 		) -> Effect<Action> {
-			/*
-			 guard state.persona?.id == persona.id else {
-			 	return .none
-			 }
-			 state.persona = persona
-			 let responsePersona = P2P.Dapp.Response.Persona(persona: persona)
-			 for (request, response) in state.responseItems {
-			 	// NB: native case paths should simplify this mutation logic a lot
-			 	switch response {
-			 	case let .remote(.auth(.login(.withChallenge(item)))):
-			 		state.responseItems[request] = .remote(.auth(.login(.withChallenge(.init(
-			 			persona: responsePersona,
-			 			challenge: item.challenge,
-			 			proof: item.proof
-			 		)))))
-			 	case .remote(.auth(.login(.withoutChallenge))):
-			 		state.responseItems[request] = .remote(.auth(.login(.withoutChallenge(.init(
-			 			persona: responsePersona
-			 		)))))
-			 	case .remote(.auth(.usePersona)):
-			 		state.responseItems[request] = .remote(.auth(.usePersona(.init(
-			 			persona: responsePersona
-			 		))))
-			 	default:
-			 		continue
-			 	}
-			 }
-			 return .none
-			  */
-			sargonProfileFinishMigrateAtEndOfStage1()
+			guard state.persona?.id == persona.id else {
+				return .none
+			}
+			state.persona = persona
+			let responsePersona = P2P.Dapp.Response.PersonaResponse(persona: persona)
+			for (request, response) in state.responseItems {
+				// NB: native case paths should simplify this mutation logic a lot
+				switch response {
+				case let .remote(.auth(.login(.withChallenge(item)))):
+					state.responseItems[request] = .remote(.auth(.login(.withChallenge(.init(
+						persona: responsePersona,
+						challenge: item.challenge,
+						proof: item.proof
+					)))))
+				case .remote(.auth(.login(.withoutChallenge))):
+					state.responseItems[request] = .remote(.auth(.login(.withoutChallenge(.init(
+						persona: responsePersona
+					)))))
+				case .remote(.auth(.usePersona)):
+					state.responseItems[request] = .remote(.auth(.usePersona(.init(
+						persona: responsePersona
+					))))
+				default:
+					continue
+				}
+			}
+			return .none
 		}
 
 		func handleSignAndSubmitTX(
