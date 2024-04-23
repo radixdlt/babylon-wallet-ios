@@ -3,51 +3,40 @@ import Sargon
 
 extension SharedPersonaData {
 	public mutating func remove(id: PersonaDataEntryID) {
-		sargonProfileFinishMigrateAtEndOfStage1()
-		/*
-		 func removeCollectionIfNeeded(
-		 	at keyPath: WritableKeyPath<Self, SharedPersonaData.SharedCollection?>
-		 ) {
-		 	guard
-		 		var collection = self[keyPath: keyPath],
-		 		collection.ids.contains(id)
-		 	else { return }
-		 	collection.ids.remove(id)
-		 	switch collection.request.quantifier {
-		 	case .atLeast:
-		 		if collection.ids.count < collection.request.quantity {
-		 			// must delete whole collection since requested quantity is no longer fulfilled.
-		 			self[keyPath: keyPath] = nil
-		 		}
-		 	case .exactly:
-		 		// Must delete whole collection since requested quantity is no longer fulfilled,
-		 		// since we **just** deleted the id from `ids`.
-		 		self[keyPath: keyPath] = nil
-		 	}
-		 }
+		if id == self.name {
+			self.name = nil
+		}
 
-		 func removeEntryIfNeeded(
-		 	at keyPath: WritableKeyPath<Self, PersonaDataEntryID?>
-		 ) {
-		 	guard self[keyPath: keyPath] == id else { return }
-		 	self[keyPath: keyPath] = nil
-		 }
+		if
+			let emailAddresses = self.emailAddresses,
+			case var ids = emailAddresses.ids,
+			case let request = emailAddresses.request,
+			let index = ids.firstIndex(of: id)
+		{
+			ids.remove(at: index)
+			if !request.isFulfilled(by: ids.count) {
+				// must delete whole collection since requested quantity is no longer fulfilled.
+				self.emailAddresses = nil
+			} else {
+				self.emailAddresses = .init(request: request, ids: ids)
+			}
+		}
 
-		 removeEntryIfNeeded(at: \.name)
-		 removeEntryIfNeeded(at: \.dateOfBirth)
-		 removeEntryIfNeeded(at: \.companyName)
-		 removeCollectionIfNeeded(at: \.emailAddresses)
-		 removeCollectionIfNeeded(at: \.phoneNumbers)
-		 removeCollectionIfNeeded(at: \.urls)
-		 removeCollectionIfNeeded(at: \.postalAddresses)
-		 removeCollectionIfNeeded(at: \.creditCards)
-
-		 // The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
-		 // we do not forget to handle it here.
-		 switch PersonaData.Entry.Kind.fullName {
-		 case .fullName, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
-		 }
-		 */
+		// TERRIBLE COPY PASTE - but - this will shortly be moved into Rust Sargon...
+		if
+			let phoneNumbers = self.phoneNumbers,
+			case var ids = phoneNumbers.ids,
+			case let request = phoneNumbers.request,
+			let index = ids.firstIndex(of: id)
+		{
+			ids.remove(at: index)
+			if !request.isFulfilled(by: ids.count) {
+				// must delete whole collection since requested quantity is no longer fulfilled.
+				self.phoneNumbers = nil
+			} else {
+				self.phoneNumbers = .init(request: request, ids: ids)
+			}
+		}
 	}
 
 	mutating func remove(ids: Set<PersonaDataEntryID>) {
