@@ -490,8 +490,7 @@ extension DappInteractionFlow {
 		if resetItem.personaData {
 			authorizedPersona.sharedPersonaData = .default
 		}
-//		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
-		sargonProfileFinishMigrateAtEndOfStage1()
+		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
 		state.authorizedDapp = authorizedDapp
 		state.authorizedPersona = authorizedPersona
 	}
@@ -499,85 +498,82 @@ extension DappInteractionFlow {
 	func autofillOngoingResponseItemsIfPossibleEffect(
 		for state: State
 	) -> Effect<Action> {
-		/*
-		 .run { [state] send in
-		 	var payload = InternalAction.AutofillOngoingResponseItemsPayload()
+		.run { [state] send in
+			var payload = InternalAction.AutofillOngoingResponseItemsPayload()
 
-		 	payload.ongoingAccountsPayload = try await { () async throws -> InternalAction.AutofillOngoingResponseItemsPayload.AccountsPayload? in
-		 		guard
-		 			let ongoingAccountsRequestItem = state.ongoingAccountsRequestItem,
-		 			ongoingAccountsRequestItem.challenge == nil, // autofill not supported for accounts with proof of ownership
-		 			let sharedAccounts = state.authorizedPersona?.sharedAccounts,
-		 			ongoingAccountsRequestItem.numberOfAccounts == sharedAccounts.request
-		 		else {
-		 			return nil
-		 		}
-		 		let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
+			payload.ongoingAccountsPayload = try await { () async throws -> InternalAction.AutofillOngoingResponseItemsPayload.AccountsPayload? in
+				guard
+					let ongoingAccountsRequestItem = state.ongoingAccountsRequestItem,
+					ongoingAccountsRequestItem.challenge == nil, // autofill not supported for accounts with proof of ownership
+					let sharedAccounts = state.authorizedPersona?.sharedAccounts,
+					ongoingAccountsRequestItem.numberOfAccounts == sharedAccounts.request
+				else {
+					return nil
+				}
+				let allAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 
-		 		guard
-		 			let selectedAccounts = try? sharedAccounts.ids.compactMap({ sharedAccount in
-		 				try allAccounts[id: .init(validatingAddress: sharedAccount.address)]
-		 			}),
-		 			selectedAccounts.count == sharedAccounts.ids.count
-		 		else { return nil }
+				guard
+					let selectedAccounts = try? sharedAccounts.ids.compactMap({ sharedAccount in
+						try allAccounts[id: .init(validatingAddress: sharedAccount.address)]
+					}),
+					selectedAccounts.count == sharedAccounts.ids.count
+				else { return nil }
 
-		 		return .init(
-		 			requestItem: .remote(.ongoingAccounts(ongoingAccountsRequestItem)),
-		 			numberOfAccountsRequested: sharedAccounts.request,
-		 			accounts: selectedAccounts
-		 		)
-		 	}()
+				return .init(
+					requestItem: .remote(.ongoingAccounts(ongoingAccountsRequestItem)),
+					numberOfAccountsRequested: sharedAccounts.request,
+					accounts: selectedAccounts
+				)
+			}()
 
-		 	payload.ongoingPersonaDataPayload = try await { () async throws -> InternalAction.AutofillOngoingResponseItemsPayload.PersonaDataPayload? in
+			payload.ongoingPersonaDataPayload = try await { () async throws -> InternalAction.AutofillOngoingResponseItemsPayload.PersonaDataPayload? in
 
-		 		guard
-		 			let personaDataRequested = state.ongoingPersonaDataRequestItem,
-		 			let authorizedPersonaID = state.authorizedPersona?.id,
-		 			let sharedPersonaData = state.authorizedPersona?.sharedPersonaData
-		 		else {
-		 			return nil
-		 		}
+				guard
+					let personaDataRequested = state.ongoingPersonaDataRequestItem,
+					let authorizedPersonaID = state.authorizedPersona?.id,
+					let sharedPersonaData = state.authorizedPersona?.sharedPersonaData
+				else {
+					return nil
+				}
 
-		 		let allPersonas = try await personasClient.getPersonas()
-		 		guard let persona = allPersonas[id: authorizedPersonaID] else { return nil }
+				let allPersonas = try await personasClient.getPersonas()
+				guard let persona = allPersonas[id: authorizedPersonaID] else { return nil }
 
-		 		guard
-		 			let responseItem = try? P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem(
-		 				personaDataRequested: personaDataRequested,
-		 				personaData: persona.personaData
-		 			)
-		 		else {
-		 			return nil
-		 		}
+				guard
+					let responseItem = try? P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestResponseItem(
+						personaDataRequested: personaDataRequested,
+						personaData: persona.personaData
+					)
+				else {
+					return nil
+				}
 
-		 		guard
-		 			let updatedSharedPersonaData = try? SharedPersonaData(
-		 				requested: personaDataRequested,
-		 				persona: persona,
-		 				provided: responseItem
-		 			),
-		 			sharedPersonaData.entryIDs.isSuperset(of: updatedSharedPersonaData.entryIDs)
-		 		else {
-		 			loggerGlobal.debug("Cannot autofill, have not shared fields earlier")
-		 			return nil
-		 		}
+				guard
+					let updatedSharedPersonaData = try? SharedPersonaData(
+						requested: personaDataRequested,
+						persona: persona,
+						provided: responseItem
+					),
+					sharedPersonaData.entryIDs.isSuperset(of: updatedSharedPersonaData.entryIDs)
+				else {
+					loggerGlobal.debug("Cannot autofill, have not shared fields earlier")
+					return nil
+				}
 
-		 		let personaDataPayload = InternalAction.AutofillOngoingResponseItemsPayload.PersonaDataPayload(
-		 			personaDataRequested: personaDataRequested,
-		 			responseItem: responseItem
-		 		)
+				let personaDataPayload = InternalAction.AutofillOngoingResponseItemsPayload.PersonaDataPayload(
+					personaDataRequested: personaDataRequested,
+					responseItem: responseItem
+				)
 
-		 		loggerGlobal.info("Autofilling with: \(personaDataPayload.responseItem)")
+				loggerGlobal.info("Autofilling with: \(personaDataPayload.responseItem)")
 
-		 		return personaDataPayload
-		 	}()
+				return personaDataPayload
+			}()
 
-		 	await send(.internal(.autofillOngoingResponseItemsIfPossible(payload)))
-		 } catch: { error, _ in
-		 	loggerGlobal.warning("Unable to autofill ongoing response, error: \(error)")
-		 }
-		  */
-		sargonProfileFinishMigrateAtEndOfStage1()
+			await send(.internal(.autofillOngoingResponseItemsIfPossible(payload)))
+		} catch: { error, _ in
+			loggerGlobal.warning("Unable to autofill ongoing response, error: \(error)")
+		}
 	}
 }
 
