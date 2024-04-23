@@ -66,16 +66,17 @@ extension FactorSourceProtocol {
 	public var kind: FactorSourceKind { Self.kind }
 	public var casePath: AnyCasePath<FactorSource, Self> { Self.casePath }
 
-//	public static func common(
-//		cryptoParametersPreset: FactorSourceCryptoParameters.Preset
-//	) throws -> FactorSourceCommon {
-//		@Dependency(\.date) var date
-//		return .init(
-//			cryptoParameters: cryptoParametersPreset.cryptoParameters,
-//			addedOn: date(),
-//			lastUsedOn: date()
-//		)
-//	}
+	public static func common(
+		cryptoParameters: FactorSourceCryptoParameters
+	) throws -> FactorSourceCommon {
+		@Dependency(\.date) var date
+		return .init(
+			cryptoParameters: cryptoParameters,
+			addedOn: date(),
+			lastUsedOn: date(),
+			flags: []
+		)
+	}
 }
 
 extension FactorSourceProtocol {
