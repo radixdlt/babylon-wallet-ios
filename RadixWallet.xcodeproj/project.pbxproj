@@ -9,9 +9,7 @@
 /* Begin PBXBuildFile section */
 		48076E402B14F5CA004575F8 /* OnFirstAppearViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48076E3F2B14F5CA004575F8 /* OnFirstAppearViewModifier.swift */; };
 		480E50D52B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 480E50D32B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift */; };
-		4813AFDD2BC9A7530046BCAD /* sargonProfileStage2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFDC2BC9A7530046BCAD /* sargonProfileStage2.swift */; };
 		4813AFE22BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFE12BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift */; };
-		4813AFE52BC9AAAF0046BCAD /* stage3.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFE42BC9AAAF0046BCAD /* stage3.swift */; };
 		4813AFEB2BC9AF4A0046BCAD /* RawRepresentable+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFEA2BC9AF4A0046BCAD /* RawRepresentable+Extensions.swift */; };
 		4813AFED2BC9AF920046BCAD /* Stage1MigrateToSargon+AppearanceID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFEC2BC9AF920046BCAD /* Stage1MigrateToSargon+AppearanceID.swift */; };
 		4813AFEF2BC9B08F0046BCAD /* DappDefinitionAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFEE2BC9B08F0046BCAD /* DappDefinitionAddress.swift */; };
@@ -1181,9 +1179,7 @@
 /* Begin PBXFileReference section */
 		48076E3F2B14F5CA004575F8 /* OnFirstAppearViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnFirstAppearViewModifier.swift; sourceTree = "<group>"; };
 		480E50D32B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecoverWalletWithoutProfileCoordinator+View.swift"; sourceTree = "<group>"; };
-		4813AFDC2BC9A7530046BCAD /* sargonProfileStage2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sargonProfileStage2.swift; sourceTree = "<group>"; };
 		4813AFE12BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+NetworkDefinition.swift"; sourceTree = "<group>"; };
-		4813AFE42BC9AAAF0046BCAD /* stage3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = stage3.swift; sourceTree = "<group>"; };
 		4813AFEA2BC9AF4A0046BCAD /* RawRepresentable+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RawRepresentable+Extensions.swift"; sourceTree = "<group>"; };
 		4813AFEC2BC9AF920046BCAD /* Stage1MigrateToSargon+AppearanceID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+AppearanceID.swift"; sourceTree = "<group>"; };
 		4813AFEE2BC9B08F0046BCAD /* DappDefinitionAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DappDefinitionAddress.swift; sourceTree = "<group>"; };
@@ -2369,7 +2365,6 @@
 		4813AFE32BC9AA960046BCAD /* Stage3 */ = {
 			isa = PBXGroup;
 			children = (
-				4813AFE42BC9AAAF0046BCAD /* stage3.swift */,
 			);
 			path = Stage3;
 			sourceTree = "<group>";
@@ -5809,7 +5804,6 @@
 			children = (
 				E65D6CF92BC98473001D8A39 /* Profile */,
 				E65D6CF82BC98466001D8A39 /* Atoms */,
-				4813AFDC2BC9A7530046BCAD /* sargonProfileStage2.swift */,
 			);
 			path = Stage2;
 			sourceTree = "<group>";
@@ -7117,7 +7111,6 @@
 				48CFC54E2ADC10DA00E77A5C /* StateEntityNonFungibleResourceVaultsPageResponse.swift in Sources */,
 				835F196D2B3581C300E0B71D /* UnknownDappComponents+View.swift in Sources */,
 				48CFC5942ADC10DA00E77A5C /* WalletApp.swift in Sources */,
-				4813AFE52BC9AAAF0046BCAD /* stage3.swift in Sources */,
 				48CFC58E2ADC10DA00E77A5C /* CameraPermissionClient+Interface.swift in Sources */,
 				48CFC53C2ADC10DA00E77A5C /* ObjectModuleId.swift in Sources */,
 				48CFC5E72ADC10DA00E77A5C /* TaskResult+Unit.swift in Sources */,
@@ -7278,7 +7271,6 @@
 				48CFC2CC2ADC10D900E77A5C /* FungibleResourceAsset+Reducer.swift in Sources */,
 				48CFC29A2ADC10D900E77A5C /* TransactionReviewDapps+View.swift in Sources */,
 				483A3DE62BD2678900055932 /* Stage1MigrateToSargon+FactorSourceCryptoParameters.swift in Sources */,
-				4813AFDD2BC9A7530046BCAD /* sargonProfileStage2.swift in Sources */,
 				48CFC36B2ADC10D900E77A5C /* FungibleTokenDetails+Reducer.swift in Sources */,
 				4855B1C72BCAC82200DD0A47 /* Stage1MigrateToSargon+SignatureOfEntity.swift in Sources */,
 				48CFC3322ADC10D900E77A5C /* ImportMnemonic.swift in Sources */,

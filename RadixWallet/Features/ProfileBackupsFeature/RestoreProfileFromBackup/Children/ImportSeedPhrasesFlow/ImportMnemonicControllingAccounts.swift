@@ -141,23 +141,19 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		case let .importMnemonic(.delegate(delegateAction)):
 			switch delegateAction {
 			case let .notPersisted(mnemonicWithPassphrase):
-				// FIXME: should always work... but please tidy up!
-//				let factorSourceID = try! FactorSourceIDFromHash(
-//					kind: .device,
-//					mnemonicWithPassphrase: mnemonicWithPassphrase
-//				)
 
-//				guard factorSourceID == state.entitiesControlledByFactorSource.factorSourceID else {
-//					overlayWindowClient.scheduleHUD(.wrongMnemonic)
-//					return .none
-//				}
-//
-//				return validate(
-//					mnemonicWithPassphrase: mnemonicWithPassphrase,
-//					accounts: state.entitiesControlledByFactorSource.accounts,
-//					factorSource: state.entitiesControlledByFactorSource.deviceFactorSource
-//				)
-				sargonProfileFinishMigrateAtEndOfStage1()
+				let factorSourceID = FactorSourceIDFromHash(kind: .device, mnemonicWithPassphrase: mnemonicWithPassphrase)
+
+				guard factorSourceID == state.entitiesControlledByFactorSource.factorSourceID else {
+					overlayWindowClient.scheduleHUD(.wrongMnemonic)
+					return .none
+				}
+
+				return validate(
+					mnemonicWithPassphrase: mnemonicWithPassphrase,
+					accounts: state.entitiesControlledByFactorSource.accounts,
+					factorSource: state.entitiesControlledByFactorSource.deviceFactorSource
+				)
 
 			case .persistedMnemonicInKeychainOnly, .doneViewing, .persistedNewFactorSourceInProfile:
 				preconditionFailure("Incorrect implementation")
