@@ -1,14 +1,17 @@
 import SwiftUI
 
+// MARK: - AccountAddressView
 @MainActor
 struct AccountAddressView: View {
 	let address: AccountAddress
 	let closeAction: () -> Void
 
 	@State private var qrImage: Result<CGImage, Error>? = nil
+	@State private var showShareView = false
 
 	@Dependency(\.qrGeneratorClient) var qrGeneratorClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
+	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.openURL) var openURL
 
 	var body: some View {
@@ -24,6 +27,9 @@ struct AccountAddressView: View {
 		.presentationDragIndicator(.visible)
 		.task {
 			await generateQrImage()
+		}
+		.sheet(isPresented: $showShareView) {
+			ShareView(items: [address.address])
 		}
 	}
 
@@ -86,11 +92,9 @@ struct AccountAddressView: View {
 
 	private var actions: some View {
 		HStack(spacing: .large3) {
-			Button("Copy", image: .copy) {}
-
-			Button("Enlarge", image: .fullScreen) {}
-
-			Button("Share", systemImage: "square.and.arrow.up") {}
+			Button("Copy", image: .copy, action: copy)
+			Button("Enlarge", image: .fullScreen, action: enlarge)
+			Button("Share", systemImage: "square.and.arrow.up", action: share)
 		}
 		.padding(.horizontal, .medium2)
 		.foregroundColor(.app.gray1)
@@ -131,6 +135,19 @@ struct AccountAddressView: View {
 		} catch {
 			self.qrImage = .failure(error)
 		}
+	}
+}
+
+// MARK: - Actions
+private extension AccountAddressView {
+	private func copy() {
+		pasteboardClient.copyString(address.address)
+	}
+
+	private func enlarge() {}
+
+	private func share() {
+		showShareView = true
 	}
 
 	private func viewOnRadixDashboard() {
