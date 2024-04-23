@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - AccountRecoveryScanInProgress
 public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
@@ -250,34 +252,32 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 extension AccountRecoveryScanInProgress {
 	private func nextDerivationPaths(state: inout State) throws -> OrderedSet<DerivationPath> {
-//		let networkID = state.networkID
-//
-//		let derivationIndices = generateIntegers(
-//			start: state.maxIndex ?? 0,
-//			count: batchSize,
-//			excluding: state.indicesOfAlreadyUsedEntities
-//		)
-//		assert(derivationIndices.count == batchSize)
-//		state.maxIndex = derivationIndices.max()! + 1
-//
-//		let paths = try derivationIndices.map { index in
-//			if state.forOlympiaAccounts {
-//				try Bip44LikePath(
-//					index: index
-//				)
-//				.wrapAsDerivationPath()
-//			} else {
-//				try AccountBabylonDerivationPath(
-//					networkID: networkID,
-//					index: index,
-//					keyKind: .virtualEntity
-//				)
-//				.wrapAsDerivationPath()
-//			}
-//		}
-//
-//		return try OrderedSet(validating: paths)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		let networkID = state.networkID
+
+		let derivationIndices = generateIntegers(
+			start: state.maxIndex ?? 0,
+			count: batchSize,
+			excluding: state.indicesOfAlreadyUsedEntities
+		)
+		assert(derivationIndices.count == batchSize)
+		state.maxIndex = derivationIndices.max()! + 1
+
+		let paths = derivationIndices.map { index in
+			if state.forOlympiaAccounts {
+				Bip44LikePath(
+					index: index
+				)
+				.asDerivationPath
+			} else {
+				AccountPath(
+					networkID: networkID,
+					keyKind: .transactionSigning,
+					index: index
+				).asDerivationPath
+			}
+		}
+
+		return try OrderedSet(validating: paths)
 	}
 
 	private func derivePublicKeys(
