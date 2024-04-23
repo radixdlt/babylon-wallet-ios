@@ -31,27 +31,25 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		let canModify: Bool
 
 		var allDepositorAddresses: OrderedSet<ResourceViewState.Address> {
-//			switch mode {
-//			case .allowDenyAssets:
-//				OrderedSet(thirdPartyDeposits.assetsExceptionSet().map { .assetException($0) })
-//			case .allowDepositors:
-//				OrderedSet(thirdPartyDeposits.depositorsAllowSet().map { .allowedDepositor($0) })
-//			}
-			sargonProfileFinishMigrateAtEndOfStage1()
+			switch mode {
+			case .allowDenyAssets:
+				OrderedSet(thirdPartyDeposits.assetsExceptionSet().map { .assetException($0) })
+			case .allowDepositors:
+				OrderedSet(thirdPartyDeposits.depositorsAllowSet().map { .allowedDepositor($0) })
+			}
 		}
 
 		var resourcesForDisplay: [ResourceViewState] {
-//			switch mode {
-//			case let .allowDenyAssets(exception):
-//				let addresses: [ResourceViewState.Address] = thirdPartyDeposits.assetsExceptionSet()
-//					.filter { $0.exceptionRule == exception }
-//					.map { .assetException($0) }
-//
-//				return loadedResources.filter { addresses.contains($0.address) }
-//			case .allowDepositors:
-//				return loadedResources
-//			}
-			sargonProfileFinishMigrateAtEndOfStage1()
+			switch mode {
+			case let .allowDenyAssets(exception):
+				let addresses: [ResourceViewState.Address] = thirdPartyDeposits.assetsExceptionSet()
+					.filter { $0.exceptionRule == exception }
+					.map { .assetException($0) }
+
+				return loadedResources.filter { addresses.contains($0.address) }
+			case .allowDepositors:
+				return loadedResources
+			}
 		}
 
 		var mode: ResourcesListMode
