@@ -43,11 +43,7 @@
 		4855B19A2BCA557D00DD0A47 /* Stage2MigrateToSargon+Persona.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4855B1992BCA557D00DD0A47 /* Stage2MigrateToSargon+Persona.swift */; };
 		4855B1AC2BCA5D2000DD0A47 /* TODO.md in Resources */ = {isa = PBXBuildFile; fileRef = 4855B1AB2BCA5D2000DD0A47 /* TODO.md */; };
 		4855B1B02BCA5E3100DD0A47 /* Stage1MigrateToSargon+DisplayName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4855B1AF2BCA5E3100DD0A47 /* Stage1MigrateToSargon+DisplayName.swift */; };
-		4855B1B22BCA5E9800DD0A47 /* Stage1MigrateToSargon+PersonaDataCollections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4855B1B12BCA5E9800DD0A47 /* Stage1MigrateToSargon+PersonaDataCollections.swift */; };
 		4855B1B42BCA60C400DD0A47 /* EmailAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4855B1B32BCA60C400DD0A47 /* EmailAddress.swift */; };
-		4855B1B72BCA63B800DD0A47 /* Stage1MigrateToSargon+PersonaDataEntryName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4855B1B62BCA63B800DD0A47 /* Stage1MigrateToSargon+PersonaDataEntryName.swift */; };
-		4855B1BB2BCA653700DD0A47 /* Stage1MigrateToSargon+HierarchicalDeterministicFactorInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4855B1BA2BCA653700DD0A47 /* Stage1MigrateToSargon+HierarchicalDeterministicFactorInstance.swift */; };
-		4855B1BD2BCA66E400DD0A47 /* Stage1MigrateToSargon+LedgerHardwareWalletFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4855B1BC2BCA66E400DD0A47 /* Stage1MigrateToSargon+LedgerHardwareWalletFactorSource.swift */; };
 		4855B1BF2BCA680200DD0A47 /* HeaderList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4855B1BE2BCA680200DD0A47 /* HeaderList.swift */; };
 		4855B1C12BCAC48700DD0A47 /* Stage1MigrateToSargon+AccountOrPersona.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4855B1C02BCAC48700DD0A47 /* Stage1MigrateToSargon+AccountOrPersona.swift */; };
 		4855B1C32BCAC59C00DD0A47 /* Stage1MigrateToSargon+Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4855B1C22BCAC59C00DD0A47 /* Stage1MigrateToSargon+Account.swift */; };
@@ -1218,11 +1214,7 @@
 		4855B1992BCA557D00DD0A47 /* Stage2MigrateToSargon+Persona.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage2MigrateToSargon+Persona.swift"; sourceTree = "<group>"; };
 		4855B1AB2BCA5D2000DD0A47 /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = TODO.md; sourceTree = "<group>"; };
 		4855B1AF2BCA5E3100DD0A47 /* Stage1MigrateToSargon+DisplayName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+DisplayName.swift"; sourceTree = "<group>"; };
-		4855B1B12BCA5E9800DD0A47 /* Stage1MigrateToSargon+PersonaDataCollections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+PersonaDataCollections.swift"; sourceTree = "<group>"; };
 		4855B1B32BCA60C400DD0A47 /* EmailAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailAddress.swift; sourceTree = "<group>"; };
-		4855B1B62BCA63B800DD0A47 /* Stage1MigrateToSargon+PersonaDataEntryName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+PersonaDataEntryName.swift"; sourceTree = "<group>"; };
-		4855B1BA2BCA653700DD0A47 /* Stage1MigrateToSargon+HierarchicalDeterministicFactorInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "Stage1MigrateToSargon+HierarchicalDeterministicFactorInstance.swift"; path = "REMOVE_AT_END_OF_STAGE_1_GET_TO_COMPILE/Stage1MigrateToSargon+HierarchicalDeterministicFactorInstance.swift"; sourceTree = "<group>"; };
-		4855B1BC2BCA66E400DD0A47 /* Stage1MigrateToSargon+LedgerHardwareWalletFactorSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+LedgerHardwareWalletFactorSource.swift"; sourceTree = "<group>"; };
 		4855B1BE2BCA680200DD0A47 /* HeaderList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderList.swift; sourceTree = "<group>"; };
 		4855B1C02BCAC48700DD0A47 /* Stage1MigrateToSargon+AccountOrPersona.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+AccountOrPersona.swift"; sourceTree = "<group>"; };
 		4855B1C22BCAC59C00DD0A47 /* Stage1MigrateToSargon+Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+Account.swift"; sourceTree = "<group>"; };
@@ -5854,14 +5846,10 @@
 				E65D6CE92BC981DA001D8A39 /* Stage1MigrateToSargon+FiatCurrency.swift */,
 				E65D6CF12BC982F8001D8A39 /* Stage1MigrateToSargon+Gateway.swift */,
 				E65D6CF62BC98400001D8A39 /* Stage1MigrateToSargon+Gateways.swift */,
-				4855B1BA2BCA653700DD0A47 /* Stage1MigrateToSargon+HierarchicalDeterministicFactorInstance.swift */,
 				484161462BCAD2D700D2B644 /* Stage1MigrateToSargon+HierarchicalDeterministicPublicKey.swift */,
-				4855B1BC2BCA66E400DD0A47 /* Stage1MigrateToSargon+LedgerHardwareWalletFactorSource.swift */,
 				4841614C2BCAD3D400D2B644 /* Stage1MigrateToSargon+MnemonicWithPassphrase.swift */,
 				4813AFE12BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift */,
 				4813B0022BCA4FD60046BCAD /* Stage1MigrateToSargon+Persona.swift */,
-				4855B1B12BCA5E9800DD0A47 /* Stage1MigrateToSargon+PersonaDataCollections.swift */,
-				4855B1B62BCA63B800DD0A47 /* Stage1MigrateToSargon+PersonaDataEntryName.swift */,
 				4855B1C62BCAC82200DD0A47 /* Stage1MigrateToSargon+SignatureOfEntity.swift */,
 			);
 			path = Stage1;
@@ -7033,7 +7021,6 @@
 				48CFC44B2ADC10DA00E77A5C /* MnemonicClient+Interface.swift in Sources */,
 				48CFC3252ADC10D900E77A5C /* LocalNetworkPermission+View.swift in Sources */,
 				48CFC5D82ADC10DA00E77A5C /* TextStyleModifier.swift in Sources */,
-				4855B1B22BCA5E9800DD0A47 /* Stage1MigrateToSargon+PersonaDataCollections.swift in Sources */,
 				48CFC6942ADC10DB00E77A5C /* MigratedSoftwareAccounts.swift in Sources */,
 				48CFC5D12ADC10DA00E77A5C /* NavigationBarHideDivider.swift in Sources */,
 				48CFC5DB2ADC10DA00E77A5C /* NavigationBarTitleFont.swift in Sources */,
@@ -7340,7 +7327,6 @@
 				48CFC5382ADC10DA00E77A5C /* ValidatorCollection.swift in Sources */,
 				48CFC3772ADC10D900E77A5C /* LSUDetails.swift in Sources */,
 				48CFC49A2ADC10DA00E77A5C /* StateEntityNonFungibleIdsPageResponse.swift in Sources */,
-				4855B1BD2BCA66E400DD0A47 /* Stage1MigrateToSargon+LedgerHardwareWalletFactorSource.swift in Sources */,
 				48CFC4E52ADC10DA00E77A5C /* ValidatorVaultItem.swift in Sources */,
 				48CFC3E42ADC10D900E77A5C /* RadixConnectConstants.swift in Sources */,
 				83EE477E2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueNonFungibleLocalId.swift in Sources */,
@@ -7404,7 +7390,6 @@
 				48CFC61B2ADC10DA00E77A5C /* P2P+RTCOutgoingMessage.swift in Sources */,
 				48CFC5BF2ADC10DA00E77A5C /* LoadingOverlayView.swift in Sources */,
 				48CFC3FD2ADC10D900E77A5C /* RTCPeerConnection+PeerConnection.swift in Sources */,
-				4855B1B72BCA63B800DD0A47 /* Stage1MigrateToSargon+PersonaDataEntryName.swift in Sources */,
 				48CFC2D22ADC10D900E77A5C /* AccountDetails+View.swift in Sources */,
 				48CFC3EF2ADC10D900E77A5C /* DataChannelClient.swift in Sources */,
 				48CFC2A32ADC10D900E77A5C /* PersonaList+View.swift in Sources */,
@@ -7607,7 +7592,6 @@
 				48CFC5962ADC10DA00E77A5C /* ControlRequirements.swift in Sources */,
 				48CFC4262ADC10DA00E77A5C /* LocalizedError+Equatable.swift in Sources */,
 				48CFC32A2ADC10D900E77A5C /* CameraPermission+View.swift in Sources */,
-				4855B1BB2BCA653700DD0A47 /* Stage1MigrateToSargon+HierarchicalDeterministicFactorInstance.swift in Sources */,
 				48CFC5C62ADC10DA00E77A5C /* ApprovalSlider.swift in Sources */,
 				A4EB37C82B6272F3003FE31D /* TrackedValidatorInteraction.swift in Sources */,
 				48CFC3572ADC10D900E77A5C /* ShowQR+Reducer.swift in Sources */,
