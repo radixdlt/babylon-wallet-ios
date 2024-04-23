@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - FactorSourcesClient + DependencyKey
 extension FactorSourcesClient: DependencyKey {
 	public typealias Value = FactorSourcesClient
@@ -11,80 +13,75 @@ extension FactorSourcesClient: DependencyKey {
 			await profileStore.profile.factorSources
 		}
 
-		let saveFactorSource: SaveFactorSource = { _ in
-//			try await profileStore.updating { profile in
-//				guard !profile.factorSources.contains(where: { $0.id == source.id }) else {
-//					throw FactorSourceAlreadyPresent()
-//				}
-//				profile.factorSources.append(source)
-//			}
-			sargonProfileFinishMigrateAtEndOfStage1()
+		let saveFactorSource: SaveFactorSource = { source in
+			try await profileStore.updating { profile in
+				guard !profile.factorSources.contains(where: { $0.id == source.id }) else {
+					throw FactorSourceAlreadyPresent()
+				}
+				profile.factorSources.append(source)
+			}
 		}
 
-		let updateFactorSource: UpdateFactorSource = { _ in
-//			try await profileStore.updating { profile in
-//				try profile.factorSources.updateFactorSource(id: source.id) {
-//					$0 = source
-//				}
-//			}
-			sargonProfileFinishMigrateAtEndOfStage1()
+		let updateFactorSource: UpdateFactorSource = { source in
+			try await profileStore.updating { profile in
+				try profile.factorSources.updateFactorSource(id: source.id) {
+					$0 = source
+				}
+			}
 		}
 
-		let addPrivateHDFactorSource: AddPrivateHDFactorSource = { _ in
-			/*
-			 let privateHDFactorSource = request.privateHDFactorSource
-			 let deviceFactorSource = privateHDFactorSource.factorSource
-			 let factorSourceID = deviceFactorSource.id
+		let addPrivateHDFactorSource: AddPrivateHDFactorSource = { request in
+			let privateHDFactorSource = request.privateHDFactorSource
+			let deviceFactorSource = privateHDFactorSource.factorSource
+			let factorSourceID = deviceFactorSource.id
 
-			 do {
-			 	try secureStorageClient.saveMnemonicForFactorSource(privateHDFactorSource)
-			 } catch {
-			 	if
-			 		secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSourceID),
-			 		request.onMnemonicExistsStrategy == .appendWithCryptoParamaters
-			 	{
-			 		loggerGlobal.notice("Failed to save mnemonic, since it already exists, so this was expected.")
-			 	} else {
-			 		loggerGlobal.error("Failed to save mnemonic, error: \(error)")
-			 		throw error
-			 	}
-			 }
+			do {
+				try secureStorageClient.saveMnemonicForFactorSource(privateHDFactorSource)
+			} catch {
+				if
+					secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSourceID),
+					request.onMnemonicExistsStrategy == .appendWithCryptoParamaters
+				{
+					loggerGlobal.notice("Failed to save mnemonic, since it already exists, so this was expected.")
+				} else {
+					loggerGlobal.error("Failed to save mnemonic, error: \(error)")
+					throw error
+				}
+			}
 
-			 /// We only need to save olympia mnemonics into Profile, the Babylon ones
-			 /// already exist in profile, and this function is used only to save the
-			 /// imported mnemonic into keychain (done above).
-			 let deviceFactorSources = try await getFactorSources()
-			 	.filter { $0.id == factorSourceID.embed() }
-			 	.map { try $0.extract(as: DeviceFactorSource.self) }
+			/// We only need to save olympia mnemonics into Profile, the Babylon ones
+			/// already exist in profile, and this function is used only to save the
+			/// imported mnemonic into keychain (done above).
+			let deviceFactorSources = try await getFactorSources()
+				.filter { $0.id == factorSourceID.embed() }
+				.map { try $0.extract(as: DeviceFactorSource.self) }
 
-			 if request.saveIntoProfile {
-			 	if let existingInProfile = deviceFactorSources.first {
-			 		switch request.onMnemonicExistsStrategy {
-			 		case .abort:
-			 			throw FactorSourceAlreadyPresent()
-			 		case .appendWithCryptoParamaters:
-			 			var updated = existingInProfile
-			 			let cryptoParamsToAdd = request.privateHDFactorSource.factorSource.common.cryptoParameters
-			 			updated.common.cryptoParameters.append(cryptoParamsToAdd)
-			 			loggerGlobal.notice("Appended crypto parameters \(cryptoParamsToAdd) to DeviceFactorSource.")
-			 			try await updateFactorSource(updated.embed())
-			 		}
-			 	} else {
-			 		do {
-			 			try await saveFactorSource(deviceFactorSource.embed())
-			 		} catch {
-			 			loggerGlobal.critical("Failed to save factor source, error: \(error)")
-			 			// We were unlucky, failed to update Profile, thus best to undo the saving of
-			 			// the mnemonic in keychain (if we can).
-			 			try? secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
-			 			throw error
-			 		}
-			 	}
-			 }
+			if request.saveIntoProfile {
+				if let existingInProfile = deviceFactorSources.first {
+					switch request.onMnemonicExistsStrategy {
+					case .abort:
+						throw FactorSourceAlreadyPresent()
+					case .appendWithCryptoParamaters:
+						var updated = existingInProfile
+						let cryptoParamsToAdd = request.privateHDFactorSource.factorSource.common.cryptoParameters
+						updated.common.cryptoParameters.append(cryptoParamsToAdd)
+						loggerGlobal.notice("Appended crypto parameters \(cryptoParamsToAdd) to DeviceFactorSource.")
+						try await updateFactorSource(updated.embed())
+					}
+				} else {
+					do {
+						try await saveFactorSource(deviceFactorSource.embed())
+					} catch {
+						loggerGlobal.critical("Failed to save factor source, error: \(error)")
+						// We were unlucky, failed to update Profile, thus best to undo the saving of
+						// the mnemonic in keychain (if we can).
+						try? secureStorageClient.deleteMnemonicByFactorSourceID(factorSourceID)
+						throw error
+					}
+				}
+			}
 
-			 return factorSourceID
-			  */
-			sargonProfileFinishMigrateAtEndOfStage1()
+			return factorSourceID
 		}
 
 		let getMainDeviceFactorSource: GetMainDeviceFactorSource = {
@@ -180,45 +177,39 @@ extension FactorSourcesClient: DependencyKey {
 				@Dependency(\.device) var device
 				@Dependency(\.mnemonicClient) var mnemonicClient
 
-				/*
-				 let model = await device.model
-				 let name = await device.name
+				let model = await device.model
+				let name = await device.name
 
-				 let mnemonicWithPassphrase = try MnemonicWithPassphrase(
-				 	mnemonic: mnemonicClient.generate(
-				 		BIP39WordCount.twentyFour,
-				 		BIP39Language.english
-				 	)
-				 )
+				let mnemonicWithPassphrase = try MnemonicWithPassphrase(
+					mnemonic: mnemonicClient.generate(
+						BIP39WordCount.twentyFour,
+						BIP39Language.english
+					), passphrase: ""
+				)
 
-				 loggerGlobal.info("Creating new main BDFS")
-				 let newBDFS = try DeviceFactorSource.babylon(
-				 	mnemonicWithPassphrase: mnemonicWithPassphrase,
-				 	isMain: true,
-				 	model: .init(model),
-				 	name: .init(name)
-				 )
-				 assert(newBDFS.isExplicitMainBDFS)
+				loggerGlobal.info("Creating new main BDFS")
+				var newBDFS = DeviceFactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, isMain: true)
+				newBDFS.hint.model = model
+				newBDFS.hint.name = name
+				assert(newBDFS.isExplicitMainBDFS)
 
-				 loggerGlobal.info("Saving new main BDFS to Keychain only, we will NOT save it into Profile just yet.")
+				loggerGlobal.info("Saving new main BDFS to Keychain only, we will NOT save it into Profile just yet.")
 
-				 _ = try await addPrivateHDFactorSource(
-				 	.init(
-				 		privateHDFactorSource: .init(
-				 			mnemonicWithPassphrase: mnemonicWithPassphrase,
-				 			factorSource: newBDFS
-				 		),
-				 		onMnemonicExistsStrategy: .abort,
-				 		saveIntoProfile: false
-				 	)
-				 )
+				_ = try await addPrivateHDFactorSource(
+					.init(
+						privateHDFactorSource: .init(
+							mnemonicWithPassphrase: mnemonicWithPassphrase,
+							factorSource: newBDFS
+						),
+						onMnemonicExistsStrategy: .abort,
+						saveIntoProfile: false
+					)
+				)
 
-				 return try PrivateHierarchicalDeterministicFactorSource(
-				 	mnemonicWithPassphrase: mnemonicWithPassphrase,
-				 	factorSource: newBDFS
-				 )
-				 */
-				sargonProfileFinishMigrateAtEndOfStage1()
+				return PrivateHierarchicalDeterministicFactorSource(
+					mnemonicWithPassphrase: mnemonicWithPassphrase,
+					factorSource: newBDFS
+				)
 			},
 			getFactorSources: getFactorSources,
 			factorSourcesAsyncSequence: {

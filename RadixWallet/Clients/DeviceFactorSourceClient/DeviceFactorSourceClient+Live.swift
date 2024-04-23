@@ -117,20 +117,19 @@ extension DeviceFactorSourceClient: DependencyKey {
 				}
 			},
 			entitiesControlledByFactorSource: entitiesControlledByFactorSource,
-			controlledEntities: { _ in
-//				let sources: IdentifiedArrayOf<DeviceFactorSource> = try await {
-//					// FIXME: Uh this aint pretty... but we are short on time.
-//					if let overridingSnapshot = maybeOverridingSnapshot {
-//						let profile = Profile(snapshot: overridingSnapshot)
-//						return IdentifiedArrayOf(uniqueElements: profile.factorSources.compactMap { $0.extract(DeviceFactorSource.self) })
-//					} else {
-//						return try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)
-//					}
-//				}()
-//				return try await IdentifiedArrayOf(uniqueElements: sources.asyncMap {
-//					try await entitiesControlledByFactorSource($0, maybeOverridingSnapshot)
-//				})
-				sargonProfileFinishMigrateAtEndOfStage1()
+			controlledEntities: { maybeOverridingSnapshot in
+				let sources: IdentifiedArrayOf<DeviceFactorSource> = try await {
+					// FIXME: Uh this aint pretty... but we are short on time.
+					if let overridingSnapshot = maybeOverridingSnapshot {
+						let profile = overridingSnapshot
+						return IdentifiedArrayOf(uniqueElements: profile.factorSources.compactMap { $0.extract(DeviceFactorSource.self) })
+					} else {
+						return try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)
+					}
+				}()
+				return try await IdentifiedArrayOf(uniqueElements: sources.asyncMap {
+					try await entitiesControlledByFactorSource($0, maybeOverridingSnapshot)
+				})
 			}
 		)
 	}()

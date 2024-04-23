@@ -1,7 +1,29 @@
 import Foundation
 import Sargon
 
+// MARK: - FactorSourceWithIDNotFound
+struct FactorSourceWithIDNotFound: Swift.Error {}
 extension FactorSources {
+	public mutating func updateFactorSource(
+		id: some FactorSourceIDProtocol,
+		_ mutate: @escaping (inout FactorSource) throws -> Void
+	) throws {
+		try updateFactorSource(id: id.embed(), mutate)
+	}
+
+	public mutating func updateFactorSource(
+		id: FactorSourceID,
+		_ mutate: (inout FactorSource) throws -> Void
+	) throws {
+		guard var factorSource = self.get(id: id) else {
+			throw FactorSourceWithIDNotFound()
+		}
+		try mutate(&factorSource)
+		var identifiedArrayOfFactorSources = self.asIdentified()
+		identifiedArrayOfFactorSources[id: id] = factorSource
+		self = try Self(identifiedArrayOfFactorSources.elements)
+	}
+
 	/// Babylon `device` factor source
 	public var babylonDevice: DeviceFactorSource {
 		babylonDeviceFactorSources().first
