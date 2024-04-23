@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ImportOlympiaWalletCoordinator
@@ -423,84 +424,82 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		factorSourceID: FactorSourceIDFromHash,
 		factorSource: PrivateHierarchicalDeterministicFactorSource?
 	) -> Effect<Action> {
-		/*
-		 .run { send in
-		 	// Migrates and saved all accounts to Profile
-		 	let migrated = try await importLegacyWalletClient.migrateOlympiaSoftwareAccountsToBabylon(
-		 		.init(
-		 			olympiaAccounts: Set(olympiaAccounts.elements),
-		 			olympiaFactorSouceID: factorSourceID,
-		 			olympiaFactorSource: factorSource
-		 		)
-		 	)
+		.run { send in
+			// Migrates and saved all accounts to Profile
+			let migrated = try await importLegacyWalletClient.migrateOlympiaSoftwareAccountsToBabylon(
+				.init(
+					olympiaAccounts: Set(olympiaAccounts.elements),
+					olympiaFactorSouceID: factorSourceID,
+					olympiaFactorSource: factorSource
+				)
+			)
 
-		 	if let factorSource, let factorSourceToSave = migrated.factorSourceToSave {
-		 		guard try factorSourceToSave.id == FactorSource.id(
-		 			fromPrivateHDFactorSource: factorSource,
-		 			factorSourceKind: .device
-		 		) else {
-		 			throw OlympiaFactorSourceToSaveIDDisrepancy()
-		 		}
+			if let factorSource, let factorSourceToSave = migrated.factorSourceToSave {
+				let calculatedID = FactorSourceIDFromHash(
+					kind: .device,
+					mnemonicWithPassphrase: factorSource.mnemonicWithPassphrase
+				)
+				guard factorSourceToSave.id == calculatedID else {
+					throw OlympiaFactorSourceToSaveIDDisrepancy()
+				}
 
-		 		let existing = try? await factorSourcesClient.getFactorSource(id: factorSourceToSave.id.embed())
-		 		do {
-		 			let saveIntoProfile = existing == nil
-		 			if saveIntoProfile {
-		 				loggerGlobal.notice("Skip saving Olympia mnemonic into Profile since it is already present, will save to keychain only")
-		 			}
+				let existing = try? await factorSourcesClient.getFactorSource(id: factorSourceToSave.id.embed())
+				do {
+					let saveIntoProfile = existing == nil
+					if saveIntoProfile {
+						loggerGlobal.notice("Skip saving Olympia mnemonic into Profile since it is already present, will save to keychain only")
+					}
 
-		 			try await factorSourcesClient.addOnDeviceFactorSource(
-		 				privateHDFactorSource: factorSource,
-		 				// This is mega edge case, but if we were to use `.abort` here, then users
-		 				// who used a 24 word mnemonic `M` with Olympia wallet and then created their
-		 				// Babylon Wallet using Account Recovery Scan with `M` would not be able to
-		 				// perform Olympia import.
-		 				onMnemonicExistsStrategy: .appendWithCryptoParamaters,
-		 				saveIntoProfile: saveIntoProfile
-		 			)
+					try await factorSourcesClient.addOnDeviceFactorSource(
+						privateHDFactorSource: factorSource,
+						// This is mega edge case, but if we were to use `.abort` here, then users
+						// who used a 24 word mnemonic `M` with Olympia wallet and then created their
+						// Babylon Wallet using Account Recovery Scan with `M` would not be able to
+						// perform Olympia import.
+						onMnemonicExistsStrategy: .appendWithCryptoParamaters,
+						saveIntoProfile: saveIntoProfile
+					)
 
-		 			overlayWindowClient.scheduleHUD(.seedPhraseImported)
+					overlayWindowClient.scheduleHUD(.seedPhraseImported)
 
-		 		} catch {
-		 			loggerGlobal.critical("Failed to save Olympia Mnemonic - error: \(error)")
+				} catch {
+					loggerGlobal.critical("Failed to save Olympia Mnemonic - error: \(error)")
 
-		 			// Check if we have already imported this Mnemonic
-		 			if let existing {
-		 				let presentInKeychain = secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSourceToSave.id)
-		 				if existing.kind == .device, existing.supportsOlympia, presentInKeychain {
-		 					// all good, we had already imported it.
-		 					loggerGlobal.notice("We had already imported this factor source (mnemonic) before.")
-		 				} else {
-		 					let msg = "Failed to save factor source (mnemonic), found in Profile, exists in keychain? \(presentInKeychain). Maybe it is not of .device kind or does not support olympia params. error: \(error)"
-		 					loggerGlobal.critical(.init(stringLiteral: msg))
-		 					assertionFailure(msg)
-		 					errorQueue.schedule(error)
-		 				}
-		 			} else {
-		 				let msg = "Failed to save factor source (mnemonic) but have already created accounts, error: \(error)"
-		 				loggerGlobal.critical(.init(stringLiteral: msg))
-		 				assertionFailure(msg)
-		 				errorQueue.schedule(error)
-		 			}
-		 		}
-		 	}
+					// Check if we have already imported this Mnemonic
+					if let existing {
+						let presentInKeychain = secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(factorSourceToSave.id)
+						if existing.kind == .device, existing.supportsOlympia, presentInKeychain {
+							// all good, we had already imported it.
+							loggerGlobal.notice("We had already imported this factor source (mnemonic) before.")
+						} else {
+							let msg = "Failed to save factor source (mnemonic), found in Profile, exists in keychain? \(presentInKeychain). Maybe it is not of .device kind or does not support olympia params. error: \(error)"
+							loggerGlobal.critical(.init(stringLiteral: msg))
+							assertionFailure(msg)
+							errorQueue.schedule(error)
+						}
+					} else {
+						let msg = "Failed to save factor source (mnemonic) but have already created accounts, error: \(error)"
+						loggerGlobal.critical(.init(stringLiteral: msg))
+						assertionFailure(msg)
+						errorQueue.schedule(error)
+					}
+				}
+			}
 
-		 	// Save all accounts
-		 	try await accountsClient.saveVirtualAccounts(migrated.babylonAccounts.elements)
+			// Save all accounts
+			try await accountsClient.saveVirtualAccounts(migrated.babylonAccounts.elements)
 
-		 	do {
-		 		try userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
-		 	} catch {
-		 		// Not important enought to throw
-		 		loggerGlobal.warning("Failed to save mnemonic as backed up, error: \(error)")
-		 	}
+			do {
+				try userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
+			} catch {
+				// Not important enought to throw
+				loggerGlobal.warning("Failed to save mnemonic as backed up, error: \(error)")
+			}
 
-		 	await send(.internal(.migratedSoftwareAccountsToBabylon(migrated)))
-		 } catch: { error, _ in
-		 	errorQueue.schedule(error)
-		 }
-		  */
-		sargonProfileFinishMigrateAtEndOfStage1()
+			await send(.internal(.migratedSoftwareAccountsToBabylon(migrated)))
+		} catch: { error, _ in
+			errorQueue.schedule(error)
+		}
 	}
 
 	public func migratedSoftwareAccountsToBabylon(
@@ -581,32 +580,29 @@ extension ImportOlympiaWalletCoordinator {
 		networkID: NetworkID,
 		existingAccounts: Int
 	) throws -> NonEmpty<[MigratableAccount]> {
-		/*
-		 let result = scannedAccounts.enumerated().map { index, account in
-		 	let babylonAddress = AccountAddress(
-		 		publicKey: Sargon.PublicKey.ecdsaSecp256k1(account.publicKey).intoSargon(),
-		 		networkID: networkID
-		 	)
+		let result = scannedAccounts.enumerated().map { index, account in
+			let babylonAddress = AccountAddress(
+				publicKey: Sargon.PublicKey.secp256k1(account.publicKey),
+				networkID: networkID
+			)
 
-		 	return MigratableAccount(
-		 		id: account.id,
-		 		accountName: account.displayName?.rawValue,
-		 		olympiaAddress: account.address,
-		 		babylonAddress: babylonAddress,
-		 		appearanceID: .fromNumberOfAccounts(existingAccounts + index),
-		 		olympiaAccountType: account.accountType
-		 	)
-		 }
+			return MigratableAccount(
+				id: account.id,
+				accountName: account.displayName?.rawValue,
+				olympiaAddress: account.address,
+				babylonAddress: babylonAddress,
+				appearanceID: .fromNumberOfAccounts(existingAccounts + index),
+				olympiaAccountType: account.accountType
+			)
+		}
 
-		 guard let nonEmpty = NonEmpty<[MigratableAccount]>(result) else {
-		 	assertionFailure("This is impossible")
-		 	struct ImpossibleError: Error {}
-		 	throw ImpossibleError()
-		 }
+		guard let nonEmpty = NonEmpty<[MigratableAccount]>(result) else {
+			assertionFailure("This is impossible")
+			struct ImpossibleError: Error {}
+			throw ImpossibleError()
+		}
 
-		 return nonEmpty
-		  */
-		sargonProfileFinishMigrateAtEndOfStage1()
+		return nonEmpty
 	}
 
 	private func progressError(_ progress: Progress, line: Int = #line) -> Effect<Action> {

@@ -3,6 +3,7 @@ import Sargon
 
 // Move elsewhere?
 extension MnemonicWithPassphrase {
+	@discardableResult
 	public func validatePublicKeys(
 		of softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 	) throws -> Bool {
