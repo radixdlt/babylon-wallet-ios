@@ -22,7 +22,6 @@ extension Profile {
 	}
 
 	public func containsNetwork(withID networkID: NetworkID) -> Bool {
-//		(try? network(id: networkID)) != nil
-		sargonProfileFinishMigrateAtEndOfStage1()
+		(try? network(id: networkID)) != nil
 	}
 }

@@ -27,18 +27,17 @@ extension Profile {
 	public mutating func addAuthorizedDapp(
 		_ unvalidatedAuthorizedDapp: AuthorizedDapp
 	) throws -> AuthorizedDapp {
-//		let authorizedDapp = try validateAuthorizedPersonas(of: unvalidatedAuthorizedDapp)
-//		let networkID = authorizedDapp.networkID
-//		var network = try network(id: networkID)
-//		guard !network.authorizedDapps.contains(where: { $0.dAppDefinitionAddress == authorizedDapp.dAppDefinitionAddress }) else {
-//			throw AuthorizedDappAlreadyExists()
-//		}
-//		guard network.authorizedDapps.updateOrAppend(authorizedDapp) == nil else {
-//			fatalError("Incorrect implementation, should have been a new AuthorizedDapp")
-//		}
-//		try updateOnNetwork(network)
-//		return authorizedDapp
-		sargonProfileFinishMigrateAtEndOfStage1()
+		let authorizedDapp = try validateAuthorizedPersonas(of: unvalidatedAuthorizedDapp)
+		let networkID = authorizedDapp.networkID
+		var network = try network(id: networkID)
+		guard !network.authorizedDapps.contains(where: { $0.dAppDefinitionAddress == authorizedDapp.dAppDefinitionAddress }) else {
+			throw AuthorizedDappAlreadyExists()
+		}
+		guard network.authorizedDapps.updateOrAppend(authorizedDapp) == nil else {
+			fatalError("Incorrect implementation, should have been a new AuthorizedDapp")
+		}
+		try updateOnNetwork(network)
+		return authorizedDapp
 	}
 
 	/// Forgets  a `AuthorizedDapp`
@@ -46,52 +45,48 @@ extension Profile {
 		_ authorizedDappID: AuthorizedDapp.ID,
 		on networkID: NetworkID
 	) throws {
-//		var network = try network(id: networkID)
-//		guard network.authorizedDapps.remove(id: authorizedDappID) != nil else {
-//			throw DappWasNotConnected()
-//		}
-//
-//		try updateOnNetwork(network)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		var network = try network(id: networkID)
+		guard network.authorizedDapps.remove(authorizedDappID) != nil else {
+			throw DappWasNotConnected()
+		}
+
+		try updateOnNetwork(network)
 	}
 
 	@discardableResult
 	private func validateAuthorizedPersonas(of authorizedDapp: AuthorizedDapp) throws -> AuthorizedDapp {
-		/*
-		 let networkID = authorizedDapp.networkID
-		 let network = try network(id: networkID)
+		let networkID = authorizedDapp.networkID
+		let network = try network(id: networkID)
 
-		 // Validate that all Personas are known and that every Field.ID is known
-		 // for each Persona.
-		 struct AuthorizedDappReferencesUnknownPersonas: Swift.Error {}
-		 struct AuthorizedDappReferencesUnknownPersonaField: Swift.Error {}
-		 for personaNeedle in authorizedDapp.referencesToAuthorizedPersonas {
-		 	guard let persona = network.getPersonas().first(where: { $0.address == personaNeedle.identityAddress }) else {
-		 		throw AuthorizedDappReferencesUnknownPersonas()
-		 	}
+		// Validate that all Personas are known and that every Field.ID is known
+		// for each Persona.
+		struct AuthorizedDappReferencesUnknownPersonas: Swift.Error {}
+		struct AuthorizedDappReferencesUnknownPersonaField: Swift.Error {}
+		for personaNeedle in authorizedDapp.referencesToAuthorizedPersonas {
+			guard let persona = network.getPersonas().first(where: { $0.address == personaNeedle.identityAddress }) else {
+				throw AuthorizedDappReferencesUnknownPersonas()
+			}
 
-		 	let fieldIDNeedles: Set<PersonaDataEntryID> = personaNeedle.sharedPersonaData.entryIDs
-		 	let fieldIDHaystack: Set<PersonaDataEntryID> = Set(persona.personaData.entries.map(\.id))
-		 	guard fieldIDHaystack.isSuperset(of: fieldIDNeedles) else {
-		 		throw AuthorizedDappReferencesUnknownPersonaField()
-		 	}
-		 }
+			let fieldIDNeedles: Set<PersonaDataEntryID> = personaNeedle.sharedPersonaData.entryIDs
+			let fieldIDHaystack: Set<PersonaDataEntryID> = Set(persona.personaData.entries.map(\.id))
+			guard fieldIDHaystack.isSuperset(of: fieldIDNeedles) else {
+				throw AuthorizedDappReferencesUnknownPersonaField()
+			}
+		}
 
-		 // Validate that all Accounts are known
-		 let accountAddressNeedles: Set<AccountAddress> = Set(
-		 	authorizedDapp.referencesToAuthorizedPersonas.flatMap {
-		 		$0.sharedAccounts?.ids ?? []
-		 	}
-		 )
-		 let accountAddressHaystack = Set(network.getAccounts().map(\.address))
-		 guard accountAddressHaystack.isSuperset(of: accountAddressNeedles) else {
-		 	struct AuthorizedDappReferencesUnknownAccount: Swift.Error {}
-		 	throw AuthorizedDappReferencesUnknownAccount()
-		 }
-		 // All good
-		 return authorizedDapp
-		  */
-		sargonProfileFinishMigrateAtEndOfStage1()
+		// Validate that all Accounts are known
+		let accountAddressNeedles: Set<AccountAddress> = Set(
+			authorizedDapp.referencesToAuthorizedPersonas.flatMap {
+				$0.sharedAccounts?.ids ?? []
+			}
+		)
+		let accountAddressHaystack = Set(network.getAccounts().map(\.address))
+		guard accountAddressHaystack.isSuperset(of: accountAddressNeedles) else {
+			struct AuthorizedDappReferencesUnknownAccount: Swift.Error {}
+			throw AuthorizedDappReferencesUnknownAccount()
+		}
+		// All good
+		return authorizedDapp
 	}
 
 	/// Removes a Persona from a dApp in the Profile

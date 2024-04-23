@@ -11,18 +11,16 @@ extension Profile {
 	public mutating func updateAccount(
 		_ account: Sargon.Account
 	) throws {
-//		var network = try network(id: account.networkID)
-//		try network.updateAccount(account)
-//		try updateOnNetwork(network)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		var network = try network(id: account.networkID)
+		try network.updateAccount(account)
+		try updateOnNetwork(network)
 	}
 
 	#if DEBUG
 	public mutating func deleteAccount(_ account: Sargon.Account) throws {
-//		var network = try network(id: account.networkID)
-//		network.deleteAccount(address: account.address)
-//		try updateOnNetwork(network)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		var network = try network(id: account.networkID)
+		network.deleteAccount(address: account.address)
+		try updateOnNetwork(network)
 	}
 	#endif
 
@@ -46,19 +44,17 @@ extension Profile {
 				authorizedDapps: []
 			)
 
-//			try networks.add(network)
-//
-//			if network.networkID == .mainnet {
-//				do {
-//					try changeGateway(to: .mainnet)
-//				} catch {
-//					let errorMsg = "Failed to switch to mainnet, even though we just created a first mainnet account, error: \(error)"
-//					loggerGlobal.critical(.init(stringLiteral: errorMsg))
-//					assertionFailure(errorMsg) // for production, we will not crash
-//				}
-//			}
+			try networks.add(network)
 
-			sargonProfileFinishMigrateAtEndOfStage1()
+			if network.id == .mainnet {
+				do {
+					try changeGateway(to: .mainnet)
+				} catch {
+					let errorMsg = "Failed to switch to mainnet, even though we just created a first mainnet account, error: \(error)"
+					loggerGlobal.critical(.init(stringLiteral: errorMsg))
+					assertionFailure(errorMsg) // for production, we will not crash
+				}
+			}
 		}
 	}
 }
