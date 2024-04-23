@@ -32,14 +32,12 @@ extension ProfileNetwork {
 
 	#if DEBUG
 	public mutating func deleteAccount(address: AccountAddress) {
-//		accounts.remove(id: address)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		accounts.remove(address)
 	}
 	#endif
 
 	public mutating func updateAccount(_ account: Account) throws {
-//		accounts[id: account.id] = account
-		sargonProfileFinishMigrateAtEndOfStage1()
+		accounts[id: account.id] = account
 	}
 
 	public mutating func addAccount(_ account: Account) throws {
@@ -95,39 +93,36 @@ extension ProfileNetwork {
 	}
 
 	public mutating func hidePersonas(ids idsOfPersonaToHide: Set<Persona.ID>) {
-//		for id in idsOfPersonaToHide {
-//			/// Hide the personas themselves
-//			personas[id: id]?.hide()
-//
-//			/// Remove the persona reference on any authorized dapp
-//			authorizedDapps.mutateAll { dapp in
-//				dapp.referencesToAuthorizedPersonas.remove(id: id)
-//			}
-//		}
-//
-//		/// Filter out dapps that do not reference any persona
-//		authorizedDapps.filterInPlace(not(\.referencesToAuthorizedPersonas.isEmpty))
-		sargonProfileFinishMigrateAtEndOfStage1()
+		for id in idsOfPersonaToHide {
+			/// Hide the personas themselves
+			personas[id: id]?.hide()
+
+			/// Remove the persona reference on any authorized dapp
+			authorizedDapps.mutateAll { dapp in
+				dapp.referencesToAuthorizedPersonas.remove(id)
+			}
+		}
+
+		/// Filter out dapps that do not reference any persona
+		authorizedDapps.filterInPlace(not(\.referencesToAuthorizedPersonas.isEmpty))
 	}
 
 	public mutating func unhideAllEntities() {
-//		accounts.mutateAll { $0.unhide() }
-//		personas.mutateAll { $0.unhide() }
-		sargonProfileFinishMigrateAtEndOfStage1()
+		accounts.mutateAll { $0.unhide() }
+		personas.mutateAll { $0.unhide() }
 	}
 
 	public var customDumpMirror: Mirror {
-//		.init(
-//			self,
-//			children: [
-//				"networkID": networkID,
-//				"accounts": accounts,
-//				"personas": personas,
-//				"authorizedDapps": authorizedDapps,
-//			],
-//			displayStyle: .struct
-//		)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		.init(
+			self,
+			children: [
+				"networkID": self.id,
+				"accounts": accounts,
+				"personas": personas,
+				"authorizedDapps": authorizedDapps,
+			],
+			displayStyle: .struct
+		)
 	}
 
 	public var description: String {
