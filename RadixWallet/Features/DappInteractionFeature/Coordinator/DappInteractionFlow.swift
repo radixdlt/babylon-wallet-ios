@@ -312,44 +312,40 @@ extension DappInteractionFlow {
 			_ authorizedPersona: AuthorizedPersonaSimple?,
 			_ signedAuthChallenge: SignedAuthChallenge?
 		) -> Effect<Action> {
-			/*
+			state.persona = persona
+			state.authorizedDapp = authorizedDapp
+			state.authorizedPersona = authorizedPersona
 
-			 state.persona = persona
-			 state.authorizedDapp = authorizedDapp
-			 state.authorizedPersona = authorizedPersona
+			let responsePersona = P2P.Dapp.Response.PersonaResponse(
+				identityAddress: persona.address,
+				label: persona.displayName.value
+			)
 
-			 let responsePersona = P2P.Dapp.Response.Persona(
-			 	identityAddress: persona.address,
-			 	label: persona.displayName
-			 )
+			if let signedAuthChallenge {
+				guard
+					// A **single** signature expected, since we sign auth with a single Persona.
+					let entitySignature = signedAuthChallenge.entitySignatures.first,
+					signedAuthChallenge.entitySignatures.count == 1
+				else {
+					return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Failed to serialize signature")
+				}
+				let proof = P2P.Dapp.Response.AuthProof(entitySignature: entitySignature)
 
-			 if let signedAuthChallenge {
-			 	guard
-			 		// A **single** signature expected, since we sign auth with a single Persona.
-			 		let entitySignature = signedAuthChallenge.entitySignatures.first,
-			 		signedAuthChallenge.entitySignatures.count == 1
-			 	else {
-			 		return dismissEffect(for: state, errorKind: .failedToSignAuthChallenge, message: "Failed to serialize signature")
-			 	}
-			 	let proof = P2P.Dapp.Response.AuthProof(entitySignature: entitySignature)
+				state.responseItems[item] = .remote(.auth(.login(.withChallenge(.init(
+					persona: responsePersona,
+					challenge: signedAuthChallenge.challenge,
+					proof: proof
+				)))))
 
-			 	state.responseItems[item] = .remote(.auth(.login(.withChallenge(.init(
-			 		persona: responsePersona,
-			 		challenge: signedAuthChallenge.challenge,
-			 		proof: proof
-			 	)))))
+			} else {
+				state.responseItems[item] = .remote(.auth(.login(.withoutChallenge(.init(
+					persona: responsePersona
+				)))))
+			}
 
-			 } else {
-			 	state.responseItems[item] = .remote(.auth(.login(.withoutChallenge(.init(
-			 		persona: responsePersona
-			 	)))))
-			 }
+			resetOngoingResponseItemsIfNeeded(for: &state)
 
-			 resetOngoingResponseItemsIfNeeded(for: &state)
-
-			 return autofillOngoingResponseItemsIfPossibleEffect(for: state)
-			  */
-			sargonProfileFinishMigrateAtEndOfStage1()
+			return autofillOngoingResponseItemsIfPossibleEffect(for: state)
 		}
 
 		func handleAccountPermission(_ item: State.AnyInteractionItem) -> Effect<Action> {
