@@ -18,7 +18,7 @@ extension PersonaData.Entry.Kind {
 }
 
 // MARK: - PersonaDataCollectionElement
-public protocol PersonaDataCollectionElement: Hashable & Identifiable {
+public protocol PersonaDataCollectionElement: Hashable & Identifiable where ID == PersonaDataEntryID {
 	associatedtype Value: Hashable
 	var value: Value { get }
 }
