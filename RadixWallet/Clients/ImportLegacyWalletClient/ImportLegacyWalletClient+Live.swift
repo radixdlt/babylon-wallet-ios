@@ -40,18 +40,16 @@ extension ImportLegacyWalletClient: DependencyKey {
 				let displayName = olympiaAccount.displayName ?? defaultAccountName
 
 				let appearanceID = await accountsClient.nextAppearanceID(networkID, accountOffset)
-//
-//				let babylon = try Sargon.Account(
-//					networkID: networkID,
-//					factorInstance: factorInstance,
-//					displayName: displayName,
-//					extraProperties: .init(appearanceID: appearanceID)
-//				)
-//
-//				let migrated = MigratedAccount(olympia: olympiaAccount, babylon: babylon)
-//				accountsSet.append(migrated)
 
-				sargonProfileFinishMigrateAtEndOfStage1()
+				let babylon = try Sargon.Account(
+					networkID: networkID,
+					factorInstance: factorInstance,
+					displayName: displayName,
+					extraProperties: .init(appearanceID: appearanceID)
+				)
+
+				let migrated = MigratedAccount(olympia: olympiaAccount, babylon: babylon)
+				accountsSet.append(migrated)
 			}
 
 			guard let accounts = NonEmpty<OrderedSet<MigratedAccount>>(rawValue: accountsSet) else {
