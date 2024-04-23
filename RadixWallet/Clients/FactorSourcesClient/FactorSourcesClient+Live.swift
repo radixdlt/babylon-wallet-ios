@@ -309,31 +309,27 @@ extension FactorSourcesClient: DependencyKey {
 					signingPurpose: request.signingPurpose
 				)
 			},
-			updateLastUsed: { _ in
-				/*
-				 _ = try await profileStore.updating { profile in
-				 var factorSources = profile.factorSources.rawValue
-				 for id in request.factorSourceIDs {
-				 guard var factorSource = factorSources[id: id] else {
-				 throw FactorSourceNotFound()
-				 }
-				 factorSource.common.lastUsedOn = request.lastUsedOn
-				 factorSources[id: id] = factorSource
-				 }
-				 profile.factorSources = .init(rawValue: factorSources)!
-				 }
-				 */
+			updateLastUsed: { request in
+				_ = try await profileStore.updating { profile in
+					var factorSources = profile.factorSources
+					for id in request.factorSourceIDs {
+						guard var factorSource = factorSources.get(id: id) else {
+							throw FactorSourceNotFound()
+						}
+						factorSource.common.lastUsedOn = request.lastUsedOn
+						let updated = factorSources.updateOrAppend(factorSource)
+						assert(updated != nil)
+					}
+					profile.factorSources = factorSources
+				}
 			},
-			flagFactorSourceForDeletion: { _ in
-				/*
-				 let factorSources = try await getFactorSources()
-				 guard var factorSource = factorSources.rawValue[id: id] else {
-				 	throw FactorSourceNotFound()
-				 }
-				 factorSource.flag(.deletedByUser)
-				 try await updateFactorSource(factorSource)
-				  */
-				sargonProfileFinishMigrateAtEndOfStage1()
+			flagFactorSourceForDeletion: { id in
+				let factorSources = try await getFactorSources()
+				guard var factorSource = factorSources.get(id: id) else {
+					throw FactorSourceNotFound()
+				}
+				factorSource.flag(.deletedByUser)
+				try await updateFactorSource(factorSource)
 			}
 		)
 	}
