@@ -29,8 +29,7 @@ extension BackupsClient: DependencyKey {
 
 		return Self(
 			snapshotOfProfileForExport: {
-//				await profileStore.profile.snapshot()
-				sargonProfileFinishMigrateAtEndOfStage1()
+				await profileStore.profile
 			},
 			loadProfileBackups: { () -> Sargon.Profile.HeaderList? in
 				do {

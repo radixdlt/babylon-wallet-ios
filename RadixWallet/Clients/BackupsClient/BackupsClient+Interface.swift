@@ -40,14 +40,13 @@ extension BackupsClient {
 		_ snapshot: Sargon.Profile,
 		fromCloud: Bool
 	) async throws {
-//		let factorSourceIDs: Set<FactorSourceIDFromHash> = .init(
-//			snapshot.factorSources.compactMap { $0.extract(DeviceFactorSource.self) }.map(\.id)
-//		)
-//		if fromCloud {
-//			try await importCloudProfile(snapshot.header, factorSourceIDs)
-//		} else {
-//			try await importProfileSnapshot(snapshot, factorSourceIDs)
-//		}
-		sargonProfileFinishMigrateAtEndOfStage1()
+		let factorSourceIDs: Set<FactorSourceIDFromHash> = .init(
+			snapshot.factorSources.compactMap { $0.extract(DeviceFactorSource.self) }.map(\.id)
+		)
+		if fromCloud {
+			try await importCloudProfile(snapshot.header, factorSourceIDs)
+		} else {
+			try await importProfileSnapshot(snapshot, factorSourceIDs)
+		}
 	}
 }
