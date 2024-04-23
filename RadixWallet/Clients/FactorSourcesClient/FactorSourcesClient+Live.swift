@@ -245,59 +245,58 @@ extension FactorSourcesClient: DependencyKey {
 				return nextIndex
 			},
 			addPrivateHDFactorSource: addPrivateHDFactorSource,
-			checkIfHasOlympiaFactorSourceForAccounts: { _, _ -> FactorSourceIDFromHash? in
-				/*
-				 guard softwareAccounts.allSatisfy({ $0.accountType == .software }) else {
-				 assertionFailure("Unexpectedly received hardware account, unable to verify.")
-				 return nil
-				 }
-				 do {
-				 // Might be empty, if it is, we will just return nil (for-loop below will not run).
-				 let deviceFactorSources: [DeviceFactorSource] = try await getFactorSources()
-				 .filter { $0.kind == .device }
-				 .compactMap {
-				 guard
-				 let deviceFactorSource = try? $0.extract(as: DeviceFactorSource.self),
-				 deviceFactorSource.hint.mnemonicWordCount == wordCount
-				 else {
-				 return nil
-				 }
-				 return deviceFactorSource
-				 }
+			checkIfHasOlympiaFactorSourceForAccounts: { wordCount, softwareAccounts -> FactorSourceIDFromHash? in
+				guard softwareAccounts.allSatisfy({ $0.accountType == .software }) else {
+					assertionFailure("Unexpectedly received hardware account, unable to verify.")
+					return nil
+				}
+				do {
+					// Might be empty, if it is, we will just return nil (for-loop below will not run).
+					let deviceFactorSources: [DeviceFactorSource] = try await getFactorSources()
+						.filter { $0.kind == .device }
+						.compactMap {
+							guard
+								let deviceFactorSource = try? $0.extract(as: DeviceFactorSource.self),
+								deviceFactorSource.hint.mnemonicWordCount == wordCount
+							else {
+								return nil
+							}
+							return deviceFactorSource
+						}
 
-				 for deviceFactorSource in deviceFactorSources {
-				 let factorSourceID = deviceFactorSource.id
-				 guard
-				 let mnemonic = try secureStorageClient.loadMnemonic(
-				 factorSourceID: factorSourceID,
-				 notifyIfMissing: false
-				 )
-				 else {
-				 continue
-				 }
-				 guard (try? mnemonic.validatePublicKeys(of: softwareAccounts)) == true else {
-				 continue
-				 }
+					for deviceFactorSource in deviceFactorSources {
+						let factorSourceID = deviceFactorSource.id
+						guard
+							let mnemonic = try secureStorageClient.loadMnemonic(
+								factorSourceID: factorSourceID,
+								notifyIfMissing: false
+							)
+						else {
+							continue
+						}
+						guard (try? mnemonic.validatePublicKeys(of: softwareAccounts)) == true else {
+							continue
+						}
 
-				 if !deviceFactorSource.supportsOlympia {
-				 loggerGlobal.notice("Adding Olympia CryptoParameters to factor source which lacked it.")
-				 var updated = deviceFactorSource
-				 updated.common.cryptoParameters.append(.olympiaOnly)
-				 try await updateFactorSource(updated.embed())
-				 }
+						if !deviceFactorSource.supportsOlympia {
+							loggerGlobal.notice("Adding Olympia CryptoParameters to factor source which lacked it.")
+							var updated = deviceFactorSource
+							updated.common.cryptoParameters.append(
+								.olympiaOnly
+							)
+							try await updateFactorSource(updated.embed())
+						}
 
-				 // YES Managed to validate all software accounts against existing factor source
-				 loggerGlobal.debug("Existing factor source found for selected Olympia software accounts.")
-				 return factorSourceID
-				 }
+						// YES Managed to validate all software accounts against existing factor source
+						loggerGlobal.debug("Existing factor source found for selected Olympia software accounts.")
+						return factorSourceID
+					}
 
-				 return nil // Did not find any Olympia `.device` factor sources
-				 } catch {
-				 loggerGlobal.warning("Failed to check if olympia factor source exists, error: \(error)")
-				 return nil // failed? to find any Olympia `.device` factor sources
-				 }
-				 */
-				sargonProfileFinishMigrateAtEndOfStage1()
+					return nil // Did not find any Olympia `.device` factor sources
+				} catch {
+					loggerGlobal.warning("Failed to check if olympia factor source exists, error: \(error)")
+					return nil // failed? to find any Olympia `.device` factor sources
+				}
 			},
 			saveFactorSource: saveFactorSource,
 			updateFactorSource: updateFactorSource,
