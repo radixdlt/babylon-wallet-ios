@@ -5,7 +5,6 @@ public struct AddressView: View {
 	let isTappable: Bool
 	let imageColor: Color?
 	private let showFull: Bool
-	private let action: Action
 
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.openURL) var openURL
@@ -25,13 +24,6 @@ public struct AddressView: View {
 		self.showFull = showFull
 		self.isTappable = isTappable
 		self.imageColor = imageColor
-
-		switch identifiable {
-		case .address, .identifier(.nonFungibleGlobalID):
-			self.action = .copy
-		case .identifier(.transaction):
-			self.action = .viewOnDashboard
-		}
 	}
 }
 
@@ -52,7 +44,6 @@ extension AddressView {
 					.onTapGesture {
 						self.accountAddress = accountAddress
 					}
-					.onLongPressGesture(perform: longPressGesture)
 					.sheet(item: $accountAddress) { address in
 						AccountAddressView(address: address) {
 							self.accountAddress = nil
@@ -70,7 +61,6 @@ extension AddressView {
 				} label: {
 					addressView
 				}
-				.onLongPressGesture(perform: longPressGesture)
 			}
 		}
 	}
@@ -97,7 +87,13 @@ extension AddressView {
 	}
 
 	private var image: Image {
-		Image(action == .copy ? ImageResource.copy : .iconLinkOut)
+		let resource: ImageResource = switch identifiable {
+		case .address, .identifier(.nonFungibleGlobalID):
+			.copy
+		case .identifier(.transaction):
+			.iconLinkOut
+		}
+		return Image(resource)
 	}
 
 	private var copyText: String {
@@ -120,10 +116,6 @@ extension AddressView {
 }
 
 extension AddressView {
-	private func longPressGesture() {
-		action == .copy ? copyToPasteboard() : viewOnRadixDashboard()
-	}
-
 	private func copyToPasteboard() {
 		pasteboardClient.copyString(identifiable.address)
 	}
@@ -142,14 +134,6 @@ extension AddressView {
 
 	private var path: String? {
 		identifiable.addressPrefix + "/" + identifiable.address
-	}
-}
-
-// MARK: AddressView.Action
-extension AddressView {
-	private enum Action {
-		case copy
-		case viewOnDashboard
 	}
 }
 
