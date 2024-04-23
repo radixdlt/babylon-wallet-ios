@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - VerifyMnemonic
@@ -13,24 +14,23 @@ public struct VerifyMnemonic: Sendable, FeatureReducer {
 		public var invalidMnemonic: Bool = false
 
 		public init(mnemonic: Mnemonic) {
-//			self.mnemonic = mnemonic
-//
-//			let identifiedWords = mnemonic.words.identifiablyEnumerated()
-//			let checksumWord = identifiedWords.last!
-//			var randomWords = identifiedWords
-//				.dropLast() // without checksum word
-//				.shuffled() // randomize
-//				.prefix(Self.numberOfRandomWordsToConfirm) // take the required number of words
-//				.sorted { $0.offset < $1.offset } // sort after shuffling
-//			randomWords.append(checksumWord)
-//
-//			self.wordsToConfirm = .init(randomWords)!
-//			self.enteredWords = wordsToConfirm.rawValue.map {
-//				OffsetIdentified(offset: $0.offset, element: "")
-//			}.asIdentified()
-//
-//			self.focusedField = wordsToConfirm.first?.offset
-			sargonProfileFinishMigrateAtEndOfStage1()
+			self.mnemonic = mnemonic
+
+			let identifiedWords = mnemonic.words.identifiablyEnumerated()
+			let checksumWord = identifiedWords.last!
+			var randomWords = identifiedWords
+				.dropLast() // without checksum word
+				.shuffled() // randomize
+				.prefix(Self.numberOfRandomWordsToConfirm) // take the required number of words
+				.sorted { $0.offset < $1.offset } // sort after shuffling
+			randomWords.append(checksumWord)
+
+			self.wordsToConfirm = .init(randomWords)!
+			self.enteredWords = wordsToConfirm.rawValue.map {
+				OffsetIdentified(offset: $0.offset, element: "")
+			}.asIdentified()
+
+			self.focusedField = wordsToConfirm.first?.offset
 		}
 	}
 
