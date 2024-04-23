@@ -2,21 +2,6 @@ import Foundation
 import Sargon
 
 extension FactorSourceCryptoParameters {
-	public var supportsOlympia: Bool {
-		supportedCurves.contains(.secp256k1) &&
-			supportedDerivationPathSchemes.contains(.bip44Olympia)
-	}
-
-	public var supportsBabylon: Bool {
-		supportedCurves.contains(.curve25519) &&
-			supportedDerivationPathSchemes.contains(.cap26)
-	}
-
-	public static let olympiaOnly = Self(
-		supportedCurves: .init(element: .secp256k1),
-		supportedDerivationPathSchemes: [.bip44Olympia]
-	)
-
 	/// Appends  `supportedCurves` and `supportedDerivationPathSchemes` from `other`. This is used if a user tries to
 	/// add an Olympia Factor Source from Manual Account Recovery Scan where the mnemonic already existed as BDFS => append
 	/// (`secp256k1, bip44Olympia)` parameters to this BDFS, and analogously the reversed for Babylon params -> existing Olympia

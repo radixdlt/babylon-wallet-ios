@@ -282,7 +282,7 @@ extension FactorSourcesClient: DependencyKey {
 							loggerGlobal.notice("Adding Olympia CryptoParameters to factor source which lacked it.")
 							var updated = deviceFactorSource
 							updated.common.cryptoParameters.append(
-								.olympiaOnly
+								.olympia
 							)
 							try await updateFactorSource(updated.embed())
 						}
