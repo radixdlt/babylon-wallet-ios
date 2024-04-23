@@ -99,20 +99,19 @@ import SwiftUI
 // MARK: - Permission_Preview
 struct PersonaDataPermission_Preview: PreviewProvider {
 	static var previews: some SwiftUI.View {
-//		NavigationStack {
-//			PersonaDataPermission.View(
-//				store: .init(
-//					initialState: .previewValue,
-//					reducer: PersonaDataPermission.init
-//				) {
-//					$0.personasClient.getPersonas = { @Sendable in
-//						[.previewValue0, .previewValue1]
-//					}
-//				}
-//			)
-//			.toolbar(.visible, for: .navigationBar)
-//		}
-		sargonProfileFinishMigrateAtEndOfStage1()
+		NavigationStack {
+			PersonaDataPermission.View(
+				store: .init(
+					initialState: .previewValue,
+					reducer: PersonaDataPermission.init
+				) {
+					$0.personasClient.getPersonas = { @Sendable in
+						[.sample, .sampleOther]
+					}
+				}
+			)
+			.toolbar(.visible, for: .navigationBar)
+		}
 	}
 }
 
