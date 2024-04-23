@@ -207,34 +207,30 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 				assert(factorSourceID == id.embed())
 				assert(networkID == state.networkID)
 				loggerGlobal.debug("Creating accounts with networkID: \(networkID)")
-				sargonProfileFinishMigrateAtEndOfStage1()
-//				return .run { send in
-//					let accounts = try await publicHDKeys.enumerated().asyncMap { localOffset, publicHDKey in
-//						let offset = localOffset + globalOffset
-//						let appearanceID = await accountsClient.nextAppearanceID(networkID, offset)
-//						return try Sargon.Account(
-//							networkID: networkID,
-//							factorInstance: HierarchicalDeterministicFactorInstance(
-//								factorSourceID: id,
-//								publicHDKey: publicHDKey
-//							),
-//							displayName: .init(rawValue: L10n.AccountRecoveryScan.InProgress.nameOfRecoveredAccount) ?? "Unnamed",
-//							extraProperties: .init(
-//								appearanceID: appearanceID,
-//								// We will be replacing the `depositRule` with one fetched from GW
-//								// in `scan` step later on.
-//								onLedgerSettings: .unknown
-//							)
-//						)
-//					}.asIdentified()
-//
-//					await send(.internal(.startScan(accounts: accounts)))
-//				} catch: { error, send in
-//					let errorMsg = "Failed to create account, error: \(error)"
-//					loggerGlobal.critical(.init(stringLiteral: errorMsg))
-//					assertionFailure(errorMsg)
-//					await send(.delegate(.failed))
-//				}
+				return .run { send in
+					let accounts = try await publicHDKeys.enumerated().asyncMap { localOffset, publicHDKey in
+						let offset = localOffset + globalOffset
+						let appearanceID = await accountsClient.nextAppearanceID(networkID, offset)
+						return try Sargon.Account(
+							networkID: networkID,
+							factorInstance: .init(factorSourceId: id, publicKey: publicHDKey),
+							displayName: .init(rawValue: L10n.AccountRecoveryScan.InProgress.nameOfRecoveredAccount) ?? "Unnamed",
+							extraProperties: .init(
+								appearanceID: appearanceID,
+								// We will be replacing the `depositRule` with one fetched from GW
+								// in `scan` step later on.
+								onLedgerSettings: .unknown
+							)
+						)
+					}.asIdentified()
+
+					await send(.internal(.startScan(accounts: accounts)))
+				} catch: { error, send in
+					let errorMsg = "Failed to create account, error: \(error)"
+					loggerGlobal.critical(.init(stringLiteral: errorMsg))
+					assertionFailure(errorMsg)
+					await send(.delegate(.failed))
+				}
 
 			case .failedToDerivePublicKey:
 				return .send(.delegate(.failed))

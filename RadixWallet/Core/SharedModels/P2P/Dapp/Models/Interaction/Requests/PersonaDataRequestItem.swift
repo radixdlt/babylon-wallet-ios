@@ -54,13 +54,12 @@ extension P2P.Dapp.Request {
 		public var existingRequestedEntries: [PersonaData.Entry.Kind: [PersonaData.Entry]] = [:]
 
 		public var response: P2P.Dapp.Request.Response? {
-//			guard missingEntries.isEmpty else { return nil }
-//			return try? .init(
-//				name: existingRequestedEntries.extract(.fullName),
-//				emailAddresses: existingRequestedEntries.extract(.emailAddress),
-//				phoneNumbers: existingRequestedEntries.extract(.phoneNumber)
-//			)
-			sargonProfileFinishMigrateAtEndOfStage1()
+			guard missingEntries.isEmpty else { return nil }
+			return try? .init(
+				name: existingRequestedEntries.extract(.fullName),
+				emailAddresses: existingRequestedEntries.extract(.emailAddress),
+				phoneNumbers: existingRequestedEntries.extract(.phoneNumber)
+			)
 		}
 	}
 }
