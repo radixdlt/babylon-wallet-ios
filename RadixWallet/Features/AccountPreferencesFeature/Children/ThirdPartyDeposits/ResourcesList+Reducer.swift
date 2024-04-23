@@ -151,17 +151,16 @@ public struct ResourcesList: FeatureReducer, Sendable {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .resourceLoaded(resource, newAsset):
-//			state.loadedResources.append(.init(iconURL: resource?.metadata.iconURL, name: resource?.metadata.title, address: newAsset))
-//
-//			switch newAsset {
-//			case let .assetException(resource):
-//				state.thirdPartyDeposits.appendToAssetsExceptionList(resource)
-//			case let .allowedDepositor(depositorAddress):
-//				state.thirdPartyDeposits.appendToDepositorsAllowList(depositorAddress)
-//			}
-//
-//			return .send(.delegate(.updated(state.thirdPartyDeposits)))
-			sargonProfileFinishMigrateAtEndOfStage1()
+			state.loadedResources.append(.init(iconURL: resource?.metadata.iconURL, name: resource?.metadata.title, address: newAsset))
+
+			switch newAsset {
+			case let .assetException(resource):
+				state.thirdPartyDeposits.appendToAssetsExceptionList(resource)
+			case let .allowedDepositor(depositorAddress):
+				state.thirdPartyDeposits.appendToDepositorsAllowList(depositorAddress)
+			}
+
+			return .send(.delegate(.updated(state.thirdPartyDeposits)))
 
 		case let .resourcesLoaded(resources):
 			guard let resources else {
@@ -195,20 +194,19 @@ public struct ResourcesList: FeatureReducer, Sendable {
 			}
 
 		case let .confirmAssetDeletion(.confirmTapped(resource)):
-//			state.loadedResources.removeAll(where: { $0.address == resource })
-//			switch resource {
-//			case let .assetException(resource):
-//				state.thirdPartyDeposits.updateAssetsExceptionList {
-//					$0?.removeAll(where: { $0.address == resource.address })
-//				}
-//			case let .allowedDepositor(depositorAddress):
-//				state.thirdPartyDeposits.updateDepositorsAllowList {
-//					$0?.remove(depositorAddress)
-//				}
-//			}
-//
-//			return .send(.delegate(.updated(state.thirdPartyDeposits)))
-			sargonProfileFinishMigrateAtEndOfStage1()
+			state.loadedResources.removeAll(where: { $0.address == resource })
+			switch resource {
+			case let .assetException(resource):
+				state.thirdPartyDeposits.updateAssetsExceptionList {
+					$0?.removeAll(where: { $0.address == resource.address })
+				}
+			case let .allowedDepositor(depositorAddress):
+				state.thirdPartyDeposits.updateDepositorsAllowList {
+					$0?.remove(depositorAddress)
+				}
+			}
+
+			return .send(.delegate(.updated(state.thirdPartyDeposits)))
 
 		default:
 			return .none
