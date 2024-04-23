@@ -7,6 +7,7 @@ struct AccountAddressView: View {
 	let closeAction: () -> Void
 
 	@State private var qrImage: Result<CGImage, Error>? = nil
+	@State private var showEnlargedView = false
 	@State private var showShareView = false
 
 	@Dependency(\.qrGeneratorClient) var qrGeneratorClient
@@ -21,8 +22,10 @@ struct AccountAddressView: View {
 			viewOnDashboard
 		}
 		.padding([.horizontal, .bottom], .medium3)
+		.overlay(alignment: .top) {
+			overlay
+		}
 		.withNavigationBar(closeAction: closeAction)
-		.toolbar(.visible, for: .navigationBar)
 		.presentationDetents([.large])
 		.presentationDragIndicator(.visible)
 		.task {
@@ -73,27 +76,20 @@ struct AccountAddressView: View {
 		let end = content.suffix(6)
 		content = String(content.dropLast(6))
 
-		if #available(iOS 17.0, *) {
-			return Text(start)
-				.foregroundColor(.app.gray1)
-				+ Text(content)
-				.foregroundStyle(LinearGradient.app.brand1)
-				+ Text(end)
-				.foregroundColor(.app.gray1)
-		} else {
-			return Text(start)
-				.foregroundColor(.app.gray1)
-				+ Text(content)
-				.foregroundColor(.app.gray2)
-				+ Text(end)
-				.foregroundColor(.app.gray1)
-		}
+		return Text(start)
+			.foregroundColor(.app.gray1)
+			+ Text(content)
+			.foregroundColor(.app.gray2)
+			+ Text(end)
+			.foregroundColor(.app.gray1)
 	}
 
 	private var actions: some View {
 		HStack(spacing: .large3) {
 			Button("Copy", image: .copy, action: copy)
-			Button("Enlarge", image: .fullScreen, action: enlarge)
+			Button("Enlarge", image: .fullScreen) {
+				showEnlargedView(true)
+			}
 			Button("Share", systemImage: "square.and.arrow.up", action: share)
 		}
 		.padding(.horizontal, .medium2)
@@ -138,19 +134,90 @@ struct AccountAddressView: View {
 	}
 }
 
+// MARK: - Enlarged view
+private extension AccountAddressView {
+	var overlay: some View {
+		Group {
+			if showEnlargedView {
+				enlargedView
+					.onTapGesture {
+						showEnlargedView(false)
+					}
+					.background(enlargedViewBackrgound)
+			}
+		}
+	}
+
+	var enlargedView: some View {
+		Group {
+			Text(enlargedText)
+				.textStyle(.enlarged)
+				.foregroundColor(.app.white)
+		}
+		.multilineTextAlignment(.center)
+		.padding(.small1)
+		.background(.app.gray1.opacity(0.8))
+		.cornerRadius(.small1)
+		.padding(.horizontal, .large2)
+	}
+
+	private var enlargedText: AttributedString {
+		let attributes = [NSAttributedString.Key.foregroundColor: UIColor(Color.app.green3)]
+		let result = NSMutableAttributedString()
+		for letter in address.address.unicodeScalars {
+			let isDigit = CharacterSet.decimalDigits.contains(letter)
+			result.append(.init(
+				string: String(letter),
+				attributes: isDigit ? attributes : nil
+			))
+		}
+
+		return .init(result)
+	}
+
+	private var enlargedViewBackrgound: some View {
+		Color.black.opacity(0.2)
+			.frame(width: UIScreen.main.bounds.width * 2, height: UIScreen.main.bounds.height * 2)
+			.contentShape(Rectangle())
+			.onTapGesture {
+				showEnlargedView(false)
+			}
+	}
+}
+
+extension String {
+	var rangesOfDigits: [NSRange] {
+		var ranges = [NSRange]()
+		var range = NSRange(location: 0, length: count)
+		while range.location != NSNotFound {
+			range = (self as NSString).rangeOfCharacter(from: .decimalDigits)
+			if range.location != NSNotFound {
+				ranges.append(range)
+				range = NSRange(location: range.location + range.length,
+				                length: count - (range.location + range.length))
+			}
+		}
+		return ranges
+	}
+}
+
 // MARK: - Actions
 private extension AccountAddressView {
-	private func copy() {
+	func copy() {
 		pasteboardClient.copyString(address.address)
 	}
 
-	private func enlarge() {}
+	func showEnlargedView(_ value: Bool) {
+		withAnimation {
+			showEnlargedView = value
+		}
+	}
 
-	private func share() {
+	func share() {
 		showShareView = true
 	}
 
-	private func viewOnRadixDashboard() {
+	func viewOnRadixDashboard() {
 		Task { [openURL, gatewaysClient] in
 			let path = "account/" + address.formatted(.raw)
 			let currentNetwork = await gatewaysClient.getCurrentGateway().network
