@@ -65,15 +65,6 @@ public struct NextEntityIndexForFactorSourceRequest {
 	public let networkID: NetworkID?
 }
 
-extension DerivationPath {
-	public var scheme: DerivationPathScheme {
-		switch self {
-		case .bip44Like: DerivationPathScheme.bip44Olympia
-		case .cap26: DerivationPathScheme.cap26
-		}
-	}
-}
-
 // MARK: - IndicesOfEntitiesControlledByFactorSourceRequest
 public struct IndicesOfEntitiesControlledByFactorSourceRequest: Sendable, Hashable {
 	public let entityKind: EntityKind
@@ -252,20 +243,6 @@ extension FactorSourcesClient {
 
 		try await saveFactorSource(newMainBDFS.embed())
 	}
-
-//	public func addOffDeviceFactorSource(
-//		mnemonicWithPassphrase: MnemonicWithPassphrase,
-//		label: OffDeviceMnemonicFactorSource.Hint.Label
-//	) async throws -> FactorSource {
-//		let factorSource = try OffDeviceMnemonicFactorSource.from(
-//			mnemonicWithPassphrase: mnemonicWithPassphrase,
-//			label: label
-//		)
-//
-//		try await saveFactorSource(factorSource.embed())
-//
-//		return factorSource.embed()
-//	}
 
 	@discardableResult
 	public func addOnDeviceFactorSource(
