@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - Login
@@ -156,31 +157,29 @@ struct Login: Sendable, FeatureReducer {
 	}
 
 	func loadPersonas(state: inout State) -> Effect<Action> {
-//		.run { [dAppDefinitionAddress = state.dappMetadata.dAppDefinitionAddress] send in
-//			let personas = try await personasClient.getPersonas()
-//			let authorizedDapps = try await authorizedDappsClient.getAuthorizedDapps()
-//			let authorizedDapp = authorizedDapps[id: dAppDefinitionAddress]
-//			let authorizedPersona: AuthorizedPersonaSimple? = { () -> AuthorizedPersonaSimple? in
-//				guard let authorizedDapp else {
-//					return nil
-//				}
-//				return personas.reduce(into: nil) { mostRecentlyAuthorizedPersona, currentPersona in
-		////					guard let currentAuthorizedPersona = authorizedDapp.referencesToAuthorizedPersonas[id: currentPersona.address] else {
-//					guard let currentAuthorizedPersona = authorizedDapp.referencesToAuthorizedPersonas.first(where: { $0.id == currentPersona.address }) else {
-//						return
-//					}
-//					if let mostRecentlyAuthorizedPersonaCopy = mostRecentlyAuthorizedPersona {
-//						if currentAuthorizedPersona.lastLogin > mostRecentlyAuthorizedPersonaCopy.lastLogin {
-//							mostRecentlyAuthorizedPersona = currentAuthorizedPersona
-//						}
-//					} else {
-//						mostRecentlyAuthorizedPersona = currentAuthorizedPersona
-//					}
-//				}
-//			}()
-//			await send(.internal(.personasLoaded(personas, authorizedDapp, authorizedPersona)))
-//		}
-		sargonProfileFinishMigrateAtEndOfStage1()
+		.run { [dAppDefinitionAddress = state.dappMetadata.dAppDefinitionAddress] send in
+			let personas = try await personasClient.getPersonas()
+			let authorizedDapps = try await authorizedDappsClient.getAuthorizedDapps()
+			let authorizedDapp = authorizedDapps[id: dAppDefinitionAddress]
+			let authorizedPersona: AuthorizedPersonaSimple? = { () -> AuthorizedPersonaSimple? in
+				guard let authorizedDapp else {
+					return nil
+				}
+				return personas.reduce(into: nil) { mostRecentlyAuthorizedPersona, currentPersona in
+					guard let currentAuthorizedPersona = authorizedDapp.referencesToAuthorizedPersonas[id: currentPersona.address] else {
+						return
+					}
+					if let mostRecentlyAuthorizedPersonaCopy = mostRecentlyAuthorizedPersona {
+						if currentAuthorizedPersona.lastLogin > mostRecentlyAuthorizedPersonaCopy.lastLogin {
+							mostRecentlyAuthorizedPersona = currentAuthorizedPersona
+						}
+					} else {
+						mostRecentlyAuthorizedPersona = currentAuthorizedPersona
+					}
+				}
+			}()
+			await send(.internal(.personasLoaded(personas, authorizedDapp, authorizedPersona)))
+		}
 	}
 
 	func determinePersonaPrimacy() -> Effect<Action> {

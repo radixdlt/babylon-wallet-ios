@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 typealias RequestEnvelope = DappInteractionClient.RequestEnvelope
@@ -448,8 +449,7 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 	}
 
 	private func networkName(for networkID: NetworkID) -> String {
-		// (try? NetworkDefinition.lookupBy(id: networkID).displayDescription) ?? String(describing: networkID)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		Gateway.forNetwork(id: networkID).network.displayDescription
 	}
 }
 
