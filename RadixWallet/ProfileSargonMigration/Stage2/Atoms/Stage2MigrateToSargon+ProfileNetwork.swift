@@ -126,13 +126,12 @@ extension ProfileNetwork {
 	}
 
 	public var description: String {
-//		"""
-//		networkID: \(networkID),
-//		accounts: \(accounts),
-//		personas: \(personas),
-//		authorizedDapps: \(authorizedDapps),
-//		"""
-		sargonProfileFinishMigrateAtEndOfStage1()
+		"""
+		networkID: \(id),
+		accounts: \(accounts),
+		personas: \(personas),
+		authorizedDapps: \(authorizedDapps),
+		"""
 	}
 }
 
@@ -166,11 +165,10 @@ extension ProfileNetworks {
 	}
 
 	public mutating func add(_ network: ProfileNetwork) throws {
-		//        guard !dictionary.contains(where: { $0.key == network.networkID }) else {
-		//            throw Error.networkAlreadyExistsWithID(network.networkID)
-		//        }
-		//        let updatedElement = dictionary.updateValue(network, forKey: network.networkID)
-		//        assert(updatedElement == nil)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		guard get(id: network.id) == nil else {
+			throw Error.networkAlreadyExistsWithID(network.id)
+		}
+		let updatedElement = self.updateOrAppend(network)
+		assert(updatedElement == nil)
 	}
 }
