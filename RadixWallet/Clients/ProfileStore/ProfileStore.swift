@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - ProfileStore
 /// An in-memory holder of the app's `Profile` which syncs changes to *Keychain* and
 /// needed state to *UserDefaults* (activeProfileID). If user has iCloud Keychain sync
@@ -615,25 +617,19 @@ extension ProfileStore {
 			), passphrase: ""
 		)
 
-//		let bdfs = try DeviceFactorSource.babylon(
-//			mnemonicWithPassphrase: mnemonic,
-//			isMain: true,
-//			model: "iPhone",
-//			name: "iPhone"
-//		)
-//
-//		let bdfsMnemonic = try PrivateHierarchicalDeterministicFactorSource(
-//			mnemonicWithPassphrase: mnemonic,
-//			factorSource: bdfs
-//		)
-//
-//		let profile = Profile(
-//			header: header,
-//			deviceFactorSource: bdfs
-//		)
-//
-//		return (profile, bdfsMnemonic)
-		sargonProfileFinishMigrateAtEndOfStage1()
+		let bdfs = DeviceFactorSource.babylon(mnemonicWithPassphrase: mnemonic, isMain: true)
+
+		let bdfsMnemonic = PrivateHierarchicalDeterministicFactorSource(
+			mnemonicWithPassphrase: mnemonic,
+			factorSource: bdfs
+		)
+
+		let profile = Profile(
+			header: header,
+			deviceFactorSource: bdfs
+		)
+
+		return (profile, bdfsMnemonic)
 	}
 
 	/// Returns `MetaDeviceInfo` which contains `fromDeprecatedDeviceID` , and if
