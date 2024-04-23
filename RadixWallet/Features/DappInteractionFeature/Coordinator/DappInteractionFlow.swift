@@ -613,50 +613,50 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse.PersonaDataRequestR
 		personaDataRequested requested: P2P.Dapp.Request.PersonaDataRequestItem,
 		personaData: PersonaData
 	) throws {
-		/*
-		 func extractEntry<T>(
-		 	_ personaDataKeyPath: KeyPath<PersonaData, PersonaData.IdentifiedEntry<T>?>,
-		 	isRequested isRequestedKeyPath: KeyPath<P2P.Dapp.Request.PersonaDataRequestItem, Bool?>
-		 ) -> T? where T: PersonaDataEntryProtocol {
-		 	// Check if incoming Dapp requested this persona data entry kind
-		 	guard requested[keyPath: isRequestedKeyPath] == true else { return nil }
-		 	guard let personaDataEntry = personaData[keyPath: personaDataKeyPath] else { return nil }
-		 	return personaDataEntry.value
-		 }
+		try self.init(
+			name: { () -> PersonaDataEntryName? in
+				// Check if incoming Dapp requested this persona data entry kind
+				guard requested[keyPath: \.isRequestingName] == true else { return nil }
+				guard let personaDataEntry = personaData[keyPath: \.name] else { return nil }
+				return personaDataEntry.value
+			}(),
+			emailAddresses: { () -> OrderedSet<PersonaDataEntryEmailAddress>? in
+				// Check if incoming Dapp requests the persona data entry kind
+				guard
+					let numberOfRequestedElements = requested[keyPath: \.numberOfRequestedEmailAddresses],
+					numberOfRequestedElements.quantity > 0
+				else {
+					// Incoming Dapp request did not ask for access to this kind
+					return nil
+				}
+				let personaDataEntries = personaData[keyPath: \.emailAddresses]
+				let personaDataEntriesOrderedSet = try OrderedSet<PersonaDataEntryEmailAddress>(validating: personaDataEntries.collection.map(\.value))
 
-		 func extractEntries<T>(
-		 	_ personaDataKeyPath: KeyPath<PersonaData, PersonaData.CollectionOfIdentifiedEntries<T>>,
-		 	requested requestedKeyPath: KeyPath<P2P.Dapp.Request.PersonaDataRequestItem, RequestedQuantity?>
-		 ) throws -> OrderedSet<T>? where T: Hashable & PersonaDataEntryProtocol {
-		 	// Check if incoming Dapp requests the persona data entry kind
-		 	guard
-		 		let numberOfRequestedElements = requested[keyPath: requestedKeyPath],
-		 		numberOfRequestedElements.quantity > 0
-		 	else {
-		 		// Incoming Dapp request did not ask for access to this kind
-		 		return nil
-		 	}
-		 	let personaDataEntries = personaData[keyPath: personaDataKeyPath]
-		 	let personaDataEntriesOrderedSet = try OrderedSet<T>(validating: personaDataEntries.map(\.value))
+				guard personaDataEntriesOrderedSet.satisfies(numberOfRequestedElements) else {
+					return nil
+				}
+				return personaDataEntriesOrderedSet
+			}(),
+			// OH NOOOOOES! TERRIBLE COPY PASTE, alas, we are gonna migrate this into Sargon very soon.
+			// so please do forgive me.
+			phoneNumbers: { () -> OrderedSet<PersonaDataEntryPhoneNumber>? in
+				// Check if incoming Dapp requests the persona data entry kind
+				guard
+					let numberOfRequestedElements = requested[keyPath: \.numberOfRequestedPhoneNumbers],
+					numberOfRequestedElements.quantity > 0
+				else {
+					// Incoming Dapp request did not ask for access to this kind
+					return nil
+				}
+				let personaDataEntries = personaData[keyPath: \.phoneNumbers]
+				let personaDataEntriesOrderedSet = try OrderedSet<PersonaDataEntryPhoneNumber>(validating: personaDataEntries.collection.map(\.value))
 
-		 	guard personaDataEntriesOrderedSet.satisfies(numberOfRequestedElements) else {
-		 		return nil
-		 	}
-		 	return personaDataEntriesOrderedSet
-		 }
-
-		 try self.init(
-		 	name: extractEntry(\.name, isRequested: \.isRequestingName),
-		 	dateOfBirth: nil, // FIXME: When P2P.Dapp.Requests and Response support it
-		 	companyName: nil, // FIXME: When P2P.Dapp.Requests and Response support it
-		 	emailAddresses: extractEntries(\.emailAddresses, requested: \.numberOfRequestedEmailAddresses),
-		 	phoneNumbers: extractEntries(\.phoneNumbers, requested: \.numberOfRequestedPhoneNumbers),
-		 	urls: nil, // FIXME: When P2P.Dapp.Requests and Response support it
-		 	postalAddresses: nil, // FIXME: When P2P.Dapp.Requests and Response support it
-		 	creditCards: nil // FIXME: When P2P.Dapp.Requests and Response support it
-		 )
-		  */
-		sargonProfileFinishMigrateAtEndOfStage1()
+				guard personaDataEntriesOrderedSet.satisfies(numberOfRequestedElements) else {
+					return nil
+				}
+				return personaDataEntriesOrderedSet
+			}()
+		)
 	}
 }
 
