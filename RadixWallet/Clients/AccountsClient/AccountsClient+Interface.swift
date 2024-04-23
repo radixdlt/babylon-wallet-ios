@@ -98,7 +98,7 @@ public struct AccountsClient: Sendable {
 }
 
 extension AccountsClient {
-	public typealias Accounts = IdentifiedArrayOf<Sargon.Account>
+	public typealias Accounts = IdentifiedArrayOf<Account>
 
 	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 
@@ -109,18 +109,18 @@ extension AccountsClient {
 	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> IdentifiedArrayOf<Account>
 
 	public typealias AccountsOnCurrentNetwork = @Sendable () async -> AnyAsyncSequence<IdentifiedArrayOf<Account>>
-	public typealias AccountUpdates = @Sendable (AccountAddress) async -> AnyAsyncSequence<Sargon.Account>
+	public typealias AccountUpdates = @Sendable (AccountAddress) async -> AnyAsyncSequence<Account>
 
-	public typealias NewVirtualAccount = @Sendable (NewAccountRequest) async throws -> Sargon.Account
-	public typealias SaveVirtualAccounts = @Sendable ([Sargon.Account]) async throws -> Void
+	public typealias NewVirtualAccount = @Sendable (NewAccountRequest) async throws -> Account
+	public typealias SaveVirtualAccounts = @Sendable ([Account]) async throws -> Void
 
-	public typealias GetAccountByAddress = @Sendable (AccountAddress) async throws -> Sargon.Account
+	public typealias GetAccountByAddress = @Sendable (AccountAddress) async throws -> Account
 
 	public typealias HasAccountOnNetwork = @Sendable (NetworkID) async throws -> Bool
 
-	public typealias UpdateAccount = @Sendable (Sargon.Account) async throws -> Void
+	public typealias UpdateAccount = @Sendable (Account) async throws -> Void
 	#if DEBUG
-	public typealias DebugOnlyDeleteAccount = @Sendable (Sargon.Account) async throws -> Void
+	public typealias DebugOnlyDeleteAccount = @Sendable (Account) async throws -> Void
 	#endif
 }
 
@@ -138,14 +138,14 @@ public struct NewAccountRequest: Sendable, Hashable {
 
 extension AccountsClient {
 	/// Saves a virtual account into the profile.
-	public func saveVirtualAccount(_ account: Sargon.Account) async throws {
+	public func saveVirtualAccount(_ account: Account) async throws {
 		try await saveVirtualAccounts([account])
 	}
 }
 
 // FIXME: Delete this TEMPORARY bridge, once Wallet uses Sargon Profile!
 extension AccountsClient {
-	public func fromSargon(_ sargonAccount: Sargon.Account) async throws -> Sargon.Account {
+	public func fromSargon(_ sargonAccount: Account) async throws -> Account {
 		try await getAccountByAddress(sargonAccount.address)
 	}
 }

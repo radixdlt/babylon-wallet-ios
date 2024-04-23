@@ -173,7 +173,7 @@ extension PersonaDetails.State {
 
 	struct AccountSection: Equatable {
 		let dAppName: String
-		let sharingAccounts: OrderedSet<Sargon.ProfileNetwork.AccountForDisplay>
+		let sharingAccounts: OrderedSet<ProfileNetwork.AccountForDisplay>
 	}
 }
 

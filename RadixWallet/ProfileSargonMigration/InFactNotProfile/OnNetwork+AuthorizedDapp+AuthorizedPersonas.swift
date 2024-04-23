@@ -1,7 +1,7 @@
 
 
 // MARK: ~~~=== LOGIC ===~~~
-extension Sargon.ProfileNetwork {
+extension ProfileNetwork {
 	public struct AccountForDisplay: Sendable, Hashable, Identifiable {
 		public typealias ID = AccountAddress
 		public var id: ID { address }
@@ -41,26 +41,26 @@ extension Sargon.ProfileNetwork {
 	}
 
 	public struct AuthorizedDappDetailed: Sendable, Hashable {
-		public let networkID: Sargon.NetworkID
+		public let networkID: NetworkID
 		public let dAppDefinitionAddress: AccountAddress
 		public let displayName: NonEmptyString?
-		public let detailedAuthorizedPersonas: IdentifiedArrayOf<Sargon.ProfileNetwork.AuthorizedPersonaDetailed>
+		public let detailedAuthorizedPersonas: IdentifiedArrayOf<ProfileNetwork.AuthorizedPersonaDetailed>
 	}
 
 	public func detailsForAuthorizedDapp(_ dapp: AuthorizedDapp) throws -> AuthorizedDappDetailed {
 		guard
 			dapp.networkID == self.id
 		else {
-			/// this is a sign that Sargon.Profile is in a bad state somehow...
+			/// this is a sign that Profile is in a bad state somehow...
 			throw NetworkDiscrepancyError()
 		}
-		let detailedAuthorizedPersonas = try IdentifiedArrayOf<Sargon.ProfileNetwork.AuthorizedPersonaDetailed>(uniqueElements: dapp.referencesToAuthorizedPersonas.map {
+		let detailedAuthorizedPersonas = try IdentifiedArrayOf<ProfileNetwork.AuthorizedPersonaDetailed>(uniqueElements: dapp.referencesToAuthorizedPersonas.map {
 			simple in
 
 			guard
 				let persona = self.getPersonas().first(where: { $0.address == simple.identityAddress })
 			else {
-				/// this is a sign that Sargon.Profile is in a bad state somehow...
+				/// this is a sign that Profile is in a bad state somehow...
 				throw DiscrepancyAuthorizedDappReferencedPersonaWhichDoesNotExist()
 			}
 			let displayName = persona.displayName.asNonEmpty

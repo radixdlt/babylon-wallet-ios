@@ -32,7 +32,7 @@ public struct AuthorizedDappsClient: Sendable {
 
 extension AuthorizedDappsClient {
 	public typealias GetAuthorizedDapps = @Sendable () async throws -> IdentifiedArrayOf<AuthorizedDapp>
-	public typealias DetailsForAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Sargon.ProfileNetwork.AuthorizedDappDetailed
+	public typealias DetailsForAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> ProfileNetwork.AuthorizedDappDetailed
 	public typealias AddAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Void
 	public typealias UpdateOrAddAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Void
 	public typealias ForgetAuthorizedDapp = @Sendable (AuthorizedDapp.ID, NetworkID?) async throws -> Void
@@ -43,7 +43,7 @@ extension AuthorizedDappsClient {
 extension AuthorizedDappsClient {
 	public func getDetailedDapp(
 		_ id: AuthorizedDapp.ID
-	) async throws -> Sargon.ProfileNetwork.AuthorizedDappDetailed {
+	) async throws -> ProfileNetwork.AuthorizedDappDetailed {
 		let dApps = try await getAuthorizedDapps()
 		guard let dApp = dApps[id: id] else {
 			throw AuthorizedDappDoesNotExists()

@@ -1,4 +1,4 @@
-public typealias NonEmptyAccounts = NonEmpty<IdentifiedArrayOf<Sargon.Account>>
+public typealias NonEmptyAccounts = NonEmpty<IdentifiedArrayOf<Account>>
 
 // MARK: - EntitiesControlledByFactorSource
 public struct EntitiesControlledByFactorSource: Sendable, Hashable, Identifiable {
@@ -33,8 +33,8 @@ extension EntitiesControlledByFactorSource {
 		}
 
 		public let id: ID
-		public let accounts: IdentifiedArrayOf<Sargon.Account>
-		public let hiddenAccounts: IdentifiedArrayOf<Sargon.Account>
+		public let accounts: IdentifiedArrayOf<Account>
+		public let hiddenAccounts: IdentifiedArrayOf<Account>
 	}
 
 	public var olympia: AccountsControlledByKeysOnSameCurve? {
@@ -56,27 +56,27 @@ extension EntitiesControlledByFactorSource {
 	}
 
 	/// Non hidden
-	public var babylonAccounts: IdentifiedArrayOf<Sargon.Account> {
+	public var babylonAccounts: IdentifiedArrayOf<Account> {
 		accounts.filter(not(\.isLegacy)).asIdentified()
 	}
 
 	/// hidden
-	public var babylonAccountsHidden: IdentifiedArrayOf<Sargon.Account> {
+	public var babylonAccountsHidden: IdentifiedArrayOf<Account> {
 		hiddenAccounts.filter(not(\.isLegacy)).asIdentified()
 	}
 
 	/// Non hidden
-	public var olympiaAccounts: IdentifiedArrayOf<Sargon.Account> {
+	public var olympiaAccounts: IdentifiedArrayOf<Account> {
 		accounts.filter(\.isLegacy).asIdentified()
 	}
 
 	/// hidden
-	public var olympiaAccountsHidden: IdentifiedArrayOf<Sargon.Account> {
+	public var olympiaAccountsHidden: IdentifiedArrayOf<Account> {
 		hiddenAccounts.filter(\.isLegacy).asIdentified()
 	}
 
-	public var accounts: [Sargon.Account] { entities.compactMap { try? $0.asAccount() } }
-	public var hiddenAccounts: [Sargon.Account] { hiddenEntities.compactMap { try? $0.asAccount() } }
+	public var accounts: [Account] { entities.compactMap { try? $0.asAccount() } }
+	public var hiddenAccounts: [Account] { hiddenEntities.compactMap { try? $0.asAccount() } }
 	public var personas: [Persona] { entities.compactMap { try? $0.asPersona() } }
 	public var hiddenPersonas: [Persona] { hiddenEntities.compactMap { try? $0.asPersona() } }
 }

@@ -92,8 +92,8 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case createAccountResult(TaskResult<Sargon.Account>)
-		case handleAccountCreated(TaskResult<Sargon.Account>)
+		case createAccountResult(TaskResult<Account>)
+		case handleAccountCreated(TaskResult<Account>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {

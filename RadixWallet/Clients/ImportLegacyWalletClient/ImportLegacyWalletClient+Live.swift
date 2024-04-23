@@ -41,7 +41,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 
 				let appearanceID = await accountsClient.nextAppearanceID(networkID, accountOffset)
 
-				let babylon = try Sargon.Account(
+				let babylon = try Account(
 					networkID: networkID,
 					factorInstance: factorInstance,
 					displayName: displayName,
@@ -163,7 +163,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 }
 
 func convert(
-	parsedOlympiaAccount raw: Olympia.Parsed.Account
+	parsedOlympiaAccount raw: Olympia.Parsed.ParsedAccount
 ) throws -> OlympiaAccountToMigrate {
 	let address = LegacyOlympiaAccountAddress(
 		publicKey: raw.publicKey

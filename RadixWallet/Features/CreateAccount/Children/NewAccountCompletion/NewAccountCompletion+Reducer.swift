@@ -3,12 +3,12 @@ import SwiftUI
 
 public struct NewAccountCompletion: Sendable, FeatureReducer {
 	public struct State: Sendable & Hashable {
-		public let account: Sargon.Account
+		public let account: Account
 		public let isFirstOnNetwork: Bool
 		public let navigationButtonCTA: CreateAccountNavigationButtonCTA
 
 		public init(
-			account: Sargon.Account,
+			account: Account,
 			isFirstOnNetwork: Bool,
 			navigationButtonCTA: CreateAccountNavigationButtonCTA
 		) {
@@ -18,7 +18,7 @@ public struct NewAccountCompletion: Sendable, FeatureReducer {
 		}
 
 		public init(
-			account: Sargon.Account,
+			account: Account,
 			config: CreateAccountConfig
 		) {
 			self.init(

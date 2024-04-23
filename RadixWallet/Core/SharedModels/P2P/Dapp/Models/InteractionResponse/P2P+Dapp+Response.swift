@@ -95,7 +95,7 @@ extension P2P.Dapp.Response {
 	}
 
 	public enum Accounts: Sendable, Hashable {
-		case withoutProofOfOwnership(IdentifiedArrayOf<Sargon.Account>)
+		case withoutProofOfOwnership(IdentifiedArrayOf<Account>)
 		case withProofOfOwnership(challenge: P2P.Dapp.Request.AuthChallengeNonce, IdentifiedArrayOf<WithProof>)
 
 		public struct WithProof: Sendable, Hashable, Encodable, Identifiable {

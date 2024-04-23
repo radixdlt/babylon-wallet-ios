@@ -1,8 +1,8 @@
 import Foundation
 import Sargon
 
-// MARK: - Sargon.Persona + EntityBaseProtocol
-extension Sargon.Persona: EntityBaseProtocol {}
+// MARK: - Persona + EntityBaseProtocol
+extension Persona: EntityBaseProtocol {}
 
 extension PersonaData.Entry.Kind {
 	public var title: String {
@@ -36,13 +36,13 @@ extension PersonaDataCollectionProtocol {
 	}
 }
 
-// MARK: - Sargon.PersonaDataIdentifiedPhoneNumber + Identifiable
-extension Sargon.PersonaDataIdentifiedPhoneNumber: Identifiable {
+// MARK: - PersonaDataIdentifiedPhoneNumber + Identifiable
+extension PersonaDataIdentifiedPhoneNumber: Identifiable {
 	public typealias ID = PersonaDataEntryID
 }
 
-// MARK: - Sargon.PersonaDataIdentifiedEmailAddress + Identifiable
-extension Sargon.PersonaDataIdentifiedEmailAddress: Identifiable {
+// MARK: - PersonaDataIdentifiedEmailAddress + Identifiable
+extension PersonaDataIdentifiedEmailAddress: Identifiable {
 	public typealias ID = PersonaDataEntryID
 }
 
@@ -51,14 +51,14 @@ extension PersonaDataIdentifiedPhoneNumber: PersonaDataCollectionElement {
 	public typealias Value = PersonaDataEntryPhoneNumber
 }
 
-// MARK: - Sargon.CollectionOfPhoneNumbers + PersonaDataCollectionProtocol
-extension Sargon.CollectionOfPhoneNumbers: PersonaDataCollectionProtocol {
-	public typealias Element = Sargon.PersonaDataIdentifiedPhoneNumber
+// MARK: - CollectionOfPhoneNumbers + PersonaDataCollectionProtocol
+extension CollectionOfPhoneNumbers: PersonaDataCollectionProtocol {
+	public typealias Element = PersonaDataIdentifiedPhoneNumber
 }
 
-// MARK: - Sargon.CollectionOfEmailAddresses + PersonaDataCollectionProtocol
-extension Sargon.CollectionOfEmailAddresses: PersonaDataCollectionProtocol {
-	public typealias Element = Sargon.PersonaDataIdentifiedEmailAddress
+// MARK: - CollectionOfEmailAddresses + PersonaDataCollectionProtocol
+extension CollectionOfEmailAddresses: PersonaDataCollectionProtocol {
+	public typealias Element = PersonaDataIdentifiedEmailAddress
 }
 
 // MARK: - PersonaDataIdentifiedEmailAddress + PersonaDataCollectionElement

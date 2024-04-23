@@ -7,9 +7,9 @@ extension Olympia {
 	public enum Export {}
 	public struct Parsed: Sendable, Hashable {
 		public let mnemonicWordCount: BIP39WordCount
-		public let accounts: NonEmpty<OrderedSet<Olympia.Parsed.Account>>
+		public let accounts: NonEmpty<OrderedSet<Olympia.Parsed.ParsedAccount>>
 
-		public struct Account: Sendable, Hashable {
+		public struct ParsedAccount: Sendable, Hashable {
 			public let accountType: Olympia.AccountType
 			public let publicKey: Secp256k1PublicKey
 			public let displayName: NonEmptyString?
@@ -21,7 +21,7 @@ extension Olympia {
 
 extension Olympia.Export {
 	public static let accountNameForbiddenCharReplacement = "_"
-	public static let accountNameMaxLength = Sargon.Account.nameMaxLength
+	public static let accountNameMaxLength = Account.nameMaxLength
 
 	public enum Separator: Sendable, Hashable, CaseIterable {
 		static let inter = "~"
@@ -54,7 +54,7 @@ extension Olympia.Export {
 		}
 
 		public struct Contents: Sendable, Hashable {
-			public let accounts: OrderedSet<Olympia.Parsed.Account>
+			public let accounts: OrderedSet<Olympia.Parsed.ParsedAccount>
 			public let rest: NonEmptyString?
 		}
 	}
@@ -69,7 +69,7 @@ public enum CAP33 {
 	public static func deserialize(
 		payloads payloadStrings: NonEmpty<OrderedSet<NonEmptyString>>
 	) throws -> Olympia.Parsed {
-		var accounts: OrderedSet<Olympia.Parsed.Account> = []
+		var accounts: OrderedSet<Olympia.Parsed.ParsedAccount> = []
 		var mnemonicWordCount: BIP39WordCount? = nil
 		var rest: NonEmptyString? = nil
 
@@ -82,7 +82,7 @@ public enum CAP33 {
 			rest = payload.contents.rest
 		}
 
-		guard let nonEmpty = NonEmpty<OrderedSet<Olympia.Parsed.Account>>(rawValue: accounts) else {
+		guard let nonEmpty = NonEmpty<OrderedSet<Olympia.Parsed.ParsedAccount>>(rawValue: accounts) else {
 			throw ParseFailure.anyAccount
 		}
 
@@ -160,7 +160,7 @@ extension CAP33 {
 	}
 
 	enum AccountOrRest {
-		case account(Olympia.Parsed.Account)
+		case account(Olympia.Parsed.ParsedAccount)
 		case rest(NonEmptyString)
 	}
 
@@ -221,7 +221,7 @@ extension CAP33 {
 
 		let maybeName = NonEmptyString(rawValue: accountName)
 
-		let account = Olympia.Parsed.Account(
+		let account = Olympia.Parsed.ParsedAccount(
 			accountType: accountType,
 			publicKey: publicKey,
 			displayName: maybeName,
@@ -270,7 +270,7 @@ extension CAP33 {
 			throw ParseFailure.payloadDidNotContainHeaderAndContent
 		}
 
-		var accounts: OrderedSet<Olympia.Parsed.Account> = .init()
+		var accounts: OrderedSet<Olympia.Parsed.ParsedAccount> = .init()
 
 		for (index, accountComponent) in accountComponentsAndMaybeRest.enumerated() {
 			let accountOrRest = try _deserializeAccount(

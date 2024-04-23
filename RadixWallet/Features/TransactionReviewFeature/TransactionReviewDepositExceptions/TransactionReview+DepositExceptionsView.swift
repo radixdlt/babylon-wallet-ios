@@ -8,7 +8,7 @@ extension TransactionReview {
 
 	public struct DepositExceptionsChange: Sendable, Identifiable, Hashable {
 		public var id: AccountAddress.ID { account.address.id }
-		public let account: Sargon.Account
+		public let account: Account
 		public let resourcePreferenceChanges: IdentifiedArrayOf<ResourcePreferenceChange>
 		public let allowedDepositorChanges: IdentifiedArrayOf<AllowedDepositorChange>
 

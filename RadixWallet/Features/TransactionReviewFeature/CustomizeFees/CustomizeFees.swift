@@ -14,7 +14,7 @@ public struct CustomizeFees: FeatureReducer, Sendable {
 		var reviewedTransaction: ReviewedTransaction
 		var modeState: CustomizationModeState
 
-		var feePayerAccount: Sargon.Account? {
+		var feePayerAccount: Account? {
 			feePayer?.account
 		}
 

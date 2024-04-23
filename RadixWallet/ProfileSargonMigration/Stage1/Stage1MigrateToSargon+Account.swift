@@ -1,17 +1,17 @@
 import Foundation
 import Sargon
 
-// MARK: - Sargon.Account + EntityBaseProtocol
-extension Sargon.Account: EntityBaseProtocol {}
+// MARK: - Account + EntityBaseProtocol
+extension Account: EntityBaseProtocol {}
 
-// MARK: - Sargon.Account + Comparable
-extension Sargon.Account: Comparable {
+// MARK: - Account + Comparable
+extension Account: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
 		lhs.derivationIndex < rhs.derivationIndex
 	}
 }
 
-extension Sargon.Account {
+extension Account {
 	public static let nameMaxLength = 30
 
 	public var derivationIndex: HDPathValue {
@@ -32,7 +32,7 @@ extension Sargon.Account {
 	}
 }
 
-extension Sargon.Account {
+extension Account {
 	public var accountAddress: AccountAddress {
 		address
 	}
@@ -46,12 +46,12 @@ extension Sargon.Account {
 	}
 }
 
-extension Sargon.Accounts {
-	public var nonHidden: IdentifiedArrayOf<Sargon.Account> {
+extension Accounts {
+	public var nonHidden: IdentifiedArrayOf<Account> {
 		filter(not(\.isHidden)).asIdentified()
 	}
 
-	public var hidden: IdentifiedArrayOf<Sargon.Account> {
+	public var hidden: IdentifiedArrayOf<Account> {
 		filter(\.isHidden).asIdentified()
 	}
 }

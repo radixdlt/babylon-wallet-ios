@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - TransferAccountList
 public struct TransferAccountList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let fromAccount: Sargon.Account
+		public let fromAccount: Account
 		public var receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State> {
 			didSet {
 				if receivingAccounts.count > 1, receivingAccounts[0].canBeRemoved == false {
@@ -20,12 +20,12 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destination.State?
 
-		public init(fromAccount: Sargon.Account, receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>) {
+		public init(fromAccount: Account, receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>) {
 			self.fromAccount = fromAccount
 			self.receivingAccounts = receivingAccounts
 		}
 
-		public init(fromAccount: Sargon.Account) {
+		public init(fromAccount: Account) {
 			self.init(
 				fromAccount: fromAccount,
 				receivingAccounts: [.empty(canBeRemovedWhenEmpty: false)].asIdentified()

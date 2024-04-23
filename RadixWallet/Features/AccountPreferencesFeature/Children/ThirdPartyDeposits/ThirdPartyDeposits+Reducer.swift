@@ -5,7 +5,7 @@ import SwiftUI
 // MARK: - ManageThirdPartyDeposits
 public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 	public struct State: Hashable, Sendable {
-		var account: Sargon.Account
+		var account: Account
 
 		var depositRule: DepositRule {
 			thirdPartyDeposits.depositRule
@@ -16,7 +16,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		@PresentationState
 		var destination: Destination.State? = nil
 
-		init(account: Sargon.Account) {
+		init(account: Account) {
 			self.account = account
 			self.thirdPartyDeposits = account.onLedgerSettings.thirdPartyDeposits
 		}
@@ -32,7 +32,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 	}
 
 	public enum InternalAction: Equatable, Sendable {
-		case updated(Sargon.Account)
+		case updated(Account)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -126,7 +126,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		}
 	}
 
-	private func submitTransaction(_ manifest: TransactionManifest, updatedAccount: Sargon.Account) -> Effect<Action> {
+	private func submitTransaction(_ manifest: TransactionManifest, updatedAccount: Account) -> Effect<Action> {
 		.run { send in
 			do {
 				/// Wait for user to complete the interaction with Transaction Review
@@ -168,7 +168,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		_ state: State
 	) throws -> (
 		manifest: TransactionManifest,
-		account: Sargon.Account
+		account: Account
 	) {
 		let inProfileConfig = state.account.onLedgerSettings.thirdPartyDeposits
 		let localConfig = state.thirdPartyDeposits

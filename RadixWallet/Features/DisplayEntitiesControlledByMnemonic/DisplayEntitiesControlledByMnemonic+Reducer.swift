@@ -30,7 +30,7 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 
 		public var isMnemonicMarkedAsBackedUp: Bool
 		public var isMnemonicPresentInKeychain: Bool
-		public let accounts: IdentifiedArrayOf<Sargon.Account>
+		public let accounts: IdentifiedArrayOf<Account>
 		public let hasHiddenAccounts: Bool
 		public var mode: Mode
 
@@ -44,7 +44,7 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 			id: ID,
 			isMnemonicMarkedAsBackedUp: Bool,
 			isMnemonicPresentInKeychain: Bool,
-			accounts: IdentifiedArrayOf<Sargon.Account>,
+			accounts: IdentifiedArrayOf<Account>,
 			hasHiddenAccounts: Bool,
 			mode: Mode
 		) {

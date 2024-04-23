@@ -13,7 +13,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 			case loadThenEncrypt
 
 			case encryptSpecific(
-				profileSnapshot: Sargon.Profile
+				profileSnapshot: Profile
 			)
 
 			var isDecrypt: Bool {
@@ -62,14 +62,14 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 		case focusTextField(State.Field?)
 
 		case loadProfileSnapshotToEncryptResult(
-			TaskResult<Sargon.Profile>
+			TaskResult<Profile>
 		)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case successfullyDecrypted(encrypted: EncryptedProfileJSONData, decrypted: Sargon.Profile)
-		case successfullyEncrypted(plaintext: Sargon.Profile, encrypted: EncryptedProfileJSONData)
+		case successfullyDecrypted(encrypted: EncryptedProfileJSONData, decrypted: Profile)
+		case successfullyEncrypted(plaintext: Profile, encrypted: EncryptedProfileJSONData)
 	}
 
 	// MARK: - Destination

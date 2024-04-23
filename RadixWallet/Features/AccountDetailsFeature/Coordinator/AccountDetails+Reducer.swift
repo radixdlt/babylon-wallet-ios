@@ -44,12 +44,12 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case exportMnemonic(controlling: Sargon.Account)
+		case exportMnemonic(controlling: Account)
 		case importMnemonics
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case accountUpdated(Sargon.Account)
+		case accountUpdated(Account)
 	}
 
 	public struct MnemonicWithPassphraseAndFactorSourceInfo: Sendable, Hashable {

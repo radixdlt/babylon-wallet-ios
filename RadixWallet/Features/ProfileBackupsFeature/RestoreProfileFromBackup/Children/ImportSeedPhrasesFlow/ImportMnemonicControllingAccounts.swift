@@ -24,7 +24,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			self.isMainBDFS = isMainBDFS
 			self.entitiesControlledByFactorSource = ents
 
-			let accounts: IdentifiedArrayOf<Sargon.Account> = switch (ents.babylonAccounts.isEmpty, ents.olympiaAccounts.isEmpty) {
+			let accounts: IdentifiedArrayOf<Account> = switch (ents.babylonAccounts.isEmpty, ents.olympiaAccounts.isEmpty) {
 			case (false, _):
 				// We prefer Babylon, always.
 				ents.babylonAccounts
@@ -206,7 +206,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 
 	private func validate(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		accounts: [Sargon.Account],
+		accounts: [Account],
 		factorSource: DeviceFactorSource
 	) -> Effect<Action> {
 		func fail(error: Swift.Error?) -> Effect<Action> {

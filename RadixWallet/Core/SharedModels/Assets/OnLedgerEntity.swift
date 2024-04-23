@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - OnLedgerEntity
 public enum OnLedgerEntity: Sendable, Hashable, Codable, CustomDebugStringConvertible {
 	public var debugDescription: String {
@@ -20,7 +22,7 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable, CustomDebugStringConver
 	}
 
 	case resource(Resource)
-	case account(Account)
+	case account(OnLedgerAccount)
 	case resourcePool(ResourcePool)
 	case validator(Validator)
 	case nonFungibleToken(NonFungibleToken)
@@ -48,7 +50,7 @@ public enum OnLedgerEntity: Sendable, Hashable, Codable, CustomDebugStringConver
 		return ids
 	}
 
-	public var account: Account? {
+	public var account: OnLedgerAccount? {
 		guard case let .account(account) = self else {
 			return nil
 		}
@@ -104,7 +106,7 @@ extension OnLedgerEntity.Metadata.ValueAtStateVersion: Equatable where Value: Eq
 extension OnLedgerEntity.Metadata.ValueAtStateVersion: Hashable where Value: Hashable {}
 
 extension OnLedgerEntity.Metadata {
-	init(newlyCreated: Sargon.NewlyCreatedResource) {
+	init(newlyCreated: NewlyCreatedResource) {
 		self.init(
 			name: newlyCreated.name,
 			symbol: newlyCreated.symbol,
@@ -408,7 +410,7 @@ extension DepositRule {
 	}
 }
 
-extension OnLedgerEntity.Account.Details {
+extension OnLedgerEntity.OnLedgerAccount.Details {
 	init?(_ component: GatewayAPI.StateEntityDetailsResponseComponentDetails?) {
 		guard let stateAny = component?.state else {
 			return nil
@@ -434,9 +436,9 @@ extension OnLedgerEntity.Account.Details {
 	}
 }
 
-// MARK: - OnLedgerEntity.Account
+// MARK: - OnLedgerEntity.OnLedgerAccount
 extension OnLedgerEntity {
-	public struct Account: Sendable, Hashable, Codable, CustomDebugStringConvertible {
+	public struct OnLedgerAccount: Sendable, Hashable, Codable, CustomDebugStringConvertible {
 		public let address: AccountAddress
 		public let atLedgerState: AtLedgerState
 		public let metadata: Metadata
@@ -501,7 +503,7 @@ extension OnLedgerEntity {
 	}
 }
 
-extension OnLedgerEntity.Account {
+extension OnLedgerEntity.OnLedgerAccount {
 	public struct PoolUnitResources: Sendable, Hashable, Codable {
 		public var radixNetworkStakes: IdentifiedArrayOf<RadixNetworkStake>
 		public let poolUnits: [PoolUnit]
@@ -617,7 +619,7 @@ extension OnLedgerEntity.NonFungibleToken.NFTData {
 	}
 }
 
-extension OnLedgerEntity.Account {
+extension OnLedgerEntity.OnLedgerAccount {
 	public var allFungibleResourceAddresses: [ResourceAddress] {
 		fungibleResources.xrdResource.asArray(\.resourceAddress) + fungibleResources.nonXrdResources.map(\.resourceAddress)
 	}

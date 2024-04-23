@@ -7,7 +7,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 	// MARK: - State
 
 	public struct State: Sendable, Hashable {
-		public let account: Sargon.Account
+		public let account: Account
 		public var address: AccountAddress { account.address }
 
 		@PresentationState
@@ -22,7 +22,7 @@ public struct DevAccountPreferences: Sendable, FeatureReducer {
 		public var createMultipleNonFungibleTokenButtonState: ControlState
 		#endif
 
-		public init(account: Sargon.Account) {
+		public init(account: Account) {
 			self.account = account
 
 			#if DEBUG

@@ -98,7 +98,7 @@ struct DappInteractionFlow: Sendable, FeatureReducer {
 			struct AccountsPayload: Sendable, Equatable {
 				var requestItem: DappInteractionFlow.State.AnyInteractionItem
 				var numberOfAccountsRequested: DappInteraction.NumberOfAccounts
-				var accounts: [Sargon.Account]
+				var accounts: [Account]
 			}
 
 			var ongoingAccountsPayload: AccountsPayload?

@@ -4,8 +4,8 @@ import SwiftUI
 // MARK: - SelectBackup
 public struct SelectBackup: Sendable, FeatureReducer {
 	public struct State: Hashable, Sendable {
-		public var backupProfileHeaders: Sargon.Profile.HeaderList?
-		public var selectedProfileHeader: Sargon.Profile.Header?
+		public var backupProfileHeaders: Profile.HeaderList?
+		public var selectedProfileHeader: Profile.Header?
 		public var isDisplayingFileImporter: Bool
 		public var thisDeviceID: UUID?
 
@@ -15,8 +15,8 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		public var profileFile: ExportableProfileFile?
 
 		public init(
-			backupProfileHeaders: Sargon.Profile.HeaderList? = nil,
-			selectedProfileHeader: Sargon.Profile.Header? = nil,
+			backupProfileHeaders: Profile.HeaderList? = nil,
+			selectedProfileHeader: Profile.Header? = nil,
 			isDisplayingFileImporter: Bool = false,
 			thisDeviceID: UUID? = nil
 		) {
@@ -50,23 +50,23 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case selectedProfileHeader(Sargon.Profile.Header?)
+		case selectedProfileHeader(Profile.Header?)
 		case importFromFileInstead
 		case dismissFileImporter
 		case otherRestoreOptionsTapped
 		case profileImportResult(Result<URL, NSError>)
-		case tappedUseCloudBackup(Sargon.Profile.Header)
+		case tappedUseCloudBackup(Profile.Header)
 		case closeButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadBackupProfileHeadersResult(Sargon.Profile.HeaderList?)
+		case loadBackupProfileHeadersResult(Profile.HeaderList?)
 		case loadThisDeviceIDResult(UUID?)
-		case snapshotWithHeaderNotFoundInCloud(Sargon.Profile.Header)
+		case snapshotWithHeaderNotFoundInCloud(Profile.Header)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case selectedProfileSnapshot(Sargon.Profile, isInCloud: Bool)
+		case selectedProfileSnapshot(Profile, isInCloud: Bool)
 		case backToStartOfOnboarding
 		case profileCreatedFromImportedBDFS
 	}
@@ -221,7 +221,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 // MARK: - ProfileNotFoundInCloud
 struct ProfileNotFoundInCloud: LocalizedError {
-	let header: Sargon.Profile.Header
+	let header: Profile.Header
 	var errorDescription: String? {
 		L10n.IOSProfileBackup.profileNotFoundInCloud
 	}

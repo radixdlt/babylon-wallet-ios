@@ -3,12 +3,12 @@ import Sargon
 
 public typealias DeviceID = UUID
 
-// MARK: - Sargon.Header + Identifiable
-extension Sargon.Header: Identifiable {
+// MARK: - Header + Identifiable
+extension Header: Identifiable {
 	public typealias ID = ProfileID
 }
 
-extension Sargon.Profile {
+extension Profile {
 	public typealias Header = Sargon.Header
-	public typealias HeaderList = NonEmpty<IdentifiedArrayOf<Sargon.Header>>
+	public typealias HeaderList = NonEmpty<IdentifiedArrayOf<Header>>
 }

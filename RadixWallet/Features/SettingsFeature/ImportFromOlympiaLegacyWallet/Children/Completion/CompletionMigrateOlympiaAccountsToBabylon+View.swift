@@ -18,7 +18,7 @@ extension CompletionMigrateOlympiaAccountsToBabylon.State {
 }
 
 extension ImportOlympiaWalletCoordinator.MigratableAccount {
-	var viewStateAccount: CompletionMigrateOlympiaAccountsToBabylon.ViewState.Account {
+	var viewStateAccount: CompletionMigrateOlympiaAccountsToBabylon.ViewState.AccountToBabylon {
 		.init(
 			name: accountName,
 			address: babylonAddress,
@@ -28,8 +28,8 @@ extension ImportOlympiaWalletCoordinator.MigratableAccount {
 	}
 }
 
-extension Sargon.Account {
-	var viewStateAccount: CompletionMigrateOlympiaAccountsToBabylon.ViewState.Account {
+extension Account {
+	var viewStateAccount: CompletionMigrateOlympiaAccountsToBabylon.ViewState.AccountToBabylon {
 		.init(
 			name: displayName.rawValue,
 			address: address,
@@ -44,9 +44,9 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 	public struct ViewState: Equatable {
 		let title: String
 		let subtitle: String
-		let accounts: [Account]
+		let accounts: [AccountToBabylon]
 
-		struct Account: Sendable, Hashable, Identifiable {
+		struct AccountToBabylon: Sendable, Hashable, Identifiable {
 			var id: AccountAddress { address }
 			let name: String?
 			let address: AccountAddress
@@ -115,7 +115,7 @@ extension CompletionMigrateOlympiaAccountsToBabylon {
 
 	@MainActor
 	struct AccountCard: SwiftUI.View {
-		let account: ViewState.Account
+		let account: ViewState.AccountToBabylon
 
 		var body: some SwiftUI.View {
 			VStack(spacing: .small1) {

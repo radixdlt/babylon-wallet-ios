@@ -5,7 +5,7 @@ import SwiftUI
 // MARK: - ImportOlympiaWalletCoordinator
 public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	public typealias AccountsToMigrate = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
-	public typealias MigratedAccounts = IdentifiedArrayOf<Sargon.Account>
+	public typealias MigratedAccounts = IdentifiedArrayOf<Account>
 
 	// MARK: State
 

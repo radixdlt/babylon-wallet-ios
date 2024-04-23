@@ -66,7 +66,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 			accessKind: AccountPermissionChooseAccounts.State.AccessKind,
 			chosenAccounts: AccountPermissionChooseAccountsResult
 		)
-		case failedToProveOwnership(of: [Sargon.Account])
+		case failedToProveOwnership(of: [Account])
 	}
 
 	public struct Destination: DestinationReducer {
@@ -165,7 +165,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 			case let .finishedSigning(.signAuth(signedAuthChallenge)):
 				state.destination = nil
 
-				var accountsLeftToVerifyDidSign: Set<Sargon.Account.ID> = Set(selectedAccounts.map(\.id))
+				var accountsLeftToVerifyDidSign: Set<Account.ID> = Set(selectedAccounts.map(\.id))
 				let walletAccountsWithProof: [P2P.Dapp.Response.Accounts.WithProof] = signedAuthChallenge.entitySignatures.map {
 					guard case let .account(account) = $0.signerEntity else {
 						fatalError()

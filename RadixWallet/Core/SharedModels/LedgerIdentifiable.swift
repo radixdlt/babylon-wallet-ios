@@ -3,7 +3,7 @@ public enum LedgerIdentifiable: Sendable {
 	case address(Address)
 	case identifier(Identifier)
 
-	public static func address(of account: Sargon.Account) -> Self {
+	public static func address(of account: Account) -> Self {
 		.address(.account(account.address, isLedgerHWAccount: account.isLedgerControlled))
 	}
 

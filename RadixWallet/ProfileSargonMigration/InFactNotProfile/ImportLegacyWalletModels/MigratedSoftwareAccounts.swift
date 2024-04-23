@@ -5,8 +5,8 @@ public struct MigratedSoftwareAccounts: Sendable, Hashable {
 	public let networkID: NetworkID
 
 	public let accounts: NonEmpty<OrderedSet<MigratedAccount>>
-	public var babylonAccounts: Sargon.Accounts {
-		Sargon.Accounts(accounts.rawValue.elements.map(\.babylon))
+	public var babylonAccounts: Accounts {
+		Accounts(accounts.rawValue.elements.map(\.babylon))
 	}
 
 	public let factorSourceToSave: DeviceFactorSource?

@@ -786,8 +786,8 @@ extension TransactionReview {
 		public let metadata: OnLedgerEntity.Metadata
 	}
 
-	public enum Account: Sendable, Hashable {
-		case user(Sargon.Account)
+	public enum ReviewAccount: Sendable, Hashable {
+		case user(Account)
 		case external(AccountAddress, approved: Bool)
 
 		var address: AccountAddress {
@@ -884,10 +884,10 @@ extension TransactionReview.State {
 
 // MARK: Helpers
 
-extension [TransactionReview.Account] {
+extension [TransactionReview.ReviewAccount] {
 	struct MissingUserAccountError: Error {}
 
-	func account(for accountAddress: AccountAddress) throws -> TransactionReview.Account {
+	func account(for accountAddress: AccountAddress) throws -> TransactionReview.ReviewAccount {
 		guard let account = first(where: { $0.address == accountAddress }) else {
 			loggerGlobal.error("Can't find address that was specified for transfer")
 			throw MissingUserAccountError()

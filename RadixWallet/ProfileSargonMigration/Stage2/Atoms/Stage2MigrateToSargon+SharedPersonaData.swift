@@ -22,7 +22,7 @@ extension SharedPersonaData {
 			}
 		}
 
-		// TERRIBLE COPY PASTE - but - this will shortly be moved into Rust Sargon...
+		// TERRIBLE COPY PASTE - but - this will shortly be moved into Rust ..
 		if
 			let phoneNumbers = self.phoneNumbers,
 			case var ids = phoneNumbers.ids,

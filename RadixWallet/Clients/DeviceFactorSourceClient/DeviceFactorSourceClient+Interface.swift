@@ -40,8 +40,8 @@ public struct SignatureFromOnDeviceHDRequest: Sendable, Hashable {
 
 // MARK: DeviceFactorSourceClient.onDeviceHDPublicKey
 extension DeviceFactorSourceClient {
-	public typealias GetEntitiesControlledByFactorSource = @Sendable (DeviceFactorSource, Sargon.Profile?) async throws -> EntitiesControlledByFactorSource
-	public typealias GetControlledEntities = @Sendable (Sargon.Profile?) async throws -> IdentifiedArrayOf<EntitiesControlledByFactorSource>
+	public typealias GetEntitiesControlledByFactorSource = @Sendable (DeviceFactorSource, Profile?) async throws -> EntitiesControlledByFactorSource
+	public typealias GetControlledEntities = @Sendable (Profile?) async throws -> IdentifiedArrayOf<EntitiesControlledByFactorSource>
 
 	public typealias PublicKeysFromOnDeviceHD = @Sendable (PublicKeysFromOnDeviceHDRequest) async throws -> [HierarchicalDeterministicPublicKey]
 	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey

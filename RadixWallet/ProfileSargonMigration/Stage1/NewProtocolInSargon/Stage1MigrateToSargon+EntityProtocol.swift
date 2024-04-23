@@ -5,10 +5,10 @@ public protocol EntityBaseProtocol {
 	typealias Flags = EntityFlags
 
 	/// The ID of the network this entity exists on.
-	var networkID: Sargon.NetworkID { get }
+	var networkID: NetworkID { get }
 
 	/// Security state of this entity, either `secured` or not (controlled by a single FactorInstance)
-	var securityState: Sargon.EntitySecurityState { get }
+	var securityState: EntitySecurityState { get }
 
 	/// A required non empty display name, used by presentation layer and sent to Dapps when requested.
 	var displayName: DisplayName { get }
@@ -18,7 +18,7 @@ public protocol EntityBaseProtocol {
 }
 
 extension EntityBaseProtocol {
-	public var virtualHierarchicalDeterministicFactorInstances: Set<Sargon.HierarchicalDeterministicFactorInstance> {
+	public var virtualHierarchicalDeterministicFactorInstances: Set<HierarchicalDeterministicFactorInstance> {
 		var factorInstances = Set<HierarchicalDeterministicFactorInstance>()
 		switch securityState {
 		case let .unsecured(unsecuredEntityControl):
@@ -45,15 +45,15 @@ public protocol EntityProtocol: EntityBaseProtocol, Sendable, Equatable, Identif
 	associatedtype EntityAddress: AddressProtocol & Hashable
 	associatedtype ExtraProperties: Sendable
 
-	static var entityKind: Sargon.EntityKind { get }
+	static var entityKind: EntityKind { get }
 
 	static func deriveVirtualAddress(
-		networkID: Sargon.NetworkID,
-		factorInstance: Sargon.HierarchicalDeterministicFactorInstance
+		networkID: NetworkID,
+		factorInstance: HierarchicalDeterministicFactorInstance
 	) throws -> EntityAddress
 
 	/// Security state of this entity, either `secured` or not (controlled by a single FactorInstance)
-	var securityState: Sargon.EntitySecurityState { get set }
+	var securityState: EntitySecurityState { get set }
 
 	/// The globally unique and identifiable Radix component address of this entity. Can be used as
 	/// a stable ID. Cryptographically derived from a seeding public key which typically was created by
@@ -77,7 +77,7 @@ extension EntityProtocol {
 	public init(
 		networkID: NetworkID,
 		address: EntityAddress,
-		factorInstance: Sargon.HierarchicalDeterministicFactorInstance,
+		factorInstance: HierarchicalDeterministicFactorInstance,
 		displayName: NonEmpty<String>,
 		extraProperties: ExtraProperties
 	) {

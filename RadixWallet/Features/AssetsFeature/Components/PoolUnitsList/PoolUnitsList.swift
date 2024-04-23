@@ -11,7 +11,7 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 
 		public struct PoolUnitState: Sendable, Hashable, Identifiable {
 			public var id: PoolAddress { poolUnit.resourcePoolAddress }
-			public let poolUnit: OnLedgerEntity.Account.PoolUnit
+			public let poolUnit: OnLedgerEntity.OnLedgerAccount.PoolUnit
 			public var resourceDetails: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails> = .idle
 			public var isSelected: Bool? = nil
 		}

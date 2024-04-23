@@ -3,7 +3,7 @@ import Foundation
 // MARK: - Definition
 extension AccountPortfoliosClient {
 	public struct AccountPortfolio: Sendable, Hashable, CustomDebugStringConvertible {
-		public var account: OnLedgerEntity.Account
+		public var account: OnLedgerEntity.OnLedgerAccount
 		public var poolUnitDetails: Loadable<[OnLedgerEntitiesClient.OwnedResourcePoolDetails]> = .idle
 		public var stakeUnitDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>> = .idle
 

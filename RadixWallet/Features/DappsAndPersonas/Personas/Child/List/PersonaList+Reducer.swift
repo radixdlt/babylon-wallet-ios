@@ -20,7 +20,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 		}
 
 		public init(
-			dApp: Sargon.ProfileNetwork.AuthorizedDappDetailed
+			dApp: ProfileNetwork.AuthorizedDappDetailed
 		) {
 			self.init(
 				personas: dApp.detailedAuthorizedPersonas.map(PersonaReducer.State.init).asIdentified(),

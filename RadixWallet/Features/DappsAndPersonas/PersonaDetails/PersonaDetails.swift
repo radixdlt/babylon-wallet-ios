@@ -22,8 +22,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			case general(Persona, dApps: IdentifiedArrayOf<DappInfo>)
 
 			case dApp(
-				Sargon.ProfileNetwork.AuthorizedDappDetailed,
-				persona: Sargon.ProfileNetwork.AuthorizedPersonaDetailed
+				ProfileNetwork.AuthorizedDappDetailed,
+				persona: ProfileNetwork.AuthorizedPersonaDetailed
 			)
 
 			var id: Persona.ID {
@@ -81,7 +81,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case dAppsUpdated(IdentifiedArrayOf<State.DappInfo>)
 		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState)
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
-		case dAppLoaded(Sargon.ProfileNetwork.AuthorizedDappDetailed)
+		case dAppLoaded(ProfileNetwork.AuthorizedDappDetailed)
 	}
 
 	// MARK: - Destination

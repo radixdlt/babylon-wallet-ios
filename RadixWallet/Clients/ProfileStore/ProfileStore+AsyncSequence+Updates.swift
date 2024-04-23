@@ -3,7 +3,7 @@
 // MARK: Public
 extension ProfileStore {
 	/// The current network if any
-	public func network() throws -> Sargon.ProfileNetwork {
+	public func network() throws -> ProfileNetwork {
 		try profile.network(id: profile.networkID)
 	}
 
@@ -13,7 +13,7 @@ extension ProfileStore {
 	}
 
 	/// A multicasting replaying AsyncSequence of distinct Accounts for the currently selected network.
-	public func accountValues() -> AnyAsyncSequence<IdentifiedArrayOf<Sargon.Account>> {
+	public func accountValues() -> AnyAsyncSequence<IdentifiedArrayOf<Account>> {
 		_lens {
 			$0.network?.getAccounts()
 		}

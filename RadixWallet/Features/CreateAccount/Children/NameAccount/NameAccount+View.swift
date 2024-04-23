@@ -29,7 +29,7 @@ extension NameAccount {
 			self.useLedgerAsFactorSource = state.useLedgerAsFactorSource
 			self.entityName = state.inputtedName
 			if let sanitizedName = state.sanitizedName {
-				if sanitizedName.count > Sargon.Account.nameMaxLength {
+				if sanitizedName.count > Account.nameMaxLength {
 					self.sanitizedNameRequirement = nil
 					self.hint = .error(L10n.Error.AccountLabel.tooLong)
 				} else {

@@ -9,11 +9,11 @@ public enum ChooseAccountsRow {
 			case radioButton
 		}
 
-		public let account: Sargon.Account
+		public let account: Account
 		public let mode: Mode
 
 		public init(
-			account: Sargon.Account,
+			account: Account,
 			mode: Mode
 		) {
 			self.account = account

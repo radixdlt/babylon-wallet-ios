@@ -19,8 +19,8 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 		public var indicesOfAlreadyUsedEntities: OrderedSet<HDPathValue> = []
 		public let forOlympiaAccounts: Bool
-		public var active: IdentifiedArrayOf<Sargon.Account> = []
-		public var inactive: IdentifiedArrayOf<Sargon.Account> = []
+		public var active: IdentifiedArrayOf<Account> = []
+		public var inactive: IdentifiedArrayOf<Account> = []
 
 		@PresentationState
 		public var destination: Destination.State? = nil
@@ -52,10 +52,10 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadIndicesUsedByFactorSourceResult(TaskResult<IndicesUsedByFactorSource>)
-		case startScan(accounts: IdentifiedArrayOf<Sargon.Account>)
+		case startScan(accounts: IdentifiedArrayOf<Account>)
 		case foundAccounts(
-			active: IdentifiedArrayOf<Sargon.Account>,
-			inactive: IdentifiedArrayOf<Sargon.Account>
+			active: IdentifiedArrayOf<Account>,
+			inactive: IdentifiedArrayOf<Account>
 		)
 		case initiate
 	}
@@ -69,8 +69,8 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case foundAccounts(
-			active: IdentifiedArrayOf<Sargon.Account>,
-			inactive: IdentifiedArrayOf<Sargon.Account>
+			active: IdentifiedArrayOf<Account>,
+			inactive: IdentifiedArrayOf<Account>
 		)
 		case failed
 		case close
@@ -213,7 +213,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 					let accounts = try await publicHDKeys.enumerated().asyncMap { localOffset, publicHDKey in
 						let offset = localOffset + globalOffset
 						let appearanceID = await accountsClient.nextAppearanceID(networkID, offset)
-						return try Sargon.Account(
+						return try Account(
 							networkID: networkID,
 							factorInstance: .init(factorSourceId: id, publicKey: publicHDKey),
 							displayName: .init(rawValue: L10n.AccountRecoveryScan.InProgress.nameOfRecoveredAccount) ?? "Unnamed",
@@ -322,7 +322,7 @@ extension AccountRecoveryScanInProgress {
 	}
 
 	private func scanOnLedger(
-		accounts: IdentifiedArrayOf<Sargon.Account>,
+		accounts: IdentifiedArrayOf<Account>,
 		state: inout State
 	) -> Effect<Action> {
 		assert(accounts.count == batchSize)

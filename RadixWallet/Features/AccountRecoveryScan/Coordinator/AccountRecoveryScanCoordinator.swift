@@ -142,10 +142,10 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 
 	private func completed(
 		purpose: State.Purpose,
-		active: IdentifiedArrayOf<Sargon.Account>,
-		inactive: IdentifiedArrayOf<Sargon.Account>
+		active: IdentifiedArrayOf<Account>,
+		inactive: IdentifiedArrayOf<Account>
 	) -> Effect<Action> {
-		let sortedAccounts: IdentifiedArrayOf<Sargon.Account> = { () -> IdentifiedArrayOf<Sargon.Account> in
+		let sortedAccounts: IdentifiedArrayOf<Account> = { () -> IdentifiedArrayOf<Account> in
 			var accounts = active
 			accounts.append(contentsOf: inactive)
 			accounts.sort() // by index

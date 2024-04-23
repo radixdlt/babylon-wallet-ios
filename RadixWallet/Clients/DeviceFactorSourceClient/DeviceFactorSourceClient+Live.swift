@@ -15,8 +15,8 @@ extension DeviceFactorSourceClient: DependencyKey {
 		let entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource = { factorSource, maybeSnapshot in
 
 			let (allNonHiddenEntities, allHiddenEntities) = try await { () -> (allNonHiddenEntities: [AccountOrPersona], allHiddenEntities: [AccountOrPersona]) in
-				let accountNonHidden: [Sargon.Account]
-				let accountHidden: [Sargon.Account]
+				let accountNonHidden: [Account]
+				let accountHidden: [Account]
 				let personasNonHidden: [Persona]
 				let personasHidden: [Persona]
 

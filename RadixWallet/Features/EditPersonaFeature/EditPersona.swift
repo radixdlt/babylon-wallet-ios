@@ -266,7 +266,7 @@ extension Persona {
 	fileprivate func updated(with output: EditPersona.Output) -> Self {
 		var updatedPersona = self
 
-		updatedPersona.displayName = Sargon.DisplayName(value: output.personaLabel.rawValue)
+		updatedPersona.displayName = DisplayName(value: output.personaLabel.rawValue)
 		updatedPersona.personaData = output.personaData
 
 		return updatedPersona

@@ -81,7 +81,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public enum DelegateAction: Sendable, Equatable {
 		case failed(Failure)
-		case completed(IdentifiedArrayOf<Sargon.Account>)
+		case completed(IdentifiedArrayOf<Account>)
 
 		public enum Failure: Sendable, Equatable {
 			case failedToSaveNewLedger

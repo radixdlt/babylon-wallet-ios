@@ -119,11 +119,11 @@ public struct LoadMnemonicByFactorSourceIDRequest: Sendable, Hashable {
 }
 
 extension SecureStorageClient {
-	public typealias UpdateIsCloudProfileSyncEnabled = @Sendable (Sargon.Profile.Header.ID, CloudProfileSyncActivation) throws -> Void
-	public typealias SaveProfileSnapshot = @Sendable (Sargon.Profile) throws -> Void
-	public typealias LoadProfileSnapshotData = @Sendable (Sargon.Profile.Header.ID) throws -> Data?
-	public typealias LoadProfileSnapshot = @Sendable (Sargon.Profile.Header.ID) throws -> Sargon.Profile?
-	public typealias LoadProfile = @Sendable (Sargon.Profile.Header.ID) throws -> Profile?
+	public typealias UpdateIsCloudProfileSyncEnabled = @Sendable (Profile.Header.ID, CloudProfileSyncActivation) throws -> Void
+	public typealias SaveProfileSnapshot = @Sendable (Profile) throws -> Void
+	public typealias LoadProfileSnapshotData = @Sendable (Profile.Header.ID) throws -> Data?
+	public typealias LoadProfileSnapshot = @Sendable (Profile.Header.ID) throws -> Profile?
+	public typealias LoadProfile = @Sendable (Profile.Header.ID) throws -> Profile?
 
 	public typealias SaveMnemonicForFactorSource = @Sendable (PrivateHierarchicalDeterministicFactorSource) throws -> Void
 	public typealias LoadMnemonicByFactorSourceID = @Sendable (LoadMnemonicByFactorSourceIDRequest) throws -> MnemonicWithPassphrase?
@@ -134,10 +134,10 @@ extension SecureStorageClient {
 	#endif
 
 	public typealias DeleteMnemonicByFactorSourceID = @Sendable (FactorSourceIDFromHash) throws -> Void
-	public typealias DeleteProfileAndMnemonicsByFactorSourceIDs = @Sendable (Sargon.Profile.Header.ID, _ keepInICloudIfPresent: Bool) throws -> Void
+	public typealias DeleteProfileAndMnemonicsByFactorSourceIDs = @Sendable (Profile.Header.ID, _ keepInICloudIfPresent: Bool) throws -> Void
 
-	public typealias LoadProfileHeaderList = @Sendable () throws -> Sargon.Profile.HeaderList?
-	public typealias SaveProfileHeaderList = @Sendable (Sargon.Profile.HeaderList) throws -> Void
+	public typealias LoadProfileHeaderList = @Sendable () throws -> Profile.HeaderList?
+	public typealias SaveProfileHeaderList = @Sendable (Profile.HeaderList) throws -> Void
 	public typealias DeleteProfileHeaderList = @Sendable () throws -> Void
 
 	public typealias LoadDeviceInfo = @Sendable () throws -> DeviceInfo?

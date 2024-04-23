@@ -4,7 +4,7 @@ struct NoEntityFoundMatchingCriteria: Swift.Error {}
 // MARK: - IncorrectEntityType
 public struct IncorrectEntityType: Swift.Error {}
 
-extension Sargon.ProfileNetwork {
+extension ProfileNetwork {
 	public func entity<Entity: EntityProtocol>(
 		address: Entity.EntityAddress
 	) throws -> Entity {

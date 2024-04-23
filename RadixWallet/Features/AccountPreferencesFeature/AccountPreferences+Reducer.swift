@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - AccountPreferences
 public struct AccountPreferences: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var account: Sargon.Account
+		public var account: Account
 		public var faucetButtonState: ControlState
 		public var address: AccountAddress { account.address }
 		public var isOnMainnet: Bool { account.networkID == .mainnet }
@@ -13,7 +13,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		var destination: Destination.State? = nil
 
 		public init(
-			account: Sargon.Account,
+			account: Account,
 			faucetButtonState: ControlState = .enabled
 		) {
 			self.account = account
@@ -32,10 +32,10 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case accountUpdated(Sargon.Account)
+		case accountUpdated(Account)
 		case isAllowedToUseFaucet(TaskResult<Bool>)
 		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState = .enabled)
-		case refreshAccountCompleted(TaskResult<OnLedgerEntity.Account>)
+		case refreshAccountCompleted(TaskResult<OnLedgerEntity.OnLedgerAccount>)
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
 	}
 

@@ -25,19 +25,19 @@ public struct BackupsClient: Sendable {
 }
 
 extension BackupsClient {
-	public typealias SnapshotOfProfileForExport = @Sendable () async throws -> Sargon.Profile
-	public typealias LoadProfileBackups = @Sendable () async -> Sargon.Profile.HeaderList?
+	public typealias SnapshotOfProfileForExport = @Sendable () async throws -> Profile
+	public typealias LoadProfileBackups = @Sendable () async -> Profile.HeaderList?
 
-	public typealias ImportProfileSnapshot = @Sendable (Sargon.Profile, Set<FactorSourceIDFromHash>) async throws -> Void
-	public typealias ImportCloudProfile = @Sendable (Sargon.Profile.Header, Set<FactorSourceIDFromHash>) async throws -> Void
-	public typealias LookupProfileSnapshotByHeader = @Sendable (Sargon.Profile.Header) async throws -> Sargon.Profile?
+	public typealias ImportProfileSnapshot = @Sendable (Profile, Set<FactorSourceIDFromHash>) async throws -> Void
+	public typealias ImportCloudProfile = @Sendable (Profile.Header, Set<FactorSourceIDFromHash>) async throws -> Void
+	public typealias LookupProfileSnapshotByHeader = @Sendable (Profile.Header) async throws -> Profile?
 
 	public typealias LoadDeviceID = @Sendable () async -> UUID?
 }
 
 extension BackupsClient {
 	public func importSnapshot(
-		_ snapshot: Sargon.Profile,
+		_ snapshot: Profile,
 		fromCloud: Bool
 	) async throws {
 		let factorSourceIDs: Set<FactorSourceIDFromHash> = .init(

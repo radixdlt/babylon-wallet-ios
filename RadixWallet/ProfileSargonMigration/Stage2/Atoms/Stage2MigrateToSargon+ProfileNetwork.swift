@@ -48,7 +48,7 @@ extension ProfileNetwork {
 		accounts.append(account)
 	}
 
-	public mutating func hideAccounts(ids idsOfAccountsToHide: Set<Sargon.Account.ID>) {
+	public mutating func hideAccounts(ids idsOfAccountsToHide: Set<Account.ID>) {
 		var identifiedArrayOf = self.accounts
 		for id in idsOfAccountsToHide {
 			identifiedArrayOf[id: id]?.hide()

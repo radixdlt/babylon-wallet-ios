@@ -14,7 +14,7 @@ extension Profile {
 		appPreferences.gateways.remove(gateway)
 	}
 
-	/// Requires the presence of an `Sargon.ProfileNetwork` in `networks` for
+	/// Requires the presence of an `ProfileNetwork` in `networks` for
 	/// `newGateway.network.id`, otherwise an error is thrown.
 	public mutating func changeGateway(to newGateway: Gateway) throws {
 		let newNetworkID = newGateway.network.id

@@ -12,11 +12,11 @@ extension Persona {
 }
 
 extension Personas {
-	public var nonHidden: IdentifiedArrayOf<Sargon.Persona> {
+	public var nonHidden: IdentifiedArrayOf<Persona> {
 		filter(not(\.isHidden)).asIdentified()
 	}
 
-	public var hiden: IdentifiedArrayOf<Sargon.Persona> {
+	public var hiden: IdentifiedArrayOf<Persona> {
 		filter(\.isHidden).asIdentified()
 	}
 }

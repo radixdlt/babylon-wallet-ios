@@ -4,11 +4,11 @@ import SwiftUI
 // MARK: - UpdateAccountLabel
 public struct UpdateAccountLabel: FeatureReducer, Sendable {
 	public struct State: Hashable, Sendable {
-		var account: Sargon.Account
+		var account: Account
 		var accountLabel: String
 		var sanitizedName: NonEmptyString?
 
-		init(account: Sargon.Account) {
+		init(account: Account) {
 			self.account = account
 			self.accountLabel = account.displayName.rawValue
 			self.sanitizedName = NonEmptyString(rawValue: account.displayName.value)

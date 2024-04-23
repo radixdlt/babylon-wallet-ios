@@ -18,7 +18,7 @@ extension MnemonicWithPassphrase {
 	}
 
 	public func validatePublicKeys(
-		of accounts: some Collection<Sargon.Account>
+		of accounts: some Collection<Account>
 	) throws -> Bool {
 		guard validate(
 			publicKeys: accounts.flatMap { account in

@@ -45,7 +45,7 @@ extension AccountPreferences.State {
 extension AccountPreferences {
 	public struct ViewState: Equatable {
 		typealias Section = PreferenceSection<AccountPreferences.Section, AccountPreferences.Section.SectionRow>.ViewState
-		let account: Sargon.Account
+		let account: Account
 		var sections: [Section]
 		var faucetButtonState: ControlState
 		var isOnMainnet: Bool
@@ -212,7 +212,7 @@ extension AccountPreferences {
 }
 
 extension PreferenceSection.Row where RowId == AccountPreferences.Section.SectionRow {
-	static func accountLabel(_ account: Sargon.Account) -> Self {
+	static func accountLabel(_ account: Account) -> Self {
 		.init(
 			id: .personalize(.accountLabel),
 			title: L10n.AccountSettings.accountLabel,

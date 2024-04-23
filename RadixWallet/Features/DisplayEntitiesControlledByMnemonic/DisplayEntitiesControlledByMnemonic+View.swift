@@ -72,7 +72,7 @@ extension DisplayEntitiesControlledByMnemonic {
 
 		public let headingState: HeadingState?
 		public let promptUserToBackUpMnemonic: Bool
-		public let accounts: [Sargon.Account]
+		public let accounts: [Account]
 		public let hasHiddenAccounts: Bool
 	}
 }

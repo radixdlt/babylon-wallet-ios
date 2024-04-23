@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - Home.AccountRow
@@ -8,12 +9,12 @@ extension Home {
 			public var id: AccountAddress { account.address }
 			public var accountWithInfo: AccountWithInfo
 
-			public var accountWithResources: Loadable<OnLedgerEntity.Account>
+			public var accountWithResources: Loadable<OnLedgerEntity.OnLedgerAccount>
 			public var showFiatWorth: Bool = true
 			public var totalFiatWorth: Loadable<FiatWorth>
 
 			public init(
-				account: Sargon.Account
+				account: Account
 			) {
 				self.accountWithInfo = .init(account: account)
 				self.accountWithResources = .loading
@@ -29,7 +30,7 @@ extension Home {
 		}
 
 		public enum InternalAction: Sendable, Equatable {
-			case accountUpdated(OnLedgerEntity.Account)
+			case accountUpdated(OnLedgerEntity.OnLedgerAccount)
 			case fiatWorthUpdated(Loadable<FiatWorth>)
 			case checkAccountAccessToMnemonic
 		}

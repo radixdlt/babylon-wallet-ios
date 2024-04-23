@@ -37,14 +37,14 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 		public var resources: Resources = .init()
 
-		public let account: Sargon.Account
+		public let account: Account
 		public var accountPortfolio: Loadable<AccountPortfoliosClient.AccountPortfolio> = .idle
 		public var isLoadingResources: Bool = false
 		public var isRefreshing: Bool = false
 		public let mode: Mode
 		public var totalFiatWorth: Loadable<FiatWorth> = .loading
 
-		public init(account: Sargon.Account, mode: Mode = .normal) {
+		public init(account: Account, mode: Mode = .normal) {
 			self.init(
 				account: account,
 				resources: .init(),
@@ -53,7 +53,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		}
 
 		init(
-			account: Sargon.Account,
+			account: Account,
 			assetKinds: NonEmpty<[AssetKind]> = .init(rawValue: AssetKind.allCases)!,
 			resources: Resources,
 			mode: Mode

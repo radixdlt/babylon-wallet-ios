@@ -13,14 +13,14 @@ extension EntitiesVisibilityClient {
 		public let hiddenPersonasCount: Int
 	}
 
-	public typealias HideAccounts = @Sendable (Set<Sargon.Account.ID>) async throws -> Void
+	public typealias HideAccounts = @Sendable (Set<Account.ID>) async throws -> Void
 	public typealias HidePersonas = @Sendable (Set<Persona.ID>) async throws -> Void
 	public typealias UnhideAllEntities = @Sendable () async throws -> Void
 	public typealias GetHiddenEntityCounts = @Sendable () async throws -> HiddenEntityCounts
 }
 
 extension EntitiesVisibilityClient {
-	public func hideAccounts(ids: some Collection<Sargon.Account.ID>) async throws {
+	public func hideAccounts(ids: some Collection<Account.ID>) async throws {
 		try await hideAccounts(Set(ids))
 	}
 
@@ -28,7 +28,7 @@ extension EntitiesVisibilityClient {
 		try await hidePersonas(Set(ids))
 	}
 
-	public func hide(accounts: some Collection<Sargon.Account>) async throws {
+	public func hide(accounts: some Collection<Account>) async throws {
 		try await hideAccounts(ids: accounts.map(\.id))
 	}
 
@@ -36,7 +36,7 @@ extension EntitiesVisibilityClient {
 		try await hidePersonas(ids: personas.map(\.id))
 	}
 
-	public func hide(account: Sargon.Account) async throws {
+	public func hide(account: Account) async throws {
 		try await hide(accounts: [account])
 	}
 

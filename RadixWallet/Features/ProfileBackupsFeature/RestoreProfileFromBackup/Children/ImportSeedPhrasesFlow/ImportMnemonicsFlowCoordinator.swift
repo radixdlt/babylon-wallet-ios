@@ -29,10 +29,10 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		public var newMainBDFS: DeviceFactorSource?
 
 		public enum Context: Sendable, Hashable {
-			case fromOnboarding(profileSnapshot: Sargon.Profile)
+			case fromOnboarding(profileSnapshot: Profile)
 			case notOnboarding
 
-			var profileSnapshotFromOnboarding: Sargon.Profile? {
+			var profileSnapshotFromOnboarding: Profile? {
 				switch self {
 				case let .fromOnboarding(profileSnapshot): profileSnapshot
 				case .notOnboarding: nil

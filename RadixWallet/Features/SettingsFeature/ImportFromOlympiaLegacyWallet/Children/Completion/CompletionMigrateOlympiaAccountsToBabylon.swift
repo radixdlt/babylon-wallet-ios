@@ -5,11 +5,11 @@ import SwiftUI
 public struct CompletionMigrateOlympiaAccountsToBabylon: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let previouslyMigrated: [ImportOlympiaWalletCoordinator.MigratableAccount]
-		public let migrated: IdentifiedArrayOf<Sargon.Account>
+		public let migrated: IdentifiedArrayOf<Account>
 
 		public init(
 			previouslyMigrated: [ImportOlympiaWalletCoordinator.MigratableAccount],
-			migrated: IdentifiedArrayOf<Sargon.Account>
+			migrated: IdentifiedArrayOf<Account>
 		) {
 			self.previouslyMigrated = previouslyMigrated
 			self.migrated = migrated

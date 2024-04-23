@@ -6,19 +6,19 @@ public struct MyEntitiesInvolvedInTransaction: Sendable, Hashable {
 	}
 
 	public let identitiesRequiringAuth: OrderedSet<Persona>
-	public let accountsRequiringAuth: OrderedSet<Sargon.Account>
+	public let accountsRequiringAuth: OrderedSet<Account>
 
 	/// A set of all MY accounts in the manifest which were deposited into. This is a subset of the addresses seen in `accountsRequiringAuth`.
-	public let accountsWithdrawnFrom: OrderedSet<Sargon.Account>
+	public let accountsWithdrawnFrom: OrderedSet<Account>
 
 	/// A set of all MY accounts in the manifest which were withdrawn from. This is a subset of the addresses seen in `accountAddresses`
-	public let accountsDepositedInto: OrderedSet<Sargon.Account>
+	public let accountsDepositedInto: OrderedSet<Account>
 
 	public init(
 		identitiesRequiringAuth: OrderedSet<Persona>,
-		accountsRequiringAuth: OrderedSet<Sargon.Account>,
-		accountsWithdrawnFrom: OrderedSet<Sargon.Account>,
-		accountsDepositedInto: OrderedSet<Sargon.Account>
+		accountsRequiringAuth: OrderedSet<Account>,
+		accountsWithdrawnFrom: OrderedSet<Account>,
+		accountsDepositedInto: OrderedSet<Account>
 	) {
 		self.identitiesRequiringAuth = identitiesRequiringAuth
 		self.accountsRequiringAuth = accountsRequiringAuth
@@ -47,13 +47,13 @@ extension TransactionClient {
 		) async throws -> MyEntitiesInvolvedInTransaction {
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
 
-			func accountFromComponentAddress(_ accountAddress: AccountAddress) -> Sargon.Account? {
+			func accountFromComponentAddress(_ accountAddress: AccountAddress) -> Account? {
 				allAccounts.first { $0.address == accountAddress }
 			}
 			func identityFromComponentAddress(_ identityAddress: IdentityAddress) async throws -> Persona {
 				try await personasClient.getPersona(id: identityAddress)
 			}
-			func mapAccount(_ addresses: [AccountAddress]) throws -> OrderedSet<Sargon.Account> {
+			func mapAccount(_ addresses: [AccountAddress]) throws -> OrderedSet<Account> {
 				try .init(validating: addresses.compactMap(accountFromComponentAddress))
 			}
 			func mapIdentity(_ addresses: [IdentityAddress]) async throws -> OrderedSet<Persona> {
@@ -304,7 +304,7 @@ extension TransactionClient {
 		let allSignerEntities = request.transactionSigners.intentSignerEntitiesOrEmpty()
 
 		func findFeePayer(
-			amongst keyPath: KeyPath<MyEntitiesInvolvedInTransaction, OrderedSet<Sargon.Account>>,
+			amongst keyPath: KeyPath<MyEntitiesInvolvedInTransaction, OrderedSet<Account>>,
 			includeSignaturesCost: Bool
 		) async throws -> FeePayerSelectionResult? {
 			let accountsToCheck = involvedEntities[keyPath: keyPath]

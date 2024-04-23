@@ -100,7 +100,7 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case derivePublicKey
-		case createPersonaResult(TaskResult<Sargon.Persona>)
+		case createPersonaResult(TaskResult<Persona>)
 		case handleFailure
 	}
 

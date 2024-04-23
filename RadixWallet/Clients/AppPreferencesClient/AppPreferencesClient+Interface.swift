@@ -37,7 +37,7 @@ extension AppPreferencesClient {
 	public typealias SetIsCloudProfileSyncEnabled = @Sendable (Bool) async throws -> Void
 	public typealias GetPreferences = @Sendable () async -> AppPreferences
 	public typealias UpdatePreferences = @Sendable (AppPreferences) async throws -> Void
-	public typealias ExtractProfileSnapshot = @Sendable () async -> Sargon.Profile
+	public typealias ExtractProfileSnapshot = @Sendable () async -> Profile
 	public typealias DeleteProfileSnapshot = @Sendable (_ keepInICloudIfPresent: Bool) async throws -> Void
 }
 

@@ -6,7 +6,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public let selectionRequirement: SelectionRequirement
 		public let filteredAccounts: [AccountAddress]
-		public var availableAccounts: IdentifiedArrayOf<Sargon.Account>
+		public var availableAccounts: IdentifiedArrayOf<Account>
 		public var selectedAccounts: [ChooseAccountsRow.State]?
 		public var canCreateNewAccount: Bool
 
@@ -16,7 +16,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 		public init(
 			selectionRequirement: SelectionRequirement,
 			filteredAccounts: [AccountAddress] = [],
-			availableAccounts: IdentifiedArrayOf<Sargon.Account> = [],
+			availableAccounts: IdentifiedArrayOf<Account> = [],
 			selectedAccounts: [ChooseAccountsRow.State]? = nil,
 			canCreateNewAccount: Bool = true
 		) {
@@ -35,7 +35,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadAccountsResult(TaskResult<IdentifiedArrayOf<Sargon.Account>>)
+		case loadAccountsResult(TaskResult<IdentifiedArrayOf<Account>>)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -88,7 +88,7 @@ public struct ChooseAccounts: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .loadAccountsResult(.success(accounts)):
-			// Uniqueness is guaranteed as per `Sargon.Accounts`
+			// Uniqueness is guaranteed as per `Accounts`
 			state.availableAccounts = accounts.filter {
 				!state.filteredAccounts.contains($0.address)
 			}.asIdentified()

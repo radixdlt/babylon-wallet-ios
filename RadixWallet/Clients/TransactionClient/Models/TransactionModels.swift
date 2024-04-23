@@ -196,13 +196,13 @@ public struct ManifestReviewRequest: Sendable {
 
 // MARK: - FeePayerCandidate
 public struct FeePayerCandidate: Sendable, Hashable, Identifiable {
-	public typealias ID = Sargon.Account.ID
+	public typealias ID = Account.ID
 	public var id: ID { account.id }
 
-	public let account: Sargon.Account
+	public let account: Account
 	public let xrdBalance: Decimal192
 
-	public init(account: Sargon.Account, xrdBalance: Decimal192) {
+	public init(account: Account, xrdBalance: Decimal192) {
 		self.account = account
 		self.xrdBalance = xrdBalance
 	}

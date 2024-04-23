@@ -35,9 +35,9 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		var availableMonths: IdentifiedArrayOf<DateRangeItem> = []
 
-		let account: Sargon.Account
+		let account: Account
 
-		let portfolio: OnLedgerEntity.Account
+		let portfolio: OnLedgerEntity.OnLedgerAccount
 
 		var resources: IdentifiedArrayOf<OnLedgerEntity.Resource> = []
 
@@ -74,7 +74,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destination.State?
 
-		init(account: Sargon.Account) throws {
+		init(account: Account) throws {
 			@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 
 			guard let portfolio = accountPortfoliosClient.portfolios().first(where: { $0.account.address == account.address }) else {

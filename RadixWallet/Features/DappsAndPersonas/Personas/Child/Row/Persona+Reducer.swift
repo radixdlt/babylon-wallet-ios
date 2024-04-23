@@ -9,7 +9,7 @@ public struct PersonaReducer: Sendable, FeatureReducer {
 		public let displayName: String
 		public var shouldWriteDownMnemonic: Bool
 
-		public init(persona: Sargon.ProfileNetwork.AuthorizedPersonaDetailed) {
+		public init(persona: ProfileNetwork.AuthorizedPersonaDetailed) {
 			self.init(
 				id: persona.id,
 				thumbnail: nil,

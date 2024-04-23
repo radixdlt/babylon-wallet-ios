@@ -4,7 +4,7 @@ import Sargon
 /// An in-memory holder of the app's `Profile` which syncs changes to *Keychain* and
 /// needed state to *UserDefaults* (activeProfileID). If user has iCloud Keychain sync
 /// enabled (we can't determine that) and has not disabled `Profile` cloud sync then
-/// iOS also syncs updates of `Profile` (a `Sargon.Profile`) to iCloud via *Keychain*.
+/// iOS also syncs updates of `Profile` (a `Profile`) to iCloud via *Keychain*.
 ///
 /// If a Profile successfully was loaded from Keychain it will be used an `Main` part
 /// of app is openened by `Splash`. If no existing Profile was found then a new one
@@ -22,8 +22,8 @@ import Sargon
 /// 	func unlockedApp() async -> Profile
 ///	 	func finishedOnboarding() async
 ///     func finishOnboarding(with _: AccountsRecoveredFromScanningUsingMnemonic) async throws
-///		func importCloudProfileSnapshot(_ h: Sargon.Profile.Header) throws
-///	 	func importProfileSnapshot(_ s: Sargon.Profile) throws
+///		func importCloudProfileSnapshot(_ h: Profile.Header) throws
+///	 	func importProfileSnapshot(_ s: Profile) throws
 ///	 	func deleteProfile(keepInICloudIfPresent: Bool) throws
 /// 	func updating<T>(_ t: (inout Profile) async throws -> T) async throws -> T
 ///
@@ -43,7 +43,7 @@ import Sargon
 /// And then a lot of sugar/convenience AsyncSequences using `values` but mapping to other
 /// values inside of `Profile`, e.g.:
 ///
-/// 	func accountValues() async -> AnyAsyncSequence<Sargon.Accounts>
+/// 	func accountValues() async -> AnyAsyncSequence<Accounts>
 ///
 /// And similar async sequences.
 ///
@@ -111,7 +111,7 @@ extension ProfileStore {
 
 	/// Update Profile, by updating the current network
 	/// - Parameter update: A mutating update to perform on the profiles's active network
-	public func updatingOnCurrentNetwork(_ update: @Sendable (inout Sargon.ProfileNetwork) async throws -> Void) async throws {
+	public func updatingOnCurrentNetwork(_ update: @Sendable (inout ProfileNetwork) async throws -> Void) async throws {
 		try await updating { profile in
 			var network = try await network()
 			try await update(&network)
@@ -119,12 +119,12 @@ extension ProfileStore {
 		}
 	}
 
-	/// Looks up a Sargon.Profile for the given `header` and tries to import it,
+	/// Looks up a Profile for the given `header` and tries to import it,
 	/// updates `headerList` (Keychain),  `activeProfileID` (UserDefaults)
 	/// and saves the snapshot of the profile into Keychain.
 	/// - Parameter profile: Imported Profile to use and save.
 	public func importCloudProfileSnapshot(
-		_ header: Sargon.Profile.Header
+		_ header: Profile.Header
 	) throws {
 		do {
 			// Load the snapshot, also this will validate if the snapshot actually exist
@@ -144,7 +144,7 @@ extension ProfileStore {
 	/// updates `headerList` (Keychain),  `activeProfileID` (UserDefaults)
 	/// and saves the snapshot of the profile into Keychain.
 	/// - Parameter profile: Imported Profile to use and save.
-	public func importProfileSnapshot(_ snapshot: Sargon.Profile) throws {
+	public func importProfileSnapshot(_ snapshot: Profile) throws {
 		try importProfile(snapshot)
 	}
 
@@ -178,7 +178,7 @@ extension ProfileStore {
 		}
 	}
 
-	private static func deleteEphemeralProfile(id: Sargon.Profile.Header.ID) {
+	private static func deleteEphemeralProfile(id: Profile.Header.ID) {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		do {
 			try secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(
@@ -216,13 +216,13 @@ extension ProfileStore {
 
 		let accounts = accountsRecoveredFromScanningUsingMnemonic.accounts
 
-		// It is important that we always create the mainnet `Sargon.ProfileNetwork` and
+		// It is important that we always create the mainnet `ProfileNetwork` and
 		// add it, even if `accounts` is empty, since during App launch we check
 		// `profile.networks.isEmpty` to determine if we should onboard the user or not,
 		// thus, this ensures that we do not onboard a user who has created Profile
 		// via Account Recovery Scan with 0 accounts if said user force quits app before
 		// she creates her first account.
-		let network = Sargon.ProfileNetwork(
+		let network = ProfileNetwork(
 			id: .mainnet,
 			accounts: accounts,
 			personas: [],
@@ -597,7 +597,7 @@ extension ProfileStore {
 		@Dependency(\.mnemonicClient) var mnemonicClient
 
 		let profileID = uuid()
-		let header = Sargon.Profile.Header(
+		let header = Profile.Header(
 			snapshotVersion: .v100,
 			id: profileID,
 			creatingDevice: creatingDevice,
@@ -674,7 +674,7 @@ extension ProfileStore {
 		}
 	}
 
-	private static func _updateHeaderList(with header: Sargon.Profile.Header) throws {
+	private static func _updateHeaderList(with header: Profile.Header) throws {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		var headers = try secureStorageClient.loadProfileHeaderList()?.rawValue ?? []
 		headers[id: header.id] = header
@@ -686,7 +686,7 @@ extension ProfileStore {
 		}
 	}
 
-	private static func _setActiveProfile(to header: Sargon.Profile.Header) {
+	private static func _setActiveProfile(to header: Profile.Header) {
 		@Dependency(\.userDefaults) var userDefaults
 		userDefaults.setActiveProfileID(header.id)
 	}
