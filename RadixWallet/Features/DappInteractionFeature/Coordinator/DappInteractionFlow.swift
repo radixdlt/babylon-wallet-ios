@@ -831,8 +831,7 @@ extension DappInteractionFlow {
 				)
 			}
 		}()
-//		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
-		sargonProfileFinishMigrateAtEndOfStage1()
+		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
 		try await authorizedDappsClient.updateOrAddAuthorizedDapp(authorizedDapp)
 	}
 
