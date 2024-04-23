@@ -1,12 +1,6 @@
 import Foundation
 import Sargon
 
-extension MnemonicWithPassphrase {
-	public func toSeed() -> BIP39Seed {
-		sargonProfileFinishMigrateAtEndOfStage1()
-	}
-}
-
 // Move elsewhere?
 extension MnemonicWithPassphrase {
 	public func validatePublicKeys(

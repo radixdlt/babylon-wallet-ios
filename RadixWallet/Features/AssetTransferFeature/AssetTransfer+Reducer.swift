@@ -78,7 +78,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 				let manifest = try await createManifest(accounts)
 
 				Task {
-					_ = try await dappInteractionClient.addWalletInteraction(
+					_ = await dappInteractionClient.addWalletInteraction(
 						.transaction(.init(send: .init(transactionManifest: manifest, message: message))),
 						.accountTransfer
 					)
@@ -259,7 +259,7 @@ func needsSignatureForDepositting(
 	resource resourceAddress: ResourceAddress
 ) async -> Bool {
 	let depositSettings = receivingAccount.onLedgerSettings.thirdPartyDeposits
-	let resourceException = depositSettings.assetsExceptionList.first { $0.address == resourceAddress }?.exceptionRule
+	let resourceException = depositSettings.assetsExceptionList?.first { $0.address == resourceAddress }?.exceptionRule
 
 	switch (depositSettings.depositRule, resourceException) {
 	// AcceptAll

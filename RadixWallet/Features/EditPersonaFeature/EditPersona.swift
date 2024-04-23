@@ -27,25 +27,25 @@ extension EditPersona {
 			}
 
 			if let emailState = emailAddress, let emailAddress = emailState.input {
-				personaData.emailAddresses = (try? .init(
+				personaData.emailAddresses = .init(
 					collection: [
 						.init(
 							id: emailState.entryID,
 							value: .init(email: emailAddress)
 						),
 					]
-				)) ?? .init(collection: [])
+				)
 			}
 
 			if let phoneState = phoneNumber, let phoneNumber = phoneState.input {
-				personaData.phoneNumbers = (try? .init(
+				personaData.phoneNumbers = .init(
 					collection: [
 						.init(
 							id: phoneState.entryID,
 							value: .init(number: phoneNumber)
 						),
 					]
-				)) ?? .init(collection: [])
+				)
 			}
 
 			return personaData
