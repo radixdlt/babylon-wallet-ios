@@ -28,16 +28,6 @@ public struct DeviceFactorSourceClient: Sendable {
 	}
 }
 
-// MARK: - SignatureFromOnDeviceHDRequest
-public struct SignatureFromOnDeviceHDRequest: Sendable, Hashable {
-	public let mnemonicWithPassphrase: MnemonicWithPassphrase
-	public let derivationPath: DerivationPath
-	public let curve: SLIP10Curve
-
-	/// The data to sign
-	public let hashedData: Hash
-}
-
 // MARK: DeviceFactorSourceClient.onDeviceHDPublicKey
 extension DeviceFactorSourceClient {
 	public typealias GetEntitiesControlledByFactorSource = @Sendable (DeviceFactorSource, Profile?) async throws -> EntitiesControlledByFactorSource
@@ -103,6 +93,16 @@ public struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
 		self.derivationPaths = derivationPaths
 		self.source = source
 	}
+}
+
+// MARK: - SignatureFromOnDeviceHDRequest
+public struct SignatureFromOnDeviceHDRequest: Sendable, Hashable {
+	public let mnemonicWithPassphrase: MnemonicWithPassphrase
+	public let derivationPath: DerivationPath
+	public let curve: SLIP10Curve
+
+	/// The data to sign
+	public let hashedData: Hash
 }
 
 // MARK: - FailedToFindDeviceFactorSourceForSigning
