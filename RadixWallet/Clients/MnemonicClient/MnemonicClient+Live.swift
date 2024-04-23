@@ -3,8 +3,9 @@ extension MnemonicClient: DependencyKey {
 	public typealias Value = MnemonicClient
 
 	public static let liveValue: Self = .init(
-		generate: { _, _ in
+		generate: {
 //			try Mnemonic(wordCount: $0, language: $1)
+			Mnemonic.init
 			sargonProfileFinishMigrateAtEndOfStage1()
 		},
 		import: { _, _ in
