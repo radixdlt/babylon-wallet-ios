@@ -60,11 +60,11 @@ extension AddressView {
 					}
 			} else {
 				Menu {
-					Button(copyText, asset: AssetResource.copyBig) {
+					Button(copyText, image: .copyBig) {
 						copyToPasteboard()
 					}
 
-					Button(L10n.AddressAction.viewOnDashboard, asset: AssetResource.iconLinkOut) {
+					Button(L10n.AddressAction.viewOnDashboard, image: .iconLinkOut) {
 						viewOnRadixDashboard()
 					}
 				} label: {
@@ -97,7 +97,7 @@ extension AddressView {
 	}
 
 	private var image: Image {
-		Image(asset: action == .copy ? AssetResource.copy : AssetResource.iconLinkOut)
+		Image(action == .copy ? ImageResource.copy : .iconLinkOut)
 	}
 
 	private var copyText: String {
