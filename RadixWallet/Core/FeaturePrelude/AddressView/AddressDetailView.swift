@@ -10,11 +10,9 @@ struct AddressDetailView: View {
 	@State private var showEnlargedView = false
 	@State private var showShareView = false
 
-	@Dependency(\.qrGeneratorClient) var qrGeneratorClient
-	@Dependency(\.gatewaysClient) var gatewaysClient
-	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
-	@Dependency(\.openURL) var openURL
+
+	@State var title: Loadable<String?> = .idle
 
 	var body: some View {
 		VStack(spacing: .medium3) {
@@ -23,6 +21,7 @@ struct AddressDetailView: View {
 			bottom
 			Spacer()
 		}
+		.multilineTextAlignment(.center)
 		.padding([.horizontal, .bottom], .medium3)
 		.overlay(alignment: .top) {
 			overlay
@@ -31,6 +30,7 @@ struct AddressDetailView: View {
 		.presentationDetents([.large])
 		.presentationDragIndicator(.visible)
 		.task {
+			await loadTitle()
 			if showQrCode {
 				await generateQrImage()
 			}
@@ -42,9 +42,13 @@ struct AddressDetailView: View {
 
 	private var top: some View {
 		VStack(spacing: .small2) {
-			Text("name")
-				.textStyle(.sheetTitle)
-				.foregroundColor(.app.gray1)
+			loadable(title) {
+				ProgressView()
+			} successContent: { title in
+				Text(title)
+					.textStyle(.sheetTitle)
+					.foregroundColor(.app.gray1)
+			}
 
 			if showQrCode {
 				Text("Address QR Code")
@@ -64,7 +68,6 @@ struct AddressDetailView: View {
 					.foregroundColor(.app.gray1)
 				colorisedAddress
 			}
-			.multilineTextAlignment(.center)
 			actions
 		}
 		.textStyle(.body1Header)
@@ -120,14 +123,6 @@ struct AddressDetailView: View {
 		}
 	}
 
-	private var viewOnDashboard: some View {
-		Button("View on Radix Dashboard", action: viewOnRadixDashboard)
-			.buttonStyle(.secondaryRectangular(
-				shouldExpand: true,
-				trailingImage: .init(.iconLinkOut)
-			))
-	}
-
 	private var qrCode: some View {
 		ZStack {
 			switch qrImage {
@@ -145,16 +140,6 @@ struct AddressDetailView: View {
 			}
 		}
 		.animation(.easeInOut, value: qrImage != nil)
-	}
-
-	private func generateQrImage() async {
-		let content = QR.addressPrefix + address.address
-		do {
-			let image = try await qrGeneratorClient.generate(.init(content: content))
-			self.qrImage = .success(image)
-		} catch {
-			self.qrImage = .failure(error)
-		}
 	}
 }
 
@@ -209,9 +194,57 @@ private extension AddressDetailView {
 	}
 }
 
+// MARK: - Business logic
+private extension AddressDetailView {
+	func generateQrImage() async {
+		@Dependency(\.qrGeneratorClient) var qrGeneratorClient
+		let content = QR.addressPrefix + address.address
+		do {
+			let image = try await qrGeneratorClient.generate(.init(content: content))
+			self.qrImage = .success(image)
+		} catch {
+			self.qrImage = .failure(error)
+		}
+	}
+
+	func loadTitle() async {
+		title = .loading
+		@Dependency(\.accountsClient) var accountsClient
+		@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+
+		do {
+			switch address {
+			case let .account(value, _):
+				let res = try await accountsClient.getAccountByAddress(value)
+				title = .success(res.displayName.rawValue)
+			case let .resource(address):
+				let res = try await onLedgerEntitiesClient.getResource(address)
+				title = .success(res.fungibleResourceName)
+			case let .validator(address):
+				let res = try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys)
+				title = .success(res.metadata?.name)
+			case let .package(address):
+				let res = try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys)
+				title = .success(res.metadata?.name)
+			case let .resourcePool(address):
+				let res = try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys)
+				title = .success(res.metadata?.name)
+			case let .component(address):
+				let res = try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys)
+				title = .success(res.metadata?.name)
+			case .nonFungibleGlobalID:
+				title = .success(nil)
+			}
+		} catch {
+			title = .failure(error)
+		}
+	}
+}
+
 // MARK: - Actions
 private extension AddressDetailView {
 	func copy() {
+		@Dependency(\.pasteboardClient) var pasteboardClient
 		pasteboardClient.copyString(address.address)
 	}
 
@@ -226,8 +259,11 @@ private extension AddressDetailView {
 	}
 
 	func viewOnRadixDashboard() {
+		@Dependency(\.gatewaysClient) var gatewaysClient
+		@Dependency(\.openURL) var openURL
 		let path = address.addressPrefix + "/" + address.formatted(.raw)
-		Task { [openURL, gatewaysClient] in
+
+		Task {
 			let currentNetwork = await gatewaysClient.getCurrentGateway().network
 			await openURL(
 				Radix.Dashboard.dashboard(forNetwork: currentNetwork)
