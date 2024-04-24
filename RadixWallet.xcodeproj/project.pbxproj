@@ -2143,6 +2143,7 @@
 		A462B5BE2B9382BC00C26D20 /* OnLedgerEntitiesClient+ComplexTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OnLedgerEntitiesClient+ComplexTypes.swift"; sourceTree = "<group>"; };
 		A462B5C02B95210000C26D20 /* TransactionHistoryFilters+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistoryFilters+Reducer.swift"; sourceTree = "<group>"; };
 		A462B5C22B95212600C26D20 /* TransactionHistoryFilters+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionHistoryFilters+View.swift"; sourceTree = "<group>"; };
+		A473079A2BD9B0FA0077B5E2 /* RadixWalletDebug-Dev.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "RadixWalletDebug-Dev.entitlements"; sourceTree = "<group>"; };
 		A47572012B29B3CA0059A95D /* IOSSecurityClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Live.swift"; sourceTree = "<group>"; };
 		A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Test.swift"; sourceTree = "<group>"; };
 		A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Interface.swift"; sourceTree = "<group>"; };
@@ -2407,6 +2408,7 @@
 		48CFBC512ADC106300E77A5C /* RadixWallet */ = {
 			isa = PBXGroup;
 			children = (
+				A473079A2BD9B0FA0077B5E2 /* RadixWalletDebug-Dev.entitlements */,
 				E65D6CE42BC980FE001D8A39 /* MIGRATE_TO_SARGON */,
 				48649AD42ADC7CAC006307CF /* AppIcon.xcassets */,
 				48CFBF522ADC10D900E77A5C /* Clients */,
@@ -7821,6 +7823,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 48CFC69C2ADC110800E77A5C /* iOS-dev.xcconfig */;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "RadixWallet/RadixWalletDebug-Dev.entitlements";
 				CURRENT_PROJECT_VERSION = 1;
 				SWIFT_VERSION = 5.0;
 			};
