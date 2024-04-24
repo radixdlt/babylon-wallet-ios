@@ -219,7 +219,7 @@ private extension AddressDetailView {
 				title = .success(res.displayName.rawValue)
 			case let .resource(address):
 				let res = try await onLedgerEntitiesClient.getResource(address)
-				title = .success(res.fungibleResourceName)
+				title = .success(res.resourceTitle)
 			case let .validator(address):
 				let res = try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys)
 				title = .success(res.metadata?.name)
@@ -292,5 +292,17 @@ private extension AddressDetailView {
 		default:
 			nil
 		}
+	}
+}
+
+private extension OnLedgerEntity.Resource {
+	var resourceTitle: String? {
+		guard let name = metadata.name else {
+			return metadata.symbol
+		}
+		guard let symbol = metadata.symbol else {
+			return name
+		}
+		return "\(name) (\(symbol))"
 	}
 }
