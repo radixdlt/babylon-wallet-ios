@@ -314,7 +314,7 @@ extension AlertState<NewConnection.Destination.Action.ErrorAlert> {
 				TextState(L10n.Common.dismiss)
 			}
 		} message: {
-			TextState(L10n.LinkedConnectors.oldFormatQRCodeErrorMessage)
+			TextState(L10n.LinkedConnectors.oldQRErrorMessage)
 		}
 	}
 }

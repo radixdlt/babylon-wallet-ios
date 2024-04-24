@@ -1167,5 +1167,5 @@ Only continue if you are linking to the **official Radix Connector browser exten
 "linkedConnectors_linkFailedErrorTitle" = "Link Failed";
 "linkedConnectors_unknownPurposeErrorMessage" = "This type of Connector link is not supported.";
 "linkedConnectors_changingPurposeNotSupportedErrorMessage" = "Changing a Connector’s type is not supported.";
-"linkedConnectors_oldFormatQRCodeErrorMessage" = "This is an old version of the Radix Connector browser extension. Please update to the latest Connector and try linking again.";
+"linkedConnectors_oldQRErrorMessage" = "This is an old version of the Radix Connector browser extension. Please update to the latest Connector and try linking again.";
 "common_dismiss" = "Dismiss";
