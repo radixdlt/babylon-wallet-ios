@@ -540,7 +540,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 
 	func test__GIVEN__no_profile__WHEN__finishOnboarding__THEN__iphone__model_is_updated_in_profile_and_keychain() async throws {
 		try await withTimeLimit {
-			let savedSnapshot = LockIsolated<ProfileSnapshot?>(nil)
+			let savedSnapshot = LockIsolated<Profile?>(nil)
 
 			let inMemory = try await withTestClients {
 				// GIVEN no profile

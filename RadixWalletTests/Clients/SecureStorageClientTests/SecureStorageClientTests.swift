@@ -89,7 +89,7 @@ final class SecureStorageClientTests: TestCase {
 private extension SecureStorageClientTests {
 	func doTest(
 		authConfig: LocalAuthenticationConfig,
-		operation: (SecureStorageClient, PrivateHierarchicalDeterministicFactorSource, ProfileSnapshot) async throws -> Void,
+		operation: (SecureStorageClient, PrivateHierarchicalDeterministicFactorSource, Profile) async throws -> Void,
 		assertKeychainSetItemWithoutAuthRequest: (@Sendable (Data, KeychainClient.Key, KeychainClient.AttributesWithoutAuth) throws -> Void)? = nil,
 		assertKeychainSetItemWithAuthRequest: (@Sendable (Data, KeychainClient.Key, KeychainClient.AttributesWithAuth) throws -> Void)? = nil
 	) async throws {
@@ -126,33 +126,32 @@ private extension SecureStorageClientTests {
 
 			let sut = SecureStorageClient.liveValue
 			let profile = Profile(
-				header: snapshotHeader,
+				header: header,
 				deviceFactorSource: factorSource
 			)
-			try await operation(sut, privateHDFactorSource, profile.snapshot())
+			try await operation(sut, privateHDFactorSource, profile)
 		}
 	}
 }
 
-private let creatingDevice = "computer unit test"
-private let stableDate = Date(timeIntervalSince1970: 0)
-private let stableUUID = UUID(uuidString: "BABE1442-3C98-41FF-AFB0-D0F5829B020D")!
+private let device: DeviceInfo = .sample
 
-private let device: DeviceInfo = .init(
-	description: creatingDevice,
-	id: stableUUID,
-	date: stableDate
-)
-
-private let snapshotHeader = Header(
-	creatingDevice: device,
-	lastUsedOnDevice: device,
-	id: stableUUID,
-	lastModified: stableDate,
-	contentHint: .init(
-		numberOfAccountsOnAllNetworksInTotal: 6,
-		numberOfPersonasOnAllNetworksInTotal: 3,
-		numberOfNetworks: 2
-	),
-	snapshotVersion: .minimum
-)
+// private let snapshotHeader = Header(
+//	creatingDevice: device,
+//	lastUsedOnDevice: device,
+//	id: stableUUID,
+//	lastModified: stableDate,
+//	contentHint: .init(
+//		numberOfAccountsOnAllNetworksInTotal: 6,
+//		numberOfPersonasOnAllNetworksInTotal: 3,
+//		numberOfNetworks: 2
+//	),
+//	snapshotVersion: .minimum
+// )
+private var header: Header {
+	var header = Header.sample
+	header.contentHint.numberOfNetworks = 2
+	header.contentHint.numberOfAccountsOnAllNetworksInTotal = 6
+	header.contentHint.numberOfPersonasOnAllNetworksInTotal = 3
+	return header
+}

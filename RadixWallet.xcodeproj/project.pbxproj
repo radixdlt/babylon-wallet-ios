@@ -18,6 +18,7 @@
 		4813AFFF2BC9B62F0046BCAD /* Stage1MigrateToSargon+AuthorizedPersonaSimple.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFFE2BC9B62F0046BCAD /* Stage1MigrateToSargon+AuthorizedPersonaSimple.swift */; };
 		4813B0012BCA48CE0046BCAD /* Stage2MigrateToSargon+ProfileNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813B0002BCA48CE0046BCAD /* Stage2MigrateToSargon+ProfileNetwork.swift */; };
 		4813B0032BCA4FD60046BCAD /* Stage1MigrateToSargon+Persona.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813B0022BCA4FD60046BCAD /* Stage1MigrateToSargon+Persona.swift */; };
+		482752032BD993DF007854E0 /* SecureStorageClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2F62ADEBFB300A38425 /* SecureStorageClientTests.swift */; };
 		483A3DE42BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483A3DE32BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift */; };
 		483A3DE62BD2678900055932 /* Stage1MigrateToSargon+FactorSourceCryptoParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483A3DE52BD2678900055932 /* Stage1MigrateToSargon+FactorSourceCryptoParameters.swift */; };
 		483A3DE92BD31CB700055932 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 483A3DE82BD31CB700055932 /* Sargon */; };
@@ -6526,6 +6527,7 @@
 				E6DBA3882ADEBFB300A38425 /* Validation+ExtraTests.swift in Sources */,
 				E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */,
 				E6DBA3212ADEBFB300A38425 /* WebSocketClientMock.swift in Sources */,
+				482752032BD993DF007854E0 /* SecureStorageClientTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
