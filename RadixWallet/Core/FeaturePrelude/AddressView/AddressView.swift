@@ -10,7 +10,6 @@ public struct AddressView: View {
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.qrGeneratorClient) var qrGeneratorClient
-	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 
 	@State private var detailAddress: LedgerIdentifiable.Address? = nil
 
@@ -109,10 +108,6 @@ extension AddressView {
 				L10n.AddressAction.copyNftId
 			}
 		}
-	}
-
-	func verifyAddressOnLedger(_ accountAddress: AccountAddress) {
-		ledgerHardwareWalletClient.verifyAddress(of: accountAddress)
 	}
 }
 

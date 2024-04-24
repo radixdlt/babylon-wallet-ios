@@ -13,13 +13,14 @@ struct AddressDetailView: View {
 	@Dependency(\.qrGeneratorClient) var qrGeneratorClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.pasteboardClient) var pasteboardClient
+	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 	@Dependency(\.openURL) var openURL
 
 	var body: some View {
 		VStack(spacing: .medium3) {
 			top
 			fullAddress
-			viewOnDashboard
+			bottom
 			Spacer()
 		}
 		.padding([.horizontal, .bottom], .medium3)
@@ -99,6 +100,24 @@ struct AddressDetailView: View {
 		}
 		.padding(.horizontal, .medium2)
 		.foregroundColor(.app.gray1)
+	}
+
+	private var bottom: some View {
+		Group {
+			Button("View on Radix Dashboard", action: viewOnRadixDashboard)
+				.buttonStyle(
+					.secondaryRectangular(
+						shouldExpand: true,
+						trailingImage: .init(.iconLinkOut)
+					)
+				)
+			if let addressToVerifyOnLedger {
+				Button("Verify Address on Ledger Device") {
+					ledgerHardwareWalletClient.verifyAddress(of: addressToVerifyOnLedger)
+				}
+				.buttonStyle(.secondaryRectangular(shouldExpand: true))
+			}
+		}
 	}
 
 	private var viewOnDashboard: some View {
@@ -227,6 +246,15 @@ private extension AddressDetailView {
 			true
 		default:
 			false
+		}
+	}
+
+	var addressToVerifyOnLedger: AccountAddress? {
+		switch address {
+		case let .account(address, isLedgerHWAccount):
+			isLedgerHWAccount ? address : nil
+		default:
+			nil
 		}
 	}
 }
