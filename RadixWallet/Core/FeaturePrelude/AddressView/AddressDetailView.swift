@@ -15,9 +15,10 @@ struct AddressDetailView: View {
 	@State var title: Loadable<String?> = .idle
 
 	var body: some View {
-		VStack(spacing: .medium3) {
+		VStack(spacing: .zero) {
 			top
 			fullAddress
+				.padding(.vertical, .medium3)
 			bottom
 			Spacer()
 		}
@@ -62,7 +63,7 @@ struct AddressDetailView: View {
 	}
 
 	private var fullAddress: some View {
-		VStack(spacing: .large3) {
+		VStack(spacing: .medium2) {
 			VStack(spacing: .small2) {
 				Text("Full address")
 					.foregroundColor(.app.gray1)
