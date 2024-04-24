@@ -58,7 +58,7 @@ extension LedgerIdentifiable {
 		}
 	}
 
-	public enum Address: Hashable, Sendable {
+	public enum Address: Hashable, Sendable, Identifiable {
 		case account(AccountAddress, isLedgerHWAccount: Bool = false)
 		case package(PackageAddress)
 		case resource(ResourceAddress)
@@ -107,6 +107,25 @@ extension LedgerIdentifiable {
 				"component"
 			case .nonFungibleGlobalID:
 				"resource"
+			}
+		}
+
+		public var id: String {
+			switch self {
+			case let .account(accountAddress, _):
+				accountAddress.id
+			case let .package(packageAddress):
+				packageAddress.id
+			case let .resource(resourceAddress):
+				resourceAddress.id
+			case let .resourcePool(resourcePoolAddress):
+				resourcePoolAddress.id
+			case let .component(componentAddress):
+				componentAddress.id
+			case let .validator(validatorAddress):
+				validatorAddress.id
+			case let .nonFungibleGlobalID(nonFungible):
+				nonFungible.id
 			}
 		}
 	}

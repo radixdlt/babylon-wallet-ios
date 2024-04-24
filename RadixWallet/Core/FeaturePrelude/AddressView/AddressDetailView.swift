@@ -1,9 +1,9 @@
 import SwiftUI
 
-// MARK: - AccountAddressView
+// MARK: - AddressDetailView
 @MainActor
-struct AccountAddressView: View {
-	let address: AccountAddress
+struct AddressDetailView: View {
+	let address: LedgerIdentifiable.Address
 	let closeAction: () -> Void
 
 	@State private var qrImage: Result<CGImage, Error>? = nil
@@ -20,6 +20,7 @@ struct AccountAddressView: View {
 			top
 			fullAddress
 			viewOnDashboard
+			Spacer()
 		}
 		.padding([.horizontal, .bottom], .medium3)
 		.overlay(alignment: .top) {
@@ -29,7 +30,9 @@ struct AccountAddressView: View {
 		.presentationDetents([.large])
 		.presentationDragIndicator(.visible)
 		.task {
-			await generateQrImage()
+			if showQrCode {
+				await generateQrImage()
+			}
 		}
 		.sheet(isPresented: $showShareView) {
 			ShareView(items: [address.address])
@@ -38,16 +41,18 @@ struct AccountAddressView: View {
 
 	private var top: some View {
 		VStack(spacing: .small2) {
-			Text("My Main Account")
+			Text("name")
 				.textStyle(.sheetTitle)
 				.foregroundColor(.app.gray1)
 
-			Text("Address QR Code")
-				.textStyle(.secondaryHeader)
-				.foregroundColor(.app.gray1)
+			if showQrCode {
+				Text("Address QR Code")
+					.textStyle(.secondaryHeader)
+					.foregroundColor(.app.gray1)
 
-			qrCode
-				.padding(.horizontal, .large2)
+				qrCode
+					.padding(.horizontal, .large2)
+			}
 		}
 	}
 
@@ -135,7 +140,7 @@ struct AccountAddressView: View {
 }
 
 // MARK: - Enlarged view
-private extension AccountAddressView {
+private extension AddressDetailView {
 	var overlay: some View {
 		Group {
 			if showEnlargedView {
@@ -185,24 +190,8 @@ private extension AccountAddressView {
 	}
 }
 
-extension String {
-	var rangesOfDigits: [NSRange] {
-		var ranges = [NSRange]()
-		var range = NSRange(location: 0, length: count)
-		while range.location != NSNotFound {
-			range = (self as NSString).rangeOfCharacter(from: .decimalDigits)
-			if range.location != NSNotFound {
-				ranges.append(range)
-				range = NSRange(location: range.location + range.length,
-				                length: count - (range.location + range.length))
-			}
-		}
-		return ranges
-	}
-}
-
 // MARK: - Actions
-private extension AccountAddressView {
+private extension AddressDetailView {
 	func copy() {
 		pasteboardClient.copyString(address.address)
 	}
@@ -218,14 +207,26 @@ private extension AccountAddressView {
 	}
 
 	func viewOnRadixDashboard() {
+		let path = address.addressPrefix + "/" + address.formatted(.raw)
 		Task { [openURL, gatewaysClient] in
-			let path = "account/" + address.formatted(.raw)
 			let currentNetwork = await gatewaysClient.getCurrentGateway().network
 			await openURL(
 				Radix.Dashboard.dashboard(forNetwork: currentNetwork)
 					.url
 					.appending(path: path)
 			)
+		}
+	}
+}
+
+// MARK: - Helpers
+private extension AddressDetailView {
+	var showQrCode: Bool {
+		switch address {
+		case .account:
+			true
+		default:
+			false
 		}
 	}
 }

@@ -12,7 +12,7 @@ public struct AddressView: View {
 	@Dependency(\.qrGeneratorClient) var qrGeneratorClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
 
-	@State private var accountAddress: AccountAddress? = nil
+	@State private var detailAddress: LedgerIdentifiable.Address? = nil
 
 	public init(
 		_ identifiable: LedgerIdentifiable,
@@ -39,17 +39,18 @@ extension AddressView {
 
 	private var tappableAddressView: some View {
 		Group {
-			if case let .address(.account(accountAddress, _)) = identifiable {
+			switch identifiable {
+			case let .address(address):
 				addressView
 					.onTapGesture {
-						self.accountAddress = accountAddress
+						self.detailAddress = address
 					}
-					.sheet(item: $accountAddress) { address in
-						AccountAddressView(address: address) {
-							self.accountAddress = nil
+					.sheet(item: $detailAddress) { address in
+						AddressDetailView(address: address) {
+							self.detailAddress = nil
 						}
 					}
-			} else {
+			case .identifier:
 				Menu {
 					Button(copyText, image: .copyBig) {
 						copyToPasteboard()
