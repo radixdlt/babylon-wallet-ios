@@ -370,7 +370,6 @@
 		48CFC4042ADC10D900E77A5C /* KeychainHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF102ADC10D900E77A5C /* KeychainHolder.swift */; };
 		48CFC4052ADC10D900E77A5C /* NoopError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF112ADC10D900E77A5C /* NoopError.swift */; };
 		48CFC4062ADC10DA00E77A5C /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF122ADC10D900E77A5C /* JSONValue.swift */; };
-		48CFC4072ADC10DA00E77A5C /* HexCodable32Bytes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF132ADC10D900E77A5C /* HexCodable32Bytes.swift */; };
 		48CFC4082ADC10DA00E77A5C /* UInt11.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF142ADC10D900E77A5C /* UInt11.swift */; };
 		48CFC40C2ADC10DA00E77A5C /* UserDefaults+Dependency+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF192ADC10D900E77A5C /* UserDefaults+Dependency+Extension.swift */; };
 		48CFC40E2ADC10DA00E77A5C /* InsecureRandomNumberGeneratorWithSeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBF1B2ADC10D900E77A5C /* InsecureRandomNumberGeneratorWithSeed.swift */; };
@@ -1075,7 +1074,6 @@
 		E65D6CEC2BC98237001D8A39 /* Stage2MigrateToSargon+Gateways.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65D6CEB2BC98237001D8A39 /* Stage2MigrateToSargon+Gateways.swift */; };
 		E65D6CEE2BC98267001D8A39 /* Stage2MigrateToSargon+AppPreferences+ViaProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65D6CED2BC98267001D8A39 /* Stage2MigrateToSargon+AppPreferences+ViaProfile.swift */; };
 		E65D6CF22BC982F8001D8A39 /* Stage1MigrateToSargon+Gateway.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65D6CF12BC982F8001D8A39 /* Stage1MigrateToSargon+Gateway.swift */; };
-		E65D6CF42BC9836A001D8A39 /* sargonProfileStage1.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65D6CF32BC9836A001D8A39 /* sargonProfileStage1.swift */; };
 		E65D6CF72BC98400001D8A39 /* Stage1MigrateToSargon+Gateways.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65D6CF62BC98400001D8A39 /* Stage1MigrateToSargon+Gateways.swift */; };
 		E66EEB9B2B06694E007624BC /* RecoverWalletWithoutProfileStart+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66EEB992B06694E007624BC /* RecoverWalletWithoutProfileStart+View.swift */; };
 		E66EEB9C2B06694E007624BC /* RecoverWalletWithoutProfileStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66EEB9A2B06694E007624BC /* RecoverWalletWithoutProfileStart.swift */; };
@@ -1553,7 +1551,6 @@
 		48CFBF102ADC10D900E77A5C /* KeychainHolder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeychainHolder.swift; sourceTree = "<group>"; };
 		48CFBF112ADC10D900E77A5C /* NoopError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoopError.swift; sourceTree = "<group>"; };
 		48CFBF122ADC10D900E77A5C /* JSONValue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONValue.swift; sourceTree = "<group>"; };
-		48CFBF132ADC10D900E77A5C /* HexCodable32Bytes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HexCodable32Bytes.swift; sourceTree = "<group>"; };
 		48CFBF142ADC10D900E77A5C /* UInt11.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UInt11.swift; sourceTree = "<group>"; };
 		48CFBF192ADC10D900E77A5C /* UserDefaults+Dependency+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Dependency+Extension.swift"; sourceTree = "<group>"; };
 		48CFBF1B2ADC10D900E77A5C /* InsecureRandomNumberGeneratorWithSeed.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InsecureRandomNumberGeneratorWithSeed.swift; sourceTree = "<group>"; };
@@ -2222,7 +2219,6 @@
 		E65D6CEB2BC98237001D8A39 /* Stage2MigrateToSargon+Gateways.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage2MigrateToSargon+Gateways.swift"; sourceTree = "<group>"; };
 		E65D6CED2BC98267001D8A39 /* Stage2MigrateToSargon+AppPreferences+ViaProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage2MigrateToSargon+AppPreferences+ViaProfile.swift"; sourceTree = "<group>"; };
 		E65D6CF12BC982F8001D8A39 /* Stage1MigrateToSargon+Gateway.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+Gateway.swift"; sourceTree = "<group>"; };
-		E65D6CF32BC9836A001D8A39 /* sargonProfileStage1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sargonProfileStage1.swift; sourceTree = "<group>"; };
 		E65D6CF62BC98400001D8A39 /* Stage1MigrateToSargon+Gateways.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+Gateways.swift"; sourceTree = "<group>"; };
 		E66EEB992B06694E007624BC /* RecoverWalletWithoutProfileStart+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecoverWalletWithoutProfileStart+View.swift"; sourceTree = "<group>"; };
 		E66EEB9A2B06694E007624BC /* RecoverWalletWithoutProfileStart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverWalletWithoutProfileStart.swift; sourceTree = "<group>"; };
@@ -4144,7 +4140,6 @@
 				48CFBF112ADC10D900E77A5C /* NoopError.swift */,
 				48CFBF122ADC10D900E77A5C /* JSONValue.swift */,
 				4855B1B32BCA60C400DD0A47 /* EmailAddress.swift */,
-				48CFBF132ADC10D900E77A5C /* HexCodable32Bytes.swift */,
 				48CFBF142ADC10D900E77A5C /* UInt11.swift */,
 				4813AFEA2BC9AF4A0046BCAD /* RawRepresentable+Extensions.swift */,
 				48CFBF1B2ADC10D900E77A5C /* InsecureRandomNumberGeneratorWithSeed.swift */,
@@ -5913,7 +5908,6 @@
 				E63257642BB314F600952051 /* ExecutionSummary+Extensions.swift */,
 				48AF19CD2BB71C1600796130 /* IntoSargon+Bridge.swift */,
 				4855B1B52BCA613300DD0A47 /* NewProtocolInSargon */,
-				E65D6CF32BC9836A001D8A39 /* sargonProfileStage1.swift */,
 				4855B1C22BCAC59C00DD0A47 /* Stage1MigrateToSargon+Account.swift */,
 				4855B1C02BCAC48700DD0A47 /* Stage1MigrateToSargon+AccountOrPersona.swift */,
 				4813AFEC2BC9AF920046BCAD /* Stage1MigrateToSargon+AppearanceID.swift */,
@@ -7252,7 +7246,6 @@
 				4813AFF52BC9B2D70046BCAD /* Stage2MigrateToSargon+SharedPersonaData.swift in Sources */,
 				48CFC2892ADC10D900E77A5C /* TransactionReviewGuarantees+View.swift in Sources */,
 				48CFC4232ADC10DA00E77A5C /* Identified+Extensions.swift in Sources */,
-				48CFC4072ADC10DA00E77A5C /* HexCodable32Bytes.swift in Sources */,
 				488A42F02BCAF9AF00F285BC /* Stage2MigrateToSargon+DeviceFactorSource.swift in Sources */,
 				48CFC4292ADC10DA00E77A5C /* Result+Async.swift in Sources */,
 				48CFC5A52ADC10DA00E77A5C /* TappableRowStyle.swift in Sources */,
@@ -7823,7 +7816,6 @@
 				48CFC5E02ADC10DA00E77A5C /* LoadableView.swift in Sources */,
 				48CFC6012ADC10DA00E77A5C /* P2P+ConnectorExtension+Request.swift in Sources */,
 				48CFC5462ADC10DA00E77A5C /* PublicKeyType.swift in Sources */,
-				E65D6CF42BC9836A001D8A39 /* sargonProfileStage1.swift in Sources */,
 				48CFC5C22ADC10DA00E77A5C /* Shapes.swift in Sources */,
 				48CFC5BA2ADC10DA00E77A5C /* RadioButton.swift in Sources */,
 				48CFC4AB2ADC10DA00E77A5C /* NonFungibleResourcesCollectionItemVaultAggregatedVaultItem.swift in Sources */,

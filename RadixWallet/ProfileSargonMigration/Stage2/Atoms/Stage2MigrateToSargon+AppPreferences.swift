@@ -14,8 +14,21 @@ extension AppPreferences {
 
 	/// Appends a new `P2PLink`, returns `nil` if it was not inserted (because already present).
 	@discardableResult
-	public mutating func appendP2PLink(_ p2pLinks: P2PLink) -> P2PLink? {
-		sargonProfileFinishMigrateAtEndOfStage1()
+	public mutating func appendP2PLink(_ p2pLink: P2PLink) -> P2PLink? {
+		self.p2pLinks.appendP2PLink(p2pLink)
+	}
+}
+
+extension P2PLinks {
+	/// Appends a new `P2PLink`, returns `nil` if it was not inserted (because already present).
+	@discardableResult
+	public mutating func appendP2PLink(_ link: P2PLink) -> P2PLink? {
+		guard !contains(id: link.id) else {
+			return nil
+		}
+		append(link)
+		assert(contains(id: link.id))
+		return link
 	}
 }
 

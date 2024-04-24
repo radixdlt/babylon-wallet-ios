@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ProfileSelection
@@ -89,8 +90,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			state.profileSelection = .init(snapshot: profileSnapshot, isInCloud: isInCloud)
 			return .run { send in
 				try? await clock.sleep(for: .milliseconds(300))
-//				try await radixConnectClient.connectToP2PLinks(profileSnapshot.appPreferences.p2pLinks)
-				sargonProfileFinishMigrateAtEndOfStage1()
+				try await radixConnectClient.connectToP2PLinks(profileSnapshot.appPreferences.p2pLinks)
 				await send(.internal(.delayedAppendToPath(
 					.importMnemonicsFlow(.init(context: .fromOnboarding(profileSnapshot: profileSnapshot))
 					))))

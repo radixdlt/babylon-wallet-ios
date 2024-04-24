@@ -17,7 +17,7 @@ public struct SignedAuthChallenge: Sendable, Hashable {
 // MARK: - P2P.Dapp.Request.AuthChallengeNonce
 extension P2P.Dapp.Request {
 	/// A 32 bytes nonce used as a challenge
-	public typealias AuthChallengeNonce = Tagged<(Self, nonce: ()), HexCodable32Bytes>
+	public typealias AuthChallengeNonce = Tagged<(Self, nonce: ()), Exactly32Bytes>
 }
 
 // MARK: - P2P.Dapp.Response

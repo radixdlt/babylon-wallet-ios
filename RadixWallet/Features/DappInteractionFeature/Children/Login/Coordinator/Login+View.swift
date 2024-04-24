@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - LoginRequest.View
@@ -141,7 +142,7 @@ struct Login_Preview: PreviewProvider {
 extension Login.State {
 	static let previewValue: Self = .init(
 		dappMetadata: .previewValue,
-		loginRequest: try! .withChallenge(.init(challenge: .init(rawValue: .init(.deadbeef32Bytes))))
+		loginRequest: try! .withChallenge(.init(challenge: .init(.sample)))
 	)
 }
 #endif

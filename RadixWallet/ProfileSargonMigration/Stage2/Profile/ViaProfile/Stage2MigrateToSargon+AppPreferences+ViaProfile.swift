@@ -29,7 +29,7 @@ extension Profile {
 
 	/// Appends a new `P2PLink` to the Profile's `AppPreferences`, returns `nil` if it was not inserted (because already present).
 	@discardableResult
-	public mutating func appendP2PLink(_ p2pLinks: P2PLink) -> P2PLink? {
-		self.appPreferences.appendP2PLink(p2pLinks)
+	public mutating func appendP2PLink(_ p2pLink: P2PLink) -> P2PLink? {
+		self.appPreferences.appendP2PLink(p2pLink)
 	}
 }
