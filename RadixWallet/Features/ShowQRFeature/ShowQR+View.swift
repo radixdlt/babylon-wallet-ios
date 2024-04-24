@@ -17,9 +17,8 @@ extension ShowQR {
 
 extension ShowQR.View {
 	public var body: some View {
-		// TODO: Remove this view and call directly AddressDetailView
 		WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
-			AddressDetailView(address: .account(viewStore.accountAddress, isLedgerHWAccount: false)) {
+			AddressDetailView(address: viewStore.address) {
 				viewStore.send(.closeButtonTapped)
 			}
 		}

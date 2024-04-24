@@ -6,7 +6,7 @@ struct AddressDetailView: View {
 	let address: LedgerIdentifiable.Address
 	let closeAction: () -> Void
 
-	@State var title: Loadable<String?> = .idle
+	@State private var title: Loadable<String?> = .idle
 	@State private var qrImage: Result<CGImage, Error>? = nil
 	@State private var showEnlargedView = false
 	@State private var showShareView = false
@@ -104,7 +104,7 @@ struct AddressDetailView: View {
 	}
 
 	private var bottom: some View {
-		Group {
+		VStack(spacing: .medium3) {
 			Button("View on Radix Dashboard", action: viewOnRadixDashboard)
 				.buttonStyle(
 					.secondaryRectangular(

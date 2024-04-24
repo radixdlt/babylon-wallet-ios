@@ -10,10 +10,10 @@ public struct ShowQR: Sendable, FeatureReducer {
 	// MARK: - State
 
 	public struct State: Sendable, Hashable {
-		public let accountAddress: AccountAddress
+		public let address: LedgerIdentifiable.Address
 
-		public init(accountAddress: AccountAddress) {
-			self.accountAddress = accountAddress
+		public init(address: LedgerIdentifiable.Address) {
+			self.address = address
 		}
 	}
 
