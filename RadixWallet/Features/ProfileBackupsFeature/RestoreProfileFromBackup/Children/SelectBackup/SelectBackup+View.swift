@@ -113,44 +113,40 @@ extension SelectBackup.View {
 		_ item: SelectionItem<Profile.Header>,
 		viewStore: ViewStoreOf<SelectBackup>
 	) -> some SwiftUI.View {
-		/*
-		 let header = item.value
-		 let isVersionCompatible = header.isVersionCompatible()
-		 let creatingDevice = header.creatingDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.creatingDevice.description
-		 return Card(action: item.action) {
-		 	HStack {
-		 		VStack(alignment: .leading, spacing: 0) {
-		 			Group {
-		 				// Contains bold text segments.
-		 				Text(LocalizedStringKey(L10n.RecoverProfileBackup.backupFrom(creatingDevice)))
-		 				Text(L10n.IOSProfileBackup.lastModifedDateLabel(formatDate(header.lastModified)))
+		let header = item.value
+		let isVersionCompatible = header.isVersionCompatible()
+		let creatingDevice = header.creatingDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.creatingDevice.description
+		return Card(action: item.action) {
+			HStack {
+				VStack(alignment: .leading, spacing: 0) {
+					Group {
+						// Contains bold text segments.
+						Text(LocalizedStringKey(L10n.RecoverProfileBackup.backupFrom(creatingDevice)))
+						Text(L10n.IOSProfileBackup.lastModifedDateLabel(formatDate(header.lastModified)))
+						Text(L10n.IOSProfileBackup.totalAccountsNumberLabel(Int(header.contentHint.numberOfAccountsOnAllNetworksInTotal)))
+						Text(L10n.IOSProfileBackup.totalPersonasNumberLabel(Int(header.contentHint.numberOfPersonasOnAllNetworksInTotal)))
+					}
+					.foregroundColor(.app.gray2)
+					.textStyle(.body2Regular)
 
-		 				Text(L10n.IOSProfileBackup.totalAccountsNumberLabel(header.contentHint.numberOfAccountsOnAllNetworksInTotal))
-		 				Text(L10n.IOSProfileBackup.totalPersonasNumberLabel(header.contentHint.numberOfPersonasOnAllNetworksInTotal))
-		 			}
-		 			.foregroundColor(.app.gray2)
-		 			.textStyle(.body2Regular)
-
-		 			if !isVersionCompatible {
-		 				Text(L10n.IOSProfileBackup.incompatibleWalletDataLabel)
-		 					.foregroundColor(.red)
-		 					.textStyle(.body2HighImportance)
-		 			}
-		 		}
-		 		if isVersionCompatible {
-		 			Spacer()
-		 			RadioButton(
-		 				appearance: .dark,
-		 				state: item.isSelected ? .selected : .unselected
-		 			)
-		 		}
-		 	}
-		 	.padding(.medium3)
-		 	.frame(maxWidth: .infinity, alignment: .leading)
-		 }
-		 .disabled(!isVersionCompatible)
-		  */
-		Text("MIGRATE ME ")
+					if !isVersionCompatible {
+						Text(L10n.IOSProfileBackup.incompatibleWalletDataLabel)
+							.foregroundColor(.red)
+							.textStyle(.body2HighImportance)
+					}
+				}
+				if isVersionCompatible {
+					Spacer()
+					RadioButton(
+						appearance: .dark,
+						state: item.isSelected ? .selected : .unselected
+					)
+				}
+			}
+			.padding(.medium3)
+			.frame(maxWidth: .infinity, alignment: .leading)
+		}
+		.disabled(!isVersionCompatible)
 	}
 
 	@MainActor

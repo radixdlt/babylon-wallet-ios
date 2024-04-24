@@ -1062,6 +1062,7 @@
 		E65D6CEC2BC98237001D8A39 /* Stage2MigrateToSargon+Gateways.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65D6CEB2BC98237001D8A39 /* Stage2MigrateToSargon+Gateways.swift */; };
 		E65D6CEE2BC98267001D8A39 /* Stage2MigrateToSargon+AppPreferences+ViaProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65D6CED2BC98267001D8A39 /* Stage2MigrateToSargon+AppPreferences+ViaProfile.swift */; };
 		E65D6CF22BC982F8001D8A39 /* Stage1MigrateToSargon+Gateway.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65D6CF12BC982F8001D8A39 /* Stage1MigrateToSargon+Gateway.swift */; };
+		E66DCC402BD93EC000547CF4 /* Stage1MigrateToSargon+Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66DCC3F2BD93EC000547CF4 /* Stage1MigrateToSargon+Header.swift */; };
 		E66EEB9B2B06694E007624BC /* RecoverWalletWithoutProfileStart+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66EEB992B06694E007624BC /* RecoverWalletWithoutProfileStart+View.swift */; };
 		E66EEB9C2B06694E007624BC /* RecoverWalletWithoutProfileStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66EEB9A2B06694E007624BC /* RecoverWalletWithoutProfileStart.swift */; };
 		E67F14452AE029BA00738BE1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E67F14442AE029BA00738BE1 /* Assets.xcassets */; };
@@ -2195,6 +2196,7 @@
 		E65D6CEB2BC98237001D8A39 /* Stage2MigrateToSargon+Gateways.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage2MigrateToSargon+Gateways.swift"; sourceTree = "<group>"; };
 		E65D6CED2BC98267001D8A39 /* Stage2MigrateToSargon+AppPreferences+ViaProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage2MigrateToSargon+AppPreferences+ViaProfile.swift"; sourceTree = "<group>"; };
 		E65D6CF12BC982F8001D8A39 /* Stage1MigrateToSargon+Gateway.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+Gateway.swift"; sourceTree = "<group>"; };
+		E66DCC3F2BD93EC000547CF4 /* Stage1MigrateToSargon+Header.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+Header.swift"; sourceTree = "<group>"; };
 		E66EEB992B06694E007624BC /* RecoverWalletWithoutProfileStart+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecoverWalletWithoutProfileStart+View.swift"; sourceTree = "<group>"; };
 		E66EEB9A2B06694E007624BC /* RecoverWalletWithoutProfileStart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecoverWalletWithoutProfileStart.swift; sourceTree = "<group>"; };
 		E67F14442AE029BA00738BE1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -2356,13 +2358,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		4813AFE32BC9AA960046BCAD /* Stage3 */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Stage3;
-			sourceTree = "<group>";
-		};
 		481B43B12ADC7F1A007945C1 /* RadixWalletTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -5861,7 +5856,6 @@
 				E65D6CF52BC983C8001D8A39 /* InFactNotProfile */,
 				E65D6CE82BC9819C001D8A39 /* Stage1 */,
 				E65D6CE52BC98129001D8A39 /* Stage2 */,
-				4813AFE32BC9AA960046BCAD /* Stage3 */,
 				4855B1AB2BCA5D2000DD0A47 /* TODO.md */,
 			);
 			path = ProfileSargonMigration;
@@ -5899,6 +5893,7 @@
 				48D5F39B2BD9023F000DE964 /* Stage1MigrateToSargon+FactorSourceCommon.swift */,
 				E65D6CF12BC982F8001D8A39 /* Stage1MigrateToSargon+Gateway.swift */,
 				484161462BCAD2D700D2B644 /* Stage1MigrateToSargon+HierarchicalDeterministicPublicKey.swift */,
+				E66DCC3F2BD93EC000547CF4 /* Stage1MigrateToSargon+Header.swift */,
 				4841614C2BCAD3D400D2B644 /* Stage1MigrateToSargon+MnemonicWithPassphrase.swift */,
 				4813AFE12BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift */,
 				4813B0022BCA4FD60046BCAD /* Stage1MigrateToSargon+Persona.swift */,
@@ -7163,6 +7158,7 @@
 				48CFC3292ADC10D900E77A5C /* CameraPermission+Reducer.swift in Sources */,
 				48CFC53A2ADC10DA00E77A5C /* NotSyncedUpError.swift in Sources */,
 				48CFC54E2ADC10DA00E77A5C /* StateEntityNonFungibleResourceVaultsPageResponse.swift in Sources */,
+				E66DCC402BD93EC000547CF4 /* Stage1MigrateToSargon+Header.swift in Sources */,
 				835F196D2B3581C300E0B71D /* UnknownDappComponents+View.swift in Sources */,
 				48CFC5942ADC10DA00E77A5C /* WalletApp.swift in Sources */,
 				48CFC58E2ADC10DA00E77A5C /* CameraPermissionClient+Interface.swift in Sources */,
