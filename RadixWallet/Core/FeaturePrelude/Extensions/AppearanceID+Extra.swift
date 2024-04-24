@@ -13,6 +13,6 @@ extension LinearGradient {
 
 extension Gradient {
 	public init(_ accountAppearanceID: AppearanceID) {
-		self.init(accountNumber: accountAppearanceID.rawValue)
+		self.init(accountNumber: accountAppearanceID.value)
 	}
 }

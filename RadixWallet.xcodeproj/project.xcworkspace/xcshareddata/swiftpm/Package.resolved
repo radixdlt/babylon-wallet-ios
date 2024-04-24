@@ -1,5 +1,5 @@
 {
-  "originHash" : "f9eb24562ad226ccc1da9e2d4671c5c28ca9bbf9ef75ef4f91b371febd3bb4fc",
+  "originHash" : "95faa3afb131ccfd21927b0210d5193e80a27979f3a307a7dd798c7451284ef0",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -80,15 +80,6 @@
       "state" : {
         "revision" : "49831cdc9c9e81f6d3bbe118dc6515a631be0d68",
         "version" : "2.2.3"
-      }
-    },
-    {
-      "identity" : "k1",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Sajjon/K1",
-      "state" : {
-        "revision" : "9e6c2716b2e6b306d38ca5ec85ff6c16ea148ad1",
-        "version" : "0.3.8"
       }
     },
     {

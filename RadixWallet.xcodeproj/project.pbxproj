@@ -11,7 +11,6 @@
 		480E50D52B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 480E50D32B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift */; };
 		4813AFE22BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFE12BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift */; };
 		4813AFEB2BC9AF4A0046BCAD /* RawRepresentable+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFEA2BC9AF4A0046BCAD /* RawRepresentable+Extensions.swift */; };
-		4813AFED2BC9AF920046BCAD /* Stage1MigrateToSargon+AppearanceID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFEC2BC9AF920046BCAD /* Stage1MigrateToSargon+AppearanceID.swift */; };
 		4813AFEF2BC9B08F0046BCAD /* DappDefinitionAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFEE2BC9B08F0046BCAD /* DappDefinitionAddress.swift */; };
 		4813AFF12BC9B0F60046BCAD /* DappOrigin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFF02BC9B0F60046BCAD /* DappOrigin.swift */; };
 		4813AFF52BC9B2D70046BCAD /* Stage2MigrateToSargon+SharedPersonaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFF42BC9B2D70046BCAD /* Stage2MigrateToSargon+SharedPersonaData.swift */; };
@@ -27,7 +26,6 @@
 		484161472BCAD2D700D2B644 /* Stage1MigrateToSargon+HierarchicalDeterministicPublicKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484161462BCAD2D700D2B644 /* Stage1MigrateToSargon+HierarchicalDeterministicPublicKey.swift */; };
 		4841614D2BCAD3D400D2B644 /* Stage1MigrateToSargon+MnemonicWithPassphrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4841614C2BCAD3D400D2B644 /* Stage1MigrateToSargon+MnemonicWithPassphrase.swift */; };
 		484161552BCAD84300D2B644 /* Stage1MigrateToSargon+HDFactorSourceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484161542BCAD84300D2B644 /* Stage1MigrateToSargon+HDFactorSourceProtocol.swift */; };
-		484161572BCAD96E00D2B644 /* Stage1MigrateToSargon+BIP39Word.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484161562BCAD96E00D2B644 /* Stage1MigrateToSargon+BIP39Word.swift */; };
 		484161592BCADA0A00D2B644 /* Stage1MigrateToSargon+BIP39+Lookup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484161582BCADA0A00D2B644 /* Stage1MigrateToSargon+BIP39+Lookup.swift */; };
 		4841615B2BCADA5800D2B644 /* Stage1MigrateToSargon+FactorSourceKindOfMnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4841615A2BCADA5800D2B644 /* Stage1MigrateToSargon+FactorSourceKindOfMnemonic.swift */; };
 		484161672BCADE2100D2B644 /* Stage1MigrateToSargon+FactorInstance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484161662BCADE2100D2B644 /* Stage1MigrateToSargon+FactorInstance.swift */; };
@@ -872,7 +870,6 @@
 		48F9CFE72B03A0A000657755 /* ProfileBuilderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48F9CFE62B03A0A000657755 /* ProfileBuilderTest.swift */; };
 		48FF43152AE43C7C00C568B9 /* TimeLimit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48FF43142AE43C7C00C568B9 /* TimeLimit.swift */; };
 		48FFFA992ADC1EEC00B2B213 /* AsyncExtensions in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFA982ADC1EEC00B2B213 /* AsyncExtensions */; };
-		48FFFA9C2ADC1F1600B2B213 /* K1 in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFA9B2ADC1F1600B2B213 /* K1 */; };
 		48FFFA9F2ADC1F2700B2B213 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFA9E2ADC1F2700B2B213 /* KeychainAccess */; };
 		48FFFAA22ADC1F5D00B2B213 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAA12ADC1F5D00B2B213 /* Algorithms */; };
 		48FFFAA52ADC1F9600B2B213 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 48FFFAA42ADC1F9600B2B213 /* AsyncAlgorithms */; };
@@ -1181,7 +1178,6 @@
 		480E50D32B0C881000FC21D5 /* RecoverWalletWithoutProfileCoordinator+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RecoverWalletWithoutProfileCoordinator+View.swift"; sourceTree = "<group>"; };
 		4813AFE12BC9A9AD0046BCAD /* Stage1MigrateToSargon+NetworkDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+NetworkDefinition.swift"; sourceTree = "<group>"; };
 		4813AFEA2BC9AF4A0046BCAD /* RawRepresentable+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RawRepresentable+Extensions.swift"; sourceTree = "<group>"; };
-		4813AFEC2BC9AF920046BCAD /* Stage1MigrateToSargon+AppearanceID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+AppearanceID.swift"; sourceTree = "<group>"; };
 		4813AFEE2BC9B08F0046BCAD /* DappDefinitionAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DappDefinitionAddress.swift; sourceTree = "<group>"; };
 		4813AFF02BC9B0F60046BCAD /* DappOrigin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DappOrigin.swift; sourceTree = "<group>"; };
 		4813AFF42BC9B2D70046BCAD /* Stage2MigrateToSargon+SharedPersonaData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage2MigrateToSargon+SharedPersonaData.swift"; sourceTree = "<group>"; };
@@ -1197,7 +1193,6 @@
 		484161462BCAD2D700D2B644 /* Stage1MigrateToSargon+HierarchicalDeterministicPublicKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+HierarchicalDeterministicPublicKey.swift"; sourceTree = "<group>"; };
 		4841614C2BCAD3D400D2B644 /* Stage1MigrateToSargon+MnemonicWithPassphrase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+MnemonicWithPassphrase.swift"; sourceTree = "<group>"; };
 		484161542BCAD84300D2B644 /* Stage1MigrateToSargon+HDFactorSourceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+HDFactorSourceProtocol.swift"; sourceTree = "<group>"; };
-		484161562BCAD96E00D2B644 /* Stage1MigrateToSargon+BIP39Word.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+BIP39Word.swift"; sourceTree = "<group>"; };
 		484161582BCADA0A00D2B644 /* Stage1MigrateToSargon+BIP39+Lookup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+BIP39+Lookup.swift"; sourceTree = "<group>"; };
 		4841615A2BCADA5800D2B644 /* Stage1MigrateToSargon+FactorSourceKindOfMnemonic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+FactorSourceKindOfMnemonic.swift"; sourceTree = "<group>"; };
 		484161662BCADE2100D2B644 /* Stage1MigrateToSargon+FactorInstance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+FactorInstance.swift"; sourceTree = "<group>"; };
@@ -2316,7 +2311,6 @@
 				48FFFABE2ADC209100B2B213 /* NukeUI in Frameworks */,
 				48FFFAE72ADC223300B2B213 /* Overture in Frameworks */,
 				48FFFA9F2ADC1F2700B2B213 /* KeychainAccess in Frameworks */,
-				48FFFA9C2ADC1F1600B2B213 /* K1 in Frameworks */,
 				48FFFAF72ADC241A00B2B213 /* Collections in Frameworks */,
 				48FFFAF92ADC241A00B2B213 /* DequeModule in Frameworks */,
 				48FFFAAB2ADC1FE900B2B213 /* DependenciesAdditions in Frameworks */,
@@ -5890,12 +5884,10 @@
 				4855B1B52BCA613300DD0A47 /* NewProtocolInSargon */,
 				4855B1C22BCAC59C00DD0A47 /* Stage1MigrateToSargon+Account.swift */,
 				4855B1C02BCAC48700DD0A47 /* Stage1MigrateToSargon+AccountOrPersona.swift */,
-				4813AFEC2BC9AF920046BCAD /* Stage1MigrateToSargon+AppearanceID.swift */,
 				48DD0FF62BCBCBB900C54C43 /* Stage1MigrateToSargon+AssetException.swift */,
 				483A3DE32BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift */,
 				4813AFFE2BC9B62F0046BCAD /* Stage1MigrateToSargon+AuthorizedPersonaSimple.swift */,
 				484161582BCADA0A00D2B644 /* Stage1MigrateToSargon+BIP39+Lookup.swift */,
-				484161562BCAD96E00D2B644 /* Stage1MigrateToSargon+BIP39Word.swift */,
 				4871C4C62BD04A4A0090D243 /* Stage1MigrateToSargon+Collection.swift */,
 				484161402BCACDC700D2B644 /* Stage1MigrateToSargon+DepositAddressExceptionRule.swift */,
 				48D5F3772BD8554B000DE964 /* Stage1MigrateToSargon+DerivationPath.swift */,
@@ -6623,7 +6615,6 @@
 			name = RadixWallet;
 			packageProductDependencies = (
 				48FFFA982ADC1EEC00B2B213 /* AsyncExtensions */,
-				48FFFA9B2ADC1F1600B2B213 /* K1 */,
 				48FFFA9E2ADC1F2700B2B213 /* KeychainAccess */,
 				48FFFAA12ADC1F5D00B2B213 /* Algorithms */,
 				48FFFAA42ADC1F9600B2B213 /* AsyncAlgorithms */,
@@ -6702,7 +6693,6 @@
 			mainGroup = 48CFBC462ADC106300E77A5C;
 			packageReferences = (
 				48FFFA972ADC1EEC00B2B213 /* XCRemoteSwiftPackageReference "AsyncExtensions" */,
-				48FFFA9A2ADC1F1600B2B213 /* XCRemoteSwiftPackageReference "K1" */,
 				48FFFA9D2ADC1F2700B2B213 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				48FFFAA02ADC1F5D00B2B213 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
 				48FFFAA32ADC1F9600B2B213 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
@@ -7608,7 +7598,6 @@
 				48CFC28E2ADC10D900E77A5C /* TransactionReviewRawTransaction.swift in Sources */,
 				48CFC6042ADC10DA00E77A5C /* ConnectorExtension+Messages.swift in Sources */,
 				48CFC65D2ADC10DB00E77A5C /* Profile+AuthorizedDapps+Edit.swift in Sources */,
-				484161572BCAD96E00D2B644 /* Stage1MigrateToSargon+BIP39Word.swift in Sources */,
 				48CFC5552ADC10DA00E77A5C /* MetadataU64ArrayValue.swift in Sources */,
 				48CFC5242ADC10DA00E77A5C /* MetadataI32Value.swift in Sources */,
 				48CFC2522ADC10D900E77A5C /* AddNewGateway+Reducer.swift in Sources */,
@@ -7673,7 +7662,6 @@
 				48CFC3552ADC10D900E77A5C /* ImportOlympiaLedgerAccountsAndFactorSources+View.swift in Sources */,
 				48CFC4E12ADC10DA00E77A5C /* StateEntityDetailsResponseFungibleVaultDetails.swift in Sources */,
 				48CFC5B22ADC10DA00E77A5C /* Footer.swift in Sources */,
-				4813AFED2BC9AF920046BCAD /* Stage1MigrateToSargon+AppearanceID.swift in Sources */,
 				4813B0032BCA4FD60046BCAD /* Stage1MigrateToSargon+Persona.swift in Sources */,
 				48CFC4152ADC10DA00E77A5C /* PasteboardClient+Interface.swift in Sources */,
 				48CFC2902ADC10D900E77A5C /* TransactionReviewAccount.swift in Sources */,
@@ -8388,14 +8376,6 @@
 				minimumVersion = 0.5.2;
 			};
 		};
-		48FFFA9A2ADC1F1600B2B213 /* XCRemoteSwiftPackageReference "K1" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Sajjon/K1";
-			requirement = {
-				kind = exactVersion;
-				version = 0.3.8;
-			};
-		};
 		48FFFA9D2ADC1F2700B2B213 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess";
@@ -8667,11 +8647,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFA972ADC1EEC00B2B213 /* XCRemoteSwiftPackageReference "AsyncExtensions" */;
 			productName = AsyncExtensions;
-		};
-		48FFFA9B2ADC1F1600B2B213 /* K1 */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 48FFFA9A2ADC1F1600B2B213 /* XCRemoteSwiftPackageReference "K1" */;
-			productName = K1;
 		};
 		48FFFA9E2ADC1F2700B2B213 /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;

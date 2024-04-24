@@ -92,7 +92,7 @@ private extension NewAccountCompletion.View {
 	) -> some View {
 		ZStack {
 			ForEach(0 ..< transparentCardsCount, id: \.self) { index in
-				AppearanceID.fromNumberOfAccounts(Int(viewStore.appearanceID.rawValue) + index).gradient.opacity(0.2)
+				AppearanceID.fromNumberOfAccounts(Int(viewStore.appearanceID.value) + index).gradient.opacity(0.2)
 					.frame(width: cardFrame.width, height: cardFrame.height)
 					.cornerRadius(.small1)
 					.scaleEffect(scale(index: index))
