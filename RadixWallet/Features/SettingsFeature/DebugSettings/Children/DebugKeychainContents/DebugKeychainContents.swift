@@ -1,4 +1,5 @@
 #if DEBUG
+import Sargon
 
 // MARK: - DebugKeychainContents
 public struct DebugKeychainContents: Sendable, FeatureReducer {

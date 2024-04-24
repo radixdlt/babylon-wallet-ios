@@ -49,12 +49,12 @@ extension DebugSettingsCoordinator.View {
 				icon: .systemImage("person.badge.key"),
 				action: .factorSourcesButtonTapped
 			),
-//			// ONLY DEBUG EVER
-//			.init(
-//				title: "Inspect profile",
-//				icon: .systemImage("wallet.pass"),
-//				action: .debugInspectProfileButtonTapped
-//			),
+			// ONLY DEBUG EVER
+			.init(
+				title: "Inspect profile",
+				icon: .systemImage("wallet.pass"),
+				action: .debugInspectProfileButtonTapped
+			),
 			// ONLY DEBUG EVER
 			.init(
 				title: "UserDefaults content",
@@ -92,13 +92,13 @@ private extension StoreOf<DebugSettingsCoordinator> {
 private extension View {
 	func destinations(with store: StoreOf<DebugSettingsCoordinator>) -> some View {
 		let destinationStore = store.destination
-		return debugUserDefaultsContents(with: destinationStore)
+		return factorSources(with: destinationStore)
+			.debugUserDefaultsContents(with: destinationStore)
 		#if DEBUG
 			.debugKeychainTest(with: destinationStore)
 			.debugKeychainContents(with: destinationStore)
 		#endif
-		//		.factorSources(with: destinationStore)
-//			.debugInspectProfile(with: destinationStore)
+			.debugInspectProfile(with: destinationStore)
 //			.securityStructureConfigs(with: destinationStore)
 	}
 
@@ -137,27 +137,27 @@ private extension View {
 	}
 	#endif // DEBUG
 
-//	private func factorSources(
-//		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
-//	) -> some View {
-//		navigationDestination(
-//			store: destinationStore,
-//			state: /DebugSettingsCoordinator.Destination.State.debugManageFactorSources,
-//			action: DebugSettingsCoordinator.Destination.Action.debugManageFactorSources,
-//			destination: { DebugManageFactorSources.View(store: $0) }
-//		)
-//	}
+	private func factorSources(
+		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
+	) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /DebugSettingsCoordinator.Destination.State.debugManageFactorSources,
+			action: DebugSettingsCoordinator.Destination.Action.debugManageFactorSources,
+			destination: { DebugManageFactorSources.View(store: $0) }
+		)
+	}
 
-//	private func debugInspectProfile(
-//		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
-//	) -> some View {
-//		navigationDestination(
-//			store: destinationStore,
-//			state: /DebugSettingsCoordinator.Destination.State.debugInspectProfile,
-//			action: DebugSettingsCoordinator.Destination.Action.debugInspectProfile,
-//			destination: { DebugInspectProfile.View(store: $0) }
-//		)
-//	}
+	private func debugInspectProfile(
+		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
+	) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /DebugSettingsCoordinator.Destination.State.debugInspectProfile,
+			action: DebugSettingsCoordinator.Destination.Action.debugInspectProfile,
+			destination: { DebugInspectProfile.View(store: $0) }
+		)
+	}
 
 //	private func securityStructureConfigs(
 //		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
