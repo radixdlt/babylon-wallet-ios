@@ -32,7 +32,7 @@ extension GatewaysClient {
 	public typealias CurrentGatewayValues = @Sendable () async -> AnyAsyncSequence<Gateway>
 	public typealias GatewaysValues = @Sendable () async -> AnyAsyncSequence<Gateways>
 	public typealias GetCurrentGateway = @Sendable () async -> Gateway
-	public typealias GetAllGateways = @Sendable () async -> Gateways.Elements
+	public typealias GetAllGateways = @Sendable () async -> [Gateway]
 	public typealias AddGateway = @Sendable (Gateway) async throws -> Void
 	public typealias RemoveGateway = @Sendable (Gateway) async throws -> Void
 	public typealias ChangeGateway = @Sendable (Gateway) async throws -> Void

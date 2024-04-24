@@ -57,7 +57,7 @@ public struct AddNewGateway: Sendable, FeatureReducer {
 
 			return .run { send in
 				let gateways = await gatewaysClient.getAllGateways()
-				let duplicate = gateways.rawValue.elements.first(where: { $0.url == url })
+				let duplicate = gateways.first(where: { $0.url == url })
 				if let _ = duplicate {
 					await send(.internal(.showDuplicateURLError))
 				} else {

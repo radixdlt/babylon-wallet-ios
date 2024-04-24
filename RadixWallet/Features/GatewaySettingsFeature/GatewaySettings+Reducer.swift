@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - GatewaySettings
@@ -133,7 +134,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 			state.currentGateway = gateways.current
 			state.gatewayList = .init(gateways: .init(
-				uniqueElements: gateways.all.elements.map {
+				uniqueElements: gateways.all.map {
 					GatewayRow.State(
 						gateway: $0,
 						isSelected: gateways.current.id == $0.id,
