@@ -401,32 +401,28 @@ extension SecureStorageClient: DependencyKey {
 			loggerGlobal.notice("Saved p2pLinks: \(p2pLinks)")
 		}
 
-		@Sendable func loadP2PLinkPrivateKey(_ publicKey: Curve25519PublicKeyBytes) throws -> Curve25519.PrivateKey? {
+		@Sendable func loadP2PLinksPrivateKey() throws -> Curve25519.PrivateKey? {
 			try keychainClient
-				.getDataWithoutAuth(forKey: key(publicKey: publicKey))
+				.getDataWithoutAuth(forKey: p2pLinksPrivateKeyKey)
 				.map {
 					try Curve25519.PrivateKey(rawRepresentation: $0)
 				}
 		}
 
-		let p2pLinkPrivateKeyAttributes = KeychainClient.AttributesWithoutAuth(
+		let p2pLinksPrivateKeyAttributes = KeychainClient.AttributesWithoutAuth(
 			iCloudSyncEnabled: false,
 			accessibility: .whenUnlocked,
 			label: importantKeychainIdentifier("Radix Wallet Private Key Per P2P link"),
 			comment: "Contains a wallet private key for a specific P2P link"
 		)
 
-		@Sendable func saveP2PLinkPrivateKey(_ publicKey: Curve25519PublicKeyBytes, privateKey: Curve25519.PrivateKey) throws {
+		@Sendable func saveP2PLinksPrivateKey(privateKey: Curve25519.PrivateKey) throws {
 			try keychainClient.setDataWithoutAuth(
 				privateKey.rawRepresentation,
-				forKey: key(publicKey: publicKey),
-				attributes: p2pLinkPrivateKeyAttributes
+				forKey: p2pLinksPrivateKeyKey,
+				attributes: p2pLinksPrivateKeyAttributes
 			)
-			loggerGlobal.notice("Saved private key for CE public key: \(publicKey)")
-		}
-
-		@Sendable func deleteP2PLinkPrivateKey(_ publicKey: Curve25519PublicKeyBytes) throws {
-			try keychainClient.removeData(forKey: key(publicKey: publicKey))
+			loggerGlobal.notice("Saved p2pLinksPrivateKeyKey")
 		}
 
 		#if DEBUG
@@ -450,9 +446,8 @@ extension SecureStorageClient: DependencyKey {
 			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID,
 			loadP2PLinks: loadP2PLinks,
 			saveP2PLinks: saveP2PLinks,
-			loadP2PLinkPrivateKey: loadP2PLinkPrivateKey,
-			saveP2PLinkPrivateKey: saveP2PLinkPrivateKey,
-			deleteP2PLinkPrivateKey: deleteP2PLinkPrivateKey,
+			loadP2PLinksPrivateKey: loadP2PLinksPrivateKey,
+			saveP2PLinksPrivateKey: saveP2PLinksPrivateKey,
 			getAllMnemonics: getAllMnemonics
 		)
 		#else
@@ -476,9 +471,8 @@ extension SecureStorageClient: DependencyKey {
 			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID,
 			loadP2PLinks: loadP2PLinks,
 			saveP2PLinks: saveP2PLinks,
-			loadP2PLinkPrivateKey: loadP2PLinkPrivateKey,
-			saveP2PLinkPrivateKey: saveP2PLinkPrivateKey,
-			deleteP2PLinkPrivateKey: deleteP2PLinkPrivateKey
+			loadP2PLinksPrivateKey: loadP2PLinksPrivateKey,
+			saveP2PLinksPrivateKey: saveP2PLinksPrivateKey
 		)
 		#endif
 	}()
@@ -489,6 +483,7 @@ let profileHeaderListKeychainKey: KeychainClient.Key = "profileHeaderList"
 private let deviceIdentifierKey: KeychainClient.Key = "deviceIdentifier"
 private let deviceInfoKey: KeychainClient.Key = "deviceInfo"
 private let p2pLinksKey: KeychainClient.Key = "p2pLinks"
+private let p2pLinksPrivateKeyKey: KeychainClient.Key = "p2pLinksPrivateKey"
 
 extension ProfileSnapshot.Header.ID {
 	private static let profileSnapshotKeychainKeyPrefix = "profileSnapshot"
@@ -500,10 +495,6 @@ extension ProfileSnapshot.Header.ID {
 
 private func key(factorSourceID: FactorSourceID.FromHash) -> KeychainClient.Key {
 	.init(rawValue: .init(rawValue: factorSourceID.keychainKey)!)
-}
-
-private func key(publicKey: Curve25519PublicKeyBytes) -> KeychainClient.Key {
-	.init(rawValue: .init(rawValue: publicKey.data.hex())!)
 }
 
 extension OverlayWindowClient.Item.AlertState {

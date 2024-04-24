@@ -215,6 +215,12 @@ public struct NewConnection: Sendable, FeatureReducer {
 
 		case let .root(.scanQR(.delegate(.scanned(qrString)))):
 			return .run { send in
+				if let _ = try? HexCodable32Bytes(hex: qrString) {
+					/// User scanned an old format QR code
+					await send(.internal(.showErrorAlert(.oldFormatQRCode)))
+					return
+				}
+
 				let result = await TaskResult {
 					try jsonDecoder().decode(LinkConnectionQRData.self, from: Data(qrString.utf8))
 				}
@@ -297,6 +303,18 @@ extension AlertState<NewConnection.Destination.Action.ErrorAlert> {
 			}
 		} message: {
 			TextState(L10n.LinkedConnectors.incorrectQrMessage)
+		}
+	}
+
+	public static var oldFormatQRCode: AlertState {
+		AlertState {
+			TextState(L10n.LinkedConnectors.incorrectQrTitle)
+		} actions: {
+			ButtonState(role: .cancel, action: .dismissTapped) {
+				TextState(L10n.Common.dismiss)
+			}
+		} message: {
+			TextState(L10n.LinkedConnectors.oldFormatQRCodeErrorMessage)
 		}
 	}
 }

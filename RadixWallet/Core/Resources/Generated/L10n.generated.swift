@@ -2051,6 +2051,8 @@ public enum L10n {
     public static let linkFailedErrorTitle = L10n.tr("Localizable", "linkedConnectors_linkFailedErrorTitle", fallback: "Link Failed")
     /// Link New Connector
     public static let linkNewConnector = L10n.tr("Localizable", "linkedConnectors_linkNewConnector", fallback: "Link New Connector")
+    /// This is an old version of the Radix Connector browser extension. Please update to the latest Connector and try linking again.
+    public static let oldFormatQRCodeErrorMessage = L10n.tr("Localizable", "linkedConnectors_oldFormatQRCodeErrorMessage", fallback: "This is an old version of the Radix Connector browser extension. Please update to the latest Connector and try linking again.")
     /// Connect your Radix Wallet to desktop web browsers by linking to the Radix Connector browser extension. Here are your linked Connectors.
     public static let subtitle = L10n.tr("Localizable", "linkedConnectors_subtitle", fallback: "Connect your Radix Wallet to desktop web browsers by linking to the Radix Connector browser extension. Here are your linked Connectors.")
     /// Linked Connectors

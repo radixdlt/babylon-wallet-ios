@@ -212,7 +212,7 @@ extension PeerConnectionNegotiator {
 		@Dependency(\.p2pLinksClient) var p2pLinkClient
 		@Dependency(\.jsonEncoder) var jsonEncoder
 
-		let (privateKey, isNewPrivateKey) = try await p2pLinkClient.getP2PLinkPrivateKey(p2pLink.publicKey)
+		let (privateKey, isNewPrivateKey) = try await p2pLinkClient.getP2PLinkPrivateKey()
 		let hashedMessageToSign = p2pLink.connectionPassword.messageToHash.hash().data
 		let linkClientInteractionResponse = try P2P.ConnectorExtension.Request.LinkClientInteractionResponse(
 			discriminator: .linkClient,
@@ -223,7 +223,7 @@ extension PeerConnectionNegotiator {
 		onSuccess()
 
 		if isNewPrivateKey {
-			try await p2pLinkClient.storeP2PLinkPrivateKey(p2pLink.publicKey, privateKey)
+			try await p2pLinkClient.storeP2PLinkPrivateKey(privateKey)
 		}
 	}
 
