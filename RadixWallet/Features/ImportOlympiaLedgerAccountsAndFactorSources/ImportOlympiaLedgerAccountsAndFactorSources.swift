@@ -369,7 +369,7 @@ extension DerivePublicKeys.State {
 	fileprivate init(ledger: LedgerHardwareWalletFactorSource, olympiaAccounts: Set<OlympiaAccountToMigrate>, networkID: NetworkID) {
 		self.init(
 			derivationPathOption: .knownPaths(
-				olympiaAccounts.map(\.path.asGeneral),
+				olympiaAccounts.map(\.path.asDerivationPath),
 				networkID: networkID
 			),
 			factorSourceOption: .specific(ledger.embed()),

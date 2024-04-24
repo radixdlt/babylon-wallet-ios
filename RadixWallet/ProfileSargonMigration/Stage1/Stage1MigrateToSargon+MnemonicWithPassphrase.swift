@@ -8,8 +8,12 @@ extension MnemonicWithPassphrase {
 		of softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
 	) throws -> Bool {
 		guard validate(
-			publicKeys: softwareAccounts.map { account in
-				.init(publicKey: account.publicKey.asGeneral, derivationPath: account.path.asGeneral)
+			publicKeys: softwareAccounts.map {
+				account in
+				.init(
+					publicKey: account.publicKey.asGeneral,
+					derivationPath: account.path.asDerivationPath
+				)
 			}
 		) else {
 			throw ValidateMnemonicAgainstEntities.publicKeyMismatch
