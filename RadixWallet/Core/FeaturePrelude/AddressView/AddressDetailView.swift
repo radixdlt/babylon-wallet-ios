@@ -6,13 +6,10 @@ struct AddressDetailView: View {
 	let address: LedgerIdentifiable.Address
 	let closeAction: () -> Void
 
+	@State var title: Loadable<String?> = .idle
 	@State private var qrImage: Result<CGImage, Error>? = nil
 	@State private var showEnlargedView = false
 	@State private var showShareView = false
-
-	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
-
-	@State var title: Loadable<String?> = .idle
 
 	var body: some View {
 		VStack(spacing: .zero) {
@@ -117,7 +114,7 @@ struct AddressDetailView: View {
 				)
 			if let addressToVerifyOnLedger {
 				Button("Verify Address on Ledger Device") {
-					ledgerHardwareWalletClient.verifyAddress(of: addressToVerifyOnLedger)
+					verifyOnLedger(address: addressToVerifyOnLedger)
 				}
 				.buttonStyle(.secondaryRectangular(shouldExpand: true))
 			}
@@ -272,6 +269,11 @@ private extension AddressDetailView {
 					.appending(path: path)
 			)
 		}
+	}
+
+	func verifyOnLedger(address: AccountAddress) {
+		@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
+		ledgerHardwareWalletClient.verifyAddress(of: address)
 	}
 }
 
