@@ -244,3 +244,202 @@ extension ConfigurationBackup {
 		}
 	}
 }
+
+import CloudKit
+import DependenciesAdditions
+
+// MARK: - CloudBackupFeature
+public struct CloudBackupFeature: FeatureReducer {
+	@ObservableState
+	public struct State: Hashable {
+		var fetchingProfile: Bool = false
+		var isUploadingProfileBackup: Bool = false
+		var iCloudStatus: String?
+
+		var lastBackupTime: String?
+	}
+
+	public enum ViewAction: Hashable, Sendable {
+		case task
+		case addDummyAccount
+		case checkAllOldProfiles
+		case checkAllNewProfiles
+		case deleteProfileTapped
+		case logoutTapped
+	}
+
+	public enum InternalAction: Hashable, Sendable {
+		case profileUploadResult(TaskResult<CKRecord>)
+		case accountStatus(TaskResult<CKAccountStatus>)
+		case cloudRecordStatus(TaskResult<CKRecord?>)
+		case logout
+	}
+
+	@Dependency(\.cloudBackupClient) var cloudBackupClient
+	@Dependency(\.userDefaults) var userDefaults
+
+	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+		switch viewAction {
+		case .task:
+			return .run { send in
+
+				let status = await TaskResult { try await cloudBackupClient.checkAccountStatus() }
+//				let cloudRecord = await TaskResult { try await cloudBackupClient.queryProfile(id) }
+
+				await send(.internal(.accountStatus(status)))
+//				await send(.internal(.cloudRecordStatus(cloudRecord)))
+			}
+
+		case .addDummyAccount:
+//			state.profile.accounts.append(.init(name: "Acccount \(UUID().uuidString)"))
+
+//			return uploadProfileBackup(&state)
+			return .none
+
+		case .checkAllOldProfiles:
+
+			return .none
+
+		case .checkAllNewProfiles:
+
+			return .none
+
+		case .deleteProfileTapped:
+			userDefaults.removeValue(forKey: "activeProfile")
+			return .run { /* [id = profile.id] */ send in
+//				try await cloudBackupClient.deleteProfile(id)
+				await send(.internal(.logout))
+			}
+
+		case .logoutTapped:
+			userDefaults.removeValue(forKey: "activeProfile")
+			return .send(.internal(.logout))
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .accountStatus(.success(status)):
+			print("•• accountStatus received")
+			switch status {
+			case .couldNotDetermine:
+				state.iCloudStatus = "Could not determine"
+			case .available:
+				state.iCloudStatus = "Available"
+			case .restricted:
+				state.iCloudStatus = "Retricted"
+			case .noAccount:
+				state.iCloudStatus = "No Account"
+			case .temporarilyUnavailable:
+				state.iCloudStatus = "Temporarily Unavailable"
+			@unknown default:
+				state.iCloudStatus = "Uknown"
+			}
+			return .none
+
+		case .accountStatus:
+			state.iCloudStatus = "Failed to determine"
+			return .none
+
+		case let .cloudRecordStatus(.success(.some(record))):
+			state.lastBackupTime = record.modificationDate?.formatted() ?? "--"
+			return .none
+
+		case .cloudRecordStatus:
+			state.lastBackupTime = "--"
+			return .none
+
+		case let .profileUploadResult(.success(record)):
+			state.lastBackupTime = record.modificationDate?.formatted() ?? "--"
+			state.isUploadingProfileBackup = false
+			return .none
+
+		case .profileUploadResult:
+			state.isUploadingProfileBackup = false
+			return .none
+
+		case .logout:
+			return .none
+		}
+	}
+
+	private func uploadProfile(_ state: inout State) -> Effect<Action> {
+		state.isUploadingProfileBackup = true
+		return .run { _ in
+			let profile = await ProfileStore.shared.profile
+			print("•• got profile: \(profile.id.uuidString)")
+			let result = await TaskResult {
+				try await cloudBackupClient.uploadProfile(profile)
+			}
+			//			await send(.profileUploadResult(result))
+		}
+	}
+}
+
+// MARK: CloudBackupFeature.View
+extension CloudBackupFeature {
+	public struct View: SwiftUI.View {
+		let store: StoreOf<CloudBackupFeature>
+
+		public var body: some SwiftUI.View {
+			VStack {
+				HStack {
+					Text("iCloud status: ")
+					if let iCloudStatus = store.iCloudStatus {
+						Text(iCloudStatus)
+					} else {
+						ProgressView()
+					}
+					Spacer()
+				}
+				HStack {
+					Text("Last Backup: ")
+					if let lastBackupTime = store.lastBackupTime, !store.isUploadingProfileBackup {
+						Text(lastBackupTime)
+					} else {
+						ProgressView()
+					}
+					Spacer()
+				}
+				if store.fetchingProfile {
+					VStack {
+						ProgressView()
+						Text("Fetching profile from iCloud")
+					}
+				} else {
+					if store.isUploadingProfileBackup {
+						VStack {
+							ProgressView()
+							Text("Uploading backup to iCloud")
+						}
+					}
+
+//					List(store.profile.accounts) {
+//						Text($0.name)
+//					}
+
+					Button("Add dummy account") {
+						store.send(.view(.addDummyAccount))
+					}
+					.buttonStyle(.borderedProminent)
+
+					Button("Delete Profile") {
+						store.send(.view(.deleteProfileTapped))
+					}
+					.buttonStyle(.borderedProminent)
+
+					Button("Logout") {
+						store.send(.view(.logoutTapped))
+					}
+					.buttonStyle(.borderedProminent)
+
+					// Toggle("iCloud sync", isOn: .constant(true))
+				}
+			}
+			.padding()
+			.task {
+				store.send(.view(.task))
+			}
+		}
+	}
+}
