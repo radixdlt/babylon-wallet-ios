@@ -243,7 +243,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	}
 
 	private func finishedWith(factorSourceID: FactorSourceIDFromHash, state: inout State) -> Effect<Action> {
-		state.mnemonicsLeftToImport.removeAll(where: { $0.id == factorSourceID.embed() })
+		state.mnemonicsLeftToImport.removeAll(where: { $0.id == factorSourceID.asGeneral })
 		return nextMnemonicIfNeeded(state: &state)
 	}
 

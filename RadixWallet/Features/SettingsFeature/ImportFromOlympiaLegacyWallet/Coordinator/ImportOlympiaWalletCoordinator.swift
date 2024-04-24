@@ -443,7 +443,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 					throw OlympiaFactorSourceToSaveIDDisrepancy()
 				}
 
-				let existing = try? await factorSourcesClient.getFactorSource(id: factorSourceToSave.id.embed())
+				let existing = try? await factorSourcesClient.getFactorSource(id: factorSourceToSave.id.asGeneral)
 				do {
 					let saveIntoProfile = existing == nil
 					if saveIntoProfile {

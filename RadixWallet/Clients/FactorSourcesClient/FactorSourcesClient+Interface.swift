@@ -256,7 +256,7 @@ extension FactorSourcesClient {
 				onMnemonicExistsStrategy: onMnemonicExistsStrategy,
 				saveIntoProfile: saveIntoProfile
 			)
-		).embed()
+		).asGeneral
 	}
 
 	public func addOnDeviceFactorSource(

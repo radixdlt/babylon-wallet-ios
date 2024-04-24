@@ -372,7 +372,7 @@ extension DerivePublicKeys.State {
 				olympiaAccounts.map(\.path.asDerivationPath),
 				networkID: networkID
 			),
-			factorSourceOption: .specific(ledger.embed()),
+			factorSourceOption: .specific(ledger.asGeneral),
 			purpose: .importLegacyAccounts
 		)
 	}

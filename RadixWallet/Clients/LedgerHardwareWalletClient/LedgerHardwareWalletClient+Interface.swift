@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - LedgerHardwareWalletClient
 public struct LedgerHardwareWalletClient: Sendable {
 	public var isConnectedToAnyConnectorExtension: IsConnectedToAnyConnectorExtension
@@ -141,7 +143,7 @@ extension LedgerHardwareWalletClient {
 		switch account.securityState {
 		case let .unsecured(unsecuredEntityControl):
 			let signTXFactorInstance = unsecuredEntityControl.transactionSigning
-			let factorSourceID = signTXFactorInstance.factorSourceID.embed()
+			let factorSourceID = signTXFactorInstance.factorSourceID.asGeneral
 			guard let ledger = try await factorSourcesClient.getFactorSource(
 				id: factorSourceID,
 				as: LedgerHardwareWalletFactorSource.self

@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - DerivePublicKeys
@@ -288,7 +289,7 @@ extension DerivePublicKeys {
 		loggerGlobal.debug("Finish deriving of #\(hdKeys.count) keys ✅ => delegating `derivedPublicKeys`")
 		return .delegate(.derivedPublicKeys(
 			hdKeys,
-			factorSourceID: source.deviceFactorSource.id.embed(),
+			factorSourceID: source.deviceFactorSource.id.asGeneral,
 			networkID: networkID
 		))
 	}
@@ -330,7 +331,7 @@ extension DerivePublicKeys {
 
 		return .delegate(.derivedPublicKeys(
 			hdKeys,
-			factorSourceID: ledger.id.embed(),
+			factorSourceID: ledger.id.asGeneral,
 			networkID: networkID
 		))
 	}

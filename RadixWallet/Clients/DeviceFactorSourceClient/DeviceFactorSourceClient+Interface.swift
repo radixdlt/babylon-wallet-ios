@@ -201,7 +201,7 @@ extension DeviceFactorSourceClient {
 				let entitySignature = SignatureOfEntity(
 					signerEntity: entity,
 					derivationPath: derivationPath,
-					factorSourceID: factorSourceID.embed(),
+					factorSourceID: factorSourceID.asGeneral,
 					signatureWithPublicKey: signatureWithPublicKey
 				)
 

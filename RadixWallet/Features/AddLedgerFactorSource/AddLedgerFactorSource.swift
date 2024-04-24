@@ -157,7 +157,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	private func completeWithLedgerEffect(_ ledger: LedgerHardwareWalletFactorSource) -> Effect<Action> {
 		.run { send in
-			try await factorSourcesClient.saveFactorSource(ledger.embed())
+			try await factorSourcesClient.saveFactorSource(ledger.asGeneral)
 			loggerGlobal.notice("Added Ledger factor source! ✅ ")
 			await send(.delegate(.completed(ledger)))
 		} catch: { error, _ in
@@ -252,7 +252,7 @@ extension LedgerHardwareWalletFactorSource {
 	) throws -> Self {
 		try .init(
 			id: .init(kind: .ledgerHqHardwareWallet, body: body),
-			common: common(
+			common: .new(
 				// We MUST always save a Ledger with Babylon AND Olympia crypto parameters
 				// since most users typically only have one Ledger, and Olympia users must
 				// be able to import from Olympia wallet, which requires Olympia crypto

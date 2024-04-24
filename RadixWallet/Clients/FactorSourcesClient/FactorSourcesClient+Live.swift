@@ -53,7 +53,7 @@ extension FactorSourcesClient: DependencyKey {
 			/// already exist in profile, and this function is used only to save the
 			/// imported mnemonic into keychain (done above).
 			let deviceFactorSources = try await getFactorSources()
-				.filter { $0.id == factorSourceID.embed() }
+				.filter { $0.id == factorSourceID.asGeneral }
 				.map { try $0.extract(as: DeviceFactorSource.self) }
 
 			if request.saveIntoProfile {
@@ -131,7 +131,7 @@ extension FactorSourcesClient: DependencyKey {
 						switch entity.securityState {
 						case let .unsecured(unsecuredControl):
 							let factorInstance = unsecuredControl.transactionSigning
-							guard factorInstance.factorSourceID.embed() == factorSourceID else {
+							guard factorInstance.factorSourceID.asGeneral == factorSourceID else {
 								return nil
 							}
 							guard factorInstance.derivationPath.scheme == request.derivationPathScheme else {
@@ -355,7 +355,7 @@ func signingFactors(
 			}
 
 			let id = factorInstance.factorSourceID
-			guard let factorSource = allFactorSources[id: id.embed()] else {
+			guard let factorSource = allFactorSources[id: id.asGeneral] else {
 				assertionFailure("Bad! factor source not found")
 				throw FactorSourceNotFound()
 			}

@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - CreateAccountCoordinator
@@ -152,7 +153,12 @@ extension CreateAccountCoordinator {
 			}
 
 		case let .path(.element(_, action: .selectLedger(.delegate(.choseLedger(ledger))))):
-			return derivePublicKey(state: &state, factorSourceOption: .specific(ledger.embed()))
+			return derivePublicKey(
+				state: &state,
+				factorSourceOption: .specific(
+					ledger.asGeneral
+				)
+			)
 
 		case .path(.element(_, action: .completion(.delegate(.completed)))):
 			return .run { send in

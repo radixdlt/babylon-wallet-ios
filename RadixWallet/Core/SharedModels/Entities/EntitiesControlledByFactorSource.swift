@@ -1,9 +1,11 @@
+import Sargon
+
 public typealias NonEmptyAccounts = NonEmpty<IdentifiedArrayOf<Account>>
 
 // MARK: - EntitiesControlledByFactorSource
 public struct EntitiesControlledByFactorSource: Sendable, Hashable, Identifiable {
 	public typealias ID = FactorSourceID
-	public var id: ID { deviceFactorSource.id.embed() }
+	public var id: ID { deviceFactorSource.id.asGeneral }
 	public let entities: [AccountOrPersona]
 	public let hiddenEntities: [AccountOrPersona]
 	public var isMnemonicPresentInKeychain: Bool

@@ -98,7 +98,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					let entitySignature = SignatureOfEntity(
 						signerEntity: requiredSigner.entity,
 						derivationPath: signature.derivationPath,
-						factorSourceID: requiredSigningFactor.factorSourceID.embed(),
+						factorSourceID: requiredSigningFactor.factorSourceID.asGeneral,
 						signatureWithPublicKey: signature.signature
 					)
 

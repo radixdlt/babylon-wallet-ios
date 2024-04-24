@@ -126,7 +126,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 						try await factorSourcesClient.indicesOfEntitiesControlledByFactorSource(
 							.init(
 								entityKind: .account,
-								factorSourceID: id.embed(),
+								factorSourceID: id.asGeneral,
 								derivationPathScheme: forOlympiaAccounts ? .bip44Olympia : .cap26,
 								networkID: nil // read current, then we will update `state.networkID` with current.
 							)
@@ -206,7 +206,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 			switch delegateAction {
 			case let .derivedPublicKeys(publicHDKeys, factorSourceID, networkID):
 				let id = state.factorSourceIDFromHash
-				assert(factorSourceID == id.embed())
+				assert(factorSourceID == id.asGeneral)
 				assert(networkID == state.networkID)
 				loggerGlobal.debug("Creating accounts with networkID: \(networkID)")
 				return .run { send in

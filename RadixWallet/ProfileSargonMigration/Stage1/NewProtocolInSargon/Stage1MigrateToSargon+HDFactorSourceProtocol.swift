@@ -2,16 +2,11 @@ import Foundation
 import Sargon
 
 // MARK: - HDFactorSourceProtocol
-public protocol HDFactorSourceProtocol {
-	var factorSourceID: FactorSourceID { get }
-}
+/// Just a marker protocol for factor sources which are Hierarchical deterministic
+public protocol HDFactorSourceProtocol: BaseFactorSourceProtocol {}
 
 // MARK: - DeviceFactorSource + HDFactorSourceProtocol
-extension DeviceFactorSource: HDFactorSourceProtocol {
-	public var factorSourceID: FactorSourceID { id.embed() }
-}
+extension DeviceFactorSource: HDFactorSourceProtocol {}
 
 // MARK: - LedgerHardwareWalletFactorSource + HDFactorSourceProtocol
-extension LedgerHardwareWalletFactorSource: HDFactorSourceProtocol {
-	public var factorSourceID: FactorSourceID { id.embed() }
-}
+extension LedgerHardwareWalletFactorSource: HDFactorSourceProtocol {}

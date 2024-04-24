@@ -8,7 +8,7 @@ extension FactorSources {
 		id: some FactorSourceIDProtocol,
 		_ mutate: @escaping (inout FactorSource) throws -> Void
 	) throws {
-		try updateFactorSource(id: id.embed(), mutate)
+		try updateFactorSource(id: id.asGeneral, mutate)
 	}
 
 	public mutating func updateFactorSource(
