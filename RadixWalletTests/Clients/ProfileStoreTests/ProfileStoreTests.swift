@@ -1,5 +1,6 @@
 import DependenciesAdditions
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
 
 // swiftformat:disable redundantInit
@@ -247,7 +248,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 				let sut = ProfileStore()
 				// WHEN import profile
 				var profileToImport = Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART
-				try profileToImport.addAccount(Profile.Network.Account.makeTestValue(name: "stoke", networkID: .stokenet))
+				try profileToImport.addAccount(Account.makeTestValue(name: "stoke", networkID: .stokenet))
 				try profileToImport.changeGateway(to: .stokenet)
 				try await sut.importProfile(profileToImport)
 				return await sut.profile
@@ -282,7 +283,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 	}
 
 	func test__GIVEN__no_profile__WHEN__import_profile_from_icloud_not_exists__THEN__error_is_thrown() async throws {
-		let icloudHeader: ProfileSnapshot.Header = .testValueProfileID_DEAD_deviceID_ABBA
+		let icloudHeader: Header = .testValueProfileID_DEAD_deviceID_ABBA
 		try await withTimeLimit {
 			let assertionFailureIsCalled = self.expectation(description: "assertionFailure is called")
 			try await withTestClients {
@@ -551,7 +552,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 				// WHEN finishedOnboarding
 				let sut = ProfileStore()
 				try await sut.updating {
-					try $0.addAccount(Profile.Network.Account.testValue)
+					try $0.addAccount(Account.testValue)
 				}
 				await sut.finishedOnboarding()
 				return await sut.profile
@@ -563,7 +564,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 				}
 			}
 
-			func assert(_ header: ProfileSnapshot.Header?) {
+			func assert(_ header: Header?) {
 				let expected = "marco (polo)"
 				XCTAssertNoDifference(header?.creatingDevice.description, expected)
 				XCTAssertNoDifference(header?.lastUsedOnDevice.description, expected)
@@ -909,7 +910,7 @@ final class ProfileStoreExistingProfileTests: TestCase {
 				}
 			}
 			XCTAssertNotEqual(P, Q)
-			XCTAssertNoDifference(Q.factorSources[0].id, PrivateHDFactorSource.testValueAbandonArt.factorSource.id.embed())
+			XCTAssertNoDifference(Q.factorSources[0].id, PrivateHierarchicalDeterministicFactorSource.testValueAbandonArt.factorSource.id.embed())
 		}
 	}
 
@@ -1009,14 +1010,14 @@ final class ProfileStoreAsyncSequenceTests: TestCase {
 					}
 				},
 				// THEN Radix.Gatewat is emitted
-				assert: [Radix.Gateway.mainnet]
+				assert: [Gateway.mainnet]
 			)
 		}
 	}
 
 	func test__GIVEN__no_profile__WHEN_add_first_account__THEN__account_is_emitted() async throws {
 		try await withTimeLimit {
-			let firstAccount: Profile.Network.Account = .testValueIdx0
+			let firstAccount: Account = .testValueIdx0
 			try await self.doTestAsyncSequence(
 				// GIVEN no profile
 				savedProfile: nil,
@@ -1042,11 +1043,11 @@ final class ProfileStoreAsyncSequenceTests: TestCase {
 	func test__GIVEN__profile_with_one_account__WHEN_add_2nd_account__THEN__both_accounts_are_emitted() async throws {
 		try await withTimeLimit(.slow) {
 			var profile = Profile.withNoAccounts
-			let firstAccount: Profile.Network.Account = .testValueIdx0
+			let firstAccount: Account = .testValueIdx0
 			// GIVEN: Profile with one account
 			try profile.addAccount(firstAccount)
 
-			let secondAccount: Profile.Network.Account = .testValueIdx1
+			let secondAccount: Account = .testValueIdx1
 			try await self.doTestAsyncSequence(
 				savedProfile: profile,
 				arrange: { sut in

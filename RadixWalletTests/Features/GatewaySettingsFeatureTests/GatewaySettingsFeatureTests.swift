@@ -1,4 +1,5 @@
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
 
 // MARK: - GatewaySettingsFeatureTests
@@ -16,8 +17,8 @@ final class GatewaySettingsFeatureTests: TestCase {
 
 	func test_whenViewAppeared_thenCurrentGatewayAndGatewayListIsLoaded() async throws {
 		// given
-		let otherGateways: IdentifiedArrayOf<Radix.Gateway> = [.stokenet, .rcnet].asIdentified()
-		let currentGateway: Radix.Gateway = .mainnet
+		let otherGateways: IdentifiedArrayOf<Gateway> = [.stokenet, .rcnet].asIdentified()
+		let currentGateway: Gateway = .mainnet
 		let gateways = try! Gateways(
 			current: currentGateway,
 			other: otherGateways
@@ -79,9 +80,9 @@ final class GatewaySettingsFeatureTests: TestCase {
 	func test_whenNonCurrentGatewayRemovalIsConfirmed_removeGateway() async throws {
 		// given
 		let gatewayToBeDeleted = GatewayRow.State(gateway: .rcnet, isSelected: false, canBeDeleted: true)
-		let otherGateways: IdentifiedArrayOf<Radix.Gateway> = [.stokenet, .rcnet].asIdentified()
-		let currentGateway: Radix.Gateway = .mainnet
-		let otherAfterDeletion: IdentifiedArrayOf<Radix.Gateway> = [.stokenet].asIdentified()
+		let otherGateways: IdentifiedArrayOf<Gateway> = [.stokenet, .rcnet].asIdentified()
+		let currentGateway: Gateway = .mainnet
+		let otherAfterDeletion: IdentifiedArrayOf<Gateway> = [.stokenet].asIdentified()
 		let gateways = try! Gateways(
 			current: currentGateway,
 			other: otherGateways
@@ -170,7 +171,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 
 	func test_whenNewAddGatewayButtonIsTapped_thenDelegateIsCalled() async throws {
 		// given
-		let allGateways: [Radix.Gateway] = [.nebunet, .hammunet, .enkinet, .mardunet]
+		let allGateways: [Gateway] = [.nebunet, .hammunet, .enkinet, .mardunet]
 		let validURL = URL.previewValue.absoluteString
 		var initialState = AddNewGateway.State()
 		initialState.inputtedURL = validURL
@@ -199,20 +200,5 @@ final class GatewaySettingsFeatureTests: TestCase {
 
 extension URL {
 	public static let previewValue = URL(string: "https://example.com")!
-}
-
-extension Radix.Network {
-	public static let previewValue = Self(
-		name: "Placeholder",
-		id: .simulator,
-		displayDescription: "A placeholder description"
-	)
-}
-
-extension Radix.Gateway {
-	public static let previewValue = Self(
-		network: .previewValue,
-		url: .previewValue
-	)
 }
 #endif // DEBUG

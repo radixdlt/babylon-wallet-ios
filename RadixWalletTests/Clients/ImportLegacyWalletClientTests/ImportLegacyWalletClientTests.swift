@@ -1,4 +1,5 @@
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
 
 // MARK: - Olympia.AccountType + Codable
@@ -92,15 +93,6 @@ extension CAP33 {
 	}
 }
 
-extension K1.PublicKey {
-	var base64Encoded: String {
-		let publicKeyCompressed = compressedRepresentation
-		assert(publicKeyCompressed.count == 33)
-		assert(publicKeyCompressed[0] == 0x02 || publicKeyCompressed[0] == 0x03)
-		return publicKeyCompressed.base64EncodedString()
-	}
-}
-
 private func generateTestVector(
 	testID: Int,
 	payloadSizeThreshold: Int,
@@ -126,7 +118,7 @@ private func generateTestVector(
 			NonEmptyString(rawValue: $0)
 		} ?? nil
 		let accountType: Olympia.AccountType = (detRND % 2) == 0 ? .software : .hardware
-		let path = try LegacyOlympiaBIP44LikeDerivationPath(index: Profile.Network.NextDerivationIndices.Index(accountIndex))
+		let path = try LegacyOlympiaBIP44LikeDerivationPath(index: ProfileNetwork.NextDerivationIndices.Index(accountIndex))
 		let publicKey = try mnemonic.hdRoot().derivePrivateKey(path: path.fullPath, curve: SECP256K1.self).publicKey
 
 		return TestVector.OlympiaWallet.Account(
@@ -262,7 +254,7 @@ final class ImportLegacyWalletClientTests: TestCase {
 
 				let accountType: Olympia.AccountType = hdWallet.isHardware ? .hardware : .software
 
-				let path = try LegacyOlympiaBIP44LikeDerivationPath(index: Profile.Network.NextDerivationIndices.Index(accountIndex))
+				let path = try LegacyOlympiaBIP44LikeDerivationPath(index: ProfileNetwork.NextDerivationIndices.Index(accountIndex))
 
 				let publicKey = try hdRoot.derivePrivateKey(
 					path: path.fullPath,

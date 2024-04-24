@@ -1,4 +1,5 @@
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
 
 // MARK: - CustomizeFeePayerTests
@@ -32,7 +33,7 @@ final class CustomizeFeePayerTests: TestCase {
 				.dependency(\.factorSourcesClient.getSigningFactors) { request in
 					try [.device: .init(rawValue: Set(request.signers.rawValue.map {
 						try SigningFactor(
-							factorSource: .device(.babylon(mnemonicWithPassphrase: .testValue, isMain: true)),
+							factorSource: .device(.babylon(mnemonicWithPassphrase: .sample, isMain: true)),
 							signer: .init(factorInstancesRequiredToSign: $0.virtualHierarchicalDeterministicFactorInstances, of: $0)
 						)
 					}))!]
@@ -49,7 +50,7 @@ final class CustomizeFeePayerTests: TestCase {
 		}
 
 		transactionStub.feePayer = .success(selectedFeePayer)
-		let accountEntity = EntityPotentiallyVirtual.account(selectedFeePayer.account)
+		let accountEntity = AccountOrPersona.account(selectedFeePayer.account)
 		transactionStub.transactionSigners = .init(
 			notaryPublicKey: notaryKey.publicKey,
 			intentSigning: .intentSigners(.init(rawValue: [accountEntity])!)
@@ -73,7 +74,7 @@ final class CustomizeFeePayerTests: TestCase {
 	}
 }
 
-extension EntityPotentiallyVirtual {
+extension AccountOrPersona {
 	var signingFactor: SigningFactor {
 		try! SigningFactor(
 			factorSource: .device(.babylon(mnemonicWithPassphrase: .testValue, isMain: true)),

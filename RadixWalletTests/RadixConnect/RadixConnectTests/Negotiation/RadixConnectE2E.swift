@@ -3,6 +3,7 @@
 // import Foundation
 // @testable import Radix_Wallet_Dev
 // import XCTest
+import Sargon
 //
 // @MainActor
 // final class E2ETests: TestCase {

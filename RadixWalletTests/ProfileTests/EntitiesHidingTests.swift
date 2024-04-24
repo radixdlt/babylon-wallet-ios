@@ -1,44 +1,45 @@
 
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
 
 // MARK: - EntitiesHidingTests
 final class EntitiesHidingTests: TestCase {
-	let account0 = Profile.Network.Account.testValueIdx0
-	let account1 = Profile.Network.Account.testValueIdx1
+	let account0 = Account.sampleMainnet
+	let account1 = Account.sampleMainnetOther
 
-	let persona0 = Profile.Network.Persona.testValueIdx0
-	let persona1 = Profile.Network.Persona.testValueIdx1
+	let persona0 = Persona.sampleMainnet
+	let persona1 = Persona.sampleMainnetOther
 
-	lazy var sharedPersona0 = try! Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple(
+	lazy var sharedPersona0 = try! AuthorizedPersonaSimple(
 		identityAddress: persona0.address,
 		lastLogin: .now,
 		sharedAccounts: .init(ids: [account0.address, account1.address], forRequest: .atLeast(1)),
 		sharedPersonaData: .init()
 	)
 
-	lazy var sharedPersona1 = try! Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple(
+	lazy var sharedPersona1 = try! AuthorizedPersonaSimple(
 		identityAddress: persona1.address,
 		lastLogin: .now,
 		sharedAccounts: .init(ids: [account0.address, account1.address], forRequest: .atLeast(1)),
 		sharedPersonaData: .init()
 	)
 
-	lazy var dApp0 = try! Profile.Network.AuthorizedDapp(
+	lazy var dApp0 = try! AuthorizedDapp(
 		networkID: .mainnet,
 		dAppDefinitionAddress: try! .init(validatingAddress: "account_rdx12xsvygvltz4uhsht6tdrfxktzpmnl77r0d40j8agmujgdj022sudkk"),
 		displayName: "name 0",
 		referencesToAuthorizedPersonas: [sharedPersona0]
 	)
 
-	lazy var dApp1 = try! Profile.Network.AuthorizedDapp(
+	lazy var dApp1 = try! AuthorizedDapp(
 		networkID: .mainnet,
 		dAppDefinitionAddress: try! .init(validatingAddress: "account_rdx1283u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxqqcs89q"),
 		displayName: "name 1",
 		referencesToAuthorizedPersonas: [sharedPersona0, sharedPersona1]
 	)
 
-	lazy var network = try! Profile.Network(
+	lazy var network = try! ProfileNetwork(
 		networkID: .mainnet,
 		accounts: [account0, account1].asIdentified(),
 		personas: [persona0, persona1],
@@ -116,12 +117,12 @@ final class EntitiesHidingTests: TestCase {
 	}
 }
 
-extension Profile.Network {
-	mutating func hide(account: Profile.Network.Account) {
+extension ProfileNetwork {
+	mutating func hide(account: Account) {
 		hideAccounts(ids: [account.id])
 	}
 
-	mutating func hide(persona: Profile.Network.Persona) {
+	mutating func hide(persona: Persona) {
 		hidePersonas(ids: [persona.id])
 	}
 }

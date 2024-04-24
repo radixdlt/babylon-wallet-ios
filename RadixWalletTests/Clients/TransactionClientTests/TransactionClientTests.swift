@@ -1,5 +1,13 @@
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
+
+// MARK: - Decimal192 + ExpressibleByFloatLiteral
+extension Decimal192: ExpressibleByFloatLiteral {
+	public init(floatLiteral value: Double) {
+		try! self.init(value)
+	}
+}
 
 // MARK: - TransactionClientTests
 final class TransactionClientTests: TestCase {
@@ -110,7 +118,7 @@ final class TransactionClientTests: TestCase {
 		var txFee = testTransactionFee()
 		let sut = TransactionClient.testValue
 
-		let accounts: [Profile.Network.Account] = [
+		let accounts: [Account] = [
 			.new(factorSource: .deviceOne, index: 0), // 0
 			.new(factorSource: .deviceOne, index: 1), // 1
 			.new(factorSource: .deviceTwo, index: 0), // 2
@@ -196,7 +204,7 @@ final class TransactionClientTests: TestCase {
 	}
 }
 
-extension Profile.Network.Account {
+extension Account {
 	var signingFactor: SigningFactor {
 		try! .init(
 			factorSource: .deviceOne,
@@ -258,7 +266,7 @@ extension TransactionFee.FeeSummary {
 	}
 }
 
-extension Profile.Network.Account {
+extension Account {
 	static func new(address: String) -> Self {
 		try! .init(
 			networkID: .simulator,
