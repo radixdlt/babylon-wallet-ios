@@ -339,8 +339,6 @@
 		48CFC3A42ADC10D900E77A5C /* VersionedAlgorithm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE8C2ADC10D800E77A5C /* VersionedAlgorithm.swift */; };
 		48CFC3A52ADC10D900E77A5C /* KeyDerivationScheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBE8E2ADC10D800E77A5C /* KeyDerivationScheme.swift */; };
 		48CFC3E42ADC10D900E77A5C /* RadixConnectConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBEE32ADC10D900E77A5C /* RadixConnectConstants.swift */; };
-		48CFC3E52ADC10D900E77A5C /* P2PLinks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBEE42ADC10D900E77A5C /* P2PLinks.swift */; };
-		48CFC3E62ADC10D900E77A5C /* P2PLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBEE52ADC10D900E77A5C /* P2PLink.swift */; };
 		48CFC3E72ADC10D900E77A5C /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBEE62ADC10D900E77A5C /* Types.swift */; };
 		48CFC3E82ADC10D900E77A5C /* Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBEE92ADC10D900E77A5C /* Async.swift */; };
 		48CFC3E92ADC10D900E77A5C /* Hashing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBEEA2ADC10D900E77A5C /* Hashing.swift */; };
@@ -1524,8 +1522,6 @@
 		48CFBE8C2ADC10D800E77A5C /* VersionedAlgorithm.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VersionedAlgorithm.swift; sourceTree = "<group>"; };
 		48CFBE8E2ADC10D800E77A5C /* KeyDerivationScheme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyDerivationScheme.swift; sourceTree = "<group>"; };
 		48CFBEE32ADC10D900E77A5C /* RadixConnectConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadixConnectConstants.swift; sourceTree = "<group>"; };
-		48CFBEE42ADC10D900E77A5C /* P2PLinks.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = P2PLinks.swift; sourceTree = "<group>"; };
-		48CFBEE52ADC10D900E77A5C /* P2PLink.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = P2PLink.swift; sourceTree = "<group>"; };
 		48CFBEE62ADC10D900E77A5C /* Types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
 		48CFBEE92ADC10D900E77A5C /* Async.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Async.swift; sourceTree = "<group>"; };
 		48CFBEEA2ADC10D900E77A5C /* Hashing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Hashing.swift; sourceTree = "<group>"; };
@@ -4026,8 +4022,6 @@
 			isa = PBXGroup;
 			children = (
 				48CFBEE32ADC10D900E77A5C /* RadixConnectConstants.swift */,
-				48CFBEE42ADC10D900E77A5C /* P2PLinks.swift */,
-				48CFBEE52ADC10D900E77A5C /* P2PLink.swift */,
 				48CFBEE62ADC10D900E77A5C /* Types.swift */,
 			);
 			path = RadixConnectModels;
@@ -7182,7 +7176,6 @@
 				48CFC4D42ADC10DA00E77A5C /* StateEntityDetailsRequest.swift in Sources */,
 				83EE478B2AF0EE3C00155F03 /* ProgrammaticScryptoSborValueU32.swift in Sources */,
 				48CFC3072ADC10D900E77A5C /* DebugUserDefaultsContents.swift in Sources */,
-				48CFC3E52ADC10D900E77A5C /* P2PLinks.swift in Sources */,
 				48CFC5B72ADC10DA00E77A5C /* Card.swift in Sources */,
 				48CFC50A2ADC10DA00E77A5C /* InvalidTransactionError.swift in Sources */,
 				48CFC2BF2ADC10D900E77A5C /* ImportMnemonicsFlowCoordinator.swift in Sources */,
@@ -7606,7 +7599,6 @@
 				48CFC2952ADC10D900E77A5C /* FeesView.swift in Sources */,
 				83EE47842AF0EE3C00155F03 /* ProgrammaticScryptoSborValueTuple.swift in Sources */,
 				48CFC4472ADC10DA00E77A5C /* AccountsClient+Interface.swift in Sources */,
-				48CFC3E62ADC10D900E77A5C /* P2PLink.swift in Sources */,
 				830EA9DB2AEA8770004C8051 /* EntitiesVisibilityClient+Interface.swift in Sources */,
 				48CFC2682ADC10D900E77A5C /* EditPersonaField+View.swift in Sources */,
 				48CFC3672ADC10D900E77A5C /* NonFungbileAssetRow+Reducer.swift in Sources */,

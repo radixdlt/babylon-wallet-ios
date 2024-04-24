@@ -1,9 +1,10 @@
+import Sargon
 import WebRTC
 
 // MARK: - P2P.ClientConnectionsUpdate
 extension P2P {
 	public struct ClientConnectionsUpdate: Sendable, Hashable {
-		public let clientID: ConnectionPassword
+		public let clientID: Hash
 		public fileprivate(set) var idsOfConnectedPeerConnections: [PeerConnectionID]
 	}
 }
@@ -68,7 +69,7 @@ extension RTCClients {
 	// MARK: - Public API
 
 	public func connect(
-		_ linkPassword: ConnectionPassword,
+		_ linkPassword: RadixConnectPassword,
 		waitsForConnectionToBeEstablished: Bool = false
 	) async throws {
 		guard !clients.contains(where: { $0.key == linkPassword }) else {
@@ -84,12 +85,12 @@ extension RTCClients {
 
 	/// Disconnect and remove the RTCClient for the given connection password
 	/// - Parameter password: The connection password identifying the RTCClient
-	public func disconnectAndRemoveClient(_ password: ConnectionPassword) async {
+	public func disconnectAndRemoveClient(_ password: RadixConnectPassword) async {
 		await clients[password]?.cancel()
 		clients.removeValue(forKey: password)
 
 		var cur = clientConnectionsUpdateSubject.value
-		if let index = cur.firstIndex(where: { $0.clientID == password }) {
+		if let index = cur.firstIndex(where: { $0.clientID == password.hash() }) {
 			cur.remove(at: index)
 			clientConnectionsUpdateSubject.send(cur)
 		}
@@ -191,10 +192,10 @@ extension RTCClients {
 			for await update in client.idsOfConnectPeerConnectionsSubject {
 				loggerGlobal.debug("RTCClients got iceConnectionUpdate: \(update)")
 				var cur = clientConnectionsUpdateSubject.value
-				if let index = cur.firstIndex(where: { $0.clientID == client.id }) {
+				if let index = cur.firstIndex(where: { $0.clientID == client.id.hash() }) {
 					cur[index].idsOfConnectedPeerConnections = update
 				} else {
-					cur.append(.init(clientID: client.id, idsOfConnectedPeerConnections: update))
+					cur.append(.init(clientID: client.id.hash(), idsOfConnectedPeerConnections: update))
 				}
 
 				clientConnectionsUpdateSubject.send(cur)
@@ -206,7 +207,7 @@ extension RTCClients {
 		self.clients[client.id] = client
 	}
 
-	func makeRTCClient(_ password: ConnectionPassword) throws -> RTCClient {
+	func makeRTCClient(_ password: RadixConnectPassword) throws -> RTCClient {
 		let signalingClient = try SignalingClient(
 			password: password,
 			baseURL: signalingServerBaseURL
@@ -270,7 +271,7 @@ actor RTCClient {
 }
 
 extension RTCClient {
-	typealias ID = ConnectionPassword
+	typealias ID = RadixConnectPassword
 	public struct PeerConnectionDidCloseError: Error, LocalizedError {
 		public var errorDescription: String? {
 			"Peer Connection did close, retry the operation from dapp"
