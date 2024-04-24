@@ -12,9 +12,14 @@ extension P2P.ConnectorExtension {
 		/// Ledger hardware wallets by LedgerHQ, e.g. Ledger Nano S
 		case ledgerHardwareWallet(LedgerHardwareWallet)
 
+		/// Accounts sent to Connector Extension
+		case accountListMessage(AccountListMessage)
+
 		public func encode(to encoder: Encoder) throws {
 			switch self {
 			case let .ledgerHardwareWallet(request):
+				try request.encode(to: encoder)
+			case let .accountListMessage(request):
 				try request.encode(to: encoder)
 			}
 		}
@@ -150,5 +155,14 @@ extension P2P.ConnectorExtension.Request {
 		public let discriminator: Discriminator
 		public let publicKey: HexCodable32Bytes
 		public let signature: HexCodable
+	}
+
+	public struct AccountListMessage: Sendable, Hashable, Encodable {
+		public enum Discriminator: String, Sendable, Hashable, Encodable {
+			case accountList
+		}
+
+		public let discriminator: Discriminator
+		public let accounts: [P2P.Dapp.Response.WalletAccount]
 	}
 }

@@ -4,9 +4,58 @@ import Network
 extension RadixConnectClient {
 	public static let liveValue: Self = {
 		@Dependency(\.p2pLinksClient) var p2pLinksClient
+		@Dependency(\.accountsClient) var accountsClient
 
 		let rtcClients = RTCClients()
 		let localNetworkAuthorization = LocalNetworkAuthorization()
+
+		Task {
+			for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
+				guard !Task.isCancelled else { return }
+				try await sendAccountListMessage(accounts: accounts)
+			}
+		}
+
+		Task {
+			let connectClients = await rtcClients.connectClients()
+				.filter { updates in
+					!updates.flatMap(\.idsOfConnectedPeerConnections).isEmpty
+				}
+			for try await updates in connectClients {
+				guard !Task.isCancelled else { return }
+				print("Connection established -> connectClients \(updates.map(\.idsOfConnectedPeerConnections))")
+				sendAccountListMessageAfterConnect()
+			}
+		}
+
+		@Sendable
+		func sendAccountListMessageAfterConnect() {
+			Task {
+				let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
+				try await sendAccountListMessage(accounts: accounts)
+				print("Connection established -> sendAccountListMessageAfterConnect")
+			}
+		}
+
+		@Sendable
+		func sendAccountListMessage(accounts: AccountsClient.Accounts) async throws {
+			print("accountListMessage acc: \(accounts.map(\.displayName))")
+			let accounts = accounts.map {
+				P2P.Dapp.Response.WalletAccount(
+					accountAddress: $0.address,
+					label: $0.displayName,
+					appearanceId: $0.appearanceID
+				)
+			}
+			do {
+				_ = try await rtcClients.sendRequest(.connectorExtension(.accountListMessage(.init(
+					discriminator: .accountList,
+					accounts: accounts
+				))), strategy: .broadcastToAllPeers)
+			} catch {
+				print("accountListMessage error: \(error)")
+			}
+		}
 
 		let getP2PLinksWithConnectionStatusUpdates: GetP2PLinksWithConnectionStatusUpdates = {
 			await rtcClients.connectClients().map { connectedClients in
@@ -27,9 +76,7 @@ extension RadixConnectClient {
 
 		let connectToP2PLinks: ConnectToP2PLinks = { links in
 			for client in links {
-				try await rtcClients.connect(
-					client
-				)
+				try await rtcClients.connect(client)
 			}
 		}
 
