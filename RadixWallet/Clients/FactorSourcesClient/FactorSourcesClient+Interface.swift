@@ -238,10 +238,10 @@ extension FactorSourcesClient {
 		let oldMainBDFSSources = try await getFactorSources(type: DeviceFactorSource.self).filter(\.isExplicitMainBDFS)
 
 		for oldMainBDFS in oldMainBDFSSources {
-			try await updateFactorSource(oldMainBDFS.removingMainFlag().embed())
+			try await updateFactorSource(oldMainBDFS.removingMainFlag().asGeneral)
 		}
 
-		try await saveFactorSource(newMainBDFS.embed())
+		try await saveFactorSource(newMainBDFS.asGeneral)
 	}
 
 	@discardableResult

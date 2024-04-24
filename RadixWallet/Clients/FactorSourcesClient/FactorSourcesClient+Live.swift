@@ -66,11 +66,11 @@ extension FactorSourcesClient: DependencyKey {
 						let cryptoParamsToAdd = request.privateHDFactorSource.factorSource.common.cryptoParameters
 						updated.common.cryptoParameters.append(cryptoParamsToAdd)
 						loggerGlobal.notice("Appended crypto parameters \(cryptoParamsToAdd) to DeviceFactorSource.")
-						try await updateFactorSource(updated.embed())
+						try await updateFactorSource(updated.asGeneral)
 					}
 				} else {
 					do {
-						try await saveFactorSource(deviceFactorSource.embed())
+						try await saveFactorSource(deviceFactorSource.asGeneral)
 					} catch {
 						loggerGlobal.critical("Failed to save factor source, error: \(error)")
 						// We were unlucky, failed to update Profile, thus best to undo the saving of
@@ -284,7 +284,7 @@ extension FactorSourcesClient: DependencyKey {
 							updated.common.cryptoParameters.append(
 								.olympia
 							)
-							try await updateFactorSource(updated.embed())
+							try await updateFactorSource(updated.asGeneral)
 						}
 
 						// YES Managed to validate all software accounts against existing factor source

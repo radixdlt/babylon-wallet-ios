@@ -516,7 +516,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 								onMnemonicExistsStrategy: persistStrategy.onMnemonicExistsStrategy,
 								saveIntoProfile: saveIntoProfile
 							)
-							return .init(factorSource: factorSource.embed(), savedIntoProfile: saveIntoProfile)
+							return .init(factorSource: factorSource.asGeneral, savedIntoProfile: saveIntoProfile)
 						}
 					)))
 				}
