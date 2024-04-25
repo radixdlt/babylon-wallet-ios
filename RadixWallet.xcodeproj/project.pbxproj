@@ -29,6 +29,7 @@
 		4827520D2BDA5E13007854E0 /* SplashFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2902ADEBFB300A38425 /* SplashFeatureTests.swift */; };
 		4827520E2BDA5E50007854E0 /* TransactionClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2FA2ADEBFB300A38425 /* TransactionClientTests.swift */; };
 		4827520F2BDA5FAF007854E0 /* AppFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA27C2ADEBFB200A38425 /* AppFeatureTests.swift */; };
+		482752102BDA60FA007854E0 /* ProfileStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA3052ADEBFB300A38425 /* ProfileStoreTests.swift */; };
 		483A3DE42BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483A3DE32BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift */; };
 		483A3DE62BD2678900055932 /* Stage1MigrateToSargon+FactorSourceCryptoParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483A3DE52BD2678900055932 /* Stage1MigrateToSargon+FactorSourceCryptoParameters.swift */; };
 		483A3DE92BD31CB700055932 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 483A3DE82BD31CB700055932 /* Sargon */; };
@@ -6501,6 +6502,7 @@
 				482752042BD9951A007854E0 /* CustomizeFeePayerTests.swift in Sources */,
 				E6DBA31D2ADEBFB300A38425 /* PeerConnectionNegotiatorTests.swift in Sources */,
 				E6DBA3832ADEBFB300A38425 /* DiskPersistenceClientTests.swift in Sources */,
+				482752102BDA60FA007854E0 /* ProfileStoreTests.swift in Sources */,
 				482752092BDA5576007854E0 /* EntitiesHidingTests.swift in Sources */,
 				4884BDBA2BD98EF6003B1ED6 /* TestFixture.swift in Sources */,
 				E6DBA3852ADEBFB300A38425 /* FaucetClientTests.swift in Sources */,

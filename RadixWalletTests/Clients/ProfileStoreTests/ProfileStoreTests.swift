@@ -17,12 +17,12 @@ extension DependencyValues {
 			}
 			secureStorageClient.loadProfileSnapshot = { key in
 				precondition(key == profile.header.id)
-				return profile.snapshot()
+				return profile
 			}
 			secureStorageClient.loadProfileSnapshotData = { key in
 				precondition(key == profile.header.id)
 
-				return try! JSONEncoder.iso8601.encode(profile.snapshot())
+				return try! JSONEncoder.iso8601.encode(profile)
 			}
 		} else {
 			secureStorageClient.loadProfile = { _ in
@@ -37,7 +37,7 @@ extension DependencyValues {
 		}
 		userDefaultsValue.set(string: profile?.header.id.uuidString, key: .activeProfileID)
 		self.userDefaults = userDefaultsValue
-		mnemonicClient.generate = { _, _ in .testValue }
+		mnemonicClient.generate = { _, _ in .sample }
 	}
 
 	mutating func savedProfile(
@@ -248,14 +248,14 @@ final class ProfileStoreNewProfileTests: TestCase {
 				let sut = ProfileStore()
 				// WHEN import profile
 				var profileToImport = Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART
-				try profileToImport.addAccount(Account.makeTestValue(name: "stoke", networkID: .stokenet))
+				try profileToImport.addAccount(Account.sampleStokenet)
 				try profileToImport.changeGateway(to: .stokenet)
 				try await sut.importProfile(profileToImport)
 				return await sut.profile
 			}
 
 			// THEN imported profile is used
-			XCTAssertNoDifference(usedProfile.network?.networkID, .mainnet)
+			XCTAssertNoDifference(usedProfile.network?.id, .mainnet)
 		}
 	}
 
@@ -267,7 +267,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 				$0.noProfile()
 				$0.secureStorageClient.loadProfileSnapshot = { headerId in
 					if headerId == profileSnapshotInIcloud.header.id {
-						profileSnapshotInIcloud.snapshot()
+						profileSnapshotInIcloud
 					} else { nil }
 				}
 			} operation: {
@@ -389,7 +389,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 				$0.noProfile()
 
 				$0.mnemonicClient.generate = { _, _ in
-					"zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong"
+					try! Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong")
 				}
 			} operation: {
 				// WHEN ProfileStore.init()
@@ -397,7 +397,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 			}
 
 			XCTAssertNoDifference(
-				profile.factorSources.first.id.description,
+				profile.factorSources.first!.id.description,
 				// THEN profile uses newly generated DeviceFactorSource
 				"device:09a501e4fafc7389202a82a3237a405ed191cdb8a4010124ff8e2c9259af1327"
 			)
@@ -466,7 +466,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 			$0.noProfile()
 
 			$0.mnemonicClient.generate = { _, _ in
-				"zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong"
+				try! Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong")
 			}
 
 			then(&$0)
@@ -519,7 +519,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 			$0.noProfile()
 
 			$0.mnemonicClient.generate = { _, _ in
-				"zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong"
+				try! Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong")
 			}
 
 			then(&$0)
@@ -603,7 +603,7 @@ final class ProfileStoreExistingProfileTests: TestCase {
 		try await withTimeLimit {
 			let mnemonicGotDeleted = self.expectation(description: "Mnemonic got deleted")
 			// GIVEN saved profile
-			let savedEmptyProfile = ProfileBuilder().bdfs().build(allowEmpty: true)
+			let savedEmptyProfile = Profile.sample
 			let firstBDFS = savedEmptyProfile.factorSources.babylonDevice
 
 			let used = await withTestClients {
@@ -683,7 +683,7 @@ final class ProfileStoreExistingProfileTests: TestCase {
 							profile_is_loaded_from_keychain.fulfill()
 						}
 					}
-					return saved.snapshot()
+					return saved
 				}
 			}
 
@@ -845,7 +845,7 @@ final class ProfileStoreExistingProfileTests: TestCase {
 
 				d.keychainClient._getDataWithoutAuthForKey = { key in
 					if key == saved.header.id.keychainKey {
-						try! JSONEncoder.iso8601.encode(saved.snapshot())
+						try! JSONEncoder.iso8601.encode(saved)
 					} else if key == profileHeaderListKeychainKey {
 						try! JSONEncoder.iso8601.encode([saved.header])
 					} else {
@@ -910,7 +910,7 @@ final class ProfileStoreExistingProfileTests: TestCase {
 				}
 			}
 			XCTAssertNotEqual(P, Q)
-			XCTAssertNoDifference(Q.factorSources[0].id, PrivateHierarchicalDeterministicFactorSource.testValueAbandonArt.factorSource.id.embed())
+			XCTAssertNoDifference(Q.factorSources[0].id, PrivateHierarchicalDeterministicFactorSource.testValueAbandonArt.factorSource.id.asGeneral)
 		}
 	}
 
@@ -928,7 +928,7 @@ final class ProfileStoreExistingProfileTests: TestCase {
 				d.uuid = .constant(newProfile.id)
 				// THEN new profile is saved to secureStorage
 				d.secureStorageClient.saveProfileSnapshot = {
-					XCTAssertNoDifference($0, newProfile.snapshot())
+					XCTAssertNoDifference($0, newProfile)
 				}
 			}
 		}
@@ -967,9 +967,9 @@ final class ProfileStoreExistingProfileTests: TestCase {
 							var modified = saved
 							modified.header.lastUsedOnDevice = .testValueBEEF // 0xBEEF != 0xABBA
 							// WHEN ... without ownership
-							return modified.snapshot()
+							return modified
 						} else {
-							return saved.snapshot()
+							return saved
 						}
 					}
 				}

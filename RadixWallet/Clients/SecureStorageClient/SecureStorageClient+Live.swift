@@ -211,13 +211,13 @@ extension SecureStorageClient: DependencyKey {
 			return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)
 		}
 
-		let loadProfileSnapshot: LoadProfileSnapshot = { id in
+		let loadProfileSnapshot: LoadProfileSnapshot = { id -> Profile? in
 			guard
 				let existingSnapshotData = try loadProfileSnapshotData(id)
 			else {
 				return nil
 			}
-			return try Profile(json: existingSnapshotData)
+			return try jsonDecoder().decode(Profile.self, from: existingSnapshotData)
 		}
 
 		let loadMnemonicByFactorSourceID: LoadMnemonicByFactorSourceID = { request in
@@ -298,7 +298,10 @@ extension SecureStorageClient: DependencyKey {
 			}
 
 			guard
-				let profileSnapshot = try? Profile(json: profileSnapshotData)
+				let profileSnapshot = try? jsonDecoder().decode(
+					Profile.self,
+					from: profileSnapshotData
+				)
 			else {
 				return
 			}
