@@ -20,6 +20,8 @@
 		4813B0032BCA4FD60046BCAD /* Stage1MigrateToSargon+Persona.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813B0022BCA4FD60046BCAD /* Stage1MigrateToSargon+Persona.swift */; };
 		482752032BD993DF007854E0 /* SecureStorageClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2F62ADEBFB300A38425 /* SecureStorageClientTests.swift */; };
 		482752042BD9951A007854E0 /* CustomizeFeePayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2892ADEBFB200A38425 /* CustomizeFeePayerTests.swift */; };
+		482752052BD99606007854E0 /* FactorSourcesClientLiveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA3092ADEBFB300A38425 /* FactorSourcesClientLiveTests.swift */; };
+		482752072BDA4E60007854E0 /* TestUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 482752062BDA4E60007854E0 /* TestUtils.swift */; };
 		483A3DE42BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483A3DE32BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift */; };
 		483A3DE62BD2678900055932 /* Stage1MigrateToSargon+FactorSourceCryptoParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483A3DE52BD2678900055932 /* Stage1MigrateToSargon+FactorSourceCryptoParameters.swift */; };
 		483A3DE92BD31CB700055932 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 483A3DE82BD31CB700055932 /* Sargon */; };
@@ -1136,6 +1138,7 @@
 		4813B0022BCA4FD60046BCAD /* Stage1MigrateToSargon+Persona.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+Persona.swift"; sourceTree = "<group>"; };
 		481B43B02ADC7F1A007945C1 /* RadixWalletTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RadixWalletTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		481B44022ADC7FB3007945C1 /* RadixWallet.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = RadixWallet.xctestplan; sourceTree = "<group>"; };
+		482752062BDA4E60007854E0 /* TestUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestUtils.swift; sourceTree = "<group>"; };
 		483A3DE32BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+FactorSources.swift"; sourceTree = "<group>"; };
 		483A3DE52BD2678900055932 /* Stage1MigrateToSargon+FactorSourceCryptoParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+FactorSourceCryptoParameters.swift"; sourceTree = "<group>"; };
 		484161402BCACDC700D2B644 /* Stage1MigrateToSargon+DepositAddressExceptionRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage1MigrateToSargon+DepositAddressExceptionRule.swift"; sourceTree = "<group>"; };
@@ -5929,6 +5932,7 @@
 				E6DBA26F2ADEBFB200A38425 /* Misc+Extensions.swift */,
 				4884BDB92BD98EF6003B1ED6 /* TestFixture.swift */,
 				E6DBA2702ADEBFB200A38425 /* NSError+TestValue.swift */,
+				482752062BDA4E60007854E0 /* TestUtils.swift */,
 				E6DBA2712ADEBFB200A38425 /* TestCase.swift */,
 				E6DBA2722ADEBFB200A38425 /* JSON+Sendable.swift */,
 				48FF43142AE43C7C00C568B9 /* TimeLimit.swift */,
@@ -6500,6 +6504,7 @@
 				E6DBA31F2ADEBFB300A38425 /* RadixConnectCustomData.swift in Sources */,
 				83EE47502AF027DF00155F03 /* AssetTransferDepositRuleTests.swift in Sources */,
 				E6DBA3462ADEBFB300A38425 /* DataToHexStringTests.swift in Sources */,
+				482752072BDA4E60007854E0 /* TestUtils.swift in Sources */,
 				E6DBA3452ADEBFB300A38425 /* SortedPropertyWrapperTests.swift in Sources */,
 				E6DBA3482ADEBFB300A38425 /* DataExtensionTests.swift in Sources */,
 				E6DBA31C2ADEBFB300A38425 /* RadixConnectE2E.swift in Sources */,
@@ -6517,6 +6522,7 @@
 				E6DBA3272ADEBFB300A38425 /* MockURLProtocol.swift in Sources */,
 				8328806C2AE6725F0014FBF3 /* AccountPreferencesTests.swift in Sources */,
 				E6DBA3192ADEBFB300A38425 /* PackagesEncodingDecodingTests.swift in Sources */,
+				482752052BD99606007854E0 /* FactorSourcesClientLiveTests.swift in Sources */,
 				8381C8B02BBD2CD400A470B4 /* TokenPriceCientTests.swift in Sources */,
 				E6DBA3472ADEBFB300A38425 /* HexStringToDataTests.swift in Sources */,
 				E6DBA3332ADEBFB300A38425 /* TransactionSigningFeatureTests.swift in Sources */,

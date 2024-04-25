@@ -1,6 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
 
+import Sargon
+
 // MARK: - WalletApp
 @main
 struct WalletApp: SwiftUI.App {
