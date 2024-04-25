@@ -950,7 +950,6 @@ Your old Accounts and Personas will still be listed, but you will have to enter 
 "accountRecoveryScan_chooseSeedPhrase_importMnemonicTitleBabylon" = "Enter Seed Phrase";
 "accountRecoveryScan_chooseSeedPhrase_continueButton" = "Continue";
 "accountRecoveryScan_olympiaLedgerNote" = "Note: You must still use the new *Radix Babylon* app on your Ledger device, not the old Radix Ledger app.";
-"accountRecoveryScan_derivingAccounts" = "Deriving Accounts";
 "accountSecuritySettings_seedPhrases_title" = "Seed Phrases";
 "accountSecuritySettings_ledgerHardwareWallets_title" = "Ledger Hardware Wallets";
 "accountSecuritySettings_depositGuarantees_title" = "Default Deposit Guarantees";
@@ -1083,13 +1082,13 @@ If you have any “Legacy” Accounts (created on the Olympia network) to import
 "securityFactors_ledgerWallet_counterSingular" = "1 set";
 "securityFactors_ledgerWallet_counterPlural" = "%d set";
 "configurationBackup_title" = "Configuration Backup";
+"configurationBackup_heading" = "You need an up-to-date Configuration Backup to recover your Accounts and Personas if you lose access to them.
+
+Your Backup does not contain your keys or seed phrase.";
 "configurationBackup_problem5WarningIOS" = "Automated Configuration Backup not working. Check internet connection and iCloud settings.";
 "configurationBackup_problem5WarningAndroid" = "Automated Configuration Backup not working. Check internet connection and Google Drive settings.";
 "configurationBackup_problem6Warning" = "To secure your wallet, turn on automated backups or manually export backup file.";
 "configurationBackup_problem7Warning" = "Configuration Backup not up to date. Turn on automated backups or manually export backup file.";
-"configurationBackup_automated_heading" = "You need an up-to-date Configuration Backup to recover your Accounts and Personas if you lose access to them.
-
-Your Backup does not contain your keys or seed phrase.";
 "configurationBackup_automated_text" = "Configuration Backup status";
 "configurationBackup_automated_warning" = "Without an updated Configuration Backup, you cannot recover your Accounts and Personas.";
 "configurationBackup_automated_toggleIOS" = "Automated iCloud Backups";
