@@ -144,7 +144,7 @@ extension FactorSource {
 
 extension Account {
 	static func new(factorSource: FactorSource, index: UInt32) -> Self {
-		try! Self(
+		var account = try! Self(
 			networkID: .simulator,
 			factorInstance: .init(
 				factorSourceId: factorSource.id.extract(),
@@ -162,6 +162,8 @@ extension Account {
 				appearanceID: .fromNumberOfAccounts(Int(index))
 			)
 		)
+		account.address = .random(networkID: .simulator)
+		return account
 	}
 }
 

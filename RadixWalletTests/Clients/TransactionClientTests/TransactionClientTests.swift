@@ -265,25 +265,3 @@ extension TransactionFee.FeeSummary {
 		totalExecutionCost + finalizationCost + storageExpansionCost
 	}
 }
-
-extension Account {
-	static func new(address: String) -> Self {
-		try! .init(
-			networkID: .simulator,
-			address: AccountAddress(validatingAddress: address),
-			factorInstance: .init(
-				factorSourceID: .previewValue,
-				publicKey: .eddsaEd25519(Curve25519.Signing.PrivateKey().publicKey),
-				derivationPath: AccountDerivationPath.babylon(.init(
-					networkID: .simulator,
-					index: 0,
-					keyKind: .transactionSigning
-				)).wrapAsDerivationPath()
-			),
-			displayName: "acc",
-			extraProperties: .init(
-				appearanceID: ._0
-			)
-		)
-	}
-}
