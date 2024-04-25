@@ -123,8 +123,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/radixdlt/sargon",
       "state" : {
-        "revision" : "0348c8d8e851e37535437bd9d5d7c87cc6dc8622",
-        "version" : "0.6.33"
+        "revision" : "47032cdd7b6ff22b50ffb56cf20ce70a438c5f53",
+        "version" : "0.6.47"
       }
     },
     {
@@ -386,6 +386,15 @@
       "state" : {
         "revision" : "a6a3c70ad5d771bd1e927fb55897231cd9592024",
         "version" : "0.13.3"
+      }
+    },
+    {
+      "identity" : "swiftyjson",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwiftyJSON/SwiftyJSON",
+      "state" : {
+        "revision" : "af76cf3ef710b6ca5f8c05f3a31307d44a3c5828",
+        "version" : "5.0.2"
       }
     },
     {

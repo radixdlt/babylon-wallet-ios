@@ -159,8 +159,8 @@ extension ThirdPartyDeposits {
 	func intoSargon() -> Sargon.ThirdPartyDeposits {
 		Sargon.ThirdPartyDeposits(
 			depositRule: self.depositRule.intoSargon(),
-			assetsExceptionList: self.assetsExceptionSet().map { $0.intoSargon() },
-			depositorsAllowList: self.depositorsAllowSet().map { $0.intoSargon() }
+			assetsExceptionList: .init(self.assetsExceptionSet().map { $0.intoSargon() }),
+			depositorsAllowList: .init(self.depositorsAllowSet().map { $0.intoSargon() })
 		)
 	}
 }
