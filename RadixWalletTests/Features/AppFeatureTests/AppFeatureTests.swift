@@ -18,7 +18,7 @@ final class AppFeatureTests: TestCase {
 			initialState: App.State(root: .main(.previewValue)),
 			reducer: App.init
 		) {
-			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .default)]).eraseToAnyAsyncSequence() }
+			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([.init(current: .mainnet)]).eraseToAnyAsyncSequence() }
 		}
 		// when
 		await store.send(.child(.main(.delegate(.removedWallet)))) {

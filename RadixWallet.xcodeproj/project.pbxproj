@@ -28,6 +28,7 @@
 		4827520C2BDA5CA5007854E0 /* GatewaySettingsFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2832ADEBFB200A38425 /* GatewaySettingsFeatureTests.swift */; };
 		4827520D2BDA5E13007854E0 /* SplashFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2902ADEBFB300A38425 /* SplashFeatureTests.swift */; };
 		4827520E2BDA5E50007854E0 /* TransactionClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2FA2ADEBFB300A38425 /* TransactionClientTests.swift */; };
+		4827520F2BDA5FAF007854E0 /* AppFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA27C2ADEBFB200A38425 /* AppFeatureTests.swift */; };
 		483A3DE42BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483A3DE32BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift */; };
 		483A3DE62BD2678900055932 /* Stage1MigrateToSargon+FactorSourceCryptoParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483A3DE52BD2678900055932 /* Stage1MigrateToSargon+FactorSourceCryptoParameters.swift */; };
 		483A3DE92BD31CB700055932 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 483A3DE82BD31CB700055932 /* Sargon */; };
@@ -6525,6 +6526,7 @@
 				E6DBA31A2ADEBFB300A38425 /* DataChannelClientTests.swift in Sources */,
 				E6DBA32B2ADEBFB300A38425 /* JSON+Sendable.swift in Sources */,
 				E6DBA3202ADEBFB300A38425 /* PeerConnectionMocks.swift in Sources */,
+				4827520F2BDA5FAF007854E0 /* AppFeatureTests.swift in Sources */,
 				48FF43152AE43C7C00C568B9 /* TimeLimit.swift in Sources */,
 				E6DBA3442ADEBFB300A38425 /* KeychainClientTests.swift in Sources */,
 				E6DBA33E2ADEBFB300A38425 /* DappInteractorTests.swift in Sources */,

@@ -191,15 +191,18 @@ extension Header {
 		profileID: UUID? = nil,
 		deviceInfo: DeviceInfo
 	) -> Self {
-//		Self(
-//			creatingDevice: deviceInfo,
-//			lastUsedOnDevice: deviceInfo,
-//			id: profileID ?? 0xDEAD,
-//			lastModified: deviceInfo.date,
-//			contentHint: .init(),
-//			snapshotVersion: .minimum
-//		)
-		fatalError()
+		Self(
+			snapshotVersion: .v100,
+			id: profileID ?? 0xDEAD,
+			creatingDevice: deviceInfo,
+			lastUsedOnDevice: deviceInfo,
+			lastModified: deviceInfo.date,
+			contentHint: .init(
+				numberOfAccountsOnAllNetworksInTotal: 0,
+				numberOfPersonasOnAllNetworksInTotal: 0,
+				numberOfNetworks: 0
+			)
+		)
 	}
 }
 
@@ -212,12 +215,7 @@ extension DeviceInfo {
 		deviceID: UUID? = nil,
 		date: Date? = nil
 	) -> Self {
-//		Self(
-//			description: "testValue",
-//			id: deviceID ?? 0xABBA,
-//			date: date ?? Date(timeIntervalSince1970: 0)
-//		)
-		fatalError()
+		Self(id: deviceID ?? 0xABBA, date: date ?? Date(timeIntervalSince1970: 0), description: "testValue")
 	}
 }
 
@@ -237,20 +235,12 @@ extension PrivateHierarchicalDeterministicFactorSource {
 		model: String,
 		mnemonicWithPassphrase: MnemonicWithPassphrase = .testValueZooVote
 	) -> Self {
-//		let deviceFactorSource = try! DeviceFactorSource.babylon(
-//			mnemonicWithPassphrase: mnemonicWithPassphrase,
-//			isMain: true,
-//			model: model,
-//			name: name,
-//			addedOn: .init(timeIntervalSince1970: 0),
-//			lastUsedOn: .init(timeIntervalSince1970: 0)
-//		)
-//
-//		return try! .init(
-//			mnemonicWithPassphrase: mnemonicWithPassphrase,
-//			factorSource: deviceFactorSource
-//		)
-		fatalError()
+		var bdfs = DeviceFactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, isMain: true)
+		bdfs.hint.model = model
+		bdfs.hint.name = name
+		bdfs.common.addedOn = .init(timeIntervalSince1970: 0)
+		bdfs.common.lastUsedOn = .init(timeIntervalSince1970: 0)
+		return Self(mnemonicWithPassphrase: mnemonicWithPassphrase, factorSource: bdfs)
 	}
 
 	static func testValue(
