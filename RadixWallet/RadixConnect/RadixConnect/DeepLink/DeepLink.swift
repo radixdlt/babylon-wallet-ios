@@ -83,10 +83,10 @@ extension Mobile2Mobile {
 
 		switch session.origin {
 		case let .webDapp(dAppOrigin):
-			let returnURL = URL(string: dAppOrigin.absoluteString + "#connect")?.appending(queryItems: [
+			let returnURL = dAppOrigin.appending(component: "connect").appending(queryItems: [
 				.init(name: "sessionId", value: sessionId.rawValue),
 			])
-			await openURL(returnURL!)
+			await openURL(returnURL)
 		}
 	}
 
