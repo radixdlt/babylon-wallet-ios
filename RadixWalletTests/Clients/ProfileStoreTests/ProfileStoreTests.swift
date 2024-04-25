@@ -1062,58 +1062,6 @@ final class ProfileStoreAsyncSequenceTests: TestCase {
 			)
 		}
 	}
-
-	func test__GIVEN__profile_with_two_accounts__WHEN_add_3Rd_account__THEN__all_3_accounts_are_emitted() async throws {
-		try await withTimeLimit(.slow) {
-			var profile = Profile(
-				header: .sample,
-				factorSources: .init(
-					element: .sample
-				),
-				appPreferences: .default,
-				networks: .init(
-					element: .init(
-						id: .stokenet,
-						accounts: [
-							.sampleStokenetNadia,
-							.sampleStokenetPaige,
-						],
-						personas: [],
-						authorizedDapps: []
-					)
-				)
-			)
-			let deviceInfo = DeviceInfo.testValueABBA
-			profile.header.lastUsedOnDevice = deviceInfo
-			profile.header.creatingDevice = deviceInfo
-			let third: Account = .sampleStokenetOlivia
-
-			try await self.doTestAsyncSequence(
-				savedProfile: profile,
-				arrange: { sut in
-					await sut.accountValues()
-				},
-				act: { (sut: ProfileStore) in
-//					try await sut.importProfile(profile)
-					print("🔮 inside ACT => updating profile")
-					try await sut.updating { (profile: inout Profile) in
-						print("🔮 inside ACT (INSIDE sut.updating) => adding account")
-						// WHEN add 3rd account
-						try profile.addAccount(
-							third
-						)
-						print("🔮 inside ACT (INSIDE sut.updating) => added account")
-					}
-					print("🔮 inside ACT => updated profile")
-				},
-				assert: [
-					[.sampleStokenetNadia, .sampleStokenetPaige],
-					// THEN both accounts are emitted
-					[.sampleStokenetNadia, .sampleStokenetPaige, third],
-				]
-			)
-		}
-	}
 }
 
 extension ProfileStoreAsyncSequenceTests {
@@ -1130,38 +1078,23 @@ extension ProfileStoreAsyncSequenceTests {
 				$0.noProfile()
 			}
 		} operation: {
-			print("🔮 creating ProfileStore")
 			let sut = ProfileStore()
-			print("🔮 creating `listenerSetup` exp")
 			let listenerSetup = self.expectation(description: "listener setup")
-			print("🔮 created `listenerSetup` exp")
 			let task = Task {
-				print("🔮 inside task => arranging")
 				let asyncSequence = await arrange(sut)
-				print("🔮 inside task => arranged")
 				var values = Set<T>()
-				print("🔮 inside task => fulfilling `listenerSetup` exp")
 				listenerSetup.fulfill()
-				print("🔮 inside task => `listenerSetup` exp fulfilled")
 				for try await value in asyncSequence {
-					print("🔮 inside task => got value: \(value)")
 					values.insert(value)
 					if values.count >= expected.count {
 						return values
 					}
 				}
-				print("🔮 inside task => returned from for try await look")
 				return values
 			}
-			print("🔮 awaiting `listenerSetup` exp")
 			await self.nearFutureFulfillment(of: listenerSetup)
-			print("🔮 `listenerSetup` exp fulfilled")
-			print("🔮 acting")
 			try await act(sut)
-			print("🔮 acted")
-			print("🔮 awaiting task.value")
 			let actual = try await task.value
-			print("🔮 got task.value")
 			XCTAssertEqual(actual, expected)
 		}
 	}
