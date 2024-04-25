@@ -145,16 +145,16 @@ private extension StoreOf<AccountPreferences> {
 private extension View {
 	func destination(store: StoreOf<AccountPreferences>) -> some View {
 		let destinationStore = store.destination
-		return showQRCode(with: destinationStore)
+		return adddresDetail(with: destinationStore)
 			.updateAccountLabel(with: destinationStore)
 			.thirdPartyDeposits(with: destinationStore)
 			.devAccountPreferences(with: destinationStore)
 			.confirmHideAccountAlert(with: destinationStore)
 	}
 
-	private func showQRCode(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.showQR, action: \.showQR)) {
-			ShowQR.View(store: $0)
+	private func adddresDetail(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.addressDetails, action: \.addressDetails)) {
+			AddressDetails.View(store: $0)
 		}
 	}
 

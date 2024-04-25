@@ -47,7 +47,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	public struct Destination: DestinationReducer {
 		@CasePathable
 		public enum State: Hashable, Sendable {
-			case showQR(ShowQR.State)
+			case addressDetails(AddressDetails.State)
 			case updateAccountLabel(UpdateAccountLabel.State)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.State)
 			case devPreferences(DevAccountPreferences.State)
@@ -56,7 +56,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 		@CasePathable
 		public enum Action: Equatable, Sendable {
-			case showQR(ShowQR.Action)
+			case addressDetails(AddressDetails.Action)
 			case updateAccountLabel(UpdateAccountLabel.Action)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
@@ -69,8 +69,8 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.showQR, action: /Action.showQR) {
-				ShowQR()
+			Scope(state: /State.addressDetails, action: /Action.addressDetails) {
+				AddressDetails()
 			}
 			Scope(state: /State.updateAccountLabel, action: /Action.updateAccountLabel) {
 				UpdateAccountLabel()
@@ -115,7 +115,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			.merge(with: state.isOnMainnet ? .none : loadIsAllowedToUseFaucet(&state))
 
 		case .qrCodeButtonTapped:
-			state.destination = .showQR(.init(address: .account(state.account.address, isLedgerHWAccount: state.account.isLedgerAccount)))
+			state.destination = .addressDetails(.init(address: .account(state.account.address, isLedgerHWAccount: state.account.isLedgerAccount)))
 			return .none
 
 		case let .rowTapped(row):
@@ -175,12 +175,12 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .showQR(.delegate(.dismiss)):
-			if case .showQR = state.destination {
+		case .addressDetails(.delegate(.dismiss)):
+			if case .addressDetails = state.destination {
 				state.destination = nil
 			}
 			return .none
-		case .showQR:
+		case .addressDetails:
 			return .none
 		case .updateAccountLabel(.delegate(.accountLabelUpdated)),
 		     .thirdPartyDeposits(.delegate(.accountUpdated)):

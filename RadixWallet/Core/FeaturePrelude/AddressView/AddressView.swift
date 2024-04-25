@@ -11,7 +11,7 @@ public struct AddressView: View {
 	@Dependency(\.pasteboardClient) var pasteboardClient
 	@Dependency(\.qrGeneratorClient) var qrGeneratorClient
 
-	@State private var detailAddress: LedgerIdentifiable.Address? = nil
+	@State private var sheet: Sheet?
 
 	public init(
 		_ identifiable: LedgerIdentifiable,
@@ -42,11 +42,18 @@ extension AddressView {
 			case let .address(address):
 				addressView
 					.onTapGesture {
-						self.detailAddress = address
+						let state = AddressDetails.State(address: address) {
+							self.sheet = nil
+						}
+						let store: StoreOf<AddressDetails> = .init(initialState: state) {
+							AddressDetails()
+						}
+						sheet = .details(store)
 					}
-					.sheet(item: $detailAddress) { address in
-						AddressDetailView(address: address) {
-							self.detailAddress = nil
+					.sheet(item: $sheet) { sheet in
+						switch sheet {
+						case let .details(store):
+							AddressDetails.View(store: store)
 						}
 					}
 			case .identifier:
@@ -130,6 +137,20 @@ extension AddressView {
 
 	private var path: String? {
 		identifiable.addressPrefix + "/" + identifiable.address
+	}
+}
+
+// MARK: AddressView.Sheet
+private extension AddressView {
+	enum Sheet: Identifiable {
+		case details(StoreOf<AddressDetails>)
+
+		var id: String {
+			switch self {
+			case .details:
+				"details"
+			}
+		}
 	}
 }
 
