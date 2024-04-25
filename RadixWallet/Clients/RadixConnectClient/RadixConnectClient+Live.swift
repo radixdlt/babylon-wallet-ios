@@ -5,6 +5,7 @@ import Network
 extension RadixConnectClient {
 	public static let liveValue: Self = {
 		@Dependency(\.p2pLinksClient) var p2pLinksClient
+		@Dependency(\.errorQueue) var errorQueue
 
 		let m2m = Mobile2Mobile()
 		let rtcClients = RTCClients()
@@ -100,7 +101,13 @@ extension RadixConnectClient {
 				try await rtcClients.sendRequest(request, strategy: strategy)
 			},
 			handleDappDeepLink: { request in
-				try await m2m.handleRequest(request)
+				do {
+					try await m2m.handleRequest(request)
+				} catch {
+					loggerGlobal.error("Failed to handle deep link \(error)")
+					errorQueue.schedule(error)
+					throw error
+				}
 			}
 		)
 	}()

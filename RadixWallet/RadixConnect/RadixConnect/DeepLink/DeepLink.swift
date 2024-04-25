@@ -34,9 +34,8 @@ extension Mobile2Mobile {
 		let wellKnown = try await httpClient.fetchDappWellKnownFile(dAppOrigin)
 		guard let returnURL = wellKnown.callbackPath else {
 			fatalError()
-			// throw Error.missingDappReturnURL
 		}
-		return .init(string: dAppOrigin.absoluteString + returnURL)! // dAppOrigin.appending(component: returnURL)
+		return dAppOrigin.appending(component: "connect")
 	}
 
 	func linkDapp(_ request: Request.DappLinking) async throws {
@@ -67,10 +66,7 @@ extension Mobile2Mobile {
 				.init(name: "sessionId", value: request.sessionId.rawValue),
 			])
 
-//			await overlayWindowClient.scheduleAlertAutoDimiss(.init(title: {
-//				.init("Verifying dApp link")
-//			}))
-
+			loggerGlobal.error("Deeplinking back")
 			await openURL(returnURL)
 		}
 	}
@@ -84,10 +80,6 @@ extension Mobile2Mobile {
 		}
 
 		try await radixConnectRelay.sendResponse(response, session)
-		let intId = switch response {
-		case let .dapp(response):
-			response.id.rawValue
-		}
 
 		switch session.origin {
 		case let .webDapp(dAppOrigin):

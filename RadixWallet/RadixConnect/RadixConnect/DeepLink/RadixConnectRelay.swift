@@ -52,17 +52,34 @@ extension RadixConnectRelay {
 				urlRequest.httpBody = try JSONEncoder().encode(body)
 				urlRequest.httpMethod = "POST"
 
-				let response = try await httpClient.executeRequest(urlRequest)
-				let content = try JSONDecoder().decode([HexCodable].self, from: response)
+				let retries = 5
+				var attempts = 0
 
-				return try content.map {
-					try encryptionScheme.decrypt(data: $0.data, decryptionKey: .init(data: session.encryptionKey.data.data))
-				}.map {
-					try JSONDecoder().decode(
-						P2P.RTCMessageFromPeer.Request.self,
-						from: $0
-					)
+				while attempts < retries {
+					do {
+						let response = try await httpClient.executeRequest(urlRequest)
+						let content = try JSONDecoder().decode([HexCodable].self, from: response)
+
+						return try content.map {
+							try encryptionScheme.decrypt(data: $0.data, decryptionKey: .init(data: session.encryptionKey.data.data))
+						}.map {
+							try JSONDecoder().decode(
+								P2P.RTCMessageFromPeer.Request.self,
+								from: $0
+							)
+						}
+					} catch {
+						print("retrying")
+						attempts += 1
+						if attempts < retries {
+							try await Task.sleep(for: .seconds(1))
+						} else {
+							throw error // Re-throw the last error after the last attempt
+						}
+					}
 				}
+				fatalError("Should not happen")
+
 			},
 			sendResponse: { response, session in
 				let encodedResponse = try JSONEncoder().encode(response)
@@ -91,18 +108,39 @@ extension RadixConnectRelay {
 				urlRequest.httpBody = try JSONEncoder().encode(body)
 				urlRequest.httpMethod = "POST"
 
-				let response = try await httpClient.executeRequest(urlRequest)
-				let content = try JSONDecoder().decode(HandshakeRequest.self, from: response)
+				let retries = 5
+				var attempts = 0
 
-				return try Session.PeerPublicKey(rawRepresentation: content.publicKey.data.data)
+				while attempts < retries {
+					do {
+						loggerGlobal.error("executing get hadnshake request \(urlRequest.debugDescription)")
+						let response = try await httpClient.executeRequest(urlRequest)
+						let content = try JSONDecoder().decode(HandshakeRequest.self, from: response)
+
+						loggerGlobal.error("response received after \(attempts) retries")
+
+						return try Session.PeerPublicKey(rawRepresentation: content.publicKey.data.data)
+					} catch {
+						print("retrying")
+						attempts += 1
+						if attempts < retries {
+							try await Task.sleep(for: .seconds(1))
+						} else {
+							loggerGlobal.error("Bailling out")
+							throw error // Re-throw the last error after the last attempt
+						}
+					}
+				}
+				fatalError("Should not happen")
 			},
 			sendHandshakeResponse: { id, key in
 				let body = try Request.sendHandshakeResponse(sessionId: id, publicKey: key)
 				var urlRequest = URLRequest(url: serviceURL)
 				urlRequest.httpBody = try JSONEncoder().encode(body)
 				urlRequest.httpMethod = "POST"
-
+				loggerGlobal.error("executing send handhsake response\(urlRequest.debugDescription)")
 				_ = try await httpClient.executeRequest(urlRequest)
+				loggerGlobal.error("Executed send handshake response")
 			}
 		)
 	}
