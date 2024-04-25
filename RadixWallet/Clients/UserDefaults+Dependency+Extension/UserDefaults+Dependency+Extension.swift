@@ -9,6 +9,7 @@ public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case transactionsCompletedCounter
 	case dateOfLastSubmittedNPSSurvey
 	case npsSurveyUserID
+	case lastSyncedAccountsWithCE
 
 	/// DO NOT CHANGE THIS KEY
 	case activeProfileID
@@ -136,5 +137,13 @@ extension UserDefaults.Dependency {
 
 	public func setNPSSurveyUserId(_ id: UUID) {
 		set(id.uuidString, forKey: Key.npsSurveyUserID.rawValue)
+	}
+
+	public func getLastSyncedAccountsWithCE() -> String? {
+		string(forKey: Key.lastSyncedAccountsWithCE.rawValue)
+	}
+
+	public func setLastSyncedAccountsWithCE(_ value: String) {
+		set(value, forKey: Key.lastSyncedAccountsWithCE.rawValue)
 	}
 }
