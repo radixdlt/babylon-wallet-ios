@@ -70,7 +70,7 @@ extension SecurityCenter {
 	}
 
 	struct ProblemView: SwiftUI.View {
-		let problem: Problem
+		let problem: SecurityProblem
 		let action: () -> Void
 
 		var body: some SwiftUI.View {
@@ -113,7 +113,7 @@ extension SecurityCenter {
 			}
 		}
 
-		func heading(for problem: Problem) -> String {
+		func heading(for problem: SecurityProblem) -> String {
 			switch problem {
 			case let .problem3(accounts, personas): L10n.SecurityCenter.Problem3.heading(accounts, personas)
 			case .problem5: L10n.SecurityCenter.Problem5.heading
@@ -123,7 +123,7 @@ extension SecurityCenter {
 			}
 		}
 
-		func text(for problem: Problem) -> String {
+		func text(for problem: SecurityProblem) -> String {
 			switch problem {
 			case .problem3: L10n.SecurityCenter.Problem3.text
 			case .problem5: L10n.SecurityCenter.Problem5.text

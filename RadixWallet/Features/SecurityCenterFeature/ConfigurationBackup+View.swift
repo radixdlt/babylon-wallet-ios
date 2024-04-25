@@ -20,6 +20,13 @@ extension ConfigurationBackup {
 							.textStyle(.body1Header)
 							.padding(.bottom, .medium2)
 
+						VStack(alignment: .leading, spacing: .medium3) {
+							ForEach(viewStore.problems) { problem in
+								ProblemView(problem: problem)
+							}
+						}
+						.padding(.bottom, .medium3)
+
 						let backupsEnabled = viewStore.binding(get: \.automatedBackupsEnabled) { .view(.toggleAutomatedBackups($0)) }
 						AutomatedBackupView(
 							backupsEnabled: backupsEnabled,
@@ -43,6 +50,9 @@ extension ConfigurationBackup {
 					.padding(.horizontal, .medium2)
 				}
 			}
+			.onAppear {
+				store.send(.view(.onAppear))
+			}
 			.navigationBarTitleDisplayMode(.large)
 			.navigationTitle(L10n.ConfigurationBackup.title)
 		}
@@ -51,6 +61,43 @@ extension ConfigurationBackup {
 
 // MARK: - ConfigurationBackup.AutomatedBackupView
 extension ConfigurationBackup {
+	struct ProblemView: SwiftUI.View {
+		let problem: SecurityProblem
+
+		var body: some SwiftUI.View {
+			VStack(spacing: 0) {
+				HStack(spacing: 0) {
+					Image(.warningError)
+						.renderingMode(.template)
+						.resizable()
+						.frame(.smallest)
+						.padding(.trailing, .medium3)
+
+					Text(text(for: problem))
+						.multilineTextAlignment(.leading)
+						.textStyle(.body2HighImportance)
+
+					Spacer(minLength: .small1)
+				}
+				.foregroundStyle(.app.alert)
+				.padding(.vertical, .small1)
+				.padding(.horizontal, .medium3)
+				.background(.app.lightAlert)
+			}
+			.roundedCorners(radius: .small1)
+		}
+
+		func text(for problem: SecurityProblem) -> String {
+			switch problem {
+			case .problem3: L10n.SecurityCenter.Problem3.text // FIXME: GK update strings
+			case .problem5: L10n.SecurityCenter.Problem5.text
+			case .problem6: L10n.SecurityCenter.Problem6.text
+			case .problem7: L10n.SecurityCenter.Problem7.text
+			case .problem9: L10n.SecurityCenter.Problem9.text
+			}
+		}
+	}
+
 	struct AutomatedBackupView: SwiftUI.View {
 		@Binding var backupsEnabled: Bool
 		let lastBackedUp: Date?
@@ -72,9 +119,11 @@ extension ConfigurationBackup {
 										.textStyle(.body1Header)
 										.foregroundStyle(.app.gray1)
 
-									Text(lastBackedUpString)
-										.textStyle(.body2Regular)
-										.foregroundStyle(.app.gray2)
+									if backupsEnabled, let lastBackedUpString {
+										Text(lastBackedUpString)
+											.textStyle(.body2Regular)
+											.foregroundStyle(.app.gray2)
+									}
 								}
 							}
 						}
@@ -122,20 +171,20 @@ extension ConfigurationBackup {
 			}
 		}
 
-		private var lastBackedUpString: String {
-			if let lastBackedUp {
-				let time = lastBackedUp.timeIntervalSinceNow
-				return L10n.ConfigurationBackup.Automated.lastBackup("3 min")
-			} else {
-				return ""
-			}
+		private var lastBackedUpString: String? {
+			guard let lastBackedUp else { return nil }
+			let timeInterval = formatter.string(from: -lastBackedUp.timeIntervalSinceNow)
+			return L10n.ConfigurationBackup.Automated.lastBackup(timeInterval ?? "----")
 		}
 
-		private let formatter = {
+		private let formatter = { // FIXME: GK
 			let formatter = DateComponentsFormatter()
 			formatter.unitsStyle = .brief
+			formatter.allowedUnits = [.second, .minute, .hour, .day, .month, .year]
+			formatter.zeroFormattingBehavior = .dropAll
+			formatter.maximumUnitCount = 1
 			return formatter
-		}
+		}()
 
 		struct ItemView: SwiftUI.View {
 			@SwiftUI.State private var expanded: Bool = false
@@ -307,8 +356,8 @@ public struct CloudBackupFeature: FeatureReducer {
 			return .run { _ in
 				let profiles = try await cloudBackupClient.queryAllProfiles()
 				print("•• got \(profiles.count) profiles")
-			} catch: { _, _ in
-				print("•• got no profiles, only error")
+			} catch: { error, _ in
+				print("•• got no profiles, only error: \(error)")
 			}
 
 		case .deleteProfileTapped:
