@@ -250,7 +250,6 @@ import DependenciesAdditions
 
 // MARK: - CloudBackupFeature
 public struct CloudBackupFeature: FeatureReducer {
-	@ObservableState
 	public struct State: Hashable {
 		var fetchingProfile: Bool = false
 		var isUploadingProfileBackup: Bool = false
@@ -261,6 +260,7 @@ public struct CloudBackupFeature: FeatureReducer {
 
 	public enum ViewAction: Hashable, Sendable {
 		case task
+		case uploadProfile
 		case addDummyAccount
 		case checkAllOldProfiles
 		case checkAllNewProfiles
@@ -296,13 +296,20 @@ public struct CloudBackupFeature: FeatureReducer {
 //			return uploadProfileBackup(&state)
 			return .none
 
+		case .uploadProfile:
+			return uploadProfile(&state)
+
 		case .checkAllOldProfiles:
 
 			return .none
 
 		case .checkAllNewProfiles:
-
-			return .none
+			return .run { _ in
+				let profiles = try await cloudBackupClient.queryAllProfiles()
+				print("•• got \(profiles.count) profiles")
+			} catch: { _, _ in
+				print("•• got no profiles, only error")
+			}
 
 		case .deleteProfileTapped:
 			userDefaults.removeValue(forKey: "activeProfile")
@@ -365,13 +372,16 @@ public struct CloudBackupFeature: FeatureReducer {
 
 	private func uploadProfile(_ state: inout State) -> Effect<Action> {
 		state.isUploadingProfileBackup = true
-		return .run { _ in
+		return .run { send in
 			let profile = await ProfileStore.shared.profile
 			print("•• got profile: \(profile.id.uuidString)")
-			let result = await TaskResult {
+			let result: TaskResult<CKRecord> = await TaskResult {
 				try await cloudBackupClient.uploadProfile(profile)
 			}
-			//			await send(.profileUploadResult(result))
+
+			print("•• uploading profile: \(profile.id.uuidString)")
+
+			await send(.internal(.profileUploadResult(result)))
 		}
 	}
 }
@@ -382,63 +392,75 @@ extension CloudBackupFeature {
 		let store: StoreOf<CloudBackupFeature>
 
 		public var body: some SwiftUI.View {
-			VStack {
-				HStack {
-					Text("iCloud status: ")
-					if let iCloudStatus = store.iCloudStatus {
-						Text(iCloudStatus)
-					} else {
-						ProgressView()
+			WithViewStore(store, observe: { $0 }) { viewStore in
+				VStack {
+					HStack {
+						Text("iCloud status: ")
+						if let iCloudStatus = viewStore.iCloudStatus {
+							Text(iCloudStatus)
+						} else {
+							ProgressView()
+						}
+						Spacer()
 					}
-					Spacer()
-				}
-				HStack {
-					Text("Last Backup: ")
-					if let lastBackupTime = store.lastBackupTime, !store.isUploadingProfileBackup {
-						Text(lastBackupTime)
-					} else {
-						ProgressView()
+					HStack {
+						Text("Last Backup: ")
+						if let lastBackupTime = viewStore.lastBackupTime, !viewStore.isUploadingProfileBackup {
+							Text(lastBackupTime)
+						} else {
+							ProgressView()
+						}
+						Spacer()
 					}
-					Spacer()
-				}
-				if store.fetchingProfile {
-					VStack {
-						ProgressView()
-						Text("Fetching profile from iCloud")
-					}
-				} else {
-					if store.isUploadingProfileBackup {
+					if viewStore.fetchingProfile {
 						VStack {
 							ProgressView()
-							Text("Uploading backup to iCloud")
+							Text("Fetching profile from iCloud")
 						}
+					} else {
+						if viewStore.isUploadingProfileBackup {
+							VStack {
+								ProgressView()
+								Text("Uploading backup to iCloud")
+							}
+						}
+
+						//					List(store.profile.accounts) {
+						//						Text($0.name)
+						//					}
+
+						Button("Add dummy account") {
+							store.send(.view(.addDummyAccount))
+						}
+						.buttonStyle(.borderedProminent)
+
+						Button("Upload profile") {
+							store.send(.view(.uploadProfile))
+						}
+						.buttonStyle(.borderedProminent)
+
+						Button("Check new profiles") {
+							store.send(.view(.checkAllNewProfiles))
+						}
+						.buttonStyle(.borderedProminent)
+
+						Button("Delete Profile") {
+							store.send(.view(.deleteProfileTapped))
+						}
+						.buttonStyle(.borderedProminent)
+
+						Button("Logout") {
+							store.send(.view(.logoutTapped))
+						}
+						.buttonStyle(.borderedProminent)
+
+						// Toggle("iCloud sync", isOn: .constant(true))
 					}
-
-//					List(store.profile.accounts) {
-//						Text($0.name)
-//					}
-
-					Button("Add dummy account") {
-						store.send(.view(.addDummyAccount))
-					}
-					.buttonStyle(.borderedProminent)
-
-					Button("Delete Profile") {
-						store.send(.view(.deleteProfileTapped))
-					}
-					.buttonStyle(.borderedProminent)
-
-					Button("Logout") {
-						store.send(.view(.logoutTapped))
-					}
-					.buttonStyle(.borderedProminent)
-
-					// Toggle("iCloud sync", isOn: .constant(true))
 				}
-			}
-			.padding()
-			.task {
-				store.send(.view(.task))
+				.padding()
+				.task {
+					store.send(.view(.task))
+				}
 			}
 		}
 	}
