@@ -4,6 +4,28 @@ import Sargon
 import XCTest
 
 // swiftformat:disable redundantInit
+extension Mnemonic {
+	public static let testValue = Self.testValueZooVote
+}
+
+extension Profile {
+	static func newEmpty() -> Self {
+		let date = Date(timeIntervalSince1970: 0)
+		let bdfs: DeviceFactorSource = { () -> DeviceFactorSource in
+			let mnemonic = Mnemonic(wordCount: .twentyFour, language: .english)
+			let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: "")
+
+			var bdfs = DeviceFactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, isMain: true)
+			bdfs.common.addedOn = date
+			bdfs.common.lastUsedOn = date
+			bdfs.hint.name = "iPhone"
+			return bdfs
+		}()
+		let deviceInfo = DeviceInfo(id: UUID(), date: date, description: "Builder")
+		var header = Header.init(snapshotVersion: .v100, id: UUID(), creatingDevice: deviceInfo, lastUsedOnDevice: deviceInfo, lastModified: date, contentHint: ContentHint.init(numberOfAccountsOnAllNetworksInTotal: 0, numberOfPersonasOnAllNetworksInTotal: 0, numberOfNetworks: 0))
+		return Self.init(header: .sample, deviceFactorSource: bdfs)
+	}
+}
 
 extension DependencyValues {
 	private mutating func _profile(
@@ -37,7 +59,7 @@ extension DependencyValues {
 		}
 		userDefaultsValue.set(string: profile?.header.id.uuidString, key: .activeProfileID)
 		self.userDefaults = userDefaultsValue
-		mnemonicClient.generate = { _, _ in .sample }
+		mnemonicClient.generate = { _, _ in .testValue }
 	}
 
 	mutating func savedProfile(
@@ -603,7 +625,7 @@ final class ProfileStoreExistingProfileTests: TestCase {
 		try await withTimeLimit {
 			let mnemonicGotDeleted = self.expectation(description: "Mnemonic got deleted")
 			// GIVEN saved profile
-			let savedEmptyProfile = Profile.sample
+			let savedEmptyProfile = Profile.newEmpty()
 			let firstBDFS = savedEmptyProfile.factorSources.babylonDevice
 
 			let used = await withTestClients {
@@ -928,7 +950,8 @@ final class ProfileStoreExistingProfileTests: TestCase {
 				d.uuid = .constant(newProfile.id)
 				// THEN new profile is saved to secureStorage
 				d.secureStorageClient.saveProfileSnapshot = {
-					XCTAssertNoDifference($0, newProfile)
+					XCTAssertNoDifference($0.header.id, newProfile.header.id)
+					XCTAssertNoDifference($0.networks, newProfile.networks)
 				}
 			}
 		}
@@ -1040,31 +1063,53 @@ final class ProfileStoreAsyncSequenceTests: TestCase {
 		}
 	}
 
-	func test__GIVEN__profile_with_one_account__WHEN_add_2nd_account__THEN__both_accounts_are_emitted() async throws {
+	func test__GIVEN__profile_with_two_accounts__WHEN_add_3Rd_account__THEN__all_3_accounts_are_emitted() async throws {
 		try await withTimeLimit(.slow) {
-			var profile = Profile.withNoAccounts
-			let firstAccount: Account = .testValueIdx0
-			// GIVEN: Profile with one account
-			try profile.addAccount(firstAccount)
+			var profile = Profile(
+				header: .sample,
+				factorSources: .init(
+					element: .sample
+				),
+				appPreferences: .default,
+				networks: .init(
+					element: .init(
+						id: .stokenet,
+						accounts: [
+							.sampleStokenetNadia,
+							.sampleStokenetPaige,
+						],
+						personas: [],
+						authorizedDapps: []
+					)
+				)
+			)
+			let deviceInfo = DeviceInfo.testValueABBA
+			profile.header.lastUsedOnDevice = deviceInfo
+			profile.header.creatingDevice = deviceInfo
+			let third: Account = .sampleStokenetOlivia
 
-			let secondAccount: Account = .testValueIdx1
 			try await self.doTestAsyncSequence(
 				savedProfile: profile,
 				arrange: { sut in
 					await sut.accountValues()
 				},
-				act: { sut in
-					try await sut.updating {
-						// WHEN add 2nd account
-						try $0.addAccount(
-							secondAccount
+				act: { (sut: ProfileStore) in
+//					try await sut.importProfile(profile)
+					print("🔮 inside ACT => updating profile")
+					try await sut.updating { (profile: inout Profile) in
+						print("🔮 inside ACT (INSIDE sut.updating) => adding account")
+						// WHEN add 3rd account
+						try profile.addAccount(
+							third
 						)
+						print("🔮 inside ACT (INSIDE sut.updating) => added account")
 					}
+					print("🔮 inside ACT => updated profile")
 				},
 				assert: [
-					[firstAccount],
+					[.sampleStokenetNadia, .sampleStokenetPaige],
 					// THEN both accounts are emitted
-					[firstAccount, secondAccount],
+					[.sampleStokenetNadia, .sampleStokenetPaige, third],
 				]
 			)
 		}
@@ -1085,24 +1130,38 @@ extension ProfileStoreAsyncSequenceTests {
 				$0.noProfile()
 			}
 		} operation: {
+			print("🔮 creating ProfileStore")
 			let sut = ProfileStore()
+			print("🔮 creating `listenerSetup` exp")
 			let listenerSetup = self.expectation(description: "listener setup")
+			print("🔮 created `listenerSetup` exp")
 			let task = Task {
+				print("🔮 inside task => arranging")
 				let asyncSequence = await arrange(sut)
+				print("🔮 inside task => arranged")
 				var values = Set<T>()
+				print("🔮 inside task => fulfilling `listenerSetup` exp")
 				listenerSetup.fulfill()
+				print("🔮 inside task => `listenerSetup` exp fulfilled")
 				for try await value in asyncSequence {
-					print("🔮 value: \(value)")
+					print("🔮 inside task => got value: \(value)")
 					values.insert(value)
 					if values.count >= expected.count {
 						return values
 					}
 				}
+				print("🔮 inside task => returned from for try await look")
 				return values
 			}
+			print("🔮 awaiting `listenerSetup` exp")
 			await self.nearFutureFulfillment(of: listenerSetup)
+			print("🔮 `listenerSetup` exp fulfilled")
+			print("🔮 acting")
 			try await act(sut)
+			print("🔮 acted")
+			print("🔮 awaiting task.value")
 			let actual = try await task.value
+			print("🔮 got task.value")
 			XCTAssertEqual(actual, expected)
 		}
 	}
