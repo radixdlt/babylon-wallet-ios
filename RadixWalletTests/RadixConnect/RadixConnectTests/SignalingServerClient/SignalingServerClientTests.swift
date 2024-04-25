@@ -33,7 +33,7 @@ final class SignalingClientTests: TestCase {
 		id: remoteClientId
 	)
 
-	static let encryptionKey = try! SignalingClient.EncryptionKey(rawValue: .init(data: .deadbeef32Bytes))
+	static let encryptionKey = try! SignalingClient.EncryptionKey(rawValue: .sample)
 
 	var jsonDecoder: JSONDecoder = {
 		let decoder = JSONDecoder()
