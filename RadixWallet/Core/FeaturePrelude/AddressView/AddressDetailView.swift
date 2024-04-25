@@ -76,11 +76,9 @@ struct AddressDetailView: View {
 	}
 
 	private var colorisedAddress: some View {
-		// TODO: The logic to return the colorised part should come from Sargon.
-		let content = address.address.dropFirst(5).dropLast(6)
-
+		let middle = address.formatted(.middle)
 		var attributedStr = AttributedString(address.address, foregroundColor: .app.gray1)
-		if let range = attributedStr.range(of: content) {
+		if let range = attributedStr.range(of: middle) {
 			attributedStr[range].foregroundColor = .app.gray2
 		}
 		return Text(attributedStr)
