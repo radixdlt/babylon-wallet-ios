@@ -26,6 +26,7 @@
 		4827520A2BDA5A2B007854E0 /* ImportLegacyWalletClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2F02ADEBFB300A38425 /* ImportLegacyWalletClientTests.swift */; };
 		4827520B2BDA5C6D007854E0 /* SignalingServerClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA25D2ADEBFB200A38425 /* SignalingServerClientTests.swift */; };
 		4827520C2BDA5CA5007854E0 /* GatewaySettingsFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2832ADEBFB200A38425 /* GatewaySettingsFeatureTests.swift */; };
+		4827520D2BDA5E13007854E0 /* SplashFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2902ADEBFB300A38425 /* SplashFeatureTests.swift */; };
 		483A3DE42BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483A3DE32BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift */; };
 		483A3DE62BD2678900055932 /* Stage1MigrateToSargon+FactorSourceCryptoParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483A3DE52BD2678900055932 /* Stage1MigrateToSargon+FactorSourceCryptoParameters.swift */; };
 		483A3DE92BD31CB700055932 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 483A3DE82BD31CB700055932 /* Sargon */; };
@@ -6544,6 +6545,7 @@
 				E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */,
 				E6DBA3212ADEBFB300A38425 /* WebSocketClientMock.swift in Sources */,
 				482752032BD993DF007854E0 /* SecureStorageClientTests.swift in Sources */,
+				4827520D2BDA5E13007854E0 /* SplashFeatureTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
