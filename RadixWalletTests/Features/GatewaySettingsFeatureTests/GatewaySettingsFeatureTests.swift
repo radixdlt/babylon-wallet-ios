@@ -17,18 +17,19 @@ final class GatewaySettingsFeatureTests: TestCase {
 
 	func test_whenViewAppeared_thenCurrentGatewayAndGatewayListIsLoaded() async throws {
 		// given
-		let otherGateways: IdentifiedArrayOf<Gateway> = [.stokenet, .rcnet].asIdentified()
+		let otherGateways: OtherGateways = [.stokenet, .ansharnet]
 		let currentGateway: Gateway = .mainnet
 		let gateways = try! Gateways(
 			current: currentGateway,
 			other: otherGateways
 		)
+
 		let store = TestStore(
 			initialState: GatewaySettings.State(),
 			reducer: GatewaySettings.init
 		) {
 			$0.gatewaysClient.getAllGateways = {
-				.init(rawValue: otherGateways)!
+				otherGateways.elements
 			}
 			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([
 				try! .init(current: currentGateway, other: otherGateways),
@@ -41,7 +42,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		await store.receive(.internal(.gatewaysLoadedResult(.success(gateways)))) {
 			// then
 			$0.gatewayList = .init(gateways: .init(
-				uniqueElements: gateways.all.elements.map {
+				uniqueElements: gateways.all.map {
 					GatewayRow.State(
 						gateway: $0,
 						isSelected: gateways.current.id == $0.id,
@@ -65,7 +66,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		}
 		store.exhaustivity = .off
 		let gatewayToBeDeleted = GatewayRow.State(
-			gateway: .previewValue,
+			gateway: .sample,
 			isSelected: false,
 			canBeDeleted: true
 		)
@@ -79,10 +80,14 @@ final class GatewaySettingsFeatureTests: TestCase {
 
 	func test_whenNonCurrentGatewayRemovalIsConfirmed_removeGateway() async throws {
 		// given
-		let gatewayToBeDeleted = GatewayRow.State(gateway: .rcnet, isSelected: false, canBeDeleted: true)
-		let otherGateways: IdentifiedArrayOf<Gateway> = [.stokenet, .rcnet].asIdentified()
+		let gatewayToBeDeleted = GatewayRow.State(
+			gateway: .ansharnet,
+			isSelected: false,
+			canBeDeleted: true
+		)
+		let otherGateways: OtherGateways = [.stokenet, .ansharnet]
 		let currentGateway: Gateway = .mainnet
-		let otherAfterDeletion: IdentifiedArrayOf<Gateway> = [.stokenet].asIdentified()
+		let otherAfterDeletion: OtherGateways = [.stokenet]
 		let gateways = try! Gateways(
 			current: currentGateway,
 			other: otherGateways
@@ -96,7 +101,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		initialState.destination = .removeGateway(.removeGateway(row: gatewayToBeDeleted))
 		initialState.currentGateway = currentGateway
 		initialState.gatewayList = .init(gateways: .init(
-			uniqueElements: gateways.all.elements.map {
+			uniqueElements: gateways.all.map {
 				GatewayRow.State(
 					gateway: $0,
 					isSelected: gateways.current.id == $0.id,
@@ -115,15 +120,15 @@ final class GatewaySettingsFeatureTests: TestCase {
 			}
 			$0.gatewaysClient.getAllGateways = {
 				if await isGatewayRemoved.value == true {
-					.init(rawValue: .init(uniqueElements: otherAfterDeletion))!
+					otherAfterDeletion.elements
 				} else {
-					.init(rawValue: .init(uniqueElements: otherGateways))!
+					otherGateways.elements
 				}
 			}
 			$0.gatewaysClient.gatewaysValues = {
 				let gateways = await isGatewayRemoved.value ? otherAfterDeletion : otherGateways
 				return AsyncLazySequence([
-					try! .init(current: currentGateway, other: .init(uniqueElements: gateways)),
+					try! .init(current: currentGateway, other: gateways),
 				]).eraseToAnyAsyncSequence()
 			}
 
@@ -141,7 +146,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		await store.send(.internal(.gatewaysLoadedResult(.success(gatewaysAfterDeletion)))) {
 			// then
 			$0.gatewayList = .init(gateways: .init(
-				uniqueElements: gatewaysAfterDeletion.all.elements.map {
+				uniqueElements: gatewaysAfterDeletion.all.map {
 					GatewayRow.State(
 						gateway: $0,
 						isSelected: gatewaysAfterDeletion.current.id == $0.id,
@@ -180,17 +185,17 @@ final class GatewaySettingsFeatureTests: TestCase {
 			initialState: initialState,
 			reducer: AddNewGateway.init
 		) {
-			$0.networkSwitchingClient.validateGatewayURL = { _ in .previewValue }
+			$0.networkSwitchingClient.validateGatewayURL = { _ in .sample }
 			$0.gatewaysClient.addGateway = { _ in }
 			$0.gatewaysClient.getAllGateways = {
-				.init(rawValue: .init(uniqueElements: allGateways))!
+				allGateways
 			}
 		}
 		store.exhaustivity = .off
 
 		// when
 		await store.send(.view(.addNewGatewayButtonTapped))
-		await store.receive(.internal(.gatewayValidationResult(.success(.previewValue))))
+		await store.receive(.internal(.gatewayValidationResult(.success(.sample))))
 		await store.receive(.internal(.addGatewayResult(.success(.instance))))
 		await store.receive(.delegate(.dismiss))
 	}
