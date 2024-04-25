@@ -18,29 +18,21 @@ extension P2PLinksClient: DependencyKey {
 			},
 			deleteP2PLinkByPassword: { password in
 				try secureStorageClient.updatingP2PLinks {
-					try $0.links
-						.filter { $0.connectionPassword == password }
-						.forEach {
-							try secureStorageClient.deleteP2PLinkPrivateKey($0.publicKey)
-						}
 					$0.links.removeAll(where: { $0.connectionPassword == password })
 				}
 			},
 			deleteAllP2PLinks: {
 				try secureStorageClient.updatingP2PLinks {
-					try $0.links.forEach {
-						try secureStorageClient.deleteP2PLinkPrivateKey($0.publicKey)
-					}
 					$0.links.removeAll()
 				}
 			},
-			getP2PLinkPrivateKey: { publicKey in
-				let privateKey = try secureStorageClient.loadP2PLinkPrivateKey(publicKey)
+			getP2PLinkPrivateKey: {
+				let privateKey = try secureStorageClient.loadP2PLinksPrivateKey()
 				let isNew = privateKey == nil
 				return (privateKey ?? Curve25519.PrivateKey(), isNew)
 			},
-			storeP2PLinkPrivateKey: { publicKey, privateKey in
-				try secureStorageClient.saveP2PLinkPrivateKey(publicKey, privateKey)
+			storeP2PLinkPrivateKey: { privateKey in
+				try secureStorageClient.saveP2PLinksPrivateKey(privateKey)
 			}
 		)
 	}

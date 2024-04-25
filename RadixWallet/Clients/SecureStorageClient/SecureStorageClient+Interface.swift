@@ -29,9 +29,8 @@ public struct SecureStorageClient: Sendable {
 	public var loadP2PLinks: LoadP2PLinks
 	public var saveP2PLinks: SaveP2PLinks
 
-	public var loadP2PLinkPrivateKey: LoadP2PLinkPrivateKey
-	public var saveP2PLinkPrivateKey: SaveP2PLinkPrivateKey
-	public var deleteP2PLinkPrivateKey: DeleteP2PLinkPrivateKey
+	public var loadP2PLinksPrivateKey: LoadP2PLinksPrivateKey
+	public var saveP2PLinksPrivateKey: SaveP2PLinksPrivateKey
 
 	#if DEBUG
 	public var getAllMnemonics: GetAllMnemonics
@@ -58,9 +57,8 @@ public struct SecureStorageClient: Sendable {
 		deleteDeprecatedDeviceID: @escaping DeleteDeprecatedDeviceID,
 		loadP2PLinks: @escaping LoadP2PLinks,
 		saveP2PLinks: @escaping SaveP2PLinks,
-		loadP2PLinkPrivateKey: @escaping LoadP2PLinkPrivateKey,
-		saveP2PLinkPrivateKey: @escaping SaveP2PLinkPrivateKey,
-		deleteP2PLinkPrivateKey: @escaping DeleteP2PLinkPrivateKey,
+		loadP2PLinksPrivateKey: @escaping LoadP2PLinksPrivateKey,
+		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey,
 		getAllMnemonics: @escaping GetAllMnemonics
 	) {
 		self.saveProfileSnapshot = saveProfileSnapshot
@@ -82,9 +80,8 @@ public struct SecureStorageClient: Sendable {
 		self.deleteDeprecatedDeviceID = deleteDeprecatedDeviceID
 		self.loadP2PLinks = loadP2PLinks
 		self.saveP2PLinks = saveP2PLinks
-		self.loadP2PLinkPrivateKey = loadP2PLinkPrivateKey
-		self.saveP2PLinkPrivateKey = saveP2PLinkPrivateKey
-		self.deleteP2PLinkPrivateKey = deleteP2PLinkPrivateKey
+		self.loadP2PLinksPrivateKey = loadP2PLinksPrivateKey
+		self.saveP2PLinksPrivateKey = saveP2PLinksPrivateKey
 		self.getAllMnemonics = getAllMnemonics
 	}
 	#else
@@ -109,9 +106,8 @@ public struct SecureStorageClient: Sendable {
 		deleteDeprecatedDeviceID: @escaping DeleteDeprecatedDeviceID,
 		loadP2PLinks: @escaping LoadP2PLinks,
 		saveP2PLinks: @escaping SaveP2PLinks,
-		loadP2PLinkPrivateKey: @escaping LoadP2PLinkPrivateKey,
-		saveP2PLinkPrivateKey: @escaping SaveP2PLinkPrivateKey,
-		deleteP2PLinkPrivateKey: @escaping DeleteP2PLinkPrivateKey
+		loadP2PLinksPrivateKey: @escaping LoadP2PLinksPrivateKey,
+		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey
 	) {
 		self.saveProfileSnapshot = saveProfileSnapshot
 		self.loadProfileSnapshotData = loadProfileSnapshotData
@@ -132,9 +128,8 @@ public struct SecureStorageClient: Sendable {
 		self.deleteDeprecatedDeviceID = deleteDeprecatedDeviceID
 		self.loadP2PLinks = loadP2PLinks
 		self.saveP2PLinks = saveP2PLinks
-		self.loadP2PLinkPrivateKey = loadP2PLinkPrivateKey
-		self.saveP2PLinkPrivateKey = saveP2PLinkPrivateKey
-		self.deleteP2PLinkPrivateKey = deleteP2PLinkPrivateKey
+		self.loadP2PLinksPrivateKey = loadP2PLinksPrivateKey
+		self.saveP2PLinksPrivateKey = saveP2PLinksPrivateKey
 	}
 	#endif // DEBUG
 }
@@ -178,9 +173,8 @@ extension SecureStorageClient {
 	public typealias LoadP2PLinks = @Sendable () throws -> P2PLinks?
 	public typealias SaveP2PLinks = @Sendable (P2PLinks) throws -> Void
 
-	public typealias LoadP2PLinkPrivateKey = @Sendable (Curve25519PublicKeyBytes) throws -> Curve25519.PrivateKey?
-	public typealias SaveP2PLinkPrivateKey = @Sendable (Curve25519PublicKeyBytes, Curve25519.PrivateKey) throws -> Void
-	public typealias DeleteP2PLinkPrivateKey = @Sendable (Curve25519PublicKeyBytes) throws -> Void
+	public typealias LoadP2PLinksPrivateKey = @Sendable () throws -> Curve25519.PrivateKey?
+	public typealias SaveP2PLinksPrivateKey = @Sendable (Curve25519.PrivateKey) throws -> Void
 
 	public enum LoadMnemonicPurpose: Sendable, Hashable, CustomStringConvertible {
 		case signTransaction
