@@ -6,42 +6,62 @@ import XCTest
 // MARK: - EntitiesHidingTests
 final class EntitiesHidingTests: TestCase {
 	let account0 = Account.sampleMainnet
-	let account1 = Account.sampleMainnetOther
+	let account1 = Account.sampleMainnetThird
 
 	let persona0 = Persona.sampleMainnet
-	let persona1 = Persona.sampleMainnetOther
+	let persona1 = Persona.sampleMainnetThird
 
-	lazy var sharedPersona0 = try! AuthorizedPersonaSimple(
+	lazy var sharedPersona0 = AuthorizedPersonaSimple(
 		identityAddress: persona0.address,
 		lastLogin: .now,
-		sharedAccounts: .init(ids: [account0.address, account1.address], forRequest: .atLeast(1)),
-		sharedPersonaData: .init()
+		sharedAccounts: .init(
+			request: .atLeast(
+				1
+			),
+			ids: [
+				account0,
+				account1,
+			].map(
+				\.address
+			)
+		),
+		sharedPersonaData: .default
 	)
 
-	lazy var sharedPersona1 = try! AuthorizedPersonaSimple(
+	lazy var sharedPersona1 = AuthorizedPersonaSimple(
 		identityAddress: persona1.address,
 		lastLogin: .now,
-		sharedAccounts: .init(ids: [account0.address, account1.address], forRequest: .atLeast(1)),
-		sharedPersonaData: .init()
+		sharedAccounts: .init(
+			request: .atLeast(
+				1
+			),
+			ids: [
+				account0,
+				account1,
+			].map(
+				\.address
+			)
+		),
+		sharedPersonaData: .default
 	)
 
-	lazy var dApp0 = try! AuthorizedDapp(
-		networkID: .mainnet,
-		dAppDefinitionAddress: try! .init(validatingAddress: "account_rdx12xsvygvltz4uhsht6tdrfxktzpmnl77r0d40j8agmujgdj022sudkk"),
+	lazy var dApp0 = AuthorizedDapp(
+		networkId: .mainnet,
+		dappDefinitionAddress: .sample,
 		displayName: "name 0",
 		referencesToAuthorizedPersonas: [sharedPersona0]
 	)
 
-	lazy var dApp1 = try! AuthorizedDapp(
-		networkID: .mainnet,
-		dAppDefinitionAddress: try! .init(validatingAddress: "account_rdx1283u6e8r2jnz4a3jwv0hnrqfr5aq50yc9ts523sd96hzfjxqqcs89q"),
+	lazy var dApp1 = AuthorizedDapp(
+		networkId: .mainnet,
+		dappDefinitionAddress: .sampleOther,
 		displayName: "name 1",
 		referencesToAuthorizedPersonas: [sharedPersona0, sharedPersona1]
 	)
 
-	lazy var network = try! ProfileNetwork(
-		networkID: .mainnet,
-		accounts: [account0, account1].asIdentified(),
+	lazy var network = ProfileNetwork(
+		id: .mainnet,
+		accounts: [account0, account1],
 		personas: [persona0, persona1],
 		authorizedDapps: [dApp0, dApp1]
 	)

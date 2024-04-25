@@ -49,17 +49,14 @@ extension ProfileNetwork {
 	}
 
 	public mutating func hideAccounts(ids idsOfAccountsToHide: Set<Account.ID>) {
-		var identifiedArrayOf = self.accounts
 		for id in idsOfAccountsToHide {
-			identifiedArrayOf[id: id]?.hide()
-
+			accounts[id: id]?.hide()
 			authorizedDapps.mutateAll { dapp in
 				dapp.referencesToAuthorizedPersonas.mutateAll { persona in
 					persona.sharedAccounts?.ids.removeAll(where: { $0 == id })
 				}
 			}
 		}
-		self.accounts = identifiedArrayOf
 	}
 
 	public func getPersonas() -> IdentifiedArrayOf<Persona> {
