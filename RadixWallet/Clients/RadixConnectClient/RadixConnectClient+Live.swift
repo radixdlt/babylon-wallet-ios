@@ -131,7 +131,7 @@ extension RadixConnectClient {
 			connectP2PLink: { p2pLink in
 				try await rtcClients.connect(p2pLink, waitsForConnectionToBeEstablished: true)
 
-				/// Clear `lastSyncedAccountsWithCE` after new connection is made, in order to send `AccountListMessage` to CE
+				/// Clear `lastSyncedAccountsWithCE` after a new connection is made, in order to send `AccountListMessage` to CE
 				userDefaults.remove(.lastSyncedAccountsWithCE)
 			},
 			receiveMessages: { await rtcClients.incomingMessages() },
