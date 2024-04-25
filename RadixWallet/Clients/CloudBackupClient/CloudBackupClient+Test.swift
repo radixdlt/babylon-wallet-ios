@@ -16,17 +16,19 @@ extension CloudBackupClient: TestDependencyKey {
 
 	public static let noop = Self(
 		checkAccountStatus: { throw NoopError() },
+		lastBackup: { _ in throw NoopError() },
 		queryProfile: { _ in throw NoopError() },
-		uploadProfile: { _ in throw NoopError() },
 		queryAllProfiles: { throw NoopError() },
+		uploadProfile: { _ in throw NoopError() },
 		deleteProfile: { _ in }
 	)
 
 	public static let testValue = Self(
 		checkAccountStatus: unimplemented("\(Self.self).checkAccountStatus"),
+		lastBackup: unimplemented("\(Self.self).lastBackup"),
 		queryProfile: unimplemented("\(Self.self).queryProfile"),
-		uploadProfile: unimplemented("\(Self.self).uploadProfile"),
 		queryAllProfiles: unimplemented("\(Self.self).queryAllProfiles"),
+		uploadProfile: unimplemented("\(Self.self).uploadProfile"),
 		deleteProfile: unimplemented("\(Self.self).deleteProfile")
 	)
 }
