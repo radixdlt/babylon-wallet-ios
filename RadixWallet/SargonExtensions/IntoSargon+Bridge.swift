@@ -6,16 +6,16 @@ import SargonUniFFI
 extension OnLedgerEntitiesClient.StakeClaim {
 	public func intoSargon() -> StakeClaim {
 		StakeClaim(
-			validatorAddress: self.validatorAddress,
-			resourceAddress: self.token.id.resourceAddress.asNonFungibleResourceAddress!,
-			ids: [self.id.nonFungibleLocalId],
-			amount: self.claimAmount.nominalAmount
+			validatorAddress: validatorAddress,
+			resourceAddress: token.id.resourceAddress.asNonFungibleResourceAddress!,
+			ids: [id.nonFungibleLocalId],
+			amount: claimAmount.nominalAmount
 		)
 	}
 }
 
 extension Curve25519.Signing.PublicKey {
 	func intoSargon() -> Ed25519PublicKey {
-		try! Ed25519PublicKey(bytes: self.compressedRepresentation)
+		try! Ed25519PublicKey(bytes: compressedRepresentation)
 	}
 }

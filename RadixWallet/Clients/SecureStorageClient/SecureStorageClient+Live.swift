@@ -124,7 +124,7 @@ extension SecureStorageClient: DependencyKey {
 			)
 		}
 
-		@Sendable func deleteProfileHeader(_ id: Profile.Header.ID) throws {
+		@Sendable func deleteProfileHeader(_ id: ProfileID) throws {
 			if let profileHeaders = try loadProfileHeaderList() {
 				let remainingHeaders = profileHeaders.filter { $0.id != id }
 				if remainingHeaders.isEmpty {
@@ -141,7 +141,7 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		@Sendable func deleteProfile(
-			_ id: Profile.Header.ID
+			_ id: ProfileID
 		) throws {
 			try keychainClient.removeData(forKey: id.keychainKey)
 			try deleteProfileHeader(id)
@@ -415,7 +415,7 @@ let profileHeaderListKeychainKey: KeychainClient.Key = "profileHeaderList"
 private let deviceIdentifierKey: KeychainClient.Key = "deviceIdentifier"
 private let deviceInfoKey: KeychainClient.Key = "deviceInfo"
 
-extension Profile.Header.ID {
+extension ProfileID {
 	private static let profileSnapshotKeychainKeyPrefix = "profileSnapshot"
 
 	var keychainKey: KeychainClient.Key {

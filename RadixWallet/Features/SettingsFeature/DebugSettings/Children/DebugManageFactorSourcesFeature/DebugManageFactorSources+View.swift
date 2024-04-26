@@ -43,11 +43,6 @@ extension DebugManageFactorSources {
 						viewStore.send(.addLedgerButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)
-
-					Button("Add `.offDevice` mnemonic") {
-						viewStore.send(.addOffDeviceMnemonicButtonTapped)
-					}
-					.buttonStyle(.primaryRectangular)
 				}
 				.padding([.horizontal, .bottom], .medium1)
 				.task { @MainActor in

@@ -779,7 +779,7 @@ extension DappInteractionFlow {
 			}()
 		)
 
-		let sharedAccounts: AuthorizedPersonaSimple.SharedAccounts? = if let (numberOfAccounts, accounts) = sharedAccountsInfo {
+		let sharedAccounts: SharedToDappWithPersonaAccountAddresses? = if let (numberOfAccounts, accounts) = sharedAccountsInfo {
 			.init(
 				request: numberOfAccounts,
 				ids: accounts.map(\.address)

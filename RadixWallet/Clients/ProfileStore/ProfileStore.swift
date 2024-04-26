@@ -178,7 +178,7 @@ extension ProfileStore {
 		}
 	}
 
-	private static func deleteEphemeralProfile(id: Profile.Header.ID) {
+	private static func deleteEphemeralProfile(id: ProfileID) {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		do {
 			try secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(

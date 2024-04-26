@@ -1,6 +1,11 @@
 import Foundation
 import Sargon
 
+// MARK: - Header + Identifiable
+extension Header: Identifiable {
+	public typealias ID = ProfileID
+}
+
 extension ProfileSnapshotVersion {
 	public static let minimum = Self(rawValue: 100)!
 }

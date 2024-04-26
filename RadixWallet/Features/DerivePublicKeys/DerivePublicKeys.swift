@@ -340,7 +340,7 @@ extension DerivePublicKeys {
 extension DerivePublicKeys {
 	private func withDerivationPath(
 		state: State,
-		hdFactorSource: some HDFactorSourceProtocol,
+		hdFactorSource: some BaseFactorSourceProtocol,
 		knownPaths deriveWithKnownDerivationPaths: @escaping @Sendable ([DerivationPath], NetworkID) async throws -> Action,
 		calculating calculatedDerivationPath: @escaping @Sendable (DerivationPath, NetworkID) -> Action
 	) -> Effect<Action> {

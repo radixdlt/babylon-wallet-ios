@@ -260,7 +260,7 @@ extension FactorSourcesClient {
 	}
 
 	public func addOnDeviceFactorSource(
-		onDeviceMnemonicKind: FactorSourceKindOfMnemonic.OnDeviceMnemonicKind,
+		onDeviceMnemonicKind: OnDeviceMnemonicKind,
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy,
 		saveIntoProfile: Bool
@@ -286,4 +286,10 @@ extension FactorSourcesClient {
 
 		return factorSource
 	}
+}
+
+// MARK: - OnDeviceMnemonicKind
+public enum OnDeviceMnemonicKind: Sendable, Hashable {
+	case babylon(isMain: Bool)
+	case olympia
 }

@@ -1,4 +1,5 @@
 import Foundation
+import OrderedCollections
 import Sargon
 
 extension FactorSourceCryptoParameters {
@@ -8,20 +9,20 @@ extension FactorSourceCryptoParameters {
 	/// DeviceFactorSource.
 	public mutating func append(_ other: Self) {
 		guard self != other else {
-			loggerGlobal.debug("NOOP, crypto parameters are the same.")
 			return
 		}
 		var curves = supportedCurves.elements
 		var derivationSchemes = supportedDerivationPathSchemes
 		curves.append(contentsOf: other.supportedCurves.elements)
 		derivationSchemes.append(contentsOf: other.supportedDerivationPathSchemes)
-		loggerGlobal.notice("🔮 `curves` BEFORE sorting: \(curves)")
-		curves = OrderedSet(uncheckedUniqueElements: curves.sorted(by: \.preference)).elements
-		loggerGlobal.notice("🔮 `curves` AFTER sorting: \(curves)")
 
-		loggerGlobal.notice("🔮 `derivationSchemes` BEFORE sorting: \(derivationSchemes)")
-		derivationSchemes = OrderedSet(uncheckedUniqueElements: derivationSchemes.sorted(by: \.preference)).elements
-		loggerGlobal.notice("🔮 `derivationSchemes` AFTER sorting: \(derivationSchemes)")
+		curves = OrderedSet(
+			uncheckedUniqueElements: curves.sorted(by: \.preference)
+		).elements
+
+		derivationSchemes = OrderedSet(
+			uncheckedUniqueElements: derivationSchemes.sorted(by: \.preference)
+		).elements
 
 		self.supportedCurves = try! .init(curves)
 		self.supportedDerivationPathSchemes = derivationSchemes

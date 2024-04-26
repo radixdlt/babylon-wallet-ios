@@ -1,3 +1,7 @@
+import Sargon
+
+public typealias DeviceID = UUID
+
 // MARK: - BackupsClient
 public struct BackupsClient: Sendable {
 	public var snapshotOfProfileForExport: SnapshotOfProfileForExport

@@ -256,27 +256,13 @@ extension PrivateHierarchicalDeterministicFactorSource {
 			)
 		}
 	}
-//
-//	func hdRoot(derivationPath: DerivationPath) throws -> HierarchicalDeterministicFactorInstance {
-//		let hdRoot = try mnemonicWithPassphrase.hdRoot()
-//
-//		let publicKey = try! hdRoot.derivePublicKey(
-//			path: derivationPath,
-//			curve: .curve25519
-//		)
-//
-//		return HierarchicalDeterministicFactorInstance(
-//			id: factorSource.id,
-//			publicKey: publicKey,
-//			derivationPath: derivationPath
-//		)
-//	}
 }
 
 private let deviceName: String = "iPhone"
 private let deviceModel: String = "iPhone"
-// private let expectedDeviceDescription = DeviceInfo(
-//	name: deviceName,
-//	model: deviceModel.rawValue
-// )
 private let expectedDeviceDescription = DeviceInfo.sample
+
+extension Mnemonic {
+	public static let testValueZooVote = try! Self(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote")
+	public static let testValueAbandonArt = try! Self(phrase: "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art")
+}

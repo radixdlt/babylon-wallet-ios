@@ -140,11 +140,11 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			}
 
 			public let onMnemonicExistsStrategy: OnMnemonicExistsStrategy
-			public let factorSourceKindOfMnemonic: FactorSourceKindOfMnemonic
+			public let factorSourceKindOfMnemonic: OnDeviceMnemonicKind
 			public let location: Location
 
 			public init(
-				factorSourceKindOfMnemonic: FactorSourceKindOfMnemonic,
+				factorSourceKindOfMnemonic: OnDeviceMnemonicKind,
 				location: Location,
 				onMnemonicExistsStrategy: OnMnemonicExistsStrategy
 			) {
@@ -500,26 +500,19 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 		switch persistStrategy.location {
 		case .intoKeychainAndProfile:
-			switch persistStrategy.factorSourceKindOfMnemonic {
-			case .offDevice:
-				assertionFailure("OffDeviceMnemonoic is not supported anymore. Will be moved into Sargon later.")
-				return .none
-
-			case let .onDevice(onDeviceKind):
-				return .run { send in
-					await send(.internal(.saveFactorSourceResult(
-						TaskResult {
-							let saveIntoProfile = true
-							let factorSource = try await factorSourcesClient.addOnDeviceFactorSource(
-								onDeviceMnemonicKind: onDeviceKind,
-								mnemonicWithPassphrase: mnemonicWithPassphrase,
-								onMnemonicExistsStrategy: persistStrategy.onMnemonicExistsStrategy,
-								saveIntoProfile: saveIntoProfile
-							)
-							return .init(factorSource: factorSource.asGeneral, savedIntoProfile: saveIntoProfile)
-						}
-					)))
-				}
+			return .run { send in
+				await send(.internal(.saveFactorSourceResult(
+					TaskResult {
+						let saveIntoProfile = true
+						let factorSource = try await factorSourcesClient.addOnDeviceFactorSource(
+							onDeviceMnemonicKind: persistStrategy.factorSourceKindOfMnemonic,
+							mnemonicWithPassphrase: mnemonicWithPassphrase,
+							onMnemonicExistsStrategy: persistStrategy.onMnemonicExistsStrategy,
+							saveIntoProfile: saveIntoProfile
+						)
+						return .init(factorSource: factorSource.asGeneral, savedIntoProfile: saveIntoProfile)
+					}
+				)))
 			}
 		}
 	}

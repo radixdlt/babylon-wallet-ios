@@ -82,7 +82,7 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 			let title = state.isOlympia ? L10n.AccountRecoveryScan.ChooseSeedPhrase.importMnemonicTitleOlympia : L10n.AccountRecoveryScan.ChooseSeedPhrase.importMnemonicTitleBabylon
 
 			let persistStrategy = ImportMnemonic.State.PersistStrategy(
-				factorSourceKindOfMnemonic: .onDevice(state.isOlympia ? .olympia : .babylon(isMain: false)),
+				factorSourceKindOfMnemonic: state.isOlympia ? .olympia : .babylon(isMain: false),
 				location: .intoKeychainAndProfile,
 				onMnemonicExistsStrategy: .appendWithCryptoParamaters
 			)
