@@ -142,10 +142,3 @@ extension AccountsClient {
 		try await saveVirtualAccounts([account])
 	}
 }
-
-// FIXME: Delete this TEMPORARY bridge, once Wallet uses Sargon Profile!
-extension AccountsClient {
-	public func fromSargon(_ sargonAccount: Account) async throws -> Account {
-		try await getAccountByAddress(sargonAccount.address)
-	}
-}

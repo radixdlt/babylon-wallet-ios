@@ -573,8 +573,10 @@ extension ProfileStore {
 		return try secureStorageClient.loadProfile(profileId)
 	}
 
-	private static func _tryGenerateAndSaveNewProfile(deviceInfo: DeviceInfo) throws -> Profile {
-		let (profile, bdfsMnemonic) = try _newProfileAndBDFSMnemonic(deviceInfo: deviceInfo)
+	private static func _tryGenerateAndSaveNewProfile(
+		deviceInfo: DeviceInfo
+	) throws -> Profile {
+		let (profile, bdfsMnemonic) = _newProfileAndBDFSMnemonic(deviceInfo: deviceInfo)
 		try _persist(bdfsMnemonic: bdfsMnemonic)
 		try _save(profile: profile)
 		return profile
@@ -591,7 +593,10 @@ extension ProfileStore {
 
 	private static func _newProfileAndBDFSMnemonic(
 		deviceInfo creatingDevice: DeviceInfo
-	) throws -> (profile: Profile, bdfsMnemonic: PrivateHierarchicalDeterministicFactorSource) {
+	) -> (
+		profile: Profile,
+		bdfsMnemonic: PrivateHierarchicalDeterministicFactorSource
+	) {
 		@Dependency(\.uuid) var uuid
 		@Dependency(\.date) var date
 		@Dependency(\.mnemonicClient) var mnemonicClient
@@ -610,14 +615,18 @@ extension ProfileStore {
 			)
 		)
 
-		let mnemonic = try MnemonicWithPassphrase(
+		let mnemonic = MnemonicWithPassphrase(
 			mnemonic: mnemonicClient.generate(
 				BIP39WordCount.twentyFour,
 				BIP39Language.english
-			), passphrase: ""
+			),
+			passphrase: ""
 		)
 
-		let bdfs = DeviceFactorSource.babylon(mnemonicWithPassphrase: mnemonic, isMain: true)
+		let bdfs = DeviceFactorSource.babylon(
+			mnemonicWithPassphrase: mnemonic,
+			isMain: true
+		)
 
 		let bdfsMnemonic = PrivateHierarchicalDeterministicFactorSource(
 			mnemonicWithPassphrase: mnemonic,

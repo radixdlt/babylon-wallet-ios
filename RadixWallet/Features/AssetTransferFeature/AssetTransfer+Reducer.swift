@@ -234,11 +234,10 @@ func useTryDepositOrAbort(
 	resource: ResourceAddress,
 	into receivingAccount: AccountOrAddressOf
 ) async throws -> Bool {
-	if case let .profileAccount(value: sargonUserAccount) = receivingAccount {
+	if case let .profileAccount(value: userAccount) = receivingAccount {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.accountsClient) var accountsClient
 
-		let userAccount = try await accountsClient.fromSargon(sargonUserAccount)
 		let needsSignatureForDepositing = await needsSignatureForDepositting(into: userAccount, resource: resource)
 		let isSoftwareAccount = !userAccount.isLedgerControlled
 		let userHasAccessToMnemonic = userAccount.deviceFactorSourceID.map { deviceFactorSourceID in

@@ -15,7 +15,7 @@ public struct MnemonicClient: Sendable {
 }
 
 extension MnemonicClient {
-	public typealias Generate = @Sendable (BIP39WordCount, BIP39Language) throws -> Mnemonic
+	public typealias Generate = @Sendable (BIP39WordCount, BIP39Language) -> Mnemonic
 	public typealias Import = @Sendable (String, BIP39Language?) throws -> Mnemonic
 	public typealias LookupWord = @Sendable (LookupRequest) -> BIP39LookupResult
 }
