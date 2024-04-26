@@ -17,8 +17,6 @@
 		4813AFFB2BC9B5A90046BCAD /* Stage2MigrateToSargpn+PersonaData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813AFFA2BC9B5A90046BCAD /* Stage2MigrateToSargpn+PersonaData.swift */; };
 		4813B0012BCA48CE0046BCAD /* Stage2MigrateToSargon+ProfileNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813B0002BCA48CE0046BCAD /* Stage2MigrateToSargon+ProfileNetwork.swift */; };
 		4813B0032BCA4FD60046BCAD /* Stage1MigrateToSargon+Persona.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4813B0022BCA4FD60046BCAD /* Stage1MigrateToSargon+Persona.swift */; };
-		482193212BDBC4F900435F3F /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 482193202BDBC4F900435F3F /* Sargon */; };
-		482193242BDBCC5900435F3F /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 482193232BDBCC5900435F3F /* Sargon */; };
 		482752032BD993DF007854E0 /* SecureStorageClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2F62ADEBFB300A38425 /* SecureStorageClientTests.swift */; };
 		482752042BD9951A007854E0 /* CustomizeFeePayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA2892ADEBFB200A38425 /* CustomizeFeePayerTests.swift */; };
 		482752052BD99606007854E0 /* FactorSourcesClientLiveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA3092ADEBFB300A38425 /* FactorSourcesClientLiveTests.swift */; };
@@ -36,8 +34,6 @@
 		4827521C2BDB9597007854E0 /* Persona+ShouldWriteDownMnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4827521B2BDB9597007854E0 /* Persona+ShouldWriteDownMnemonic.swift */; };
 		483A3DE42BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483A3DE32BD2658B00055932 /* Stage1MigrateToSargon+FactorSources.swift */; };
 		483A3DE62BD2678900055932 /* Stage1MigrateToSargon+FactorSourceCryptoParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483A3DE52BD2678900055932 /* Stage1MigrateToSargon+FactorSourceCryptoParameters.swift */; };
-		483A3DE92BD31CB700055932 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 483A3DE82BD31CB700055932 /* Sargon */; };
-		483A3DEC2BD31F5A00055932 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = 483A3DEB2BD31F5A00055932 /* Sargon */; };
 		484161412BCACDC700D2B644 /* Stage1MigrateToSargon+DepositAddressExceptionRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484161402BCACDC700D2B644 /* Stage1MigrateToSargon+DepositAddressExceptionRule.swift */; };
 		484161472BCAD2D700D2B644 /* Stage1MigrateToSargon+HierarchicalDeterministicPublicKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484161462BCAD2D700D2B644 /* Stage1MigrateToSargon+HierarchicalDeterministicPublicKey.swift */; };
 		4841614D2BCAD3D400D2B644 /* Stage1MigrateToSargon+MnemonicWithPassphrase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4841614C2BCAD3D400D2B644 /* Stage1MigrateToSargon+MnemonicWithPassphrase.swift */; };
@@ -2247,7 +2243,6 @@
 				48FFFABC2ADC209100B2B213 /* NukeExtensions in Frameworks */,
 				A41557502B757C5E0040AD4E /* ComposableArchitecture in Frameworks */,
 				48FFFAFD2ADC241A00B2B213 /* HeapModule in Frameworks */,
-				483A3DE92BD31CB700055932 /* Sargon in Frameworks */,
 				48FFFAD52ADC21B900B2B213 /* LegibleError in Frameworks */,
 				48FFFB082ADC6FD300B2B213 /* SwiftUINavigationCore in Frameworks */,
 				48FFFAD82ADC21D200B2B213 /* NonEmpty in Frameworks */,
@@ -2256,14 +2251,11 @@
 				48FFFAA52ADC1F9600B2B213 /* AsyncAlgorithms in Frameworks */,
 				48FFFAEA2ADC225B00B2B213 /* ScreenshotPreventing in Frameworks */,
 				48FFFAA82ADC1FBE00B2B213 /* Atomics in Frameworks */,
-				482193242BDBCC5900435F3F /* Sargon in Frameworks */,
 				48FFFAF02ADC229900B2B213 /* AnyCodable in Frameworks */,
 				48FFFAF52ADC241A00B2B213 /* BitCollections in Frameworks */,
 				48FFFABA2ADC209100B2B213 /* Nuke in Frameworks */,
 				48FFFAE42ADC222100B2B213 /* Validated in Frameworks */,
 				48FFFAED2ADC226B00B2B213 /* CodeScanner in Frameworks */,
-				483A3DEC2BD31F5A00055932 /* Sargon in Frameworks */,
-				482193212BDBC4F900435F3F /* Sargon in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6355,10 +6347,6 @@
 				A47571FE2B29B0860059A95D /* IOSSecuritySuite */,
 				A415574F2B757C5E0040AD4E /* ComposableArchitecture */,
 				5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */,
-				483A3DE82BD31CB700055932 /* Sargon */,
-				483A3DEB2BD31F5A00055932 /* Sargon */,
-				482193202BDBC4F900435F3F /* Sargon */,
-				482193232BDBCC5900435F3F /* Sargon */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -8294,23 +8282,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		482193202BDBC4F900435F3F /* Sargon */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Sargon;
-		};
-		482193232BDBCC5900435F3F /* Sargon */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 482193222BDBCC5900435F3F /* XCRemoteSwiftPackageReference "sargon" */;
-			productName = Sargon;
-		};
-		483A3DE82BD31CB700055932 /* Sargon */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Sargon;
-		};
-		483A3DEB2BD31F5A00055932 /* Sargon */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Sargon;
-		};
 		48FFFA982ADC1EEC00B2B213 /* AsyncExtensions */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFA972ADC1EEC00B2B213 /* XCRemoteSwiftPackageReference "AsyncExtensions" */;
