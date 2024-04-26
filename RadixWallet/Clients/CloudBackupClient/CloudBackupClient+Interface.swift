@@ -10,7 +10,7 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 	public let lastBackup: LastBackup
 	public let loadProfile: LoadProfile
 	public let loadAllProfiles: LoadAllProfiles
-	public let uploadProfile: UploadProfile
+	public let backupProfile: BackupProfile
 	public let deleteProfile: DeleteProfile
 
 	public init(
@@ -19,7 +19,7 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 		lastBackup: @escaping LastBackup,
 		loadProfile: @escaping LoadProfile,
 		loadAllProfiles: @escaping LoadAllProfiles,
-		uploadProfile: @escaping UploadProfile,
+		backupProfile: @escaping BackupProfile,
 		deleteProfile: @escaping DeleteProfile
 	) {
 		self.migrateKeychainProfiles = migrateKeychainProfiles
@@ -27,7 +27,7 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 		self.lastBackup = lastBackup
 		self.loadProfile = loadProfile
 		self.loadAllProfiles = loadAllProfiles
-		self.uploadProfile = uploadProfile
+		self.backupProfile = backupProfile
 		self.deleteProfile = deleteProfile
 	}
 }
@@ -38,6 +38,6 @@ extension CloudBackupClient {
 	public typealias LastBackup = @Sendable (UUID) async throws -> Date?
 	public typealias LoadProfile = @Sendable (UUID) async throws -> Profile?
 	public typealias LoadAllProfiles = @Sendable () async throws -> [Profile]
-	public typealias UploadProfile = @Sendable (Profile) async throws -> CKRecord
+	public typealias BackupProfile = @Sendable (Profile) async throws -> CKRecord
 	public typealias DeleteProfile = @Sendable (UUID) async throws -> Void
 }

@@ -20,7 +20,7 @@ extension CloudBackupClient: TestDependencyKey {
 		lastBackup: { _ in throw NoopError() },
 		loadProfile: { _ in throw NoopError() },
 		loadAllProfiles: { throw NoopError() },
-		uploadProfile: { _ in throw NoopError() },
+		backupProfile: { _ in throw NoopError() },
 		deleteProfile: { _ in }
 	)
 
@@ -30,7 +30,7 @@ extension CloudBackupClient: TestDependencyKey {
 		lastBackup: unimplemented("\(Self.self).lastBackup"),
 		loadProfile: unimplemented("\(Self.self).queryProfile"),
 		loadAllProfiles: unimplemented("\(Self.self).queryAllProfiles"),
-		uploadProfile: unimplemented("\(Self.self).uploadProfile"),
+		backupProfile: unimplemented("\(Self.self).uploadProfile"),
 		deleteProfile: unimplemented("\(Self.self).deleteProfile")
 	)
 }
