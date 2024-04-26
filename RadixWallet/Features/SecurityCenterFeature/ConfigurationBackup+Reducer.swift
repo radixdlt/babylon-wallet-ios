@@ -1,8 +1,10 @@
+import CloudKit
 import ComposableArchitecture
 
 public struct ConfigurationBackup: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var automatedBackupsEnabled: Bool = false
+		public var iCLoudAccountStatus: CKAccountStatus? = nil
+		public var automatedBackupsEnabled: Bool = true
 		public var problems: [SecurityProblem] = [.problem5]
 		public var lastBackup: Date? = nil
 
@@ -30,11 +32,31 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
+		case isCloudBackupEnabled(Bool)
+		case iCloudAccountStatus(CKAccountStatus)
 		case lastBackedUp(Date?)
 		case outdatedBackupDeleted(Profile.ID)
 	}
 
 	@Dependency(\.cloudBackupClient) var cloudBackupClient
+
+	private func checkCloudBackupEnabledEffect() -> Effect<Action> {
+		.run { send in
+			let profile = await ProfileStore.shared.profile
+			let networkProfile = try profile.network(id: profile.networkID)
+			let iCloudEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
+			await send(.internal(.isCloudBackupEnabled(iCloudEnabled)))
+		} catch: { _, _ in
+		}
+	}
+
+	private func checkCloudAccountStatusEffect() -> Effect<Action> {
+		.run { send in
+			let status = try await cloudBackupClient.checkAccountStatus()
+			await send(.internal(.iCloudAccountStatus(status)))
+		} catch: { _, _ in
+		}
+	}
 
 	private func updateLastBackupEffect() -> Effect<Action> {
 		.run { send in
@@ -90,6 +112,14 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 		case let .outdatedBackupDeleted(id):
 			// FIXME: GK - show alert? toast?
+			return .none
+
+		case let .isCloudBackupEnabled(isEnabled):
+			state.automatedBackupsEnabled = isEnabled
+			return .none
+
+		case let .iCloudAccountStatus(status):
+			state.iCLoudAccountStatus = status
 			return .none
 		}
 	}
