@@ -19,6 +19,10 @@ extension CloudBackupClient {
 
 	private static let container = CKContainer(identifier: "iCloud.com.radixpublishing.radixwallet.ios.dev.cloudBackup")
 
+	public func loadBackedUpProfileHeaderList() async -> ProfileSnapshot.HeaderList? {
+		try? await .init(rawValue: loadAllProfiles().map(\.header).asIdentified())
+	}
+
 	public static func live(
 		profileStore: ProfileStore = .shared
 	) -> CloudBackupClient {
