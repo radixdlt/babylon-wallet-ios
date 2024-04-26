@@ -94,13 +94,7 @@ extension AddressView {
 	}
 
 	private var image: Image {
-		let resource: ImageResource = switch identifiable {
-		case .address, .identifier(.nonFungibleGlobalID):
-			.copy
-		case .identifier(.transaction):
-			.iconLinkOut
-		}
-		return Image(resource)
+		Image(.copy)
 	}
 
 	private var copyText: String {
