@@ -8,9 +8,9 @@ extension PersonaData.Entry.Kind {
 		case .fullName:
 			L10n.AuthorizedDapps.PersonaDetails.fullName
 		case .emailAddress:
-			"Email Address"
+			L10n.AuthorizedDapps.PersonaDetails.emailAddress
 		case .phoneNumber:
-			"Phone Number"
+			L10n.AuthorizedDapps.PersonaDetails.phoneNumber
 		}
 	}
 }
