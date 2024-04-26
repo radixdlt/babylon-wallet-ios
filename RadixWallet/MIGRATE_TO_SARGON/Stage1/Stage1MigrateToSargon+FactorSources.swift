@@ -19,9 +19,8 @@ extension FactorSources {
 			throw FactorSourceWithIDNotFound()
 		}
 		try mutate(&factorSource)
-		var identifiedArrayOfFactorSources = self.asIdentified()
-		identifiedArrayOfFactorSources[id: id] = factorSource
-		self = try Self(identifiedArrayOfFactorSources.elements)
+		let updated = self.updateOrAppend(factorSource)
+		assert(updated != nil)
 	}
 
 	/// Babylon `device` factor source
@@ -29,6 +28,12 @@ extension FactorSources {
 		babylonDeviceFactorSources().first
 	}
 
+	// Cyon: We can migrate this to Sargon if we declare with the macro a NeverEmptyCollection
+	// of DeviceFactorSources, being a "cousing" to `FactorSources` which has `FactorSource` element,
+	// that is probably a good idea since it is actually the collection of DeviceFactorSources
+	// specifically which is never allowed to be empty. Then we can UniFFI export a method
+	// of FactorSources returning `DeviceFactorSources` (never empty) and maybe even in the future
+	// remove the `NonEmpty` Swift crate (which I've been over using since start...).
 	public func babylonDeviceFactorSources() -> NonEmpty<IdentifiedArrayOf<DeviceFactorSource>> {
 		let array = compactMap { $0.extract(DeviceFactorSource.self) }.filter(\.isBDFS)
 		let identifiedArray = array.asIdentified()

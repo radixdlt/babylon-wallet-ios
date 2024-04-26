@@ -1,7 +1,6 @@
 import Foundation
 import Sargon
 
-// Move elsewhere?
 extension MnemonicWithPassphrase {
 	@discardableResult
 	public func validatePublicKeys(

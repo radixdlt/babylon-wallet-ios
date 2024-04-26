@@ -17,6 +17,3 @@ extension Profile {
 			.reduce(into: false) { $0 = $0 || $1 }
 	}
 }
-
-// MARK: - Discrepancy
-struct Discrepancy: Swift.Error {}
