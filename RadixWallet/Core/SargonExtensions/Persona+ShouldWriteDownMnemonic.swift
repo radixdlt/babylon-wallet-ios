@@ -3,7 +3,8 @@ import Sargon
 
 extension Persona {
 	public var shouldWriteDownMnemonic: Bool {
-		@Dependency(\.userDefaults) var userDefaults
+		let userDefaults = UserDefaults.Dependency.radix // FIXME: find a better way to ensure we use the same userDefaults everywhere
+
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
 		guard let deviceFactorSourceID else {
