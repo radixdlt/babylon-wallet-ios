@@ -83,10 +83,12 @@ private extension View {
 	}
 
 	private func encryptionPasswordSheet(with destinationStore: PresentationStoreOf<ConfigurationBackup.Destination>) -> some View {
-		sheet(
-			store: destinationStore.scope(state: \.encryptionPassword, action: \.encryptionPassword),
-			content: { EncryptOrDecryptProfile.View(store: $0).inNavigationView }
-		)
+		sheet(store: destinationStore.scope(state: \.encryptionPassword, action: \.encryptionPassword)) {
+			EncryptOrDecryptProfile.View(store: $0)
+				.withNavigationBar {
+					destinationStore.send(.dismiss)
+				}
+		}
 	}
 
 	func exportFileSheet(store: StoreOf<ConfigurationBackup>, profileFile: ExportableProfileFile?) -> some View {
@@ -218,7 +220,6 @@ extension ConfigurationBackup {
 
 		private var lastBackedUpString: String? {
 			guard let lastBackedUp else { return nil }
-			print("••• making lastBackedUpString")
 			return L10n.ConfigurationBackup.Automated.lastBackup(RadixDateFormatter.string(from: lastBackedUp))
 		}
 

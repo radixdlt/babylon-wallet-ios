@@ -4,7 +4,7 @@ import SwiftUI
 extension EncryptOrDecryptProfile.State {
 	var viewState: EncryptOrDecryptProfile.ViewState {
 		.init(
-			inputtedEncryptionPassword: inputtedEncryptionPassword,
+			enteredEncryptionPassword: enteredEncryptionPassword,
 			confirmedEncryptionPassword: confirmedEncryptionPassword,
 			focusedField: focusedField,
 			isEncrypting: isEncrypting
@@ -15,7 +15,7 @@ extension EncryptOrDecryptProfile.State {
 // MARK: - EncryptOrDecryptProfile.View
 extension EncryptOrDecryptProfile {
 	public struct ViewState: Equatable {
-		let inputtedEncryptionPassword: String
+		let enteredEncryptionPassword: String
 		let confirmedEncryptionPassword: String
 		let focusedField: State.Field?
 		let isEncrypting: Bool
@@ -29,22 +29,22 @@ extension EncryptOrDecryptProfile {
 		}
 
 		var isNonConfirmingPasswordValid: Bool {
-			!inputtedEncryptionPassword.isEmpty
+			!enteredEncryptionPassword.isEmpty
 		}
 
 		var isConfirmingPasswordValid: Bool {
 			guard isNonConfirmingPasswordValid else {
 				return false
 			}
-			return confirmedEncryptionPassword == inputtedEncryptionPassword
+			return confirmedEncryptionPassword == enteredEncryptionPassword
 		}
 
 		var confirmHint: Hint? {
 			guard needToConfirm else { return nil }
-			if inputtedEncryptionPassword.isEmpty || !confirmedEncryptionPassword.isEmpty && focusedField != .confirmPassword {
+			if enteredEncryptionPassword.isEmpty || !confirmedEncryptionPassword.isEmpty && focusedField != .confirmPassword {
 				return nil
 			}
-			if !confirmedEncryptionPassword.isEmpty, confirmedEncryptionPassword != inputtedEncryptionPassword {
+			if !confirmedEncryptionPassword.isEmpty, confirmedEncryptionPassword != enteredEncryptionPassword {
 				return .error(L10n.ProfileBackup.ManualBackups.passwordsMissmatchError)
 			}
 
@@ -92,19 +92,22 @@ extension EncryptOrDecryptProfile {
 				ScrollView {
 					VStack(spacing: .medium2) {
 						Text(viewStore.title)
+							.multilineTextAlignment(.center)
 							.lineLimit(2)
 							.textStyle(.sheetTitle)
 							.foregroundColor(.app.gray1)
 
 						Text(viewStore.subtitle)
+							.multilineTextAlignment(.center)
 							.foregroundColor(.app.gray1)
 							.textStyle(.body1Regular)
+							.padding(.horizontal, .large2)
 
 						AppTextField(
 							useSecureField: true,
 							placeholder: viewStore.nonConfirmingPasswordPlaceholder,
 							text: viewStore.binding(
-								get: \.inputtedEncryptionPassword,
+								get: \.enteredEncryptionPassword,
 								send: { .passwordChanged($0) }
 							),
 							focus: .on(
@@ -118,6 +121,7 @@ extension EncryptOrDecryptProfile {
 						)
 						.textInputAutocapitalization(.never)
 						.autocorrectionDisabled()
+						.padding(.horizontal, .medium1)
 
 						if viewStore.needToConfirm {
 							AppTextField(
@@ -139,9 +143,10 @@ extension EncryptOrDecryptProfile {
 							)
 							.textInputAutocapitalization(.never)
 							.autocorrectionDisabled()
+							.padding(.horizontal, .medium1)
 						}
 					}
-					.padding([.bottom, .horizontal], .medium1)
+					.padding(.bottom, .medium1)
 				}
 				.footer {
 					Button(viewStore.continueButtonTitle) {
