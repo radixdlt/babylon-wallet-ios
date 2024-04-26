@@ -27,7 +27,7 @@ extension ConfigurationBackup {
 						}
 						.padding(.bottom, .medium3)
 
-						let backupsEnabled = viewStore.binding(get: \.automatedBackupsEnabled) { .view(.toggleAutomatedBackups($0)) }
+						let backupsEnabled = viewStore.binding(get: \.automatedBackupsEnabled) { .view(.automatedBackupsToggled($0)) }
 						AutomatedBackupView(
 							backupsEnabled: backupsEnabled,
 							lastBackedUp: viewStore.lastBackup,
@@ -49,15 +49,133 @@ extension ConfigurationBackup {
 					.padding(.top, .small2)
 					.padding(.horizontal, .medium2)
 				}
+				.exportFileSheet(store: store, profileFile: viewStore.profileFile)
 			}
 			.onAppear {
-				store.send(.view(.onAppear))
+				store.send(.view(.didAppear))
 			}
+			.destinations(with: store)
 			.navigationBarTitleDisplayMode(.large)
 			.navigationTitle(L10n.ConfigurationBackup.title)
 		}
 	}
 }
+
+private extension StoreOf<ConfigurationBackup> {
+	var destination: PresentationStoreOf<ConfigurationBackup.Destination> {
+		func scopeState(state: State) -> PresentationState<ConfigurationBackup.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<ConfigurationBackup>) -> some View {
+		let destinationStore = store.destination
+		return confirmDisableCloudBackupAlert(with: destinationStore)
+			.encryptProfileOrNotAlert(with: destinationStore)
+	}
+
+	private func confirmDisableCloudBackupAlert(with destinationStore: PresentationStoreOf<ConfigurationBackup.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.confirmDisableCloudBackup, action: \.confirmDisableCloudBackup))
+	}
+
+	private func encryptProfileOrNotAlert(with destinationStore: PresentationStoreOf<ConfigurationBackup.Destination>) -> some View {
+		alert(store: destinationStore.scope(state: \.encryptProfileOrNot, action: \.encryptProfileOrNot))
+	}
+
+	private func encryptionPasswordSheet(with destinationStore: PresentationStoreOf<ConfigurationBackup.Destination>) -> some View {
+		sheet(
+			store: destinationStore.scope(state: \.encryptionPassword, action: \.encryptionPassword),
+			content: { EncryptOrDecryptProfile.View(store: $0).inNavigationView }
+		)
+	}
+
+	func exportFileSheet(store: StoreOf<ConfigurationBackup>, profileFile: ExportableProfileFile?) -> some View {
+		fileExporter(
+			isPresented: .init(get: { profileFile != nil }, set: { store.send(.view(.showFileExporter($0))) }),
+			document: profileFile,
+			contentType: .profile,
+			// Need to disable, since broken in swiftformat 0.52.7
+			// swiftformat:disable redundantClosure
+			defaultFilename: {
+				switch profileFile {
+				case .plaintext, .none: String.filenameProfileNotEncrypted
+				case .encrypted: String.filenameProfileEncrypted
+				}
+			}(),
+			// swiftformat:enable redundantClosure
+			onCompletion: { store.send(.view(.profileExportResult($0.mapError { $0 as NSError }))) }
+		)
+	}
+}
+
+// public struct ProfileExporter: Sendable, FeatureReducer {
+//	public struct State: Sendable, Hashable {
+//
+//	}
+//
+//	public enum ViewAction: Sendable, Equatable {
+////		case itemTapped(Item)
+//	}
+//
+////	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
+////		switch viewAction {
+////		case let .problemTapped(id):
+////			return .none
+////
+////		case let .itemTapped(item):
+////			switch item {
+////			case .securityFactors:
+////				return .none
+////			case .configurationBackup:
+////				state.destination = .configurationBackup(.init(problems: state.problems))
+////				return .none
+////			}
+////		}
+////	}
+// }
+//
+// extension ProfileExporter {
+//	@MainActor
+//	public struct View: SwiftUI.View {
+//		private let store: StoreOf<ProfileExporter>
+//
+//		public init(store: StoreOf<ProfileExporter>) {
+//			self.store = store
+//		}
+//
+//		public var body: some SwiftUI.View {
+//			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+//
+//				fileExporter(
+//					isPresented: viewStore.binding(
+//						get: \.isDisplayingFileExporter,
+//						send: .dismissFileExporter
+//					),
+//					document: viewStore.profileFile,
+//					contentType: .profile,
+//					// Need to disable, since broken in swiftformat 0.52.7
+//					// swiftformat:disable redundantClosure
+//					defaultFilename: {
+//						switch viewStore.profileFile {
+//						case .plaintext, .none: String.filenameProfileNotEncrypted
+//						case .encrypted: String.filenameProfileEncrypted
+//						}
+//					}(),
+//					// swiftformat:enable redundantClosure
+//					onCompletion: { viewStore.send(.profileExportResult($0.mapError { $0 as NSError })) }
+//				)
+//
+//
+//			}
+//		}
+//	}
+// }
+//
+//
 
 // MARK: - ConfigurationBackup.AutomatedBackupView
 extension ConfigurationBackup {
