@@ -1113,6 +1113,7 @@
 		E6DBA3852ADEBFB300A38425 /* FaucetClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA30F2ADEBFB300A38425 /* FaucetClientTests.swift */; };
 		E6DBA3872ADEBFB300A38425 /* LedgerModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA3152ADEBFB300A38425 /* LedgerModelTests.swift */; };
 		E6DBA3882ADEBFB300A38425 /* Validation+ExtraTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6DBA3172ADEBFB300A38425 /* Validation+ExtraTests.swift */; };
+		E6F460132BDBE56800B122DB /* Stage2MigrateToSargon+RadixConnectModels+Logic.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6F460122BDBE56800B122DB /* Stage2MigrateToSargon+RadixConnectModels+Logic.swift */; };
 		E6FA984A2B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98482B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift */; };
 		E6FA984B2B04B9AC00748F20 /* ConfirmSkippingBDFS.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */; };
 		E6FA984E2B04E3D500748F20 /* NoContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA984D2B04E3D500748F20 /* NoContentView.swift */; };
@@ -2200,6 +2201,7 @@
 		E6DBA30F2ADEBFB300A38425 /* FaucetClientTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FaucetClientTests.swift; sourceTree = "<group>"; };
 		E6DBA3152ADEBFB300A38425 /* LedgerModelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LedgerModelTests.swift; sourceTree = "<group>"; };
 		E6DBA3172ADEBFB300A38425 /* Validation+ExtraTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Validation+ExtraTests.swift"; sourceTree = "<group>"; };
+		E6F460122BDBE56800B122DB /* Stage2MigrateToSargon+RadixConnectModels+Logic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Stage2MigrateToSargon+RadixConnectModels+Logic.swift"; sourceTree = "<group>"; };
 		E6FA98482B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfirmSkippingBDFS+View.swift"; sourceTree = "<group>"; };
 		E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmSkippingBDFS.swift; sourceTree = "<group>"; };
 		E6FA984D2B04E3D500748F20 /* NoContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoContentView.swift; sourceTree = "<group>"; };
@@ -5799,6 +5801,7 @@
 		E65D6CE52BC98129001D8A39 /* Stage2 */ = {
 			isa = PBXGroup;
 			children = (
+				E6F460112BDBE54000B122DB /* RadixConnect */,
 				E65D6CF92BC98473001D8A39 /* Profile */,
 				E65D6CF82BC98466001D8A39 /* Atoms */,
 			);
@@ -6257,6 +6260,14 @@
 				E6DBA3172ADEBFB300A38425 /* Validation+ExtraTests.swift */,
 			);
 			path = FeaturePreludeTests;
+			sourceTree = "<group>";
+		};
+		E6F460112BDBE54000B122DB /* RadixConnect */ = {
+			isa = PBXGroup;
+			children = (
+				E6F460122BDBE56800B122DB /* Stage2MigrateToSargon+RadixConnectModels+Logic.swift */,
+			);
+			path = RadixConnect;
 			sourceTree = "<group>";
 		};
 		E6FA984C2B04B9C000748F20 /* ConfirmSkippingBDFS */ = {
@@ -7162,6 +7173,7 @@
 				48CFC4182ADC10DA00E77A5C /* IdentifiedArrayOf+Extensions.swift in Sources */,
 				48CFC3EB2ADC10D900E77A5C /* RTCClients.swift in Sources */,
 				48CFC4592ADC10DA00E77A5C /* LedgerHardwareWalletClient+Interface.swift in Sources */,
+				E6F460132BDBE56800B122DB /* Stage2MigrateToSargon+RadixConnectModels+Logic.swift in Sources */,
 				4841614D2BCAD3D400D2B644 /* Stage1MigrateToSargon+MnemonicWithPassphrase.swift in Sources */,
 				48CFC5A82ADC10DA00E77A5C /* URLButtonStyle.swift in Sources */,
 				48CFC4602ADC10DA00E77A5C /* TransactionModels.swift in Sources */,
