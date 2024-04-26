@@ -1052,6 +1052,9 @@
 		A47572042B29B4EE0059A95D /* IOSSecurityClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */; };
 		A47572052B29B4F20059A95D /* IOSSecurityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */; };
 		A47572062B29B4F50059A95D /* IOSSecurityClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47572012B29B3CA0059A95D /* IOSSecurityClient+Live.swift */; };
+		A47809042BDBD35D006B68C0 /* SecurityCenterClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47809012BDBD35D006B68C0 /* SecurityCenterClient+Live.swift */; };
+		A47809052BDBD35D006B68C0 /* SecurityCenterClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47809032BDBD35D006B68C0 /* SecurityCenterClient+Interface.swift */; };
+		A47809062BDBD35D006B68C0 /* SecurityCenterClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47809022BDBD35D006B68C0 /* SecurityCenterClient+Test.swift */; };
 		A48FD15F2B55E671009295E9 /* TrackedPoolInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48FD15E2B55E671009295E9 /* TrackedPoolInteraction.swift */; };
 		A48FD1612B55F8F0009295E9 /* TransactionReview+Sections.swift in Sources */ = {isa = PBXBuildFile; fileRef = A48FD1602B55F8F0009295E9 /* TransactionReview+Sections.swift */; };
 		A4B017F72B4C099D00B42B8E /* TransactionReview+DepositSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4B017F42B4BF59000B42B8E /* TransactionReview+DepositSettingView.swift */; };
@@ -2146,6 +2149,9 @@
 		A47572012B29B3CA0059A95D /* IOSSecurityClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Live.swift"; sourceTree = "<group>"; };
 		A47572022B29B3CA0059A95D /* IOSSecurityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Test.swift"; sourceTree = "<group>"; };
 		A47572032B29B3CA0059A95D /* IOSSecurityClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "IOSSecurityClient+Interface.swift"; sourceTree = "<group>"; };
+		A47809012BDBD35D006B68C0 /* SecurityCenterClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityCenterClient+Live.swift"; sourceTree = "<group>"; };
+		A47809022BDBD35D006B68C0 /* SecurityCenterClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityCenterClient+Test.swift"; sourceTree = "<group>"; };
+		A47809032BDBD35D006B68C0 /* SecurityCenterClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SecurityCenterClient+Interface.swift"; sourceTree = "<group>"; };
 		A48FD15E2B55E671009295E9 /* TrackedPoolInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackedPoolInteraction.swift; sourceTree = "<group>"; };
 		A48FD1602B55F8F0009295E9 /* TransactionReview+Sections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionReview+Sections.swift"; sourceTree = "<group>"; };
 		A4B017F42B4BF59000B42B8E /* TransactionReview+DepositSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TransactionReview+DepositSettingView.swift"; sourceTree = "<group>"; };
@@ -4172,6 +4178,7 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
+				A47809002BDBD35D006B68C0 /* SecurityCenterClient */,
 				A43F1E162BC6BB66001DD3FA /* CloudBackupClient */,
 				5B2A45002BD667FB00AEC8AD /* ContactSupportClient */,
 				5B9846BE2BBD5EF600E814F3 /* SensitiveInfoClient */,
@@ -5802,6 +5809,16 @@
 			path = IOSSecurityClient;
 			sourceTree = "<group>";
 		};
+		A47809002BDBD35D006B68C0 /* SecurityCenterClient */ = {
+			isa = PBXGroup;
+			children = (
+				A47809032BDBD35D006B68C0 /* SecurityCenterClient+Interface.swift */,
+				A47809012BDBD35D006B68C0 /* SecurityCenterClient+Live.swift */,
+				A47809022BDBD35D006B68C0 /* SecurityCenterClient+Test.swift */,
+			);
+			path = SecurityCenterClient;
+			sourceTree = "<group>";
+		};
 		A4B017F32B4BF57B00B42B8E /* TransactionReviewDepositSetting */ = {
 			isa = PBXGroup;
 			children = (
@@ -7258,6 +7275,8 @@
 				48CFC3A32ADC10D900E77A5C /* EncryptionScheme.swift in Sources */,
 				48CFC2952ADC10D900E77A5C /* FeesView.swift in Sources */,
 				83EE47842AF0EE3C00155F03 /* ProgrammaticScryptoSborValueTuple.swift in Sources */,
+				A47809062BDBD35D006B68C0 /* SecurityCenterClient+Test.swift in Sources */,
+				48CFC3AB2ADC10D900E77A5C /* ECPublicKey.swift in Sources */,
 				48CFC4472ADC10DA00E77A5C /* AccountsClient+Interface.swift in Sources */,
 				830EA9DB2AEA8770004C8051 /* EntitiesVisibilityClient+Interface.swift in Sources */,
 				48CFC2682ADC10D900E77A5C /* EditPersonaField+View.swift in Sources */,
@@ -7478,6 +7497,7 @@
 				A41557552B7645F70040AD4E /* TransactionHistory+View.swift in Sources */,
 				48CFC47D2ADC10DA00E77A5C /* BackupsClient+Interface.swift in Sources */,
 				48CFC2B42ADC10D900E77A5C /* ProfileBackupSettings+Reducer.swift in Sources */,
+				A47809052BDBD35D006B68C0 /* SecurityCenterClient+Interface.swift in Sources */,
 				48CFC5792ADC10DA00E77A5C /* FungibleResourcesCollectionItem.swift in Sources */,
 				48CFC4AF2ADC10DA00E77A5C /* NonFungibleResourcesCollectionItemGloballyAggregated.swift in Sources */,
 				48CFC54D2ADC10DA00E77A5C /* StateEntityDetailsResponseNonFungibleResourceDetails.swift in Sources */,
@@ -7580,6 +7600,9 @@
 				48CFC45A2ADC10DA00E77A5C /* LedgerHardwareWalletClient+Test.swift in Sources */,
 				48CFC29B2ADC10D900E77A5C /* TransactionReviewDapps.swift in Sources */,
 				48CFC3532ADC10D900E77A5C /* DappInteractor+ViewModifier.swift in Sources */,
+				48CFC6562ADC10DB00E77A5C /* EntityProtocol.swift in Sources */,
+				48CFC6872ADC10DB00E77A5C /* AppPreferences+Security.swift in Sources */,
+				A47809042BDBD35D006B68C0 /* SecurityCenterClient+Live.swift in Sources */,
 				48CFC40C2ADC10DA00E77A5C /* UserDefaults+Dependency+Extension.swift in Sources */,
 				48CFC2442ADC10D900E77A5C /* ThirdPartyDeposits+Reducer.swift in Sources */,
 				48CFC3F62ADC10D900E77A5C /* ClientMessage.swift in Sources */,
