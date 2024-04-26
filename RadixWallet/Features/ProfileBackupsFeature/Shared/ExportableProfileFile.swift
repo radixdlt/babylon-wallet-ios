@@ -1,9 +1,17 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 import UniformTypeIdentifiers
 
 // MARK: - NoJSONDataFound
 struct NoJSONDataFound: Error {}
+
+// MARK: - FileContentsNotProfile
+struct FileContentsNotProfile: LocalizedError {
+	var errorDescription: String? {
+		L10n.Error.ProfileLoad.decodingError("Invalid backup file.")
+	}
+}
 
 // MARK: - ExportableProfileFile
 /// An exportable (and thus importable) Profile file, either encrypted or plaintext.
@@ -36,11 +44,13 @@ extension ExportableProfileFile {
 	}
 
 	public init(data: Data) throws {
-		@Dependency(\.jsonDecoder) var jsonDecoder
-		do {
-			self = try .plaintext(jsonDecoder().decode(Profile.self, from: data))
-		} catch {
+		switch Profile.analyzeFile(contents: data) {
+		case .encryptedProfile:
 			self = .encrypted(data)
+		case .notProfile:
+			throw FileContentsNotProfile()
+		case let .plaintextProfile(plaintextProfile):
+			self = .plaintext(plaintextProfile)
 		}
 	}
 
@@ -54,8 +64,7 @@ extension ExportableProfileFile {
 			let jsonData = plaintext.profileSnapshot()
 			return FileWrapper(regularFileWithContents: jsonData)
 		case let .encrypted(encryptedSnapshot):
-			let jsonData = try encoder.encode(encryptedSnapshot)
-			return FileWrapper(regularFileWithContents: jsonData)
+			return FileWrapper(regularFileWithContents: encryptedSnapshot)
 		}
 	}
 }
