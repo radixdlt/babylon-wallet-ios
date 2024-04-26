@@ -42,11 +42,8 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 	private func checkCloudBackupEnabledEffect() -> Effect<Action> {
 		.run { send in
-			let profile = await ProfileStore.shared.profile
-			let networkProfile = try profile.network(id: profile.networkID)
-			let iCloudEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
+			let iCloudEnabled = await ProfileStore.shared.profile.appPreferences.security.isCloudProfileSyncEnabled
 			await send(.internal(.isCloudBackupEnabled(iCloudEnabled)))
-		} catch: { _, _ in
 		}
 	}
 

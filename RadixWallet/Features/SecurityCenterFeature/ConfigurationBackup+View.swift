@@ -65,35 +65,31 @@ extension ConfigurationBackup {
 		let problem: SecurityProblem
 
 		var body: some SwiftUI.View {
-			if let warning = warning(for: problem) {
-				HStack(spacing: 0) {
-					Image(.warningError)
-						.renderingMode(.template)
-						.resizable()
-						.frame(.smallest)
-						.padding(.trailing, .medium3)
+			HStack(spacing: 0) {
+				Image(.warningError)
+					.renderingMode(.template)
+					.resizable()
+					.frame(.smallest)
+					.padding(.trailing, .medium3)
 
-					Text(warning)
-						.multilineTextAlignment(.leading)
-						.textStyle(.body2HighImportance)
+				Text(warning(for: problem))
+					.multilineTextAlignment(.leading)
+					.textStyle(.body2HighImportance)
 
-					Spacer(minLength: 0)
-				}
-				.foregroundStyle(.app.alert)
-				.padding(.vertical, .small1)
-				.padding(.horizontal, .medium3)
-				.background(.app.lightAlert)
-				.roundedCorners(radius: .small1)
+				Spacer(minLength: 0)
 			}
+			.foregroundStyle(.app.alert)
+			.padding(.vertical, .small1)
+			.padding(.horizontal, .medium3)
+			.background(.app.lightAlert)
+			.roundedCorners(radius: .small1)
 		}
 
-		func warning(for problem: SecurityProblem) -> String? {
+		func warning(for problem: SecurityProblem) -> String {
 			switch problem {
-			case .problem3: nil
 			case .problem5: L10n.ConfigurationBackup.problem5WarningIOS
 			case .problem6: L10n.ConfigurationBackup.problem6Warning
 			case .problem7: L10n.ConfigurationBackup.problem7Warning
-			case .problem9: nil
 			}
 		}
 	}
