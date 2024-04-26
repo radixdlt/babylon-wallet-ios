@@ -391,7 +391,7 @@ public struct CloudBackupFeature: FeatureReducer {
 
 		case .checkAllNewProfiles:
 			return .run { _ in
-				let profiles = try await cloudBackupClient.queryAllProfiles()
+				let profiles = try await cloudBackupClient.loadAllProfiles()
 				print("•• got \(profiles.count) profiles")
 			} catch: { error, _ in
 				print("•• got no profiles, only error: \(error)")
@@ -399,9 +399,10 @@ public struct CloudBackupFeature: FeatureReducer {
 
 		case .deleteProfileTapped:
 			userDefaults.removeValue(forKey: "activeProfile")
-			return .run { /* [id = profile.id] */ send in
-//				try await cloudBackupClient.deleteProfile(id)
-				await send(.internal(.logout))
+			return .run { /* [id = profile.id] */ _ in
+				let profile = await ProfileStore.shared.profile
+				try await cloudBackupClient.deleteProfile(profile.id)
+//				await send(.internal(.logout))
 			}
 
 		case .logoutTapped:

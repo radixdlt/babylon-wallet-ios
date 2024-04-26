@@ -52,6 +52,7 @@ public struct Main: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.personasClient) var personasClient
+	@Dependency(\.cloudBackupClient) var cloudBackupClient
 
 	public init() {}
 
@@ -71,6 +72,11 @@ public struct Main: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			.run { send in
+
+				let migrated = try await cloudBackupClient.migrateKeychainProfiles()
+
+				print("•• did migrate \(migrated.count)")
+
 				for try await gateway in await gatewaysClient.currentGatewayValues() {
 					guard !Task.isCancelled else { return }
 					loggerGlobal.notice("Changed network to: \(gateway)")
