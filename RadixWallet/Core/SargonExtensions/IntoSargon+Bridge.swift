@@ -1,7 +1,6 @@
 import CryptoKit
 import Foundation
 import Sargon
-import SargonUniFFI
 
 extension OnLedgerEntitiesClient.StakeClaim {
 	public func intoSargon() -> StakeClaim {

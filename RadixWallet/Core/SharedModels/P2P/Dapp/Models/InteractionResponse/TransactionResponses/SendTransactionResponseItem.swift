@@ -1,4 +1,4 @@
-import SargonUniFFI
+import Sargon
 
 extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 	/// Response to Dapp from wallet, info about a signed and submitted transaction, see [CAP21][cap].

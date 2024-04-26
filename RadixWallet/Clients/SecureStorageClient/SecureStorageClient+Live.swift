@@ -1,5 +1,4 @@
 import Sargon
-import SargonUniFFI
 
 // MARK: - KeychainAccess.Accessibility + Sendable
 extension KeychainAccess.Accessibility: @unchecked Sendable {}
