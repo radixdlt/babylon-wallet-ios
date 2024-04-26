@@ -11,7 +11,7 @@ public struct UpdateAccountLabel: FeatureReducer, Sendable {
 		init(account: Account) {
 			self.account = account
 			self.accountLabel = account.displayName.rawValue
-			self.sanitizedName = NonEmptyString(rawValue: account.displayName.value)
+			self.sanitizedName = account.displayName.asNonEmpty
 		}
 	}
 
