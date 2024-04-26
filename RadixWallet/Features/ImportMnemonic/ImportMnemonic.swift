@@ -678,7 +678,6 @@ extension ImportMnemonic {
 
 			default:
 				let scale = UInt16(89) // 2048 / 23
-//				let indexScaled = BIP39Word.Index(valueBoundBy16Bits: scale * UInt16(index))!
 				let indexScaled = U11(inner: scale * UInt16(index))
 				return wordList.first(where: { $0.index == indexScaled })!
 			}

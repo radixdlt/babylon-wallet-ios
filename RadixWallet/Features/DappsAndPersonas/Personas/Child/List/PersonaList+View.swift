@@ -60,7 +60,7 @@ public struct PersonaListCoreView: View {
 					action: { .child(.persona(id: $0, action: $1)) }
 				)
 			) {
-				PersonaReducer.View(store: $0, tappable: tappable, showShield: showShield)
+				PersonaFeature.View(store: $0, tappable: tappable, showShield: showShield)
 					.padding(.horizontal, .medium3)
 			}
 		}

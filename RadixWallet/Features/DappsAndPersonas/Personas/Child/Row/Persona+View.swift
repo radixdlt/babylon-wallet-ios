@@ -1,15 +1,15 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - PersonaReducer.View
-extension PersonaReducer {
+// MARK: - PersonaFeature.View
+extension PersonaFeature {
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<PersonaReducer>
+		private let store: StoreOf<PersonaFeature>
 		private let tappable: Bool
 		private let showShield: Bool
 
-		public init(store: StoreOf<PersonaReducer>, tappable: Bool, showShield: Bool) {
+		public init(store: StoreOf<PersonaFeature>, tappable: Bool, showShield: Bool) {
 			self.store = store
 			self.tappable = tappable
 			self.showShield = showShield
@@ -60,10 +60,10 @@ import SwiftUI
 // TODO: preview fails, persona previewValue needs to be fixed
 struct Persona_Preview: PreviewProvider {
 	static var previews: some View {
-		PersonaReducer.View(
+		PersonaFeature.View(
 			store: .init(
 				initialState: .previewValue,
-				reducer: PersonaReducer.init
+				reducer: PersonaFeature.init
 			),
 			tappable: true,
 			showShield: true
@@ -71,7 +71,7 @@ struct Persona_Preview: PreviewProvider {
 	}
 }
 
-extension PersonaReducer.State {
+extension PersonaFeature.State {
 	public static let previewValue: Self = .init(persona: .previewValue0)
 }
 #endif
