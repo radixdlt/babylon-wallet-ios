@@ -368,12 +368,8 @@ public struct CloudBackupFeature: FeatureReducer {
 		switch viewAction {
 		case .task:
 			return .run { send in
-
 				let status = await TaskResult { try await cloudBackupClient.checkAccountStatus() }
-//				let cloudRecord = await TaskResult { try await cloudBackupClient.queryProfile(id) }
-
 				await send(.internal(.accountStatus(status)))
-//				await send(.internal(.cloudRecordStatus(cloudRecord)))
 			}
 
 		case .addDummyAccount:
@@ -463,7 +459,7 @@ public struct CloudBackupFeature: FeatureReducer {
 			let profile = await ProfileStore.shared.profile
 			print("•• got profile: \(profile.id.uuidString)")
 			let result: TaskResult<CKRecord> = await TaskResult {
-				try await cloudBackupClient.uploadProfile(profile)
+				try await cloudBackupClient.backupProfile(profile)
 			}
 
 			await send(.internal(.profileUploadResult(result)))
