@@ -21,7 +21,7 @@ struct KeyValueView<Content: View>: View {
 
 	init(nonFungibleGlobalID: NonFungibleGlobalId, imageColor: Color? = .app.gray2) where Content == AddressView {
 		self.init(key: L10n.AssetDetails.NFTDetails.id) {
-			AddressView(.identifier(.nonFungibleGlobalID(nonFungibleGlobalID)), imageColor: imageColor)
+			AddressView(.address(.nonFungibleGlobalID(nonFungibleGlobalID)), imageColor: imageColor)
 		}
 	}
 

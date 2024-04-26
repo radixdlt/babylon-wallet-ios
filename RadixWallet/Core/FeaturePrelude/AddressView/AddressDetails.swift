@@ -141,8 +141,11 @@ public struct AddressDetails: Sendable, FeatureReducer {
 					let entity = try await onLedgerEntitiesClient.getEntity(address.asGeneral, metadataKeys: .resourceMetadataKeys)
 					return entity.metadata?.name
 				}
-			case .nonFungibleGlobalID:
-				.success(nil)
+			case let .nonFungibleGlobalID(globalId):
+				await TaskResult {
+					let resource = try await onLedgerEntitiesClient.getResource(globalId.resourceAddress)
+					return resource.resourceTitle
+				}
 			}
 			await send(.internal(.loadedTitle(result)))
 		}
