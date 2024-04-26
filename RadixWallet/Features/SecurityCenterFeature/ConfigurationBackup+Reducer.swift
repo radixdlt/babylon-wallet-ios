@@ -117,12 +117,12 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	private func updateLastBackupEffect() -> Effect<Action> {
 		.run { send in
 			let profile = await ProfileStore.shared.profile
-			do {
-				let lastBackedUp = try await cloudBackupClient.lastBackup(profile.id)
-				await send(.internal(.setLastBackedUp(lastBackedUp)))
-				print("•• got last backed up")
-			} catch {
-				loggerGlobal.error("Failed to fetch last backup for \(profile.id.uuidString): \(error)")
+			let lastBackedUp = try? await cloudBackupClient.lastBackup(profile.id)
+			await send(.internal(.setLastBackedUp(lastBackedUp)))
+			if let lastBackedUp {
+				print("•• got last backed up: \(RadixDateFormatter.string(from: lastBackedUp))")
+			} else {
+				print("•• got last backed up: nil")
 			}
 		}
 	}
@@ -140,10 +140,13 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 				.concatenate(with: updateLastBackupEffect())
 
 		case .exportTapped:
+			print("•• exportTapped, destination == nil: \(state.destination == nil)")
+
 			state.destination = .encryptProfileOrNot(.encryptProfileOrNotAlert)
 			return .none
 
 		case let .showFileExporter(show):
+			print("•• show file exporter \(show)")
 			if !show {
 				state.profileFile = nil
 			}
@@ -197,12 +200,15 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			return .none
 
 		case let .encryptProfileOrNot(encryptOrNot):
+			print("•• encryptProfileOrNot, destination == nil: \(state.destination == nil)")
+
 			switch encryptOrNot {
 			case .encrypt:
 				state.destination = .encryptionPassword(.init(mode: .loadThenEncrypt()))
 				return .none
 
 			case .doNotEncrypt:
+				state.destination = nil
 				return .run { send in
 					let snapshot = await ProfileStore.shared.profile.snapshot()
 					await send(.internal(.exportProfileSnapshot(snapshot)))
