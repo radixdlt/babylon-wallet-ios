@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - GatewaysClient
 public struct GatewaysClient: Sendable {
 	/// Async sequence of Gateways, emits new value of Gateways
