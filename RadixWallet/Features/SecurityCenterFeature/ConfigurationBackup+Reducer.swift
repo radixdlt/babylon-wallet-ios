@@ -79,6 +79,15 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		}
 	}
 
+	public var body: some ReducerOf<Self> {
+		Reduce(core)
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
+			}
+	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
+
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
@@ -134,19 +143,15 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 				.merge(with: checkCloudAccountStatusEffect())
 
 		case let .automatedBackupsToggled(isEnabled):
-			print("•• automatedBackupsToggled")
 			state.lastBackup = nil
 			return updateCloudBackupsSettingEffect(isEnabled: isEnabled)
 				.concatenate(with: updateLastBackupEffect())
 
 		case .exportTapped:
-			print("•• exportTapped, destination == nil: \(state.destination == nil)")
-
 			state.destination = .encryptProfileOrNot(.encryptProfileOrNotAlert)
 			return .none
 
 		case let .showFileExporter(show):
-			print("•• show file exporter \(show)")
 			if !show {
 				state.profileFile = nil
 			}
@@ -158,7 +163,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 				do {
 					try await cloudBackupClient.deleteProfile(profile.id)
 					await send(.internal(.didDeleteOutdatedBackup(profile.id)))
-					print("•• deleted outdate \(profile.id)")
 				} catch {
 					loggerGlobal.error("Failed to delete outdate backup \(profile.id.uuidString): \(error)")
 				}
@@ -179,40 +183,22 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .encryptionPassword(.delegate(delegateAction)):
-			switch delegateAction {
-			case .dismiss:
-				state.destination = nil
-				print("•• encryptionPassword dismiss")
-				return .none
-
-			case .successfullyDecrypted:
-				preconditionFailure("Incorrect implementation, should only ENcrypt")
-
-			case let .successfullyEncrypted(_, encrypted: encryptedFile):
-				print("•• successfullyEncrypted")
-				state.destination = nil
-				state.profileFile = .encrypted(encryptedFile)
-				return .none
-			}
+		case let .encryptionPassword(.delegate(.successfullyEncrypted(_, encrypted: encryptedFile))):
+			state.destination = nil
+			state.profileFile = .encrypted(encryptedFile)
+			return .none
 
 		case .encryptionPassword:
 			return .none
 
-		case let .encryptProfileOrNot(encryptOrNot):
-			print("•• encryptProfileOrNot, destination == nil: \(state.destination == nil)")
-
-			switch encryptOrNot {
-			case .encrypt:
-				state.destination = .encryptionPassword(.init(mode: .loadThenEncrypt()))
-				return .none
-
-			case .doNotEncrypt:
-				state.destination = nil
-				return .run { send in
-					let snapshot = await ProfileStore.shared.profile.snapshot()
-					await send(.internal(.exportProfileSnapshot(snapshot)))
-				}
+		case .encryptProfileOrNot(.encrypt):
+			state.destination = .encryptionPassword(.init(mode: .loadThenEncrypt()))
+			return .none
+		case .encryptProfileOrNot(.doNotEncrypt):
+			state.destination = nil
+			return .run { send in
+				let snapshot = await ProfileStore.shared.profile.snapshot()
+				await send(.internal(.exportProfileSnapshot(snapshot)))
 			}
 		}
 	}
@@ -225,7 +211,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 		case let .didDeleteOutdatedBackup(id):
 			state.lastBackup = nil
-			print("•• didDeleteOutdatedBackup")
 			// FIXME: GK - show alert? toast?
 			return .none
 
