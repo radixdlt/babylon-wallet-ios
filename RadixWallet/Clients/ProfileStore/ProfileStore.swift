@@ -4,7 +4,7 @@ import Sargon
 /// An in-memory holder of the app's `Profile` which syncs changes to *Keychain* and
 /// needed state to *UserDefaults* (activeProfileID). If user has iCloud Keychain sync
 /// enabled (we can't determine that) and has not disabled `Profile` cloud sync then
-/// iOS also syncs updates of `Profile` (a `Profile`) to iCloud via *Keychain*.
+/// iOS also syncs updates of `Profile` to iCloud via *Keychain*.
 ///
 /// If a Profile successfully was loaded from Keychain it will be used an `Main` part
 /// of app is openened by `Splash`. If no existing Profile was found then a new one
