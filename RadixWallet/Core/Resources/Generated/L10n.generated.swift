@@ -67,8 +67,6 @@ public enum L10n {
     }
   }
   public enum AccountRecoveryScan {
-    /// Deriving Accounts
-    public static let derivingAccounts = L10n.tr("Localizable", "accountRecoveryScan_derivingAccounts", fallback: "Deriving Accounts")
     /// Use Ledger Hardware Wallet
     public static let ledgerButtonTitle = L10n.tr("Localizable", "accountRecoveryScan_ledgerButtonTitle", fallback: "Use Ledger Hardware Wallet")
     /// Note: You must still use the new *Radix Babylon* app on your Ledger device, not the old Radix Ledger app.
@@ -415,6 +413,24 @@ public enum L10n {
       /// Address verified
       public static let success = L10n.tr("Localizable", "addressAction_verifyAddressLedger_success", fallback: "Address verified")
     }
+  }
+  public enum AddressDetails {
+    /// Copy
+    public static let copy = L10n.tr("Localizable", "addressDetails_copy", fallback: "Copy")
+    /// Enlarge
+    public static let enlarge = L10n.tr("Localizable", "addressDetails_enlarge", fallback: "Enlarge")
+    /// Full address
+    public static let fullAddress = L10n.tr("Localizable", "addressDetails_fullAddress", fallback: "Full address")
+    /// Address QR Code
+    public static let qrCode = L10n.tr("Localizable", "addressDetails_qrCode", fallback: "Address QR Code")
+    /// Could not create QR code
+    public static let qrCodeFailure = L10n.tr("Localizable", "addressDetails_qrCodeFailure", fallback: "Could not create QR code")
+    /// Share
+    public static let share = L10n.tr("Localizable", "addressDetails_share", fallback: "Share")
+    /// Verify Address on Ledger Device
+    public static let verifyOnLedger = L10n.tr("Localizable", "addressDetails_verifyOnLedger", fallback: "Verify Address on Ledger Device")
+    /// View on Radix Dashboard
+    public static let viewOnDashboard = L10n.tr("Localizable", "addressDetails_viewOnDashboard", fallback: "View on Radix Dashboard")
   }
   public enum AndroidProfileBackup {
     /// Back up is turned off
@@ -877,6 +893,8 @@ public enum L10n {
     public static let copy = L10n.tr("Localizable", "common_copy", fallback: "Copy")
     /// Connected to a test network, not Radix main network.
     public static let developerDisclaimerText = L10n.tr("Localizable", "common_developerDisclaimerText", fallback: "Connected to a test network, not Radix main network.")
+    /// Dismiss
+    public static let dismiss = L10n.tr("Localizable", "common_dismiss", fallback: "Dismiss")
     /// Done
     public static let done = L10n.tr("Localizable", "common_done", fallback: "Done")
     /// An Error Occurred
@@ -919,6 +937,10 @@ public enum L10n {
     public static let unauthorized = L10n.tr("Localizable", "common_unauthorized", fallback: "Unauthorized")
   }
   public enum ConfigurationBackup {
+    /// You need an up-to-date Configuration Backup to recover your Accounts and Personas if you lose access to them.
+    /// 
+    /// Your Backup does not contain your keys or seed phrase.
+    public static let heading = L10n.tr("Localizable", "configurationBackup_heading", fallback: "You need an up-to-date Configuration Backup to recover your Accounts and Personas if you lose access to them.\n\nYour Backup does not contain your keys or seed phrase.")
     /// Automated Configuration Backup not working. Check internet connection and Google Drive settings.
     public static let problem5WarningAndroid = L10n.tr("Localizable", "configurationBackup_problem5WarningAndroid", fallback: "Automated Configuration Backup not working. Check internet connection and Google Drive settings.")
     /// Automated Configuration Backup not working. Check internet connection and iCloud settings.
@@ -938,13 +960,9 @@ public enum L10n {
       public static let deleteOutdatedBackupIOS = L10n.tr("Localizable", "configurationBackup_automated_deleteOutdatedBackupIOS", fallback: "Delete")
       /// Disconnect
       public static let disconnectAndroid = L10n.tr("Localizable", "configurationBackup_automated_disconnectAndroid", fallback: "Disconnect")
-      /// You need an up-to-date Configuration Backup to recover your Accounts and Personas if you lose access to them.
-      /// 
-      /// Your Backup does not contain your keys or seed phrase.
-      public static let heading = L10n.tr("Localizable", "configurationBackup_automated_heading", fallback: "You need an up-to-date Configuration Backup to recover your Accounts and Personas if you lose access to them.\n\nYour Backup does not contain your keys or seed phrase.")
-      /// Last backup: %@ ago
+      /// Last backup: %@
       public static func lastBackup(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "configurationBackup_automated_lastBackup", String(describing: p1), fallback: "Last backup: %@ ago")
+        return L10n.tr("Localizable", "configurationBackup_automated_lastBackup", String(describing: p1), fallback: "Last backup: %@")
       }
       /// Logged in as:
       public static let loggedInAsAndroid = L10n.tr("Localizable", "configurationBackup_automated_loggedInAsAndroid", fallback: "Logged in as:")
@@ -1384,24 +1402,6 @@ public enum L10n {
       public static let subtitleWrongNetworkID = L10n.tr("Localizable", "dAppRequest_validationOutcome_subtitleWrongNetworkID", fallback: "Network mismatch")
     }
   }
-  public enum DerivePublicKeys {
-    /// Authenticate to your phone to sign.
-    public static let subtitleDevice = L10n.tr("Localizable", "derivePublicKeys_subtitleDevice", fallback: "Authenticate to your phone to sign.")
-    /// Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension. Complete signing on the device.
-    public static let subtitleLedger = L10n.tr("Localizable", "derivePublicKeys_subtitleLedger", fallback: "Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension. Complete signing on the device.")
-    /// Deriving Accounts
-    public static let titleAccountRecoveryScan = L10n.tr("Localizable", "derivePublicKeys_titleAccountRecoveryScan", fallback: "Deriving Accounts")
-    /// Creating Account
-    public static let titleCreateAccount = L10n.tr("Localizable", "derivePublicKeys_titleCreateAccount", fallback: "Creating Account")
-    /// Creating Key
-    public static let titleCreateAuthSignKeyForAccount = L10n.tr("Localizable", "derivePublicKeys_titleCreateAuthSignKeyForAccount", fallback: "Creating Key")
-    /// Creating Key
-    public static let titleCreateAuthSignKeyForPersona = L10n.tr("Localizable", "derivePublicKeys_titleCreateAuthSignKeyForPersona", fallback: "Creating Key")
-    /// Creating Persona
-    public static let titleCreatePersona = L10n.tr("Localizable", "derivePublicKeys_titleCreatePersona", fallback: "Creating Persona")
-    /// Deriving Accounts
-    public static let titleImportLegacyAccount = L10n.tr("Localizable", "derivePublicKeys_titleImportLegacyAccount", fallback: "Deriving Accounts")
-  }
   public enum DisplayMnemonics {
     /// Write Down this Seed Phrase
     public static let backUpWarning = L10n.tr("Localizable", "displayMnemonics_backUpWarning", fallback: "Write Down this Seed Phrase")
@@ -1698,6 +1698,10 @@ public enum L10n {
       public static let legacySoftware = L10n.tr("Localizable", "homePage_accountsTag_legacySoftware", fallback: "Legacy")
     }
     public enum ProfileOlympiaError {
+      /// Affected Accounts
+      public static let affectedAccounts = L10n.tr("Localizable", "homePage_profileOlympiaError_affectedAccounts", fallback: "Affected Accounts")
+      /// Affected Personas
+      public static let affectedPersonas = L10n.tr("Localizable", "homePage_profileOlympiaError_affectedPersonas", fallback: "Affected Personas")
       /// OK (%d)
       public static func okCountdown(_ p1: Int) -> String {
         return L10n.tr("Localizable", "homePage_profileOlympiaError_okCountdown", p1, fallback: "OK (%d)")
@@ -2035,6 +2039,8 @@ public enum L10n {
     }
   }
   public enum LinkedConnectors {
+    /// Changing a Connector’s type is not supported.
+    public static let changingPurposeNotSupportedErrorMessage = L10n.tr("Localizable", "linkedConnectors_changingPurposeNotSupportedErrorMessage", fallback: "Changing a Connector’s type is not supported.")
     /// Please scan the QR code provided by your Radix Wallet Connector browser extension.
     public static let incorrectQrMessage = L10n.tr("Localizable", "linkedConnectors_incorrectQrMessage", fallback: "Please scan the QR code provided by your Radix Wallet Connector browser extension.")
     /// Incorrect QR code scanned.
@@ -2043,12 +2049,30 @@ public enum L10n {
     public static func lastConnected(_ p1: Any) -> String {
       return L10n.tr("Localizable", "linkedConnectors_lastConnected", String(describing: p1), fallback: "Last connected %@")
     }
+    /// Link Failed
+    public static let linkFailedErrorTitle = L10n.tr("Localizable", "linkedConnectors_linkFailedErrorTitle", fallback: "Link Failed")
     /// Link New Connector
     public static let linkNewConnector = L10n.tr("Localizable", "linkedConnectors_linkNewConnector", fallback: "Link New Connector")
     /// Connect your Radix Wallet to desktop web browsers by linking to the Radix Connector browser extension. Here are your linked Connectors.
     public static let subtitle = L10n.tr("Localizable", "linkedConnectors_subtitle", fallback: "Connect your Radix Wallet to desktop web browsers by linking to the Radix Connector browser extension. Here are your linked Connectors.")
     /// Linked Connectors
     public static let title = L10n.tr("Localizable", "linkedConnectors_title", fallback: "Linked Connectors")
+    /// This type of Connector link is not supported.
+    public static let unknownPurposeErrorMessage = L10n.tr("Localizable", "linkedConnectors_unknownPurposeErrorMessage", fallback: "This type of Connector link is not supported.")
+    public enum ApproveExistingConnector {
+      /// This appears to be a Radix Connector you previously linked to. Link will be updated.
+      public static let message = L10n.tr("Localizable", "linkedConnectors_approveExistingConnector_message", fallback: "This appears to be a Radix Connector you previously linked to. Link will be updated.")
+      /// Update Link
+      public static let title = L10n.tr("Localizable", "linkedConnectors_approveExistingConnector_title", fallback: "Update Link")
+    }
+    public enum ApproveNewConnector {
+      /// This Connector will be trusted to verify the dApp origin of requests to this wallet.
+      /// 
+      /// Only continue if you are linking to the **official Radix Connector browser extension** - or a Connector you control and trust.
+      public static let message = L10n.tr("Localizable", "linkedConnectors_approveNewConnector_message", fallback: "This Connector will be trusted to verify the dApp origin of requests to this wallet.\n\nOnly continue if you are linking to the **official Radix Connector browser extension** - or a Connector you control and trust.")
+      /// Link Connector
+      public static let title = L10n.tr("Localizable", "linkedConnectors_approveNewConnector_title", fallback: "Link Connector")
+    }
     public enum CameraPermissionDeniedAlert {
       /// Camera access is required to link to a Connector.
       public static let message = L10n.tr("Localizable", "linkedConnectors_cameraPermissionDeniedAlert_message", fallback: "Camera access is required to link to a Connector.")
@@ -2558,38 +2582,6 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "settings_linkToConnectorHeader_title", fallback: "Link your Wallet to a Desktop Browser")
     }
   }
-  public enum Signing {
-    public enum SignatureRequest {
-      /// Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension, and the Radix Babylon app is launched on the device.
-      public static let body = L10n.tr("Localizable", "signing_signatureRequest_body", fallback: "Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension, and the Radix Babylon app is launched on the device.")
-      /// Review and sign the transaction on the Ledger device to continue.
-      public static let instructions = L10n.tr("Localizable", "signing_signatureRequest_instructions", fallback: "Review and sign the transaction on the Ledger device to continue.")
-      /// Signature Request
-      public static let title = L10n.tr("Localizable", "signing_signatureRequest_title", fallback: "Signature Request")
-    }
-    public enum SignatureSuccessful {
-      /// Signature successful
-      public static let body = L10n.tr("Localizable", "signing_signatureSuccessful_body", fallback: "Signature successful")
-      /// Signed
-      public static let title = L10n.tr("Localizable", "signing_signatureSuccessful_title", fallback: "Signed")
-    }
-    public enum UseLedgerLabel {
-      /// Added on
-      public static let addedOn = L10n.tr("Localizable", "signing_useLedgerLabel_addedOn", fallback: "Added on")
-      /// Last used
-      public static let lastUsed = L10n.tr("Localizable", "signing_useLedgerLabel_lastUsed", fallback: "Last used")
-      /// Ledger
-      public static let ledger = L10n.tr("Localizable", "signing_useLedgerLabel_Ledger", fallback: "Ledger")
-    }
-    public enum WithDeviceFactorSource {
-      /// Factor Source ID: %@
-      public static func idLabel(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "signing_withDeviceFactorSource_idLabel", String(describing: p1), fallback: "Factor Source ID: %@")
-      }
-      /// Sign transaction with phone
-      public static let signTransaction = L10n.tr("Localizable", "signing_withDeviceFactorSource_signTransaction", fallback: "Sign transaction with phone")
-    }
-  }
   public enum Splash {
     /// This app requires your phone to have a passcode set up
     public static let passcodeNotSetMessage = L10n.tr("Localizable", "splash_passcodeNotSetMessage", fallback: "This app requires your phone to have a passcode set up")
@@ -2655,6 +2647,20 @@ public enum L10n {
       /// What’s the main reason for your score?
       public static let heading = L10n.tr("Localizable", "survey_reason_heading", fallback: "What’s the main reason for your score?")
     }
+  }
+  public enum TimeFormatting {
+    /// %@ ago
+    public static func ago(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "timeFormatting_ago", String(describing: p1), fallback: "%@ ago")
+    }
+    /// Just now
+    public static let justNow = L10n.tr("Localizable", "timeFormatting_justNow", fallback: "Just now")
+    /// Today
+    public static let today = L10n.tr("Localizable", "timeFormatting_today", fallback: "Today")
+    /// Tomorrow
+    public static let tomorrow = L10n.tr("Localizable", "timeFormatting_tomorrow", fallback: "Tomorrow")
+    /// Yesterday
+    public static let yesterday = L10n.tr("Localizable", "timeFormatting_yesterday", fallback: "Yesterday")
   }
   public enum TransactionHistory {
     /// This transaction cannot be summarized. Only the raw transaction manifest may be viewed.
@@ -2743,8 +2749,8 @@ public enum L10n {
     public static let estimated = L10n.tr("Localizable", "transactionReview_estimated", fallback: "Estimated")
     /// Account
     public static let externalAccountName = L10n.tr("Localizable", "transactionReview_externalAccountName", fallback: "Account")
-    /// Fee Payer account required
-    public static let feePayerRequiredMessage = L10n.tr("Localizable", "transactionReview_feePayerRequiredMessage", fallback: "Fee Payer account required")
+    /// Fee payer account required
+    public static let feePayerRequiredMessage = L10n.tr("Localizable", "transactionReview_feePayerRequiredMessage", fallback: "Fee payer account required")
     /// Guaranteed
     public static let guaranteed = L10n.tr("Localizable", "transactionReview_guaranteed", fallback: "Guaranteed")
     /// Insufficient Balance
