@@ -15,7 +15,7 @@ extension ConfigurationBackup {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				ScrollView {
 					VStack(alignment: .leading, spacing: .zero) {
-						Text(L10n.ConfigurationBackup.Automated.heading)
+						Text(L10n.ConfigurationBackup.heading)
 							.foregroundStyle(.app.gray2)
 							.textStyle(.body1Header)
 							.padding(.bottom, .medium2)
@@ -65,7 +65,7 @@ extension ConfigurationBackup {
 		let problem: SecurityProblem
 
 		var body: some SwiftUI.View {
-			VStack(spacing: 0) {
+			if let warning = warning(for: problem) {
 				HStack(spacing: 0) {
 					Image(.warningError)
 						.renderingMode(.template)
@@ -73,27 +73,27 @@ extension ConfigurationBackup {
 						.frame(.smallest)
 						.padding(.trailing, .medium3)
 
-					Text(text(for: problem))
+					Text(warning)
 						.multilineTextAlignment(.leading)
 						.textStyle(.body2HighImportance)
 
-					Spacer(minLength: .small1)
+					Spacer(minLength: 0)
 				}
 				.foregroundStyle(.app.alert)
 				.padding(.vertical, .small1)
 				.padding(.horizontal, .medium3)
 				.background(.app.lightAlert)
+				.roundedCorners(radius: .small1)
 			}
-			.roundedCorners(radius: .small1)
 		}
 
-		func text(for problem: SecurityProblem) -> String {
+		func warning(for problem: SecurityProblem) -> String? {
 			switch problem {
-			case .problem3: L10n.SecurityCenter.Problem3.text // FIXME: GK update strings
-			case .problem5: L10n.SecurityCenter.Problem5.text
-			case .problem6: L10n.SecurityCenter.Problem6.text
-			case .problem7: L10n.SecurityCenter.Problem7.text
-			case .problem9: L10n.SecurityCenter.Problem9.text
+			case .problem3: nil
+			case .problem5: L10n.ConfigurationBackup.problem5WarningIOS
+			case .problem6: L10n.ConfigurationBackup.problem6Warning
+			case .problem7: L10n.ConfigurationBackup.problem7Warning
+			case .problem9: nil
 			}
 		}
 	}
@@ -174,22 +174,9 @@ extension ConfigurationBackup {
 		private var lastBackedUpString: String? {
 			guard let lastBackedUp else { return nil }
 			print("••• making lastBackedUpString")
-			guard let timeInterval = formatter.string(from: -lastBackedUp.timeIntervalSinceNow) else {
-				// This should never happen
-				return lastBackedUp.formatted(date: .numeric, time: .shortened)
-			}
 
 			return L10n.ConfigurationBackup.Automated.lastBackup(timeInterval)
 		}
-
-		private let formatter = { // FIXME: GK
-			let formatter = DateComponentsFormatter()
-			formatter.unitsStyle = .brief
-			formatter.allowedUnits = [.second, .minute, .hour, .day, .month, .year]
-			formatter.zeroFormattingBehavior = .dropAll
-			formatter.maximumUnitCount = 1
-			return formatter
-		}()
 
 		struct ItemView: SwiftUI.View {
 			@SwiftUI.State private var expanded: Bool = false
@@ -297,6 +284,38 @@ extension ConfigurationBackup {
 			.background(.app.gray5)
 		}
 	}
+}
+
+// MARK: - PastTimeFormatter
+public enum PastTimeFormatter {
+	public static func string(from date: Date) -> String {
+		let dateString = { date.formatted(date: .numeric, time: .shortened) }
+
+		let calendar = Calendar.current
+
+		if calendar.isDateInToday(date) {
+			let timeInterval = -date.timeIntervalSinceNow
+			if timeInterval < 60 {
+				return "Just now" // FIXME: strings
+			}
+			guard let relative = relativeFormatter.string(from: timeInterval) else {
+				return dateString() // This should never happen
+			}
+			return relative + "ago" // FIXME: strings
+
+		} else if calendar.isDateInYesterday(date) {}
+
+		return string
+	}
+
+	private static let relativeFormatter = {
+		let formatter = DateComponentsFormatter()
+		formatter.unitsStyle = .short
+		formatter.allowedUnits = [.minute, .hour, .day, .month, .year]
+		formatter.zeroFormattingBehavior = .dropAll
+		formatter.maximumUnitCount = 1
+		return formatter
+	}()
 }
 
 import CloudKit
