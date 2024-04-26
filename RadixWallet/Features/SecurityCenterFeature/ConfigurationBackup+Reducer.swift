@@ -52,9 +52,12 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 	private func checkCloudAccountStatusEffect() -> Effect<Action> {
 		.run { send in
-			let status = try await cloudBackupClient.checkAccountStatus()
-			await send(.internal(.iCloudAccountStatus(status)))
-		} catch: { _, _ in
+			do {
+				let status = try await cloudBackupClient.checkAccountStatus()
+				await send(.internal(.iCloudAccountStatus(status)))
+			} catch {
+				loggerGlobal.error("Failed to get iCloud account status: \(error)")
+			}
 		}
 	}
 
@@ -75,6 +78,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		switch viewAction {
 		case .onAppear:
 			return updateLastBackupEffect()
+				.merge(with: checkCloudAccountStatusEffect())
 
 		case let .toggleAutomatedBackups(isEnabled):
 			state.automatedBackupsEnabled = isEnabled
@@ -115,6 +119,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			return .none
 
 		case let .isCloudBackupEnabled(isEnabled):
+			print("•• is enabled: \(isEnabled)")
 			state.automatedBackupsEnabled = isEnabled
 			return .none
 
