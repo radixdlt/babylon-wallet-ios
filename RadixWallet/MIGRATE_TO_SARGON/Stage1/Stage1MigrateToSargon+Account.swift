@@ -47,11 +47,11 @@ extension Account {
 }
 
 extension Accounts {
-	public var nonHidden: IdentifiedArrayOf<Account> {
-		filter(not(\.isHidden)).asIdentified()
+	public var nonHidden: Accounts {
+		filter(not(\.isHidden))
 	}
 
-	public var hidden: IdentifiedArrayOf<Account> {
-		filter(\.isHidden).asIdentified()
+	public var hidden: Accounts {
+		filter(\.isHidden)
 	}
 }

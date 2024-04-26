@@ -284,11 +284,14 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 
 		// Migrates and saved all accounts to Profile
 		let migrated = try await importLegacyWalletClient.migrateOlympiaHardwareAccountsToBabylon(
-			.init(olympiaAccounts: validatedAccounts, ledgerFactorSourceID: ledgerID)
+			.init(
+				olympiaAccounts: validatedAccounts,
+				ledgerFactorSourceID: ledgerID
+			)
 		)
 
 		// Save all accounts
-		try await accountsClient.saveVirtualAccounts(migrated.babylonAccounts.elements)
+		try await accountsClient.saveVirtualAccounts(migrated.babylonAccounts)
 
 		loggerGlobal.notice("Converted #\(migrated.accounts.count) accounts to babylon! ✅")
 

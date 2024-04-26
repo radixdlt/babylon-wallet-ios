@@ -31,7 +31,7 @@ public struct AuthorizedDappsClient: Sendable {
 }
 
 extension AuthorizedDappsClient {
-	public typealias GetAuthorizedDapps = @Sendable () async throws -> IdentifiedArrayOf<AuthorizedDapp>
+	public typealias GetAuthorizedDapps = @Sendable () async throws -> AuthorizedDapps
 	public typealias DetailsForAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> ProfileNetwork.AuthorizedDappDetailed
 	public typealias AddAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Void
 	public typealias UpdateOrAddAuthorizedDapp = @Sendable (AuthorizedDapp) async throws -> Void
@@ -53,7 +53,7 @@ extension AuthorizedDappsClient {
 
 	public func getDappsAuthorizedByPersona(
 		_ id: Persona.ID
-	) async throws -> IdentifiedArrayOf<AuthorizedDapp> {
+	) async throws -> AuthorizedDapps {
 		try await getAuthorizedDapps().filter { dapp in dapp.referencesToAuthorizedPersonas.contains(where: { authPersona in authPersona.id == id }) }
 	}
 

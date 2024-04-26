@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - PersonaList
@@ -69,7 +70,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 			.run { [strategy = state.strategy] send in
 				for try await personas in await personasClient.personas() {
 					guard !Task.isCancelled else { return }
-					let ids = try await personaIDs(strategy) ?? personas.ids
+					let ids = try await personaIDs(strategy) ?? OrderedSet(validating: personas.ids)
 					let result = ids.compactMap { personas[id: $0] }.map(PersonaFeature.State.init)
 					guard result.count == ids.count else {
 						throw UpdatePersonaError.personasMissingFromClient(ids.subtracting(result.map(\.id)))

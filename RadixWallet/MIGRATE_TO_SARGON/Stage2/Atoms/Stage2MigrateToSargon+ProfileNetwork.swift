@@ -10,16 +10,16 @@ struct PersonaAlreadyExists: Swift.Error {}
 struct TryingToUpdateAPersonaWhichIsNotAlreadySaved: Swift.Error {}
 
 extension ProfileNetwork {
-	public func getAccounts() -> IdentifiedArrayOf<Account> {
+	public func getAccounts() -> Accounts {
 		accounts.nonHidden
 	}
 
-	public func getHiddenAccounts() -> IdentifiedArrayOf<Account> {
+	public func getHiddenAccounts() -> Accounts {
 		accounts.hidden
 	}
 
-	public func accountsIncludingHidden() -> IdentifiedArrayOf<Account> {
-		accounts.asIdentified()
+	public func accountsIncludingHidden() -> Accounts {
+		accounts
 	}
 
 	public func hasSomeAccount() -> Bool {
@@ -59,16 +59,16 @@ extension ProfileNetwork {
 		}
 	}
 
-	public func getPersonas() -> IdentifiedArrayOf<Persona> {
+	public func getPersonas() -> Personas {
 		personas.nonHidden
 	}
 
-	public func getHiddenPersonas() -> IdentifiedArrayOf<Persona> {
+	public func getHiddenPersonas() -> Personas {
 		personas.hiden
 	}
 
-	public func personasIncludingHidden() -> IdentifiedArrayOf<Persona> {
-		personas.asIdentified()
+	public func personasIncludingHidden() -> Personas {
+		personas
 	}
 
 	public func hasSomePersona() -> Bool {

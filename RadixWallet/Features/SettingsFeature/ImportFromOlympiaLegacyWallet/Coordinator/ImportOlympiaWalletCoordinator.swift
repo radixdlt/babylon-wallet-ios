@@ -487,7 +487,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			}
 
 			// Save all accounts
-			try await accountsClient.saveVirtualAccounts(migrated.babylonAccounts.elements)
+			try await accountsClient.saveVirtualAccounts(migrated.babylonAccounts)
 
 			do {
 				try userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)

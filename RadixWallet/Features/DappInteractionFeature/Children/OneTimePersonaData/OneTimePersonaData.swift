@@ -34,7 +34,7 @@ struct OneTimePersonaData: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case personasLoaded(IdentifiedArrayOf<Persona>)
+		case personasLoaded(Personas)
 		case personaPrimacyDetermined(PersonaPrimacy)
 	}
 

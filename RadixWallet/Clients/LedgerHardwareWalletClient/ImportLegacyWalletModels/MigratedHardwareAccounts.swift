@@ -4,8 +4,8 @@ public struct MigratedHardwareAccounts: Sendable, Hashable {
 	public let ledgerID: LedgerHardwareWalletFactorSource.ID
 
 	public let accounts: NonEmpty<OrderedSet<MigratedAccount>>
-	public var babylonAccounts: IdentifiedArrayOf<Account> {
-		accounts.elements.map(\.babylon).asIdentified()
+	public var babylonAccounts: Accounts {
+		Accounts(accounts.map(\.babylon))
 	}
 
 	public init(

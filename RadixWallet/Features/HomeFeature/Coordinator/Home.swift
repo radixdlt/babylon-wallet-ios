@@ -36,7 +36,7 @@ public struct Home: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		public typealias HasAccessToMnemonic = Bool
-		case accountsLoadedResult(TaskResult<IdentifiedArrayOf<Account>>)
+		case accountsLoadedResult(TaskResult<Accounts>)
 		case exportMnemonic(account: Account)
 		case importMnemonic
 		case loadedShouldWriteDownPersonasSeedPhrase(Bool)

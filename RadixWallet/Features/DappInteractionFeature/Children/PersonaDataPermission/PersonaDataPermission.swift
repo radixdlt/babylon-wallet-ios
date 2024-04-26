@@ -29,7 +29,7 @@ struct PersonaDataPermission: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case personasLoaded(IdentifiedArrayOf<Persona>)
+		case personasLoaded(Personas)
 	}
 
 	enum ChildAction: Sendable, Equatable {

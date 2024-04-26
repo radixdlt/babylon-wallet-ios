@@ -48,7 +48,7 @@ extension ExportableProfileFile {
 		case .encryptedProfile:
 			self = .encrypted(data)
 		case .notProfile:
-			throw FileContentsNotProfile()
+			throw FileContentIsNotProfile()
 		case let .plaintextProfile(plaintextProfile):
 			self = .plaintext(plaintextProfile)
 		}

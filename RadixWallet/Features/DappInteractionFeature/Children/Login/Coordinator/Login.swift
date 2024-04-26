@@ -38,7 +38,11 @@ struct Login: Sendable, FeatureReducer {
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case personasLoaded(IdentifiedArrayOf<Persona>, AuthorizedDapp?, AuthorizedPersonaSimple?)
+		case personasLoaded(
+			Personas,
+			AuthorizedDapp?,
+			AuthorizedPersonaSimple?
+		)
 		case personaPrimacyDetermined(PersonaPrimacy)
 	}
 

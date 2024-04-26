@@ -98,21 +98,19 @@ public struct AccountsClient: Sendable {
 }
 
 extension AccountsClient {
-	public typealias Accounts = IdentifiedArrayOf<Account>
-
 	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 
 	public typealias NextAppearanceID = @Sendable (NetworkID?, _ offset: Int?) async -> AppearanceID
 
-	public typealias GetAccountsOnCurrentNetwork = @Sendable () async throws -> IdentifiedArrayOf<Account>
-	public typealias GetHiddenAccountsOnCurrentNetwork = @Sendable () async throws -> IdentifiedArrayOf<Account>
-	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> IdentifiedArrayOf<Account>
+	public typealias GetAccountsOnCurrentNetwork = @Sendable () async throws -> Accounts
+	public typealias GetHiddenAccountsOnCurrentNetwork = @Sendable () async throws -> Accounts
+	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> Accounts
 
-	public typealias AccountsOnCurrentNetwork = @Sendable () async -> AnyAsyncSequence<IdentifiedArrayOf<Account>>
+	public typealias AccountsOnCurrentNetwork = @Sendable () async -> AnyAsyncSequence<Accounts>
 	public typealias AccountUpdates = @Sendable (AccountAddress) async -> AnyAsyncSequence<Account>
 
 	public typealias NewVirtualAccount = @Sendable (NewAccountRequest) async throws -> Account
-	public typealias SaveVirtualAccounts = @Sendable ([Account]) async throws -> Void
+	public typealias SaveVirtualAccounts = @Sendable (Accounts) async throws -> Void
 
 	public typealias GetAccountByAddress = @Sendable (AccountAddress) async throws -> Account
 

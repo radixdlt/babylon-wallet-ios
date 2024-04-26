@@ -173,7 +173,9 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		case .addAccounts:
 			return .run { send in
 				let result = await TaskResult<EqVoid> {
-					try await accountsClient.saveVirtualAccounts(Array(sortedAccounts))
+					try await accountsClient.saveVirtualAccounts(
+						Accounts(identified: sortedAccounts)
+					)
 				}
 				await send(.internal(.addAccountsToExistingProfileResult(result)))
 			}
