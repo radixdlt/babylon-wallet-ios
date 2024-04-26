@@ -414,6 +414,24 @@ public enum L10n {
       public static let success = L10n.tr("Localizable", "addressAction_verifyAddressLedger_success", fallback: "Address verified")
     }
   }
+  public enum AddressDetails {
+    /// Copy
+    public static let copy = L10n.tr("Localizable", "addressDetails_copy", fallback: "Copy")
+    /// Enlarge
+    public static let enlarge = L10n.tr("Localizable", "addressDetails_enlarge", fallback: "Enlarge")
+    /// Full address
+    public static let fullAddress = L10n.tr("Localizable", "addressDetails_fullAddress", fallback: "Full address")
+    /// Address QR Code
+    public static let qrCode = L10n.tr("Localizable", "addressDetails_qrCode", fallback: "Address QR Code")
+    /// Could not create QR code
+    public static let qrCodeFailure = L10n.tr("Localizable", "addressDetails_qrCodeFailure", fallback: "Could not create QR code")
+    /// Share
+    public static let share = L10n.tr("Localizable", "addressDetails_share", fallback: "Share")
+    /// Verify Address on Ledger Device
+    public static let verifyOnLedger = L10n.tr("Localizable", "addressDetails_verifyOnLedger", fallback: "Verify Address on Ledger Device")
+    /// View on Radix Dashboard
+    public static let viewOnDashboard = L10n.tr("Localizable", "addressDetails_viewOnDashboard", fallback: "View on Radix Dashboard")
+  }
   public enum AndroidProfileBackup {
     /// Back up is turned off
     public static let disabledText = L10n.tr("Localizable", "androidProfileBackup_disabledText", fallback: "Back up is turned off")
@@ -942,9 +960,9 @@ public enum L10n {
       public static let deleteOutdatedBackupIOS = L10n.tr("Localizable", "configurationBackup_automated_deleteOutdatedBackupIOS", fallback: "Delete")
       /// Disconnect
       public static let disconnectAndroid = L10n.tr("Localizable", "configurationBackup_automated_disconnectAndroid", fallback: "Disconnect")
-      /// Last backup: %@ ago
+      /// Last backup: %@
       public static func lastBackup(_ p1: Any) -> String {
-        return L10n.tr("Localizable", "configurationBackup_automated_lastBackup", String(describing: p1), fallback: "Last backup: %@ ago")
+        return L10n.tr("Localizable", "configurationBackup_automated_lastBackup", String(describing: p1), fallback: "Last backup: %@")
       }
       /// Logged in as:
       public static let loggedInAsAndroid = L10n.tr("Localizable", "configurationBackup_automated_loggedInAsAndroid", fallback: "Logged in as:")
@@ -1680,6 +1698,10 @@ public enum L10n {
       public static let legacySoftware = L10n.tr("Localizable", "homePage_accountsTag_legacySoftware", fallback: "Legacy")
     }
     public enum ProfileOlympiaError {
+      /// Affected Accounts
+      public static let affectedAccounts = L10n.tr("Localizable", "homePage_profileOlympiaError_affectedAccounts", fallback: "Affected Accounts")
+      /// Affected Personas
+      public static let affectedPersonas = L10n.tr("Localizable", "homePage_profileOlympiaError_affectedPersonas", fallback: "Affected Personas")
       /// OK (%d)
       public static func okCountdown(_ p1: Int) -> String {
         return L10n.tr("Localizable", "homePage_profileOlympiaError_okCountdown", p1, fallback: "OK (%d)")
@@ -2625,6 +2647,20 @@ public enum L10n {
       /// What’s the main reason for your score?
       public static let heading = L10n.tr("Localizable", "survey_reason_heading", fallback: "What’s the main reason for your score?")
     }
+  }
+  public enum TimeFormatting {
+    /// %@ ago
+    public static func ago(_ p1: Any) -> String {
+      return L10n.tr("Localizable", "timeFormatting_ago", String(describing: p1), fallback: "%@ ago")
+    }
+    /// Just now
+    public static let justNow = L10n.tr("Localizable", "timeFormatting_justNow", fallback: "Just now")
+    /// Today
+    public static let today = L10n.tr("Localizable", "timeFormatting_today", fallback: "Today")
+    /// Tomorrow
+    public static let tomorrow = L10n.tr("Localizable", "timeFormatting_tomorrow", fallback: "Tomorrow")
+    /// Yesterday
+    public static let yesterday = L10n.tr("Localizable", "timeFormatting_yesterday", fallback: "Yesterday")
   }
   public enum TransactionHistory {
     /// This transaction cannot be summarized. Only the raw transaction manifest may be viewed.
