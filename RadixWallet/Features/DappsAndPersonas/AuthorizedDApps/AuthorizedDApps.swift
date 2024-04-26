@@ -3,7 +3,7 @@ import Sargon
 import SwiftUI
 
 // MARK: - AuthorizedDapps
-public struct AuthorizedDappsReducer: Sendable, FeatureReducer {
+public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.errorQueue) var errorQueue

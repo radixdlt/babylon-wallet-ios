@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - AuthorizedDapps.View
-extension AuthorizedDappsReducer {
+extension AuthorizedDappsFeature {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: Store
@@ -25,7 +25,7 @@ extension AuthorizedDappsReducer {
 
 // MARK: - Body
 
-extension AuthorizedDappsReducer.View {
+extension AuthorizedDappsFeature.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
@@ -65,10 +65,10 @@ extension AuthorizedDappsReducer.View {
 
 // MARK: - Extensions
 
-extension AuthorizedDappsReducer.State {
-	var viewState: AuthorizedDappsReducer.ViewState {
+extension AuthorizedDappsFeature.State {
+	var viewState: AuthorizedDappsFeature.ViewState {
 		let dAppViewStates = dApps.map {
-			AuthorizedDappsReducer.ViewState.Dapp(
+			AuthorizedDappsFeature.ViewState.Dapp(
 				id: $0.id,
 				name: $0.displayName ?? L10n.DAppRequest.Metadata.unknownName,
 				thumbnail: thumbnails[$0.id]
@@ -79,9 +79,9 @@ extension AuthorizedDappsReducer.State {
 	}
 }
 
-private extension StoreOf<AuthorizedDappsReducer> {
-	var destination: PresentationStoreOf<AuthorizedDappsReducer.Destination> {
-		func scopeState(state: State) -> PresentationState<AuthorizedDappsReducer.Destination.State> {
+private extension StoreOf<AuthorizedDappsFeature> {
+	var destination: PresentationStoreOf<AuthorizedDappsFeature.Destination> {
+		func scopeState(state: State) -> PresentationState<AuthorizedDappsFeature.Destination.State> {
 			state.$destination
 		}
 		return scope(state: scopeState, action: Action.destination)
@@ -90,12 +90,12 @@ private extension StoreOf<AuthorizedDappsReducer> {
 
 @MainActor
 private extension View {
-	func destinations(with store: StoreOf<AuthorizedDappsReducer>) -> some View {
+	func destinations(with store: StoreOf<AuthorizedDappsFeature>) -> some View {
 		let destinationStore = store.destination
 		return navigationDestination(
 			store: destinationStore,
-			state: /AuthorizedDappsReducer.Destination.State.presentedDapp,
-			action: AuthorizedDappsReducer.Destination.Action.presentedDapp,
+			state: /AuthorizedDappsFeature.Destination.State.presentedDapp,
+			action: AuthorizedDappsFeature.Destination.Action.presentedDapp,
 			destination: { DappDetails.View(store: $0) }
 		)
 	}

@@ -55,7 +55,7 @@ public struct Settings: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case manageP2PLinks(P2PLinksFeature.State)
 
-			case authorizedDapps(AuthorizedDappsReducer.State)
+			case authorizedDapps(AuthorizedDappsFeature.State)
 			case personas(PersonasCoordinator.State)
 			case accountSecurity(AccountSecurity.State)
 			case appSettings(AppSettings.State)
@@ -65,7 +65,7 @@ public struct Settings: Sendable, FeatureReducer {
 		public enum Action: Sendable, Equatable {
 			case manageP2PLinks(P2PLinksFeature.Action)
 
-			case authorizedDapps(AuthorizedDappsReducer.Action)
+			case authorizedDapps(AuthorizedDappsFeature.Action)
 			case personas(PersonasCoordinator.Action)
 			case accountSecurity(AccountSecurity.Action)
 			case appSettings(AppSettings.Action)
@@ -77,7 +77,7 @@ public struct Settings: Sendable, FeatureReducer {
 				P2PLinksFeature()
 			}
 			Scope(state: /State.authorizedDapps, action: /Action.authorizedDapps) {
-				AuthorizedDappsReducer()
+				AuthorizedDappsFeature()
 			}
 			Scope(state: /State.personas, action: /Action.personas) {
 				PersonasCoordinator()
