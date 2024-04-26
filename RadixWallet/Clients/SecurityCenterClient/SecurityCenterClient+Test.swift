@@ -15,7 +15,7 @@ extension SecurityCenterClient: TestDependencyKey {
 	public static let previewValue: Self = .noop
 
 	public static let noop = Self(
-		problems: { throw NoopError() },
+		problems: { throw NoopError() }
 	)
 
 	public static let testValue = Self(
