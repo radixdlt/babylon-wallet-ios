@@ -196,6 +196,15 @@
 "linkedConnectors_localNetworkPermissionDeniedAlert_message" = "Local network access is required to link to a Connector.";
 "linkedConnectors_incorrectQrTitle" = "Incorrect QR code scanned.";
 "linkedConnectors_incorrectQrMessage" = "Please scan the QR code provided by your Radix Wallet Connector browser extension.";
+"linkedConnectors_approveNewConnector_title" = "Link Connector";
+"linkedConnectors_approveExistingConnector_title" = "Update Link";
+"linkedConnectors_approveNewConnector_message" = "This Connector will be trusted to verify the dApp origin of requests to this wallet.
+
+Only continue if you are linking to the **official Radix Connector browser extension** - or a Connector you control and trust.";
+"linkedConnectors_approveExistingConnector_message" = "This appears to be a Radix Connector you previously linked to. Link will be updated.";
+"linkedConnectors_linkFailedErrorTitle" = "Link Failed";
+"linkedConnectors_unknownPurposeErrorMessage" = "This type of Connector link is not supported.";
+"linkedConnectors_changingPurposeNotSupportedErrorMessage" = "Changing a Connector’s type is not supported.";
 "gateways_title" = "Gateways";
 "gateways_subtitle" = "Choose the gateway your wallet will use to connect to the Radix Network or test networks. Only change this if you know what you’re doing.";
 "gateways_whatIsAGateway" = "What is a Gateway?";
@@ -393,7 +402,7 @@
 "transactionReview_slideToSign" = "Slide to Sign";
 "transactionReview_xrdAmount" = "%@ XRD";
 "transactionReview_insufficientBalance" = "Insufficient Balance";
-"transactionReview_feePayerRequiredMessage" = "Fee Payer account required";
+"transactionReview_feePayerRequiredMessage" = "Fee payer account required";
 "transactionReview_withdrawalsHeading" = "Withdrawing From";
 "transactionReview_depositsHeading" = "Depositing To";
 "transactionReview_sendingToHeading" = "Sending to";
@@ -510,6 +519,7 @@
 "common_unauthorized" = "Unauthorized";
 "common_rateLimitReached" = "Gateway access blocked due to exceeding rate limit. Please wait a few minutes to retry.";
 "common_badHttpResponseStatusCode" = "Bad HTTP response status code %d";
+"common_dismiss" = "Dismiss";
 "error_dappRequest_invalidPersonaId" = "Invalid Persona specified by dApp";
 "error_dappRequest_invalidRequest" = "Invalid request";
 "error_profileLoad_decodingError" = "Failed to import Radix Wallet backup: %@";
@@ -678,16 +688,6 @@ Or you can clear this wallet from this phone and start fresh.";
 "importOlympiaLedgerAccounts_continueButtonTitle" = "Continue";
 "importOlympiaLedgerAccounts_accountCount" = "Accounts remaining to verify: %d";
 "importOlympiaLedgerAccounts_instruction" = "Connect your next Ledger device, launch the Radix Babylon app on it, and tap Continue here.";
-"signing_withDeviceFactorSource_signTransaction" = "Sign transaction with phone";
-"signing_withDeviceFactorSource_idLabel" = "Factor Source ID: %@";
-"signing_useLedgerLabel_Ledger" = "Ledger";
-"signing_useLedgerLabel_lastUsed" = "Last used";
-"signing_useLedgerLabel_addedOn" = "Added on";
-"signing_signatureRequest_title" = "Signature Request";
-"signing_signatureRequest_body" = "Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension, and the Radix Babylon app is launched on the device.";
-"signing_signatureRequest_instructions" = "Review and sign the transaction on the Ledger device to continue.";
-"signing_signatureSuccessful_title" = "Signed";
-"signing_signatureSuccessful_body" = "Signature successful";
 "ledgerHardwareDevices_linkConnectorAlert_title" = "Link a Connector";
 "ledgerHardwareDevices_linkConnectorAlert_message" = "To use a Ledger hardware wallet device, it must be connected to a computer running the Radix Connector browser extension.";
 "ledgerHardwareDevices_linkConnectorAlert_continue" = "Continue";
@@ -950,7 +950,6 @@ Your old Accounts and Personas will still be listed, but you will have to enter 
 "accountRecoveryScan_chooseSeedPhrase_importMnemonicTitleBabylon" = "Enter Seed Phrase";
 "accountRecoveryScan_chooseSeedPhrase_continueButton" = "Continue";
 "accountRecoveryScan_olympiaLedgerNote" = "Note: You must still use the new *Radix Babylon* app on your Ledger device, not the old Radix Ledger app.";
-"accountRecoveryScan_derivingAccounts" = "Deriving Accounts";
 "accountSecuritySettings_seedPhrases_title" = "Seed Phrases";
 "accountSecuritySettings_ledgerHardwareWallets_title" = "Ledger Hardware Wallets";
 "accountSecuritySettings_depositGuarantees_title" = "Default Deposit Guarantees";
@@ -968,14 +967,6 @@ You can always change the guarantee from this default in each transaction.";
 "enterSeedPhrase_titleBabylonMain" = "Enter Main Seed Phrase";
 "enterSeedPhrase_titleBabylon" = "Enter Babylon Seed Phrase";
 "enterSeedPhrase_titleOlympia" = "Enter Olympia Seed Phrase";
-"derivePublicKeys_titleCreateAccount" = "Creating Account";
-"derivePublicKeys_titleCreatePersona" = "Creating Persona";
-"derivePublicKeys_titleImportLegacyAccount" = "Deriving Accounts";
-"derivePublicKeys_titleAccountRecoveryScan" = "Deriving Accounts";
-"derivePublicKeys_titleCreateAuthSignKeyForAccount" = "Creating Key";
-"derivePublicKeys_titleCreateAuthSignKeyForPersona" = "Creating Key";
-"derivePublicKeys_subtitleDevice" = "Authenticate to your phone to sign.";
-"derivePublicKeys_subtitleLedger" = "Make sure the following **Ledger hardware wallet device** is connected to a computer with a linked Radix Connector browser extension. Complete signing on the device.";
 "recoverWalletWithoutProfile_start_headerTitle" = "Recover Control Without Backup";
 "recoverWalletWithoutProfile_start_headerSubtitle" = "If you have no wallet backup in the cloud, or as an exported backup file, you still have other restore options.";
 "recoverWalletWithoutProfile_start_babylonSectionTitle" = "I have my main “Babylon” 24-word seed phrase.";
@@ -1091,13 +1082,13 @@ If you have any “Legacy” Accounts (created on the Olympia network) to import
 "securityFactors_ledgerWallet_counterSingular" = "1 set";
 "securityFactors_ledgerWallet_counterPlural" = "%d set";
 "configurationBackup_title" = "Configuration Backup";
+"configurationBackup_heading" = "You need an up-to-date Configuration Backup to recover your Accounts and Personas if you lose access to them.
+
+Your Backup does not contain your keys or seed phrase.";
 "configurationBackup_problem5WarningIOS" = "Automated Configuration Backup not working. Check internet connection and iCloud settings.";
 "configurationBackup_problem5WarningAndroid" = "Automated Configuration Backup not working. Check internet connection and Google Drive settings.";
 "configurationBackup_problem6Warning" = "To secure your wallet, turn on automated backups or manually export backup file.";
 "configurationBackup_problem7Warning" = "Configuration Backup not up to date. Turn on automated backups or manually export backup file.";
-"configurationBackup_automated_heading" = "You need an up-to-date Configuration Backup to recover your Accounts and Personas if you lose access to them.
-
-Your Backup does not contain your keys or seed phrase.";
 "configurationBackup_automated_text" = "Configuration Backup status";
 "configurationBackup_automated_warning" = "Without an updated Configuration Backup, you cannot recover your Accounts and Personas.";
 "configurationBackup_automated_toggleIOS" = "Automated iCloud Backups";
