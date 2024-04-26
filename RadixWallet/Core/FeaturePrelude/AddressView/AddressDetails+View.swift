@@ -80,7 +80,7 @@ public extension AddressDetails {
 				}
 
 				if showQrCode {
-					Text("Address QR Code")
+					Text(L10n.AddressDetails.qrCode)
 						.textStyle(.secondaryHeader)
 						.foregroundColor(.app.gray1)
 
@@ -93,7 +93,7 @@ public extension AddressDetails {
 		private func fullAddress(address: AttributedString) -> some SwiftUI.View {
 			VStack(spacing: .medium2) {
 				VStack(spacing: .small2) {
-					Text("Full address")
+					Text(L10n.AddressDetails.fullAddress)
 						.foregroundColor(.app.gray1)
 					Text(address)
 				}
@@ -108,13 +108,13 @@ public extension AddressDetails {
 
 		private var actions: some SwiftUI.View {
 			HStack(spacing: .large3) {
-				Button("Copy", image: .copy) {
+				Button(L10n.AddressDetails.copy, image: .copy) {
 					store.send(.view(.copyButtonTapped))
 				}
-				Button("Enlarge", image: .fullScreen) {
+				Button(L10n.AddressDetails.enlarge, image: .fullScreen) {
 					store.send(.view(.enlargeButtonTapped))
 				}
-				Button("Share", systemImage: "square.and.arrow.up") {
+				Button(L10n.AddressDetails.share, systemImage: "square.and.arrow.up") {
 					store.send(.view(.shareButtonTapped))
 				}
 			}
@@ -124,7 +124,7 @@ public extension AddressDetails {
 
 		private func bottom(showVerifyOnLedger: Bool) -> some SwiftUI.View {
 			VStack(spacing: .medium3) {
-				Button("View on Radix Dashboard") {
+				Button(L10n.AddressDetails.viewOnDashboard) {
 					store.send(.view(.viewOnDashboardButtonTapped))
 				}
 				.buttonStyle(
@@ -134,7 +134,7 @@ public extension AddressDetails {
 					)
 				)
 				if showVerifyOnLedger {
-					Button("Verify Address on Ledger Device") {
+					Button(L10n.AddressDetails.verifyOnLedger) {
 						store.send(.view(.verifyOnLedgerButtonTapped))
 					}
 					.buttonStyle(.secondaryRectangular(shouldExpand: true))
@@ -151,7 +151,7 @@ public extension AddressDetails {
 						.aspectRatio(1, contentMode: .fit)
 						.transition(.scale(scale: 0.95).combined(with: .opacity))
 				case .failure:
-					Text("Failed to generate QR code")
+					Text(L10n.AddressDetails.qrCodeFailure)
 						.textStyle(.body1HighImportance)
 						.foregroundColor(.app.alert)
 				case .loading:
