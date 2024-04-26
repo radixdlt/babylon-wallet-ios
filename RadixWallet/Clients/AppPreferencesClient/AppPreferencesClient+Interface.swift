@@ -1,5 +1,3 @@
-import Sargon
-
 // MARK: - AppPreferencesClient
 public struct AppPreferencesClient: Sendable {
 	public var appPreferenceUpdates: AppPreferenceUpdates
@@ -9,10 +7,15 @@ public struct AppPreferencesClient: Sendable {
 	/// Needs special treatment since this setting involves Keychain and iCloud
 	public var setIsCloudProfileSyncEnabled: SetIsCloudProfileSyncEnabled
 
+	/// Sets the flag on the profile, does not delete old backups
+	public var setIsCloudBackupEnabled: SetIsCloudBackupEnabled
+
 	// FIXME: find a better home for this...? Should we have some actual `ProfileSnapshotClient`
 	// for this and `delete` method?
 	public var extractProfileSnapshot: ExtractProfileSnapshot
 	public var deleteProfileAndFactorSources: DeleteProfileSnapshot
+
+	public var getDetailsOfSecurityStructure: GetDetailsOfSecurityStructure
 
 	public init(
 		appPreferenceUpdates: @escaping AppPreferenceUpdates,
@@ -20,7 +23,9 @@ public struct AppPreferencesClient: Sendable {
 		updatePreferences: @escaping UpdatePreferences,
 		extractProfileSnapshot: @escaping ExtractProfileSnapshot,
 		deleteProfileAndFactorSources: @escaping DeleteProfileSnapshot,
-		setIsCloudProfileSyncEnabled: @escaping SetIsCloudProfileSyncEnabled
+		setIsCloudProfileSyncEnabled: @escaping SetIsCloudProfileSyncEnabled,
+		setIsCloudBackupEnabled: @escaping SetIsCloudBackupEnabled,
+		getDetailsOfSecurityStructure: @escaping GetDetailsOfSecurityStructure
 	) {
 		self.appPreferenceUpdates = appPreferenceUpdates
 		self.getPreferences = getPreferences
@@ -28,6 +33,8 @@ public struct AppPreferencesClient: Sendable {
 		self.extractProfileSnapshot = extractProfileSnapshot
 		self.deleteProfileAndFactorSources = deleteProfileAndFactorSources
 		self.setIsCloudProfileSyncEnabled = setIsCloudProfileSyncEnabled
+		self.setIsCloudBackupEnabled = setIsCloudBackupEnabled
+		self.getDetailsOfSecurityStructure = getDetailsOfSecurityStructure
 	}
 }
 
@@ -35,10 +42,12 @@ public struct AppPreferencesClient: Sendable {
 extension AppPreferencesClient {
 	public typealias AppPreferenceUpdates = @Sendable () async -> AnyAsyncSequence<AppPreferences>
 	public typealias SetIsCloudProfileSyncEnabled = @Sendable (Bool) async throws -> Void
+	public typealias SetIsCloudBackupEnabled = @Sendable (Bool) async throws -> Void
 	public typealias GetPreferences = @Sendable () async -> AppPreferences
 	public typealias UpdatePreferences = @Sendable (AppPreferences) async throws -> Void
-	public typealias ExtractProfileSnapshot = @Sendable () async -> Profile
+	public typealias ExtractProfileSnapshot = @Sendable () async -> ProfileSnapshot
 	public typealias DeleteProfileSnapshot = @Sendable (_ keepInICloudIfPresent: Bool) async throws -> Void
+	public typealias GetDetailsOfSecurityStructure = @Sendable (SecurityStructureConfigurationReference) async throws -> SecurityStructureConfigurationDetailed
 }
 
 extension AppPreferencesClient {
@@ -56,7 +65,7 @@ extension AppPreferencesClient {
 	}
 
 	public func updatingDisplay<T>(
-		_ mutateDisplay: @Sendable (inout AppDisplay) throws -> T
+		_ mutateDisplay: @Sendable (inout AppPreferences.Display) throws -> T
 	) async throws -> T {
 		try await updating { preferences in
 			try mutateDisplay(&preferences.display)

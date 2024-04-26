@@ -74,12 +74,8 @@ private extension StoreOf<ConfigurationBackup> {
 private extension View {
 	func destinations(with store: StoreOf<ConfigurationBackup>) -> some View {
 		let destinationStore = store.destination
-		return confirmDisableCloudBackupAlert(with: destinationStore)
-			.encryptProfileOrNotAlert(with: destinationStore)
-	}
-
-	private func confirmDisableCloudBackupAlert(with destinationStore: PresentationStoreOf<ConfigurationBackup.Destination>) -> some View {
-		alert(store: destinationStore.scope(state: \.confirmDisableCloudBackup, action: \.confirmDisableCloudBackup))
+		return encryptProfileOrNotAlert(with: destinationStore)
+			.encryptionPasswordSheet(with: destinationStore)
 	}
 
 	private func encryptProfileOrNotAlert(with destinationStore: PresentationStoreOf<ConfigurationBackup.Destination>) -> some View {

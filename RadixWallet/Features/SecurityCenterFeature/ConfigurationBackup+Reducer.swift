@@ -51,26 +51,20 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		case setLastBackedUp(Date?)
 		case didDeleteOutdatedBackup(Profile.ID)
 
-		case exportProfile(ExportableProfileFile)
+		case exportProfileSnapshot(ProfileSnapshot)
 	}
 
 	public struct Destination: DestinationReducer {
 		@CasePathable
 		public enum State: Sendable, Hashable {
 			case encryptionPassword(EncryptOrDecryptProfile.State)
-			case confirmDisableCloudBackup(AlertState<Action.ConfirmDisableCloudBackup>)
 			case encryptProfileOrNot(AlertState<Action.EncryptProfileOrNot>)
 		}
 
 		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case encryptionPassword(EncryptOrDecryptProfile.Action)
-			case confirmDisableCloudBackup(ConfirmDisableCloudBackup)
 			case encryptProfileOrNot(EncryptProfileOrNot)
-
-			public enum ConfirmDisableCloudBackup: Sendable, Hashable {
-				case confirm
-			}
 
 			public enum EncryptProfileOrNot: Sendable, Hashable {
 				case encrypt
@@ -108,12 +102,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		}
 	}
 
-	private func toggleCloudBackupsEffect(state: inout State, isEnabled: Bool) -> Effect<Action> {
-		state.lastBackup = nil
-		return updateCloudBackupsSettingEffect(isEnabled: isEnabled)
-			.concatenate(with: updateLastBackupEffect())
-	}
-
 	private func updateCloudBackupsSettingEffect(isEnabled: Bool) -> Effect<Action> {
 		.run { send in
 			do {
@@ -146,12 +134,10 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 				.merge(with: checkCloudAccountStatusEffect())
 
 		case let .automatedBackupsToggled(isEnabled):
-			if isEnabled {
-				return toggleCloudBackupsEffect(state: &state, isEnabled: true)
-			} else {
-				state.destination = .confirmDisableCloudBackup(.confirmDisableCloudBackupAlert)
-				return .none
-			}
+			print("•• automatedBackupsToggled")
+			state.lastBackup = nil
+			return updateCloudBackupsSettingEffect(isEnabled: isEnabled)
+				.concatenate(with: updateLastBackupEffect())
 
 		case .exportTapped:
 			state.destination = .encryptProfileOrNot(.encryptProfileOrNotAlert)
@@ -193,7 +179,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		case let .encryptionPassword(.delegate(delegateAction)):
 			switch delegateAction {
 			case .dismiss:
-//				state.destination = nil
+				state.destination = nil
 				print("•• encryptionPassword dismiss")
 				return .none
 
@@ -201,6 +187,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 				preconditionFailure("Incorrect implementation, should only ENcrypt")
 
 			case let .successfullyEncrypted(_, encrypted: encryptedFile):
+				print("•• successfullyEncrypted")
 				state.destination = nil
 				state.profileFile = .encrypted(encryptedFile)
 				return .none
@@ -208,10 +195,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 		case .encryptionPassword:
 			return .none
-
-		case .confirmDisableCloudBackup(.confirm):
-			print("•• confirmed cloud backup disable")
-			return toggleCloudBackupsEffect(state: &state, isEnabled: false)
 
 		case let .encryptProfileOrNot(encryptOrNot):
 			switch encryptOrNot {
@@ -221,8 +204,8 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 			case .doNotEncrypt:
 				return .run { send in
-					let profileSnapshot = await ProfileStore.shared.profile.snapshot()
-					await send(.internal(.exportProfile(.plaintext(profileSnapshot))))
+					let snapshot = await ProfileStore.shared.profile.snapshot()
+					await send(.internal(.exportProfileSnapshot(snapshot)))
 				}
 			}
 		}
@@ -250,24 +233,13 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			state.iCloudAccountStatus = status
 			return .none
 
-		case let .exportProfile(profileFile):
-			state.profileFile = profileFile
+		case let .exportProfileSnapshot(snapshot):
+			print("•• exportProfileSnapshot")
+
+			state.profileFile = .plaintext(snapshot)
 			return .none
 		}
 	}
-}
-
-extension AlertState<ConfigurationBackup.Destination.Action.ConfirmDisableCloudBackup> {
-	static let confirmDisableCloudBackupAlert: AlertState = .init(
-		title: {
-			TextState(L10n.IOSProfileBackup.ConfirmCloudSyncDisableAlert.title)
-		},
-		actions: {
-			ButtonState(role: .destructive, action: .confirm) {
-				TextState(L10n.Common.confirm)
-			}
-		}
-	)
 }
 
 extension AlertState<ConfigurationBackup.Destination.Action.EncryptProfileOrNot> {
