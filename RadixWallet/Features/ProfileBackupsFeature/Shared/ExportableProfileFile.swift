@@ -7,7 +7,7 @@ import UniformTypeIdentifiers
 struct NoJSONDataFound: Error {}
 
 // MARK: - FileContentsNotProfile
-struct FileContentsNotProfile: LocalizedError {
+struct FileContentIsNotProfile: LocalizedError {
 	var errorDescription: String? {
 		L10n.Error.ProfileLoad.decodingError("Invalid backup file.")
 	}
