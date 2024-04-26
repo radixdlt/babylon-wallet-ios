@@ -399,7 +399,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 			d.mnemonicClient.generate = { wordCount, _ in
 				// THEN 24 word mnemonic is generated
 				XCTAssertNoDifference(wordCount, .twentyFour)
-				return try Mnemonic(wordCount: wordCount, language: .english)
+				return Mnemonic(wordCount: wordCount, language: .english)
 			}
 		}
 	}
