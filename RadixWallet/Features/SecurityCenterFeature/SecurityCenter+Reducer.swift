@@ -74,7 +74,7 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 			case .securityFactors:
 				return .none
 			case .configurationBackup:
-				state.destination = .configurationBackup(.init())
+				state.destination = .configurationBackup(.init(problems: state.problems))
 				return .none
 			}
 		}

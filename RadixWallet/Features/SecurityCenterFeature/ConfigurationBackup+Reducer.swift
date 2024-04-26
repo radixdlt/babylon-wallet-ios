@@ -1,12 +1,23 @@
 import CloudKit
 import ComposableArchitecture
 
+// MARK: - ConfigurationBackup
 public struct ConfigurationBackup: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var iCLoudAccountStatus: CKAccountStatus? = nil
+		public var iCloudAccountStatus: CKAccountStatus? = nil
 		public var automatedBackupsEnabled: Bool = true
-		public var problems: [SecurityProblem] = [.problem5]
 		public var lastBackup: Date? = nil
+		public var problems: [SecurityProblem]
+
+		@PresentationState
+		public var destination: Destination.State? = nil
+
+		/// An exportable Profile file, either encrypted or plaintext. Setting this will trigger showing a file exporter
+		public var profileFile: ExportableProfileFile?
+
+		public init(problems: [SecurityProblem]) {
+			self.problems = problems
+		}
 
 		public var outdatedBackupPresent: Bool {
 			!automatedBackupsEnabled && lastBackup != nil
@@ -25,25 +36,64 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case onAppear
-		case toggleAutomatedBackups(Bool)
+		case didAppear
+		case automatedBackupsToggled(Bool)
 		case exportTapped
 		case deleteOutdatedTapped
+
+		case showFileExporter(Bool)
+		case profileExportResult(Result<URL, NSError>)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case isCloudBackupEnabled(Bool)
-		case iCloudAccountStatus(CKAccountStatus)
-		case lastBackedUp(Date?)
-		case outdatedBackupDeleted(Profile.ID)
+		case setCloudBackupEnabled(Bool)
+		case setICloudAccountStatus(CKAccountStatus)
+		case setLastBackedUp(Date?)
+		case didDeleteOutdatedBackup(Profile.ID)
+
+		case exportProfile(ExportableProfileFile)
 	}
 
+	public struct Destination: DestinationReducer {
+		@CasePathable
+		public enum State: Sendable, Hashable {
+			case encryptionPassword(EncryptOrDecryptProfile.State)
+			case confirmDisableCloudBackup(AlertState<Action.ConfirmDisableCloudBackup>)
+			case encryptProfileOrNot(AlertState<Action.EncryptProfileOrNot>)
+		}
+
+		@CasePathable
+		public enum Action: Sendable, Equatable {
+			case encryptionPassword(EncryptOrDecryptProfile.Action)
+			case confirmDisableCloudBackup(ConfirmDisableCloudBackup)
+			case encryptProfileOrNot(EncryptProfileOrNot)
+
+			public enum ConfirmDisableCloudBackup: Sendable, Hashable {
+				case confirm
+			}
+
+			public enum EncryptProfileOrNot: Sendable, Hashable {
+				case encrypt
+				case doNotEncrypt
+			}
+		}
+
+		public var body: some Reducer<State, Action> {
+			Scope(state: \.encryptionPassword, action: \.encryptionPassword) {
+				EncryptOrDecryptProfile()
+			}
+		}
+	}
+
+	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.cloudBackupClient) var cloudBackupClient
 
 	private func checkCloudBackupEnabledEffect() -> Effect<Action> {
 		.run { send in
-			let iCloudEnabled = await ProfileStore.shared.profile.appPreferences.security.isCloudProfileSyncEnabled
-			await send(.internal(.isCloudBackupEnabled(iCloudEnabled)))
+			let isEnabled = await ProfileStore.shared.profile.appPreferences.security.isCloudProfileSyncEnabled
+			await send(.internal(.setCloudBackupEnabled(isEnabled)))
 		}
 	}
 
@@ -51,9 +101,27 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		.run { send in
 			do {
 				let status = try await cloudBackupClient.checkAccountStatus()
-				await send(.internal(.iCloudAccountStatus(status)))
+				await send(.internal(.setICloudAccountStatus(status)))
 			} catch {
 				loggerGlobal.error("Failed to get iCloud account status: \(error)")
+			}
+		}
+	}
+
+	private func toggleCloudBackupsEffect(state: inout State, isEnabled: Bool) -> Effect<Action> {
+		state.lastBackup = nil
+		return updateCloudBackupsSettingEffect(isEnabled: isEnabled)
+			.concatenate(with: updateLastBackupEffect())
+	}
+
+	private func updateCloudBackupsSettingEffect(isEnabled: Bool) -> Effect<Action> {
+		.run { send in
+			do {
+				try await appPreferencesClient.setIsCloudProfileSyncEnabled(isEnabled)
+				await send(.internal(.setCloudBackupEnabled(isEnabled)))
+				print("•• toggled cloud backups \(isEnabled)")
+			} catch {
+				loggerGlobal.error("Failed toggle cloud backups \(isEnabled ? "on" : "off"): \(error)")
 			}
 		}
 	}
@@ -63,7 +131,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			let profile = await ProfileStore.shared.profile
 			do {
 				let lastBackedUp = try await cloudBackupClient.lastBackup(profile.id)
-				await send(.internal(.lastBackedUp(lastBackedUp)))
+				await send(.internal(.setLastBackedUp(lastBackedUp)))
 				print("•• got last backed up")
 			} catch {
 				loggerGlobal.error("Failed to fetch last backup for \(profile.id.uuidString): \(error)")
@@ -73,33 +141,88 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
-		case .onAppear:
+		case .didAppear:
 			return updateLastBackupEffect()
 				.merge(with: checkCloudAccountStatusEffect())
 
-		case let .toggleAutomatedBackups(isEnabled):
-			state.automatedBackupsEnabled = isEnabled
+		case let .automatedBackupsToggled(isEnabled):
 			if isEnabled {
-				state.lastBackup = nil
+				return toggleCloudBackupsEffect(state: &state, isEnabled: true)
 			} else {
-				// FIXME: GK - turn off backups
+				state.destination = .confirmDisableCloudBackup(.confirmDisableCloudBackupAlert)
+				return .none
 			}
-			return updateLastBackupEffect()
 
 		case .exportTapped:
+			state.destination = .encryptProfileOrNot(.encryptProfileOrNotAlert)
+			return .none
+
+		case let .showFileExporter(show):
+			if !show {
+				state.profileFile = nil
+			}
 			return .none
 
 		case .deleteOutdatedTapped:
-
 			return .run { send in
 				let profile = await ProfileStore.shared.profile
 				do {
 					try await cloudBackupClient.deleteProfile(profile.id)
-					await send(.internal(.outdatedBackupDeleted(profile.id)))
-					await send(.internal(.lastBackedUp(nil)))
+					await send(.internal(.didDeleteOutdatedBackup(profile.id)))
 					print("•• deleted outdate \(profile.id)")
 				} catch {
 					loggerGlobal.error("Failed to delete outdate backup \(profile.id.uuidString): \(error)")
+				}
+			}
+
+		case let .profileExportResult(.success(exportedProfileURL)):
+			let didEncryptIt = exportedProfileURL.absoluteString.contains(.profileFileEncryptedPart)
+			overlayWindowClient.scheduleHUD(.exportedProfile(encrypted: didEncryptIt))
+			loggerGlobal.notice("Profile successfully exported to: \(exportedProfileURL)")
+			return .none
+
+		case let .profileExportResult(.failure(error)):
+			loggerGlobal.error("Failed to export profile, error: \(error)")
+			errorQueue.schedule(error)
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case let .encryptionPassword(.delegate(delegateAction)):
+			switch delegateAction {
+			case .dismiss:
+//				state.destination = nil
+				print("•• encryptionPassword dismiss")
+				return .none
+
+			case .successfullyDecrypted:
+				preconditionFailure("Incorrect implementation, should only ENcrypt")
+
+			case let .successfullyEncrypted(_, encrypted: encryptedFile):
+				state.destination = nil
+				state.profileFile = .encrypted(encryptedFile)
+				return .none
+			}
+
+		case .encryptionPassword:
+			return .none
+
+		case .confirmDisableCloudBackup(.confirm):
+			print("•• confirmed cloud backup disable")
+			return toggleCloudBackupsEffect(state: &state, isEnabled: false)
+
+		case let .encryptProfileOrNot(encryptOrNot):
+			switch encryptOrNot {
+			case .encrypt:
+				state.destination = .encryptionPassword(.init(mode: .loadThenEncrypt()))
+				return .none
+
+			case .doNotEncrypt:
+				return .run { send in
+					let profileSnapshot = await ProfileStore.shared.profile.snapshot()
+					await send(.internal(.exportProfile(.plaintext(profileSnapshot))))
 				}
 			}
 		}
@@ -107,22 +230,58 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .lastBackedUp(date):
+		case let .setLastBackedUp(date):
 			state.lastBackup = date
 			return .none
 
-		case let .outdatedBackupDeleted(id):
+		case let .didDeleteOutdatedBackup(id):
+			state.lastBackup = nil
+			print("•• didDeleteOutdatedBackup")
 			// FIXME: GK - show alert? toast?
 			return .none
 
-		case let .isCloudBackupEnabled(isEnabled):
-			print("•• is enabled: \(isEnabled)")
+		case let .setCloudBackupEnabled(isEnabled):
+			print("•• set setCloudBackupEnabled: \(isEnabled)")
 			state.automatedBackupsEnabled = isEnabled
 			return .none
 
-		case let .iCloudAccountStatus(status):
-			state.iCLoudAccountStatus = status
+		case let .setICloudAccountStatus(status):
+			print("•• set iCloudAccountStatus: \(status)")
+			state.iCloudAccountStatus = status
+			return .none
+
+		case let .exportProfile(profileFile):
+			state.profileFile = profileFile
 			return .none
 		}
 	}
+}
+
+extension AlertState<ConfigurationBackup.Destination.Action.ConfirmDisableCloudBackup> {
+	static let confirmDisableCloudBackupAlert: AlertState = .init(
+		title: {
+			TextState(L10n.IOSProfileBackup.ConfirmCloudSyncDisableAlert.title)
+		},
+		actions: {
+			ButtonState(role: .destructive, action: .confirm) {
+				TextState(L10n.Common.confirm)
+			}
+		}
+	)
+}
+
+extension AlertState<ConfigurationBackup.Destination.Action.EncryptProfileOrNot> {
+	static let encryptProfileOrNotAlert: AlertState = .init(
+		title: {
+			TextState(L10n.ProfileBackup.ManualBackups.encryptBackupDialogTitle)
+		},
+		actions: {
+			ButtonState(action: .encrypt) {
+				TextState(L10n.ProfileBackup.ManualBackups.encryptBackupDialogConfirm)
+			}
+			ButtonState(action: .doNotEncrypt) {
+				TextState(L10n.ProfileBackup.ManualBackups.encryptBackupDialogDeny)
+			}
+		}
+	)
 }
