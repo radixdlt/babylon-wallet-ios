@@ -4,8 +4,9 @@ import SwiftUI
 // MARK: - SelectBackup
 public struct SelectBackup: Sendable, FeatureReducer {
 	public struct State: Hashable, Sendable {
-		public var backupProfileHeaders: Profile.HeaderList?
-		public var selectedProfileHeader: Profile.Header?
+		public var backupProfileHeaders: ProfileSnapshot.HeaderList?
+		public var cloudBackupProfileHeaders: ProfileSnapshot.HeaderList? = nil
+		public var selectedProfileHeader: ProfileSnapshot.Header?
 		public var isDisplayingFileImporter: Bool
 		public var thisDeviceID: UUID?
 
@@ -15,8 +16,8 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		public var profileFile: ExportableProfileFile?
 
 		public init(
-			backupProfileHeaders: Profile.HeaderList? = nil,
-			selectedProfileHeader: Profile.Header? = nil,
+			backupProfileHeaders: ProfileSnapshot.HeaderList? = nil,
+			selectedProfileHeader: ProfileSnapshot.Header? = nil,
 			isDisplayingFileImporter: Bool = false,
 			thisDeviceID: UUID? = nil
 		) {
@@ -50,23 +51,24 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case selectedProfileHeader(Profile.Header?)
+		case selectedProfileHeader(ProfileSnapshot.Header?)
 		case importFromFileInstead
 		case dismissFileImporter
 		case otherRestoreOptionsTapped
 		case profileImportResult(Result<URL, NSError>)
-		case tappedUseCloudBackup(Profile.Header)
+		case tappedUseCloudBackup(ProfileSnapshot.Header)
 		case closeButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadBackupProfileHeadersResult(Profile.HeaderList?)
+		case loadBackupProfileHeadersResult(ProfileSnapshot.HeaderList?)
+		case loadCloudBackupProfileHeadersResult(ProfileSnapshot.HeaderList?)
 		case loadThisDeviceIDResult(UUID?)
-		case snapshotWithHeaderNotFoundInCloud(Profile.Header)
+		case snapshotWithHeaderNotFoundInCloud(ProfileSnapshot.Header)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case selectedProfileSnapshot(Profile, isInCloud: Bool)
+		case selectedProfileSnapshot(ProfileSnapshot, isInCloud: Bool)
 		case backToStartOfOnboarding
 		case profileCreatedFromImportedBDFS
 	}
@@ -76,6 +78,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 	@Dependency(\.dataReader) var dataReader
 	@Dependency(\.jsonDecoder) var jsonDecoder
 	@Dependency(\.backupsClient) var backupsClient
+	@Dependency(\.cloudBackupClient) var cloudBackupClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
@@ -100,6 +103,10 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 				await send(.internal(.loadBackupProfileHeadersResult(
 					backupsClient.loadProfileBackups()
+				)))
+
+				await send(.internal(.loadCloudBackupProfileHeadersResult(
+					cloudBackupClient.loadBackedUpProfileHeaderList()
 				)))
 			}
 
@@ -170,6 +177,10 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			state.backupProfileHeaders = profileHeaders
 			return .none
 
+		case let .loadCloudBackupProfileHeadersResult(profileHeaders):
+			state.cloudBackupProfileHeaders = profileHeaders
+			return .none
+
 		case let .loadThisDeviceIDResult(identifier):
 			state.thisDeviceID = identifier
 			return .none
@@ -221,7 +232,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 // MARK: - ProfileNotFoundInCloud
 struct ProfileNotFoundInCloud: LocalizedError {
-	let header: Profile.Header
+	let header: ProfileSnapshot.Header
 	var errorDescription: String? {
 		L10n.IOSProfileBackup.profileNotFoundInCloud
 	}
