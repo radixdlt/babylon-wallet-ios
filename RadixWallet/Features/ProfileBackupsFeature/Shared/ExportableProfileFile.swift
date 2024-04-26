@@ -39,7 +39,7 @@ extension ExportableProfileFile {
 		@Dependency(\.jsonDecoder) var jsonDecoder
 		do {
 			self = try .plaintext(jsonDecoder().decode(Profile.self, from: data))
-		} catch let decodePlaintextError {
+		} catch {
 			self = .encrypted(data)
 		}
 	}
