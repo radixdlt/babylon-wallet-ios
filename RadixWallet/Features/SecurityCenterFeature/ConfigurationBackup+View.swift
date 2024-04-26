@@ -173,8 +173,13 @@ extension ConfigurationBackup {
 
 		private var lastBackedUpString: String? {
 			guard let lastBackedUp else { return nil }
-			let timeInterval = formatter.string(from: -lastBackedUp.timeIntervalSinceNow)
-			return L10n.ConfigurationBackup.Automated.lastBackup(timeInterval ?? "----")
+			print("••• making lastBackedUpString")
+			guard let timeInterval = formatter.string(from: -lastBackedUp.timeIntervalSinceNow) else {
+				// This should never happen
+				return lastBackedUp.formatted(date: .numeric, time: .shortened)
+			}
+
+			return L10n.ConfigurationBackup.Automated.lastBackup(timeInterval)
 		}
 
 		private let formatter = { // FIXME: GK
@@ -427,8 +432,6 @@ public struct CloudBackupFeature: FeatureReducer {
 			let result: TaskResult<CKRecord> = await TaskResult {
 				try await cloudBackupClient.uploadProfile(profile)
 			}
-
-			print("•• uploading profile: \(profile.id.uuidString)")
 
 			await send(.internal(.profileUploadResult(result)))
 		}

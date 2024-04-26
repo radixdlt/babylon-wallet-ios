@@ -36,33 +36,44 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 	@Dependency(\.cloudBackupClient) var cloudBackupClient
 
+	private func updateLastBackupEffect() -> Effect<Action> {
+		.run { send in
+			let profile = await ProfileStore.shared.profile
+			do {
+				let lastBackedUp = try await cloudBackupClient.lastBackup(profile.id)
+				await send(.internal(.lastBackedUp(lastBackedUp)))
+				print("•• got last backed up")
+			} catch {
+				loggerGlobal.error("Failed to fetch last backup for \(profile.id.uuidString): \(error)")
+			}
+		}
+	}
+
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onAppear:
-			return .run { send in
-				let profile = await ProfileStore.shared.profile
-				do {
-					let lastBackedUp = try await cloudBackupClient.lastBackup(profile.id)
-					await send(.internal(.lastBackedUp(lastBackedUp)))
-					print("•• got last backed up")
-				} catch {
-					loggerGlobal.error("Failed to fetch last backup for \(profile.id.uuidString): \(error)")
-				}
-			}
+			return updateLastBackupEffect()
 
 		case let .toggleAutomatedBackups(isEnabled):
 			state.automatedBackupsEnabled = isEnabled
-			return .none
+			if isEnabled {
+				state.lastBackup = nil
+			} else {
+				// FIXME: GK - turn off backups
+			}
+			return updateLastBackupEffect()
 
 		case .exportTapped:
 			return .none
 
 		case .deleteOutdatedTapped:
+
 			return .run { send in
 				let profile = await ProfileStore.shared.profile
 				do {
 					try await cloudBackupClient.deleteProfile(profile.id)
 					await send(.internal(.outdatedBackupDeleted(profile.id)))
+					await send(.internal(.lastBackedUp(nil)))
 					print("•• deleted outdate \(profile.id)")
 				} catch {
 					loggerGlobal.error("Failed to delete outdate backup \(profile.id.uuidString): \(error)")
