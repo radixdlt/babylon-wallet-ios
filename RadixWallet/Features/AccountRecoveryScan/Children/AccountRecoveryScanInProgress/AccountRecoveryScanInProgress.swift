@@ -210,13 +210,13 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 				assert(networkID == state.networkID)
 				loggerGlobal.debug("Creating accounts with networkID: \(networkID)")
 				return .run { send in
-					let accounts = try await publicHDKeys.enumerated().asyncMap { localOffset, publicHDKey in
+					let accounts = await publicHDKeys.enumerated().asyncMap { localOffset, publicHDKey in
 						let offset = localOffset + globalOffset
 						let appearanceID = await accountsClient.nextAppearanceID(networkID, offset)
-						return try Account(
+						return Account(
 							networkID: networkID,
 							factorInstance: .init(factorSourceId: id, publicKey: publicHDKey),
-							displayName: .init(rawValue: L10n.AccountRecoveryScan.InProgress.nameOfRecoveredAccount) ?? "Unnamed",
+							displayName: (try? .init(validating: L10n.AccountRecoveryScan.InProgress.nameOfRecoveredAccount)) ?? DisplayName(value: "Unnamed"),
 							extraProperties: .init(
 								appearanceID: appearanceID,
 								// We will be replacing the `depositRule` with one fetched from GW

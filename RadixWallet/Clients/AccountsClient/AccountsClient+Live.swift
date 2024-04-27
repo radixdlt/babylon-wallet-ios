@@ -62,10 +62,10 @@ extension AccountsClient: DependencyKey {
 		let newVirtualAccount: NewVirtualAccount = { request in
 			let networkID = request.networkID
 			let appearanceID = await nextAppearanceID(networkID, nil)
-			return try Account(
+			return Account(
 				networkID: networkID,
 				factorInstance: request.factorInstance,
-				displayName: request.name,
+				displayName: DisplayName(nonEmpty: request.name),
 				extraProperties: .init(appearanceID: appearanceID)
 			)
 		}

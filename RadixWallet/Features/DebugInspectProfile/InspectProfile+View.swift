@@ -570,7 +570,7 @@ extension EntitiesView {
 				Text("HIDDEN")
 					.fontWeight(.heavy)
 			}
-			Text(Entity.entityKind == .persona ? "Personas" : "Accounts")
+			Text(Entity.kind == .persona ? "Personas" : "Accounts")
 				.fontWeight(.heavy)
 			#if os(macOS)
 				.font(.title)
@@ -626,7 +626,7 @@ extension EntityView {
 				Labeled("Account Appearance ID", value: account.appearanceID.description)
 			}
 		}
-		.foregroundColor(isHidden ? .white : (entity.kind == .account ? .white : .black))
+		.foregroundColor(isHidden ? .white : (entity.entityKind == .account ? .white : .black))
 		.padding(.leading, leadingPadding)
 		.background {
 			if isHidden {
