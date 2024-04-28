@@ -14,7 +14,6 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 		public var root: Path.State
 		public var path: StackState<Path.State> = .init()
 		public var profileSelection: ProfileSelection?
-		public var selectedProfile: Profile?
 
 		public init() {
 			self.root = .selectBackup(.init())
@@ -93,18 +92,8 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 				try? await clock.sleep(for: .milliseconds(300))
 				try await radixConnectClient.connectToP2PLinks(profileSnapshot.appPreferences.p2pLinks)
 				await send(.internal(.delayedAppendToPath(
-					.importMnemonicsFlow(.init(context: .fromOnboarding(profileSnapshot: profileSnapshot)))
-				)))
-			}
-
-		case let .root(.selectBackup(.delegate(.selectProfile(profile)))):
-			state.selectedProfile = profile
-			return .run { send in
-				try? await clock.sleep(for: .milliseconds(300))
-				try await radixConnectClient.connectToP2PLinks(profile.appPreferences.p2pLinks)
-				await send(.internal(.delayedAppendToPath(
-					.importMnemonicsFlow(.init(context: .fromOnboarding(profileSnapshot: profile.snapshot())))
-				)))
+					.importMnemonicsFlow(.init(context: .fromOnboarding(profileSnapshot: profileSnapshot))
+					))))
 			}
 
 		case .root(.selectBackup(.delegate(.backToStartOfOnboarding))):
