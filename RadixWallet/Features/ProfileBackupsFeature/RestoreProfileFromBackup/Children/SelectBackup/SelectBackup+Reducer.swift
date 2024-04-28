@@ -5,16 +5,18 @@ import SwiftUI
 public struct SelectBackup: Sendable, FeatureReducer {
 	public struct State: Hashable, Sendable {
 		public enum Status: Hashable, Sendable {
+			case start
 			case migrating
 			case loading
 			case loaded
 			case failed
 		}
 
-		public var backupProfileHeaders: ProfileSnapshot.HeaderList? // TODO: DELETE
+		public var status: Status = .start { didSet { print("•• STATUS: \(status)") } }
 
-		public var cloudBackups: [Profile]? = nil
+		public var backupProfileHeaders: ProfileSnapshot.HeaderList?
 		public var selectedProfileHeader: ProfileSnapshot.Header?
+
 		public var isDisplayingFileImporter: Bool
 		public var thisDeviceID: UUID?
 
@@ -24,12 +26,10 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		public var profileFile: ExportableProfileFile?
 
 		public init(
-			backupProfileHeaders: ProfileSnapshot.HeaderList? = nil,
 			selectedProfileHeader: ProfileSnapshot.Header? = nil,
 			isDisplayingFileImporter: Bool = false,
 			thisDeviceID: UUID? = nil
 		) {
-			self.backupProfileHeaders = backupProfileHeaders
 			self.selectedProfileHeader = selectedProfileHeader
 			self.isDisplayingFileImporter = isDisplayingFileImporter
 			self.thisDeviceID = thisDeviceID
@@ -67,7 +67,6 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case otherRestoreOptionsTapped
 		case profileImportResult(Result<URL, NSError>)
 		case tappedUseCloudBackup(ProfileSnapshot.Header)
-		case cloudBackupSelected(Profile)
 		case closeButtonTapped
 	}
 
@@ -80,7 +79,6 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case selectedProfileSnapshot(ProfileSnapshot, isInCloud: Bool)
-		case selectProfile(Profile)
 		case backToStartOfOnboarding
 		case profileCreatedFromImportedBDFS
 	}
@@ -133,9 +131,6 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case let .selectedProfileHeader(header):
 			state.selectedProfileHeader = header
 			return .none
-
-		case let .cloudBackupSelected(profile):
-			return .send(.delegate(.selectProfile(profile)))
 
 		case let .tappedUseCloudBackup(profileHeader):
 			return .run { send in
