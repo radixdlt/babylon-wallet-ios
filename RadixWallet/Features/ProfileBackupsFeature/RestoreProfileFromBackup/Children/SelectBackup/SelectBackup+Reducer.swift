@@ -222,7 +222,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 				do {
 					let profilesInKeychain = try secureStorageClient.loadProfileHeaderList()?.count ?? 0
 					if profilesInKeychain > 0 {
-						_ = try await cloudBackupClient.migrateKeychainProfiles()
+						_ = try await cloudBackupClient.migrateProfilesFromKeychain()
 						userDefaults.setDidMigrateKeychainProfiles(true)
 						print("•• finished migrating profiles")
 					}

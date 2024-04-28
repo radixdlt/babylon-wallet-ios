@@ -346,12 +346,8 @@ public struct CloudBackupFeature: FeatureReducer {
 
 	public enum ViewAction: Hashable, Sendable {
 		case task
-		case uploadProfile
-		case addDummyAccount
 		case checkAllOldProfiles
 		case checkAllNewProfiles
-		case deleteProfileTapped
-		case logoutTapped
 	}
 
 	public enum InternalAction: Hashable, Sendable {
@@ -367,43 +363,21 @@ public struct CloudBackupFeature: FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			return .run { send in
+			.run { send in
 				let status = await TaskResult { try await cloudBackupClient.checkAccountStatus() }
 				await send(.internal(.accountStatus(status)))
 			}
 
-		case .addDummyAccount:
-//			state.profile.accounts.append(.init(name: "Acccount \(UUID().uuidString)"))
-
-//			return uploadProfileBackup(&state)
-			return .none
-
-		case .uploadProfile:
-			return uploadProfile(&state)
-
 		case .checkAllOldProfiles:
-
-			return .none
+			.none
 
 		case .checkAllNewProfiles:
-			return .run { _ in
+			.run { _ in
 				let profiles = try await cloudBackupClient.loadAllProfiles()
 				print("•• got \(profiles.count) profiles")
 			} catch: { error, _ in
 				print("•• got no profiles, only error: \(error)")
 			}
-
-		case .deleteProfileTapped:
-			userDefaults.removeValue(forKey: "activeProfile")
-			return .run { /* [id = profile.id] */ _ in
-				let profile = await ProfileStore.shared.profile
-				try await cloudBackupClient.deleteProfile(profile.id)
-//				await send(.internal(.logout))
-			}
-
-		case .logoutTapped:
-			userDefaults.removeValue(forKey: "activeProfile")
-			return .send(.internal(.logout))
 		}
 	}
 
@@ -456,10 +430,8 @@ public struct CloudBackupFeature: FeatureReducer {
 	private func uploadProfile(_ state: inout State) -> Effect<Action> {
 		state.isUploadingProfileBackup = true
 		return .run { send in
-			let profile = await ProfileStore.shared.profile
-			print("•• got profile: \(profile.id.uuidString)")
 			let result: TaskResult<CKRecord> = await TaskResult {
-				try await cloudBackupClient.backupProfile(profile)
+				try await cloudBackupClient.backupProfile()
 			}
 
 			await send(.internal(.profileUploadResult(result)))
@@ -510,32 +482,10 @@ extension CloudBackupFeature {
 						//						Text($0.name)
 						//					}
 
-						Button("Add dummy account") {
-							store.send(.view(.addDummyAccount))
-						}
-						.buttonStyle(.borderedProminent)
-
-						Button("Upload profile") {
-							store.send(.view(.uploadProfile))
-						}
-						.buttonStyle(.borderedProminent)
-
 						Button("Check new profiles") {
 							store.send(.view(.checkAllNewProfiles))
 						}
 						.buttonStyle(.borderedProminent)
-
-						Button("Delete Profile") {
-							store.send(.view(.deleteProfileTapped))
-						}
-						.buttonStyle(.borderedProminent)
-
-						Button("Logout") {
-							store.send(.view(.logoutTapped))
-						}
-						.buttonStyle(.borderedProminent)
-
-						// Toggle("iCloud sync", isOn: .constant(true))
 					}
 				}
 				.padding()

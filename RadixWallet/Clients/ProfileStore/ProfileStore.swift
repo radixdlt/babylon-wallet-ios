@@ -106,6 +106,11 @@ extension ProfileStore {
 		var updated = profile
 		let result = try await transform(&updated)
 		try updateHeaderOfThenSave(profile: updated)
+
+		Task {
+			@Dependency(\.cloudBackupClient) var cloudBackupClient
+			_ = try await cloudBackupClient.backupProfile()
+		}
 		return result // in many cases `Void`.
 	}
 
