@@ -23,6 +23,8 @@ extension CloudBackupClient {
 	public static func live(
 		profileStore: ProfileStore = .shared
 	) -> CloudBackupClient {
+		@Dependency(\.secureStorageClient) var secureStorageClient
+
 		@Sendable
 		func fetchProfileRecord(_ id: CKRecord.ID) async throws -> CKRecord {
 			try await container.privateCloudDatabase.record(for: id)
@@ -69,10 +71,11 @@ extension CloudBackupClient {
 		}
 
 		return .init(
+			loadDeviceID: {
+				try? secureStorageClient.loadDeviceInfo()?.id
+			},
 			migrateKeychainProfiles: {
-				@Dependency(\.secureStorageClient) var secureStorageClient
-
-				let activeProfile = await ProfileStore.shared.profile.id
+				let activeProfile = await profileStore.profile.id
 				print("•• Current profile \(activeProfile.uuidString)")
 
 				let backedUpRecords = try await fetchAllProfileRecords()
@@ -97,14 +100,14 @@ extension CloudBackupClient {
 
 					if let backedUpRecord, try extractProfile(backedUpRecord).header.lastModified >= profile.header.lastModified {
 						print("  •• already backed up \(id.uuidString)")
-//						return nil
+						return nil
 					}
 
 					let savedRecord = try await saveProfile(profile, existingRecord: backedUpRecord)
 					// Migration completed, deleting old copy
 //					try secureStorageClient.deleteProfile(profile.id)
 
-					return (profile, savedRecord)
+					return savedRecord
 				}
 			},
 			checkAccountStatus: {
