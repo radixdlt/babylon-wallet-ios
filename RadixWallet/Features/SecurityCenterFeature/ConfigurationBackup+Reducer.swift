@@ -161,7 +161,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			return .run { send in
 				let profile = await ProfileStore.shared.profile
 				do {
-					try await cloudBackupClient.deleteProfile(profile.id)
+					try await cloudBackupClient.deleteProfileInKeychain(profile.id)
 					await send(.internal(.didDeleteOutdatedBackup(profile.id)))
 				} catch {
 					loggerGlobal.error("Failed to delete outdate backup \(profile.id.uuidString): \(error)")

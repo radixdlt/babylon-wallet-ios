@@ -16,23 +16,23 @@ extension CloudBackupClient: TestDependencyKey {
 
 	public static let noop = Self(
 		loadDeviceID: { nil },
-		migrateKeychainProfiles: { throw NoopError() },
+		migrateProfilesFromKeychain: { throw NoopError() },
+		deleteProfileInKeychain: { _ in },
 		checkAccountStatus: { throw NoopError() },
 		lastBackup: { _ in throw NoopError() },
 		loadProfile: { _ in throw NoopError() },
 		loadAllProfiles: { throw NoopError() },
-		backupProfile: { _ in throw NoopError() },
-		deleteProfile: { _ in }
+		backupProfile: { throw NoopError() }
 	)
 
 	public static let testValue = Self(
 		loadDeviceID: unimplemented("\(Self.self).loadDeviceID"),
-		migrateKeychainProfiles: unimplemented("\(Self.self).migrateKeychainProfiles"),
+		migrateProfilesFromKeychain: unimplemented("\(Self.self).migrateProfilesFromKeychain"),
+		deleteProfileInKeychain: unimplemented("\(Self.self).deleteProfileInKeychain"),
 		checkAccountStatus: unimplemented("\(Self.self).checkAccountStatus"),
 		lastBackup: unimplemented("\(Self.self).lastBackup"),
 		loadProfile: unimplemented("\(Self.self).queryProfile"),
 		loadAllProfiles: unimplemented("\(Self.self).queryAllProfiles"),
-		backupProfile: unimplemented("\(Self.self).uploadProfile"),
-		deleteProfile: unimplemented("\(Self.self).deleteProfile")
+		backupProfile: unimplemented("\(Self.self).uploadProfile")
 	)
 }

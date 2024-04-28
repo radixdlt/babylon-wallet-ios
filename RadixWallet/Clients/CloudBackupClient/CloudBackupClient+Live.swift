@@ -74,7 +74,7 @@ extension CloudBackupClient {
 			loadDeviceID: {
 				try? secureStorageClient.loadDeviceInfo()?.id
 			},
-			migrateKeychainProfiles: {
+			migrateProfilesFromKeychain: {
 				let activeProfile = await profileStore.profile.id
 				print("•• Current profile \(activeProfile.uuidString)")
 
@@ -110,6 +110,9 @@ extension CloudBackupClient {
 					return savedRecord
 				}
 			},
+			deleteProfileInKeychain: { id in
+				try await container.privateCloudDatabase.deleteRecord(withID: .init(recordName: id.uuidString))
+			},
 			checkAccountStatus: {
 				try await container.accountStatus()
 			},
@@ -122,7 +125,8 @@ extension CloudBackupClient {
 			loadAllProfiles: {
 				try await fetchAllProfileRecords().map(extractProfile)
 			},
-			backupProfile: { profile in
+			backupProfile: {
+				let profile = await profileStore.profile
 				print("•• backupProfile \(profile.id.uuidString)")
 				let existingRecord: CKRecord?
 				do {
@@ -142,9 +146,6 @@ extension CloudBackupClient {
 				return try await saveProfile(profile, existingRecord: existingRecord)
 				//				let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
 				//				return try await saveProfile(profile, existingRecord: existingRecord)
-			},
-			deleteProfile: { id in
-				try await container.privateCloudDatabase.deleteRecord(withID: .init(recordName: id.uuidString))
 			}
 		)
 	}

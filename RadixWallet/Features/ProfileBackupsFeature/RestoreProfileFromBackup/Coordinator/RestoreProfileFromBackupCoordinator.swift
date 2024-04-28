@@ -63,6 +63,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.radixConnectClient) var radixConnectClient
+
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
