@@ -5,6 +5,7 @@ import os
 
 // MARK: - CloudBackupClient
 public struct CloudBackupClient: DependencyKey, Sendable {
+	public let loadDeviceID: LoadDeviceID
 	public let migrateKeychainProfiles: MigrateKeychainProfiles
 	public let checkAccountStatus: CheckAccountStatus
 	public let lastBackup: LastBackup
@@ -14,6 +15,7 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 	public let deleteProfile: DeleteProfile
 
 	public init(
+		loadDeviceID: @escaping LoadDeviceID,
 		migrateKeychainProfiles: @escaping MigrateKeychainProfiles,
 		checkAccountStatus: @escaping CheckAccountStatus,
 		lastBackup: @escaping LastBackup,
@@ -22,6 +24,7 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 		backupProfile: @escaping BackupProfile,
 		deleteProfile: @escaping DeleteProfile
 	) {
+		self.loadDeviceID = loadDeviceID
 		self.migrateKeychainProfiles = migrateKeychainProfiles
 		self.checkAccountStatus = checkAccountStatus
 		self.lastBackup = lastBackup
@@ -33,7 +36,8 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 }
 
 extension CloudBackupClient {
-	public typealias MigrateKeychainProfiles = @Sendable () async throws -> [(profile: Profile, record: CKRecord)]
+	public typealias LoadDeviceID = @Sendable () async -> UUID?
+	public typealias MigrateKeychainProfiles = @Sendable () async throws -> [CKRecord]
 	public typealias CheckAccountStatus = @Sendable () async throws -> CKAccountStatus
 	public typealias LastBackup = @Sendable (UUID) async throws -> Date?
 	public typealias LoadProfile = @Sendable (UUID) async throws -> Profile?

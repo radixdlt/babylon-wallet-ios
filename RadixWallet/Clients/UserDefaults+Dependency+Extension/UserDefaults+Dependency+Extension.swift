@@ -10,6 +10,7 @@ public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case transactionsCompletedCounter
 	case dateOfLastSubmittedNPSSurvey
 	case npsSurveyUserID
+	case didMigrateKeychainProfiles
 
 	/// DO NOT CHANGE THIS KEY
 	case activeProfileID
@@ -137,5 +138,13 @@ extension UserDefaults.Dependency {
 
 	public func setNPSSurveyUserId(_ id: UUID) {
 		set(id.uuidString, forKey: Key.npsSurveyUserID.rawValue)
+	}
+
+	public var getDidMigrateKeychainProfiles: Bool {
+		bool(key: .didMigrateKeychainProfiles)
+	}
+
+	public func setDidMigrateKeychainProfiles(_ value: Bool) {
+		set(value, forKey: Key.didMigrateKeychainProfiles.rawValue)
 	}
 }

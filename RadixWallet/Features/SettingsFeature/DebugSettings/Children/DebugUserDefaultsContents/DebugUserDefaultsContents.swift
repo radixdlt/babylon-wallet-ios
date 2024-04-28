@@ -111,6 +111,8 @@ extension UserDefaults.Dependency.Key {
 			return userDefaults.getDateOfLastSubmittedNPSSurvey().map(String.init(describing:)).asArray(\.self)
 		case .npsSurveyUserID:
 			return userDefaults.getNPSSurveyUserId().map(String.init(describing:)).asArray(\.self)
+		case .didMigrateKeychainProfiles:
+			return [userDefaults.getDidMigrateKeychainProfiles].map(String.init(describing:))
 		}
 	}
 }
