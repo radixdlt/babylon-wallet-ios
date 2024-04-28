@@ -4,8 +4,16 @@ import SwiftUI
 // MARK: - SelectBackup
 public struct SelectBackup: Sendable, FeatureReducer {
 	public struct State: Hashable, Sendable {
-		public var backupProfileHeaders: ProfileSnapshot.HeaderList?
-		public var cloudBackupProfileHeaders: ProfileSnapshot.HeaderList? = nil
+		public enum Status: Hashable, Sendable {
+			case migrating
+			case loading
+			case loaded
+			case failed
+		}
+
+		public var backupProfileHeaders: ProfileSnapshot.HeaderList? // TODO: DELETE
+
+		public var cloudBackups: [Profile]? = nil
 		public var selectedProfileHeader: ProfileSnapshot.Header?
 		public var isDisplayingFileImporter: Bool
 		public var thisDeviceID: UUID?
@@ -29,21 +37,23 @@ public struct SelectBackup: Sendable, FeatureReducer {
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.State)
 			case recoverWalletWithoutProfileCoordinator(RecoverWalletWithoutProfileCoordinator.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case inputEncryptionPassword(EncryptOrDecryptProfile.Action)
 			case recoverWalletWithoutProfileCoordinator(RecoverWalletWithoutProfileCoordinator.Action)
 		}
 
 		public var body: some Reducer<State, Action> {
-			Scope(state: /State.inputEncryptionPassword, action: /Action.inputEncryptionPassword) {
+			Scope(state: \.inputEncryptionPassword, action: \.inputEncryptionPassword) {
 				EncryptOrDecryptProfile()
 			}
-			Scope(state: /State.recoverWalletWithoutProfileCoordinator, action: /Action.recoverWalletWithoutProfileCoordinator) {
+			Scope(state: \.recoverWalletWithoutProfileCoordinator, action: \.recoverWalletWithoutProfileCoordinator) {
 				RecoverWalletWithoutProfileCoordinator()
 			}
 		}
@@ -57,18 +67,20 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case otherRestoreOptionsTapped
 		case profileImportResult(Result<URL, NSError>)
 		case tappedUseCloudBackup(ProfileSnapshot.Header)
+		case cloudBackupSelected(Profile)
 		case closeButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadBackupProfileHeadersResult(ProfileSnapshot.HeaderList?)
-		case loadCloudBackupProfileHeadersResult(ProfileSnapshot.HeaderList?)
+		case loadCloudBackupProfiles([Profile]?)
 		case loadThisDeviceIDResult(UUID?)
 		case snapshotWithHeaderNotFoundInCloud(ProfileSnapshot.Header)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case selectedProfileSnapshot(ProfileSnapshot, isInCloud: Bool)
+		case selectProfile(Profile)
 		case backToStartOfOnboarding
 		case profileCreatedFromImportedBDFS
 	}
@@ -105,8 +117,8 @@ public struct SelectBackup: Sendable, FeatureReducer {
 					backupsClient.loadProfileBackups()
 				)))
 
-				await send(.internal(.loadCloudBackupProfileHeadersResult(
-					cloudBackupClient.loadBackedUpProfileHeaderList()
+				try await send(.internal(.loadCloudBackupProfiles(
+					cloudBackupClient.loadAllProfiles()
 				)))
 			}
 
@@ -121,6 +133,9 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case let .selectedProfileHeader(header):
 			state.selectedProfileHeader = header
 			return .none
+
+		case let .cloudBackupSelected(profile):
+			return .send(.delegate(.selectProfile(profile)))
 
 		case let .tappedUseCloudBackup(profileHeader):
 			return .run { send in
@@ -177,8 +192,8 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			state.backupProfileHeaders = profileHeaders
 			return .none
 
-		case let .loadCloudBackupProfileHeadersResult(profileHeaders):
-			state.cloudBackupProfileHeaders = profileHeaders
+		case let .loadCloudBackupProfiles(profiles):
+			state.cloudBackups = profiles
 			return .none
 
 		case let .loadThisDeviceIDResult(identifier):

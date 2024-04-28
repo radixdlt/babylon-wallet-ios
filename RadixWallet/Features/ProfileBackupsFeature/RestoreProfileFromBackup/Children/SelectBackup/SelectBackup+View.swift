@@ -89,6 +89,23 @@ extension SelectBackup.View {
 	private func backupsList(with viewStore: ViewStoreOf<SelectBackup>) -> some View {
 		// TODO: This is speculative design, needs to be updated once we have the proper design
 		VStack(spacing: .medium1) {
+			if let backupProfiles = viewStore.cloudBackups {
+				Selection(
+					viewStore.binding(
+						get: \.selectedProfileHeader,
+						send: {
+							.selectedProfileHeader($0)
+						}
+					),
+					from: backupProfiles.map(\.header)
+				) { item in
+					cloudBackupDataCard(item, viewStore: viewStore)
+						.border(.green)
+				}
+			} else {
+				NoContentView(L10n.IOSRecoverProfileBackup.noBackupsAvailable)
+			}
+
 			if let backupProfileHeaders = viewStore.backupProfileHeaders {
 				Selection(
 					viewStore.binding(
@@ -101,23 +118,6 @@ extension SelectBackup.View {
 				) { item in
 					cloudBackupDataCard(item, viewStore: viewStore)
 						.border(.red)
-				}
-			} else {
-				NoContentView(L10n.IOSRecoverProfileBackup.noBackupsAvailable)
-			}
-
-			if let backupProfileHeaders = viewStore.cloudBackupProfileHeaders {
-				Selection(
-					viewStore.binding(
-						get: \.selectedProfileHeader,
-						send: {
-							.selectedProfileHeader($0)
-						}
-					),
-					from: backupProfileHeaders
-				) { item in
-					cloudBackupDataCard(item, viewStore: viewStore)
-						.border(.green)
 				}
 			} else {
 				NoContentView(L10n.IOSRecoverProfileBackup.noBackupsAvailable)
