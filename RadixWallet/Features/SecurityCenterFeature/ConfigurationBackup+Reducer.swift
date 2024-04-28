@@ -40,7 +40,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		case automatedBackupsToggled(Bool)
 		case exportTapped
 		case deleteOutdatedTapped
-
 		case showFileExporter(Bool)
 		case profileExportResult(Result<URL, NSError>)
 	}
@@ -93,13 +92,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.cloudBackupClient) var cloudBackupClient
 
-	private func checkCloudBackupEnabledEffect() -> Effect<Action> {
-		.run { send in
-			let isEnabled = await ProfileStore.shared.profile.appPreferences.security.isCloudProfileSyncEnabled
-			await send(.internal(.setCloudBackupEnabled(isEnabled)))
-		}
-	}
-
 	private func checkCloudAccountStatusEffect() -> Effect<Action> {
 		.run { send in
 			do {
@@ -111,12 +103,18 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		}
 	}
 
+	private func checkCloudBackupEnabledEffect() -> Effect<Action> {
+		.run { send in
+			let isEnabled = await ProfileStore.shared.profile.appPreferences.security.isCloudProfileSyncEnabled
+			await send(.internal(.setCloudBackupEnabled(isEnabled)))
+		}
+	}
+
 	private func updateCloudBackupsSettingEffect(isEnabled: Bool) -> Effect<Action> {
 		.run { send in
 			do {
 				try await appPreferencesClient.setIsCloudProfileSyncEnabled(isEnabled)
 				await send(.internal(.setCloudBackupEnabled(isEnabled)))
-				print("•• toggled cloud backups \(isEnabled)")
 			} catch {
 				loggerGlobal.error("Failed toggle cloud backups \(isEnabled ? "on" : "off"): \(error)")
 			}
@@ -128,24 +126,18 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			let profile = await ProfileStore.shared.profile
 			let lastBackedUp = try? await cloudBackupClient.lastBackup(profile.id)
 			await send(.internal(.setLastBackedUp(lastBackedUp)))
-			if let lastBackedUp {
-				print("•• got last backed up: \(RadixDateFormatter.string(from: lastBackedUp))")
-			} else {
-				print("•• got last backed up: nil")
-			}
 		}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .didAppear:
-			return updateLastBackupEffect()
-				.merge(with: checkCloudAccountStatusEffect())
+			return checkCloudAccountStatusEffect()
+				.merge(with: checkCloudBackupEnabledEffect())
 
 		case let .automatedBackupsToggled(isEnabled):
 			state.lastBackup = nil
 			return updateCloudBackupsSettingEffect(isEnabled: isEnabled)
-				.concatenate(with: updateLastBackupEffect())
 
 		case .exportTapped:
 			state.destination = .encryptProfileOrNot(.encryptProfileOrNotAlert)
@@ -194,6 +186,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		case .encryptProfileOrNot(.encrypt):
 			state.destination = .encryptionPassword(.init(mode: .loadThenEncrypt()))
 			return .none
+
 		case .encryptProfileOrNot(.doNotEncrypt):
 			state.destination = nil
 			return .run { send in
@@ -217,7 +210,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		case let .setCloudBackupEnabled(isEnabled):
 			print("•• set setCloudBackupEnabled: \(isEnabled)")
 			state.automatedBackupsEnabled = isEnabled
-			return .none
+			return updateLastBackupEffect()
 
 		case let .setICloudAccountStatus(status):
 			print("•• set iCloudAccountStatus: \(status)")
@@ -225,8 +218,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			return .none
 
 		case let .exportProfileSnapshot(snapshot):
-			print("•• exportProfileSnapshot")
-
 			state.profileFile = .plaintext(snapshot)
 			return .none
 		}

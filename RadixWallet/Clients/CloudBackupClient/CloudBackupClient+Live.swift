@@ -67,6 +67,8 @@ extension CloudBackupClient {
 			let savedRecord = try await container.privateCloudDatabase.save(record)
 			try fileManager.removeItem(at: fileURL)
 
+			print("  •• SAVED PROFILE")
+
 			return savedRecord
 		}
 
@@ -117,7 +119,10 @@ extension CloudBackupClient {
 				try await container.accountStatus()
 			},
 			lastBackup: { id in
-				try await fetchProfileRecord(.init(recordName: id.uuidString)).modificationDate
+				print("  •• CALL LAST")
+				let last = try await fetchProfileRecord(.init(recordName: id.uuidString)).modificationDate
+				print("  •• LAST: \(last)")
+				return last
 			},
 			loadProfile: { id in
 				try await extractProfile(fetchProfileRecord(.init(recordName: id.uuidString)))
