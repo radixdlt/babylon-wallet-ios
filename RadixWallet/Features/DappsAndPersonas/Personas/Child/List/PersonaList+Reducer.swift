@@ -21,7 +21,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 		}
 
 		public init(
-			dApp: ProfileNetwork.AuthorizedDappDetailed
+			dApp: AuthorizedDappDetailed
 		) {
 			self.init(
 				personas: dApp.detailedAuthorizedPersonas.map(PersonaFeature.State.init).asIdentified(),
@@ -100,7 +100,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 			return ids
 		case let .dApp(dAppID):
 			guard let dApp = try? await authorizedDappsClient.getDetailedDapp(dAppID) else { return [] }
-			return dApp.detailedAuthorizedPersonas.ids
+			return OrderedSet(dApp.detailedAuthorizedPersonas.ids)
 		}
 	}
 

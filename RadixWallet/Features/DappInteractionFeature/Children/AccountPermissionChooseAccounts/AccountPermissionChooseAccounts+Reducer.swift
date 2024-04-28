@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ChooseAccountsResult
@@ -167,9 +168,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 
 				var accountsLeftToVerifyDidSign: Set<Account.ID> = Set(selectedAccounts.map(\.id))
 				let walletAccountsWithProof: [P2P.Dapp.Response.Accounts.WithProof] = signedAuthChallenge.entitySignatures.map {
-					guard case let .account(account) = $0.signerEntity else {
-						fatalError()
-					}
+					let account = try! $0.signerEntity.asAccount()
 					accountsLeftToVerifyDidSign.remove(account.id)
 					let proof = P2P.Dapp.Response.AuthProof(entitySignature: $0)
 					return P2P.Dapp.Response.Accounts.WithProof(account: .init(account: account), proof: proof)

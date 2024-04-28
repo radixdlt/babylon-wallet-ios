@@ -829,7 +829,6 @@
 		48CFC6232ADC10DA00E77A5C /* AccountPortfolio+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1972ADC10D900E77A5C /* AccountPortfolio+Extensions.swift */; };
 		48CFC6242ADC10DA00E77A5C /* EntitiesControlledByFactorSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1992ADC10D900E77A5C /* EntitiesControlledByFactorSource.swift */; };
 		48CFC6572ADC10DB00E77A5C /* ProfileNetwork+Entity+Lookup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1E32ADC10D900E77A5C /* ProfileNetwork+Entity+Lookup.swift */; };
-		48CFC6582ADC10DB00E77A5C /* AuthorizedPersonaDetailed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1E42ADC10D900E77A5C /* AuthorizedPersonaDetailed.swift */; };
 		48CFC6592ADC10DB00E77A5C /* Profile+Account+Add.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1E62ADC10D900E77A5C /* Profile+Account+Add.swift */; };
 		48CFC65A2ADC10DB00E77A5C /* Profile+UpdateNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1E72ADC10D900E77A5C /* Profile+UpdateNetwork.swift */; };
 		48CFC65B2ADC10DB00E77A5C /* Profile+DetailsForConnectedDapp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1E82ADC10D900E77A5C /* Profile+DetailsForConnectedDapp.swift */; };
@@ -1945,7 +1944,6 @@
 		48CFC1972ADC10D900E77A5C /* AccountPortfolio+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "AccountPortfolio+Extensions.swift"; sourceTree = "<group>"; };
 		48CFC1992ADC10D900E77A5C /* EntitiesControlledByFactorSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EntitiesControlledByFactorSource.swift; sourceTree = "<group>"; };
 		48CFC1E32ADC10D900E77A5C /* ProfileNetwork+Entity+Lookup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ProfileNetwork+Entity+Lookup.swift"; sourceTree = "<group>"; };
-		48CFC1E42ADC10D900E77A5C /* AuthorizedPersonaDetailed.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthorizedPersonaDetailed.swift; sourceTree = "<group>"; };
 		48CFC1E62ADC10D900E77A5C /* Profile+Account+Add.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Profile+Account+Add.swift"; sourceTree = "<group>"; };
 		48CFC1E72ADC10D900E77A5C /* Profile+UpdateNetwork.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Profile+UpdateNetwork.swift"; sourceTree = "<group>"; };
 		48CFC1E82ADC10D900E77A5C /* Profile+DetailsForConnectedDapp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Profile+DetailsForConnectedDapp.swift"; sourceTree = "<group>"; };
@@ -2292,22 +2290,6 @@
 				482752192BDB90D4007854E0 /* FactorSourceCommon+New+Dependencies.swift */,
 			);
 			path = SargonExtensions;
-			sourceTree = "<group>";
-		};
-		482752162BDB8FFD007854E0 /* Types */ = {
-			isa = PBXGroup;
-			children = (
-				48CFC1E42ADC10D900E77A5C /* AuthorizedPersonaDetailed.swift */,
-			);
-			path = Types;
-			sourceTree = "<group>";
-		};
-		4855B1B52BCA613300DD0A47 /* DeclareNewInSargon */ = {
-			isa = PBXGroup;
-			children = (
-				482752162BDB8FFD007854E0 /* Types */,
-			);
-			path = DeclareNewInSargon;
 			sourceTree = "<group>";
 		};
 		48AE39D82B0CBE3900813CF3 /* AccountRecoveryScan */ = {
@@ -5799,7 +5781,6 @@
 		E65D6CE82BC9819C001D8A39 /* Stage1 */ = {
 			isa = PBXGroup;
 			children = (
-				4855B1B52BCA613300DD0A47 /* DeclareNewInSargon */,
 				4855B1C22BCAC59C00DD0A47 /* Stage1MigrateToSargon+Account.swift */,
 				48DD0FF62BCBCBB900C54C43 /* Stage1MigrateToSargon+AssetException.swift */,
 				484161582BCADA0A00D2B644 /* Stage1MigrateToSargon+BIP39+Lookup.swift */,
@@ -6987,7 +6968,6 @@
 				48CFC5D22ADC10DA00E77A5C /* OnSizeChanged.swift in Sources */,
 				48CFC4202ADC10DA00E77A5C /* RandomBytes.swift in Sources */,
 				A462B58C2B83673000C26D20 /* StateKeyValueStoreKeysCollection.swift in Sources */,
-				48CFC6582ADC10DB00E77A5C /* AuthorizedPersonaDetailed.swift in Sources */,
 				48CFC5AB2ADC10DA00E77A5C /* InertButtonStyle.swift in Sources */,
 				48CFC4412ADC10DA00E77A5C /* RadixConnectClient+Test.swift in Sources */,
 				48CFC42C2ADC10DA00E77A5C /* Unit.swift in Sources */,

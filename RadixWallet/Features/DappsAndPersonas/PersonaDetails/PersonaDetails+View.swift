@@ -174,7 +174,7 @@ extension PersonaDetails.State {
 
 	struct AccountSection: Equatable {
 		let dAppName: String
-		let sharingAccounts: OrderedSet<ProfileNetwork.AccountForDisplay>
+		let sharingAccounts: AccountsForDisplay
 	}
 }
 
@@ -198,7 +198,7 @@ extension PersonaDetails.View {
 							SmallAccountCard(
 								account.label.rawValue,
 								identifiable: .address(.account(account.address)),
-								gradient: .init(account.appearanceID)
+								gradient: .init(account.appearanceId)
 							)
 							.cornerRadius(.small1)
 						}

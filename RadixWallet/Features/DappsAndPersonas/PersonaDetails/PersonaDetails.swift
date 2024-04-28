@@ -22,8 +22,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			case general(Persona, dApps: IdentifiedArrayOf<DappInfo>)
 
 			case dApp(
-				ProfileNetwork.AuthorizedDappDetailed,
-				persona: ProfileNetwork.AuthorizedPersonaDetailed
+				AuthorizedDappDetailed,
+				persona: AuthorizedPersonaDetailed
 			)
 
 			var id: Persona.ID {
@@ -81,7 +81,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		case dAppsUpdated(IdentifiedArrayOf<State.DappInfo>)
 		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState)
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
-		case dAppLoaded(ProfileNetwork.AuthorizedDappDetailed)
+		case dAppLoaded(AuthorizedDappDetailed)
 	}
 
 	// MARK: - Destination
@@ -235,7 +235,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 		case .confirmForgetAlert(.confirmTapped):
 			guard case let .dApp(dApp, persona: persona) = state.mode else { return .none }
-			let (personaID, dAppID, networkID) = (persona.id, dApp.dAppDefinitionAddress, dApp.networkID)
+			let (personaID, dAppID, networkID) = (persona.id, dApp.dAppDefinitionAddress, dApp.networkId)
 			return .run { send in
 				try await authorizedDappsClient.deauthorizePersonaFromDapp(personaID, dAppID, networkID)
 				await send(.delegate(.personaDeauthorized))
