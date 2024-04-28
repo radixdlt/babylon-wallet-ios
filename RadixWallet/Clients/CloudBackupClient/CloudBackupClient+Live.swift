@@ -13,15 +13,12 @@ extension CKRecord.FieldKey {
 
 extension CloudBackupClient {
 	struct IncorrectRecordTypeError: Error {}
-	struct MissingProfileError: Error {}
+	struct NoProfileInRecordError: Error {}
+	struct ProfileMissingFromKeychainError: Error { let id: UUID }
 
 	public static let liveValue: Self = .live()
 
 	private static let container = CKContainer(identifier: "iCloud.com.radixpublishing.radixwallet.ios.dev.cloudBackup")
-
-	public func loadBackedUpProfileHeaderList() async -> ProfileSnapshot.HeaderList? {
-		try? await .init(rawValue: loadAllProfiles().map(\.header).asIdentified())
-	}
 
 	public static func live(
 		profileStore: ProfileStore = .shared
@@ -45,7 +42,7 @@ extension CloudBackupClient {
 				throw IncorrectRecordTypeError()
 			}
 			guard let asset = record[.content] as? CKAsset, let fileURL = asset.fileURL else {
-				throw MissingProfileError()
+				throw NoProfileInRecordError()
 			}
 
 			let data = try Data(contentsOf: fileURL)
@@ -57,7 +54,6 @@ extension CloudBackupClient {
 
 		@Sendable
 		func saveProfile(_ profile: Profile, existingRecord: CKRecord?) async throws -> CKRecord {
-			print("  •• uploadProfile (exists: \(existingRecord != nil)) \(profile.id.uuidString)")
 			let fileManager = FileManager.default
 			let tempDirectoryURL = fileManager.temporaryDirectory
 			let fileURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
@@ -69,8 +65,6 @@ extension CloudBackupClient {
 			let savedRecord = try await container.privateCloudDatabase.save(record)
 			try fileManager.removeItem(at: fileURL)
 
-			print("  •• uploadProfile DONE")
-
 			return savedRecord
 		}
 
@@ -78,32 +72,39 @@ extension CloudBackupClient {
 			migrateKeychainProfiles: {
 				@Dependency(\.secureStorageClient) var secureStorageClient
 
-				let p = await ProfileStore.shared.profile
-				print("•• Current profile \(p.id.uuidString)")
+				let activeProfile = await ProfileStore.shared.profile.id
+				print("•• Current profile \(activeProfile.uuidString)")
 
 				let backedUpRecords = try await fetchAllProfileRecords()
-				let headerList = try secureStorageClient.loadProfileHeaderList()
-				let ids = headerList?.ids ?? []
+				guard let headerList = try secureStorageClient.loadProfileHeaderList() else { return [] }
 
-				return try await ids.asyncCompactMap { id in
-					print("•• Migrating \(id.uuidString)")
+				return try await headerList.ids.asyncCompactMap { id in
+					guard id != activeProfile else {
+						// No need to migrate the currently active profile
+						return nil
+					}
 
 					guard let profile = try secureStorageClient.loadProfile(id) else {
-						return nil // FIXME: GK - or throw?
+						throw ProfileMissingFromKeychainError(id: id)
 					}
-					guard profile.appPreferences.security.isCloudProfileSyncEnabled else {
-						print("  •• cloud sync disabled for \(id.uuidString)")
+
+					print("•• Migrating \(id.uuidString) synced: \(profile.appPreferences.security.isCloudProfileSyncEnabled), empty: \(profile.networks.isEmpty)")
+
+					guard !profile.networks.isEmpty, profile.appPreferences.security.isCloudProfileSyncEnabled else {
 						return nil
 					}
 					let backedUpRecord = backedUpRecords.first { $0.recordID.recordName == id.uuidString }
 
 					if let backedUpRecord, try extractProfile(backedUpRecord).header.lastModified >= profile.header.lastModified {
 						print("  •• already backed up \(id.uuidString)")
-						return nil
+//						return nil
 					}
 
-					return try await saveProfile(profile, existingRecord: backedUpRecord)
-					// FIXME: GK - remove from keychain?
+					let savedRecord = try await saveProfile(profile, existingRecord: backedUpRecord)
+					// Migration completed, deleting old copy
+//					try secureStorageClient.deleteProfile(profile.id)
+
+					return (profile, savedRecord)
 				}
 			},
 			checkAccountStatus: {

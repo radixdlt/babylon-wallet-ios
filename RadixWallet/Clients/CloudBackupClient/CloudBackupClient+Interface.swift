@@ -33,7 +33,7 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 }
 
 extension CloudBackupClient {
-	public typealias MigrateKeychainProfiles = @Sendable () async throws -> [CKRecord]
+	public typealias MigrateKeychainProfiles = @Sendable () async throws -> [(profile: Profile, record: CKRecord)]
 	public typealias CheckAccountStatus = @Sendable () async throws -> CKAccountStatus
 	public typealias LastBackup = @Sendable (UUID) async throws -> Date?
 	public typealias LoadProfile = @Sendable (UUID) async throws -> Profile?
