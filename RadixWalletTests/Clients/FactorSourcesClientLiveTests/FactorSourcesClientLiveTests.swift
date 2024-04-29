@@ -157,7 +157,7 @@ extension Account {
 					).asDerivationPath
 				)
 			),
-			displayName: "\(index)",
+			displayName: DisplayName(validating: "\(index)"),
 			extraProperties: .init(
 				appearanceID: .fromNumberOfAccounts(Int(index))
 			)
