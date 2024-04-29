@@ -18,16 +18,21 @@ extension GatewayAPI {
 public struct MetadataInstantValue: Codable, Hashable {
 
     public private(set) var type: MetadataValueType
+    /** The RFC 3339 / ISO 8601 string representation of the timestamp. Will always use \"Z\" (denoting UTC) and omits milliseconds. E.g.: `2023-01-26T18:30:09Z`.  Note: This field will return clamped value if the actual on-ledger `unix_timestamp_seconds` value is outside the basic range supported by the RFC 3339 / ISO 8601 standard, which starts at year 1583 (i.e. the beginning of the Gregorian calendar) and ends at year 9999 (inclusive).  */
     public private(set) var value: String
+    /** A decimal string-encoded 64-bit signed integer, marking the unix timestamp in seconds.  Note: this field accurately represents the full range of possible on-ledger values (i.e. `-2^63 <= seconds < 2^63`).  */
+    public private(set) var unixTimestampSeconds: String
 
-    public init(type: MetadataValueType, value: String) {
+    public init(type: MetadataValueType, value: String, unixTimestampSeconds: String) {
         self.type = type
         self.value = value
+        self.unixTimestampSeconds = unixTimestampSeconds
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case type
         case value
+        case unixTimestampSeconds = "unix_timestamp_seconds"
     }
 
     // Encodable protocol methods
@@ -36,6 +41,7 @@ public struct MetadataInstantValue: Codable, Hashable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(type, forKey: .type)
         try container.encode(value, forKey: .value)
+        try container.encode(unixTimestampSeconds, forKey: .unixTimestampSeconds)
     }
 }
 

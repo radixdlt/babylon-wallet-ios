@@ -27,8 +27,9 @@ public struct StateEntityDetailsResponseComponentDetails: Codable, Hashable {
     public private(set) var roleAssignments: ComponentEntityRoleAssignments?
     /** String-encoded decimal representing the amount of a related fungible resource. */
     public private(set) var royaltyVaultBalance: String?
+    public private(set) var royaltyConfig: ComponentRoyaltyConfig?
 
-    public init(type: StateEntityDetailsResponseItemDetailsType, packageAddress: String? = nil, blueprintName: String, blueprintVersion: String, state: AnyCodable? = nil, roleAssignments: ComponentEntityRoleAssignments? = nil, royaltyVaultBalance: String? = nil) {
+    public init(type: StateEntityDetailsResponseItemDetailsType, packageAddress: String? = nil, blueprintName: String, blueprintVersion: String, state: AnyCodable? = nil, roleAssignments: ComponentEntityRoleAssignments? = nil, royaltyVaultBalance: String? = nil, royaltyConfig: ComponentRoyaltyConfig? = nil) {
         self.type = type
         self.packageAddress = packageAddress
         self.blueprintName = blueprintName
@@ -36,6 +37,7 @@ public struct StateEntityDetailsResponseComponentDetails: Codable, Hashable {
         self.state = state
         self.roleAssignments = roleAssignments
         self.royaltyVaultBalance = royaltyVaultBalance
+        self.royaltyConfig = royaltyConfig
     }
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
@@ -46,6 +48,7 @@ public struct StateEntityDetailsResponseComponentDetails: Codable, Hashable {
         case state
         case roleAssignments = "role_assignments"
         case royaltyVaultBalance = "royalty_vault_balance"
+        case royaltyConfig = "royalty_config"
     }
 
     // Encodable protocol methods
@@ -59,6 +62,7 @@ public struct StateEntityDetailsResponseComponentDetails: Codable, Hashable {
         try container.encodeIfPresent(state, forKey: .state)
         try container.encodeIfPresent(roleAssignments, forKey: .roleAssignments)
         try container.encodeIfPresent(royaltyVaultBalance, forKey: .royaltyVaultBalance)
+        try container.encodeIfPresent(royaltyConfig, forKey: .royaltyConfig)
     }
 }
 
