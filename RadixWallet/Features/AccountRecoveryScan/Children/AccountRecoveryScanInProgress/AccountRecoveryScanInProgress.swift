@@ -216,7 +216,7 @@ public struct AccountRecoveryScanInProgress: Sendable, FeatureReducer {
 						return Account(
 							networkID: networkID,
 							factorInstance: .init(factorSourceId: id, publicKey: publicHDKey),
-							displayName: (try? .init(validating: L10n.AccountRecoveryScan.InProgress.nameOfRecoveredAccount)) ?? DisplayName(value: "Unnamed"),
+							displayName: .init(value: L10n.AccountRecoveryScan.InProgress.nameOfRecoveredAccount),
 							extraProperties: .init(
 								appearanceID: appearanceID,
 								// We will be replacing the `depositRule` with one fetched from GW
