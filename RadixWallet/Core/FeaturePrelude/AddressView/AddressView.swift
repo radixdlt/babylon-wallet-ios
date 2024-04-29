@@ -81,7 +81,7 @@ extension AddressView {
 				.minimumScaleFactor(0.5)
 		} else {
 			HStack(spacing: .small3) {
-				Text(identifiable.formatted(.default))
+				Text(compactedText)
 					.lineLimit(1)
 				if let imageColor {
 					image
@@ -108,6 +108,15 @@ extension AddressView {
 			case .nonFungibleGlobalID:
 				L10n.AddressAction.copyNftId
 			}
+		}
+	}
+
+	private var compactedText: String {
+		switch identifiable {
+		case let .address(.nonFungibleGlobalID(globalId)):
+			globalId.nonFungibleLocalId.toUserFacingString()
+		case .address, .identifier:
+			identifiable.formatted(.default)
 		}
 	}
 }
