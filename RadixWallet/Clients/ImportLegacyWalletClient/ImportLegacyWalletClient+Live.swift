@@ -41,10 +41,10 @@ extension ImportLegacyWalletClient: DependencyKey {
 
 				let appearanceID = await accountsClient.nextAppearanceID(networkID, accountOffset)
 
-				let babylon = try Account(
+				let babylon = Account(
 					networkID: networkID,
 					factorInstance: factorInstance,
-					displayName: displayName,
+					displayName: DisplayName(nonEmpty: displayName),
 					extraProperties: .init(appearanceID: appearanceID)
 				)
 
@@ -87,7 +87,7 @@ extension ImportLegacyWalletClient: DependencyKey {
 			},
 			parseLegacyWalletFromQRCodes: {
 				let parsed = try CAP33.deserialize(payloads: $0)
-				let accountsArray = try parsed.accounts.rawValue.map(convert)
+				let accountsArray = parsed.accounts.rawValue.map(convert)
 				guard
 					!accountsArray.isEmpty,
 					case let accountsSet = OrderedSet<OlympiaAccountToMigrate>(accountsArray),
@@ -164,12 +164,12 @@ extension ImportLegacyWalletClient: DependencyKey {
 
 func convert(
 	parsedOlympiaAccount raw: Olympia.Parsed.ParsedAccount
-) throws -> OlympiaAccountToMigrate {
+) -> OlympiaAccountToMigrate {
 	let address = LegacyOlympiaAccountAddress(
 		publicKey: raw.publicKey
 	)
 
-	let derivationPath = try BIP44LikePath(
+	let derivationPath = BIP44LikePath(
 		index: raw.addressIndex
 	)
 

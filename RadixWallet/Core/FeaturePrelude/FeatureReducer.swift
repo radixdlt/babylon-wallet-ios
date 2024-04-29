@@ -160,7 +160,7 @@ extension FeatureReducer {
 
 extension FeatureReducer {
 	func exportMnemonic(
-		controlling entity: EntityBaseProtocol,
+		controlling entity: any EntityBaseProtocol,
 		notifyIfMissing: Bool = true,
 		onSuccess: (SimplePrivateFactorSource) -> Void
 	) -> Effect<Action> {

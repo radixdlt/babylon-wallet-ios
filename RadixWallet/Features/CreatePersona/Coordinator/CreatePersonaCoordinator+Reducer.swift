@@ -211,13 +211,13 @@ extension CreatePersonaCoordinator {
 			}
 			return .run { send in
 				let factorSourceIDFromHash = try factorSourceID.extract(as: FactorSourceIDFromHash.self)
-				let persona = try Persona(
+				let persona = Persona(
 					networkID: networkID,
 					factorInstance: HierarchicalDeterministicFactorInstance(
 						factorSourceId: factorSourceIDFromHash,
 						publicKey: hdKey
 					),
-					displayName: name,
+					displayName: DisplayName(nonEmpty: name),
 					extraProperties: .init(personaData: personaData)
 				)
 

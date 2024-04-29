@@ -9,18 +9,7 @@ extension ROLAClient {
 		let manifestForAuthKeyCreation: ManifestForAuthKeyCreation = { request in
 			let entity = request.entity
 			let newPublicKey = request.newPublicKey
-
-			let entityAddress: AddressOfAccountOrPersona = {
-				switch entity {
-				case let .account(account):
-					assert(account.networkID == request.entity.networkID)
-					return AddressOfAccountOrPersona.account(account.address)
-				case let .persona(persona):
-					assert(persona.networkID == request.entity.networkID)
-					return AddressOfAccountOrPersona.identity(persona.address)
-				}
-			}()
-
+			let entityAddress = entity.address
 			let metadata = try await onLedgerEntitiesClient.getEntity(entityAddress.asGeneral, metadataKeys: [.ownerKeys]).genericComponent?.metadata
 			var ownerKeyHashes = try metadata?.ownerKeyHashes() ?? []
 

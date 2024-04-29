@@ -367,7 +367,7 @@ extension AppSecurityView {
 public struct AuthorizedDappsView: IndentedView {
 	public let authorizedDapps: AuthorizedDapps
 	public let indentation: Indentation
-	public let getDetailedAuthorizedDapp: (AuthorizedDapp) -> ProfileNetwork.AuthorizedDappDetailed?
+	public let getDetailedAuthorizedDapp: (AuthorizedDapp) -> AuthorizedDappDetailed?
 }
 
 extension AuthorizedDappsView {
@@ -398,7 +398,7 @@ extension AuthorizedDappsView {
 public struct AuthorizedDappView: IndentedView {
 	public let authorizedDapp: AuthorizedDapp
 	public let indentation: Indentation
-	public let authorizedPersonas: IdentifiedArrayOf<ProfileNetwork.AuthorizedPersonaDetailed>?
+	public let authorizedPersonas: DetailedAuthorizedPersonas?
 }
 
 extension AuthorizedDappView {
@@ -424,7 +424,7 @@ extension AuthorizedDappView {
 
 // MARK: - DappAuthorizedPersonaView
 public struct DappAuthorizedPersonaView: IndentedView {
-	public let detailedAuthorizedPersona: ProfileNetwork.AuthorizedPersonaDetailed
+	public let detailedAuthorizedPersona: AuthorizedPersonaDetailed
 	public let indentation: Indentation
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
@@ -462,7 +462,7 @@ public struct DappAuthorizedPersonaView: IndentedView {
 					ForEach(simpleAccounts) { simpleAccount in
 						Labeled("displayName", value: simpleAccount.label.rawValue)
 						Labeled("address", value: simpleAccount.address.address)
-						Labeled("appearanceID", value: simpleAccount.appearanceID.description)
+						Labeled("appearanceID", value: simpleAccount.appearanceId.description)
 					}
 				} else {
 					Text("None yet")
@@ -570,7 +570,7 @@ extension EntitiesView {
 				Text("HIDDEN")
 					.fontWeight(.heavy)
 			}
-			Text(Entity.entityKind == .persona ? "Personas" : "Accounts")
+			Text(Entity.kind == .persona ? "Personas" : "Accounts")
 				.fontWeight(.heavy)
 			#if os(macOS)
 				.font(.title)
@@ -626,7 +626,7 @@ extension EntityView {
 				Labeled("Account Appearance ID", value: account.appearanceID.description)
 			}
 		}
-		.foregroundColor(isHidden ? .white : (entity.kind == .account ? .white : .black))
+		.foregroundColor(isHidden ? .white : (entity.entityKind == .account ? .white : .black))
 		.padding(.leading, leadingPadding)
 		.background {
 			if isHidden {
