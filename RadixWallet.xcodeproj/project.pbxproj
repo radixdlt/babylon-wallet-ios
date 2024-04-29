@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -1062,6 +1062,7 @@
 		E65D6CE72BC9815B001D8A39 /* Stage2MigrateToSargon+AppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65D6CE62BC9815B001D8A39 /* Stage2MigrateToSargon+AppPreferences.swift */; };
 		E65D6CEC2BC98237001D8A39 /* Stage2MigrateToSargon+Gateways.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65D6CEB2BC98237001D8A39 /* Stage2MigrateToSargon+Gateways.swift */; };
 		E65D6CEE2BC98267001D8A39 /* Stage2MigrateToSargon+AppPreferences+ViaProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = E65D6CED2BC98267001D8A39 /* Stage2MigrateToSargon+AppPreferences+ViaProfile.swift */; };
+		E6632B172BDFCCB100703B01 /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = E6632B162BDFCCB100703B01 /* Sargon */; };
 		E66DCC402BD93EC000547CF4 /* Stage1MigrateToSargon+Header.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66DCC3F2BD93EC000547CF4 /* Stage1MigrateToSargon+Header.swift */; };
 		E66EEB9B2B06694E007624BC /* RecoverWalletWithoutProfileStart+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66EEB992B06694E007624BC /* RecoverWalletWithoutProfileStart+View.swift */; };
 		E66EEB9C2B06694E007624BC /* RecoverWalletWithoutProfileStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66EEB9A2B06694E007624BC /* RecoverWalletWithoutProfileStart.swift */; };
@@ -2245,6 +2246,7 @@
 				48FFFABC2ADC209100B2B213 /* NukeExtensions in Frameworks */,
 				A41557502B757C5E0040AD4E /* ComposableArchitecture in Frameworks */,
 				48FFFAFD2ADC241A00B2B213 /* HeapModule in Frameworks */,
+				E6632B172BDFCCB100703B01 /* Sargon in Frameworks */,
 				48FFFAD52ADC21B900B2B213 /* LegibleError in Frameworks */,
 				48FFFB082ADC6FD300B2B213 /* SwiftUINavigationCore in Frameworks */,
 				48FFFAD82ADC21D200B2B213 /* NonEmpty in Frameworks */,
@@ -6326,6 +6328,7 @@
 				A415574F2B757C5E0040AD4E /* ComposableArchitecture */,
 				5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */,
 				489FEF902BDD0B80003EC10D /* Sargon */,
+				E6632B162BDFCCB100703B01 /* Sargon */,
 			);
 			productName = RadixWallet;
 			productReference = 48CFBC4F2ADC106300E77A5C /* Radix Wallet Dev.app */;
@@ -6395,7 +6398,7 @@
 				A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 				5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */,
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
-				489FEF8F2BDD0B80003EC10D /* XCLocalSwiftPackageReference "../sargon" */,
+				E6632B152BDFCCB100703B01 /* XCRemoteSwiftPackageReference "sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -7985,13 +7988,6 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		489FEF8F2BDD0B80003EC10D /* XCLocalSwiftPackageReference "../sargon" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../sargon;
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
 		48FFFA972ADC1EEC00B2B213 /* XCRemoteSwiftPackageReference "AsyncExtensions" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -8257,6 +8253,14 @@
 				minimumVersion = 1.9.10;
 			};
 		};
+		E6632B152BDFCCB100703B01 /* XCRemoteSwiftPackageReference "sargon" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/radixdlt/sargon";
+			requirement = {
+				kind = exactVersion;
+				version = 0.6.54;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -8463,6 +8467,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 48FFFAB22ADC206300B2B213 /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
 			productName = SwiftUIIntrospect;
+		};
+		E6632B162BDFCCB100703B01 /* Sargon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E6632B152BDFCCB100703B01 /* XCRemoteSwiftPackageReference "sargon" */;
+			productName = Sargon;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
