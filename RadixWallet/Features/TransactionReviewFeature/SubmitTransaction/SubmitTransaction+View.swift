@@ -98,7 +98,7 @@ extension SubmitTransaction {
 						HStack {
 							Text(L10n.TransactionReview.SubmitTransaction.txID)
 								.foregroundColor(.app.gray1)
-							AddressView(.identifier(.transaction(viewStore.txID)))
+							AddressView(.transaction(viewStore.txID))
 								.foregroundColor(.app.blue1)
 						}
 						.textStyle(.body1Header)

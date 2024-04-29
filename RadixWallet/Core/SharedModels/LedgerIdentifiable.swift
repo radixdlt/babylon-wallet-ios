@@ -1,7 +1,7 @@
 // MARK: - LedgerIdentifiable
 public enum LedgerIdentifiable: Sendable {
 	case address(Address)
-	case identifier(Identifier)
+	case transaction(IntentHash)
 
 	public static func address(of account: Profile.Network.Account) -> Self {
 		.address(.account(account.address, isLedgerHWAccount: account.isLedgerAccount))
@@ -15,7 +15,7 @@ public enum LedgerIdentifiable: Sendable {
 		switch self {
 		case let .address(address):
 			address.formatted(format)
-		case let .identifier(identifier):
+		case let .transaction(identifier):
 			identifier.formatted(format)
 		}
 	}
@@ -24,40 +24,14 @@ public enum LedgerIdentifiable: Sendable {
 		switch self {
 		case let .address(address):
 			address.addressPrefix
-		case let .identifier(identifier):
-			identifier.addressPrefix
+		case .transaction:
+			"transaction"
 		}
 	}
 }
 
+// MARK: LedgerIdentifiable.Address
 extension LedgerIdentifiable {
-	public enum Identifier: Sendable {
-		case transaction(IntentHash)
-		case nonFungibleGlobalID(NonFungibleGlobalId)
-
-		public var address: String {
-			formatted(.raw)
-		}
-
-		public func formatted(_ format: AddressFormat = .default) -> String {
-			switch self {
-			case let .transaction(txId):
-				txId.formatted(format)
-			case let .nonFungibleGlobalID(nonFungibleGlobalId):
-				nonFungibleGlobalId.formatted(format)
-			}
-		}
-
-		public var addressPrefix: String {
-			switch self {
-			case .transaction:
-				"transaction"
-			case .nonFungibleGlobalID:
-				"nft"
-			}
-		}
-	}
-
 	public enum Address: Hashable, Sendable, Identifiable {
 		case account(AccountAddress, isLedgerHWAccount: Bool = false)
 		case package(PackageAddress)

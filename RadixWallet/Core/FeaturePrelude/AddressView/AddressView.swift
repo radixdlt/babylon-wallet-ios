@@ -56,9 +56,9 @@ extension AddressView {
 							AddressDetails.View(store: store)
 						}
 					}
-			case .identifier:
+			case .transaction:
 				Menu {
-					Button(copyText, image: .copyBig) {
+					Button(L10n.AddressAction.copyTransactionId, image: .copyBig) {
 						copyToPasteboard()
 					}
 
@@ -97,25 +97,11 @@ extension AddressView {
 		Image(.copy)
 	}
 
-	private var copyText: String {
-		switch identifiable {
-		case .address:
-			L10n.AddressAction.copyAddress
-		case let .identifier(identifier):
-			switch identifier {
-			case .transaction:
-				L10n.AddressAction.copyTransactionId
-			case .nonFungibleGlobalID:
-				L10n.AddressAction.copyNftId
-			}
-		}
-	}
-
 	private var compactedText: String {
 		switch identifiable {
 		case let .address(.nonFungibleGlobalID(globalId)):
 			globalId.nonFungibleLocalId.toUserFacingString()
-		case .address, .identifier:
+		case .address, .transaction:
 			identifiable.formatted(.default)
 		}
 	}
