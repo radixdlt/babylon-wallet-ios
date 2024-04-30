@@ -65,7 +65,7 @@ extension Mobile2Mobile {
 				.init(name: "publicKey", value: walletPublicKey.rawRepresentation.hex()),
 			])
 
-			switch request.browser {
+			switch request.browser.lowercased() {
 			case "chrome":
 				await openURL(URL(string: returnURL.absoluteString.replacingOccurrences(of: "https://", with: "googlechromes://"))!)
 			case "firefox":
