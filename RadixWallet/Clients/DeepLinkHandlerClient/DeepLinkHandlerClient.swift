@@ -47,9 +47,11 @@ extension DeepLinkHandlerClient {
 				throw Error.missingRequestOrigin
 			}
 
+			let browser = queryItems.first(where: { $0.name == "browser" })?.value ?? "safari"
+
 			let publicKey = try HexCodable32Bytes(hex: publicKeyItem)
 
-			return try .linking(.init(origin: .webDapp(oringURL), sessionId: .init(sessionId), publicKey: .init(rawRepresentation: publicKey.data.data)))
+			return try .linking(.init(origin: .webDapp(oringURL), sessionId: .init(sessionId), publicKey: .init(rawRepresentation: publicKey.data.data), browser: browser))
 		}
 
 		return DeepLinkHandlerClient(handleDeepLink: { url in

@@ -63,11 +63,16 @@ extension Mobile2Mobile {
 			let returnURL = dappReturnURL.appending(queryItems: [
 				.init(name: "sessionId", value: request.sessionId.rawValue),
 				.init(name: "publicKey", value: walletPublicKey.rawRepresentation.hex()),
-
 			])
 
-			loggerGlobal.error("Deeplinking back")
-			await openURL(returnURL)
+			switch request.browser {
+			case "chrome":
+				await openURL(URL(string: returnURL.absoluteString.replacingOccurrences(of: "https://", with: "googlechromes://"))!)
+			case "firefox":
+				await openURL(URL(string: "firefox://open-url?url=\(returnURL.absoluteString)")!)
+			default:
+				await openURL(returnURL)
+			}
 		}
 	}
 
@@ -113,6 +118,7 @@ extension Mobile2Mobile {
 			public let origin: RadixConnectRelay.Session.Origin
 			public let sessionId: RadixConnectRelay.Session.ID
 			public let publicKey: Curve25519.KeyAgreement.PublicKey
+			public let browser: String
 		}
 
 		public struct DappRequest: Sendable {
