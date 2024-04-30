@@ -59,6 +59,11 @@ extension Completion {
 							}
 							.textStyle(.body1Header)
 						}
+
+						Text("You can return back to the dapp!")
+							.foregroundColor(.app.gray1)
+							.textStyle(.body1Header)
+							.multilineTextAlignment(.center)
 					}
 					.padding(.horizontal, .medium2)
 					.padding(.bottom, .small3)

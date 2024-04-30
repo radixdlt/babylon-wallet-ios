@@ -42,7 +42,14 @@ extension DeepLinkHandlerClient {
 				throw Error.missingRequestOrigin
 			}
 
-			return .linking(.init(origin: .webDapp(oringURL), sessionId: .init(sessionId)))
+			guard let publicKeyItem = queryItems.first(where: { $0.name == "publicKey" })?.value
+			else {
+				throw Error.missingRequestOrigin
+			}
+
+			let publicKey = try HexCodable32Bytes(hex: publicKeyItem)
+
+			return try .linking(.init(origin: .webDapp(oringURL), sessionId: .init(sessionId), publicKey: .init(rawRepresentation: publicKey.data.data)))
 		}
 
 		return DeepLinkHandlerClient(handleDeepLink: { url in
