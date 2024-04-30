@@ -24,6 +24,21 @@ extension CloudBackupClient {
 		profileStore: ProfileStore = .shared
 	) -> CloudBackupClient {
 		@Dependency(\.secureStorageClient) var secureStorageClient
+		@Dependency(\.userDefaults) var userDefaults
+
+		Task {
+			for try await profile in await profileStore.values() {
+				let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
+				do {
+					try await saveProfile(profile, existingRecord: existingRecord)
+					try? userDefaults.setLastBackup(success: true, for: profile.id)
+					print("•• backed up \(profile.id.uuidString)")
+				} catch {
+					try? userDefaults.setLastBackup(success: false, for: profile.id)
+					print("•• back up FAILED \(profile.id.uuidString)")
+				}
+			}
+		}
 
 		@Sendable
 		func fetchProfileRecord(_ id: CKRecord.ID) async throws -> CKRecord {
@@ -54,6 +69,7 @@ extension CloudBackupClient {
 			return profile
 		}
 
+		@discardableResult
 		@Sendable
 		func saveProfile(_ profile: Profile, existingRecord: CKRecord?) async throws -> CKRecord {
 			let fileManager = FileManager.default
