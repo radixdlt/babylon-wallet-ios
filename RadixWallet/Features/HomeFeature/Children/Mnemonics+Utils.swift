@@ -21,5 +21,5 @@ extension ExportMnemonic.State {
 // MARK: - SimplePrivateFactorSource
 struct SimplePrivateFactorSource: Sendable, Hashable {
 	let mnemonicWithPassphrase: MnemonicWithPassphrase
-	let factorSourceID: FactorSource.ID.FromHash
+	let factorSourceID: FactorSourceIdFromHash
 }

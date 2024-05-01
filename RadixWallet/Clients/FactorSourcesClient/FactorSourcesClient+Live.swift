@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - FactorSourcesClient + DependencyKey
 extension FactorSourcesClient: DependencyKey {
 	public typealias Value = FactorSourcesClient
@@ -51,7 +53,7 @@ extension FactorSourcesClient: DependencyKey {
 			/// already exist in profile, and this function is used only to save the
 			/// imported mnemonic into keychain (done above).
 			let deviceFactorSources = try await getFactorSources()
-				.filter { $0.id == factorSourceID.embed() }
+				.filter { $0.id == factorSourceID.asGeneral }
 				.map { try $0.extract(as: DeviceFactorSource.self) }
 
 			if request.saveIntoProfile {
@@ -64,11 +66,11 @@ extension FactorSourcesClient: DependencyKey {
 						let cryptoParamsToAdd = request.privateHDFactorSource.factorSource.common.cryptoParameters
 						updated.common.cryptoParameters.append(cryptoParamsToAdd)
 						loggerGlobal.notice("Appended crypto parameters \(cryptoParamsToAdd) to DeviceFactorSource.")
-						try await updateFactorSource(updated.embed())
+						try await updateFactorSource(updated.asGeneral)
 					}
 				} else {
 					do {
-						try await saveFactorSource(deviceFactorSource.embed())
+						try await saveFactorSource(deviceFactorSource.asGeneral)
 					} catch {
 						loggerGlobal.critical("Failed to save factor source, error: \(error)")
 						// We were unlucky, failed to update Profile, thus best to undo the saving of
@@ -84,7 +86,8 @@ extension FactorSourcesClient: DependencyKey {
 
 		let getMainDeviceFactorSource: GetMainDeviceFactorSource = {
 			let sources = try await getFactorSources()
-				.filter { $0.factorSourceKind == .device && !$0.supportsOlympia }
+				.filter { $0.factorSourceKind == .device }
+				.filter { !$0.supportsOlympia }
 				.map { try $0.extract(as: DeviceFactorSource.self) }
 
 			if let explicitMain = sources.first(where: { $0.isExplicitMain }) {
@@ -112,6 +115,7 @@ extension FactorSourcesClient: DependencyKey {
 		}
 
 		let indicesOfEntitiesControlledByFactorSource: IndicesOfEntitiesControlledByFactorSource = { request in
+
 			let factorSourceID = request.factorSourceID
 			guard let factorSource = try await getFactorSources().first(where: { $0.id == factorSourceID }) else { throw FailedToFindFactorSource() }
 
@@ -121,13 +125,13 @@ extension FactorSourcesClient: DependencyKey {
 
 			func nextDerivationIndexForFactorSource(
 				entitiesControlledByFactorSource: some Collection<some EntityProtocol>
-			) throws -> OrderedSet<HD.Path.Component.Child.Value> {
+			) throws -> OrderedSet<HDPathValue> {
 				let indicesOfEntitiesControlledByAccount = entitiesControlledByFactorSource
-					.compactMap { entity -> HD.Path.Component.Child.Value? in
+					.compactMap { entity -> HDPathValue? in
 						switch entity.securityState {
 						case let .unsecured(unsecuredControl):
 							let factorInstance = unsecuredControl.transactionSigning
-							guard factorInstance.factorSourceID.embed() == factorSourceID else {
+							guard factorInstance.factorSourceID.asGeneral == factorSourceID else {
 								return nil
 							}
 							guard factorInstance.derivationPath.scheme == request.derivationPathScheme else {
@@ -135,19 +139,19 @@ extension FactorSourcesClient: DependencyKey {
 								/// allow `M` to be able to derive account wit hBIP44-like derivation path at index `0` as well in the future.
 								return nil
 							}
-							return factorInstance.derivationPath.index
+							return factorInstance.derivationPath.nonHardenedIndex
 						}
 					}
 				return try OrderedSet(validating: indicesOfEntitiesControlledByAccount)
 			}
 
-			let indices: OrderedSet<HD.Path.Component.Child.Value> = if let network {
+			let indices: OrderedSet<HDPathValue> = if let network {
 				switch request.entityKind {
 				case .account:
 					try nextDerivationIndexForFactorSource(
 						entitiesControlledByFactorSource: network.accountsIncludingHidden()
 					)
-				case .identity:
+				case .persona:
 					try nextDerivationIndexForFactorSource(
 						entitiesControlledByFactorSource: network.personasIncludingHidden()
 					)
@@ -178,18 +182,15 @@ extension FactorSourcesClient: DependencyKey {
 
 				let mnemonicWithPassphrase = try MnemonicWithPassphrase(
 					mnemonic: mnemonicClient.generate(
-						BIP39.WordCount.twentyFour,
-						BIP39.Language.english
-					)
+						BIP39WordCount.twentyFour,
+						BIP39Language.english
+					), passphrase: ""
 				)
 
 				loggerGlobal.info("Creating new main BDFS")
-				let newBDFS = try DeviceFactorSource.babylon(
-					mnemonicWithPassphrase: mnemonicWithPassphrase,
-					isMain: true,
-					model: .init(model),
-					name: .init(name)
-				)
+				var newBDFS = DeviceFactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, isMain: true)
+				newBDFS.hint.model = model
+				newBDFS.hint.name = name
 				assert(newBDFS.isExplicitMainBDFS)
 
 				loggerGlobal.info("Saving new main BDFS to Keychain only, we will NOT save it into Profile just yet.")
@@ -205,11 +206,10 @@ extension FactorSourcesClient: DependencyKey {
 					)
 				)
 
-				return try PrivateHDFactorSource(
+				return PrivateHierarchicalDeterministicFactorSource(
 					mnemonicWithPassphrase: mnemonicWithPassphrase,
 					factorSource: newBDFS
 				)
-
 			},
 			getFactorSources: getFactorSources,
 			factorSourcesAsyncSequence: {
@@ -217,7 +217,7 @@ extension FactorSourcesClient: DependencyKey {
 			},
 			nextEntityIndexForFactorSource: { request in
 				let mainBDFS = try await getMainDeviceFactorSource()
-				let factorSourceID = request.factorSourceID ?? mainBDFS.factorSourceID.embed()
+				let factorSourceID = request.factorSourceID ?? mainBDFS.factorSourceID
 
 				/// We CANNOT just use `entitiesControlledByFactorSource.count` since it is possible that
 				/// some users from Radix Babylon Wallet version 1.0.0 created accounts not sarting at
@@ -245,8 +245,7 @@ extension FactorSourcesClient: DependencyKey {
 				return nextIndex
 			},
 			addPrivateHDFactorSource: addPrivateHDFactorSource,
-			checkIfHasOlympiaFactorSourceForAccounts: { wordCount, softwareAccounts -> FactorSourceID.FromHash? in
-
+			checkIfHasOlympiaFactorSourceForAccounts: { wordCount, softwareAccounts -> FactorSourceIDFromHash? in
 				guard softwareAccounts.allSatisfy({ $0.accountType == .software }) else {
 					assertionFailure("Unexpectedly received hardware account, unable to verify.")
 					return nil
@@ -282,8 +281,10 @@ extension FactorSourcesClient: DependencyKey {
 						if !deviceFactorSource.supportsOlympia {
 							loggerGlobal.notice("Adding Olympia CryptoParameters to factor source which lacked it.")
 							var updated = deviceFactorSource
-							updated.common.cryptoParameters.append(.olympiaOnly)
-							try await updateFactorSource(updated.embed())
+							updated.common.cryptoParameters.append(
+								.olympia
+							)
+							try await updateFactorSource(updated.asGeneral)
 						}
 
 						// YES Managed to validate all software accounts against existing factor source
@@ -303,27 +304,27 @@ extension FactorSourcesClient: DependencyKey {
 				assert(request.signers.allSatisfy { $0.networkID == request.networkID })
 				return try await signingFactors(
 					for: request.signers,
-					from: getFactorSources().rawValue,
+					from: getFactorSources().asIdentified(),
 					signingPurpose: request.signingPurpose
 				)
 			},
 			updateLastUsed: { request in
-
 				_ = try await profileStore.updating { profile in
-					var factorSources = profile.factorSources.rawValue
+					var factorSources = profile.factorSources
 					for id in request.factorSourceIDs {
-						guard var factorSource = factorSources[id: id] else {
+						guard var factorSource = factorSources.get(id: id) else {
 							throw FactorSourceNotFound()
 						}
 						factorSource.common.lastUsedOn = request.lastUsedOn
-						factorSources[id: id] = factorSource
+						let updated = factorSources.updateOrAppend(factorSource)
+						assert(updated != nil)
 					}
-					profile.factorSources = .init(rawValue: factorSources)!
+					profile.factorSources = factorSources
 				}
 			},
 			flagFactorSourceForDeletion: { id in
 				let factorSources = try await getFactorSources()
-				guard var factorSource = factorSources.rawValue[id: id] else {
+				guard var factorSource = factorSources.get(id: id) else {
 					throw FactorSourceNotFound()
 				}
 				factorSource.flag(.deletedByUser)
@@ -336,7 +337,7 @@ extension FactorSourcesClient: DependencyKey {
 }
 
 func signingFactors(
-	for entities: some Collection<EntityPotentiallyVirtual>,
+	for entities: some Collection<AccountOrPersona>,
 	from allFactorSources: IdentifiedArrayOf<FactorSource>,
 	signingPurpose: SigningPurpose
 ) throws -> SigningFactors {
@@ -354,7 +355,7 @@ func signingFactors(
 			}
 
 			let id = factorInstance.factorSourceID
-			guard let factorSource = allFactorSources[id: id.embed()] else {
+			guard let factorSource = allFactorSources[id: id.asGeneral] else {
 				assertionFailure("Bad! factor source not found")
 				throw FactorSourceNotFound()
 			}
@@ -401,7 +402,7 @@ extension FactorSourceKind: Comparable {
 
 	fileprivate var signingOrder: Int {
 		switch self {
-		case .ledgerHQHardwareWallet: 0
+		case .ledgerHqHardwareWallet: 0
 		case .offDeviceMnemonic: 1
 		case .securityQuestions: 2
 		case .trustedContact: 3

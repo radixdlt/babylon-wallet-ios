@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - CreateAccountCoordinator
@@ -92,8 +93,8 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case createAccountResult(TaskResult<Profile.Network.Account>)
-		case handleAccountCreated(TaskResult<Profile.Network.Account>)
+		case createAccountResult(TaskResult<Account>)
+		case handleAccountCreated(TaskResult<Account>)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -152,7 +153,12 @@ extension CreateAccountCoordinator {
 			}
 
 		case let .path(.element(_, action: .selectLedger(.delegate(.choseLedger(ledger))))):
-			return derivePublicKey(state: &state, factorSourceOption: .specific(ledger.embed()))
+			return derivePublicKey(
+				state: &state,
+				factorSourceOption: .specific(
+					ledger.asGeneral
+				)
+			)
 
 		case .path(.element(_, action: .completion(.delegate(.completed)))):
 			return .run { send in
@@ -208,12 +214,13 @@ extension CreateAccountCoordinator {
 
 			return .run { send in
 				await send(.internal(.createAccountResult(TaskResult {
+					let factorSourceIDFromHash = try factorSourceID.extract(as: FactorSourceIDFromHash.self)
+
 					let account = try await accountsClient.newVirtualAccount(.init(
 						name: name,
-						factorInstance: .init(
-							factorSourceID: factorSourceID,
-							publicKey: hdKey.publicKey,
-							derivationPath: hdKey.derivationPath
+						factorInstance: HierarchicalDeterministicFactorInstance(
+							factorSourceId: factorSourceIDFromHash,
+							publicKey: hdKey
 						),
 						networkID: networkID
 					))

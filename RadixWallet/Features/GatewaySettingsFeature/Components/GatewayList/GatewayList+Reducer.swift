@@ -35,7 +35,7 @@ public struct GatewayList: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case removeGateway(GatewayRow.State)
-		case switchToGateway(Radix.Gateway)
+		case switchToGateway(Gateway)
 	}
 
 	public init() {}

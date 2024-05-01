@@ -10,7 +10,7 @@ extension P2P {
 		/// The PerPeerPairConnection
 		public let p2pLink: P2PLink
 		/// The PerPeerPairConnection password.
-		public var connectionId: ConnectionPassword { p2pLink.connectionPassword }
+		public var connectionId: RadixConnectPassword { p2pLink.connectionPassword }
 		/// ID to a specific peer **connection** for some PerPeerPairConnection.
 		public let peerConnectionId: PeerConnectionID
 

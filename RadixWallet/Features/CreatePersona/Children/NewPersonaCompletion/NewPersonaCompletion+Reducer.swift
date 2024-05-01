@@ -3,12 +3,12 @@ import SwiftUI
 
 public struct NewPersonaCompletion: Sendable, FeatureReducer {
 	public struct State: Sendable & Hashable {
-		public let persona: Profile.Network.Persona
+		public let persona: Persona
 		public let isFirstOnNetwork: Bool
 		public let navigationButtonCTA: CreatePersonaNavigationButtonCTA
 
 		public init(
-			persona: Profile.Network.Persona,
+			persona: Persona,
 			isFirstOnNetwork: Bool,
 			navigationButtonCTA: CreatePersonaNavigationButtonCTA
 		) {
@@ -18,7 +18,7 @@ public struct NewPersonaCompletion: Sendable, FeatureReducer {
 		}
 
 		public init(
-			persona: Profile.Network.Persona,
+			persona: Persona,
 			config: CreatePersonaConfig
 		) {
 			self.init(

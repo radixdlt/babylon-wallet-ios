@@ -1,11 +1,11 @@
 
 extension SelectionRequirement {
-	public init(_ numberOfAccounts: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple.SharedAccounts.Number) {
+	public init(_ numberOfAccounts: RequestedQuantity) {
 		switch numberOfAccounts.quantifier {
 		case .exactly:
-			self = .exactly(numberOfAccounts.quantity)
+			self = .exactly(Int(numberOfAccounts.quantity))
 		case .atLeast:
-			self = .atLeast(numberOfAccounts.quantity)
+			self = .atLeast(Int(numberOfAccounts.quantity))
 		}
 	}
 }

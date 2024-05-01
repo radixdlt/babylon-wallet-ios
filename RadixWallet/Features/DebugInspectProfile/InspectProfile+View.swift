@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ProfileView
@@ -90,13 +91,13 @@ extension IndentedView {
 
 // MARK: - HeaderView
 public struct HeaderView: IndentedView {
-	public let header: ProfileSnapshot.Header
+	public let header: Profile.Header
 	public let indentation: Indentation
 
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
 			Labeled("ID", value: header.id)
-			Labeled("Snapshot version", value: header.snapshotVersion)
+			Labeled("Snapshot version", value: header.snapshotVersion.rawValue)
 			CreatingDeviceView(device: header.creatingDevice, indentation: inOneLevel)
 			HeaderHintView(hint: header.contentHint, indentation: inOneLevel)
 		}
@@ -105,7 +106,7 @@ public struct HeaderView: IndentedView {
 
 // MARK: - CreatingDeviceView
 public struct CreatingDeviceView: IndentedView {
-	public let device: ProfileSnapshot.Header.UsedDeviceInfo
+	public let device: DeviceInfo
 	public let indentation: Indentation
 
 	public var body: some View {
@@ -119,7 +120,7 @@ public struct CreatingDeviceView: IndentedView {
 
 // MARK: - HeaderHintView
 public struct HeaderHintView: IndentedView {
-	public let hint: ProfileSnapshot.Header.ContentHint
+	public let hint: ContentHint
 	public let indentation: Indentation
 
 	public var body: some View {
@@ -180,14 +181,6 @@ extension DebugInspectFactorSourceView {
 				DeviceFactorSouceView(deviceFactorSource: deviceFactorSource)
 			case let .ledger(ledgerFactorSource):
 				LedgerFactorSourceView(ledgerFactorSource: ledgerFactorSource)
-			case let .offDeviceMnemonic(offDeviceMnemonicFactorSource):
-				OffDeviceMnemonicFactorSourceView(offDeviceMnemonicFactorSource: offDeviceMnemonicFactorSource)
-			case let .securityQuestions(questionsFactorSource):
-				// FIXME: impl me
-				Text("\(String(describing: questionsFactorSource))")
-			case let .trustedContact(trustedContact):
-				// FIXME: impl me
-				Text("\(String(describing: trustedContact))")
 			}
 			FactorSourceCommonView(common: factorSource.common)
 		}
@@ -218,7 +211,7 @@ extension FactorSource {
 
 // MARK: - FactorSourceCommonView
 public struct FactorSourceCommonView: View {
-	public let common: FactorSource.Common
+	public let common: FactorSourceCommon
 	public var body: some View {
 		Labeled("Added On", value: common.addedOn.ISO8601Format())
 		Labeled("LastUsed On", value: common.lastUsedOn.ISO8601Format())
@@ -230,12 +223,12 @@ public struct FactorSourceCommonView: View {
 // MARK: - DeviceFactorSouceView
 public struct DeviceFactorSouceView: View {
 	public let deviceFactorSource: DeviceFactorSource
-	var isMain: Bool { deviceFactorSource.flags.contains(.main) }
+	var isMain: Bool { deviceFactorSource.common.flags.contains(.main) }
 	public var body: some View {
 		Labeled("Is Main?", value: isMain)
 			.fontWeight(.heavy)
 		Labeled("Name", value: deviceFactorSource.hint.name)
-		Labeled("Model", value: deviceFactorSource.hint.model.rawValue)
+		Labeled("Model", value: deviceFactorSource.hint.model)
 	}
 }
 
@@ -245,17 +238,6 @@ public struct LedgerFactorSourceView: View {
 	public var body: some View {
 		Labeled("Name", value: ledgerFactorSource.hint.name)
 		Labeled("Model", value: ledgerFactorSource.hint.model.rawValue)
-	}
-}
-
-// MARK: - OffDeviceMnemonicFactorSourceView
-public struct OffDeviceMnemonicFactorSourceView: View {
-	public let offDeviceMnemonicFactorSource: OffDeviceMnemonicFactorSource
-	public var body: some View {
-		Labeled("Word count", value: offDeviceMnemonicFactorSource.bip39Parameters.wordCount)
-		Labeled("Language", value: offDeviceMnemonicFactorSource.bip39Parameters.language)
-		Labeled("Passphrase?", value: offDeviceMnemonicFactorSource.bip39Parameters.bip39PassphraseSpecified)
-		Labeled("Label", value: offDeviceMnemonicFactorSource.hint.label)
 	}
 }
 
@@ -316,7 +298,7 @@ extension GatewaysView {
 
 // MARK: - GatewayView
 public struct GatewayView: IndentedView {
-	public let gateway: Radix.Gateway
+	public let gateway: Gateway
 	public let isCurrent: Bool
 	public let indentation: Indentation
 }
@@ -329,7 +311,7 @@ extension GatewayView {
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
-			Labeled("Network Name", value: gateway.network.name.rawValue)
+			Labeled("Network Name", value: gateway.network.logicalName)
 			Labeled("Network ID", value: gateway.network.id.description)
 			if isCurrent {
 				Text("Is current gateway ✅")
@@ -342,7 +324,7 @@ extension GatewayView {
 
 // MARK: - DisplayView
 public struct DisplayView: IndentedView {
-	public let display: AppPreferences.Display
+	public let display: AppDisplay
 	public let indentation: Indentation
 }
 
@@ -362,7 +344,7 @@ extension DisplayView {
 
 // MARK: - AppSecurityView
 public struct AppSecurityView: IndentedView {
-	public let security: AppPreferences.Security
+	public let security: Security
 	public let indentation: Indentation
 }
 
@@ -383,9 +365,9 @@ extension AppSecurityView {
 
 // MARK: - AuthorizedDappsView
 public struct AuthorizedDappsView: IndentedView {
-	public let authorizedDapps: Profile.Network.AuthorizedDapps
+	public let authorizedDapps: AuthorizedDapps
 	public let indentation: Indentation
-	public let getDetailedAuthorizedDapp: (Profile.Network.AuthorizedDapp) -> Profile.Network.AuthorizedDappDetailed?
+	public let getDetailedAuthorizedDapp: (AuthorizedDapp) -> AuthorizedDappDetailed?
 }
 
 extension AuthorizedDappsView {
@@ -414,9 +396,9 @@ extension AuthorizedDappsView {
 
 // MARK: - AuthorizedDappView
 public struct AuthorizedDappView: IndentedView {
-	public let authorizedDapp: Profile.Network.AuthorizedDapp
+	public let authorizedDapp: AuthorizedDapp
 	public let indentation: Indentation
-	public let authorizedPersonas: IdentifiedArrayOf<Profile.Network.AuthorizedPersonaDetailed>?
+	public let authorizedPersonas: DetailedAuthorizedPersonas?
 }
 
 extension AuthorizedDappView {
@@ -442,11 +424,11 @@ extension AuthorizedDappView {
 
 // MARK: - DappAuthorizedPersonaView
 public struct DappAuthorizedPersonaView: IndentedView {
-	public let detailedAuthorizedPersona: Profile.Network.AuthorizedPersonaDetailed
+	public let detailedAuthorizedPersona: AuthorizedPersonaDetailed
 	public let indentation: Indentation
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Labeled("Address", value: detailedAuthorizedPersona.identityAddress.address)
+			Labeled("Address", value: detailedAuthorizedPersona.identityAddress)
 			Labeled("Name", value: detailedAuthorizedPersona.displayName.rawValue)
 
 			Text("Shared Fields")
@@ -461,31 +443,16 @@ public struct DappAuthorizedPersonaView: IndentedView {
 					Labeled("id", value: name.id)
 				}
 
-				if let dateOfBirth = sharedPersonaData.dateOfBirth {
-					Text("Date of birth")
-					Labeled("id", value: dateOfBirth.id)
-					Labeled("value", value: dateOfBirth.value.date.ISO8601Format())
-				}
-
 				Text("Emails")
-				ForEach(sharedPersonaData.emailAddresses) { email in
+				ForEach(sharedPersonaData.emailAddresses.collection) { email in
 					Labeled("Value", value: email.value.email)
 					Labeled("id", value: email.id)
 				}
 
 				Text("Phonenumbers")
-				ForEach(sharedPersonaData.phoneNumbers) { phone in
+				ForEach(sharedPersonaData.phoneNumbers.collection) { phone in
 					Labeled("Value", value: phone.value.number)
 					Labeled("id", value: phone.id)
-				}
-				Group {
-					Text("Postal addresses")
-					ForEach(sharedPersonaData.postalAddresses) { postalAddress in
-						Labeled("id", value: postalAddress.id)
-						ForEach(postalAddress.value.fields) { field in
-							Labeled("Value", value: String(describing: field))
-						}
-					}
 				}
 			}
 
@@ -495,7 +462,7 @@ public struct DappAuthorizedPersonaView: IndentedView {
 					ForEach(simpleAccounts) { simpleAccount in
 						Labeled("displayName", value: simpleAccount.label.rawValue)
 						Labeled("address", value: simpleAccount.address.address)
-						Labeled("appearanceID", value: simpleAccount.appearanceID.description)
+						Labeled("appearanceID", value: simpleAccount.appearanceId.description)
 					}
 				} else {
 					Text("None yet")
@@ -508,30 +475,9 @@ public struct DappAuthorizedPersonaView: IndentedView {
 	}
 }
 
-// MARK: - P2PLinkView
-public struct P2PLinkView: IndentedView {
-	public let p2pLinks: P2PLink
-	public let indentation: Indentation
-}
-
-extension P2PLinkView {
-	public var body: some View {
-		VStack(alignment: .leading, spacing: indentation.spacing) {
-			Text("P2P Client")
-				.fontWeight(.heavy)
-			#if os(macOS)
-				.font(.title)
-			#endif // os(macOS)
-			Labeled("ID", value: String(p2pLinks.id.data.hex().mask(showLast: 6)))
-			Labeled("Client Name", value: p2pLinks.displayName)
-		}
-		.padding(.leading, leadingPadding)
-	}
-}
-
 // MARK: - PerNetworkView
 public struct PerNetworkView: IndentedView {
-	public let networks: Profile.Networks
+	public let networks: ProfileNetworks
 	public let indentation: Indentation
 }
 
@@ -544,9 +490,9 @@ extension PerNetworkView {
 			#if os(macOS)
 				.font(.title)
 			#endif // os(macOS)
-			ForEach(networks.keys, id: \.self) { networkID in
+			ForEach(networks, id: \.self) { network in
 				ProfileNetworkView(
-					network: try! networks.network(id: networkID),
+					network: network,
 					indentation: inOneLevel
 				)
 			}
@@ -557,7 +503,7 @@ extension PerNetworkView {
 
 // MARK: - ProfileNetworkView
 public struct ProfileNetworkView: IndentedView {
-	public let network: Profile.Network
+	public let network: ProfileNetwork
 	public let indentation: Indentation
 }
 
@@ -570,7 +516,7 @@ extension ProfileNetworkView {
 				.font(.title)
 			#endif // os(macOS)
 
-			Labeled("ID", value: String(describing: network.networkID))
+			Labeled("ID", value: String(describing: network.id))
 
 			AccountsView(
 				areHidden: false,
@@ -607,8 +553,8 @@ extension ProfileNetworkView {
 	}
 }
 
-public typealias AccountsView = EntitiesView<Profile.Network.Account>
-public typealias PersonasView = EntitiesView<Profile.Network.Persona>
+public typealias AccountsView = EntitiesView<Account>
+public typealias PersonasView = EntitiesView<Persona>
 
 // MARK: - EntitiesView
 public struct EntitiesView<Entity: EntityProtocol>: IndentedView {
@@ -624,7 +570,7 @@ extension EntitiesView {
 				Text("HIDDEN")
 					.fontWeight(.heavy)
 			}
-			Text(Entity.entityKind == .identity ? "Personas" : "Accounts")
+			Text(Entity.kind == .persona ? "Personas" : "Accounts")
 				.fontWeight(.heavy)
 			#if os(macOS)
 				.font(.title)
@@ -667,7 +613,7 @@ extension EntityView {
 			}
 
 			Group {
-				if let persona = self.entity as? Profile.Network.Persona {
+				if let persona = self.entity as? Persona {
 					Text("Persona fields")
 					ForEach(persona.personaData.entries, id: \.self) { entry in
 						Labeled("id:\(entry.id)", value: String(describing: entry.value))
@@ -676,17 +622,17 @@ extension EntityView {
 			}
 			.padding(.leading, indentation.inOneLevel.leadingPadding)
 
-			if let account = self.entity as? Profile.Network.Account {
+			if let account = self.entity as? Account {
 				Labeled("Account Appearance ID", value: account.appearanceID.description)
 			}
 		}
-		.foregroundColor(isHidden ? .white : (entity.kind == .account ? .white : .black))
+		.foregroundColor(isHidden ? .white : (entity.entityKind == .account ? .white : .black))
 		.padding(.leading, leadingPadding)
 		.background {
 			if isHidden {
 				Color.gray
 			} else {
-				if let account = entity as? Profile.Network.Account {
+				if let account = entity as? Account {
 					account.appearanceID.gradient
 						.brightness(-0.2)
 				}
@@ -737,9 +683,8 @@ extension HierarchicalDeterministicFactorInstanceView {
 			#endif // os(macOS)
 
 			Labeled("Derivation Path", value: factorInstance.derivationPath.description)
-			Labeled("Derivation Scheme", value: factorInstance.derivationPath.scheme.rawValue)
-			Labeled("Public Key", value: factorInstance.publicKey.compressedRepresentation.hex)
-			Labeled("Curve", value: factorInstance.publicKey.curve.rawValue)
+			Labeled("Public Key", value: factorInstance.publicKey.publicKey.hex)
+			Labeled("Curve", value: factorInstance.publicKey.curve.description)
 			Labeled("Factor Source ID", value: String(factorInstance.factorSourceID.description.mask(showLast: 6)))
 		}
 		.padding(.leading, leadingPadding)

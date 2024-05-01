@@ -14,16 +14,15 @@ extension DeviceFactorSourceClient: DependencyKey {
 
 		let entitiesControlledByFactorSource: GetEntitiesControlledByFactorSource = { factorSource, maybeSnapshot in
 
-			let (allNonHiddenEntities, allHiddenEntities) = try await { () -> (allNonHiddenEntities: [EntityPotentiallyVirtual], allHiddenEntities: [EntityPotentiallyVirtual]) in
-				let accountNonHidden: [Profile.Network.Account]
-				let accountHidden: [Profile.Network.Account]
-				let personasNonHidden: [Profile.Network.Persona]
-				let personasHidden: [Profile.Network.Persona]
+			let (allNonHiddenEntities, allHiddenEntities) = try await { () -> (allNonHiddenEntities: [AccountOrPersona], allHiddenEntities: [AccountOrPersona]) in
+				let accountNonHidden: [Account]
+				let accountHidden: [Account]
+				let personasNonHidden: [Persona]
+				let personasHidden: [Persona]
 
-				// FIXME: Uh this aint pretty... but we are short on time.
 				if let overridingSnapshot = maybeSnapshot {
-					let networkID = Radix.Gateway.default.network.id
-					let profile = Profile(snapshot: overridingSnapshot)
+					let networkID = NetworkID.mainnet
+					let profile = overridingSnapshot
 					let network = try profile.network(id: networkID)
 					accountNonHidden = network.getAccounts().elements
 					personasNonHidden = network.getPersonas().elements
@@ -38,11 +37,11 @@ extension DeviceFactorSourceClient: DependencyKey {
 					personasHidden = try await personasClient.getHiddenPersonasOnCurrentNetwork().elements
 				}
 
-				var allNonHiddenEntities = accountNonHidden.map(EntityPotentiallyVirtual.account)
-				allNonHiddenEntities.append(contentsOf: personasNonHidden.map(EntityPotentiallyVirtual.persona))
+				var allNonHiddenEntities = accountNonHidden.map(AccountOrPersona.account)
+				allNonHiddenEntities.append(contentsOf: personasNonHidden.map(AccountOrPersona.persona))
 
-				var allHidden = accountHidden.map(EntityPotentiallyVirtual.account)
-				allHidden.append(contentsOf: personasHidden.map(EntityPotentiallyVirtual.persona))
+				var allHidden = accountHidden.map(AccountOrPersona.account)
+				allHidden.append(contentsOf: personasHidden.map(AccountOrPersona.persona))
 
 				return (allNonHiddenEntities, allHidden)
 			}()
@@ -76,22 +75,10 @@ extension DeviceFactorSourceClient: DependencyKey {
 			publicKeysFromOnDeviceHD: { request in
 				let factorSourceID = request.deviceFactorSource.id
 				let mnemonicWithPassphrase = try request.getMnemonicWithPassphrase()
-				let hdRoot = try mnemonicWithPassphrase.hdRoot()
-				let derivedKeys = try request.derivationPaths.map {
-					let key = try hdRoot.derivePrivateKey(
-						path: $0,
-						curve: $0.curveForScheme
-					)
-					return HierarchicalDeterministicPublicKey(publicKey: key.publicKey(), derivationPath: $0)
-				}
-				return derivedKeys
+				return mnemonicWithPassphrase.derivePublicKeys(paths: request.derivationPaths)
 			},
 			signatureFromOnDeviceHD: { request in
-				let privateKey = try request.hdRoot.derivePrivateKey(
-					path: request.derivationPath,
-					curve: request.curve
-				)
-				return try privateKey.sign(hashOfMessage: request.hashedData)
+				request.mnemonicWithPassphrase.sign(hash: request.hashedData, path: request.derivationPath)
 			},
 			isAccountRecoveryNeeded: {
 				do {
@@ -134,7 +121,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 				let sources: IdentifiedArrayOf<DeviceFactorSource> = try await {
 					// FIXME: Uh this aint pretty... but we are short on time.
 					if let overridingSnapshot = maybeOverridingSnapshot {
-						let profile = Profile(snapshot: overridingSnapshot)
+						let profile = overridingSnapshot
 						return IdentifiedArrayOf(uniqueElements: profile.factorSources.compactMap { $0.extract(DeviceFactorSource.self) })
 					} else {
 						return try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)

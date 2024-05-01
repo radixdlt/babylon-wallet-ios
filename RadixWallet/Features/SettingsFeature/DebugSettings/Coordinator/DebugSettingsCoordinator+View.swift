@@ -38,11 +38,6 @@ extension DebugSettingsCoordinator.View {
 	@MainActor
 	private var rows: [SettingsRowModel<DebugSettingsCoordinator>] {
 		[
-			.init(
-				title: "Multi-Factor Setup",
-				icon: .systemImage("lock.square.stack.fill"),
-				action: .securityStructureConfigsButtonTapped
-			),
 			// ONLY DEBUG EVER
 			.init(
 				title: "Factor sources",
@@ -99,7 +94,6 @@ private extension View {
 			.debugKeychainContents(with: destinationStore)
 		#endif
 			.debugInspectProfile(with: destinationStore)
-			.securityStructureConfigs(with: destinationStore)
 	}
 
 	private func debugUserDefaultsContents(
@@ -156,17 +150,6 @@ private extension View {
 			state: /DebugSettingsCoordinator.Destination.State.debugInspectProfile,
 			action: DebugSettingsCoordinator.Destination.Action.debugInspectProfile,
 			destination: { DebugInspectProfile.View(store: $0) }
-		)
-	}
-
-	private func securityStructureConfigs(
-		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
-	) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /DebugSettingsCoordinator.Destination.State.securityStructureConfigs,
-			action: DebugSettingsCoordinator.Destination.Action.securityStructureConfigs,
-			destination: { SecurityStructureConfigurationListCoordinator.View(store: $0) }
 		)
 	}
 }

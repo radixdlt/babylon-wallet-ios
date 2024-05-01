@@ -1,26 +1,27 @@
 import Foundation
 import RegexBuilder
+import Sargon
 import SwiftUI
 
 extension Olympia {
 	public enum Export {}
 	public struct Parsed: Sendable, Hashable {
-		public let mnemonicWordCount: BIP39.WordCount
-		public let accounts: NonEmpty<OrderedSet<Olympia.Parsed.Account>>
+		public let mnemonicWordCount: BIP39WordCount
+		public let accounts: NonEmpty<OrderedSet<Olympia.Parsed.ParsedAccount>>
 
-		public struct Account: Sendable, Hashable {
+		public struct ParsedAccount: Sendable, Hashable {
 			public let accountType: Olympia.AccountType
-			public let publicKey: K1.PublicKey
+			public let publicKey: Secp256k1PublicKey
 			public let displayName: NonEmptyString?
 			/// the non hardened value of the path
-			public let addressIndex: HD.Path.Component.Child.Value
+			public let addressIndex: HDPathValue
 		}
 	}
 }
 
 extension Olympia.Export {
 	public static let accountNameForbiddenCharReplacement = "_"
-	public static let accountNameMaxLength = Profile.Network.Account.nameMaxLength
+	public static let accountNameMaxLength = Account.nameMaxLength
 
 	public enum Separator: Sendable, Hashable, CaseIterable {
 		static let inter = "~"
@@ -53,7 +54,7 @@ extension Olympia.Export {
 		}
 
 		public struct Contents: Sendable, Hashable {
-			public let accounts: OrderedSet<Olympia.Parsed.Account>
+			public let accounts: OrderedSet<Olympia.Parsed.ParsedAccount>
 			public let rest: NonEmptyString?
 		}
 	}
@@ -68,20 +69,20 @@ public enum CAP33 {
 	public static func deserialize(
 		payloads payloadStrings: NonEmpty<OrderedSet<NonEmptyString>>
 	) throws -> Olympia.Parsed {
-		var accounts: OrderedSet<Olympia.Parsed.Account> = []
-		var mnemonicWordCount: BIP39.WordCount? = nil
+		var accounts: OrderedSet<Olympia.Parsed.ParsedAccount> = []
+		var mnemonicWordCount: BIP39WordCount? = nil
 		var rest: NonEmptyString? = nil
 
 		for payloadString in payloadStrings.rawValue.elements {
 			let payload = try _deserialize(payload: payloadString, rest: rest)
 			if mnemonicWordCount == nil {
-				mnemonicWordCount = BIP39.WordCount(wordCount: payload.header.mnemonicWordCount)!
+				mnemonicWordCount = BIP39WordCount(wordCount: payload.header.mnemonicWordCount)!
 			}
 			accounts.append(contentsOf: payload.contents.accounts)
 			rest = payload.contents.rest
 		}
 
-		guard let nonEmpty = NonEmpty<OrderedSet<Olympia.Parsed.Account>>(rawValue: accounts) else {
+		guard let nonEmpty = NonEmpty<OrderedSet<Olympia.Parsed.ParsedAccount>>(rawValue: accounts) else {
 			throw ParseFailure.anyAccount
 		}
 
@@ -159,7 +160,7 @@ extension CAP33 {
 	}
 
 	enum AccountOrRest {
-		case account(Olympia.Parsed.Account)
+		case account(Olympia.Parsed.ParsedAccount)
 		case rest(NonEmptyString)
 	}
 
@@ -198,14 +199,14 @@ extension CAP33 {
 			throw ParseFailure.accountPublicKeyInvalidByteCount
 		}
 
-		let publicKey: K1.PublicKey
+		let publicKey: Secp256k1PublicKey
 		do {
-			publicKey = try K1.PublicKey(compressedRepresentation: publicKeyData)
+			publicKey = try Secp256k1PublicKey(bytes: publicKeyData)
 		} catch {
 			throw ParseFailure.accountPublicKeyInvalidSecp256k1PublicKey
 		}
 
-		guard let bip44LikeAddressIndex = HD.Path.Component.Child.Value(components[2]) else {
+		guard let bip44LikeAddressIndex = HDPathValue(components[2]) else {
 			throw ParseFailure.accountAddressIndex
 		}
 
@@ -220,7 +221,7 @@ extension CAP33 {
 
 		let maybeName = NonEmptyString(rawValue: accountName)
 
-		let account = Olympia.Parsed.Account(
+		let account = Olympia.Parsed.ParsedAccount(
 			accountType: accountType,
 			publicKey: publicKey,
 			displayName: maybeName,
@@ -269,7 +270,7 @@ extension CAP33 {
 			throw ParseFailure.payloadDidNotContainHeaderAndContent
 		}
 
-		var accounts: OrderedSet<Olympia.Parsed.Account> = .init()
+		var accounts: OrderedSet<Olympia.Parsed.ParsedAccount> = .init()
 
 		for (index, accountComponent) in accountComponentsAndMaybeRest.enumerated() {
 			let accountOrRest = try _deserializeAccount(

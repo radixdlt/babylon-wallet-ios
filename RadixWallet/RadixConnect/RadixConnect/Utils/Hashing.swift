@@ -1,7 +1,7 @@
-import WebRTC
+import Sargon
 
-extension ConnectionPassword {
-	func hash() -> Data {
-		self.data.data.hash().data
+extension RadixConnectPassword {
+	func hash() -> Hash {
+		self.value.hash()
 	}
 }

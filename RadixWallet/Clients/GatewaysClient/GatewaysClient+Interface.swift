@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - GatewaysClient
 public struct GatewaysClient: Sendable {
 	/// Async sequence of Gateways, emits new value of Gateways
@@ -29,13 +31,13 @@ public struct GatewaysClient: Sendable {
 }
 
 extension GatewaysClient {
-	public typealias CurrentGatewayValues = @Sendable () async -> AnyAsyncSequence<Radix.Gateway>
+	public typealias CurrentGatewayValues = @Sendable () async -> AnyAsyncSequence<Gateway>
 	public typealias GatewaysValues = @Sendable () async -> AnyAsyncSequence<Gateways>
-	public typealias GetCurrentGateway = @Sendable () async -> Radix.Gateway
-	public typealias GetAllGateways = @Sendable () async -> Gateways.Elements
-	public typealias AddGateway = @Sendable (Radix.Gateway) async throws -> Void
-	public typealias RemoveGateway = @Sendable (Radix.Gateway) async throws -> Void
-	public typealias ChangeGateway = @Sendable (Radix.Gateway) async throws -> Void
+	public typealias GetCurrentGateway = @Sendable () async -> Gateway
+	public typealias GetAllGateways = @Sendable () async -> [Gateway]
+	public typealias AddGateway = @Sendable (Gateway) async throws -> Void
+	public typealias RemoveGateway = @Sendable (Gateway) async throws -> Void
+	public typealias ChangeGateway = @Sendable (Gateway) async throws -> Void
 }
 
 extension GatewaysClient {

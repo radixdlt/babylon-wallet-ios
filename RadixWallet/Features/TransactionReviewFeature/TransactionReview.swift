@@ -493,7 +493,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 
 			if reviewedTransaction.transactionSigners.notaryIsSignatory {
-				let notaryKey: SLIP10.PrivateKey = .curve25519(state.ephemeralNotaryPrivateKey)
+				let notaryKey = state.ephemeralNotaryPrivateKey
 
 				/// Silently sign the transaction with notary keys.
 				return .run { send in
@@ -773,17 +773,6 @@ extension TransactionReview {
 	}
 }
 
-extension ResourceOrNonFungible {
-	func resourceAddress() throws -> ResourceAddress {
-		switch self {
-		case let .resource(address):
-			address
-		case let .nonFungible(globalID):
-			globalID.resourceAddress
-		}
-	}
-}
-
 // MARK: Useful types
 
 extension TransactionReview {
@@ -797,8 +786,8 @@ extension TransactionReview {
 		public let metadata: OnLedgerEntity.Metadata
 	}
 
-	public enum Account: Sendable, Hashable {
-		case user(Profile.Network.Account)
+	public enum ReviewAccount: Sendable, Hashable {
+		case user(Account)
 		case external(AccountAddress, approved: Bool)
 
 		var address: AccountAddress {
@@ -895,10 +884,10 @@ extension TransactionReview.State {
 
 // MARK: Helpers
 
-extension [TransactionReview.Account] {
+extension [TransactionReview.ReviewAccount] {
 	struct MissingUserAccountError: Error {}
 
-	func account(for accountAddress: AccountAddress) throws -> TransactionReview.Account {
+	func account(for accountAddress: AccountAddress) throws -> TransactionReview.ReviewAccount {
 		guard let account = first(where: { $0.address == accountAddress }) else {
 			loggerGlobal.error("Can't find address that was specified for transfer")
 			throw MissingUserAccountError()
@@ -1045,7 +1034,7 @@ func printSigners(_ reviewedTransaction: ReviewedTransaction) {
 
 #if DEBUG
 extension TransactionSigners {
-	func intentSignerEntitiesNonEmptyOrNil() -> NonEmpty<OrderedSet<EntityPotentiallyVirtual>>? {
+	func intentSignerEntitiesNonEmptyOrNil() -> NonEmpty<OrderedSet<AccountOrPersona>>? {
 		switch intentSigning {
 		case let .intentSigners(signers) where !signers.isEmpty:
 			NonEmpty(rawValue: OrderedSet(signers))

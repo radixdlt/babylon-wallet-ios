@@ -1,8 +1,10 @@
+import Sargon
+
 // MARK: - ProfileStore
 /// An in-memory holder of the app's `Profile` which syncs changes to *Keychain* and
 /// needed state to *UserDefaults* (activeProfileID). If user has iCloud Keychain sync
 /// enabled (we can't determine that) and has not disabled `Profile` cloud sync then
-/// iOS also syncs updates of `Profile` (a `ProfileSnapshot`) to iCloud via *Keychain*.
+/// iOS also syncs updates of `Profile` to iCloud via *Keychain*.
 ///
 /// If a Profile successfully was loaded from Keychain it will be used an `Main` part
 /// of app is openened by `Splash`. If no existing Profile was found then a new one
@@ -20,8 +22,8 @@
 /// 	func unlockedApp() async -> Profile
 ///	 	func finishedOnboarding() async
 ///     func finishOnboarding(with _: AccountsRecoveredFromScanningUsingMnemonic) async throws
-///		func importCloudProfileSnapshot(_ h: ProfileSnapshot.Header) throws
-///	 	func importProfileSnapshot(_ s: ProfileSnapshot) throws
+///		func importCloudProfileSnapshot(_ h: Profile.Header) throws
+///	 	func importProfileSnapshot(_ s: Profile) throws
 ///	 	func deleteProfile(keepInICloudIfPresent: Bool) throws
 /// 	func updating<T>(_ t: (inout Profile) async throws -> T) async throws -> T
 ///
@@ -41,7 +43,7 @@
 /// And then a lot of sugar/convenience AsyncSequences using `values` but mapping to other
 /// values inside of `Profile`, e.g.:
 ///
-/// 	func accountValues() async -> AnyAsyncSequence<Profile.Network.Accounts>
+/// 	func accountValues() async -> AnyAsyncSequence<Accounts>
 ///
 /// And similar async sequences.
 ///
@@ -109,7 +111,7 @@ extension ProfileStore {
 
 	/// Update Profile, by updating the current network
 	/// - Parameter update: A mutating update to perform on the profiles's active network
-	public func updatingOnCurrentNetwork(_ update: @Sendable (inout Profile.Network) async throws -> Void) async throws {
+	public func updatingOnCurrentNetwork(_ update: @Sendable (inout ProfileNetwork) async throws -> Void) async throws {
 		try await updating { profile in
 			var network = try await network()
 			try await update(&network)
@@ -117,12 +119,12 @@ extension ProfileStore {
 		}
 	}
 
-	/// Looks up a ProfileSnapshot for the given `header` and tries to import it,
+	/// Looks up a Profile for the given `header` and tries to import it,
 	/// updates `headerList` (Keychain),  `activeProfileID` (UserDefaults)
 	/// and saves the snapshot of the profile into Keychain.
 	/// - Parameter profile: Imported Profile to use and save.
 	public func importCloudProfileSnapshot(
-		_ header: ProfileSnapshot.Header
+		_ header: Profile.Header
 	) throws {
 		do {
 			// Load the snapshot, also this will validate if the snapshot actually exist
@@ -142,8 +144,8 @@ extension ProfileStore {
 	/// updates `headerList` (Keychain),  `activeProfileID` (UserDefaults)
 	/// and saves the snapshot of the profile into Keychain.
 	/// - Parameter profile: Imported Profile to use and save.
-	public func importProfileSnapshot(_ snapshot: ProfileSnapshot) throws {
-		try importProfile(Profile(snapshot: snapshot))
+	public func importProfileSnapshot(_ snapshot: Profile) throws {
+		try importProfile(snapshot)
 	}
 
 	/// Change current profile to new importedProfile and saves it, by
@@ -176,7 +178,7 @@ extension ProfileStore {
 		}
 	}
 
-	private static func deleteEphemeralProfile(id: ProfileSnapshot.Header.ID) {
+	private static func deleteEphemeralProfile(id: ProfileID) {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		do {
 			try secureStorageClient.deleteProfileAndMnemonicsByFactorSourceIDs(
@@ -214,34 +216,40 @@ extension ProfileStore {
 
 		let accounts = accountsRecoveredFromScanningUsingMnemonic.accounts
 
-		// It is important that we always create the mainnet `Profile.Network` and
+		// It is important that we always create the mainnet `ProfileNetwork` and
 		// add it, even if `accounts` is empty, since during App launch we check
 		// `profile.networks.isEmpty` to determine if we should onboard the user or not,
 		// thus, this ensures that we do not onboard a user who has created Profile
 		// via Account Recovery Scan with 0 accounts if said user force quits app before
 		// she creates her first account.
-		let network = Profile.Network(
-			networkID: .mainnet,
+		let network = ProfileNetwork(
+			id: .mainnet,
 			accounts: accounts,
 			personas: [],
 			authorizedDapps: []
 		)
 
 		let profile = Profile(
-			header: ProfileSnapshot.Header(
+			header: Header(
+				snapshotVersion: .v100,
+				id: uuid(),
 				creatingDevice: creatingDevice,
 				lastUsedOnDevice: creatingDevice,
-				id: uuid(),
 				lastModified: bdfs.addedOn,
-				contentHint: ProfileSnapshot.Header.ContentHint(
-					numberOfAccountsOnAllNetworksInTotal: accounts.count,
+				contentHint: .init(
+					numberOfAccountsOnAllNetworksInTotal: UInt16(
+						accounts.count
+					),
 					numberOfPersonasOnAllNetworksInTotal: 0,
 					numberOfNetworks: 1
 				)
 			),
-			deviceFactorSource: bdfs,
-			networks: Profile.Networks(
-				network: network
+			factorSources: FactorSources(
+				element: bdfs.asGeneral
+			),
+			appPreferences: .default,
+			networks: ProfileNetworks(
+				element: network
 			)
 		)
 
@@ -407,9 +415,9 @@ extension ProfileStore {
 		let networks = profile.networks
 
 		profile.header.lastModified = date.now
-		profile.header.contentHint.numberOfNetworks = networks.count
-		profile.header.contentHint.numberOfAccountsOnAllNetworksInTotal = networks.values.map { $0.getAccounts().count }.reduce(0, +)
-		profile.header.contentHint.numberOfPersonasOnAllNetworksInTotal = networks.values.map { $0.getPersonas().count }.reduce(0, +)
+		profile.header.contentHint.numberOfNetworks = UInt16(networks.count)
+		profile.header.contentHint.numberOfAccountsOnAllNetworksInTotal = UInt16(networks.map { $0.getAccounts().count }.reduce(0, +))
+		profile.header.contentHint.numberOfPersonasOnAllNetworksInTotal = UInt16(networks.map { $0.getPersonas().count }.reduce(0, +))
 	}
 
 	/// Updates the in-memory copy of profile in ProfileStores and saves it, by
@@ -565,8 +573,10 @@ extension ProfileStore {
 		return try secureStorageClient.loadProfile(profileId)
 	}
 
-	private static func _tryGenerateAndSaveNewProfile(deviceInfo: DeviceInfo) throws -> Profile {
-		let (profile, bdfsMnemonic) = try _newProfileAndBDFSMnemonic(deviceInfo: deviceInfo)
+	private static func _tryGenerateAndSaveNewProfile(
+		deviceInfo: DeviceInfo
+	) throws -> Profile {
+		let (profile, bdfsMnemonic) = _newProfileAndBDFSMnemonic(deviceInfo: deviceInfo)
 		try _persist(bdfsMnemonic: bdfsMnemonic)
 		try _save(profile: profile)
 		return profile
@@ -583,35 +593,42 @@ extension ProfileStore {
 
 	private static func _newProfileAndBDFSMnemonic(
 		deviceInfo creatingDevice: DeviceInfo
-	) throws -> (profile: Profile, bdfsMnemonic: PrivateHDFactorSource) {
+	) -> (
+		profile: Profile,
+		bdfsMnemonic: PrivateHierarchicalDeterministicFactorSource
+	) {
 		@Dependency(\.uuid) var uuid
 		@Dependency(\.date) var date
 		@Dependency(\.mnemonicClient) var mnemonicClient
 
 		let profileID = uuid()
-		let header = ProfileSnapshot.Header(
+		let header = Profile.Header(
+			snapshotVersion: .v100,
+			id: profileID,
 			creatingDevice: creatingDevice,
 			lastUsedOnDevice: creatingDevice,
-			id: profileID,
 			lastModified: date.now,
-			contentHint: .init()
-		)
-
-		let mnemonic = try MnemonicWithPassphrase(
-			mnemonic: mnemonicClient.generate(
-				BIP39.WordCount.twentyFour,
-				BIP39.Language.english
+			contentHint: .init(
+				numberOfAccountsOnAllNetworksInTotal: 0,
+				numberOfPersonasOnAllNetworksInTotal: 0,
+				numberOfNetworks: 0
 			)
 		)
 
-		let bdfs = try DeviceFactorSource.babylon(
-			mnemonicWithPassphrase: mnemonic,
-			isMain: true,
-			model: "iPhone",
-			name: "iPhone"
+		let mnemonic = MnemonicWithPassphrase(
+			mnemonic: mnemonicClient.generate(
+				BIP39WordCount.twentyFour,
+				BIP39Language.english
+			),
+			passphrase: ""
 		)
 
-		let bdfsMnemonic = try PrivateHDFactorSource(
+		let bdfs = DeviceFactorSource.babylon(
+			mnemonicWithPassphrase: mnemonic,
+			isMain: true
+		)
+
+		let bdfsMnemonic = PrivateHierarchicalDeterministicFactorSource(
 			mnemonicWithPassphrase: mnemonic,
 			factorSource: bdfs
 		)
@@ -634,9 +651,9 @@ extension ProfileStore {
 
 		func createNew(deviceID: DeviceID? = nil) -> DeviceInfo {
 			.init(
-				description: "iPhone",
 				id: deviceID ?? uuid(),
-				date: date.now
+				date: date.now,
+				description: "iPhone"
 			)
 		}
 
@@ -666,7 +683,7 @@ extension ProfileStore {
 		}
 	}
 
-	private static func _updateHeaderList(with header: ProfileSnapshot.Header) throws {
+	private static func _updateHeaderList(with header: Profile.Header) throws {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		var headers = try secureStorageClient.loadProfileHeaderList()?.rawValue ?? []
 		headers[id: header.id] = header
@@ -678,24 +695,20 @@ extension ProfileStore {
 		}
 	}
 
-	private static func _setActiveProfile(to header: ProfileSnapshot.Header) {
+	private static func _setActiveProfile(to header: Profile.Header) {
 		@Dependency(\.userDefaults) var userDefaults
 		userDefaults.setActiveProfileID(header.id)
 	}
 
 	/// **B**abylon **D**evice **F**actor **S**ource
-	private static func _persist(bdfsMnemonic: PrivateHDFactorSource) throws {
+	private static func _persist(bdfsMnemonic: PrivateHierarchicalDeterministicFactorSource) throws {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		try secureStorageClient.saveMnemonicForFactorSource(bdfsMnemonic)
 	}
 
 	private static func _persist(profile: Profile) throws {
-		try _persist(profileSnapshot: profile.snapshot())
-	}
-
-	private static func _persist(profileSnapshot: ProfileSnapshot) throws {
 		@Dependency(\.secureStorageClient) var secureStorageClient
-		try secureStorageClient.saveProfileSnapshot(profileSnapshot)
+		try secureStorageClient.saveProfileSnapshot(profile)
 	}
 }
 

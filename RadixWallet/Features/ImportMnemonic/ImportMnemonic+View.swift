@@ -55,8 +55,8 @@ extension ImportMnemonic {
 		let header: State.Header?
 		let warning: String?
 		let rowCount: Int
-		let wordCount: BIP39.WordCount
-		let completedWords: [BIP39.Word]
+		let wordCount: BIP39WordCount
+		let completedWords: [BIP39Word]
 		let mnemonic: Mnemonic?
 		let bip39Passphrase: String
 
@@ -137,7 +137,7 @@ extension ImportMnemonic {
 									get: \.wordCount,
 									send: { .changedWordCountTo($0) }
 								)) {
-									ForEach(BIP39.WordCount.allCases, id: \.self) { wordCount in
+									ForEach(BIP39WordCount.allCases, id: \.self) { wordCount in
 										Text("\(wordCount.rawValue)")
 											.textStyle(.body1Regular)
 									}
@@ -237,8 +237,7 @@ private extension StoreOf<ImportMnemonic> {
 private extension View {
 	func destinations(with store: StoreOf<ImportMnemonic>) -> some View {
 		let destinationStore = store.destination
-		return offDeviceMnemonicInfoPrompt(with: destinationStore)
-			.onContinueWarning(with: destinationStore)
+		return onContinueWarning(with: destinationStore)
 			.backupConfirmation(with: destinationStore)
 			.verifyMnemonic(with: destinationStore)
 	}
@@ -265,15 +264,6 @@ private extension View {
 			store: destinationStore,
 			state: /ImportMnemonic.Destination.State.onContinueWarning,
 			action: ImportMnemonic.Destination.Action.onContinueWarning
-		)
-	}
-
-	private func offDeviceMnemonicInfoPrompt(with destinationStore: PresentationStoreOf<ImportMnemonic.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /ImportMnemonic.Destination.State.offDeviceMnemonicInfoPrompt,
-			action: ImportMnemonic.Destination.Action.offDeviceMnemonicInfoPrompt,
-			content: { OffDeviceMnemonicInfo.View(store: $0) }
 		)
 	}
 }

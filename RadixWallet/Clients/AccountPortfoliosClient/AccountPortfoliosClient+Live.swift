@@ -27,7 +27,7 @@ extension AccountPortfoliosClient: DependencyKey {
 
 		/// Fetches the pool and stake units details for a given account; Will update the portfolio accordingly
 		@Sendable
-		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.Account, cachingStrategy: OnLedgerEntitiesClient.CachingStrategy) async {
+		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.OnLedgerAccount, cachingStrategy: OnLedgerEntitiesClient.CachingStrategy) async {
 			async let poolDetailsFetch = Task {
 				do {
 					let poolUnitDetails = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account, cachingStrategy: cachingStrategy)
@@ -178,7 +178,7 @@ extension AccountPortfoliosClient: DependencyKey {
 	}()
 }
 
-extension OnLedgerEntity.Account {
+extension OnLedgerEntity.OnLedgerAccount {
 	/// The resources which can have prices
 	fileprivate var resourcesWithPrices: [ResourceAddress] {
 		allFungibleResourceAddresses + poolUnitResources.poolUnits.flatMap(\.poolResources)

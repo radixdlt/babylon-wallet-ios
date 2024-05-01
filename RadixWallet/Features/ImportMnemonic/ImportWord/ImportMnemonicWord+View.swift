@@ -81,14 +81,14 @@ extension ImportMnemonicWord {
 						),
 						hint: viewStore.hint,
 						// FIXME: Bring back autofocus
-//						focus: .on(
-//							.textField,
-//							binding: viewStore.binding(
-//								get: \.focusedField,
-//								send: { .textFieldFocused($0) }
-//							),
-//							to: $focusedField
-//						),
+						//	focus: .on(
+						//		.textField,
+						//		binding: viewStore.binding(
+						//			get: \.focusedField,
+						//			send: { .textFieldFocused($0) }
+						//		),
+						//		to: $focusedField
+						//	),
 						showClearButton: viewStore.showClearButton,
 						innerAccessory: {
 							if viewStore.displayValidAccessory {
@@ -110,7 +110,7 @@ extension ImportMnemonicWord {
 								ScrollView(.horizontal, showsIndicators: false) {
 									HStack {
 										ForEach(autocompletionCandidates.candidates, id: \.self) { candidate in
-											Button(candidate.word.rawValue) {
+											Button(candidate.word) {
 												viewStore.send(.userSelectedCandidate(candidate))
 											}
 											.buttonStyle(.primaryRectangular(height: .toolbarButtonHeight))
