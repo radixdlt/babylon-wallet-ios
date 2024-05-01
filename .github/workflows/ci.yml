@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
   
 env:
-  SNYK_EXCLUDE: "SecureStorageClient+Live"
+  SNYK_EXCLUDE: "SecureStorageClient+Live.swift"
 
 jobs:
   snyk_scan:
