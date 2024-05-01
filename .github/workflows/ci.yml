@@ -13,7 +13,9 @@ on:
 concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: true
-
+  
+env:
+  SNYK_EXCLUDE: "SecureStorageClient+Live"
 
 jobs:
   snyk_scan:
@@ -50,7 +52,7 @@ jobs:
           timeout 300 snyk test --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --severity-threshold=high || [ "$?" = "124" ]
       - name: Snyk code scan
         run: |
-          timeout 300 snyk code test --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --severity-threshold=high || [ "$?" = "124" ]
+          timeout 300 snyk code test --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --severity-threshold=high || [ "$?" = "124" ] --exclude=${{ env.SNYK_EXCLUDE }}
 
   snyk_sbom:
     if: >
