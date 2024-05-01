@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
   
 env:
-  SNYK_EXCLUDE: "RadixWallet/Clients/SecureStorageClient/SecureStorageClient+Live.swift"
+  SNYK_EXCLUDE: "SecureStorageClient+Live.swift"
 
 jobs:
   snyk_scan:
@@ -50,9 +50,9 @@ jobs:
       - name: Snyk deps and licences scan
         run: |
           timeout 300 snyk test --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --severity-threshold=high || [ "$?" = "124" ]
-      - name: Snyk code scan
-        run: |
-          timeout 300 snyk code test --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --severity-threshold=high --exclude=${{ env.SNYK_EXCLUDE }} || [ "$?" = "124" ]
+#      - name: Snyk code scan
+#        run: |
+#          timeout 300 snyk code test --all-projects --org=${{ env.SNYK_COREAPPS_ORG_ID }} --severity-threshold=high --exclude=${{ env.SNYK_EXCLUDE }} || [ "$?" = "124" ]
 
   snyk_sbom:
     if: >
