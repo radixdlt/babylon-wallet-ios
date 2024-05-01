@@ -6,6 +6,7 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 	public var overlayWindow: UIWindow?
 
 	@Dependency(\.radixConnectClient) var radixConnectionClient
+	@Dependency(\.deepLinkHandlerClient) var deepLinkHandlerClient
 
 	public func scene(
 		_ scene: UIScene,
@@ -23,7 +24,8 @@ public final class SceneDelegate: NSObject, UIWindowSceneDelegate, ObservableObj
 
 		for userActivity in connectionOptions.userActivities {
 			if let universalLink = userActivity.webpageURL {
-				loggerGlobal.error("did open from unviersal link \(universalLink), referral: \(userActivity.referrerURL), info: \(userActivity.userInfo)")
+				deepLinkHandlerClient.addDeepLink(universalLink)
+//				loggerGlobal.error("did open from unviersal link \(universalLink), referral: \(userActivity.referrerURL), info: \(userActivity.userInfo)")
 			}
 		}
 	}

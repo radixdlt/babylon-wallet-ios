@@ -3,11 +3,15 @@ import Foundation
 // MARK: - DeepLinkHandlerClient
 public struct DeepLinkHandlerClient: DependencyKey {
 	public var handleDeepLink: HandleDeepLink
+	public var addDeepLink: AddDeepLink
+	public var hasDeepLink: HasDeepLink
 }
 
 // MARK: DeepLinkHandlerClient.HandleDeepLink
 extension DeepLinkHandlerClient {
-	public typealias HandleDeepLink = (URL) -> Void
+	public typealias HandleDeepLink = () -> Void
+	public typealias AddDeepLink = (URL) -> Void
+	public typealias HasDeepLink = () -> Bool
 }
 
 extension DeepLinkHandlerClient {
@@ -40,6 +44,12 @@ extension DeepLinkHandlerClient {
 		@Dependency(\.radixConnectClient) var radixConnectClient
 		@Dependency(\.errorQueue) var errorQueue
 
+		struct State {
+			var bufferedDeepLink: URL?
+		}
+
+		var state = State()
+
 		func extractWalletConnectRequest(_ url: URL) throws -> Mobile2Mobile.Request {
 			guard let queryItems = URLComponents(url: url, resolvingAgainstBaseURL: true)?.queryItems else {
 				throw Error.emptyQuery
@@ -71,21 +81,32 @@ extension DeepLinkHandlerClient {
 			return try .linking(.init(origin: .webDapp(oringURL), sessionId: .init(sessionId), publicKey: .init(rawRepresentation: publicKey.data.data), browser: browser))
 		}
 
-		return DeepLinkHandlerClient(handleDeepLink: { url in
-			if url.host() == m2mDeepLinkHost {
-				do {
-					let request = try extractWalletConnectRequest(url)
-					Task {
-						try await radixConnectClient.handleDappDeepLink(request)
+		return DeepLinkHandlerClient(
+			handleDeepLink: {
+				if let url = state.bufferedDeepLink {
+					state.bufferedDeepLink = nil
+					if url.host() == m2mDeepLinkHost {
+						do {
+							let request = try extractWalletConnectRequest(url)
+							Task {
+								try await radixConnectClient.handleDappDeepLink(request)
+							}
+						} catch {
+							errorQueue.schedule(error)
+						}
+					} else {
+						struct UnknownDeepLinkURL: Swift.Error {}
+						errorQueue.schedule(UnknownDeepLinkURL())
 					}
-				} catch {
-					errorQueue.schedule(error)
 				}
-			} else {
-				struct UnknownDeepLinkURL: Swift.Error {}
-				errorQueue.schedule(UnknownDeepLinkURL())
+			},
+			addDeepLink: {
+				state.bufferedDeepLink = $0
+			},
+			hasDeepLink: {
+				state.bufferedDeepLink != nil
 			}
-		})
+		)
 	}
 }
 

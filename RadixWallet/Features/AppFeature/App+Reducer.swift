@@ -8,9 +8,17 @@ public struct App: Sendable, FeatureReducer {
 			case main(Main.State)
 			case onboardingCoordinator(OnboardingCoordinator.State)
 			case splash(Splash.State)
+
+			var isMain: Bool {
+				if case .main = self {
+					return true
+				}
+				return false
+			}
 		}
 
 		public var root: Root
+		public var deferredDeepLink: URL?
 
 		public init(
 			root: Root = .splash(.init())
@@ -42,6 +50,7 @@ public struct App: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.deepLinkHandlerClient) var deepLinkHandlerClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	public init() {}
 
@@ -64,7 +73,18 @@ public struct App: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case let .urlOpened(url):
-			deepLinkHandlerClient.handleDeepLink(url)
+			switch state.root {
+			case .main:
+				deepLinkHandlerClient.addDeepLink(url)
+				deepLinkHandlerClient.handleDeepLink()
+			case .splash:
+				deepLinkHandlerClient.addDeepLink(url)
+			case .onboardingCoordinator:
+				deepLinkHandlerClient.addDeepLink(url)
+				overlayWindowClient.scheduleAlertIgnoreAction(.init(title: { TextState("dApp Request") }, message: {
+					TextState("You will be able to handle dApp request after creating a profile")
+				}))
+			}
 			return .none
 		}
 	}
@@ -105,11 +125,18 @@ public struct App: Sendable, FeatureReducer {
 		state.root = .main(.init(
 			home: .init())
 		)
+
+		deepLinkHandlerClient.handleDeepLink()
 		return .none
 	}
 
 	func goToOnboarding(state: inout State) -> Effect<Action> {
 		state.root = .onboardingCoordinator(.init())
+		if deepLinkHandlerClient.hasDeepLink() {
+			overlayWindowClient.scheduleAlertIgnoreAction(.init(title: { TextState("dApp Request") }, message: {
+				TextState("You will be able to handle dApp request after creating a profile")
+			}))
+		}
 		return .none
 	}
 }
