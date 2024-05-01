@@ -48,7 +48,8 @@ extension CloudBackupClient {
 
 // MARK: - CloudBackup
 public struct CloudBackup: Codable, Sendable {
-	public let profileModified: Date
+	public let date: Date
+	public let profileHash: Int
 	public let status: Status
 
 	public enum Status: Codable, Sendable {
@@ -61,7 +62,11 @@ public struct CloudBackup: Codable, Sendable {
 extension UserDefaults.Dependency {
 	public func setLastBackup(_ status: CloudBackup.Status, of profile: Profile) throws {
 		var backups: [UUID: CloudBackup] = try loadCodable(key: .lastBackups) ?? [:]
-		backups[profile.id] = .init(profileModified: profile.header.lastModified, status: status)
+		backups[profile.id] = .init(
+			date: profile.header.lastModified,
+			profileHash: profile.hashValue,
+			status: status
+		)
 		try save(codable: backups, forKey: .lastBackups)
 	}
 

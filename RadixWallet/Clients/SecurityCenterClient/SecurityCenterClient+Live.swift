@@ -10,9 +10,15 @@ extension SecurityCenterClient {
 		profileStore: ProfileStore = .shared
 	) -> SecurityCenterClient {
 		@Dependency(\.cloudBackupClient) var cloudBackupClient
+		@Dependency(\.userDefaults) var userDefaults
 
 		return .init(
-			problems: {
+			problems: { profileID in
+				print("•• subscribe to problems for \(profileID.uuidString)")
+				userDefaults.lastBackupValues(for: profileID).map { _ in
+					print("•• backup emitted for \(profileID.uuidString)")
+				}
+
 				fatalError()
 			}
 		)

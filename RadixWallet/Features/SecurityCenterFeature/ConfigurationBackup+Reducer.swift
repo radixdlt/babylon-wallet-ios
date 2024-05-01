@@ -96,9 +96,10 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			let profileID = await ProfileStore.shared.profile.id
 			for try await lastBackup in cloudBackupClient.lastBackup(profileID) {
 				guard !Task.isCancelled else { return }
-				let modified = await ProfileStore.shared.profile.header.lastModified
-				print("•• Backup changed for \(profileID.uuidString) \(lastBackup.profileModified == modified)")
-				await send(.internal(.setLastBackedUp(lastBackup.profileModified)))
+				let currentProfileHash = await ProfileStore.shared.profile.hashValue
+				let isUpToDate = lastBackup.profileHash == currentProfileHash
+				print("•• Backup changed for \(profileID.uuidString) \(isUpToDate)")
+				await send(.internal(.setLastBackedUp(isUpToDate ? nil : lastBackup.date)))
 			}
 		}
 	}
