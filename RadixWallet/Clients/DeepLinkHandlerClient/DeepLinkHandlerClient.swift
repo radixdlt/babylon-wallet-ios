@@ -1,3 +1,5 @@
+import Foundation
+
 // MARK: - DeepLinkHandlerClient
 public struct DeepLinkHandlerClient: DependencyKey {
 	public var handleDeepLink: HandleDeepLink
@@ -11,14 +13,14 @@ extension DeepLinkHandlerClient {
 extension DeepLinkHandlerClient {
 	static let m2mDeepLinkHost = "d1rxdfxrfmemlj.cloudfront.net"
 
-	public enum Error: Swift.LocalizedError {
+	public enum Error: LocalizedError {
 		case emptyQuery
 		case missingRequestOrigin
 		case missingPublicKey
 		case missingSessionId
 		case missingDappReturnURL
 
-		var errorDescription: String? {
+		public var errorDescription: String? {
 			switch self {
 			case .emptyQuery:
 				"Empty query"
