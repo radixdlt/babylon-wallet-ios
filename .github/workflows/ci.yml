@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
   
 env:
-  SNYK_EXCLUDE: "SecureStorageClient+Live.swift"
+  SNYK_EXCLUDE: "RadixWallet/Clients/SecureStorageClient/SecureStorageClient+Live.swift"
 
 jobs:
   snyk_scan:
