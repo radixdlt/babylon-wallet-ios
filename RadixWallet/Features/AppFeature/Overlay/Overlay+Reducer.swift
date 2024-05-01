@@ -27,22 +27,29 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case hud(HUD.State)
 			case alert(OverlayWindowClient.Item.AlertState)
+			case linkDappSheet(LinkingToDapp.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case hud(HUD.Action)
 			case alert(OverlayWindowClient.Item.AlertAction)
+			case linkDappSheet(LinkingToDapp.Action)
 		}
 
 		public var body: some Reducer<State, Action> {
 			Scope(state: /State.hud, action: /Action.hud) {
 				HUD()
 			}
+
+			Scope(state: /State.linkDappSheet, action: /Action.linkDappSheet) {
+				LinkingToDapp()
+			}
 		}
 	}
 
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.continuousClock) var clock
+	var userDefaults = UserDefaults.Dependency.radix
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -89,6 +96,13 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		case .hud(.delegate(.dismiss)):
 			return dismiss(&state)
 
+		case .linkDappSheet(.delegate(.dismiss)):
+			if let item = state.itemsQueue.first, case let .autodismissSheet(id) = item {
+				overlayWindowClient.sendAlertAction(.dismissed, id)
+			}
+
+			return dismiss(&state)
+
 		default:
 			return .none
 		}
@@ -130,6 +144,9 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			return .none
 		case let .alert(alert):
 			state.destination = .alert(alert)
+			return setIsUserInteractionEnabled(&state, isEnabled: true)
+		case .autodismissSheet:
+			state.destination = .linkDappSheet(.init(dismissDelay: userDefaults.getDappLinkingDelay()))
 			return setIsUserInteractionEnabled(&state, isEnabled: true)
 		case let .autodismissAlert(alert):
 			state.destination = .alert(alert)

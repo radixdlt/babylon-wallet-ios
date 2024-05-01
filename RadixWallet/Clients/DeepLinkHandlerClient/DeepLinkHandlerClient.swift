@@ -11,12 +11,27 @@ extension DeepLinkHandlerClient {
 extension DeepLinkHandlerClient {
 	static let m2mDeepLinkHost = "d1rxdfxrfmemlj.cloudfront.net"
 
-	public enum Error: Swift.Error {
+	public enum Error: Swift.LocalizedError {
 		case emptyQuery
 		case missingRequestOrigin
 		case missingPublicKey
 		case missingSessionId
 		case missingDappReturnURL
+
+		var errorDescription: String? {
+			switch self {
+			case .emptyQuery:
+				"Empty query"
+			case .missingRequestOrigin:
+				"missingRequestOrigin"
+			case .missingPublicKey:
+				"missingPublicKey"
+			case .missingSessionId:
+				"missingSessionId"
+			case .missingDappReturnURL:
+				"missingDappReturnURL"
+			}
+		}
 	}
 
 	public static var liveValue: DeepLinkHandlerClient {
@@ -44,7 +59,7 @@ extension DeepLinkHandlerClient {
 
 			guard let publicKeyItem = queryItems.first(where: { $0.name == "publicKey" })?.value
 			else {
-				throw Error.missingRequestOrigin
+				throw Error.missingPublicKey
 			}
 
 			let browser = queryItems.first(where: { $0.name == "browser" })?.value ?? "safari"

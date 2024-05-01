@@ -24,6 +24,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 		case debugTestKeychainButtonTapped
 		case debugKeychainContentsButtonTapped
 		case securityStructureConfigsButtonTapped
+		case dappLinkingDelayTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -40,6 +41,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			case debugKeychainContents(DebugKeychainContents.State)
 			#endif // DEBUG
 			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.State)
+			case dappLinkingDelay(DappLinkingDelay.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -51,6 +53,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			#endif // DEBUG
 			case debugManageFactorSources(DebugManageFactorSources.Action)
 			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.Action)
+			case dappLinkingDelay(DappLinkingDelay.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -74,6 +77,9 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			Scope(state: /State.securityStructureConfigs, action: /Action.securityStructureConfigs) {
 				SecurityStructureConfigurationListCoordinator()
 			}
+			Scope(state: /State.dappLinkingDelay, action: /Action.dappLinkingDelay) {
+				DappLinkingDelay()
+			}
 		}
 	}
 
@@ -82,6 +88,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.dismiss) var dismiss
+	@Dependency(\.userDefaults) var userDefaults
 
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -123,6 +130,9 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 
 		case .debugUserDefaultsContentsButtonTapped:
 			state.destination = .debugUserDefaultsContents(.init())
+			return .none
+		case .dappLinkingDelayTapped:
+			state.destination = .dappLinkingDelay(.init(delayInSeconds: userDefaults.getDappLinkingDelay()))
 			return .none
 		}
 	}

@@ -1076,6 +1076,8 @@
 		830EA9E52AEB9088004C8051 /* DefaultValueDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E42AEB9088004C8051 /* DefaultValueDecodable.swift */; };
 		830EA9E72AEBA793004C8051 /* EntitiesVisibilityClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E62AEBA793004C8051 /* EntitiesVisibilityClient+Live.swift */; };
 		830EA9E92AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */; };
+		832868652BE2641800902126 /* LinkingToDapp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832868642BE2641800902126 /* LinkingToDapp.swift */; };
+		832868682BE28A1D00902126 /* DappLinkingDelay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832868672BE28A1D00902126 /* DappLinkingDelay.swift */; };
 		832880692AE664C30014FBF3 /* EntityFlag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 832880682AE664C30014FBF3 /* EntityFlag.swift */; };
 		8328806C2AE6725F0014FBF3 /* AccountPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */; };
 		8329ACE42BBAB9E7005FD9DC /* DeepLinkHandlerClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8329ACE32BBAB9E7005FD9DC /* DeepLinkHandlerClient.swift */; };
@@ -2361,6 +2363,8 @@
 		830EA9E42AEB9088004C8051 /* DefaultValueDecodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultValueDecodable.swift; sourceTree = "<group>"; };
 		830EA9E62AEBA793004C8051 /* EntitiesVisibilityClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Live.swift"; sourceTree = "<group>"; };
 		830EA9E82AEBA7C5004C8051 /* EntitiesVisibilityClient+Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "EntitiesVisibilityClient+Test.swift"; sourceTree = "<group>"; };
+		832868642BE2641800902126 /* LinkingToDapp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkingToDapp.swift; sourceTree = "<group>"; };
+		832868672BE28A1D00902126 /* DappLinkingDelay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DappLinkingDelay.swift; sourceTree = "<group>"; };
 		832880682AE664C30014FBF3 /* EntityFlag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntityFlag.swift; sourceTree = "<group>"; };
 		8328806B2AE6725F0014FBF3 /* AccountPreferencesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountPreferencesTests.swift; sourceTree = "<group>"; };
 		8329ACE32BBAB9E7005FD9DC /* DeepLinkHandlerClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepLinkHandlerClient.swift; sourceTree = "<group>"; };
@@ -3112,9 +3116,10 @@
 			isa = PBXGroup;
 			children = (
 				48CFBCCA2ADC10D800E77A5C /* HUD+Reducer.swift */,
-				48CFBCCB2ADC10D800E77A5C /* Overlay+Reducer.swift */,
 				48CFBCCC2ADC10D800E77A5C /* HUD+View.swift */,
+				48CFBCCB2ADC10D800E77A5C /* Overlay+Reducer.swift */,
 				48CFBCCD2ADC10D800E77A5C /* Overlay+View.swift */,
+				832868642BE2641800902126 /* LinkingToDapp.swift */,
 			);
 			path = Overlay;
 			sourceTree = "<group>";
@@ -3802,6 +3807,7 @@
 		48CFBD982ADC10D800E77A5C /* Children */ = {
 			isa = PBXGroup;
 			children = (
+				832868662BE28A0D00902126 /* DappLinkingDelay */,
 				E634CA2C2AFD259000C43DB7 /* DebugKeychainContents */,
 				48CFBD992ADC10D800E77A5C /* DebugManageFactorSourcesFeature */,
 				48CFBD9C2ADC10D800E77A5C /* DebugKeychainTest */,
@@ -6717,6 +6723,14 @@
 			path = EntitiesHidingTests;
 			sourceTree = "<group>";
 		};
+		832868662BE28A0D00902126 /* DappLinkingDelay */ = {
+			isa = PBXGroup;
+			children = (
+				832868672BE28A1D00902126 /* DappLinkingDelay.swift */,
+			);
+			path = DappLinkingDelay;
+			sourceTree = "<group>";
+		};
 		8328806A2AE6724B0014FBF3 /* AccountPreferencesTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -8022,6 +8036,7 @@
 				48CFC5912ADC10DA00E77A5C /* ProfileStore.swift in Sources */,
 				48CFC3FB2ADC10D900E77A5C /* AsyncWebSocket.swift in Sources */,
 				48CFC3712ADC10D900E77A5C /* PoolUnitsList.swift in Sources */,
+				832868682BE28A1D00902126 /* DappLinkingDelay.swift in Sources */,
 				48CFC58B2ADC10DA00E77A5C /* SubmitTransactionClient+Test.swift in Sources */,
 				48CFC5642ADC10DA00E77A5C /* MetadataU32ArrayValue.swift in Sources */,
 				48CFC2DA2ADC10D900E77A5C /* ManageSecurityStructureCoordinator+View.swift in Sources */,
@@ -8329,6 +8344,7 @@
 				48CFC4B92ADC10DA00E77A5C /* MetadataBoolArrayValue.swift in Sources */,
 				48CFC3822ADC10D900E77A5C /* AssetBehaviorsView.swift in Sources */,
 				48CFC5652ADC10DA00E77A5C /* MetadataNonFungibleGlobalIdValue.swift in Sources */,
+				832868652BE2641800902126 /* LinkingToDapp.swift in Sources */,
 				48CFC63C2ADC10DB00E77A5C /* DerivationPathScheme.swift in Sources */,
 				48CFC4B02ADC10DA00E77A5C /* MetadataStringValue.swift in Sources */,
 				48CFC5362ADC10DA00E77A5C /* StateEntityDetailsResponse.swift in Sources */,

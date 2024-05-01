@@ -60,6 +60,8 @@ extension Mobile2Mobile {
 				)
 			)
 
+			await overlayWindowClient.scheduleLinkingDapp()
+
 			let returnURL = dappReturnURL.appending(queryItems: [
 				.init(name: "sessionId", value: request.sessionId.rawValue),
 				.init(name: "publicKey", value: walletPublicKey.rawRepresentation.hex()),

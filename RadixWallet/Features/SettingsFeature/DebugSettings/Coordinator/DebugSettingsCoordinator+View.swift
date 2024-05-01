@@ -73,6 +73,7 @@ extension DebugSettingsCoordinator.View {
 				icon: .systemImage("key"),
 				action: .debugKeychainContentsButtonTapped
 			),
+			.init(title: "Dapp linking delay", icon: .systemImage("cloud"), action: .dappLinkingDelayTapped),
 		]
 	}
 }
@@ -100,6 +101,7 @@ private extension View {
 		#endif
 			.debugInspectProfile(with: destinationStore)
 			.securityStructureConfigs(with: destinationStore)
+			.dappLinkingDelay(with: destinationStore)
 	}
 
 	private func debugUserDefaultsContents(
@@ -167,6 +169,17 @@ private extension View {
 			state: /DebugSettingsCoordinator.Destination.State.securityStructureConfigs,
 			action: DebugSettingsCoordinator.Destination.Action.securityStructureConfigs,
 			destination: { SecurityStructureConfigurationListCoordinator.View(store: $0) }
+		)
+	}
+
+	private func dappLinkingDelay(
+		with destinationStore: PresentationStoreOf<DebugSettingsCoordinator.Destination>
+	) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /DebugSettingsCoordinator.Destination.State.dappLinkingDelay,
+			action: DebugSettingsCoordinator.Destination.Action.dappLinkingDelay,
+			destination: { DappLinkingDelay.View(store: $0) }
 		)
 	}
 }

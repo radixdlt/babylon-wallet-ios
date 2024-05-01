@@ -33,9 +33,10 @@ extension OverlayWindowClient: DependencyKey {
 			sendAlertAction: { action, id in alertActions.send((action, id)) },
 			setIsUserIteractionEnabled: { isUserInteractionEnabled.send($0) },
 			isUserInteractionEnabled: { isUserInteractionEnabled.eraseToAnyAsyncSequence() },
-			scheduleAlertAutoDimiss: { alert in
-				items.send(.autodismissAlert(alert))
-				await alertActions.first { $0.id == alert.id }?.action
+			scheduleLinkingDapp: {
+				let id = UUID()
+				items.send(.autodismissSheet(id))
+				await alertActions.first { $0.id == id }?.action
 			}
 		)
 	}()
