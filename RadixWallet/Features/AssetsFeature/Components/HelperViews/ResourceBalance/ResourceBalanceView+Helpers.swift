@@ -1,7 +1,7 @@
 import SwiftUI
 
 extension ResourceBalance.ViewState.PoolUnit {
-	public init(poolUnit: OnLedgerEntity.Account.PoolUnit, details: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails> = .idle) {
+	public init(poolUnit: OnLedgerEntity.OnLedgerAccount.PoolUnit, details: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails> = .idle) {
 		self.init(
 			resourcePoolAddress: poolUnit.resourcePoolAddress,
 			poolUnitAddress: poolUnit.resource.resourceAddress,

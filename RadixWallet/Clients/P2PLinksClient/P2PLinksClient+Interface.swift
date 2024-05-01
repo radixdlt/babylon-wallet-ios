@@ -21,6 +21,6 @@ public struct P2PLinksClient: Sendable {
 extension P2PLinksClient {
 	public typealias GetP2PLinks = @Sendable () async -> P2PLinks
 	public typealias AddP2PLink = @Sendable (P2PLink) async throws -> Void
-	public typealias DeleteP2PLinkByPassword = @Sendable (ConnectionPassword) async throws -> Void
+	public typealias DeleteP2PLinkByPassword = @Sendable (RadixConnectPassword) async throws -> Void
 	public typealias DeleteAllP2PLinks = @Sendable () async throws -> Void
 }

@@ -20,7 +20,7 @@ public struct DebugInspectProfile: Sendable, FeatureReducer {
 			let encoder = jsonEncoder()
 			encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys]
 			guard
-				let json = try? encoder.encode(profile.snapshot()),
+				let json = try? encoder.encode(profile),
 				let jsonString = String(data: json, encoding: .utf8)
 			else { return nil }
 			return jsonString

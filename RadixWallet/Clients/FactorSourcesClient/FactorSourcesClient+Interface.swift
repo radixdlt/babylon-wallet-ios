@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - FactorSourcesClient
 public struct FactorSourcesClient: Sendable {
 	public var indicesOfEntitiesControlledByFactorSource: IndicesOfEntitiesControlledByFactorSource
@@ -77,7 +79,7 @@ public struct IndicesOfEntitiesControlledByFactorSourceRequest: Sendable, Hashab
 
 // MARK: - IndicesUsedByFactorSource
 public struct IndicesUsedByFactorSource: Sendable, Hashable {
-	let indices: OrderedSet<HD.Path.Component.Child.Value>
+	let indices: OrderedSet<HDPathValue>
 	let factorSource: FactorSource
 	let currentNetworkID: NetworkID
 }
@@ -85,14 +87,14 @@ public struct IndicesUsedByFactorSource: Sendable, Hashable {
 // MARK: FactorSourcesClient.GetFactorSources
 extension FactorSourcesClient {
 	public typealias IndicesOfEntitiesControlledByFactorSource = @Sendable (IndicesOfEntitiesControlledByFactorSourceRequest) async throws -> IndicesUsedByFactorSource
-	public typealias NextEntityIndexForFactorSource = @Sendable (NextEntityIndexForFactorSourceRequest) async throws -> HD.Path.Component.Child.Value
+	public typealias NextEntityIndexForFactorSource = @Sendable (NextEntityIndexForFactorSourceRequest) async throws -> HDPathValue
 	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 	public typealias GetMainDeviceFactorSource = @Sendable () async throws -> DeviceFactorSource
-	public typealias CreateNewMainDeviceFactorSource = @Sendable () async throws -> PrivateHDFactorSource
+	public typealias CreateNewMainDeviceFactorSource = @Sendable () async throws -> PrivateHierarchicalDeterministicFactorSource
 	public typealias GetFactorSources = @Sendable () async throws -> FactorSources
 	public typealias FactorSourcesAsyncSequence = @Sendable () async -> AnyAsyncSequence<FactorSources>
-	public typealias AddPrivateHDFactorSource = @Sendable (AddPrivateHDFactorSourceRequest) async throws -> FactorSourceID.FromHash
-	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (BIP39.WordCount, NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceID.FromHash?
+	public typealias AddPrivateHDFactorSource = @Sendable (AddPrivateHDFactorSourceRequest) async throws -> FactorSourceIDFromHash
+	public typealias CheckIfHasOlympiaFactorSourceForAccounts = @Sendable (BIP39WordCount, NonEmpty<OrderedSet<OlympiaAccountToMigrate>>) async -> FactorSourceIDFromHash?
 	public typealias SaveFactorSource = @Sendable (FactorSource) async throws -> Void
 	public typealias UpdateFactorSource = @Sendable (FactorSource) async throws -> Void
 	public typealias GetSigningFactors = @Sendable (GetSigningFactorsRequest) async throws -> SigningFactors
@@ -102,12 +104,12 @@ extension FactorSourcesClient {
 
 // MARK: - AddPrivateHDFactorSourceRequest
 public struct AddPrivateHDFactorSourceRequest: Sendable, Hashable {
-	public let privateHDFactorSource: PrivateHDFactorSource
+	public let privateHDFactorSource: PrivateHierarchicalDeterministicFactorSource
 	public let onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy
 	/// E.g. import babylon factor sources should only be saved keychain, not profile (already there).
 	public let saveIntoProfile: Bool
 	public init(
-		privateHDFactorSource: PrivateHDFactorSource,
+		privateHDFactorSource: PrivateHierarchicalDeterministicFactorSource,
 		onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy,
 		saveIntoProfile: Bool
 	) {
@@ -128,9 +130,9 @@ extension SigningFactors {
 // MARK: - GetSigningFactorsRequest
 public struct GetSigningFactorsRequest: Sendable, Hashable {
 	public let networkID: NetworkID
-	public let signers: NonEmpty<Set<EntityPotentiallyVirtual>>
+	public let signers: NonEmpty<Set<AccountOrPersona>>
 	public let signingPurpose: SigningPurpose
-	public init(networkID: NetworkID, signers: NonEmpty<Set<EntityPotentiallyVirtual>>, signingPurpose: SigningPurpose) {
+	public init(networkID: NetworkID, signers: NonEmpty<Set<AccountOrPersona>>, signingPurpose: SigningPurpose) {
 		self.networkID = networkID
 		self.signers = signers
 		self.signingPurpose = signingPurpose
@@ -138,7 +140,7 @@ public struct GetSigningFactorsRequest: Sendable, Hashable {
 }
 
 extension FactorSourcesClient {
-	public func createNewMainBDFS() async throws -> PrivateHDFactorSource {
+	public func createNewMainBDFS() async throws -> PrivateHierarchicalDeterministicFactorSource {
 		try await createNewMainDeviceFactorSource()
 	}
 
@@ -231,42 +233,20 @@ public struct SigningFactor: Sendable, Hashable, Identifiable {
 	}
 }
 
-extension DeviceFactorSource {
-	func removingMainFlag() -> Self {
-		var copy = self
-		copy.common.flags.remove(.main)
-		return copy
-	}
-}
-
 extension FactorSourcesClient {
 	public func saveNewMainBDFS(_ newMainBDFS: DeviceFactorSource) async throws {
 		let oldMainBDFSSources = try await getFactorSources(type: DeviceFactorSource.self).filter(\.isExplicitMainBDFS)
 
 		for oldMainBDFS in oldMainBDFSSources {
-			try await updateFactorSource(oldMainBDFS.removingMainFlag().embed())
+			try await updateFactorSource(oldMainBDFS.removingMainFlag().asGeneral)
 		}
 
-		try await saveFactorSource(newMainBDFS.embed())
-	}
-
-	public func addOffDeviceFactorSource(
-		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		label: OffDeviceMnemonicFactorSource.Hint.Label
-	) async throws -> FactorSource {
-		let factorSource = try OffDeviceMnemonicFactorSource.from(
-			mnemonicWithPassphrase: mnemonicWithPassphrase,
-			label: label
-		)
-
-		try await saveFactorSource(factorSource.embed())
-
-		return factorSource.embed()
+		try await saveFactorSource(newMainBDFS.asGeneral)
 	}
 
 	@discardableResult
 	public func addOnDeviceFactorSource(
-		privateHDFactorSource: PrivateHDFactorSource,
+		privateHDFactorSource: PrivateHierarchicalDeterministicFactorSource,
 		onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy,
 		saveIntoProfile: Bool
 	) async throws -> FactorSourceID {
@@ -276,23 +256,23 @@ extension FactorSourcesClient {
 				onMnemonicExistsStrategy: onMnemonicExistsStrategy,
 				saveIntoProfile: saveIntoProfile
 			)
-		).embed()
+		).asGeneral
 	}
 
 	public func addOnDeviceFactorSource(
-		onDeviceMnemonicKind: FactorSourceKindOfMnemonic.OnDeviceMnemonicKind,
+		onDeviceMnemonicKind: OnDeviceMnemonicKind,
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
 		onMnemonicExistsStrategy: ImportMnemonic.State.PersistStrategy.OnMnemonicExistsStrategy,
 		saveIntoProfile: Bool
 	) async throws -> DeviceFactorSource {
-		let factorSource: DeviceFactorSource = switch onDeviceMnemonicKind {
+		let factorSource = switch onDeviceMnemonicKind {
 		case let .babylon(isMain):
-			try DeviceFactorSource.babylon(
+			DeviceFactorSource.babylon(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
 				isMain: isMain
 			)
 		case .olympia:
-			try DeviceFactorSource.olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
+			DeviceFactorSource.olympia(mnemonicWithPassphrase: mnemonicWithPassphrase)
 		}
 
 		try await self.addOnDeviceFactorSource(
@@ -308,68 +288,8 @@ extension FactorSourcesClient {
 	}
 }
 
-// Move elsewhere?
-extension MnemonicWithPassphrase {
-	@discardableResult
-	public func validatePublicKeys(
-		of softwareAccounts: NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
-	) throws -> Bool {
-		try validatePublicKeys(
-			of: softwareAccounts.map {
-				(
-					path: $0.path.fullPath,
-					expectedPublicKey: .ecdsaSecp256k1($0.publicKey)
-				)
-			}
-		)
-	}
-
-	@discardableResult
-	public func validatePublicKeys(
-		of accounts: some Collection<Profile.Network.Account>
-	) throws -> Bool {
-		try validatePublicKeys(
-			of: accounts.flatMap { account in
-				try account.virtualHierarchicalDeterministicFactorInstances.map {
-					try (
-						path: $0.derivationPath.hdFullPath(),
-						expectedPublicKey: $0.publicKey
-					)
-				}
-			}
-		)
-	}
-
-	@discardableResult
-	public func validatePublicKeys(
-		of accounts: [(path: HD.Path.Full, expectedPublicKey: SLIP10.PublicKey)]
-	) throws -> Bool {
-		let hdRoot = try self.hdRoot()
-
-		for (path, publicKey) in accounts {
-			let derivedPublicKey: SLIP10.PublicKey = switch publicKey.curve {
-			case .secp256k1:
-				try .ecdsaSecp256k1(hdRoot.derivePrivateKey(
-					path: path,
-					curve: SECP256K1.self
-				).publicKey)
-			case .curve25519:
-				try .eddsaEd25519(hdRoot.derivePrivateKey(
-					path: path,
-					curve: Curve25519.self
-				).publicKey)
-			}
-
-			guard derivedPublicKey == publicKey else {
-				throw ValidateMnemonicAgainstEntities.publicKeyMismatch
-			}
-		}
-		// PublicKeys matches
-		return true
-	}
-}
-
-// MARK: - ValidateMnemonicAgainstEntities
-enum ValidateMnemonicAgainstEntities: LocalizedError {
-	case publicKeyMismatch
+// MARK: - OnDeviceMnemonicKind
+public enum OnDeviceMnemonicKind: Sendable, Hashable {
+	case babylon(isMain: Bool)
+	case olympia
 }

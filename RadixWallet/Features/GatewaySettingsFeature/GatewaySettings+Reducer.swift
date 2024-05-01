@@ -1,13 +1,14 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - GatewaySettings
 public struct GatewaySettings: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var gatewayList: GatewayList.State
-		var currentGateway: Radix.Gateway?
-		var validatedNewGatewayToSwitchTo: Radix.Gateway?
-		var gatewayForRemoval: Radix.Gateway?
+		var currentGateway: Gateway?
+		var validatedNewGatewayToSwitchTo: Gateway?
+		var gatewayForRemoval: Gateway?
 
 		@PresentationState
 		var destination: Destination.State?
@@ -28,8 +29,8 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable, Equatable {
 		case gatewaysLoadedResult(TaskResult<Gateways>)
 		case hasAccountsResult(TaskResult<Bool>)
-		case createAccountOnNetworkBeforeSwitchingToIt(Radix.Gateway)
-		case switchToGatewayResult(TaskResult<Radix.Gateway>)
+		case createAccountOnNetworkBeforeSwitchingToIt(Gateway)
+		case switchToGatewayResult(TaskResult<Gateway>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -133,7 +134,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 			state.currentGateway = gateways.current
 			state.gatewayList = .init(gateways: .init(
-				uniqueElements: gateways.all.elements.map {
+				uniqueElements: gateways.all.map {
 					GatewayRow.State(
 						gateway: $0,
 						isSelected: gateways.current.id == $0.id,
@@ -296,7 +297,7 @@ private extension GatewaySettings {
 		return .none
 	}
 
-	func switchToGateway(_ state: inout State, gateway: Radix.Gateway) -> Effect<Action> {
+	func switchToGateway(_ state: inout State, gateway: Gateway) -> Effect<Action> {
 		guard
 			let current = state.currentGateway,
 			current.id != gateway.id

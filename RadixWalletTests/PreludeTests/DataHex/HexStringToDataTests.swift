@@ -1,5 +1,6 @@
 import Foundation
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
 
 final class HexStringToDataTests: TestCase {

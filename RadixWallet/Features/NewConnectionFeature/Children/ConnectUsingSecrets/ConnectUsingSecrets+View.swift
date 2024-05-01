@@ -97,7 +97,7 @@ struct ConnectUsingPassword_Preview: PreviewProvider {
 	static var previews: some View {
 		ConnectUsingSecrets.View(
 			store: .init(
-				initialState: .previewValue,
+				initialState: .sample,
 				reducer: ConnectUsingSecrets.init
 			)
 		)
@@ -105,6 +105,10 @@ struct ConnectUsingPassword_Preview: PreviewProvider {
 }
 
 extension ConnectUsingSecrets.State {
-	public static let previewValue: Self = .init(connectionPassword: .placeholder)
+	public static let sample: Self = .init(connectionPassword: .sample)
+}
+
+extension RadixConnectPassword {
+	public static let sample: Self = .init(value: .sample)
 }
 #endif

@@ -1,3 +1,4 @@
+import Sargon
 import XCTest
 
 open class TestCase: XCTestCase {

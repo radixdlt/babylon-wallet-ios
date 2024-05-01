@@ -109,7 +109,10 @@ extension SelectBackup.View {
 	}
 
 	@MainActor
-	private func cloudBackupDataCard(_ item: SelectionItem<ProfileSnapshot.Header>, viewStore: ViewStoreOf<SelectBackup>) -> some View {
+	private func cloudBackupDataCard(
+		_ item: SelectionItem<Profile.Header>,
+		viewStore: ViewStoreOf<SelectBackup>
+	) -> some SwiftUI.View {
 		let header = item.value
 		let isVersionCompatible = header.isVersionCompatible()
 		let creatingDevice = header.creatingDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.creatingDevice.description
@@ -120,9 +123,8 @@ extension SelectBackup.View {
 						// Contains bold text segments.
 						Text(LocalizedStringKey(L10n.RecoverProfileBackup.backupFrom(creatingDevice)))
 						Text(L10n.IOSProfileBackup.lastModifedDateLabel(formatDate(header.lastModified)))
-
-						Text(L10n.IOSProfileBackup.totalAccountsNumberLabel(header.contentHint.numberOfAccountsOnAllNetworksInTotal))
-						Text(L10n.IOSProfileBackup.totalPersonasNumberLabel(header.contentHint.numberOfPersonasOnAllNetworksInTotal))
+						Text(L10n.IOSProfileBackup.totalAccountsNumberLabel(Int(header.contentHint.numberOfAccountsOnAllNetworksInTotal)))
+						Text(L10n.IOSProfileBackup.totalPersonasNumberLabel(Int(header.contentHint.numberOfPersonasOnAllNetworksInTotal)))
 					}
 					.foregroundColor(.app.gray2)
 					.textStyle(.body2Regular)

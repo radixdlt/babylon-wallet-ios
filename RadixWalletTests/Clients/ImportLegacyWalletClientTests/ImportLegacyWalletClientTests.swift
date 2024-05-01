@@ -1,4 +1,5 @@
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
 
 // MARK: - Olympia.AccountType + Codable
@@ -92,15 +93,6 @@ extension CAP33 {
 	}
 }
 
-extension K1.PublicKey {
-	var base64Encoded: String {
-		let publicKeyCompressed = compressedRepresentation
-		assert(publicKeyCompressed.count == 33)
-		assert(publicKeyCompressed[0] == 0x02 || publicKeyCompressed[0] == 0x03)
-		return publicKeyCompressed.base64EncodedString()
-	}
-}
-
 private func generateTestVector(
 	testID: Int,
 	payloadSizeThreshold: Int,
@@ -126,19 +118,20 @@ private func generateTestVector(
 			NonEmptyString(rawValue: $0)
 		} ?? nil
 		let accountType: Olympia.AccountType = (detRND % 2) == 0 ? .software : .hardware
-		let path = try LegacyOlympiaBIP44LikeDerivationPath(index: Profile.Network.NextDerivationIndices.Index(accountIndex))
-		let publicKey = try mnemonic.hdRoot().derivePrivateKey(path: path.fullPath, curve: SECP256K1.self).publicKey
-
-		return TestVector.OlympiaWallet.Account(
-			accountType: accountType,
-			publicKeyCompressedBase64: publicKey.base64Encoded,
-			addressIndex: accountIndex,
-			name: name
-		)
+//		let path = try BIP44LikePath(index: ProfileNetwork.NextDerivationIndices.Index(accountIndex))
+//		let publicKey = try mnemonic.hdRoot().derivePrivateKey(path: path.fullPath, curve: SECP256K1.self).publicKey
+//
+//		return TestVector.OlympiaWallet.Account(
+//			accountType: accountType,
+//			publicKeyCompressedBase64: publicKey.base64Encoded,
+//			addressIndex: accountIndex,
+//			name: name
+//		)
+		fatalError()
 	}
 
 	let payloads = try CAP33.serialize(
-		wordCount: mnemonic.wordCount.wordCount,
+		wordCount: Int(mnemonic.wordCount.rawValue),
 		accounts: accounts,
 		payloadSizeThreshold: payloadSizeThreshold
 	)
@@ -157,7 +150,7 @@ private func generateTestVector(
 
 	return .init(
 		testID: testID, olympiaWallet: .init(
-			mnemonic: mnemonic.phrase.rawValue,
+			mnemonic: mnemonic.phrase,
 			accounts: accountsWithSanitizedNames
 		), payloadSizeThreshold: payloadSizeThreshold,
 		payloads: payloads
@@ -181,8 +174,8 @@ private func generateTestVectors() throws -> [TestVector] {
 	var testID = 0
 
 	let testVectors: [TestVector] = try payloadAndNumberOfAccounts.flatMap { payloadSizeThreshold, numberOfAccountsPossible in
-		try [BIP39.WordCount.twelve, BIP39.WordCount.twentyFour].flatMap { wordCount in
-			let mnemonic = try Mnemonic.generate(wordCount: wordCount)
+		try [BIP39WordCount.twelve, BIP39WordCount.twentyFour].flatMap { wordCount in
+			let mnemonic = Mnemonic(wordCount: wordCount, language: .english)
 			return try numberOfAccountsPossible.map { numberOfAccounts in
 				defer { testID += 1 }
 				return try generateTestVector(
@@ -209,7 +202,7 @@ extension TestVector.OlympiaWallet.Account {
 	}
 }
 
-extension Olympia.Parsed.Account {
+extension Olympia.Parsed.ParsedAccount {
 	fileprivate func toTestVectorAccount() -> TestVector.OlympiaWallet.Account {
 		.init(
 			accountType: accountType,
@@ -220,107 +213,17 @@ extension Olympia.Parsed.Account {
 	}
 }
 
+extension Secp256k1PublicKey {
+	var base64Encoded: String {
+		let publicKeyCompressed = data
+		assert(publicKeyCompressed.count == 33)
+		assert(publicKeyCompressed[0] == 0x02 || publicKeyCompressed[0] == 0x03)
+		return publicKeyCompressed.base64EncodedString()
+	}
+}
+
 // MARK: - ImportLegacyWalletClientTests
 final class ImportLegacyWalletClientTests: TestCase {
-	func omit_test_ledger_dev_mnemonic_generate_hardwarewallet_vector() throws {
-		let accountNames: [String?] = [
-			String?.none,
-			"",
-			Olympia.Export.accountNameForbiddenCharReplacement,
-			"Main account.",
-			"Saving's account.",
-			"Olympia is a small town in Elis on the Peloponnese peninsula in Greece, famous for the nearby archaeological site of the same name",
-			"Alexandria is the second largest city in Egypt, and the largest city on the Mediterranean coast",
-			"Forbidden \(Olympia.Export.Separator.allCases.joined(separator: "|"))",
-			"OK +?-,.\\)[\\(!#$%{&/*<>=OK",
-			"Numbers are allowed 0123456789",
-		]
-		let payloadSizeThreshold = 1800
-		struct HDWallet {
-			let mnemonic: Mnemonic
-			let isHardware: Bool
-			let accountsCount: Int
-		}
-		let softwareWallet = try HDWallet(mnemonic: Mnemonic.generate(wordCount: .twelve), isHardware: false, accountsCount: 4)
-
-		// the Ledger app dev Mnemonic
-		let hardwareWallet0 = try HDWallet(mnemonic: .init(phrase: "equip will roof matter pink blind book anxiety banner elbow sun young", language: .english), isHardware: true, accountsCount: 6)
-
-		let hardwareWallet1 = try HDWallet(mnemonic: Mnemonic.generate(wordCount: .twelve), isHardware: true, accountsCount: 5)
-		let hardwareWallet2 = try HDWallet(mnemonic: Mnemonic.generate(wordCount: .twelve), isHardware: true, accountsCount: 3)
-
-		var accountNameIndex = 0
-		let accountsSorted: [TestVector.OlympiaWallet.Account] = try [softwareWallet, hardwareWallet0, hardwareWallet1, hardwareWallet2].flatMap { hdWallet -> [TestVector.OlympiaWallet.Account] in
-			print("🔮 hardware? \(hdWallet.isHardware), mnemonic: \(hdWallet.mnemonic.phrase)")
-			let hdRoot = try hdWallet.mnemonic.hdRoot()
-			return try (0 ..< hdWallet.accountsCount).map { (accountIndex: Int) -> TestVector.OlympiaWallet.Account in
-				defer { accountNameIndex += 1 }
-
-				let name: NonEmptyString? = accountNames[accountNameIndex % accountNames.count].map {
-					NonEmptyString(rawValue: $0)
-				} ?? nil
-
-				let accountType: Olympia.AccountType = hdWallet.isHardware ? .hardware : .software
-
-				let path = try LegacyOlympiaBIP44LikeDerivationPath(index: Profile.Network.NextDerivationIndices.Index(accountIndex))
-
-				let publicKey = try hdRoot.derivePrivateKey(
-					path: path.fullPath,
-					curve: SECP256K1.self
-				).publicKey
-
-				return TestVector.OlympiaWallet.Account(
-					accountType: accountType,
-					publicKeyCompressedBase64: publicKey.base64Encoded,
-					addressIndex: accountIndex,
-					name: name
-				)
-			}
-		}
-		let accounts = accountsSorted.shuffled()
-
-		let payloads = try CAP33.serialize(
-			wordCount: softwareWallet.mnemonic.wordCount.wordCount,
-			accounts: accounts,
-			payloadSizeThreshold: payloadSizeThreshold
-		)
-
-		let accountsWithSanitizedNames = accounts.map {
-			$0.sanitizedName()
-		}
-
-		// Soundness check!
-		let parsed = try CAP33.deserialize(payloads: payloads)
-		XCTAssertEqual(parsed.mnemonicWordCount, softwareWallet.mnemonic.wordCount)
-		XCTAssertEqual(accounts.count, parsed.accounts.count)
-		XCTAssertEqual(parsed.accounts.elements.map {
-			$0.toTestVectorAccount()
-		}, accountsWithSanitizedNames)
-
-		//        print(payloads)
-
-		let testVector = TestVector(
-			testID: 0,
-			olympiaWallet: .init(
-				mnemonic: softwareWallet.mnemonic.phrase.rawValue,
-				accounts: accountsWithSanitizedNames
-			), payloadSizeThreshold: payloadSizeThreshold,
-			payloads: payloads
-		)
-		let jsonEncoder = JSONEncoder()
-		jsonEncoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes]
-		let testJSON = try jsonEncoder.encode(testVector)
-		print(String(data: testJSON, encoding: .utf8)!)
-	}
-
-	func omit_test_generate_tests() throws {
-		let testVectors = try generateTestVectors()
-		let jsonEncoder = JSONEncoder()
-		jsonEncoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes]
-		let testJSON = try jsonEncoder.encode(testVectors)
-		print(String(data: testJSON, encoding: .utf8)!)
-	}
-
 	func test_vectors() throws {
 		func doTestDeserialize(_ vector: TestVector) throws {
 			let mnemonic = try Mnemonic(phrase: vector.olympiaWallet.mnemonic, language: .english)
@@ -333,7 +236,7 @@ final class ImportLegacyWalletClientTests: TestCase {
 			let mnemonic = try Mnemonic(phrase: vector.olympiaWallet.mnemonic, language: .english)
 
 			let payloads = try CAP33.serialize(
-				wordCount: mnemonic.wordCount.wordCount,
+				wordCount: Int(mnemonic.wordCount.rawValue),
 				accounts: vector.olympiaWallet.accounts,
 				payloadSizeThreshold: vector.payloadSizeThreshold
 			)
@@ -355,31 +258,28 @@ final class ImportLegacyWalletClientTests: TestCase {
 	}
 
 	func test_cap33_example() throws {
-		let expectedAccounts: [Olympia.Parsed.Account] = try [
+		let expectedAccounts: [Olympia.Parsed.ParsedAccount] = try [
 			.init(
 				accountType: .software,
-				publicKey: K1.PublicKey(
-					compressedRepresentation: Data(
-						hex: "02f669a43024d90fde69351ccc53022c2f86708d9b3c42693640733c5778235da5"
-					)),
+				publicKey: Secp256k1PublicKey(
+					hex: "02f669a43024d90fde69351ccc53022c2f86708d9b3c42693640733c5778235da5"
+				),
 				displayName: .init(rawValue: "With forbidden char in name"),
 				addressIndex: 0
 			),
 			.init(
 				accountType: .hardware,
-				publicKey: K1.PublicKey(
-					compressedRepresentation: Data(
-						hex: "03f6332edc2aa0f035c3c54d74a3acec76d9b5985eaddcda995b97d4117705d7b3"
-					)),
+				publicKey: Secp256k1PublicKey(
+					hex: "03f6332edc2aa0f035c3c54d74a3acec76d9b5985eaddcda995b97d4117705d7b3"
+				),
 				displayName: nil,
 				addressIndex: 1
 			),
 			.init(
 				accountType: .hardware,
-				publicKey: K1.PublicKey(
-					compressedRepresentation: Data(
-						hex: "0354938a7db217e2e610f5389996ab63a070fb4414664df9d15e275aea6fe497c6"
-					)),
+				publicKey: Secp256k1PublicKey(
+					hex: "0354938a7db217e2e610f5389996ab63a070fb4414664df9d15e275aea6fe497c6"
+				),
 				displayName: .init(rawValue: "Third|account_ok"),
 				addressIndex: 2
 			),

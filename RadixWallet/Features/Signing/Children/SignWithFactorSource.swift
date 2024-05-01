@@ -110,11 +110,11 @@ public struct SignWithFactorSource: Sendable, FeatureReducer {
 		factor deviceFactorSource: DeviceFactorSource,
 		state: State
 	) async throws -> Set<SignatureOfEntity> {
-		let dataToSign: Data = switch state.signingPurposeWithPayload {
+		let dataToSign: Hash = switch state.signingPurposeWithPayload {
 		case let .signAuth(auth):
-			auth.payloadToHashAndSign.hash().data
+			auth.payloadToHashAndSign.hash()
 		case let .signTransaction(_, intent, _):
-			intent.hash().hash.data
+			intent.hash().hash
 		}
 
 		return try await deviceFactorSourceClient.signUsingDeviceFactorSource(

@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 public typealias LedgerDeviceInfo = P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.GetDeviceInfo
@@ -134,7 +135,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 		return .run { send in
 
 			if let ledger = try await factorSourcesClient.getFactorSource(
-				id: .init(kind: .ledgerHQHardwareWallet, hash: ledgerDeviceInfo.id.data.data),
+				id: FactorSourceID.hash(value: FactorSourceIdFromHash(kind: .ledgerHqHardwareWallet, body: Exactly32Bytes(bytes: ledgerDeviceInfo.id.data.data))),
 				as: LedgerHardwareWalletFactorSource.self
 			) {
 				await send(.internal(.alreadyExists(ledger)))
@@ -156,7 +157,7 @@ public struct AddLedgerFactorSource: Sendable, FeatureReducer {
 
 	private func completeWithLedgerEffect(_ ledger: LedgerHardwareWalletFactorSource) -> Effect<Action> {
 		.run { send in
-			try await factorSourcesClient.saveFactorSource(ledger.embed())
+			try await factorSourcesClient.saveFactorSource(ledger.asGeneral)
 			loggerGlobal.notice("Added Ledger factor source! ✅ ")
 			await send(.delegate(.completed(ledger)))
 		} catch: { error, _ in
@@ -225,18 +226,5 @@ public struct NameLedgerFactorSource: Sendable, FeatureReducer {
 				return .send(.delegate(.failedToCreateLedgerFactorSource))
 			}
 		}
-	}
-}
-
-extension LedgerHardwareWalletFactorSource {
-	static func from(
-		device: LedgerDeviceInfo,
-		name: String
-	) throws -> Self {
-		try model(
-			.init(model: device.model),
-			name: name,
-			deviceID: device.id
-		)
 	}
 }

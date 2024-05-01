@@ -1,4 +1,5 @@
 import ComposableArchitecture // actually CasePaths... but CI fails if we do `import CasePaths` 🤷‍♂️
+import Sargon
 
 // MARK: - LedgerHardwareWalletClient + DependencyKey
 extension LedgerHardwareWalletClient: DependencyKey {
@@ -86,10 +87,10 @@ extension LedgerHardwareWalletClient: DependencyKey {
 				for requiredSigningFactor in requiredSigner.factorInstancesRequiredToSign {
 					guard
 						let signature = signaturesValidated.first(where: {
-							$0.signature.publicKey == requiredSigningFactor.publicKey
+							$0.signature.publicKey == requiredSigningFactor.publicKey.publicKey
 						})
 					else {
-						loggerGlobal.error("Missing signature from required signer with publicKey: \(requiredSigningFactor.publicKey.compressedRepresentation.hex)")
+						loggerGlobal.error("Missing signature from required signer with publicKey: \(requiredSigningFactor.publicKey.publicKey.hex)")
 						throw MissingSignatureFromRequiredSigner()
 					}
 					assert(requiredSigningFactor.derivationPath == signature.derivationPath)
@@ -97,7 +98,7 @@ extension LedgerHardwareWalletClient: DependencyKey {
 					let entitySignature = SignatureOfEntity(
 						signerEntity: requiredSigner.entity,
 						derivationPath: signature.derivationPath,
-						factorSourceID: requiredSigningFactor.factorSourceID.embed(),
+						factorSourceID: requiredSigningFactor.factorSourceID.asGeneral,
 						signatureWithPublicKey: signature.signature
 					)
 
@@ -226,45 +227,6 @@ public struct MissingSignatureFromRequiredSigner: Swift.Error {}
 // MARK: - FailedToFindFactorInstanceMatchingDerivationPathInSignature
 public struct FailedToFindFactorInstanceMatchingDerivationPathInSignature: Swift.Error {}
 
-extension HierarchicalDeterministicPublicKey {
-	init(curve curveString: String, key keyData: Data, path: String) throws {
-		guard let curve = SLIP10.Curve(rawValue: curveString) else {
-			struct BadCurve: Swift.Error {}
-			loggerGlobal.error("Bad curve")
-			throw BadCurve()
-		}
-		let publicKey: SLIP10.PublicKey = switch curve {
-		case .secp256k1:
-			try .ecdsaSecp256k1(.init(compressedRepresentation: keyData))
-		case .curve25519:
-			try .eddsaEd25519(.init(compressedRepresentation: keyData))
-		}
-
-		let derivationPath: DerivationPath
-		do {
-			derivationPath = try .init(
-				scheme: .cap26,
-				path: AccountBabylonDerivationPath(
-					derivationPath: path
-				)
-				.derivationPath
-			)
-		} catch {
-			derivationPath = try .init(
-				scheme: .bip44Olympia,
-				path: LegacyOlympiaBIP44LikeDerivationPath(
-					derivationPath: path
-				)
-				.derivationPath
-			)
-		}
-
-		assert(derivationPath.curveForScheme == curve)
-
-		self.init(publicKey: publicKey, derivationPath: derivationPath)
-	}
-}
-
 extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.SignatureOfSigner {
 	struct Validated: Sendable, Hashable {
 		public let signature: SignatureWithPublicKey
@@ -274,19 +236,23 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet.Success.Signature
 	func validate(hashed: Data) throws -> Validated {
 		let hdPubKey = try self.derivedPublicKey.hdPubKey()
 		let signatureWithPublicKey: SignatureWithPublicKey = switch hdPubKey.publicKey {
-		case let .ecdsaSecp256k1(pubKey):
-			try .ecdsaSecp256k1(
-				signature: .init(radixFormat: self.signature.data),
-				publicKey: pubKey
+		case let .secp256k1(pubKey):
+			try .secp256k1(
+				publicKey: pubKey,
+				signature: .init(bytes: self.signature.data)
 			)
-		case let .eddsaEd25519(pubKey):
-			.eddsaEd25519(
-				signature: self.signature.data,
-				publicKey: pubKey
+		case let .ed25519(pubKey):
+			try .ed25519(
+				publicKey: pubKey,
+				signature: .init(bytes: self.signature.data)
 			)
 		}
 
-		guard signatureWithPublicKey.isValidSignature(for: hashed) else {
+		let bytes32 = try Exactly32Bytes(bytes: hashed)
+		let hash = Hash(bytes32: bytes32)
+		let isValidSignature = signatureWithPublicKey.isValid(hash)
+
+		guard isValidSignature else {
 			loggerGlobal.error("Signature invalid for hashed msg: \(hashed.hex), signatureWithPublicKey: \(signatureWithPublicKey)")
 			throw InvalidSignature()
 		}
@@ -306,7 +272,7 @@ extension Signer {
 		factorInstancesRequiredToSign.compactMap {
 			P2P.LedgerHardwareWallet.KeyParameters(
 				curve: $0.publicKey.curve.toLedger(),
-				derivationPath: $0.derivationPath.path
+				derivationPath: $0.derivationPath.toString()
 			)
 		}
 	}

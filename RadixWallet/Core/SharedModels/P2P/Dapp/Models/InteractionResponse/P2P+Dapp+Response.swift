@@ -17,7 +17,7 @@ public struct SignedAuthChallenge: Sendable, Hashable {
 // MARK: - P2P.Dapp.Request.AuthChallengeNonce
 extension P2P.Dapp.Request {
 	/// A 32 bytes nonce used as a challenge
-	public typealias AuthChallengeNonce = Tagged<(Self, nonce: ()), HexCodable32Bytes>
+	public typealias AuthChallengeNonce = Tagged<(Self, nonce: ()), Exactly32Bytes>
 }
 
 // MARK: - P2P.Dapp.Response
@@ -61,12 +61,12 @@ extension P2P.Dapp {
 extension P2P.Dapp.Response {
 	public struct AuthProof: Sendable, Hashable, Codable {
 		public let publicKey: String
-		public let curve: SLIP10.Curve
+		public let curve: SLIP10Curve
 		public let signature: String
 
 		public init(
 			publicKey: String,
-			curve: SLIP10.Curve,
+			curve: SLIP10Curve,
 			signature: String
 		) {
 			self.publicKey = publicKey
@@ -76,9 +76,9 @@ extension P2P.Dapp.Response {
 
 		public init(entitySignature: SignatureOfEntity) {
 			let sigPub = entitySignature.signatureWithPublicKey
-			let signature = sigPub.signature.serialize()
+			let signature = sigPub.signature.data
 			self.init(
-				publicKey: sigPub.publicKey.compressedRepresentation.hex,
+				publicKey: sigPub.publicKey.hex,
 				curve: sigPub.publicKey.curve,
 				signature: signature.hex
 			)
@@ -95,7 +95,7 @@ extension P2P.Dapp.Response {
 	}
 
 	public enum Accounts: Sendable, Hashable {
-		case withoutProofOfOwnership(IdentifiedArrayOf<Profile.Network.Account>)
+		case withoutProofOfOwnership(IdentifiedArrayOf<Account>)
 		case withProofOfOwnership(challenge: P2P.Dapp.Request.AuthChallengeNonce, IdentifiedArrayOf<WithProof>)
 
 		public struct WithProof: Sendable, Hashable, Encodable, Identifiable {

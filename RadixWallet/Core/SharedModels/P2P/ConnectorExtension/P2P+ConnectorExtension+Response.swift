@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - P2P.ConnectorExtension.Response
 extension P2P.ConnectorExtension {
 	/// A response received from connector extension for some request we have sent.
@@ -78,11 +80,11 @@ extension P2P.ConnectorExtension.Response.LedgerHardwareWallet {
 		case deriveAndDisplayAddress(DerivedAddress)
 
 		public struct GetDeviceInfo: Sendable, Hashable, Decodable {
-			public let id: HexCodable32Bytes
+			public let id: Exactly32Bytes
 			public let model: P2P.LedgerHardwareWallet.Model
 
 			public init(
-				id: HexCodable32Bytes,
+				id: Exactly32Bytes,
 				model: P2P.LedgerHardwareWallet.Model
 			) {
 				self.id = id

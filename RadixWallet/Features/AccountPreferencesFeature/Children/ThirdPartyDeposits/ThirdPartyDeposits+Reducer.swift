@@ -1,14 +1,13 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
-
-public typealias ThirdPartyDeposits = Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits
 
 // MARK: - ManageThirdPartyDeposits
 public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 	public struct State: Hashable, Sendable {
-		var account: Profile.Network.Account
+		var account: Account
 
-		var depositRule: ThirdPartyDeposits.DepositRule {
+		var depositRule: DepositRule {
 			thirdPartyDeposits.depositRule
 		}
 
@@ -17,7 +16,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		@PresentationState
 		var destination: Destination.State? = nil
 
-		init(account: Profile.Network.Account) {
+		init(account: Account) {
 			self.account = account
 			self.thirdPartyDeposits = account.onLedgerSettings.thirdPartyDeposits
 		}
@@ -33,7 +32,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 	}
 
 	public enum InternalAction: Equatable, Sendable {
-		case updated(Profile.Network.Account)
+		case updated(Account)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -127,7 +126,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		}
 	}
 
-	private func submitTransaction(_ manifest: TransactionManifest, updatedAccount: Profile.Network.Account) -> Effect<Action> {
+	private func submitTransaction(_ manifest: TransactionManifest, updatedAccount: Account) -> Effect<Action> {
 		.run { send in
 			do {
 				/// Wait for user to complete the interaction with Transaction Review
@@ -169,7 +168,7 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		_ state: State
 	) throws -> (
 		manifest: TransactionManifest,
-		account: Profile.Network.Account
+		account: Account
 	) {
 		let inProfileConfig = state.account.onLedgerSettings.thirdPartyDeposits
 		let localConfig = state.thirdPartyDeposits
@@ -177,9 +176,9 @@ public struct ManageThirdPartyDeposits: FeatureReducer, Sendable {
 		updatedAccount.onLedgerSettings.thirdPartyDeposits = localConfig
 		return (
 			manifest: TransactionManifest.thirdPartyDepositUpdate(
-				accountAddress: state.account.accountAddress,
-				from: inProfileConfig.intoSargon(),
-				to: localConfig.intoSargon()
+				accountAddress: state.account.address,
+				from: inProfileConfig,
+				to: localConfig
 			),
 			account: updatedAccount
 		)

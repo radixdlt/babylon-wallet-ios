@@ -1,14 +1,15 @@
+import Sargon
 import WebRTC
 
 extension SignalingClient {
 	init(
-		password: ConnectionPassword,
+		password: RadixConnectPassword,
 		source: ClientSource = .wallet,
 		baseURL: URL
 	) throws {
 		let connectionURL = try Self.signalingServerURL(connectionPassword: password, source: source, baseURL: baseURL)
 		let webSocket = AsyncWebSocket(url: connectionURL)
-		let encryptionKey = try EncryptionKey(.init(data: password.data.data))
+		let encryptionKey = EncryptionKey(password.value)
 
 		self.init(encryptionKey: encryptionKey, transport: webSocket, clientSource: source)
 	}
@@ -32,13 +33,13 @@ extension SignalingClient {
 	}
 
 	static func signalingServerURL(
-		connectionPassword: ConnectionPassword,
+		connectionPassword: RadixConnectPassword,
 		source: ClientSource,
 		baseURL: URL
 	) throws -> URL {
 		let target: ClientSource = source == .wallet ? .extension : .wallet
 
-		let connectionID = try HexCodable32Bytes(.init(data: connectionPassword.hash()))
+		let connectionID = connectionPassword.hash().bytes
 
 		let url = baseURL.appendingPathComponent(
 			connectionID.data.hex()

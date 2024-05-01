@@ -25,7 +25,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 		@Loadable
 		public var ledgers: IdentifiedArrayOf<LedgerHardwareWalletFactorSource>? = nil
 
-		public var selectedLedgerID: FactorSourceID.FromHash? = nil
+		public var selectedLedgerID: FactorSourceIDFromHash? = nil
 		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements? = nil
 
 		@PresentationState
@@ -47,7 +47,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case onFirstTask
-		case selectedLedger(id: FactorSourceID.FromHash?)
+		case selectedLedger(id: FactorSourceIDFromHash?)
 		case addNewLedgerButtonTapped
 		case confirmedLedger(LedgerHardwareWalletFactorSource)
 		case whatIsALedgerButtonTapped

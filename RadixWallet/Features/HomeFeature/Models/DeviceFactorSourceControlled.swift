@@ -23,7 +23,7 @@ public enum MnemonicHandling: String, CustomStringConvertible, Sendable, Hashabl
 
 // MARK: - DeviceFactorSourceControlled
 public struct DeviceFactorSourceControlled: Sendable, CustomStringConvertible, Hashable {
-	public let factorSourceID: FactorSourceID.FromHash
+	public let factorSourceID: FactorSourceIDFromHash
 	public var mnemonicHandlingCallToAction: MnemonicHandling?
 
 	public var description: String {

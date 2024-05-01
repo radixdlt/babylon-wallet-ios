@@ -1,6 +1,7 @@
 import Foundation
 import KeychainAccess
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
 
 let authRandomKey: KeychainHolder.Key = "authRandomDataKey"

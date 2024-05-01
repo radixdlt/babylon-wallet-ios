@@ -61,7 +61,7 @@ public struct ImportOlympiaNameLedger: Sendable, FeatureReducer {
 
 	private func saveNewLedger(_ ledger: LedgerHardwareWalletFactorSource) -> Effect<Action> {
 		.run { send in
-			try await factorSourcesClient.saveFactorSource(ledger.embed())
+			try await factorSourcesClient.saveFactorSource(ledger.asGeneral)
 			loggerGlobal.notice("Saved Ledger factor source! ✅")
 			await send(.delegate(.savedNewLedger(ledger)))
 		} catch: { error, _ in

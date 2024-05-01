@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - P2PLink
 public struct P2PLinkRow: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
-		public typealias ID = ConnectionPassword
+		public typealias ID = RadixConnectPassword
 		public var id: ID { link.connectionPassword }
 		public let link: P2PLink
 
