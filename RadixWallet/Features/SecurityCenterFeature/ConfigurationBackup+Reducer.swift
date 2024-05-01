@@ -48,8 +48,8 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		case setCloudBackupEnabled(Bool)
 		case setICloudAccountStatus(CKAccountStatus)
 		case setLastBackedUp(Date?)
-		case didDeleteOutdatedBackup(Profile.ID)
-		case exportProfileSnapshot(ProfileSnapshot)
+		case didDeleteOutdatedBackup(ProfileID)
+		case exportProfile(Profile)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -187,14 +187,14 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			return .none
 
 		case .encryptProfileOrNot(.encrypt):
-			state.destination = .encryptionPassword(.init(mode: .loadThenEncrypt()))
+			state.destination = .encryptionPassword(.init(mode: .loadThenEncrypt))
 			return .none
 
 		case .encryptProfileOrNot(.doNotEncrypt):
 			state.destination = nil
 			return .run { send in
-				let snapshot = await ProfileStore.shared.profile.snapshot()
-				await send(.internal(.exportProfileSnapshot(snapshot)))
+				let profile = await ProfileStore.shared.profile
+				await send(.internal(.exportProfile(profile)))
 			}
 		}
 	}
@@ -220,8 +220,8 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			state.iCloudAccountStatus = status
 			return .none
 
-		case let .exportProfileSnapshot(snapshot):
-			state.profileFile = .plaintext(snapshot)
+		case let .exportProfile(profile):
+			state.profileFile = .plaintext(profile)
 			return .none
 		}
 	}

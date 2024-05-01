@@ -65,7 +65,7 @@ extension UserDefaults.Dependency {
 		try save(codable: backups, forKey: .lastBackups)
 	}
 
-	public func lastBackupValues(for profileID: ProfileSnapshot.Header.ID) -> AnyAsyncSequence<CloudBackup> {
+	public func lastBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<CloudBackup> {
 		codableValues(key: .lastBackups, codable: [UUID: CloudBackup].self)
 			.compactMap { (try? $0.get())?[profileID] }
 			.eraseToAnyAsyncSequence()
