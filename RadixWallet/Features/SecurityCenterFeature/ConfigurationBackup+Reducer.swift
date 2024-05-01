@@ -49,7 +49,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		case setICloudAccountStatus(CKAccountStatus)
 		case setLastBackedUp(Date?)
 		case didDeleteOutdatedBackup(Profile.ID)
-
 		case exportProfileSnapshot(ProfileSnapshot)
 	}
 
@@ -92,6 +91,18 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.cloudBackupClient) var cloudBackupClient
 
+	private func lastBackupEffect() -> Effect<Action> {
+		.run { send in
+			let profileID = await ProfileStore.shared.profile.id
+			for try await lastBackup in cloudBackupClient.lastBackup(profileID) {
+				guard !Task.isCancelled else { return }
+				let modified = await ProfileStore.shared.profile.header.lastModified
+				print("•• Backup changed for \(profileID.uuidString) \(lastBackup.profileModified == modified)")
+				await send(.internal(.setLastBackedUp(lastBackup.profileModified)))
+			}
+		}
+	}
+
 	private func checkCloudAccountStatusEffect() -> Effect<Action> {
 		.run { send in
 			do {
@@ -118,14 +129,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			} catch {
 				loggerGlobal.error("Failed toggle cloud backups \(isEnabled ? "on" : "off"): \(error)")
 			}
-		}
-	}
-
-	private func updateLastBackupEffect() -> Effect<Action> {
-		.run { send in
-			let profile = await ProfileStore.shared.profile
-			let lastBackedUp = try? await cloudBackupClient.lastBackup(profile.id)
-			await send(.internal(.setLastBackedUp(lastBackedUp)))
 		}
 	}
 
@@ -210,7 +213,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		case let .setCloudBackupEnabled(isEnabled):
 			print("•• set setCloudBackupEnabled: \(isEnabled)")
 			state.automatedBackupsEnabled = isEnabled
-			return updateLastBackupEffect()
+			return .none
 
 		case let .setICloudAccountStatus(status):
 			print("•• set iCloudAccountStatus: \(status)")

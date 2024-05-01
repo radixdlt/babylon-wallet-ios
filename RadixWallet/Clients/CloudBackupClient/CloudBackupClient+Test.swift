@@ -19,7 +19,7 @@ extension CloudBackupClient: TestDependencyKey {
 		migrateProfilesFromKeychain: { throw NoopError() },
 		deleteProfileInKeychain: { _ in },
 		checkAccountStatus: { throw NoopError() },
-		lastBackup: { _ in throw NoopError() },
+		lastBackup: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		loadProfile: { _ in throw NoopError() },
 		loadAllProfiles: { throw NoopError() },
 		backupProfile: { throw NoopError() }

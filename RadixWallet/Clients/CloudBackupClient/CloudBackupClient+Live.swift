@@ -31,11 +31,16 @@ extension CloudBackupClient {
 				let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
 				do {
 					try await saveProfile(profile, existingRecord: existingRecord)
-					try? userDefaults.setLastBackup(success: true, for: profile.id)
+					try? userDefaults.setLastBackup(.success, of: profile)
 					print("•• backed up \(profile.id.uuidString)")
 				} catch {
-					try? userDefaults.setLastBackup(success: false, for: profile.id)
-					print("•• back up FAILED \(profile.id.uuidString)")
+					try? userDefaults.setLastBackup(.failure, of: profile)
+					if let ckError = error as? CKError {
+//						CKErrorAccountTemporarilyUnavailable
+						print("•• back up FAILED CK \(profile.id.uuidString): \(type(of: ckError)): \(ckError)")
+					} else {
+						print("•• back up FAILED \(profile.id.uuidString): \(type(of: error)): \(error)")
+					}
 				}
 			}
 		}
@@ -135,10 +140,11 @@ extension CloudBackupClient {
 				try await container.accountStatus()
 			},
 			lastBackup: { id in
-				print("  •• CALL LAST")
-				let last = try await fetchProfileRecord(.init(recordName: id.uuidString)).modificationDate
-				print("  •• LAST: \(last)")
-				return last
+				print("  •• CALL LAST backup \(id.uuidString)")
+//				let last = try await fetchProfileRecord(.init(recordName: id.uuidString)).modificationDate
+//				print("  •• LAST: \(last)")
+//				return last
+				return userDefaults.lastBackupValues(for: id)
 			},
 			loadProfile: { id in
 				try await extractProfile(fetchProfileRecord(.init(recordName: id.uuidString)))

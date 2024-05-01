@@ -148,34 +148,8 @@ extension UserDefaults.Dependency {
 	public func setDidMigrateKeychainProfiles(_ value: Bool) {
 		set(value, forKey: Key.didMigrateKeychainProfiles.rawValue)
 	}
-}
 
-// MARK: - CloudBackup
-public struct CloudBackup: Codable, Sendable {
-	public let date: Date
-	public let success: Bool
-}
-
-extension UserDefaults.Dependency {
-	public func setLastBackup(success: Bool, for profileID: ProfileSnapshot.Header.ID) throws {
-		var backups: [UUID: CloudBackup] = try loadCodable(key: .lastBackups) ?? [:]
-		backups[profileID] = .init(date: .now, success: success)
-		try save(codable: backups, forKey: .lastBackups)
-	}
-
-	public func lastBackupValues(for profileID: ProfileSnapshot.Header.ID) -> AnyAsyncSequence<CloudBackup?> {
-		codableValues(key: .lastBackups, codable: [UUID: CloudBackup].self)
-			.map { (try? $0.get())?[profileID] }
-			.eraseToAnyAsyncSequence()
+	public var getLastBackups: [UUID: CloudBackup] {
+		(try? loadCodable(key: .lastBackups)) ?? [:]
 	}
 }
-
-// extension UserDefaults.Dependency {
-//	public func setLastBackup(_ date: Date) throws {
-//		try save(codable: date, forKey: .lastBackups)
-//	}
-//
-//	public func lastBackupValues() -> AnyAsyncSequence<Result<Date?, Error>> {
-//		codableValues(key: .lastBackups, codable: Date.self)
-//	}
-// }
