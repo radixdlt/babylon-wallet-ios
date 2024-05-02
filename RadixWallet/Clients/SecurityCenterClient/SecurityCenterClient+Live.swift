@@ -24,26 +24,43 @@ extension SecurityCenterClient {
 			}
 		}
 
+		/*
+		 5: last cloud backup failed
+		 6: cloud backups are turned off + never manually backed up
+		 7: cloud backups are turned off + has done manual but not latest
+		 */
+
 		return .init(
 			problems: { profileID in
 				print("•• subscribe to problems for \(profileID.uuidString)")
 
-				let cloud = userDefaults.lastCloudBackupValues(for: profileID)
-//				let hasDoneManualExport = userDefaults.lastManualBackupValues(for: profileID).map { $0. }
+				let cloudBackups = userDefaults.lastCloudBackupValues(for: profileID).optional
+				let manualBackups = userDefaults.lastManualBackupValues(for: profileID).optional
 
-				for await dd in AsyncAlgorithms.zip(cloud, manual) {}
-
-//				let dd = merge(cloud, manual)
-
-//					.map { _ in
-//					var problems: [SecurityProblem] = []
+//				return AsyncAlgorithms.zip(cloudBackups, manualBackups).map { cloudBackup, manualBackup in
 //
+//					print("•• cloud \(cloudBackup), manual \(manualBackup)")
 //
-//					print("•• backup emitted for \(profileID.uuidString)")
+//					return [SecurityProblem.problem5]
 //				}
+//				.eraseToAnyAsyncSequence()
 
-				fatalError()
+				return cloudBackups.map { cloudBackup in
+					let result = Bool.random() ? [SecurityProblem.problem5] : []
+					print("•• PROBLEMS EMIT cloud \(cloudBackup) \(result)")
+					return result
+				}
+				.eraseToAnyAsyncSequence()
 			}
 		)
+	}
+}
+
+extension AsyncSequence where Self: Sendable, Element: Sendable {
+	/// A sequence of optional Elements, starting with `nil`. Useful when zipping sequences without wanting to wait for the first emitted element
+	var optional: AnyAsyncSequence<Element?> {
+		map { $0 as Element? }
+			.prepend(nil)
+			.eraseToAnyAsyncSequence()
 	}
 }

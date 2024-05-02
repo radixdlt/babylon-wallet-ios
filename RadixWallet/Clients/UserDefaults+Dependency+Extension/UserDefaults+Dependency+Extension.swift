@@ -150,33 +150,56 @@ extension UserDefaults.Dependency {
 		set(value, forKey: Key.didMigrateKeychainProfiles.rawValue)
 	}
 
-	public var getLastCloudBackups: [UUID: BackupMetadata] {
-		getLastBackups(cloud: true)
+	public var getLastCloudBackups: [UUID: CloudBackupResult] {
+		(try? loadCodable(key: .lastCloudBackups)) ?? [:]
 	}
 
-	public func setLastCloudBackup(_ status: BackupMetadata.Status, of profile: Profile) throws {
-		try setLastBackup(cloud: true, status: status, of: profile)
+	public func setLastCloudBackup(_ status: CloudBackupResult.Status, of profile: Profile) throws {
+		var backups: [UUID: CloudBackupResult] = getLastCloudBackups
+		backups[profile.id] = .init(
+			date: profile.header.lastModified,
+			profileHash: profile.hashValue,
+			status: status
+		)
+
+		try save(codable: backups, forKey: .lastCloudBackups)
+		print("  •• did setLastCloudBackup \(status)")
 	}
 
-	public func lastCloudBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<BackupMetadata> {
-		lastBackupValues(cloud: true, for: profileID)
+	public func lastCloudBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<CloudBackupResult> {
+		lastBackupValues(for: profileID, key: .lastCloudBackups)
 	}
 
-	public var getLastManualBackups: [UUID: BackupMetadata] {
-		getLastBackups(cloud: false)
+	public var getLastManualBackups: [UUID: ManualBackupResult] {
+		(try? loadCodable(key: .lastManualBackups)) ?? [:]
 	}
 
-	public func setLastManualBackup(_ status: BackupMetadata.Status, of profile: Profile) throws {
-		try setLastBackup(cloud: false, status: status, of: profile)
+	/// Only call this on successful manual backups
+	public func setLastManualBackup(of profile: Profile) throws {
+		var backups: [UUID: ManualBackupResult] = getLastManualBackups
+		let isFirstBackup = backups[profile.id] != nil
+		backups[profile.id] = .init(
+			date: profile.header.lastModified,
+			profileHash: profile.hashValue,
+			isFirstBackup: isFirstBackup
+		)
+
+		try save(codable: backups, forKey: .lastManualBackups)
 	}
 
-	public func lastManualBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<BackupMetadata> {
-		lastBackupValues(cloud: false, for: profileID)
+	public func lastManualBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<ManualBackupResult> {
+		lastBackupValues(for: profileID, key: .lastManualBackups)
+	}
+
+	private func lastBackupValues<T: Codable & Sendable>(for profileID: ProfileID, key: UserDefaultsKey) -> AnyAsyncSequence<T> {
+		codableValues(key: key, codable: [UUID: T].self)
+			.compactMap { (try? $0.get())?[profileID] }
+			.eraseToAnyAsyncSequence()
 	}
 }
 
-// MARK: - BackupMetadata
-public struct BackupMetadata: Codable, Sendable {
+// MARK: - CloudBackupResult
+public struct CloudBackupResult: Codable, Sendable {
 	public let date: Date
 	public let profileHash: Int
 	public let status: Status
@@ -189,30 +212,10 @@ public struct BackupMetadata: Codable, Sendable {
 	}
 }
 
-extension UserDefaults.Dependency {
-	private func setLastBackup(cloud: Bool, status: BackupMetadata.Status, of profile: Profile) throws {
-		let key = backupKey(cloud: cloud)
-		var backups: [UUID: BackupMetadata] = getLastBackups(cloud: cloud)
-		backups[profile.id] = .init(
-			date: profile.header.lastModified,
-			profileHash: profile.hashValue,
-			status: status
-		)
-
-		try save(codable: backups, forKey: key)
-	}
-
-	private func getLastBackups(cloud: Bool) -> [UUID: BackupMetadata] {
-		(try? loadCodable(key: backupKey(cloud: cloud))) ?? [:]
-	}
-
-	private func lastBackupValues(cloud: Bool, for profileID: ProfileID) -> AnyAsyncSequence<BackupMetadata> {
-		codableValues(key: backupKey(cloud: cloud), codable: [UUID: BackupMetadata].self)
-			.compactMap { (try? $0.get())?[profileID] }
-			.eraseToAnyAsyncSequence()
-	}
-
-	private func backupKey(cloud: Bool) -> UserDefaultsKey {
-		cloud ? .lastCloudBackups : .lastManualBackups
-	}
+// MARK: - ManualBackupResult
+/// For manual backups, we only store the successful results
+public struct ManualBackupResult: Codable, Sendable {
+	public let date: Date
+	public let profileHash: Int
+	public let isFirstBackup: Bool
 }
