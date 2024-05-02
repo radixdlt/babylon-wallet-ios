@@ -12,19 +12,23 @@ public struct DeviceFactorSourceClient: Sendable {
 	/// Fetched accounts and personas on current network that are controlled by a device factor source, for every factor source in current profile
 	public var controlledEntities: GetControlledEntities
 
+	/// Checks if there is any account for which the wallet doesn't have its seed phrase.
+	public var isSeedPhraseNeededToRecoverAccounts: IsSeedPhraseNeededToRecoverAccounts
+
 	public init(
 		publicKeysFromOnDeviceHD: @escaping PublicKeysFromOnDeviceHD,
 		signatureFromOnDeviceHD: @escaping SignatureFromOnDeviceHD,
 		isAccountRecoveryNeeded: @escaping IsAccountRecoveryNeeded,
 		entitiesControlledByFactorSource: @escaping GetEntitiesControlledByFactorSource,
-		controlledEntities: @escaping GetControlledEntities
+		controlledEntities: @escaping GetControlledEntities,
+		isSeedPhraseNeededToRecoverAccounts: @escaping IsSeedPhraseNeededToRecoverAccounts
 	) {
 		self.publicKeysFromOnDeviceHD = publicKeysFromOnDeviceHD
 		self.signatureFromOnDeviceHD = signatureFromOnDeviceHD
 		self.isAccountRecoveryNeeded = isAccountRecoveryNeeded
-
 		self.entitiesControlledByFactorSource = entitiesControlledByFactorSource
 		self.controlledEntities = controlledEntities
+		self.isSeedPhraseNeededToRecoverAccounts = isSeedPhraseNeededToRecoverAccounts
 	}
 }
 
@@ -36,6 +40,7 @@ extension DeviceFactorSourceClient {
 	public typealias PublicKeysFromOnDeviceHD = @Sendable (PublicKeysFromOnDeviceHDRequest) async throws -> [HierarchicalDeterministicPublicKey]
 	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey
 	public typealias IsAccountRecoveryNeeded = @Sendable () async throws -> Bool
+	public typealias IsSeedPhraseNeededToRecoverAccounts = @Sendable () async throws -> Bool
 }
 
 // MARK: - DiscrepancyUnsupportedCurve

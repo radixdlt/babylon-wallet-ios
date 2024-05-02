@@ -355,10 +355,7 @@ extension TransactionHistory {
 					EventHeader.Dummy()
 
 					HStack(spacing: .small2) {
-						Image(.warningError)
-							.renderingMode(.template)
-							.resizable()
-							.frame(.smallest)
+						Image(.error)
 
 						Text(L10n.TransactionHistory.failedTransaction)
 							.textStyle(.body2HighImportance)
