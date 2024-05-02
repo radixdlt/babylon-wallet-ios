@@ -183,7 +183,8 @@ public struct BackupMetadata: Codable, Sendable {
 
 	public enum Status: Codable, Sendable {
 		case success
-		case notAuthorized
+		case temporarilyUnavailable
+		case notAuthenticated
 		case failure
 	}
 }
