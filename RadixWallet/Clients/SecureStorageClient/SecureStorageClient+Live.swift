@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - KeychainAccess.Accessibility + Sendable
 extension KeychainAccess.Accessibility: @unchecked Sendable {}
 
@@ -91,23 +93,23 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		@Sendable func saveProfile(
-			snapshot profileSnapshot: ProfileSnapshot,
+			snapshot profile: Profile,
 			iCloudSyncEnabled: Bool
 		) throws {
-			let data = try jsonEncoder().encode(profileSnapshot)
-			try saveProfile(snapshotData: data, key: profileSnapshot.header.id.keychainKey, iCloudSyncEnabled: iCloudSyncEnabled)
+			let data = profile.profileSnapshot()
+			try saveProfile(snapshotData: data, key: profile.header.id.keychainKey, iCloudSyncEnabled: iCloudSyncEnabled)
 		}
 
-		@Sendable func loadProfileHeaderList() throws -> ProfileSnapshot.HeaderList? {
+		@Sendable func loadProfileHeaderList() throws -> Profile.HeaderList? {
 			try keychainClient
 				.getDataWithoutAuth(forKey: profileHeaderListKeychainKey)
 				.map {
-					try jsonDecoder().decode([ProfileSnapshot.Header].self, from: $0)
+					try jsonDecoder().decode([Profile.Header].self, from: $0)
 				}
-				.flatMap(ProfileSnapshot.HeaderList.init)
+				.flatMap(Profile.HeaderList.init)
 		}
 
-		@Sendable func saveProfileHeaderList(_ headers: ProfileSnapshot.HeaderList) throws {
+		@Sendable func saveProfileHeaderList(_ headers: Profile.HeaderList) throws {
 			let data = try jsonEncoder().encode(headers)
 			try keychainClient.setDataWithoutAuth(
 				data,
@@ -121,7 +123,7 @@ extension SecureStorageClient: DependencyKey {
 			)
 		}
 
-		@Sendable func deleteProfileHeader(_ id: ProfileSnapshot.Header.ID) throws {
+		@Sendable func deleteProfileHeader(_ id: ProfileID) throws {
 			if let profileHeaders = try loadProfileHeaderList() {
 				let remainingHeaders = profileHeaders.filter { $0.id != id }
 				if remainingHeaders.isEmpty {
@@ -138,7 +140,7 @@ extension SecureStorageClient: DependencyKey {
 		}
 
 		@Sendable func deleteProfile(
-			_ id: ProfileSnapshot.Header.ID
+			_ id: ProfileID
 		) throws {
 			try keychainClient.removeData(forKey: id.keychainKey)
 			try deleteProfileHeader(id)
@@ -208,13 +210,13 @@ extension SecureStorageClient: DependencyKey {
 			return try jsonDecoder().decode(MnemonicWithPassphrase.self, from: data)
 		}
 
-		let loadProfileSnapshot: LoadProfileSnapshot = { id in
+		let loadProfileSnapshot: LoadProfileSnapshot = { id -> Profile? in
 			guard
 				let existingSnapshotData = try loadProfileSnapshotData(id)
 			else {
 				return nil
 			}
-			return try jsonDecoder().decode(ProfileSnapshot.self, from: existingSnapshotData)
+			return try jsonDecoder().decode(Profile.self, from: existingSnapshotData)
 		}
 
 		let loadMnemonicByFactorSourceID: LoadMnemonicByFactorSourceID = { request in
@@ -253,7 +255,7 @@ extension SecureStorageClient: DependencyKey {
 
 			return keys.compactMap {
 				guard
-					let factorSourceID = FactorSourceID.FromHash(keychainKey: $0),
+					let factorSourceID = FactorSourceIDFromHash(keychainKey: $0),
 					let mnemonicWithPassphrase = try? loadMnemonicByFactorSourceID(
 						.init(factorSourceID: factorSourceID, notifyIfMissing: false)
 					)
@@ -268,23 +270,16 @@ extension SecureStorageClient: DependencyKey {
 		}
 		#endif
 
-		let saveProfileSnapshot: SaveProfileSnapshot = {
-			profileSnapshot in
-			let data = try jsonEncoder().encode(profileSnapshot)
+		let saveProfileSnapshot: SaveProfileSnapshot = { profile in
 			try saveProfile(
-				snapshotData: data,
-				key: profileSnapshot.header.id.keychainKey,
-				iCloudSyncEnabled: profileSnapshot.appPreferences.security.isCloudProfileSyncEnabled
+				snapshotData: profile.profileSnapshot(),
+				key: profile.header.id.keychainKey,
+				iCloudSyncEnabled: profile.appPreferences.security.isCloudProfileSyncEnabled
 			)
 		}
 
 		let loadProfile: LoadProfile = { id in
-			guard
-				let existingSnapshot = try loadProfileSnapshot(id)
-			else {
-				return nil
-			}
-			return Profile(snapshot: existingSnapshot)
+			try loadProfileSnapshot(id)
 		}
 
 		let containsMnemonicIdentifiedByFactorSourceID: ContainsMnemonicIdentifiedByFactorSourceID = { factorSourceID in
@@ -303,7 +298,7 @@ extension SecureStorageClient: DependencyKey {
 
 			guard
 				let profileSnapshot = try? jsonDecoder().decode(
-					ProfileSnapshot.self,
+					Profile.self,
 					from: profileSnapshotData
 				)
 			else {
@@ -419,7 +414,7 @@ let profileHeaderListKeychainKey: KeychainClient.Key = "profileHeaderList"
 private let deviceIdentifierKey: KeychainClient.Key = "deviceIdentifier"
 private let deviceInfoKey: KeychainClient.Key = "deviceInfo"
 
-extension ProfileSnapshot.Header.ID {
+extension ProfileID {
 	private static let profileSnapshotKeychainKeyPrefix = "profileSnapshot"
 
 	var keychainKey: KeychainClient.Key {
@@ -427,7 +422,7 @@ extension ProfileSnapshot.Header.ID {
 	}
 }
 
-private func key(factorSourceID: FactorSourceID.FromHash) -> KeychainClient.Key {
+private func key(factorSourceID: FactorSourceIDFromHash) -> KeychainClient.Key {
 	.init(rawValue: .init(rawValue: factorSourceID.keychainKey)!)
 }
 
@@ -438,18 +433,27 @@ extension OverlayWindowClient.Item.AlertState {
 	)
 }
 
-extension FactorSourceID.FromHash {
+extension FactorSourceIDFromHash {
 	init?(keychainKey: KeychainClient.Key) {
 		let key = keychainKey.rawValue.rawValue
 		guard
 			case let parts = key.split(separator: Self.keychainKeySeparator),
 			parts.count == 2,
 			let kind = FactorSourceKind(rawValue: String(parts[0])),
-			let hex32 = try? HexCodable(hex: String(parts[1])),
-			let id = try? Self(kind: kind, hash: hex32.data)
+			case let hex32 = String(parts[1]),
+			let exactly32Bytes = try? Exactly32Bytes(hex: hex32)
 		else {
 			return nil
 		}
-		self = id
+		self.init(kind: kind, body: exactly32Bytes)
+	}
+}
+
+extension FactorSourceIdFromHash {
+	public static let keychainKeySeparator = ":"
+	/// NEVER EVER CHANGE THIS! If you do, users apps will be unable to load the Mnemonic
+	/// from keychain!
+	public var keychainKey: String {
+		"\(kind)\(Self.keychainKeySeparator)\(body.data.hex())"
 	}
 }

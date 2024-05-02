@@ -10,15 +10,15 @@ public struct PoolUnitsList: Sendable, FeatureReducer {
 		var destination: Destination.State?
 
 		public struct PoolUnitState: Sendable, Hashable, Identifiable {
-			public var id: ResourcePoolAddress { poolUnit.resourcePoolAddress }
-			public let poolUnit: OnLedgerEntity.Account.PoolUnit
+			public var id: PoolAddress { poolUnit.resourcePoolAddress }
+			public let poolUnit: OnLedgerEntity.OnLedgerAccount.PoolUnit
 			public var resourceDetails: Loadable<OnLedgerEntitiesClient.OwnedResourcePoolDetails> = .idle
 			public var isSelected: Bool? = nil
 		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case poolUnitWasTapped(ResourcePoolAddress)
+		case poolUnitWasTapped(PoolAddress)
 	}
 
 	public struct Destination: DestinationReducer {

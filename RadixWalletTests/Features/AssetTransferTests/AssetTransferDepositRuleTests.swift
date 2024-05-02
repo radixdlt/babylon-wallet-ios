@@ -1,13 +1,15 @@
-import EngineToolkit
+
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
 
+// MARK: - AssetTransferDepositRuleTests
 @MainActor
 final class AssetTransferDepositRuleTests: TestCase {
-	static let recipientAccount = Profile.Network.Account.testValueIdx0
-	static let resourceAddress = try! ResourceAddress(validatingAddress: "resource_rdx1tkk83magp3gjyxrpskfsqwkg4g949rmcjee4tu2xmw93ltw2cz94sq")
+	static let recipientAccount = Account.sampleMainnet
+	static let resourceAddress = ResourceAddress.mainnetXRD
 
-	static let onLedgerAccountWithResource = OnLedgerEntity.Account(
+	static let onLedgerAccountWithResource = OnLedgerEntity.OnLedgerAccount(
 		address: recipientAccount.address,
 		atLedgerState: .init(version: 0, epoch: 0),
 		metadata: .init(nil),
@@ -15,7 +17,7 @@ final class AssetTransferDepositRuleTests: TestCase {
 			xrdResource: .init(
 				resourceAddress: resourceAddress,
 				atLedgerState: .init(version: 0, epoch: 0),
-				amount: .init(nominalAmount: .one()),
+				amount: .init(nominalAmount: Decimal192(1)),
 				metadata: .init(nil)
 			)
 		),
@@ -162,20 +164,20 @@ final class AssetTransferDepositRuleTests: TestCase {
 	// MARK: - Private
 
 	private func assertSignatureIsRequired(
-		for account: Profile.Network.Account,
-		onLedgerAccounts: [OnLedgerEntity.Account] = []
+		for account: Account,
+		onLedgerAccounts: [OnLedgerEntity.OnLedgerAccount] = []
 	) async throws {
 		try await assertSignatureIsRequired(for: account, isRequired: true, onLedgerAccounts: onLedgerAccounts)
 	}
 
 	private func assertNoSignatureIsRequired(
-		for account: Profile.Network.Account,
-		onLedgerAccounts: [OnLedgerEntity.Account] = []
+		for account: Account,
+		onLedgerAccounts: [OnLedgerEntity.OnLedgerAccount] = []
 	) async throws {
 		try await assertSignatureIsRequired(for: account, isRequired: false, onLedgerAccounts: onLedgerAccounts)
 	}
 
-	private func assertSignatureIsRequired(for account: Profile.Network.Account, isRequired: Bool, onLedgerAccounts: [OnLedgerEntity.Account]) async throws {
+	private func assertSignatureIsRequired(for account: Account, isRequired: Bool, onLedgerAccounts: [OnLedgerEntity.OnLedgerAccount]) async throws {
 		try await withTimeLimit(.fast) {
 			await withDependencies { d in
 				d.onLedgerEntitiesClient.getEntities = { _, _, _, _ in
@@ -186,5 +188,18 @@ final class AssetTransferDepositRuleTests: TestCase {
 				XCTAssertEqual(isRequired, result)
 			}
 		}
+	}
+}
+
+extension ThirdPartyDeposits {
+	public mutating func setAssetsExceptionList(
+		_ new: OrderedSet<AssetException>?
+	) {
+		guard let new else {
+			updateAssetsExceptionList { $0 = nil }
+			return
+		}
+		let list = AssetsExceptionList(new.elements)
+		updateAssetsExceptionList { $0 = list }
 	}
 }

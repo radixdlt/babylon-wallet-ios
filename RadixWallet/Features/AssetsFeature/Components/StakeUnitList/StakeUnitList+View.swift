@@ -52,7 +52,7 @@ public extension StakeUnitList {
 		}
 
 		@ViewBuilder
-		private func loadingView(_ ownedStakes: IdentifiedArrayOf<OnLedgerEntity.Account.RadixNetworkStake>) -> some SwiftUI.View {
+		private func loadingView(_ ownedStakes: IdentifiedArrayOf<OnLedgerEntity.OnLedgerAccount.RadixNetworkStake>) -> some SwiftUI.View {
 			Section {
 				shimmeringLoadingView()
 			} header: {
@@ -67,7 +67,7 @@ public extension StakeUnitList {
 		}
 
 		@ViewBuilder
-		private func loadedView(_ ownedStakes: IdentifiedArrayOf<OnLedgerEntity.Account.RadixNetworkStake>) -> some SwiftUI.View {
+		private func loadedView(_ ownedStakes: IdentifiedArrayOf<OnLedgerEntity.OnLedgerAccount.RadixNetworkStake>) -> some SwiftUI.View {
 			Section {
 				shimmeringLoadingView()
 			} header: {

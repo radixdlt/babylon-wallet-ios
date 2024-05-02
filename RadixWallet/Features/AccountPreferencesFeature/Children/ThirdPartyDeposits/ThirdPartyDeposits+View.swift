@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 extension ManageThirdPartyDeposits.State {
@@ -69,7 +70,7 @@ extension ManageThirdPartyDeposits {
 		case allowDepositors
 
 		public enum Row: Hashable, Sendable {
-			case depositRule(ThirdPartyDeposits.DepositRule)
+			case depositRule(DepositRule)
 			case allowDenyAssets(AllowDenyAssetsRow)
 			case allowDepositors(AllowDepositorsRow)
 		}

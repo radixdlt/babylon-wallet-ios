@@ -31,22 +31,24 @@ public struct AddAsset: FeatureReducer, Sendable {
 				return .invalid
 			}
 
-			let address: ResourceViewState.Address?
+			var address: ResourceViewState.Address?
 
 			switch mode {
 			case let .allowDenyAssets(exceptionRule):
 				address = try? .assetException(.init(address: .init(validatingAddress: resourceAddress), exceptionRule: exceptionRule))
 			case .allowDepositors:
-				address = ThirdPartyDeposits.DepositorAddress(raw: resourceAddress).map { .allowedDepositor($0) }
+				if let resourceAddress = try? ResourceAddress(validatingAddress: resourceAddress) {
+					address = .allowedDepositor(.resource(value: resourceAddress))
+				}
 			}
 
-			guard let address, let engineAddress = try? address.resourceAddress.intoEngine() else {
+			guard let address else {
 				return .invalid
 			}
 
-			guard engineAddress.networkId() == networkID.rawValue else {
+			guard address.resourceAddress.networkID == networkID else {
 				// On wrong network
-				return .wrongNetwork(address, incorrectNetwork: engineAddress.networkId())
+				return .wrongNetwork(address, incorrectNetwork: address.resourceAddress.networkID.rawValue)
 			}
 
 			guard !alreadyAddedResources.contains(where: { $0.resourceAddress == address.resourceAddress }) else {
@@ -93,21 +95,5 @@ public struct AddAsset: FeatureReducer, Sendable {
 				await dismiss()
 			}
 		}
-	}
-}
-
-extension ThirdPartyDeposits.DepositorAddress {
-	init?(raw: String) {
-		if let asResourceAddress = try? ResourceAddress(validatingAddress: raw) {
-			self = .resourceAddress(asResourceAddress)
-			return
-		}
-
-		if let asNFTId = try? NonFungibleGlobalId(nonFungibleGlobalId: raw) {
-			self = .nonFungibleGlobalID(asNFTId)
-			return
-		}
-
-		return nil
 	}
 }

@@ -13,7 +13,7 @@ extension AccountsClient: TestDependencyKey {
 	#if DEBUG
 	public static let noop = Self(
 		getCurrentNetworkID: { .kisharnet },
-		nextAppearanceID: { _, _ in ._0 },
+		nextAppearanceID: { _, _ in .sample },
 		getAccountsOnCurrentNetwork: { throw NoopError() },
 		getHiddenAccountsOnCurrentNetwork: { throw NoopError() },
 		accountsOnCurrentNetwork: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },

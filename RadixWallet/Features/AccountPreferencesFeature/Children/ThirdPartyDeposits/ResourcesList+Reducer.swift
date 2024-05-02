@@ -1,9 +1,10 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ResourcesListMode
 public enum ResourcesListMode: Hashable, Sendable {
-	public typealias ExceptionRule = ThirdPartyDeposits.DepositAddressExceptionRule
+	public typealias ExceptionRule = DepositAddressExceptionRule
 	case allowDenyAssets(ExceptionRule)
 	case allowDepositors
 }
@@ -11,8 +12,8 @@ public enum ResourcesListMode: Hashable, Sendable {
 // MARK: - ResourceViewState
 public struct ResourceViewState: Hashable, Sendable, Identifiable {
 	public enum Address: Hashable, Sendable {
-		case assetException(ThirdPartyDeposits.AssetException)
-		case allowedDepositor(ThirdPartyDeposits.DepositorAddress)
+		case assetException(AssetException)
+		case allowedDepositor(ResourceOrNonFungible)
 	}
 
 	public var id: Address { address }
@@ -66,7 +67,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		case task
 		case addAssetTapped
 		case assetRemove(ResourceViewState.Address)
-		case exceptionListChanged(ThirdPartyDeposits.DepositAddressExceptionRule)
+		case exceptionListChanged(DepositAddressExceptionRule)
 	}
 
 	public enum DelegateAction: Equatable, Sendable {
@@ -264,22 +265,5 @@ extension ResourcesListMode {
 		case .allowDepositors:
 			L10n.AccountSettings.SpecificAssetsDeposits.removeBadgeMessageDepositors
 		}
-	}
-}
-
-extension ThirdPartyDeposits.DepositorAddress {
-	var resourceAddress: ResourceAddress {
-		switch self {
-		case let .resourceAddress(address):
-			address
-		case let .nonFungibleGlobalID(nonFungibleGlobalID):
-			try! nonFungibleGlobalID.resourceAddress().asSpecific()
-		}
-	}
-}
-
-extension ThirdPartyDeposits.AssetException {
-	func updateExceptionRule(_ rule: ThirdPartyDeposits.DepositAddressExceptionRule) -> Self {
-		.init(address: address, exceptionRule: rule)
 	}
 }

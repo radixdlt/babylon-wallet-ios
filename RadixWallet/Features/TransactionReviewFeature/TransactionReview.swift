@@ -136,8 +136,8 @@ public struct TransactionReview: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case failed(TransactionFailure)
-		case signedTXAndSubmittedToGateway(TXID)
-		case transactionCompleted(TXID)
+		case signedTXAndSubmittedToGateway(IntentHash)
+		case transactionCompleted(IntentHash)
 		case dismiss
 	}
 
@@ -432,7 +432,9 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 			state.destination = .customizeFees(.init(
 				reviewedTransaction: reviewedTransaction,
-				manifestSummary: reviewedTransaction.transactionManifest.summary(networkId: reviewedTransaction.networkID.rawValue),
+				manifestSummary: reviewedTransaction
+					.transactionManifest
+					.summary,
 				signingPurpose: .signTransaction(state.signTransactionPurpose)
 			))
 			return .none
@@ -457,7 +459,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 				transactionFee: preview.transactionFee,
 				transactionSigners: preview.transactionSigners,
 				signingFactors: preview.signingFactors,
-				accountWithdraws: preview.analyzedManifestToReview.accountWithdraws,
+				accountWithdraws: preview.analyzedManifestToReview.withdrawals,
 				isNonConforming: preview.analyzedManifestToReview.detailedManifestClass == nil
 			)
 
@@ -491,7 +493,7 @@ public struct TransactionReview: Sendable, FeatureReducer {
 			}
 
 			if reviewedTransaction.transactionSigners.notaryIsSignatory {
-				let notaryKey: SLIP10.PrivateKey = .curve25519(state.ephemeralNotaryPrivateKey)
+				let notaryKey = state.ephemeralNotaryPrivateKey
 
 				/// Silently sign the transaction with notary keys.
 				return .run { send in
@@ -660,7 +662,7 @@ extension TransactionReview {
 			return .none
 		}
 		guard let networkID = state.networkID else {
-			"Bad implementation, expected `networkID`"
+			assertionFailure("Bad implementation, expected `networkID`")
 			return .none
 		}
 
@@ -676,35 +678,10 @@ extension TransactionReview {
 		}
 	}
 
-	public func addingGuarantees(
-		to manifest: TransactionManifest,
-		guarantees: [TransactionClient.Guarantee]
-	) throws -> TransactionManifest {
-		guard !guarantees.isEmpty else { return manifest }
-
-		var manifest = manifest
-
-		/// Will be increased with each added guarantee to account for the difference in indexes from the initial manifest.
-		var indexInc = 1 // LockFee was added, start from 1
-		for guarantee in guarantees {
-			let decimalplaces = guarantee.resourceDivisibility.map(UInt.init) ?? RETDecimal.maxDivisibility
-			let guaranteeInstruction: Instruction = try .assertWorktopContains(
-				resourceAddress: guarantee.resourceAddress.intoEngine(),
-				amount: guarantee.amount.rounded(decimalPlaces: decimalplaces)
-			)
-
-			manifest = try manifest.withInstructionAdded(guaranteeInstruction, at: Int(guarantee.instructionIndex) + indexInc)
-
-			indexInc += 1
-		}
-		return manifest
-	}
-
 	func showRawTransaction(_ state: inout State) -> Effect<Action> {
 		do {
 			let manifest = try transactionManifestWithWalletInstructionsAdded(state)
-			let rawTransaction = try manifest.instructions().asStr()
-			state.displayMode = .raw(rawTransaction)
+			state.displayMode = .raw(manifest.instructionsString)
 		} catch {
 			errorQueue.schedule(error)
 		}
@@ -719,22 +696,13 @@ extension TransactionReview {
 
 		var manifest = reviewedTransaction.transactionManifest
 		if case let .success(feePayerAccount) = reviewedTransaction.feePayer.unwrap()?.account {
-			do {
-				manifest = try reviewedTransaction.transactionManifest.withLockFeeCallMethodAdded(
-					address: feePayerAccount.address.asGeneral,
-					fee: reviewedTransaction.transactionFee.totalFee.lockFee
-				)
-			} catch {
-				loggerGlobal.error("Failed to add lock fee, error: \(error)")
-				throw FailedToAddLockFee(underlyingError: error)
-			}
+			manifest = reviewedTransaction.transactionManifest.modify(
+				lockFee: reviewedTransaction.transactionFee.totalFee.lockFee,
+				addressOfFeePayer: feePayerAccount.address
+			)
 		}
-		do {
-			return try addingGuarantees(to: manifest, guarantees: state.allGuarantees)
-		} catch {
-			loggerGlobal.error("Failed to add guarantee, error: \(error)")
-			throw FailedToAddGuarantee(underlyingError: error)
-		}
+
+		return manifest.modify(addGuarantees: state.allGuarantees)
 	}
 
 	func determineFeePayer(_ state: State, reviewedTransaction: ReviewedTransaction) -> Effect<Action> {
@@ -805,17 +773,6 @@ extension TransactionReview {
 	}
 }
 
-extension ResourceOrNonFungible {
-	func resourceAddress() throws -> ResourceAddress {
-		switch self {
-		case let .resource(address):
-			try address.asSpecific()
-		case let .nonFungible(globalID):
-			try globalID.resourceAddress().asSpecific()
-		}
-	}
-}
-
 // MARK: Useful types
 
 extension TransactionReview {
@@ -829,8 +786,8 @@ extension TransactionReview {
 		public let metadata: OnLedgerEntity.Metadata
 	}
 
-	public enum Account: Sendable, Hashable {
-		case user(Profile.Network.Account)
+	public enum ReviewAccount: Sendable, Hashable {
+		case user(Account)
 		case external(AccountAddress, approved: Bool)
 
 		var address: AccountAddress {
@@ -855,7 +812,7 @@ extension TransactionReview {
 
 extension ResourceBalance {
 	/// The guarantee, for a fungible resource
-	public var fungibleGuarantee: TransactionClient.Guarantee? {
+	public var fungibleGuarantee: TransactionGuarantee? {
 		get {
 			switch details {
 			case let .fungible(fungible):
@@ -886,7 +843,7 @@ extension ResourceBalance {
 	}
 
 	/// The transferred amount, for a fungible resource
-	public var fungibleTransferAmount: RETDecimal? {
+	public var fungibleTransferAmount: Decimal192? {
 		switch details {
 		case let .fungible(fungible):
 			fungible.amount.nominalAmount
@@ -901,11 +858,14 @@ extension ResourceBalance {
 }
 
 extension TransactionReview.State {
-	public var allGuarantees: [TransactionClient.Guarantee] {
+	public var allGuarantees: [TransactionGuarantee] {
 		deposits?.accounts.flatMap { $0.transfers.compactMap(\.fungibleGuarantee) } ?? []
 	}
 
-	public mutating func applyGuarantee(_ updated: TransactionClient.Guarantee, transferID: TransactionReview.Transfer.ID) {
+	public mutating func applyGuarantee(
+		_ updated: TransactionGuarantee,
+		transferID: TransactionReview.Transfer.ID
+	) {
 		guard let accountID = accountID(for: transferID) else { return }
 		deposits?.accounts[id: accountID]?.transfers[id: transferID]?.fungibleGuarantee = updated
 	}
@@ -924,12 +884,12 @@ extension TransactionReview.State {
 
 // MARK: Helpers
 
-extension [TransactionReview.Account] {
+extension [TransactionReview.ReviewAccount] {
 	struct MissingUserAccountError: Error {}
 
-	func account(for componentAddress: ComponentAddress) throws -> TransactionReview.Account {
-		guard let account = first(where: { $0.address.address == componentAddress.address }) else {
-			loggerGlobal.error("Can't find component address that was specified for transfer")
+	func account(for accountAddress: AccountAddress) throws -> TransactionReview.ReviewAccount {
+		guard let account = first(where: { $0.address == accountAddress }) else {
+			loggerGlobal.error("Can't find address that was specified for transfer")
 			throw MissingUserAccountError()
 		}
 
@@ -991,7 +951,7 @@ public struct ReviewedTransaction: Hashable, Sendable {
 	var transactionSigners: TransactionSigners
 	var signingFactors: SigningFactors
 
-	let accountWithdraws: [String: [ResourceIndicator]]
+	let accountWithdraws: [AccountAddress: [ResourceIndicator]]
 	let isNonConforming: Bool
 }
 
@@ -1006,16 +966,16 @@ extension ReviewedTransaction {
 	var feePayingValidation: Loadable<FeeValidationOutcome> {
 		feePayer.map { selected in
 			guard let feePayer = selected,
-			      let feePayerWithdraws = accountWithdraws[feePayer.account.address.address]
+			      let feePayerWithdraws = accountWithdraws[feePayer.account.address]
 			else {
 				return selected.validateBalance(forFee: transactionFee)
 			}
 
-			let xrdAddress = knownAddresses(networkId: networkID.rawValue).resourceAddresses.xrd
+			let xrdAddress = ResourceAddress.xrd(on: networkID)
 
-			let xrdTotalTransfer: RETDecimal = feePayerWithdraws.reduce(.zero) { partialResult, resource in
+			let xrdTotalTransfer: Decimal192 = feePayerWithdraws.reduce(.zero) { partialResult, resource in
 				if case let .fungible(resourceAddress, indicator) = resource, resourceAddress == xrdAddress {
-					return (try? partialResult.add(other: indicator.amount)) ?? partialResult
+					return partialResult + indicator.amount
 				}
 				return partialResult
 			}
@@ -1074,7 +1034,7 @@ func printSigners(_ reviewedTransaction: ReviewedTransaction) {
 
 #if DEBUG
 extension TransactionSigners {
-	func intentSignerEntitiesNonEmptyOrNil() -> NonEmpty<OrderedSet<EntityPotentiallyVirtual>>? {
+	func intentSignerEntitiesNonEmptyOrNil() -> NonEmpty<OrderedSet<AccountOrPersona>>? {
 		switch intentSigning {
 		case let .intentSigners(signers) where !signers.isEmpty:
 			NonEmpty(rawValue: OrderedSet(signers))

@@ -45,7 +45,7 @@ public struct SmallAccountCard<Accessory: View>: View {
 }
 
 extension SmallAccountCard where Accessory == EmptyView {
-	public init(account: Profile.Network.Account) {
+	public init(account: Account) {
 		self.init(
 			account.displayName.rawValue,
 			identifiable: .address(of: account),

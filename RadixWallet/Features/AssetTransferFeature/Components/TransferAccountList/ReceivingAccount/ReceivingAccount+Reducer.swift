@@ -1,32 +1,29 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ReceivingAccount
 public struct ReceivingAccount: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
-		public typealias OwnedAccount = Profile.Network.Account
-		public typealias Account = Either<OwnedAccount, AccountAddress>
-
 		public typealias ID = UUID
 		public let id = ID()
 
-		// Either user owned account, or foreign account Address
-		public var account: Account?
+		public var recipient: AccountOrAddressOf?
 		public var assets: IdentifiedArrayOf<ResourceAsset.State>
 		public var canBeRemoved: Bool
 
 		public init(
-			account: Account?,
+			recipient: AccountOrAddressOf?,
 			assets: IdentifiedArrayOf<ResourceAsset.State>,
 			canBeRemovedWhenEmpty: Bool
 		) {
-			self.account = account
+			self.recipient = recipient
 			self.assets = assets
 			self.canBeRemoved = canBeRemovedWhenEmpty
 		}
 
 		public static func empty(canBeRemovedWhenEmpty: Bool) -> Self {
-			.init(account: nil, assets: [], canBeRemovedWhenEmpty: canBeRemovedWhenEmpty)
+			.init(recipient: nil, assets: [], canBeRemovedWhenEmpty: canBeRemovedWhenEmpty)
 		}
 	}
 
@@ -76,64 +73,40 @@ public struct ReceivingAccount: Sendable, FeatureReducer {
 	}
 }
 
-extension ReceivingAccount.State.Account {
+extension AccountOrAddressOf {
 	var name: String {
 		switch self {
-		case let .left(account):
-			account.displayName.rawValue
-		case .right:
+		case let .profileAccount(account):
+			account.displayName.value
+		case .addressOfExternalAccount:
 			L10n.Common.account
 		}
 	}
 
 	var identifer: LedgerIdentifiable {
 		switch self {
-		case let .left(account):
-			.address(of: account)
-		case let .right(address):
+		case let .profileAccount(value: account):
+			.address(.account(account.address))
+		case let .addressOfExternalAccount(address):
 			.address(.account(address))
 		}
 	}
 
 	var gradient: Gradient {
 		switch self {
-		case let .left(account):
+		case let .profileAccount(value: account):
 			.init(account.appearanceID)
-		case .right:
+		case .addressOfExternalAccount:
 			.init(colors: [.app.gray2])
 		}
 	}
 
-	var address: AccountAddress {
-		switch self {
-		case let .left(account):
-			account.address
-		case let .right(address):
-			address
-		}
-	}
-
 	var isUserAccount: Bool {
-		guard case .left = self else {
+		guard case .profileAccount = self else {
 			return false
 		}
 
 		return true
-	}
-
-	var isLedgerAccount: Bool {
-		guard case let .left(account) = self else {
-			return false
-		}
-
-		return account.isLedgerAccount
-	}
-}
-
-// MARK: - ReceivingAccount.State.Account + Identifiable
-extension ReceivingAccount.State.Account: Identifiable {
-	public var id: AccountAddress {
-		address
 	}
 }
 

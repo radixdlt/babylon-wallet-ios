@@ -8,7 +8,7 @@ extension TransactionReview {
 
 	public struct DepositExceptionsChange: Sendable, Identifiable, Hashable {
 		public var id: AccountAddress.ID { account.address.id }
-		public let account: Profile.Network.Account
+		public let account: Account
 		public let resourcePreferenceChanges: IdentifiedArrayOf<ResourcePreferenceChange>
 		public let allowedDepositorChanges: IdentifiedArrayOf<AllowedDepositorChange>
 
@@ -149,7 +149,7 @@ struct ResourceIconNameView: View {
 
 	var body: some View {
 		HStack(spacing: .small1) {
-			if case .globalNonFungibleResourceManager = resource.resourceAddress.decodedKind {
+			if resource.resourceAddress.isNonFungible {
 				Thumbnail(.nft, url: resource.metadata.iconURL)
 			} else {
 				Thumbnail(token: .other(resource.metadata.iconURL))

@@ -2,18 +2,21 @@ import Foundation
 
 // MARK: - Definition
 extension AccountPortfoliosClient {
-	public struct AccountPortfolio: Sendable, Hashable {
-		public var account: OnLedgerEntity.Account
+	public struct AccountPortfolio: Sendable, Hashable, CustomDebugStringConvertible {
+		public var account: OnLedgerEntity.OnLedgerAccount
 		public var poolUnitDetails: Loadable<[OnLedgerEntitiesClient.OwnedResourcePoolDetails]> = .idle
 		public var stakeUnitDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>> = .idle
 
 		var isCurrencyAmountVisible: Bool = true
 		var fiatCurrency: FiatCurrency = .usd
+		public var debugDescription: String {
+			account.debugDescription
+		}
 	}
 
 	/// Internal state that holds all loaded portfolios.
 	actor State {
-		typealias TokenPrices = [ResourceAddress: RETDecimal]
+		typealias TokenPrices = [ResourceAddress: Decimal192]
 		let portfoliosSubject: AsyncCurrentValueSubject<Loadable<[AccountAddress: AccountPortfolio]>> = .init(.loading)
 		var tokenPrices: TokenPrices = [:]
 
@@ -22,13 +25,13 @@ extension AccountPortfoliosClient {
 
 		// Useful for DEBUG mode, when we want to display proper resources fiat worth on mainnet
 		// but use random prices on testnets; as one resources from mainnet have prices.
-		var gateway: Radix.Gateway = .mainnet
+		var gateway: Gateway = .mainnet
 	}
 }
 
 // MARK: - Portfolio Setters/Getters
 extension AccountPortfoliosClient.State {
-	func setRadixGateway(_ gateway: Radix.Gateway) {
+	func setRadixGateway(_ gateway: Gateway) {
 		self.gateway = gateway
 	}
 
@@ -124,12 +127,12 @@ extension AccountPortfoliosClient.State {
 
 // MARK: - Stake and Pool details handling
 extension AccountPortfoliosClient.State {
-	func calculateWorth(_ gateway: Radix.Gateway) -> (ResourceAddress, ResourceAmount) -> FiatWorth? {
+	func calculateWorth(_ gateway: Gateway) -> (ResourceAddress, ResourceAmount) -> FiatWorth? {
 		{ resourceAddress, amount in
 			let price = {
 				#if DEBUG
 				if gateway != .mainnet {
-					if resourceAddress == .mainnetXRDAddress {
+					if resourceAddress == .mainnetXRD {
 						return self.tokenPrices[resourceAddress]
 					} else {
 						return self.tokenPrices.values.randomElement()
@@ -198,7 +201,7 @@ private extension AccountPortfoliosClient.AccountPortfolio {
 private extension OnLedgerEntity.OwnedFungibleResources {
 	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
 		xrdResource.mutate { resource in
-			resource.amount.fiatWorth = change(.mainnetXRDAddress, resource.amount)
+			resource.amount.fiatWorth = change(.mainnetXRD, resource.amount)
 		}
 
 		nonXrdResources.mutateAll { resource in
@@ -213,7 +216,7 @@ private extension MutableCollection where Element == OnLedgerEntitiesClient.Owne
 	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
 		mutateAll { detail in
 			detail.xrdResource?.redemptionValue.mutate { amount in
-				amount.fiatWorth = change(.mainnetXRDAddress, amount)
+				amount.fiatWorth = change(.mainnetXRD, amount)
 			}
 
 			detail.nonXrdResources.mutateAll { resource in
@@ -230,11 +233,11 @@ private extension MutableCollection where Element == OnLedgerEntitiesClient.Owne
 	mutating func updateFiatWorth(_ change: (ResourceAddress, ResourceAmount) -> FiatWorth?) {
 		mutateAll { detail in
 			detail.stakeUnitResource.mutate {
-				$0.amount.fiatWorth = change(.mainnetXRDAddress, $0.amount)
+				$0.amount.fiatWorth = change(.mainnetXRD, $0.amount)
 			}
 			detail.stakeClaimTokens.mutate {
 				$0.stakeClaims.mutateAll { token in
-					token.claimAmount.fiatWorth = change(.mainnetXRDAddress, token.claimAmount)
+					token.claimAmount.fiatWorth = change(.mainnetXRD, token.claimAmount)
 				}
 			}
 		}

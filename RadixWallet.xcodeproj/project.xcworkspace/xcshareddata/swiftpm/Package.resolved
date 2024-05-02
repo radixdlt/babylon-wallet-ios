@@ -1,5 +1,5 @@
 {
-  "originHash" : "3313f884630244f405efa4cdbbcb2486d097b16289931114ea3c6826384f24b9",
+  "originHash" : "3cdd7744e36817138fd8635ea3d7c4a20d0a97dcdf4565a3b4b324eff4eb80ff",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -83,15 +83,6 @@
       }
     },
     {
-      "identity" : "k1",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Sajjon/K1",
-      "state" : {
-        "revision" : "9e6c2716b2e6b306d38ca5ec85ff6c16ea148ad1",
-        "version" : "0.3.8"
-      }
-    },
-    {
       "identity" : "keychainaccess",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kishikawakatsumi/KeychainAccess",
@@ -116,6 +107,15 @@
       "state" : {
         "revision" : "33f7e93be5d4ec027d42af77a8ec4680d1862ad2",
         "version" : "11.6.4"
+      }
+    },
+    {
+      "identity" : "sargon",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/radixdlt/sargon",
+      "state" : {
+        "revision" : "4846abf2c5ca290285f222014f6aafbd120c8a83",
+        "version" : "0.6.54"
       }
     },
     {
@@ -186,8 +186,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-collections.git",
       "state" : {
-        "branch" : "main",
-        "revision" : "b2c7faa198164f3d928b1ceec9ce373e22febb96"
+        "revision" : "94cf62b3ba8d4bed62680a282d4c25f9c63c2efb",
+        "version" : "1.1.0"
       }
     },
     {
@@ -242,15 +242,6 @@
       "state" : {
         "branch" : "main",
         "revision" : "db33f4084304e2ef47c8b4d2949f0eb286f95b90"
-      }
-    },
-    {
-      "identity" : "swift-engine-toolkit",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/radixdlt/swift-engine-toolkit",
-      "state" : {
-        "branch" : "1.0.12_update",
-        "revision" : "4cf2edc92a430d4f59547d405e4c2c4bc5c912fe"
       }
     },
     {
@@ -389,6 +380,15 @@
       }
     },
     {
+      "identity" : "swiftyjson",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwiftyJSON/SwiftyJSON",
+      "state" : {
+        "revision" : "af76cf3ef710b6ca5f8c05f3a31307d44a3c5828",
+        "version" : "5.0.2"
+      }
+    },
+    {
       "identity" : "textbuilder",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/davdroman/TextBuilder",
@@ -425,5 +425,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

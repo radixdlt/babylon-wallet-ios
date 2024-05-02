@@ -1,6 +1,7 @@
 // MARK: - SecondaryRectangularButtonStyle
 public struct SecondaryRectangularButtonStyle: ButtonStyle {
 	@Environment(\.controlState) var controlState
+	let backgroundColor: Color
 	let shouldExpand: Bool
 	let isDestructive: Bool
 	let isInToolbar: Bool
@@ -19,7 +20,7 @@ public struct SecondaryRectangularButtonStyle: ButtonStyle {
 			.frame(height: isInToolbar ? .toolbarButtonHeight : .standardButtonHeight)
 			.frame(maxWidth: shouldExpand ? .infinity : nil)
 			.padding(.horizontal, isInToolbar ? .small1 : .medium1)
-			.background(.app.gray4)
+			.background(backgroundColor)
 			.cornerRadius(isInToolbar ? .small3 : .small2)
 			.brightness(configuration.isPressed ? -0.1 : 0)
 
@@ -52,6 +53,7 @@ extension ButtonStyle where Self == SecondaryRectangularButtonStyle {
 	public static var secondaryRectangular: Self { .secondaryRectangular() }
 
 	public static func secondaryRectangular(
+		backgroundColor: Color = .app.gray4,
 		shouldExpand: Bool = false,
 		isDestructive: Bool = false,
 		isInToolbar: Bool = false,
@@ -59,6 +61,7 @@ extension ButtonStyle where Self == SecondaryRectangularButtonStyle {
 		trailingImage: Image? = nil
 	) -> Self {
 		Self(
+			backgroundColor: backgroundColor,
 			shouldExpand: shouldExpand,
 			isDestructive: isDestructive,
 			isInToolbar: isInToolbar,

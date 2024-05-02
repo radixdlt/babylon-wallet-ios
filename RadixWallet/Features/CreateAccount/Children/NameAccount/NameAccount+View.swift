@@ -29,7 +29,7 @@ extension NameAccount {
 			self.useLedgerAsFactorSource = state.useLedgerAsFactorSource
 			self.entityName = state.inputtedName
 			if let sanitizedName = state.sanitizedName {
-				if sanitizedName.count > Profile.Network.Account.nameMaxLength {
+				if sanitizedName.count > Account.nameMaxLength {
 					self.sanitizedNameRequirement = nil
 					self.hint = .error(L10n.Error.AccountLabel.tooLong)
 				} else {
@@ -129,19 +129,3 @@ extension NameAccount.View {
 		)
 	}
 }
-
-// #if DEBUG
-// import SwiftUI
-import ComposableArchitecture //
-
-// struct NameAccount_Previews: PreviewProvider {
-//	static var previews: some View {
-//		NameAccount.View(
-//			store: .init(
-//				initialState: .init(isFirst: true),
-//				reducer: NameNewEntity.init
-//			)
-//		)
-//	}
-// }
-// #endif

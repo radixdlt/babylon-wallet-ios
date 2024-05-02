@@ -2,13 +2,13 @@
 
 public struct SelectInactiveAccountsToAdd: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let active: IdentifiedArrayOf<Profile.Network.Account>
-		public let inactive: IdentifiedArrayOf<Profile.Network.Account>
-		public var selectedInactive: IdentifiedArrayOf<Profile.Network.Account> = []
+		public let active: IdentifiedArrayOf<Account>
+		public let inactive: IdentifiedArrayOf<Account>
+		public var selectedInactive: IdentifiedArrayOf<Account> = []
 
 		public init(
-			active: IdentifiedArrayOf<Profile.Network.Account>,
-			inactive: IdentifiedArrayOf<Profile.Network.Account>
+			active: IdentifiedArrayOf<Account>,
+			inactive: IdentifiedArrayOf<Account>
 		) {
 			self.active = active
 			self.inactive = inactive
@@ -24,8 +24,8 @@ public struct SelectInactiveAccountsToAdd: Sendable, FeatureReducer {
 	public enum DelegateAction: Sendable, Equatable {
 		case goBack
 		case finished(
-			selectedInactive: IdentifiedArrayOf<Profile.Network.Account>,
-			active: IdentifiedArrayOf<Profile.Network.Account>
+			selectedInactive: IdentifiedArrayOf<Account>,
+			active: IdentifiedArrayOf<Account>
 		)
 	}
 

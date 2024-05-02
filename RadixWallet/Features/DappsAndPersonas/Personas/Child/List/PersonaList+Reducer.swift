@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - PersonaList
@@ -8,11 +9,11 @@ public struct PersonaList: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 
 	public struct State: Sendable, Hashable {
-		public var personas: IdentifiedArrayOf<Persona.State>
+		public var personas: IdentifiedArrayOf<PersonaFeature.State>
 		public let strategy: ReloadingStrategy
 
 		public init(
-			personas: IdentifiedArrayOf<Persona.State> = [],
+			personas: IdentifiedArrayOf<PersonaFeature.State> = [],
 			strategy: ReloadingStrategy = .all
 		) {
 			self.personas = personas
@@ -20,18 +21,18 @@ public struct PersonaList: Sendable, FeatureReducer {
 		}
 
 		public init(
-			dApp: Profile.Network.AuthorizedDappDetailed
+			dApp: AuthorizedDappDetailed
 		) {
 			self.init(
-				personas: dApp.detailedAuthorizedPersonas.map(Persona.State.init).asIdentified(),
+				personas: dApp.detailedAuthorizedPersonas.map(PersonaFeature.State.init).asIdentified(),
 				strategy: .dApp(dApp.dAppDefinitionAddress)
 			)
 		}
 
 		public enum ReloadingStrategy: Sendable, Hashable {
 			case all
-			case ids(OrderedSet<Profile.Network.Persona.ID>)
-			case dApp(Profile.Network.AuthorizedDapp.ID)
+			case ids(OrderedSet<Persona.ID>)
+			case dApp(AuthorizedDapp.ID)
 		}
 	}
 
@@ -41,17 +42,17 @@ public struct PersonaList: Sendable, FeatureReducer {
 	}
 
 	public enum ChildAction: Sendable, Equatable {
-		case persona(id: Profile.Network.Persona.ID, action: Persona.Action)
+		case persona(id: Persona.ID, action: PersonaFeature.Action)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case createNewPersona
-		case openDetails(Profile.Network.Persona)
-		case exportMnemonic(Profile.Network.Persona)
+		case openDetails(Persona)
+		case exportMnemonic(Persona)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case personasLoaded(IdentifiedArrayOf<Persona.State>)
+		case personasLoaded(IdentifiedArrayOf<PersonaFeature.State>)
 	}
 
 	public init() {}
@@ -59,7 +60,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 	public var body: some ReducerOf<Self> {
 		Reduce(core)
 			.forEach(\.personas, action: /Action.child .. ChildAction.persona) {
-				Persona()
+				PersonaFeature()
 			}
 	}
 
@@ -69,8 +70,8 @@ public struct PersonaList: Sendable, FeatureReducer {
 			.run { [strategy = state.strategy] send in
 				for try await personas in await personasClient.personas() {
 					guard !Task.isCancelled else { return }
-					let ids = try await personaIDs(strategy) ?? personas.ids
-					let result = ids.compactMap { personas[id: $0] }.map(Persona.State.init)
+					let ids = try await personaIDs(strategy) ?? OrderedSet(validating: personas.ids)
+					let result = ids.compactMap { personas[id: $0] }.map(PersonaFeature.State.init)
 					guard result.count == ids.count else {
 						throw UpdatePersonaError.personasMissingFromClient(ids.subtracting(result.map(\.id)))
 					}
@@ -87,11 +88,11 @@ public struct PersonaList: Sendable, FeatureReducer {
 	}
 
 	enum UpdatePersonaError: Error {
-		case personasMissingFromClient(OrderedSet<Profile.Network.Persona.ID>)
+		case personasMissingFromClient(OrderedSet<Persona.ID>)
 	}
 
 	/// Returns the ids of personas to include under the given strategy. nil means that all ids should be included
-	private func personaIDs(_ strategy: State.ReloadingStrategy) async throws -> OrderedSet<Profile.Network.Persona.ID>? {
+	private func personaIDs(_ strategy: State.ReloadingStrategy) async throws -> OrderedSet<Persona.ID>? {
 		switch strategy {
 		case .all:
 			return nil
@@ -99,7 +100,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 			return ids
 		case let .dApp(dAppID):
 			guard let dApp = try? await authorizedDappsClient.getDetailedDapp(dAppID) else { return [] }
-			return dApp.detailedAuthorizedPersonas.ids
+			return OrderedSet(dApp.detailedAuthorizedPersonas.ids)
 		}
 	}
 

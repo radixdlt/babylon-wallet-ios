@@ -27,7 +27,7 @@ extension AccountPortfoliosClient: DependencyKey {
 
 		/// Fetches the pool and stake units details for a given account; Will update the portfolio accordingly
 		@Sendable
-		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.Account, cachingStrategy: OnLedgerEntitiesClient.CachingStrategy) async {
+		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.OnLedgerAccount, cachingStrategy: OnLedgerEntitiesClient.CachingStrategy) async {
 			async let poolDetailsFetch = Task {
 				do {
 					let poolUnitDetails = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account, cachingStrategy: cachingStrategy)
@@ -66,12 +66,15 @@ extension AccountPortfoliosClient: DependencyKey {
 		}
 
 		@Sendable
-		func fetchAccountPortfolios(_ accountAddresses: [AccountAddress], _ forceRefresh: Bool) async throws -> [AccountPortfolio] {
+		func fetchAccountPortfolios(
+			_ accountAddresses: [AccountAddress],
+			_ forceRefresh: Bool
+		) async throws -> [AccountPortfolio] {
 			let gateway = await gatewaysClient.getCurrentGateway()
 			await state.setRadixGateway(gateway)
 			if forceRefresh {
 				for accountAddress in accountAddresses {
-					cacheClient.removeFolder(.onLedgerEntity(.account(accountAddress.asGeneral)))
+					cacheClient.removeFolder(.init(address: accountAddress))
 				}
 			}
 
@@ -91,12 +94,12 @@ extension AccountPortfoliosClient: DependencyKey {
 			let allResources: [ResourceAddress] = {
 				if gateway == .mainnet {
 					/// Only Mainnet resources have prices
-					return (currentAccounts + accounts).flatMap(\.resourcesWithPrices) + [.mainnetXRDAddress]
+					return (currentAccounts + accounts).flatMap(\.resourcesWithPrices) + [.mainnetXRD]
 				} else {
 					#if DEBUG
 					/// Helpful for testing on stokenet
 					return [
-						.mainnetXRDAddress,
+						.mainnetXRD,
 						try! .init(validatingAddress:
 							"resource_rdx1t4tjx4g3qzd98nayqxm7qdpj0a0u8ns6a0jrchq49dyfevgh6u0gj3"
 						),
@@ -128,9 +131,12 @@ extension AccountPortfoliosClient: DependencyKey {
 		}
 
 		@Sendable
-		func fetchAccountPortfolio(_ accountAddress: AccountAddress, _ forceRefresh: Bool) async throws -> AccountPortfolio {
+		func fetchAccountPortfolio(
+			_ accountAddress: AccountAddress,
+			_ forceRefresh: Bool
+		) async throws -> AccountPortfolio {
 			if forceRefresh {
-				cacheClient.removeFolder(.onLedgerEntity(.account(accountAddress.asGeneral)))
+				cacheClient.removeFolder(.init(address: accountAddress))
 			}
 
 			let account = try await onLedgerEntitiesClient.getAccount(accountAddress)
@@ -172,7 +178,7 @@ extension AccountPortfoliosClient: DependencyKey {
 	}()
 }
 
-extension OnLedgerEntity.Account {
+extension OnLedgerEntity.OnLedgerAccount {
 	/// The resources which can have prices
 	fileprivate var resourcesWithPrices: [ResourceAddress] {
 		allFungibleResourceAddresses + poolUnitResources.poolUnits.flatMap(\.poolResources)

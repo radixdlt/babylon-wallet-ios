@@ -47,7 +47,7 @@ extension SubmitTransaction.State.TXStatus {
 // MARK: - SubmitTransaction.View
 extension SubmitTransaction {
 	public struct ViewState: Equatable {
-		let txID: TXID
+		let txID: IntentHash
 		let status: State.TXStatus
 		let dismissalDisabled: Bool
 	}
@@ -69,7 +69,7 @@ extension SubmitTransaction {
 				} content: {
 					VStack(spacing: .medium2) {
 						if viewStore.status.failed {
-							Image(asset: AssetResource.warningError)
+							Image(.errorLarge)
 							Text(viewStore.status.errorTitle)
 								.foregroundColor(.app.gray1)
 								.textStyle(.sheetTitle)

@@ -8,7 +8,7 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 			/// Mixture of account sets, including both:
 			/// * "Babylon accounts" (controlled by keys on `Curve25519`)
 			/// * "Olympia accounts" (controlled by keys on curve `secp256k1`)
-			case mixedCurves(FactorSourceID.FromHash)
+			case mixedCurves(FactorSourceIDFromHash)
 
 			/// Only of accounts in one of the sets:
 			/// - "Babylon accounts" (controlled by keys on `Curve25519`)
@@ -16,9 +16,9 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 			/// **OR**
 			///
 			/// - "Olympia accounts" (controlled by keys on curve `secp256k1`)
-			case singleCurve(FactorSourceID.FromHash, isOlympia: Bool)
+			case singleCurve(FactorSourceIDFromHash, isOlympia: Bool)
 
-			public var factorSourceID: FactorSourceID.FromHash {
+			public var factorSourceID: FactorSourceIDFromHash {
 				switch self {
 				case let .mixedCurves(id): id
 				case let .singleCurve(id, _): id
@@ -30,7 +30,7 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 
 		public var isMnemonicMarkedAsBackedUp: Bool
 		public var isMnemonicPresentInKeychain: Bool
-		public let accounts: IdentifiedArrayOf<Profile.Network.Account>
+		public let accounts: IdentifiedArrayOf<Account>
 		public let hasHiddenAccounts: Bool
 		public var mode: Mode
 
@@ -44,7 +44,7 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 			id: ID,
 			isMnemonicMarkedAsBackedUp: Bool,
 			isMnemonicPresentInKeychain: Bool,
-			accounts: IdentifiedArrayOf<Profile.Network.Account>,
+			accounts: IdentifiedArrayOf<Account>,
 			hasHiddenAccounts: Bool,
 			mode: Mode
 		) {

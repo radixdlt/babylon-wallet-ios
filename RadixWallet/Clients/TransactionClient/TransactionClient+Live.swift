@@ -1,24 +1,24 @@
 // MARK: - MyEntitiesInvolvedInTransaction
 public struct MyEntitiesInvolvedInTransaction: Sendable, Hashable {
 	/// A set of all MY personas or accounts in the manifest which had methods invoked on them that would typically require auth (or a signature) to be called successfully.
-	public var entitiesRequiringAuth: OrderedSet<EntityPotentiallyVirtual> {
+	public var entitiesRequiringAuth: OrderedSet<AccountOrPersona> {
 		OrderedSet(accountsRequiringAuth.map { .account($0) } + identitiesRequiringAuth.map { .persona($0) })
 	}
 
-	public let identitiesRequiringAuth: OrderedSet<Profile.Network.Persona>
-	public let accountsRequiringAuth: OrderedSet<Profile.Network.Account>
+	public let identitiesRequiringAuth: OrderedSet<Persona>
+	public let accountsRequiringAuth: OrderedSet<Account>
 
 	/// A set of all MY accounts in the manifest which were deposited into. This is a subset of the addresses seen in `accountsRequiringAuth`.
-	public let accountsWithdrawnFrom: OrderedSet<Profile.Network.Account>
+	public let accountsWithdrawnFrom: OrderedSet<Account>
 
 	/// A set of all MY accounts in the manifest which were withdrawn from. This is a subset of the addresses seen in `accountAddresses`
-	public let accountsDepositedInto: OrderedSet<Profile.Network.Account>
+	public let accountsDepositedInto: OrderedSet<Account>
 
 	public init(
-		identitiesRequiringAuth: OrderedSet<Profile.Network.Persona>,
-		accountsRequiringAuth: OrderedSet<Profile.Network.Account>,
-		accountsWithdrawnFrom: OrderedSet<Profile.Network.Account>,
-		accountsDepositedInto: OrderedSet<Profile.Network.Account>
+		identitiesRequiringAuth: OrderedSet<Persona>,
+		accountsRequiringAuth: OrderedSet<Account>,
+		accountsWithdrawnFrom: OrderedSet<Account>,
+		accountsDepositedInto: OrderedSet<Account>
 	) {
 		self.identitiesRequiringAuth = identitiesRequiringAuth
 		self.accountsRequiringAuth = accountsRequiringAuth
@@ -47,26 +47,26 @@ extension TransactionClient {
 		) async throws -> MyEntitiesInvolvedInTransaction {
 			let allAccounts = try await accountsClient.getAccountsOnNetwork(networkID)
 
-			func accountFromComponentAddress(_ accountAddress: AccountAddress) -> Profile.Network.Account? {
+			func accountFromComponentAddress(_ accountAddress: AccountAddress) -> Account? {
 				allAccounts.first { $0.address == accountAddress }
 			}
-			func identityFromComponentAddress(_ identityAddress: IdentityAddress) async throws -> Profile.Network.Persona {
+			func identityFromComponentAddress(_ identityAddress: IdentityAddress) async throws -> Persona {
 				try await personasClient.getPersona(id: identityAddress)
 			}
-			func mapAccount(_ addresses: [EngineToolkit.Address]) throws -> OrderedSet<Profile.Network.Account> {
-				try .init(validating: addresses.asSpecific().compactMap(accountFromComponentAddress))
+			func mapAccount(_ addresses: [AccountAddress]) throws -> OrderedSet<Account> {
+				try .init(validating: addresses.compactMap(accountFromComponentAddress))
 			}
-			func mapIdentity(_ addresses: [EngineToolkit.Address]) async throws -> OrderedSet<Profile.Network.Persona> {
-				try await .init(validating: addresses.asSpecific().asyncMap(identityFromComponentAddress))
+			func mapIdentity(_ addresses: [IdentityAddress]) async throws -> OrderedSet<Persona> {
+				try await .init(validating: addresses.asyncMap(identityFromComponentAddress))
 			}
 
-			let summary = manifest.summary(networkId: networkID.rawValue)
+			let summary = manifest.summary
 
 			return try await MyEntitiesInvolvedInTransaction(
-				identitiesRequiringAuth: mapIdentity(summary.identitiesRequiringAuth),
-				accountsRequiringAuth: mapAccount(summary.accountsRequiringAuth),
-				accountsWithdrawnFrom: mapAccount(summary.accountsWithdrawnFrom),
-				accountsDepositedInto: mapAccount(summary.accountsDepositedInto)
+				identitiesRequiringAuth: mapIdentity(summary.addressesOfPersonasRequiringAuth),
+				accountsRequiringAuth: mapAccount(summary.addressesOfAccountsRequiringAuth),
+				accountsWithdrawnFrom: mapAccount(summary.addressesOfAccountsWithdrawnFrom),
+				accountsDepositedInto: mapAccount(summary.addressesOfAccountsDepositedInto)
 			)
 		}
 
@@ -120,38 +120,36 @@ extension TransactionClient {
 			let epoch = try await gatewayAPIClient.getEpoch()
 
 			let header = TransactionHeader(
-				networkId: request.networkID.rawValue,
-				startEpochInclusive: epoch.rawValue,
-				endEpochExclusive: (epoch + request.makeTransactionHeaderInput.epochWindow).rawValue,
-				nonce: request.nonce.rawValue,
-				notaryPublicKey: SLIP10.PublicKey.eddsaEd25519(request.transactionSigners.notaryPublicKey).intoEngine(),
+				networkId: request.networkID,
+				startEpochInclusive: epoch,
+				endEpochExclusive: epoch + request.makeTransactionHeaderInput.epochWindow,
+				nonce: request.nonce,
+				notaryPublicKey: Sargon.PublicKey.ed25519(request.transactionSigners.notaryPublicKey.intoSargon()),
 				notaryIsSignatory: request.transactionSigners.notaryIsSignatory,
 				tipPercentage: request.makeTransactionHeaderInput.tipPercentage
 			)
 
-			return .init(header: header, manifest: request.manifest, message: request.message)
+			return .init(header: header, manifest: request.manifest, message: request.message ?? Message.none)
 		}
 
 		let notarizeTransaction: NotarizeTransaction = { request in
 			let signedTransactionIntent = SignedIntent(
 				intent: request.transactionIntent,
-				intentSignatures: Array(request.intentSignatures)
+				intentSignatures: IntentSignatures(signatures: Array(request.intentSignatures.map { IntentSignature(signatureWithPublicKey: $0) }))
 			)
 
-			let signedIntentHash = try signedTransactionIntent.signedIntentHash()
+			let signedIntentHash = signedTransactionIntent.hash()
 
-			let notarySignature = try request.notary.sign(
-				hashOfMessage: signedIntentHash.bytes().data
-			)
+			let notarySignature = try request.notary.signature(for: signedIntentHash.hash.data)
 
 			let uncompiledNotarized = try NotarizedTransaction(
 				signedIntent: signedTransactionIntent,
-				notarySignature: notarySignature.intoEngine().signature
+				notarySignature: NotarySignature(signature: .ed25519(value: .init(bytes: .init(bytes: notarySignature))))
 			)
 
-			let compiledNotarizedTXIntent = try uncompiledNotarized.compile()
+			let compiledNotarizedTXIntent = uncompiledNotarized.compile()
 
-			let txID = try request.transactionIntent.intentHash()
+			let txID = request.transactionIntent.hash()
 
 			return .init(
 				notarized: compiledNotarizedTXIntent,
@@ -186,7 +184,9 @@ extension TransactionClient {
 			let receiptBytes = try Data(hex: transactionPreviewResponse.encodedReceipt)
 
 			/// Analyze the manifest
-			let analyzedManifestToReview = try manifestToSign.executionSummary(networkId: networkID.rawValue, encodedReceipt: receiptBytes)
+			let analyzedManifestToReview = try manifestToSign.executionSummary(
+				encodedReceipt: receiptBytes
+			)
 
 			/// Transactions created outside of the Wallet are not allowed to use reserved instructions
 			if !request.isWalletTransaction, !analyzedManifestToReview.reservedInstructions.isEmpty {
@@ -195,7 +195,7 @@ extension TransactionClient {
 
 			/// Get all of the expected signing factors.
 			let signingFactors = try await {
-				if let nonEmpty = NonEmpty<Set<EntityPotentiallyVirtual>>(transactionSigners.intentSignerEntitiesOrEmpty()) {
+				if let nonEmpty = NonEmpty<Set<AccountOrPersona>>(transactionSigners.intentSignerEntitiesOrEmpty()) {
 					return try await factorSourcesClient.getSigningFactors(.init(
 						networkID: networkID,
 						signers: nonEmpty,
@@ -250,7 +250,7 @@ extension TransactionClient {
 
 			return try .init(
 				rawManifest: transactionManifest,
-				header: intent.header(),
+				header: intent.header,
 				transactionSigners: transactionSigners
 			)
 		}
@@ -304,7 +304,7 @@ extension TransactionClient {
 		let allSignerEntities = request.transactionSigners.intentSignerEntitiesOrEmpty()
 
 		func findFeePayer(
-			amongst keyPath: KeyPath<MyEntitiesInvolvedInTransaction, OrderedSet<Profile.Network.Account>>,
+			amongst keyPath: KeyPath<MyEntitiesInvolvedInTransaction, OrderedSet<Account>>,
 			includeSignaturesCost: Bool
 		) async throws -> FeePayerSelectionResult? {
 			let accountsToCheck = involvedEntities[keyPath: keyPath]

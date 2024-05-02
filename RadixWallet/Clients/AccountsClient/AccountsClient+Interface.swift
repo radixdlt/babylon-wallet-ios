@@ -1,3 +1,6 @@
+import IdentifiedCollections
+import Sargon
+
 // MARK: - AccountsClient
 public struct AccountsClient: Sendable {
 	public var getCurrentNetworkID: GetCurrentNetworkID
@@ -95,29 +98,27 @@ public struct AccountsClient: Sendable {
 }
 
 extension AccountsClient {
-	public typealias Accounts = IdentifiedArrayOf<Profile.Network.Account>
-
 	public typealias GetCurrentNetworkID = @Sendable () async -> NetworkID
 
-	public typealias NextAppearanceID = @Sendable (NetworkID?, _ offset: Int?) async -> Profile.Network.Account.AppearanceID
+	public typealias NextAppearanceID = @Sendable (NetworkID?, _ offset: Int?) async -> AppearanceID
 
 	public typealias GetAccountsOnCurrentNetwork = @Sendable () async throws -> Accounts
 	public typealias GetHiddenAccountsOnCurrentNetwork = @Sendable () async throws -> Accounts
 	public typealias GetAccountsOnNetwork = @Sendable (NetworkID) async throws -> Accounts
 
 	public typealias AccountsOnCurrentNetwork = @Sendable () async -> AnyAsyncSequence<Accounts>
-	public typealias AccountUpdates = @Sendable (AccountAddress) async -> AnyAsyncSequence<Profile.Network.Account>
+	public typealias AccountUpdates = @Sendable (AccountAddress) async -> AnyAsyncSequence<Account>
 
-	public typealias NewVirtualAccount = @Sendable (NewAccountRequest) async throws -> Profile.Network.Account
-	public typealias SaveVirtualAccounts = @Sendable ([Profile.Network.Account]) async throws -> Void
+	public typealias NewVirtualAccount = @Sendable (NewAccountRequest) async throws -> Account
+	public typealias SaveVirtualAccounts = @Sendable (Accounts) async throws -> Void
 
-	public typealias GetAccountByAddress = @Sendable (AccountAddress) async throws -> Profile.Network.Account
+	public typealias GetAccountByAddress = @Sendable (AccountAddress) async throws -> Account
 
 	public typealias HasAccountOnNetwork = @Sendable (NetworkID) async throws -> Bool
 
-	public typealias UpdateAccount = @Sendable (Profile.Network.Account) async throws -> Void
+	public typealias UpdateAccount = @Sendable (Account) async throws -> Void
 	#if DEBUG
-	public typealias DebugOnlyDeleteAccount = @Sendable (Profile.Network.Account) async throws -> Void
+	public typealias DebugOnlyDeleteAccount = @Sendable (Account) async throws -> Void
 	#endif
 }
 
@@ -135,7 +136,7 @@ public struct NewAccountRequest: Sendable, Hashable {
 
 extension AccountsClient {
 	/// Saves a virtual account into the profile.
-	public func saveVirtualAccount(_ account: Profile.Network.Account) async throws {
+	public func saveVirtualAccount(_ account: Account) async throws {
 		try await saveVirtualAccounts([account])
 	}
 }

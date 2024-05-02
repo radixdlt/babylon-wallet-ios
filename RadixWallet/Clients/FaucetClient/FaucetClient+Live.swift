@@ -23,7 +23,7 @@ extension FaucetClient: DependencyKey {
 			// will never be negative thx to `if current < last` check above.
 			let delta = current - last
 
-			guard delta.rawValue >= minimumNumberOfEpochsPassedForFaucetToBeReused else {
+			guard delta >= minimumNumberOfEpochsPassedForFaucetToBeReused else {
 				return nil /* NOT allowed to use */
 			}
 			return (epochs, current) /* is allowed to use */
@@ -47,7 +47,7 @@ extension FaucetClient: DependencyKey {
 				.init(
 					networkID: networkID,
 					manifest: manifest,
-					message: .none,
+					message: Message.none,
 					makeTransactionHeaderInput: .default,
 					transactionSigners: .init(notaryPublicKey: ephemeralNotary.publicKey, intentSigning: .notaryIsSignatory)
 				)
@@ -56,7 +56,7 @@ extension FaucetClient: DependencyKey {
 			let notarized = try await transactionClient.notarizeTransaction(.init(
 				intentSignatures: [],
 				transactionIntent: transactionIntent,
-				notary: .curve25519(ephemeralNotary)
+				notary: ephemeralNotary
 			))
 
 			let txID = notarized.txID
@@ -72,6 +72,7 @@ extension FaucetClient: DependencyKey {
 		let getFreeXRD: GetFreeXRD = { faucetRequest in
 
 			let accountAddress = faucetRequest.recipientAccountAddress
+
 			guard let epochsAndMaybeCurrent = await isAllowedToUseFaucetIfSoGetEpochs(
 				accountAddress: accountAddress
 			) else {
@@ -80,10 +81,11 @@ extension FaucetClient: DependencyKey {
 			}
 
 			let networkID = await gatewaysClient.getCurrentNetworkID()
-			let manifest = try ManifestBuilder.manifestForFaucet(
+			let networkIDOfAddress = try accountAddress.networkID
+			assert(networkIDOfAddress == networkID)
+			let manifest = try TransactionManifest.faucet(
 				includeLockFeeInstruction: true,
-				networkID: networkID,
-				componentAddress: accountAddress.asGeneral
+				addressOfReceivingAccount: accountAddress
 			)
 
 			try await signSubmitTX(manifest: manifest)
@@ -101,57 +103,9 @@ extension FaucetClient: DependencyKey {
 			// Done
 		}
 
-		#if DEBUG
-		let createFungibleToken: CreateFungibleToken = { request in
-			let networkID = await gatewaysClient.getCurrentNetworkID()
-			// TODO: Re-enable. With new manifest builder that is not easy to handle.
-			let manifest = if request.numberOfTokens == 1 {
-				try ManifestBuilder.manifestForCreateFungibleToken(
-					account: request.recipientAccountAddress,
-					networkID: networkID
-				)
-			} else {
-				try ManifestBuilder.manifestForCreateMultipleFungibleTokens(
-					account: request.recipientAccountAddress,
-					networkID: networkID
-				)
-			}
-
-			try await signSubmitTX(manifest: manifest)
-		}
-
-		let createNonFungibleToken: CreateNonFungibleToken = { _ in
-			fatalError()
-			// TODO: Re-enable. With new manifest builder that is not easy to handle.
-//			let networkID = await gatewaysClient.getCurrentNetworkID()
-//			let manifest = try {
-//				if request.numberOfTokens == 1 {
-//					return try TransactionManifest.manifestForCreateNonFungibleToken(
-//						account: request.recipientAccountAddress,
-//						network: networkID
-//					)
-//				} else {
-//					return try TransactionManifest.manifestForCreateMultipleNonFungibleTokens(
-//						account: request.recipientAccountAddress,
-//						network: networkID
-//					)
-//				}
-//			}()
-
-//			try await signSubmitTX(manifest: manifest)
-		}
-
-		return Self(
-			getFreeXRD: getFreeXRD,
-			isAllowedToUseFaucet: isAllowedToUseFaucet,
-			createFungibleToken: createFungibleToken,
-			createNonFungibleToken: createNonFungibleToken
-		)
-		#else
 		return Self(
 			getFreeXRD: getFreeXRD,
 			isAllowedToUseFaucet: isAllowedToUseFaucet
 		)
-		#endif // DEBUG
 	}()
 }

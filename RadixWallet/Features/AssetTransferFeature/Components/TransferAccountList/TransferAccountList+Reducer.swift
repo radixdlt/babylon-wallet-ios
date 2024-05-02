@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - TransferAccountList
 public struct TransferAccountList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let fromAccount: Profile.Network.Account
+		public let fromAccount: Account
 		public var receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State> {
 			didSet {
 				if receivingAccounts.count > 1, receivingAccounts[0].canBeRemoved == false {
@@ -20,12 +20,12 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destination.State?
 
-		public init(fromAccount: Profile.Network.Account, receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>) {
+		public init(fromAccount: Account, receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>) {
 			self.fromAccount = fromAccount
 			self.receivingAccounts = receivingAccounts
 		}
 
-		public init(fromAccount: Profile.Network.Account) {
+		public init(fromAccount: Account) {
 			self.init(
 				fromAccount: fromAccount,
 				receivingAccounts: [.empty(canBeRemovedWhenEmpty: false)].asIdentified()
@@ -136,8 +136,8 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		guard let id = state.destination?.id else { return .none }
 
 		switch presentedAction {
-		case let .chooseAccount(.delegate(.handleResult(account))):
-			state.receivingAccounts[id: id]?.account = account
+		case let .chooseAccount(.delegate(.handleResult(recipient))):
+			state.receivingAccounts[id: id]?.recipient = recipient
 			state.destination = nil
 			return .none
 
@@ -231,7 +231,7 @@ extension TransferAccountList {
 	}
 
 	private func navigateToChooseAccounts(_ state: inout State, id: ReceivingAccount.State.ID) -> Effect<Action> {
-		let filteredAccounts = state.receivingAccounts.compactMap(\.account?.left?.address) + [state.fromAccount.address]
+		let filteredAccounts = state.receivingAccounts.compactMap(\.recipient?.accountAddress) + [state.fromAccount.address]
 		let chooseAccount: ChooseReceivingAccount.State = .init(
 			networkID: state.fromAccount.networkID,
 			chooseAccounts: .init(
@@ -297,11 +297,16 @@ extension TransferAccountList {
 		_ receivingAccount: ReceivingAccount.State,
 		forAssets assets: IdentifiedArrayOf<ResourceAsset.State>
 	) -> Effect<Action> {
-		if case let .left(userOwnedAccount) = receivingAccount.account {
+		if case let .profileAccount(value: userOwnedAccount) = receivingAccount.recipient {
 			return .run { send in
+				@Dependency(\.accountsClient) var accountsClient
 				for asset in assets {
 					let resourceAddress = asset.resourceAddress
-					let signatureNeeded = await needsSignatureForDepositting(into: userOwnedAccount, resource: resourceAddress)
+					let signatureNeeded = await needsSignatureForDepositting(
+						into: userOwnedAccount,
+						resource: resourceAddress
+					)
+
 					await send(.internal(.updateSignatureStatus(
 						accountID: receivingAccount.id,
 						assetID: asset.id,

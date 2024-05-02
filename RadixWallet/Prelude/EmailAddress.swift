@@ -1,3 +1,6 @@
+import Foundation
+import NonEmpty
+
 // MARK: - EmailAddress
 public struct EmailAddress: Sendable, Hashable, Codable {
 	public let email: NonEmptyString

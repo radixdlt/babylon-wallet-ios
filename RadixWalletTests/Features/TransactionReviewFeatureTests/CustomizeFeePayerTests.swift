@@ -1,24 +1,23 @@
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
 
 // MARK: - CustomizeFeePayerTests
 @MainActor
 final class CustomizeFeePayerTests: TestCase {
 	func test_from_noFeePayer_toFeePayerSelected() async throws {
-		let manifestStub = try TransactionManifest(
-			instructions: .fromInstructions(
-				instructions: [],
-				networkId: NetworkID.enkinet.rawValue
-			),
-			blobs: []
-		)
+		let manifestStub = TransactionManifest.sample
+
 		let notaryKey = Curve25519.Signing.PrivateKey()
 		var transactionStub = ReviewedTransaction(
 			transactionManifest: manifestStub,
-			networkID: NetworkID.enkinet,
+			networkID: NetworkID.mainnet,
 			feePayer: .success(nil),
 			transactionFee: .nonContingentLockPaying,
-			transactionSigners: .init(notaryPublicKey: notaryKey.publicKey, intentSigning: .notaryIsSignatory),
+			transactionSigners: .init(
+				notaryPublicKey: notaryKey.publicKey,
+				intentSigning: .notaryIsSignatory
+			),
 			signingFactors: [:],
 			accountWithdraws: [:],
 			isNonConforming: true
@@ -26,16 +25,17 @@ final class CustomizeFeePayerTests: TestCase {
 
 		let state = CustomizeFees.State(
 			reviewedTransaction: transactionStub,
-			manifestSummary: manifestStub.summary(networkId: transactionStub.networkID.rawValue),
+			manifestSummary: manifestStub.summary,
 			signingPurpose: .signTransaction(.internalManifest(.transfer))
 		)
+
 		let sut = TestStore(initialState: state) {
 			CustomizeFees()
 				.dependency(\.date, .constant(.init(timeIntervalSince1970: 0)))
 				.dependency(\.factorSourcesClient.getSigningFactors) { request in
 					try [.device: .init(rawValue: Set(request.signers.rawValue.map {
 						try SigningFactor(
-							factorSource: .device(.babylon(mnemonicWithPassphrase: .testValue, isMain: true)),
+							factorSource: DeviceFactorSource.sample.asGeneral,
 							signer: .init(factorInstancesRequiredToSign: $0.virtualHierarchicalDeterministicFactorInstances, of: $0)
 						)
 					}))!]
@@ -52,7 +52,7 @@ final class CustomizeFeePayerTests: TestCase {
 		}
 
 		transactionStub.feePayer = .success(selectedFeePayer)
-		let accountEntity = EntityPotentiallyVirtual.account(selectedFeePayer.account)
+		let accountEntity = AccountOrPersona.account(selectedFeePayer.account)
 		transactionStub.transactionSigners = .init(
 			notaryPublicKey: notaryKey.publicKey,
 			intentSigning: .intentSigners(.init(rawValue: [accountEntity])!)
@@ -76,11 +76,14 @@ final class CustomizeFeePayerTests: TestCase {
 	}
 }
 
-extension EntityPotentiallyVirtual {
+extension AccountOrPersona {
 	var signingFactor: SigningFactor {
 		try! SigningFactor(
-			factorSource: .device(.babylon(mnemonicWithPassphrase: .testValue, isMain: true)),
-			signer: .init(factorInstancesRequiredToSign: virtualHierarchicalDeterministicFactorInstances, of: self)
+			factorSource: DeviceFactorSource.sample.asGeneral,
+			signer: .init(
+				factorInstancesRequiredToSign: virtualHierarchicalDeterministicFactorInstances,
+				of: self
+			)
 		)
 	}
 }

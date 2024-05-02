@@ -1,7 +1,20 @@
+import Sargon
+
+extension FiatCurrency {
+	var currencyCode: String {
+		switch self {
+		case .usd:
+			"USD"
+		case .sek:
+			"SEK"
+		}
+	}
+}
+
 // MARK: - FiatWorth
 public struct FiatWorth: Sendable, Hashable {
 	enum Worth: Sendable, Hashable {
-		case known(RETDecimal)
+		case known(Decimal192)
 		case unknown
 	}
 
@@ -38,7 +51,7 @@ extension FiatWorth.Worth {
 extension FiatWorth.Worth {
 	static let zero: Self = .known(.zero)
 
-	var value: RETDecimal? {
+	var value: Decimal192? {
 		if case let .known(value) = self {
 			return value
 		}
@@ -94,7 +107,8 @@ extension FiatWorth {
 		let value = worth.value ?? .zero // Zero for the unknown case, just to do to the base formatting
 
 		let formattedValue = {
-			guard let double = try? value.asDouble(), let value = formatter.string(for: double) else {
+			let double = value.asDouble
+			guard let value = formatter.string(for: double) else {
 				// Good enough fallback
 				return "\(currency.currencyCode)\(value.formattedPlain())"
 			}
@@ -117,7 +131,7 @@ extension FiatWorth {
 			return AttributedString(formattedValue)
 		}()
 
-		if !isVisible || worth.isUnknown || value == .zero() {
+		if !isVisible || worth.isUnknown || value == .zero {
 			attributedString.foregroundColor = .app.gray3
 		}
 
@@ -142,14 +156,5 @@ extension FiatWorth {
 		}
 
 		return attributedString
-	}
-}
-
-extension FiatCurrency {
-	var currencyCode: String {
-		switch self {
-		case .usd:
-			"USD"
-		}
 	}
 }

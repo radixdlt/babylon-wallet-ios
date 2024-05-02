@@ -3,13 +3,13 @@ import SwiftUI
 
 struct PersonaDataPermissionBox: Sendable, FeatureReducer {
 	struct State: Sendable, Hashable, Identifiable {
-		var id: Profile.Network.Persona.ID { persona.id }
-		let persona: Profile.Network.Persona
+		var id: Persona.ID { persona.id }
+		let persona: Persona
 		let requested: P2P.Dapp.Request.PersonaDataRequestItem
 		let responseValidation: P2P.Dapp.Request.RequestValidation
 
 		init(
-			persona: Profile.Network.Persona,
+			persona: Persona,
 			requested: P2P.Dapp.Request.PersonaDataRequestItem
 		) {
 			self.persona = persona

@@ -1,5 +1,6 @@
 import JSONTesting
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
 
 // MARK: - ROLAClientTests
@@ -18,7 +19,7 @@ final class ROLAClientTests: TestCase {
 		dAppDefinitionAddress: DappDefinitionAddress
 	) -> P2P.Dapp.Request.Metadata {
 		try! .init(
-			version: 1, networkId: 0,
+			version: 1, networkId: NetworkID.mainnet,
 			origin: .init(string: origin),
 			dAppDefinitionAddress: dAppDefinitionAddress
 		)
@@ -74,7 +75,7 @@ final class ROLAClientTests: TestCase {
 					origin: .init(string: vector.origin)
 				)
 				XCTAssertEqual(payload.hex, vector.payloadToHash)
-				let blakeHashOfPayload = try blake2b(data: payload)
+				let blakeHashOfPayload = payload.hash()
 				XCTAssertEqual(blakeHashOfPayload.hex, vector.blakeHashOfPayload)
 			}
 		}
@@ -95,13 +96,13 @@ final class ROLAClientTests: TestCase {
 			try accounts.flatMap { dAppDefinitionAddress -> [TestVector] in
 				try (UInt8.zero ..< 10).map { seed -> TestVector in
 					/// deterministic derivation of a challenge, this is not `blakeHashOfPayload`
-					let challenge = try blake2b(data: Data((origin.urlString.rawValue + dAppDefinitionAddress.address).utf8) + [seed])
+					let challenge = (Data((origin.urlString.rawValue + dAppDefinitionAddress.address).utf8) + [seed]).hash()
 					let payload = try ROLAClient.payloadToHash(
-						challenge: .init(rawValue: .init(data: challenge)),
+						challenge: .init(rawValue: challenge.bytes),
 						dAppDefinitionAddress: dAppDefinitionAddress,
 						origin: origin
 					)
-					let blakeHashOfPayload = try blake2b(data: payload)
+					let blakeHashOfPayload = payload.hash()
 					return TestVector(
 						origin: origin.urlString.rawValue,
 						challenge: challenge.hex,
@@ -120,23 +121,20 @@ final class ROLAClientTests: TestCase {
 
 	func test_sign_auth() throws {
 		let mnemonic = try Mnemonic(phrase: "equip will roof matter pink blind book anxiety banner elbow sun young", language: .english)
-		let hdRoot = try mnemonic.hdRoot()
-		let path = try HD.Path.Full(string: "m/44H/1022H/12H/525H/1460H/1H")
-		let key = try hdRoot.derivePrivateKey(path: path, curve: Curve25519.self)
-		let publicKey = key.publicKey
-		XCTAssertEqual(publicKey.compressedRepresentation.hex, "0a4b894208a1f6b1bd7e823b59909f01aae0172b534baa2905b25f1bcbbb4f0a")
-
-		let hash: Data = try {
+		let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: "")
+		let accountPath = try AccountPath(string: "m/44H/1022H/12H/525H/1460H/1H")
+		let publicKey = mnemonicWithPassphrase.derivePublicKey(path: accountPath)
+		XCTAssertEqual(publicKey.publicKey.hex, "0a4b894208a1f6b1bd7e823b59909f01aae0172b534baa2905b25f1bcbbb4f0a")
+		let hash: Hash = try {
 			let payload = try ROLAClient.payloadToHash(
-				challenge: .init(.init(data: Data(hex: "2596b7902d56a32d17ca90ce2a1ee0a18a9cac6a82fb9f186d904e4a3eeeb627"))),
+				challenge: .init(rawValue: Exactly32Bytes(hex: "2596b7902d56a32d17ca90ce2a1ee0a18a9cac6a82fb9f186d904e4a3eeeb627")),
 				dAppDefinitionAddress: .init(validatingAddress: "account_rdx168fghy4kapzfnwpmq7t7753425lwklk65r82ys7pz2xzleehk2ap0k"),
 				origin: .init(string: "https://radix-dapp-toolkit-dev.rdx-works-main.extratools.works")
 			)
-			return try blake2b(data: payload)
+			return payload.hash()
 		}()
-
-		let signature = try key.privateKey!.signature(for: hash)
-		XCTAssertTrue(publicKey.isValidSignature(signature, for: hash))
+		let signature = mnemonicWithPassphrase.sign(hash: hash, path: accountPath)
+		XCTAssertTrue(signature.isValid(hash))
 	}
 
 	func testHappyPath_performWellKnownFileCheck() async throws {
@@ -315,7 +313,7 @@ final class ROLAClientTests: TestCase {
 	}
 }
 
-extension OnLedgerEntity.Account {
+extension OnLedgerEntity.OnLedgerAccount {
 	static func withMetadata(_ metadata: OnLedgerEntity.Metadata) -> Self {
 		.init(address: .wallet,
 		      atLedgerState: .init(version: 0, epoch: 0),

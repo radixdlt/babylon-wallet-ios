@@ -70,7 +70,7 @@ struct KeyedMnemonicView: SwiftUI.View {
 				Text("❌ Unknown by current Profile")
 			}
 
-			Text("*\(keyedMnemonicWithPassphrase.mnemonicWithPassphrase.mnemonic.phrase.rawValue)*")
+			Text("*\(keyedMnemonicWithPassphrase.mnemonicWithPassphrase.mnemonic.phrase)*")
 			Button("Delete") {
 				delete()
 			}

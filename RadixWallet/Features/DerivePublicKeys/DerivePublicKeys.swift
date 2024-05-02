@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - DerivePublicKeys
@@ -21,13 +22,27 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 					.importOlympiaAccounts
 				}
 			}
+
+			var factorSourceAccessPurpose: FactorSourceAccess.State.Purpose {
+				switch self {
+				case .createNewEntity(.account):
+					.createAccount
+				case .createNewEntity(.persona):
+					.createPersona
+				case .accountRecoveryScan:
+					.deriveAccounts
+				case .importLegacyAccounts:
+					.deriveAccounts
+				case .createAuthSigningKey:
+					.createKey
+				}
+			}
 		}
 
 		public let derivationsPathOption: DerivationPathOption
-		public var ledgerBeingUsed: LedgerHardwareWalletFactorSource?
 		public enum DerivationPathOption: Sendable, Hashable {
 			case knownPaths([DerivationPath], networkID: NetworkID) // derivation paths must not be a Set, since import from Olympia can contain duplicate derivation paths, for different Ledger devices.
-			case next(networkOption: NetworkOption, entityKind: EntityKind, curve: SLIP10.Curve, scheme: DerivationPathScheme)
+			case next(networkOption: NetworkOption, entityKind: EntityKind, curve: SLIP10Curve, scheme: DerivationPathScheme)
 
 			public enum NetworkOption: Sendable, Hashable {
 				case specific(NetworkID)
@@ -45,7 +60,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			public static func next(
 				for entityKind: EntityKind,
 				networkID: NetworkID?,
-				curve: SLIP10.Curve,
+				curve: SLIP10Curve,
 				scheme: DerivationPathScheme
 			) -> Self {
 				.next(
@@ -62,10 +77,29 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		public enum FactorSourceOption: Sendable, Hashable {
 			case device
 			case specific(FactorSource)
-			case specificPrivateHDFactorSource(PrivateHDFactorSource)
+			case specificPrivateHDFactorSource(PrivateHierarchicalDeterministicFactorSource)
+
+			var factorSourceAccessKind: FactorSourceAccess.State.Kind {
+				switch self {
+				case .device:
+					.device
+				case let .specific(source):
+					switch source {
+					case .device:
+						.device
+					case let .ledger(ledger):
+						.ledger(ledger)
+					default:
+						fatalError("Implement")
+					}
+				case .specificPrivateHDFactorSource:
+					.device
+				}
+			}
 		}
 
 		public let purpose: Purpose
+		public var factorSourceAccess: FactorSourceAccess.State
 
 		public init(
 			derivationPathOption: DerivationPathOption,
@@ -75,17 +109,13 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			self.derivationsPathOption = derivationPathOption
 			self.factorSourceOption = factorSourceOption
 			self.purpose = purpose
+			self.factorSourceAccess = .init(kind: factorSourceOption.factorSourceAccessKind, purpose: purpose.factorSourceAccessPurpose)
 		}
 	}
 
-	public enum ViewAction: Sendable, Equatable {
-		case onFirstAppear
-	}
-
 	public enum InternalAction: Sendable, Hashable {
-		case delayedStart
+		case start
 		case loadedDeviceFactorSource(DeviceFactorSource)
-
 		case deriveWithDeviceFactor(DerivationPath, NetworkID, PublicKeysFromOnDeviceHDRequest.Source)
 		case deriveWithLedgerFactor(LedgerHardwareWalletFactorSource, DerivationPath, NetworkID)
 	}
@@ -97,6 +127,12 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			networkID: NetworkID
 		)
 		case failedToDerivePublicKey
+		case cancel
+	}
+
+	@CasePathable
+	public enum ChildAction: Sendable, Hashable {
+		case factorSourceAccess(FactorSourceAccess.Action)
 	}
 
 	@Dependency(\.accountsClient) var accountsClient
@@ -107,21 +143,16 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 
 	public init() {}
 
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
-		switch viewAction {
-		case .onFirstAppear:
-			.run { send in
-				/// For more information about that `sleep` please  check [this discussion in Slack](https://rdxworks.slack.com/archives/C03QFAWBRNX/p1687967412207119?thread_ts=1687964494.772899&cid=C03QFAWBRNX)
-				@Dependency(\.continuousClock) var clock
-				try? await clock.sleep(for: .milliseconds(700))
-				await send(.internal(.delayedStart))
-			}
+	public var body: some ReducerOf<Self> {
+		Scope(state: \.factorSourceAccess, action: /Action.child .. ChildAction.factorSourceAccess) {
+			FactorSourceAccess()
 		}
+		Reduce(core)
 	}
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case .delayedStart:
+		case .start:
 			switch state.factorSourceOption {
 			case .device:
 				return .run { send in
@@ -146,7 +177,6 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 						state
 					)
 				case let .ledger(ledgerFactorSource):
-					state.ledgerBeingUsed = ledgerFactorSource
 					return deriveWith(ledgerFactorSource: ledgerFactorSource, state)
 				default:
 					loggerGlobal.critical("Unsupported factor source: \(factorSource)")
@@ -172,13 +202,23 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			)
 
 		case let .deriveWithLedgerFactor(ledger, derivationPath, networkID):
-			state.ledgerBeingUsed = ledger
 			return deriveWith(
 				ledger: ledger,
 				derivationPaths: [derivationPath],
 				networkID: networkID,
 				state: state
 			)
+		}
+	}
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		case .factorSourceAccess(.delegate(.perform)):
+			.send(.internal(.start))
+		case .factorSourceAccess(.delegate(.cancel)):
+			.send(.delegate(.cancel))
+		default:
+			.none
 		}
 	}
 }
@@ -249,7 +289,7 @@ extension DerivePublicKeys {
 		loggerGlobal.debug("Finish deriving of #\(hdKeys.count) keys ✅ => delegating `derivedPublicKeys`")
 		return .delegate(.derivedPublicKeys(
 			hdKeys,
-			factorSourceID: source.deviceFactorSource.id.embed(),
+			factorSourceID: source.deviceFactorSource.id.asGeneral,
 			networkID: networkID
 		))
 	}
@@ -282,8 +322,8 @@ extension DerivePublicKeys {
 		let hdKeys = try await ledgerHardwareWalletClient.derivePublicKeys(
 			derivationPaths.map {
 				P2P.LedgerHardwareWallet.KeyParameters(
-					curve: $0.curveForScheme.p2pCurve,
-					derivationPath: $0.path
+					curve: $0.curve.p2pCurve,
+					derivationPath: $0.toString()
 				)
 			},
 			ledger
@@ -291,7 +331,7 @@ extension DerivePublicKeys {
 
 		return .delegate(.derivedPublicKeys(
 			hdKeys,
-			factorSourceID: ledger.id.embed(),
+			factorSourceID: ledger.id.asGeneral,
 			networkID: networkID
 		))
 	}
@@ -300,7 +340,7 @@ extension DerivePublicKeys {
 extension DerivePublicKeys {
 	private func withDerivationPath(
 		state: State,
-		hdFactorSource: some HDFactorSourceProtocol,
+		hdFactorSource: some BaseFactorSourceProtocol,
 		knownPaths deriveWithKnownDerivationPaths: @escaping @Sendable ([DerivationPath], NetworkID) async throws -> Action,
 		calculating calculatedDerivationPath: @escaping @Sendable (DerivationPath, NetworkID) -> Action
 	) -> Effect<Action> {
@@ -324,7 +364,7 @@ extension DerivePublicKeys {
 						derivationPathScheme: derivationPathScheme,
 						networkID: networkID
 					)
-					assert(derivationPath.curveForScheme == curve)
+					assert(derivationPath.curve == curve)
 					try await send(deriveWithKnownDerivationPaths([derivationPath], networkID))
 				} catch: { error, send in
 					loggerGlobal.error("Failed to create derivation path, error: \(error)")
@@ -373,7 +413,7 @@ extension DerivePublicKeys {
 		of entityKind: EntityKind,
 		derivationPathScheme: DerivationPathScheme,
 		networkID maybeNetworkID: NetworkID?
-	) async throws -> (index: HD.Path.Component.Child.Value, networkID: NetworkID) {
+	) async throws -> (index: HDPathValue, networkID: NetworkID) {
 		let currentNetwork = await accountsClient.getCurrentNetworkID()
 		let networkID = maybeNetworkID ?? currentNetwork
 		let request = NextEntityIndexForFactorSourceRequest(
@@ -387,7 +427,7 @@ extension DerivePublicKeys {
 	}
 }
 
-extension SLIP10.Curve {
+extension SLIP10Curve {
 	var p2pCurve: P2P.LedgerHardwareWallet.KeyParameters.Curve {
 		switch self {
 		case .curve25519:

@@ -163,7 +163,7 @@ extension GatewayAPIClient {
 				) {
 					$0.appendingPathComponent("status/gateway-status")
 				}
-				return Radix.Network.Name(response.ledgerState.network)
+				return NetworkDefinition.Name(response.ledgerState.network)
 			},
 			getEpoch: {
 				let response = try await makeRequest(
@@ -173,7 +173,7 @@ extension GatewayAPIClient {
 				) {
 					$0.appendingPathComponent("transaction/construction")
 				}
-				return Epoch(rawValue: .init(response.ledgerState.epoch))
+				return Epoch(response.ledgerState.epoch)
 			},
 			getEntityDetails: getEntityDetails,
 			getEntityMetadata: { address, explicitMetadata in

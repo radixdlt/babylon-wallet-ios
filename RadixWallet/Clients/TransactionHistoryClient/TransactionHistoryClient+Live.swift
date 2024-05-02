@@ -1,4 +1,3 @@
-import EngineToolkit
 
 extension TransactionHistoryClient {
 	public static let liveValue = TransactionHistoryClient.live()
@@ -57,9 +56,9 @@ extension TransactionHistoryClient {
 			// Loading all NFT data
 
 			let nonFungibleIDs = try Set(response.items.flatMap { try $0.balanceChanges.map(extractAllNonFungibleIDs) ?? [] })
-			let groupedNonFungibleIDs = Dictionary(grouping: nonFungibleIDs) { $0.resourceAddress() }
+			let groupedNonFungibleIDs = Dictionary(grouping: nonFungibleIDs) { $0.resourceAddress }
 			let nonFungibleTokenArrays = try await groupedNonFungibleIDs.parallelMap { address, ids in
-				try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(resource: address.asSpecific(), nonFungibleIds: ids))
+				try await onLedgerEntitiesClient.getNonFungibleTokenData(.init(resource: address, nonFungibleIds: ids))
 			}
 			var keyedNonFungibleTokens: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken> = []
 			for nonFungibleTokenArray in nonFungibleTokenArrays {
@@ -77,7 +76,12 @@ extension TransactionHistoryClient {
 				// Will be non-nil if this is a stake claim NFT (or multiple)
 				let stakeClaimNFT = try await onLedgerEntitiesClient.isStakeClaimNFT(resource)
 					.map { validator in
-						try onLedgerEntitiesClient.stakeClaim(resource, stakeClaimValidator: validator, unstakeData: [], tokens: [])
+						try onLedgerEntitiesClient.stakeClaim(
+							resource,
+							stakeClaimValidator: validator,
+							unstakeData: [:],
+							tokens: []
+						)
 					}
 
 				return try extractNonFungibleIDs(type, from: changes)
@@ -99,7 +103,7 @@ extension TransactionHistoryClient {
 					throw MissingIntentHash()
 				}
 
-				let txid = try TXID.fromStr(string: hash, networkId: account.networkID.rawValue)
+				let txid = try IntentHash(hash)
 
 				let manifestClass = info.manifestClasses?.first
 
@@ -131,17 +135,17 @@ extension TransactionHistoryClient {
 							throw ProgrammerError()
 						}
 
-						let amount = try RETDecimal(value: fungible.balanceChange)
-						guard !amount.isZero() else { continue }
+						let amount = try Decimal192(fungible.balanceChange)
+						guard !amount.isZero else { continue }
 
 						// NB: The sign of the amount in the balance is made positive, negative balances are treated as withdrawals
 						let resource = try await onLedgerEntitiesClient.fungibleResourceBalance(
 							baseResource,
-							resourceQuantifier: .guaranteed(amount: amount.abs()),
+							resourceQuantifier: .guaranteed(decimal: amount.abs()),
 							networkID: account.networkID
 						)
 
-						if amount.isNegative() {
+						if amount.isNegative {
 							withdrawals.append(resource)
 						} else {
 							deposits.append(resource)
@@ -194,7 +198,7 @@ extension TransactionHistoryClient {
 	private static func extractResourceAddresses(from changes: GatewayAPI.TransactionBalanceChanges) throws -> [ResourceAddress] {
 		try (changes.fungibleBalanceChanges.map(\.resourceAddress)
 			+ changes.nonFungibleBalanceChanges.map(\.resourceAddress))
-			.map(ResourceAddress.init)
+			.map(ResourceAddress.init(validatingAddress:))
 	}
 
 	@Sendable
@@ -209,12 +213,15 @@ extension TransactionHistoryClient {
 	}
 
 	@Sendable
-	private static func extractNonFungibleIDs(_ type: ChangeType, from changes: GatewayAPI.TransactionNonFungibleBalanceChanges) throws -> [NonFungibleGlobalId] {
+	private static func extractNonFungibleIDs(
+		_ type: ChangeType,
+		from changes: GatewayAPI.TransactionNonFungibleBalanceChanges
+	) throws -> [NonFungibleGlobalId] {
 		let localIDStrings = type == .added ? changes.added : changes.removed
-		let resourceAddress = try EngineToolkit.Address(address: changes.resourceAddress)
+		let resourceAddress = try ResourceAddress(validatingAddress: changes.resourceAddress)
 		return try localIDStrings
-			.map(nonFungibleLocalIdFromStr)
-			.map { try NonFungibleGlobalId.fromParts(resourceAddress: resourceAddress, nonFungibleLocalId: $0) }
+			.map(NonFungibleLocalId.init)
+			.map { NonFungibleGlobalId(resourceAddress: resourceAddress, nonFungibleLocalId: $0) }
 	}
 
 	struct TimestampFormatter {
@@ -270,11 +277,5 @@ extension TransactionHistoryRequest {
 		filters
 			.compactMap(\.asset?.address)
 			.nilIfEmpty
-	}
-}
-
-extension SpecificAddress {
-	public var networkID: NetworkID {
-		(try? .init(intoEngine().networkId())) ?? .mainnet
 	}
 }

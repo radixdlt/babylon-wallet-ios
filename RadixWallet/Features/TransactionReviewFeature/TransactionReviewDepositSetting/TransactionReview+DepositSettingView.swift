@@ -1,6 +1,8 @@
 import ComposableArchitecture
 import SwiftUI
 
+public typealias AccountDefaultDepositRule = DepositRule
+
 extension TransactionReview {
 	public struct DepositSettingState: Sendable, Hashable {
 		public var changes: IdentifiedArrayOf<DepositSettingChange>
@@ -8,7 +10,7 @@ extension TransactionReview {
 
 	public struct DepositSettingChange: Sendable, Identifiable, Hashable {
 		public var id: AccountAddress.ID { account.address.id }
-		public let account: Profile.Network.Account
+		public let account: Account
 		public let ruleChange: AccountDefaultDepositRule
 	}
 }
@@ -56,22 +58,22 @@ extension TransactionReview.View {
 extension AccountDefaultDepositRule {
 	var string: String {
 		switch self {
-		case .accept:
+		case .acceptAll:
 			L10n.TransactionReview.AccountDepositSettings.acceptAllRule
-		case .reject:
+		case .denyAll:
 			L10n.TransactionReview.AccountDepositSettings.denyAllRule
-		case .allowExisting:
+		case .acceptKnown:
 			L10n.TransactionReview.AccountDepositSettings.acceptKnownRule
 		}
 	}
 
 	var image: ImageAsset {
 		switch self {
-		case .accept:
+		case .acceptAll:
 			AssetResource.iconAcceptAirdrop
-		case .reject:
+		case .denyAll:
 			AssetResource.iconDeclineAirdrop
-		case .allowExisting:
+		case .acceptKnown:
 			AssetResource.iconAcceptKnownAirdrop
 		}
 	}

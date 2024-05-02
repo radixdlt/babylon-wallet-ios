@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 typealias RequestEnvelope = DappInteractionClient.RequestEnvelope
@@ -50,7 +51,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			P2P.Dapp.Response,
 			for: RequestEnvelope,
 			DappMetadata,
-			TXID?
+			IntentHash?
 		)
 		case failedToSendResponseToDapp(
 			P2P.Dapp.Response,
@@ -63,7 +64,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			for: RequestEnvelope,
 			DappMetadata, reason: String
 		)
-		case presentResponseSuccessView(DappMetadata, TXID?)
+		case presentResponseSuccessView(DappMetadata, IntentHash?)
 		case presentInvalidRequest(
 			P2P.Dapp.RequestUnvalidated,
 			reason: DappInteractionClient.ValidatedDappRequest.InvalidRequestReason,
@@ -307,7 +308,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 
 			// In case of transaction response, sending it to the peer client is a silent operation.
 			// The success or failures is determined based on the transaction polling status.
-			let txID: TXID? = {
+			let txID: IntentHash? = {
 				if case let .success(successResponse) = responseToDapp,
 				   case let .transaction(txID) = successResponse.items
 				{
@@ -448,7 +449,7 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 	}
 
 	private func networkName(for networkID: NetworkID) -> String {
-		(try? Radix.Network.lookupBy(id: networkID).displayDescription) ?? String(describing: networkID)
+		Gateway.forNetwork(id: networkID).network.displayDescription
 	}
 }
 

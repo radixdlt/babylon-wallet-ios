@@ -41,17 +41,8 @@ extension TokenPricesClient {
 
 extension TokenPricesClient.TokenPrices {
 	public init(_ tokenPricesResponse: TokensPriceResponse) {
-		let formatter = NumberFormatter()
-		formatter.locale = Locale(identifier: "en_US_POSIX") // Just ignore the users locale
-		formatter.numberStyle = .decimal
-		formatter.maximumFractionDigits = Int(RETDecimal.maxDivisibility)
-		formatter.roundingMode = .down
-		formatter.decimalSeparator = "." // Enforce dot notation for RETDecimal
-		formatter.usesGroupingSeparator = false // No grouping separator for RETDecimal
-
 		self = tokenPricesResponse.tokens.reduce(into: [:]) { partialResult, next in
-			let trimmed = formatter.string(for: next.price) ?? ""
-			if let value = try? RETDecimal(value: trimmed) {
+			if let value = try? Decimal192(next.price) {
 				partialResult[next.resourceAddress] = value
 			}
 		}

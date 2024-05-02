@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - OnLedgerEntitiesClient
 /// A client that manages loading Entities from the Ledger.
 public struct OnLedgerEntitiesClient: Sendable {
@@ -111,7 +113,7 @@ extension OnLedgerEntitiesClient {
 }
 
 extension OnLedgerEntitiesClient {
-	public struct CachingStrategy: Sendable, Hashable {
+	public struct CachingStrategy: Sendable, Hashable, CustomDebugStringConvertible {
 		public enum Read: Sendable, Hashable {
 			case fromCache
 			case fromLedger
@@ -124,6 +126,18 @@ extension OnLedgerEntitiesClient {
 
 		public let read: Read
 		public let write: Write
+
+		public var debugDescription: String {
+			if self == Self.forceUpdate {
+				"forceUpdate"
+			} else if self == Self.useCache {
+				"useCache"
+			} else if self == Self.readFromLedgerSkipWrite {
+				"readFromLedgerSkipWrite"
+			} else {
+				"read: \(read), write: \(write)"
+			}
+		}
 
 		public static let forceUpdate = Self(read: .fromLedger, write: .toCache)
 		public static let useCache = Self(read: .fromCache, write: .toCache)
@@ -151,7 +165,7 @@ extension OnLedgerEntitiesClient {
 		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys,
 		cachingStrategy: CachingStrategy = .useCache,
 		atLedgerState: AtLedgerState? = nil
-	) async throws -> [OnLedgerEntity.Account] {
+	) async throws -> [OnLedgerEntity.OnLedgerAccount] {
 		try await getEntities(
 			addresses: addresses.map(\.asGeneral),
 			metadataKeys: metadataKeys,
@@ -185,7 +199,7 @@ extension OnLedgerEntitiesClient {
 		metadataKeys: Set<EntityMetadataKey> = .resourceMetadataKeys,
 		cachingStrategy: CachingStrategy = .useCache,
 		atLedgerState: AtLedgerState? = nil
-	) async throws -> OnLedgerEntity.Account {
+	) async throws -> OnLedgerEntity.OnLedgerAccount {
 		guard let account = try await getEntity(
 			address.asGeneral,
 			metadataKeys: metadataKeys,
@@ -306,16 +320,16 @@ extension OnLedgerEntitiesClient {
 // MARK: - OnLedgerSyncOfAccounts
 public struct OnLedgerSyncOfAccounts: Sendable, Hashable {
 	/// Inactive virtual accounts, unknown to the Ledger OnNetwork.
-	public let inactive: IdentifiedArrayOf<Profile.Network.Account>
+	public let inactive: IdentifiedArrayOf<Account>
 	/// Accounts known to the Ledger OnNetwork, with state updated according to that OnNetwork.
-	public let active: IdentifiedArrayOf<Profile.Network.Account>
+	public let active: IdentifiedArrayOf<Account>
 }
 
 extension OnLedgerEntitiesClient {
 	/// returns the updated account, else `nil` if account was not changed,
 	public func syncThirdPartyDepositWithOnLedgerSettings(
-		account: Profile.Network.Account
-	) async throws -> Profile.Network.Account? {
+		account: Account
+	) async throws -> Account? {
 		guard let ruleOfAccount = try await getOnLedgerCustomizedThirdPartyDepositRule(addresses: [account.address]).first else {
 			return nil
 		}
@@ -331,18 +345,18 @@ extension OnLedgerEntitiesClient {
 	}
 
 	public func syncThirdPartyDepositWithOnLedgerSettings(
-		addressesOf accounts: IdentifiedArrayOf<Profile.Network.Account>
+		addressesOf accounts: IdentifiedArrayOf<Account>
 	) async throws -> OnLedgerSyncOfAccounts {
 		let activeAddresses: [CustomizedOnLedgerThirdPartDepositForAccount]
 		do {
-			activeAddresses = try await getOnLedgerCustomizedThirdPartyDepositRule(addresses: accounts.map(\.accountAddress))
+			activeAddresses = try await getOnLedgerCustomizedThirdPartyDepositRule(addresses: accounts.map(\.address))
 		} catch is GatewayAPIClient.EmptyEntityDetailsResponse {
 			return OnLedgerSyncOfAccounts(inactive: accounts, active: [])
 		} catch {
 			throw error
 		}
-		var inactive: IdentifiedArrayOf<Profile.Network.Account> = []
-		var active: IdentifiedArrayOf<Profile.Network.Account> = []
+		var inactive: IdentifiedArrayOf<Account> = []
+		var active: IdentifiedArrayOf<Account> = []
 		for account in accounts { // iterate with `accounts` to retain insertion order.
 			if let onLedgerActiveAccount = activeAddresses.first(where: { $0.address == account.address }) {
 				var activeAccount = account
@@ -357,7 +371,7 @@ extension OnLedgerEntitiesClient {
 
 	public struct CustomizedOnLedgerThirdPartDepositForAccount: Sendable, Hashable {
 		public let address: AccountAddress
-		public let rule: Profile.Network.Account.OnLedgerSettings.ThirdPartyDeposits.DepositRule
+		public let rule: DepositRule
 	}
 
 	public func getOnLedgerCustomizedThirdPartyDepositRule(
@@ -368,7 +382,7 @@ extension OnLedgerEntitiesClient {
 			metadataKeys: [.ownerBadge, .ownerKeys],
 			cachingStrategy: .readFromLedgerSkipWrite
 		)
-		.compactMap { (onLedgerAccount: OnLedgerEntity.Account) -> CustomizedOnLedgerThirdPartDepositForAccount? in
+		.compactMap { (onLedgerAccount: OnLedgerEntity.OnLedgerAccount) -> CustomizedOnLedgerThirdPartDepositForAccount? in
 			let address = onLedgerAccount.address
 			guard
 				case let metadata = onLedgerAccount.metadata,
@@ -466,7 +480,7 @@ extension OnLedgerEntitiesClient {
 }
 
 extension OnLedgerEntitiesClient {
-	public func getPoolUnitDetails(_ poolUnitResource: OnLedgerEntity.Resource, forAmount amount: RETDecimal) async throws -> OwnedResourcePoolDetails? {
+	public func getPoolUnitDetails(_ poolUnitResource: OnLedgerEntity.Resource, forAmount amount: Decimal192) async throws -> OwnedResourcePoolDetails? {
 		guard let poolAddress = poolUnitResource.metadata.poolUnit?.asGeneral else {
 			return nil
 		}
@@ -513,12 +527,12 @@ extension OnLedgerEntitiesClient {
 	/// We don't do any pagination there(yet), since the number of owned pools will not be big, this can be revised in the future.
 	@Sendable
 	public func getOwnedPoolUnitsDetails(
-		_ account: OnLedgerEntity.Account,
+		_ account: OnLedgerEntity.OnLedgerAccount,
 		cachingStrategy: CachingStrategy = .useCache
 	) async throws -> [OwnedResourcePoolDetails] {
 		let ownedPoolUnits = account.poolUnitResources.poolUnits
 		let pools = try await getEntities(
-			ownedPoolUnits.map(\.resourcePoolAddress.asGeneral),
+			ownedPoolUnits.map(\.resourcePoolAddress).map(\.asGeneral),
 			[.dappDefinition],
 			account.atLedgerState,
 			cachingStrategy
@@ -534,7 +548,7 @@ extension OnLedgerEntitiesClient {
 		}
 
 		let allResources = try await getResources(
-			allResourceAddresses,
+			Array(allResourceAddresses.uniqued()),
 			cachingStrategy: cachingStrategy,
 			atLedgerState: account.atLedgerState
 		).asIdentified()

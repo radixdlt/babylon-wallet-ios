@@ -1,5 +1,13 @@
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
+
+// MARK: - Decimal192 + ExpressibleByFloatLiteral
+extension Decimal192: ExpressibleByFloatLiteral {
+	public init(floatLiteral value: Double) {
+		try! self.init(value)
+	}
+}
 
 // MARK: - TransactionClientTests
 final class TransactionClientTests: TestCase {
@@ -110,7 +118,7 @@ final class TransactionClientTests: TestCase {
 		var txFee = testTransactionFee()
 		let sut = TransactionClient.testValue
 
-		let accounts: [Profile.Network.Account] = [
+		let accounts: [Account] = [
 			.new(factorSource: .deviceOne, index: 0), // 0
 			.new(factorSource: .deviceOne, index: 1), // 1
 			.new(factorSource: .deviceTwo, index: 0), // 2
@@ -156,7 +164,7 @@ final class TransactionClientTests: TestCase {
 					transactionSigners: defaultSigners,
 					signingFactors: [.device: .init(rawValue: Set(defaultFactors))!],
 					signingPurpose: .signTransaction(.manifestFromDapp),
-					manifest: .init(instructions: .fromInstructions(instructions: [], networkId: NetworkID.mainnet.rawValue), blobs: [])
+					manifest: TransactionManifest(instructionsString: "", networkID: .mainnet)
 				),
 				allFeePayerCandidates: .init(rawValue: .init(uncheckedUniqueElements: allFeePayerCandidates))!,
 				involvedEntities: .init(
@@ -196,7 +204,7 @@ final class TransactionClientTests: TestCase {
 	}
 }
 
-extension Profile.Network.Account {
+extension Account {
 	var signingFactor: SigningFactor {
 		try! .init(
 			factorSource: .deviceOne,
@@ -206,7 +214,7 @@ extension Profile.Network.Account {
 }
 
 extension TransactionFee {
-	var normalModeNetworkFee: RETDecimal {
+	var normalModeNetworkFee: Decimal192 {
 		let networkFee = feeSummary.executionCost
 			+ feeSummary.finalizationCost
 			+ feeSummary.storageExpansionCost
@@ -218,16 +226,16 @@ extension TransactionFee {
 		return networkFee * (1 + PredefinedFeeConstants.networkFeeMultiplier)
 	}
 
-	var expectedNormalModeNetworkFee: RETDecimal {
+	var expectedNormalModeNetworkFee: Decimal192 {
 		(normalModeNetworkFee - feeLocks.nonContingentLock).clamped
 	}
 
-	var expectedNormalModeRoyaltyFee: RETDecimal {
+	var expectedNormalModeRoyaltyFee: Decimal192 {
 		let remainingNonContingentLock = (feeLocks.nonContingentLock - normalModeNetworkFee).clamped
 		return (feeSummary.royaltyCost - remainingNonContingentLock).clamped
 	}
 
-	var expectedNormalModeLockFee: RETDecimal {
+	var expectedNormalModeLockFee: Decimal192 {
 		expectedNormalModeNetworkFee + expectedNormalModeRoyaltyFee
 	}
 
@@ -253,29 +261,7 @@ extension TransactionFee {
 }
 
 extension TransactionFee.FeeSummary {
-	var networkFee: RETDecimal {
+	var networkFee: Decimal192 {
 		totalExecutionCost + finalizationCost + storageExpansionCost
-	}
-}
-
-extension Profile.Network.Account {
-	static func new(address: String) -> Self {
-		try! .init(
-			networkID: .simulator,
-			address: AccountAddress(validatingAddress: address),
-			factorInstance: .init(
-				factorSourceID: .previewValue,
-				publicKey: .eddsaEd25519(Curve25519.Signing.PrivateKey().publicKey),
-				derivationPath: AccountDerivationPath.babylon(.init(
-					networkID: .simulator,
-					index: 0,
-					keyKind: .transactionSigning
-				)).wrapAsDerivationPath()
-			),
-			displayName: "acc",
-			extraProperties: .init(
-				appearanceID: ._0
-			)
-		)
 	}
 }

@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ImportOlympiaLedgerAccountsAndFactorSources
@@ -36,21 +37,26 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 		public enum State: Sendable, Hashable {
 			case noP2PLink(AlertState<NoP2PLinkAlert>)
 			case addNewP2PLink(NewConnection.State)
-			case nameLedgerAndDerivePublicKeys(NameLedgerAndDerivePublicKeys.State)
+			case nameLedger(ImportOlympiaNameLedger.State)
+			case derivePublicKeys(DerivePublicKeys.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case noP2PLink(NoP2PLinkAlert)
 			case addNewP2PLink(NewConnection.Action)
-			case nameLedgerAndDerivePublicKeys(NameLedgerAndDerivePublicKeys.Action)
+			case nameLedger(ImportOlympiaNameLedger.Action)
+			case derivePublicKeys(DerivePublicKeys.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
 			Scope(state: /State.addNewP2PLink, action: /Action.addNewP2PLink) {
 				NewConnection()
 			}
-			Scope(state: /State.nameLedgerAndDerivePublicKeys, action: /Action.nameLedgerAndDerivePublicKeys) {
-				NameLedgerAndDerivePublicKeys()
+			Scope(state: /State.nameLedger, action: /Action.nameLedger) {
+				ImportOlympiaNameLedger()
+			}
+			Scope(state: /State.derivePublicKeys, action: /Action.derivePublicKeys) {
+				DerivePublicKeys()
 			}
 		}
 	}
@@ -75,7 +81,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public enum DelegateAction: Sendable, Equatable {
 		case failed(Failure)
-		case completed(IdentifiedArrayOf<Profile.Network.Account>)
+		case completed(IdentifiedArrayOf<Account>)
 
 		public enum Failure: Sendable, Equatable {
 			case failedToSaveNewLedger
@@ -117,7 +123,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				let ledgerInfo = try await ledgerHardwareWalletClient.getDeviceInfo()
 
 				if let ledger = try await factorSourcesClient.getFactorSource(
-					id: .init(kind: .ledgerHQHardwareWallet, hash: ledgerInfo.id.data.data),
+					id: FactorSourceID.hash(value: FactorSourceIdFromHash(kind: FactorSourceKind.ledgerHqHardwareWallet, body: Exactly32Bytes(bytes: ledgerInfo.id.data.data))),
 					as: LedgerHardwareWalletFactorSource.self
 				) {
 					await send(.internal(.useExistingLedger(ledger)))
@@ -137,19 +143,17 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 			return .none
 
 		case let .useNewLedger(deviceInfo):
-			state.destination = .nameLedgerAndDerivePublicKeys(.init(
-				networkID: state.networkID,
-				olympiaAccounts: state.olympiaAccounts.unvalidated,
+			state.destination = .nameLedger(.init(
 				deviceInfo: deviceInfo
 			))
 			return .none
 
 		case let .useExistingLedger(ledger):
 			state.knownLedgers.append(ledger)
-			state.destination = .nameLedgerAndDerivePublicKeys(.init(
-				networkID: state.networkID,
+			state.destination = .derivePublicKeys(.init(
+				ledger: ledger,
 				olympiaAccounts: state.olympiaAccounts.unvalidated,
-				ledger: ledger
+				networkID: state.networkID
 			))
 
 			return .none
@@ -204,39 +208,42 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				return .none
 			}
 
-		case let .nameLedgerAndDerivePublicKeys(.delegate(delegateAction)):
+		case let .nameLedger(.delegate(delegateAction)):
 			switch delegateAction {
 			case .failedToSaveNewLedger:
 				state.destination = nil
 				return .send(.delegate(.failed(.failedToSaveNewLedger)))
 
 			case let .savedNewLedger(ledger):
-				state.knownLedgers.append(ledger)
-				return .none
-
-			case .derivePublicKeys(.failedToDerivePublicKey):
-				state.destination = nil
-				return .send(.delegate(.failed(.failedToDerivePublicKey)))
-
-			case let .derivePublicKeys(.derivedPublicKeys(publicKeys, factorSourceID, _)):
-				state.destination = nil
-				guard let ledgerID = factorSourceID.extract(FactorSourceID.FromHash.self) else {
-					loggerGlobal.error("Failed to find ledger with factor sourceID in local state: \(factorSourceID)")
-					return .none
-				}
-
-				return .run { [unvalidated = state.olympiaAccounts.unvalidated] send in
-					let (validated, migrated) = try await process(
-						derivedPublicKeys: publicKeys,
-						ledgerID: ledgerID,
-						olympiaAccountsToValidate: unvalidated
-					)
-					await send(.internal(.processedOlympiaHardwareAccounts(validated, migrated)))
-				} catch: { error, _ in
-					loggerGlobal.error("Failed to process Olympia hardware accounts: \(error)")
-					errorQueue.schedule(error)
-				}
+				return .send(.internal(.useExistingLedger(ledger)))
 			}
+
+		case let .derivePublicKeys(.delegate(.derivedPublicKeys(publicKeys, factorSourceID, _))):
+			state.destination = nil
+			guard let ledgerID = factorSourceID.extract(FactorSourceIDFromHash.self) else {
+				loggerGlobal.error("Failed to find ledger with factor sourceID in local state: \(factorSourceID)")
+				return .none
+			}
+
+			return .run { [unvalidated = state.olympiaAccounts.unvalidated] send in
+				let (validated, migrated) = try await process(
+					derivedPublicKeys: publicKeys,
+					ledgerID: ledgerID,
+					olympiaAccountsToValidate: unvalidated
+				)
+				await send(.internal(.processedOlympiaHardwareAccounts(validated, migrated)))
+			} catch: { error, _ in
+				loggerGlobal.error("Failed to process Olympia hardware accounts: \(error)")
+				errorQueue.schedule(error)
+			}
+
+		case .derivePublicKeys(.delegate(.failedToDerivePublicKey)):
+			state.destination = nil
+			return .send(.delegate(.failed(.failedToDerivePublicKey)))
+
+		case .derivePublicKeys(.delegate(.cancel)):
+			state.destination = nil
+			return .none
 
 		default:
 			return .none
@@ -277,11 +284,14 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 
 		// Migrates and saved all accounts to Profile
 		let migrated = try await importLegacyWalletClient.migrateOlympiaHardwareAccountsToBabylon(
-			.init(olympiaAccounts: validatedAccounts, ledgerFactorSourceID: ledgerID)
+			.init(
+				olympiaAccounts: validatedAccounts,
+				ledgerFactorSourceID: ledgerID
+			)
 		)
 
 		// Save all accounts
-		try await accountsClient.saveVirtualAccounts(migrated.babylonAccounts.elements)
+		try await accountsClient.saveVirtualAccounts(migrated.babylonAccounts)
 
 		loggerGlobal.notice("Converted #\(migrated.accounts.count) accounts to babylon! ✅")
 
@@ -300,8 +310,8 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 			)
 		}
 
-		let derivedKeys: [K1.PublicKey] = derivedPublicKeys.compactMap {
-			guard case let .ecdsaSecp256k1(k1Key) = $0.publicKey else {
+		let derivedKeys: [Secp256k1PublicKey] = derivedPublicKeys.compactMap {
+			guard case let .secp256k1(k1Key) = $0.publicKey else {
 				return nil
 			}
 			return k1Key
@@ -314,7 +324,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 		}
 
 		if olympiaAccountsToMigrate.isEmpty, !olympiaAccountsToValidate.isEmpty, !derivedKeys.isEmpty {
-			loggerGlobal.critical("Invalid keys from export format?\nderivedKeys: \(derivedKeys.map { $0.compressedRepresentation.hex() })\nolympiaAccountsToValidate:\(olympiaAccountsToValidate.map(\.publicKey.compressedRepresentation.hex))")
+			loggerGlobal.critical("Invalid keys from export format?\nderivedKeys: \(derivedKeys.map(\.hex))\nolympiaAccountsToValidate:\(olympiaAccountsToValidate.map(\.publicKey.hex))")
 		}
 
 		guard
@@ -337,140 +347,13 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 	}
 }
 
-extension LedgerHardwareWalletFactorSource.DeviceModel {
+extension LedgerHardwareWalletModel {
 	init(model: P2P.LedgerHardwareWallet.Model) {
 		switch model {
 		case .nanoS: self = .nanoS
 		case .nanoX: self = .nanoX
 		case .nanoSPlus: self = .nanoSPlus
 		}
-	}
-}
-
-// MARK: - NameLedgerAndDerivePublicKeys
-public struct NameLedgerAndDerivePublicKeys: Sendable, FeatureReducer {
-	public struct State: Sendable, Hashable {
-		public let networkID: NetworkID
-
-		public let olympiaAccounts: Set<OlympiaAccountToMigrate>
-
-		public var nameLedger: NameLedgerFactorSource.State? = nil
-
-		@PresentationState
-		public var derivePublicKeys: DerivePublicKeys.State? = nil
-
-		public init(networkID: NetworkID, olympiaAccounts: Set<OlympiaAccountToMigrate>, deviceInfo: LedgerDeviceInfo) {
-			self.networkID = networkID
-			self.olympiaAccounts = olympiaAccounts
-			self.nameLedger = .init(deviceInfo: deviceInfo)
-		}
-
-		public init(networkID: NetworkID, olympiaAccounts: Set<OlympiaAccountToMigrate>, ledger: LedgerHardwareWalletFactorSource) {
-			self.networkID = networkID
-			self.olympiaAccounts = olympiaAccounts
-
-			showDerivePublicKeys(using: ledger)
-		}
-
-		mutating func showDerivePublicKeys(using ledger: LedgerHardwareWalletFactorSource) {
-			derivePublicKeys = .init(ledger: ledger, olympiaAccounts: olympiaAccounts, networkID: networkID)
-		}
-	}
-
-	public enum ViewAction: Sendable, Equatable {
-		case closeButtonTapped
-	}
-
-	public enum ChildAction: Sendable, Equatable {
-		case nameLedger(NameLedgerFactorSource.Action)
-		case derivePublicKeys(PresentationAction<DerivePublicKeys.Action>)
-	}
-
-	public enum InternalAction: Sendable, Equatable {
-		/// Saved the newly added Ledger device
-		case savedNewLedger(LedgerHardwareWalletFactorSource)
-	}
-
-	public enum DelegateAction: Sendable, Equatable {
-		case savedNewLedger(LedgerHardwareWalletFactorSource)
-
-		case failedToSaveNewLedger
-
-		case derivePublicKeys(DerivePublicKeys.DelegateAction)
-	}
-
-	@Dependency(\.dismiss) var dismiss
-	@Dependency(\.errorQueue) var errorQueue
-	@Dependency(\.factorSourcesClient) var factorSourcesClient
-
-	public init() {}
-
-	public var body: some ReducerOf<Self> {
-		Reduce(core)
-			.ifLet(\.nameLedger, action: /Action.child .. ChildAction.nameLedger) {
-				NameLedgerFactorSource()
-			}
-			.ifLet(\.$derivePublicKeys, action: /Action.child .. ChildAction.derivePublicKeys) {
-				DerivePublicKeys()
-			}
-	}
-
-	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
-		switch viewAction {
-		case .closeButtonTapped:
-			.run { _ in
-				await dismiss()
-			}
-		}
-	}
-
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .nameLedger(.delegate(.complete(ledger))):
-			saveNewLedger(ledger)
-
-		case .nameLedger(.delegate(.failedToCreateLedgerFactorSource)):
-			.send(.delegate(.failedToSaveNewLedger))
-
-		case let .derivePublicKeys(.presented(.delegate(derivePublicKeysAction))):
-			.send(.delegate(.derivePublicKeys(derivePublicKeysAction)))
-
-		default:
-			.none
-		}
-	}
-
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
-		case let .savedNewLedger(ledger):
-			state.showDerivePublicKeys(using: ledger)
-			return .none
-		}
-	}
-
-	private func saveNewLedger(_ ledger: LedgerHardwareWalletFactorSource) -> Effect<Action> {
-		.run { send in
-			try await factorSourcesClient.saveFactorSource(ledger.embed())
-			loggerGlobal.notice("Saved Ledger factor source! ✅")
-			await send(.delegate(.savedNewLedger(ledger)))
-			await send(.internal(.savedNewLedger(ledger)))
-		} catch: { error, _ in
-			loggerGlobal.error("Failed to save Factor Source, error: \(error)")
-			errorQueue.schedule(error)
-		}
-	}
-}
-
-extension DerivePublicKeys.State {
-	public init(ledger: LedgerHardwareWalletFactorSource, olympiaAccounts: Set<OlympiaAccountToMigrate>, networkID: NetworkID) {
-		self.init(
-			derivationPathOption: .knownPaths(
-				olympiaAccounts.map { $0.path.wrapAsDerivationPath() },
-				networkID: networkID
-			),
-			factorSourceOption: .specific(ledger.embed()),
-			purpose: .importLegacyAccounts
-		)
 	}
 }
 
@@ -481,5 +364,19 @@ public struct OlympiaAccountsValidation: Sendable, Hashable {
 	public init(validated: Set<OlympiaAccountToMigrate>, unvalidated: Set<OlympiaAccountToMigrate>) {
 		self.validated = validated
 		self.unvalidated = unvalidated
+	}
+}
+
+// MARK: - DerivePublicKeys.State
+extension DerivePublicKeys.State {
+	fileprivate init(ledger: LedgerHardwareWalletFactorSource, olympiaAccounts: Set<OlympiaAccountToMigrate>, networkID: NetworkID) {
+		self.init(
+			derivationPathOption: .knownPaths(
+				olympiaAccounts.map(\.path.asDerivationPath),
+				networkID: networkID
+			),
+			factorSourceOption: .specific(ledger.asGeneral),
+			purpose: .importLegacyAccounts
+		)
 	}
 }

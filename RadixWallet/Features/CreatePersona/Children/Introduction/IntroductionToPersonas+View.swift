@@ -86,7 +86,7 @@ import ComposableArchitecture //
 // struct IntroductionToEntity_Preview: PreviewProvider {
 //	static var previews: some View {
 //		NavigationStack {
-//			IntroductionToEntity<Profile.Network.Persona>.View(
+//			IntroductionToEntity<Persona>.View(
 //				store: .init(
 //					initialState: .init(),
 //					reducer: IntroductionToEntity.init

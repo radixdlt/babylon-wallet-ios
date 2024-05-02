@@ -17,58 +17,25 @@ extension Settings {
 		let debugAppInfo: String
 		#endif
 		let shouldShowAddP2PLinkButton: Bool
-		let shouldShowMigrateOlympiaButton: Bool
-		let shouldWriteDownPersonasSeedPhrase: Bool
 		let appVersion: String
-
-		var showsSomeBanner: Bool {
-			shouldShowAddP2PLinkButton || shouldShowMigrateOlympiaButton
-		}
 
 		init(state: Settings.State) {
 			#if DEBUG
-			let retCommitHash: String = buildInformation().version
-			self.debugAppInfo = "RET #\(retCommitHash), SS \(RadixConnectConstants.defaultSignalingServer.absoluteString)"
+			let buildInfo = SargonBuildInformation.get()
+			let dependencies = buildInfo.dependencies
+			let sargon = buildInfo.sargonVersion.description
+			let ret = String(dependencies.radixEngineToolkit.description.prefix(7))
+			self.debugAppInfo =
+				"""
+				Sargon: \(sargon)
+				RET: #\(ret)
+				SS: \(RadixConnectConstants.defaultSignalingServer.absoluteString)
+				"""
 			#endif
 
 			self.shouldShowAddP2PLinkButton = state.userHasNoP2PLinks ?? false
-			self.shouldShowMigrateOlympiaButton = state.shouldShowMigrateOlympiaButton
-			self.shouldWriteDownPersonasSeedPhrase = state.shouldWriteDownPersonasSeedPhrase
 			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
-			self.appVersion = L10n.Settings.appVersion(bundleInfo.shortVersion, bundleInfo.version)
-		}
-	}
-}
-
-// MARK: - SettingsRowModel
-struct SettingsRowModel<Feature: FeatureReducer>: Identifiable {
-	let id: String
-	let rowViewState: PlainListRow<AssetIcon>.ViewState
-	let action: Feature.ViewAction
-
-	public init(
-		title: String,
-		subtitle: String? = nil,
-		hint: Hint.ViewState? = nil,
-		icon: AssetIcon.Content,
-		action: Feature.ViewAction
-	) {
-		self.id = title
-		self.rowViewState = .init(icon, rowCoreViewState: .init(title: title, subtitle: subtitle, hint: hint))
-		self.action = action
-	}
-}
-
-// MARK: - SettingsRow
-struct SettingsRow<Feature: FeatureReducer>: View {
-	let row: SettingsRowModel<Feature>
-	let action: () -> Void
-
-	var body: some View {
-		VStack(spacing: .small3) {
-			PlainListRow(viewState: row.rowViewState)
-				.tappable(action)
-				.withSeparator
+			self.appVersion = L10n.WalletSettings.appVersion(bundleInfo.shortVersion)
 		}
 	}
 }
@@ -76,10 +43,7 @@ struct SettingsRow<Feature: FeatureReducer>: View {
 extension Settings.View {
 	public var body: some View {
 		settingsView()
-			.navigationTitle(L10n.Settings.title)
-			.navigationBarTitleColor(.app.gray1)
-			.navigationBarTitleDisplayMode(.inline)
-			.navigationBarInlineTitleFont(.app.secondaryHeader)
+			.setUpNavigationBar(title: L10n.WalletSettings.title)
 			.tint(.app.gray1)
 			.foregroundColor(.app.gray1)
 			.destinations(with: store)
@@ -101,48 +65,32 @@ extension Settings.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: .zero) {
-					if viewStore.showsSomeBanner {
-						VStack(spacing: .medium3) {
-							if viewStore.shouldShowAddP2PLinkButton {
-								ConnectExtensionView {
-									viewStore.send(.addP2PLinkButtonTapped)
-								}
-							}
-							if viewStore.shouldShowMigrateOlympiaButton {
-								MigrateOlympiaAccountsView {
-									viewStore.send(.importOlympiaButtonTapped)
-								} dismiss: {
-									viewStore.send(.dismissImportOlympiaHeaderButtonTapped)
-								}
-								.transition(headerTransition)
-							}
+					if viewStore.shouldShowAddP2PLinkButton {
+						ConnectExtensionView {
+							viewStore.send(.addConnectorButtonTapped)
 						}
-						.padding(.medium3)
 					}
 
-					ForEach(rows(viewStore: viewStore)) { row in
-						SettingsRow(row: row) {
-							viewStore.send(row.action)
-						}
+					ForEach(rows) { kind in
+						SettingsRow(kind: kind, store: store)
 					}
 				}
-				.padding(.bottom, .large3)
 
-				VStack(spacing: .zero) {
+				VStack(spacing: .medium1) {
 					Text(viewStore.appVersion)
 						.foregroundColor(.app.gray2)
-						.textStyle(.body2Regular)
-						.padding(.bottom, .medium1)
+						.textStyle(.body1Regular)
 
 					#if DEBUG
 					Text(viewStore.debugAppInfo)
 						.foregroundColor(.app.gray2)
 						.textStyle(.body2Regular)
-						.padding(.bottom, .medium1)
+						.multilineTextAlignment(.leading)
 					#endif
 				}
+				.frame(minHeight: .huge1)
 			}
-			.animation(.default, value: viewStore.shouldShowMigrateOlympiaButton)
+			.background(Color.app.gray4)
 			.onAppear {
 				store.send(.view(.appeared))
 			}
@@ -154,10 +102,11 @@ extension Settings.View {
 	}
 
 	@MainActor
-	private func rows(viewStore: ViewStoreOf<Settings>) -> [SettingsRowModel<Settings>] {
-		var visibleRows = normalRows(viewStore: viewStore)
+	private var rows: [SettingsRow<Settings>.Kind] {
+		var visibleRows = normalRows
 		#if DEBUG
-		visibleRows.append(.init(
+		visibleRows.append(.separator)
+		visibleRows.append(.model(
 			title: "Debug Settings",
 			icon: .asset(AssetResource.appSettings), // FIXME: Find
 			action: .debugButtonTapped
@@ -167,28 +116,46 @@ extension Settings.View {
 	}
 
 	@MainActor
-	private func normalRows(viewStore: ViewStoreOf<Settings>) -> [SettingsRowModel<Settings>] {
+	private var normalRows: [SettingsRow<Settings>.Kind] {
 		[
-			.init(
-				title: L10n.Settings.authorizedDapps,
-				icon: .asset(AssetResource.authorizedDapps),
-				action: .authorizedDappsButtonTapped
+			.model(
+				title: L10n.WalletSettings.SecurityCenter.title,
+				subtitle: L10n.WalletSettings.SecurityCenter.subtitle,
+				icon: .asset(AssetResource.security),
+				action: .securityButtonTapped
 			),
-			.init(
-				title: L10n.Settings.personas,
-				hint: viewStore.shouldWriteDownPersonasSeedPhrase ? .init(kind: .warning, text: .init(L10n.Settings.personasSeedPhrasePrompt)) : nil,
+			.separator,
+			.model(
+				title: L10n.WalletSettings.Personas.title,
+				subtitle: L10n.WalletSettings.Personas.subtitle,
 				icon: .asset(AssetResource.personas),
 				action: .personasButtonTapped
 			),
-			.init(
-				title: L10n.Settings.accountSecurityAndSettings,
-				icon: .asset(AssetResource.accountSecurity),
-				action: .accountSecurityButtonTapped
+			.model(
+				title: L10n.WalletSettings.Dapps.title,
+				subtitle: L10n.WalletSettings.Dapps.subtitle,
+				icon: .asset(AssetResource.authorizedDapps),
+				action: .dappsButtonTapped
 			),
-			.init(
-				title: L10n.Settings.appSettings,
-				icon: .asset(AssetResource.appSettings),
-				action: .appSettingsButtonTapped
+			.model(
+				title: L10n.WalletSettings.Connectors.title,
+				subtitle: L10n.WalletSettings.Connectors.subtitle,
+				icon: .asset(AssetResource.desktopConnections),
+				action: .connectorsButtonTapped
+			),
+			.separator,
+			.model(
+				title: L10n.WalletSettings.Preferences.title,
+				subtitle: L10n.WalletSettings.Preferences.subtitle,
+				icon: .asset(AssetResource.depositGuarantees),
+				action: .preferencesButtonTapped
+			),
+			.separator,
+			.model(
+				title: L10n.WalletSettings.Troubleshooting.title,
+				subtitle: L10n.WalletSettings.Troubleshooting.subtitle,
+				icon: .asset(AssetResource.troubleshooting),
+				action: .troubleshootingButtonTapped
 			),
 		]
 	}
@@ -210,8 +177,8 @@ private extension View {
 		return manageP2PLinks(with: destinationStore)
 			.authorizedDapps(with: destinationStore)
 			.personas(with: destinationStore)
-			.accountSecurity(with: destinationStore)
-			.appSettings(with: destinationStore)
+			.preferences(with: destinationStore)
+			.troubleshooting(with: destinationStore)
 		#if DEBUG
 			.debugSettings(with: destinationStore)
 		#endif
@@ -231,7 +198,7 @@ private extension View {
 			store: destinationStore,
 			state: /Settings.Destination.State.authorizedDapps,
 			action: Settings.Destination.Action.authorizedDapps,
-			destination: { AuthorizedDapps.View(store: $0) }
+			destination: { AuthorizedDappsFeature.View(store: $0) }
 		)
 	}
 
@@ -244,21 +211,21 @@ private extension View {
 		)
 	}
 
-	private func accountSecurity(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
+	private func preferences(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /Settings.Destination.State.accountSecurity,
-			action: Settings.Destination.Action.accountSecurity,
-			destination: { AccountSecurity.View(store: $0) }
+			state: /Settings.Destination.State.preferences,
+			action: Settings.Destination.Action.preferences,
+			destination: { Preferences.View(store: $0) }
 		)
 	}
 
-	private func appSettings(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
+	private func troubleshooting(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
 		navigationDestination(
 			store: destinationStore,
-			state: /Settings.Destination.State.appSettings,
-			action: Settings.Destination.Action.appSettings,
-			destination: { AppSettings.View(store: $0) }
+			state: /Settings.Destination.State.troubleshooting,
+			action: Settings.Destination.Action.troubleshooting,
+			destination: { Troubleshooting.View(store: $0) }
 		)
 	}
 
@@ -274,86 +241,38 @@ private extension View {
 	#endif
 }
 
-#if DEBUG
-struct SettingsView_Previews: PreviewProvider {
-	static var previews: some View {
-		Settings.View(
-			store: .init(
-				initialState: .init(),
-				reducer: Settings.init
-			)
-		)
-	}
-}
-#endif
+// MARK: - Settings.View.ConnectExtensionView
+extension Settings.View {
+	// MARK: - ConnectExtensionView
+	struct ConnectExtensionView: View {
+		let action: () -> Void
 
-// MARK: - ConnectExtensionView
-struct ConnectExtensionView: View {
-	let action: () -> Void
+		var body: some View {
+			VStack(spacing: .medium2) {
+				Image(asset: AssetResource.connectorBrowsersIcon)
 
-	var body: some View {
-		VStack(spacing: .medium2) {
-			Image(asset: AssetResource.connectorBrowsersIcon)
-				.padding(.horizontal, .medium1)
+				VStack(spacing: .medium3) {
+					Text(L10n.WalletSettings.LinkToConnectorHeader.title)
+						.textStyle(.body1Header)
+						.foregroundColor(.app.gray1)
 
-			Text(L10n.Settings.LinkToConnectorHeader.title)
-				.textStyle(.body1Header)
-				.foregroundColor(.app.gray1)
-				.padding(.horizontal, .medium2)
+					Text(L10n.WalletSettings.LinkToConnectorHeader.subtitle)
+						.foregroundColor(.app.gray2)
+						.textStyle(.body2Regular)
+						.multilineTextAlignment(.center)
+						.padding(.horizontal, .large3)
+				}
 
-			Text(L10n.Settings.LinkToConnectorHeader.subtitle)
-				.foregroundColor(.app.gray2)
-				.textStyle(.body2Regular)
-				.multilineTextAlignment(.center)
-				.padding(.horizontal, .medium2)
-
-			Button(L10n.Settings.LinkToConnectorHeader.linkToConnector, action: action)
-				.buttonStyle(.secondaryRectangular(
-					shouldExpand: true,
-					image: .init(asset: AssetResource.qrCodeScanner)
-				))
-				.padding(.horizontal, .medium1)
-		}
-		.padding(.vertical, .medium1)
-		.background(Color.app.gray5)
-		.cornerRadius(.medium3)
-	}
-}
-
-// MARK: - MigrateOlympiaAccountsView
-struct MigrateOlympiaAccountsView: View {
-	let action: () -> Void
-	let dismiss: () -> Void
-
-	var body: some View {
-		VStack(spacing: .medium2) {
-			Text(L10n.Settings.ImportFromLegacyWalletHeader.title)
-				.textStyle(.body1Header)
-				.foregroundColor(.app.gray1)
-				.padding(.horizontal, .medium2)
-
-			Text(L10n.Settings.ImportFromLegacyWalletHeader.subtitle)
-				.foregroundColor(.app.gray2)
-				.textStyle(.body2Regular)
-				.multilineTextAlignment(.center)
-				.padding(.horizontal, .medium1)
-
-			Button(
-				L10n.Settings.ImportFromLegacyWalletHeader.importLegacyAccounts,
-				action: action
-			)
-			.buttonStyle(.secondaryRectangular(
-				shouldExpand: true,
-				image: .init(asset: AssetResource.qrCodeScanner) // FIXME: Pick asset
-			))
-			.padding(.horizontal, .medium1)
-		}
-		.padding(.vertical, .medium1)
-		.background(Color.app.gray5)
-		.cornerRadius(.medium3)
-		.overlay(alignment: .topTrailing) {
-			CloseButton(action: dismiss)
-				.padding(.small3)
+				Button(L10n.WalletSettings.LinkToConnectorHeader.button, action: action)
+					.buttonStyle(.secondaryRectangular(
+						backgroundColor: .app.gray3,
+						shouldExpand: true,
+						image: .init(asset: AssetResource.qrCodeScanner)
+					))
+			}
+			.padding(.vertical, .large3)
+			.padding(.horizontal, .large2)
+			.background(Color.clear)
 		}
 	}
 }

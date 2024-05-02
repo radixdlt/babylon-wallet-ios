@@ -1,5 +1,6 @@
 import Foundation
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
 
 // MARK: - ImportMnemonicTests
@@ -25,8 +26,8 @@ final class ImportMnemonicTests: TestCase {
 	/// after user erases "i" and focuses next TextField.
 	func test_addi_erase_results_in_add_not_addict() async throws {
 		let mnemonic = try Mnemonic(phrase: "add addict address pen penalty pencil act action actor actress zoo wreck", language: .english)
-		let wordsBIP39 = mnemonic.words.rawValue
-		let wordStrings = wordsBIP39.map(\.word.rawValue)
+		let wordsBIP39 = mnemonic.words
+		let wordStrings = wordsBIP39.map(\.word)
 		let testClock = TestClock()
 		let store = TestStore(
 			initialState: ImportMnemonic.State(
@@ -43,9 +44,9 @@ final class ImportMnemonicTests: TestCase {
 		store.exhaustivity = .off
 
 		for (index, wordBIP39) in wordsBIP39.enumerated() {
-			let word4Letters = String(wordBIP39.word.rawValue.prefix(4))
+			let word4Letters = String(wordBIP39.word.prefix(4))
 
-			if wordBIP39.word.rawValue == "add" {
+			if wordBIP39.word == "add" {
 				await store.send(
 					.child(
 						.word(
@@ -88,8 +89,8 @@ final class ImportMnemonicTests: TestCase {
 extension ImportMnemonicTests {
 	private func doTest(mnemonic phrase: String) async throws {
 		let mnemonic = try Mnemonic(phrase: phrase, language: .english)
-		let wordsBIP39 = mnemonic.words.rawValue
-		let wordStrings = wordsBIP39.map(\.word.rawValue)
+		let wordsBIP39 = mnemonic.words
+		let wordStrings = wordsBIP39.map(\.word)
 		XCTAssertEqual(phrase, wordStrings.joined(separator: " "))
 		let testClock = TestClock()
 		let store = TestStore(
@@ -107,7 +108,7 @@ extension ImportMnemonicTests {
 		store.exhaustivity = .off
 
 		for (index, wordBIP39) in wordsBIP39.enumerated() {
-			let word4Letters = String(wordBIP39.word.rawValue.prefix(4))
+			let word4Letters = String(wordBIP39.word.prefix(4))
 			await store.send(
 				.child(
 					.word(
