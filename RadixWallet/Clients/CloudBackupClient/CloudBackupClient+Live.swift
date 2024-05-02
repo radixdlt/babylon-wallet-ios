@@ -65,7 +65,7 @@ extension CloudBackupClient {
 			}
 
 			let data = try Data(contentsOf: fileURL)
-			let profile = try JSONDecoder().decode(Profile.self, from: data)
+			let profile = try Profile(jsonData: data)
 			try FileManager.default.removeItem(at: fileURL)
 
 			return profile
@@ -77,7 +77,7 @@ extension CloudBackupClient {
 			let fileManager = FileManager.default
 			let tempDirectoryURL = fileManager.temporaryDirectory
 			let fileURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
-			try JSONEncoder().encode(profile).write(to: fileURL)
+			try profile.jsonData().write(to: fileURL)
 
 			let record = existingRecord ?? .init(recordType: .profile, recordID: .init(recordName: profile.id.uuidString))
 			record[.content] = CKAsset(fileURL: fileURL)
