@@ -15,10 +15,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		/// An exportable Profile file, either encrypted or plaintext. Setting this will trigger showing a file exporter
 		public var profileFile: ExportableProfileFile?
 
-//		public init(problems: [SecurityProblem]) {
-//			self.problems = problems
-//		}
-
 		public var outdatedBackupPresent: Bool {
 			!automatedBackupsEnabled && lastBackup != nil
 		}
@@ -91,61 +87,9 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.cloudBackupClient) var cloudBackupClient
+	@Dependency(\.backupsClient) var backupsClient
 	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.userDefaults) var userDefaults
-
-//	private func lastBackupEffect() -> Effect<Action> {
-//		.run { send in
-//			let profileID = await ProfileStore.shared.profile.id
-//			for try await lastBackup in cloudBackupClient.lastBackup(profileID) {
-//				guard !Task.isCancelled else { return }
-//				let currentProfileHash = await ProfileStore.shared.profile.hashValue
-//				let isUpToDate = lastBackup.profileHash == currentProfileHash
-//				print("•• Backup changed for \(profileID.uuidString) \(isUpToDate)")
-//				await send(.internal(.setLastBackedUp(isUpToDate ? nil : lastBackup.date)))
-//			}
-//		}
-//	}
-
-	private func problemsSubscriptionEffect() -> Effect<Action> {
-		.run { send in
-			let profileID = await ProfileStore.shared.profile.id
-			for try await problems in securityCenterClient.problems(profileID) {
-				guard !Task.isCancelled else { return }
-				print("•• CB sub problems: \(problems)")
-				await send(.internal(.setProblems(problems)))
-			}
-		}
-	}
-
-	private func checkCloudAccountStatusEffect() -> Effect<Action> {
-		.run { send in
-			do {
-				let status = try await cloudBackupClient.checkAccountStatus()
-				await send(.internal(.setICloudAccountStatus(status)))
-			} catch {
-				loggerGlobal.error("Failed to get iCloud account status: \(error)")
-			}
-		}
-	}
-
-	private func checkCloudBackupEnabledEffect() -> Effect<Action> {
-		.run { send in
-			let isEnabled = await ProfileStore.shared.profile.appPreferences.security.isCloudProfileSyncEnabled
-			await send(.internal(.setCloudBackupEnabled(isEnabled)))
-		}
-	}
-
-	private func updateCloudBackupsSettingEffect(isEnabled: Bool) -> Effect<Action> {
-		.run { send in
-			do {
-				try await appPreferencesClient.setIsCloudBackupEnabled(isEnabled)
-				await send(.internal(.setCloudBackupEnabled(isEnabled)))
-			} catch {
-				loggerGlobal.error("Failed toggle cloud backups \(isEnabled ? "on" : "off"): \(error)")
-			}
-		}
-	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -183,6 +127,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			let didEncryptIt = exportedProfileURL.absoluteString.contains(.profileFileEncryptedPart)
 			overlayWindowClient.scheduleHUD(.exportedProfile(encrypted: didEncryptIt))
 			loggerGlobal.notice("Profile successfully exported to: \(exportedProfileURL)")
+			backupsClient.didExportProfileSnapshot(profile)
 			return .none
 
 		case let .profileExportResult(.failure(error)):
@@ -244,6 +189,59 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		case let .exportProfile(profile):
 			state.profileFile = .plaintext(profile)
 			return .none
+		}
+	}
+
+	//	private func lastBackupEffect() -> Effect<Action> {
+	//		.run { send in
+	//			let profileID = await ProfileStore.shared.profile.id
+	//			for try await lastBackup in cloudBackupClient.lastBackup(profileID) {
+	//				guard !Task.isCancelled else { return }
+	//				let currentProfileHash = await ProfileStore.shared.profile.hashValue
+	//				let isUpToDate = lastBackup.profileHash == currentProfileHash
+	//				print("•• Backup changed for \(profileID.uuidString) \(isUpToDate)")
+	//				await send(.internal(.setLastBackedUp(isUpToDate ? nil : lastBackup.date)))
+	//			}
+	//		}
+	//	}
+
+	private func problemsSubscriptionEffect() -> Effect<Action> {
+		.run { send in
+			let profileID = await ProfileStore.shared.profile.id
+			for try await problems in securityCenterClient.problems(profileID) {
+				guard !Task.isCancelled else { return }
+				print("•• CB sub problems: \(problems)")
+				await send(.internal(.setProblems(problems)))
+			}
+		}
+	}
+
+	private func checkCloudAccountStatusEffect() -> Effect<Action> {
+		.run { send in
+			do {
+				let status = try await cloudBackupClient.checkAccountStatus()
+				await send(.internal(.setICloudAccountStatus(status)))
+			} catch {
+				loggerGlobal.error("Failed to get iCloud account status: \(error)")
+			}
+		}
+	}
+
+	private func checkCloudBackupEnabledEffect() -> Effect<Action> {
+		.run { send in
+			let isEnabled = await ProfileStore.shared.profile.appPreferences.security.isCloudProfileSyncEnabled
+			await send(.internal(.setCloudBackupEnabled(isEnabled)))
+		}
+	}
+
+	private func updateCloudBackupsSettingEffect(isEnabled: Bool) -> Effect<Action> {
+		.run { send in
+			do {
+				try await appPreferencesClient.setIsCloudBackupEnabled(isEnabled)
+				await send(.internal(.setCloudBackupEnabled(isEnabled)))
+			} catch {
+				loggerGlobal.error("Failed toggle cloud backups \(isEnabled ? "on" : "off"): \(error)")
+			}
 		}
 	}
 }

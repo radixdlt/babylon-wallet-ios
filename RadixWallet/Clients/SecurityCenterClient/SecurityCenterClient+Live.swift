@@ -37,27 +37,29 @@ extension SecurityCenterClient {
 				let cloudBackups = userDefaults.lastCloudBackupValues(for: profileID).optional
 				let manualBackups = userDefaults.lastManualBackupValues(for: profileID).optional
 
-//				return AsyncAlgorithms.zip(cloudBackups, manualBackups).map { cloudBackup, manualBackup in
-//
-//					print("•• cloud \(cloudBackup), manual \(manualBackup)")
-//
-//					return [SecurityProblem.problem5]
-//				}
-//				.eraseToAnyAsyncSequence()
+				return AsyncAlgorithms.combineLatest(cloudBackups, manualBackups).map { cloudBackup, manualBackup in
 
-				return cloudBackups.map { cloudBackup in
+					print("•• cloud \(cloudBackup), manual \(manualBackup)")
+
 					let result = Bool.random() ? [SecurityProblem.problem5] : []
 					print("•• PROBLEMS EMIT cloud \(cloudBackup) \(result)")
 					return result
 				}
 				.eraseToAnyAsyncSequence()
+
+//				return cloudBackups.map { cloudBackup in
+//					let result = Bool.random() ? [SecurityProblem.problem5] : []
+//					print("•• PROBLEMS EMIT cloud \(cloudBackup) \(result)")
+//					return result
+//				}
+//				.eraseToAnyAsyncSequence()
 			}
 		)
 	}
 }
 
 extension AsyncSequence where Self: Sendable, Element: Sendable {
-	/// A sequence of optional Elements, starting with `nil`. Useful when zipping sequences without wanting to wait for the first emitted element
+	/// A sequence of optional Elements, starting with `nil`. Useful together with `combineLatest`.
 	var optional: AnyAsyncSequence<Element?> {
 		map { $0 as Element? }
 			.prepend(nil)

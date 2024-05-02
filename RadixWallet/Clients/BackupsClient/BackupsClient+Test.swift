@@ -15,6 +15,7 @@ extension BackupsClient: TestDependencyKey {
 		loadProfileBackups: unimplemented("\(Self.self).loadProfile"),
 		lookupProfileSnapshotByHeader: unimplemented("\(Self.self).lookupProfileSnapshotByHeader"),
 		importProfileSnapshot: unimplemented("\(Self.self).importProfileSnapshot"),
+		didExportProfileSnapshot: unimplemented("\(Self.self).didExportProfileSnapshot"),
 		importCloudProfile: unimplemented("\(Self.self).importCloudProfile"),
 		loadDeviceID: unimplemented("\(Self.self).loadDeviceID")
 	)
@@ -24,6 +25,7 @@ extension BackupsClient: TestDependencyKey {
 		loadProfileBackups: { nil },
 		lookupProfileSnapshotByHeader: { _ in throw NoopError() },
 		importProfileSnapshot: { _, _ in throw NoopError() },
+		didExportProfileSnapshot: { _ in throw NoopError() },
 		importCloudProfile: { _, _ in throw NoopError() },
 		loadDeviceID: { nil }
 	)
