@@ -35,24 +35,36 @@ extension SecurityCenterClient {
 				print("•• subscribe to problems for \(profileID.uuidString)")
 
 				let cloudBackups = userDefaults.lastCloudBackupValues(for: profileID).optional
+				let cloudBackupsEnabled = await profileStore.appPreferencesValues().map(\.security.isCloudProfileSyncEnabled)
 				let manualBackups = userDefaults.lastManualBackupValues(for: profileID).optional
 
-				return AsyncAlgorithms.combineLatest(cloudBackups, manualBackups).map { cloudBackup, manualBackup in
+				return combineLatest(cloudBackups, cloudBackupsEnabled, manualBackups).map { cloudBackup, enabled, manualBackup in
+					let profile = await profileStore.profile
+					var result: [SecurityProblem] = []
 
-					print("•• cloud \(cloudBackup), manual \(manualBackup)")
+					func hasProblem5() -> Bool {
+						if let cloudBackup {
+							cloudBackup.status != .success
+						} else {
+							false // FIXME: GK - is this what we want?
+						}
+					}
 
-					let result = Bool.random() ? [SecurityProblem.problem5] : []
-					print("•• PROBLEMS EMIT cloud \(cloudBackup) \(result)")
+					func hasProblem6() -> Bool {
+						!enabled && manualBackup == nil
+					}
+
+					func hasProblem7() -> Bool {
+						!enabled && manualBackup != nil && manualBackup?.profileHash != profile.hashValue
+					}
+
+					if hasProblem5() { result.append(.problem5) }
+					if hasProblem6() { result.append(.problem6) }
+					if hasProblem7() { result.append(.problem7) }
+
 					return result
 				}
 				.eraseToAnyAsyncSequence()
-
-//				return cloudBackups.map { cloudBackup in
-//					let result = Bool.random() ? [SecurityProblem.problem5] : []
-//					print("•• PROBLEMS EMIT cloud \(cloudBackup) \(result)")
-//					return result
-//				}
-//				.eraseToAnyAsyncSequence()
 			}
 		)
 	}
