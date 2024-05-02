@@ -28,16 +28,20 @@ extension CloudBackupClient {
 
 		Task {
 			for try await profile in await profileStore.values() {
+				print("  •• profileStore new value")
 				let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
 				let status: BackupMetadata.Status
 				do {
 					try await saveProfile(profile, existingRecord: existingRecord)
 					status = .success
 				} catch CKError.accountTemporarilyUnavailable {
-					status = .notAuthorized
+					status = .temporarilyUnavailable
+				} catch CKError.notAuthenticated {
+					status = .notAuthenticated
 				} catch {
 					status = .failure
 				}
+				print("  •• saveProfile \(status)")
 				try? userDefaults.setLastCloudBackup(status, of: profile)
 			}
 		}
@@ -84,8 +88,6 @@ extension CloudBackupClient {
 
 			let savedRecord = try await container.privateCloudDatabase.save(record)
 			try fileManager.removeItem(at: fileURL)
-
-			print("  •• SAVED PROFILE")
 
 			return savedRecord
 		}
