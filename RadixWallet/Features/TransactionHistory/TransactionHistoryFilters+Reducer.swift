@@ -31,7 +31,7 @@ public struct TransactionHistoryFilters: Sendable, FeatureReducer {
 			}
 		}
 
-		public init(portfolio: OnLedgerEntity.Account, filters: [Filter.ID]) {
+		public init(portfolio: OnLedgerEntity.OnLedgerAccount, filters: [Filter.ID]) {
 			let transferTypes = TransactionFilter.TransferType.allCases.map { Filter($0, isActive: filters.contains(.transferType($0))) }
 			let fungibles = portfolio.fungibleMetadata.map { Filter($0.key, metadata: $0.value, isActive: filters.contains(.asset($0.key))) }
 			let nonFungibles = portfolio.nonFungibleMetadata.map { Filter($0.key, metadata: $0.value, isActive: filters.contains(.asset($0.key))) }
@@ -159,7 +159,7 @@ extension IdentifiedArrayOf<TransactionHistoryFilters.State.Filter> {
 	}
 }
 
-private extension OnLedgerEntity.Account {
+private extension OnLedgerEntity.OnLedgerAccount {
 	var fungibleMetadata: [ResourceAddress: OnLedgerEntity.Metadata] {
 		var result: [ResourceAddress: OnLedgerEntity.Metadata] = [:]
 

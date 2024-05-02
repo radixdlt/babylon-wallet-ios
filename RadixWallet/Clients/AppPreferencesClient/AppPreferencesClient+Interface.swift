@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - AppPreferencesClient
 public struct AppPreferencesClient: Sendable {
 	public var appPreferenceUpdates: AppPreferenceUpdates
@@ -12,16 +14,13 @@ public struct AppPreferencesClient: Sendable {
 	public var extractProfileSnapshot: ExtractProfileSnapshot
 	public var deleteProfileAndFactorSources: DeleteProfileSnapshot
 
-	public var getDetailsOfSecurityStructure: GetDetailsOfSecurityStructure
-
 	public init(
 		appPreferenceUpdates: @escaping AppPreferenceUpdates,
 		getPreferences: @escaping GetPreferences,
 		updatePreferences: @escaping UpdatePreferences,
 		extractProfileSnapshot: @escaping ExtractProfileSnapshot,
 		deleteProfileAndFactorSources: @escaping DeleteProfileSnapshot,
-		setIsCloudProfileSyncEnabled: @escaping SetIsCloudProfileSyncEnabled,
-		getDetailsOfSecurityStructure: @escaping GetDetailsOfSecurityStructure
+		setIsCloudProfileSyncEnabled: @escaping SetIsCloudProfileSyncEnabled
 	) {
 		self.appPreferenceUpdates = appPreferenceUpdates
 		self.getPreferences = getPreferences
@@ -29,7 +28,6 @@ public struct AppPreferencesClient: Sendable {
 		self.extractProfileSnapshot = extractProfileSnapshot
 		self.deleteProfileAndFactorSources = deleteProfileAndFactorSources
 		self.setIsCloudProfileSyncEnabled = setIsCloudProfileSyncEnabled
-		self.getDetailsOfSecurityStructure = getDetailsOfSecurityStructure
 	}
 }
 
@@ -39,9 +37,8 @@ extension AppPreferencesClient {
 	public typealias SetIsCloudProfileSyncEnabled = @Sendable (Bool) async throws -> Void
 	public typealias GetPreferences = @Sendable () async -> AppPreferences
 	public typealias UpdatePreferences = @Sendable (AppPreferences) async throws -> Void
-	public typealias ExtractProfileSnapshot = @Sendable () async -> ProfileSnapshot
+	public typealias ExtractProfileSnapshot = @Sendable () async -> Profile
 	public typealias DeleteProfileSnapshot = @Sendable (_ keepInICloudIfPresent: Bool) async throws -> Void
-	public typealias GetDetailsOfSecurityStructure = @Sendable (SecurityStructureConfigurationReference) async throws -> SecurityStructureConfigurationDetailed
 }
 
 extension AppPreferencesClient {
@@ -59,7 +56,7 @@ extension AppPreferencesClient {
 	}
 
 	public func updatingDisplay<T>(
-		_ mutateDisplay: @Sendable (inout AppPreferences.Display) throws -> T
+		_ mutateDisplay: @Sendable (inout AppDisplay) throws -> T
 	) async throws -> T {
 		try await updating { preferences in
 			try mutateDisplay(&preferences.display)

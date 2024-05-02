@@ -97,7 +97,7 @@ struct NewConnectionName_Preview: PreviewProvider {
 	static var previews: some View {
 		NewConnectionName.View(
 			store: .init(
-				initialState: .previewValue,
+				initialState: .sample,
 				reducer: NewConnectionName.init
 			)
 		)
@@ -105,6 +105,10 @@ struct NewConnectionName_Preview: PreviewProvider {
 }
 
 extension NewConnectionName.State {
-	public static let previewValue: Self = .init()
+	public static let sample: Self = .init()
+}
+
+extension RadixConnectPassword {
+	public static let sample: Self = .init(value: .sample)
 }
 #endif

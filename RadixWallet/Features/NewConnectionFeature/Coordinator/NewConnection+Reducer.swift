@@ -215,7 +215,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 
 		case let .root(.scanQR(.delegate(.scanned(qrString)))):
 			return .run { send in
-				if let _ = try? HexCodable32Bytes(hex: qrString) {
+				if let _ = try? Exactly32Bytes(hex: qrString) {
 					/// User scanned an old format QR code
 					await send(.internal(.showErrorAlert(.oldFormatQRCode)))
 					return

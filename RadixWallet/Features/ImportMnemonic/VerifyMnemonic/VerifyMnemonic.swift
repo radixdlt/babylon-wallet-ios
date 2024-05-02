@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - VerifyMnemonic
@@ -7,7 +8,7 @@ public struct VerifyMnemonic: Sendable, FeatureReducer {
 		public static let numberOfRandomWordsToConfirm = 3
 
 		public let mnemonic: Mnemonic
-		public let wordsToConfirm: NonEmpty<IdentifiedArrayOf<OffsetIdentified<Mnemonic.Word>>>
+		public let wordsToConfirm: NonEmpty<IdentifiedArrayOf<OffsetIdentified<BIP39Word>>>
 		public var enteredWords: IdentifiedArrayOf<OffsetIdentified<String>>
 		public var focusedField: Int?
 		public var invalidMnemonic: Bool = false
@@ -80,7 +81,7 @@ public struct VerifyMnemonic: Sendable, FeatureReducer {
 				state.enteredWords.elements,
 				state.wordsToConfirm.rawValue.elements
 			).reduce(true) { partialResult, words in
-				partialResult && words.0.element == words.1.element.word.rawValue
+				partialResult && words.0.element == words.1.element.word
 			}
 
 			if mnemonicMatches {

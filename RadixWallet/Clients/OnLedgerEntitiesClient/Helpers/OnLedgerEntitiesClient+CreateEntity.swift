@@ -56,7 +56,7 @@ extension OnLedgerEntitiesClient {
 		address accountAddress: AccountAddress,
 		_ item: GatewayAPI.StateEntityDetailsResponseItem,
 		ledgerState: AtLedgerState
-	) async throws -> OnLedgerEntity.Account {
+	) async throws -> OnLedgerEntity.OnLedgerAccount {
 		let fungibleResources = try extractOwnedFungibleResources(item, ledgerState: ledgerState)
 		let nonFungibleResources = try extractOwnedNonFungibleResources(item, ledgerState: ledgerState)
 
@@ -82,7 +82,7 @@ extension OnLedgerEntitiesClient {
 			fungibleResources: filteredFungibleResources.sorted(),
 			nonFungibleResources: filteredNonFungibleResources.sorted(),
 			poolUnitResources: poolUnitResources,
-			details: OnLedgerEntity.Account.Details(item.details)
+			details: OnLedgerEntity.OnLedgerAccount.Details(item.details)
 		)
 	}
 
@@ -200,7 +200,7 @@ extension OnLedgerEntitiesClient {
 		rawNonFungibleResources: [OnLedgerEntity.OwnedNonFungibleResource],
 		ledgerState: AtLedgerState,
 		cachingStrategy: CachingStrategy = .useCache
-	) async throws -> OnLedgerEntity.Account.PoolUnitResources {
+	) async throws -> OnLedgerEntity.OnLedgerAccount.PoolUnitResources {
 		let stakeUnitCandidates = rawFungibleResources.filter {
 			$0.metadata.validator != nil
 		}
@@ -252,7 +252,7 @@ extension OnLedgerEntitiesClient {
 		let validators = entities.compactMap(\.validator)
 		let resourcesPools = entities.compactMap(\.resourcePool)
 
-		let stakeUnits = validators.compactMap { validator -> OnLedgerEntity.Account.RadixNetworkStake? in
+		let stakeUnits = validators.compactMap { validator -> OnLedgerEntity.OnLedgerAccount.RadixNetworkStake? in
 			let stakeUnit = matchPoolUnitCandidate(
 				for: validator.stakeUnitResourceAddress,
 				itemAddress: validator.address.asGeneral,
@@ -289,7 +289,7 @@ extension OnLedgerEntitiesClient {
 			return nil
 		}
 
-		let poolUnits = resourcesPools.compactMap { pool -> OnLedgerEntity.Account.PoolUnit? in
+		let poolUnits = resourcesPools.compactMap { pool -> OnLedgerEntity.OnLedgerAccount.PoolUnit? in
 			let poolUnitResource = matchPoolUnitCandidate(
 				for: pool.poolUnitResourceAddress,
 				itemAddress: pool.address.asGeneral,
@@ -302,10 +302,10 @@ extension OnLedgerEntitiesClient {
 				return nil
 			}
 
-			return OnLedgerEntity.Account.PoolUnit(resource: poolUnitResource, resourcePoolAddress: pool.address)
+			return OnLedgerEntity.OnLedgerAccount.PoolUnit(resource: poolUnitResource, resourcePoolAddress: pool.address)
 		}
 
-		let poolUnitResources = OnLedgerEntity.Account.PoolUnitResources(radixNetworkStakes: stakeUnits.asIdentified(), poolUnits: poolUnits.sorted())
+		let poolUnitResources = OnLedgerEntity.OnLedgerAccount.PoolUnitResources(radixNetworkStakes: stakeUnits.asIdentified(), poolUnits: poolUnits.sorted())
 		return poolUnitResources
 	}
 
@@ -354,7 +354,7 @@ extension OnLedgerEntitiesClient {
 	/// This loads all of the related stake unit details required by the Pool Units screen.
 	/// We don't do any pagination there(yet), since the number of owned stakes will not be big, this can be revised in the future.
 	public func getOwnedStakesDetails(
-		account: OnLedgerEntity.Account,
+		account: OnLedgerEntity.OnLedgerAccount,
 		cachingStrategy: CachingStrategy = .useCache
 	) async throws -> [OwnedStakeDetails] {
 		let ownedStakes = account.poolUnitResources.radixNetworkStakes
@@ -458,8 +458,8 @@ extension OnLedgerEntitiesClient {
 	}
 }
 
-extension OnLedgerEntity.Account.PoolUnitResources {
-	var nonEmptyVaults: OnLedgerEntity.Account.PoolUnitResources {
+extension OnLedgerEntity.OnLedgerAccount.PoolUnitResources {
+	var nonEmptyVaults: OnLedgerEntity.OnLedgerAccount.PoolUnitResources {
 		let stakes = radixNetworkStakes.compactMap { stake in
 			let stakeUnitResource: OnLedgerEntity.OwnedFungibleResource? = {
 				guard let stakeUnitResource = stake.stakeUnitResource, stakeUnitResource.amount.nominalAmount > 0 else {
@@ -476,7 +476,7 @@ extension OnLedgerEntity.Account.PoolUnitResources {
 			}()
 
 			if stakeUnitResource != nil || stakeClaimNFT != nil {
-				return OnLedgerEntity.Account.RadixNetworkStake(
+				return OnLedgerEntity.OnLedgerAccount.RadixNetworkStake(
 					validatorAddress: stake.validatorAddress,
 					stakeUnitResource: stakeUnitResource,
 					stakeClaimResource: stakeClaimNFT
@@ -508,8 +508,8 @@ extension OnLedgerEntity.OwnedFungibleResources {
 	}
 }
 
-extension OnLedgerEntity.Account {
-	public var nonEmptyVaults: OnLedgerEntity.Account {
+extension OnLedgerEntity.OnLedgerAccount {
+	public var nonEmptyVaults: OnLedgerEntity.OnLedgerAccount {
 		.init(
 			address: address,
 			atLedgerState: atLedgerState,
@@ -664,8 +664,8 @@ extension OnLedgerEntity.OwnedNonFungibleResource: Comparable {
 	}
 }
 
-// MARK: - OnLedgerEntity.Account.PoolUnit + Comparable
-extension OnLedgerEntity.Account.PoolUnit: Comparable {
+// MARK: - OnLedgerEntity.OnLedgerAccount.PoolUnit + Comparable
+extension OnLedgerEntity.OnLedgerAccount.PoolUnit: Comparable {
 	public static func < (
 		lhs: Self,
 		rhs: Self

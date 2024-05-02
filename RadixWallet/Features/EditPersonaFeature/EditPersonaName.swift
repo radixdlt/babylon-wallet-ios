@@ -8,11 +8,11 @@ public struct EditPersonaName: FeatureReducer, EmptyInitializable {
 		var family: EditPersonaDynamicField.State
 		var given: EditPersonaDynamicField.State
 		var nickname: EditPersonaDynamicField.State
-		var variant: PersonaData.Name.Variant
+		var variant: PersonaDataEntryName.Variant
 
 		init(
 			entryID: PersonaDataEntryID?,
-			with name: PersonaData.Name,
+			with name: PersonaDataEntryName,
 			isRequestedByDapp: Bool
 		) {
 			@Dependency(\.uuid) var uuid
@@ -44,7 +44,7 @@ public struct EditPersonaName: FeatureReducer, EmptyInitializable {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
-		case variantPick(PersonaData.Name.Variant)
+		case variantPick(PersonaDataEntryName.Variant)
 	}
 
 	public enum ChildAction: Sendable, Equatable {

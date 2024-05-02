@@ -1,5 +1,5 @@
 {
-  "originHash" : "f8e8a767cab7d9334987bf06a9dbed1c6759bf30eb416e1f63c6552765355846",
+  "originHash" : "136e3a1717e535f7f4817c4c452e7f0f9a077f467187dd7381b7e2ab133531b1",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -83,15 +83,6 @@
       }
     },
     {
-      "identity" : "k1",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Sajjon/K1",
-      "state" : {
-        "revision" : "9e6c2716b2e6b306d38ca5ec85ff6c16ea148ad1",
-        "version" : "0.3.8"
-      }
-    },
-    {
       "identity" : "keychainaccess",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kishikawakatsumi/KeychainAccess",
@@ -123,8 +114,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/radixdlt/sargon",
       "state" : {
-        "revision" : "0348c8d8e851e37535437bd9d5d7c87cc6dc8622",
-        "version" : "0.6.33"
+        "revision" : "4846abf2c5ca290285f222014f6aafbd120c8a83",
+        "version" : "0.6.54"
       }
     },
     {
@@ -386,6 +377,15 @@
       "state" : {
         "revision" : "a6a3c70ad5d771bd1e927fb55897231cd9592024",
         "version" : "0.13.3"
+      }
+    },
+    {
+      "identity" : "swiftyjson",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwiftyJSON/SwiftyJSON",
+      "state" : {
+        "revision" : "af76cf3ef710b6ca5f8c05f3a31307d44a3c5828",
+        "version" : "5.0.2"
       }
     },
     {

@@ -4,7 +4,7 @@ import SwiftUI
 extension EditPersona.State {
 	var viewState: EditPersona.ViewState {
 		.init(
-			personaLabel: persona.displayName.rawValue,
+			personaLabel: persona.displayName.value,
 			avatarURL: URL(string: "something")!,
 			// Need to disable, since broken in swiftformat 0.52.7
 			// swiftformat:disable redundantClosure

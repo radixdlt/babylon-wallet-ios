@@ -4,14 +4,14 @@ import SwiftUI
 // MARK: - UpdateAccountLabel
 public struct UpdateAccountLabel: FeatureReducer, Sendable {
 	public struct State: Hashable, Sendable {
-		var account: Profile.Network.Account
+		var account: Account
 		var accountLabel: String
 		var sanitizedName: NonEmptyString?
 
-		init(account: Profile.Network.Account) {
+		init(account: Account) {
 			self.account = account
 			self.accountLabel = account.displayName.rawValue
-			self.sanitizedName = account.displayName
+			self.sanitizedName = account.displayName.asNonEmpty
 		}
 	}
 
@@ -36,7 +36,7 @@ public struct UpdateAccountLabel: FeatureReducer, Sendable {
 			return .none
 
 		case let .updateTapped(newLabel):
-			state.account.displayName = newLabel
+			state.account.displayName = DisplayName(nonEmpty: newLabel)
 
 			return .run { [account = state.account] send in
 				do {

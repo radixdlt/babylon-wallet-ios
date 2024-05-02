@@ -1,10 +1,11 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ImportOlympiaWalletCoordinator
 public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	public typealias AccountsToMigrate = NonEmpty<OrderedSet<OlympiaAccountToMigrate>>
-	public typealias MigratedAccounts = IdentifiedArrayOf<Profile.Network.Account>
+	public typealias MigratedAccounts = IdentifiedArrayOf<Account>
 
 	// MARK: State
 
@@ -18,11 +19,11 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	}
 
 	public struct MigratableAccount: Sendable, Hashable, Identifiable {
-		public let id: K1.PublicKey
+		public let id: Secp256k1PublicKey
 		public let accountName: String?
 		public let olympiaAddress: LegacyOlympiaAccountAddress
 		public let babylonAddress: AccountAddress
-		public let appearanceID: Profile.Network.Account.AppearanceID
+		public let appearanceID: AppearanceID
 		public let olympiaAccountType: Olympia.AccountType
 	}
 
@@ -57,7 +58,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 		}
 
 		struct ScannedQR: Sendable, Hashable {
-			let expectedMnemonicWordCount: BIP39.WordCount
+			let expectedMnemonicWordCount: BIP39WordCount
 			let scannedAccounts: AccountsToMigrate
 		}
 
@@ -97,7 +98,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			existingAccounts: Int
 		)
 		case checkedIfOlympiaFactorSourceAlreadyExists(
-			FactorSourceID.FromHash?,
+			FactorSourceIDFromHash?,
 			softwareAccounts: AccountsToMigrate
 		)
 		case migratedSoftwareAccountsToBabylon(
@@ -342,7 +343,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 	}
 
 	private func checkIfOlympiaFactorSourceAlreadyExists(
-		wordCount: BIP39.WordCount,
+		wordCount: BIP39WordCount,
 		_ softwareAccounts: AccountsToMigrate
 	) -> Effect<Action> {
 		.run { send in
@@ -353,7 +354,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	private func checkedIfOlympiaFactorSourceAlreadyExists(
 		in state: inout State,
-		idOfExistingFactorSource: FactorSourceID.FromHash?,
+		idOfExistingFactorSource: FactorSourceIDFromHash?,
 		softwareAccounts: AccountsToMigrate
 	) -> Effect<Action> {
 		guard case let .foundAlreadyImported(progress) = state.progress else { return progressError(state.progress) }
@@ -403,11 +404,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 				of: progress.softwareAccountsToMigrate
 			)
 
-			let privateHDFactorSource = try PrivateHDFactorSource(
-				mnemonicWithPassphrase: mnemonicWithPassphrase,
-				factorSource: DeviceFactorSource.olympia(
-					mnemonicWithPassphrase: mnemonicWithPassphrase
-				)
+			let privateHDFactorSource = PrivateHierarchicalDeterministicFactorSource.olympia(
+				mnemonicWithPassphrase: mnemonicWithPassphrase
 			)
 
 			return migrateSoftwareAccountsToBabylon(
@@ -423,8 +421,8 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 	private func migrateSoftwareAccountsToBabylon(
 		_ olympiaAccounts: AccountsToMigrate,
-		factorSourceID: FactorSourceID.FromHash,
-		factorSource: PrivateHDFactorSource?
+		factorSourceID: FactorSourceIDFromHash,
+		factorSource: PrivateHierarchicalDeterministicFactorSource?
 	) -> Effect<Action> {
 		.run { send in
 			// Migrates and saved all accounts to Profile
@@ -437,14 +435,15 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			)
 
 			if let factorSource, let factorSourceToSave = migrated.factorSourceToSave {
-				guard try factorSourceToSave.id == FactorSource.id(
-					fromPrivateHDFactorSource: factorSource,
-					factorSourceKind: .device
-				) else {
+				let calculatedID = FactorSourceIDFromHash(
+					kind: .device,
+					mnemonicWithPassphrase: factorSource.mnemonicWithPassphrase
+				)
+				guard factorSourceToSave.id == calculatedID else {
 					throw OlympiaFactorSourceToSaveIDDisrepancy()
 				}
 
-				let existing = try? await factorSourcesClient.getFactorSource(id: factorSourceToSave.id.embed())
+				let existing = try? await factorSourcesClient.getFactorSource(id: factorSourceToSave.id.asGeneral)
 				do {
 					let saveIntoProfile = existing == nil
 					if saveIntoProfile {
@@ -488,7 +487,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 			}
 
 			// Save all accounts
-			try await accountsClient.saveVirtualAccounts(migrated.babylonAccounts.elements)
+			try await accountsClient.saveVirtualAccounts(migrated.babylonAccounts)
 
 			do {
 				try userDefaults.addFactorSourceIDOfBackedUpMnemonic(factorSourceID)
@@ -516,7 +515,7 @@ public struct ImportOlympiaWalletCoordinator: Sendable, FeatureReducer {
 
 		state.progress = .migratedSoftwareAccounts(.init(
 			previous: progress.previous,
-			migratedSoftwareAccounts: softwareAccounts.babylonAccounts
+			migratedSoftwareAccounts: softwareAccounts.babylonAccounts.asIdentified()
 		))
 
 		return migrateHardwareAccounts(in: &state)
@@ -583,7 +582,7 @@ extension ImportOlympiaWalletCoordinator {
 	) throws -> NonEmpty<[MigratableAccount]> {
 		let result = scannedAccounts.enumerated().map { index, account in
 			let babylonAddress = AccountAddress(
-				publicKey: SLIP10.PublicKey.ecdsaSecp256k1(account.publicKey).intoSargon(),
+				publicKey: Sargon.PublicKey.secp256k1(account.publicKey),
 				networkID: networkID
 			)
 

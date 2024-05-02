@@ -40,7 +40,7 @@ extension EditPersonaName {
 					),
 					label: EmptyView()
 				) {
-					ForEach(PersonaData.Name.Variant.allCases, id: \.self) {
+					ForEach(PersonaDataEntryName.Variant.allCases, id: \.self) {
 						Text($0.text)
 							.textStyle(.body1Regular)
 							.foregroundColor(.app.gray1)
@@ -105,7 +105,7 @@ extension EditPersonaName {
 	}
 }
 
-extension PersonaData.Name.Variant {
+extension PersonaDataEntryName.Variant {
 	var text: String {
 		switch self {
 		case .western:

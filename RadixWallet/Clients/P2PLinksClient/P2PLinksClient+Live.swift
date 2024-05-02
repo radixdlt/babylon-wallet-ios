@@ -13,17 +13,17 @@ extension P2PLinksClient: DependencyKey {
 			},
 			updateOrAddP2PLink: { newLink in
 				try secureStorageClient.updatingP2PLinks {
-					$0.links.updateOrAppend(newLink)
+					$0.updateOrAppend(newLink)
 				}
 			},
 			deleteP2PLinkByPassword: { password in
 				try secureStorageClient.updatingP2PLinks {
-					$0.links.removeAll(where: { $0.connectionPassword == password })
+					$0.removeAll(where: { $0.connectionPassword == password })
 				}
 			},
 			deleteAllP2PLinks: {
 				try secureStorageClient.updatingP2PLinks {
-					$0.links.removeAll()
+					$0.removeAll()
 				}
 			},
 			getP2PLinkPrivateKey: {

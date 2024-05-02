@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 
 // MARK: - Triggering
 // Triggers a View update, even if the value wasn't changed
@@ -34,9 +35,9 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		var availableMonths: IdentifiedArrayOf<DateRangeItem> = []
 
-		let account: Profile.Network.Account
+		let account: Account
 
-		let portfolio: OnLedgerEntity.Account
+		let portfolio: OnLedgerEntity.OnLedgerAccount
 
 		var resources: IdentifiedArrayOf<OnLedgerEntity.Resource> = []
 
@@ -73,12 +74,12 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destination.State?
 
-		init(account: Profile.Network.Account) throws {
+		init(account: Account) throws {
 			@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 
 			guard let portfolio = accountPortfoliosClient.portfolios().first(where: { $0.account.address == account.address }) else {
 				struct MissingPortfolioError: Error { let account: AccountAddress }
-				throw MissingPortfolioError(account: account.accountAddress)
+				throw MissingPortfolioError(account: account.address)
 			}
 
 			self.account = account
@@ -154,7 +155,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		switch viewAction {
 		case .onAppear:
 			state.loading.isLoading = true
-			return .run { [accountAddress = state.account.accountAddress] send in
+			return .run { [accountAddress = state.account.address] send in
 				let date = try await transactionHistoryClient.getFirstTransactionDate(accountAddress)
 				await send(.internal(.loadedFirstTransactionDate(date)))
 			} catch: { error, _ in
@@ -197,7 +198,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 			case let .transactionTapped(txid):
 				let path = "transaction/\(txid.bech32EncodedTxId)/summary"
-				let url = Radix.Dashboard.dashboard(forNetworkID: state.account.networkID).url.appending(path: path)
+				let url = RadixDashboard.dashboard(forNetworkID: state.account.networkID).url.appending(path: path)
 				return .run { _ in
 					await openURL(url)
 				}
@@ -297,7 +298,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		state.loading.isLoading = true
 
 		let request = TransactionHistoryRequest(
-			account: state.account.accountAddress,
+			account: state.account.address,
 			parameters: parameters,
 			cursor: cursor.string,
 			allResourcesAddresses: state.portfolio.allResourceAddresses,

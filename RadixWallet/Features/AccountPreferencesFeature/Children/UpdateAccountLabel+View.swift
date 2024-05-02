@@ -14,7 +14,7 @@ extension UpdateAccountLabel.State {
 
 	private var hintAndControlState: (ControlState, Hint?) {
 		if let sanitizedName {
-			if sanitizedName.count > Profile.Network.Account.nameMaxLength {
+			if sanitizedName.count > Account.nameMaxLength {
 				return (.disabled, .error(L10n.Error.AccountLabel.tooLong))
 			}
 		} else {

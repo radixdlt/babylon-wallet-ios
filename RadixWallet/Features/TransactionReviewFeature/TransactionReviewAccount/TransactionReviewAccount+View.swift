@@ -54,7 +54,7 @@ extension TransactionReviewAccount.State {
 // MARK: - TransactionReviewAccount.View
 extension TransactionReviewAccount {
 	public struct ViewState: Equatable {
-		let account: TransactionReview.Account
+		let account: TransactionReview.ReviewAccount
 		let transfers: [TransactionReview.Transfer] // FIXME: GK use viewstate?
 		let showApprovedMark: Bool
 	}
@@ -156,7 +156,7 @@ extension ResourceBalance.Fungible {
 }
 
 extension SmallAccountCard where Accessory == EmptyView {
-	public init(account: TransactionReview.Account) {
+	public init(account: TransactionReview.ReviewAccount) {
 		switch account {
 		case let .user(account):
 			self.init(

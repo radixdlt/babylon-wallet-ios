@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ChooseAccountsResult
@@ -66,7 +67,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 			accessKind: AccountPermissionChooseAccounts.State.AccessKind,
 			chosenAccounts: AccountPermissionChooseAccountsResult
 		)
-		case failedToProveOwnership(of: [Profile.Network.Account])
+		case failedToProveOwnership(of: [Account])
 	}
 
 	public struct Destination: DestinationReducer {
@@ -115,7 +116,7 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 				)))
 			}
 
-			guard let signers = NonEmpty<Set<EntityPotentiallyVirtual>>(rawValue: Set(selectedAccounts.map { EntityPotentiallyVirtual.account($0) })) else {
+			guard let signers = NonEmpty<Set<AccountOrPersona>>(rawValue: Set(selectedAccounts.map { AccountOrPersona.account($0) })) else {
 				return .send(.delegate(.continue(
 					accessKind: state.accessKind,
 					chosenAccounts: .withoutProofOfOwnership(selectedAccounts)
@@ -165,11 +166,9 @@ struct AccountPermissionChooseAccounts: Sendable, FeatureReducer {
 			case let .finishedSigning(.signAuth(signedAuthChallenge)):
 				state.destination = nil
 
-				var accountsLeftToVerifyDidSign: Set<Profile.Network.Account.ID> = Set(selectedAccounts.map(\.id))
+				var accountsLeftToVerifyDidSign: Set<Account.ID> = Set(selectedAccounts.map(\.id))
 				let walletAccountsWithProof: [P2P.Dapp.Response.Accounts.WithProof] = signedAuthChallenge.entitySignatures.map {
-					guard case let .account(account) = $0.signerEntity else {
-						fatalError()
-					}
+					let account = try! $0.signerEntity.asAccount()
 					accountsLeftToVerifyDidSign.remove(account.id)
 					let proof = P2P.Dapp.Response.AuthProof(entitySignature: $0)
 					return P2P.Dapp.Response.Accounts.WithProof(account: .init(account: account), proof: proof)

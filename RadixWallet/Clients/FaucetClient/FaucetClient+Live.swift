@@ -56,7 +56,7 @@ extension FaucetClient: DependencyKey {
 			let notarized = try await transactionClient.notarizeTransaction(.init(
 				intentSignatures: [],
 				transactionIntent: transactionIntent,
-				notary: .curve25519(ephemeralNotary)
+				notary: ephemeralNotary
 			))
 
 			let txID = notarized.txID

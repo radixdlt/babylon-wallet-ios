@@ -153,7 +153,7 @@ extension P2P.ConnectorExtension.Request {
 		}
 
 		public let discriminator: Discriminator
-		public let publicKey: HexCodable32Bytes
+		public let publicKey: Exactly32Bytes
 		public let signature: HexCodable
 	}
 

@@ -5,7 +5,7 @@ public protocol AccountWithInfoHolder {
 }
 
 extension AccountWithInfoHolder {
-	public var account: Profile.Network.Account {
+	public var account: Account {
 		get { accountWithInfo.account }
 		set { accountWithInfo.account = newValue }
 	}
@@ -72,7 +72,7 @@ extension AccountWithInfo {
 }
 
 extension AccountWithInfoHolder {
-	mutating func checkAccountAccessToMnemonic(portfolio: OnLedgerEntity.Account? = nil) {
+	mutating func checkAccountAccessToMnemonic(portfolio: OnLedgerEntity.OnLedgerAccount? = nil) {
 		if let portfolio, account.address != portfolio.address {
 			assertionFailure("Discrepancy, wrong owner")
 		}

@@ -1,3 +1,7 @@
+import Sargon
+
+public typealias DeviceID = UUID
+
 // MARK: - BackupsClient
 public struct BackupsClient: Sendable {
 	public var snapshotOfProfileForExport: SnapshotOfProfileForExport
@@ -25,22 +29,22 @@ public struct BackupsClient: Sendable {
 }
 
 extension BackupsClient {
-	public typealias SnapshotOfProfileForExport = @Sendable () async throws -> ProfileSnapshot
-	public typealias LoadProfileBackups = @Sendable () async -> ProfileSnapshot.HeaderList?
+	public typealias SnapshotOfProfileForExport = @Sendable () async throws -> Profile
+	public typealias LoadProfileBackups = @Sendable () async -> Profile.HeaderList?
 
-	public typealias ImportProfileSnapshot = @Sendable (ProfileSnapshot, Set<FactorSourceID.FromHash>) async throws -> Void
-	public typealias ImportCloudProfile = @Sendable (ProfileSnapshot.Header, Set<FactorSourceID.FromHash>) async throws -> Void
-	public typealias LookupProfileSnapshotByHeader = @Sendable (ProfileSnapshot.Header) async throws -> ProfileSnapshot?
+	public typealias ImportProfileSnapshot = @Sendable (Profile, Set<FactorSourceIDFromHash>) async throws -> Void
+	public typealias ImportCloudProfile = @Sendable (Profile.Header, Set<FactorSourceIDFromHash>) async throws -> Void
+	public typealias LookupProfileSnapshotByHeader = @Sendable (Profile.Header) async throws -> Profile?
 
 	public typealias LoadDeviceID = @Sendable () async -> UUID?
 }
 
 extension BackupsClient {
 	public func importSnapshot(
-		_ snapshot: ProfileSnapshot,
+		_ snapshot: Profile,
 		fromCloud: Bool
 	) async throws {
-		let factorSourceIDs: Set<FactorSourceID.FromHash> = .init(
+		let factorSourceIDs: Set<FactorSourceIDFromHash> = .init(
 			snapshot.factorSources.compactMap { $0.extract(DeviceFactorSource.self) }.map(\.id)
 		)
 		if fromCloud {

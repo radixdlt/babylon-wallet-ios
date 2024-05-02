@@ -82,7 +82,7 @@ public struct ManualAccountRecoveryCoordinator: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return .run { send in
-				let isMainnet = await gatewaysClient.getCurrentGateway().network == .mainnet
+				let isMainnet = await gatewaysClient.getCurrentGateway().network.id == .mainnet
 				await send(.internal(.isMainnet(isMainnet)))
 			}
 

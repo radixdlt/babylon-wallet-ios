@@ -14,7 +14,7 @@ extension LedgerHardwareDevices {
 		var showIcon: Bool { context != .settings }
 
 		let ledgers: Loadable<IdentifiedArrayOf<LedgerHardwareWalletFactorSource>>
-		let selectedLedgerID: FactorSourceID.FromHash?
+		let selectedLedgerID: FactorSourceIDFromHash?
 		let selectedLedgerControlRequirements: SelectedLedgerControlRequirements?
 		let context: State.Context
 

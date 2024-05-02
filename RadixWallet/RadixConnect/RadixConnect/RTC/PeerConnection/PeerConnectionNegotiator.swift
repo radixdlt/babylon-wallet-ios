@@ -216,7 +216,7 @@ extension PeerConnectionNegotiator {
 		let hashedMessageToSign = p2pLink.connectionPassword.messageToHash.hash().data
 		let linkClientInteractionResponse = try P2P.ConnectorExtension.Request.LinkClientInteractionResponse(
 			discriminator: .linkClient,
-			publicKey: HexCodable32Bytes(data: privateKey.publicKey.compressedRepresentation),
+			publicKey: Exactly32Bytes(bytes: privateKey.publicKey.compressedRepresentation),
 			signature: HexCodable(data: privateKey.signature(for: hashedMessageToSign))
 		)
 		try await peerConnectionClient.sendData(jsonEncoder().encode(linkClientInteractionResponse))

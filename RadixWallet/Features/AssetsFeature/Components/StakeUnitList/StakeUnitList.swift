@@ -3,8 +3,8 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 	typealias SelectedStakeClaimTokens = [OnLedgerEntity.OwnedNonFungibleResource: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>]
 
 	public struct State: Sendable, Hashable {
-		let account: OnLedgerEntity.Account
-		var ownedStakes: IdentifiedArrayOf<OnLedgerEntity.Account.RadixNetworkStake> {
+		let account: OnLedgerEntity.OnLedgerAccount
+		var ownedStakes: IdentifiedArrayOf<OnLedgerEntity.OnLedgerAccount.RadixNetworkStake> {
 			account.poolUnitResources.radixNetworkStakes
 		}
 
@@ -20,7 +20,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		var destination: Destination.State?
 
 		init(
-			account: OnLedgerEntity.Account,
+			account: OnLedgerEntity.OnLedgerAccount,
 			selectedLiquidStakeUnits: IdentifiedArrayOf<OnLedgerEntity.OwnedFungibleResource>?,
 			selectedStakeClaimTokens: SelectedStakeClaimTokens?,
 			stakeUnitDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>>,

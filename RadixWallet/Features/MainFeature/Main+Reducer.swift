@@ -30,7 +30,7 @@ public struct Main: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case currentGatewayChanged(to: Radix.Gateway)
+		case currentGatewayChanged(to: Gateway)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -94,7 +94,7 @@ public struct Main: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .currentGatewayChanged(currentGateway):
-			state.isOnMainnet = currentGateway.network == .mainnet
+			state.isOnMainnet = currentGateway.network.id == .mainnet
 			return .none
 		}
 	}

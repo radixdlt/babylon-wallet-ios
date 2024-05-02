@@ -9,28 +9,17 @@ extension ROLAClient {
 		let manifestForAuthKeyCreation: ManifestForAuthKeyCreation = { request in
 			let entity = request.entity
 			let newPublicKey = request.newPublicKey
-
-			let entityAddress: AddressOfAccountOrPersona = {
-				switch entity {
-				case let .account(account):
-					assert(account.networkID == request.entity.networkID)
-					return AddressOfAccountOrPersona.account(account.address)
-				case let .persona(persona):
-					assert(persona.networkID == request.entity.networkID)
-					return AddressOfAccountOrPersona.identity(persona.address)
-				}
-			}()
-
+			let entityAddress = entity.address
 			let metadata = try await onLedgerEntitiesClient.getEntity(entityAddress.asGeneral, metadataKeys: [.ownerKeys]).genericComponent?.metadata
 			var ownerKeyHashes = try metadata?.ownerKeyHashes() ?? []
 
 			let transactionSigningKeyHash: PublicKeyHash = switch entity.securityState {
 			case let .unsecured(control):
-				.init(hashing: control.transactionSigning.publicKey.intoSargon())
+				.init(hashing: control.transactionSigning.publicKey.publicKey)
 			}
 
 			loggerGlobal.debug("ownerKeyHashes: \(ownerKeyHashes)")
-			ownerKeyHashes.append(.init(hashing: newPublicKey.intoSargon()))
+			ownerKeyHashes.append(.init(hashing: newPublicKey))
 
 			if !ownerKeyHashes.contains(transactionSigningKeyHash) {
 				loggerGlobal.debug("Did not contain transactionSigningKey hash, re-adding it: \(transactionSigningKeyHash)")
