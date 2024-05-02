@@ -71,7 +71,7 @@ extension Settings.View {
 						}
 					}
 
-					ForEach(rows) { kind in
+					ForEachStatic(rows) { kind in
 						SettingsRow(kind: kind, store: store)
 					}
 				}

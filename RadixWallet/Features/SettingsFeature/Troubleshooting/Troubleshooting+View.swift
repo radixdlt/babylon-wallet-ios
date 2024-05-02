@@ -24,7 +24,7 @@ extension Troubleshooting.View {
 	private var content: some View {
 		ScrollView {
 			VStack(spacing: .zero) {
-				ForEach(rows) { kind in
+				ForEachStatic(rows) { kind in
 					SettingsRow(kind: kind, store: store)
 				}
 			}
