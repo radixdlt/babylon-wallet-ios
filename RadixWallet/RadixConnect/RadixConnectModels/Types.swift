@@ -14,10 +14,10 @@ extension RadixConnectPassword {
 	/// CE uses the same logic to compute its own message.
 	var messageToHash: Data {
 		let prefix = Data("L".utf8)
-//		let passwordData = self.data.data
+		let passwordData = self.hash().data
 		var messageData = Data()
 		messageData.append(prefix)
-//		messageData.append(passwordData)
+		messageData.append(passwordData)
 
 		return Data(messageData)
 	}
@@ -59,9 +59,9 @@ public struct LinkConnectionQRData: Sendable, Hashable, Decodable {
 
 extension LinkConnectionQRData {
 	public func hasValidSignature() throws -> Bool {
-        return false
-        
-        // FIXME: -
+		false
+
+		// FIXME: -
 //		let signature = try SignatureWithPublicKey.eddsaEd25519(
 //			signature: signature.data,
 //			publicKey: .init(rawRepresentation: publicKey.data.data)
@@ -88,51 +88,51 @@ public enum ConnectionPurpose: String, Sendable, Codable, UnknownCaseDecodable {
 	case unknown
 }
 
-import WebRTC
-
-// MARK: - P2PLink
-/// A client the user have connected P2P with, typically a
-/// WebRTC connections with a DApp, but might be Android or iPhone
-/// client as well.
-public struct P2PLink:
-    Sendable,
-    Hashable,
-    Codable,
-    Identifiable
-{
-    public var id: Curve25519PublicKeyBytes {
-        publicKey
-    }
-
-    /// The `RadixConnectPassword` is used to be able to restablish the P2P connection.
-    public let connectionPassword: RadixConnectPassword
-
-    /// Acts as the seed for the `ID`.
-    public let publicKey: Curve25519PublicKeyBytes
-
-    /// Link purpose
-    public let purpose: ConnectionPurpose
-
-    /// Client name, e.g. "Chrome on Macbook" or "My work Android" or "My wifes iPhone SE".
-    public let displayName: String
-
-    /// The canonical initializer requiring a `RadixConnectPassword`, `Curve25519PublicKeyBytes`, `ConnectionPurpose` and `Display` name.
-    public init(
-        connectionPassword: RadixConnectPassword,
-        publicKey: Curve25519PublicKeyBytes,
-        purpose: ConnectionPurpose,
-        displayName: String
-    ) {
-        self.connectionPassword = connectionPassword
-        self.publicKey = publicKey
-        self.purpose = purpose
-        self.displayName = displayName
-    }
-}
-
-// MARK: Equatable
-extension P2PLink: Equatable {
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.id == rhs.id
-    }
-}
+// import WebRTC
+//
+//// MARK: - P2PLink
+///// A client the user have connected P2P with, typically a
+///// WebRTC connections with a DApp, but might be Android or iPhone
+///// client as well.
+// public struct P2PLink:
+//    Sendable,
+//    Hashable,
+//    Codable,
+//    Identifiable
+// {
+//    public var id: Curve25519PublicKeyBytes {
+//        publicKey
+//    }
+//
+//    /// The `RadixConnectPassword` is used to be able to restablish the P2P connection.
+//    public let connectionPassword: RadixConnectPassword
+//
+//    /// Acts as the seed for the `ID`.
+//    public let publicKey: Curve25519PublicKeyBytes
+//
+//    /// Link purpose
+//    public let purpose: ConnectionPurpose
+//
+//    /// Client name, e.g. "Chrome on Macbook" or "My work Android" or "My wifes iPhone SE".
+//    public let displayName: String
+//
+//    /// The canonical initializer requiring a `RadixConnectPassword`, `Curve25519PublicKeyBytes`, `ConnectionPurpose` and `Display` name.
+//    public init(
+//        connectionPassword: RadixConnectPassword,
+//        publicKey: Curve25519PublicKeyBytes,
+//        purpose: ConnectionPurpose,
+//        displayName: String
+//    ) {
+//        self.connectionPassword = connectionPassword
+//        self.publicKey = publicKey
+//        self.purpose = purpose
+//        self.displayName = displayName
+//    }
+// }
+//
+//// MARK: Equatable
+// extension P2PLink: Equatable {
+//    public static func == (lhs: Self, rhs: Self) -> Bool {
+//        lhs.id == rhs.id
+//    }
+// }

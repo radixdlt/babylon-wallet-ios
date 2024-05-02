@@ -105,7 +105,7 @@ struct NewConnectionName_Preview: PreviewProvider {
 }
 
 extension NewConnectionName.State {
-    public static let sample: Self = .init()
+	public static let sample: Self = .init()
 }
 
 extension RadixConnectPassword {
