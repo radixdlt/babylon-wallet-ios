@@ -7,7 +7,7 @@ extension Home.AccountRow {
 		let address: AccountAddress
 		let showFiatWorth: Bool
 		let fiatWorth: Loadable<FiatWorth>
-		let appearanceID: Profile.Network.Account.AppearanceID
+		let appearanceID: AppearanceID
 		let isLoadingResources: Bool
 
 		public enum AccountTag: Int, Hashable, Identifiable, Sendable {

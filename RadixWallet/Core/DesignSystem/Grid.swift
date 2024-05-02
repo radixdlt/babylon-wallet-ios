@@ -63,7 +63,7 @@ extension CGFloat {
 	public static let standardButtonWidth: Self = 250
 
 	/// 72
-	public static let settingsRowHeight: Self = 72
+	public static let plainListRowMinHeight: Self = 72
 
 	/// 75
 	public static let largeButtonHeight: Self = 75

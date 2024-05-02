@@ -1,4 +1,5 @@
 #if DEBUG
+import Sargon
 
 // MARK: - DebugKeychainContents
 public struct DebugKeychainContents: Sendable, FeatureReducer {
@@ -9,7 +10,7 @@ public struct DebugKeychainContents: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case deleteMnemonicByFactorSourceID(FactorSourceID.FromHash)
+		case deleteMnemonicByFactorSourceID(FactorSourceIDFromHash)
 		case deleteAllMnemonics
 	}
 
@@ -43,7 +44,7 @@ public struct DebugKeychainContents: Sendable, FeatureReducer {
 		}
 	}
 
-	private func delete(ids: [FactorSourceID.FromHash]) -> Effect<Action> {
+	private func delete(ids: [FactorSourceIDFromHash]) -> Effect<Action> {
 		.run { _ in
 			for id in ids {
 				try secureStorageClient.deleteMnemonicByFactorSourceID(id)
@@ -60,7 +61,10 @@ public struct DebugKeychainContents: Sendable, FeatureReducer {
 			let values = try await keyedMnemonics.asyncMap {
 				do {
 					if
-						let deviceFactorSource = try await factorSourcesClient.getFactorSource(id: $0.factorSourceID.embed(), as: DeviceFactorSource.self),
+						let deviceFactorSource = try await factorSourcesClient.getFactorSource(
+							id: $0.factorSourceID.asGeneral,
+							as: DeviceFactorSource.self
+						),
 						let entitiesControlledByFactorSource = try? await deviceFactorSourceClient.entitiesControlledByFactorSource(deviceFactorSource, nil)
 					{
 						return KeyedMnemonicWithMetadata(keyedMnemonic: $0, entitiesControlledByFactorSource: entitiesControlledByFactorSource)
@@ -79,7 +83,7 @@ public struct DebugKeychainContents: Sendable, FeatureReducer {
 
 public struct KeyedMnemonicWithMetadata: Sendable, Hashable, Identifiable {
 	public let keyedMnemonic: KeyedMnemonicWithPassphrase
-	public typealias ID = FactorSourceID.FromHash
+	public typealias ID = FactorSourceIDFromHash
 	public var id: ID { keyedMnemonic.factorSourceID }
 	public let entitiesControlledByFactorSource: EntitiesControlledByFactorSource?
 	init(keyedMnemonic: KeyedMnemonicWithPassphrase, entitiesControlledByFactorSource: EntitiesControlledByFactorSource? = nil) {

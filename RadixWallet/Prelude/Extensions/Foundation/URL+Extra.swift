@@ -9,3 +9,8 @@ extension URL {
 		return .init(string: httpsString)
 	}
 }
+
+// MARK: - URL + Identifiable
+extension URL: Identifiable {
+	public var id: URL { self.absoluteURL }
+}

@@ -8,14 +8,16 @@ extension AppPreferencesClient: DependencyKey {
 			appPreferenceUpdates: {
 				await profileStore.appPreferencesValues()
 			},
-			getPreferences: { await profileStore.profile.appPreferences },
+			getPreferences: {
+				await profileStore.profile.appPreferences
+			},
 			updatePreferences: { newPreferences in
 				try await profileStore.updating {
 					$0.appPreferences = newPreferences
 				}
 			},
 			extractProfileSnapshot: {
-				await profileStore.profile.snapshot()
+				await profileStore.profile
 			},
 			deleteProfileAndFactorSources: { keepInICloudIfPresent in
 				try await profileStore.deleteProfile(keepInICloudIfPresent: keepInICloudIfPresent)
@@ -33,9 +35,6 @@ extension AppPreferencesClient: DependencyKey {
 					profile.id,
 					isEnabled ? .enable : .disable
 				)
-			},
-			getDetailsOfSecurityStructure: { configRef in
-				try await profileStore.profile.detailedSecurityStructureConfiguration(reference: configRef)
 			}
 		)
 	}

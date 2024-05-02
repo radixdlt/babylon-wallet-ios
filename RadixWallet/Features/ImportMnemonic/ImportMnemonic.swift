@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ImportMnemonic
@@ -11,21 +12,21 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		public var idOfWordWithTextFieldFocus: ImportMnemonicWord.State.ID?
 
-		public var language: BIP39.Language
-		public var wordCount: BIP39.WordCount {
-			guard let wordCount = BIP39.WordCount(wordCount: words.count) else {
+		public var language: BIP39Language
+		public var wordCount: BIP39WordCount {
+			guard let wordCount = BIP39WordCount(wordCount: words.count) else {
 				assertionFailure("Should never happen")
 				return .twentyFour
 			}
 			return wordCount
 		}
 
-		public mutating func changeWordCount(to newWordCount: BIP39.WordCount) {
+		public mutating func changeWordCount(to newWordCount: BIP39WordCount) {
 			let wordCount = words.count
-			let delta = newWordCount.rawValue - wordCount
+			let delta = Int(newWordCount.rawValue) - wordCount
 			if delta > 0 {
 				// is increasing word count
-				words.append(contentsOf: (wordCount ..< newWordCount.rawValue).map {
+				words.append(contentsOf: (wordCount ..< Int(newWordCount.rawValue)).map {
 					.init(
 						id: $0,
 						placeholder: ImportMnemonic.placeholder(
@@ -53,7 +54,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			)
 		}
 
-		public var completedWords: [BIP39.Word] {
+		public var completedWords: [BIP39Word] {
 			words.compactMap(\.completeWord)
 		}
 
@@ -76,10 +77,10 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			// to much logic and responsibility into this reducer here... for when a mnemonic is displayed
 			// either from settings or from AccountDetails after user have pressed "Back up this mnemonic"
 			// prompt, we need to able to mark a mnemonic as "backed up by user", we do so by use of
-			// `FactorSourceID.FromHash` - which require a FactorSourceKind....
-			public let factorSourceID: FactorSourceID.FromHash
+			// `FactorSourceIDFromHash` - which require a FactorSourceKind....
+			public let factorSourceID: FactorSourceIDFromHash
 
-			public init(context: Context, factorSourceID: FactorSourceID.FromHash) {
+			public init(context: Context, factorSourceID: FactorSourceIDFromHash) {
 				self.context = context
 				self.factorSourceID = factorSourceID
 			}
@@ -139,11 +140,11 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			}
 
 			public let onMnemonicExistsStrategy: OnMnemonicExistsStrategy
-			public let factorSourceKindOfMnemonic: FactorSourceKindOfMnemonic
+			public let factorSourceKindOfMnemonic: OnDeviceMnemonicKind
 			public let location: Location
 
 			public init(
-				factorSourceKindOfMnemonic: FactorSourceKindOfMnemonic,
+				factorSourceKindOfMnemonic: OnDeviceMnemonicKind,
 				location: Location,
 				onMnemonicExistsStrategy: OnMnemonicExistsStrategy
 			) {
@@ -173,12 +174,11 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			warningOnContinue: OnContinueWarning? = nil,
 			isWordCountFixed: Bool = false,
 			persistStrategy: PersistStrategy?,
-			language: BIP39.Language = .english,
-			wordCount: BIP39.WordCount = .twelve,
-			bip39Passphrase: String = "",
-			offDeviceMnemonicInfoPrompt: OffDeviceMnemonicInfo.State? = nil
+			language: BIP39Language = .english,
+			wordCount: BIP39WordCount = .twelve,
+			bip39Passphrase: String = ""
 		) {
-			precondition(wordCount.rawValue.isMultiple(of: ImportMnemonic.wordsPerRow))
+			precondition(wordCount.rawValue.isMultiple(of: UInt8(ImportMnemonic.wordsPerRow)))
 
 			self.mode = .write(
 				.init(
@@ -193,9 +193,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 			self.isWordCountFixed = isWordCountFixed
 			self.words = []
-			if let offDeviceMnemonicInfoPrompt {
-				self.destination = .offDeviceMnemonicInfoPrompt(offDeviceMnemonicInfoPrompt)
-			}
 			self.header = header
 			self.warning = warning
 			self.warningOnContinue = warningOnContinue
@@ -231,7 +228,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 						ImportMnemonicWord.State(
 							id: $0.offset,
 							value: .complete(
-								text: $0.element.word.rawValue,
+								text: $0.element.word,
 								word: $0.element,
 								completion: .auto(match: .exact)
 							),
@@ -262,7 +259,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		case toggleModeButtonTapped
 		case passphraseChanged(String)
-		case changedWordCountTo(BIP39.WordCount)
+		case changedWordCountTo(BIP39WordCount)
 		case doneViewing
 		case closeButtonTapped
 		case backButtonTapped
@@ -298,19 +295,17 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		case persistedNewFactorSourceInProfile(FactorSource)
 		case persistedMnemonicInKeychainOnly(FactorSource)
 		case notPersisted(MnemonicWithPassphrase)
-		case doneViewing(idOfBackedUpFactorSource: FactorSource.ID.FromHash?) // `nil` means it was already marked as backed up
+		case doneViewing(idOfBackedUpFactorSource: FactorSourceIdFromHash?) // `nil` means it was already marked as backed up
 	}
 
 	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
-			case offDeviceMnemonicInfoPrompt(OffDeviceMnemonicInfo.State)
 			case backupConfirmation(AlertState<Action.BackupConfirmation>)
 			case onContinueWarning(AlertState<Action.OnContinueWarning>)
 			case verifyMnemonic(VerifyMnemonic.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case offDeviceMnemonicInfoPrompt(OffDeviceMnemonicInfo.Action)
 			case backupConfirmation(BackupConfirmation)
 			case verifyMnemonic(VerifyMnemonic.Action)
 			case onContinueWarning(OnContinueWarning)
@@ -326,9 +321,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 
 		public var body: some Reducer<State, Action> {
-			Scope(state: /State.offDeviceMnemonicInfoPrompt, action: /Action.offDeviceMnemonicInfoPrompt) {
-				OffDeviceMnemonicInfo()
-			}
 			Scope(state: /State.verifyMnemonic, action: /Action.verifyMnemonic) {
 				VerifyMnemonic()
 			}
@@ -371,7 +363,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			let lookupResult = lookup(input: displayText, state)
 			switch lookupResult {
 			case let .known(.ambigous(candidates, input)):
-				if let exactMatch = candidates.first(where: { $0.word == input }) {
+				if let exactMatch = candidates.first(where: { $0.word == input.rawValue }) {
 					state.words[id: id]?.value = .complete(
 						text: displayText,
 						word: exactMatch,
@@ -460,7 +452,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 		#if DEBUG
 		case .debugCopyMnemonic:
-			if let mnemonic = state.mnemonic?.phrase.rawValue {
+			if let mnemonic = state.mnemonic?.phrase {
 				pasteboardClient.copyString(mnemonic)
 			}
 			return .none
@@ -488,7 +480,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 			return .send(.view(.debugMnemonicChanged("wine over village stage barrel strategy cushion decline echo fiber salad carry empower fun awful cereal galaxy laundry practice appear bean flat mansion license", continue: continueAutomatically)))
 
 		case let .debugUseTestingMnemonicZooVote(continueAutomatically):
-			return .send(.view(.debugMnemonicChanged(Mnemonic.testValueZooVote.phrase.rawValue, continue: continueAutomatically)))
+			return .send(.view(.debugMnemonicChanged(Mnemonic.sample24ZooVote.phrase, continue: continueAutomatically)))
 		#endif
 		}
 	}
@@ -508,28 +500,19 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 		}
 		switch persistStrategy.location {
 		case .intoKeychainAndProfile:
-			switch persistStrategy.factorSourceKindOfMnemonic {
-			case .offDevice:
-				state.destination = .offDeviceMnemonicInfoPrompt(.init(
-					mnemonicWithPassphrase: mnemonicWithPassphrase
-				))
-				return .none
-
-			case let .onDevice(onDeviceKind):
-				return .run { send in
-					await send(.internal(.saveFactorSourceResult(
-						TaskResult {
-							let saveIntoProfile = true
-							let factorSource = try await factorSourcesClient.addOnDeviceFactorSource(
-								onDeviceMnemonicKind: onDeviceKind,
-								mnemonicWithPassphrase: mnemonicWithPassphrase,
-								onMnemonicExistsStrategy: persistStrategy.onMnemonicExistsStrategy,
-								saveIntoProfile: saveIntoProfile
-							)
-							return .init(factorSource: factorSource.embed(), savedIntoProfile: saveIntoProfile)
-						}
-					)))
-				}
+			return .run { send in
+				await send(.internal(.saveFactorSourceResult(
+					TaskResult {
+						let saveIntoProfile = true
+						let factorSource = try await factorSourcesClient.addOnDeviceFactorSource(
+							onDeviceMnemonicKind: persistStrategy.factorSourceKindOfMnemonic,
+							mnemonicWithPassphrase: mnemonicWithPassphrase,
+							onMnemonicExistsStrategy: persistStrategy.onMnemonicExistsStrategy,
+							saveIntoProfile: saveIntoProfile
+						)
+						return .init(factorSource: factorSource.asGeneral, savedIntoProfile: saveIntoProfile)
+					}
+				)))
 			}
 		}
 	}
@@ -576,26 +559,6 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .offDeviceMnemonicInfoPrompt(.delegate(.done(label, mnemonicWithPassphrase))):
-			state.destination = nil
-
-			guard let persistStrategy = state.mode.write?.persistStrategy else {
-				preconditionFailure("expected persistStrategy")
-			}
-			precondition(persistStrategy.factorSourceKindOfMnemonic == .offDevice)
-
-			return .run { send in
-				await send(.internal(.saveFactorSourceResult(
-					TaskResult {
-						let factorSource = try await factorSourcesClient.addOffDeviceFactorSource(
-							mnemonicWithPassphrase: mnemonicWithPassphrase,
-							label: label
-						)
-						return .init(factorSource: factorSource, savedIntoProfile: true)
-					}
-				)))
-			}
-
 		case .backupConfirmation(.userHasBackedUp):
 			guard let mnemonic = state.mnemonic else {
 				return .none
@@ -635,7 +598,7 @@ public struct ImportMnemonic: Sendable, FeatureReducer {
 }
 
 extension ImportMnemonic {
-	private func lookup(input: String, _ state: State) -> BIP39.WordList.LookupResult {
+	private func lookup(input: String, _ state: State) -> BIP39LookupResult {
 		mnemonicClient.lookup(.init(
 			language: state.language,
 			input: input,
@@ -644,7 +607,7 @@ extension ImportMnemonic {
 	}
 
 	private func completeWith(
-		word: BIP39.Word,
+		word: BIP39Word,
 		completion: ImportMnemonicWord.State.WordValue.Completion,
 		id: ImportMnemonicWord.State.ID,
 		input: String,
@@ -658,16 +621,34 @@ extension ImportMnemonic {
 		id: ImportMnemonicWord.State.ID,
 		input: String,
 		_ state: inout State,
-		lookupResult: BIP39.WordList.LookupResult
+		lookupResult: BIP39LookupResult
 	) -> Effect<Action> {
+		// FIXME: - 1.5.4 hot fix
+		/// Words strip is broken in latest iOS versions, so we don't count on users selecting the word
+		/// dissambiguate between them. Rather the Wallet will validate the word eagerly if it is a valid one.
+		/// Behaviour:
+		/// - User enters the first two characters, having the word `en` - the word is incomplete.
+		/// - User enters another character, having the word`end` - the word is valid.
+		/// - User enters additional character, having the word `endl` - the word is incomplete.
+		/// - User enters additional characters, having the word `endless` - the word is considered valid.
+		/// - User removes some characters, having the word `endle` - the word is incomplete.
+		/// - User removes more characters, having the word `end` - the word is valid.
+		/// - User removes another character, having the word `en` - the word is incomplete.
 		switch lookupResult {
 		case let .known(.ambigous(candidates, nonEmptyInput)):
-			state.words[id: id]?.autocompletionCandidates = .init(input: nonEmptyInput, candidates: candidates)
-			state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: false)
-			return .none
+			guard let userInput = candidates.first(where: { $0.word == nonEmptyInput.rawValue }) else {
+				state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: false)
+				return .none
+			}
 
-		case let .known(.unambiguous(word, match, _)):
-			return completeWith(word: word, completion: .auto(match: match), id: id, input: input, &state)
+			return completeWith(word: userInput, completion: .user, id: id, input: input, &state)
+
+		case let .known(.unambiguous(word, _, _)):
+			guard word.word == input else {
+				state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: false)
+				return .none
+			}
+			return completeWith(word: word, completion: .user, id: id, input: input, &state)
 
 		case .unknown(.notInList):
 			state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: true)
@@ -697,31 +678,30 @@ extension ImportMnemonic {
 extension ImportMnemonic {
 	static func placeholder(
 		index: Int,
-		wordCount: BIP39.WordCount,
-		language: BIP39.Language
+		wordCount: BIP39WordCount,
+		language: BIP39Language
 	) -> String {
 		precondition(index <= 23, "Invalid BIP39 word index, got index: \(index), exected less than 24.")
-		let word: BIP39.Word = {
-			let wordList = BIP39.wordList(for: language)
+		let word: BIP39Word = {
+			let wordList = language.wordlist() // BIP39.wordList(for: language)
 			switch language {
 			case .english:
 				let bip39Alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", /* X is missing */ "y", "z"]
 				return wordList
-					.words
 					// we use `last` simply because we did not like the words "abandon baby"
 					// which we get by using `first`, too sad a combination.
 					.last(
-						where: { $0.word.rawValue.hasPrefix(bip39Alphabet[index]) }
+						where: { $0.word.hasPrefix(bip39Alphabet[index]) }
 					)!
 
 			default:
 				let scale = UInt16(89) // 2048 / 23
-				let indexScaled = BIP39.Word.Index(valueBoundBy16Bits: scale * UInt16(index))!
-				return wordList.indexToWord[indexScaled]!
+				let indexScaled = U11(inner: scale * UInt16(index))
+				return wordList.first(where: { $0.index == indexScaled })!
 			}
 
 		}()
-		return word.word.rawValue
+		return word.word
 	}
 }
 

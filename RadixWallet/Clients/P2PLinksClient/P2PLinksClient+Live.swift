@@ -18,12 +18,12 @@ extension P2PLinksClient: DependencyKey {
 			},
 			deleteP2PLinkByPassword: { password in
 				try await appPreferencesClient.updating {
-					$0.p2pLinks.links.removeAll(where: { $0.connectionPassword == password })
+					$0.p2pLinks.removeAll(where: { $0.connectionPassword == password })
 				}
 			},
 			deleteAllP2PLinks: {
 				try await appPreferencesClient.updating {
-					$0.p2pLinks.links.removeAll()
+					$0.p2pLinks.removeAll()
 				}
 			}
 		)

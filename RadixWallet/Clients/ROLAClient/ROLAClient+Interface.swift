@@ -59,12 +59,12 @@ public struct AuthenticationDataToSignForChallengeResponse: Sendable, Hashable {
 
 // MARK: - ManifestForAuthKeyCreationRequest
 public struct ManifestForAuthKeyCreationRequest: Sendable, Hashable {
-	public let entity: EntityPotentiallyVirtual
-	public let newPublicKey: SLIP10.PublicKey
+	public let entity: AccountOrPersona
+	public let newPublicKey: Sargon.PublicKey
 
 	public init(
-		entity: EntityPotentiallyVirtual,
-		newPublicKey: SLIP10.PublicKey
+		entity: AccountOrPersona,
+		newPublicKey: Sargon.PublicKey
 	) throws {
 		guard !entity.hasAuthenticationSigningKey else {
 			throw EntityHasAuthSigningKeyAlready()

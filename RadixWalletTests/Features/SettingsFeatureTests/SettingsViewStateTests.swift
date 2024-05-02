@@ -1,5 +1,6 @@
 import Foundation
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
 
 final class SettingsViewStateTests: TestCase {
@@ -11,11 +12,11 @@ final class SettingsViewStateTests: TestCase {
 				displayName: "",
 				spokenName: "",
 				shortVersion: "4.2.0",
-				version: "42"
+				version: ""
 			)
 		} operation: {
 			let sut = Settings.ViewState(state: .init())
-			XCTAssertEqual(sut.appVersion, "Version: 4.2.0 build #42")
+			XCTAssertEqual(sut.appVersion, "App version: 4.2.0")
 		}
 	}
 }

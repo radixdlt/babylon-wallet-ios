@@ -8,11 +8,11 @@ extension P2P {
 	/// Recipient of sender of an RTC message
 	public struct RTCRoute: Sendable, Hashable {
 		/// The PerPeerPairConnection password.
-		public let connectionId: ConnectionPassword
+		public let connectionId: RadixConnectPassword
 		/// ID to a specific peer **connection** for some PerPeerPairConnection.
 		public let peerConnectionId: PeerConnectionID
 
-		public init(connectionId: ConnectionPassword, peerConnectionId: PeerConnectionID) {
+		public init(connectionId: RadixConnectPassword, peerConnectionId: PeerConnectionID) {
 			self.connectionId = connectionId
 			self.peerConnectionId = peerConnectionId
 		}

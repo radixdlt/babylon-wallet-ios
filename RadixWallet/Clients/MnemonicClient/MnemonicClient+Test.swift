@@ -17,7 +17,7 @@ extension MnemonicClient: TestDependencyKey {
 	)
 
 	public static let noop = Self(
-		generate: { _, _ in throw NoopError() },
+		generate: { _, _ in .sample },
 		import: { _, _ in throw NoopError() },
 		lookup: { _ in .unknown(.tooShort) }
 	)

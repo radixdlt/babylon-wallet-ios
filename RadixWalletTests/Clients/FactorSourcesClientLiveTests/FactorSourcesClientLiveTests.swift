@@ -1,10 +1,11 @@
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
 
 // MARK: - FactorSourcesClientLiveTests
 final class FactorSourcesClientLiveTests: TestCase {
 	func testSigningFactors() throws {
-		let accounts: [Profile.Network.Account] = [
+		let accounts: [Account] = [
 			.new(factorSource: .deviceOne, index: 0), // 0
 			.new(factorSource: .deviceOne, index: 1), // 1
 			.new(factorSource: .deviceTwo, index: 0), // 2
@@ -14,7 +15,7 @@ final class FactorSourcesClientLiveTests: TestCase {
 		]
 
 		let signingFactors = try signingFactors(
-			for: Set(accounts.map { EntityPotentiallyVirtual.account($0) }),
+			for: Set(accounts.map { AccountOrPersona.account($0) }),
 			from: [
 				FactorSource.deviceOne,
 				FactorSource.deviceTwo,
@@ -23,7 +24,6 @@ final class FactorSourcesClientLiveTests: TestCase {
 			],
 			signingPurpose: .signTransaction(.manifestFromDapp)
 		)
-
 		XCTAssertEqual(signingFactors.expectedSignatureCount, 6)
 
 		let devices = try XCTUnwrap(signingFactors[.device])
@@ -31,17 +31,17 @@ final class FactorSourcesClientLiveTests: TestCase {
 		XCTAssertEqual(devices.count, 2)
 		let devicesSorted = Array(devices.rawValue).sorted(by: { $0.factorSource < $1.factorSource })
 		let device0 = devicesSorted[0]
-		func accountsOf(signingFactor: SigningFactor) -> [Profile.Network.Account] {
+		func accountsOf(signingFactor: SigningFactor) -> [Account] {
 			signingFactor.signers.map(\.entity).compactMap { try? $0.asAccount() }
 		}
+
 		let device0Accounts = accountsOf(signingFactor: device0)
 		XCTAssertEqual(device0Accounts.sorted(), [accounts[0], accounts[1]])
 		let device1 = devicesSorted[1]
 		let device1Accounts = accountsOf(signingFactor: device1)
 
 		XCTAssertEqual(device1Accounts.sorted(), [accounts[2]])
-
-		let ledgers = try XCTUnwrap(signingFactors[.ledgerHQHardwareWallet])
+		let ledgers = try XCTUnwrap(signingFactors[.ledgerHqHardwareWallet])
 		XCTAssertEqual(Array(ledgers.rawValue).map(\.factorSource).sorted(), [.ledgerTwo])
 		XCTAssertEqual(ledgers.count, 1)
 		let ledger = ledgers.first
@@ -50,10 +50,7 @@ final class FactorSourcesClientLiveTests: TestCase {
 
 	func test_new_bdfs() async throws {
 		let userDefaults = UserDefaults.Dependency.ephemeral()
-		let profile = ProfileBuilder()
-			.bdfs()
-			.account(name: "Foo")
-			.build()
+		let profile = Profile.sample
 		userDefaults.set(string: profile.header.id.uuidString, key: .activeProfileID)
 
 		try await withTestClients {
@@ -74,13 +71,6 @@ final class FactorSourcesClientLiveTests: TestCase {
 extension SigningFactor: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
 		lhs.factorSource < rhs.factorSource
-	}
-}
-
-// MARK: - Profile.Network.Account + Comparable
-extension Profile.Network.Account: Comparable {
-	public static func < (lhs: Self, rhs: Self) -> Bool {
-		lhs.appearanceID.rawValue < rhs.appearanceID.rawValue
 	}
 }
 
@@ -116,14 +106,16 @@ extension FactorSource {
 		withDependencies {
 			$0.date = .constant(.init(timeIntervalSince1970: 0))
 		} operation: {
-			let device = try! DeviceFactorSource(
-				id: .device(hash: Data.random(byteCount: 32)),
-				common: .init(
-					cryptoParameters: olympiaCompat ? FactorSource.CryptoParameters.Preset.babylonWithOlympiaCompatability.cryptoParameters : .babylon
+			DeviceFactorSource(
+				id: FactorSourceIdFromHash(kind: .device, body: .generate()),
+				common: FactorSourceCommon(
+					cryptoParameters: olympiaCompat ? .babylonOlympiaCompatible : .babylon,
+					addedOn: .now,
+					lastUsedOn: .now,
+					flags: []
 				),
-				hint: .init(name: name, model: "", mnemonicWordCount: .twentyFour)
-			)
-			return device.embed()
+				hint: DeviceFactorSourceHint(name: name, model: "iPhone", mnemonicWordCount: .twentyFour)
+			).asGeneral
 		}
 	}
 
@@ -131,14 +123,16 @@ extension FactorSource {
 		withDependencies {
 			$0.date = .constant(.init(timeIntervalSince1970: 0))
 		} operation: {
-			let ledger = try! LedgerHardwareWalletFactorSource(
-				id: .init(kind: .ledgerHQHardwareWallet, hash: Data.random(byteCount: 32)),
-				common: .init(
-					cryptoParameters: olympiaCompat ? FactorSource.CryptoParameters.Preset.babylonWithOlympiaCompatability.cryptoParameters : .babylon
+			try! LedgerHardwareWalletFactorSource(
+				id: FactorSourceIdFromHash(kind: .ledgerHqHardwareWallet, body: .generate()),
+				common: FactorSourceCommon(
+					cryptoParameters: olympiaCompat ? .babylonOlympiaCompatible : .babylon,
+					addedOn: .now,
+					lastUsedOn: .now,
+					flags: []
 				),
 				hint: .init(name: .init(name), model: .nanoS)
-			)
-			return ledger.embed()
+			).asGeneral
 		}
 	}
 
@@ -148,29 +142,33 @@ extension FactorSource {
 	static let ledgerTwo = Self.ledger("Two", olympiaCompat: true)
 }
 
-extension Profile.Network.Account {
+extension Account {
 	static func new(factorSource: FactorSource, index: UInt32) -> Self {
-		try! .init(
+		var account = try! Self(
 			networkID: .simulator,
 			factorInstance: .init(
-				factorSourceID: factorSource.id,
-				publicKey: .eddsaEd25519(Curve25519.Signing.PrivateKey().publicKey),
-				derivationPath: AccountDerivationPath.babylon(.init(
-					networkID: .simulator,
-					index: index,
-					keyKind: .transactionSigning
-				)).wrapAsDerivationPath()
+				factorSourceId: factorSource.id.extract(),
+				publicKey: .init(
+					publicKey: .sample,
+					derivationPath: AccountPath(
+						networkID: .simulator,
+						keyKind: .transactionSigning,
+						index: index
+					).asDerivationPath
+				)
 			),
-			displayName: "\(index)",
+			displayName: DisplayName(validating: "\(index)"),
 			extraProperties: .init(
 				appearanceID: .fromNumberOfAccounts(Int(index))
 			)
 		)
+		account.address = .random(networkID: .simulator)
+		return account
 	}
 }
 
 extension FactorSourcesClient {
-	func saveNew(mainBDFS: PrivateHDFactorSource) async throws {
+	func saveNew(mainBDFS: PrivateHierarchicalDeterministicFactorSource) async throws {
 		try await saveNewMainBDFS(mainBDFS.factorSource)
 	}
 }

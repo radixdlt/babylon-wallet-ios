@@ -21,11 +21,11 @@ extension AccountPermission {
 				case (.atLeast, 0):
 					L10n.DAppRequest.AccountPermission.numberOfAccountsAtLeastZero
 				case let (.atLeast, number):
-					L10n.DAppRequest.AccountPermission.numberOfAccountsAtLeast(number)
+					L10n.DAppRequest.AccountPermission.numberOfAccountsAtLeast(Int(number))
 				case (.exactly, 1):
 					L10n.DAppRequest.AccountPermission.numberOfAccountsExactlyOne
 				case let (.exactly, number):
-					L10n.DAppRequest.AccountPermission.numberOfAccountsExactly(number)
+					L10n.DAppRequest.AccountPermission.numberOfAccountsExactly(Int(number))
 				}
 			}()
 			// swiftformat:enable redundantClosure

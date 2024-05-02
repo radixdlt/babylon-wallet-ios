@@ -106,7 +106,7 @@ struct PersonaDataPermission_Preview: PreviewProvider {
 					reducer: PersonaDataPermission.init
 				) {
 					$0.personasClient.getPersonas = { @Sendable in
-						[.previewValue0, .previewValue1]
+						[.sample, .sampleOther]
 					}
 				}
 			)
@@ -118,7 +118,7 @@ struct PersonaDataPermission_Preview: PreviewProvider {
 extension PersonaDataPermission.State {
 	static let previewValue: Self = .init(
 		dappMetadata: .previewValue,
-		personaID: Profile.Network.Persona.previewValue0.id,
+		personaID: Persona.previewValue0.id,
 		requested: .init(
 			isRequestingName: true,
 			numberOfRequestedEmailAddresses: .atLeast(1),

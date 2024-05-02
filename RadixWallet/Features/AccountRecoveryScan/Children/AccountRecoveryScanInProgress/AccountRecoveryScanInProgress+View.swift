@@ -31,7 +31,7 @@ public extension AccountRecoveryScanInProgress {
 		let status: AccountRecoveryScanInProgress.State.Status
 		let kind: FactorSourceKind
 		let olympia: Bool
-		let active: IdentifiedArrayOf<Profile.Network.Account>
+		let active: IdentifiedArrayOf<Account>
 		let hasFoundAnyAccounts: Bool
 		let maxIndex: Int
 
@@ -61,7 +61,7 @@ public extension AccountRecoveryScanInProgress {
 				} else {
 					L10n.AccountRecoveryScan.InProgress.factorSourceBabylonSeedPhrase
 				}
-			case .ledgerHQHardwareWallet:
+			case .ledgerHqHardwareWallet:
 				L10n.AccountRecoveryScan.InProgress.factorSourceLedgerHardwareDevice
 			default:
 				L10n.AccountRecoveryScan.InProgress.factorSourceFallback
@@ -188,7 +188,7 @@ public extension AccountRecoveryScanInProgress {
 // MARK: - SimpleAccountCard
 /// A `SmallAccountCard` without `name`, and with the address centered
 private struct SimpleAccountCard: View {
-	let account: Profile.Network.Account
+	let account: Account
 
 	var body: some View {
 		SmallAccountCard(

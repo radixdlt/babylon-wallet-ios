@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - LedgerHardwareWalletClient
 public struct LedgerHardwareWalletClient: Sendable {
 	public var isConnectedToAnyConnectorExtension: IsConnectedToAnyConnectorExtension
@@ -136,12 +138,12 @@ extension LedgerHardwareWalletClient {
 	}
 
 	@discardableResult
-	public func verifyAddress(of account: Profile.Network.Account) async throws -> VerifyAddressOutcome {
+	public func verifyAddress(of account: Account) async throws -> VerifyAddressOutcome {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
 		switch account.securityState {
 		case let .unsecured(unsecuredEntityControl):
 			let signTXFactorInstance = unsecuredEntityControl.transactionSigning
-			let factorSourceID = signTXFactorInstance.factorSourceID.embed()
+			let factorSourceID = signTXFactorInstance.factorSourceID.asGeneral
 			guard let ledger = try await factorSourcesClient.getFactorSource(
 				id: factorSourceID,
 				as: LedgerHardwareWalletFactorSource.self
@@ -149,14 +151,14 @@ extension LedgerHardwareWalletClient {
 				throw FailedToFindLedger(factorSourceID: factorSourceID)
 			}
 			let keyParams = P2P.LedgerHardwareWallet.KeyParameters(
-				curve: signTXFactorInstance.derivationPath.curveForScheme.toLedger(),
-				derivationPath: signTXFactorInstance.derivationPath.path
+				curve: signTXFactorInstance.derivationPath.curve.toLedger(),
+				derivationPath: signTXFactorInstance.derivationPath.toString()
 			)
 
 			let (derivedKey, address) = try await deriveAndDisplayAddress(keyParams, ledger)
 
-			if derivedKey != signTXFactorInstance.hierarchicalDeterministicPublicKey {
-				let errMsg = "Re-derived public key on Ledger does not matched the transactionSigning factor instance of the account. \(derivedKey) != \(signTXFactorInstance.hierarchicalDeterministicPublicKey)"
+			if derivedKey != signTXFactorInstance.publicKey {
+				let errMsg = "Re-derived public key on Ledger does not matched the transactionSigning factor instance of the account. \(derivedKey) != \(signTXFactorInstance.publicKey)"
 				loggerGlobal.error(.init(stringLiteral: errMsg))
 				return .mismatch(.publicKeyMismatch)
 			}
@@ -172,7 +174,7 @@ extension LedgerHardwareWalletClient {
 	}
 }
 
-extension SLIP10.Curve {
+extension SLIP10Curve {
 	public func toLedger() -> P2P.LedgerHardwareWallet.KeyParameters.Curve {
 		switch self {
 		case .curve25519: .curve25519

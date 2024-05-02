@@ -29,7 +29,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case connectionPasswordFromStringResult(TaskResult<ConnectionPassword>)
+		case connectionPasswordFromStringResult(TaskResult<RadixConnectPassword>)
 	}
 
 	@Dependency(\.errorQueue) var errorQueue
@@ -81,7 +81,7 @@ public struct NewConnection: Sendable, FeatureReducer {
 		case let .scanQR(.delegate(.scanned(qrString))):
 			return .run { send in
 				let result = await TaskResult {
-					try ConnectionPassword(.init(hex: qrString))
+					try RadixConnectPassword(value: .init(hex: qrString))
 				}
 				await send(.internal(.connectionPasswordFromStringResult(result)))
 			}

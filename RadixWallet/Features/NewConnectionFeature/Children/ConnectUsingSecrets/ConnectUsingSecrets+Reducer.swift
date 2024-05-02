@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - ConnectUsingSecrets
 public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var connectionPassword: ConnectionPassword
+		public var connectionPassword: RadixConnectPassword
 		public var isConnecting: Bool
 		public var nameOfConnection: String
 		public var focusedField: Field?
@@ -12,7 +12,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 		public var isNameValid: Bool { !nameOfConnection.isEmpty }
 
 		public init(
-			connectionPassword: ConnectionPassword,
+			connectionPassword: RadixConnectPassword,
 			isConnecting: Bool = false,
 			focusedField: Field? = nil,
 			nameOfConnection: String = ""
@@ -33,7 +33,7 @@ public struct ConnectUsingSecrets: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case focusTextField(ConnectUsingSecrets.State.Field?)
-		case establishConnectionResult(TaskResult<ConnectionPassword>)
+		case establishConnectionResult(TaskResult<RadixConnectPassword>)
 		case cancelOngoingEffects
 	}
 

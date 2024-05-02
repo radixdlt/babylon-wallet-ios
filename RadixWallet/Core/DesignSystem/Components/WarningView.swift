@@ -21,10 +21,7 @@ public struct WarningErrorView: View {
 
 	public var body: some View {
 		HStack(spacing: spacing) {
-			Image(asset: AssetResource.warningError)
-				.resizable()
-				.renderingMode(.template)
-				.frame(.smallest)
+			Image(.error)
 			Text(text)
 				.textStyle(.body1Header)
 				.multilineTextAlignment(.leading)

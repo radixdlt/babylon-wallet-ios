@@ -13,7 +13,7 @@ extension BackupsClient: DependencyKey {
 
 		@Sendable
 		func importFor(
-			factorSourceIDs: Set<FactorSourceID.FromHash>,
+			factorSourceIDs: Set<FactorSourceIDFromHash>,
 			operation: () async throws -> Void
 		) async throws {
 			do {
@@ -29,16 +29,16 @@ extension BackupsClient: DependencyKey {
 
 		return Self(
 			snapshotOfProfileForExport: {
-				await profileStore.profile.snapshot()
+				await profileStore.profile
 			},
-			loadProfileBackups: { () -> ProfileSnapshot.HeaderList? in
+			loadProfileBackups: { () -> Profile.HeaderList? in
 				do {
 					let headers = try secureStorageClient.loadProfileHeaderList()
 					guard let headers else {
 						return nil
 					}
 					// filter out header for which the related profile is not present in the keychain:
-					var filteredHeaders = [ProfileSnapshot.Header]()
+					var filteredHeaders = [Profile.Header]()
 					for header in headers {
 						guard
 							let snapshot = try? secureStorageClient.loadProfileSnapshot(header.id),

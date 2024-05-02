@@ -34,7 +34,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 	public enum InternalAction: Sendable & Equatable {
 		case personaPrimacyDetermined(PersonaPrimacy)
 		case loadedPersonaDetails(PersonaDetails.State)
-		case finishedWritingDownMnemonicForPersonas(ids: Set<Profile.Network.Persona.ID>)
+		case finishedWritingDownMnemonicForPersonas(ids: Set<Persona.ID>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -192,7 +192,7 @@ public struct PersonasCoordinator: Sendable, FeatureReducer {
 	}
 
 	private func exportMnemonic(
-		controlling persona: Profile.Network.Persona,
+		controlling persona: Persona,
 		state: inout State
 	) -> Effect<Action> {
 		exportMnemonic(
