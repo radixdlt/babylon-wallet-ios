@@ -141,12 +141,18 @@ extension RTCClients {
 		switch sendStrategy {
 		case .broadcastToAllPeers:
 			try await broadcastRequest(request)
+		case let .broadcastToAllPeersWith(purpose):
+			try await broadcastRequest(request, purpose: purpose)
 		}
 	}
 
-	private func connectedClients() async -> NonEmpty<[RTCClient]>? {
+	private func connectedClients(purpose: ConnectionPurpose?) async -> NonEmpty<[RTCClient]>? {
 		var connectedClient = [RTCClient]()
-		for client in clients.values {
+		let clients = clients.values.filter {
+			guard let purpose else { return true }
+			return $0.p2pLink.purpose == purpose
+		}
+		for client in clients {
 			guard await client.hasAnyActiveConnections() else { continue }
 			connectedClient.append(client)
 		}
@@ -158,9 +164,10 @@ extension RTCClients {
 	///   - request: request to send
 	/// - Returns: Number of peers we sent the message to
 	private func broadcastRequest(
-		_ request: P2P.RTCOutgoingMessage.Request
+		_ request: P2P.RTCOutgoingMessage.Request,
+		purpose: ConnectionPurpose? = nil
 	) async throws -> Int {
-		guard let connectedClients = await connectedClients() else {
+		guard let connectedClients = await connectedClients(purpose: purpose) else {
 			throw NoConnectedClients()
 		}
 		return try await withThrowingTaskGroup(of: Int.self, returning: Int.self) { group in

@@ -4,9 +4,65 @@ import Network
 extension RadixConnectClient {
 	public static let liveValue: Self = {
 		@Dependency(\.p2pLinksClient) var p2pLinksClient
+		@Dependency(\.accountsClient) var accountsClient
+		@Dependency(\.jsonEncoder) var jsonEncoder
 
+		let userDefaults = UserDefaults.Dependency.radix // FIXME: find a better way to ensure we use the same userDefaults everywhere
 		let rtcClients = RTCClients()
 		let localNetworkAuthorization = LocalNetworkAuthorization()
+
+		Task {
+			for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
+				guard !Task.isCancelled else { return }
+				try await sendAccountListMessage(accounts: accounts)
+			}
+		}
+
+		Task {
+			let connectedClients = await rtcClients.connectClients()
+				.filter { updates in
+					!updates.flatMap(\.idsOfConnectedPeerConnections).isEmpty
+				}
+			for try await updates in connectedClients {
+				guard !Task.isCancelled else { return }
+				sendAccountListMessageAfterConnect()
+			}
+		}
+
+		@Sendable
+		func sendAccountListMessageAfterConnect() {
+			Task {
+				let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
+				try await sendAccountListMessage(accounts: accounts)
+			}
+		}
+
+		@Sendable
+		func sendAccountListMessage(accounts: AccountsClient.Accounts) async throws {
+			let encoder = jsonEncoder()
+			let accounts = accounts.map {
+				P2P.Dapp.Response.WalletAccount(
+					accountAddress: $0.address,
+					label: $0.displayName,
+					appearanceId: $0.appearanceID
+				)
+			}
+			let accountListMessage = P2P.ConnectorExtension.Request.AccountListMessage(
+				discriminator: .accountList,
+				accounts: accounts
+			)
+
+			/// The keys in the JSON will be sorted alphabetically before encoding, ensuring consistent hashing
+			encoder.outputFormatting = .sortedKeys
+
+			let accountsHash = try encoder.encode(accountListMessage).hash().hex
+
+			/// Send `AccountListMessage` to CE only if `accountsHash` has changed
+			guard userDefaults.getLastSyncedAccountsWithCE() != accountsHash else { return }
+
+			_ = try await rtcClients.sendRequest(.connectorExtension(.accountListMessage(accountListMessage)), strategy: .broadcastToAllPeersWith(purpose: .general))
+			userDefaults.setLastSyncedAccountsWithCE(accountsHash)
+		}
 
 		let getP2PLinksWithConnectionStatusUpdates: GetP2PLinksWithConnectionStatusUpdates = {
 			await rtcClients.connectClients().map { connectedClients in
@@ -27,9 +83,7 @@ extension RadixConnectClient {
 
 		let connectToP2PLinks: ConnectToP2PLinks = { links in
 			for client in links {
-				try await rtcClients.connect(
-					client
-				)
+				try await rtcClients.connect(client)
 			}
 		}
 
@@ -76,6 +130,9 @@ extension RadixConnectClient {
 			},
 			connectP2PLink: { p2pLink in
 				try await rtcClients.connect(p2pLink, waitsForConnectionToBeEstablished: true)
+
+				/// Clear `lastSyncedAccountsWithCE` after a new connection is made, in order to send `AccountListMessage` to CE
+				userDefaults.remove(.lastSyncedAccountsWithCE)
 			},
 			receiveMessages: { await rtcClients.incomingMessages() },
 			sendResponse: { response, route in

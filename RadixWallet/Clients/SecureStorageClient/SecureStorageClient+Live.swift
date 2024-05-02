@@ -398,7 +398,7 @@ extension SecureStorageClient: DependencyKey {
 
 		@Sendable func loadP2PLinksPrivateKey() throws -> Curve25519.PrivateKey? {
 			try keychainClient
-				.getDataWithoutAuth(forKey: p2pLinksPKKey)
+				.getDataWithoutAuth(forKey: p2pLinksPrivateKey)
 				.map {
 					try Curve25519.PrivateKey(rawRepresentation: $0)
 				}
@@ -414,7 +414,7 @@ extension SecureStorageClient: DependencyKey {
 		@Sendable func saveP2PLinksPrivateKey(privateKey: Curve25519.PrivateKey) throws {
 			try keychainClient.setDataWithoutAuth(
 				privateKey.rawRepresentation,
-				forKey: p2pLinksPKKey,
+				forKey: p2pLinksPrivateKey,
 				attributes: p2pLinksPrivateKeyAttributes
 			)
 			loggerGlobal.notice("Saved p2pLinksPrivateKeyKey")
@@ -478,7 +478,7 @@ let profileHeaderListKeychainKey: KeychainClient.Key = "profileHeaderList"
 private let deviceIdentifierKey: KeychainClient.Key = "deviceIdentifier"
 private let deviceInfoKey: KeychainClient.Key = "deviceInfo"
 private let p2pLinksKey: KeychainClient.Key = "p2pLinks"
-private let p2pLinksPKKey: KeychainClient.Key = "p2pLinksWalletPK"
+private let p2pLinksPrivateKey: KeychainClient.Key = "p2pLinksPrivateKey"
 
 extension ProfileID {
 	private static let profileSnapshotKeychainKeyPrefix = "profileSnapshot"
