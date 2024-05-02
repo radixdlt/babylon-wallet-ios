@@ -216,7 +216,7 @@ extension SecureStorageClient: DependencyKey {
 			else {
 				return nil
 			}
-			return try jsonDecoder().decode(Profile.self, from: existingSnapshotData)
+			return try Profile(jsonData: existingSnapshotData)
 		}
 
 		let loadMnemonicByFactorSourceID: LoadMnemonicByFactorSourceID = { request in
@@ -297,10 +297,7 @@ extension SecureStorageClient: DependencyKey {
 			}
 
 			guard
-				let profileSnapshot = try? jsonDecoder().decode(
-					Profile.self,
-					from: profileSnapshotData
-				)
+				let profileSnapshot = try? Profile(jsonData: profileSnapshotData)
 			else {
 				return
 			}
