@@ -636,7 +636,7 @@ extension ImportMnemonic {
 		/// - User removes another character, having the word `en` - the word is incomplete.
 		switch lookupResult {
 		case let .known(.ambigous(candidates, nonEmptyInput)):
-			guard let userInput = candidates.first(where: { $0.word == nonEmptyInput }) else {
+			guard let userInput = candidates.first(where: { $0.word == nonEmptyInput.rawValue }) else {
 				state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: false)
 				return .none
 			}
@@ -644,7 +644,7 @@ extension ImportMnemonic {
 			return completeWith(word: userInput, completion: .user, id: id, input: input, &state)
 
 		case let .known(.unambiguous(word, _, _)):
-			guard word.word.rawValue == input else {
+			guard word.word == input else {
 				state.words[id: id]?.value = .incomplete(text: input, hasFailedValidation: false)
 				return .none
 			}
