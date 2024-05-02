@@ -125,7 +125,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	private func updateCloudBackupsSettingEffect(isEnabled: Bool) -> Effect<Action> {
 		.run { send in
 			do {
-				try await appPreferencesClient.setIsCloudProfileSyncEnabled(isEnabled)
+				try await appPreferencesClient.setIsCloudBackupEnabled(isEnabled)
 				await send(.internal(.setCloudBackupEnabled(isEnabled)))
 			} catch {
 				loggerGlobal.error("Failed toggle cloud backups \(isEnabled ? "on" : "off"): \(error)")

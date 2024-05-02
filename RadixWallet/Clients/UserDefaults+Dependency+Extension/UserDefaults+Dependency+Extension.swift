@@ -11,7 +11,8 @@ public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case dateOfLastSubmittedNPSSurvey
 	case npsSurveyUserID
 	case didMigrateKeychainProfiles
-	case lastBackups
+	case lastCloudBackups
+	case lastManualBackups
 
 	/// DO NOT CHANGE THIS KEY
 	case activeProfileID
@@ -149,7 +150,77 @@ extension UserDefaults.Dependency {
 		set(value, forKey: Key.didMigrateKeychainProfiles.rawValue)
 	}
 
-	public var getLastBackups: [UUID: CloudBackup] {
-		(try? loadCodable(key: .lastBackups)) ?? [:]
+	public var getLastCloudBackups: [UUID: BackupMetadata] {
+		getLastBackups(cloud: true)
+	}
+
+	public func setLastCloudBackup(_ status: BackupMetadata.Status, of profile: Profile) throws {
+		try setLastBackup(cloud: true, status: status, of: profile)
+	}
+
+	public func lastCloudBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<BackupMetadata> {
+		lastBackupValues(cloud: true, for: profileID)
+	}
+
+	public var getLastManualBackups: [UUID: BackupMetadata] {
+		getLastBackups(cloud: false)
+	}
+
+	public func setLastManualBackup(_ status: BackupMetadata.Status, of profile: Profile) throws {
+		try setLastBackup(cloud: false, status: status, of: profile)
+	}
+
+	public func lastManualBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<BackupMetadata> {
+		lastBackupValues(cloud: false, for: profileID)
+	}
+}
+
+// MARK: - BackupMetadata
+public struct BackupMetadata: Codable, Sendable {
+	public let date: Date
+	public let profileHash: Int
+	public let status: Status
+
+	public enum Status: Codable, Sendable {
+		case success
+		case notAuthorized
+		case failure
+	}
+}
+
+extension UserDefaults.Dependency {
+	private func setLastBackup(cloud: Bool, status: BackupMetadata.Status, of profile: Profile) throws {
+		let key = backupKey(cloud: cloud)
+		var backups: [UUID: BackupMetadata] = getLastBackups(cloud: cloud)
+		backups[profile.id] = .init(
+			date: profile.header.lastModified,
+			profileHash: profile.hashValue,
+			status: status
+		)
+
+		@Dependency(\.jsonEncoder) var jsonEncoder
+		let data = try jsonEncoder().encode(backups)
+		set(data: data, key: key)
+	}
+
+	private func getLastBackups(cloud: Bool) -> [UUID: BackupMetadata] {
+		@Dependency(\.jsonDecoder) var jsonDecoder
+		guard let data = data(key: backupKey(cloud: cloud)) else { return [:] }
+		guard let result = try? jsonDecoder().decode([UUID: BackupMetadata].self, from: data) else { return [:] }
+		return result
+	}
+
+	private func lastBackupValues(cloud: Bool, for profileID: ProfileID) -> AnyAsyncSequence<BackupMetadata> {
+		@Dependency(\.jsonDecoder) var jsonDecoder
+		return dataValues(forKey: backupKey(cloud: cloud).rawValue).compactMap { data -> BackupMetadata? in
+			guard let data else { return nil }
+			guard let backups = try? jsonDecoder().decode([UUID: BackupMetadata].self, from: data) else { return nil }
+			return backups[profileID]
+		}
+		.eraseToAnyAsyncSequence()
+	}
+
+	private func backupKey(cloud: Bool) -> UserDefaultsKey {
+		cloud ? .lastCloudBackups : .lastManualBackups
 	}
 }
