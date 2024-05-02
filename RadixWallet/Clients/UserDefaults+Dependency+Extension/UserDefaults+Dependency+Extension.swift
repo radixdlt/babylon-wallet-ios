@@ -198,26 +198,17 @@ extension UserDefaults.Dependency {
 			status: status
 		)
 
-		@Dependency(\.jsonEncoder) var jsonEncoder
-		let data = try jsonEncoder().encode(backups)
-		set(data: data, key: key)
+		try save(codable: backups, forKey: key)
 	}
 
 	private func getLastBackups(cloud: Bool) -> [UUID: BackupMetadata] {
-		@Dependency(\.jsonDecoder) var jsonDecoder
-		guard let data = data(key: backupKey(cloud: cloud)) else { return [:] }
-		guard let result = try? jsonDecoder().decode([UUID: BackupMetadata].self, from: data) else { return [:] }
-		return result
+		(try? loadCodable(key: backupKey(cloud: cloud))) ?? [:]
 	}
 
 	private func lastBackupValues(cloud: Bool, for profileID: ProfileID) -> AnyAsyncSequence<BackupMetadata> {
-		@Dependency(\.jsonDecoder) var jsonDecoder
-		return dataValues(forKey: backupKey(cloud: cloud).rawValue).compactMap { data -> BackupMetadata? in
-			guard let data else { return nil }
-			guard let backups = try? jsonDecoder().decode([UUID: BackupMetadata].self, from: data) else { return nil }
-			return backups[profileID]
-		}
-		.eraseToAnyAsyncSequence()
+		codableValues(key: backupKey(cloud: cloud), codable: [UUID: BackupMetadata].self)
+			.compactMap { (try? $0.get())?[profileID] }
+			.eraseToAnyAsyncSequence()
 	}
 
 	private func backupKey(cloud: Bool) -> UserDefaultsKey {
