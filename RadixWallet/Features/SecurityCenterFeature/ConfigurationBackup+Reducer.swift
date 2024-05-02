@@ -3,6 +3,11 @@ import ComposableArchitecture
 
 // MARK: - ConfigurationBackup
 public struct ConfigurationBackup: Sendable, FeatureReducer {
+	public struct Exportable: Sendable, Hashable {
+		public let profile: Profile
+		public let file: ExportableProfileFile
+	}
+
 	public struct State: Sendable, Hashable {
 		public var iCloudAccountStatus: CKAccountStatus? = nil
 		public var automatedBackupsEnabled: Bool = true
@@ -13,7 +18,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		public var destination: Destination.State? = nil
 
 		/// An exportable Profile file, either encrypted or plaintext. Setting this will trigger showing a file exporter
-		public var profileFile: ExportableProfileFile?
+		public var exportable: Exportable?
 
 		public var outdatedBackupPresent: Bool {
 			!automatedBackupsEnabled && lastBackup != nil
@@ -37,7 +42,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		case exportTapped
 		case deleteOutdatedTapped
 		case showFileExporter(Bool)
-		case profileExportResult(Result<URL, NSError>)
+		case profileExportResult(Result<URL, NSError>, Profile?)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -108,7 +113,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 		case let .showFileExporter(show):
 			if !show {
-				state.profileFile = nil
+				state.exportable = nil
 			}
 			return .none
 
@@ -123,14 +128,16 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 				}
 			}
 
-		case let .profileExportResult(.success(exportedProfileURL)):
+		case let .profileExportResult(.success(exportedProfileURL), profile):
 			let didEncryptIt = exportedProfileURL.absoluteString.contains(.profileFileEncryptedPart)
 			overlayWindowClient.scheduleHUD(.exportedProfile(encrypted: didEncryptIt))
 			loggerGlobal.notice("Profile successfully exported to: \(exportedProfileURL)")
-			backupsClient.didExportProfileSnapshot(profile)
+			if let profile {
+				try? backupsClient.didExportProfileSnapshot(profile)
+			}
 			return .none
 
-		case let .profileExportResult(.failure(error)):
+		case let .profileExportResult(.failure(error), _):
 			loggerGlobal.error("Failed to export profile, error: \(error)")
 			errorQueue.schedule(error)
 			return .none
@@ -139,9 +146,9 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .encryptionPassword(.delegate(.successfullyEncrypted(_, encrypted: encryptedFile))):
+		case let .encryptionPassword(.delegate(.successfullyEncrypted(profile, encrypted: encryptedFile))):
 			state.destination = nil
-			state.profileFile = .encrypted(encryptedFile)
+			state.exportable = .init(profile: profile, file: .encrypted(encryptedFile))
 			return .none
 
 		case .encryptionPassword:
@@ -182,12 +189,11 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			return .none
 
 		case let .setProblems(problems):
-			print("•• CB set problems: \(problems)")
 			state.problems = problems
 			return .none
 
 		case let .exportProfile(profile):
-			state.profileFile = .plaintext(profile)
+			state.exportable = .init(profile: profile, file: .plaintext(profile))
 			return .none
 		}
 	}
@@ -208,9 +214,8 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	private func problemsSubscriptionEffect() -> Effect<Action> {
 		.run { send in
 			let profileID = await ProfileStore.shared.profile.id
-			for try await problems in securityCenterClient.problems(profileID) {
+			for try await problems in await securityCenterClient.problems(profileID) {
 				guard !Task.isCancelled else { return }
-				print("•• CB sub problems: \(problems)")
 				await send(.internal(.setProblems(problems)))
 			}
 		}

@@ -49,7 +49,7 @@ extension ConfigurationBackup {
 					.padding(.top, .small2)
 					.padding(.horizontal, .medium2)
 				}
-				.exportFileSheet(store: store, profileFile: viewStore.profileFile)
+				.exportFileSheet(store: store, exportable: viewStore.exportable)
 			}
 			.onAppear {
 				store.send(.view(.didAppear))
@@ -91,21 +91,21 @@ private extension View {
 		}
 	}
 
-	func exportFileSheet(store: StoreOf<ConfigurationBackup>, profileFile: ExportableProfileFile?) -> some View {
+	func exportFileSheet(store: StoreOf<ConfigurationBackup>, exportable: ConfigurationBackup.Exportable?) -> some View {
 		fileExporter(
-			isPresented: .init(get: { profileFile != nil }, set: { store.send(.view(.showFileExporter($0))) }),
-			document: profileFile,
+			isPresented: .init(get: { exportable != nil }, set: { store.send(.view(.showFileExporter($0))) }),
+			document: exportable?.file,
 			contentType: .profile,
 			// Need to disable, since broken in swiftformat 0.52.7
 			// swiftformat:disable redundantClosure
 			defaultFilename: {
-				switch profileFile {
+				switch exportable?.file {
 				case .plaintext, .none: String.filenameProfileNotEncrypted
 				case .encrypted: String.filenameProfileEncrypted
 				}
 			}(),
 			// swiftformat:enable redundantClosure
-			onCompletion: { store.send(.view(.profileExportResult($0.mapError { $0 as NSError }))) }
+			onCompletion: { store.send(.view(.profileExportResult($0.mapError { $0 as NSError }, exportable?.profile))) }
 		)
 	}
 }

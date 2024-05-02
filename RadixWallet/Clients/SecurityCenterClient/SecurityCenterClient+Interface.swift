@@ -10,5 +10,5 @@ public struct SecurityCenterClient: DependencyKey, Sendable {
 
 // MARK: SecurityCenterClient.Problems
 extension SecurityCenterClient {
-	public typealias Problems = @Sendable (ProfileID) -> AnyAsyncSequence<[SecurityProblem]>
+	public typealias Problems = @Sendable (ProfileID) async -> AnyAsyncSequence<[SecurityProblem]>
 }
