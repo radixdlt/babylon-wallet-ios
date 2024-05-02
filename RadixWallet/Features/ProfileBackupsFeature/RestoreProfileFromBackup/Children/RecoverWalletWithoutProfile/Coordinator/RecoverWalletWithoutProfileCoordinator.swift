@@ -6,7 +6,7 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		public var path: StackState<Path.State> = .init()
 
 		/// Not saved into keychain yet
-		public var factorSourceOfImportedMnemonic: PrivateHDFactorSource?
+		public var factorSourceOfImportedMnemonic: PrivateHierarchicalDeterministicFactorSource?
 
 		@PresentationState
 		var destination: Destination.State? = nil
@@ -132,28 +132,17 @@ public struct RecoverWalletWithoutProfileCoordinator: Sendable, FeatureReducer {
 		case let .path(.element(_, action: .importMnemonic(.delegate(delegateAction)))):
 			switch delegateAction {
 			case let .notPersisted(mnemonicWithPassphrase):
-				do {
-					let mainBDFS = try DeviceFactorSource.babylon(
-						mnemonicWithPassphrase: mnemonicWithPassphrase,
-						isMain: true,
-						isOlympiaCompatible: false // FIXME: is this what we want?
-					)
+				let mainBDFS = DeviceFactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, isMain: true)
 
-					let privateHD = try PrivateHDFactorSource(
-						mnemonicWithPassphrase: mnemonicWithPassphrase,
-						factorSource: mainBDFS
-					)
+				let privateHD = PrivateHierarchicalDeterministicFactorSource(
+					mnemonicWithPassphrase: mnemonicWithPassphrase,
+					factorSource: mainBDFS
+				)
 
-					state.factorSourceOfImportedMnemonic = privateHD
-					state.destination = .accountRecoveryScanCoordinator(.init(purpose: .createProfile(privateHD)))
+				state.factorSourceOfImportedMnemonic = privateHD
+				state.destination = .accountRecoveryScanCoordinator(.init(purpose: .createProfile(privateHD)))
 
-					return .none
-				} catch {
-					let errorMsg = "Failed to create Private HD FactorSource from MnemonicWithPassphrase, error: \(error)"
-					loggerGlobal.error(.init(stringLiteral: errorMsg))
-					assertionFailure(errorMsg)
-					return .send(.delegate(.dismiss))
-				}
+				return .none
 
 			default:
 				let errorMsg = "Discrepancy! Expected to have saved mnemonic into keychain but other action happened: \(delegateAction)"

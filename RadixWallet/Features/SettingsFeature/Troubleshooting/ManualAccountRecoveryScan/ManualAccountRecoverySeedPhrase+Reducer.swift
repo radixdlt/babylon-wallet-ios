@@ -51,7 +51,7 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case recover(FactorSourceID.FromHash, olympia: Bool)
+		case recover(FactorSourceIDFromHash, olympia: Bool)
 	}
 
 	// MARK: - Reducer
@@ -82,21 +82,22 @@ public struct ManualAccountRecoverySeedPhrase: Sendable, FeatureReducer {
 			let title = state.isOlympia ? L10n.AccountRecoveryScan.ChooseSeedPhrase.importMnemonicTitleOlympia : L10n.AccountRecoveryScan.ChooseSeedPhrase.importMnemonicTitleBabylon
 
 			let persistStrategy = ImportMnemonic.State.PersistStrategy(
-				factorSourceKindOfMnemonic: .onDevice(state.isOlympia ? .olympia : .babylon(isMain: false)),
+				factorSourceKindOfMnemonic: state.isOlympia ? .olympia : .babylon(isMain: false),
 				location: .intoKeychainAndProfile,
 				onMnemonicExistsStrategy: .appendWithCryptoParamaters
 			)
 
-			state.destination = .importMnemonic(.init(
-				header: .init(title: title),
-				warning: L10n.EnterSeedPhrase.warning,
-				warningOnContinue: nil,
-				isWordCountFixed: !state.isOlympia,
-				persistStrategy: persistStrategy,
-				wordCount: state.isOlympia ? .twelve : .twentyFour,
-				bip39Passphrase: "",
-				offDeviceMnemonicInfoPrompt: nil
-			))
+			state.destination = .importMnemonic(
+				ImportMnemonic.State(
+					header: .init(title: title),
+					warning: L10n.EnterSeedPhrase.warning,
+					warningOnContinue: nil,
+					isWordCountFixed: !state.isOlympia,
+					persistStrategy: persistStrategy,
+					wordCount: state.isOlympia ? BIP39WordCount.twelve : BIP39WordCount.twentyFour,
+					bip39Passphrase: ""
+				)
+			)
 			return .none
 
 		case .closeEnterMnemonicButtonTapped:

@@ -100,7 +100,7 @@ public struct CreatePersonaCoordinator: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case derivePublicKey
-		case createPersonaResult(TaskResult<Profile.Network.Persona>)
+		case createPersonaResult(TaskResult<Persona>)
 		case handleFailure
 	}
 
@@ -170,12 +170,12 @@ extension CreatePersonaCoordinator {
 				.init(
 					derivationPathOption: .next(
 						networkOption: .useCurrent,
-						entityKind: .identity,
+						entityKind: .persona,
 						curve: .curve25519,
 						scheme: .cap26
 					),
 					factorSourceOption: .device,
-					purpose: .createNewEntity(kind: .identity)
+					purpose: .createNewEntity(kind: .persona)
 				)
 			)
 			return .none
@@ -210,14 +210,14 @@ extension CreatePersonaCoordinator {
 				fatalError("Derived public keys without persona name or extra fields set")
 			}
 			return .run { send in
-				let persona = try Profile.Network.Persona(
+				let factorSourceIDFromHash = try factorSourceID.extract(as: FactorSourceIDFromHash.self)
+				let persona = Persona(
 					networkID: networkID,
-					factorInstance: .init(
-						factorSourceID: factorSourceID,
-						publicKey: hdKey.publicKey,
-						derivationPath: hdKey.derivationPath
+					factorInstance: HierarchicalDeterministicFactorInstance(
+						factorSourceId: factorSourceIDFromHash,
+						publicKey: hdKey
 					),
-					displayName: name,
+					displayName: DisplayName(nonEmpty: name),
 					extraProperties: .init(personaData: personaData)
 				)
 

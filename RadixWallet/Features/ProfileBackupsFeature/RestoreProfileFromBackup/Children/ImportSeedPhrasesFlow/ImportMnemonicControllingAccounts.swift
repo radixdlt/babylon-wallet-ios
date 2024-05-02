@@ -24,7 +24,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 			self.isMainBDFS = isMainBDFS
 			self.entitiesControlledByFactorSource = ents
 
-			let accounts: IdentifiedArrayOf<Profile.Network.Account> = switch (ents.babylonAccounts.isEmpty, ents.olympiaAccounts.isEmpty) {
+			let accounts: IdentifiedArrayOf<Account> = switch (ents.babylonAccounts.isEmpty, ents.olympiaAccounts.isEmpty) {
 			case (false, _):
 				// We prefer Babylon, always.
 				ents.babylonAccounts
@@ -51,7 +51,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case validated(PrivateHDFactorSource)
+		case validated(PrivateHierarchicalDeterministicFactorSource)
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -61,10 +61,10 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case persistedMnemonicInKeychain(FactorSourceID.FromHash)
-		case skippedMnemonic(FactorSourceID.FromHash)
-		case createdNewMainBDFS(oldSkipped: FactorSourceID.FromHash, DeviceFactorSource)
-		case failedToSaveInKeychain(FactorSourceID.FromHash)
+		case persistedMnemonicInKeychain(FactorSourceIDFromHash)
+		case skippedMnemonic(FactorSourceIDFromHash)
+		case createdNewMainBDFS(oldSkipped: FactorSourceIDFromHash, DeviceFactorSource)
+		case failedToSaveInKeychain(FactorSourceIDFromHash)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -141,11 +141,9 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 		case let .importMnemonic(.delegate(delegateAction)):
 			switch delegateAction {
 			case let .notPersisted(mnemonicWithPassphrase):
-				// FIXME: should always work... but please tidy up!
-				let factorSourceID = try! FactorSourceID.FromHash(
-					kind: .device,
-					mnemonicWithPassphrase: mnemonicWithPassphrase
-				)
+
+				let factorSourceID = FactorSourceIDFromHash(kind: .device, mnemonicWithPassphrase: mnemonicWithPassphrase)
+
 				guard factorSourceID == state.entitiesControlledByFactorSource.factorSourceID else {
 					overlayWindowClient.scheduleHUD(.wrongMnemonic)
 					return .none
@@ -208,7 +206,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 
 	private func validate(
 		mnemonicWithPassphrase: MnemonicWithPassphrase,
-		accounts: [Profile.Network.Account],
+		accounts: [Account],
 		factorSource: DeviceFactorSource
 	) -> Effect<Action> {
 		func fail(error: Swift.Error?) -> Effect<Action> {
@@ -221,7 +219,7 @@ public struct ImportMnemonicControllingAccounts: Sendable, FeatureReducer {
 				return fail(error: nil)
 			}
 
-			let privateHDFactorSource = try PrivateHDFactorSource(
+			let privateHDFactorSource = try PrivateHierarchicalDeterministicFactorSource(
 				mnemonicWithPassphrase: mnemonicWithPassphrase,
 				factorSource: factorSource
 			)

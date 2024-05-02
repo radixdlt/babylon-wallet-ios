@@ -1,12 +1,12 @@
 import ComposableArchitecture
 import SwiftUI
 
-extension Radix.Gateway {
+extension Gateway {
 	var displayName: String {
 		if isWellknown {
-			if network == .mainnet {
+			if network.id == .mainnet {
 				"Mainnet Gateway"
-			} else if network == .stokenet {
+			} else if network.id == .stokenet {
 				"Stokenet (testnet) Gateway"
 			} else {
 				network.displayDescription

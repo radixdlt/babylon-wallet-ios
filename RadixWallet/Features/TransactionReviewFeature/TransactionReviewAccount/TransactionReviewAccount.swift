@@ -57,10 +57,10 @@ public struct TransactionReviewAccounts: Sendable, FeatureReducer {
 public struct TransactionReviewAccount: Sendable, FeatureReducer {
 	public struct State: Sendable, Identifiable, Hashable {
 		public var id: AccountAddress { account.address }
-		public let account: TransactionReview.Account
+		public let account: TransactionReview.ReviewAccount
 		public var transfers: IdentifiedArrayOf<TransactionReview.Transfer>
 
-		public init(account: TransactionReview.Account, transfers: IdentifiedArrayOf<TransactionReview.Transfer>) {
+		public init(account: TransactionReview.ReviewAccount, transfers: IdentifiedArrayOf<TransactionReview.Transfer>) {
 			self.account = account
 			self.transfers = transfers
 		}

@@ -95,7 +95,7 @@ extension AccountOrAddressOf {
 	var gradient: Gradient {
 		switch self {
 		case let .profileAccount(value: account):
-			.init(Profile.Network.Account.AppearanceID(sargon: account.appearanceID))
+			.init(account.appearanceID)
 		case .addressOfExternalAccount:
 			.init(colors: [.app.gray2])
 		}

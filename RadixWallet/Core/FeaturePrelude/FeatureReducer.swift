@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - FeatureView
@@ -159,7 +160,7 @@ extension FeatureReducer {
 
 extension FeatureReducer {
 	func exportMnemonic(
-		controlling entity: EntityBaseProtocol,
+		controlling entity: any EntityBaseProtocol,
 		notifyIfMissing: Bool = true,
 		onSuccess: (SimplePrivateFactorSource) -> Void
 	) -> Effect<Action> {
@@ -176,7 +177,7 @@ extension FeatureReducer {
 	}
 
 	func exportMnemonic(
-		factorSourceID: FactorSource.ID.FromHash,
+		factorSourceID: FactorSourceIdFromHash,
 		notifyIfMissing: Bool = true,
 		onSuccess: (SimplePrivateFactorSource) -> Void,
 		onError: (Swift.Error) -> Void = { error in

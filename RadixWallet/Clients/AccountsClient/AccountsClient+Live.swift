@@ -14,7 +14,9 @@ extension AccountsClient: DependencyKey {
 			}
 		}
 
-		let getCurrentNetworkID: GetCurrentNetworkID = { await profileStore.profile.networkID }
+		let getCurrentNetworkID: GetCurrentNetworkID = {
+			await profileStore.profile.networkID
+		}
 
 		let getAccountsOnNetwork: GetAccountsOnNetwork = {
 			try await profileStore.profile.network(id: $0).getAccounts()
@@ -29,7 +31,7 @@ extension AccountsClient: DependencyKey {
 			let currentNetworkID = await getCurrentNetworkID()
 			let networkID = maybeNetworkID ?? currentNetworkID
 			let numberOfAccounts = await (try? profileStore.profile.network(id: networkID).numberOfAccountsIncludingHidden) ?? 0
-			return Profile.Network.Account.AppearanceID.fromNumberOfAccounts(numberOfAccounts + offset)
+			return AppearanceID.fromNumberOfAccounts(numberOfAccounts + offset)
 		}
 
 		let hasAccountOnNetwork: HasAccountOnNetwork = { networkID in
@@ -46,7 +48,9 @@ extension AccountsClient: DependencyKey {
 			try await profileStore.profile.network(id: getCurrentNetworkID()).getHiddenAccounts()
 		}
 
-		let accountsOnCurrentNetwork: AccountsOnCurrentNetwork = { await profileStore.accountValues() }
+		let accountsOnCurrentNetwork: AccountsOnCurrentNetwork = {
+			await profileStore.accountValues()
+		}
 
 		let accountUpdates: AccountUpdates = { address in
 			await profileStore.accountValues().compactMap {
@@ -58,10 +62,10 @@ extension AccountsClient: DependencyKey {
 		let newVirtualAccount: NewVirtualAccount = { request in
 			let networkID = request.networkID
 			let appearanceID = await nextAppearanceID(networkID, nil)
-			return try Profile.Network.Account(
+			return Account(
 				networkID: networkID,
 				factorInstance: request.factorInstance,
-				displayName: request.name,
+				displayName: DisplayName(nonEmpty: request.name),
 				extraProperties: .init(appearanceID: appearanceID)
 			)
 		}

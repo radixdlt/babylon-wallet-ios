@@ -1,10 +1,11 @@
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
 
 @MainActor
 final class AccountPreferencesTests: TestCase {
 	func test_hideAccount_flow() async {
-		var account = Profile.Network.Account.previewValue0
+		var account = Account.previewValue0
 
 		let store = TestStore(
 			initialState: AccountPreferences.State(account: account),
@@ -22,7 +23,7 @@ final class AccountPreferencesTests: TestCase {
 			))
 		}
 
-		let idsOfUpdatedAccounts = ActorIsolated<Set<Profile.Network.Account.ID>?>(nil)
+		let idsOfUpdatedAccounts = ActorIsolated<Set<Account.ID>?>(nil)
 		store.dependencies.entitiesVisibilityClient.hideAccounts = { accounts in
 			await idsOfUpdatedAccounts.setValue(accounts)
 		}

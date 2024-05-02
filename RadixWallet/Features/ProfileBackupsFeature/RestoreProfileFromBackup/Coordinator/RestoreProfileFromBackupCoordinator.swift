@@ -1,9 +1,10 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ProfileSelection
 public struct ProfileSelection: Sendable, Hashable {
-	public let snapshot: ProfileSnapshot
+	public let snapshot: Profile
 	public let isInCloud: Bool
 }
 

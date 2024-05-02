@@ -314,7 +314,7 @@ extension Address {
 	}
 }
 
-extension OnLedgerEntity.Account.PoolUnitResources {
+extension OnLedgerEntity.OnLedgerAccount.PoolUnitResources {
 	// The fungible resources used to build up the pool units.
 	// Will be used to filter out those from the general fungible resources list.
 	var fungibleResourceAddresses: [ResourceAddress] {

@@ -1,4 +1,5 @@
 import Algorithms
+import Sargon
 
 public typealias ResourceIdentifier = String
 
@@ -30,7 +31,7 @@ public struct GatewayAPIClient: Sendable, DependencyKey {
 }
 
 extension GatewayAPIClient {
-	public typealias GetNetworkName = @Sendable (URL) async throws -> Radix.Network.Name
+	public typealias GetNetworkName = @Sendable (URL) async throws -> NetworkDefinition.Name
 	public typealias GetEpoch = @Sendable () async throws -> Epoch
 
 	// MARK: - Entity

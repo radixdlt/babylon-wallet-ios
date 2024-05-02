@@ -138,7 +138,7 @@ private extension ManualAccountRecoverySeedPhrase.View {
 						accounts: item.value.accounts.filter {
 							switch $0.securityState {
 							case let .unsecured(unsecuredEntityControl):
-								let curve = unsecuredEntityControl.transactionSigning.derivationPath.curveForScheme
+								let curve = unsecuredEntityControl.transactionSigning.derivationPath.curve
 								return viewStore.isOlympia && curve == .secp256k1 || !viewStore.isOlympia && curve == .curve25519
 							}
 						},

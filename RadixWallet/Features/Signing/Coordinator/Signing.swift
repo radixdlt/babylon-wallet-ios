@@ -1,10 +1,10 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - K1.PublicKey + CustomDumpStringConvertible
-extension K1.PublicKey: CustomDumpStringConvertible {
+// MARK: - Secp256k1PublicKey + CustomDumpStringConvertible
+extension Secp256k1PublicKey: CustomDumpStringConvertible {
 	public var customDumpDescription: String {
-		self.compressedRepresentation.hex
+		self.hex
 	}
 }
 
@@ -94,7 +94,6 @@ public struct Signing: Sendable, FeatureReducer {
 				let response = SignedAuthChallenge(challenge: authData.input.challenge, entitySignatures: Set(state.signatures))
 				return .send(.delegate(.finishedSigning(.signAuth(response))))
 			case let .signTransaction(ephemeralNotaryPrivateKey, intent, _):
-				let notaryKey: SLIP10.PrivateKey = .curve25519(ephemeralNotaryPrivateKey)
 
 				return .run { [signatures = state.signatures] send in
 					await send(.internal(.notarizeResult(TaskResult {
@@ -102,7 +101,7 @@ public struct Signing: Sendable, FeatureReducer {
 						return try await transactionClient.notarizeTransaction(.init(
 							intentSignatures: intentSignatures,
 							transactionIntent: intent,
-							notary: notaryKey
+							notary: ephemeralNotaryPrivateKey
 						))
 					})))
 				}
@@ -188,7 +187,7 @@ public struct Signing: Sendable, FeatureReducer {
 				signingFactors: nextFactors,
 				signingPurposeWithPayload: signingPurposeWithPayload
 			)
-		case .ledgerHQHardwareWallet:
+		case .ledgerHqHardwareWallet:
 			return .init(
 				kind: .ledger,
 				signingFactors: nextFactors,

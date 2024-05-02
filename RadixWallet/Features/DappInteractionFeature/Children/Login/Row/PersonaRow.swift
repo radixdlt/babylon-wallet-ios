@@ -4,12 +4,12 @@ import SwiftUI
 // MARK: - PersonaRow
 enum PersonaRow {
 	struct State: Sendable, Equatable, Hashable, Identifiable {
-		var id: Profile.Network.Persona.ID { persona.id }
-		let persona: Profile.Network.Persona
+		var id: Persona.ID { persona.id }
+		let persona: Persona
 		let lastLogin: Date?
 
 		init(
-			persona: Profile.Network.Persona,
+			persona: Persona,
 			lastLogin: Date?
 		) {
 			self.persona = persona

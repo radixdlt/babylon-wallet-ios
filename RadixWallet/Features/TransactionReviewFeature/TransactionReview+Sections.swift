@@ -294,7 +294,7 @@ extension TransactionReview {
 		}
 	}
 
-	private func extractUserAccounts(_ allAddress: [AccountAddress]) async throws -> [Account] {
+	private func extractUserAccounts(_ allAddress: [AccountAddress]) async throws -> [ReviewAccount] {
 		let userAccounts = try await accountsClient.getAccountsOnCurrentNetwork()
 
 		return allAddress
@@ -368,8 +368,8 @@ extension TransactionReview {
 		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
-		var withdrawals: [Account: IdentifiedArrayOf<Transfer>] = [:]
-		let userAccounts: [Account] = try await extractUserAccounts(Array(accountWithdraws.keys))
+		var withdrawals: [ReviewAccount: IdentifiedArrayOf<Transfer>] = [:]
+		let userAccounts: [ReviewAccount] = try await extractUserAccounts(Array(accountWithdraws.keys))
 
 		for (accountAddress, resources) in accountWithdraws {
 			let account = try userAccounts.account(for: accountAddress)
@@ -409,10 +409,10 @@ extension TransactionReview {
 		resourceAssociatedDapps: ResourceAssociatedDapps? = nil,
 		networkID: NetworkID
 	) async throws -> TransactionReviewAccounts.State? {
-		let userAccounts: [Account] = try await extractUserAccounts(Array(accountDeposits.keys))
+		let userAccounts: [ReviewAccount] = try await extractUserAccounts(Array(accountDeposits.keys))
 		let defaultDepositGuarantee = await appPreferencesClient.getPreferences().transaction.defaultDepositGuarantee
 
-		var deposits: [Account: IdentifiedArrayOf<Transfer>] = [:]
+		var deposits: [ReviewAccount: IdentifiedArrayOf<Transfer>] = [:]
 
 		for (accountAddress, accountDeposits) in accountDeposits {
 			let account = try userAccounts.account(for: accountAddress)
@@ -472,7 +472,7 @@ extension TransactionReview {
 	}
 
 	func extractAccountDepositSetting(
-		for validAccounts: [Profile.Network.Account],
+		for validAccounts: [Account],
 		defaultDepositRuleChanges: [AccountAddress: AccountDefaultDepositRule]
 	) -> DepositSettingState? {
 		let depositSettingChanges: [TransactionReview.DepositSettingChange] = validAccounts.compactMap { account in
@@ -486,7 +486,7 @@ extension TransactionReview {
 	}
 
 	func extractAccountDepositExceptions(
-		for validAccounts: [Profile.Network.Account],
+		for validAccounts: [Account],
 		resourcePreferenceChanges: [AccountAddress: [ResourceAddress: ResourcePreferenceUpdate]],
 		authorizedDepositorsAdded: [AccountAddress: [ResourceOrNonFungible]],
 		authorizedDepositorsRemoved: [AccountAddress: [ResourceOrNonFungible]]
@@ -504,7 +504,7 @@ extension TransactionReview {
 				var changes: [DepositExceptionsChange.AllowedDepositorChange] = []
 				if let authorizedDepositorsAdded = authorizedDepositorsAdded[account.address] {
 					let added = try await authorizedDepositorsAdded.asyncMap { resourceOrNonFungible in
-						let resourceAddress = try resourceOrNonFungible.resourceAddress()
+						let resourceAddress = resourceOrNonFungible.resourceAddress
 						return try await DepositExceptionsChange.AllowedDepositorChange(
 							resource: onLedgerEntitiesClient.getResource(resourceAddress),
 							change: .added
@@ -514,7 +514,7 @@ extension TransactionReview {
 				}
 				if let authorizedDepositorsRemoved = authorizedDepositorsRemoved[account.address] {
 					let removed = try await authorizedDepositorsRemoved.asyncMap { resourceOrNonFungible in
-						let resourceAddress = try resourceOrNonFungible.resourceAddress()
+						let resourceAddress = resourceOrNonFungible.resourceAddress
 						return try await DepositExceptionsChange.AllowedDepositorChange(
 							resource: onLedgerEntitiesClient.getResource(resourceAddress),
 							change: .removed

@@ -4,8 +4,8 @@ import SwiftUI
 // MARK: - SelectBackup
 public struct SelectBackup: Sendable, FeatureReducer {
 	public struct State: Hashable, Sendable {
-		public var backupProfileHeaders: ProfileSnapshot.HeaderList?
-		public var selectedProfileHeader: ProfileSnapshot.Header?
+		public var backupProfileHeaders: Profile.HeaderList?
+		public var selectedProfileHeader: Profile.Header?
 		public var isDisplayingFileImporter: Bool
 		public var thisDeviceID: UUID?
 
@@ -15,8 +15,8 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		public var profileFile: ExportableProfileFile?
 
 		public init(
-			backupProfileHeaders: ProfileSnapshot.HeaderList? = nil,
-			selectedProfileHeader: ProfileSnapshot.Header? = nil,
+			backupProfileHeaders: Profile.HeaderList? = nil,
+			selectedProfileHeader: Profile.Header? = nil,
 			isDisplayingFileImporter: Bool = false,
 			thisDeviceID: UUID? = nil
 		) {
@@ -50,23 +50,23 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case selectedProfileHeader(ProfileSnapshot.Header?)
+		case selectedProfileHeader(Profile.Header?)
 		case importFromFileInstead
 		case dismissFileImporter
 		case otherRestoreOptionsTapped
 		case profileImportResult(Result<URL, NSError>)
-		case tappedUseCloudBackup(ProfileSnapshot.Header)
+		case tappedUseCloudBackup(Profile.Header)
 		case closeButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadBackupProfileHeadersResult(ProfileSnapshot.HeaderList?)
+		case loadBackupProfileHeadersResult(Profile.HeaderList?)
 		case loadThisDeviceIDResult(UUID?)
-		case snapshotWithHeaderNotFoundInCloud(ProfileSnapshot.Header)
+		case snapshotWithHeaderNotFoundInCloud(Profile.Header)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case selectedProfileSnapshot(ProfileSnapshot, isInCloud: Bool)
+		case selectedProfileSnapshot(Profile, isInCloud: Bool)
 		case backToStartOfOnboarding
 		case profileCreatedFromImportedBDFS
 	}
@@ -221,7 +221,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 // MARK: - ProfileNotFoundInCloud
 struct ProfileNotFoundInCloud: LocalizedError {
-	let header: ProfileSnapshot.Header
+	let header: Profile.Header
 	var errorDescription: String? {
 		L10n.IOSProfileBackup.profileNotFoundInCloud
 	}

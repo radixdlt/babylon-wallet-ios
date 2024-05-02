@@ -1,8 +1,9 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - AuthorizedDapps
-public struct AuthorizedDapps: Sendable, FeatureReducer {
+public struct AuthorizedDappsFeature: Sendable, FeatureReducer {
 	@Dependency(\.authorizedDappsClient) var authorizedDappsClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.errorQueue) var errorQueue
@@ -12,8 +13,8 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 	// MARK: State
 
 	public struct State: Sendable, Hashable {
-		public var dApps: Profile.Network.AuthorizedDapps = []
-		public var thumbnails: [Profile.Network.AuthorizedDapp.ID: URL] = [:]
+		public var dApps: AuthorizedDapps = []
+		public var thumbnails: [AuthorizedDapp.ID: URL] = [:]
 
 		@PresentationState
 		public var destination: Destination.State? = nil
@@ -27,14 +28,14 @@ public struct AuthorizedDapps: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case didSelectDapp(Profile.Network.AuthorizedDapp.ID)
+		case didSelectDapp(AuthorizedDapp.ID)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedDapps(TaskResult<Profile.Network.AuthorizedDapps>)
-		case loadedThumbnail(URL, dApp: Profile.Network.AuthorizedDapp.ID)
+		case loadedDapps(TaskResult<AuthorizedDapps>)
+		case loadedThumbnail(URL, dApp: AuthorizedDapp.ID)
 		case presentDappDetails(DappDetails.State)
-		case failedToGetDetailsOfDapp(id: Profile.Network.AuthorizedDapp.ID)
+		case failedToGetDetailsOfDapp(id: AuthorizedDapp.ID)
 	}
 
 	// MARK: Destination
