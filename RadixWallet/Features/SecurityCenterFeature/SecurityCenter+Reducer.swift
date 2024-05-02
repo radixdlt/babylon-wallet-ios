@@ -20,7 +20,7 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 // MARK: - SecurityCenter
 public struct SecurityCenter: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public var problems: [SecurityProblem] = []
+		public var problems: [SecurityProblem] = Bool.random() ? [.problem5] : []
 		public var actionsRequired: [Item] = []
 
 		@PresentationState
@@ -36,16 +36,21 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 		@CasePathable
 		public enum State: Sendable, Hashable {
 			case configurationBackup(ConfigurationBackup.State)
+			case securityFactors(SecurityFactors.State)
 		}
 
 		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case configurationBackup(ConfigurationBackup.Action)
+			case securityFactors(SecurityFactors.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
 			Scope(state: \.configurationBackup, action: \.configurationBackup) {
 				ConfigurationBackup()
+			}
+			Scope(state: \.securityFactors, action: \.securityFactors) {
+				SecurityFactors()
 			}
 		}
 	}
@@ -72,7 +77,9 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 		case let .itemTapped(item):
 			switch item {
 			case .securityFactors:
+				state.destination = .securityFactors(.init())
 				return .none
+
 			case .configurationBackup:
 				state.destination = .configurationBackup(.init(problems: state.problems))
 				return .none
