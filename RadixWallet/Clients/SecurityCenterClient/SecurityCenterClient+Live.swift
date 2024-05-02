@@ -1,3 +1,4 @@
+import AsyncAlgorithms
 import CloudKit
 import ComposableArchitecture
 import DependenciesAdditions
@@ -15,9 +16,15 @@ extension SecurityCenterClient {
 		return .init(
 			problems: { profileID in
 				print("•• subscribe to problems for \(profileID.uuidString)")
-				userDefaults.lastBackupValues(for: profileID).map { _ in
-					print("•• backup emitted for \(profileID.uuidString)")
-				}
+
+//				merge(userDefaults.lastCloudBackupValues(for: profileID), userDefaults.lastManualBackupValues(for: profileID))
+
+//					.map { _ in
+//					var problems: [SecurityProblem] = []
+//
+//
+//					print("•• backup emitted for \(profileID.uuidString)")
+//				}
 
 				fatalError()
 			}

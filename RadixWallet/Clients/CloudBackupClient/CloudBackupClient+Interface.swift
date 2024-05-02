@@ -40,39 +40,8 @@ extension CloudBackupClient {
 	public typealias MigrateProfilesFromKeychain = @Sendable () async throws -> [CKRecord]
 	public typealias DeleteProfileInKeychain = @Sendable (UUID) async throws -> Void
 	public typealias CheckAccountStatus = @Sendable () async throws -> CKAccountStatus
-	public typealias LastBackup = @Sendable (UUID) -> AnyAsyncSequence<CloudBackup>
+	public typealias LastBackup = @Sendable (UUID) -> AnyAsyncSequence<BackupMetadata>
 	public typealias LoadProfile = @Sendable (UUID) async throws -> Profile?
 	public typealias LoadAllProfiles = @Sendable () async throws -> [Profile]
 	public typealias BackupProfile = @Sendable () async throws -> CKRecord
-}
-
-// MARK: - CloudBackup
-public struct CloudBackup: Codable, Sendable {
-	public let date: Date
-	public let profileHash: Int
-	public let status: Status
-
-	public enum Status: Codable, Sendable {
-		case success
-		case notAuthorized
-		case failure
-	}
-}
-
-extension UserDefaults.Dependency {
-	public func setLastBackup(_ status: CloudBackup.Status, of profile: Profile) throws {
-		var backups: [UUID: CloudBackup] = try loadCodable(key: .lastBackups) ?? [:]
-		backups[profile.id] = .init(
-			date: profile.header.lastModified,
-			profileHash: profile.hashValue,
-			status: status
-		)
-		try save(codable: backups, forKey: .lastBackups)
-	}
-
-	public func lastBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<CloudBackup> {
-		codableValues(key: .lastBackups, codable: [UUID: CloudBackup].self)
-			.compactMap { (try? $0.get())?[profileID] }
-			.eraseToAnyAsyncSequence()
-	}
 }
