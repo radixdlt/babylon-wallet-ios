@@ -117,10 +117,7 @@ extension ConfigurationBackup {
 
 		var body: some SwiftUI.View {
 			HStack(spacing: 0) {
-				Image(.warningError)
-					.renderingMode(.template)
-					.resizable()
-					.frame(.smallest)
+				Image(.error)
 					.padding(.trailing, .medium3)
 
 				Text(warning(for: problem))
@@ -236,12 +233,14 @@ extension ConfigurationBackup {
 						}
 					} label: {
 						HStack(spacing: .zero) {
-							SecurityCenter.StatusIcon(actionRequired: actionRequired)
+							let style: Color = actionRequired ? .app.alert : .app.green1
+							Image(actionRequired ? .error : .checkCircle)
 								.padding(.trailing, .small3)
+								.foregroundStyle(style)
 
 							Text(title)
 								.textStyle(.body2HighImportance)
-								.foregroundStyle(actionRequired ? .app.alert : .app.green1)
+								.foregroundStyle(style)
 
 							Spacer(minLength: 0)
 
@@ -309,11 +308,8 @@ extension ConfigurationBackup {
 
 		var body: some SwiftUI.View {
 			HStack(spacing: 0) {
-				Image(.warningError)
-					.resizable()
-					.renderingMode(.template)
+				Image(.error)
 					.foregroundStyle(.app.gray1)
-					.frame(.smallest)
 					.padding(.trailing, .medium3)
 
 				Text(text)

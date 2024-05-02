@@ -77,10 +77,7 @@ extension SecurityCenter {
 			Button(action: action) {
 				VStack(spacing: 0) {
 					HStack(spacing: 0) {
-						Image(.warningError)
-							.renderingMode(.template)
-							.resizable()
-							.frame(.smallest)
+						Image(.error)
 							.padding(.trailing, .small2)
 
 						Text(heading(for: problem))
@@ -155,13 +152,13 @@ extension SecurityCenter {
 							.textStyle(.body2Regular)
 
 						HStack(spacing: .zero) {
-							StatusIcon(actionRequired: actionRequired)
+							Image(actionRequired ? .error : .checkCircle)
 								.padding(.trailing, .small3)
 
 							Text(status)
-								.foregroundStyle(actionRequired ? .app.alert : .app.green1)
 								.textStyle(.body2HighImportance)
 						}
+						.foregroundStyle(actionRequired ? .app.alert : .app.green1)
 					}
 
 					Spacer(minLength: .zero)
@@ -204,20 +201,6 @@ extension SecurityCenter {
 			}
 		}
 	}
-
-	struct StatusIcon: SwiftUI.View {
-		let actionRequired: Bool
-
-		var body: some SwiftUI.View {
-			if actionRequired {
-				Image(.warningError)
-					.resizable()
-					.frame(.smallest)
-			} else {
-				Image(.checkCircle)
-			}
-		}
-	}
 }
 
 private extension StoreOf<SecurityCenter> {
@@ -234,14 +217,18 @@ private extension View {
 	func destinations(with store: StoreOf<SecurityCenter>) -> some View {
 		let destinationStore = store.destination
 		return configurationBackup(with: destinationStore)
+			.securityFactors(with: destinationStore)
 	}
 
 	private func configurationBackup(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /SecurityCenter.Destination.State.configurationBackup,
-			action: SecurityCenter.Destination.Action.configurationBackup,
-			destination: { ConfigurationBackup.View(store: $0) }
-		)
+		navigationDestination(store: destinationStore.scope(state: \.configurationBackup, action: \.configurationBackup)) {
+			ConfigurationBackup.View(store: $0)
+		}
+	}
+
+	private func securityFactors(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.securityFactors, action: \.securityFactors)) {
+			SecurityFactors.View(store: $0)
+		}
 	}
 }

@@ -142,10 +142,15 @@ public enum AssetResource {
   public static let transactionReviewDepositSetting = ImageAsset(name: "transactionReview_depositSetting")
   public static let transactionReviewDepositing = ImageAsset(name: "transactionReview_depositing")
   public static let transactionReviewWithdrawing = ImageAsset(name: "transactionReview_withdrawing")
+  public static let checkCircle = ImageAsset(name: "check_circle")
+  public static let cloud = ImageAsset(name: "cloud")
+  public static let configurationBackup = ImageAsset(name: "configuration_backup")
   public static let errorLarge = ImageAsset(name: "error_large")
   public static let successCheckmark = ImageAsset(name: "success-checkmark")
   public static let transactionInProgress = ImageAsset(name: "transaction_in_progress")
+  public static let folder = ImageAsset(name: "folder")
   public static let radixIconWhite = ImageAsset(name: "radix-icon-white")
+  public static let securityFactors = ImageAsset(name: "security_factors")
 }
 // swiftlint:enable identifier_name line_length nesting type_body_length type_name
 
