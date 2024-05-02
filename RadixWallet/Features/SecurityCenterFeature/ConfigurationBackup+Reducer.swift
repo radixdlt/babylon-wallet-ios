@@ -15,9 +15,9 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		/// An exportable Profile file, either encrypted or plaintext. Setting this will trigger showing a file exporter
 		public var profileFile: ExportableProfileFile?
 
-		public init(problems: [SecurityProblem]) {
-			self.problems = problems
-		}
+//		public init(problems: [SecurityProblem]) {
+//			self.problems = problems
+//		}
 
 		public var outdatedBackupPresent: Bool {
 			!automatedBackupsEnabled && lastBackup != nil
@@ -48,6 +48,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		case setCloudBackupEnabled(Bool)
 		case setICloudAccountStatus(CKAccountStatus)
 		case setLastBackedUp(Date?)
+		case setProblems([SecurityProblem])
 		case didDeleteOutdatedBackup(ProfileID)
 		case exportProfile(Profile)
 	}
@@ -90,16 +91,29 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.cloudBackupClient) var cloudBackupClient
+	@Dependency(\.securityCenterClient) var securityCenterClient
+	@Dependency(\.userDefaults) var userDefaults
 
-	private func lastBackupEffect() -> Effect<Action> {
+//	private func lastBackupEffect() -> Effect<Action> {
+//		.run { send in
+//			let profileID = await ProfileStore.shared.profile.id
+//			for try await lastBackup in cloudBackupClient.lastBackup(profileID) {
+//				guard !Task.isCancelled else { return }
+//				let currentProfileHash = await ProfileStore.shared.profile.hashValue
+//				let isUpToDate = lastBackup.profileHash == currentProfileHash
+//				print("•• Backup changed for \(profileID.uuidString) \(isUpToDate)")
+//				await send(.internal(.setLastBackedUp(isUpToDate ? nil : lastBackup.date)))
+//			}
+//		}
+//	}
+
+	private func problemsSubscriptionEffect() -> Effect<Action> {
 		.run { send in
 			let profileID = await ProfileStore.shared.profile.id
-			for try await lastBackup in cloudBackupClient.lastBackup(profileID) {
+			for try await problems in securityCenterClient.problems(profileID) {
 				guard !Task.isCancelled else { return }
-				let currentProfileHash = await ProfileStore.shared.profile.hashValue
-				let isUpToDate = lastBackup.profileHash == currentProfileHash
-				print("•• Backup changed for \(profileID.uuidString) \(isUpToDate)")
-				await send(.internal(.setLastBackedUp(isUpToDate ? nil : lastBackup.date)))
+				print("•• CB sub problems: \(problems)")
+				await send(.internal(.setProblems(problems)))
 			}
 		}
 	}
@@ -138,6 +152,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		case .didAppear:
 			return checkCloudAccountStatusEffect()
 				.merge(with: checkCloudBackupEnabledEffect())
+				.merge(with: problemsSubscriptionEffect())
 
 		case let .automatedBackupsToggled(isEnabled):
 			state.lastBackup = nil
@@ -212,13 +227,18 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			return .none
 
 		case let .setCloudBackupEnabled(isEnabled):
-			print("•• set setCloudBackupEnabled: \(isEnabled)")
+			print("•• CB set setCloudBackupEnabled: \(isEnabled)")
 			state.automatedBackupsEnabled = isEnabled
 			return .none
 
 		case let .setICloudAccountStatus(status):
-			print("•• set iCloudAccountStatus: \(status)")
+			print("•• CB set iCloudAccountStatus: \(status)")
 			state.iCloudAccountStatus = status
+			return .none
+
+		case let .setProblems(problems):
+			print("•• CB set problems: \(problems)")
+			state.problems = problems
 			return .none
 
 		case let .exportProfile(profile):

@@ -30,7 +30,7 @@ extension CloudBackupClient {
 			for try await profile in await profileStore.values() {
 				print("  •• profileStore new value")
 				let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
-				let status: BackupMetadata.Status
+				let status: CloudBackupResult.Status
 				do {
 					try await saveProfile(profile, existingRecord: existingRecord)
 					status = .success
@@ -41,7 +41,7 @@ extension CloudBackupClient {
 				} catch {
 					status = .failure
 				}
-				print("  •• saveProfile \(status)")
+
 				try? userDefaults.setLastCloudBackup(status, of: profile)
 			}
 		}
