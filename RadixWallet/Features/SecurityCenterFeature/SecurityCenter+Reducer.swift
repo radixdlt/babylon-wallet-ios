@@ -91,16 +91,12 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 	}
 
 	private func problemsSubscriptionEffect() -> Effect<Action> {
-		print("•• SC subscribe"); return
-			.run { send in
-				let profileID = await ProfileStore.shared.profile.id
-				for try await problems in await securityCenterClient.problems(profileID) {
-					print("•• SC emit")
-					guard !Task.isCancelled else { print("•• SC cancelled"); return }
-					await send(.internal(.setProblems(problems)))
-				}
-
-				print("•• SC finished")
+		.run { send in
+			let profileID = await ProfileStore.shared.profile.id
+			for try await problems in await securityCenterClient.problems(profileID) {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.setProblems(problems)))
 			}
+		}
 	}
 }
