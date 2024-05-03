@@ -99,6 +99,8 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 					guard !Task.isCancelled else { print("•• SC cancelled"); return }
 					await send(.internal(.setProblems(problems)))
 				}
+
+				print("•• SC finished")
 			}
 	}
 }
