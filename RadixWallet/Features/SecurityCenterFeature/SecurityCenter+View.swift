@@ -42,6 +42,9 @@ extension SecurityCenter {
 					.padding(.horizontal, .medium2)
 				}
 			}
+			.onAppear {
+				store.send(.view(.didAppear))
+			}
 			.navigationBarTitleDisplayMode(.large)
 			.navigationTitle(L10n.SecurityCenter.title)
 			.destinations(with: store)

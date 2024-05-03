@@ -72,7 +72,6 @@ extension BackupsClient: DependencyKey {
 				}
 			},
 			didExportProfileSnapshot: { profile in
-				print("•• didExportProfileSnapshot")
 				try userDefaults.setLastManualBackup(of: profile)
 			},
 			importCloudProfile: { header, factorSourceIDs in

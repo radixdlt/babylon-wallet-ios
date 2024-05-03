@@ -10,30 +10,10 @@ extension SecurityCenterClient {
 	public static func live(
 		profileStore: ProfileStore = .shared
 	) -> SecurityCenterClient {
-		@Dependency(\.cloudBackupClient) var cloudBackupClient
 		@Dependency(\.userDefaults) var userDefaults
-
-		Task {
-			let profileID = await profileStore.profile.id
-			for try await lastBackup in cloudBackupClient.lastBackup(profileID) {
-				guard !Task.isCancelled else { return }
-				let currentProfileHash = await profileStore.profile.hashValue
-				let isUpToDate = lastBackup.profileHash == currentProfileHash
-				print("•• Backup changed for \(profileID.uuidString) \(isUpToDate)")
-				//			await send(.internal(.setLastBackedUp(isUpToDate ? nil : lastBackup.date)))
-			}
-		}
-
-		/*
-		 5: last cloud backup failed
-		 6: cloud backups are turned off + never manually backed up
-		 7: cloud backups are turned off + has done manual but not latest
-		 */
 
 		return .init(
 			problems: { profileID in
-				print("•• subscribe to problems for \(profileID.uuidString)")
-
 				let cloudBackups = userDefaults.lastCloudBackupValues(for: profileID).optional
 				let cloudBackupsEnabled = await profileStore.appPreferencesValues().map(\.security.isCloudProfileSyncEnabled)
 				let manualBackups = userDefaults.lastManualBackupValues(for: profileID).optional

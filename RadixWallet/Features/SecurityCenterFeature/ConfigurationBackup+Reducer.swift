@@ -12,13 +12,13 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		public var iCloudAccountStatus: CKAccountStatus? = nil
 		public var automatedBackupsEnabled: Bool = true
 		public var lastBackup: Date? = nil
-		public var problems: [SecurityProblem]
+		public var problems: [SecurityProblem] = []
 
 		@PresentationState
 		public var destination: Destination.State? = nil
 
 		/// An exportable Profile file, either encrypted or plaintext. Setting this will trigger showing a file exporter
-		public var exportable: Exportable?
+		public var exportable: Exportable? = nil
 
 		public var outdatedBackupPresent: Bool {
 			!automatedBackupsEnabled && lastBackup != nil
@@ -27,6 +27,8 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		public var actionsRequired: [Item] {
 			problems.isEmpty ? [] : Item.allCases
 		}
+
+		public init() {}
 	}
 
 	public enum Item: Sendable, Hashable, CaseIterable {
@@ -102,6 +104,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			return checkCloudAccountStatusEffect()
 				.merge(with: checkCloudBackupEnabledEffect())
 				.merge(with: problemsSubscriptionEffect())
+				.merge(with: lastBackupEffect())
 
 		case let .automatedBackupsToggled(isEnabled):
 			state.lastBackup = nil
@@ -175,16 +178,15 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 		case let .didDeleteOutdatedBackup(id):
 			state.lastBackup = nil
-			// FIXME: GK - show alert? toast?
+			// FIXME: GK - show toast?
 			return .none
 
 		case let .setCloudBackupEnabled(isEnabled):
-			print("•• CB set setCloudBackupEnabled: \(isEnabled)")
+			print("•• automatedBackupsEnabled \(isEnabled)")
 			state.automatedBackupsEnabled = isEnabled
 			return .none
 
 		case let .setICloudAccountStatus(status):
-			print("•• CB set iCloudAccountStatus: \(status)")
 			state.iCloudAccountStatus = status
 			return .none
 
@@ -198,27 +200,30 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		}
 	}
 
-	//	private func lastBackupEffect() -> Effect<Action> {
-	//		.run { send in
-	//			let profileID = await ProfileStore.shared.profile.id
-	//			for try await lastBackup in cloudBackupClient.lastBackup(profileID) {
-	//				guard !Task.isCancelled else { return }
-	//				let currentProfileHash = await ProfileStore.shared.profile.hashValue
-	//				let isUpToDate = lastBackup.profileHash == currentProfileHash
-	//				print("•• Backup changed for \(profileID.uuidString) \(isUpToDate)")
-	//				await send(.internal(.setLastBackedUp(isUpToDate ? nil : lastBackup.date)))
-	//			}
-	//		}
-	//	}
-
-	private func problemsSubscriptionEffect() -> Effect<Action> {
+	private func lastBackupEffect() -> Effect<Action> {
 		.run { send in
 			let profileID = await ProfileStore.shared.profile.id
-			for try await problems in await securityCenterClient.problems(profileID) {
+			for try await lastBackup in cloudBackupClient.lastBackup(profileID) {
 				guard !Task.isCancelled else { return }
-				await send(.internal(.setProblems(problems)))
+				let currentProfileHash = await ProfileStore.shared.profile.hashValue
+				let curr = await ProfileStore.shared.profile.header.lastModified
+				let isUpToDate = lastBackup.profileHash == currentProfileHash
+				print("•• lastBackup: \(lastBackup.date) \(curr) \(isUpToDate)")
+				await send(.internal(.setLastBackedUp(isUpToDate ? nil : lastBackup.date)))
 			}
 		}
+	}
+
+	private func problemsSubscriptionEffect() -> Effect<Action> {
+		print("•• CB subscribe"); return
+			.run { send in
+				let profileID = await ProfileStore.shared.profile.id
+				for try await problems in await securityCenterClient.problems(profileID) {
+					print("•• CB emit")
+					guard !Task.isCancelled else { print("•• CB cancelled"); return }
+					await send(.internal(.setProblems(problems)))
+				}
+			}
 	}
 
 	private func checkCloudAccountStatusEffect() -> Effect<Action> {
