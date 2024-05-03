@@ -20,7 +20,6 @@ struct OverlayReducer: Sendable, FeatureReducer {
 	enum InternalAction: Sendable, Equatable {
 		case scheduleItem(OverlayWindowClient.Item)
 		case showNextItemIfPossible
-		case autoDimissed
 	}
 
 	public struct Destination: DestinationReducer {
@@ -78,11 +77,6 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			return showItemIfPossible(state: &state)
 		case .showNextItemIfPossible:
 			return showItemIfPossible(state: &state)
-		case .autoDimissed:
-			if let item = state.itemsQueue.first, case let .autodismissAlert(state) = item {
-				overlayWindowClient.sendAlertAction(.dismissed, state.id)
-			}
-			return dismiss(&state)
 		}
 	}
 
@@ -97,7 +91,7 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			return dismiss(&state)
 
 		case .linkDappSheet(.delegate(.dismiss)):
-			if let item = state.itemsQueue.first, case let .autodismissSheet(id) = item {
+			if let item = state.itemsQueue.first, case let .autodismissSheet(id, _) = item {
 				overlayWindowClient.sendAlertAction(.dismissed, id)
 			}
 
@@ -145,15 +139,9 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		case let .alert(alert):
 			state.destination = .alert(alert)
 			return setIsUserInteractionEnabled(&state, isEnabled: true)
-		case .autodismissSheet:
-			state.destination = .linkDappSheet(.init(dismissDelay: userDefaults.getDappLinkingDelay()))
+		case let .autodismissSheet(_, dAppMetadata):
+			state.destination = .linkDappSheet(.init(dismissDelay: userDefaults.getDappLinkingDelay(), dAppMetadata: dAppMetadata))
 			return setIsUserInteractionEnabled(&state, isEnabled: true)
-		case let .autodismissAlert(alert):
-			state.destination = .alert(alert)
-			return setIsUserInteractionEnabled(&state, isEnabled: true).concatenate(with: .run { send in
-				try await Task.sleep(for: .seconds(.random(in: 1 ..< 4)))
-				await send(.internal(.autoDimissed))
-			})
 		}
 	}
 

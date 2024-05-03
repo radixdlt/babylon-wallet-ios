@@ -52,7 +52,7 @@ extension OverlayWindowClient {
 
 	public typealias SetIsUserIteractionEnabled = @Sendable (Bool) -> Void
 	public typealias IsUserInteractionEnabled = @Sendable () -> AnyAsyncSequence<Bool>
-	public typealias ScheduleLinkingDapp = @Sendable () async -> Void
+	public typealias ScheduleLinkingDapp = @Sendable (DappMetadata) async -> Void
 }
 
 // MARK: OverlayWindowClient.Item
@@ -102,8 +102,7 @@ extension OverlayWindowClient {
 
 		case hud(HUD)
 		case alert(AlertState)
-		case autodismissAlert(AlertState)
-		case autodismissSheet(UUID)
+		case autodismissSheet(UUID, DappMetadata)
 	}
 }
 

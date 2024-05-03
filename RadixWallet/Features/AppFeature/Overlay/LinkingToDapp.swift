@@ -7,10 +7,12 @@ struct LinkingToDapp: FeatureReducer {
 		let cancellationId = UUID()
 
 		var timer: Double
+		let dAppMetadata: DappMetadata
 
-		init(dismissDelay: Double) {
+		init(dismissDelay: Double, dAppMetadata: DappMetadata) {
 			self.dismissDelay = dismissDelay
 			self.timer = dismissDelay
+			self.dAppMetadata = dAppMetadata
 		}
 	}
 
@@ -64,24 +66,24 @@ extension LinkingToDapp {
 		var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }) { viewStore in
 				VStack(spacing: .medium1) {
-					Spacer()
-					Text("Linking to dApp")
-						.textStyle(.sheetTitle)
-						.padding(.bottom, .medium1)
+					DappHeader(
+						thumbnail: viewStore.dAppMetadata.thumbnail,
+						title: "Verifying dApp",
+						subtitle: "\(viewStore.dAppMetadata.name) is requesting verification"
+					)
 
-					Spacer()
-					ProgressView("Current dApp Link delay is \(viewStore.dismissDelay) seconds", value: viewStore.timer, total: viewStore.dismissDelay)
+					Text("**\(viewStore.dAppMetadata.name)** wants to make requests to your Radix Wallet. Click Continue to verify the identity of this dApp and proceed with the request.")
 						.textStyle(.body1HighImportance)
 
-					Button("Link on action") {
+					Spacer()
+				}
+				.padding(.horizontal, .medium1)
+				.padding(.vertical, .medium1)
+				.footer {
+					Button(L10n.DAppRequest.Login.continue) {
 						store.send(.view(.continueTapped))
 					}
 					.buttonStyle(.primaryRectangular)
-					Spacer()
-				}
-				.padding()
-				.task { @MainActor in
-					await store.send(.view(.task)).finish()
 				}
 			}
 		}

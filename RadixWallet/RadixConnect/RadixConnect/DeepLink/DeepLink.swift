@@ -11,6 +11,9 @@ public actor Mobile2Mobile {
 	@Dependency(\.radixConnectRelay) var radixConnectRelay
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.secureStorageClient) var secureStorageClient
+	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.cacheClient) var cacheClient
+	@Dependency(\.gatewayAPIClient) var gatewayAPIClient
 
 	private let incomingMessagesSubject: AsyncPassthroughSubject<P2P.RTCIncomingMessage> = .init()
 
@@ -30,19 +33,69 @@ public actor Mobile2Mobile {
 }
 
 extension Mobile2Mobile {
-	func getDappReturnURL(_ dAppOrigin: URL) async throws -> URL {
-		let wellKnown = try await httpClient.fetchDappWellKnownFile(dAppOrigin)
-		guard let returnURL = wellKnown.callbackPath else {
-			fatalError()
-		}
-		return dAppOrigin.appending(component: "connect")
+	func getDappReturnURL(_ dAppOrigin: URL, wellKnownFile: HTTPClient.WellKnownFileResponse) -> URL {
+		let callbackPath: String = wellKnownFile.callbackPath ?? "connect"
+
+		return dAppOrigin.appendingPathComponent(callbackPath)
+	}
+
+	func getDAppMetadata(_ dappDefinitionAddress: DappDefinitionAddress, origin: URL) async throws -> DappMetadata {
+		let ledgerMetadata = try await cacheClient.withCaching(
+			cacheEntry: .dAppRequestMetadata(dappDefinitionAddress.address),
+			invalidateCached: { (cached: DappMetadata.Ledger) in
+				guard
+					cached.name != nil,
+					cached.description != nil,
+					cached.thumbnail != nil
+				else {
+					/// Some of these fields were not set, fetch and see if they
+					/// have been updated since last time...
+					return .cachedIsInvalid
+				}
+				// All relevant fields are set, the cached metadata is valid.
+				return .cachedIsValid
+			},
+			request: {
+				let entityMetadataForDapp = try await gatewayAPIClient.getEntityMetadata(dappDefinitionAddress.address, .dappMetadataKeys)
+				return try DappMetadata.Ledger(
+					entityMetadataForDapp: entityMetadataForDapp,
+					dAppDefinintionAddress: dappDefinitionAddress,
+					origin: .init(string: origin.absoluteString)
+				)
+			}
+		)
+
+		return .ledger(ledgerMetadata)
+	}
+
+	func fetchWellKnown(dAppOrigin: URL) async throws -> HTTPClient.WellKnownFileResponse {
+		try await httpClient.fetchDappWellKnownFile(dAppOrigin)
 	}
 
 	func linkDapp(_ request: Request.DappLinking) async throws {
 		switch request.origin {
 		case let .webDapp(dAppOrigin):
-			let dAppPublicKey = request.publicKey // try await radixConnectRelay.getHandshakeRequest(request.sessionId)
-			let dappReturnURL = try await getDappReturnURL(dAppOrigin)
+			let dAppPublicKey = request.publicKey
+
+			let wellKnown = await (try? fetchWellKnown(dAppOrigin: dAppOrigin)) ?? HTTPClient.WellKnownFileResponse(dApps: [.init(dAppDefinitionAddress: .wallet)], callbackPath: nil)
+			let dappReturnURL = getDappReturnURL(dAppOrigin, wellKnownFile: wellKnown)
+
+			let dAppMetadata: DappMetadata = try await {
+				guard let dappDefinitionAddress = wellKnown.dApps.first?.dAppDefinitionAddress else {
+					struct MissingDappDefinitionAddress: Error {}
+					throw MissingDappDefinitionAddress()
+				}
+
+				do {
+					return try await getDAppMetadata(dappDefinitionAddress, origin: dAppOrigin)
+				} catch {
+					if await appPreferencesClient.isDeveloperModeEnabled() {
+						return DappMetadata.deepLink(.init(origin: dAppOrigin, dAppDefAddress: dappDefinitionAddress))
+					}
+
+					throw error
+				}
+			}()
 
 			loggerGlobal.critical("Creating the Wallet Private/Public key pair")
 
@@ -60,7 +113,7 @@ extension Mobile2Mobile {
 				)
 			)
 
-			await overlayWindowClient.scheduleLinkingDapp()
+			await overlayWindowClient.scheduleLinkingDapp(dAppMetadata)
 
 			let returnURL = dappReturnURL.appending(queryItems: [
 				.init(name: "sessionId", value: request.sessionId.rawValue),

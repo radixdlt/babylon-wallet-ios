@@ -10,6 +10,8 @@ extension DappMetadata {
 			L10n.DAppRequest.Metadata.unknownName
 		case .wallet:
 			L10n.DAppRequest.Metadata.wallet
+		case .deepLink:
+			L10n.DAppRequest.Metadata.unknownName
 		}
 	}
 }

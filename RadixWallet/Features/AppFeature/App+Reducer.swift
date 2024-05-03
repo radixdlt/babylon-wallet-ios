@@ -82,7 +82,7 @@ public struct App: Sendable, FeatureReducer {
 			case .onboardingCoordinator:
 				deepLinkHandlerClient.addDeepLink(url)
 				overlayWindowClient.scheduleAlertIgnoreAction(.init(title: { TextState("dApp Request") }, message: {
-					TextState("You will be able to handle dApp request after creating a profile")
+					TextState("You can proceed with this request after you create or restore your Radix Wallet.")
 				}))
 			}
 			return .none
@@ -134,7 +134,7 @@ public struct App: Sendable, FeatureReducer {
 		state.root = .onboardingCoordinator(.init())
 		if deepLinkHandlerClient.hasDeepLink() {
 			overlayWindowClient.scheduleAlertIgnoreAction(.init(title: { TextState("dApp Request") }, message: {
-				TextState("You will be able to handle dApp request after creating a profile")
+				TextState("You can proceed with this request after you create or restore your Radix Wallet.")
 			}))
 		}
 		return .none
