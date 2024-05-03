@@ -7990,7 +7990,10 @@
 			baseConfigurationReference = 48CFC6A22ADC110800E77A5C /* iOS-preAlpha.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "RadixWallet/RadixWalletDebug-PreAlpha.entitlements";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MDH99V28LM;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.radixpublishing.radixwallet.ios.pre-alpha";
 				SWIFT_VERSION = 5.0;
 			};
 			name = "Debug-PreAlpha";
