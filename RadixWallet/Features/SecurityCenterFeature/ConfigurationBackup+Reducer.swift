@@ -215,15 +215,13 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	}
 
 	private func problemsSubscriptionEffect() -> Effect<Action> {
-		print("•• CB subscribe"); return
-			.run { send in
-				let profileID = await ProfileStore.shared.profile.id
-				for try await problems in await securityCenterClient.problems(profileID) {
-					print("•• CB emit")
-					guard !Task.isCancelled else { print("•• CB cancelled"); return }
-					await send(.internal(.setProblems(problems)))
-				}
+		.run { send in
+			let profileID = await ProfileStore.shared.profile.id
+			for try await problems in await securityCenterClient.problems(profileID) {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.setProblems(problems)))
 			}
+		}
 	}
 
 	private func checkCloudAccountStatusEffect() -> Effect<Action> {

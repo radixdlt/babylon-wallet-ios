@@ -29,6 +29,7 @@ extension CloudBackupClient {
 		Task {
 			for try await profile in await profileStore.values() {
 				print("  •• profileStore new value")
+				guard profile.appPreferences.security.isCloudProfileSyncEnabled else { continue }
 				let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
 				let status: CloudBackupResult.Status
 				do {
