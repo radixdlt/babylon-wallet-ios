@@ -14,6 +14,7 @@ public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case activeProfileID
 
 	case dappLinkingDelay
+	case dAppLinkingAutoContinueEnabled
 
 	case mnemonicsUserClaimsToHaveBackedUp
 }
@@ -145,6 +146,14 @@ extension UserDefaults.Dependency {
 	}
 
 	public func getDappLinkingDelay() -> Double {
-		double(forKey: Key.dappLinkingDelay.rawValue) ?? 2
+		double(forKey: Key.dappLinkingDelay.rawValue) ?? 1
+	}
+
+	public func setDappLinkingAutoContinueEnabled(_ isEnabled: Bool) {
+		set(isEnabled, forKey: Key.dAppLinkingAutoContinueEnabled.rawValue)
+	}
+
+	public func getDappLinkingAutoContinueEnabled() -> Bool {
+		bool(forKey: Key.dAppLinkingAutoContinueEnabled.rawValue) ?? false
 	}
 }

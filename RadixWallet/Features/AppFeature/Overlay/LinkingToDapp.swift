@@ -7,34 +7,45 @@ struct LinkingToDapp: FeatureReducer {
 		let cancellationId = UUID()
 
 		var timer: Double
+		var autoDismissEnabled: Bool
+		var autoDismissSelection: Bool
 		let dAppMetadata: DappMetadata
 
-		init(dismissDelay: Double, dAppMetadata: DappMetadata) {
+		init(dismissDelay: Double, autoDismissEnabled: Bool, dAppMetadata: DappMetadata) {
 			self.dismissDelay = dismissDelay
 			self.timer = dismissDelay
 			self.dAppMetadata = dAppMetadata
+			self.autoDismissEnabled = autoDismissEnabled
+			self.autoDismissSelection = false
 		}
 	}
 
-	enum ViewAction: Sendable {
+	enum ViewAction: Sendable, Equatable {
+		case cancel
 		case task
 		case continueTapped
+		case autoDismissEnabled(Bool)
 	}
 
-	enum DelegateAction: Sendable {
-		case dismiss
+	enum DelegateAction: Sendable, Equatable {
+		case cancel
+		case continueFlow
 	}
 
-	enum InternalAction: Sendable {
+	enum InternalAction: Sendable, Equatable {
 		case timerTick
 	}
 
 	@Dependency(\.continuousClock) var continuousClock
+	var userDefaults = UserDefaults.Dependency.radix
 
 	func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			.run { [dismissDelay = state.dismissDelay] send in
+			guard state.autoDismissEnabled else {
+				return .none
+			}
+			return .run { send in
 				for await tick in continuousClock.timer(interval: .milliseconds(100)) {
 					await send(.internal(.timerTick))
 				}
@@ -42,7 +53,15 @@ struct LinkingToDapp: FeatureReducer {
 			.cancellable(id: state.cancellationId, cancelInFlight: true)
 
 		case .continueTapped:
-			.concatenate(.cancel(id: state.cancellationId), .send(.delegate(.dismiss)))
+			userDefaults.setDappLinkingAutoContinueEnabled(state.autoDismissSelection)
+			return .concatenate(.cancel(id: state.cancellationId), .send(.delegate(.continueFlow)))
+
+		case let .autoDismissEnabled(value):
+			state.autoDismissSelection = value
+			return .none
+
+		case .cancel:
+			return .concatenate(.cancel(id: state.cancellationId), .send(.delegate(.cancel)))
 		}
 	}
 
@@ -51,7 +70,7 @@ struct LinkingToDapp: FeatureReducer {
 		case .timerTick:
 			state.timer -= 0.1
 			if state.timer < 0 {
-				return .concatenate(.cancel(id: state.cancellationId), .send(.delegate(.dismiss)))
+				return .concatenate(.cancel(id: state.cancellationId), .send(.delegate(.continueFlow)))
 			}
 			return .none
 		}
@@ -64,7 +83,12 @@ extension LinkingToDapp {
 		let store: StoreOf<LinkingToDapp>
 
 		var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }) { viewStore in
+			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+				CloseButton {
+					viewStore.send(.cancel)
+				}
+				.flushedLeft
+
 				VStack(spacing: .medium1) {
 					DappHeader(
 						thumbnail: viewStore.dAppMetadata.thumbnail,
@@ -76,14 +100,28 @@ extension LinkingToDapp {
 						.textStyle(.body1HighImportance)
 
 					Spacer()
+
+					if !viewStore.autoDismissEnabled {
+						ToggleView(
+							title: "Auto Confirm",
+							subtitle: "Auto confirm next dApp verification requests",
+							isOn: viewStore.binding(
+								get: \.autoDismissSelection,
+								send: { .autoDismissEnabled($0) }
+							)
+						)
+						.textStyle(.body1HighImportance)
+
+						Button(L10n.DAppRequest.Login.continue) {
+							viewStore.send(.continueTapped)
+						}
+						.buttonStyle(.primaryRectangular)
+					}
 				}
 				.padding(.horizontal, .medium1)
 				.padding(.vertical, .medium1)
-				.footer {
-					Button(L10n.DAppRequest.Login.continue) {
-						store.send(.view(.continueTapped))
-					}
-					.buttonStyle(.primaryRectangular)
+				.task { @MainActor in
+					await viewStore.send(.task).finish()
 				}
 			}
 		}

@@ -113,6 +113,8 @@ extension UserDefaults.Dependency.Key {
 			return userDefaults.getNPSSurveyUserId().map(String.init(describing:)).asArray(\.self)
 		case .dappLinkingDelay:
 			return [String(userDefaults.getDappLinkingDelay())]
+		case .dAppLinkingAutoContinueEnabled:
+			return [String(userDefaults.getDappLinkingAutoContinueEnabled())]
 		}
 	}
 }

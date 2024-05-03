@@ -113,7 +113,11 @@ extension Mobile2Mobile {
 				)
 			)
 
-			await overlayWindowClient.scheduleLinkingDapp(dAppMetadata)
+			let result = await overlayWindowClient.scheduleLinkingDapp(dAppMetadata)
+
+			guard case .primaryButtonTapped = result else {
+				return
+			}
 
 			let returnURL = dappReturnURL.appending(queryItems: [
 				.init(name: "sessionId", value: request.sessionId.rawValue),

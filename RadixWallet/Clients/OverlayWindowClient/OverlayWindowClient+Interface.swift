@@ -52,7 +52,7 @@ extension OverlayWindowClient {
 
 	public typealias SetIsUserIteractionEnabled = @Sendable (Bool) -> Void
 	public typealias IsUserInteractionEnabled = @Sendable () -> AnyAsyncSequence<Bool>
-	public typealias ScheduleLinkingDapp = @Sendable (DappMetadata) async -> Void
+	public typealias ScheduleLinkingDapp = @Sendable (DappMetadata) async -> Item.AlertAction
 }
 
 // MARK: OverlayWindowClient.Item

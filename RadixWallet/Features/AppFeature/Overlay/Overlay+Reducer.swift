@@ -90,7 +90,14 @@ struct OverlayReducer: Sendable, FeatureReducer {
 		case .hud(.delegate(.dismiss)):
 			return dismiss(&state)
 
-		case .linkDappSheet(.delegate(.dismiss)):
+		case .linkDappSheet(.delegate(.continueFlow)):
+			if let item = state.itemsQueue.first, case let .autodismissSheet(id, _) = item {
+				overlayWindowClient.sendAlertAction(.primaryButtonTapped, id)
+			}
+
+			return dismiss(&state)
+
+		case .linkDappSheet(.delegate(.cancel)):
 			if let item = state.itemsQueue.first, case let .autodismissSheet(id, _) = item {
 				overlayWindowClient.sendAlertAction(.dismissed, id)
 			}
@@ -140,7 +147,11 @@ struct OverlayReducer: Sendable, FeatureReducer {
 			state.destination = .alert(alert)
 			return setIsUserInteractionEnabled(&state, isEnabled: true)
 		case let .autodismissSheet(_, dAppMetadata):
-			state.destination = .linkDappSheet(.init(dismissDelay: userDefaults.getDappLinkingDelay(), dAppMetadata: dAppMetadata))
+			state.destination = .linkDappSheet(.init(
+				dismissDelay: userDefaults.getDappLinkingDelay(),
+				autoDismissEnabled: userDefaults.getDappLinkingAutoContinueEnabled(),
+				dAppMetadata: dAppMetadata
+			))
 			return setIsUserInteractionEnabled(&state, isEnabled: true)
 		}
 	}

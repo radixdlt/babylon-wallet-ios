@@ -37,7 +37,7 @@ extension OverlayWindowClient: DependencyKey {
 				let id = UUID()
 				items.send(.autodismissSheet(id, dAppMetdata))
 				// FIXME: Should not be alert actions
-				await alertActions.first { $0.id == id }?.action
+				return await alertActions.first { $0.id == id }?.action ?? .dismissed
 			}
 		)
 	}()
