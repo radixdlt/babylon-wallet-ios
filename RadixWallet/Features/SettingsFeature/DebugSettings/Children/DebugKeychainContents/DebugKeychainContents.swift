@@ -10,6 +10,9 @@ public struct DebugKeychainContents: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
+		case deleteUserInfo
+		case createAndSaveUserInfoWithRust
+		case createAndSaveUserInfoWithSwift
 		case deleteMnemonicByFactorSourceID(FactorSourceIDFromHash)
 		case deleteAllMnemonics
 	}
@@ -18,6 +21,8 @@ public struct DebugKeychainContents: Sendable, FeatureReducer {
 		case loadedMnemonics([KeyedMnemonicWithMetadata])
 	}
 
+	@Dependency(\.keychainClient) var keychainClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.secureStorageClient) var secureStorageClient
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
@@ -26,13 +31,28 @@ public struct DebugKeychainContents: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			loadKeyValues()
+			return loadKeyValues()
 
 		case let .deleteMnemonicByFactorSourceID(id):
-			delete(ids: [id])
+			return delete(ids: [id])
 
 		case .deleteAllMnemonics:
-			delete(ids: state.keyedMnemonics.map(\.id))
+			return delete(ids: state.keyedMnemonics.map(\.id))
+
+		case .createAndSaveUserInfoWithRust:
+			overlayWindowClient.scheduleHUD(.init(text: "Saving NEW UserInfo created from Rust Sargon"))
+			try! secureStorageClient.saveDeviceInfo(DeviceInfo.sample)
+			return .none
+
+		case .createAndSaveUserInfoWithSwift:
+			overlayWindowClient.scheduleHUD(.init(text: "Saving NEW UserInfo created with Swift"))
+			try! secureStorageClient.saveDeviceInfo(DeviceInfo(id: .init(), date: .now, description: "Debug keychain test"))
+			return .none
+
+		case .deleteUserInfo:
+			overlayWindowClient.scheduleHUD(.init(text: "Deleting UserInfo"))
+			try? keychainClient.removeData(forKey: deviceInfoKey)
+			return .none
 		}
 	}
 

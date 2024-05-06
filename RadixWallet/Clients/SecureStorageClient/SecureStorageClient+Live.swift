@@ -409,7 +409,7 @@ extension SecureStorageClient: DependencyKey {
 let profileHeaderListKeychainKey: KeychainClient.Key = "profileHeaderList"
 @available(*, deprecated, renamed: "deviceInfoKey", message: "Migrate to use `deviceInfoKey` instead")
 private let deviceIdentifierKey: KeychainClient.Key = "deviceIdentifier"
-private let deviceInfoKey: KeychainClient.Key = "deviceInfo"
+let deviceInfoKey: KeychainClient.Key = "deviceInfo"
 
 extension ProfileID {
 	private static let profileSnapshotKeychainKeyPrefix = "profileSnapshot"

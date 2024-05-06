@@ -23,17 +23,34 @@ extension DebugKeychainContents {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 				VStack(alignment: .leading) {
-					Form {
-						ForEach(viewStore.keyedMnemonics, id: \.self) { keyedMnemonic in
-							KeyedMnemonicView(keyedMnemonic) {
-								viewStore.send(.deleteMnemonicByFactorSourceID(keyedMnemonic.id))
+					ScrollView {
+						VStack {
+							ForEach(viewStore.keyedMnemonics, id: \.self) { keyedMnemonic in
+								KeyedMnemonicView(keyedMnemonic) {
+									viewStore.send(.deleteMnemonicByFactorSourceID(keyedMnemonic.id))
+								}
 							}
 						}
 					}
-					Button("Delete All") {
+
+					Button("New UserInfo (Swift)") {
+						viewStore.send(.createAndSaveUserInfoWithSwift)
+					}
+					.buttonStyle(.primaryRectangular(isDestructive: true))
+
+					Button("New UserInfo (Rust)") {
+						viewStore.send(.createAndSaveUserInfoWithRust)
+					}
+					.buttonStyle(.primaryRectangular(isDestructive: true))
+
+					Button("Delete UserInfo") {
+						viewStore.send(.deleteUserInfo)
+					}
+					.buttonStyle(.primaryRectangular(isDestructive: true))
+
+					Button("Delete All Mnemonics") {
 						viewStore.send(.deleteAllMnemonics)
 					}
-					.padding()
 					.buttonStyle(.primaryRectangular(isDestructive: true))
 				}
 				.task { @MainActor in
