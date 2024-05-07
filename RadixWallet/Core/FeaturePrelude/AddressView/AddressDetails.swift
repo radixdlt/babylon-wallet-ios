@@ -74,7 +74,7 @@ public struct AddressDetails: Sendable, FeatureReducer {
 			let path = state.address.addressPrefix + "/" + state.address.formatted(.raw)
 			return .run { _ in
 				let currentNetwork = await gatewaysClient.getCurrentGateway().network
-				let url = Radix.Dashboard.dashboard(forNetwork: currentNetwork)
+				let url = RadixDashboard.dashboard(forNetwork: currentNetwork)
 					.url
 					.appending(path: path)
 				await openURL(url)

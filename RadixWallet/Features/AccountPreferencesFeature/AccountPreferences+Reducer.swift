@@ -115,7 +115,7 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 			.merge(with: state.isOnMainnet ? .none : loadIsAllowedToUseFaucet(&state))
 
 		case .qrCodeButtonTapped:
-			state.destination = .addressDetails(.init(address: .account(state.account.address, isLedgerHWAccount: state.account.isLedgerAccount)))
+			state.destination = .addressDetails(.init(address: .account(state.account.address, isLedgerHWAccount: state.account.isLedgerControlled)))
 			return .none
 
 		case let .rowTapped(row):
