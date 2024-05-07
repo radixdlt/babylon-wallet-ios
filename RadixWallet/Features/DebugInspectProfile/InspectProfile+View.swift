@@ -262,7 +262,7 @@ extension AppPreferencesView {
 			)
 
 			GatewaysView(
-				gateways: appPreferences.gateways,
+				savedGateways: appPreferences.gateways,
 				indentation: inOneLevel
 			)
 
@@ -277,17 +277,17 @@ extension AppPreferencesView {
 
 // MARK: - GatewaysView
 public struct GatewaysView: IndentedView {
-	public let gateways: Gateways
+	public let savedGateways: SavedGateways
 	public let indentation: Indentation
 }
 
 extension GatewaysView {
 	public var body: some View {
 		VStack(alignment: .leading, spacing: indentation.spacing) {
-			ForEach(gateways.all) { gateway in
+			ForEach(savedGateways.all) { gateway in
 				GatewayView(
 					gateway: gateway,
-					isCurrent: self.gateways.current == gateway,
+					isCurrent: savedGateways.current == gateway,
 					indentation: inOneLevel
 				)
 			}

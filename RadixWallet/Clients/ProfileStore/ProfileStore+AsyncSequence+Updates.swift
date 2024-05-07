@@ -34,7 +34,7 @@ extension ProfileStore {
 	}
 
 	/// A multicasting replaying AsyncSequence of distinct Gateways
-	public func gatewaysValues() -> AnyAsyncSequence<Gateways> {
+	public func gatewaysValues() -> AnyAsyncSequence<SavedGateways> {
 		_lens {
 			$0.appPreferences.gateways
 		}

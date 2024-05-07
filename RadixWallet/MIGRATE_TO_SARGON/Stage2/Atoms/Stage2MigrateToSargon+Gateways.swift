@@ -3,7 +3,7 @@ import Sargon
 
 // MARK: - DiscrepancyOtherShouldNotContainCurrent
 struct DiscrepancyOtherShouldNotContainCurrent: Swift.Error {}
-extension Gateways {
+extension SavedGateways {
 	public mutating func changeCurrentToMainnetIfNeeded() {
 		if current == .mainnet { return }
 		try? changeCurrent(to: .mainnet)

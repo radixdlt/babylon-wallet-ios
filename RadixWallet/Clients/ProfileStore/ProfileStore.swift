@@ -224,7 +224,7 @@ extension ProfileStore {
 		// she creates her first account.
 		let network = ProfileNetwork(
 			id: .mainnet,
-			accounts: accounts,
+			accounts: accounts.elements, // FIXME: Declare init in (Swift)Sargon accepting `Accounts` (IdentifiedArrayOf<Account>) ?
 			personas: [],
 			authorizedDapps: []
 		)

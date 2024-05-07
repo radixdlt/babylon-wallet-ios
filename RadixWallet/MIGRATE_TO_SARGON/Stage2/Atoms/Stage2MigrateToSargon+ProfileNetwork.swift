@@ -19,7 +19,7 @@ extension ProfileNetwork {
 	}
 
 	public func accountsIncludingHidden() -> Accounts {
-		accounts
+		accounts.asIdentified()
 	}
 
 	public func hasSomeAccount() -> Bool {
@@ -32,16 +32,20 @@ extension ProfileNetwork {
 
 	#if DEBUG
 	public mutating func deleteAccount(address: AccountAddress) {
-		accounts.remove(address)
+		var identified = accounts.asIdentified()
+		identified.remove(id: address)
+		accounts = identified.elements
 	}
 	#endif
 
 	public mutating func updateAccount(_ account: Account) throws {
-		accounts[id: account.id] = account
+		var identified = accounts.asIdentified()
+		identified[id: account.id] = account
+		accounts = identified.elements
 	}
 
 	public mutating func addAccount(_ account: Account) throws {
-		guard accounts.get(id: account.id) == nil else {
+		guard accounts.asIdentified()[id: account.id] == nil else {
 			throw AccountAlreadyExists()
 		}
 
@@ -49,14 +53,16 @@ extension ProfileNetwork {
 	}
 
 	public mutating func hideAccounts(ids idsOfAccountsToHide: Set<Account.ID>) {
+		var identified = accounts.asIdentified()
 		for id in idsOfAccountsToHide {
-			accounts[id: id]?.hide()
+			identified[id: id]?.hide()
 			authorizedDapps.mutateAll { dapp in
 				dapp.referencesToAuthorizedPersonas.mutateAll { persona in
 					persona.sharedAccounts?.ids.removeAll(where: { $0 == id })
 				}
 			}
 		}
+		accounts = identified.elements
 	}
 
 	public func getPersonas() -> Personas {
