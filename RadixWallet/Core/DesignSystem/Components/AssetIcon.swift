@@ -27,6 +27,7 @@ public struct AssetIcon: View {
 	public var body: some View {
 		image
 			.resizable()
+			.scaledToFit()
 			.frame(hitTargetSize)
 			.cornerRadius(cornerRadius)
 	}

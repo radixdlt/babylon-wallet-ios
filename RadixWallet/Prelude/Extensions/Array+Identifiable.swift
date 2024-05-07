@@ -1,3 +1,9 @@
+extension BaseIdentifiedCollection {
+	/// Returns an `IdentifiedArray` of the `Element`, omitting clashing elements
+	public func asIdentified() -> IdentifiedArrayOf<Element> {
+		elements.asIdentified()
+	}
+}
 
 extension Array where Element: Identifiable {
 	/// Returns an `IdentifiedArray` of the `Element`, omitting clashing elements

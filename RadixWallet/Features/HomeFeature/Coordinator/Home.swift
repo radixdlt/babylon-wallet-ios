@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - Home
@@ -35,13 +36,13 @@ public struct Home: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		public typealias HasAccessToMnemonic = Bool
-		case accountsLoadedResult(TaskResult<IdentifiedArrayOf<Profile.Network.Account>>)
-		case exportMnemonic(account: Profile.Network.Account)
+		case accountsLoadedResult(TaskResult<Accounts>)
+		case exportMnemonic(account: Account)
 		case importMnemonic
 		case loadedShouldWriteDownPersonasSeedPhrase(Bool)
-		case currentGatewayChanged(to: Radix.Gateway)
+		case currentGatewayChanged(to: Gateway)
 		case shouldShowNPSSurvey(Bool)
-		case accountsResourcesLoaded(Loadable<[OnLedgerEntity.Account]>)
+		case accountsResourcesLoaded(Loadable<[OnLedgerEntity.OnLedgerAccount]>)
 		case accountsFiatWorthLoaded([AccountAddress: Loadable<FiatWorth>])
 	}
 
@@ -338,7 +339,7 @@ public struct Home: Sendable, FeatureReducer {
 		return .none
 	}
 
-	private func exportMnemonic(controlling account: Profile.Network.Account, state: inout State) -> Effect<Action> {
+	private func exportMnemonic(controlling account: Account, state: inout State) -> Effect<Action> {
 		exportMnemonic(
 			controlling: account,
 			onSuccess: {
@@ -389,7 +390,11 @@ public struct Home: Sendable, FeatureReducer {
 
 	private func loadAccountResources() -> Effect<Action> {
 		.run { send in
-			for try await accountResources in accountPortfoliosClient.portfolioUpdates().map { $0.map { $0.map(\.account) } }.removeDuplicates() {
+			for try await accountResources in accountPortfoliosClient
+				.portfolioUpdates()
+				.map({ updates in updates.map { update in update.map(\.account) } })
+				.removeDuplicates()
+			{
 				guard !Task.isCancelled else { return }
 				await send(.internal(.accountsResourcesLoaded(accountResources)))
 			}
@@ -421,7 +426,7 @@ public struct Home: Sendable, FeatureReducer {
 }
 
 extension Home.State {
-	public var accounts: IdentifiedArrayOf<Profile.Network.Account> {
+	public var accounts: IdentifiedArrayOf<Account> {
 		accountRows.map(\.account).asIdentified()
 	}
 

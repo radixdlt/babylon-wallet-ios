@@ -1,6 +1,8 @@
 /// Disabled tests, should be migrated to TransactionReviewFeatureTests
 
 // import XCTest
+import Sargon
+
 // @testable import Radix_Wallet_Dev
 //
 // @MainActor

@@ -28,7 +28,7 @@ final class TokenPriceCientTests: XCTestCase {
 	}
 
 	func test_belowOne_1() {
-		validateDecimalPriceConversion(0.99, expected: 0.99)
+		validateDecimalPriceConversion(0.99, expected: try! Decimal192(0.99))
 	}
 
 	func test_belowOne_2() {

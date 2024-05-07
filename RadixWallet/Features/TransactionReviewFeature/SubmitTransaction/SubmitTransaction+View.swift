@@ -69,7 +69,7 @@ extension SubmitTransaction {
 				} content: {
 					VStack(spacing: .medium2) {
 						if viewStore.status.failed {
-							Image(asset: AssetResource.warningError)
+							Image(.errorLarge)
 							Text(viewStore.status.errorTitle)
 								.foregroundColor(.app.gray1)
 								.textStyle(.sheetTitle)

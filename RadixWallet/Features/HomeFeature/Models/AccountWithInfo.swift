@@ -2,17 +2,17 @@ import Foundation
 
 // MARK: - AccountWithInfo
 public struct AccountWithInfo: Sendable, Hashable {
-	public var account: Profile.Network.Account
+	public var account: Account
 
 	public var isDappDefinitionAccount: Bool = false
 	public var deviceFactorSourceControlled: DeviceFactorSourceControlled?
 
-	init(account: Profile.Network.Account) {
+	init(account: Account) {
 		self.account = account
 		self.deviceFactorSourceControlled = Self.makeDeviceFactorSourceControlled(account)
 	}
 
-	private static func makeDeviceFactorSourceControlled(_ account: Profile.Network.Account) -> DeviceFactorSourceControlled? {
+	private static func makeDeviceFactorSourceControlled(_ account: Account) -> DeviceFactorSourceControlled? {
 		switch account.securityState {
 		case let .unsecured(unsecuredEntityControl):
 			if unsecuredEntityControl.transactionSigning.factorSourceID.kind == .device {
@@ -26,8 +26,8 @@ public struct AccountWithInfo: Sendable, Hashable {
 	}
 
 	public var id: AccountAddress { account.address }
-	public var isLegacyAccount: Bool { account.isOlympiaAccount }
-	public var isLedgerAccount: Bool { account.isLedgerAccount }
+	public var isLegacyAccount: Bool { account.isLegacy }
+	public var isLedgerAccount: Bool { account.isLedgerControlled }
 
 	public var mnemonicHandlingCallToAction: MnemonicHandling? {
 		deviceFactorSourceControlled?.mnemonicHandlingCallToAction

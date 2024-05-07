@@ -3,8 +3,8 @@ public enum LedgerIdentifiable: Sendable {
 	case address(Address)
 	case transaction(IntentHash)
 
-	public static func address(of account: Profile.Network.Account) -> Self {
-		.address(.account(account.address, isLedgerHWAccount: account.isLedgerAccount))
+	public static func address(of account: Account) -> Self {
+		.address(.account(account.address, isLedgerHWAccount: account.isLedgerControlled))
 	}
 
 	public var address: String {

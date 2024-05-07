@@ -117,7 +117,7 @@ extension AddressView {
 		Task { [openURL, gatewaysClient] in
 			let currentNetwork = await gatewaysClient.getCurrentGateway().network
 			await openURL(
-				Radix.Dashboard.dashboard(forNetwork: currentNetwork)
+				RadixDashboard.dashboard(forNetwork: currentNetwork)
 					.url
 					.appending(path: path)
 			)

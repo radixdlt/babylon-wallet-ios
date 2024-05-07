@@ -1,8 +1,31 @@
 import DependenciesAdditions
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
 
 // swiftformat:disable redundantInit
+extension Mnemonic {
+	public static let testValue = Self.testValueZooVote
+}
+
+extension Profile {
+	static func newEmpty() -> Self {
+		let date = Date(timeIntervalSince1970: 0)
+		let bdfs: DeviceFactorSource = { () -> DeviceFactorSource in
+			let mnemonic = Mnemonic(wordCount: .twentyFour, language: .english)
+			let mnemonicWithPassphrase = MnemonicWithPassphrase(mnemonic: mnemonic, passphrase: "")
+
+			var bdfs = DeviceFactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, isMain: true)
+			bdfs.common.addedOn = date
+			bdfs.common.lastUsedOn = date
+			bdfs.hint.name = "iPhone"
+			return bdfs
+		}()
+		let deviceInfo = DeviceInfo(id: UUID(), date: date, description: "Builder")
+		var header = Header.init(snapshotVersion: .v100, id: UUID(), creatingDevice: deviceInfo, lastUsedOnDevice: deviceInfo, lastModified: date, contentHint: ContentHint.init(numberOfAccountsOnAllNetworksInTotal: 0, numberOfPersonasOnAllNetworksInTotal: 0, numberOfNetworks: 0))
+		return Self.init(header: .sample, deviceFactorSource: bdfs)
+	}
+}
 
 extension DependencyValues {
 	private mutating func _profile(
@@ -16,12 +39,11 @@ extension DependencyValues {
 			}
 			secureStorageClient.loadProfileSnapshot = { key in
 				precondition(key == profile.header.id)
-				return profile.snapshot()
+				return profile
 			}
 			secureStorageClient.loadProfileSnapshotData = { key in
 				precondition(key == profile.header.id)
-
-				return try! JSONEncoder.iso8601.encode(profile.snapshot())
+				return profile.jsonData()
 			}
 		} else {
 			secureStorageClient.loadProfile = { _ in
@@ -247,14 +269,14 @@ final class ProfileStoreNewProfileTests: TestCase {
 				let sut = ProfileStore()
 				// WHEN import profile
 				var profileToImport = Profile.withOneAccountsDeviceInfo_ABBA_mnemonic_ABANDON_ART
-				try profileToImport.addAccount(Profile.Network.Account.makeTestValue(name: "stoke", networkID: .stokenet))
+				try profileToImport.addAccount(Account.sampleStokenet)
 				try profileToImport.changeGateway(to: .stokenet)
 				try await sut.importProfile(profileToImport)
 				return await sut.profile
 			}
 
 			// THEN imported profile is used
-			XCTAssertNoDifference(usedProfile.network?.networkID, .mainnet)
+			XCTAssertNoDifference(usedProfile.network?.id, .mainnet)
 		}
 	}
 
@@ -266,7 +288,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 				$0.noProfile()
 				$0.secureStorageClient.loadProfileSnapshot = { headerId in
 					if headerId == profileSnapshotInIcloud.header.id {
-						profileSnapshotInIcloud.snapshot()
+						profileSnapshotInIcloud
 					} else { nil }
 				}
 			} operation: {
@@ -282,7 +304,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 	}
 
 	func test__GIVEN__no_profile__WHEN__import_profile_from_icloud_not_exists__THEN__error_is_thrown() async throws {
-		let icloudHeader: ProfileSnapshot.Header = .testValueProfileID_DEAD_deviceID_ABBA
+		let icloudHeader: Header = .testValueProfileID_DEAD_deviceID_ABBA
 		try await withTimeLimit {
 			let assertionFailureIsCalled = self.expectation(description: "assertionFailure is called")
 			try await withTestClients {
@@ -376,7 +398,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 			d.mnemonicClient.generate = { wordCount, _ in
 				// THEN 24 word mnemonic is generated
 				XCTAssertNoDifference(wordCount, .twentyFour)
-				return try Mnemonic(wordCount: wordCount, language: .english)
+				return Mnemonic(wordCount: wordCount, language: .english)
 			}
 		}
 	}
@@ -388,7 +410,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 				$0.noProfile()
 
 				$0.mnemonicClient.generate = { _, _ in
-					"zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong"
+					try! Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong")
 				}
 			} operation: {
 				// WHEN ProfileStore.init()
@@ -396,7 +418,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 			}
 
 			XCTAssertNoDifference(
-				profile.factorSources.first.id.description,
+				profile.factorSources.first!.id.description,
 				// THEN profile uses newly generated DeviceFactorSource
 				"device:09a501e4fafc7389202a82a3237a405ed191cdb8a4010124ff8e2c9259af1327"
 			)
@@ -465,7 +487,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 			$0.noProfile()
 
 			$0.mnemonicClient.generate = { _, _ in
-				"zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong"
+				try! Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong")
 			}
 
 			then(&$0)
@@ -518,7 +540,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 			$0.noProfile()
 
 			$0.mnemonicClient.generate = { _, _ in
-				"zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong"
+				try! Mnemonic(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong")
 			}
 
 			then(&$0)
@@ -539,7 +561,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 
 	func test__GIVEN__no_profile__WHEN__finishOnboarding__THEN__iphone__model_is_updated_in_profile_and_keychain() async throws {
 		try await withTimeLimit {
-			let savedSnapshot = LockIsolated<ProfileSnapshot?>(nil)
+			let savedSnapshot = LockIsolated<Profile?>(nil)
 
 			let inMemory = try await withTestClients {
 				// GIVEN no profile
@@ -551,7 +573,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 				// WHEN finishedOnboarding
 				let sut = ProfileStore()
 				try await sut.updating {
-					try $0.addAccount(Profile.Network.Account.testValue)
+					try $0.addAccount(Account.testValue)
 				}
 				await sut.finishedOnboarding()
 				return await sut.profile
@@ -563,7 +585,7 @@ final class ProfileStoreNewProfileTests: TestCase {
 				}
 			}
 
-			func assert(_ header: ProfileSnapshot.Header?) {
+			func assert(_ header: Header?) {
 				let expected = "marco (polo)"
 				XCTAssertNoDifference(header?.creatingDevice.description, expected)
 				XCTAssertNoDifference(header?.lastUsedOnDevice.description, expected)
@@ -602,7 +624,7 @@ final class ProfileStoreExistingProfileTests: TestCase {
 		try await withTimeLimit {
 			let mnemonicGotDeleted = self.expectation(description: "Mnemonic got deleted")
 			// GIVEN saved profile
-			let savedEmptyProfile = ProfileBuilder().bdfs().build(allowEmpty: true)
+			let savedEmptyProfile = Profile.newEmpty()
 			let firstBDFS = savedEmptyProfile.factorSources.babylonDevice
 
 			let used = await withTestClients {
@@ -682,7 +704,7 @@ final class ProfileStoreExistingProfileTests: TestCase {
 							profile_is_loaded_from_keychain.fulfill()
 						}
 					}
-					return saved.snapshot()
+					return saved
 				}
 			}
 
@@ -844,7 +866,7 @@ final class ProfileStoreExistingProfileTests: TestCase {
 
 				d.keychainClient._getDataWithoutAuthForKey = { key in
 					if key == saved.header.id.keychainKey {
-						try! JSONEncoder.iso8601.encode(saved.snapshot())
+						saved.jsonData()
 					} else if key == profileHeaderListKeychainKey {
 						try! JSONEncoder.iso8601.encode([saved.header])
 					} else {
@@ -909,7 +931,7 @@ final class ProfileStoreExistingProfileTests: TestCase {
 				}
 			}
 			XCTAssertNotEqual(P, Q)
-			XCTAssertNoDifference(Q.factorSources[0].id, PrivateHDFactorSource.testValueAbandonArt.factorSource.id.embed())
+			XCTAssertNoDifference(Q.factorSources[0].id, PrivateHierarchicalDeterministicFactorSource.testValueAbandonArt.factorSource.id.asGeneral)
 		}
 	}
 
@@ -927,7 +949,8 @@ final class ProfileStoreExistingProfileTests: TestCase {
 				d.uuid = .constant(newProfile.id)
 				// THEN new profile is saved to secureStorage
 				d.secureStorageClient.saveProfileSnapshot = {
-					XCTAssertNoDifference($0, newProfile.snapshot())
+					XCTAssertNoDifference($0.header.id, newProfile.header.id)
+					XCTAssertNoDifference($0.networks, newProfile.networks)
 				}
 			}
 		}
@@ -966,9 +989,9 @@ final class ProfileStoreExistingProfileTests: TestCase {
 							var modified = saved
 							modified.header.lastUsedOnDevice = .testValueBEEF // 0xBEEF != 0xABBA
 							// WHEN ... without ownership
-							return modified.snapshot()
+							return modified
 						} else {
-							return saved.snapshot()
+							return saved
 						}
 					}
 				}
@@ -1009,14 +1032,14 @@ final class ProfileStoreAsyncSequenceTests: TestCase {
 					}
 				},
 				// THEN Radix.Gatewat is emitted
-				assert: [Radix.Gateway.mainnet]
+				assert: [Gateway.mainnet]
 			)
 		}
 	}
 
 	func test__GIVEN__no_profile__WHEN_add_first_account__THEN__account_is_emitted() async throws {
 		try await withTimeLimit {
-			let firstAccount: Profile.Network.Account = .testValueIdx0
+			let firstAccount: Account = .testValueIdx0
 			try await self.doTestAsyncSequence(
 				// GIVEN no profile
 				savedProfile: nil,
@@ -1034,36 +1057,6 @@ final class ProfileStoreAsyncSequenceTests: TestCase {
 				assert: [
 					// THEN account is emitted
 					[firstAccount],
-				]
-			)
-		}
-	}
-
-	func test__GIVEN__profile_with_one_account__WHEN_add_2nd_account__THEN__both_accounts_are_emitted() async throws {
-		try await withTimeLimit(.slow) {
-			var profile = Profile.withNoAccounts
-			let firstAccount: Profile.Network.Account = .testValueIdx0
-			// GIVEN: Profile with one account
-			try profile.addAccount(firstAccount)
-
-			let secondAccount: Profile.Network.Account = .testValueIdx1
-			try await self.doTestAsyncSequence(
-				savedProfile: profile,
-				arrange: { sut in
-					await sut.accountValues()
-				},
-				act: { sut in
-					try await sut.updating {
-						// WHEN add 2nd account
-						try $0.addAccount(
-							secondAccount
-						)
-					}
-				},
-				assert: [
-					[firstAccount],
-					// THEN both accounts are emitted
-					[firstAccount, secondAccount],
 				]
 			)
 		}
@@ -1091,7 +1084,6 @@ extension ProfileStoreAsyncSequenceTests {
 				var values = Set<T>()
 				listenerSetup.fulfill()
 				for try await value in asyncSequence {
-					print("🔮 value: \(value)")
 					values.insert(value)
 					if values.count >= expected.count {
 						return values

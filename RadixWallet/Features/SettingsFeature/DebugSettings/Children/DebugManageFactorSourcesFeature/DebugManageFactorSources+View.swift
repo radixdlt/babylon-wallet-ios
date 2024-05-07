@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 extension DebugManageFactorSources.State {
@@ -42,11 +43,6 @@ extension DebugManageFactorSources {
 						viewStore.send(.addLedgerButtonTapped)
 					}
 					.buttonStyle(.primaryRectangular)
-
-					Button("Add `.offDevice` mnemonic") {
-						viewStore.send(.addOffDeviceMnemonicButtonTapped)
-					}
-					.buttonStyle(.primaryRectangular)
 				}
 				.padding([.horizontal, .bottom], .medium1)
 				.task { @MainActor in
@@ -67,7 +63,7 @@ struct FactorSourceView: SwiftUI.View {
 extension FactorSourceView {
 	var body: some View {
 		VStack(alignment: .leading, spacing: 0) {
-			VPair(heading: "Kind", item: factorSource.kind)
+			VPair(heading: "Kind", item: factorSource.factorSourceKind)
 			VPair(heading: "Added on", item: factorSource.addedOn.ISO8601Format())
 			VPair(heading: "ID", item: String(factorSource.id.description.mask(showLast: 6)))
 			if factorSource.isFlaggedForDeletion {

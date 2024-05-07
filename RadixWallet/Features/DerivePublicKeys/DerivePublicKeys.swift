@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - DerivePublicKeys
@@ -26,7 +27,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 				switch self {
 				case .createNewEntity(.account):
 					.createAccount
-				case .createNewEntity(.identity):
+				case .createNewEntity(.persona):
 					.createPersona
 				case .accountRecoveryScan:
 					.deriveAccounts
@@ -41,7 +42,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		public let derivationsPathOption: DerivationPathOption
 		public enum DerivationPathOption: Sendable, Hashable {
 			case knownPaths([DerivationPath], networkID: NetworkID) // derivation paths must not be a Set, since import from Olympia can contain duplicate derivation paths, for different Ledger devices.
-			case next(networkOption: NetworkOption, entityKind: EntityKind, curve: SLIP10.Curve, scheme: DerivationPathScheme)
+			case next(networkOption: NetworkOption, entityKind: EntityKind, curve: SLIP10Curve, scheme: DerivationPathScheme)
 
 			public enum NetworkOption: Sendable, Hashable {
 				case specific(NetworkID)
@@ -59,7 +60,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 			public static func next(
 				for entityKind: EntityKind,
 				networkID: NetworkID?,
-				curve: SLIP10.Curve,
+				curve: SLIP10Curve,
 				scheme: DerivationPathScheme
 			) -> Self {
 				.next(
@@ -76,7 +77,7 @@ public struct DerivePublicKeys: Sendable, FeatureReducer {
 		public enum FactorSourceOption: Sendable, Hashable {
 			case device
 			case specific(FactorSource)
-			case specificPrivateHDFactorSource(PrivateHDFactorSource)
+			case specificPrivateHDFactorSource(PrivateHierarchicalDeterministicFactorSource)
 
 			var factorSourceAccessKind: FactorSourceAccess.State.Kind {
 				switch self {
@@ -288,7 +289,7 @@ extension DerivePublicKeys {
 		loggerGlobal.debug("Finish deriving of #\(hdKeys.count) keys ✅ => delegating `derivedPublicKeys`")
 		return .delegate(.derivedPublicKeys(
 			hdKeys,
-			factorSourceID: source.deviceFactorSource.id.embed(),
+			factorSourceID: source.deviceFactorSource.id.asGeneral,
 			networkID: networkID
 		))
 	}
@@ -321,8 +322,8 @@ extension DerivePublicKeys {
 		let hdKeys = try await ledgerHardwareWalletClient.derivePublicKeys(
 			derivationPaths.map {
 				P2P.LedgerHardwareWallet.KeyParameters(
-					curve: $0.curveForScheme.p2pCurve,
-					derivationPath: $0.path
+					curve: $0.curve.p2pCurve,
+					derivationPath: $0.toString()
 				)
 			},
 			ledger
@@ -330,7 +331,7 @@ extension DerivePublicKeys {
 
 		return .delegate(.derivedPublicKeys(
 			hdKeys,
-			factorSourceID: ledger.id.embed(),
+			factorSourceID: ledger.id.asGeneral,
 			networkID: networkID
 		))
 	}
@@ -339,7 +340,7 @@ extension DerivePublicKeys {
 extension DerivePublicKeys {
 	private func withDerivationPath(
 		state: State,
-		hdFactorSource: some HDFactorSourceProtocol,
+		hdFactorSource: some BaseFactorSourceProtocol,
 		knownPaths deriveWithKnownDerivationPaths: @escaping @Sendable ([DerivationPath], NetworkID) async throws -> Action,
 		calculating calculatedDerivationPath: @escaping @Sendable (DerivationPath, NetworkID) -> Action
 	) -> Effect<Action> {
@@ -363,7 +364,7 @@ extension DerivePublicKeys {
 						derivationPathScheme: derivationPathScheme,
 						networkID: networkID
 					)
-					assert(derivationPath.curveForScheme == curve)
+					assert(derivationPath.curve == curve)
 					try await send(deriveWithKnownDerivationPaths([derivationPath], networkID))
 				} catch: { error, send in
 					loggerGlobal.error("Failed to create derivation path, error: \(error)")
@@ -412,7 +413,7 @@ extension DerivePublicKeys {
 		of entityKind: EntityKind,
 		derivationPathScheme: DerivationPathScheme,
 		networkID maybeNetworkID: NetworkID?
-	) async throws -> (index: HD.Path.Component.Child.Value, networkID: NetworkID) {
+	) async throws -> (index: HDPathValue, networkID: NetworkID) {
 		let currentNetwork = await accountsClient.getCurrentNetworkID()
 		let networkID = maybeNetworkID ?? currentNetwork
 		let request = NextEntityIndexForFactorSourceRequest(
@@ -426,7 +427,7 @@ extension DerivePublicKeys {
 	}
 }
 
-extension SLIP10.Curve {
+extension SLIP10Curve {
 	var p2pCurve: P2P.LedgerHardwareWallet.KeyParameters.Curve {
 		switch self {
 		case .curve25519:

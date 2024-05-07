@@ -72,7 +72,7 @@ struct PreferenceSection<SectionId: Hashable, RowId: Hashable>: View {
 						}
 					}
 					.padding(.vertical, .small1)
-					.frame(minHeight: .settingsRowHeight)
+					.frame(minHeight: .plainListRowMinHeight)
 
 					Spacer(minLength: 0)
 

@@ -18,7 +18,7 @@ extension NetworkSwitchingClient {
 		@Dependency(\.cacheClient) var cacheClient
 		@Dependency(\.userDefaults) var userDefaults
 
-		let validateGatewayURL: ValidateGatewayURL = { newURL -> Radix.Gateway? in
+		let validateGatewayURL: ValidateGatewayURL = { newURL -> Gateway? in
 			let currentURL = await gatewaysClient.getGatewayAPIEndpointBaseURL()
 			guard newURL != currentURL else {
 				return nil
@@ -33,9 +33,9 @@ extension NetworkSwitchingClient {
 
 			// FIXME: mainnet: also compare `NetworkID` from lookup with NetworkID from `getNetworkInformation` call
 			// once it returns networkID!
-			let network = try Radix.Network.lookupBy(name: name)
+			let network = try NetworkDefinition.lookupBy(name: name)
 
-			let gateway = Radix.Gateway(
+			let gateway = Gateway(
 				network: network,
 				url: newURL
 			)

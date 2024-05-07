@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - AssetTransfer
@@ -9,7 +10,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 		public let isMainnetAccount: Bool
 
 		public init(
-			from account: Profile.Network.Account
+			from account: Account
 		) {
 			self.isMainnetAccount = account.networkID == .mainnet
 			self.accounts = .init(fromAccount: account)
@@ -77,7 +78,7 @@ public struct AssetTransfer: Sendable, FeatureReducer {
 				let manifest = try await createManifest(accounts)
 
 				Task {
-					_ = try await dappInteractionClient.addWalletInteraction(
+					_ = await dappInteractionClient.addWalletInteraction(
 						.transaction(.init(send: .init(transactionManifest: manifest, message: message))),
 						.accountTransfer
 					)
@@ -220,7 +221,7 @@ extension AssetTransfer {
 		}
 
 		let perAssetTransfers = PerAssetTransfers(
-			fromAccount: accounts.fromAccount.accountAddress,
+			fromAccount: accounts.fromAccount.address,
 			fungibleResources: fungibles,
 			nonFungibleResources: nonFungibles
 		)
@@ -233,13 +234,12 @@ func useTryDepositOrAbort(
 	resource: ResourceAddress,
 	into receivingAccount: AccountOrAddressOf
 ) async throws -> Bool {
-	if case let .profileAccount(value: sargonUserAccount) = receivingAccount {
+	if case let .profileAccount(value: userAccount) = receivingAccount {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.accountsClient) var accountsClient
 
-		let userAccount = try await accountsClient.fromSargon(sargonUserAccount)
 		let needsSignatureForDepositing = await needsSignatureForDepositting(into: userAccount, resource: resource)
-		let isSoftwareAccount = !userAccount.isLedgerAccount
+		let isSoftwareAccount = !userAccount.isLedgerControlled
 		let userHasAccessToMnemonic = userAccount.deviceFactorSourceID.map { deviceFactorSourceID in
 			secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(deviceFactorSourceID)
 		} ?? false
@@ -254,11 +254,11 @@ func useTryDepositOrAbort(
 
 /// Determines if depositting the resource into an account requires the addition of a signature
 func needsSignatureForDepositting(
-	into receivingAccount: Profile.Network.Account,
+	into receivingAccount: Account,
 	resource resourceAddress: ResourceAddress
 ) async -> Bool {
 	let depositSettings = receivingAccount.onLedgerSettings.thirdPartyDeposits
-	let resourceException = depositSettings.assetsExceptionSet().first { $0.address == resourceAddress }?.exceptionRule
+	let resourceException = depositSettings.assetsExceptionList?.first { $0.address == resourceAddress }?.exceptionRule
 
 	switch (depositSettings.depositRule, resourceException) {
 	// AcceptAll

@@ -1,5 +1,5 @@
 {
-  "originHash" : "f8e8a767cab7d9334987bf06a9dbed1c6759bf30eb416e1f63c6552765355846",
+  "originHash" : "136e3a1717e535f7f4817c4c452e7f0f9a077f467187dd7381b7e2ab133531b1",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -83,15 +83,6 @@
       }
     },
     {
-      "identity" : "k1",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Sajjon/K1",
-      "state" : {
-        "revision" : "9e6c2716b2e6b306d38ca5ec85ff6c16ea148ad1",
-        "version" : "0.3.8"
-      }
-    },
-    {
       "identity" : "keychainaccess",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/kishikawakatsumi/KeychainAccess",
@@ -123,8 +114,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/radixdlt/sargon",
       "state" : {
-        "revision" : "47032cdd7b6ff22b50ffb56cf20ce70a438c5f53",
-        "version" : "0.6.47"
+        "revision" : "a02679cd3f4be02964ccd7a3cc07f1f685cca332",
+        "version" : "0.7.4"
       }
     },
     {

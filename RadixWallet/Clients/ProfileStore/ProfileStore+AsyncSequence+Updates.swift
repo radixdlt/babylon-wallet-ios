@@ -3,7 +3,7 @@
 // MARK: Public
 extension ProfileStore {
 	/// The current network if any
-	public func network() throws -> Profile.Network {
+	public func network() throws -> ProfileNetwork {
 		try profile.network(id: profile.networkID)
 	}
 
@@ -13,21 +13,21 @@ extension ProfileStore {
 	}
 
 	/// A multicasting replaying AsyncSequence of distinct Accounts for the currently selected network.
-	public func accountValues() -> AnyAsyncSequence<IdentifiedArrayOf<Profile.Network.Account>> {
+	public func accountValues() -> AnyAsyncSequence<Accounts> {
 		_lens {
 			$0.network?.getAccounts()
 		}
 	}
 
 	/// A multicasting replaying AsyncSequence of distinct Personas for the currently selected network.
-	public func personaValues() -> AnyAsyncSequence<IdentifiedArrayOf<Profile.Network.Persona>> {
+	public func personaValues() -> AnyAsyncSequence<Personas> {
 		_lens {
 			$0.network?.getPersonas()
 		}
 	}
 
 	/// A multicasting replaying AsyncSequence of distinct Gateways
-	public func currentGatewayValues() -> AnyAsyncSequence<Radix.Gateway> {
+	public func currentGatewayValues() -> AnyAsyncSequence<Gateway> {
 		_lens {
 			$0.appPreferences.gateways.current
 		}

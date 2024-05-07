@@ -2,7 +2,7 @@ import ComposableArchitecture
 import SwiftUI
 
 // MARK: - AuthorizedDapps.View
-extension AuthorizedDapps {
+extension AuthorizedDappsFeature {
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: Store
@@ -16,7 +16,7 @@ extension AuthorizedDapps {
 		let dApps: IdentifiedArrayOf<Dapp>
 
 		struct Dapp: Equatable, Identifiable {
-			let id: Profile.Network.AuthorizedDapp.ID
+			let id: AuthorizedDapp.ID
 			let name: String
 			let thumbnail: URL?
 		}
@@ -25,7 +25,7 @@ extension AuthorizedDapps {
 
 // MARK: - Body
 
-extension AuthorizedDapps.View {
+extension AuthorizedDappsFeature.View {
 	public var body: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
@@ -65,12 +65,12 @@ extension AuthorizedDapps.View {
 
 // MARK: - Extensions
 
-extension AuthorizedDapps.State {
-	var viewState: AuthorizedDapps.ViewState {
+extension AuthorizedDappsFeature.State {
+	var viewState: AuthorizedDappsFeature.ViewState {
 		let dAppViewStates = dApps.map {
-			AuthorizedDapps.ViewState.Dapp(
+			AuthorizedDappsFeature.ViewState.Dapp(
 				id: $0.id,
-				name: $0.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
+				name: $0.displayName ?? L10n.DAppRequest.Metadata.unknownName,
 				thumbnail: thumbnails[$0.id]
 			)
 		}
@@ -79,9 +79,9 @@ extension AuthorizedDapps.State {
 	}
 }
 
-private extension StoreOf<AuthorizedDapps> {
-	var destination: PresentationStoreOf<AuthorizedDapps.Destination> {
-		func scopeState(state: State) -> PresentationState<AuthorizedDapps.Destination.State> {
+private extension StoreOf<AuthorizedDappsFeature> {
+	var destination: PresentationStoreOf<AuthorizedDappsFeature.Destination> {
+		func scopeState(state: State) -> PresentationState<AuthorizedDappsFeature.Destination.State> {
 			state.$destination
 		}
 		return scope(state: scopeState, action: Action.destination)
@@ -90,12 +90,12 @@ private extension StoreOf<AuthorizedDapps> {
 
 @MainActor
 private extension View {
-	func destinations(with store: StoreOf<AuthorizedDapps>) -> some View {
+	func destinations(with store: StoreOf<AuthorizedDappsFeature>) -> some View {
 		let destinationStore = store.destination
 		return navigationDestination(
 			store: destinationStore,
-			state: /AuthorizedDapps.Destination.State.presentedDapp,
-			action: AuthorizedDapps.Destination.Action.presentedDapp,
+			state: /AuthorizedDappsFeature.Destination.State.presentedDapp,
+			action: AuthorizedDappsFeature.Destination.Action.presentedDapp,
 			destination: { DappDetails.View(store: $0) }
 		)
 	}
