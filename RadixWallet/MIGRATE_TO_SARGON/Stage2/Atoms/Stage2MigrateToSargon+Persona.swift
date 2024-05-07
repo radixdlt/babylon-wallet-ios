@@ -16,7 +16,7 @@ extension Personas {
 		filter(not(\.isHidden))
 	}
 
-	public var hiden: Personas {
+	public var hidden: Personas {
 		filter(\.isHidden)
 	}
 }

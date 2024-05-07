@@ -56,7 +56,7 @@ extension ProfileView {
 				)
 
 				PerNetworkView(
-					networks: profile.networks,
+					networks: profile.networks.asIdentified(),
 					indentation: inOneLevel
 				)
 

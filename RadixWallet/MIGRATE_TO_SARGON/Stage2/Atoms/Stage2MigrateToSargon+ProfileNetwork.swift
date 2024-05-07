@@ -66,15 +66,15 @@ extension ProfileNetwork {
 	}
 
 	public func getPersonas() -> Personas {
-		personas.nonHidden
+		personas.asIdentified().nonHidden
 	}
 
 	public func getHiddenPersonas() -> Personas {
-		personas.hiden
+		personas.asIdentified().hidden
 	}
 
 	public func personasIncludingHidden() -> Personas {
-		personas
+		personas.asIdentified()
 	}
 
 	public func hasSomePersona() -> Bool {
@@ -82,29 +82,35 @@ extension ProfileNetwork {
 	}
 
 	public mutating func addPersona(_ persona: Persona) throws {
-		guard personas.get(id: persona.id) == nil else {
+		var identifiedPersonas = personas.asIdentified()
+		guard identifiedPersonas[id: persona.id] == nil else {
 			throw PersonaAlreadyExists()
 		}
 
-		personas.append(persona)
+		identifiedPersonas.append(persona)
+		self.personas = identifiedPersonas.elements
 	}
 
 	public mutating func updatePersona(_ persona: Persona) throws {
-		guard personas.updateOrAppend(persona) != nil else {
+		var identifiedPersonas = personas.asIdentified()
+		guard identifiedPersonas.updateOrAppend(persona) != nil else {
 			throw TryingToUpdateAPersonaWhichIsNotAlreadySaved()
 		}
+		self.personas = identifiedPersonas.elements
 	}
 
 	public mutating func hidePersonas(ids idsOfPersonaToHide: Set<Persona.ID>) {
+		var identifiedPersonas = personas.asIdentified()
 		for id in idsOfPersonaToHide {
 			/// Hide the personas themselves
-			personas[id: id]?.hide()
+			identifiedPersonas[id: id]?.hide()
 
 			/// Remove the persona reference on any authorized dapp
 			authorizedDapps.mutateAll { dapp in
 				dapp.referencesToAuthorizedPersonas.remove(id)
 			}
 		}
+		self.personas = identifiedPersonas.elements
 
 		/// Filter out dapps that do not reference any persona
 		authorizedDapps.filterInPlace(not(\.referencesToAuthorizedPersonas.isEmpty))
@@ -144,7 +150,7 @@ extension ProfileNetworks {
 	}
 
 	public func network(id needle: NetworkID) throws -> ProfileNetwork {
-		guard let network = self.get(id: needle) else {
+		guard let network = self[id: needle] else {
 			throw Error.unknownNetworkWithID(needle)
 		}
 		return network
@@ -160,7 +166,7 @@ extension ProfileNetworks {
 	}
 
 	public mutating func update(_ network: ProfileNetwork) throws {
-		guard get(id: network.id) != nil else {
+		guard self[id: network.id] != nil else {
 			throw Error.unknownNetworkWithID(network.id)
 		}
 		let updatedElement = self.updateOrAppend(network)
@@ -168,7 +174,7 @@ extension ProfileNetworks {
 	}
 
 	public mutating func add(_ network: ProfileNetwork) throws {
-		guard get(id: network.id) == nil else {
+		guard self[id: network.id] == nil else {
 			throw Error.networkAlreadyExistsWithID(network.id)
 		}
 		let updatedElement = self.updateOrAppend(network)

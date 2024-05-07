@@ -10,6 +10,8 @@ import Sargon
 import IdentifiedCollections
 
 public typealias Accounts = IdentifiedArrayOf<Account>
+public typealias Personas = IdentifiedArrayOf<Persona>
+public typealias ProfileNetworks = IdentifiedArrayOf<ProfileNetwork>
 
 public typealias EntityFlags = IdentifiedArrayOf<EntityFlag>
 

@@ -248,9 +248,7 @@ extension ProfileStore {
 				element: bdfs.asGeneral
 			),
 			appPreferences: .default,
-			networks: ProfileNetworks(
-				element: network
-			)
+			networks: [network]
 		)
 
 		// We can "piggyback" on importProfile! Same logic applies!
