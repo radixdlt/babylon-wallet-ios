@@ -3,6 +3,8 @@ import SwiftUI
 
 // MARK: - DebugSettingsCoordinator.View
 extension DebugSettingsCoordinator {
+	public struct ViewState: Equatable {}
+
 	@MainActor
 	public struct View: SwiftUI.View {
 		private let store: Store
@@ -17,18 +19,13 @@ extension DebugSettingsCoordinator.View {
 	public var body: some View {
 		ScrollView {
 			VStack(spacing: .zero) {
-				ForEach(rows) { row in
-					SettingsRow(row: row) {
-						store.send(.view(row.action))
-					}
+				ForEach(rows) { kind in
+					SettingsRow(kind: kind, store: store)
 				}
 			}
 		}
 		.padding(.bottom, .large3)
-		.navigationTitle("Debug Settings")
-		.navigationBarTitleColor(.app.gray1)
-		.navigationBarTitleDisplayMode(.inline)
-		.navigationBarInlineTitleFont(.app.secondaryHeader)
+		.setUpNavigationBar(title: "Debug Settings")
 		.destinations(with: store)
 		.tint(.app.gray1)
 		.foregroundColor(.app.gray1)
@@ -36,34 +33,34 @@ extension DebugSettingsCoordinator.View {
 	}
 
 	@MainActor
-	private var rows: [SettingsRowModel<DebugSettingsCoordinator>] {
+	private var rows: [SettingsRow<DebugSettingsCoordinator>.Kind] {
 		[
 			// ONLY DEBUG EVER
-			.init(
+			.model(
 				title: "Factor sources",
 				icon: .systemImage("person.badge.key"),
 				action: .factorSourcesButtonTapped
 			),
 			// ONLY DEBUG EVER
-			.init(
+			.model(
 				title: "Inspect profile",
 				icon: .systemImage("wallet.pass"),
 				action: .debugInspectProfileButtonTapped
 			),
 			// ONLY DEBUG EVER
-			.init(
+			.model(
 				title: "UserDefaults content",
 				icon: .systemImage("person.text.rectangle"),
 				action: .debugUserDefaultsContentsButtonTapped
 			),
 			// ONLY DEBUG EVER
-			.init(
+			.model(
 				title: "Keychain Test",
 				icon: .systemImage("key"),
 				action: .debugTestKeychainButtonTapped
 			),
 			// ONLY DEBUG EVER
-			.init(
+			.model(
 				title: "Keychain Contents",
 				icon: .systemImage("key"),
 				action: .debugKeychainContentsButtonTapped

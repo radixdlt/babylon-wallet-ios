@@ -43,8 +43,7 @@ extension DependencyValues {
 			}
 			secureStorageClient.loadProfileSnapshotData = { key in
 				precondition(key == profile.header.id)
-
-				return try! JSONEncoder.iso8601.encode(profile)
+				return profile.jsonData()
 			}
 		} else {
 			secureStorageClient.loadProfile = { _ in
@@ -867,7 +866,7 @@ final class ProfileStoreExistingProfileTests: TestCase {
 
 				d.keychainClient._getDataWithoutAuthForKey = { key in
 					if key == saved.header.id.keychainKey {
-						try! JSONEncoder.iso8601.encode(saved)
+						saved.jsonData()
 					} else if key == profileHeaderListKeychainKey {
 						try! JSONEncoder.iso8601.encode([saved.header])
 					} else {
