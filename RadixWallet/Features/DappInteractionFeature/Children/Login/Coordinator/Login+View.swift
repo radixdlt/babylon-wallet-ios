@@ -12,6 +12,7 @@ extension Login {
 		let availablePersonas: IdentifiedArrayOf<PersonaRow.State>
 		let selectedPersona: PersonaRow.State?
 		let continueButtonRequirements: ContinueButtonRequirements?
+		let createPersonaControlState: ControlState
 
 		struct ContinueButtonRequirements: Equatable {
 			let persona: Persona
@@ -41,6 +42,8 @@ extension Login {
 			} else {
 				self.continueButtonRequirements = nil
 			}
+
+			self.createPersonaControlState = state.personaPrimacy == nil ? .disabled : .enabled
 		}
 	}
 
@@ -88,6 +91,7 @@ extension Login {
 							viewStore.send(.createNewPersonaButtonTapped)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: false))
+						.controlState(viewStore.createPersonaControlState)
 					}
 					.padding(.horizontal, .medium1)
 					.padding(.bottom, .medium2)
