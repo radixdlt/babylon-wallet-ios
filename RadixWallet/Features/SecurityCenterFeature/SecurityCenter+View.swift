@@ -141,11 +141,12 @@ extension SecurityCenter {
 
 		var body: some SwiftUI.View {
 			Card(action: action) {
-				HStack(spacing: .medium2) {
+				HStack(spacing: .zero) {
 					Image(image)
 						.resizable()
 						.frame(.medium)
 						.frame(width: 80, height: 80)
+						.padding(.trailing, .medium3)
 
 					VStack(alignment: .leading, spacing: .small3) {
 						Text(title)
@@ -172,7 +173,7 @@ extension SecurityCenter {
 				}
 				.padding(.vertical, .medium2)
 				.padding(.leading, .medium2)
-				.padding(.trailing, .large3)
+				.padding(.trailing, .medium3)
 			}
 		}
 
