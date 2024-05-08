@@ -10,7 +10,7 @@ extension FactorSourcesClient: DependencyKey {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 
 		let getFactorSources: GetFactorSources = {
-			await profileStore.profile.factorSources
+			await profileStore.profile.factorSources.asIdentified()
 		}
 
 		let saveFactorSource: SaveFactorSource = { source in
@@ -24,9 +24,11 @@ extension FactorSourcesClient: DependencyKey {
 
 		let updateFactorSource: UpdateFactorSource = { source in
 			try await profileStore.updating { profile in
-				try profile.factorSources.updateFactorSource(id: source.id) {
+				var identifiedFactorSources = profile.factorSources.asIdentified()
+				try identifiedFactorSources.updateFactorSource(id: source.id) {
 					$0 = source
 				}
+				profile.factorSources = identifiedFactorSources.elements
 			}
 		}
 
@@ -179,7 +181,7 @@ extension FactorSourcesClient: DependencyKey {
 				let model = await device.model
 				let name = await device.name
 
-				let mnemonicWithPassphrase = try MnemonicWithPassphrase(
+				let mnemonicWithPassphrase = MnemonicWithPassphrase(
 					mnemonic: mnemonicClient.generate(
 						BIP39WordCount.twentyFour,
 						BIP39Language.english
@@ -303,27 +305,27 @@ extension FactorSourcesClient: DependencyKey {
 				assert(request.signers.allSatisfy { $0.networkID == request.networkID })
 				return try await signingFactors(
 					for: request.signers,
-					from: getFactorSources().asIdentified(),
+					from: getFactorSources(),
 					signingPurpose: request.signingPurpose
 				)
 			},
 			updateLastUsed: { request in
 				_ = try await profileStore.updating { profile in
-					var factorSources = profile.factorSources
+					var identifiedFactorSources = profile.factorSources.asIdentified()
 					for id in request.factorSourceIDs {
-						guard var factorSource = factorSources.get(id: id) else {
+						guard var factorSource = identifiedFactorSources[id: id] else {
 							throw FactorSourceNotFound()
 						}
 						factorSource.common.lastUsedOn = request.lastUsedOn
-						let updated = factorSources.updateOrAppend(factorSource)
+						let updated = identifiedFactorSources.updateOrAppend(factorSource)
 						assert(updated != nil)
 					}
-					profile.factorSources = factorSources
+					profile.factorSources = identifiedFactorSources.elements
 				}
 			},
 			flagFactorSourceForDeletion: { id in
 				let factorSources = try await getFactorSources()
-				guard var factorSource = factorSources.get(id: id) else {
+				guard var factorSource = factorSources[id: id] else {
 					throw FactorSourceNotFound()
 				}
 				factorSource.flag(.deletedByUser)

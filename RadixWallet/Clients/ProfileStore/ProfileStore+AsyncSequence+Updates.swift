@@ -43,7 +43,7 @@ extension ProfileStore {
 	/// A multicasting replaying AsyncSequence of distinct FactorSources
 	public func factorSourcesValues() -> AnyAsyncSequence<FactorSources> {
 		_lens {
-			$0.factorSources
+			$0.factorSources.asIdentified()
 		}
 	}
 

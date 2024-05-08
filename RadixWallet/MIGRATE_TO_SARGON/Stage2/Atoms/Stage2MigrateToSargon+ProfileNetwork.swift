@@ -107,7 +107,9 @@ extension ProfileNetwork {
 
 			/// Remove the persona reference on any authorized dapp
 			authorizedDapps.mutateAll { dapp in
-				dapp.referencesToAuthorizedPersonas.remove(id)
+				var referencesToAuthorizedPersonas = dapp.referencesToAuthorizedPersonas.asIdentified()
+				referencesToAuthorizedPersonas.remove(id: id)
+				dapp.referencesToAuthorizedPersonas = referencesToAuthorizedPersonas.elements
 			}
 		}
 		self.personas = identifiedPersonas.elements

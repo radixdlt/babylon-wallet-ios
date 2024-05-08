@@ -9,7 +9,7 @@ extension P2PLinksClient: DependencyKey {
 
 		return Self(
 			getP2PLinks: {
-				await appPreferencesClient.getPreferences().p2pLinks
+				await appPreferencesClient.getPreferences().p2pLinks.asIdentified()
 			},
 			addP2PLink: { newLink in
 				try await appPreferencesClient.updating {

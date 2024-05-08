@@ -66,7 +66,7 @@ extension ProfileView {
 				)
 
 				FactorSourcesView(
-					factorSources: profile.factorSources,
+					factorSources: profile.factorSources.asIdentified(),
 					indentation: inOneLevel
 				)
 			}
@@ -385,7 +385,7 @@ extension AuthorizedDappsView {
 					AuthorizedDappView(
 						authorizedDapp: authorizedDapp,
 						indentation: inOneLevel,
-						authorizedPersonas: getDetailedAuthorizedDapp(authorizedDapp)?.detailedAuthorizedPersonas
+						authorizedPersonas: getDetailedAuthorizedDapp(authorizedDapp)?.detailedAuthorizedPersonas.asIdentified()
 					)
 				}
 			}
@@ -543,7 +543,7 @@ extension ProfileNetworkView {
 			)
 
 			AuthorizedDappsView(
-				authorizedDapps: network.authorizedDapps,
+				authorizedDapps: network.authorizedDapps.asIdentified(),
 				indentation: inOneLevel
 			) {
 				try? network.detailsForAuthorizedDapp($0)

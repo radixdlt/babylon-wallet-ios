@@ -15,7 +15,9 @@ extension SavedGateways {
 	}
 
 	public mutating func remove(_ gateway: Gateway) {
-		other.remove(element: gateway)
+		var identifiedOther = other.asIdentified()
+		identifiedOther.remove(gateway)
+		other = identifiedOther.elements
 	}
 
 	public var customDumpMirror: Mirror {

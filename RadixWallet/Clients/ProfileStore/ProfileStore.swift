@@ -244,9 +244,7 @@ extension ProfileStore {
 					numberOfNetworks: 1
 				)
 			),
-			factorSources: FactorSources(
-				element: bdfs.asGeneral
-			),
+			factorSources: [bdfs.asGeneral],
 			appPreferences: .default,
 			networks: [network]
 		)
@@ -514,7 +512,7 @@ extension ProfileStore {
 		do {
 			if var existing = try _tryLoadSavedProfile() {
 				if
-					case let bdfs = existing.factorSources.babylonDevice,
+					case let bdfs = existing.factorSources.asIdentified().babylonDevice,
 					!secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(bdfs.id),
 					existing.networks.isEmpty
 				{
