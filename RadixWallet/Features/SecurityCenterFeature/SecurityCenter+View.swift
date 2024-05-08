@@ -14,7 +14,12 @@ extension SecurityCenter {
 		public var body: some SwiftUI.View {
 			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
 				ScrollView {
-					VStack(spacing: .zero) {
+					VStack(alignment: .leading, spacing: .zero) {
+						Text(L10n.SecurityCenter.title)
+							.foregroundStyle(.app.gray1)
+							.textStyle(.sheetTitle)
+							.padding(.bottom, .small1)
+
 						Text(L10n.SecurityCenter.subtitle)
 							.foregroundStyle(.app.gray1)
 							.textStyle(.body1Regular)
@@ -46,8 +51,6 @@ extension SecurityCenter {
 			.onAppear {
 				store.send(.view(.didAppear))
 			}
-			.navigationBarTitleDisplayMode(.large)
-			.navigationTitle(L10n.SecurityCenter.title)
 			.destinations(with: store)
 		}
 	}
