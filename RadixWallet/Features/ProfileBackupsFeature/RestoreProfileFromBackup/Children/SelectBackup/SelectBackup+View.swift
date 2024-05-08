@@ -116,16 +116,16 @@ extension SelectBackup.View {
 		return Card(action: item.action) {
 			HStack {
 				VStack(alignment: .leading, spacing: 0) {
-//					Group {
-					// Contains bold text segments.
-//						Text(LocalizedStringKey(L10n.RecoverProfileBackup.backupFrom(creatingDevice)))
-//						Text(L10n.IOSProfileBackup.lastModifedDateLabel(formatDate(header.lastModified)))
+					Group {
+						// Contains bold text segments.
+						Text(LocalizedStringKey(L10n.RecoverProfileBackup.backupFrom(creatingDevice)))
+						Text(L10n.IOSProfileBackup.lastModifedDateLabel(formatDate(header.lastModified)))
 
-//						Text(L10n.IOSProfileBackup.totalAccountsNumberLabel(header.contentHint.numberOfAccountsOnAllNetworksInTotal))
-//						Text(L10n.IOSProfileBackup.totalPersonasNumberLabel(header.contentHint.numberOfPersonasOnAllNetworksInTotal))
-//					}
-//					.foregroundColor(.app.gray2)
-//					.textStyle(.body2Regular)
+						Text(L10n.IOSProfileBackup.totalAccountsNumberLabel(Int(header.contentHint.numberOfAccountsOnAllNetworksInTotal)))
+						Text(L10n.IOSProfileBackup.totalPersonasNumberLabel(Int(header.contentHint.numberOfPersonasOnAllNetworksInTotal)))
+					}
+					.foregroundColor(.app.gray2)
+					.textStyle(.body2Regular)
 
 					if !isVersionCompatible {
 						Text(L10n.IOSProfileBackup.incompatibleWalletDataLabel)
