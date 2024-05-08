@@ -41,6 +41,7 @@ extension SecurityCenter {
 					.padding(.top, .small2)
 					.padding(.horizontal, .medium2)
 				}
+				.background(.app.gray5)
 			}
 			.onAppear {
 				store.send(.view(.didAppear))
