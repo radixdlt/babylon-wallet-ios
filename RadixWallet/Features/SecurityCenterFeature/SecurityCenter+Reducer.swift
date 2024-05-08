@@ -4,7 +4,7 @@ import ComposableArchitecture
 public struct SecurityCenter: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var problems: [SecurityProblem] = []
-		public var actionsRequired: [Item] = []
+		public var actionsRequired: Set<Item> = []
 
 		@PresentationState
 		public var destination: Destination.State? = nil
@@ -86,6 +86,11 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .setProblems(problems):
 			state.problems = problems
+			if problems.isEmpty {
+				state.actionsRequired.remove(.configurationBackup)
+			} else {
+				state.actionsRequired.insert(.configurationBackup)
+			}
 			return .none
 		}
 	}
