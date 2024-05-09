@@ -483,7 +483,9 @@ extension DappInteractionFlow {
 		if resetItem.personaData {
 			authorizedPersona.sharedPersonaData = .default
 		}
-		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
+		var identifiedReferencesToAuthorizedPersonas = authorizedDapp.referencesToAuthorizedPersonas.asIdentified()
+		identifiedReferencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
+		authorizedDapp.referencesToAuthorizedPersonas = identifiedReferencesToAuthorizedPersonas.elements
 		state.authorizedDapp = authorizedDapp
 		state.authorizedPersona = authorizedPersona
 	}
@@ -768,7 +770,9 @@ extension DappInteractionFlow {
 				)
 			}
 		}()
-		authorizedDapp.referencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
+		var identifiedDeferencesToAuthorizedPersonas = authorizedDapp.referencesToAuthorizedPersonas.asIdentified()
+		identifiedDeferencesToAuthorizedPersonas[id: authorizedPersona.id] = authorizedPersona
+		authorizedDapp.referencesToAuthorizedPersonas = identifiedDeferencesToAuthorizedPersonas.elements
 		try await authorizedDappsClient.updateOrAddAuthorizedDapp(authorizedDapp)
 	}
 

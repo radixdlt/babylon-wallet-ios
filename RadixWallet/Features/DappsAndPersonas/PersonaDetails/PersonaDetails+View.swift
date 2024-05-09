@@ -168,7 +168,10 @@ extension PersonaDetails.State {
 		case .general:
 			nil
 		case let .dApp(dApp, persona):
-			.init(dAppName: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName, sharingAccounts: persona.simpleAccounts ?? [])
+			AccountSection(
+				dAppName: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
+				sharingAccounts: persona.simpleAccounts?.asIdentified() ?? []
+			)
 		}
 	}
 

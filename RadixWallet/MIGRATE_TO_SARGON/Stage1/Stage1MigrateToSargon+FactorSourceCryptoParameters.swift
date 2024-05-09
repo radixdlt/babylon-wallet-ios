@@ -2,6 +2,17 @@ import Foundation
 import OrderedCollections
 import Sargon
 
+// MARK: - CannotBeEmpty
+struct CannotBeEmpty: Swift.Error {}
+extension Array {
+	public init(notEmpty elements: some Collection<Element>) throws {
+		guard !elements.isEmpty else {
+			throw CannotBeEmpty()
+		}
+		self = Array(elements)
+	}
+}
+
 extension FactorSourceCryptoParameters {
 	/// Appends  `supportedCurves` and `supportedDerivationPathSchemes` from `other`. This is used if a user tries to
 	/// add an Olympia Factor Source from Manual Account Recovery Scan where the mnemonic already existed as BDFS => append
@@ -11,9 +22,9 @@ extension FactorSourceCryptoParameters {
 		guard self != other else {
 			return
 		}
-		var curves = supportedCurves.elements
+		var curves = supportedCurves
 		var derivationSchemes = supportedDerivationPathSchemes
-		curves.append(contentsOf: other.supportedCurves.elements)
+		curves.append(contentsOf: other.supportedCurves)
 		derivationSchemes.append(contentsOf: other.supportedDerivationPathSchemes)
 
 		curves = OrderedSet(
@@ -24,7 +35,7 @@ extension FactorSourceCryptoParameters {
 			uncheckedUniqueElements: derivationSchemes.sorted(by: \.preference)
 		).elements
 
-		self.supportedCurves = try! .init(curves)
+		self.supportedCurves = try! .init(notEmpty: curves)
 		self.supportedDerivationPathSchemes = derivationSchemes
 	}
 }

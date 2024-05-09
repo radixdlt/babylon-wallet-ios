@@ -27,7 +27,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case gatewaysLoadedResult(TaskResult<Gateways>)
+		case savedGatewaysLoadedResult(TaskResult<SavedGateways>)
 		case hasAccountsResult(TaskResult<Bool>)
 		case createAccountOnNetworkBeforeSwitchingToIt(Gateway)
 		case switchToGatewayResult(TaskResult<Gateway>)
@@ -105,7 +105,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			return .run { send in
 				for try await gateways in await gatewaysClient.gatewaysValues() {
 					guard !Task.isCancelled else { return }
-					await send(.internal(.gatewaysLoadedResult(.success(gateways))))
+					await send(.internal(.savedGatewaysLoadedResult(.success(gateways))))
 				}
 			} catch: { error, _ in
 				errorQueue.schedule(error)
@@ -130,14 +130,14 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .gatewaysLoadedResult(.success(gateways)):
+		case let .savedGatewaysLoadedResult(.success(savedGateways)):
 
-			state.currentGateway = gateways.current
+			state.currentGateway = savedGateways.current
 			state.gatewayList = .init(gateways: .init(
-				uniqueElements: gateways.all.map {
+				uniqueElements: savedGateways.all.map {
 					GatewayRow.State(
 						gateway: $0,
-						isSelected: gateways.current.id == $0.id,
+						isSelected: savedGateways.current.id == $0.id,
 						canBeDeleted: !$0.isWellknown
 					)
 				}
@@ -145,7 +145,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			state.gatewayList.gateways.sort()
 			return .none
 
-		case let .gatewaysLoadedResult(.failure(error)):
+		case let .savedGatewaysLoadedResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
 

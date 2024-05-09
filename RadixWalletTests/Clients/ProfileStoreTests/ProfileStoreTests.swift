@@ -625,7 +625,7 @@ final class ProfileStoreExistingProfileTests: TestCase {
 			let mnemonicGotDeleted = self.expectation(description: "Mnemonic got deleted")
 			// GIVEN saved profile
 			let savedEmptyProfile = Profile.newEmpty()
-			let firstBDFS = savedEmptyProfile.factorSources.babylonDevice
+			let firstBDFS = savedEmptyProfile.factorSources.asIdentified().babylonDevice
 
 			let used = await withTestClients {
 				$0.secureStorageClient.containsMnemonicIdentifiedByFactorSourceID = { factorSourceID in

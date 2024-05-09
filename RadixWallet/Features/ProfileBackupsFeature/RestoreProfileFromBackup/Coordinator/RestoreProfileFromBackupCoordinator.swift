@@ -92,7 +92,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			return .run { send in
 				try? await clock.sleep(for: .milliseconds(300))
 				let p2pLinks = await p2pLinksClient.getP2PLinks()
-				try await radixConnectClient.connectToP2PLinks(p2pLinks)
+				try await radixConnectClient.connectToP2PLinks(p2pLinks.asIdentified())
 				await send(.internal(.delayedAppendToPath(
 					.importMnemonicsFlow(.init(context: .fromOnboarding(profileSnapshot: profileSnapshot))
 					))))

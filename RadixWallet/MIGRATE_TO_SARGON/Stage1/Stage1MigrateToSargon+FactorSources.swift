@@ -15,7 +15,7 @@ extension FactorSources {
 		id: FactorSourceID,
 		_ mutate: (inout FactorSource) throws -> Void
 	) throws {
-		guard var factorSource = self.get(id: id) else {
+		guard var factorSource = self[id: id] else {
 			throw FactorSourceWithIDNotFound()
 		}
 		try mutate(&factorSource)
