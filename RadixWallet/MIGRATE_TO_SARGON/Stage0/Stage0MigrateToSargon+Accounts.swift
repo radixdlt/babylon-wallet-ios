@@ -13,6 +13,7 @@ public typealias AuthorizedDapps = IdentifiedArrayOf<AuthorizedDapp>
 public typealias ReferencesToAuthorizedPersonas = IdentifiedArrayOf<AuthorizedPersonaSimple>
 public typealias DetailedAuthorizedPersonas = IdentifiedArrayOf<AuthorizedPersonaDetailed>
 public typealias AccountsForDisplay = IdentifiedArrayOf<AccountForDisplay>
+public typealias Gateways = IdentifiedArrayOf<Gateway>
 
 public typealias EntityFlags = IdentifiedArrayOf<EntityFlag>
 
