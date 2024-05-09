@@ -69,7 +69,6 @@ extension Troubleshooting.View {
 				icon: .systemImage("arrow.clockwise"),
 				action: .factoryResetButtonTapped
 			),
-			// arrow.clockwise
 		]
 	}
 }
@@ -91,6 +90,7 @@ private extension View {
 		let destinationStore = store.destination
 		return accountRecovery(with: destinationStore)
 			.importOlympiaWallet(with: destinationStore)
+			.factoryReset(with: destinationStore)
 	}
 
 	private func accountRecovery(with destinationStore: PresentationStoreOf<Troubleshooting.Destination>) -> some View {
@@ -108,6 +108,15 @@ private extension View {
 			state: /Troubleshooting.Destination.State.importOlympiaWallet,
 			action: Troubleshooting.Destination.Action.importOlympiaWallet,
 			content: { ImportOlympiaWalletCoordinator.View(store: $0) }
+		)
+	}
+
+	private func factoryReset(with destinationStore: PresentationStoreOf<Troubleshooting.Destination>) -> some View {
+		navigationDestination(
+			store: destinationStore,
+			state: /Troubleshooting.Destination.State.factoryReset,
+			action: Troubleshooting.Destination.Action.factoryReset,
+			destination: { FactoryReset.View(store: $0) }
 		)
 	}
 }

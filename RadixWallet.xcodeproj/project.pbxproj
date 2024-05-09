@@ -933,6 +933,8 @@
 		5BB7C1762BC81F50001216EB /* ImportOlympiaNameLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB7C1752BC81F50001216EB /* ImportOlympiaNameLedger.swift */; };
 		5BB7C1782BC81F61001216EB /* ImportOlympiaNameLedger+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BB7C1772BC81F61001216EB /* ImportOlympiaNameLedger+View.swift */; };
 		5BBC43A92BBAC6B0005747B1 /* AppTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */; };
+		5BC82B6C2BED18A1009AC162 /* FactoryReset+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */; };
+		5BC82B6D2BED18A1009AC162 /* FactoryReset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC82B6B2BED18A1009AC162 /* FactoryReset.swift */; };
 		830818482B9F1621002D8351 /* HTTPClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830818472B9F1621002D8351 /* HTTPClient+Live.swift */; };
 		8308184A2B9F162B002D8351 /* HTTPClient+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830818492B9F162B002D8351 /* HTTPClient+Mock.swift */; };
 		8308184C2B9F169B002D8351 /* TokenPriceClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8308184B2B9F169B002D8351 /* TokenPriceClient+Live.swift */; };
@@ -2020,6 +2022,8 @@
 		5BB7C1752BC81F50001216EB /* ImportOlympiaNameLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportOlympiaNameLedger.swift; sourceTree = "<group>"; };
 		5BB7C1772BC81F61001216EB /* ImportOlympiaNameLedger+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ImportOlympiaNameLedger+View.swift"; sourceTree = "<group>"; };
 		5BBC43A82BBAC6B0005747B1 /* AppTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTextEditor.swift; sourceTree = "<group>"; };
+		5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FactoryReset+View.swift"; sourceTree = "<group>"; };
+		5BC82B6B2BED18A1009AC162 /* FactoryReset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FactoryReset.swift; sourceTree = "<group>"; };
 		830818472B9F1621002D8351 /* HTTPClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Live.swift"; sourceTree = "<group>"; };
 		830818492B9F162B002D8351 /* HTTPClient+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HTTPClient+Mock.swift"; sourceTree = "<group>"; };
 		8308184B2B9F169B002D8351 /* TokenPriceClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TokenPriceClient+Live.swift"; sourceTree = "<group>"; };
@@ -5531,6 +5535,15 @@
 			path = ContactSupportClient;
 			sourceTree = "<group>";
 		};
+		5B2F2DCE2BED1641009FBFA3 /* FactoryReset */ = {
+			isa = PBXGroup;
+			children = (
+				5BC82B6A2BED18A1009AC162 /* FactoryReset+View.swift */,
+				5BC82B6B2BED18A1009AC162 /* FactoryReset.swift */,
+			);
+			path = FactoryReset;
+			sourceTree = "<group>";
+		};
 		5B45E2F32BC45706007C4C84 /* FactorSourceAccess */ = {
 			isa = PBXGroup;
 			children = (
@@ -5567,6 +5580,7 @@
 				5B758D5B2BCEC3B200348722 /* Troubleshooting.swift */,
 				A41266ED2B15577200EA38E9 /* ManualAccountRecoveryScan */,
 				48CFBDAD2ADC10D800E77A5C /* ImportFromOlympiaLegacyWallet */,
+				5B2F2DCE2BED1641009FBFA3 /* FactoryReset */,
 			);
 			path = Troubleshooting;
 			sourceTree = "<group>";
@@ -6608,6 +6622,8 @@
 				48CFC2B12ADC10D900E77A5C /* DerivePublicKeys+View.swift in Sources */,
 				48CFC3212ADC10D900E77A5C /* NewConnection+Reducer.swift in Sources */,
 				48CFC5C92ADC10DA00E77A5C /* StackedViewsLayout.swift in Sources */,
+				5BC82B6C2BED18A1009AC162 /* FactoryReset+View.swift in Sources */,
+				5BC82B6D2BED18A1009AC162 /* FactoryReset.swift in Sources */,
 				48CFC45C2ADC10DA00E77A5C /* P2PLinksClient+Interface.swift in Sources */,
 				48CFC4BA2ADC10DA00E77A5C /* StateNonFungibleDetailsResponseItem.swift in Sources */,
 				48CFC60C2ADC10DA00E77A5C /* WalletInteractionSuccessResponse.swift in Sources */,

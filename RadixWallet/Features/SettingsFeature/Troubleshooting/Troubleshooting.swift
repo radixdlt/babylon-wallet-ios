@@ -25,11 +25,13 @@ public struct Troubleshooting: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case accountRecovery(ManualAccountRecoveryCoordinator.State)
 			case importOlympiaWallet(ImportOlympiaWalletCoordinator.State)
+			case factoryReset(FactoryReset.State)
 		}
 
 		public enum Action: Sendable, Equatable {
 			case accountRecovery(ManualAccountRecoveryCoordinator.Action)
 			case importOlympiaWallet(ImportOlympiaWalletCoordinator.Action)
+			case factoryReset(FactoryReset.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -38,6 +40,9 @@ public struct Troubleshooting: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.importOlympiaWallet, action: /Action.importOlympiaWallet) {
 				ImportOlympiaWalletCoordinator()
+			}
+			Scope(state: /State.factoryReset, action: /Action.factoryReset) {
+				FactoryReset()
 			}
 		}
 	}
@@ -80,6 +85,7 @@ public struct Troubleshooting: Sendable, FeatureReducer {
 			}
 
 		case .factoryResetButtonTapped:
+			state.destination = .factoryReset(.init())
 			return .none
 		}
 	}
@@ -97,7 +103,7 @@ public struct Troubleshooting: Sendable, FeatureReducer {
 				return .none
 			}
 
-//		case let .resetWallet(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))):
+//		case let .factoryReset(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))):
 //			return .send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent)))
 
 		default:
