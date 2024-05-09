@@ -51,6 +51,7 @@ extension ConfigurationBackup {
 				}
 				.exportFileSheet(store: store, exportable: viewStore.exportable)
 			}
+			.background(.app.gray5)
 			.onAppear {
 				store.send(.view(.didAppear))
 			}
