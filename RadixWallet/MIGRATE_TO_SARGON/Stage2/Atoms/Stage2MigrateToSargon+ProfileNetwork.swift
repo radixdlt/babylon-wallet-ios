@@ -45,11 +45,14 @@ extension ProfileNetwork {
 	}
 
 	public mutating func addAccount(_ account: Account) throws {
-		guard accounts.asIdentified()[id: account.id] == nil else {
+		var identified = accounts.asIdentified()
+		guard identified[id: account.id] == nil else {
 			throw AccountAlreadyExists()
 		}
 
-		accounts.append(account)
+		identified.append(account)
+
+		accounts = identified.elements
 	}
 
 	public mutating func hideAccounts(ids idsOfAccountsToHide: Set<Account.ID>) {
@@ -101,12 +104,13 @@ extension ProfileNetwork {
 
 	public mutating func hidePersonas(ids idsOfPersonaToHide: Set<Persona.ID>) {
 		var identifiedPersonas = personas.asIdentified()
+		var identifiedAuthorizedDapps = authorizedDapps.asIdentified()
 		for id in idsOfPersonaToHide {
 			/// Hide the personas themselves
 			identifiedPersonas[id: id]?.hide()
 
 			/// Remove the persona reference on any authorized dapp
-			authorizedDapps.mutateAll { dapp in
+			identifiedAuthorizedDapps.mutateAll { dapp in
 				var referencesToAuthorizedPersonas = dapp.referencesToAuthorizedPersonas.asIdentified()
 				referencesToAuthorizedPersonas.remove(id: id)
 				dapp.referencesToAuthorizedPersonas = referencesToAuthorizedPersonas.elements
@@ -115,12 +119,17 @@ extension ProfileNetwork {
 		self.personas = identifiedPersonas.elements
 
 		/// Filter out dapps that do not reference any persona
-		authorizedDapps.filterInPlace(not(\.referencesToAuthorizedPersonas.isEmpty))
+		identifiedAuthorizedDapps.filterInPlace(not(\.referencesToAuthorizedPersonas.isEmpty))
+		self.authorizedDapps = identifiedAuthorizedDapps.elements
 	}
 
 	public mutating func unhideAllEntities() {
-		accounts.mutateAll { $0.unhide() }
-		personas.mutateAll { $0.unhide() }
+		var identifiedAccounts = accounts.asIdentified()
+		var identifiedPersonas = personas.asIdentified()
+		identifiedAccounts.mutateAll { $0.unhide() }
+		identifiedPersonas.mutateAll { $0.unhide() }
+		accounts = identifiedAccounts.elements
+		personas = identifiedPersonas.elements
 	}
 
 	public var customDumpMirror: Mirror {
