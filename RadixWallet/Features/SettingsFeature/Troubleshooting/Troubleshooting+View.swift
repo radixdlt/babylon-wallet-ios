@@ -29,7 +29,7 @@ extension Troubleshooting.View {
 				}
 			}
 		}
-		.background(Color.app.gray4)
+		.background(Color.app.gray5)
 	}
 
 	@MainActor
