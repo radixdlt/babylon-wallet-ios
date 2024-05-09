@@ -15,10 +15,16 @@ extension FactorSourcesClient: DependencyKey {
 
 		let saveFactorSource: SaveFactorSource = { source in
 			try await profileStore.updating { profile in
-				guard !profile.factorSources.contains(where: { $0.id == source.id }) else {
+				var identifiedFactorSources = profile.factorSources.asIdentified()
+				guard identifiedFactorSources[id: source.id] == nil else {
 					throw FactorSourceAlreadyPresent()
 				}
-				profile.factorSources.append(source)
+				identifiedFactorSources.append(source)
+				guard let nonEmpty = identifiedFactorSources.nonEmptyElements else {
+					assertionFailure("Expected factor sources to not be empty, aborting update.")
+					return
+				}
+				profile.factorSources = nonEmpty.rawValue
 			}
 		}
 
@@ -28,7 +34,11 @@ extension FactorSourcesClient: DependencyKey {
 				try identifiedFactorSources.updateFactorSource(id: source.id) {
 					$0 = source
 				}
-				profile.factorSources = identifiedFactorSources.elements
+				guard let nonEmpty = identifiedFactorSources.nonEmptyElements else {
+					assertionFailure("Expected factor sources to not be empty, aborting update.")
+					return
+				}
+				profile.factorSources = nonEmpty.rawValue
 			}
 		}
 
@@ -320,7 +330,11 @@ extension FactorSourcesClient: DependencyKey {
 						let updated = identifiedFactorSources.updateOrAppend(factorSource)
 						assert(updated != nil)
 					}
-					profile.factorSources = identifiedFactorSources.elements
+					guard let nonEmpty = identifiedFactorSources.nonEmptyElements else {
+						assertionFailure("Expected factor sources to not be empty, aborting update.")
+						return
+					}
+					profile.factorSources = nonEmpty.rawValue
 				}
 			},
 			flagFactorSourceForDeletion: { id in
