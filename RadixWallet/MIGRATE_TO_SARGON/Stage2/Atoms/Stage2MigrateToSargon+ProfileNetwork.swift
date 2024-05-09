@@ -19,7 +19,7 @@ extension ProfileNetwork {
 	}
 
 	public func accountsIncludingHidden() -> Accounts {
-		accounts
+		accounts.asIdentified()
 	}
 
 	public func hasSomeAccount() -> Bool {
@@ -32,43 +32,52 @@ extension ProfileNetwork {
 
 	#if DEBUG
 	public mutating func deleteAccount(address: AccountAddress) {
-		accounts.remove(address)
+		var identified = accounts.asIdentified()
+		identified.remove(id: address)
+		accounts = identified.elements
 	}
 	#endif
 
 	public mutating func updateAccount(_ account: Account) throws {
-		accounts[id: account.id] = account
+		var identified = accounts.asIdentified()
+		identified[id: account.id] = account
+		accounts = identified.elements
 	}
 
 	public mutating func addAccount(_ account: Account) throws {
-		guard accounts.get(id: account.id) == nil else {
+		var identified = accounts.asIdentified()
+		guard identified[id: account.id] == nil else {
 			throw AccountAlreadyExists()
 		}
 
-		accounts.append(account)
+		identified.append(account)
+
+		accounts = identified.elements
 	}
 
 	public mutating func hideAccounts(ids idsOfAccountsToHide: Set<Account.ID>) {
+		var identified = accounts.asIdentified()
 		for id in idsOfAccountsToHide {
-			accounts[id: id]?.hide()
+			identified[id: id]?.hide()
 			authorizedDapps.mutateAll { dapp in
 				dapp.referencesToAuthorizedPersonas.mutateAll { persona in
 					persona.sharedAccounts?.ids.removeAll(where: { $0 == id })
 				}
 			}
 		}
+		accounts = identified.elements
 	}
 
 	public func getPersonas() -> Personas {
-		personas.nonHidden
+		personas.asIdentified().nonHidden
 	}
 
 	public func getHiddenPersonas() -> Personas {
-		personas.hiden
+		personas.asIdentified().hidden
 	}
 
 	public func personasIncludingHidden() -> Personas {
-		personas
+		personas.asIdentified()
 	}
 
 	public func hasSomePersona() -> Bool {
@@ -76,37 +85,51 @@ extension ProfileNetwork {
 	}
 
 	public mutating func addPersona(_ persona: Persona) throws {
-		guard personas.get(id: persona.id) == nil else {
+		var identifiedPersonas = personas.asIdentified()
+		guard identifiedPersonas[id: persona.id] == nil else {
 			throw PersonaAlreadyExists()
 		}
 
-		personas.append(persona)
+		identifiedPersonas.append(persona)
+		self.personas = identifiedPersonas.elements
 	}
 
 	public mutating func updatePersona(_ persona: Persona) throws {
-		guard personas.updateOrAppend(persona) != nil else {
+		var identifiedPersonas = personas.asIdentified()
+		guard identifiedPersonas.updateOrAppend(persona) != nil else {
 			throw TryingToUpdateAPersonaWhichIsNotAlreadySaved()
 		}
+		self.personas = identifiedPersonas.elements
 	}
 
 	public mutating func hidePersonas(ids idsOfPersonaToHide: Set<Persona.ID>) {
+		var identifiedPersonas = personas.asIdentified()
+		var identifiedAuthorizedDapps = authorizedDapps.asIdentified()
 		for id in idsOfPersonaToHide {
 			/// Hide the personas themselves
-			personas[id: id]?.hide()
+			identifiedPersonas[id: id]?.hide()
 
 			/// Remove the persona reference on any authorized dapp
-			authorizedDapps.mutateAll { dapp in
-				dapp.referencesToAuthorizedPersonas.remove(id)
+			identifiedAuthorizedDapps.mutateAll { dapp in
+				var referencesToAuthorizedPersonas = dapp.referencesToAuthorizedPersonas.asIdentified()
+				referencesToAuthorizedPersonas.remove(id: id)
+				dapp.referencesToAuthorizedPersonas = referencesToAuthorizedPersonas.elements
 			}
 		}
+		self.personas = identifiedPersonas.elements
 
 		/// Filter out dapps that do not reference any persona
-		authorizedDapps.filterInPlace(not(\.referencesToAuthorizedPersonas.isEmpty))
+		identifiedAuthorizedDapps.filterInPlace(not(\.referencesToAuthorizedPersonas.isEmpty))
+		self.authorizedDapps = identifiedAuthorizedDapps.elements
 	}
 
 	public mutating func unhideAllEntities() {
-		accounts.mutateAll { $0.unhide() }
-		personas.mutateAll { $0.unhide() }
+		var identifiedAccounts = accounts.asIdentified()
+		var identifiedPersonas = personas.asIdentified()
+		identifiedAccounts.mutateAll { $0.unhide() }
+		identifiedPersonas.mutateAll { $0.unhide() }
+		accounts = identifiedAccounts.elements
+		personas = identifiedPersonas.elements
 	}
 
 	public var customDumpMirror: Mirror {
@@ -138,7 +161,7 @@ extension ProfileNetworks {
 	}
 
 	public func network(id needle: NetworkID) throws -> ProfileNetwork {
-		guard let network = self.get(id: needle) else {
+		guard let network = self[id: needle] else {
 			throw Error.unknownNetworkWithID(needle)
 		}
 		return network
@@ -154,7 +177,7 @@ extension ProfileNetworks {
 	}
 
 	public mutating func update(_ network: ProfileNetwork) throws {
-		guard get(id: network.id) != nil else {
+		guard self[id: network.id] != nil else {
 			throw Error.unknownNetworkWithID(network.id)
 		}
 		let updatedElement = self.updateOrAppend(network)
@@ -162,7 +185,7 @@ extension ProfileNetworks {
 	}
 
 	public mutating func add(_ network: ProfileNetwork) throws {
-		guard get(id: network.id) == nil else {
+		guard self[id: network.id] == nil else {
 			throw Error.networkAlreadyExistsWithID(network.id)
 		}
 		let updatedElement = self.updateOrAppend(network)

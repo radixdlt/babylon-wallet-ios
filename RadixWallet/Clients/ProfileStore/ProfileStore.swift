@@ -224,7 +224,7 @@ extension ProfileStore {
 		// she creates her first account.
 		let network = ProfileNetwork(
 			id: .mainnet,
-			accounts: accounts,
+			accounts: accounts.elements, // FIXME: Declare init in (Swift)Sargon accepting `Accounts` (IdentifiedArrayOf<Account>) ?
 			personas: [],
 			authorizedDapps: []
 		)
@@ -244,13 +244,9 @@ extension ProfileStore {
 					numberOfNetworks: 1
 				)
 			),
-			factorSources: FactorSources(
-				element: bdfs.asGeneral
-			),
+			factorSources: [bdfs.asGeneral],
 			appPreferences: .default,
-			networks: ProfileNetworks(
-				element: network
-			)
+			networks: [network]
 		)
 
 		// We can "piggyback" on importProfile! Same logic applies!
@@ -516,7 +512,7 @@ extension ProfileStore {
 		do {
 			if var existing = try _tryLoadSavedProfile() {
 				if
-					case let bdfs = existing.factorSources.babylonDevice,
+					case let bdfs = existing.factorSources.asIdentified().babylonDevice,
 					!secureStorageClient.containsMnemonicIdentifiedByFactorSourceID(bdfs.id),
 					existing.networks.isEmpty
 				{

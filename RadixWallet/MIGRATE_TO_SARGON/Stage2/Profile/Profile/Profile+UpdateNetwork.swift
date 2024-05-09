@@ -2,7 +2,9 @@ import Sargon
 
 extension Profile {
 	mutating func updateOnNetwork(_ network: ProfileNetwork) throws {
-		try networks.update(network)
+		var identifiedNetworks = networks.asIdentified()
+		try identifiedNetworks.update(network)
+		self.networks = identifiedNetworks.elements
 	}
 }
 
@@ -18,7 +20,7 @@ extension Profile {
 	}
 
 	public func network(id needle: NetworkID) throws -> ProfileNetwork {
-		try networks.network(id: needle)
+		try networks.asIdentified().network(id: needle)
 	}
 
 	public func containsNetwork(withID networkID: NetworkID) -> Bool {

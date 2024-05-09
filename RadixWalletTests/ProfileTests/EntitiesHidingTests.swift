@@ -108,13 +108,13 @@ final class EntitiesHidingTests: TestCase {
 		var sut = network
 		sut.hide(account: account0)
 
-		let authorizedDapp0 = sut.authorizedDapps[id: dApp0.id]!
-		let authorizedDapp1 = sut.authorizedDapps[id: dApp1.id]!
+		let authorizedDapp0 = sut.authorizedDapps.asIdentified()[id: dApp0.id]!
+		let authorizedDapp1 = sut.authorizedDapps.asIdentified()[id: dApp1.id]!
 
 		/// Assert that account0 is not present anymore, but account1 is still kept.
-		XCTAssertEqual(authorizedDapp0.referencesToAuthorizedPersonas[id: sharedPersona0.id]?.sharedAccounts?.ids, [account1.address])
-		XCTAssertEqual(authorizedDapp1.referencesToAuthorizedPersonas[id: sharedPersona0.id]?.sharedAccounts?.ids, [account1.address])
-		XCTAssertEqual(authorizedDapp1.referencesToAuthorizedPersonas[id: sharedPersona1.id]?.sharedAccounts?.ids, [account1.address])
+		XCTAssertEqual(authorizedDapp0.referencesToAuthorizedPersonas.asIdentified()[id: sharedPersona0.id]?.sharedAccounts?.ids, [account1.address])
+		XCTAssertEqual(authorizedDapp1.referencesToAuthorizedPersonas.asIdentified()[id: sharedPersona0.id]?.sharedAccounts?.ids, [account1.address])
+		XCTAssertEqual(authorizedDapp1.referencesToAuthorizedPersonas.asIdentified()[id: sharedPersona1.id]?.sharedAccounts?.ids, [account1.address])
 	}
 
 	func test_GIVEN_hasAuthorizedDappsWithOnePersona_WHEN_personaIsHidden_THEN_dappIsRemoved() {
@@ -122,7 +122,7 @@ final class EntitiesHidingTests: TestCase {
 		sut.hide(persona: persona0)
 
 		/// dApp0 references only persona0
-		XCTAssertNil(sut.authorizedDapps[id: dApp0.id])
+		XCTAssertNil(sut.authorizedDapps.asIdentified()[id: dApp0.id])
 	}
 
 	func test_GIVEN_hasAuthorizedDappsWithMoreThanOnePersona_WHEN_personaIsHidden_THEN_personaIsRemovedFromDapp() throws {

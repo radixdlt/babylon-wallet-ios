@@ -80,13 +80,15 @@ extension Profile {
 				authenticationSigning: nil
 			)
 		)
-		var accounts = Accounts(
-			element: account
+
+		let network = ProfileNetwork(
+			id: networkID,
+			accounts: [account],
+			personas: [],
+			authorizedDapps: []
 		)
 
-		let network = ProfileNetwork(id: networkID, accounts: accounts, personas: [], authorizedDapps: [])
-
-		self.networks = .init(element: network)
+		self.networks = [network]
 	}
 
 	static func testValue(

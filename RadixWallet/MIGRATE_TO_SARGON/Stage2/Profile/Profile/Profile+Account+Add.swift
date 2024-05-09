@@ -39,12 +39,13 @@ extension Profile {
 		} else {
 			let network = ProfileNetwork(
 				id: networkID,
-				accounts: Accounts(element: account),
+				accounts: [account],
 				personas: [],
 				authorizedDapps: []
 			)
-
-			try networks.add(network)
+			var identifiedNetworks = networks.asIdentified()
+			try identifiedNetworks.add(network)
+			self.networks = identifiedNetworks.elements
 
 			if network.id == .mainnet {
 				do {

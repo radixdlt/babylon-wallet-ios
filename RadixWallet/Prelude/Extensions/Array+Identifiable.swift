@@ -1,9 +1,5 @@
-extension BaseIdentifiedCollection {
-	/// Returns an `IdentifiedArray` of the `Element`, omitting clashing elements
-	public func asIdentified() -> IdentifiedArrayOf<Element> {
-		elements.asIdentified()
-	}
-}
+import IdentifiedCollections
+import NonEmpty
 
 extension Array where Element: Identifiable {
 	/// Returns an `IdentifiedArray` of the `Element`, omitting clashing elements
@@ -20,5 +16,11 @@ extension Array where Element: Identifiable {
 extension Array {
 	var nonEmpty: NonEmpty<Self>? {
 		.init(self)
+	}
+}
+
+extension IdentifiedArrayOf {
+	var nonEmptyElements: NonEmpty<[Element]>? {
+		.init(rawValue: elements)
 	}
 }

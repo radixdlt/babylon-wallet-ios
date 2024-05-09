@@ -100,7 +100,7 @@ public struct PersonaList: Sendable, FeatureReducer {
 			return ids
 		case let .dApp(dAppID):
 			guard let dApp = try? await authorizedDappsClient.getDetailedDapp(dAppID) else { return [] }
-			return OrderedSet(dApp.detailedAuthorizedPersonas.ids)
+			return OrderedSet(dApp.detailedAuthorizedPersonas.map(\.id))
 		}
 	}
 

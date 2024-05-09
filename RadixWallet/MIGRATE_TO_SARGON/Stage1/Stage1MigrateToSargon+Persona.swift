@@ -1,9 +1,6 @@
 import Foundation
 import Sargon
 
-// MARK: - Persona + EntityBaseProtocol
-extension Persona: EntityBaseProtocol {}
-
 // MARK: - PersonaDataCollectionElement
 public protocol PersonaDataCollectionElement: Hashable & Identifiable where ID == PersonaDataEntryID {
 	associatedtype Value: Hashable

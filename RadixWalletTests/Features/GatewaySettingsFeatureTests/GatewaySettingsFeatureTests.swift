@@ -17,11 +17,11 @@ final class GatewaySettingsFeatureTests: TestCase {
 
 	func test_whenViewAppeared_thenCurrentGatewayAndGatewayListIsLoaded() async throws {
 		// given
-		let otherGateways: OtherGateways = [.stokenet, .ansharnet]
+		let otherGateways: Gateways = [.stokenet, .ansharnet]
 		let currentGateway: Gateway = .mainnet
-		let gateways = try! Gateways(
+		let savedGateways = try! SavedGateways(
 			current: currentGateway,
-			other: otherGateways
+			other: otherGateways.elements
 		)
 
 		let store = TestStore(
@@ -29,23 +29,23 @@ final class GatewaySettingsFeatureTests: TestCase {
 			reducer: GatewaySettings.init
 		) {
 			$0.gatewaysClient.getAllGateways = {
-				otherGateways.elements
+				otherGateways
 			}
 			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([
-				try! .init(current: currentGateway, other: otherGateways),
+				try! .init(current: currentGateway, other: otherGateways.elements),
 			]
 			).eraseToAnyAsyncSequence() }
 		}
 
 		// when
 		let viewTask = await store.send(.view(.task))
-		await store.receive(.internal(.gatewaysLoadedResult(.success(gateways)))) {
+		await store.receive(.internal(.savedGatewaysLoadedResult(.success(savedGateways)))) {
 			// then
 			$0.gatewayList = .init(gateways: .init(
-				uniqueElements: gateways.all.map {
+				uniqueElements: savedGateways.all.map {
 					GatewayRow.State(
 						gateway: $0,
-						isSelected: gateways.current.id == $0.id,
+						isSelected: savedGateways.current.id == $0.id,
 						canBeDeleted: !$0.isWellknown
 					)
 				}
@@ -85,26 +85,26 @@ final class GatewaySettingsFeatureTests: TestCase {
 			isSelected: false,
 			canBeDeleted: true
 		)
-		let otherGateways: OtherGateways = [.stokenet, .ansharnet]
+		let otherGateways: Gateways = [.stokenet, .ansharnet]
 		let currentGateway: Gateway = .mainnet
-		let otherAfterDeletion: OtherGateways = [.stokenet]
-		let gateways = try! Gateways(
+		let otherAfterDeletion: Gateways = [.stokenet]
+		let savedGateways = try! SavedGateways(
 			current: currentGateway,
-			other: otherGateways
+			other: otherGateways.elements
 		)
-		let gatewaysAfterDeletion = try! Gateways(
+		let gatewaysAfterDeletion = try! SavedGateways(
 			current: currentGateway,
-			other: otherAfterDeletion
+			other: otherAfterDeletion.elements
 		)
 
 		var initialState = GatewaySettings.State()
 		initialState.destination = .removeGateway(.removeGateway(row: gatewayToBeDeleted))
 		initialState.currentGateway = currentGateway
 		initialState.gatewayList = .init(gateways: .init(
-			uniqueElements: gateways.all.map {
+			uniqueElements: savedGateways.all.map {
 				GatewayRow.State(
 					gateway: $0,
-					isSelected: gateways.current.id == $0.id,
+					isSelected: savedGateways.current.id == $0.id,
 					canBeDeleted: !$0.isWellknown
 				)
 			}
@@ -120,15 +120,15 @@ final class GatewaySettingsFeatureTests: TestCase {
 			}
 			$0.gatewaysClient.getAllGateways = {
 				if await isGatewayRemoved.value == true {
-					otherAfterDeletion.elements
+					otherAfterDeletion
 				} else {
-					otherGateways.elements
+					otherGateways
 				}
 			}
 			$0.gatewaysClient.gatewaysValues = {
 				let gateways = await isGatewayRemoved.value ? otherAfterDeletion : otherGateways
 				return AsyncLazySequence([
-					try! .init(current: currentGateway, other: gateways),
+					try! .init(current: currentGateway, other: gateways.elements),
 				]).eraseToAnyAsyncSequence()
 			}
 
@@ -143,7 +143,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		}
 
 		// when
-		await store.send(.internal(.gatewaysLoadedResult(.success(gatewaysAfterDeletion)))) {
+		await store.send(.internal(.savedGatewaysLoadedResult(.success(gatewaysAfterDeletion)))) {
 			// then
 			$0.gatewayList = .init(gateways: .init(
 				uniqueElements: gatewaysAfterDeletion.all.map {
@@ -176,7 +176,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 
 	func test_whenNewAddGatewayButtonIsTapped_thenDelegateIsCalled() async throws {
 		// given
-		let allGateways: [Gateway] = [.nebunet, .hammunet, .enkinet, .mardunet]
+		let allGateways: Gateways = [.nebunet, .hammunet, .enkinet, .mardunet]
 		let validURL = URL.previewValue.absoluteString
 		var initialState = AddNewGateway.State()
 		initialState.inputtedURL = validURL

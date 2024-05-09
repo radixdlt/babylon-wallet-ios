@@ -19,11 +19,12 @@ extension ThirdPartyDeposits {
 	)
 
 	public mutating func appendToAssetsExceptionList(_ new: AssetException) {
-		if assetsExceptionList == nil {
+		guard var identifiedAssetsExceptions = assetsExceptionList?.asIdentified() else {
 			assetsExceptionList = [new]
-		} else {
-			assetsExceptionList!.updateOrAppend(new)
+			return
 		}
+		identifiedAssetsExceptions.updateOrAppend(new)
+		assetsExceptionList = identifiedAssetsExceptions.elements
 	}
 
 	public mutating func removeAllAssetsExceptions() {
@@ -35,18 +36,23 @@ extension ThirdPartyDeposits {
 	}
 
 	public mutating func updateAssetsExceptionList(_ update: (inout AssetsExceptionList?) -> Void) {
-		update(&self.assetsExceptionList)
+		var identifiedExceptions = assetsExceptionList?.asIdentified()
+		update(&identifiedExceptions)
+		assetsExceptionList = identifiedExceptions?.elements
 	}
 
 	public mutating func updateDepositorsAllowList(_ update: (inout DepositorsAllowList?) -> Void) {
-		update(&self.depositorsAllowList)
+		var identifiedExceptions = depositorsAllowList?.asIdentified()
+		update(&identifiedExceptions)
+		depositorsAllowList = identifiedExceptions?.elements
 	}
 
 	public mutating func appendToDepositorsAllowList(_ new: ResourceOrNonFungible) {
-		if depositorsAllowList == nil {
+		guard var identifiedAssetsExceptions = depositorsAllowList?.asIdentified() else {
 			depositorsAllowList = [new]
-		} else {
-			depositorsAllowList!.updateOrAppend(new)
+			return
 		}
+		identifiedAssetsExceptions.updateOrAppend(new)
+		depositorsAllowList = identifiedAssetsExceptions.elements
 	}
 }
