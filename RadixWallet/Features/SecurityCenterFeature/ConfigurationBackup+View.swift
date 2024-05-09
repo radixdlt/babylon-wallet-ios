@@ -54,9 +54,9 @@ extension ConfigurationBackup {
 			.onAppear {
 				store.send(.view(.didAppear))
 			}
-			.destinations(with: store)
-			.navigationBarTitleDisplayMode(.large)
+			.navigationBarTitleDisplayMode(.inline)
 			.navigationTitle(L10n.ConfigurationBackup.title)
+			.destinations(with: store)
 		}
 	}
 }
