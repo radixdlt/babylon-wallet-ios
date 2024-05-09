@@ -4,7 +4,9 @@ import ComposableArchitecture
 public struct SecurityCenter: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var problems: [SecurityProblem] = []
-		public var actionsRequired: Set<Item> = []
+		public var actionsRequired: Set<Item> {
+			Set(problems.map(\.item))
+		}
 
 		@PresentationState
 		public var destination: Destination.State? = nil
@@ -42,7 +44,7 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case didAppear
-		case problemTapped(SecurityProblem.ID)
+		case problemTapped(SecurityProblem)
 		case itemTapped(Item)
 	}
 
@@ -66,7 +68,13 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 		case .didAppear:
 			return problemsSubscriptionEffect()
 
-		case let .problemTapped(id):
+		case let .problemTapped(problem):
+			switch problem.item {
+			case .securityFactors:
+				state.destination = .securityFactors(.init())
+			case .configurationBackup:
+				state.destination = .configurationBackup(.init())
+			}
 			return .none
 
 		case let .itemTapped(item):
@@ -86,11 +94,6 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .setProblems(problems):
 			state.problems = problems
-			if problems.isEmpty {
-				state.actionsRequired.remove(.configurationBackup)
-			} else {
-				state.actionsRequired.insert(.configurationBackup)
-			}
 			return .none
 		}
 	}
@@ -102,6 +105,17 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.setProblems(problems)))
 			}
+		}
+	}
+}
+
+private extension SecurityProblem {
+	var item: SecurityCenter.Item {
+		switch self {
+		case .problem5, .problem6, .problem7:
+			.configurationBackup
+		case .problem3, .problem9:
+			.securityFactors
 		}
 	}
 }
