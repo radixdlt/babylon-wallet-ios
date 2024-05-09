@@ -1,13 +1,6 @@
-//
-//  Stage0MigrateToSargon+Accounts.swift
-//  RadixWallet
-//
-//  Created by Alexander Cyon on 2024-05-07.
-//
-
 import Foundation
-import Sargon
 import IdentifiedCollections
+import Sargon
 
 public typealias Accounts = IdentifiedArrayOf<Account>
 public typealias Personas = IdentifiedArrayOf<Persona>
@@ -21,7 +14,6 @@ public typealias ReferencesToAuthorizedPersonas = IdentifiedArrayOf<AuthorizedPe
 public typealias DetailedAuthorizedPersonas = IdentifiedArrayOf<AuthorizedPersonaDetailed>
 public typealias AccountsForDisplay = IdentifiedArrayOf<AccountForDisplay>
 
-
 public typealias EntityFlags = IdentifiedArrayOf<EntityFlag>
 
 extension Account {
@@ -32,7 +24,6 @@ extension Account {
 		}
 	}
 }
-
 
 extension Persona {
 	public var entityFlags: EntityFlags {

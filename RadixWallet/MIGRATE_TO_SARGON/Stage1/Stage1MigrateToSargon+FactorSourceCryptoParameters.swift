@@ -2,6 +2,7 @@ import Foundation
 import OrderedCollections
 import Sargon
 
+// MARK: - CannotBeEmpty
 struct CannotBeEmpty: Swift.Error {}
 extension Array {
 	public init(notEmpty elements: some Collection<Element>) throws {

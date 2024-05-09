@@ -2,7 +2,6 @@ import Foundation
 import OrderedCollections
 import Sargon
 
-
 extension ThirdPartyDeposits {
 	public func assetsExceptionSet() -> OrderedSet<AssetException> {
 		assetsExceptionList.map(OrderedSet.init) ?? []

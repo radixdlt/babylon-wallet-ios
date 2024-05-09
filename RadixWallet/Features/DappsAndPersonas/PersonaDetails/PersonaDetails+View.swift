@@ -166,9 +166,9 @@ extension PersonaDetails.State {
 	var accountSection: AccountSection? {
 		switch mode {
 		case .general:
-			return nil
+			nil
 		case let .dApp(dApp, persona):
-			return AccountSection(
+			AccountSection(
 				dAppName: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
 				sharingAccounts: persona.simpleAccounts?.asIdentified() ?? []
 			)

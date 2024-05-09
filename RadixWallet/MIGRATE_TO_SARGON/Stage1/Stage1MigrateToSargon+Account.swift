@@ -30,7 +30,6 @@ extension Account {
 }
 
 extension Account {
-	
 	public var accountAddress: AccountAddress {
 		address
 	}
@@ -53,7 +52,6 @@ extension Accounts {
 		filter(\.isHidden)
 	}
 }
-
 
 extension [Account] {
 	public var nonHidden: Accounts {
