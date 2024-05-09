@@ -151,6 +151,8 @@ public struct Settings: Sendable, FeatureReducer {
 		switch presentedAction {
 		case .troubleshooting(.delegate(.goToAccountList)):
 			.run { _ in await dismiss() }
+		case let .troubleshooting(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))):
+			.send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent: keepInICloudIfPresent)))
 		default:
 			.none
 		}

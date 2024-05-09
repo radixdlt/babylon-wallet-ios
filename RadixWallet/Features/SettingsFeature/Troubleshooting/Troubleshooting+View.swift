@@ -63,6 +63,13 @@ extension Troubleshooting.View {
 				accessory: .iconLinkOut,
 				action: .discordButtonTapped
 			),
+			.model(
+				title: "Factory Reset",
+				subtitle: "USE LOCALIZATION",
+				icon: .systemImage("arrow.clockwise"),
+				action: .factoryResetButtonTapped
+			),
+			// arrow.clockwise
 		]
 	}
 }

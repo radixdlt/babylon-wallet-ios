@@ -13,10 +13,12 @@ public struct Troubleshooting: Sendable, FeatureReducer {
 		case legacyImportButtonTapped
 		case contactSupportButtonTapped
 		case discordButtonTapped
+		case factoryResetButtonTapped
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
 		case goToAccountList
+		case deleteProfileAndFactorSources(keepInICloudIfPresent: Bool)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -76,6 +78,9 @@ public struct Troubleshooting: Sendable, FeatureReducer {
 			return .run { _ in
 				await openURL(url)
 			}
+
+		case .factoryResetButtonTapped:
+			return .none
 		}
 	}
 
@@ -91,6 +96,9 @@ public struct Troubleshooting: Sendable, FeatureReducer {
 				state.destination = nil
 				return .none
 			}
+
+//		case let .resetWallet(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))):
+//			return .send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent)))
 
 		default:
 			return .none
