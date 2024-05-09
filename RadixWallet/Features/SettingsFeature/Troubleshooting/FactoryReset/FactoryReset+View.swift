@@ -25,7 +25,7 @@ public extension FactoryReset {
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 				.presentsLoadingViewOverlay()
-//				.destinations(with: store)
+				.destinations(with: store)
 		}
 	}
 }
@@ -62,7 +62,6 @@ extension FactoryReset.View {
 			}
 			.padding(.horizontal, .medium3)
 			.padding(.vertical, .large3)
-			// .frame(maxWidth: .infinity)
 			.background(Color.app.white)
 
 			disclosure
@@ -111,5 +110,30 @@ extension FactoryReset.View {
 			store.send(.view(.resetWalletButtonTapped))
 		}
 		.buttonStyle(.primaryRectangular(isDestructive: true))
+	}
+}
+
+private extension StoreOf<FactoryReset> {
+	var destination: PresentationStoreOf<FactoryReset.Destination> {
+		func scopeState(state: State) -> PresentationState<FactoryReset.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<FactoryReset>) -> some View {
+		let destination = store.destination
+		return confirmReset(with: destination)
+	}
+
+	private func confirmReset(with destinationStore: PresentationStoreOf<FactoryReset.Destination>) -> some View {
+		alert(
+			store: destinationStore,
+			state: /FactoryReset.Destination.State.confirmReset,
+			action: FactoryReset.Destination.Action.confirmReset
+		)
 	}
 }

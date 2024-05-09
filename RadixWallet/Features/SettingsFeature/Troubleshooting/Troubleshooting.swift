@@ -18,7 +18,7 @@ public struct Troubleshooting: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case goToAccountList
-		case deleteProfileAndFactorSources(keepInICloudIfPresent: Bool)
+		case resettedWallet
 	}
 
 	public struct Destination: DestinationReducer {
@@ -103,8 +103,8 @@ public struct Troubleshooting: Sendable, FeatureReducer {
 				return .none
 			}
 
-//		case let .factoryReset(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent))):
-//			return .send(.delegate(.deleteProfileAndFactorSources(keepInICloudIfPresent)))
+		case .factoryReset(.delegate(.resettedWallet)):
+			return .send(.delegate(.resettedWallet))
 
 		default:
 			return .none
