@@ -1108,7 +1108,7 @@ Your Backup does not contain your keys or seed phrase.";
 "configurationBackup_automated_securityFactorsItemSubtitle" = "The list of Security Factors you need to recover your Accounts and Personas.";
 "configurationBackup_automated_walletSettingsItemTitle" = "Wallet settings";
 "configurationBackup_automated_walletSettingsItemSubtitle" = "Your general settings, such as trusted dApps, linked Connectors and wallet display settings.";
-"configurationBackup_manual_heading" = "Manual backup.";
+"configurationBackup_manual_heading" = "Manual backup";
 "configurationBackup_manual_text" = "You can export your own Configuration Backup file and save it locally";
 "configurationBackup_manual_warning" = "You’ll need to export a new Backup file each time you make a change in your wallet.";
 "configurationBackup_manual_exportButton" = "Export Backup File";
