@@ -34,18 +34,20 @@ public extension FactoryReset {
 extension FactoryReset.View {
 	private var content: some View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
-			VStack(alignment: .leading, spacing: .large3) {
-				Text(L10n.FactoryReset.message)
-					.textStyle(.body1Link)
-					.foregroundColor(.app.gray2)
-					.padding(.horizontal, .small3)
+			ScrollView {
+				VStack(alignment: .leading, spacing: .large3) {
+					Text(L10n.FactoryReset.message)
+						.textStyle(.body1Link)
+						.foregroundColor(.app.gray2)
+						.padding(.horizontal, .small3)
 
-				securityCenter(isRecoverable: viewStore.isRecoverable)
+					securityCenter(isRecoverable: viewStore.isRecoverable)
 
-				Spacer()
+					Spacer()
+				}
+				.padding(.horizontal, .medium2)
+				.padding(.vertical, .medium3)
 			}
-			.padding(.horizontal, .medium2)
-			.padding(.vertical, .medium3)
 			.background(Color.app.gray5)
 			.footer { resetWallet }
 			.onFirstTask { @MainActor in
@@ -79,11 +81,14 @@ extension FactoryReset.View {
 				Image(isRecoverable ? .security : .error)
 				Text(isRecoverable ? L10n.FactoryReset.recoverable : L10n.FactoryReset.Unrecoverable.title)
 					.textStyle(.body1Header)
+					.multilineTextAlignment(.leading)
+					.minimumScaleFactor(0.8)
+					.lineLimit(1)
 				Spacer()
 			}
 			.foregroundColor(.app.white)
 			.padding(.horizontal, .medium2)
-			.frame(height: .large1)
+			.padding(.vertical, .small2)
 			.frame(maxWidth: .infinity)
 			.background(isRecoverable ? .app.green2 : .app.alert)
 			.cornerRadius(.small1)
