@@ -150,12 +150,12 @@ extension UserDefaults.Dependency {
 		set(value, forKey: Key.didMigrateKeychainProfiles.rawValue)
 	}
 
-	public var getLastCloudBackups: [UUID: CloudBackupResult] {
+	public var getLastCloudBackups: [UUID: BackupResult] {
 		(try? loadCodable(key: .lastCloudBackups)) ?? [:]
 	}
 
-	public func setLastCloudBackup(_ result: CloudBackupResult.Result, of profile: Profile) throws {
-		var backups: [UUID: CloudBackupResult] = getLastCloudBackups
+	public func setLastCloudBackup(_ result: BackupResult.Result, of profile: Profile) throws {
+		var backups: [UUID: BackupResult] = getLastCloudBackups
 		backups[profile.id] = .init(
 			backupDate: .now,
 			profileHash: profile.hashValue,
@@ -166,20 +166,21 @@ extension UserDefaults.Dependency {
 		print("  •• did setLastCloudBackup \(result)")
 	}
 
-	public func lastCloudBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<CloudBackupResult> {
+	public func lastCloudBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<BackupResult> {
 		lastBackupValues(for: profileID, key: .lastCloudBackups)
 	}
 
-	public var getLastManualBackups: [UUID: ManualBackupResult] {
+	public var getLastManualBackups: [UUID: BackupResult] {
 		(try? loadCodable(key: .lastManualBackups)) ?? [:]
 	}
 
 	/// Only call this on successful manual backups
 	public func setLastManualBackup(of profile: Profile) throws {
-		var backups: [UUID: ManualBackupResult] = getLastManualBackups
+		var backups: [UUID: BackupResult] = getLastManualBackups
 		backups[profile.id] = .init(
 			backupDate: .now,
-			profileHash: profile.hashValue
+			profileHash: profile.hashValue,
+			result: .success
 		)
 
 		print("•• UD setting last manual backup")
@@ -187,7 +188,7 @@ extension UserDefaults.Dependency {
 		print("•• UD did set last manual backup")
 	}
 
-	public func lastManualBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<ManualBackupResult> {
+	public func lastManualBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<BackupResult> {
 		lastBackupValues(for: profileID, key: .lastManualBackups)
 	}
 
@@ -198,8 +199,8 @@ extension UserDefaults.Dependency {
 	}
 }
 
-// MARK: - CloudBackupResult
-public struct CloudBackupResult: Codable, Sendable {
+// MARK: - BackupResult
+public struct BackupResult: Codable, Sendable {
 	public let backupDate: Date
 	public let profileHash: Int
 	public let result: Result
@@ -210,11 +211,4 @@ public struct CloudBackupResult: Codable, Sendable {
 		case notAuthenticated
 		case failure
 	}
-}
-
-// MARK: - ManualBackupResult
-/// For manual backups, we only store the successful results
-public struct ManualBackupResult: Codable, Sendable {
-	public let backupDate: Date
-	public let profileHash: Int
 }

@@ -44,5 +44,6 @@ extension SecurityCenterClient {
 	public struct BackupStatus: Codable, Sendable {
 		public let backupDate: Date
 		public let upToDate: Bool
+		public let success: Bool
 	}
 }

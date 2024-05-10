@@ -40,7 +40,7 @@ extension CloudBackupClient {
 	public typealias MigrateProfilesFromKeychain = @Sendable () async throws -> [CKRecord]
 	public typealias DeleteProfileInKeychain = @Sendable (UUID) async throws -> Void
 	public typealias CheckAccountStatus = @Sendable () async throws -> CKAccountStatus
-	public typealias LastBackup = @Sendable (UUID) -> AnyAsyncSequence<CloudBackupResult>
+	public typealias LastBackup = @Sendable (UUID) -> AnyAsyncSequence<BackupResult>
 	public typealias LoadProfile = @Sendable (UUID) async throws -> Profile?
 	public typealias LoadAllProfiles = @Sendable () async throws -> [Profile]
 	public typealias BackupProfile = @Sendable () async throws -> CKRecord

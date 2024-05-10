@@ -17,20 +17,22 @@ extension SecurityCenterClient {
 		func manualBackups() async -> AnyAsyncSequence<BackupStatus> {
 			let profileID = await profileStore.profile.id
 			let backups = userDefaults.lastManualBackupValues(for: profileID)
-			return await combineLatest(profileStore.values(), backups).map { profile, backup in
-				let upToDate = backup.profileHash == profile.hashValue
-				return .init(backupDate: backup.backupDate, upToDate: upToDate)
-			}
-			.eraseToAnyAsyncSequence()
+			return await statusValues(results: backups)
 		}
 
 		@Sendable
 		func cloudBackups() async -> AnyAsyncSequence<BackupStatus> {
 			let profileID = await profileStore.profile.id
 			let backups = userDefaults.lastCloudBackupValues(for: profileID)
-			return await combineLatest(profileStore.values(), backups).map { profile, backup in
+			return await statusValues(results: backups)
+		}
+
+		@Sendable
+		func statusValues(results: AnyAsyncSequence<BackupResult>) async -> AnyAsyncSequence<BackupStatus> {
+			await combineLatest(profileStore.values(), results).map { profile, backup in
 				let upToDate = backup.profileHash == profile.hashValue
-				return .init(backupDate: backup.backupDate, upToDate: upToDate)
+				let success = backup.result == .success
+				return .init(backupDate: backup.backupDate, upToDate: upToDate, success: success)
 			}
 			.eraseToAnyAsyncSequence()
 		}
@@ -50,7 +52,7 @@ extension SecurityCenterClient {
 
 					func hasProblem5() -> Bool {
 						if let cloudBackup {
-							cloudBackup.result != .success
+							!cloudBackup.success
 						} else {
 							false // FIXME: GK - is this what we want?
 						}
@@ -61,7 +63,7 @@ extension SecurityCenterClient {
 					}
 
 					func hasProblem7() -> Bool {
-						!enabled && manualBackup != nil && manualBackup?.profileHash != profile.hashValue
+						!enabled && manualBackup?.upToDate == false
 					}
 
 					func hasProblem9() async -> Bool {
