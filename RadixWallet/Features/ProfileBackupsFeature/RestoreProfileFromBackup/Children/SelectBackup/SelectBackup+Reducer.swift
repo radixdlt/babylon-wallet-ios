@@ -12,7 +12,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			case failed
 		}
 
-		public var status: Status = .start { didSet { print("•• STATUS: \(status)") } }
+		public var status: Status = .start
 
 		public var backedUpProfiles: [Profile]? = nil
 
@@ -217,20 +217,16 @@ public struct SelectBackup: Sendable, FeatureReducer {
 	public func migrateEffect() -> Effect<Action> {
 		.run { send in
 			if !userDefaults.getDidMigrateKeychainProfiles {
-				print("•• will migrate profiles")
 				await send(.internal(.setStatus(.migrating)))
 				do {
 					let profilesInKeychain = try secureStorageClient.loadProfileHeaderList()?.count ?? 0
 					if profilesInKeychain > 0 {
 						_ = try await cloudBackupClient.migrateProfilesFromKeychain()
 						userDefaults.setDidMigrateKeychainProfiles(true)
-						print("•• finished migrating profiles")
 					}
 				} catch {
-					print("•• migration failed")
+					await send(.internal(.setStatus(.failed)))
 				}
-			} else {
-				print("•• already migrated profiles")
 			}
 		}
 	}
@@ -243,7 +239,6 @@ public struct SelectBackup: Sendable, FeatureReducer {
 				)))
 
 				await send(.internal(.setStatus(.loading)))
-				print("•• loading backed up profiles")
 
 				try await send(.internal(.loadCloudBackupProfiles(
 					cloudBackupClient.loadAllProfiles()
@@ -251,8 +246,6 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 				await send(.internal(.setStatus(.loaded)))
 			} catch {
-				print("•• loading failed: \(error)")
-
 				await send(.internal(.setStatus(.failed)))
 			}
 		}

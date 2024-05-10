@@ -101,8 +101,17 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 	private func problemsSubscriptionEffect() -> Effect<Action> {
 		.run { send in
 			let profileID = await ProfileStore.shared.profile.id
-			for try await problems in await securityCenterClient.problems(profileID) {
+			for try await problems in await securityCenterClient.problems() {
 				guard !Task.isCancelled else { return }
+
+//				let all: [SecurityProblem] = [
+//					.problem3(accounts: 2, personas: 3),
+//					.problem5, .problem6, .problem7, .problem9
+//				]
+//				if let p = all.randomElement() {
+//					await send(.internal(.setProblems([p])))
+//				}
+
 				await send(.internal(.setProblems(problems)))
 			}
 		}
