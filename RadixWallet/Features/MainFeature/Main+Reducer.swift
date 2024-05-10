@@ -103,7 +103,7 @@ public struct Main: Sendable, FeatureReducer {
 		switch presentedAction {
 		case .settings(.delegate(.resettedWallet)):
 			.run { send in
-				try await appPreferencesClient.deleteProfileAndFactorSources(false)
+				try await appPreferencesClient.deleteProfileAndFactorSources(true)
 				await send(.delegate(.removedWallet))
 			} catch: { error, _ in
 				loggerGlobal.error("Failed to delete profile: \(error)")
