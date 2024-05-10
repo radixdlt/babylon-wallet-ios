@@ -207,7 +207,6 @@ Only continue if you are linking to the **official Radix Connector browser exten
 "linkedConnectors_linkFailedErrorTitle" = "Link Failed";
 "linkedConnectors_unknownPurposeErrorMessage" = "This type of Connector link is not supported.";
 "linkedConnectors_changingPurposeNotSupportedErrorMessage" = "Changing a Connector’s type is not supported.";
-"linkedConnectors_oldQRErrorMessage" = "This is an old version of the Radix Connector browser extension. Please update to the latest Connector and try linking again.";
 "gateways_title" = "Gateways";
 "gateways_subtitle" = "Choose the gateway your wallet will use to connect to the Radix Network or test networks. Only change this if you know what you’re doing.";
 "gateways_whatIsAGateway" = "What is a Gateway?";
@@ -1125,7 +1124,7 @@ Your Backup does not contain your keys or seed phrase.";
 "walletSettings_connectors_title" = "Linked Connectors";
 "walletSettings_connectors_subtitle" = "Connect to desktop through the Radix Connector browser extension";
 "walletSettings_preferences_title" = "Preferences";
-"walletSettings_preferences_subtitle" = "Deposits, hidden Accounts and Personas, and avdanced preferences";
+"walletSettings_preferences_subtitle" = "Deposits, hidden Accounts and Personas, and advanced preferences";
 "walletSettings_troubleshooting_title" = "Troubleshooting";
 "walletSettings_troubleshooting_subtitle" = "Add your existing Accounts and contact support";
 "walletSettings_appVersion" = "App version: %@";
