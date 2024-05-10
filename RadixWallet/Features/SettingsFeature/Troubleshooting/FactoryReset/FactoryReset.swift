@@ -2,6 +2,8 @@
 
 public struct FactoryReset: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
+		var isRecoverable = true
+
 		@PresentationState
 		public var destination: Destination.State?
 
@@ -9,7 +11,12 @@ public struct FactoryReset: Sendable, FeatureReducer {
 	}
 
 	public enum ViewAction: Sendable, Equatable {
+		case onFirstTask
 		case resetWalletButtonTapped
+	}
+
+	public enum InternalAction: Sendable, Equatable {
+		case loadedIsRecoverable(Bool)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -67,8 +74,18 @@ public struct FactoryReset: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
+		case .onFirstTask:
+			return loadIsRecoverable()
 		case .resetWalletButtonTapped:
 			state.destination = Destination.confirmResetState
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .loadedIsRecoverable(isRecoverable):
+			state.isRecoverable = isRecoverable
 			return .none
 		}
 	}
@@ -82,6 +99,14 @@ public struct FactoryReset: Sendable, FeatureReducer {
 				userDefaults.removeAll()
 				await send(.delegate(.resettedWallet))
 			}
+		}
+	}
+
+	private func loadIsRecoverable() -> Effect<Action> {
+		.run { send in
+			// TODO: Update with actual logic once from SecurityCenterClient once this PR is merged
+			// https://github.com/radixdlt/babylon-wallet-ios/pull/1106
+			await send(.internal(.loadedIsRecoverable(false)))
 		}
 	}
 }

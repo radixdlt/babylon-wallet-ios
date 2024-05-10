@@ -1,6 +1,6 @@
 extension FactoryReset.State {
 	var viewState: FactoryReset.ViewState {
-		.init(isRecoverable: false)
+		.init(isRecoverable: isRecoverable)
 	}
 }
 
@@ -48,6 +48,9 @@ extension FactoryReset.View {
 			.padding(.vertical, .medium3)
 			.background(Color.app.gray5)
 			.footer { resetWallet }
+			.onFirstTask { @MainActor in
+				await viewStore.send(.onFirstTask).finish()
+			}
 		}
 	}
 
