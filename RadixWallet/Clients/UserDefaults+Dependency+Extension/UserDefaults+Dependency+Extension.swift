@@ -183,9 +183,7 @@ extension UserDefaults.Dependency {
 			result: .success
 		)
 
-		print("•• UD setting last manual backup")
 		try save(codable: backups, forKey: .lastManualBackups)
-		print("•• UD did set last manual backup")
 	}
 
 	public func lastManualBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<BackupResult> {

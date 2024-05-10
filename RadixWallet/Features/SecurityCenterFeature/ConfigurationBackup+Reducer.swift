@@ -181,7 +181,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			return .none
 
 		case let .setCloudBackupEnabled(isEnabled):
-			print("•• cloudBackupsEnabled \(isEnabled)")
 			state.cloudBackupsEnabled = isEnabled
 			return .none
 

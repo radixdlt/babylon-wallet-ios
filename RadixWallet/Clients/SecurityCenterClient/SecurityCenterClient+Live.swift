@@ -45,8 +45,6 @@ extension SecurityCenterClient {
 				let manualBackups = await manualBackups().optional
 
 				return combineLatest(profiles, cloudBackups, manualBackups).map { profile, cloudBackup, manualBackup in
-					print("•• SecurityCenterClient problems sequence EMIT")
-
 					let enabled = profile.appPreferences.security.isCloudProfileSyncEnabled
 					var result: [SecurityProblem] = []
 

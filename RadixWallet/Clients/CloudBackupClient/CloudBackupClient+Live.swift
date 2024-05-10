@@ -99,8 +99,6 @@ extension CloudBackupClient {
 			},
 			migrateProfilesFromKeychain: {
 				let activeProfile = await profileStore.profile.id
-				print("•• Current profile \(activeProfile.uuidString)")
-
 				let backedUpRecords = try await fetchAllProfileRecords()
 				guard let headerList = try secureStorageClient.loadProfileHeaderList() else { return [] }
 
@@ -114,21 +112,18 @@ extension CloudBackupClient {
 						throw ProfileMissingFromKeychainError(id: id)
 					}
 
-					print("•• Migrating \(id.uuidString) synced: \(profile.appPreferences.security.isCloudProfileSyncEnabled), empty: \(profile.networks.isEmpty)")
-
 					guard !profile.networks.isEmpty, profile.appPreferences.security.isCloudProfileSyncEnabled else {
 						return nil
 					}
 					let backedUpRecord = backedUpRecords.first { $0.recordID.recordName == id.uuidString }
 
 					if let backedUpRecord, try extractProfile(backedUpRecord).header.lastModified >= profile.header.lastModified {
-						print("  •• already backed up \(id.uuidString)")
 						return nil
 					}
 
 					let savedRecord = try await saveProfile(profile, existingRecord: backedUpRecord)
 					// Migration completed, deleting old copy
-//					try secureStorageClient.deleteProfile(profile.id)
+					try secureStorageClient.deleteProfile(profile.id)
 
 					return savedRecord
 				}
@@ -150,25 +145,8 @@ extension CloudBackupClient {
 			},
 			backupProfile: {
 				let profile = await profileStore.profile
-				print("•• backupProfile \(profile.id.uuidString)")
-				let existingRecord: CKRecord?
-				do {
-					existingRecord = try await fetchProfileRecord(.init(recordName: profile.id.uuidString))
-					print("  •• record found already, updating")
-				} catch {
-					let ckError = error as? CKError
-					switch ckError?.code {
-					case .unknownItem: // Item not in iCloud, create new
-						existingRecord = nil
-						print("  •• record not found previously")
-					default:
-						print("  •• uploadProfile FAILED other \(error)")
-						throw error
-					}
-				}
+				let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
 				return try await saveProfile(profile, existingRecord: existingRecord)
-				//				let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
-				//				return try await saveProfile(profile, existingRecord: existingRecord)
 			}
 		)
 	}
