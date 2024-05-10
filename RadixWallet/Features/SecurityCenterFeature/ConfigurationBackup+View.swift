@@ -27,10 +27,10 @@ extension ConfigurationBackup {
 						}
 						.padding(.bottom, .medium3)
 
-						let backupsEnabled = viewStore.binding(get: \.automatedBackupsEnabled) { .view(.automatedBackupsToggled($0)) }
+						let backupsEnabled = viewStore.binding(get: \.cloudBackupsEnabled) { .view(.cloudBackupsToggled($0)) }
 						AutomatedBackupView(
 							backupsEnabled: backupsEnabled,
-							lastBackedUp: viewStore.lastBackup,
+							lastBackedUp: viewStore.lastCloudBackup,
 							actionsRequired: viewStore.actionsRequired,
 							outdatedBackupPresent: viewStore.outdatedBackupPresent,
 							deleteOutdatedAction: { store.send(.view(.deleteOutdatedTapped)) }
@@ -42,7 +42,7 @@ extension ConfigurationBackup {
 							.textStyle(.body1Header)
 							.padding(.bottom, .medium2)
 
-						ManualBackupView {
+						ManualBackupView(lastBackedUp: viewStore.lastManualBackup) {
 							store.send(.view(.exportTapped))
 						}
 					}
@@ -285,6 +285,7 @@ extension ConfigurationBackup {
 	}
 
 	struct ManualBackupView: SwiftUI.View {
+		let lastBackedUp: Date?
 		let exportAction: () -> Void
 
 		var body: some SwiftUI.View {
@@ -302,9 +303,21 @@ extension ConfigurationBackup {
 						.buttonStyle(.primaryRectangular(shouldExpand: true))
 						.padding(.horizontal, .large2)
 
+					if let lastBackedUpString {
+						Text(lastBackedUpString)
+							.textStyle(.body2Regular)
+							.foregroundStyle(.app.gray2)
+							.padding(.horizontal, .medium2)
+					}
+
 					WarningView(text: L10n.ConfigurationBackup.Manual.warning)
 				}
 			}
+		}
+
+		private var lastBackedUpString: String? {
+			guard let lastBackedUp else { return nil }
+			return L10n.ConfigurationBackup.Automated.lastBackup(RadixDateFormatter.string(from: lastBackedUp))
 		}
 	}
 
