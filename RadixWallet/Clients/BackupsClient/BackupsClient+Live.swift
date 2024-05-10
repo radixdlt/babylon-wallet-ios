@@ -71,6 +71,9 @@ extension BackupsClient: DependencyKey {
 					try await profileStore.importProfileSnapshot(snapshot)
 				}
 			},
+			didExportProfileSnapshot: { profile in
+				try userDefaults.setLastManualBackup(of: profile)
+			},
 			importCloudProfile: { header, factorSourceIDs in
 				try await importFor(factorSourceIDs: factorSourceIDs) {
 					try await profileStore.importCloudProfileSnapshot(header)
