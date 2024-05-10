@@ -105,6 +105,7 @@ public struct FactoryReset: Sendable, FeatureReducer {
 	private func loadIsRecoverable() -> Effect<Action> {
 		.run { send in
 			// TODO: Update with actual logic once from SecurityCenterClient once this PR is merged
+			// A wallet is recoverable if it doesn't have problems 5, 6 or 7.
 			// https://github.com/radixdlt/babylon-wallet-ios/pull/1106
 			await send(.internal(.loadedIsRecoverable(false)))
 		}
