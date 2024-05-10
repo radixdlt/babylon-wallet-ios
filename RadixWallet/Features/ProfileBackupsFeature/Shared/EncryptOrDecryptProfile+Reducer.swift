@@ -164,12 +164,10 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 			}
 
 		case let .passwordChanged(password):
-			print("•• passwordChanged \(password)")
 			state.enteredEncryptionPassword = password
 			return .none
 
 		case let .passwordConfirmationChanged(password):
-			print("•• passwordConfirmationChanged \(password)")
 			state.confirmedEncryptionPassword = password
 			return .none
 		}
