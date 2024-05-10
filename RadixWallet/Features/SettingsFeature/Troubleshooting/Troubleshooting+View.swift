@@ -1,5 +1,15 @@
+extension Troubleshooting.State {
+	var viewState: Troubleshooting.ViewState {
+		.init(isLegacyImportEnabled: isLegacyImportEnabled)
+	}
+}
+
 // MARK: - Troubleshooting.View
 public extension Troubleshooting {
+	struct ViewState: Equatable {
+		let isLegacyImportEnabled: Bool
+	}
+
 	@MainActor
 	struct View: SwiftUI.View {
 		private let store: StoreOf<Troubleshooting>
@@ -22,18 +32,23 @@ public extension Troubleshooting {
 extension Troubleshooting.View {
 	@MainActor
 	private var content: some View {
-		ScrollView {
-			VStack(spacing: .zero) {
-				ForEach(rows) { kind in
-					SettingsRow(kind: kind, store: store)
+		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
+			ScrollView {
+				VStack(spacing: .zero) {
+					ForEach(rows(isLegacyImportEnabled: viewStore.isLegacyImportEnabled)) { kind in
+						SettingsRow(kind: kind, store: store)
+					}
 				}
 			}
+			.background(Color.app.gray5)
+			.onFirstTask { @MainActor in
+				await viewStore.send(.onFirstTask).finish()
+			}
 		}
-		.background(Color.app.gray5)
 	}
 
 	@MainActor
-	private var rows: [SettingsRow<Troubleshooting>.Kind] {
+	private func rows(isLegacyImportEnabled: Bool) -> [SettingsRow<Troubleshooting>.Kind] {
 		[
 			.header(L10n.Troubleshooting.accountRecovery),
 			.model(
@@ -47,7 +62,7 @@ extension Troubleshooting.View {
 				subtitle: L10n.Troubleshooting.LegacyImport.subtitle,
 				icon: .asset(AssetResource.recovery),
 				action: .legacyImportButtonTapped
-			),
+			).valid(if: isLegacyImportEnabled),
 			.header(L10n.Troubleshooting.supportAndCommunity),
 			.model(
 				title: L10n.Troubleshooting.ContactSupport.title,
@@ -71,6 +86,7 @@ extension Troubleshooting.View {
 				action: .factoryResetButtonTapped
 			),
 		]
+		.compactMap { $0 }
 	}
 }
 
@@ -119,5 +135,11 @@ private extension View {
 			action: Troubleshooting.Destination.Action.factoryReset,
 			destination: { FactoryReset.View(store: $0) }
 		)
+	}
+}
+
+private extension SettingsRow.Kind {
+	func valid(if condition: Bool) -> Self? {
+		condition ? self : nil
 	}
 }
