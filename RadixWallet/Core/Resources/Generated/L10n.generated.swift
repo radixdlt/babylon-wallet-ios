@@ -992,8 +992,12 @@ public enum L10n {
     public enum Manual {
       /// Export Backup File
       public static let exportButton = L10n.tr("Localizable", "configurationBackup_manual_exportButton", fallback: "Export Backup File")
-      /// Manual backup.
-      public static let heading = L10n.tr("Localizable", "configurationBackup_manual_heading", fallback: "Manual backup.")
+      /// Manual backup
+      public static let heading = L10n.tr("Localizable", "configurationBackup_manual_heading", fallback: "Manual backup")
+      /// Last backup: %@
+      public static func lastBackup(_ p1: Any) -> String {
+        return L10n.tr("Localizable", "configurationBackup_manual_lastBackup", String(describing: p1), fallback: "Last backup: %@")
+      }
       /// You can export your own Configuration Backup file and save it locally
       public static let text = L10n.tr("Localizable", "configurationBackup_manual_text", fallback: "You can export your own Configuration Backup file and save it locally")
       /// You’ll need to export a new Backup file each time you make a change in your wallet.
@@ -1180,8 +1184,8 @@ public enum L10n {
       public static let info = L10n.tr("Localizable", "customizeNetworkFees_totalFee_info", fallback: "(maximum to lock)")
     }
     public enum Warning {
-      /// Insufficient balance to pay the transaction fee
-      public static let insufficientBalance = L10n.tr("Localizable", "customizeNetworkFees_warning_insufficientBalance", fallback: "Insufficient balance to pay the transaction fee")
+      /// Not enough XRD for transaction fee
+      public static let insufficientBalance = L10n.tr("Localizable", "customizeNetworkFees_warning_insufficientBalance", fallback: "Not enough XRD for transaction fee")
       /// Please select a fee payer for the transaction fee
       public static let selectFeePayer = L10n.tr("Localizable", "customizeNetworkFees_warning_selectFeePayer", fallback: "Please select a fee payer for the transaction fee")
     }
@@ -1634,6 +1638,32 @@ public enum L10n {
       public static let securityQuestions = L10n.tr("Localizable", "factorSources_kind_securityQuestions", fallback: "Security Questions")
       /// Third-party
       public static let trustedContact = L10n.tr("Localizable", "factorSources_kind_trustedContact", fallback: "Third-party")
+    }
+  }
+  public enum FactoryReset {
+    /// Once you’ve completed a factory reset, you will not be able to access your Accounts and Personas unless you do a full recovery.
+    public static let disclosure = L10n.tr("Localizable", "factoryReset_disclosure", fallback: "Once you’ve completed a factory reset, you will not be able to access your Accounts and Personas unless you do a full recovery.")
+    /// A factory reset will restore your Radix wallet to its original settings. All of your data and preferences will be erased.
+    public static let message = L10n.tr("Localizable", "factoryReset_message", fallback: "A factory reset will restore your Radix wallet to its original settings. All of your data and preferences will be erased.")
+    /// Your wallet is recoverable
+    public static let recoverable = L10n.tr("Localizable", "factoryReset_recoverable", fallback: "Your wallet is recoverable")
+    /// Reset Wallet
+    public static let resetWallet = L10n.tr("Localizable", "factoryReset_resetWallet", fallback: "Reset Wallet")
+    /// Security Center status
+    public static let status = L10n.tr("Localizable", "factoryReset_status", fallback: "Security Center status")
+    /// Factory Reset
+    public static let title = L10n.tr("Localizable", "factoryReset_title", fallback: "Factory Reset")
+    public enum Dialog {
+      /// Return wallet to factory settings? You cannot undo this.
+      public static let message = L10n.tr("Localizable", "factoryReset_dialog_message", fallback: "Return wallet to factory settings? You cannot undo this.")
+      /// Confirm factory reset
+      public static let title = L10n.tr("Localizable", "factoryReset_dialog_title", fallback: "Confirm factory reset")
+    }
+    public enum Unrecoverable {
+      /// Your wallet is currently unrecoverable. If you do a factory reset now, you will never be able to access your Accounts and Personas again.
+      public static let message = L10n.tr("Localizable", "factoryReset_unrecoverable_message", fallback: "Your wallet is currently unrecoverable. If you do a factory reset now, you will never be able to access your Accounts and Personas again.")
+      /// Your wallet is not recoverable
+      public static let title = L10n.tr("Localizable", "factoryReset_unrecoverable_title", fallback: "Your wallet is not recoverable")
     }
   }
   public enum Gateways {
@@ -2965,6 +2995,8 @@ public enum L10n {
   public enum Troubleshooting {
     /// Account Recovery
     public static let accountRecovery = L10n.tr("Localizable", "troubleshooting_accountRecovery", fallback: "Account Recovery")
+    /// Reset Account
+    public static let resetAccount = L10n.tr("Localizable", "troubleshooting_resetAccount", fallback: "Reset Account")
     /// Support and Community
     public static let supportAndCommunity = L10n.tr("Localizable", "troubleshooting_supportAndCommunity", fallback: "Support and Community")
     /// Troubleshooting
@@ -2986,6 +3018,12 @@ public enum L10n {
       public static let subtitle = L10n.tr("Localizable", "troubleshooting_discord_subtitle", fallback: "Connect to the official Radix Discord channel to join the community and ask for help.")
       /// Discord
       public static let title = L10n.tr("Localizable", "troubleshooting_discord_title", fallback: "Discord")
+    }
+    public enum FactoryReset {
+      /// Restore your Radix wallet to its original state
+      public static let subtitle = L10n.tr("Localizable", "troubleshooting_factoryReset_subtitle", fallback: "Restore your Radix wallet to its original state")
+      /// Factory Reset
+      public static let title = L10n.tr("Localizable", "troubleshooting_factoryReset_title", fallback: "Factory Reset")
     }
     public enum LegacyImport {
       /// Import Accounts from an Olympia wallet
