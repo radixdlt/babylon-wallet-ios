@@ -63,9 +63,10 @@ extension Troubleshooting.View {
 				accessory: .iconLinkOut,
 				action: .discordButtonTapped
 			),
+			.header(L10n.Troubleshooting.resetAccount),
 			.model(
-				title: "Factory Reset",
-				subtitle: "USE LOCALIZATION",
+				title: L10n.Troubleshooting.FactoryReset.title,
+				subtitle: L10n.Troubleshooting.FactoryReset.subtitle,
 				icon: .systemImage("arrow.clockwise"),
 				action: .factoryResetButtonTapped
 			),

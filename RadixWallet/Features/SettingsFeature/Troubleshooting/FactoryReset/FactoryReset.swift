@@ -19,7 +19,7 @@ public struct FactoryReset: Sendable, FeatureReducer {
 	public struct Destination: DestinationReducer {
 		static let confirmResetState: Self.State = .confirmReset(.init(
 			title: {
-				TextState("Confirm factory reset")
+				TextState(L10n.FactoryReset.Dialog.title)
 			},
 			actions: {
 				ButtonState(role: .destructive, action: .confirm) {
@@ -27,7 +27,7 @@ public struct FactoryReset: Sendable, FeatureReducer {
 				}
 			},
 			message: {
-				TextState("Return wallet to factory settings? You cannot undo this.")
+				TextState(L10n.FactoryReset.Dialog.message)
 			}
 		))
 
