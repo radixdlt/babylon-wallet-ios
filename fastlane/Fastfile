@@ -99,6 +99,7 @@ platform :ios do
     desc "Installs distribution certificates"
     desc "Usage `bundle exec fastlane ios install_distribution_certificate --env ios.<specific env>`"
     lane :install_distribution_certificates do
+        Dotenv.load ".env.ios.release"
         code_signing(type: "appstore")
     end
 
