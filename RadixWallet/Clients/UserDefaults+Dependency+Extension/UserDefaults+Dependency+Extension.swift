@@ -154,16 +154,16 @@ extension UserDefaults.Dependency {
 		(try? loadCodable(key: .lastCloudBackups)) ?? [:]
 	}
 
-	public func setLastCloudBackup(_ status: CloudBackupResult.Status, of profile: Profile) throws {
+	public func setLastCloudBackup(_ result: CloudBackupResult.Result, of profile: Profile) throws {
 		var backups: [UUID: CloudBackupResult] = getLastCloudBackups
 		backups[profile.id] = .init(
-			date: profile.header.lastModified,
+			backupDate: .now,
 			profileHash: profile.hashValue,
-			status: status
+			result: result
 		)
 
 		try save(codable: backups, forKey: .lastCloudBackups)
-		print("  •• did setLastCloudBackup \(status)")
+		print("  •• did setLastCloudBackup \(result)")
 	}
 
 	public func lastCloudBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<CloudBackupResult> {
@@ -177,14 +177,14 @@ extension UserDefaults.Dependency {
 	/// Only call this on successful manual backups
 	public func setLastManualBackup(of profile: Profile) throws {
 		var backups: [UUID: ManualBackupResult] = getLastManualBackups
-		let isFirstBackup = backups[profile.id] != nil
 		backups[profile.id] = .init(
-			date: profile.header.lastModified,
-			profileHash: profile.hashValue,
-			isFirstBackup: isFirstBackup
+			backupDate: .now,
+			profileHash: profile.hashValue
 		)
 
+		print("•• UD setting last manual backup")
 		try save(codable: backups, forKey: .lastManualBackups)
+		print("•• UD did set last manual backup")
 	}
 
 	public func lastManualBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<ManualBackupResult> {
@@ -200,11 +200,11 @@ extension UserDefaults.Dependency {
 
 // MARK: - CloudBackupResult
 public struct CloudBackupResult: Codable, Sendable {
-	public let date: Date
+	public let backupDate: Date
 	public let profileHash: Int
-	public let status: Status
+	public let result: Result
 
-	public enum Status: Codable, Sendable {
+	public enum Result: Codable, Sendable {
 		case success
 		case temporarilyUnavailable
 		case notAuthenticated
@@ -215,7 +215,6 @@ public struct CloudBackupResult: Codable, Sendable {
 // MARK: - ManualBackupResult
 /// For manual backups, we only store the successful results
 public struct ManualBackupResult: Codable, Sendable {
-	public let date: Date
+	public let backupDate: Date
 	public let profileHash: Int
-	public let isFirstBackup: Bool
 }

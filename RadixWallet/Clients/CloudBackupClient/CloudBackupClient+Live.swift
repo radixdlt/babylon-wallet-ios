@@ -32,19 +32,19 @@ extension CloudBackupClient {
 				print("  •• profileStore new value")
 				guard profile.appPreferences.security.isCloudProfileSyncEnabled else { continue }
 				let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
-				let status: CloudBackupResult.Status
+				let result: CloudBackupResult.Result
 				do {
 					try await saveProfile(profile, existingRecord: existingRecord)
-					status = .success
+					result = .success
 				} catch CKError.accountTemporarilyUnavailable {
-					status = .temporarilyUnavailable
+					result = .temporarilyUnavailable
 				} catch CKError.notAuthenticated {
-					status = .notAuthenticated
+					result = .notAuthenticated
 				} catch {
-					status = .failure
+					result = .failure
 				}
 
-				try? userDefaults.setLastCloudBackup(status, of: profile)
+				try? userDefaults.setLastCloudBackup(result, of: profile)
 			}
 		}
 

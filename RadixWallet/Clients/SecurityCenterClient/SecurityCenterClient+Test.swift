@@ -15,10 +15,14 @@ extension SecurityCenterClient: TestDependencyKey {
 	public static let previewValue: Self = .noop
 
 	public static let noop = Self(
-		problems: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() }
+		problems: { AsyncLazySequence([[]]).eraseToAnyAsyncSequence() },
+		lastManualBackup: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
+		lastCloudBackup: { AsyncLazySequence([]).eraseToAnyAsyncSequence() }
 	)
 
 	public static let testValue = Self(
-		problems: unimplemented("\(Self.self).problems")
+		problems: unimplemented("\(Self.self).problems"),
+		lastManualBackup: unimplemented("\(Self.self).lastManualBackup"),
+		lastCloudBackup: unimplemented("\(Self.self).lastCloudBackup")
 	)
 }

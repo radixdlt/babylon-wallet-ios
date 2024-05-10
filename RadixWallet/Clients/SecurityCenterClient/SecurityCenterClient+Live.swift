@@ -11,20 +11,46 @@ extension SecurityCenterClient {
 		profileStore: ProfileStore = .shared
 	) -> SecurityCenterClient {
 		@Dependency(\.userDefaults) var userDefaults
+		@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
+
+		@Sendable
+		func manualBackups() async -> AnyAsyncSequence<BackupStatus> {
+			let profileID = await profileStore.profile.id
+			let backups = userDefaults.lastManualBackupValues(for: profileID)
+			return await combineLatest(profileStore.values(), backups).map { profile, backup in
+				let upToDate = backup.profileHash == profile.hashValue
+				return .init(backupDate: backup.backupDate, upToDate: upToDate)
+			}
+			.eraseToAnyAsyncSequence()
+		}
+
+		@Sendable
+		func cloudBackups() async -> AnyAsyncSequence<BackupStatus> {
+			let profileID = await profileStore.profile.id
+			let backups = userDefaults.lastCloudBackupValues(for: profileID)
+			return await combineLatest(profileStore.values(), backups).map { profile, backup in
+				let upToDate = backup.profileHash == profile.hashValue
+				return .init(backupDate: backup.backupDate, upToDate: upToDate)
+			}
+			.eraseToAnyAsyncSequence()
+		}
 
 		return .init(
-			problems: { profileID in
-				let cloudBackups = userDefaults.lastCloudBackupValues(for: profileID).optional
-				let cloudBackupsEnabled = await profileStore.appPreferencesValues().map(\.security.isCloudProfileSyncEnabled)
-				let manualBackups = userDefaults.lastManualBackupValues(for: profileID).optional
+			problems: {
+				let profileID = await profileStore.profile.id
+				let profiles = await profileStore.values()
+				let cloudBackups = await cloudBackups().optional
+				let manualBackups = await manualBackups().optional
 
-				return combineLatest(cloudBackups, cloudBackupsEnabled, manualBackups).map { cloudBackup, enabled, manualBackup in
-					let profile = await profileStore.profile
+				return combineLatest(profiles, cloudBackups, manualBackups).map { profile, cloudBackup, manualBackup in
+					print("•• SecurityCenterClient problems sequence EMIT")
+
+					let enabled = profile.appPreferences.security.isCloudProfileSyncEnabled
 					var result: [SecurityProblem] = []
 
 					func hasProblem5() -> Bool {
 						if let cloudBackup {
-							cloudBackup.status != .success
+							cloudBackup.result != .success
 						} else {
 							false // FIXME: GK - is this what we want?
 						}
@@ -38,14 +64,21 @@ extension SecurityCenterClient {
 						!enabled && manualBackup != nil && manualBackup?.profileHash != profile.hashValue
 					}
 
+					func hasProblem9() async -> Bool {
+						await (try? deviceFactorSourceClient.isSeedPhraseNeededToRecoverAccounts()) ?? false
+					}
+
 					if hasProblem5() { result.append(.problem5) }
 					if hasProblem6() { result.append(.problem6) }
 					if hasProblem7() { result.append(.problem7) }
+					if await hasProblem9() { result.append(.problem9) }
 
 					return result
 				}
 				.eraseToAnyAsyncSequence()
-			}
+			},
+			lastManualBackup: manualBackups,
+			lastCloudBackup: cloudBackups
 		)
 	}
 }
