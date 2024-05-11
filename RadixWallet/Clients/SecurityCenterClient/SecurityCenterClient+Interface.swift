@@ -18,6 +18,7 @@ extension SecurityCenterClient {
 }
 
 // MARK: - SecurityProblem
+/// As outlined in https://radixdlt.atlassian.net/wiki/spaces/AT/pages/3392569357/Security-related+Problem+States+in+the+Wallet
 public enum SecurityProblem: Hashable, Sendable, Identifiable {
 	case problem3(accounts: Int, personas: Int)
 	case problem5

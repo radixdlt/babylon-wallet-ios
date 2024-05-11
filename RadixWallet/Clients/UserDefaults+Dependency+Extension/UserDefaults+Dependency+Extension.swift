@@ -163,7 +163,6 @@ extension UserDefaults.Dependency {
 		)
 
 		try save(codable: backups, forKey: .lastCloudBackups)
-		print("  •• did setLastCloudBackup \(result)")
 	}
 
 	public func lastCloudBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<BackupResult> {
