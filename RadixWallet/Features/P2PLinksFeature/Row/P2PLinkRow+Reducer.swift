@@ -4,8 +4,8 @@ import SwiftUI
 // MARK: - P2PLink
 public struct P2PLinkRow: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable, Identifiable {
-		public typealias ID = Curve25519PublicKeyBytes
-		public var id: ID { link.id }
+		public typealias ID = Ed25519PublicKey
+		public var id: ID { link.publicKey }
 		public let link: P2PLink
 
 		public init(

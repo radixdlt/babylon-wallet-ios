@@ -1,5 +1,6 @@
 @testable import Radix_Wallet_Dev
 import XCTest
+import Sargon
 
 // MARK: - NewConnectionTests
 @MainActor
@@ -14,13 +15,13 @@ final class NewConnectionTests: TestCase {
 			),
 			reducer: NewConnection.init
 		)
-		let qrData = LinkConnectionQRData.placeholder
+		let qrData = LinkConnectionQRData.sample
 		let qrString = """
 		{
-		"purpose": "\(qrData.purpose.rawValue)",
-		"password": "\(qrData.password.rawValue.data.hex())",
-		"publicKey": "\(qrData.publicKey.rawValue.data.hex())",
-		"signature": "\(qrData.signature.rawValue.data.hex())"
+		"purpose": "general",
+		"password": "\(qrData.password.value.hex)",
+		"publicKey": "\(qrData.publicKeyOfOtherParty.hex)",
+		"signature": "\(qrData.signature.hex)"
 		}
 		"""
 
@@ -41,16 +42,16 @@ final class NewConnectionTests: TestCase {
 		let connectionName = "Foobar"
 		let purpose = NewConnectionApproval.State.Purpose.approveNewConnection
 		let p2pLink = P2PLink(
-			connectionPassword: .placeholder,
-			publicKey: .placeholder,
-			purpose: .general,
+			connectionPassword: .sample,
+			connectionPurpose: .general,
+			publicKey: .sample,
 			displayName: connectionName
 		)
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State(
 				root: .connectionApproval(.init(purpose: purpose)),
-				linkConnectionQRData: .placeholder
+				linkConnectionQRData: .sample
 			),
 			reducer: NewConnection.init
 		) {
@@ -91,16 +92,16 @@ final class NewConnectionTests: TestCase {
 		let connectionName = "Foobar"
 		let purpose = NewConnectionApproval.State.Purpose.approveExisitingConnection(connectionName)
 		let p2pLink = P2PLink(
-			connectionPassword: .placeholder,
-			publicKey: .placeholder,
-			purpose: .general,
+			connectionPassword: .sample,
+			connectionPurpose: .general,
+			publicKey: .sample,
 			displayName: connectionName
 		)
 		let store = TestStore(
 			// GIVEN initial state
 			initialState: NewConnection.State(
 				root: .connectionApproval(.init(purpose: purpose)),
-				linkConnectionQRData: .placeholder
+				linkConnectionQRData: .sample
 			),
 			reducer: NewConnection.init
 		) {

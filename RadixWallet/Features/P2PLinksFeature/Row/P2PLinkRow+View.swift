@@ -62,8 +62,8 @@ struct P2PLinkRow_Preview: PreviewProvider {
 				initialState: .init(link:
 					.init(
 						connectionPassword: .sample,
+						connectionPurpose: .general,
 						publicKey: .sample,
-						purpose: .general,
 						displayName: "Test"
 					)
 				),

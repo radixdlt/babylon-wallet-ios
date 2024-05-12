@@ -26,8 +26,8 @@ extension P2P {
 				/// Sends a request to ALL P2PLinks
 				case broadcastToAllPeers
 
-				/// Sends a request to ALL P2PLinks that have a specific `ConnectionPurpose`
-				case broadcastToAllPeersWith(purpose: ConnectionPurpose)
+				/// Sends a request to ALL P2PLinks that have a specific `RadixConnectPurpose`
+				case broadcastToAllPeersWith(purpose: RadixConnectPurpose)
 			}
 
 			/// e.g. for Ledger Nano interaction, `PeerConnectionID` is not known

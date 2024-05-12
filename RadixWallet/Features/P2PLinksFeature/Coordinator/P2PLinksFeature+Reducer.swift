@@ -117,7 +117,7 @@ public struct P2PLinksFeature: Sendable, FeatureReducer {
 			return .none
 
 		case let .deleteConnectionResult(.success(p2pLink)):
-			state.links.remove(id: p2pLink.id)
+			state.links.remove(id: p2pLink.publicKey)
 			return .none
 
 		case let .deleteConnectionResult(.failure(error)):

@@ -132,15 +132,15 @@ public struct NewConnection: Sendable, FeatureReducer {
 			state.linkConnectionQRData = linkConnectionQRData
 
 			return .run { send in
-				guard try linkConnectionQRData.hasValidSignature() else {
+				guard linkConnectionQRData.hasValidSignature() else {
 					await send(.internal(.showErrorAlert(.invalidQRCode)))
 					return
 				}
 
 				let p2pLinks = await p2pLinksClient.getP2PLinks()
 
-				if let p2pLink = p2pLinks.first(where: { $0.publicKey == linkConnectionQRData.publicKey }) {
-					if p2pLink.purpose == linkConnectionQRData.purpose {
+				if let p2pLink = p2pLinks.first(where: { $0.publicKey == linkConnectionQRData.publicKeyOfOtherParty }) {
+					if p2pLink.connectionPurpose == linkConnectionQRData.purpose {
 						await send(.internal(.approveConnection(.approveExisitingConnection(p2pLink.displayName))))
 					} else {
 						await send(.internal(.showErrorAlert(.changingPurposeNotSupported)))
@@ -167,8 +167,8 @@ public struct NewConnection: Sendable, FeatureReducer {
 
 			let p2pLink = P2PLink(
 				connectionPassword: linkConnectionQRData.password,
-				publicKey: linkConnectionQRData.publicKey,
-				purpose: linkConnectionQRData.purpose,
+				connectionPurpose: linkConnectionQRData.purpose,
+				publicKey: linkConnectionQRData.publicKeyOfOtherParty,
 				displayName: connectionName
 			)
 

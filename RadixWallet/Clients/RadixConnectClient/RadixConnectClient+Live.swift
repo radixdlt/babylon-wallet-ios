@@ -38,7 +38,7 @@ extension RadixConnectClient {
 		}
 
 		@Sendable
-		func sendAccountListMessage(accounts: AccountsClient.Accounts) async throws {
+		func sendAccountListMessage(accounts: Accounts) async throws {
 			let encoder = jsonEncoder()
 			let accounts = accounts.map {
 				P2P.Dapp.Response.WalletAccount(

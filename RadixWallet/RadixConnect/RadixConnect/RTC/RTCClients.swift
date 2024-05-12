@@ -146,11 +146,11 @@ extension RTCClients {
 		}
 	}
 
-	private func connectedClients(purpose: ConnectionPurpose?) async -> NonEmpty<[RTCClient]>? {
+	private func connectedClients(purpose: RadixConnectPurpose?) async -> NonEmpty<[RTCClient]>? {
 		var connectedClient = [RTCClient]()
 		let clients = clients.values.filter {
 			guard let purpose else { return true }
-			return $0.p2pLink.purpose == purpose
+			return $0.p2pLink.connectionPurpose == purpose
 		}
 		for client in clients {
 			guard await client.hasAnyActiveConnections() else { continue }
@@ -165,7 +165,7 @@ extension RTCClients {
 	/// - Returns: Number of peers we sent the message to
 	private func broadcastRequest(
 		_ request: P2P.RTCOutgoingMessage.Request,
-		purpose: ConnectionPurpose? = nil
+		purpose: RadixConnectPurpose? = nil
 	) async throws -> Int {
 		guard let connectedClients = await connectedClients(purpose: purpose) else {
 			throw NoConnectedClients()
@@ -270,9 +270,9 @@ actor RTCClient {
 		self.id = p2pLink.connectionPassword
 		self.p2pLink = p2pLink
 		self.peerConnectionNegotiator = peerConnectionNegotiator
-		(incomingMessages, incomingMessagesContinuation) = AsyncStream.streamWithContinuation()
+		(incomingMessages, incomingMessagesContinuation) = AsyncStream.makeStream()
 
-		(disconnectedPeerConnection, disconnectedPeerConnectionContinuation) = AsyncStream.streamWithContinuation()
+		(disconnectedPeerConnection, disconnectedPeerConnectionContinuation) = AsyncStream.makeStream()
 
 		Task {
 			await listenForPeerConnections()

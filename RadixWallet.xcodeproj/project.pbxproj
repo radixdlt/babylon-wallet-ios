@@ -1126,6 +1126,7 @@
 		E7B7A0FD2BBBFB6100EEE900 /* HeaderListViewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B7A0FC2BBBFB6100EEE900 /* HeaderListViewContainer.swift */; };
 		E7B7A1052BC904E800EEE900 /* NewConnectionApproval+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B7A1042BC904E800EEE900 /* NewConnectionApproval+Reducer.swift */; };
 		E7B7A1072BC904EE00EEE900 /* NewConnectionApproval+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B7A1062BC904EE00EEE900 /* NewConnectionApproval+View.swift */; };
+		E7FAE65D2BF0F2EC00620273 /* NewConnectionFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7FAE65B2BF0F2EC00620273 /* NewConnectionFeatureTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -2223,6 +2224,7 @@
 		E7B7A0FC2BBBFB6100EEE900 /* HeaderListViewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderListViewContainer.swift; sourceTree = "<group>"; };
 		E7B7A1042BC904E800EEE900 /* NewConnectionApproval+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NewConnectionApproval+Reducer.swift"; sourceTree = "<group>"; };
 		E7B7A1062BC904EE00EEE900 /* NewConnectionApproval+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NewConnectionApproval+View.swift"; sourceTree = "<group>"; };
+		E7FAE65B2BF0F2EC00620273 /* NewConnectionFeatureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewConnectionFeatureTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -5995,6 +5997,7 @@
 				E6DBA28D2ADEBFB300A38425 /* MainFeatureTests */,
 				E6DBA28F2ADEBFB300A38425 /* SplashFeatureTests */,
 				E6DBA2932ADEBFB300A38425 /* DappInteractionFeatureTests */,
+				E7FAE65C2BF0F2EC00620273 /* NewConnectionFeatureTests */,
 				E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */,
 			);
 			path = Features;
@@ -6312,6 +6315,14 @@
 			path = NewConnectionApproval;
 			sourceTree = "<group>";
 		};
+		E7FAE65C2BF0F2EC00620273 /* NewConnectionFeatureTests */ = {
+			isa = PBXGroup;
+			children = (
+				E7FAE65B2BF0F2EC00620273 /* NewConnectionFeatureTests.swift */,
+			);
+			path = NewConnectionFeatureTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -6563,6 +6574,7 @@
 				4827520E2BDA5E50007854E0 /* TransactionClientTests.swift in Sources */,
 				E6DBA32A2ADEBFB300A38425 /* TestCase.swift in Sources */,
 				E6DBA3732ADEBFB300A38425 /* ROLAClientTests.swift in Sources */,
+				E7FAE65D2BF0F2EC00620273 /* NewConnectionFeatureTests.swift in Sources */,
 				E6DBA31F2ADEBFB300A38425 /* RadixConnectCustomData.swift in Sources */,
 				83EE47502AF027DF00155F03 /* AssetTransferDepositRuleTests.swift in Sources */,
 				E6DBA3462ADEBFB300A38425 /* DataToHexStringTests.swift in Sources */,
@@ -8329,7 +8341,7 @@
 			repositoryURL = "https://github.com/radixdlt/sargon";
 			requirement = {
 				kind = exactVersion;
-				version = 0.7.7;
+				version = 0.7.13;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
