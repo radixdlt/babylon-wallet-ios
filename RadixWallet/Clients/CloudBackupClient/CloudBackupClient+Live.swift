@@ -33,7 +33,7 @@ extension CloudBackupClient {
 				let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
 				let result: BackupResult.Result
 				do {
-					try await saveProfile(profile, existingRecord: existingRecord)
+					try await uploadProfileToICloud(profile, existingRecord: existingRecord)
 					result = .success
 				} catch CKError.accountTemporarilyUnavailable {
 					result = .temporarilyUnavailable
@@ -78,7 +78,7 @@ extension CloudBackupClient {
 
 		@discardableResult
 		@Sendable
-		func saveProfile(_ profile: Profile, existingRecord: CKRecord?) async throws -> CKRecord {
+		func uploadProfileToICloud(_ profile: Profile, existingRecord: CKRecord?) async throws -> CKRecord {
 			let fileManager = FileManager.default
 			let tempDirectoryURL = fileManager.temporaryDirectory
 			let fileURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
@@ -121,7 +121,7 @@ extension CloudBackupClient {
 						return nil
 					}
 
-					let savedRecord = try await saveProfile(profile, existingRecord: backedUpRecord)
+					let savedRecord = try await uploadProfileToICloud(profile, existingRecord: backedUpRecord)
 					// Migration completed, deleting old copy
 					try secureStorageClient.deleteProfile(profile.id)
 
@@ -146,7 +146,7 @@ extension CloudBackupClient {
 			backupProfile: {
 				let profile = await profileStore.profile
 				let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
-				return try await saveProfile(profile, existingRecord: existingRecord)
+				return try await uploadProfileToICloud(profile, existingRecord: existingRecord)
 			}
 		)
 	}
