@@ -277,7 +277,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		switch mode {
 		case let .dApp(dApp, persona: persona):
 			let updatedDapp = try await authorizedDappsClient.getDetailedDapp(dApp.dAppDefinitionAddress)
-			guard let updatedPersona = updatedDapp.detailedAuthorizedPersonas[id: persona.id] else {
+			let identifiedDetailedAuthorizedPersonas = updatedDapp.detailedAuthorizedPersonas.asIdentified()
+			guard let updatedPersona = identifiedDetailedAuthorizedPersonas[id: persona.id] else {
 				throw ReloadError.personaNotPresentInDapp(persona.id, updatedDapp.dAppDefinitionAddress)
 			}
 			return .dApp(updatedDapp, persona: updatedPersona)

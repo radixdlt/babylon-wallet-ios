@@ -15,7 +15,10 @@ extension AppPreferences {
 	/// Appends a new `P2PLink`, returns `nil` if it was not inserted (because already present).
 	@discardableResult
 	public mutating func appendP2PLink(_ p2pLink: P2PLink) -> P2PLink? {
-		self.p2pLinks.appendP2PLink(p2pLink)
+		var identifiedP2PLinks = p2pLinks.asIdentified()
+		let appended = identifiedP2PLinks.appendP2PLink(p2pLink)
+		p2pLinks = identifiedP2PLinks.elements
+		return appended
 	}
 }
 
@@ -23,11 +26,11 @@ extension P2PLinks {
 	/// Appends a new `P2PLink`, returns `nil` if it was not inserted (because already present).
 	@discardableResult
 	public mutating func appendP2PLink(_ link: P2PLink) -> P2PLink? {
-		guard !contains(id: link.id) else {
+		guard !contains(link) else {
 			return nil
 		}
 		append(link)
-		assert(contains(id: link.id))
+		assert(contains(link))
 		return link
 	}
 }

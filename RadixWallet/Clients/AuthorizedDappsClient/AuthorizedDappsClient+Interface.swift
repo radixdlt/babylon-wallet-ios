@@ -92,7 +92,9 @@ extension AuthorizedDappsClient {
 				authorizedPersonaSimple.sharedPersonaData.remove(ids: idsOfEntriesToDelete)
 
 				// Write back to `updatedAuthedDapp`
-				updatedAuthedDapp.referencesToAuthorizedPersonas[id: authorizedPersonaSimple.id] = authorizedPersonaSimple
+				var referencesToAuthorizedPersonas = updatedAuthedDapp.referencesToAuthorizedPersonas.asIdentified()
+				referencesToAuthorizedPersonas[id: authorizedPersonaSimple.id] = authorizedPersonaSimple
+				updatedAuthedDapp.referencesToAuthorizedPersonas = referencesToAuthorizedPersonas.elements
 
 				// Soundness check
 				if
@@ -100,7 +102,7 @@ extension AuthorizedDappsClient {
 					.isSuperset(
 						of:
 						updatedAuthedDapp
-							.referencesToAuthorizedPersonas[id: authorizedPersonaSimple.id]!
+							.referencesToAuthorizedPersonas.asIdentified()[id: authorizedPersonaSimple.id]!
 							.sharedPersonaData
 							.entryIDs
 					)

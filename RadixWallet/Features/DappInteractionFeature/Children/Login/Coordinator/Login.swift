@@ -170,7 +170,7 @@ struct Login: Sendable, FeatureReducer {
 					return nil
 				}
 				return personas.reduce(into: nil) { mostRecentlyAuthorizedPersona, currentPersona in
-					guard let currentAuthorizedPersona = authorizedDapp.referencesToAuthorizedPersonas[id: currentPersona.address] else {
+					guard let currentAuthorizedPersona = authorizedDapp.referencesToAuthorizedPersonas.asIdentified()[id: currentPersona.address] else {
 						return
 					}
 					if let mostRecentlyAuthorizedPersonaCopy = mostRecentlyAuthorizedPersona {
