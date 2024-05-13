@@ -1057,6 +1057,12 @@
 		A4CFB55F2BAA821E00778BDD /* HScrollBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4CFB55E2BAA821E00778BDD /* HScrollBar.swift */; };
 		A4CFB5612BAA826E00778BDD /* Measure+Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4CFB5602BAA826E00778BDD /* Measure+Position.swift */; };
 		A4EB37C82B6272F3003FE31D /* TrackedValidatorInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4EB37C72B6272F3003FE31D /* TrackedValidatorInteraction.swift */; };
+		A4ECE2722BEEAFFC00468BF6 /* SecurityCenterClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECE26E2BEEAFFC00468BF6 /* SecurityCenterClient+Interface.swift */; };
+		A4ECE2732BEEAFFC00468BF6 /* SecurityCenterClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECE26F2BEEAFFC00468BF6 /* SecurityCenterClient+Live.swift */; };
+		A4ECE2742BEEAFFC00468BF6 /* SecurityCenterClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECE2702BEEAFFC00468BF6 /* SecurityCenterClient+Test.swift */; };
+		A4ECE2792BEEB01800468BF6 /* CloudBackupClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECE2752BEEB01800468BF6 /* CloudBackupClient+Interface.swift */; };
+		A4ECE27A2BEEB01800468BF6 /* CloudBackupClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECE2762BEEB01800468BF6 /* CloudBackupClient+Live.swift */; };
+		A4ECE27B2BEEB01800468BF6 /* CloudBackupClient+Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4ECE2772BEEB01800468BF6 /* CloudBackupClient+Test.swift */; };
 		E62449D52AFBA61100272C67 /* Home+AccountRow+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */; };
 		E62449D62AFBA61100272C67 /* Home+AccountRow+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */; };
 		E62BB7632AEA856300D46DAC /* ImportMnemonicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */; };
@@ -2145,6 +2151,12 @@
 		A4CFB55E2BAA821E00778BDD /* HScrollBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HScrollBar.swift; sourceTree = "<group>"; };
 		A4CFB5602BAA826E00778BDD /* Measure+Position.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Measure+Position.swift"; sourceTree = "<group>"; };
 		A4EB37C72B6272F3003FE31D /* TrackedValidatorInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackedValidatorInteraction.swift; sourceTree = "<group>"; };
+		A4ECE26E2BEEAFFC00468BF6 /* SecurityCenterClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SecurityCenterClient+Interface.swift"; sourceTree = "<group>"; };
+		A4ECE26F2BEEAFFC00468BF6 /* SecurityCenterClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SecurityCenterClient+Live.swift"; sourceTree = "<group>"; };
+		A4ECE2702BEEAFFC00468BF6 /* SecurityCenterClient+Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SecurityCenterClient+Test.swift"; sourceTree = "<group>"; };
+		A4ECE2752BEEB01800468BF6 /* CloudBackupClient+Interface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CloudBackupClient+Interface.swift"; sourceTree = "<group>"; };
+		A4ECE2762BEEB01800468BF6 /* CloudBackupClient+Live.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CloudBackupClient+Live.swift"; sourceTree = "<group>"; };
+		A4ECE2772BEEB01800468BF6 /* CloudBackupClient+Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CloudBackupClient+Test.swift"; sourceTree = "<group>"; };
 		E62449D32AFBA61100272C67 /* Home+AccountRow+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+Reducer.swift"; sourceTree = "<group>"; };
 		E62449D42AFBA61100272C67 /* Home+AccountRow+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Home+AccountRow+View.swift"; sourceTree = "<group>"; };
 		E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportMnemonicTests.swift; sourceTree = "<group>"; };
@@ -4167,6 +4179,8 @@
 		48CFBF522ADC10D900E77A5C /* Clients */ = {
 			isa = PBXGroup;
 			children = (
+				A4ECE2782BEEB01800468BF6 /* CloudBackupClient */,
+				A4ECE2712BEEAFFC00468BF6 /* SecurityCenterClient */,
 				5B2A45002BD667FB00AEC8AD /* ContactSupportClient */,
 				5B9846BE2BBD5EF600E814F3 /* SensitiveInfoClient */,
 				5B1C4FD62BBB0C0100B9436F /* AppsFlyerClient */,
@@ -5793,6 +5807,26 @@
 			path = TransactionReviewDepositSetting;
 			sourceTree = "<group>";
 		};
+		A4ECE2712BEEAFFC00468BF6 /* SecurityCenterClient */ = {
+			isa = PBXGroup;
+			children = (
+				A4ECE26E2BEEAFFC00468BF6 /* SecurityCenterClient+Interface.swift */,
+				A4ECE26F2BEEAFFC00468BF6 /* SecurityCenterClient+Live.swift */,
+				A4ECE2702BEEAFFC00468BF6 /* SecurityCenterClient+Test.swift */,
+			);
+			path = SecurityCenterClient;
+			sourceTree = "<group>";
+		};
+		A4ECE2782BEEB01800468BF6 /* CloudBackupClient */ = {
+			isa = PBXGroup;
+			children = (
+				A4ECE2752BEEB01800468BF6 /* CloudBackupClient+Interface.swift */,
+				A4ECE2762BEEB01800468BF6 /* CloudBackupClient+Live.swift */,
+				A4ECE2772BEEB01800468BF6 /* CloudBackupClient+Test.swift */,
+			);
+			path = CloudBackupClient;
+			sourceTree = "<group>";
+		};
 		E634CA2C2AFD259000C43DB7 /* DebugKeychainContents */ = {
 			isa = PBXGroup;
 			children = (
@@ -6650,6 +6684,7 @@
 				4827521C2BDB9597007854E0 /* Persona+ShouldWriteDownMnemonic.swift in Sources */,
 				48CFC2FB2ADC10D900E77A5C /* NewPersonaCompletion+Reducer.swift in Sources */,
 				48CFC6222ADC10DA00E77A5C /* AssetTag.swift in Sources */,
+				A4ECE2722BEEAFFC00468BF6 /* SecurityCenterClient+Interface.swift in Sources */,
 				48CFC2A62ADC10D900E77A5C /* PersonaDetails.swift in Sources */,
 				48CFC4A42ADC10DA00E77A5C /* ValidatorUptimeCollectionItem.swift in Sources */,
 				83EE47822AF0EE3C00155F03 /* ProgrammaticScryptoSborValueU16.swift in Sources */,
@@ -6880,6 +6915,7 @@
 				48CFC3832ADC10D900E77A5C /* GeneralHelperViews.swift in Sources */,
 				48CFC34C2ADC10D900E77A5C /* OneTimePersonaData+View.swift in Sources */,
 				48CFC3F02ADC10D900E77A5C /* RTCPrimitive.swift in Sources */,
+				A4ECE27B2BEEB01800468BF6 /* CloudBackupClient+Test.swift in Sources */,
 				48CFC2C02ADC10D900E77A5C /* AssetTransfer+View.swift in Sources */,
 				48CFC2F82ADC10D900E77A5C /* InfoOfNewPersona+View.swift in Sources */,
 				48CFC3EC2ADC10D900E77A5C /* DataChannelMessage.swift in Sources */,
@@ -6938,6 +6974,7 @@
 				48CFC5B82ADC10DA00E77A5C /* DeveloperDisclaimerBanner.swift in Sources */,
 				48CFC4B62ADC10DA00E77A5C /* StateEntityMetadataPageResponse.swift in Sources */,
 				48CFC4742ADC10DA00E77A5C /* DeviceFactorSourceClient+Live.swift in Sources */,
+				A4ECE2792BEEB01800468BF6 /* CloudBackupClient+Interface.swift in Sources */,
 				48CFC5732ADC10DA00E77A5C /* Configuration.swift in Sources */,
 				48CFC5A42ADC10DA00E77A5C /* PrimaryTextButtonStyle.swift in Sources */,
 				83EE47862AF0EE3C00155F03 /* ProgrammaticScryptoSborValueMap.swift in Sources */,
@@ -7187,6 +7224,7 @@
 				48CFC3132ADC10D900E77A5C /* CompletionMigrateOlympiaAccountsToBabylon+View.swift in Sources */,
 				48CFC5512ADC10DA00E77A5C /* StateEntityDetailsResponseFungibleResourceDetails.swift in Sources */,
 				48CFC51C2ADC10DA00E77A5C /* MetadataI64ArrayValue.swift in Sources */,
+				A4ECE2732BEEAFFC00468BF6 /* SecurityCenterClient+Live.swift in Sources */,
 				48CFC56E2ADC10DA00E77A5C /* TransactionStatus.swift in Sources */,
 				48CFC5392ADC10DA00E77A5C /* NonFungibleResourcesCollectionItemVaultAggregated.swift in Sources */,
 				48CFC36D2ADC10D900E77A5C /* FungibleAssetList+Row+Reducer.swift in Sources */,
@@ -7275,6 +7313,7 @@
 				48CFC2F42ADC10D900E77A5C /* IntroductionToPersonas+View.swift in Sources */,
 				48CFC6142ADC10DA00E77A5C /* AccountsRequestItem.swift in Sources */,
 				48CFC5452ADC10DA00E77A5C /* ResultSetCursorMixin.swift in Sources */,
+				A4ECE2742BEEAFFC00468BF6 /* SecurityCenterClient+Test.swift in Sources */,
 				48CFC5BB2ADC10DA00E77A5C /* PlainListRow.swift in Sources */,
 				48CFC2AB2ADC10D900E77A5C /* Home.swift in Sources */,
 				48CFC42F2ADC10DA00E77A5C /* Tagged+Comparable.swift in Sources */,
@@ -7400,6 +7439,7 @@
 				48CFC5332ADC10DA00E77A5C /* StateEntityNonFungibleResourceVaultsPageRequest.swift in Sources */,
 				48CFC48A2ADC10DA00E77A5C /* OnLedgerEntitiesClient+CreateEntity.swift in Sources */,
 				48CFC6132ADC10DA00E77A5C /* AuthRequestItem.swift in Sources */,
+				A4ECE27A2BEEB01800468BF6 /* CloudBackupClient+Live.swift in Sources */,
 				8338B9E52AFAB20700D1D8EA /* TransactionFee.swift in Sources */,
 				48CFC28C2ADC10D900E77A5C /* TransactionReviewProofs.swift in Sources */,
 				48CFC5092ADC10DA00E77A5C /* MetadataInstantArrayValue.swift in Sources */,
