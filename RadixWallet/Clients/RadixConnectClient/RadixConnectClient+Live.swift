@@ -33,7 +33,6 @@ extension RadixConnectClient {
 		func sendAccountListMessageAfterConnect() {
 			Task {
 				let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
-                try? await Task.sleep(for: .milliseconds(100))
 				try await sendAccountListMessage(accounts: accounts)
 			}
 		}
