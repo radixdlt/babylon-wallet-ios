@@ -70,7 +70,7 @@ extension RadixConnectClient {
 			await rtcClients.connectClients().map { connectedClients in
 				let links = await p2pLinksClient.getP2PLinks()
 				return connectedClients.compactMap { (clientUpdate: P2P.ClientConnectionsUpdate) -> P2P.LinkConnectionUpdate? in
-					guard let link = links.first(where: { $0.connectionPassword.hash() == clientUpdate.clientID }) else {
+					guard let link = links.first(where: { $0.clientID == clientUpdate.clientID }) else {
 						return nil
 					}
 					return P2P.LinkConnectionUpdate(
@@ -116,7 +116,7 @@ extension RadixConnectClient {
 				let links = await p2pLinksClient.getP2PLinks()
 
 				return connectedClients.flatMap { connectedClient -> [PeerConnectionID] in
-					guard links.contains(where: { $0.connectionPassword.hash() == connectedClient.clientID }) else { return [] }
+					guard links.contains(where: { $0.clientID == connectedClient.clientID }) else { return [] }
 					return connectedClient.idsOfConnectedPeerConnections
 				}
 			},
