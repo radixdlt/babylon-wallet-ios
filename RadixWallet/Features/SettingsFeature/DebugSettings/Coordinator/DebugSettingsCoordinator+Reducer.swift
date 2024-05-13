@@ -94,7 +94,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 
 		case .debugInspectProfileButtonTapped:
 			return .run { send in
-				let profile = await appPreferencesClient.extractProfileSnapshot()
+				let profile = await appPreferencesClient.extractProfile()
 				await send(.internal(.profileToDebugLoaded(profile)))
 			}
 

@@ -10,6 +10,9 @@ public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case transactionsCompletedCounter
 	case dateOfLastSubmittedNPSSurvey
 	case npsSurveyUserID
+	case didMigrateKeychainProfiles
+	case lastCloudBackups
+	case lastManualBackups
 
 	/// DO NOT CHANGE THIS KEY
 	case activeProfileID
@@ -137,5 +140,72 @@ extension UserDefaults.Dependency {
 
 	public func setNPSSurveyUserId(_ id: UUID) {
 		set(id.uuidString, forKey: Key.npsSurveyUserID.rawValue)
+	}
+
+	public var getDidMigrateKeychainProfiles: Bool {
+		bool(key: .didMigrateKeychainProfiles)
+	}
+
+	public func setDidMigrateKeychainProfiles(_ value: Bool) {
+		set(value, forKey: Key.didMigrateKeychainProfiles.rawValue)
+	}
+
+	public var getLastCloudBackups: [UUID: BackupResult] {
+		(try? loadCodable(key: .lastCloudBackups)) ?? [:]
+	}
+
+	public func setLastCloudBackup(_ result: BackupResult.Result, of profile: Profile) throws {
+		var backups: [UUID: BackupResult] = getLastCloudBackups
+		backups[profile.id] = .init(
+			backupDate: .now,
+			profileHash: profile.hashValue,
+			result: result
+		)
+
+		try save(codable: backups, forKey: .lastCloudBackups)
+	}
+
+	public func lastCloudBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<BackupResult> {
+		lastBackupValues(for: profileID, key: .lastCloudBackups)
+	}
+
+	public var getLastManualBackups: [UUID: BackupResult] {
+		(try? loadCodable(key: .lastManualBackups)) ?? [:]
+	}
+
+	/// Only call this on successful manual backups
+	public func setLastManualBackup(of profile: Profile) throws {
+		var backups: [UUID: BackupResult] = getLastManualBackups
+		backups[profile.id] = .init(
+			backupDate: .now,
+			profileHash: profile.hashValue,
+			result: .success
+		)
+
+		try save(codable: backups, forKey: .lastManualBackups)
+	}
+
+	public func lastManualBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<BackupResult> {
+		lastBackupValues(for: profileID, key: .lastManualBackups)
+	}
+
+	private func lastBackupValues<T: Codable & Sendable>(for profileID: ProfileID, key: UserDefaultsKey) -> AnyAsyncSequence<T> {
+		codableValues(key: key, codable: [UUID: T].self)
+			.compactMap { (try? $0.get())?[profileID] }
+			.eraseToAnyAsyncSequence()
+	}
+}
+
+// MARK: - BackupResult
+public struct BackupResult: Codable, Sendable {
+	public let backupDate: Date
+	public let profileHash: Int
+	public let result: Result
+
+	public enum Result: Codable, Sendable {
+		case success
+		case temporarilyUnavailable
+		case notAuthenticated
+		case failure
 	}
 }
