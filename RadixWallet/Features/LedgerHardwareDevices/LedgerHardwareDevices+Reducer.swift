@@ -94,7 +94,7 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
-	@Dependency(\.p2pLinksClient) var p2pLinksClient
+	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
@@ -166,15 +166,11 @@ public struct LedgerHardwareDevices: Sendable, FeatureReducer {
 			case let .newConnection(connectedClient):
 				state.destination = nil
 				return .run { _ in
-					try await p2pLinksClient.addP2PLink(connectedClient)
+					try await radixConnectClient.updateOrAddP2PLink(connectedClient)
 				} catch: { error, _ in
 					loggerGlobal.error("Failed P2PLink, error \(error)")
 					errorQueue.schedule(error)
 				}
-
-			case .dismiss:
-				state.destination = nil
-				return .none
 			}
 
 		case let .addNewLedger(.delegate(newLedgerAction)):

@@ -4,15 +4,73 @@ import Network
 extension RadixConnectClient {
 	public static let liveValue: Self = {
 		@Dependency(\.p2pLinksClient) var p2pLinksClient
+		@Dependency(\.accountsClient) var accountsClient
+		@Dependency(\.jsonEncoder) var jsonEncoder
 
+		let userDefaults = UserDefaults.Dependency.radix // FIXME: find a better way to ensure we use the same userDefaults everywhere
 		let rtcClients = RTCClients()
 		let localNetworkAuthorization = LocalNetworkAuthorization()
+
+		Task {
+			for try await accounts in await accountsClient.accountsOnCurrentNetwork() {
+				guard !Task.isCancelled else { return }
+				try await sendAccountListMessage(accounts: accounts)
+			}
+		}
+
+		Task {
+			let connectedClients = await rtcClients.connectClients()
+				.filter { updates in
+					!updates.flatMap(\.idsOfConnectedPeerConnections).isEmpty
+				}
+			for try await updates in connectedClients {
+				guard !Task.isCancelled else { return }
+				sendAccountListMessageAfterConnect()
+			}
+		}
+
+		@Sendable
+		func sendAccountListMessageAfterConnect() {
+			Task {
+				let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
+				// FIXME: Investigate why this delay is needed. [Slack discussion](https://rdxworks.slack.com/archives/C03QFAWBRNX/p1715583069664349)
+				try? await Task.sleep(for: .milliseconds(500))
+				try await sendAccountListMessage(accounts: accounts)
+			}
+		}
+
+		@Sendable
+		func sendAccountListMessage(accounts: Accounts) async throws {
+			let encoder = jsonEncoder()
+			let accounts = accounts.map {
+				P2P.Dapp.Response.WalletAccount(
+					accountAddress: $0.address,
+					label: $0.displayName,
+					appearanceId: $0.appearanceID
+				)
+			}
+			let accountListMessage = P2P.ConnectorExtension.Request.AccountListMessage(
+				discriminator: .accountList,
+				accounts: accounts
+			)
+
+			/// The keys in the JSON will be sorted alphabetically before encoding, ensuring consistent hashing
+			encoder.outputFormatting = .sortedKeys
+
+			let accountsHash = try encoder.encode(accountListMessage).hash().hex
+
+			/// Send `AccountListMessage` to CE only if `accountsHash` has changed
+			guard userDefaults.getLastSyncedAccountsWithCE() != accountsHash else { return }
+
+			_ = try await rtcClients.sendRequest(.connectorExtension(.accountListMessage(accountListMessage)), strategy: .broadcastToAllPeersWith(purpose: .general))
+			userDefaults.setLastSyncedAccountsWithCE(accountsHash)
+		}
 
 		let getP2PLinksWithConnectionStatusUpdates: GetP2PLinksWithConnectionStatusUpdates = {
 			await rtcClients.connectClients().map { connectedClients in
 				let links = await p2pLinksClient.getP2PLinks()
 				return connectedClients.compactMap { (clientUpdate: P2P.ClientConnectionsUpdate) -> P2P.LinkConnectionUpdate? in
-					guard let link = links.first(where: { $0.id == clientUpdate.clientID }) else {
+					guard let link = links.first(where: { $0.clientID == clientUpdate.clientID }) else {
 						return nil
 					}
 					return P2P.LinkConnectionUpdate(
@@ -27,9 +85,7 @@ extension RadixConnectClient {
 
 		let connectToP2PLinks: ConnectToP2PLinks = { links in
 			for client in links {
-				try await rtcClients.connect(
-					client.connectionPassword
-				)
+				try await rtcClients.connect(client, isNewConnection: false)
 			}
 		}
 
@@ -60,20 +116,29 @@ extension RadixConnectClient {
 				let links = await p2pLinksClient.getP2PLinks()
 
 				return connectedClients.flatMap { connectedClient -> [PeerConnectionID] in
-					guard links.contains(where: { $0.id == connectedClient.clientID }) else { return [] }
+					guard links.contains(where: { $0.clientID == connectedClient.clientID }) else { return [] }
 					return connectedClient.idsOfConnectedPeerConnections
 				}
 			},
-			storeP2PLink: { client in
-				try await p2pLinksClient.addP2PLink(client)
+			updateOrAddP2PLink: { client in
+				if let oldLink = try await p2pLinksClient.updateOrAddP2PLink(client) {
+					await rtcClients.disconnectAndRemoveClient(oldLink.connectionPassword)
+				}
 			},
 			deleteP2PLinkByPassword: { password in
 				loggerGlobal.info("Deleting P2P Connection")
 				try await p2pLinksClient.deleteP2PLinkByPassword(password)
 				await rtcClients.disconnectAndRemoveClient(password)
 			},
-			addP2PWithPassword: { password in
-				try await rtcClients.connect(password, waitsForConnectionToBeEstablished: true)
+			connectP2PLink: { p2pLink in
+				try await rtcClients.connect(
+					p2pLink,
+					isNewConnection: true,
+					waitsForConnectionToBeEstablished: true
+				)
+
+				/// Clear `lastSyncedAccountsWithCE` after a new connection is made, in order to send `AccountListMessage` to CE
+				userDefaults.remove(.lastSyncedAccountsWithCE)
 			},
 			receiveMessages: { await rtcClients.incomingMessages() },
 			sendResponse: { response, route in

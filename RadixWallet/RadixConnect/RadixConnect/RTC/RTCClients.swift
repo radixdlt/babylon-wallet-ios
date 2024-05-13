@@ -69,14 +69,15 @@ extension RTCClients {
 	// MARK: - Public API
 
 	public func connect(
-		_ linkPassword: RadixConnectPassword,
+		_ p2pLink: P2PLink,
+		isNewConnection: Bool,
 		waitsForConnectionToBeEstablished: Bool = false
 	) async throws {
-		guard !clients.contains(where: { $0.key == linkPassword }) else {
-			loggerGlobal.notice("Ignored connecting RTCClient with connectionPassword/id: \(linkPassword), since it is already in RTCClients.clients")
+		guard !clients.contains(where: { $0.key == p2pLink.connectionPassword }) else {
+			loggerGlobal.notice("Ignored connecting RTCClient with connectionPassword/id: \(p2pLink.connectionPassword), since it is already in RTCClients.clients")
 			return
 		}
-		let client = try makeRTCClient(linkPassword)
+		let client = try makeRTCClient(p2pLink, isNewConnection: isNewConnection)
 		if waitsForConnectionToBeEstablished {
 			try await client.waitForFirstConnection()
 		}
@@ -116,7 +117,11 @@ extension RTCClients {
 			loggerGlobal.info("RTCClients: No Active Peer Connection to send back message to, creating anew")
 			await disconnectAndRemoveClient(origin.connectionId)
 			// missing client, create anew
-			try await connect(origin.connectionId, waitsForConnectionToBeEstablished: true)
+			try await connect(
+				origin.p2pLink,
+				isNewConnection: false,
+				waitsForConnectionToBeEstablished: true
+			)
 			try await clients[origin.connectionId]?.send(response: response, to: origin.peerConnectionId)
 			loggerGlobal.info("RTCClients: Did send message over freshly established PeerConnection")
 			return
@@ -141,12 +146,18 @@ extension RTCClients {
 		switch sendStrategy {
 		case .broadcastToAllPeers:
 			try await broadcastRequest(request)
+		case let .broadcastToAllPeersWith(purpose):
+			try await broadcastRequest(request, purpose: purpose)
 		}
 	}
 
-	private func connectedClients() async -> NonEmpty<[RTCClient]>? {
+	private func connectedClients(purpose: RadixConnectPurpose?) async -> NonEmpty<[RTCClient]>? {
 		var connectedClient = [RTCClient]()
-		for client in clients.values {
+		let clients = clients.values.filter {
+			guard let purpose else { return true }
+			return $0.p2pLink.connectionPurpose == purpose
+		}
+		for client in clients {
 			guard await client.hasAnyActiveConnections() else { continue }
 			connectedClient.append(client)
 		}
@@ -158,9 +169,10 @@ extension RTCClients {
 	///   - request: request to send
 	/// - Returns: Number of peers we sent the message to
 	private func broadcastRequest(
-		_ request: P2P.RTCOutgoingMessage.Request
+		_ request: P2P.RTCOutgoingMessage.Request,
+		purpose: RadixConnectPurpose? = nil
 	) async throws -> Int {
-		guard let connectedClients = await connectedClients() else {
+		guard let connectedClients = await connectedClients(purpose: purpose) else {
 			throw NoConnectedClients()
 		}
 		return try await withThrowingTaskGroup(of: Int.self, returning: Int.self) { group in
@@ -207,17 +219,22 @@ extension RTCClients {
 		self.clients[client.id] = client
 	}
 
-	func makeRTCClient(_ password: RadixConnectPassword) throws -> RTCClient {
+	func makeRTCClient(
+		_ p2pLink: P2PLink,
+		isNewConnection: Bool
+	) throws -> RTCClient {
 		let signalingClient = try SignalingClient(
-			password: password,
+			password: p2pLink.connectionPassword,
 			baseURL: signalingServerBaseURL
 		)
 		let negotiator = PeerConnectionNegotiator(
+			p2pLink: p2pLink,
+			isNewConnection: isNewConnection,
 			signalingClient: signalingClient,
 			factory: peerConnectionFactory
 		)
 		let client = RTCClient(
-			id: password,
+			p2pLink: p2pLink,
 			peerConnectionNegotiator: negotiator
 		)
 
@@ -231,6 +248,7 @@ struct NoConnectedClients: Swift.Error {}
 // MARK: - RTCClient
 actor RTCClient {
 	let id: ID
+	let p2pLink: P2PLink
 
 	let incomingMessages: AsyncStream<P2P.RTCIncomingMessage>
 	private let incomingMessagesContinuation: AsyncStream<P2P.RTCIncomingMessage>.Continuation
@@ -255,14 +273,15 @@ actor RTCClient {
 	private var disconnectTask: Task<Void, Never>?
 
 	init(
-		id: ID,
+		p2pLink: P2PLink,
 		peerConnectionNegotiator: PeerConnectionNegotiator
 	) {
-		self.id = id
+		self.id = p2pLink.connectionPassword
+		self.p2pLink = p2pLink
 		self.peerConnectionNegotiator = peerConnectionNegotiator
-		(incomingMessages, incomingMessagesContinuation) = AsyncStream.streamWithContinuation()
+		(incomingMessages, incomingMessagesContinuation) = AsyncStream.makeStream()
 
-		(disconnectedPeerConnection, disconnectedPeerConnectionContinuation) = AsyncStream.streamWithContinuation()
+		(disconnectedPeerConnection, disconnectedPeerConnectionContinuation) = AsyncStream.makeStream()
 
 		Task {
 			await listenForPeerConnections()
@@ -379,7 +398,7 @@ extension RTCClient {
 		await connection
 			.receivedMessagesStream()
 			.map { (messageResult: Result<DataChannelClient.AssembledMessage, Error>) in
-				let route = P2P.RTCRoute(connectionId: self.id, peerConnectionId: connection.id)
+				let route = P2P.RTCRoute(p2pLink: self.p2pLink, peerConnectionId: connection.id)
 				return P2P.RTCIncomingMessage(
 					result: decode(messageResult),
 					route: .rtc(route)

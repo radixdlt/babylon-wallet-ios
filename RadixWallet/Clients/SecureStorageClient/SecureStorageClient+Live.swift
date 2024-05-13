@@ -361,6 +361,62 @@ extension SecureStorageClient: DependencyKey {
 			try? keychainClient.removeData(forKey: deviceIdentifierKey)
 		}
 
+		@Sendable func loadP2PLinks() throws -> P2PLinks? {
+			let loaded = try keychainClient
+				.getDataWithoutAuth(forKey: p2pLinksKey)
+				.map {
+					try jsonDecoder().decode(P2PLinks.self, from: $0)
+				}
+
+			if let loaded {
+				loggerGlobal.trace("Loaded loadP2PLinks: \(loaded)")
+			} else {
+				loggerGlobal.info("No loadP2PLinks loaded, was nil.")
+			}
+			return loaded
+		}
+
+		let p2pLinksAttributes = KeychainClient.AttributesWithoutAuth(
+			iCloudSyncEnabled: false,
+			accessibility: .whenUnlocked,
+			label: importantKeychainIdentifier("Radix Wallet P2P Links"),
+			comment: "Contains linked connector extensions"
+		)
+
+		@Sendable func saveP2PLinks(_ p2pLinks: P2PLinks) throws {
+			let data = try jsonEncoder().encode(p2pLinks)
+			try keychainClient.setDataWithoutAuth(
+				data,
+				forKey: p2pLinksKey,
+				attributes: p2pLinksAttributes
+			)
+			loggerGlobal.notice("Saved p2pLinks: \(p2pLinks)")
+		}
+
+		@Sendable func loadP2PLinksPrivateKey() throws -> Curve25519.PrivateKey? {
+			try keychainClient
+				.getDataWithoutAuth(forKey: p2pLinksPrivateKey)
+				.map {
+					try Curve25519.PrivateKey(rawRepresentation: $0)
+				}
+		}
+
+		let p2pLinksPrivateKeyAttributes = KeychainClient.AttributesWithoutAuth(
+			iCloudSyncEnabled: false,
+			accessibility: .whenUnlocked,
+			label: importantKeychainIdentifier("Radix Wallet Private Key Per P2P link"),
+			comment: "Contains a wallet private key for a specific P2P link"
+		)
+
+		@Sendable func saveP2PLinksPrivateKey(privateKey: Curve25519.PrivateKey) throws {
+			try keychainClient.setDataWithoutAuth(
+				privateKey.rawRepresentation,
+				forKey: p2pLinksPrivateKey,
+				attributes: p2pLinksPrivateKeyAttributes
+			)
+			loggerGlobal.notice("Saved p2pLinksPrivateKeyKey")
+		}
+
 		#if DEBUG
 		return Self(
 			saveProfileSnapshot: saveProfileSnapshot,
@@ -381,6 +437,10 @@ extension SecureStorageClient: DependencyKey {
 			saveDeviceInfo: saveDeviceInfo,
 			deprecatedLoadDeviceID: deprecatedLoadDeviceID,
 			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID,
+			loadP2PLinks: loadP2PLinks,
+			saveP2PLinks: saveP2PLinks,
+			loadP2PLinksPrivateKey: loadP2PLinksPrivateKey,
+			saveP2PLinksPrivateKey: saveP2PLinksPrivateKey,
 			getAllMnemonics: getAllMnemonics
 		)
 		#else
@@ -402,7 +462,11 @@ extension SecureStorageClient: DependencyKey {
 			loadDeviceInfo: loadDeviceInfo,
 			saveDeviceInfo: saveDeviceInfo,
 			deprecatedLoadDeviceID: deprecatedLoadDeviceID,
-			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID
+			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID,
+			loadP2PLinks: loadP2PLinks,
+			saveP2PLinks: saveP2PLinks,
+			loadP2PLinksPrivateKey: loadP2PLinksPrivateKey,
+			saveP2PLinksPrivateKey: saveP2PLinksPrivateKey
 		)
 		#endif
 	}()
@@ -412,6 +476,8 @@ let profileHeaderListKeychainKey: KeychainClient.Key = "profileHeaderList"
 @available(*, deprecated, renamed: "deviceInfoKey", message: "Migrate to use `deviceInfoKey` instead")
 private let deviceIdentifierKey: KeychainClient.Key = "deviceIdentifier"
 private let deviceInfoKey: KeychainClient.Key = "deviceInfo"
+private let p2pLinksKey: KeychainClient.Key = "p2pLinks"
+private let p2pLinksPrivateKey: KeychainClient.Key = "p2pLinksPrivateKey"
 
 extension ProfileID {
 	private static let profileSnapshotKeychainKeyPrefix = "profileSnapshot"

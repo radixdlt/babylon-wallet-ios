@@ -33,6 +33,8 @@ struct PeerConnectionNegotiator {
 	private let factory: PeerConnectionFactory
 
 	init(
+		p2pLink: P2PLink,
+		isNewConnection: Bool,
 		signalingClient: SignalingClient,
 		factory: PeerConnectionFactory,
 		isOfferer: Bool = false
@@ -40,10 +42,12 @@ struct PeerConnectionNegotiator {
 		self.signalingClient = signalingClient
 		self.factory = factory
 
-		let (negotiationResultsStream, negotiationResultsContinuation) = AsyncStream<NegotiationResult>.streamWithContinuation()
+		let (negotiationResultsStream, negotiationResultsContinuation) = AsyncStream<NegotiationResult>.makeStream()
 		self.negotiationResults = negotiationResultsStream.eraseToAnyAsyncSequence().share().eraseToAnyAsyncSequence()
 		self.negotiationResultsContinuation = negotiationResultsContinuation
 		self.negotiationTask = Self.listenForNegotiationTriggers(
+			p2pLink: p2pLink,
+			isNewConnection: isNewConnection,
 			signalingClient: signalingClient,
 			factory: factory,
 			isOfferer: isOfferer,
@@ -60,6 +64,8 @@ extension PeerConnectionNegotiator {
 	}
 
 	private static func listenForNegotiationTriggers(
+		p2pLink: P2PLink,
+		isNewConnection: Bool,
 		signalingClient: SignalingClient,
 		factory: PeerConnectionFactory,
 		isOfferer: Bool,
@@ -69,6 +75,8 @@ extension PeerConnectionNegotiator {
 			do {
 				let peerConnection = try await negotiatePeerConnection(
 					trigger,
+					p2pLink: p2pLink,
+					isNewConnection: isNewConnection,
 					signalingServerClient: signalingClient,
 					factory: factory
 				)
@@ -111,6 +119,8 @@ extension PeerConnectionNegotiator {
 
 	private static func negotiatePeerConnection(
 		_ trigger: NegotiationTrigger,
+		p2pLink: P2PLink,
+		isNewConnection: Bool,
 		signalingServerClient: SignalingClient,
 		factory: PeerConnectionFactory
 	) async throws -> PeerConnectionClient {
@@ -188,10 +198,40 @@ extension PeerConnectionNegotiator {
 
 		_ = try await onConnectionEstablished.collect()
 		_ = try await onDataChannelReady.collect()
+
+		if isNewConnection {
+			try await sendLinkClientInteractionResponse(peerConnectionClient: peerConnectionClient, p2pLink: p2pLink) {
+				log("Sent LinkClientInteractionResponse")
+			}
+		}
+
 		log("Connection established")
 		iceExchangeTask.cancel()
 
 		return peerConnectionClient
+	}
+
+	private static func sendLinkClientInteractionResponse(
+		peerConnectionClient: PeerConnectionClient,
+		p2pLink: P2PLink,
+		onSuccess: () -> Void
+	) async throws {
+		@Dependency(\.p2pLinksClient) var p2pLinkClient
+		@Dependency(\.jsonEncoder) var jsonEncoder
+
+		let (privateKey, isNewPrivateKey) = try await p2pLinkClient.getP2PLinkPrivateKey()
+		let hashedMessageToSign = p2pLink.connectionPassword.messageHash.data
+		let linkClientInteractionResponse = try P2P.ConnectorExtension.Request.LinkClientInteractionResponse(
+			discriminator: .linkClient,
+			publicKey: .init(bytes: privateKey.publicKey.compressedRepresentation),
+			signature: .init(bytes: privateKey.signature(for: hashedMessageToSign))
+		)
+		try await peerConnectionClient.sendData(jsonEncoder().encode(linkClientInteractionResponse))
+		onSuccess()
+
+		if isNewPrivateKey {
+			try await p2pLinkClient.storeP2PLinkPrivateKey(privateKey)
+		}
 	}
 
 	private static func tracePeerConnectionNegotiation(_ id: RemoteClientID) -> @Sendable (_ info: String) -> Void {
