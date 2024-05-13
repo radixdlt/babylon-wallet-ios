@@ -33,6 +33,8 @@ extension RadixConnectClient {
 		func sendAccountListMessageAfterConnect() {
 			Task {
 				let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
+				// FIXME: Investigate why this delay is needed. [Slack discussion](https://rdxworks.slack.com/archives/C03QFAWBRNX/p1715583069664349)
+				try? await Task.sleep(for: .milliseconds(500))
 				try await sendAccountListMessage(accounts: accounts)
 			}
 		}
