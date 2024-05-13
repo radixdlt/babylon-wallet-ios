@@ -48,8 +48,8 @@ extension SecurityCenterClient {
 					let enabled = profile.appPreferences.security.isCloudProfileSyncEnabled
 					var result: [SecurityProblem] = []
 
-					func problem3() -> (accounts: Int, personas: Int) {
-						(accounts: 0, personas: 0)
+					func problem3() async -> (accounts: Int, personas: Int) {
+						await (try? deviceFactorSourceClient.unrecoverableEntitiesCount()) ?? (0, 0)
 					}
 
 					func hasProblem5() -> Bool {
@@ -72,7 +72,7 @@ extension SecurityCenterClient {
 						await (try? deviceFactorSourceClient.isSeedPhraseNeededToRecoverAccounts()) ?? false
 					}
 
-					let problem3 = problem3()
+					let problem3 = await problem3()
 					if (problem3.accounts + problem3.personas) > 0 {
 						result.append(.problem3(accounts: problem3.accounts, personas: problem3.personas))
 					}
