@@ -14,6 +14,7 @@ public struct Settings: Sendable, FeatureReducer {
 		public var destination: Destination.State?
 
 		public var userHasNoP2PLinks: Bool? = nil
+		public var securityProblems: [SecurityProblem] = []
 
 		public init() {}
 	}
@@ -34,6 +35,7 @@ public struct Settings: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		case loadedP2PLinks(P2PLinks)
+		case loadedSecurityProblems([SecurityProblem])
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -88,6 +90,7 @@ public struct Settings: Sendable, FeatureReducer {
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.p2pLinksClient) var p2pLinksClient
+	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.userDefaults) var userDefaults
 
@@ -104,6 +107,7 @@ public struct Settings: Sendable, FeatureReducer {
 		switch viewAction {
 		case .appeared:
 			return loadP2PLinks()
+				.merge(with: loadSecurityProblems())
 
 		case .addConnectorButtonTapped:
 			state.destination = .manageP2PLinks(.init(destination: .newConnection(.init())))
@@ -144,6 +148,9 @@ public struct Settings: Sendable, FeatureReducer {
 		case let .loadedP2PLinks(clients):
 			state.userHasNoP2PLinks = clients.isEmpty
 			return .none
+		case let .loadedSecurityProblems(problems):
+			state.securityProblems = problems
+			return .none
 		}
 	}
 
@@ -175,6 +182,15 @@ extension Settings {
 			await send(.internal(.loadedP2PLinks(
 				p2pLinksClient.getP2PLinks()
 			)))
+		}
+	}
+
+	private func loadSecurityProblems() -> Effect<Action> {
+		.run { send in
+			for try await problems in await securityCenterClient.problems() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.loadedSecurityProblems(problems)))
+			}
 		}
 	}
 }

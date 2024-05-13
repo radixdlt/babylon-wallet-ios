@@ -48,6 +48,10 @@ extension SecurityCenterClient {
 					let enabled = profile.appPreferences.security.isCloudProfileSyncEnabled
 					var result: [SecurityProblem] = []
 
+					func problem3() -> (accounts: Int, personas: Int) {
+						(accounts: 0, personas: 0)
+					}
+
 					func hasProblem5() -> Bool {
 						if let cloudBackup {
 							!cloudBackup.success
@@ -66,6 +70,11 @@ extension SecurityCenterClient {
 
 					func hasProblem9() async -> Bool {
 						await (try? deviceFactorSourceClient.isSeedPhraseNeededToRecoverAccounts()) ?? false
+					}
+
+					let problem3 = problem3()
+					if (problem3.accounts + problem3.personas) > 0 {
+						result.append(.problem3(accounts: problem3.accounts, personas: problem3.personas))
 					}
 
 					if hasProblem5() { result.append(.problem5) }

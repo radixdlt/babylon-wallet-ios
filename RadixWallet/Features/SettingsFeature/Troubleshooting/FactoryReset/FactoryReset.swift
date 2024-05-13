@@ -60,6 +60,7 @@ public struct FactoryReset: Sendable, FeatureReducer {
 	@Dependency(\.cacheClient) var cacheClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.userDefaults) var userDefaults
+	@Dependency(\.securityCenterClient) var securityCenterClient
 
 	public init() {}
 
@@ -104,10 +105,11 @@ public struct FactoryReset: Sendable, FeatureReducer {
 
 	private func loadIsRecoverable() -> Effect<Action> {
 		.run { send in
-			// TODO: Update with actual logic once from SecurityCenterClient once this PR is merged
-			// A wallet is recoverable if it doesn't have problems 5, 6 or 7.
-			// https://github.com/radixdlt/babylon-wallet-ios/pull/1106
-			await send(.internal(.loadedIsRecoverable(false)))
+			for try await problems in await securityCenterClient.problems() {
+				guard !Task.isCancelled else { return }
+				let isRecoverable = !problems.contains(.problem5) && !problems.contains(.problem6) && !problems.contains(.problem7)
+				await send(.internal(.loadedIsRecoverable(isRecoverable)))
+			}
 		}
 	}
 }
