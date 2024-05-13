@@ -153,8 +153,8 @@ extension P2P.ConnectorExtension.Request {
 		}
 
 		public let discriminator: Discriminator
-		public let publicKey: Exactly32Bytes
-		public let signature: HexCodable
+		public let publicKey: Ed25519PublicKey
+		public let signature: Ed25519Signature
 	}
 
 	public struct AccountListMessage: Sendable, Hashable, Encodable {
