@@ -153,17 +153,10 @@ private extension StoreOf<AccountPreferences> {
 private extension View {
 	func destination(store: StoreOf<AccountPreferences>) -> some View {
 		let destinationStore = store.destination
-		return adddresDetail(with: destinationStore)
-			.updateAccountLabel(with: destinationStore)
+		return updateAccountLabel(with: destinationStore)
 			.thirdPartyDeposits(with: destinationStore)
 			.devAccountPreferences(with: destinationStore)
 			.confirmHideAccountAlert(with: destinationStore)
-	}
-
-	private func adddresDetail(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {
-		sheet(store: destinationStore.scope(state: \.addressDetails, action: \.addressDetails)) {
-			AddressDetails.View(store: $0)
-		}
 	}
 
 	private func updateAccountLabel(with destinationStore: PresentationStoreOf<AccountPreferences.Destination>) -> some View {

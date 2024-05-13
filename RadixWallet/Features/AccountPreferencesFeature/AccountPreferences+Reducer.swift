@@ -25,7 +25,6 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case qrCodeButtonTapped
 		case rowTapped(AccountPreferences.Section.SectionRow)
 		case hideAccountTapped
 		case faucetButtonTapped
@@ -47,7 +46,6 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 	public struct Destination: DestinationReducer {
 		@CasePathable
 		public enum State: Hashable, Sendable {
-			case addressDetails(AddressDetails.State)
 			case updateAccountLabel(UpdateAccountLabel.State)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.State)
 			case devPreferences(DevAccountPreferences.State)
@@ -56,7 +54,6 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 		@CasePathable
 		public enum Action: Equatable, Sendable {
-			case addressDetails(AddressDetails.Action)
 			case updateAccountLabel(UpdateAccountLabel.Action)
 			case thirdPartyDeposits(ManageThirdPartyDeposits.Action)
 			case devPreferences(DevAccountPreferences.Action)
@@ -69,9 +66,6 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.addressDetails, action: /Action.addressDetails) {
-				AddressDetails()
-			}
 			Scope(state: /State.updateAccountLabel, action: /Action.updateAccountLabel) {
 				UpdateAccountLabel()
 			}
@@ -113,10 +107,6 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 				}
 			}
 			.merge(with: state.isOnMainnet ? .none : loadIsAllowedToUseFaucet(&state))
-
-		case .qrCodeButtonTapped:
-			state.destination = .addressDetails(.init(address: .account(state.account.address, isLedgerHWAccount: state.account.isLedgerControlled)))
-			return .none
 
 		case let .rowTapped(row):
 			return destination(for: row, &state)
@@ -175,13 +165,6 @@ public struct AccountPreferences: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .addressDetails(.delegate(.dismiss)):
-			if case .addressDetails = state.destination {
-				state.destination = nil
-			}
-			return .none
-		case .addressDetails:
-			return .none
 		case .updateAccountLabel(.delegate(.accountLabelUpdated)),
 		     .thirdPartyDeposits(.delegate(.accountUpdated)):
 			state.destination = nil
