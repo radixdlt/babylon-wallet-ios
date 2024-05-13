@@ -70,13 +70,14 @@ extension RTCClients {
 
 	public func connect(
 		_ p2pLink: P2PLink,
+		isNewConnection: Bool,
 		waitsForConnectionToBeEstablished: Bool = false
 	) async throws {
 		guard !clients.contains(where: { $0.key == p2pLink.connectionPassword }) else {
 			loggerGlobal.notice("Ignored connecting RTCClient with connectionPassword/id: \(p2pLink.connectionPassword), since it is already in RTCClients.clients")
 			return
 		}
-		let client = try makeRTCClient(p2pLink)
+		let client = try makeRTCClient(p2pLink, isNewConnection: isNewConnection)
 		if waitsForConnectionToBeEstablished {
 			try await client.waitForFirstConnection()
 		}
@@ -116,7 +117,11 @@ extension RTCClients {
 			loggerGlobal.info("RTCClients: No Active Peer Connection to send back message to, creating anew")
 			await disconnectAndRemoveClient(origin.connectionId)
 			// missing client, create anew
-			try await connect(origin.p2pLink, waitsForConnectionToBeEstablished: true)
+			try await connect(
+				origin.p2pLink,
+				isNewConnection: false,
+				waitsForConnectionToBeEstablished: true
+			)
 			try await clients[origin.connectionId]?.send(response: response, to: origin.peerConnectionId)
 			loggerGlobal.info("RTCClients: Did send message over freshly established PeerConnection")
 			return
@@ -214,13 +219,17 @@ extension RTCClients {
 		self.clients[client.id] = client
 	}
 
-	func makeRTCClient(_ p2pLink: P2PLink) throws -> RTCClient {
+	func makeRTCClient(
+		_ p2pLink: P2PLink,
+		isNewConnection: Bool
+	) throws -> RTCClient {
 		let signalingClient = try SignalingClient(
 			password: p2pLink.connectionPassword,
 			baseURL: signalingServerBaseURL
 		)
 		let negotiator = PeerConnectionNegotiator(
 			p2pLink: p2pLink,
+			isNewConnection: isNewConnection,
 			signalingClient: signalingClient,
 			factory: peerConnectionFactory
 		)

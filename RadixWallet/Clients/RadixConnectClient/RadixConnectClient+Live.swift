@@ -33,6 +33,7 @@ extension RadixConnectClient {
 		func sendAccountListMessageAfterConnect() {
 			Task {
 				let accounts = try await accountsClient.getAccountsOnCurrentNetwork()
+                try? await Task.sleep(for: .milliseconds(100))
 				try await sendAccountListMessage(accounts: accounts)
 			}
 		}
@@ -83,7 +84,7 @@ extension RadixConnectClient {
 
 		let connectToP2PLinks: ConnectToP2PLinks = { links in
 			for client in links {
-				try await rtcClients.connect(client)
+				try await rtcClients.connect(client, isNewConnection: false)
 			}
 		}
 
@@ -129,7 +130,11 @@ extension RadixConnectClient {
 				await rtcClients.disconnectAndRemoveClient(password)
 			},
 			connectP2PLink: { p2pLink in
-				try await rtcClients.connect(p2pLink, waitsForConnectionToBeEstablished: true)
+				try await rtcClients.connect(
+					p2pLink,
+					isNewConnection: true,
+					waitsForConnectionToBeEstablished: true
+				)
 
 				/// Clear `lastSyncedAccountsWithCE` after a new connection is made, in order to send `AccountListMessage` to CE
 				userDefaults.remove(.lastSyncedAccountsWithCE)

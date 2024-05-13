@@ -34,6 +34,7 @@ struct PeerConnectionNegotiator {
 
 	init(
 		p2pLink: P2PLink,
+		isNewConnection: Bool,
 		signalingClient: SignalingClient,
 		factory: PeerConnectionFactory,
 		isOfferer: Bool = false
@@ -46,6 +47,7 @@ struct PeerConnectionNegotiator {
 		self.negotiationResultsContinuation = negotiationResultsContinuation
 		self.negotiationTask = Self.listenForNegotiationTriggers(
 			p2pLink: p2pLink,
+			isNewConnection: isNewConnection,
 			signalingClient: signalingClient,
 			factory: factory,
 			isOfferer: isOfferer,
@@ -63,6 +65,7 @@ extension PeerConnectionNegotiator {
 
 	private static func listenForNegotiationTriggers(
 		p2pLink: P2PLink,
+		isNewConnection: Bool,
 		signalingClient: SignalingClient,
 		factory: PeerConnectionFactory,
 		isOfferer: Bool,
@@ -73,6 +76,7 @@ extension PeerConnectionNegotiator {
 				let peerConnection = try await negotiatePeerConnection(
 					trigger,
 					p2pLink: p2pLink,
+					isNewConnection: isNewConnection,
 					signalingServerClient: signalingClient,
 					factory: factory
 				)
@@ -116,6 +120,7 @@ extension PeerConnectionNegotiator {
 	private static func negotiatePeerConnection(
 		_ trigger: NegotiationTrigger,
 		p2pLink: P2PLink,
+		isNewConnection: Bool,
 		signalingServerClient: SignalingClient,
 		factory: PeerConnectionFactory
 	) async throws -> PeerConnectionClient {
@@ -194,8 +199,10 @@ extension PeerConnectionNegotiator {
 		_ = try await onConnectionEstablished.collect()
 		_ = try await onDataChannelReady.collect()
 
-		try await sendLinkClientInteractionResponse(peerConnectionClient: peerConnectionClient, p2pLink: p2pLink) {
-			log("Sent LinkClientInteractionResponse")
+		if isNewConnection {
+			try await sendLinkClientInteractionResponse(peerConnectionClient: peerConnectionClient, p2pLink: p2pLink) {
+				log("Sent LinkClientInteractionResponse")
+			}
 		}
 
 		log("Connection established")
