@@ -1,5 +1,5 @@
 {
-  "originHash" : "136e3a1717e535f7f4817c4c452e7f0f9a077f467187dd7381b7e2ab133531b1",
+  "originHash" : "3c3bcd0ac778178b1f6d2fefec06dd7d0b6b38ec52e50ab67b977c895c445948",
   "pins" : [
     {
       "identity" : "anycodable",
@@ -249,8 +249,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-identified-collections",
       "state" : {
-        "revision" : "d1e45f3e1eee2c9193f5369fa9d70a6ddad635e8",
-        "version" : "1.0.0"
+        "revision" : "2481e39ea43e14556ca9628259fa6b377427730c",
+        "version" : "1.0.1"
       }
     },
     {
