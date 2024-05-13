@@ -11,6 +11,7 @@ public struct SecureStorageClient: Sendable {
 	public var loadProfileSnapshotData: LoadProfileSnapshotData
 	public var loadProfileSnapshot: LoadProfileSnapshot
 	public var loadProfile: LoadProfile
+	public var deleteProfile: DeleteProfile
 
 	public var saveMnemonicForFactorSource: SaveMnemonicForFactorSource
 	public var loadMnemonicByFactorSourceID: LoadMnemonicByFactorSourceID
@@ -49,6 +50,7 @@ public struct SecureStorageClient: Sendable {
 		loadProfileSnapshotData: @escaping LoadProfileSnapshotData,
 		loadProfileSnapshot: @escaping LoadProfileSnapshot,
 		loadProfile: @escaping LoadProfile,
+		deleteProfile: @escaping DeleteProfile,
 		saveMnemonicForFactorSource: @escaping SaveMnemonicForFactorSource,
 		loadMnemonicByFactorSourceID: @escaping LoadMnemonicByFactorSourceID,
 		containsMnemonicIdentifiedByFactorSourceID: @escaping ContainsMnemonicIdentifiedByFactorSourceID,
@@ -72,6 +74,7 @@ public struct SecureStorageClient: Sendable {
 		self.loadProfileSnapshotData = loadProfileSnapshotData
 		self.loadProfileSnapshot = loadProfileSnapshot
 		self.loadProfile = loadProfile
+		self.deleteProfile = deleteProfile
 		self.saveMnemonicForFactorSource = saveMnemonicForFactorSource
 		self.loadMnemonicByFactorSourceID = loadMnemonicByFactorSourceID
 		self.containsMnemonicIdentifiedByFactorSourceID = containsMnemonicIdentifiedByFactorSourceID
@@ -98,6 +101,7 @@ public struct SecureStorageClient: Sendable {
 		loadProfileSnapshotData: @escaping LoadProfileSnapshotData,
 		loadProfileSnapshot: @escaping LoadProfileSnapshot,
 		loadProfile: @escaping LoadProfile,
+		deleteProfile: @escaping DeleteProfile,
 		saveMnemonicForFactorSource: @escaping SaveMnemonicForFactorSource,
 		loadMnemonicByFactorSourceID: @escaping LoadMnemonicByFactorSourceID,
 		containsMnemonicIdentifiedByFactorSourceID: @escaping ContainsMnemonicIdentifiedByFactorSourceID,
@@ -120,6 +124,7 @@ public struct SecureStorageClient: Sendable {
 		self.loadProfileSnapshotData = loadProfileSnapshotData
 		self.loadProfileSnapshot = loadProfileSnapshot
 		self.loadProfile = loadProfile
+		self.deleteProfile = deleteProfile
 		self.saveMnemonicForFactorSource = saveMnemonicForFactorSource
 		self.loadMnemonicByFactorSourceID = loadMnemonicByFactorSourceID
 		self.containsMnemonicIdentifiedByFactorSourceID = containsMnemonicIdentifiedByFactorSourceID
@@ -153,6 +158,7 @@ extension SecureStorageClient {
 	public typealias LoadProfileSnapshotData = @Sendable (ProfileID) throws -> Data?
 	public typealias LoadProfileSnapshot = @Sendable (ProfileID) throws -> Profile?
 	public typealias LoadProfile = @Sendable (ProfileID) throws -> Profile?
+	public typealias DeleteProfile = @Sendable (ProfileID) throws -> Void
 
 	public typealias SaveMnemonicForFactorSource = @Sendable (PrivateHierarchicalDeterministicFactorSource) throws -> Void
 	public typealias LoadMnemonicByFactorSourceID = @Sendable (LoadMnemonicByFactorSourceIDRequest) throws -> MnemonicWithPassphrase?
