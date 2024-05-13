@@ -459,6 +459,9 @@ extension RandomAccessCollection<TransactionHistory.TransactionSection> {
 	}
 }
 
+// MARK: - TransactionHistory.TransactionSection + Codable
+extension TransactionHistory.TransactionSection: Codable {}
+
 extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
 	mutating func addTransactions(_ transactions: some Collection<TransactionHistoryItem>) {
 		let calendar: Calendar = .current
@@ -477,7 +480,7 @@ extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
 			self[id: sectionID]?.transactions.sort(by: \.time, >)
 		}
 
-		sort(by: \.day, >)
+		sort(by: { $0.day.compare($1.day) == .orderedAscending })
 	}
 }
 

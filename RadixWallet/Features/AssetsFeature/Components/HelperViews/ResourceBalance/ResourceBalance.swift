@@ -6,8 +6,36 @@ extension ResourceBalance {
 	}
 }
 
+// MARK: - TransactionGuarantee + Codable
+extension TransactionGuarantee: Codable {
+	private enum CodingKeys: String, CodingKey {
+		case amount
+		case instructionIndex
+		case resourceAddress
+		case resourceDivisibility
+	}
+
+	public init(from decoder: any Decoder) throws {
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		try self.init(
+			amount: container.decode(Decimal192.self, forKey: .amount),
+			instructionIndex: container.decode(UInt64.self, forKey: .instructionIndex),
+			resourceAddress: container.decode(ResourceAddress.self, forKey: .resourceAddress),
+			resourceDivisibility: container.decodeIfPresent(UInt8.self, forKey: .resourceDivisibility)
+		)
+	}
+
+	public func encode(to encoder: any Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(amount, forKey: .amount)
+		try container.encode(instructionIndex, forKey: .instructionIndex)
+		try container.encode(resourceAddress, forKey: .resourceAddress)
+		try container.encodeIfPresent(resourceDivisibility, forKey: .resourceDivisibility)
+	}
+}
+
 // MARK: - ResourceBalance
-public struct ResourceBalance: Sendable, Hashable {
+public struct ResourceBalance: Sendable, Hashable, Codable {
 	public let resource: OnLedgerEntity.Resource
 	public var details: Details
 
@@ -16,7 +44,7 @@ public struct ResourceBalance: Sendable, Hashable {
 		self.details = details
 	}
 
-	public enum Details: Sendable, Hashable {
+	public enum Details: Sendable, Hashable, Codable {
 		case fungible(Fungible)
 		case nonFungible(NonFungible)
 		case poolUnit(PoolUnit)
@@ -24,13 +52,13 @@ public struct ResourceBalance: Sendable, Hashable {
 		case stakeClaimNFT(StakeClaimNFT)
 	}
 
-	public struct Fungible: Sendable, Hashable {
+	public struct Fungible: Sendable, Hashable, Codable {
 		public let isXRD: Bool
 		public let amount: ResourceAmount
 		public var guarantee: TransactionGuarantee?
 	}
 
-	public struct LiquidStakeUnit: Sendable, Hashable {
+	public struct LiquidStakeUnit: Sendable, Hashable, Codable {
 		public let resource: OnLedgerEntity.Resource
 		public let amount: Decimal192
 		public let worth: ResourceAmount
@@ -40,12 +68,12 @@ public struct ResourceBalance: Sendable, Hashable {
 
 	public typealias NonFungible = OnLedgerEntity.NonFungibleToken
 
-	public struct PoolUnit: Sendable, Hashable {
+	public struct PoolUnit: Sendable, Hashable, Codable {
 		public let details: OnLedgerEntitiesClient.OwnedResourcePoolDetails
 		public var guarantee: TransactionGuarantee?
 	}
 
-	public struct StakeClaimNFT: Sendable, Hashable {
+	public struct StakeClaimNFT: Sendable, Hashable, Codable {
 		public let validatorName: String?
 		public var stakeClaimTokens: Tokens
 		public let stakeClaimResource: OnLedgerEntity.Resource
@@ -69,7 +97,7 @@ public struct ResourceBalance: Sendable, Hashable {
 			)
 		}
 
-		public struct Tokens: Sendable, Hashable {
+		public struct Tokens: Sendable, Hashable, Codable {
 			public let canClaimTokens: Bool
 			public let stakeClaims: IdentifiedArrayOf<OnLedgerEntitiesClient.StakeClaim>
 			var selectedStakeClaims: IdentifiedArrayOf<NonFungibleGlobalId>?
