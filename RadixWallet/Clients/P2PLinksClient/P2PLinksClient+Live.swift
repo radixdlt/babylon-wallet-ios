@@ -44,7 +44,7 @@ private extension SecureStorageClient {
 	@Sendable func updatingP2PLinks<T>(
 		_ mutateP2PLinks: @Sendable (inout P2PLinks) throws -> T
 	) throws -> T {
-		var copy = try loadP2PLinks() ?? []
+		var copy = (try? loadP2PLinks()) ?? []
 		let result = try mutateP2PLinks(&copy)
 		try saveP2PLinks(copy)
 		return result
