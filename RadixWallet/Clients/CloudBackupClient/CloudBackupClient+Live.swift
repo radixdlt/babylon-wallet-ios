@@ -81,23 +81,45 @@ extension CloudBackupClient {
 			return savedRecord
 		}
 
+		@Sendable
+		func backupProfileAndSaveResult(_ profile: Profile) async {
+			let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
+			let result: BackupResult.Result
+			do {
+				try await uploadProfileToICloud(profile, existingRecord: existingRecord)
+				result = .success
+			} catch CKError.accountTemporarilyUnavailable {
+				result = .temporarilyUnavailable
+			} catch CKError.notAuthenticated {
+				result = .notAuthenticated
+			} catch {
+				result = .failure
+			}
+
+			try? userDefaults.setLastCloudBackup(result, of: profile)
+
+			print("•• successfully backed up")
+		}
+
 		Task {
 			for try await profile in await profileStore.values() {
 				guard profile.appPreferences.security.isCloudProfileSyncEnabled else { continue }
-				let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
-				let result: BackupResult.Result
-				do {
-					try await uploadProfileToICloud(profile, existingRecord: existingRecord)
-					result = .success
-				} catch CKError.accountTemporarilyUnavailable {
-					result = .temporarilyUnavailable
-				} catch CKError.notAuthenticated {
-					result = .notAuthenticated
-				} catch {
-					result = .failure
+				await backupProfileAndSaveResult(profile)
+			}
+		}
+
+		Task {
+			for await tick in AsyncTimerSequence(every: .seconds(10)) {
+				print("•• tick: \(tick.formatted(date: .omitted, time: .shortened))")
+				let profile = await profileStore.profile
+				let last = userDefaults.getLastCloudBackups[profile.id]
+				if let last, last.result == .success, last.profileHash == profile.hashValue {
+					print("  •• already successfully backed up")
+					continue
 				}
 
-				try? userDefaults.setLastCloudBackup(result, of: profile)
+				print("•• will back up")
+				await backupProfileAndSaveResult(profile)
 			}
 		}
 
