@@ -39,7 +39,6 @@ extension SecurityCenterClient {
 
 		return .init(
 			problems: {
-				let profileID = await profileStore.profile.id
 				let profiles = await profileStore.values()
 				let cloudBackups = await cloudBackups().optional
 				let manualBackups = await manualBackups().optional
