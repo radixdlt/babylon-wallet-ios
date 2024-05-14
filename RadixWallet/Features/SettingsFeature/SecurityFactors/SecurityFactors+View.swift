@@ -27,7 +27,7 @@ public extension SecurityFactors {
 
 		public var body: some SwiftUI.View {
 			content
-				.setUpNavigationBar(title: L10n.SecurityFactors.title)
+				.radixNavigationBar(title: L10n.SecurityFactors.title)
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 				.presentsLoadingViewOverlay()
@@ -47,7 +47,7 @@ private extension SecurityFactors.View {
 					}
 				}
 			}
-			.background(Color.app.gray4)
+			.background(Color.app.gray5)
 			.onFirstTask { @MainActor in
 				await viewStore.send(.onFirstTask).finish()
 			}

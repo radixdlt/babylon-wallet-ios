@@ -42,7 +42,7 @@ public extension Preferences {
 
 		public var body: some SwiftUI.View {
 			content
-				.setUpNavigationBar(title: L10n.Preferences.title)
+				.radixNavigationBar(title: L10n.Preferences.title)
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 				.presentsLoadingViewOverlay()
