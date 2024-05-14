@@ -37,7 +37,7 @@ public struct TransactionHistoryResponse: Sendable, Hashable {
 }
 
 // MARK: - TransactionHistoryItem
-public struct TransactionHistoryItem: Sendable, Hashable, Identifiable, Codable {
+public struct TransactionHistoryItem: Sendable, Hashable, Identifiable {
 	public let id: IntentHash
 	public let time: Date
 	public let message: String?

@@ -523,32 +523,32 @@ extension OnLedgerEntity.OnLedgerAccount {
 }
 
 extension OnLedgerEntitiesClient {
-	public struct OwnedStakeDetails: Hashable, Sendable, Codable {
+	public struct OwnedStakeDetails: Hashable, Sendable {
 		public let validator: OnLedgerEntity.Validator
 		public var stakeUnitResource: ResourceWithVaultAmount?
 		public var stakeClaimTokens: NonFungibleResourceWithTokens?
 		public let currentEpoch: Epoch
 	}
 
-	public struct OwnedResourcePoolDetails: Hashable, Sendable, Codable {
+	public struct OwnedResourcePoolDetails: Hashable, Sendable {
 		public let address: PoolAddress
 		public let dAppName: String?
 		public let poolUnitResource: ResourceWithVaultAmount
 		public var xrdResource: ResourceWithRedemptionValue?
 		public var nonXrdResources: [ResourceWithRedemptionValue]
 
-		public struct ResourceWithRedemptionValue: Hashable, Sendable, Codable {
+		public struct ResourceWithRedemptionValue: Hashable, Sendable {
 			public let resource: OnLedgerEntity.Resource
 			public var redemptionValue: ResourceAmount?
 		}
 	}
 
-	public struct ResourceWithVaultAmount: Hashable, Sendable, Codable {
+	public struct ResourceWithVaultAmount: Hashable, Sendable {
 		public let resource: OnLedgerEntity.Resource
 		public var amount: ResourceAmount
 	}
 
-	public struct StakeClaim: Hashable, Sendable, Identifiable, Codable {
+	public struct StakeClaim: Hashable, Sendable, Identifiable {
 		public var id: NonFungibleGlobalId {
 			token.id
 		}
@@ -573,7 +573,7 @@ extension OnLedgerEntitiesClient {
 		}
 	}
 
-	public struct NonFungibleResourceWithTokens: Hashable, Sendable, Codable {
+	public struct NonFungibleResourceWithTokens: Hashable, Sendable {
 		public let resource: OnLedgerEntity.Resource
 		public var stakeClaims: IdentifiedArrayOf<StakeClaim>
 	}
