@@ -34,6 +34,12 @@ public struct SecureStorageClient: Sendable {
 	/// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
 	public var deleteDeprecatedDeviceID: DeleteDeprecatedDeviceID
 
+	public var loadP2PLinks: LoadP2PLinks
+	public var saveP2PLinks: SaveP2PLinks
+
+	public var loadP2PLinksPrivateKey: LoadP2PLinksPrivateKey
+	public var saveP2PLinksPrivateKey: SaveP2PLinksPrivateKey
+
 	#if DEBUG
 	public var getAllMnemonics: GetAllMnemonics
 	#endif
@@ -58,6 +64,10 @@ public struct SecureStorageClient: Sendable {
 		saveDeviceInfo: @escaping SaveDeviceInfo,
 		deprecatedLoadDeviceID: @escaping DeprecatedLoadDeviceID,
 		deleteDeprecatedDeviceID: @escaping DeleteDeprecatedDeviceID,
+		loadP2PLinks: @escaping LoadP2PLinks,
+		saveP2PLinks: @escaping SaveP2PLinks,
+		loadP2PLinksPrivateKey: @escaping LoadP2PLinksPrivateKey,
+		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey,
 		getAllMnemonics: @escaping GetAllMnemonics
 	) {
 		self.saveProfileSnapshot = saveProfileSnapshot
@@ -78,6 +88,10 @@ public struct SecureStorageClient: Sendable {
 		self.saveDeviceInfo = saveDeviceInfo
 		self.deprecatedLoadDeviceID = deprecatedLoadDeviceID
 		self.deleteDeprecatedDeviceID = deleteDeprecatedDeviceID
+		self.loadP2PLinks = loadP2PLinks
+		self.saveP2PLinks = saveP2PLinks
+		self.loadP2PLinksPrivateKey = loadP2PLinksPrivateKey
+		self.saveP2PLinksPrivateKey = saveP2PLinksPrivateKey
 		self.getAllMnemonics = getAllMnemonics
 	}
 	#else
@@ -100,7 +114,11 @@ public struct SecureStorageClient: Sendable {
 		loadDeviceInfo: @escaping LoadDeviceInfo,
 		saveDeviceInfo: @escaping SaveDeviceInfo,
 		deprecatedLoadDeviceID: @escaping DeprecatedLoadDeviceID,
-		deleteDeprecatedDeviceID: @escaping DeleteDeprecatedDeviceID
+		deleteDeprecatedDeviceID: @escaping DeleteDeprecatedDeviceID,
+		loadP2PLinks: @escaping LoadP2PLinks,
+		saveP2PLinks: @escaping SaveP2PLinks,
+		loadP2PLinksPrivateKey: @escaping LoadP2PLinksPrivateKey,
+		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey
 	) {
 		self.saveProfileSnapshot = saveProfileSnapshot
 		self.loadProfileSnapshotData = loadProfileSnapshotData
@@ -120,6 +138,10 @@ public struct SecureStorageClient: Sendable {
 		self.saveDeviceInfo = saveDeviceInfo
 		self.deprecatedLoadDeviceID = deprecatedLoadDeviceID
 		self.deleteDeprecatedDeviceID = deleteDeprecatedDeviceID
+		self.loadP2PLinks = loadP2PLinks
+		self.saveP2PLinks = saveP2PLinks
+		self.loadP2PLinksPrivateKey = loadP2PLinksPrivateKey
+		self.saveP2PLinksPrivateKey = saveP2PLinksPrivateKey
 	}
 	#endif // DEBUG
 }
@@ -160,6 +182,12 @@ extension SecureStorageClient {
 	public typealias DeprecatedLoadDeviceID = @Sendable () throws -> DeviceID?
 	/// See https://radixdlt.atlassian.net/l/cp/fmoH9KcN
 	public typealias DeleteDeprecatedDeviceID = @Sendable () -> Void
+
+	public typealias LoadP2PLinks = @Sendable () throws -> P2PLinks?
+	public typealias SaveP2PLinks = @Sendable (P2PLinks) throws -> Void
+
+	public typealias LoadP2PLinksPrivateKey = @Sendable () throws -> Curve25519.PrivateKey?
+	public typealias SaveP2PLinksPrivateKey = @Sendable (Curve25519.PrivateKey) throws -> Void
 
 	public enum LoadMnemonicPurpose: Sendable, Hashable, CustomStringConvertible {
 		case signTransaction

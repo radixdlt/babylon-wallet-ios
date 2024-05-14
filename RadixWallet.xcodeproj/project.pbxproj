@@ -245,8 +245,8 @@
 		48CFC3202ADC10D900E77A5C /* NameAccount+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDCA2ADC10D800E77A5C /* NameAccount+View.swift */; };
 		48CFC3212ADC10D900E77A5C /* NewConnection+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDCD2ADC10D800E77A5C /* NewConnection+Reducer.swift */; };
 		48CFC3222ADC10D900E77A5C /* NewConnection+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDCE2ADC10D800E77A5C /* NewConnection+View.swift */; };
-		48CFC3232ADC10D900E77A5C /* ConnectUsingSecrets+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDD12ADC10D800E77A5C /* ConnectUsingSecrets+Reducer.swift */; };
-		48CFC3242ADC10D900E77A5C /* ConnectUsingSecrets+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDD22ADC10D800E77A5C /* ConnectUsingSecrets+View.swift */; };
+		48CFC3232ADC10D900E77A5C /* NewConnectionName+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDD12ADC10D800E77A5C /* NewConnectionName+Reducer.swift */; };
+		48CFC3242ADC10D900E77A5C /* NewConnectionName+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDD22ADC10D800E77A5C /* NewConnectionName+View.swift */; };
 		48CFC3252ADC10D900E77A5C /* LocalNetworkPermission+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDD42ADC10D800E77A5C /* LocalNetworkPermission+View.swift */; };
 		48CFC3262ADC10D900E77A5C /* LocalNetworkPermission+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDD52ADC10D800E77A5C /* LocalNetworkPermission+Reducer.swift */; };
 		48CFC3272ADC10D900E77A5C /* ScanQRCoordinator+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFBDD82ADC10D800E77A5C /* ScanQRCoordinator+Reducer.swift */; };
@@ -1130,7 +1130,11 @@
 		E6FA984A2B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98482B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift */; };
 		E6FA984B2B04B9AC00748F20 /* ConfirmSkippingBDFS.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */; };
 		E6FA984E2B04E3D500748F20 /* NoContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA984D2B04E3D500748F20 /* NoContentView.swift */; };
+		E713204C2BCD372600AE6B3C /* UnknownCaseDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E713204B2BCD372600AE6B3C /* UnknownCaseDecodable.swift */; };
 		E7B7A0FD2BBBFB6100EEE900 /* HeaderListViewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B7A0FC2BBBFB6100EEE900 /* HeaderListViewContainer.swift */; };
+		E7B7A1052BC904E800EEE900 /* NewConnectionApproval+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B7A1042BC904E800EEE900 /* NewConnectionApproval+Reducer.swift */; };
+		E7B7A1072BC904EE00EEE900 /* NewConnectionApproval+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B7A1062BC904EE00EEE900 /* NewConnectionApproval+View.swift */; };
+		E7FAE65D2BF0F2EC00620273 /* NewConnectionFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7FAE65B2BF0F2EC00620273 /* NewConnectionFeatureTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1372,8 +1376,8 @@
 		48CFBDCA2ADC10D800E77A5C /* NameAccount+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NameAccount+View.swift"; sourceTree = "<group>"; };
 		48CFBDCD2ADC10D800E77A5C /* NewConnection+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NewConnection+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBDCE2ADC10D800E77A5C /* NewConnection+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NewConnection+View.swift"; sourceTree = "<group>"; };
-		48CFBDD12ADC10D800E77A5C /* ConnectUsingSecrets+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ConnectUsingSecrets+Reducer.swift"; sourceTree = "<group>"; };
-		48CFBDD22ADC10D800E77A5C /* ConnectUsingSecrets+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ConnectUsingSecrets+View.swift"; sourceTree = "<group>"; };
+		48CFBDD12ADC10D800E77A5C /* NewConnectionName+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NewConnectionName+Reducer.swift"; sourceTree = "<group>"; };
+		48CFBDD22ADC10D800E77A5C /* NewConnectionName+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NewConnectionName+View.swift"; sourceTree = "<group>"; };
 		48CFBDD42ADC10D800E77A5C /* LocalNetworkPermission+View.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LocalNetworkPermission+View.swift"; sourceTree = "<group>"; };
 		48CFBDD52ADC10D800E77A5C /* LocalNetworkPermission+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "LocalNetworkPermission+Reducer.swift"; sourceTree = "<group>"; };
 		48CFBDD82ADC10D800E77A5C /* ScanQRCoordinator+Reducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ScanQRCoordinator+Reducer.swift"; sourceTree = "<group>"; };
@@ -2232,7 +2236,11 @@
 		E6FA98482B04B9AC00748F20 /* ConfirmSkippingBDFS+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ConfirmSkippingBDFS+View.swift"; sourceTree = "<group>"; };
 		E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfirmSkippingBDFS.swift; sourceTree = "<group>"; };
 		E6FA984D2B04E3D500748F20 /* NoContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoContentView.swift; sourceTree = "<group>"; };
+		E713204B2BCD372600AE6B3C /* UnknownCaseDecodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnknownCaseDecodable.swift; sourceTree = "<group>"; };
 		E7B7A0FC2BBBFB6100EEE900 /* HeaderListViewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderListViewContainer.swift; sourceTree = "<group>"; };
+		E7B7A1042BC904E800EEE900 /* NewConnectionApproval+Reducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NewConnectionApproval+Reducer.swift"; sourceTree = "<group>"; };
+		E7B7A1062BC904EE00EEE900 /* NewConnectionApproval+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NewConnectionApproval+View.swift"; sourceTree = "<group>"; };
+		E7FAE65B2BF0F2EC00620273 /* NewConnectionFeatureTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NewConnectionFeatureTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -3455,19 +3463,20 @@
 		48CFBDCF2ADC10D800E77A5C /* Children */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBDD02ADC10D800E77A5C /* ConnectUsingSecrets */,
+				E7B7A1032BC848D800EEE900 /* NewConnectionApproval */,
+				48CFBDD02ADC10D800E77A5C /* NewConnectionName */,
 				48CFBDD32ADC10D800E77A5C /* LocalNetworkAuthorization */,
 			);
 			path = Children;
 			sourceTree = "<group>";
 		};
-		48CFBDD02ADC10D800E77A5C /* ConnectUsingSecrets */ = {
+		48CFBDD02ADC10D800E77A5C /* NewConnectionName */ = {
 			isa = PBXGroup;
 			children = (
-				48CFBDD12ADC10D800E77A5C /* ConnectUsingSecrets+Reducer.swift */,
-				48CFBDD22ADC10D800E77A5C /* ConnectUsingSecrets+View.swift */,
+				48CFBDD12ADC10D800E77A5C /* NewConnectionName+Reducer.swift */,
+				48CFBDD22ADC10D800E77A5C /* NewConnectionName+View.swift */,
 			);
-			path = ConnectUsingSecrets;
+			path = NewConnectionName;
 			sourceTree = "<group>";
 		};
 		48CFBDD32ADC10D800E77A5C /* LocalNetworkAuthorization */ = {
@@ -4054,6 +4063,7 @@
 				48CFBF4F2ADC10D900E77A5C /* QRAddressPrefix.swift */,
 				48CFBF502ADC10D900E77A5C /* Validation */,
 				830EA9E42AEB9088004C8051 /* DefaultValueDecodable.swift */,
+				E713204B2BCD372600AE6B3C /* UnknownCaseDecodable.swift */,
 			);
 			path = Prelude;
 			sourceTree = "<group>";
@@ -6035,6 +6045,7 @@
 				E6DBA28D2ADEBFB300A38425 /* MainFeatureTests */,
 				E6DBA28F2ADEBFB300A38425 /* SplashFeatureTests */,
 				E6DBA2932ADEBFB300A38425 /* DappInteractionFeatureTests */,
+				E7FAE65C2BF0F2EC00620273 /* NewConnectionFeatureTests */,
 				E62BB7622AEA856300D46DAC /* ImportMnemonicTests.swift */,
 			);
 			path = Features;
@@ -6343,6 +6354,23 @@
 			path = ConfirmSkippingBDFS;
 			sourceTree = "<group>";
 		};
+		E7B7A1032BC848D800EEE900 /* NewConnectionApproval */ = {
+			isa = PBXGroup;
+			children = (
+				E7B7A1042BC904E800EEE900 /* NewConnectionApproval+Reducer.swift */,
+				E7B7A1062BC904EE00EEE900 /* NewConnectionApproval+View.swift */,
+			);
+			path = NewConnectionApproval;
+			sourceTree = "<group>";
+		};
+		E7FAE65C2BF0F2EC00620273 /* NewConnectionFeatureTests */ = {
+			isa = PBXGroup;
+			children = (
+				E7FAE65B2BF0F2EC00620273 /* NewConnectionFeatureTests.swift */,
+			);
+			path = NewConnectionFeatureTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -6594,6 +6622,7 @@
 				4827520E2BDA5E50007854E0 /* TransactionClientTests.swift in Sources */,
 				E6DBA32A2ADEBFB300A38425 /* TestCase.swift in Sources */,
 				E6DBA3732ADEBFB300A38425 /* ROLAClientTests.swift in Sources */,
+				E7FAE65D2BF0F2EC00620273 /* NewConnectionFeatureTests.swift in Sources */,
 				E6DBA31F2ADEBFB300A38425 /* RadixConnectCustomData.swift in Sources */,
 				83EE47502AF027DF00155F03 /* AssetTransferDepositRuleTests.swift in Sources */,
 				E6DBA3462ADEBFB300A38425 /* DataToHexStringTests.swift in Sources */,
@@ -6738,6 +6767,7 @@
 				48CFC3082ADC10D900E77A5C /* DisplayMnemonics+View.swift in Sources */,
 				48CFC4492ADC10DA00E77A5C /* AuthorizedDappsClient+Test.swift in Sources */,
 				48CFC4EF2ADC10DA00E77A5C /* MetadataDecimalArrayValue.swift in Sources */,
+				E713204C2BCD372600AE6B3C /* UnknownCaseDecodable.swift in Sources */,
 				48CFC27A2ADC10D900E77A5C /* App+View.swift in Sources */,
 				48CFC6152ADC10DA00E77A5C /* ResetRequestItem.swift in Sources */,
 				48CFC3ED2ADC10D900E77A5C /* DataChannelMessage+Codable.swift in Sources */,
@@ -7021,6 +7051,7 @@
 				48CFC5C72ADC10DA00E77A5C /* FixedSpacer.swift in Sources */,
 				48CFC3F22ADC10D900E77A5C /* PeerConnectionNegotiator.swift in Sources */,
 				48CFC5E22ADC10DA00E77A5C /* Store+Extra.swift in Sources */,
+				E7B7A1052BC904E800EEE900 /* NewConnectionApproval+Reducer.swift in Sources */,
 				48CFC4132ADC10DA00E77A5C /* ErrorQueue+Test.swift in Sources */,
 				48CFC2D02ADC10D900E77A5C /* TransferAccountList+View.swift in Sources */,
 				48CFC23F2ADC10D900E77A5C /* PreferenceList.swift in Sources */,
@@ -7079,6 +7110,7 @@
 				48CFC3892ADC10D900E77A5C /* DisplayEntitiesControlledByMnemonic+Reducer.swift in Sources */,
 				48CFC4562ADC10DA00E77A5C /* CacheClient+Test.swift in Sources */,
 				48CFC5902ADC10DA00E77A5C /* FactorSourcesClient+Live.swift in Sources */,
+				E7B7A1072BC904EE00EEE900 /* NewConnectionApproval+View.swift in Sources */,
 				48CFC24E2ADC10D900E77A5C /* GatewayList+View.swift in Sources */,
 				48CFC3362ADC10D900E77A5C /* PreviewOfSomeFeatureReducer+View.swift in Sources */,
 				48CFC2542ADC10D900E77A5C /* Splash+View.swift in Sources */,
@@ -7417,10 +7449,10 @@
 				83377A052B9DDB5C00D8AA36 /* NPSSurveyClient+Live.swift in Sources */,
 				A462B5B22B8407D300C26D20 /* CoreAPI_BinaryPlaintextMessageContent.swift in Sources */,
 				48CFC4F42ADC10DA00E77A5C /* StateNonFungibleLocationResponse.swift in Sources */,
-				48CFC3242ADC10D900E77A5C /* ConnectUsingSecrets+View.swift in Sources */,
+				48CFC3242ADC10D900E77A5C /* NewConnectionName+View.swift in Sources */,
 				48CFC2412ADC10D900E77A5C /* DevAccountPreferences+Reducer.swift in Sources */,
 				48CFC5062ADC10DA00E77A5C /* EntityMetadataItem.swift in Sources */,
-				48CFC3232ADC10D900E77A5C /* ConnectUsingSecrets+Reducer.swift in Sources */,
+				48CFC3232ADC10D900E77A5C /* NewConnectionName+Reducer.swift in Sources */,
 				48CFC5FF2ADC10DA00E77A5C /* Persona+PreviewValues.swift in Sources */,
 				4827521A2BDB90D4007854E0 /* FactorSourceCommon+New+Dependencies.swift in Sources */,
 				83EE47812AF0EE3C00155F03 /* ProgrammaticScryptoSborValueBool.swift in Sources */,
@@ -8365,7 +8397,7 @@
 			repositoryURL = "https://github.com/radixdlt/sargon";
 			requirement = {
 				kind = exactVersion;
-				version = 0.7.9;
+				version = 0.7.16;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */

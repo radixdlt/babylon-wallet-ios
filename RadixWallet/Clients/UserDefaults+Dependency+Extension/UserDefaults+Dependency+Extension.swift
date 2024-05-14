@@ -13,6 +13,7 @@ public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case didMigrateKeychainProfiles
 	case lastCloudBackups
 	case lastManualBackups
+	case lastSyncedAccountsWithCE
 
 	/// DO NOT CHANGE THIS KEY
 	case activeProfileID
@@ -193,6 +194,14 @@ extension UserDefaults.Dependency {
 		codableValues(key: key, codable: [UUID: T].self)
 			.compactMap { (try? $0.get())?[profileID] }
 			.eraseToAnyAsyncSequence()
+	}
+
+	public func getLastSyncedAccountsWithCE() -> String? {
+		string(forKey: Key.lastSyncedAccountsWithCE.rawValue)
+	}
+
+	public func setLastSyncedAccountsWithCE(_ value: String) {
+		set(value, forKey: Key.lastSyncedAccountsWithCE.rawValue)
 	}
 }
 

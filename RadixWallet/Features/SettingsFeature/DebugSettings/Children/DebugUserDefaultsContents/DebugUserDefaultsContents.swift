@@ -117,6 +117,8 @@ extension UserDefaults.Dependency.Key {
 			return userDefaults.getLastCloudBackups.map { "\($0.key.uuidString): \(String(describing: $0.value))" }
 		case .lastManualBackups:
 			return userDefaults.getLastManualBackups.map { "\($0.key.uuidString): \(String(describing: $0.value))" }
+		case .lastSyncedAccountsWithCE:
+			return userDefaults.getLastSyncedAccountsWithCE().asArray(\.self)
 		}
 	}
 }
