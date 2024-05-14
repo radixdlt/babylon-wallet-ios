@@ -43,7 +43,9 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 
 		var activeFilters: IdentifiedArrayOf<TransactionHistoryFilters.State.Filter> = []
 
-		var sections: IdentifiedArrayOf<TransactionSection> = []
+		private(set) var sections: IdentifiedArrayOf<TransactionSection> = []
+
+		private(set) var dateSpan: Range<Date>?
 
 		var scrollTarget: Triggering<IntentHash?> = .updated(nil)
 
@@ -251,7 +253,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	/// Load history for the previously selected period, using the provided filters
 	func loadTransactionsWithFilters(_ filters: [TransactionFilter], state: inout State) -> Effect<Action> {
 		guard filters != state.loading.filters else { return .none }
-		state.sections = []
+		state.updateSections(transactions: [])
 		state.loading = state.loading.withNewFilters(filters)
 		return loadTransactionsForMonth(state.currentMonth, state: &state)
 	}
@@ -260,16 +262,16 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 	func loadTransactionsForMonth(_ month: Date, state: inout State) -> Effect<Action> {
 		guard let endOfMonth = Calendar.current.date(byAdding: .month, value: 1, to: month) else { return .none }
 		if endOfMonth > state.fullPeriod.upperBound {
-			state.sections = []
+			state.updateSections(transactions: [])
 			state.loading = state.loading.withNewPivotDate(nil)
 			return loadHistory(.down, scrollTarget: .latestTransaction, state: &state)
 		} else {
-			if state.sections.dateSpan?.contains(month ..< endOfMonth) == true {
+			if state.dateSpan?.contains(month ..< endOfMonth) == true {
 				// We have already loaded all transactions for the chosen month
 				state.setScrollTarget(.beforeDate(endOfMonth))
 				return .none
 			}
-			state.sections = []
+			state.updateSections(transactions: [])
 			state.loading = state.loading.withNewPivotDate(endOfMonth)
 			return loadHistory(.down, scrollTarget: .beforeDate(endOfMonth), state: &state)
 		}
@@ -327,7 +329,7 @@ public struct TransactionHistory: Sendable, FeatureReducer {
 		}
 		state.resources.append(contentsOf: response.resources)
 		state.loading[cursor: parameters.direction] = response.nextCursor.map { .next($0) } ?? .loadedAll
-		state.sections.addTransactions(response.items)
+		state.updateSections(transactions: response.items)
 		state.loading.isLoading = false
 		state.setScrollTarget(scrollTarget)
 	}
@@ -346,7 +348,7 @@ extension TransactionHistory.State {
 
 	var shouldAlsoLoadUpwards: Bool {
 		guard let upwardsPeriod = requestParameters(for: .up)?.period else { return false }
-		guard let lastLoaded = sections.dateSpan?.upperBound else { return true }
+		guard let lastLoaded = dateSpan?.upperBound else { return true }
 		return !upwardsPeriod.contains(lastLoaded)
 	}
 
@@ -450,20 +452,8 @@ extension Range {
 	}
 }
 
-extension RandomAccessCollection<TransactionHistory.TransactionSection> {
-	var dateSpan: Range<Date>? {
-		guard let first = first?.transactions.first?.time, let last = last?.transactions.last?.time else {
-			return nil
-		}
-		guard last <= first else {
-			return last ..< last
-		}
-		return last ..< first
-	}
-}
-
-extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
-	mutating func addTransactions(_ transactions: some Collection<TransactionHistoryItem>) {
+extension TransactionHistory.State {
+	mutating func updateSections(transactions: some Collection<TransactionHistoryItem>) {
 		let calendar: Calendar = .current
 		let grouped = Dictionary(grouping: transactions) { transaction in
 			calendar.startOfDay(for: transaction.time)
@@ -472,13 +462,28 @@ extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
 		for (day, transactions) in grouped {
 			let sectionID = TransactionHistory.TransactionSection.ID(day)
 			let month = calendar.startOfMonth(for: day)
-			var section = self[id: sectionID] ?? .init(day: day, month: month, transactions: [])
+			var section = sections[id: sectionID] ?? .init(day: day, month: month, transactions: [])
 			section.transactions.append(contentsOf: transactions)
 			section.transactions.sort(by: \.time, >)
-			self[id: sectionID] = section
+			sections[id: sectionID] = section
 		}
 
-		sort(by: \.day, >)
+		sections.sort(by: \.day, >)
+
+		dateSpan = getDateSpan()
+	}
+
+	/// Should only be used when `sections` are sorted
+	private func getDateSpan() -> Range<Date>? {
+		guard let first = sections.first?.transactions.first?.time, let last = sections.last?.transactions.last?.time else {
+			return nil
+		}
+
+		guard last <= first else {
+			assertionFailure("DateSpan error: this should be impossible since the sections were just sorted")
+			return last ..< last
+		}
+		return last ..< first
 	}
 }
 
