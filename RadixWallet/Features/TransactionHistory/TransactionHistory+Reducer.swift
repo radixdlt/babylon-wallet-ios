@@ -455,6 +455,9 @@ extension RandomAccessCollection<TransactionHistory.TransactionSection> {
 		guard let first = first?.transactions.first?.time, let last = last?.transactions.last?.time else {
 			return nil
 		}
+		guard last <= first else {
+			return last ..< last
+		}
 		return last ..< first
 	}
 }
