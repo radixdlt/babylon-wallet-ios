@@ -19,14 +19,20 @@ final class IdentifiedArrayOfTests: XCTestCase {
 	func test_crash() throws {
 		let jsonData = Data(json.utf8)
 		let sections = try JSONDecoder.iso8601.decode([TransactionHistory.TransactionSection].self, from: jsonData)
-		var identifiedArray = IdentifiedArrayOf<TransactionHistory.TransactionSection>.init(uncheckedUniqueElements: sections, id: \.id)
+		let identifiedArray = IdentifiedArrayOf<TransactionHistory.TransactionSection>(uncheckedUniqueElements: sections, id: \.id)
 		XCTAssertEqual(identifiedArray.count, sections.count)
 
+		var unsorted = identifiedArray
 		// this below does not crash
-		//        identifiedArray.sort(by: { $0.day.compare($1.day) == .orderedAscending })
+		unsorted.sort(by: { $0.day > $1.day })
 
-		// this reproduces the bug! this below will crash
-		identifiedArray.sort(by: \.day, >)
+		var unsorted2 = identifiedArray
+		// this does not crash anymore - uses the method defined on IdentifiedArray
+		unsorted2.sort(by: \.day, >)
+
+		var elements = identifiedArray.elements
+		// this never crashed - uses the method defined on RandomAccessCollection
+		elements.sort(by: \.day, >)
 	}
 }
 
