@@ -45,7 +45,7 @@ extension Settings {
 extension Settings.View {
 	public var body: some View {
 		settingsView()
-			.setUpNavigationBar(title: L10n.WalletSettings.title)
+			.radixNavigationBar(title: L10n.WalletSettings.title)
 			.tint(.app.gray1)
 			.foregroundColor(.app.gray1)
 			.destinations(with: store)

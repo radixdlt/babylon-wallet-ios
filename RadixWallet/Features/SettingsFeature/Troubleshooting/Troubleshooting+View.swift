@@ -20,7 +20,7 @@ public extension Troubleshooting {
 
 		public var body: some SwiftUI.View {
 			content
-				.setUpNavigationBar(title: L10n.Troubleshooting.title)
+				.radixNavigationBar(title: L10n.Troubleshooting.title)
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 				.presentsLoadingViewOverlay()
