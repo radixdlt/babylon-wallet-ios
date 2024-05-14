@@ -55,8 +55,7 @@ extension ConfigurationBackup {
 			.onAppear {
 				store.send(.view(.didAppear))
 			}
-			.navigationBarTitleDisplayMode(.inline)
-			.navigationTitle(L10n.ConfigurationBackup.title)
+			.radixNavigationBar(title: L10n.ConfigurationBackup.title)
 			.destinations(with: store)
 		}
 	}
@@ -257,8 +256,8 @@ extension ConfigurationBackup {
 						Text(subtitle)
 							.multilineTextAlignment(.leading)
 							.lineSpacing(0)
-							.textStyle(.body1Regular)
-							.foregroundStyle(.app.gray1)
+							.textStyle(.body2Regular)
+							.foregroundStyle(.app.gray2)
 					}
 				}
 				.clipped()
