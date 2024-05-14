@@ -474,16 +474,14 @@ extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
 
 		for (day, transactions) in grouped {
 			let sectionID = TransactionHistory.TransactionSection.ID(day)
-			if self[id: sectionID] == nil {
-				let month = calendar.startOfMonth(for: day)
-				self[id: sectionID] = .init(day: day, month: month, transactions: transactions.asIdentified())
-			} else {
-				self[id: sectionID]?.transactions.append(contentsOf: transactions)
-			}
-			self[id: sectionID]?.transactions.sort(by: \.time, >)
+			let month = calendar.startOfMonth(for: day)
+			var section = self[id: sectionID] ?? .init(day: day, month: month, transactions: [])
+			section.transactions.append(contentsOf: transactions)
+			section.transactions.sort(by: \.time, >)
+			self[id: sectionID] = section
 		}
 
-		sort(by: { $0.day.compare($1.day) == .orderedAscending })
+		sort(by: \.day, >)
 	}
 }
 
