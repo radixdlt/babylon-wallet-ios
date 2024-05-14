@@ -107,7 +107,7 @@ public struct FactoryReset: Sendable, FeatureReducer {
 		.run { send in
 			for try await problems in await securityCenterClient.problems() {
 				guard !Task.isCancelled else { return }
-				let isRecoverable = !problems.contains(.problem5) && !problems.contains(.problem6) && !problems.contains(.problem7)
+				let isRecoverable = !(problems.contains(.problem5) || problems.contains(.problem6) || problems.contains(.problem7))
 				await send(.internal(.loadedIsRecoverable(isRecoverable)))
 			}
 		}
