@@ -462,9 +462,6 @@ extension RandomAccessCollection<TransactionHistory.TransactionSection> {
 	}
 }
 
-// MARK: - TransactionHistory.TransactionSection + Codable
-extension TransactionHistory.TransactionSection: Codable {}
-
 extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
 	mutating func addTransactions(_ transactions: some Collection<TransactionHistoryItem>) {
 		let calendar: Calendar = .current
