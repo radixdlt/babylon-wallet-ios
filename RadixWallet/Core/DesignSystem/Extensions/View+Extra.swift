@@ -1,7 +1,6 @@
 extension View {
 	func withDottedCircleOverlay() -> some View {
-		self
-			.padding(.small3)
+		padding(.small3)
 			.overlay {
 				Circle()
 					.stroke(style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
@@ -9,18 +8,17 @@ extension View {
 			}
 	}
 
-	func setUpNavigationBar(title: String) -> some View {
-		self
-			.toolbar {
-				ToolbarItem(placement: .principal) {
-					Text(title)
-						.foregroundColor(.app.gray1)
-						.textStyle(.secondaryHeader)
-				}
+	func radixNavigationBar(title: String) -> some View {
+		toolbar {
+			ToolbarItem(placement: .principal) {
+				Text(title)
+					.foregroundColor(.app.gray1)
+					.textStyle(.secondaryHeader)
 			}
-			.navigationBarTitleDisplayMode(.inline)
-			.toolbarBackground(.app.background, for: .navigationBar)
-			.toolbarBackground(.visible, for: .navigationBar)
+		}
+		.navigationBarTitleDisplayMode(.inline)
+		.toolbarBackground(.app.background, for: .navigationBar)
+		.toolbarBackground(.visible, for: .navigationBar)
 	}
 
 	func eraseToAnyView() -> AnyView {
