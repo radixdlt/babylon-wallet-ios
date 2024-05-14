@@ -54,7 +54,6 @@ public struct Settings: Sendable, FeatureReducer {
 
 		public enum Action: Sendable, Equatable {
 			case manageP2PLinks(P2PLinksFeature.Action)
-			case securityFactors(SecurityFactors.Action)
 			case authorizedDapps(AuthorizedDappsFeature.Action)
 			case personas(PersonasCoordinator.Action)
 			case preferences(Preferences.Action)
