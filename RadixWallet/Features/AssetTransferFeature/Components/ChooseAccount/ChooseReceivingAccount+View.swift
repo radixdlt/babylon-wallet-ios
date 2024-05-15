@@ -79,10 +79,7 @@ extension ChooseReceivingAccount.View {
 				}
 				.destinations(with: store)
 				.footer { chooseButton(viewStore) }
-				.navigationTitle(L10n.AssetTransfer.ChooseReceivingAccount.navigationTitle)
-				.navigationBarTitleColor(.app.gray1)
-				.navigationBarTitleDisplayMode(.inline)
-				.navigationBarInlineTitleFont(.app.secondaryHeader)
+				.setUpNavigationBar(title: L10n.AssetTransfer.ChooseReceivingAccount.navigationTitle)
 				.toolbar {
 					ToolbarItem(placement: .navigationBarLeading) {
 						CloseButton {
