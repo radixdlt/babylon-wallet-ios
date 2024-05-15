@@ -148,7 +148,7 @@ extension ConfigurationBackup {
 
 	struct AutomatedBackupView: SwiftUI.View {
 		@Binding var backupsEnabled: Bool
-		let lastBackedUp: Date?
+		let lastBackedUp: BackupStatus?
 		let actionsRequired: [Item]
 		let outdatedBackupPresent: Bool
 		let deleteOutdatedAction: () -> Void
@@ -167,7 +167,7 @@ extension ConfigurationBackup {
 										.textStyle(.body1Header)
 										.foregroundStyle(.app.gray1)
 
-									if backupsEnabled, let lastBackedUpString {
+									if let lastBackedUpString {
 										Text(lastBackedUpString)
 											.textStyle(.body2Regular)
 											.foregroundStyle(.app.gray2)
@@ -220,8 +220,8 @@ extension ConfigurationBackup {
 		}
 
 		private var lastBackedUpString: String? {
-			guard let lastBackedUp else { return nil }
-			return L10n.ConfigurationBackup.Automated.lastBackup(RadixDateFormatter.string(from: lastBackedUp))
+			guard let lastBackedUp, lastBackedUp.success, !lastBackedUp.upToDate else { return nil }
+			return L10n.ConfigurationBackup.Automated.lastBackup(RadixDateFormatter.string(from: lastBackedUp.backupDate))
 		}
 
 		struct ItemView: SwiftUI.View {
