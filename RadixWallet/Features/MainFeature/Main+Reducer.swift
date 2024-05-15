@@ -101,7 +101,7 @@ public struct Main: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .settings(.delegate(.resettedWallet)):
+		case .settings(.delegate(.didResetWallet)):
 			.run { send in
 				try await appPreferencesClient.deleteProfileAndFactorSources(true)
 				await send(.delegate(.removedWallet))

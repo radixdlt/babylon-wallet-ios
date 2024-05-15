@@ -20,7 +20,7 @@ public struct FactoryReset: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case resettedWallet
+		case didResetWallet
 	}
 
 	public struct Destination: DestinationReducer {
@@ -98,7 +98,7 @@ public struct FactoryReset: Sendable, FeatureReducer {
 				cacheClient.removeAll()
 				await radixConnectClient.disconnectAll()
 				userDefaults.removeAll()
-				await send(.delegate(.resettedWallet))
+				await send(.delegate(.didResetWallet))
 			}
 		}
 	}

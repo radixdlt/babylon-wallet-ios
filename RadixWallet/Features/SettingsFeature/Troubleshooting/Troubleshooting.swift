@@ -25,7 +25,7 @@ public struct Troubleshooting: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case goToAccountList
-		case resettedWallet
+		case didResetWallet
 	}
 
 	public struct Destination: DestinationReducer {
@@ -122,8 +122,8 @@ public struct Troubleshooting: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case .factoryReset(.delegate(.resettedWallet)):
-			return .send(.delegate(.resettedWallet))
+		case .factoryReset(.delegate(.didResetWallet)):
+			return .send(.delegate(.didResetWallet))
 
 		default:
 			return .none
