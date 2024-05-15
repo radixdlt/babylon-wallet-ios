@@ -20,6 +20,7 @@ extension Settings {
 		let appVersion: String
 
 		init(state: Settings.State) {
+			@Dependency(\.bundleInfo) var bundleInfo
 			#if DEBUG
 			let buildInfo = SargonBuildInformation.get()
 			let dependencies = buildInfo.dependencies
@@ -31,11 +32,12 @@ extension Settings {
 				RET: #\(ret)
 				SS: \(RadixConnectConstants.defaultSignalingServer.absoluteString)
 				"""
+			self.appVersion = L10n.WalletSettings.appVersion("\(bundleInfo.shortVersion) (\(bundleInfo.version))")
+			#else
+			self.appVersion = L10n.WalletSettings.appVersion(bundleInfo.shortVersion)
 			#endif
 
 			self.shouldShowAddP2PLinkButton = state.userHasNoP2PLinks ?? false
-			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
-			self.appVersion = L10n.WalletSettings.appVersion(bundleInfo.shortVersion)
 		}
 	}
 }
