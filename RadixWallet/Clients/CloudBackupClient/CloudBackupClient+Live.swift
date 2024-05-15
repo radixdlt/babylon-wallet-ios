@@ -97,8 +97,6 @@ extension CloudBackupClient {
 			}
 
 			try? userDefaults.setLastCloudBackup(result, of: profile)
-
-			print("•• backed up with result: \(result)")
 		}
 
 		Task {
@@ -110,19 +108,15 @@ extension CloudBackupClient {
 
 		Task {
 			for await tick in AsyncTimerSequence(every: .seconds(10)) {
-				print("•• tick: \(tick.formatted(date: .omitted, time: .shortened))")
 				let profile = await profileStore.profile
 				guard profile.appPreferences.security.isCloudProfileSyncEnabled else {
-					print("  •• syncing disabled")
 					continue
 				}
 				let last = userDefaults.getLastCloudBackups[profile.id]
 				if let last, last.result == .success, last.profileHash == profile.hashValue {
-					print("  •• already successfully backed up")
 					continue
 				}
 
-				print("•• will back up")
 				await backupProfileAndSaveResult(profile)
 			}
 		}
@@ -162,8 +156,9 @@ extension CloudBackupClient {
 					return savedRecord
 				}
 			},
-			deleteProfileInKeychain: { id in
+			deleteProfileBackup: { id in
 				try await container().privateCloudDatabase.deleteRecord(withID: .init(recordName: id.uuidString))
+				try userDefaults.removeLastCloudBackup(for: id)
 			},
 			checkAccountStatus: {
 				try await container().accountStatus()

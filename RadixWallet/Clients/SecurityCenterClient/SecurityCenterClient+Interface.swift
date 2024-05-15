@@ -13,8 +13,8 @@ public struct SecurityCenterClient: DependencyKey, Sendable {
 // MARK: SecurityCenterClient.Problems
 extension SecurityCenterClient {
 	public typealias Problems = @Sendable () async -> AnyAsyncSequence<[SecurityProblem]>
-	public typealias LastManualBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus>
-	public typealias LastCloudBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus>
+	public typealias LastManualBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus?>
+	public typealias LastCloudBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus?>
 }
 
 // MARK: - SecurityProblem
@@ -55,7 +55,7 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 // MARK: - SecurityCenterClient.BackupStatus
 extension SecurityCenterClient {
 	// MARK: - BackupStatus
-	public struct BackupStatus: Codable, Sendable {
+	public struct BackupStatus: Hashable, Codable, Sendable {
 		public let backupDate: Date
 		public let upToDate: Bool
 		public let success: Bool
