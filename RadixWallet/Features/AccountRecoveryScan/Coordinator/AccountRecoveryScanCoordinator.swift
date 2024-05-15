@@ -124,8 +124,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case .accountRecoveryScanInProgress(.delegate(.failed)),
-		     .accountRecoveryScanInProgress(.delegate(.close)):
+		case .accountRecoveryScanInProgress(.delegate(.close)):
 			return .send(.delegate(.dismissed))
 
 		case .selectInactiveAccountsToAdd(.delegate(.goBack)):
@@ -145,7 +144,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		active: IdentifiedArrayOf<Account>,
 		inactive: IdentifiedArrayOf<Account>
 	) -> Effect<Action> {
-		let sortedAccounts: IdentifiedArrayOf<Account> = { () -> IdentifiedArrayOf<Account> in
+		let sortedAccounts: Accounts = { () -> IdentifiedArrayOf<Account> in
 			var accounts = active
 			accounts.append(contentsOf: inactive)
 			accounts.sort() // by index
@@ -156,7 +155,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		switch purpose {
 		case let .createProfile(privateHD):
 			let recoveredAccountAndBDFS = AccountsRecoveredFromScanningUsingMnemonic(
-				accounts: Accounts(identified: sortedAccounts),
+				accounts: sortedAccounts,
 				deviceFactorSource: privateHD.factorSource
 			)
 			return .run { send in
@@ -174,7 +173,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 			return .run { send in
 				let result = await TaskResult<EqVoid> {
 					try await accountsClient.saveVirtualAccounts(
-						Accounts(identified: sortedAccounts)
+						sortedAccounts
 					)
 				}
 				await send(.internal(.addAccountsToExistingProfileResult(result)))

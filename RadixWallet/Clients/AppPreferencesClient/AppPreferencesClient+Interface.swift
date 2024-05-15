@@ -1,5 +1,3 @@
-import Sargon
-
 // MARK: - AppPreferencesClient
 public struct AppPreferencesClient: Sendable {
 	public var appPreferenceUpdates: AppPreferenceUpdates
@@ -9,25 +7,30 @@ public struct AppPreferencesClient: Sendable {
 	/// Needs special treatment since this setting involves Keychain and iCloud
 	public var setIsCloudProfileSyncEnabled: SetIsCloudProfileSyncEnabled
 
+	/// Sets the flag on the profile, does not delete old backups
+	public var setIsCloudBackupEnabled: SetIsCloudBackupEnabled
+
 	// FIXME: find a better home for this...? Should we have some actual `ProfileSnapshotClient`
 	// for this and `delete` method?
-	public var extractProfileSnapshot: ExtractProfileSnapshot
-	public var deleteProfileAndFactorSources: DeleteProfileSnapshot
+	public var extractProfile: ExtractProfile
+	public var deleteProfileAndFactorSources: DeleteProfile
 
 	public init(
 		appPreferenceUpdates: @escaping AppPreferenceUpdates,
 		getPreferences: @escaping GetPreferences,
 		updatePreferences: @escaping UpdatePreferences,
-		extractProfileSnapshot: @escaping ExtractProfileSnapshot,
-		deleteProfileAndFactorSources: @escaping DeleteProfileSnapshot,
-		setIsCloudProfileSyncEnabled: @escaping SetIsCloudProfileSyncEnabled
+		extractProfile: @escaping ExtractProfile,
+		deleteProfileAndFactorSources: @escaping DeleteProfile,
+		setIsCloudProfileSyncEnabled: @escaping SetIsCloudProfileSyncEnabled,
+		setIsCloudBackupEnabled: @escaping SetIsCloudBackupEnabled
 	) {
 		self.appPreferenceUpdates = appPreferenceUpdates
 		self.getPreferences = getPreferences
 		self.updatePreferences = updatePreferences
-		self.extractProfileSnapshot = extractProfileSnapshot
+		self.extractProfile = extractProfile
 		self.deleteProfileAndFactorSources = deleteProfileAndFactorSources
 		self.setIsCloudProfileSyncEnabled = setIsCloudProfileSyncEnabled
+		self.setIsCloudBackupEnabled = setIsCloudBackupEnabled
 	}
 }
 
@@ -35,10 +38,11 @@ public struct AppPreferencesClient: Sendable {
 extension AppPreferencesClient {
 	public typealias AppPreferenceUpdates = @Sendable () async -> AnyAsyncSequence<AppPreferences>
 	public typealias SetIsCloudProfileSyncEnabled = @Sendable (Bool) async throws -> Void
+	public typealias SetIsCloudBackupEnabled = @Sendable (Bool) async throws -> Void
 	public typealias GetPreferences = @Sendable () async -> AppPreferences
 	public typealias UpdatePreferences = @Sendable (AppPreferences) async throws -> Void
-	public typealias ExtractProfileSnapshot = @Sendable () async -> Profile
-	public typealias DeleteProfileSnapshot = @Sendable (_ keepInICloudIfPresent: Bool) async throws -> Void
+	public typealias ExtractProfile = @Sendable () async -> Profile
+	public typealias DeleteProfile = @Sendable (_ keepInICloudIfPresent: Bool) async throws -> Void
 }
 
 extension AppPreferencesClient {
@@ -64,7 +68,7 @@ extension AppPreferencesClient {
 	}
 
 	public func isDeveloperModeEnabled() async -> Bool {
-		await extractProfileSnapshot().appPreferences.security.isDeveloperModeEnabled
+		await extractProfile().appPreferences.security.isDeveloperModeEnabled
 	}
 
 	public func toggleIsCurrencyAmountVisible() async throws {

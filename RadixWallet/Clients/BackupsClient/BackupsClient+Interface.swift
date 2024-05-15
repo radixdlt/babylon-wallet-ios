@@ -8,6 +8,7 @@ public struct BackupsClient: Sendable {
 	public var loadProfileBackups: LoadProfileBackups
 	public var lookupProfileSnapshotByHeader: LookupProfileSnapshotByHeader
 	public var importProfileSnapshot: ImportProfileSnapshot
+	public var didExportProfileSnapshot: DidExportProfileSnapshot
 	public var importCloudProfile: ImportCloudProfile
 	public var loadDeviceID: LoadDeviceID
 
@@ -16,6 +17,7 @@ public struct BackupsClient: Sendable {
 		loadProfileBackups: @escaping LoadProfileBackups,
 		lookupProfileSnapshotByHeader: @escaping LookupProfileSnapshotByHeader,
 		importProfileSnapshot: @escaping ImportProfileSnapshot,
+		didExportProfileSnapshot: @escaping DidExportProfileSnapshot,
 		importCloudProfile: @escaping ImportCloudProfile,
 		loadDeviceID: @escaping LoadDeviceID
 	) {
@@ -23,6 +25,7 @@ public struct BackupsClient: Sendable {
 		self.loadProfileBackups = loadProfileBackups
 		self.lookupProfileSnapshotByHeader = lookupProfileSnapshotByHeader
 		self.importProfileSnapshot = importProfileSnapshot
+		self.didExportProfileSnapshot = didExportProfileSnapshot
 		self.importCloudProfile = importCloudProfile
 		self.loadDeviceID = loadDeviceID
 	}
@@ -31,11 +34,10 @@ public struct BackupsClient: Sendable {
 extension BackupsClient {
 	public typealias SnapshotOfProfileForExport = @Sendable () async throws -> Profile
 	public typealias LoadProfileBackups = @Sendable () async -> Profile.HeaderList?
-
-	public typealias ImportProfileSnapshot = @Sendable (Profile, Set<FactorSourceIDFromHash>) async throws -> Void
-	public typealias ImportCloudProfile = @Sendable (Profile.Header, Set<FactorSourceIDFromHash>) async throws -> Void
 	public typealias LookupProfileSnapshotByHeader = @Sendable (Profile.Header) async throws -> Profile?
-
+	public typealias ImportProfileSnapshot = @Sendable (Profile, Set<FactorSourceIDFromHash>) async throws -> Void
+	public typealias DidExportProfileSnapshot = @Sendable (Profile) throws -> Void
+	public typealias ImportCloudProfile = @Sendable (Profile.Header, Set<FactorSourceIDFromHash>) async throws -> Void
 	public typealias LoadDeviceID = @Sendable () async -> UUID?
 }
 

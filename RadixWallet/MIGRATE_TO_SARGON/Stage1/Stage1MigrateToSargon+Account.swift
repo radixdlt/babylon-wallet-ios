@@ -1,9 +1,6 @@
 import Foundation
 import Sargon
 
-// MARK: - Account + EntityBaseProtocol
-extension Account: EntityBaseProtocol {}
-
 // MARK: - Account + Comparable
 extension Account: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
@@ -42,7 +39,7 @@ extension Account {
 	}
 
 	public mutating func unhide() {
-		flags.remove(element: .deletedByUser)
+		entityFlags.remove(.deletedByUser)
 	}
 }
 
@@ -53,5 +50,15 @@ extension Accounts {
 
 	public var hidden: Accounts {
 		filter(\.isHidden)
+	}
+}
+
+extension [Account] {
+	public var nonHidden: Accounts {
+		asIdentified().nonHidden
+	}
+
+	public var hidden: Accounts {
+		asIdentified().hidden
 	}
 }

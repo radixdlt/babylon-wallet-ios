@@ -76,7 +76,7 @@ extension AccountPortfoliosClient.State {
 
 	func setTokenPrices(_ tokenPrices: TokenPrices) {
 		self.tokenPrices = tokenPrices
-		if var existingPortfolios = portfoliosSubject.value.values.wrappedValue.map(Array.init) {
+		if var existingPortfolios = portfoliosSubject.value.values.wrappedValue.map({ Array($0) }) {
 			applyTokenPrices(to: &existingPortfolios)
 			setOrUpdateAccountPortfolios(existingPortfolios)
 		}
@@ -84,7 +84,7 @@ extension AccountPortfoliosClient.State {
 
 	func setIsCurrencyAmountVisble(_ isVisible: Bool) {
 		self.isCurrencyAmountVisible = isVisible
-		if var existingPortfolios = portfoliosSubject.value.values.wrappedValue.map(Array.init) {
+		if var existingPortfolios = portfoliosSubject.value.values.wrappedValue.map({ Array($0) }) {
 			applyCurrencyVisibility(to: &existingPortfolios)
 			setOrUpdateAccountPortfolios(existingPortfolios)
 		}
@@ -92,7 +92,7 @@ extension AccountPortfoliosClient.State {
 
 	func setSelectedCurrency(_ currency: FiatCurrency) {
 		self.selectedCurrency = currency
-		if var existingPortfolios = portfoliosSubject.value.values.wrappedValue.map(Array.init) {
+		if var existingPortfolios = portfoliosSubject.value.values.wrappedValue.map({ Array($0) }) {
 			applyFiatCurrency(to: &existingPortfolios)
 			setOrUpdateAccountPortfolios(existingPortfolios)
 		}
