@@ -20,9 +20,8 @@ extension SecurityCenterClient {
 // MARK: - SecurityProblem
 /// As outlined in https://radixdlt.atlassian.net/wiki/spaces/AT/pages/3392569357/Security-related+Problem+States+in+the+Wallet
 public enum SecurityProblem: Hashable, Sendable, Identifiable {
-	/// User has at least one shield, but has no XRD. User has an account (or accounts) without a shield applied, meaning it is only secured by a single factor.
-	/// That factor (as is often, but not always the case) is a phone key factor and the user has never viewed the seed phrase and confirmed that they wrote it down.
-	/// Losing the phone means losing that account forever.
+	/// The given number of `accounts` and `personas` are unrecoverabl if the user loses their phone, since their corresponding seed phrase has not been written down.
+	/// NOTE: This definition differs from the one at Confluence since we don't have shields implemented yet.
 	case problem3(accounts: Int, personas: Int)
 	/// Wallet backups to the cloud aren’t working (wallet tried to do a backup and it didn’t work within, say, 5 minutes.)
 	/// This means that currently all accounts and personas are at risk of being practically unrecoverable if the user loses their phone.
