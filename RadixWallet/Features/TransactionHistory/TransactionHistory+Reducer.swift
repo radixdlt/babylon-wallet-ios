@@ -456,6 +456,7 @@ extension RandomAccessCollection<TransactionHistory.TransactionSection> {
 			return nil
 		}
 		guard last <= first else {
+			assertionFailure("DateSpan error: this should be impossible since the sections should always be sorted")
 			return last ..< last
 		}
 		return last ..< first
