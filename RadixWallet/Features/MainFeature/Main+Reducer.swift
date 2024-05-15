@@ -81,20 +81,18 @@ public struct Main: Sendable, FeatureReducer {
 			do {
 				try await cloudBackupClient.startAutomaticBackups()
 			} catch {
-				print("•• startAutomaticBackupsEffect failed: \(error)")
+				loggerGlobal.notice("cloudBackupClient.startAutomaticBackups failed: \(error)")
 			}
 		}
 	}
 
 	private func gatewayValuesEffect() -> Effect<Action> {
 		.run { send in
-			print("•• MAIN TASK STArT")
 			for try await gateway in await gatewaysClient.currentGatewayValues() {
 				guard !Task.isCancelled else { return }
 				loggerGlobal.notice("Changed network to: \(gateway)")
 				await send(.internal(.currentGatewayChanged(to: gateway)))
 			}
-			print("•• MAIN TASK ENDED")
 		}
 	}
 
