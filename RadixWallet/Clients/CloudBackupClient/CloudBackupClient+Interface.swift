@@ -5,6 +5,7 @@ import os
 
 // MARK: - CloudBackupClient
 public struct CloudBackupClient: DependencyKey, Sendable {
+	public let startAutomaticBackups: StartAutomaticBackups
 	public let loadDeviceID: LoadDeviceID
 	public let migrateProfilesFromKeychain: MigrateProfilesFromKeychain
 	public let deleteProfileBackup: DeleteProfileBackup
@@ -15,6 +16,7 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 	public let backupProfile: BackupProfile
 
 	public init(
+		startAutomaticBackups: @escaping StartAutomaticBackups,
 		loadDeviceID: @escaping LoadDeviceID,
 		migrateProfilesFromKeychain: @escaping MigrateProfilesFromKeychain,
 		deleteProfileBackup: @escaping DeleteProfileBackup,
@@ -24,6 +26,7 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 		loadAllProfiles: @escaping LoadAllProfiles,
 		backupProfile: @escaping BackupProfile
 	) {
+		self.startAutomaticBackups = startAutomaticBackups
 		self.loadDeviceID = loadDeviceID
 		self.migrateProfilesFromKeychain = migrateProfilesFromKeychain
 		self.deleteProfileBackup = deleteProfileBackup
@@ -36,12 +39,13 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 }
 
 extension CloudBackupClient {
+	public typealias StartAutomaticBackups = @Sendable () async throws -> Void
 	public typealias LoadDeviceID = @Sendable () async -> UUID?
 	public typealias MigrateProfilesFromKeychain = @Sendable () async throws -> [CKRecord]
-	public typealias DeleteProfileBackup = @Sendable (UUID) async throws -> Void
+	public typealias DeleteProfileBackup = @Sendable (ProfileID) async throws -> Void
 	public typealias CheckAccountStatus = @Sendable () async throws -> CKAccountStatus
-	public typealias LastBackup = @Sendable (UUID) -> AnyAsyncSequence<BackupResult?>
-	public typealias LoadProfile = @Sendable (UUID) async throws -> Profile?
+	public typealias LastBackup = @Sendable (ProfileID) -> AnyAsyncSequence<BackupResult?>
+	public typealias LoadProfile = @Sendable (ProfileID) async throws -> Profile?
 	public typealias LoadAllProfiles = @Sendable () async throws -> [Profile]
 	public typealias BackupProfile = @Sendable () async throws -> CKRecord
 }

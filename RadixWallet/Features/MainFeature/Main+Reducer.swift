@@ -52,6 +52,7 @@ public struct Main: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.personasClient) var personasClient
+	@Dependency(\.cloudBackupClient) var cloudBackupClient
 
 	public init() {}
 
@@ -70,13 +71,30 @@ public struct Main: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			.run { send in
-				for try await gateway in await gatewaysClient.currentGatewayValues() {
-					guard !Task.isCancelled else { return }
-					loggerGlobal.notice("Changed network to: \(gateway)")
-					await send(.internal(.currentGatewayChanged(to: gateway)))
-				}
+			startAutomaticBackupsEffect()
+				.merge(with: gatewayValuesEffect())
+		}
+	}
+
+	private func startAutomaticBackupsEffect() -> Effect<Action> {
+		.run { _ in
+			do {
+				try await cloudBackupClient.startAutomaticBackups()
+			} catch {
+				print("•• startAutomaticBackupsEffect failed: \(error)")
 			}
+		}
+	}
+
+	private func gatewayValuesEffect() -> Effect<Action> {
+		.run { send in
+			print("•• MAIN TASK STArT")
+			for try await gateway in await gatewaysClient.currentGatewayValues() {
+				guard !Task.isCancelled else { return }
+				loggerGlobal.notice("Changed network to: \(gateway)")
+				await send(.internal(.currentGatewayChanged(to: gateway)))
+			}
+			print("•• MAIN TASK ENDED")
 		}
 	}
 
