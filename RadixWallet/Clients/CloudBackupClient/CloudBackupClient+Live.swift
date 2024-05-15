@@ -105,20 +105,12 @@ extension CloudBackupClient {
 				let profiles = await profileStore.values()
 
 				for try await (profile, _) in combineLatest(profiles, timer) {
-					guard !Task.isCancelled else { print("•• cancel auto backups"); return }
-					print("•• tick or profile change")
-					guard profile.appPreferences.security.isCloudProfileSyncEnabled else {
-						print("•• CloudProfileSync disabled")
-						continue
-					}
+					guard !Task.isCancelled else { return }
+					guard profile.appPreferences.security.isCloudProfileSyncEnabled else { continue }
 
 					let last = userDefaults.getLastCloudBackups[profile.id]
-					if let last, last.result == .success, last.profileHash == profile.hashValue {
-						print("•• alredy up to date")
-						continue
-					}
+					if let last, last.result == .success, last.profileHash == profile.hashValue { continue }
 
-					print("•• will backup")
 					await backupProfileAndSaveResult(profile)
 				}
 			},
