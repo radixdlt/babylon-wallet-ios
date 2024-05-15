@@ -14,22 +14,23 @@ extension SecurityCenterClient {
 		@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
 
 		@Sendable
-		func manualBackups() async -> AnyAsyncSequence<BackupStatus> {
+		func manualBackups() async -> AnyAsyncSequence<BackupStatus?> {
 			let profileID = await profileStore.profile.id
 			let backups = userDefaults.lastManualBackupValues(for: profileID)
 			return await statusValues(results: backups)
 		}
 
 		@Sendable
-		func cloudBackups() async -> AnyAsyncSequence<BackupStatus> {
+		func cloudBackups() async -> AnyAsyncSequence<BackupStatus?> {
 			let profileID = await profileStore.profile.id
 			let backups = userDefaults.lastCloudBackupValues(for: profileID)
 			return await statusValues(results: backups)
 		}
 
 		@Sendable
-		func statusValues(results: AnyAsyncSequence<BackupResult>) async -> AnyAsyncSequence<BackupStatus> {
-			await combineLatest(profileStore.values(), results).map { profile, backup in
+		func statusValues(results: AnyAsyncSequence<BackupResult?>) async -> AnyAsyncSequence<BackupStatus?> {
+			await combineLatest(profileStore.values(), results.prepend(nil)).map { profile, backup in
+				guard let backup else { return nil }
 				let upToDate = backup.profileHash == profile.hashValue
 				let success = backup.result == .success
 				return .init(backupDate: backup.backupDate, upToDate: upToDate, success: success)
@@ -39,10 +40,9 @@ extension SecurityCenterClient {
 
 		return .init(
 			problems: {
-				let profileID = await profileStore.profile.id
 				let profiles = await profileStore.values()
-				let cloudBackups = await cloudBackups().optional
-				let manualBackups = await manualBackups().optional
+				let cloudBackups = await cloudBackups()
+				let manualBackups = await manualBackups()
 
 				return combineLatest(profiles, cloudBackups, manualBackups).map { profile, cloudBackup, manualBackup in
 					let enabled = profile.appPreferences.security.isCloudProfileSyncEnabled
