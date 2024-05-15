@@ -15,7 +15,7 @@ extension CloudBackupClient {
 	struct MissingCloudKitIdentifierError: Error {}
 	struct IncorrectRecordTypeError: Error {}
 	struct NoProfileInRecordError: Error {}
-	struct ProfileMissingFromKeychainError: Error { let id: UUID }
+	struct ProfileMissingFromKeychainError: Error { let id: ProfileID }
 
 	public static let liveValue: Self = .live()
 
@@ -107,7 +107,7 @@ extension CloudBackupClient {
 		}
 
 		Task {
-			for await tick in AsyncTimerSequence(every: .seconds(10)) {
+			for await tick in AsyncTimerSequence(every: .seconds(60)) {
 				let profile = await profileStore.profile
 				guard profile.appPreferences.security.isCloudProfileSyncEnabled else {
 					continue
