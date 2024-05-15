@@ -99,29 +99,29 @@ extension CloudBackupClient {
 			try? userDefaults.setLastCloudBackup(result, of: profile)
 		}
 
-		Task {
-			for try await profile in await profileStore.values() {
-				guard profile.appPreferences.security.isCloudProfileSyncEnabled else { continue }
-				await backupProfileAndSaveResult(profile)
-			}
-		}
-
-		Task {
-			for await tick in AsyncTimerSequence(every: .seconds(60)) {
-				let profile = await profileStore.profile
-				guard profile.appPreferences.security.isCloudProfileSyncEnabled else {
-					continue
-				}
-				let last = userDefaults.getLastCloudBackups[profile.id]
-				if let last, last.result == .success, last.profileHash == profile.hashValue {
-					continue
-				}
-
-				await backupProfileAndSaveResult(profile)
-			}
-		}
-
 		return .init(
+			startAutomaticBackups: {
+				let timer = AsyncTimerSequence(every: .seconds(60))
+				let profiles = await profileStore.values()
+
+				for try await (profile, _) in combineLatest(profiles, timer) {
+					guard !Task.isCancelled else { print("•• cancel auto backups"); return }
+					print("•• tick or profile change")
+					guard profile.appPreferences.security.isCloudProfileSyncEnabled else {
+						print("•• CloudProfileSync disabled")
+						continue
+					}
+
+					let last = userDefaults.getLastCloudBackups[profile.id]
+					if let last, last.result == .success, last.profileHash == profile.hashValue {
+						print("•• alredy up to date")
+						continue
+					}
+
+					print("•• will backup")
+					await backupProfileAndSaveResult(profile)
+				}
+			},
 			loadDeviceID: {
 				try? secureStorageClient.loadDeviceInfo()?.id
 			},
