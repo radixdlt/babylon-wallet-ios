@@ -3,6 +3,8 @@ import ComposableArchitecture
 
 // MARK: - ConfigurationBackup
 public struct ConfigurationBackup: Sendable, FeatureReducer {
+	public typealias BackupStatus = SecurityCenterClient.BackupStatus
+
 	public struct Exportable: Sendable, Hashable {
 		public let profile: Profile
 		public let file: ExportableProfileFile
@@ -12,7 +14,8 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		public var iCloudAccountStatus: CKAccountStatus? = nil
 		public var cloudBackupsEnabled: Bool = true
 		public var lastManualBackup: Date? = nil
-		public var lastCloudBackup: Date? = nil
+		public var lastCloudBackup: BackupStatus? = nil
+
 		public var problems: [SecurityProblem] = []
 
 		@PresentationState
@@ -22,7 +25,8 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		public var exportable: Exportable? = nil
 
 		public var outdatedBackupPresent: Bool {
-			!cloudBackupsEnabled && lastCloudBackup != nil
+			guard let lastCloudBackup, lastCloudBackup.success else { return false }
+			return !cloudBackupsEnabled && !lastCloudBackup.upToDate
 		}
 
 		public var actionsRequired: [Item] {
@@ -53,7 +57,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		case setICloudAccountStatus(CKAccountStatus)
 		case setProblems([SecurityProblem])
 		case setLastManualBackup(Date?)
-		case setLastCloudBackup(Date?)
+		case setLastCloudBackup(BackupStatus?)
 		case didDeleteOutdatedBackup(ProfileID)
 		case exportProfile(Profile)
 	}
@@ -110,7 +114,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 				.merge(with: lastCloudBackupEffect())
 
 		case let .cloudBackupsToggled(isEnabled):
-			state.lastCloudBackup = nil
 			return updateCloudBackupsSettingEffect(isEnabled: isEnabled)
 
 		case .exportTapped:
@@ -127,7 +130,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			return .run { send in
 				let profile = await ProfileStore.shared.profile
 				do {
-					try await cloudBackupClient.deleteProfileInKeychain(profile.id)
+					try await cloudBackupClient.deleteProfileBackup(profile.id)
 					await send(.internal(.didDeleteOutdatedBackup(profile.id)))
 				} catch {
 					loggerGlobal.error("Failed to delete outdate backup \(profile.id.uuidString): \(error)")
@@ -176,7 +179,6 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .didDeleteOutdatedBackup(id):
-			state.lastCloudBackup = nil
 			// FIXME: GK - show toast?
 			return .none
 
@@ -192,8 +194,8 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			state.problems = problems
 			return .none
 
-		case let .setLastCloudBackup(date):
-			state.lastCloudBackup = date
+		case let .setLastCloudBackup(status):
+			state.lastCloudBackup = status
 			return .none
 
 		case let .setLastManualBackup(date):
@@ -210,7 +212,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		.run { send in
 			for try await lastBackup in await securityCenterClient.lastManualBackup() {
 				guard !Task.isCancelled else { return }
-				await send(.internal(.setLastManualBackup(lastBackup.backupDate)))
+				await send(.internal(.setLastManualBackup(lastBackup?.backupDate)))
 			}
 		}
 	}
@@ -219,7 +221,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		.run { send in
 			for try await lastBackup in await securityCenterClient.lastCloudBackup() {
 				guard !Task.isCancelled else { return }
-				await send(.internal(.setLastCloudBackup(lastBackup.upToDate ? nil : lastBackup.backupDate)))
+				await send(.internal(.setLastCloudBackup(lastBackup)))
 			}
 		}
 	}
