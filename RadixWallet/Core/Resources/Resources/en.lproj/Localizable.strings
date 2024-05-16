@@ -206,6 +206,10 @@
 "linkedConnectors_unknownPurposeErrorMessage" = "This type of Connector link is not supported.";
 "linkedConnectors_changingPurposeNotSupportedErrorMessage" = "Changing a Connector’s type is not supported.";
 "linkedConnectors_oldQRErrorMessage" = "This is an old version of the Radix Connector browser extension. Please update to the latest Connector and try linking again.";
+"linkedConnectors_relinkConnectors_title" = "Re-link Connector";
+"linkedConnectors_relinkConnectors_afterUpdateMessage" = "Radix Connector now supports linking multiple phones with one browser.\n\nTo support this feature, we\'ve had to disconnect your existing links – **please re-link your Connector(s).**";
+"linkedConnectors_relinkConnectors_afterProfileRestoreMessage" = "Any Connectors you had linked to this wallet using a different phone have been disconnected\n\n**Please re-link your Connector(s) to use with this phone.**";
+"linkedConnectors_relinkConnectors_laterButton" = "Later";
 "gateways_title" = "Gateways";
 "gateways_subtitle" = "Choose the gateway your wallet will use to connect to the Radix Network or test networks. Only change this if you know what you’re doing.";
 "gateways_whatIsAGateway" = "What is a Gateway?";
@@ -595,10 +599,10 @@
 "onboarding_cloudAndroid_backupSubtitle" = "Connect to Google Drive to automatically backup your Radix wallet settings.";
 "onboarding_cloudAndroid_skip" = "Skip";
 "onboarding_cloudAndroid_backupButton" = "Back up to Google Drive";
-"onboarding_cloudAndroidRestore_BackupTitle" = "Restore wallet from backup";
-"onboarding_cloudAndroidRestore_BackupSubtitle" = "Log in to Google Drive to restore your Radix Wallet from backup.";
-"onboarding_cloudAndroidRestore_Skip" = "Skip";
-"onboarding_cloudAndroidRestore_LoginButton" = "Log in to Google Drive";
+"onboarding_cloudRestoreAndroid_backupTitle" = "Restore wallet from backup";
+"onboarding_cloudRestoreAndroid_backupSubtitle" = "Log in to Google Drive to restore your Radix Wallet from backup.";
+"onboarding_cloudRestoreAndroid_skip" = "Skip";
+"onboarding_cloudRestoreAndroid_loginButton" = "Log in to Google Drive";
 "splash_tapAnywhereToUnlock" = "Tap to unlock";
 "splash_passcodeNotSetTitle" = "Passcode not set up";
 "splash_passcodeNotSetMessage" = "This app requires your phone to have a passcode set up";
