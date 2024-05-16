@@ -1050,7 +1050,7 @@
 "securityCenter_securityFactorsItem_subtitle" = "The keys you use to control your Accounts and Personas";
 "securityCenter_securityFactorsItem_activeStatus" = "Active";
 "securityCenter_configurationBackupItem_title" = "Configuration Backup";
-"securityCenter_configurationBackupItem_subtitle" = "A Backup of your Account, Persona and wallet settings";
+"securityCenter_configurationBackupItem_subtitle" = "A backup of your Account, Personas and wallet settings";
 "securityCenter_configurationBackupItem_backedUpStatus" = "Backed up";
 "securityCenter_anyItem_actionRequiredStatus" = "Action required";
 "securityCenter_encryptWalletBackup_title" = "Encrypt Wallet Backup File";
@@ -1066,7 +1066,7 @@
 "securityFactors_seedPhrases_counterSingular" = "1 Seed phrase";
 "securityFactors_seedPhrases_counterPlural" = "%d Seed phrases";
 "securityFactors_seedPhrases_enterSeedPhrase" = "Enter your seed phrase to recover Accounts";
-"securityFactors_ledgerWallet_title" = "Ledger Hardware Wallet";
+"securityFactors_ledgerWallet_title" = "Ledger Hardware Wallets";
 "securityFactors_ledgerWallet_subtitle" = "Hardware wallet designed for holding crypto";
 "securityFactors_ledgerWallet_counterSingular" = "1 set";
 "securityFactors_ledgerWallet_counterPlural" = "%d set";
