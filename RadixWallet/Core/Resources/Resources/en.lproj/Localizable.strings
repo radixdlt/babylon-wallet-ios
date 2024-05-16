@@ -591,6 +591,14 @@
 "onboarding_eula_headerTitle" = "User Terms";
 "onboarding_eula_headerSubtitle" = "To proceed, you must accept the user terms below.";
 "onboarding_eula_accept" = "Accept";
+"onboarding_cloudAndroid_backupTitle" = "Back up your wallet settings";
+"onboarding_cloudAndroid_backupSubtitle" = "Connect to Google Drive to automatically backup your Radix wallet settings.";
+"onboarding_cloudAndroid_skip" = "Skip";
+"onboarding_cloudAndroid_backupButton" = "Back up to Google Drive";
+"onboarding_cloudAndroidRestore_BackupTitle" = "Restore wallet from backup";
+"onboarding_cloudAndroidRestore_BackupSubtitle" = "Log in to Google Drive to restore your Radix Wallet from backup.";
+"onboarding_cloudAndroidRestore_Skip" = "Skip";
+"onboarding_cloudAndroidRestore_LoginButton" = "Log in to Google Drive";
 "splash_tapAnywhereToUnlock" = "Tap to unlock";
 "splash_passcodeNotSetTitle" = "Passcode not set up";
 "splash_passcodeNotSetMessage" = "This app requires your phone to have a passcode set up";
@@ -1069,6 +1077,7 @@
 "configurationBackup_automated_toggleIOS" = "Automated iCloud Backups";
 "configurationBackup_automated_toggleAndroid" = "Automated Google Drive Backups";
 "configurationBackup_automated_lastBackup" = "Last backup: %@";
+"configurationBackup_automated_logInAndroid" = "Log in to Google Drive";
 "configurationBackup_automated_loggedInAsAndroid" = "Logged in as:";
 "configurationBackup_automated_disconnectAndroid" = "Disconnect";
 "configurationBackup_automated_outdatedBackupIOS" = "Out-of-date backup still present on iCloud";
