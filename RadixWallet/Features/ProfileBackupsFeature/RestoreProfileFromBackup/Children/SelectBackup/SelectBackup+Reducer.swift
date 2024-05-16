@@ -167,7 +167,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			return .none
 
 		case let .loadCloudBackupProfiles(profiles):
-			state.backedUpProfiles = profiles
+			state.backedUpProfiles = profiles?.sorted(by: \.header.lastModified).reversed()
 			return .none
 
 		case let .loadThisDeviceIDResult(identifier):
