@@ -455,6 +455,10 @@ extension RandomAccessCollection<TransactionHistory.TransactionSection> {
 		guard let first = first?.transactions.first?.time, let last = last?.transactions.last?.time else {
 			return nil
 		}
+		guard last <= first else {
+			assertionFailure("DateSpan error: this should be impossible since the sections should always be sorted")
+			return last ..< last
+		}
 		return last ..< first
 	}
 }
@@ -468,13 +472,11 @@ extension IdentifiedArrayOf<TransactionHistory.TransactionSection> {
 
 		for (day, transactions) in grouped {
 			let sectionID = TransactionHistory.TransactionSection.ID(day)
-			if self[id: sectionID] == nil {
-				let month = calendar.startOfMonth(for: day)
-				self[id: sectionID] = .init(day: day, month: month, transactions: transactions.asIdentified())
-			} else {
-				self[id: sectionID]?.transactions.append(contentsOf: transactions)
-			}
-			self[id: sectionID]?.transactions.sort(by: \.time, >)
+			let month = calendar.startOfMonth(for: day)
+			var section = self[id: sectionID] ?? .init(day: day, month: month, transactions: [])
+			section.transactions.append(contentsOf: transactions)
+			section.transactions.sort(by: \.time, >)
+			self[id: sectionID] = section
 		}
 
 		sort(by: \.day, >)

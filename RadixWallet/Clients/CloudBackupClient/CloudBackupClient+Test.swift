@@ -17,7 +17,7 @@ extension CloudBackupClient: TestDependencyKey {
 	public static let noop = Self(
 		loadDeviceID: { nil },
 		migrateProfilesFromKeychain: { throw NoopError() },
-		deleteProfileInKeychain: { _ in },
+		deleteProfileBackup: { _ in },
 		checkAccountStatus: { throw NoopError() },
 		lastBackup: { _ in AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		loadProfile: { _ in throw NoopError() },
@@ -28,7 +28,7 @@ extension CloudBackupClient: TestDependencyKey {
 	public static let testValue = Self(
 		loadDeviceID: unimplemented("\(Self.self).loadDeviceID"),
 		migrateProfilesFromKeychain: unimplemented("\(Self.self).migrateProfilesFromKeychain"),
-		deleteProfileInKeychain: unimplemented("\(Self.self).deleteProfileInKeychain"),
+		deleteProfileBackup: unimplemented("\(Self.self).deleteProfileBackup"),
 		checkAccountStatus: unimplemented("\(Self.self).checkAccountStatus"),
 		lastBackup: unimplemented("\(Self.self).lastBackup"),
 		loadProfile: unimplemented("\(Self.self).queryProfile"),

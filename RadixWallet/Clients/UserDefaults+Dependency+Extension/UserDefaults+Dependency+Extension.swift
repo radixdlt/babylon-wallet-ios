@@ -151,8 +151,14 @@ extension UserDefaults.Dependency {
 		set(value, forKey: Key.didMigrateKeychainProfiles.rawValue)
 	}
 
-	public var getLastCloudBackups: [UUID: BackupResult] {
+	public var getLastCloudBackups: [ProfileID: BackupResult] {
 		(try? loadCodable(key: .lastCloudBackups)) ?? [:]
+	}
+
+	public func removeLastCloudBackup(for id: ProfileID) throws {
+		var backups: [UUID: BackupResult] = getLastCloudBackups
+		backups[id] = nil
+		try save(codable: backups, forKey: .lastCloudBackups)
 	}
 
 	public func setLastCloudBackup(_ result: BackupResult.Result, of profile: Profile) throws {
@@ -166,17 +172,17 @@ extension UserDefaults.Dependency {
 		try save(codable: backups, forKey: .lastCloudBackups)
 	}
 
-	public func lastCloudBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<BackupResult> {
+	public func lastCloudBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<BackupResult?> {
 		lastBackupValues(for: profileID, key: .lastCloudBackups)
 	}
 
-	public var getLastManualBackups: [UUID: BackupResult] {
+	public var getLastManualBackups: [ProfileID: BackupResult] {
 		(try? loadCodable(key: .lastManualBackups)) ?? [:]
 	}
 
 	/// Only call this on successful manual backups
 	public func setLastManualBackup(of profile: Profile) throws {
-		var backups: [UUID: BackupResult] = getLastManualBackups
+		var backups: [ProfileID: BackupResult] = getLastManualBackups
 		backups[profile.id] = .init(
 			backupDate: .now,
 			profileHash: profile.hashValue,
@@ -186,13 +192,13 @@ extension UserDefaults.Dependency {
 		try save(codable: backups, forKey: .lastManualBackups)
 	}
 
-	public func lastManualBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<BackupResult> {
+	public func lastManualBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<BackupResult?> {
 		lastBackupValues(for: profileID, key: .lastManualBackups)
 	}
 
-	private func lastBackupValues<T: Codable & Sendable>(for profileID: ProfileID, key: UserDefaultsKey) -> AnyAsyncSequence<T> {
-		codableValues(key: key, codable: [UUID: T].self)
-			.compactMap { (try? $0.get())?[profileID] }
+	private func lastBackupValues(for profileID: ProfileID, key: UserDefaultsKey) -> AnyAsyncSequence<BackupResult?> {
+		codableValues(key: key, codable: [ProfileID: BackupResult].self)
+			.map { (try? $0.get())?[profileID] }
 			.eraseToAnyAsyncSequence()
 	}
 
