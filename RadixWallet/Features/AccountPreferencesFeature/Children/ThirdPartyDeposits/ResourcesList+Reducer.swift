@@ -82,11 +82,13 @@ public struct ResourcesList: FeatureReducer, Sendable {
 	// MARK: Destination
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Hashable, Sendable {
 			case addAsset(AddAsset.State)
 			case confirmAssetDeletion(AlertState<Action.ConfirmDeletionAlert>)
 		}
 
+		@CasePathable
 		public enum Action: Equatable, Sendable {
 			case addAsset(AddAsset.Action)
 			case confirmAssetDeletion(ConfirmDeletionAlert)
@@ -98,7 +100,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.addAsset, action: /Action.addAsset) {
+			Scope(state: \.addAsset, action: \.addAsset) {
 				AddAsset()
 			}
 		}
