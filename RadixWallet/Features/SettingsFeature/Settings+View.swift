@@ -73,7 +73,7 @@ extension Settings.View {
 						}
 					}
 
-					ForEach(rows(securityProblems: viewStore.securityProblems)) { kind in
+					ForEachStatic(rows(securityProblems: viewStore.securityProblems)) { kind in
 						SettingsRow(kind: kind, store: store)
 					}
 				}

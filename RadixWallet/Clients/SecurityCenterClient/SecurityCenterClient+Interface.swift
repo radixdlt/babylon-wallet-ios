@@ -59,6 +59,16 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 		case .problem9: L10n.SecurityCenter.Problem9.text
 		}
 	}
+
+	public var heading: String {
+		switch self {
+		case let .problem3(accounts, personas): L10n.SecurityCenter.Problem3.heading(accounts, personas)
+		case .problem5: L10n.SecurityCenter.Problem5.heading
+		case .problem6: L10n.SecurityCenter.Problem6.heading
+		case .problem7: L10n.SecurityCenter.Problem7.heading
+		case .problem9: L10n.SecurityCenter.Problem9.heading
+		}
+	}
 }
 
 // MARK: - SecurityCenterClient.BackupStatus

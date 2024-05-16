@@ -7,6 +7,13 @@ import os
 extension SecurityCenterClient {
 	public static let liveValue: Self = .live()
 
+	public func isRecoverable() async -> AnyAsyncSequence<Bool> {
+		await problems().map { problems in
+			!problems.contains(.problem5) && !problems.contains(.problem6) && !problems.contains(.problem7)
+		}
+		.eraseToAnyAsyncSequence()
+	}
+
 	public static func live(
 		profileStore: ProfileStore = .shared
 	) -> SecurityCenterClient {
@@ -45,15 +52,12 @@ extension SecurityCenterClient {
 				let manualBackups = await manualBackups()
 
 				return combineLatest(profiles, cloudBackups, manualBackups).map { profile, cloudBackup, manualBackup in
-					let enabled = profile.appPreferences.security.isCloudProfileSyncEnabled
-					var result: [SecurityProblem] = []
+					let isCloudProfileSyncEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
 
 					func hasProblem3() async -> (accounts: Int, personas: Int)? {
 						guard let result = try? await deviceFactorSourceClient.unrecoverableEntitiesCount(),
 						      result.accounts + result.personas > 0
-						else {
-							return nil
-						}
+						else { return nil }
 						return result
 					}
 
@@ -66,16 +70,18 @@ extension SecurityCenterClient {
 					}
 
 					func hasProblem6() -> Bool {
-						!enabled && manualBackup == nil
+						!isCloudProfileSyncEnabled && manualBackup == nil
 					}
 
 					func hasProblem7() -> Bool {
-						!enabled && manualBackup?.upToDate == false
+						!isCloudProfileSyncEnabled && manualBackup?.upToDate == false
 					}
 
 					func hasProblem9() async -> Bool {
 						await (try? deviceFactorSourceClient.isSeedPhraseNeededToRecoverAccounts()) ?? false
 					}
+
+					var result: [SecurityProblem] = []
 
 					if let (accounts, personas) = await hasProblem3() {
 						result.append(.problem3(accounts: accounts, personas: personas))
@@ -92,14 +98,5 @@ extension SecurityCenterClient {
 			lastManualBackup: manualBackups,
 			lastCloudBackup: cloudBackups
 		)
-	}
-}
-
-extension AsyncSequence where Self: Sendable, Element: Sendable {
-	/// A sequence of optional Elements, starting with `nil`. Useful together with `combineLatest`.
-	var optional: AnyAsyncSequence<Element?> {
-		map { $0 as Element? }
-			.prepend(nil)
-			.eraseToAnyAsyncSequence()
 	}
 }
