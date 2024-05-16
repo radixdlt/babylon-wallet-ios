@@ -87,7 +87,7 @@ extension SecurityCenter {
 						Image(.error)
 							.padding(.trailing, .small2)
 
-						Text(heading(for: problem))
+						Text(problem.heading)
 							.multilineTextAlignment(.leading)
 							.lineSpacing(-.small2)
 							.textStyle(.body1Header)
@@ -100,7 +100,7 @@ extension SecurityCenter {
 					.background(.app.alert)
 
 					HStack(spacing: 0) {
-						Text(text(for: problem))
+						Text(problem.message)
 							.multilineTextAlignment(.leading)
 							.textStyle(.body2HighImportance)
 
@@ -114,26 +114,6 @@ extension SecurityCenter {
 					.background(.app.lightAlert)
 				}
 				.roundedCorners(radius: .small1)
-			}
-		}
-
-		func heading(for problem: SecurityProblem) -> String {
-			switch problem {
-			case let .problem3(accounts, personas): L10n.SecurityCenter.Problem3.heading(accounts, personas)
-			case .problem5: L10n.SecurityCenter.Problem5.heading
-			case .problem6: L10n.SecurityCenter.Problem6.heading
-			case .problem7: L10n.SecurityCenter.Problem7.heading
-			case .problem9: L10n.SecurityCenter.Problem9.heading
-			}
-		}
-
-		func text(for problem: SecurityProblem) -> String {
-			switch problem {
-			case .problem3: L10n.SecurityCenter.Problem3.text
-			case .problem5: L10n.SecurityCenter.Problem5.text
-			case .problem6: L10n.SecurityCenter.Problem6.text
-			case .problem7: L10n.SecurityCenter.Problem7.text
-			case .problem9: L10n.SecurityCenter.Problem9.text
 			}
 		}
 	}
