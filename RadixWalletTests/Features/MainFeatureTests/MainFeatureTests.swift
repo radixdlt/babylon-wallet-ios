@@ -29,6 +29,7 @@ final class MainFeatureTests: TestCase {
 		let store = TestStore(initialState: Main.State(home: .previewValue)) {
 			Main()
 //				.dependency(\.userDefaults, .noop)
+				.dependency(\.cloudBackupClient, .noop)
 				.dependency(\.gatewaysClient.currentGatewayValues) { AsyncLazySequence([.stokenet]).eraseToAnyAsyncSequence() }
 		}
 
