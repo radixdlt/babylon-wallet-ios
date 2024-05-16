@@ -12,7 +12,7 @@ extension SecurityCenter {
 		}
 
 		public var body: some SwiftUI.View {
-			WithViewStore(store, observe: { $0 }, send: { .view($0) }) { viewStore in
+			WithViewStore(store, observe: { $0 }) { viewStore in
 				ScrollView {
 					VStack(alignment: .leading, spacing: .zero) {
 						Text(L10n.SecurityCenter.title)
@@ -36,9 +36,9 @@ extension SecurityCenter {
 								}
 							}
 
-							ForEach(Item.allCases, id: \.self) { item in
-								ItemCardView(item: item, actionRequired: viewStore.actionsRequired.contains(item)) {
-									store.send(.view(.itemTapped(item)))
+							ForEach(SecurityProblem.ProblemType.allCases, id: \.self) { type in
+								ProblemTypeCard(type: type, actionRequired: viewStore.actionsRequired.contains(type)) {
+									store.send(.view(.cardTapped(type)))
 								}
 							}
 						}
@@ -118,8 +118,8 @@ extension SecurityCenter {
 		}
 	}
 
-	struct ItemCardView: SwiftUI.View {
-		let item: Item
+	struct ProblemTypeCard: SwiftUI.View {
+		let type: SecurityProblem.ProblemType
 		let actionRequired: Bool
 		let action: () -> Void
 
@@ -160,21 +160,21 @@ extension SecurityCenter {
 		}
 
 		private var image: ImageResource {
-			switch item {
+			switch type {
 			case .securityFactors: .securityFactors
 			case .configurationBackup: .configurationBackup
 			}
 		}
 
 		private var title: String {
-			switch item {
+			switch type {
 			case .securityFactors: L10n.SecurityCenter.SecurityFactorsItem.title
 			case .configurationBackup: L10n.SecurityCenter.ConfigurationBackupItem.title
 			}
 		}
 
 		private var subtitle: String {
-			switch item {
+			switch type {
 			case .securityFactors: L10n.SecurityCenter.SecurityFactorsItem.subtitle
 			case .configurationBackup: L10n.SecurityCenter.ConfigurationBackupItem.subtitle
 			}
@@ -184,7 +184,7 @@ extension SecurityCenter {
 			if actionRequired {
 				L10n.SecurityCenter.AnyItem.actionRequiredStatus
 			} else {
-				switch item {
+				switch type {
 				case .securityFactors: L10n.SecurityCenter.SecurityFactorsItem.activeStatus
 				case .configurationBackup: L10n.SecurityCenter.ConfigurationBackupItem.backedUpStatus
 				}
