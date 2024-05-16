@@ -34,8 +34,8 @@ public struct Settings: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedP2PLinks(P2PLinks)
-		case loadedSecurityProblems([SecurityProblem])
+		case setP2PLinks(P2PLinks)
+		case setSecurityProblems([SecurityProblem])
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -105,8 +105,8 @@ public struct Settings: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return loadP2PLinks()
-				.merge(with: loadSecurityProblems())
+			return p2pLinksEffect()
+				.merge(with: securityProblemsEffect())
 
 		case .addConnectorButtonTapped:
 			state.destination = .manageP2PLinks(.init(destination: .newConnection(.init())))
@@ -144,10 +144,10 @@ public struct Settings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadedP2PLinks(clients):
+		case let .setP2PLinks(clients):
 			state.userHasNoP2PLinks = clients.isEmpty
 			return .none
-		case let .loadedSecurityProblems(problems):
+		case let .setSecurityProblems(problems):
 			state.securityProblems = problems
 			return .none
 		}
@@ -167,7 +167,7 @@ public struct Settings: Sendable, FeatureReducer {
 	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
 		switch state.destination {
 		case .manageP2PLinks:
-			loadP2PLinks()
+			p2pLinksEffect()
 		default:
 			.none
 		}
@@ -176,19 +176,19 @@ public struct Settings: Sendable, FeatureReducer {
 
 // MARK: Private
 extension Settings {
-	private func loadP2PLinks() -> Effect<Action> {
+	private func p2pLinksEffect() -> Effect<Action> {
 		.run { send in
-			await send(.internal(.loadedP2PLinks(
+			await send(.internal(.setP2PLinks(
 				p2pLinksClient.getP2PLinks()
 			)))
 		}
 	}
 
-	private func loadSecurityProblems() -> Effect<Action> {
+	private func securityProblemsEffect() -> Effect<Action> {
 		.run { send in
 			for try await problems in await securityCenterClient.problems() {
 				guard !Task.isCancelled else { return }
-				await send(.internal(.loadedSecurityProblems(problems)))
+				await send(.internal(.setSecurityProblems(problems)))
 			}
 		}
 	}
