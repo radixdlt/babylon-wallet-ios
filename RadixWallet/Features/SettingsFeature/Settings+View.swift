@@ -17,6 +17,7 @@ extension Settings {
 		let debugAppInfo: String
 		#endif
 		let shouldShowAddP2PLinkButton: Bool
+		let securityProblems: [SecurityProblem]
 		let appVersion: String
 
 		init(state: Settings.State) {
@@ -73,7 +74,7 @@ extension Settings.View {
 						}
 					}
 
-					ForEach(rows) { kind in
+					ForEach(rows(securityProblems: viewStore.securityProblems)) { kind in
 						SettingsRow(kind: kind, store: store)
 					}
 				}
@@ -92,7 +93,7 @@ extension Settings.View {
 				}
 				.frame(minHeight: .huge1)
 			}
-			.background(Color.app.gray4)
+			.background(Color.app.gray5)
 			.onAppear {
 				store.send(.view(.appeared))
 			}
@@ -104,8 +105,8 @@ extension Settings.View {
 	}
 
 	@MainActor
-	private var rows: [SettingsRow<Settings>.Kind] {
-		var visibleRows = normalRows
+	private func rows(securityProblems: [SecurityProblem]) -> [SettingsRow<Settings>.Kind] {
+		var visibleRows = normalRows(securityProblems: securityProblems)
 		#if DEBUG
 		visibleRows.append(.separator)
 		visibleRows.append(.model(
@@ -118,11 +119,12 @@ extension Settings.View {
 	}
 
 	@MainActor
-	private var normalRows: [SettingsRow<Settings>.Kind] {
+	private func normalRows(securityProblems: [SecurityProblem]) -> [SettingsRow<Settings>.Kind] {
 		[
 			.model(
 				title: L10n.WalletSettings.SecurityCenter.title,
 				subtitle: L10n.WalletSettings.SecurityCenter.subtitle,
+				hints: securityCenterHints(problems: securityProblems),
 				icon: .asset(AssetResource.security),
 				action: .securityButtonTapped
 			),
@@ -160,6 +162,13 @@ extension Settings.View {
 				action: .troubleshootingButtonTapped
 			),
 		]
+	}
+
+	@MainActor
+	private func securityCenterHints(problems: [SecurityProblem]) -> [Hint.ViewState] {
+		problems.map { problem in
+			.init(kind: .warning, text: Text(problem.message))
+		}
 	}
 }
 

@@ -13,16 +13,15 @@ public struct SecurityCenterClient: DependencyKey, Sendable {
 // MARK: SecurityCenterClient.Problems
 extension SecurityCenterClient {
 	public typealias Problems = @Sendable () async -> AnyAsyncSequence<[SecurityProblem]>
-	public typealias LastManualBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus>
-	public typealias LastCloudBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus>
+	public typealias LastManualBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus?>
+	public typealias LastCloudBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus?>
 }
 
 // MARK: - SecurityProblem
 /// As outlined in https://radixdlt.atlassian.net/wiki/spaces/AT/pages/3392569357/Security-related+Problem+States+in+the+Wallet
 public enum SecurityProblem: Hashable, Sendable, Identifiable {
-	/// User has at least one shield, but has no XRD. User has an account (or accounts) without a shield applied, meaning it is only secured by a single factor.
-	/// That factor (as is often, but not always the case) is a phone key factor and the user has never viewed the seed phrase and confirmed that they wrote it down.
-	/// Losing the phone means losing that account forever.
+	/// The given number of `accounts` and `personas` are unrecoverabl if the user loses their phone, since their corresponding seed phrase has not been written down.
+	/// NOTE: This definition differs from the one at Confluence since we don't have shields implemented yet.
 	case problem3(accounts: Int, personas: Int)
 	/// Wallet backups to the cloud aren’t working (wallet tried to do a backup and it didn’t work within, say, 5 minutes.)
 	/// This means that currently all accounts and personas are at risk of being practically unrecoverable if the user loses their phone.
@@ -50,12 +49,22 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 		case .problem9: 9
 		}
 	}
+
+	public var message: String {
+		switch self {
+		case .problem3: L10n.SecurityCenter.Problem3.text
+		case .problem5: L10n.SecurityCenter.Problem5.text
+		case .problem6: L10n.SecurityCenter.Problem6.text
+		case .problem7: L10n.SecurityCenter.Problem7.text
+		case .problem9: L10n.SecurityCenter.Problem9.text
+		}
+	}
 }
 
 // MARK: - SecurityCenterClient.BackupStatus
 extension SecurityCenterClient {
 	// MARK: - BackupStatus
-	public struct BackupStatus: Codable, Sendable {
+	public struct BackupStatus: Hashable, Codable, Sendable {
 		public let backupDate: Date
 		public let upToDate: Bool
 		public let success: Bool
