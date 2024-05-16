@@ -68,7 +68,7 @@ extension Preferences.View {
 					#endif
 				}
 			}
-			.background(Color.app.gray4)
+			.background(Color.app.gray5)
 			.onAppear {
 				viewStore.send(.appeared)
 			}

@@ -164,7 +164,7 @@ final class TransactionClientTests: TestCase {
 					transactionSigners: defaultSigners,
 					signingFactors: [.device: .init(rawValue: Set(defaultFactors))!],
 					signingPurpose: .signTransaction(.manifestFromDapp),
-					manifest: TransactionManifest(instructionsString: "", networkID: .mainnet)
+					manifest: TransactionManifest.sample
 				),
 				allFeePayerCandidates: .init(rawValue: .init(uncheckedUniqueElements: allFeePayerCandidates))!,
 				involvedEntities: .init(

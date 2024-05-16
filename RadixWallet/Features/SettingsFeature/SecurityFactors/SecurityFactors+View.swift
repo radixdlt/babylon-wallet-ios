@@ -47,7 +47,7 @@ private extension SecurityFactors.View {
 					}
 				}
 			}
-			.background(Color.app.gray4)
+			.background(Color.app.gray5)
 			.onFirstTask { @MainActor in
 				await viewStore.send(.onFirstTask).finish()
 			}

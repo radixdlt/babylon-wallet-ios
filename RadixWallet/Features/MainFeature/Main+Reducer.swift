@@ -101,9 +101,9 @@ public struct Main: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .settings(.delegate(.deleteProfileAndFactorSources(keepInIcloudIfPresent))):
+		case .settings(.delegate(.didResetWallet)):
 			.run { send in
-				try await appPreferencesClient.deleteProfileAndFactorSources(keepInIcloudIfPresent)
+				try await appPreferencesClient.deleteProfileAndFactorSources(true)
 				await send(.delegate(.removedWallet))
 			} catch: { error, _ in
 				loggerGlobal.error("Failed to delete profile: \(error)")

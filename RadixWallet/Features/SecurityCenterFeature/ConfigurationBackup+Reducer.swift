@@ -127,7 +127,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 			return .run { send in
 				let profile = await ProfileStore.shared.profile
 				do {
-					try await cloudBackupClient.deleteProfileInKeychain(profile.id)
+					try await cloudBackupClient.deleteProfileBackup(profile.id)
 					await send(.internal(.didDeleteOutdatedBackup(profile.id)))
 				} catch {
 					loggerGlobal.error("Failed to delete outdate backup \(profile.id.uuidString): \(error)")
@@ -210,7 +210,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		.run { send in
 			for try await lastBackup in await securityCenterClient.lastManualBackup() {
 				guard !Task.isCancelled else { return }
-				await send(.internal(.setLastManualBackup(lastBackup.backupDate)))
+				await send(.internal(.setLastManualBackup(lastBackup?.backupDate)))
 			}
 		}
 	}
@@ -219,7 +219,7 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 		.run { send in
 			for try await lastBackup in await securityCenterClient.lastCloudBackup() {
 				guard !Task.isCancelled else { return }
-				await send(.internal(.setLastCloudBackup(lastBackup.upToDate ? nil : lastBackup.backupDate)))
+				await send(.internal(.setLastCloudBackup(lastBackup?.upToDate ?? true ? nil : lastBackup?.backupDate)))
 			}
 		}
 	}

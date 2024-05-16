@@ -63,7 +63,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.radixConnectClient) var radixConnectClient
-
+	@Dependency(\.p2pLinksClient) var p2pLinksClient
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
@@ -91,10 +91,11 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			state.profileSelection = .init(profile: profile, isInCloud: isInCloud)
 			return .run { send in
 				try? await clock.sleep(for: .milliseconds(300))
-				try await radixConnectClient.connectToP2PLinks(profile.appPreferences.p2pLinks.asIdentified())
+				let p2pLinks = await p2pLinksClient.getP2PLinks()
+				try await radixConnectClient.connectToP2PLinks(p2pLinks)
 				await send(.internal(.delayedAppendToPath(
-					.importMnemonicsFlow(.init(context: .fromOnboarding(profile: profile)))
-				)))
+					.importMnemonicsFlow(.init(context: .fromOnboarding(profile: profile))
+					))))
 			}
 
 		case .root(.selectBackup(.delegate(.backToStartOfOnboarding))):

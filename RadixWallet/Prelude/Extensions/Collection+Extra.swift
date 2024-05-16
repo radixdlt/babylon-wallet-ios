@@ -33,6 +33,18 @@ extension MutableCollection where Self: RandomAccessCollection {
 	}
 }
 
+extension IdentifiedArray {
+	/// This overload will use a different overload of the inner `sort`, which will prevent a crash
+	public mutating func sort<Value: Comparable>(
+		by keyPath: KeyPath<Element, Value>,
+		_ comparator: (Value, Value) -> Bool = (<)
+	) {
+		sort {
+			comparator($0[keyPath: keyPath], $1[keyPath: keyPath])
+		}
+	}
+}
+
 extension OrderedSet where Element: Hashable {
 	/// Add or remove the given element
 	public mutating func toggle(_ element: Element) {

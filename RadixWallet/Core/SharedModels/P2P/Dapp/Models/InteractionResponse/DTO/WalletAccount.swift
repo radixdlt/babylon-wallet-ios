@@ -9,12 +9,12 @@ extension P2P.Dapp.Response {
 	///
 	public struct WalletAccount: Sendable, Hashable, Encodable {
 		public let address: AccountAddress
-		public let label: NonEmptyString
+		public let label: DisplayName
 		public let appearanceId: AppearanceID
 
 		public init(
 			accountAddress: AccountAddress,
-			label: NonEmptyString,
+			label: DisplayName,
 			appearanceId: AppearanceID
 		) {
 			self.address = accountAddress
@@ -38,7 +38,7 @@ extension P2P.Dapp.Response.WalletAccount {
 	public init(account: Account) {
 		self.init(
 			accountAddress: account.address,
-			label: account.displayName.asNonEmpty,
+			label: account.displayName,
 			appearanceId: account.appearanceID
 		)
 	}

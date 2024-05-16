@@ -17,6 +17,7 @@ extension Settings {
 		let debugAppInfo: String
 		#endif
 		let shouldShowAddP2PLinkButton: Bool
+		let securityProblems: [SecurityProblem]
 		let appVersion: String
 
 		init(state: Settings.State) {
@@ -34,6 +35,7 @@ extension Settings {
 			#endif
 
 			self.shouldShowAddP2PLinkButton = state.userHasNoP2PLinks ?? false
+			self.securityProblems = state.securityProblems
 			@Dependency(\.bundleInfo) var bundleInfo: BundleInfo
 			self.appVersion = L10n.WalletSettings.appVersion(bundleInfo.shortVersion)
 		}
@@ -71,7 +73,7 @@ extension Settings.View {
 						}
 					}
 
-					ForEachStatic(rows) { kind in
+					ForEachStatic(rows(securityProblems: viewStore.securityProblems)) { kind in
 						SettingsRow(kind: kind, store: store)
 					}
 				}
@@ -90,7 +92,7 @@ extension Settings.View {
 				}
 				.frame(minHeight: .huge1)
 			}
-			.background(Color.app.gray4)
+			.background(Color.app.gray5)
 			.onAppear {
 				store.send(.view(.appeared))
 			}
@@ -102,8 +104,8 @@ extension Settings.View {
 	}
 
 	@MainActor
-	private var rows: [SettingsRow<Settings>.Kind] {
-		var visibleRows = normalRows
+	private func rows(securityProblems: [SecurityProblem]) -> [SettingsRow<Settings>.Kind] {
+		var visibleRows = normalRows(securityProblems: securityProblems)
 		#if DEBUG
 		visibleRows.append(.separator)
 		visibleRows.append(.model(
@@ -116,11 +118,12 @@ extension Settings.View {
 	}
 
 	@MainActor
-	private var normalRows: [SettingsRow<Settings>.Kind] {
+	private func normalRows(securityProblems: [SecurityProblem]) -> [SettingsRow<Settings>.Kind] {
 		[
 			.model(
 				title: L10n.WalletSettings.SecurityCenter.title,
 				subtitle: L10n.WalletSettings.SecurityCenter.subtitle,
+				hints: securityCenterHints(problems: securityProblems),
 				icon: .asset(AssetResource.security),
 				action: .securityCenterButtonTapped
 			),
@@ -159,6 +162,13 @@ extension Settings.View {
 			),
 		]
 	}
+
+	@MainActor
+	private func securityCenterHints(problems: [SecurityProblem]) -> [Hint.ViewState] {
+		problems.map { problem in
+			.init(kind: .warning, text: Text(problem.message))
+		}
+	}
 }
 
 private extension StoreOf<Settings> {
@@ -174,8 +184,7 @@ private extension StoreOf<Settings> {
 private extension View {
 	func destinations(with store: StoreOf<Settings>) -> some View {
 		let destinationStore = store.destination
-		return securityCenter(with: destinationStore)
-			.manageP2PLinks(with: destinationStore)
+		return manageP2PLinks(with: destinationStore)
 			.authorizedDapps(with: destinationStore)
 			.personas(with: destinationStore)
 			.preferences(with: destinationStore)
@@ -185,47 +194,59 @@ private extension View {
 		#endif
 	}
 
-	private func securityCenter(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.securityCenter, action: \.securityCenter)) {
-			SecurityCenter.View(store: $0)
-		}
-	}
-
 	private func manageP2PLinks(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.manageP2PLinks, action: \.manageP2PLinks)) {
-			P2PLinksFeature.View(store: $0)
-		}
+		navigationDestination(
+			store: destinationStore,
+			state: /Settings.Destination.State.manageP2PLinks,
+			action: Settings.Destination.Action.manageP2PLinks,
+			destination: { P2PLinksFeature.View(store: $0) }
+		)
 	}
 
 	private func authorizedDapps(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.authorizedDapps, action: \.authorizedDapps)) {
-			AuthorizedDappsFeature.View(store: $0)
-		}
+		navigationDestination(
+			store: destinationStore,
+			state: /Settings.Destination.State.authorizedDapps,
+			action: Settings.Destination.Action.authorizedDapps,
+			destination: { AuthorizedDappsFeature.View(store: $0) }
+		)
 	}
 
 	private func personas(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.personas, action: \.personas)) {
-			PersonasCoordinator.View(store: $0)
-		}
+		navigationDestination(
+			store: destinationStore,
+			state: /Settings.Destination.State.personas,
+			action: Settings.Destination.Action.personas,
+			destination: { PersonasCoordinator.View(store: $0) }
+		)
 	}
 
 	private func preferences(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.preferences, action: \.preferences)) {
-			Preferences.View(store: $0)
-		}
+		navigationDestination(
+			store: destinationStore,
+			state: /Settings.Destination.State.preferences,
+			action: Settings.Destination.Action.preferences,
+			destination: { Preferences.View(store: $0) }
+		)
 	}
 
 	private func troubleshooting(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.troubleshooting, action: \.troubleshooting)) {
-			Troubleshooting.View(store: $0)
-		}
+		navigationDestination(
+			store: destinationStore,
+			state: /Settings.Destination.State.troubleshooting,
+			action: Settings.Destination.Action.troubleshooting,
+			destination: { Troubleshooting.View(store: $0) }
+		)
 	}
 
 	#if DEBUG
 	private func debugSettings(with destinationStore: PresentationStoreOf<Settings.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.debugSettings, action: \.debugSettings)) {
-			DebugSettingsCoordinator.View(store: $0)
-		}
+		navigationDestination(
+			store: destinationStore,
+			state: /Settings.Destination.State.debugSettings,
+			action: Settings.Destination.Action.debugSettings,
+			destination: { DebugSettingsCoordinator.View(store: $0) }
+		)
 	}
 	#endif
 }

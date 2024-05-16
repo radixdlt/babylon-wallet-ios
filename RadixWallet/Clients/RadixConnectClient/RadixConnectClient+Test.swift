@@ -12,9 +12,9 @@ extension RadixConnectClient: TestDependencyKey {
 		getP2PLinks: unimplemented("\(Self.self).getP2PLinks"),
 		getP2PLinksWithConnectionStatusUpdates: unimplemented("\(Self.self).getP2PLinksWithConnectionStatusUpdates"),
 		idsOfConnectedPeerConnections: unimplemented("\(Self.self).idsOfConnectedPeerConnections"),
-		storeP2PLink: unimplemented("\(Self.self).storeP2PLink"),
+		updateOrAddP2PLink: unimplemented("\(Self.self).updateOrAddP2PLink"),
 		deleteP2PLinkByPassword: unimplemented("\(Self.self).deleteP2PLinkByPassword"),
-		addP2PWithPassword: unimplemented("\(Self.self).addP2PWithPassword"),
+		connectP2PLink: unimplemented("\(Self.self).connectP2PLink"),
 		receiveMessages: unimplemented("\(Self.self).receiveMessages"),
 		sendResponse: unimplemented("\(Self.self).sendResponse"),
 		sendRequest: unimplemented("\(Self.self).sendRequest")
@@ -30,9 +30,9 @@ extension RadixConnectClient {
 		getP2PLinks: { [] },
 		getP2PLinksWithConnectionStatusUpdates: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		idsOfConnectedPeerConnections: { [] },
-		storeP2PLink: { _ in },
+		updateOrAddP2PLink: { _ in },
 		deleteP2PLinkByPassword: { _ in },
-		addP2PWithPassword: { _ in },
+		connectP2PLink: { _ in },
 		receiveMessages: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		sendResponse: { _, _ in },
 		sendRequest: { _, _ in 0 }

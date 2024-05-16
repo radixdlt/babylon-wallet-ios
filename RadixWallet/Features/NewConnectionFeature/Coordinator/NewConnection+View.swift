@@ -14,34 +14,7 @@ extension NewConnection {
 		public var body: some SwiftUI.View {
 			NavigationStack {
 				ZStack {
-					SwitchStore(store) { state in
-						switch state {
-						case .localNetworkPermission:
-							CaseLet(
-								/NewConnection.State.localNetworkPermission,
-								action: { NewConnection.Action.child(.localNetworkPermission($0)) },
-								then: {
-									LocalNetworkPermission.View(store: $0)
-										.withTitle(L10n.LinkedConnectors.NewConnection.title)
-								}
-							)
-						case .scanQR:
-							CaseLet(
-								/NewConnection.State.scanQR,
-								action: { NewConnection.Action.child(.scanQR($0)) },
-								then: {
-									ScanQRCoordinator.View(store: $0)
-										.withTitle(L10n.LinkedConnectors.NewConnection.title)
-								}
-							)
-						case .connectUsingSecrets:
-							CaseLet(
-								/NewConnection.State.connectUsingSecrets,
-								action: { NewConnection.Action.child(.connectUsingSecrets($0)) },
-								then: { ConnectUsingSecrets.View(store: $0) }
-							)
-						}
-					}
+					root(for: store.scope(state: \.root, action: { .child(.root($0)) }))
 				}
 				.toolbar {
 					ToolbarItem(placement: .cancellationAction) {
@@ -50,9 +23,49 @@ extension NewConnection {
 						}
 					}
 				}
+				.destination(with: store)
 			}
 			.tint(.app.gray1)
 			.foregroundColor(.app.gray1)
+		}
+
+		private func root(
+			for store: StoreOf<NewConnection.Root>
+		) -> some SwiftUI.View {
+			SwitchStore(store) { state in
+				switch state {
+				case .localNetworkPermission:
+					CaseLet(
+						/NewConnection.Root.State.localNetworkPermission,
+						action: NewConnection.Root.Action.localNetworkPermission,
+						then: {
+							LocalNetworkPermission.View(store: $0)
+								.withTitle(L10n.LinkedConnectors.NewConnection.title)
+						}
+					)
+				case .scanQR:
+					CaseLet(
+						/NewConnection.Root.State.scanQR,
+						action: NewConnection.Root.Action.scanQR,
+						then: {
+							ScanQRCoordinator.View(store: $0)
+								.withTitle(L10n.LinkedConnectors.NewConnection.title)
+						}
+					)
+				case .connectionApproval:
+					CaseLet(
+						/NewConnection.Root.State.connectionApproval,
+						action: NewConnection.Root.Action.connectionApproval,
+						then: { NewConnectionApproval.View(store: $0) }
+					)
+				case .nameConnection:
+					CaseLet(
+						/NewConnection.Root.State.nameConnection,
+						action: NewConnection.Root.Action.nameConnection,
+						then: { NewConnectionName.View(store: $0) }
+					)
+				}
+			}
 		}
 	}
 }
@@ -71,22 +84,19 @@ extension View {
 	}
 }
 
-#if DEBUG
-import ComposableArchitecture
-import SwiftUI
-
-struct NewConnection_Preview: PreviewProvider {
-	static var previews: some View {
-		NewConnection.View(
-			store: .init(
-				initialState: .previewValue,
-				reducer: NewConnection.init
-			)
-		)
+@MainActor
+private extension View {
+	func destination(with store: StoreOf<NewConnection>) -> some View {
+		let destination = store.destination
+		return alert(store: destination.scope(state: \.errorAlert, action: \.errorAlert))
 	}
 }
 
-extension NewConnection.State {
-	public static let previewValue: Self = .init()
+extension StoreOf<NewConnection> {
+	var destination: PresentationStoreOf<NewConnection.Destination> {
+		func scopeState(state: State) -> PresentationState<NewConnection.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
 }
-#endif

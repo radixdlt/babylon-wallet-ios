@@ -1,22 +1,22 @@
 import ComposableArchitecture
 import SwiftUI
 
-// MARK: - ConnectUsingSecrets.State.Field
-extension ConnectUsingSecrets.State {
+// MARK: - NewConnectionName.State.Field
+extension NewConnectionName.State {
 	public enum Field: String, Sendable, Hashable {
 		case connectionName
 	}
 }
 
-// MARK: - ConnectUsingSecrets.View
-extension ConnectUsingSecrets {
+// MARK: - NewConnectionName.View
+extension NewConnectionName {
 	public struct ViewState: Equatable {
 		let screenState: ControlState
 		let nameOfConnection: String
 		let saveButtonControlState: ControlState
-		let focusedField: ConnectUsingSecrets.State.Field?
+		let focusedField: NewConnectionName.State.Field?
 
-		init(state: ConnectUsingSecrets.State) {
+		init(state: NewConnectionName.State) {
 			nameOfConnection = state.nameOfConnection
 			screenState = state.isConnecting ? .loading(.global(text: L10n.LinkedConnectors.NewConnection.linking)) : .enabled
 			focusedField = state.focusedField
@@ -31,10 +31,10 @@ extension ConnectUsingSecrets {
 
 	@MainActor
 	public struct View: SwiftUI.View {
-		private let store: StoreOf<ConnectUsingSecrets>
+		private let store: StoreOf<NewConnectionName>
 
-		@FocusState private var focusedField: ConnectUsingSecrets.State.Field?
-		public init(store: StoreOf<ConnectUsingSecrets>) {
+		@FocusState private var focusedField: NewConnectionName.State.Field?
+		public init(store: StoreOf<NewConnectionName>) {
 			self.store = store
 		}
 
@@ -93,22 +93,18 @@ extension ConnectUsingSecrets {
 import ComposableArchitecture
 import SwiftUI
 
-struct ConnectUsingPassword_Preview: PreviewProvider {
+struct NewConnectionName_Preview: PreviewProvider {
 	static var previews: some View {
-		ConnectUsingSecrets.View(
+		NewConnectionName.View(
 			store: .init(
 				initialState: .sample,
-				reducer: ConnectUsingSecrets.init
+				reducer: NewConnectionName.init
 			)
 		)
 	}
 }
 
-extension ConnectUsingSecrets.State {
-	public static let sample: Self = .init(connectionPassword: .sample)
-}
-
-extension RadixConnectPassword {
-	public static let sample: Self = .init(value: .sample)
+extension NewConnectionName.State {
+	public static let sample: Self = .init()
 }
 #endif
