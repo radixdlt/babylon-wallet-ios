@@ -2,9 +2,9 @@
 
 public struct SecurityFactors: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		var seedPhrasesCount: Int?
-		var ledgerWalletsCount: Int?
-		var isSeedPhraseRequiredToRecoverAccounts = false
+		public var seedPhrasesCount: Int?
+		public var ledgerWalletsCount: Int?
+		public var isSeedPhraseRequiredToRecoverAccounts = false
 
 		@PresentationState
 		public var destination: Destination.State?
@@ -25,21 +25,23 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case seedPhrases(DisplayMnemonics.State)
 			case ledgerWallets(LedgerHardwareDevices.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case seedPhrases(DisplayMnemonics.Action)
 			case ledgerWallets(LedgerHardwareDevices.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.seedPhrases, action: /Action.seedPhrases) {
+			Scope(state: \.seedPhrases, action: \.seedPhrases) {
 				DisplayMnemonics()
 			}
-			Scope(state: /State.ledgerWallets, action: /Action.ledgerWallets) {
+			Scope(state: \.ledgerWallets, action: \.ledgerWallets) {
 				LedgerHardwareDevices()
 			}
 		}

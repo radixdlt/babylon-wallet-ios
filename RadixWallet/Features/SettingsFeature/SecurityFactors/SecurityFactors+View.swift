@@ -49,7 +49,7 @@ private extension SecurityFactors.View {
 			}
 			.background(Color.app.gray5)
 			.onFirstTask { @MainActor in
-				await viewStore.send(.onFirstTask).finish()
+				await store.send(.view(.onFirstTask)).finish()
 			}
 		}
 	}
@@ -119,25 +119,17 @@ private extension View {
 	}
 
 	private func seedPhrases(with destinationStore: PresentationStoreOf<SecurityFactors.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /SecurityFactors.Destination.State.seedPhrases,
-			action: SecurityFactors.Destination.Action.seedPhrases,
-			destination: { DisplayMnemonics.View(store: $0) }
-		)
+		navigationDestination(store: destinationStore.scope(state: \.seedPhrases, action: \.seedPhrases)) {
+			DisplayMnemonics.View(store: $0)
+		}
 	}
 
 	private func ledgerHardwareWallets(with destinationStore: PresentationStoreOf<SecurityFactors.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /SecurityFactors.Destination.State.ledgerWallets,
-			action: SecurityFactors.Destination.Action.ledgerWallets,
-			destination: {
-				LedgerHardwareDevices.View(store: $0)
-					.background(.app.gray5)
-					.navigationTitle(L10n.AccountSecuritySettings.LedgerHardwareWallets.title)
-					.toolbarBackground(.visible, for: .navigationBar)
-			}
-		)
+		navigationDestination(store: destinationStore.scope(state: \.ledgerWallets, action: \.ledgerWallets)) {
+			LedgerHardwareDevices.View(store: $0)
+				.background(.app.gray5)
+				.navigationTitle(L10n.AccountSecuritySettings.LedgerHardwareWallets.title)
+				.toolbarBackground(.visible, for: .navigationBar)
+		}
 	}
 }
