@@ -4,19 +4,14 @@ import ComposableArchitecture
 public struct SecurityCenter: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var problems: [SecurityProblem] = []
-		public var actionsRequired: Set<Item> {
-			Set(problems.map(\.item))
+		public var actionsRequired: Set<SecurityProblem.ProblemType> {
+			Set(problems.map(\.type))
 		}
 
 		@PresentationState
 		public var destination: Destination.State? = nil
 
 		public init() {}
-	}
-
-	public enum Item: Hashable, Sendable, CaseIterable {
-		case securityFactors
-		case configurationBackup
 	}
 
 	public struct Destination: DestinationReducer {
@@ -45,7 +40,7 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case didAppear
 		case problemTapped(SecurityProblem)
-		case itemTapped(Item)
+		case cardTapped(SecurityProblem.ProblemType)
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -66,10 +61,10 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .didAppear:
-			return problemsSubscriptionEffect()
+			return securityProblemsEffect()
 
 		case let .problemTapped(problem):
-			switch problem.item {
+			switch problem.type {
 			case .securityFactors:
 				state.destination = .securityFactors(.init())
 			case .configurationBackup:
@@ -77,8 +72,8 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 			}
 			return .none
 
-		case let .itemTapped(item):
-			switch item {
+		case let .cardTapped(type):
+			switch type {
 			case .securityFactors:
 				state.destination = .securityFactors(.init())
 				return .none
@@ -98,33 +93,12 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 		}
 	}
 
-	private func problemsSubscriptionEffect() -> Effect<Action> {
+	private func securityProblemsEffect() -> Effect<Action> {
 		.run { send in
-			let profileID = await ProfileStore.shared.profile.id
 			for try await problems in await securityCenterClient.problems() {
 				guard !Task.isCancelled else { return }
-
-//				let all: [SecurityProblem] = [
-//					.problem3(accounts: 2, personas: 3),
-//					.problem5, .problem6, .problem7, .problem9
-//				]
-//				if let p = all.randomElement() {
-//					await send(.internal(.setProblems([p])))
-//				}
-
 				await send(.internal(.setProblems(problems)))
 			}
-		}
-	}
-}
-
-private extension SecurityProblem {
-	var item: SecurityCenter.Item {
-		switch self {
-		case .problem5, .problem6, .problem7:
-			.configurationBackup
-		case .problem3, .problem9:
-			.securityFactors
 		}
 	}
 }

@@ -69,6 +69,18 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 		case .problem9: L10n.SecurityCenter.Problem9.heading
 		}
 	}
+
+	public var type: ProblemType {
+		switch self {
+		case .problem3, .problem9: .securityFactors
+		case .problem5, .problem6, .problem7: .configurationBackup
+		}
+	}
+
+	public enum ProblemType: Hashable, Sendable, CaseIterable {
+		case securityFactors
+		case configurationBackup
+	}
 }
 
 // MARK: - SecurityCenterClient.BackupStatus
