@@ -39,6 +39,7 @@ extension Settings {
 			#endif
 
 			self.shouldShowAddP2PLinkButton = state.userHasNoP2PLinks ?? false
+			self.securityProblems = state.securityProblems
 		}
 	}
 }

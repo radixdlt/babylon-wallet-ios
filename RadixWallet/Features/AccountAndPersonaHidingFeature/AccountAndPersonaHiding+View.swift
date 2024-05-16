@@ -80,9 +80,7 @@ extension AccountAndPersonaHiding {
 					action: \.destination.confirmUnhideAllAlert
 				))
 			}
-			.navigationTitle(L10n.AppSettings.EntityHiding.title)
-			.toolbarBackground(.app.background, for: .navigationBar)
-			.toolbarBackground(.visible, for: .navigationBar)
+			.setUpNavigationBar(title: L10n.AppSettings.EntityHiding.title)
 		}
 	}
 }

@@ -51,7 +51,7 @@ extension AccountDetails {
 					ToolbarItem(placement: .principal) {
 						Text(viewStore.displayName)
 							.foregroundColor(.white)
-							.textStyle(.secondaryHeader)
+							.textStyle(.body1Header)
 					}
 
 					ToolbarItem(placement: .navigationBarLeading) {

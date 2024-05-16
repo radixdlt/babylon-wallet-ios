@@ -77,8 +77,7 @@ extension TransactionHistory {
 						}
 					}
 				}
-				.navigationTitle(L10n.TransactionHistory.title)
-				.navigationBarTitleDisplayMode(.inline)
+				.setUpNavigationBar(title: L10n.TransactionHistory.title, includeBackground: false)
 			}
 			.onAppear {
 				store.send(.view(.onAppear))

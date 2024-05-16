@@ -78,8 +78,7 @@ extension TransactionHistoryFilters {
 						.buttonStyle(.blueText)
 					}
 				}
-				.navigationTitle(L10n.TransactionHistory.Filters.title)
-				.navigationBarTitleDisplayMode(.inline)
+				.setUpNavigationBar(title: L10n.TransactionHistory.Filters.title, includeBackground: false)
 			}
 		}
 

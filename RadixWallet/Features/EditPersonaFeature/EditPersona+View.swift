@@ -80,7 +80,7 @@ extension EditPersona {
 							.padding(.top, .medium2)
 						}
 						.padding(.horizontal, .medium1)
-						.padding(.bottom, .medium1)
+						.padding(.vertical, .medium1)
 					}
 					.scrollDismissesKeyboard(.interactively)
 					.footer {
@@ -92,8 +92,7 @@ extension EditPersona {
 								.buttonStyle(.primaryRectangular)
 						}
 					}
-					.navigationTitle(viewStore.personaLabel)
-					.navigationBarTitleDisplayMode(.inline)
+					.setUpNavigationBar(title: viewStore.personaLabel)
 					.toolbar {
 						ToolbarItem(placement: .cancellationAction) {
 							CloseButton { viewStore.send(.closeButtonTapped) }
