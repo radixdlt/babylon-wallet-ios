@@ -80,6 +80,7 @@ extension ChooseReceivingAccount.View {
 				.destinations(with: store)
 				.footer { chooseButton(viewStore) }
 				.navigationTitle(L10n.AssetTransfer.ChooseReceivingAccount.navigationTitle)
+				.navigationBarTitleDisplayMode(.inline)
 				.toolbar {
 					ToolbarItem(placement: .navigationBarLeading) {
 						CloseButton {

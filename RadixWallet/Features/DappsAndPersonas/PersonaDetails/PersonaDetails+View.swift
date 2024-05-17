@@ -66,6 +66,7 @@ extension PersonaDetails.View {
 					}
 				}
 				.navigationTitle(viewStore.personaName)
+				.navigationBarTitleDisplayMode(.inline)
 				.onAppear {
 					viewStore.send(.appeared)
 				}

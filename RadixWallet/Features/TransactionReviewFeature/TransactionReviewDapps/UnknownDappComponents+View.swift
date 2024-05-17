@@ -14,6 +14,7 @@ extension UnknownDappComponents {
 					}
 				}
 				.navigationTitle(state.title)
+				.navigationBarTitleDisplayMode(.inline)
 			}
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {

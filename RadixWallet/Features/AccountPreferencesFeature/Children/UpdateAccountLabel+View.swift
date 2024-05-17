@@ -76,6 +76,7 @@ extension UpdateAccountLabel {
 				}
 				.background(.app.gray5)
 				.navigationTitle(L10n.AccountSettings.RenameAccount.title)
+				.navigationBarTitleDisplayMode(.inline)
 			}
 		}
 	}

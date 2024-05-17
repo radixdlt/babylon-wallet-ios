@@ -62,6 +62,7 @@ extension ResourcesList {
 				.background(.app.gray5)
 				.destinations(with: store)
 				.navigationTitle(viewStore.mode.navigationTitle)
+				.navigationBarTitleDisplayMode(.inline)
 				.footer {
 					Button(viewStore.mode.addButtonTitle) {
 						viewStore.send(.addAssetTapped)

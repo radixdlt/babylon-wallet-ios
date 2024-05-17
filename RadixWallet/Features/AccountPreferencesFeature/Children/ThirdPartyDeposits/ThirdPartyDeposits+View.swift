@@ -48,6 +48,7 @@ extension ManageThirdPartyDeposits {
 				)
 				.background(.app.gray5)
 				.navigationTitle(L10n.AccountSettings.thirdPartyDeposits)
+				.navigationBarTitleDisplayMode(.inline)
 				.destinations(with: store)
 				.footer {
 					Button(L10n.AccountSettings.SpecificAssetsDeposits.update) {

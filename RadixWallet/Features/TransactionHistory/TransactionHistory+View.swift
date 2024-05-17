@@ -78,6 +78,7 @@ extension TransactionHistory {
 					}
 				}
 				.navigationTitle(L10n.TransactionHistory.title)
+				.navigationBarTitleDisplayMode(.inline)
 			}
 			.onAppear {
 				store.send(.view(.onAppear))
