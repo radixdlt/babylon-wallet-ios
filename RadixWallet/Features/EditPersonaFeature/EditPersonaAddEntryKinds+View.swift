@@ -43,8 +43,7 @@ extension EditPersonaAddEntryKinds {
 							requiring: .atLeast(1)
 						)
 					}
-					.navigationTitle(L10n.EditPersona.AddAField.title)
-					.navigationBarTitleDisplayMode(.inline)
+					.setUpNavigationBar(title: L10n.EditPersona.AddAField.title)
 					.toolbar {
 						ToolbarItem(placement: .cancellationAction) {
 							CloseButton(action: { viewStore.send(.closeButtonTapped) })

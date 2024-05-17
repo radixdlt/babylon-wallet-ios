@@ -41,7 +41,7 @@ extension DisplayMnemonics {
 					.padding(.top, .medium3)
 				}
 				.background(.app.gray5)
-				.navigationTitle(L10n.SeedPhrases.title)
+				.setUpNavigationBar(title: L10n.SeedPhrases.title)
 				.onFirstTask { @MainActor in
 					await viewStore.send(.onFirstTask).finish()
 				}

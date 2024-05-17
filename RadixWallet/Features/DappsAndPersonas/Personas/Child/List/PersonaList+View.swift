@@ -34,7 +34,7 @@ extension PersonaList {
 					.padding(.horizontal, .medium3)
 					.padding(.vertical, .large1)
 				}
-				.navigationTitle(L10n.Personas.title)
+				.setUpNavigationBar(title: L10n.Personas.title)
 			}
 		}
 	}

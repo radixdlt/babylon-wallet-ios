@@ -40,6 +40,6 @@ extension DefaultDepositGuarantees.View {
 					focused = false
 				}
 		}
-		.navigationTitle(L10n.AccountSecuritySettings.DepositGuarantees.title)
+		.setUpNavigationBar(title: L10n.AccountSecuritySettings.DepositGuarantees.title)
 	}
 }

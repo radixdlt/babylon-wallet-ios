@@ -13,8 +13,7 @@ extension UnknownDappComponents {
 						row(address, heading: state.rowHeading)
 					}
 				}
-				.navigationTitle(state.title)
-				.navigationBarTitleDisplayMode(.inline)
+				.setUpNavigationBar(title: state.title, setBackgroundColor: false)
 			}
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {

@@ -103,8 +103,7 @@ struct DetailsContainer<Contents: View>: View {
 			ScrollView {
 				contents
 			}
-			.navigationTitle(titleString)
-			.navigationBarTitleDisplayMode(.inline)
+			.setUpNavigationBar(title: titleString)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					CloseButton(action: closeButtonAction)

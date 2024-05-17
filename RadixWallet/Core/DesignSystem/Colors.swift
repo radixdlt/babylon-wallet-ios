@@ -272,9 +272,3 @@ extension Color {
 		)
 	}
 }
-
-extension Color {
-	var uiColor: UIColor {
-		.init(self)
-	}
-}

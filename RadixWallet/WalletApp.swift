@@ -22,7 +22,6 @@ struct WalletApp: SwiftUI.App {
 					}
 				)
 				.environment(\.colorScheme, .light) // TODO: implement dark mode and remove this
-				.configureNavigationBarAppearence()
 			} else {
 				Text("Running tests")
 			}

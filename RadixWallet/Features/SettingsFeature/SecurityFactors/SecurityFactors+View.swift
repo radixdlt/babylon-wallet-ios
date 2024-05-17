@@ -27,7 +27,7 @@ public extension SecurityFactors {
 
 		public var body: some SwiftUI.View {
 			content
-				.navigationTitle(L10n.SecurityFactors.title)
+				.setUpNavigationBar(title: L10n.SecurityFactors.title)
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 				.presentsLoadingViewOverlay()
@@ -135,7 +135,7 @@ private extension View {
 			destination: {
 				LedgerHardwareDevices.View(store: $0)
 					.background(.app.gray5)
-					.navigationTitle(L10n.AccountSecuritySettings.LedgerHardwareWallets.title)
+					.setUpNavigationBar(title: L10n.AccountSecuritySettings.LedgerHardwareWallets.title)
 			}
 		)
 	}

@@ -54,12 +54,11 @@ extension AccountDetails {
 							.textStyle(.body1Header)
 					}
 
-					ToolbarItem(placement: .topBarLeading) {
+					ToolbarItem(placement: .navigationBarLeading) {
 						BackButton {
 							viewStore.send(.backButtonTapped)
 						}
 						.foregroundColor(.app.white)
-						.padding(.leading, -.small1)
 					}
 
 					ToolbarItem(placement: .navigationBarTrailing) {
@@ -70,8 +69,6 @@ extension AccountDetails {
 						.foregroundColor(.app.white)
 					}
 				}
-				.toolbarBackground(.clear, for: .navigationBar)
-				.toolbar(.visible, for: .navigationBar)
 			}
 			.destinations(with: store)
 		}

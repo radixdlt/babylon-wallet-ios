@@ -57,7 +57,7 @@ extension AuthorizedDappsFeature.View {
 					viewStore.send(.appeared)
 				}
 			}
-			.navigationTitle(L10n.AuthorizedDapps.title)
+			.setUpNavigationBar(title: L10n.AuthorizedDapps.title)
 			.destinations(with: store)
 		}
 	}

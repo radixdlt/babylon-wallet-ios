@@ -25,7 +25,7 @@ extension DebugSettingsCoordinator.View {
 			}
 		}
 		.padding(.bottom, .large3)
-		.navigationTitle("Debug Settings")
+		.setUpNavigationBar(title: "Debug Settings")
 		.destinations(with: store)
 		.tint(.app.gray1)
 		.foregroundColor(.app.gray1)
