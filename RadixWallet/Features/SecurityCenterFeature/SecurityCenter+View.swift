@@ -45,6 +45,7 @@ extension SecurityCenter {
 					}
 					.padding(.top, .small2)
 					.padding(.horizontal, .medium2)
+					.padding(.bottom, .medium3)
 				}
 				.background(.app.gray5)
 			}
