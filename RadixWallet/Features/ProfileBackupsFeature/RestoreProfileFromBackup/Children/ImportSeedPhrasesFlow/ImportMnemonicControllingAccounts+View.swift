@@ -113,7 +113,7 @@ private extension View {
 			action: ImportMnemonicControllingAccounts.Destination.Action.importMnemonic,
 			content: {
 				ImportMnemonic.View(store: $0)
-					.setUpNavigationBar(title: L10n.EnterSeedPhrase.Header.title, includeBackground: false)
+					.setUpNavigationBar(title: L10n.EnterSeedPhrase.Header.title)
 					.inNavigationView
 			}
 		)
