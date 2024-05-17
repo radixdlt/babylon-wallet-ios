@@ -93,6 +93,7 @@ extension CloudBackupClient {
 			} catch CKError.notAuthenticated {
 				result = .notAuthenticated
 			} catch {
+				loggerGlobal.error("Automatic cloud backup failed with error \(error)")
 				result = .failure
 			}
 
