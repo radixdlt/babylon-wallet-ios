@@ -7,11 +7,14 @@ import os
 extension SecurityCenterClient {
 	public static let liveValue: Self = .live()
 
+	public func problems() async -> AnyAsyncSequence<[SecurityProblem]> {
+		await problems(nil)
+	}
+
 	public func isRecoverable() async -> AnyAsyncSequence<Bool> {
-		await problems().map { problems in
-			!problems.contains(.problem5) && !problems.contains(.problem6) && !problems.contains(.problem7)
-		}
-		.eraseToAnyAsyncSequence()
+		await problems(.configurationBackup)
+			.map(\.isEmpty)
+			.eraseToAnyAsyncSequence()
 	}
 
 	public static func live(
@@ -46,7 +49,7 @@ extension SecurityCenterClient {
 		}
 
 		return .init(
-			problems: {
+			problems: { type in
 				let profiles = await profileStore.values()
 				let cloudBackups = await cloudBackups()
 				let manualBackups = await manualBackups()
@@ -83,13 +86,19 @@ extension SecurityCenterClient {
 
 					var result: [SecurityProblem] = []
 
-					if let (accounts, personas) = await hasProblem3() {
-						result.append(.problem3(accounts: accounts, personas: personas))
+					if type == nil || type == .securityFactors {
+						if let (accounts, personas) = await hasProblem3() {
+							result.append(.problem3(accounts: accounts, personas: personas))
+						}
+
+						if await hasProblem9() { result.append(.problem9) }
 					}
-					if hasProblem5() { result.append(.problem5) }
-					if hasProblem6() { result.append(.problem6) }
-					if hasProblem7() { result.append(.problem7) }
-					if await hasProblem9() { result.append(.problem9) }
+
+					if type == nil || type == .configurationBackup {
+						if hasProblem5() { result.append(.problem5) }
+						if hasProblem6() { result.append(.problem6) }
+						if hasProblem7() { result.append(.problem7) }
+					}
 
 					return result
 				}

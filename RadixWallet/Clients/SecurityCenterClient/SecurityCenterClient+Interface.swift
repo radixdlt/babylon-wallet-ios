@@ -12,7 +12,7 @@ public struct SecurityCenterClient: DependencyKey, Sendable {
 
 // MARK: SecurityCenterClient.Problems
 extension SecurityCenterClient {
-	public typealias Problems = @Sendable () async -> AnyAsyncSequence<[SecurityProblem]>
+	public typealias Problems = @Sendable (SecurityProblem.ProblemType?) async -> AnyAsyncSequence<[SecurityProblem]>
 	public typealias LastManualBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus?>
 	public typealias LastCloudBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus?>
 }
@@ -67,6 +67,16 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 		case .problem6: L10n.SecurityCenter.Problem6.heading
 		case .problem7: L10n.SecurityCenter.Problem7.heading
 		case .problem9: L10n.SecurityCenter.Problem9.heading
+		}
+	}
+
+	public var warning: String {
+		switch self {
+		case .problem3: L10n.SecurityCenter.Problem3.warning
+		case .problem5: L10n.SecurityCenter.Problem5.warningIOS
+		case .problem6: L10n.SecurityCenter.Problem6.warning
+		case .problem7: L10n.SecurityCenter.Problem7.warning
+		case .problem9: L10n.SecurityCenter.Problem9.warning
 		}
 	}
 
