@@ -19,7 +19,7 @@ extension NewConnectionApproval.State {
 		case .approveExisitingConnection:
 			L10n.LinkedConnectors.ApproveExistingConnector.title
 		case .approveRelinkAfterProfileRestore, .approveRelinkAfterUpdate:
-			L10n.LinkedConnectors.ApproveRelink.title
+			L10n.LinkedConnectors.RelinkConnectors.title
 		}
 	}
 
@@ -30,9 +30,9 @@ extension NewConnectionApproval.State {
 		case .approveExisitingConnection:
 			L10n.LinkedConnectors.ApproveExistingConnector.message
 		case .approveRelinkAfterProfileRestore:
-			L10n.LinkedConnectors.ApproveRelinkAfterProfileRestore.message
+			L10n.LinkedConnectors.RelinkConnectors.afterProfileRestoreMessage
 		case .approveRelinkAfterUpdate:
-			L10n.LinkedConnectors.ApproveRelinkAfterUpdate.message
+			L10n.LinkedConnectors.RelinkConnectors.afterUpdateMessage
 		}
 	}
 
@@ -41,7 +41,7 @@ extension NewConnectionApproval.State {
 		case .approveNewConnection, .approveExisitingConnection:
 			L10n.Common.cancel
 		case .approveRelinkAfterProfileRestore, .approveRelinkAfterUpdate:
-			L10n.Common.later
+			L10n.LinkedConnectors.RelinkConnectors.laterButton
 		}
 	}
 }
