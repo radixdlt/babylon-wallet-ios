@@ -27,6 +27,13 @@ extension ConfigurationBackup {
 						}
 						.padding(.bottom, .medium3)
 
+						if let errorText = viewStore.lastCloudBackup?.error {
+							Text(errorText)
+								.foregroundStyle(.app.red1)
+								.textStyle(.body1HighImportance)
+								.padding(.bottom, .medium1)
+						}
+
 						let backupsEnabled = viewStore.binding(get: \.cloudBackupsEnabled) { .view(.cloudBackupsToggled($0)) }
 						AutomatedBackupView(
 							backupsEnabled: backupsEnabled,

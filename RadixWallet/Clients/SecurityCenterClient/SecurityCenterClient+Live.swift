@@ -40,7 +40,12 @@ extension SecurityCenterClient {
 				guard let backup else { return nil }
 				let upToDate = backup.profileHash == profile.hashValue
 				let success = backup.result == .success
-				return .init(backupDate: backup.backupDate, upToDate: upToDate, success: success)
+				let error: String? = if case let .failure_DEBUG(errorString) = backup.result {
+					errorString
+				} else {
+					nil
+				}
+				return .init(backupDate: backup.backupDate, upToDate: upToDate, success: success, error: error)
 			}
 			.eraseToAnyAsyncSequence()
 		}

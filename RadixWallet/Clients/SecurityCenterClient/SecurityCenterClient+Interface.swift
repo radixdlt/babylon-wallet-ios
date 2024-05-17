@@ -90,5 +90,6 @@ extension SecurityCenterClient {
 		public let backupDate: Date
 		public let upToDate: Bool
 		public let success: Bool
+		public let error: String?
 	}
 }
