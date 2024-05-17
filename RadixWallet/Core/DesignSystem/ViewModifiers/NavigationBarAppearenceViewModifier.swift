@@ -1,9 +1,22 @@
 import SwiftUI
 
-// MARK: - Appearence
 extension View {
+	func configureNavigationBarAppearence() -> some View {
+		modifier(NavigationBarAppearenceViewModifier())
+	}
+}
+
+// MARK: - NavigationBarAppearenceViewModifier
+private struct NavigationBarAppearenceViewModifier: ViewModifier {
+	func body(content: Content) -> some View {
+		content
+			.onFirstTask { @MainActor in
+				configureNavigationBarAppearence()
+			}
+	}
+
 	@MainActor
-	func configureNavigationBarAppearence() {
+	private func configureNavigationBarAppearence() {
 		func setUp(appearence: UINavigationBarAppearance) {
 			appearence.titleTextAttributes = [.foregroundColor: Color.app.gray1.uiColor, .font: UIFont(font: FontFamily.IBMPlexSans.semiBold, size: 16)!]
 			appearence.largeTitleTextAttributes = [.foregroundColor: Color.app.gray1.uiColor]

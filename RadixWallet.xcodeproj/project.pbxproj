@@ -922,7 +922,7 @@
 		5B758D582BCE7AEC00348722 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D562BCE7AEC00348722 /* Preferences.swift */; };
 		5B758D5C2BCEC3B200348722 /* Troubleshooting+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D5A2BCEC3B200348722 /* Troubleshooting+View.swift */; };
 		5B758D5D2BCEC3B200348722 /* Troubleshooting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B758D5B2BCEC3B200348722 /* Troubleshooting.swift */; };
-		5B7BBD122BF76B6100F45A58 /* View+Appearence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7BBD112BF76B6100F45A58 /* View+Appearence.swift */; };
+		5B7BBD122BF76B6100F45A58 /* NavigationBarAppearenceViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7BBD112BF76B6100F45A58 /* NavigationBarAppearenceViewModifier.swift */; };
 		5B9846BD2BBD5C8800E814F3 /* SensitiveInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */; };
 		5B9846C02BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */; };
 		5B9846C22BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B9846C12BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift */; };
@@ -2019,7 +2019,7 @@
 		5B758D562BCE7AEC00348722 /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		5B758D5A2BCEC3B200348722 /* Troubleshooting+View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Troubleshooting+View.swift"; sourceTree = "<group>"; };
 		5B758D5B2BCEC3B200348722 /* Troubleshooting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Troubleshooting.swift; sourceTree = "<group>"; };
-		5B7BBD112BF76B6100F45A58 /* View+Appearence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Appearence.swift"; sourceTree = "<group>"; };
+		5B7BBD112BF76B6100F45A58 /* NavigationBarAppearenceViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationBarAppearenceViewModifier.swift; sourceTree = "<group>"; };
 		5B9846BC2BBD5C8800E814F3 /* SensitiveInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SensitiveInfo.plist; sourceTree = "<group>"; };
 		5B9846BF2BBD5F0800E814F3 /* SensitiveInfoClient+Interface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SensitiveInfoClient+Interface.swift"; sourceTree = "<group>"; };
 		5B9846C12BBD5F7600E814F3 /* SensitiveInfoClient+Live.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SensitiveInfoClient+Live.swift"; sourceTree = "<group>"; };
@@ -4935,7 +4935,6 @@
 				48CFC0F02ADC10D900E77A5C /* Label+Extra.swift */,
 				48CFC0F12ADC10D900E77A5C /* Binding+Extra.swift */,
 				48CFC0F22ADC10D900E77A5C /* Stroke.swift */,
-				5B7BBD112BF76B6100F45A58 /* View+Appearence.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -5011,6 +5010,7 @@
 				48CFC12A2ADC10D900E77A5C /* TokenShadowModifier.swift */,
 				48CFC12D2ADC10D900E77A5C /* TextStyleModifier.swift */,
 				48CFC12F2ADC10D900E77A5C /* PresentationDetentIntrinsicHeight.swift */,
+				5B7BBD112BF76B6100F45A58 /* NavigationBarAppearenceViewModifier.swift */,
 				48CFC1312ADC10D900E77A5C /* Modifier.swift */,
 			);
 			path = ViewModifiers;
@@ -7647,7 +7647,7 @@
 				48CFC2D82ADC10D900E77A5C /* ChooseAccounts+View.swift in Sources */,
 				48CFC2462ADC10D900E77A5C /* AddAssets+View.swift in Sources */,
 				48D5F3932BD8DDB9000DE964 /* DebugSettingsCoordinator+View.swift in Sources */,
-				5B7BBD122BF76B6100F45A58 /* View+Appearence.swift in Sources */,
+				5B7BBD122BF76B6100F45A58 /* NavigationBarAppearenceViewModifier.swift in Sources */,
 				48CFC5662ADC10DA00E77A5C /* StateNonFungibleDataResponse.swift in Sources */,
 				48CFC2512ADC10D900E77A5C /* GatewaySettings+Reducer.swift in Sources */,
 				48CFC6112ADC10DA00E77A5C /* WalletInteractionItems.swift in Sources */,

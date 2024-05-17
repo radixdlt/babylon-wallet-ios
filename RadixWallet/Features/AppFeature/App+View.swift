@@ -9,7 +9,6 @@ extension App {
 
 		public init(store: StoreOf<App>) {
 			self.store = store
-			configureNavigationBarAppearence()
 		}
 
 		public var body: some SwiftUI.View {
