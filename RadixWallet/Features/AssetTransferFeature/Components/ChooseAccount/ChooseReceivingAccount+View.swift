@@ -158,7 +158,7 @@ private extension View {
 			action: ChooseReceivingAccount.Destination.Action.scanAccountAddress,
 			destination: {
 				ScanQRCoordinator.View(store: $0)
-					.navigationTitle(L10n.AssetTransfer.ChooseReceivingAccount.scanQRNavigationTitle)
+					.setUpNavigationBar(title: L10n.AssetTransfer.ChooseReceivingAccount.scanQRNavigationTitle, includeBackground: false)
 			}
 		)
 	}

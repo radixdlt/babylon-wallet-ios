@@ -135,8 +135,7 @@ private extension View {
 			destination: {
 				LedgerHardwareDevices.View(store: $0)
 					.background(.app.gray5)
-					.navigationTitle(L10n.AccountSecuritySettings.LedgerHardwareWallets.title)
-					.toolbarBackground(.visible, for: .navigationBar)
+					.setUpNavigationBar(title: L10n.AccountSecuritySettings.LedgerHardwareWallets.title)
 			}
 		)
 	}
