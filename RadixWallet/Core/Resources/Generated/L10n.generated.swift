@@ -2514,30 +2514,42 @@ public enum L10n {
       }
       /// View and write down your seed phrase so Accounts and Personas are recoverable
       public static let text = L10n.tr("Localizable", "securityCenter_problem3_text", fallback: "View and write down your seed phrase so Accounts and Personas are recoverable")
+      /// Please write down your seed phrase
+      public static let warning = L10n.tr("Localizable", "securityCenter_problem3_warning", fallback: "Please write down your seed phrase")
     }
     public enum Problem5 {
       /// Your wallet is not recoverable
       public static let heading = L10n.tr("Localizable", "securityCenter_problem5_heading", fallback: "Your wallet is not recoverable")
       /// Automated Configuration Backup has stopped working. Check internet and cloud settings.
       public static let text = L10n.tr("Localizable", "securityCenter_problem5_text", fallback: "Automated Configuration Backup has stopped working. Check internet and cloud settings.")
+      /// Automated Configuration Backup not working. Check internet connection and Google Drive settings.
+      public static let warningAndroid = L10n.tr("Localizable", "securityCenter_problem5_warningAndroid", fallback: "Automated Configuration Backup not working. Check internet connection and Google Drive settings.")
+      /// Automated Configuration Backup not working. Check internet connection and iCloud settings.
+      public static let warningIOS = L10n.tr("Localizable", "securityCenter_problem5_warningIOS", fallback: "Automated Configuration Backup not working. Check internet connection and iCloud settings.")
     }
     public enum Problem6 {
       /// Your wallet is not recoverable
       public static let heading = L10n.tr("Localizable", "securityCenter_problem6_heading", fallback: "Your wallet is not recoverable")
       /// Configuration Backup is not up to date. Create backup now.
       public static let text = L10n.tr("Localizable", "securityCenter_problem6_text", fallback: "Configuration Backup is not up to date. Create backup now.")
+      /// To secure your wallet, turn on automated backups or manually export backup file.
+      public static let warning = L10n.tr("Localizable", "securityCenter_problem6_warning", fallback: "To secure your wallet, turn on automated backups or manually export backup file.")
     }
     public enum Problem7 {
       /// Your wallet is not recoverable
       public static let heading = L10n.tr("Localizable", "securityCenter_problem7_heading", fallback: "Your wallet is not recoverable")
       /// Accounts and Personas not recoverable. Create Configuration Backup now.
       public static let text = L10n.tr("Localizable", "securityCenter_problem7_text", fallback: "Accounts and Personas not recoverable. Create Configuration Backup now.")
+      /// Configuration Backup not up to date. Turn on automated backups or manually export backup file.
+      public static let warning = L10n.tr("Localizable", "securityCenter_problem7_warning", fallback: "Configuration Backup not up to date. Turn on automated backups or manually export backup file.")
     }
     public enum Problem9 {
       /// Recovery required
       public static let heading = L10n.tr("Localizable", "securityCenter_problem9_heading", fallback: "Recovery required")
       /// Enter seed phrase to begin recovery.
       public static let text = L10n.tr("Localizable", "securityCenter_problem9_text", fallback: "Enter seed phrase to begin recovery.")
+      /// Enter your seed phrase to recover Accounts
+      public static let warning = L10n.tr("Localizable", "securityCenter_problem9_warning", fallback: "Enter your seed phrase to recover Accounts")
     }
     public enum SecurityFactorsItem {
       /// Active
