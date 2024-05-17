@@ -49,6 +49,13 @@
             ReferencedContainer = "container:RadixWallet.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "cloud-backup-identifier"
+            value = "iCloud.com.radixpublishing.radixwallet.ios.release.cloudBackup"
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
