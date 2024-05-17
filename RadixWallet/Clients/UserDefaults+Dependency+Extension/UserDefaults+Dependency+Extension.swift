@@ -217,10 +217,11 @@ public struct BackupResult: Codable, Sendable {
 	public let profileHash: Int
 	public let result: Result
 
-	public enum Result: Codable, Sendable {
+	public enum Result: Codable, Sendable, Equatable {
 		case success
 		case temporarilyUnavailable
 		case notAuthenticated
 		case failure
+		case failure_DEBUG(String)
 	}
 }

@@ -91,12 +91,14 @@ extension CloudBackupClient {
 				try await uploadProfileToICloud(profile, existingRecord: existingRecord)
 				result = .success
 			} catch CKError.accountTemporarilyUnavailable {
-				result = .temporarilyUnavailable
+//				result = .temporarilyUnavailable
+				result = .failure_DEBUG("temporarilyUnavailable")
 			} catch CKError.notAuthenticated {
-				result = .notAuthenticated
+//				result = .notAuthenticated
+				result = .failure_DEBUG("notAuthenticated")
 			} catch {
 				loggerGlobal.error("Automatic cloud backup failed with error \(error)")
-				result = .failure
+				result = .failure_DEBUG("Automatic cloud backup failed with error \(error)")
 			}
 
 			try? userDefaults.setLastCloudBackup(result, of: profile)
