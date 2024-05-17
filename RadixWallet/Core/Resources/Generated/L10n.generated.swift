@@ -968,6 +968,8 @@ public enum L10n {
       }
       /// Logged in as:
       public static let loggedInAsAndroid = L10n.tr("Localizable", "configurationBackup_automated_loggedInAsAndroid", fallback: "Logged in as:")
+      /// Log in to Google Drive
+      public static let logInAndroid = L10n.tr("Localizable", "configurationBackup_automated_logInAndroid", fallback: "Log in to Google Drive")
       /// Out-of-date backup still present on iCloud
       public static let outdatedBackupIOS = L10n.tr("Localizable", "configurationBackup_automated_outdatedBackupIOS", fallback: "Out-of-date backup still present on iCloud")
       /// Your list of Personas and the Factors required to recover them. Also your Persona data.
@@ -2153,6 +2155,20 @@ public enum L10n {
       /// Link New Connector
       public static let title = L10n.tr("Localizable", "linkedConnectors_newConnection_title", fallback: "Link New Connector")
     }
+    public enum RelinkConnectors {
+      /// Any Connectors you had linked to this wallet using a different phone have been disconnected
+      /// 
+      /// **Please re-link your Connector(s) to use with this phone.**
+      public static let afterProfileRestoreMessage = L10n.tr("Localizable", "linkedConnectors_relinkConnectors_afterProfileRestoreMessage", fallback: "Any Connectors you had linked to this wallet using a different phone have been disconnected\n\n**Please re-link your Connector(s) to use with this phone.**")
+      /// Radix Connector now supports linking multiple phones with one browser.
+      /// 
+      /// To support this feature, we've had to disconnect your existing links – **please re-link your Connector(s).**
+      public static let afterUpdateMessage = L10n.tr("Localizable", "linkedConnectors_relinkConnectors_afterUpdateMessage", fallback: "Radix Connector now supports linking multiple phones with one browser.\n\nTo support this feature, we've had to disconnect your existing links – **please re-link your Connector(s).**")
+      /// Later
+      public static let laterButton = L10n.tr("Localizable", "linkedConnectors_relinkConnectors_laterButton", fallback: "Later")
+      /// Re-link Connector
+      public static let title = L10n.tr("Localizable", "linkedConnectors_relinkConnectors_title", fallback: "Re-link Connector")
+    }
     public enum RemoveConnectionAlert {
       /// You will no longer be able to connect your wallet to this device and browser combination.
       public static let message = L10n.tr("Localizable", "linkedConnectors_removeConnectionAlert_message", fallback: "You will no longer be able to connect your wallet to this device and browser combination.")
@@ -2175,6 +2191,26 @@ public enum L10n {
     public static let newUser = L10n.tr("Localizable", "onboarding_newUser", fallback: "I'm a New Radix Wallet User")
     /// Restore Wallet from Backup
     public static let restoreFromBackup = L10n.tr("Localizable", "onboarding_restoreFromBackup", fallback: "Restore Wallet from Backup")
+    public enum CloudAndroid {
+      /// Back up to Google Drive
+      public static let backupButton = L10n.tr("Localizable", "onboarding_cloudAndroid_backupButton", fallback: "Back up to Google Drive")
+      /// Connect to Google Drive to automatically backup your Radix wallet settings.
+      public static let backupSubtitle = L10n.tr("Localizable", "onboarding_cloudAndroid_backupSubtitle", fallback: "Connect to Google Drive to automatically backup your Radix wallet settings.")
+      /// Back up your wallet settings
+      public static let backupTitle = L10n.tr("Localizable", "onboarding_cloudAndroid_backupTitle", fallback: "Back up your wallet settings")
+      /// Skip
+      public static let skip = L10n.tr("Localizable", "onboarding_cloudAndroid_skip", fallback: "Skip")
+    }
+    public enum CloudRestoreAndroid {
+      /// Log in to Google Drive to restore your Radix Wallet from backup.
+      public static let backupSubtitle = L10n.tr("Localizable", "onboarding_cloudRestoreAndroid_backupSubtitle", fallback: "Log in to Google Drive to restore your Radix Wallet from backup.")
+      /// Restore wallet from backup
+      public static let backupTitle = L10n.tr("Localizable", "onboarding_cloudRestoreAndroid_backupTitle", fallback: "Restore wallet from backup")
+      /// Log in to Google Drive
+      public static let loginButton = L10n.tr("Localizable", "onboarding_cloudRestoreAndroid_loginButton", fallback: "Log in to Google Drive")
+      /// Skip
+      public static let skip = L10n.tr("Localizable", "onboarding_cloudRestoreAndroid_skip", fallback: "Skip")
+    }
     public enum Eula {
       /// Accept
       public static let accept = L10n.tr("Localizable", "onboarding_eula_accept", fallback: "Accept")
@@ -2464,8 +2500,8 @@ public enum L10n {
     public enum ConfigurationBackupItem {
       /// Backed up
       public static let backedUpStatus = L10n.tr("Localizable", "securityCenter_configurationBackupItem_backedUpStatus", fallback: "Backed up")
-      /// A Backup of your Account, Persona and wallet settings
-      public static let subtitle = L10n.tr("Localizable", "securityCenter_configurationBackupItem_subtitle", fallback: "A Backup of your Account, Persona and wallet settings")
+      /// A backup of your Account, Personas and wallet settings
+      public static let subtitle = L10n.tr("Localizable", "securityCenter_configurationBackupItem_subtitle", fallback: "A backup of your Account, Personas and wallet settings")
       /// Configuration Backup
       public static let title = L10n.tr("Localizable", "securityCenter_configurationBackupItem_title", fallback: "Configuration Backup")
     }
@@ -2542,8 +2578,8 @@ public enum L10n {
       public static let counterSingular = L10n.tr("Localizable", "securityFactors_ledgerWallet_counterSingular", fallback: "1 set")
       /// Hardware wallet designed for holding crypto
       public static let subtitle = L10n.tr("Localizable", "securityFactors_ledgerWallet_subtitle", fallback: "Hardware wallet designed for holding crypto")
-      /// Ledger Hardware Wallet
-      public static let title = L10n.tr("Localizable", "securityFactors_ledgerWallet_title", fallback: "Ledger Hardware Wallet")
+      /// Ledger Hardware Wallets
+      public static let title = L10n.tr("Localizable", "securityFactors_ledgerWallet_title", fallback: "Ledger Hardware Wallets")
     }
     public enum SeedPhrases {
       /// %d Seed phrases
@@ -3086,8 +3122,8 @@ public enum L10n {
       public static let title = L10n.tr("Localizable", "walletSettings_personas_title", fallback: "Personas")
     }
     public enum Preferences {
-      /// Deposits, hidden Accounts and Personas, and avdanced preferences
-      public static let subtitle = L10n.tr("Localizable", "walletSettings_preferences_subtitle", fallback: "Deposits, hidden Accounts and Personas, and avdanced preferences")
+      /// Deposits, hidden Accounts and Personas, and advanced preferences
+      public static let subtitle = L10n.tr("Localizable", "walletSettings_preferences_subtitle", fallback: "Deposits, hidden Accounts and Personas, and advanced preferences")
       /// Preferences
       public static let title = L10n.tr("Localizable", "walletSettings_preferences_title", fallback: "Preferences")
     }
