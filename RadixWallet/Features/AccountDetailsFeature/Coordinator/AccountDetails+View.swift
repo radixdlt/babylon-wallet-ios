@@ -69,6 +69,8 @@ extension AccountDetails {
 						.foregroundColor(.app.white)
 					}
 				}
+				.toolbarBackground(.clear, for: .navigationBar)
+				.toolbar(.visible, for: .navigationBar)
 			}
 			.destinations(with: store)
 		}

@@ -9,20 +9,10 @@ extension View {
 			}
 	}
 
-	func setUpNavigationBar(title: String, includeBackground: Bool = true) -> some View {
+	func setUpNavigationBar(title: String) -> some View {
 		self
-			.toolbar {
-				ToolbarItem(placement: .principal) {
-					Text(title)
-						.foregroundColor(.app.gray1)
-						.textStyle(.body1Header)
-				}
-			}
+			.navigationTitle(title)
 			.navigationBarTitleDisplayMode(.inline)
-			.applyIf(includeBackground) {
-				$0.toolbarBackground(.app.background, for: .navigationBar)
-					.toolbarBackground(.visible, for: .navigationBar)
-			}
 	}
 
 	func eraseToAnyView() -> AnyView {
