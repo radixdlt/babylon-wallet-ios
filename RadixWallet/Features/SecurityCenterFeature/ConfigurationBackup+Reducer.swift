@@ -228,9 +228,9 @@ public struct ConfigurationBackup: Sendable, FeatureReducer {
 
 	private func problemsEffect() -> Effect<Action> {
 		.run { send in
-			for try await problems in await securityCenterClient.problems() {
+			for try await problems in await securityCenterClient.problems(.configurationBackup) {
 				guard !Task.isCancelled else { return }
-				await send(.internal(.setProblems(problems.filter { $0.type == .configurationBackup })))
+				await send(.internal(.setProblems(problems)))
 			}
 		}
 	}
