@@ -88,16 +88,7 @@ private extension SecurityFactors.ViewState {
 
 	var seedPhraseHints: [Hint.ViewState] {
 		securityProblems.compactMap { problem in
-			switch problem {
-			case .problem3:
-				// TODO: Replace with real String once it is defined
-				.init(kind: .error, text: "Please write down your seed phrase")
-			case .problem9:
-				.init(kind: .warning, text: L10n.SecurityFactors.SeedPhrases.enterSeedPhrase)
-			case .problem5, .problem6, .problem7:
-				// We don't care about these problems on this view
-				nil
-			}
+			.init(kind: .warning, text: problem.warning)
 		}
 	}
 

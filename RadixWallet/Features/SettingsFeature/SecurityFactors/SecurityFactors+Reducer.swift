@@ -114,7 +114,7 @@ public struct SecurityFactors: Sendable, FeatureReducer {
 		.run { send in
 			for try await problems in await securityCenterClient.problems() {
 				guard !Task.isCancelled else { return }
-				await send(.internal(.setSecurityProblems(problems)))
+				await send(.internal(.setSecurityProblems(problems.filter { $0.type == .securityFactors })))
 			}
 		}
 	}
