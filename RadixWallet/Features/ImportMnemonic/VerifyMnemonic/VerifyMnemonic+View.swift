@@ -87,7 +87,7 @@ extension VerifyMnemonic {
 				}
 				.scrollIndicators(.hidden)
 			}
-			.setUpNavigationBar(title: L10n.ConfirmMnemonicBackedUp.title)
+			.navigationTitle(L10n.ConfirmMnemonicBackedUp.title)
 		}
 
 		@ViewBuilder

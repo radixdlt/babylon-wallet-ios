@@ -15,7 +15,7 @@ extension GatewaySettings {
 			ScrollView {
 				coreView()
 					.padding(.bottom, .medium1)
-					.setUpNavigationBar(title: L10n.Gateways.title)
+					.navigationTitle(L10n.Gateways.title)
 			}
 			.task { @MainActor in await store.send(.view(.task)).finish() }
 			.destinations(with: store)

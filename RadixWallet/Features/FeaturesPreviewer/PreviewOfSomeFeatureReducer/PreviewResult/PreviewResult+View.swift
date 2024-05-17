@@ -66,7 +66,7 @@ extension PreviewResult {
 					}
 					.buttonStyle(.primaryRectangular)
 				}
-				.setUpNavigationBar(title: "Feature Result")
+				.navigationTitle("Feature Result")
 			}
 		}
 	}

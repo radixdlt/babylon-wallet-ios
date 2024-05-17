@@ -92,7 +92,7 @@ private extension View {
 	private func addAsset(with destinationStore: PresentationStoreOf<TransferAccountList.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.state.addAsset, action: \.addAsset)) { assetsStore in
 			AssetsView.View(store: assetsStore)
-				.setUpNavigationBar(title: L10n.AssetTransfer.AddAssets.navigationTitle)
+				.navigationTitle(L10n.AssetTransfer.AddAssets.navigationTitle)
 				.withNavigationBar {
 					assetsStore.send(.view(.closeButtonTapped))
 				}

@@ -21,7 +21,7 @@ public extension FactoryReset {
 
 		public var body: some SwiftUI.View {
 			content
-				.setUpNavigationBar(title: L10n.FactoryReset.title)
+				.navigationTitle(L10n.FactoryReset.title)
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 				.presentsLoadingViewOverlay()

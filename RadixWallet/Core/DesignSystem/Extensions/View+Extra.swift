@@ -9,12 +9,6 @@ extension View {
 			}
 	}
 
-	func setUpNavigationBar(title: String) -> some View {
-		self
-			.navigationTitle(title)
-			.navigationBarTitleDisplayMode(.inline)
-	}
-
 	func eraseToAnyView() -> AnyView {
 		AnyView(self)
 	}

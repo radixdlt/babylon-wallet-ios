@@ -82,7 +82,7 @@ extension DevAccountPreferences {
 					.onAppear {
 						viewStore.send(.appeared)
 					}
-					.setUpNavigationBar(title: "Dev Preferences")
+					.navigationTitle("Dev Preferences")
 					#if DEBUG
 						.destinations(with: store)
 					#endif

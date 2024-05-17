@@ -79,7 +79,7 @@ extension ChooseReceivingAccount.View {
 				}
 				.destinations(with: store)
 				.footer { chooseButton(viewStore) }
-				.setUpNavigationBar(title: L10n.AssetTransfer.ChooseReceivingAccount.navigationTitle)
+				.navigationTitle(L10n.AssetTransfer.ChooseReceivingAccount.navigationTitle)
 				.toolbar {
 					ToolbarItem(placement: .navigationBarLeading) {
 						CloseButton {
@@ -158,7 +158,7 @@ private extension View {
 			action: ChooseReceivingAccount.Destination.Action.scanAccountAddress,
 			destination: {
 				ScanQRCoordinator.View(store: $0)
-					.setUpNavigationBar(title: L10n.AssetTransfer.ChooseReceivingAccount.scanQRNavigationTitle)
+					.navigationTitle(L10n.AssetTransfer.ChooseReceivingAccount.scanQRNavigationTitle)
 			}
 		)
 	}

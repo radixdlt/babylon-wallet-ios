@@ -48,7 +48,7 @@ extension DebugManageFactorSources {
 				.task { @MainActor in
 					await store.send(.view(.task)).finish()
 				}
-				.setUpNavigationBar(title: "Factor Sources")
+				.navigationTitle("Factor Sources")
 			}
 			.destinations(with: store)
 		}

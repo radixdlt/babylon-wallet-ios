@@ -92,7 +92,7 @@ extension EditPersona {
 								.buttonStyle(.primaryRectangular)
 						}
 					}
-					.setUpNavigationBar(title: viewStore.personaLabel)
+					.navigationTitle(viewStore.personaLabel)
 					.toolbar {
 						ToolbarItem(placement: .cancellationAction) {
 							CloseButton { viewStore.send(.closeButtonTapped) }

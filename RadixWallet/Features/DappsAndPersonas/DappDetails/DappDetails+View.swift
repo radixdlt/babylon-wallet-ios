@@ -53,7 +53,7 @@ extension DappDetails.View {
 						.padding(.bottom, .large2)
 					}
 				}
-				.setUpNavigationBar(title: viewStore.title)
+				.navigationTitle(viewStore.title)
 			}
 		}
 		.onAppear {
