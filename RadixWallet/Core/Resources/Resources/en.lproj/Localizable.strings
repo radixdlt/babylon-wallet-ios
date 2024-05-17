@@ -200,13 +200,16 @@
 "linkedConnectors_incorrectQrMessage" = "Please scan the QR code provided by your Radix Wallet Connector browser extension.";
 "linkedConnectors_approveNewConnector_title" = "Link Connector";
 "linkedConnectors_approveExistingConnector_title" = "Update Link";
-"linkedConnectors_approveNewConnector_message" = "This Connector will be trusted to verify the dApp origin of requests to this wallet.
-
-Only continue if you are linking to the **official Radix Connector browser extension** - or a Connector you control and trust.";
+"linkedConnectors_approveNewConnector_message" = "This Connector will be trusted to verify the dApp origin of requests to this wallet.\n\nOnly continue if you are linking to the **official Radix Connector browser extension** - or a Connector you control and trust.";
 "linkedConnectors_approveExistingConnector_message" = "This appears to be a Radix Connector you previously linked to. Link will be updated.";
 "linkedConnectors_linkFailedErrorTitle" = "Link Failed";
 "linkedConnectors_unknownPurposeErrorMessage" = "This type of Connector link is not supported.";
 "linkedConnectors_changingPurposeNotSupportedErrorMessage" = "Changing a Connector’s type is not supported.";
+"linkedConnectors_oldQRErrorMessage" = "This is an old version of the Radix Connector browser extension. Please update to the latest Connector and try linking again.";
+"linkedConnectors_relinkConnectors_title" = "Re-link Connector";
+"linkedConnectors_relinkConnectors_afterUpdateMessage" = "Radix Connector now supports linking multiple phones with one browser.\n\nTo support this feature, we\'ve had to disconnect your existing links – **please re-link your Connector(s).**";
+"linkedConnectors_relinkConnectors_afterProfileRestoreMessage" = "Any Connectors you had linked to this wallet using a different phone have been disconnected\n\n**Please re-link your Connector(s) to use with this phone.**";
+"linkedConnectors_relinkConnectors_laterButton" = "Later";
 "gateways_title" = "Gateways";
 "gateways_subtitle" = "Choose the gateway your wallet will use to connect to the Radix Network or test networks. Only change this if you know what you’re doing.";
 "gateways_whatIsAGateway" = "What is a Gateway?";
@@ -592,6 +595,14 @@ Only continue if you are linking to the **official Radix Connector browser exten
 "onboarding_eula_headerTitle" = "User Terms";
 "onboarding_eula_headerSubtitle" = "To proceed, you must accept the user terms below.";
 "onboarding_eula_accept" = "Accept";
+"onboarding_cloudAndroid_backupTitle" = "Back up your wallet settings";
+"onboarding_cloudAndroid_backupSubtitle" = "Connect to Google Drive to automatically backup your Radix wallet settings.";
+"onboarding_cloudAndroid_skip" = "Skip";
+"onboarding_cloudAndroid_backupButton" = "Back up to Google Drive";
+"onboarding_cloudRestoreAndroid_backupTitle" = "Restore wallet from backup";
+"onboarding_cloudRestoreAndroid_backupSubtitle" = "Log in to Google Drive to restore your Radix Wallet from backup.";
+"onboarding_cloudRestoreAndroid_skip" = "Skip";
+"onboarding_cloudRestoreAndroid_loginButton" = "Log in to Google Drive";
 "splash_tapAnywhereToUnlock" = "Tap to unlock";
 "splash_passcodeNotSetTitle" = "Passcode not set up";
 "splash_passcodeNotSetMessage" = "This app requires your phone to have a passcode set up";
@@ -604,11 +615,7 @@ Only continue if you are linking to the **official Radix Connector browser exten
 "splash_profileOnAnotherDeviceAlert_claimExisting" = "Claim Existing Wallet";
 "splash_profileOnAnotherDeviceAlert_claimHere" = "Clear Wallet on This Phone";
 "splash_profileOnAnotherDeviceAlert_askLater" = "Ask Later (no changes)";
-"splash_profileOnAnotherDeviceAlert_message" = "This wallet is currently configured with a set of Accounts and Personas in use by a different phone.
-
-To make changes to this wallet, you must claim it for use on this phone instead, removing access by the other phone.
-
-Or you can clear this wallet from this phone and start fresh.";
+"splash_profileOnAnotherDeviceAlert_message" = "This wallet is currently configured with a set of Accounts and Personas in use by a different phone.\n\nTo make changes to this wallet, you must claim it for use on this phone instead, removing access by the other phone.\n\nOr you can clear this wallet from this phone and start fresh.";
 "splash_rootDetection_messageAndroid" = "It appears that your device might be rooted. To ensure the security of your Accounts and assets, using the Radix Wallet on rooted devices is not recommended. Please confirm if you wish to continue anyway at your own risk.";
 "splash_rootDetection_titleIOS" = "Possible jailbreak detected";
 "splash_rootDetection_messageIOS" = "It appears that your device might be jailbroken. To ensure the security of your Accounts and assets, using the Radix Wallet on jailbroken devices is not recommended. Please confirm if you wish to continue anyway at your own risk.";
@@ -776,14 +783,10 @@ Or you can clear this wallet from this phone and start fresh.";
 "addLedgerDevice_nameLedger_detectedType" = "Detected type: %@";
 "addLedgerDevice_nameLedger_namePlaceholder" = "Green Ledger Nano S+";
 "addLedgerDevice_nameLedger_continueButtonTitle" = "Save and Continue";
-"profileBackup_headerTitle" = "Backing up your wallet ensures that you can restore access to your Accounts, Personas, and wallet settings on a new phone by re-entering your seed phrase(s).
-
-**For security, backups do not contain any seed phrases or private keys. You must write them down separately.**";
+"profileBackup_headerTitle" = "Backing up your wallet ensures that you can restore access to your Accounts, Personas, and wallet settings on a new phone by re-entering your seed phrase(s).\n\n**For security, backups do not contain any seed phrases or private keys. You must write them down separately.**";
 "profileBackup_automaticBackups_title" = "Automatic Backups (recommended)";
 "profileBackup_manualBackups_title" = "Manual Backups";
-"profileBackup_manualBackups_subtitle" = "A manually exported wallet backup file may also be used for recovery, along with your seed phrase(s).
-
-Only the **current configuration** of your wallet is backed up with each manual export.";
+"profileBackup_manualBackups_subtitle" = "A manually exported wallet backup file may also be used for recovery, along with your seed phrase(s).\n\nOnly the **current configuration** of your wallet is backed up with each manual export.";
 "profileBackup_manualBackups_exportButtonTitle" = "Export Wallet Backup File";
 "profileBackup_manualBackups_encryptBackupDialogTitle" = "Encrypt this backup with a password?";
 "profileBackup_manualBackups_successMessage" = "Exported wallet backup file";
@@ -815,9 +818,7 @@ Only the **current configuration** of your wallet is backed up with each manual 
 "androidProfileBackup_openSystemBackupSettings" = "Open System Backup Settings";
 "androidProfileBackup_backupWalletData_title" = "Backup Wallet Data to Cloud";
 "androidProfileBackup_backupWalletData_message" = "Warning: If disabled you might lose access to your Accounts and Personas.";
-"androidProfileBackup_deleteWallet_subtitle" = "You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any cloud backup.
-
-**Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**";
+"androidProfileBackup_deleteWallet_subtitle" = "You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any cloud backup.\n\n**Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**";
 "androidProfileBackup_deleteWallet_confirmButton" = "Delete Wallet";
 "iOSProfileBackup_iCloudSyncEnabledAlert_title" = "Enabling iCloud sync";
 "iOSProfileBackup_iCloudSyncEnabledAlert_message" = "iCloud sync is now enabled, but it might take up to an hour before your wallet data is uploaded to iCloud.";
@@ -840,9 +841,7 @@ Only the **current configuration** of your wallet is backed up with each manual 
 "iOSProfileBackup_totalAccountsNumberLabel" = "Number of Accounts: %d";
 "iOSProfileBackup_totalPersonasNumberLabel" = "Number of Personas: %d";
 "iOSProfileBackup_incompatibleWalletDataLabel" = "Incompatible Wallet data";
-"iOSProfileBackup_deleteWallet_subtitle" = "You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any iCloud backup.
-
-**Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**";
+"iOSProfileBackup_deleteWallet_subtitle" = "You may delete your wallet. This will clear the Radix Wallet app, clears its contents, and delete any iCloud backup.\n\n**Access to any Accounts or Personas will be permanently lost unless you have a manual backup file.**";
 "iOSProfileBackup_deleteWallet_confirmButton" = "Delete Wallet and iCloud Backup";
 "iOSProfileBackup_profileNotFoundInCloud" = "Unable to find wallet backup in iCloud.";
 "encryptProfileBackup_header_title" = "Encrypt Wallet Backup File";
@@ -870,11 +869,7 @@ Only the **current configuration** of your wallet is backed up with each manual 
 "recoverSeedPhrase_header_titleOther" = "Seed Phrase Required";
 "recoverSeedPhrase_header_subtitleMainSeedPhrase" = "Your **Personas** and the following **Accounts** are controlled by your main seed phrase. To recover control, you must re-enter it.";
 "recoverSeedPhrase_header_subtitleOtherSeedPhrase" = "The following **Accounts** are controlled by a seed phrase. To recover control, you must re-enter it.";
-"recoverSeedPhrase_header_subtitleNoMainSeedPhrase" = "The Radix Wallet always uses a single main “Babylon” seed phrase to generate new Personas and new Accounts (when not using a Ledger device).
-
-If you do not have access to your previous main seed phrase, you can skip entering it for now. **The Radix Wallet will create a new one, which will be used for new Personas and Accounts.**
-
-Your old Accounts and Personas will still be listed, but you will have to enter their original seed phrase to use them. Alternatively, you can hide them if you no longer are interested in using them.";
+"recoverSeedPhrase_header_subtitleNoMainSeedPhrase" = "The Radix Wallet always uses a single main “Babylon” seed phrase to generate new Personas and new Accounts (when not using a Ledger device).\n\nIf you do not have access to your previous main seed phrase, you can skip entering it for now. **The Radix Wallet will create a new one, which will be used for new Personas and Accounts.**\n\nYour old Accounts and Personas will still be listed, but you will have to enter their original seed phrase to use them. Alternatively, you can hide them if you no longer are interested in using them.";
 "recoverSeedPhrase_skipButton" = "Skip This Seed Phrase For Now";
 "recoverSeedPhrase_noMainSeedPhraseButton" = "I Don’t Have the Main Seed Phrase";
 "recoverSeedPhrase_enterButton" = "Enter This Seed Phrase";
@@ -937,9 +932,7 @@ Your old Accounts and Personas will still be listed, but you will have to enter 
 "accountRecoveryScan_babylonSection_title" = "Babylon Accounts";
 "accountRecoveryScan_babylonSection_subtitle" = "Scan for Accounts originally created on the **Babylon** network.";
 "accountRecoveryScan_olympiaSection_title" = "Olympia Accounts";
-"accountRecoveryScan_olympiaSection_subtitle" = "Scan for Accounts originally created on the **Olympia** network.
-
-(If you have Olympia Accounts in the Radix Olympia Desktop Wallet, consider using **Import from a Legacy Wallet** instead.";
+"accountRecoveryScan_olympiaSection_subtitle" = "Scan for Accounts originally created on the **Olympia** network.\n\n(If you have Olympia Accounts in the Radix Olympia Desktop Wallet, consider using **Import from a Legacy Wallet** instead.";
 "accountRecoveryScan_olympiaSection_footnote" = "Note: You will still use the new **Radix Babylon** app on your Ledger device, not the old Radix Ledger app.";
 "accountRecoveryScan_seedPhraseButtonTitle" = "Use Seed Phrase";
 "accountRecoveryScan_ledgerButtonTitle" = "Use Ledger Hardware Wallet";
@@ -956,9 +949,7 @@ Your old Accounts and Personas will still be listed, but you will have to enter 
 "accountSecuritySettings_ledgerHardwareWallets_title" = "Ledger Hardware Wallets";
 "accountSecuritySettings_depositGuarantees_title" = "Default Deposit Guarantees";
 "accountSecuritySettings_depositGuarantees_subtitle" = "Set your default guaranteed minimum for estimated deposits";
-"accountSecuritySettings_depositGuarantees_text" = "Set the guaranteed minimum deposit to be applied whenever a deposit in a transaction can only be estimated.
-
-You can always change the guarantee from this default in each transaction.";
+"accountSecuritySettings_depositGuarantees_text" = "Set the guaranteed minimum deposit to be applied whenever a deposit in a transaction can only be estimated.\n\nYou can always change the guarantee from this default in each transaction.";
 "accountSecuritySettings_accountRecoveryScan_title" = "Account Recovery Scan";
 "accountSecuritySettings_accountRecoveryScan_subtitle" = "Using seed phrase or Ledger device";
 "accountSecuritySettings_backups_title" = "Backups";
@@ -983,14 +974,10 @@ You can always change the guarantee from this default in each transaction.";
 "recoverWalletWithoutProfile_start_useNewWalletAlertCancel" = "Cancel";
 "recoverWalletWithoutProfile_start_useNewWalletAlertContinue" = "Continue";
 "recoverWalletWithoutProfile_info_headerTitle" = "Recover Control Without Backup";
-"recoverWalletWithoutProfile_info_headerSubtitle" = "**If you have no wallet backup in the cloud or as an exported backup file**, you can still restore Account access only using your main “Babylon” seed phrase. You cannot recover your Account names or other wallet settings this way.
-
-You will be asked to enter your main seed phrase. This is a set of **24 words** that the Radix Wallet mobile app showed you to write down and save securely.";
+"recoverWalletWithoutProfile_info_headerSubtitle" = "**If you have no wallet backup in the cloud or as an exported backup file**, you can still restore Account access only using your main “Babylon” seed phrase. You cannot recover your Account names or other wallet settings this way.\n\nYou will be asked to enter your main seed phrase. This is a set of **24 words** that the Radix Wallet mobile app showed you to write down and save securely.";
 "recoverWalletWithoutProfile_info_continueButton" = "Continue";
 "recoverWalletWithoutProfile_complete_headerTitle" = "Recovery Complete";
-"recoverWalletWithoutProfile_complete_headerSubtitle" = "Accounts discovered in the scan have been added to your wallet.
-
-If you have any “Legacy” Accounts (created on the Olympia network) to import - or any Accounts using a Ledger hardware wallet device - please continue and then use the **Account Recovery Scan** option in your Radix Wallet settings under **Account Security**.";
+"recoverWalletWithoutProfile_complete_headerSubtitle" = "Accounts discovered in the scan have been added to your wallet.\n\nIf you have any “Legacy” Accounts (created on the Olympia network) to import - or any Accounts using a Ledger hardware wallet device - please continue and then use the **Account Recovery Scan** option in your Radix Wallet settings under **Account Security**.";
 "recoverWalletWithoutProfile_complete_continueButton" = "Continue";
 "transactionHistory_title" = "History";
 "transactionHistory_settingsSection" = "Settings";
@@ -1063,7 +1050,7 @@ If you have any “Legacy” Accounts (created on the Olympia network) to import
 "securityCenter_securityFactorsItem_subtitle" = "The keys you use to control your Accounts and Personas";
 "securityCenter_securityFactorsItem_activeStatus" = "Active";
 "securityCenter_configurationBackupItem_title" = "Configuration Backup";
-"securityCenter_configurationBackupItem_subtitle" = "A Backup of your Account, Persona and wallet settings";
+"securityCenter_configurationBackupItem_subtitle" = "A backup of your Account, Personas and wallet settings";
 "securityCenter_configurationBackupItem_backedUpStatus" = "Backed up";
 "securityCenter_anyItem_actionRequiredStatus" = "Action required";
 "securityCenter_encryptWalletBackup_title" = "Encrypt Wallet Backup File";
@@ -1079,14 +1066,12 @@ If you have any “Legacy” Accounts (created on the Olympia network) to import
 "securityFactors_seedPhrases_counterSingular" = "1 Seed phrase";
 "securityFactors_seedPhrases_counterPlural" = "%d Seed phrases";
 "securityFactors_seedPhrases_enterSeedPhrase" = "Enter your seed phrase to recover Accounts";
-"securityFactors_ledgerWallet_title" = "Ledger Hardware Wallet";
+"securityFactors_ledgerWallet_title" = "Ledger Hardware Wallets";
 "securityFactors_ledgerWallet_subtitle" = "Hardware wallet designed for holding crypto";
 "securityFactors_ledgerWallet_counterSingular" = "1 set";
 "securityFactors_ledgerWallet_counterPlural" = "%d set";
 "configurationBackup_title" = "Configuration Backup";
-"configurationBackup_heading" = "You need an up-to-date Configuration Backup to recover your Accounts and Personas if you lose access to them.
-
-Your Backup does not contain your keys or seed phrase.";
+"configurationBackup_heading" = "You need an up-to-date Configuration Backup to recover your Accounts and Personas if you lose access to them.\n\nYour Backup does not contain your keys or seed phrase.";
 "configurationBackup_problem5WarningIOS" = "Automated Configuration Backup not working. Check internet connection and iCloud settings.";
 "configurationBackup_problem5WarningAndroid" = "Automated Configuration Backup not working. Check internet connection and Google Drive settings.";
 "configurationBackup_problem6Warning" = "To secure your wallet, turn on automated backups or manually export backup file.";
@@ -1096,6 +1081,7 @@ Your Backup does not contain your keys or seed phrase.";
 "configurationBackup_automated_toggleIOS" = "Automated iCloud Backups";
 "configurationBackup_automated_toggleAndroid" = "Automated Google Drive Backups";
 "configurationBackup_automated_lastBackup" = "Last backup: %@";
+"configurationBackup_automated_logInAndroid" = "Log in to Google Drive";
 "configurationBackup_automated_loggedInAsAndroid" = "Logged in as:";
 "configurationBackup_automated_disconnectAndroid" = "Disconnect";
 "configurationBackup_automated_outdatedBackupIOS" = "Out-of-date backup still present on iCloud";
@@ -1124,7 +1110,7 @@ Your Backup does not contain your keys or seed phrase.";
 "walletSettings_connectors_title" = "Linked Connectors";
 "walletSettings_connectors_subtitle" = "Connect to desktop through the Radix Connector browser extension";
 "walletSettings_preferences_title" = "Preferences";
-"walletSettings_preferences_subtitle" = "Deposits, hidden Accounts and Personas, and avdanced preferences";
+"walletSettings_preferences_subtitle" = "Deposits, hidden Accounts and Personas, and advanced preferences";
 "walletSettings_troubleshooting_title" = "Troubleshooting";
 "walletSettings_troubleshooting_subtitle" = "Add your existing Accounts and contact support";
 "walletSettings_appVersion" = "App version: %@";
