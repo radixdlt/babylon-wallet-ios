@@ -6,6 +6,7 @@ import SwiftUI
 public struct ProfileSelection: Sendable, Hashable {
 	public let snapshot: Profile
 	public let isInCloud: Bool
+	public let containsP2PLinks: Bool
 }
 
 // MARK: - RestoreProfileFromBackupCoordinator
@@ -87,8 +88,8 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .root(.selectBackup(.delegate(.selectedProfileSnapshot(profileSnapshot, isInCloud)))):
-			state.profileSelection = .init(snapshot: profileSnapshot, isInCloud: isInCloud)
+		case let .root(.selectBackup(.delegate(.selectedProfileSnapshot(profileSnapshot, isInCloud, containsP2PLinks)))):
+			state.profileSelection = .init(snapshot: profileSnapshot, isInCloud: isInCloud, containsP2PLinks: containsP2PLinks)
 			return .run { send in
 				try? await clock.sleep(for: .milliseconds(300))
 				let p2pLinks = await p2pLinksClient.getP2PLinks()
@@ -111,7 +112,11 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			}
 			return .run { send in
 				loggerGlobal.notice("Importing snapshot...")
-				try await backupsClient.importSnapshot(profileSelection.snapshot, fromCloud: profileSelection.isInCloud)
+				try await backupsClient.importSnapshot(
+					profileSelection.snapshot,
+					fromCloud: profileSelection.isInCloud,
+					containsP2PLinks: profileSelection.containsP2PLinks
+				)
 
 				if let notYetSavedNewMainBDFS {
 					try await factorSourcesClient.saveNewMainBDFS(notYetSavedNewMainBDFS)

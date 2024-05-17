@@ -903,6 +903,8 @@ public enum L10n {
     public static let history = L10n.tr("Localizable", "common_history", fallback: "History")
     /// Invalid
     public static let invalid = L10n.tr("Localizable", "common_invalid", fallback: "Invalid")
+    /// Later
+    public static let later = L10n.tr("Localizable", "common_later", fallback: "Later")
     /// Max
     public static let max = L10n.tr("Localizable", "common_max", fallback: "Max")
     /// None
@@ -2083,8 +2085,6 @@ public enum L10n {
     public static let linkFailedErrorTitle = L10n.tr("Localizable", "linkedConnectors_linkFailedErrorTitle", fallback: "Link Failed")
     /// Link New Connector
     public static let linkNewConnector = L10n.tr("Localizable", "linkedConnectors_linkNewConnector", fallback: "Link New Connector")
-    /// This is an old version of the Radix Connector browser extension. Please update to the latest Connector and try linking again.
-    public static let oldQRErrorMessage = L10n.tr("Localizable", "linkedConnectors_oldQRErrorMessage", fallback: "This is an old version of the Radix Connector browser extension. Please update to the latest Connector and try linking again.")
     /// Connect your Radix Wallet to desktop web browsers by linking to the Radix Connector browser extension. Here are your linked Connectors.
     public static let subtitle = L10n.tr("Localizable", "linkedConnectors_subtitle", fallback: "Connect your Radix Wallet to desktop web browsers by linking to the Radix Connector browser extension. Here are your linked Connectors.")
     /// Linked Connectors
@@ -2104,6 +2104,22 @@ public enum L10n {
       public static let message = L10n.tr("Localizable", "linkedConnectors_approveNewConnector_message", fallback: "This Connector will be trusted to verify the dApp origin of requests to this wallet.\n\nOnly continue if you are linking to the **official Radix Connector browser extension** - or a Connector you control and trust.")
       /// Link Connector
       public static let title = L10n.tr("Localizable", "linkedConnectors_approveNewConnector_title", fallback: "Link Connector")
+    }
+    public enum ApproveRelink {
+      /// Re-link Connector
+      public static let title = L10n.tr("Localizable", "linkedConnectors_approveRelink_title", fallback: "Re-link Connector")
+    }
+    public enum ApproveRelinkAfterProfileRestore {
+      /// Any Connectors you had linked to this wallet using a different phone have been disconnected.
+      /// 
+      /// **Please re-link your Connector(s) to use with this phone.**
+      public static let message = L10n.tr("Localizable", "linkedConnectors_approveRelinkAfterProfileRestore_message", fallback: "Any Connectors you had linked to this wallet using a different phone have been disconnected.\n\n**Please re-link your Connector(s) to use with this phone.**")
+    }
+    public enum ApproveRelinkAfterUpdate {
+      /// Radix Connector now supports linking multiple phones with one browser.
+      /// 
+      /// To support this feature, we've had to disconnect your existing links – **please re-link your Connector(s).**
+      public static let message = L10n.tr("Localizable", "linkedConnectors_approveRelinkAfterUpdate_message", fallback: "Radix Connector now supports linking multiple phones with one browser.\n\nTo support this feature, we've had to disconnect your existing links – **please re-link your Connector(s).**")
     }
     public enum CameraPermissionDeniedAlert {
       /// Camera access is required to link to a Connector.

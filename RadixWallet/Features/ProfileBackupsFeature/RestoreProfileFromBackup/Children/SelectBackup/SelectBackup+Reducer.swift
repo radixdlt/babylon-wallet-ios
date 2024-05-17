@@ -66,7 +66,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case selectedProfileSnapshot(Profile, isInCloud: Bool)
+		case selectedProfileSnapshot(Profile, isInCloud: Bool, containsP2PLinks: Bool)
 		case backToStartOfOnboarding
 		case profileCreatedFromImportedBDFS
 	}
@@ -117,11 +117,12 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 		case let .tappedUseCloudBackup(profileHeader):
 			return .run { send in
-				guard let snapshot = try await backupsClient.lookupProfileSnapshotByHeader(profileHeader) else {
+				let (snapshot, containsP2PLinks) = try await backupsClient.lookupProfileSnapshotByHeader(profileHeader)
+				guard let snapshot else {
 					await send(.internal(.snapshotWithHeaderNotFoundInCloud(profileHeader)))
 					return
 				}
-				await send(.delegate(.selectedProfileSnapshot(snapshot, isInCloud: true)))
+				await send(.delegate(.selectedProfileSnapshot(snapshot, isInCloud: true, containsP2PLinks: containsP2PLinks)))
 			} catch: { error, send in
 				loggerGlobal.error("Failed to load profile snapshot with header, error: \(error), header: \(profileHeader)")
 				await send(.internal(.snapshotWithHeaderNotFoundInCloud(profileHeader)))
@@ -149,7 +150,8 @@ public struct SelectBackup: Sendable, FeatureReducer {
 					return .none
 
 				case let .plaintext(snapshot):
-					return .send(.delegate(.selectedProfileSnapshot(snapshot, isInCloud: false)))
+					let containsP2PLinks = Profile.checkIfProfileJsonContainsLegacyP2PLinks(contents: data)
+					return .send(.delegate(.selectedProfileSnapshot(snapshot, isInCloud: false, containsP2PLinks: containsP2PLinks)))
 				}
 			} catch {
 				errorQueue.schedule(error)
@@ -200,10 +202,10 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			state.destination = nil
 			return .none
 
-		case let .inputEncryptionPassword(.delegate(.successfullyDecrypted(_, decrypted))):
+		case let .inputEncryptionPassword(.delegate(.successfullyDecrypted(_, decrypted, containsP2PLinks))):
 			state.destination = nil
 			overlayWindowClient.scheduleHUD(.decryptedProfile)
-			return .send(.delegate(.selectedProfileSnapshot(decrypted, isInCloud: false)))
+			return .send(.delegate(.selectedProfileSnapshot(decrypted, isInCloud: false, containsP2PLinks: containsP2PLinks)))
 
 		case .inputEncryptionPassword(.delegate(.successfullyEncrypted)):
 			preconditionFailure("What? Encrypted? Expected to only have DECRYPTED. Incorrect implementation somewhere...")

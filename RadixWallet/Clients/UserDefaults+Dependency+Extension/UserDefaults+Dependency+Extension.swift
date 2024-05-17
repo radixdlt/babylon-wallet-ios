@@ -14,6 +14,8 @@ public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case lastCloudBackups
 	case lastManualBackups
 	case lastSyncedAccountsWithCE
+	case showRelinkConnectorsAfterUpdate
+	case showRelinkConnectorsAfterProfileRestore
 
 	/// DO NOT CHANGE THIS KEY
 	case activeProfileID
@@ -202,6 +204,22 @@ extension UserDefaults.Dependency {
 
 	public func setLastSyncedAccountsWithCE(_ value: String) {
 		set(value, forKey: Key.lastSyncedAccountsWithCE.rawValue)
+	}
+
+	public var showRelinkConnectorsAfterUpdate: Bool {
+		bool(key: .showRelinkConnectorsAfterUpdate)
+	}
+
+	public func setShowRelinkConnectorsAfterUpdate(_ value: Bool) {
+		set(value, forKey: Key.showRelinkConnectorsAfterUpdate.rawValue)
+	}
+
+	public var showRelinkConnectorsAfterProfileRestore: Bool {
+		bool(key: .showRelinkConnectorsAfterProfileRestore)
+	}
+
+	public func setShowRelinkConnectorsAfterProfileRestore(_ value: Bool) {
+		set(value, forKey: Key.showRelinkConnectorsAfterProfileRestore.rawValue)
 	}
 }
 
