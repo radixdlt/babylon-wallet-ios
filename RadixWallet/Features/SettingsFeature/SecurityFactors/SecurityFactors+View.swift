@@ -3,7 +3,7 @@ extension SecurityFactors.State {
 		.init(
 			seedPhrasesCount: seedPhrasesCount,
 			ledgerWalletsCount: ledgerWalletsCount,
-			isSeedPhraseRequiredToRecoverAccounts: isSeedPhraseRequiredToRecoverAccounts
+			securityProblems: securityProblems
 		)
 	}
 }
@@ -14,7 +14,7 @@ public extension SecurityFactors {
 	struct ViewState: Equatable {
 		let seedPhrasesCount: Int?
 		let ledgerWalletsCount: Int?
-		let isSeedPhraseRequiredToRecoverAccounts: Bool
+		let securityProblems: [SecurityProblem]
 	}
 
 	@MainActor
@@ -48,8 +48,8 @@ private extension SecurityFactors.View {
 				}
 			}
 			.background(Color.app.gray5)
-			.onFirstTask { @MainActor in
-				await store.send(.view(.onFirstTask)).finish()
+			.onAppear {
+				store.send(.view(.appeared))
 			}
 		}
 	}
@@ -87,10 +87,9 @@ private extension SecurityFactors.ViewState {
 	}
 
 	var seedPhraseHints: [Hint.ViewState] {
-		guard isSeedPhraseRequiredToRecoverAccounts else {
-			return []
+		securityProblems.compactMap { problem in
+			.init(kind: .warning, text: problem.warning)
 		}
-		return [.init(kind: .warning, text: .init(L10n.SecurityFactors.SeedPhrases.enterSeedPhrase))]
 	}
 
 	var ledgerWalletsDetail: String? {
