@@ -12,11 +12,11 @@ final class SettingsViewStateTests: TestCase {
 				displayName: "",
 				spokenName: "",
 				shortVersion: "4.2.0",
-				version: ""
+				version: "5"
 			)
 		} operation: {
 			let sut = Settings.ViewState(state: .init())
-			XCTAssertEqual(sut.appVersion, "App version: 4.2.0")
+			XCTAssertEqual(sut.appVersion, "App version: 4.2.0 (5)")
 		}
 	}
 }

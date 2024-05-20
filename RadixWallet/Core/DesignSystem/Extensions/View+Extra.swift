@@ -9,18 +9,18 @@ extension View {
 			}
 	}
 
-	func setUpNavigationBar(title: String) -> some View {
+	func radixToolbar(title: String, alwaysVisible: Bool = true) -> some View {
 		self
 			.toolbar {
 				ToolbarItem(placement: .principal) {
 					Text(title)
 						.foregroundColor(.app.gray1)
-						.textStyle(.secondaryHeader)
+						.textStyle(.body1Header)
 				}
 			}
 			.navigationBarTitleDisplayMode(.inline)
 			.toolbarBackground(.app.background, for: .navigationBar)
-			.toolbarBackground(.visible, for: .navigationBar)
+			.toolbarBackground(alwaysVisible ? .visible : .automatic, for: .navigationBar)
 	}
 
 	func eraseToAnyView() -> AnyView {
