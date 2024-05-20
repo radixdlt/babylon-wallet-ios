@@ -85,7 +85,7 @@ extension AccountPreferences {
 				}
 				.destination(store: store)
 				.background(.app.gray5)
-				.setUpNavigationBar(title: L10n.AccountSettings.title)
+				.radixToolbar(title: L10n.AccountSettings.title)
 			}
 		}
 	}

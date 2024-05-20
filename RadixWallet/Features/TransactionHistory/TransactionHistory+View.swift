@@ -77,7 +77,7 @@ extension TransactionHistory {
 						}
 					}
 				}
-				.setUpNavigationBar(title: L10n.TransactionHistory.title, setBackgroundColor: false)
+				.radixToolbar(title: L10n.TransactionHistory.title, alwaysVisible: false)
 			}
 			.onAppear {
 				store.send(.view(.onAppear))

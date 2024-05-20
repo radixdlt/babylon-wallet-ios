@@ -65,7 +65,7 @@ extension PersonaDetails.View {
 						.padding(.bottom, .large2)
 					}
 				}
-				.setUpNavigationBar(title: viewStore.personaName)
+				.radixToolbar(title: viewStore.personaName)
 				.onAppear {
 					viewStore.send(.appeared)
 				}

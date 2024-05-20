@@ -61,7 +61,7 @@ extension ResourcesList {
 				.padding(.top, .medium1)
 				.background(.app.gray5)
 				.destinations(with: store)
-				.setUpNavigationBar(title: viewStore.mode.navigationTitle)
+				.radixToolbar(title: viewStore.mode.navigationTitle)
 				.footer {
 					Button(viewStore.mode.addButtonTitle) {
 						viewStore.send(.addAssetTapped)

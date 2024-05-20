@@ -13,7 +13,7 @@ extension UnknownDappComponents {
 						row(address, heading: state.rowHeading)
 					}
 				}
-				.setUpNavigationBar(title: state.title, setBackgroundColor: false)
+				.radixToolbar(title: state.title, alwaysVisible: false)
 			}
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {

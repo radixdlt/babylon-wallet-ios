@@ -38,7 +38,7 @@ extension ProfileBackupSettings {
 			.task { @MainActor in
 				await store.send(.view(.task)).finish()
 			}
-			.setUpNavigationBar(title: L10n.AccountSecuritySettings.Backups.title)
+			.radixToolbar(title: L10n.AccountSecuritySettings.Backups.title)
 		}
 	}
 }

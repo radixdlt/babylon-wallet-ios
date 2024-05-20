@@ -80,7 +80,7 @@ extension AccountAndPersonaHiding {
 					action: \.destination.confirmUnhideAllAlert
 				))
 			}
-			.setUpNavigationBar(title: L10n.AppSettings.EntityHiding.title)
+			.radixToolbar(title: L10n.AppSettings.EntityHiding.title)
 		}
 	}
 }

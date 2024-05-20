@@ -103,7 +103,7 @@ struct DetailsContainer<Contents: View>: View {
 			ScrollView {
 				contents
 			}
-			.setUpNavigationBar(title: titleString)
+			.radixToolbar(title: titleString)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
 					CloseButton(action: closeButtonAction)

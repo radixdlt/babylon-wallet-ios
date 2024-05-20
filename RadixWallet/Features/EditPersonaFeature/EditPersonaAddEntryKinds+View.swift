@@ -43,7 +43,7 @@ extension EditPersonaAddEntryKinds {
 							requiring: .atLeast(1)
 						)
 					}
-					.setUpNavigationBar(title: L10n.EditPersona.AddAField.title)
+					.radixToolbar(title: L10n.EditPersona.AddAField.title)
 					.toolbar {
 						ToolbarItem(placement: .cancellationAction) {
 							CloseButton(action: { viewStore.send(.closeButtonTapped) })

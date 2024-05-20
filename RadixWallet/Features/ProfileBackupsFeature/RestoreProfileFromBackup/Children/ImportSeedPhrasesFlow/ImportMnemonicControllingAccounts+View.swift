@@ -113,7 +113,7 @@ private extension View {
 			action: ImportMnemonicControllingAccounts.Destination.Action.importMnemonic,
 			content: {
 				ImportMnemonic.View(store: $0)
-					.setUpNavigationBar(title: L10n.EnterSeedPhrase.Header.title, setBackgroundColor: false)
+					.radixToolbar(title: L10n.EnterSeedPhrase.Header.title, alwaysVisible: false)
 					.inNavigationView
 			}
 		)

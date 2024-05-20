@@ -75,7 +75,7 @@ extension UpdateAccountLabel {
 					Spacer(minLength: 0)
 				}
 				.background(.app.gray5)
-				.setUpNavigationBar(title: L10n.AccountSettings.RenameAccount.title)
+				.radixToolbar(title: L10n.AccountSettings.RenameAccount.title)
 			}
 		}
 	}

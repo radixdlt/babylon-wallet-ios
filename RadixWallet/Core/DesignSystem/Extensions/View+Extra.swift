@@ -9,7 +9,7 @@ extension View {
 			}
 	}
 
-	func setUpNavigationBar(title: String, setBackgroundColor: Bool = true) -> some View {
+	func radixToolbar(title: String, alwaysVisible: Bool = true) -> some View {
 		self
 			.toolbar {
 				ToolbarItem(placement: .principal) {
@@ -19,10 +19,8 @@ extension View {
 				}
 			}
 			.navigationBarTitleDisplayMode(.inline)
-			.applyIf(setBackgroundColor) {
-				$0.toolbarBackground(.app.background, for: .navigationBar)
-					.toolbarBackground(.visible, for: .navigationBar)
-			}
+			.toolbarBackground(.app.background, for: .navigationBar)
+			.toolbarBackground(alwaysVisible ? .visible : .automatic, for: .navigationBar)
 	}
 
 	func eraseToAnyView() -> AnyView {

@@ -59,7 +59,7 @@ extension P2PLinksFeature {
 					.padding(.horizontal, .medium3)
 					.padding(.vertical, .large1)
 				}
-				.setUpNavigationBar(title: L10n.LinkedConnectors.title)
+				.radixToolbar(title: L10n.LinkedConnectors.title)
 				.task { @MainActor in
 					await store.send(.view(.task)).finish()
 				}
