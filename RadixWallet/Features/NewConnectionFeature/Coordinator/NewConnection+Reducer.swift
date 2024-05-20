@@ -234,6 +234,10 @@ public struct NewConnection: Sendable, FeatureReducer {
 				return .none
 			case let .approveExisitingConnection(connectionName):
 				return .send(.internal(.establishConnection(connectionName)))
+			case .approveRelinkAfterProfileRestore, .approveRelinkAfterUpdate:
+				let string = L10n.LinkedConnectors.NewConnection.subtitle
+				state.root = .scanQR(.init(scanInstructions: string))
+				return .none
 			}
 
 		case let .root(.nameConnection(.delegate(.nameSet(connectionName)))):
@@ -314,7 +318,7 @@ extension AlertState<NewConnection.Destination.Action.ErrorAlert> {
 				TextState(L10n.Common.dismiss)
 			}
 		} message: {
-			TextState(L10n.LinkedConnectors.oldQRErrorMessage)
+			TextState(L10n.LinkedConnectors.incorrectQrMessage)
 		}
 	}
 }

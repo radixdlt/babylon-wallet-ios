@@ -45,5 +45,7 @@ extension NewConnectionApproval.State {
 	public enum Purpose: Sendable, Hashable {
 		case approveNewConnection
 		case approveExisitingConnection(NewConnection.State.ConnectionName)
+		case approveRelinkAfterProfileRestore
+		case approveRelinkAfterUpdate
 	}
 }
