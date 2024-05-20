@@ -65,7 +65,7 @@ extension SecurityCenterClient {
 					}
 
 					func hasProblem5() -> Bool {
-						if let cloudBackup {
+						if isCloudProfileSyncEnabled, let cloudBackup {
 							!cloudBackup.success
 						} else {
 							false // FIXME: GK - is this what we want?
