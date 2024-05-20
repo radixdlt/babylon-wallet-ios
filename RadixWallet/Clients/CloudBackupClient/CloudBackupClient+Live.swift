@@ -27,12 +27,14 @@ extension CloudBackupClient {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.userDefaults) var userDefaults
 
-		let cloudContainer = ProcessInfo.processInfo.environment[Self.cloudBackupIdentifierKey].map(CKContainer.init)
+//		let cloudContainer = ProcessInfo.processInfo.environment[Self.cloudBackupIdentifierKey].map(CKContainer.init)
+
+		let cloudContainer = CKContainer(identifier: "iCloud.com.radixpublishing.radixwallet.ios.pre-alpha.cloudBackup")
 
 		@Sendable
 		func container() throws -> CKContainer {
-			guard let cloudContainer else { throw MissingCloudKitIdentifierError() }
-			return cloudContainer
+//			guard let cloudContainer else { throw MissingCloudKitIdentifierError() }
+			cloudContainer
 		}
 
 		@Sendable
