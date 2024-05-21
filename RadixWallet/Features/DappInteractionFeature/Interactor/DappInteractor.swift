@@ -18,7 +18,26 @@ struct DappInteractor: Sendable, FeatureReducer {
 		var requestQueue: IdentifiedArrayOf<RequestEnvelope> = []
 
 		@PresentationState
-		var destination: Destination.State?
+		public var destination: Destination.State? {
+			didSet {
+				guard destination == nil else { return }
+				showNextDestination()
+			}
+		}
+
+		private var destinationsQueue: [Destination.State] = []
+		fileprivate mutating func addDestination(_ destination: Destination.State) {
+			if self.destination == nil {
+				self.destination = destination
+			} else {
+				destinationsQueue.append(destination)
+			}
+		}
+
+		private mutating func showNextDestination() {
+			guard !destinationsQueue.isEmpty else { return }
+			destination = destinationsQueue.removeFirst()
+		}
 	}
 
 	enum ViewAction: Sendable, Equatable {
@@ -163,7 +182,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return .send(.internal(.presentResponseFailureAlert(response, for: request, metadata, reason: reason)))
 
 		case let .presentResponseFailureAlert(response, for: request, dappMetadata, reason):
-			state.destination = .responseFailure(.init(
+			state.addDestination(.responseFailure(.init(
 				title: { TextState(L10n.Common.errorAlertTitle) },
 				actions: {
 					ButtonState(role: .cancel, action: .cancelButtonTapped(request)) {
@@ -180,7 +199,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 					TextState(L10n.DAppRequest.ResponseFailureAlert.message)
 					#endif
 				}
-			))
+			)))
 			return .none
 
 		case let .presentInvalidRequest(invalidRequest, reason, route, isDeveloperModeEnabled):
@@ -190,7 +209,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 				message: reason.responseMessage()
 			)
 
-			state.destination = .invalidRequest(.init(
+			state.addDestination(.invalidRequest(.init(
 				title: { TextState(L10n.Error.DappRequest.invalidRequest) },
 				actions: {
 					ButtonState(
@@ -201,16 +220,16 @@ struct DappInteractor: Sendable, FeatureReducer {
 					}
 				},
 				message: { TextState(reason.alertMessage(isDeveloperModeEnabled)) }
-			))
+			)))
 			return .none
 
 		case let .presentResponseSuccessView(dappMetadata, txID):
-			state.destination = .dappInteractionCompletion(
+			state.addDestination(.dappInteractionCompletion(
 				.init(
 					txID: txID,
 					dappMetadata: dappMetadata
 				)
-			)
+			))
 			return .none
 		}
 	}
@@ -283,6 +302,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			return .none
 		}
 
+		// We shouldn't use addDestination() in this case.
 		state.destination = .dappInteraction(.init(interaction: next.request))
 
 		return .none
