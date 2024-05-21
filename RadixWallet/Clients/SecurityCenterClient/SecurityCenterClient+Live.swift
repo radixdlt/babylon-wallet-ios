@@ -11,8 +11,12 @@ extension SecurityCenterClient {
 		await problems(nil)
 	}
 
+	/// Emits `false` if there is at least one Security problem.
+	///
+	/// Despite `.securityFactors` problems aren't actually related to recoverability status, we are considering them as well so
+	/// that user is aware that they still have problems to take care of.
 	public func isRecoverable() async -> AnyAsyncSequence<Bool> {
-		await problems(.configurationBackup)
+		await problems()
 			.map(\.isEmpty)
 			.eraseToAnyAsyncSequence()
 	}
@@ -57,9 +61,9 @@ extension SecurityCenterClient {
 				return combineLatest(profiles, cloudBackups, manualBackups).map { profile, cloudBackup, manualBackup in
 					let isCloudProfileSyncEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
 
-					func hasProblem3() async -> (accounts: Int, personas: Int)? {
-						guard let result = try? await deviceFactorSourceClient.unrecoverableEntitiesCount(),
-						      result.accounts + result.personas > 0
+					func hasProblem3() async -> (accounts: [AccountAddress], personas: [IdentityAddress])? {
+						guard let result = try? await deviceFactorSourceClient.unrecoverableEntities(),
+						      result.accounts.count + result.personas.count > 0
 						else { return nil }
 						return result
 					}

@@ -17,7 +17,7 @@ extension DeviceFactorSourceClient: TestDependencyKey {
 		entitiesControlledByFactorSource: { _, _ in throw NoopError() },
 		controlledEntities: { _ in [] },
 		isSeedPhraseNeededToRecoverAccounts: { false },
-		unrecoverableEntitiesCount: { (accounts: 0, personas: 0) }
+		unrecoverableEntities: { (accounts: [], personas: []) }
 	)
 
 	public static let testValue = Self(
@@ -27,6 +27,6 @@ extension DeviceFactorSourceClient: TestDependencyKey {
 		entitiesControlledByFactorSource: unimplemented("\(Self.self).entitiesControlledByFactorSource"),
 		controlledEntities: unimplemented("\(Self.self).controlledEntities"),
 		isSeedPhraseNeededToRecoverAccounts: unimplemented("\(Self.self).isSeedPhraseNeededToRecoverAccounts"),
-		unrecoverableEntitiesCount: unimplemented("\(Self.self).unrecoverableEntitiesCount")
+		unrecoverableEntities: unimplemented("\(Self.self).unrecoverableEntities")
 	)
 }
