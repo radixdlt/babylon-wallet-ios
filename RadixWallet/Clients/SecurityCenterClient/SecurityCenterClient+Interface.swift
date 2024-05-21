@@ -20,9 +20,9 @@ extension SecurityCenterClient {
 // MARK: - SecurityProblem
 /// As outlined in https://radixdlt.atlassian.net/wiki/spaces/AT/pages/3392569357/Security-related+Problem+States+in+the+Wallet
 public enum SecurityProblem: Hashable, Sendable, Identifiable {
-	/// The given number of `accounts` and `personas` are unrecoverabl if the user loses their phone, since their corresponding seed phrase has not been written down.
+	/// The given addresses of `accounts` and `personas` are unrecoverable if the user loses their phone, since their corresponding seed phrase has not been written down.
 	/// NOTE: This definition differs from the one at Confluence since we don't have shields implemented yet.
-	case problem3(accounts: Int, personas: Int)
+	case problem3(accounts: [String], personas: [String])
 	/// Wallet backups to the cloud aren’t working (wallet tried to do a backup and it didn’t work within, say, 5 minutes.)
 	/// This means that currently all accounts and personas are at risk of being practically unrecoverable if the user loses their phone.
 	/// Also they would lose all of their other non-security wallet settings and data.
@@ -62,7 +62,7 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 
 	public var heading: String {
 		switch self {
-		case let .problem3(accounts, personas): L10n.SecurityCenter.Problem3.heading(accounts, personas)
+		case let .problem3(accounts, personas): L10n.SecurityCenter.Problem3.heading(accounts.count, personas.count)
 		case .problem5: L10n.SecurityCenter.Problem5.heading
 		case .problem6: L10n.SecurityCenter.Problem6.heading
 		case .problem7: L10n.SecurityCenter.Problem7.heading

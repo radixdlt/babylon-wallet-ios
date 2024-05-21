@@ -79,17 +79,17 @@ extension DeviceFactorSourceClient: DependencyKey {
 			return entities.contains(where: { !$0.isMnemonicPresentInKeychain })
 		}
 
-		let unrecoverableEntitiesCount: @Sendable () async throws -> (accounts: Int, personas: Int) = {
+		let unrecoverableEntities: @Sendable () async throws -> (accounts: [Account], personas: [Persona]) = {
 			let deviceFactorSources = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)
 			let entities = try await deviceFactorSources.asyncMap {
 				try await entitiesControlledByFactorSource($0, nil)
 			}
-			var accounts = 0
-			var personas = 0
+			var accounts: [Account] = []
+			var personas: [Persona] = []
 			for entity in entities {
 				if !entity.isMnemonicMarkedAsBackedUp {
-					accounts += entity.accounts.count
-					personas += entity.personas.count
+					accounts.append(contentsOf: entity.accounts)
+					personas.append(contentsOf: entity.personas)
 				}
 			}
 			return (accounts, personas)
@@ -156,7 +156,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 				})
 			},
 			isSeedPhraseNeededToRecoverAccounts: isSeedPhraseNeededToRecoverAccounts,
-			unrecoverableEntitiesCount: unrecoverableEntitiesCount
+			unrecoverableEntities: unrecoverableEntities
 		)
 	}()
 }

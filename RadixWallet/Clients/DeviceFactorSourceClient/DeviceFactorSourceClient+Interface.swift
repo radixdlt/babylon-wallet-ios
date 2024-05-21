@@ -15,7 +15,9 @@ public struct DeviceFactorSourceClient: Sendable {
 	/// Checks if there is any account for which the wallet doesn't have its seed phrase.
 	public var isSeedPhraseNeededToRecoverAccounts: IsSeedPhraseNeededToRecoverAccounts
 
-	public var unrecoverableEntitiesCount: UnrecoverableEntitiesCount
+	/// The `Accounts` & `Personas` the user wouldn't be able to recover if they loose their phone,
+	/// since they haven't been backed up (seed phrase not written).
+	public var unrecoverableEntities: UnrecoverableEntities
 
 	public init(
 		publicKeysFromOnDeviceHD: @escaping PublicKeysFromOnDeviceHD,
@@ -24,7 +26,7 @@ public struct DeviceFactorSourceClient: Sendable {
 		entitiesControlledByFactorSource: @escaping GetEntitiesControlledByFactorSource,
 		controlledEntities: @escaping GetControlledEntities,
 		isSeedPhraseNeededToRecoverAccounts: @escaping IsSeedPhraseNeededToRecoverAccounts,
-		unrecoverableEntitiesCount: @escaping UnrecoverableEntitiesCount
+		unrecoverableEntities: @escaping UnrecoverableEntities
 	) {
 		self.publicKeysFromOnDeviceHD = publicKeysFromOnDeviceHD
 		self.signatureFromOnDeviceHD = signatureFromOnDeviceHD
@@ -32,7 +34,7 @@ public struct DeviceFactorSourceClient: Sendable {
 		self.entitiesControlledByFactorSource = entitiesControlledByFactorSource
 		self.controlledEntities = controlledEntities
 		self.isSeedPhraseNeededToRecoverAccounts = isSeedPhraseNeededToRecoverAccounts
-		self.unrecoverableEntitiesCount = unrecoverableEntitiesCount
+		self.unrecoverableEntities = unrecoverableEntities
 	}
 }
 
@@ -45,7 +47,7 @@ extension DeviceFactorSourceClient {
 	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey
 	public typealias IsAccountRecoveryNeeded = @Sendable () async throws -> Bool
 	public typealias IsSeedPhraseNeededToRecoverAccounts = @Sendable () async throws -> Bool
-	public typealias UnrecoverableEntitiesCount = @Sendable () async throws -> (accounts: Int, personas: Int)
+	public typealias UnrecoverableEntities = @Sendable () async throws -> (accounts: [Account], personas: [Persona])
 }
 
 // MARK: - DiscrepancyUnsupportedCurve
