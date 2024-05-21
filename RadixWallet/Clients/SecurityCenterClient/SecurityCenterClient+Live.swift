@@ -11,8 +11,12 @@ extension SecurityCenterClient {
 		await problems(nil)
 	}
 
+	/// Emits `false` if there is at least one Security problem.
+	///
+	/// Despite `.securityFactors` problems aren't actually related to recoverability status, we are considering them as well so
+	/// that user is aware that they still have problems to take care of.
 	public func isRecoverable() async -> AnyAsyncSequence<Bool> {
-		await problems(.configurationBackup)
+		await problems()
 			.map(\.isEmpty)
 			.eraseToAnyAsyncSequence()
 	}
