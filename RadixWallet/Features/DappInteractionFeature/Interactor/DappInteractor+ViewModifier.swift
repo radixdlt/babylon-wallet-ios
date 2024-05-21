@@ -26,35 +26,18 @@ extension DappInteractor {
 		func body(content: Content) -> some SwiftUI.View {
 			ZStack {
 				content
-				WithViewStore(store, observe: { $0.currentModal }) { viewStore in
+				WithViewStore(store, observe: { $0.destination }) { viewStore in
 					IfLetStore(
-						store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
-						state: /DappInteractor.Modal.State.dappInteraction,
-						action: DappInteractor.Modal.Action.dappInteraction,
+						store.destination,
+						state: /DappInteractor.Destination.State.dappInteraction,
+						action: DappInteractor.Destination.Action.dappInteraction,
 						then: { DappInteractionCoordinator.View(store: $0) }
 					)
 					.transition(.move(edge: .bottom))
 					.animation(.linear, value: viewStore.state)
 				}
 			}
-			.sheet(
-				store: store.scope(state: \.$currentModal, action: { .child(.modal($0)) }),
-				state: /DappInteractor.Modal.State.dappInteractionCompletion,
-				action: DappInteractor.Modal.Action.dappInteractionCompletion,
-				content: { Completion.View(store: $0) }
-			)
-			.alert(
-				store: store.scope(
-					state: \.$invalidRequestAlert,
-					action: { .view(.invalidRequestAlert($0)) }
-				)
-			)
-			.alert(
-				store: store.scope(
-					state: \.$responseFailureAlert,
-					action: { .view(.responseFailureAlert($0)) }
-				)
-			)
+			.destinations(with: store)
 			.task {
 				await store.send(.view(.task)).finish()
 			}
@@ -65,6 +48,50 @@ extension DappInteractor {
 				store.send(.view(.moveToBackground))
 			}
 		}
+	}
+}
+
+private extension StoreOf<DappInteractor> {
+	var destination: PresentationStoreOf<DappInteractor.Destination> {
+		func scopeState(state: State) -> PresentationState<DappInteractor.Destination.State> {
+			state.$destination
+		}
+		return scope(state: scopeState, action: Action.destination)
+	}
+}
+
+@MainActor
+private extension View {
+	func destinations(with store: StoreOf<DappInteractor>) -> some View {
+		let destinationStore = store.destination
+		return dappInteractionCompletion(with: destinationStore)
+			.invalidRequestAlert(with: destinationStore)
+			.responseFailureAlert(with: destinationStore)
+	}
+
+	private func dappInteractionCompletion(with destinationStore: PresentationStoreOf<DappInteractor.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /DappInteractor.Destination.State.dappInteractionCompletion,
+			action: DappInteractor.Destination.Action.dappInteractionCompletion,
+			content: { Completion.View(store: $0) }
+		)
+	}
+
+	private func invalidRequestAlert(with destinationStore: PresentationStoreOf<DappInteractor.Destination>) -> some View {
+		alert(
+			store: destinationStore,
+			state: /DappInteractor.Destination.State.invalidRequest,
+			action: DappInteractor.Destination.Action.invalidRequest
+		)
+	}
+
+	private func responseFailureAlert(with destinationStore: PresentationStoreOf<DappInteractor.Destination>) -> some View {
+		alert(
+			store: destinationStore,
+			state: /DappInteractor.Destination.State.responseFailure,
+			action: DappInteractor.Destination.Action.responseFailure
+		)
 	}
 }
 
