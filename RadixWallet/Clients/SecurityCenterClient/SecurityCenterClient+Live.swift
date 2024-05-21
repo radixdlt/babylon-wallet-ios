@@ -57,13 +57,11 @@ extension SecurityCenterClient {
 				return combineLatest(profiles, cloudBackups, manualBackups).map { profile, cloudBackup, manualBackup in
 					let isCloudProfileSyncEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
 
-					func hasProblem3() async -> (accounts: [String], personas: [String])? {
+					func hasProblem3() async -> (accounts: [AccountAddress], personas: [IdentityAddress])? {
 						guard let result = try? await deviceFactorSourceClient.unrecoverableEntities(),
 						      result.accounts.count + result.personas.count > 0
 						else { return nil }
-						let accounts = result.accounts.map(\.address.address)
-						let personas = result.personas.map(\.address.address)
-						return (accounts, personas)
+						return result
 					}
 
 					func hasProblem5() -> Bool {

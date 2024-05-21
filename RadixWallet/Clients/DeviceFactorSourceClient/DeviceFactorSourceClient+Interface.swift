@@ -47,7 +47,7 @@ extension DeviceFactorSourceClient {
 	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey
 	public typealias IsAccountRecoveryNeeded = @Sendable () async throws -> Bool
 	public typealias IsSeedPhraseNeededToRecoverAccounts = @Sendable () async throws -> Bool
-	public typealias UnrecoverableEntities = @Sendable () async throws -> (accounts: [Account], personas: [Persona])
+	public typealias UnrecoverableEntities = @Sendable () async throws -> (accounts: [AccountAddress], personas: [IdentityAddress])
 }
 
 // MARK: - DiscrepancyUnsupportedCurve

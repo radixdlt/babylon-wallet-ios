@@ -22,7 +22,7 @@ extension SecurityCenterClient {
 public enum SecurityProblem: Hashable, Sendable, Identifiable {
 	/// The given addresses of `accounts` and `personas` are unrecoverable if the user loses their phone, since their corresponding seed phrase has not been written down.
 	/// NOTE: This definition differs from the one at Confluence since we don't have shields implemented yet.
-	case problem3(accounts: [String], personas: [String])
+	case problem3(accounts: [AccountAddress], personas: [IdentityAddress])
 	/// Wallet backups to the cloud aren’t working (wallet tried to do a backup and it didn’t work within, say, 5 minutes.)
 	/// This means that currently all accounts and personas are at risk of being practically unrecoverable if the user loses their phone.
 	/// Also they would lose all of their other non-security wallet settings and data.
