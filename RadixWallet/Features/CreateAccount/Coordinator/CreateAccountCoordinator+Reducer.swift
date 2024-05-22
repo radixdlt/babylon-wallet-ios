@@ -105,6 +105,7 @@ public struct CreateAccountCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.accountsClient) var accountsClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
+	@Dependency(\.radixConnectClient) var radixConnectClient
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.isPresented) var isPresented
 	@Dependency(\.dismiss) var dismiss
@@ -179,6 +180,7 @@ extension CreateAccountCoordinator {
 			return .run { send in
 				await send(.internal(.handleAccountCreated(TaskResult {
 					try await accountsClient.saveVirtualAccount(account)
+					_ = await radixConnectClient.loadP2PLinksAndConnectAll()
 					return account
 				})))
 			}
