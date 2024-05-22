@@ -526,16 +526,21 @@ private extension DappInteractor {
 	}
 
 	func showNpsSurveyEffect() -> Effect<Action> {
-		.run { send in
+		@Dependency(\.continuousClock) var clock
+		return .run { send in
 			for try await shouldShow in await npsSurveyClient.shouldAskForUserFeedback() {
 				guard !Task.isCancelled else { return }
+				// Add delay so that `.npsSurvey` is always shown after `.dappInteractionCompletion`.
+				try await clock.sleep(for: .seconds(0.6))
 				await send(.internal(.shouldShowNpsSurvey(shouldShow)))
 			}
 		}
 	}
 
 	private func uploadUserFeedbackEffect(_ feedback: NPSSurveyClient.UserFeedback?) -> Effect<Action> {
-		overlayWindowClient.scheduleHUD(.thankYou)
+		if feedback != nil {
+			overlayWindowClient.scheduleHUD(.thankYou)
+		}
 
 		return .run { _ in
 			await npsSurveyClient.uploadUserFeedback(feedback)
