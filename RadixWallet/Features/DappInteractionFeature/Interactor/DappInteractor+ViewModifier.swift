@@ -67,6 +67,7 @@ private extension View {
 		return dappInteractionCompletion(with: destinationStore)
 			.invalidRequestAlert(with: destinationStore)
 			.responseFailureAlert(with: destinationStore)
+			.npsSurvey(with: destinationStore)
 	}
 
 	private func dappInteractionCompletion(with destinationStore: PresentationStoreOf<DappInteractor.Destination>) -> some View {
@@ -91,6 +92,15 @@ private extension View {
 			store: destinationStore,
 			state: /DappInteractor.Destination.State.responseFailure,
 			action: DappInteractor.Destination.Action.responseFailure
+		)
+	}
+
+	private func npsSurvey(with destinationStore: PresentationStoreOf<DappInteractor.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /DappInteractor.Destination.State.npsSurvey,
+			action: DappInteractor.Destination.Action.npsSurvey,
+			content: { NPSSurvey.View(store: $0) }
 		)
 	}
 }

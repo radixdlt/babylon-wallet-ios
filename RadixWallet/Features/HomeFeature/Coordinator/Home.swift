@@ -61,7 +61,6 @@ public struct Home: Sendable, FeatureReducer {
 		case importMnemonic
 		case loadedShouldWriteDownPersonasSeedPhrase(Bool)
 		case currentGatewayChanged(to: Gateway)
-		case shouldShowNPSSurvey(Bool)
 		case accountsResourcesLoaded(Loadable<[OnLedgerEntity.OnLedgerAccount]>)
 		case accountsFiatWorthLoaded([AccountAddress: Loadable<FiatWorth>])
 		case showLinkConnectorIfNeeded
@@ -82,7 +81,6 @@ public struct Home: Sendable, FeatureReducer {
 			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
 			case exportMnemonic(ExportMnemonic.State)
 			case acknowledgeJailbreakAlert(AlertState<Action.AcknowledgeJailbreakAlert>)
-			case npsSurvey(NPSSurvey.State)
 			case relinkConnector(NewConnection.State)
 		}
 
@@ -92,7 +90,6 @@ public struct Home: Sendable, FeatureReducer {
 			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
 			case exportMnemonic(ExportMnemonic.Action)
 			case acknowledgeJailbreakAlert(AcknowledgeJailbreakAlert)
-			case npsSurvey(NPSSurvey.Action)
 			case relinkConnector(NewConnection.Action)
 
 			public enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
@@ -111,9 +108,6 @@ public struct Home: Sendable, FeatureReducer {
 			Scope(state: /State.exportMnemonic, action: /Action.exportMnemonic) {
 				ExportMnemonic()
 			}
-			Scope(state: /State.npsSurvey, action: /Action.npsSurvey) {
-				NPSSurvey()
-			}
 			Scope(state: /State.relinkConnector, action: /Action.relinkConnector) {
 				NewConnection()
 			}
@@ -128,8 +122,6 @@ public struct Home: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.iOSSecurityClient) var iOSSecurityClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
-	@Dependency(\.npsSurveyClient) var npsSurveyClient
-	@Dependency(\.overlayWindowClient) var overlayWindowClient
 	@Dependency(\.radixConnectClient) var radixConnectClient
 
 	public init() {}
@@ -176,7 +168,6 @@ public struct Home: Sendable, FeatureReducer {
 			.merge(with: checkAccountsAccessToMnemonic(state: state))
 			.merge(with: loadShouldWriteDownPersonasSeedPhrase())
 			.merge(with: loadGateways())
-			.merge(with: loadNPSSurveyStatus())
 			.merge(with: loadAccountResources())
 			.merge(with: loadFiatValues())
 			.merge(with: .send(.internal(.showLinkConnectorIfNeeded)))
@@ -263,11 +254,7 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			#endif
 			return .none
-		case let .shouldShowNPSSurvey(shouldShow):
-			if shouldShow {
-				state.addDestination(.npsSurvey(.init()))
-			}
-			return .none
+
 		case let .accountsFiatWorthLoaded(fiatWorths):
 			state.accountRows.mutateAll {
 				if let fiatWorth = fiatWorths[$0.id] {
@@ -357,10 +344,6 @@ public struct Home: Sendable, FeatureReducer {
 			}
 			return .none
 
-		case let .npsSurvey(.delegate(.feedbackFilled(userFeedback))):
-			state.destination = nil
-			return uploadUserFeedback(userFeedback)
-
 		case let .relinkConnector(.delegate(.newConnection(connectedClient))):
 			state.destination = nil
 			userDefaults.setShowRelinkConnectorsAfterProfileRestore(false)
@@ -381,8 +364,6 @@ public struct Home: Sendable, FeatureReducer {
 		var effect: Effect<Action>?
 
 		switch state.destination {
-		case .npsSurvey:
-			effect = uploadUserFeedback(nil)
 		case .relinkConnector:
 			userDefaults.setShowRelinkConnectorsAfterProfileRestore(false)
 			userDefaults.setShowRelinkConnectorsAfterUpdate(false)
@@ -433,23 +414,6 @@ public struct Home: Sendable, FeatureReducer {
 				guard !Task.isCancelled else { return }
 				await send(.internal(.currentGatewayChanged(to: gateway)))
 			}
-		}
-	}
-
-	private func loadNPSSurveyStatus() -> Effect<Action> {
-		.run { send in
-			for try await shouldAsk in await npsSurveyClient.shouldAskForUserFeedback() {
-				guard !Task.isCancelled else { return }
-				await send(.internal(.shouldShowNPSSurvey(shouldAsk)))
-			}
-		}
-	}
-
-	private func uploadUserFeedback(_ feedback: NPSSurveyClient.UserFeedback?) -> Effect<Action> {
-		overlayWindowClient.scheduleHUD(.thankYou)
-
-		return .run { _ in
-			await npsSurveyClient.uploadUserFeedback(feedback)
 		}
 	}
 

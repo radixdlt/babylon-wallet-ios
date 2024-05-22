@@ -34,7 +34,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}
 		}
 
-		private mutating func showNextDestination() {
+		fileprivate mutating func showNextDestination() {
 			guard !destinationsQueue.isEmpty else { return }
 			destination = destinationsQueue.removeFirst()
 		}
@@ -73,6 +73,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			route: P2P.Route,
 			isDeveloperModeEnabled: Bool
 		)
+		case shouldShowNpsSurvey(Bool)
 	}
 
 	struct Destination: Sendable, DestinationReducer {
@@ -81,6 +82,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			case dappInteractionCompletion(Completion.State)
 			case responseFailure(AlertState<Action.ResponseFailure>)
 			case invalidRequest(AlertState<Action.InvalidRequest>)
+			case npsSurvey(NPSSurvey.State)
 		}
 
 		enum Action: Sendable, Equatable {
@@ -88,6 +90,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			case dappInteractionCompletion(Completion.Action)
 			case responseFailure(ResponseFailure)
 			case invalidRequest(InvalidRequest)
+			case npsSurvey(NPSSurvey.Action)
 
 			enum ResponseFailure: Sendable, Hashable {
 				case cancelButtonTapped(RequestEnvelope)
@@ -106,6 +109,9 @@ struct DappInteractor: Sendable, FeatureReducer {
 			Scope(state: /State.dappInteractionCompletion, action: /Action.dappInteractionCompletion) {
 				Completion()
 			}
+			Scope(state: /State.npsSurvey, action: /Action.npsSurvey) {
+				NPSSurvey()
+			}
 		}
 	}
 
@@ -117,6 +123,8 @@ struct DappInteractor: Sendable, FeatureReducer {
 	@Dependency(\.rolaClient) var rolaClient
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.dappInteractionClient) var dappInteractionClient
+	@Dependency(\.npsSurveyClient) var npsSurveyClient
+	@Dependency(\.overlayWindowClient) var overlayWindowClient
 
 	var body: some ReducerOf<Self> {
 		Reduce(core)
@@ -131,6 +139,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 		switch viewAction {
 		case .task:
 			handleIncomingRequests()
+				.merge(with: showNpsSurveyEffect())
 
 		case .moveToBackground:
 			.run { _ in
@@ -231,6 +240,12 @@ struct DappInteractor: Sendable, FeatureReducer {
 				)
 			))
 			return .none
+
+		case let .shouldShowNpsSurvey(show):
+			if show {
+				state.addDestination(.npsSurvey(.init()))
+			}
+			return .none
 		}
 	}
 
@@ -287,9 +302,26 @@ struct DappInteractor: Sendable, FeatureReducer {
 				}
 			}
 
+		case let .npsSurvey(.delegate(.feedbackFilled(userFeedback))):
+			state.destination = nil
+			return uploadUserFeedbackEffect(userFeedback)
+
 		default:
 			return .none
 		}
+	}
+
+	func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
+		var effect: Effect<Action>?
+		switch state.destination {
+		case .npsSurvey:
+			effect = uploadUserFeedbackEffect(nil)
+		default:
+			break
+		}
+
+		state.showNextDestination()
+		return effect ?? .none
 	}
 
 	func presentQueuedRequestIfNeededEffect(
@@ -462,7 +494,7 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 	}
 }
 
-extension DappInteractor {
+private extension DappInteractor {
 	func handleIncomingRequests() -> Effect<Action> {
 		.run { send in
 			for try await incomingRequest in dappInteractionClient.interactions {
@@ -490,6 +522,23 @@ extension DappInteractor {
 			}
 		} catch: { error, _ in
 			errorQueue.schedule(error)
+		}
+	}
+
+	func showNpsSurveyEffect() -> Effect<Action> {
+		.run { send in
+			for try await shouldShow in await npsSurveyClient.shouldAskForUserFeedback() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.shouldShowNpsSurvey(shouldShow)))
+			}
+		}
+	}
+
+	private func uploadUserFeedbackEffect(_ feedback: NPSSurveyClient.UserFeedback?) -> Effect<Action> {
+		overlayWindowClient.scheduleHUD(.thankYou)
+
+		return .run { _ in
+			await npsSurveyClient.uploadUserFeedback(feedback)
 		}
 	}
 }

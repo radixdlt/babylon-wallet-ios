@@ -152,7 +152,6 @@ private extension View {
 			.exportMnemonic(with: destinationStore)
 			.importMnemonics(with: destinationStore)
 			.acknowledgeJailbreakAlert(with: destinationStore)
-			.userFeedback(with: destinationStore)
 			.relinkConnector(with: destinationStore)
 	}
 
@@ -197,15 +196,6 @@ private extension View {
 			store: destinationStore,
 			state: /Home.Destination.State.acknowledgeJailbreakAlert,
 			action: Home.Destination.Action.acknowledgeJailbreakAlert
-		)
-	}
-
-	private func userFeedback(with destinationStore: PresentationStoreOf<Home.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /Home.Destination.State.npsSurvey,
-			action: Home.Destination.Action.npsSurvey,
-			content: { NPSSurvey.View(store: $0) }
 		)
 	}
 
