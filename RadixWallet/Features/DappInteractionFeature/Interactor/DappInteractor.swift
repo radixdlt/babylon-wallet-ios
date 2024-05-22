@@ -271,6 +271,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			case let .dismiss(dappMetadata, txID):
 				dismissCurrentModalAndRequest(request, for: &state)
 				return .send(.internal(.presentResponseSuccessView(dappMetadata, txID)))
+					.concatenate(with: incrementTransactionCompleteCounterEffect())
 			case .dismissSilently:
 				dismissCurrentModalAndRequest(request, for: &state)
 				return delayedMediumEffect(internal: .presentQueuedRequestIfNeeded)
@@ -525,13 +526,15 @@ private extension DappInteractor {
 		}
 	}
 
+	func incrementTransactionCompleteCounterEffect() -> Effect<Action> {
+		npsSurveyClient.incrementTransactionCompleteCounter()
+		return .none
+	}
+
 	func showNpsSurveyEffect() -> Effect<Action> {
-		@Dependency(\.continuousClock) var clock
-		return .run { send in
+		.run { send in
 			for try await shouldShow in await npsSurveyClient.shouldAskForUserFeedback() {
 				guard !Task.isCancelled else { return }
-				// Add delay so that `.npsSurvey` is always shown after `.dappInteractionCompletion`.
-				try await clock.sleep(for: .seconds(0.6))
 				await send(.internal(.shouldShowNpsSurvey(shouldShow)))
 			}
 		}
