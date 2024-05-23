@@ -14,9 +14,9 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 		public var status: Status = .start
 
-		public var backedUpProfiles: [Profile]? = nil
+		public var backedUpProfiles: [CloudBackupClient.BackedupProfile]? = nil
 
-		public var selectedProfile: Profile? = nil
+		public var selectedProfile: CloudBackupClient.BackedupProfile? = nil
 
 		public var isDisplayingFileImporter: Bool
 		public var thisDeviceID: UUID?
@@ -60,23 +60,23 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case task
-		case selectedProfile(Profile?)
+		case selectedProfile(CloudBackupClient.BackedupProfile?)
 		case importFromFileInstead
 		case dismissFileImporter
 		case otherRestoreOptionsTapped
 		case profileImportResult(Result<URL, NSError>)
-		case tappedUseCloudBackup(Profile)
+		case tappedUseCloudBackup(CloudBackupClient.BackedupProfile)
 		case closeButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
 		case setStatus(State.Status)
-		case loadCloudBackupProfiles([Profile]?)
+		case loadCloudBackupProfiles([CloudBackupClient.BackedupProfile]?)
 		case loadThisDeviceIDResult(UUID?)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case selectedProfile(Profile, isInCloud: Bool, containsP2PLinks: Bool)
+		case selectedProfile(Profile, isInCloud: Bool, containsLegacyP2PLinks: Bool)
 		case backToStartOfOnboarding
 		case profileCreatedFromImportedBDFS
 	}
@@ -120,9 +120,8 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			state.selectedProfile = profile
 			return .none
 
-		case let .tappedUseCloudBackup(profile):
-			// TODO: pass p2pLinks
-			return .send(.delegate(.selectedProfile(profile, isInCloud: true, containsP2PLinks: false)))
+		case let .tappedUseCloudBackup(backedupProfile):
+			return .send(.delegate(.selectedProfile(backedupProfile.profile, isInCloud: true, containsLegacyP2PLinks: backedupProfile.containsLegacyP2PLinks)))
 
 		case .dismissFileImporter:
 			state.isDisplayingFileImporter = false
@@ -147,7 +146,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 
 				case let .plaintext(profile):
 					let containsP2PLinks = Profile.checkIfProfileJsonContainsLegacyP2PLinks(contents: data)
-					return .send(.delegate(.selectedProfile(profile, isInCloud: false, containsP2PLinks: containsP2PLinks)))
+					return .send(.delegate(.selectedProfile(profile, isInCloud: false, containsLegacyP2PLinks: containsP2PLinks)))
 				}
 			} catch {
 				errorQueue.schedule(error)
@@ -169,7 +168,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 			return .none
 
 		case let .loadCloudBackupProfiles(profiles):
-			state.backedUpProfiles = profiles?.sorted(by: \.header.lastModified).reversed()
+			state.backedUpProfiles = profiles?.sorted(by: \.profile.header.lastModified).reversed()
 			return .none
 
 		case let .loadThisDeviceIDResult(identifier):
@@ -201,7 +200,7 @@ public struct SelectBackup: Sendable, FeatureReducer {
 		case let .inputEncryptionPassword(.delegate(.successfullyDecrypted(_, decrypted, containsP2PLinks))):
 			state.destination = nil
 			overlayWindowClient.scheduleHUD(.decryptedProfile)
-			return .send(.delegate(.selectedProfile(decrypted, isInCloud: false, containsP2PLinks: containsP2PLinks)))
+			return .send(.delegate(.selectedProfile(decrypted, isInCloud: false, containsLegacyP2PLinks: containsP2PLinks)))
 
 		case .inputEncryptionPassword(.delegate(.successfullyEncrypted)):
 			preconditionFailure("Incorrect implementation, expected decryption")

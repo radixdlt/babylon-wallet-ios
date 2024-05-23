@@ -45,7 +45,15 @@ extension CloudBackupClient {
 	public typealias DeleteProfileBackup = @Sendable (ProfileID) async throws -> Void
 	public typealias CheckAccountStatus = @Sendable () async throws -> CKAccountStatus
 	public typealias LastBackup = @Sendable (ProfileID) -> AnyAsyncSequence<BackupResult?>
-	public typealias LoadProfile = @Sendable (ProfileID) async throws -> Profile?
-	public typealias LoadAllProfiles = @Sendable () async throws -> [Profile]
+	public typealias LoadProfile = @Sendable (ProfileID) async throws -> BackedupProfile?
+	public typealias LoadAllProfiles = @Sendable () async throws -> [BackedupProfile]
 	public typealias BackupProfile = @Sendable () async throws -> CKRecord
+}
+
+// MARK: CloudBackupClient.BackedupProfile
+extension CloudBackupClient {
+	public struct BackedupProfile: Hashable, Sendable {
+		public let profile: Profile
+		public let containsLegacyP2PLinks: Bool
+	}
 }

@@ -49,7 +49,7 @@ extension CloudBackupClient {
 		}
 
 		@Sendable
-		func extractProfile(_ record: CKRecord) throws -> Profile {
+		func extractProfile(_ record: CKRecord) throws -> BackedupProfile {
 			guard record.recordType == .profile else {
 				throw IncorrectRecordTypeError()
 			}
@@ -58,21 +58,28 @@ extension CloudBackupClient {
 			}
 
 			let data = try Data(contentsOf: fileURL)
+			let containsLegacyP2PLinks = Profile.checkIfProfileJsonContainsLegacyP2PLinks(contents: data)
 			let profile = try Profile(jsonData: data)
 			try FileManager.default.removeItem(at: fileURL)
 
-			return profile
+			return BackedupProfile(profile: profile, containsLegacyP2PLinks: containsLegacyP2PLinks)
 		}
 
 		@discardableResult
 		@Sendable
 		func uploadProfileToICloud(_ profile: Profile, existingRecord: CKRecord?) async throws -> CKRecord {
+			try await uploadProfileSnapshotToICloud(profile.profileSnapshot(), id: profile.id, existingRecord: existingRecord)
+		}
+
+		@discardableResult
+		@Sendable
+		func uploadProfileSnapshotToICloud(_ profileSnapshot: Data, id: ProfileID, existingRecord: CKRecord?) async throws -> CKRecord {
 			let fileManager = FileManager.default
 			let tempDirectoryURL = fileManager.temporaryDirectory
 			let fileURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
-			try profile.jsonData().write(to: fileURL)
+			try profileSnapshot.write(to: fileURL)
 
-			let record = existingRecord ?? .init(recordType: .profile, recordID: .init(recordName: profile.id.uuidString))
+			let record = existingRecord ?? .init(recordType: .profile, recordID: .init(recordName: id.uuidString))
 			record[.content] = CKAsset(fileURL: fileURL)
 
 			let savedRecord = try await container().privateCloudDatabase.save(record)
@@ -123,26 +130,28 @@ extension CloudBackupClient {
 				let backedUpRecords = try await fetchAllProfileRecords()
 				guard let headerList = try secureStorageClient.loadProfileHeaderList() else { return [] }
 
-				return try await headerList.ids.asyncCompactMap { id in
+				return try await headerList.ids.asyncCompactMap { id -> CKRecord? in
 					guard id != activeProfile else {
 						// No need to migrate the currently active profile
 						return nil
 					}
 
-					guard let profile = try secureStorageClient.loadProfile(id) else {
+					guard let profileSnapshot = try secureStorageClient.loadProfileSnapshotData(id) else {
 						throw ProfileMissingFromKeychainError(id: id)
 					}
+
+					let profile = try Profile(jsonData: profileSnapshot)
 
 					guard !profile.networks.isEmpty, profile.appPreferences.security.isCloudProfileSyncEnabled else {
 						return nil
 					}
 					let backedUpRecord = backedUpRecords.first { $0.recordID.recordName == id.uuidString }
 
-					if let backedUpRecord, try extractProfile(backedUpRecord).header.lastModified >= profile.header.lastModified {
+					if let backedUpRecord, try extractProfile(backedUpRecord).profile.header.lastModified >= profile.header.lastModified {
 						return nil
 					}
 
-					let savedRecord = try await uploadProfileToICloud(profile, existingRecord: backedUpRecord)
+					let savedRecord = try await uploadProfileSnapshotToICloud(profileSnapshot, id: profile.id, existingRecord: backedUpRecord)
 					// Migration completed, deleting old copy
 					try secureStorageClient.deleteProfile(profile.id)
 

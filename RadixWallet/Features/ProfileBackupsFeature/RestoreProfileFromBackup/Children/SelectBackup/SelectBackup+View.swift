@@ -109,8 +109,8 @@ extension SelectBackup.View {
 	}
 
 	@MainActor
-	private func cloudBackupDataCard(_ item: SelectionItem<Profile>, viewStore: ViewStoreOf<SelectBackup>) -> some View {
-		let header = item.value.header
+	private func cloudBackupDataCard(_ item: SelectionItem<CloudBackupClient.BackedupProfile>, viewStore: ViewStoreOf<SelectBackup>) -> some View {
+		let header = item.value.profile.header
 		let isVersionCompatible = header.isVersionCompatible()
 		let creatingDevice = header.creatingDevice.id == viewStore.thisDeviceID ? L10n.IOSProfileBackup.thisDevice : header.creatingDevice.description
 		return Card(action: item.action) {
