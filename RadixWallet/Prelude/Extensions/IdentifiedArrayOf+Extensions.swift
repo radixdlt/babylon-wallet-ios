@@ -8,17 +8,17 @@ extension IdentifiedArrayOf {
 
 // MARK: - ForEachStatic
 /// A wrapper around ForEach that can be used with **static** collections of elements that don't conform to `Identifiable`
-public struct ForEachStatic<Data: RandomAccessCollection, Content: View>: View {
-	public let data: [OffsetIdentified<Data.Element>]
-	public let content: (OffsetIdentified<Data.Element>) -> Content
+public struct ForEachStatic<Elements: RandomAccessCollection, Content: View>: View {
+	public let elements: [OffsetIdentified<Elements.Element>]
+	public let content: (OffsetIdentified<Elements.Element>) -> Content
 
-	public init(_ data: Data, content: @escaping (Data.Element) -> Content) {
-		self.data = data.identifiablyEnumerated()
+	public init(_ elements: Elements, content: @escaping (Elements.Element) -> Content) {
+		self.elements = elements.identifiablyEnumerated()
 		self.content = { content($0.element) }
 	}
 
 	public var body: some View {
-		ForEach(data, content: content)
+		ForEach(elements, content: content)
 	}
 }
 
