@@ -196,7 +196,7 @@ extension DisplayEntitiesControlledByMnemonic.State {
 
 // MARK: - DisplayMnemonics.ComparableEntities
 private extension DisplayMnemonics {
-	/// A helper struct to sor mnemonics using the following criteria:
+	/// A helper struct to sort mnemonics using the following criteria:
 	/// 1) First should be the one associated with main device factor source.
 	/// 2) Last should be those with Olympia device factor source.
 	/// 3) In the middle will show those with babylon device factor source sorted by date added.
@@ -214,10 +214,8 @@ private extension DisplayMnemonics {
 			} else {
 				if lhs.isBDFS, rhs.isBDFS {
 					return lhs.common.addedOn < rhs.common.addedOn
-				} else if lhs.isBDFS {
-					return true
 				} else {
-					return false
+					return lhs.isBDFS
 				}
 			}
 		}
