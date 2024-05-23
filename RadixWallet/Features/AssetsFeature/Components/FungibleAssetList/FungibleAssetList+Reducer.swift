@@ -15,6 +15,10 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 		case section(FungibleAssetList.Section.State.ID, FungibleAssetList.Section.Action)
 	}
 
+	public enum DelegateAction: Sendable, Equatable {
+		case selected(OnLedgerEntity.OwnedFungibleResource, Bool)
+	}
+
 	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
 			case details(FungibleTokenDetails.State)
@@ -50,14 +54,14 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .section(id, .delegate(.selected(token))):
-			state.destination = .details(.init(
-				resourceAddress: token.resourceAddress,
-				ownedFungibleResource: token,
-				isXRD: id == .xrd
-			))
-			return .none
+//			state.destination = .details(.init(
+//				resourceAddress: token.resourceAddress,
+//				ownedFungibleResource: token,
+//				isXRD: id == .xrd
+//			))
+			.send(.delegate(.selected(token, id == .xrd)))
 		case .section:
-			return .none
+			.none
 		}
 	}
 

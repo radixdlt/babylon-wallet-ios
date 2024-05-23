@@ -35,6 +35,9 @@ public struct AssetsView: Sendable, FeatureReducer {
 		public var activeAssetKind: AssetKind
 		public var assetKinds: NonEmpty<[AssetKind]>
 
+		@PresentationState
+		public var destination: Destination.State?
+
 		public var resources: Resources = .init()
 
 		public let account: Account
@@ -91,6 +94,22 @@ public struct AssetsView: Sendable, FeatureReducer {
 		case dismiss
 	}
 
+	public struct Destination: DestinationReducer {
+		public enum State: Sendable, Hashable {
+			case details(FungibleTokenDetails.State)
+		}
+
+		public enum Action: Sendable, Equatable {
+			case details(FungibleTokenDetails.Action)
+		}
+
+		public var body: some ReducerOf<Self> {
+			Scope(state: /State.details, action: /Action.details) {
+				FungibleTokenDetails()
+			}
+		}
+	}
+
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 
@@ -110,6 +129,36 @@ public struct AssetsView: Sendable, FeatureReducer {
 			.ifLet(\.resources.poolUnitsList, action: \.child.poolUnitsList) {
 				PoolUnitsList()
 			}
+			.ifLet(destinationPath, action: /Action.destination) {
+				Destination()
+			}
+	}
+
+	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
+
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		case let .fungibleTokenList(.delegate(.selected(token, isXrd))):
+			state.destination = .details(.init(
+				resourceAddress: token.resourceAddress,
+				ownedFungibleResource: token,
+				isXRD: isXrd
+			))
+			return .none
+
+		default:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .details(.delegate(.dismiss)):
+			state.destination = nil
+			return .none
+		default:
+			return .none
+		}
 	}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
