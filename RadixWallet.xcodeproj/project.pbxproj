@@ -749,17 +749,12 @@
 		48CFC5CE2ADC10DA00E77A5C /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1222ADC10D900E77A5C /* Colors.swift */; };
 		48CFC5CF2ADC10DA00E77A5C /* LinearGradients.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1232ADC10D900E77A5C /* LinearGradients.swift */; };
 		48CFC5D02ADC10DA00E77A5C /* LabelledDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1242ADC10D900E77A5C /* LabelledDate.swift */; };
-		48CFC5D12ADC10DA00E77A5C /* NavigationBarHideDivider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1262ADC10D900E77A5C /* NavigationBarHideDivider.swift */; };
 		48CFC5D22ADC10DA00E77A5C /* OnSizeChanged.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1272ADC10D900E77A5C /* OnSizeChanged.swift */; };
 		48CFC5D32ADC10DA00E77A5C /* PresentationBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1282ADC10D900E77A5C /* PresentationBackground.swift */; };
 		48CFC5D42ADC10DA00E77A5C /* OnWillDisappear.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1292ADC10D900E77A5C /* OnWillDisappear.swift */; };
 		48CFC5D52ADC10DA00E77A5C /* TokenShadowModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC12A2ADC10D900E77A5C /* TokenShadowModifier.swift */; };
-		48CFC5D62ADC10DA00E77A5C /* NavigationBarLargeTitleInsets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC12B2ADC10D900E77A5C /* NavigationBarLargeTitleInsets.swift */; };
-		48CFC5D72ADC10DA00E77A5C /* NavigationBarTitleColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC12C2ADC10D900E77A5C /* NavigationBarTitleColor.swift */; };
 		48CFC5D82ADC10DA00E77A5C /* TextStyleModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC12D2ADC10D900E77A5C /* TextStyleModifier.swift */; };
-		48CFC5D92ADC10DA00E77A5C /* NavigationBarBackButtonFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC12E2ADC10D900E77A5C /* NavigationBarBackButtonFont.swift */; };
 		48CFC5DA2ADC10DA00E77A5C /* PresentationDetentIntrinsicHeight.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC12F2ADC10D900E77A5C /* PresentationDetentIntrinsicHeight.swift */; };
-		48CFC5DB2ADC10DA00E77A5C /* NavigationBarTitleFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1302ADC10D900E77A5C /* NavigationBarTitleFont.swift */; };
 		48CFC5DC2ADC10DA00E77A5C /* Modifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1312ADC10D900E77A5C /* Modifier.swift */; };
 		48CFC5DD2ADC10DA00E77A5C /* LedgerRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1332ADC10D900E77A5C /* LedgerRowView.swift */; };
 		48CFC5DE2ADC10DA00E77A5C /* OnFirstTaskViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CFC1342ADC10D900E77A5C /* OnFirstTaskViewModifier.swift */; };
@@ -1087,7 +1082,6 @@
 		E66EEB9C2B06694E007624BC /* RecoverWalletWithoutProfileStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = E66EEB9A2B06694E007624BC /* RecoverWalletWithoutProfileStart.swift */; };
 		E67F14452AE029BA00738BE1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E67F14442AE029BA00738BE1 /* Assets.xcassets */; };
 		E68878592BDBFD42003F3393 /* Stage2MigrateToSargon+LedgerHardwareWalletFactorSource+New.swift in Sources */ = {isa = PBXBuildFile; fileRef = E68878582BDBFD42003F3393 /* Stage2MigrateToSargon+LedgerHardwareWalletFactorSource+New.swift */; };
-		E695F2DE2BECDD7C00761ACE /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = E695F2DD2BECDD7C00761ACE /* Sargon */; };
 		E6A0B04B2BF23C7000617DAC /* IdentifiedCollections in Frameworks */ = {isa = PBXBuildFile; productRef = E6A0B04A2BF23C7000617DAC /* IdentifiedCollections */; };
 		E6A0B04D2BF23D6E00617DAC /* IdentifiedArrayOf+Mutation+Position.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A0B04C2BF23D6E00617DAC /* IdentifiedArrayOf+Mutation+Position.swift */; };
 		E6A2D9E12AFA6BFE001857EC /* DeviceFactorSourceControlled.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6A2D9E02AFA6BFE001857EC /* DeviceFactorSourceControlled.swift */; };
@@ -1138,6 +1132,7 @@
 		E6FA984B2B04B9AC00748F20 /* ConfirmSkippingBDFS.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA98492B04B9AC00748F20 /* ConfirmSkippingBDFS.swift */; };
 		E6FA984E2B04E3D500748F20 /* NoContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6FA984D2B04E3D500748F20 /* NoContentView.swift */; };
 		E713204C2BCD372600AE6B3C /* UnknownCaseDecodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = E713204B2BCD372600AE6B3C /* UnknownCaseDecodable.swift */; };
+		E7AE2D052BF7844300830BAA /* Sargon in Frameworks */ = {isa = PBXBuildFile; productRef = E695F2DD2BECDD7C00761ACE /* Sargon */; };
 		E7B7A0FD2BBBFB6100EEE900 /* HeaderListViewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B7A0FC2BBBFB6100EEE900 /* HeaderListViewContainer.swift */; };
 		E7B7A1052BC904E800EEE900 /* NewConnectionApproval+Reducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B7A1042BC904E800EEE900 /* NewConnectionApproval+Reducer.swift */; };
 		E7B7A1072BC904EE00EEE900 /* NewConnectionApproval+View.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7B7A1062BC904EE00EEE900 /* NewConnectionApproval+View.swift */; };
@@ -1887,17 +1882,12 @@
 		48CFC1222ADC10D900E77A5C /* Colors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		48CFC1232ADC10D900E77A5C /* LinearGradients.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinearGradients.swift; sourceTree = "<group>"; };
 		48CFC1242ADC10D900E77A5C /* LabelledDate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelledDate.swift; sourceTree = "<group>"; };
-		48CFC1262ADC10D900E77A5C /* NavigationBarHideDivider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavigationBarHideDivider.swift; sourceTree = "<group>"; };
 		48CFC1272ADC10D900E77A5C /* OnSizeChanged.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnSizeChanged.swift; sourceTree = "<group>"; };
 		48CFC1282ADC10D900E77A5C /* PresentationBackground.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentationBackground.swift; sourceTree = "<group>"; };
 		48CFC1292ADC10D900E77A5C /* OnWillDisappear.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnWillDisappear.swift; sourceTree = "<group>"; };
 		48CFC12A2ADC10D900E77A5C /* TokenShadowModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenShadowModifier.swift; sourceTree = "<group>"; };
-		48CFC12B2ADC10D900E77A5C /* NavigationBarLargeTitleInsets.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavigationBarLargeTitleInsets.swift; sourceTree = "<group>"; };
-		48CFC12C2ADC10D900E77A5C /* NavigationBarTitleColor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavigationBarTitleColor.swift; sourceTree = "<group>"; };
 		48CFC12D2ADC10D900E77A5C /* TextStyleModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextStyleModifier.swift; sourceTree = "<group>"; };
-		48CFC12E2ADC10D900E77A5C /* NavigationBarBackButtonFont.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavigationBarBackButtonFont.swift; sourceTree = "<group>"; };
 		48CFC12F2ADC10D900E77A5C /* PresentationDetentIntrinsicHeight.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PresentationDetentIntrinsicHeight.swift; sourceTree = "<group>"; };
-		48CFC1302ADC10D900E77A5C /* NavigationBarTitleFont.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavigationBarTitleFont.swift; sourceTree = "<group>"; };
 		48CFC1312ADC10D900E77A5C /* Modifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Modifier.swift; sourceTree = "<group>"; };
 		48CFC1332ADC10D900E77A5C /* LedgerRowView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LedgerRowView.swift; sourceTree = "<group>"; };
 		48CFC1342ADC10D900E77A5C /* OnFirstTaskViewModifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OnFirstTaskViewModifier.swift; sourceTree = "<group>"; };
@@ -2271,6 +2261,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E7AE2D052BF7844300830BAA /* Sargon in Frameworks */,
 				48FFFABE2ADC209100B2B213 /* NukeUI in Frameworks */,
 				48FFFAE72ADC223300B2B213 /* Overture in Frameworks */,
 				48FFFA9F2ADC1F2700B2B213 /* KeychainAccess in Frameworks */,
@@ -2314,7 +2305,6 @@
 				48FFFABA2ADC209100B2B213 /* Nuke in Frameworks */,
 				48FFFAE42ADC222100B2B213 /* Validated in Frameworks */,
 				48FFFAED2ADC226B00B2B213 /* CodeScanner in Frameworks */,
-				E695F2DE2BECDD7C00761ACE /* Sargon in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5029,17 +5019,12 @@
 		48CFC1252ADC10D900E77A5C /* ViewModifiers */ = {
 			isa = PBXGroup;
 			children = (
-				48CFC1262ADC10D900E77A5C /* NavigationBarHideDivider.swift */,
 				48CFC1272ADC10D900E77A5C /* OnSizeChanged.swift */,
 				48CFC1282ADC10D900E77A5C /* PresentationBackground.swift */,
 				48CFC1292ADC10D900E77A5C /* OnWillDisappear.swift */,
 				48CFC12A2ADC10D900E77A5C /* TokenShadowModifier.swift */,
-				48CFC12B2ADC10D900E77A5C /* NavigationBarLargeTitleInsets.swift */,
-				48CFC12C2ADC10D900E77A5C /* NavigationBarTitleColor.swift */,
 				48CFC12D2ADC10D900E77A5C /* TextStyleModifier.swift */,
-				48CFC12E2ADC10D900E77A5C /* NavigationBarBackButtonFont.swift */,
 				48CFC12F2ADC10D900E77A5C /* PresentationDetentIntrinsicHeight.swift */,
-				48CFC1302ADC10D900E77A5C /* NavigationBarTitleFont.swift */,
 				48CFC1312ADC10D900E77A5C /* Modifier.swift */,
 			);
 			path = ViewModifiers;
@@ -6481,8 +6466,6 @@
 				A47571FE2B29B0860059A95D /* IOSSecuritySuite */,
 				A415574F2B757C5E0040AD4E /* ComposableArchitecture */,
 				5B1C4FD42BBB0B0C00B9436F /* AppsFlyerLib-Strict */,
-				489FEF902BDD0B80003EC10D /* Sargon */,
-				48C845C62BEA6DC600F74DA7 /* Sargon */,
 				E695F2DD2BECDD7C00761ACE /* Sargon */,
 				E6A0B04A2BF23C7000617DAC /* IdentifiedCollections */,
 			);
@@ -6554,8 +6537,8 @@
 				A415574E2B757C5E0040AD4E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 				5B1C4FD32BBB0B0C00B9436F /* XCRemoteSwiftPackageReference "AppsFlyerFramework-Strict" */,
 				8318BB172BC8403800057BCB /* XCRemoteSwiftPackageReference "swift-custom-dump" */,
-				E695F2DC2BECDD7C00761ACE /* XCRemoteSwiftPackageReference "sargon" */,
 				E6A0B0492BF23C7000617DAC /* XCRemoteSwiftPackageReference "swift-identified-collections" */,
+				E7AE2D072BF7855500830BAA /* XCRemoteSwiftPackageReference "sargon" */,
 			);
 			productRefGroup = 48CFBC502ADC106300E77A5C /* Products */;
 			projectDirPath = "";
@@ -6868,8 +6851,6 @@
 				48CFC3252ADC10D900E77A5C /* LocalNetworkPermission+View.swift in Sources */,
 				48CFC5D82ADC10DA00E77A5C /* TextStyleModifier.swift in Sources */,
 				48CFC6942ADC10DB00E77A5C /* MigratedSoftwareAccounts.swift in Sources */,
-				48CFC5D12ADC10DA00E77A5C /* NavigationBarHideDivider.swift in Sources */,
-				48CFC5DB2ADC10DA00E77A5C /* NavigationBarTitleFont.swift in Sources */,
 				48CFC4772ADC10DA00E77A5C /* GatewaysClient+Interface.swift in Sources */,
 				48CFC59D2ADC10DA00E77A5C /* UIKeyboardType+Extra.swift in Sources */,
 				48CFC5292ADC10DA00E77A5C /* TransactionSubmitResponse.swift in Sources */,
@@ -6988,7 +6969,6 @@
 				48CFC2F82ADC10D900E77A5C /* InfoOfNewPersona+View.swift in Sources */,
 				48CFC3EC2ADC10D900E77A5C /* DataChannelMessage.swift in Sources */,
 				48CFC3FF2ADC10D900E77A5C /* RTCPeerConnectionAsyncDelegate.swift in Sources */,
-				48CFC5D72ADC10DA00E77A5C /* NavigationBarTitleColor.swift in Sources */,
 				48CFC5B62ADC10DA00E77A5C /* CloseButton.swift in Sources */,
 				A462B5832B83671100C26D20 /* ValidatorCollectionItemEffectiveFeeFactor.swift in Sources */,
 				48CFC2622ADC10D900E77A5C /* EditPersona+View.swift in Sources */,
@@ -7244,7 +7224,6 @@
 				48CFC3172ADC10D900E77A5C /* Settings+Reducer.swift in Sources */,
 				48CFC3042ADC10D900E77A5C /* DebugKeychainTest.swift in Sources */,
 				48CFC41A2ADC10DA00E77A5C /* BigUInt+Extra.swift in Sources */,
-				48CFC5D62ADC10DA00E77A5C /* NavigationBarLargeTitleInsets.swift in Sources */,
 				A462B5952B837CA800C26D20 /* CoreAPI.swift in Sources */,
 				48CFC4832ADC10DA00E77A5C /* QRGeneratorClient+Interface.swift in Sources */,
 				48CFC2812ADC10D900E77A5C /* SceneDelegate.swift in Sources */,
@@ -7388,7 +7367,6 @@
 				48CFC5BB2ADC10DA00E77A5C /* PlainListRow.swift in Sources */,
 				48CFC2AB2ADC10D900E77A5C /* Home.swift in Sources */,
 				48CFC42F2ADC10DA00E77A5C /* Tagged+Comparable.swift in Sources */,
-				48CFC5D92ADC10DA00E77A5C /* NavigationBarBackButtonFont.swift in Sources */,
 				48CFC4EE2ADC10DA00E77A5C /* PackageVmType.swift in Sources */,
 				48CFC29E2ADC10D900E77A5C /* TransactionReview+DepositExceptionsView.swift in Sources */,
 				48CFC43C2ADC10DA00E77A5C /* Validation.swift in Sources */,
@@ -8495,20 +8473,20 @@
 				minimumVersion = 1.9.10;
 			};
 		};
-		E695F2DC2BECDD7C00761ACE /* XCRemoteSwiftPackageReference "sargon" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/radixdlt/sargon";
-			requirement = {
-				kind = exactVersion;
-				version = 0.7.18;
-			};
-		};
 		E6A0B0492BF23C7000617DAC /* XCRemoteSwiftPackageReference "swift-identified-collections" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-identified-collections";
 			requirement = {
 				kind = exactVersion;
 				version = 1.0.1;
+			};
+		};
+		E7AE2D072BF7855500830BAA /* XCRemoteSwiftPackageReference "sargon" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/radixdlt/sargon";
+			requirement = {
+				kind = exactVersion;
+				version = 0.7.19;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -8724,7 +8702,6 @@
 		};
 		E695F2DD2BECDD7C00761ACE /* Sargon */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E695F2DC2BECDD7C00761ACE /* XCRemoteSwiftPackageReference "sargon" */;
 			productName = Sargon;
 		};
 		E6A0B04A2BF23C7000617DAC /* IdentifiedCollections */ = {

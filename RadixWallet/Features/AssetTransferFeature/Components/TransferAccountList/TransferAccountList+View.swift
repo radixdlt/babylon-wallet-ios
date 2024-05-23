@@ -92,8 +92,7 @@ private extension View {
 	private func addAsset(with destinationStore: PresentationStoreOf<TransferAccountList.Destination>) -> some View {
 		sheet(store: destinationStore.scope(state: \.state.addAsset, action: \.addAsset)) { assetsStore in
 			AssetsView.View(store: assetsStore)
-				.navigationTitle(L10n.AssetTransfer.AddAssets.navigationTitle)
-				.navigationBarTitleDisplayMode(.inline)
+				.radixToolbar(title: L10n.AssetTransfer.AddAssets.navigationTitle)
 				.withNavigationBar {
 					assetsStore.send(.view(.closeButtonTapped))
 				}

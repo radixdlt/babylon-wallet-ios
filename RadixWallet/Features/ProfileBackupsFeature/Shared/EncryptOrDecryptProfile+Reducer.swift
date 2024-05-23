@@ -68,7 +68,7 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case successfullyDecrypted(encrypted: EncryptedProfileJSONData, decrypted: Profile)
+		case successfullyDecrypted(encrypted: EncryptedProfileJSONData, decrypted: Profile, containsP2PLinks: Bool)
 		case successfullyEncrypted(plaintext: Profile, encrypted: EncryptedProfileJSONData)
 	}
 
@@ -147,7 +147,11 @@ public struct EncryptOrDecryptProfile: Sendable, FeatureReducer {
 			case let .decrypt(encrypted):
 				do {
 					let decrypted = try Profile(encrypted: encrypted, decryptionPassword: password)
-					return .send(.delegate(.successfullyDecrypted(encrypted: encrypted, decrypted: decrypted)))
+					let containsP2PLinks = Profile.checkIfEncryptedProfileJsonContainsLegacyP2PLinks(
+						contents: encrypted,
+						password: password
+					)
+					return .send(.delegate(.successfullyDecrypted(encrypted: encrypted, decrypted: decrypted, containsP2PLinks: containsP2PLinks)))
 				} catch {
 					loggerGlobal.error("Failed to encrypt profile snapshot, error: \(error)")
 					state.destination = .incorrectPasswordAlert(encrypt: false)

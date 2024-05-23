@@ -27,7 +27,7 @@ public extension SecurityFactors {
 
 		public var body: some SwiftUI.View {
 			content
-				.radixNavigationBar(title: L10n.SecurityFactors.title)
+				.radixToolbar(title: L10n.SecurityFactors.title)
 				.tint(.app.gray1)
 				.foregroundColor(.app.gray1)
 				.presentsLoadingViewOverlay()
@@ -124,11 +124,15 @@ private extension View {
 	}
 
 	private func ledgerHardwareWallets(with destinationStore: PresentationStoreOf<SecurityFactors.Destination>) -> some View {
-		navigationDestination(store: destinationStore.scope(state: \.ledgerWallets, action: \.ledgerWallets)) {
-			LedgerHardwareDevices.View(store: $0)
-				.background(.app.gray5)
-				.navigationTitle(L10n.AccountSecuritySettings.LedgerHardwareWallets.title)
-				.toolbarBackground(.visible, for: .navigationBar)
-		}
+		navigationDestination(
+			store: destinationStore,
+			state: /SecurityFactors.Destination.State.ledgerWallets,
+			action: SecurityFactors.Destination.Action.ledgerWallets,
+			destination: {
+				LedgerHardwareDevices.View(store: $0)
+					.background(.app.gray5)
+					.radixToolbar(title: L10n.AccountSecuritySettings.LedgerHardwareWallets.title)
+			}
+		)
 	}
 }

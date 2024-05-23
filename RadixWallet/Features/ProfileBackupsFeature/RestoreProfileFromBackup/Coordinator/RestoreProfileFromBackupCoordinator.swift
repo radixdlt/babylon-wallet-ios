@@ -6,6 +6,7 @@ import SwiftUI
 public struct ProfileSelection: Sendable, Hashable {
 	public let profile: Profile
 	public let isInCloud: Bool
+	public let containsP2PLinks: Bool
 }
 
 // MARK: - RestoreProfileFromBackupCoordinator
@@ -63,7 +64,6 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.radixConnectClient) var radixConnectClient
-	@Dependency(\.p2pLinksClient) var p2pLinksClient
 
 	public init() {}
 
@@ -88,12 +88,12 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .root(.selectBackup(.delegate(.selectedProfile(profile, isInCloud)))):
-			state.profileSelection = .init(profile: profile, isInCloud: isInCloud)
+		case let .root(.selectBackup(.delegate(.selectedProfile(profileSnapshot, isInCloud, containsP2PLinks)))):
+			state.profileSelection = .init(snapshot: profileSnapshot, isInCloud: isInCloud, containsP2PLinks: containsP2PLinks)
+
 			return .run { send in
 				try? await clock.sleep(for: .milliseconds(300))
-				let p2pLinks = await p2pLinksClient.getP2PLinks()
-				try await radixConnectClient.connectToP2PLinks(p2pLinks)
+				_ = await radixConnectClient.loadP2PLinksAndConnectAll()
 				await send(.internal(.delayedAppendToPath(
 					.importMnemonicsFlow(.init(context: .fromOnboarding(profile: profile)))
 				)))
@@ -112,7 +112,11 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			}
 			return .run { send in
 				loggerGlobal.notice("Importing snapshot...")
-				try await backupsClient.importSnapshot(profileSelection.profile, fromCloud: profileSelection.isInCloud)
+				try await backupsClient.importSnapshot(
+					profileSelection.profile,
+					fromCloud: profileSelection.isInCloud,
+					containsP2PLinks: profileSelection.containsP2PLinks
+				)
 
 				if let notYetSavedNewMainBDFS {
 					try await factorSourcesClient.saveNewMainBDFS(notYetSavedNewMainBDFS)
