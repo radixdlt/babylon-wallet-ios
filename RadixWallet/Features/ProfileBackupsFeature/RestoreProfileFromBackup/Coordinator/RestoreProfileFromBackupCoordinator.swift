@@ -88,8 +88,8 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .root(.selectBackup(.delegate(.selectedProfile(profileSnapshot, isInCloud, containsP2PLinks)))):
-			state.profileSelection = .init(snapshot: profileSnapshot, isInCloud: isInCloud, containsP2PLinks: containsP2PLinks)
+		case let .root(.selectBackup(.delegate(.selectedProfile(profile, isInCloud, containsP2PLinks)))):
+			state.profileSelection = .init(profile: profile, isInCloud: isInCloud, containsP2PLinks: containsP2PLinks)
 
 			return .run { send in
 				try? await clock.sleep(for: .milliseconds(300))

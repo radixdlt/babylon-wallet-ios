@@ -55,7 +55,7 @@ extension ConfigurationBackup {
 			.onAppear {
 				store.send(.view(.didAppear))
 			}
-			.radixNavigationBar(title: L10n.ConfigurationBackup.title)
+			.radixToolbar(title: L10n.ConfigurationBackup.title)
 			.destinations(with: store)
 		}
 	}
