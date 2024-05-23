@@ -30,6 +30,7 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 	}
 
 	@Dependency(\.onboardingClient) var onboardingClient
+	@Dependency(\.radixConnectClient) var radixConnectClient
 
 	public init() {}
 
@@ -72,7 +73,8 @@ public struct OnboardingCoordinator: Sendable, FeatureReducer {
 
 		case .createAccountCoordinator(.delegate(.completed)):
 			return .run { send in
-				let _ = await onboardingClient.finishOnboarding()
+				_ = await onboardingClient.finishOnboarding()
+				_ = await radixConnectClient.loadP2PLinksAndConnectAll()
 				await send(.internal(.finishedOnboarding))
 			}
 
