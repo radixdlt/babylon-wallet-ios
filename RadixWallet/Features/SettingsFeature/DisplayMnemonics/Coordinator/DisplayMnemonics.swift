@@ -79,22 +79,25 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 						// `nil` means read profile in ProfileStore, instead of using an overriding profile
 						nil
 					)
-					let deviceFactorSources: [DisplayEntitiesControlledByMnemonic.State] = entitiesForDeviceFactorSources.flatMap { ents in
-
-						let states = [ents.babylon, ents.olympia]
+					let comparableEntities = entitiesForDeviceFactorSources.flatMap { ents in
+						[ents.babylon, ents.olympia]
 							.compactMap { $0 }
 							.map {
-								DisplayEntitiesControlledByMnemonic.State(
-									accountsControlledByKeysOnSameCurve: $0,
-									isMnemonicMarkedAsBackedUp: ents.isMnemonicMarkedAsBackedUp,
-									isMnemonicPresentInKeychain: ents.isMnemonicPresentInKeychain,
-									mode: ents.isMnemonicPresentInKeychain ? .mnemonicCanBeDisplayed : .mnemonicNeedsImport
+								ComparableEntities(
+									state: .init(
+										accountsControlledByKeysOnSameCurve: $0,
+										isMnemonicMarkedAsBackedUp: ents.isMnemonicMarkedAsBackedUp,
+										isMnemonicPresentInKeychain: ents.isMnemonicPresentInKeychain,
+										mode: ents.isMnemonicPresentInKeychain ? .mnemonicCanBeDisplayed : .mnemonicNeedsImport
+									),
+									deviceFactorSource: ents.deviceFactorSource
 								)
 							}
-
-						return states
 					}
-					return deviceFactorSources.asIdentified()
+					return comparableEntities
+						.sorted()
+						.map(\.state)
+						.asIdentified()
 				}
 
 				await send(
@@ -188,5 +191,35 @@ extension DisplayEntitiesControlledByMnemonic.State {
 
 	mutating func backedUp() {
 		self.isMnemonicMarkedAsBackedUp = true
+	}
+}
+
+// MARK: - DisplayMnemonics.ComparableEntities
+private extension DisplayMnemonics {
+	/// A helper struct to sor mnemonics using the following criteria:
+	/// 1) First should be the one associated with main device factor source.
+	/// 2) Last should be those with Olympia device factor source.
+	/// 3) In the middle will show those with babylon device factor source sorted by date added.
+	struct ComparableEntities: Comparable {
+		let state: DisplayEntitiesControlledByMnemonic.State
+		let deviceFactorSource: DeviceFactorSource
+
+		static func < (lhs: Self, rhs: Self) -> Bool {
+			let lhs = lhs.deviceFactorSource
+			let rhs = rhs.deviceFactorSource
+			if lhs.isExplicitMain {
+				return true
+			} else if rhs.isExplicitMain {
+				return false
+			} else {
+				if lhs.isBDFS, rhs.isBDFS {
+					return lhs.common.addedOn < rhs.common.addedOn
+				} else if lhs.isBDFS {
+					return true
+				} else {
+					return false
+				}
+			}
+		}
 	}
 }
