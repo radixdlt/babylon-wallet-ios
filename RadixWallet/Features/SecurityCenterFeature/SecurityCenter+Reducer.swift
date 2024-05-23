@@ -20,6 +20,7 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 			case configurationBackup(ConfigurationBackup.State)
 			case securityFactors(SecurityFactors.State)
 			case displayMnemonics(DisplayMnemonics.State)
+			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
 		}
 
 		@CasePathable
@@ -27,6 +28,7 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 			case configurationBackup(ConfigurationBackup.Action)
 			case securityFactors(SecurityFactors.Action)
 			case displayMnemonics(DisplayMnemonics.Action)
+			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -38,6 +40,9 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 			}
 			Scope(state: \.displayMnemonics, action: \.displayMnemonics) {
 				DisplayMnemonics()
+			}
+			Scope(state: /State.importMnemonics, action: /Action.importMnemonics) {
+				ImportMnemonicsFlowCoordinator()
 			}
 		}
 	}
@@ -77,8 +82,7 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 				state.destination = .configurationBackup(.init())
 
 			case .problem9:
-				// TODO: go to ImportMnemonicFlowCoordinator
-				break
+				state.destination = .importMnemonics(.init())
 			}
 			return .none
 
@@ -99,6 +103,17 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .setProblems(problems):
 			state.problems = problems
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .importMnemonics(.delegate(.finishedEarly)),
+		     .importMnemonics(.delegate(.finishedImportingMnemonics)):
+			state.destination = nil
+			return .none
+		default:
 			return .none
 		}
 	}
