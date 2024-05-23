@@ -209,6 +209,8 @@ private extension View {
 		let destinationStore = store.destination
 		return configurationBackup(with: destinationStore)
 			.securityFactors(with: destinationStore)
+			.displayMnemonics(with: destinationStore)
+			.importMnemonics(with: destinationStore)
 	}
 
 	private func configurationBackup(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
@@ -221,5 +223,20 @@ private extension View {
 		navigationDestination(store: destinationStore.scope(state: \.securityFactors, action: \.securityFactors)) {
 			SecurityFactors.View(store: $0)
 		}
+	}
+
+	private func displayMnemonics(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.displayMnemonics, action: \.displayMnemonics)) {
+			DisplayMnemonics.View(store: $0)
+		}
+	}
+
+	private func importMnemonics(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /SecurityCenter.Destination.State.importMnemonics,
+			action: SecurityCenter.Destination.Action.importMnemonics,
+			content: { ImportMnemonicsFlowCoordinator.View(store: $0) }
+		)
 	}
 }

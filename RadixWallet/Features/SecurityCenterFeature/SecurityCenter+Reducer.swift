@@ -19,12 +19,16 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case configurationBackup(ConfigurationBackup.State)
 			case securityFactors(SecurityFactors.State)
+			case displayMnemonics(DisplayMnemonics.State)
+			case importMnemonics(ImportMnemonicsFlowCoordinator.State)
 		}
 
 		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case configurationBackup(ConfigurationBackup.Action)
 			case securityFactors(SecurityFactors.Action)
+			case displayMnemonics(DisplayMnemonics.Action)
+			case importMnemonics(ImportMnemonicsFlowCoordinator.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -33,6 +37,12 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 			}
 			Scope(state: \.securityFactors, action: \.securityFactors) {
 				SecurityFactors()
+			}
+			Scope(state: \.displayMnemonics, action: \.displayMnemonics) {
+				DisplayMnemonics()
+			}
+			Scope(state: /State.importMnemonics, action: /Action.importMnemonics) {
+				ImportMnemonicsFlowCoordinator()
 			}
 		}
 	}
@@ -64,11 +74,15 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 			return securityProblemsEffect()
 
 		case let .problemTapped(problem):
-			switch problem.type {
-			case .securityFactors:
-				state.destination = .securityFactors(.init())
-			case .configurationBackup:
+			switch problem {
+			case .problem3:
+				state.destination = .displayMnemonics(.init())
+
+			case .problem5, .problem6, .problem7:
 				state.destination = .configurationBackup(.init())
+
+			case .problem9:
+				state.destination = .importMnemonics(.init())
 			}
 			return .none
 
@@ -89,6 +103,17 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 		switch internalAction {
 		case let .setProblems(problems):
 			state.problems = problems
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .importMnemonics(.delegate(.finishedEarly)),
+		     .importMnemonics(.delegate(.finishedImportingMnemonics)):
+			state.destination = nil
+			return .none
+		default:
 			return .none
 		}
 	}
