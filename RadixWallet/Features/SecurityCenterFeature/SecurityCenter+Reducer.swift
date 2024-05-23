@@ -19,12 +19,14 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 		public enum State: Sendable, Hashable {
 			case configurationBackup(ConfigurationBackup.State)
 			case securityFactors(SecurityFactors.State)
+			case displayMnemonics(DisplayMnemonics.State)
 		}
 
 		@CasePathable
 		public enum Action: Sendable, Equatable {
 			case configurationBackup(ConfigurationBackup.Action)
 			case securityFactors(SecurityFactors.Action)
+			case displayMnemonics(DisplayMnemonics.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
@@ -33,6 +35,9 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 			}
 			Scope(state: \.securityFactors, action: \.securityFactors) {
 				SecurityFactors()
+			}
+			Scope(state: \.displayMnemonics, action: \.displayMnemonics) {
+				DisplayMnemonics()
 			}
 		}
 	}
@@ -64,11 +69,16 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 			return securityProblemsEffect()
 
 		case let .problemTapped(problem):
-			switch problem.type {
-			case .securityFactors:
-				state.destination = .securityFactors(.init())
-			case .configurationBackup:
+			switch problem {
+			case .problem3:
+				state.destination = .displayMnemonics(.init())
+
+			case .problem5, .problem6, .problem7:
 				state.destination = .configurationBackup(.init())
+
+			case .problem9:
+				// TODO: go to ImportMnemonicFlowCoordinator
+				break
 			}
 			return .none
 

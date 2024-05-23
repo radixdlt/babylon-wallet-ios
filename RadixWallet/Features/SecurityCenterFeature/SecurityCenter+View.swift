@@ -209,6 +209,7 @@ private extension View {
 		let destinationStore = store.destination
 		return configurationBackup(with: destinationStore)
 			.securityFactors(with: destinationStore)
+			.displayMnemonics(with: destinationStore)
 	}
 
 	private func configurationBackup(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
@@ -220,6 +221,12 @@ private extension View {
 	private func securityFactors(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
 		navigationDestination(store: destinationStore.scope(state: \.securityFactors, action: \.securityFactors)) {
 			SecurityFactors.View(store: $0)
+		}
+	}
+
+	private func displayMnemonics(with destinationStore: PresentationStoreOf<SecurityCenter.Destination>) -> some View {
+		navigationDestination(store: destinationStore.scope(state: \.displayMnemonics, action: \.displayMnemonics)) {
+			DisplayMnemonics.View(store: $0)
 		}
 	}
 }
