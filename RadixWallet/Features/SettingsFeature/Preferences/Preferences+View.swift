@@ -57,7 +57,7 @@ extension Preferences.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: .zero) {
-					ForEach(rows) { kind in
+					ForEachStatic(rows) { kind in
 						SettingsRow(kind: kind, store: store)
 					}
 

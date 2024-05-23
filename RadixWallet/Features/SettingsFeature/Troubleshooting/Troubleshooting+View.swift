@@ -35,7 +35,7 @@ extension Troubleshooting.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: .zero) {
-					ForEach(rows(isLegacyImportEnabled: viewStore.isLegacyImportEnabled)) { kind in
+					ForEachStatic(rows(isLegacyImportEnabled: viewStore.isLegacyImportEnabled)) { kind in
 						SettingsRow(kind: kind, store: store)
 					}
 				}

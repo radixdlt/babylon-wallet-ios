@@ -12,7 +12,7 @@ public struct SecurityCenterClient: DependencyKey, Sendable {
 
 // MARK: SecurityCenterClient.Problems
 extension SecurityCenterClient {
-	public typealias Problems = @Sendable () async -> AnyAsyncSequence<[SecurityProblem]>
+	public typealias Problems = @Sendable (SecurityProblem.ProblemType?) async -> AnyAsyncSequence<[SecurityProblem]>
 	public typealias LastManualBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus?>
 	public typealias LastCloudBackup = @Sendable () async -> AnyAsyncSequence<BackupStatus?>
 }
@@ -20,9 +20,9 @@ extension SecurityCenterClient {
 // MARK: - SecurityProblem
 /// As outlined in https://radixdlt.atlassian.net/wiki/spaces/AT/pages/3392569357/Security-related+Problem+States+in+the+Wallet
 public enum SecurityProblem: Hashable, Sendable, Identifiable {
-	/// The given number of `accounts` and `personas` are unrecoverabl if the user loses their phone, since their corresponding seed phrase has not been written down.
+	/// The given addresses of `accounts` and `personas` are unrecoverable if the user loses their phone, since their corresponding seed phrase has not been written down.
 	/// NOTE: This definition differs from the one at Confluence since we don't have shields implemented yet.
-	case problem3(accounts: Int, personas: Int)
+	case problem3(accounts: [AccountAddress], personas: [IdentityAddress])
 	/// Wallet backups to the cloud aren’t working (wallet tried to do a backup and it didn’t work within, say, 5 minutes.)
 	/// This means that currently all accounts and personas are at risk of being practically unrecoverable if the user loses their phone.
 	/// Also they would lose all of their other non-security wallet settings and data.
@@ -58,6 +58,38 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 		case .problem7: L10n.SecurityCenter.Problem7.text
 		case .problem9: L10n.SecurityCenter.Problem9.text
 		}
+	}
+
+	public var heading: String {
+		switch self {
+		case let .problem3(accounts, personas): L10n.SecurityCenter.Problem3.heading(accounts.count, personas.count)
+		case .problem5: L10n.SecurityCenter.Problem5.heading
+		case .problem6: L10n.SecurityCenter.Problem6.heading
+		case .problem7: L10n.SecurityCenter.Problem7.heading
+		case .problem9: L10n.SecurityCenter.Problem9.heading
+		}
+	}
+
+	public var warning: String {
+		switch self {
+		case .problem3: L10n.SecurityCenter.Problem3.warning
+		case .problem5: L10n.SecurityCenter.Problem5.warningIOS
+		case .problem6: L10n.SecurityCenter.Problem6.warning
+		case .problem7: L10n.SecurityCenter.Problem7.warning
+		case .problem9: L10n.SecurityCenter.Problem9.warning
+		}
+	}
+
+	public var type: ProblemType {
+		switch self {
+		case .problem3, .problem9: .securityFactors
+		case .problem5, .problem6, .problem7: .configurationBackup
+		}
+	}
+
+	public enum ProblemType: Hashable, Sendable, CaseIterable {
+		case securityFactors
+		case configurationBackup
 	}
 }
 

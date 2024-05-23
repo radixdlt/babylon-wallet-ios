@@ -29,7 +29,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		public var newMainBDFS: DeviceFactorSource?
 
 		public enum Context: Sendable, Hashable {
-			case fromOnboarding(profileSnapshot: Profile)
+			case fromOnboarding(profile: Profile)
 			case notOnboarding
 
 			var profileSnapshotFromOnboarding: Profile? {

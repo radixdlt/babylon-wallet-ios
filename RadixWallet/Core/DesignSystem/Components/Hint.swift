@@ -9,6 +9,11 @@ public struct Hint: View, Equatable {
 			self.kind = kind
 			self.text = text
 		}
+
+		public init(kind: Kind, text: some StringProtocol) {
+			self.kind = kind
+			self.text = Text(text)
+		}
 	}
 
 	public enum Kind: Equatable {

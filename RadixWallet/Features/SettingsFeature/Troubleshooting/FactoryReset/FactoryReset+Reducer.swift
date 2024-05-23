@@ -1,8 +1,7 @@
 // MARK: - FactoryReset
-
 public struct FactoryReset: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		var isRecoverable = true
+		public var isRecoverable = true
 
 		@PresentationState
 		public var destination: Destination.State?
@@ -16,7 +15,7 @@ public struct FactoryReset: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedIsRecoverable(Bool)
+		case setIsRecoverable(Bool)
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
@@ -24,24 +23,12 @@ public struct FactoryReset: Sendable, FeatureReducer {
 	}
 
 	public struct Destination: DestinationReducer {
-		static let confirmResetState: Self.State = .confirmReset(.init(
-			title: {
-				TextState(L10n.FactoryReset.Dialog.title)
-			},
-			actions: {
-				ButtonState(role: .destructive, action: .confirm) {
-					TextState(L10n.Common.confirm)
-				}
-			},
-			message: {
-				TextState(L10n.FactoryReset.Dialog.message)
-			}
-		))
-
+		@CasePathable
 		public enum State: Sendable, Hashable {
 			case confirmReset(AlertState<Action.ConfirmReset>)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Hashable {
 			case confirmReset(ConfirmReset)
 
@@ -51,9 +38,7 @@ public struct FactoryReset: Sendable, FeatureReducer {
 		}
 
 		public var body: some Reducer<State, Action> {
-			Scope(state: /State.confirmReset, action: /Action.confirmReset) {
-				EmptyReducer()
-			}
+			EmptyReducer()
 		}
 	}
 
@@ -76,7 +61,7 @@ public struct FactoryReset: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .onFirstTask:
-			return loadIsRecoverable()
+			return isRecoverableEffect()
 		case .resetWalletButtonTapped:
 			state.destination = Destination.confirmResetState
 			return .none
@@ -85,7 +70,7 @@ public struct FactoryReset: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadedIsRecoverable(isRecoverable):
+		case let .setIsRecoverable(isRecoverable):
 			state.isRecoverable = isRecoverable
 			return .none
 		}
@@ -103,13 +88,28 @@ public struct FactoryReset: Sendable, FeatureReducer {
 		}
 	}
 
-	private func loadIsRecoverable() -> Effect<Action> {
+	private func isRecoverableEffect() -> Effect<Action> {
 		.run { send in
-			for try await problems in await securityCenterClient.problems() {
+			for try await isRecoverable in await securityCenterClient.isRecoverable() {
 				guard !Task.isCancelled else { return }
-				let isRecoverable = !(problems.contains(.problem5) || problems.contains(.problem6) || problems.contains(.problem7))
-				await send(.internal(.loadedIsRecoverable(isRecoverable)))
+				await send(.internal(.setIsRecoverable(isRecoverable)))
 			}
 		}
 	}
+}
+
+extension FactoryReset.Destination {
+	static let confirmResetState: State = .confirmReset(.init(
+		title: {
+			TextState(L10n.FactoryReset.Dialog.title)
+		},
+		actions: {
+			ButtonState(role: .destructive, action: .confirm) {
+				TextState(L10n.Common.confirm)
+			}
+		},
+		message: {
+			TextState(L10n.FactoryReset.Dialog.message)
+		}
+	))
 }

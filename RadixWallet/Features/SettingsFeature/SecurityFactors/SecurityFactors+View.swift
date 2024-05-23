@@ -3,7 +3,7 @@ extension SecurityFactors.State {
 		.init(
 			seedPhrasesCount: seedPhrasesCount,
 			ledgerWalletsCount: ledgerWalletsCount,
-			isSeedPhraseRequiredToRecoverAccounts: isSeedPhraseRequiredToRecoverAccounts
+			securityProblems: securityProblems
 		)
 	}
 }
@@ -14,7 +14,7 @@ public extension SecurityFactors {
 	struct ViewState: Equatable {
 		let seedPhrasesCount: Int?
 		let ledgerWalletsCount: Int?
-		let isSeedPhraseRequiredToRecoverAccounts: Bool
+		let securityProblems: [SecurityProblem]
 	}
 
 	@MainActor
@@ -42,14 +42,14 @@ private extension SecurityFactors.View {
 		WithViewStore(store, observe: \.viewState, send: { .view($0) }) { viewStore in
 			ScrollView {
 				VStack(spacing: .zero) {
-					ForEach(rows(viewStore: viewStore)) { kind in
+					ForEachStatic(rows(viewStore: viewStore)) { kind in
 						SettingsRow(kind: kind, store: store)
 					}
 				}
 			}
 			.background(Color.app.gray5)
-			.onFirstTask { @MainActor in
-				await viewStore.send(.onFirstTask).finish()
+			.onAppear {
+				store.send(.view(.appeared))
 			}
 		}
 	}
@@ -87,10 +87,9 @@ private extension SecurityFactors.ViewState {
 	}
 
 	var seedPhraseHints: [Hint.ViewState] {
-		guard isSeedPhraseRequiredToRecoverAccounts else {
-			return []
+		securityProblems.compactMap { problem in
+			.init(kind: .warning, text: problem.warning)
 		}
-		return [.init(kind: .warning, text: .init(L10n.SecurityFactors.SeedPhrases.enterSeedPhrase))]
 	}
 
 	var ledgerWalletsDetail: String? {
@@ -119,12 +118,9 @@ private extension View {
 	}
 
 	private func seedPhrases(with destinationStore: PresentationStoreOf<SecurityFactors.Destination>) -> some View {
-		navigationDestination(
-			store: destinationStore,
-			state: /SecurityFactors.Destination.State.seedPhrases,
-			action: SecurityFactors.Destination.Action.seedPhrases,
-			destination: { DisplayMnemonics.View(store: $0) }
-		)
+		navigationDestination(store: destinationStore.scope(state: \.seedPhrases, action: \.seedPhrases)) {
+			DisplayMnemonics.View(store: $0)
+		}
 	}
 
 	private func ledgerHardwareWallets(with destinationStore: PresentationStoreOf<SecurityFactors.Destination>) -> some View {
