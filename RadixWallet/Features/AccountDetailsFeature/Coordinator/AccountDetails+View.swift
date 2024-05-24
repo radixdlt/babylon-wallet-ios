@@ -182,6 +182,11 @@ private extension View {
 		return preferences(with: destinationStore)
 			.history(with: destinationStore)
 			.transfer(with: destinationStore)
+			.fungibleDetails(with: destinationStore)
+			.nonFungibleDetails(with: destinationStore)
+			.stakeUnitDetails(with: destinationStore)
+			.stakeClaimDetails(with: destinationStore)
+			.poolUnitDetails(with: destinationStore)
 	}
 
 	private func preferences(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
@@ -199,6 +204,36 @@ private extension View {
 	private func transfer(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
 		fullScreenCover(store: destinationStore.scope(state: \.transfer, action: \.transfer)) {
 			AssetTransfer.SheetView(store: $0)
+		}
+	}
+
+	private func fungibleDetails(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.fungibleDetails, action: \.fungibleDetails)) {
+			FungibleTokenDetails.View(store: $0)
+		}
+	}
+
+	private func nonFungibleDetails(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.nonFungibleDetails, action: \.nonFungibleDetails)) {
+			NonFungibleTokenDetails.View(store: $0)
+		}
+	}
+
+	private func stakeUnitDetails(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.stakeUnitDetails, action: \.stakeUnitDetails)) {
+			LSUDetails.View(store: $0)
+		}
+	}
+
+	private func stakeClaimDetails(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.stakeClaimDetails, action: \.stakeClaimDetails)) {
+			NonFungibleTokenDetails.View(store: $0)
+		}
+	}
+
+	private func poolUnitDetails(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.poolUnitDetails, action: \.poolUnitDetails)) {
+			PoolUnitDetails.View(store: $0)
 		}
 	}
 }

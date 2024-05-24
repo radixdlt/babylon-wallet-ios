@@ -35,6 +35,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 
 	public enum ViewAction: Equatable, Sendable {
 		case addAccountTapped
+		case addAssetCloseButtonTapped
 	}
 
 	@CasePathable
@@ -101,6 +102,10 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		case .addAccountTapped:
 			state.receivingAccounts.append(.empty(canBeRemovedWhenEmpty: true))
 			return .none
+
+		case .addAssetCloseButtonTapped:
+			state.destination = nil
+			return .none
 		}
 	}
 
@@ -148,10 +153,6 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		case let .addAsset(.delegate(.handleSelectedAssets(selectedAssets))):
 			state.destination = nil
 			return handleSelectedAssets(selectedAssets, id: id, state: &state)
-
-		case .addAsset(.delegate(.dismiss)):
-			state.destination = nil
-			return .none
 
 		default:
 			return .none
