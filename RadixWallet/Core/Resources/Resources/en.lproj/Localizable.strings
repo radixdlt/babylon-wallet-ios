@@ -1100,6 +1100,16 @@
 "configurationBackup_automated_securityFactorsItemSubtitle" = "The list of Security Factors you need to recover your Accounts and Personas.";
 "configurationBackup_automated_walletSettingsItemTitle" = "Wallet settings";
 "configurationBackup_automated_walletSettingsItemSubtitle" = "Your general settings, such as trusted dApps, linked Connectors and wallet display settings.";
+"configurationBackup_automated_walletTransferredTitle" = "Wallet Control Has Been Transferred";
+"configurationBackup_automated_walletTransferredSubtitle" = "The current wallet configuration is now controlled by another phone.";
+"configurationBackup_automated_walletTransferredExplanation1" = "If this was done in error, you can reclaim control to this phone. You won’t be able to access it from your old phone after the transfer.";
+"configurationBackup_automated_walletTransferredExplanation2" = "Or, you can clear the wallet configuration from this phone and start fresh.";
+"configurationBackup_automated_walletTransferredClearButton" = "Clear Wallet on This Phone";
+"configurationBackup_automated_walletTransferredTransferBackButton" = "Transfer Control Back to This Phone";
+"configurationBackup_automated_cloudUpdatedTitleAndroid" = "Backups on Google Drive Have Updated";
+"configurationBackup_automated_cloudUpdatedSubtitleAndroid" = "The Radix Wallet has an all new and improved backup system.\n\nTo continue, log in with the Google Drive account you want to use for backups.";
+"configurationBackup_automated_cloudUpdatedLoginButtonAndroid" = "Login to Google Drive for Backups";
+"configurationBackup_automated_cloudUpdatedSkipButtonAndroid" = "Skip for Now";
 "configurationBackup_manual_heading" = "Manual backup";
 "configurationBackup_manual_text" = "You can export your own Configuration Backup file and save it locally";
 "configurationBackup_manual_warning" = "You’ll need to export a new Backup file each time you make a change in your wallet.";
