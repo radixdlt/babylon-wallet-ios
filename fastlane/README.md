@@ -99,6 +99,14 @@ Generate new dev certificates
 
 Generate new preAlpha certificates
 
+### ios generate_new_alpha_certificates
+
+```sh
+[bundle exec] fastlane ios generate_new_alpha_certificates
+```
+
+Generate new alpha certificates
+
 ### ios generate_new_appstore_certificates
 
 ```sh
