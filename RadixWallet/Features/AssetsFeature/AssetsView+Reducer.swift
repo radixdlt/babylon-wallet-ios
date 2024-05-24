@@ -95,6 +95,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		public enum Selection: Sendable, Equatable {
 			case fungible(OnLedgerEntity.OwnedFungibleResource, isXrd: Bool)
 			case nonFungible(OnLedgerEntity.OwnedNonFungibleResource, token: OnLedgerEntity.NonFungibleToken)
+			case stakeUnit(OnLedgerEntitiesClient.ResourceWithVaultAmount, details: OnLedgerEntitiesClient.OwnedStakeDetails)
 		}
 	}
 
@@ -165,6 +166,9 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 		case let .nonFungibleTokenList(.delegate(.selected(resource, token))):
 			.send(.delegate(.selected(.nonFungible(resource, token: token))))
+
+		case let .stakeUnitList(.delegate(.selected(resource, details))):
+			.send(.delegate(.selected(.stakeUnit(resource, details: details))))
 
 		default:
 			.none

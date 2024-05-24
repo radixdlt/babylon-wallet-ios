@@ -119,24 +119,20 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		case didTapClaimAllStakes
 	}
 
+	public enum DelegateAction: Sendable, Equatable {
+		case selected(OnLedgerEntitiesClient.ResourceWithVaultAmount, details: OnLedgerEntitiesClient.OwnedStakeDetails)
+	}
+
 	public struct Destination: DestinationReducer {
 		public enum State: Sendable, Hashable {
-			case details(LSUDetails.State)
 			case stakeClaimDetails(NonFungibleTokenDetails.State)
 		}
 
 		public enum Action: Sendable, Equatable {
-			case details(LSUDetails.Action)
 			case stakeClaimDetails(NonFungibleTokenDetails.Action)
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(
-				state: /State.details,
-				action: /Action.details,
-				child: LSUDetails.init
-			)
-
 			Scope(
 				state: /State.stakeClaimDetails,
 				action: /Action.stakeClaimDetails,
@@ -182,16 +178,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 				else {
 					return .none
 				}
-				state.destination = .details(
-					.init(
-						validator: stakeDetails.validator,
-						stakeUnitResource: stakeUnitResource,
-						xrdRedemptionValue: .init(
-							nominalAmount: stakeDetails.xrdRedemptionValue,
-							fiatWorth: stakeUnitResource.amount.fiatWorth
-						)
-					)
-				)
+				return .send(.delegate(.selected(stakeUnitResource, details: stakeDetails)))
 			}
 
 			return .none
@@ -299,7 +286,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 					stakeClaim.intoSargon(),
 				]
 			)
-		case .stakeClaimDetails, .details:
+		case .stakeClaimDetails:
 			return .none
 		}
 	}

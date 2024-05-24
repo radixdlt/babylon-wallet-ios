@@ -65,6 +65,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			case transfer(AssetTransfer.State)
 			case fungibleDetails(FungibleTokenDetails.State)
 			case nonFungibleDetails(NonFungibleTokenDetails.State)
+			case stakeUnitDetails(LSUDetails.State)
 		}
 
 		@CasePathable
@@ -74,6 +75,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			case transfer(AssetTransfer.Action)
 			case fungibleDetails(FungibleTokenDetails.Action)
 			case nonFungibleDetails(NonFungibleTokenDetails.Action)
+			case stakeUnitDetails(LSUDetails.Action)
 		}
 
 		public var body: some Reducer<State, Action> {
@@ -91,6 +93,9 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.nonFungibleDetails, action: /Action.nonFungibleDetails) {
 				NonFungibleTokenDetails()
+			}
+			Scope(state: /State.stakeUnitDetails, action: /Action.stakeUnitDetails) {
+				LSUDetails()
 			}
 		}
 	}
@@ -190,6 +195,16 @@ public struct AccountDetails: Sendable, FeatureReducer {
 					ownedResource: resource,
 					token: token,
 					ledgerState: resource.atLedgerState
+				))
+
+			case let .stakeUnit(resource, details):
+				state.destination = .stakeUnitDetails(.init(
+					validator: details.validator,
+					stakeUnitResource: resource,
+					xrdRedemptionValue: .init(
+						nominalAmount: details.xrdRedemptionValue,
+						fiatWorth: resource.amount.fiatWorth
+					)
 				))
 			}
 			return .none

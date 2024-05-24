@@ -124,17 +124,7 @@ private extension StoreOf<StakeUnitList> {
 private extension View {
 	func destinations(with store: StoreOf<StakeUnitList>) -> some View {
 		let destinationStore = store.destination
-		return lsuDetails(with: destinationStore)
-			.stakeClaimNFTDetails(with: destinationStore)
-	}
-
-	private func lsuDetails(with destinationStore: PresentationStoreOf<StakeUnitList.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /StakeUnitList.Destination.State.details,
-			action: StakeUnitList.Destination.Action.details,
-			content: { LSUDetails.View(store: $0) }
-		)
+		return stakeClaimNFTDetails(with: destinationStore)
 	}
 
 	private func stakeClaimNFTDetails(with destinationStore: PresentationStoreOf<StakeUnitList.Destination>) -> some View {
