@@ -97,7 +97,6 @@ extension AssetsView {
 					viewStore.send(.task)
 				}
 			}
-			.destinations(with: store)
 		}
 
 		private func assetTypeSelectorView(_ viewStore: ViewStoreOf<AssetsView>) -> some SwiftUI.View {
@@ -128,28 +127,6 @@ extension AssetsView {
 				}
 			}
 		}
-	}
-}
-
-private extension StoreOf<AssetsView> {
-	var destination: PresentationStoreOf<AssetsView.Destination> {
-		func scopeState(state: State) -> PresentationState<AssetsView.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
-	}
-}
-
-@MainActor
-private extension View {
-	func destinations(with store: StoreOf<AssetsView>) -> some View {
-		let destinationStore = store.destination
-		return sheet(
-			store: destinationStore,
-			state: /AssetsView.Destination.State.details,
-			action: AssetsView.Destination.Action.details,
-			content: { FungibleTokenDetails.View(store: $0) }
-		)
 	}
 }
 

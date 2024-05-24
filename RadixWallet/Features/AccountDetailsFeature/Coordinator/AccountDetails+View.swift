@@ -182,6 +182,7 @@ private extension View {
 		return preferences(with: destinationStore)
 			.history(with: destinationStore)
 			.transfer(with: destinationStore)
+			.fungibleDetails(with: destinationStore)
 	}
 
 	private func preferences(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
@@ -200,6 +201,15 @@ private extension View {
 		fullScreenCover(store: destinationStore.scope(state: \.transfer, action: \.transfer)) {
 			AssetTransfer.SheetView(store: $0)
 		}
+	}
+
+	private func fungibleDetails(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /AccountDetails.Destination.State.fungibleDetails,
+			action: AccountDetails.Destination.Action.fungibleDetails,
+			content: { FungibleTokenDetails.View(store: $0) }
+		)
 	}
 }
 

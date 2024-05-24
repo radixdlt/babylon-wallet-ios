@@ -63,6 +63,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			case preferences(AccountPreferences.State)
 			case history(TransactionHistory.State)
 			case transfer(AssetTransfer.State)
+			case fungibleDetails(FungibleTokenDetails.State)
 		}
 
 		@CasePathable
@@ -70,6 +71,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			case preferences(AccountPreferences.Action)
 			case history(TransactionHistory.Action)
 			case transfer(AssetTransfer.Action)
+			case fungibleDetails(FungibleTokenDetails.Action)
 		}
 
 		public var body: some Reducer<State, Action> {
@@ -81,6 +83,9 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			}
 			Scope(state: \.transfer, action: \.transfer) {
 				AssetTransfer()
+			}
+			Scope(state: /State.fungibleDetails, action: /Action.fungibleDetails) {
+				FungibleTokenDetails()
 			}
 		}
 	}
@@ -150,22 +155,30 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .accountUpdated(account):
+			state.account = account
+			checkAccountAccessToMnemonic(state: &state)
+			return .none
+		}
+	}
+
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .assets(.internal(.portfolioUpdated)):
 			checkAccountAccessToMnemonic(state: &state)
 			return .none
 
-		default:
+		case let .assets(.delegate(.selectedFungible(token, isXrd))):
+			state.destination = .fungibleDetails(.init(
+				resourceAddress: token.resourceAddress,
+				ownedFungibleResource: token,
+				isXRD: isXrd
+			))
 			return .none
-		}
-	}
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
-		case let .accountUpdated(account):
-			state.account = account
-			checkAccountAccessToMnemonic(state: &state)
+		default:
 			return .none
 		}
 	}
