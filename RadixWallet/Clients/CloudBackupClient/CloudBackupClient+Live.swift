@@ -152,8 +152,6 @@ extension CloudBackupClient {
 					}
 
 					let savedRecord = try await uploadProfileSnapshotToICloud(profileSnapshot, id: profile.id, existingRecord: backedUpRecord)
-					// Migration completed, deleting old copy
-					try secureStorageClient.deleteProfile(profile.id)
 
 					return savedRecord
 				}
@@ -173,11 +171,6 @@ extension CloudBackupClient {
 			},
 			loadAllProfiles: {
 				try await fetchAllProfileRecords().map(extractProfile)
-			},
-			backupProfile: {
-				let profile = await profileStore.profile
-				let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
-				return try await uploadProfileToICloud(profile, existingRecord: existingRecord)
 			}
 		)
 	}
