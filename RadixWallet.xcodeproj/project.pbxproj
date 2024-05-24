@@ -8606,7 +8606,7 @@
 			repositoryURL = "https://github.com/pointfreeco/swift-identified-collections";
 			requirement = {
 				kind = exactVersion;
-				version = 1.0.2;
+				version = 1.0.1;
 			};
 		};
 		E7AE2D072BF7855500830BAA /* XCRemoteSwiftPackageReference "sargon" */ = {
