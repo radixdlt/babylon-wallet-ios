@@ -61,8 +61,7 @@ extension ResourcesList {
 				.padding(.top, .medium1)
 				.background(.app.gray5)
 				.destinations(with: store)
-				.navigationTitle(viewStore.mode.navigationTitle)
-				.defaultNavBarConfig()
+				.radixToolbar(title: viewStore.mode.navigationTitle)
 				.footer {
 					Button(viewStore.mode.addButtonTitle) {
 						viewStore.send(.addAssetTapped)
@@ -176,22 +175,15 @@ private extension View {
 	private func addAsset(
 		with destinationStore: PresentationStoreOf<ResourcesList.Destination>
 	) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /ResourcesList.Destination.State.addAsset,
-			action: ResourcesList.Destination.Action.addAsset,
-			content: { AddAsset.View(store: $0) }
-		)
+		sheet(store: destinationStore.scope(state: \.addAsset, action: \.addAsset)) {
+			AddAsset.View(store: $0)
+		}
 	}
 
 	private func confirmDeletionAlert(
 		with destinationStore: PresentationStoreOf<ResourcesList.Destination>
 	) -> some View {
-		alert(
-			store: destinationStore,
-			state: /ResourcesList.Destination.State.confirmAssetDeletion,
-			action: ResourcesList.Destination.Action.confirmAssetDeletion
-		)
+		alert(store: destinationStore.scope(state: \.confirmAssetDeletion, action: \.confirmAssetDeletion))
 	}
 }
 

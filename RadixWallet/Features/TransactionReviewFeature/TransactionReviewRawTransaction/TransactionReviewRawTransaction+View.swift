@@ -17,7 +17,7 @@ extension TransactionReviewRawTransaction {
 					ScrollView {
 						RawTransactionView(transaction: viewStore.transaction)
 					}
-					.navigationTitle(L10n.TransactionReview.rawTransactionTitle)
+					.radixToolbar(title: L10n.TransactionReview.rawTransactionTitle, alwaysVisible: false)
 					.toolbar {
 						ToolbarItem(placement: .cancellationAction) {
 							CloseButton {

@@ -152,7 +152,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}
 		case .moveToForeground:
 			return .run { _ in
-				_ = await radixConnectClient.loadFromProfileAndConnectAll()
+				_ = await radixConnectClient.loadP2PLinksAndConnectAll()
 			}
 		}
 	}

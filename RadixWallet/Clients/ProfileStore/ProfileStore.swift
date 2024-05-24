@@ -566,6 +566,11 @@ extension ProfileStore {
 			return nil
 		}
 
+		if let profileSnapshotData = try? secureStorageClient.loadProfileSnapshotData(profileId) {
+			let containsLegacyP2PLinks = Profile.checkIfProfileJsonContainsLegacyP2PLinks(contents: profileSnapshotData)
+			userDefaults.setShowRelinkConnectorsAfterUpdate(containsLegacyP2PLinks)
+		}
+
 		return try secureStorageClient.loadProfile(profileId)
 	}
 

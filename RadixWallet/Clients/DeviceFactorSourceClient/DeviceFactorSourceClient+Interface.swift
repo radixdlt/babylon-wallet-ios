@@ -15,13 +15,18 @@ public struct DeviceFactorSourceClient: Sendable {
 	/// Checks if there is any account for which the wallet doesn't have its seed phrase.
 	public var isSeedPhraseNeededToRecoverAccounts: IsSeedPhraseNeededToRecoverAccounts
 
+	/// The `Accounts` & `Personas` the user wouldn't be able to recover if they loose their phone,
+	/// since they haven't been backed up (seed phrase not written).
+	public var unrecoverableEntities: UnrecoverableEntities
+
 	public init(
 		publicKeysFromOnDeviceHD: @escaping PublicKeysFromOnDeviceHD,
 		signatureFromOnDeviceHD: @escaping SignatureFromOnDeviceHD,
 		isAccountRecoveryNeeded: @escaping IsAccountRecoveryNeeded,
 		entitiesControlledByFactorSource: @escaping GetEntitiesControlledByFactorSource,
 		controlledEntities: @escaping GetControlledEntities,
-		isSeedPhraseNeededToRecoverAccounts: @escaping IsSeedPhraseNeededToRecoverAccounts
+		isSeedPhraseNeededToRecoverAccounts: @escaping IsSeedPhraseNeededToRecoverAccounts,
+		unrecoverableEntities: @escaping UnrecoverableEntities
 	) {
 		self.publicKeysFromOnDeviceHD = publicKeysFromOnDeviceHD
 		self.signatureFromOnDeviceHD = signatureFromOnDeviceHD
@@ -29,6 +34,7 @@ public struct DeviceFactorSourceClient: Sendable {
 		self.entitiesControlledByFactorSource = entitiesControlledByFactorSource
 		self.controlledEntities = controlledEntities
 		self.isSeedPhraseNeededToRecoverAccounts = isSeedPhraseNeededToRecoverAccounts
+		self.unrecoverableEntities = unrecoverableEntities
 	}
 }
 
@@ -41,6 +47,7 @@ extension DeviceFactorSourceClient {
 	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey
 	public typealias IsAccountRecoveryNeeded = @Sendable () async throws -> Bool
 	public typealias IsSeedPhraseNeededToRecoverAccounts = @Sendable () async throws -> Bool
+	public typealias UnrecoverableEntities = @Sendable () async throws -> (accounts: [AccountAddress], personas: [IdentityAddress])
 }
 
 // MARK: - DiscrepancyUnsupportedCurve

@@ -14,6 +14,7 @@ public struct Settings: Sendable, FeatureReducer {
 		public var destination: Destination.State?
 
 		public var userHasNoP2PLinks: Bool? = nil
+		public var securityProblems: [SecurityProblem] = []
 
 		public init() {}
 	}
@@ -23,7 +24,7 @@ public struct Settings: Sendable, FeatureReducer {
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
 		case addConnectorButtonTapped
-		case securityButtonTapped
+		case securityCenterButtonTapped
 		case personasButtonTapped
 		case dappsButtonTapped
 		case connectorsButtonTapped
@@ -33,15 +34,18 @@ public struct Settings: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case loadedP2PLinks(P2PLinks)
+		case setP2PLinks(P2PLinks)
+		case setSecurityProblems([SecurityProblem])
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case deleteProfileAndFactorSources(keepInICloudIfPresent: Bool)
+		case didResetWallet
 	}
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Sendable, Hashable {
+			case securityCenter(SecurityCenter.State)
 			case manageP2PLinks(P2PLinksFeature.State)
 			case authorizedDapps(AuthorizedDappsFeature.State)
 			case personas(PersonasCoordinator.State)
@@ -50,9 +54,10 @@ public struct Settings: Sendable, FeatureReducer {
 			case debugSettings(DebugSettingsCoordinator.State)
 		}
 
+		@CasePathable
 		public enum Action: Sendable, Equatable {
+			case securityCenter(SecurityCenter.Action)
 			case manageP2PLinks(P2PLinksFeature.Action)
-			case securityFactors(SecurityFactors.Action)
 			case authorizedDapps(AuthorizedDappsFeature.Action)
 			case personas(PersonasCoordinator.Action)
 			case preferences(Preferences.Action)
@@ -61,23 +66,26 @@ public struct Settings: Sendable, FeatureReducer {
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.manageP2PLinks, action: /Action.manageP2PLinks) {
+			Scope(state: \.securityCenter, action: \.securityCenter) {
+				SecurityCenter()
+			}
+			Scope(state: \.manageP2PLinks, action: \.manageP2PLinks) {
 				P2PLinksFeature()
 			}
-			Scope(state: /State.authorizedDapps, action: /Action.authorizedDapps) {
+			Scope(state: \.authorizedDapps, action: \.authorizedDapps) {
 				AuthorizedDappsFeature()
 			}
-			Scope(state: /State.personas, action: /Action.personas) {
+			Scope(state: \.personas, action: \.personas) {
 				PersonasCoordinator()
 			}
-			Scope(state: /State.preferences, action: /Action.preferences) {
+			Scope(state: \.preferences, action: \.preferences) {
 				Preferences()
 			}
-			Scope(state: /State.troubleshooting, action: /Action.troubleshooting) {
+			Scope(state: \.troubleshooting, action: \.troubleshooting) {
 				Troubleshooting()
 			}
 			#if DEBUG
-			Scope(state: /State.debugSettings, action: /Action.debugSettings) {
+			Scope(state: \.debugSettings, action: \.debugSettings) {
 				DebugSettingsCoordinator()
 			}
 			#endif
@@ -88,6 +96,7 @@ public struct Settings: Sendable, FeatureReducer {
 
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.p2pLinksClient) var p2pLinksClient
+	@Dependency(\.securityCenterClient) var securityCenterClient
 	@Dependency(\.dismiss) var dismiss
 	@Dependency(\.userDefaults) var userDefaults
 
@@ -103,14 +112,15 @@ public struct Settings: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .appeared:
-			return loadP2PLinks()
+			return p2pLinksEffect()
+				.merge(with: securityProblemsEffect())
 
 		case .addConnectorButtonTapped:
 			state.destination = .manageP2PLinks(.init(destination: .newConnection(.init())))
 			return .none
 
-		case .securityButtonTapped:
-			// TODO: Implement
+		case .securityCenterButtonTapped:
+			state.destination = .securityCenter(.init())
 			return .none
 
 		case .personasButtonTapped:
@@ -141,8 +151,11 @@ public struct Settings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .loadedP2PLinks(clients):
+		case let .setP2PLinks(clients):
 			state.userHasNoP2PLinks = clients.isEmpty
+			return .none
+		case let .setSecurityProblems(problems):
+			state.securityProblems = problems
 			return .none
 		}
 	}
@@ -151,6 +164,8 @@ public struct Settings: Sendable, FeatureReducer {
 		switch presentedAction {
 		case .troubleshooting(.delegate(.goToAccountList)):
 			.run { _ in await dismiss() }
+		case .troubleshooting(.delegate(.didResetWallet)):
+			.send(.delegate(.didResetWallet))
 		default:
 			.none
 		}
@@ -159,7 +174,7 @@ public struct Settings: Sendable, FeatureReducer {
 	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
 		switch state.destination {
 		case .manageP2PLinks:
-			loadP2PLinks()
+			p2pLinksEffect()
 		default:
 			.none
 		}
@@ -168,11 +183,20 @@ public struct Settings: Sendable, FeatureReducer {
 
 // MARK: Private
 extension Settings {
-	private func loadP2PLinks() -> Effect<Action> {
+	private func p2pLinksEffect() -> Effect<Action> {
 		.run { send in
-			await send(.internal(.loadedP2PLinks(
+			await send(.internal(.setP2PLinks(
 				p2pLinksClient.getP2PLinks()
 			)))
+		}
+	}
+
+	private func securityProblemsEffect() -> Effect<Action> {
+		.run { send in
+			for try await problems in await securityCenterClient.problems() {
+				guard !Task.isCancelled else { return }
+				await send(.internal(.setSecurityProblems(problems)))
+			}
 		}
 	}
 }

@@ -7,7 +7,8 @@ extension NewConnectionApproval.State {
 			screenState: isConnecting ? .loading(.global(text: L10n.LinkedConnectors.NewConnection.linking)) : .enabled,
 			continueButtonControlState: isConnecting ? .loading(.local) : .enabled,
 			title: title,
-			message: message
+			message: message,
+			dismissButtonTitle: dismissButtonTitle
 		)
 	}
 
@@ -17,6 +18,8 @@ extension NewConnectionApproval.State {
 			L10n.LinkedConnectors.ApproveNewConnector.title
 		case .approveExisitingConnection:
 			L10n.LinkedConnectors.ApproveExistingConnector.title
+		case .approveRelinkAfterProfileRestore, .approveRelinkAfterUpdate:
+			L10n.LinkedConnectors.RelinkConnectors.title
 		}
 	}
 
@@ -26,6 +29,19 @@ extension NewConnectionApproval.State {
 			L10n.LinkedConnectors.ApproveNewConnector.message
 		case .approveExisitingConnection:
 			L10n.LinkedConnectors.ApproveExistingConnector.message
+		case .approveRelinkAfterProfileRestore:
+			L10n.LinkedConnectors.RelinkConnectors.afterProfileRestoreMessage
+		case .approveRelinkAfterUpdate:
+			L10n.LinkedConnectors.RelinkConnectors.afterUpdateMessage
+		}
+	}
+
+	private var dismissButtonTitle: String {
+		switch purpose {
+		case .approveNewConnection, .approveExisitingConnection:
+			L10n.Common.cancel
+		case .approveRelinkAfterProfileRestore, .approveRelinkAfterUpdate:
+			L10n.LinkedConnectors.RelinkConnectors.laterButton
 		}
 	}
 }
@@ -37,6 +53,7 @@ extension NewConnectionApproval {
 		let continueButtonControlState: ControlState
 		let title: String
 		let message: String
+		let dismissButtonTitle: String
 	}
 
 	@MainActor
@@ -66,7 +83,7 @@ extension NewConnectionApproval {
 					Spacer()
 
 					HStack {
-						Button(L10n.Common.cancel) {
+						Button(viewStore.dismissButtonTitle) {
 							viewStore.send(.dismissButtonTapped)
 						}
 						.buttonStyle(.secondaryRectangular)

@@ -40,6 +40,6 @@ extension DefaultDepositGuarantees.View {
 					focused = false
 				}
 		}
-		.navigationTitle(L10n.AccountSecuritySettings.DepositGuarantees.title)
+		.radixToolbar(title: L10n.AccountSecuritySettings.DepositGuarantees.title)
 	}
 }

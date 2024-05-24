@@ -21,11 +21,11 @@ extension P2P {
 
 // MARK: - RadixConnectClient
 public struct RadixConnectClient: DependencyKey, Sendable {
-	/// Connects to the p2p links stored in the current profile
-	public var loadFromProfileAndConnectAll: LoadFromProfileAndConnectAll
+	/// Connects to the p2p links stored in secure storage.
+	public var loadP2PLinksAndConnectAll: LoadFromProfileAndConnectAll
 	public var disconnectAll: DisconnectAll
 
-	/// Connects to a given list of p2p links, those will not be stored in profile.
+	/// Connects to a given list of p2p links, those will not be stored in secure storage.
 	public var connectToP2PLinks: ConnectToP2PLinks
 
 	public var getLocalNetworkAccess: GetLocalNetworkAccess

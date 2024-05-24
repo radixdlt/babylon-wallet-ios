@@ -47,8 +47,7 @@ extension ManageThirdPartyDeposits {
 					onRowSelected: { _, row in viewStore.send(.rowTapped(row)) }
 				)
 				.background(.app.gray5)
-				.navigationTitle(L10n.AccountSettings.thirdPartyDeposits)
-				.defaultNavBarConfig()
+				.radixToolbar(title: L10n.AccountSettings.thirdPartyDeposits)
 				.destinations(with: store)
 				.footer {
 					Button(L10n.AccountSettings.SpecificAssetsDeposits.update) {

@@ -24,9 +24,9 @@ extension BackupsClient: TestDependencyKey {
 		snapshotOfProfileForExport: { throw NoopError() },
 		loadProfileBackups: { nil },
 		lookupProfileSnapshotByHeader: { _ in throw NoopError() },
-		importProfileSnapshot: { _, _ in throw NoopError() },
+		importProfileSnapshot: { _, _, _ in throw NoopError() },
 		didExportProfileSnapshot: { _ in throw NoopError() },
-		importCloudProfile: { _, _ in throw NoopError() },
+		importCloudProfile: { _, _, _ in throw NoopError() },
 		loadDeviceID: { nil }
 	)
 }

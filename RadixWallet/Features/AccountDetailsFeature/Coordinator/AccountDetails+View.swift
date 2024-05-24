@@ -9,7 +9,6 @@ extension AccountDetails.State {
 			displayName: account.displayName.rawValue,
 			mnemonicHandlingCallToAction: mnemonicHandlingCallToAction,
 			isLedgerAccount: account.isLedgerControlled,
-			showToolbar: destination == nil,
 			totalFiatWorth: showFiatWorth ? assets.totalFiatWorth : nil,
 			account: account
 		)
@@ -24,7 +23,6 @@ extension AccountDetails {
 		let displayName: String
 		let mnemonicHandlingCallToAction: MnemonicHandling?
 		let isLedgerAccount: Bool
-		let showToolbar: Bool
 		let totalFiatWorth: Loadable<FiatWorth>?
 		let account: Account
 	}
@@ -49,24 +47,26 @@ extension AccountDetails {
 				.task {
 					viewStore.send(.task)
 				}
-				.navigationTitle(viewStore.displayName)
-				.navigationBarTitleColor(.white)
 				.toolbar {
-					if viewStore.showToolbar {
-						ToolbarItem(placement: .navigationBarLeading) {
-							BackButton {
-								viewStore.send(.backButtonTapped)
-							}
-							.foregroundColor(.app.white)
-						}
+					ToolbarItem(placement: .principal) {
+						Text(viewStore.displayName)
+							.foregroundColor(.white)
+							.textStyle(.body1Header)
+					}
 
-						ToolbarItem(placement: .navigationBarTrailing) {
-							Button(asset: AssetResource.ellipsis) {
-								viewStore.send(.preferencesButtonTapped)
-							}
-							.frame(.small)
-							.foregroundColor(.app.white)
+					ToolbarItem(placement: .navigationBarLeading) {
+						BackButton {
+							viewStore.send(.backButtonTapped)
 						}
+						.foregroundColor(.app.white)
+					}
+
+					ToolbarItem(placement: .navigationBarTrailing) {
+						Button(asset: AssetResource.ellipsis) {
+							viewStore.send(.preferencesButtonTapped)
+						}
+						.frame(.small)
+						.foregroundColor(.app.white)
 					}
 				}
 			}

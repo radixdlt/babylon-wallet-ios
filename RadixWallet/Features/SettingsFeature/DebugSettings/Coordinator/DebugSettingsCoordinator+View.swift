@@ -19,13 +19,13 @@ extension DebugSettingsCoordinator.View {
 	public var body: some View {
 		ScrollView {
 			VStack(spacing: .zero) {
-				ForEach(rows) { kind in
+				ForEachStatic(rows) { kind in
 					SettingsRow(kind: kind, store: store)
 				}
 			}
 		}
 		.padding(.bottom, .large3)
-		.setUpNavigationBar(title: "Debug Settings")
+		.radixToolbar(title: "Debug Settings")
 		.destinations(with: store)
 		.tint(.app.gray1)
 		.foregroundColor(.app.gray1)
