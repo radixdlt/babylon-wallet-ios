@@ -96,6 +96,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			case fungible(OnLedgerEntity.OwnedFungibleResource, isXrd: Bool)
 			case nonFungible(OnLedgerEntity.OwnedNonFungibleResource, token: OnLedgerEntity.NonFungibleToken)
 			case stakeUnit(OnLedgerEntitiesClient.ResourceWithVaultAmount, details: OnLedgerEntitiesClient.OwnedStakeDetails)
+			case stakeClaim(OnLedgerEntity.Resource, claim: OnLedgerEntitiesClient.StakeClaim)
 		}
 	}
 
@@ -167,8 +168,13 @@ public struct AssetsView: Sendable, FeatureReducer {
 		case let .nonFungibleTokenList(.delegate(.selected(resource, token))):
 			.send(.delegate(.selected(.nonFungible(resource, token: token))))
 
-		case let .stakeUnitList(.delegate(.selected(resource, details))):
-			.send(.delegate(.selected(.stakeUnit(resource, details: details))))
+		case let .stakeUnitList(.delegate(.selected(selection))):
+			switch selection {
+			case let .unit(resource, details):
+				.send(.delegate(.selected(.stakeUnit(resource, details: details))))
+			case let .claim(resource, claim):
+				.send(.delegate(.selected(.stakeClaim(resource, claim: claim))))
+			}
 
 		default:
 			.none
@@ -260,8 +266,7 @@ extension AssetsView {
 						dict[resource] = selectedtokens
 					}
 				} : nil,
-			stakeUnitDetails: state.accountPortfolio.stakeUnitDetails.flatten(),
-			destination: state.resources.stakeUnitList?.destination
+			stakeUnitDetails: state.accountPortfolio.stakeUnitDetails.flatten()
 		)
 
 		state.totalFiatWorth.refresh(from: portfolio.totalFiatWorth)

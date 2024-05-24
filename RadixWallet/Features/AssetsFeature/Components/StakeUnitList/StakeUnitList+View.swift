@@ -48,7 +48,6 @@ public extension StakeUnitList {
 			.onAppear {
 				store.send(.view(.appeared))
 			}
-			.destinations(with: store)
 		}
 
 		@ViewBuilder
@@ -108,31 +107,5 @@ public extension StakeUnitList {
 			.rowStyle()
 			.padding(.bottom, .small2)
 		}
-	}
-}
-
-private extension StoreOf<StakeUnitList> {
-	var destination: PresentationStoreOf<StakeUnitList.Destination> {
-		func scopeState(state: State) -> PresentationState<StakeUnitList.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
-	}
-}
-
-@MainActor
-private extension View {
-	func destinations(with store: StoreOf<StakeUnitList>) -> some View {
-		let destinationStore = store.destination
-		return stakeClaimNFTDetails(with: destinationStore)
-	}
-
-	private func stakeClaimNFTDetails(with destinationStore: PresentationStoreOf<StakeUnitList.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /StakeUnitList.Destination.State.stakeClaimDetails,
-			action: StakeUnitList.Destination.Action.stakeClaimDetails,
-			content: { NonFungibleTokenDetails.View(store: $0) }
-		)
 	}
 }

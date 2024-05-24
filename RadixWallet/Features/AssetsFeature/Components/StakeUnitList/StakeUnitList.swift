@@ -16,20 +16,15 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		var selectedLiquidStakeUnits: IdentifiedArrayOf<OnLedgerEntity.OwnedFungibleResource>?
 		var selectedStakeClaimTokens: SelectedStakeClaimTokens?
 
-		@PresentationState
-		var destination: Destination.State?
-
 		init(
 			account: OnLedgerEntity.OnLedgerAccount,
 			selectedLiquidStakeUnits: IdentifiedArrayOf<OnLedgerEntity.OwnedFungibleResource>?,
 			selectedStakeClaimTokens: SelectedStakeClaimTokens?,
-			stakeUnitDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>>,
-			destination: Destination.State? = nil
+			stakeUnitDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>>
 		) {
 			self.account = account
 			self.selectedLiquidStakeUnits = selectedLiquidStakeUnits
 			self.selectedStakeClaimTokens = selectedStakeClaimTokens
-			self.destination = destination
 
 			switch stakeUnitDetails {
 			case .idle, .loading:
@@ -120,24 +115,11 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case selected(OnLedgerEntitiesClient.ResourceWithVaultAmount, details: OnLedgerEntitiesClient.OwnedStakeDetails)
-	}
+		case selected(Selection)
 
-	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
-			case stakeClaimDetails(NonFungibleTokenDetails.State)
-		}
-
-		public enum Action: Sendable, Equatable {
-			case stakeClaimDetails(NonFungibleTokenDetails.Action)
-		}
-
-		public var body: some ReducerOf<Self> {
-			Scope(
-				state: /State.stakeClaimDetails,
-				action: /Action.stakeClaimDetails,
-				child: NonFungibleTokenDetails.init
-			)
+		public enum Selection: Sendable, Equatable {
+			case unit(OnLedgerEntitiesClient.ResourceWithVaultAmount, details: OnLedgerEntitiesClient.OwnedStakeDetails)
+			case claim(OnLedgerEntity.Resource, claim: OnLedgerEntitiesClient.StakeClaim)
 		}
 	}
 
@@ -146,15 +128,6 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
-
-	public var body: some ReducerOf<Self> {
-		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
-				Destination()
-			}
-	}
-
-	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -178,10 +151,8 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 				else {
 					return .none
 				}
-				return .send(.delegate(.selected(stakeUnitResource, details: stakeDetails)))
+				return .send(.delegate(.selected(.unit(stakeUnitResource, details: stakeDetails))))
 			}
-
-			return .none
 
 		case let .didTapStakeClaimNFT(stakeClaim):
 			guard let stakedValidator = state.stakedValidators[id: stakeClaim.validatorAddress] else {
@@ -208,15 +179,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 			guard let stakeClaimTokens = stakedValidator.stakeDetails.stakeClaimTokens else {
 				return .none
 			}
-
-			state.destination = .stakeClaimDetails(.init(
-				resourceAddress: stakeClaimTokens.resource.resourceAddress,
-				resourceDetails: .success(stakeClaimTokens.resource),
-				token: stakeClaim.token,
-				ledgerState: stakeClaimTokens.resource.atLedgerState,
-				stakeClaim: stakeClaim
-			))
-			return .none
+			return .send(.delegate(.selected(.claim(stakeClaimTokens.resource, claim: stakeClaim))))
 
 		case let .didTapClaimAll(validatorAddress):
 			guard let stakeClaimTokens = state.stakedValidators[id: validatorAddress]?.stakeDetails.stakeClaimTokens,
@@ -261,33 +224,6 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 					)
 				}
 			)
-		}
-	}
-
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		switch presentedAction {
-		case let .stakeClaimDetails(.delegate(.tappedClaimStake(resourceAddress, stakeClaim))):
-
-			guard let nonFungibleResourceAddress = try? NonFungibleResourceAddress(validatingAddress: resourceAddress.address) else {
-				return .none
-			}
-
-			state.destination = nil
-
-			return sendStakeClaimTransaction(
-				state.account.address,
-				stakeClaims: [
-					//					.init(
-//						validatorAddress: stakeClaim.validatorAddress,
-//						resourceAddress: nonFungibleResourceAddress,
-//						ids: .init(stakeClaim.id.nonFungibleLocalId),
-//						amount: stakeClaim.claimAmount.nominalAmount
-//					),
-					stakeClaim.intoSargon(),
-				]
-			)
-		case .stakeClaimDetails:
-			return .none
 		}
 	}
 
