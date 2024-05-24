@@ -7071,7 +7071,6 @@
 				48CFC2F82ADC10D900E77A5C /* InfoOfNewPersona+View.swift in Sources */,
 				48CFC3EC2ADC10D900E77A5C /* DataChannelMessage.swift in Sources */,
 				48CFC3FF2ADC10D900E77A5C /* RTCPeerConnectionAsyncDelegate.swift in Sources */,
-				48CFC5D72ADC10DA00E77A5C /* NavigationBarTitleColor.swift in Sources */,
 				83EE5EE32BE3C16F00B1531D /* AccountDepositPreValidationResourceBadge.swift in Sources */,
 				48CFC5B62ADC10DA00E77A5C /* CloseButton.swift in Sources */,
 				A462B5832B83671100C26D20 /* ValidatorCollectionItemEffectiveFeeFactor.swift in Sources */,
@@ -8607,7 +8606,7 @@
 			repositoryURL = "https://github.com/pointfreeco/swift-identified-collections";
 			requirement = {
 				kind = exactVersion;
-				version = 1.0.1;
+				version = 1.0.2;
 			};
 		};
 		E7AE2D072BF7855500830BAA /* XCRemoteSwiftPackageReference "sargon" */ = {
@@ -8615,7 +8614,7 @@
 			repositoryURL = "https://github.com/radixdlt/sargon";
 			requirement = {
 				kind = exactVersion;
-				version = 0.7.19;
+				version = 1.0.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
