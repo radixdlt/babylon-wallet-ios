@@ -27,7 +27,9 @@ extension CloudBackupClient {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.userDefaults) var userDefaults
 
-		let cloudContainer = (Bundle.main.infoDictionary?[Self.cloudBackupIdentifierKey] as? String).map(CKContainer.init)
+		let cloudContainer = (Bundle.main.infoDictionary?[Self.cloudBackupIdentifierKey] as? String)?
+			.nilIfEmpty
+			.map(CKContainer.init)
 
 		@Sendable
 		func container() throws -> CKContainer {
