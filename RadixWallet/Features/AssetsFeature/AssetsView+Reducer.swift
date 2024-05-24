@@ -74,7 +74,6 @@ public struct AssetsView: Sendable, FeatureReducer {
 		case pullToRefreshStarted
 		case didSelectList(State.AssetKind)
 		case chooseButtonTapped(State.Mode.SelectedAssets)
-		case closeButtonTapped
 	}
 
 	@CasePathable
@@ -91,7 +90,6 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case handleSelectedAssets(State.Mode.SelectedAssets)
-		case dismiss
 		case selectedFungible(OnLedgerEntity.OwnedFungibleResource, isXrd: Bool)
 	}
 
@@ -141,8 +139,6 @@ public struct AssetsView: Sendable, FeatureReducer {
 			}
 		case let .chooseButtonTapped(items):
 			return .send(.delegate(.handleSelectedAssets(items)))
-		case .closeButtonTapped:
-			return .send(.delegate(.dismiss))
 		}
 	}
 
