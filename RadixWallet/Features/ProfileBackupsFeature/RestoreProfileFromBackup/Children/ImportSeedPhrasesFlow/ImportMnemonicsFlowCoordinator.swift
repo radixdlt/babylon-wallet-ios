@@ -260,9 +260,6 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 					try await factorSourcesClient.saveNewMainBDFS(newMainBDFS)
 				}
 
-				/// A small delay is needed after dismissal in order to not break Home screen modal presentations
-				try? await Task.sleep(for: .milliseconds(250))
-
 				return await send(.delegate(.finishedImportingMnemonics(
 					skipped: skipped,
 					imported: imported,
