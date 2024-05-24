@@ -35,9 +35,6 @@ public struct AssetsView: Sendable, FeatureReducer {
 		public var activeAssetKind: AssetKind
 		public var assetKinds: NonEmpty<[AssetKind]>
 
-		@PresentationState
-		public var destination: Destination.State?
-
 		public var resources: Resources = .init()
 
 		public let account: Account
