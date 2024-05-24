@@ -16,23 +16,7 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case selected(OnLedgerEntity.OwnedFungibleResource, Bool)
-	}
-
-	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
-			case details(FungibleTokenDetails.State)
-		}
-
-		public enum Action: Sendable, Equatable {
-			case details(FungibleTokenDetails.Action)
-		}
-
-		public var body: some ReducerOf<Self> {
-			Scope(state: /State.details, action: /Action.details) {
-				FungibleTokenDetails()
-			}
-		}
+		case selected(OnLedgerEntity.OwnedFungibleResource, isXrd: Bool)
 	}
 
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
@@ -44,9 +28,6 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 			.forEach(\.sections, action: /Action.child .. ChildAction.section) {
 				FungibleAssetList.Section()
 			}
-			.ifLet(destinationPath, action: /Action.destination) {
-				Destination()
-			}
 	}
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
@@ -54,24 +35,9 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .section(id, .delegate(.selected(token))):
-//			state.destination = .details(.init(
-//				resourceAddress: token.resourceAddress,
-//				ownedFungibleResource: token,
-//				isXRD: id == .xrd
-//			))
-			.send(.delegate(.selected(token, id == .xrd)))
+			.send(.delegate(.selected(token, isXrd: id == .xrd)))
 		case .section:
 			.none
-		}
-	}
-
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		switch presentedAction {
-		case .details(.delegate(.dismiss)):
-			state.destination = nil
-			return .none
-		default:
-			return .none
 		}
 	}
 }

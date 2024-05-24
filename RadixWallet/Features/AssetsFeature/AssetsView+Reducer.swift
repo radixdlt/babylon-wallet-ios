@@ -136,31 +136,6 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
-	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
-		switch childAction {
-		case let .fungibleTokenList(.delegate(.selected(token, isXrd))):
-			state.destination = .details(.init(
-				resourceAddress: token.resourceAddress,
-				ownedFungibleResource: token,
-				isXRD: isXrd
-			))
-			return .none
-
-		default:
-			return .none
-		}
-	}
-
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		switch presentedAction {
-		case .details(.delegate(.dismiss)):
-			state.destination = nil
-			return .none
-		default:
-			return .none
-		}
-	}
-
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
@@ -202,6 +177,33 @@ public struct AssetsView: Sendable, FeatureReducer {
 		}
 	}
 
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		case let .fungibleTokenList(.delegate(.selected(token, isXrd))):
+			state.destination = .details(.init(
+				resourceAddress: token.resourceAddress,
+				ownedFungibleResource: token,
+				isXRD: isXrd
+			))
+			return .none
+
+		default:
+			return .none
+		}
+	}
+
+	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
+		switch presentedAction {
+		case .details(.delegate(.dismiss)):
+			state.destination = nil
+			return .none
+		default:
+			return .none
+		}
+	}
+}
+
+extension AssetsView {
 	private func updateFromPortfolio(
 		state: inout State,
 		from portfolio: AccountPortfoliosClient.AccountPortfolio

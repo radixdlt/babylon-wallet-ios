@@ -21,29 +21,6 @@ extension FungibleAssetList.View {
 		) {
 			FungibleAssetList.Section.View(store: $0)
 		}
-		.destinations(with: store)
-	}
-}
-
-private extension StoreOf<FungibleAssetList> {
-	var destination: PresentationStoreOf<FungibleAssetList.Destination> {
-		func scopeState(state: State) -> PresentationState<FungibleAssetList.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
-	}
-}
-
-@MainActor
-private extension View {
-	func destinations(with store: StoreOf<FungibleAssetList>) -> some View {
-		let destinationStore = store.destination
-		return sheet(
-			store: destinationStore,
-			state: /FungibleAssetList.Destination.State.details,
-			action: FungibleAssetList.Destination.Action.details,
-			content: { FungibleTokenDetails.View(store: $0) }
-		)
 	}
 }
 
