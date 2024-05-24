@@ -208,48 +208,33 @@ private extension View {
 	}
 
 	private func fungibleDetails(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /AccountDetails.Destination.State.fungibleDetails,
-			action: AccountDetails.Destination.Action.fungibleDetails,
-			content: { FungibleTokenDetails.View(store: $0) }
-		)
+		sheet(store: destinationStore.scope(state: \.fungibleDetails, action: \.fungibleDetails)) {
+			FungibleTokenDetails.View(store: $0)
+		}
 	}
 
 	private func nonFungibleDetails(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /AccountDetails.Destination.State.nonFungibleDetails,
-			action: AccountDetails.Destination.Action.nonFungibleDetails,
-			content: { NonFungibleTokenDetails.View(store: $0) }
-		)
+		sheet(store: destinationStore.scope(state: \.nonFungibleDetails, action: \.nonFungibleDetails)) {
+			NonFungibleTokenDetails.View(store: $0)
+		}
 	}
 
 	private func stakeUnitDetails(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /AccountDetails.Destination.State.stakeUnitDetails,
-			action: AccountDetails.Destination.Action.stakeUnitDetails,
-			content: { LSUDetails.View(store: $0) }
-		)
+		sheet(store: destinationStore.scope(state: \.stakeUnitDetails, action: \.stakeUnitDetails)) {
+			LSUDetails.View(store: $0)
+		}
 	}
 
 	private func stakeClaimDetails(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /AccountDetails.Destination.State.stakeClaimDetails,
-			action: AccountDetails.Destination.Action.stakeClaimDetails,
-			content: { NonFungibleTokenDetails.View(store: $0) }
-		)
+		sheet(store: destinationStore.scope(state: \.stakeClaimDetails, action: \.stakeClaimDetails)) {
+			NonFungibleTokenDetails.View(store: $0)
+		}
 	}
 
 	private func poolUnitDetails(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /AccountDetails.Destination.State.poolUnitDetails,
-			action: AccountDetails.Destination.Action.poolUnitDetails,
-			content: { PoolUnitDetails.View(store: $0) }
-		)
+		sheet(store: destinationStore.scope(state: \.poolUnitDetails, action: \.poolUnitDetails)) {
+			PoolUnitDetails.View(store: $0)
+		}
 	}
 }
 

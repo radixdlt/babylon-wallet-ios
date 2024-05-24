@@ -92,19 +92,19 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			Scope(state: \.transfer, action: \.transfer) {
 				AssetTransfer()
 			}
-			Scope(state: /State.fungibleDetails, action: /Action.fungibleDetails) {
+			Scope(state: \.fungibleDetails, action: \.fungibleDetails) {
 				FungibleTokenDetails()
 			}
-			Scope(state: /State.nonFungibleDetails, action: /Action.nonFungibleDetails) {
+			Scope(state: \.nonFungibleDetails, action: \.nonFungibleDetails) {
 				NonFungibleTokenDetails()
 			}
-			Scope(state: /State.stakeUnitDetails, action: /Action.stakeUnitDetails) {
+			Scope(state: \.stakeUnitDetails, action: \.stakeUnitDetails) {
 				LSUDetails()
 			}
-			Scope(state: /State.stakeClaimDetails, action: /Action.stakeClaimDetails) {
+			Scope(state: \.stakeClaimDetails, action: \.stakeClaimDetails) {
 				NonFungibleTokenDetails()
 			}
-			Scope(state: /State.poolUnitDetails, action: /Action.poolUnitDetails) {
+			Scope(state: \.poolUnitDetails, action: \.poolUnitDetails) {
 				PoolUnitDetails()
 			}
 		}
