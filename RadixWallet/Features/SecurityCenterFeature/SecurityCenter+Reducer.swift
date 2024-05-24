@@ -41,7 +41,7 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 			Scope(state: \.displayMnemonics, action: \.displayMnemonics) {
 				DisplayMnemonics()
 			}
-			Scope(state: /State.importMnemonics, action: /Action.importMnemonics) {
+			Scope(state: \.importMnemonics, action: \.importMnemonics) {
 				ImportMnemonicsFlowCoordinator()
 			}
 		}
@@ -109,8 +109,7 @@ public struct SecurityCenter: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case .importMnemonics(.delegate(.finishedEarly)),
-		     .importMnemonics(.delegate(.finishedImportingMnemonics)):
+		case .importMnemonics(.delegate(.finishedEarly)), .importMnemonics(.delegate(.finishedImportingMnemonics)):
 			state.destination = nil
 			return .none
 		default:
