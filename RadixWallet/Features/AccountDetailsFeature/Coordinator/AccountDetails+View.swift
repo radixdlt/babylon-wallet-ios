@@ -186,6 +186,7 @@ private extension View {
 			.nonFungibleDetails(with: destinationStore)
 			.stakeUnitDetails(with: destinationStore)
 			.stakeClaimDetails(with: destinationStore)
+			.poolUnitDetails(with: destinationStore)
 	}
 
 	private func preferences(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
@@ -239,6 +240,15 @@ private extension View {
 			state: /AccountDetails.Destination.State.stakeClaimDetails,
 			action: AccountDetails.Destination.Action.stakeClaimDetails,
 			content: { NonFungibleTokenDetails.View(store: $0) }
+		)
+	}
+
+	private func poolUnitDetails(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /AccountDetails.Destination.State.poolUnitDetails,
+			action: AccountDetails.Destination.Action.poolUnitDetails,
+			content: { PoolUnitDetails.View(store: $0) }
 		)
 	}
 }

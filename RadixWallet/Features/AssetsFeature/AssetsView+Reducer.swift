@@ -97,6 +97,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 			case nonFungible(OnLedgerEntity.OwnedNonFungibleResource, token: OnLedgerEntity.NonFungibleToken)
 			case stakeUnit(OnLedgerEntitiesClient.ResourceWithVaultAmount, details: OnLedgerEntitiesClient.OwnedStakeDetails)
 			case stakeClaim(OnLedgerEntity.Resource, claim: OnLedgerEntitiesClient.StakeClaim)
+			case poolUnit(OnLedgerEntitiesClient.OwnedResourcePoolDetails)
 		}
 	}
 
@@ -176,6 +177,9 @@ public struct AssetsView: Sendable, FeatureReducer {
 				.send(.delegate(.selected(.stakeClaim(resource, claim: claim))))
 			}
 
+		case let .poolUnitsList(.delegate(.selected(details))):
+			.send(.delegate(.selected(.poolUnit(details))))
+
 		default:
 			.none
 		}
@@ -241,8 +245,7 @@ extension AssetsView {
 					},
 					isSelected: mode.nonXrdRowSelected(poolUnit.resource.resourceAddress)
 				)
-			}.asIdentified(),
-			destination: state.resources.poolUnitsList?.destination
+			}.asIdentified()
 		)
 
 		let stakes = portfolio.account.poolUnitResources.radixNetworkStakes
