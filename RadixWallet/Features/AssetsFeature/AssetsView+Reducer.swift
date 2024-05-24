@@ -90,7 +90,12 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case handleSelectedAssets(State.Mode.SelectedAssets)
-		case selectedFungible(OnLedgerEntity.OwnedFungibleResource, isXrd: Bool)
+		case selected(Selection)
+
+		public enum Selection: Sendable, Equatable {
+			case fungible(OnLedgerEntity.OwnedFungibleResource, isXrd: Bool)
+			case nonFungible(OnLedgerEntity.OwnedNonFungibleResource, token: OnLedgerEntity.NonFungibleToken)
+		}
 	}
 
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
@@ -155,8 +160,11 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .fungibleTokenList(.delegate(.selected(token, isXrd))):
-			.send(.delegate(.selectedFungible(token, isXrd: isXrd)))
+		case let .fungibleTokenList(.delegate(.selected(resource, isXrd))):
+			.send(.delegate(.selected(.fungible(resource, isXrd: isXrd))))
+
+		case let .nonFungibleTokenList(.delegate(.selected(resource, token))):
+			.send(.delegate(.selected(.nonFungible(resource, token: token))))
 
 		default:
 			.none
@@ -208,7 +216,7 @@ extension AssetsView {
 				return nil
 			}
 
-			return .init(sections: sections, destination: state.resources.fungibleTokenList?.destination)
+			return .init(sections: sections)
 		}()
 
 		state.accountPortfolio.refresh(from: .success(portfolio))
@@ -255,7 +263,7 @@ extension AssetsView {
 		state.totalFiatWorth.refresh(from: portfolio.totalFiatWorth)
 		state.resources = .init(
 			fungibleTokenList: fungibleTokenList,
-			nonFungibleTokenList: !nfts.isEmpty ? .init(rows: nfts.asIdentified(), destination: state.resources.nonFungibleTokenList?.destination) : nil,
+			nonFungibleTokenList: !nfts.isEmpty ? .init(rows: nfts.asIdentified()) : nil,
 			stakeUnitList: stakeUnitList,
 			poolUnitsList: poolUnitList
 		)

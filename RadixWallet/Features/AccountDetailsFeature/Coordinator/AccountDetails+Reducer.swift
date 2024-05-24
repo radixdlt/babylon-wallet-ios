@@ -64,6 +64,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			case history(TransactionHistory.State)
 			case transfer(AssetTransfer.State)
 			case fungibleDetails(FungibleTokenDetails.State)
+			case nonFungibleDetails(NonFungibleTokenDetails.State)
 		}
 
 		@CasePathable
@@ -72,6 +73,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			case history(TransactionHistory.Action)
 			case transfer(AssetTransfer.Action)
 			case fungibleDetails(FungibleTokenDetails.Action)
+			case nonFungibleDetails(NonFungibleTokenDetails.Action)
 		}
 
 		public var body: some Reducer<State, Action> {
@@ -86,6 +88,9 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			}
 			Scope(state: /State.fungibleDetails, action: /Action.fungibleDetails) {
 				FungibleTokenDetails()
+			}
+			Scope(state: /State.nonFungibleDetails, action: /Action.nonFungibleDetails) {
+				NonFungibleTokenDetails()
 			}
 		}
 	}
@@ -170,12 +175,23 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			checkAccountAccessToMnemonic(state: &state)
 			return .none
 
-		case let .assets(.delegate(.selectedFungible(token, isXrd))):
-			state.destination = .fungibleDetails(.init(
-				resourceAddress: token.resourceAddress,
-				ownedFungibleResource: token,
-				isXRD: isXrd
-			))
+		case let .assets(.delegate(.selected(selection))):
+			switch selection {
+			case let .fungible(resource, isXrd):
+				state.destination = .fungibleDetails(.init(
+					resourceAddress: resource.resourceAddress,
+					ownedFungibleResource: resource,
+					isXRD: isXrd
+				))
+
+			case let .nonFungible(resource, token):
+				state.destination = .nonFungibleDetails(.init(
+					resourceAddress: resource.resourceAddress,
+					ownedResource: resource,
+					token: token,
+					ledgerState: resource.atLedgerState
+				))
+			}
 			return .none
 
 		default:

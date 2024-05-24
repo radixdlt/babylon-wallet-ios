@@ -183,6 +183,7 @@ private extension View {
 			.history(with: destinationStore)
 			.transfer(with: destinationStore)
 			.fungibleDetails(with: destinationStore)
+			.nonFungibleDetails(with: destinationStore)
 	}
 
 	private func preferences(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
@@ -209,6 +210,15 @@ private extension View {
 			state: /AccountDetails.Destination.State.fungibleDetails,
 			action: AccountDetails.Destination.Action.fungibleDetails,
 			content: { FungibleTokenDetails.View(store: $0) }
+		)
+	}
+
+	private func nonFungibleDetails(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		sheet(
+			store: destinationStore,
+			state: /AccountDetails.Destination.State.nonFungibleDetails,
+			action: AccountDetails.Destination.Action.nonFungibleDetails,
+			content: { NonFungibleTokenDetails.View(store: $0) }
 		)
 	}
 }

@@ -5,9 +5,6 @@ import SwiftUI
 public struct FungibleAssetList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		public var sections: IdentifiedArrayOf<FungibleAssetList.Section.State> = []
-
-		@PresentationState
-		public var destination: Destination.State?
 	}
 
 	@CasePathable
@@ -30,12 +27,10 @@ public struct FungibleAssetList: Sendable, FeatureReducer {
 			}
 	}
 
-	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
-
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .section(id, .delegate(.selected(token))):
-			.send(.delegate(.selected(token, isXrd: id == .xrd)))
+		case let .section(id, .delegate(.selected(resource))):
+			.send(.delegate(.selected(resource, isXrd: id == .xrd)))
 		case .section:
 			.none
 		}
