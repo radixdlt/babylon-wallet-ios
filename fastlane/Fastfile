@@ -32,7 +32,7 @@ platform :ios do
 
     desc "Creates SensitiveInfo.plist if it doesn't exist"
     lane :create_sensitive_info do
-        if File.exists?("../Aux/SensitiveInfo.plist")
+        if File.exist?("../Aux/SensitiveInfo.plist")
             puts "SensitiveInfo.plist already available"
         elsif
             sh("cp -v '../Aux/SensitiveInfo-Sample.plist' '../Aux/SensitiveInfo.plist'")
