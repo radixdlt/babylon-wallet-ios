@@ -88,7 +88,7 @@ extension SecurityCenter {
 						Image(.error)
 							.padding(.trailing, .small2)
 
-						Text(problem.heading)
+						Text(problem.securityCenterTitle)
 							.multilineTextAlignment(.leading)
 							.lineSpacing(-.small2)
 							.textStyle(.body1Header)
@@ -101,7 +101,7 @@ extension SecurityCenter {
 					.background(.app.alert)
 
 					HStack(spacing: 0) {
-						Text(problem.message)
+						Text(problem.securityCenterBody)
 							.multilineTextAlignment(.leading)
 							.textStyle(.body2HighImportance)
 

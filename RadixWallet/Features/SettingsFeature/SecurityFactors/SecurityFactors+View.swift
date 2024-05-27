@@ -87,9 +87,9 @@ private extension SecurityFactors.ViewState {
 	}
 
 	var seedPhraseHints: [Hint.ViewState] {
-		securityProblems.compactMap { problem in
-			.init(kind: .warning, text: problem.warning)
-		}
+		securityProblems
+			.compactMap(\.securityFactors)
+			.map { .init(kind: .warning, text: $0) }
 	}
 
 	var ledgerWalletsDetail: String? {

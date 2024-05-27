@@ -116,21 +116,23 @@ extension ConfigurationBackup {
 		let problem: SecurityProblem
 
 		var body: some SwiftUI.View {
-			HStack(spacing: 0) {
-				Image(.error)
-					.padding(.trailing, .medium3)
+			if let text = problem.configurationBackup {
+				HStack(spacing: 0) {
+					Image(.error)
+						.padding(.trailing, .medium3)
 
-				Text(problem.warning)
-					.multilineTextAlignment(.leading)
-					.textStyle(.body2HighImportance)
+					Text(text)
+						.multilineTextAlignment(.leading)
+						.textStyle(.body2HighImportance)
 
-				Spacer(minLength: 0)
+					Spacer(minLength: 0)
+				}
+				.foregroundStyle(.app.alert)
+				.padding(.vertical, .small1)
+				.padding(.horizontal, .medium3)
+				.background(.app.lightAlert)
+				.roundedCorners(radius: .small1)
 			}
-			.foregroundStyle(.app.alert)
-			.padding(.vertical, .small1)
-			.padding(.horizontal, .medium3)
-			.background(.app.lightAlert)
-			.roundedCorners(radius: .small1)
 		}
 	}
 
