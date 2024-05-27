@@ -50,33 +50,96 @@ public enum SecurityProblem: Hashable, Sendable, Identifiable {
 		}
 	}
 
-	public var message: String {
+	public var accountCard: String {
 		switch self {
-		case .problem3: L10n.SecurityCenter.Problem3.text
-		case .problem5: L10n.SecurityCenter.Problem5.text
-		case .problem6: L10n.SecurityCenter.Problem6.text
-		case .problem7: L10n.SecurityCenter.Problem7.text
-		case .problem9: L10n.SecurityCenter.Problem9.text
+		case .problem3: L10n.SecurityProblems.No3.accountCard
+		case .problem5: L10n.SecurityProblems.No5.accountCard
+		case .problem6: L10n.SecurityProblems.No6.accountCard
+		case .problem7: L10n.SecurityProblems.No7.accountCard
+		case .problem9: L10n.SecurityProblems.No9.accountCard
 		}
 	}
 
-	public var heading: String {
+	public var walletSettingsSecurityCenter: String {
+		securityCenterTitle
+	}
+
+	public var securityCenterTitle: String {
 		switch self {
-		case let .problem3(accounts, personas): L10n.SecurityCenter.Problem3.heading(accounts.count, personas.count)
-		case .problem5: L10n.SecurityCenter.Problem5.heading
-		case .problem6: L10n.SecurityCenter.Problem6.heading
-		case .problem7: L10n.SecurityCenter.Problem7.heading
-		case .problem9: L10n.SecurityCenter.Problem9.heading
+		case let .problem3(accounts, personas): problem3(accounts: accounts.count, personas: personas.count)
+		case .problem5: L10n.SecurityProblems.No5.securityCenterTitle
+		case .problem6: L10n.SecurityProblems.No6.securityCenterTitle
+		case .problem7: L10n.SecurityProblems.No7.securityCenterTitle
+		case .problem9: L10n.SecurityProblems.No9.securityCenterTitle
 		}
 	}
 
-	public var warning: String {
+	private typealias Common = L10n.SecurityProblems.Common
+
+	private func problem3(accounts: Int, personas: Int) -> String {
+		L10n.SecurityProblems.No3.securityCenterTitle(
+			accounts == 1 ? Common.accountSingular : Common.accountPlural(accounts),
+			personas == 1 ? Common.personaSingular : Common.personaPlural(personas)
+		)
+	}
+
+	public var securityCenterBody: String {
 		switch self {
-		case .problem3: L10n.SecurityCenter.Problem3.warning
-		case .problem5: L10n.SecurityCenter.Problem5.warningIOS
-		case .problem6: L10n.SecurityCenter.Problem6.warning
-		case .problem7: L10n.SecurityCenter.Problem7.warning
-		case .problem9: L10n.SecurityCenter.Problem9.warning
+		case .problem3: L10n.SecurityProblems.No3.securityCenterBody
+		case .problem5: L10n.SecurityProblems.No5.securityCenterBody
+		case .problem6: L10n.SecurityProblems.No6.securityCenterBody
+		case .problem7: L10n.SecurityProblems.No7.securityCenterBody
+		case .problem9: L10n.SecurityProblems.No9.securityCenterBody
+		}
+	}
+
+	public var configurationBackup: String? {
+		switch self {
+		case .problem3: nil
+		case .problem5: L10n.SecurityProblems.No5.configurationBackup
+		case .problem6: L10n.SecurityProblems.No6.configurationBackup
+		case .problem7: L10n.SecurityProblems.No7.configurationBackup
+		case .problem9: nil
+		}
+	}
+
+	public var securityFactors: String? {
+		switch self {
+		case .problem3: L10n.SecurityProblems.No3.securityFactors
+		case .problem5: nil
+		case .problem6: nil
+		case .problem7: nil
+		case .problem9: L10n.SecurityProblems.No9.securityFactors
+		}
+	}
+
+	public var seedPhrases: String? {
+		switch self {
+		case .problem3: L10n.SecurityProblems.No3.seedPhrases
+		case .problem5: nil
+		case .problem6: nil
+		case .problem7: nil
+		case .problem9: L10n.SecurityProblems.No9.seedPhrases
+		}
+	}
+
+	public var walletSettingsPersonas: String {
+		switch self {
+		case .problem3: L10n.SecurityProblems.No3.walletSettingsPersonas
+		case .problem5: L10n.SecurityProblems.No5.walletSettingsPersonas
+		case .problem6: L10n.SecurityProblems.No6.walletSettingsPersonas
+		case .problem7: L10n.SecurityProblems.No7.walletSettingsPersonas
+		case .problem9: L10n.SecurityProblems.No9.walletSettingsPersonas
+		}
+	}
+
+	public var personas: String {
+		switch self {
+		case .problem3: L10n.SecurityProblems.No3.personas
+		case .problem5: L10n.SecurityProblems.No5.personas
+		case .problem6: L10n.SecurityProblems.No6.personas
+		case .problem7: L10n.SecurityProblems.No7.personas
+		case .problem9: L10n.SecurityProblems.No9.personas
 		}
 	}
 

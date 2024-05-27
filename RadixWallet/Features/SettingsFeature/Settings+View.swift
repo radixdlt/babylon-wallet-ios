@@ -168,7 +168,7 @@ extension Settings.View {
 	@MainActor
 	private func securityCenterHints(problems: [SecurityProblem]) -> [Hint.ViewState] {
 		problems.map { problem in
-			.init(kind: .warning, text: problem.message)
+			.init(kind: .warning, text: problem.walletSettingsSecurityCenter)
 		}
 	}
 }
