@@ -117,6 +117,7 @@ extension CloudBackupClient {
 				for try await (profile, _) in combineLatest(profiles, timer) {
 					guard !Task.isCancelled else { return }
 					guard profile.appPreferences.security.isCloudProfileSyncEnabled else { continue }
+					guard profile.isNonEmpty else { continue }
 
 					let last = userDefaults.getLastCloudBackups[profile.id]
 					if let last, last.result == .success, last.profileHash == profile.hashValue { continue }
@@ -174,7 +175,7 @@ extension CloudBackupClient {
 				try await extractProfile(fetchProfileRecord(.init(recordName: id.uuidString)))
 			},
 			loadAllProfiles: {
-				try await fetchAllProfileRecords().map(extractProfile)
+				try await fetchAllProfileRecords().map(extractProfile).filter(\.profile.isNonEmpty)
 			},
 			backupProfile: {
 				let profile = await profileStore.profile
@@ -182,5 +183,11 @@ extension CloudBackupClient {
 				return try await uploadProfileToICloud(profile, existingRecord: existingRecord)
 			}
 		)
+	}
+}
+
+extension Profile {
+	var isNonEmpty: Bool {
+		header.contentHint.numberOfAccountsOnAllNetworksInTotal + header.contentHint.numberOfPersonasOnAllNetworksInTotal > 0
 	}
 }
