@@ -58,7 +58,7 @@ extension AccountPortfoliosClient.State {
 	}
 
 	private func setOrUpdateAccountPortfolios(_ portfolios: [AccountPortfoliosClient.AccountPortfolio]) {
-		var newValue: [AccountAddress: AccountPortfoliosClient.AccountPortfolio] = [:]
+		var newValue: [AccountAddress: AccountPortfoliosClient.AccountPortfolio] = portfoliosSubject.value.wrappedValue ?? [:]
 		for portfolio in portfolios {
 			newValue[portfolio.account.address] = portfolio
 		}
