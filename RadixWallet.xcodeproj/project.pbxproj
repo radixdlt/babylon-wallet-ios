@@ -8118,7 +8118,7 @@
 			baseConfigurationReference = 48CFC69E2ADC110800E77A5C /* iOS-alpha.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = "RadixWallet/RadixWalletDebug-Alpha.entitlements";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CURRENT_PROJECT_VERSION = 1;
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = MDH99V28LM;
 				INFOPLIST_KEY_CFBundleDisplayName = "Radix Wallet";
@@ -8131,7 +8131,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development com.radixpublishing.radixwallet.ios.alpha";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore com.radixpublishing.radixwallet.ios.alpha";
 				SWIFT_VERSION = 5.0;
 			};
 			name = "Debug-Alpha";
