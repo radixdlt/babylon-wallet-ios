@@ -44,6 +44,7 @@ extension CloudBackupClient {
 	) -> CloudBackupClient {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.userDefaults) var userDefaults
+		@Dependency(\.errorQueue) var errorQueue
 
 		let container: CKContainer = .default()
 
@@ -164,14 +165,18 @@ extension CloudBackupClient {
 				let profiles = await profileStore.values()
 
 				for try await (profile, _) in combineLatest(profiles, timer) {
-					guard !Task.isCancelled else { return }
-					guard profile.appPreferences.security.isCloudProfileSyncEnabled else { continue }
-					guard profile.header.isNonEmpty else { continue }
+					do {
+						guard !Task.isCancelled else { return }
+						guard profile.appPreferences.security.isCloudProfileSyncEnabled else { continue }
+						guard profile.header.isNonEmpty else { continue }
 
-					let last = userDefaults.getLastCloudBackups[profile.id]
-					if let last, last.result == .success, last.profileHash == profile.hashValue { continue }
+						let last = userDefaults.getLastCloudBackups[profile.id]
+						if let last, last.result == .success, last.profileHash == profile.hashValue { continue }
 
-					await backupProfileAndSaveResult(profile)
+						await backupProfileAndSaveResult(profile)
+					} catch {
+						errorQueue.schedule(error)
+					}
 				}
 			},
 			loadDeviceID: {
