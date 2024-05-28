@@ -76,13 +76,16 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 			accountsControlledByKeysOnSameCurve accountSet: EntitiesControlledByFactorSource.AccountsControlledByKeysOnSameCurve,
 			problems: [SecurityProblem]
 		) {
+			let accounts = accountSet.accounts.elements + accountSet.hiddenAccounts.elements
+			let isMnemonicMarkedAsBackedUp = problems.isMnemonicMarkedAsBackedUp(accounts: accounts)
+			let isMnemonicPresentInKeychain = problems.isMnemonicPresentInKeychain(accounts: accounts)
 			self.init(
 				id: .singleCurve(accountSet.id.factorSourceID, isOlympia: accountSet.id.isOlympia),
-				isMnemonicMarkedAsBackedUp: problems.isMnemonicMarkedAsBackedUp,
-				isMnemonicPresentInKeychain: problems.isMnemonicPresentInKeychain,
+				isMnemonicMarkedAsBackedUp: isMnemonicMarkedAsBackedUp,
+				isMnemonicPresentInKeychain: isMnemonicPresentInKeychain,
 				accounts: accountSet.accounts,
 				hasHiddenAccounts: !accountSet.hiddenAccounts.isEmpty,
-				mode: problems.mode
+				mode: isMnemonicPresentInKeychain ? .mnemonicCanBeDisplayed : .mnemonicNeedsImport
 			)
 		}
 	}
@@ -118,25 +121,31 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 }
 
 private extension [SecurityProblem] {
-	var isMnemonicMarkedAsBackedUp: Bool {
+	func isMnemonicMarkedAsBackedUp(accounts: [Account]) -> Bool {
 		!contains(where: { item in
 			switch item {
-			case .problem3: true
-			default: false
+			case let .problem3(problematicAccounts, _):
+				guard let first = problematicAccounts.first else {
+					return false
+				}
+				return accounts.contains(where: { $0.address.id == first.id })
+			default:
+				return false
 			}
 		})
 	}
 
-	var isMnemonicPresentInKeychain: Bool {
+	func isMnemonicPresentInKeychain(accounts: [Account]) -> Bool {
 		!contains(where: { item in
 			switch item {
-			case .problem9: true
-			default: false
+			case let .problem9(problematicAccounts, _):
+				guard let first = problematicAccounts.first else {
+					return false
+				}
+				return accounts.contains(where: { $0.address.id == first.id })
+			default:
+				return false
 			}
 		})
-	}
-
-	var mode: DisplayEntitiesControlledByMnemonic.State.Mode {
-		isMnemonicPresentInKeychain ? .mnemonicCanBeDisplayed : .mnemonicNeedsImport
 	}
 }
