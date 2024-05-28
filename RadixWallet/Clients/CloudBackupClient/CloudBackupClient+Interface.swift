@@ -13,7 +13,6 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 	public let lastBackup: LastBackup
 	public let loadProfile: LoadProfile
 	public let loadAllProfiles: LoadAllProfiles
-	public let backupProfile: BackupProfile
 
 	public init(
 		startAutomaticBackups: @escaping StartAutomaticBackups,
@@ -23,8 +22,7 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 		checkAccountStatus: @escaping CheckAccountStatus,
 		lastBackup: @escaping LastBackup,
 		loadProfile: @escaping LoadProfile,
-		loadAllProfiles: @escaping LoadAllProfiles,
-		backupProfile: @escaping BackupProfile
+		loadAllProfiles: @escaping LoadAllProfiles
 	) {
 		self.startAutomaticBackups = startAutomaticBackups
 		self.loadDeviceID = loadDeviceID
@@ -34,7 +32,6 @@ public struct CloudBackupClient: DependencyKey, Sendable {
 		self.lastBackup = lastBackup
 		self.loadProfile = loadProfile
 		self.loadAllProfiles = loadAllProfiles
-		self.backupProfile = backupProfile
 	}
 }
 
@@ -47,7 +44,6 @@ extension CloudBackupClient {
 	public typealias LastBackup = @Sendable (ProfileID) -> AnyAsyncSequence<BackupResult?>
 	public typealias LoadProfile = @Sendable (ProfileID) async throws -> BackedupProfile?
 	public typealias LoadAllProfiles = @Sendable () async throws -> [BackedupProfile]
-	public typealias BackupProfile = @Sendable () async throws -> CKRecord
 }
 
 // MARK: CloudBackupClient.BackedupProfile
