@@ -19,6 +19,17 @@ extension CKRecord.FieldKey {
 	static let lastUsedOnDevice = "LastUsedOnDevice"
 }
 
+extension [CKRecord.FieldKey] {
+	static let metadata: Self = [
+		.snapshotVersion,
+		.creatingDevice,
+		.lastModified,
+		.totalPersonas,
+		.totalAccounts,
+		.lastUsedOnDevice,
+	]
+}
+
 extension CloudBackupClient {
 	struct IncorrectRecordTypeError: Error {}
 	struct NoProfileInRecordError: Error {}
@@ -42,9 +53,10 @@ extension CloudBackupClient {
 		}
 
 		@Sendable
-		func fetchAllProfileRecords() async throws -> [CKRecord] {
+		func fetchAllProfileRecords(metadataOnly: Bool = false) async throws -> [CKRecord] {
 			let records = try await container.privateCloudDatabase.records(
-				matching: .init(recordType: .profile, predicate: .init(value: true))
+				matching: .init(recordType: .profile, predicate: .init(value: true)),
+				desiredKeys: metadataOnly ? .metadata : nil
 			)
 			return try records.matchResults.map { try $0.1.get() }
 		}
