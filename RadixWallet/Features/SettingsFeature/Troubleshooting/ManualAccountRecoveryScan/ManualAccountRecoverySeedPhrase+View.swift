@@ -141,7 +141,7 @@ private extension ManualAccountRecoverySeedPhrase.View {
 								return viewStore.isOlympia && curve == .secp256k1 || !viewStore.isOlympia && curve == .curve25519
 							}
 						},
-						hasHiddenAccounts: !item.value.hiddenAccounts.isEmpty
+						hiddenAccountsCount: item.value.hiddenAccounts.count
 					)
 				)
 				.padding(.medium3)

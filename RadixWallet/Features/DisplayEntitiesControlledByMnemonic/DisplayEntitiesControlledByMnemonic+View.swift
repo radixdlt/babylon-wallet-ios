@@ -24,7 +24,7 @@ extension DisplayEntitiesControlledByMnemonic.State {
 			}(),
 			promptUserToBackUpMnemonic: mode == .mnemonicCanBeDisplayed && !isMnemonicMarkedAsBackedUp,
 			accounts: accounts.elements,
-			hasHiddenAccounts: hasHiddenAccounts
+			hiddenAccountsCount: hiddenAccountsCount
 		)
 	}
 }
@@ -70,7 +70,11 @@ extension DisplayEntitiesControlledByMnemonic {
 		public let headingState: HeadingState?
 		public let promptUserToBackUpMnemonic: Bool
 		public let accounts: [Account]
-		public let hasHiddenAccounts: Bool
+		public let hiddenAccountsCount: Int
+
+		var totalAccountsCount: Int {
+			accounts.count + hiddenAccountsCount
+		}
 	}
 }
 
@@ -130,7 +134,7 @@ extension DisplayEntitiesControlledByMnemonic {
 								.cornerRadius(.small1)
 						}
 					}
-				} else if viewState.hasHiddenAccounts {
+				} else if viewState.hiddenAccountsCount > 0 {
 					NoContentView(L10n.SeedPhrases.hiddenAccountsOnly)
 						.frame(maxWidth: .infinity)
 						.frame(height: .huge2)
@@ -152,7 +156,7 @@ extension DisplayEntitiesControlledByMnemonic {
 						.textStyle(.body1Header)
 						.foregroundColor(headingState.foregroundColor)
 
-					Text(headingState.connectedAccountsLabel(accounts: viewState.accounts.count))
+					Text(headingState.connectedAccountsLabel(accounts: viewState.totalAccountsCount))
 						.textStyle(.body2Regular)
 						.foregroundColor(.app.gray2)
 				}

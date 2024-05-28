@@ -31,7 +31,7 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 		public var isMnemonicMarkedAsBackedUp: Bool
 		public var isMnemonicPresentInKeychain: Bool
 		public let accounts: IdentifiedArrayOf<Account>
-		public let hasHiddenAccounts: Bool
+		public let hiddenAccountsCount: Int
 		public var mode: Mode
 
 		public enum Mode: Sendable, Hashable {
@@ -45,14 +45,14 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 			isMnemonicMarkedAsBackedUp: Bool,
 			isMnemonicPresentInKeychain: Bool,
 			accounts: IdentifiedArrayOf<Account>,
-			hasHiddenAccounts: Bool,
+			hiddenAccountsCount: Int,
 			mode: Mode
 		) {
 			self.id = id
 			self.isMnemonicMarkedAsBackedUp = isMnemonicMarkedAsBackedUp
 			self.isMnemonicPresentInKeychain = isMnemonicPresentInKeychain
 			self.accounts = accounts
-			self.hasHiddenAccounts = hasHiddenAccounts
+			self.hiddenAccountsCount = hiddenAccountsCount
 			self.mode = mode
 		}
 
@@ -68,7 +68,7 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 				isMnemonicMarkedAsBackedUp: isMnemonicMarkedAsBackedUp,
 				isMnemonicPresentInKeychain: isMnemonicPresentInKeychain,
 				accounts: accountSet.accounts,
-				hasHiddenAccounts: !accountSet.hiddenAccounts.isEmpty,
+				hiddenAccountsCount: accountSet.hiddenAccounts.count,
 				mode: isMnemonicPresentInKeychain ? .mnemonicCanBeDisplayed : .mnemonicNeedsImport
 			)
 		}
