@@ -154,9 +154,7 @@ extension CloudBackupClient {
 						return nil
 					}
 
-					let savedRecord = try await uploadProfileSnapshotToICloud(profileSnapshot, id: profile.id, existingRecord: backedUpRecord)
-
-					return savedRecord
+					return try await uploadProfileSnapshotToICloud(profileSnapshot, id: profile.id, existingRecord: backedUpRecord)
 				}
 			},
 			deleteProfileBackup: { id in
