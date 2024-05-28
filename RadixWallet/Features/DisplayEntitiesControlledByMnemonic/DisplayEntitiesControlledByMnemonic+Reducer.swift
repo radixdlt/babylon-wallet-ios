@@ -58,22 +58,6 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 
 		public init(
 			accountsControlledByKeysOnSameCurve accountSet: EntitiesControlledByFactorSource.AccountsControlledByKeysOnSameCurve,
-			isMnemonicMarkedAsBackedUp: Bool,
-			isMnemonicPresentInKeychain: Bool,
-			mode: Mode
-		) {
-			self.init(
-				id: .singleCurve(accountSet.id.factorSourceID, isOlympia: accountSet.id.isOlympia),
-				isMnemonicMarkedAsBackedUp: isMnemonicMarkedAsBackedUp,
-				isMnemonicPresentInKeychain: isMnemonicPresentInKeychain,
-				accounts: accountSet.accounts,
-				hasHiddenAccounts: !accountSet.hiddenAccounts.isEmpty,
-				mode: mode
-			)
-		}
-
-		public init(
-			accountsControlledByKeysOnSameCurve accountSet: EntitiesControlledByFactorSource.AccountsControlledByKeysOnSameCurve,
 			problems: [SecurityProblem]
 		) {
 			let accounts = accountSet.accounts.elements + accountSet.hiddenAccounts.elements
