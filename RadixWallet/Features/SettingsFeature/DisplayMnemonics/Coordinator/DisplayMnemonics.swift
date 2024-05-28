@@ -12,8 +12,8 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 		public var destination: Destination.State? = nil
 
 		public var deviceFactorSources: IdentifiedArrayOf<DisplayEntitiesControlledByMnemonic.State> = []
-		fileprivate var problems: [SecurityProblem] = []
-		fileprivate var entities: IdentifiedArrayOf<EntitiesControlledByFactorSource> = []
+		fileprivate var problems: [SecurityProblem]?
+		fileprivate var entities: IdentifiedArrayOf<EntitiesControlledByFactorSource>?
 
 		public init() {}
 	}
@@ -187,7 +187,10 @@ public struct DisplayMnemonics: Sendable, FeatureReducer {
 	}
 
 	private func deviceFactorSourcesEffect(state: State) -> Effect<Action> {
-		.run { [problems = state.problems, entities = state.entities] send in
+		guard let problems = state.problems, let entities = state.entities else {
+			return .none
+		}
+		return .run { send in
 			let comparableEntities = entities.flatMap { ents in
 				[ents.babylon, ents.olympia]
 					.compactMap { $0 }
