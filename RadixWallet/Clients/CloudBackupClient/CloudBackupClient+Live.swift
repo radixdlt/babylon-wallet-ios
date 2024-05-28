@@ -19,21 +19,17 @@ extension CloudBackupClient {
 
 	public static let liveValue: Self = .live()
 
-	private static let cloudBackupIdentifierKey = "RDX_ICLOUD_BACKUPS_CONTAINER"
-
 	public static func live(
 		profileStore: ProfileStore = .shared
 	) -> CloudBackupClient {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.userDefaults) var userDefaults
 
-		let cloudContainer = (Bundle.main.infoDictionary?[Self.cloudBackupIdentifierKey] as? String)?
-			.nilIfEmpty
-			.map(CKContainer.init)
+		let cloudContainer: CKContainer = .default()
 
 		@Sendable
 		func container() throws -> CKContainer {
-			guard let cloudContainer else { throw MissingCloudKitIdentifierError() }
+			print("•• cloudContainer: \(cloudContainer.containerIdentifier ?? "nil")")
 			return cloudContainer
 		}
 
