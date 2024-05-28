@@ -154,11 +154,7 @@ extension CloudBackupClient {
 						return nil
 					}
 
-					let savedRecord = try await uploadProfileSnapshotToICloud(profileSnapshot, id: profile.id, existingRecord: backedUpRecord)
-					// Migration completed, deleting old copy
-					try secureStorageClient.deleteProfile(profile.id)
-
-					return savedRecord
+					return try await uploadProfileSnapshotToICloud(profileSnapshot, id: profile.id, existingRecord: backedUpRecord)
 				}
 			},
 			deleteProfileBackup: { id in
