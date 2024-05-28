@@ -15,7 +15,7 @@ extension DisplayEntitiesControlledByMnemonic.State {
 					)
 				case .mnemonicNeedsImport:
 					.init(
-						title: L10n.SeedPhrases.SeedPhrase.headingNeedsImport,
+						title: L10n.SecurityProblems.No9.seedPhrases,
 						imageAsset: AssetResource.error,
 						type: .standard,
 						isError: true
@@ -120,7 +120,7 @@ extension DisplayEntitiesControlledByMnemonic {
 
 				if viewState.promptUserToBackUpMnemonic {
 					WarningErrorView(
-						text: L10n.SeedPhrases.backupWarning,
+						text: L10n.SecurityProblems.No3.seedPhrases,
 						type: .error,
 						useNarrowSpacing: true
 					)
