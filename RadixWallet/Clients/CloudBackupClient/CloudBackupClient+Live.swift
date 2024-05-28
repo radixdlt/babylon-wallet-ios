@@ -173,7 +173,7 @@ extension CloudBackupClient {
 				try await extractProfile(fetchProfileRecord(.init(recordName: id.uuidString)))
 			},
 			loadAllProfiles: {
-				try await fetchAllProfileRecords().map(extractProfile)
+				try await fetchAllProfileRecords().map(extractProfile).filter(\.profile.isNonEmpty)
 			}
 		)
 	}
