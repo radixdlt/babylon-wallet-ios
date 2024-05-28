@@ -52,4 +52,13 @@ extension CloudBackupClient {
 		public let profile: Profile
 		public let containsLegacyP2PLinks: Bool
 	}
+
+	public struct ProfileMetadata: Hashable, Sendable {
+		public let snapshotVersion: ProfileSnapshotVersion
+		public let creatingDevice: UUID
+		public let lastModified: Date
+		public let totalPersonas: UInt16
+		public let totalAccounts: UInt16
+		public let lastUsedOnDevice: UUID
+	}
 }
