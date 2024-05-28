@@ -65,7 +65,14 @@ extension SelectBackup.View {
 				Text(L10n.IOSRecoverProfileBackup.Choose.title)
 					.textStyle(.body1Header)
 
-				backupsList(with: viewStore)
+				switch viewStore.status {
+				case .start, .migrating, .loading:
+					ProgressView()
+				case .loaded:
+					backupsList(with: viewStore)
+				case .failed:
+					EmptyView()
+				}
 
 				VStack(alignment: .center, spacing: .small1) {
 					selectFileInsteadButton(with: store)
