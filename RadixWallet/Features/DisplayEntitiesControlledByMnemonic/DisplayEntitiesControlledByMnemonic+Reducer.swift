@@ -71,6 +71,20 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 				mode: mode
 			)
 		}
+
+		public init(
+			accountsControlledByKeysOnSameCurve accountSet: EntitiesControlledByFactorSource.AccountsControlledByKeysOnSameCurve,
+			problems: [SecurityProblem]
+		) {
+			self.init(
+				id: .singleCurve(accountSet.id.factorSourceID, isOlympia: accountSet.id.isOlympia),
+				isMnemonicMarkedAsBackedUp: problems.isMnemonicMarkedAsBackedUp,
+				isMnemonicPresentInKeychain: problems.isMnemonicPresentInKeychain,
+				accounts: accountSet.accounts,
+				hasHiddenAccounts: !accountSet.hiddenAccounts.isEmpty,
+				mode: problems.mode
+			)
+		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -100,5 +114,29 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 				return .none
 			}
 		}
+	}
+}
+
+private extension [SecurityProblem] {
+	var isMnemonicMarkedAsBackedUp: Bool {
+		!contains(where: { item in
+			switch item {
+			case .problem3: true
+			default: false
+			}
+		})
+	}
+
+	var isMnemonicPresentInKeychain: Bool {
+		!contains(where: { item in
+			switch item {
+			case .problem9: true
+			default: false
+			}
+		})
+	}
+
+	var mode: DisplayEntitiesControlledByMnemonic.State.Mode {
+		isMnemonicPresentInKeychain ? .mnemonicCanBeDisplayed : .mnemonicNeedsImport
 	}
 }
