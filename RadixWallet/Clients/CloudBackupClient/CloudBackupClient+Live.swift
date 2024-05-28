@@ -200,7 +200,7 @@ extension CloudBackupClient {
 					}
 					let backedUpRecord = backedUpRecords.first { $0.recordID.recordName == id.uuidString }
 
-					if let backedUpRecord, let backedUp = try? extractProfile(backedUpRecord).profile, backedUp.header.lastModified >= profile.header.lastModified {
+					if let backedUpRecord, try extractProfile(backedUpRecord).profile.header.lastModified >= profile.header.lastModified {
 						return nil
 					}
 
@@ -222,7 +222,7 @@ extension CloudBackupClient {
 			},
 			loadAllProfiles: {
 				try await fetchAllProfileRecords()
-					.compactMap { try? extractProfile($0) }
+					.map(extractProfile)
 					.filter(\.profile.header.isNonEmpty)
 			}
 		)
