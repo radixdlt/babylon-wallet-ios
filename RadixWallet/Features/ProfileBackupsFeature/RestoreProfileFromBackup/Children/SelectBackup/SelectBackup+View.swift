@@ -206,7 +206,9 @@ private extension View {
 			store: destinationStore.scope(state: \.inputEncryptionPassword, action: \.inputEncryptionPassword))
 		{
 			EncryptOrDecryptProfile.View(store: $0)
-				.inNavigationStack
+				.withNavigationBar {
+					destinationStore.send(.dismiss)
+				}
 		}
 	}
 
