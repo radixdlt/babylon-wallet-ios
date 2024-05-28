@@ -71,12 +71,21 @@ extension DeviceFactorSourceClient: DependencyKey {
 			)
 		}
 
-		let isSeedPhraseNeededToRecoverAccounts: @Sendable () async throws -> Bool = {
+		let missingMnemonicEntities: @Sendable () async throws -> (accounts: [AccountAddress], personas: [IdentityAddress]) = {
 			let deviceFactorSources = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)
 			let entities = try await deviceFactorSources.asyncMap {
 				try await entitiesControlledByFactorSource($0, nil)
 			}
-			return entities.contains(where: { !$0.isMnemonicPresentInKeychain })
+
+			var accounts: [AccountAddress] = []
+			var personas: [IdentityAddress] = []
+			for entity in entities {
+				if !entity.isMnemonicPresentInKeychain {
+					accounts.append(contentsOf: entity.accounts.map(\.address))
+					personas.append(contentsOf: entity.personas.map(\.address))
+				}
+			}
+			return (accounts, personas)
 		}
 
 		let unrecoverableEntities: @Sendable () async throws -> (accounts: [AccountAddress], personas: [IdentityAddress]) = {
@@ -155,7 +164,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 					try await entitiesControlledByFactorSource($0, maybeOverridingSnapshot)
 				})
 			},
-			isSeedPhraseNeededToRecoverAccounts: isSeedPhraseNeededToRecoverAccounts,
+			missingMnemonicEntities: missingMnemonicEntities,
 			unrecoverableEntities: unrecoverableEntities
 		)
 	}()
