@@ -176,11 +176,6 @@ extension CloudBackupClient {
 			},
 			loadAllProfiles: {
 				try await fetchAllProfileRecords().map(extractProfile).filter(\.profile.isNonEmpty)
-			},
-			backupProfile: {
-				let profile = await profileStore.profile
-				let existingRecord = try? await fetchProfileRecord(.init(recordName: profile.id.uuidString))
-				return try await uploadProfileToICloud(profile, existingRecord: existingRecord)
 			}
 		)
 	}
