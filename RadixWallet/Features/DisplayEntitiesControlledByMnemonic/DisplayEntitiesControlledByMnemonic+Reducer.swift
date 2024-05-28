@@ -109,10 +109,10 @@ private extension [SecurityProblem] {
 		!contains(where: { item in
 			switch item {
 			case let .problem3(problematicAccounts, _):
-				guard let first = problematicAccounts.first else {
+				guard let first = accounts.first else {
 					return false
 				}
-				return accounts.contains(where: { $0.address.id == first.id })
+				return problematicAccounts.contains(where: { $0.id == first.address.id })
 			default:
 				return false
 			}
@@ -123,10 +123,10 @@ private extension [SecurityProblem] {
 		!contains(where: { item in
 			switch item {
 			case let .problem9(problematicAccounts, _):
-				guard let first = problematicAccounts.first else {
+				guard let first = accounts.first else {
 					return false
 				}
-				return accounts.contains(where: { $0.address.id == first.id })
+				return problematicAccounts.contains(where: { $0.id == first.address.id })
 			default:
 				return false
 			}

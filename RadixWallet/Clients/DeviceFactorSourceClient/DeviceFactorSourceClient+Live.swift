@@ -82,7 +82,9 @@ extension DeviceFactorSourceClient: DependencyKey {
 			for entity in entities {
 				if !entity.isMnemonicPresentInKeychain {
 					accounts.append(contentsOf: entity.accounts.map(\.address))
+					accounts.append(contentsOf: entity.hiddenAccounts.map(\.address))
 					personas.append(contentsOf: entity.personas.map(\.address))
+					personas.append(contentsOf: entity.hiddenPersonas.map(\.address))
 				}
 			}
 			return (accounts, personas)
@@ -98,7 +100,9 @@ extension DeviceFactorSourceClient: DependencyKey {
 			for entity in entities {
 				if !entity.isMnemonicMarkedAsBackedUp {
 					accounts.append(contentsOf: entity.accounts.map(\.address))
+					accounts.append(contentsOf: entity.hiddenAccounts.map(\.address))
 					personas.append(contentsOf: entity.personas.map(\.address))
+					personas.append(contentsOf: entity.hiddenPersonas.map(\.address))
 				}
 			}
 			return (accounts, personas)
