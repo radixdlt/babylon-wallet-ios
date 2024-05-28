@@ -98,12 +98,7 @@ extension SelectBackup.View {
 		VStack(spacing: .medium1) {
 			if let backedUpProfiles = viewStore.backedUpProfiles {
 				Selection(
-					viewStore.binding(
-						get: \.selectedProfile,
-						send: {
-							.selectedProfile($0)
-						}
-					),
+					viewStore.binding(get: \.selectedProfile) { .selectedProfile($0) },
 					from: backedUpProfiles
 				) { item in
 					cloudBackupDataCard(item, viewStore: viewStore)
