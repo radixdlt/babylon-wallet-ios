@@ -203,22 +203,18 @@ private extension View {
 
 	private func inputEncryptionPassword(with destinationStore: PresentationStoreOf<SelectBackup.Destination>) -> some View {
 		sheet(
-			store: destinationStore.scope(
-				state: \.inputEncryptionPassword,
-				action: \.inputEncryptionPassword
-			)) { store in
-				EncryptOrDecryptProfile.View(store: store)
-					.inNavigationView
-			}
+			store: destinationStore.scope(state: \.inputEncryptionPassword, action: \.inputEncryptionPassword))
+		{
+			EncryptOrDecryptProfile.View(store: $0)
+				.inNavigationStack
+		}
 	}
 
 	private func recoverWalletWithoutProfileCoordinator(with destinationStore: PresentationStoreOf<SelectBackup.Destination>) -> some View {
 		fullScreenCover(
-			store: destinationStore.scope(
-				state: \.recoverWalletWithoutProfileCoordinator,
-				action: \.recoverWalletWithoutProfileCoordinator
-			)) { store in
-				RecoverWalletWithoutProfileCoordinator.View(store: store)
-			}
+			store: destinationStore.scope(state: \.recoverWalletWithoutProfileCoordinator, action: \.recoverWalletWithoutProfileCoordinator))
+		{
+			RecoverWalletWithoutProfileCoordinator.View(store: $0)
+		}
 	}
 }
