@@ -25,22 +25,16 @@ extension CloudBackupClient {
 		@Dependency(\.secureStorageClient) var secureStorageClient
 		@Dependency(\.userDefaults) var userDefaults
 
-		let cloudContainer: CKContainer = .default()
-
-		@Sendable
-		func container() throws -> CKContainer {
-			print("•••• cloudContainer: \(cloudContainer.containerIdentifier ?? "nil")")
-			return cloudContainer
-		}
+		let container: CKContainer = .default()
 
 		@Sendable
 		func fetchProfileRecord(_ id: CKRecord.ID) async throws -> CKRecord {
-			try await container().privateCloudDatabase.record(for: id)
+			try await container.privateCloudDatabase.record(for: id)
 		}
 
 		@Sendable
 		func fetchAllProfileRecords() async throws -> [CKRecord] {
-			let records = try await container().privateCloudDatabase.records(
+			let records = try await container.privateCloudDatabase.records(
 				matching: .init(recordType: .profile, predicate: .init(value: true))
 			)
 			return try records.matchResults.map { try $0.1.get() }
@@ -80,7 +74,7 @@ extension CloudBackupClient {
 			let record = existingRecord ?? .init(recordType: .profile, recordID: .init(recordName: id.uuidString))
 			record[.content] = CKAsset(fileURL: fileURL)
 
-			let savedRecord = try await container().privateCloudDatabase.save(record)
+			let savedRecord = try await container.privateCloudDatabase.save(record)
 			try fileManager.removeItem(at: fileURL)
 
 			return savedRecord
@@ -154,11 +148,11 @@ extension CloudBackupClient {
 				}
 			},
 			deleteProfileBackup: { id in
-				try await container().privateCloudDatabase.deleteRecord(withID: .init(recordName: id.uuidString))
+				try await container.privateCloudDatabase.deleteRecord(withID: .init(recordName: id.uuidString))
 				try userDefaults.removeLastCloudBackup(for: id)
 			},
 			checkAccountStatus: {
-				try await container().accountStatus()
+				try await container.accountStatus()
 			},
 			lastBackup: { id in
 				userDefaults.lastCloudBackupValues(for: id)
