@@ -130,7 +130,6 @@ private extension ManualAccountRecoverySeedPhrase.View {
 					viewState: .init(
 						headingState: .init(
 							title: L10n.SeedPhrases.SeedPhrase.headingScan,
-							imageAsset: AssetResource.signingKey,
 							type: .scanning(selected: item.isSelected),
 							isError: false
 						),

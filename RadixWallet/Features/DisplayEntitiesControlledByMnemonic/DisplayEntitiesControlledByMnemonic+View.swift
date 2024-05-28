@@ -9,14 +9,12 @@ extension DisplayEntitiesControlledByMnemonic.State {
 				case .mnemonicCanBeDisplayed:
 					.init(
 						title: L10n.SeedPhrases.SeedPhrase.headingReveal,
-						imageAsset: AssetResource.signingKey,
 						type: .standard,
 						isError: false
 					)
 				case .mnemonicNeedsImport:
 					.init(
 						title: L10n.SecurityProblems.No9.seedPhrases,
-						imageAsset: AssetResource.error,
 						type: .standard,
 						isError: true
 					)
@@ -36,11 +34,10 @@ extension DisplayEntitiesControlledByMnemonic {
 	public struct ViewState: Equatable {
 		public struct HeadingState: Equatable {
 			public let title: String
-			public let imageAsset: ImageAsset
 			public let type: HeadingType
 			public let isError: Bool
 			var foregroundColor: Color {
-				isError ? .app.red1 : .black
+				isError ? .app.gray2 : .app.gray1
 			}
 
 			public enum HeadingType: Equatable {
@@ -121,7 +118,7 @@ extension DisplayEntitiesControlledByMnemonic {
 				if viewState.promptUserToBackUpMnemonic {
 					WarningErrorView(
 						text: L10n.SecurityProblems.No3.seedPhrases,
-						type: .error,
+						type: .warning,
 						useNarrowSpacing: true
 					)
 				}
@@ -144,7 +141,7 @@ extension DisplayEntitiesControlledByMnemonic {
 
 		private func heading(_ headingState: ViewState.HeadingState) -> some SwiftUI.View {
 			HStack {
-				Image(asset: headingState.imageAsset)
+				Image(.signingKey)
 					.resizable()
 					.renderingMode(.template)
 					.frame(.smallest)
@@ -164,7 +161,8 @@ extension DisplayEntitiesControlledByMnemonic {
 
 				switch headingState.type {
 				case .standard:
-					Image(asset: AssetResource.chevronRight)
+					Image(.chevronRight)
+						.foregroundColor(headingState.foregroundColor)
 				case let .scanning(isSelected):
 					RadioButton(appearance: .dark, state: isSelected ? .selected : .unselected)
 				}
