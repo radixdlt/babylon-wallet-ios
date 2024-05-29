@@ -123,8 +123,8 @@ public struct SecureStorageClient: Sendable {
 		deprecatedLoadDeviceID: @escaping DeprecatedLoadDeviceID,
 		deleteDeprecatedDeviceID: @escaping DeleteDeprecatedDeviceID,
 		saveRadixConnectRelaySession: @escaping SaveRadixConnectRelaySession,
-		loadRadixConnectRelaySession: @escaping loadRadixConnectRelaySession loadP2PLinks: @escaping LoadP2PLinks,
-
+		loadRadixConnectRelaySession: @escaping LoadRadixConnectRelaySession,
+		loadP2PLinks: @escaping LoadP2PLinks,
 		saveP2PLinks: @escaping SaveP2PLinks,
 		loadP2PLinksPrivateKey: @escaping LoadP2PLinksPrivateKey,
 		saveP2PLinksPrivateKey: @escaping SaveP2PLinksPrivateKey

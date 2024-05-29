@@ -682,7 +682,7 @@ extension DappInteractionFlow {
 			displayName: { () -> String? in
 				switch state.dappMetadata {
 				case let .ledger(ledger): ledger.name?.rawValue
-				case .request, .wallet: nil
+				case .request, .wallet, .deepLink: nil
 				}
 			}(),
 			referencesToAuthorizedPersonas: []

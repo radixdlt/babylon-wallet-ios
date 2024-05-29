@@ -88,7 +88,7 @@ extension SecureStorageClient: TestDependencyKey {
 		deprecatedLoadDeviceID: unimplemented("\(Self.self).deprecatedLoadDeviceID"),
 		deleteDeprecatedDeviceID: unimplemented("\(Self.self).deleteDeprecatedDeviceID"),
 		saveRadixConnectRelaySession: unimplemented("\(Self.self).saveRadixConnectRelaySession"),
-		loadRadixConnectRelaySession: unimplemented("\(Self.self).loadRadixConnectRelaySession")
+		loadRadixConnectRelaySession: unimplemented("\(Self.self).loadRadixConnectRelaySession"),
 		loadP2PLinks: unimplemented("\(Self.self).loadP2PLinks"),
 		saveP2PLinks: unimplemented("\(Self.self).saveP2PLinks"),
 		loadP2PLinksPrivateKey: unimplemented("\(Self.self).loadP2PLinksPrivateKey"),
@@ -116,7 +116,7 @@ extension SecureStorageClient: TestDependencyKey {
 		deprecatedLoadDeviceID: unimplemented("\(Self.self).deprecatedLoadDeviceID"),
 		deleteDeprecatedDeviceID: unimplemented("\(Self.self).deleteDeprecatedDeviceID"),
 		saveRadixConnectRelaySession: unimplemented("\(Self.self).saveRadixConnectRelaySession"),
-		loadRadixConnectRelaySession: unimplemented("\(Self.self).loadRadixConnectRelaySession")
+		loadRadixConnectRelaySession: unimplemented("\(Self.self).loadRadixConnectRelaySession"),
 		loadP2PLinks: unimplemented("\(Self.self).loadP2PLinks"),
 		saveP2PLinks: unimplemented("\(Self.self).saveP2PLinks"),
 		loadP2PLinksPrivateKey: unimplemented("\(Self.self).loadP2PLinksPrivateKey"),

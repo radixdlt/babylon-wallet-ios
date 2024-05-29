@@ -76,7 +76,7 @@ extension DeepLinkHandlerClient {
 
 			let browser = queryItems.first(where: { $0.name == "browser" })?.value ?? "safari"
 
-			let publicKey = try HexCodable32Bytes(hex: publicKeyItem)
+			let publicKey = try Exactly33Bytes(hex: publicKeyItem)
 
 			return try .linking(.init(origin: .webDapp(oringURL), sessionId: .init(sessionId), publicKey: .init(rawRepresentation: publicKey.data.data), browser: browser))
 		}

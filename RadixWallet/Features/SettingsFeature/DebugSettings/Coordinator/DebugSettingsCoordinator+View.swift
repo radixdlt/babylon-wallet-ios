@@ -65,7 +65,11 @@ extension DebugSettingsCoordinator.View {
 				icon: .systemImage("key"),
 				action: .debugKeychainContentsButtonTapped
 			),
-			.init(title: "Dapp linking delay", icon: .systemImage("cloud"), action: .dappLinkingDelayTapped),
+			.model(
+				title: "Dapp linking delay",
+				icon: .systemImage("cloud"),
+				action: .dappLinkingDelayTapped
+			),
 		]
 	}
 }

@@ -461,8 +461,8 @@ extension SecureStorageClient: DependencyKey {
 			deprecatedLoadDeviceID: deprecatedLoadDeviceID,
 			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID,
 			saveRadixConnectRelaySession: saveRadixConnectRelaySession,
-			loadRadixConnectRelaySession: loadRadixConnectRelaySession loadP2PLinks: loadP2PLinks,
-
+			loadRadixConnectRelaySession: loadRadixConnectRelaySession,
+			loadP2PLinks: loadP2PLinks,
 			saveP2PLinks: saveP2PLinks,
 			loadP2PLinksPrivateKey: loadP2PLinksPrivateKey,
 			saveP2PLinksPrivateKey: saveP2PLinksPrivateKey,
@@ -489,8 +489,8 @@ extension SecureStorageClient: DependencyKey {
 			deprecatedLoadDeviceID: deprecatedLoadDeviceID,
 			deleteDeprecatedDeviceID: deleteDeprecatedDeviceID,
 			saveRadixConnectRelaySession: saveRadixConnectRelaySession,
-			loadRadixConnectRelaySession: loadRadixConnectRelaySession loadP2PLinks: loadP2PLinks,
-
+			loadRadixConnectRelaySession: loadRadixConnectRelaySession,
+			loadP2PLinks: loadP2PLinks,
 			saveP2PLinks: saveP2PLinks,
 			loadP2PLinksPrivateKey: loadP2PLinksPrivateKey,
 			saveP2PLinksPrivateKey: saveP2PLinksPrivateKey
