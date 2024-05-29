@@ -16,7 +16,7 @@ extension DeviceFactorSourceClient: TestDependencyKey {
 		isAccountRecoveryNeeded: { false },
 		entitiesControlledByFactorSource: { _, _ in throw NoopError() },
 		controlledEntities: { _ in [] },
-		isSeedPhraseNeededToRecoverAccounts: { false },
+		mnemonicMissingEntities: { (accounts: [], personas: []) },
 		unrecoverableEntities: { (accounts: [], personas: []) }
 	)
 
@@ -26,7 +26,7 @@ extension DeviceFactorSourceClient: TestDependencyKey {
 		isAccountRecoveryNeeded: unimplemented("\(Self.self).isAccountRecoveryNeeded"),
 		entitiesControlledByFactorSource: unimplemented("\(Self.self).entitiesControlledByFactorSource"),
 		controlledEntities: unimplemented("\(Self.self).controlledEntities"),
-		isSeedPhraseNeededToRecoverAccounts: unimplemented("\(Self.self).isSeedPhraseNeededToRecoverAccounts"),
+		mnemonicMissingEntities: unimplemented("\(Self.self).mnemonicMissingEntities"),
 		unrecoverableEntities: unimplemented("\(Self.self).unrecoverableEntities")
 	)
 }
