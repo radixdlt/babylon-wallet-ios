@@ -138,6 +138,7 @@ extension CloudBackupClient {
 
 			return savedRecord
 		}
+		@Dependency(\.errorQueue) var errorQueue
 
 		@Sendable
 		func backupProfileAndSaveResult(_ profile: Profile) async {
@@ -146,13 +147,14 @@ extension CloudBackupClient {
 			do {
 				try await uploadProfileToICloud(profile, existingRecord: existingRecord)
 				result = .success
-			} catch CKError.accountTemporarilyUnavailable {
-				result = .temporarilyUnavailable
-			} catch CKError.notAuthenticated {
-				result = .notAuthenticated
+//			} catch CKError.accountTemporarilyUnavailable {
+//				result = .temporarilyUnavailable
+//			} catch CKError.notAuthenticated {
+//				result = .notAuthenticated
 			} catch {
 				loggerGlobal.error("Automatic cloud backup failed with error \(error)")
 				result = .failure
+				errorQueue.schedule(error)
 			}
 
 			try? userDefaults.setLastCloudBackup(result, of: profile)
