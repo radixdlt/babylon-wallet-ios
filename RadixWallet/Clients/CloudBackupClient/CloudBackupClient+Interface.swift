@@ -60,5 +60,20 @@ extension CloudBackupClient {
 		public let lastModified: Date
 		public let numberOfPersonas: UInt16
 		public let numberOfAccounts: UInt16
+
+		public init(snapshotVersion: ProfileSnapshotVersion, creatingDeviceID: UUID, lastUsedOnDeviceID: UUID, lastModified: Date, numberOfPersonas: UInt16, numberOfAccounts: UInt16) {
+			self.snapshotVersion = snapshotVersion
+			self.creatingDeviceID = creatingDeviceID
+			self.lastUsedOnDeviceID = lastUsedOnDeviceID
+			self.lastModified = lastModified.roundedToMS
+			self.numberOfPersonas = numberOfPersonas
+			self.numberOfAccounts = numberOfAccounts
+		}
+	}
+}
+
+private extension Date {
+	var roundedToMS: Date {
+		Date(timeIntervalSince1970: 0.001 * (1000 * timeIntervalSince1970).rounded())
 	}
 }
