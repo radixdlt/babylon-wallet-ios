@@ -22,9 +22,9 @@ public extension EntitySecurity {
 						}
 					}
 				}
-			}
-			.onFirstTask { @MainActor in
-				await store.send(.view(.onFirstTask)).finish()
+				.onAppear {
+					viewStore.send(.appeared)
+				}
 			}
 		}
 
