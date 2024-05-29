@@ -55,10 +55,10 @@ extension CloudBackupClient {
 
 	public struct ProfileMetadata: Hashable, Sendable {
 		public let snapshotVersion: ProfileSnapshotVersion
-		public let creatingDevice: UUID
+		public let creatingDeviceID: UUID
+		public let lastUsedOnDeviceID: UUID
 		public let lastModified: Date
-		public let totalPersonas: UInt16
-		public let totalAccounts: UInt16
-		public let lastUsedOnDevice: UUID
+		public let numberOfPersonas: UInt16
+		public let numberOfAccounts: UInt16
 	}
 }
