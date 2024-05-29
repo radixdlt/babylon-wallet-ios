@@ -18,19 +18,21 @@ public struct ClaimWallet: Sendable, FeatureReducer {
 		case transferBackButtonTapped
 	}
 
-	public enum DelegateAction: Sendable, Equatable {}
-
-	@Dependency(\.dismiss) var dismiss
+	public enum DelegateAction: Sendable, Equatable {
+		case dismiss
+	}
 
 	public init() {}
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .clearWalletButtonTapped:
-			.run { _ in await dismiss() }
+			// TODO: clear wallet
+			.send(.delegate(.dismiss))
 
 		case .transferBackButtonTapped:
-			.run { _ in await dismiss() }
+			// TODO: transfer back
+			.send(.delegate(.dismiss))
 		}
 	}
 }

@@ -36,10 +36,24 @@ private extension StoreOf<OverlayReducer> {
 private extension View {
 	func destinations(with store: StoreOf<OverlayReducer>) -> some View {
 		let destinationStore = store.destination
-		return alert(
+		return alert(with: destinationStore)
+			.claimWallet(with: destinationStore)
+	}
+
+	private func alert(with destinationStore: PresentationStoreOf<OverlayReducer.Destination>) -> some View {
+		alert(
 			store: destinationStore,
 			state: /OverlayReducer.Destination.State.alert,
 			action: OverlayReducer.Destination.Action.alert
+		)
+	}
+
+	private func claimWallet(with destinationStore: PresentationStoreOf<OverlayReducer.Destination>) -> some View {
+		fullScreenCover(
+			store: destinationStore,
+			state: /OverlayReducer.Destination.State.fullScreen,
+			action: OverlayReducer.Destination.Action.fullScreen,
+			content: { FullScreenOverlayCoordinator.View(store: $0) }
 		)
 	}
 }
