@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - Login
@@ -10,8 +11,8 @@ struct Login: Sendable, FeatureReducer {
 		var personaPrimacy: PersonaPrimacy? = nil
 
 		var personas: IdentifiedArrayOf<PersonaRow.State> = []
-		var authorizedDapp: Profile.Network.AuthorizedDapp?
-		var authorizedPersona: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple?
+		var authorizedDapp: AuthorizedDapp?
+		var authorizedPersona: AuthorizedPersonaSimple?
 
 		var selectedPersona: PersonaRow.State?
 
@@ -33,11 +34,15 @@ struct Login: Sendable, FeatureReducer {
 		case appeared
 		case selectedPersonaChanged(PersonaRow.State?)
 		case createNewPersonaButtonTapped
-		case continueButtonTapped(Profile.Network.Persona)
+		case continueButtonTapped(Persona)
 	}
 
 	enum InternalAction: Sendable, Equatable {
-		case personasLoaded(IdentifiedArrayOf<Profile.Network.Persona>, Profile.Network.AuthorizedDapp?, Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple?)
+		case personasLoaded(
+			Personas,
+			AuthorizedDapp?,
+			AuthorizedPersonaSimple?
+		)
 		case personaPrimacyDetermined(PersonaPrimacy)
 	}
 
@@ -47,9 +52,9 @@ struct Login: Sendable, FeatureReducer {
 
 	enum DelegateAction: Sendable, Equatable {
 		case continueButtonTapped(
-			Profile.Network.Persona,
-			Profile.Network.AuthorizedDapp?,
-			Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple?,
+			Persona,
+			AuthorizedDapp?,
+			AuthorizedPersonaSimple?,
 			SignedAuthChallenge?
 		)
 		case failedToSignAuthChallenge
@@ -85,7 +90,7 @@ struct Login: Sendable, FeatureReducer {
 			return .none
 
 		case let .continueButtonTapped(persona):
-			let authorizedPersona = state.authorizedDapp?.referencesToAuthorizedPersonas[id: persona.address]
+			let authorizedPersona = state.authorizedDapp?.referencesToAuthorizedPersonas.first(where: { $0.id == persona.id })
 			guard case let .withChallenge(loginWithChallenge) = state.loginRequest else {
 				return .send(.delegate(.continueButtonTapped(persona, state.authorizedDapp, authorizedPersona, nil)))
 			}
@@ -103,7 +108,7 @@ struct Login: Sendable, FeatureReducer {
 
 				let signature = try await deviceFactorSourceClient.signUsingDeviceFactorSource(
 					signerEntity: .persona(persona),
-					hashedDataToSign: authToSignResponse.payloadToHashAndSign.hash().data,
+					hashedDataToSign: authToSignResponse.payloadToHashAndSign.hash(),
 					purpose: .signAuth
 				)
 				let signedAuthChallenge = SignedAuthChallenge(challenge: challenge, entitySignatures: Set([signature]))
@@ -119,7 +124,7 @@ struct Login: Sendable, FeatureReducer {
 			return .none
 
 		case let .personasLoaded(personas, authorizedDapp, authorizedPersonaSimple):
-			let lastLoggedInPersona: Profile.Network.Persona? = if let authorizedPersonaSimple {
+			let lastLoggedInPersona: Persona? = if let authorizedPersonaSimple {
 				personas[id: authorizedPersonaSimple.identityAddress]
 			} else {
 				nil
@@ -160,12 +165,12 @@ struct Login: Sendable, FeatureReducer {
 			let personas = try await personasClient.getPersonas()
 			let authorizedDapps = try await authorizedDappsClient.getAuthorizedDapps()
 			let authorizedDapp = authorizedDapps[id: dAppDefinitionAddress]
-			let authorizedPersona: Profile.Network.AuthorizedDapp.AuthorizedPersonaSimple? = {
+			let authorizedPersona: AuthorizedPersonaSimple? = { () -> AuthorizedPersonaSimple? in
 				guard let authorizedDapp else {
 					return nil
 				}
 				return personas.reduce(into: nil) { mostRecentlyAuthorizedPersona, currentPersona in
-					guard let currentAuthorizedPersona = authorizedDapp.referencesToAuthorizedPersonas[id: currentPersona.address] else {
+					guard let currentAuthorizedPersona = authorizedDapp.referencesToAuthorizedPersonas.asIdentified()[id: currentPersona.address] else {
 						return
 					}
 					if let mostRecentlyAuthorizedPersonaCopy = mostRecentlyAuthorizedPersona {

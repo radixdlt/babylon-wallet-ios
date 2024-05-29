@@ -4,7 +4,7 @@ import SwiftUI
 extension EditPersona.State {
 	var viewState: EditPersona.ViewState {
 		.init(
-			personaLabel: persona.displayName.rawValue,
+			personaLabel: persona.displayName.value,
 			avatarURL: URL(string: "something")!,
 			// Need to disable, since broken in swiftformat 0.52.7
 			// swiftformat:disable redundantClosure
@@ -80,7 +80,7 @@ extension EditPersona {
 							.padding(.top, .medium2)
 						}
 						.padding(.horizontal, .medium1)
-						.padding(.bottom, .medium1)
+						.padding(.vertical, .medium1)
 					}
 					.scrollDismissesKeyboard(.interactively)
 					.footer {
@@ -92,8 +92,7 @@ extension EditPersona {
 								.buttonStyle(.primaryRectangular)
 						}
 					}
-					.navigationTitle(viewStore.personaLabel)
-					.navigationBarTitleDisplayMode(.inline)
+					.radixToolbar(title: viewStore.personaLabel)
 					.toolbar {
 						ToolbarItem(placement: .cancellationAction) {
 							CloseButton { viewStore.send(.closeButtonTapped) }

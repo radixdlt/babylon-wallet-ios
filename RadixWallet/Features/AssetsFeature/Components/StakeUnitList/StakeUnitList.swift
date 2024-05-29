@@ -3,8 +3,8 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 	typealias SelectedStakeClaimTokens = [OnLedgerEntity.OwnedNonFungibleResource: IdentifiedArrayOf<OnLedgerEntity.NonFungibleToken>]
 
 	public struct State: Sendable, Hashable {
-		let account: OnLedgerEntity.Account
-		var ownedStakes: IdentifiedArrayOf<OnLedgerEntity.Account.RadixNetworkStake> {
+		let account: OnLedgerEntity.OnLedgerAccount
+		var ownedStakes: IdentifiedArrayOf<OnLedgerEntity.OnLedgerAccount.RadixNetworkStake> {
 			account.poolUnitResources.radixNetworkStakes
 		}
 
@@ -16,20 +16,15 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		var selectedLiquidStakeUnits: IdentifiedArrayOf<OnLedgerEntity.OwnedFungibleResource>?
 		var selectedStakeClaimTokens: SelectedStakeClaimTokens?
 
-		@PresentationState
-		var destination: Destination.State?
-
 		init(
-			account: OnLedgerEntity.Account,
+			account: OnLedgerEntity.OnLedgerAccount,
 			selectedLiquidStakeUnits: IdentifiedArrayOf<OnLedgerEntity.OwnedFungibleResource>?,
 			selectedStakeClaimTokens: SelectedStakeClaimTokens?,
-			stakeUnitDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>>,
-			destination: Destination.State? = nil
+			stakeUnitDetails: Loadable<IdentifiedArrayOf<OnLedgerEntitiesClient.OwnedStakeDetails>>
 		) {
 			self.account = account
 			self.selectedLiquidStakeUnits = selectedLiquidStakeUnits
 			self.selectedStakeClaimTokens = selectedStakeClaimTokens
-			self.destination = destination
 
 			switch stakeUnitDetails {
 			case .idle, .loading:
@@ -119,29 +114,12 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 		case didTapClaimAllStakes
 	}
 
-	public struct Destination: DestinationReducer {
-		public enum State: Sendable, Hashable {
-			case details(LSUDetails.State)
-			case stakeClaimDetails(NonFungibleTokenDetails.State)
-		}
+	public enum DelegateAction: Sendable, Equatable {
+		case selected(Selection)
 
-		public enum Action: Sendable, Equatable {
-			case details(LSUDetails.Action)
-			case stakeClaimDetails(NonFungibleTokenDetails.Action)
-		}
-
-		public var body: some ReducerOf<Self> {
-			Scope(
-				state: /State.details,
-				action: /Action.details,
-				child: LSUDetails.init
-			)
-
-			Scope(
-				state: /State.stakeClaimDetails,
-				action: /Action.stakeClaimDetails,
-				child: NonFungibleTokenDetails.init
-			)
+		public enum Selection: Sendable, Equatable {
+			case unit(OnLedgerEntitiesClient.ResourceWithVaultAmount, details: OnLedgerEntitiesClient.OwnedStakeDetails)
+			case claim(OnLedgerEntity.Resource, claim: OnLedgerEntitiesClient.StakeClaim)
 		}
 	}
 
@@ -150,15 +128,6 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 
 	public init() {}
-
-	public var body: some ReducerOf<Self> {
-		Reduce(core)
-			.ifLet(destinationPath, action: /Action.destination) {
-				Destination()
-			}
-	}
-
-	private let destinationPath: WritableKeyPath<State, PresentationState<Destination.State>> = \.$destination
 
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
@@ -182,19 +151,8 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 				else {
 					return .none
 				}
-				state.destination = .details(
-					.init(
-						validator: stakeDetails.validator,
-						stakeUnitResource: stakeUnitResource,
-						xrdRedemptionValue: .init(
-							nominalAmount: stakeDetails.xrdRedemptionValue,
-							fiatWorth: stakeUnitResource.amount.fiatWorth
-						)
-					)
-				)
+				return .send(.delegate(.selected(.unit(stakeUnitResource, details: stakeDetails))))
 			}
-
-			return .none
 
 		case let .didTapStakeClaimNFT(stakeClaim):
 			guard let stakedValidator = state.stakedValidators[id: stakeClaim.validatorAddress] else {
@@ -221,15 +179,7 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 			guard let stakeClaimTokens = stakedValidator.stakeDetails.stakeClaimTokens else {
 				return .none
 			}
-
-			state.destination = .stakeClaimDetails(.init(
-				resourceAddress: stakeClaimTokens.resource.resourceAddress,
-				resourceDetails: .success(stakeClaimTokens.resource),
-				token: stakeClaim.token,
-				ledgerState: stakeClaimTokens.resource.atLedgerState,
-				stakeClaim: stakeClaim
-			))
-			return .none
+			return .send(.delegate(.selected(.claim(stakeClaimTokens.resource, claim: stakeClaim))))
 
 		case let .didTapClaimAll(validatorAddress):
 			guard let stakeClaimTokens = state.stakedValidators[id: validatorAddress]?.stakeDetails.stakeClaimTokens,
@@ -274,33 +224,6 @@ public struct StakeUnitList: Sendable, FeatureReducer {
 					)
 				}
 			)
-		}
-	}
-
-	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
-		switch presentedAction {
-		case let .stakeClaimDetails(.delegate(.tappedClaimStake(resourceAddress, stakeClaim))):
-
-			guard let nonFungibleResourceAddress = try? NonFungibleResourceAddress(validatingAddress: resourceAddress.address) else {
-				return .none
-			}
-
-			state.destination = nil
-
-			return sendStakeClaimTransaction(
-				state.account.address,
-				stakeClaims: [
-					//					.init(
-//						validatorAddress: stakeClaim.validatorAddress,
-//						resourceAddress: nonFungibleResourceAddress,
-//						ids: .init(stakeClaim.id.nonFungibleLocalId),
-//						amount: stakeClaim.claimAmount.nominalAmount
-//					),
-					stakeClaim.intoSargon(),
-				]
-			)
-		case .stakeClaimDetails, .details:
-			return .none
 		}
 	}
 

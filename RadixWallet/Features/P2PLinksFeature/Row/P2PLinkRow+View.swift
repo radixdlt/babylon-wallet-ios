@@ -60,7 +60,12 @@ struct P2PLinkRow_Preview: PreviewProvider {
 		P2PLinkRow.View(
 			store: .init(
 				initialState: .init(link:
-					.init(connectionPassword: .placeholder, displayName: "Test")
+					.init(
+						connectionPassword: .sample,
+						connectionPurpose: .general,
+						publicKey: .sample,
+						displayName: "Test"
+					)
 				),
 				reducer: P2PLinkRow.init
 			)

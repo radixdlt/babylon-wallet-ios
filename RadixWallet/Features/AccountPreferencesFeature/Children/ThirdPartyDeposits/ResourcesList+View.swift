@@ -61,8 +61,7 @@ extension ResourcesList {
 				.padding(.top, .medium1)
 				.background(.app.gray5)
 				.destinations(with: store)
-				.navigationTitle(viewStore.mode.navigationTitle)
-				.defaultNavBarConfig()
+				.radixToolbar(title: viewStore.mode.navigationTitle)
 				.footer {
 					Button(viewStore.mode.addButtonTitle) {
 						viewStore.send(.addAssetTapped)
@@ -89,7 +88,7 @@ extension ResourcesList.View {
 						send: { .exceptionListChanged($0) }
 					)
 				) {
-					ForEach(ThirdPartyDeposits.DepositAddressExceptionRule.allCases, id: \.self) {
+					ForEach(DepositAddressExceptionRule.allCases, id: \.self) {
 						Text($0.text)
 					}
 				}
@@ -165,31 +164,30 @@ private extension StoreOf<ResourcesList> {
 
 @MainActor
 private extension View {
-	func destinations(with store: StoreOf<ResourcesList>) -> some View {
+	func destinations(
+		with store: StoreOf<ResourcesList>
+	) -> some View {
 		let destinationStore = store.destination
 		return addAsset(with: destinationStore)
 			.confirmDeletionAlert(with: destinationStore)
 	}
 
-	private func addAsset(with destinationStore: PresentationStoreOf<ResourcesList.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /ResourcesList.Destination.State.addAsset,
-			action: ResourcesList.Destination.Action.addAsset,
-			content: { AddAsset.View(store: $0) }
-		)
+	private func addAsset(
+		with destinationStore: PresentationStoreOf<ResourcesList.Destination>
+	) -> some View {
+		sheet(store: destinationStore.scope(state: \.addAsset, action: \.addAsset)) {
+			AddAsset.View(store: $0)
+		}
 	}
 
-	private func confirmDeletionAlert(with destinationStore: PresentationStoreOf<ResourcesList.Destination>) -> some View {
-		alert(
-			store: destinationStore,
-			state: /ResourcesList.Destination.State.confirmAssetDeletion,
-			action: ResourcesList.Destination.Action.confirmAssetDeletion
-		)
+	private func confirmDeletionAlert(
+		with destinationStore: PresentationStoreOf<ResourcesList.Destination>
+	) -> some View {
+		alert(store: destinationStore.scope(state: \.confirmAssetDeletion, action: \.confirmAssetDeletion))
 	}
 }
 
-extension ThirdPartyDeposits.DepositAddressExceptionRule {
+extension DepositAddressExceptionRule {
 	var text: String {
 		switch self {
 		case .allow:
@@ -226,10 +224,10 @@ extension ResourceViewState.Address {
 		case let .assetException(exception):
 			.address(.resource(exception.address))
 
-		case let .allowedDepositor(.resourceAddress(resourceAddress)):
+		case let .allowedDepositor(.resource(resourceAddress)):
 			.address(.resource(resourceAddress))
 
-		case let .allowedDepositor(.nonFungibleGlobalID(nonFungibleGlobalID)):
+		case let .allowedDepositor(.nonFungible(nonFungibleGlobalID)):
 			.address(.nonFungibleGlobalID(nonFungibleGlobalID))
 		}
 	}

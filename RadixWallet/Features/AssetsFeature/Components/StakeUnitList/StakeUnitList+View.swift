@@ -48,11 +48,10 @@ public extension StakeUnitList {
 			.onAppear {
 				store.send(.view(.appeared))
 			}
-			.destinations(with: store)
 		}
 
 		@ViewBuilder
-		private func loadingView(_ ownedStakes: IdentifiedArrayOf<OnLedgerEntity.Account.RadixNetworkStake>) -> some SwiftUI.View {
+		private func loadingView(_ ownedStakes: IdentifiedArrayOf<OnLedgerEntity.OnLedgerAccount.RadixNetworkStake>) -> some SwiftUI.View {
 			Section {
 				shimmeringLoadingView()
 			} header: {
@@ -67,7 +66,7 @@ public extension StakeUnitList {
 		}
 
 		@ViewBuilder
-		private func loadedView(_ ownedStakes: IdentifiedArrayOf<OnLedgerEntity.Account.RadixNetworkStake>) -> some SwiftUI.View {
+		private func loadedView(_ ownedStakes: IdentifiedArrayOf<OnLedgerEntity.OnLedgerAccount.RadixNetworkStake>) -> some SwiftUI.View {
 			Section {
 				shimmeringLoadingView()
 			} header: {
@@ -108,41 +107,5 @@ public extension StakeUnitList {
 			.rowStyle()
 			.padding(.bottom, .small2)
 		}
-	}
-}
-
-private extension StoreOf<StakeUnitList> {
-	var destination: PresentationStoreOf<StakeUnitList.Destination> {
-		func scopeState(state: State) -> PresentationState<StakeUnitList.Destination.State> {
-			state.$destination
-		}
-		return scope(state: scopeState, action: Action.destination)
-	}
-}
-
-@MainActor
-private extension View {
-	func destinations(with store: StoreOf<StakeUnitList>) -> some View {
-		let destinationStore = store.destination
-		return lsuDetails(with: destinationStore)
-			.stakeClaimNFTDetails(with: destinationStore)
-	}
-
-	private func lsuDetails(with destinationStore: PresentationStoreOf<StakeUnitList.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /StakeUnitList.Destination.State.details,
-			action: StakeUnitList.Destination.Action.details,
-			content: { LSUDetails.View(store: $0) }
-		)
-	}
-
-	private func stakeClaimNFTDetails(with destinationStore: PresentationStoreOf<StakeUnitList.Destination>) -> some View {
-		sheet(
-			store: destinationStore,
-			state: /StakeUnitList.Destination.State.stakeClaimDetails,
-			action: StakeUnitList.Destination.Action.stakeClaimDetails,
-			content: { NonFungibleTokenDetails.View(store: $0) }
-		)
 	}
 }

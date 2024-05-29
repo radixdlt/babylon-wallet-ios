@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 typealias RequestEnvelope = DappInteractionClient.RequestEnvelope
@@ -151,7 +152,7 @@ struct DappInteractor: Sendable, FeatureReducer {
 			}
 		case .moveToForeground:
 			return .run { _ in
-				_ = await radixConnectClient.loadFromProfileAndConnectAll()
+				_ = await radixConnectClient.loadP2PLinksAndConnectAll()
 			}
 		}
 	}
@@ -448,7 +449,7 @@ extension DappInteractionClient.ValidatedDappRequest.InvalidRequestReason {
 	}
 
 	private func networkName(for networkID: NetworkID) -> String {
-		(try? Radix.Network.lookupBy(id: networkID).displayDescription) ?? String(describing: networkID)
+		Gateway.forNetwork(id: networkID).network.displayDescription
 	}
 }
 

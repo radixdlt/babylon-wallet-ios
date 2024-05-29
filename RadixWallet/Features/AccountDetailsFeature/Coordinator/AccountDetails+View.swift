@@ -8,8 +8,7 @@ extension AccountDetails.State {
 			appearanceID: account.appearanceID,
 			displayName: account.displayName.rawValue,
 			mnemonicHandlingCallToAction: mnemonicHandlingCallToAction,
-			isLedgerAccount: account.isLedgerAccount,
-			showToolbar: destination == nil,
+			isLedgerAccount: account.isLedgerControlled,
 			totalFiatWorth: showFiatWorth ? assets.totalFiatWorth : nil,
 			account: account
 		)
@@ -20,13 +19,12 @@ extension AccountDetails.State {
 extension AccountDetails {
 	public struct ViewState: Equatable {
 		let accountAddress: AccountAddress
-		let appearanceID: Profile.Network.Account.AppearanceID
+		let appearanceID: AppearanceID
 		let displayName: String
 		let mnemonicHandlingCallToAction: MnemonicHandling?
 		let isLedgerAccount: Bool
-		let showToolbar: Bool
 		let totalFiatWorth: Loadable<FiatWorth>?
-		let account: Profile.Network.Account
+		let account: Account
 	}
 
 	@MainActor
@@ -49,24 +47,26 @@ extension AccountDetails {
 				.task {
 					viewStore.send(.task)
 				}
-				.navigationTitle(viewStore.displayName)
-				.navigationBarTitleColor(.white)
 				.toolbar {
-					if viewStore.showToolbar {
-						ToolbarItem(placement: .navigationBarLeading) {
-							BackButton {
-								viewStore.send(.backButtonTapped)
-							}
-							.foregroundColor(.app.white)
-						}
+					ToolbarItem(placement: .principal) {
+						Text(viewStore.displayName)
+							.foregroundColor(.white)
+							.textStyle(.body1Header)
+					}
 
-						ToolbarItem(placement: .navigationBarTrailing) {
-							Button(asset: AssetResource.ellipsis) {
-								viewStore.send(.preferencesButtonTapped)
-							}
-							.frame(.small)
-							.foregroundColor(.app.white)
+					ToolbarItem(placement: .navigationBarLeading) {
+						BackButton {
+							viewStore.send(.backButtonTapped)
 						}
+						.foregroundColor(.app.white)
+					}
+
+					ToolbarItem(placement: .navigationBarTrailing) {
+						Button(asset: AssetResource.ellipsis) {
+							viewStore.send(.preferencesButtonTapped)
+						}
+						.frame(.small)
+						.foregroundColor(.app.white)
 					}
 				}
 			}
@@ -182,6 +182,11 @@ private extension View {
 		return preferences(with: destinationStore)
 			.history(with: destinationStore)
 			.transfer(with: destinationStore)
+			.fungibleDetails(with: destinationStore)
+			.nonFungibleDetails(with: destinationStore)
+			.stakeUnitDetails(with: destinationStore)
+			.stakeClaimDetails(with: destinationStore)
+			.poolUnitDetails(with: destinationStore)
 	}
 
 	private func preferences(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
@@ -199,6 +204,36 @@ private extension View {
 	private func transfer(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
 		fullScreenCover(store: destinationStore.scope(state: \.transfer, action: \.transfer)) {
 			AssetTransfer.SheetView(store: $0)
+		}
+	}
+
+	private func fungibleDetails(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.fungibleDetails, action: \.fungibleDetails)) {
+			FungibleTokenDetails.View(store: $0)
+		}
+	}
+
+	private func nonFungibleDetails(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.nonFungibleDetails, action: \.nonFungibleDetails)) {
+			NonFungibleTokenDetails.View(store: $0)
+		}
+	}
+
+	private func stakeUnitDetails(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.stakeUnitDetails, action: \.stakeUnitDetails)) {
+			LSUDetails.View(store: $0)
+		}
+	}
+
+	private func stakeClaimDetails(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.stakeClaimDetails, action: \.stakeClaimDetails)) {
+			NonFungibleTokenDetails.View(store: $0)
+		}
+	}
+
+	private func poolUnitDetails(with destinationStore: PresentationStoreOf<AccountDetails.Destination>) -> some View {
+		sheet(store: destinationStore.scope(state: \.poolUnitDetails, action: \.poolUnitDetails)) {
+			PoolUnitDetails.View(store: $0)
 		}
 	}
 }

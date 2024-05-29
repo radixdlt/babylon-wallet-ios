@@ -25,10 +25,10 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 
 		/// Create new Profile or add accounts
 		public enum Purpose: Sendable, Hashable {
-			case createProfile(PrivateHDFactorSource)
+			case createProfile(PrivateHierarchicalDeterministicFactorSource)
 
 			case addAccounts(
-				factorSourceID: FactorSourceID.FromHash,
+				factorSourceID: FactorSourceIDFromHash,
 				olympia: Bool
 			)
 		}
@@ -124,8 +124,7 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 				return .none
 			}
 
-		case .accountRecoveryScanInProgress(.delegate(.failed)),
-		     .accountRecoveryScanInProgress(.delegate(.close)):
+		case .accountRecoveryScanInProgress(.delegate(.close)):
 			return .send(.delegate(.dismissed))
 
 		case .selectInactiveAccountsToAdd(.delegate(.goBack)):
@@ -142,10 +141,10 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 
 	private func completed(
 		purpose: State.Purpose,
-		active: IdentifiedArrayOf<Profile.Network.Account>,
-		inactive: IdentifiedArrayOf<Profile.Network.Account>
+		active: IdentifiedArrayOf<Account>,
+		inactive: IdentifiedArrayOf<Account>
 	) -> Effect<Action> {
-		let sortedAccounts: IdentifiedArrayOf<Profile.Network.Account> = { () -> IdentifiedArrayOf<Profile.Network.Account> in
+		let sortedAccounts: Accounts = { () -> IdentifiedArrayOf<Account> in
 			var accounts = active
 			accounts.append(contentsOf: inactive)
 			accounts.sort() // by index
@@ -173,7 +172,9 @@ public struct AccountRecoveryScanCoordinator: Sendable, FeatureReducer {
 		case .addAccounts:
 			return .run { send in
 				let result = await TaskResult<EqVoid> {
-					try await accountsClient.saveVirtualAccounts(Array(sortedAccounts))
+					try await accountsClient.saveVirtualAccounts(
+						sortedAccounts
+					)
 				}
 				await send(.internal(.addAccountsToExistingProfileResult(result)))
 			}

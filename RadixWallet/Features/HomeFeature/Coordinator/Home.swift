@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - Home
@@ -17,9 +18,29 @@ public struct Home: Sendable, FeatureReducer {
 
 		// MARK: - Destination
 		@PresentationState
-		public var destination: Destination.State? = nil
+		public var destination: Destination.State? = nil {
+			didSet {
+				guard destination == nil else { return }
+				showNextDestination()
+			}
+		}
+
+		private var destinationsQueue: [Destination.State] = []
 
 		public init() {}
+
+		public mutating func addDestination(_ destination: Destination.State) {
+			if self.destination == nil {
+				self.destination = destination
+			} else {
+				destinationsQueue.append(destination)
+			}
+		}
+
+		public mutating func showNextDestination() {
+			guard !destinationsQueue.isEmpty else { return }
+			destination = destinationsQueue.removeFirst()
+		}
 	}
 
 	public enum ViewAction: Sendable, Equatable {
@@ -35,14 +56,15 @@ public struct Home: Sendable, FeatureReducer {
 
 	public enum InternalAction: Sendable, Equatable {
 		public typealias HasAccessToMnemonic = Bool
-		case accountsLoadedResult(TaskResult<IdentifiedArrayOf<Profile.Network.Account>>)
-		case exportMnemonic(account: Profile.Network.Account)
+		case accountsLoadedResult(TaskResult<Accounts>)
+		case exportMnemonic(account: Account)
 		case importMnemonic
 		case loadedShouldWriteDownPersonasSeedPhrase(Bool)
-		case currentGatewayChanged(to: Radix.Gateway)
+		case currentGatewayChanged(to: Gateway)
 		case shouldShowNPSSurvey(Bool)
-		case accountsResourcesLoaded(Loadable<[OnLedgerEntity.Account]>)
+		case accountsResourcesLoaded(Loadable<[OnLedgerEntity.OnLedgerAccount]>)
 		case accountsFiatWorthLoaded([AccountAddress: Loadable<FiatWorth>])
+		case showLinkConnectorIfNeeded
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -61,6 +83,7 @@ public struct Home: Sendable, FeatureReducer {
 			case exportMnemonic(ExportMnemonic.State)
 			case acknowledgeJailbreakAlert(AlertState<Action.AcknowledgeJailbreakAlert>)
 			case npsSurvey(NPSSurvey.State)
+			case relinkConnector(NewConnection.State)
 		}
 
 		public enum Action: Sendable, Equatable {
@@ -70,6 +93,7 @@ public struct Home: Sendable, FeatureReducer {
 			case exportMnemonic(ExportMnemonic.Action)
 			case acknowledgeJailbreakAlert(AcknowledgeJailbreakAlert)
 			case npsSurvey(NPSSurvey.Action)
+			case relinkConnector(NewConnection.Action)
 
 			public enum AcknowledgeJailbreakAlert: Sendable, Hashable {}
 		}
@@ -90,6 +114,9 @@ public struct Home: Sendable, FeatureReducer {
 			Scope(state: /State.npsSurvey, action: /Action.npsSurvey) {
 				NPSSurvey()
 			}
+			Scope(state: /State.relinkConnector, action: /Action.relinkConnector) {
+				NewConnection()
+			}
 		}
 	}
 
@@ -103,6 +130,7 @@ public struct Home: Sendable, FeatureReducer {
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.npsSurveyClient) var npsSurveyClient
 	@Dependency(\.overlayWindowClient) var overlayWindowClient
+	@Dependency(\.radixConnectClient) var radixConnectClient
 
 	public init() {}
 
@@ -122,13 +150,15 @@ public struct Home: Sendable, FeatureReducer {
 		switch viewAction {
 		case .onFirstAppear:
 			if iOSSecurityClient.isJailbroken() {
-				state.destination = .acknowledgeJailbreakAlert(.init(
-					title: .init(L10n.Splash.RootDetection.titleIOS),
-					message: .init(L10n.Splash.RootDetection.messageIOS),
-					buttons: [
-						.cancel(.init(L10n.Splash.RootDetection.acknowledgeButton)),
-					]
-				))
+				state.addDestination(
+					.acknowledgeJailbreakAlert(.init(
+						title: .init(L10n.Splash.RootDetection.titleIOS),
+						message: .init(L10n.Splash.RootDetection.messageIOS),
+						buttons: [
+							.cancel(.init(L10n.Splash.RootDetection.acknowledgeButton)),
+						]
+					))
+				)
 			}
 			return .none
 
@@ -149,6 +179,7 @@ public struct Home: Sendable, FeatureReducer {
 			.merge(with: loadNPSSurveyStatus())
 			.merge(with: loadAccountResources())
 			.merge(with: loadFiatValues())
+			.merge(with: delayedMediumEffect(for: .internal(.showLinkConnectorIfNeeded)))
 
 		case .createAccountButtonTapped:
 			state.destination = .createAccount(
@@ -234,7 +265,7 @@ public struct Home: Sendable, FeatureReducer {
 			return .none
 		case let .shouldShowNPSSurvey(shouldShow):
 			if shouldShow {
-				state.destination = .npsSurvey(.init())
+				state.addDestination(.npsSurvey(.init()))
 			}
 			return .none
 		case let .accountsFiatWorthLoaded(fiatWorths):
@@ -244,6 +275,20 @@ public struct Home: Sendable, FeatureReducer {
 				}
 			}
 			state.totalFiatWorth = state.accountRows.map(\.totalFiatWorth).reduce(+) ?? .loading
+			return .none
+		case .showLinkConnectorIfNeeded:
+			let purpose: NewConnectionApproval.State.Purpose? = if userDefaults.showRelinkConnectorsAfterProfileRestore {
+				.approveRelinkAfterProfileRestore
+			} else if userDefaults.showRelinkConnectorsAfterUpdate {
+				.approveRelinkAfterUpdate
+			} else {
+				nil
+			}
+			if let purpose {
+				state.addDestination(
+					.relinkConnector(.init(root: .connectionApproval(.init(purpose: purpose))))
+				)
+			}
 			return .none
 		}
 	}
@@ -316,16 +361,37 @@ public struct Home: Sendable, FeatureReducer {
 			state.destination = nil
 			return uploadUserFeedback(userFeedback)
 
+		case let .relinkConnector(.delegate(.newConnection(connectedClient))):
+			state.destination = nil
+			userDefaults.setShowRelinkConnectorsAfterProfileRestore(false)
+			userDefaults.setShowRelinkConnectorsAfterUpdate(false)
+			return .run { _ in
+				try await radixConnectClient.updateOrAddP2PLink(connectedClient)
+			} catch: { error, _ in
+				loggerGlobal.error("Failed P2PLink, error \(error)")
+				errorQueue.schedule(error)
+			}
+
 		default:
 			return .none
 		}
 	}
 
 	public func reduceDismissedDestination(into state: inout State) -> Effect<Action> {
-		if case .npsSurvey = state.destination {
-			return uploadUserFeedback(nil)
+		var effect: Effect<Action>?
+
+		switch state.destination {
+		case .npsSurvey:
+			effect = uploadUserFeedback(nil)
+		case .relinkConnector:
+			userDefaults.setShowRelinkConnectorsAfterProfileRestore(false)
+			userDefaults.setShowRelinkConnectorsAfterUpdate(false)
+		default:
+			break
 		}
-		return .none
+
+		state.showNextDestination()
+		return effect ?? .none
 	}
 
 	private func dismissAccountDetails(then internalAction: InternalAction, _ state: inout State) -> Effect<Action> {
@@ -338,7 +404,7 @@ public struct Home: Sendable, FeatureReducer {
 		return .none
 	}
 
-	private func exportMnemonic(controlling account: Profile.Network.Account, state: inout State) -> Effect<Action> {
+	private func exportMnemonic(controlling account: Account, state: inout State) -> Effect<Action> {
 		exportMnemonic(
 			controlling: account,
 			onSuccess: {
@@ -389,7 +455,11 @@ public struct Home: Sendable, FeatureReducer {
 
 	private func loadAccountResources() -> Effect<Action> {
 		.run { send in
-			for try await accountResources in accountPortfoliosClient.portfolioUpdates().map { $0.map { $0.map(\.account) } }.removeDuplicates() {
+			for try await accountResources in accountPortfoliosClient
+				.portfolioUpdates()
+				.map({ updates in updates.map { update in update.map(\.account) } })
+				.removeDuplicates()
+			{
 				guard !Task.isCancelled else { return }
 				await send(.internal(.accountsResourcesLoaded(accountResources)))
 			}
@@ -421,7 +491,7 @@ public struct Home: Sendable, FeatureReducer {
 }
 
 extension Home.State {
-	public var accounts: IdentifiedArrayOf<Profile.Network.Account> {
+	public var accounts: IdentifiedArrayOf<Account> {
 		accountRows.map(\.account).asIdentified()
 	}
 

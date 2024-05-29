@@ -39,7 +39,6 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 		case task
 		case importOlympiaMnemonicButtonTapped
 		case addLedgerButtonTapped
-		case addOffDeviceMnemonicButtonTapped
 	}
 
 	public enum InternalAction: Sendable, Equatable {
@@ -78,21 +77,9 @@ public struct DebugManageFactorSources: Sendable, FeatureReducer {
 			state.destination = .importMnemonic(
 				.init(
 					persistStrategy: .init(
-						factorSourceKindOfMnemonic: .onDevice(.olympia),
+						factorSourceKindOfMnemonic: .olympia,
 						location: .intoKeychainAndProfile,
 						onMnemonicExistsStrategy: .appendWithCryptoParamaters
-					)
-				)
-			)
-			return .none
-
-		case .addOffDeviceMnemonicButtonTapped:
-			state.destination = .importMnemonic(
-				.init(
-					persistStrategy: .init(
-						factorSourceKindOfMnemonic: .offDevice,
-						location: .intoKeychainAndProfile,
-						onMnemonicExistsStrategy: .abort
 					)
 				)
 			)

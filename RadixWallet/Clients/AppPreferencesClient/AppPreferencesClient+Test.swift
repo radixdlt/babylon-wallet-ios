@@ -6,10 +6,10 @@ extension AppPreferencesClient: TestDependencyKey {
 		appPreferenceUpdates: unimplemented("\(Self.self).appPreferenceUpdates"),
 		getPreferences: unimplemented("\(Self.self).getPreferences"),
 		updatePreferences: unimplemented("\(Self.self).updatePreferences"),
-		extractProfileSnapshot: unimplemented("\(Self.self).extractProfileSnapshot"),
+		extractProfile: unimplemented("\(Self.self).extractProfile"),
 		deleteProfileAndFactorSources: unimplemented("\(Self.self).deleteProfileAndFactorSources"),
 		setIsCloudProfileSyncEnabled: unimplemented("\(Self.self).setIsCloudProfileSyncEnabled"),
-		getDetailsOfSecurityStructure: unimplemented("\(Self.self).getDetailsOfSecurityStructure")
+		setIsCloudBackupEnabled: unimplemented("\(Self.self).setIsCloudBackupEnabled")
 	)
 }
 
@@ -18,9 +18,9 @@ extension AppPreferencesClient {
 		appPreferenceUpdates: { AsyncLazySequence([]).eraseToAnyAsyncSequence() },
 		getPreferences: { .default },
 		updatePreferences: { _ in },
-		extractProfileSnapshot: { fatalError() },
+		extractProfile: { fatalError() },
 		deleteProfileAndFactorSources: { _ in },
 		setIsCloudProfileSyncEnabled: { _ in },
-		getDetailsOfSecurityStructure: { _ in throw NoopError() }
+		setIsCloudBackupEnabled: { _ in }
 	)
 }

@@ -4,7 +4,7 @@ import SwiftUI
 // MARK: - TransferAccountList
 public struct TransferAccountList: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
-		public let fromAccount: Profile.Network.Account
+		public let fromAccount: Account
 		public var receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State> {
 			didSet {
 				if receivingAccounts.count > 1, receivingAccounts[0].canBeRemoved == false {
@@ -20,12 +20,12 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		@PresentationState
 		public var destination: Destination.State?
 
-		public init(fromAccount: Profile.Network.Account, receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>) {
+		public init(fromAccount: Account, receivingAccounts: IdentifiedArrayOf<ReceivingAccount.State>) {
 			self.fromAccount = fromAccount
 			self.receivingAccounts = receivingAccounts
 		}
 
-		public init(fromAccount: Profile.Network.Account) {
+		public init(fromAccount: Account) {
 			self.init(
 				fromAccount: fromAccount,
 				receivingAccounts: [.empty(canBeRemovedWhenEmpty: false)].asIdentified()
@@ -35,6 +35,7 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 
 	public enum ViewAction: Equatable, Sendable {
 		case addAccountTapped
+		case addAssetCloseButtonTapped
 	}
 
 	@CasePathable
@@ -101,6 +102,10 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		case .addAccountTapped:
 			state.receivingAccounts.append(.empty(canBeRemovedWhenEmpty: true))
 			return .none
+
+		case .addAssetCloseButtonTapped:
+			state.destination = nil
+			return .none
 		}
 	}
 
@@ -148,10 +153,6 @@ public struct TransferAccountList: Sendable, FeatureReducer {
 		case let .addAsset(.delegate(.handleSelectedAssets(selectedAssets))):
 			state.destination = nil
 			return handleSelectedAssets(selectedAssets, id: id, state: &state)
-
-		case .addAsset(.delegate(.dismiss)):
-			state.destination = nil
-			return .none
 
 		default:
 			return .none
@@ -297,10 +298,9 @@ extension TransferAccountList {
 		_ receivingAccount: ReceivingAccount.State,
 		forAssets assets: IdentifiedArrayOf<ResourceAsset.State>
 	) -> Effect<Action> {
-		if case let .profileAccount(value: sargonUserOwnedAccount) = receivingAccount.recipient {
+		if case let .profileAccount(value: userOwnedAccount) = receivingAccount.recipient {
 			return .run { send in
 				@Dependency(\.accountsClient) var accountsClient
-				let userOwnedAccount = try await accountsClient.fromSargon(sargonUserOwnedAccount)
 				for asset in assets {
 					let resourceAddress = asset.resourceAddress
 					let signatureNeeded = await needsSignatureForDepositting(

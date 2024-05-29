@@ -44,12 +44,12 @@ public struct AccountDetails: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case dismiss
-		case exportMnemonic(controlling: Profile.Network.Account)
+		case exportMnemonic(controlling: Account)
 		case importMnemonics
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case accountUpdated(Profile.Network.Account)
+		case accountUpdated(Account)
 	}
 
 	public struct MnemonicWithPassphraseAndFactorSourceInfo: Sendable, Hashable {
@@ -63,6 +63,11 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			case preferences(AccountPreferences.State)
 			case history(TransactionHistory.State)
 			case transfer(AssetTransfer.State)
+			case fungibleDetails(FungibleTokenDetails.State)
+			case nonFungibleDetails(NonFungibleTokenDetails.State)
+			case stakeUnitDetails(LSUDetails.State)
+			case stakeClaimDetails(NonFungibleTokenDetails.State)
+			case poolUnitDetails(PoolUnitDetails.State)
 		}
 
 		@CasePathable
@@ -70,6 +75,11 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			case preferences(AccountPreferences.Action)
 			case history(TransactionHistory.Action)
 			case transfer(AssetTransfer.Action)
+			case fungibleDetails(FungibleTokenDetails.Action)
+			case nonFungibleDetails(NonFungibleTokenDetails.Action)
+			case stakeUnitDetails(LSUDetails.Action)
+			case stakeClaimDetails(NonFungibleTokenDetails.Action)
+			case poolUnitDetails(PoolUnitDetails.Action)
 		}
 
 		public var body: some Reducer<State, Action> {
@@ -82,6 +92,21 @@ public struct AccountDetails: Sendable, FeatureReducer {
 			Scope(state: \.transfer, action: \.transfer) {
 				AssetTransfer()
 			}
+			Scope(state: \.fungibleDetails, action: \.fungibleDetails) {
+				FungibleTokenDetails()
+			}
+			Scope(state: \.nonFungibleDetails, action: \.nonFungibleDetails) {
+				NonFungibleTokenDetails()
+			}
+			Scope(state: \.stakeUnitDetails, action: \.stakeUnitDetails) {
+				LSUDetails()
+			}
+			Scope(state: \.stakeClaimDetails, action: \.stakeClaimDetails) {
+				NonFungibleTokenDetails()
+			}
+			Scope(state: \.poolUnitDetails, action: \.poolUnitDetails) {
+				PoolUnitDetails()
+			}
 		}
 	}
 
@@ -90,6 +115,7 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.openURL) var openURL
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
+	@Dependency(\.dappInteractionClient) var dappInteractionClient
 
 	public init() {}
 
@@ -150,22 +176,63 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		}
 	}
 
+	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
+		switch internalAction {
+		case let .accountUpdated(account):
+			state.account = account
+			checkAccountAccessToMnemonic(state: &state)
+			return .none
+		}
+	}
+
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case .assets(.internal(.portfolioUpdated)):
 			checkAccountAccessToMnemonic(state: &state)
 			return .none
 
-		default:
-			return .none
-		}
-	}
+		case let .assets(.delegate(.selected(selection))):
+			switch selection {
+			case let .fungible(resource, isXrd):
+				state.destination = .fungibleDetails(.init(
+					resourceAddress: resource.resourceAddress,
+					ownedFungibleResource: resource,
+					isXRD: isXrd
+				))
 
-	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
-		switch internalAction {
-		case let .accountUpdated(account):
-			state.account = account
-			checkAccountAccessToMnemonic(state: &state)
+			case let .nonFungible(resource, token):
+				state.destination = .nonFungibleDetails(.init(
+					resourceAddress: resource.resourceAddress,
+					ownedResource: resource,
+					token: token,
+					ledgerState: resource.atLedgerState
+				))
+
+			case let .stakeUnit(resource, details):
+				state.destination = .stakeUnitDetails(.init(
+					validator: details.validator,
+					stakeUnitResource: resource,
+					xrdRedemptionValue: .init(
+						nominalAmount: details.xrdRedemptionValue,
+						fiatWorth: resource.amount.fiatWorth
+					)
+				))
+
+			case let .stakeClaim(resource, claim):
+				state.destination = .stakeClaimDetails(.init(
+					resourceAddress: resource.resourceAddress,
+					resourceDetails: .success(resource),
+					token: claim.token,
+					ledgerState: resource.atLedgerState,
+					stakeClaim: claim
+				))
+
+			case let .poolUnit(details):
+				state.destination = .poolUnitDetails(.init(resourcesDetails: details))
+			}
+			return .none
+
+		default:
 			return .none
 		}
 	}
@@ -179,6 +246,10 @@ public struct AccountDetails: Sendable, FeatureReducer {
 		case .preferences(.delegate(.accountHidden)):
 			return .send(.delegate(.dismiss))
 
+		case let .stakeClaimDetails(.delegate(.tappedClaimStake(stakeClaim))):
+			state.destination = nil
+			return sendStakeClaimTransaction(state.account.address, stakeClaims: [stakeClaim.intoSargon()])
+
 		default:
 			return .none
 		}
@@ -187,5 +258,21 @@ public struct AccountDetails: Sendable, FeatureReducer {
 	private func checkAccountAccessToMnemonic(state: inout State) {
 		let xrdResource = state.assets.resources.fungibleTokenList?.sections[id: .xrd]?.rows.first?.token
 		state.checkAccountAccessToMnemonic(xrdResource: xrdResource)
+	}
+
+	private func sendStakeClaimTransaction(
+		_ acccountAddress: AccountAddress,
+		stakeClaims: [StakeClaim]
+	) -> Effect<Action> {
+		.run { _ in
+			let manifest = TransactionManifest.stakesClaim(
+				accountAddress: acccountAddress,
+				stakeClaims: stakeClaims
+			)
+			_ = await dappInteractionClient.addWalletInteraction(
+				.transaction(.init(send: .init(transactionManifest: manifest))),
+				.accountTransfer
+			)
+		}
 	}
 }

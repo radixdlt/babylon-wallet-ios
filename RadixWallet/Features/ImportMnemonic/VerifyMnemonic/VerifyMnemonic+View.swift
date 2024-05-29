@@ -30,11 +30,11 @@ extension VerifyMnemonic.State {
 extension VerifyMnemonic {
 	public struct ViewState: Sendable, Equatable {
 		struct WordViewState: Sendable, Equatable, Identifiable {
-			var id: OffsetIdentified<Mnemonic.Word> {
+			var id: OffsetIdentified<BIP39Word> {
 				word
 			}
 
-			let word: OffsetIdentified<Mnemonic.Word>
+			let word: OffsetIdentified<BIP39Word>
 			let placeholder: String
 			let isDisabled: Bool
 			let displayText: String
@@ -87,7 +87,7 @@ extension VerifyMnemonic {
 				}
 				.scrollIndicators(.hidden)
 			}
-			.navigationTitle(L10n.ConfirmMnemonicBackedUp.title)
+			.radixToolbar(title: L10n.ConfirmMnemonicBackedUp.title)
 		}
 
 		@ViewBuilder

@@ -30,16 +30,13 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 		case task
 	}
 
-	public enum DelegateAction: Sendable, Equatable {
-		case dismiss
-	}
-
 	public enum InternalAction: Sendable, Equatable {
 		case resourceLoadResult(TaskResult<OnLedgerEntity.Resource>)
 	}
 
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
 	@Dependency(\.errorQueue) var errorQueue
+	@Dependency(\.dismiss) var dismiss
 
 	public init() {}
 
@@ -55,7 +52,7 @@ public struct FungibleTokenDetails: Sendable, FeatureReducer {
 				await send(.internal(.resourceLoadResult(result)))
 			}
 		case .closeButtonTapped:
-			return .send(.delegate(.dismiss))
+			return .run { _ in await dismiss() }
 		}
 	}
 

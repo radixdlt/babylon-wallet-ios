@@ -11,14 +11,18 @@ extension P2PLinksClient: TestDependencyKey {
 	public static let previewValue = Self.noop
 	public static let noop = Self(
 		getP2PLinks: { [] },
-		addP2PLink: { _ in },
+		updateOrAddP2PLink: { _ in nil },
 		deleteP2PLinkByPassword: { _ in },
-		deleteAllP2PLinks: {}
+		deleteAllP2PLinks: {},
+		getP2PLinkPrivateKey: { (.init(), false) },
+		storeP2PLinkPrivateKey: { _ in }
 	)
 	public static let testValue = Self(
 		getP2PLinks: unimplemented("\(Self.self).getP2PLinks"),
-		addP2PLink: unimplemented("\(Self.self).addP2PLink"),
+		updateOrAddP2PLink: unimplemented("\(Self.self).updateOrAddP2PLink"),
 		deleteP2PLinkByPassword: unimplemented("\(Self.self).deleteP2PLinkByPassword"),
-		deleteAllP2PLinks: unimplemented("\(Self.self).deleteAllp2pLinks")
+		deleteAllP2PLinks: unimplemented("\(Self.self).deleteAllp2pLinks"),
+		getP2PLinkPrivateKey: unimplemented("\(Self.self).getP2PLinkPrivateKey"),
+		storeP2PLinkPrivateKey: unimplemented("\(Self.self).storeP2PLinkPrivateKey")
 	)
 }

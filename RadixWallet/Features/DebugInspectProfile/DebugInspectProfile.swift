@@ -16,11 +16,8 @@ public struct DebugInspectProfile: Sendable, FeatureReducer {
 		}
 
 		public var json: String? {
-			@Dependency(\.jsonEncoder) var jsonEncoder
-			let encoder = jsonEncoder()
-			encoder.outputFormatting = [.prettyPrinted, .withoutEscapingSlashes, .sortedKeys]
 			guard
-				let json = try? encoder.encode(profile.snapshot()),
+				case let json = profile.profileSnapshot(),
 				let jsonString = String(data: json, encoding: .utf8)
 			else { return nil }
 			return jsonString

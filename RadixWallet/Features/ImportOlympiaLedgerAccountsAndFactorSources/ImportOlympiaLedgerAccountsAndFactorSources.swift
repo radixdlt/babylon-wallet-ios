@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ImportOlympiaLedgerAccountsAndFactorSources
@@ -80,7 +81,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 	public enum DelegateAction: Sendable, Equatable {
 		case failed(Failure)
-		case completed(IdentifiedArrayOf<Profile.Network.Account>)
+		case completed(IdentifiedArrayOf<Account>)
 
 		public enum Failure: Sendable, Equatable {
 			case failedToSaveNewLedger
@@ -94,7 +95,6 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 	@Dependency(\.factorSourcesClient) var factorSourcesClient
 	@Dependency(\.importLegacyWalletClient) var importLegacyWalletClient
 	@Dependency(\.ledgerHardwareWalletClient) var ledgerHardwareWalletClient
-	@Dependency(\.p2pLinksClient) var p2pLinksClient
 
 	public init() {}
 
@@ -122,7 +122,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				let ledgerInfo = try await ledgerHardwareWalletClient.getDeviceInfo()
 
 				if let ledger = try await factorSourcesClient.getFactorSource(
-					id: .init(kind: .ledgerHQHardwareWallet, hash: ledgerInfo.id.data.data),
+					id: FactorSourceID.hash(value: FactorSourceIdFromHash(kind: FactorSourceKind.ledgerHqHardwareWallet, body: Exactly32Bytes(bytes: ledgerInfo.id.data.data))),
 					as: LedgerHardwareWalletFactorSource.self
 				) {
 					await send(.internal(.useExistingLedger(ledger)))
@@ -196,15 +196,11 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 				state.destination = nil
 
 				return .run { _ in
-					try await p2pLinksClient.addP2PLink(connectedClient)
+					try await radixConnectClient.updateOrAddP2PLink(connectedClient)
 				} catch: { error, _ in
 					loggerGlobal.error("Failed P2PLink, error \(error)")
 					errorQueue.schedule(error)
 				}
-
-			case .dismiss:
-				state.destination = nil
-				return .none
 			}
 
 		case let .nameLedger(.delegate(delegateAction)):
@@ -219,7 +215,7 @@ public struct ImportOlympiaLedgerAccountsAndFactorSources: Sendable, FeatureRedu
 
 		case let .derivePublicKeys(.delegate(.derivedPublicKeys(publicKeys, factorSourceID, _))):
 			state.destination = nil
-			guard let ledgerID = factorSourceID.extract(FactorSourceID.FromHash.self) else {
+			guard let ledgerID = factorSourceID.extract(FactorSourceIDFromHash.self) else {
 				loggerGlobal.error("Failed to find ledger with factor sourceID in local state: \(factorSourceID)")
 				return .none
 			}
@@ -283,11 +279,14 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 
 		// Migrates and saved all accounts to Profile
 		let migrated = try await importLegacyWalletClient.migrateOlympiaHardwareAccountsToBabylon(
-			.init(olympiaAccounts: validatedAccounts, ledgerFactorSourceID: ledgerID)
+			.init(
+				olympiaAccounts: validatedAccounts,
+				ledgerFactorSourceID: ledgerID
+			)
 		)
 
 		// Save all accounts
-		try await accountsClient.saveVirtualAccounts(migrated.babylonAccounts.elements)
+		try await accountsClient.saveVirtualAccounts(migrated.babylonAccounts)
 
 		loggerGlobal.notice("Converted #\(migrated.accounts.count) accounts to babylon! ✅")
 
@@ -306,8 +305,8 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 			)
 		}
 
-		let derivedKeys: [K1.PublicKey] = derivedPublicKeys.compactMap {
-			guard case let .ecdsaSecp256k1(k1Key) = $0.publicKey else {
+		let derivedKeys: [Secp256k1PublicKey] = derivedPublicKeys.compactMap {
+			guard case let .secp256k1(k1Key) = $0.publicKey else {
 				return nil
 			}
 			return k1Key
@@ -320,7 +319,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 		}
 
 		if olympiaAccountsToMigrate.isEmpty, !olympiaAccountsToValidate.isEmpty, !derivedKeys.isEmpty {
-			loggerGlobal.critical("Invalid keys from export format?\nderivedKeys: \(derivedKeys.map { $0.compressedRepresentation.hex() })\nolympiaAccountsToValidate:\(olympiaAccountsToValidate.map(\.publicKey.compressedRepresentation.hex))")
+			loggerGlobal.critical("Invalid keys from export format?\nderivedKeys: \(derivedKeys.map(\.hex))\nolympiaAccountsToValidate:\(olympiaAccountsToValidate.map(\.publicKey.hex))")
 		}
 
 		guard
@@ -343,7 +342,7 @@ extension ImportOlympiaLedgerAccountsAndFactorSources {
 	}
 }
 
-extension LedgerHardwareWalletFactorSource.DeviceModel {
+extension LedgerHardwareWalletModel {
 	init(model: P2P.LedgerHardwareWallet.Model) {
 		switch model {
 		case .nanoS: self = .nanoS
@@ -368,10 +367,10 @@ extension DerivePublicKeys.State {
 	fileprivate init(ledger: LedgerHardwareWalletFactorSource, olympiaAccounts: Set<OlympiaAccountToMigrate>, networkID: NetworkID) {
 		self.init(
 			derivationPathOption: .knownPaths(
-				olympiaAccounts.map { $0.path.wrapAsDerivationPath() },
+				olympiaAccounts.map(\.path.asDerivationPath),
 				networkID: networkID
 			),
-			factorSourceOption: .specific(ledger.embed()),
+			factorSourceOption: .specific(ledger.asGeneral),
 			purpose: .importLegacyAccounts
 		)
 	}

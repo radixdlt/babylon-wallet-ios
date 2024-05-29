@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - PersonaDetails
@@ -18,14 +19,14 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		public var mode: Mode
 
 		public enum Mode: Sendable, Hashable {
-			case general(Profile.Network.Persona, dApps: IdentifiedArrayOf<DappInfo>)
+			case general(Persona, dApps: IdentifiedArrayOf<DappInfo>)
 
 			case dApp(
-				Profile.Network.AuthorizedDappDetailed,
-				persona: Profile.Network.AuthorizedPersonaDetailed
+				AuthorizedDappDetailed,
+				persona: AuthorizedPersonaDetailed
 			)
 
-			var id: Profile.Network.Persona.ID {
+			var id: Persona.ID {
 				switch self {
 				case let .general(persona, _): persona.id
 				case let .dApp(_, persona: persona): persona.id
@@ -34,14 +35,14 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		}
 
 		public struct DappInfo: Sendable, Hashable, Identifiable {
-			public let id: Profile.Network.AuthorizedDapp.ID
+			public let id: AuthorizedDapp.ID
 			public var thumbnail: URL?
 			public let displayName: String
 
-			public init(dApp: Profile.Network.AuthorizedDapp) {
+			public init(dApp: AuthorizedDapp) {
 				self.id = dApp.id
 				self.thumbnail = nil
-				self.displayName = dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName
+				self.displayName = dApp.displayName ?? L10n.DAppRequest.Metadata.unknownName
 			}
 		}
 
@@ -61,7 +62,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public enum ViewAction: Sendable, Equatable {
 		case appeared
-		case dAppTapped(Profile.Network.AuthorizedDapp.ID)
+		case dAppTapped(AuthorizedDapp.ID)
 		case editPersonaTapped
 		case editAccountSharingTapped
 		case deauthorizePersonaTapped
@@ -70,17 +71,17 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case personaDeauthorized
-		case personaChanged(Profile.Network.Persona.ID)
+		case personaChanged(Persona.ID)
 		case personaHidden
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case editablePersonaFetched(Profile.Network.Persona)
+		case editablePersonaFetched(Persona)
 		case reloaded(State.Mode)
 		case dAppsUpdated(IdentifiedArrayOf<State.DappInfo>)
 		case callDone(updateControlState: WritableKeyPath<State, ControlState>, changeTo: ControlState)
 		case hideLoader(updateControlState: WritableKeyPath<State, ControlState>)
-		case dAppLoaded(Profile.Network.AuthorizedDappDetailed)
+		case dAppLoaded(AuthorizedDappDetailed)
 	}
 
 	// MARK: - Destination
@@ -189,7 +190,6 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 			case .general:
 				state.destination = .editPersona(.init(mode: .edit, persona: persona))
 			case let .dApp(_, detailedPersona):
-				// TODO: This should be tested
 				let required = Set(detailedPersona.sharedPersonaData.entries.map(\.value.discriminator))
 				state.destination = .editPersona(.init(mode: .dapp(requiredEntries: required), persona: persona))
 			}
@@ -235,7 +235,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 
 		case .confirmForgetAlert(.confirmTapped):
 			guard case let .dApp(dApp, persona: persona) = state.mode else { return .none }
-			let (personaID, dAppID, networkID) = (persona.id, dApp.dAppDefinitionAddress, dApp.networkID)
+			let (personaID, dAppID, networkID) = (persona.id, dApp.dAppDefinitionAddress, dApp.networkId)
 			return .run { send in
 				try await authorizedDappsClient.deauthorizePersonaFromDapp(personaID, dAppID, networkID)
 				await send(.delegate(.personaDeauthorized))
@@ -277,7 +277,8 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 		switch mode {
 		case let .dApp(dApp, persona: persona):
 			let updatedDapp = try await authorizedDappsClient.getDetailedDapp(dApp.dAppDefinitionAddress)
-			guard let updatedPersona = updatedDapp.detailedAuthorizedPersonas[id: persona.id] else {
+			let identifiedDetailedAuthorizedPersonas = updatedDapp.detailedAuthorizedPersonas.asIdentified()
+			guard let updatedPersona = identifiedDetailedAuthorizedPersonas[id: persona.id] else {
 				throw ReloadError.personaNotPresentInDapp(persona.id, updatedDapp.dAppDefinitionAddress)
 			}
 			return .dApp(updatedDapp, persona: updatedPersona)
@@ -322,7 +323,7 @@ public struct PersonaDetails: Sendable, FeatureReducer {
 	}
 
 	enum ReloadError: Error {
-		case personaNotPresentInDapp(Profile.Network.Persona.ID, Profile.Network.AuthorizedDapp.ID)
+		case personaNotPresentInDapp(Persona.ID, AuthorizedDapp.ID)
 	}
 }
 

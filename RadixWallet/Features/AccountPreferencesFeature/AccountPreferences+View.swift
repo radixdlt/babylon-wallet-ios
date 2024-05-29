@@ -45,7 +45,7 @@ extension AccountPreferences.State {
 extension AccountPreferences {
 	public struct ViewState: Equatable {
 		typealias Section = PreferenceSection<AccountPreferences.Section, AccountPreferences.Section.SectionRow>.ViewState
-		let account: Profile.Network.Account
+		let account: Account
 		var sections: [Section]
 		var faucetButtonState: ControlState
 		var isOnMainnet: Bool
@@ -85,12 +85,7 @@ extension AccountPreferences {
 				}
 				.destination(store: store)
 				.background(.app.gray5)
-				.navigationTitle(L10n.AccountSettings.title)
-				.navigationBarTitleColor(.app.gray1)
-				.navigationBarTitleDisplayMode(.inline)
-				.navigationBarInlineTitleFont(.app.secondaryHeader)
-				.toolbarBackground(.app.background, for: .navigationBar)
-				.toolbarBackground(.visible, for: .navigationBar)
+				.radixToolbar(title: L10n.AccountSettings.title)
 			}
 		}
 	}
@@ -212,7 +207,7 @@ extension AccountPreferences {
 }
 
 extension PreferenceSection.Row where RowId == AccountPreferences.Section.SectionRow {
-	static func accountLabel(_ account: Profile.Network.Account) -> Self {
+	static func accountLabel(_ account: Account) -> Self {
 		.init(
 			id: .personalize(.accountLabel),
 			title: L10n.AccountSettings.accountLabel,
@@ -221,7 +216,7 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 		)
 	}
 
-	static func thirdPartyDeposits(_ rule: ThirdPartyDeposits.DepositRule) -> Self {
+	static func thirdPartyDeposits(_ rule: DepositRule) -> Self {
 		.init(
 			id: .onLedger(.thirdPartyDeposits),
 			title: L10n.AccountSettings.thirdPartyDeposits,
@@ -240,7 +235,7 @@ extension PreferenceSection.Row where RowId == AccountPreferences.Section.Sectio
 	}
 }
 
-extension ThirdPartyDeposits.DepositRule {
+extension DepositRule {
 	var text: String {
 		switch self {
 		case .acceptAll:

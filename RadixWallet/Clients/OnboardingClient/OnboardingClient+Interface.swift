@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - OnboardingClient
 public struct OnboardingClient: Sendable {
 	/// Call this when user has finished authentication from lock screen (e.g. Splash)

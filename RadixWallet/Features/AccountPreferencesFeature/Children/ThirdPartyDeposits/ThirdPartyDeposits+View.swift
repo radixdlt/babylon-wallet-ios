@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 extension ManageThirdPartyDeposits.State {
@@ -46,8 +47,7 @@ extension ManageThirdPartyDeposits {
 					onRowSelected: { _, row in viewStore.send(.rowTapped(row)) }
 				)
 				.background(.app.gray5)
-				.navigationTitle(L10n.AccountSettings.thirdPartyDeposits)
-				.defaultNavBarConfig()
+				.radixToolbar(title: L10n.AccountSettings.thirdPartyDeposits)
 				.destinations(with: store)
 				.footer {
 					Button(L10n.AccountSettings.SpecificAssetsDeposits.update) {
@@ -69,7 +69,7 @@ extension ManageThirdPartyDeposits {
 		case allowDepositors
 
 		public enum Row: Hashable, Sendable {
-			case depositRule(ThirdPartyDeposits.DepositRule)
+			case depositRule(DepositRule)
 			case allowDenyAssets(AllowDenyAssetsRow)
 			case allowDepositors(AllowDepositorsRow)
 		}

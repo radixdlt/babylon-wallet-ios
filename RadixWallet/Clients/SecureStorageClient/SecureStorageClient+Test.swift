@@ -14,6 +14,7 @@ extension SecureStorageClient: TestDependencyKey {
 		loadProfileSnapshotData: { _ in nil },
 		loadProfileSnapshot: { _ in nil },
 		loadProfile: { _ in nil },
+		deleteProfile: { _ in },
 		saveMnemonicForFactorSource: { _ in },
 		loadMnemonicByFactorSourceID: { _ in nil },
 		containsMnemonicIdentifiedByFactorSourceID: { _ in false },
@@ -27,9 +28,13 @@ extension SecureStorageClient: TestDependencyKey {
 		saveDeviceInfo: { _ in },
 		deprecatedLoadDeviceID: { nil },
 		deleteDeprecatedDeviceID: {},
-		getAllMnemonics: { [] },
 		saveRadixConnectRelaySession: { _ in },
-		loadRadixConnectRelaySession: { _ in nil }
+		loadRadixConnectRelaySession: { _ in nil },
+		loadP2PLinks: { nil },
+		saveP2PLinks: { _ in },
+		loadP2PLinksPrivateKey: { nil },
+		saveP2PLinksPrivateKey: { _ in },
+		getAllMnemonics: { [] }
 	)
 	#else
 	public static let noop = Self(
@@ -37,6 +42,7 @@ extension SecureStorageClient: TestDependencyKey {
 		loadProfileSnapshotData: { _ in nil },
 		loadProfileSnapshot: { _ in nil },
 		loadProfile: { _ in nil },
+		deleteProfile: { _ in },
 		saveMnemonicForFactorSource: { _ in },
 		loadMnemonicByFactorSourceID: { _ in nil },
 		containsMnemonicIdentifiedByFactorSourceID: { _ in false },
@@ -51,7 +57,11 @@ extension SecureStorageClient: TestDependencyKey {
 		deprecatedLoadDeviceID: { nil },
 		deleteDeprecatedDeviceID: {},
 		saveRadixConnectRelaySession: { _ in },
-		loadRadixConnectRelaySession: { _ in nil }
+		loadRadixConnectRelaySession: { _ in nil },
+		loadP2PLinks: { nil },
+		saveP2PLinks: { _ in },
+		loadP2PLinksPrivateKey: { nil },
+		saveP2PLinksPrivateKey: { _ in }
 	)
 	#endif // DEBUG
 
@@ -63,6 +73,7 @@ extension SecureStorageClient: TestDependencyKey {
 		loadProfileSnapshotData: unimplemented("\(Self.self).loadProfileSnapshotData"),
 		loadProfileSnapshot: unimplemented("\(Self.self).loadProfileSnapshot"),
 		loadProfile: unimplemented("\(Self.self).loadProfile"),
+		deleteProfile: unimplemented("\(Self.self).deleteProfile"),
 		saveMnemonicForFactorSource: unimplemented("\(Self.self).saveMnemonicForFactorSource"),
 		loadMnemonicByFactorSourceID: unimplemented("\(Self.self).loadMnemonicByFactorSourceID"),
 		containsMnemonicIdentifiedByFactorSourceID: unimplemented("\(Self.self).containsMnemonicIdentifiedByFactorSourceID"),
@@ -76,9 +87,13 @@ extension SecureStorageClient: TestDependencyKey {
 		saveDeviceInfo: unimplemented("\(Self.self).saveDeviceInfo"),
 		deprecatedLoadDeviceID: unimplemented("\(Self.self).deprecatedLoadDeviceID"),
 		deleteDeprecatedDeviceID: unimplemented("\(Self.self).deleteDeprecatedDeviceID"),
-		getAllMnemonics: unimplemented("\(Self.self).getAllMnemonics"),
 		saveRadixConnectRelaySession: unimplemented("\(Self.self).saveRadixConnectRelaySession"),
 		loadRadixConnectRelaySession: unimplemented("\(Self.self).loadRadixConnectRelaySession")
+		loadP2PLinks: unimplemented("\(Self.self).loadP2PLinks"),
+		saveP2PLinks: unimplemented("\(Self.self).saveP2PLinks"),
+		loadP2PLinksPrivateKey: unimplemented("\(Self.self).loadP2PLinksPrivateKey"),
+		saveP2PLinksPrivateKey: unimplemented("\(Self.self).saveP2PLinksPrivateKey"),
+		getAllMnemonics: unimplemented("\(Self.self).getAllMnemonics")
 	)
 	#else
 	public static let testValue = Self(
@@ -86,6 +101,7 @@ extension SecureStorageClient: TestDependencyKey {
 		loadProfileSnapshotData: unimplemented("\(Self.self).loadProfileSnapshotData"),
 		loadProfileSnapshot: unimplemented("\(Self.self).loadProfileSnapshot"),
 		loadProfile: unimplemented("\(Self.self).loadProfile"),
+		deleteProfile: unimplemented("\(Self.self).deleteProfile"),
 		saveMnemonicForFactorSource: unimplemented("\(Self.self).saveMnemonicForFactorSource"),
 		loadMnemonicByFactorSourceID: unimplemented("\(Self.self).loadMnemonicByFactorSourceID"),
 		containsMnemonicIdentifiedByFactorSourceID: unimplemented("\(Self.self).containsMnemonicIdentifiedByFactorSourceID"),
@@ -101,6 +117,10 @@ extension SecureStorageClient: TestDependencyKey {
 		deleteDeprecatedDeviceID: unimplemented("\(Self.self).deleteDeprecatedDeviceID"),
 		saveRadixConnectRelaySession: unimplemented("\(Self.self).saveRadixConnectRelaySession"),
 		loadRadixConnectRelaySession: unimplemented("\(Self.self).loadRadixConnectRelaySession")
+		loadP2PLinks: unimplemented("\(Self.self).loadP2PLinks"),
+		saveP2PLinks: unimplemented("\(Self.self).saveP2PLinks"),
+		loadP2PLinksPrivateKey: unimplemented("\(Self.self).loadP2PLinksPrivateKey"),
+		saveP2PLinksPrivateKey: unimplemented("\(Self.self).saveP2PLinksPrivateKey")
 	)
 	#endif
 }

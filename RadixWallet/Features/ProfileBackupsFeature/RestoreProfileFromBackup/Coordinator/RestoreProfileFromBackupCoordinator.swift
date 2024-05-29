@@ -1,10 +1,12 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ProfileSelection
 public struct ProfileSelection: Sendable, Hashable {
-	public let snapshot: ProfileSnapshot
+	public let profile: Profile
 	public let isInCloud: Bool
+	public let containsP2PLinks: Bool
 }
 
 // MARK: - RestoreProfileFromBackupCoordinator
@@ -62,6 +64,7 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 	@Dependency(\.errorQueue) var errorQueue
 	@Dependency(\.continuousClock) var clock
 	@Dependency(\.radixConnectClient) var radixConnectClient
+
 	public init() {}
 
 	public var body: some ReducerOf<Self> {
@@ -85,14 +88,15 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
-		case let .root(.selectBackup(.delegate(.selectedProfileSnapshot(profileSnapshot, isInCloud)))):
-			state.profileSelection = .init(snapshot: profileSnapshot, isInCloud: isInCloud)
+		case let .root(.selectBackup(.delegate(.selectedProfile(profile, isInCloud, containsLegacyP2PLinks)))):
+			state.profileSelection = .init(profile: profile, isInCloud: isInCloud, containsP2PLinks: containsLegacyP2PLinks)
+
 			return .run { send in
 				try? await clock.sleep(for: .milliseconds(300))
-				try await radixConnectClient.connectToP2PLinks(profileSnapshot.appPreferences.p2pLinks)
+				_ = await radixConnectClient.loadP2PLinksAndConnectAll()
 				await send(.internal(.delayedAppendToPath(
-					.importMnemonicsFlow(.init(context: .fromOnboarding(profileSnapshot: profileSnapshot))
-					))))
+					.importMnemonicsFlow(.init(context: .fromOnboarding(profile: profile)))
+				)))
 			}
 
 		case .root(.selectBackup(.delegate(.backToStartOfOnboarding))):
@@ -108,7 +112,11 @@ public struct RestoreProfileFromBackupCoordinator: Sendable, FeatureReducer {
 			}
 			return .run { send in
 				loggerGlobal.notice("Importing snapshot...")
-				try await backupsClient.importSnapshot(profileSelection.snapshot, fromCloud: profileSelection.isInCloud)
+				try await backupsClient.importSnapshot(
+					profileSelection.profile,
+					fromCloud: profileSelection.isInCloud,
+					containsP2PLinks: profileSelection.containsP2PLinks
+				)
 
 				if let notYetSavedNewMainBDFS {
 					try await factorSourcesClient.saveNewMainBDFS(notYetSavedNewMainBDFS)

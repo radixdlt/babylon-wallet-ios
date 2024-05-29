@@ -1,95 +1,17 @@
 import Foundation
 @testable import Radix_Wallet_Dev
+import Sargon
 
-extension Profile.Network.Account {
+extension Account {
 	static let testValue = Self.testValueIdx0
-
-	static let testValueIdx0 = Self.makeTestValue(
-		name: "First",
-		index: 0
-	)
-
-	static let testValueIdx1 = Self.makeTestValue(
-		name: "Second",
-		index: 1
-	)
-
-	static func makeTestValue(
-		name nameOfFirstAccount: String,
-		networkID: NetworkID = .mainnet,
-		index: HD.Path.Component.Child.Value = 0,
-		privateHDFactorSource maybePrivateHDFactorSource: PrivateHDFactorSource? = nil
-	) -> Self {
-		let privateHDFactorSource = maybePrivateHDFactorSource ?? PrivateHDFactorSource.testValue
-		let path = try! AccountBabylonDerivationPath(networkID: networkID, index: index, keyKind: .transactionSigning)
-
-		let hdFactorInstance = try! privateHDFactorSource.hdRoot(derivationPath: path.wrapAsDerivationPath())
-
-		return try! Profile.Network.Account(
-			networkID: networkID,
-			address: Profile.Network.Account.deriveVirtualAddress(
-				networkID: networkID,
-				factorInstance: hdFactorInstance
-			),
-			securityState: .unsecured(
-				.init(
-					transactionSigning: hdFactorInstance
-				)
-			),
-			displayName: .init(
-				rawValue: nameOfFirstAccount
-			)!,
-			extraProperties: .init(
-				appearanceID: try! .init(id: .init(index))
-			)
-		)
-	}
+	static let testValueIdx0 = Self.sample
+	static let testValueIdx1 = Self.sampleOther
 }
 
-extension Profile.Network.Persona {
+extension Persona {
 	static let testValue = Self.testValueIdx0
-
-	static let testValueIdx0 = Self.makeTestValue(
-		name: "First",
-		index: 0
-	)
-
-	static let testValueIdx1 = Self.makeTestValue(
-		name: "Second",
-		index: 1
-	)
-
-	static func makeTestValue(
-		name nameOfPersona: String,
-		index: HD.Path.Component.Child.Value = 0,
-		privateHDFactorSource maybePrivateHDFactorSource: PrivateHDFactorSource? = nil
-	) -> Self {
-		let privateHDFactorSource = maybePrivateHDFactorSource ?? PrivateHDFactorSource.testValue
-
-		let derivationPath = DerivationPath(
-			scheme: .cap26,
-			path: "m/44H/1022H/10H/618H/1460H/\(index)H"
-		)
-
-		let networkID = NetworkID.mainnet
-		let hdFactorInstance = try! privateHDFactorSource.hdRoot(derivationPath: derivationPath)
-
-		return try! Profile.Network.Persona(
-			networkID: networkID,
-			address: Profile.Network.Persona.deriveVirtualAddress(
-				networkID: networkID,
-				factorInstance: hdFactorInstance
-			),
-			securityState: .unsecured(
-				.init(
-					transactionSigning: hdFactorInstance
-				)
-			),
-			displayName: .init(
-				rawValue: nameOfPersona
-			)!
-		)
-	}
+	static let testValueIdx0 = Self.sample
+	static let testValueIdx1 = Self.sampleOther
 }
 
 extension Profile {
@@ -143,50 +65,43 @@ extension Profile {
 
 	mutating func createMainnetWithOneAccount(
 		name nameOfFirstAccount: String,
-		privateHDFactorSource: PrivateHDFactorSource = .testValue
+		privateHDFactorSource: PrivateHierarchicalDeterministicFactorSource = .testValue
 	) {
-		var accounts = IdentifiedArrayOf<Profile.Network.Account>()
-		accounts.append(
-			Profile.Network.Account.makeTestValue(
-				name: nameOfFirstAccount,
-				privateHDFactorSource: privateHDFactorSource
+		var account = Account.sampleMainnet
+		account.displayName = try! .init(
+			validating: nameOfFirstAccount
+		)
+		account.securityState = .unsecured(
+			value: UnsecuredEntityControl(
+				transactionSigning: HierarchicalDeterministicFactorInstance(
+					factorSourceId: privateHDFactorSource.factorSource.id,
+					publicKey: .sample
+				),
+				authenticationSigning: nil
 			)
 		)
 
-		let network = Profile.Network(
-			networkID: networkID,
-			accounts: accounts,
+		let network = ProfileNetwork(
+			id: networkID,
+			accounts: [account],
 			personas: [],
 			authorizedDapps: []
 		)
 
-		self.networks = [networkID: network]
+		self.networks = [network]
 	}
 
 	static func testValue(
 		nameOfFirstAccount: String? = "Main",
-		header: ProfileSnapshot.Header,
-		privateHDFactorSource: PrivateHDFactorSource = .testValueZooVote
+		header: Header,
+		privateHDFactorSource: PrivateHierarchicalDeterministicFactorSource = .testValueZooVote
 	) -> Self {
-		var profile = Profile(
-			header: header,
-			factorSources: NonEmpty(rawValue: [
-				privateHDFactorSource.factorSource.embed(),
-			])!
-		)
-
+		var profile = Profile(header: header, deviceFactorSource: privateHDFactorSource.factorSource)
 		if let nameOfFirstAccount {
-			var header = header
-			profile.createMainnetWithOneAccount(
-				name: nameOfFirstAccount,
-				privateHDFactorSource: privateHDFactorSource
-			)
-			header.contentHint = ProfileSnapshot.Header.ContentHint(
-				numberOfAccountsOnAllNetworksInTotal: 1,
-				numberOfPersonasOnAllNetworksInTotal: 0,
-				numberOfNetworks: 1
-			)
-			profile.header = header
+			profile.createMainnetWithOneAccount(name: nameOfFirstAccount, privateHDFactorSource: privateHDFactorSource)
+			profile.header.contentHint.numberOfNetworks = 1
+			profile.header.contentHint.numberOfPersonasOnAllNetworksInTotal = 0
+			profile.header.contentHint.numberOfAccountsOnAllNetworksInTotal = 1
 		}
 		return profile
 	}
@@ -236,7 +151,7 @@ private func configureTestClients(
 	d.entitiesVisibilityClient.hidePersonas = { _ in }
 	d.uuid = .incrementing
 	d.date = .constant(Date(timeIntervalSince1970: 0))
-	d.mnemonicClient.generate = { _, _ in Mnemonic.testValue }
+	d.mnemonicClient.generate = { _, _ in Mnemonic.sample }
 	d.secureStorageClient.saveDeviceInfo = { _ in }
 	d.secureStorageClient.deprecatedLoadDeviceID = { nil }
 	d.secureStorageClient.loadDeviceInfo = { .testValueABBA }
@@ -254,11 +169,12 @@ private func configureTestClients(
 	d.date = .constant(Date(timeIntervalSince1970: 0))
 }
 
-extension ProfileSnapshot.Header {
+extension Header {
 	static let testValueProfileID_DEAD_deviceID_BEEF = Self.testValue(profileID: 0xDEAD, deviceID: 0xBEEF)
 	static let testValueProfileID_DEAD_deviceID_ABBA = Self.testValue(profileID: 0xDEAD, deviceID: 0xABBA)
 	static let testValueProfileID_FADE_deviceID_BEEF = Self.testValue(profileID: 0xFADE, deviceID: 0xBEEF)
 	static let testValueProfileID_FADE_deviceID_ABBA = Self.testValue(profileID: 0xFADE, deviceID: 0xABBA)
+
 	static func testValue(
 		profileID: UUID? = nil,
 		deviceID: UUID? = nil,
@@ -278,12 +194,16 @@ extension ProfileSnapshot.Header {
 		deviceInfo: DeviceInfo
 	) -> Self {
 		Self(
+			snapshotVersion: .v100,
+			id: profileID ?? 0xDEAD,
 			creatingDevice: deviceInfo,
 			lastUsedOnDevice: deviceInfo,
-			id: profileID ?? 0xDEAD,
 			lastModified: deviceInfo.date,
-			contentHint: .init(),
-			snapshotVersion: .minimum
+			contentHint: .init(
+				numberOfAccountsOnAllNetworksInTotal: 0,
+				numberOfPersonasOnAllNetworksInTotal: 0,
+				numberOfNetworks: 0
+			)
 		)
 	}
 }
@@ -297,19 +217,33 @@ extension DeviceInfo {
 		deviceID: UUID? = nil,
 		date: Date? = nil
 	) -> Self {
-		Self(
-			description: "testValue",
-			id: deviceID ?? 0xABBA,
-			date: date ?? Date(timeIntervalSince1970: 0)
-		)
+		Self(id: deviceID ?? 0xABBA, date: date ?? Date(timeIntervalSince1970: 0), description: "testValue")
 	}
 }
 
-extension PrivateHDFactorSource {
+extension MnemonicWithPassphrase {
+	public static let testValueZooVote: Self = .init(mnemonic: .testValueZooVote, passphrase: "")
+	public static let testValueAbandonArt: Self = .init(mnemonic: .testValueAbandonArt, passphrase: "")
+}
+
+extension PrivateHierarchicalDeterministicFactorSource {
 	static let testValue = Self.testValueZooVote
 
 	static let testValueZooVote: Self = testValue(mnemonicWithPassphrase: .testValueZooVote)
 	static let testValueAbandonArt: Self = testValue(mnemonicWithPassphrase: .testValueAbandonArt)
+
+	public static func testValue(
+		name: String,
+		model: String,
+		mnemonicWithPassphrase: MnemonicWithPassphrase = .testValueZooVote
+	) -> Self {
+		var bdfs = DeviceFactorSource.babylon(mnemonicWithPassphrase: mnemonicWithPassphrase, isMain: true)
+		bdfs.hint.model = model
+		bdfs.hint.name = name
+		bdfs.common.addedOn = .init(timeIntervalSince1970: 0)
+		bdfs.common.lastUsedOn = .init(timeIntervalSince1970: 0)
+		return Self(mnemonicWithPassphrase: mnemonicWithPassphrase, factorSource: bdfs)
+	}
 
 	static func testValue(
 		mnemonicWithPassphrase: MnemonicWithPassphrase
@@ -324,26 +258,13 @@ extension PrivateHDFactorSource {
 			)
 		}
 	}
-
-	func hdRoot(derivationPath: DerivationPath) throws -> HierarchicalDeterministicFactorInstance {
-		let hdRoot = try mnemonicWithPassphrase.hdRoot()
-
-		let publicKey = try! hdRoot.derivePublicKey(
-			path: derivationPath,
-			curve: .curve25519
-		)
-
-		return HierarchicalDeterministicFactorInstance(
-			id: factorSource.id,
-			publicKey: publicKey,
-			derivationPath: derivationPath
-		)
-	}
 }
 
 private let deviceName: String = "iPhone"
-private let deviceModel: DeviceFactorSource.Hint.Model = "iPhone"
-private let expectedDeviceDescription = DeviceInfo.deviceDescription(
-	name: deviceName,
-	model: deviceModel.rawValue
-)
+private let deviceModel: String = "iPhone"
+private let expectedDeviceDescription = DeviceInfo.sample
+
+extension Mnemonic {
+	public static let testValueZooVote = try! Self(phrase: "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo vote")
+	public static let testValueAbandonArt = try! Self(phrase: "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon art")
+}

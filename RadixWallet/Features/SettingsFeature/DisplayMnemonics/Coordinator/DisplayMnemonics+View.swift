@@ -41,8 +41,7 @@ extension DisplayMnemonics {
 					.padding(.top, .medium3)
 				}
 				.background(.app.gray5)
-				.navigationTitle(L10n.SeedPhrases.title)
-				.toolbarBackground(.visible, for: .navigationBar)
+				.radixToolbar(title: L10n.SeedPhrases.title)
 				.onFirstTask { @MainActor in
 					await viewStore.send(.onFirstTask).finish()
 				}

@@ -109,6 +109,8 @@ extension Address {
 
 extension CacheClient {
 	public enum Entry: Equatable {
+		static let root: String = "RadixWallet"
+
 		public init(address: some AddressProtocol) {
 			self = .onLedgerEntity(.init(address: address))
 		}
@@ -161,7 +163,7 @@ extension CacheClient {
 		case dateOfFirstTransaction(_ accountAddress: AccountAddress)
 
 		var filesystemFilePath: String {
-			switch self {
+			let path = switch self {
 			case let .onLedgerEntity(entity):
 				entity.filesystemFilePath
 			case let .networkName(url):
@@ -177,6 +179,8 @@ extension CacheClient {
 			case let .dateOfFirstTransaction(address):
 				"\(filesystemFolderPath)/account-\(address.address)"
 			}
+
+			return "\(Self.root)/\(path)"
 		}
 
 		var filesystemFolderPath: String {

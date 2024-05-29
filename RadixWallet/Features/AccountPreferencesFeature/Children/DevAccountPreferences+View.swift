@@ -82,15 +82,10 @@ extension DevAccountPreferences {
 					.onAppear {
 						viewStore.send(.appeared)
 					}
-					.navigationTitle("Dev Preferences")
+					.radixToolbar(title: "Dev Preferences")
 					#if DEBUG
 						.destinations(with: store)
 					#endif
-						.navigationBarTitleColor(.app.gray1)
-						.navigationBarTitleDisplayMode(.inline)
-						.navigationBarInlineTitleFont(.app.secondaryHeader)
-						.toolbarBackground(.app.background, for: .navigationBar)
-						.toolbarBackground(.visible, for: .navigationBar)
 				}
 			}
 		}

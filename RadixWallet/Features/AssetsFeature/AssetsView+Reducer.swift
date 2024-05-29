@@ -37,14 +37,14 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 		public var resources: Resources = .init()
 
-		public let account: Profile.Network.Account
+		public let account: Account
 		public var accountPortfolio: Loadable<AccountPortfoliosClient.AccountPortfolio> = .idle
 		public var isLoadingResources: Bool = false
 		public var isRefreshing: Bool = false
 		public let mode: Mode
 		public var totalFiatWorth: Loadable<FiatWorth> = .loading
 
-		public init(account: Profile.Network.Account, mode: Mode = .normal) {
+		public init(account: Account, mode: Mode = .normal) {
 			self.init(
 				account: account,
 				resources: .init(),
@@ -53,7 +53,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 		}
 
 		init(
-			account: Profile.Network.Account,
+			account: Account,
 			assetKinds: NonEmpty<[AssetKind]> = .init(rawValue: AssetKind.allCases)!,
 			resources: Resources,
 			mode: Mode
@@ -71,7 +71,6 @@ public struct AssetsView: Sendable, FeatureReducer {
 		case pullToRefreshStarted
 		case didSelectList(State.AssetKind)
 		case chooseButtonTapped(State.Mode.SelectedAssets)
-		case closeButtonTapped
 	}
 
 	@CasePathable
@@ -88,7 +87,15 @@ public struct AssetsView: Sendable, FeatureReducer {
 
 	public enum DelegateAction: Sendable, Equatable {
 		case handleSelectedAssets(State.Mode.SelectedAssets)
-		case dismiss
+		case selected(Selection)
+
+		public enum Selection: Sendable, Equatable {
+			case fungible(OnLedgerEntity.OwnedFungibleResource, isXrd: Bool)
+			case nonFungible(OnLedgerEntity.OwnedNonFungibleResource, token: OnLedgerEntity.NonFungibleToken)
+			case stakeUnit(OnLedgerEntitiesClient.ResourceWithVaultAmount, details: OnLedgerEntitiesClient.OwnedStakeDetails)
+			case stakeClaim(OnLedgerEntity.Resource, claim: OnLedgerEntitiesClient.StakeClaim)
+			case poolUnit(OnLedgerEntitiesClient.OwnedResourcePoolDetails)
+		}
 	}
 
 	@Dependency(\.accountPortfoliosClient) var accountPortfoliosClient
@@ -137,8 +144,6 @@ public struct AssetsView: Sendable, FeatureReducer {
 			}
 		case let .chooseButtonTapped(items):
 			return .send(.delegate(.handleSelectedAssets(items)))
-		case .closeButtonTapped:
-			return .send(.delegate(.dismiss))
 		}
 	}
 
@@ -153,6 +158,32 @@ public struct AssetsView: Sendable, FeatureReducer {
 		}
 	}
 
+	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
+		switch childAction {
+		case let .fungibleTokenList(.delegate(.selected(resource, isXrd))):
+			.send(.delegate(.selected(.fungible(resource, isXrd: isXrd))))
+
+		case let .nonFungibleTokenList(.delegate(.selected(resource, token))):
+			.send(.delegate(.selected(.nonFungible(resource, token: token))))
+
+		case let .stakeUnitList(.delegate(.selected(selection))):
+			switch selection {
+			case let .unit(resource, details):
+				.send(.delegate(.selected(.stakeUnit(resource, details: details))))
+			case let .claim(resource, claim):
+				.send(.delegate(.selected(.stakeClaim(resource, claim: claim))))
+			}
+
+		case let .poolUnitsList(.delegate(.selected(details))):
+			.send(.delegate(.selected(.poolUnit(details))))
+
+		default:
+			.none
+		}
+	}
+}
+
+extension AssetsView {
 	private func updateFromPortfolio(
 		state: inout State,
 		from portfolio: AccountPortfoliosClient.AccountPortfolio
@@ -196,7 +227,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 				return nil
 			}
 
-			return .init(sections: sections, destination: state.resources.fungibleTokenList?.destination)
+			return .init(sections: sections)
 		}()
 
 		state.accountPortfolio.refresh(from: .success(portfolio))
@@ -211,8 +242,7 @@ public struct AssetsView: Sendable, FeatureReducer {
 					},
 					isSelected: mode.nonXrdRowSelected(poolUnit.resource.resourceAddress)
 				)
-			}.asIdentified(),
-			destination: state.resources.poolUnitsList?.destination
+			}.asIdentified()
 		)
 
 		let stakes = portfolio.account.poolUnitResources.radixNetworkStakes
@@ -236,14 +266,13 @@ public struct AssetsView: Sendable, FeatureReducer {
 						dict[resource] = selectedtokens
 					}
 				} : nil,
-			stakeUnitDetails: state.accountPortfolio.stakeUnitDetails.flatten(),
-			destination: state.resources.stakeUnitList?.destination
+			stakeUnitDetails: state.accountPortfolio.stakeUnitDetails.flatten()
 		)
 
 		state.totalFiatWorth.refresh(from: portfolio.totalFiatWorth)
 		state.resources = .init(
 			fungibleTokenList: fungibleTokenList,
-			nonFungibleTokenList: !nfts.isEmpty ? .init(rows: nfts.asIdentified(), destination: state.resources.nonFungibleTokenList?.destination) : nil,
+			nonFungibleTokenList: !nfts.isEmpty ? .init(rows: nfts.asIdentified()) : nil,
 			stakeUnitList: stakeUnitList,
 			poolUnitsList: poolUnitList
 		)

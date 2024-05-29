@@ -30,7 +30,7 @@ public struct Main: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case currentGatewayChanged(to: Radix.Gateway)
+		case currentGatewayChanged(to: Gateway)
 	}
 
 	public struct Destination: DestinationReducer {
@@ -52,6 +52,7 @@ public struct Main: Sendable, FeatureReducer {
 	@Dependency(\.appPreferencesClient) var appPreferencesClient
 	@Dependency(\.gatewaysClient) var gatewaysClient
 	@Dependency(\.personasClient) var personasClient
+	@Dependency(\.cloudBackupClient) var cloudBackupClient
 
 	public init() {}
 
@@ -70,12 +71,27 @@ public struct Main: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, viewAction: ViewAction) -> Effect<Action> {
 		switch viewAction {
 		case .task:
-			.run { send in
-				for try await gateway in await gatewaysClient.currentGatewayValues() {
-					guard !Task.isCancelled else { return }
-					loggerGlobal.notice("Changed network to: \(gateway)")
-					await send(.internal(.currentGatewayChanged(to: gateway)))
-				}
+			startAutomaticBackupsEffect()
+				.merge(with: gatewayValuesEffect())
+		}
+	}
+
+	private func startAutomaticBackupsEffect() -> Effect<Action> {
+		.run { _ in
+			do {
+				try await cloudBackupClient.startAutomaticBackups()
+			} catch {
+				loggerGlobal.notice("cloudBackupClient.startAutomaticBackups failed: \(error)")
+			}
+		}
+	}
+
+	private func gatewayValuesEffect() -> Effect<Action> {
+		.run { send in
+			for try await gateway in await gatewaysClient.currentGatewayValues() {
+				guard !Task.isCancelled else { return }
+				loggerGlobal.notice("Changed network to: \(gateway)")
+				await send(.internal(.currentGatewayChanged(to: gateway)))
 			}
 		}
 	}
@@ -94,16 +110,16 @@ public struct Main: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
 		case let .currentGatewayChanged(currentGateway):
-			state.isOnMainnet = currentGateway.network == .mainnet
+			state.isOnMainnet = currentGateway.network.id == .mainnet
 			return .none
 		}
 	}
 
 	public func reduce(into state: inout State, presentedAction: Destination.Action) -> Effect<Action> {
 		switch presentedAction {
-		case let .settings(.delegate(.deleteProfileAndFactorSources(keepInIcloudIfPresent))):
+		case .settings(.delegate(.didResetWallet)):
 			.run { send in
-				try await appPreferencesClient.deleteProfileAndFactorSources(keepInIcloudIfPresent)
+				try await appPreferencesClient.deleteProfileAndFactorSources(true)
 				await send(.delegate(.removedWallet))
 			} catch: { error, _ in
 				loggerGlobal.error("Failed to delete profile: \(error)")

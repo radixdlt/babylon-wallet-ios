@@ -23,7 +23,6 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 		case debugUserDefaultsContentsButtonTapped
 		case debugTestKeychainButtonTapped
 		case debugKeychainContentsButtonTapped
-		case securityStructureConfigsButtonTapped
 		case dappLinkingDelayTapped
 	}
 
@@ -40,7 +39,6 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			case debugKeychainTest(DebugKeychainTest.State)
 			case debugKeychainContents(DebugKeychainContents.State)
 			#endif // DEBUG
-			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.State)
 			case dappLinkingDelay(DappLinkingDelay.State)
 		}
 
@@ -52,7 +50,6 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			case debugKeychainContents(DebugKeychainContents.Action)
 			#endif // DEBUG
 			case debugManageFactorSources(DebugManageFactorSources.Action)
-			case securityStructureConfigs(SecurityStructureConfigurationListCoordinator.Action)
 			case dappLinkingDelay(DappLinkingDelay.Action)
 		}
 
@@ -73,9 +70,6 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			#endif // DEBUG
 			Scope(state: /State.debugManageFactorSources, action: /Action.debugManageFactorSources) {
 				DebugManageFactorSources()
-			}
-			Scope(state: /State.securityStructureConfigs, action: /Action.securityStructureConfigs) {
-				SecurityStructureConfigurationListCoordinator()
 			}
 			Scope(state: /State.dappLinkingDelay, action: /Action.dappLinkingDelay) {
 				DappLinkingDelay()
@@ -107,8 +101,7 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 
 		case .debugInspectProfileButtonTapped:
 			return .run { send in
-				let snapshot = await appPreferencesClient.extractProfileSnapshot()
-				guard let profile = try? Profile(snapshot: snapshot) else { return }
+				let profile = await appPreferencesClient.extractProfile()
 				await send(.internal(.profileToDebugLoaded(profile)))
 			}
 
@@ -122,10 +115,6 @@ public struct DebugSettingsCoordinator: Sendable, FeatureReducer {
 			#if DEBUG
 			state.destination = .debugKeychainContents(.init())
 			#endif // DEBUG
-			return .none
-
-		case .securityStructureConfigsButtonTapped:
-			state.destination = .securityStructureConfigs(.init())
 			return .none
 
 		case .debugUserDefaultsContentsButtonTapped:

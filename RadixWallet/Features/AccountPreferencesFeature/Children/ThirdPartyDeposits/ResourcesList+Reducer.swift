@@ -1,9 +1,10 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - ResourcesListMode
 public enum ResourcesListMode: Hashable, Sendable {
-	public typealias ExceptionRule = ThirdPartyDeposits.DepositAddressExceptionRule
+	public typealias ExceptionRule = DepositAddressExceptionRule
 	case allowDenyAssets(ExceptionRule)
 	case allowDepositors
 }
@@ -11,8 +12,8 @@ public enum ResourcesListMode: Hashable, Sendable {
 // MARK: - ResourceViewState
 public struct ResourceViewState: Hashable, Sendable, Identifiable {
 	public enum Address: Hashable, Sendable {
-		case assetException(ThirdPartyDeposits.AssetException)
-		case allowedDepositor(ThirdPartyDeposits.DepositorAddress)
+		case assetException(AssetException)
+		case allowedDepositor(ResourceOrNonFungible)
 	}
 
 	public var id: Address { address }
@@ -66,7 +67,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		case task
 		case addAssetTapped
 		case assetRemove(ResourceViewState.Address)
-		case exceptionListChanged(ThirdPartyDeposits.DepositAddressExceptionRule)
+		case exceptionListChanged(DepositAddressExceptionRule)
 	}
 
 	public enum DelegateAction: Equatable, Sendable {
@@ -81,11 +82,13 @@ public struct ResourcesList: FeatureReducer, Sendable {
 	// MARK: Destination
 
 	public struct Destination: DestinationReducer {
+		@CasePathable
 		public enum State: Hashable, Sendable {
 			case addAsset(AddAsset.State)
 			case confirmAssetDeletion(AlertState<Action.ConfirmDeletionAlert>)
 		}
 
+		@CasePathable
 		public enum Action: Equatable, Sendable {
 			case addAsset(AddAsset.Action)
 			case confirmAssetDeletion(ConfirmDeletionAlert)
@@ -97,7 +100,7 @@ public struct ResourcesList: FeatureReducer, Sendable {
 		}
 
 		public var body: some ReducerOf<Self> {
-			Scope(state: /State.addAsset, action: /Action.addAsset) {
+			Scope(state: \.addAsset, action: \.addAsset) {
 				AddAsset()
 			}
 		}
@@ -264,22 +267,5 @@ extension ResourcesListMode {
 		case .allowDepositors:
 			L10n.AccountSettings.SpecificAssetsDeposits.removeBadgeMessageDepositors
 		}
-	}
-}
-
-extension ThirdPartyDeposits.DepositorAddress {
-	var resourceAddress: ResourceAddress {
-		switch self {
-		case let .resourceAddress(address):
-			address
-		case let .nonFungibleGlobalID(nonFungibleGlobalID):
-			nonFungibleGlobalID.resourceAddress
-		}
-	}
-}
-
-extension ThirdPartyDeposits.AssetException {
-	func updateExceptionRule(_ rule: ThirdPartyDeposits.DepositAddressExceptionRule) -> Self {
-		.init(address: address, exceptionRule: rule)
 	}
 }

@@ -13,7 +13,7 @@ extension BackupsClient: DependencyKey {
 
 		@Sendable
 		func importFor(
-			factorSourceIDs: Set<FactorSourceID.FromHash>,
+			factorSourceIDs: Set<FactorSourceIDFromHash>,
 			operation: () async throws -> Void
 		) async throws {
 			do {
@@ -29,16 +29,16 @@ extension BackupsClient: DependencyKey {
 
 		return Self(
 			snapshotOfProfileForExport: {
-				await profileStore.profile.snapshot()
+				await profileStore.profile
 			},
-			loadProfileBackups: { () -> ProfileSnapshot.HeaderList? in
+			loadProfileBackups: { () -> Profile.HeaderList? in
 				do {
 					let headers = try secureStorageClient.loadProfileHeaderList()
 					guard let headers else {
 						return nil
 					}
 					// filter out header for which the related profile is not present in the keychain:
-					var filteredHeaders = [ProfileSnapshot.Header]()
+					var filteredHeaders = [Profile.Header]()
 					for header in headers {
 						guard
 							let snapshot = try? secureStorageClient.loadProfileSnapshot(header.id),
@@ -64,16 +64,28 @@ extension BackupsClient: DependencyKey {
 				}
 			},
 			lookupProfileSnapshotByHeader: { header in
-				try secureStorageClient.loadProfileSnapshot(header.id)
+				let containsP2PLinks = if let profileSnapshotData = try? secureStorageClient.loadProfileSnapshotData(header.id) {
+					Profile.checkIfProfileJsonContainsLegacyP2PLinks(contents: profileSnapshotData)
+				} else {
+					false
+				}
+				let profileSnapshot = try secureStorageClient.loadProfileSnapshot(header.id)
+
+				return (profileSnapshot, containsP2PLinks)
 			},
-			importProfileSnapshot: { snapshot, factorSourceIDs in
+			importProfileSnapshot: { snapshot, factorSourceIDs, containsP2PLinks in
 				try await importFor(factorSourceIDs: factorSourceIDs) {
 					try await profileStore.importProfileSnapshot(snapshot)
+					userDefaults.setShowRelinkConnectorsAfterProfileRestore(containsP2PLinks)
 				}
 			},
-			importCloudProfile: { header, factorSourceIDs in
+			didExportProfileSnapshot: { profile in
+				try userDefaults.setLastManualBackup(of: profile)
+			},
+			importCloudProfile: { header, factorSourceIDs, containsP2PLinks in
 				try await importFor(factorSourceIDs: factorSourceIDs) {
 					try await profileStore.importCloudProfileSnapshot(header)
+					userDefaults.setShowRelinkConnectorsAfterProfileRestore(containsP2PLinks)
 				}
 			},
 			loadDeviceID: {

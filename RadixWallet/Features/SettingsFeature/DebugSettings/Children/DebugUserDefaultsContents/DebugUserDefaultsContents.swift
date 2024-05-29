@@ -111,10 +111,24 @@ extension UserDefaults.Dependency.Key {
 			return userDefaults.getDateOfLastSubmittedNPSSurvey().map(String.init(describing:)).asArray(\.self)
 		case .npsSurveyUserID:
 			return userDefaults.getNPSSurveyUserId().map(String.init(describing:)).asArray(\.self)
+
 		case .dappLinkingDelay:
 			return [String(userDefaults.getDappLinkingDelay())]
 		case .dAppLinkingAutoContinueEnabled:
 			return [String(userDefaults.getDappLinkingAutoContinueEnabled())]
+
+		case .didMigrateKeychainProfiles:
+			return [userDefaults.getDidMigrateKeychainProfiles].map(String.init(describing:))
+		case .lastCloudBackups:
+			return userDefaults.getLastCloudBackups.map { "\($0.key.uuidString): \(String(describing: $0.value))" }
+		case .lastManualBackups:
+			return userDefaults.getLastManualBackups.map { "\($0.key.uuidString): \(String(describing: $0.value))" }
+		case .lastSyncedAccountsWithCE:
+			return userDefaults.getLastSyncedAccountsWithCE().asArray(\.self)
+		case .showRelinkConnectorsAfterUpdate:
+			return [userDefaults.showRelinkConnectorsAfterUpdate].map(String.init(describing:))
+		case .showRelinkConnectorsAfterProfileRestore:
+			return [userDefaults.showRelinkConnectorsAfterProfileRestore].map(String.init(describing:))
 		}
 	}
 }

@@ -1,4 +1,5 @@
 @testable import Radix_Wallet_Dev
+import Sargon
 import XCTest
 
 // MARK: - GatewaySettingsFeatureTests
@@ -16,34 +17,35 @@ final class GatewaySettingsFeatureTests: TestCase {
 
 	func test_whenViewAppeared_thenCurrentGatewayAndGatewayListIsLoaded() async throws {
 		// given
-		let otherGateways: IdentifiedArrayOf<Radix.Gateway> = [.stokenet, .rcnet].asIdentified()
-		let currentGateway: Radix.Gateway = .mainnet
-		let gateways = try! Gateways(
+		let otherGateways: Gateways = [.stokenet, .ansharnet]
+		let currentGateway: Gateway = .mainnet
+		let savedGateways = try! SavedGateways(
 			current: currentGateway,
-			other: otherGateways
+			other: otherGateways.elements
 		)
+
 		let store = TestStore(
 			initialState: GatewaySettings.State(),
 			reducer: GatewaySettings.init
 		) {
 			$0.gatewaysClient.getAllGateways = {
-				.init(rawValue: otherGateways)!
+				otherGateways
 			}
 			$0.gatewaysClient.gatewaysValues = { AsyncLazySequence([
-				try! .init(current: currentGateway, other: otherGateways),
+				try! .init(current: currentGateway, other: otherGateways.elements),
 			]
 			).eraseToAnyAsyncSequence() }
 		}
 
 		// when
 		let viewTask = await store.send(.view(.task))
-		await store.receive(.internal(.gatewaysLoadedResult(.success(gateways)))) {
+		await store.receive(.internal(.savedGatewaysLoadedResult(.success(savedGateways)))) {
 			// then
 			$0.gatewayList = .init(gateways: .init(
-				uniqueElements: gateways.all.elements.map {
+				uniqueElements: savedGateways.all.map {
 					GatewayRow.State(
 						gateway: $0,
-						isSelected: gateways.current.id == $0.id,
+						isSelected: savedGateways.current.id == $0.id,
 						canBeDeleted: !$0.isWellknown
 					)
 				}
@@ -64,7 +66,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 		}
 		store.exhaustivity = .off
 		let gatewayToBeDeleted = GatewayRow.State(
-			gateway: .previewValue,
+			gateway: .sample,
 			isSelected: false,
 			canBeDeleted: true
 		)
@@ -78,27 +80,31 @@ final class GatewaySettingsFeatureTests: TestCase {
 
 	func test_whenNonCurrentGatewayRemovalIsConfirmed_removeGateway() async throws {
 		// given
-		let gatewayToBeDeleted = GatewayRow.State(gateway: .rcnet, isSelected: false, canBeDeleted: true)
-		let otherGateways: IdentifiedArrayOf<Radix.Gateway> = [.stokenet, .rcnet].asIdentified()
-		let currentGateway: Radix.Gateway = .mainnet
-		let otherAfterDeletion: IdentifiedArrayOf<Radix.Gateway> = [.stokenet].asIdentified()
-		let gateways = try! Gateways(
-			current: currentGateway,
-			other: otherGateways
+		let gatewayToBeDeleted = GatewayRow.State(
+			gateway: .ansharnet,
+			isSelected: false,
+			canBeDeleted: true
 		)
-		let gatewaysAfterDeletion = try! Gateways(
+		let otherGateways: Gateways = [.stokenet, .ansharnet]
+		let currentGateway: Gateway = .mainnet
+		let otherAfterDeletion: Gateways = [.stokenet]
+		let savedGateways = try! SavedGateways(
 			current: currentGateway,
-			other: otherAfterDeletion
+			other: otherGateways.elements
+		)
+		let gatewaysAfterDeletion = try! SavedGateways(
+			current: currentGateway,
+			other: otherAfterDeletion.elements
 		)
 
 		var initialState = GatewaySettings.State()
 		initialState.destination = .removeGateway(.removeGateway(row: gatewayToBeDeleted))
 		initialState.currentGateway = currentGateway
 		initialState.gatewayList = .init(gateways: .init(
-			uniqueElements: gateways.all.elements.map {
+			uniqueElements: savedGateways.all.map {
 				GatewayRow.State(
 					gateway: $0,
-					isSelected: gateways.current.id == $0.id,
+					isSelected: savedGateways.current.id == $0.id,
 					canBeDeleted: !$0.isWellknown
 				)
 			}
@@ -114,15 +120,15 @@ final class GatewaySettingsFeatureTests: TestCase {
 			}
 			$0.gatewaysClient.getAllGateways = {
 				if await isGatewayRemoved.value == true {
-					.init(rawValue: .init(uniqueElements: otherAfterDeletion))!
+					otherAfterDeletion
 				} else {
-					.init(rawValue: .init(uniqueElements: otherGateways))!
+					otherGateways
 				}
 			}
 			$0.gatewaysClient.gatewaysValues = {
 				let gateways = await isGatewayRemoved.value ? otherAfterDeletion : otherGateways
 				return AsyncLazySequence([
-					try! .init(current: currentGateway, other: .init(uniqueElements: gateways)),
+					try! .init(current: currentGateway, other: gateways.elements),
 				]).eraseToAnyAsyncSequence()
 			}
 
@@ -137,10 +143,10 @@ final class GatewaySettingsFeatureTests: TestCase {
 		}
 
 		// when
-		await store.send(.internal(.gatewaysLoadedResult(.success(gatewaysAfterDeletion)))) {
+		await store.send(.internal(.savedGatewaysLoadedResult(.success(gatewaysAfterDeletion)))) {
 			// then
 			$0.gatewayList = .init(gateways: .init(
-				uniqueElements: gatewaysAfterDeletion.all.elements.map {
+				uniqueElements: gatewaysAfterDeletion.all.map {
 					GatewayRow.State(
 						gateway: $0,
 						isSelected: gatewaysAfterDeletion.current.id == $0.id,
@@ -170,7 +176,7 @@ final class GatewaySettingsFeatureTests: TestCase {
 
 	func test_whenNewAddGatewayButtonIsTapped_thenDelegateIsCalled() async throws {
 		// given
-		let allGateways: [Radix.Gateway] = [.nebunet, .hammunet, .enkinet, .mardunet]
+		let allGateways: Gateways = [.nebunet, .hammunet, .enkinet, .mardunet]
 		let validURL = URL.previewValue.absoluteString
 		var initialState = AddNewGateway.State()
 		initialState.inputtedURL = validURL
@@ -179,17 +185,17 @@ final class GatewaySettingsFeatureTests: TestCase {
 			initialState: initialState,
 			reducer: AddNewGateway.init
 		) {
-			$0.networkSwitchingClient.validateGatewayURL = { _ in .previewValue }
+			$0.networkSwitchingClient.validateGatewayURL = { _ in .sample }
 			$0.gatewaysClient.addGateway = { _ in }
 			$0.gatewaysClient.getAllGateways = {
-				.init(rawValue: .init(uniqueElements: allGateways))!
+				allGateways
 			}
 		}
 		store.exhaustivity = .off
 
 		// when
 		await store.send(.view(.addNewGatewayButtonTapped))
-		await store.receive(.internal(.gatewayValidationResult(.success(.previewValue))))
+		await store.receive(.internal(.gatewayValidationResult(.success(.sample))))
 		await store.receive(.internal(.addGatewayResult(.success(.instance))))
 		await store.receive(.delegate(.dismiss))
 	}
@@ -199,20 +205,5 @@ final class GatewaySettingsFeatureTests: TestCase {
 
 extension URL {
 	public static let previewValue = URL(string: "https://example.com")!
-}
-
-extension Radix.Network {
-	public static let previewValue = Self(
-		name: "Placeholder",
-		id: .simulator,
-		displayDescription: "A placeholder description"
-	)
-}
-
-extension Radix.Gateway {
-	public static let previewValue = Self(
-		network: .previewValue,
-		url: .previewValue
-	)
 }
 #endif // DEBUG

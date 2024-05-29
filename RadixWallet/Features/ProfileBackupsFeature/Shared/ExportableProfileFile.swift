@@ -1,15 +1,23 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 import UniformTypeIdentifiers
 
 // MARK: - NoJSONDataFound
 struct NoJSONDataFound: Error {}
 
+// MARK: - FileContentIsNotProfile
+struct FileContentIsNotProfile: LocalizedError {
+	var errorDescription: String? {
+		L10n.Error.ProfileLoad.decodingError("Invalid backup file.")
+	}
+}
+
 // MARK: - ExportableProfileFile
 /// An exportable (and thus importable) Profile file, either encrypted or plaintext.
 public enum ExportableProfileFile: FileDocument, Sendable, Hashable {
-	case plaintext(ProfileSnapshot)
-	case encrypted(EncryptedProfileSnapshot)
+	case plaintext(Profile)
+	case encrypted(EncryptedProfileJSONData)
 }
 
 extension String {
@@ -17,6 +25,11 @@ extension String {
 	private static let filenameProfileBase = "radix_wallet_backup_file"
 	static let filenameProfileNotEncrypted: Self = "\(filenameProfileBase).plaintext.json"
 	static let filenameProfileEncrypted: Self = "\(filenameProfileBase).\(profileFileEncryptedPart).json"
+}
+
+extension UTType {
+	// FIXME: should we declare our own file format? For now we use require `.json` file extension.
+	public static let profile: Self = .json
 }
 
 extension ExportableProfileFile {
@@ -31,18 +44,13 @@ extension ExportableProfileFile {
 	}
 
 	public init(data: Data) throws {
-		@Dependency(\.jsonDecoder) var jsonDecoder
-		do {
-			self = try .plaintext(jsonDecoder().decode(ProfileSnapshot.self, from: data))
-		} catch let decodePlaintextError {
-			do {
-				self = try .encrypted(jsonDecoder().decode(EncryptedProfileSnapshot.self, from: data))
-			} catch {
-				loggerGlobal.error("Failed to decode imported profile file JSON as ProfileSnapshot, underlying error: \(decodePlaintextError)")
-
-				loggerGlobal.error("Failed to decode imported profile file JSON as EncryptedProfileSnapshot, underlying error: \(error)")
-				throw error
-			}
+		switch Profile.analyzeContents(data: data) {
+		case .encryptedProfile:
+			self = .encrypted(data)
+		case .notProfile:
+			throw FileContentIsNotProfile()
+		case let .plaintextProfile(plaintextProfile):
+			self = .plaintext(plaintextProfile)
 		}
 	}
 
@@ -53,11 +61,10 @@ extension ExportableProfileFile {
 		encoder.outputFormatting = [.withoutEscapingSlashes]
 		switch self {
 		case let .plaintext(plaintext):
-			let jsonData = try encoder.encode(plaintext)
+			let jsonData = plaintext.profileSnapshot()
 			return FileWrapper(regularFileWithContents: jsonData)
 		case let .encrypted(encryptedSnapshot):
-			let jsonData = try encoder.encode(encryptedSnapshot)
-			return FileWrapper(regularFileWithContents: jsonData)
+			return FileWrapper(regularFileWithContents: encryptedSnapshot)
 		}
 	}
 }

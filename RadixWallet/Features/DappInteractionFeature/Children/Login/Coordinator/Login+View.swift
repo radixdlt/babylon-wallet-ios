@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - LoginRequest.View
@@ -11,9 +12,10 @@ extension Login {
 		let availablePersonas: IdentifiedArrayOf<PersonaRow.State>
 		let selectedPersona: PersonaRow.State?
 		let continueButtonRequirements: ContinueButtonRequirements?
+		let createPersonaControlState: ControlState
 
 		struct ContinueButtonRequirements: Equatable {
-			let persona: Profile.Network.Persona
+			let persona: Persona
 		}
 
 		init(state: Login.State) {
@@ -40,6 +42,8 @@ extension Login {
 			} else {
 				self.continueButtonRequirements = nil
 			}
+
+			self.createPersonaControlState = state.personaPrimacy == nil ? .disabled : .enabled
 		}
 	}
 
@@ -87,6 +91,7 @@ extension Login {
 							viewStore.send(.createNewPersonaButtonTapped)
 						}
 						.buttonStyle(.secondaryRectangular(shouldExpand: false))
+						.controlState(viewStore.createPersonaControlState)
 					}
 					.padding(.horizontal, .medium1)
 					.padding(.bottom, .medium2)
@@ -141,7 +146,7 @@ struct Login_Preview: PreviewProvider {
 extension Login.State {
 	static let previewValue: Self = .init(
 		dappMetadata: .previewValue,
-		loginRequest: try! .withChallenge(.init(challenge: .init(rawValue: .init(.deadbeef32Bytes))))
+		loginRequest: try! .withChallenge(.init(challenge: .init(.sample)))
 	)
 }
 #endif

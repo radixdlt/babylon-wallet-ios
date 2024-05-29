@@ -29,10 +29,10 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		public var newMainBDFS: DeviceFactorSource?
 
 		public enum Context: Sendable, Hashable {
-			case fromOnboarding(profileSnapshot: ProfileSnapshot)
+			case fromOnboarding(profile: Profile)
 			case notOnboarding
 
-			var profileSnapshotFromOnboarding: ProfileSnapshot? {
+			var profileSnapshotFromOnboarding: Profile? {
 				switch self {
 				case let .fromOnboarding(profileSnapshot): profileSnapshot
 				case .notOnboarding: nil
@@ -102,7 +102,7 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 	}
 
 	public struct SkippedOrImported: Sendable, Hashable {
-		public let factorSourceID: FactorSource.ID.FromHash
+		public let factorSourceID: FactorSourceIdFromHash
 	}
 
 	@Dependency(\.deviceFactorSourceClient) var deviceFactorSourceClient
@@ -242,8 +242,8 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 		}
 	}
 
-	private func finishedWith(factorSourceID: FactorSourceID.FromHash, state: inout State) -> Effect<Action> {
-		state.mnemonicsLeftToImport.removeAll(where: { $0.id == factorSourceID.embed() })
+	private func finishedWith(factorSourceID: FactorSourceIDFromHash, state: inout State) -> Effect<Action> {
+		state.mnemonicsLeftToImport.removeAll(where: { $0.id == factorSourceID.asGeneral })
 		return nextMnemonicIfNeeded(state: &state)
 	}
 
@@ -255,20 +255,16 @@ public struct ImportMnemonicsFlowCoordinator: Sendable, FeatureReducer {
 			return .none
 		} else {
 			state.destination = nil
-			guard let newMainBDFS = state.newMainBDFS else {
-				return .send(.delegate(.finishedImportingMnemonics(skipped: state.skipped, imported: state.imported, notYetSavedNewMainBDFS: nil)))
-			}
-			if state.context.isFromOnboarding {
-				return .send(.delegate(.finishedImportingMnemonics(skipped: state.skipped, imported: state.imported, notYetSavedNewMainBDFS: state.newMainBDFS)))
-			} else {
-				return .run { [skipped = state.skipped, imported = state.imported] send in
+			return .run { [skipped = state.skipped, imported = state.imported, newMainBDFS = state.newMainBDFS, context = state.context] send in
+				if let newMainBDFS, !context.isFromOnboarding {
 					try await factorSourcesClient.saveNewMainBDFS(newMainBDFS)
-					return await send(.delegate(.finishedImportingMnemonics(
-						skipped: skipped,
-						imported: imported,
-						notYetSavedNewMainBDFS: nil
-					)))
 				}
+
+				return await send(.delegate(.finishedImportingMnemonics(
+					skipped: skipped,
+					imported: imported,
+					notYetSavedNewMainBDFS: newMainBDFS
+				)))
 			}
 		}
 	}

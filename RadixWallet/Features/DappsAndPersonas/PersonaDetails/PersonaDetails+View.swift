@@ -1,4 +1,5 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - View
@@ -64,8 +65,7 @@ extension PersonaDetails.View {
 						.padding(.bottom, .large2)
 					}
 				}
-				.navigationTitle(viewStore.personaName)
-				.navigationBarTitleDisplayMode(.inline)
+				.radixToolbar(title: viewStore.personaName)
 				.onAppear {
 					viewStore.send(.appeared)
 				}
@@ -167,13 +167,16 @@ extension PersonaDetails.State {
 		case .general:
 			nil
 		case let .dApp(dApp, persona):
-			.init(dAppName: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName, sharingAccounts: persona.simpleAccounts ?? [])
+			AccountSection(
+				dAppName: dApp.displayName?.rawValue ?? L10n.DAppRequest.Metadata.unknownName,
+				sharingAccounts: persona.simpleAccounts?.asIdentified() ?? []
+			)
 		}
 	}
 
 	struct AccountSection: Equatable {
 		let dAppName: String
-		let sharingAccounts: OrderedSet<Profile.Network.AccountForDisplay>
+		let sharingAccounts: AccountsForDisplay
 	}
 }
 
@@ -197,7 +200,7 @@ extension PersonaDetails.View {
 							SmallAccountCard(
 								account.label.rawValue,
 								identifiable: .address(.account(account.address)),
-								gradient: .init(account.appearanceID)
+								gradient: .init(account.appearanceId)
 							)
 							.cornerRadius(.small1)
 						}
@@ -298,14 +301,9 @@ extension PersonaDetails.View {
 		struct ViewState: Equatable {
 			let dAppInfo: DappInfo?
 			let personaName: String
-			let companyName: String?
 			let fullName: String?
-			let dateOfBirth: Date?
 			let emailAddresses: [String]?
 			let phoneNumbers: [String]?
-			let urls: [String]?
-			let postalAddresses: [PersonaData.PostalAddress]?
-			let creditCards: [PersonaData.CreditCard]?
 
 			struct DappInfo: Equatable {
 				let name: String
@@ -320,20 +318,8 @@ extension PersonaDetails.View {
 				self.dAppInfo = dAppInfo
 				self.personaName = personaName
 				self.fullName = personaData?.name?.value.formatted
-				self.emailAddresses = personaData?.emailAddresses.map(\.value.email)
-				self.phoneNumbers = personaData?.phoneNumbers.map(\.value.number)
-
-				self.dateOfBirth = personaData?.dateOfBirth?.value.date
-				self.companyName = personaData?.companyName?.value.name
-				self.urls = personaData?.urls.map(\.value.url)
-				self.postalAddresses = personaData?.postalAddresses.map(\.value)
-				self.creditCards = personaData?.creditCards.map(\.value)
-
-				// The only purpose of this switch is to make sure we get a compilation error when we add a new PersonaData.Entry kind, so
-				// we do not forget to handle it here.
-				switch PersonaData.Entry.Kind.fullName {
-				case .fullName, .dateOfBirth, .companyName, .emailAddress, .phoneNumber, .url, .postalAddress, .creditCard: break
-				}
+				self.emailAddresses = personaData?.emailAddresses.collection.map(\.value.email)
+				self.phoneNumbers = personaData?.phoneNumbers.collection.map(\.value.number)
 			}
 		}
 

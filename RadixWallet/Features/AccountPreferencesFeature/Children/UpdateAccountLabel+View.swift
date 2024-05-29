@@ -14,7 +14,7 @@ extension UpdateAccountLabel.State {
 
 	private var hintAndControlState: (ControlState, Hint?) {
 		if let sanitizedName {
-			if sanitizedName.count > Profile.Network.Account.nameMaxLength {
+			if sanitizedName.count > Account.nameMaxLength {
 				return (.disabled, .error(L10n.Error.AccountLabel.tooLong))
 			}
 		} else {
@@ -75,19 +75,8 @@ extension UpdateAccountLabel {
 					Spacer(minLength: 0)
 				}
 				.background(.app.gray5)
-				.navigationTitle(L10n.AccountSettings.RenameAccount.title)
-				.defaultNavBarConfig()
+				.radixToolbar(title: L10n.AccountSettings.RenameAccount.title)
 			}
 		}
-	}
-}
-
-extension View {
-	func defaultNavBarConfig() -> some View {
-		navigationBarTitleColor(.app.gray1)
-			.navigationBarTitleDisplayMode(.inline)
-			.navigationBarInlineTitleFont(.app.secondaryHeader)
-			.toolbarBackground(.app.background, for: .navigationBar)
-			.toolbarBackground(.visible, for: .navigationBar)
 	}
 }

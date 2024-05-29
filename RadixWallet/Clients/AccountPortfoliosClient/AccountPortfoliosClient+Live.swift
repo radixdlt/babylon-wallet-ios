@@ -27,7 +27,7 @@ extension AccountPortfoliosClient: DependencyKey {
 
 		/// Fetches the pool and stake units details for a given account; Will update the portfolio accordingly
 		@Sendable
-		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.Account, cachingStrategy: OnLedgerEntitiesClient.CachingStrategy) async {
+		func fetchPoolAndStakeUnitsDetails(_ account: OnLedgerEntity.OnLedgerAccount, cachingStrategy: OnLedgerEntitiesClient.CachingStrategy) async {
 			async let poolDetailsFetch = Task {
 				do {
 					let poolUnitDetails = try await onLedgerEntitiesClient.getOwnedPoolUnitsDetails(account, cachingStrategy: cachingStrategy)
@@ -51,17 +51,17 @@ extension AccountPortfoliosClient: DependencyKey {
 		@Sendable
 		func applyTokenPrices(_ resources: [ResourceAddress], forceRefresh: Bool) async {
 			if !resources.isEmpty {
-				let prices = try? await tokenPricesClient.getTokenPrices(
-					.init(
-						tokens: Array(resources.uniqued()),
-						currency: state.selectedCurrency
-					),
-					forceRefresh
-				)
-
-				if let prices {
-					await state.setTokenPrices(prices)
+				let prices = await Result {
+					try await tokenPricesClient.getTokenPrices(
+						.init(
+							tokens: Array(resources.uniqued()),
+							currency: state.selectedCurrency
+						),
+						forceRefresh
+					)
 				}
+
+				await state.setTokenPrices(prices)
 			}
 		}
 
@@ -142,11 +142,12 @@ extension AccountPortfoliosClient: DependencyKey {
 			let account = try await onLedgerEntitiesClient.getAccount(accountAddress)
 			let portfolio = AccountPortfolio(account: account)
 
-			let currentResources = await state.tokenPrices.keys
-			await applyTokenPrices(
-				currentResources + account.resourcesWithPrices,
-				forceRefresh: forceRefresh
-			)
+			if case let .success(tokenPrices) = await state.tokenPrices {
+				await applyTokenPrices(
+					tokenPrices.keys + account.resourcesWithPrices,
+					forceRefresh: forceRefresh
+				)
+			}
 
 			await state.handlePortfolioUpdate(portfolio)
 			await fetchPoolAndStakeUnitsDetails(account.nonEmptyVaults, cachingStrategy: forceRefresh ? .forceUpdate : .useCache)
@@ -178,7 +179,7 @@ extension AccountPortfoliosClient: DependencyKey {
 	}()
 }
 
-extension OnLedgerEntity.Account {
+extension OnLedgerEntity.OnLedgerAccount {
 	/// The resources which can have prices
 	fileprivate var resourcesWithPrices: [ResourceAddress] {
 		allFungibleResourceAddresses + poolUnitResources.poolUnits.flatMap(\.poolResources)

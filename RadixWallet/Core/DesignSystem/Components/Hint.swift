@@ -4,6 +4,16 @@ public struct Hint: View, Equatable {
 	public struct ViewState: Equatable {
 		public let kind: Kind
 		public let text: Text?
+
+		public init(kind: Kind, text: Text?) {
+			self.kind = kind
+			self.text = text
+		}
+
+		public init(kind: Kind, text: some StringProtocol) {
+			self.kind = kind
+			self.text = Text(text)
+		}
 	}
 
 	public enum Kind: Equatable {
@@ -44,15 +54,17 @@ public struct Hint: View, Equatable {
 
 	public var body: some View {
 		if let text = viewState.text {
-			Label {
-				text.lineSpacing(0).textStyle(.body2Regular)
-			} icon: {
-				if let iconAsset {
-					Image(asset: iconAsset)
-						.resizable()
+			HStack(spacing: .small3) {
+				if let iconResource {
+					Image(iconResource)
 						.renderingMode(.template)
+						.resizable()
+						.scaledToFit()
 						.frame(.smallest)
 				}
+				text
+					.lineSpacing(0)
+					.textStyle(.body2HighImportance)
 			}
 			.foregroundColor(foregroundColor)
 		}
@@ -69,14 +81,12 @@ public struct Hint: View, Equatable {
 		}
 	}
 
-	private var iconAsset: ImageAsset? {
+	private var iconResource: ImageResource? {
 		switch viewState.kind {
 		case .info:
 			nil
-		case .error:
-			AssetResource.error
-		case .warning:
-			AssetResource.warningError
+		case .error, .warning:
+			.error
 		}
 	}
 }

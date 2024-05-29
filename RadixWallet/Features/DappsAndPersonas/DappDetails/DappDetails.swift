@@ -32,7 +32,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		public let dAppDefinitionAddress: DappDefinitionAddress
 
 		// This will only be non-nil if the dApp is in fact authorized
-		public var authorizedDapp: Profile.Network.AuthorizedDappDetailed?
+		public var authorizedDapp: AuthorizedDappDetailed?
 
 		public var personaList: PersonaList.State
 
@@ -50,7 +50,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 
 		// Authorized dApp
 		public init(
-			dApp: Profile.Network.AuthorizedDappDetailed,
+			dApp: AuthorizedDappDetailed,
 			context: Context.SettingsContext,
 			metadata: OnLedgerEntity.Metadata? = nil,
 			resources: Resources? = nil,
@@ -110,7 +110,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 		case metadataLoaded(Loadable<OnLedgerEntity.Metadata>)
 		case resourcesLoaded(Loadable<State.Resources>)
 		case associatedDappsLoaded(Loadable<[OnLedgerEntity.AssociatedDapp]>)
-		case dAppUpdated(Profile.Network.AuthorizedDappDetailed)
+		case dAppUpdated(AuthorizedDappDetailed)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -235,7 +235,12 @@ public struct DappDetails: Sendable, FeatureReducer {
 	public func reduce(into state: inout State, childAction: ChildAction) -> Effect<Action> {
 		switch childAction {
 		case let .personaList(.delegate(.openDetails(persona))):
-			guard let dApp = state.authorizedDapp, let detailedPersona = dApp.detailedAuthorizedPersonas[id: persona.id] else { return .none }
+
+			guard
+				let dApp = state.authorizedDapp,
+				let detailedPersona = dApp.detailedAuthorizedPersonas.asIdentified()[id: persona.id]
+			else { return .none }
+
 			let personaDetailsState = PersonaDetails.State(.dApp(dApp, persona: detailedPersona))
 			state.destination = .personaDetails(personaDetailsState)
 			return .none
@@ -271,7 +276,7 @@ public struct DappDetails: Sendable, FeatureReducer {
 			assert(dApp.dAppDefinitionAddress == state.dAppDefinitionAddress, "dAppUpdated called with wrong dApp")
 			guard !dApp.detailedAuthorizedPersonas.isEmpty else {
 				// FIXME: Without this delay, the screen is never dismissed
-				return disconnectDappEffect(dAppID: dApp.dAppDefinitionAddress, networkID: dApp.networkID, delay: .milliseconds(500))
+				return disconnectDappEffect(dAppID: dApp.dAppDefinitionAddress, networkID: dApp.networkId, delay: .milliseconds(500))
 			}
 			state.authorizedDapp = dApp
 			state.personaList = .init(dApp: dApp)
@@ -290,13 +295,9 @@ public struct DappDetails: Sendable, FeatureReducer {
 			let dAppID = state.dAppDefinitionAddress
 			return update(dAppID: dAppID, dismissPersonaDetails: false)
 
-		case .fungibleDetails(.delegate(.dismiss)):
-			state.destination = nil
-			return .none
-
 		case .confirmDisconnectAlert(.confirmTapped):
 			assert(state.authorizedDapp != nil, "Can only disconnect a dApp that has been authorized")
-			guard let networkID = state.authorizedDapp?.networkID else { return .none }
+			guard let networkID = state.authorizedDapp?.networkId else { return .none }
 			return disconnectDappEffect(dAppID: state.dAppDefinitionAddress, networkID: networkID)
 
 		default:

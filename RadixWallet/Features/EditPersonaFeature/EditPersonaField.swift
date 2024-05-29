@@ -184,6 +184,16 @@ extension DynamicFieldID: EditPersonaFieldKindBehaviour {
 	}
 }
 
+extension PersonaData.Entry.Kind {
+	public static var supportedKinds: [Self] {
+		[
+			.fullName,
+			.phoneNumber,
+			.emailAddress,
+		]
+	}
+}
+
 // MARK: - PersonaData.Entry.Kind + Comparable
 extension PersonaData.Entry.Kind: Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {

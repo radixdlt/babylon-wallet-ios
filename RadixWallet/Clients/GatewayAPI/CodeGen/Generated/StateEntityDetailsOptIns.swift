@@ -20,6 +20,8 @@ public struct StateEntityDetailsOptIns: Codable, Hashable {
 
     /** if set to `true`, ancestor addresses - `parent_address`, `owner_address` and `global_address` for entities are returned. */
     public private(set) var ancestorIdentities: Bool? = false
+    /** if set to `true`, `royalty_config` for component entities is returned. */
+    public private(set) var componentRoyaltyConfig: Bool? = false
     /** if set to `true`, `royalty_vault_balance` for component entities is returned. */
     public private(set) var componentRoyaltyVaultBalance: Bool? = false
     /** if set to `true`, `royalty_vault_balance` for package entities is returned. */
@@ -29,8 +31,9 @@ public struct StateEntityDetailsOptIns: Codable, Hashable {
     /** allows specifying explicitly metadata properties which should be returned in response. */
     public private(set) var explicitMetadata: [String]?
 
-    public init(ancestorIdentities: Bool? = false, componentRoyaltyVaultBalance: Bool? = false, packageRoyaltyVaultBalance: Bool? = false, nonFungibleIncludeNfids: Bool? = false, explicitMetadata: [String]? = nil) {
+    public init(ancestorIdentities: Bool? = false, componentRoyaltyConfig: Bool? = false, componentRoyaltyVaultBalance: Bool? = false, packageRoyaltyVaultBalance: Bool? = false, nonFungibleIncludeNfids: Bool? = false, explicitMetadata: [String]? = nil) {
         self.ancestorIdentities = ancestorIdentities
+        self.componentRoyaltyConfig = componentRoyaltyConfig
         self.componentRoyaltyVaultBalance = componentRoyaltyVaultBalance
         self.packageRoyaltyVaultBalance = packageRoyaltyVaultBalance
         self.nonFungibleIncludeNfids = nonFungibleIncludeNfids
@@ -39,6 +42,7 @@ public struct StateEntityDetailsOptIns: Codable, Hashable {
 
     public enum CodingKeys: String, CodingKey, CaseIterable {
         case ancestorIdentities = "ancestor_identities"
+        case componentRoyaltyConfig = "component_royalty_config"
         case componentRoyaltyVaultBalance = "component_royalty_vault_balance"
         case packageRoyaltyVaultBalance = "package_royalty_vault_balance"
         case nonFungibleIncludeNfids = "non_fungible_include_nfids"
@@ -50,6 +54,7 @@ public struct StateEntityDetailsOptIns: Codable, Hashable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(ancestorIdentities, forKey: .ancestorIdentities)
+        try container.encodeIfPresent(componentRoyaltyConfig, forKey: .componentRoyaltyConfig)
         try container.encodeIfPresent(componentRoyaltyVaultBalance, forKey: .componentRoyaltyVaultBalance)
         try container.encodeIfPresent(packageRoyaltyVaultBalance, forKey: .packageRoyaltyVaultBalance)
         try container.encodeIfPresent(nonFungibleIncludeNfids, forKey: .nonFungibleIncludeNfids)

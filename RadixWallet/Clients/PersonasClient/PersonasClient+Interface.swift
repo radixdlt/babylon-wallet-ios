@@ -1,6 +1,9 @@
+import IdentifiedCollections
+import Sargon
+
 // MARK: - PersonasClient
 public struct PersonasClient: Sendable {
-	public var personas: Personas
+	public var personas: PersonasUpdates
 	public var getPersonas: GetPersonas
 	public var getPersonasOnNetwork: GetPersonasOnNetwork
 	public var getHiddenPersonasOnCurrentNetwork: getHiddenPersonasOnCurrentNetwork
@@ -11,7 +14,7 @@ public struct PersonasClient: Sendable {
 	public var hasSomePersonaOnCurrentNetwork: HasSomePersonaOnCurrentNetwork
 
 	public init(
-		personas: @escaping Personas,
+		personas: @escaping PersonasUpdates,
 		getPersonas: @escaping GetPersonas,
 		getPersonasOnNetwork: @escaping GetPersonasOnNetwork,
 		getHiddenPersonasOnCurrentNetwork: @escaping getHiddenPersonasOnCurrentNetwork,
@@ -32,18 +35,18 @@ public struct PersonasClient: Sendable {
 }
 
 extension PersonasClient {
-	public typealias Personas = @Sendable () async -> AnyAsyncSequence<Profile.Network.Personas>
-	public typealias GetPersonas = @Sendable () async throws -> Profile.Network.Personas
-	public typealias GetPersonasOnNetwork = @Sendable (NetworkID) async -> Profile.Network.Personas
-	public typealias getHiddenPersonasOnCurrentNetwork = @Sendable () async throws -> Profile.Network.Personas
+	public typealias PersonasUpdates = @Sendable () async -> AnyAsyncSequence<Personas>
+	public typealias GetPersonas = @Sendable () async throws -> Personas
+	public typealias GetPersonasOnNetwork = @Sendable (NetworkID) async -> Personas
+	public typealias getHiddenPersonasOnCurrentNetwork = @Sendable () async throws -> Personas
 	public typealias HasSomePersonaOnAnyNetworks = @Sendable () async -> Bool
 	public typealias HasSomePersonaOnCurrentNetwork = @Sendable () async -> Bool
-	public typealias UpdatePersona = @Sendable (Profile.Network.Persona) async throws -> Void
-	public typealias SaveVirtualPersona = @Sendable (Profile.Network.Persona) async throws -> Void
+	public typealias UpdatePersona = @Sendable (Persona) async throws -> Void
+	public typealias SaveVirtualPersona = @Sendable (Persona) async throws -> Void
 }
 
 extension PersonasClient {
-	public func getPersona(id: Profile.Network.Persona.ID) async throws -> Profile.Network.Persona {
+	public func getPersona(id: Persona.ID) async throws -> Persona {
 		let personas = try await getPersonas()
 		guard let persona = personas[id: id] else {
 			throw PersonaNotFoundError(id: id)
@@ -53,7 +56,7 @@ extension PersonasClient {
 	}
 
 	public struct PersonaNotFoundError: Error {
-		let id: Profile.Network.Persona.ID
+		let id: Persona.ID
 	}
 
 	public func determinePersonaPrimacy() async -> PersonaPrimacy {

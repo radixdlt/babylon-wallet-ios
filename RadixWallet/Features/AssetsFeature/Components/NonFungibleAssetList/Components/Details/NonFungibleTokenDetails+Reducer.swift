@@ -40,7 +40,7 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 	}
 
 	public enum DelegateAction: Sendable, Equatable {
-		case tappedClaimStake(ResourceAddress, OnLedgerEntitiesClient.StakeClaim)
+		case tappedClaimStake(OnLedgerEntitiesClient.StakeClaim)
 	}
 
 	@Dependency(\.onLedgerEntitiesClient) var onLedgerEntitiesClient
@@ -72,7 +72,7 @@ public struct NonFungibleTokenDetails: Sendable, FeatureReducer {
 			guard let stakeClaim = state.stakeClaim else {
 				return .none
 			}
-			return .send(.delegate(.tappedClaimStake(state.resourceAddress, stakeClaim)))
+			return .send(.delegate(.tappedClaimStake(stakeClaim)))
 		}
 	}
 

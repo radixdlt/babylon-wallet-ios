@@ -34,7 +34,7 @@ extension PersonaList {
 					.padding(.horizontal, .medium3)
 					.padding(.vertical, .large1)
 				}
-				.navigationTitle(L10n.Personas.title)
+				.radixToolbar(title: L10n.Personas.title)
 			}
 		}
 	}
@@ -60,7 +60,7 @@ public struct PersonaListCoreView: View {
 					action: { .child(.persona(id: $0, action: $1)) }
 				)
 			) {
-				Persona.View(store: $0, tappable: tappable, showShield: showShield)
+				PersonaFeature.View(store: $0, tappable: tappable, showShield: showShield)
 					.padding(.horizontal, .medium3)
 			}
 		}

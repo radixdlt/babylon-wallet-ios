@@ -1,3 +1,16 @@
+import Sargon
+
+extension FiatCurrency {
+	var currencyCode: String {
+		switch self {
+		case .usd:
+			"USD"
+		case .sek:
+			"SEK"
+		}
+	}
+}
+
 // MARK: - FiatWorth
 public struct FiatWorth: Sendable, Hashable {
 	enum Worth: Sendable, Hashable {
@@ -143,14 +156,5 @@ extension FiatWorth {
 		}
 
 		return attributedString
-	}
-}
-
-extension FiatCurrency {
-	var currencyCode: String {
-		switch self {
-		case .usd:
-			"USD"
-		}
 	}
 }

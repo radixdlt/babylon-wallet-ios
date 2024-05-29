@@ -1,5 +1,6 @@
 
 import DependenciesAdditions
+import Sargon
 
 // MARK: - UserDefaultsKey
 public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
@@ -9,6 +10,12 @@ public enum UserDefaultsKey: String, Sendable, Hashable, CaseIterable {
 	case transactionsCompletedCounter
 	case dateOfLastSubmittedNPSSurvey
 	case npsSurveyUserID
+	case didMigrateKeychainProfiles
+	case lastCloudBackups
+	case lastManualBackups
+	case lastSyncedAccountsWithCE
+	case showRelinkConnectorsAfterUpdate
+	case showRelinkConnectorsAfterProfileRestore
 
 	/// DO NOT CHANGE THIS KEY
 	case activeProfileID
@@ -101,11 +108,11 @@ extension UserDefaults.Dependency {
 		set(value, forKey: Key.showRadixBanner.rawValue)
 	}
 
-	public func getActiveProfileID() -> ProfileSnapshot.Header.ID? {
+	public func getActiveProfileID() -> ProfileID? {
 		string(forKey: Key.activeProfileID.rawValue).flatMap(UUID.init(uuidString:))
 	}
 
-	public func setActiveProfileID(_ id: ProfileSnapshot.Header.UsedDeviceInfo.ID) {
+	public func setActiveProfileID(_ id: ProfileID) {
 		set(id.uuidString, forKey: Key.activeProfileID.rawValue)
 	}
 
@@ -155,5 +162,102 @@ extension UserDefaults.Dependency {
 
 	public func getDappLinkingAutoContinueEnabled() -> Bool {
 		bool(forKey: Key.dAppLinkingAutoContinueEnabled.rawValue) ?? false
+	}
+
+	public var getDidMigrateKeychainProfiles: Bool {
+		bool(key: .didMigrateKeychainProfiles)
+	}
+
+	public func setDidMigrateKeychainProfiles(_ value: Bool) {
+		set(value, forKey: Key.didMigrateKeychainProfiles.rawValue)
+	}
+
+	public var getLastCloudBackups: [ProfileID: BackupResult] {
+		(try? loadCodable(key: .lastCloudBackups)) ?? [:]
+	}
+
+	public func removeLastCloudBackup(for id: ProfileID) throws {
+		var backups: [UUID: BackupResult] = getLastCloudBackups
+		backups[id] = nil
+		try save(codable: backups, forKey: .lastCloudBackups)
+	}
+
+	public func setLastCloudBackup(_ result: BackupResult.Result, of profile: Profile) throws {
+		var backups: [UUID: BackupResult] = getLastCloudBackups
+		backups[profile.id] = .init(
+			backupDate: .now,
+			profileHash: profile.hashValue,
+			result: result
+		)
+
+		try save(codable: backups, forKey: .lastCloudBackups)
+	}
+
+	public func lastCloudBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<BackupResult?> {
+		lastBackupValues(for: profileID, key: .lastCloudBackups)
+	}
+
+	public var getLastManualBackups: [ProfileID: BackupResult] {
+		(try? loadCodable(key: .lastManualBackups)) ?? [:]
+	}
+
+	/// Only call this on successful manual backups
+	public func setLastManualBackup(of profile: Profile) throws {
+		var backups: [ProfileID: BackupResult] = getLastManualBackups
+		backups[profile.id] = .init(
+			backupDate: .now,
+			profileHash: profile.hashValue,
+			result: .success
+		)
+
+		try save(codable: backups, forKey: .lastManualBackups)
+	}
+
+	public func lastManualBackupValues(for profileID: ProfileID) -> AnyAsyncSequence<BackupResult?> {
+		lastBackupValues(for: profileID, key: .lastManualBackups)
+	}
+
+	private func lastBackupValues(for profileID: ProfileID, key: UserDefaultsKey) -> AnyAsyncSequence<BackupResult?> {
+		codableValues(key: key, codable: [ProfileID: BackupResult].self)
+			.map { (try? $0.get())?[profileID] }
+			.eraseToAnyAsyncSequence()
+	}
+
+	public func getLastSyncedAccountsWithCE() -> String? {
+		string(forKey: Key.lastSyncedAccountsWithCE.rawValue)
+	}
+
+	public func setLastSyncedAccountsWithCE(_ value: String) {
+		set(value, forKey: Key.lastSyncedAccountsWithCE.rawValue)
+	}
+
+	public var showRelinkConnectorsAfterUpdate: Bool {
+		bool(key: .showRelinkConnectorsAfterUpdate)
+	}
+
+	public func setShowRelinkConnectorsAfterUpdate(_ value: Bool) {
+		set(value, forKey: Key.showRelinkConnectorsAfterUpdate.rawValue)
+	}
+
+	public var showRelinkConnectorsAfterProfileRestore: Bool {
+		bool(key: .showRelinkConnectorsAfterProfileRestore)
+	}
+
+	public func setShowRelinkConnectorsAfterProfileRestore(_ value: Bool) {
+		set(value, forKey: Key.showRelinkConnectorsAfterProfileRestore.rawValue)
+	}
+}
+
+// MARK: - BackupResult
+public struct BackupResult: Codable, Sendable {
+	public let backupDate: Date
+	public let profileHash: Int
+	public let result: Result
+
+	public enum Result: Codable, Sendable {
+		case success
+		case temporarilyUnavailable
+		case notAuthenticated
+		case failure
 	}
 }

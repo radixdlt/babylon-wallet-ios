@@ -1,13 +1,14 @@
 import ComposableArchitecture
+import Sargon
 import SwiftUI
 
 // MARK: - GatewaySettings
 public struct GatewaySettings: Sendable, FeatureReducer {
 	public struct State: Sendable, Hashable {
 		var gatewayList: GatewayList.State
-		var currentGateway: Radix.Gateway?
-		var validatedNewGatewayToSwitchTo: Radix.Gateway?
-		var gatewayForRemoval: Radix.Gateway?
+		var currentGateway: Gateway?
+		var validatedNewGatewayToSwitchTo: Gateway?
+		var gatewayForRemoval: Gateway?
 
 		@PresentationState
 		var destination: Destination.State?
@@ -26,10 +27,10 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 	}
 
 	public enum InternalAction: Sendable, Equatable {
-		case gatewaysLoadedResult(TaskResult<Gateways>)
+		case savedGatewaysLoadedResult(TaskResult<SavedGateways>)
 		case hasAccountsResult(TaskResult<Bool>)
-		case createAccountOnNetworkBeforeSwitchingToIt(Radix.Gateway)
-		case switchToGatewayResult(TaskResult<Radix.Gateway>)
+		case createAccountOnNetworkBeforeSwitchingToIt(Gateway)
+		case switchToGatewayResult(TaskResult<Gateway>)
 	}
 
 	public enum ChildAction: Sendable, Equatable {
@@ -104,7 +105,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			return .run { send in
 				for try await gateways in await gatewaysClient.gatewaysValues() {
 					guard !Task.isCancelled else { return }
-					await send(.internal(.gatewaysLoadedResult(.success(gateways))))
+					await send(.internal(.savedGatewaysLoadedResult(.success(gateways))))
 				}
 			} catch: { error, _ in
 				errorQueue.schedule(error)
@@ -129,14 +130,14 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 
 	public func reduce(into state: inout State, internalAction: InternalAction) -> Effect<Action> {
 		switch internalAction {
-		case let .gatewaysLoadedResult(.success(gateways)):
+		case let .savedGatewaysLoadedResult(.success(savedGateways)):
 
-			state.currentGateway = gateways.current
+			state.currentGateway = savedGateways.current
 			state.gatewayList = .init(gateways: .init(
-				uniqueElements: gateways.all.elements.map {
+				uniqueElements: savedGateways.all.map {
 					GatewayRow.State(
 						gateway: $0,
-						isSelected: gateways.current.id == $0.id,
+						isSelected: savedGateways.current.id == $0.id,
 						canBeDeleted: !$0.isWellknown
 					)
 				}
@@ -144,7 +145,7 @@ public struct GatewaySettings: Sendable, FeatureReducer {
 			state.gatewayList.gateways.sort()
 			return .none
 
-		case let .gatewaysLoadedResult(.failure(error)):
+		case let .savedGatewaysLoadedResult(.failure(error)):
 			errorQueue.schedule(error)
 			return .none
 
@@ -296,7 +297,7 @@ private extension GatewaySettings {
 		return .none
 	}
 
-	func switchToGateway(_ state: inout State, gateway: Radix.Gateway) -> Effect<Action> {
+	func switchToGateway(_ state: inout State, gateway: Gateway) -> Effect<Action> {
 		guard
 			let current = state.currentGateway,
 			current.id != gateway.id

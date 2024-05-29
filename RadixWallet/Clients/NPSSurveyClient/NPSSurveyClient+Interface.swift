@@ -11,7 +11,7 @@ extension NPSSurveyClient {
 		public let reason: String?
 	}
 
-	public typealias UploadUserFeedback = (UserFeedback?) async -> Void
-	public typealias IncrementTransactionCompleteCounter = () -> Void
-	public typealias ShouldAskForUserFeedback = () async -> AnyAsyncSequence<Bool>
+	public typealias UploadUserFeedback = @Sendable (UserFeedback?) async -> Void
+	public typealias IncrementTransactionCompleteCounter = @Sendable () -> Void
+	public typealias ShouldAskForUserFeedback = @Sendable () async -> AnyAsyncSequence<Bool>
 }

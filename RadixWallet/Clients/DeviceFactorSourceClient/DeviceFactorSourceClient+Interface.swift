@@ -1,3 +1,5 @@
+import Sargon
+
 // MARK: - DeviceFactorSourceClient
 public struct DeviceFactorSourceClient: Sendable {
 	public var publicKeysFromOnDeviceHD: PublicKeysFromOnDeviceHD
@@ -10,30 +12,42 @@ public struct DeviceFactorSourceClient: Sendable {
 	/// Fetched accounts and personas on current network that are controlled by a device factor source, for every factor source in current profile
 	public var controlledEntities: GetControlledEntities
 
+	/// Checks if there is any account for which the wallet doesn't have its seed phrase.
+	public var isSeedPhraseNeededToRecoverAccounts: IsSeedPhraseNeededToRecoverAccounts
+
+	/// The `Accounts` & `Personas` the user wouldn't be able to recover if they loose their phone,
+	/// since they haven't been backed up (seed phrase not written).
+	public var unrecoverableEntities: UnrecoverableEntities
+
 	public init(
 		publicKeysFromOnDeviceHD: @escaping PublicKeysFromOnDeviceHD,
 		signatureFromOnDeviceHD: @escaping SignatureFromOnDeviceHD,
 		isAccountRecoveryNeeded: @escaping IsAccountRecoveryNeeded,
 		entitiesControlledByFactorSource: @escaping GetEntitiesControlledByFactorSource,
-		controlledEntities: @escaping GetControlledEntities
+		controlledEntities: @escaping GetControlledEntities,
+		isSeedPhraseNeededToRecoverAccounts: @escaping IsSeedPhraseNeededToRecoverAccounts,
+		unrecoverableEntities: @escaping UnrecoverableEntities
 	) {
 		self.publicKeysFromOnDeviceHD = publicKeysFromOnDeviceHD
 		self.signatureFromOnDeviceHD = signatureFromOnDeviceHD
 		self.isAccountRecoveryNeeded = isAccountRecoveryNeeded
-
 		self.entitiesControlledByFactorSource = entitiesControlledByFactorSource
 		self.controlledEntities = controlledEntities
+		self.isSeedPhraseNeededToRecoverAccounts = isSeedPhraseNeededToRecoverAccounts
+		self.unrecoverableEntities = unrecoverableEntities
 	}
 }
 
 // MARK: DeviceFactorSourceClient.onDeviceHDPublicKey
 extension DeviceFactorSourceClient {
-	public typealias GetEntitiesControlledByFactorSource = @Sendable (DeviceFactorSource, ProfileSnapshot?) async throws -> EntitiesControlledByFactorSource
-	public typealias GetControlledEntities = @Sendable (ProfileSnapshot?) async throws -> IdentifiedArrayOf<EntitiesControlledByFactorSource>
+	public typealias GetEntitiesControlledByFactorSource = @Sendable (DeviceFactorSource, Profile?) async throws -> EntitiesControlledByFactorSource
+	public typealias GetControlledEntities = @Sendable (Profile?) async throws -> IdentifiedArrayOf<EntitiesControlledByFactorSource>
 
 	public typealias PublicKeysFromOnDeviceHD = @Sendable (PublicKeysFromOnDeviceHDRequest) async throws -> [HierarchicalDeterministicPublicKey]
 	public typealias SignatureFromOnDeviceHD = @Sendable (SignatureFromOnDeviceHDRequest) async throws -> SignatureWithPublicKey
 	public typealias IsAccountRecoveryNeeded = @Sendable () async throws -> Bool
+	public typealias IsSeedPhraseNeededToRecoverAccounts = @Sendable () async throws -> Bool
+	public typealias UnrecoverableEntities = @Sendable () async throws -> (accounts: [AccountAddress], personas: [IdentityAddress])
 }
 
 // MARK: - DiscrepancyUnsupportedCurve
@@ -61,7 +75,7 @@ public struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
 	}
 
 	public enum Source: Sendable, Hashable {
-		case privateHDFactorSource(PrivateHDFactorSource)
+		case privateHDFactorSource(PrivateHierarchicalDeterministicFactorSource)
 		case loadMnemonicFor(DeviceFactorSource, purpose: SecureStorageClient.LoadMnemonicPurpose)
 
 		public var deviceFactorSource: DeviceFactorSource {
@@ -84,7 +98,7 @@ public struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
 		source: Source
 	) throws {
 		for derivationPath in derivationPaths {
-			guard source.deviceFactorSource.cryptoParameters.supportedCurves.contains(derivationPath.curveForScheme) else {
+			guard source.deviceFactorSource.cryptoParameters.supportedCurves.contains(derivationPath.curve) else {
 				throw DiscrepancyUnsupportedCurve()
 			}
 		}
@@ -95,24 +109,12 @@ public struct PublicKeysFromOnDeviceHDRequest: Sendable, Hashable {
 
 // MARK: - SignatureFromOnDeviceHDRequest
 public struct SignatureFromOnDeviceHDRequest: Sendable, Hashable {
-	public let hdRoot: HD.Root
+	public let mnemonicWithPassphrase: MnemonicWithPassphrase
 	public let derivationPath: DerivationPath
-	public let curve: SLIP10.Curve
+	public let curve: SLIP10Curve
 
 	/// The data to sign
-	public let hashedData: Data
-
-	public init(
-		hdRoot: HD.Root,
-		derivationPath: DerivationPath,
-		curve: SLIP10.Curve,
-		hashedData: Data
-	) {
-		self.hdRoot = hdRoot
-		self.derivationPath = derivationPath
-		self.curve = curve
-		self.hashedData = hashedData
-	}
+	public let hashedData: Hash
 }
 
 // MARK: - FailedToFindDeviceFactorSourceForSigning
@@ -122,8 +124,8 @@ struct FailedToFindDeviceFactorSourceForSigning: Swift.Error {}
 struct IncorrectSignatureCountExpectedExactlyOne: Swift.Error {}
 extension DeviceFactorSourceClient {
 	public func signUsingDeviceFactorSource(
-		signerEntity: EntityPotentiallyVirtual,
-		hashedDataToSign: Data,
+		signerEntity: AccountOrPersona,
+		hashedDataToSign: Hash,
 		purpose: SigningPurpose
 	) async throws -> SignatureOfEntity {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
@@ -160,8 +162,8 @@ extension DeviceFactorSourceClient {
 
 	public func signUsingDeviceFactorSource(
 		deviceFactorSource: DeviceFactorSource,
-		signerEntities: Set<EntityPotentiallyVirtual>,
-		hashedDataToSign: some DataProtocol,
+		signerEntities: Set<AccountOrPersona>,
+		hashedDataToSign: Hash,
 		purpose: SigningPurpose
 	) async throws -> Set<SignatureOfEntity> {
 		@Dependency(\.factorSourcesClient) var factorSourcesClient
@@ -176,7 +178,6 @@ extension DeviceFactorSourceClient {
 		else {
 			throw FailedToFindDeviceFactorSourceForSigning()
 		}
-		let hdRoot = try loadedMnemonicWithPassphrase.hdRoot()
 
 		var signatures = Set<SignatureOfEntity>()
 
@@ -202,17 +203,17 @@ extension DeviceFactorSourceClient {
 
 				loggerGlobal.debug("🔏 Signing data with device, with entity=\(entity.displayName), curve=\(curve), factor source hint.name=\(deviceFactorSource.hint.name), hint.model=\(deviceFactorSource.hint.model)")
 
-				let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(.init(
-					hdRoot: hdRoot,
+				let signatureWithPublicKey = try await self.signatureFromOnDeviceHD(SignatureFromOnDeviceHDRequest(
+					mnemonicWithPassphrase: loadedMnemonicWithPassphrase,
 					derivationPath: derivationPath,
 					curve: curve,
-					hashedData: Data(hashedDataToSign)
+					hashedData: hashedDataToSign
 				))
 
 				let entitySignature = SignatureOfEntity(
 					signerEntity: entity,
 					derivationPath: derivationPath,
-					factorSourceID: factorSourceID.embed(),
+					factorSourceID: factorSourceID.asGeneral,
 					signatureWithPublicKey: signatureWithPublicKey
 				)
 

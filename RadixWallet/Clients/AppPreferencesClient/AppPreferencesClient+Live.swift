@@ -14,8 +14,8 @@ extension AppPreferencesClient: DependencyKey {
 					$0.appPreferences = newPreferences
 				}
 			},
-			extractProfileSnapshot: {
-				await profileStore.profile.snapshot()
+			extractProfile: {
+				await profileStore.profile
 			},
 			deleteProfileAndFactorSources: { keepInICloudIfPresent in
 				try await profileStore.deleteProfile(keepInICloudIfPresent: keepInICloudIfPresent)
@@ -34,8 +34,14 @@ extension AppPreferencesClient: DependencyKey {
 					isEnabled ? .enable : .disable
 				)
 			},
-			getDetailsOfSecurityStructure: { configRef in
-				try await profileStore.profile.detailedSecurityStructureConfiguration(reference: configRef)
+			setIsCloudBackupEnabled: { isEnabled in
+				let profile = await profileStore.profile
+				let wasEnabled = profile.appPreferences.security.isCloudProfileSyncEnabled
+				guard wasEnabled != isEnabled else { return }
+
+				try await profileStore.updating { profile in
+					profile.appPreferences.security.isCloudProfileSyncEnabled = isEnabled
+				}
 			}
 		)
 	}

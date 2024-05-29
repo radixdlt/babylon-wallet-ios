@@ -33,21 +33,21 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 
 	public struct AuthLoginWithoutChallengeRequestResponseItem: Sendable, Hashable, Encodable {
 		public let discriminator = P2P.Dapp.Request.AuthRequestItem.Discriminator.loginWithoutChallenge.rawValue
-		public let persona: P2P.Dapp.Response.Persona
+		public let persona: P2P.Dapp.Response.PersonaResponse
 
-		public init(persona: P2P.Dapp.Response.Persona) {
+		public init(persona: P2P.Dapp.Response.PersonaResponse) {
 			self.persona = persona
 		}
 	}
 
 	public struct AuthLoginWithChallengeRequestResponseItem: Sendable, Hashable, Encodable {
 		public let discriminator = P2P.Dapp.Request.AuthRequestItem.Discriminator.loginWithChallenge.rawValue
-		public let persona: P2P.Dapp.Response.Persona
+		public let persona: P2P.Dapp.Response.PersonaResponse
 		public let challenge: P2P.Dapp.Request.AuthChallengeNonce
 		public let proof: P2P.Dapp.Response.AuthProof
 
 		public init(
-			persona: P2P.Dapp.Response.Persona,
+			persona: P2P.Dapp.Response.PersonaResponse,
 			challenge: P2P.Dapp.Request.AuthChallengeNonce,
 			proof: P2P.Dapp.Response.AuthProof
 		) {
@@ -62,9 +62,9 @@ extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 extension P2P.Dapp.Response.WalletInteractionSuccessResponse {
 	public struct AuthUsePersonaRequestResponseItem: Sendable, Hashable, Encodable {
 		public let discriminator = P2P.Dapp.Request.AuthRequestItem.Discriminator.usePersona.rawValue
-		public let persona: P2P.Dapp.Response.Persona
+		public let persona: P2P.Dapp.Response.PersonaResponse
 
-		public init(persona: P2P.Dapp.Response.Persona) {
+		public init(persona: P2P.Dapp.Response.PersonaResponse) {
 			self.persona = persona
 		}
 	}
