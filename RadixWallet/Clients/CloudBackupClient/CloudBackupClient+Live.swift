@@ -8,25 +8,24 @@ extension CKRecord.RecordType {
 }
 
 extension CKRecord.FieldKey {
-	static let content = "Content"
+	static let content = "content"
 
-	static let snapshotVersion = "SnapshotVersion"
-	static let creatingDevice = "CreatingDevice"
-	static let lastModified = "LastModified"
-	static let totalPersonas = "TotalPersonas"
-	static let totalAccounts = "TotalAccounts"
-
-	static let lastUsedOnDevice = "LastUsedOnDevice"
+	static let snapshotVersion = "snapshotVersion"
+	static let creatingDeviceID = "creatingDeviceID"
+	static let lastUsedOnDeviceID = "lastUsedOnDeviceID"
+	static let lastModified = "lastModified"
+	static let numberOfPersonas = "numberOfPersonas"
+	static let numberOfAccounts = "numberOfAccounts"
 }
 
 extension [CKRecord.FieldKey] {
 	static let metadata: Self = [
 		.snapshotVersion,
-		.creatingDevice,
+		.creatingDeviceID,
+		.lastUsedOnDeviceID,
 		.lastModified,
-		.totalPersonas,
-		.totalAccounts,
-		.lastUsedOnDevice,
+		.numberOfPersonas,
+		.numberOfAccounts,
 	]
 }
 
@@ -64,32 +63,33 @@ extension CloudBackupClient {
 		@Sendable
 		func getMetadata(_ record: CKRecord) throws -> ProfileMetadata {
 			guard let snapshotVersion = (record[.snapshotVersion] as? UInt16).flatMap(ProfileSnapshotVersion.init(rawValue:)),
-			      let creatingDevice = (record[.creatingDevice] as? String).flatMap(UUID.init),
+			      let creatingDeviceID = (record[.creatingDeviceID] as? String).flatMap(UUID.init),
+			      let lastUsedOnDeviceID = (record[.lastUsedOnDeviceID] as? String).flatMap(UUID.init),
 			      let lastModified = record[.lastModified] as? Date,
-			      let totalPersonas = record[.totalPersonas] as? UInt16,
-			      let totalAccounts = record[.totalAccounts] as? UInt16,
-			      let lastUsedOnDevice = (record[.lastUsedOnDevice] as? String).flatMap(UUID.init)
+			      let numberOfPersonas = record[.numberOfPersonas] as? UInt16,
+			      let numberOfAccounts = record[.numberOfAccounts] as? UInt16
 			else {
 				throw MissingMetadataError()
 			}
+
 			return .init(
 				snapshotVersion: snapshotVersion,
-				creatingDevice: creatingDevice,
+				creatingDeviceID: creatingDeviceID,
+				lastUsedOnDeviceID: lastUsedOnDeviceID,
 				lastModified: lastModified,
-				totalPersonas: totalPersonas,
-				totalAccounts: totalAccounts,
-				lastUsedOnDevice: lastUsedOnDevice
+				numberOfPersonas: numberOfPersonas,
+				numberOfAccounts: numberOfAccounts
 			)
 		}
 
 		@Sendable
 		func setMetadata(_ metadata: ProfileMetadata, on record: CKRecord) {
 			record[.snapshotVersion] = metadata.snapshotVersion.rawValue
-			record[.creatingDevice] = metadata.creatingDevice.uuidString
+			record[.creatingDeviceID] = metadata.creatingDeviceID.uuidString
+			record[.lastUsedOnDeviceID] = metadata.lastUsedOnDeviceID.uuidString
 			record[.lastModified] = metadata.lastModified
-			record[.totalPersonas] = metadata.totalPersonas
-			record[.totalAccounts] = metadata.totalAccounts
-			record[.lastUsedOnDevice] = metadata.lastUsedOnDevice.uuidString
+			record[.numberOfPersonas] = metadata.numberOfPersonas
+			record[.numberOfAccounts] = metadata.numberOfAccounts
 		}
 
 		@Sendable
@@ -237,11 +237,11 @@ private extension Profile.Header {
 	var metadata: CloudBackupClient.ProfileMetadata {
 		.init(
 			snapshotVersion: snapshotVersion,
-			creatingDevice: creatingDevice.id,
+			creatingDeviceID: creatingDevice.id,
+			lastUsedOnDeviceID: lastUsedOnDevice.id,
 			lastModified: lastModified,
-			totalPersonas: contentHint.numberOfPersonasOnAllNetworksInTotal,
-			totalAccounts: contentHint.numberOfAccountsOnAllNetworksInTotal,
-			lastUsedOnDevice: lastUsedOnDevice.id
+			numberOfPersonas: contentHint.numberOfPersonasOnAllNetworksInTotal,
+			numberOfAccounts: contentHint.numberOfAccountsOnAllNetworksInTotal
 		)
 	}
 }
