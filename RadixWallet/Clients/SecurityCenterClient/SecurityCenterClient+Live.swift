@@ -85,7 +85,7 @@ extension SecurityCenterClient {
 					}
 
 					func hasProblem9() async -> (accounts: [AccountAddress], personas: [IdentityAddress])? {
-						guard let result = try? await deviceFactorSourceClient.missingMnemonicEntities(),
+						guard let result = try? await deviceFactorSourceClient.mnemonicMissingEntities(),
 						      result.accounts.count + result.personas.count > 0
 						else { return nil }
 						return result

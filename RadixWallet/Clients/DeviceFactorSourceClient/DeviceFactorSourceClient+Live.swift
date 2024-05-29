@@ -71,22 +71,16 @@ extension DeviceFactorSourceClient: DependencyKey {
 			)
 		}
 
-		let missingMnemonicEntities: @Sendable () async throws -> (accounts: [AccountAddress], personas: [IdentityAddress]) = {
+		let mnemonicMissingEntities: @Sendable () async throws -> (accounts: [AccountAddress], personas: [IdentityAddress]) = {
 			let deviceFactorSources = try await factorSourcesClient.getFactorSources(type: DeviceFactorSource.self)
 			let entities = try await deviceFactorSources.asyncMap {
 				try await entitiesControlledByFactorSource($0, nil)
 			}
+			.filter { !$0.isMnemonicPresentInKeychain }
 
-			var accounts: [AccountAddress] = []
-			var personas: [IdentityAddress] = []
-			for entity in entities {
-				if !entity.isMnemonicPresentInKeychain {
-					accounts.append(contentsOf: entity.accounts.map(\.address))
-					accounts.append(contentsOf: entity.hiddenAccounts.map(\.address))
-					personas.append(contentsOf: entity.personas.map(\.address))
-					personas.append(contentsOf: entity.hiddenPersonas.map(\.address))
-				}
-			}
+			let accounts = entities.flatMap { $0.accounts + $0.hiddenAccounts }.map(\.address)
+			let personas = entities.flatMap { $0.personas + $0.hiddenPersonas }.map(\.address)
+
 			return (accounts, personas)
 		}
 
@@ -95,16 +89,11 @@ extension DeviceFactorSourceClient: DependencyKey {
 			let entities = try await deviceFactorSources.asyncMap {
 				try await entitiesControlledByFactorSource($0, nil)
 			}
-			var accounts: [AccountAddress] = []
-			var personas: [IdentityAddress] = []
-			for entity in entities {
-				if !entity.isMnemonicMarkedAsBackedUp {
-					accounts.append(contentsOf: entity.accounts.map(\.address))
-					accounts.append(contentsOf: entity.hiddenAccounts.map(\.address))
-					personas.append(contentsOf: entity.personas.map(\.address))
-					personas.append(contentsOf: entity.hiddenPersonas.map(\.address))
-				}
-			}
+			.filter { !$0.isMnemonicMarkedAsBackedUp }
+
+			let accounts = entities.flatMap { $0.accounts + $0.hiddenAccounts }.map(\.address)
+			let personas = entities.flatMap { $0.personas + $0.hiddenPersonas }.map(\.address)
+
 			return (accounts, personas)
 		}
 
@@ -168,7 +157,7 @@ extension DeviceFactorSourceClient: DependencyKey {
 					try await entitiesControlledByFactorSource($0, maybeOverridingSnapshot)
 				})
 			},
-			missingMnemonicEntities: missingMnemonicEntities,
+			mnemonicMissingEntities: mnemonicMissingEntities,
 			unrecoverableEntities: unrecoverableEntities
 		)
 	}()

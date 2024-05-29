@@ -106,30 +106,24 @@ public struct DisplayEntitiesControlledByMnemonic: Sendable, FeatureReducer {
 
 private extension [SecurityProblem] {
 	func isMnemonicMarkedAsBackedUp(accounts: [Account]) -> Bool {
-		!contains(where: { item in
-			switch item {
+		allSatisfy { problem in
+			switch problem {
 			case let .problem3(problematicAccounts, _):
-				guard let first = accounts.first else {
-					return false
-				}
-				return problematicAccounts.contains(where: { $0.id == first.address.id })
+				Set(problematicAccounts).isDisjoint(with: accounts.map(\.address))
 			default:
-				return false
+				true
 			}
-		})
+		}
 	}
 
 	func isMnemonicPresentInKeychain(accounts: [Account]) -> Bool {
-		!contains(where: { item in
-			switch item {
+		allSatisfy { problem in
+			switch problem {
 			case let .problem9(problematicAccounts, _):
-				guard let first = accounts.first else {
-					return false
-				}
-				return problematicAccounts.contains(where: { $0.id == first.address.id })
+				Set(problematicAccounts).isDisjoint(with: accounts.map(\.address))
 			default:
-				return false
+				true
 			}
-		})
+		}
 	}
 }
